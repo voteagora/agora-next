@@ -2,51 +2,54 @@
 
 import { ProposalStage } from "@prisma/client";
 import TempCheckForm from "./stages/TempCheckForm";
-import DraftFormClient from "./stages/DraftForm/DraftFormClient";
+import DraftForm from "./stages/DraftForm";
 import SubmitForm from "./stages/SubmitForm";
 import GithubPRForm from "./stages/GithubPRForm";
 import { DraftProposal } from "../types";
-import { motion, AnimatePresence } from "framer-motion";
 
 export default function DraftProposalForm({
   stage,
   draftProposal,
   proposalTypes,
+  rightColumn,
 }: {
   stage: ProposalStage;
   draftProposal: DraftProposal;
   proposalTypes: any[];
+  rightColumn: React.ReactElement;
 }) {
   const renderStage = (stage: ProposalStage) => {
     switch (stage) {
       case ProposalStage.ADDING_TEMP_CHECK:
-        return <TempCheckForm draftProposal={draftProposal} />;
+        return (
+          <TempCheckForm
+            draftProposal={draftProposal}
+            rightColumn={rightColumn}
+          />
+        );
       case ProposalStage.DRAFTING:
         return (
-          <DraftFormClient
+          <DraftForm
             proposalTypes={proposalTypes}
             draftProposal={draftProposal}
+            rightColumn={rightColumn}
           />
         );
       case ProposalStage.ADDING_GITHUB_PR:
-        return <GithubPRForm draftProposal={draftProposal} />;
+        return (
+          <GithubPRForm
+            draftProposal={draftProposal}
+            rightColumn={rightColumn}
+          />
+        );
       case ProposalStage.AWAITING_SUBMISSION:
-        return <SubmitForm draftProposal={draftProposal} />;
+        return (
+          <SubmitForm draftProposal={draftProposal} rightColumn={rightColumn} />
+        );
       default:
         return null;
     }
   };
-  return (
-    <AnimatePresence mode="popLayout" initial={false}>
-      <motion.div
-        key={stage}
-        initial={{ x: "10%", opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: "-10%", opacity: 0 }}
-        transition={{ duration: 0.2 }}
-      >
-        {renderStage(stage)}
-      </motion.div>
-    </AnimatePresence>
-  );
+
+  return <>{renderStage(stage)}</>;
 }

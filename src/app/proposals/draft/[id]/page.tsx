@@ -2,7 +2,6 @@ import Tenant from "@/lib/tenant/tenant";
 import DraftProposalForm from "../components/DraftProposalForm";
 import BackButton from "../components/BackButton";
 import { GET_DRAFT_STAGES, getStageMetadata } from "../utils/stages";
-import ArchivedDraftProposal from "../components/ArchivedDraftProposal";
 import DeleteDraftButton from "../components/DeleteDraftButton";
 import ReactMarkdown from "react-markdown";
 import { fetchDraftProposal } from "@/app/api/common/draftProposals/getDraftProposals";
@@ -10,6 +9,16 @@ import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 import { PLMConfig } from "@/app/proposals/draft/types";
 import { getConnectedAccountFromCookies } from "@/lib/wagmi";
 
+const RightColumn = () => {
+  const { ui } = Tenant.current();
+  const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
+
+  return (
+    <ReactMarkdown className="prose-h2:text-lg prose-h2:font-bold prose-h2:text-primary prose-p:text-secondary prose-p:mt-2 prose-li:list-inside prose-li:list-disc prose-li:my-2">
+      {(proposalLifecycleToggle?.config as PLMConfig)?.copy.helperText}
+    </ReactMarkdown>
+  );
+};
 export default async function DraftProposalPage({
   params,
   searchParams,
@@ -33,7 +42,8 @@ export default async function DraftProposalPage({
 
   // implies that the proposal has been sponsored, and the sponsor view is archived
   if (!!draftProposal.sponsor_address) {
-    return <ArchivedDraftProposal draftProposal={draftProposal} />;
+    // GO TO LIVE PROPOSAL!
+    return <div>Go to live proposal</div>;
   }
 
   const DRAFT_STAGES_FOR_TENANT = GET_DRAFT_STAGES()!;

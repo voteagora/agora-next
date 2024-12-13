@@ -4,7 +4,7 @@ import { useState } from "react";
 import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { onSubmitAction as deleteAction } from "../actions/deleteDraftProposal";
-import { TrashIcon } from "@heroicons/react/20/solid";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import X from "@/assets/icons/x.svg";
 import Image from "next/image";
 
@@ -24,7 +24,6 @@ const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
       }}
     >
       <TrashIcon className="h-5 w-5" />
-      <span className="block">Delete Proposal</span>
     </button>
   );
 };

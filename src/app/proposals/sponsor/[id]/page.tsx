@@ -1,5 +1,4 @@
 import prisma from "@/app/lib/prisma";
-import ArchivedDraftProposal from "../../draft/components/ArchivedDraftProposal";
 import { DraftProposal } from "../../../proposals/draft/types";
 import SponsorActionPanel from "../components/SponsorActionPanel";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
@@ -52,7 +51,8 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
 
   // implies that the proposal has been sponsored, and the sponsor view is archived
   if (!!draftProposal.sponsor_address) {
-    return <ArchivedDraftProposal draftProposal={draftProposal} />;
+    // GO TO LIVE PROPOSAL!
+    return <div>Go to live proposal</div>;
   }
 
   return (
