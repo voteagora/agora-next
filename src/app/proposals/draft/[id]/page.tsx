@@ -1,6 +1,6 @@
 import Tenant from "@/lib/tenant/tenant";
 import DraftProposalForm from "../components/DraftProposalForm";
-import { GET_DRAFT_STAGES } from "../utils/stages";
+import { GET_DRAFT_STAGES, isPostSubmission } from "../utils/stages";
 import ReactMarkdown from "react-markdown";
 import { fetchDraftProposal } from "@/app/api/common/draftProposals/getDraftProposals";
 import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
@@ -24,7 +24,7 @@ export default async function DraftProposalPage({
   params: { id: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const { ui } = Tenant.current();
+  const { ui, slug } = Tenant.current();
   const connectedAccount = getConnectedAccountFromCookies();
   const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
   const tenantSupportsProposalLifecycle = proposalLifecycleToggle?.enabled;
@@ -34,24 +34,38 @@ export default async function DraftProposalPage({
   }
 
   const [draftProposal, proposalTypes] = await Promise.all([
-    fetchDraftProposal(parseInt(params.id)),
+    fetchDraftProposal(parseInt(params.id), slug),
     fetchProposalTypes(),
   ]);
-
-  // implies that the proposal has been sponsored, and the sponsor view is archived
-  if (!!draftProposal.sponsor_address) {
-    // GO TO LIVE PROPOSAL!
-    return <div>Go to live proposal</div>;
-  }
 
   const DRAFT_STAGES_FOR_TENANT = GET_DRAFT_STAGES()!;
   const stageParam = (searchParams?.stage || "0") as string;
   const stageIndex = parseInt(stageParam, 10);
   const stageObject = DRAFT_STAGES_FOR_TENANT[stageIndex];
 
+  if (!draftProposal) {
+    return (
+      <div className="bg-tertiary/5 rounded-lg p-4 border border-line mt-12 flex flex-col items-center justify-center text-secondary h-[calc(100vh-15rem)]">
+        <h1 className="text-primary text-2xl font-bold">Error</h1>
+        <p className="text-secondary mt-2">Submission not found.</p>
+      </div>
+    );
+  }
+
+  if (isPostSubmission(draftProposal.stage)) {
+    return (
+      <div className="bg-tertiary/5 rounded-lg p-4 border border-line mt-12 flex flex-col items-center justify-center text-secondary h-[calc(100vh-15rem)]">
+        <h1 className="text-primary text-2xl font-bold">Error</h1>
+        <p className="text-secondary mt-2">
+          This proposal has been published onchain.
+        </p>
+      </div>
+    );
+  }
+
   if (draftProposal.author_address !== connectedAccount) {
     return (
-      <div className="bg-tertiary/5 rounded-lg p-4 border border-line mt-10 flex flex-col items-center justify-center text-secondary h-[calc(100vh-15rem)]">
+      <div className="bg-tertiary/5 rounded-lg p-4 border border-line mt-12 flex flex-col items-center justify-center text-secondary h-[calc(100vh-15rem)]">
         <h1 className="text-primary text-2xl font-bold">Unauthorized</h1>
         <p className="text-secondary mt-2">
           Only the creator of this draft submission can edit.

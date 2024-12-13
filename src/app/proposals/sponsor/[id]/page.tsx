@@ -22,6 +22,7 @@ import {
 import { proposalTypeDescriptionMap } from "@/app/proposals/draft/types";
 import SponsorActionTab from "./SponsorActionTab";
 import Tenant from "@/lib/tenant/tenant";
+import { isPostSubmission } from "@/app/proposals/draft/utils/stages";
 
 const getDraftProposal = async (id: number, slug: DaoSlug) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -55,16 +56,22 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
 
   if (!draftProposal) {
     return (
-      <div className="w-full mt-6 border border-line bg-tertiary/5 rounded-lg h-[calc(100vh-200px)] flex items-center justify-center text-tertiary">
-        Submission not found.
+      <div className="bg-tertiary/5 rounded-lg p-4 border border-line mt-12 flex flex-col items-center justify-center text-secondary h-[calc(100vh-15rem)]">
+        <h1 className="text-primary text-2xl font-bold">Error</h1>
+        <p className="text-secondary mt-2">Submission not found.</p>
       </div>
     );
   }
 
-  // implies that the proposal has been sponsored, and the sponsor view is archived
-  if (!!draftProposal.sponsor_address) {
-    // GO TO LIVE PROPOSAL!
-    return <div>Go to live proposal</div>;
+  if (isPostSubmission(draftProposal.stage)) {
+    return (
+      <div className="bg-tertiary/5 rounded-lg p-4 border border-line mt-12 flex flex-col items-center justify-center text-secondary h-[calc(100vh-15rem)]">
+        <h1 className="text-primary text-2xl font-bold">Error</h1>
+        <p className="text-secondary mt-2">
+          This proposal has been published onchain.
+        </p>
+      </div>
+    );
   }
 
   return (
