@@ -14,6 +14,7 @@ import Tenant from "@/lib/tenant/tenant";
 import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
 import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
 import { PaginationParams } from "./lib/pagination";
+import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -72,7 +73,7 @@ export async function generateMetadata() {
 }
 
 async function Home() {
-  const { ui, namespace } = Tenant.current();
+  const { ui } = Tenant.current();
 
   if (!ui.toggle("proposals")) {
     return <div>Route not supported for namespace</div>;
@@ -90,6 +91,7 @@ async function Home() {
 
   return (
     <div className="flex flex-col">
+      <SubscribeDialogLauncher />
       <Hero />
       <MyDraftProposals
         fetchDraftProposals={async (address) => {
