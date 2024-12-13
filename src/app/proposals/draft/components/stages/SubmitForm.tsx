@@ -36,6 +36,8 @@ import { invalidatePath } from "../../actions/revalidatePath";
 import { ProposalStage } from "@prisma/client";
 import { isAddress } from "viem";
 import SponsorInput from "../SponsorInput";
+import SponsorActions from "../../../sponsor/components/SponsorActions";
+
 import { AnimatePresence, motion } from "framer-motion";
 enum Visibility {
   PUBLIC = "Public",
@@ -142,7 +144,7 @@ const SubmitForm = ({
   return (
     <FormProvider {...methods}>
       <form>
-        <main className="max-w-screen-xl mx-auto mt-10">
+        <main className="max-w-screen-xl mx-auto mt-12">
           <div className="flex flex-row items-center justify-between bg-neutral">
             <div className="flex flex-row items-center space-x-4">
               {stageIndex > 0 && (
@@ -151,7 +153,7 @@ const SubmitForm = ({
                   index={stageIndex}
                 />
               )}
-              <h1 className="font-semibold text-primary text-2xl m-0">
+              <h1 className="font-bold text-primary text-2xl m-0">
                 Submit for review
               </h1>
               <span className="bg-tertiary/5 text-tertiary rounded-full px-2 py-1 text-sm">
@@ -162,40 +164,7 @@ const SubmitForm = ({
             <div className="flex flex-row items-center space-x-4">
               <DeleteDraftButton proposalId={draftProposal.id} />
               {canUserSponsor && (
-                <UpdatedButton
-                  type="secondary"
-                  fullWidth={true}
-                  isSubmit={false}
-                  isLoading={isPending}
-                  className="whitespace-nowrap"
-                  onClick={async () => {
-                    if (formValid) {
-                      setIsPending(true);
-                      const res = await requestSponsorshipAction({
-                        draftProposalId: draftProposal.id,
-                        is_public: visibility === Visibility.PUBLIC,
-                        sponsors: sponsors.filter(
-                          (sponsor: { address: `0x${string}` }) =>
-                            isAddress(sponsor.address)
-                        ),
-                      });
-                      if (res.ok) {
-                        invalidatePath(draftProposal.id);
-                        router.push(`/proposals/sponsor/${draftProposal.id}`);
-                      } else {
-                        console.error(res.message);
-                      }
-                      setIsPending(false);
-                    }
-                  }}
-                >
-                  Publish onchain
-                </UpdatedButton>
-                //   <p className="text-xs text-secondary mt-2">
-                //     You meet the criteria for publishing a proposal onchain. If
-                //     you would like, you can publish it now. Or, create a draft
-                //     to create a sharable offchain proposal for early feedback.
-                //   </p>
+                <SponsorActions draftProposal={draftProposal} />
               )}
               <UpdatedButton
                 fullWidth={true}

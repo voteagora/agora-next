@@ -95,13 +95,13 @@ const GithubPRForm = ({
   const DRAFT_STAGES_FOR_TENANT = GET_DRAFT_STAGES()!;
 
   return (
-    <main className="max-w-screen-xl mx-auto mt-10">
+    <main className="max-w-screen-xl mx-auto mt-12">
       <div className="flex flex-row items-center justify-between bg-neutral">
         <div className="flex flex-row items-center space-x-4">
           {stageIndex > 0 && (
             <BackButton draftProposalId={draftProposal.id} index={stageIndex} />
           )}
-          <h1 className="font-semibold text-primary text-2xl m-0">
+          <h1 className="font-bold text-primary text-2xl m-0">
             Create Github PR
           </h1>
           <span className="bg-tertiary/5 text-tertiary rounded-full px-2 py-1 text-sm">

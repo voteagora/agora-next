@@ -10,8 +10,8 @@ import ProposalRequirements from "../../draft/components/ProposalRequirements";
 import { useCanSponsor } from "../../draft/hooks/useCanSponsor";
 import { DraftProposal } from "../../draft/types";
 import { ackSponsorshipRequest } from "../actions/rejectSponsorshipRequest";
-import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import SponsorActions from "./SponsorActions";
 
 const SponsorActionPanel = ({
   draftProposal,
@@ -95,34 +95,6 @@ const SponsorActionPanel = ({
                     <span className="text-secondary bg-tertiary/5 border border-line rounded px-1 py-0.5 text-xs lowercase first-letter:uppercase">
                       {sponsor.status}
                     </span>
-                    {/* <AnimatePresence initial={false}>
-                      {sponsor.status === "REJECTED" && (
-                        <motion.div
-                          key={`${sponsor.sponsor_address}-rejected`}
-                          className="absolute left-[-10px] w-[calc(100%+5px)] flex flex-row items-center"
-                          initial={false}
-                        >
-                          <motion.div
-                            className="h-[3px] bg-negative/50 rounded-full mr-1 flex-1"
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: 1 }}
-                            transition={{
-                              duration: 0.2,
-                              ease: [0.32, 0, 0.67, 0],
-                            }}
-                            style={{ transformOrigin: "left" }}
-                          />
-                          <motion.span
-                            className="text-negative text-xs italic"
-                            initial={{ opacity: 0, y: 4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2, duration: 0.5 }}
-                          >
-                            Declined
-                          </motion.span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence> */}
                   </div>
                 </>
               ))}
@@ -142,10 +114,7 @@ const SponsorActionPanel = ({
             </span>
           ) : canSponsor ? (
             <div className="flex flex-col gap-2 mt-6">
-              <UpdatedButton type="primary" className="w-full">
-                Sponsor proposal
-              </UpdatedButton>
-
+              <SponsorActions draftProposal={draftProposal} />
               <UpdatedButton
                 type="secondary"
                 className="w-full"
