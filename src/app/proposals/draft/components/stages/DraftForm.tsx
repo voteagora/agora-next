@@ -183,19 +183,10 @@ const DraftForm = ({
             <div className="flex flex-row items-center space-x-4">
               <DeleteDraftButton proposalId={draftProposal.id} />
               <UpdatedButton
-                type="secondary"
-                className="flex items-center justify-center whitespace-nowrap"
-                fullWidth={true}
-                // isLoading={isSkipPending}
-                // onClick={handleSubmit(onSubmitSkip)}
-              >
-                Save draft
-              </UpdatedButton>
-              <UpdatedButton
                 fullWidth={true}
                 type="primary"
                 onClick={handleSubmit(onSubmit)}
-                className="flex items-center justify-center whitespace-nowrap"
+                className="whitespace-nowrap min-w-[184px]"
                 isLoading={isPending}
               >
                 {draftProposal.title ? "Update draft" : "Create draft"}

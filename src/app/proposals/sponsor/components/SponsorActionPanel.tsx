@@ -73,7 +73,7 @@ const SponsorActionPanel = ({
 
   return (
     <div className="relative z-20">
-      <div className="border border-line rounded-lg z-20 relative bg-neutral">
+      <div className="border border-line rounded-2xl z-20 relative bg-neutral">
         {optimisticDraftProposal.approved_sponsors.length > 0 && (
           <section className="border-b border-line p-6">
             <h3 className="font-semibold text-primary">Sponsorship requests</h3>
