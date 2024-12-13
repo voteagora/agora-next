@@ -43,7 +43,10 @@ export async function createDelegateStatement({
     discord,
     email,
     scw_address: scwAddress?.toLowerCase(),
-    notification_preferences: notificationPreferences,
+    notification_preferences: {
+      last_updated: new Date().toISOString(),
+      ...notificationPreferences,
+    },
   };
 
   return prisma.delegateStatements.upsert({
