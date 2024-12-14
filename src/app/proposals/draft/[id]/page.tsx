@@ -6,15 +6,37 @@ import { fetchDraftProposal } from "@/app/api/common/draftProposals/getDraftProp
 import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 import { PLMConfig } from "@/app/proposals/draft/types";
 import { getConnectedAccountFromCookies } from "@/lib/wagmi";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 
 const RightColumn = () => {
   const { ui } = Tenant.current();
   const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
 
   return (
-    <ReactMarkdown className="prose-h2:text-lg prose-h2:font-bold prose-h2:text-primary prose-p:text-secondary prose-p:mt-2 prose-li:list-inside prose-li:list-disc prose-li:my-2">
-      {(proposalLifecycleToggle?.config as PLMConfig)?.copy.helperText}
-    </ReactMarkdown>
+    <Accordion type="single" collapsible className="">
+      {(proposalLifecycleToggle?.config as PLMConfig)?.copy.draftSteps.map(
+        (step: any, index: any) => (
+          <AccordionItem value={`item-${index + 1}`}>
+            <AccordionTrigger className="flex items-center gap-2">
+              <span className="text-primary font-bold bg-tertiary/5 rounded-full text-sm border border-line h-[30px] w-[30px] flex items-center justify-center">
+                {index + 1}
+              </span>
+              <span className="text-primary">{step.title}</span>
+            </AccordionTrigger>
+            <AccordionContent>
+              <ReactMarkdown className="prose-a:text-primary prose-a:underline">
+                {step.description}
+              </ReactMarkdown>
+            </AccordionContent>
+          </AccordionItem>
+        )
+      )}
+    </Accordion>
   );
 };
 export default async function DraftProposalPage({

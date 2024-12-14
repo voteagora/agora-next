@@ -284,11 +284,7 @@ const DraftForm = ({
                 </FormCard>
               </motion.section>
             </AnimatePresence>
-            <section className="col-span-1">
-              <div className="bg-wash border border-line rounded-2xl p-4">
-                {rightColumn}
-              </div>
-            </section>
+            <section className="col-span-1">{rightColumn}</section>
           </div>
         </main>
       </form>

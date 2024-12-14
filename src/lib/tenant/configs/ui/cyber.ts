@@ -265,24 +265,28 @@ export const cyberTenantUIConfig = new TenantUI({
           },
         ],
         copy: {
-          helperText: `
-## Proposal checklist
-**1. Select the proposal type**
-
-Proposal types set the quorum and approval thresholds for your proposal. Select the correct type for the proposal that you're making.
-
-**2. Choose your vote type**
-
-This determines if your proposal will be a simple yes/no or a multiple choice.
-
-**3. Create your proposal draft**
-
-Now that the vote and proposal type are set, you can create your proposal by giving it a title, description, and optionally a set of transactions to execute.
-
-**4. Submit your draft onchain**
-
-If you meet the proposal threshold or are the manager of the governor, then you can submit your draft onchain as a proposal. If you do not meet these requirements, you can find a sponsor for your proposal who does.
-        `.trim(),
+          draftSteps: [
+            {
+              title: "Select the proposal type",
+              description:
+                "Proposal types set the quorum and approval thresholds for your proposal. Select the correct type for the proposal that you're making.",
+            },
+            {
+              title: "Choose your vote type",
+              description:
+                "This determines if your proposal will be a simple yes/no or a multiple choice.",
+            },
+            {
+              title: "Create your proposal draft",
+              description:
+                "Now that the vote and proposal type are set, you can create your proposal by giving it a title, description, and optionally a set of transactions to execute.",
+            },
+            {
+              title: "Submit your draft onchain",
+              description:
+                "If you meet the proposal threshold or are the manager of the governor, then you can submit your draft onchain as a proposal. If you do not meet these requirements, you can find a sponsor for your proposal who does.",
+            },
+          ],
         },
         gatingType: ProposalGatingType?.GOVERNOR_V1,
       },

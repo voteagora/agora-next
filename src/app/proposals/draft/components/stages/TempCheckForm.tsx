@@ -8,7 +8,7 @@ import { UpdatedButton } from "@/components/Button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useAccount } from "wagmi";
@@ -120,57 +120,52 @@ const TempCheckForm = ({
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
-            <AnimatePresence mode="wait">
-              <motion.section
-                className="col-span-1 sm:col-span-2 order-last sm:order-first"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-              >
-                <FormCard>
-                  <FormCard.Section>
-                    <div className="w-full rounded-md h-[350px] block relative">
-                      <Image
-                        // TODO: do we want to make this something that is configurable by tenant?
-                        // Or should we have a default for all tenants?
-                        src="/images/ens_temp_check.png"
-                        alt="Digital collage of sparkles and thumbs ups promoting caputuring a temp check."
-                        fill={true}
-                        className="object-cover rounded-md"
-                      />
-                    </div>
-                    {/*
+            <motion.section
+              className="col-span-1 sm:col-span-2 order-last sm:order-first"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+            >
+              <FormCard>
+                <FormCard.Section>
+                  <div className="w-full rounded-md h-[350px] block relative">
+                    <Image
+                      // TODO: do we want to make this something that is configurable by tenant?
+                      // Or should we have a default for all tenants?
+                      src="/images/ens_temp_check.png"
+                      alt="Digital collage of sparkles and thumbs ups promoting caputuring a temp check."
+                      fill={true}
+                      className="object-cover rounded-md"
+                    />
+                  </div>
+                  {/*
             TODO: is this copy the same for everyone who wants to do a temp check?
             Should this be something you configure at the tenant level?
            */}
-                    <p className="mt-4 text-secondary">
-                      We encourage you to go to Discourse to post a temp check
-                      that helps gauge the community&apos;s interest. It&apos;s
-                      not mandatory, but helps create alignment with the voter
-                      base.
-                    </p>
-                  </FormCard.Section>
-                  <FormCard.Section>
-                    <div className="flex flex-row justify-between space-x-2">
-                      <div className="flex-grow">
-                        <TextInput
-                          label="Link"
-                          name="temp_check_link"
-                          control={control}
-                          //   TODO: still ENS branded -- make generalizable
-                          placeholder="https://discuss.ens.domains/"
-                        />
-                      </div>
+                  <p className="mt-4 text-secondary">
+                    We encourage you to go to Discourse to post a temp check
+                    that helps gauge the community&apos;s interest. It&apos;s
+                    not mandatory, but helps create alignment with the voter
+                    base.
+                  </p>
+                </FormCard.Section>
+                <FormCard.Section>
+                  <div className="flex flex-row justify-between space-x-2">
+                    <div className="flex-grow">
+                      <TextInput
+                        label="Link"
+                        name="temp_check_link"
+                        control={control}
+                        //   TODO: still ENS branded -- make generalizable
+                        placeholder="https://discuss.ens.domains/"
+                      />
                     </div>
-                  </FormCard.Section>
-                </FormCard>
-              </motion.section>
-            </AnimatePresence>
-            <section className="col-span-1">
-              <div className="bg-wash border border-line rounded-2xl p-4">
-                {rightColumn}
-              </div>
-            </section>
+                  </div>
+                </FormCard.Section>
+              </FormCard>
+            </motion.section>
+
+            <section className="col-span-1">{rightColumn}</section>
           </div>
         </main>
       </form>
