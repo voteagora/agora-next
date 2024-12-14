@@ -200,25 +200,28 @@ export const ensTenantUIConfig = new TenantUI({
           requiredTokens: 10000,
         },
         copy: {
-          helperText: `
-## Proposal checklist
-
-**1. Post a temp check on Discourse**
-
-The purpose of the Temperature Check is to determine if there is sufficient will to make changes to the status quo. To create a Temperature Check, ask a general, non-biased question to the community on discuss.ens.domains about a potential change.
-
-**2. Create a draft proposal on Github**
-
-This determines if your proposal will be a simple yes/no or a multiple choice. To create a Draft Proposal, create a new governance proposal in the governance-docs repository on GitHub. Start by copying the template for an executable proposal, social proposal, or constitutional amendment, as appropriate. Once you have written your proposal, create a Draft Pull Request for it. Start a new post in the DAO-wide -> Draft Proposals category with a link to the PR for discussion.
-
-**3. Create your proposal**
-
-Now you're ready to use this form to create your proposal. Choose whether your proposal is a Social Proposal or Executable. If your proposal is a Social Proposal, that's it! If the vote passes, the proposal is passed and you are done. If it's the latter, once the propose() function has been called, a seven day voting period is started. Ongoing discussion can take place on your proposal post. If the proposal passes successfully, a two day timelock will follow before the proposed code is executed.
-
-**4. Learn more**
-
-For a full walkthrough of the proposal process, check out the [ENS DAO docs](https://docs.ens.domains/dao/proposals/submit)
-`.trim(),
+          draftSteps: [
+            {
+              title: "Post a temp check on Discourse",
+              description:
+                "The purpose of the Temperature Check is to determine if there is sufficient will to make changes to the status quo. To create a Temperature Check, ask a general, non-biased question to the community on discuss.ens.domains about a potential change.",
+            },
+            {
+              title: "Create a draft proposal on Github",
+              description:
+                "This determines if your proposal will be a simple yes/no or a multiple choice. To create a Draft Proposal, create a new governance proposal in the governance-docs repository on GitHub. Start by copying the template for an executable proposal, social proposal, or constitutional amendment, as appropriate. Once you have written your proposal, create a Draft Pull Request for it. Start a new post in the DAO-wide -> Draft Proposals category with a link to the PR for discussion.",
+            },
+            {
+              title: "Create your proposal",
+              description:
+                "Now you're ready to use this form to create your proposal. Choose whether your proposal is a Social Proposal or Executable. If your proposal is a Social Proposal, that's it! If the vote passes, the proposal is passed and you are done. If it's the latter, once the propose() function has been called, a seven day voting period is started. Ongoing discussion can take place on your proposal post. If the proposal passes successfully, a two day timelock will follow before the proposed code is executed.",
+            },
+            {
+              title: "Learn more",
+              description:
+                "For a full walkthrough of the proposal process, check out the [ENS DAO docs.](https://docs.ens.domains/dao/proposals/submit)",
+            },
+          ],
         },
         public: false,
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
