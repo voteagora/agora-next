@@ -28,6 +28,8 @@ type AddressInputProps = {
   placeholder?: string;
   required?: boolean;
   tooltip?: string;
+  className?: string;
+  onBlur?: () => void;
 };
 
 function AddressInput<
@@ -40,6 +42,8 @@ function AddressInput<
   label,
   placeholder,
   tooltip,
+  className,
+  onBlur,
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> & AddressInputProps) {
   const { watch, setValue } = useFormContext();
   const address = watch(name);
@@ -109,10 +113,13 @@ function AddressInput<
               <input
                 {...field}
                 type="text"
-                className={`border bg-wash border-line placeholder:text-tertiary p-2 rounded-lg w-full`}
+                className={`border bg-wash border-line placeholder:text-tertiary p-2 rounded-lg w-full ${
+                  className
+                }`}
                 onBlur={() => {
                   if (!isAddress(address) && ensAddress != null) {
                     setValue(name, ensAddress as any);
+                    onBlur?.();
                   }
                 }}
                 onKeyDown={handleKeyDown}
