@@ -7,6 +7,7 @@ import AvatarAddress from "./AvatarAdress";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { useCanSponsor } from "../hooks/useCanSponsor";
 import { XMarkIcon } from "@heroicons/react/20/solid";
+import { useEffect } from "react";
 
 const SponsorInput = ({
   index,
@@ -15,7 +16,8 @@ const SponsorInput = ({
   index: number;
   remove: UseFieldArrayRemove;
 }) => {
-  const { control, watch } = useFormContext();
+  const { control, watch, setError, clearErrors, trigger } = useFormContext();
+  const existingSponsors = watch("sponsors");
   const address = watch(`sponsors.${index}.address`);
 
   const {
@@ -25,12 +27,31 @@ const SponsorInput = ({
     isSuccess,
   } = useCanSponsor(address);
 
+  const isSponsorAlreadyAdded = existingSponsors.some(
+    (existingSponsor: any, loopIndex: number) =>
+      existingSponsor.address.toLowerCase() === address.toLowerCase() &&
+      loopIndex < index
+  );
+
+  useEffect(() => {
+    if (isSponsorAlreadyAdded) {
+      // ADD ERROR MESSAGE
+      setError(`sponsors.${index}.address`, {
+        type: "custom",
+        message: "Sponsor already added",
+      });
+    } else {
+      clearErrors(`sponsors.${index}.address`);
+    }
+  }, [isSponsorAlreadyAdded, remove, index]);
+
   return (
     <>
       <AddressInput
         control={control}
         label="Sponsor address"
         name={`sponsors.${index}.address`}
+        onBlur={() => trigger()}
       />
       <div className="space-y-1">
         <label className="text-xs font-semibold text-secondary block">
@@ -38,13 +59,15 @@ const SponsorInput = ({
         </label>
         <div className="flex items-center justify-between gap-2">
           <div className="border border-line p-2 rounded-lg w-full relative h-[42px]">
-            {isAddress(address) && <AvatarAddress address={address} />}
+            {isAddress(address) && !isSponsorAlreadyAdded && (
+              <AvatarAddress address={address} />
+            )}
             <div className="absolute right-2 top-2.5 text-sm">
               {isFetching ? (
                 <LoadingSpinner className="w-5 h-5 text-tertiary" />
               ) : isError ? (
                 <span className="text-negative">Error checking status</span>
-              ) : isAddress(address) && isSuccess ? (
+              ) : isAddress(address) && isSuccess && !isSponsorAlreadyAdded ? (
                 <span
                   className={
                     canAddressSponsor ? "text-positive" : "text-negative"

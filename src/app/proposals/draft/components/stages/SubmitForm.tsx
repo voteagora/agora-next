@@ -135,7 +135,7 @@ const SubmitForm = ({
     name: "sponsors",
   });
 
-  const formValid = true;
+  const formValid = methods.formState.isValid;
   const visibility = methods.watch("visibility");
   const sponsors = methods.watch("sponsors");
 
@@ -338,7 +338,7 @@ const SubmitForm = ({
                                 onClick={() =>
                                   append({ address: "" as `0x${string}` })
                                 }
-                                className="bg-neutral text-primary col-span-2 border border-line rounded-lg p-2 font-semibold"
+                                className="bg-primary text-neutral col-span-2 border-0 rounded-lg p-2 font-semibold"
                               >
                                 Add sponsor
                               </button>
