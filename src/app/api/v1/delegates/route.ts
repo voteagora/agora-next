@@ -10,7 +10,7 @@ import {
 import { traceWithUserId } from "../apiUtils";
 
 const DEFAULT_SORT = "voting_power";
-const DEFAULT_MAX_LIMIT = 100;
+const DEFAULT_MAX_LIMIT = 1500;
 const DEFAULT_LIMIT = 20;
 const DEFAULT_OFFSET = 0;
 
