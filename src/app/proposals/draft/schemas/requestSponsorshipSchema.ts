@@ -4,16 +4,18 @@ import { DraftProposal } from "../types";
 
 export const schema = z.object({
   is_public: z.boolean(),
-  sponsors: z.array(
-    z.object({
-      address: z
-        .string()
-        .trim()
-        .refine((value) => isAddress(value), {
-          message: "Invalid address in sponsor list.",
-        }),
-    })
-  ),
+  sponsors: z
+    .array(
+      z.object({
+        address: z
+          .string()
+          .trim()
+          .refine((value) => isAddress(value), {
+            message: "Invalid address in sponsor list.",
+          }),
+      })
+    )
+    .min(1, { message: "Please add at least one sponsor." }),
 });
 
 export const parseToForm = (draftProposal: DraftProposal) => {
@@ -28,5 +30,5 @@ export const parseToForm = (draftProposal: DraftProposal) => {
 
 export const DEFAULT_FORM = {
   is_public: false,
-  sponsors: [{ address: "" }],
+  sponsors: [],
 };
