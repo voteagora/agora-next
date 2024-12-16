@@ -237,18 +237,23 @@ export const cyberTenantUIConfig = new TenantUI({
             isPreSubmission: true,
           },
           {
-            stage: PrismaProposalStage.PENDING,
+            stage: PrismaProposalStage.AWAITING_SPONSORSHIP,
             order: 2,
-            isPreSubmission: false,
+            isPreSubmission: true,
           },
           {
-            stage: PrismaProposalStage.QUEUED,
+            stage: PrismaProposalStage.PENDING,
             order: 3,
             isPreSubmission: false,
           },
           {
-            stage: PrismaProposalStage.EXECUTED,
+            stage: PrismaProposalStage.QUEUED,
             order: 4,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.EXECUTED,
+            order: 5,
             isPreSubmission: false,
           },
         ],
