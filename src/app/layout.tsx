@@ -6,7 +6,7 @@ import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import Tenant from "@/lib/tenant/tenant";
 import { inter } from "@/styles/fonts";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
 
 declare global {
   interface BigInt {
@@ -128,7 +128,8 @@ export default async function RootLayout({
         {children}
         <DAOMetricsHeader metrics={metrics} />
       </ClientLayout>
-      {ui.googleAnalytics && <GoogleAnalytics gaId={ui.googleAnalytics} />}
+      {/* {ui.googleAnalytics && <GoogleAnalytics gaId={ui.googleAnalytics} />} */}
+      {ui.googleAnalytics && <GoogleTagManager gtmId={ui.googleAnalytics} />}
     </html>
   );
 }
