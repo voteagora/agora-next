@@ -222,16 +222,19 @@ export const uniswapTenantUIConfig = new TenantUI({
       name: "sponsoredVote",
       enabled: true,
       config: {
-        domain: "Uniswap Governor Bravo",
-        version: "1",
+        domain: {
+          name: "Uniswap Governor Bravo",
+          version: "1",
+        },
       },
     },
     {
       name: "sponsoredDelegate",
       enabled: true,
       config: {
-        domain: "Uniswap",
-        version: "1",
+        domain: {
+          name: "Uniswap",
+        },
       },
     },
     {

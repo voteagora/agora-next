@@ -46,8 +46,7 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
 
     const signature = await signTypedDataAsync({
       domain: {
-        name: gasRelayConfig.domain,
-        version: gasRelayConfig.version,
+        ...gasRelayConfig.domain,
         chainId: contracts.token.chain.id,
         verifyingContract: contracts.token.address as Address,
       },

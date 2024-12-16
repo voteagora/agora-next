@@ -16,8 +16,10 @@ export type UIEndorsedConfig = {
 };
 
 export type UIGasRelayConfig = {
-  domain: string;
-  version: string;
+  domain: {
+    name: string;
+    version?: string;
+  };
 };
 
 // UI config exists to give tenant specifc config options to a UI toggle
