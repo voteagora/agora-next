@@ -223,7 +223,7 @@ export const ensTenantUIConfig = new TenantUI({
             },
           ],
         },
-        public: false,
+        public: true,
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
       },
     },

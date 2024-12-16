@@ -62,9 +62,9 @@ const AllProposalListClient = ({
             }
             element="main"
           >
-            {proposals.map((proposal) => (
+            {proposals.map((proposal, idx) => (
               <Proposal
-                key={`${proposal.id}_${proposal.status}`}
+                key={`${proposal.id}_${proposal.status}_${idx}`}
                 proposal={proposal}
                 votableSupply={votableSupply}
               />
