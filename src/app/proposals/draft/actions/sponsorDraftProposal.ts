@@ -27,7 +27,7 @@ export async function onSubmitAction(
     };
   }
 
-  const currentIndex = getStageIndexForTenant("AWAITING_SUBMISSION") as number;
+  const currentIndex = getStageIndexForTenant("AWAITING_SPONSORSHIP") as number;
 
   try {
     const nextStage = getStageByIndex(currentIndex + 1);

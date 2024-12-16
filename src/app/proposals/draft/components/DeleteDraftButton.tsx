@@ -70,7 +70,8 @@ export const DeleteDraftProposalDialog = ({
           onClick={async () => {
             setIsPending(true);
             await deleteAction(proposalId);
-            window.location.href = "/";
+            // TODO: this is a hack to refresh the page after deleting a draft proposal
+            window.location.reload();
           }}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
