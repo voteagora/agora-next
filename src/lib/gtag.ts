@@ -1,15 +1,9 @@
 import Tenant from "@/lib/tenant/tenant";
 
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void;
-  }
-}
-
 const { ui } = Tenant.current();
-export const GA_TRACKING_ID = ui?.googleAnalytics;
+export const GTM_ID = ui?.googleTagManager;
 
-type GtagEvent = {
+type DataLayerEvent = {
   action: string;
   category?: string;
   label?: string;
@@ -23,8 +17,8 @@ export const event = ({
   label,
   value,
   custom_params,
-}: GtagEvent) => {
-  console.log("Sending GA event:", {
+}: DataLayerEvent) => {
+  console.log("Pushing to dataLayer:", {
     action,
     category,
     label,
@@ -32,14 +26,16 @@ export const event = ({
     custom_params,
   });
 
-  if (!window.gtag) {
-    console.error("gtag not found");
+  if (!window.dataLayer) {
+    console.error("dataLayer not found");
     return;
   }
-  window.gtag("event", action, {
-    event_category: category,
-    event_label: label,
-    value: value,
+
+  window.dataLayer.push({
+    event: action,
+    eventCategory: category,
+    eventLabel: label,
+    eventValue: value,
     ...custom_params,
   });
 };
