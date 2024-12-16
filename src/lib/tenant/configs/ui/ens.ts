@@ -31,8 +31,6 @@ export const ensTenantUIConfig = new TenantUI({
     brandSecondary: "255 255 255",
   },
 
-
-
   organization: {
     title: "ENS Foundation",
   },
