@@ -5,7 +5,6 @@ import { useState } from "react";
 import { formatEther } from "viem";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { getBlockScanUrl } from "@/lib/utils";
-import Tenant from "@/lib/tenant/tenant";
 
 export default function ApprovedTransactions({
   proposalData,
@@ -23,11 +22,11 @@ export default function ApprovedTransactions({
     return null;
   }
 
-  const { namespace } = Tenant.current();
-
   const isNoProposedTransactions =
     proposalType === "STANDARD" &&
     proposalData.options[0].calldatas[0] === "0x";
+
+  console.log("PD", proposalData);
 
   return (
     <div className="flex flex-col gap-1 border border-line rounded-lg bg-wash py-4">
@@ -53,7 +52,7 @@ export default function ApprovedTransactions({
               <div key={i}>
                 {proposalType === "APPROVAL" && (
                   <p className="font-mono text-xs font-medium leading-4 text-tertiary">
-                    {"//"} {option.description}
+                    {"//"} {option.description.join(", ")}
                   </p>
                 )}
                 {option.values.length > 0 &&
