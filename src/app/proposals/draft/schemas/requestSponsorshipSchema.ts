@@ -2,10 +2,10 @@ import { z } from "zod";
 import { isAddress } from "viem";
 import { DraftProposal } from "../types";
 
-export const schema = z.object({
-  is_public: z.boolean(),
-  sponsors: z
-    .array(
+export const schema = z
+  .object({
+    is_public: z.boolean(),
+    sponsors: z.array(
       z.object({
         address: z
           .string()
@@ -14,9 +14,11 @@ export const schema = z.object({
             message: "Invalid address in sponsor list.",
           }),
       })
-    )
-    .min(1, { message: "Please add at least one sponsor." }),
-});
+    ),
+  })
+  .refine((data) => data.is_public || data.sponsors.length > 0, {
+    message: "Please make this proposal public or add at least one sponsor.",
+  });
 
 export const parseToForm = (draftProposal: DraftProposal) => {
   return {
