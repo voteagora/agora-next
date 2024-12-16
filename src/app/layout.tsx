@@ -129,7 +129,7 @@ export default async function RootLayout({
         <DAOMetricsHeader metrics={metrics} />
       </ClientLayout>
       {/* {ui.googleAnalytics && <GoogleAnalytics gaId={ui.googleAnalytics} />} */}
-      {ui.googleAnalytics && <GoogleTagManager gtmId={ui.googleAnalytics} />}
+      {ui.googleTagManager && <GoogleTagManager gtmId={ui.googleTagManager} />}
     </html>
   );
 }

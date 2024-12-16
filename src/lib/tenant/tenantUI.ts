@@ -83,6 +83,7 @@ type TenantUIParams = {
   assets: UIAssets;
   delegates?: UIDelegates;
   googleAnalytics?: string;
+  googleTagManager?: string;
   governanceIssues?: UIGovernanceIssue[];
   governanceStakeholders?: UIGovernanceStakeholder[];
   hideAgoraBranding?: boolean;
@@ -118,6 +119,7 @@ export class TenantUI {
   private _assets: UIAssets;
   private _delegates?: UIDelegates;
   private _googleAnalytics?: string;
+  private _googleTagManager?: string;
   private _governanceIssues?: UIGovernanceIssue[];
   private _governanceStakeholders?: UIGovernanceStakeholder[];
   private _hideAgoraBranding?: boolean;
@@ -158,6 +160,7 @@ export class TenantUI {
     delegates,
     favicon,
     googleAnalytics,
+    googleTagManager,
     governanceIssues,
     governanceStakeholders,
     hideAgoraBranding,
@@ -174,6 +177,7 @@ export class TenantUI {
     this._delegates = delegates;
     this._favicon = favicon;
     this._googleAnalytics = googleAnalytics;
+    this._googleTagManager = googleTagManager;
     this._governanceIssues = governanceIssues;
     this._governanceStakeholders = governanceStakeholders;
     this._hideAgoraBranding = hideAgoraBranding;
@@ -208,6 +212,10 @@ export class TenantUI {
 
   public get googleAnalytics(): string | undefined {
     return this._googleAnalytics;
+  }
+
+  public get googleTagManager(): string | undefined {
+    return this._googleTagManager;
   }
 
   public get title(): string {
