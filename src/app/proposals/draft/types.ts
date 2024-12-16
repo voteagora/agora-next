@@ -249,4 +249,8 @@ export const proposalTypeDescriptionMap = {
     "Social proposals are offchain proposals that are submitted to snapshot and used to gauge support for a proposal.",
   [ProposalType.BASIC]:
     "Basic proposals are onchain proposals with for/against/abstain vote types.",
+  [ProposalType.OPTIMISTIC]:
+    "Optimistic proposals are onchain proposals that are automatically passed unless 12% vote against.",
+  [ProposalType.APPROVAL]:
+    "Approval proposals are onchain proposals that are used to approve multiple options.",
 } as Record<ProposalType, string>;
