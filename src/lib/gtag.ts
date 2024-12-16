@@ -24,6 +24,18 @@ export const event = ({
   value,
   custom_params,
 }: GtagEvent) => {
+  console.log("Sending GA event:", {
+    action,
+    category,
+    label,
+    value,
+    custom_params,
+  });
+
+  if (!window.gtag) {
+    console.error("gtag not found");
+    return;
+  }
   window.gtag("event", action, {
     event_category: category,
     event_label: label,
