@@ -6,7 +6,9 @@ import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/Appr
 import {
   ProposalDraftApprovedSponsors,
   ProposalDraftComment,
+  ProposalApprovalOption,
   DaoSlug,
+  ProposalDraftTransaction,
 } from "@prisma/client";
 import MobileSponsorActionPanel from "./MobileSponsorActionPanel";
 import CommentPanel from "./CommentPanel";
@@ -23,6 +25,16 @@ import { proposalTypeDescriptionMap } from "@/app/proposals/draft/types";
 import SponsorActionTab from "./SponsorActionTab";
 import Tenant from "@/lib/tenant/tenant";
 import { isPostSubmission } from "@/app/proposals/draft/utils/stages";
+import ApprovedTransactions from "@/components/Proposals/ProposalPage/ApprovedTransactions/ApprovedTransactions";
+import { parseProposalData } from "@/lib/proposalUtils";
+
+const PreText = ({ text }: { text: string }) => {
+  return (
+    <span className="bg-[#FAFAF2] border-[#ECE3CA] text-[#B16B19] inline-block px-1 py-0.5 rounded">
+      {text}
+    </span>
+  );
+};
 
 const getDraftProposal = async (id: number, slug: DaoSlug) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
@@ -47,12 +59,35 @@ const getDraftProposal = async (id: number, slug: DaoSlug) => {
   return draftProposal as DraftProposal & {
     approved_sponsors: ProposalDraftApprovedSponsors[];
     comments: ProposalDraftComment[];
+    approval_options: (ProposalApprovalOption & {
+      transactions: ProposalDraftTransaction[];
+    })[];
   };
 };
 
 const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
   const { slug } = await Tenant.current();
   const draftProposal = await getDraftProposal(parseInt(params.id), slug);
+
+  // Really janky way to parse the approval options so we can render
+  // in "ApprovedTransactions" component. Not trivial because the indexed
+  // proposals emit a certain data format and are parsed, but our pre-indexed
+  // format is different and missing some context. This does the trick though.
+  const approvalOptions = parseProposalData(
+    JSON.stringify([
+      draftProposal.approval_options.map((option) => {
+        return [
+          option.transactions.map((t) => t.value),
+          option.transactions.map((t) => t.target),
+          option.transactions.map((t) => t.calldata),
+          option.transactions.map((t) => t.description),
+        ];
+      }),
+      //   maxApprovals, criteria, budgetToken, criteriaValue, budgetAmount
+      ["", "", "", "", ""],
+    ]),
+    "APPROVAL"
+  );
 
   if (!draftProposal) {
     return (
@@ -92,11 +127,11 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
       </div>
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-x-0 sm:gap-x-6 gap-y-4 sm:gap-y-0">
         <div className="col-span-1 sm:col-span-2">
-          <div className="border border-line rounded-2xl p-4 bg-neutral">
+          <div className="border border-line rounded-2xl p-6 bg-neutral">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="flex flex-row space-x-1 items-center mb-4">
-                  <span className="font-medium capitalize">
+                  <span className="font-semibold capitalize">
                     {draftProposal.voting_module_type} proposal
                   </span>
                   <InformationCircleIcon className="h-4 w-4 text-secondary" />
@@ -107,7 +142,7 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
                   align="start"
                 >
                   <div className="flex flex-col gap-1">
-                    <span className="font-medium capitalize">
+                    <span className="font-semibold capitalize">
                       {draftProposal.voting_module_type} proposal
                     </span>
                     <span className="text-secondary text-xs">
@@ -121,6 +156,16 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            {draftProposal.voting_module_type === ProposalType.APPROVAL && (
+              <div className="mt-2 mb-6">
+                <span className="bg-tertiary/5 text-secondary text-xs border border-line rounded-lg p-2 block font-mono">
+                  Budget: {draftProposal.budget}, Max options:{" "}
+                  {draftProposal.max_options}, Threshold:{" "}
+                  {draftProposal.threshold}, Top choices:{" "}
+                  {draftProposal.threshold}
+                </span>
+              </div>
+            )}
             {draftProposal.voting_module_type === ProposalType.BASIC && (
               <ProposalTransactionDisplay
                 descriptions={(draftProposal as BasicProposal).transactions.map(
@@ -145,7 +190,17 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
                 }}
               />
             )}
-            <p className="prose mt-6">{draftProposal.abstract}</p>
+            {draftProposal.voting_module_type === ProposalType.APPROVAL && (
+              <ApprovedTransactions
+                proposalData={approvalOptions.kind}
+                proposalType={"APPROVAL"}
+                executedTransactionHash={undefined}
+              />
+            )}
+            <span className="font-semibold capitalize mt-6 block">
+              Description
+            </span>
+            <p className="prose mt-1">{draftProposal.abstract}</p>
           </div>
 
           {/* Comments are coming in the next phase */}

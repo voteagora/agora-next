@@ -1,10 +1,10 @@
 import { ProposalType } from "@prisma/client";
-import { blocksToSeconds, getHumanBlockTime } from "./blockTimes";
+import { getHumanBlockTime } from "./blockTimes";
 import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData, keccak256 } from "viem";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
-import { Block, ethers, toUtf8Bytes } from "ethers";
+import { Block, toUtf8Bytes } from "ethers";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
