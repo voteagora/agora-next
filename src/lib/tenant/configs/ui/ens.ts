@@ -42,6 +42,10 @@ export const ensTenantUIConfig = new TenantUI({
       url: "/changelog",
     },
   ],
+
+  googleAnalytics: "G-VYC88QBHZ0",
+  googleTagManager: "GTM-57MBJGG6",
+
   pages: [
     {
       route: "/",
