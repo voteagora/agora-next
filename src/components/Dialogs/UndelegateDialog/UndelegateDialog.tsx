@@ -56,8 +56,8 @@ export function UndelegateDialog({
 
   const {
     call,
-    isFetching: isProcessingSponsoredDelegation,
-    isFetched: didProcessSponsoredDelegation,
+    isFetching: isProcessingSponsoredUnelegation,
+    isFetched: didProcessSponsoredUnelegation,
     txHash: sponsoredTxnHash,
   } = useSponsoredDelegation({
     address: accountAddress,
@@ -136,13 +136,13 @@ export function UndelegateDialog({
       );
     }
 
-    if (isProcessingDelegation || isProcessingSponsoredDelegation) {
+    if (isProcessingDelegation || isProcessingSponsoredUnelegation) {
       return (
         <Button disabled={true}>Submitting your undelegation request...</Button>
       );
     }
 
-    if (didProcessDelegation || didProcessSponsoredDelegation) {
+    if (didProcessDelegation || didProcessSponsoredUnelegation) {
       return (
         <div>
           <Button className="w-full" disabled={false}>
