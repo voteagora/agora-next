@@ -72,6 +72,8 @@ const useStandardVoting = ({
         proposal_id: String(proposalId),
         support: support,
         address: String(address),
+        eth_address: `eth_${address}`,
+        raw_proposal_id: `proposal_id_${proposalId}`,
       };
 
       if (reason) {
