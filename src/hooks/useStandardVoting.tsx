@@ -69,9 +69,9 @@ const useStandardVoting = ({
     const vote = async () => {
       const trackingData: any = {
         dao_slug: slug,
-        proposal_id: BigInt(proposalId),
+        proposal_id: String(proposalId),
         support: support,
-        address: address,
+        address: String(address),
       };
 
       if (reason) {
@@ -87,9 +87,6 @@ const useStandardVoting = ({
           track("Standard Vote", trackingData);
           gaEvent({
             action: "standard_vote",
-            category: "governance",
-            label: slug,
-            value: Number(proposalId),
             custom_params: trackingData,
           });
           await _standardVote();
