@@ -21,6 +21,7 @@ import VotesContainerWrapper, {
   VotesContainerSkeleton,
 } from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
 import { getPublicClient } from "@/lib/viem";
+import { fetchDelegateForSCW } from "@/app/api/common/delegates/getDelegateForSCW";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -92,8 +93,10 @@ export default async function Page({
   const blockNumber = await publicClient.getBlockNumber({
     cacheTime: 0,
   });
-  const [delegate, voterStats] = await Promise.all([
+
+  const [delegate, scwOwner, voterStats] = await Promise.all([
     fetchDelegate(address),
+    fetchDelegateForSCW(address),
     fetchVoterStats(address, Number(blockNumber)),
   ]);
 

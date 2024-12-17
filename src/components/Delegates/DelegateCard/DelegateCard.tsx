@@ -93,7 +93,7 @@ export default function DelegateCard({
           />
         )
       ) : null}
-      <div className="flex flex-col bg-white border border-line shadow-newDefault rounded-xl">
+      <div className="flex flex-col bg-brandPrimary border border-line shadow-newDefault rounded-xl">
         <div className="flex flex-col items-stretch p-4 border-b border-line">
           <DelegateProfileImage
             endorsed={delegate.statement?.endorsed}
@@ -104,7 +104,7 @@ export default function DelegateCard({
           />
         </div>
         {hasSCWAddress && (
-          <div className="flex flex-col items-stretch p-6 border-b border-line bg-yellow-50">
+          <div className="flex flex-col items-stretch p-6 border-b border-line bg-wash">
             <SCWProfileImage
               address={delegate.statement?.scw_address}
               copyable={true}
