@@ -42,7 +42,7 @@ function DelegationsContainer({
       fetching.current = true;
       const data = await fetchDelegators({
         offset: meta.next_offset,
-        limit: meta.total_returned,
+        limit: 10,
       });
       setDelegators(delegators.concat(data.data));
       setMeta(data.meta);
