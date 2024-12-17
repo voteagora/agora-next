@@ -23,6 +23,7 @@ import DelegationsContainerWrapper, {
 import VotesContainerWrapper, {
   VotesContainerSkeleton,
 } from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
+import { fetchDelegateForSCW } from "@/app/api/common/delegates/getDelegateForSCW";
 
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
@@ -86,8 +87,10 @@ export default async function Page({
   params: { addressOrENSName: string };
 }) {
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
-  const [delegate, totalProposals] = await Promise.all([
+
+  const [delegate, scwOwner, totalProposals] = await Promise.all([
     fetchDelegate(address),
+    fetchDelegateForSCW(address),
     fetchProposalsCount(),
   ]);
 

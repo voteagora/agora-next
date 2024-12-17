@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import ENSName from "./ENSName"; // adjust the import path as per your project structure
-import { HStack } from "@/components/Layout/Stack";
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { icons } from "@/icons/icons";
 
@@ -26,10 +25,8 @@ function CopyableHumanAddress({ address }: { address: string }) {
   }, [isInCopiedState]);
 
   return (
-    <HStack
-      alignItems="items-center"
-      className="cursor-pointer group"
-      gap={1}
+    <div
+      className="flex flex-row gap-1 items-center cursor-pointer group text-primary"
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -47,7 +44,7 @@ function CopyableHumanAddress({ address }: { address: string }) {
           className="w-4 h-4 hidden group-hover:block group-hover:opacity-90"
         />
       )}
-    </HStack>
+    </div>
   );
 }
 

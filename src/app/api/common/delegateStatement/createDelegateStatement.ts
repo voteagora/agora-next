@@ -41,7 +41,7 @@ export async function createDelegateStatement({
     warpcast,
     discord,
     email,
-    scw_address: scwAddress,
+    scw_address: scwAddress?.toLowerCase(),
   };
 
   return prisma.delegateStatements.upsert({

@@ -101,7 +101,6 @@ const dummyPaymasterAndData = (): `0x${string}` => {
 };
 
 const derivePaymasterAndData: ClientMiddlewareFn = async (uo) => {
-
   const res = await fetch("https://derive.xyz/api/paymaster", {
     method: "POST",
     headers: {
