@@ -13,6 +13,7 @@ import { getVpToDisplay } from "@/lib/voteUtils";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import useStandardVoting from "@/hooks/useStandardVoting";
 import Tenant from "@/lib/tenant/tenant";
+import { useAccount } from "wagmi";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
@@ -37,11 +38,13 @@ function BasicVoteDialog({
   delegate,
   missingVote,
 }: CastVoteDialogProps) {
+  const { address } = useAccount();
   const { write, isLoading, isSuccess, data } = useStandardVoting({
     proposalId,
     support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
     reason,
     missingVote,
+    address,
   });
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);

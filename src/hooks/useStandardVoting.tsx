@@ -13,12 +13,14 @@ const useStandardVoting = ({
   reason = "",
   params,
   missingVote,
+  address,
 }: {
   proposalId: string;
   support: number;
   reason?: string;
   params?: `0x${string}`;
   missingVote: MissingVote;
+  address?: `0x${string}`;
 }) => {
   const { contracts, slug } = Tenant.current();
 
@@ -69,6 +71,7 @@ const useStandardVoting = ({
         dao_slug: slug,
         proposal_id: BigInt(proposalId),
         support: support,
+        address: address,
       };
 
       if (reason) {
