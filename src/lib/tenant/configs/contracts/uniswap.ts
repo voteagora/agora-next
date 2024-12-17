@@ -11,6 +11,7 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
 import { AlchemyProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
+import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 
 interface Props {
   isProd: boolean;
@@ -76,7 +77,7 @@ export const uniswapTenantContractConfig = ({
       provider,
     }),
 
-    timelock: new TenantContract<IGovernorContract>({
+    timelock: new TenantContract<ITimelockContract>({
       abi: UniswapTimelock__factory.abi,
       address: TIMELOCK,
       chain,

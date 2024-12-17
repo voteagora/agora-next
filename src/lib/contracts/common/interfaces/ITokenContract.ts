@@ -19,6 +19,8 @@ export interface ITokenContract extends BaseContract {
 
   nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
 
+  name: TypedContractMethod<[], [string], "view">;
+
   // Agora governor methods
   "delegate(address)"?: TypedContractMethod<
     [delegatee: AddressLike],

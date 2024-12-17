@@ -23,4 +23,6 @@ export interface IMembershipContract extends BaseContract {
   >;
 
   nonces?: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+
+  name: TypedContractMethod<[], [string], "view">;
 }

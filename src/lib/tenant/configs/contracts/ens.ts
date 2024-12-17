@@ -9,6 +9,7 @@ import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { AlchemyProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
+import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 
 interface Props {
   isProd: boolean;
@@ -55,7 +56,7 @@ export const ensTenantContractConfig = ({
       provider,
     }),
 
-    timelock: new TenantContract<IGovernorContract>({
+    timelock: new TenantContract<ITimelockContract>({
       abi: ENSTimelock__factory.abi,
       address: TIMELOCK,
       chain: chain,

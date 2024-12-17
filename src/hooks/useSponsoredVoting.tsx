@@ -5,6 +5,7 @@ import { waitForTransactionReceipt } from "wagmi/actions";
 import { config } from "@/app/Web3Provider";
 import AgoraAPI from "@/app/lib/agoraAPI";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
+import { useGovernorName } from "@/hooks/useGovernorName";
 
 const types = {
   Ballot: [
@@ -23,7 +24,9 @@ const useSponsoredVoting = ({
   const { slug, ui, contracts } = Tenant.current();
   const { signTypedDataAsync } = useSignTypedData();
 
-  const gasRelayConfig = ui.toggle("sponsoredVote")!.config as UIGasRelayConfig;
+  const isGasRelayEnabled = ui.toggle("sponsoredDelegate")?.enabled === true;
+  const gasRelayConfig =
+    (ui.toggle("sponsoredVote")?.config as UIGasRelayConfig) || {};
 
   const [signature, setSignature] = useState<string | undefined>(undefined);
   const [error, setError] = useState<any | undefined>(undefined);
@@ -35,14 +38,23 @@ const useSponsoredVoting = ({
     string | undefined
   >(undefined);
 
+  const { data: name } = useGovernorName({
+    enabled: isGasRelayEnabled,
+  });
+
   const write = useCallback(() => {
+    if (!name) {
+      throw new Error("Unable to process voting without governor name.");
+    }
+
     const _sponsoredVote = async () => {
       // Sign the vote
       setWaitingForSignature(true);
       try {
         const signature = await signTypedDataAsync({
           domain: {
-            ...gasRelayConfig.domain,
+            ...gasRelayConfig,
+            name,
             chainId: contracts.governor.chain.id,
             verifyingContract: contracts.governor.address as `0x${string}`,
           },

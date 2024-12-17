@@ -6,6 +6,7 @@ import AgoraAPI from "@/app/lib/agoraAPI";
 import { useSignTypedData } from "wagmi";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { useState } from "react";
+import { useTokenName } from "@/hooks/useTokenName";
 
 interface Props {
   address: `0x${string}` | undefined;
@@ -29,15 +30,23 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
 
   const isGasRelayEnabled = ui.toggle("sponsoredDelegate")?.enabled === true;
-  const gasRelayConfig = ui.toggle("sponsoredDelegate")!
-    .config as UIGasRelayConfig;
+  const gasRelayConfig =
+    (ui.toggle("sponsoredDelegate")?.config as UIGasRelayConfig) || {};
 
   const { data: nonce } = useNonce({
     address: address,
     enabled: isGasRelayEnabled && !!address,
   });
 
+  const { data: name } = useTokenName({
+    enabled: isGasRelayEnabled && !!address,
+  });
+
   const call = async () => {
+    if (!nonce || !name) {
+      throw new Error("Unable to process delegation without nonce or name.");
+    }
+
     setIsFetching(true);
     setIsFetched(false);
 
@@ -46,7 +55,8 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
 
     const signature = await signTypedDataAsync({
       domain: {
-        ...gasRelayConfig.domain,
+        ...gasRelayConfig,
+        name,
         chainId: contracts.token.chain.id,
         verifyingContract: contracts.token.address as Address,
       },
