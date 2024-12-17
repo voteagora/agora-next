@@ -3,52 +3,40 @@
 .agora_markdown {
   h1 {
     font-size: $font-size-2xl;
-    color: var(--primary);
   }
 
   h2 {
     font-size: $font-size-xl;
     margin-bottom: $spacing-2;
     margin-top: $spacing-8;
-    color: var(--primary);
   }
 
   h3 {
     font-size: $font-size-lg;
     margin-bottom: $spacing-2;
     margin-top: $spacing-8;
-    color: var(--primary);
   }
 
   h4 {
     font-size: $font-size-lg;
     margin-bottom: $spacing-2;
     margin-top: $spacing-8;
-    color: var(--primary);
   }
 
   h5 {
     font-size: $font-size-lg;
     margin-bottom: $spacing-2;
     margin-top: $spacing-8;
-    color: var(--primary);
   }
 
   h6 {
     font-size: $font-size-lg;
     margin-bottom: $spacing-2;
     margin-top: $spacing-8;
-    color: var(--primary);
   }
 
   pre {
-    background-color: var(--neutral);
     border-radius: $border-radius-lg;
-    border: 1px solid var(--line);
-  }
-
-  code {
-    color: var(--secondary);
   }
 
   ul,
@@ -60,11 +48,6 @@
     padding-left: $spacing-0;
   }
 
-  li::marker,
-  ol::marker {
-    color: var(--secondary);
-  }
-
   img {
     border-radius: $border-radius-lg;
   }
@@ -73,17 +56,11 @@
     text-decoration: none;
     font-weight: inherit;
     padding-bottom: 1px;
-    border-bottom: 1px solid var(--line);
     transition: 200ms all;
-  }
-
-  a:hover {
-    border-bottom: 1px solid var(--tertiary);
   }
 
   p {
     word-break: break-word;
-    color: var(--secondary);
   }
 
   pre {

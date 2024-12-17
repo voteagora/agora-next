@@ -26,22 +26,38 @@ const CardHeader = ({
   );
 };
 
-const ActiveHeader = ({ outOfTen }: { outOfTen: string }) => {
+const ActiveHeader = ({
+  outOfTen,
+  totalProposals,
+  percentParticipation,
+}: {
+  outOfTen: string;
+  totalProposals: number;
+  percentParticipation: number;
+}) => {
   return (
     <CardHeader
       title="Active delegate"
-      cornerTitle={`🎉 ${parseInt(outOfTen) * 10}%`}
-      subtitle={`Voted in ${outOfTen}/10 of the most recent proposals`}
+      cornerTitle={`🎉 ${percentParticipation}%`}
+      subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
     />
   );
 };
 
-const InactiveHeader = ({ outOfTen }: { outOfTen: string }) => {
+const InactiveHeader = ({
+  outOfTen,
+  totalProposals,
+  percentParticipation,
+}: {
+  outOfTen: string;
+  totalProposals: number;
+  percentParticipation: number;
+}) => {
   return (
     <CardHeader
       title="Inactive delegate"
-      cornerTitle={`💤 ${parseInt(outOfTen) * 10}%`}
-      subtitle={`Voted in ${outOfTen}/10 of the most recent proposals`}
+      cornerTitle={`💤 ${percentParticipation}%`}
+      subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
     />
   );
 };
@@ -53,16 +69,26 @@ export default function DelegateCard({
   delegate: Delegate;
   totalProposals: number;
 }) {
+  const percentParticipation =
+    (parseInt(delegate.lastTenProps) / Math.min(10, totalProposals)) * 100 || 0;
   // Display SCW if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
 
   return (
-    <div className="flex flex-col sticky top-16 bg-neutral flex-shrink-0 width-[20rem]">
+    <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
       {totalProposals >= 3 ? (
-        parseInt(delegate.lastTenProps) > 5 ? (
-          <ActiveHeader outOfTen={delegate.lastTenProps} />
+        percentParticipation > 50 ? (
+          <ActiveHeader
+            outOfTen={delegate.lastTenProps}
+            totalProposals={totalProposals}
+            percentParticipation={percentParticipation}
+          />
         ) : (
-          <InactiveHeader outOfTen={delegate.lastTenProps} />
+          <InactiveHeader
+            outOfTen={delegate.lastTenProps}
+            totalProposals={totalProposals}
+            percentParticipation={percentParticipation}
+          />
         )
       ) : null}
       <div className="flex flex-col bg-white border border-line shadow-newDefault rounded-xl">

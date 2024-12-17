@@ -451,6 +451,7 @@ export function getProposalsCount({
   const condition = {
     where: {
       contract,
+      cancelled_block: null,
     },
   };
 

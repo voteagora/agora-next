@@ -18,6 +18,19 @@ export const ensTenantUIConfig = new TenantUI({
     delegate: delegateAvatar,
   },
 
+  customization: {
+    primary: "1 26 37",
+    secondary: "9 60 82",
+    tertiary: "74 92 99",
+    neutral: "255 255 255",
+    wash: "246 246 246",
+    line: "229 229 229",
+    positive: "97 209 97",
+    negative: "226 54 54",
+    brandPrimary: "206 225 232",
+    brandSecondary: "255 255 255",
+  },
+
   organization: {
     title: "ENS Foundation",
   },
