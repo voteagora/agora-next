@@ -9,11 +9,10 @@ import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api
 import Hero from "@/components/Hero/Hero";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
-import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
+import { proposalsFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
 import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
-import Image from "next/image";
 import { PaginationParams } from "./lib/pagination";
 
 // Revalidate cache every 60 seconds
@@ -73,11 +72,13 @@ export async function generateMetadata() {
 }
 
 async function Home() {
-  const { ui, namespace } = Tenant.current();
+  const { ui } = Tenant.current();
 
   if (!ui.toggle("proposals")) {
     return <div>Route not supported for namespace</div>;
   }
+
+  const plmEnabled = ui.toggle("proposal-lifecycle")?.enabled === true;
 
   const governanceCalendar = await fetchGovernanceCalendar();
   const relevalntProposals = await fetchProposals(
@@ -92,18 +93,22 @@ async function Home() {
   return (
     <div className="flex flex-col">
       <Hero />
-      <MyDraftProposals
-        fetchDraftProposals={async (address) => {
-          "use server";
-          return apiFetchDraftProposals(address);
-        }}
-      />
-      <MySponsorshipRequests
-        fetchDraftProposals={async (address) => {
-          "use server";
-          return apiFetchDraftProposalsForSponsorship(address);
-        }}
-      />
+      {plmEnabled && (
+        <>
+          <MyDraftProposals
+            fetchDraftProposals={async (address) => {
+              "use server";
+              return apiFetchDraftProposals(address);
+            }}
+          />
+          <MySponsorshipRequests
+            fetchDraftProposals={async (address) => {
+              "use server";
+              return apiFetchDraftProposalsForSponsorship(address);
+            }}
+          />
+        </>
+      )}
       <NeedsMyVoteProposalsList
         fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
         votableSupply={votableSupply}
