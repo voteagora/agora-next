@@ -21,7 +21,7 @@ const ENSName = ({ address }: { address: string | `0x${string}` }) => {
     }
   }, [data, address]);
 
-  return <span>{ensName}</span>;
+  return <span className="text-primary">{ensName}</span>;
 };
 
 export default ENSName;

@@ -35,10 +35,10 @@ export default function ProposalVotesSummary({ proposal, votes }: Props) {
         <HoverCardTrigger className="w-full cursor-pointer block">
           <div className="flex flex-col gap-2 pt-2 px-4 rounded-md font-bold shrink-0 text-xs border border-line mx-4 shadow-newDefault">
             <div className="flex flex-row justify-between mt-2">
-              <div className="gl_votes_for">
+              <div className="text-positive">
                 FOR <TokenAmountDisplay amount={results.for} />
               </div>
-              <div className="gl_votes_against">
+              <div className="text-negative">
                 AGAINST <TokenAmountDisplay amount={results.against} />
               </div>
             </div>

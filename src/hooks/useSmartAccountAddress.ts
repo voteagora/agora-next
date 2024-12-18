@@ -29,5 +29,9 @@ export const useSmartAccountAddress = ({ owner }: Props) => {
     },
   });
 
+  if (!scwConfig?.factoryAddress) {
+    return { data: undefined, isFetching: false, isFetched: false };
+  }
+
   return { data, isFetching, isFetched };
 };

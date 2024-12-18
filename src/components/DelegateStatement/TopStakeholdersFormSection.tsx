@@ -50,7 +50,7 @@ export default function TopStakeholdersFormSection({
   };
 
   return (
-    <div className="py-8 px-6 border-b border-gray-300">
+    <div className="py-8 px-6 border-b border-line text-primary">
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-baseline">
         <h3 className="font-bold">Stakeholders I represent</h3>
         <DropdownMenu>
@@ -122,7 +122,7 @@ const StakeholderInput = ({
 }: StakeholderInputProps) => {
   return (
     <div className="flex flex-row gap-4 items-center">
-      <div className="flex justify-center items-center w-12 h-12 min-w-12 bg-white rounded-md border border-gray-300 shadow-newDefault p-2">
+      <div className="flex justify-center items-center w-12 h-12 min-w-12 bg-white rounded-md border border-line shadow-newDefault p-2">
         <Image src={icons.community} alt="Stakeholders" />
       </div>
 

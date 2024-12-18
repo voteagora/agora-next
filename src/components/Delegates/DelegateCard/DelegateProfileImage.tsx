@@ -18,7 +18,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
-import { truncateAddress } from "@/app/lib/utils/text";
 
 interface Props {
   address: string;

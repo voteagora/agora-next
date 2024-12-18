@@ -110,7 +110,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
 
   if (action) {
     return (
-      <div className="flex flex-row justify-between items-center align-middle border border-line p-2 mb-6 rounded-md bg-neutral text-sm">
+      <div className="flex flex-row justify-between items-center align-middle border border-line p-2 mb-6 rounded-md bg-neutral text-sm text-primary">
         <div className="ml-4">{renderLabel()}</div>
         <div>{action}</div>
       </div>
