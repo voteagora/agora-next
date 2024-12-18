@@ -42,7 +42,7 @@ async function fetchGovernanceCalendar() {
 }
 
 export async function generateMetadata() {
-  const { ui, namespace } = Tenant.current();
+  const { ui } = Tenant.current();
 
   const page = ui.page("proposals");
   const { title, description, imageTitle, imageDescription } = page!.meta;
