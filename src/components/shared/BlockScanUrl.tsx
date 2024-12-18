@@ -14,7 +14,7 @@ export default function BlockScanUrls({
   return (
     <div className={cn("pt-4 text-xs text-secondary", className)}>
       {hash2 && hash1 ? (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center">
           <a
             href={getBlockScanUrl(hash1)}
             target="_blank"
@@ -39,7 +39,7 @@ export default function BlockScanUrls({
           href={getBlockScanUrl(hash1 || hash2 || "")}
           target="_blank"
           rel="noreferrer noopener"
-          className="flex flex-row items-center justify-between w-full hover:underline"
+          className="flex flex-row items-center w-full hover:underline"
         >
           <p>View transaction on block explorer</p>
           <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-2" />

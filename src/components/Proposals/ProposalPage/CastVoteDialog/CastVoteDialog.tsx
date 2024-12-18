@@ -21,6 +21,7 @@ export type SupportTextProps = {
 // TODO: Better rendering for users with no voting power
 export function CastVoteDialog(props: CastVoteDialogProps) {
   const { contracts } = Tenant.current();
+
   return contracts?.alligator ? (
     <AdvancedVoteDialog {...props} />
   ) : (
@@ -201,7 +202,6 @@ const VoteButton = ({
 }: {
   children: ReactNode;
   onClick?: () => void;
-  isLoading?: boolean;
 }) => {
   return (
     <Button onClick={onClick} className="w-full">
@@ -216,8 +216,8 @@ export function SuccessMessage({
 }: {
   closeDialog: () => void;
   data: {
-    standardTxHash: string | undefined;
-    advancedTxHash: string | undefined;
+    standardTxHash?: string;
+    advancedTxHash?: string;
   };
 }) {
   const { ui } = Tenant.current();

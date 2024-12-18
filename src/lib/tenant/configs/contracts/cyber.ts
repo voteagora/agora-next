@@ -10,6 +10,7 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { BaseContract, JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";
 import { createTokenContract } from "@/lib/tokenUtils";
+import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 
 interface Props {
   isProd: boolean;
@@ -92,7 +93,7 @@ export const cyberTenantConfig = ({
       provider,
     }),
 
-    timelock: new TenantContract<IGovernorContract>({
+    timelock: new TenantContract<ITimelockContract>({
       abi: AgoraTimelock__factory.abi,
       address: TIMELOCK,
       chain,

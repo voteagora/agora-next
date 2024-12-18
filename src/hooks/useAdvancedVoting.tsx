@@ -172,6 +172,7 @@ const useAdvancedVoting = ({
      * failed, probably due to a nonce error
      */
     isError: missingVote === "DIRECT" ? standardVoteError : advancedVoteError,
+    resetError: () => setAdvancedVoteError(false),
     isSuccess:
       missingVote === "DIRECT" ? standardVoteSuccess : advancedVoteSuccess,
     write,

@@ -232,6 +232,14 @@ export const uniswapTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "sponsoredVote",
+      enabled: true,
+    },
+    {
+      name: "sponsoredDelegate",
+      enabled: true,
+    },
+    {
       name: "proposal-execute",
       enabled: true,
     },
