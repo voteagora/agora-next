@@ -21,7 +21,7 @@ import VotesContainerWrapper, {
   VotesContainerSkeleton,
 } from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
 import { getPublicClient } from "@/lib/viem";
-import { fetchDelegateForSCW } from "@/app/api/common/delegates/getDelegateForSCW";
+import { SCWRedirect } from "@/app/delegates/[addressOrENSName]/components/SCWRedirect";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -94,9 +94,8 @@ export default async function Page({
     cacheTime: 0,
   });
 
-  const [delegate, scwOwner, voterStats] = await Promise.all([
+  const [delegate, voterStats] = await Promise.all([
     fetchDelegate(address),
-    fetchDelegateForSCW(address),
     fetchVoterStats(address, Number(blockNumber)),
   ]);
 
@@ -116,6 +115,7 @@ export default async function Page({
         />
       </div>
       <div className="flex flex-col sm:ml-12 min-w-0 flex-1 max-w-full gap-8">
+        <SCWRedirect address={address} />
         <Suspense fallback={<DelegateStatementSkeleton />}>
           <DelegateStatementWrapper addressOrENSName={addressOrENSName} />
         </Suspense>
