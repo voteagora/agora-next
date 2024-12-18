@@ -43,7 +43,7 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
   });
 
   const call = async () => {
-    if (!nonce || !name) {
+    if (nonce === undefined || !name) {
       throw new Error("Unable to process delegation without nonce or name.");
     }
 
