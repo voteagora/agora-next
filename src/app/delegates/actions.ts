@@ -28,8 +28,8 @@ export async function fetchDelegate(address: string) {
   return apiFetchDelegate(address);
 }
 
-export async function fetchVoterStats(address: string) {
-  return apiFetchVoterStats(address);
+export async function fetchVoterStats(address: string, blockNumber?: number) {
+  return apiFetchVoterStats(address, blockNumber);
 }
 
 export async function fetchDelegateStatement(address: string) {

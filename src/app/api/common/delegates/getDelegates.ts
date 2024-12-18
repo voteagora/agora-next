@@ -315,6 +315,10 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     ? addressOrENSName.toLowerCase()
     : await resolveENSName(addressOrENSName);
 
+  // Eventually want to deprecate voter_stats from this query
+  // we are already relying on getVoterStats below
+  // but this voter_stats view includes things like for/against/abstain
+  // so we can't totally pull it out
   const delegateQuery = prisma.$queryRawUnsafe<DelegateStats[]>(
     `
     SELECT
@@ -497,7 +501,10 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   };
 }
 
-async function getVoterStats(addressOrENSName: string): Promise<any> {
+async function getVoterStats(
+  addressOrENSName: string,
+  blockNumber?: number
+): Promise<any> {
   const { namespace, contracts } = Tenant.current();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
@@ -511,6 +518,7 @@ async function getVoterStats(addressOrENSName: string): Promise<any> {
         SELECT proposal_id
         FROM ${namespace}.proposals_v2
         WHERE contract = $2
+        AND end_block::INTEGER <= $3
         ORDER BY ordinal DESC
         LIMIT 10
     ),
@@ -536,10 +544,8 @@ async function getVoterStats(addressOrENSName: string): Promise<any> {
     `,
     address,
     contracts.governor.address.toLowerCase(),
-    contracts.governor.chain.id
+    blockNumber || 0
   );
-
-  console.log(statsQuery);
 
   return (
     statsQuery?.[0] || {
