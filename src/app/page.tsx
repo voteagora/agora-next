@@ -9,11 +9,10 @@ import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api
 import Hero from "@/components/Hero/Hero";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
-import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
+import { proposalsFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
 import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
-import Image from "next/image";
 import { PaginationParams } from "./lib/pagination";
 
 // Revalidate cache every 60 seconds
