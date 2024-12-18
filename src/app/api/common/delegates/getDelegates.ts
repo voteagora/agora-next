@@ -504,35 +504,47 @@ async function getVoterStats(addressOrENSName: string): Promise<any> {
     : await resolveENSName(addressOrENSName);
 
   const statsQuery = await prisma.$queryRawUnsafe<
-    Pick<DelegateStats, "voter" | "participation_rate" | "last_10_props">[]
+    Pick<DelegateStats, "voter" | "last_10_props">[]
   >(
     `
-        SELECT
-          voter,
-          participation_rate,
-          last_10_props,
-          COUNT(p.proposal_id) as total_proposals
-        FROM ${namespace + ".voter_stats"} v
-        LEFT JOIN ${namespace + ".proposals_v2"} p ON
-          p.contract = v.contract
-        WHERE
-          v.voter = $1
-          AND v.contract = $2
-          AND p.cancelled_block IS NULL
-        GROUP BY
-          v.voter,
-          v.participation_rate,
-          v.last_10_props
-        `,
+    WITH last_10_props AS (
+        SELECT proposal_id
+        FROM ${namespace}.proposals_v2
+        WHERE contract = $2
+        ORDER BY ordinal DESC
+        LIMIT 10
+    ),
+    total_proposals AS (
+        SELECT COUNT(*) as count
+        FROM ${namespace}.proposals_v2
+        WHERE contract = $2
+    )
+    SELECT
+        v.voter,
+        sum(COALESCE((
+            SELECT count(DISTINCT last_10_props.proposal_id) AS count
+            FROM last_10_props
+            WHERE last_10_props.proposal_id = v.proposal_id
+        ), 0::bigint)) AS last_10_props,
+        total_proposals.count AS total_proposals
+    FROM ${namespace}.votes v
+    CROSS JOIN total_proposals
+    WHERE
+        v.voter = $1
+        AND v.contract = $2
+    GROUP BY v.voter, v.contract, total_proposals.count;
+    `,
     address,
     contracts.governor.address.toLowerCase(),
     contracts.governor.chain.id
   );
 
+  console.log(statsQuery);
+
   return (
     statsQuery?.[0] || {
       voter: address,
-      participation_rate: 0,
+      total_proposals: 0,
       last_10_props: 0,
     }
   );
