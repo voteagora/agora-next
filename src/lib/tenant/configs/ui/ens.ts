@@ -101,6 +101,20 @@ export const ensTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "sponsoredVote",
+      enabled: true,
+      config: {
+        version: "1",
+      },
+    },
+    {
+      name: "sponsoredDelegate",
+      enabled: true,
+      config: {
+        version: "1",
+      },
+    },
+    {
       name: "proposal-execute",
       enabled: true,
     },

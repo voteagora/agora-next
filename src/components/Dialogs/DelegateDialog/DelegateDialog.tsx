@@ -1,8 +1,8 @@
 import {
   useAccount,
-  useWriteContract,
   useEnsName,
   useWaitForTransactionReceipt,
+  useWriteContract,
 } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/Button";
@@ -20,6 +20,7 @@ import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
+import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
 
 export function DelegateDialog({
   delegate,
@@ -42,7 +43,10 @@ export function DelegateDialog({
   const [votingPower, setVotingPower] = useState<string>("");
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
   const [isReady, setIsReady] = useState(false);
+
   const { setRefetchDelegate } = useConnectButtonContext();
+  const isGasRelayEnabled = ui.toggle("sponsoredDelegate")?.enabled === true;
+
   const sameDelegatee = delegate.address === delegatee?.delegatee;
 
   const isDisabledInTenant = ui.toggle("delegates/delegate")?.enabled === false;
@@ -57,14 +61,28 @@ export function DelegateDialog({
     address: delegatee?.delegatee as `0x${string}`,
   });
 
-  const { isError, writeContract: write, data } = useWriteContract();
+  const {
+    call,
+    isFetching: isProcessingSponsoredDelegation,
+    isFetched: didProcessSponsoredDelegation,
+    txHash: sponsoredTxnHash,
+  } = useSponsoredDelegation({
+    address: accountAddress,
+    delegate,
+  });
+
+  const {
+    isError,
+    writeContract: write,
+    data: delegateTxHash,
+  } = useWriteContract();
 
   const {
     isLoading: isProcessingDelegation,
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
   } = useWaitForTransactionReceipt({
-    hash: data,
+    hash: isGasRelayEnabled ? sponsoredTxnHash : delegateTxHash,
   });
 
   const fetchData = useCallback(async () => {
@@ -81,6 +99,19 @@ export function DelegateDialog({
       setIsReady(true);
     }
   }, [fetchBalanceForDirectDelegation, accountAddress, fetchDirectDelegatee]);
+
+  async function executeDelegate() {
+    if (isGasRelayEnabled) {
+      await call();
+    } else {
+      write({
+        address: contracts.token.address as any,
+        abi: contracts.token.abi,
+        functionName: "delegate",
+        args: [delegate.address as any],
+      });
+    }
+  }
 
   const renderActionButtons = () => {
     if (isDisabledInTenant) {
@@ -101,51 +132,30 @@ export function DelegateDialog({
 
     if (isError || didFailDelegation) {
       return (
-        <Button
-          disabled={false}
-          onClick={() =>
-            write({
-              address: contracts.token.address as any,
-              abi: contracts.token.abi,
-              functionName: "delegate",
-              args: [delegate.address as any],
-            })
-          }
-        >
+        <Button disabled={false} onClick={executeDelegate}>
           Delegation failed - try again
         </Button>
       );
     }
 
-    if (isProcessingDelegation) {
+    if (isProcessingDelegation || isProcessingSponsoredDelegation) {
       return <Button disabled={true}>Submitting your delegation...</Button>;
     }
 
-    if (didProcessDelegation) {
+    if (didProcessDelegation || didProcessSponsoredDelegation) {
       return (
         <div>
           <Button className="w-full" disabled={false}>
             Delegation completed!
           </Button>
-          <BlockScanUrls hash1={data} />
+          <BlockScanUrls
+            hash1={isGasRelayEnabled ? sponsoredTxnHash : delegateTxHash}
+          />
         </div>
       );
     }
 
-    return (
-      <ShadcnButton
-        onClick={() =>
-          write({
-            address: contracts.token.address as any,
-            abi: contracts.token.abi,
-            functionName: "delegate",
-            args: [delegate.address as any],
-          })
-        }
-      >
-        Delegate
-      </ShadcnButton>
-    );
+    return <ShadcnButton onClick={executeDelegate}>Delegate</ShadcnButton>;
   };
 
   useEffect(() => {
@@ -153,7 +163,7 @@ export function DelegateDialog({
       fetchData();
     }
 
-    if (didProcessDelegation) {
+    if (didProcessDelegation || didProcessSponsoredDelegation) {
       // Refresh delegation
       if (Number(votingPower) > 0) {
         setRefetchDelegate({
