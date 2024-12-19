@@ -19,8 +19,9 @@ import {
   isScientificNotation,
 } from "@/lib/utils";
 import { PaginatedResult } from "@/app/lib/pagination";
+import { DaoSlug } from "@prisma/client";
 
-const { token } = Tenant.current();
+const { token, slug } = Tenant.current();
 
 /**
  * Transforms an array of votes into chart data.
@@ -89,6 +90,23 @@ export default function VotingTimelineChart({
 }
 
 const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
+  let stackIds = {
+    for: "1",
+    abstain: "1",
+    against: "1",
+  };
+
+  /**
+   * This is a temporary fix for ENS.
+   * https://voteagora.atlassian.net/browse/ENG-903
+   * ENS does not count against votes in the quorum calculation.
+   * This is a temporary fix stack for + abstain, but not against.
+   * A future fix will read each tenant and stack depending on how the tenant counts quorum.
+   */
+  if (slug === DaoSlug.ENS) {
+    stackIds.against = "2";
+  }
+
   /**
    * Sorts the voting data based on the timestamp in ascending order.
    */
@@ -117,8 +135,6 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
       total: chartData[chartData.length - 1]?.total,
     },
   ];
-
-  console.log(modifiedChartData);
 
   return (
     <ResponsiveContainer width="100%" height={230}>
@@ -156,21 +172,21 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
         <Area
           type="step"
           dataKey="against"
-          stackId="1"
+          stackId={stackIds.against}
           stroke="#dc2626"
           fill="#fecaca"
         />
         <Area
           type="step"
           dataKey="abstain"
-          stackId="1"
+          stackId={stackIds.abstain}
           stroke="#57534e"
           fill="#e7e5e4"
         />
         <Area
           type="step"
           dataKey="for"
-          stackId="1"
+          stackId={stackIds.for}
           stroke="#16a34a"
           fill="#bbf7d0"
         />
