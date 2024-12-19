@@ -12,14 +12,15 @@ import { Delegate } from "@/app/api/common/delegates/delegate";
 import {
   fetchDelegate,
   submitDelegateStatement,
+  fetchVoterStats,
 } from "@/app/delegates/actions";
-import { fetchProposalsCount } from "@/app/proposals/actions";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeholdersFormSection";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
+import { useBlockNumber } from "wagmi";
 
 export default function DelegateStatementForm({
   form,
@@ -28,14 +29,13 @@ export default function DelegateStatementForm({
 }) {
   const router = useRouter();
   const { ui } = Tenant.current();
-
   const { address } = useAccount();
-
+  const { data: blockNumber } = useBlockNumber();
   const walletClient = useWalletClient();
   const messageSigner = useSignMessage();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [delegate, setDelegate] = useState<Delegate | null>(null);
-  const [totalProposals, setTotalProposals] = useState<number>(0);
+  const [voterStats, setVoterStats] = useState<any | null>(null);
 
   const { data: scwAddress } = useSmartAccountAddress({ owner: address });
 
@@ -54,12 +54,12 @@ export default function DelegateStatementForm({
   useEffect(() => {
     async function fetchData() {
       if (address) {
-        const [_delegate, _totalProposals] = await Promise.all([
+        const [_delegate, _voterStats] = await Promise.all([
           fetchDelegate(address as string),
-          fetchProposalsCount(),
+          fetchVoterStats(address as string, Number(blockNumber)),
         ]);
         setDelegate(_delegate);
-        setTotalProposals(_totalProposals);
+        setVoterStats(_voterStats);
       }
     }
 
@@ -141,7 +141,11 @@ export default function DelegateStatementForm({
     <div className="flex flex-col sm:flex-row-reverse items-center sm:items-start gap-16 justify-between mt-12 w-full max-w-full">
       {delegate && (
         <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
-          <DelegateCard delegate={delegate} totalProposals={totalProposals} />
+          <DelegateCard
+            delegate={delegate}
+            totalProposals={voterStats?.total_proposals}
+            lastTenProps={voterStats?.last_10_props}
+          />
         </div>
       )}
       <div className="flex flex-col w-full">
