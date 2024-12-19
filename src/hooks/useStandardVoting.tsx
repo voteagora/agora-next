@@ -5,6 +5,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
+import { useAccount } from "wagmi";
 
 const useStandardVoting = ({
   proposalId,
@@ -20,7 +21,7 @@ const useStandardVoting = ({
   missingVote: MissingVote;
 }) => {
   const { contracts, slug } = Tenant.current();
-
+  const { address } = useAccount();
   const { writeContractAsync: standardVote, isError: _standardVoteError } =
     useWriteContract();
 
@@ -54,6 +55,18 @@ const useStandardVoting = ({
 
         if (status === "success") {
           setStandardTxHash(directTx);
+
+          await trackEvent({
+            event_name: "Standard Vote",
+            event_data: {
+              dao_slug: slug,
+              proposal_id: BigInt(proposalId),
+              support: support,
+              reason: reason,
+              params: params,
+              voter: address,
+            },
+          });
           setStandardVoteSuccess(true);
         }
       } catch (error) {
@@ -64,26 +77,8 @@ const useStandardVoting = ({
     };
 
     const vote = async () => {
-      const trackingData: any = {
-        dao_slug: slug,
-        proposal_id: BigInt(proposalId),
-        support: support,
-      };
-
-      if (reason) {
-        trackingData.reason = reason;
-      }
-
-      if (params) {
-        trackingData.params = params;
-      }
-
       switch (missingVote) {
         case "DIRECT":
-          await trackEvent({
-            event_name: "Standard Vote",
-            event_data: trackingData,
-          });
           await _standardVote();
           break;
       }
