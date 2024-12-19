@@ -167,6 +167,16 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           interval={0}
           width={36}
           tickMargin={0}
+          domain={[
+            0,
+            (dataMax: number) => {
+              const quorumValue = proposal.quorum
+                ? +proposal.quorum.toString()
+                : 0;
+              // Add 10% padding above the higher value between dataMax and quorum
+              return Math.max(dataMax, quorumValue) * 1.1;
+            },
+          ]}
         />
 
         <Area

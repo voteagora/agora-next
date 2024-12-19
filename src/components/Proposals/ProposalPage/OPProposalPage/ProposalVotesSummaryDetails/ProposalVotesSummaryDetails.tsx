@@ -7,6 +7,7 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import { format } from "date-fns";
 import Link from "next/link";
+import { DaoSlug } from "@prisma/client";
 
 import Tenant from "@/lib/tenant/tenant";
 import { Vote } from "@/app/api/common/votes/vote";
@@ -34,7 +35,7 @@ export default function ProposalVotesSummaryDetails({
   proposal: Proposal;
   votes: Vote[];
 }) {
-  const { token } = Tenant.current();
+  const { token, slug } = Tenant.current();
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
@@ -42,8 +43,19 @@ export default function ProposalVotesSummaryDetails({
     return format(new Date(date ?? ""), "h:mma MMMM dd yyyy");
   };
 
-  const totalVotes =
+  let totalVotes =
     BigInt(results.for) + BigInt(results.abstain) + BigInt(results.against);
+
+  /**
+   * This is a temporary fix for ENS.
+   * https://voteagora.atlassian.net/browse/ENG-903
+   * ENS does not count against votes in the quorum calculation.
+   * This is a temporary fix stack for + abstain, but not against.
+   * A future fix will read each tenant and stack depending on how the tenant counts quorum.
+   */
+  if (slug === DaoSlug.ENS) {
+    totalVotes = BigInt(results.for) + BigInt(results.abstain);
+  }
 
   const voteThresholdPercent =
     Number(totalVotes) > 0
