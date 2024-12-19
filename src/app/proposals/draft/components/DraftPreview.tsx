@@ -122,7 +122,7 @@ const DraftPreview = ({
     if (votingModuleType === ProposalType.SOCIAL) {
       return (
         <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-          <p className="flex-grow">Token balance</p>
+          <p className="flex-grow">Voting power</p>
           <span className="text-secondary font-mono text-xs">
             {"> "}
             {(plmToggle?.config as PLMConfig)?.snapshotConfig?.requiredTokens}
@@ -152,7 +152,7 @@ const DraftPreview = ({
     ) {
       return (
         <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-          <p className="flex-grow">Token balance</p>
+          <p className="flex-grow">Voting power</p>
           <span className="text-secondary font-mono text-xs">
             {"> "}
             {threshold
