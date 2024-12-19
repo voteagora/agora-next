@@ -43,6 +43,9 @@ export default function ProposalVotesSummaryDetails({
     return format(new Date(date ?? ""), "h:mma MMMM dd yyyy");
   };
 
+  let quorumVotes =
+    BigInt(results.for) + BigInt(results.abstain) + BigInt(results.against);
+
   let totalVotes =
     BigInt(results.for) + BigInt(results.abstain) + BigInt(results.against);
 
@@ -54,7 +57,7 @@ export default function ProposalVotesSummaryDetails({
    * A future fix will read each tenant and stack depending on how the tenant counts quorum.
    */
   if (slug === DaoSlug.ENS) {
-    totalVotes = BigInt(results.for) + BigInt(results.abstain);
+    quorumVotes = quorumVotes - BigInt(results.against);
   }
 
   const voteThresholdPercent =
@@ -64,7 +67,7 @@ export default function ProposalVotesSummaryDetails({
   const apprThresholdPercent = Number(proposal.approvalThreshold) / 100;
 
   const hasMetQuorum = Boolean(
-    Number(totalVotes) >= Number(proposal.quorum || 0)
+    Number(quorumVotes) >= Number(proposal.quorum || 0)
   );
   const hasMetThreshold = Boolean(voteThresholdPercent >= apprThresholdPercent);
 
@@ -102,7 +105,7 @@ export default function ProposalVotesSummaryDetails({
               )}
               <p className="text-xs font-semibold text-secondary">
                 <TokenAmountDisplay
-                  amount={totalVotes}
+                  amount={quorumVotes}
                   decimals={token.decimals}
                   currency={""}
                 />{" "}
