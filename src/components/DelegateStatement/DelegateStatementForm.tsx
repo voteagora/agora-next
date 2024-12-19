@@ -85,6 +85,7 @@ export default function DelegateStatementForm({
       warpcast,
       topIssues,
       topStakeholders,
+      notificationPreferences,
     } = values;
 
     // User will only sign what they are seeing on the frontend
@@ -99,6 +100,7 @@ export default function DelegateStatementForm({
       topIssues,
       topStakeholders,
       scwAddress,
+      notificationPreferences,
     };
 
     const serializedBody = JSON.stringify(body, undefined, "\t");
