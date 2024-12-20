@@ -166,7 +166,7 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           axisLine={false}
           tickCount={6}
           interval={0}
-          width={40}
+          width={36}
           tickMargin={0}
           domain={[
             0,
