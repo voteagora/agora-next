@@ -37,6 +37,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
       TENANT_NAMESPACES.CYBER,
       TENANT_NAMESPACES.DERIVE,
       TENANT_NAMESPACES.SCROLL,
+      TENANT_NAMESPACES.OPTIMISM,
       TENANT_NAMESPACES.UNISWAP,
     ].includes(namespace as any);
 
