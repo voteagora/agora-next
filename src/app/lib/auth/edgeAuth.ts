@@ -103,12 +103,12 @@ export async function validateBearerToken(
 }
 
 /*
-  This function performs any stateless validations of the supplied scope 
+  This function performs any stateless validations of the supplied scope
   against the particular route being accessed in this request.
 
   Further validations may be performed on the server, with access to our
-  database for further authorization information. Note that this implies 
-  that a request which passes validation here may still be unauthorized 
+  database for further authorization information. Note that this implies
+  that a request which passes validation here may still be unauthorized
   if the server-side validation fails.
 
   Anything supplied to the user in the JWT payload should be validated
@@ -122,12 +122,7 @@ export async function validateScopeAgainstRoute(
   const isBadge = roles.includes(ROLE_BADGEHOLDER);
   const isDemoUser = roles.includes(ROLE_RF_DEMO_USER);
   const isPublic = roles.includes(ROLE_PUBLIC_READER);
-  if (
-    request.nextUrl.pathname.includes("ballots") ||
-    request.method === "POST" ||
-    request.method === "PUT" ||
-    request.method === "DELETE"
-  ) {
+  if (request.nextUrl.pathname.includes("ballots")) {
     return isBadge || isDemoUser;
   } else {
     return isPublic;

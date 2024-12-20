@@ -1,10 +1,10 @@
 import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useState } from "react";
 import { useWriteContract } from "wagmi";
-import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { config } from "@/app/Web3Provider";
+import { trackEvent } from "@/lib/analytics";
 
 const useStandardVoting = ({
   proposalId,
@@ -80,7 +80,10 @@ const useStandardVoting = ({
 
       switch (missingVote) {
         case "DIRECT":
-          track("Standard Vote", trackingData);
+          await trackEvent({
+            event_name: "Standard Vote",
+            event_data: trackingData,
+          });
           await _standardVote();
           break;
       }
