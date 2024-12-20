@@ -8,10 +8,14 @@ import xIcon from "@/icons/x.svg";
 import warpcastIcon from "@/icons/warpcast.svg";
 import Image from "next/image";
 import { toast } from "react-hot-toast";
+import { useGetVotes } from "@/hooks/useGetVotes";
+import { Proposal } from "@/app/api/common/proposals/proposal";
 
 export function ProposalSingleNonVoter({
   voter,
+  proposal,
 }: {
+  proposal: Proposal;
   voter: {
     delegate: string;
     direct_vp: string;
@@ -26,7 +30,10 @@ export function ProposalSingleNonVoter({
     address: voter.delegate as `0x${string}`,
   });
 
-  console.log(voter);
+  const { data: pastVotes } = useGetVotes({
+    address: voter.delegate as `0x${string}`,
+    blockNumber: BigInt(proposal.snapshotBlockNumber),
+  });
 
   return (
     <VStack
@@ -96,7 +103,7 @@ export function ProposalSingleNonVoter({
           )}
         </HStack>
         <HStack alignItems="items-center">
-          <TokenAmountDisplay amount={voter.direct_vp} />
+          <TokenAmountDisplay amount={pastVotes || "0"} />
         </HStack>
       </HStack>
     </VStack>
