@@ -33,8 +33,6 @@ const DUMB_SIGNATURE =
 const LYRA_TESTNET_BUNDLER_URL =
   "https://bundler-prod-testnet-0eakp60405.t.conduit.xyz";
 
-const PAYMASTER_SECRET = process.env.DERIVE_PAYMASTER_SECRET;
-
 const bundlerRpcMethods = new Set([
   "eth_estimateUserOperationGas",
   "eth_sendUserOperation",
@@ -103,26 +101,6 @@ const dummyPaymasterAndData = (): `0x${string}` => {
 };
 
 const derivePaymasterAndData: ClientMiddlewareFn = async (uo) => {
-  console.log(
-    JSON.stringify({
-      secret: PAYMASTER_SECRET,
-      userOp: {
-        callData: await uo.callData,
-        sender: await uo.sender,
-        nonce: toHex((await uo.nonce) as bigint),
-        initCode: "initCode" in uo ? await uo.initCode : undefined,
-        callGasLimit: toHexOrString(uo.callGasLimit),
-        verificationGasLimit: toHexOrString(uo.verificationGasLimit),
-        preVerificationGas: toHexOrString(uo.preVerificationGas),
-        maxFeePerGas: toHexOrString(uo.maxFeePerGas),
-        maxPriorityFeePerGas: toHexOrString(uo.maxPriorityFeePerGas),
-        paymasterAndData:
-          "paymasterAndData" in uo ? await uo.paymasterAndData : undefined,
-        signature: await uo.signature,
-      },
-    })
-  );
-
   const res = await fetch("https://derive.xyz/api/paymaster", {
     method: "POST",
     headers: {

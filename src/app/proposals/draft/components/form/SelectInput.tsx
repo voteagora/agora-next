@@ -68,7 +68,7 @@ function SelectInput<
             <Tooltip>
               <TooltipTrigger className="flex flex-row space-x-1">
                 <FormLabel
-                  className="text-xs font-semibold secondary"
+                  className="text-xs font-semibold text-secondary"
                   isRequired={required}
                 >
                   {label}
@@ -101,7 +101,7 @@ function SelectInput<
                       </span>
                       <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                         <ChevronUpDownIcon
-                          className="h-5 w-5 text-gray-400"
+                          className="h-5 w-5 text-secondary"
                           aria-hidden="true"
                         />
                       </span>
@@ -112,15 +112,13 @@ function SelectInput<
                       leaveFrom="opacity-100"
                       leaveTo="opacity-0"
                     >
-                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none z-50">
+                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-primary shadow-lg ring-1 ring-black/5 focus:outline-none z-50">
                         {options.map((option, idx) => (
                           <Listbox.Option
                             key={`option-${idx}`}
                             className={({ active }) =>
-                              `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                                active
-                                  ? "bg-wash text-primary"
-                                  : "text-tertiary"
+                              `relative cursor-default select-none py-2 pl-10 pr-4 bg-wash ${
+                                active ? "text-primary" : "text-tertiary"
                               }`
                             }
                             value={option.value}
@@ -135,7 +133,7 @@ function SelectInput<
                                   {option.label}
                                 </span>
                                 {selected ? (
-                                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-brandPrimary">
+                                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
                                     <CheckIcon
                                       className="h-5 w-5"
                                       aria-hidden="true"

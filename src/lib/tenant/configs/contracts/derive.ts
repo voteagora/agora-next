@@ -2,14 +2,15 @@ import {
   AgoraGovernor__factory,
   AgoraTimelock__factory,
   ERC20__factory,
+  ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { JsonRpcProvider } from "ethers";
+import { BaseContract, JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";
 import { createTokenContract } from "@/lib/tokenUtils";
-import { Chain } from "viem/chains";
+import { Chain, lyra } from "viem/chains";
 
 const LYRA_TESTNET_RPC = "https://rpc-prod-testnet-0eakp60405.t.conduit.xyz";
 
@@ -74,13 +75,18 @@ export const deriveTenantConfig = ({
   const GOVERNOR = "0x79CA2f1450Ba61Daa13a56a679E3148eEf96b1Ee";
   const APPROVAL_MODULE = "0x8dfC3B23EE4ca0b8C4af1e4EC7F72D2efbAB70E3";
   const TIMELOCK = "0x53767D56c782D0479Fa7283E2A1A38B1aaEd2DCE";
+
+  const TYPES = isProd
+    ? "0xd828b681F717E5a03C41540Bc6A31b146b5C1Ac6"
+    : "0x98Baf5c59689a3292b365ff5Fc03b475EfeC8776";
+
   const rpcURL = isProd
     ? `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
     : LYRA_TESTNET_RPC;
 
   const provider = new JsonRpcProvider(rpcURL);
   // const chain = isProd ? lyra : lyraTestnet;
-  const chain = lyraTestnet;
+  const chain = isProd ? lyra : lyraTestnet;
 
   return {
     token: createTokenContract({
@@ -92,7 +98,6 @@ export const deriveTenantConfig = ({
       type: "erc20",
     }),
 
-    // PLACEHOLDER CONTRACT
     governor: new TenantContract<IGovernorContract>({
       abi: AgoraGovernor__factory.abi,
       address: GOVERNOR,
@@ -106,6 +111,14 @@ export const deriveTenantConfig = ({
       address: TIMELOCK,
       chain,
       contract: AgoraTimelock__factory.connect(TIMELOCK, provider),
+      provider,
+    }),
+
+    proposalTypesConfigurator: new TenantContract<BaseContract>({
+      abi: ProposalTypesConfigurator__factory.abi,
+      address: TYPES,
+      chain,
+      contract: ProposalTypesConfigurator__factory.connect(TYPES, provider),
       provider,
     }),
 
