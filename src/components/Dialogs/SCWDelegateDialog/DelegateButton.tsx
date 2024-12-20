@@ -75,7 +75,6 @@ export const DelegateButton = ({ delegate, onSuccess }: Props) => {
             setRefetchDelegate({ address: delegate.address });
           })
           .catch((error) => {
-            console.log(error);
             setError(error.message);
           });
       }}
