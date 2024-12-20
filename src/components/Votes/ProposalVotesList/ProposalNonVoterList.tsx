@@ -5,12 +5,13 @@ import { PaginatedResult } from "@/app/lib/pagination";
 import { fetchVotersWhoHaveNotVotedForProposal } from "@/app/proposals/actions";
 import InfiniteScroll from "react-infinite-scroller";
 import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
+import { Proposal } from "@/app/api/common/proposals/proposal";
 
 const ProposalNonVoterList = ({
-  proposalId,
+  proposal,
   initialNonVoters,
 }: {
-  proposalId: string;
+  proposal: Proposal;
   initialNonVoters: PaginatedResult<any[]>; // TODO: add better types
 }) => {
   const fetching = useRef(false);
@@ -20,7 +21,7 @@ const ProposalNonVoterList = ({
   const loadMore = useCallback(async () => {
     if (!fetching.current && meta.has_next) {
       fetching.current = true;
-      const data = await fetchVotersWhoHaveNotVotedForProposal(proposalId, {
+      const data = await fetchVotersWhoHaveNotVotedForProposal(proposal.id, {
         limit: 20,
         offset: meta.next_offset,
       });
@@ -28,7 +29,7 @@ const ProposalNonVoterList = ({
       setMeta(data.meta);
       fetching.current = false;
     }
-  }, [proposalId, meta]);
+  }, [proposal, meta]);
 
   const voters = pages.flatMap((page) => page.data);
 
@@ -49,7 +50,7 @@ const ProposalNonVoterList = ({
         <ul className="flex flex-col gap-2">
           {voters.map((voter) => (
             <li key={voter.delegate} className="">
-              <ProposalSingleNonVoter voter={voter} />
+              <ProposalSingleNonVoter voter={voter} proposal={proposal} />
             </li>
           ))}
         </ul>
