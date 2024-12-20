@@ -57,12 +57,13 @@ const tickFormatter = (timeStr: string, index: number) => {
 const yTickFormatter = (value: any) => {
   const roundedValue = Math.round(value);
   const isSciNotation = isScientificNotation(roundedValue.toString());
+
   return formatNumber(
     isSciNotation
       ? formatNumberWithScientificNotation(roundedValue)
       : BigInt(roundedValue),
     token.decimals,
-    4
+    roundedValue > 1_000_000 ? 2 : 4
   );
 };
 

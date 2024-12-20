@@ -55,7 +55,10 @@ async function fetchCurrentDelegators(addressOrENSName) {
 
 export default async function OPProposalPage({ proposal }) {
   const votableSupply = await fetchVotableSupply();
-  const proposalVotes = await fetchProposalVotes(proposal.id);
+  const proposalVotes = await fetchProposalVotes(proposal.id, {
+    limit: 250,
+    offset: 0,
+  });
   const nonVoters = await fetchVotersWhoHaveNotVotedForProposal(proposal.id);
 
   const formattedVotableSupply = Number(
