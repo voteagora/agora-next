@@ -103,7 +103,7 @@ export function ProposalSingleNonVoter({
           )}
         </HStack>
         <HStack alignItems="items-center">
-          <TokenAmountDisplay amount={pastVotes || "0"} />
+          <TokenAmountDisplay amount={pastVotes || voter.direct_vp} />
         </HStack>
       </HStack>
     </VStack>
