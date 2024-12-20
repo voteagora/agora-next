@@ -32,7 +32,8 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
   // Only check admin for active proposals for Agora and Bravo governors.
   // This check is used to hide the entire admin bar, not just the Cancel button.
   const isCancellable =
-    (proposal.status === PROPOSAL_STATUS.ACTIVE || proposal.status === PROPOSAL_STATUS.QUEUED) &&
+    (proposal.status === PROPOSAL_STATUS.ACTIVE ||
+      proposal.status === PROPOSAL_STATUS.QUEUED) &&
     (namespace === TENANT_NAMESPACES.CYBER ||
       namespace === TENANT_NAMESPACES.SCROLL ||
       namespace === TENANT_NAMESPACES.OPTIMISM ||
@@ -167,10 +168,12 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
       return <AgoraGovExecute proposal={proposal} />;
 
     case TENANT_NAMESPACES.OPTIMISM:
-      return <div className="flex flex-row gap-2">
-                <AgoraOptimismGovCancel proposal={proposal} />
-                <AgoraOptimismGovExecute proposal={proposal} />
-             </div>;
+      return (
+        <div className="flex flex-row gap-2">
+          <AgoraOptimismGovCancel proposal={proposal} />
+          <AgoraOptimismGovExecute proposal={proposal} />
+        </div>
+      );
 
       return <AgoraOptimismGovCancel proposal={proposal} />;
 
