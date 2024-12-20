@@ -2,13 +2,12 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import {
   useReadContract,
-  useWriteContract,
   useWaitForTransactionReceipt,
+  useWriteContract,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { blocksToSeconds } from "@/lib/blockTimes";
 
 import {
   Tooltip,
@@ -26,7 +25,7 @@ export const BravoGovExecute = ({ proposal }: Props) => {
   const [canExecute, setCanExecute] = useState(false);
   const [executeTime, setExecuteTime] = useState<Date | undefined>();
 
-  const { data: executionDelayInBlocks, isFetched: executionDelayFetched } =
+  const { data: delayInSeconds, isFetched: executionDelayFetched } =
     useReadContract({
       address: contracts.timelock!.address as `0x${string}`,
       abi: contracts.timelock!.abi,
@@ -41,18 +40,13 @@ export const BravoGovExecute = ({ proposal }: Props) => {
     });
 
   useEffect(() => {
-    const delayInSeconds =
-      Number(executionDelayInBlocks?.toString()) > 0
-        ? blocksToSeconds(Number(executionDelayInBlocks))
-        : 0;
-
     let executeTimeInSeconds = 0;
 
     if (proposal.queuedTime) {
       const queuedTimeInSeconds = Math.floor(
         (proposal.queuedTime as Date).getTime() / 1000
       );
-      executeTimeInSeconds = queuedTimeInSeconds + delayInSeconds;
+      executeTimeInSeconds = queuedTimeInSeconds + Number(delayInSeconds);
       const currentTimeInSeconds = Math.floor(Date.now() / 1000);
       setCanExecute(currentTimeInSeconds >= executeTimeInSeconds);
       setExecuteTime(new Date(executeTimeInSeconds * 1000));
