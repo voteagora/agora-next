@@ -175,8 +175,6 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
         </div>
       );
 
-      return <AgoraOptimismGovCancel proposal={proposal} />;
-
     case TENANT_NAMESPACES.ENS:
       return <OZGovExecute proposal={proposal} />;
 
