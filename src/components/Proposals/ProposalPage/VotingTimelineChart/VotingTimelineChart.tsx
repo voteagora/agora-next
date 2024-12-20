@@ -57,12 +57,13 @@ const tickFormatter = (timeStr: string, index: number) => {
 const yTickFormatter = (value: any) => {
   const roundedValue = Math.round(value);
   const isSciNotation = isScientificNotation(roundedValue.toString());
+
   return formatNumber(
     isSciNotation
       ? formatNumberWithScientificNotation(roundedValue)
       : BigInt(roundedValue),
     token.decimals,
-    4
+    roundedValue > 1_000_000 ? 2 : 4
   );
 };
 
@@ -165,7 +166,7 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           axisLine={false}
           tickCount={6}
           interval={0}
-          width={36}
+          width={40}
           tickMargin={0}
           domain={[
             0,
