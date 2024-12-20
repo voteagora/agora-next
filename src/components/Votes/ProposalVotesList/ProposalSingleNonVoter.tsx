@@ -10,6 +10,8 @@ import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export function ProposalSingleNonVoter({
   voter,
@@ -24,6 +26,8 @@ export function ProposalSingleNonVoter({
     warpcast: string | null;
   };
 }) {
+  const { namespace } = Tenant.current();
+
   const { address: connectedAddress } = useAccount();
   const { data } = useEnsName({
     chainId: 1,
@@ -33,6 +37,7 @@ export function ProposalSingleNonVoter({
   const { data: pastVotes } = useGetVotes({
     address: voter.delegate as `0x${string}`,
     blockNumber: BigInt(proposal.snapshotBlockNumber),
+    enabled: namespace !== TENANT_NAMESPACES.UNISWAP,
   });
 
   return (
