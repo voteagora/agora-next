@@ -10,9 +10,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## About this repo
 
-You will find a mix of different styles at work in this repo. We are a small team and will be settling on standards in the coming months as we move more and more of the multi-tennant / instance style of Agora, into one codebase.
+You will find a mix of different styles at work in this repo. We are a small team and will be settling on standards in the coming months as we move more and more of the multi-tenant / instance style of Agora, into one codebase.
 
-### Data and data access paterns
+### Data and data access patterns
 
 The entire data model for this application is based on Postgres and Prisma. All data access should happen through the `/api` endpoints which will use Prisma to interact with the database.
 
@@ -29,7 +29,7 @@ NextJS has some peculiar data access patterns given the mix of server-side and c
 
 #### Data fetching
 
-When rendering the various components on the page on the server, it's commong that many different components need to access the same data for a single request. For example, a user's address or ENS name may need to be displayed both on a component on the page and in the page metdata.
+When rendering the various components on the page on the server, it's common that many different components need to access the same data for a single request. For example, a user's address or ENS name may need to be displayed both on a component on the page and in the page metdata.
 
 To avoid re-fetching the same data for a given request, Next.JS includes the `fetch('example.api/resource')` API, which retrieves and caches external resources ([see](https://nextjs.org/docs/app/building-your-application/data-fetching)).
 
@@ -38,7 +38,7 @@ When we're unable to use the `fetch()` (e.g. because we're accessing data via th
 As mentioned above, all data access code under `/api` should
 
 1. be wrapped in a `React.cache` invocation
-2. by default, _only_ export cache-wrapped data accesses, to prevent unintentional mutliple fetching
+2. by default, _only_ export cache-wrapped data accesses, to prevent unintentional multiple fetching
 
 See `/src/app/api/common/delegates/getDelegates.ts` for an example.
 
@@ -52,9 +52,9 @@ Ping the Discord to get access to the database.
 
 You can also explore the queries here: `https://github.com/voteagora/queries`
 
-#### Database strcuture
+#### Database structure
 
-This applicaiton uses a Postgres database with the following schemas:
+This application uses a Postgres database with the following schemas:
 
 - **center**: Admin-only access
 - **config**: Shared configuration data
@@ -93,11 +93,11 @@ If you add a new style to any of these files, you should duplicate them across a
 Use `@/components/Hero` as the reference for this section to see how clean the template file is + the corresponding styles.
 
 1. Think of a good name for your component
-2. Navigate to the component tree and see if there is already a folder that semantically matches what your new comonent will do. If not, create one.
+2. Navigate to the component tree and see if there is already a folder that semantically matches what your new component will do. If not, create one.
 3. Duplicate the name of the folder as a JS/TSX file inside it. This will be your component.
 4. Create a `<folder_name>.module.scss` file and name it with the same name as your component file. This will hold the styles.
 5. Build your component
-6. Use semantic HTML elements where appropirate and target styles using the class name
+6. Use semantic HTML elements where appropriate and target styles using the class name
 7. In your SCSS file, make sure that you import
 
 ### Global styles
