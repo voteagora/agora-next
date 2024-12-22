@@ -103,7 +103,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
 
   // For the active state, where only the admin can cancel proposals,
   // we shouldn't display the admin bar at all.
-  if ((isCancellable && !canCancel) && !PROPOSAL_STATUS.QUEUED) {
+  if (isCancellable && !canCancel && !PROPOSAL_STATUS.QUEUED) {
     return null;
   }
 
