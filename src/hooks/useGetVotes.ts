@@ -7,15 +7,17 @@ export const VOTES_QK = "proposalThreshold";
 export const useGetVotes = ({
   address,
   blockNumber,
+  enabled,
 }: {
   address: `0x${string}`;
   blockNumber: bigint;
+  enabled: boolean;
 }) => {
   const client = getPublicClient(Tenant.current().contracts.governor.chain.id);
 
   const { contracts } = Tenant.current();
   const { data, isFetching, isFetched } = useQuery({
-    enabled: !!address && !!blockNumber,
+    enabled: enabled,
     queryKey: [VOTES_QK, address, blockNumber.toString()],
     queryFn: async () => {
       const votes = (await client.readContract({

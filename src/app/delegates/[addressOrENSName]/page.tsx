@@ -2,7 +2,7 @@ import { Metadata, ResolvingMetadata } from "next";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { fetchDelegate } from "@/app/delegates/actions";
-import { fetchProposalsCount } from "@/app/api/common/proposals/getProposals";
+import { fetchVoterStats } from "@/app/api/common/delegates/getDelegates";
 import { formatNumber } from "@/lib/tokenUtils";
 import {
   processAddressOrEnsName,
@@ -20,7 +20,11 @@ import DelegationsContainerWrapper, {
 import VotesContainerWrapper, {
   VotesContainerSkeleton,
 } from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
+import { getPublicClient } from "@/lib/viem";
 import { SCWRedirect } from "@/app/delegates/[addressOrENSName]/components/SCWRedirect";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
@@ -83,11 +87,15 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
+  const { contracts } = Tenant.current();
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
-
-  const [delegate, totalProposals] = await Promise.all([
+  const publicClient = getPublicClient(contracts.governor.chain.id);
+  const blockNumber = await publicClient.getBlockNumber({
+    cacheTime: 0,
+  });
+  const [delegate, voterStats] = await Promise.all([
     fetchDelegate(address),
-    fetchProposalsCount(),
+    fetchVoterStats(address, Number(blockNumber)),
   ]);
 
   if (!delegate) {
@@ -99,7 +107,11 @@ export default async function Page({
   return (
     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
       <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
-        <DelegateCard delegate={delegate} totalProposals={totalProposals} />
+        <DelegateCard
+          delegate={delegate}
+          totalProposals={Number(voterStats.total_proposals)}
+          lastTenProps={Number(voterStats.last_10_props)}
+        />
       </div>
       <div className="flex flex-col sm:ml-12 min-w-0 flex-1 max-w-full gap-8">
         <SCWRedirect address={address} />

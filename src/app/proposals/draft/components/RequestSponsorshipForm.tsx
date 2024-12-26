@@ -40,6 +40,7 @@ const RequestSponsorshipForm = ({
   const { data: accountVotesData } = useGetVotes({
     address: address as `0x${string}`,
     blockNumber: blockNumber || BigInt(0),
+    enabled: true,
   });
 
   const canSponsor = () => {

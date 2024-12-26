@@ -65,12 +65,14 @@ const InactiveHeader = ({
 export default function DelegateCard({
   delegate,
   totalProposals,
+  lastTenProps,
 }: {
   delegate: Delegate;
   totalProposals: number;
+  lastTenProps: number;
 }) {
   const percentParticipation =
-    (parseInt(delegate.lastTenProps) / Math.min(10, totalProposals)) * 100 || 0;
+    (lastTenProps / Math.min(10, totalProposals)) * 100 || 0;
 
   // Display SCW if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
@@ -80,13 +82,13 @@ export default function DelegateCard({
       {totalProposals >= 3 ? (
         percentParticipation > 50 ? (
           <ActiveHeader
-            outOfTen={delegate.lastTenProps}
+            outOfTen={lastTenProps.toString()}
             totalProposals={totalProposals}
             percentParticipation={percentParticipation}
           />
         ) : (
           <InactiveHeader
-            outOfTen={delegate.lastTenProps}
+            outOfTen={lastTenProps.toString()}
             totalProposals={totalProposals}
             percentParticipation={percentParticipation}
           />
@@ -117,24 +119,6 @@ export default function DelegateCard({
               title="Voting power"
               detail={formatNumber(delegate.votingPower.total)}
             />
-            {/* <PanelRow
-              title="Proposals Voted"
-              detail={
-                !delegate.proposalsVotedOn
-                  ? "N/A"
-                  : `${delegate.proposalsVotedOn} (${bpsToString(
-                      delegate.votingParticipation * 100
-                    )})`
-              }
-            /> */}
-            {/* <PanelRow
-              title="Recent activity"
-              detail={
-                delegate.lastTenProps
-                  ? `${delegate.lastTenProps} of 10 last props`
-                  : "N/A"
-              }
-            /> */}
             <PanelRow
               title="Delegated addresses"
               detail={delegate.numOfDelegators.toString()}
