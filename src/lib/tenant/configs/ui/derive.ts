@@ -31,13 +31,13 @@ export const deriveTenantUIConfig = new TenantUI({
     primary: "232 231 255",
     secondary: "149 149 143",
     tertiary: "149 149 143",
-    neutral: "10 10 10",
+    neutral: "9 10 10",
     wash: "20 20 20",
     line: "38 41 41",
     positive: "19 238 154",
     negative: "246 62 88",
-    brandPrimary: "246 62 88",
-    brandSecondary: "252 165 42",
+    brandPrimary: "244 62 88",
+    brandSecondary: "251 165 42",
   },
 
   links: [
