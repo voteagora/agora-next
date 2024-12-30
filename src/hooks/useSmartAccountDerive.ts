@@ -14,14 +14,15 @@ import {
   createBundlerClient,
   createSmartAccountClientFromExisting,
   getEntryPoint,
+  PromiseOrValue,
   SmartAccountClient,
   WalletClientSigner,
-  PromiseOrValue,
 } from "@alchemy/aa-core";
 
 import { createLightAccount, LightAccount } from "@alchemy/aa-accounts";
 import { useEffect, useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
+import { fetchPaymasterData } from "@/app/api/paymaster/fetchPaymasterData";
 
 const TESTNET_ENTRY_POINT = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
 const TESTNET_FACTORY = "0x000000893A26168158fbeaDD9335Be5bC96592E2";
@@ -100,39 +101,23 @@ const dummyPaymasterAndData = (): `0x${string}` => {
   ]) as `0x${string}`;
 };
 
-const derivePaymasterAndData: ClientMiddlewareFn = async (uo) => {
-  const res = await fetch("https://derive.xyz/api/paymaster", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      secret: PAYMASTER_SECRET,
-      userOp: {
-        callData: await uo.callData,
-        sender: await uo.sender,
-        nonce: toHex((await uo.nonce) as bigint),
-        initCode: "initCode" in uo ? await uo.initCode : undefined,
-        callGasLimit: toHexOrString(uo.callGasLimit),
-        verificationGasLimit: toHexOrString(uo.verificationGasLimit),
-        preVerificationGas: toHexOrString(uo.preVerificationGas),
-        maxFeePerGas: toHexOrString(uo.maxFeePerGas),
-        maxPriorityFeePerGas: toHexOrString(uo.maxPriorityFeePerGas),
-        paymasterAndData:
-          "paymasterAndData" in uo ? await uo.paymasterAndData : undefined,
-        signature: await uo.signature,
-      },
-    }),
-    cache: "no-store",
-    mode: "no-cors",
-  });
+const paymasterAndData: ClientMiddlewareFn = async (uo) => {
+  const params = {
+    callData: await uo.callData,
+    sender: await uo.sender,
+    nonce: toHex((await uo.nonce) as bigint),
+    initCode: "initCode" in uo ? await uo.initCode : undefined,
+    callGasLimit: toHexOrString(uo.callGasLimit),
+    verificationGasLimit: toHexOrString(uo.verificationGasLimit),
+    preVerificationGas: toHexOrString(uo.preVerificationGas),
+    maxFeePerGas: toHexOrString(uo.maxFeePerGas),
+    maxPriorityFeePerGas: toHexOrString(uo.maxPriorityFeePerGas),
+    paymasterAndData:
+      "paymasterAndData" in uo ? await uo.paymasterAndData : undefined,
+    signature: await uo.signature,
+  };
 
-  if (!res.ok) {
-    throw new Error("failed to fetch paymaster data:" + (await res.text()));
-  }
-
-  const { paymasterAndData }: { paymasterAndData: `0x${string}` } =
-    await res.json();
+  const paymasterAndData = await fetchPaymasterData(params);
 
   return { ...uo, paymasterAndData };
 };
@@ -175,7 +160,7 @@ export const useLyraDeriveAccount = () => {
           account,
           paymasterAndData: {
             dummyPaymasterAndData,
-            paymasterAndData: derivePaymasterAndData,
+            paymasterAndData,
           },
         })
       );

@@ -3,10 +3,10 @@
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { Button as ShadcnButton } from "@/components/ui/button";
 import Tenant from "@/lib/tenant/tenant";
-import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { useState } from "react";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { useLyraDeriveAccount } from "@/hooks/useSmartAccountDerive";
+import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 
 interface Props {
   delegate: DelegateChunk;
