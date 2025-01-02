@@ -1,8 +1,17 @@
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 
+const startingBlockNumber = {
+  1: 17423000, // mainnet
+  11155111: 7287777, // sepolia
+  10: 17423000, // optimism
+  59144: 17423000, // scroll
+  31337: 17423000, // cyber
+};
+
 export const getVotes = async () => {
-  const { namespace } = Tenant.current();
+  const { namespace, contracts } = Tenant.current();
+  const chainId = contracts.governor.chain.id;
 
   const eventsQuery = `
     SELECT
@@ -14,10 +23,15 @@ export const getVotes = async () => {
     ORDER BY vote_count DESC;
   `;
 
+  const eventsStartedAtBlock =
+    startingBlockNumber[chainId as keyof typeof startingBlockNumber];
+
   const votesQuery = `
     SELECT v.proposal_id, COUNT(*) as vote_count, p.end_block
     FROM ${namespace}.votes v
     JOIN ${namespace}.proposals_v2 p ON v.proposal_id = p.proposal_id
+    WHERE CAST(p.start_block AS INTEGER) >= ${eventsStartedAtBlock}
+    AND p.contract = '${contracts.governor.address.toLowerCase()}'
     GROUP BY v.proposal_id, p.end_block
     ORDER BY p.end_block DESC;
   `;
@@ -29,8 +43,6 @@ export const getVotes = async () => {
     proposal_id: string;
     vote_count: number;
   }[];
-
-  // zip by proposal_id
 
   const zipped = votesByProposalId.map((vote) => {
     const event = voteEventsByProposalId.find(

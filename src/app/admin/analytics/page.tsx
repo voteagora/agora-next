@@ -12,10 +12,14 @@ const AnalyticsPage = async () => {
   const votes = await getVotes();
   return (
     <div>
-      <h1 className="text-2xl font-bold text-primary">Analytics</h1>
-      <h2 className="text-lg font-semibold text-primary mb-2 mt-4">
+      <h1 className="text-2xl font-bold text-primary mt-6">Analytics</h1>
+      <h2 className="text font-semibold text-primary mt-4">
         Vote participation
       </h2>
+      <p className="text-sm text-tertiary mb-6 mt-2">
+        This table shows the total number of votes cast on each proposal and the
+        number of votes that were cast on Agora.
+      </p>
 
       <Table>
         <TableHeader>
