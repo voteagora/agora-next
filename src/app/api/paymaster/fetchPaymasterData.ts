@@ -1,7 +1,15 @@
 "use server";
 
+import Tenant from "@/lib/tenant/tenant";
+
 export const fetchPaymasterData = async (params: any) => {
-  const response = await fetch("https://derive.xyz/api/paymaster", {
+  const { ui } = Tenant.current();
+
+  if (!ui.smartAccountConfig) {
+    throw new Error("Missing Smart Account Config");
+  }
+
+  const response = await fetch(ui.smartAccountConfig!.paymasterUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

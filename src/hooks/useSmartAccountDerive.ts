@@ -24,15 +24,9 @@ import { useEffect, useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { fetchPaymasterData } from "@/app/api/paymaster/fetchPaymasterData";
 
-const TESTNET_ENTRY_POINT = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
-const TESTNET_FACTORY = "0x000000893A26168158fbeaDD9335Be5bC96592E2";
-const TESTNET_PAYMASTER = "0x5a6499b442711feeA0Aa73C6574042EC5E2e5945";
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DUMB_SIGNATURE =
   "0xfffffffffffffffffffffffffffffff0000000000000000000000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabb1c";
-
-const LYRA_TESTNET_BUNDLER_URL =
-  "https://bundler-prod-testnet-0eakp60405.t.conduit.xyz";
 
 const bundlerRpcMethods = new Set([
   "eth_estimateUserOperationGas",
@@ -45,11 +39,11 @@ const bundlerRpcMethods = new Set([
     : null,
 ]);
 
-const { contracts } = Tenant.current();
+const { contracts, ui } = Tenant.current();
 
 export const lyraEntrypoint = getEntryPoint(contracts.token.chain, {
   version: "0.6.0",
-  addressOverride: TESTNET_ENTRY_POINT,
+  addressOverride: ui.smartAccountConfig!.entryPointAddress,
 });
 
 const combinedTransport = custom({
@@ -74,7 +68,7 @@ const lyraBundlerClient = createBundlerClient({
   cacheTime: 1000,
 });
 
-const bundlerTransport = http(LYRA_TESTNET_BUNDLER_URL);
+const bundlerTransport = http(ui.smartAccountConfig!.bundlerUrl);
 const nodeTransport = http(
   `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
 );
@@ -95,7 +89,7 @@ const dummyPaymasterAndData = (): `0x${string}` => {
   );
 
   return concat([
-    TESTNET_PAYMASTER,
+    ui.smartAccountConfig!.paymasterAddress,
     encodedPaymasterData,
     DUMB_SIGNATURE,
   ]) as `0x${string}`;
@@ -146,8 +140,8 @@ export const useLyraDeriveAccount = () => {
     chain: contracts.token.chain,
     signer,
     entryPoint: lyraEntrypoint,
-    factoryAddress: TESTNET_FACTORY,
-    version: "v1.1.0",
+    factoryAddress: ui.smartAccountConfig!.factoryAddress,
+    version: ui.smartAccountConfig!.version,
   }).then((account) => {
     setAccount(account);
   });

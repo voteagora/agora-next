@@ -7,6 +7,7 @@ import pendingImage from "@/assets/tenant/derive_pending.svg";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 
+const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
 export const deriveTenantUIConfig = new TenantUI({
   title: "Derive Agora",
   logo: deriveLogo,
@@ -49,10 +50,20 @@ export const deriveTenantUIConfig = new TenantUI({
   ],
 
   smartAccountConfig: {
-    factoryAddress: "0x000000893A26168158fbeaDD9335Be5bC96592E2",
-    version: "v2.0.0",
-    type: "LightAccount",
+    bundlerUrl: "https://bundler-prod-testnet-0eakp60405.t.conduit.xyz",
+    entryPointAddress: isProd
+      ? "0x0"
+      : "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+    factoryAddress: isProd
+      ? "0x0"
+      : "0x000000893A26168158fbeaDD9335Be5bC96592E2",
+    paymasterAddress: isProd
+      ? "0x0"
+      : "0x5a6499b442711feeA0Aa73C6574042EC5E2e5945",
+    paymasterUrl: "https://derive.xyz/api/paymaster",
     salt: BigInt(0),
+    type: "LightAccount",
+    version: "v1.0.0",
   },
 
   governanceIssues: [
