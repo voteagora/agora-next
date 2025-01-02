@@ -28,6 +28,7 @@ import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithu
 import { StakedDeposit } from "@/lib/types";
 import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
+import SubscribeDialog from "@/components/Notifications/SubscribeDialog";
 
 export type DialogType =
   | DelegateDialogType
@@ -44,7 +45,8 @@ export type DialogType =
   | UpdateDraftProposalDialog
   | SponsorSnapshotDraftProposalDialog
   | SponsorOnchainDraftProposalDialog
-  | OpenGithubPRDialog;
+  | OpenGithubPRDialog
+  | SubscribeDialog;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -194,6 +196,11 @@ export type SponsorOnchainDraftProposalDialog = {
 export type OpenGithubPRDialog = {
   type: "OPEN_GITHUB_PR";
   params: { redirectUrl: string; githubUrl: string };
+};
+
+export type SubscribeDialog = {
+  type: "SUBSCRIBE";
+  params: { type: "root" | "vote" };
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -359,6 +366,9 @@ export const dialogs: DialogDefinitions<DialogType> = {
       closeDialog={closeDialog}
     />
   ),
+  SUBSCRIBE: ({ type }, closeDialog) => {
+    return <SubscribeDialog closeDialog={closeDialog} type={type} />;
+  },
   // FAQ: () => {
   //   return <FaqDialog />;
   // },

@@ -9,12 +9,12 @@ import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api
 import Hero from "@/components/Hero/Hero";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
-import { proposalsFilterOptions, TENANT_NAMESPACES } from "@/lib/constants";
+import { proposalsFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
 import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
-import Image from "next/image";
 import { PaginationParams } from "./lib/pagination";
+import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -73,7 +73,7 @@ export async function generateMetadata() {
 }
 
 async function Home() {
-  const { ui, namespace } = Tenant.current();
+  const { ui } = Tenant.current();
 
   if (!ui.toggle("proposals")) {
     return <div>Route not supported for namespace</div>;
@@ -91,6 +91,7 @@ async function Home() {
 
   return (
     <div className="flex flex-col">
+      <SubscribeDialogLauncher />
       <Hero />
       <MyDraftProposals
         fetchDraftProposals={async (address) => {
