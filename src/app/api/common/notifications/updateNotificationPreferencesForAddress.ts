@@ -18,7 +18,7 @@ const NotificationPreferencesOptionsSchema = z.object({
 
 const UpdateNotificationPreferencesSchema = z.object({
   address: z.string().startsWith("0x"),
-  email: z.string().email(),
+  email: z.string().email().optional(),
   options: NotificationPreferencesOptionsSchema,
 });
 
