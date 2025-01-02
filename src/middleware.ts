@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
 
 const API_PREFIX = "/api/v1";
-const EXCLUDED_ROUTES_FROM_AUTH = ["/spec", "/auth/nonce", "/auth/verify"];
+const EXCLUDED_ROUTES_FROM_AUTH = ["/spec", "/auth/nonce", "/auth/verify", "/votable_supply"];
 const ROOT_PATH = process.env.NEXT_PUBLIC_AGORA_ROOT || "/";
 
 /*
