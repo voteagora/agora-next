@@ -27,12 +27,12 @@ export const getVotes = async () => {
     startingBlockNumber[chainId as keyof typeof startingBlockNumber];
 
   const votesQuery = `
-    SELECT v.proposal_id, COUNT(*) as vote_count, p.end_block
+    SELECT v.proposal_id, COUNT(*) as vote_count, p.end_block, p.description
     FROM ${namespace}.votes v
     JOIN ${namespace}.proposals_v2 p ON v.proposal_id = p.proposal_id
     WHERE CAST(p.start_block AS INTEGER) >= ${eventsStartedAtBlock}
     AND p.contract = '${contracts.governor.address.toLowerCase()}'
-    GROUP BY v.proposal_id, p.end_block
+    GROUP BY v.proposal_id, p.end_block, p.description
     ORDER BY p.end_block DESC;
   `;
 
@@ -42,6 +42,8 @@ export const getVotes = async () => {
   const votesByProposalId = (await prisma.$queryRawUnsafe(votesQuery)) as {
     proposal_id: string;
     vote_count: number;
+    end_block: number;
+    description: string;
   }[];
 
   const zipped = votesByProposalId.map((vote) => {
@@ -52,6 +54,10 @@ export const getVotes = async () => {
       proposal_id: vote.proposal_id,
       vote_count: vote.vote_count,
       event_count: event?.vote_count || 0,
+      votes_on_agora: event?.vote_count || 0,
+      votes_elsewhere:
+        Number(vote.vote_count) - (Number(event?.vote_count) || 0),
+      name: vote.description.split("\n\n")[0],
     };
   });
 
