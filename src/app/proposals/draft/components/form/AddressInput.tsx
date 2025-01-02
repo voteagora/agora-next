@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/form";
 import { useEnsAddress, useEnsName } from "wagmi";
 import { isAddress } from "viem";
-import { normalize } from "viem/ens";
 
 type AddressInputProps = {
   label: string;
