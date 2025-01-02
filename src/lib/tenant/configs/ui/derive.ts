@@ -63,7 +63,7 @@ export const deriveTenantUIConfig = new TenantUI({
     paymasterUrl: "https://derive.xyz/api/paymaster",
     salt: BigInt(0),
     type: "LightAccount",
-    version: "v1.0.0",
+    version: "v1.1.0",
   },
 
   governanceIssues: [

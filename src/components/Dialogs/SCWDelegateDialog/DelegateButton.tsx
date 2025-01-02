@@ -56,6 +56,7 @@ export const DelegateButton = ({ delegate, onSuccess }: Props) => {
 
   return (
     <ShadcnButton
+      className="bg-brandPrimary text-primary hover:bg-brandPrimary/90"
       onClick={() => {
         smartAccountClient
           .sendUserOperation({
