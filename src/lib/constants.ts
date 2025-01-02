@@ -119,3 +119,8 @@ export const retroPGFSort = {
 };
 
 export const disapprovalThreshold = 12;
+
+export const ANALYTICS_EVENTS = {
+  STANDARD_VOTE: "standard_vote",
+  DELEGATE: "delegate",
+};

@@ -25,6 +25,8 @@ import { useEthBalance } from "@/hooks/useEthBalance";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { formatEther } from "viem";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENTS } from "@/lib/constants";
 
 export function DelegateDialog({
   delegate,
@@ -41,7 +43,7 @@ export function DelegateDialog({
 }) {
   const shouldFetchData = useRef(true);
   const [isReady, setIsReady] = useState(false);
-  const { ui, contracts, token } = Tenant.current();
+  const { ui, contracts, token, slug } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const { address: accountAddress } = useAccount();
@@ -111,6 +113,19 @@ export function DelegateDialog({
       setIsReady(true);
     }
   };
+
+  useEffect(() => {
+    if (didProcessDelegation) {
+      trackEvent({
+        event_name: ANALYTICS_EVENTS.DELEGATE,
+        event_data: {
+          delegatee: delegatee?.delegatee,
+          delegator: accountAddress,
+          dao_slug: slug,
+        },
+      });
+    }
+  }, [didProcessDelegation]);
 
   async function executeDelegate() {
     if (isGasRelayLive) {
