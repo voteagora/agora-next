@@ -83,6 +83,7 @@ const SubscribeDialog = ({
             type="text"
             className="border bg-wash border-line placeholder:text-tertiary text-primary p-2 rounded-lg w-full"
             value={email}
+            placeholder="your@email.com"
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>

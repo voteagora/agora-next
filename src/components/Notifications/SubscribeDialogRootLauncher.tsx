@@ -25,7 +25,7 @@ const SubscribeDialogLauncher = () => {
   // 3. make sure delegate is marked as "prompt" (should prompt)
   useEffect(() => {
     if (
-      ui.toggle("email-subscriptions") &&
+      ui.toggle("email-subscriptions")?.enabled &&
       !hasShownRootDialog &&
       (delegate?.statement?.notification_preferences
         .wants_proposal_created_email === "prompt" ||
@@ -39,7 +39,7 @@ const SubscribeDialogLauncher = () => {
         },
       });
     }
-  }, [delegate]);
+  }, [delegate, hasShownRootDialog]);
 
   return null;
 };
