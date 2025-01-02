@@ -40,7 +40,7 @@ export const OZGovExecute = ({ proposal }: Props) => {
   });
 
   // Check whether time has passed
-  const { data: delayInBlocks, isFetched: fetchedDelay } = useReadContract({
+  const { data: delayInSeconds, isFetched: fetchedDelay } = useReadContract({
     address: contracts.timelock!.address as `0x${string}`,
     abi: contracts.timelock!.abi,
     functionName: "getMinDelay",
@@ -55,13 +55,12 @@ export const OZGovExecute = ({ proposal }: Props) => {
 
   useEffect(() => {
     if (fetchedRole && fetchedDelay) {
-      const delayInSeconds = Number(delayInBlocks);
-
       if (proposal.queuedTime) {
         const queuedTimeInSeconds = Math.floor(
           (proposal.queuedTime as Date).getTime() / 1000
         );
-        const executeTimeInSeconds = queuedTimeInSeconds + delayInSeconds;
+        const executeTimeInSeconds =
+          queuedTimeInSeconds + Number(delayInSeconds);
         const currentTimeInSeconds = Math.floor(Date.now() / 1000);
         setCanExecute(currentTimeInSeconds >= executeTimeInSeconds);
         setExecuteTime(new Date(executeTimeInSeconds * 1000));
