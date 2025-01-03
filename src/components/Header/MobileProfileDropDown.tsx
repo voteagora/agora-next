@@ -190,7 +190,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                           <Link
                             href={`/delegates/${ensName ?? address}`}
                             onClick={() => close()}
-                            className="rounded-lg border py-3 px-2 text-primary bg-neutral mt-1 flex justify-center hover:bg-wash"
+                            className="rounded-lg border py-3 px-2 text-primary bg-brandPrimary hover:bg-brandPrimary/90 mt-1 flex justify-center"
                           >
                             View my profile
                           </Link>

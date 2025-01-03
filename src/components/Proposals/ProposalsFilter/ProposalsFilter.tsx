@@ -25,9 +25,9 @@ export default function ProposalsFilter() {
   }, [router, selected, isRecentFilter]);
 
   return (
-    <div className="relative">
+    <div className="relative text-primary">
       <Listbox value={selected} onChange={setSelected}>
-        <Listbox.Button className="w-full sm:w-fit bg-wash text-base font-medium border-none rounded-full py-2 px-4 flex items-center">
+        <Listbox.Button className="text-primary w-full sm:w-fit bg-neutral font-medium border-wash rounded-full py-2 px-4 flex items-center">
           {selected === proposalsFilterOptions.relevant.filter
             ? proposalsFilterOptions.relevant.value
             : proposalsFilterOptions.everything.value}

@@ -79,7 +79,7 @@ const DraftPreview = ({
     switch (proposal.voting_module_type) {
       case ProposalType.BASIC:
         return (
-          <p className="text-agora-stone-700 mt-2">
+          <p className="text-secondary mt-2">
             This is a <PreText text="basic" /> proposal.
           </p>
         );
@@ -137,8 +137,8 @@ const DraftPreview = ({
       gatingType === ProposalGatingType.GOVERNOR_V1
     ) {
       return (
-        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-          <p className="flex-grow">Manager address</p>
+        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+          <p className="flex-grow text-primary">Manager address</p>
           <span className="text-secondary font-mono text-xs">
             {manager?.toString()}
           </span>
@@ -174,7 +174,7 @@ const DraftPreview = ({
   return (
     <FormCard>
       <FormCard.Section>
-        <h2 className="font-black text-agora-stone-900 text-2xl">
+        <h2 className="font-black text-primary text-2xl">
           {proposalDraft.title}
         </h2>
         {renderProposalDescription(proposalDraft)}
@@ -235,11 +235,11 @@ const DraftPreview = ({
           </div>
         )}
 
-        <h3 className="font-semibold mt-6">Description</h3>
-        <div className="mt-2 p-4 bg-wash border border-line rounded-lg">
+        <h3 className="text-primary font-semibold mt-6">Description</h3>
+        <div className="mt-2 p-4 bg-wash border border-line rounded-lg text-primary">
           <MarkdownPreview
             source={proposalDraft.abstract}
-            className={`h-full py-3 px-4 rounded-t-lg max-w-full bg-transparent prose`}
+            className={`h-full text-primary py-3 px-4 rounded-t-lg max-w-full bg-transparent prose`}
             style={{
               backgroundColor: "transparent",
             }}
@@ -263,7 +263,7 @@ const DraftPreview = ({
               the meantime, you can contact your sponsor by copying the link
               below.
             </p>
-            <div className="bg-agora-stone-50 border border-agora-stone-100 rounded-lg p-2 relative mt-6">
+            <div className="bg-agora-stone-50 border border-line rounded-lg p-2 relative mt-6">
               <div className="flex flex-row items-center space-x-2">
                 <AvatarAddress
                   address={proposalDraft.sponsor_address as `0x${string}`}
@@ -274,7 +274,7 @@ const DraftPreview = ({
               </div>
               <button
                 type="button"
-                className="absolute right-[-1px] top-[-1px] rounded-lg box-border border bg-white border-agora-stone-100 p-2"
+                className="absolute right-[-1px] top-[-1px] rounded-lg box-border border bg-white border-line p-2"
                 onClick={() => {
                   navigator.clipboard.writeText(
                     `${window.location.origin}/proposals/sponsor/${proposalDraft.id}`
@@ -288,9 +288,9 @@ const DraftPreview = ({
           </>
         ) : (
           <>
-            <h3 className="font-semibold">Requirements</h3>
+            <h3 className="font-semibold text-primary">Requirements</h3>
             {!canAddressSponsor && (
-              <p className="text-agora-stone-700 mt-2">
+              <p className="text-secondary mt-2">
                 You do not meet the requirement to submit this proposal.
                 However, you can ask someone who does to help you by sharing
                 this link with them.

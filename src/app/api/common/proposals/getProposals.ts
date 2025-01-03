@@ -106,12 +106,10 @@ async function getProposalTypes() {
     return [];
   }
 
-  const results = await findProposalType({
+  return await findProposalType({
     namespace,
     contract: contracts.proposalTypesConfigurator.address,
   });
-
-  return results;
 }
 
 async function getDraftProposals(address: `0x${string}`) {

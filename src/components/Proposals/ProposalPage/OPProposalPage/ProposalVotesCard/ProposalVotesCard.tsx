@@ -44,7 +44,7 @@ const ProposalVotesCard = ({
           </div>
         </button>
         <div className="flex flex-col gap-4">
-          <div className="font-semibold px-4">Proposal votes</div>
+          <div className="font-semibold px-4 text-primary">Proposal votes</div>
           <ProposalVotesSummary
             votes={proposalVotes.data}
             proposal={proposal}

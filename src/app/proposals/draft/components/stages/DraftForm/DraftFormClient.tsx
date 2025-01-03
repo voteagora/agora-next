@@ -102,6 +102,7 @@ const DraftFormClient = ({
   const { watch, handleSubmit, control } = methods;
 
   const votingModuleType = watch("type");
+
   const stageIndex = getStageIndexForTenant("DRAFTING") as number;
 
   useEffect(() => {

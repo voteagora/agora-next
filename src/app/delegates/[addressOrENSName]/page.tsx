@@ -21,6 +21,7 @@ import VotesContainerWrapper, {
   VotesContainerSkeleton,
 } from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
 import { getPublicClient } from "@/lib/viem";
+import { SCWRedirect } from "@/app/delegates/[addressOrENSName]/components/SCWRedirect";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -113,6 +114,7 @@ export default async function Page({
         />
       </div>
       <div className="flex flex-col sm:ml-12 min-w-0 flex-1 max-w-full gap-8">
+        <SCWRedirect address={address} />
         <Suspense fallback={<DelegateStatementSkeleton />}>
           <DelegateStatementWrapper addressOrENSName={addressOrENSName} />
         </Suspense>

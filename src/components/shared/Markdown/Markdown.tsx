@@ -34,7 +34,9 @@ export default function Markdown({ content }: { content: string }) {
   const line = ui?.customization?.line ?? defaults.line;
   const positive = ui?.customization?.positive ?? defaults.positive;
   return (
-    <div className={cn(styles.proposal_description_md, "max-w-full")}>
+    <div
+      className={cn(styles.proposal_description_md, "max-w-full text-primary")}
+    >
       <MarkdownPreview
         source={content}
         style={
@@ -51,6 +53,11 @@ export default function Markdown({ content }: { content: string }) {
         className={`h-full py-3 max-w-full bg-transparent prose prose-code:bg-wash prose-code:text-tertiary prose-pre:text-tertiary`}
         wrapperElement={{
           "data-color-mode": "light",
+        }}
+        components={{
+          h2: ({ node, ...props }) => (
+            <h1 className="text-primary" {...props} />
+          ),
         }}
       />
     </div>

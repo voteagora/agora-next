@@ -67,7 +67,7 @@ function MarkdownTextareaInput<
             <Tooltip>
               <TooltipTrigger className="flex flex-row space-x-1">
                 <FormLabel
-                  className="text-xs font-semibold secondary"
+                  className="text-xs font-semibold text-secondary"
                   isRequired={required}
                 >
                   {label}
@@ -85,7 +85,7 @@ function MarkdownTextareaInput<
           </TooltipProvider>
           <FormControl>
             <div className="flex flex-col">
-              <div className="min-h-[215px] w-full border border-line rounded-t-lg bg-wash">
+              <div className="min-h-[215px] w-full border border-line rounded-t-lg bg-wash text-primary">
                 <textarea
                   className={`py-3 px-4 border-0 placeholder-gray-af w-full bg-wash rounded-t-lg focus:outline-none focus:ring-0 resize-none
                 ${selectedMode === "write" ? "visible" : "hidden"}`}
@@ -111,7 +111,7 @@ function MarkdownTextareaInput<
                   type="button"
                   className={`py-2 px-3 rounded-full font-medium ${
                     selectedMode === "write"
-                      ? "bg-wash text-black"
+                      ? "bg-secondary text-primary"
                       : "text-tertiary"
                   }`}
                   onClick={() => setSelectedMode("write")}
@@ -122,7 +122,7 @@ function MarkdownTextareaInput<
                   type="button"
                   className={`py-2 px-3 rounded-full font-medium ${
                     selectedMode === "preview"
-                      ? "bg-wash text-black"
+                      ? "bg-secondary text-primary"
                       : "text-tertiary"
                   }`}
                   onClick={() => setSelectedMode("preview")}

@@ -165,7 +165,7 @@ export default function DelegateStatementForm({
 
                 <Button
                   variant="elevatedOutline"
-                  className="py-3 px-4"
+                  className="py-3 px-4 text-primary"
                   disabled={!canSubmit}
                   type="submit"
                 >

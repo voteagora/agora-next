@@ -1,4 +1,3 @@
-import { HStack } from "@/components/Layout/Stack";
 import { TokenAmountDisplay } from "@/lib/utils";
 import { formatUnits } from "ethers";
 
@@ -14,7 +13,7 @@ export default function OPStandardProposalStatus({ proposal }) {
   const totalLength = forLength + againstLength + abstainLength;
   return (
     <div className="flex flex-col items-end gap-1 justify-center">
-      <HStack gap={1} justifyContent="space-between">
+      <div className="flex flex-row space-between text-primary gap-1">
         <div>
           {TokenAmountDisplay({
             amount: proposal.proposalResults.for,
@@ -30,7 +29,7 @@ export default function OPStandardProposalStatus({ proposal }) {
           })}{" "}
           Against
         </div>
-      </HStack>
+      </div>
 
       {totalLength > 0 && (
         <div className="flex w-52 h-1 bg-wash rounded-full">
@@ -49,7 +48,7 @@ export default function OPStandardProposalStatus({ proposal }) {
         </div>
       )}
 
-      {totalLength == 0 && (
+      {totalLength === 0 && (
         <div className="flex w-52 h-1 bg-wash rounded-full">
           <div className=" bg-tertiary h-1" style={{ width: `100%` }}></div>
         </div>

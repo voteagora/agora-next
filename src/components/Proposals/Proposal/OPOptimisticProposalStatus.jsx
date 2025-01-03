@@ -1,4 +1,3 @@
-import { VStack } from "@/components/Layout/Stack";
 import { formatUnits } from "ethers";
 import { disapprovalThreshold } from "@/lib/constants";
 
@@ -20,8 +19,8 @@ export default function OPOptimisticProposalStatus({
   const status =
     againstRelativeAmount <= disapprovalThreshold ? "approved" : "defeated";
   return (
-    <VStack className="text-right">
-      <VStack>
+    <div className="flex flex-col text-right text-primary">
+      <div>
         <div className="text-xs text-secondary">
           <p>
             {againstRelativeAmount}% / {disapprovalThreshold}% against needed to
@@ -29,7 +28,7 @@ export default function OPOptimisticProposalStatus({
           </p>
         </div>
         <p>Optimistically {status}</p>
-      </VStack>
-    </VStack>
+      </div>
+    </div>
   );
 }

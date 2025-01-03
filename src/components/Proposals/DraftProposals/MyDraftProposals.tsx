@@ -34,7 +34,7 @@ const MyDraftProposals = ({
 
   return (
     <div className="mb-16">
-      <h1 className="text-2xl font-black mb-6">My proposals</h1>
+      <h1 className="text-2xl font-black mb-6 text-primary">My proposals</h1>
       <div className="space-y-6">
         {draftProposals.map((proposal) => {
           return (

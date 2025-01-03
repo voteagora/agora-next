@@ -193,7 +193,7 @@ input[type="number"] {
     @apply border-border;
   }
   body {
-    @apply bg-brandSecondary text-foreground;
+    @apply bg-neutral text-foreground;
     font-feature-settings:
       "rlig" 1,
       "calt" 1;
