@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { useAccount, useDisconnect } from "wagmi";
 import { AnimatePresence, motion } from "framer-motion";
-import { HStack, VStack } from "../Layout/Stack";
 import { icons } from "@/assets/icons/icons";
 import ENSAvatar from "../shared/ENSAvatar";
 import { pluralizeAddresses, shortAddress } from "@/lib/utils";
@@ -14,9 +13,10 @@ import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import Tenant from "@/lib/tenant/tenant";
 import CreateProposalDraftButton from "../Proposals/ProposalsList/CreateProposalDraftButton";
-import { DaoSlug } from "@prisma/client";
-
-const { slug } = Tenant.current();
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
+import { CubeIcon } from "@/icons/CubeIcon";
+import { InfoIcon } from "@/icons/InfoIcon";
 
 type Props = {
   ensName: string | undefined;
@@ -36,13 +36,15 @@ const ValueWrapper = ({
   );
 
 export const DesktopProfileDropDown = ({ ensName }: Props) => {
-  const { ui } = Tenant.current();
+  const { namespace, ui } = Tenant.current();
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
   const { isLoading, delegate, balance } = useConnectedDelegate();
 
   const hasStatement = !!delegate?.statement;
+
   const canCreateDelegateStatement = ui.toggle("delegates/edit")?.enabled;
+  const { data: scwAddress } = useSmartAccountAddress({ owner: address });
 
   return (
     <Popover className="relative cursor-auto">
@@ -81,8 +83,8 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
             <Popover.Panel>
               {({ close }) => (
                 <div className="bg-neutral border border-line py-8 px-6 mt-4 mr-[-16px] rounded-xl w-[350px]">
-                  <VStack gap={3} className="min-h-[250px] justify-center">
-                    <HStack className="items-center mb-1">
+                  <div className="flex flex-col gap-3 min-h-[250px] justify-center">
+                    <div className="flex flex-row items-center mb-1">
                       <div
                         className={`relative aspect-square mr-4 ${
                           isLoading && "animate-pulse"
@@ -93,7 +95,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                           ensName={ensName}
                         />
                       </div>
-                      <VStack className="justify-center">
+                      <div className="flex flex-col justify-center">
                         {ensName ? (
                           <>
                             <span className="text-base">{ensName}</span>
@@ -103,12 +105,12 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                           </>
                         ) : (
                           <>
-                            <span className="text-base">
+                            <span className="text-primary">
                               {shortAddress(address!)}
                             </span>
                           </>
                         )}
-                      </VStack>
+                      </div>
                       <div className="ml-auto">
                         <Image
                           src={icons.power}
@@ -119,7 +121,35 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                           className="cursor-pointer"
                         />
                       </div>
-                    </HStack>
+                    </div>
+                    {scwAddress && (
+                      <div className="mb-10">
+                        <div className="flex flex-row gap-3">
+                          <div className="w-[44px] flex justify-center items-center">
+                            <div className="flex items-center justify-center rounded-full border border-line w-[30px] h-[30px]">
+                              <CubeIcon
+                                className="w-5 h-5"
+                                fill={"rgb(232 231 255)"}
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-[10px] font-light text-secondary uppercase">
+                              <div className="flex flex-row gap-1 items-center">
+                                <div>smart contract wallet</div>
+                                <InfoIcon
+                                  className="w-3 h-3"
+                                  fill={"rgb(149 149 143)"}
+                                />
+                              </div>
+                            </div>
+                            <div className="text-primary">
+                              {shortAddress(scwAddress)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     <PanelRow
                       title="My token balance"
@@ -195,22 +225,23 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                         {hasStatement && (
                           <Link
                             href={`/delegates/${ensName ?? address}`}
-                            className="rounded-lg border py-3 px-2 text-primary bg-neutral mt-1 flex justify-center hover:bg-wash"
+                            className="rounded-lg py-3 px-2 text-primary bg-brandPrimary hover:bg-brandPrimary/90 mt-1 flex justify-center"
                             onClick={() => close()}
                           >
                             View my profile
                           </Link>
                         )}
                         {/* little temporary hack for the manager to test secret links for users to create a draft */}
-                        {slug === DaoSlug.OP && address && (
-                          <CreateProposalDraftButton
-                            address={address}
-                            className="opacity-0 cursor-default hidden sm:block"
-                          />
-                        )}
+                        {namespace === TENANT_NAMESPACES.OPTIMISM &&
+                          address && (
+                            <CreateProposalDraftButton
+                              address={address}
+                              className="opacity-0 cursor-default hidden sm:block"
+                            />
+                          )}
                       </>
                     )}
-                  </VStack>
+                  </div>
                 </div>
               )}
             </Popover.Panel>
