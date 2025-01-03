@@ -6,6 +6,7 @@ import { waitForTransactionReceipt } from "wagmi/actions";
 import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
 import { useAccount } from "wagmi";
+import { ANALYTICS_EVENTS } from "@/lib/constants";
 
 const useStandardVoting = ({
   proposalId,
@@ -57,7 +58,7 @@ const useStandardVoting = ({
           setStandardTxHash(directTx);
 
           await trackEvent({
-            event_name: "Standard Vote",
+            event_name: ANALYTICS_EVENTS.STANDARD_VOTE,
             event_data: {
               dao_slug: slug,
               proposal_id: BigInt(proposalId),
@@ -65,6 +66,8 @@ const useStandardVoting = ({
               reason: reason,
               params: params,
               voter: address,
+              transaction_hash: directTx,
+              contract_address: contracts.governor.address.toLowerCase(),
             },
           });
           setStandardVoteSuccess(true);

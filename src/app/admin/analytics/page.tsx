@@ -1,12 +1,15 @@
 import { getVotes } from "./actions/getVotes";
-import VotesDataView from "./components/VotesDataView";
-
+import AnalyticsContainer from "./components/AnalyticsContainer";
+import { getDelegates } from "./actions/getDelegates";
 const AnalyticsPage = async () => {
-  const votes = await getVotes();
+  const [votes, delegates] = await Promise.all([getVotes(), getDelegates()]);
+
   return (
     <div>
-      <h1 className="text-2xl font-bold text-primary mt-6">Analytics</h1>
-      <VotesDataView votes={votes} />
+      <h1 className="text-2xl font-bold text-primary mt-6">
+        Agora analytics dashboard
+      </h1>
+      <AnalyticsContainer votes={votes} delegates={delegates} />
     </div>
   );
 };

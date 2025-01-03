@@ -122,6 +122,8 @@ export function DelegateDialog({
           delegatee: delegatee?.delegatee,
           delegator: accountAddress,
           dao_slug: slug,
+          transaction_hash: data,
+          contract_address: contracts.token.address.toLowerCase(),
         },
       });
     }
