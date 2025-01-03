@@ -10,6 +10,7 @@ import Link from "next/link";
 
 import Tenant from "@/lib/tenant/tenant";
 import { Vote } from "@/app/api/common/votes/vote";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 function AmountAndPercent({
   amount,
@@ -34,7 +35,7 @@ export default function ProposalVotesSummaryDetails({
   proposal: Proposal;
   votes: Vote[];
 }) {
-  const { token } = Tenant.current();
+  const { token, namespace } = Tenant.current();
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
@@ -42,8 +43,29 @@ export default function ProposalVotesSummaryDetails({
     return format(new Date(date ?? ""), "h:mma MMMM dd yyyy");
   };
 
-  const totalVotes =
+  let quorumVotes =
     BigInt(results.for) + BigInt(results.abstain) + BigInt(results.against);
+
+  let totalVotes =
+    BigInt(results.for) + BigInt(results.abstain) + BigInt(results.against);
+
+  /**
+   * This is a temporary fix for ENS.
+   * https://voteagora.atlassian.net/browse/ENG-903
+   * ENS does not count against votes in the quorum calculation.
+   * This is a temporary fix stack for + abstain, but not against.
+   * A future fix will read each tenant and stack depending on how the tenant counts quorum.
+   */
+  if (namespace === TENANT_NAMESPACES.ENS) {
+    quorumVotes = quorumVotes - BigInt(results.against);
+  }
+
+  /**
+   * Only FOR votes are counted towards quorum for Uniswap.
+   */
+  if (namespace === TENANT_NAMESPACES.UNISWAP) {
+    quorumVotes = BigInt(results.for);
+  }
 
   const voteThresholdPercent =
     Number(totalVotes) > 0
@@ -52,8 +74,9 @@ export default function ProposalVotesSummaryDetails({
   const apprThresholdPercent = Number(proposal.approvalThreshold) / 100;
 
   const hasMetQuorum = Boolean(
-    Number(totalVotes) >= Number(proposal.quorum || 0)
+    Number(quorumVotes) >= Number(proposal.quorum || 0)
   );
+
   const hasMetThreshold = Boolean(voteThresholdPercent >= apprThresholdPercent);
 
   return (
@@ -90,7 +113,7 @@ export default function ProposalVotesSummaryDetails({
               )}
               <p className="text-xs font-semibold text-secondary">
                 <TokenAmountDisplay
-                  amount={totalVotes}
+                  amount={quorumVotes}
                   decimals={token.decimals}
                   currency={""}
                 />{" "}

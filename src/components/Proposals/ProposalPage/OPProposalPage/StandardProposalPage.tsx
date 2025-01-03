@@ -12,8 +12,10 @@ export default async function StandardProposalPage({
 }: {
   proposal: Proposal;
 }) {
-  // TODO: Replace with governor-level check
-  const proposalVotes = await fetchProposalVotes(proposal.id);
+  const proposalVotes = await fetchProposalVotes(proposal.id, {
+    limit: 250,
+    offset: 0,
+  });
   const nonVoters = await fetchVotersWhoHaveNotVotedForProposal(proposal.id);
 
   return (

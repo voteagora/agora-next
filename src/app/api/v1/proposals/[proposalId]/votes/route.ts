@@ -8,7 +8,7 @@ import {
 } from "@/app/api/common/utils/validators";
 
 const DEFAULT_SORT = "weight";
-const DEFAULT_MAX_LIMIT = 50;
+const DEFAULT_MAX_LIMIT = 1000;
 const DEFAULT_LIMIT = 20;
 const DEFAULT_OFFSET = 0;
 

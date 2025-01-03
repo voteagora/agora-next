@@ -66,7 +66,7 @@ const ProposalVotesCard = ({
           />
         ) : (
           <ProposalNonVoterList
-            proposalId={proposal.id}
+            proposal={proposal}
             initialNonVoters={nonVoters}
           />
         )}

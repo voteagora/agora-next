@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { blocksToSeconds } from "@/lib/blockTimes";
 
 import {
   Tooltip,
@@ -29,21 +28,20 @@ interface Props {
 export const AgoraOptimismGovExecute = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
 
-  const { data: executionDelayInBlocks } = useReadContract({
+  const { data: delayInSeconds } = useReadContract({
     address: contracts.timelock!.address as `0x${string}`,
     abi: contracts.timelock!.abi,
     functionName: "getMinDelay",
   });
 
   let canExecute = false;
-  const delayInSeconds = blocksToSeconds(Number(executionDelayInBlocks));
   let executeTimeInSeconds = 0;
 
   if (proposal.queuedTime) {
     const queuedTimeInSeconds = Math.floor(
       (proposal.queuedTime as Date).getTime() / 1000
     );
-    executeTimeInSeconds = queuedTimeInSeconds + delayInSeconds;
+    executeTimeInSeconds = queuedTimeInSeconds + Number(delayInSeconds);
     const currentTimeInSeconds = Math.floor(Date.now() / 1000);
     canExecute = currentTimeInSeconds >= executeTimeInSeconds;
   }
