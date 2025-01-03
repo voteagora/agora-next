@@ -13,6 +13,9 @@ import {
   type Dispatch,
   SetStateAction,
 } from "react";
+import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
+import { useEthBalance } from "@/hooks/useEthBalance";
+import { formatEther } from "viem";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
@@ -102,8 +105,22 @@ const CastVoteContextProvider = ({
     missingVote,
   });
 
+  const isGasRelayEnabled = ui.toggle("sponsoredVote")?.enabled === true;
+  const gasRelayConfig = ui.toggle("sponsoredVote")?.config as UIGasRelayConfig;
+  const { data: sponsorBalance } = useEthBalance({
+    enabled: isGasRelayEnabled,
+    address: gasRelayConfig.sponsorAddress,
+  });
+  // Gas relay is only LIVE when it is enabled in the settings and the sponsor meets minimum eth requirements
+  const isGasRelayLive =
+    isGasRelayEnabled &&
+    Number(formatEther(sponsorBalance || 0n)) >=
+      Number(gasRelayConfig.minBalance) &&
+    !reason &&
+    !fallbackToStandardVote;
+
   const { write, isLoading, isSuccess, data, isError, resetError } = (() => {
-    if (ui.toggle("sponsoredVote") && !reason && !fallbackToStandardVote) {
+    if (isGasRelayLive) {
       return sponsoredVotingValues;
     }
     if (contracts?.alligator) {

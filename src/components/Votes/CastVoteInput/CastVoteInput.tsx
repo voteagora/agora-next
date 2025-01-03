@@ -24,6 +24,9 @@ import freeGasMegaphon from "@/icons/freeGasMegaphon.gif";
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/icons/icons";
 import Image from "next/image";
+import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
+import { useEthBalance } from "@/hooks/useEthBalance";
+import { formatEther } from "viem";
 
 type Props = {
   proposal: Proposal;
@@ -115,7 +118,21 @@ function CastVoteInputContent({
 
   const showSuccessMessage = isSuccess || missingVote === "NONE";
 
-  const canUseRelay = ui.toggle("sponsoredVote") && !reason;
+  // Gas relay settings
+  const isGasRelayEnabled = ui.toggle("sponsoredVote")?.enabled === true;
+  const gasRelayConfig = ui.toggle("sponsoredVote")?.config as UIGasRelayConfig;
+
+  const { data: sponsorBalance } = useEthBalance({
+    enabled: isGasRelayEnabled,
+    address: gasRelayConfig.sponsorAddress,
+  });
+
+  // Gas relay is only LIVE when it is enabled in the settings and the sponsor meets minimum eth requirements
+  const isGasRelayLive =
+    isGasRelayEnabled &&
+    Number(formatEther(sponsorBalance || 0n)) >=
+      Number(gasRelayConfig.minBalance) &&
+    !reason;
 
   return (
     <VStack className="flex-shrink bg-wash">
@@ -154,7 +171,7 @@ function CastVoteInputContent({
               )}
             </VStack>
           )}
-          {isError && (!canUseRelay || fallbackToStandardVote) && (
+          {isError && (!isGasRelayLive || fallbackToStandardVote) && (
             <ErrorState
               message="Error submitting vote"
               button1={{ message: "Cancel", action: reset }}
@@ -164,7 +181,7 @@ function CastVoteInputContent({
               }}
             />
           )}
-          {isError && canUseRelay && !fallbackToStandardVote && (
+          {isError && isGasRelayLive && !fallbackToStandardVote && (
             <ErrorState
               message="Error submitting vote"
               button1={{

@@ -105,7 +105,10 @@ export const ensTenantUIConfig = new TenantUI({
       enabled: true,
       config: {
         version: "1",
-        sponsorAddress: "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
+        sponsorAddress:
+          process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+            ? "0x0"
+            : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
         minBalance: "0.1",
       },
     },
@@ -114,7 +117,10 @@ export const ensTenantUIConfig = new TenantUI({
       enabled: true,
       config: {
         version: "1",
-        sponsorAddress: "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
+        sponsorAddress:
+          process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+            ? "0x0"
+            : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
         minBalance: "0.1",
       },
     },
