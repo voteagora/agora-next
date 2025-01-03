@@ -1,16 +1,10 @@
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
-
-const startingBlockNumber = {
-  1: 17423000, // mainnet
-  11155111: 7287777, // sepolia
-  10: 17423000, // optimism
-  59144: 17423000, // scroll
-  31337: 17423000, // cyber
-};
+import { startingBlockNumber } from "../utils";
+import { ANALYTICS_EVENTS } from "@/lib/constants";
 
 export const getVotes = async () => {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, slug } = Tenant.current();
   const chainId = contracts.governor.chain.id;
 
   const eventsQuery = `
@@ -18,11 +12,12 @@ export const getVotes = async () => {
     event_data->>'proposal_id' as proposal_id,
     COUNT(*) as vote_count
     FROM alltenant.analytics_events
-    WHERE event_name = 'Standard Vote'
+    WHERE event_name = '${ANALYTICS_EVENTS.STANDARD_VOTE}'
+    AND event_data->>'dao_slug' = '${slug}'
+    AND event_data->>'contract_address' = '${contracts.governor.address.toLowerCase()}'
     GROUP BY event_data->>'proposal_id'
     ORDER BY vote_count DESC;
   `;
-
   const eventsStartedAtBlock =
     startingBlockNumber[chainId as keyof typeof startingBlockNumber];
 

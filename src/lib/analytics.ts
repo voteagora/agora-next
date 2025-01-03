@@ -36,6 +36,8 @@ class AnalyticsManager {
     this.services.push(service);
   }
 
+  // Thoughts on adding things like dao_slug, contract_address, etc. here
+  // so we can guarantee the the event log has it?
   async trackEvent(event: AnalyticsEvent) {
     await Promise.all(
       this.services.map((service) =>
