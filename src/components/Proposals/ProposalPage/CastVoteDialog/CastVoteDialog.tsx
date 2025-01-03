@@ -48,7 +48,6 @@ function BasicVoteDialog({
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
   if (!delegate) {
-    // todo: log
     return null;
   }
 

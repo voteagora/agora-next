@@ -21,6 +21,9 @@ import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
 import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
+import { useEthBalance } from "@/hooks/useEthBalance";
+import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
+import { formatEther } from "viem";
 
 export function DelegateDialog({
   delegate,
@@ -45,10 +48,23 @@ export function DelegateDialog({
   const [isReady, setIsReady] = useState(false);
 
   const { setRefetchDelegate } = useConnectButtonContext();
+
+  // Gas relay settings
   const isGasRelayEnabled = ui.toggle("sponsoredDelegate")?.enabled === true;
+  const gasRelayConfig = ui.toggle("sponsoredDelegate")
+    ?.config as UIGasRelayConfig;
+
+  const { data: sponsorBalance } = useEthBalance({
+    enabled: isGasRelayEnabled,
+    address: gasRelayConfig.sponsorAddress,
+  });
+
+  // Gas relay is only LIVE when it is enabled in the settings and the sponsor meets minimum eth requirements
+  const isGasRelayLive =
+    Number(formatEther(sponsorBalance || 0n)) >=
+    Number(gasRelayConfig.minBalance);
 
   const sameDelegatee = delegate.address === delegatee?.delegatee;
-
   const isDisabledInTenant = ui.toggle("delegates/delegate")?.enabled === false;
 
   const { data: delegateEnsName } = useEnsName({
@@ -82,7 +98,7 @@ export function DelegateDialog({
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
   } = useWaitForTransactionReceipt({
-    hash: isGasRelayEnabled ? sponsoredTxnHash : delegateTxHash,
+    hash: isGasRelayLive ? sponsoredTxnHash : delegateTxHash,
   });
 
   const fetchData = useCallback(async () => {
@@ -101,7 +117,7 @@ export function DelegateDialog({
   }, [fetchBalanceForDirectDelegation, accountAddress, fetchDirectDelegatee]);
 
   async function executeDelegate() {
-    if (isGasRelayEnabled) {
+    if (isGasRelayLive) {
       await call();
     } else {
       write({
@@ -149,7 +165,7 @@ export function DelegateDialog({
             Delegation completed!
           </Button>
           <BlockScanUrls
-            hash1={isGasRelayEnabled ? sponsoredTxnHash : delegateTxHash}
+            hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
           />
         </div>
       );

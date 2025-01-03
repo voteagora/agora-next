@@ -17,6 +17,8 @@ export type UIEndorsedConfig = {
 
 export type UIGasRelayConfig = {
   version?: string;
+  minBalance: string;
+  sponsorAddress: `0x${string}`;
 };
 
 // UI config exists to give tenant specifc config options to a UI toggle
