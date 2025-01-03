@@ -7,10 +7,10 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import { format } from "date-fns";
 import Link from "next/link";
-import { DaoSlug } from "@prisma/client";
 
 import Tenant from "@/lib/tenant/tenant";
 import { Vote } from "@/app/api/common/votes/vote";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 function AmountAndPercent({
   amount,
@@ -35,7 +35,7 @@ export default function ProposalVotesSummaryDetails({
   proposal: Proposal;
   votes: Vote[];
 }) {
-  const { token, slug } = Tenant.current();
+  const { token, namespace } = Tenant.current();
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
@@ -56,8 +56,15 @@ export default function ProposalVotesSummaryDetails({
    * This is a temporary fix stack for + abstain, but not against.
    * A future fix will read each tenant and stack depending on how the tenant counts quorum.
    */
-  if (slug === DaoSlug.ENS) {
+  if (namespace === TENANT_NAMESPACES.ENS) {
     quorumVotes = quorumVotes - BigInt(results.against);
+  }
+
+  /**
+   * Only FOR votes are counted towards quorum for Uniswap.
+   */
+  if (namespace === TENANT_NAMESPACES.UNISWAP) {
+    quorumVotes = BigInt(results.for);
   }
 
   const voteThresholdPercent =
@@ -69,6 +76,7 @@ export default function ProposalVotesSummaryDetails({
   const hasMetQuorum = Boolean(
     Number(quorumVotes) >= Number(proposal.quorum || 0)
   );
+
   const hasMetThreshold = Boolean(voteThresholdPercent >= apprThresholdPercent);
 
   return (
