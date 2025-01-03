@@ -20,6 +20,8 @@ import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
+import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENTS } from "@/lib/constants";
 
 export function DelegateDialog({
   delegate,
@@ -34,7 +36,7 @@ export function DelegateDialog({
     addressOrENSName: string
   ) => Promise<DelegateePayload | null>;
 }) {
-  const { ui, contracts, token } = Tenant.current();
+  const { ui, contracts, token, slug } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const { address: accountAddress } = useAccount();
@@ -66,6 +68,21 @@ export function DelegateDialog({
   } = useWaitForTransactionReceipt({
     hash: data,
   });
+
+  useEffect(() => {
+    if (didProcessDelegation) {
+      trackEvent({
+        event_name: ANALYTICS_EVENTS.DELEGATE,
+        event_data: {
+          delegatee: delegatee?.delegatee,
+          delegator: accountAddress,
+          dao_slug: slug,
+          transaction_hash: data,
+          contract_address: contracts.token.address.toLowerCase(),
+        },
+      });
+    }
+  }, [didProcessDelegation]);
 
   const fetchData = useCallback(async () => {
     setIsReady(false);

@@ -3437,6 +3437,15 @@ view boostVotingPowerSnaps {
   @@map("voting_power_snaps")
 }
 
+model AnalyticsEvent {
+  id String @id @default(uuid())
+  event_name String
+  event_data Json
+  created_at DateTime @default(now())
+
+  @@schema("alltenant")
+  @@map("analytics_events")
+}
 
 enum DaoSlug {
   OP
