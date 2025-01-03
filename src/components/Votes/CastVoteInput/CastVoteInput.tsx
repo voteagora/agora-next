@@ -1,6 +1,6 @@
 "use client";
 
-import { VStack, HStack } from "@/components/Layout/Stack";
+import { HStack, VStack } from "@/components/Layout/Stack";
 import { ReactNode } from "react";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,9 @@ import { type Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import { type VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import {
-  MissingVote,
   checkMissingVoteForDelegate,
   getVpToDisplay,
+  MissingVote,
 } from "@/lib/voteUtils";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
 import { TokenAmountDisplay } from "@/lib/utils";
@@ -137,7 +137,7 @@ function CastVoteInputContent({
   return (
     <VStack className="flex-shrink bg-wash">
       <VStack
-        className={`bg-neutral border-b border-line rounded-b-lg flex-shrink ${ui.toggle("sponsoredVote") && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
+        className={`bg-neutral border-b border-line rounded-b-lg flex-shrink ${isGasRelayLive && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
       >
         <VStack
           justifyContent="justify-between"
@@ -196,9 +196,9 @@ function CastVoteInputContent({
           )}
         </VStack>
       </VStack>
-      {ui.toggle("sponsoredVote") &&
-        !showSuccessMessage &&
-        !fallbackToStandardVote && <VotingBanner />}
+      {isGasRelayLive && !showSuccessMessage && !fallbackToStandardVote && (
+        <VotingBanner />
+      )}
       {showSuccessMessage && <SuccessMessage />}
     </VStack>
   );
