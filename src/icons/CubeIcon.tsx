@@ -1,4 +1,10 @@
-export const CubeIcon = ({ className, fill }: { className?: string; fill?: string }) => {
+export const CubeIcon = ({
+  className,
+  fill,
+}: {
+  className?: string;
+  fill?: string;
+}) => {
   return (
     <svg
       className={className}
