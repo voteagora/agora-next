@@ -12,6 +12,7 @@ import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { optimism } from "viem/chains";
 import { createTokenContract } from "@/lib/tokenUtils";
+import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 
 interface Props {
   isProd: boolean;
@@ -79,7 +80,7 @@ export const optimismTenantContractConfig = ({
       provider,
     }),
 
-    timelock: new TenantContract<IGovernorContract>({
+    timelock: new TenantContract<ITimelockContract>({
       abi: AgoraTimelock__factory.abi,
       address: TIMELOCK,
       chain,

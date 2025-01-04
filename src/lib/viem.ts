@@ -1,14 +1,16 @@
 import {
-  createPublicClient,
   createWalletClient,
-  custom,
+  createPublicClient,
   defineChain,
+  custom,
   http,
+  Chain,
 } from "viem";
-import { cyber, lyra, mainnet, optimism, scroll, sepolia } from "viem/chains";
-
+import { mainnet, sepolia, optimism, scroll, lyra, cyber } from "viem/chains";
 import "viem/window";
-import { getTransportForChain } from "./utils";
+
+import Tenant from "@/lib/tenant/tenant";
+import { getTransportForChain } from "@/lib/utils";
 
 export const lyraTestnet = /*#__PURE__*/ defineChain({
   id: 901,
@@ -82,51 +84,15 @@ export const getWalletClient = (chainId: number) => {
   }
 };
 
-export const getPublicClient = (chainId: number) => {
-  const transport = getTransportForChain(chainId);
+export const getPublicClient = (chain?: Chain) => {
+  const { contracts } = Tenant.current();
 
-  if (!transport) {
-    throw new Error("Invalid chainId");
-  }
+  const transport = getTransportForChain(
+    chain?.id ?? contracts.token.chain.id
+  )!;
 
-  switch (chainId) {
-    case mainnet.id:
-      return createPublicClient({
-        chain: mainnet,
-        transport,
-      });
-    case sepolia.id:
-      return createPublicClient({
-        chain: sepolia,
-        transport,
-      });
-    case optimism.id:
-      return createPublicClient({
-        chain: optimism,
-        transport,
-      });
-    case cyber.id:
-      return createPublicClient({
-        chain: cyber,
-        transport,
-      });
-    case scroll.id:
-      return createPublicClient({
-        chain: scroll,
-        transport,
-      });
-
-    case lyra.id:
-      return createPublicClient({
-        chain: lyra,
-        transport: http(),
-      });
-    case lyraTestnet.id:
-      return createPublicClient({
-        chain: lyraTestnet,
-        transport: http(),
-      });
-    default:
-      throw new Error("Invalid chainId");
-  }
+  return createPublicClient({
+    chain: chain ?? contracts.token.chain,
+    transport,
+  });
 };

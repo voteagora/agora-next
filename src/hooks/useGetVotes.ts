@@ -13,7 +13,7 @@ export const useGetVotes = ({
   blockNumber: bigint;
   enabled: boolean;
 }) => {
-  const client = getPublicClient(Tenant.current().contracts.governor.chain.id);
+  const client = getPublicClient();
 
   const { contracts } = Tenant.current();
   const { data, isFetching, isFetched } = useQuery({

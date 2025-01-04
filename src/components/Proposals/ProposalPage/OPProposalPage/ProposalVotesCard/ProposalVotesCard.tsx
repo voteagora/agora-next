@@ -34,7 +34,7 @@ const ProposalVotesCard = ({
         transition: "bottom 600ms cubic-bezier(0, 0.975, 0.015, 0.995)",
       }}
     >
-      <div className="flex flex-col gap-4 min-h-0 shrink py-4 w-full">
+      <div className="flex flex-col gap-4 min-h-0 shrink pt-4 w-full">
         <button
           onClick={handleClick}
           className="border w-10 h-10 rounded-full bg-neutral absolute top-[-20px] left-[calc(50%-20px)] shadow-newDefault block sm:hidden"
