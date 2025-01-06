@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { useAccount, useDisconnect } from "wagmi";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,6 +17,12 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { CubeIcon } from "@/icons/CubeIcon";
 import { InfoIcon } from "@/icons/InfoIcon";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type Props = {
   ensName: string | undefined;
@@ -84,72 +90,84 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
               {({ close }) => (
                 <div className="bg-neutral border border-line py-8 px-6 mt-4 mr-[-16px] rounded-xl w-[350px]">
                   <div className="flex flex-col gap-3 min-h-[250px] justify-center">
-                    <div className="flex flex-row items-center mb-1">
-                      <div
-                        className={`relative aspect-square mr-4 ${
-                          isLoading && "animate-pulse"
-                        }`}
-                      >
-                        <ENSAvatar
-                          className="w-[44px] h-[44px] rounded-full"
-                          ensName={ensName}
-                        />
+                    <div className="flex flex-col">
+                      <div className="flex flex-row items-center">
+                        <div
+                          className={`relative aspect-square mr-4 ${
+                            isLoading && "animate-pulse"
+                          }`}
+                        >
+                          <ENSAvatar
+                            className="w-[44px] h-[44px] rounded-full"
+                            ensName={ensName}
+                          />
+                        </div>
+                        <div className="flex flex-col justify-center">
+                          {ensName ? (
+                            <>
+                              <span className="text-base">{ensName}</span>
+                              <span className="text-xs text-secondary">
+                                {shortAddress(address!)}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-primary">
+                                {shortAddress(address!)}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        <div className="ml-auto">
+                          <Image
+                            src={icons.power}
+                            onClick={() => {
+                              disconnect();
+                            }}
+                            alt="Disconnect Wallet"
+                            className="cursor-pointer"
+                          />
+                        </div>
                       </div>
-                      <div className="flex flex-col justify-center">
-                        {ensName ? (
-                          <>
-                            <span className="text-base">{ensName}</span>
-                            <span className="text-xs text-secondary">
-                              {shortAddress(address!)}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-primary">
-                              {shortAddress(address!)}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                      <div className="ml-auto">
-                        <Image
-                          src={icons.power}
-                          onClick={() => {
-                            disconnect();
-                          }}
-                          alt="Disconnect Wallet"
-                          className="cursor-pointer"
-                        />
-                      </div>
-                    </div>
-                    {scwAddress && (
-                      <div className="mb-10">
-                        <div className="flex flex-row gap-3">
+                      {scwAddress && (
+                        <div>
                           <div className="w-[44px] flex justify-center items-center">
-                            <div className="flex items-center justify-center rounded-full border border-line w-[30px] h-[30px]">
-                              <CubeIcon
-                                className="w-5 h-5"
-                                fill={"rgb(232 231 255)"}
-                              />
-                            </div>
+                            <div className="border-l border-dashed border-line h-5"></div>
                           </div>
-                          <div>
-                            <div className="text-[10px] font-light text-secondary uppercase">
-                              <div className="flex flex-row gap-1 items-center">
-                                <div>smart contract wallet</div>
-                                <InfoIcon
-                                  className="w-3 h-3"
-                                  fill={"rgb(149 149 143)"}
+
+                          <div className="flex flex-row items-center gap-3">
+                            <div className="w-[44px] flex justify-center items-center">
+                              <div className="flex items-center justify-center rounded-full border border-line w-[30px] h-[30px]">
+                                <CubeIcon
+                                  className="w-5 h-5"
+                                  fill={"rgb(232 231 255)"}
                                 />
                               </div>
                             </div>
-                            <div className="text-primary">
-                              {shortAddress(scwAddress)}
-                            </div>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger className="flex flex-row space-x-1 items-center">
+                                  <div className="text-primary">
+                                    {shortAddress(scwAddress)}
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent className="text-xs max-w-[250px] p-3">
+                                  <div className="text-primary">
+                                    Smart Contract Wallet
+                                  </div>
+                                  <div className="text-xs text-secondary font-light">
+                                    Your SCW is where your governance power
+                                    comes from. Your stkDRV tokens establish
+                                    your voting power or how much you can
+                                    delegate to another member.
+                                  </div>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
 
                     <PanelRow
                       title="My token balance"
