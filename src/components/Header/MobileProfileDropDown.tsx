@@ -13,6 +13,8 @@ import TokenAmountDisplay from "../shared/TokenAmountDisplay";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import Tenant from "@/lib/tenant/tenant";
+import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
+import { CubeIcon } from "@/icons/CubeIcon";
 
 type Props = {
   ensName: string | undefined;
@@ -46,6 +48,8 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
 
   const hasStatement = !!delegate?.statement;
   const canCreateDelegateStatement = ui.toggle("delegates/edit")?.enabled;
+
+  const { data: scwAddress } = useSmartAccountAddress({ owner: address });
 
   return (
     <Popover className="relative cursor-auto">
@@ -82,36 +86,58 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                   transition={{ duration: 0.2 }}
                 >
                   <div className="flex flex-col gap-3 min-h-[325px] justify-center mb-10">
-                    <div className="flex flex-row items-center gap-2 mb-1">
-                      <div
-                        className={`relative aspect-square ${
-                          isLoading && "animate-pulse"
-                        }`}
-                      >
-                        <ENSAvatar ensName={ensName} />
+                    <div className="flex flex-col">
+                      <div className="flex flex-row items-center gap-2 mb-1">
+                        <div
+                          className={`relative aspect-square ${
+                            isLoading && "animate-pulse"
+                          }`}
+                        >
+                          <ENSAvatar ensName={ensName} />
+                        </div>
+                        <div className="flex flex-col flex-1">
+                          {ensName ? (
+                            <>
+                              <span className="text-primary">{ensName}</span>
+                              <span className="text-xs text-secondary">
+                                {shortAddress(address!)}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-primary">
+                                {shortAddress(address!)}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        <Image
+                          src={icons.power}
+                          onClick={() => disconnect()}
+                          alt="Disconnect Wallet"
+                          className="cursor-pointer"
+                        />
                       </div>
-                      <div className="flex flex-col flex-1">
-                        {ensName ? (
-                          <>
-                            <span className="text-base">{ensName}</span>
-                            <span className="text-xs text-secondary">
-                              {shortAddress(address!)}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-base">
-                              {shortAddress(address!)}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                      <Image
-                        src={icons.power}
-                        onClick={() => disconnect()}
-                        alt="Disconnect Wallet"
-                        className="cursor-pointer"
-                      />
+                      {scwAddress && (
+                        <div>
+                          <div className="w-[44px] flex justify-center items-center">
+                            <div className="border-l border-dashed border-line h-5"></div>
+                          </div>
+                          <div className="flex flex-row items-center gap-3">
+                            <div className="w-[44px] flex justify-center items-center">
+                              <div className="flex items-center justify-center rounded-full border border-line w-[30px] h-[30px]">
+                                <CubeIcon
+                                  className="w-5 h-5"
+                                  fill={"rgb(232 231 255)"}
+                                />
+                              </div>
+                            </div>
+                            <div className="text-primary">
+                              {shortAddress(scwAddress)}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <PanelRow
@@ -190,7 +216,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                           <Link
                             href={`/delegates/${ensName ?? address}`}
                             onClick={() => close()}
-                            className="rounded-lg border py-3 px-2 text-primary bg-brandPrimary hover:bg-brandPrimary/90 mt-1 flex justify-center"
+                            className="rounded-lg py-3 px-2 text-primary bg-brandPrimary hover:bg-brandPrimary/90 mt-1 flex justify-center"
                           >
                             View my profile
                           </Link>

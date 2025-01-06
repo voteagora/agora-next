@@ -16,7 +16,6 @@ import CreateProposalDraftButton from "../Proposals/ProposalsList/CreateProposal
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { CubeIcon } from "@/icons/CubeIcon";
-import { InfoIcon } from "@/icons/InfoIcon";
 import {
   Tooltip,
   TooltipContent,
@@ -105,7 +104,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                         <div className="flex flex-col justify-center">
                           {ensName ? (
                             <>
-                              <span className="text-base">{ensName}</span>
+                              <span className="text-primary">{ensName}</span>
                               <span className="text-xs text-secondary">
                                 {shortAddress(address!)}
                               </span>
