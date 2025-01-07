@@ -60,7 +60,9 @@ export const deriveTenantUIConfig = new TenantUI({
     paymasterAddress: isProd
       ? "0x0"
       : "0x5a6499b442711feeA0Aa73C6574042EC5E2e5945",
-    paymasterUrl: "https://derive.xyz/api/paymaster",
+    paymasterUrl: isProd
+      ? "https://derive.xyz/api/paymaster"
+      : " https://testnet.derive.xyz/api/paymaster",
     salt: BigInt(0),
     type: "LightAccount",
     version: "v1.1.0",

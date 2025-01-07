@@ -47,9 +47,9 @@ export const DelegateButton = ({ delegate, onSuccess }: Props) => {
 
   if (txn && !error) {
     return (
-      <div className="px-3 py-2 bg-green-200 border border-green-300 rounded-md text-sm">
+      <div className="px-3 py-2 bg-positive rounded-md text-sm">
         <div className="font-semibold">Delegation completed!</div>
-        <BlockScanUrls hash1={data} />
+        <BlockScanUrls hash1={data} className={"pt-0"} />
       </div>
     );
   }
