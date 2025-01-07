@@ -1,5 +1,7 @@
 import { useState } from "react";
 import DelegatesPieChart from "./DelegatesPieChart";
+import DelegatesBarChart from "./DelegatesBarChart";
+import DelegatesTable from "./DelegatesTable";
 import { Switch } from "@/components/shared/Switch";
 
 const DelegationsDataView = ({ delegates }: { delegates: any }) => {
@@ -24,10 +26,10 @@ const DelegationsDataView = ({ delegates }: { delegates: any }) => {
         </div>
       </div>
       {view === "table" ? (
-        <p>Table coming soon...</p>
+        <DelegatesTable delegates={delegates} />
       ) : (
         <div className="mt-6 w-full h-[400px]">
-          <DelegatesPieChart delegates={delegates} />
+          <DelegatesBarChart data={delegates} />
         </div>
       )}
     </div>
