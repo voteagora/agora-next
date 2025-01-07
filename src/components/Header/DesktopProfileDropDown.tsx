@@ -22,6 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { rgbStringToHex } from "@/app/lib/utils/color";
 
 type Props = {
   ensName: string | undefined;
@@ -139,7 +140,9 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                               <div className="flex items-center justify-center rounded-full border border-line w-[30px] h-[30px]">
                                 <CubeIcon
                                   className="w-5 h-5"
-                                  fill={"rgb(232 231 255)"}
+                                  fill={rgbStringToHex(
+                                    ui.customization?.primary
+                                  )}
                                 />
                               </div>
                             </div>

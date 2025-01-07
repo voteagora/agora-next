@@ -17,6 +17,7 @@ import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { CubeIcon } from "@/icons/CubeIcon";
 import { shortAddress } from "@/lib/utils";
+import { rgbStringToHex } from "@/app/lib/utils/color";
 
 export function SCWDelegateDialog({
   delegate,
@@ -108,7 +109,10 @@ export function SCWDelegateDialog({
                 <div className="flex flex-row items-center gap-3">
                   <div className="w-[44px] flex justify-center items-center">
                     <div className="flex items-center justify-center rounded-full border border-line w-[30px] h-[30px]">
-                      <CubeIcon className="w-5 h-5" fill={"rgb(232 231 255)"} />
+                      <CubeIcon
+                        className="w-5 h-5"
+                        fill={rgbStringToHex(ui.customization?.primary)}
+                      />
                     </div>
                   </div>
                   <div className="text-primary">{shortAddress(scwAddress)}</div>

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { AgoraIcon } from "@/icons/AgoraIcon";
+import { rgbStringToHex } from "@/app/lib/utils/color";
 
 export default function LogoLink() {
   const { namespace, ui } = Tenant.current();
@@ -13,7 +14,7 @@ export default function LogoLink() {
         {namespace !== TENANT_NAMESPACES.SCROLL && (
           <>
             <AgoraIcon
-              fill={"#FF00FF"}
+              fill={rgbStringToHex(ui.customization.primary)}
               className="hidden sm:block w-[20px] h-[20px]"
             />
             <div className="h-3 w-[2px] bg-line rounded-full hidden sm:block"></div>
