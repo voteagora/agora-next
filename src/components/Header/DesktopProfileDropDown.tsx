@@ -119,8 +119,11 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                             </>
                           )}
                         </div>
-                        <div className="ml-auto" onClick={() => disconnect()}>
-                          <div className="bg-wash border border-line p-0.5 rounded-sm">
+                        <div className="ml-auto">
+                          <div
+                            onClick={() => disconnect()}
+                            className="bg-wash border border-line p-0.5 rounded-sm"
+                          >
                             <PowerIcon
                               fill={rgbStringToHex(ui.customization?.primary)}
                               className={"cursor-pointer"}
@@ -224,7 +227,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                             {hasStatement ? (
                               <Link
                                 href={`/delegates/edit`}
-                                className="rounded-lg py-3 px-2 bg-brandPrimary hover:bg-brandPrimary/80 text-primary flex justify-center mt-1"
+                                className="rounded-lg py-3 px-2 border border-line bg-wash hover:bg-none text-primary flex justify-center mt-1"
                                 onClick={() => close()}
                               >
                                 Edit delegate statement
@@ -232,7 +235,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                             ) : (
                               <Link
                                 href={`/delegates/create`}
-                                className="rounded-lg py-3 px-2 bg-brandPrimary hover:bg-brandPrimary/80 text-primary flex justify-center mt-1"
+                                className="rounded-lg py-3 px-2 border border-line bg-wash hover:bg-none text-primary flex justify-center mt-1"
                                 onClick={() => close()}
                               >
                                 Create delegate statement
@@ -244,7 +247,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                         {hasStatement && (
                           <Link
                             href={`/delegates/${ensName ?? address}`}
-                            className="rounded-lg py-3 px-2 text-neutral bg-primary hover:bg-primary/90 mt-1 flex justify-center"
+                            className="rounded-lg py-3 px-2 text-primary bg-brandPrimary hover:bg-brandPrimary/90 mt-1 flex justify-center"
                             onClick={() => close()}
                           >
                             View my profile

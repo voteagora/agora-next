@@ -6,6 +6,9 @@ import successImage from "@/assets/tenant/derive_success.svg";
 import pendingImage from "@/assets/tenant/derive_pending.svg";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import infoPageCard02 from "@/assets/tenant/scroll_info_2.png";
+import infoPageCard03 from "@/assets/tenant/scroll_info_3.png";
+import infoPageCard04 from "@/assets/tenant/scroll_info_4.png";
 
 const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
 export const deriveTenantUIConfig = new TenantUI({
@@ -143,11 +146,47 @@ export const deriveTenantUIConfig = new TenantUI({
         imageDescription: "Home of token governance",
       },
     },
+    {
+      route: "info",
+      title: "Welcome to Derive Governance",
+      description:
+        "Derive voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+      meta: {
+        title: "Derive Agora",
+        description: "Home of token governance",
+        imageTitle: "Derive Agora",
+        imageDescription: "Home of Derive Governance",
+      },
+      links: [
+        {
+          name: "Governance Forums",
+          title: "Gov. Forums",
+          url: "https://forum.scroll.io",
+          image: infoPageCard02,
+        },
+        {
+          name: "Governance Docs",
+          title: "Gov. Docs",
+          url: "https://scroll.io/gov-docs/content/overview",
+          image: infoPageCard03,
+        },
+        {
+          name: "Protocol Vision",
+          title: "Protocol Vision",
+          url: "https://scroll.io/blog/scroll-everyone-everywhere",
+          image: infoPageCard04,
+        },
+      ],
+    },
   ],
 
   toggles: [
     {
       name: "admin",
+      enabled: true,
+    },
+    {
+      name: "info",
       enabled: true,
     },
     {

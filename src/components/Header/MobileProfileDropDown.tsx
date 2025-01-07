@@ -16,6 +16,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { CubeIcon } from "@/icons/CubeIcon";
 import { rgbStringToHex } from "@/app/lib/utils/color";
+import { PowerIcon } from "@/icons/PowerIcon";
 
 type Props = {
   ensName: string | undefined;
@@ -112,12 +113,15 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                             </>
                           )}
                         </div>
-                        <Image
-                          src={icons.power}
+                        <div
                           onClick={() => disconnect()}
-                          alt="Disconnect Wallet"
-                          className="cursor-pointer"
-                        />
+                          className="bg-wash border border-line p-0.5 rounded-sm"
+                        >
+                          <PowerIcon
+                            fill={rgbStringToHex(ui.customization?.primary)}
+                            className={"cursor-pointer"}
+                          />
+                        </div>
                       </div>
                       {scwAddress && (
                         <div>
@@ -198,7 +202,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                             {hasStatement ? (
                               <Link
                                 href={`/delegates/edit`}
-                                className="rounded-lg border py-3 px-2 text-neutral bg-primary flex justify-center mt-1 hover:bg-primary"
+                                className="rounded-lg border border-line py-3 px-2 text-primary bg-wash flex justify-center mt-1 hover:bg-primary"
                                 onClick={() => close()}
                               >
                                 Edit delegate statement
@@ -206,7 +210,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                             ) : (
                               <Link
                                 href={`/delegates/create`}
-                                className="rounded-lg border py-3 px-2 text-neutral bg-primary flex justify-center mt-1 hover:bg-primary"
+                                className="rounded-lg border border-line py-3 px-2 text-primary bg-wash flex justify-center mt-1 hover:bg-primary"
                                 onClick={() => close()}
                               >
                                 Create delegate statement
