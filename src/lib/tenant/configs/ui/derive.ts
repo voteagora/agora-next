@@ -193,7 +193,23 @@ export const deriveTenantUIConfig = new TenantUI({
             isPreSubmission: false,
           },
         ],
-        proposalTypes: [ProposalType?.BASIC, ProposalType?.APPROVAL],
+        proposalTypes: [
+          {
+            type: ProposalType?.BASIC,
+            prodAddress: null,
+            testnetAddress: null,
+          },
+          {
+            type: ProposalType?.APPROVAL,
+            prodAddress: "0x5d729d4c0BF5d0a2Fa0F801c6e0023BD450c4fd6",
+            testnetAddress: "0x8dfC3B23EE4ca0b8C4af1e4EC7F72D2efbAB70E3",
+          },
+          {
+            type: ProposalType?.OPTIMISTIC,
+            prodAddress: "0xf8D15c3132eFA557989A1C9331B6667Ca8Caa3a9",
+            testnetAddress: "0x785553111A66B88E3D0cef523C3A2c6D821e675B",
+          },
+        ],
         copy: {
           helperText: `
 ## Proposal checklist

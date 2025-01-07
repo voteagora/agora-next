@@ -151,6 +151,13 @@ const DraftFormClient = ({
     }
   };
 
+  console.log(
+    (plmToggle?.config as PLMConfig)?.proposalTypes.map((pt) => console.log(pt))
+  );
+  console.log(
+    (plmToggle?.config as PLMConfig)?.proposalTypes.map((pt) => console.log(pt))
+  );
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>

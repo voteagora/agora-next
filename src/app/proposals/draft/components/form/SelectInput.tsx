@@ -96,7 +96,7 @@ function SelectInput<
                 >
                   <div className="relative mt-1">
                     <Listbox.Button className="relative cursor-default py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 border bg-wash border-line placeholder:text-tertiary p-2 rounded-lg w-full">
-                      <span className="block truncate">
+                      <span className="block truncate text-primary">
                         {getOptionByValue(value)?.label}
                       </span>
                       <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
@@ -112,7 +112,7 @@ function SelectInput<
                       leaveFrom="opacity-100"
                       leaveTo="opacity-0"
                     >
-                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-primary shadow-lg ring-1 ring-black/5 focus:outline-none z-50">
+                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md py-1 text-primary shadow-lg ring-1 ring-black/5 focus:outline-none z-50 bg-wash border border-line ">
                         {options.map((option, idx) => (
                           <Listbox.Option
                             key={`option-${idx}`}
