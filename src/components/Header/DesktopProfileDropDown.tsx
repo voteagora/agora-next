@@ -23,6 +23,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { rgbStringToHex } from "@/app/lib/utils/color";
+import { PowerIcon } from "@/icons/PowerIcon";
 
 type Props = {
   ensName: string | undefined;
@@ -118,15 +119,13 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                             </>
                           )}
                         </div>
-                        <div className="ml-auto">
-                          <Image
-                            src={icons.power}
-                            onClick={() => {
-                              disconnect();
-                            }}
-                            alt="Disconnect Wallet"
-                            className="cursor-pointer"
-                          />
+                        <div className="ml-auto" onClick={() => disconnect()}>
+                          <div className="bg-wash border border-line p-0.5 rounded-sm">
+                            <PowerIcon
+                              fill={rgbStringToHex(ui.customization?.primary)}
+                              className={"cursor-pointer"}
+                            />
+                          </div>
                         </div>
                       </div>
                       {scwAddress && (
@@ -225,7 +224,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                             {hasStatement ? (
                               <Link
                                 href={`/delegates/edit`}
-                                className="rounded-lg border py-3 px-2 bg-primary text-neutral flex justify-center mt-1 hover:bg-primary"
+                                className="rounded-lg py-3 px-2 bg-brandPrimary hover:bg-brandPrimary/80 text-primary flex justify-center mt-1"
                                 onClick={() => close()}
                               >
                                 Edit delegate statement
@@ -233,7 +232,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                             ) : (
                               <Link
                                 href={`/delegates/create`}
-                                className="rounded-lg border py-3 px-2 bg-primary text-neutral flex justify-center mt-1 hover:bg-primary"
+                                className="rounded-lg py-3 px-2 bg-brandPrimary hover:bg-brandPrimary/80 text-primary flex justify-center mt-1"
                                 onClick={() => close()}
                               >
                                 Create delegate statement
@@ -245,7 +244,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                         {hasStatement && (
                           <Link
                             href={`/delegates/${ensName ?? address}`}
-                            className="rounded-lg py-3 px-2 text-primary bg-brandPrimary hover:bg-brandPrimary/90 mt-1 flex justify-center"
+                            className="rounded-lg py-3 px-2 text-neutral bg-primary hover:bg-primary/90 mt-1 flex justify-center"
                             onClick={() => close()}
                           >
                             View my profile

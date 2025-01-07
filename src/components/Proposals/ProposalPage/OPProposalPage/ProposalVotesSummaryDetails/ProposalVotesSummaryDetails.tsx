@@ -86,7 +86,7 @@ export default function ProposalVotesSummaryDetails({
         <div className="flex justify-between text-positive">
           FOR <AmountAndPercent amount={results.for} total={totalVotes} />
         </div>
-        <div className="text-neutral flex justify-between">
+        <div className="text-secondary flex justify-between">
           ABSTAIN{" "}
           <AmountAndPercent amount={results.abstain} total={totalVotes} />
         </div>

@@ -29,7 +29,7 @@ export const deriveTenantUIConfig = new TenantUI({
   },
 
   customization: {
-    primary: "232 231 255",
+    primary: "233 232 226",
     secondary: "149 149 143",
     tertiary: "149 149 143",
     neutral: "9 10 10",
