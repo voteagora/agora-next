@@ -19,13 +19,7 @@ export type SupportTextProps = {
 };
 
 export function CastVoteDialog(props: CastVoteDialogProps) {
-  const { ui, contracts } = Tenant.current();
-  const scwConfig = ui.smartAccountConfig;
-
-  // Assume voting from SCW if config is present on the tenant
-  if (scwConfig?.factoryAddress) {
-    return <SCWVoteDialog {...props} />;
-  }
+  const { contracts } = Tenant.current();
 
   return contracts?.alligator ? (
     <AdvancedVoteDialog {...props} />
@@ -34,6 +28,10 @@ export function CastVoteDialog(props: CastVoteDialogProps) {
   );
 }
 
+/**
+ * Voting from the SCW wallet works but is not yet supported in the UI
+ * Note that the voting power is derived from the scw wallet and not EOA
+ */
 const SCWVoteDialog = ({
   proposalId,
   reason,
@@ -83,7 +81,7 @@ const SCWVoteDialog = ({
                 Casting vote&nbsp;{supportType.toLowerCase()}
               </div>
             </div>
-            <div className="flex flex-col items-end">
+            <div className="flex flex-col items-end text-primary">
               <div className="text-xs text-tertiary font-medium">with</div>
               <TokenAmountDisplay amount={vpToDisplay} />
             </div>
@@ -161,7 +159,7 @@ const BasicVoteDialog = ({
                 Casting vote&nbsp;{supportType.toLowerCase()}
               </div>
             </div>
-            <div className="flex flex-col items-end">
+            <div className="flex flex-col items-end text-primary">
               <div className="text-xs text-tertiary font-medium">with</div>
               <TokenAmountDisplay amount={vpToDisplay} />
             </div>
@@ -246,7 +244,7 @@ function AdvancedVoteDialog({
                 Casting vote&nbsp;{supportType.toLowerCase()}
               </div>
             </div>
-            <div className="flex flex-col items-end">
+            <div className="flex flex-col items-end text-primary">
               <div className="text-xs text-tertiary font-medium">with</div>
               <TokenAmountDisplay amount={vpToDisplay} />
             </div>
@@ -288,7 +286,10 @@ const VoteButton = ({
   isLoading?: boolean;
 }) => {
   return (
-    <Button onClick={onClick} className="w-full">
+    <Button
+      onClick={onClick}
+      className="w-full bg-brandPrimary hover:bg-brandPrimary/90 text-primary"
+    >
       {children}
     </Button>
   );
@@ -315,7 +316,7 @@ export function SuccessMessage({
         className="w-full mb-3"
         alt="agora loading"
       />
-      <div className="mb-2 text-2xl font-black">
+      <div className="mb-2 text-2xl font-black text-primary">
         Your vote has been submitted!
       </div>
       <div className="mb-5 text-sm text-secondary">
@@ -329,7 +330,7 @@ export function SuccessMessage({
             window.location.reload();
             closeDialog();
           }}
-          className="text-center bg-neutral rounded-md border border-line font-medium shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary"
+          className="text-center bg-neutral rounded-md border border-line font-medium shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-wash active:shadow-none disabled:bg-line text-secondary"
         >
           Got it
         </div>
@@ -352,7 +353,9 @@ export function LoadingVote() {
         className="w-full mb-3"
         alt="Vote pending"
       />
-      <div className="mb-2 text-2xl font-black">Casting your vote</div>
+      <div className="mb-2 text-2xl font-black text-primary">
+        Casting your vote
+      </div>
       <div className="mb-5 text-sm text-secondary">
         It might take up to a minute for the changes to be reflected.
       </div>

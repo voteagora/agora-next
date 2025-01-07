@@ -37,7 +37,7 @@ const MobileValueWrapper = ({
   isLoading ? (
     <div className="animate-pulse bg-tertiary h-5 w-[90px] rounded-2xl"></div>
   ) : (
-    <div className="text-base">{children}</div>
+    <div className="text-primary">{children}</div>
   );
 
 export const MobileProfileDropDown = ({ ensName }: Props) => {

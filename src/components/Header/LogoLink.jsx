@@ -1,8 +1,8 @@
 import Tenant from "@/lib/tenant/tenant";
 import Image from "next/image";
 import Link from "next/link";
-import logo from "@/assets/agora_logo.svg";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { AgoraIcon } from "@/icons/AgoraIcon";
 
 export default function LogoLink() {
   const { namespace, ui } = Tenant.current();
@@ -12,12 +12,9 @@ export default function LogoLink() {
       <div className="gap-2 h-full flex flex-row items-center w-full">
         {namespace !== TENANT_NAMESPACES.SCROLL && (
           <>
-            <Image
-              src={logo}
-              alt="logo"
-              width="20"
-              height="20"
-              className="hidden sm:block"
+            <AgoraIcon
+              fill={"#FF00FF"}
+              className="hidden sm:block w-[20px] h-[20px]"
             />
             <div className="h-3 w-[2px] bg-line rounded-full hidden sm:block"></div>
           </>

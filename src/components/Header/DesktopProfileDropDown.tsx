@@ -37,7 +37,7 @@ const ValueWrapper = ({
   isLoading ? (
     <div className="animate-pulse bg-primary/30 h-5 w-[90px] rounded-2xl"></div>
   ) : (
-    <div className="text-base">{children}</div>
+    <div className="text-primary">{children}</div>
   );
 
 export const DesktopProfileDropDown = ({ ensName }: Props) => {

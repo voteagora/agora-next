@@ -27,7 +27,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
   const { isConnected, address } = useAccount();
   const { namespace } = Tenant.current();
 
-  const hasProposalLifecycle = Boolean(ui.toggle("proposal-execute")?.enabled);
+  const hasProposalLifecycle = Boolean(ui.toggle("proposal-execu te")?.enabled);
 
   // Only check admin for active proposals for Agora and Bravo governors.
   // This check is used to hide the entire admin bar, not just the Cancel button.
@@ -37,6 +37,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
     (namespace === TENANT_NAMESPACES.CYBER ||
       namespace === TENANT_NAMESPACES.SCROLL ||
       namespace === TENANT_NAMESPACES.OPTIMISM ||
+      namespace === TENANT_NAMESPACES.DERIVE ||
       namespace === TENANT_NAMESPACES.UNISWAP);
 
   const { data: adminAddress } = useGovernorAdmin({ enabled: isCancellable });
@@ -103,7 +104,11 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
 
   // For the active state, where only the admin can cancel proposals,
   // we shouldn't display the admin bar at all.
-  if (isCancellable && !canCancel && !PROPOSAL_STATUS.QUEUED) {
+  if (
+    isCancellable &&
+    !canCancel &&
+    proposal.status !== PROPOSAL_STATUS.QUEUED
+  ) {
     return null;
   }
 
@@ -128,6 +133,7 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
+    case TENANT_NAMESPACES.DERIVE:
       return (
         <div className="flex flex-row gap-2">
           <AgoraGovCancel proposal={proposal} />
@@ -165,6 +171,7 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
+    case TENANT_NAMESPACES.DERIVE:
       return <AgoraGovExecute proposal={proposal} />;
 
     case TENANT_NAMESPACES.OPTIMISM:
@@ -190,6 +197,7 @@ const activeStateActions = ({ proposal, namespace }: ActionProps) => {
   switch (namespace) {
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
+    case TENANT_NAMESPACES.DERIVE:
       return <AgoraGovCancel proposal={proposal} />;
 
     case TENANT_NAMESPACES.OPTIMISM:
