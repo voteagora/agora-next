@@ -117,7 +117,7 @@ export default function GovernorSettings() {
         <h1 className="font-extrabold text-2xl text-primary">
           Governor settings
         </h1>
-        <p>Set how all proposals work</p>
+        <p className="text-secondary">Set how all proposals work</p>
       </section>
       <div className="space-y-8 my-4">
         <div className="space-y-4 sm:space-y-0 sm:flex sm:justify-between sm:gap-4">
@@ -132,7 +132,7 @@ export default function GovernorSettings() {
                 step={0.01}
                 type="number"
               />
-              <p className="absolute text-sm text-muted-foreground right-[96px]">
+              <p className="absolute text-sm text-tertiary right-[96px]">
                 Hours
               </p>
               <Button
@@ -164,7 +164,7 @@ export default function GovernorSettings() {
                 step={0.01}
                 type="number"
               />
-              <p className="absolute text-sm text-muted-foreground right-[96px]">
+              <p className="absolute text-sm text-tertiary right-[96px]">
                 Hours
               </p>
               <Button

@@ -12,7 +12,7 @@ const inputVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-line bg-wash",
+        default: "border-line bg-wash text-primary",
         none: "border-none bg-wash",
         bgGray100: "border-line bg-wash",
       },

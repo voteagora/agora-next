@@ -147,6 +147,10 @@ export const deriveTenantUIConfig = new TenantUI({
 
   toggles: [
     {
+      name: "admin",
+      enabled: true,
+    },
+    {
       name: "delegates",
       enabled: true,
     },

@@ -8,7 +8,7 @@ export default function FAQs() {
             <h2 className="font-semibold text-sm text-primary">
               What’s the difference between voting period and voting delay?
             </h2>
-            <p>
+            <p className="text-secondary">
               A voting period determines how many hours voters get to vote on
               proposals. Voting delay means how many hours voters have to wait
               after a proposal is created before they&apos;re allowed to vote. A
@@ -22,7 +22,7 @@ export default function FAQs() {
             <h2 className="font-semibold text-sm text-primary">
               What are proposal types?
             </h2>
-            <p>
+            <p className="text-secondary">
               A proposal type is a set of parameters that proposals can be
               configured with. These are helpful when different types of
               proposals have different quorum and approval threshold values.
@@ -32,7 +32,7 @@ export default function FAQs() {
             <h2 className="font-semibold text-sm text-primary">
               What’s the difference between quorum and approval threshold?
             </h2>
-            <p>
+            <p className="text-secondary">
               The quorum is the minimum number of For or Abstain votes needed
               for a proposal to pass. The quorum is calculated as a percentage
               of the total votable supply. The approval threshold refers to the

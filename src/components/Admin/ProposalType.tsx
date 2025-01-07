@@ -133,7 +133,9 @@ export default function ProposalType({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 my-4">
         <div>
           <div className="flex justify-between items-center">
-            <p className="text-sm font-semibold">Proposal type {index + 1}</p>
+            <p className="text-sm font-semibold text-primary">
+              Proposal type {index + 1}
+            </p>
             <Button
               size="icon"
               variant="ghost"
