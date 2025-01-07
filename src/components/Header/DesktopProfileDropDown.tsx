@@ -131,7 +131,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                       {scwAddress && (
                         <div>
                           <div className="w-[44px] flex justify-center items-center">
-                            <div className="border-l border-dashed border-line h-5"></div>
+                            <div className="border-l border-dashed border-line h-2"></div>
                           </div>
 
                           <div className="flex flex-row items-center gap-3">
