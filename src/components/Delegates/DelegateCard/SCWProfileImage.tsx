@@ -14,12 +14,10 @@ interface Props {
 }
 
 export function SCWProfileImage({ address, copyable = false }: Props) {
-  const { token, ui, namespace } = Tenant.current();
+  const { token } = Tenant.current();
 
   // Note, we are displaying total token balance and not voting power for the SCW account
   const { data: tokenBalance } = useTokenBalance(address);
-
-  const org = ui.organization?.title || namespace;
 
   return (
     <div>
@@ -47,7 +45,7 @@ export function SCWProfileImage({ address, copyable = false }: Props) {
         </div>
       </div>
       <div className="text-xs leading-5 mt-4 text-secondary">
-        {`This is a smart account which is used to enable gasless voting and delegation.`}
+        {`This is a smart account which is used to enable gasless delegation.`}
       </div>
     </div>
   );
