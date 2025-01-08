@@ -90,7 +90,7 @@ export default function DelegateVotes({
         </div>
       }
       element="main"
-      className="divide-y divide-gray-300 overflow-hidden bg-neutral shadow-newDefault ring-1 ring-gray-300 rounded-xl"
+      className="divide-y divide-line overflow-hidden bg-neutral shadow-newDefault ring-1 ring-line rounded-xl"
     >
       {delegateVotes.map(
         (vote) =>

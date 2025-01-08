@@ -33,7 +33,7 @@ const VotesContainer = ({
     return (
       <div className="flex flex-col space-y-4">
         <div className="flex flex-row justify-between items-center relative">
-          <h2 className="text-black text-2xl font-bold flex-grow">
+          <h2 className="text-primary text-2xl font-bold flex-grow">
             Past Votes
           </h2>
         </div>
