@@ -57,12 +57,9 @@ export default async function Page() {
     ui.toggle("info/governance-charts")?.enabled === true;
 
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
-    let treasuryData: { result: MetricTimeSeriesValue[] } = { result: [] };
-    try {
-      treasuryData = await apiFetchTreasuryBalanceTS(FREQUENCY_FILTERS.YEAR);
-    } catch (e) {
-      console.log("Error loading treasury data", e);
-    }
+    const treasuryData = await apiFetchTreasuryBalanceTS(
+      FREQUENCY_FILTERS.YEAR
+    );
 
     return (
       <div className="flex flex-col font-inter">
