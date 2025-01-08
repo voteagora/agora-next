@@ -58,7 +58,7 @@ export default async function DraftProposalPage({
             <h1 className="font-black text-primary text-2xl m-0">
               {stageMetadata?.title}
             </h1>
-            <span className="bg-secondary text-primary rounded-full px-2 py-1 text-sm">
+            <span className="bg-tertiary/5 text-primary rounded-full px-2 py-1 text-sm">
               {/* stageObject.order + 1 is becuase order is zero indexed */}
               Step {stageObject.order + 1}/{DRAFT_STAGES_FOR_TENANT.length}
             </span>
