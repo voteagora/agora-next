@@ -30,7 +30,9 @@ export default function ProposalTypeSettings({
       <h1 className="font-extrabold text-2xl text-primary">
         Proposal type settings
       </h1>
-      <p>Create and manage different types of proposals</p>
+      <p className="text-secondary">
+        Create and manage different types of proposals
+      </p>
 
       {propTypes.map((proposalType, key) => (
         <Fragment key={key}>
@@ -59,7 +61,7 @@ export default function ProposalTypeSettings({
         >
           <Plus className="w-3.5 h-3.5 text-neutral" />
         </Button>
-        <p className="text-sm">Add another proposal type</p>
+        <p className="text-sm text-primary">Add another proposal type</p>
       </div>
     </section>
   );

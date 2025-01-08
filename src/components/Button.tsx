@@ -51,12 +51,12 @@ export function UpdatedButton({
           className={cn(
             className,
             type === "primary" &&
-              "bg-primary hover:bg-primary/90 text-white transition-colors",
+              "bg-primary hover:bg-primary/90 text-neutral transition-colors",
             type === "secondary" && "",
             type === "link" && "",
             variant === "rounded" && "rounded-full",
             fullWidth && "w-full",
-            "font-semibold py-2 px-4 border border-agora-stone-100 cursor-pointer"
+            "font-semibold py-2 px-4 border border-line cursor-pointer"
           )}
         >
           <Link href={href} {...props}>
@@ -69,9 +69,9 @@ export function UpdatedButton({
             className,
             "font-semibold py-2 px-4 border border-line cursor-pointer",
             type === "primary" &&
-              "bg-primary hover:bg-primary/90 text-neutral transition-shadow",
+              "bg-brandPrimary hover:bg-brandPrimary/90 text-neutral transition-shadow",
             type === "secondary" &&
-              "bg-neutral text-primary hover:bg-tertiary/5",
+              "bg-neutral text-primary hover:shadow-newDefault",
             type === "link" && "",
             type === "destructive" &&
               "bg-white text-red-500 hover:text-red-700",

@@ -61,7 +61,7 @@ interface IssueProps {
 
 const Issue = ({ title, icon, value }: IssueProps) => {
   return (
-    <div className="rounded-xl border border-line shadow-newDefault bg-white p-3">
+    <div className="rounded-xl border border-line shadow-newDefault bg-wash p-3">
       <div className="flex flex-row gap-4 items-start">
         <div className="flex flex-col justify-center shrink-0">
           <div className="flex flex-col p-3 rounded-lg shadow-newDefault border border-line">
@@ -71,7 +71,7 @@ const Issue = ({ title, icon, value }: IssueProps) => {
 
         <div className="flex flex-col">
           <div className="text-xs font-medium text-secondary">{title}</div>
-          <div>{value}</div>
+          <div className="text-primary">{value}</div>
         </div>
       </div>
     </div>

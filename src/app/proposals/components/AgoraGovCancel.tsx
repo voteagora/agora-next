@@ -51,6 +51,7 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
     <>
       {!isFetched && (
         <Button
+          className="bg-neutral hover:bg-neutral border-line"
           onClick={() =>
             write({
               address: contracts.governor.address as `0x${string}`,

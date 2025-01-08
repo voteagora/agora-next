@@ -16,6 +16,19 @@ export const protocolGuildTenantUIConfig = new TenantUI({
     delegate: delegateAvatar,
   },
 
+  customization: {
+    primary: "0 0 0",
+    secondary: "64 64 64",
+    tertiary: "115 115 115",
+    neutral: "255 255 255",
+    wash: "250 250 250",
+    line: "229 229 229",
+    positive: "97 209 97",
+    negative: "226 54 54",
+    brandPrimary: "0 0 0",
+    brandSecondary: "255 255 255",
+  },
+
   organization: {
     title: "ENS Foundation",
   },

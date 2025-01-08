@@ -24,7 +24,7 @@ const SponsorOnchainProposalDialog = ({
   const router = useRouter();
   return (
     <VStack alignItems="items-center">
-      <VStack className="w-full bg-white rounded-xl">
+      <VStack className="w-full bg-neutral rounded-xl">
         <VStack>
           <VStack className="w-full">
             <Image
@@ -34,7 +34,7 @@ const SponsorOnchainProposalDialog = ({
               className="w-full mb-3"
               alt={isLoading ? "Pending" : "Success"}
             />
-            <div className="mb-2 text-2xl font-black">
+            <div className="mb-2 text-2xl font-black text-primary">
               {isLoading ? "Creating your proposal ..." : "Proposal complete!"}
             </div>
             {isLoading && (

@@ -59,7 +59,7 @@ const GovernorSettingsProposalTypes = ({
                   <span>Proposal type</span>
                   <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
                 </TooltipTrigger>
-                <TooltipContent className="text-sm max-w-[200px]">
+                <TooltipContent className="text-primary text-sm max-w-[200px]">
                   Proposal types can have different quorums and approval
                   thresholds.
                 </TooltipContent>
@@ -73,7 +73,7 @@ const GovernorSettingsProposalTypes = ({
                   <span>Approval threshold</span>
                   <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
                 </TooltipTrigger>
-                <TooltipContent className="text-sm max-w-[200px]">
+                <TooltipContent className="text-primary text-sm max-w-[200px]">
                   {`For votes as a percentage of (For + Against) required for a vote to be approved ("pass").`}
                 </TooltipContent>
               </Tooltip>
@@ -89,7 +89,7 @@ const GovernorSettingsProposalTypes = ({
                   <span>Proposal threshold</span>
                   <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
                 </TooltipTrigger>
-                <TooltipContent className="text-sm max-w-[200px]">
+                <TooltipContent className="text-primary text-sm max-w-[200px]">
                   How much voting power is needed to submit a proposal of this
                   type.
                 </TooltipContent>
@@ -104,7 +104,7 @@ const GovernorSettingsProposalTypes = ({
                     <span>Quorum</span>
                     <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
                   </TooltipTrigger>
-                  <TooltipContent className="text-sm max-w-[200px]">
+                  <TooltipContent className="text-primary text-sm max-w-[200px]">
                     What percentage of the total supply of voting power must
                     vote For, Against, or Abstain in order for a vote to be
                     valid.

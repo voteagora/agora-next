@@ -37,7 +37,10 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
 
       // If no quorum is set, calculate it based on votable supply
       if (!quorum) {
-        votableSupply = await findVotableSupply({ namespace });
+        votableSupply = await findVotableSupply({
+          namespace,
+          address: contracts.token.address,
+        });
         return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
       }
       return quorum;
@@ -49,7 +52,10 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       // https://voteagora.slack.com/archives/C07ATDL9P8F/p1723657375357649?thread_ts=1723579392.179389&cid=C07ATDL9P8F
       // https://voteagora.slack.com/archives/C07ATDL9P8F/p1723657834565499
 
-      votableSupply = await findVotableSupply({ namespace });
+      votableSupply = await findVotableSupply({
+        namespace,
+        address: contracts.token.address,
+      });
       return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
 
     default: // TENANT_NAMESPACES.PGUILD - yes, TENANT_NAMESPACES.SCROLL?
@@ -59,7 +65,10 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
         );
       } catch {
         // this is a hack, because... // https://linear.app/agora-app/issue/AGORA-3246/quorum-isnt-known-for-proposal-before-its-snapshot
-        quorum = await findVotableSupply({ namespace });
+        quorum = await findVotableSupply({
+          namespace,
+          address: contracts.token.address,
+        });
       }
 
       return BigInt(Number(quorum));

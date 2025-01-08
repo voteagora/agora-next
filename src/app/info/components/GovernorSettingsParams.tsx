@@ -62,7 +62,7 @@ const GovernorSettingsParams = () => {
             Voting Period
           </TableCell>
           <TableCell className="text-base font-semibold text-right text-primary rounded-br-xl">
-            {isPeriodFetched && votingPeriod
+            {isPeriodFetched && votingPeriod !== undefined
               ? secondsToHuman(blocksToSeconds(Number(votingPeriod)))
               : "Loading..."}
           </TableCell>

@@ -28,22 +28,28 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
       <div className="flex flex-col sm:flex-row justify-between bg-neutral border border-line rounded-2xl px-6 py-5 shadow-sm">
         <div>
           <p className="font-semibold text-secondary text-xs">{`By ${proposal.author_address}`}</p>
-          <p className="font-medium">{proposal.title || "[Title pending]"}</p>
+          <p className="font-medium text-primary">
+            {proposal.title || "[Title pending]"}
+          </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-x-16 space-y-4 sm:space-y-0 mt-4 sm:mt-0">
           <div className="w-[140px]">
             <p className="font-semibold text-secondary text-xs">{`Status`}</p>
-            <p className="font-medium">{currentStageMetadata.shortTitle}</p>
+            <p className="font-medium text-primary">
+              {currentStageMetadata.shortTitle}
+            </p>
           </div>
           <div className="w-[140px]">
             <p className="font-semibold text-secondary text-xs">{`Type`}</p>
-            <p className="font-medium">
+            <p className="font-medium text-primary">
               {proposal.voting_module_type || "[Type pending]"}
             </p>
           </div>
           <div className="w-[140px]">
             <p className="font-semibold text-secondary text-xs">{`Waiting for`}</p>
-            <p className="font-medium">{currentStageMetadata.waitingFor}</p>
+            <p className="font-medium text-primary">
+              {currentStageMetadata.waitingFor}
+            </p>
           </div>
         </div>
       </div>
@@ -72,7 +78,7 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
                   }`}
                 ></div>
               </div>
-              <p className="text-xs font-medium text-gray-800">
+              <p className="text-xs font-medium text-secondary">
                 {stageMetadata.title}
               </p>
             </div>

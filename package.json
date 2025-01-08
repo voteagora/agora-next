@@ -20,6 +20,9 @@
     "@aa-sdk/core": "^4.0.0-beta.10",
     "@account-kit/infra": "^4.0.0-beta.10",
     "@account-kit/smart-contracts": "^4.0.0-beta.10",
+    "@alchemy/aa-accounts": "^3.19.0",
+    "@alchemy/aa-alchemy": "^3.19.0",
+    "@alchemy/aa-core": "^3.19.0",
     "@babel/core": "^7.0.0-0",
     "@emotion/css": "^11.11.2",
     "@headlessui/react": "^1.7.17",
@@ -97,8 +100,11 @@
     "utf-8-validate": "^6.0.3",
     "uuid": "^9.0.1",
     "viem": "2.21.16",
-    "wagmi": "^2.12.17",
+    "wagmi": "^2.13.0",
     "zod": "^3.22.4"
+  },
+  "resolutions": {
+    "viem": "2.21.16"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.454.0",

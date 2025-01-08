@@ -47,7 +47,7 @@ function TextInput<
             <Tooltip>
               <TooltipTrigger className="flex flex-row space-x-1">
                 <FormLabel
-                  className="text-xs font-semibold secondary"
+                  className="text-xs font-semibold text-secondary"
                   isRequired={required}
                 >
                   {label}

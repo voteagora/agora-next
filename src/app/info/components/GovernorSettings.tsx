@@ -19,7 +19,7 @@ const GovernorSettings = async () => {
       className="w-full border border-line p-6 mt-4 rounded-xl bg-neutral shadow-sm"
     >
       <AccordionItem className="border-none" value="item-1">
-        <AccordionTrigger className="text-base font-bold text-black hover:no-underline p-0">
+        <AccordionTrigger className="text-primary font-bold hover:no-underline p-0">
           Governor settings
         </AccordionTrigger>
         <AccordionContent className="pt-6 px-0">

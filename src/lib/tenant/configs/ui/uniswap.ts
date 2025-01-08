@@ -35,7 +35,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     line: "229 229 229",
     positive: "97 209 97",
     negative: "226 54 54",
-    brandPrimary: "245 13 180",
+    brandPrimary: "0 0 0",
     brandSecondary: "255 255 255",
   },
 

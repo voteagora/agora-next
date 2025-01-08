@@ -14,7 +14,7 @@ export default function OtherInfoFormSection({
 
   return (
     <div className="py-8 px-6 border-b border-line">
-      <h3 className="font-bold">Other info</h3>
+      <h3 className="font-bold text-primary">Other info</h3>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
         <DelegateStatementInputGroup

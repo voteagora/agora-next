@@ -1,7 +1,6 @@
 "use client";
 
 import { ReactNode } from "react";
-import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import HumanAddress from "@/components/shared/HumanAddress";
 import Image from "next/image";
@@ -13,14 +12,15 @@ import { getVpToDisplay } from "@/lib/voteUtils";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import useStandardVoting from "@/hooks/useStandardVoting";
 import Tenant from "@/lib/tenant/tenant";
+import { useScwVoting } from "@/hooks/useScwVoting";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
 };
 
-// TODO: Better rendering for users with no voting power
 export function CastVoteDialog(props: CastVoteDialogProps) {
   const { contracts } = Tenant.current();
+
   return contracts?.alligator ? (
     <AdvancedVoteDialog {...props} />
   ) : (
@@ -28,7 +28,11 @@ export function CastVoteDialog(props: CastVoteDialogProps) {
   );
 }
 
-function BasicVoteDialog({
+/**
+ * Voting from the SCW wallet works but is not yet supported in the UI
+ * Note that the voting power is derived from the scw wallet and not EOA
+ */
+const SCWVoteDialog = ({
   proposalId,
   reason,
   supportType,
@@ -36,7 +40,85 @@ function BasicVoteDialog({
   votingPower,
   delegate,
   missingVote,
-}: CastVoteDialogProps) {
+}: CastVoteDialogProps) => {
+  const { write, isLoading, isSuccess, data } = useScwVoting({
+    proposalId,
+    support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
+    reason,
+    missingVote,
+  });
+
+  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+
+  if (!delegate) {
+    // todo: log
+    return null;
+  }
+
+  if (isLoading) {
+    return <LoadingVote />;
+  }
+
+  return (
+    <>
+      {!isSuccess && (
+        <div
+          className="flex flex-col gap-4 w-full relative"
+          style={{ transformStyle: "preserve-3d" }}
+        >
+          <div className="flex flex-row justify-between">
+            <div className="flex flex-col">
+              {delegate.address ? (
+                <div className="text-xs text-tertiary font-medium">
+                  <HumanAddress address={delegate.address} />
+                </div>
+              ) : (
+                <div className="text-xs text-tertiary font-medium">
+                  Anonymous
+                </div>
+              )}
+              <div className="text-lg text-primary font-extrabold">
+                Casting vote&nbsp;{supportType.toLowerCase()}
+              </div>
+            </div>
+            <div className="flex flex-col items-end text-primary">
+              <div className="text-xs text-tertiary font-medium">with</div>
+              <TokenAmountDisplay amount={vpToDisplay} />
+            </div>
+          </div>
+          <div>
+            {reason ? (
+              <div className="max-h-[40vh] overflow-y-scroll text-secondary">
+                {reason}
+              </div>
+            ) : (
+              <div className="w-full py-6 px-4 rounded-lg border border-line text-center text-secondary">
+                No voting reason provided
+              </div>
+            )}
+          </div>
+          <div>
+            <VoteButton onClick={write}>
+              Vote {supportType.toLowerCase()} with{"\u00A0"}
+              <TokenAmountDisplay amount={vpToDisplay} />
+            </VoteButton>
+          </div>
+        </div>
+      )}
+      {isSuccess && <SuccessMessage closeDialog={closeDialog} data={data} />}
+    </>
+  );
+};
+
+const BasicVoteDialog = ({
+  proposalId,
+  reason,
+  supportType,
+  closeDialog,
+  votingPower,
+  delegate,
+  missingVote,
+}: CastVoteDialogProps) => {
   const { write, isLoading, isSuccess, data } = useStandardVoting({
     proposalId,
     support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
@@ -62,8 +144,8 @@ function BasicVoteDialog({
           className="flex flex-col gap-4 w-full relative"
           style={{ transformStyle: "preserve-3d" }}
         >
-          <HStack justifyContent="justify-between">
-            <VStack>
+          <div className="flex flex-row justify-between">
+            <div className="flex flex-col">
               {delegate.address ? (
                 <div className="text-xs text-tertiary font-medium">
                   <HumanAddress address={delegate.address} />
@@ -76,12 +158,12 @@ function BasicVoteDialog({
               <div className="text-lg text-primary font-extrabold">
                 Casting vote&nbsp;{supportType.toLowerCase()}
               </div>
-            </VStack>
-            <VStack alignItems="items-end">
+            </div>
+            <div className="flex flex-col items-end text-primary">
               <div className="text-xs text-tertiary font-medium">with</div>
               <TokenAmountDisplay amount={vpToDisplay} />
-            </VStack>
-          </HStack>
+            </div>
+          </div>
           <div>
             {reason ? (
               <div className="max-h-[40vh] overflow-y-scroll text-secondary">
@@ -108,7 +190,7 @@ function BasicVoteDialog({
       {isSuccess && <SuccessMessage closeDialog={closeDialog} data={data} />}
     </>
   );
-}
+};
 
 function AdvancedVoteDialog({
   proposalId,
@@ -147,8 +229,8 @@ function AdvancedVoteDialog({
           className="w-full relative gap-4"
           style={{ transformStyle: "preserve-3d" }}
         >
-          <HStack justifyContent="justify-between">
-            <VStack>
+          <div className="flex flex-row justify-between">
+            <div className="flex flex-col">
               {delegate.address ? (
                 <div className="text-xs text-tertiary font-medium">
                   <HumanAddress address={delegate.address} />
@@ -161,12 +243,12 @@ function AdvancedVoteDialog({
               <div className="text-lg text-primary font-extrabold">
                 Casting vote&nbsp;{supportType.toLowerCase()}
               </div>
-            </VStack>
-            <VStack alignItems="items-end">
+            </div>
+            <div className="flex flex-col items-end text-primary">
               <div className="text-xs text-tertiary font-medium">with</div>
               <TokenAmountDisplay amount={vpToDisplay} />
-            </VStack>
-          </HStack>
+            </div>
+          </div>
           <div>
             {reason ? (
               <div className="max-h-[40vh] overflow-y-scroll text-secondary">
@@ -204,7 +286,10 @@ const VoteButton = ({
   isLoading?: boolean;
 }) => {
   return (
-    <Button onClick={onClick} className="w-full">
+    <Button
+      onClick={onClick}
+      className="w-full bg-brandPrimary hover:bg-brandPrimary/90 text-primary"
+    >
       {children}
     </Button>
   );
@@ -223,7 +308,7 @@ export function SuccessMessage({
   const { ui } = Tenant.current();
 
   return (
-    <VStack className="w-full">
+    <div className="flex flex-col w-full">
       <Image
         width="457"
         height="155"
@@ -231,7 +316,7 @@ export function SuccessMessage({
         className="w-full mb-3"
         alt="agora loading"
       />
-      <div className="mb-2 text-2xl font-black">
+      <div className="mb-2 text-2xl font-black text-primary">
         Your vote has been submitted!
       </div>
       <div className="mb-5 text-sm text-secondary">
@@ -245,7 +330,7 @@ export function SuccessMessage({
             window.location.reload();
             closeDialog();
           }}
-          className="text-center bg-neutral rounded-md border border-line font-medium shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary"
+          className="text-center bg-neutral rounded-md border border-line font-medium shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-wash active:shadow-none disabled:bg-line text-secondary"
         >
           Got it
         </div>
@@ -254,7 +339,7 @@ export function SuccessMessage({
         hash1={data?.standardTxHash}
         hash2={data?.advancedTxHash}
       />
-    </VStack>
+    </div>
   );
 }
 
@@ -262,13 +347,15 @@ export function LoadingVote() {
   const { ui } = Tenant.current();
 
   return (
-    <VStack className="w-full">
+    <div className="flex flex-col w-full">
       <Image
         src={ui.assets.pending}
         className="w-full mb-3"
         alt="Vote pending"
       />
-      <div className="mb-2 text-2xl font-black">Casting your vote</div>
+      <div className="mb-2 text-2xl font-black text-primary">
+        Casting your vote
+      </div>
       <div className="mb-5 text-sm text-secondary">
         It might take up to a minute for the changes to be reflected.
       </div>
@@ -281,7 +368,7 @@ export function LoadingVote() {
           </div>
         </div>
       </div>
-    </VStack>
+    </div>
   );
 }
 
@@ -308,7 +395,7 @@ export function DisabledVoteDialog({
   const { ui } = Tenant.current();
 
   return (
-    <VStack className="w-full">
+    <div className="flex flex-col w-full">
       <Image
         width="457"
         height="155"
@@ -332,6 +419,6 @@ export function DisabledVoteDialog({
           <div className="font-medium">Got it, I’ll come back later</div>
         </div>
       </div>
-    </VStack>
+    </div>
   );
 }
