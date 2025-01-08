@@ -1,17 +1,18 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import ENSName from "./ENSName"; // adjust the import path as per your project structure
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
-import { icons } from "@/icons/icons";
+import { ClipboardIcon } from "@/icons/ClipboardIcon";
+import { rgbStringToHex } from "@/app/lib/utils/color";
+import Tenant from "@/lib/tenant/tenant";
 
 // This component will display the ENS name for a given address
 // It will also be copyable, meaning that when clicked, it will copy the address to the clipboard
 // It will also show a checkmark when the address has been copied
 function CopyableHumanAddress({ address }: { address: string }) {
   const [isInCopiedState, setIsInCopiedState] = useState<boolean>(false);
-
+  const { ui } = Tenant.current();
   useEffect(() => {
     let id: NodeJS.Timeout | number | null = null;
     if (isInCopiedState) {
@@ -38,9 +39,8 @@ function CopyableHumanAddress({ address }: { address: string }) {
       {isInCopiedState ? (
         <CheckCircleIcon className="text-green-600 w-4 h-4" />
       ) : (
-        <Image
-          src={icons.clipboard}
-          alt={"clipboard icon"}
+        <ClipboardIcon
+          fill={rgbStringToHex(ui.customization?.secondary)}
           className="w-4 h-4 hidden group-hover:block group-hover:opacity-90"
         />
       )}
