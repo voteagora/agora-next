@@ -6,9 +6,11 @@ import successImage from "@/assets/tenant/derive_success.svg";
 import pendingImage from "@/assets/tenant/derive_pending.svg";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
-import infoPageCard02 from "@/assets/tenant/scroll_info_2.png";
-import infoPageCard03 from "@/assets/tenant/scroll_info_3.png";
-import infoPageCard04 from "@/assets/tenant/scroll_info_4.png";
+import infoPageCard01 from "@/assets/tenant/derive_info_0.png";
+import infoPageCard02 from "@/assets/tenant/derive_info_1.png";
+import infoPageCard03 from "@/assets/tenant/derive_info_2.png";
+import infoPageCard04 from "@/assets/tenant/derive_info_3.png";
+import infoPageHero from "@/assets/tenant/derive_gov.png";
 
 const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
 export const deriveTenantUIConfig = new TenantUI({
@@ -108,22 +110,10 @@ export const deriveTenantUIConfig = new TenantUI({
       },
     },
     {
-      route: "info",
-      title: "Agora is the home of Derive governance",
-      description: "Derive governance is launching now.",
-      hero: deriveHero,
-      meta: {
-        title: "Derive Agora",
-        description: "Home of token governance",
-        imageTitle: "Derive Agora",
-        imageDescription: "Home of token governance",
-      },
-    },
-    {
       route: "delegates",
       title: "Agora is the home of Derive delegates",
       description:
-        "Derive voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+        "Agora is the home of Derive governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem.",
       hero: deriveHero,
       meta: {
         title: "Voter on Agora",
@@ -147,33 +137,52 @@ export const deriveTenantUIConfig = new TenantUI({
       },
     },
     {
-      route: "info",
-      title: "Welcome to Derive Governance",
+      route: "info/about",
+      title: "About Derive",
+      hero: infoPageHero,
       description:
-        "Derive voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+        "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
       meta: {
-        title: "Derive Agora",
-        description: "Home of token governance",
-        imageTitle: "Derive Agora",
+        title: "Info of Derive Governance",
+        description: "Welcome to the Scroll DAO",
+        imageTitle: "",
+        imageDescription: "",
+      },
+    },
+    {
+      route: "info",
+      title: "Welcome to the Community",
+      description:
+        "Agora is the home of Derive governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem.",
+      meta: {
+        title: "Scroll Governance",
+        description: "Home of Derive Governance",
+        imageTitle: "Scroll Governance",
         imageDescription: "Home of Derive Governance",
       },
       links: [
         {
-          name: "Governance Forums",
+          name: "Community Discord",
+          title: "Community Discord",
+          url: "https://discord.com/invite/Derive",
+          image: infoPageCard01,
+        },
+        {
+          name: "Governance Portal",
           title: "Gov. Forums",
-          url: "https://forum.scroll.io",
+          url: "https://www.derive.xyz/drv",
           image: infoPageCard02,
         },
         {
-          name: "Governance Docs",
-          title: "Gov. Docs",
-          url: "https://scroll.io/gov-docs/content/overview",
+          name: "Protocol Docs",
+          title: "Protocol Docs",
+          url: "https://docs.derive.xyz",
           image: infoPageCard03,
         },
         {
           name: "Protocol Vision",
           title: "Protocol Vision",
-          url: "https://scroll.io/blog/scroll-everyone-everywhere",
+          url: "#",
           image: infoPageCard04,
         },
       ],
@@ -183,6 +192,10 @@ export const deriveTenantUIConfig = new TenantUI({
   toggles: [
     {
       name: "admin",
+      enabled: true,
+    },
+    {
+      name: "info",
       enabled: true,
     },
     {

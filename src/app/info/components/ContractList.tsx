@@ -32,7 +32,7 @@ const ContractList = () => {
         <TableRow>
           <TableHead
             colSpan={4}
-            className="text-base font-semibold text-secondary bg-wash rounded-t-xl"
+            className="font-semibold text-secondary bg-wash rounded-t-xl"
           >
             Contracts
           </TableHead>
@@ -42,7 +42,7 @@ const ContractList = () => {
         {list.map((contract, index) => (
           <TableRow key={index}>
             <TableCell
-              className={`pr-1 text-base font-semibold text-secondary ${
+              className={`pr-1 font-semibold text-secondary ${
                 index === list.length - 1 && "rounded-bl-xl"
               }`}
             >
