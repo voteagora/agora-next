@@ -47,8 +47,7 @@ export function SCWProfileImage({ address, copyable = false }: Props) {
         </div>
       </div>
       <div className="text-xs leading-5 mt-4 text-secondary">
-        {`This is a smart account. Agora uses smart accounts to enable
-        gasless voting and delegation for ${org}.`}
+        {`This is a smart account which is used to enable gasless voting and delegation.`}
       </div>
     </div>
   );
