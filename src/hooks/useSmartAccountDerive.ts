@@ -68,7 +68,7 @@ const lyraBundlerClient = createBundlerClient({
   cacheTime: 1000,
 });
 
-const bundlerTransport = http(ui.smartAccountConfig!.bundlerUrl);
+const bundlerTransport = http(ui.smartAccountConfig?.bundlerUrl);
 const nodeTransport = http(
   `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
 );
