@@ -64,7 +64,7 @@ export default function DAOMetricsHeader({ metrics }) {
                       </span>
                     </HoverCardTrigger>
                     <HoverCardContent
-                      className="w-full shadow"
+                      className="w-full shadow text-primary"
                       side="bottom"
                       sideOffset={3}
                     >
@@ -81,7 +81,7 @@ export default function DAOMetricsHeader({ metrics }) {
                         </span>
                       </HoverCardTrigger>
                       <HoverCardContent
-                        className="w-full shadow"
+                        className="w-full shadow text-primary"
                         side="bottom"
                         sideOffset={3}
                       >
