@@ -186,10 +186,6 @@ export const deriveTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "info",
-      enabled: true,
-    },
-    {
       name: "delegates",
       enabled: true,
     },
