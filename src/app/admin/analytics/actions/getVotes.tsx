@@ -1,6 +1,6 @@
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
-import { startingBlockNumber } from "../utils";
+import { analyticsStartingBlockNumber } from "../utils";
 import { ANALYTICS_EVENTS } from "@/lib/constants";
 
 export const getVotes = async () => {
@@ -19,7 +19,9 @@ export const getVotes = async () => {
     ORDER BY vote_count DESC;
   `;
   const eventsStartedAtBlock =
-    startingBlockNumber[chainId as keyof typeof startingBlockNumber];
+    analyticsStartingBlockNumber[
+      chainId as keyof typeof analyticsStartingBlockNumber
+    ];
 
   const votesQuery = `
     SELECT v.proposal_id, COUNT(*) as vote_count, p.end_block, p.description

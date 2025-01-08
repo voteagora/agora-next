@@ -7,10 +7,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const DelegatesTable = ({
-  delegates,
+const ProposalsTable = ({
+  proposals,
 }: {
-  delegates: { matches: number; misses: number }[];
+  proposals: { matches: number; misses: number }[];
 }) => {
   return (
     <Table>
@@ -31,28 +31,28 @@ const DelegatesTable = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {delegates.map(
-          (delegate: { matches: number; misses: number }, index: number) => (
+        {proposals.map(
+          (proposal: { matches: number; misses: number }, index: number) => (
             <TableRow key={index}>
               <TableCell
                 className={`pr-1 text-base text-secondary ${
-                  index === delegates.length - 1 && "rounded-bl-xl"
+                  index === proposals.length - 1 && "rounded-bl-xl"
                 }`}
               >
                 {index + 1}
               </TableCell>
               <TableCell className="px-1 text-base text-primary">
-                {delegate.matches}
+                {proposal.matches}
               </TableCell>
               <TableCell
-                className={`px-1 ${index === delegates.length - 1 && "rounded-br-xl"}`}
+                className={`px-1 ${index === proposals.length - 1 && "rounded-br-xl"}`}
               >
-                {delegate.misses}
+                {proposal.misses}
               </TableCell>
               <TableCell className="px-1 text-base text-primary">
                 {(
-                  (Number(delegate.matches) /
-                    (Number(delegate.matches) + Number(delegate.misses))) *
+                  (Number(proposal.matches) /
+                    (Number(proposal.matches) + Number(proposal.misses))) *
                   100
                 ).toFixed(2)}
                 %
@@ -65,4 +65,4 @@ const DelegatesTable = ({
   );
 };
 
-export default DelegatesTable;
+export default ProposalsTable;

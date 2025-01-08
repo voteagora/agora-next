@@ -13,12 +13,13 @@ import {
   useSimulateContract,
 } from "wagmi";
 import { useModal } from "connectkit";
-import { disapprovalThreshold } from "@/lib/constants";
+import { ANALYTICS_EVENTS, disapprovalThreshold } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import { ProposalType } from "@/app/proposals/draft/types";
+import { trackEvent } from "@/lib/analytics";
 
-const { contracts, ui } = Tenant.current();
+const { contracts, ui, slug } = Tenant.current();
 
 const abiCoder = new AbiCoder();
 const governorContract = contracts.governor;
@@ -61,13 +62,23 @@ export default function SubmitButton({
     isPending: isLoading,
     isSuccess,
     isError,
-    writeContract: write,
+    writeContractAsync: writeAsync,
   } = useWriteContract();
 
   const openDialog = useOpenDialog();
 
-  function submitProposal() {
-    write(config!.request);
+  async function submitProposal() {
+    const txHash = await writeAsync(config!.request);
+    trackEvent({
+      event_name: ANALYTICS_EVENTS.CREATE_PROPOSAL,
+      event_data: {
+        transactionHash: txHash,
+        uses_plm: false,
+        proposal_data: inputData,
+        contract_address: governorContract.address,
+        dao_slug: slug,
+      },
+    });
     openDialog({
       type: "CAST_PROPOSAL",
       params: {

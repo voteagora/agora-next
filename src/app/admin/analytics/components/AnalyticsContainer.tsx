@@ -1,16 +1,14 @@
 "use client";
-
 import { useState } from "react";
-import VotesDataView from "./votes/VotesDataView";
-import DelegationsDataView from "./delegates/DelegationsDataView";
-import ProposalsDataView from "./proposals/ProposalsDataView";
 
 const AnalyticsContainer = ({
-  votes,
-  delegates,
+  votesComponent,
+  delegatesComponent,
+  proposalsComponent,
 }: {
-  votes: any;
-  delegates: any;
+  votesComponent: React.ReactNode;
+  delegatesComponent: React.ReactNode;
+  proposalsComponent: React.ReactNode;
 }) => {
   const [selectedView, setSelectedView] = useState("votes");
 
@@ -36,11 +34,9 @@ const AnalyticsContainer = ({
           Proposals
         </button>
       </div>
-      {selectedView === "votes" && <VotesDataView votes={votes} />}
-      {selectedView === "delegations" && (
-        <DelegationsDataView delegates={delegates} />
-      )}
-      {selectedView === "proposals" && <ProposalsDataView />}
+      {selectedView === "votes" && votesComponent}
+      {selectedView === "delegations" && delegatesComponent}
+      {selectedView === "proposals" && proposalsComponent}
     </div>
   );
 };

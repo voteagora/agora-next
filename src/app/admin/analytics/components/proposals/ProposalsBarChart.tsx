@@ -16,9 +16,6 @@ import {
   NameType,
   ValueType,
 } from "recharts/types/component/DefaultTooltipContent";
-import { getHumanBlockTime } from "@/lib/blockTimes";
-import { Block } from "ethers";
-import { formatFullDate } from "@/lib/utils";
 
 // Custom tooltip component
 const CustomTooltip = ({
@@ -35,8 +32,8 @@ const CustomTooltip = ({
     return (
       <div className="bg-white p-4 border rounded shadow">
         <p className="font-bold">{label}</p>
-        <p>{`Delegates on Agora: ${matches}`}</p>
-        <p>{`Delegates elsewhere: ${misses}`}</p>
+        <p>{`Proposals on Agora: ${matches}`}</p>
+        <p>{`Proposals elsewhere: ${misses}`}</p>
         <p className="mt-2">{`Percentage on Agora: ${percentage}%`}</p>
       </div>
     );
@@ -44,17 +41,10 @@ const CustomTooltip = ({
   return null;
 };
 
-export default function DelegatesBarChart({
+export default function ProposalsBarChart({
   data,
-  latestBlock,
 }: {
-  data: {
-    matches: number;
-    misses: number;
-    startBlock: number;
-    endBlock: number;
-  }[];
-  latestBlock: Block;
+  data: { matches: number; misses: number }[];
 }) {
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -70,18 +60,7 @@ export default function DelegatesBarChart({
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="startBlock"
-          tickFormatter={(block) =>
-            formatFullDate(getHumanBlockTime(block, latestBlock))
-          }
-          angle={-15}
-          textAnchor="end"
-          height={100}
-          tick={{
-            fontSize: 12,
-          }}
-        />
+        <XAxis dataKey="name" />
         <YAxis />
         <Tooltip content={<CustomTooltip />} />
         <Legend formatter={(value) => value.replace(/_/g, " ")} />
@@ -89,13 +68,13 @@ export default function DelegatesBarChart({
           dataKey="matches"
           stackId="a"
           fill="#82ca9d"
-          name="Delegates on Agora"
+          name="Proposals on Agora"
         />
         <Bar
           dataKey="misses"
           stackId="a"
           fill="#C95687"
-          name="Delegates elsewhere"
+          name="Proposals elsewhere"
         />
       </BarChart>
     </ResponsiveContainer>
