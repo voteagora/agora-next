@@ -16,9 +16,9 @@ import {
   NameType,
   ValueType,
 } from "recharts/types/component/DefaultTooltipContent";
-import { getHumanBlockTime } from "@/lib/blockTimes";
+import { getHumanBlockTime, getSecondsPerBlock } from "@/lib/blockTimes";
 import { Block } from "ethers";
-import { formatFullDate } from "@/lib/utils";
+import { formatAbbreviatedDate } from "@/lib/utils";
 
 // Custom tooltip component
 const CustomTooltip = ({
@@ -30,7 +30,8 @@ const CustomTooltip = ({
     const matches = Number(payload[0].value);
     const misses = Number(payload[1].value);
     const totalDelegates = matches + misses;
-    const percentage = ((matches / totalDelegates) * 100).toFixed(1);
+    const percentage =
+      totalDelegates > 0 ? ((matches / totalDelegates) * 100).toFixed(1) : 0;
 
     return (
       <div className="bg-white p-4 border rounded shadow">
@@ -47,6 +48,7 @@ const CustomTooltip = ({
 export default function DelegatesBarChart({
   data,
   latestBlock,
+  interval,
 }: {
   data: {
     matches: number;
@@ -55,7 +57,11 @@ export default function DelegatesBarChart({
     endBlock: number;
   }[];
   latestBlock: Block;
+  interval: number;
 }) {
+  const secondsPerBlock = getSecondsPerBlock();
+  const blocksPerInterval = interval / secondsPerBlock;
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart
@@ -72,11 +78,11 @@ export default function DelegatesBarChart({
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
           dataKey="startBlock"
-          tickFormatter={(block) =>
-            formatFullDate(getHumanBlockTime(block, latestBlock))
-          }
-          angle={-15}
-          textAnchor="end"
+          tickFormatter={(block) => {
+            return `${formatAbbreviatedDate(getHumanBlockTime(block, latestBlock))} - ${formatAbbreviatedDate(getHumanBlockTime(block + blocksPerInterval, latestBlock))}`;
+          }}
+          angle={-0}
+          textAnchor="middle"
           height={100}
           tick={{
             fontSize: 12,

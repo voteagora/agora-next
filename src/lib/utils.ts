@@ -304,6 +304,14 @@ export function formatFullDate(date: Date): string {
   return formattedDate;
 }
 
+export function formatAbbreviatedDate(date: Date): string {
+  return date.toLocaleDateString("en-US", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "2-digit",
+  });
+}
+
 export async function fetchAndSet<T>(
   fetcher: () => Promise<T>,
   setter: (value: T) => void

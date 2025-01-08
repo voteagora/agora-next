@@ -56,7 +56,18 @@ export default function VotesBarChart({ data }: { data: any }) {
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
+        <XAxis
+          tickFormatter={(name) => {
+            return `${name.slice(1)}`;
+          }}
+          dataKey="name"
+          angle={-15}
+          textAnchor="end"
+          height={100}
+          tick={{
+            fontSize: 12,
+          }}
+        />
         <YAxis />
         <Tooltip content={<CustomTooltip />} />
         <Legend formatter={(value) => value.replace(/_/g, " ")} />

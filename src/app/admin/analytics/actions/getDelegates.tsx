@@ -1,3 +1,5 @@
+"use server";
+
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { analyticsStartingBlockNumber } from "../utils";
@@ -17,13 +19,9 @@ export const getDelegates = async ({
   const chainId = contracts.token.chain.id;
 
   const secondsPerBlock = getSecondsPerBlock();
-  console.log("secondsPerBlock", secondsPerBlock);
   const rangeInBlocks = Math.floor(range / secondsPerBlock);
-  console.log("rangeInBlocks", rangeInBlocks);
   const intervalInBlocks = Math.floor(interval / secondsPerBlock);
-  console.log("intervalInBlocks", intervalInBlocks);
   const currentBlockNumber = await contracts.token.provider.getBlockNumber();
-  console.log("currentBlockNumber", currentBlockNumber);
 
   const eventsQuery = `
     SELECT
@@ -44,7 +42,7 @@ export const getDelegates = async ({
     SELECT d.transaction_hash, d.block_number
     FROM ${namespace}.delegate_changed_events d
     WHERE CAST(d.block_number AS INTEGER) >= ${eventsStartedAtBlock}
-    AND d.block_number <= ${currentBlockNumber - range}
+    AND d.block_number >= ${currentBlockNumber - range}
     AND d.address = '${contracts.token.address.toLowerCase()}'
     GROUP BY d.transaction_hash, d.block_number
     ORDER BY d.block_number ASC
