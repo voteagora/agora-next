@@ -43,7 +43,7 @@ const { contracts, ui } = Tenant.current();
 
 export const lyraEntrypoint = getEntryPoint(contracts.token.chain, {
   version: "0.6.0",
-  addressOverride: ui.smartAccountConfig!.entryPointAddress,
+  addressOverride: ui.smartAccountConfig?.entryPointAddress,
 });
 
 const combinedTransport = custom({
