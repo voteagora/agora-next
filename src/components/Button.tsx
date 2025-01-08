@@ -71,7 +71,7 @@ export function UpdatedButton({
             type === "primary" &&
               "bg-brandPrimary hover:bg-brandPrimary/90 text-neutral transition-shadow",
             type === "secondary" &&
-              "bg-neutral text-primary hover:bg-tertiary/5",
+              "bg-neutral text-primary hover:shadow-newDefault",
             type === "link" && "",
             type === "destructive" &&
               "bg-white text-red-500 hover:text-red-700",
