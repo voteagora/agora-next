@@ -141,7 +141,7 @@ export const deriveTenantUIConfig = new TenantUI({
       title: "About Derive",
       hero: infoPageHero,
       description:
-        "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
+        "Derive is a permissionless, decentralized protocol that creates and settles unique programmable onchain options, perpetuals, and structured products. The protocol is deployed on an Optimistic Rollup that settles to the Ethereum blockchain. The protocol is governed by the Derive DAO and DRV token stakers.",
       meta: {
         title: "Info of Derive Governance",
         description: "Welcome to the Derive DAO",
