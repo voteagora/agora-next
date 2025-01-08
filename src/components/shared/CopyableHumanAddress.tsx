@@ -40,7 +40,7 @@ function CopyableHumanAddress({ address }: { address: string }) {
         <CheckCircleIcon className="text-green-600 w-4 h-4" />
       ) : (
         <ClipboardIcon
-          fill={rgbStringToHex(ui.customization?.secondary)}
+          fill={rgbStringToHex(ui.customization?.primary)}
           className="w-4 h-4 hidden group-hover:block group-hover:opacity-90"
         />
       )}
