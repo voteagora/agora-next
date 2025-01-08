@@ -144,20 +144,20 @@ export const deriveTenantUIConfig = new TenantUI({
         "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
       meta: {
         title: "Info of Derive Governance",
-        description: "Welcome to the Scroll DAO",
+        description: "Welcome to the Derive DAO",
         imageTitle: "",
         imageDescription: "",
       },
     },
     {
       route: "info",
-      title: "Welcome to the Community",
+      title: "Welcome to Derive Governance",
       description:
         "Agora is the home of Derive governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem.",
       meta: {
-        title: "Scroll Governance",
+        title: "Derive Governance",
         description: "Home of Derive Governance",
-        imageTitle: "Scroll Governance",
+        imageTitle: "Derive Governance",
         imageDescription: "Home of Derive Governance",
       },
       links: [
@@ -168,9 +168,9 @@ export const deriveTenantUIConfig = new TenantUI({
           image: infoPageCard01,
         },
         {
-          name: "Governance Portal",
+          name: "Gov. Forums",
           title: "Gov. Forums",
-          url: "https://www.derive.xyz/drv",
+          url: "https://forums.derive.xyz",
           image: infoPageCard02,
         },
         {
@@ -182,7 +182,7 @@ export const deriveTenantUIConfig = new TenantUI({
         {
           name: "Protocol Vision",
           title: "Protocol Vision",
-          url: "#",
+          url: "https://derive.xyz",
           image: infoPageCard04,
         },
       ],
