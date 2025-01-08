@@ -105,7 +105,7 @@ export default function DelegateCard({
           />
         </div>
         {hasSCWAddress && (
-          <div className="flex flex-col items-stretch p-6 border-b border-line bg-neutral">
+          <div className="flex flex-col items-stretch p-6 border-b border-line">
             <SCWProfileImage
               address={delegate.statement?.scw_address}
               copyable={true}
