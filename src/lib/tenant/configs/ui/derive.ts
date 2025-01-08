@@ -43,7 +43,7 @@ export const deriveTenantUIConfig = new TenantUI({
     positive: "19 238 154",
     negative: "246 62 88",
     brandPrimary: "244 62 88",
-    brandSecondary: "251 165 42",
+    brandSecondary: "0 0 0 ",
   },
 
   links: [

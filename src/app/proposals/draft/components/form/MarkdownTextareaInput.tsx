@@ -111,7 +111,7 @@ function MarkdownTextareaInput<
                   type="button"
                   className={`py-2 px-3 rounded-full font-medium ${
                     selectedMode === "write"
-                      ? "bg-secondary text-primary"
+                      ? "bg-tertiary/5 text-primary"
                       : "text-tertiary"
                   }`}
                   onClick={() => setSelectedMode("write")}
@@ -122,7 +122,7 @@ function MarkdownTextareaInput<
                   type="button"
                   className={`py-2 px-3 rounded-full font-medium ${
                     selectedMode === "preview"
-                      ? "bg-secondary text-primary"
+                      ? "bg-tertiary/5 text-primary"
                       : "text-tertiary"
                   }`}
                   onClick={() => setSelectedMode("preview")}

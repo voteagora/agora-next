@@ -27,7 +27,7 @@ export const ensTenantUIConfig = new TenantUI({
     line: "229 229 229",
     positive: "97 209 97",
     negative: "226 54 54",
-    brandPrimary: "0 128 188",
+    brandPrimary: "1 26 37",
     brandSecondary: "255 255 255",
   },
 
