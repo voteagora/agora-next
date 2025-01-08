@@ -56,14 +56,10 @@ export const deriveTenantUIConfig = new TenantUI({
 
   smartAccountConfig: {
     bundlerUrl: "https://bundler-prod-testnet-0eakp60405.t.conduit.xyz",
-    entryPointAddress: isProd
-      ? "0x0"
-      : "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
-    factoryAddress: isProd
-      ? "0x0"
-      : "0x000000893A26168158fbeaDD9335Be5bC96592E2",
+    entryPointAddress: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+    factoryAddress: "0x000000893A26168158fbeaDD9335Be5bC96592E2",
     paymasterAddress: isProd
-      ? "0x0"
+      ? "0xa179c3b32d3eE58353d3F277b32D1e03DD33fFCA"
       : "0x5a6499b442711feeA0Aa73C6574042EC5E2e5945",
     paymasterUrl: isProd
       ? "https://derive.xyz/api/paymaster"
