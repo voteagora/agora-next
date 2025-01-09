@@ -97,7 +97,7 @@ export const deriveTenantUIConfig = new TenantUI({
       route: "/",
       title: "Agora is the home of Derive Governance",
       description:
-        "Agora is the home of Derive governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem. ",
+        "Agora is the home of Derive Governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem.",
       hero: deriveHero,
       meta: {
         title: "Derive Agora",
@@ -110,7 +110,7 @@ export const deriveTenantUIConfig = new TenantUI({
       route: "delegates",
       title: "Agora is the home of Derive Governance",
       description:
-        "Agora is the home of Derive governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem. ",
+        "Agora is the home of Derive Governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem.",
       hero: deriveHero,
       meta: {
         title: "Voter on Derive Agora",
@@ -124,7 +124,7 @@ export const deriveTenantUIConfig = new TenantUI({
       route: "proposals",
       title: "Agora is the home of Derive Governance",
       description:
-        "Agora is the home of Derive governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem. ",
+        "Agora is the home of Derive Governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem.",
       hero: deriveHero,
       meta: {
         title: "Derive Agora",
@@ -150,7 +150,7 @@ export const deriveTenantUIConfig = new TenantUI({
       route: "info",
       title: "Welcome to Derive Governance",
       description:
-        "Agora is the home of Derive governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem.",
+        "Agora is the home of Derive Governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem.",
       meta: {
         title: "About Derive Governance",
         description: "Home of Derive Governance",
