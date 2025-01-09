@@ -45,6 +45,7 @@ export const ensTenantContractConfig = ({
       contract: ERC20__factory.connect(TOKEN, provider),
       provider,
       type: "erc20",
+      votesInterface: "IVotes",
     }),
 
     governor: new TenantContract<IGovernorContract>({

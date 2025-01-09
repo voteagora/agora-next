@@ -33,6 +33,7 @@ export const etherfiTenantContractConfig = ({
       contract: ERC20__factory.connect(TOKEN, provider),
       provider,
       type: "erc20",
+      votesInterface: "IVotes",
     }),
 
     // PLACEHOLDER CONTRACT

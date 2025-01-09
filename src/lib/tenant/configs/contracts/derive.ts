@@ -91,6 +91,7 @@ export const deriveTenantConfig = ({
       contract: AgoraToken__factory.connect(TOKEN, provider),
       provider,
       type: "erc20",
+      votesInterface: "IVotesPartialDelegation",
     }),
 
     governor: new TenantContract<IGovernorContract>({

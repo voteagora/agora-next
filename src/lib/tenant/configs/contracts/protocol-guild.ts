@@ -62,6 +62,7 @@ export const protocolGuildTenantContractConfig = ({
       contract: Membership__factory.connect(TOKEN, provider),
       provider,
       type: "erc721",
+      votesInterface: "IVotes",
     }),
 
     governor: new TenantContract<IGovernorContract>({

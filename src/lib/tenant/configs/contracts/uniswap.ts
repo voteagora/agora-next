@@ -58,6 +58,7 @@ export const uniswapTenantContractConfig = ({
       contract: ERC20__factory.connect(TOKEN, provider),
       provider,
       type: "erc20",
+      votesInterface: "IVotes",
     }),
 
     staker: new TenantContract<IStaker>({
