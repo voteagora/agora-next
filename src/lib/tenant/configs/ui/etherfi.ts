@@ -20,6 +20,7 @@ export const etherfiTenantUIConfig = new TenantUI({
     title: "ether.fi DAO",
   },
 
+  // THESE NEED TO BE LOWER CASE
   delegates: {
     allowed: [
       "0x454b5f1458782a06da4656de844e019f26e3280a",
@@ -35,7 +36,7 @@ export const etherfiTenantUIConfig = new TenantUI({
       "0x27c7ced729280060577a68a54a94075d18614d19",
       "0x4f894bfc9481110278c356ade1473ebe2127fd3c",
       "0x3fb19771947072629c8eee7995a2ef23b72d4c8a",
-      "0xC6F089EF91a31d354731490189B076A4CedfDbe9",
+      "0xc6f089ef91a31d354731490189b076a4cedfdbe9",
     ],
     advanced: [],
     retired: [],
