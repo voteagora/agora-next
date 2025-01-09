@@ -23,9 +23,7 @@ const AnalyticsPage = async () => {
           <DelegationsDataView latestBlock={latestBlock as Block} />
         }
         proposalsComponent={
-          <Suspense fallback={<LoadingChart type="bar" />}>
-            <ProposalsDataView />
-          </Suspense>
+          <ProposalsDataView latestBlock={latestBlock as Block} />
         }
       />
     </div>

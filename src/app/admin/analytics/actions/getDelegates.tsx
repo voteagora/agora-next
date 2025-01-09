@@ -42,7 +42,7 @@ export const getDelegates = async ({
     SELECT d.transaction_hash, d.block_number
     FROM ${namespace}.delegate_changed_events d
     WHERE CAST(d.block_number AS INTEGER) >= ${eventsStartedAtBlock}
-    AND d.block_number >= ${currentBlockNumber - range}
+    AND CAST(d.block_number AS INTEGER) >= ${currentBlockNumber - range}
     AND d.address = '${contracts.token.address.toLowerCase()}'
     GROUP BY d.transaction_hash, d.block_number
     ORDER BY d.block_number ASC

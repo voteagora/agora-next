@@ -1,13 +1,18 @@
 "use client";
 
-import DelegatesBarChart from "./DelegatesBarChart";
-import { getDelegates } from "../../actions/getDelegates";
-import { Block } from "ethers";
+import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
+import { Block } from "ethers";
+import { useState } from "react";
+import { getDelegates } from "../../actions/getDelegates";
 import LoadingChart from "../LoadingChart";
+import DelegatesBarChart from "./DelegatesBarChart";
+
+const dayInSeconds = 60 * 60 * 24;
 
 const DelegationsDataView = ({ latestBlock }: { latestBlock: Block }) => {
-  const interval = 60 * 60 * 24 * 7;
+  const [selectedInterval, setSelectedInterval] = useState<1 | 7 | 30 | 365>(1);
+  const interval = dayInSeconds * selectedInterval;
   const range = interval * 5;
 
   const { data: delegateData, isLoading } = useQuery({
@@ -15,21 +20,56 @@ const DelegationsDataView = ({ latestBlock }: { latestBlock: Block }) => {
     queryFn: () => getDelegates({ range, interval }),
   });
 
-  if (isLoading) return <LoadingChart type="bar" />;
-  if (!delegateData) return <div>No data</div>;
-
   return (
     <>
-      <DelegatesBarChart
-        data={delegateData}
-        latestBlock={latestBlock}
-        interval={interval}
-      />
+      {isLoading ? (
+        <LoadingChart type="bar" />
+      ) : !delegateData ? (
+        <div>No data</div>
+      ) : (
+        <DelegatesBarChart
+          data={delegateData}
+          latestBlock={latestBlock}
+          interval={interval}
+        />
+      )}
       <div className="absolute bottom-4 right-4 rounded-xl border border-line p-2 flex flex-row gap-2">
-        <span>1Y</span>
-        <span>1M</span>
-        <span>1W</span>
-        <span>1D</span>
+        <span
+          className={cn(
+            "text-sm hover:bg-tertiary/5 rounded-full px-2 py-1 cursor-pointer",
+            selectedInterval === 365 && "bg-tertiary/5"
+          )}
+          onClick={() => setSelectedInterval(365)}
+        >
+          1Y
+        </span>
+        <span
+          className={cn(
+            "text-sm hover:bg-tertiary/5 rounded-full px-2 py-1 cursor-pointer",
+            selectedInterval === 30 && "bg-tertiary/5"
+          )}
+          onClick={() => setSelectedInterval(30)}
+        >
+          1M
+        </span>
+        <span
+          className={cn(
+            "text-sm hover:bg-tertiary/5 rounded-full px-2 py-1 cursor-pointer",
+            selectedInterval === 7 && "bg-tertiary/5"
+          )}
+          onClick={() => setSelectedInterval(7)}
+        >
+          1W
+        </span>
+        <span
+          className={cn(
+            "text-sm hover:bg-tertiary/5 rounded-full px-2 py-1 cursor-pointer",
+            selectedInterval === 1 && "bg-tertiary/5"
+          )}
+          onClick={() => setSelectedInterval(1)}
+        >
+          1D
+        </span>
       </div>
     </>
   );

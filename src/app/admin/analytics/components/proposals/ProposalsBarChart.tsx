@@ -16,6 +16,9 @@ import {
   NameType,
   ValueType,
 } from "recharts/types/component/DefaultTooltipContent";
+import { getHumanBlockTime, getSecondsPerBlock } from "@/lib/blockTimes";
+import { Block } from "ethers";
+import { formatAbbreviatedDate } from "@/lib/utils";
 
 // Custom tooltip component
 const CustomTooltip = ({
@@ -26,8 +29,10 @@ const CustomTooltip = ({
   if (active && payload && payload.length) {
     const matches = Number(payload[0].value);
     const misses = Number(payload[1].value);
-    const totalDelegates = matches + misses;
-    const percentage = ((matches / totalDelegates) * 100).toFixed(1);
+    const totalProposals = matches + misses;
+    const percentage = totalProposals
+      ? ((matches / totalProposals) * 100).toFixed(1)
+      : "0";
 
     return (
       <div className="bg-white p-4 border rounded shadow">
@@ -43,9 +48,21 @@ const CustomTooltip = ({
 
 export default function ProposalsBarChart({
   data,
+  latestBlock,
+  interval,
 }: {
-  data: { matches: number; misses: number }[];
+  data: {
+    matches: number;
+    misses: number;
+    startBlock: number;
+    endBlock: number;
+  }[];
+  latestBlock: Block;
+  interval: number;
 }) {
+  const secondsPerBlock = getSecondsPerBlock();
+  const blocksPerInterval = interval / secondsPerBlock;
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart
@@ -60,7 +77,18 @@ export default function ProposalsBarChart({
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
+        <XAxis
+          dataKey="name"
+          tickFormatter={(block) => {
+            return `${formatAbbreviatedDate(getHumanBlockTime(block, latestBlock))} - ${formatAbbreviatedDate(getHumanBlockTime(block + blocksPerInterval, latestBlock))}`;
+          }}
+          angle={-0}
+          textAnchor="middle"
+          height={100}
+          tick={{
+            fontSize: 12,
+          }}
+        />
         <YAxis />
         <Tooltip content={<CustomTooltip />} />
         <Legend formatter={(value) => value.replace(/_/g, " ")} />

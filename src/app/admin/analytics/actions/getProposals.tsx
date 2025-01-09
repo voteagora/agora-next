@@ -1,11 +1,25 @@
+"use server";
+
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { analyticsStartingBlockNumber } from "../utils";
 import { ANALYTICS_EVENTS } from "@/lib/constants";
+import { getSecondsPerBlock } from "@/lib/blockTimes";
 
-export const getProposals = async () => {
+export const getProposals = async ({
+  range = 60 * 60 * 24,
+  interval = 60 * 60 * 24,
+}: {
+  range: number;
+  interval: number;
+}) => {
   const { namespace, contracts, slug } = Tenant.current();
   const chainId = contracts.governor.chain.id;
+
+  const secondsPerBlock = getSecondsPerBlock();
+  const rangeInBlocks = Math.floor(range / secondsPerBlock);
+  const intervalInBlocks = Math.floor(interval / secondsPerBlock);
+  const currentBlockNumber = await contracts.token.provider.getBlockNumber();
 
   const eventsQuery = `
     SELECT
@@ -25,16 +39,19 @@ export const getProposals = async () => {
     SELECT  p.end_block, p.description, p.created_transaction_hash
     FROM ${namespace}.proposals_v2 p
     WHERE CAST(p.start_block AS INTEGER) >= ${eventsStartedAtBlock}
+    AND CAST(p.start_block AS INTEGER) >= ${currentBlockNumber - range}
     AND p.contract = '${contracts.governor.address.toLowerCase()}'
     GROUP BY p.end_block, p.description, p.created_transaction_hash
     ORDER BY p.end_block DESC;
   `;
 
-  const proposalEvents = (await prisma.$queryRawUnsafe(eventsQuery)) as {
+  const proposalAnalyticsEvents = (await prisma.$queryRawUnsafe(
+    eventsQuery
+  )) as {
     transaction_hash: string;
   }[];
 
-  const proposalTransactions = (await prisma.$queryRawUnsafe(
+  const proposalOnChainEvents = (await prisma.$queryRawUnsafe(
     proposalsQuery
   )) as {
     end_block: number;
@@ -42,43 +59,47 @@ export const getProposals = async () => {
     created_transaction_hash: string;
   }[];
 
-  const proposalEventsGroups = proposalTransactions.reduce(
-    (acc, event) => {
-      const blockNumber = Number(event.end_block);
-      const group = acc.find(
-        (group) => Number(group[0].end_block) === Number(blockNumber - 1000)
-      );
-      if (group) {
-        group.push(event);
-      } else {
-        acc.push([event]);
-      }
-      return acc;
-    },
-    [] as {
-      end_block: number;
-      description: string;
-      created_transaction_hash: string;
-    }[][]
-  );
+  let intervals = [];
+  for (
+    let startBlock = currentBlockNumber - rangeInBlocks;
+    startBlock < currentBlockNumber;
+    startBlock += intervalInBlocks
+  ) {
+    const endBlock = startBlock + intervalInBlocks;
+    const eventsInBlockRange = proposalOnChainEvents.filter(
+      (event) => event.end_block >= startBlock && event.end_block <= endBlock
+    );
+    intervals.push({
+      startBlock,
+      endBlock,
+      events: eventsInBlockRange,
+    });
+  }
 
   // for each group, check if the transaction hash is in the delegateAnalyticsEvents array
   // get count of matches for each group and return the total matches and total misses
-  const matches = proposalEventsGroups.reduce(
+  const matches = intervals.reduce(
     (acc, group) => {
-      const matches = group.filter((event) =>
-        proposalEvents.some(
+      const matches = group.events.filter((event) =>
+        proposalAnalyticsEvents.some(
           (e) => e.transaction_hash === event.created_transaction_hash
         )
       );
       acc.push({
         matches: matches.length,
-        misses: group.length - matches.length,
+        misses: group.events.length - matches.length,
+        startBlock: group.startBlock,
+        endBlock: group.endBlock,
       });
 
       return acc;
     },
-    [] as { matches: number; misses: number }[]
+    [] as {
+      matches: number;
+      misses: number;
+      startBlock: number;
+      endBlock: number;
+    }[]
   );
 
   return matches;
