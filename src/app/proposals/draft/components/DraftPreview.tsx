@@ -94,7 +94,7 @@ const DraftPreview = ({
             {proposal.criteria === "Threshold" &&
               `All options with more than ${proposal.threshold} votes will be considered approved.`}
             {proposal.criteria === "Top choices" &&
-              `The top ${proposal.threshold} choices will be considered approved.`}
+              `The top ${proposal.top_choices} choices will be considered approved.`}
           </p>
         );
 
