@@ -98,14 +98,18 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
   };
 
   /**
-   * This is a temporary fix for ENS.
+   * This is a temporary fix for ENS and UNI.
    * https://voteagora.atlassian.net/browse/ENG-903
    * ENS does not count against votes in the quorum calculation.
+   * UNI does not count against or abstain votes in the quorum calculation.
    * This is a temporary fix stack for + abstain, but not against.
    * A future fix will read each tenant and stack depending on how the tenant counts quorum.
    */
   if (slug === DaoSlug.ENS) {
     stackIds.against = "2";
+  } else if (slug === DaoSlug.UNISWAP) {
+    stackIds.against = "2";
+    stackIds.abstain = "3";
   }
 
   /**
