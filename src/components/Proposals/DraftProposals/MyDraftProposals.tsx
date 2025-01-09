@@ -6,12 +6,15 @@ import { useEffect, useState, useCallback } from "react";
 import { ProposalDraft } from "@prisma/client";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
 import DraftProposalCard from "./DraftProposalCard";
+import Tenant from "@/lib/tenant/tenant";
 
 const MyDraftProposals = ({
   fetchDraftProposals,
 }: {
   fetchDraftProposals: (address: `0x${string}`) => Promise<ProposalDraft[]>;
 }) => {
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const { address } = useAccount();
   const [draftProposals, setDraftProposals] = useState<ProposalDraft[]>([]);
 
@@ -29,6 +32,10 @@ const MyDraftProposals = ({
   }, [fetchDraftProposals, address, getDraftProposalsAndSet]);
 
   if (!draftProposals.length) {
+    return null;
+  }
+
+  if (!plmToggle || !plmToggle.enabled) {
     return null;
   }
 
