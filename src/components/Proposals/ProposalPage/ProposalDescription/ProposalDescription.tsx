@@ -31,9 +31,12 @@ export default function ProposalDescription({
     "27878184270712708211495755831534918916136653803154031118511283847257927730426",
     "90839767999322802375479087567202389126141447078032129455920633707568400402209",
   ];
+
+  // removes the "## Description" line that was previously added to the description
+  // without the users input via the PLM tool
   const patchedDescription = proposalsWithBadDescription.includes(proposal.id)
     ? proposal.description?.split("\\n ")[1]
-    : proposal.description;
+    : proposal.description?.replace(/\n\n ## Description \n/, "");
 
   const title = proposal.markdowntitle;
 
