@@ -101,9 +101,9 @@ export const deriveTenantUIConfig = new TenantUI({
       hero: deriveHero,
       meta: {
         title: "Derive Agora",
-        description: "Home of token governance",
+        description: "Home of Derive Governance",
         imageTitle: "Derive Agora",
-        imageDescription: "Home of token governance",
+        imageDescription: "Home of Derive Governance",
       },
     },
     {
@@ -113,9 +113,9 @@ export const deriveTenantUIConfig = new TenantUI({
         "Agora is the home of Derive governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem. ",
       hero: deriveHero,
       meta: {
-        title: "Voter on Agora",
+        title: "Voter on Derive Agora",
         description: "Delegate your voting power to a trusted representative",
-        imageTitle: "Voter on Agora",
+        imageTitle: "Voter on Derive Agora",
         imageDescription:
           "Delegate your voting power to a trusted representative",
       },
@@ -128,9 +128,9 @@ export const deriveTenantUIConfig = new TenantUI({
       hero: deriveHero,
       meta: {
         title: "Derive Agora",
-        description: "Home of token governance",
+        description: "Home of Derive Governance",
         imageTitle: "Derive Agora",
-        imageDescription: "Home of token governance",
+        imageDescription: "Home of Derive Governance",
       },
     },
     {
@@ -140,10 +140,10 @@ export const deriveTenantUIConfig = new TenantUI({
       description:
         "Derive is a permissionless, decentralized protocol that creates and settles unique programmable onchain options, perpetuals, and structured products. The protocol is deployed on an Optimistic Rollup that settles to the Ethereum blockchain. The protocol is governed by the Derive DAO and DRV stakers.",
       meta: {
-        title: "Info of Derive Governance",
-        description: "Welcome to the Derive DAO",
-        imageTitle: "",
-        imageDescription: "",
+        title: "About Derive Governance",
+        description: "Home of Derive Governance",
+        imageTitle: "About Derive Governance",
+        imageDescription: "Home of Derive Governance",
       },
     },
     {
@@ -152,9 +152,9 @@ export const deriveTenantUIConfig = new TenantUI({
       description:
         "Agora is the home of Derive governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem.",
       meta: {
-        title: "Derive Governance",
+        title: "About Derive Governance",
         description: "Home of Derive Governance",
-        imageTitle: "Derive Governance",
+        imageTitle: "About Derive Governance",
         imageDescription: "Home of Derive Governance",
       },
       links: [
