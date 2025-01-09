@@ -95,8 +95,9 @@ export const deriveTenantUIConfig = new TenantUI({
   pages: [
     {
       route: "/",
-      title: "Agora is the home of Derive governance",
-      description: "Derive governance is launching now. ",
+      title: "Agora is the home of Derive Governance",
+      description:
+        "Agora is the home of Derive governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem. ",
       hero: deriveHero,
       meta: {
         title: "Derive Agora",
@@ -107,9 +108,9 @@ export const deriveTenantUIConfig = new TenantUI({
     },
     {
       route: "delegates",
-      title: "Agora is the home of Derive delegates",
+      title: "Agora is the home of Derive Governance",
       description:
-        "Agora is the home of Derive governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem.",
+        "Agora is the home of Derive governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem. ",
       hero: deriveHero,
       meta: {
         title: "Voter on Agora",
@@ -121,9 +122,9 @@ export const deriveTenantUIConfig = new TenantUI({
     },
     {
       route: "proposals",
-      title: "Agora is the home of Derive delegates",
+      title: "Agora is the home of Derive Governance",
       description:
-        "Derive voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+        "Agora is the home of Derive governance, where DRV stakers delegate, vote, and make decisions to steward the future of the Derive ecosystem. ",
       hero: deriveHero,
       meta: {
         title: "Derive Agora",
