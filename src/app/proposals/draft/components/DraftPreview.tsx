@@ -119,6 +119,8 @@ const DraftPreview = ({
   };
 
   const renderProposalRequirements = () => {
+    const requirements = [];
+
     if (votingModuleType === ProposalType.SOCIAL) {
       return (
         <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
@@ -136,8 +138,11 @@ const DraftPreview = ({
       gatingType === ProposalGatingType.MANAGER ||
       gatingType === ProposalGatingType.GOVERNOR_V1
     ) {
-      return (
-        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+      requirements.push(
+        <div
+          key="manager"
+          className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
+        >
           <p className="flex-grow text-primary">Manager address</p>
           <span className="text-secondary font-mono text-xs">
             {manager?.toString()}
@@ -150,8 +155,11 @@ const DraftPreview = ({
       gatingType === ProposalGatingType.TOKEN_THRESHOLD ||
       gatingType === ProposalGatingType.GOVERNOR_V1
     ) {
-      return (
-        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+      requirements.push(
+        <div
+          key="threshold"
+          className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
+        >
           <p className="flex-grow">Voting power</p>
           <span className="text-secondary font-mono text-xs">
             {"> "}
@@ -168,7 +176,7 @@ const DraftPreview = ({
       );
     }
 
-    return null;
+    return requirements.length > 0 ? requirements : null;
   };
 
   return (
