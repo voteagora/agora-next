@@ -45,7 +45,7 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       }
       return quorum;
 
-    case TENANT_NAMESPACES.CYBER, TENANT_NAMESPACES.SCROLL:
+    case (TENANT_NAMESPACES.CYBER, TENANT_NAMESPACES.SCROLL):
       // Why is the cyber implementation hardcoded to 30%? Rather than checking based on every proposal?
 
       // Because...
