@@ -107,7 +107,7 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
    */
   if (slug === DaoSlug.ENS) {
     stackIds.against = "2";
-  } else if (slug === DaoSlug.UNISWAP) {
+  } else if (slug === DaoSlug.UNI) {
     stackIds.against = "2";
     stackIds.abstain = "3";
   }
@@ -170,8 +170,8 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           axisLine={false}
           tickCount={6}
           interval={0}
-          width={36}
-          tickMargin={0}
+          width={54}
+          tickMargin={4}
           domain={[
             0,
             (dataMax: number) => {
