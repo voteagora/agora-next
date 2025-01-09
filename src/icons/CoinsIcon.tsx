@@ -22,6 +22,7 @@ export const CoinsIcon = ({
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
+        fill="none"
       />
     </svg>
   );
