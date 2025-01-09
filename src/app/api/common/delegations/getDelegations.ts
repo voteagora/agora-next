@@ -48,7 +48,7 @@ async function getCurrentDelegateesForAddress({
   let directDelegatee;
 
   // Should be if governor == Agora 1.0 w/ Partial Delegation On
-  if (namespace === TENANT_NAMESPACES.SCROLL) {
+  if (contracts.token.isIVotesPartialDelegation()) {
     advancedDelegatees = await findAdvancedDelegatee({
       namespace,
       address,
@@ -136,7 +136,7 @@ async function getCurrentDelegatorsForAddress({
     : contracts.token.address;
 
   // Replace with the Agora Governor flag
-  if (contracts.alligator || namespace === TENANT_NAMESPACES.SCROLL) {
+  if (contracts.alligator || contracts.token.isIVotesPartialDelegation()) {
     advancedDelegatorsSubQry = `SELECT
                                 "from",
                                 "to",
@@ -166,7 +166,7 @@ async function getCurrentDelegatorsForAddress({
                                 AND ghost."from" = $2`;
   }
 
-  if (namespace == TENANT_NAMESPACES.SCROLL) {
+  if (contracts.token.isIVotesPartialDelegation()) {
     directDelegatorsSubQry = `WITH ghost as (SELECT
               null::text as "from",
               null::text as "to",

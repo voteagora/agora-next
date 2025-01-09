@@ -445,7 +445,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       address,
       partialDelegationContract
     );
-  } else if (namespace === TENANT_NAMESPACES.SCROLL) {
+  } else if (contracts.token.isIVotesPartialDelegation()) {
     numOfDelegationsQuery = prisma.$queryRawUnsafe<
       { num_of_delegators: BigInt }[]
     >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);
