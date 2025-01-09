@@ -14,7 +14,7 @@ const tabs = [
     icon: (
       <CoinsIcon
         className="w-[24px] h-[24px]"
-        fill={rgbStringToHex(ui.customization?.brandPrimary)}
+        stroke={rgbStringToHex(ui.customization?.secondary)}
       />
     ),
     title: "Delegate voting power",
@@ -25,7 +25,7 @@ const tabs = [
     icon: (
       <NotificationIcon
         className="w-[24px] h-[24px]"
-        fill={rgbStringToHex(ui.customization?.brandPrimary)}
+        stroke={rgbStringToHex(ui.customization?.secondary)}
       />
     ),
     title: "Browse proposals",
@@ -36,7 +36,7 @@ const tabs = [
     icon: (
       <CheckCircleBrokenIcon
         className="w-[24px] h-[24px]"
-        fill={rgbStringToHex(ui.customization?.brandPrimary)}
+        stroke={rgbStringToHex(ui.customization?.secondary)}
       />
     ),
     title: "Vote on proposals",
