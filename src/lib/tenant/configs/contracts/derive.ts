@@ -1,7 +1,7 @@
 import {
   AgoraGovernor__factory,
   AgoraTimelock__factory,
-  ERC20__factory,
+  AgoraToken__factory,
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
@@ -58,7 +58,7 @@ export const deriveTenantConfig = ({
 }: Props): TenantContracts => {
   const TOKEN = isProd
     ? "0x7499d654422023a407d92e1D83D387d81BC68De1"
-    : "0xbe9dbda519e15a1c0d238cea0b3dad47a484a6ff";
+    : "0x47b4Ad50177b8e88F774B4E1D09e590d9cb9e386";
 
   const GOVERNOR = isProd
     ? "0x3CdCbB7dBfb4BC02009f2879dAd7620619046b1A"
@@ -85,10 +85,10 @@ export const deriveTenantConfig = ({
 
   return {
     token: createTokenContract({
-      abi: ERC20__factory.abi,
+      abi: AgoraToken__factory.abi,
       address: TOKEN as `0x${string}`,
       chain,
-      contract: ERC20__factory.connect(TOKEN, provider),
+      contract: AgoraToken__factory.connect(TOKEN, provider),
       provider,
       type: "erc20",
     }),

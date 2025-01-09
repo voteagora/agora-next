@@ -28,7 +28,6 @@ import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithu
 import { StakedDeposit } from "@/lib/types";
 import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
-import { SCWDelegateDialog } from "@/components/Dialogs/SCWDelegateDialog/SCWDelegateDialog";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -41,7 +40,6 @@ export type DialogType =
   | OpenGithubPRDialog
   | PartialDelegateDialogType
   | RetroPGFShareCardDialog
-  | SCWDelegateDialogType
   | SponsorOnchainDraftProposalDialog
   | SponsorSnapshotDraftProposalDialog
   | SwithcNetworkDialogType
@@ -56,16 +54,6 @@ export type DelegateDialogType = {
     fetchBalanceForDirectDelegation: (
       addressOrENSName: string
     ) => Promise<bigint>;
-    fetchDirectDelegatee: (
-      addressOrENSName: string
-    ) => Promise<DelegateePayload | null>;
-  };
-};
-
-export type SCWDelegateDialogType = {
-  type: "SWC_DELEGATE";
-  params: {
-    delegate: DelegateChunk;
     fetchDirectDelegatee: (
       addressOrENSName: string
     ) => Promise<DelegateePayload | null>;
@@ -239,14 +227,6 @@ export const dialogs: DialogDefinitions<DialogType> = {
         closeDialog={closeDialog}
         delegate={delegate}
         fetchCurrentDelegatees={fetchCurrentDelegatees}
-      />
-    );
-  },
-  SWC_DELEGATE: ({ delegate, fetchDirectDelegatee }, closeDialog) => {
-    return (
-      <SCWDelegateDialog
-        delegate={delegate}
-        fetchDirectDelegatee={fetchDirectDelegatee}
       />
     );
   },
