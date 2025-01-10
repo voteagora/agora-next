@@ -45,7 +45,7 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       }
       return quorum;
 
-    case (TENANT_NAMESPACES.CYBER, TENANT_NAMESPACES.SCROLL):
+    case TENANT_NAMESPACES.CYBER:
       // Why is the cyber implementation hardcoded to 30%? Rather than checking based on every proposal?
 
       // Because...
@@ -58,13 +58,28 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       });
       return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
 
+    case TENANT_NAMESPACES.SCROLL:
+      if (contracts.token.isERC20()) {
+        let totalSupply = await contracts.token.contract.totalSupply();
+
+        const proposalTypeData = proposal?.proposal_type_data as {
+          quorum: number;
+        };
+
+        quorum =
+          (totalSupply * BigInt(proposalTypeData.quorum) * 100000n) /
+          1000000000n;
+      }
+
+      return BigInt(Number(quorum));
+
     default: // TENANT_NAMESPACES.PGUILD - yes, TENANT_NAMESPACES.SCROLL?
       try {
         quorum = await contracts.governor.contract.quorum!(
           proposal.proposal_id
         );
       } catch {
-        // this is a hack, because... // https://linear.app/agora-app/issue/AGORA-3246/quorum-isnt-known-for-proposal-before-its-snapshot
+        // this is a hack, because...git // https://linear.app/agora-app/issue/AGORA-3246/quorum-isnt-known-for-proposal-before-its-snapshot
         quorum = await findVotableSupply({
           namespace,
           address: contracts.token.address,
