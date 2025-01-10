@@ -61,7 +61,14 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
     case TENANT_NAMESPACES.SCROLL:
       if (contracts.token.isERC20()) {
         let totalSupply = await contracts.token.contract.totalSupply();
-        quorum = (totalSupply * 21n * 100000n) / 1000000000n;
+
+        const proposalTypeData = proposal?.proposal_type_data as {
+          quorum: number;
+        };
+
+        quorum =
+          (totalSupply * BigInt(proposalTypeData.quorum) * 100000n) /
+          1000000000n;
       }
 
       return BigInt(Number(quorum));
@@ -72,7 +79,7 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
           proposal.proposal_id
         );
       } catch {
-        // this is a hack, because... // https://linear.app/agora-app/issue/AGORA-3246/quorum-isnt-known-for-proposal-before-its-snapshot
+        // this is a hack, because...git // https://linear.app/agora-app/issue/AGORA-3246/quorum-isnt-known-for-proposal-before-its-snapshot
         quorum = await findVotableSupply({
           namespace,
           address: contracts.token.address,
