@@ -5,11 +5,12 @@ import {
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
-import { DelegationModel, TenantContracts } from "@/lib/types";
+import { TenantContracts } from "@/lib/types";
 import { scroll } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { FallbackProvider, JsonRpcProvider, BaseContract } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
+import { DELEGATION_MODEL } from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -94,6 +95,6 @@ export const scrollTenantContractConfig = ({
 
     treasury: TREASURY,
 
-    delegationModel: DelegationModel.FULL,
+    delegationModel: DELEGATION_MODEL.FULL,
   };
 };

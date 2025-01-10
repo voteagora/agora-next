@@ -5,11 +5,12 @@ import {
   ERC20__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
-import { DelegationModel, TenantContracts } from "@/lib/types";
+import { TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { BaseContract, JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";
 import { createTokenContract } from "@/lib/tokenUtils";
+import { DELEGATION_MODEL } from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -120,6 +121,6 @@ export const cyberTenantConfig = ({
     treasury: TREASURY,
     governorApprovalModule: APPROVAL_MODULE,
 
-    delegationModel: DelegationModel.FULL,
+    delegationModel: DELEGATION_MODEL.FULL,
   };
 };

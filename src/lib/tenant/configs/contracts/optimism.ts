@@ -9,9 +9,10 @@ import { AlchemyProvider, BaseContract } from "ethers";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
-import { DelegationModel, TenantContracts } from "@/lib/types";
+import { TenantContracts } from "@/lib/types";
 import { optimism } from "viem/chains";
 import { createTokenContract } from "@/lib/tokenUtils";
+import { DELEGATION_MODEL } from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -87,6 +88,6 @@ export const optimismTenantContractConfig = ({
       provider,
     }),
 
-    delegationModel: DelegationModel.ADVANCED,
+    delegationModel: DELEGATION_MODEL.ADVANCED,
   };
 };

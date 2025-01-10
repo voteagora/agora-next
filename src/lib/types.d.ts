@@ -21,12 +21,6 @@ export type StakedDeposit = {
   id: number;
 };
 
-export enum DelegationModel {
-  FULL = "FULL",
-  ADVANCED = "ADVANCED",
-  PARTIAL = "PARTIAL",
-}
-
 export type TenantNamespace =
   (typeof TENANT_NAMESPACES)[keyof typeof TENANT_NAMESPACES];
 
@@ -43,7 +37,7 @@ export type TenantContracts = {
   alligator?: TenantContract<IAlligatorContract>;
   treasury?: string[]; // We don't interact with them, but maybe one day we will.
   governorApprovalModule?: string;
-  delegationModel?: DelegationModel;
+  delegationModel?: DELEGATION_MODEL;
 };
 
 export type TenantToken = {
