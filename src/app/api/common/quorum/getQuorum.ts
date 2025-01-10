@@ -45,7 +45,7 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       }
       return quorum;
 
-    case (TENANT_NAMESPACES.CYBER, TENANT_NAMESPACES.SCROLL):
+    case TENANT_NAMESPACES.CYBER:
       // Why is the cyber implementation hardcoded to 30%? Rather than checking based on every proposal?
 
       // Because...
@@ -57,6 +57,14 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
         address: contracts.token.address,
       });
       return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
+
+    case TENANT_NAMESPACES.SCROLL:
+      if (contracts.token.isERC20()) {
+        let totalSupply = await contracts.token.contract.totalSupply();
+        quorum = (totalSupply * 21n * 100000n) / 1000000000n;
+      }
+
+      return BigInt(Number(quorum));
 
     default: // TENANT_NAMESPACES.PGUILD - yes, TENANT_NAMESPACES.SCROLL?
       try {
