@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Area,
   AreaChart,
@@ -8,6 +9,7 @@ import {
   ResponsiveContainer,
   XAxis,
   YAxis,
+  Tooltip,
 } from "recharts";
 import { format } from "date-fns";
 import { Proposal } from "@/app/api/common/proposals/proposal";
@@ -17,9 +19,11 @@ import {
   formatNumber,
   formatNumberWithScientificNotation,
   isScientificNotation,
+  formatFullDate,
 } from "@/lib/utils";
 import { PaginatedResult } from "@/app/lib/pagination";
 import { DaoSlug } from "@prisma/client";
+import { formatUnits } from "viem";
 
 const { token, slug } = Tenant.current();
 
@@ -78,6 +82,37 @@ const customizedXTick = (props: any) => {
       </text>
     </g>
   );
+};
+
+// Custom tooltip component
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-3 border rounded-lg shadow-md">
+        <p className="text-xs font-semibold mb-2">
+          {formatFullDate(new Date(label))}
+        </p>
+        {payload.map((entry: any) => (
+          <div
+            key={entry.name}
+            className="flex justify-between items-center gap-4 text-xs"
+          >
+            <span style={{ color: entry.color }}>
+              {entry.name.charAt(0).toUpperCase() + entry.name.slice(1)}:
+            </span>
+            <span className="font-mono">
+              {formatNumber(
+                BigInt(entry.value),
+                token.decimals,
+                entry.value > 1_000_000 ? 2 : 4
+              )}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return null;
 };
 
 export default function VotingTimelineChart({
@@ -141,6 +176,9 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
     },
   ];
 
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [tooltipContent, setTooltipContent] = useState("");
+
   return (
     <ResponsiveContainer width="100%" height={230}>
       <AreaChart data={modifiedChartData}>
@@ -184,12 +222,17 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           ]}
         />
 
+        <Tooltip
+          content={<CustomTooltip />}
+          cursor={{ stroke: "#666", strokeWidth: 1, strokeDasharray: "4 4" }}
+        />
         <Area
           type="step"
           dataKey="against"
           stackId={stackIds.against}
           stroke="#dc2626"
           fill="#fecaca"
+          name="Against"
         />
         <Area
           type="step"
@@ -197,6 +240,7 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           stackId={stackIds.abstain}
           stroke="#57534e"
           fill="#e7e5e4"
+          name="Abstain"
         />
         <Area
           type="step"
@@ -204,6 +248,7 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
           stackId={stackIds.for}
           stroke="#16a34a"
           fill="#bbf7d0"
+          name="For"
         />
 
         {!!proposal.quorum && (
@@ -218,6 +263,23 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
               className: "text-xs font-inter font-semibold",
               fill: "#565656",
             }}
+            onMouseOver={(props) => {
+              setTooltipContent(`Quorum: ${proposal.quorum?.toString()}`);
+              setTooltipVisible(true);
+            }}
+            onMouseOut={() => {
+              setTooltipVisible(false);
+            }}
+          />
+        )}
+        {tooltipVisible && (
+          <Tooltip
+            cursor={false}
+            content={
+              <div className="bg-white p-2 rounded shadow border">
+                <span className="text-xs font-inter">{tooltipContent}</span>
+              </div>
+            }
           />
         )}
       </AreaChart>
