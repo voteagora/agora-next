@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { useAccount, useDisconnect } from "wagmi";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,6 +17,7 @@ import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { CubeIcon } from "@/icons/CubeIcon";
 import { rgbStringToHex } from "@/app/lib/utils/color";
 import { PowerIcon } from "@/icons/PowerIcon";
+import { balanceOf } from "@/app/delegates/actions";
 
 type Props = {
   ensName: string | undefined;
@@ -51,7 +52,27 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
   const hasStatement = !!delegate?.statement;
   const canCreateDelegateStatement = ui.toggle("delegates/edit")?.enabled;
 
-  const { data: scwAddress } = useSmartAccountAddress({ owner: address });
+  const [scwTokenBalance, setScwTokenBalance] = useState<bigint | null>(null);
+  const { data: scwAddress, enabled: isScwEnabled } = useSmartAccountAddress({
+    owner: address,
+  });
+
+  const walletBalance = () => {
+    return isScwEnabled ? scwTokenBalance || BigInt(0) : balance || BigInt(0);
+  };
+
+  const fetchScwBalance = async () => {
+    if (scwAddress) {
+      const scwBalance = await balanceOf(scwAddress);
+      setScwTokenBalance(BigInt(scwBalance));
+    }
+  };
+
+  useEffect(() => {
+    if (isScwEnabled && scwAddress) {
+      fetchScwBalance();
+    }
+  }, [isScwEnabled, scwAddress]);
 
   return (
     <Popover className="relative cursor-auto">
@@ -151,7 +172,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                       title="My token balance"
                       detail={
                         <MobileValueWrapper isLoading={isLoading}>
-                          <TokenAmountDisplay amount={balance || BigInt(0)} />
+                          <TokenAmountDisplay amount={walletBalance()} />
                         </MobileValueWrapper>
                       }
                     />
