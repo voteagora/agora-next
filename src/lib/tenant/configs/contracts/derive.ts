@@ -11,6 +11,7 @@ import { BaseContract, JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { Chain, lyra } from "viem/chains";
+import { DELEGATION_MODEL } from "@/lib/constants";
 
 const LYRA_TESTNET_RPC = "https://rpc-prod-testnet-0eakp60405.t.conduit.xyz";
 
@@ -118,5 +119,7 @@ export const deriveTenantConfig = ({
     }),
 
     governorApprovalModule: APPROVAL_MODULE,
+
+    delegationModel: DELEGATION_MODEL.PARTIAL,
   };
 };

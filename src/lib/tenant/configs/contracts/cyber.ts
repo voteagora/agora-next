@@ -10,6 +10,7 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { BaseContract, JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";
 import { createTokenContract } from "@/lib/tokenUtils";
+import { DELEGATION_MODEL } from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -119,5 +120,7 @@ export const cyberTenantConfig = ({
 
     treasury: TREASURY,
     governorApprovalModule: APPROVAL_MODULE,
+
+    delegationModel: DELEGATION_MODEL.FULL,
   };
 };

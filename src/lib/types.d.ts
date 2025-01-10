@@ -37,6 +37,7 @@ export type TenantContracts = {
   alligator?: TenantContract<IAlligatorContract>;
   treasury?: string[]; // We don't interact with them, but maybe one day we will.
   governorApprovalModule?: string;
+  delegationModel?: DELEGATION_MODEL;
 };
 
 export type TenantToken = {

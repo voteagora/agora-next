@@ -10,6 +10,7 @@ import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { AlchemyProvider, BaseContract } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
+import { DELEGATION_MODEL } from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -89,5 +90,7 @@ export const protocolGuildTenantContractConfig = ({
     }),
 
     treasury: TREASURY,
+
+    delegationModel: DELEGATION_MODEL.FULL,
   };
 };

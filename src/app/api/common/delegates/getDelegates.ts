@@ -17,7 +17,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { doInSpan } from "@/app/lib/logging";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import { DELEGATION_MODEL } from "@/lib/constants";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 
 /*
@@ -445,7 +445,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       address,
       partialDelegationContract
     );
-  } else if (namespace === TENANT_NAMESPACES.SCROLL) {
+  } else if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
     numOfDelegationsQuery = prisma.$queryRawUnsafe<
       { num_of_delegators: BigInt }[]
     >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);

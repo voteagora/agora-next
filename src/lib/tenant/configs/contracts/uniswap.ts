@@ -11,6 +11,7 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
 import { AlchemyProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
+import { DELEGATION_MODEL } from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -85,5 +86,7 @@ export const uniswapTenantContractConfig = ({
     }),
 
     treasury: TREASURY,
+
+    delegationModel: DELEGATION_MODEL.FULL,
   };
 };
