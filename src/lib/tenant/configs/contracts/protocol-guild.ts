@@ -5,7 +5,7 @@ import {
   Membership__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
-import { TenantContracts } from "@/lib/types";
+import { DelegationModel, TenantContracts } from "@/lib/types";
 import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { AlchemyProvider, BaseContract } from "ethers";
@@ -62,7 +62,6 @@ export const protocolGuildTenantContractConfig = ({
       contract: Membership__factory.connect(TOKEN, provider),
       provider,
       type: "erc721",
-      votesInterface: "IVotes",
     }),
 
     governor: new TenantContract<IGovernorContract>({
@@ -90,5 +89,7 @@ export const protocolGuildTenantContractConfig = ({
     }),
 
     treasury: TREASURY,
+
+    delegationModel: DelegationModel.FULL,
   };
 };

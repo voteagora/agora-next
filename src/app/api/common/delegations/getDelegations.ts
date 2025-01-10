@@ -13,6 +13,7 @@ import {
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Prisma } from "@prisma/client";
 import { findAdvancedDelegatee, findDelagatee } from "@/lib/prismaUtils";
+import { DelegationModel } from "@/lib/types";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -48,7 +49,7 @@ async function getCurrentDelegateesForAddress({
   let directDelegatee;
 
   // Should be if governor == Agora 1.0 w/ Partial Delegation On
-  if (contracts.token.isIVotesPartialDelegation()) {
+  if (contracts.delegationModel === DelegationModel.PARTIAL) {
     advancedDelegatees = await findAdvancedDelegatee({
       namespace,
       address,
@@ -136,7 +137,10 @@ async function getCurrentDelegatorsForAddress({
     : contracts.token.address;
 
   // Replace with the Agora Governor flag
-  if (contracts.alligator || contracts.token.isIVotesPartialDelegation()) {
+  if (
+    contracts.alligator ||
+    contracts.delegationModel === DelegationModel.PARTIAL
+  ) {
     advancedDelegatorsSubQry = `SELECT
                                 "from",
                                 "to",
@@ -166,7 +170,7 @@ async function getCurrentDelegatorsForAddress({
                                 AND ghost."from" = $2`;
   }
 
-  if (contracts.token.isIVotesPartialDelegation()) {
+  if (contracts.delegationModel === DelegationModel.PARTIAL) {
     directDelegatorsSubQry = `WITH ghost as (SELECT
               null::text as "from",
               null::text as "to",

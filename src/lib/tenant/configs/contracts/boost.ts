@@ -5,7 +5,7 @@ import {
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
-import { TenantContracts } from "@/lib/types";
+import { DelegationModel, TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { optimism } from "viem/chains";
@@ -52,7 +52,6 @@ export const boostTenantConfig = ({
       contract: Membership__factory.connect(TOKEN, provider),
       provider,
       type: "erc721",
-      votesInterface: "IVotes",
     }),
 
     governor: new TenantContract<IGovernorContract>({
@@ -80,5 +79,7 @@ export const boostTenantConfig = ({
     }),
 
     treasury: TREASURY,
+
+    delegationModel: DelegationModel.FULL,
   };
 };

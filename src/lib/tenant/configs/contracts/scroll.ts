@@ -5,7 +5,7 @@ import {
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
-import { TenantContracts } from "@/lib/types";
+import { DelegationModel, TenantContracts } from "@/lib/types";
 import { scroll } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { FallbackProvider, JsonRpcProvider, BaseContract } from "ethers";
@@ -65,7 +65,6 @@ export const scrollTenantContractConfig = ({
       contract: AgoraToken__factory.connect(TOKEN, provider),
       provider,
       type: "erc20",
-      votesInterface: "IVotesPartialDelegation",
     }),
 
     // PLACEHOLDER CONTRACT
@@ -94,5 +93,7 @@ export const scrollTenantContractConfig = ({
     }),
 
     treasury: TREASURY,
+
+    delegationModel: DelegationModel.FULL,
   };
 };

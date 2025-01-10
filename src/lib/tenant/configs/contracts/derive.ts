@@ -5,7 +5,7 @@ import {
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
-import { TenantContracts } from "@/lib/types";
+import { DelegationModel, TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { BaseContract, JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";
@@ -91,7 +91,6 @@ export const deriveTenantConfig = ({
       contract: AgoraToken__factory.connect(TOKEN, provider),
       provider,
       type: "erc20",
-      votesInterface: "IVotesPartialDelegation",
     }),
 
     governor: new TenantContract<IGovernorContract>({
@@ -119,5 +118,7 @@ export const deriveTenantConfig = ({
     }),
 
     governorApprovalModule: APPROVAL_MODULE,
+
+    delegationModel: DelegationModel.PARTIAL,
   };
 };

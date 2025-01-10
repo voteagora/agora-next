@@ -19,6 +19,7 @@ import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSup
 import { doInSpan } from "@/app/lib/logging";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getProxyAddress } from "@/lib/alligatorUtils";
+import { DelegationModel } from "@/lib/types";
 
 /*
  * Fetches a list of delegates
@@ -445,7 +446,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       address,
       partialDelegationContract
     );
-  } else if (contracts.token.isIVotesPartialDelegation()) {
+  } else if (contracts.delegationModel === DelegationModel.PARTIAL) {
     numOfDelegationsQuery = prisma.$queryRawUnsafe<
       { num_of_delegators: BigInt }[]
     >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);
