@@ -1,6 +1,7 @@
 import Tenant from "@/lib/tenant/tenant";
 import { rgbStringToHex } from "@/app/lib/utils/color";
 import { AgoraIcon } from "@/icons/AgoraIcon";
+import Image from "next/image";
 
 const { ui } = Tenant.current();
 export default function AgoraLoader() {
@@ -26,12 +27,10 @@ export function AgoraLoaderSmall() {
 }
 
 export function LogoLoader() {
+  const { ui } = Tenant.current();
   return (
     <div className="w-full h-full min-h-screen animate-pulse flex flex-col justify-center items-center">
-      <AgoraIcon
-        fill={rgbStringToHex(ui.customization?.primary)}
-        className="w-[44px] h-[44px]"
-      />
+      <Image alt="loading" width={36} height={36} src={ui.logo} />
     </div>
   );
 }
