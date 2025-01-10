@@ -59,7 +59,7 @@ function DelegationsContainer({
   }
 
   return (
-    <div className="max-w-full">
+    <div className="max-w-full text-primary">
       <Tabs className="max-w-full mb-8" defaultValue="delegatedFrom">
         <div className="flex flex-row items-center justify-between">
           <TabsList>

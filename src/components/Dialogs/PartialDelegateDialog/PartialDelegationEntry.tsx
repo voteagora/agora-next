@@ -68,7 +68,7 @@ export const PartialDelegationEntry = ({
           <Input
             value={value}
             placeholder="0"
-            className="max-w-[4rem] pl-2 pr-1 text-right focus:outline-none focus:ring-0"
+            className="text-primary max-w-[4rem] pl-2 pr-1 text-right focus:outline-none focus:ring-0"
             variant="none"
             onChange={(e) => {
               setValue(e.target.value as any);
@@ -95,9 +95,11 @@ export const PartialDelegationEntry = ({
             inputMode="numeric"
           />
           <div className="flex items-center pr-2 pl-1 w-[100px]">
-            <p>{token.symbol}</p>
-            <div className="bg-input w-[1px] h-6 mx-1"></div>
-            <p>{formatPercentageWithPrecision(percentage, 2)}%</p>
+            <p className="text-secondary text-sm">{token.symbol}</p>
+            <div className="border-r border-line w-[1px] h-6 mx-1"></div>
+            <p className="text-secondary text-sm">
+              {formatPercentageWithPrecision(percentage, 2)}%
+            </p>
           </div>
         </div>
       </div>
