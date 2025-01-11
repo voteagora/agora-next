@@ -25,6 +25,12 @@ export const getVotes = async ({ range = 60 * 60 * 24 }: { range: number }) => {
     ORDER BY vote_count DESC;
   `;
 
+  // @dev
+  // The "votes" table was pretty much unusable here due to how slow it is.
+  // I'm guessing it's doing a crazy amount of joins or something.
+  // Opting for "vote_cast_events" instead, which feels a bit lower level but should
+  // serve our need as long as there is 1 record per vote.
+  // Even still, this query is slow (~30s to load votes going back 1 week's worth of time)
   const votesQuery = `
     WITH filtered_proposals AS (
       SELECT proposal_id, end_block, description
@@ -37,7 +43,7 @@ export const getVotes = async ({ range = 60 * 60 * 24 }: { range: number }) => {
       COUNT(*) as vote_count,
       p.end_block,
       p.description
-    FROM ${namespace}.votes v
+    FROM ${namespace}.vote_cast_events v
     JOIN filtered_proposals p ON v.proposal_id = p.proposal_id
     GROUP BY v.proposal_id, p.end_block, p.description
     ORDER BY p.end_block DESC;
