@@ -1,11 +1,18 @@
+"use server";
+
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { analyticsStartingBlockNumber } from "../utils";
 import { ANALYTICS_EVENTS } from "@/lib/constants";
+import { getSecondsPerBlock } from "@/lib/blockTimes";
 
-export const getVotes = async () => {
+export const getVotes = async ({ range = 60 * 60 * 24 }: { range: number }) => {
   const { namespace, contracts, slug } = Tenant.current();
   const chainId = contracts.governor.chain.id;
+
+  const secondsPerBlock = getSecondsPerBlock();
+  const rangeInBlocks = Math.floor(range / secondsPerBlock);
+  const currentBlockNumber = await contracts.token.provider.getBlockNumber();
 
   const eventsQuery = `
     SELECT
@@ -28,6 +35,7 @@ export const getVotes = async () => {
     FROM ${namespace}.votes v
     JOIN ${namespace}.proposals_v2 p ON v.proposal_id = p.proposal_id
     WHERE CAST(p.start_block AS INTEGER) >= ${eventsStartedAtBlock}
+    AND CAST(p.start_block AS INTEGER) >= ${currentBlockNumber - rangeInBlocks}
     AND p.contract = '${contracts.governor.address.toLowerCase()}'
     GROUP BY v.proposal_id, p.end_block, p.description
     ORDER BY p.end_block DESC;

@@ -39,7 +39,7 @@ export const getProposals = async ({
     SELECT  p.end_block, p.description, p.created_transaction_hash
     FROM ${namespace}.proposals_v2 p
     WHERE CAST(p.start_block AS INTEGER) >= ${eventsStartedAtBlock}
-    AND CAST(p.start_block AS INTEGER) >= ${currentBlockNumber - range}
+    AND CAST(p.start_block AS INTEGER) >= ${currentBlockNumber - rangeInBlocks}
     AND p.contract = '${contracts.governor.address.toLowerCase()}'
     GROUP BY p.end_block, p.description, p.created_transaction_hash
     ORDER BY p.end_block DESC;

@@ -1,5 +1,6 @@
 "use client";
 
+import { Block } from "ethers";
 import React from "react";
 import {
   BarChart,
@@ -41,7 +42,13 @@ const CustomTooltip = ({
   return null;
 };
 
-export default function VotesBarChart({ data }: { data: any }) {
+export default function VotesBarChart({
+  data,
+  latestBlock,
+}: {
+  data: any;
+  latestBlock: Block;
+}) {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart
