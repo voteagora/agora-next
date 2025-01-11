@@ -2,7 +2,6 @@
 
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
-import { analyticsStartingBlockNumber } from "../utils";
 import { ANALYTICS_EVENTS } from "@/lib/constants";
 import { getSecondsPerBlock } from "@/lib/blockTimes";
 
@@ -30,34 +29,35 @@ export const getProposals = async ({
     AND event_data->>'contract_address' = '${contracts.governor.address.toLowerCase()}'
     GROUP BY event_data->>'transaction_hash'
   `;
-  const eventsStartedAtBlock =
-    analyticsStartingBlockNumber[
-      chainId as keyof typeof analyticsStartingBlockNumber
-    ];
 
   const proposalsQuery = `
     SELECT  p.end_block, p.description, p.created_transaction_hash
     FROM ${namespace}.proposals_v2 p
-    WHERE CAST(p.start_block AS INTEGER) >= ${eventsStartedAtBlock}
-    AND CAST(p.start_block AS INTEGER) >= ${currentBlockNumber - rangeInBlocks}
+    WHERE CAST(p.start_block AS INTEGER) >= ${currentBlockNumber - rangeInBlocks}
     AND p.contract = '${contracts.governor.address.toLowerCase()}'
     GROUP BY p.end_block, p.description, p.created_transaction_hash
     ORDER BY p.end_block DESC;
   `;
 
-  const proposalAnalyticsEvents = (await prisma.$queryRawUnsafe(
-    eventsQuery
-  )) as {
-    transaction_hash: string;
-  }[];
+  const start = performance.now();
 
-  const proposalOnChainEvents = (await prisma.$queryRawUnsafe(
-    proposalsQuery
-  )) as {
-    end_block: number;
-    description: string;
-    created_transaction_hash: string;
-  }[];
+  const [proposalAnalyticsEvents, proposalOnChainEvents] = await Promise.all([
+    prisma.$queryRawUnsafe(eventsQuery) as Promise<
+      {
+        transaction_hash: string;
+      }[]
+    >,
+    prisma.$queryRawUnsafe(proposalsQuery) as Promise<
+      {
+        end_block: number;
+        description: string;
+        created_transaction_hash: string;
+      }[]
+    >,
+  ]);
+
+  const end = performance.now();
+  console.log(`Total query execution time: ${end - start} milliseconds`);
 
   let intervals = [];
   for (

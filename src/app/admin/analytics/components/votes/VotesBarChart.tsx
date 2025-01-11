@@ -49,6 +49,14 @@ export default function VotesBarChart({
   data: any;
   latestBlock: Block;
 }) {
+  if (data.length === 0) {
+    return (
+      <div className="w-full h-[370px] flex items-center justify-center bg-tertiary/5  text-secondary">
+        No data for this range
+      </div>
+    );
+  }
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart

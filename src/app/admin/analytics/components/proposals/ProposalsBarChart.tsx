@@ -63,6 +63,18 @@ export default function ProposalsBarChart({
   const secondsPerBlock = getSecondsPerBlock();
   const blocksPerInterval = interval / secondsPerBlock;
 
+  const emptyData = data.every(
+    (dataInterval) => dataInterval.matches === 0 && dataInterval.misses === 0
+  );
+
+  if (emptyData) {
+    return (
+      <div className="w-full h-[370px] flex items-center justify-center bg-tertiary/5 text-secondary">
+        No data for this range
+      </div>
+    );
+  }
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart
@@ -78,7 +90,7 @@ export default function ProposalsBarChart({
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
-          dataKey="name"
+          dataKey="startBlock"
           tickFormatter={(block) => {
             return `${formatAbbreviatedDate(getHumanBlockTime(block, latestBlock))} - ${formatAbbreviatedDate(getHumanBlockTime(block + blocksPerInterval, latestBlock))}`;
           }}

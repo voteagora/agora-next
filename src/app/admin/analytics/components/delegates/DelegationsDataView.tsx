@@ -13,11 +13,11 @@ const dayInSeconds = 60 * 60 * 24;
 const DelegationsDataView = ({ latestBlock }: { latestBlock: Block }) => {
   const [selectedInterval, setSelectedInterval] = useState<1 | 7 | 30 | 365>(1);
   const interval = dayInSeconds * selectedInterval;
-  const range = interval * 5;
+  const numOfIntervals = 5;
 
   const { data: delegateData, isLoading } = useQuery({
-    queryKey: ["delegates", range, interval],
-    queryFn: () => getDelegates({ range, interval }),
+    queryKey: ["delegates", interval, numOfIntervals],
+    queryFn: () => getDelegates({ interval, numOfIntervals }),
   });
 
   return (

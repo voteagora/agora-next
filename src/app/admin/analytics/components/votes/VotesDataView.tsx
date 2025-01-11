@@ -10,7 +10,7 @@ import LoadingChart from "../LoadingChart";
 
 const dayInSeconds = 60 * 60 * 24;
 
-const VotesDataView = async ({ latestBlock }: { latestBlock: Block }) => {
+const VotesDataView = ({ latestBlock }: { latestBlock: Block }) => {
   const [selectedRange, setSelectedRange] = useState<1 | 7 | 30 | 365>(1);
   const range = dayInSeconds * selectedRange;
 

@@ -2,7 +2,6 @@
 
 import prisma from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
-import { analyticsStartingBlockNumber } from "../utils";
 import { ANALYTICS_EVENTS } from "@/lib/constants";
 import { getSecondsPerBlock } from "@/lib/blockTimes";
 
@@ -25,31 +24,43 @@ export const getVotes = async ({ range = 60 * 60 * 24 }: { range: number }) => {
     GROUP BY event_data->>'proposal_id'
     ORDER BY vote_count DESC;
   `;
-  const eventsStartedAtBlock =
-    analyticsStartingBlockNumber[
-      chainId as keyof typeof analyticsStartingBlockNumber
-    ];
 
   const votesQuery = `
-    SELECT v.proposal_id, COUNT(*) as vote_count, p.end_block, p.description
+    WITH filtered_proposals AS (
+      SELECT proposal_id, end_block, description
+      FROM ${namespace}.proposals_v2
+      WHERE CAST(start_block AS INTEGER) >= ${currentBlockNumber - rangeInBlocks}
+       AND contract = '${contracts.governor.address.toLowerCase()}'
+    )
+    SELECT
+      v.proposal_id,
+      COUNT(*) as vote_count,
+      p.end_block,
+      p.description
     FROM ${namespace}.votes v
-    JOIN ${namespace}.proposals_v2 p ON v.proposal_id = p.proposal_id
-    WHERE CAST(p.start_block AS INTEGER) >= ${eventsStartedAtBlock}
-    AND CAST(p.start_block AS INTEGER) >= ${currentBlockNumber - rangeInBlocks}
-    AND p.contract = '${contracts.governor.address.toLowerCase()}'
+    JOIN filtered_proposals p ON v.proposal_id = p.proposal_id
     GROUP BY v.proposal_id, p.end_block, p.description
     ORDER BY p.end_block DESC;
   `;
 
-  const voteEventsByProposalId = (await prisma.$queryRawUnsafe(
-    eventsQuery
-  )) as { proposal_id: string; vote_count: number }[];
-  const votesByProposalId = (await prisma.$queryRawUnsafe(votesQuery)) as {
-    proposal_id: string;
-    vote_count: number;
-    end_block: number;
-    description: string;
-  }[];
+  const start = performance.now();
+
+  const [voteEventsByProposalId, votesByProposalId] = await Promise.all([
+    prisma.$queryRawUnsafe(eventsQuery) as Promise<
+      { proposal_id: string; vote_count: number }[]
+    >,
+    prisma.$queryRawUnsafe(votesQuery) as Promise<
+      {
+        proposal_id: string;
+        vote_count: number;
+        end_block: number;
+        description: string;
+      }[]
+    >,
+  ]);
+
+  const end = performance.now();
+  console.log(`Total query execution time: ${end - start} milliseconds`);
 
   const zipped = votesByProposalId.map((vote) => {
     const event = voteEventsByProposalId.find(
