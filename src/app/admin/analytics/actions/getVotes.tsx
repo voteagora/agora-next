@@ -30,7 +30,7 @@ export const getVotes = async ({ range = 60 * 60 * 24 }: { range: number }) => {
   // I'm guessing it's doing a crazy amount of joins or something.
   // Opting for "vote_cast_events" instead, which feels a bit lower level but should
   // serve our need as long as there is 1 record per vote.
-  // Even still, this query is slow (~30s to load votes going back 1 week's worth of time)
+  // Even still, this query is slow (~30s to load votes going back 1 week's worth of time on OP)
   const votesQuery = `
     WITH filtered_proposals AS (
       SELECT proposal_id, end_block, description

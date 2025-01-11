@@ -17,6 +17,7 @@ import {
   NameType,
   ValueType,
 } from "recharts/types/component/DefaultTooltipContent";
+import { truncateString } from "@/app/lib/utils/text";
 
 // Custom tooltip component
 const CustomTooltip = ({
@@ -25,17 +26,20 @@ const CustomTooltip = ({
   label,
 }: TooltipProps<ValueType, NameType>) => {
   if (active && payload && payload.length) {
-    const votesOnAgora = Number(payload[0].value);
-    const votesElsewhere = Number(payload[1].value);
-    const totalVotes = votesOnAgora + votesElsewhere;
-    const percentage = ((votesOnAgora / totalVotes) * 100).toFixed(1);
-
     return (
-      <div className="bg-white p-4 border rounded shadow">
-        <p className="font-bold">{label}</p>
-        <p>{`Votes on Agora: ${votesOnAgora}`}</p>
-        <p>{`Votes elsewhere: ${votesElsewhere}`}</p>
-        <p className="mt-2">{`Percentage on Agora: ${percentage}%`}</p>
+      <div className="bg-white p-3 border rounded-lg shadow-md">
+        <p className="font-bold">{truncateString(label, 50)}</p>
+        {payload.map((entry: any) => (
+          <div
+            key={entry.name}
+            className="flex justify-between items-center gap-4 text-xs"
+          >
+            <span style={{ color: entry.color }}>
+              {entry.name.charAt(0).toUpperCase() + entry.name.slice(1)}:
+            </span>
+            <span className="font-mono">{entry.value.toLocaleString()}</span>
+          </div>
+        ))}
       </div>
     );
   }
@@ -73,7 +77,11 @@ export default function VotesBarChart({
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
           tickFormatter={(name) => {
-            return `${name.slice(1)}`;
+            const maxLength = 20;
+            const truncatedName = name.slice(1); // gets rid of "hashtag" # that starts all props
+            return truncatedName.length > maxLength
+              ? `${truncatedName.slice(0, maxLength)}...`
+              : truncatedName;
           }}
           dataKey="name"
           angle={-15}

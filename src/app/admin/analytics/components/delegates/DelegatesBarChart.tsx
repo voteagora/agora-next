@@ -25,7 +25,12 @@ const CustomTooltip = ({
   active,
   payload,
   label,
-}: TooltipProps<ValueType, NameType>) => {
+  latestBlock,
+  blocksPerInterval,
+}: TooltipProps<ValueType, NameType> & {
+  latestBlock: Block;
+  blocksPerInterval: number;
+}) => {
   if (active && payload && payload.length) {
     const matches = Number(payload[0].value);
     const misses = Number(payload[1].value);
@@ -34,11 +39,23 @@ const CustomTooltip = ({
       totalDelegates > 0 ? ((matches / totalDelegates) * 100).toFixed(1) : 0;
 
     return (
-      <div className="bg-white p-4 border rounded shadow">
-        <p className="font-bold">{label}</p>
-        <p>{`Delegates on Agora: ${matches}`}</p>
-        <p>{`Delegates elsewhere: ${misses}`}</p>
-        <p className="mt-2">{`Percentage on Agora: ${percentage}%`}</p>
+      <div className="bg-white p-3 border rounded-lg shadow-md">
+        <p className="font-bold">{`${formatAbbreviatedDate(getHumanBlockTime(label, latestBlock))} - ${formatAbbreviatedDate(getHumanBlockTime(label + blocksPerInterval, latestBlock))}`}</p>
+        {payload.map((entry: any) => (
+          <div
+            key={entry.name}
+            className="flex justify-between items-center gap-4 text-xs"
+          >
+            <span style={{ color: entry.color }}>
+              {entry.name.charAt(0).toUpperCase() + entry.name.slice(1)}:
+            </span>
+            <span className="font-mono">{entry.value.toLocaleString()}</span>
+          </div>
+        ))}
+        <div className="flex justify-between items-center gap-4 text-xs">
+          <span style={{ color: "#333" }}>Percentage:</span>
+          <span className="font-mono">{percentage}%</span>
+        </div>
       </div>
     );
   }
@@ -101,7 +118,14 @@ export default function DelegatesBarChart({
           }}
         />
         <YAxis />
-        <Tooltip content={<CustomTooltip />} />
+        <Tooltip
+          content={
+            <CustomTooltip
+              latestBlock={latestBlock}
+              blocksPerInterval={blocksPerInterval}
+            />
+          }
+        />
         <Legend formatter={(value) => value.replace(/_/g, " ")} />
         <Bar
           dataKey="matches"
