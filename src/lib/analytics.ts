@@ -1,3 +1,7 @@
+import Tenant from "@/lib/tenant/tenant";
+
+const { contracts, slug } = Tenant.current();
+
 interface AnalyticsEvent {
   event_name: string;
   event_data: Record<string, any>;
@@ -36,12 +40,22 @@ class AnalyticsManager {
     this.services.push(service);
   }
 
-  // Thoughts on adding things like dao_slug, contract_address, etc. here
-  // so we can guarantee the the event log has it?
   async trackEvent(event: AnalyticsEvent) {
+    // The idea is to add tenant data to the event so we can guarantee the event log has it
+    // even if the call to trackEvent fails to include it.
+    const eventWithTenantData = {
+      ...event,
+      event_data: {
+        ...event.event_data,
+        dao_slug: slug,
+        chain_id: contracts.token.chain.id,
+        token_address: contracts.token.address,
+        governor_address: contracts.governor.address,
+      },
+    };
     await Promise.all(
       this.services.map((service) =>
-        service.trackEvent(event).catch((err) => {
+        service.trackEvent(eventWithTenantData).catch((err) => {
           console.error("Analytics service error:", err);
           // Don't throw - we don't want one service failure to affect others
         })
