@@ -1,5 +1,6 @@
 import { BaseContract } from "ethers";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
+import { IVotableSupplyContract } from "@/lib/contracts/common/interfaces/IVotableSupplyContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
@@ -37,6 +38,7 @@ export type TenantContracts = {
   alligator?: TenantContract<IAlligatorContract>;
   treasury?: string[]; // We don't interact with them, but maybe one day we will.
   governorApprovalModule?: string;
+  votableSupplyOracle?: TenantContract<IVotableSupplyContract>;
 };
 
 export type TenantToken = {
