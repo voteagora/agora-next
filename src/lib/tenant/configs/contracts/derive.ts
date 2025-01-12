@@ -10,12 +10,40 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { BaseContract, JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";
 import { createTokenContract } from "@/lib/tokenUtils";
-import { Chain, lyra } from "viem/chains";
+import { Chain } from "viem/chains";
 import { DELEGATION_MODEL } from "@/lib/constants";
 
-const LYRA_TESTNET_RPC = "https://rpc-prod-testnet-0eakp60405.t.conduit.xyz";
+const DERIVE_TESTNET_RPC = "https://rpc-prod-testnet-0eakp60405.t.conduit.xyz";
+const DERIVE_PROD_RPC = `https://rpc-lyra-mainnet-0.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`;
 
-const lyraTestnet: Chain = defineChain({
+const deriveMainnet: Chain = defineChain({
+  id: 957,
+  name: "Derive",
+  network: "derive",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Ethers",
+    symbol: "ETH",
+  },
+  rpcUrls: {
+    default: {
+      http: [DERIVE_PROD_RPC],
+      webSocket: [DERIVE_PROD_RPC.replace("http", "ws")],
+    },
+    public: {
+      http: [DERIVE_PROD_RPC],
+      webSocket: [DERIVE_PROD_RPC.replace("http", "ws")],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Derive Explorer",
+      url: "https://explorer.derive.xyz/",
+    },
+  },
+});
+
+const deriveTestnet: Chain = defineChain({
   id: 901,
   name: "Derive",
   network: "derive",
@@ -26,12 +54,12 @@ const lyraTestnet: Chain = defineChain({
   },
   rpcUrls: {
     default: {
-      http: [LYRA_TESTNET_RPC],
-      webSocket: [LYRA_TESTNET_RPC.replace("http", "ws")],
+      http: [DERIVE_TESTNET_RPC],
+      webSocket: [DERIVE_TESTNET_RPC.replace("http", "ws")],
     },
     public: {
-      http: [LYRA_TESTNET_RPC],
-      webSocket: [LYRA_TESTNET_RPC.replace("http", "ws")],
+      http: [DERIVE_TESTNET_RPC],
+      webSocket: [DERIVE_TESTNET_RPC.replace("http", "ws")],
     },
   },
   blockExplorers: {
@@ -79,10 +107,10 @@ export const deriveTenantConfig = ({
 
   const rpcURL = isProd
     ? `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
-    : LYRA_TESTNET_RPC;
+    : DERIVE_TESTNET_RPC;
 
   const provider = new JsonRpcProvider(rpcURL);
-  const chain = isProd ? lyra : lyraTestnet;
+  const chain = isProd ? deriveMainnet : deriveTestnet;
 
   return {
     token: createTokenContract({

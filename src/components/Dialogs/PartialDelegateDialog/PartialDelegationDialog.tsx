@@ -50,15 +50,22 @@ export function PartialDelegationDialog({
     0
   );
 
+  const delegatableBalace = async () => {
+    try {
+      return await contracts.token.contract.balanceOf(
+        ownerAddress as `0x${string}`
+      );
+    } catch (e) {
+      return BigInt(0);
+    }
+  };
+
   const fetchData = useCallback(async () => {
     try {
       if (!ownerAddress) return;
+      const rawTokenBalance = await delegatableBalace();
 
       shouldFetchData.current = false;
-
-      const rawTokenBalance = await contracts.token.contract.balanceOf(
-        ownerAddress as `0x${string}`
-      );
       const rawDelegations = await fetchCurrentDelegatees(ownerAddress);
 
       const isNewDelegate = !rawDelegations.find(

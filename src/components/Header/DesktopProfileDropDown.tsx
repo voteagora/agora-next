@@ -61,8 +61,12 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
 
   const fetchScwBalance = async () => {
     if (scwAddress) {
-      const scwBalance = await balanceOf(scwAddress);
-      setScwTokenBalance(BigInt(scwBalance));
+      try {
+        const scwBalance = await balanceOf(scwAddress);
+        setScwTokenBalance(BigInt(scwBalance));
+      } catch (error) {
+        setScwTokenBalance(BigInt(0));
+      }
     }
   };
 
