@@ -388,13 +388,12 @@ export const getTransportForChain = (chainId: number) => {
         http("https://rpc.scroll.io"),
       ]);
 
-    // lyra
+    // derive
     case 957:
       return fallback([
         http(
           `https://rpc-lyra-mainnet-0.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
         ),
-        http("https://rpc.lyra.finance"),
       ]);
 
     //   lyra testnet
