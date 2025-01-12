@@ -109,7 +109,42 @@ async function getDelegates({
     ? await getProxyAddress(filters?.delegator?.toLowerCase())
     : null;
 
-  delegateUniverseCTE = `
+  if (namespace === TENANT_NAMESPACES.DERIVE) {
+    delegateUniverseCTE = `
+    with del_statements as (
+      select address
+      from agora.delegate_statements
+      where dao_slug='${slug}'
+    ),
+    filtered_delegates as (
+      select 
+        address as delegate,
+        0 as num_of_delegators,
+        0 as direct_vp,
+        0 as advanced_vp,
+        0 as voting_power
+        from agora.delegate_statements where dao_slug='DERIVE'
+      union
+        select 
+          d.delegate as delegate,
+          d.num_of_delegators as num_of_delegators,
+          d.direct_vp as direct_vp,
+          d.advanced_vp as advanced_vp,
+          d.voting_power as voting_power
+        from ${namespace}.delegates d
+        where d.contract = '${tokenAddress}'
+    ),
+    del_card_universe as (
+      select
+        d.delegate as delegate,
+        d.num_of_delegators as num_of_delegators,
+        d.direct_vp as direct_vp,
+        d.advanced_vp as advanced_vp,
+        d.voting_power as voting_power
+      from filtered_delegates d
+    )`;
+  } else {
+    delegateUniverseCTE = `
     with del_statements as (
       select address
       from agora.delegate_statements
@@ -152,7 +187,7 @@ async function getDelegates({
         d.voting_power as voting_power
       from filtered_delegates d
     )`;
-
+  }
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
     const allowListString = allowList.map((value) => `'${value}'`).join(", ");
