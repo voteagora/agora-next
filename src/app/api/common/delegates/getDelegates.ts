@@ -120,7 +120,7 @@ async function getDelegates({
       from agora.delegate_statements
       where dao_slug='${slug}'
     ),
-    filtered_delegates as (
+    filtered_delegates_both as (
       select 
         address as delegate,
         0 as num_of_delegators,
@@ -137,6 +137,15 @@ async function getDelegates({
           d.voting_power as voting_power
         from ${namespace}.delegates d
         where d.contract = '${tokenAddress}'
+    ),
+    filtered_delegates as (
+      select
+      delegate,
+      sum(num_of_delegators) as num_of_delegators,
+      sum(direct_vp) as direct_vp,
+      sum(advanced_vp) as advanced_vp,
+      sum(voting_power) as voting_power
+      from filtered_delegates_both group by delegate
     ),
     del_card_universe as (
       select
