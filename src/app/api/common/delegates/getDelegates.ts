@@ -109,6 +109,10 @@ async function getDelegates({
     ? await getProxyAddress(filters?.delegator?.toLowerCase())
     : null;
 
+  // This toggle for Deriver should be a temporary one, and reverted within ~1 week.
+  // They don't have a token yet, so nobody can delegate.
+  // This makes the universe include all delegate statements, albeit in a sloppy
+  // way.  It's structured to mirror the SQL for the other more complex CTE.
   if (namespace === TENANT_NAMESPACES.DERIVE) {
     delegateUniverseCTE = `
     with del_statements as (
