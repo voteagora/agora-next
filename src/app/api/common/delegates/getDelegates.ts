@@ -50,7 +50,7 @@ async function getDelegates({
 
   const allowList = ui.delegates?.allowed || [];
 
-  const endorsedFilterQuery = filters?.endorsed
+  const endorsedFilterQuery = filters?.endorsed || (namespace === TENANT_NAMESPACES.DERIVE)
     ? `AND endorsed = true AND s.dao_slug = '${slug}'`
     : "";
 
