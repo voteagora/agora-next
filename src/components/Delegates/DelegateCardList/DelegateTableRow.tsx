@@ -19,9 +19,6 @@ export default function DelegateTableRow({
 
   return (
     <TableRow className="font-semibold">
-      <TableCell className="text-secondary w-[1%] font-normal">
-        {idx + 1}
-      </TableCell>
       <TableCell>
         <DelegateProfileImage
           endorsed={delegate.statement?.endorsed}

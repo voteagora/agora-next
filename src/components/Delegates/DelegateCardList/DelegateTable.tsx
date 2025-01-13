@@ -55,54 +55,59 @@ export default function DelegateTable({
 
   return (
     <DialogProvider>
-      <Table className="min-w-full">
-        <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
-          <TableRow>
-            <TableHead className="h-10 text-secondary w-[1%]"></TableHead>
-            <TableHead className="h-10 text-secondary">Name</TableHead>
-            <TableHead className="h-10 text-secondary">Voting power</TableHead>
-            <TableHead className="h-10 text-secondary">Participation</TableHead>
-            <TableHead className="h-10 text-secondary">
-              Delegated from
-            </TableHead>
-            <TableHead className="h-10 text-secondary">
-              For / Against / Abstain
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <InfiniteScroll
-          hasMore={meta.has_next}
-          pageStart={1}
-          loadMore={loadMore}
-          loader={
-            <TableRow key={0}>
-              <TableCell
-                key="loader"
-                className="gl_loader justify-center py-6 text-sm text-secondary"
-              >
-                Loading...
-              </TableCell>
+      <div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg mt-6">
+        <Table className="min-w-full">
+          <TableHeader className="text-sm text-secondary sticky top-0 bg-white z-10 rounded-t-lg">
+            <TableRow className="bg-tertiary/5">
+              <TableHead className="h-10 text-secondary">Name</TableHead>
+              <TableHead className="h-10 text-secondary">
+                Voting power
+              </TableHead>
+              <TableHead className="h-10 text-secondary">
+                Participation
+              </TableHead>
+              <TableHead className="h-10 text-secondary">
+                Delegated from
+              </TableHead>
+              <TableHead className="h-10 text-secondary">
+                For / Against / Abstain
+              </TableHead>
             </TableRow>
-          }
-          // References styles of TableBody
-          className="[&_tr:last-child]:border-0"
-          element="tbody"
-          useWindow={false}
-        >
-          {delegates.length === 0 ? (
-            <td
-              className="w-full p-4 bg-neutral text-center text-secondary text-sm"
-              colSpan={6}
-            >
-              None found
-            </td>
-          ) : (
-            delegates.map((delegate, idx) => (
-              <DelegateTableRow key={idx} idx={idx} delegate={delegate} />
-            ))
-          )}
-        </InfiniteScroll>
-      </Table>
+          </TableHeader>
+          <InfiniteScroll
+            hasMore={meta.has_next}
+            pageStart={1}
+            loadMore={loadMore}
+            loader={
+              <TableRow key={0}>
+                <TableCell
+                  key="loader"
+                  className="gl_loader justify-center py-6 text-sm text-secondary"
+                >
+                  Loading...
+                </TableCell>
+              </TableRow>
+            }
+            // References styles of TableBody
+            className="[&_tr:last-child]:border-0"
+            element="tbody"
+            useWindow={false}
+          >
+            {delegates.length === 0 ? (
+              <td
+                className="w-full p-4 bg-neutral text-center text-secondary text-sm"
+                colSpan={6}
+              >
+                None found
+              </td>
+            ) : (
+              delegates.map((delegate, idx) => (
+                <DelegateTableRow key={idx} idx={idx} delegate={delegate} />
+              ))
+            )}
+          </InfiniteScroll>
+        </Table>
+      </div>
     </DialogProvider>
   );
 }
