@@ -2686,10 +2686,11 @@ view deriveStakedDeposits {
 }
 
 view deriveVotableSupply {
-  votable_supply String @unique
+  address String @unique
+  votable_supply String
 
   @@schema("derive")
-  @@map("votable_supply")
+  @@map("votable_supply_v2")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.

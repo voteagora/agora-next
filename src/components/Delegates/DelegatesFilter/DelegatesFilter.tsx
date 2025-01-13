@@ -35,7 +35,7 @@ export default function DelegatesFilter() {
     >
       {() => (
         <>
-          <Listbox.Button className="w-full sm:w-[200px] bg-wash text-base font-medium border border-line rounded-full py-2 px-4 flex items-center justify-between">
+          <Listbox.Button className="w-full sm:w-[200px] text-base font-medium border border-line rounded-full py-2 px-4 flex items-center justify-between bg-neutral text-primary">
             <span>
               {delegatesFilterOptions[
                 orderByParam as keyof typeof delegatesFilterOptions

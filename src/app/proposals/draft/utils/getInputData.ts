@@ -53,16 +53,15 @@ const isTransfer = (calldata: string) => {
 export function getInputData(proposal: DraftProposal): {
   inputData: InputData;
 } {
-  const tenant = Tenant.current();
+  const { namespace, contracts } = Tenant.current();
   const description =
     "# " +
     proposal.title +
     "\n\n" +
     `${
       proposal.temp_check_link &&
-      "[Temp Check Discourse link](" + proposal.temp_check_link + ")\n"
+      "[Temp Check Discourse link](" + proposal.temp_check_link + ")\n\n"
     }` +
-    "\n\n ## Description \n" +
     proposal.abstract;
 
   // Inputs for basic type
@@ -83,7 +82,7 @@ export function getInputData(proposal: DraftProposal): {
 
       if (proposal.transactions.length === 0) {
         // empty eth transfer from governor
-        const governorAddress = tenant.contracts.governor.address;
+        const governorAddress = contracts.governor.address;
         targets.push(governorAddress as `0x${string}`);
         values.push(0);
         calldatas.push("0x" as `0x${string}`);
@@ -98,7 +97,7 @@ export function getInputData(proposal: DraftProposal): {
       // OZ governor does not have proposal types
       // need a better way to read which governor a particular tenant is on
       // would be great if we could read this from the contract, or the tenant
-      if (tenant.namespace === TENANT_NAMESPACES.ENS) {
+      if (namespace === TENANT_NAMESPACES.ENS) {
         inputData = inputData.slice(0, 4) as OZBasicInputData;
       }
 
@@ -155,7 +154,7 @@ export function getInputData(proposal: DraftProposal): {
         maxApprovals: proposal.max_options,
         criteria: proposal.criteria === "Threshold" ? 0 : 1,
         budgetToken: (proposal.budget > 0
-          ? tenant.contracts.governor.address
+          ? contracts.governor.address
           : ethers.ZeroAddress) as `0x${string}`,
         criteriaValue:
           proposal.criteria === "Threshold"
@@ -198,7 +197,7 @@ export function getInputData(proposal: DraftProposal): {
 
       if (!approvalModuleAddress) {
         throw new Error(
-          `Approval module address not found for tenant ${tenant.namespace}`
+          `Approval module address not found for tenant ${namespace}`
         );
       }
 
@@ -238,7 +237,7 @@ export function getInputData(proposal: DraftProposal): {
 
       if (!optimisticModuleAddress) {
         throw new Error(
-          `Optimistic module address not found for tenant ${tenant.namespace}`
+          `Optimistic module address not found for tenant ${namespace}`
         );
       }
 

@@ -1,11 +1,10 @@
 "use client";
 
+import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
-import { HStack, VStack } from "@/components/Layout/Stack";
 import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFilter";
-import * as React from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
 import { useSearchParams } from "next/navigation";
@@ -76,7 +75,7 @@ export default function ProposalsList({
   const proposals = pages.flatMap((page) => page.data);
 
   return (
-    <VStack className="max-w-[76rem]">
+    <div className="flex flex-col max-w-[76rem]">
       {/* {address && <NonVotedProposalsList address={address} />} */}
       <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
         <PageHeader headerText="All Proposals" />
@@ -95,7 +94,7 @@ export default function ProposalsList({
           reviewPeriod={governanceCalendar.reviewPeriod}
         />
       )}
-      <VStack className="bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+      <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
         <div>
           {proposals.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">
@@ -108,12 +107,12 @@ export default function ProposalsList({
               loadMore={loadMore}
               loader={
                 <div key={0}>
-                  <HStack
+                  <div
+                    className="flex flex-row gl_loader justify-center py-6 text-sm text-secondary"
                     key="loader"
-                    className="gl_loader justify-center py-6 text-sm text-secondary"
                   >
                     Loading...
-                  </HStack>
+                  </div>
                 </div>
               }
               element="main"
@@ -128,7 +127,7 @@ export default function ProposalsList({
             </InfiniteScroll>
           )}
         </div>
-      </VStack>
-    </VStack>
+      </div>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useAccount } from "wagmi";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/AdvancedDelegationDisplayAmount";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
@@ -12,6 +12,8 @@ import {
 import { PartialDelegationButton } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationButton";
 import { PartialDelegationSuccess } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationSuccess";
 import { formatPercentageWithPrecision } from "@/lib/utils";
+import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
+import { ScwPartialDelegationButton } from "@/components/Dialogs/PartialDelegateDialog/ScwPartialDelegationButton";
 
 interface Props {
   delegate: DelegateChunk;
@@ -28,6 +30,14 @@ export function PartialDelegationDialog({
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const { address } = useAccount();
+  const { data: scwAddress, enabled: isScwEnabled } = useSmartAccountAddress({
+    owner: address,
+  });
+
+  const ownerAddress = scwAddress || address;
+
+  const shouldFetchData = useRef(true);
+
   const [isLoading, setIsLoading] = useState(true);
   const [tokenBalance, setTokenBalance] = useState<bigint | undefined>();
   const [delegations, setDelegations] = useState<Delegation[]>([]);
@@ -40,14 +50,23 @@ export function PartialDelegationDialog({
     0
   );
 
+  const delegatableBalace = async () => {
+    try {
+      return await contracts.token.contract.balanceOf(
+        ownerAddress as `0x${string}`
+      );
+    } catch (e) {
+      return BigInt(0);
+    }
+  };
+
   const fetchData = useCallback(async () => {
     try {
-      if (!address) return;
+      if (!ownerAddress) return;
+      const rawTokenBalance = await delegatableBalace();
 
-      const rawTokenBalance = await contracts.token.contract.balanceOf(
-        address as `0x${string}`
-      );
-      const rawDelegations = await fetchCurrentDelegatees(address);
+      shouldFetchData.current = false;
+      const rawDelegations = await fetchCurrentDelegatees(ownerAddress);
 
       const isNewDelegate = !rawDelegations.find(
         (delegation) =>
@@ -57,7 +76,7 @@ export function PartialDelegationDialog({
       // Add new delegation to the end of the existing list
       if (isNewDelegate) {
         rawDelegations.push({
-          from: address!,
+          from: ownerAddress!,
           to: delegate.address,
           allowance: "0",
           percentage: "0",
@@ -74,11 +93,18 @@ export function PartialDelegationDialog({
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [address, delegate.address]);
+  }, [ownerAddress, delegate.address]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (shouldFetchData.current) {
+      // Wait to for either a scw or a regular address to be available
+      if (isScwEnabled && scwAddress) {
+        fetchData();
+      } else if (!isScwEnabled && address) {
+        fetchData();
+      }
+    }
+  }, [fetchData, address, scwAddress, isScwEnabled]);
 
   const updateDelegations = (updatedDelegation: Delegation) => {
     setDelegations((prev) => {
@@ -105,7 +131,7 @@ export function PartialDelegationDialog({
     if (tokenBalance) {
       return (
         <div className="flex flex-col text-xs border border-line rounded-lg justify-center items-center py-8 px-2 relative">
-          <div className="flex flex-row items-center gap-1">
+          <div className="flex flex-row items-center gap-1 text-primary">
             Your total delegatable votes{" "}
           </div>
           <AdvancedDelegationDisplayAmount amount={tokenBalance as any} />
@@ -149,11 +175,19 @@ export function PartialDelegationDialog({
           </div>
         )}
         <div className="mt-4">
-          <PartialDelegationButton
-            onSuccess={setSuccessHash}
-            disabled={totalPercentage > 1 || !isUnsaved}
-            delegations={delegations}
-          />
+          {scwAddress ? (
+            <ScwPartialDelegationButton
+              onSuccess={setSuccessHash}
+              disabled={totalPercentage > 1 || !isUnsaved}
+              delegations={delegations}
+            />
+          ) : (
+            <PartialDelegationButton
+              onSuccess={setSuccessHash}
+              disabled={totalPercentage > 1 || !isUnsaved}
+              delegations={delegations}
+            />
+          )}
         </div>
       </div>
     );

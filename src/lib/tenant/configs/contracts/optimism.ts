@@ -13,6 +13,7 @@ import { TenantContracts } from "@/lib/types";
 import { optimism } from "viem/chains";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
+import { DELEGATION_MODEL } from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -87,5 +88,7 @@ export const optimismTenantContractConfig = ({
       contract: AgoraTimelock__factory.connect(TIMELOCK, provider),
       provider,
     }),
+
+    delegationModel: DELEGATION_MODEL.ADVANCED,
   };
 };

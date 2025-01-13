@@ -1,24 +1,44 @@
 import React from "react";
 import Image from "next/image";
-import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { CoinsIcon } from "@/icons/CoinsIcon";
+import { rgbStringToHex } from "@/app/lib/utils/color";
+import { NotificationIcon } from "@/icons/NotificationIcon";
+import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
+
+const { ui } = Tenant.current();
 
 const tabs = [
   {
-    icon: icons.coins,
+    icon: (
+      <CoinsIcon
+        className="w-[24px] h-[24px]"
+        stroke={rgbStringToHex(ui.customization?.secondary)}
+      />
+    ),
     title: "Delegate voting power",
     description:
       "The community is governed by its token holders, represented by trusted delegates.",
   },
   {
-    icon: icons.notificationMessage,
+    icon: (
+      <NotificationIcon
+        className="w-[24px] h-[24px]"
+        stroke={rgbStringToHex(ui.customization?.secondary)}
+      />
+    ),
     title: "Browse proposals",
     description:
       "Governance decisions are initiated as proposals, providing insights into the priorities of the community.",
   },
   {
-    icon: icons.checkCircleBroken,
+    icon: (
+      <CheckCircleBrokenIcon
+        className="w-[24px] h-[24px]"
+        stroke={rgbStringToHex(ui.customization?.secondary)}
+      />
+    ),
     title: "Vote on proposals",
     description:
       "Proposals that advance to a vote are accepted or rejected by the community’s delegates.",
@@ -91,12 +111,7 @@ const InfoAbout = () => {
                 className="flex flex-row gap-3 justify-center items-center mt-3"
               >
                 <div className="min-w-[72px] h-[72px] flex justify-center items-center rounded-full border border-line bg-tertiary/10">
-                  <Image
-                    src={item.icon}
-                    width={24}
-                    height={24}
-                    alt="notification"
-                  />
+                  {item.icon}
                 </div>
                 <div>
                   <h3 className="font-semibold text-primary">{item.title}</h3>

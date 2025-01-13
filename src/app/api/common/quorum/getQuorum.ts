@@ -37,7 +37,10 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
 
       // If no quorum is set, calculate it based on votable supply
       if (!quorum) {
-        votableSupply = await findVotableSupply({ namespace });
+        votableSupply = await findVotableSupply({
+          namespace,
+          address: contracts.token.address,
+        });
         return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
       }
       return quorum;
@@ -49,8 +52,26 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       // https://voteagora.slack.com/archives/C07ATDL9P8F/p1723657375357649?thread_ts=1723579392.179389&cid=C07ATDL9P8F
       // https://voteagora.slack.com/archives/C07ATDL9P8F/p1723657834565499
 
-      votableSupply = await findVotableSupply({ namespace });
+      votableSupply = await findVotableSupply({
+        namespace,
+        address: contracts.token.address,
+      });
       return (BigInt(Number(votableSupply?.votable_supply)) * 30n) / 100n;
+
+    case TENANT_NAMESPACES.SCROLL:
+      if (contracts.token.isERC20()) {
+        let totalSupply = await contracts.token.contract.totalSupply();
+
+        const proposalTypeData = proposal?.proposal_type_data as {
+          quorum: number;
+        };
+
+        quorum =
+          (totalSupply * BigInt(proposalTypeData.quorum) * 100000n) /
+          1000000000n;
+      }
+
+      return BigInt(Number(quorum));
 
     default: // TENANT_NAMESPACES.PGUILD - yes, TENANT_NAMESPACES.SCROLL?
       try {
@@ -58,8 +79,11 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
           proposal.proposal_id
         );
       } catch {
-        // this is a hack, because... // https://linear.app/agora-app/issue/AGORA-3246/quorum-isnt-known-for-proposal-before-its-snapshot
-        quorum = await findVotableSupply({ namespace });
+        // this is a hack, because...git // https://linear.app/agora-app/issue/AGORA-3246/quorum-isnt-known-for-proposal-before-its-snapshot
+        quorum = await findVotableSupply({
+          namespace,
+          address: contracts.token.address,
+        });
       }
 
       return BigInt(Number(quorum));

@@ -22,7 +22,7 @@ export default function ProposalStatus({ proposal }) {
 
   const approved = ["succeeded", "executed", "queued"];
   const rejected = ["defeated", "expired", "cancelled", "vetoed"];
-  const pending = ["pending"];
+  const pending = ["pending", "failed"];
   const active = ["active"];
   const test = ["test"];
   const closed = ["closed"];

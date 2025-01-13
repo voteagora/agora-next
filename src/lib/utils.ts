@@ -388,6 +388,18 @@ export const getTransportForChain = (chainId: number) => {
         http("https://rpc.scroll.io"),
       ]);
 
+    // derive
+    case 957:
+      return fallback([
+        http(
+          `https://rpc-lyra-mainnet-0.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
+        ),
+      ]);
+
+    //   lyra testnet
+    case 901:
+      return http(`https://rpc-prod-testnet-0eakp60405.t.conduit.xyz`);
+
     // for each new dao with a new chainId add them here
     default:
       return null;

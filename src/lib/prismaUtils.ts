@@ -85,9 +85,18 @@ export function findAdvancedDelegatee({
 
 export function findVotableSupply({
   namespace,
+  address,
 }: {
   namespace: TenantNamespace;
+  address: string;
 }) {
+  const condition = {
+    where: { address },
+    select: {
+      votable_supply: true,
+    },
+  };
+
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
       return prisma.optimismVotableSupply.findFirst({});
@@ -102,7 +111,7 @@ export function findVotableSupply({
     case TENANT_NAMESPACES.SCROLL:
       return prisma.scrollVotableSupply.findFirst({});
     case TENANT_NAMESPACES.DERIVE:
-      return prisma.deriveVotableSupply.findFirst({});
+      return prisma.deriveVotableSupply.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prisma.pguildVotableSupply.findFirst({});
     case TENANT_NAMESPACES.BOOST:

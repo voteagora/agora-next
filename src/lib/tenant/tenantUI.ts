@@ -29,10 +29,14 @@ type UIConfig = PLMConfig;
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account
 export type UISmartAccountConfig = {
+  bundlerUrl: string;
+  entryPointAddress: `0x${string}`;
   factoryAddress: `0x${string}`;
-  version: "v1.1.0" | "v2.0.0";
-  type: "LightAccount";
+  paymasterAddress: `0x${string}`;
+  paymasterUrl: string;
   salt: bigint;
+  type: "LightAccount";
+  version: "v1.1.0" | "v2.0.0";
 };
 
 export type UILink = {

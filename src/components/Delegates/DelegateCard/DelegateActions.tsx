@@ -7,7 +7,7 @@ import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
-import { Button } from "@/components/Button";
+import { UpdatedButton } from "@/components/Button";
 import { ConnectKitButton } from "connectkit";
 import { type SyntheticEvent } from "react";
 import Tenant from "@/lib/tenant/tenant";
@@ -49,10 +49,11 @@ export function DelegateActions({
 
   const delegationButton = () => {
     switch (namespace) {
+      case TENANT_NAMESPACES.DERIVE:
       case TENANT_NAMESPACES.SCROLL:
         return <PartialDelegateButton full={false} delegate={delegate} />;
 
-      // Optimism in the only tenant currently supporting advnaced delegation
+      // Optimism in the only tenant currently supporting advanced delegation
       case TENANT_NAMESPACES.OPTIMISM:
         if (isAdvancedUser && hasAlligator) {
           return (
@@ -96,7 +97,8 @@ export function DelegateActions({
         ) : (
           <ConnectKitButton.Custom>
             {({ show }) => (
-              <Button
+              <UpdatedButton
+                type="secondary"
                 onClick={(e: SyntheticEvent) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -104,7 +106,7 @@ export function DelegateActions({
                 }}
               >
                 {isConnectedAccountDelegate ? "Undelegate" : "Delegate"}
-              </Button>
+              </UpdatedButton>
             )}
           </ConnectKitButton.Custom>
         )}

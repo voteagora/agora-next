@@ -7,13 +7,18 @@ import { cache } from "react";
 async function getTreasuryBalanceTS(
   frequency: string
 ): Promise<{ result: MetricTimeSeriesValue[] }> {
+  const { contracts } = Tenant.current();
+
+  if (!contracts.treasury || contracts.treasury.length === 0) {
+    return { result: [] };
+  }
+
   if (frequency == "latest") {
     const { result } = await getTreasuryBalanceTS("3d");
     const lastObject = result[result.length - 1];
     return { result: [lastObject] };
   }
 
-  const { contracts } = Tenant.current();
   const chainId = contracts.token?.chain?.id;
   const { lookback } = frequencyToLookbackDayCount(frequency);
   const crit = `(${contracts.treasury?.map((value: string) => `'${value}'`).join(", ") ?? ""})`;

@@ -30,6 +30,8 @@ const DelegateCard = ({
     }
   );
 
+  const numProposals = votingStats?.total_proposals || 0;
+
   return (
     <div
       key={delegate.address}
@@ -41,7 +43,7 @@ const DelegateCard = ({
       )}
     >
       <Link href={`/delegates/${delegate.address}`}>
-        <div className="flex flex-col gap-4 h-full rounded-xl bg-white border border-line shadow-newDefault">
+        <div className="flex flex-col gap-4 h-full rounded-xl bg-wash border border-line shadow-newDefault">
           <div className="flex flex-col gap-4 justify-center pt-4">
             <div className="border-b border-line px-4 pb-4">
               <DelegateProfileImage
@@ -55,10 +57,10 @@ const DelegateCard = ({
               <span className="text-primary font-bold">
                 {formatNumber(delegate.votingPower.total)} {token.symbol}
               </span>
-              {!isVotingStatsPending && (
+              {numProposals > 0 && !isVotingStatsPending && (
                 <span className="text-primary font-bold">
                   {((votingStats?.last_10_props || 0) /
-                    Math.min(10, votingStats?.total_proposals || 0)) *
+                    Math.min(10, numProposals)) *
                     100 || "0"}
                   % Participation
                 </span>

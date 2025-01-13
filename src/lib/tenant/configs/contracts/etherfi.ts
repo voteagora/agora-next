@@ -8,6 +8,7 @@ import { mainnet } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { AlchemyProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
+import { DELEGATION_MODEL } from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -43,5 +44,7 @@ export const etherfiTenantContractConfig = ({
       contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
       provider,
     }),
+
+    delegationModel: DELEGATION_MODEL.FULL,
   };
 };

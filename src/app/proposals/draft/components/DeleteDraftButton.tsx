@@ -37,10 +37,10 @@ export const DeleteDraftProposalDialog = ({
   const [isPending, setIsPending] = useState(false);
   return (
     <div>
-      <h3 className="text-center font-semibold text-lg mb-1">
+      <h3 className="text-center text-primary font-semibold text-lg mb-1">
         Delete my draft
       </h3>
-      <p className="text-center text-agora-stone-700">
+      <p className="text-center text-secondary">
         Are you sure you want to delete this proposal?
       </p>
       <div className="mt-6 flex items-center justify-between space-x-2">

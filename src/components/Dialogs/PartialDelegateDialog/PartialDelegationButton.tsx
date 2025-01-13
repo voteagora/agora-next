@@ -77,7 +77,9 @@ export const PartialDelegationButton = ({
           Error simulating transaction
         </Button>
 
-        {error && <div className="text-xs text-red">{error.toString()}</div>}
+        <div className="mt-4 text-xs text-primary bg-negative/40 border border-negative/80 p-2 rounded-md break-words">
+          {error.toString()}
+        </div>
       </div>
     );
   }

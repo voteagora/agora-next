@@ -5,13 +5,13 @@ import useAdvancedVoting from "@/hooks/useAdvancedVoting";
 import useSponsoredVoting from "@/hooks/useSponsoredVoting";
 import useStandardVoting from "@/hooks/useStandardVoting";
 import Tenant from "@/lib/tenant/tenant";
-import { checkMissingVoteForDelegate, MissingVote } from "@/lib/voteUtils";
+import { checkMissingVoteForDelegate } from "@/lib/voteUtils";
 import {
   createContext,
-  useContext,
-  useState,
   type Dispatch,
   SetStateAction,
+  useContext,
+  useState,
 } from "react";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
@@ -109,7 +109,7 @@ const CastVoteContextProvider = ({
   const gasRelayConfig = ui.toggle("sponsoredVote")?.config as UIGasRelayConfig;
   const { data: sponsorBalance } = useEthBalance({
     enabled: isGasRelayEnabled,
-    address: gasRelayConfig.sponsorAddress,
+    address: gasRelayConfig?.sponsorAddress,
   });
   // Gas relay is only LIVE when it is enabled in the settings and the sponsor meets minimum eth requirements
   const isGasRelayLive =

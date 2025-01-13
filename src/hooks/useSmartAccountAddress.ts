@@ -15,9 +15,10 @@ export const useSmartAccountAddress = ({ owner }: Props) => {
   const scwConfig = ui.smartAccountConfig;
 
   const client = getPublicClient(contracts.governor.chain);
+  const enabled = Boolean(scwConfig?.factoryAddress && owner !== undefined);
 
   const { data, isFetching, isFetched } = useQuery({
-    enabled: Boolean(scwConfig?.factoryAddress && owner !== undefined),
+    enabled: enabled,
     queryKey: [SCW_QK, owner],
     queryFn: async () => {
       return (await client.readContract({
@@ -29,5 +30,9 @@ export const useSmartAccountAddress = ({ owner }: Props) => {
     },
   });
 
-  return { data, isFetching, isFetched };
+  if (!scwConfig?.factoryAddress) {
+    return { data: undefined, enabled, isFetching: false, isFetched: false };
+  }
+
+  return { data, enabled, isFetching, isFetched };
 };

@@ -17,7 +17,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { fetchCurrentQuorum } from "@/app/api/common/quorum/getQuorum";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { doInSpan } from "@/app/lib/logging";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import { DELEGATION_MODEL, TENANT_NAMESPACES } from "@/lib/constants";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 
 /*
@@ -109,7 +109,55 @@ async function getDelegates({
     ? await getProxyAddress(filters?.delegator?.toLowerCase())
     : null;
 
-  delegateUniverseCTE = `
+  // This toggle for Deriver should be a temporary one, and reverted within ~1 week.
+  // They don't have a token yet, so nobody can delegate.
+  // This makes the universe include all delegate statements, albeit in a sloppy
+  // way.  It's structured to mirror the SQL for the other more complex CTE.
+  if (namespace === TENANT_NAMESPACES.DERIVE) {
+    delegateUniverseCTE = `
+    with del_statements as (
+      select address
+      from agora.delegate_statements
+      where dao_slug='${slug}'
+    ),
+    filtered_delegates_both as (
+      select 
+        address as delegate,
+        0 as num_of_delegators,
+        0 as direct_vp,
+        0 as advanced_vp,
+        0 as voting_power
+        from agora.delegate_statements where dao_slug='DERIVE'
+      union
+        select 
+          d.delegate as delegate,
+          d.num_of_delegators as num_of_delegators,
+          d.direct_vp as direct_vp,
+          d.advanced_vp as advanced_vp,
+          d.voting_power as voting_power
+        from ${namespace}.delegates d
+        where d.contract = '${tokenAddress}'
+    ),
+    filtered_delegates as (
+      select
+      delegate,
+      sum(num_of_delegators) as num_of_delegators,
+      sum(direct_vp) as direct_vp,
+      sum(advanced_vp) as advanced_vp,
+      sum(voting_power) as voting_power
+      from filtered_delegates_both group by delegate
+    ),
+    del_card_universe as (
+      select
+        d.delegate as delegate,
+        d.num_of_delegators as num_of_delegators,
+        d.direct_vp as direct_vp,
+        d.advanced_vp as advanced_vp,
+        d.voting_power as voting_power
+      from filtered_delegates d
+    )`;
+  } else {
+    delegateUniverseCTE = `
     with del_statements as (
       select address
       from agora.delegate_statements
@@ -152,7 +200,7 @@ async function getDelegates({
         d.voting_power as voting_power
       from filtered_delegates d
     )`;
-
+  }
   // Applies allow-list filtering to the delegate list
   const paginatedAllowlistQuery = async (skip: number, take: number) => {
     const allowListString = allowList.map((value) => `'${value}'`).join(", ");
@@ -445,7 +493,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       address,
       partialDelegationContract
     );
-  } else if (namespace === TENANT_NAMESPACES.SCROLL) {
+  } else if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
     numOfDelegationsQuery = prisma.$queryRawUnsafe<
       { num_of_delegators: BigInt }[]
     >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);

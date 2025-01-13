@@ -20,7 +20,10 @@ async function getMetrics() {
       totalSupply = 0;
     }
 
-    const votableSupply = await findVotableSupply({ namespace });
+    const votableSupply = await findVotableSupply({
+      namespace,
+      address: contracts.token.address,
+    });
 
     return {
       votableSupply: votableSupply?.votable_supply || "0",

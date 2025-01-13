@@ -30,21 +30,21 @@ import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
 
 export type DialogType =
-  | DelegateDialogType
-  | UndelegateDialogType
+  | AdvancedDelegateDialogType
+  | ApprovalCastVoteDialogType
   | CastProposalDialogType
   | CastVoteDialogType
-  | AdvancedDelegateDialogType
-  | PartialDelegateDialogType
-  | ApprovalCastVoteDialogType
-  | RetroPGFShareCardDialog
-  | SwithcNetworkDialogType
-  | DeleteDraftProposalDialog
   | CreateDraftProposalDialog
-  | UpdateDraftProposalDialog
-  | SponsorSnapshotDraftProposalDialog
+  | DelegateDialogType
+  | DeleteDraftProposalDialog
+  | OpenGithubPRDialog
+  | PartialDelegateDialogType
+  | RetroPGFShareCardDialog
   | SponsorOnchainDraftProposalDialog
-  | OpenGithubPRDialog;
+  | SponsorSnapshotDraftProposalDialog
+  | SwithcNetworkDialogType
+  | UndelegateDialogType
+  | UpdateDraftProposalDialog;
 // | FaqDialogType
 
 export type DelegateDialogType = {

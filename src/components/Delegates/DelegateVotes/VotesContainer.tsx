@@ -33,7 +33,7 @@ const VotesContainer = ({
     return (
       <div className="flex flex-col space-y-4">
         <div className="flex flex-row justify-between items-center relative">
-          <h2 className="text-black text-2xl font-bold flex-grow">
+          <h2 className="text-primary text-2xl font-bold flex-grow">
             Past Votes
           </h2>
         </div>
@@ -45,7 +45,9 @@ const VotesContainer = ({
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex flex-row justify-between items-center relative">
-        <h2 className="text-black text-2xl font-bold flex-grow">Past Votes</h2>
+        <h2 className="text-primary text-2xl font-bold flex-grow">
+          Past Votes
+        </h2>
         <Listbox value={activeTab} onChange={setActiveTab}>
           <Listbox.Button className="w-[175px] bg-wash text-primary font-medium border-none rounded-full py-2 px-4 flex items-center justify-between">
             <span>

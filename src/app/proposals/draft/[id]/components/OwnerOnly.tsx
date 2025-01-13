@@ -27,7 +27,11 @@ const OnlyOwner = ({
   //   }
 
   if (ownerAddress !== address) {
-    return <div>You are not the owner of this proposal.</div>;
+    return (
+      <div className="text-primary">
+        You are not the owner of this proposal.
+      </div>
+    );
   }
 
   return <>{children}</>;

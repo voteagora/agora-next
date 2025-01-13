@@ -4,6 +4,7 @@ import { resolveENSName } from "@/app/lib/ENSUtils";
 import {
   fetchCurrentDelegatees,
   fetchCurrentDelegators,
+  fetchDelegate,
 } from "@/app/delegates/actions";
 
 const DelegationsContainerWrapper = async ({
@@ -12,8 +13,15 @@ const DelegationsContainerWrapper = async ({
   addressOrENSName: string;
 }) => {
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
+  const delegate = await fetchDelegate(address);
+
+  // Use scw address for the 'delegated to' if exists
+  const hasSCWAddress = Boolean(delegate.statement?.scw_address);
+
   const [delegatees, delegators] = await Promise.all([
-    fetchCurrentDelegatees(address),
+    fetchCurrentDelegatees(
+      hasSCWAddress ? delegate.statement?.scw_address : address
+    ),
     fetchCurrentDelegators(address),
   ]);
   return (

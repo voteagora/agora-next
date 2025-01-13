@@ -12,10 +12,10 @@ const BackButton = ({
 }) => {
   return (
     <Link
-      className="cursor-pointer border border-agora-stone-100 rounded-full p-1 w-8 h-8 flex items-center justify-center shadow-newDefault"
+      className="cursor-pointer border border-line rounded-full p-1 w-8 h-8 flex items-center justify-center shadow-newDefault"
       href={`/proposals/draft/${draftProposalId}?stage=${index - 1}`}
     >
-      <ChevronLeftIcon className="h-6 w-6 text-agora-stone-700" />
+      <ChevronLeftIcon className="h-6 w-6 text-secondary" />
     </Link>
   );
 };

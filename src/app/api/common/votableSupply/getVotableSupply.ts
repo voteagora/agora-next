@@ -3,9 +3,10 @@ import { cache } from "react";
 import { findVotableSupply } from "@/lib/prismaUtils";
 
 async function getVotableSupply() {
-  const { namespace } = Tenant.current();
+  const { namespace, contracts } = Tenant.current();
+  const address = contracts.token.address;
   try {
-    const votableSupply = await findVotableSupply({ namespace });
+    const votableSupply = await findVotableSupply({ namespace, address });
     return votableSupply?.votable_supply || "0";
   } catch (error) {
     console.log("Error fetching votable supply:", error);

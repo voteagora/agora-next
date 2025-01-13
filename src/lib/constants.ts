@@ -23,6 +23,12 @@ export enum PROPOSAL_STATUS {
   SUCCEEDED = "SUCCEEDED",
 }
 
+export enum DELEGATION_MODEL {
+  FULL = "FULL",
+  ADVANCED = "ADVANCED",
+  PARTIAL = "PARTIAL",
+}
+
 export const TENANT_NAMESPACES = {
   ENS: "ens",
   ETHERFI: "etherfi",

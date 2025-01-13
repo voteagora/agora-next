@@ -1,12 +1,11 @@
 import {
-  createWalletClient,
-  createPublicClient,
-  defineChain,
-  custom,
-  http,
   Chain,
+  createPublicClient,
+  createWalletClient,
+  custom,
+  defineChain,
 } from "viem";
-import { mainnet, sepolia, optimism, scroll, lyra, cyber } from "viem/chains";
+import { cyber, lyra, mainnet, optimism, scroll, sepolia } from "viem/chains";
 import "viem/window";
 
 import Tenant from "@/lib/tenant/tenant";
@@ -31,7 +30,7 @@ export const lyraTestnet = /*#__PURE__*/ defineChain({
   },
   blockExplorers: {
     default: {
-      name: "Testnet Scan",
+      name: "Derive Testnet Scan",
       url: "https://explorer-prod-testnet-0eakp60405.t.conduit.xyz/",
     },
   },

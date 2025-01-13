@@ -124,7 +124,7 @@ function CastVoteInputContent({
 
   const { data: sponsorBalance } = useEthBalance({
     enabled: isGasRelayEnabled,
-    address: gasRelayConfig.sponsorAddress,
+    address: gasRelayConfig?.sponsorAddress,
   });
 
   // Gas relay is only LIVE when it is enabled in the settings and the sponsor meets minimum eth requirements
@@ -145,7 +145,7 @@ function CastVoteInputContent({
           className="pb-3 pt-1"
         >
           {!isError && !showSuccessMessage && (
-            <VStack className="border-t border-line px-3 ">
+            <VStack className="bg-neutral border-t border-line px-3 ">
               {!isLoading && (
                 <VStack gap={2}>
                   <textarea
@@ -153,7 +153,7 @@ function CastVoteInputContent({
                     value={reason || undefined}
                     onChange={(e) => setReason(e.target.value)}
                     rows={reason ? undefined : 1}
-                    className="text-sm resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
+                    className="text-sm text-primary bg-neutral resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
                   />
                   <VoteButtons
                     proposalStatus={proposal.status}
@@ -393,8 +393,6 @@ function ErrorState({
   button1: { message: string; action: () => void };
   button2: { message: string; action: () => void };
 }) {
-  const { reset, setFallbackToStandardVote, resetError } = useCastVoteContext();
-
   return (
     <VStack gap={3} className="p-3 border-t border-line">
       <div className="py-2 px-4 bg-red-300 text-xs text-red-700 font-medium rounded-lg flex items-center gap-2">
