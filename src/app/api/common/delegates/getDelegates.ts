@@ -127,7 +127,7 @@ async function getDelegates({
         0 as direct_vp,
         0 as advanced_vp,
         0 as voting_power
-        from agora.delegate_statements where dao_slug='DERIVE'
+        from agora.delegate_statements where dao_slug='DERIVE' AND LENGTH(payload->>'delegateStatement') > 0
       union
         select 
           d.delegate as delegate,
