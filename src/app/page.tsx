@@ -14,6 +14,7 @@ import Tenant from "@/lib/tenant/tenant";
 import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
 import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
 import { PaginationParams } from "./lib/pagination";
+import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -78,7 +79,8 @@ async function Home() {
     return <div>Route not supported for namespace</div>;
   }
 
-  const plmEnabled = ui.toggle("proposal-lifecycle")?.enabled === true;
+  const plmEnabled = ui.toggle("proposal-lifecycle")?.enabled;
+  const supportsNotifications = ui.toggle("email-subscriptions")?.enabled;
 
   const governanceCalendar = await fetchGovernanceCalendar();
   const relevalntProposals = await fetchProposals(
@@ -92,6 +94,7 @@ async function Home() {
 
   return (
     <div className="flex flex-col">
+      {supportsNotifications && <SubscribeDialogLauncher />}
       <Hero />
       {plmEnabled && (
         <>

@@ -260,6 +260,10 @@ export const uniswapTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "email-subscriptions",
+      enabled: true,
+    },
+    {
       name: "proposal-lifecycle",
       enabled: false,
     },

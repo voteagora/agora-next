@@ -5,7 +5,6 @@ import { useAccount } from "wagmi";
 import { useSearchParams } from "next/navigation";
 import DelegateStatement from "./DelegateStatement";
 import { DelegateStatement as DelegateStatementType } from "@/app/api/common/delegateStatement/delegateStatement";
-import { fetchDelegate } from "@/app/delegates/actions";
 
 export default function DelegateStatementContainer({
   addressOrENSName,
