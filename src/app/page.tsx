@@ -79,6 +79,7 @@ async function Home() {
     return <div>Route not supported for namespace</div>;
   }
 
+  const supportsNotifications = ui.toggle("email-subscriptions")?.enabled;
   const governanceCalendar = await fetchGovernanceCalendar();
   const relevalntProposals = await fetchProposals(
     proposalsFilterOptions.relevant.filter
@@ -91,7 +92,7 @@ async function Home() {
 
   return (
     <div className="flex flex-col">
-      <SubscribeDialogLauncher />
+      {supportsNotifications && <SubscribeDialogLauncher />}
       <Hero />
       <MyDraftProposals
         fetchDraftProposals={async (address) => {
