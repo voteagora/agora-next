@@ -212,7 +212,7 @@ export const optimismTenantUIConfig = new TenantUI({
     },
     {
       name: "retropgf",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "citizens",
