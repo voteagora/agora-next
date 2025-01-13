@@ -28,7 +28,7 @@ export const getDelegates = async ({
     FROM alltenant.analytics_events
     WHERE event_name = '${ANALYTICS_EVENTS.DELEGATE}'
     AND event_data->>'dao_slug' = '${slug}'
-    AND event_data->>'contract_address' = '${contracts.token.address.toLowerCase()}'
+    AND event_data->>'token_address' = '${contracts.token.address.toLowerCase()}'
     GROUP BY event_data->>'transaction_hash'
   `;
 

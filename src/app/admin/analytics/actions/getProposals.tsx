@@ -26,7 +26,7 @@ export const getProposals = async ({
     FROM alltenant.analytics_events
     WHERE event_name = '${ANALYTICS_EVENTS.CREATE_PROPOSAL}'
     AND event_data->>'dao_slug' = '${slug}'
-    AND event_data->>'contract_address' = '${contracts.governor.address.toLowerCase()}'
+    AND event_data->>'governor_address' = '${contracts.governor.address.toLowerCase()}'
     GROUP BY event_data->>'transaction_hash'
   `;
 

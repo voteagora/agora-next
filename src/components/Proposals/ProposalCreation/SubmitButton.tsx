@@ -75,8 +75,6 @@ export default function SubmitButton({
         transactionHash: txHash,
         uses_plm: false,
         proposal_data: inputData,
-        contract_address: governorContract.address,
-        dao_slug: slug,
       },
     });
     openDialog({

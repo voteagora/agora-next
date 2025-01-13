@@ -20,7 +20,7 @@ export const getVotes = async ({ range = 60 * 60 * 24 }: { range: number }) => {
     FROM alltenant.analytics_events
     WHERE event_name = '${ANALYTICS_EVENTS.STANDARD_VOTE}'
     AND event_data->>'dao_slug' = '${slug}'
-    AND event_data->>'contract_address' = '${contracts.governor.address.toLowerCase()}'
+    AND event_data->>'governor_address' = '${contracts.governor.address.toLowerCase()}'
     GROUP BY event_data->>'proposal_id'
     ORDER BY vote_count DESC;
   `;

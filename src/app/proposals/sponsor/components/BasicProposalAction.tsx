@@ -7,6 +7,8 @@ import { useSimulateContract, useWriteContract } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
+import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENTS } from "@/lib/constants";
 
 const BasicProposalAction = ({
   draftProposal,
@@ -58,6 +60,15 @@ const BasicProposalAction = ({
               console.log(error);
               return;
             }
+
+            trackEvent({
+              event_name: ANALYTICS_EVENTS.CREATE_PROPOSAL,
+              event_data: {
+                transactionHash: data,
+                uses_plm: true,
+                proposal_data: inputData,
+              },
+            });
 
             await sponsorDraftProposal({
               draftProposalId: draftProposal.id,
