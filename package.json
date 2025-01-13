@@ -84,8 +84,6 @@
     "postgres": "^3.3.5",
     "prisma": "^5.22.0",
     "react": "18.2.0",
-    "react-canvas-confetti": "^2.0.7",
-    "react-confetti-boom": "^1.1.2",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.48.2",
     "react-hot-toast": "^2.4.1",

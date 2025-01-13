@@ -22,8 +22,6 @@ import {
 import { PaginatedResult } from "@/app/lib/pagination";
 import { DaoSlug } from "@prisma/client";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import { useState, useCallback } from "react";
-import Confetti from "react-confetti-boom";
 
 const { token, slug } = Tenant.current();
 
@@ -231,48 +229,10 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
     },
   ];
 
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [confettiPosition, setConfettiPosition] = useState({ x: 0, y: 0 });
-  const [hasShownConfetti, setHasShownConfetti] = useState(false); // To show only once
-
-  const handleMouseMove = useCallback(
-    (props: any) => {
-      if (!props.activePayload) return;
-
-      console.log("props", props);
-
-      const currentQuorumVotes = props.activePayload[0].payload.quorumVotes;
-      const previousQuorumVotes =
-        props.activePayload[0].payload.previousQuorumVotes;
-
-      // Check if we just crossed the quorum threshold
-      if (props.chartX > 630 && !hasShownConfetti) {
-        console.log("CONFETTI", "WOO");
-        setConfettiPosition({
-          x: 500,
-          y: 300,
-        });
-        setShowConfetti(true);
-        setHasShownConfetti(true);
-
-        // Hide confetti after a few seconds
-        setTimeout(() => {
-          setShowConfetti(false);
-          setHasShownConfetti(false);
-        }, 3000);
-      }
-    },
-    [proposal?.quorum, hasShownConfetti]
-  );
-
   return (
     <div className="relative">
-      {showConfetti && (
-        <Confetti x={0.3} y={0.2} particleCount={200} spreadDegree={70} />
-      )}
-
       <ResponsiveContainer width="100%" height={230}>
-        <AreaChart data={modifiedChartData} onMouseMove={handleMouseMove}>
+        <AreaChart data={modifiedChartData}>
           <CartesianGrid vertical={false} strokeDasharray={"3 3"} />
           <XAxis
             dataKey="timestamp"
