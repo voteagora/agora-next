@@ -60,7 +60,6 @@
     "@vercel/speed-insights": "^1.0.2",
     "autoprefixer": "10.4.14",
     "bufferutil": "^4.0.7",
-    "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.6.1",
     "clsx": "^1.2.1",
     "connectkit": "^1.8.2",
