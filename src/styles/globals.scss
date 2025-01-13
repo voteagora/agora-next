@@ -247,3 +247,130 @@ input[type="number"] {
   src: url("/fonts/TransSansPremium/TransSansPremium_Bold.otf")
     format("opentype");
 }
+
+.confettiContainer {
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  animation: confetti-fall 3s ease-out forwards;
+}
+
+/* Colors */
+.confetti:nth-child(4n) {
+  background-color: #ffd700;
+}
+.confetti:nth-child(4n + 1) {
+  background-color: #ff4f4f;
+}
+.confetti:nth-child(4n + 2) {
+  background-color: #4faf4f;
+}
+.confetti:nth-child(4n + 3) {
+  background-color: #4f4fff;
+}
+
+/* Positions and delays */
+.confetti:nth-child(1) {
+  left: 10%;
+  animation-delay: 0s;
+}
+.confetti:nth-child(2) {
+  left: 20%;
+  animation-delay: 0.1s;
+}
+.confetti:nth-child(3) {
+  left: 30%;
+  animation-delay: 0.2s;
+}
+.confetti:nth-child(4) {
+  left: 40%;
+  animation-delay: 0.3s;
+}
+.confetti:nth-child(5) {
+  left: 50%;
+  animation-delay: 0.4s;
+}
+.confetti:nth-child(6) {
+  left: 60%;
+  animation-delay: 0.5s;
+}
+.confetti:nth-child(7) {
+  left: 70%;
+  animation-delay: 0.6s;
+}
+.confetti:nth-child(8) {
+  left: 80%;
+  animation-delay: 0.7s;
+}
+.confetti:nth-child(9) {
+  left: 90%;
+  animation-delay: 0.8s;
+}
+.confetti:nth-child(10) {
+  left: 15%;
+  animation-delay: 0.9s;
+}
+.confetti:nth-child(11) {
+  left: 25%;
+  animation-delay: 1s;
+}
+.confetti:nth-child(12) {
+  left: 35%;
+  animation-delay: 1.1s;
+}
+
+/* Shapes */
+.confetti:nth-child(4n) {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%); /* Triangle */
+}
+.confetti:nth-child(4n + 1) {
+  border-radius: 50%; /* Circle */
+}
+.confetti:nth-child(4n + 2) {
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* Diamond */
+}
+.confetti:nth-child(4n + 3) {
+  clip-path: polygon(
+    20% 0%,
+    80% 0%,
+    100% 20%,
+    100% 80%,
+    80% 100%,
+    20% 100%,
+    0% 80%,
+    0% 20%
+  ); /* Octagon */
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  25% {
+    transform: translateY(25px) rotate(45deg);
+    opacity: 0.75;
+  }
+
+  50% {
+    transform: translateY(50px) rotate(90deg);
+    opacity: 0.5;
+  }
+
+  75% {
+    transform: translateY(75px) rotate(135deg);
+    opacity: 0.25;
+  }
+
+  100% {
+    transform: translateY(100px) rotate(180deg);
+    opacity: 0;
+  }
+}
