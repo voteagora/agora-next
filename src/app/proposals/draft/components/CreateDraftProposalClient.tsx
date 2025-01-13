@@ -30,7 +30,6 @@ const CreateDraftProposalClient = ({
   const stageObject = DRAFT_STAGES_FOR_TENANT[stageIndex];
   const stageMetadata = getStageMetadata(stageObject.stage);
 
-
   return (
     <form>
       <main className="max-w-screen-xl mx-auto mt-10">
