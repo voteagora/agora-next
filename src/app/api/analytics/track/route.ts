@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
       data: {
         event_name,
         event_data,
+        dao_slug: event_data.dao_slug,
       },
     });
     return NextResponse.json({ success: true });

@@ -3443,8 +3443,10 @@ model AnalyticsEvent {
   id String @id @default(uuid())
   event_name String
   event_data Json
+  dao_slug DaoSlug
   created_at DateTime @default(now())
 
+  @@index([dao_slug], name: "ix_analytics_events_dao_slug")
   @@schema("alltenant")
   @@map("analytics_events")
 }
