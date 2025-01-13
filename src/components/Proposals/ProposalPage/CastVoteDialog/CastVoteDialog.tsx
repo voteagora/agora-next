@@ -339,7 +339,7 @@ const VoteButton = ({
   return (
     <Button
       onClick={onClick}
-      className="w-full bg-brandPrimary hover:bg-brandPrimary/90 text-primary"
+      className="w-full bg-brandPrimary hover:bg-brandPrimary/90 text-neutral"
     >
       {children}
     </Button>
