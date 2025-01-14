@@ -55,7 +55,10 @@ export const deriveTenantUIConfig = new TenantUI({
   ],
 
   smartAccountConfig: {
-    bundlerUrl: "https://bundler-prod-testnet-0eakp60405.t.conduit.xyz",
+    bundlerUrl: isProd
+      ? `https://bundler-lyra-mainnet-0.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
+      : "https://bundler-prod-testnet-0eakp60405.t.conduit.xyz",
+
     entryPointAddress: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
     factoryAddress: "0x000000893A26168158fbeaDD9335Be5bC96592E2",
     paymasterAddress: isProd

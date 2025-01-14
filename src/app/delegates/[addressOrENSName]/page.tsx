@@ -89,7 +89,7 @@ export default async function Page({
 }) {
   const { contracts } = Tenant.current();
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
-  const publicClient = getPublicClient(contracts.governor.chain.id);
+  const publicClient = getPublicClient();
   const blockNumber = await publicClient.getBlockNumber({
     cacheTime: 0,
   });

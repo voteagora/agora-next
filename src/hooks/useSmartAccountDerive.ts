@@ -23,6 +23,10 @@ import { createLightAccount, LightAccount } from "@alchemy/aa-accounts";
 import { useEffect, useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { fetchPaymasterData } from "@/app/api/paymaster/fetchPaymasterData";
+import {
+  DERIVE_MAINNET_RPC,
+  DERIVE_TESTNET_RPC,
+} from "@/lib/tenant/configs/contracts/derive";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DUMB_SIGNATURE =
@@ -70,7 +74,9 @@ const lyraBundlerClient = createBundlerClient({
 
 const bundlerTransport = http(ui.smartAccountConfig?.bundlerUrl);
 const nodeTransport = http(
-  `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
+  process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+    ? DERIVE_MAINNET_RPC
+    : DERIVE_TESTNET_RPC
 );
 
 const dummyPaymasterAndData = (): `0x${string}` => {

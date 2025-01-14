@@ -10,6 +10,7 @@ import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { AlchemyProvider, BaseContract } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
+import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 import { DELEGATION_MODEL } from "@/lib/constants";
 
 interface Props {
@@ -73,7 +74,7 @@ export const protocolGuildTenantContractConfig = ({
       provider,
     }),
 
-    timelock: new TenantContract<IGovernorContract>({
+    timelock: new TenantContract<ITimelockContract>({
       abi: AgoraTimelock__factory.abi,
       address: TIMELOCK,
       chain,

@@ -4,6 +4,10 @@ import { useMemo } from "react";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
 import { http, fallback } from "wagmi";
+import {
+  DERIVE_MAINNET_RPC,
+  DERIVE_TESTNET_RPC,
+} from "@/lib/tenant/configs/contracts/derive";
 
 const { token } = Tenant.current();
 
@@ -388,17 +392,13 @@ export const getTransportForChain = (chainId: number) => {
         http("https://rpc.scroll.io"),
       ]);
 
-    // derive
+    // derive mainnet
     case 957:
-      return fallback([
-        http(
-          `https://rpc-lyra-mainnet-0.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
-        ),
-      ]);
+      http(DERIVE_MAINNET_RPC);
 
-    //   lyra testnet
+    // derive testnet
     case 901:
-      return http(`https://rpc-prod-testnet-0eakp60405.t.conduit.xyz`);
+      return http(DERIVE_TESTNET_RPC);
 
     // for each new dao with a new chainId add them here
     default:

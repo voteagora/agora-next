@@ -153,7 +153,6 @@ const BasicVoteDialog = ({
   }, [isSuccess]);
 
   if (!delegate) {
-    // todo: log
     return null;
   }
 
@@ -334,7 +333,6 @@ const VoteButton = ({
 }: {
   children: ReactNode;
   onClick?: () => void;
-  isLoading?: boolean;
 }) => {
   return (
     <Button
@@ -352,8 +350,8 @@ export function SuccessMessage({
 }: {
   closeDialog: () => void;
   data: {
-    standardTxHash: string | undefined;
-    advancedTxHash: string | undefined;
+    standardTxHash?: string;
+    advancedTxHash?: string;
   };
 }) {
   const { ui } = Tenant.current();

@@ -43,7 +43,7 @@ async function fetchGovernanceCalendar() {
 }
 
 export async function generateMetadata() {
-  const { ui, namespace } = Tenant.current();
+  const { ui } = Tenant.current();
 
   const page = ui.page("proposals");
   const { title, description, imageTitle, imageDescription } = page!.meta;
@@ -79,7 +79,9 @@ async function Home() {
     return <div>Route not supported for namespace</div>;
   }
 
+  const plmEnabled = ui.toggle("proposal-lifecycle")?.enabled;
   const supportsNotifications = ui.toggle("email-subscriptions")?.enabled;
+
   const governanceCalendar = await fetchGovernanceCalendar();
   const relevalntProposals = await fetchProposals(
     proposalsFilterOptions.relevant.filter
@@ -94,18 +96,22 @@ async function Home() {
     <div className="flex flex-col">
       {supportsNotifications && <SubscribeDialogLauncher />}
       <Hero />
-      <MyDraftProposals
-        fetchDraftProposals={async (address) => {
-          "use server";
-          return apiFetchDraftProposals(address);
-        }}
-      />
-      <MySponsorshipRequests
-        fetchDraftProposals={async (address) => {
-          "use server";
-          return apiFetchDraftProposalsForSponsorship(address);
-        }}
-      />
+      {plmEnabled && (
+        <>
+          <MyDraftProposals
+            fetchDraftProposals={async (address) => {
+              "use server";
+              return apiFetchDraftProposals(address);
+            }}
+          />
+          <MySponsorshipRequests
+            fetchDraftProposals={async (address) => {
+              "use server";
+              return apiFetchDraftProposalsForSponsorship(address);
+            }}
+          />
+        </>
+      )}
       <NeedsMyVoteProposalsList
         fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
         votableSupply={votableSupply}

@@ -21,11 +21,9 @@ const useStandardVoting = ({
 }) => {
   const { contracts, slug } = Tenant.current();
 
-  const { writeContractAsync: standardVote, isError: _standardVoteError } =
-    useWriteContract();
+  const { writeContractAsync: standardVote, isError } = useWriteContract();
 
-  const [standardVoteError, setStandardVoteError] =
-    useState(_standardVoteError);
+  const [standardVoteError, setStandardVoteError] = useState(isError);
   const [standardVoteLoading, setStandardVoteLoading] = useState(false);
   const [standardVoteSuccess, setStandardVoteSuccess] = useState(false);
   const [standardTxHash, setStandardTxHash] = useState<string | undefined>(
@@ -91,7 +89,8 @@ const useStandardVoting = ({
 
   return {
     isLoading: standardVoteLoading,
-    isError: standardVoteError,
+    isError: standardVoteError || isError,
+    resetError: () => setStandardVoteError(false),
     isSuccess: standardVoteSuccess,
     write,
     data: { advancedTxHash, standardTxHash },

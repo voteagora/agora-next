@@ -12,11 +12,17 @@ import { defineChain } from "viem";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { Chain } from "viem/chains";
 import { DELEGATION_MODEL } from "@/lib/constants";
+import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 
-const DERIVE_TESTNET_RPC = "https://rpc-prod-testnet-0eakp60405.t.conduit.xyz";
-const DERIVE_PROD_RPC = `https://rpc-lyra-mainnet-0.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`;
+export const DERIVE_TESTNET_RPC =
+  "https://rpc-prod-testnet-0eakp60405.t.conduit.xyz";
+export const DERIVE_MAINNET_RPC = "https://rpc.derive.xyz";
 
-const deriveMainnet: Chain = defineChain({
+const MAINNET_BLOCK_EXPLORER = "https://explorer.derive.xyz";
+const TESTNET_BLOCK_EXPLORER =
+  "https://explorer-prod-testnet-0eakp60405.t.conduit.xyz";
+
+export const deriveMainnet: Chain = defineChain({
   id: 957,
   name: "Derive",
   network: "derive",
@@ -27,23 +33,29 @@ const deriveMainnet: Chain = defineChain({
   },
   rpcUrls: {
     default: {
-      http: [DERIVE_PROD_RPC],
-      webSocket: [DERIVE_PROD_RPC.replace("http", "ws")],
+      http: [DERIVE_MAINNET_RPC],
+      webSocket: [DERIVE_MAINNET_RPC.replace("http", "ws")],
     },
     public: {
-      http: [DERIVE_PROD_RPC],
-      webSocket: [DERIVE_PROD_RPC.replace("http", "ws")],
+      http: [DERIVE_MAINNET_RPC],
+      webSocket: [DERIVE_MAINNET_RPC.replace("http", "ws")],
     },
   },
   blockExplorers: {
     default: {
-      name: "Derive Explorer",
-      url: "https://explorer.derive.xyz/",
+      name: "Blockscout",
+      url: MAINNET_BLOCK_EXPLORER,
     },
   },
+  contracts: {
+    multicall3: {
+      address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+    },
+  },
+  testnet: false,
 });
 
-const deriveTestnet: Chain = defineChain({
+export const deriveTestnet: Chain = defineChain({
   id: 901,
   name: "Derive",
   network: "derive",
@@ -65,7 +77,7 @@ const deriveTestnet: Chain = defineChain({
   blockExplorers: {
     default: {
       name: "Blockscout",
-      url: "https://explorer-prod-testnet-0eakp60405.t.conduit.xyz",
+      url: TESTNET_BLOCK_EXPLORER,
     },
   },
   contracts: {
@@ -105,9 +117,7 @@ export const deriveTenantConfig = ({
     ? "0xd828b681F717E5a03C41540Bc6A31b146b5C1Ac6"
     : "0x98Baf5c59689a3292b365ff5Fc03b475EfeC8776";
 
-  const rpcURL = isProd
-    ? `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
-    : DERIVE_TESTNET_RPC;
+  const rpcURL = isProd ? DERIVE_MAINNET_RPC : DERIVE_TESTNET_RPC;
 
   const provider = new JsonRpcProvider(rpcURL);
   const chain = isProd ? deriveMainnet : deriveTestnet;
@@ -130,7 +140,7 @@ export const deriveTenantConfig = ({
       provider,
     }),
 
-    timelock: new TenantContract<IGovernorContract>({
+    timelock: new TenantContract<ITimelockContract>({
       abi: AgoraTimelock__factory.abi,
       address: TIMELOCK,
       chain,

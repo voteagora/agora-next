@@ -122,12 +122,7 @@ export async function validateScopeAgainstRoute(
   const isBadge = roles.includes(ROLE_BADGEHOLDER);
   const isDemoUser = roles.includes(ROLE_RF_DEMO_USER);
   const isPublic = roles.includes(ROLE_PUBLIC_READER);
-  if (
-    request.nextUrl.pathname.includes("ballots") ||
-    request.method === "POST" ||
-    request.method === "PUT" ||
-    request.method === "DELETE"
-  ) {
+  if (request.nextUrl.pathname.includes("ballots")) {
     return isBadge || isDemoUser;
   } else {
     return isPublic;

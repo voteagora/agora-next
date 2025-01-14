@@ -85,7 +85,7 @@ const DraftPreview = ({
         );
       case ProposalType.APPROVAL:
         return (
-          <p className="text-agora-stone-700 mt-2">
+          <p className="text-secondary mt-2">
             This is an <PreText text="approval" /> proposal. The maximum number
             of tokens that can be transferred from all the options in this
             proposal is <PreText text={proposal.budget.toString()} />. The
@@ -100,7 +100,7 @@ const DraftPreview = ({
 
       case ProposalType.SOCIAL:
         return (
-          <p className="text-agora-stone-700 mt-2">
+          <p className="text-secondary mt-2">
             This is a <PreText text="social" /> proposal. Voters will vote on
             snapshot.
           </p>
@@ -108,7 +108,7 @@ const DraftPreview = ({
 
       case ProposalType.OPTIMISTIC:
         return (
-          <p className="text-agora-stone-700 mt-2">
+          <p className="text-secondary mt-2">
             This is an <PreText text="optimistic" /> proposal
           </p>
         );
@@ -124,7 +124,7 @@ const DraftPreview = ({
     if (votingModuleType === ProposalType.SOCIAL) {
       return (
         <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-          <p className="flex-grow">Voting power</p>
+          <p className="flex-grow text-primary">Voting power</p>
           <span className="text-secondary font-mono text-xs">
             {"> "}
             {(plmToggle?.config as PLMConfig)?.snapshotConfig?.requiredTokens}
@@ -141,7 +141,7 @@ const DraftPreview = ({
       requirements.push(
         <div
           key="manager"
-          className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
+          className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
         >
           <p className="flex-grow text-primary">Manager address</p>
           <span className="text-secondary font-mono text-xs">
@@ -158,9 +158,9 @@ const DraftPreview = ({
       requirements.push(
         <div
           key="threshold"
-          className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
+          className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
         >
-          <p className="flex-grow">Voting power</p>
+          <p className="flex-grow text-primary">Voting power</p>
           <span className="text-secondary font-mono text-xs">
             {"> "}
             {threshold
@@ -215,13 +215,13 @@ const DraftPreview = ({
         {proposalDraft.voting_module_type === "social" && (
           <div>
             <h3 className="font-semibold mt-6">Voting strategy</h3>
-            <p className="text-agora-stone-700 mt-2">
+            <p className="text-secondary mt-2">
               {proposalDraft.proposal_social_type}
             </p>
             {proposalDraft.start_date_social && (
               <>
                 <h3 className="font-semibold mt-6">Voting start</h3>
-                <p className="text-agora-stone-700 mt-2">
+                <p className="text-secondary mt-2">
                   {formatFullDate(proposalDraft.start_date_social)}
                 </p>
               </>
@@ -229,14 +229,14 @@ const DraftPreview = ({
             {proposalDraft.end_date_social && (
               <>
                 <h3 className="font-semibold mt-6">Voting end</h3>
-                <p className="text-agora-stone-700 mt-2">
+                <p className="text-secondary mt-2">
                   {formatFullDate(proposalDraft.end_date_social)}
                 </p>
               </>
             )}
             <h3 className="font-semibold mt-6 mb-2">Voting options</h3>
             {proposalDraft.social_options.map((option, index) => (
-              <p className="text-agora-stone-700" key={`draft-${index}`}>
+              <p className="text-secondary" key={`draft-${index}`}>
                 {option.text}
               </p>
             ))}
@@ -261,7 +261,7 @@ const DraftPreview = ({
         {proposalDraft.sponsor_address &&
         address != proposalDraft.sponsor_address ? (
           <>
-            <p className="text-agora-stone-700">
+            <p className="text-secondary">
               Your proposal is awaiting{" "}
               <span className="font-mono text-xs border border-yellow-500 text-yellow-700 bg-yellow-100 p-1 rounded">
                 {proposalDraft.sponsor_address}
@@ -271,12 +271,12 @@ const DraftPreview = ({
               the meantime, you can contact your sponsor by copying the link
               below.
             </p>
-            <div className="bg-agora-stone-50 border border-line rounded-lg p-2 relative mt-6">
+            <div className="bg-wash border border-line rounded-lg p-2 relative mt-6">
               <div className="flex flex-row items-center space-x-2">
                 <AvatarAddress
                   address={proposalDraft.sponsor_address as `0x${string}`}
                 />
-                <span className="text-xs font-bold text-agora-stone-700">
+                <span className="text-xs font-bold text-secondary">
                   Awaiting sponsorship
                 </span>
               </div>
