@@ -215,7 +215,7 @@ async function getVotersWhoHaveNotVotedForProposal({
       ON del.delegate = ds.address
       AND ds.dao_slug = '${slug}'
     WHERE del.delegate NOT IN (
-      SELECT voter FROM ${namespace + ".vote_cast_events"} WHERE proposal_id = $1
+      SELECT voter FROM ${namespace + ".votes"} WHERE proposal_id = $1
     )
       AND del.contract = $2
       ORDER BY del.voting_power DESC
@@ -232,12 +232,10 @@ async function getVotersWhoHaveNotVotedForProposal({
     );
   };
 
-  const [{ meta, data: nonVoters }, latestBlock] = await Promise.all([
-    doInSpan({ name: "getVotersWhoHaveNotVotedForProposal" }, async () =>
-      paginateResult(queryFunction, pagination)
-    ),
-    contracts.token.provider.getBlock("latest"),
-  ]);
+  const { meta, data: nonVoters } = await doInSpan(
+    { name: "getVotersWhoHaveNotVotedForProposal" },
+    async () => paginateResult(queryFunction, pagination)
+  );
 
   if (!nonVoters || nonVoters.length === 0) {
     return {
