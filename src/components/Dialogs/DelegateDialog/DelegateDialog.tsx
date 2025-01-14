@@ -56,13 +56,13 @@ export function DelegateDialog({
 
   const { data: sponsorBalance } = useEthBalance({
     enabled: isGasRelayEnabled,
-    address: gasRelayConfig.sponsorAddress,
+    address: gasRelayConfig?.sponsorAddress,
   });
 
   // Gas relay is only LIVE when it is enabled in the settings and the sponsor meets minimum eth requirements
   const isGasRelayLive =
     Number(formatEther(sponsorBalance || 0n)) >=
-    Number(gasRelayConfig.minBalance);
+    Number(gasRelayConfig?.minBalance);
 
   const sameDelegatee = delegate.address === delegatee?.delegatee;
   const isDisabledInTenant = ui.toggle("delegates/delegate")?.enabled === false;
