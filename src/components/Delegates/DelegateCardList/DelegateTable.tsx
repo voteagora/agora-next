@@ -102,7 +102,12 @@ export default function DelegateTable({
               </td>
             ) : (
               delegates.map((delegate) => (
-                <DelegateTableRow key={delegate.address} delegate={delegate} />
+                <DelegateTableRow
+                  key={delegate.address}
+                  delegate={
+                    delegate as DelegateChunk & { numOfDelegators: bigint }
+                  }
+                />
               ))
             )}
           </InfiniteScroll>

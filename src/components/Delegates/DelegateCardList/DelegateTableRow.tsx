@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 export default function DelegateTableRow({
   delegate,
 }: {
-  delegate: DelegateChunk;
+  delegate: DelegateChunk & { numOfDelegators: bigint };
 }) {
   const router = useRouter();
   const { data: votingStats, isPending: isVotingStatsPending } = useVotingStats(
