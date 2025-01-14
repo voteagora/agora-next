@@ -115,8 +115,8 @@ const CustomTooltip = ({ active, payload, label, quorum }: any) => {
     }
 
     return (
-      <div className="bg-white p-3 border rounded-lg shadow-md">
-        <p className="text-xs font-semibold mb-2">
+      <div className="bg-neutral p-3 border border-line rounded-lg shadow-newDefault">
+        <p className="text-xs font-semibold mb-2 text-primary">
           {formatFullDate(new Date(label))}
         </p>
         {sortedPayload.map((entry: any) => (
@@ -127,7 +127,7 @@ const CustomTooltip = ({ active, payload, label, quorum }: any) => {
             <span style={{ color: entry.color }}>
               {entry.name.charAt(0).toUpperCase() + entry.name.slice(1)}:
             </span>
-            <span className="font-mono">
+            <span className="font-mono text-primary">
               {formatNumber(
                 BigInt(entry.value),
                 token.decimals,
@@ -138,7 +138,7 @@ const CustomTooltip = ({ active, payload, label, quorum }: any) => {
         ))}
         {!!quorum && (
           <div className="flex justify-between items-center gap-4 text-xs pt-2 border-t border-line border-dashed mt-2">
-            <span style={{ color: "#333" }}>Quorum:</span>
+            <span className="text-secondary">Quorum:</span>
             <div className="flex items-center gap-1">
               <span
                 className={`font-mono ${
@@ -151,8 +151,8 @@ const CustomTooltip = ({ active, payload, label, quorum }: any) => {
                   quorumVotes > 1_000_000 ? 2 : 4
                 )}
               </span>
-              <span>/</span>
-              <span className="font-mono">
+              <span className="text-primary">/</span>
+              <span className="font-mono text-primary">
                 {formatNumber(
                   BigInt(quorum),
                   token.decimals,
