@@ -39,7 +39,9 @@ export default function DelegateTableRow({
         {!isVotingStatsPending && `${(votingStats?.last_10_props || 0) * 10}%`}
       </TableCell>
       {/* @ts-ignore */}
-      <TableCell>{delegate.numOfDelegators.toString()} addresses</TableCell>
+      <TableCell>
+        {delegate.numOfDelegators?.toString() || 0} addresses
+      </TableCell>
       <TableCell>
         <div className="flex flex-row gap-2">
           <span className="text-positive font-bold border border-line rounded-md px-2 py-1">
