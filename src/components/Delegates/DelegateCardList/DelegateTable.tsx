@@ -101,8 +101,8 @@ export default function DelegateTable({
                 None found
               </td>
             ) : (
-              delegates.map((delegate, idx) => (
-                <DelegateTableRow key={idx} idx={idx} delegate={delegate} />
+              delegates.map((delegate) => (
+                <DelegateTableRow key={delegate.address} delegate={delegate} />
               ))
             )}
           </InfiniteScroll>

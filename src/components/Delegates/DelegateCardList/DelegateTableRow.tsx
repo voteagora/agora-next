@@ -1,16 +1,18 @@
+"use client";
+
 import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { formatNumber } from "@/lib/tokenUtils";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useVotingStats } from "@/hooks/useVotingStats";
+import { useRouter } from "next/navigation";
 
 export default function DelegateTableRow({
   delegate,
-  idx,
 }: {
   delegate: DelegateChunk;
-  idx: number;
 }) {
+  const router = useRouter();
   const { data: votingStats, isPending: isVotingStatsPending } = useVotingStats(
     {
       address: delegate.address as `0x${string}`,
@@ -18,7 +20,12 @@ export default function DelegateTableRow({
   );
 
   return (
-    <TableRow className="font-semibold">
+    <TableRow
+      className="font-semibold cursor-pointer"
+      onClick={() => {
+        router.push(`/delegates/${delegate.address}`);
+      }}
+    >
       <TableCell>
         <DelegateProfileImage
           endorsed={delegate.statement?.endorsed}
