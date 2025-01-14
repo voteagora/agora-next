@@ -122,6 +122,8 @@ export const disapprovalThreshold = 12;
 
 export const ANALYTICS_EVENTS = {
   STANDARD_VOTE: "standard_vote",
+  ADVANCED_VOTE: "advanced_vote",
   DELEGATE: "delegate",
+  ADVANCED_DELEGATE: "advanced_delegate",
   CREATE_PROPOSAL: "create_proposal",
 };

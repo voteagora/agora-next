@@ -1,10 +1,12 @@
 import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useState } from "react";
-import { useWriteContract } from "wagmi";
+import { useAccount, useWriteContract } from "wagmi";
 import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { config } from "@/app/Web3Provider";
+import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENTS } from "@/lib/constants";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -23,7 +25,8 @@ const useAdvancedVoting = ({
   params?: `0x${string}`;
   missingVote: MissingVote;
 }) => {
-  const { contracts } = Tenant.current();
+  const { contracts, slug } = Tenant.current();
+  const { address } = useAccount();
   const { writeContractAsync: advancedVote, isError: _advancedVoteError } =
     useWriteContract();
 
@@ -71,6 +74,19 @@ const useAdvancedVoting = ({
           hash: directTx,
         });
         if (status === "success") {
+          await trackEvent({
+            event_name: ANALYTICS_EVENTS.STANDARD_VOTE,
+            event_data: {
+              dao_slug: slug,
+              proposal_id: BigInt(proposalId),
+              support: support,
+              reason: reason,
+              params: params,
+              voter: address,
+              transaction_hash: directTx,
+              contract_address: contracts.governor.address.toLowerCase(),
+            },
+          });
           setStandardTxHash(directTx);
           setStandardVoteSuccess(true);
         }
@@ -103,6 +119,19 @@ const useAdvancedVoting = ({
           hash: advancedTx,
         });
         if (status === "success") {
+          await trackEvent({
+            event_name: ANALYTICS_EVENTS.STANDARD_VOTE,
+            event_data: {
+              dao_slug: slug,
+              proposal_id: BigInt(proposalId),
+              support: support,
+              reason: reason,
+              params: params,
+              voter: address,
+              transaction_hash: advancedTx,
+              contract_address: contracts.alligator!.address.toLowerCase(),
+            },
+          });
           setAdvancedTxHash(advancedTx);
           setAdvancedVoteSuccess(true);
         }
