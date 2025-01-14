@@ -8,7 +8,7 @@ import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/Button";
 import { Button as ShadcnButton } from "@/components/ui/button";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AgoraLoaderSmall,
   LogoLoader,
@@ -38,6 +38,8 @@ export function DelegateDialog({
     addressOrENSName: string
   ) => Promise<DelegateePayload | null>;
 }) {
+  const shouldFetchData = useRef(true);
+  const [isReady, setIsReady] = useState(false);
   const { ui, contracts, token } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
@@ -45,7 +47,6 @@ export function DelegateDialog({
 
   const [votingPower, setVotingPower] = useState<string>("");
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
-  const [isReady, setIsReady] = useState(false);
 
   const { setRefetchDelegate } = useConnectButtonContext();
 
@@ -101,20 +102,19 @@ export function DelegateDialog({
     hash: isGasRelayLive ? sponsoredTxnHash : delegateTxHash,
   });
 
-  const fetchData = useCallback(async () => {
-    setIsReady(false);
-    if (!accountAddress) return;
+  const fetchData = async () => {
+    if (shouldFetchData.current && accountAddress) {
+      shouldFetchData.current = false;
 
-    try {
       const vp = await fetchBalanceForDirectDelegation(accountAddress);
       setVotingPower(vp.toString());
 
       const direct = await fetchDirectDelegatee(accountAddress);
+
       setDelegatee(direct);
-    } finally {
       setIsReady(true);
     }
-  }, [fetchBalanceForDirectDelegation, accountAddress, fetchDirectDelegatee]);
+  };
 
   async function executeDelegate() {
     if (isGasRelayLive) {
@@ -175,7 +175,7 @@ export function DelegateDialog({
   };
 
   useEffect(() => {
-    if (!isReady) {
+    if (shouldFetchData.current && accountAddress) {
       fetchData();
     }
 
@@ -188,7 +188,7 @@ export function DelegateDialog({
         });
       }
     }
-  }, [isReady, fetchData, didProcessDelegation, delegate, votingPower]);
+  }, [didProcessDelegation, delegate, votingPower, accountAddress]);
 
   if (!isReady) {
     return (
