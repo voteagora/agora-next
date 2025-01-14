@@ -13,7 +13,7 @@ const tabsListVariants = cva(
   {
     variants: {
       variant: {
-        bool: "bg-wash rounded-md border border-wash overflow-hidden gap-0 w-full",
+        bool: "bg-wash rounded-md border border-line overflow-hidden gap-0 w-full",
       },
     },
   }

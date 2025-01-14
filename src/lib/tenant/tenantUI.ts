@@ -5,7 +5,7 @@ import { PLMConfig } from "@/app/proposals/draft/types";
 type UIToggle = {
   name: string;
   enabled: boolean;
-  config?: UIConfig | UIEndorsedConfig;
+  config?: UIConfig | UIEndorsedConfig | UIGasRelayConfig;
 };
 
 export type UIEndorsedConfig = {
@@ -13,6 +13,12 @@ export type UIEndorsedConfig = {
   showFilterLabel: string;
   hideFilterLabel: string;
   defaultFilter: boolean;
+};
+
+export type UIGasRelayConfig = {
+  version?: string;
+  minBalance: string;
+  sponsorAddress: `0x${string}`;
 };
 
 // UI config exists to give tenant specifc config options to a UI toggle

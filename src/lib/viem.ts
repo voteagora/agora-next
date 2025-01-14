@@ -1,4 +1,4 @@
-import { createPublicClient, createWalletClient, custom, http } from "viem";
+import { Chain, createPublicClient, createWalletClient, custom } from "viem";
 import { cyber, mainnet, optimism, scroll, sepolia } from "viem/chains";
 
 import "viem/window";
@@ -7,6 +7,7 @@ import {
   deriveMainnet,
   deriveTestnet,
 } from "@/lib/tenant/configs/contracts/derive";
+import Tenant from "@/lib/tenant/tenant";
 
 export const getWalletClient = (chainId: number) => {
   switch (chainId) {
@@ -54,52 +55,15 @@ export const getWalletClient = (chainId: number) => {
   }
 };
 
-export const getPublicClient = (chainId: number) => {
-  const transport = getTransportForChain(chainId);
+export const getPublicClient = (chain?: Chain) => {
+  const { contracts } = Tenant.current();
 
-  if (!transport) {
-    throw new Error("Invalid chainId");
-  }
+  const transport = getTransportForChain(
+    chain?.id ?? contracts.token.chain.id
+  )!;
 
-  switch (chainId) {
-    case mainnet.id:
-      return createPublicClient({
-        chain: mainnet,
-        transport,
-      });
-    case sepolia.id:
-      return createPublicClient({
-        chain: sepolia,
-        transport,
-      });
-    case optimism.id:
-      return createPublicClient({
-        chain: optimism,
-        transport,
-      });
-    case cyber.id:
-      return createPublicClient({
-        chain: cyber,
-        transport,
-      });
-    case scroll.id:
-      return createPublicClient({
-        chain: scroll,
-        transport,
-      });
-
-    case deriveTestnet.id:
-      return createPublicClient({
-        chain: deriveTestnet,
-        transport: http(),
-      });
-
-    case deriveMainnet.id:
-      return createPublicClient({
-        chain: deriveMainnet,
-        transport: http(),
-      });
-    default:
-      throw new Error("Invalid chainId");
-  }
+  return createPublicClient({
+    chain: chain ?? contracts.token.chain,
+    transport,
+  });
 };

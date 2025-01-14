@@ -10,6 +10,7 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { createTokenContract } from "@/lib/tokenUtils";
 import { optimism } from "viem/chains";
 import { AlchemyProvider, BaseContract } from "ethers";
+import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 import { DELEGATION_MODEL } from "@/lib/constants";
 
 interface Props {
@@ -63,7 +64,7 @@ export const boostTenantConfig = ({
       provider,
     }),
 
-    timelock: new TenantContract<IGovernorContract>({
+    timelock: new TenantContract<ITimelockContract>({
       abi: AgoraTimelock__factory.abi,
       address: TIMELOCK,
       chain,

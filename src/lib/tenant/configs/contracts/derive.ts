@@ -12,6 +12,7 @@ import { defineChain } from "viem";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { Chain } from "viem/chains";
 import { DELEGATION_MODEL } from "@/lib/constants";
+import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 
 export const DERIVE_TESTNET_RPC =
   "https://rpc-prod-testnet-0eakp60405.t.conduit.xyz";
@@ -139,7 +140,7 @@ export const deriveTenantConfig = ({
       provider,
     }),
 
-    timelock: new TenantContract<IGovernorContract>({
+    timelock: new TenantContract<ITimelockContract>({
       abi: AgoraTimelock__factory.abi,
       address: TIMELOCK,
       chain,

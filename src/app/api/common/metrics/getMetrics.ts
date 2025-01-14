@@ -13,7 +13,7 @@ async function getMetrics() {
       totalSupply = await contracts.token.contract.totalSupply();
     } else if (contracts.token.isERC721()) {
       const token = contracts.token.contract as IMembershipContract;
-      const publicClient = getPublicClient(contracts.token.chain.id);
+      const publicClient = getPublicClient(contracts.token.chain);
       const blockNumber = await publicClient.getBlockNumber();
       totalSupply = await token.getPastTotalSupply(Number(blockNumber) - 1);
     } else {

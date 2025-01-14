@@ -1,8 +1,8 @@
 import {
   useAccount,
-  useWriteContract,
   useEnsName,
   useWaitForTransactionReceipt,
+  useWriteContract,
 } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/Button";
@@ -21,6 +21,7 @@ import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
 import { revalidateData } from "./revalidateAction";
 import { zeroAddress } from "viem";
+import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
 
 export function UndelegateDialog({
   delegate,
@@ -46,25 +47,40 @@ export function UndelegateDialog({
     delegate.address.toLowerCase() === accountAddress?.toLowerCase();
 
   const isDisabledInTenant = ui.toggle("delegates/delegate")?.enabled === false;
-
-  const { data: accountEnsName } = useEnsName({
-    chainId: 1,
-    address: accountAddress as `0x${string}`,
-  });
+  const isGasRelayEnabled = ui.toggle("sponsoredDelegate")?.enabled === true;
 
   const { data: delegateeEnsName } = useEnsName({
     chainId: 1,
     address: delegatee?.delegatee as `0x${string}`,
   });
 
-  const { isError, writeContract: write, data } = useWriteContract();
+  const {
+    call,
+    isFetching: isProcessingSponsoredUnelegation,
+    isFetched: didProcessSponsoredUnelegation,
+    txHash: sponsoredTxnHash,
+  } = useSponsoredDelegation({
+    address: accountAddress,
+    delegate: {
+      address: zeroAddress,
+      votingPower: { total: "0", direct: "0", advanced: "0" },
+      statement: null,
+      citizen: false,
+    },
+  });
+
+  const {
+    isError,
+    writeContract: write,
+    data: delegateTxHash,
+  } = useWriteContract();
 
   const {
     isLoading: isProcessingDelegation,
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
   } = useWaitForTransactionReceipt({
-    hash: data,
+    hash: isGasRelayEnabled ? sponsoredTxnHash : delegateTxHash,
   });
 
   const fetchData = useCallback(async () => {
@@ -81,6 +97,19 @@ export function UndelegateDialog({
       setIsReady(true);
     }
   }, [fetchBalanceForDirectDelegation, accountAddress, fetchDirectDelegatee]);
+
+  const executeDelegate = async () => {
+    if (isGasRelayEnabled) {
+      await call();
+    } else {
+      write({
+        address: contracts.token.address as any,
+        abi: contracts.token.abi,
+        functionName: "delegate",
+        args: [zeroAddress],
+      });
+    }
+  };
 
   const renderActionButtons = () => {
     if (isDisabledInTenant) {
@@ -101,53 +130,32 @@ export function UndelegateDialog({
 
     if (isError || didFailDelegation) {
       return (
-        <Button
-          disabled={false}
-          onClick={() =>
-            write({
-              address: contracts.token.address as any,
-              abi: contracts.token.abi,
-              functionName: "delegate",
-              args: [zeroAddress],
-            })
-          }
-        >
+        <Button disabled={false} onClick={executeDelegate}>
           Undelegation failed - try again
         </Button>
       );
     }
 
-    if (isProcessingDelegation) {
+    if (isProcessingDelegation || isProcessingSponsoredUnelegation) {
       return (
         <Button disabled={true}>Submitting your undelegation request...</Button>
       );
     }
 
-    if (didProcessDelegation) {
+    if (didProcessDelegation || didProcessSponsoredUnelegation) {
       return (
         <div>
           <Button className="w-full" disabled={false}>
             Undelegation completed!
           </Button>
-          <BlockScanUrls hash1={data} />
+          <BlockScanUrls
+            hash1={isGasRelayEnabled ? sponsoredTxnHash : delegateTxHash}
+          />
         </div>
       );
     }
 
-    return (
-      <ShadcnButton
-        onClick={() =>
-          write({
-            address: contracts.token.address as any,
-            abi: contracts.token.abi,
-            functionName: "delegate",
-            args: [zeroAddress],
-          })
-        }
-      >
-        Undelegate
-      </ShadcnButton>
-    );
+    return <ShadcnButton onClick={executeDelegate}>Undelegate</ShadcnButton>;
   };
 
   useEffect(() => {
