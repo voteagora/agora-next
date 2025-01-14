@@ -4,10 +4,10 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
-  ReferenceLine,
   ResponsiveContainer,
   XAxis,
   YAxis,
+  Tooltip,
 } from "recharts";
 import { format } from "date-fns";
 import { Proposal } from "@/app/api/common/proposals/proposal";
@@ -17,9 +17,11 @@ import {
   formatNumber,
   formatNumberWithScientificNotation,
   isScientificNotation,
+  formatFullDate,
 } from "@/lib/utils";
 import { PaginatedResult } from "@/app/lib/pagination";
 import { DaoSlug } from "@prisma/client";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const { token, slug } = Tenant.current();
 
@@ -78,6 +80,92 @@ const customizedXTick = (props: any) => {
       </text>
     </g>
   );
+};
+
+const voteOrder = ["For", "Against", "Abstain"];
+
+const CustomTooltip = ({ active, payload, label, quorum }: any) => {
+  const { namespace } = Tenant.current();
+  const forVotes = payload.find((p: any) => p.name === "For");
+  const againstVotes = payload.find((p: any) => p.name === "Against");
+  const abstainVotes = payload.find((p: any) => p.name === "Abstain");
+
+  if (active && payload && payload.length) {
+    const sortedPayload = [...payload].sort(
+      (a, b) => voteOrder.indexOf(a.name) - voteOrder.indexOf(b.name)
+    );
+
+    let quorumVotes =
+      BigInt(forVotes.value) +
+      BigInt(abstainVotes.value) +
+      BigInt(againstVotes.value);
+
+    /**
+     * ENS does not count against votes in the quorum calculation.
+     */
+    if (namespace === TENANT_NAMESPACES.ENS) {
+      quorumVotes = quorumVotes - BigInt(againstVotes.value);
+    }
+
+    /**
+     * Only FOR votes are counted towards quorum for Uniswap.
+     */
+    if (namespace === TENANT_NAMESPACES.UNISWAP) {
+      quorumVotes = BigInt(forVotes.value);
+    }
+
+    return (
+      <div className="bg-neutral p-3 border border-line rounded-lg shadow-newDefault">
+        <p className="text-xs font-semibold mb-2 text-primary">
+          {formatFullDate(new Date(label))}
+        </p>
+        {sortedPayload.map((entry: any) => (
+          <div
+            key={entry.name}
+            className="flex justify-between items-center gap-4 text-xs"
+          >
+            <span style={{ color: entry.color }}>
+              {entry.name.charAt(0).toUpperCase() + entry.name.slice(1)}:
+            </span>
+            <span className="font-mono text-primary">
+              {formatNumber(
+                BigInt(entry.value),
+                token.decimals,
+                entry.value > 1_000_000 ? 2 : 4
+              )}
+            </span>
+          </div>
+        ))}
+        {!!quorum && (
+          <div className="flex justify-between items-center gap-4 text-xs pt-2 border-t border-line border-dashed mt-2">
+            <span className="text-secondary">Quorum:</span>
+            <div className="flex items-center gap-1">
+              <span
+                className={`font-mono ${
+                  quorumVotes > quorum ? "text-primary" : "text-tertiary"
+                }`}
+              >
+                {formatNumber(
+                  BigInt(quorumVotes),
+                  token.decimals,
+                  quorumVotes > 1_000_000 ? 2 : 4
+                )}
+              </span>
+              <span className="text-primary">/</span>
+              <span className="font-mono text-primary">
+                {formatNumber(
+                  BigInt(quorum),
+                  token.decimals,
+                  quorum > 1_000_000 ? 2 : 4
+                )}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+  return null;
 };
 
 export default function VotingTimelineChart({
@@ -142,85 +230,79 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
   ];
 
   return (
-    <ResponsiveContainer width="100%" height={230}>
-      <AreaChart data={modifiedChartData}>
-        <CartesianGrid vertical={false} strokeDasharray={"3 3"} />
-        <XAxis
-          dataKey="timestamp"
-          axisLine={false}
-          tickLine={false}
-          interval="preserveStartEnd"
-          ticks={[
-            (proposal.startTime as unknown as string) || "",
-            (proposal.endTime as unknown as string) || "",
-          ]}
-          tickFormatter={tickFormatter}
-          tick={customizedXTick}
-          className="text-xs font-inter font-semibold text-primary/30"
-          fill={"#AFAFAF"}
-        />
-
-        <YAxis
-          className="text-xs font-inter font-semibold fill:text-primary/30 fill"
-          tick={{
-            fill: "#AFAFAF",
-          }}
-          tickFormatter={yTickFormatter}
-          tickLine={false}
-          axisLine={false}
-          tickCount={6}
-          interval={0}
-          width={54}
-          tickMargin={4}
-          domain={[
-            0,
-            (dataMax: number) => {
-              const quorumValue = proposal.quorum
-                ? +proposal.quorum.toString()
-                : 0;
-              // Add 10% padding above the higher value between dataMax and quorum
-              return Math.max(dataMax, quorumValue) * 1.1;
-            },
-          ]}
-        />
-
-        <Area
-          type="step"
-          dataKey="against"
-          stackId={stackIds.against}
-          stroke="#dc2626"
-          fill="#fecaca"
-        />
-        <Area
-          type="step"
-          dataKey="abstain"
-          stackId={stackIds.abstain}
-          stroke="#57534e"
-          fill="#e7e5e4"
-        />
-        <Area
-          type="step"
-          dataKey="for"
-          stackId={stackIds.for}
-          stroke="#16a34a"
-          fill="#bbf7d0"
-        />
-
-        {!!proposal.quorum && (
-          <ReferenceLine
-            y={+proposal.quorum.toString()}
-            strokeWidth={1}
-            strokeDasharray="3 3"
-            stroke="#4F4F4F"
-            label={{
-              position: "insideBottomLeft",
-              value: "QUORUM",
-              className: "text-xs font-inter font-semibold",
-              fill: "#565656",
-            }}
+    <div className="relative">
+      <ResponsiveContainer width="100%" height={230}>
+        <AreaChart data={modifiedChartData}>
+          <CartesianGrid vertical={false} strokeDasharray={"3 3"} />
+          <XAxis
+            dataKey="timestamp"
+            axisLine={false}
+            tickLine={false}
+            interval="preserveStartEnd"
+            ticks={[
+              (proposal.startTime as unknown as string) || "",
+              (proposal.endTime as unknown as string) || "",
+            ]}
+            tickFormatter={tickFormatter}
+            tick={customizedXTick}
+            className="text-xs font-inter font-semibold text-primary/30"
+            fill={"#AFAFAF"}
           />
-        )}
-      </AreaChart>
-    </ResponsiveContainer>
+
+          <YAxis
+            className="text-xs font-inter font-semibold fill:text-primary/30 fill"
+            tick={{
+              fill: "#AFAFAF",
+            }}
+            tickFormatter={yTickFormatter}
+            tickLine={false}
+            axisLine={false}
+            tickCount={6}
+            interval={0}
+            width={54}
+            tickMargin={4}
+            domain={[
+              0,
+              (dataMax: number) => {
+                const quorumValue = proposal.quorum
+                  ? +proposal.quorum.toString()
+                  : 0;
+                // Add 10% padding above the higher value between dataMax and quorum
+                return Math.max(dataMax, quorumValue) * 1.1;
+              },
+            ]}
+          />
+
+          <Tooltip
+            content={<CustomTooltip quorum={proposal.quorum} />}
+            cursor={{ stroke: "#666", strokeWidth: 1, strokeDasharray: "4 4" }}
+          />
+          <Area
+            type="step"
+            dataKey="against"
+            stackId={stackIds.against}
+            stroke="#dc2626"
+            fill="#fecaca"
+            name="Against"
+          />
+          <Area
+            type="step"
+            dataKey="abstain"
+            stackId={stackIds.abstain}
+            stroke="#57534e"
+            fill="#e7e5e4"
+            name="Abstain"
+          />
+          <Area
+            type="step"
+            dataKey="for"
+            stackId={stackIds.for}
+            stroke="#16a34a"
+            fill="#bbf7d0"
+            name="For"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
