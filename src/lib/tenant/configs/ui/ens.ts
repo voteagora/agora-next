@@ -107,9 +107,9 @@ export const ensTenantUIConfig = new TenantUI({
         version: "1",
         sponsorAddress:
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-            ? "0x0"
+            ? "0x7735C385081568e9338aEc70492Debfd2d5c3450"
             : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
-        minBalance: "0.1",
+        minBalance: "0.001",
       },
     },
     {
@@ -119,9 +119,9 @@ export const ensTenantUIConfig = new TenantUI({
         version: "1",
         sponsorAddress:
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-            ? "0x0"
+            ? "0x7735C385081568e9338aEc70492Debfd2d5c3450"
             : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
-        minBalance: "0.1",
+        minBalance: "0.001",
       },
     },
     {
