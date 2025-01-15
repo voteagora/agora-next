@@ -212,6 +212,7 @@ export const dialogs: DialogDefinitions<DialogType> = {
     return (
       <DelegateDialog
         delegate={delegate}
+        fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
         fetchDirectDelegatee={fetchDirectDelegatee}
       />
     );

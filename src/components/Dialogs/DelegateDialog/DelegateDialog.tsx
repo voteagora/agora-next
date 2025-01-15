@@ -28,9 +28,13 @@ import { useTokenBalance } from "@/hooks/useTokenBalance";
 
 export function DelegateDialog({
   delegate,
+  fetchBalanceForDirectDelegation,
   fetchDirectDelegatee,
 }: {
   delegate: DelegateChunk;
+  fetchBalanceForDirectDelegation: (
+    addressOrENSName: string
+  ) => Promise<bigint>;
   fetchDirectDelegatee: (
     addressOrENSName: string
   ) => Promise<DelegateePayload | null>;
