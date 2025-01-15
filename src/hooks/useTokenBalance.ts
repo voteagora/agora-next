@@ -11,6 +11,7 @@ export const useTokenBalance = (address?: string) => {
     queryFn: async () => {
       return await contracts.token.contract.balanceOf(address as `0x${string}`);
     },
+    staleTime: 180000, // 3 minute cache
   });
   return { data, isFetching, isFetched };
 };

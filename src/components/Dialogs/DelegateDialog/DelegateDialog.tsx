@@ -8,7 +8,7 @@ import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/Button";
 import { Button as ShadcnButton } from "@/components/ui/button";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AgoraLoaderSmall,
   LogoLoader,
@@ -24,6 +24,7 @@ import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { formatEther } from "viem";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
 
 export function DelegateDialog({
   delegate,
@@ -38,14 +39,15 @@ export function DelegateDialog({
     addressOrENSName: string
   ) => Promise<DelegateePayload | null>;
 }) {
+  const shouldFetchData = useRef(true);
+  const [isReady, setIsReady] = useState(false);
   const { ui, contracts, token } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const { address: accountAddress } = useAccount();
 
-  const [votingPower, setVotingPower] = useState<string>("");
+  const { data: tokenBalance } = useTokenBalance(accountAddress);
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
-  const [isReady, setIsReady] = useState(false);
 
   const { setRefetchDelegate } = useConnectButtonContext();
 
@@ -101,20 +103,14 @@ export function DelegateDialog({
     hash: isGasRelayLive ? sponsoredTxnHash : delegateTxHash,
   });
 
-  const fetchData = useCallback(async () => {
-    setIsReady(false);
-    if (!accountAddress) return;
-
-    try {
-      const vp = await fetchBalanceForDirectDelegation(accountAddress);
-      setVotingPower(vp.toString());
-
+  const fetchData = async () => {
+    if (shouldFetchData.current && accountAddress) {
+      shouldFetchData.current = false;
       const direct = await fetchDirectDelegatee(accountAddress);
       setDelegatee(direct);
-    } finally {
       setIsReady(true);
     }
-  }, [fetchBalanceForDirectDelegation, accountAddress, fetchDirectDelegatee]);
+  };
 
   async function executeDelegate() {
     if (isGasRelayLive) {
@@ -175,20 +171,24 @@ export function DelegateDialog({
   };
 
   useEffect(() => {
-    if (!isReady) {
+    if (
+      shouldFetchData.current &&
+      accountAddress &&
+      tokenBalance !== undefined
+    ) {
       fetchData();
     }
 
     if (didProcessDelegation || didProcessSponsoredDelegation) {
       // Refresh delegation
-      if (Number(votingPower) > 0) {
+      if (tokenBalance !== undefined && tokenBalance > 0n) {
         setRefetchDelegate({
           address: delegate.address,
           prevVotingPowerDelegatee: delegate.votingPower.total,
         });
       }
     }
-  }, [isReady, fetchData, didProcessDelegation, delegate, votingPower]);
+  }, [didProcessDelegation, delegate, tokenBalance, accountAddress]);
 
   if (!isReady) {
     return (
@@ -207,7 +207,11 @@ export function DelegateDialog({
               <div className="flex flex-row items-center gap-1">
                 Your total delegatable votes
               </div>
-              <AdvancedDelegationDisplayAmount amount={votingPower} />
+              <AdvancedDelegationDisplayAmount
+                amount={
+                  tokenBalance !== undefined ? tokenBalance.toString() : "0"
+                }
+              />
             </div>
             <div className="flex flex-col relative w-full">
               <div className="flex flex-row items-center gap-3 p-2 pb-4 pl-0 border-b border-line">
