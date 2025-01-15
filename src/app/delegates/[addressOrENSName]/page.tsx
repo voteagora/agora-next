@@ -87,7 +87,6 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
-  const { contracts } = Tenant.current();
   const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
   const publicClient = getPublicClient();
   const blockNumber = await publicClient.getBlockNumber({
