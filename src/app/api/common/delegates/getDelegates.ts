@@ -121,7 +121,7 @@ async function getDelegates({
       where dao_slug='${slug}'
     ),
     filtered_delegates_both as (
-      select 
+      select
         address as delegate,
         0 as num_of_delegators,
         0 as direct_vp,
@@ -129,7 +129,7 @@ async function getDelegates({
         0 as voting_power
         from agora.delegate_statements where dao_slug='DERIVE'
       union
-        select 
+        select
           d.delegate as delegate,
           d.num_of_delegators as num_of_delegators,
           d.direct_vp as direct_vp,
@@ -569,6 +569,7 @@ async function getVoterStats(
         FROM ${namespace}.proposals_v2
         WHERE contract = $2
         AND end_block::INTEGER <= $3
+        AND cancelled_block IS NULL
         ORDER BY ordinal DESC
         LIMIT 10
     ),
@@ -576,6 +577,7 @@ async function getVoterStats(
         SELECT COUNT(*) as count
         FROM ${namespace}.proposals_v2
         WHERE contract = $2
+        AND cancelled_block IS NULL
     )
     SELECT
         v.voter,
