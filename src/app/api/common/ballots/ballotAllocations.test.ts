@@ -61,8 +61,6 @@ describe("ballotAllocations", () => {
 
     const adjustedAllocations = calculateAllocations(parsedBalot, 0.4);
 
-    console.log(adjustedAllocations);
-
     expect(adjustedAllocations).toEqual({
       address: "0x123",
       round_id: 4,

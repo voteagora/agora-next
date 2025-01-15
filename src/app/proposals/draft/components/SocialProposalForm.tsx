@@ -16,8 +16,6 @@ const SocialProposalForm = () => {
     formState: { defaultValues },
   } = useFormContext<FormType>();
 
-  console.log(defaultValues);
-
   const { fields, replace, append } = useFieldArray({
     control,
     name: "socialProposal.options",

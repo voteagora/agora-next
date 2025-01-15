@@ -12,11 +12,7 @@ interface Props {
 export const DelegateButton = ({ delegate, delegator, onChange }: Props) => {
   const { contracts } = Tenant.current();
 
-  const { data, writeContract, isError: isCancelled } = useWriteContract();
-  const { isLoading, isSuccess, isError } = useWaitForTransactionReceipt({});
-
-  console.log(isLoading, isSuccess, isError);
-  console.log(isCancelled);
+  const { data, writeContract } = useWriteContract();
 
   return (
     <ShadcnButton

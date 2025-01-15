@@ -34,7 +34,6 @@ export default function SimulateTransaction({
       setIsLoading(true);
 
       try {
-        console.log("test");
         const response = await fetch("/api/simulate", {
           method: "POST",
           headers: {
