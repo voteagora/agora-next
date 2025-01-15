@@ -15,8 +15,6 @@ import Tenant from "@/lib/tenant/tenant";
 
 const OptimisticProposalVotesCard = ({
   proposal,
-  proposalVotes,
-  nonVoters,
   disapprovalThreshold,
   againstRelativeAmount,
   againstLengthString,
@@ -28,8 +26,6 @@ const OptimisticProposalVotesCard = ({
   status,
 }: {
   proposal: Proposal;
-  proposalVotes: any;
-  nonVoters: any;
   disapprovalThreshold: number;
   againstRelativeAmount: string;
   againstLengthString: string;
@@ -110,15 +106,9 @@ const OptimisticProposalVotesCard = ({
         </div>
         {/* Show the scrolling list of votes for the proposal */}
         {showVoters ? (
-          <ProposalVotesList
-            initialProposalVotes={proposalVotes}
-            proposalId={proposal.id}
-          />
+          <ProposalVotesList proposalId={proposal.id} />
         ) : (
-          <ProposalNonVoterList
-            proposal={proposal}
-            initialNonVoters={nonVoters}
-          />
+          <ProposalNonVoterList proposal={proposal} />
         )}
         {/* Show the input for the user to vote on a proposal if allowed */}
         <CastVoteInput proposal={proposal} isOptimistic />

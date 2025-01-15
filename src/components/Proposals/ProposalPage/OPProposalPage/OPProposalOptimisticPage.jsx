@@ -6,7 +6,6 @@ import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
   fetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
-import { fetchVotersWhoHaveNotVotedForProposal } from "@/app/proposals/actions";
 import { disapprovalThreshold } from "@/lib/constants";
 import { formatNumber } from "@/lib/utils";
 import { formatUnits } from "ethers";
@@ -54,14 +53,7 @@ async function fetchCurrentDelegators(addressOrENSName) {
 }
 
 export default async function OPProposalPage({ proposal }) {
-  const [votableSupply, proposalVotes, nonVoters] = await Promise.all([
-    fetchVotableSupply(),
-    fetchProposalVotes(proposal.id, {
-      limit: 250,
-      offset: 0,
-    }),
-    fetchVotersWhoHaveNotVotedForProposal(proposal.id),
-  ]);
+  const votableSupply = await fetchVotableSupply();
 
   const formattedVotableSupply = Number(
     BigInt(votableSupply) / BigInt(10 ** 18)
