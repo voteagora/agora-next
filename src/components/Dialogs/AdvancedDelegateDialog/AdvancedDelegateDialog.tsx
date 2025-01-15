@@ -325,7 +325,7 @@ function InfoDialog({
           </div>
           {delegators?.map((delegator, index) => (
             <div
-              className="flex flex-row w-full items-center justify-between"
+              className="flex flex-row w-full items-center justify-between text-primary"
               key={index}
             >
               <p>

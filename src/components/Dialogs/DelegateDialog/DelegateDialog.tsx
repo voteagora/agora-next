@@ -243,7 +243,7 @@ export function DelegateDialog({
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            <p className="text-xl font-bold text-left">
+            <p className="text-xl font-bold text-left text-primary">
               Set <ENSName address={delegate.address} /> as your delegate
             </p>
             <div className="text-secondary">

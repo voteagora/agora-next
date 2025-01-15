@@ -54,7 +54,7 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
                   height={42}
                 />
 
-                <p className="font-semibold">
+                <p className="font-semibold text-primary">
                   <ENSName address={draftProposal.author_address} /> would like
                   your help to submit this proposal
                 </p>
@@ -67,8 +67,13 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
               <p className="text-[#B16B19]/70 mt-2">
                 If you choose to do so, this proposal will be marked as
                 &apos;submitted by{" "}
-                <ENSName address={draftProposal.sponsor_address || ""} />,
-                authored by <ENSName address={draftProposal.author_address} />
+                <span className="text-primary">
+                  <ENSName address={draftProposal.sponsor_address || ""} />
+                </span>
+                , authored by{" "}
+                <span className="text-primary">
+                  <ENSName address={draftProposal.author_address} />
+                </span>
                 &apos;
               </p>
             </div>

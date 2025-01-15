@@ -22,8 +22,9 @@ import {
 import { PaginatedResult } from "@/app/lib/pagination";
 import { DaoSlug } from "@prisma/client";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { rgbStringToHex } from "@/app/lib/utils/color";
 
-const { token, slug } = Tenant.current();
+const { token, slug, ui } = Tenant.current();
 
 /**
  * Transforms an array of votes into chart data.
@@ -233,7 +234,11 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
     <div className="relative">
       <ResponsiveContainer width="100%" height={230}>
         <AreaChart data={modifiedChartData}>
-          <CartesianGrid vertical={false} strokeDasharray={"3 3"} />
+          <CartesianGrid
+            vertical={false}
+            strokeDasharray={"3 3"}
+            stroke={rgbStringToHex(ui.customization?.tertiary)}
+          />
           <XAxis
             dataKey="timestamp"
             axisLine={false}
@@ -246,13 +251,13 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
             tickFormatter={tickFormatter}
             tick={customizedXTick}
             className="text-xs font-inter font-semibold text-primary/30"
-            fill={"#AFAFAF"}
+            fill={rgbStringToHex(ui.customization?.tertiary)}
           />
 
           <YAxis
             className="text-xs font-inter font-semibold fill:text-primary/30 fill"
             tick={{
-              fill: "#AFAFAF",
+              fill: rgbStringToHex(ui.customization?.tertiary),
             }}
             tickFormatter={yTickFormatter}
             tickLine={false}
@@ -281,24 +286,24 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
             type="step"
             dataKey="against"
             stackId={stackIds.against}
-            stroke="#dc2626"
-            fill="#fecaca"
+            stroke={rgbStringToHex(ui.customization?.negative)}
+            fill={rgbStringToHex(ui.customization?.negative)}
             name="Against"
           />
           <Area
             type="step"
             dataKey="abstain"
             stackId={stackIds.abstain}
-            stroke="#57534e"
-            fill="#e7e5e4"
+            stroke={rgbStringToHex(ui.customization?.tertiary)}
+            fill={rgbStringToHex(ui.customization?.tertiary)}
             name="Abstain"
           />
           <Area
             type="step"
             dataKey="for"
             stackId={stackIds.for}
-            stroke="#16a34a"
-            fill="#bbf7d0"
+            stroke={rgbStringToHex(ui.customization?.positive)}
+            fill={rgbStringToHex(ui.customization?.positive)}
             name="For"
           />
         </AreaChart>
