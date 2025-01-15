@@ -24,10 +24,10 @@ export default function ProposalVotesSummary({ proposal }: Props) {
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
   const { data: fetchedVotes, isFetched } = useProposalVotes({
-    proposalId: proposal.id,
+    enabled: true,
     limit: 250,
     offset: 0,
-    enabled: true,
+    proposalId: proposal.id,
   });
 
   const hasVotes = fetchedVotes && isFetched;

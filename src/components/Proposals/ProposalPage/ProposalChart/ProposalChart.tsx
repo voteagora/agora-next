@@ -13,10 +13,10 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
   const [showChart, setShowChart] = useState(proposal.status === "ACTIVE");
 
   const { data: fetchedVotes, isFetched } = useProposalVotes({
-    proposalId: proposal.id,
+    enabled: showChart,
     limit: 250,
     offset: 0,
-    enabled: showChart,
+    proposalId: proposal.id,
   });
 
   const handleTabsChange = (index: number) => {

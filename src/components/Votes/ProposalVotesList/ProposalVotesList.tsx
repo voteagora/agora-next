@@ -18,14 +18,14 @@ interface Props {
   proposalId: string;
 }
 
-const LIMIT = 100;
+const LIMIT = 20;
 
 export default function ProposalVotesList({ proposalId }: Props) {
   const { data: fetchedVotes, isFetched } = useProposalVotes({
-    proposalId: proposalId,
+    enabled: true,
     limit: LIMIT,
     offset: 0,
-    enabled: true,
+    proposalId: proposalId,
   });
 
   const { address: connectedAddress } = useAccount();
@@ -85,44 +85,48 @@ export default function ProposalVotesList({ proposalId }: Props) {
 
   return (
     <div className="px-4 pb-4 overflow-y-scroll max-h-[calc(100vh-437px)]">
-      <InfiniteScroll
-        hasMore={meta?.has_next}
-        pageStart={0}
-        loadMore={loadMore}
-        useWindow={false}
-        loader={
-          <div className="flex text-xs font-medium text-secondary" key={0}>
-            Loading more votes...
-          </div>
-        }
-        element="main"
-      >
-        <ul className="flex flex-col">
-          {userVotes.map((vote) => (
-            <li key={vote.transactionHash}>
-              <ProposalSingleVote
-                vote={vote}
-                isAdvancedUser={isAdvancedUser}
-                delegators={advancedDelegators}
-              />
-            </li>
-          ))}
-          {proposalVotes.map((vote) => (
-            <li
-              key={vote.transactionHash}
-              className={`${
-                connectedAddress?.toLowerCase() === vote.address && "hidden"
-              }`}
-            >
-              <ProposalSingleVote
-                vote={vote}
-                isAdvancedUser={isAdvancedUser}
-                delegators={advancedDelegators}
-              />
-            </li>
-          ))}
-        </ul>
-      </InfiniteScroll>
+      {isFetched && fetchedVotes ? (
+        <InfiniteScroll
+          hasMore={meta?.has_next}
+          pageStart={0}
+          loadMore={loadMore}
+          useWindow={false}
+          loader={
+            <div className="flex text-xs font-medium text-secondary" key={0}>
+              Loading more votes...
+            </div>
+          }
+          element="main"
+        >
+          <ul className="flex flex-col">
+            {userVotes.map((vote) => (
+              <li key={vote.transactionHash}>
+                <ProposalSingleVote
+                  vote={vote}
+                  isAdvancedUser={isAdvancedUser}
+                  delegators={advancedDelegators}
+                />
+              </li>
+            ))}
+            {proposalVotes.map((vote) => (
+              <li
+                key={vote.transactionHash}
+                className={`${
+                  connectedAddress?.toLowerCase() === vote.address && "hidden"
+                }`}
+              >
+                <ProposalSingleVote
+                  vote={vote}
+                  isAdvancedUser={isAdvancedUser}
+                  delegators={advancedDelegators}
+                />
+              </li>
+            ))}
+          </ul>
+        </InfiniteScroll>
+      ) : (
+        <div className="text-secondary text-xs">Loading...</div>
+      )}
     </div>
   );
 }
