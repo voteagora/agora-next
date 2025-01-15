@@ -6,16 +6,12 @@ import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
 import ProposalTransactionDisplay from "../ApprovedTransactions/ProposalTransactionDisplay";
 import ProposalChart from "../ProposalChart/ProposalChart";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
-import { PaginatedResult } from "@/app/lib/pagination";
 import Markdown from "@/components/shared/Markdown/Markdown";
 
 export default function ProposalDescription({
   proposal,
-  proposalVotes,
 }: {
   proposal: Proposal;
-  proposalVotes: PaginatedResult<Vote[]>;
 }) {
   const proposalsWithBadDescription = [
     "94365805422398770067924881378455503928423439630602149628781926844759467250082",

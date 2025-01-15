@@ -85,10 +85,7 @@ export default async function OPProposalPage({ proposal }) {
     <div className="flex flex-col">
       <ProposalStateAdmin proposal={proposal} />
       <div className="flex gap-16 justify-between items-start max-w-[76rem] flex-col sm:flex-row sm:items-start sm:justify-between">
-        <ProposalDescription
-          proposalVotes={proposalVotes}
-          proposal={proposal}
-        />
+        <ProposalDescription proposal={proposal} />
         <OptimisticProposalVotesCard
           proposal={proposal}
           proposalVotes={proposalVotes}
