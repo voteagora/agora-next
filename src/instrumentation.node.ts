@@ -31,4 +31,3 @@ const sdk = new NodeSDK({
   // @ts-ignore
   spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
 });
-sdk.start();
