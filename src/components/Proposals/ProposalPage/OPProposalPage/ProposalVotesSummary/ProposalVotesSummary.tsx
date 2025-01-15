@@ -88,21 +88,13 @@ export default function ProposalVotesSummary({ proposal }: Props) {
             side="top"
             align={"start"}
           >
-            {hasVotes ? (
-              <ProposalVotesSummaryDetails
-                proposal={proposal}
-                votes={fetchedVotes?.data}
-              />
-            ) : (
-              <LoadingState />
-            )}
+            <ProposalVotesSummaryDetails
+              proposal={proposal}
+              votes={fetchedVotes?.data}
+            />
           </HoverCardContent>
         </HoverCardTrigger>
       </div>
     </HoverCard>
   );
 }
-
-const LoadingState = () => {
-  return <div className="text-secondary text-xs">Loading</div>;
-};
