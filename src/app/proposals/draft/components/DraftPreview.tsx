@@ -5,11 +5,7 @@ import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/Appr
 import { useAccount } from "wagmi";
 import { formatFullDate } from "@/lib/utils";
 import { useManager } from "@/hooks/useManager";
-import {
-  DraftProposal,
-  PLMConfig,
-  ProposalGatingType,
-} from "@/app/proposals/draft/types";
+import { DraftProposal, PLMConfig } from "@/app/proposals/draft/types";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import MarkdownPreview from "@uiw/react-markdown-preview";
@@ -170,7 +166,7 @@ const DraftPreview = ({
             the community to sponsor.
           </p>
         )}
-        <div className="mt-6">{renderProposalRequirements()}</div>
+        <ProposalRequirements proposalDraft={proposalDraft} />
         {actions}
       </FormCard.Section>
     </FormCard>
