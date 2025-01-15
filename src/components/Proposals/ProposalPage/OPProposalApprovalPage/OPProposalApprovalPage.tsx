@@ -51,7 +51,7 @@ export default async function OPProposalApprovalPage({
 }) {
   const [proposalVotes, nonVoters] = await Promise.all([
     fetchProposalVotes(proposal.id, {
-      limit: 250,
+      limit: 20,
       offset: 0,
     }),
     fetchVotersWhoHaveNotVotedForProposal(proposal.id),
