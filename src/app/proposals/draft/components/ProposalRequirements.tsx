@@ -21,8 +21,9 @@ const ProposalRequirements = ({
   const { data: manager } = useManager();
 
   const renderProposalRequirements = () => {
+    let requirements = [];
     if (votingModuleType === ProposalType.SOCIAL) {
-      return (
+      requirements.push(
         <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4">
           <p className="flex-grow">Token balance</p>
           <span className="text-secondary font-mono text-xs">
@@ -38,11 +39,11 @@ const ProposalRequirements = ({
       gatingType === ProposalGatingType.MANAGER ||
       gatingType === ProposalGatingType.GOVERNOR_V1
     ) {
-      return (
+      requirements.push(
         <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4">
           <p className="flex-grow">Manager address</p>
           <span className="text-secondary font-mono text-xs">
-            {truncateAddress(manager?.toString() ?? "", 6)}
+            {truncateAddress(manager?.toString() ?? "")}
           </span>
         </div>
       );
@@ -52,7 +53,7 @@ const ProposalRequirements = ({
       gatingType === ProposalGatingType.TOKEN_THRESHOLD ||
       gatingType === ProposalGatingType.GOVERNOR_V1
     ) {
-      return (
+      requirements.push(
         <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4">
           <p className="flex-grow">Token balance</p>
           <span className="text-secondary font-mono text-xs">
@@ -70,7 +71,7 @@ const ProposalRequirements = ({
       );
     }
 
-    return null;
+    return requirements;
   };
   return <>{renderProposalRequirements()}</>;
 };
