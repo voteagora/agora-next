@@ -119,8 +119,6 @@ async function autobalanceCategories(
     idToSkip: categoryToSkip,
   });
 
-  console.log(autobalancedAllocations);
-
   await Promise.all(
     autobalancedAllocations.map(async (allocation) => {
       await prisma.categoryAllocations.upsert({

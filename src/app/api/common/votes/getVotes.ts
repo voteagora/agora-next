@@ -337,8 +337,6 @@ async function getVotesForProposal({
     };
   }
 
-  console.log("votes", votes);
-
   const proposalData = parseProposalData(
     JSON.stringify(votes[0]?.proposal_data || {}),
     votes[0]?.proposal_type

@@ -19,8 +19,6 @@ async function main(
   const delegateStatements = [];
 
   for await (const line of rl) {
-    console.log(line);
-
     // Each line in the file is a complete JSON object
     const statement = JSON.parse(line);
     delegateStatements.push({
@@ -54,7 +52,6 @@ async function main(
       : new Set();
 
     console.log(`${existingIds.size} existing statements found.`);
-    console.log(existingIds);
 
     // Filter out existing records
     const newStatements = delegateStatements.filter(

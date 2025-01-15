@@ -35,8 +35,6 @@ export default function VotingTimelineChart({
 
 const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
   const chartData = transformVotesToTreeMapData(votes);
-  console.log(votes);
-  console.log(chartData);
 
   return (
     <ResponsiveContainer width="100%" height={230}>

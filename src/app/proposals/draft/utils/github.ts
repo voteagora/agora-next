@@ -123,7 +123,6 @@ function formatGithubProposal(proposal: DraftProposal) {
 export async function createGithubProposal(
   proposal: DraftProposal
 ): Promise<string> {
-  console.log("pr token", process.env.PR_BOT_TOKEN);
   const octokit = new Octokit({
     auth: process.env.PR_BOT_TOKEN || "",
   });
