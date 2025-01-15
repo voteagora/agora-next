@@ -9,6 +9,8 @@ import infoPageCard02 from "@/assets/tenant/uniswap_info_2.png";
 import infoPageCard03 from "@/assets/tenant/uniswap_info_3.png";
 import infoPageCard04 from "@/assets/tenant/uniswap_info_4.png";
 import infoPageHero from "@/assets/tenant/uniswap_info_hero.png";
+import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 export const uniswapTenantUIConfig = new TenantUI({
   title: "Uniswap Agora",
@@ -268,7 +270,51 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "proposal-lifecycle",
-      enabled: false,
+      enabled: true,
+      config: {
+        stages: [
+          {
+            stage: PrismaProposalStage.DRAFTING,
+            order: 0,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.AWAITING_SUBMISSION,
+            order: 1,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.PENDING,
+            order: 2,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.QUEUED,
+            order: 3,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.EXECUTED,
+            order: 4,
+            isPreSubmission: false,
+          },
+        ],
+        proposalTypes: [
+          {
+            type: ProposalType?.BASIC,
+            prodAddress: null,
+            testnetAddress: null,
+          },
+        ],
+        copy: {
+          helperText: `
+  ## Proposal checklist
+
+  **1. Create your proposal**
+  `.trim(),
+        },
+        gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
+      },
     },
   ],
 });
