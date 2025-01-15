@@ -7,17 +7,14 @@ import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { PaginatedResult } from "@/app/lib/pagination";
-import { Vote } from "@/app/api/common/votes/vote";
 import ProposalVotesFilter from "./ProposalVotesFilter";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 
 const ProposalVotesCard = ({
   proposal,
-  proposalVotes,
   nonVoters,
 }: {
   proposal: Proposal;
-  proposalVotes: PaginatedResult<Vote[]>;
   nonVoters: PaginatedResult<any[]>; // TODO: add better types
 }) => {
   const [isClicked, setIsClicked] = useState(false);
@@ -45,10 +42,7 @@ const ProposalVotesCard = ({
         </button>
         <div className="flex flex-col gap-4">
           <div className="font-semibold px-4 text-primary">Proposal votes</div>
-          <ProposalVotesSummary
-            votes={proposalVotes.data}
-            proposal={proposal}
-          />
+          <ProposalVotesSummary proposal={proposal} />
           <div className="px-4">
             <ProposalVotesFilter
               initialSelection={showVoters ? "Voters" : "Hasn't voted"}

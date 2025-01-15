@@ -11,18 +11,26 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import ProposalVotesSummaryDetails from "../ProposalVotesSummaryDetails/ProposalVotesSummaryDetails";
-import { Vote } from "@/app/api/common/votes/vote";
+import { useProposalVotes } from "@/hooks/useProposalVotes";
 
 interface Props {
   proposal: Proposal;
-  votes: Vote[];
 }
 
-export default function ProposalVotesSummary({ proposal, votes }: Props) {
+export default function ProposalVotesSummary({ proposal }: Props) {
   const [showDetails, setShowDetails] = useState(false);
 
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
+
+  const { data: fetchedVotes, isFetched } = useProposalVotes({
+    proposalId: proposal.id,
+    limit: 250,
+    offset: 0,
+    enabled: true,
+  });
+
+  const hasVotes = fetchedVotes && isFetched;
 
   return (
     <HoverCard
@@ -42,7 +50,10 @@ export default function ProposalVotesSummary({ proposal, votes }: Props) {
                 AGAINST <TokenAmountDisplay amount={results.against} />
               </div>
             </div>
-            <ProposalVotesBar proposal={proposal} votes={votes} />
+            {hasVotes && (
+              <ProposalVotesBar proposal={proposal} votes={fetchedVotes.data} />
+            )}
+
             <div className="flex flex-col font-medium">
               <div className="flex flex-row text-secondary pb-2 justify-between">
                 <>
@@ -77,10 +88,21 @@ export default function ProposalVotesSummary({ proposal, votes }: Props) {
             side="top"
             align={"start"}
           >
-            <ProposalVotesSummaryDetails proposal={proposal} votes={votes} />
+            {hasVotes ? (
+              <ProposalVotesSummaryDetails
+                proposal={proposal}
+                votes={fetchedVotes?.data}
+              />
+            ) : (
+              <LoadingState />
+            )}
           </HoverCardContent>
         </HoverCardTrigger>
       </div>
     </HoverCard>
   );
 }
+
+const LoadingState = () => {
+  return <div className="text-secondary text-xs">Loading</div>;
+};

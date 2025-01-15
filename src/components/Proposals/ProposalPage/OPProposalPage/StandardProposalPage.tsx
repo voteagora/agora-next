@@ -12,13 +12,7 @@ export default async function StandardProposalPage({
 }: {
   proposal: Proposal;
 }) {
-  const [proposalVotes, nonVoters] = await Promise.all([
-    fetchProposalVotes(proposal.id, {
-      limit: 250,
-      offset: 0,
-    }),
-    fetchVotersWhoHaveNotVotedForProposal(proposal.id),
-  ]);
+  const nonVoters = await fetchVotersWhoHaveNotVotedForProposal(proposal.id);
 
   return (
     <div className="flex flex-col">
@@ -26,11 +20,7 @@ export default async function StandardProposalPage({
       <div className="flex gap-16 justify-between items-start max-w-[76rem] flex-col sm:flex-row sm:items-start sm:justify-between">
         <ProposalDescription proposal={proposal} />
         <div>
-          <ProposalVotesCard
-            proposal={proposal}
-            proposalVotes={proposalVotes}
-            nonVoters={nonVoters}
-          />
+          <ProposalVotesCard proposal={proposal} nonVoters={nonVoters} />
         </div>
       </div>
     </div>
