@@ -12,11 +12,13 @@ export default async function StandardProposalPage({
 }: {
   proposal: Proposal;
 }) {
-  const proposalVotes = await fetchProposalVotes(proposal.id, {
-    limit: 250,
-    offset: 0,
-  });
-  const nonVoters = await fetchVotersWhoHaveNotVotedForProposal(proposal.id);
+  const [proposalVotes, nonVoters] = await Promise.all([
+    fetchProposalVotes(proposal.id, {
+      limit: 250,
+      offset: 0,
+    }),
+    fetchVotersWhoHaveNotVotedForProposal(proposal.id),
+  ]);
 
   return (
     <div className="flex flex-col">

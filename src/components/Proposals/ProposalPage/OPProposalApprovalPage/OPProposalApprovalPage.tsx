@@ -49,11 +49,13 @@ export default async function OPProposalApprovalPage({
 }: {
   proposal: Proposal;
 }) {
-  const proposalVotes = await fetchProposalVotes(proposal.id, {
-    limit: 250,
-    offset: 0,
-  });
-  const nonVoters = await fetchVotersWhoHaveNotVotedForProposal(proposal.id);
+  const [proposalVotes, nonVoters] = await Promise.all([
+    fetchProposalVotes(proposal.id, {
+      limit: 250,
+      offset: 0,
+    }),
+    fetchVotersWhoHaveNotVotedForProposal(proposal.id),
+  ]);
 
   return (
     // 2 Colum Layout: Description on left w/ transactions and Votes / voting on the right
