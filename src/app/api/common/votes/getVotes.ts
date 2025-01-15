@@ -205,26 +205,29 @@ async function getVotersWhoHaveNotVotedForProposal({
 
   const queryFunction = (skip: number, take: number) => {
     const notVotedQuery = `
-    SELECT
-      del.*,
-      ds.twitter,
-      ds.discord,
-      ds.warpcast
-    FROM ${namespace + ".delegates"} del
-    LEFT JOIN agora.delegate_statements ds
-      ON del.delegate = ds.address
-      AND ds.dao_slug = '${slug}'
-    WHERE del.delegate NOT IN (
-      SELECT voter FROM ${namespace + ".votes"} WHERE proposal_id = $1
-    )
-      AND del.contract = $2
-      ORDER BY del.voting_power DESC
-  `;
+          with has_voted as (
+              SELECT voter FROM ${namespace}.vote_cast_events WHERE proposal_id = $1 and contract = $2
+              UNION ALL
+              SELECT voter FROM ${namespace}.vote_cast_with_params_events WHERE proposal_id = $1 and contract = $2
+            ),
+            relevant_delegates as (
+              SELECT * FROM ${namespace}.delegates where contract = $2
+            ),
+            delegates_who_havent_votes as (
+              SELECT * FROM relevant_delegates d left join has_voted v on d.delegate = v.voter where v.voter is null
+            )
+            select del.*,
+                  ds.twitter,
+                ds.discord,
+                ds.warpcast
+            from delegates_who_havent_votes del LEFT JOIN agora.delegate_statements ds on 
+              del.delegate = ds.address
+              AND ds.dao_slug = 'OP'
+            ORDER BY del.voting_power DESC
+            OFFSET $3 LIMIT $4;`;
 
     return prisma.$queryRawUnsafe<VotePayload[]>(
-      `${notVotedQuery}
-        OFFSET $3
-        LIMIT $4;`,
+      notVotedQuery,
       proposalId,
       contracts.token.address.toLowerCase(),
       skip,
