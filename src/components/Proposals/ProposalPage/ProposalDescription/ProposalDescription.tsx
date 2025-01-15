@@ -59,7 +59,7 @@ export default function ProposalDescription({
   return (
     <div className={`flex flex-col gap-4 ${styles.proposal_description}`}>
       <ProposalTitle title={shortTitle} proposal={proposal} />
-      <ProposalChart proposal={proposal} proposalVotes={proposalVotes} />
+      <ProposalChart proposal={proposal} />
 
       <div className="flex flex-col gap-2">
         {/* Right now I'm only sure this better decoded component works for standard proposals */}
