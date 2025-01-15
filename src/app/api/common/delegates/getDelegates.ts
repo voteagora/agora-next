@@ -577,6 +577,7 @@ async function getVoterStats(
         SELECT COUNT(*) as count
         FROM ${namespace}.proposals_v2
         WHERE contract = $2
+        AND cancelled_block IS NULL
     )
     SELECT
         v.voter,
