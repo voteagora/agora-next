@@ -101,10 +101,7 @@ export default function ApprovalVotesPanel({
                 proposalId={proposal.id}
               />
             ) : (
-              <ProposalNonVoterList
-                proposal={proposal}
-                initialNonVoters={nonVoters}
-              />
+              <ProposalNonVoterList proposal={proposal} />
             )}
           </>
         )}
