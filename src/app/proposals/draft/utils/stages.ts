@@ -107,6 +107,10 @@ export const getProposalTypeAddress = (
     );
   }
 
+  if (type === ProposalType.BASIC) {
+    return ("0x" + "0".repeat(40)) as `0x${string}`;
+  }
+
   const proposalTypes = (plmToggle.config as PLMConfig).proposalTypes;
   const proposalType = proposalTypes.find((pt) => pt?.type === type);
 
