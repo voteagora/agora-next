@@ -60,10 +60,7 @@ const ProposalVotesCard = ({
         </div>
 
         {showVoters ? (
-          <ProposalVotesList
-            initialProposalVotes={proposalVotes}
-            proposalId={proposal.id}
-          />
+          <ProposalVotesList proposalId={proposal.id} />
         ) : (
           <ProposalNonVoterList
             proposal={proposal}

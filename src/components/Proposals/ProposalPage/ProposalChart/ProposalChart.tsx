@@ -14,7 +14,7 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
 
   const { data: fetchedVotes, isFetched } = useProposalVotes({
     proposalId: proposal.id,
-    limit: 500,
+    limit: 250,
     offset: 0,
     enabled: showChart,
   });
