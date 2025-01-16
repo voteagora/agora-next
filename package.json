@@ -62,6 +62,7 @@
     "class-variance-authority": "^0.6.1",
     "clsx": "^1.2.1",
     "connectkit": "^1.8.2",
+    "contentful": "^11.4.3",
     "csstype": "^3.0.10",
     "date-fns": "^2.30.0",
     "encoding": "^0.1.13",
