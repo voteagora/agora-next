@@ -64,8 +64,7 @@ async function getVotesForDelegateForAddress({
             SUM(weight::numeric) as weight,
             STRING_AGG(distinct reason, '\n --------- \n') as reason,
             MAX(block_number) as block_number,
-            params,
-            contract
+            params
           FROM (
             SELECT
               *
@@ -77,7 +76,7 @@ async function getVotesForDelegateForAddress({
               FROM ${namespace + ".vote_cast_with_params_events"}
               WHERE voter = $1 AND contract = $2
           ) t
-          GROUP BY 2,3,4,8,9
+          GROUP BY 2,3,4,8
           ) av
           LEFT JOIN LATERAL (
             SELECT
@@ -88,7 +87,7 @@ async function getVotesForDelegateForAddress({
             FROM
               ${namespace + ".proposals_v2"} proposals
             WHERE
-              proposals.proposal_id = av.proposal_id AND proposals.contract = av.contract) p ON TRUE
+              proposals.proposal_id = av.proposal_id AND proposals.contract = $2) p ON TRUE
         ) q
         ORDER BY block_number DESC
         OFFSET $3
@@ -290,8 +289,7 @@ async function getVotesForProposal({
           SUM(weight::numeric) as weight,
           STRING_AGG(distinct reason, '\n --------- \n') as reason,
           MAX(block_number) as block_number,
-          params,
-          contract
+          params
         FROM (
           SELECT
             *
@@ -303,7 +301,7 @@ async function getVotesForProposal({
           FROM ${namespace + ".vote_cast_with_params_events"}
           WHERE proposal_id = $1 AND contract = $2
         ) t
-        GROUP BY 2,3,4,8,9
+        GROUP BY 2,3,4,8
         ) av
         LEFT JOIN LATERAL (
           SELECT
@@ -312,7 +310,7 @@ async function getVotesForProposal({
             proposals.proposal_data,
             proposals.proposal_type::config.proposal_type AS proposal_type
           FROM ${namespace + ".proposals_v2"} proposals
-          WHERE proposals.proposal_id = $1 AND proposals.contract = av.contract) p ON TRUE
+          WHERE proposals.proposal_id = $1 AND proposals.contract = $2) p ON TRUE
       ) q
       ORDER BY ${sort} DESC
       OFFSET $3
