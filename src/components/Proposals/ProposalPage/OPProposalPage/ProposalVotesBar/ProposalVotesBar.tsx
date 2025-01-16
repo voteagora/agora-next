@@ -59,7 +59,7 @@ export default function ProposalVotesBar({ proposal, votes }: Props) {
                     <div
                       key={`${support}-${idx}`} // use a combination of support and idx as a unique key
                       style={{ flex: `${vote.weight} 1 0%` }}
-                      className={`min-w-[1px] ${support === "FOR" ? "bg-positive" : support === "AGAINST" ? "bg-negative" : "bg-neutral"}`}
+                      className={`min-w-[1px] ${support === "FOR" ? "bg-positive" : support === "AGAINST" ? "bg-negative" : "bg-tertiary"}`}
                     ></div>
                   ))}
                 </div>
