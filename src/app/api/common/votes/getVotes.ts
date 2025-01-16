@@ -68,12 +68,12 @@ async function getVotesForDelegateForAddress({
           FROM (
             SELECT
               *
-              FROM ${namespace + ".vote_cast_events"}
+              FROM ${namespace}.vote_cast_events
               WHERE voter = $1 AND contract = $2
             UNION ALL
               SELECT
                 *
-              FROM ${namespace + ".vote_cast_with_params_events"}
+              FROM ${namespace}.vote_cast_with_params_events
               WHERE voter = $1 AND contract = $2
           ) t
           GROUP BY 2,3,4,8
@@ -85,7 +85,7 @@ async function getVotesForDelegateForAddress({
               proposals.proposal_data,
               proposals.proposal_type::config.proposal_type AS proposal_type
             FROM
-              ${namespace + ".proposals_v2"} proposals
+              ${namespace}.proposals_v2 proposals
             WHERE
               proposals.proposal_id = av.proposal_id AND proposals.contract = $2) p ON TRUE
         ) q
@@ -293,12 +293,12 @@ async function getVotesForProposal({
         FROM (
           SELECT
             *
-          FROM ${namespace + ".vote_cast_events"}
+          FROM ${namespace}.vote_cast_events
           WHERE proposal_id = $1 AND contract = $2
           UNION ALL
           SELECT
             *
-          FROM ${namespace + ".vote_cast_with_params_events"}
+          FROM ${namespace}.vote_cast_with_params_events
           WHERE proposal_id = $1 AND contract = $2
         ) t
         GROUP BY 2,3,4,8
@@ -309,7 +309,7 @@ async function getVotesForProposal({
             proposals.description,
             proposals.proposal_data,
             proposals.proposal_type::config.proposal_type AS proposal_type
-          FROM ${namespace + ".proposals_v2"} proposals
+          FROM ${namespace}.proposals_v2 proposals
           WHERE proposals.proposal_id = $1 AND proposals.contract = $2) p ON TRUE
       ) q
       ORDER BY ${sort} DESC
