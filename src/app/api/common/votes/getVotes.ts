@@ -206,9 +206,9 @@ async function getVotersWhoHaveNotVotedForProposal({
   const queryFunction = (skip: number, take: number) => {
     const notVotedQuery = `
           with has_voted as (
-              SELECT voter FROM ${namespace}.vote_cast_events WHERE proposal_id = $1 and contract = $2
+              SELECT voter FROM ${namespace}.vote_cast_events WHERE proposal_id = $1 and contract = $3
               UNION ALL
-              SELECT voter FROM ${namespace}.vote_cast_with_params_events WHERE proposal_id = $1 and contract = $2
+              SELECT voter FROM ${namespace}.vote_cast_with_params_events WHERE proposal_id = $1 and contract = $3
             ),
             relevant_delegates as (
               SELECT * FROM ${namespace}.delegates where contract = $2
@@ -224,12 +224,13 @@ async function getVotersWhoHaveNotVotedForProposal({
               del.delegate = ds.address
               AND ds.dao_slug = 'OP'
             ORDER BY del.voting_power DESC
-            OFFSET $3 LIMIT $4;`;
+            OFFSET $4 LIMIT $5;`;
 
     return prisma.$queryRawUnsafe<VotePayload[]>(
       notVotedQuery,
       proposalId,
       contracts.token.address.toLowerCase(),
+      contracts.governor.address.toLowerCase(),
       skip,
       take
     );
