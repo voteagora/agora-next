@@ -1,11 +1,10 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { type RetroPGFProject } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { capitalizeFirstLetter, cn } from "@/lib/utils";
 import Image from "next/image";
 import projectPlaceholder from "@/icons/projectPlaceholder.svg";
-import HumanAddress from "@/components/shared/HumanAddress";
-import { capitalizeFirstLetter } from "@/lib/utils";
+import ENSName from "@/components/shared/ENSName";
 
 function extractWebsiteName(urlString: string): string {
   try {
@@ -78,7 +77,7 @@ export default function RetroPGFApplicationBanner({
                     {capitalizeFirstLetter(applicantType)}
                   </p>
                   <div className="bg-wash py-0 px-3 rounded-[24px]">
-                    <HumanAddress address={applicant.address.address} />
+                    <ENSName address={applicant.address.address} />
                   </div>
                   <div className="bg-wash py-0 px-3 rounded-[24px]">
                     <a href={websiteUrl} rel="noreferrer" target="_blank">

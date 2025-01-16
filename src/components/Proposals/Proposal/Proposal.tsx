@@ -8,10 +8,10 @@ import OPOptimisticProposalStatus from "./OPOptimisticProposalStatus";
 import SnapshotProposalStatus from "./SnapshotProposalStatus";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import Tenant from "@/lib/tenant/tenant";
-import HumanAddress from "@/components/shared/HumanAddress";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { type Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData } from "@/lib/proposalUtils";
+import ENSName from "@/components/shared/ENSName";
 
 export default function Proposal({
   proposal,
@@ -55,7 +55,7 @@ export default function Proposal({
                     `by The ${ui.organization?.title}`
                   ) : (
                     <>
-                      by <HumanAddress address={proposal.proposer} />{" "}
+                      by <ENSName address={proposal.proposer} />{" "}
                     </>
                   )}
                 </span>

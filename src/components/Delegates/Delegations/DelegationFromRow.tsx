@@ -1,13 +1,12 @@
 "use client";
 
 import { Delegation } from "@/app/api/common/delegations/delegation";
-import HumanAddress from "@/components/shared/HumanAddress";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { TokenAmountDisplay } from "@/lib/utils";
+import { getBlockScanUrl, TokenAmountDisplay } from "@/lib/utils";
 import { format } from "date-fns";
 import Link from "next/link";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
-import { getBlockScanUrl } from "@/lib/utils";
+import ENSName from "@/components/shared/ENSName";
 
 export default function DelegationFromRow({
   delegation,
@@ -28,7 +27,7 @@ export default function DelegationFromRow({
           href={`/delegates/${delegation.from}`}
           title={`Address ${delegation.from}`}
         >
-          <HumanAddress address={delegation.from} />
+          <ENSName address={delegation.from} />
         </Link>
       </TableCell>
       <TableCell>
