@@ -5,13 +5,18 @@ import Tenant from "@/lib/tenant/tenant";
 export const getContentfulClient = () => {
   const { ui } = Tenant.current();
 
-  if (!ui.contentful?.spaceId || !ui.contentful?.accessToken) {
-    throw new Error("Contentful configuration missing for tenant");
+  if (!ui.contentful?.spaceId) {
+    throw new Error("Contentful space ID missing for tenant");
+  }
+
+  const accessToken = process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN;
+  if (!accessToken) {
+    throw new Error("Contentful access token is missing");
   }
 
   return createClient({
     space: ui.contentful.spaceId,
-    accessToken: ui.contentful.accessToken,
-    environment: ui.contentful.environment || "master", // default in Contentful
+    accessToken: accessToken,
+    environment: process.env.CONTENTFUL_ENVIRONMENT || "master",
   });
 };

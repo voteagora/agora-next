@@ -99,6 +99,7 @@ type TenantUIParams = {
   links?: UILink[];
   logo: string;
   organization?: UIOrganization;
+  contentful?: ContentfulConfig;
   pages?: UIPage[];
   smartAccountConfig?: UISmartAccountConfig;
   title: string;
@@ -123,6 +124,15 @@ type TenantUIParams = {
     "shortcut-icon"?: string;
   };
 };
+
+export interface ContentfulConfig {
+  spaceId: string;
+  contentMapping: {
+    pages?: {
+      [key: string]: string;
+    };
+  };
+}
 
 export class TenantUI {
   private _assets: UIAssets;
@@ -161,6 +171,7 @@ export class TenantUI {
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
 
   private _smartAccountConfig?: UISmartAccountConfig;
+  private _contentful?: ContentfulConfig;
 
   constructor({
     assets,
@@ -178,6 +189,7 @@ export class TenantUI {
     smartAccountConfig,
     title,
     toggles,
+    contentful,
   }: TenantUIParams) {
     this._assets = assets;
     this._customization = customization;
@@ -194,6 +206,7 @@ export class TenantUI {
     this._smartAccountConfig = smartAccountConfig;
     this._title = title;
     this._toggles = toggles;
+    this._contentful = contentful;
   }
 
   public get assets(): UIAssets {
@@ -293,5 +306,9 @@ export class TenantUI {
 
   public get smartAccountConfig(): UISmartAccountConfig | undefined {
     return this._smartAccountConfig;
+  }
+
+  public get contentful(): ContentfulConfig | undefined {
+    return this._contentful;
   }
 }
