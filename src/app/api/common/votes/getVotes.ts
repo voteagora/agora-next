@@ -18,6 +18,7 @@ import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 import { doInSpan } from "@/app/lib/logging";
 import { findVotes } from "@/lib/prismaUtils";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -38,6 +39,14 @@ async function getVotesForDelegateForAddress({
   pagination?: PaginationParams;
 }) {
   const { namespace, contracts } = Tenant.current();
+
+  let eventsViewName;
+  
+  if (namespace == TENANT_NAMESPACES.OPTIMISM) {
+    eventsViewName = 'vote_cast_with_params_events_v2'
+  } else {
+    eventsViewName = 'vote_cast_with_params_events'
+  }
 
   const queryFunction = (skip: number, take: number) => {
     const query = `
@@ -73,7 +82,7 @@ async function getVotesForDelegateForAddress({
             UNION ALL
               SELECT
                 *
-              FROM ${namespace}.vote_cast_with_params_events
+              FROM ${namespace}.${eventsViewName}
               WHERE voter = $1 AND contract = $2
           ) t
           GROUP BY 2,3,4,8
@@ -202,12 +211,21 @@ async function getVotersWhoHaveNotVotedForProposal({
 }) {
   const { namespace, contracts, slug } = Tenant.current();
 
+  let eventsViewName;
+
+  if (namespace == TENANT_NAMESPACES.OPTIMISM) {
+    eventsViewName = 'vote_cast_with_params_events_v2'
+  } else {
+    eventsViewName = 'vote_cast_with_params_events'
+  }
+
   const queryFunction = (skip: number, take: number) => {
     const notVotedQuery = `
           with has_voted as (
               SELECT voter FROM ${namespace}.vote_cast_events WHERE proposal_id = $1 and contract = $3
               UNION ALL
-              SELECT voter FROM ${namespace}.vote_cast_with_params_events WHERE proposal_id = $1 and contract = $3
+              SELECT voter FROM ${namespace}.${eventsViewName} WHERE proposal_id = $1 and contract = $3
+
             ),
             relevant_delegates as (
               SELECT * FROM ${namespace}.delegates where contract = $2
@@ -264,6 +282,14 @@ async function getVotesForProposal({
 }): Promise<PaginatedResult<Vote[]>> {
   const { namespace, contracts } = Tenant.current();
 
+  let eventsViewName;
+
+  if (namespace == TENANT_NAMESPACES.OPTIMISM) {
+    eventsViewName = 'vote_cast_with_params_events_v2'
+  } else {
+    eventsViewName = 'vote_cast_with_params_events'
+  }
+
   const queryFunction = (skip: number, take: number) => {
     const query = `
       SELECT
@@ -286,19 +312,33 @@ async function getVotesForProposal({
           proposal_id,
           voter,
           support,
-          SUM(weight::numeric) as weight,
+          SUM(weight) as weight,
           STRING_AGG(distinct reason, '\n --------- \n') as reason,
           MAX(block_number) as block_number,
           params
         FROM (
           SELECT
-            *
+            transaction_hash,
+            proposal_id,
+            voter,
+            support,
+            weight::numeric,
+            reason,
+            params,
+            block_number
           FROM ${namespace}.vote_cast_events
           WHERE proposal_id = $1 AND contract = $2
           UNION ALL
           SELECT
-            *
-          FROM ${namespace}.vote_cast_with_params_events
+            transaction_hash,
+            proposal_id,
+            voter,
+            support,
+            weight::numeric,
+            reason,
+            params,
+            block_number
+          FROM ${namespace}.${eventsViewName}
           WHERE proposal_id = $1 AND contract = $2
         ) t
         GROUP BY 2,3,4,8
