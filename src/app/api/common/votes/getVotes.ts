@@ -41,11 +41,11 @@ async function getVotesForDelegateForAddress({
   const { namespace, contracts } = Tenant.current();
 
   let eventsViewName;
-  
+
   if (namespace == TENANT_NAMESPACES.OPTIMISM) {
-    eventsViewName = 'vote_cast_with_params_events_v2'
+    eventsViewName = "vote_cast_with_params_events_v2";
   } else {
-    eventsViewName = 'vote_cast_with_params_events'
+    eventsViewName = "vote_cast_with_params_events";
   }
 
   const queryFunction = (skip: number, take: number) => {
@@ -214,9 +214,9 @@ async function getVotersWhoHaveNotVotedForProposal({
   let eventsViewName;
 
   if (namespace == TENANT_NAMESPACES.OPTIMISM) {
-    eventsViewName = 'vote_cast_with_params_events_v2'
+    eventsViewName = "vote_cast_with_params_events_v2";
   } else {
-    eventsViewName = 'vote_cast_with_params_events'
+    eventsViewName = "vote_cast_with_params_events";
   }
 
   const queryFunction = (skip: number, take: number) => {
@@ -285,9 +285,9 @@ async function getVotesForProposal({
   let eventsViewName;
 
   if (namespace == TENANT_NAMESPACES.OPTIMISM) {
-    eventsViewName = 'vote_cast_with_params_events_v2'
+    eventsViewName = "vote_cast_with_params_events_v2";
   } else {
-    eventsViewName = 'vote_cast_with_params_events'
+    eventsViewName = "vote_cast_with_params_events";
   }
 
   const queryFunction = (skip: number, take: number) => {
