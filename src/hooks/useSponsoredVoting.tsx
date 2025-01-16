@@ -53,7 +53,6 @@ const useSponsoredVoting = ({
       try {
         const signature = await signTypedDataAsync({
           domain: {
-            ...gasRelayConfig,
             name,
             chainId: contracts.governor.chain.id,
             verifyingContract: contracts.governor.address as `0x${string}`,
