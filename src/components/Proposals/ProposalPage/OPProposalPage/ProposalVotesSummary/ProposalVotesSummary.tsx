@@ -30,8 +30,6 @@ export default function ProposalVotesSummary({ proposal }: Props) {
     proposalId: proposal.id,
   });
 
-  const hasVotes = fetchedVotes && isFetched;
-
   return (
     <HoverCard
       open={showDetails}
@@ -50,9 +48,8 @@ export default function ProposalVotesSummary({ proposal }: Props) {
                 AGAINST <TokenAmountDisplay amount={results.against} />
               </div>
             </div>
-            {hasVotes && (
-              <ProposalVotesBar proposal={proposal} votes={fetchedVotes.data} />
-            )}
+
+            <ProposalVotesBar proposal={proposal} votes={fetchedVotes?.data} />
 
             <div className="flex flex-col font-medium">
               <div className="flex flex-row text-secondary pb-2 justify-between">

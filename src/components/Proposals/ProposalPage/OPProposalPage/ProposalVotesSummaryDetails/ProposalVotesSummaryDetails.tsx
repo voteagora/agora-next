@@ -81,7 +81,7 @@ export default function ProposalVotesSummaryDetails({
 
   return (
     <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[317px] sm:min-w-[317px] bg-wash">
-      {votes && <ProposalVotesBar proposal={proposal} votes={votes} />}
+      <ProposalVotesBar proposal={proposal} votes={votes} />
 
       <div className="flex flex-col gap-2 w-full mt-4">
         <div className="flex justify-between text-positive">
