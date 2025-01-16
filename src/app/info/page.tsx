@@ -1,6 +1,6 @@
 import React from "react";
 import InfoAbout from "@/app/info/components/InfoAbout";
-import { InfoHero } from "@/app/info/components/InfoHero";
+import { InfoHero, type InfoHeroContent } from "@/app/info/components/InfoHero";
 
 import { ChartTreasury } from "@/app/info/components/ChartTreasury";
 import GovernorSettings from "@/app/info/components/GovernorSettings";
@@ -13,6 +13,8 @@ import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/getProposal
 import { apiFetchMetricTS } from "@/app/api/analytics/metric/[metric_id]/[frequency]/getMetricsTS";
 import Hero from "@/components/Hero/Hero";
 import { MetricTimeSeriesValue } from "@/lib/types";
+import { getContentfulClient } from "@/lib/contentful/client";
+import { Entry } from "contentful";
 
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
@@ -53,8 +55,23 @@ export default async function Page() {
     );
   }
 
-  const hasGovernanceCharts =
-    ui.toggle("info/governance-charts")?.enabled === true;
+  // if derive and we've got a spaceId in Contentful set
+  if (namespace === TENANT_NAMESPACES.DERIVE && ui.contentful?.spaceId) {
+    const client = getContentfulClient();
+    const contentfulMapping = ui.contentful?.contentMapping.pages ?? {};
+    //We have compontents in components so we need a 2 depth here
+    const content = await client.getEntries({
+      "sys.id": contentfulMapping.infoPage!,
+      include: 2,
+    });
+
+    return (
+      <div className="flex flex-col font-inter">
+        <InfoHero contentfulData={content.items[0] as Entry<InfoHeroContent>} />
+        <InfoAbout />
+      </div>
+    );
+  }
 
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
     const treasuryData = await apiFetchTreasuryBalanceTS(
@@ -75,7 +92,7 @@ export default async function Page() {
             }}
           />
         )}
-        {hasGovernanceCharts && (
+        {ui.toggle("info/governance-charts")?.enabled === true && (
           <GovernanceCharts
             getDelegates={async () => {
               "use server";

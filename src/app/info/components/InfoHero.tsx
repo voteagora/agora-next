@@ -5,10 +5,60 @@ import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
+import { Entry } from "contentful";
 
-export const InfoHero = () => {
+export type InfoHeroContent = {
+  contentTypeId: string;
+  fields: {
+    header: string;
+    subtext: string;
+    cards: {
+      sys: {
+        type: "Link";
+        linkType: "Entry";
+        id: string;
+      };
+    }[];
+  };
+};
+
+export type InfoHeroProps = {
+  contentfulData?: Entry<InfoHeroContent>;
+};
+
+interface ContentfulCard {
+  fields: {
+    title: string;
+    url: string;
+    image: {
+      fields: {
+        file: {
+          url: string;
+        };
+      };
+    };
+  };
+}
+
+export const InfoHero = ({ contentfulData }: InfoHeroProps) => {
   const { ui, namespace } = Tenant.current();
   const page = ui!.page("info");
+
+  // Get cards from Contentful or fallback
+  const cards = Array.isArray(contentfulData?.fields?.cards)
+    ? contentfulData.fields.cards.map((card) => {
+        console.log("Card fields:", card.fields);
+        return {
+          title: card.fields.label,
+          url: card.fields.href,
+          image: `https:${card.fields.cardImage.fields.file.url}`,
+        };
+      })
+    : page?.links || [];
+
+  const title = (contentfulData?.fields?.header || page!.title) as string;
+  const description = (contentfulData?.fields?.subtext ||
+    page!.description) as string;
 
   const rotationClasses = [
     "sm:-rotate-2",
@@ -21,10 +71,10 @@ export const InfoHero = () => {
     <div className="flex flex-col sm:flex-row mt-12 gap-y-6 sm:gap-y-0 gap-x-0 sm:gap-x-6 flex-wrap sm:flex-nowrap">
       <div className="flex flex-col w-full sm:w-2/5">
         <h1 className="text-4xl leading-[36px] sm:text-[40px] sm:leading-[40px] font-black text-primary">
-          {page!.title}
+          {title}
         </h1>
         <p className="text-base text-secondary mt-4">
-          {page!.description}
+          {description}
           {namespace === TENANT_NAMESPACES.SCROLL && (
             <div className="flex flex-row gap-2 mt-4">
               <Link href={"https://claim.scroll.io"}>
@@ -43,13 +93,13 @@ export const InfoHero = () => {
       </div>
 
       <div className="grid grid-cols-2 sm:flex sm:flex-row self-start justify-between sm:justify-end w-full sm:w-3/5 gap-4">
-        {page!.links!.map((link, idx) => (
+        {cards.map((card, idx) => (
           <Card
             className={rotationClasses[idx % rotationClasses.length]}
-            image={link.image || ""}
+            image={card.image || ""}
             key={`card-${idx}`}
-            link={link.url}
-            linkText={link.title}
+            link={card.url}
+            linkText={card.title}
           />
         ))}
       </div>
