@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { useAccount, useDisconnect } from "wagmi";
 import { AnimatePresence, motion } from "framer-motion";
@@ -7,7 +7,6 @@ import { pluralizeAddresses, shortAddress } from "@/lib/utils";
 import Link from "next/link";
 import TokenAmountDisplay from "../shared/TokenAmountDisplay";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
-import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import Tenant from "@/lib/tenant/tenant";
 import CreateProposalDraftButton from "../Proposals/ProposalsList/CreateProposalDraftButton";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -21,66 +20,61 @@ import {
 } from "@/components/ui/tooltip";
 import { rgbStringToHex } from "@/app/lib/utils/color";
 import { PowerIcon } from "@/icons/PowerIcon";
-import { balanceOf } from "@/app/delegates/actions";
 import ENSName from "@/components/shared/ENSName";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { useDelegate } from "@/hooks/useDelegate";
 
 type Props = {
   ensName: string | undefined;
 };
-
-const ValueWrapper = ({
-  children,
-  isLoading,
-}: {
-  children: ReactNode;
-  isLoading: boolean;
-}) =>
-  isLoading ? (
-    <div className="animate-pulse bg-primary/30 h-5 w-[90px] rounded-2xl"></div>
-  ) : (
-    <div className="text-primary">{children}</div>
-  );
 
 export const DesktopProfileDropDown = ({ ensName }: Props) => {
   const { namespace, ui } = Tenant.current();
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
 
-  const { isLoading, delegate, balance } = useConnectedDelegate();
-  const hasStatement = !!delegate?.statement;
-  const canCreateDelegateStatement = ui.toggle("delegates/edit")?.enabled;
+  // Don't hydrate the component until the user clicks on the profile dropdown
+  const [shouldHydrate, setShouldHydrate] = useState(false);
+  const isSmartAccountEnabled = ui?.smartAccountConfig?.factoryAddress;
 
-  const [scwTokenBalance, setScwTokenBalance] = useState<bigint | null>(null);
-  const { data: scwAddress, enabled: isScwEnabled } = useSmartAccountAddress({
-    owner: address,
+  // The hook is called only when the component should be hydrated
+  // Once the delegate is loaded
+
+  // - if smart account is enabled
+  // --- load smart account address
+  // --- load balance of the smart account wallet
+
+  // - if smart account is not enabled
+  // --- load balance of the EOA
+  const { data: delegate, isFetching } = useDelegate({
+    address: shouldHydrate ? address : undefined,
   });
 
-  const walletBalance = () => {
-    return isScwEnabled ? scwTokenBalance || BigInt(0) : balance || BigInt(0);
-  };
+  // Load SCW address if delegate is loaded and smart accounts enabled
+  const { data: scwAddress } = useSmartAccountAddress({
+    owner: delegate ? (isSmartAccountEnabled ? address : undefined) : undefined,
+  });
 
-  const fetchScwBalance = async () => {
-    if (scwAddress) {
-      try {
-        const scwBalance = await balanceOf(scwAddress);
-        setScwTokenBalance(BigInt(scwBalance));
-      } catch (error) {
-        setScwTokenBalance(BigInt(0));
-      }
-    }
-  };
+  // Load EOA token balance if delegate is loaded and scw not enabled
+  const { data: tokenBalance } = useTokenBalance(
+    delegate ? (isSmartAccountEnabled ? scwAddress : address) : undefined
+  );
 
-  useEffect(() => {
-    if (isScwEnabled && scwAddress) {
-      fetchScwBalance();
-    }
-  }, [isScwEnabled, scwAddress]);
+  const hasStatement = !!delegate?.statement;
+  const canCreateDelegateStatement = ui?.toggle("delegates/edit")?.enabled;
 
   return (
     <Popover className="relative cursor-auto">
       {({ open }) => (
         <>
-          <Popover.Button className="flex outline-none">
+          <Popover.Button
+            onClick={() => {
+              if (!shouldHydrate) {
+                setShouldHydrate(true);
+              }
+            }}
+            className="flex outline-none"
+          >
             <div className="text-primary flex items-center gap-3">
               <div className="w-6 h-6 shadow-newDefault rounded-full">
                 <ENSAvatar ensName={ensName} />
@@ -117,7 +111,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                       <div className="flex flex-row items-center">
                         <div
                           className={`relative aspect-square mr-4 ${
-                            isLoading && "animate-pulse"
+                            isFetching && "animate-pulse"
                           }`}
                         >
                           <ENSAvatar
@@ -147,7 +141,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                             className="bg-wash border border-line p-0.5 rounded-sm"
                           >
                             <PowerIcon
-                              fill={rgbStringToHex(ui.customization?.primary)}
+                              fill={rgbStringToHex(ui?.customization?.primary)}
                               className={"cursor-pointer"}
                             />
                           </div>
@@ -165,7 +159,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                                 <CubeIcon
                                   className="w-5 h-5"
                                   fill={rgbStringToHex(
-                                    ui.customization?.primary
+                                    ui?.customization?.primary
                                   )}
                                 />
                               </div>
@@ -198,16 +192,18 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                     <PanelRow
                       title="My token balance"
                       detail={
-                        <ValueWrapper isLoading={isLoading}>
-                          <TokenAmountDisplay amount={walletBalance()} />
-                        </ValueWrapper>
+                        <RowSkeletonWrapper isLoading={isFetching}>
+                          <TokenAmountDisplay
+                            amount={tokenBalance || BigInt(0)}
+                          />
+                        </RowSkeletonWrapper>
                       }
                     />
 
                     <PanelRow
                       title="Delegated to"
                       detail={
-                        <ValueWrapper isLoading={isLoading}>
+                        <RowSkeletonWrapper isLoading={isFetching}>
                           <Link
                             href={`/delegates/${delegate?.address}`}
                             onClick={() => close()}
@@ -215,32 +211,32 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                           >
                             View more
                           </Link>
-                        </ValueWrapper>
+                        </RowSkeletonWrapper>
                       }
                     />
 
                     <PanelRow
                       title="My voting power"
                       detail={
-                        <ValueWrapper isLoading={isLoading}>
+                        <RowSkeletonWrapper isLoading={isFetching}>
                           <TokenAmountDisplay
                             amount={delegate?.votingPower.total || BigInt(0)}
                           />
-                        </ValueWrapper>
+                        </RowSkeletonWrapper>
                       }
                     />
 
                     <PanelRow
                       title="Delegated from"
                       detail={
-                        <ValueWrapper isLoading={isLoading}>
+                        <RowSkeletonWrapper isLoading={isFetching}>
                           {pluralizeAddresses(
                             Number(delegate?.numOfDelegators || 0)
                           )}
-                        </ValueWrapper>
+                        </RowSkeletonWrapper>
                       }
                     />
-                    {isLoading ? (
+                    {isFetching ? (
                       <div className="animate-pulse bg-primary/30 h-[50px] mt-1 w-full rounded-2xl"></div>
                     ) : (
                       <>
@@ -295,3 +291,16 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
     </Popover>
   );
 };
+
+const RowSkeletonWrapper = ({
+  children,
+  isLoading,
+}: {
+  children: ReactNode;
+  isLoading: boolean;
+}) =>
+  isLoading ? (
+    <div className="animate-pulse bg-tertiary/10 h-5 w-[90px] rounded-2xl"></div>
+  ) : (
+    <div className="text-primary">{children}</div>
+  );
