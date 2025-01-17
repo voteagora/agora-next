@@ -70,18 +70,32 @@ async function getVotesForDelegateForAddress({
             proposal_id,
             voter,
             support,
-            SUM(weight::numeric) as weight,
+            SUM(weight) as weight,
             STRING_AGG(distinct reason, '\n --------- \n') as reason,
             MAX(block_number) as block_number,
             params
           FROM (
             SELECT
-              *
+                transaction_hash,
+                proposal_id,
+                voter,
+                support,
+                weight::numeric,
+                reason,
+                block_number,
+                params
               FROM ${namespace}.vote_cast_events
               WHERE voter = $1 AND contract = $2
             UNION ALL
               SELECT
-                *
+                transaction_hash,
+                proposal_id,
+                voter,
+                support,
+                weight::numeric,
+                reason,
+                block_number,
+                params
               FROM ${namespace}.${eventsViewName}
               WHERE voter = $1 AND contract = $2
           ) t
