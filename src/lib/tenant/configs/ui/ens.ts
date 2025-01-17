@@ -104,7 +104,9 @@ export const ensTenantUIConfig = new TenantUI({
       name: "sponsoredVote",
       enabled: true,
       config: {
-        version: "1",
+        signature: {
+          version: "1",
+        },
         sponsorAddress:
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
             ? "0x7735C385081568e9338aEc70492Debfd2d5c3450"
@@ -116,7 +118,9 @@ export const ensTenantUIConfig = new TenantUI({
       name: "sponsoredDelegate",
       enabled: true,
       config: {
-        version: "1",
+        signature: {
+          version: "1",
+        },
         sponsorAddress:
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
             ? "0x7735C385081568e9338aEc70492Debfd2d5c3450"
