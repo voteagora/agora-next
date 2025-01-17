@@ -18,6 +18,7 @@ import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 import { doInSpan } from "@/app/lib/logging";
 import { findVotes } from "@/lib/prismaUtils";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -38,6 +39,14 @@ async function getVotesForDelegateForAddress({
   pagination?: PaginationParams;
 }) {
   const { namespace, contracts } = Tenant.current();
+
+  let eventsViewName;
+
+  if (namespace == TENANT_NAMESPACES.OPTIMISM) {
+    eventsViewName = "vote_cast_with_params_events_v2";
+  } else {
+    eventsViewName = "vote_cast_with_params_events";
+  }
 
   const queryFunction = (skip: number, take: number) => {
     const query = `
@@ -64,20 +73,19 @@ async function getVotesForDelegateForAddress({
             SUM(weight::numeric) as weight,
             STRING_AGG(distinct reason, '\n --------- \n') as reason,
             MAX(block_number) as block_number,
-            params,
-            contract
+            params
           FROM (
             SELECT
               *
-              FROM ${namespace + ".vote_cast_events"}
+              FROM ${namespace}.vote_cast_events
               WHERE voter = $1 AND contract = $2
             UNION ALL
               SELECT
                 *
-              FROM ${namespace + ".vote_cast_with_params_events"}
+              FROM ${namespace}.${eventsViewName}
               WHERE voter = $1 AND contract = $2
           ) t
-          GROUP BY 2,3,4,8,9
+          GROUP BY 2,3,4,8
           ) av
           LEFT JOIN LATERAL (
             SELECT
@@ -86,9 +94,9 @@ async function getVotesForDelegateForAddress({
               proposals.proposal_data,
               proposals.proposal_type::config.proposal_type AS proposal_type
             FROM
-              ${namespace + ".proposals_v2"} proposals
+              ${namespace}.proposals_v2 proposals
             WHERE
-              proposals.proposal_id = av.proposal_id AND proposals.contract = av.contract) p ON TRUE
+              proposals.proposal_id = av.proposal_id AND proposals.contract = $2) p ON TRUE
         ) q
         ORDER BY block_number DESC
         OFFSET $3
@@ -203,30 +211,43 @@ async function getVotersWhoHaveNotVotedForProposal({
 }) {
   const { namespace, contracts, slug } = Tenant.current();
 
+  let eventsViewName;
+
+  if (namespace == TENANT_NAMESPACES.OPTIMISM) {
+    eventsViewName = "vote_cast_with_params_events_v2";
+  } else {
+    eventsViewName = "vote_cast_with_params_events";
+  }
+
   const queryFunction = (skip: number, take: number) => {
     const notVotedQuery = `
-    SELECT
-      del.*,
-      ds.twitter,
-      ds.discord,
-      ds.warpcast
-    FROM ${namespace + ".delegates"} del
-    LEFT JOIN agora.delegate_statements ds
-      ON del.delegate = ds.address
-      AND ds.dao_slug = '${slug}'
-    WHERE del.delegate NOT IN (
-      SELECT voter FROM ${namespace + ".votes"} WHERE proposal_id = $1
-    )
-      AND del.contract = $2
-      ORDER BY del.voting_power DESC
-  `;
+          with has_voted as (
+              SELECT voter FROM ${namespace}.vote_cast_events WHERE proposal_id = $1 and contract = $3
+              UNION ALL
+              SELECT voter FROM ${namespace}.${eventsViewName} WHERE proposal_id = $1 and contract = $3
+
+            ),
+            relevant_delegates as (
+              SELECT * FROM ${namespace}.delegates where contract = $2
+            ),
+            delegates_who_havent_votes as (
+              SELECT * FROM relevant_delegates d left join has_voted v on d.delegate = v.voter where v.voter is null
+            )
+            select del.*,
+                  ds.twitter,
+                ds.discord,
+                ds.warpcast
+            from delegates_who_havent_votes del LEFT JOIN agora.delegate_statements ds on 
+              del.delegate = ds.address
+              AND ds.dao_slug = 'OP'
+            ORDER BY del.voting_power DESC
+            OFFSET $4 LIMIT $5;`;
 
     return prisma.$queryRawUnsafe<VotePayload[]>(
-      `${notVotedQuery}
-        OFFSET $3
-        LIMIT $4;`,
+      notVotedQuery,
       proposalId,
       contracts.token.address.toLowerCase(),
+      contracts.governor.address.toLowerCase(),
       skip,
       take
     );
@@ -261,6 +282,14 @@ async function getVotesForProposal({
 }): Promise<PaginatedResult<Vote[]>> {
   const { namespace, contracts } = Tenant.current();
 
+  let eventsViewName;
+
+  if (namespace == TENANT_NAMESPACES.OPTIMISM) {
+    eventsViewName = "vote_cast_with_params_events_v2";
+  } else {
+    eventsViewName = "vote_cast_with_params_events";
+  }
+
   const queryFunction = (skip: number, take: number) => {
     const query = `
       SELECT
@@ -283,23 +312,36 @@ async function getVotesForProposal({
           proposal_id,
           voter,
           support,
-          SUM(weight::numeric) as weight,
+          SUM(weight) as weight,
           STRING_AGG(distinct reason, '\n --------- \n') as reason,
           MAX(block_number) as block_number,
-          params,
-          contract
+          params
         FROM (
           SELECT
-            *
-          FROM ${namespace + ".vote_cast_events"}
+            transaction_hash,
+            proposal_id,
+            voter,
+            support,
+            weight::numeric,
+            reason,
+            params,
+            block_number
+          FROM ${namespace}.vote_cast_events
           WHERE proposal_id = $1 AND contract = $2
           UNION ALL
           SELECT
-            *
-          FROM ${namespace + ".vote_cast_with_params_events"}
+            transaction_hash,
+            proposal_id,
+            voter,
+            support,
+            weight::numeric,
+            reason,
+            params,
+            block_number
+          FROM ${namespace}.${eventsViewName}
           WHERE proposal_id = $1 AND contract = $2
         ) t
-        GROUP BY 2,3,4,8,9
+        GROUP BY 2,3,4,8
         ) av
         LEFT JOIN LATERAL (
           SELECT
@@ -307,8 +349,8 @@ async function getVotesForProposal({
             proposals.description,
             proposals.proposal_data,
             proposals.proposal_type::config.proposal_type AS proposal_type
-          FROM ${namespace + ".proposals_v2"} proposals
-          WHERE proposals.proposal_id = $1 AND proposals.contract = av.contract) p ON TRUE
+          FROM ${namespace}.proposals_v2 proposals
+          WHERE proposals.proposal_id = $1 AND proposals.contract = $2) p ON TRUE
       ) q
       ORDER BY ${sort} DESC
       OFFSET $3
