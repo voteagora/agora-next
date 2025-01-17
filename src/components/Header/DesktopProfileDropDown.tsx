@@ -6,7 +6,6 @@ import ENSAvatar from "../shared/ENSAvatar";
 import { pluralizeAddresses, shortAddress } from "@/lib/utils";
 import Link from "next/link";
 import TokenAmountDisplay from "../shared/TokenAmountDisplay";
-import HumanAddress from "../shared/HumanAddress";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import Tenant from "@/lib/tenant/tenant";
@@ -23,6 +22,7 @@ import {
 import { rgbStringToHex } from "@/app/lib/utils/color";
 import { PowerIcon } from "@/icons/PowerIcon";
 import { balanceOf } from "@/app/delegates/actions";
+import ENSName from "@/components/shared/ENSName";
 
 type Props = {
   ensName: string | undefined;
@@ -81,12 +81,11 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
       {({ open }) => (
         <>
           <Popover.Button className="flex outline-none">
-            <div className="flex items-center gap-3">
+            <div className="text-primary flex items-center gap-3">
               <div className="w-6 h-6 shadow-newDefault rounded-full">
                 <ENSAvatar ensName={ensName} />
               </div>
-
-              <HumanAddress address={address} />
+              {address && <ENSName address={address} />}
             </div>
           </Popover.Button>
 

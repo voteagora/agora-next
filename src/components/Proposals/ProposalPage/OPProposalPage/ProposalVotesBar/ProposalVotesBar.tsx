@@ -1,9 +1,10 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
+import { Bar } from "recharts";
 
 interface Props {
   proposal: Proposal;
-  votes: Vote[];
+  votes: Vote[] | undefined;
 }
 
 type Support = "FOR" | "ABSTAIN" | "AGAINST";
@@ -15,6 +16,10 @@ export default function ProposalVotesBar({ proposal, votes }: Props) {
     ABSTAIN: [],
     AGAINST: [],
   };
+
+  if (!votes) {
+    return <BarSkeleton />;
+  }
 
   votes.forEach((vote) => {
     voteCounts[vote.support as Support].push(vote);
@@ -38,7 +43,7 @@ export default function ProposalVotesBar({ proposal, votes }: Props) {
                 >
                   <div
                     style={{ flex: `1 1 0%` }}
-                    className={`min-w-[1px] ${support === "FOR" ? "bg-[#41b579]" : support === "AGAINST" ? "bg-[#db5664]" : "bg-[#666666]"}`}
+                    className={`min-w-[1px] ${support === "FOR" ? "bg-positive" : support === "AGAINST" ? "bg-negative" : "bg-tertiary"}`}
                   ></div>
                 </div>
               ))
@@ -54,7 +59,7 @@ export default function ProposalVotesBar({ proposal, votes }: Props) {
                     <div
                       key={`${support}-${idx}`} // use a combination of support and idx as a unique key
                       style={{ flex: `${vote.weight} 1 0%` }}
-                      className={`min-w-[1px] ${support === "FOR" ? "bg-[#41b579]" : support === "AGAINST" ? "bg-[#db5664]" : "bg-[#666666]"}`}
+                      className={`min-w-[1px] ${support === "FOR" ? "bg-positive" : support === "AGAINST" ? "bg-negative" : "bg-tertiary"}`}
                     ></div>
                   ))}
                 </div>
@@ -73,3 +78,11 @@ export default function ProposalVotesBar({ proposal, votes }: Props) {
     </div>
   );
 }
+
+const BarSkeleton = () => {
+  return (
+    <div className="flex animate-pulse">
+      <div className="w-full h-[10px] bg-tertiary/10"></div>
+    </div>
+  );
+};

@@ -6,7 +6,6 @@ import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
   fetchVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
-import { fetchVotersWhoHaveNotVotedForProposal } from "@/app/proposals/actions";
 import { disapprovalThreshold } from "@/lib/constants";
 import { formatNumber } from "@/lib/utils";
 import { formatUnits } from "ethers";
@@ -54,14 +53,7 @@ async function fetchCurrentDelegators(addressOrENSName) {
 }
 
 export default async function OPProposalPage({ proposal }) {
-  const [votableSupply, proposalVotes, nonVoters] = await Promise.all([
-    fetchVotableSupply(),
-    fetchProposalVotes(proposal.id, {
-      limit: 250,
-      offset: 0,
-    }),
-    fetchVotersWhoHaveNotVotedForProposal(proposal.id),
-  ]);
+  const votableSupply = await fetchVotableSupply();
 
   const formattedVotableSupply = Number(
     BigInt(votableSupply) / BigInt(10 ** 18)
@@ -85,10 +77,7 @@ export default async function OPProposalPage({ proposal }) {
     <div className="flex flex-col">
       <ProposalStateAdmin proposal={proposal} />
       <div className="flex gap-16 justify-between items-start max-w-[76rem] flex-col sm:flex-row sm:items-start sm:justify-between">
-        <ProposalDescription
-          proposalVotes={proposalVotes}
-          proposal={proposal}
-        />
+        <ProposalDescription proposal={proposal} />
         <OptimisticProposalVotesCard
           proposal={proposal}
           proposalVotes={proposalVotes}

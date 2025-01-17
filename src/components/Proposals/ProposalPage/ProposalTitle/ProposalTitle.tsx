@@ -1,9 +1,9 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { getBlockScanUrl, getProposalTypeText } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
-import HumanAddress from "@/components/shared/HumanAddress";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import ENSName from "@/components/shared/ENSName";
 
 export default function ProposalTitle({
   title,
@@ -24,7 +24,7 @@ export default function ProposalTitle({
         ) : (
           <>
             &nbsp;
-            <HumanAddress address={proposal.proposer} />{" "}
+            <ENSName address={proposal.proposer} />{" "}
           </>
         )}
         <a

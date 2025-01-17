@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
-import HumanAddress from "@/components/shared/HumanAddress";
+import ENSName from "@/components/shared/ENSName";
 
 type ChartData = {
   address: string;
@@ -67,10 +67,10 @@ const ChartGovernanceTopDelegates = ({ getData }: Props) => {
                 style={{ backgroundColor: primary }}
               />
               <div className="flex flex-col">
-                <h3 className="text-xs font-semibold text-gray-4f">
-                  <HumanAddress address={item.address} />
+                <h3 className="text-xs font-semibold text-secondary">
+                  <ENSName address={item.address} />
                 </h3>
-                <p className="text-xs font-medium text-gray-4f">
+                <p className="text-xs font-medium text-secondary">
                   {Number(item.weight).toFixed(2)}%
                 </p>
               </div>

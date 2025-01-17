@@ -6,20 +6,10 @@ import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVote
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { PaginatedResult } from "@/app/lib/pagination";
-import { Vote } from "@/app/api/common/votes/vote";
 import ProposalVotesFilter from "./ProposalVotesFilter";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 
-const ProposalVotesCard = ({
-  proposal,
-  proposalVotes,
-  nonVoters,
-}: {
-  proposal: Proposal;
-  proposalVotes: PaginatedResult<Vote[]>;
-  nonVoters: PaginatedResult<any[]>; // TODO: add better types
-}) => {
+const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
   const [isClicked, setIsClicked] = useState(false);
   const [showVoters, setShowVoters] = useState(true);
 
@@ -45,10 +35,7 @@ const ProposalVotesCard = ({
         </button>
         <div className="flex flex-col gap-4">
           <div className="font-semibold px-4 text-primary">Proposal votes</div>
-          <ProposalVotesSummary
-            votes={proposalVotes.data}
-            proposal={proposal}
-          />
+          <ProposalVotesSummary proposal={proposal} />
           <div className="px-4">
             <ProposalVotesFilter
               initialSelection={showVoters ? "Voters" : "Hasn't voted"}
@@ -60,15 +47,9 @@ const ProposalVotesCard = ({
         </div>
 
         {showVoters ? (
-          <ProposalVotesList
-            initialProposalVotes={proposalVotes}
-            proposalId={proposal.id}
-          />
+          <ProposalVotesList proposalId={proposal.id} />
         ) : (
-          <ProposalNonVoterList
-            proposal={proposal}
-            initialNonVoters={nonVoters}
-          />
+          <ProposalNonVoterList proposal={proposal} />
         )}
         {/* Show the input for the user to vote on a proposal if allowed */}
         <CastVoteInput proposal={proposal} />

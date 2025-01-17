@@ -17,8 +17,6 @@ import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalN
 
 type Props = {
   proposal: Proposal;
-  initialProposalVotes: PaginatedResult<Vote[]>;
-  nonVoters: any;
   fetchVotesForProposal: (
     proposalId: string,
     pagination?: PaginationParams
@@ -41,8 +39,6 @@ type Props = {
 
 export default function ApprovalVotesPanel({
   proposal,
-  initialProposalVotes,
-  nonVoters,
   fetchVotesForProposal,
   fetchAllForVoting,
   fetchUserVotesForProposal,
@@ -95,16 +91,12 @@ export default function ApprovalVotesPanel({
             </div>
             {showVoters ? (
               <ApprovalProposalVotesList
-                initialProposalVotes={initialProposalVotes}
                 fetchVotesForProposal={fetchVotesForProposal}
                 fetchUserVotes={fetchUserVotesForProposal}
                 proposalId={proposal.id}
               />
             ) : (
-              <ProposalNonVoterList
-                proposal={proposal}
-                initialNonVoters={nonVoters}
-              />
+              <ProposalNonVoterList proposal={proposal} />
             )}
           </>
         )}

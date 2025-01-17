@@ -12,19 +12,29 @@ import {
 } from "@/app/proposals/actions";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { PaginatedResult } from "@/app/lib/pagination";
+import { useProposalVotes } from "@/hooks/useProposalVotes";
 
-export default function ProposalVotesList({
-  initialProposalVotes,
-  proposalId,
-}: {
-  initialProposalVotes: PaginatedResult<Vote[]>;
+interface Props {
   proposalId: string;
-}) {
+}
+
+const LIMIT = 20;
+
+export default function ProposalVotesList({ proposalId }: Props) {
+  const { data: fetchedVotes, isFetched } = useProposalVotes({
+    enabled: true,
+    limit: LIMIT,
+    offset: 0,
+    proposalId: proposalId,
+  });
+
   const { address: connectedAddress } = useAccount();
   const { advancedDelegators } = useConnectedDelegate();
   const fetching = useRef(false);
-  const [pages, setPages] = useState([initialProposalVotes]);
-  const [meta, setMeta] = useState(initialProposalVotes.meta);
+
+  const [pages, setPages] = useState<PaginatedResult<Vote[]>[]>([]);
+  const [meta, setMeta] = useState<PaginatedResult<Vote[]>["meta"]>();
+
   const [userVotes, setUserVotes] = useState<Vote[]>([]);
 
   const fetchUserVoteAndSet = useCallback(
@@ -40,6 +50,14 @@ export default function ProposalVotesList({
     []
   );
 
+  // Set the initial votes list
+  useEffect(() => {
+    if (isFetched && fetchedVotes) {
+      setPages([fetchedVotes]);
+      setMeta(fetchedVotes.meta);
+    }
+  }, [fetchedVotes, isFetched]);
+
   useEffect(() => {
     if (connectedAddress) {
       fetchUserVoteAndSet(proposalId, connectedAddress);
@@ -48,16 +66,13 @@ export default function ProposalVotesList({
     }
   }, [connectedAddress, fetchUserVoteAndSet, proposalId]);
 
-  const proposalVotes = pages.reduce(
-    (all, page) => all.concat(page.data),
-    [] as Vote[]
-  );
+  const proposalVotes = pages.flatMap((page) => page.data);
 
   const loadMore = useCallback(async () => {
-    if (!fetching.current && meta.has_next) {
+    if (!fetching.current && meta?.has_next) {
       fetching.current = true;
       const data = await fetchProposalVotes(proposalId, {
-        limit: 20,
+        limit: LIMIT,
         offset: meta.next_offset,
       });
       setPages((prev) => [...prev, { ...data, votes: data.data }]);
@@ -70,44 +85,48 @@ export default function ProposalVotesList({
 
   return (
     <div className="px-4 pb-4 overflow-y-scroll max-h-[calc(100vh-437px)]">
-      <InfiniteScroll
-        hasMore={meta.has_next}
-        pageStart={0}
-        loadMore={loadMore}
-        useWindow={false}
-        loader={
-          <div className="flex text-xs font-medium text-secondary" key={0}>
-            Loading more votes...
-          </div>
-        }
-        element="main"
-      >
-        <ul className="flex flex-col">
-          {userVotes.map((vote) => (
-            <li key={vote.transactionHash}>
-              <ProposalSingleVote
-                vote={vote}
-                isAdvancedUser={isAdvancedUser}
-                delegators={advancedDelegators}
-              />
-            </li>
-          ))}
-          {proposalVotes.map((vote) => (
-            <li
-              key={vote.transactionHash}
-              className={`${
-                connectedAddress?.toLowerCase() === vote.address && "hidden"
-              }`}
-            >
-              <ProposalSingleVote
-                vote={vote}
-                isAdvancedUser={isAdvancedUser}
-                delegators={advancedDelegators}
-              />
-            </li>
-          ))}
-        </ul>
-      </InfiniteScroll>
+      {isFetched && fetchedVotes ? (
+        <InfiniteScroll
+          hasMore={meta?.has_next}
+          pageStart={0}
+          loadMore={loadMore}
+          useWindow={false}
+          loader={
+            <div className="flex text-xs font-medium text-secondary" key={0}>
+              Loading more votes...
+            </div>
+          }
+          element="main"
+        >
+          <ul className="flex flex-col">
+            {userVotes.map((vote) => (
+              <li key={vote.transactionHash}>
+                <ProposalSingleVote
+                  vote={vote}
+                  isAdvancedUser={isAdvancedUser}
+                  delegators={advancedDelegators}
+                />
+              </li>
+            ))}
+            {proposalVotes.map((vote) => (
+              <li
+                key={vote.transactionHash}
+                className={`${
+                  connectedAddress?.toLowerCase() === vote.address && "hidden"
+                }`}
+              >
+                <ProposalSingleVote
+                  vote={vote}
+                  isAdvancedUser={isAdvancedUser}
+                  delegators={advancedDelegators}
+                />
+              </li>
+            ))}
+          </ul>
+        </InfiniteScroll>
+      ) : (
+        <div className="text-secondary text-xs">Loading...</div>
+      )}
     </div>
   );
 }

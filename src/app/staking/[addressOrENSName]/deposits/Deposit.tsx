@@ -1,7 +1,6 @@
 "use client";
 
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import HumanAddress from "@/components/shared/HumanAddress";
 import React, { useEffect, useRef, useState } from "react";
 import { StakedDeposit } from "@/lib/types";
 import type { Delegate } from "@/app/api/common/delegates/delegate";
@@ -10,9 +9,9 @@ import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 import {
   useAccount,
-  useWriteContract,
   useSimulateContract,
   useWaitForTransactionReceipt,
+  useWriteContract,
 } from "wagmi";
 
 import { useRouter } from "next/navigation";
@@ -22,6 +21,7 @@ import { TOKEN_BALANCE_QK, useTokenBalance } from "@/hooks/useTokenBalance";
 import { DEPOSITOR_TOTAL_STAKED_QK } from "@/hooks/useDepositorTotalStaked";
 import { INDEXER_DELAY } from "@/lib/constants";
 import { TOKEN_ALLOWANCE_QK } from "@/hooks/useTokenAllowance";
+import ENSName from "@/components/shared/ENSName";
 
 interface DepositProps {
   deposit: StakedDeposit;
@@ -116,8 +116,8 @@ export const Deposit = ({
           <div className="text-xs font-medium text-gray-700">
             Vote delegated to
           </div>
-          <div className="font-medium">
-            <HumanAddress address={deposit.delegatee} />
+          <div className="font-medium text-primary">
+            <ENSName address={deposit.delegatee} />
           </div>
         </div>
 

@@ -1,8 +1,8 @@
 import { useEnsName } from "wagmi";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ENSAvatar from "@/components/shared/ENSAvatar";
-import HumanAddress from "@/components/shared/HumanAddress";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import ENSName from "@/components/shared/ENSName";
 
 interface DelegateProfileImageProps {
   address: string;
@@ -26,8 +26,8 @@ export const DelegateProfileImage = ({
       </div>
 
       <VStack>
-        <div className="text-base font-semibold">
-          <HumanAddress address={address} />
+        <div className="text-primary font-semibold">
+          <ENSName address={address} />
         </div>
         {votingPower && (
           <div className="text-xs font-semibold text-gray-800">

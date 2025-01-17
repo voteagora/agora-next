@@ -1,25 +1,27 @@
+"use client";
+
 import { useState } from "react";
 import VotingTimelineChart from "../VotingTimelineChart/VotingTimelineChart";
 import TreeMapChart from "../TreeMapChart/TreeMapChart";
 import { icons } from "@/icons/icons";
 import Image from "next/image";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
-import { PaginatedResult } from "@/app/lib/pagination";
+import { useProposalVotes } from "@/hooks/useProposalVotes";
 
-export default function ProposalChart({
-  proposal,
-  proposalVotes,
-}: {
-  proposal: Proposal;
-  proposalVotes: PaginatedResult<Vote[]>;
-}) {
+export default function ProposalChart({ proposal }: { proposal: Proposal }) {
   const [tabIndex, setTabIndex] = useState(0);
+  const [showChart, setShowChart] = useState(proposal.status === "ACTIVE");
+
+  const { data: fetchedVotes, isFetched } = useProposalVotes({
+    enabled: showChart,
+    limit: 250,
+    offset: 0,
+    proposalId: proposal.id,
+  });
 
   const handleTabsChange = (index: number) => {
     setTabIndex(index);
   };
-  const [showChart, setShowChart] = useState(proposal.status === "ACTIVE");
 
   const handleExpandChart = () => {
     setShowChart((prevState) => !prevState);
@@ -51,22 +53,41 @@ export default function ProposalChart({
         </div>
       </div>
       {showChart && (
-        <div className="tab-panels">
-          {tabIndex === 0 && (
-            <div className="tab-panel">
-              <VotingTimelineChart
-                proposal={proposal}
-                proposalVotes={proposalVotes}
-              />
+        <>
+          {isFetched && fetchedVotes ? (
+            <div className="tab-panels">
+              {tabIndex === 0 && (
+                <div className="tab-panel">
+                  <VotingTimelineChart
+                    proposal={proposal}
+                    proposalVotes={fetchedVotes}
+                  />
+                </div>
+              )}
+              {tabIndex === 1 && (
+                <div className="tab-panel">
+                  <TreeMapChart
+                    proposal={proposal}
+                    proposalVotes={fetchedVotes}
+                  />
+                </div>
+              )}
             </div>
+          ) : (
+            <ChartSkeleton />
           )}
-          {tabIndex === 1 && (
-            <div className="tab-panel">
-              <TreeMapChart proposal={proposal} proposalVotes={proposalVotes} />
-            </div>
-          )}
-        </div>
+        </>
       )}
     </div>
   );
 }
+
+const ChartSkeleton = () => {
+  return (
+    <div className="flex anumate-pulse">
+      <div className="flex h-[230px] w-full bg-tertiary/10 rounded-md items-center justify-center text-xs text-secondary">
+        {"Loading chart data..."}
+      </div>
+    </div>
+  );
+};
