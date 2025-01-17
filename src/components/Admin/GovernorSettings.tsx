@@ -138,7 +138,7 @@ export default function GovernorSettings() {
               <Button
                 variant="outline"
                 size="sm"
-                className="absolute right-[6px] rounded-sm bg-neutral"
+                className="absolute right-[6px] rounded-sm"
                 loading={isDisabledSetVotingPeriod}
                 disabled={
                   /* isInitializing || */ isDisabledSetVotingPeriod ||
