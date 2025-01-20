@@ -7,12 +7,16 @@ import OtherInfoFormSection from "./OtherInfoFormSection";
 import { Button } from "@/components/ui/button";
 import { type UseFormReturn, useWatch } from "react-hook-form";
 import { Form } from "@/components/ui/form";
-import { useAccount, useSignMessage, useWalletClient } from "wagmi";
+import {
+  useAccount,
+  useBlockNumber,
+  useSignMessage,
+  useWalletClient,
+} from "wagmi";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import {
   fetchDelegate,
   submitDelegateStatement,
-  fetchVoterStats,
 } from "@/app/delegates/actions";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -20,7 +24,6 @@ import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeholdersFormSection";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
-import { useBlockNumber } from "wagmi";
 
 export default function DelegateStatementForm({
   form,
@@ -35,7 +38,6 @@ export default function DelegateStatementForm({
   const messageSigner = useSignMessage();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [delegate, setDelegate] = useState<Delegate | null>(null);
-  const [voterStats, setVoterStats] = useState<any | null>(null);
 
   const { data: scwAddress } = useSmartAccountAddress({ owner: address });
 
@@ -54,12 +56,8 @@ export default function DelegateStatementForm({
   useEffect(() => {
     async function fetchData() {
       if (address) {
-        const [_delegate, _voterStats] = await Promise.all([
-          fetchDelegate(address as string),
-          fetchVoterStats(address as string, Number(blockNumber)),
-        ]);
+        const _delegate = await fetchDelegate(address as string);
         setDelegate(_delegate);
-        setVoterStats(_voterStats);
       }
     }
 
@@ -143,11 +141,7 @@ export default function DelegateStatementForm({
     <div className="flex flex-col sm:flex-row-reverse items-center sm:items-start gap-16 justify-between mt-12 w-full max-w-full">
       {delegate && (
         <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
-          <DelegateCard
-            delegate={delegate}
-            totalProposals={voterStats?.total_proposals}
-            lastTenProps={voterStats?.last_10_props}
-          />
+          <DelegateCard delegate={delegate} />
         </div>
       )}
       <div className="flex flex-col w-full">
