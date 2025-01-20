@@ -32,8 +32,13 @@ export default function ProposalVotesList({ proposalId }: Props) {
   const { advancedDelegators } = useConnectedDelegate();
   const fetching = useRef(false);
 
-  const [pages, setPages] = useState<PaginatedResult<Vote[]>[]>([]);
-  const [meta, setMeta] = useState<PaginatedResult<Vote[]>["meta"]>();
+  const [voteState, setVoteState] = useState<{
+    pages: PaginatedResult<Vote[]>[];
+    meta: PaginatedResult<Vote[]>["meta"] | undefined;
+  }>({
+    pages: [],
+    meta: undefined,
+  });
 
   const [userVotes, setUserVotes] = useState<Vote[]>([]);
 
@@ -53,8 +58,10 @@ export default function ProposalVotesList({ proposalId }: Props) {
   // Set the initial votes list
   useEffect(() => {
     if (isFetched && fetchedVotes) {
-      setPages([fetchedVotes]);
-      setMeta(fetchedVotes.meta);
+      setVoteState({
+        pages: [fetchedVotes],
+        meta: fetchedVotes.meta,
+      });
     }
   }, [fetchedVotes, isFetched]);
 
@@ -66,20 +73,22 @@ export default function ProposalVotesList({ proposalId }: Props) {
     }
   }, [connectedAddress, fetchUserVoteAndSet, proposalId]);
 
-  const proposalVotes = pages.flatMap((page) => page.data);
+  const proposalVotes = voteState.pages.flatMap((page) => page.data);
 
   const loadMore = useCallback(async () => {
-    if (!fetching.current && meta?.has_next) {
+    if (!fetching.current && voteState.meta?.has_next) {
       fetching.current = true;
       const data = await fetchProposalVotes(proposalId, {
         limit: LIMIT,
-        offset: meta.next_offset,
+        offset: voteState.meta.next_offset,
       });
-      setPages((prev) => [...prev, { ...data, votes: data.data }]);
-      setMeta(data.meta);
+      setVoteState((prev) => ({
+        pages: [...prev.pages, { ...data, votes: data.data }],
+        meta: data.meta,
+      }));
       fetching.current = false;
     }
-  }, [proposalId, meta]);
+  }, [proposalId, voteState.meta]);
 
   const { isAdvancedUser } = useIsAdvancedUser();
 
@@ -87,7 +96,7 @@ export default function ProposalVotesList({ proposalId }: Props) {
     <div className="px-4 pb-4 overflow-y-scroll max-h-[calc(100vh-437px)]">
       {isFetched && fetchedVotes ? (
         <InfiniteScroll
-          hasMore={meta?.has_next}
+          hasMore={voteState.meta?.has_next}
           pageStart={0}
           loadMore={loadMore}
           useWindow={false}
