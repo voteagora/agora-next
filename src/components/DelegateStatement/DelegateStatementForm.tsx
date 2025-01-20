@@ -7,23 +7,15 @@ import OtherInfoFormSection from "./OtherInfoFormSection";
 import { Button } from "@/components/ui/button";
 import { type UseFormReturn, useWatch } from "react-hook-form";
 import { Form } from "@/components/ui/form";
-import {
-  useAccount,
-  useBlockNumber,
-  useSignMessage,
-  useWalletClient,
-} from "wagmi";
-import { Delegate } from "@/app/api/common/delegates/delegate";
-import {
-  fetchDelegate,
-  submitDelegateStatement,
-} from "@/app/delegates/actions";
-import { useEffect, useState } from "react";
+import { useAccount, useSignMessage, useWalletClient } from "wagmi";
+import { submitDelegateStatement } from "@/app/delegates/actions";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeholdersFormSection";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
+import { useDelegate } from "@/hooks/useDelegate";
 
 export default function DelegateStatementForm({
   form,
@@ -33,13 +25,12 @@ export default function DelegateStatementForm({
   const router = useRouter();
   const { ui } = Tenant.current();
   const { address } = useAccount();
-  const { data: blockNumber } = useBlockNumber();
   const walletClient = useWalletClient();
   const messageSigner = useSignMessage();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
-  const [delegate, setDelegate] = useState<Delegate | null>(null);
 
   const { data: scwAddress } = useSmartAccountAddress({ owner: address });
+  const { data: delegate } = useDelegate({ address });
 
   const hasTopIssues = Boolean(
     ui.governanceIssues && ui.governanceIssues.length > 0
@@ -52,17 +43,6 @@ export default function DelegateStatementForm({
     control: form.control,
     name: "agreeCodeConduct",
   });
-
-  useEffect(() => {
-    async function fetchData() {
-      if (address) {
-        const _delegate = await fetchDelegate(address as string);
-        setDelegate(_delegate);
-      }
-    }
-
-    fetchData();
-  }, [address]);
 
   async function onSubmit(values: DelegateStatementFormValues) {
     if (!agreeCodeConduct) {
