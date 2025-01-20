@@ -27,9 +27,9 @@ export const InfoHero = () => {
           {page!.description}
           {namespace === TENANT_NAMESPACES.SCROLL && (
             <div className="flex flex-row gap-2 mt-4">
-              <Link href={"https://claim.scroll.io"}>
+              <Link href={"https://scroll.io/sessions"}>
                 <Button className="bg-brandPrimary hover:bg-brandPrimary/90 cursor-pointer block">
-                  Claim your tokens to get started
+                  Join Session 2
                 </Button>
               </Link>
               <Link href={"https://claim.scroll.io/faq"}>
