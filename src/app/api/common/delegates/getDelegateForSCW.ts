@@ -19,9 +19,9 @@ export const fetchDelegateForSCW = unstable_cache(
   async (address: string) => {
     return getDelegateForSCW(address);
   },
-  ["delegateForSCW"],
+  [],
   {
-    revalidate: 3600000, // 1 hour cache
+    revalidate: 3600, // 1 hour cache
     tags: ["delegateForSCW"],
   }
 );

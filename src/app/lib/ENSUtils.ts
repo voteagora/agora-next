@@ -11,17 +11,18 @@ export const ensNameToAddress = unstable_cache(
     if (isAddress(nameOrAddress)) {
       return nameOrAddress;
     }
+
     const address = await mainnetProvider.resolveName(nameOrAddress);
+
     if (!address) {
       throw new Error("No address found for ENS name");
     }
 
     return address.toLowerCase();
   },
-  ["addressToENS"],
+  [],
   {
-    revalidate: 3600000, // 1 hour cache
-    tags: ["addressToENS"],
+    revalidate: 3600, // 1 hour cache
   }
 );
 
