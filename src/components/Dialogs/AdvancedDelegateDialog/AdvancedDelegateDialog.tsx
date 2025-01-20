@@ -26,7 +26,7 @@ import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
 import { useModal } from "connectkit";
 import { useParams } from "next/navigation";
-import { resolveENSName } from "@/app/lib/ENSUtils";
+import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import { fetchDelegate } from "@/app/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
 import { config } from "@/app/Web3Provider";
@@ -137,7 +137,7 @@ export function AdvancedDelegateDialog({
   });
 
   const getVotingPowerPageDelegatee = async () => {
-    const pageDelegateeAddress = await resolveENSName(
+    const pageDelegateeAddress = await ensNameToAddress(
       params?.addressOrENSName || target
     );
     const pageDelegateeIndex = delegatees.findIndex(

@@ -5,6 +5,8 @@ import { getPublicClient } from "@/lib/viem";
 
 export const VOTER_STATS_QK = "voterStats";
 
+const CACHE_TIME = 180000; // 3 minute cache
+
 interface Props {
   address?: string | `0x${string}` | undefined;
 }
@@ -18,11 +20,14 @@ export const useVoterStats = ({
     enabled: !!address,
     queryKey: [VOTER_STATS_QK, address],
     queryFn: async () => {
+      // Intentionally caching the block number for 3 minutes to avoid
+      // unnecessary requests. The tradeoff is that the most recent voting activity
+      // won't be immediately reflected in the UI.
       const blockNumber = await publicClient.getBlockNumber({
-        cacheTime: 600000, // 10 minute cache
+        cacheTime: CACHE_TIME,
       });
       return await fetchVoterStats(address!, Number(blockNumber) || 0);
     },
-    staleTime: 180000, // 3 minute cache
+    staleTime: CACHE_TIME,
   });
 };

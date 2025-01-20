@@ -2,7 +2,7 @@
 
 import { fetchAllForAdvancedDelegation as apiFetchAllForAdvancedDelegation } from "@/app/api/delegations/getDelegations";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 import { fetchVotesForDelegate as apiFetchVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import {
   fetchIsDelegatingToProxy,
@@ -24,17 +24,40 @@ import { createDelegateStatement } from "@/app/api/common/delegateStatement/crea
 import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
-export async function fetchDelegate(address: string) {
-  return apiFetchDelegate(address);
-}
 
-export async function fetchVoterStats(address: string, blockNumber?: number) {
-  return apiFetchVoterStats(address, blockNumber);
-}
+export const fetchDelegate = unstable_cache(
+  async (address: string) => {
+    return await apiFetchDelegate(address);
+  },
 
-export async function fetchDelegateStatement(address: string) {
-  return apiFetchDelegateStatement(address);
-}
+  ["delegate"],
+  {
+    revalidate: 600000, // 10 minute cache
+    tags: ["delegate"],
+  }
+);
+
+export const fetchVoterStats = unstable_cache(
+  async (address: string, blockNumber?: number) => {
+    return apiFetchVoterStats(address, blockNumber);
+  },
+  ["voterStats"],
+  {
+    revalidate: 600000, // This cache will get invalidated byt the block number update
+    tags: ["voterStats"],
+  }
+);
+
+export const fetchDelegateStatement = unstable_cache(
+  async (address: string) => {
+    return apiFetchDelegateStatement(address);
+  },
+  ["delegateStatement"],
+  {
+    revalidate: 600000, // 10 minute cache
+    tags: ["delegateStatement"],
+  }
+);
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(
@@ -97,19 +120,30 @@ export async function fetchVotesForDelegate(
 }
 
 // Pass address of the connected wallet
-export async function fetchCurrentDelegatees(addressOrENSName: string) {
-  return apiFetchCurrentDelegatees(addressOrENSName);
-}
-
-export async function fetchCurrentDelegators(
-  addressOrENSName: string,
-  pagination: PaginationParams = {
-    offset: 0,
-    limit: 20,
+export const fetchCurrentDelegatees = unstable_cache(
+  async (addressOrENSName: string) => {
+    return apiFetchCurrentDelegatees(addressOrENSName);
+  },
+  ["currentDelegatees"],
+  {
+    revalidate: 600000, // 10 minute cache
+    tags: ["currentDelegatees"],
   }
-) {
-  return apiFetchCurrentDelegators(addressOrENSName, pagination);
-}
+);
+
+export const fetchCurrentDelegators = unstable_cache(
+  async (
+    addressOrENSName: string,
+    pagination: PaginationParams = { offset: 0, limit: 20 }
+  ) => {
+    return apiFetchCurrentDelegators(addressOrENSName, pagination);
+  },
+  ["currentDelegators"],
+  {
+    revalidate: 600000, // 10 minute cache
+    tags: ["currentDelegators"],
+  }
+);
 
 // TODO temporary fetch all query - optimization via API needed
 export async function fetchAllForAdvancedDelegation(address: string) {

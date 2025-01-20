@@ -1,4 +1,4 @@
-import { resolveENSName } from "@/app/lib/ENSUtils";
+import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import VotesContainer from "./VotesContainer";
 import { fetchVotesForDelegate } from "@/app/delegates/actions";
 import { fetchSnapshotVotesForDelegate } from "@/app/api/common/votes/getVotes";
@@ -11,7 +11,8 @@ const VotesContainerWrapper = async ({
 }: {
   addressOrENSName: string;
 }) => {
-  const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
+  const address =
+    (await ensNameToAddress(addressOrENSName)) || addressOrENSName;
   const [delegateVotes, snapshotVotes] = await Promise.all([
     fetchVotesForDelegate(address),
     fetchSnapshotVotesForDelegate({ addressOrENSName: address }),

@@ -427,8 +427,8 @@ async function getAllDelegatorsInChainsForAddress({
   return allAddresess[0].addresses;
 }
 
-export const fetchCurrentDelegatees = cache(getCurrentDelegatees);
-export const fetchCurrentDelegators = cache(getCurrentDelegators);
+export const fetchCurrentDelegatees = getCurrentDelegatees;
+export const fetchCurrentDelegators = getCurrentDelegators;
 export const fetchDirectDelegatee = cache(getDirectDelegatee);
 export const fetchAllDelegatorsInChains = cache(getAllDelegatorsInChains);
 export const fetchCurrentAdvancedDelegators = cache(

@@ -5,7 +5,7 @@ import { fetchDelegate } from "@/app/delegates/actions";
 import { formatNumber } from "@/lib/tokenUtils";
 import {
   processAddressOrEnsName,
-  resolveENSName,
+  ensNameToAddress,
   resolveENSProfileImage,
 } from "@/app/lib/ENSUtils";
 import Tenant from "@/lib/tenant/tenant";
@@ -30,7 +30,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   // cache ENS address upfront for all subsequent queries
   // TODO: change subqueries to use react cache
-  const address = await resolveENSName(params.addressOrENSName);
+  const address = await ensNameToAddress(params.addressOrENSName);
   const ensOrTruncatedAddress = await processAddressOrEnsName(
     params.addressOrENSName
   );
@@ -85,8 +85,7 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
-  const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
-
+  const address = await ensNameToAddress(addressOrENSName);
   const delegate = await fetchDelegate(address);
 
   if (!delegate) {
@@ -101,12 +100,13 @@ export default async function Page({
         <DelegateCard delegate={delegate} />
       </div>
       <div className="flex flex-col sm:ml-12 min-w-0 flex-1 max-w-full gap-8">
+        {/*TODO: Fix this for Derive */}
         <SCWRedirect address={address} />
         <Suspense fallback={<DelegateStatementSkeleton />}>
-          <DelegateStatementWrapper addressOrENSName={addressOrENSName} />
+          <DelegateStatementWrapper delegate={delegate} />
         </Suspense>
         <Suspense fallback={<DelegationsContainerSkeleton />}>
-          <DelegationsContainerWrapper addressOrENSName={addressOrENSName} />
+          <DelegationsContainerWrapper delegate={delegate} />
         </Suspense>
         <Suspense fallback={<VotesContainerSkeleton />}>
           <VotesContainerWrapper addressOrENSName={addressOrENSName} />

@@ -1,38 +1,38 @@
 import { PaginationParams } from "@/app/lib/pagination";
 import DelegationsContainer from "./DelegationsContainer";
-import { resolveENSName } from "@/app/lib/ENSUtils";
+import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import {
   fetchCurrentDelegatees,
   fetchCurrentDelegators,
-  fetchDelegate,
 } from "@/app/delegates/actions";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 
-const DelegationsContainerWrapper = async ({
-  addressOrENSName,
-}: {
-  addressOrENSName: string;
-}) => {
-  const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
-  const delegate = await fetchDelegate(address);
+interface Props {
+  delegate: Delegate;
+}
+
+const DelegationsContainerWrapper = async ({ delegate }: Props) => {
+  const address = await ensNameToAddress(delegate.address);
 
   // Use scw address for the 'delegated to' if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
 
-  // const [delegatees, delegators] = await Promise.all([
-  //   fetchCurrentDelegatees(
-  //     hasSCWAddress ? delegate.statement?.scw_address : address
-  //   ),
-  //   fetchCurrentDelegators(address),
-  // ]);
-  return "Nothing here yet";
-  // <DelegationsContainer
-  //   delegatees={delegatees}
-  //   initialDelegators={delegators}
-  //   fetchDelegators={async (pagination: PaginationParams) => {
-  //     "use server";
-  //     return fetchCurrentDelegators(addressOrENSName, pagination);
-  //   }}
-  // />
+  const [delegatees, delegators] = await Promise.all([
+    fetchCurrentDelegatees(
+      hasSCWAddress ? delegate.statement?.scw_address : address
+    ),
+    fetchCurrentDelegators(address),
+  ]);
+  return (
+    <DelegationsContainer
+      delegatees={delegatees}
+      initialDelegators={delegators}
+      fetchDelegators={async (pagination: PaginationParams) => {
+        "use server";
+        return fetchCurrentDelegators(address, pagination);
+      }}
+    />
+  );
 };
 
 export const DelegationsContainerSkeleton = () => {

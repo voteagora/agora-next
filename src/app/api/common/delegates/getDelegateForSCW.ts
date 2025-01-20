@@ -1,8 +1,8 @@
 import "server-only";
 
 import prisma from "@/app/lib/prisma";
-import { cache } from "react";
 import Tenant from "@/lib/tenant/tenant";
+import { unstable_cache } from "next/cache";
 
 // Returns an owner delegate for a given SCW address
 async function getDelegateForSCW(address: string) {
@@ -15,4 +15,13 @@ async function getDelegateForSCW(address: string) {
     .catch((error) => console.error(error));
 }
 
-export const fetchDelegateForSCW = cache(getDelegateForSCW);
+export const fetchDelegateForSCW = unstable_cache(
+  async (address: string) => {
+    return getDelegateForSCW(address);
+  },
+  ["delegateForSCW"],
+  {
+    revalidate: 3600000, // 1 hour cache
+    tags: ["delegateForSCW"],
+  }
+);

@@ -6,7 +6,7 @@ import {
 import prisma from "@/app/lib/prisma";
 import { cache } from "react";
 import { isAddress } from "viem";
-import { resolveENSName } from "@/app/lib/ENSUtils";
+import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import {
   type Delegate,
   DelegateChunk,
@@ -361,7 +361,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   const { namespace, contracts, slug } = Tenant.current();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
-    : await resolveENSName(addressOrENSName);
+    : await ensNameToAddress(addressOrENSName);
 
   // Eventually want to deprecate voter_stats from this query
   // we are already relying on getVoterStats below
@@ -558,7 +558,7 @@ async function getVoterStats(
   const { namespace, contracts } = Tenant.current();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
-    : await resolveENSName(addressOrENSName);
+    : await ensNameToAddress(addressOrENSName);
 
   const statsQuery = await prisma.$queryRawUnsafe<
     Pick<DelegateStats, "voter" | "last_10_props">[]
@@ -609,5 +609,5 @@ async function getVoterStats(
 }
 
 export const fetchDelegates = cache(getDelegates);
-export const fetchDelegate = cache(getDelegate);
-export const fetchVoterStats = cache(getVoterStats);
+export const fetchDelegate = getDelegate;
+export const fetchVoterStats = getVoterStats;
