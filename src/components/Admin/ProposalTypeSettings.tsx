@@ -10,26 +10,15 @@ import { useReadContract } from "wagmi";
 import { useAccount } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 
-// TODO: Take init values from the chain
-export default function ProposalTypeSettings({
-  votableSupply,
-  proposalTypes,
-}: {
-  votableSupply: string;
-  proposalTypes: OptimismProposalTypes[];
-}) {
-  const { address } = useAccount();
-  const { contracts } = Tenant.current();
+const RestrictedCallout = () => {
+  const { address, isConnected } = useAccount();
+  const { contracts, slug } = Tenant.current();
 
-  const fmtPropTypes = proposalTypes.map(
-    ({ quorum, approval_threshold, name }) => ({
-      name,
-      quorum: Number(quorum) / 100,
-      approval_threshold: Number(approval_threshold) / 100,
-    })
-  );
-
-  const [propTypes, setPropTypes] = useState(fmtPropTypes);
+  const { data: managerAddress } = useReadContract({
+    address: contracts.governor?.address as `0x${string}`,
+    abi: contracts.governor.abi,
+    functionName: "manager",
+  }) as { data: `0x${string}` };
 
   const { data: adminAddress } = useReadContract({
     address: contracts.governor?.address as `0x${string}`,
@@ -43,6 +32,68 @@ export default function ProposalTypeSettings({
     functionName: "timelock",
   }) as { data: `0x${string}` };
 
+  let addressesToRender = [
+    {
+      address: timelockAddress,
+      label: "Timelock",
+    },
+  ];
+
+  // OP is is v 0.1 of agora gov and uses a different PTC that is manager and not admin based
+  if (slug === "OP") {
+    addressesToRender.push({
+      address: managerAddress,
+      label: "Manager",
+    });
+  } else {
+    addressesToRender.push({
+      address: adminAddress,
+      label: "Admin",
+    });
+  }
+
+  if (
+    isConnected &&
+    !addressesToRender.some((addr) => addr.address === address)
+  ) {
+    return (
+      <div className="text-sm w-[800px] rounded border-2 p-4 bg-negative/10 border-negative text-negative mt-4">
+        Only the following addresses can create or update proposal types:
+        <ul className="list-disc list-inside">
+          {addressesToRender.map((addr) => (
+            <li key={addr.address}>
+              <span className="font-semibold px-1 py-0.5 rounded-lg bg-negative/20">
+                {addr.address}
+              </span>{" "}
+            </li>
+          ))}
+        </ul>
+        You are not currently logged in as one of the addresses above.
+      </div>
+    );
+  }
+
+  return null;
+};
+
+// TODO: Take init values from the chain
+export default function ProposalTypeSettings({
+  votableSupply,
+  proposalTypes,
+}: {
+  votableSupply: string;
+  proposalTypes: OptimismProposalTypes[];
+}) {
+  const fmtPropTypes = proposalTypes.map(
+    ({ quorum, approval_threshold, name }) => ({
+      name,
+      quorum: Number(quorum) / 100,
+      approval_threshold: Number(approval_threshold) / 100,
+    })
+  );
+
+  const [propTypes, setPropTypes] = useState(fmtPropTypes);
+
   return (
     <section className="gl_box bg-neutral">
       <h1 className="font-extrabold text-2xl text-primary">
@@ -51,21 +102,7 @@ export default function ProposalTypeSettings({
       <p className="text-secondary">
         Create and manage different types of proposals
       </p>
-      {(!address || address !== adminAddress) && (
-        <div className="text-sm w-[800px] rounded border-2 p-4 bg-negative/10 border-negative text-negative mt-4">
-          Only the governor admin address{" "}
-          <span className="font-semibold px-1 py-0.5 rounded-lg bg-negative/20">
-            {adminAddress}
-          </span>{" "}
-          or the governor timelock{" "}
-          <span className="font-semibold px-1 py-0.5 rounded-lg bg-negative/20">
-            {timelockAddress}
-          </span>{" "}
-          can create or update proposal types. You are not currently logged in
-          as the admin.
-        </div>
-      )}
-
+      <RestrictedCallout />
       {propTypes.map((proposalType, key) => (
         <Fragment key={key}>
           <ProposalType
