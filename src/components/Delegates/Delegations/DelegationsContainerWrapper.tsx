@@ -18,22 +18,21 @@ const DelegationsContainerWrapper = async ({
   // Use scw address for the 'delegated to' if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
 
-  const [delegatees, delegators] = await Promise.all([
-    fetchCurrentDelegatees(
-      hasSCWAddress ? delegate.statement?.scw_address : address
-    ),
-    fetchCurrentDelegators(address),
-  ]);
-  return (
-    <DelegationsContainer
-      delegatees={delegatees}
-      initialDelegators={delegators}
-      fetchDelegators={async (pagination: PaginationParams) => {
-        "use server";
-        return fetchCurrentDelegators(addressOrENSName, pagination);
-      }}
-    />
-  );
+  // const [delegatees, delegators] = await Promise.all([
+  //   fetchCurrentDelegatees(
+  //     hasSCWAddress ? delegate.statement?.scw_address : address
+  //   ),
+  //   fetchCurrentDelegators(address),
+  // ]);
+  return "Nothing here yet";
+  // <DelegationsContainer
+  //   delegatees={delegatees}
+  //   initialDelegators={delegators}
+  //   fetchDelegators={async (pagination: PaginationParams) => {
+  //     "use server";
+  //     return fetchCurrentDelegators(addressOrENSName, pagination);
+  //   }}
+  // />
 };
 
 export const DelegationsContainerSkeleton = () => {
