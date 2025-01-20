@@ -22,6 +22,5 @@ export const fetchDelegateForSCW = unstable_cache(
   [],
   {
     revalidate: 3600, // 1 hour cache
-    tags: ["delegateForSCW"],
   }
 );

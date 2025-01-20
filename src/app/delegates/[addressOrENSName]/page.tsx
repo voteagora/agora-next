@@ -100,7 +100,6 @@ export default async function Page({
         <DelegateCard delegate={delegate} />
       </div>
       <div className="flex flex-col sm:ml-12 min-w-0 flex-1 max-w-full gap-8">
-        {/*TODO: Fix this for Derive */}
         <SCWRedirect address={address} />
         <Suspense fallback={<DelegateStatementSkeleton />}>
           <DelegateStatementWrapper delegate={delegate} />
