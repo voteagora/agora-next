@@ -42,19 +42,6 @@ export default function DelegateTableRow({
       <TableCell>
         {delegate.numOfDelegators?.toString() || 0} addresses
       </TableCell>
-      <TableCell>
-        <div className="flex flex-row gap-2">
-          <span className="text-positive font-bold border border-line rounded-md px-2 py-1">
-            0
-          </span>
-          <span className="text-negative font-bold border border-line rounded-md px-2 py-1">
-            0
-          </span>
-          <span className="text-tertiary font-bold border border-line rounded-md px-2 py-1">
-            0
-          </span>
-        </div>
-      </TableCell>
     </TableRow>
   );
 }

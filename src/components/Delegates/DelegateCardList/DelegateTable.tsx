@@ -69,9 +69,6 @@ export default function DelegateTable({
               <TableHead className="h-10 text-secondary">
                 Delegated from
               </TableHead>
-              <TableHead className="h-10 text-secondary">
-                For / Against / Abstain
-              </TableHead>
             </TableRow>
           </TableHeader>
           <InfiniteScroll
