@@ -29,11 +29,9 @@ export const fetchDelegate = unstable_cache(
   async (address: string) => {
     return await apiFetchDelegate(address);
   },
-
-  ["delegate"],
+  [],
   {
-    revalidate: 600000, // 10 minute cache
-    tags: ["delegate"],
+    revalidate: 600, // 10 minute cache
   }
 );
 
@@ -41,10 +39,9 @@ export const fetchVoterStats = unstable_cache(
   async (address: string, blockNumber?: number) => {
     return apiFetchVoterStats(address, blockNumber);
   },
-  ["voterStats"],
+  [],
   {
-    revalidate: 600000, // This cache will get invalidated byt the block number update
-    tags: ["voterStats"],
+    revalidate: 600, // This cache will get invalidated byt the block number update
   }
 );
 
@@ -52,10 +49,9 @@ export const fetchDelegateStatement = unstable_cache(
   async (address: string) => {
     return apiFetchDelegateStatement(address);
   },
-  ["delegateStatement"],
+  [],
   {
-    revalidate: 600000, // 10 minute cache
-    tags: ["delegateStatement"],
+    revalidate: 600, // 10 minute cache
   }
 );
 
@@ -120,30 +116,19 @@ export async function fetchVotesForDelegate(
 }
 
 // Pass address of the connected wallet
-export const fetchCurrentDelegatees = unstable_cache(
-  async (addressOrENSName: string) => {
-    return apiFetchCurrentDelegatees(addressOrENSName);
-  },
-  ["currentDelegatees"],
-  {
-    revalidate: 600000, // 10 minute cache
-    tags: ["currentDelegatees"],
-  }
-);
+export async function fetchCurrentDelegatees(addressOrENSName: string) {
+  return apiFetchCurrentDelegatees(addressOrENSName);
+}
 
-export const fetchCurrentDelegators = unstable_cache(
-  async (
-    addressOrENSName: string,
-    pagination: PaginationParams = { offset: 0, limit: 20 }
-  ) => {
-    return apiFetchCurrentDelegators(addressOrENSName, pagination);
-  },
-  ["currentDelegators"],
-  {
-    revalidate: 600000, // 10 minute cache
-    tags: ["currentDelegators"],
+export async function fetchCurrentDelegators(
+  addressOrENSName: string,
+  pagination: PaginationParams = {
+    offset: 0,
+    limit: 20,
   }
-);
+) {
+  return apiFetchCurrentDelegators(addressOrENSName, pagination);
+}
 
 // TODO temporary fetch all query - optimization via API needed
 export async function fetchAllForAdvancedDelegation(address: string) {

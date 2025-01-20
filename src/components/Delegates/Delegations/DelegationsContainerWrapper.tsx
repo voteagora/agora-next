@@ -1,6 +1,5 @@
 import { PaginationParams } from "@/app/lib/pagination";
 import DelegationsContainer from "./DelegationsContainer";
-import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import {
   fetchCurrentDelegatees,
   fetchCurrentDelegators,
@@ -12,16 +11,14 @@ interface Props {
 }
 
 const DelegationsContainerWrapper = async ({ delegate }: Props) => {
-  const address = await ensNameToAddress(delegate.address);
-
   // Use scw address for the 'delegated to' if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
 
   const [delegatees, delegators] = await Promise.all([
     fetchCurrentDelegatees(
-      hasSCWAddress ? delegate.statement?.scw_address : address
+      hasSCWAddress ? delegate.statement?.scw_address : delegate.address
     ),
-    fetchCurrentDelegators(address),
+    fetchCurrentDelegators(delegate.address),
   ]);
   return (
     <DelegationsContainer
@@ -29,7 +26,7 @@ const DelegationsContainerWrapper = async ({ delegate }: Props) => {
       initialDelegators={delegators}
       fetchDelegators={async (pagination: PaginationParams) => {
         "use server";
-        return fetchCurrentDelegators(address, pagination);
+        return fetchCurrentDelegators(delegate.address, pagination);
       }}
     />
   );
