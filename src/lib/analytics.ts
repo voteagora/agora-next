@@ -1,6 +1,11 @@
 import Tenant from "@/lib/tenant/tenant";
 
-const { contracts, slug } = Tenant.current();
+const { contracts, slug, ui } = Tenant.current();
+
+// If a tenant explicitly sets analytics to disabled, we don't track events
+const hasAnalyticsEnabled = ui.toggle("analytics")
+  ? ui.toggle("analytics")?.enabled
+  : true;
 
 interface AnalyticsEvent {
   event_name: string;
@@ -41,6 +46,10 @@ class AnalyticsManager {
   }
 
   async trackEvent(event: AnalyticsEvent) {
+    if (!hasAnalyticsEnabled) {
+      return;
+    }
+
     // The idea is to add tenant data to the event so we can guarantee the event log has it
     // even if the call to trackEvent fails to include it.
     const eventWithTenantData = {
