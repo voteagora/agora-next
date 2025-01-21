@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PaginatedResult } from "@/app/lib/pagination";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function DelegationsContainer({
   delegatees,
@@ -28,8 +28,9 @@ function DelegationsContainer({
 }) {
   const [meta, setMeta] = useState(initialDelegators.meta);
   const [delegators, setDelegators] = useState(initialDelegators.data);
+
+  const isLoadingRef = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
-  const hasDelegated = delegatees.length > 0;
 
   useEffect(() => {
     setDelegators(initialDelegators.data);
@@ -37,15 +38,17 @@ function DelegationsContainer({
   }, [initialDelegators]);
 
   const loadMore = async () => {
-    if (!isLoading && meta.has_next) {
+    if (!isLoadingRef.current && meta.has_next) {
+      isLoadingRef.current = true;
       setIsLoading(true);
       const data = await fetchDelegators({
         offset: meta.next_offset,
-        limit: 10,
+        limit: 20,
       });
-      setDelegators(delegators.concat(data.data));
-      setMeta(data.meta);
+      isLoadingRef.current = false;
       setIsLoading(false);
+      setMeta(data.meta);
+      setDelegators(delegators.concat(data.data));
     }
   };
 

@@ -26,7 +26,7 @@ export const useVoterStats = ({
       const blockNumber = await publicClient.getBlockNumber({
         cacheTime: CACHE_TIME,
       });
-      return await fetchVoterStats(address!, Number(blockNumber) || 0);
+      return await fetchVoterStats(address!, Number(blockNumber));
     },
     staleTime: CACHE_TIME,
   });

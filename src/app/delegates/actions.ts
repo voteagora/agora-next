@@ -41,7 +41,9 @@ export const fetchVoterStats = unstable_cache(
   },
   [],
   {
-    revalidate: 600, // This cache will get invalidated byt the block number update
+    // Cache for 10 minutes unless invalidated by the block
+    // This cache will get invalidated by the block number update
+    revalidate: 600,
   }
 );
 
