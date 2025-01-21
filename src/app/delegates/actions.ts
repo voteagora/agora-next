@@ -2,7 +2,7 @@
 
 import { fetchAllForAdvancedDelegation as apiFetchAllForAdvancedDelegation } from "@/app/api/delegations/getDelegations";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
-import { revalidatePath, unstable_cache } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { fetchVotesForDelegate as apiFetchVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import {
   fetchIsDelegatingToProxy,
@@ -29,9 +29,10 @@ export const fetchDelegate = unstable_cache(
   async (address: string) => {
     return await apiFetchDelegate(address);
   },
-  [],
+  ["delegate"],
   {
     revalidate: 600, // 10 minute cache
+    tags: ["delegate"],
   }
 );
 
@@ -39,11 +40,12 @@ export const fetchVoterStats = unstable_cache(
   async (address: string, blockNumber?: number) => {
     return apiFetchVoterStats(address, blockNumber);
   },
-  [],
+  ["voterStats"],
   {
     // Cache for 10 minutes unless invalidated by the block
     // This cache will get invalidated by the block number update
     revalidate: 600,
+    tags: ["voterStats"],
   }
 );
 
@@ -51,9 +53,10 @@ export const fetchDelegateStatement = unstable_cache(
   async (address: string) => {
     return apiFetchDelegateStatement(address);
   },
-  [],
+  ["delegateStatement"],
   {
     revalidate: 600, // 10 minute cache
+    tags: ["delegateStatement"],
   }
 );
 
@@ -100,6 +103,9 @@ export async function submitDelegateStatement({
     message,
     scwAddress,
   });
+
+  revalidateTag("delegate");
+  revalidateTag("delegateStatement");
   revalidatePath("/delegates/create", "page");
   return response;
 }
