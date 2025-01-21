@@ -1,4 +1,5 @@
 import Tenant from "@/lib/tenant/tenant";
+import { AnalyticsEvent } from "./types";
 
 const { contracts, slug, ui } = Tenant.current();
 
@@ -6,11 +7,6 @@ const { contracts, slug, ui } = Tenant.current();
 const hasAnalyticsEnabled = ui.toggle("analytics")
   ? ui.toggle("analytics")?.enabled
   : true;
-
-interface AnalyticsEvent {
-  event_name: string;
-  event_data: Record<string, any>;
-}
 
 interface AnalyticsService {
   trackEvent(event: AnalyticsEvent): Promise<void>;

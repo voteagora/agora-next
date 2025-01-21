@@ -30,8 +30,8 @@ import { resolveENSName } from "@/app/lib/ENSUtils";
 import { fetchDelegate } from "@/app/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
 import { config } from "@/app/Web3Provider";
-import { ANALYTICS_EVENTS } from "@/lib/constants";
 import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -162,11 +162,10 @@ export function AdvancedDelegateDialog({
     const tx = await writeAsync();
     await waitForTransactionReceipt(config, { hash: tx });
     trackEvent({
-      event_name: ANALYTICS_EVENTS.ADVANCED_DELEGATE,
+      event_name: ANALYTICS_EVENT_NAMES.ADVANCED_DELEGATE,
       event_data: {
         delegatees: delegatees,
-        delegator: address,
-        dao_slug: slug,
+        delegator: address as `0x${string}`,
         transaction_hash: tx,
       },
     });

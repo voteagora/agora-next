@@ -13,13 +13,14 @@ import {
   useSimulateContract,
 } from "wagmi";
 import { useModal } from "connectkit";
-import { ANALYTICS_EVENTS, disapprovalThreshold } from "@/lib/constants";
+import { disapprovalThreshold } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import { ProposalType } from "@/app/proposals/draft/types";
 import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 
-const { contracts, ui, slug } = Tenant.current();
+const { contracts, ui } = Tenant.current();
 
 const abiCoder = new AbiCoder();
 const governorContract = contracts.governor;
@@ -70,9 +71,9 @@ export default function SubmitButton({
   async function submitProposal() {
     const txHash = await writeAsync(config!.request);
     trackEvent({
-      event_name: ANALYTICS_EVENTS.CREATE_PROPOSAL,
+      event_name: ANALYTICS_EVENT_NAMES.CREATE_PROPOSAL,
       event_data: {
-        transactionHash: txHash,
+        transaction_hash: txHash,
         uses_plm: false,
         proposal_data: inputData,
       },

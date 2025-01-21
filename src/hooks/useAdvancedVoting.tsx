@@ -6,7 +6,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENTS } from "@/lib/constants";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -75,16 +75,14 @@ const useAdvancedVoting = ({
         });
         if (status === "success") {
           await trackEvent({
-            event_name: ANALYTICS_EVENTS.STANDARD_VOTE,
+            event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
             event_data: {
-              dao_slug: slug,
-              proposal_id: BigInt(proposalId),
+              proposal_id: proposalId,
               support: support,
               reason: reason,
               params: params,
-              voter: address,
+              voter: address as `0x${string}`,
               transaction_hash: directTx,
-              contract_address: contracts.governor.address.toLowerCase(),
             },
           });
           setStandardTxHash(directTx);
@@ -120,16 +118,14 @@ const useAdvancedVoting = ({
         });
         if (status === "success") {
           await trackEvent({
-            event_name: ANALYTICS_EVENTS.STANDARD_VOTE,
+            event_name: ANALYTICS_EVENT_NAMES.ADVANCED_VOTE,
             event_data: {
-              dao_slug: slug,
-              proposal_id: BigInt(proposalId),
+              proposal_id: proposalId,
               support: support,
               reason: reason,
               params: params,
-              voter: address,
+              voter: address as `0x${string}`,
               transaction_hash: advancedTx,
-              contract_address: contracts.alligator!.address.toLowerCase(),
             },
           });
           setAdvancedTxHash(advancedTx);

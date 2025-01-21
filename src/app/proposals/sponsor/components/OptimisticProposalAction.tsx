@@ -6,7 +6,7 @@ import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENTS } from "@/lib/constants";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 
 const OptimisticProposalAction = ({
   draftProposal,
@@ -47,9 +47,9 @@ const OptimisticProposalAction = ({
             }
 
             trackEvent({
-              event_name: ANALYTICS_EVENTS.CREATE_PROPOSAL,
+              event_name: ANALYTICS_EVENT_NAMES.CREATE_PROPOSAL,
               event_data: {
-                transactionHash: data,
+                transaction_hash: data,
                 uses_plm: true,
                 proposal_data: inputData,
               },

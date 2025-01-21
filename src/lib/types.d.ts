@@ -84,3 +84,61 @@ export type RetroPGFProject = {
     description: string;
   }[];
 };
+
+// Analytics events
+export enum ANALYTICS_EVENT_NAMES {
+  STANDARD_VOTE = "standard_vote",
+  ADVANCED_VOTE = "advanced_vote",
+  DELEGATE = "delegate",
+  ADVANCED_DELEGATE = "advanced_delegate",
+  CREATE_PROPOSAL = "create_proposal",
+}
+
+export type AnalyticsEvent =
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE;
+      event_data: {
+        proposal_id: string;
+        support: number;
+        voter: `0x${string}`;
+        transaction_hash: string;
+        reason?: string;
+        params?: `0x${string}`;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.ADVANCED_VOTE;
+      event_data: {
+        proposal_id: string;
+        support: number;
+        voter: `0x${string}`;
+        transaction_hash: string;
+        reason?: string;
+        params?: `0x${string}`;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.DELEGATE;
+      event_data: {
+        delegator: `0x${string}`;
+        delegate: `0x${string}`;
+        tokens?: string;
+        transaction_hash: string;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.ADVANCED_DELEGATE;
+      event_data: {
+        delegatees: DelegateChunk[];
+        delegator: `0x${string}`;
+        transaction_hash: string;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.CREATE_PROPOSAL;
+      event_data: {
+        transaction_hash: string;
+        uses_plm: boolean;
+        proposal_data: any;
+      };
+    };

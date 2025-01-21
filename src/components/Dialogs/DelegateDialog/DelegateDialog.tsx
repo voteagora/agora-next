@@ -26,7 +26,7 @@ import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { formatEther } from "viem";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENTS } from "@/lib/constants";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 
 export function DelegateDialog({
   delegate,
@@ -117,13 +117,11 @@ export function DelegateDialog({
   useEffect(() => {
     if (didProcessDelegation) {
       trackEvent({
-        event_name: ANALYTICS_EVENTS.DELEGATE,
+        event_name: ANALYTICS_EVENT_NAMES.DELEGATE,
         event_data: {
-          delegatee: delegatee?.delegatee,
-          delegator: accountAddress,
-          dao_slug: slug,
-          transaction_hash: data,
-          contract_address: contracts.token.address.toLowerCase(),
+          delegate: delegate.address as `0x${string}`,
+          delegator: accountAddress as `0x${string}`,
+          transaction_hash: delegateTxHash as `0x${string}`,
         },
       });
     }
