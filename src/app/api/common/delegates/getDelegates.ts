@@ -609,5 +609,5 @@ async function getVoterStats(
 }
 
 export const fetchDelegates = cache(getDelegates);
-export const fetchDelegate = getDelegate;
-export const fetchVoterStats = getVoterStats;
+export const fetchDelegate = cache(getDelegate);
+export const fetchVoterStats = cache(getVoterStats);
