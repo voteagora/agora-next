@@ -108,7 +108,7 @@ export default async function Page({
           <DelegationsContainerWrapper delegate={delegate} />
         </Suspense>
         <Suspense fallback={<VotesContainerSkeleton />}>
-          <VotesContainerWrapper addressOrENSName={addressOrENSName} />
+          <VotesContainerWrapper delegate={delegate} />
         </Suspense>
       </div>
     </div>

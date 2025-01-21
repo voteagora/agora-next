@@ -1,21 +1,19 @@
-import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import VotesContainer from "./VotesContainer";
 import { fetchVotesForDelegate } from "@/app/delegates/actions";
 import { fetchSnapshotVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import { PaginationParams } from "@/app/lib/pagination";
 import DelegateVotes from "./DelegateVotes";
 import SnapshotVotes from "./SnapshotVotes";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 
-const VotesContainerWrapper = async ({
-  addressOrENSName,
-}: {
-  addressOrENSName: string;
-}) => {
-  const address =
-    (await ensNameToAddress(addressOrENSName)) || addressOrENSName;
+interface Props {
+  delegate: Delegate;
+}
+
+const VotesContainerWrapper = async ({ delegate }: Props) => {
   const [delegateVotes, snapshotVotes] = await Promise.all([
-    fetchVotesForDelegate(address),
-    fetchSnapshotVotesForDelegate({ addressOrENSName: address }),
+    fetchVotesForDelegate(delegate.address),
+    fetchSnapshotVotesForDelegate({ addressOrENSName: delegate.address }),
   ]);
 
   return (
@@ -28,7 +26,7 @@ const VotesContainerWrapper = async ({
                 initialVotes={delegateVotes}
                 fetchDelegateVotes={async (pagination: PaginationParams) => {
                   "use server";
-                  return fetchVotesForDelegate(addressOrENSName, pagination);
+                  return fetchVotesForDelegate(delegate.address, pagination);
                 }}
               />
             </div>
@@ -47,7 +45,7 @@ const VotesContainerWrapper = async ({
               fetchSnapshotVotes={async (pagination: PaginationParams) => {
                 "use server";
                 return await fetchSnapshotVotesForDelegate({
-                  addressOrENSName: addressOrENSName,
+                  addressOrENSName: delegate.address,
                   pagination,
                 });
               }}
