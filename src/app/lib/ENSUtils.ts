@@ -27,6 +27,7 @@ export const ensNameToAddress = unstable_cache(
   }
 );
 
+// Only used in OP delegation modal  - use ensNameToAddress instead
 export async function resolveENSName(nameOrAddress: string) {
   if (isAddress(nameOrAddress)) {
     return nameOrAddress;
