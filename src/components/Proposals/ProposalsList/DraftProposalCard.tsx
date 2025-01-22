@@ -4,7 +4,7 @@ import {
   ProposalDraftApprovedSponsors,
 } from "@prisma/client";
 import Link from "next/link";
-import HumanAddress from "@/components/shared/HumanAddress";
+import HumanAddress from "@/components/shared/CopyableHumanAddress";
 import { useAccount } from "wagmi";
 import { cn, formatFullDate } from "@/lib/utils";
 import DraftProposalVoteContainer from "./DraftProposalVoteContainer";
