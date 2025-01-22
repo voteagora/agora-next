@@ -12,6 +12,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
+import { AnimationDirectionProvider } from "./components/AnimationDirectionProvider";
 
 const RightColumn = () => {
   const { ui } = Tenant.current();
@@ -97,11 +98,13 @@ export default async function DraftProposalPage({
   }
 
   return (
-    <DraftProposalForm
-      proposalTypes={proposalTypes}
-      stage={stageObject.stage}
-      draftProposal={draftProposal}
-      rightColumn={<RightColumn />}
-    />
+    <AnimationDirectionProvider>
+      <DraftProposalForm
+        proposalTypes={proposalTypes}
+        stage={stageObject.stage}
+        draftProposal={draftProposal}
+        rightColumn={<RightColumn />}
+      />
+    </AnimationDirectionProvider>
   );
 }

@@ -8,7 +8,7 @@ import { UpdatedButton } from "@/components/Button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useAccount } from "wagmi";
@@ -21,6 +21,7 @@ import TextInput from "../form/TextInput";
 import DeleteDraftButton from "../DeleteDraftButton";
 import BackButton from "../BackButton";
 import { AnimatePresence, motion } from "framer-motion";
+import { useDirection } from "../../[id]/components/AnimationDirectionProvider";
 
 const TempCheckForm = ({
   draftProposal,
@@ -31,6 +32,7 @@ const TempCheckForm = ({
 }) => {
   const router = useRouter();
   const { address } = useAccount();
+  const { direction, setDirection } = useDirection();
   const [isSkipPending, setIsSkipPending] = useState(false);
   const [isSubmitPending, setIsSubmitPending] = useState(false);
   const methods = useForm<z.output<typeof tempCheckSchema>>({
@@ -54,6 +56,7 @@ const TempCheckForm = ({
   };
 
   const sharedOnSubmit = async (data: z.output<typeof tempCheckSchema>) => {
+    setDirection("next");
     try {
       if (!address) {
         toast.error("No address connected");
@@ -122,9 +125,9 @@ const TempCheckForm = ({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
             <motion.section
               className="col-span-1 sm:col-span-2 order-last sm:order-first"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, x: direction === "prev" ? -20 : 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: direction === "prev" ? 20 : -20 }}
             >
               <FormCard>
                 <FormCard.Section>

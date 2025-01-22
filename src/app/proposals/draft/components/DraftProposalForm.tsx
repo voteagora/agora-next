@@ -6,6 +6,7 @@ import DraftForm from "./stages/DraftForm";
 import SubmitForm from "./stages/SubmitForm";
 import GithubPRForm from "./stages/GithubPRForm";
 import { DraftProposal } from "../types";
+import { AnimatePresence } from "framer-motion";
 
 export default function DraftProposalForm({
   stage,
@@ -51,5 +52,9 @@ export default function DraftProposalForm({
     }
   };
 
-  return <>{renderStage(stage)}</>;
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      {renderStage(stage)}
+    </AnimatePresence>
+  );
 }
