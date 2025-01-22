@@ -1,8 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import prisma from "@/app/lib/prisma";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function POST(request: NextRequest) {
+  const { slug } = Tenant.current();
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
@@ -16,7 +18,7 @@ export async function POST(request: NextRequest) {
       data: {
         event_name,
         event_data,
-        dao_slug: event_data.dao_slug,
+        dao_slug: slug,
       },
     });
     return NextResponse.json({ success: true });
