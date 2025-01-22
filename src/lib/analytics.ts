@@ -9,7 +9,7 @@ const hasAnalyticsEnabled = ui.toggle("analytics")
   : true;
 
 interface AnalyticsService {
-  trackEvent(event: AnalyticsEvent): Promise<void>;
+  trackEvent(event: any): Promise<void>;
 }
 
 // Database analytics service
