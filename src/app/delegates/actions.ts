@@ -168,6 +168,7 @@ export const fetchConnectedDelegate = async (address: string) => {
 export const revalidateDelegateAddressPage = async (
   delegateAddress: string
 ) => {
+  revalidateTag("delegate");
   revalidatePath(`/delegates/${delegateAddress}`, "page");
 };
 

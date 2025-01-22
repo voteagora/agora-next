@@ -1,15 +1,16 @@
 import {
   fetchConnectedDelegate,
+  fetchDelegate,
   revalidateDelegateAddressPage,
 } from "@/app/delegates/actions";
 import { useAccount } from "wagmi";
 import { useState } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { timeout } from "@/lib/utils";
-import { fetchDelegate } from "@/app/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
 import { ZERO_ADDRESS } from "@/lib/constants";
+import { DELEGATE_QK } from "@/hooks/useDelegate";
 
 /**
  * Define maximum number of retries, max retries 10 means 180 seconds waiting in total (advanced delegation voting power
@@ -21,6 +22,7 @@ const MAX_RETRIES = 10;
 // also to prevent additional unnecessary fetches being done right now
 const useConnectedDelegate = () => {
   const { contracts } = Tenant.current();
+  const queryClient = useQueryClient();
   const isTestToken = contracts.token.address === ZERO_ADDRESS;
 
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
@@ -35,7 +37,17 @@ const useConnectedDelegate = () => {
       const [delegate, advancedDelegators, balance] =
         await fetchConnectedDelegate(address!);
       if (refetchDelegate) {
-        revalidateDelegateAddressPage(refetchDelegate.address);
+        Promise.all([
+          // Invalidate delegate and delegator queries
+          queryClient.invalidateQueries({
+            queryKey: [DELEGATE_QK, refetchDelegate.address],
+          }),
+          queryClient.invalidateQueries({
+            queryKey: [DELEGATE_QK, address],
+          }),
+        ]).finally(() => {
+          revalidateDelegateAddressPage(refetchDelegate.address);
+        });
       }
       setLastVotingPower(delegate.votingPower.total);
 

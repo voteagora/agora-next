@@ -2,12 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchDelegate } from "@/app/delegates/actions";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 
-export const DELEGATE_QK = "delegate";
 const CACHE_TIME = 180000; // 3 minute cache
 
 interface Props {
   address: `0x${string}` | undefined;
 }
+export const DELEGATE_QK = "delegate";
 
 export const useDelegate = ({ address }: Props) => {
   const { data, isFetching, isFetched } = useQuery({
