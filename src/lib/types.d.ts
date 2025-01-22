@@ -91,6 +91,7 @@ export enum ANALYTICS_EVENT_NAMES {
   ADVANCED_VOTE = "advanced_vote",
   DELEGATE = "delegate",
   ADVANCED_DELEGATE = "advanced_delegate",
+  PARTIAL_DELEGATION = "partial_delegation",
   CREATE_PROPOSAL = "create_proposal",
 }
 
@@ -122,7 +123,6 @@ export type AnalyticsEvent =
       event_data: {
         delegator: `0x${string}`;
         delegate: `0x${string}`;
-        tokens?: string;
         transaction_hash: string;
       };
     }
@@ -140,5 +140,14 @@ export type AnalyticsEvent =
         transaction_hash: string;
         uses_plm: boolean;
         proposal_data: any;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.PARTIAL_DELEGATION;
+      event_data: {
+        transaction_hash: string;
+        delegatees: DelegateChunk[];
+        delegator: `0x${string}`;
+        is_scw: boolean;
       };
     };
