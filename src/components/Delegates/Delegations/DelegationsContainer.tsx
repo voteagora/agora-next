@@ -74,7 +74,7 @@ function DelegationsContainer({
           </TabsList>
         </div>
         <TabsContent value="delegatedFrom" className="max-w-full">
-          <div className="flex flex-col gap-3 border border-line shadow-sm rounded-xl overflow-auto max-h-[500px]">
+          <div className="flex flex-col gap-3 border border-line shadow-sm rounded-xl overflow-auto max-h-[500px] bg-wash">
             <div className="w-full overflow-x-auto">
               <div className="min-w-[600px]">
                 <Table className="min-w-full">
