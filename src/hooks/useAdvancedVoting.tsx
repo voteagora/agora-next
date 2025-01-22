@@ -6,7 +6,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 
 const useAdvancedVoting = ({
   proposalId,

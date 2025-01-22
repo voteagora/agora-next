@@ -18,7 +18,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import { ProposalType } from "@/app/proposals/draft/types";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 
 const { contracts, ui } = Tenant.current();
 

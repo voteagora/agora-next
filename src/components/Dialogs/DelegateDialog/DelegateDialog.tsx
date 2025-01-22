@@ -26,7 +26,7 @@ import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { formatEther } from "viem";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 
 export function DelegateDialog({
   delegate,
