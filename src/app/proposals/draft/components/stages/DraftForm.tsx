@@ -36,6 +36,7 @@ import Tenant from "@/lib/tenant/tenant";
 import DeleteDraftButton from "../DeleteDraftButton";
 import BackButton from "../BackButton";
 import { AnimatePresence, motion } from "framer-motion";
+import { useDirection } from "../../[id]/components/AnimationDirectionProvider";
 
 const DEFAULT_FORM = {
   type: ProposalType.BASIC,
@@ -89,6 +90,7 @@ const DraftForm = ({
   proposalTypes: any[];
   rightColumn: React.ReactNode;
 }) => {
+  const { direction, setDirection } = useDirection();
   const [isPending, setIsPending] = useState<boolean>(false);
   const [validProposalTypes, setValidProposalTypes] = useState<any[]>(
     getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
@@ -194,96 +196,92 @@ const DraftForm = ({
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
-            <AnimatePresence mode="wait">
-              <motion.section
-                key={"draftForm"}
-                className="col-span-1 sm:col-span-2 order-last sm:order-first"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-              >
-                <FormCard>
-                  <FormCard.Section>
-                    <div className="flex flex-col space-y-6">
-                      <div className="grid grid-cols-2 gap-4">
-                        <SwitchInput
-                          control={control}
-                          label="Voting module"
-                          required={true}
-                          options={[
-                            ...(
-                              (plmToggle?.config as PLMConfig)?.proposalTypes ||
-                              []
-                            ).map((pt) => pt.type),
-                          ]}
-                          name="type"
-                        />
-
-                        <p className="text-sm self-center text-agora-stone-700 mt-6">
-                          {ProposalTypeMetadata[votingModuleType].description}
-                        </p>
-                      </div>
-
-                      {validProposalTypes.length > 1 ? (
-                        <div className="relative">
-                          <SelectInput
-                            control={control}
-                            label="Proposal type"
-                            required={true}
-                            options={validProposalTypes.map((typeConfig) => {
-                              return {
-                                label: typeConfig.name,
-                                value: typeConfig.proposal_type_id,
-                              };
-                            })}
-                            name="proposalConfigType"
-                            emptyCopy="Default"
-                          />
-                        </div>
-                      ) : (
-                        <input
-                          type="hidden"
-                          name="proposalConfigType"
-                          value={
-                            validProposalTypes[0]?.proposal_type_id || null
-                          }
-                        />
-                      )}
-
-                      <TextInput
-                        label="Title"
-                        name="title"
+            <motion.section
+              key={"draftForm"}
+              className="col-span-1 sm:col-span-2 order-last sm:order-first"
+              initial={{ opacity: 0, x: direction === "prev" ? -50 : 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: direction === "prev" ? 50 : -50 }}
+            >
+              <FormCard>
+                <FormCard.Section>
+                  <div className="flex flex-col space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <SwitchInput
+                        control={control}
+                        label="Voting module"
                         required={true}
-                        control={methods.control}
+                        options={[
+                          ...(
+                            (plmToggle?.config as PLMConfig)?.proposalTypes ||
+                            []
+                          ).map((pt) => pt.type),
+                        ]}
+                        name="type"
                       />
-                      <MarkdownTextareaInput
-                        control={methods.control}
-                        label="Description"
-                        required={true}
-                        name="abstract"
-                      />
+
+                      <p className="text-sm self-center text-agora-stone-700 mt-6">
+                        {ProposalTypeMetadata[votingModuleType].description}
+                      </p>
                     </div>
-                  </FormCard.Section>
-                  <FormCard.Section>
-                    {(() => {
-                      switch (votingModuleType) {
-                        case ProposalType.BASIC:
-                          return <BasicProposalForm />;
-                        case ProposalType.SOCIAL:
-                          return <SocialProposalForm />;
-                        case ProposalType.APPROVAL:
-                          return <ApprovalProposalForm />;
-                        case ProposalType.OPTIMISTIC:
-                          return <OptimisticProposalForm />;
-                        default:
-                          const exhaustiveCheck: never = votingModuleType;
-                          return exhaustiveCheck;
-                      }
-                    })()}
-                  </FormCard.Section>
-                </FormCard>
-              </motion.section>
-            </AnimatePresence>
+
+                    {validProposalTypes.length > 1 ? (
+                      <div className="relative">
+                        <SelectInput
+                          control={control}
+                          label="Proposal type"
+                          required={true}
+                          options={validProposalTypes.map((typeConfig) => {
+                            return {
+                              label: typeConfig.name,
+                              value: typeConfig.proposal_type_id,
+                            };
+                          })}
+                          name="proposalConfigType"
+                          emptyCopy="Default"
+                        />
+                      </div>
+                    ) : (
+                      <input
+                        type="hidden"
+                        name="proposalConfigType"
+                        value={validProposalTypes[0]?.proposal_type_id || null}
+                      />
+                    )}
+
+                    <TextInput
+                      label="Title"
+                      name="title"
+                      required={true}
+                      control={methods.control}
+                    />
+                    <MarkdownTextareaInput
+                      control={methods.control}
+                      label="Description"
+                      required={true}
+                      name="abstract"
+                    />
+                  </div>
+                </FormCard.Section>
+                <FormCard.Section>
+                  {(() => {
+                    switch (votingModuleType) {
+                      case ProposalType.BASIC:
+                        return <BasicProposalForm />;
+                      case ProposalType.SOCIAL:
+                        return <SocialProposalForm />;
+                      case ProposalType.APPROVAL:
+                        return <ApprovalProposalForm />;
+                      case ProposalType.OPTIMISTIC:
+                        return <OptimisticProposalForm />;
+                      default:
+                        const exhaustiveCheck: never = votingModuleType;
+                        return exhaustiveCheck;
+                    }
+                  })()}
+                </FormCard.Section>
+              </FormCard>
+            </motion.section>
             <section className="col-span-1">{rightColumn}</section>
           </div>
         </main>
