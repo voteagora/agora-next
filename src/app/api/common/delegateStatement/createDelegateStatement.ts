@@ -44,8 +44,8 @@ export async function createDelegateStatement({
     email,
     scw_address: scwAddress?.toLowerCase(),
     notification_preferences: {
-      last_updated: new Date().toISOString(),
       ...notificationPreferences,
+      last_updated: new Date().toISOString(),
     },
   };
 

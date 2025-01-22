@@ -11,11 +11,16 @@ export default function NotificationSelector({
   const [subscribed, setSubscribed] = useState(false);
 
   useEffect(() => {
+    const wantsProposalCreatedEmail = form.getValues(
+      "notificationPreferences.wants_proposal_created_email"
+    );
+    const wantsProposalEndingSoonEmail = form.getValues(
+      "notificationPreferences.wants_proposal_ending_soon_email"
+    );
+
     setSubscribed(
-      form.getValues("notificationPreferences.wants_proposal_created_email") ||
-        form.getValues(
-          "notificationPreferences.wants_proposal_ending_soon_email"
-        )
+      wantsProposalCreatedEmail === true ||
+        wantsProposalEndingSoonEmail === true
     );
   }, [form]);
 
