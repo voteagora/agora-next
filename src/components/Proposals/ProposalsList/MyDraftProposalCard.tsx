@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import HumanAddress from "@/components/shared/HumanAddress";
+import HumanAddress from "@/components/shared/CopyableHumanAddress";
 import { ProposalDraft } from "@prisma/client";
 import Link from "next/link";
 import {
