@@ -15,7 +15,7 @@ import { DELEGATION_MODEL } from "@/lib/constants";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 
 export const DERIVE_TESTNET_RPC = `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`;
-export const DERIVE_MAINNET_RPC = "https://rpc.derive.xyz";
+export const DERIVE_MAINNET_RPC = `https://rpc.derive.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`;
 
 const MAINNET_BLOCK_EXPLORER = "https://explorer.derive.xyz";
 const TESTNET_BLOCK_EXPLORER =
