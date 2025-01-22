@@ -2,6 +2,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type UseFormReturn } from "react-hook-form";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import { useState, useEffect } from "react";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default function NotificationSelector({
   form,
@@ -35,6 +36,8 @@ export default function NotificationSelector({
       value
     );
   };
+
+  TENANT_NAMESPACES.OPTIMISM;
 
   return (
     <div className="flex flex-col">

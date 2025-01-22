@@ -31,7 +31,7 @@ export const fetchDelegate = unstable_cache(
   },
   ["delegate"],
   {
-    revalidate: 600, // 10 minute cache
+    revalidate: 180, // 10 minute cache
     tags: ["delegate"],
   }
 );
@@ -55,6 +55,8 @@ export const fetchDelegateStatement = unstable_cache(
   },
   ["delegateStatement"],
   {
+    // Longer cache is acceptable since the statement is not expected to change
+    // often and invalidated with every delegate statement update
     revalidate: 600, // 10 minute cache
     tags: ["delegateStatement"],
   }
