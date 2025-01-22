@@ -9,10 +9,11 @@ import ProposalType from "./ProposalType";
 import { useReadContract } from "wagmi";
 import { useAccount } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const RestrictedCallout = () => {
   const { address, isConnected } = useAccount();
-  const { contracts, slug } = Tenant.current();
+  const { contracts, namespace } = Tenant.current();
 
   const { data: managerAddress } = useReadContract({
     address: contracts.governor?.address as `0x${string}`,
@@ -40,7 +41,7 @@ const RestrictedCallout = () => {
   ];
 
   // OP is is v 0.1 of agora gov and uses a different PTC that is manager and not admin based
-  if (slug === "OP") {
+  if (namespace === TENANT_NAMESPACES.OPTIMISM) {
     addressesToRender.push({
       address: managerAddress,
       label: "Manager",
