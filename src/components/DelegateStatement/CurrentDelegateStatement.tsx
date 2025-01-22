@@ -63,8 +63,17 @@ const formSchema = z.object({
       .strict()
   ),
   notificationPreferences: z.object({
-    wants_proposal_created_email: z.boolean(),
-    wants_proposal_ending_soon_email: z.boolean(),
+    last_updated: z.string(),
+    wants_proposal_created_email: z.union([
+      z.literal("prompt"),
+      z.literal("prompted"),
+      z.boolean(),
+    ]),
+    wants_proposal_ending_soon_email: z.union([
+      z.literal("prompt"),
+      z.literal("prompted"),
+      z.boolean(),
+    ]),
   }),
 });
 
