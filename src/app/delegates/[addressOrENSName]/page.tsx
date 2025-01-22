@@ -3,11 +3,7 @@ import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { fetchDelegate } from "@/app/delegates/actions";
 import { formatNumber } from "@/lib/tokenUtils";
-import {
-  processAddressOrEnsName,
-  ensNameToAddress,
-  resolveENSProfileImage,
-} from "@/app/lib/ENSUtils";
+import { ensNameToAddress, processAddressOrEnsName } from "@/app/lib/ENSUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { Suspense } from "react";
 import DelegateStatementWrapper, {
@@ -34,10 +30,7 @@ export async function generateMetadata(
   const ensOrTruncatedAddress = await processAddressOrEnsName(
     params.addressOrENSName
   );
-  const [delegate, avatar] = await Promise.all([
-    fetchDelegate(address || params.addressOrENSName),
-    resolveENSProfileImage(address || params.addressOrENSName),
-  ]);
+  const delegate = await fetchDelegate(address);
 
   const { token } = Tenant.current();
 
@@ -50,7 +43,6 @@ export async function generateMetadata(
       `votes=${encodeURIComponent(
         `${formatNumber(delegate.votingPower.total || "0")} ${token.symbol}`
       )}`,
-    avatar && `avatar=${encodeURIComponent(avatar)}`,
     statement && `statement=${encodeURIComponent(statement)}`,
   ].filter(Boolean);
 
