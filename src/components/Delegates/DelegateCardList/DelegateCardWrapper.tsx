@@ -102,7 +102,7 @@ const DelegateCardWrapper = async ({ searchParams }: { searchParams: any }) => {
           }}
           // @ts-ignore
           fetchDelegators={fetchDelegators}
-        />{" "}
+        />
       </TabsContent>
     </DelegateTabs>
   );

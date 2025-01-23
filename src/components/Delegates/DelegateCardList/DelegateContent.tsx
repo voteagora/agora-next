@@ -1,11 +1,11 @@
 "use client";
 
-import { useLayout } from "@/contexts/LayoutContext";
 import DelegateCardList from "./DelegateCardList";
 import DelegateTable from "./DelegateTable";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { Delegation } from "@/app/api/common/delegations/delegation";
+import { useQueryState } from "nuqs";
 
 interface Props {
   isDelegatesCitizensFetching: boolean;
@@ -23,14 +23,14 @@ export default function DelegateContent({
   isDelegatesCitizensFetching,
   fetchDelegators,
 }: Props) {
-  const { layout } = useLayout();
-
+  const [layout] = useQueryState("layout", {
+    defaultValue: "grid",
+  });
   return layout === "grid" ? (
     <DelegateCardList
       isDelegatesCitizensFetching={isDelegatesCitizensFetching}
       initialDelegates={initialDelegates}
       fetchDelegates={fetchDelegates}
-      // @ts-ignore
       fetchDelegators={fetchDelegators}
     />
   ) : (
