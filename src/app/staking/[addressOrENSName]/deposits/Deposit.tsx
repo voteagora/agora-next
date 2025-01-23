@@ -42,6 +42,7 @@ export const Deposit = ({
   const isDelegateFetched = useRef(false);
 
   const { contracts } = Tenant.current();
+
   const { data: config } = useSimulateContract({
     address: contracts.staker!.address as `0x${string}`,
     abi: contracts.staker!.abi,
@@ -50,7 +51,7 @@ export const Deposit = ({
     args: [BigInt(deposit.id), BigInt(deposit.amount)],
   });
 
-  const { data, writeContract: write } = useWriteContract();
+  const { data, writeContract } = useWriteContract();
   const isDepositOwner =
     isConnected && address?.toLowerCase() === deposit.depositor.toLowerCase();
 
@@ -167,7 +168,7 @@ export const Deposit = ({
                     </div>
                     <div
                       className="py-3 px-5 font-medium cursor-pointer hover:bg-gray-100"
-                      onClick={() => write(config!.request)}
+                      onClick={() => writeContract(config!.request)}
                     >
                       Withdraw stake
                     </div>
