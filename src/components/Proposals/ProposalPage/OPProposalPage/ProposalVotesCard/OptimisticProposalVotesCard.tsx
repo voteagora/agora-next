@@ -7,42 +7,31 @@ import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/Proposal
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
-import { PaginatedResult } from "@/app/lib/pagination";
-import { Vote } from "@/app/api/common/votes/vote";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import ProposalVotesFilter from "./ProposalVotesFilter";
 import Tenant from "@/lib/tenant/tenant";
+
+interface Props {
+  proposal: Proposal;
+  disapprovalThreshold: number;
+  againstRelativeAmount: string;
+  againstLengthString: string;
+  status: string;
+}
 
 const OptimisticProposalVotesCard = ({
   proposal,
   disapprovalThreshold,
   againstRelativeAmount,
   againstLengthString,
-  fetchProposalVotes,
-  fetchDelegate,
-  fetchDelegateStatement,
-  fetchUserVotesForProposal,
-  fetchCurrentDelegators,
   status,
-}: {
-  proposal: Proposal;
-  disapprovalThreshold: number;
-  againstRelativeAmount: string;
-  againstLengthString: string;
-  fetchProposalVotes: Promise<PaginatedResult<Vote[]>>;
-  fetchDelegate: (address: string) => void;
-  fetchDelegateStatement: (address: string) => void;
-  fetchUserVotesForProposal: (proposalId: string) => void;
-  fetchCurrentDelegators: (proposalId: string) => void;
-  status: string;
-}) => {
+}: Props) => {
   const { token } = Tenant.current();
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [showVoters, setShowVoters] = useState(true);
+
   const handleClick = () => {
     setIsClicked(!isClicked);
-    // var div = document.getElementsByClassName("mobile-web-scroll-div")[0];
-    // div.scrollTop = 0;
   };
   return (
     <div
@@ -72,8 +61,8 @@ const OptimisticProposalVotesCard = ({
                 <p
                   className={
                     status === "approved"
-                      ? "text-green-positive font-bold"
-                      : "text-red-negative font-bold"
+                      ? "text-positive font-bold"
+                      : "text-negative font-bold"
                   }
                 >
                   This proposal is optimistically {status}
