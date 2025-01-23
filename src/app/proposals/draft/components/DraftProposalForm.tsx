@@ -6,7 +6,8 @@ import DraftForm from "./stages/DraftForm";
 import SubmitForm from "./stages/SubmitForm";
 import GithubPRForm from "./stages/GithubPRForm";
 import { DraftProposal } from "../types";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import AnimatedText from "./AnimatedText";
 
 export default function DraftProposalForm({
   stage,
