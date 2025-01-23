@@ -1,7 +1,7 @@
 "use client";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import DelegatesFilter from "@/components/Delegates/DelegatesFilter/DelegatesFilter";
 import CitizensFilter from "@/components/Delegates/DelegatesFilter/CitizensFilter";
 import DelegatesSearch from "@/components/Delegates/DelegatesSearch/DelegatesSearch";
@@ -16,9 +16,7 @@ import { LayoutGrid, AlignJustify } from "lucide-react";
 import { useQueryState } from "nuqs";
 
 export default function DelegateTabs({ children }: { children: ReactNode }) {
-  const searchParams = useSearchParams();
-  const tabParam = searchParams?.get("tab");
-
+  const [tabParam] = useQueryState("tab");
   const [value, setValue] = useState(tabParam || "delegates");
   const [layout, setLayout] = useQueryState("layout", {
     defaultValue: "grid",
@@ -82,26 +80,28 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
           {hasIssuesFilter && tabParam !== "citizens" && <IssuesFilter />}
           {hasEndorsedFilter && tabParam !== "citizens" && <EndorsedFilter />}
           {tabParam === "citizens" ? <CitizensFilter /> : <DelegatesFilter />}
-          <div className="flex items-center gap-2 bg-wash rounded-full px-4 py-2">
-            <button
-              onClick={() => {
-                setLayout("grid");
-              }}
-            >
-              <LayoutGrid
-                className={`h-6 w-6 ${layout === "grid" ? "text-secondary" : "text-secondary/30"}`}
-              />
-            </button>
-            <button
-              onClick={() => {
-                setLayout("list");
-              }}
-            >
-              <AlignJustify
-                className={`h-6 w-6 ${layout === "list" ? "text-primary" : "text-secondary/30"}`}
-              />
-            </button>
-          </div>
+          {tabParam !== "citizens" && (
+            <div className="flex items-center gap-2 bg-wash rounded-full px-4 py-2">
+              <button
+                onClick={() => {
+                  setLayout("grid");
+                }}
+              >
+                <LayoutGrid
+                  className={`h-6 w-6 ${layout === "grid" ? "text-secondary" : "text-secondary/30"}`}
+                />
+              </button>
+              <button
+                onClick={() => {
+                  setLayout("list");
+                }}
+              >
+                <AlignJustify
+                  className={`h-6 w-6 ${layout === "list" ? "text-primary" : "text-secondary/30"}`}
+                />
+              </button>
+            </div>
+          )}
         </div>
       </div>
       {children}

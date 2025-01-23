@@ -4,7 +4,6 @@ import DelegateCardWrapper, {
   DelegateCardLoadingState,
 } from "@/components/Delegates/DelegateCardList/DelegateCardWrapper";
 import Hero from "@/components/Hero/Hero";
-import { LayoutProvider } from "@/contexts/LayoutContext";
 
 export async function generateMetadata({}, parent) {
   const { ui } = Tenant.current();
@@ -40,9 +39,7 @@ export default async function Page({ searchParams }) {
     <section>
       <Hero />
       <Suspense fallback={<DelegateCardLoadingState />}>
-        <LayoutProvider>
-          <DelegateCardWrapper searchParams={searchParams} />
-        </LayoutProvider>
+        <DelegateCardWrapper searchParams={searchParams} />
       </Suspense>
     </section>
   );
