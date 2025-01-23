@@ -7,11 +7,13 @@ import { onSubmitAction as deleteAction } from "../actions/deleteDraftProposal";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import X from "@/assets/icons/x.svg";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
   const openDialog = useOpenDialog();
   return (
-    <div
+    <motion.div
+      //   layoutId="delete-draft-button"
       className="border border-line rounded p-1 h-[42px] aspect-square flex items-center justify-center bg-tertiary/5 hover:bg-tertiary/10 transition-colors cursor-pointer"
       onClick={() => {
         openDialog({
@@ -23,7 +25,7 @@ const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
       }}
     >
       <TrashIcon className="h-4 w-4 text-secondary" />
-    </div>
+    </motion.div>
   );
 };
 
