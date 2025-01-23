@@ -37,6 +37,7 @@ import DeleteDraftButton from "../DeleteDraftButton";
 import BackButton from "../BackButton";
 import { AnimatePresence, motion } from "framer-motion";
 import { useDirection } from "../../[id]/components/AnimationDirectionProvider";
+import MorphingText from "../MorphingText";
 
 const DEFAULT_FORM = {
   type: ProposalType.BASIC,
@@ -175,7 +176,7 @@ const DraftForm = ({
                 />
               )}
               <h1 className="font-bold text-primary text-2xl m-0">
-                Draft submission
+                <MorphingText text="Draft submission" />
               </h1>
               <span className="bg-tertiary/5 text-tertiary rounded-full px-2 py-1 text-sm">
                 {/* stageObject.order + 1 is becuase order is zero indexed */}
@@ -191,17 +192,29 @@ const DraftForm = ({
                 className="whitespace-nowrap min-w-[184px]"
                 isLoading={isPending}
               >
+                {/* <MorphingText
+                  text={draftProposal.title ? "Update draft" : "Create draft"}
+                /> */}
                 {draftProposal.title ? "Update draft" : "Create draft"}
               </UpdatedButton>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
             <motion.section
-              key={"draftForm"}
+              key="draftForm"
               className="col-span-1 sm:col-span-2 order-last sm:order-first"
-              initial={{ opacity: 0, x: direction === "prev" ? -50 : 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: direction === "prev" ? 50 : -50 }}
+              initial={{
+                opacity: 0,
+                x: direction === "prev" ? -50 : 50,
+                filter: "blur(5px)",
+              }}
+              animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+              exit={{
+                opacity: 0,
+                x: direction === "prev" ? 50 : -50,
+                filter: "blur(5px)",
+              }}
+              //   transition={{ duration: 0.3 }}
             >
               <FormCard>
                 <FormCard.Section>

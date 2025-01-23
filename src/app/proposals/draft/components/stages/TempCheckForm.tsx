@@ -22,6 +22,12 @@ import DeleteDraftButton from "../DeleteDraftButton";
 import BackButton from "../BackButton";
 import { AnimatePresence, motion } from "framer-motion";
 import { useDirection } from "../../[id]/components/AnimationDirectionProvider";
+import MorphingText from "../MorphingText";
+
+import EnvelopeBottom from "@/components/Notifications/DialogImage/EnvelopeBottom";
+import EnvelopePaper from "@/components/Notifications/DialogImage/EnvelopePaper";
+import EnvelopeTop from "@/components/Notifications/DialogImage/EnvelopeTop";
+import StarIcon from "@/components/Notifications/DialogImage/Star";
 
 const TempCheckForm = ({
   draftProposal,
@@ -82,6 +88,8 @@ const TempCheckForm = ({
 
   const DRAFT_STAGES_FOR_TENANT = GET_DRAFT_STAGES()!;
 
+  const [isHovering, setIsHovering] = useState(false);
+
   return (
     <FormProvider {...methods}>
       <form>
@@ -95,7 +103,7 @@ const TempCheckForm = ({
                 />
               )}
               <h1 className="font-bold text-primary text-2xl m-0">
-                Add temp check
+                <MorphingText text="Add temp check" />
               </h1>
               <span className="bg-tertiary/5 text-tertiary rounded-full px-2 py-1 text-sm">
                 {/* stageObject.order + 1 is becuase order is zero indexed */}
@@ -118,28 +126,77 @@ const TempCheckForm = ({
                 className="whitespace-nowrap min-w-[184px]"
                 onClick={handleSubmit(onSubmit)}
               >
+                {/* <MorphingText text="Continue" /> */}
                 Continue
               </UpdatedButton>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
             <motion.section
+              key="tempCheckForm"
               className="col-span-1 sm:col-span-2 order-last sm:order-first"
-              initial={{ opacity: 0, x: direction === "prev" ? -20 : 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: direction === "prev" ? 20 : -20 }}
+              initial={{
+                opacity: 0,
+                x: direction === "prev" ? -50 : 50,
+                filter: "blur(5px)",
+              }}
+              animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+              exit={{
+                opacity: 0,
+                x: direction === "prev" ? 50 : -50,
+                filter: "blur(5px)",
+              }}
+              //   transition={{ duration: 0.3 }}
             >
               <FormCard>
                 <FormCard.Section>
                   <div className="w-full rounded-md h-[350px] block relative">
-                    <Image
+                    {/* <Image
                       // TODO: do we want to make this something that is configurable by tenant?
                       // Or should we have a default for all tenants?
                       src="/images/ens_temp_check.png"
                       alt="Digital collage of sparkles and thumbs ups promoting caputuring a temp check."
                       fill={true}
                       className="object-cover rounded-md"
-                    />
+                    /> */}
+                    <div className="flex items-center gap-2 bg-tertiary/5 rounded-lg relative overflow-y-hidden h-full">
+                      <div className="absolute w-full h-full bg-[url('/images/grid.svg')]"></div>
+                      <StarIcon
+                        className={`text-brandPrimary absolute top-[40px] left-[45px] transition-all duration-500 ${
+                          isHovering
+                            ? "rotate-[20deg] scale-150"
+                            : "rotate-[30deg] scale-125"
+                        }`}
+                      />
+                      <StarIcon
+                        className={`text-brandPrimary absolute top-[40px] right-[45px] transition-all duration-500 ${
+                          isHovering
+                            ? "rotate-[-20deg] scale-150"
+                            : "rotate-[-30deg] scale-125"
+                        }`}
+                      />
+                      <StarIcon
+                        className={`text-secondary absolute bottom-[40px] left-[55px] transition-all duration-500 ${
+                          isHovering
+                            ? "rotate-[-20deg] scale-100"
+                            : "rotate-[-30deg] scale-95"
+                        }`}
+                      />
+                      <StarIcon
+                        className={`text-secondary absolute bottom-[40px] right-[55px] transition-all duration-500 ${
+                          isHovering
+                            ? "rotate-[20deg] scale-100"
+                            : "rotate-[30deg] scale-95"
+                        }`}
+                      />
+                      <EnvelopePaper
+                        className={`h-[280px] w-[280px] absolute transition-all left-[calc(50%-140px)] ${
+                          isHovering
+                            ? "bottom-[-40px] duration-500"
+                            : "bottom-[-10px] duration-300"
+                        }`}
+                      />
+                    </div>
                   </div>
                   {/*
             TODO: is this copy the same for everyone who wants to do a temp check?
