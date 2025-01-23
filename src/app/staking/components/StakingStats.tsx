@@ -13,40 +13,38 @@ export const StakingStats = async () => {
   const { data: rewardPerToken } = useRewardPerToken({ enabled: true });
   const { data: rewardDuration } = useRewardDuration({ enabled: true });
 
-  console.log(rewardDuration);
-
   return (
-    <div className="flex justify-evenly rounded-xl border border-gray-300 w-auto h-100 mb-4 bg-gray-50">
+    <div className="flex justify-evenly rounded-xl border border-line w-auto h-100 mb-4 bg-wash">
       <div className="flex flex-col text-center p-5">
-        <div className="text-xs">Total Supply</div>
-        <div className="font-medium">
+        <div className="text-xs text-secondary">Total Supply</div>
+        <div className="font-medium text-primary">
           <TokenAmountDisplay amount={totalSupply || 0n} />
         </div>
       </div>
 
-      <div className="border-r border-gray-300"></div>
+      <div className="border-r border-line"></div>
 
       <div className="flex flex-col text-center p-5">
-        <div className="text-xs">Total Staked</div>
-        <div className="font-medium">
+        <div className="text-xs text-secondary">Total Staked</div>
+        <div className="font-medium text-primary">
           <TokenAmountDisplay amount={totalStaked || 0n} />
         </div>
       </div>
 
-      <div className="border-r border-gray-300"></div>
+      <div className="border-r border-line"></div>
 
       <div className="flex flex-col text-center p-5">
-        <div className="text-xs">Rewards per token</div>
-        <div className="font-medium">
+        <div className="text-xs text-secondary">Rewards per token</div>
+        <div className="font-medium text-primary">
           <TokenAmountDisplay amount={rewardPerToken || 0n} currency={"WETH"} />
         </div>
       </div>
 
-      <div className="border-r border-gray-300"></div>
+      <div className="border-r border-line"></div>
 
       <div className="flex flex-col text-center p-5">
-        <div className="text-xs">Rewards Duration</div>
-        <div className="font-medium">
+        <div className="text-xs text-secondary">Rewards Duration</div>
+        <div className="font-medium text-primary">
           {rewardDuration
             ? `Every ${Number(rewardDuration.toString()) / 86400} days}`
             : "Undefined"}

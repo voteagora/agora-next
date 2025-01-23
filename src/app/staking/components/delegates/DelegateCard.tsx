@@ -1,4 +1,3 @@
-import { HStack, VStack } from "@/components/Layout/Stack";
 import { DelegateProfileImage } from "@/app/staking/components/delegates/DelegateProfileImage";
 import { DelegateSocialLinks } from "@/components/Delegates/DelegateCard/DelegateSocialLinks";
 import { Button } from "@/components/ui/button";
@@ -26,18 +25,15 @@ export const DelegateCard = ({
 }: DelegateCardProps) => {
   return (
     <div className="flex flex-col">
-      <VStack
-        gap={4}
-        className="bg-neutral border border-line shadow-newDefault rounded-xl"
-      >
-        <VStack gap={4} justifyContent="justify-center">
+      <div className="flex flex-col gap-4 bg-wash border border-line shadow-newDefault rounded-xl p-4">
+        <div className="flex flex-col gap-4 justify-center">
           <DelegateProfileImage address={address} votingPower={votingPower} />
           <p className="break-words text-secondary overflow-hidden overflow-ellipsis line-clamp-2 text-base min-h-[48px]">
             {statement}
           </p>
-        </VStack>
+        </div>
         <div className="min-h-[24px]">
-          <HStack alignItems="items-stretch" className="justify-between">
+          <div className="flex flex-row justify-between items-stretch">
             <DelegateSocialLinks
               discord={discord}
               twitter={twitter}
@@ -52,9 +48,9 @@ export const DelegateCard = ({
             >
               {action}
             </Button>
-          </HStack>
+          </div>
         </div>
-      </VStack>
+      </div>
     </div>
   );
 };

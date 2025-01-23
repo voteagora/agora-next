@@ -4,7 +4,6 @@ import { type StakedDeposit } from "@/lib/types";
 import { useAccount } from "wagmi";
 import { useState } from "react";
 import { Breadcrumbs } from "@/app/staking/components/Breadcrumbs";
-import { HStack } from "@/components/Layout/Stack";
 import ReceiptContainer from "@/app/staking/components/receipt/ReceiptContainer";
 import { Receipt } from "@/app/staking/components/receipt/Receipt";
 import { PanelSetStakeAmount } from "@/app/staking/components/PanelSetStakeAmount";
@@ -36,7 +35,7 @@ export const EditDepositAmount = ({
       />
 
       {step === 1 && (
-        <HStack className="grid grid-cols-1  sm:grid-cols-4 gap-5 sm:gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 sm:gap-10">
           <div className="sm:col-span-4">
             <ReceiptContainer>
               <Receipt
@@ -55,11 +54,11 @@ export const EditDepositAmount = ({
               onClick={() => setStep(2)}
             />
           </div>
-        </HStack>
+        </div>
       )}
 
       {step === 2 && (
-        <HStack className="grid grid-cols-1  sm:grid-cols-4 gap-5 sm:gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 sm:gap-10">
           <div className="sm:col-span-4">
             <ReceiptContainer>
               <Receipt
@@ -82,7 +81,7 @@ export const EditDepositAmount = ({
               "Something went wrong!"
             )}
           </div>
-        </HStack>
+        </div>
       )}
     </div>
   );

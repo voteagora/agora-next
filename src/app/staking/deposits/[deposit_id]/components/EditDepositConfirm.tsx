@@ -8,14 +8,13 @@ import { StakedDeposit } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import {
-  useWriteContract,
   useSimulateContract,
   useWaitForTransactionReceipt,
+  useWriteContract,
 } from "wagmi";
 import { RedirectAfterSuccess } from "@/app/staking/components/RedirectAfterSuccess";
 import { useTokenAllowance } from "@/hooks/useTokenAllowance";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
-import { isAddress } from "viem";
 import { PanelSetAllowance } from "@/app/staking/components/PanelSetAllowance";
 
 interface EditDepositConfirmProps {
@@ -69,13 +68,13 @@ export const EditDepositConfirm = ({
   const isTransactionConfirmed = Boolean(data && !isLoading);
 
   return (
-    <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">
-      <div className="border border-slate-300 rounded-lg p-4">
-        <div className="text-center text-xs text-gray-600">
+    <div className="rounded-xl bg-wash border border-line w-[354px] p-4 shadow-newDefault">
+      <div className="border border-line bg-neutral rounded-lg p-4">
+        <div className="text-center text-xs text-secondary">
           Adding {token.symbol} to existing stake
         </div>
 
-        <div className="w-full text-center bg-neutral font-bold text-3xl text-primary">
+        <div className="w-full text-center font-bold text-3xl text-primary">
           {formatNumber(numberToToken(amount).toString(), token.decimals)}{" "}
           {token.symbol}
         </div>
@@ -96,7 +95,7 @@ export const EditDepositConfirm = ({
             </div>
           ) : (
             <>
-              <div className="text-sm py-4">
+              <div className="text-sm py-4 text-primary">
                 Please verify your transaction details before confirming.
               </div>
               <Button

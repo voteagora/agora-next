@@ -6,6 +6,7 @@ import { RedirectOrConnect } from "@/app/staking/components/RedirectOrConnect";
 import StakingFaq from "@/app/staking/components/StakingFaq";
 import { PanelNewDeposit } from "@/app/staking/components/PanelNewDeposit";
 import { StakingIntro } from "@/app/staking/components/StakingIntro";
+import { RouteNotSupported } from "@/components/shared/RouteNotSupported";
 
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
@@ -40,10 +41,8 @@ export async function generateMetadata({}) {
 export default async function Page() {
   const { token, ui } = Tenant.current();
 
-  if (ui.toggle("staking").enabled === false) {
-    return (
-      <div className="text-primary">Route not supported for namespace</div>
-    );
+  if (!ui.toggle("staking")?.enabled) {
+    return <RouteNotSupported />;
   }
 
   return (
@@ -55,7 +54,7 @@ export default async function Page() {
         </div>
 
         <div className="mt-10">
-          <div className="font-black text-2xl mb-5">
+          <div className="font-black text-2xl mb-5 text-primary">
             {token.symbol} Staking Metrics
           </div>
           <StakingStats />

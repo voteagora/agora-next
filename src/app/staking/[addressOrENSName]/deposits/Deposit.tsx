@@ -103,9 +103,9 @@ export const Deposit = ({
   return (
     <div className="px-5 py-4 w-full">
       <div className="flex flex-row gap-5 justify-between w-full">
-        <div className="w-[130px] border-r border-gray-300">
-          <div className="text-xs font-medium text-gray-700">Staked</div>
-          <div className="font-medium">
+        <div className="w-[130px] border-r border-line">
+          <div className="text-xs font-medium text-secondary">Staked</div>
+          <div className="font-medium text-primary">
             <TokenAmountDisplay
               maximumSignificantDigits={4}
               amount={deposit.amount}
@@ -114,7 +114,7 @@ export const Deposit = ({
         </div>
 
         <div className="text-left">
-          <div className="text-xs font-medium text-gray-700">
+          <div className="text-xs font-medium text-secondary">
             Vote delegated to
           </div>
           <div className="font-medium text-primary">
@@ -123,10 +123,10 @@ export const Deposit = ({
         </div>
 
         <div className="text-right">
-          <div className="text-xs font-medium text-gray-700">
+          <div className="text-xs font-medium text-secondary">
             Voting activity
           </div>
-          <div className="font-medium">
+          <div className="font-medium text-primary">
             {delegate
               ? `${delegate.lastTenProps} / 10 last props`
               : "0 / 10 last props"}
@@ -134,7 +134,7 @@ export const Deposit = ({
         </div>
 
         {isProcessingWithdrawal || didProcessWithdrawal ? (
-          <div className="py-3 px-5 font-medium rounded-lg border border-gray-300 text-gray-500">
+          <div className="py-3 px-5 font-medium rounded-lg border border-line text-secondary">
             Withdrawing...
           </div>
         ) : (
@@ -142,32 +142,32 @@ export const Deposit = ({
             {isDepositOwner ? (
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                  <div className="py-3 px-5 font-medium rounded-lg border border-gray-300 shadow-newDefault cursor-pointer">
+                  <div className="py-3 px-5 font-medium rounded-lg border border-line shadow-newDefault cursor-pointer text-primary">
                     Manage Deposit
                   </div>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Portal>
                   <DropdownMenu.Content
-                    className="DropdownMenuContent bg-neutral rounded-lg border border-gray-300 shadow-newDefault w-[250px]"
+                    className="DropdownMenuContent bg-neutral rounded-lg border border-line text-primary shadow-newDefault w-[250px]"
                     sideOffset={10}
                     alignOffset={0}
                     align="end"
                   >
                     {tokenBalance && tokenBalance > 0n && (
                       // Hide edit button when no token balance
-                      <div className="py-3 px-5 font-medium border-b border-gray-300 cursor-pointer hover:bg-gray-100">
+                      <div className="py-3 px-5 font-medium border-b border-line text-secondary hover:text-primary cursor-pointer">
                         <Link href={`/staking/deposits/${deposit.id}`}>
                           Edit amount
                         </Link>
                       </div>
                     )}
-                    <div className="py-3 px-5 font-medium border-b border-gray-300 cursor-pointer hover:bg-gray-100">
+                    <div className="py-3 px-5 font-medium border-b border-line text-secondary hover:text-primary cursor-pointer">
                       <Link href={`/staking/deposits/${deposit.id}/delegate`}>
                         Change delegate
                       </Link>
                     </div>
                     <div
-                      className="py-3 px-5 font-medium cursor-pointer hover:bg-gray-100"
+                      className="py-3 px-5 font-medium border-b border-line text-secondary hover:text-primary cursor-pointer"
                       onClick={() => writeContract(config!.request)}
                     >
                       Withdraw stake
@@ -176,7 +176,7 @@ export const Deposit = ({
                 </DropdownMenu.Portal>
               </DropdownMenu.Root>
             ) : (
-              <div className="py-3 px-5 font-medium rounded-lg border border-gray-300 text-gray-500">
+              <div className="py-3 px-5 font-medium rounded-lg border border-line text-secondary hover:bg-wash">
                 Manage Deposit
               </div>
             )}

@@ -20,7 +20,7 @@ export const DepositListAction = ({ address }: DepositListActionProps) => {
 
   return (
     <div>
-      <div className="p-5 flex justify-between">
+      <div className="p-5 flex justify-between text-primary">
         {tokenBalance !== undefined ? (
           <>
             <div className="font-medium">
@@ -36,7 +36,7 @@ export const DepositListAction = ({ address }: DepositListActionProps) => {
               )}
             </div>
 
-            <div className="font-light text-gray-600">
+            <div className="font-light text-secondary">
               <>
                 {hasDepositedBalance && (
                   <span className="mr-2">

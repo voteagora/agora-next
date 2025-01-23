@@ -71,9 +71,9 @@ export const NewStakeConfirm = ({
   const isTransactionConfirmed = Boolean(data && !isLoading);
 
   return (
-    <div className="rounded-xl border border-slate-300 w-[354px] p-4 shadow-newDefault">
-      <div className="border border-slate-300 rounded-lg p-4">
-        <div className="text-center text-xs text-gray-600">
+    <div className="rounded-xl border border-line bg-wash w-[354px] p-4 shadow-newDefault">
+      <div className="border border-line bg-neutral rounded-lg p-4">
+        <div className="text-center text-xs text-secondary">
           Staking {token.symbol}
         </div>
 
@@ -98,7 +98,7 @@ export const NewStakeConfirm = ({
             </div>
           ) : (
             <>
-              <div className="text-sm py-4">
+              <div className="text-sm py-4 text-primary">
                 Please verify your transaction details before confirming.
               </div>
 
