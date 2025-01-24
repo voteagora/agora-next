@@ -8,13 +8,13 @@ import { useModal } from "connectkit";
 
 export const RedirectOrConnect = () => {
   const { setOpen } = useModal();
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
 
   useEffect(() => {
-    if (address) {
+    if (address && isConnected) {
       redirect(`/staking/${address}`);
     }
-  }, [address]);
+  }, [address, isConnected]);
 
   return (
     <Button

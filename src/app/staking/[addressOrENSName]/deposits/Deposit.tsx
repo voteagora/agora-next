@@ -1,9 +1,8 @@
 "use client";
 
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import { StakedDeposit } from "@/lib/types";
-import type { Delegate } from "@/app/api/common/delegates/delegate";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
@@ -22,24 +21,20 @@ import { DEPOSITOR_TOTAL_STAKED_QK } from "@/hooks/useDepositorTotalStaked";
 import { INDEXER_DELAY } from "@/lib/constants";
 import { TOKEN_ALLOWANCE_QK } from "@/hooks/useTokenAllowance";
 import ENSName from "@/components/shared/ENSName";
+import { useVoterStats } from "@/hooks/useVoterStats";
 
 interface DepositProps {
   deposit: StakedDeposit;
-  fetchDelegate: (address: string) => Promise<Delegate>;
   refreshPath: (path: string) => void;
 }
 
-export const Deposit = ({
-  deposit,
-  fetchDelegate,
-  refreshPath,
-}: DepositProps) => {
+export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const { isConnected, address } = useAccount();
   const { data: tokenBalance } = useTokenBalance(address);
-  const [delegate, setDelegate] = useState<Delegate | null>(null);
-  const isDelegateFetched = useRef(false);
+
+  const { data: voterStats } = useVoterStats({ address: deposit.delegatee });
 
   const { contracts } = Tenant.current();
 
@@ -58,19 +53,7 @@ export const Deposit = ({
   const { isLoading: isProcessingWithdrawal, isFetched: didProcessWithdrawal } =
     useWaitForTransactionReceipt({ hash: data });
 
-  const getDelegate = async () => {
-    if (!isDelegateFetched.current) {
-      const delegate = await fetchDelegate(deposit.delegatee as `0x${string}`);
-      setDelegate(delegate);
-      isDelegateFetched.current = true;
-    }
-  };
-
   useEffect(() => {
-    //  Fetch delegate if not already fetched
-    if (!delegate && !isDelegateFetched.current) {
-      getDelegate();
-    }
     // Refresh route and invalidate cache if withdrawal was processed
     if (didProcessWithdrawal) {
       setTimeout(() => {
@@ -90,15 +73,7 @@ export const Deposit = ({
         });
       }, INDEXER_DELAY);
     }
-  }, [
-    delegate,
-    deposit,
-    didProcessWithdrawal,
-    getDelegate,
-    isDelegateFetched,
-    queryClient,
-    router,
-  ]);
+  }, [didProcessWithdrawal, queryClient]);
 
   return (
     <div className="px-5 py-4 w-full">
@@ -127,8 +102,8 @@ export const Deposit = ({
             Voting activity
           </div>
           <div className="font-medium text-primary">
-            {delegate
-              ? `${delegate.lastTenProps} / 10 last props`
+            {voterStats
+              ? `${voterStats.last_10_props} / 10 last props`
               : "0 / 10 last props"}
           </div>
         </div>

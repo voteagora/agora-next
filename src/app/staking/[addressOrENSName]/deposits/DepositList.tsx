@@ -2,19 +2,16 @@
 
 import React from "react";
 import { StakedDeposit } from "@/lib/types";
-import type { Delegate } from "@/app/api/common/delegates/delegate";
 import { Deposit } from "@/app/staking/[addressOrENSName]/deposits/Deposit";
 import { DepositListAction } from "@/app/staking/[addressOrENSName]/deposits/DepositListAction";
 
 interface StakedDepositListProps {
   deposits: StakedDeposit[];
-  fetchDelegate: (address: string) => Promise<Delegate>;
   refreshPath: (path: string) => void;
 }
 
 export const DepositList = ({
   deposits,
-  fetchDelegate,
   refreshPath,
 }: StakedDepositListProps) => {
   return (
@@ -23,11 +20,7 @@ export const DepositList = ({
         {deposits.map(async (deposit) => {
           return (
             <div key={`deposit-${deposit.id}`} className="flex w-auto h-100">
-              <Deposit
-                deposit={deposit}
-                fetchDelegate={fetchDelegate}
-                refreshPath={refreshPath}
-              />
+              <Deposit deposit={deposit} refreshPath={refreshPath} />
             </div>
           );
         })}

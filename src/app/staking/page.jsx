@@ -1,4 +1,3 @@
-import { HStack } from "@/components/Layout/Stack";
 import React from "react";
 import { StakingStats } from "@/app/staking/components/StakingStats";
 import Tenant from "@/lib/tenant/tenant";
@@ -46,7 +45,7 @@ export default async function Page() {
   }
 
   return (
-    <HStack className="grid grid-cols-1 grid-rows-2 sm:grid-cols-4 sm:grid-rows-1 gap-5 sm:gap-10 mt-12">
+    <div className="grid grid-cols-1 grid-rows-2 sm:grid-cols-4 sm:grid-rows-1 gap-5 sm:gap-10 mt-12">
       <div className="sm:col-span-4">
         <StakingIntro />
         <div className="mt-2">
@@ -66,6 +65,6 @@ export default async function Page() {
       <div className="sm:col-start-5">
         <PanelNewDeposit />
       </div>
-    </HStack>
+    </div>
   );
 }
