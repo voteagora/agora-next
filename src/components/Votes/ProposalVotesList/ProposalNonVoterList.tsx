@@ -8,10 +8,16 @@ import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useProposalNonVotes } from "@/hooks/useProposalNonVotes";
 import { Vote } from "@/app/api/common/votes/vote";
+import { cn } from "@/lib/utils";
 
 const LIMIT = 20;
 
-const ProposalNonVoterList = ({ proposal }: { proposal: Proposal }) => {
+type Props = {
+  proposal: Proposal;
+  isApprovalProposal?: boolean;
+};
+
+const ProposalNonVoterList = ({ proposal, isApprovalProposal }: Props) => {
   const { data: fetchedNonVotes, isFetched } = useProposalNonVotes({
     enabled: true,
     limit: LIMIT,
@@ -47,7 +53,14 @@ const ProposalNonVoterList = ({ proposal }: { proposal: Proposal }) => {
   const voters = pages.flatMap((page) => page.data);
 
   return (
-    <div className="px-4 pb-4 overflow-y-scroll max-h-[calc(100vh-437px)]">
+    <div
+      className={cn(
+        "px-4 pb-4 overflow-y-scroll",
+        isApprovalProposal
+          ? "max-h-[calc(100vh-497px)]"
+          : "max-h-[calc(100vh-437px)]"
+      )}
+    >
       {isFetched && fetchedNonVotes ? (
         <InfiniteScroll
           hasMore={meta?.has_next}

@@ -88,7 +88,7 @@ export default function ApprovalProposalVotesList({
   }, [connectedAddress, proposalId, fetchUserVotes, fetchUserVoteAndSet]);
 
   return (
-    <div className={"overflow-y-scroll max-h-[calc(100vh-437px)]"}>
+    <div className={"overflow-y-scroll max-h-[calc(100vh-497px)]"}>
       <InfiniteScroll
         hasMore={meta?.has_next}
         pageStart={1}
