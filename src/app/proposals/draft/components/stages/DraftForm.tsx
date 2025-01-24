@@ -176,7 +176,7 @@ const DraftForm = ({
                 />
               )}
               <h1 className="font-bold text-primary text-2xl m-0">
-                <MorphingText text="Draft submission" />
+                Draft submission
               </h1>
               <span className="bg-tertiary/5 text-tertiary rounded-full px-2 py-1 text-sm">
                 {/* stageObject.order + 1 is becuase order is zero indexed */}

@@ -103,7 +103,7 @@ const TempCheckForm = ({
                 />
               )}
               <h1 className="font-bold text-primary text-2xl m-0">
-                <MorphingText text="Add temp check" />
+                Add Temp Check
               </h1>
               <span className="bg-tertiary/5 text-tertiary rounded-full px-2 py-1 text-sm">
                 {/* stageObject.order + 1 is becuase order is zero indexed */}
@@ -150,7 +150,11 @@ const TempCheckForm = ({
             >
               <FormCard>
                 <FormCard.Section>
-                  <div className="w-full rounded-md h-[350px] block relative">
+                  <div
+                    className="w-full rounded-md h-[350px] block relative"
+                    onMouseEnter={() => setIsHovering(true)}
+                    onMouseLeave={() => setIsHovering(false)}
+                  >
                     {/* <Image
                       // TODO: do we want to make this something that is configurable by tenant?
                       // Or should we have a default for all tenants?
@@ -161,39 +165,39 @@ const TempCheckForm = ({
                     /> */}
                     <div className="flex items-center gap-2 bg-tertiary/5 rounded-lg relative overflow-y-hidden h-full">
                       <div className="absolute w-full h-full bg-[url('/images/grid.svg')]"></div>
+                      <EnvelopePaper
+                        className={`h-[280px] w-[280px] absolute transition-all left-[calc(50%-140px)] ${
+                          isHovering
+                            ? "bottom-[-40px] duration-500"
+                            : "bottom-[-50px] duration-300"
+                        }`}
+                      />
                       <StarIcon
-                        className={`text-brandPrimary absolute top-[40px] left-[45px] transition-all duration-500 ${
+                        className={`text-brandPrimary absolute top-[220px] left-[220px] transition-all duration-500 ${
                           isHovering
                             ? "rotate-[20deg] scale-150"
                             : "rotate-[30deg] scale-125"
                         }`}
                       />
                       <StarIcon
-                        className={`text-brandPrimary absolute top-[40px] right-[45px] transition-all duration-500 ${
+                        className={`text-brandPrimary absolute top-[100px] right-[230px] transition-all duration-500 ${
                           isHovering
                             ? "rotate-[-20deg] scale-150"
                             : "rotate-[-30deg] scale-125"
                         }`}
                       />
                       <StarIcon
-                        className={`text-secondary absolute bottom-[40px] left-[55px] transition-all duration-500 ${
+                        className={`text-secondary absolute bottom-[40px] left-[200px] transition-all duration-500 ${
                           isHovering
                             ? "rotate-[-20deg] scale-100"
                             : "rotate-[-30deg] scale-95"
                         }`}
                       />
                       <StarIcon
-                        className={`text-secondary absolute bottom-[40px] right-[55px] transition-all duration-500 ${
+                        className={`text-secondary absolute bottom-[150px] right-[190px] transition-all duration-500 ${
                           isHovering
                             ? "rotate-[20deg] scale-100"
                             : "rotate-[30deg] scale-95"
-                        }`}
-                      />
-                      <EnvelopePaper
-                        className={`h-[280px] w-[280px] absolute transition-all left-[calc(50%-140px)] ${
-                          isHovering
-                            ? "bottom-[-40px] duration-500"
-                            : "bottom-[-10px] duration-300"
                         }`}
                       />
                     </div>
