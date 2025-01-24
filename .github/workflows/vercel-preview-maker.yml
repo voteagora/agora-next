@@ -17,6 +17,9 @@ jobs:
         with:
           python-version: '3.11'  # or whichever version you prefer
 
+      - name: Install Vercel CLI
+        run: npm install --global vercel
+        
       - name: Install Python dependencies
         run: pip install requests
 
