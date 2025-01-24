@@ -63,7 +63,7 @@ const formSchema = z.object({
       .strict()
   ),
   notificationPreferences: z.object({
-    last_updated: z.string(),
+    last_updated: z.string().optional(),
     wants_proposal_created_email: z.union([
       z.literal("prompt"),
       z.literal("prompted"),
@@ -175,6 +175,7 @@ export default function CurrentDelegateStatement() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: setDefaultValues(delegateStatement),
+    mode: "onChange",
   });
   const { reset } = form;
 
