@@ -2,13 +2,8 @@ import { Metadata, ResolvingMetadata } from "next";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { fetchDelegate } from "@/app/delegates/actions";
-import { fetchVoterStats } from "@/app/api/common/delegates/getDelegates";
 import { formatNumber } from "@/lib/tokenUtils";
-import {
-  processAddressOrEnsName,
-  resolveENSName,
-  resolveENSProfileImage,
-} from "@/app/lib/ENSUtils";
+import { ensNameToAddress, processAddressOrEnsName } from "@/app/lib/ENSUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { Suspense } from "react";
 import DelegateStatementWrapper, {
@@ -20,7 +15,6 @@ import DelegationsContainerWrapper, {
 import VotesContainerWrapper, {
   VotesContainerSkeleton,
 } from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
-import { getPublicClient } from "@/lib/viem";
 import { SCWRedirect } from "@/app/delegates/[addressOrENSName]/components/SCWRedirect";
 
 export const dynamic = "force-dynamic";
@@ -32,14 +26,11 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   // cache ENS address upfront for all subsequent queries
   // TODO: change subqueries to use react cache
-  const address = await resolveENSName(params.addressOrENSName);
+  const address = await ensNameToAddress(params.addressOrENSName);
   const ensOrTruncatedAddress = await processAddressOrEnsName(
     params.addressOrENSName
   );
-  const [delegate, avatar] = await Promise.all([
-    fetchDelegate(address || params.addressOrENSName),
-    resolveENSProfileImage(address || params.addressOrENSName),
-  ]);
+  const delegate = await fetchDelegate(address);
 
   const { token } = Tenant.current();
 
@@ -52,7 +43,6 @@ export async function generateMetadata(
       `votes=${encodeURIComponent(
         `${formatNumber(delegate.votingPower.total || "0")} ${token.symbol}`
       )}`,
-    avatar && `avatar=${encodeURIComponent(avatar)}`,
     statement && `statement=${encodeURIComponent(statement)}`,
   ].filter(Boolean);
 
@@ -87,15 +77,8 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
-  const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
-  const publicClient = getPublicClient();
-  const blockNumber = await publicClient.getBlockNumber({
-    cacheTime: 0,
-  });
-  const [delegate, voterStats] = await Promise.all([
-    fetchDelegate(address),
-    fetchVoterStats(address, Number(blockNumber)),
-  ]);
+  const address = await ensNameToAddress(addressOrENSName);
+  const delegate = await fetchDelegate(address);
 
   if (!delegate) {
     return (
@@ -106,22 +89,18 @@ export default async function Page({
   return (
     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
       <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
-        <DelegateCard
-          delegate={delegate}
-          totalProposals={Number(voterStats.total_proposals)}
-          lastTenProps={Number(voterStats.last_10_props)}
-        />
+        <DelegateCard delegate={delegate} />
       </div>
       <div className="flex flex-col sm:ml-12 min-w-0 flex-1 max-w-full gap-8">
         <SCWRedirect address={address} />
         <Suspense fallback={<DelegateStatementSkeleton />}>
-          <DelegateStatementWrapper addressOrENSName={addressOrENSName} />
+          <DelegateStatementWrapper delegate={delegate} />
         </Suspense>
         <Suspense fallback={<DelegationsContainerSkeleton />}>
-          <DelegationsContainerWrapper addressOrENSName={addressOrENSName} />
+          <DelegationsContainerWrapper delegate={delegate} />
         </Suspense>
         <Suspense fallback={<VotesContainerSkeleton />}>
-          <VotesContainerWrapper addressOrENSName={addressOrENSName} />
+          <VotesContainerWrapper delegate={delegate} />
         </Suspense>
       </div>
     </div>

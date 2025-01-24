@@ -21,6 +21,12 @@ export type StakedDeposit = {
   id: number;
 };
 
+export type VoterStats = {
+  voter: string;
+  total_proposals: number;
+  last_10_props: number;
+};
+
 export type TenantNamespace =
   (typeof TENANT_NAMESPACES)[keyof typeof TENANT_NAMESPACES];
 

@@ -14,7 +14,7 @@ import {
 import { fetchBadgeholder } from "@/app/api/common/badgeholders/getBadgeholders";
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
 import { AuthInfo } from "@/app/lib/auth/types";
-import { resolveENSName } from "../ENSUtils";
+import { ensNameToAddress } from "../ENSUtils";
 import { SiweMessage } from "siwe";
 import { fetchProjectApi } from "@/app/api/common/projects/getProjects";
 
@@ -154,7 +154,7 @@ export async function validateAddressScope(
   addressOrEnsName: string,
   authResponse: AuthInfo
 ) {
-  const address = (await resolveENSName(addressOrEnsName)).toLowerCase();
+  const address = (await ensNameToAddress(addressOrEnsName)).toLowerCase();
 
   if (authResponse.userId?.toLowerCase() !== address) {
     return new Response("Unauthorized to perform action on this address", {

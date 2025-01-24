@@ -3,97 +3,15 @@ import DelegateCardClient from "./DelegateCardClient";
 import { formatNumber } from "@/lib/tokenUtils";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import { SCWProfileImage } from "@/components/Delegates/DelegateCard/SCWProfileImage";
+import { DelegateCardHeader } from "@/components/Delegates/DelegateCard/DelegateCardHeader";
 
-const CardHeader = ({
-  title,
-  cornerTitle,
-  subtitle,
-}: {
-  title: string;
-  cornerTitle: string;
-  subtitle: string;
-}) => {
-  return (
-    <div className="px-4 pt-4 pb-8 border border-line bg-tertiary/5 rounded-lg mb-[-16px]">
-      <div className="flex flex-col gap-0.5">
-        <div className="flex flex-row justify-between">
-          <h3 className="text-primary font-bold">{title}</h3>
-          <span className="text-primary font-bold">{cornerTitle}</span>
-        </div>
-        <p className="text-xs text-tertiary">{subtitle}</p>
-      </div>
-    </div>
-  );
-};
-
-const ActiveHeader = ({
-  outOfTen,
-  totalProposals,
-  percentParticipation,
-}: {
-  outOfTen: string;
-  totalProposals: number;
-  percentParticipation: number;
-}) => {
-  return (
-    <CardHeader
-      title="Active delegate"
-      cornerTitle={`🎉 ${percentParticipation}%`}
-      subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
-    />
-  );
-};
-
-const InactiveHeader = ({
-  outOfTen,
-  totalProposals,
-  percentParticipation,
-}: {
-  outOfTen: string;
-  totalProposals: number;
-  percentParticipation: number;
-}) => {
-  return (
-    <CardHeader
-      title="Inactive delegate"
-      cornerTitle={`💤 ${percentParticipation}%`}
-      subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
-    />
-  );
-};
-
-export default function DelegateCard({
-  delegate,
-  totalProposals,
-  lastTenProps,
-}: {
-  delegate: Delegate;
-  totalProposals: number;
-  lastTenProps: number;
-}) {
-  const percentParticipation =
-    (lastTenProps / Math.min(10, totalProposals)) * 100 || 0;
-
+export default function DelegateCard({ delegate }: { delegate: Delegate }) {
   // Display SCW if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
 
   return (
     <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
-      {totalProposals >= 3 ? (
-        percentParticipation > 50 ? (
-          <ActiveHeader
-            outOfTen={lastTenProps.toString()}
-            totalProposals={totalProposals}
-            percentParticipation={percentParticipation}
-          />
-        ) : (
-          <InactiveHeader
-            outOfTen={lastTenProps.toString()}
-            totalProposals={totalProposals}
-            percentParticipation={percentParticipation}
-          />
-        )
-      ) : null}
+      <DelegateCardHeader delegate={delegate} />
       <div className="flex flex-col bg-wash border border-line shadow-newDefault rounded-xl">
         <div className="flex flex-col items-stretch p-4 border-b border-line">
           <DelegateProfileImage

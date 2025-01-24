@@ -7,14 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { PaginatedResult } from "@/app/lib/pagination";
 import { useEffect, useRef, useState } from "react";
-import InfiniteScroll from "react-infinite-scroller";
 
 function DelegationsContainer({
   delegatees,
@@ -28,9 +26,11 @@ function DelegationsContainer({
     limit: number;
   }) => Promise<PaginatedResult<Delegation[]>>;
 }) {
-  const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegators.meta);
   const [delegators, setDelegators] = useState(initialDelegators.data);
+
+  const isLoadingRef = useRef(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setDelegators(initialDelegators.data);
@@ -38,15 +38,17 @@ function DelegationsContainer({
   }, [initialDelegators]);
 
   const loadMore = async () => {
-    if (!fetching.current && meta.has_next) {
-      fetching.current = true;
+    if (!isLoadingRef.current && meta.has_next) {
+      isLoadingRef.current = true;
+      setIsLoading(true);
       const data = await fetchDelegators({
         offset: meta.next_offset,
-        limit: 10,
+        limit: 20,
       });
-      setDelegators(delegators.concat(data.data));
+      isLoadingRef.current = false;
+      setIsLoading(false);
       setMeta(data.meta);
-      fetching.current = false;
+      setDelegators(delegators.concat(data.data));
     }
   };
 
@@ -72,7 +74,7 @@ function DelegationsContainer({
           </TabsList>
         </div>
         <TabsContent value="delegatedFrom" className="max-w-full">
-          <div className="flex flex-col gap-3 border border-line shadow-sm rounded-xl overflow-auto max-h-[500px]">
+          <div className="flex flex-col gap-3 border border-line shadow-sm rounded-xl overflow-auto max-h-[500px] bg-wash">
             <div className="w-full overflow-x-auto">
               <div className="min-w-[600px]">
                 <Table className="min-w-full">
@@ -92,25 +94,7 @@ function DelegationsContainer({
                       </TableHead>
                     </TableRow>
                   </TableHeader>
-                  <InfiniteScroll
-                    hasMore={meta.has_next}
-                    pageStart={1}
-                    loadMore={loadMore}
-                    loader={
-                      <TableRow key={0}>
-                        <TableCell
-                          key="loader"
-                          className="gl_loader justify-center py-6 text-sm text-secondary"
-                        >
-                          Loading...
-                        </TableCell>
-                      </TableRow>
-                    }
-                    // References styles of TableBody
-                    className="[&_tr:last-child]:border-0"
-                    element="tbody"
-                    useWindow={false}
-                  >
+                  <TableBody>
                     {delegators.length === 0 ? (
                       <td
                         className="w-full p-4 bg-neutral text-center text-secondary text-sm"
@@ -126,8 +110,19 @@ function DelegationsContainer({
                         />
                       ))
                     )}
-                  </InfiniteScroll>
+                  </TableBody>
                 </Table>
+                {meta.has_next && (
+                  <div className="text-center my-4">
+                    <button
+                      onClick={loadMore}
+                      disabled={isLoading}
+                      className="px-4 py-2 text-primary text-sm bg-wash hover:bg-wash/80 rounded-lg"
+                    >
+                      {isLoading ? "Loading..." : "Load More"}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -151,12 +146,14 @@ function DelegationsContainer({
               </TableHeader>
               <TableBody>
                 {delegatees.length === 0 ? (
-                  <td
-                    className="w-full p-4 bg-neutral text-center text-secondary text-sm"
-                    colSpan={6}
-                  >
-                    None found
-                  </td>
+                  <TableRow>
+                    <td
+                      className="w-full p-4 bg-neutral text-center text-secondary text-sm"
+                      colSpan={6}
+                    >
+                      None found
+                    </td>
+                  </TableRow>
                 ) : (
                   delegatees.map((delegation) => (
                     <DelegationToRow

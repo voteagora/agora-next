@@ -8,7 +8,7 @@ import { StakingStats } from "@/app/staking/components/StakingStats";
 import StakingFaq from "@/app/staking/components/StakingFaq";
 import { PanelClaimRewards } from "@/app/staking/components/PanelClaimRewards";
 import { PanelNewDeposit } from "@/app/staking/components/PanelNewDeposit";
-import { resolveENSName } from "@/app/lib/ENSUtils";
+import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import { revalidatePath } from "next/cache";
 import { StakingIntro } from "@/app/staking/components/StakingIntro";
 
@@ -28,7 +28,8 @@ export default async function Page({ params: { addressOrENSName } }) {
     return <div>Route not supported for namespace</div>;
   }
 
-  const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
+  const address =
+    (await ensNameToAddress(addressOrENSName)) || addressOrENSName;
 
   const { token } = Tenant.current();
   const deposits = await fetchDeposits(address.toLowerCase());

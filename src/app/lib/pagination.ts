@@ -17,8 +17,12 @@ export async function paginateResult<T>(
   query: (skip: number, take: number) => Promise<T[]>,
   params: PaginationParams
 ): Promise<PaginatedResult<T[]>> {
-  // retrieve one more than requested to see if there is more data
-  // for user to query
+  if (params.limit <= 0 || params.offset < 0) {
+    throw new Error(
+      "Limit must be greater than 0 and offset must be non-negative"
+    );
+  }
+
   const data = await query(params.offset, params.limit + 1);
 
   if (!data || data.length === 0) {
@@ -37,8 +41,8 @@ export async function paginateResult<T>(
 
   return {
     meta: {
-      has_next: has_next,
-      total_returned: data.length,
+      has_next,
+      total_returned: theData.length,
       next_offset: has_next ? params.offset + params.limit : 0,
     },
     data: theData,
