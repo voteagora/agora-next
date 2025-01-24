@@ -62,7 +62,6 @@ export default async function OPProposalApprovalPage({
               <ApprovalVotesPanel
                 proposal={proposal}
                 fetchVotesForProposal={fetchProposalVotes}
-                fetchAllForVoting={fetchAllForVoting}
                 fetchUserVotesForProposal={fetchUserVotesForProposal}
               />
             </div>

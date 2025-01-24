@@ -9,8 +9,6 @@ import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalPropos
 import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/ApprovalCastVoteButton";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
-import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
-import { Delegate } from "@/app/api/common/delegates/delegate";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
@@ -22,16 +20,6 @@ type Props = {
     proposalId: string,
     pagination?: PaginationParams
   ) => Promise<PaginatedResult<Vote[]>>;
-  fetchAllForVoting: (
-    address: string | `0x${string}`,
-    blockNumber: number,
-    proposalId: string
-  ) => Promise<{
-    votingPower: VotingPowerData;
-    authorityChains: string[][];
-    delegate: Delegate;
-    votesForProposalAndDelegate: Vote[];
-  }>;
   fetchUserVotesForProposal: (
     proposalId: string,
     address: string | `0x${string}`
@@ -41,7 +29,6 @@ type Props = {
 export default function ApprovalVotesPanel({
   proposal,
   fetchVotesForProposal,
-  fetchAllForVoting,
   fetchUserVotesForProposal,
 }: Props) {
   const [showVoters, setShowVoters] = useState(true);
@@ -112,10 +99,7 @@ export default function ApprovalVotesPanel({
         )}
         <ApprovalProposalCriteria proposal={proposal} />
         <div className="px-4 pb-6">
-          <ApprovalCastVoteButton
-            proposal={proposal}
-            fetchAllForVoting={fetchAllForVoting}
-          />
+          <ApprovalCastVoteButton proposal={proposal} />
         </div>
       </VStack>
     </motion.div>
