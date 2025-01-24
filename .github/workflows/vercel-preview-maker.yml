@@ -10,8 +10,6 @@ on:
 
 jobs:
   preview-build:
-    # Only run if the issue_comment event comes from a Pull Request
-    if: ${{ github.event.issue.pull_request }}
     runs-on: ubuntu-latest
 
     steps:
