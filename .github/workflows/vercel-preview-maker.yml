@@ -4,6 +4,10 @@ on:
   issue_comment:
     types: [created]
 
+  pull_request:
+    branches:
+      - '*'
+
 jobs:
   preview-build:
     # Only run if the issue_comment event comes from a Pull Request
