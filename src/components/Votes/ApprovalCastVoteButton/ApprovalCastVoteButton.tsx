@@ -1,14 +1,11 @@
 "use client";
 
 import { VStack, HStack } from "@/components/Layout/Stack";
-import { useCallback, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Delegate } from "@/app/api/common/delegates/delegate";
 import { Vote } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
@@ -20,69 +17,20 @@ import {
 } from "@/components/ui/tooltip";
 import { TokenAmountDisplay } from "@/lib/utils";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+<<<<<<< HEAD
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+=======
+import useFetchAllForVotingRoute from "@/hooks/useFetchAllForVotingRoute";
+>>>>>>> e02cd835 (Removes server action)
 
 type Props = {
   proposal: Proposal;
-  fetchAllForVoting: (
-    address: string | `0x${string}`,
-    blockNumber: number,
-    proposalId: string
-  ) => Promise<{
-    votingPower: VotingPowerData;
-    authorityChains: string[][];
-    delegate: Delegate;
-    votesForProposalAndDelegate: Vote[];
-  }>;
 };
 
-export default function ApprovalCastVoteButton({
-  proposal,
-  fetchAllForVoting,
-}: Props) {
-  const [votingPower, setVotingPower] = useState<VotingPowerData>({
-    directVP: "0",
-    advancedVP: "0",
-    totalVP: "0",
-  });
-  const [delegate, setDelegate] = useState<Delegate>();
-  const [chains, setChains] = useState<string[][]>([]);
-  const [votes, setVotes] = useState<Vote[]>([]);
-  const [isReady, setIsReady] = useState(false);
+export default function ApprovalCastVoteButton({ proposal }: Props) {
   const openDialog = useOpenDialog();
-
-  const { address } = useAccount();
-
-  const fetchData = useCallback(async () => {
-    setIsReady(false);
-    try {
-      const {
-        votingPower,
-        authorityChains,
-        delegate,
-        votesForProposalAndDelegate,
-      } = await fetchAllForVoting(
-        address!,
-        proposal.snapshotBlockNumber,
-        proposal.id
-      );
-
-      setVotingPower(votingPower);
-      setDelegate(delegate);
-      setChains(authorityChains);
-      setVotes(votesForProposalAndDelegate);
-      setIsReady(true);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }, [address, proposal, fetchAllForVoting]);
-
-  useEffect(() => {
-    if (address && proposal.snapshotBlockNumber) {
-      fetchData();
-    }
-  }, [fetchData, address, proposal.snapshotBlockNumber]);
+  const { data, isSuccess } = useFetchAllForVotingRoute({ proposal });
 
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
@@ -90,14 +38,18 @@ export default function ApprovalCastVoteButton({
   return (
     <VStack className="flex-shrink-0">
       <VStack alignItems="items-stretch">
+<<<<<<< HEAD
         {isReady && isOptimismTenant && (
+=======
+        {isSuccess && (
+>>>>>>> e02cd835 (Removes server action)
           <div className="pt-3">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="w-full flex items-center justify-center gap-1 text-primary font-medium cursor-help">
                   <span className="flex items-center text-xs font-semibold text-primary">
                     Proposal voting power{"\u00A0"}
-                    <TokenAmountDisplay amount={votingPower.totalVP} />
+                    <TokenAmountDisplay amount={data?.votingPower.totalVP} />
                     <InformationCircleIcon className="w-4 h-4 ml-1" />
                   </span>
                 </TooltipTrigger>
@@ -142,17 +94,17 @@ export default function ApprovalCastVoteButton({
               type: "APPROVAL_CAST_VOTE",
               params: {
                 proposal: proposal,
-                hasStatement: !!delegate?.statement,
-                votingPower,
-                authorityChains: chains,
+                hasStatement: !!data?.delegate?.statement,
+                votingPower: data?.votingPower,
+                authorityChains: data?.chains,
                 missingVote,
               },
             })
           }
           proposalStatus={proposal.status}
-          delegateVotes={votes}
-          isReady={isReady}
-          votingPower={votingPower}
+          delegateVotes={data?.votes}
+          isReady={isSuccess}
+          votingPower={data?.votingPower}
         />
       </VStack>
     </VStack>
