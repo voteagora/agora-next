@@ -159,7 +159,7 @@ const ProposalTransactionItem = ({
           <>
             {bigValue === 0n
               ? ""
-              : ".transfer( " + ethers.formatEther(value) + " ETH )"}
+              : ".transfer( " + ethers.formatEther(bigValue) + " ETH )"}
           </>
         );
       })()}
