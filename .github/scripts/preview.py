@@ -5,116 +5,83 @@ import json
 import subprocess
 import requests
 
-def main():
-    # 1. Load the GitHub event payload
-    event_path = os.environ.get("GITHUB_EVENT_PATH")
-    if not event_path or not os.path.exists(event_path):
-        print("No event payload found. Exiting.")
-        return
 
-    with open(event_path, 'r', encoding='utf-8') as f:
-        event = json.load(f)
+class VercelClient:
+    def __init__(self, project, token):
+        self.project = project
+        self.token = token
 
-    # 2. Extract comment body
-    comment_body = event.get("comment", {}).get("body", "")
-    print(f"Comment body: {comment_body}")
+        # Set your Vercel API token and project details
+        self.team_id = os.getenv('VERCEL_TEAM_ID', 'team_hKtANNG7ss8aaHhb1BkJJYdH')  # Found in Vercel's project settings
 
-    # 3. Check if the comment starts with '/preview'
-    if not comment_body.startswith("/preview"):
-        print("Comment does not start with /preview. Exiting.")
-        return
+        self.org = "voteagora"
+        self.repo = "agora-next"
 
-    # 4. Parse the project argument
-    # Expected command format: "/preview <project>"
-    tokens = comment_body.split()
-    if len(tokens) > 1:
-        project_arg = tokens[1]
-    else:
-        project_arg = "all-projects"  # default if none specified
+    def deploy(self, pr, extra_message=""):
 
-    print(f"Project argument: {project_arg}")
+        # Vercel API endpoint
+        VERCEL_DEPLOY_URL = "https://api.vercel.com/v13/deployments?forceNew=1&teamId=" + self.team_id
 
-    # 5. Deploy to Vercel if /preview is invoked
-    vercel_token = os.environ.get("VERCEL_TOKEN")
-    if not vercel_token:
-        print("VERCEL_TOKEN not found in environment. Exiting.")
-        return
+        # Deployment payload
+        payload = {
+            "name": self.project,
+            "project": self.project,
+        
+            "gitSource": {
+                "type": "github",
+                "org": self.org,
+                "repo": self.repo,
+                "ref": f"refs/pull/{pr}/head"
+            },
+            "target": "staging"  # Deploy as a preview deployment
+        }
 
-    try:
-        if project_arg == "all-projects":
-            # Example: deploy multiple projects in a loop
-            print("Deploying ALL projects...")
-            # for proj_id in ["my-project-A", "my-project-B", ...]:
-            #     deploy_vercel(proj_id, vercel_token)
-            deploy_vercel(None, vercel_token, extra_message="(All projects placeholder)")
+        # Headers with authentication
+        headers = {
+            "Authorization": f"Bearer {self.token}",
+            "Content-Type": "application/json"
+        }
+
+        # Make the request
+        response = requests.post(VERCEL_DEPLOY_URL, json=payload, headers=headers)
+
+        # Check response
+        if response.status_code == 200:
+            print("Deployment triggered successfully!")
+            url = response.json().get("url")
+            print("Deployment URL:", url)
+            print(response.json())
         else:
-            # Deploy a single project
-            print(f"Deploying project: {project_arg}")
-            deploy_vercel(project_arg, vercel_token)
-    except Exception as e:
-        print(f"Error deploying to Vercel: {e}")
+            print("Failed to trigger deployment:", response.text)
+            
+        return f"[Preview Link]({url})"
 
-    # 6. Post a comment back to the PR indicating that we've started the preview
-    github_token = os.environ.get("GITHUB_TOKEN")
-    if not github_token:
-        print("GITHUB_TOKEN not found; cannot comment on PR.")
-        return
+    def set_envvar(self, key, val, branch):
 
-    # We can comment on the same issue (PR) that triggered this
-    issue_number = event.get("issue", {}).get("number")
-    repo_owner = event.get("repository", {}).get("owner", {}).get("login")
-    repo_name = event.get("repository", {}).get("name")
+        # Vercel API endpoint
+        VERCEL_DEPLOY_URL = f"https://api.vercel.com/v10/projects/{self.project}/env?teamId={self.team_id}&upsert=true"
 
-    if not (issue_number and repo_owner and repo_name):
-        print("Could not determine issue/repo details from event. Exiting.")
-        return
+        # Deployment payload
+        payload = {
+            "key" : key,
+            "value" : val,
+            "type" : "plain",
+            "gitBranch" : branch,
+            "target": ["preview"]  # Deploy as a preview deployment
+        }
 
-    if project_arg == "all-projects":
-        body_message = "Preview deployment triggered for **all** projects."
-    else:
-        body_message = f"Preview deployment triggered for project **{project_arg}**."
+        # Headers with authentication
+        headers = {
+            "Authorization": f"Bearer {self.token}",
+            "Content-Type": "application/json"
+        }
 
-    post_github_comment(
-        github_token=github_token,
-        owner=repo_owner,
-        repo=repo_name,
-        issue_number=issue_number,
-        body=body_message
-    )
+        # Make the request
+        response = requests.post(VERCEL_DEPLOY_URL, json=payload, headers=headers)
 
+        print(response.json())
 
-def deploy_vercel(project, token, extra_message=""):
-    """
-    Deploy to Vercel using the CLI. If `project` is None, do a placeholder
-    or loop over your actual projects. Adjust flags for your org/team.
-    """
-    if project is None:
-        # Example placeholder for all-projects scenario
-        cmd = [
-            "vercel",
-            "--token", token,
-            # Additional flags as needed
-        ]
-    else:
-        cmd = [
-            "vercel",
-            "--token", token,
-            "--scope", "YOUR_ORG",       # if needed
-            "--project", project        # if needed
-        ]
-
-    print(f"Running Vercel command: {' '.join(cmd)}")
-    completed = subprocess.run(cmd, capture_output=True, text=True)
-    if completed.returncode != 0:
-        raise RuntimeError(f"Vercel deploy failed: {completed.stderr}")
-
-    # Optionally parse the deployment URL from completed.stdout and log it
-    # For example:
-    #   deployment_url = get_url_from_output(completed.stdout)
-    #   print(f"Deployment URL: {deployment_url}")
-    print(f"Vercel output:\n{completed.stdout}")
-    print("Deployment succeeded!", extra_message)
-
+        return f"Env Var Set : {key} = {val}"
 
 def post_github_comment(github_token, owner, repo, issue_number, body):
     """
@@ -130,6 +97,68 @@ def post_github_comment(github_token, owner, repo, issue_number, body):
         print(f"Failed to post comment: {response.text}")
     else:
         print("Successfully posted comment to PR!")
+
+
+def main():
+    # 1. Load the GitHub event payload
+    event_path = os.environ.get("GITHUB_EVENT_PATH")
+    if not event_path or not os.path.exists(event_path):
+        print("No event payload found. Exiting.")
+        return
+
+    # 5. Deploy to Vercel if /preview is invoked
+    VERCEL_TOKEN = os.environ.get("VERCEL_TOKEN")
+    if not vercel_token:
+        print("VERCEL_TOKEN not found in environment. Exiting.")
+        return
+    
+    with open(event_path, 'r', encoding='utf-8') as f:
+        event = json.load(f)
+    
+    print(event)
+
+    # We can comment on the same issue (PR) that triggered this
+    issue_number = event.get("issue", {}).get("number")
+    repo_owner = event.get("repository", {}).get("owner", {}).get("login")
+    repo_name = event.get("repository", {}).get("name")
+    branch = event.get("branch", {}).get("name", "jeff/test-vercel-commands")
+
+    # 2. Extract comment body
+    comment_body = event.get("comment", {}).get("body", "")
+    print(f"Comment body: {comment_body}")
+
+    # 3. Check if the comment starts with '/preview'
+    if comment_body.startswith("/set"):
+        _, project, key, val = comment_body.split(" ")
+        vercel = VercelClient(project, VERCEL_TOKEN)
+        msg = vercel.set_envvar(key, val, branch)
+
+    # 3. Check if the comment starts with '/preview'
+    elif comment_body.startswith("/preview"):
+        _, project = comment_body.split(" ")
+        vercel = VercelClient(project, VERCEL_TOKEN)
+        msg = vercel.deploy(issue_number)
+    
+    else:
+
+        # 6. Post a comment back to the PR indicating that we've started the preview
+        github_token = os.environ.get("GITHUB_TOKEN")
+        if not github_token:
+            print("GITHUB_TOKEN not found; cannot comment on PR.")
+            return
+
+        if not (issue_number and repo_owner and repo_name):
+            print("Could not determine issue/repo details from event. Exiting.")
+            return
+
+        post_github_comment(
+            github_token=github_token,
+            owner=repo_owner,
+            repo=repo_name,
+            issue_number=issue_number,
+            body=msg
+        )
+
 
 if __name__ == "__main__":
     main()
