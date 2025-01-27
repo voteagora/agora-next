@@ -1,3 +1,5 @@
+"use client";
+
 import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import Tenant from "@/lib/tenant/tenant";
 import Link from "next/link";
@@ -5,11 +7,11 @@ import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import React from "react";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 
-interface DepositListActionProps {
+interface Props {
   address: string;
 }
 
-export const DepositListAction = ({ address }: DepositListActionProps) => {
+export const DepositListAction = ({ address }: Props) => {
   const { token } = Tenant.current();
   const { data: tokenBalance } = useTokenBalance(address);
   const { data: depositedBalance, isFetched: isDepositFetched } =

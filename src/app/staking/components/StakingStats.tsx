@@ -7,7 +7,7 @@ import { useTotalStaked } from "@/hooks/useTotalStaked";
 import { useRewardPerToken } from "@/hooks/useRewardPerToken";
 import { useRewardDuration } from "@/hooks/useRewardDuration";
 
-export const StakingStats = async () => {
+export const StakingStats = () => {
   const { data: totalSupply } = useTotalSupply({ enabled: true });
   const { data: totalStaked } = useTotalStaked({ enabled: true });
   const { data: rewardPerToken } = useRewardPerToken({ enabled: true });

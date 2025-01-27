@@ -8,7 +8,6 @@ import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 import {
   useAccount,
-  useSimulateContract,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
@@ -22,6 +21,7 @@ import { INDEXER_DELAY } from "@/lib/constants";
 import { TOKEN_ALLOWANCE_QK } from "@/hooks/useTokenAllowance";
 import ENSName from "@/components/shared/ENSName";
 import { useVoterStats } from "@/hooks/useVoterStats";
+import { TOTAL_STAKED_QK } from "@/hooks/useTotalStaked";
 
 interface DepositProps {
   deposit: StakedDeposit;
@@ -31,22 +31,14 @@ interface DepositProps {
 export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
   const queryClient = useQueryClient();
   const router = useRouter();
+
   const { isConnected, address } = useAccount();
   const { data: tokenBalance } = useTokenBalance(address);
-
   const { data: voterStats } = useVoterStats({ address: deposit.delegatee });
 
   const { contracts } = Tenant.current();
-
-  const { data: config } = useSimulateContract({
-    address: contracts.staker!.address as `0x${string}`,
-    abi: contracts.staker!.abi,
-    chainId: contracts.staker!.chain.id,
-    functionName: "withdraw",
-    args: [BigInt(deposit.id), BigInt(deposit.amount)],
-  });
-
   const { data, writeContract } = useWriteContract();
+
   const isDepositOwner =
     isConnected && address?.toLowerCase() === deposit.depositor.toLowerCase();
 
@@ -67,13 +59,16 @@ export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
           queryClient.invalidateQueries({
             queryKey: [TOKEN_ALLOWANCE_QK],
           }),
+          queryClient.invalidateQueries({
+            queryKey: [TOTAL_STAKED_QK],
+          }),
         ]).then(() => {
           refreshPath(`/staking/${deposit.depositor}`);
           router.refresh();
         });
       }, INDEXER_DELAY);
     }
-  }, [didProcessWithdrawal, queryClient]);
+  }, [didProcessWithdrawal]);
 
   return (
     <div className="px-5 py-4 w-full">
@@ -143,7 +138,15 @@ export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
                     </div>
                     <div
                       className="py-3 px-5 font-medium border-b border-line text-secondary hover:text-primary cursor-pointer"
-                      onClick={() => writeContract(config!.request)}
+                      onClick={() => {
+                        writeContract({
+                          address: contracts.staker!.address as `0x${string}`,
+                          abi: contracts.staker!.abi,
+                          chainId: contracts.staker!.chain.id,
+                          functionName: "withdraw",
+                          args: [BigInt(deposit.id), BigInt(deposit.amount)],
+                        });
+                      }}
                     >
                       Withdraw stake
                     </div>

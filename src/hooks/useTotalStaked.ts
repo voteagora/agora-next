@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Tenant from "@/lib/tenant/tenant";
 
-export const TOTAL_STAKED_QK = "tokenBalance";
+export const TOTAL_STAKED_QK = "totalStaked";
 
 interface Props {
   enabled: true;

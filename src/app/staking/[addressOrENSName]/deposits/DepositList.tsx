@@ -1,4 +1,4 @@
-"use client";
+"use server";
 
 import React from "react";
 import { StakedDeposit } from "@/lib/types";
@@ -10,7 +10,7 @@ interface StakedDepositListProps {
   refreshPath: (path: string) => void;
 }
 
-export const DepositList = ({
+export const DepositList = async ({
   deposits,
   refreshPath,
 }: StakedDepositListProps) => {
