@@ -7,6 +7,8 @@ import { icons } from "@/icons/icons";
 import Image from "next/image";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useProposalVotes } from "@/hooks/useProposalVotes";
+import { useProposalVotesChart } from "@/hooks/useProposalVotesChart";
+import { useLatestBlock } from "@/hooks/useLatestBlock";
 
 export default function ProposalChart({ proposal }: { proposal: Proposal }) {
   const [tabIndex, setTabIndex] = useState(0);
@@ -18,6 +20,13 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
     offset: 0,
     proposalId: proposal.id,
   });
+
+  const { data: chartVotes } = useProposalVotesChart({
+    enabled: showChart,
+    proposalId: proposal.id,
+  });
+
+  const { data: latestBlock } = useLatestBlock({ enabled: showChart });
 
   const handleTabsChange = (index: number) => {
     setTabIndex(index);
@@ -54,13 +63,15 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
       </div>
       {showChart && (
         <>
-          {isFetched && fetchedVotes ? (
+          {fetchedVotes && latestBlock && chartVotes ? (
             <div className="tab-panels">
               {tabIndex === 0 && (
                 <div className="tab-panel">
                   <VotingTimelineChart
                     proposal={proposal}
                     proposalVotes={fetchedVotes}
+                    votes={chartVotes}
+                    block={latestBlock}
                   />
                 </div>
               )}

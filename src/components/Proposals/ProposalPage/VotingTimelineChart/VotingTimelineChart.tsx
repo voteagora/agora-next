@@ -5,45 +5,57 @@ import {
   AreaChart,
   CartesianGrid,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
 } from "recharts";
 import { format } from "date-fns";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import Tenant from "@/lib/tenant/tenant";
 import {
+  formatFullDate,
   formatNumber,
   formatNumberWithScientificNotation,
   isScientificNotation,
-  formatFullDate,
 } from "@/lib/utils";
 import { PaginatedResult } from "@/app/lib/pagination";
-import { DaoSlug } from "@prisma/client";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { rgbStringToHex } from "@/app/lib/utils/color";
+import { ChartVote } from "@/lib/types";
+import { getHumanBlockTime } from "@/lib/blockTimes";
+import { Block } from "ethers";
+import { formatUnits } from "viem";
 
-const { token, slug, ui } = Tenant.current();
+const { token, namespace, contracts, ui } = Tenant.current();
 
 /**
  * Transforms an array of votes into chart data.
  */
-const transformVotesToChartData = (votes: Vote[]) => {
+const transformVotesToChartData = ({
+  votes,
+  block,
+}: {
+  votes: ChartVote[];
+  block: Block;
+}) => {
   let forCount = 0;
   let abstain = 0;
   let against = 0;
 
-  return votes.map((voter) => {
-    forCount = voter.support === "FOR" ? forCount + +voter.weight : forCount;
-    abstain = voter.support === "ABSTAIN" ? abstain + +voter.weight : abstain;
-    against = voter.support === "AGAINST" ? against + +voter.weight : against;
+  return votes.map((vote) => {
+    const weight = parseInt(vote.weight, 18);
+
+    forCount = vote.support === "FOR" ? forCount + +weight : forCount;
+    abstain = vote.support === "ABSTAIN" ? abstain + +weight : abstain;
+    against = vote.support === "AGAINST" ? against + +weight : against;
 
     return {
-      ...voter,
+      weight: weight,
       for: forCount,
       abstain: abstain,
       against: against,
+      timestamp: getHumanBlockTime(vote.block_number, block),
       total: forCount + abstain + against,
     };
   });
@@ -170,16 +182,16 @@ const CustomTooltip = ({ active, payload, label, quorum }: any) => {
 };
 
 export default function VotingTimelineChart({
-  proposal,
+  block,
+  votes,
   proposalVotes,
+  proposal,
 }: {
+  block: Block;
   proposal: Proposal;
   proposalVotes: PaginatedResult<Vote[]>;
+  votes: ChartVote[];
 }) {
-  return <Chart proposal={proposal} votes={proposalVotes.data} />;
-}
-
-const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
   let stackIds = {
     for: "1",
     abstain: "1",
@@ -194,9 +206,9 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
    * This is a temporary fix stack for + abstain, but not against.
    * A future fix will read each tenant and stack depending on how the tenant counts quorum.
    */
-  if (slug === DaoSlug.ENS) {
+  if (namespace === TENANT_NAMESPACES.ENS) {
     stackIds.against = "2";
-  } else if (slug === DaoSlug.UNI) {
+  } else if (namespace === TENANT_NAMESPACES.UNISWAP) {
     stackIds.against = "2";
     stackIds.abstain = "3";
   }
@@ -204,13 +216,13 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
   /**
    * Sorts the voting data based on the timestamp in ascending order.
    */
-  const sortedChartData = votes?.sort(
-    (a, b) =>
-      new Date(a?.timestamp || "").getTime() -
-      new Date(b?.timestamp || "").getTime()
-  );
+  // const sortedChartData = votes?.sort(
+  //   (a, b) =>
+  //     new Date(a?.timestamp || "").getTime() -
+  //     new Date(b?.timestamp || "").getTime()
+  // );
 
-  const chartData = transformVotesToChartData(sortedChartData);
+  const chartData = transformVotesToChartData({ votes, block });
 
   const modifiedChartData = [
     {
@@ -310,4 +322,4 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
       </ResponsiveContainer>
     </div>
   );
-};
+}

@@ -420,15 +420,31 @@ async function getVotesChart({
   }
 
   const query = `
-  SELECT
-    voter,
-    support,
-    weight,
-    block_number
-  FROM ${namespace}.${eventsViewName}
-  WHERE proposal_id = $1
-  ORDER BY block_number DESC;
-`;
+    SELECT
+      voter,
+      support,
+      SUM(weight) as weight,
+      MAX(block_number) as block_number
+    FROM (
+      SELECT
+        voter,
+        support,
+        weight::numeric,
+        block_number
+      FROM ${namespace}.vote_cast_events
+      WHERE proposal_id = $1 AND contract = $2
+      UNION ALL
+      SELECT
+        voter,
+        support,
+        weight::numeric,
+        block_number
+      FROM ${namespace}.${eventsViewName}
+      WHERE proposal_id = $1 AND contract = $2
+    ) t
+    GROUP BY voter, support
+    ORDER BY block_number DESC;
+  `;
 
   return await prisma.$queryRawUnsafe<VotePayload[]>(
     query,
