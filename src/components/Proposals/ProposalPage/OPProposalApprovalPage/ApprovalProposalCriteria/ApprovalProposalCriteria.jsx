@@ -16,10 +16,20 @@ export default function ApprovalProposalCriteria({ proposal }) {
           className="text-xs font-semibold text-secondary py-2"
         >
           <div>
-            Quorum <TokenAmountDisplay amount={proposal.quorum} />
+            Quorum{" "}
+            <TokenAmountDisplay
+              amount={proposal.quorum}
+              hideCurrency
+              specialFormatting
+            />
           </div>
           <div>
-            Current <TokenAmountDisplay amount={currentQuorum} />
+            Current{" "}
+            <TokenAmountDisplay
+              amount={currentQuorum}
+              hideCurrency
+              specialFormatting
+            />
           </div>
         </HStack>
         <ProposalStatusDetail

@@ -23,7 +23,8 @@ function AmountAndPercent({
     total > 0 ? ((Number(amount) / Number(total)) * 100).toFixed(2) : undefined;
   return (
     <span>
-      <TokenAmountDisplay amount={amount} /> {percent && `(${percent}%)`}
+      <TokenAmountDisplay amount={amount} hideCurrency specialFormatting />
+      {percent && `(${percent}%)`}
     </span>
   );
 }
@@ -116,13 +117,15 @@ export default function ProposalVotesSummaryDetails({
                 <TokenAmountDisplay
                   amount={quorumVotes}
                   decimals={token.decimals}
-                  currency={""}
+                  hideCurrency
+                  specialFormatting
                 />{" "}
                 /{" "}
                 <TokenAmountDisplay
                   amount={proposal.quorum}
                   decimals={token.decimals}
-                  currency={""}
+                  hideCurrency
+                  specialFormatting
                 />{" "}
                 Required
               </p>

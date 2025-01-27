@@ -42,10 +42,20 @@ export default function ProposalVotesSummary({ proposal }: Props) {
           <div className="flex flex-col gap-2 pt-2 px-4 rounded-md font-bold shrink-0 text-xs border border-line mx-4 shadow-newDefault">
             <div className="flex flex-row justify-between mt-2">
               <div className="text-positive">
-                FOR <TokenAmountDisplay amount={results.for} />
+                FOR -{" "}
+                <TokenAmountDisplay
+                  amount={results.for}
+                  hideCurrency
+                  specialFormatting
+                />
               </div>
               <div className="text-negative">
-                AGAINST <TokenAmountDisplay amount={results.against} />
+                AGAINST -{" "}
+                <TokenAmountDisplay
+                  amount={results.against}
+                  hideCurrency
+                  specialFormatting
+                />
               </div>
             </div>
 
@@ -56,7 +66,12 @@ export default function ProposalVotesSummary({ proposal }: Props) {
                 <>
                   {proposal.quorum && (
                     <div>
-                      Quorum <TokenAmountDisplay amount={proposal.quorum} />
+                      Quorum{" "}
+                      <TokenAmountDisplay
+                        amount={proposal.quorum}
+                        hideCurrency
+                        specialFormatting
+                      />
                     </div>
                   )}
                 </>

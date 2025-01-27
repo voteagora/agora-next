@@ -7,13 +7,35 @@ import {
 } from "@/components/ui/hover-card";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import VoteText from "../VoteText/VoteText";
 import VoterHoverCard from "../VoterHoverCard";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
-import { getBlockScanUrl, timeout } from "@/lib/utils";
+import {
+  capitalizeFirstLetter,
+  formatNumber,
+  getBlockScanUrl,
+  timeout,
+} from "@/lib/utils";
 import { useState } from "react";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
+import { Support } from "@/lib/voteUtils";
+import { CheckIcon, MinusIcon, X } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import Tenant from "@/lib/tenant/tenant";
+
+const { token } = Tenant.current();
+
+// Using Lucide icons instead of Heroicons for better support of strokeWidth
+const SUPPORT_TO_ICON: Record<Support, React.ReactNode> = {
+  ["FOR"]: <CheckIcon strokeWidth={4} className="w-3 h-3 text-positive" />,
+  ["AGAINST"]: <X strokeWidth={4} className="w-3 h-3 text-negative" />,
+  ["ABSTAIN"]: <MinusIcon strokeWidth={4} className="w-3 h-3 text-tertiary" />,
+};
 
 export function ProposalSingleVote({
   vote,
@@ -61,11 +83,12 @@ export function ProposalSingleVote({
             >
               <HStack gap={1} alignItems="items-center">
                 <ENSAvatar ensName={data} className="w-5 h-5" />
-                <ENSName address={vote.address} />
+                <div className="text-primary">
+                  <ENSName address={vote.address} />
+                </div>
                 {vote.address === connectedAddress?.toLowerCase() && (
-                  <p>(you)</p>
+                  <p className="text-primary">(you)</p>
                 )}
-                <VoteText support={vote.support} />
                 {hovered && (
                   <>
                     <a
@@ -88,7 +111,32 @@ export function ProposalSingleVote({
                 )}
               </HStack>
               <HStack alignItems="items-center">
-                <TokenAmountDisplay amount={vote.weight} />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div
+                        className={
+                          vote.support === "AGAINST"
+                            ? "text-negative"
+                            : vote.support === "FOR"
+                              ? "text-positive"
+                              : "text-tertiary"
+                        }
+                      >
+                        <TokenAmountDisplay
+                          amount={vote.weight}
+                          useChivoMono
+                          hideCurrency
+                          specialFormatting
+                          icon={SUPPORT_TO_ICON[vote.support as Support]}
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="p-4">
+                      {`${formatNumber(vote.weight, token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </HStack>
             </HStack>
           </HoverCardTrigger>
@@ -105,7 +153,7 @@ export function ProposalSingleVote({
           </HoverCardContent>
         </HoverCard>
       </VStack>
-      <pre className="text-xs font-medium whitespace-pre-wrap text-tertiary w-fit break-all font-sans">
+      <pre className="text-xs font-medium whitespace-pre-wrap text-secondary w-fit break-all font-sans">
         {vote.reason}
       </pre>
     </VStack>

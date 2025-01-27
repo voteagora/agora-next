@@ -15,7 +15,8 @@ export default async function OPProposalPage({ proposal }) {
   const againstLengthString = formatNumber(
     proposal.proposalResults.against,
     18,
-    0
+    0,
+    true
   );
   const againstLength = Number(
     formatUnits(proposal.proposalResults.against, 18)

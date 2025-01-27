@@ -52,8 +52,12 @@ export function ProposalSingleNonVoter({
       >
         <HStack gap={1} alignItems="items-center">
           <ENSAvatar ensName={data} className="w-5 h-5" />
-          <ENSName address={voter.delegate} />
-          {voter.delegate === connectedAddress?.toLowerCase() && <p>(you)</p>}
+          <div className="text-primary">
+            <ENSName address={voter.delegate} />
+          </div>
+          {voter.delegate === connectedAddress?.toLowerCase() && (
+            <p className="text-primary">(you)</p>
+          )}
           {voter.twitter && (
             <button
               className="hover:opacity-80"
@@ -107,8 +111,13 @@ export function ProposalSingleNonVoter({
             </button>
           )}
         </HStack>
-        <HStack alignItems="items-center">
-          <TokenAmountDisplay amount={pastVotes || voter.direct_vp} />
+        <HStack className="text-primary" alignItems="items-center">
+          <TokenAmountDisplay
+            amount={pastVotes || voter.direct_vp}
+            useChivoMono
+            hideCurrency
+            specialFormatting
+          />
         </HStack>
       </HStack>
     </VStack>

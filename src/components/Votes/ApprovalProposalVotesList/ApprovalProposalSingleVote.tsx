@@ -9,12 +9,24 @@ import { useAccount } from "wagmi";
 import { type Vote } from "@/app/api/common/votes/vote";
 import VoterHoverCard from "../VoterHoverCard";
 import { useState } from "react";
-import { getBlockScanUrl, timeout } from "@/lib/utils";
+import {
+  capitalizeFirstLetter,
+  formatNumber,
+  getBlockScanUrl,
+  timeout,
+} from "@/lib/utils";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipContent } from "@/components/ui/tooltip";
+import { Tooltip } from "@/components/ui/tooltip";
+import { TooltipTrigger } from "@/components/ui/tooltip";
+import Tenant from "@/lib/tenant/tenant";
+
+const { token } = Tenant.current();
 
 export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
   const { isAdvancedUser } = useIsAdvancedUser();
@@ -55,11 +67,12 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
           >
             <div className="text-primary font-semibold flex items-center">
               <ENSAvatar ensName={voterAddress} className="w-5 h-5 mr-1" />
-              <ENSName address={voterAddress} />
+              <div className="text-primary">
+                <ENSName address={voterAddress} />
+              </div>
               {address?.toLowerCase() === voterAddress && (
-                <span>&nbsp;(you)</span>
+                <span className="text-primary">&nbsp;(you)</span>
               )}
-              <span>&nbsp;voted for</span>
               {hovered && (
                 <>
                   <a
@@ -81,8 +94,24 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
                 </>
               )}
             </div>
-            <div className={"font-semibold text-secondary"}>
-              <TokenAmountDisplay amount={weight} />
+            <div className={"font-semibold text-primary"}>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>
+                      <TokenAmountDisplay
+                        amount={weight}
+                        useChivoMono
+                        hideCurrency
+                        specialFormatting
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="p-4">
+                    {`${formatNumber(vote.weight, token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </HStack>
         </HoverCardTrigger>

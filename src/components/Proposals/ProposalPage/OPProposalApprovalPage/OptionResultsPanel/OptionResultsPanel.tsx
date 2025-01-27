@@ -5,6 +5,8 @@ import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
 import { parseUnits } from "viem";
 import { tokenForContractAddress } from "@/lib/tokenUtils";
 import Tenant from "@/lib/tenant/tenant";
+import { cn } from "@/lib/utils";
+import { chivoMono } from "@/styles/fonts";
 
 export default function OptionsResultsPanel({
   proposal,
@@ -151,15 +153,20 @@ function SingleOption({
         justifyContent="justify-between"
         className="font-semibold text-sm mb-1"
       >
-        <div className="overflow-ellipsis overflow-hidden whitespace-nowrap max-w-[12rem]">
+        <div className="overflow-ellipsis overflow-hidden whitespace-nowrap max-w-[12rem] text-primary">
           {description}
         </div>
-        <div className="text-secondary">
-          <TokenAmountDisplay amount={votes} />
-          <span className="ml-1">
+        <div className="text-primary flex items-center gap-1">
+          <TokenAmountDisplay
+            amount={votes}
+            useChivoMono
+            hideCurrency
+            specialFormatting
+          />
+          <span className={cn("ml-1 text-tertiary", chivoMono.variable)}>
             {percentage === 0n
-              ? "(0%)"
-              : "(" + Math.round(Number(percentage) / 100).toString() + "%)"}
+              ? "0%"
+              : (Number(percentage) / 100).toFixed(2) + "%"}
           </span>
         </div>
       </HStack>
@@ -187,7 +194,7 @@ export function ProgressBar({
       Number(barPercentage) !== 0 ? 1 : 0
     ).toFixed(2) + "%";
 
-  const progressBarColor = isApproved ? "bg-green-positive" : "bg-secondary";
+  const progressBarColor = isApproved ? "bg-green-positive" : "bg-tertiary";
 
   return (
     <HStack>
