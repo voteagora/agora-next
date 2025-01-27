@@ -27,26 +27,38 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
     setShowChart((prevState) => !prevState);
   };
 
+  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (showChart) {
+      e.stopPropagation();
+    }
+  };
+
   return (
     <div className="border border-line rounded-lg p-4 pb-2 w-full bg-neutral">
-      <div className="flex justify-between w-full items-center text-xs font-semibold mb-2 cursor-pointer">
-        <div
-          onClick={handleExpandChart}
-          className="flex gap-1 py-1 text-secondary"
-        >
+      <div
+        onClick={handleExpandChart}
+        className="flex justify-between w-full items-center text-xs font-semibold mb-2 cursor-pointer"
+      >
+        <div className="flex gap-1 py-1 text-secondary">
           Proposal Visualization{" "}
           <Image src={icons.chevronSelectorVertical} alt="chevronIcon" />
         </div>
         <div className="flex gap-x-2 items-center">
           <button
             className={`tab ${tabIndex === 0 ? "active text-primary bg-wash px-2 py-1 rounded-full" : "text-secondary px-2 py-1"}`}
-            onClick={() => handleTabsChange(0)}
+            onClick={(e) => {
+              handleButtonClick(e);
+              handleTabsChange(0);
+            }}
           >
             Timeline
           </button>
           <button
             className={`tab ${tabIndex === 1 ? "active text-primary bg-wash px-2 py-1 rounded-full" : "text-secondary px-2 py-1"}`}
-            onClick={() => handleTabsChange(1)}
+            onClick={(e) => {
+              handleButtonClick(e);
+              handleTabsChange(1);
+            }}
           >
             Composition
           </button>
