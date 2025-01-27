@@ -404,6 +404,39 @@ async function getVotesForProposal({
   };
 }
 
+async function getVotesChart({
+  proposalId,
+}: {
+  proposalId: string;
+}): Promise<any[]> {
+  const { namespace, contracts } = Tenant.current();
+
+  let eventsViewName;
+
+  if (namespace == TENANT_NAMESPACES.OPTIMISM) {
+    eventsViewName = "vote_cast_with_params_events_v2";
+  } else {
+    eventsViewName = "vote_cast_with_params_events";
+  }
+
+  const query = `
+  SELECT
+    voter,
+    support,
+    weight,
+    block_number
+  FROM ${namespace}.${eventsViewName}
+  WHERE proposal_id = $1
+  ORDER BY block_number DESC;
+`;
+
+  return await prisma.$queryRawUnsafe<VotePayload[]>(
+    query,
+    proposalId,
+    contracts.governor.address.toLowerCase()
+  );
+}
+
 async function getUserVotesForProposal({
   proposalId,
   address,
@@ -483,6 +516,7 @@ async function getVotesForProposalAndDelegate({
 export const fetchVotesForDelegate = cache(getVotesForDelegate);
 export const fetchSnapshotVotesForDelegate = cache(getSnapshotVotesForDelegate);
 export const fetchVotesForProposal = cache(getVotesForProposal);
+export const fetchVotesChartForProposal = cache(getVotesChart);
 export const fetchUserVotesForProposal = cache(getUserVotesForProposal);
 export const fetchVotesForProposalAndDelegate = cache(
   getVotesForProposalAndDelegate
