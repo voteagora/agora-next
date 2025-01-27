@@ -22,7 +22,7 @@ export default function Navbar() {
     >
       {hasProposals && (
         <HeaderLink
-          href={hasProposalsHref ? ui.page("proposals")?.href : "/"}
+          href={hasProposalsHref ? ui.page("proposals")?.href : "/proposals"}
           target={hasProposalsHref ? "_blank" : "_self"}
           isActive={pathname.includes("proposals") || pathname === "/"}
         >
