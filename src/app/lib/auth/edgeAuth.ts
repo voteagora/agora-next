@@ -103,12 +103,12 @@ export async function validateBearerToken(
 }
 
 /*
-  This function performs any stateless validations of the supplied scope 
+  This function performs any stateless validations of the supplied scope
   against the particular route being accessed in this request.
 
   Further validations may be performed on the server, with access to our
-  database for further authorization information. Note that this implies 
-  that a request which passes validation here may still be unauthorized 
+  database for further authorization information. Note that this implies
+  that a request which passes validation here may still be unauthorized
   if the server-side validation fails.
 
   Anything supplied to the user in the JWT payload should be validated

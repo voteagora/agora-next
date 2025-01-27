@@ -3,6 +3,7 @@
 import { useWriteContract, useReadContract } from "wagmi";
 import { useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
+
 const AdminMembershipPage = () => {
   const tenant = Tenant.current();
   const [address, setAddress] = useState("");

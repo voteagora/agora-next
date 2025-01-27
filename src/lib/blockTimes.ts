@@ -39,8 +39,7 @@ export function getSecondsPerBlock(): number {
 
 /*
  * @param {number} blockNumber
- * @param {number} latestBlockNumber
- * @param {number} latestBlockTimestamp
+ * @param {Block} latestBlock
  * @returns {Date}
  * @description Converts a block number to a human-readable date
  */

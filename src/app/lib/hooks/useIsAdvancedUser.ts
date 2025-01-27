@@ -87,6 +87,10 @@ const useIsAdvancedUser = () => {
     if (!isBalanceFetched) return;
     if (!balance) return;
     const allowedBalance = parseUnits("100000", 18);
+    console.log("balance", balance);
+    console.log("isProd", isProd);
+    console.log("allowList", allowList);
+    console.log("address", address);
     setIsAdvancedUser(
       isProd
         ? allowList.includes(address!)
