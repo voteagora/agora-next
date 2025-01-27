@@ -57,11 +57,13 @@ const DelegateCard = ({
               <span className="text-primary font-bold">
                 {formatNumber(delegate.votingPower.total)} {token.symbol}
               </span>
-              {numProposals > 0 && !isVotingStatsPending && (
+              {!isVotingStatsPending && (
                 <span className="text-primary font-bold">
-                  {((votingStats?.last_10_props || 0) /
-                    Math.min(10, numProposals)) *
-                    100 || "0"}
+                  {numProposals === 0
+                    ? "0"
+                    : ((votingStats?.last_10_props || 0) /
+                        Math.min(10, numProposals)) *
+                      100}
                   % Participation
                 </span>
               )}

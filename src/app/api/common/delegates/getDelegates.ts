@@ -580,19 +580,18 @@ async function getVoterStats(
         AND cancelled_block IS NULL
     )
     SELECT
-        v.voter,
-        sum(COALESCE((
+        COALESCE(v.voter, $1) as voter,
+        COALESCE(sum((
             SELECT count(DISTINCT last_10_props.proposal_id) AS count
             FROM last_10_props
             WHERE last_10_props.proposal_id = v.proposal_id
-        ), 0::bigint)) AS last_10_props,
+        )), 0::bigint) AS last_10_props,
         total_proposals.count AS total_proposals
-    FROM ${namespace}.votes v
-    CROSS JOIN total_proposals
-    WHERE
+    FROM total_proposals
+    LEFT JOIN ${namespace}.votes v ON
         v.voter = $1
         AND v.contract = $2
-    GROUP BY v.voter, v.contract, total_proposals.count;
+    GROUP BY COALESCE(v.voter, $1), total_proposals.count;
     `,
     address,
     contracts.governor.address.toLowerCase(),
