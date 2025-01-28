@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import VotingTimelineChart from "../VotingTimelineChart/VotingTimelineChart";
+import { TimelineChart } from "@/components/Proposals/ProposalPage/Charts/TimelineChart";
 import TreeMapChart from "../TreeMapChart/TreeMapChart";
 import { icons } from "@/icons/icons";
 import Image from "next/image";
@@ -67,9 +67,8 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
             <div className="tab-panels">
               {tabIndex === 0 && (
                 <div className="tab-panel">
-                  <VotingTimelineChart
+                  <TimelineChart
                     proposal={proposal}
-                    proposalVotes={fetchedVotes}
                     votes={chartVotes}
                     block={latestBlock}
                   />
