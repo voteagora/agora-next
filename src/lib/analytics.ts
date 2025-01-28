@@ -27,8 +27,12 @@ class DatabaseAnalytics implements AnalyticsService {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify(event, (_, value) =>
-        typeof value === "bigint" ? value.toString() : value
+      body: JSON.stringify(event, (key, value) =>
+        value === undefined
+          ? null // Convert undefined to null to preserve the key, otherwise JSON.stringify will remove it
+          : typeof value === "bigint"
+            ? value.toString()
+            : value
       ),
     });
   }
