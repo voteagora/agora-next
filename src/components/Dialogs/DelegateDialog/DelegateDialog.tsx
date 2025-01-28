@@ -121,7 +121,9 @@ export function DelegateDialog({
         event_data: {
           delegate: delegate.address as `0x${string}`,
           delegator: accountAddress as `0x${string}`,
-          transaction_hash: delegateTxHash as `0x${string}`,
+          transaction_hash: (isGasRelayLive
+            ? sponsoredTxnHash
+            : delegateTxHash) as `0x${string}`,
         },
       });
     }
