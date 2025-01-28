@@ -37,7 +37,7 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
     <div className="border border-line rounded-lg p-4 pb-2 w-full bg-neutral">
       <div
         onClick={handleExpandChart}
-        className="flex justify-between w-full items-center text-xs font-semibold mb-2 cursor-pointer"
+        className="flex justify-between w-full items-center text-xs font-semibold mb-2 cursor-pointer select-none"
       >
         <div className="flex gap-1 py-1 text-secondary">
           Proposal Visualization{" "}
