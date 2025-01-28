@@ -7,11 +7,12 @@ import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/
 import { EditDelegateFlow } from "@/app/staking/deposits/[deposit_id]/delegate/components/EditDelegateFlow";
 import { revalidatePath } from "next/cache";
 import Tenant from "@/lib/tenant/tenant";
+import { RouteNotSupported } from "@/components/shared/RouteNotSupported";
 
 export default async function Page({ params: { deposit_id } }) {
   const { ui } = Tenant.current();
   if (!ui.toggle("staking")) {
-    return <div>Route not supported for namespace</div>;
+    return <RouteNotSupported />;
   }
 
   const sort = delegatesFilterOptions.weightedRandom.sort;

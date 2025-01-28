@@ -36,9 +36,7 @@ export const EditDepositConfirm = ({
   );
   const hasAllowance = isLoadedAllowance && allowance !== undefined;
 
-  const { data: maxBalance, isFetched: isLoadedMaxBalance } = useTokenBalance(
-    deposit.depositor
-  );
+  const { data: maxBalance } = useTokenBalance(deposit.depositor);
 
   // There are cases where the amount might be higher than the balance of available tokes due to artifacts of
   // number to BigInt conversion. In such cases, we need to ensure that the amount to stake is capped at the maximum.
@@ -50,11 +48,7 @@ export const EditDepositConfirm = ({
   const isSufficientSpendingAllowance =
     hasAllowance && allowance >= amountToAdd;
 
-  const {
-    data: config,
-    status,
-    error,
-  } = useSimulateContract({
+  const { data: config } = useSimulateContract({
     query: { enabled: isSufficientSpendingAllowance },
     address: contracts.staker!.address as `0x${string}`,
     abi: contracts.staker!.abi,

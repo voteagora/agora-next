@@ -2,11 +2,10 @@
 
 import React from "react";
 import Tenant from "@/lib/tenant/tenant";
-import { isAddress } from "viem";
 import {
-  useWriteContract,
   useSimulateContract,
   useWaitForTransactionReceipt,
+  useWriteContract,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { formatNumber, numberToToken } from "@/lib/utils";
@@ -49,15 +48,7 @@ export const NewStakeConfirm = ({
   const isSufficientSpendingAllowance =
     hasAllowance && allowance >= amountToStake;
 
-  const isValidInput = Boolean(
-    isSufficientSpendingAllowance && isAddress(delegate)
-  );
-
-  const {
-    data: config,
-    status,
-    error,
-  } = useSimulateContract({
+  const { data: config } = useSimulateContract({
     query: { enabled: isSufficientSpendingAllowance },
     address: contracts.staker!.address as `0x${string}`,
     abi: contracts.staker!.abi,

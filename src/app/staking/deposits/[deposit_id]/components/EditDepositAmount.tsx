@@ -23,7 +23,7 @@ export const EditDepositAmount = ({
   const { address } = useAccount();
   const [step, setStep] = useState(1);
   const [amount, setAmount] = useState(0);
-  const [delegate, setDelegate] = useState<string>(deposit.delegatee);
+  const delegate = deposit.delegatee;
 
   return (
     <div>
