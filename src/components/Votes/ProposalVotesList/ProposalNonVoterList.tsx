@@ -9,6 +9,7 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useProposalNonVotes } from "@/hooks/useProposalNonVotes";
 import { Vote } from "@/app/api/common/votes/vote";
 import { cn } from "@/lib/utils";
+import { ParsedProposalData } from "@/lib/proposalUtils";
 
 const LIMIT = 20;
 
@@ -52,13 +53,20 @@ const ProposalNonVoterList = ({ proposal, isApprovalProposal }: Props) => {
 
   const voters = pages.flatMap((page) => page.data);
 
+  const isThresholdCriteria =
+    isApprovalProposal &&
+    (proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"])
+      .proposalSettings?.criteria === "THRESHOLD";
+
   return (
     <div
       className={cn(
         "px-4 pb-4 overflow-y-scroll",
-        isApprovalProposal
-          ? "max-h-[calc(100vh-497px)]"
-          : "max-h-[calc(100vh-437px)]"
+        isThresholdCriteria
+          ? "max-h-[calc(100vh-530px)]"
+          : isApprovalProposal
+            ? "max-h-[calc(100vh-497px)]"
+            : "max-h-[calc(100vh-437px)]"
       )}
     >
       {isFetched && fetchedNonVotes ? (
