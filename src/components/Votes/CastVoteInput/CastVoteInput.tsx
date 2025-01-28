@@ -27,6 +27,13 @@ import Image from "next/image";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { formatEther } from "viem";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { format } from "date-fns";
 
 type Props = {
   proposal: Proposal;
@@ -42,6 +49,7 @@ export default function CastVoteInput({
   const { chains, delegate, isSuccess, votes, votingPower } =
     useFetchAllForVoting({
       proposal,
+      blockNumber: proposal.snapshotBlockNumber,
     });
 
   if (!isConnected) {
@@ -167,6 +175,7 @@ function CastVoteInputContent({
                   supportType={support}
                   votingPower={votingPower}
                   missingVote={checkMissingVoteForDelegate(votes, votingPower)}
+                  proposal={proposal}
                 />
               )}
             </VStack>
@@ -227,20 +236,61 @@ function VoteSubmitButton({
   supportType,
   votingPower,
   missingVote,
+  proposal,
 }: {
   supportType: SupportTextProps["supportType"] | null;
   votingPower: VotingPowerData;
   missingVote: MissingVote;
+  proposal: Proposal;
 }) {
   const { write } = useCastVoteContext();
-
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+
+  const startDate = format(
+    new Date(proposal.startTime ?? ""),
+    "MMM dd, yyyy '@' h:mma 'ET'"
+  );
+
+  if (!supportType) {
+    return (
+      <div className="pt-3">
+        <TooltipProvider>
+          <Tooltip>
+            <span className="flex justify-center text-primary font-medium">
+              Proposal voting power{"\u00A0"}
+              <TokenAmountDisplay amount={vpToDisplay} />
+              {"\u00A0"}
+              <TooltipTrigger className="inline-flex cursor-help">
+                <Image src={icons.info} alt="Info" width={16} height={16} />
+              </TooltipTrigger>
+            </span>
+            <TooltipContent className="bg-neutral p-4 rounded-lg border border-line shadow-newDefault w-[calc(100vw-32px)] sm:w-[400px]">
+              <div className="flex flex-col gap-4">
+                <div>
+                  <div className="text-lg font-medium">Proposal launched</div>
+                  <div className="text-lg font-medium">{startDate}</div>
+                </div>
+                <div className="text-base">
+                  Your voting power is captured when proposals launch based on
+                  your token holdings and delegations at that time.
+                </div>
+                <div className="text-base">
+                  Any changes to your holdings after launch will not affect
+                  voting on this proposal.
+                </div>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-3">
-      <SubmitButton onClick={write} disabled={!supportType}>
+      <SubmitButton onClick={write} disabled={false}>
         <>
-          Submit vote with{"\u00A0"}
+          Proposal voting power{"\u00A0"}
           <TokenAmountDisplay amount={vpToDisplay} />
         </>
       </SubmitButton>

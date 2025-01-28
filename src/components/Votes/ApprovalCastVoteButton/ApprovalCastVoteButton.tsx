@@ -12,6 +12,16 @@ import { Delegate } from "@/app/api/common/delegates/delegate";
 import { Vote } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { format } from "date-fns";
+import Image from "next/image";
+import { TokenAmountDisplay } from "@/lib/utils";
+import { icons } from "@/icons/icons";
 
 type Props = {
   proposal: Proposal;
@@ -77,6 +87,45 @@ export default function ApprovalCastVoteButton({
   return (
     <VStack className="flex-shrink-0">
       <VStack alignItems="items-stretch">
+        {isReady && (
+          <div className="pt-3">
+            <TooltipProvider>
+              <Tooltip>
+                <span className="flex justify-center text-primary font-medium">
+                  Proposal voting power{"\u00A0"}
+                  <TokenAmountDisplay amount={votingPower.totalVP} />
+                  {"\u00A0"}
+                  <TooltipTrigger className="inline-flex cursor-help">
+                    <Image src={icons.info} alt="Info" width={16} height={16} />
+                  </TooltipTrigger>
+                </span>
+                <TooltipContent className="bg-neutral p-4 rounded-lg border border-line shadow-newDefault w-[calc(100vw-32px)] sm:w-[400px]">
+                  <div className="flex flex-col gap-4">
+                    <div>
+                      <div className="text-lg font-medium">
+                        Proposal launched
+                      </div>
+                      <div className="text-lg font-medium">
+                        {format(
+                          new Date(proposal.startTime ?? ""),
+                          "MMM dd, yyyy '@' h:mma 'ET'"
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-base">
+                      Your voting power is captured when proposals launch based
+                      on your token holdings and delegations at that time.
+                    </div>
+                    <div className="text-base">
+                      Any changes to your holdings after launch will not affect
+                      voting on this proposal.
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        )}
         <VoteButton
           onClick={(missingVote: MissingVote) =>
             openDialog({
