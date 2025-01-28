@@ -45,6 +45,11 @@ export const uniswapTenantUIConfig = new TenantUI({
       title: "Change log",
       url: "/changelog",
     },
+    {
+      name: "code-of-conduct",
+      title: "Delegate Code of Conduct",
+      url: "https://gov.uniswap.org/t/rfc-delegate-code-of-conduct/20913",
+    },
   ],
 
   governanceStakeholders: [
