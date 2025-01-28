@@ -39,6 +39,7 @@ export const TENANT_NAMESPACES = {
   DERIVE: "derive",
   PGUILD: "pguild",
   BOOST: "boost",
+  XAI: "xai",
 } as const;
 
 export const proposalsFilterOptions = {
