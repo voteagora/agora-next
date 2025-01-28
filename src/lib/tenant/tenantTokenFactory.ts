@@ -65,6 +65,12 @@ export default class TenantTokenFactory {
           symbol: "BGUILD",
           decimals: 0,
         };
+      case TENANT_NAMESPACES.DEMO:
+        return {
+          name: "Demo",
+          symbol: "DEMO",
+          decimals: 18,
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
