@@ -112,7 +112,7 @@ export function ProposalSingleVote({
                 )}
               </HStack>
               <HStack alignItems="items-center">
-                <TooltipProvider>
+                <TooltipProvider delayDuration={0}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div

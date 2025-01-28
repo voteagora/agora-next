@@ -96,7 +96,7 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
               )}
             </div>
             <div className={"font-semibold text-primary"}>
-              <TooltipProvider>
+              <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div>
