@@ -1,5 +1,5 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import { getProposalCurrentQuorum } from "@/lib/proposalUtils";
 
@@ -17,7 +17,7 @@ export default function ApprovalProposalCriteria({ proposal }) {
         >
           <div>
             Quorum{" "}
-            <TokenAmountDisplay
+            <TokenAmountDecorated
               amount={proposal.quorum}
               hideCurrency
               specialFormatting
@@ -25,7 +25,7 @@ export default function ApprovalProposalCriteria({ proposal }) {
           </div>
           <div>
             Current{" "}
-            <TokenAmountDisplay
+            <TokenAmountDecorated
               amount={currentQuorum}
               hideCurrency
               specialFormatting
@@ -54,10 +54,10 @@ export default function ApprovalProposalCriteria({ proposal }) {
           <p>
             In this threshold-based proposal, all options passing the approval
             threshold of{" "}
-            <TokenAmountDisplay amount={proposalSettings.criteriaValue} /> votes
-            will be executed in order from most to least popular, until the
-            total budget of{" "}
-            <TokenAmountDisplay amount={proposalSettings.budgetAmount} /> runs
+            <TokenAmountDecorated amount={proposalSettings.criteriaValue} />{" "}
+            votes will be executed in order from most to least popular, until
+            the total budget of{" "}
+            <TokenAmountDecorated amount={proposalSettings.budgetAmount} /> runs
             out. Voters can select up to {proposalSettings.maxApprovals}{" "}
             options. If the quorum is not met, no options will be executed.
           </p>

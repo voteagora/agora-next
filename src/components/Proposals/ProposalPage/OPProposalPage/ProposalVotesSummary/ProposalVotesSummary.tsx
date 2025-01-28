@@ -2,7 +2,7 @@
 import { useState } from "react";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import {
@@ -43,7 +43,7 @@ export default function ProposalVotesSummary({ proposal }: Props) {
             <div className="flex flex-row justify-between mt-2">
               <div className="text-positive">
                 FOR -{" "}
-                <TokenAmountDisplay
+                <TokenAmountDecorated
                   amount={results.for}
                   hideCurrency
                   specialFormatting
@@ -51,7 +51,7 @@ export default function ProposalVotesSummary({ proposal }: Props) {
               </div>
               <div className="text-negative">
                 AGAINST -{" "}
-                <TokenAmountDisplay
+                <TokenAmountDecorated
                   amount={results.against}
                   hideCurrency
                   specialFormatting
@@ -67,7 +67,7 @@ export default function ProposalVotesSummary({ proposal }: Props) {
                   {proposal.quorum && (
                     <div>
                       Quorum{" "}
-                      <TokenAmountDisplay
+                      <TokenAmountDecorated
                         amount={proposal.quorum}
                         hideCurrency
                         specialFormatting

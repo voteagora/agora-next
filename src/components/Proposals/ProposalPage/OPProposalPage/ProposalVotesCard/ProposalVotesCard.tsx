@@ -34,7 +34,7 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
           </div>
         </button>
         <div className="flex flex-col gap-4">
-          <div className="font-semibold px-4 text-primary">Voting Activity</div>
+          <div className="font-semibold px-4 text-primary">Voting activity</div>
           <ProposalVotesSummary proposal={proposal} />
           <div className="px-4">
             <ProposalVotesFilter

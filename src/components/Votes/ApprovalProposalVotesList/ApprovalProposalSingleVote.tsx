@@ -4,7 +4,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { useAccount } from "wagmi";
 import { type Vote } from "@/app/api/common/votes/vote";
 import VoterHoverCard from "../VoterHoverCard";
@@ -25,8 +25,9 @@ import { TooltipContent } from "@/components/ui/tooltip";
 import { Tooltip } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
 import Tenant from "@/lib/tenant/tenant";
+import { fontMapper } from "@/styles/fonts";
 
-const { token } = Tenant.current();
+const { token, ui } = Tenant.current();
 
 export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
   const { isAdvancedUser } = useIsAdvancedUser();
@@ -99,11 +100,13 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div>
-                      <TokenAmountDisplay
+                      <TokenAmountDecorated
                         amount={weight}
-                        useChivoMono
                         hideCurrency
                         specialFormatting
+                        className={
+                          fontMapper[ui?.customization?.tokenAmountFont || ""]
+                        }
                       />
                     </div>
                   </TooltipTrigger>

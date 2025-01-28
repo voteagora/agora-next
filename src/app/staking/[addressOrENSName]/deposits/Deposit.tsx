@@ -1,6 +1,6 @@
 "use client";
 
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import React, { useEffect, useRef, useState } from "react";
 import { StakedDeposit } from "@/lib/types";
 import type { Delegate } from "@/app/api/common/delegates/delegate";
@@ -105,7 +105,7 @@ export const Deposit = ({
         <div className="w-[130px] border-r border-gray-300">
           <div className="text-xs font-medium text-gray-700">Staked</div>
           <div className="font-medium">
-            <TokenAmountDisplay
+            <TokenAmountDecorated
               maximumSignificantDigits={4}
               amount={deposit.amount}
             />

@@ -13,5 +13,5 @@ export const chivoMono = Chivo_Mono({
 
 export const fontMapper = {
   "font-inter": inter.variable,
-  "font-chivo-mono": chivoMono.variable,
+  "font-chivoMono": chivoMono.variable,
 } as Record<string, string>;

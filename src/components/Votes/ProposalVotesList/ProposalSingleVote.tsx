@@ -6,7 +6,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import VoterHoverCard from "../VoterHoverCard";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import {
@@ -27,8 +27,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Tenant from "@/lib/tenant/tenant";
+import { fontMapper } from "@/styles/fonts";
 
-const { token } = Tenant.current();
+const { token, ui } = Tenant.current();
 
 // Using Lucide icons instead of Heroicons for better support of strokeWidth
 const SUPPORT_TO_ICON: Record<Support, React.ReactNode> = {
@@ -123,11 +124,13 @@ export function ProposalSingleVote({
                               : "text-tertiary"
                         }
                       >
-                        <TokenAmountDisplay
+                        <TokenAmountDecorated
                           amount={vote.weight}
-                          useChivoMono
                           hideCurrency
                           specialFormatting
+                          className={
+                            fontMapper[ui?.customization?.tokenAmountFont || ""]
+                          }
                           icon={SUPPORT_TO_ICON[vote.support as Support]}
                         />
                       </div>

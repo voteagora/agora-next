@@ -1,7 +1,7 @@
 import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import Tenant from "@/lib/tenant/tenant";
 import Link from "next/link";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import React from "react";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 
@@ -40,10 +40,10 @@ export const DepositListAction = ({ address }: DepositListActionProps) => {
               <>
                 {hasDepositedBalance && (
                   <span className="mr-2">
-                    <TokenAmountDisplay amount={depositedBalance} /> staked
+                    <TokenAmountDecorated amount={depositedBalance} /> staked
                   </span>
                 )}
-                <TokenAmountDisplay
+                <TokenAmountDecorated
                   maximumSignificantDigits={4}
                   amount={tokenBalance || 0n}
                   currency={""}

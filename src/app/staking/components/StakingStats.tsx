@@ -1,5 +1,5 @@
 import React from "react";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 
 interface StakingStatsProps {
   rewardDuration: string;
@@ -19,7 +19,7 @@ export const StakingStats = ({
       <div className="flex flex-col text-center p-5">
         <div className="text-xs">Total Supply</div>
         <div className="font-medium">
-          <TokenAmountDisplay amount={totalSupply} />
+          <TokenAmountDecorated amount={totalSupply} />
         </div>
       </div>
 
@@ -28,7 +28,7 @@ export const StakingStats = ({
       <div className="flex flex-col text-center p-5">
         <div className="text-xs">Total Staked</div>
         <div className="font-medium">
-          <TokenAmountDisplay amount={totalStaked} />
+          <TokenAmountDecorated amount={totalStaked} />
         </div>
       </div>
 
@@ -37,7 +37,7 @@ export const StakingStats = ({
       <div className="flex flex-col text-center p-5">
         <div className="text-xs">Rewards per token</div>
         <div className="font-medium">
-          <TokenAmountDisplay amount={rewardPerToken} currency={"WETH"} />
+          <TokenAmountDecorated amount={rewardPerToken} currency={"WETH"} />
         </div>
       </div>
 

@@ -27,6 +27,7 @@ export const etherfiTenantUIConfig = new TenantUI({
     negative: "197 47 0",
     brandPrimary: "23 23 23",
     brandSecondary: "255 255 255",
+    tokenAmountFont: "font-chivoMono",
   },
 
   organization: {

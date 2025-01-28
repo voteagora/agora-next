@@ -1,5 +1,5 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import { useAccount, useEnsName } from "wagmi";
 import discordIcon from "@/icons/discord.svg";
@@ -12,6 +12,7 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import ENSName from "@/components/shared/ENSName";
+import { fontMapper } from "@/styles/fonts";
 
 export function ProposalSingleNonVoter({
   voter,
@@ -26,7 +27,7 @@ export function ProposalSingleNonVoter({
     warpcast: string | null;
   };
 }) {
-  const { namespace } = Tenant.current();
+  const { namespace, ui } = Tenant.current();
 
   const { address: connectedAddress } = useAccount();
   const { data } = useEnsName({
@@ -112,11 +113,11 @@ export function ProposalSingleNonVoter({
           )}
         </HStack>
         <HStack className="text-primary" alignItems="items-center">
-          <TokenAmountDisplay
+          <TokenAmountDecorated
             amount={pastVotes || voter.direct_vp}
-            useChivoMono
             hideCurrency
             specialFormatting
+            className={fontMapper[ui?.customization?.tokenAmountFont || ""]}
           />
         </HStack>
       </HStack>
