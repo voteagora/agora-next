@@ -11,6 +11,7 @@ import { protocolGuildTenantContractConfig } from "./configs/contracts/protocol-
 import { boostTenantConfig } from "./configs/contracts/boost";
 import { xaiTenantConfig } from "./configs/contracts/xai";
 import { b3TenantConfig } from "./configs/contracts/b3";
+import { demoTenantConfig } from "./configs/contracts/demo";
 
 export default class TenantContractFactory {
   public static create(
@@ -41,6 +42,8 @@ export default class TenantContractFactory {
         return xaiTenantConfig({ isProd, alchemyId });
       case TENANT_NAMESPACES.B3:
         return b3TenantConfig({ isProd, alchemyId });
+      case TENANT_NAMESPACES.DEMO:
+        return demoTenantConfig({ isProd, alchemyId });
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

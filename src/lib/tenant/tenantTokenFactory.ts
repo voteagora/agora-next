@@ -77,6 +77,12 @@ export default class TenantTokenFactory {
           symbol: "B3",
           decimals: 18,
         };
+      case TENANT_NAMESPACES.DEMO:
+        return {
+          name: "Demo",
+          symbol: "DEMO",
+          decimals: 18,
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

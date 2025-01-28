@@ -24,6 +24,9 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
     case TENANT_NAMESPACES.UNISWAP:
       return await contracts.governor.contract.quorumVotes!();
 
+    case TENANT_NAMESPACES.DEMO:
+      await contracts.governor.contract.quorum!(proposal.proposal_id);
+
     case TENANT_NAMESPACES.OPTIMISM:
       if (
         contracts.governor.v6UpgradeBlock &&

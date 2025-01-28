@@ -41,6 +41,8 @@ export function findDelagatee({
       return prisma.xaiDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.B3:
       return prisma.b3Delegatees.findFirst(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prisma.demoDelegatees.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -86,6 +88,8 @@ export function findAdvancedDelegatee({
       return prisma.xaiAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.B3:
       return prisma.b3AdvancedDelegatees.findMany(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prisma.demoAdvancedDelegatees.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -128,6 +132,8 @@ export function findVotableSupply({
       return prisma.xaiVotableSupply.findFirst(condition);
     case TENANT_NAMESPACES.B3:
       return prisma.b3VotableSupply.findFirst({});
+    case TENANT_NAMESPACES.DEMO:
+      return prisma.demoVotableSupply.findFirst({});
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -181,6 +187,8 @@ export function findProposalsQuery({
       return prisma.xaiProposals.findMany(condition);
     case TENANT_NAMESPACES.B3:
       return prisma.b3Proposals.findMany(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prisma.demoProposals.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -222,6 +230,8 @@ export function findProposal({
       return prisma.xaiProposals.findFirst(condition);
     case TENANT_NAMESPACES.B3:
       return prisma.b3Proposals.findFirst(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prisma.demoProposals.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -266,6 +276,8 @@ export function findProposalType({
       return prisma.xaiProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.B3:
       return prisma.b3ProposalTypes.findMany(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prisma.demoProposalTypes.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -307,6 +319,8 @@ export function findVotes({
       return prisma.xaiVotes.findMany(condition);
     case TENANT_NAMESPACES.B3:
       return prisma.b3Votes.findMany(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prisma.demoVotes.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -351,6 +365,8 @@ export function findVotingPower({
       return prisma.xaiVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.B3:
       return prisma.b3VotingPower.findFirst(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prisma.demoVotingPower.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -395,6 +411,8 @@ export function findAdvancedVotingPower({
       return prisma.xaiAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.B3:
       return prisma.b3AdvancedVotingPower.findFirst(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prisma.demoAdvancedVotingPower.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -436,6 +454,8 @@ export async function findStakedDeposit({
       return prisma.xaiStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.B3:
       return prisma.b3StakedDeposits.findFirst(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prisma.demoStakedDeposits.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -489,6 +509,8 @@ export function findStakedDeposits({
       return prisma.xaiStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.B3:
       return prisma.b3StakedDeposits.findMany(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prisma.demoStakedDeposits.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -531,6 +553,8 @@ export function getProposalsCount({
       return prisma.xaiProposals.count(condition);
     case TENANT_NAMESPACES.B3:
       return prisma.b3Proposals.count(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prisma.demoProposals.count(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
