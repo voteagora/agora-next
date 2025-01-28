@@ -6,27 +6,16 @@ import TreeMapChart from "../TreeMapChart/TreeMapChart";
 import { icons } from "@/icons/icons";
 import Image from "next/image";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { useProposalVotes } from "@/hooks/useProposalVotes";
 import { useProposalVotesChart } from "@/hooks/useProposalVotesChart";
-import { useLatestBlock } from "@/hooks/useLatestBlock";
 
 export default function ProposalChart({ proposal }: { proposal: Proposal }) {
   const [tabIndex, setTabIndex] = useState(0);
   const [showChart, setShowChart] = useState(proposal.status === "ACTIVE");
 
-  const { data: fetchedVotes, isFetched } = useProposalVotes({
-    enabled: showChart,
-    limit: 250,
-    offset: 0,
-    proposalId: proposal.id,
-  });
-
-  const { data: chartVotes } = useProposalVotesChart({
+  const { data: votes } = useProposalVotesChart({
     enabled: showChart,
     proposalId: proposal.id,
   });
-
-  const { data: latestBlock } = useLatestBlock({ enabled: showChart });
 
   const handleTabsChange = (index: number) => {
     setTabIndex(index);
@@ -63,23 +52,16 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
       </div>
       {showChart && (
         <>
-          {fetchedVotes && latestBlock && chartVotes ? (
+          {votes ? (
             <div className="tab-panels">
               {tabIndex === 0 && (
                 <div className="tab-panel">
-                  <TimelineChart
-                    proposal={proposal}
-                    votes={chartVotes}
-                    block={latestBlock}
-                  />
+                  <TimelineChart proposal={proposal} votes={votes} />
                 </div>
               )}
               {tabIndex === 1 && (
                 <div className="tab-panel">
-                  <TreeMapChart
-                    proposal={proposal}
-                    proposalVotes={fetchedVotes}
-                  />
+                  <TreeMapChart proposal={proposal} votes={votes} />
                 </div>
               )}
             </div>

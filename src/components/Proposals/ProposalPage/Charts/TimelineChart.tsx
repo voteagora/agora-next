@@ -23,16 +23,18 @@ import { rgbStringToHex } from "@/app/lib/utils/color";
 import { ChartVote } from "@/lib/types";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { Block } from "ethers";
+import { useLatestBlock } from "@/hooks/useLatestBlock";
 
 const { token, namespace, ui } = Tenant.current();
 
 interface Props {
   proposal: Proposal;
   votes: ChartVote[];
-  block: Block;
 }
 
-export const TimelineChart = ({ votes, proposal, block }: Props) => {
+export const TimelineChart = ({ votes, proposal }: Props) => {
+  const { data: block } = useLatestBlock({ enabled: true });
+
   let stackIds = {
     for: "1",
     abstain: "1",
@@ -218,7 +220,7 @@ const yTickFormatter = (value: any) => {
 };
 
 const customizedXTick = (props: any) => {
-  const { index, x, y, fill, payload, tickFormatter, className } = props;
+  const { index, x, y, payload, tickFormatter, className } = props;
   return (
     <g transform={`translate(${index === 0 ? x : x + 15},${y})`}>
       <text x={0} y={0} dy={10} fill="#AFAFAF" className={className}>
