@@ -1,7 +1,6 @@
 "use client";
 
 import InfiniteScroll from "react-infinite-scroller";
-import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { useAccount } from "wagmi";
 import { ProposalSingleVote } from "./ProposalSingleVote";
 import { Vote } from "@/app/api/common/votes/vote";
@@ -10,7 +9,6 @@ import {
   fetchProposalVotes,
   fetchUserVotesForProposal,
 } from "@/app/proposals/actions";
-import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { PaginatedResult } from "@/app/lib/pagination";
 import { useProposalVotes } from "@/hooks/useProposalVotes";
 
@@ -29,7 +27,6 @@ export default function ProposalVotesList({ proposalId }: Props) {
   });
 
   const { address: connectedAddress } = useAccount();
-  const { advancedDelegators } = useConnectedDelegate();
   const fetching = useRef(false);
 
   const [voteState, setVoteState] = useState<{
@@ -89,8 +86,6 @@ export default function ProposalVotesList({ proposalId }: Props) {
       fetching.current = false;
     }
   }, [proposalId, voteState.meta]);
-
-  const { isAdvancedUser } = useIsAdvancedUser();
 
   return (
     <div className="px-4 pb-4 overflow-y-scroll max-h-[calc(100vh-437px)]">

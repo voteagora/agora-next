@@ -1,4 +1,4 @@
-import TokenAmountDisplay from "@/components/shared/TokenAmountDecorated";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
 import { parseUnits } from "viem";
@@ -154,7 +154,7 @@ function SingleOption({
           {description}
         </div>
         <div className="text-primary flex items-center gap-1">
-          <TokenAmountDisplay
+          <TokenAmountDecorated
             amount={votes}
             className={fontMapper[ui?.customization?.tokenAmountFont || ""]}
             specialFormatting
