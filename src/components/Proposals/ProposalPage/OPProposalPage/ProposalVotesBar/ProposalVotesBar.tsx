@@ -1,69 +1,41 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
-import { Bar } from "recharts";
+import { ParsedProposalResults } from "@/lib/proposalUtils";
 
 interface Props {
   proposal: Proposal;
-  votes: Vote[] | undefined;
 }
 
-type Support = "FOR" | "ABSTAIN" | "AGAINST";
-
-export default function ProposalVotesBar({ proposal, votes }: Props) {
+export default function ProposalVotesBar({ proposal }: Props) {
   const thresholdPercent = Math.round(Number(proposal.approvalThreshold) / 100);
-  const voteCounts: Record<Support, Vote[]> = {
-    FOR: [],
-    ABSTAIN: [],
-    AGAINST: [],
-  };
 
-  if (!votes) {
-    return <BarSkeleton />;
-  }
-
-  votes.forEach((vote) => {
-    voteCounts[vote.support as Support].push(vote);
-  });
-
-  const hasVotes = votes.length > 0;
-  const totalVotes = votes.length;
+  const results =
+    proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
+  const totalVotesCount =
+    Number(results.for) + Number(results.against) + Number(results.abstain);
+  const hasVotes = totalVotesCount > 0;
 
   return (
     <div id="chartContainer" className="relative flex items-stretch gap-x-0.5">
       {hasVotes ? (
         <>
-          {totalVotes > 100
-            ? Object.entries(voteCounts).map(([support, parsedVotes]) => (
-                <div
-                  key={support} // use support as a unique key
-                  style={{
-                    flex: `${(proposal.proposalResults as any)[support.toLowerCase()]} 1 0%`,
-                  }}
-                  className="flex items-stretch gap-x-0.5 min-h-[10px]"
-                >
-                  <div
-                    style={{ flex: `1 1 0%` }}
-                    className={`min-w-[1px] ${support === "FOR" ? "bg-positive" : support === "AGAINST" ? "bg-negative" : "bg-tertiary"}`}
-                  ></div>
-                </div>
-              ))
-            : Object.entries(voteCounts).map(([support, parsedVotes]) => (
-                <div
-                  key={support} // use support as a unique key
-                  style={{
-                    flex: `${(proposal.proposalResults as any)[support.toLowerCase()]} 1 0%`,
-                  }}
-                  className="flex items-stretch gap-x-0.5 min-h-[10px]"
-                >
-                  {parsedVotes?.map((vote: Vote, idx) => (
-                    <div
-                      key={`${support}-${idx}`} // use a combination of support and idx as a unique key
-                      style={{ flex: `${vote.weight} 1 0%` }}
-                      className={`min-w-[1px] ${support === "FOR" ? "bg-positive" : support === "AGAINST" ? "bg-negative" : "bg-tertiary"}`}
-                    ></div>
-                  ))}
-                </div>
-              ))}
+          {Number(results.for) > 0 && (
+            <div
+              style={{ flex: Number(results.for) / totalVotesCount }}
+              className="min-w-[1px] bg-positive h-[10px]"
+            ></div>
+          )}
+          {Number(results.abstain) > 0 && (
+            <div
+              style={{ flex: Number(results.abstain) / totalVotesCount }}
+              className="min-w-[1px] bg-tertiary h-[10px]"
+            ></div>
+          )}
+          {Number(results.against) > 0 && (
+            <div
+              style={{ flex: Number(results.against) / totalVotesCount }}
+              className="min-w-[1px] bg-negative h-[10px]"
+            ></div>
+          )}
         </>
       ) : (
         <div className="w-full bg-wash h-[10px]"></div>
@@ -78,11 +50,3 @@ export default function ProposalVotesBar({ proposal, votes }: Props) {
     </div>
   );
 }
-
-const BarSkeleton = () => {
-  return (
-    <div className="flex animate-pulse">
-      <div className="w-full h-[10px] bg-tertiary/10"></div>
-    </div>
-  );
-};

@@ -1,43 +1,19 @@
 "use client";
 
-import { Treemap, ResponsiveContainer, Tooltip } from "recharts";
+import { ResponsiveContainer, Tooltip, Treemap } from "recharts";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
 import ENSName from "@/components/shared/ENSName";
-import { PaginatedResult } from "@/app/lib/pagination";
 import Tenant from "@/lib/tenant/tenant";
 import { rgbStringToHex } from "@/app/lib/utils/color";
+import { ChartVote } from "@/lib/types";
 
-/**
- * Transforms an array of votes into chart data suitable for a treemap.
- */
-const transformVotesToTreeMapData = (votes: Vote[]) => {
-  const data = {
-    name: "votes",
-    children: votes
-      .map((vote) => ({
-        address: vote.address,
-        support: vote.support,
-        value: +vote.weight,
-      }))
-      .sort((a, b) => b.support.localeCompare(a.support)),
-  };
-
-  return data;
-};
-
-export default function VotingTimelineChart({
-  proposal,
-  proposalVotes,
-}: {
+interface Props {
   proposal: Proposal;
-  proposalVotes: PaginatedResult<Vote[]>;
-}) {
-  return <Chart proposal={proposal} votes={proposalVotes.data} />;
+  votes: ChartVote[];
 }
 
-const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
-  const chartData = transformVotesToTreeMapData(votes);
+export default function VotingTimelineChart({ proposal, votes }: Props) {
+  const chartData = transformData(votes);
 
   return (
     <ResponsiveContainer width="100%" height={230}>
@@ -52,7 +28,7 @@ const Chart = ({ proposal, votes }: { proposal: Proposal; votes: Vote[] }) => {
       </Treemap>
     </ResponsiveContainer>
   );
-};
+}
 
 const CustomTooltip = ({ payload }: any) => {
   if (payload && payload.length) {
@@ -74,9 +50,9 @@ const CustomContent = (props: any) => {
   const { ui } = Tenant.current();
 
   const fillColor =
-    support === "AGAINST"
+    support === "0"
       ? rgbStringToHex(ui.customization?.negative)
-      : support === "FOR"
+      : support === "1"
         ? rgbStringToHex(ui.customization?.positive)
         : rgbStringToHex(ui.customization?.tertiary);
   return (
@@ -110,4 +86,20 @@ const CustomContent = (props: any) => {
       )}
     </g>
   );
+};
+
+/**
+ * Transforms an array of votes into chart data suitable for a treemap.
+ */
+const transformData = (votes: ChartVote[]) => {
+  return {
+    name: "votes",
+    children: votes
+      .map((vote) => ({
+        address: vote.voter,
+        support: vote.support,
+        value: +Number(vote.weight),
+      }))
+      .sort((a, b) => b.support.localeCompare(a.support)),
+  };
 };
