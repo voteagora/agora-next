@@ -32,7 +32,7 @@ export default function LogoLink() {
           <>
             <div className="h-3 w-[2px] bg-line rounded-full hidden sm:block"></div>
             <span className="hidden sm:block font-semibold text-primary bg-tertiary/10 px-1.5 py-0.5 rounded-lg text-xs border border-line">
-              DEV MODE
+              Test contracts mode
             </span>
           </>
         )}
