@@ -38,10 +38,9 @@ const TreeMapNode = memo(
       [node.data.support, ui.customization]
     );
 
-    const fontSize = Math.min(
-      (Math.sqrt(width * height) / 12) * 0.8 * transform.k,
-      height * 0.8,
-      (width * 0.9) / 7.2
+    const fontSize = useMemo(
+      () => Math.min(width / 12, height / 2, Math.sqrt(width * height) / 8),
+      [width, height]
     );
 
     return (
@@ -74,18 +73,14 @@ const TreeMapNode = memo(
             }}
           >
             <div
-              className="w-full h-full flex items-center justify-center text-white"
+              className="w-full h-full flex items-center justify-center text-white font-medium"
               style={{
-                fontSize: `${Math.min(
-                  width / 12,
-                  height / 2,
-                  Math.sqrt(width * height) / 8
-                )}px`,
-                fontWeight: "500",
+                fontSize: `${fontSize}px`,
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 userSelect: "none",
+                padding: "0 4px",
               }}
             >
               <ENSName address={node.data.address || ""} truncate />
@@ -93,6 +88,12 @@ const TreeMapNode = memo(
           </foreignObject>
         )}
       </g>
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.node === nextProps.node &&
+      prevProps.transform === nextProps.transform
     );
   }
 );
