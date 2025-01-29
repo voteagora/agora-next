@@ -7,6 +7,7 @@ import {
   capitalizeFirstLetter,
   formatNumber,
   getBlockScanUrl,
+  timeout,
 } from "@/lib/utils";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import ENSAvatar from "@/components/shared/ENSAvatar";
@@ -18,6 +19,7 @@ import { TooltipTrigger } from "@/components/ui/tooltip";
 import Tenant from "@/lib/tenant/tenant";
 import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
+import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 
 const { token, ui } = Tenant.current();
 
@@ -34,66 +36,83 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
   const [hovered, setHovered] = useState(false);
   const [hash1, hash2] = transactionHash.split("|");
 
+  const _onOpenChange = async (open: boolean) => {
+    if (open) {
+      setHovered(open);
+    } else {
+      await timeout(100);
+      setHovered(open);
+    }
+  };
+
   return (
     <VStack>
-      <HStack
-        alignItems="items-center"
-        justifyContent="justify-between"
-        className="mb-2 text-xs leading-4"
+      <HoverCard
+        openDelay={100}
+        closeDelay={100}
+        onOpenChange={(open) => _onOpenChange(open)}
       >
-        <div className="text-primary font-semibold flex items-center">
-          <ENSAvatar ensName={voterAddress} className="w-5 h-5 mr-1" />
-          <div className="text-primary hover:underline">
-            <Link href={`/delegates/${voterAddress}`}>
-              <ENSName address={voterAddress} />
-            </Link>
-          </div>
-          {address?.toLowerCase() === voterAddress && (
-            <span className="text-primary">&nbsp;(you)</span>
-          )}
-          {hovered && (
-            <>
-              <a
-                href={getBlockScanUrl(hash1)}
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
-              </a>
-              {hash2 && (
-                <a
-                  href={getBlockScanUrl(hash2)}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
-                </a>
+        <HoverCardTrigger>
+          <HStack
+            alignItems="items-center"
+            justifyContent="justify-between"
+            className="mb-2 text-xs leading-4"
+          >
+            <div className="text-primary font-semibold flex items-center">
+              <ENSAvatar ensName={voterAddress} className="w-5 h-5 mr-1" />
+              <div className="text-primary hover:underline">
+                <Link href={`/delegates/${voterAddress}`}>
+                  <ENSName address={voterAddress} />
+                </Link>
+              </div>
+              {address?.toLowerCase() === voterAddress && (
+                <span className="text-primary">&nbsp;(you)</span>
               )}
-            </>
-          )}
-        </div>
-        <div className={"font-semibold text-primary"}>
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div>
-                  <TokenAmountDecorated
-                    amount={weight}
-                    hideCurrency
-                    specialFormatting
-                    className={
-                      fontMapper[ui?.customization?.tokenAmountFont || ""]
-                    }
-                  />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="p-4">
-                {`${formatNumber(vote.weight, token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      </HStack>
+              {hovered && (
+                <>
+                  <a
+                    href={getBlockScanUrl(hash1)}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+                  </a>
+                  {hash2 && (
+                    <a
+                      href={getBlockScanUrl(hash2)}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                    >
+                      <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+                    </a>
+                  )}
+                </>
+              )}
+            </div>
+            <div className={"font-semibold text-primary"}>
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>
+                      <TokenAmountDecorated
+                        amount={weight}
+                        hideCurrency
+                        specialFormatting
+                        className={
+                          fontMapper[ui?.customization?.tokenAmountFont || ""]
+                        }
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="p-4">
+                    {`${formatNumber(vote.weight, token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </HStack>
+        </HoverCardTrigger>
+      </HoverCard>
       <VStack className={"text-xs leading-4 mb-2"}>
         {params?.map((option: string, index: number) => (
           <p

@@ -23,6 +23,7 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
+import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 
 const { token, ui } = Tenant.current();
 
@@ -43,6 +44,15 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
     address: vote.address as `0x${string}`,
   });
 
+  const _onOpenChange = async (open: boolean) => {
+    if (open) {
+      setHovered(open);
+    } else {
+      await timeout(100);
+      setHovered(open);
+    }
+  };
+
   return (
     <VStack
       key={vote.transactionHash}
@@ -50,72 +60,80 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
       className="text-xs text-tertiary px-0 py-1"
     >
       <VStack>
-        <HStack
-          justifyContent="justify-between"
-          className="font-semibold text-secondary"
+        <HoverCard
+          openDelay={100}
+          closeDelay={100}
+          onOpenChange={(open) => _onOpenChange(open)}
         >
-          <HStack gap={1} alignItems="items-center">
-            <ENSAvatar ensName={data} className="w-5 h-5" />
-            <div className="text-primary hover:underline">
-              <Link href={`/delegates/${vote.address}`}>
-                <ENSName address={vote.address} />
-              </Link>
-            </div>
-            {vote.address === connectedAddress?.toLowerCase() && (
-              <p className="text-primary">(you)</p>
-            )}
-            {hovered && (
-              <>
-                <a
-                  href={getBlockScanUrl(hash1)}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  <ArrowTopRightOnSquareIcon className="w-3 h-3" />
-                </a>
-                {hash2 && (
-                  <a
-                    href={getBlockScanUrl(hash2)}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >
-                    <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
-                  </a>
+          <HoverCardTrigger>
+            <HStack
+              justifyContent="justify-between"
+              className="font-semibold text-secondary"
+            >
+              <HStack gap={1} alignItems="items-center">
+                <ENSAvatar ensName={data} className="w-5 h-5" />
+                <div className="text-primary hover:underline">
+                  <Link href={`/delegates/${vote.address}`}>
+                    <ENSName address={vote.address} />
+                  </Link>
+                </div>
+                {vote.address === connectedAddress?.toLowerCase() && (
+                  <p className="text-primary">(you)</p>
                 )}
-              </>
-            )}
-          </HStack>
-          <HStack alignItems="items-center">
-            <TooltipProvider delayDuration={0}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div
-                    className={
-                      vote.support === "AGAINST"
-                        ? "text-negative"
-                        : vote.support === "FOR"
-                          ? "text-positive"
-                          : "text-tertiary"
-                    }
-                  >
-                    <TokenAmountDecorated
-                      amount={vote.weight}
-                      hideCurrency
-                      specialFormatting
-                      className={
-                        fontMapper[ui?.customization?.tokenAmountFont || ""]
-                      }
-                      icon={SUPPORT_TO_ICON[vote.support as Support]}
-                    />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent className="p-4">
-                  {`${formatNumber(vote.weight, token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </HStack>
-        </HStack>
+                {hovered && (
+                  <>
+                    <a
+                      href={getBlockScanUrl(hash1)}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                    >
+                      <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                    </a>
+                    {hash2 && (
+                      <a
+                        href={getBlockScanUrl(hash2)}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+                      </a>
+                    )}
+                  </>
+                )}
+              </HStack>
+              <HStack alignItems="items-center">
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div
+                        className={
+                          vote.support === "AGAINST"
+                            ? "text-negative"
+                            : vote.support === "FOR"
+                              ? "text-positive"
+                              : "text-tertiary"
+                        }
+                      >
+                        <TokenAmountDecorated
+                          amount={vote.weight}
+                          hideCurrency
+                          specialFormatting
+                          className={
+                            fontMapper[ui?.customization?.tokenAmountFont || ""]
+                          }
+                          icon={SUPPORT_TO_ICON[vote.support as Support]}
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="p-4">
+                      {`${formatNumber(vote.weight, token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </HStack>
+            </HStack>
+          </HoverCardTrigger>
+        </HoverCard>
       </VStack>
       <pre className="text-xs font-medium whitespace-pre-wrap text-secondary w-fit break-all font-sans">
         {vote.reason}
