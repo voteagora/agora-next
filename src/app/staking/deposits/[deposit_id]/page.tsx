@@ -7,13 +7,19 @@ import { revalidatePath } from "next/cache";
 import Tenant from "@/lib/tenant/tenant";
 import { RouteNotSupported } from "@/components/shared/RouteNotSupported";
 
-export default async function Page({ params: { deposit_id } }) {
+interface Props {
+  params: {
+    deposit_id: string;
+  };
+}
+
+export default async function Page({ params: { deposit_id } }: Props) {
   const { ui } = Tenant.current();
   if (!ui.toggle("staking")) {
     return <RouteNotSupported />;
   }
 
-  const deposit = await apiFetchDeposit({ id: BigInt(deposit_id) });
+  const deposit = await apiFetchDeposit({ id: Number(deposit_id) });
 
   return (
     <div className="mt-12">

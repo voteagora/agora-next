@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Tenant from "@/lib/tenant/tenant";
 
-export const REWARD_DURATION_QK = "rewardPerToken";
+export const REWARD_DURATION_QK = "REWARD_DURATION";
 
 interface Props {
   enabled: true;

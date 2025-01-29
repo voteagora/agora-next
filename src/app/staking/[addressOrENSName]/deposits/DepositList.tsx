@@ -1,5 +1,3 @@
-"use server";
-
 import React from "react";
 import { StakedDeposit } from "@/lib/types";
 import { Deposit } from "@/app/staking/[addressOrENSName]/deposits/Deposit";

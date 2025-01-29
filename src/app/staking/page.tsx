@@ -11,7 +11,7 @@ export async function generateMetadata({}) {
   const tenant = Tenant.current();
   const page = tenant.ui.page("/");
 
-  const { title, description } = page.meta;
+  const { title, description } = page?.meta || { title: "", description: "" };
 
   const preview = `/api/images/og/generic?title=${encodeURIComponent(
     title

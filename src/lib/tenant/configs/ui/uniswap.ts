@@ -221,7 +221,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "staking",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "info",
