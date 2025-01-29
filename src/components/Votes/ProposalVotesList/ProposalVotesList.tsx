@@ -110,11 +110,7 @@ export default function ProposalVotesList({ proposalId }: Props) {
           <ul className="flex flex-col">
             {userVotes.map((vote) => (
               <li key={vote.transactionHash}>
-                <ProposalSingleVote
-                  vote={vote}
-                  isAdvancedUser={isAdvancedUser}
-                  delegators={advancedDelegators}
-                />
+                <ProposalSingleVote vote={vote} />
               </li>
             ))}
             {proposalVotes.map((vote) => (
@@ -124,11 +120,7 @@ export default function ProposalVotesList({ proposalId }: Props) {
                   connectedAddress?.toLowerCase() === vote.address && "hidden"
                 }`}
               >
-                <ProposalSingleVote
-                  vote={vote}
-                  isAdvancedUser={isAdvancedUser}
-                  delegators={advancedDelegators}
-                />
+                <ProposalSingleVote vote={vote} />
               </li>
             ))}
           </ul>
