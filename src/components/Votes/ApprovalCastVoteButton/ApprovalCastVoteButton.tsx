@@ -18,10 +18,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { format } from "date-fns";
-import Image from "next/image";
 import { TokenAmountDisplay } from "@/lib/utils";
-import { icons } from "@/icons/icons";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 type Props = {
   proposal: Proposal;
@@ -92,16 +90,10 @@ export default function ApprovalCastVoteButton({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="w-full flex items-center justify-center gap-1 text-primary font-medium cursor-help">
-                  <span className="flex items-center">
+                  <span className="flex items-center text-xs font-semibold text-primary">
                     Proposal voting power{"\u00A0"}
                     <TokenAmountDisplay amount={votingPower.totalVP} />
-                    <Image
-                      src={icons.info}
-                      alt="Info"
-                      width={16}
-                      height={16}
-                      className="ml-1"
-                    />
+                    <InformationCircleIcon className="w-4 h-4 ml-1" />
                   </span>
                 </TooltipTrigger>
                 <TooltipContent
@@ -111,10 +103,10 @@ export default function ApprovalCastVoteButton({
                 >
                   <div className="flex flex-col gap-4">
                     <div>
-                      <div className="text-lg font-medium">
+                      <div className="text-sm font-semibold text-primary">
                         Proposal launched
                       </div>
-                      <div className="text-lg font-medium">
+                      <div className="text-sm font-semibold text-primary">
                         {new Intl.DateTimeFormat("en-US", {
                           month: "short",
                           day: "numeric",
@@ -125,11 +117,11 @@ export default function ApprovalCastVoteButton({
                         }).format(new Date(proposal.startTime ?? ""))}
                       </div>
                     </div>
-                    <div className="text-base">
+                    <div className="text-sm font-medium text-primary">
                       Your voting power is captured when proposals launch based
                       on your token holdings and delegations at that time.
                     </div>
-                    <div className="text-base">
+                    <div className="text-sm font-medium text-primary">
                       Any changes to your holdings after launch will not affect
                       voting on this proposal.
                     </div>

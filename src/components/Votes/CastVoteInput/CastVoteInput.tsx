@@ -33,7 +33,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { format } from "date-fns";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 type Props = {
   proposal: Proposal;
@@ -261,16 +261,10 @@ function VoteSubmitButton({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center gap-1 text-primary font-medium cursor-help">
-              <span className="flex items-center">
+              <span className="flex items-center text-xs font-semibold text-primary">
                 Proposal voting power{"\u00A0"}
                 <TokenAmountDisplay amount={vpToDisplay} />
-                <Image
-                  src={icons.info}
-                  alt="Info"
-                  width={16}
-                  height={16}
-                  className="ml-1"
-                />
+                <InformationCircleIcon className="w-4 h-4 ml-1" />
               </span>
             </TooltipTrigger>
             <TooltipContent
@@ -280,14 +274,18 @@ function VoteSubmitButton({
             >
               <div className="flex flex-col gap-4">
                 <div>
-                  <div className="text-lg font-medium">Proposal launched</div>
-                  <div className="text-lg font-medium">{startDate}</div>
+                  <div className="text-sm font-semibold text-primary">
+                    Proposal launched
+                  </div>
+                  <div className="text-sm font-semibold text-primary">
+                    {startDate}
+                  </div>
                 </div>
-                <div className="text-base">
+                <div className="text-sm font-medium text-primary">
                   Your voting power is captured when proposals launch based on
                   your token holdings and delegations at that time.
                 </div>
-                <div className="text-base">
+                <div className="text-sm font-medium text-primary">
                   Any changes to your holdings after launch will not affect
                   voting on this proposal.
                 </div>
@@ -301,7 +299,7 @@ function VoteSubmitButton({
 
   return (
     <div className="pt-3">
-      <SubmitButton onClick={write} disabled={false}>
+      <SubmitButton onClick={write}>
         Submit vote with{"\u00A0"}
         <TokenAmountDisplay amount={vpToDisplay} />
       </SubmitButton>
@@ -312,14 +310,12 @@ function VoteSubmitButton({
 const SubmitButton = ({
   children,
   onClick,
-  disabled = false,
 }: {
   children: ReactNode;
   onClick?: () => void;
-  disabled?: boolean;
 }) => {
   return (
-    <Button onClick={onClick} className="w-full" disabled={disabled}>
+    <Button onClick={onClick} className="w-full">
       {children}
     </Button>
   );
