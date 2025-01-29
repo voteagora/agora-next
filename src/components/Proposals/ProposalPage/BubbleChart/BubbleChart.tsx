@@ -6,8 +6,8 @@ import { Vote } from "@/app/api/common/votes/vote";
 import { PaginatedResult } from "@/app/lib/pagination";
 import Tenant from "@/lib/tenant/tenant";
 import { rgbStringToHex } from "@/app/lib/utils/color";
-import { useEnsName } from "wagmi";
 import { Plus, Minus } from "lucide-react";
+import ENSName from "@/components/shared/ENSName";
 
 interface BubbleNode extends d3.SimulationNodeDatum {
   address: string;
@@ -31,10 +31,6 @@ const transformVotesToBubbleData = (votes: Vote[]): BubbleNode[] => {
 const BubbleNode = memo(
   ({ node, transform }: { node: BubbleNode; transform: d3.ZoomTransform }) => {
     const router = useRouter();
-    const { data: ensName } = useEnsName({
-      address: node.address as `0x${string}`,
-      chainId: 1,
-    });
     const { ui } = Tenant.current();
 
     const fillColor = useMemo(
@@ -47,23 +43,9 @@ const BubbleNode = memo(
       [node.support, ui.customization]
     );
 
-    const displayText =
-      ensName || `${node.address.slice(0, 6)}...${node.address.slice(-4)}`;
-
-    const diameter = node.r * 2;
-    const baseFontSize = Math.min(
-      (diameter / displayText.length) * 1.2,
-      node.r / 2
-    );
-
-    const fontSize = Math.min(
-      baseFontSize * Math.min(1, transform.k * 0.3),
-      diameter / (displayText.length * 0.8)
-    );
-
     const handleClick = (e: React.MouseEvent) => {
       e.stopPropagation();
-      router.push(`/delegates/${ensName || node.address}`);
+      router.push(`/delegates/${node.address}`);
     };
 
     return (
@@ -79,20 +61,28 @@ const BubbleNode = memo(
             transition: "fill 0.15s ease-out",
           }}
         />
-        <text
-          dy=".3em"
-          fontSize={fontSize}
-          fill="white"
+        <foreignObject
+          x={-node.r}
+          y={-node.r}
+          width={node.r * 2}
+          height={node.r * 2}
           style={{
-            textAnchor: "middle",
             pointerEvents: "none",
-            whiteSpace: "nowrap",
-            fontWeight: "500",
-            userSelect: "none",
+            overflow: "hidden",
           }}
         >
-          {displayText}
-        </text>
+          <div
+            className="flex items-center justify-center w-full h-full text-white"
+            style={{
+              fontSize: `${Math.min(node.r / 3.5, (node.r * 2) / 10)}px`,
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+            }}
+          >
+            <ENSName address={node.address} truncate />
+          </div>
+        </foreignObject>
       </g>
     );
   }
