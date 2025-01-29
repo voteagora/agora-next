@@ -108,8 +108,9 @@ export default function BubbleChart({
   proposalVotes: PaginatedResult<Vote[]>;
 }) {
   const [nodes, setNodes] = useState<BubbleNode[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [transform, setTransform] = useState(() =>
-    d3.zoomIdentity.translate(360, 115).scale(1.5)
+    d3.zoomIdentity.translate(0, 0).scale(1)
   );
 
   const svgRef = useRef<SVGSVGElement>(null);
@@ -131,6 +132,7 @@ export default function BubbleChart({
   };
 
   useEffect(() => {
+    setIsLoading(true);
     const svg = svgRef.current;
     if (!svg) return;
 
@@ -143,20 +145,11 @@ export default function BubbleChart({
       .scaleExtent([0.5, 100])
       .on("zoom", (event) => setTransform(event.transform));
 
-    d3.select<SVGSVGElement, undefined>(svg)
-      .call(zoom as any)
-      .call((selection) =>
-        zoom.transform(
-          selection,
-          d3.zoomIdentity.translate(360, 115).scale(1.5)
-        )
-      );
-
     const simulation = d3
       .forceSimulation<BubbleNode>(bubbleData)
       .alphaDecay(0.02)
       .velocityDecay(0.3)
-      .force("center", d3.forceCenter(360, 115))
+      .force("center", d3.forceCenter(width / 2, height / 2))
       .force(
         "collision",
         d3
@@ -165,12 +158,38 @@ export default function BubbleChart({
           .strength(0.8)
       )
       .force("charge", d3.forceManyBody().strength(5))
-      .on("tick", () => {
+      .on("end", () => {
+        let minX = Infinity,
+          maxX = -Infinity;
+        let minY = Infinity,
+          maxY = -Infinity;
+
         bubbleData.forEach((node) => {
-          node.x = Math.max(node.r!, Math.min(width - node.r!, node.x!));
-          node.y = Math.max(node.r!, Math.min(height - node.r!, node.y!));
+          if (node.x && node.y && node.r) {
+            minX = Math.min(minX, node.x - node.r);
+            maxX = Math.max(maxX, node.x + node.r);
+            minY = Math.min(minY, node.y - node.r);
+            maxY = Math.max(maxY, node.y + node.r);
+          }
         });
+
+        const dx = maxX - minX;
+        const dy = maxY - minY;
+        const scale = 0.9 / Math.max(dx / width, dy / height);
+        const translateX = (width - scale * (minX + maxX)) / 2;
+        const translateY = (height - scale * (minY + maxY)) / 2;
+
+        d3.select<SVGSVGElement, undefined>(svg)
+          .call(zoom as any)
+          .call((selection) =>
+            zoom.transform(
+              selection,
+              d3.zoomIdentity.translate(translateX, translateY).scale(scale)
+            )
+          );
+
         setNodes([...bubbleData]);
+        setIsLoading(false);
       });
 
     simulationRef.current = simulation;
@@ -183,6 +202,17 @@ export default function BubbleChart({
 
   return (
     <div className="relative w-full h-[230px]" ref={containerRef}>
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-neutral/5 backdrop-blur-sm z-20">
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm text-primary">
+              Reticulating splines...
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="absolute top-2 right-2 flex flex-col gap-1 z-10">
         <button
           onClick={() => handleZoom(2.5)}
@@ -203,7 +233,12 @@ export default function BubbleChart({
       <svg
         ref={svgRef}
         viewBox="0 0 720 230"
-        style={{ width: "100%", height: "100%" }}
+        style={{
+          width: "100%",
+          height: "100%",
+          opacity: isLoading ? 0 : 1,
+          transition: "opacity 0.3s ease-in-out",
+        }}
       >
         <g
           transform={`translate(${transform.x}, ${transform.y}) scale(${transform.k})`}
