@@ -9,7 +9,6 @@ import ENSName from "@/components/shared/ENSName";
 import { PaginatedResult } from "@/app/lib/pagination";
 import Tenant from "@/lib/tenant/tenant";
 import { rgbStringToHex } from "@/app/lib/utils/color";
-import { useEnsName } from "wagmi";
 import { Plus, Minus } from "lucide-react";
 
 interface TreeNode
@@ -23,19 +22,11 @@ interface TreeNode
 const TreeMapNode = memo(
   ({ node, transform }: { node: TreeNode; transform: d3.ZoomTransform }) => {
     const router = useRouter();
-    const { data: ensName } = useEnsName({
-      address: node.data.address as `0x${string}`,
-      chainId: 1,
-    });
     const { ui } = Tenant.current();
 
     const width = node.x1 - node.x0;
     const height = node.y1 - node.y0;
-    const displayText =
-      ensName ||
-      (node.data.address
-        ? `${node.data.address.slice(0, 6)}...${node.data.address.slice(-4)}`
-        : "Unknown");
+    const isTextVisible = width * transform.k > 20 && height * transform.k > 10;
 
     const fillColor = useMemo(
       () =>
@@ -48,19 +39,17 @@ const TreeMapNode = memo(
     );
 
     const fontSize = Math.min(
-      (Math.sqrt(width * height) / displayText.length) * 0.8 * transform.k,
+      (Math.sqrt(width * height) / 12) * 0.8 * transform.k,
       height * 0.8,
-      (width * 0.9) / (displayText.length * 0.6)
+      (width * 0.9) / 7.2
     );
-
-    const isTextVisible = width * transform.k > 20 && height * transform.k > 10;
 
     return (
       <g
         transform={`translate(${node.x0},${node.y0})`}
         onClick={(e) => {
           e.stopPropagation();
-          router.push(`/delegates/${ensName || node.data.address}`);
+          router.push(`/delegates/${node.data.address}`);
         }}
         style={{ cursor: "pointer" }}
       >
@@ -74,24 +63,34 @@ const TreeMapNode = memo(
           }}
         />
         {isTextVisible && (
-          <text
-            x={width / 2}
-            y={height / 2}
-            dy=".3em"
-            fontSize={fontSize}
-            fill="white"
+          <foreignObject
+            x={0}
+            y={0}
+            width={width}
+            height={height}
             style={{
-              textAnchor: "middle",
-              pointerEvents: "none",
-              whiteSpace: "nowrap",
-              fontWeight: "500",
-              userSelect: "none",
-              textOverflow: "ellipsis",
               overflow: "hidden",
+              pointerEvents: "none",
             }}
           >
-            {displayText}
-          </text>
+            <div
+              className="w-full h-full flex items-center justify-center text-white"
+              style={{
+                fontSize: `${Math.min(
+                  width / 12,
+                  height / 2,
+                  Math.sqrt(width * height) / 8
+                )}px`,
+                fontWeight: "500",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                userSelect: "none",
+              }}
+            >
+              <ENSName address={node.data.address || ""} truncate />
+            </div>
+          </foreignObject>
         )}
       </g>
     );
