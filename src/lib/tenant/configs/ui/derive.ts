@@ -17,6 +17,16 @@ export const deriveTenantUIConfig = new TenantUI({
   title: "Derive Agora",
   logo: deriveLogo,
 
+  //Might want to pull to env vars too
+  contentful: {
+    spaceId: "kynliln1q9fy",
+    contentMapping: {
+      pages: {
+        infoPage: "Nx7TQ7efs2PjcDd9LW7wF",
+      },
+    },
+  },
+
   assets: {
     success: successImage,
     pending: pendingImage,
