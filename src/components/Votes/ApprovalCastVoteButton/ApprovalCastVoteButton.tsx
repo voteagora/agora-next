@@ -91,25 +91,38 @@ export default function ApprovalCastVoteButton({
           <div className="pt-3">
             <TooltipProvider>
               <Tooltip>
-                <span className="flex justify-center text-primary font-medium">
-                  Proposal voting power{"\u00A0"}
-                  <TokenAmountDisplay amount={votingPower.totalVP} />
-                  {"\u00A0"}
-                  <TooltipTrigger className="inline-flex cursor-help">
-                    <Image src={icons.info} alt="Info" width={16} height={16} />
-                  </TooltipTrigger>
-                </span>
-                <TooltipContent className="bg-neutral p-4 rounded-lg border border-line shadow-newDefault w-[calc(100vw-32px)] sm:w-[400px]">
+                <TooltipTrigger className="w-full flex items-center justify-center gap-1 text-primary font-medium cursor-help">
+                  <span className="flex items-center">
+                    Proposal voting power{"\u00A0"}
+                    <TokenAmountDisplay amount={votingPower.totalVP} />
+                    <Image
+                      src={icons.info}
+                      alt="Info"
+                      width={16}
+                      height={16}
+                      className="ml-1"
+                    />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="top"
+                  align="center"
+                  className="bg-neutral p-4 rounded-lg border border-line shadow-newDefault w-[calc(100vw-32px)] sm:w-[400px]"
+                >
                   <div className="flex flex-col gap-4">
                     <div>
                       <div className="text-lg font-medium">
                         Proposal launched
                       </div>
                       <div className="text-lg font-medium">
-                        {format(
-                          new Date(proposal.startTime ?? ""),
-                          "MMM dd, yyyy '@' h:mma 'ET'"
-                        )}
+                        {new Intl.DateTimeFormat("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "numeric",
+                          minute: "numeric",
+                          timeZoneName: "short",
+                        }).format(new Date(proposal.startTime ?? ""))}
                       </div>
                     </div>
                     <div className="text-base">

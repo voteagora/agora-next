@@ -246,25 +246,38 @@ function VoteSubmitButton({
   const { write } = useCastVoteContext();
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
-  const startDate = format(
-    new Date(proposal.startTime ?? ""),
-    "MMM dd, yyyy '@' h:mma 'ET'"
-  );
+  const startDate = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    timeZoneName: "short",
+  }).format(new Date(proposal.startTime ?? ""));
 
   if (!supportType) {
     return (
       <div className="pt-3">
         <TooltipProvider>
           <Tooltip>
-            <span className="flex justify-center text-primary font-medium">
-              Proposal voting power{"\u00A0"}
-              <TokenAmountDisplay amount={vpToDisplay} />
-              {"\u00A0"}
-              <TooltipTrigger className="inline-flex cursor-help">
-                <Image src={icons.info} alt="Info" width={16} height={16} />
-              </TooltipTrigger>
-            </span>
-            <TooltipContent className="bg-neutral p-4 rounded-lg border border-line shadow-newDefault w-[calc(100vw-32px)] sm:w-[400px]">
+            <TooltipTrigger className="w-full flex items-center justify-center gap-1 text-primary font-medium cursor-help">
+              <span className="flex items-center">
+                Proposal voting power{"\u00A0"}
+                <TokenAmountDisplay amount={vpToDisplay} />
+                <Image
+                  src={icons.info}
+                  alt="Info"
+                  width={16}
+                  height={16}
+                  className="ml-1"
+                />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent
+              side="top"
+              align="center"
+              className="bg-neutral p-4 rounded-lg border border-line shadow-newDefault w-[calc(100vw-32px)] sm:w-[400px]"
+            >
               <div className="flex flex-col gap-4">
                 <div>
                   <div className="text-lg font-medium">Proposal launched</div>
@@ -289,10 +302,8 @@ function VoteSubmitButton({
   return (
     <div className="pt-3">
       <SubmitButton onClick={write} disabled={false}>
-        <>
-          Proposal voting power{"\u00A0"}
-          <TokenAmountDisplay amount={vpToDisplay} />
-        </>
+        Submit vote with{"\u00A0"}
+        <TokenAmountDisplay amount={vpToDisplay} />
       </SubmitButton>
     </div>
   );
