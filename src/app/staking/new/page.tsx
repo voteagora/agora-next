@@ -6,11 +6,13 @@ import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/
 import { delegatesFilterOptions } from "@/lib/constants";
 import { revalidatePath } from "next/cache";
 import Tenant from "@/lib/tenant/tenant";
+import { RouteNotSupported } from "@/components/shared/RouteNotSupported";
 
 export default async function Page() {
   const { ui } = Tenant.current();
-  if (!ui.toggle("staking")) {
-    return <div>Route not supported for namespace</div>;
+
+  if (!ui.toggle("staking")?.enabled) {
+    return <RouteNotSupported />;
   }
 
   const sort = delegatesFilterOptions.weightedRandom.sort;
