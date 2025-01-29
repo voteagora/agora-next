@@ -7,6 +7,10 @@ import { useSignTypedData } from "wagmi";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { useState } from "react";
 import { useTokenName } from "@/hooks/useTokenName";
+import { trackEvent } from "@/lib/analytics";
+import { waitForTransactionReceipt } from "wagmi/actions";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { config } from "@/app/Web3Provider";
 
 interface Props {
   address: `0x${string}` | undefined;
@@ -80,6 +84,7 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
     });
 
     const hash = await response.json();
+
     setTxHash(hash);
     setIsFetching(false);
     setIsFetched(true);

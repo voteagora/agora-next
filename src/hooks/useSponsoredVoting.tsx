@@ -6,6 +6,9 @@ import { config } from "@/app/Web3Provider";
 import AgoraAPI from "@/app/lib/agoraAPI";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useGovernorName } from "@/hooks/useGovernorName";
+import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { useAccount } from "wagmi";
 
 const types = {
   Ballot: [
@@ -23,7 +26,7 @@ const useSponsoredVoting = ({
 }) => {
   const { slug, ui, contracts } = Tenant.current();
   const { signTypedDataAsync } = useSignTypedData();
-
+  const { address } = useAccount();
   const isGasRelayEnabled = ui.toggle("sponsoredDelegate")?.enabled === true;
   const gasRelayConfig =
     (ui.toggle("sponsoredVote")?.config as UIGasRelayConfig) || {};
@@ -85,6 +88,15 @@ const useSponsoredVoting = ({
         if (status === "success") {
           setSponsoredVoteTxHash(voteTxHash);
           setSponsoredVoteSuccess(true);
+          trackEvent({
+            event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
+            event_data: {
+              proposal_id: proposalId,
+              support,
+              voter: address as `0x${string}`,
+              transaction_hash: voteTxHash,
+            },
+          });
         } else {
           setSponsoredVoteLoading(false);
           setSponsoredVoteError(true);

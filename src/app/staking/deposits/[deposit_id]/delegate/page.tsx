@@ -7,17 +7,24 @@ import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/
 import { EditDelegateFlow } from "@/app/staking/deposits/[deposit_id]/delegate/components/EditDelegateFlow";
 import { revalidatePath } from "next/cache";
 import Tenant from "@/lib/tenant/tenant";
+import { RouteNotSupported } from "@/components/shared/RouteNotSupported";
 
-export default async function Page({ params: { deposit_id } }) {
+interface Props {
+  params: {
+    deposit_id: string;
+  };
+}
+
+export default async function Page({ params: { deposit_id } }: Props) {
   const { ui } = Tenant.current();
   if (!ui.toggle("staking")) {
-    return <div>Route not supported for namespace</div>;
+    return <RouteNotSupported />;
   }
 
   const sort = delegatesFilterOptions.weightedRandom.sort;
   const seed = Math.random();
-  const delegates = await apiFetchDelegates({ page: 1, seed, sort });
-  const deposit = await apiFetchDeposit({ id: BigInt(deposit_id) });
+  const delegates = await apiFetchDelegates({ seed, sort });
+  const deposit = await apiFetchDeposit({ id: Number(deposit_id) });
   return (
     <div className="mt-12">
       <EditDelegateFlow
@@ -25,7 +32,7 @@ export default async function Page({ params: { deposit_id } }) {
         delegates={delegates}
         fetchDelegates={async (page, seed) => {
           "use server";
-          return apiFetchDelegates({ page, seed, sort });
+          return apiFetchDelegates({ seed, sort });
         }}
         refreshPath={async (path) => {
           "use server";

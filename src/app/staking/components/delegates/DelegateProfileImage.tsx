@@ -1,5 +1,4 @@
 import { useEnsName } from "wagmi";
-import { HStack, VStack } from "@/components/Layout/Stack";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import ENSName from "@/components/shared/ENSName";
@@ -20,21 +19,21 @@ export const DelegateProfileImage = ({
   });
 
   return (
-    <HStack className="gap-4">
-      <div className="relative aspect-square">
+    <div className="flex flex-row gap-4">
+      <div className="relative aspect-square text">
         <ENSAvatar className="w-[44px] h-[44px] rounded-full" ensName={data} />
       </div>
 
-      <VStack>
+      <div className="flex flex-col">
         <div className="text-primary font-semibold">
           <ENSName address={address} />
         </div>
         {votingPower && (
-          <div className="text-xs font-semibold text-gray-800">
+          <div className="text-xs font-semibold text-secondary">
             <TokenAmountDecorated amount={votingPower} />
           </div>
         )}
-      </VStack>
-    </HStack>
+      </div>
+    </div>
   );
 };

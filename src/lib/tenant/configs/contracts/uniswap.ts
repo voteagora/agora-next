@@ -50,6 +50,7 @@ export const uniswapTenantContractConfig = ({
   const provider = isProd
     ? new AlchemyProvider("mainnet", alchemyId)
     : new AlchemyProvider("sepolia", alchemyId);
+
   const chain = isProd ? mainnet : sepolia;
 
   return {

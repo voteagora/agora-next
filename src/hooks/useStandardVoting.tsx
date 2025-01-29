@@ -1,10 +1,12 @@
 import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useState } from "react";
 import { useWriteContract } from "wagmi";
-import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { config } from "@/app/Web3Provider";
+import { trackEvent } from "@/lib/analytics";
+import { useAccount } from "wagmi";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 
 const useStandardVoting = ({
   proposalId,
@@ -20,10 +22,12 @@ const useStandardVoting = ({
   missingVote: MissingVote;
 }) => {
   const { contracts, slug } = Tenant.current();
+  const { address } = useAccount();
+  const { writeContractAsync: standardVote, isError: _standardVoteError } =
+    useWriteContract();
 
-  const { writeContractAsync: standardVote, isError } = useWriteContract();
-
-  const [standardVoteError, setStandardVoteError] = useState(isError);
+  const [standardVoteError, setStandardVoteError] =
+    useState(_standardVoteError);
   const [standardVoteLoading, setStandardVoteLoading] = useState(false);
   const [standardVoteSuccess, setStandardVoteSuccess] = useState(false);
   const [standardTxHash, setStandardTxHash] = useState<string | undefined>(
@@ -52,6 +56,18 @@ const useStandardVoting = ({
 
         if (status === "success") {
           setStandardTxHash(directTx);
+
+          await trackEvent({
+            event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
+            event_data: {
+              proposal_id: proposalId,
+              support: support,
+              reason: reason,
+              params: params,
+              voter: address as `0x${string}`,
+              transaction_hash: directTx,
+            },
+          });
           setStandardVoteSuccess(true);
         }
       } catch (error) {
@@ -62,23 +78,8 @@ const useStandardVoting = ({
     };
 
     const vote = async () => {
-      const trackingData: any = {
-        dao_slug: slug,
-        proposal_id: BigInt(proposalId),
-        support: support,
-      };
-
-      if (reason) {
-        trackingData.reason = reason;
-      }
-
-      if (params) {
-        trackingData.params = params;
-      }
-
       switch (missingVote) {
         case "DIRECT":
-          track("Standard Vote", trackingData);
           await _standardVote();
           break;
       }
@@ -89,7 +90,7 @@ const useStandardVoting = ({
 
   return {
     isLoading: standardVoteLoading,
-    isError: standardVoteError || isError,
+    isError: standardVoteError || _standardVoteError,
     resetError: () => setStandardVoteError(false),
     isSuccess: standardVoteSuccess,
     write,

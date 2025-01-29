@@ -7,6 +7,7 @@ import { type Vote } from "@/app/api/common/votes/vote";
 import ApprovalProposalSingleVote from "./ApprovalProposalSingleVote";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { useProposalVotes } from "@/hooks/useProposalVotes";
+import { cn } from "@/lib/utils";
 
 type Props = {
   fetchVotesForProposal: (
@@ -15,6 +16,7 @@ type Props = {
   ) => Promise<PaginatedResult<Vote[]>>;
   fetchUserVotes: (proposalId: string, address: string) => Promise<Vote[]>;
   proposalId: string;
+  isThresholdCriteria: boolean;
 };
 
 const LIMIT = 20;
@@ -23,6 +25,7 @@ export default function ApprovalProposalVotesList({
   fetchVotesForProposal,
   fetchUserVotes,
   proposalId,
+  isThresholdCriteria,
 }: Props) {
   const { data: fetchedVotes, isFetched } = useProposalVotes({
     enabled: true,
@@ -88,7 +91,14 @@ export default function ApprovalProposalVotesList({
   }, [connectedAddress, proposalId, fetchUserVotes, fetchUserVoteAndSet]);
 
   return (
-    <div className={"overflow-y-scroll max-h-[calc(100vh-437px)]"}>
+    <div
+      className={cn(
+        "overflow-y-scroll",
+        isThresholdCriteria
+          ? "max-h-[calc(100vh-530px)]"
+          : "max-h-[calc(100vh-497px)]"
+      )}
+    >
       <InfiniteScroll
         hasMore={meta?.has_next}
         pageStart={1}

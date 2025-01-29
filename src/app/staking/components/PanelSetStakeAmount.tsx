@@ -40,12 +40,12 @@ export const PanelSetStakeAmount = ({
     amount <= tokenToHumanNumber(Number(tokenBalance), token.decimals);
 
   return (
-    <div className="rounded-xl border border-slate-300 w-[354px] p-4">
-      <div className="mb-3 text-center text-xs text-gray-600">
+    <div className="rounded-xl border border-line w-[354px] p-4 bg-wash">
+      <div className="mb-3 text-center text-xs text-secondary">
         Enter {token.symbol} to stake
       </div>
-      <div className="text-center text-sm mb-5 bg-gray-100 border border-slate-300 rounded-lg shadow-newDefault">
-        <div className="rounded-lg bg-neutral border-b border-b-slate-300 p-2">
+      <div className="text-center text-sm mb-5 bg-neutral border border-line rounded-lg shadow-newDefault">
+        <div className="rounded-lg bg-neutral border-b border-b-line p-2">
           <div className="flex flex-row gap-3 items-center justify-center">
             <Input
               className="w-full text-left border-none bg-neutral font-bold text-3xl text-primary"
@@ -61,7 +61,7 @@ export const PanelSetStakeAmount = ({
             <div className="w-10">
               {hasTokenBalance && (
                 <Button
-                  className="text-uppercase bg-neutral text-xs rounded-full border w-10 h-10 items-center justify-center shadow-newDefault"
+                  className="text-uppercase bg-neutral text-xs rounded-full border border-line text-secondary w-10 h-10 items-center justify-center shadow-newDefault"
                   variant="secondary"
                   onClick={() => {
                     const maxAmount = tokenToHumanNumber(
@@ -81,8 +81,8 @@ export const PanelSetStakeAmount = ({
         </div>
 
         <div className="flex flex-row gap-2 justify-between py-3 px-2">
-          <div className="text-left">
-            <div className="text-xs text-gray-600">Available to stake</div>
+          <div className="text-left text-primary">
+            <div className="text-xs text-secondary">Available to stake</div>
             {hasTokenBalance && (
               <TokenAmountDecorated
                 maximumSignificantDigits={5}
@@ -90,9 +90,9 @@ export const PanelSetStakeAmount = ({
               />
             )}
           </div>
-          <div className="border-r border-r-slate-300"></div>
-          <div className="text-right">
-            <div className="text-xs text-gray-600">Already staked</div>
+          <div className="border-r border-r-line"></div>
+          <div className="text-right text-primary">
+            <div className="text-xs text-secondary">Already staked</div>
 
             {hasTotalStaked && (
               <TokenAmountDecorated

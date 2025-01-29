@@ -1,6 +1,5 @@
 "use client";
 
-import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
 import { useEffect } from "react";
 import { redirect } from "next/navigation";
@@ -9,17 +8,19 @@ import { useModal } from "connectkit";
 
 export const RedirectOrConnect = () => {
   const { setOpen } = useModal();
-  const { isConnected } = useAgoraContext();
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
 
   useEffect(() => {
-    if (isConnected && address) {
+    if (address && isConnected) {
       redirect(`/staking/${address}`);
     }
-  }, [isConnected, address]);
+  }, [address, isConnected]);
 
   return (
-    <Button className="mt-3" onClick={() => setOpen(true)}>
+    <Button
+      className="mt-3 text-neutral bg-brandPrimary"
+      onClick={() => setOpen(true)}
+    >
       Connect wallet to delegate
     </Button>
   );

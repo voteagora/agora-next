@@ -27,6 +27,13 @@ import Image from "next/image";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { formatEther } from "viem";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 type Props = {
   proposal: Proposal;
@@ -42,6 +49,7 @@ export default function CastVoteInput({
   const { chains, delegate, isSuccess, votes, votingPower } =
     useFetchAllForVoting({
       proposal,
+      blockNumber: proposal.snapshotBlockNumber,
     });
 
   if (!isConnected) {
@@ -167,6 +175,7 @@ function CastVoteInputContent({
                   supportType={support}
                   votingPower={votingPower}
                   missingVote={checkMissingVoteForDelegate(votes, votingPower)}
+                  proposal={proposal}
                 />
               )}
             </VStack>
@@ -227,22 +236,72 @@ function VoteSubmitButton({
   supportType,
   votingPower,
   missingVote,
+  proposal,
 }: {
   supportType: SupportTextProps["supportType"] | null;
   votingPower: VotingPowerData;
   missingVote: MissingVote;
+  proposal: Proposal;
 }) {
   const { write } = useCastVoteContext();
-
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+
+  const startDate = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    timeZoneName: "short",
+  }).format(new Date(proposal.startTime ?? ""));
+
+  if (!supportType) {
+    return (
+      <div className="pt-3">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger className="w-full flex items-center justify-center gap-1 text-primary font-medium cursor-help">
+              <span className="flex items-center text-xs font-semibold text-primary">
+                Proposal voting power{"\u00A0"}
+                <TokenAmountDisplay amount={vpToDisplay} />
+                <InformationCircleIcon className="w-4 h-4 ml-1" />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent
+              side="top"
+              align="center"
+              className="bg-neutral p-4 rounded-lg border border-line shadow-newDefault w-[calc(100vw-32px)] sm:w-[400px]"
+            >
+              <div className="flex flex-col gap-4">
+                <div>
+                  <div className="text-sm font-semibold text-primary">
+                    Proposal launched
+                  </div>
+                  <div className="text-sm font-semibold text-primary">
+                    {startDate}
+                  </div>
+                </div>
+                <div className="text-sm font-medium text-primary">
+                  Your voting power is captured when proposals launch based on
+                  your token holdings and delegations at that time.
+                </div>
+                <div className="text-sm font-medium text-primary">
+                  Any changes to your holdings after launch will not affect
+                  voting on this proposal.
+                </div>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-3">
-      <SubmitButton onClick={write} disabled={!supportType}>
-        <>
-          Submit vote with{"\u00A0"}
-          <TokenAmountDisplay amount={vpToDisplay} />
-        </>
+      <SubmitButton onClick={write}>
+        Submit vote with{"\u00A0"}
+        <TokenAmountDisplay amount={vpToDisplay} />
       </SubmitButton>
     </div>
   );
@@ -251,14 +310,12 @@ function VoteSubmitButton({
 const SubmitButton = ({
   children,
   onClick,
-  disabled = false,
 }: {
   children: ReactNode;
   onClick?: () => void;
-  disabled?: boolean;
 }) => {
   return (
-    <Button onClick={onClick} className="w-full" disabled={disabled}>
+    <Button onClick={onClick} className="w-full">
       {children}
     </Button>
   );

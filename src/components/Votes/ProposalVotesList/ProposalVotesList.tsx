@@ -16,7 +16,7 @@ interface Props {
   proposalId: string;
 }
 
-const LIMIT = 20;
+const LIMIT = 10;
 
 export default function ProposalVotesList({ proposalId }: Props) {
   const { data: fetchedVotes, isFetched } = useProposalVotes({

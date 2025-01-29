@@ -1,3 +1,5 @@
+"use client";
+
 import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import Tenant from "@/lib/tenant/tenant";
 import Link from "next/link";
@@ -5,11 +7,11 @@ import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import React from "react";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 
-interface DepositListActionProps {
+interface Props {
   address: string;
 }
 
-export const DepositListAction = ({ address }: DepositListActionProps) => {
+export const DepositListAction = ({ address }: Props) => {
   const { token } = Tenant.current();
   const { data: tokenBalance } = useTokenBalance(address);
   const { data: depositedBalance, isFetched: isDepositFetched } =
@@ -20,7 +22,7 @@ export const DepositListAction = ({ address }: DepositListActionProps) => {
 
   return (
     <div>
-      <div className="p-5 flex justify-between">
+      <div className="p-5 flex justify-between text-primary">
         {tokenBalance !== undefined ? (
           <>
             <div className="font-medium">
@@ -36,7 +38,7 @@ export const DepositListAction = ({ address }: DepositListActionProps) => {
               )}
             </div>
 
-            <div className="font-light text-gray-600">
+            <div className="font-light text-secondary">
               <>
                 {hasDepositedBalance && (
                   <span className="mr-2">

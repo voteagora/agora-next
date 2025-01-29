@@ -10,8 +10,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import ProposalVotesSummaryDetails from "../ProposalVotesSummaryDetails/ProposalVotesSummaryDetails";
-import { useProposalVotes } from "@/hooks/useProposalVotes";
+import ProposalVotesSummaryDetails from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesSummaryDetails/ProposalVotesSummaryDetails";
 
 interface Props {
   proposal: Proposal;
@@ -22,13 +21,6 @@ export default function ProposalVotesSummary({ proposal }: Props) {
 
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
-
-  const { data: fetchedVotes, isFetched } = useProposalVotes({
-    enabled: true,
-    limit: 250,
-    offset: 0,
-    proposalId: proposal.id,
-  });
 
   return (
     <HoverCard
@@ -59,7 +51,7 @@ export default function ProposalVotesSummary({ proposal }: Props) {
               </div>
             </div>
 
-            <ProposalVotesBar proposal={proposal} votes={fetchedVotes?.data} />
+            <ProposalVotesBar proposal={proposal} />
 
             <div className="flex flex-col font-medium">
               <div className="flex flex-row text-secondary pb-2 justify-between">
@@ -100,10 +92,7 @@ export default function ProposalVotesSummary({ proposal }: Props) {
             side="top"
             align={"start"}
           >
-            <ProposalVotesSummaryDetails
-              proposal={proposal}
-              votes={fetchedVotes?.data}
-            />
+            <ProposalVotesSummaryDetails proposal={proposal} />
           </HoverCardContent>
         </HoverCardTrigger>
       </div>
