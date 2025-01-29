@@ -74,7 +74,7 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
   );
 }
 
-const ChartSkeleton = () => {
+export const ChartSkeleton = () => {
   return (
     <div className="flex anumate-pulse">
       <div className="flex h-[230px] w-full bg-tertiary/10 rounded-md items-center justify-center text-xs text-secondary">

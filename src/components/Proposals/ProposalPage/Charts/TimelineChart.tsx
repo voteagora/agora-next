@@ -24,6 +24,8 @@ import { ChartVote } from "@/lib/types";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { Block } from "ethers";
 import { useLatestBlock } from "@/hooks/useLatestBlock";
+import { useEffect, useState } from "react";
+import { ChartSkeleton } from "@/components/Proposals/ProposalPage/ProposalChart/ProposalChart";
 
 const { token, namespace, ui } = Tenant.current();
 
@@ -32,10 +34,19 @@ interface Props {
   votes: ChartVote[];
 }
 
+type ChartData = {
+  timestamp: Date | null;
+  for: number;
+  against: number;
+  abstain: number;
+  total: number;
+};
+
 export const TimelineChart = ({ votes, proposal }: Props) => {
   const { data: block } = useLatestBlock({ enabled: true });
+  const [chartData, setChartData] = useState<ChartData[] | null>(null);
 
-  let stackIds = {
+  let stackIds: { [key: string]: string } = {
     for: "1",
     abstain: "1",
     against: "1",
@@ -56,40 +67,39 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
     stackIds.abstain = "3";
   }
 
-  /**
-   * Sorts the voting data based on the timestamp in ascending order.
-   */
-  const sortedChartData = votes?.sort(
-    (a, b) => Number(a.block_number) - Number(b.block_number)
-  );
+  useEffect(() => {
+    if (block && !chartData) {
+      const transformedData = transformVotesToChartData({
+        votes: votes,
+        block,
+      });
 
-  const chartData = transformVotesToChartData({
-    votes: sortedChartData,
-    block,
-  });
+      setChartData([
+        {
+          timestamp: proposal.startTime,
+          for: 0,
+          against: 0,
+          abstain: 0,
+          total: 0,
+        },
+        ...transformedData,
+        {
+          timestamp: proposal.endTime,
+          for: transformedData[transformedData.length - 1]?.for,
+          abstain: transformedData[transformedData.length - 1]?.abstain,
+          against: transformedData[transformedData.length - 1]?.against,
+          total: transformedData[transformedData.length - 1]?.total,
+        },
+      ]);
+    }
+  }, [block, chartData]);
 
-  const modifiedChartData = [
-    {
-      timestamp: proposal.startTime,
-      for: 0,
-      against: 0,
-      abstain: 0,
-      total: 0,
-    },
-    ...chartData,
-    {
-      timestamp: proposal.endTime,
-      for: chartData[chartData.length - 1]?.for,
-      abstain: chartData[chartData.length - 1]?.abstain,
-      against: chartData[chartData.length - 1]?.against,
-      total: chartData[chartData.length - 1]?.total,
-    },
-  ];
+  if (!chartData || !block) return <ChartSkeleton />;
 
   return (
     <div className="relative">
       <ResponsiveContainer width="100%" height={230}>
-        <AreaChart data={modifiedChartData}>
+        <AreaChart data={chartData}>
           <CartesianGrid
             vertical={false}
             strokeDasharray={"3 3"}
@@ -149,7 +159,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
           <Area
             type="step"
             dataKey="abstain"
-            stackId={stackIds.abstain}
+            stackId={1}
             stroke={rgbStringToHex(ui.customization?.tertiary)}
             fill={rgbStringToHex(ui.customization?.tertiary)}
             name="Abstain"
