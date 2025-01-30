@@ -13,7 +13,6 @@ import {
   getVpToDisplay,
   MissingVote,
 } from "@/lib/voteUtils";
-import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
 import { TokenAmountDisplay } from "@/lib/utils";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import CastVoteContextProvider, {
@@ -35,6 +34,7 @@ import {
 } from "@/components/ui/tooltip";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
 
 type Props = {
   proposal: Proposal;
@@ -49,11 +49,15 @@ export default function CastVoteInput({
   const { setOpen } = useModal();
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
-  const { chains, delegate, isSuccess, votes, votingPower } =
-    useFetchAllForVoting({
-      proposal,
-      blockNumber: isOptimismTenant ? proposal.snapshotBlockNumber : undefined,
-    });
+  const { data, isSuccess } = useFetchAllForVoting({
+    proposal,
+    blockNumber: isOptimismTenant ? proposal.snapshotBlockNumber : undefined,
+  });
+
+  const chains = data?.chains;
+  const delegate = data?.delegate;
+  const votes = data?.votes;
+  const votingPower = data?.votingPower;
 
   if (!isConnected) {
     return (

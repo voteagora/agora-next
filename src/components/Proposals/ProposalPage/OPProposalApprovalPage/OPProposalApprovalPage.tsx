@@ -1,6 +1,5 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
-import { fetchAllForVoting as apiFetchAllForVoting } from "@/app/api/votes/getVotes";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
@@ -19,16 +18,6 @@ async function fetchProposalVotes(
     proposalId,
     pagination,
   });
-}
-
-async function fetchAllForVoting(
-  address: string | `0x${string}`,
-  blockNumber: number,
-  proposalId: string
-) {
-  "use server";
-
-  return await apiFetchAllForVoting(address, blockNumber, proposalId);
 }
 
 async function fetchUserVotesForProposal(
