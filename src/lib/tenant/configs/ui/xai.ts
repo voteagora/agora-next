@@ -97,7 +97,7 @@ export const xaiTenantUIConfig = new TenantUI({
           "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
         imageTitle: "Voter on Agora",
         imageDescription:
-          "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
+          "This is the home of Xai Governance. Membership is determined by holding the Xai token",
       },
     },
   ],
