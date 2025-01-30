@@ -27,7 +27,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
   const { isConnected, address } = useAccount();
   const { namespace } = Tenant.current();
 
-  const hasProposalLifecycle = Boolean(ui.toggle("proposal-execu te")?.enabled);
+  const hasProposalLifecycle = Boolean(ui.toggle("proposal-execute")?.enabled);
 
   // Only check admin for active proposals for Agora and Bravo governors.
   // This check is used to hide the entire admin bar, not just the Cancel button.
