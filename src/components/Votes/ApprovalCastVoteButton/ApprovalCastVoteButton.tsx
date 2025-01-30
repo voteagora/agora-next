@@ -19,7 +19,7 @@ import { TokenAmountDisplay } from "@/lib/utils";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import useFetchAllForVotingRoute from "@/hooks/useFetchAllForVotingRoute";
+import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
 
 type Props = {
   proposal: Proposal;
@@ -27,10 +27,10 @@ type Props = {
 
 export default function ApprovalCastVoteButton({ proposal }: Props) {
   const openDialog = useOpenDialog();
-  const { data, isSuccess } = useFetchAllForVotingRoute({ proposal });
 
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
+  const { data, isSuccess } = useFetchAllForVoting({ proposal });
 
   return (
     <VStack className="flex-shrink-0">
