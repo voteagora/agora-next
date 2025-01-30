@@ -1,40 +1,61 @@
-import { Suspense } from "react";
+"use client";
+
 import { ProposalStage } from "@prisma/client";
 import TempCheckForm from "./stages/TempCheckForm";
-import DraftFormClient from "./stages/DraftForm/DraftFormClient";
+import DraftForm from "./stages/DraftForm";
 import SubmitForm from "./stages/SubmitForm";
 import GithubPRForm from "./stages/GithubPRForm";
 import { DraftProposal } from "../types";
+import { AnimatePresence, motion } from "framer-motion";
+import AnimatedText from "./AnimatedText";
 
 export default function DraftProposalForm({
   stage,
   draftProposal,
   proposalTypes,
+  rightColumn,
 }: {
   stage: ProposalStage;
   draftProposal: DraftProposal;
   proposalTypes: any[];
+  rightColumn: React.ReactElement;
 }) {
   const renderStage = (stage: ProposalStage) => {
     switch (stage) {
       case ProposalStage.ADDING_TEMP_CHECK:
-        return <TempCheckForm draftProposal={draftProposal} />;
+        return (
+          <TempCheckForm
+            draftProposal={draftProposal}
+            rightColumn={rightColumn}
+          />
+        );
       case ProposalStage.DRAFTING:
         return (
-          <Suspense fallback={"loading!"}>
-            <DraftFormClient
-              proposalTypes={proposalTypes}
-              draftProposal={draftProposal}
-            />
-          </Suspense>
+          <DraftForm
+            proposalTypes={proposalTypes}
+            draftProposal={draftProposal}
+            rightColumn={rightColumn}
+          />
         );
       case ProposalStage.ADDING_GITHUB_PR:
-        return <GithubPRForm draftProposal={draftProposal} />;
+        return (
+          <GithubPRForm
+            draftProposal={draftProposal}
+            rightColumn={rightColumn}
+          />
+        );
       case ProposalStage.AWAITING_SUBMISSION:
-        return <SubmitForm draftProposal={draftProposal} />;
+        return (
+          <SubmitForm draftProposal={draftProposal} rightColumn={rightColumn} />
+        );
       default:
         return null;
     }
   };
-  return <>{renderStage(stage)}</>;
+
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      {renderStage(stage)}
+    </AnimatePresence>
+  );
 }

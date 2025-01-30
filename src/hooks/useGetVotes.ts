@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import Tenant from "@/lib/tenant/tenant";
 import { getPublicClient } from "@/lib/viem";
 
-export const VOTES_QK = "proposalThreshold";
+export const VOTES_QK = "votes";
 
 export const useGetVotes = ({
   address,

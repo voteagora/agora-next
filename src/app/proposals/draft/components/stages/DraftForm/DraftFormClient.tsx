@@ -17,10 +17,10 @@ import {
   ProposalType,
   SocialProposalType,
   ProposalTypeMetadata,
-  parseProposalToForm,
   DraftProposal,
   PLMConfig,
 } from "../../../types";
+import { parseProposalToForm } from "../../../utils/parseTransaction";
 import BasicProposalForm from "../../BasicProposalForm";
 import SocialProposalForm from "../../SocialProposalForm";
 import ApprovalProposalForm from "../../ApprovalProposalForm";

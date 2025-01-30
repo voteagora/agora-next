@@ -26,7 +26,7 @@ const SponsorActions = ({
     }
   };
 
-  return <div className="mt-6">{renderAction(draftProposal)}</div>;
+  return <>{renderAction(draftProposal)}</>;
 };
 
 export default SponsorActions;
