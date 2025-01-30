@@ -1,8 +1,8 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import xaiLogo from "@/assets/tenant/xai_logo.svg";
-import xaiBanner from "@/assets/tenant/xai_banner.png";
-import successImage from "@/assets/tenant/xai_banner.png";
-import pendingImage from "@/assets/tenant/xai_banner.png";
+import xaiBanner from "@/assets/tenant/xai_banner.svg";
+import successImage from "@/assets/tenant/xai_success.svg";
+import pendingImage from "@/assets/tenant/xai_pending.svg";
 import delegateImage from "@/assets/tenant/xai_logo.svg";
 
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
