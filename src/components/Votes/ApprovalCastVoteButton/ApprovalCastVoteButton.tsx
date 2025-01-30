@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/tooltip";
 import { TokenAmountDisplay } from "@/lib/utils";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 type Props = {
   proposal: Proposal;
@@ -82,10 +84,13 @@ export default function ApprovalCastVoteButton({
     }
   }, [fetchData, address, proposal.snapshotBlockNumber]);
 
+  const isOptimismTenant =
+    Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
+
   return (
     <VStack className="flex-shrink-0">
       <VStack alignItems="items-stretch">
-        {isReady && (
+        {isReady && isOptimismTenant && (
           <div className="pt-3">
             <TooltipProvider>
               <Tooltip>
