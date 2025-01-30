@@ -2,34 +2,32 @@
 
 import { useAccount } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
-import { fetchAllForVoting } from "@/app/proposals/actions";
 import { type Proposal } from "@/app/api/common/proposals/proposal";
-
-type FetchAllForVotingProps = {
-  proposal: Proposal;
-  blockNumber?: number;
-};
 
 const useFetchAllForVoting = ({
   proposal,
   blockNumber,
-}: FetchAllForVotingProps) => {
+}: {
+  proposal: Proposal;
+  blockNumber?: number;
+}) => {
   const { address } = useAccount();
+  const finalBlockNumber = blockNumber ?? proposal.snapshotBlockNumber;
 
   const { data, isSuccess } = useQuery({
-    enabled: !!address && !!proposal.snapshotBlockNumber,
-    queryKey: ["useFetchAllForVoting", address, proposal.id, blockNumber],
+    enabled: !!address && !!finalBlockNumber,
+    queryKey: ["useFetchAllForVoting", address, proposal, finalBlockNumber],
     queryFn: async () => {
+      const res = await fetch(
+        `/api/common/votes?address=${address}&blockNumber=${finalBlockNumber}&proposalId=${proposal.id}`
+      );
+
       const {
         votingPower,
         authorityChains,
         delegate,
         votesForProposalAndDelegate,
-      } = await fetchAllForVoting(
-        address!,
-        blockNumber || proposal.snapshotBlockNumber,
-        proposal.id
-      );
+      } = await res.json();
 
       return {
         chains: authorityChains,
@@ -40,7 +38,7 @@ const useFetchAllForVoting = ({
     },
   });
 
-  return { ...data, isSuccess };
+  return { data, isSuccess };
 };
 
 export default useFetchAllForVoting;

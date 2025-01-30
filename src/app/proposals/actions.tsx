@@ -1,6 +1,5 @@
 "use server";
 
-import { fetchAllForVoting as apiFetchAllForVoting } from "@/app/api/votes/getVotes";
 import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
   fetchVotesForProposal as apiFetchVotesForProposal,
@@ -43,9 +42,3 @@ export const fetchUserVotesForProposal = (
     proposalId,
     address,
   });
-
-export const fetchAllForVoting = (
-  address: string | `0x${string}`,
-  blockNumber: number,
-  proposalId: string
-) => apiFetchAllForVoting(address, blockNumber, proposalId);
