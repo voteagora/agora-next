@@ -4,7 +4,7 @@ import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { formatNumber } from "@/lib/tokenUtils";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { useVotingStats } from "@/hooks/useVotingStats";
+import { useVoterStats } from "@/hooks/useVoterStats";
 import { useRouter } from "next/navigation";
 
 export default function DelegateTableRow({
@@ -13,15 +13,13 @@ export default function DelegateTableRow({
   delegate: DelegateChunk & { numOfDelegators: bigint };
 }) {
   const router = useRouter();
-  const { data: votingStats, isPending: isVotingStatsPending } = useVotingStats(
-    {
-      address: delegate.address as `0x${string}`,
-    }
-  );
+  const { data: voterStats, isPending: isVoterStatsPending } = useVoterStats({
+    address: delegate.address as `0x${string}`,
+  });
 
   return (
     <TableRow
-      className="font-semibold cursor-pointer"
+      className="font-semibold cursor-pointer bg-neutral text-secondary"
       onClick={() => {
         router.push(`/delegates/${delegate.address}`);
       }}
@@ -36,7 +34,7 @@ export default function DelegateTableRow({
       </TableCell>
       <TableCell>{formatNumber(delegate.votingPower.total)}</TableCell>
       <TableCell>
-        {!isVotingStatsPending && `${(votingStats?.last_10_props || 0) * 10}%`}
+        {!isVoterStatsPending && `${(voterStats?.last_10_props || 0) * 10}%`}
       </TableCell>
       {/* @ts-ignore */}
       <TableCell>

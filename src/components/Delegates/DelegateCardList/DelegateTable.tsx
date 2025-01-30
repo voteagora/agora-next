@@ -57,7 +57,7 @@ export default function DelegateTable({
     <DialogProvider>
       <div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg mt-6">
         <Table className="min-w-full">
-          <TableHeader className="text-sm text-secondary sticky top-0 bg-white z-10 rounded-t-lg">
+          <TableHeader className="text-sm text-secondary sticky top-0 bg-neutral z-10 rounded-t-lg">
             <TableRow className="bg-tertiary/5">
               <TableHead className="h-10 text-secondary">Name</TableHead>
               <TableHead className="h-10 text-secondary">
