@@ -98,7 +98,7 @@ model SnapshotProposal {
   type           String?
   votes          Decimal?  @db.Decimal
 
-  @@map("proposals_v2")
+  @@map("proposals_v3")
   @@schema("snapshot")
 }
 
@@ -630,7 +630,7 @@ view ensProposals {
   queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals_v2")
+  @@map("proposals_v3")
   @@schema("ens")
 }
 
@@ -856,7 +856,7 @@ view etherfiProposals {
   cancelled_transaction_hash String?
   executed_transaction_hash  String?
 
-  @@map("proposals_v2")
+  @@map("proposals_v3")
   @@schema("etherfi")
 }
 
@@ -1054,7 +1054,7 @@ view uniswapProposals {
   queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals_v2")
+  @@map("proposals_v3")
   @@schema("uniswap")
 }
 
@@ -2009,7 +2009,7 @@ view cyberProposals {
   queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals_v2")
+  @@map("proposals_v3")
   @@schema("cyber")
 }
 
@@ -2346,7 +2346,7 @@ view scrollProposals {
   queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals_v2")
+  @@map("proposals_v3")
   @@schema("scroll")
 }
 
@@ -2671,7 +2671,7 @@ view deriveProposals {
   queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals_v2")
+  @@map("proposals_v3")
   @@schema("derive")
 }
 
@@ -2997,7 +2997,7 @@ view pguildProposals {
   queued_transaction_hash    String?      @db.VarChar
   executed_transaction_hash  String?      @db.VarChar
 
-  @@map("proposals_v2")
+  @@map("proposals_v3")
   @@schema("pguild")
 }
 
