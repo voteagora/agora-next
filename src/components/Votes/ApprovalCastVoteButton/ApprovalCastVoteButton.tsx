@@ -17,12 +17,9 @@ import {
 } from "@/components/ui/tooltip";
 import { TokenAmountDisplay } from "@/lib/utils";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
-<<<<<<< HEAD
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-=======
 import useFetchAllForVotingRoute from "@/hooks/useFetchAllForVotingRoute";
->>>>>>> e02cd835 (Removes server action)
 
 type Props = {
   proposal: Proposal;
@@ -38,11 +35,7 @@ export default function ApprovalCastVoteButton({ proposal }: Props) {
   return (
     <VStack className="flex-shrink-0">
       <VStack alignItems="items-stretch">
-<<<<<<< HEAD
-        {isReady && isOptimismTenant && (
-=======
-        {isSuccess && (
->>>>>>> e02cd835 (Removes server action)
+        {isSuccess && isOptimismTenant && (
           <div className="pt-3">
             <TooltipProvider>
               <Tooltip>
