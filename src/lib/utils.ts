@@ -165,7 +165,9 @@ export function numberToToken(number: number) {
 export function formatNumber(
   amount: string | bigint,
   decimals: number,
-  maximumSignificantDigits = 4
+  maximumSignificantDigits = 4,
+  useSpecialFormatting?: boolean,
+  useCompactDisplay = true
 ) {
   let bigIntAmount: bigint;
 
@@ -189,8 +191,20 @@ export function formatNumber(
   const standardUnitAmount =
     Number(wholePart) + Number(fractionalPart) / Number(divisor);
 
+  if (useSpecialFormatting) {
+    if (standardUnitAmount === 0) return "";
+    if (standardUnitAmount >= 1.5) {
+      const rounded = Math.round(standardUnitAmount);
+      return new Intl.NumberFormat("en", {
+        maximumFractionDigits: 0,
+      }).format(rounded);
+    }
+    if (standardUnitAmount >= 1) return "~1";
+    if (standardUnitAmount > 0) return "<1";
+  }
+
   const numberFormat = new Intl.NumberFormat("en", {
-    notation: "compact",
+    notation: useCompactDisplay ? "compact" : "standard",
     maximumFractionDigits: maximumSignificantDigits,
   });
 

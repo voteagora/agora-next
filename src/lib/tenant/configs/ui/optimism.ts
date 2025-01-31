@@ -32,6 +32,7 @@ export const optimismTenantUIConfig = new TenantUI({
     negative: "226 54 54",
     brandPrimary: "0 0 0",
     brandSecondary: "255 255 255",
+    tokenAmountFont: "font-chivoMono",
   },
 
   delegates: {

@@ -23,7 +23,7 @@ import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { CloseIcon } from "@/components/shared/CloseIcon";
 import { Button } from "@/components/ui/button";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
 import { useModal } from "connectkit";
@@ -333,7 +333,7 @@ function InfoDialog({
         <div className="flex flex-col items-start gap-3 w-[95%] py-4 mx-auto mt-4 border-t border-dashed border-line max-h-[256px] overflow-y-scroll">
           <div className="flex flex-row w-full items-center justify-between">
             <p>You own</p>
-            <TokenAmountDisplay amount={balance} />
+            <TokenAmountDecorated amount={balance} />
           </div>
           {delegators?.map((delegator, index) => (
             <div
@@ -344,14 +344,14 @@ function InfoDialog({
                 <ENSName address={delegator.from} />
                 &apos;s delegation
               </p>
-              <TokenAmountDisplay amount={BigInt(delegator.allowance)} />
+              <TokenAmountDecorated amount={BigInt(delegator.allowance)} />
             </div>
           ))}
         </div>
         {directDelegatedFromOthers > 0n && (
           <p className="w-full p-3 text-xs font-medium leading-4 border-t text-primary/30 border-line">
             You’ve been delegated an additional{" "}
-            <TokenAmountDisplay amount={directDelegatedFromOthers} /> without
+            <TokenAmountDecorated amount={directDelegatedFromOthers} /> without
             the right to redelegate. You can only vote with this portion of
             votes and cannot pass them to others.
           </p>

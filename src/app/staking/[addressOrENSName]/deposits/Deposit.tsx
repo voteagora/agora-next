@@ -1,6 +1,6 @@
 "use client";
 
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import React, { useEffect } from "react";
 import { StakedDeposit } from "@/lib/types";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -76,7 +76,7 @@ export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
         <div className="w-[130px] border-r border-line">
           <div className="text-xs font-medium text-secondary">Staked</div>
           <div className="font-medium text-primary">
-            <TokenAmountDisplay
+            <TokenAmountDecorated
               maximumSignificantDigits={4}
               amount={deposit.amount}
             />

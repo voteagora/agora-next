@@ -45,6 +45,7 @@ export const cyberTenantUIConfig = new TenantUI({
     negative: "197 47 0",
     brandPrimary: "23 23 23",
     brandSecondary: "242 242 242",
+    tokenAmountFont: "font-chivoMono",
   },
 
   links: [

@@ -29,6 +29,7 @@ export const ensTenantUIConfig = new TenantUI({
     negative: "226 54 54",
     brandPrimary: "1 26 37",
     brandSecondary: "255 255 255",
+    tokenAmountFont: "font-chivoMono",
   },
 
   organization: {

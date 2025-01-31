@@ -26,6 +26,7 @@ export const boostTenantUIConfig = new TenantUI({
 
   customization: {
     brandSecondary: "240 244 247",
+    tokenAmountFont: "font-chivoMono",
   },
 
   // TODO

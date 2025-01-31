@@ -14,7 +14,7 @@ import type { MetricTimeSeriesValue } from "@/lib/types";
 import { FREQUENCY_FILTERS } from "@/lib/constants";
 import { formatNumber, scientificNotationToPrecision } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 
 interface Props {
   getData: (
@@ -131,7 +131,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <div className="flex flex-row gap-1 justify-center items-center text-center mt-4">
           <p className="text-xs font-medium text-gray-4f ">
             <span className="pr-10">All Delegates</span>
-            <TokenAmountDisplay amount={payload[0].value} />
+            <TokenAmountDecorated amount={payload[0].value} />
           </p>
         </div>
       </div>

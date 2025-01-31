@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 
 import { Input } from "@/components/ui/input";
 import Tenant from "@/lib/tenant/tenant";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { Button } from "@/components/ui/button";
@@ -84,7 +84,7 @@ export const PanelSetStakeAmount = ({
           <div className="text-left text-primary">
             <div className="text-xs text-secondary">Available to stake</div>
             {hasTokenBalance && (
-              <TokenAmountDisplay
+              <TokenAmountDecorated
                 maximumSignificantDigits={5}
                 amount={tokenBalance}
               />
@@ -95,7 +95,7 @@ export const PanelSetStakeAmount = ({
             <div className="text-xs text-secondary">Already staked</div>
 
             {hasTotalStaked && (
-              <TokenAmountDisplay
+              <TokenAmountDecorated
                 maximumSignificantDigits={5}
                 amount={totalStaked}
               />

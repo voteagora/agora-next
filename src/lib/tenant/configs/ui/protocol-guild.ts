@@ -27,6 +27,7 @@ export const protocolGuildTenantUIConfig = new TenantUI({
     negative: "226 54 54",
     brandPrimary: "0 0 0",
     brandSecondary: "255 255 255",
+    tokenAmountFont: "font-chivoMono",
   },
 
   organization: {

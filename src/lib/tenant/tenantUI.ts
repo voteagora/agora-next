@@ -117,6 +117,7 @@ type TenantUIParams = {
     brandPrimary?: string;
     brandSecondary?: string;
     font?: string;
+    tokenAmountFont?: string;
   };
   favicon?: {
     "apple-touch-icon"?: string;
@@ -151,6 +152,7 @@ export class TenantUI {
     brandPrimary?: string;
     brandSecondary?: string;
     font?: string;
+    tokenAmountFont?: string;
   };
   private _favicon?: {
     "apple-touch-icon"?: string;
@@ -247,6 +249,7 @@ export class TenantUI {
         brandPrimary?: string;
         brandSecondary?: string;
         font?: string;
+        tokenAmountFont?: string;
       }
     | undefined {
     return this._customization;
