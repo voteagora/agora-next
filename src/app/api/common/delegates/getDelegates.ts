@@ -568,7 +568,7 @@ async function getVoterStats(
         SELECT proposal_id
         FROM ${namespace}.proposals_v2
         WHERE contract = $2
-        AND end_block::INTEGER <= $3
+        AND NULLIF(end_block, '')::INTEGER <= $3
         AND cancelled_block IS NULL
         ORDER BY ordinal DESC
         LIMIT 10
