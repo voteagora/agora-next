@@ -81,25 +81,31 @@ export function AdvancedDelegateDialog({
         directDelegatedVP,
       ] = await fetchAllForAdvancedDelegation(address);
 
-      setDirectDelegatedVP(directDelegatedVP);
-      setAvailableBalance(balance);
-      setIsDelegatingToProxy(isDelegating);
-      setOpBalance(directDelegatedVP);
-      setDelegators(delegatorsRes);
+      setDirectDelegatedVP(
+        directDelegatedVP ? BigInt(directDelegatedVP.toString()) : 0n
+      );
+      setAvailableBalance(typeof balance === "string" ? balance : "0");
+      setIsDelegatingToProxy(!!isDelegating);
+      setOpBalance(
+        directDelegatedVP ? BigInt(directDelegatedVP.toString()) : 0n
+      );
+      setDelegators(delegatorsRes as Delegation[]);
 
       let isTargetDelegated = false;
 
-      const initialAllowance = delegatees.map((delegation: Delegation) => {
-        if (!isTargetDelegated) {
-          isTargetDelegated = delegation.to === target.toLowerCase();
-        }
+      const initialAllowance = (delegatees as Delegation[]).map(
+        (delegation: Delegation) => {
+          if (!isTargetDelegated) {
+            isTargetDelegated = delegation.to === target.toLowerCase();
+          }
 
-        return (
-          Math.round(
-            Number(formatUnits(BigInt(delegation.allowance), 18)) * 1000
-          ) / 1000
-        );
-      });
+          return (
+            Math.round(
+              Number(formatUnits(BigInt(delegation.allowance), 18)) * 1000
+            ) / 1000
+          );
+        }
+      );
 
       const initAllowance = [...initialAllowance];
       if (!isTargetDelegated) {
@@ -115,10 +121,9 @@ export function AdvancedDelegateDialog({
           amount: "PARTIAL",
         });
       }
-
       setAllowance(initAllowance);
-      setDelegatees(delegatees);
-      setProxyAddress(proxyAddress || "");
+      setDelegatees(delegatees as Delegatee[]);
+      setProxyAddress((proxyAddress as string) || "");
 
       setIsReady(true);
     } catch (error) {
@@ -304,7 +309,7 @@ function InfoDialog({
   delegators,
   directDelegatedVP,
 }: {
-  setShowInfo: Dispatch<any>;
+  setShowInfo: Dispatch<SetStateAction<boolean>>;
   availableBalance: string;
   balance: bigint;
   delegators: Delegation[] | undefined;
@@ -350,7 +355,7 @@ function InfoDialog({
         </div>
         {directDelegatedFromOthers > 0n && (
           <p className="w-full p-3 text-xs font-medium leading-4 border-t text-primary/30 border-line">
-            You’ve been delegated an additional{" "}
+            You've been delegated an additional{" "}
             <TokenAmountDisplay amount={directDelegatedFromOthers} /> without
             the right to redelegate. You can only vote with this portion of
             votes and cannot pass them to others.
