@@ -22,7 +22,7 @@ export function getSecondsPerBlock(): number {
 
     case 42161: // Arbitrum one
     case 421614: // Arbitrum sepolia
-      return 0.25; // This should be equal to L1 block time
+      return 0.25;
 
     case 901: // Derive
     case 957: // Derive Testnet

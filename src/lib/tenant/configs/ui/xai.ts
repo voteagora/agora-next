@@ -113,6 +113,21 @@ export const xaiTenantUIConfig = new TenantUI({
           "This is the home of Xai Governance. Membership is determined by holding the Xai token",
       },
     },
+    {
+      route: "info",
+      title: "Welcome to Xai Governance",
+      description:
+        "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
+      meta: {
+        title: "Xai Governance",
+        description: "Home of Xai Governance",
+        imageTitle: "Xai Governance",
+        imageDescription: "Home of Xai Governance",
+      },
+      links: [
+        // Add other relevant links for documentation, forums, etc.
+      ],
+    },
   ],
 
   toggles: [
@@ -130,6 +145,10 @@ export const xaiTenantUIConfig = new TenantUI({
     },
     {
       name: "delegates/edit",
+      enabled: true,
+    },
+    {
+      name: "info",
       enabled: true,
     },
     {
