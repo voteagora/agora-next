@@ -214,13 +214,13 @@ export const xaiTenantUIConfig = new TenantUI({
           },
           {
             type: ProposalType?.APPROVAL,
-            prodAddress: "0xEE0178EabB933A5eDA6309AC1D1678A0670103e3",
-            testnetAddress: "0x044e697c37B974d3822832934fC88fA07fa18Fb2",
+            prodAddress: "0xA8D1D683a43586330b44c073406789e6f6dC04cc",
+            testnetAddress: "0x4990cce6e8cd9596305b83c4860d4c0f3bf4e8fa",
           },
           {
             type: ProposalType?.OPTIMISTIC,
-            prodAddress: "0x38947322EBDb3e892DED2EDca9AA35dD177CCd06",
-            testnetAddress: "0x7dB0853038F845c70A278F0dc23d7437404F44fd",
+            prodAddress: "0x7a0f7659103cfc42f3Eeb265EDb0205bE9B25490",
+            testnetAddress: "0xf8d15c3132efa557989a1c9331b6667ca8caa3a9",
           },
         ],
         copy: {
