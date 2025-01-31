@@ -128,7 +128,7 @@ export const xaiTenantUIConfig = new TenantUI({
         {
           name: "Community Discord",
           title: "Community Discord",
-          url: "",
+          url: "https://discord.com/invite/xaigames",
           image: infoPageCard01,
         },
         {
@@ -140,13 +140,13 @@ export const xaiTenantUIConfig = new TenantUI({
         {
           name: "Protocol Docs",
           title: "Protocol Docs",
-          url: "",
+          url: "https://xai-foundation.gitbook.io/xai-network",
           image: infoPageCard03,
         },
         {
           name: "Xai Vision",
           title: "Xai Vision",
-          url: "",
+          url: "https://xai.games/",
           image: infoPageCard04,
         },
       ],
