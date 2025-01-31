@@ -23,6 +23,8 @@ export default class TenantSlugFactory {
         return "PGUILD";
       case TENANT_NAMESPACES.BOOST:
         return "BOOST";
+      case TENANT_NAMESPACES.XAI:
+        return "XAI";
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

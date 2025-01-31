@@ -20,6 +20,10 @@ export function getSecondsPerBlock(): number {
     case 534352: // Scroll
       return 3;
 
+    case 42161: // Arbitrum one
+    case 421614: // Arbitrum sepolia
+      return 0.25;
+
     case 901: // Derive
     case 957: // Derive Testnet
       return 2;
@@ -97,6 +101,16 @@ export function getHumanBlockTime(
       const estCyberSecondsDiff =
         (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
       return new Date((latestBlock.timestamp - estCyberSecondsDiff) * 1000);
+    }
+
+    // Arbitrum one
+    // Arbitrum sepolia
+    case 42161:
+    case 421614: {
+      const blockSeconds = getSecondsPerBlock();
+      const estArbitrumSecondsDiff =
+        (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
+      return new Date((latestBlock.timestamp - estArbitrumSecondsDiff) * 1000);
     }
 
     //   Ethereum Mainnet

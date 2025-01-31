@@ -119,7 +119,7 @@ const CastVoteContextProvider = ({
     !reason &&
     !fallbackToStandardVote;
 
-  const { write, isLoading, isSuccess, data, isError, resetError } = (() => {
+  const { write, isLoading, isSuccess, data, isError } = (() => {
     if (isGasRelayLive) {
       return sponsoredVotingValues;
     }
@@ -128,6 +128,8 @@ const CastVoteContextProvider = ({
     }
     return standardVoteValues;
   })();
+
+  const resetError = () => {}; // Add default no-op reset function
 
   return (
     <CastVoteContext.Provider

@@ -293,9 +293,7 @@ async function getCurrentDelegatorsForAddress({
       allowance:
         delegator.type === "ADVANCED"
           ? delegator.allowance.toFixed(0)
-          : (
-              await contracts.token.contract.balanceOf(delegator.from)
-            ).toString(),
+          : BigInt(0).toString(),
       percentage: "0", // Only used in Agora token partial delegation
       timestamp: latestBlock
         ? getHumanBlockTime(delegator.block_number, latestBlock)

@@ -221,8 +221,7 @@ async function getVotingPowerAvailableForDirectDelegationForAddress({
 }: {
   address: string;
 }): Promise<bigint> {
-  const { contracts } = Tenant.current();
-  return contracts.token.contract.balanceOf(address);
+  return BigInt(0);
 }
 
 /**

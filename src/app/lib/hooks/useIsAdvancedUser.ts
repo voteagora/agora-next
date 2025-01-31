@@ -69,19 +69,10 @@ const useIsAdvancedUser = () => {
     "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB", // Michael test
   ] as `0x${string}`[];
 
-  const { data: balance, isFetched: isBalanceFetched } = useReadContract({
-    address: contracts.token.address as `0x${string}`,
-    abi: contracts.token.abi,
-    functionName: "balanceOf",
-    query: {
-      enabled: isConnected && !!address /**
-       * @dev Checks if the user is an advanced user
-       * PROD: only allowlist
-       * TEST: more than 1 token or allowlist
-       */,
-    },
-    args: [address!],
-  }) as { data: bigint | undefined; isFetched: boolean };
+  const { data: balance, isFetched: isBalanceFetched } = {
+    data: BigInt(0),
+    isFetched: true,
+  };
 
   useEffect(() => {
     if (!isBalanceFetched) return;

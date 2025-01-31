@@ -34,8 +34,9 @@ const useConnectedDelegate = () => {
     enabled: !(!address || isTestToken),
     queryKey: ["useConnectedDelegate", address, refetchDelegate, retries],
     queryFn: async () => {
-      const [delegate, advancedDelegators, balance] =
-        await fetchConnectedDelegate(address!);
+      const [delegate, advancedDelegators] = await fetchConnectedDelegate(
+        address!
+      );
       if (refetchDelegate) {
         Promise.all([
           // Invalidate delegate and delegator queries
@@ -73,7 +74,7 @@ const useConnectedDelegate = () => {
             console.error("Maximum retries reached");
           }
         }
-        return { delegate, advancedDelegators, balance };
+        return { delegate, advancedDelegators };
       } else if (refetchDelegate) {
         // When refetchDelegate is true, if last voting power is equal to actual it means indexer has not indexed the
         // create voting power
@@ -91,9 +92,9 @@ const useConnectedDelegate = () => {
         } else {
           setRefetchDelegate(null);
         }
-        return { delegate, advancedDelegators, balance };
+        return { delegate, advancedDelegators };
       } else {
-        return { delegate, advancedDelegators, balance };
+        return { delegate, advancedDelegators };
       }
     },
   });

@@ -372,6 +372,16 @@ export const getTransportForChain = (chainId: number) => {
       return http(
         `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
+    // arbitrum one
+    case 42161:
+      return http(
+        `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
+    // arbitrum sepolia
+    case 421614:
+      return http(
+        `https://arb-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
     // sepolia
     case 11155111:
       return http(

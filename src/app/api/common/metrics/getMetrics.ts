@@ -8,17 +8,19 @@ async function getMetrics() {
   const { namespace, contracts } = Tenant.current();
 
   try {
-    let totalSupply;
-    if (contracts.token.isERC20()) {
-      totalSupply = await contracts.token.contract.totalSupply();
-    } else if (contracts.token.isERC721()) {
-      const token = contracts.token.contract as IMembershipContract;
-      const publicClient = getPublicClient(contracts.token.chain);
-      const blockNumber = await publicClient.getBlockNumber();
-      totalSupply = await token.getPastTotalSupply(Number(blockNumber) - 1);
-    } else {
-      totalSupply = 0;
-    }
+    // let totalSupply;
+    // if (contracts.token.isERC20()) {
+    //   totalSupply = await contracts.token.contract.totalSupply();
+    // } else if (contracts.token.isERC721()) {
+    //   const token = contracts.token.contract as IMembershipContract;
+    //   const publicClient = getPublicClient(contracts.token.chain);
+    //   const blockNumber = await publicClient.getBlockNumber();
+    //   totalSupply = await token.getPastTotalSupply(Number(blockNumber) - 1);
+    // } else {
+    //   totalSupply = 0;
+    // }
+
+    const totalSupply = BigInt(0);
 
     const votableSupply = await findVotableSupply({
       namespace,
