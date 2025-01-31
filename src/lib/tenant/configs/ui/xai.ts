@@ -190,7 +190,7 @@ export const xaiTenantUIConfig = new TenantUI({
     },
     {
       name: "info/treasury",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "proposal-lifecycle",
