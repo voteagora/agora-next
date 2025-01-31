@@ -54,9 +54,10 @@ export function PartialDelegationDialog({
 
   const delegatableBalace = async () => {
     try {
-      return await contracts.token.contract.balanceOf(
-        ownerAddress as `0x${string}`
-      );
+      return BigInt(0);
+      // return await contracts.token.contract.balanceOf(
+      //   ownerAddress as `0x${string}`
+      // );
     } catch (e) {
       return BigInt(0);
     }

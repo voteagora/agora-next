@@ -8,12 +8,9 @@ const AdminMembershipPage = () => {
   const tenant = Tenant.current();
   const [address, setAddress] = useState("");
 
-  const { data: memberBalance } = useReadContract({
-    address: tenant.contracts.token.address as `0x${string}`,
-    abi: tenant.contracts.token.abi,
-    functionName: "balanceOf",
-    args: [address as `0x${string}`],
-  });
+  const { data: memberBalance } = {
+    data: BigInt(0),
+  };
 
   const { writeContract: addMember, error: addMemberError } =
     useWriteContract();

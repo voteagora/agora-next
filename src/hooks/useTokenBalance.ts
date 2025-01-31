@@ -4,14 +4,9 @@ import Tenant from "@/lib/tenant/tenant";
 export const TOKEN_BALANCE_QK = "tokenBalance";
 
 export const useTokenBalance = (address?: string) => {
-  const { contracts } = Tenant.current();
-  const { data, isFetching, isFetched } = useQuery({
-    enabled: !!address,
-    queryKey: [TOKEN_BALANCE_QK, address],
-    queryFn: async () => {
-      return await contracts.token.contract.balanceOf(address as `0x${string}`);
-    },
-    staleTime: 180000, // 3 minute cache
-  });
-  return { data, isFetching, isFetched };
+  return {
+    data: BigInt(0),
+    isFetching: false,
+    isFetched: true,
+  };
 };

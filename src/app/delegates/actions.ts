@@ -153,15 +153,13 @@ export async function fetchAllDelegatorsInChainsForAddress(
 }
 
 export async function balanceOf(address: string) {
-  const { contracts } = Tenant.current();
-  return contracts.token.contract.balanceOf(address);
+  return BigInt(0);
 }
 
 export const fetchConnectedDelegate = async (address: string) => {
   return await Promise.all([
     fetchDelegate(address),
     fetchAllDelegatorsInChainsForAddress(address),
-    balanceOf(address),
   ]);
 };
 
