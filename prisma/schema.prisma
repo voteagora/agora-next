@@ -7,7 +7,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "uniswap"]
+  schemas  = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "uniswap", "xai"]
 }
 
 model DelegateStatements {
@@ -3439,6 +3439,328 @@ view boostVotingPowerSnaps {
   @@map("voting_power_snaps")
 }
 
+// ##############################################
+//
+//    Xai
+//
+// ##############################################
+
+view xaiAdvancedDelegatees {
+  pair             String   @unique
+  from             String
+  to               String
+  delegated_amount Decimal  @db.Decimal
+  delegated_share  Decimal  @db.Decimal
+  block_number     BigInt
+  contract         String?  @db.VarChar
+  transaction_hash String?
+
+  @@schema("xai")
+  @@map("advanced_delegatees")
+}
+
+view xaiAdvancedVotingPower {
+  delegate                 String   @unique
+  vp_allowance             Decimal  @db.Decimal
+  vp_delegatable_allowance Decimal  @db.Decimal
+  delegated_vp             Decimal  @db.Decimal
+  advanced_vp              Decimal  @db.Decimal
+  subdelegated_share       Decimal? @db.Decimal
+  contract                 String   @db.VarChar
+
+  @@schema("xai")
+  @@map("advanced_voting_power")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view xai_advanced_voting_power_raw_snaps {
+  chain_str           String?
+  delegate            String?
+  chain               String[]
+  rules               Json?
+  allowance           Decimal? @db.Decimal
+  subdelegated_share  Decimal? @db.Decimal
+  subdelegated_amount Decimal? @db.Decimal
+  balance             Decimal? @db.Decimal
+  block_number        BigInt?
+  proxy               String?
+  contract            String?  @db.VarChar
+  ordinal             Decimal? @db.Decimal
+
+  @@map("advanced_voting_power_raw_snaps")
+  @@ignore
+  @@schema("xai")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view xai_authority_chains {
+  delegate  String?
+  rules     Json?
+  chain     String[]
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+  contract  String?  @db.VarChar
+
+  @@map("authority_chains")
+  @@ignore
+  @@schema("xai")
+}
+
+view xaiAuthorityChainsSnaps {
+  id                   String   @unique
+  delegate             String
+  rules                Json?
+  chain                String[]
+  proxy                String
+  balance              Decimal  @db.Decimal
+  allowance            Decimal  @db.Decimal
+  contract             String   @db.VarChar
+  balance_block_number BigInt?
+  balance_ordinal      Decimal? @db.Decimal
+
+  @@schema("xai")
+  @@map("authority_chains_snaps")
+}
+
+view xaiDelegateChangedEvents {
+  chain_id          Int
+  address           String  @db.VarChar(42)
+  block_number      BigInt
+  block_hash        String  @db.VarChar(66)
+  log_index         Int?
+  transaction_index Int?
+  transaction_hash  String  @db.VarChar(66) @unique
+  delegator         String
+  from_delegate     String
+  to_delegate       String
+
+  @@schema("xai")
+  @@map("delegate_changed_events")
+}
+
+view xaiDelegatees {
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  contract         String? @db.VarChar(42)
+  transaction_hash String? @db.VarChar(66)
+
+  @@schema("xai")
+  @@map("delegatees")
+}
+
+view xaiDelegates {
+  delegate          String   @unique
+  contract          String?  @db.VarChar(42)
+  num_of_delegators Decimal  @db.Decimal
+  direct_vp         Decimal  @db.Decimal
+  advanced_vp       Decimal  @db.Decimal
+  voting_power      Decimal  @db.Decimal
+
+  @@schema("xai")
+  @@map("delegates")
+}
+
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+view xai_delegates_wrapper {
+  delegate          String?
+  num_of_delegators Decimal? @db.Decimal
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       Decimal? @db.Decimal
+  voting_power      Decimal? @db.Decimal
+  contract          String?  @db.VarChar(42)
+
+  @@map("delegates_wrapper")
+  @@ignore
+  @@schema("xai")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view xai_direct_chains {
+  delegate  String?
+  rules     Json? // Uh oh, this is a Json[] for optimism, [] for uniswap
+  chain     String?
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+  contract  String?  @db.VarChar
+
+  @@map("direct_chains")
+  @@ignore
+  @@schema("xai")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view xai_direct_chains_snaps {
+  delegate             String?
+  rules                Json?
+  chain                String?
+  proxy                String?
+  balance              Decimal? @db.Decimal
+  balance_block_number BigInt?
+  allowance            Decimal? @db.Decimal
+  contract             String?  @db.VarChar
+  balance_ordinal      Decimal? @db.Decimal
+
+  @@map("direct_chains_snaps")
+  @@ignore
+  @@schema("xai")
+}
+
+view xaiProposalTypes {
+  id                 String @unique
+  contract           String @db.VarChar
+  block_number       BigInt
+  proposal_type_id   String
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
+
+  @@schema("xai")
+  @@map("proposal_types")
+}
+
+view xaiProposals {
+  proposal_id                String       @unique
+  contract                   String       @db.VarChar
+  proposer                   String
+  description                String?
+  ordinal                    Decimal      @db.Decimal
+  created_block              BigInt?
+  start_block                String
+  end_block                  String?
+  cancelled_block            BigInt?
+  queued_block               BigInt?
+  executed_block             BigInt?
+  proposal_data              Json?
+  proposal_data_raw          String?
+  proposal_type              ProposalType
+  proposal_type_data         Json?
+  proposal_results           Json?
+  created_transaction_hash   String?      @db.VarChar(66)
+  cancelled_transaction_hash String?      @db.VarChar
+  queued_transaction_hash    String?      @db.VarChar
+  executed_transaction_hash  String?      @db.VarChar
+
+  @@map("proposals_v2")
+  @@schema("xai")
+}
+
+view xaiStakedDeposits {
+  deposit_id  BigInt   @unique
+  depositor   String
+  beneficiary String
+  delegatee   String
+  amount      Decimal  @db.Decimal
+
+  @@schema("xai")
+  @@map("staked_deposits")
+}
+
+view xaiVotableSupply {
+  votable_supply String @unique
+
+  @@schema("xai")
+  @@map("votable_supply")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view xai_vote_cast_events {
+  transaction_hash String?  @db.VarChar(66)
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+  contract         String?  @db.VarChar(42)
+  chain_id         Int?
+
+  @@map("vote_cast_events")
+  @@ignore
+  @@schema("xai")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view xai_vote_cast_with_params_events {
+  transaction_hash String?
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+  contract         String?
+  chain_id         Int?
+
+  @@map("vote_cast_with_params_events")
+  @@ignore
+  @@schema("xai")
+}
+
+view xaiVoterStats {
+  voter              String  @unique
+  proposals_voted    BigInt?
+  participation_rate Float?
+  last_10_props      Decimal? @db.Decimal
+  for                BigInt?
+  abstain            BigInt?
+  against            BigInt?
+  proposals_proposed BigInt?
+  contract           String?  @db.VarChar(42)
+
+  @@schema("xai")
+  @@map("voter_stats")
+}
+
+view xaiVotes {
+  transaction_hash String       @unique @db.VarChar
+  proposal_id      String
+  voter            String
+  support          String
+  weight           Decimal      @db.Decimal
+  reason           String?
+  block_number     BigInt
+  params           String?
+  start_block      String?
+  description      String?
+  proposal_data    Json
+  proposal_type    ProposalType
+  contract         String?       @db.VarChar(42)
+  chain_id         Int?
+
+  @@map("votes")
+  @@schema("xai")
+}
+
+view xaiVotingPower {
+  delegate     String  @unique
+  voting_power String?
+  contract     String  @db.VarChar(42)
+
+  @@schema("xai")
+  @@map("voting_power")
+}
+
+view xaiVotingPowerSnaps {
+  id                String   @id
+  delegate          String?
+  balance           String?
+  block_number      BigInt?
+  ordinal           Decimal? @db.Decimal
+  transaction_index Int?
+  log_index         Int?
+  contract          String?  @db.VarChar(42)
+
+  @@schema("xai")
+  @@map("voting_power_snaps")
+}
+
 model AnalyticsEvent {
   id String @id @default(uuid())
   event_name String
@@ -3464,6 +3786,7 @@ enum DaoSlug {
   DERIVE
   PGUILD
   BOOST
+  XAI
 
   @@map("dao_slug")
   @@schema("config")

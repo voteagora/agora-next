@@ -73,6 +73,21 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
 
       return BigInt(Number(quorum));
 
+    case TENANT_NAMESPACES.XAI:
+      if (contracts.token.isERC20()) {
+        let totalSupply = await contracts.token.contract.totalSupply();
+
+        const proposalTypeData = proposal?.proposal_type_data as {
+          quorum: number;
+        };
+
+        quorum =
+          (totalSupply * BigInt(proposalTypeData.quorum) * 100000n) /
+          1000000000n;
+      }
+
+      return BigInt(Number(quorum));
+
     default: // TENANT_NAMESPACES.PGUILD - yes, TENANT_NAMESPACES.SCROLL?
       try {
         quorum = await contracts.governor.contract.quorum!(

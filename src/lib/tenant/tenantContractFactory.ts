@@ -9,6 +9,7 @@ import { deriveTenantConfig } from "@/lib/tenant/configs/contracts/derive";
 import { scrollTenantContractConfig } from "@/lib/tenant/configs/contracts/scroll";
 import { protocolGuildTenantContractConfig } from "./configs/contracts/protocol-guild";
 import { boostTenantConfig } from "./configs/contracts/boost";
+import { xaiTenantConfig } from "./configs/contracts/xai";
 
 export default class TenantContractFactory {
   public static create(
@@ -35,6 +36,8 @@ export default class TenantContractFactory {
         return protocolGuildTenantContractConfig({ isProd, alchemyId });
       case TENANT_NAMESPACES.BOOST:
         return boostTenantConfig({ isProd, alchemyId });
+      case TENANT_NAMESPACES.XAI:
+        return xaiTenantConfig({ isProd, alchemyId });
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
