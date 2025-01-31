@@ -4,6 +4,10 @@ import xaiBanner from "@/assets/tenant/xai_banner.svg";
 import successImage from "@/assets/tenant/xai_success.svg";
 import pendingImage from "@/assets/tenant/xai_pending.svg";
 import delegateImage from "@/assets/tenant/xai_logo.svg";
+import infoPageCard01 from "@/assets/tenant/xai_info_1.svg";
+import infoPageCard02 from "@/assets/tenant/xai_info_2.svg";
+import infoPageCard03 from "@/assets/tenant/xai_info_3.svg";
+import infoPageCard04 from "@/assets/tenant/xai_info_4.svg";
 
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
@@ -25,21 +29,17 @@ export const xaiTenantUIConfig = new TenantUI({
   },
 
   customization: {
-    brandSecondary: "240 244 247",
-  },
-
-  /**
-   *     primary: "250 250 249",
+    primary: "250 250 249",
     secondary: "245 245 255",
     tertiary: "231 229 228",
     neutral: "12 10 9",
     wash: "28 25 23",
     line: "41 37 36",
-    positive: "97 209 97",
-    negative: "226 54 54",
+    positive: "34 197 94",
+    negative: "239 68 68",
     brandPrimary: "255 0 48",
-    brandSecondary: "46 5 12",
-   */
+    brandSecondary: "12 10 9",
+  },
 
   // TODO
   governanceIssues: [
@@ -125,7 +125,30 @@ export const xaiTenantUIConfig = new TenantUI({
         imageDescription: "Home of Xai Governance",
       },
       links: [
-        // Add other relevant links for documentation, forums, etc.
+        {
+          name: "Community Discord",
+          title: "Community Discord",
+          url: "",
+          image: infoPageCard01,
+        },
+        {
+          name: "Governance Forums",
+          title: "Governance Forums",
+          url: "",
+          image: infoPageCard02,
+        },
+        {
+          name: "Protocol Docs",
+          title: "Protocol Docs",
+          url: "",
+          image: infoPageCard03,
+        },
+        {
+          name: "Xai Vision",
+          title: "Xai Vision",
+          url: "",
+          image: infoPageCard04,
+        },
       ],
     },
   ],
