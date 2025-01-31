@@ -26,51 +26,13 @@ const RequestSponsorshipForm = ({
   draftProposal: DraftProposal;
 }) => {
   const tenant = Tenant.current();
-  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-  const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
   const [isPending, setIsPending] = useState(false);
   const { watch, control } = useFormContext();
 
   const address = watch("sponsorAddress");
-  const votingModuleType = draftProposal.voting_module_type;
 
-  const { data: threshold } = useProposalThreshold();
-  const { data: manager } = useManager();
-  const { data: blockNumber } = useBlockNumber();
-  const { data: accountVotesData } = useGetVotes({
-    address: address as `0x${string}`,
-    blockNumber: blockNumber || BigInt(0),
-    enabled: true,
-  });
-
-  const canSponsor = () => {
-    if (votingModuleType === ProposalType.SOCIAL) {
-      const requiredTokensForSnapshot = (plmToggle?.config as PLMConfig)
-        ?.snapshotConfig?.requiredTokens;
-      return (
-        accountVotesData !== undefined &&
-        requiredTokensForSnapshot !== undefined &&
-        accountVotesData >= requiredTokensForSnapshot
-      );
-    }
-    switch (gatingType) {
-      case ProposalGatingType.MANAGER:
-        return manager === address;
-      case ProposalGatingType.TOKEN_THRESHOLD:
-        return accountVotesData !== undefined && threshold !== undefined
-          ? accountVotesData >= threshold
-          : false;
-      case ProposalGatingType.GOVERNOR_V1:
-        return (
-          manager === address ||
-          (accountVotesData !== undefined && threshold !== undefined
-            ? accountVotesData >= threshold
-            : false)
-        );
-      default:
-        return false;
-    }
-  };
+  // Always return true to ignore thresholds
+  const canSponsor = () => true;
 
   const canAddressSponsor = canSponsor();
 
@@ -88,10 +50,8 @@ const RequestSponsorshipForm = ({
           </label>
           <div className="border border-line p-2 rounded-lg w-full relative h-[42px]">
             {isAddress(address) && <AvatarAddress address={address} />}
-            <div
-              className={`absolute right-2 top-2.5 text-sm ${canAddressSponsor ? "text-positive" : "text-negative"}`}
-            >
-              {canAddressSponsor ? "Can sponsor" : "Cannot sponsor"}
+            <div className="absolute right-2 top-2.5 text-sm text-positive">
+              Can sponsor
             </div>
           </div>
         </div>
@@ -100,19 +60,17 @@ const RequestSponsorshipForm = ({
         fullWidth={true}
         isSubmit={false}
         isLoading={isPending}
-        type={canAddressSponsor ? "primary" : "disabled"}
+        type="primary"
         className="mt-6"
         onClick={async () => {
-          if (canAddressSponsor) {
-            setIsPending(true);
-            const res = await requestSponsorshipAction({
-              draftProposalId: draftProposal.id,
-              sponsor_address: address,
-            });
-            setIsPending(false);
-            if (res.ok) {
-              invalidatePath(draftProposal.id);
-            }
+          setIsPending(true);
+          const res = await requestSponsorshipAction({
+            draftProposalId: draftProposal.id,
+            sponsor_address: address,
+          });
+          setIsPending(false);
+          if (res.ok) {
+            invalidatePath(draftProposal.id);
           }
         }}
       >

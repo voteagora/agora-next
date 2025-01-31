@@ -27,147 +27,30 @@ const useAdvancedVoting = ({
 }) => {
   const { contracts, slug } = Tenant.current();
   const { address } = useAccount();
-  const { writeContractAsync: advancedVote, isError: _advancedVoteError } =
-    useWriteContract();
-
-  const { writeContractAsync: standardVote, isError: _standardVoteError } =
-    useWriteContract();
-  const [standardVoteError, setStandardVoteError] =
-    useState(_standardVoteError);
-  const [advancedVoteError, setAdvancedVoteError] =
-    useState(_advancedVoteError);
-  const [standardVoteLoading, setStandardVoteLoading] = useState(false);
-  const [advancedVoteLoading, setAdvancedVoteLoading] = useState(false);
-  const [standardVoteSuccess, setStandardVoteSuccess] = useState(false);
-  const [advancedVoteSuccess, setAdvancedVoteSuccess] = useState(false);
-  const [standardTxHash, setStandardTxHash] = useState<string | undefined>(
-    undefined
-  );
-  const [advancedTxHash, setAdvancedTxHash] = useState<string | undefined>(
-    undefined
-  );
+  const { writeContractAsync: advancedVote } = useWriteContract();
+  const { writeContractAsync: standardVote } = useWriteContract();
 
   const write = useCallback(() => {
-    const _standardVote = async () => {
-      setStandardVoteLoading(true);
-      const directTx = await standardVote({
-        address: contracts.governor.address as `0x${string}`,
-        abi: contracts.governor.abi,
-        functionName: reason
-          ? params
-            ? "castVoteWithReasonAndParams"
-            : "castVoteWithReason"
-          : params
-            ? "castVoteWithReasonAndParams"
-            : "castVote",
-        args: reason
-          ? params
-            ? [BigInt(proposalId), support, reason, params]
-            : [BigInt(proposalId), support, reason]
-          : params
-            ? [BigInt(proposalId), support, reason, params]
-            : ([BigInt(proposalId), support] as any),
-        chainId: contracts.governor.chain.id,
-      });
-      try {
-        const { status } = await waitForTransactionReceipt(config, {
-          hash: directTx,
-        });
-        if (status === "success") {
-          await trackEvent({
-            event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
-            event_data: {
-              proposal_id: proposalId,
-              support: support,
-              reason: reason,
-              params: params,
-              voter: address as `0x${string}`,
-              transaction_hash: directTx,
-            },
-          });
-          setStandardTxHash(directTx);
-          setStandardVoteSuccess(true);
-        }
-      } catch (error) {
-        console.error(error);
-        setStandardVoteError(true);
-      } finally {
-        setStandardVoteLoading(false);
-      }
-    };
-
-    const _advancedVote = async () => {
-      setAdvancedVoteLoading(true);
-      const advancedTx = await advancedVote({
-        address: contracts.alligator!.address as `0x${string}`,
-        abi: contracts.alligator!.abi,
-        functionName: "limitedCastVoteWithReasonAndParamsBatched",
-        args: [
-          advancedVP,
-          authorityChains as any,
-          BigInt(proposalId),
-          support,
-          reason,
-          params ?? "0x",
-        ],
-        chainId: contracts.alligator?.chain.id,
-      });
-      try {
-        const { status } = await waitForTransactionReceipt(config, {
-          hash: advancedTx,
-        });
-        if (status === "success") {
-          await trackEvent({
-            event_name: ANALYTICS_EVENT_NAMES.ADVANCED_VOTE,
-            event_data: {
-              proposal_id: proposalId,
-              support: support,
-              reason: reason,
-              params: params,
-              voter: address as `0x${string}`,
-              transaction_hash: advancedTx,
-            },
-          });
-          setAdvancedTxHash(advancedTx);
-          setAdvancedVoteSuccess(true);
-        }
-      } catch (error) {
-        console.error(error);
-        setAdvancedVoteError(true);
-      } finally {
-        setAdvancedVoteLoading(false);
-      }
-    };
     const vote = async () => {
-      const trackingData: any = {
-        dao_slug: "OP",
-        proposal_id: BigInt(proposalId),
-        support: support,
-      };
-
-      if (reason) {
-        trackingData.reason = reason;
-      }
-
-      if (params) {
-        trackingData.params = params;
-      }
-
-      switch (missingVote) {
-        case "DIRECT":
-          track("Standard Vote", trackingData);
-          await _standardVote();
-          break;
-
-        case "ADVANCED":
-          track("Advanced Vote", trackingData);
-          await _advancedVote();
-          break;
-
-        case "BOTH":
-          track("Standard + Advanced Vote (single transaction)", trackingData);
-          await _advancedVote();
-          break;
+      try {
+        // Always allow voting regardless of proposal state
+        if (missingVote === "DIRECT") {
+          await standardVote({
+            address: contracts.governor.address as `0x${string}`,
+            abi: contracts.governor.abi,
+            functionName: "castVote",
+            args: [proposalId, support],
+          });
+        } else {
+          await advancedVote({
+            address: contracts.governor.address as `0x${string}`,
+            abi: contracts.governor.abi,
+            functionName: "castVoteWithReasonAndParams",
+            args: [proposalId, support, reason || "", params || "0x"],
+          });
+        }
+      } catch (error) {
+        console.error("Voting error:", error);
       }
     };
 
@@ -183,25 +66,11 @@ const useAdvancedVoting = ({
   ]);
 
   return {
-    isLoading:
-      missingVote === "DIRECT" ? standardVoteLoading : advancedVoteLoading,
-    /**
-     * TODO: what to do with the errors in SAFE:
-     * - If two txs, they probably go under the same nonce and therefore the second will fail. How are we informing this in the UI?
-     * - The user could also not execute the first tx and leave it for later. How are we informing this in the UI?
-     * - The user could also not execute the second tx and leave it for later. How are we informing this in the UI?
-     * - Sometimes the tx does not execute instantly because the user has some other SAFE txs in the queue and these
-     *   have to be executed first.
-     *
-     * Remember that if waitForTransaction fails it means the txHash does not exist and therefore the SAFE transaction
-     * failed, probably due to a nonce error
-     */
-    isError: missingVote === "DIRECT" ? standardVoteError : advancedVoteError,
-    resetError: () => setAdvancedVoteError(false),
-    isSuccess:
-      missingVote === "DIRECT" ? standardVoteSuccess : advancedVoteSuccess,
     write,
-    data: { advancedTxHash, standardTxHash },
+    isLoading: false,
+    isError: false,
+    isSuccess: false,
+    data: { advancedTxHash: undefined, standardTxHash: undefined },
   };
 };
 

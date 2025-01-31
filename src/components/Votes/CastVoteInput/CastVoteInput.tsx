@@ -317,10 +317,6 @@ function VoteButtons({
   proposalStatus: Proposal["status"];
   isOptimistic: boolean;
 }) {
-  if (proposalStatus !== "ACTIVE") {
-    return <DisabledVoteButton reason="Not open to voting" />;
-  }
-
   return (
     <HStack gap={2} className="pt-1">
       {(isOptimistic ? ["AGAINST"] : ["FOR", "AGAINST", "ABSTAIN"]).map(
