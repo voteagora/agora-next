@@ -1,6 +1,6 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import xaiLogo from "@/assets/tenant/xai_logo.svg";
-import xaiBanner from "@/assets/tenant/xai_banner.svg";
+import xaiHero from "@/assets/tenant/xai_hero.svg";
 import successImage from "@/assets/tenant/xai_success.svg";
 import pendingImage from "@/assets/tenant/xai_pending.svg";
 import delegateImage from "@/assets/tenant/xai_logo.svg";
@@ -74,7 +74,7 @@ export const xaiTenantUIConfig = new TenantUI({
       title: "Agora is the home of Xai voters",
       description:
         "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
-      hero: xaiBanner,
+      hero: xaiHero,
       meta: {
         title: "Xai Agora",
         description:
@@ -89,7 +89,7 @@ export const xaiTenantUIConfig = new TenantUI({
       title: "Agora is the home of Xai voters",
       description:
         "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
-      hero: xaiBanner,
+      hero: xaiHero,
       meta: {
         title: "Xai Agora",
         description:
@@ -104,7 +104,7 @@ export const xaiTenantUIConfig = new TenantUI({
       title: "Agora is the home of Xai voters",
       description:
         "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
-      hero: xaiBanner,
+      hero: xaiHero,
       meta: {
         title: "Voter on Agora",
         description:
