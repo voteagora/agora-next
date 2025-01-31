@@ -7,6 +7,7 @@ import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import Tenant from "@/lib/tenant/tenant";
 import { inter } from "@/styles/fonts";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 declare global {
   interface BigInt {
@@ -123,11 +124,14 @@ export default async function RootLayout({
         />
         <meta name="theme-color" content="#000" />
       </head>
-      <ClientLayout>
-        <Header />
-        {children}
-        <DAOMetricsHeader metrics={metrics} />
-      </ClientLayout>
+
+      <NuqsAdapter>
+        <ClientLayout>
+          <Header />
+          {children}
+          <DAOMetricsHeader metrics={metrics} />
+        </ClientLayout>
+      </NuqsAdapter>
       {ui.googleAnalytics && <GoogleAnalytics gaId={ui.googleAnalytics} />}
     </html>
   );
