@@ -22,7 +22,7 @@ export function getSecondsPerBlock(): number {
 
     case 42161: // Arbitrum one
     case 421614: // Arbitrum sepolia
-      return 12; // This should be equal to L1 block time
+      return 0.25; // This should be equal to L1 block time
 
     case 901: // Derive
     case 957: // Derive Testnet
@@ -103,11 +103,16 @@ export function getHumanBlockTime(
       return new Date((latestBlock.timestamp - estCyberSecondsDiff) * 1000);
     }
 
-    // Arbitrum is the same as mainnet block times
     // Arbitrum one
     // Arbitrum sepolia
     case 42161:
-    case 421614:
+    case 421614: {
+      const blockSeconds = getSecondsPerBlock();
+      const estArbitrumSecondsDiff =
+        (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
+      return new Date((latestBlock.timestamp - estArbitrumSecondsDiff) * 1000);
+    }
+
     //   Ethereum Mainnet
     //   Ethereum Sepolia
     case 1:

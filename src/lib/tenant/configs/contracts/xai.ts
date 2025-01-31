@@ -8,7 +8,7 @@ import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { createTokenContract } from "@/lib/tokenUtils";
-import { arbitrum } from "viem/chains";
+import { arbitrum, arbitrumSepolia } from "viem/chains";
 import { AlchemyProvider, BaseContract } from "ethers";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 import { DELEGATION_MODEL } from "@/lib/constants";
@@ -43,8 +43,11 @@ export const xaiTenantConfig = ({
     ? "0x23C70cB62A7FC60AE7118c33068eF42c125654Bc"
     : "0x5d729d4c0bf5d0a2fa0f801c6e0023bd450c4fd6";
 
-  const provider = new AlchemyProvider("arbitrum", alchemyId);
-  const chain = arbitrum;
+  const provider = new AlchemyProvider(
+    isProd ? "arbitrum" : "arbitrum-sepolia",
+    alchemyId
+  );
+  const chain = isProd ? arbitrum : arbitrumSepolia;
 
   return {
     token: createTokenContract({

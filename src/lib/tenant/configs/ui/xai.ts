@@ -28,6 +28,19 @@ export const xaiTenantUIConfig = new TenantUI({
     brandSecondary: "240 244 247",
   },
 
+  /**
+   *     primary: "250 250 249",
+    secondary: "245 245 255",
+    tertiary: "231 229 228",
+    neutral: "12 10 9",
+    wash: "28 25 23",
+    line: "41 37 36",
+    positive: "97 209 97",
+    negative: "226 54 54",
+    brandPrimary: "255 0 48",
+    brandSecondary: "46 5 12",
+   */
+
   // TODO
   governanceIssues: [
     // {
