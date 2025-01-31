@@ -33,6 +33,7 @@ export default function ProposalsList({
     title: string;
     endDate: string;
     reviewPeriod: boolean;
+    votingPeriod: boolean;
   } | null;
 }) {
   const { address } = useAccount();
@@ -92,6 +93,7 @@ export default function ProposalsList({
           title={governanceCalendar.title}
           endDate={governanceCalendar.endDate}
           reviewPeriod={governanceCalendar.reviewPeriod}
+          votingPeriod={governanceCalendar.votingPeriod}
         />
       )}
       <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
