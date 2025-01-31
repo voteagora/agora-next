@@ -8,6 +8,7 @@ import infoPageCard01 from "@/assets/tenant/xai_info_1.svg";
 import infoPageCard02 from "@/assets/tenant/xai_info_2.svg";
 import infoPageCard03 from "@/assets/tenant/xai_info_3.svg";
 import infoPageCard04 from "@/assets/tenant/xai_info_4.svg";
+import infoPageHero from "@/assets/tenant/xai_info_page_hero.svg";
 
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
@@ -111,6 +112,19 @@ export const xaiTenantUIConfig = new TenantUI({
         imageTitle: "Voter on Agora",
         imageDescription:
           "This is the home of Xai Governance. Membership is determined by holding the Xai token",
+      },
+    },
+    {
+      route: "info/about",
+      title: "About Xai",
+      hero: infoPageHero,
+      description:
+        "Xai is the world’s first Layer 3 solution for Indie gaming. Powered by Offchain Labs’ Arbitrum Technology with games from Ex Populus and other game developers, Xai is set to transform the gaming industry. Join the community, compete with the best, and be part of the revolutionary Vanguard League.",
+      meta: {
+        title: "About Xai Governance",
+        description: "Home of Xai Governance",
+        imageTitle: "About Xai Governance",
+        imageDescription: "Home of Xai Governance",
       },
     },
     {
