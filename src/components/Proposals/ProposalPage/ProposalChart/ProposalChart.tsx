@@ -79,10 +79,7 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
               )}
               {tabIndex === 2 && (
                 <div className="tab-panel">
-                  <BubbleChart
-                    proposal={proposal}
-                    proposalVotes={fetchedVotes}
-                  />
+                  <BubbleChart proposal={proposal} votes={votes} />
                 </div>
               )}
             </div>
