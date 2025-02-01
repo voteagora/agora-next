@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { TimelineChart } from "@/components/Proposals/ProposalPage/Charts/TimelineChart";
 import TreeMapChart from "../TreeMapChart/TreeMapChart";
+import BubbleChart from "../BubbleChart/BubbleChart";
 import { icons } from "@/icons/icons";
 import Image from "next/image";
 import { Proposal } from "@/app/api/common/proposals/proposal";
@@ -16,6 +17,12 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
     enabled: showChart,
     proposalId: proposal.id,
   });
+
+  const tabs = [
+    { name: "Timeline", index: 0 },
+    { name: "Map", index: 1 },
+    { name: "Bubble", index: 2 },
+  ];
 
   const handleTabsChange = (index: number) => {
     setTabIndex(index);
@@ -42,24 +49,18 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
           <Image src={icons.chevronSelectorVertical} alt="chevronIcon" />
         </div>
         <div className="flex gap-x-2 items-center">
-          <button
-            className={`tab ${tabIndex === 0 ? "active text-primary bg-wash px-2 py-1 rounded-full" : "text-secondary px-2 py-1"}`}
-            onClick={(e) => {
-              handleButtonClick(e);
-              handleTabsChange(0);
-            }}
-          >
-            Timeline
-          </button>
-          <button
-            className={`tab ${tabIndex === 1 ? "active text-primary bg-wash px-2 py-1 rounded-full" : "text-secondary px-2 py-1"}`}
-            onClick={(e) => {
-              handleButtonClick(e);
-              handleTabsChange(1);
-            }}
-          >
-            Composition
-          </button>
+          {tabs.map((tab) => (
+            <button
+              key={tab.name}
+              className={`tab ${tabIndex === tab.index ? "active text-primary bg-wash px-2 py-1 rounded-full" : "text-secondary px-2 py-1"}`}
+              onClick={(e) => {
+                handleButtonClick(e);
+                handleTabsChange(tab.index);
+              }}
+            >
+              {tab.name}
+            </button>
+          ))}
         </div>
       </div>
       {showChart && (
@@ -74,6 +75,11 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
               {tabIndex === 1 && (
                 <div className="tab-panel">
                   <TreeMapChart proposal={proposal} votes={votes} />
+                </div>
+              )}
+              {tabIndex === 2 && (
+                <div className="tab-panel">
+                  <BubbleChart proposal={proposal} votes={votes} />
                 </div>
               )}
             </div>
