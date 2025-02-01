@@ -2,56 +2,95 @@ import { useEffect, useRef, useState, useMemo, memo } from "react";
 import * as d3 from "d3";
 import { useRouter } from "next/navigation";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
-import { PaginatedResult } from "@/app/lib/pagination";
+import { ChartVote } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 import { rgbStringToHex } from "@/app/lib/utils/color";
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, RotateCcw } from "lucide-react";
 import ENSName from "@/components/shared/ENSName";
+
+//Bubble contransts
+const CHART_DIMENSIONS = {
+  width: 720,
+  height: 230,
+  padding: 3,
+  maxVotes: 50,
+} as const;
+
+const BUBBLE_PADDING = 10;
+
+const ZOOM_CONFIG = {
+  min: 0.5,
+  max: 100,
+  step: 3,
+} as const;
 
 interface BubbleNode extends d3.SimulationNodeDatum {
   address: string;
-  support: string;
+  support: "0" | "1" | "2";
   value: number;
   r: number;
 }
 
-const transformVotesToBubbleData = (votes: Vote[]): BubbleNode[] => {
-  const maxWeight = Math.max(...votes.map((v) => +v.weight));
-  return votes
-    .sort((a, b) => +b.weight - +a.weight)
-    .map((vote) => ({
-      address: vote.address,
-      support: vote.support,
-      value: +vote.weight,
-      r: Math.sqrt(+vote.weight / maxWeight) * 40,
-    }));
+const SCALING_EXPONENT = 0.4;
+const transformVotesToBubbleData = (votes: ChartVote[]): BubbleNode[] => {
+  const sortedVotes = votes
+    .slice()
+    .sort((a, b) => Number(b.weight) - Number(a.weight))
+    .slice(0, CHART_DIMENSIONS.maxVotes);
+  const maxWeight = Math.max(...sortedVotes.map((v) => Number(v.weight)));
+  return sortedVotes.map((vote) => ({
+    address: vote.voter,
+    support: vote.support as "0" | "1" | "2",
+    value: Number(vote.weight),
+    r: Math.pow(Number(vote.weight) / maxWeight, SCALING_EXPONENT) * 40,
+  }));
 };
+
+const ZoomButton = memo(
+  ({
+    onClick,
+    icon: Icon,
+    label,
+  }: {
+    onClick: () => void;
+    icon: typeof Plus | typeof Minus | typeof RotateCcw;
+    label: string;
+  }) => (
+    <button
+      onClick={onClick}
+      className="p-1 bg-neutral hover:bg-wash rounded-md border border-line"
+      aria-label={label}
+    >
+      <Icon size={16} />
+    </button>
+  )
+);
+
+ZoomButton.displayName = "ZoomButton";
 
 const BubbleNode = memo(
   ({ node, transform }: { node: BubbleNode; transform: d3.ZoomTransform }) => {
     const router = useRouter();
     const { ui } = Tenant.current();
 
-    const fillColor = useMemo(
-      () =>
-        node.support === "FOR"
-          ? rgbStringToHex(ui.customization?.positive)
-          : node.support === "AGAINST"
-            ? rgbStringToHex(ui.customization?.negative)
-            : rgbStringToHex(ui.customization?.tertiary),
-      [node.support, ui.customization]
-    );
+    const fillColor = useMemo(() => {
+      const colorMap = {
+        "1": ui.customization?.positive,
+        "0": ui.customization?.negative,
+        "2": ui.customization?.tertiary,
+      };
+      return rgbStringToHex(colorMap[node.support]);
+    }, [node.support, ui.customization]);
 
-    const handleClick = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      router.push(`/delegates/${node.address}`);
-    };
+    const fontSize = Math.min(node.r / 3.5, (node.r * 2) / 10);
 
     return (
       <g
         transform={`translate(${node.x},${node.y})`}
-        onClick={handleClick}
+        onClick={(e) => {
+          e.stopPropagation();
+          router.push(`/delegates/${node.address}`);
+        }}
         style={{ cursor: "pointer" }}
       >
         <circle
@@ -74,7 +113,7 @@ const BubbleNode = memo(
           <div
             className="flex items-center justify-center w-full h-full text-white"
             style={{
-              fontSize: `${Math.min(node.r / 3.5, (node.r * 2) / 10)}px`,
+              fontSize: `${fontSize}px`,
               overflow: "hidden",
               whiteSpace: "nowrap",
               textOverflow: "ellipsis",
@@ -92,25 +131,36 @@ BubbleNode.displayName = "BubbleNode";
 
 export default function BubbleChart({
   proposal,
-  proposalVotes,
+  votes,
 }: {
   proposal: Proposal;
-  proposalVotes: PaginatedResult<Vote[]>;
+  votes: ChartVote[];
 }) {
   const [nodes, setNodes] = useState<BubbleNode[]>([]);
   const [transform, setTransform] = useState(() =>
     d3.zoomIdentity.translate(0, 0).scale(1)
   );
+  const [hasMoreVotes, setHasMoreVotes] = useState(false);
 
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const defaultTransformRef = useRef<d3.ZoomTransform | null>(null);
+
+  const createZoom = useMemo(
+    () =>
+      d3
+        .zoom<SVGSVGElement, unknown>()
+        .scaleExtent([ZOOM_CONFIG.min, ZOOM_CONFIG.max])
+        .on("zoom", (event) => setTransform(event.transform)),
+    []
+  );
 
   const handleZoom = (factor: number) => {
     if (!svgRef.current) return;
 
     const zoom = d3
       .zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.5, 100])
+      .scaleExtent([ZOOM_CONFIG.min, ZOOM_CONFIG.max])
       .on("zoom", (event) => setTransform(event.transform));
 
     d3.select<SVGSVGElement, unknown>(svgRef.current)
@@ -119,22 +169,29 @@ export default function BubbleChart({
       .call((t) => zoom.scaleTo(t as any, transform.k + factor));
   };
 
+  const handleReset = () => {
+    if (!svgRef.current || !defaultTransformRef.current) return;
+    d3.select<SVGSVGElement, unknown>(svgRef.current)
+      .transition()
+      .duration(300)
+      .call(createZoom.transform, defaultTransformRef.current);
+  };
+
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
 
-    const width = 720;
-    const height = 230;
+    setHasMoreVotes(votes.length > CHART_DIMENSIONS.maxVotes);
 
-    const bubbleData = transformVotesToBubbleData(proposalVotes.data);
+    const bubbleData = transformVotesToBubbleData(votes);
     const pack = d3
       .pack<BubbleNode>()
-      .size([width - 20, height - 20])
-      .padding(3);
+      .size([CHART_DIMENSIONS.width - 20, CHART_DIMENSIONS.height - 20])
+      .padding(BUBBLE_PADDING);
 
     const root = d3
       .hierarchy<BubbleNode>({ children: bubbleData } as any)
-      .sum((d) => ("value" in d ? Number(d.value) : 0));
+      .sum((d) => d.value ?? 0);
 
     const packedData = pack(root)
       .leaves()
@@ -147,70 +204,89 @@ export default function BubbleChart({
 
     const bounds = {
       minX: d3.min(packedData, (d) => (d.x ?? 0) - (d.r ?? 0)) || 0,
-      maxX: d3.max(packedData, (d) => (d.x ?? 0) + (d.r ?? 0)) || width,
+      maxX:
+        d3.max(packedData, (d) => (d.x ?? 0) + (d.r ?? 0)) ||
+        CHART_DIMENSIONS.width,
       minY: d3.min(packedData, (d) => (d.y ?? 0) - (d.r ?? 0)) || 0,
-      maxY: d3.max(packedData, (d) => (d.y ?? 0) + (d.r ?? 0)) || height,
+      maxY:
+        d3.max(packedData, (d) => (d.y ?? 0) + (d.r ?? 0)) ||
+        CHART_DIMENSIONS.height,
     };
 
     const dx = bounds.maxX - bounds.minX;
     const dy = bounds.maxY - bounds.minY;
-    const scale = 1.5 / Math.max(dx / width, dy / height);
-    const translateX = (width - scale * (bounds.minX + bounds.maxX)) / 2;
-    const translateY = (height - scale * (bounds.minY + bounds.maxY)) / 2;
+    const scale =
+      1.5 / Math.max(dx / CHART_DIMENSIONS.width, dy / CHART_DIMENSIONS.height);
+    const translateX =
+      (CHART_DIMENSIONS.width - scale * (bounds.minX + bounds.maxX)) / 2;
+    const translateY =
+      (CHART_DIMENSIONS.height - scale * (bounds.minY + bounds.maxY)) / 2;
 
+    const defaultTransform = d3.zoomIdentity
+      .translate(translateX, translateY)
+      .scale(scale);
+    defaultTransformRef.current = defaultTransform;
+    setTransform(defaultTransform);
     setNodes(packedData);
 
     const zoom = d3
       .zoom<SVGSVGElement, undefined>()
-      .scaleExtent([0.5, 100])
+      .scaleExtent([ZOOM_CONFIG.min, ZOOM_CONFIG.max])
       .on("zoom", (event) => setTransform(event.transform));
 
     d3.select<SVGSVGElement, undefined>(svg)
       .call(zoom as any)
-      .call((selection) =>
-        zoom.transform(
-          selection,
-          d3.zoomIdentity.translate(translateX, translateY).scale(scale)
-        )
-      );
+      .call((selection) => zoom.transform(selection, defaultTransform));
 
     return () => {
       zoom.on("zoom", null);
     };
-  }, [proposalVotes.data]);
+  }, [votes, createZoom]);
 
   return (
-    <div className="relative w-full h-[230px]" ref={containerRef}>
-      <div className="absolute top-2 right-2 flex flex-col gap-1 z-10">
-        <button
-          onClick={() => handleZoom(2.5)}
-          className="p-1 bg-neutral hover:bg-wash rounded-md border border-line"
-          aria-label="Zoom in"
-        >
-          <Plus size={16} />
-        </button>
-        <button
-          onClick={() => handleZoom(-2.5)}
-          className="p-1 bg-neutral hover:bg-wash rounded-md border border-line"
-          aria-label="Zoom out"
-        >
-          <Minus size={16} />
-        </button>
-      </div>
+    <div className="relative w-full" ref={containerRef}>
+      <div className="relative h-[230px]">
+        <div className="absolute top-2 right-2 flex flex-col gap-1 z-10">
+          <ZoomButton
+            onClick={() => handleZoom(ZOOM_CONFIG.step)}
+            icon={Plus}
+            label="Zoom in"
+          />
+          <ZoomButton
+            onClick={() => handleZoom(-ZOOM_CONFIG.step)}
+            icon={Minus}
+            label="Zoom out"
+          />
+          <ZoomButton
+            onClick={handleReset}
+            icon={RotateCcw}
+            label="Reset zoom"
+          />
+        </div>
 
-      <svg
-        ref={svgRef}
-        viewBox="0 0 720 230"
-        style={{ width: "100%", height: "100%" }}
-      >
-        <g
-          transform={`translate(${transform.x}, ${transform.y}) scale(${transform.k})`}
+        <svg
+          ref={svgRef}
+          viewBox={`0 0 ${CHART_DIMENSIONS.width} ${CHART_DIMENSIONS.height}`}
+          style={{ width: "100%", height: "100%" }}
         >
-          {nodes.map((node) => (
-            <BubbleNode key={node.address} node={node} transform={transform} />
-          ))}
-        </g>
-      </svg>
+          <g
+            transform={`translate(${transform.x}, ${transform.y}) scale(${transform.k})`}
+          >
+            {nodes.map((node) => (
+              <BubbleNode
+                key={node.address}
+                node={node}
+                transform={transform}
+              />
+            ))}
+          </g>
+        </svg>
+      </div>
+      {hasMoreVotes && (
+        <div className="mt-2 text-center text-xs text-gray-500">
+          Highlighting the most impactful votes
+        </div>
+      )}
     </div>
   );
 }
