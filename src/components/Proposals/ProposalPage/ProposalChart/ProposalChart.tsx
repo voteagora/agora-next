@@ -1,22 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import VotingTimelineChart from "../VotingTimelineChart/VotingTimelineChart";
+import { TimelineChart } from "@/components/Proposals/ProposalPage/Charts/TimelineChart";
 import TreeMapChart from "../TreeMapChart/TreeMapChart";
 import BubbleChart from "../BubbleChart/BubbleChart";
 import { icons } from "@/icons/icons";
 import Image from "next/image";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { useProposalVotes } from "@/hooks/useProposalVotes";
+import { useProposalVotesChart } from "@/hooks/useProposalVotesChart";
 
 export default function ProposalChart({ proposal }: { proposal: Proposal }) {
   const [tabIndex, setTabIndex] = useState(0);
   const [showChart, setShowChart] = useState(proposal.status === "ACTIVE");
 
-  const { data: fetchedVotes, isFetched } = useProposalVotes({
+  const { data: votes } = useProposalVotesChart({
     enabled: showChart,
-    limit: 250,
-    offset: 0,
     proposalId: proposal.id,
   });
 
@@ -67,22 +65,16 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
       </div>
       {showChart && (
         <>
-          {isFetched && fetchedVotes ? (
+          {votes ? (
             <div className="tab-panels">
               {tabIndex === 0 && (
                 <div className="tab-panel">
-                  <VotingTimelineChart
-                    proposal={proposal}
-                    proposalVotes={fetchedVotes}
-                  />
+                  <TimelineChart proposal={proposal} votes={votes} />
                 </div>
               )}
               {tabIndex === 1 && (
                 <div className="tab-panel">
-                  <TreeMapChart
-                    proposal={proposal}
-                    proposalVotes={fetchedVotes}
-                  />
+                  <TreeMapChart proposal={proposal} votes={votes} />
                 </div>
               )}
               {tabIndex === 2 && (
@@ -103,7 +95,7 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
   );
 }
 
-const ChartSkeleton = () => {
+export const ChartSkeleton = () => {
   return (
     <div className="flex anumate-pulse">
       <div className="flex h-[230px] w-full bg-tertiary/10 rounded-md items-center justify-center text-xs text-secondary">

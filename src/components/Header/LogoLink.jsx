@@ -6,7 +6,7 @@ import { AgoraIcon } from "@/icons/AgoraIcon";
 import { rgbStringToHex } from "@/app/lib/utils/color";
 
 export default function LogoLink() {
-  const { namespace, ui } = Tenant.current();
+  const { namespace, ui, isProd } = Tenant.current();
 
   return (
     <Link href="/" className="flex flex-row justify-between w-full">
@@ -27,7 +27,15 @@ export default function LogoLink() {
           height="24"
           className="h-[24px] w-auto"
         />
-        <span className="hidden sm:block font-medium text-primary flex-1">{`${ui.title}`}</span>
+        <span className="hidden sm:block font-medium text-primary">{`${ui.title}`}</span>
+        {!isProd && (
+          <>
+            <div className="h-3 w-[2px] bg-line rounded-full hidden sm:block"></div>
+            <span className="hidden sm:block font-semibold text-primary bg-tertiary/10 px-1.5 py-0.5 rounded-lg text-xs border border-line">
+              Test contracts mode
+            </span>
+          </>
+        )}
       </div>
     </Link>
   );

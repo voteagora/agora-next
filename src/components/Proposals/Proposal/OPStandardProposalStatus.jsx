@@ -34,7 +34,7 @@ export default function OPStandardProposalStatus({ proposal }) {
       {totalLength > 0 && (
         <div className="flex w-52 h-1 bg-wash rounded-full">
           <div
-            className=" bg-green-500 h-1 rounded-l-full"
+            className=" bg-positive h-1 rounded-l-full"
             style={{ width: `${(forLength / totalLength) * 100}%` }}
           ></div>
           <div
@@ -42,7 +42,7 @@ export default function OPStandardProposalStatus({ proposal }) {
             style={{ width: `${(abstainLength / totalLength) * 100}%` }}
           ></div>
           <div
-            className=" bg-red-500 h-1 rounded-r-full"
+            className=" bg-negative h-1 rounded-r-full"
             style={{ width: `${(againstLength / totalLength) * 100}%` }}
           ></div>
         </div>

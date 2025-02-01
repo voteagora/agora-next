@@ -14,6 +14,7 @@ import { Delegate } from "@/app/api/common/delegates/delegate";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
+import { ParsedProposalData } from "@/lib/proposalUtils";
 
 type Props = {
   proposal: Proposal;
@@ -51,6 +52,11 @@ export default function ApprovalVotesPanel({
       setActiveTab(index);
     });
   }
+
+  const isThresholdCriteria =
+    (proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"])
+      .proposalSettings.criteria === "THRESHOLD";
+
   return (
     <motion.div
       className="flex flex-col"
@@ -94,9 +100,13 @@ export default function ApprovalVotesPanel({
                 fetchVotesForProposal={fetchVotesForProposal}
                 fetchUserVotes={fetchUserVotesForProposal}
                 proposalId={proposal.id}
+                isThresholdCriteria={isThresholdCriteria}
               />
             ) : (
-              <ProposalNonVoterList proposal={proposal} />
+              <ProposalNonVoterList
+                proposal={proposal}
+                isApprovalProposal={true}
+              />
             )}
           </>
         )}

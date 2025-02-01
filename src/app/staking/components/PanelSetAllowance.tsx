@@ -44,7 +44,7 @@ export const PanelSetAllowance = ({ amount }: PanelSetAllowanceProps) => {
 
   return (
     <>
-      <div className="text-sm py-4">
+      <div className="text-sm py-4 text-primary">
         Please allow your {token.symbol} tokens to be used for staking.
       </div>
 

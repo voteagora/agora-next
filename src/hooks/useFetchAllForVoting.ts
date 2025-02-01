@@ -5,12 +5,20 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchAllForVoting } from "@/app/proposals/actions";
 import { type Proposal } from "@/app/api/common/proposals/proposal";
 
-const useFetchAllForVoting = ({ proposal }: { proposal: Proposal }) => {
+type FetchAllForVotingProps = {
+  proposal: Proposal;
+  blockNumber?: number;
+};
+
+const useFetchAllForVoting = ({
+  proposal,
+  blockNumber,
+}: FetchAllForVotingProps) => {
   const { address } = useAccount();
 
   const { data, isSuccess } = useQuery({
     enabled: !!address && !!proposal.snapshotBlockNumber,
-    queryKey: ["useFetchAllForVoting", address, proposal],
+    queryKey: ["useFetchAllForVoting", address, proposal.id, blockNumber],
     queryFn: async () => {
       const {
         votingPower,
@@ -19,7 +27,7 @@ const useFetchAllForVoting = ({ proposal }: { proposal: Proposal }) => {
         votesForProposalAndDelegate,
       } = await fetchAllForVoting(
         address!,
-        proposal.snapshotBlockNumber,
+        blockNumber || proposal.snapshotBlockNumber,
         proposal.id
       );
 
