@@ -186,16 +186,6 @@ export const demoTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "delegates/endorsed-filter",
-      enabled: true,
-      config: {
-        tooltip: "Endorsed by {Brand name} team",
-        showFilterLabel: "Endorsed Delegates",
-        hideFilterLabel: "All Delegates",
-        defaultFilter: true,
-      },
-    },
-    {
       name: "delegates/edit",
       enabled: true,
     },
