@@ -47,7 +47,7 @@ export default function Markdown({ content }: { content: string }) {
             "--color-border-muted": toRGBA(line, 1),
             "--color-canvas-subtle": toRGBA(tertiary, 0.05),
             "--color-prettylights-syntax-entity-tag": toRGBA(positive, 1),
-            fontFamily: ui?.customization?.font ?? defaults.font,
+            fontFamily: defaults.font,
           } as React.CSSProperties
         }
         className={`h-full py-3 max-w-full bg-transparent prose prose-code:bg-wash prose-code:text-tertiary prose-pre:text-tertiary`}
