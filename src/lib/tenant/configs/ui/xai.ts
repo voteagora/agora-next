@@ -40,6 +40,7 @@ export const xaiTenantUIConfig = new TenantUI({
     negative: "239 68 68",
     brandPrimary: "255 0 48",
     brandSecondary: "12 10 9",
+    font: "font-rajdhani",
   },
 
   // TODO
@@ -71,47 +72,47 @@ export const xaiTenantUIConfig = new TenantUI({
   pages: [
     {
       route: "/",
-      title: "Agora is the home of Xai voters",
+      title: "WELCOME TO XAI GOVERNANCE",
       description:
-        "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
+        "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
       hero: xaiHero,
       meta: {
         title: "Xai Agora",
         description:
-          "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
+          "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
         imageTitle: "Xai Agora",
         imageDescription:
-          "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
+          "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
       },
     },
     {
       route: "proposals",
-      title: "Agora is the home of Xai voters",
+      title: "WELCOME TO XAI GOVERNANCE",
       description:
-        "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
+        "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
       hero: xaiHero,
       meta: {
         title: "Xai Agora",
         description:
-          "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
+          "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
         imageTitle: "Xai Agora",
         imageDescription:
-          "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
+          "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
       },
     },
     {
       route: "delegates",
-      title: "Agora is the home of Xai voters",
+      title: "WELCOME TO XAI GOVERNANCE",
       description:
-        "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
+        "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
       hero: xaiHero,
       meta: {
         title: "Voter on Agora",
         description:
-          "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
+          "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
         imageTitle: "Voter on Agora",
         imageDescription:
-          "This is the home of Xai Governance. Membership is determined by holding the Xai token",
+          "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
       },
     },
     {
@@ -129,9 +130,9 @@ export const xaiTenantUIConfig = new TenantUI({
     },
     {
       route: "info",
-      title: "Welcome to Xai Governance",
+      title: "WELCOME TO THE XAI COMMUNITY",
       description:
-        "This is the home of Xai Governance. Membership is determined by holding the Xai token.",
+        "Agora is your home for onchain proposals, voting, and governance",
       meta: {
         title: "Xai Governance",
         description: "Home of Xai Governance",
