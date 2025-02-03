@@ -39,6 +39,7 @@ import SponsorInput from "../SponsorInput";
 import SponsorActions from "../../../sponsor/components/SponsorActions";
 import { useDirection } from "../../[id]/components/AnimationDirectionProvider";
 import { motion } from "framer-motion";
+import { truncateAddress } from "@/app/lib/utils/text";
 
 enum Visibility {
   PUBLIC = "Public",
@@ -147,7 +148,7 @@ const SubmitForm = ({
     <FormProvider {...methods}>
       <form>
         <main className="max-w-screen-xl mx-auto mt-12">
-          <div className="flex flex-row items-center justify-between bg-neutral">
+          <div className="flex flex-row items-center justify-between">
             <div className="flex flex-row items-center space-x-4">
               {stageIndex > 0 && (
                 <BackButton
@@ -282,11 +283,13 @@ const SubmitForm = ({
                       ))}
                     </div>
                   )}
-                  <h3 className="font-semibold mt-6">Description</h3>
+                  <h3 className="font-semibold text-primary mt-6">
+                    Description
+                  </h3>
                   <div className="mt-2 p-4 bg-wash border border-line rounded-lg">
                     <MarkdownPreview
                       source={draftProposal.abstract}
-                      className={`h-full py-3 px-4 rounded-t-lg max-w-full bg-transparent prose`}
+                      className={`h-full rounded-t-lg max-w-full bg-transparent prose prose-p:text-secondary`}
                       style={{
                         backgroundColor: "transparent",
                       }}
@@ -298,9 +301,9 @@ const SubmitForm = ({
                 </FormCard.Section>
                 <FormCard.Section className="z-0">
                   <>
-                    <h3 className="font-semibold">Requirements</h3>
+                    <h3 className="font-semibold text-primary">Requirements</h3>
                     {!canAddressSponsor && (
-                      <p className="text-agora-stone-700 mt-2">
+                      <p className="text-secondary mt-2">
                         You do not meet the requirement to submit this proposal.
                         However, you can ask someone who does meet the
                         requirement to sponsor this proposal on your behalf. You
@@ -309,51 +312,41 @@ const SubmitForm = ({
                         community to sponsor.
                       </p>
                     )}
+
                     <div className="mt-6">
-                      {(gatingType === ProposalGatingType.MANAGER ||
-                        gatingType === ProposalGatingType.GOVERNOR_V1) && (
-                        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-                          <p className="flex-grow">Manager address</p>
-                          <span className="text-secondary font-mono text-xs">
-                            {manager?.toString()}
-                          </span>
+                      <ProposalRequirements proposalDraft={draftProposal} />
+                    </div>
+
+                    <div className="mt-4">
+                      {tenantSupportsPublicDrafts && (
+                        <SwitchInput
+                          control={methods.control}
+                          label="Draft proposal visibility"
+                          required={true}
+                          options={Object.values(Visibility)}
+                          name="visibility"
+                        />
+                      )}
+                      {visibility === Visibility.PRIVATE && (
+                        <div className="grid grid-cols-2 gap-4 mt-4">
+                          {fields.map((_field, index) => (
+                            <SponsorInput
+                              key={`sponsor-${index}`}
+                              index={index}
+                              remove={remove}
+                            />
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              append({ address: "" as `0x${string}` })
+                            }
+                            className="bg-primary text-neutral col-span-2 border-0 rounded-lg p-2 font-semibold"
+                          >
+                            Add sponsor
+                          </button>
                         </div>
                       )}
-                      <div className="mt-6">
-                        <ProposalRequirements proposalDraft={draftProposal} />
-                      </div>
-
-                      <div className="mt-4">
-                        {tenantSupportsPublicDrafts && (
-                          <SwitchInput
-                            control={methods.control}
-                            label="Draft proposal visibility"
-                            required={true}
-                            options={Object.values(Visibility)}
-                            name="visibility"
-                          />
-                        )}
-                        {visibility === Visibility.PRIVATE && (
-                          <div className="grid grid-cols-2 gap-4 mt-4">
-                            {fields.map((_field, index) => (
-                              <SponsorInput
-                                key={`sponsor-${index}`}
-                                index={index}
-                                remove={remove}
-                              />
-                            ))}
-                            <button
-                              type="button"
-                              onClick={() =>
-                                append({ address: "" as `0x${string}` })
-                              }
-                              className="bg-primary text-neutral col-span-2 border-0 rounded-lg p-2 font-semibold"
-                            >
-                              Add sponsor
-                            </button>
-                          </div>
-                        )}
-                      </div>
                     </div>
                   </>
                 </FormCard.Section>

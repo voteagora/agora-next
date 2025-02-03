@@ -98,7 +98,7 @@ const GithubPRForm = ({
 
   return (
     <main className="max-w-screen-xl mx-auto mt-12">
-      <div className="flex flex-row items-center justify-between bg-neutral">
+      <div className="flex flex-row items-center justify-between">
         <div className="flex flex-row items-center space-x-4">
           {stageIndex > 0 && (
             <BackButton draftProposalId={draftProposal.id} index={stageIndex} />

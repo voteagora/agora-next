@@ -43,7 +43,7 @@ const AllProposalListClient = ({
       <div>
         {proposals.length === 0 ? (
           <div className="flex flex-row justify-center py-8 text-secondary">
-            No proposals currently
+            No proposals found
           </div>
         ) : (
           <InfiniteScroll

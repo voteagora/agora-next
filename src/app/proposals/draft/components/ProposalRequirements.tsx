@@ -25,7 +25,7 @@ const ProposalRequirements = ({
     if (votingModuleType === ProposalType.SOCIAL) {
       requirements.push(
         <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4">
-          <p className="flex-grow">Token balance</p>
+          <p className="flex-grow text-primary">Token balance</p>
           <span className="text-secondary font-mono text-xs">
             {"> "}
             {(plmToggle?.config as PLMConfig)?.snapshotConfig?.requiredTokens}
@@ -41,7 +41,7 @@ const ProposalRequirements = ({
     ) {
       requirements.push(
         <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4">
-          <p className="flex-grow">Manager address</p>
+          <p className="flex-grow text-primary">Manager address</p>
           <span className="text-secondary font-mono text-xs">
             {truncateAddress(manager?.toString() ?? "")}
           </span>
@@ -55,7 +55,7 @@ const ProposalRequirements = ({
     ) {
       requirements.push(
         <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4">
-          <p className="flex-grow">Token balance</p>
+          <p className="flex-grow text-primary">Token balance</p>
           <span className="text-secondary font-mono text-xs">
             {"> "}
             {threshold

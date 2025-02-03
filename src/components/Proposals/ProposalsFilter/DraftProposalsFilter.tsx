@@ -37,7 +37,7 @@ export default function DraftProposalsFilter() {
   return (
     <div className="relative w-full sm:w-fit">
       <Listbox value={selected} onChange={setSelected}>
-        <Listbox.Button className="w-full sm:w-fit bg-wash text-base font-medium border-none rounded-full py-2 px-4 flex items-center justify-between">
+        <Listbox.Button className="w-full sm:w-fit bg-wash text-primary font-medium border-none rounded-full py-2 px-4 flex items-center justify-between">
           <span>{getFilterOptionValue(selected)}</span>
           <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
         </Listbox.Button>
