@@ -5,7 +5,7 @@ import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { onSubmitAction as deleteAction } from "../actions/deleteDraftProposal";
 import { TrashIcon } from "@heroicons/react/24/outline";
-import X from "@/assets/icons/x.svg";
+import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
@@ -44,7 +44,7 @@ export const DeleteDraftProposalDialog = ({
         <div className="absolute w-full h-full bg-[url('/images/grid.svg')]"></div>
         <div className="mt-2 relative block h-[85px] w-[85px] mx-auto">
           <Image
-            src={X}
+            src={icons.X}
             alt="X"
             width={85}
             height={85}
