@@ -6,9 +6,7 @@ import ProposalListContainer, {
   ProposalListContainerSkeleton,
 } from "@/components/Proposals/ProposalsList/ProposalListContainer";
 import DraftProposalList from "@/components/Proposals/ProposalsList/DraftProposalList";
-import MyDraftProposalList from "@/components/Proposals/ProposalsList/MyDraftProposalList";
 import AllProposalList from "@/components/Proposals/ProposalsList/AllProposalList";
-import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
 import MyDraftProposalListServer from "@/components/Proposals/ProposalsList/MyDraftProposalListServer";
 import { Suspense } from "react";
 

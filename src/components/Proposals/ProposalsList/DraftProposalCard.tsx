@@ -66,8 +66,9 @@ const DraftProposalCard = ({
         {/* <DraftProposalVoteContainer proposal={proposal} /> */}
         <div className="w-full sm:w-[55%] flex flex-col justify-between gap-y-1">
           <div className="flex flex-row gap-1 text-xs text-tertiary">
-            <div>
-              Submitted by <HumanAddress address={proposal.author_address} />
+            <div className="flex flex-row gap-1">
+              <div>Submitted by</div>
+              <HumanAddress address={proposal.author_address} />
             </div>
           </div>
           <div className="flex flex-row gap-1">

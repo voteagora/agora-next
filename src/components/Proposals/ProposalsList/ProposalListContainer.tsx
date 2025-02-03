@@ -15,6 +15,7 @@ import MyDraftsSort from "../ProposalsFilter/MyDraftsSort";
 import useUnreadDraftCount from "@/hooks/useUnreadDraftCount";
 import CurrentGovernanceStage from "../CurrentGovernanceStage/CurrentGovernanceStage";
 import { AgoraLoaderSmall } from "@/components/shared/AgoraLoader/AgoraLoader";
+import { useEffect, useState } from "react";
 
 enum ProposalListTab {
   ALL = "all",
@@ -40,7 +41,7 @@ const ProposalListContainer = ({
   const { address } = useAccount();
   const { ui, slug } = Tenant.current();
   let tenantSupportsProposalLifecycle =
-    ui.toggle("proposal-lifecycle")?.enabled;
+    ui.toggle("proposal-lifecycle")?.enabled ?? false;
 
   if (slug === DaoSlug.OP) {
     tenantSupportsProposalLifecycle =
@@ -77,35 +78,39 @@ const ProposalListContainer = ({
             >
               Proposals
             </button>
-            <button
-              type="button"
-              className={cn(
-                "sm:text-xl mb-0 flex flex-row gap-2 items-center",
-                activeTab === ProposalListTab.DRAFT
-                  ? "text-primary border-b-2 border-primary"
-                  : "text-primary/40 hover:text-primary/80 transition-colors"
-              )}
-              onClick={() => clearFiltersAndSetTab(ProposalListTab.DRAFT)}
-            >
-              <span>Submissions</span>
-              {!!unreadDraftCount && (
-                <span className="text-xs text-secondary font-medium border border-line rounded px-1">
-                  {unreadDraftCount.toString()}
-                </span>
-              )}
-            </button>
-            <button
-              type="button"
-              className={cn(
-                "sm:text-xl mb-0",
-                activeTab === ProposalListTab.MY_DRAFTS
-                  ? "text-primary border-b-2 border-primary"
-                  : "text-primary/40 hover:text-primary/80 transition-colors"
-              )}
-              onClick={() => clearFiltersAndSetTab(ProposalListTab.MY_DRAFTS)}
-            >
-              Drafts
-            </button>
+            {tenantSupportsProposalLifecycle && (
+              <button
+                type="button"
+                className={cn(
+                  "sm:text-xl mb-0 flex flex-row gap-2 items-center",
+                  activeTab === ProposalListTab.DRAFT
+                    ? "text-primary border-b-2 border-primary"
+                    : "text-primary/40 hover:text-primary/80 transition-colors"
+                )}
+                onClick={() => clearFiltersAndSetTab(ProposalListTab.DRAFT)}
+              >
+                <span>Submissions</span>
+                {!!unreadDraftCount && (
+                  <span className="text-xs text-secondary font-medium border border-line rounded px-1">
+                    {unreadDraftCount.toString()}
+                  </span>
+                )}
+              </button>
+            )}
+            {tenantSupportsProposalLifecycle && (
+              <button
+                type="button"
+                className={cn(
+                  "sm:text-xl mb-0",
+                  activeTab === ProposalListTab.MY_DRAFTS
+                    ? "text-primary border-b-2 border-primary"
+                    : "text-primary/40 hover:text-primary/80 transition-colors"
+                )}
+                onClick={() => clearFiltersAndSetTab(ProposalListTab.MY_DRAFTS)}
+              >
+                Drafts
+              </button>
+            )}
           </div>
           <div className="flex flex-col sm:flex-row justify-end gap-4 items-center flex-1 w-full sm:w-fit">
             {activeTab === ProposalListTab.ALL && <ProposalsFilter />}
@@ -135,6 +140,7 @@ const ProposalListContainer = ({
             title={governanceCalendar.title}
             endDate={governanceCalendar.endDate}
             reviewPeriod={governanceCalendar.reviewPeriod}
+            votingPeriod={governanceCalendar.votingPeriod}
           />
         </div>
       )}
@@ -143,14 +149,28 @@ const ProposalListContainer = ({
         key={activeTab}
       >
         {activeTab === ProposalListTab.ALL && allProposalsListElement}
-        {activeTab === ProposalListTab.DRAFT && draftProposalsListElement}
-        {activeTab === ProposalListTab.MY_DRAFTS && myDraftProposalsListElement}
+        {activeTab === ProposalListTab.DRAFT &&
+          tenantSupportsProposalLifecycle &&
+          draftProposalsListElement}
+        {activeTab === ProposalListTab.MY_DRAFTS &&
+          tenantSupportsProposalLifecycle &&
+          myDraftProposalsListElement}
       </section>
     </div>
   );
 };
 
 export const ProposalListContainerSkeleton = () => {
+  const { address } = useAccount();
+  const { ui, slug } = Tenant.current();
+  let tenantSupportsProposalLifecycle =
+    ui.toggle("proposal-lifecycle")?.enabled ?? false;
+
+  if (slug === DaoSlug.OP) {
+    tenantSupportsProposalLifecycle =
+      address === "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8" || false;
+  }
+
   return (
     <div>
       <div className="flex flex-col max-w-[76rem]">
@@ -164,20 +184,24 @@ export const ProposalListContainerSkeleton = () => {
               >
                 Proposals
               </button>
-              <button
-                type="button"
-                className="sm:text-xl mb-0 flex flex-row gap-2 items-center text-primary/40 hover:text-primary/80 transition-colors"
-                onClick={() => {}}
-              >
-                <span>Submissions</span>
-              </button>
-              <button
-                type="button"
-                className="sm:text-xl mb-0 flex flex-row gap-2 items-center text-primary/40 hover:text-primary/80 transition-colors"
-                onClick={() => {}}
-              >
-                Drafts
-              </button>
+              {tenantSupportsProposalLifecycle && (
+                <button
+                  type="button"
+                  className="sm:text-xl mb-0 flex flex-row gap-2 items-center text-primary/40 hover:text-primary/80 transition-colors"
+                  onClick={() => {}}
+                >
+                  <span>Submissions</span>
+                </button>
+              )}
+              {tenantSupportsProposalLifecycle && (
+                <button
+                  type="button"
+                  className="sm:text-xl mb-0 flex flex-row gap-2 items-center text-primary/40 hover:text-primary/80 transition-colors"
+                  onClick={() => {}}
+                >
+                  Drafts
+                </button>
+              )}
             </div>
             <div className="flex flex-col sm:flex-row justify-end gap-4 items-center flex-1 w-full sm:w-fit">
               <span></span>
