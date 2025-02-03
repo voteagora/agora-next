@@ -22,7 +22,7 @@ const RightColumn = () => {
     <Accordion type="single" collapsible className="">
       {(proposalLifecycleToggle?.config as PLMConfig)?.copy.draftSteps.map(
         (step: any, index: any) => (
-          <AccordionItem value={`item-${index + 1}`}>
+          <AccordionItem value={`item-${index + 1}`} key={`item-${index + 1}`}>
             <AccordionTrigger className="flex items-center gap-2">
               <span className="text-primary font-bold bg-tertiary/5 rounded-full text-sm border border-line h-[30px] w-[30px] flex items-center justify-center">
                 {index + 1}
