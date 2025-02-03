@@ -143,36 +143,9 @@ const TransactionFormItem = ({
   return (
     <div className="">
       <div className="flex flex-row justify-between items-center mb-6">
-        <div className="flex flex-row items-center space-x-2">
-          <h2 className="text-secondary font-semibold">
-            Transaction #{transactionIndex + 1}
-          </h2>
-          {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
-            (simulationState === "INVALID" ? (
-              <a
-                href={`https://dashboard.tenderly.co/shared/simulation/${simulationId}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span className="bg-red-100 text-negative rounded-lg px-2 py-1 text-xs font-semibold">
-                  Invalid
-                </span>
-              </a>
-            ) : simulationState === "UNCONFIRMED" ? (
-              <span className="bg-gray-100 text-tertiary px-2 py-1 rounded-lg text-xs font-semibold">
-                No simulation
-              </span>
-            ) : (
-              <a
-                href={`https://dashboard.tenderly.co/shared/simulation/${simulationId}`}
-                target="_blank"
-                rel="noreferrer"
-                className="bg-green-100 text-positive px-2 py-1 rounded-lg text-xs font-semibold"
-              >
-                Valid
-              </a>
-            ))}
-        </div>
+        <h2 className="text-primary font-semibold">
+          Transaction #{transactionIndex + 1}
+        </h2>
         <span
           className="text-red-500 text-sm hover:underline cursor-pointer"
           onClick={() => {
@@ -443,10 +416,7 @@ const ApprovalProposalForm = () => {
         <div className="mt-6 space-y-12">
           {options.map((field, index) => {
             return (
-              <div
-                className="p-4 border border-agora-stone-100 rounded-lg"
-                key={field.id}
-              >
+              <div className="p-4 border border-line rounded-lg" key={field.id}>
                 <div className="flex flex-col mb-6">
                   <div className="flex flex-row justify-between mb-4">
                     <h2 className="text-secondary font-semibold">

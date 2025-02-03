@@ -88,7 +88,7 @@ export function UpdatedButton({
             <span
               className={cn(
                 type === "primary" && "text-white",
-                type === "secondary" && "text-black",
+                type === "secondary" && "text-brandPrimary",
                 type === "destructive" && "text-red-500",
                 type === "link" && "",
                 "font-semibold flex flex-row space-x-2 items-center justify-center"
@@ -97,7 +97,7 @@ export function UpdatedButton({
               <LoadingSpinner
                 className={cn(
                   type === "primary" && "text-white",
-                  type === "secondary" && "text-black",
+                  type === "secondary" && "text-brandPrimary",
                   type === "destructive" && "text-red-500",
                   type === "link" && "",
                   "font-semibold"

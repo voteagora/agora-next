@@ -83,7 +83,7 @@ const SponsorInput = ({
             onClick={() => remove(index)}
             className="border border-line rounded-lg h-[42px] w-[42px] flex items-center justify-center hover:bg-tertiary/5 transition-colors cursor-pointer"
           >
-            <XMarkIcon className="w-4 h-4" />
+            <XMarkIcon className="w-4 h-4 text-primary" />
           </button>
         </div>
       </div>

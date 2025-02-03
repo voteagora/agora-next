@@ -31,7 +31,7 @@ export default function ProposalsFilter() {
   return (
     <div className="relative w-full sm:w-fit">
       <Listbox value={selected} onChange={setSelected}>
-        <Listbox.Button className="w-full sm:w-fit bg-wash text-base font-medium border-none rounded-full py-2 px-4 flex items-center justify-between">
+        <Listbox.Button className="w-full sm:w-fit bg-wash text-primary font-medium border-none rounded-full py-2 px-4 flex items-center justify-between">
           <span>
             {selected === proposalsFilterOptions.relevant.filter
               ? proposalsFilterOptions.relevant.value

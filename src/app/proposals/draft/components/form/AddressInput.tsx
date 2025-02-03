@@ -113,7 +113,7 @@ function AddressInput<
               <input
                 {...field}
                 type="text"
-                className={`border bg-wash border-line placeholder:text-tertiary p-2 rounded-lg w-full text-primary ${
+                className={`border bg-wash border-line text-primary placeholder:text-tertiary p-2 rounded-lg w-full ${
                   className
                 }`}
                 onBlur={() => {
