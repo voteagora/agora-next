@@ -44,7 +44,7 @@ export function SuccessView({
         be slightly different due to{" "}
         <a
           className="underline"
-          href="https://argoagora.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c?pvs=4"
+          href="https://agoraxyz.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c"
           target="_blank"
           rel="noopener noreferrer"
         >
