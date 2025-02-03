@@ -11,7 +11,7 @@ import ENSName from "@/components/shared/ENSName";
 //Bubble contransts
 const CHART_DIMENSIONS = {
   width: 720,
-  height: 230,
+  height: 250,
   padding: 3,
   maxVotes: 50,
 } as const;
