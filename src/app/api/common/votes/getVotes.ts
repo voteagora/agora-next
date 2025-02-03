@@ -19,6 +19,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { doInSpan } from "@/app/lib/logging";
 import { findVotes } from "@/lib/prismaUtils";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { Block } from "ethers";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -38,7 +39,7 @@ async function getVotesForDelegateForAddress({
   address: string;
   pagination?: PaginationParams;
 }) {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
 
   let eventsViewName;
 
@@ -137,7 +138,9 @@ async function getVotesForDelegateForAddress({
     };
   }
 
-  const latestBlock = await contracts.token.provider.getBlock("latest");
+  const latestBlock = ui.toggle("use-l1-block-number")?.enabled
+    ? await contracts.providerForTime?.getBlock("latest")
+    : await contracts.token.provider.getBlock("latest");
 
   return {
     meta,
@@ -294,7 +297,7 @@ async function getVotesForProposal({
   pagination?: PaginationParams;
   sort?: VotesSort;
 }): Promise<PaginatedResult<Vote[]>> {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
 
   let eventsViewName;
 
@@ -379,11 +382,16 @@ async function getVotesForProposal({
     );
   };
 
+  const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
+    ?.enabled
+    ? contracts.providerForTime?.getBlock("latest")
+    : contracts.token.provider.getBlock("latest");
+
   const [{ meta, data: votes }, latestBlock] = await Promise.all([
     doInSpan({ name: "getVotesForProposal" }, async () =>
       paginateResult(queryFunction, pagination)
     ),
-    contracts.token.provider.getBlock("latest"),
+    latestBlockPromise,
   ]);
 
   if (!votes || votes.length === 0) {
@@ -411,7 +419,7 @@ async function getUserVotesForProposal({
   proposalId: string;
   address: string;
 }) {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
   const queryFunciton = prisma.$queryRawUnsafe<VotePayload[]>(
     `
     SELECT
@@ -438,7 +446,9 @@ async function getUserVotesForProposal({
     async () => queryFunciton
   );
 
-  const latestBlock = await contracts.token.provider.getBlock("latest");
+  const latestBlock = ui.toggle("use-l1-block-number")?.enabled
+    ? await contracts.providerForTime?.getBlock("latest")
+    : await contracts.token.provider.getBlock("latest");
 
   return votes.map((vote) =>
     parseVote(
@@ -459,14 +469,16 @@ async function getVotesForProposalAndDelegate({
   proposalId: string;
   address: string;
 }) {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
   const votes = await findVotes({
     namespace,
     proposalId,
     voter: address.toLowerCase(),
   });
 
-  const latestBlock = await contracts.token.provider.getBlock("latest");
+  const latestBlock = ui.toggle("use-l1-block-number")?.enabled
+    ? await contracts.providerForTime?.getBlock("latest")
+    : await contracts.token.provider.getBlock("latest");
 
   return votes.map((vote: VotePayload) =>
     parseVote(

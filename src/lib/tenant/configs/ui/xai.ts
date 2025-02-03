@@ -193,6 +193,10 @@ export const xaiTenantUIConfig = new TenantUI({
       enabled: false,
     },
     {
+      name: "use-l1-block-number",
+      enabled: true,
+    },
+    {
       name: "proposal-lifecycle",
       enabled: true,
       config: {

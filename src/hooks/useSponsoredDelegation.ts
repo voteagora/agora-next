@@ -56,7 +56,9 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
     setIsFetching(true);
     setIsFetched(false);
 
-    const latestBlock = await contracts.token.provider.getBlock("latest");
+    const latestBlock = ui.toggle("use-l1-block-number")?.enabled
+      ? await contracts.providerForTime?.getBlock("latest")
+      : await contracts.token.provider.getBlock("latest");
     const expiry = (latestBlock?.timestamp || 0) + 1000;
 
     const signature = await signTypedDataAsync({

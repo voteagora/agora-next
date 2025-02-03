@@ -14,6 +14,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Prisma } from "@prisma/client";
 import { findAdvancedDelegatee, findDelagatee } from "@/lib/prismaUtils";
 import { DELEGATION_MODEL } from "@/lib/constants";
+import { Block } from "ethers";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -27,7 +28,7 @@ async function getCurrentDelegateesForAddress({
 }: {
   address: string;
 }): Promise<Delegation[]> {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
 
   const getDirectDelegatee = async () => {
     const delegatee = await findDelagatee({
@@ -67,7 +68,9 @@ async function getCurrentDelegateesForAddress({
     ]);
   }
 
-  const latestBlock = await contracts.token.provider.getBlock("latest");
+  const latestBlock = ui.toggle("use-l1-block-number")?.enabled
+    ? await contracts.providerForTime?.getBlock("latest")
+    : await contracts.token.provider.getBlock("latest");
 
   const advancedDelegateesData = advancedDelegatees.map(
     (advancedDelegatee) => ({
@@ -128,7 +131,7 @@ async function getCurrentDelegatorsForAddress({
   address: string;
   pagination?: PaginationParams;
 }): Promise<PaginatedResult<Delegation[]>> {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
 
   let advancedDelegatorsSubQry: string;
   let directDelegatorsSubQry: string;
@@ -253,6 +256,11 @@ async function getCurrentDelegatorsForAddress({
             transaction_index DESC`;
   }
 
+  const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
+    ?.enabled
+    ? contracts.providerForTime?.getBlock("latest")
+    : contracts.token.provider.getBlock("latest");
+
   const [delegators, latestBlock] = await Promise.all([
     paginateResult(async (skip: number, take: number) => {
       return prisma.$queryRawUnsafe<
@@ -283,7 +291,7 @@ async function getCurrentDelegatorsForAddress({
         take
       );
     }, pagination),
-    contracts.token.provider.getBlock("latest"),
+    latestBlockPromise,
   ]);
 
   const delagtorsData = await Promise.all(
@@ -344,7 +352,12 @@ async function getCurrentAdvancedDelegatorsForAddress({
 }: {
   address: string;
 }): Promise<Delegation[]> {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
+
+  const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
+    ?.enabled
+    ? contracts.providerForTime?.getBlock("latest")
+    : contracts.token.provider.getBlock("latest");
 
   const [advancedDelegators, latestBlock] = await Promise.all([
     findAdvancedDelegatee({
@@ -352,7 +365,7 @@ async function getCurrentAdvancedDelegatorsForAddress({
       address,
       contract: contracts.alligator?.address,
     }),
-    contracts.token.provider.getBlock("latest"),
+    latestBlockPromise,
   ]);
 
   return advancedDelegators.map((advancedDelegator) => ({
