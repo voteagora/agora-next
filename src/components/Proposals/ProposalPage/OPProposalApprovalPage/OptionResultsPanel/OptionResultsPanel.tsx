@@ -64,7 +64,7 @@ export default function OptionsResultsPanel({
     });
 
   return (
-    <VStack className="max-h-[calc(100vh-452px)] overflow-y-scroll flex-shrink px-4">
+    <VStack className="max-h-[calc(100vh-482px)] overflow-y-scroll flex-shrink px-4">
       {sortedOptions.map((option, index) => {
         let isApproved = false;
         const votesAmountBN = BigInt(option?.votes || 0);

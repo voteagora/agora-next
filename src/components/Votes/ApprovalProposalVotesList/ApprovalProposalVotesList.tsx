@@ -95,8 +95,8 @@ export default function ApprovalProposalVotesList({
       className={cn(
         "overflow-y-scroll",
         isThresholdCriteria
-          ? "max-h-[calc(100vh-530px)]"
-          : "max-h-[calc(100vh-497px)]"
+          ? "max-h-[calc(100vh-560px)]"
+          : "max-h-[calc(100vh-527px)]"
       )}
     >
       <InfiniteScroll
