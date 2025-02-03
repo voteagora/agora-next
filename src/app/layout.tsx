@@ -5,7 +5,7 @@ import Header from "@/components/Header/Header";
 import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import Tenant from "@/lib/tenant/tenant";
-import { inter } from "@/styles/fonts";
+import { fontMapper, inter } from "@/styles/fonts";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 declare global {
@@ -63,7 +63,9 @@ export default async function RootLayout({
   const brandPrimary = ui?.customization?.brandPrimary || defaults.brandPrimary;
   const brandSecondary =
     ui?.customization?.brandSecondary || defaults.brandSecondary;
-  const font = ui?.customization?.font || inter.style.fontFamily;
+  const font =
+    fontMapper[ui?.customization?.font || ""]?.style.fontFamily ||
+    inter.style.fontFamily;
 
   const favicons = {
     appleTouchIcon:

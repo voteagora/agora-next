@@ -62,7 +62,7 @@ export default async function Page() {
     );
 
     return (
-      <div className="flex flex-col font-inter">
+      <div className="flex flex-col">
         <InfoHero />
         <InfoAbout />
         <GovernorSettings />
