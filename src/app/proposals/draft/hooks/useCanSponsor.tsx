@@ -48,6 +48,7 @@ export const useCanSponsor = (address: `0x${string}` | undefined) => {
     useGetVotes({
       address: address as `0x${string}`,
       blockNumber: blockNumber || BigInt(0),
+      enabled: !!address && !!blockNumber,
     });
 
   const {
