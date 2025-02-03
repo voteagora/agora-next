@@ -11,6 +11,9 @@ import infoPageCard04 from "@/assets/tenant/optimism_info_4.png";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
+export const OptimismFaqLink =
+  "https://agoraxyz.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c";
+
 export const optimismTenantUIConfig = new TenantUI({
   title: "Optimism Agora",
   logo: optimismLogo,
@@ -73,7 +76,7 @@ export const optimismTenantUIConfig = new TenantUI({
     {
       name: "faq",
       title: "FAQ",
-      url: "https://agoraxyz.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c",
+      url: OptimismFaqLink,
     },
     {
       name: "changelog",

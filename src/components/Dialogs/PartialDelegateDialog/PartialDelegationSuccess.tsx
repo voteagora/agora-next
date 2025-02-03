@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import Tenant from "@/lib/tenant/tenant";
+import { OptimismFaqLink } from "@/lib/tenant/configs/ui/optimism";
 
 interface Props {
   closeDialog: () => void;
@@ -29,7 +30,7 @@ export const PartialDelegationSuccess = ({ hash, closeDialog }: Props) => {
         be slightly different due to{" "}
         <a
           className="underline"
-          href="https://agoraxyz.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c"
+          href={OptimismFaqLink}
           target="_blank"
           rel="noopener noreferrer"
         >

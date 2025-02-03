@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { useEffect } from "react";
 import Tenant from "@/lib/tenant/tenant";
+import { OptimismFaqLink } from "@/lib/tenant/configs/ui/optimism";
 
 // TODO: Add notion link in "Learn more"
 export function SuccessView({
@@ -44,7 +45,7 @@ export function SuccessView({
         be slightly different due to{" "}
         <a
           className="underline"
-          href="https://agoraxyz.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c"
+          href={OptimismFaqLink}
           target="_blank"
           rel="noopener noreferrer"
         >
