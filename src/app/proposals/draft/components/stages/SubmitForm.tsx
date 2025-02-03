@@ -37,8 +37,9 @@ import { ProposalStage } from "@prisma/client";
 import { isAddress } from "viem";
 import SponsorInput from "../SponsorInput";
 import SponsorActions from "../../../sponsor/components/SponsorActions";
+import { useDirection } from "../../[id]/components/AnimationDirectionProvider";
+import { motion } from "framer-motion";
 
-import { AnimatePresence, motion } from "framer-motion";
 enum Visibility {
   PUBLIC = "Public",
   PRIVATE = "Private",
@@ -102,6 +103,7 @@ const SubmitForm = ({
   draftProposal: DraftProposal;
   rightColumn: React.ReactNode;
 }) => {
+  const { direction } = useDirection();
   const router = useRouter();
   const { ui } = Tenant.current();
   const plmToggle = ui.toggle("proposal-lifecycle");
@@ -200,157 +202,163 @@ const SubmitForm = ({
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
-            <AnimatePresence mode="wait">
-              <motion.section
-                className="col-span-1 sm:col-span-2 order-last sm:order-first"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-              >
-                <FormCard>
-                  <FormCard.Section>
-                    <h2 className="font-semibold text-primary text-lg">
-                      {draftProposal.title}
-                    </h2>
-                    {renderProposalDescription(draftProposal)}
-                    <div className="mt-6">
-                      {draftProposal.voting_module_type ===
-                        ProposalType.BASIC && (
-                        <ProposalTransactionDisplay
-                          descriptions={(
-                            draftProposal as BasicProposal
-                          ).transactions.map((t) => t.description)}
-                          targets={(
-                            draftProposal as BasicProposal
-                          ).transactions.map((t) => t.target)}
-                          calldatas={
-                            (draftProposal as BasicProposal).transactions.map(
-                              (t) => t.calldata
-                            ) as `0x${string}`[]
-                          }
-                          values={(
-                            draftProposal as BasicProposal
-                          ).transactions.map((t) => t.value)}
-                          simulationDetails={{
-                            id: (draftProposal as BasicProposal).transactions[0]
-                              ?.simulation_id,
-                            state: (draftProposal as BasicProposal)
-                              .transactions[0]?.simulation_state,
-                          }}
-                        />
-                      )}
-                    </div>
+            <motion.section
+              key="draftForm"
+              className="col-span-1 sm:col-span-2 order-last sm:order-first"
+              initial={{
+                opacity: 0,
+                x: direction === "prev" ? -50 : 50,
+                filter: "blur(5px)",
+              }}
+              animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+              exit={{
+                opacity: 0,
+                x: direction === "prev" ? 50 : -50,
+                filter: "blur(5px)",
+              }}
+            >
+              <FormCard>
+                <FormCard.Section>
+                  <h2 className="font-semibold text-primary text-lg">
+                    {draftProposal.title}
+                  </h2>
+                  {renderProposalDescription(draftProposal)}
+                  <div className="mt-6">
                     {draftProposal.voting_module_type ===
-                      ProposalType.SOCIAL && (
-                      <div>
-                        <h3 className="font-semibold mt-6">Voting strategy</h3>
-                        <p className="text-secondary mt-2">
-                          {draftProposal.proposal_social_type}
-                        </p>
-                        {draftProposal.start_date_social && (
-                          <>
-                            <h3 className="font-semibold mt-6">Voting start</h3>
-                            <p className="text-secondary mt-2">
-                              {formatFullDate(draftProposal.start_date_social)}
-                            </p>
-                          </>
-                        )}
-                        {draftProposal.end_date_social && (
-                          <>
-                            <h3 className="font-semibold mt-6">Voting end</h3>
-                            <p className="text-secondary mt-2">
-                              {formatFullDate(draftProposal.end_date_social)}
-                            </p>
-                          </>
-                        )}
-                        <h3 className="font-semibold mt-6 mb-2">
-                          Voting options
-                        </h3>
-                        {draftProposal.social_options.map((option, index) => (
-                          <p className="text-secondary" key={`draft-${index}`}>
-                            {option.text}
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                    <h3 className="font-semibold mt-6">Description</h3>
-                    <div className="mt-2 p-4 bg-wash border border-line rounded-lg">
-                      <MarkdownPreview
-                        source={draftProposal.abstract}
-                        className={`h-full py-3 px-4 rounded-t-lg max-w-full bg-transparent prose`}
-                        style={{
-                          backgroundColor: "transparent",
-                        }}
-                        wrapperElement={{
-                          "data-color-mode": "light",
+                      ProposalType.BASIC && (
+                      <ProposalTransactionDisplay
+                        descriptions={(
+                          draftProposal as BasicProposal
+                        ).transactions.map((t) => t.description)}
+                        targets={(
+                          draftProposal as BasicProposal
+                        ).transactions.map((t) => t.target)}
+                        calldatas={
+                          (draftProposal as BasicProposal).transactions.map(
+                            (t) => t.calldata
+                          ) as `0x${string}`[]
+                        }
+                        values={(
+                          draftProposal as BasicProposal
+                        ).transactions.map((t) => t.value)}
+                        simulationDetails={{
+                          id: (draftProposal as BasicProposal).transactions[0]
+                            ?.simulation_id,
+                          state: (draftProposal as BasicProposal)
+                            .transactions[0]?.simulation_state,
                         }}
                       />
-                    </div>
-                  </FormCard.Section>
-                  <FormCard.Section className="z-0">
-                    <>
-                      <h3 className="font-semibold">Requirements</h3>
-                      {!canAddressSponsor && (
-                        <p className="text-agora-stone-700 mt-2">
-                          You do not meet the requirement to submit this
-                          proposal. However, you can ask someone who does meet
-                          the requirement to sponsor this proposal on your
-                          behalf. You can make this proposal private and send it
-                          to a select few people, or you can make it public for
-                          anyone in the community to sponsor.
+                    )}
+                  </div>
+                  {draftProposal.voting_module_type === ProposalType.SOCIAL && (
+                    <div>
+                      <h3 className="font-semibold mt-6">Voting strategy</h3>
+                      <p className="text-secondary mt-2">
+                        {draftProposal.proposal_social_type}
+                      </p>
+                      {draftProposal.start_date_social && (
+                        <>
+                          <h3 className="font-semibold mt-6">Voting start</h3>
+                          <p className="text-secondary mt-2">
+                            {formatFullDate(draftProposal.start_date_social)}
+                          </p>
+                        </>
+                      )}
+                      {draftProposal.end_date_social && (
+                        <>
+                          <h3 className="font-semibold mt-6">Voting end</h3>
+                          <p className="text-secondary mt-2">
+                            {formatFullDate(draftProposal.end_date_social)}
+                          </p>
+                        </>
+                      )}
+                      <h3 className="font-semibold mt-6 mb-2">
+                        Voting options
+                      </h3>
+                      {draftProposal.social_options.map((option, index) => (
+                        <p className="text-secondary" key={`draft-${index}`}>
+                          {option.text}
                         </p>
+                      ))}
+                    </div>
+                  )}
+                  <h3 className="font-semibold mt-6">Description</h3>
+                  <div className="mt-2 p-4 bg-wash border border-line rounded-lg">
+                    <MarkdownPreview
+                      source={draftProposal.abstract}
+                      className={`h-full py-3 px-4 rounded-t-lg max-w-full bg-transparent prose`}
+                      style={{
+                        backgroundColor: "transparent",
+                      }}
+                      wrapperElement={{
+                        "data-color-mode": "light",
+                      }}
+                    />
+                  </div>
+                </FormCard.Section>
+                <FormCard.Section className="z-0">
+                  <>
+                    <h3 className="font-semibold">Requirements</h3>
+                    {!canAddressSponsor && (
+                      <p className="text-agora-stone-700 mt-2">
+                        You do not meet the requirement to submit this proposal.
+                        However, you can ask someone who does meet the
+                        requirement to sponsor this proposal on your behalf. You
+                        can make this proposal private and send it to a select
+                        few people, or you can make it public for anyone in the
+                        community to sponsor.
+                      </p>
+                    )}
+                    <div className="mt-6">
+                      {(gatingType === ProposalGatingType.MANAGER ||
+                        gatingType === ProposalGatingType.GOVERNOR_V1) && (
+                        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+                          <p className="flex-grow">Manager address</p>
+                          <span className="text-secondary font-mono text-xs">
+                            {manager?.toString()}
+                          </span>
+                        </div>
                       )}
                       <div className="mt-6">
-                        {(gatingType === ProposalGatingType.MANAGER ||
-                          gatingType === ProposalGatingType.GOVERNOR_V1) && (
-                          <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
-                            <p className="flex-grow">Manager address</p>
-                            <span className="text-secondary font-mono text-xs">
-                              {manager?.toString()}
-                            </span>
+                        <ProposalRequirements proposalDraft={draftProposal} />
+                      </div>
+
+                      <div className="mt-4">
+                        {tenantSupportsPublicDrafts && (
+                          <SwitchInput
+                            control={methods.control}
+                            label="Draft proposal visibility"
+                            required={true}
+                            options={Object.values(Visibility)}
+                            name="visibility"
+                          />
+                        )}
+                        {visibility === Visibility.PRIVATE && (
+                          <div className="grid grid-cols-2 gap-4 mt-4">
+                            {fields.map((_field, index) => (
+                              <SponsorInput
+                                key={`sponsor-${index}`}
+                                index={index}
+                                remove={remove}
+                              />
+                            ))}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                append({ address: "" as `0x${string}` })
+                              }
+                              className="bg-primary text-neutral col-span-2 border-0 rounded-lg p-2 font-semibold"
+                            >
+                              Add sponsor
+                            </button>
                           </div>
                         )}
-                        <div className="mt-6">
-                          <ProposalRequirements proposalDraft={draftProposal} />
-                        </div>
-
-                        <div className="mt-4">
-                          {tenantSupportsPublicDrafts && (
-                            <SwitchInput
-                              control={methods.control}
-                              label="Draft proposal visibility"
-                              required={true}
-                              options={Object.values(Visibility)}
-                              name="visibility"
-                            />
-                          )}
-                          {visibility === Visibility.PRIVATE && (
-                            <div className="grid grid-cols-2 gap-4 mt-4">
-                              {fields.map((_field, index) => (
-                                <SponsorInput
-                                  key={`sponsor-${index}`}
-                                  index={index}
-                                  remove={remove}
-                                />
-                              ))}
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  append({ address: "" as `0x${string}` })
-                                }
-                                className="bg-primary text-neutral col-span-2 border-0 rounded-lg p-2 font-semibold"
-                              >
-                                Add sponsor
-                              </button>
-                            </div>
-                          )}
-                        </div>
                       </div>
-                    </>
-                  </FormCard.Section>
-                </FormCard>
-              </motion.section>
-            </AnimatePresence>
+                    </div>
+                  </>
+                </FormCard.Section>
+              </FormCard>
+            </motion.section>
             <section className="col-span-1">{rightColumn}</section>
           </div>
         </main>

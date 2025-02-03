@@ -13,7 +13,8 @@ import { DraftProposal } from "../../types";
 import DeleteDraftButton from "../DeleteDraftButton";
 import BackButton from "../BackButton";
 import { GET_DRAFT_STAGES, getStageIndexForTenant } from "../../utils/stages";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useDirection } from "../../[id]/components/AnimationDirectionProvider";
 
 /**
  * TODO:
@@ -28,6 +29,7 @@ const GithubPRForm = ({
   draftProposal: DraftProposal;
   rightColumn: React.ReactNode;
 }) => {
+  const { direction, setDirection } = useDirection();
   const router = useRouter();
   const openDialog = useOpenDialog();
   const { address } = useAccount();
@@ -133,6 +135,7 @@ const GithubPRForm = ({
                 isLoading={isSkipPending}
                 onClick={() => {
                   // If we have already created a PR we don't even need to handleCLick, we can just redirect
+                  setDirection("next");
                   handleSkip();
                 }}
               >
@@ -144,6 +147,7 @@ const GithubPRForm = ({
                 fullWidth={true}
                 isLoading={isCreatePRPending}
                 onClick={() => {
+                  setDirection("next");
                   handleCreatePR();
                 }}
                 className="whitespace-nowrap min-w-[184px]"
@@ -155,46 +159,54 @@ const GithubPRForm = ({
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
-        <AnimatePresence mode="wait">
-          <motion.section
-            className="col-span-1 sm:col-span-2 order-last sm:order-first"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-          >
-            <FormCard>
-              <FormCard.Section>
-                <div className="w-full rounded-md h-[350px] block relative">
-                  <Image
-                    src="/images/ens_temp_check.png"
-                    alt="Temp Check"
-                    fill={true}
-                    className="object-cover rounded-md"
-                  />
-                </div>
-                <p className="mt-4 text-secondary">
-                  {!!github_pr_checklist_item ? (
-                    <span>
-                      You have already started creating docs for this draft
-                      proposal. If you have since updated your proposal, please{" "}
-                      <a
-                        href={github_pr_checklist_item.link || ""}
-                        className="underline"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        edit the docs on Github
-                      </a>{" "}
-                      to account for new details.
-                    </span>
-                  ) : (
-                    "You must submit your proposal to the ENS docs by creating a pull request. Click below to allow Agora to update the docs for you."
-                  )}
-                </p>
-              </FormCard.Section>
-            </FormCard>
-          </motion.section>
-        </AnimatePresence>
+        <motion.section
+          key="draftForm"
+          className="col-span-1 sm:col-span-2 order-last sm:order-first"
+          initial={{
+            opacity: 0,
+            x: direction === "prev" ? -50 : 50,
+            filter: "blur(5px)",
+          }}
+          animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+          exit={{
+            opacity: 0,
+            x: direction === "prev" ? 50 : -50,
+            filter: "blur(5px)",
+          }}
+        >
+          <FormCard>
+            <FormCard.Section>
+              <div className="w-full rounded-md h-[350px] block relative">
+                <Image
+                  src="/images/ens_temp_check.png"
+                  alt="Temp Check"
+                  fill={true}
+                  className="object-cover rounded-md"
+                />
+              </div>
+              <p className="mt-4 text-secondary">
+                {!!github_pr_checklist_item ? (
+                  <span>
+                    You have already started creating docs for this draft
+                    proposal. If you have since updated your proposal, please{" "}
+                    <a
+                      href={github_pr_checklist_item.link || ""}
+                      className="underline"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      edit the docs on Github
+                    </a>{" "}
+                    to account for new details.
+                  </span>
+                ) : (
+                  "You must submit your proposal to the ENS docs by creating a pull request. Click below to allow Agora to update the docs for you."
+                )}
+              </p>
+            </FormCard.Section>
+          </FormCard>
+        </motion.section>
+
         <section className="col-span-1">{rightColumn}</section>
       </div>
     </main>

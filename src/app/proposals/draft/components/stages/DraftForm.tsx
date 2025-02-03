@@ -35,9 +35,8 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import DeleteDraftButton from "../DeleteDraftButton";
 import BackButton from "../BackButton";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useDirection } from "../../[id]/components/AnimationDirectionProvider";
-import MorphingText from "../MorphingText";
 
 const DEFAULT_FORM = {
   type: ProposalType.BASIC,
@@ -133,6 +132,7 @@ const DraftForm = ({
 
   const onSubmit = async (data: z.output<typeof DraftProposalSchema>) => {
     setIsPending(true);
+    setDirection("next");
 
     try {
       if (!address) {
