@@ -11,7 +11,7 @@ async function getAuthorityChains({
   address: string;
   blockNumber: number;
 }): Promise<Array<string[]>> {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
   const chainsQuery = prisma.$queryRawUnsafe<AuthorityChainsSnaps[]>(
     `
     SELECT
@@ -42,9 +42,15 @@ async function getAuthorityChains({
     blockNumber
   );
 
+  const latestBlockNumberPromise: Promise<number> = ui.toggle(
+    "use-l1-block-number"
+  )?.enabled
+    ? contracts.providerForTime?.getBlockNumber()
+    : contracts.token.provider.getBlockNumber();
+
   const [chains, latestBlockNumber] = await Promise.all([
     chainsQuery,
-    contracts.token.provider.getBlockNumber(),
+    latestBlockNumberPromise,
   ]);
 
   const reversedChains = chains

@@ -5,11 +5,18 @@ import Tenant from "@/lib/tenant/tenant";
 import { ProposalPayload } from "./proposal";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
+import { Block } from "ethers";
 
 async function getNeedsMyVoteProposals(address: string) {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
+
+  const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
+    ?.enabled
+    ? contracts.providerForTime?.getBlock("latest")
+    : contracts.token.provider.getBlock("latest");
+
   const [latestBlock, votableSupply] = await Promise.all([
-    contracts.token.provider.getBlock("latest"),
+    latestBlockPromise,
     fetchVotableSupply(),
   ]);
 

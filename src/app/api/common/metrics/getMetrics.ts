@@ -5,7 +5,7 @@ import { getPublicClient } from "@/lib/viem";
 import { findVotableSupply } from "@/lib/prismaUtils";
 
 async function getMetrics() {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
 
   try {
     let totalSupply;
@@ -13,7 +13,11 @@ async function getMetrics() {
       totalSupply = await contracts.token.contract.totalSupply();
     } else if (contracts.token.isERC721()) {
       const token = contracts.token.contract as IMembershipContract;
-      const publicClient = getPublicClient(contracts.token.chain);
+      const publicClient = getPublicClient(
+        ui.toggle("use-l1-block-number")?.enabled
+          ? contracts.chainForTime
+          : contracts.token.chain
+      );
       const blockNumber = await publicClient.getBlockNumber();
       totalSupply = await token.getPastTotalSupply(Number(blockNumber) - 1);
     } else {

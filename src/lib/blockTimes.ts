@@ -2,7 +2,11 @@
 import Tenant from "@/lib/tenant/tenant";
 import { Block } from "ethers";
 
-const chainId = Tenant.current().contracts.token.chain.id;
+const { contracts, ui } = Tenant.current();
+
+const chainId = ui.toggle("use-l1-block-number")?.enabled
+  ? contracts.chainForTime?.id
+  : contracts.token.chain.id;
 
 export function secondsToBlocks(seconds: number): number {
   return Math.floor(seconds / getSecondsPerBlock());

@@ -40,7 +40,11 @@ const DraftPreview = ({
   const { address } = useAccount();
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
-  const { data: blockNumber } = useBlockNumber();
+  const { data: blockNumber } = useBlockNumber({
+    chainId: tenant.ui.toggle("use-l1-block-number")?.enabled
+      ? tenant.contracts.chainForTime?.id
+      : undefined,
+  });
 
   const { data: accountVotes } = useReadContract({
     chainId: tenant.contracts.governor.chain.id,

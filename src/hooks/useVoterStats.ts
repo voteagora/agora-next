@@ -2,6 +2,7 @@ import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { fetchVoterStats } from "@/app/delegates/actions";
 import { VoterStats } from "@/lib/types";
 import { getPublicClient } from "@/lib/viem";
+import Tenant from "@/lib/tenant/tenant";
 
 export const VOTER_STATS_QK = "voterStats";
 
@@ -14,7 +15,12 @@ interface Props {
 export const useVoterStats = ({
   address,
 }: Props): UseQueryResult<VoterStats, Error> => {
-  const publicClient = getPublicClient();
+  const { contracts, ui } = Tenant.current();
+  const publicClient = getPublicClient(
+    ui.toggle("use-l1-block-number")?.enabled
+      ? contracts.chainForTime
+      : undefined
+  );
 
   return useQuery<VoterStats, Error>({
     enabled: !!address,

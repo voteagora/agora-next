@@ -7,7 +7,7 @@ import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembersh
 import { TENANT_NAMESPACES } from "./constants";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { DelegateChunk } from "@/app/staking/components/delegates/DelegateCardList";
-
+import { Chain } from "viem/chains";
 export type MetricTimeSeriesValue = {
   day: string;
   date: string;
@@ -44,6 +44,8 @@ export type TenantContracts = {
   treasury?: string[]; // We don't interact with them, but maybe one day we will.
   governorApprovalModule?: string;
   delegationModel?: DELEGATION_MODEL;
+  chainForTime?: Chain;
+  providerForTime?: AlchemyProvider;
 };
 
 export type TenantToken = {
