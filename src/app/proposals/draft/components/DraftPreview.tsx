@@ -17,6 +17,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import toast from "react-hot-toast";
 import MarkdownPreview from "@uiw/react-markdown-preview";
+import { rgbStringToHex } from "@/app/lib/utils/color";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -254,6 +255,7 @@ const DraftPreview = ({
             className={`h-full text-primary py-3 px-4 rounded-t-lg max-w-full bg-transparent prose`}
             style={{
               backgroundColor: "transparent",
+              color: rgbStringToHex(tenant.ui.customization?.secondary),
             }}
             wrapperElement={{
               "data-color-mode": "light",
