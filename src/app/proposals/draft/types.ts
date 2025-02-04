@@ -256,3 +256,8 @@ export const proposalTypeDescriptionMap = {
   [ProposalType.APPROVAL]:
     "Approval proposals are onchain proposals that are used to approve multiple options.",
 } as Record<ProposalType, string>;
+
+export enum Visibility {
+  PUBLIC = "Public",
+  PRIVATE = "Private",
+}
