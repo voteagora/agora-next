@@ -28,9 +28,9 @@ const SponsorSnapshotProposalDialog = ({
             />
             <div className="text-2xl font-black">Proposal complete!</div>
             <div className="flex flex-row justify-between items-center mt-4">
-              <span className="text-agora-stone-700">Snapshot proposal</span>
+              <span className="text-secondary">Snapshot proposal</span>
               <div className="flex flex-row items-center space-x-2">
-                <span className="text-green-500">Created</span>
+                <span className="text-positive">Created</span>
 
                 <Link href={snapshotLink}>
                   <Image

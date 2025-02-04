@@ -19,7 +19,7 @@ const VoteDetails = ({ vote }: { vote: SnapshotVote }) => {
 
   return (
     <div
-      className={`text-xs mt-1 font-medium space-x-[3px] ${isFor ? "text-green-700" : isAgainst ? "text-red-700" : "text-stone-500"}`}
+      className={`text-xs mt-1 font-medium space-x-[3px] ${isFor ? "text-positive" : isAgainst ? "text-negative" : "text-tertiary"}`}
     >
       {choiceLabels.map((label: string, idx: number) => {
         return (

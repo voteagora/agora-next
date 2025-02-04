@@ -77,7 +77,7 @@ export function UpdatedButton({
             type === "destructive" &&
               "bg-white text-red-500 hover:text-red-700",
             type === "disabled" &&
-              "bg-agora-stone-50 text-agora-stone-100 cursor-not-allowed",
+              "bg-wash text-tertiary/50 cursor-not-allowed",
             variant === "rounded" ? "rounded-full" : "rounded-lg",
             fullWidth && "w-full"
           )}

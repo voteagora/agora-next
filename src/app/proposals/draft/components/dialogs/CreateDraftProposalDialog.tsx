@@ -11,10 +11,10 @@ const CreateDraftProposalDialog = ({
 }) => {
   return (
     <div>
-      <span className="block h-[150px] w-full bg-agora-stone-100 rounded-lg"></span>
+      <span className="block h-[150px] w-full bg-wash rounded-lg"></span>
       <h3 className="font-black text-2xl mt-6">Draft successfully created</h3>
       <div className="flex flex-row justify-between items-center mt-6">
-        <span className="text-agora-stone-700">Update ENS docs</span>
+        <span className="text-secondary">Update ENS docs</span>
         <div className="flex flexr-row items-center space-x-2">
           <span className="text-green-500">Completed</span>
           <a href={githubUrl} target="_blank" rel="noreferrer">

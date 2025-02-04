@@ -56,7 +56,7 @@ const SocialProposalForm = () => {
         <h3 className="text-primary font-semibold">
           Voting strategy and choices
         </h3>
-        <p className="mt-2 stone-700">
+        <p className="mt-2 text-secondary">
           Choose the voting strategy and options for your proposal.
         </p>
       </div>
