@@ -233,7 +233,7 @@ const DraftForm = ({
                         name="type"
                       />
 
-                      <p className="text-sm self-center text-agora-stone-700 mt-6">
+                      <p className="text-sm self-center text-secondary mt-6">
                         {ProposalTypeMetadata[votingModuleType].description}
                       </p>
                     </div>
