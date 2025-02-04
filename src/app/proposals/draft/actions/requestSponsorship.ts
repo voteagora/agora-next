@@ -7,7 +7,7 @@ import {
   getStageByIndex,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
-
+import { Visibility } from "../types";
 export type FormState = {
   ok: boolean;
   message: string;
@@ -36,10 +36,19 @@ export async function onSubmitAction(
       },
       data: {
         stage: nextStage?.stage,
-        is_public: parsed.data.is_public,
+        is_public: parsed.data.visibility === Visibility.PUBLIC,
         approved_sponsors: {
-          create: parsed.data.sponsors.map((sponsor) => ({
-            sponsor_address: sponsor.address,
+          upsert: parsed.data.sponsors.map((sponsor) => ({
+            where: {
+              sponsor_address_proposal_id: {
+                sponsor_address: sponsor.address,
+                proposal_id: data.draftProposalId,
+              },
+            },
+            update: {},
+            create: {
+              sponsor_address: sponsor.address,
+            },
           })),
         },
       },

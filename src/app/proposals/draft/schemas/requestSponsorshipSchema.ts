@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { isAddress } from "viem";
-import { DraftProposal } from "../types";
+import { DraftProposal, Visibility } from "../types";
 
 export const schema = z
   .object({
-    is_public: z.boolean(),
+    visibility: z.nativeEnum(Visibility),
     sponsors: z.array(
       z.object({
         address: z
@@ -16,7 +16,7 @@ export const schema = z
       })
     ),
   })
-  .refine((data) => data.is_public || data.sponsors.length > 0, {
+  .refine((data) => data.visibility === "Public" || data.sponsors.length > 0, {
     message: "Please make this proposal public or add at least one sponsor.",
   });
 

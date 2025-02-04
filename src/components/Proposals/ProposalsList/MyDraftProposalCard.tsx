@@ -30,8 +30,9 @@ const MyDraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
       <div className="py-4 px-6 flex flex-row gap-4 items-center">
         <div className="w-full sm:w-[60%] flex flex-col justify-between gap-1">
           <div className="flex flex-row gap-1 text-xs text-tertiary">
-            <div>
-              Created by <HumanAddress address={proposal.author_address} />
+            <div className="flex flex-row gap-1">
+              <span className="text-secondary">Created by</span>
+              <HumanAddress address={proposal.author_address} />
             </div>
           </div>
           <div className="flex flex-row gap-1">

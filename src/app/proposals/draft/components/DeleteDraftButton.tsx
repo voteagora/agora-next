@@ -53,7 +53,7 @@ export const DeleteDraftProposalDialog = ({
         </div>
       </div>
       <h3 className="text-primary text-xl font-bold mt-4">
-        Are you sure you want to delete your proposal?
+        Are you sure you want to delete this draft?
       </h3>
       <div className="flex flex-col items-center gap-2 mt-4">
         <UpdatedButton

@@ -13,8 +13,8 @@ import {
   DraftProposal,
   PLMConfig,
   ProposalType,
+  Visibility,
 } from "../../types";
-import { useManager } from "@/hooks/useManager";
 import DeleteDraftButton from "../DeleteDraftButton";
 import BackButton from "../BackButton";
 import { GET_DRAFT_STAGES, getStageIndexForTenant } from "../../utils/stages";
@@ -26,7 +26,6 @@ import MarkdownPreview from "@uiw/react-markdown-preview";
 import ProposalRequirements from "../ProposalRequirements";
 import Tenant from "@/lib/tenant/tenant";
 import { useCanSponsor } from "../../hooks/useCanSponsor";
-import { ProposalGatingType } from "../../types";
 import { useAccount } from "wagmi";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -39,12 +38,6 @@ import SponsorInput from "../SponsorInput";
 import SponsorActions from "../../../sponsor/components/SponsorActions";
 import { useDirection } from "../../[id]/components/AnimationDirectionProvider";
 import { motion } from "framer-motion";
-import { truncateAddress } from "@/app/lib/utils/text";
-
-enum Visibility {
-  PUBLIC = "Public",
-  PRIVATE = "Private",
-}
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -109,13 +102,8 @@ const SubmitForm = ({
   const { ui } = Tenant.current();
   const plmToggle = ui.toggle("proposal-lifecycle");
   const proposalLifecycleConfig = plmToggle?.config as PLMConfig;
-  const gatingType = proposalLifecycleConfig?.gatingType;
   const tenantSupportsPublicDrafts = proposalLifecycleConfig?.public;
-  const methods = useForm<
-    z.output<typeof requestSponsorshipSchema> & {
-      visibility: Visibility;
-    }
-  >({
+  const methods = useForm<z.output<typeof requestSponsorshipSchema>>({
     resolver: zodResolver(requestSponsorshipSchema),
     defaultValues: {
       ...(parseToForm(draftProposal) || DEFAULT_FORM),
@@ -126,12 +114,9 @@ const SubmitForm = ({
   });
 
   const { address } = useAccount();
-  const { data: manager } = useManager();
   const { data: canAddressSponsor } = useCanSponsor(address as `0x${string}`);
-
   const stageIndex = getStageIndexForTenant("AWAITING_SUBMISSION") as number;
   const DRAFT_STAGES_FOR_TENANT = GET_DRAFT_STAGES()!;
-
   const [isPending, setIsPending] = useState(false);
   const { fields, append, remove } = useFieldArray({
     control: methods.control,
@@ -180,7 +165,7 @@ const SubmitForm = ({
                     setIsPending(true);
                     const res = await requestSponsorshipAction({
                       draftProposalId: draftProposal.id,
-                      is_public: visibility === Visibility.PUBLIC,
+                      visibility: visibility,
                       sponsors: sponsors.filter(
                         (sponsor: { address: `0x${string}` }) =>
                           isAddress(sponsor.address)
