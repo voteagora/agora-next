@@ -521,6 +521,12 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
         )
       : cachedNumOfDelegators;
 
+  const votingPowerRelativeToVotableSupplyExponential = votableSupply && BigInt(votableSupply) > 0n
+    ? Number(Number(totalVotingPower) / Number(votableSupply)).toExponential(3)
+    : 0;
+  
+  const votingPowerRelativeToVotableSupply = Number(votingPowerRelativeToVotableSupplyExponential);
+
   // Build out delegate JSON response
   return {
     address: address,
@@ -530,10 +536,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       direct: delegate?.voting_power?.toString() || "0",
       advanced: delegate?.advanced_vp?.toFixed(0) || "0",
     },
-    votingPowerRelativeToVotableSupply:
-      votableSupply && BigInt(votableSupply) > 0n
-        ? Number(totalVotingPower / BigInt(votableSupply || 0))
-        : 0,
+    votingPowerRelativeToVotableSupply,
     votingPowerRelativeToQuorum:
       quorum && quorum > 0n
         ? Number((totalVotingPower * 10000n) / quorum) / 10000
