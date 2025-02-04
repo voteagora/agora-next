@@ -67,7 +67,7 @@ export const scrollTenantUIConfig = new TenantUI({
     },
     {
       name: "partial-delegation-faq",
-      title: "FAQ",
+      title: "partial delegation FAQ",
       url: "https://agoraxyz.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c",
     },
   ],

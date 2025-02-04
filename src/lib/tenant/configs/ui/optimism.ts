@@ -77,7 +77,7 @@ export const optimismTenantUIConfig = new TenantUI({
     },
     {
       name: "advanced-delegation-faq",
-      title: "FAQ",
+      title: "advanced delegation FAQ",
       url: "https://agoraxyz.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c",
     },
     {
