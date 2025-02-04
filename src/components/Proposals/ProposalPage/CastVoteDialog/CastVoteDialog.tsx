@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import HumanAddress from "@/components/shared/HumanAddress";
 import Image from "next/image";
 import Link from "next/link";
 import useAdvancedVoting from "../../../../hooks/useAdvancedVoting";
@@ -15,6 +13,7 @@ import useStandardVoting from "@/hooks/useStandardVoting";
 import Tenant from "@/lib/tenant/tenant";
 import { useScwVoting } from "@/hooks/useScwVoting";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import ENSName from "@/components/shared/ENSName";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
@@ -72,7 +71,7 @@ const SCWVoteDialog = ({
             <div className="flex flex-col">
               {delegate.address ? (
                 <div className="text-xs text-tertiary font-medium">
-                  <HumanAddress address={delegate.address} />
+                  <ENSName address={delegate.address} />
                 </div>
               ) : (
                 <div className="text-xs text-tertiary font-medium">
@@ -171,7 +170,7 @@ const BasicVoteDialog = ({
             <div className="flex flex-col">
               {delegate.address ? (
                 <div className="text-xs text-tertiary font-medium">
-                  <HumanAddress address={delegate.address} />
+                  <ENSName address={delegate.address} />
                 </div>
               ) : (
                 <div className="text-xs text-tertiary font-medium">
@@ -281,7 +280,7 @@ function AdvancedVoteDialog({
             <div className="flex flex-col">
               {delegate.address ? (
                 <div className="text-xs text-tertiary font-medium">
-                  <HumanAddress address={delegate.address} />
+                  <ENSName address={delegate.address} />
                 </div>
               ) : (
                 <div className="text-xs text-tertiary font-medium">

@@ -6,16 +6,12 @@ import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
 import ProposalTransactionDisplay from "../ApprovedTransactions/ProposalTransactionDisplay";
 import ProposalChart from "../ProposalChart/ProposalChart";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
-import { PaginatedResult } from "@/app/lib/pagination";
 import Markdown from "@/components/shared/Markdown/Markdown";
 
 export default function ProposalDescription({
   proposal,
-  proposalVotes,
 }: {
   proposal: Proposal;
-  proposalVotes: PaginatedResult<Vote[]>;
 }) {
   const proposalsWithBadDescription = [
     "94365805422398770067924881378455503928423439630602149628781926844759467250082",
@@ -59,7 +55,7 @@ export default function ProposalDescription({
   return (
     <div className={`flex flex-col gap-4 ${styles.proposal_description}`}>
       <ProposalTitle title={shortTitle} proposal={proposal} />
-      <ProposalChart proposal={proposal} proposalVotes={proposalVotes} />
+      <ProposalChart proposal={proposal} />
 
       <div className="flex flex-col gap-2">
         {/* Right now I'm only sure this better decoded component works for standard proposals */}

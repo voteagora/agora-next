@@ -28,7 +28,7 @@ export const Breadcrumbs = ({
   };
 
   return (
-    <div className="flex flex-row gap-3 mb-5 items-center">
+    <div className="flex flex-row gap-3 mb-5 items-center text-primary">
       <Button
         className="w-8 h-8 border bg-neutral rounded-full items-center justify-center mr-2 shadow-newDefault"
         variant="secondary"
@@ -39,7 +39,7 @@ export const Breadcrumbs = ({
       </Button>
 
       <div className="text-xl font-bold">{title}</div>
-      <div className="text-sm">
+      <div className="text-sm text-secondary">
         Step {step}/{totalSteps}
       </div>
     </div>

@@ -1,12 +1,11 @@
 import { Vote } from "@/app/api/common/votes/vote";
-import { useAccount } from "wagmi";
+import { useAccount, useEnsName } from "wagmi";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { VStack, HStack } from "@/components/Layout/Stack";
-import HumanAddress from "@/components/shared/HumanAddress";
+import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import VoteText from "../VoteText/VoteText";
 import VoterHoverCard from "../VoterHoverCard";
@@ -14,7 +13,7 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { getBlockScanUrl, timeout } from "@/lib/utils";
 import { useState } from "react";
 import ENSAvatar from "@/components/shared/ENSAvatar";
-import { useEnsName } from "wagmi";
+import ENSName from "@/components/shared/ENSName";
 
 export function ProposalSingleVote({
   vote,
@@ -62,7 +61,7 @@ export function ProposalSingleVote({
             >
               <HStack gap={1} alignItems="items-center">
                 <ENSAvatar ensName={data} className="w-5 h-5" />
-                <HumanAddress address={vote.address} />
+                <ENSName address={vote.address} />
                 {vote.address === connectedAddress?.toLowerCase() && (
                   <p>(you)</p>
                 )}

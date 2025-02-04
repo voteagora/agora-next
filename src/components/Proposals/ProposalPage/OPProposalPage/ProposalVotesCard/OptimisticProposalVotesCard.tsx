@@ -7,46 +7,31 @@ import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/Proposal
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
-import { PaginatedResult } from "@/app/lib/pagination";
-import { Vote } from "@/app/api/common/votes/vote";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import ProposalVotesFilter from "./ProposalVotesFilter";
 import Tenant from "@/lib/tenant/tenant";
 
-const OptimisticProposalVotesCard = ({
-  proposal,
-  proposalVotes,
-  nonVoters,
-  disapprovalThreshold,
-  againstRelativeAmount,
-  againstLengthString,
-  fetchProposalVotes,
-  fetchDelegate,
-  fetchDelegateStatement,
-  fetchUserVotesForProposal,
-  fetchCurrentDelegators,
-  status,
-}: {
+interface Props {
   proposal: Proposal;
-  proposalVotes: any;
-  nonVoters: any;
   disapprovalThreshold: number;
   againstRelativeAmount: string;
   againstLengthString: string;
-  fetchProposalVotes: Promise<PaginatedResult<Vote[]>>;
-  fetchDelegate: (address: string) => void;
-  fetchDelegateStatement: (address: string) => void;
-  fetchUserVotesForProposal: (proposalId: string) => void;
-  fetchCurrentDelegators: (proposalId: string) => void;
   status: string;
-}) => {
+}
+
+const OptimisticProposalVotesCard = ({
+  proposal,
+  disapprovalThreshold,
+  againstRelativeAmount,
+  againstLengthString,
+  status,
+}: Props) => {
   const { token } = Tenant.current();
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [showVoters, setShowVoters] = useState(true);
+
   const handleClick = () => {
     setIsClicked(!isClicked);
-    // var div = document.getElementsByClassName("mobile-web-scroll-div")[0];
-    // div.scrollTop = 0;
   };
   return (
     <div
@@ -76,8 +61,8 @@ const OptimisticProposalVotesCard = ({
                 <p
                   className={
                     status === "approved"
-                      ? "text-green-positive font-bold"
-                      : "text-red-negative font-bold"
+                      ? "text-positive font-bold"
+                      : "text-negative font-bold"
                   }
                 >
                   This proposal is optimistically {status}
@@ -110,15 +95,9 @@ const OptimisticProposalVotesCard = ({
         </div>
         {/* Show the scrolling list of votes for the proposal */}
         {showVoters ? (
-          <ProposalVotesList
-            initialProposalVotes={proposalVotes}
-            proposalId={proposal.id}
-          />
+          <ProposalVotesList proposalId={proposal.id} />
         ) : (
-          <ProposalNonVoterList
-            proposal={proposal}
-            initialNonVoters={nonVoters}
-          />
+          <ProposalNonVoterList proposal={proposal} />
         )}
         {/* Show the input for the user to vote on a proposal if allowed */}
         <CastVoteInput proposal={proposal} isOptimistic />

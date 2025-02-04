@@ -6,7 +6,7 @@ import {
 import prisma from "@/app/lib/prisma";
 import { cache } from "react";
 import { isAddress } from "viem";
-import { resolveENSName } from "@/app/lib/ENSUtils";
+import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import {
   type Delegate,
   DelegateChunk,
@@ -361,7 +361,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   const { namespace, contracts, slug } = Tenant.current();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
-    : await resolveENSName(addressOrENSName);
+    : await ensNameToAddress(addressOrENSName);
 
   // Eventually want to deprecate voter_stats from this query
   // we are already relying on getVoterStats below
@@ -558,7 +558,7 @@ async function getVoterStats(
   const { namespace, contracts } = Tenant.current();
   const address = isAddress(addressOrENSName)
     ? addressOrENSName.toLowerCase()
-    : await resolveENSName(addressOrENSName);
+    : await ensNameToAddress(addressOrENSName);
 
   const statsQuery = await prisma.$queryRawUnsafe<
     Pick<DelegateStats, "voter" | "last_10_props">[]
@@ -580,19 +580,18 @@ async function getVoterStats(
         AND cancelled_block IS NULL
     )
     SELECT
-        v.voter,
-        sum(COALESCE((
+        COALESCE(v.voter, $1) as voter,
+        COALESCE(sum((
             SELECT count(DISTINCT last_10_props.proposal_id) AS count
             FROM last_10_props
             WHERE last_10_props.proposal_id = v.proposal_id
-        ), 0::bigint)) AS last_10_props,
+        )), 0::bigint) AS last_10_props,
         total_proposals.count AS total_proposals
-    FROM ${namespace}.votes v
-    CROSS JOIN total_proposals
-    WHERE
+    FROM total_proposals
+    LEFT JOIN ${namespace}.votes v ON
         v.voter = $1
         AND v.contract = $2
-    GROUP BY v.voter, v.contract, total_proposals.count;
+    GROUP BY COALESCE(v.voter, $1), total_proposals.count;
     `,
     address,
     contracts.governor.address.toLowerCase(),

@@ -6,10 +6,8 @@ import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvid
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { Delegation } from "@/app/api/common/delegations/delegation";
-import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
-import Tenant from "@/lib/tenant/tenant";
 import DelegateCard from "./DelegateCard";
 
 interface Props {
@@ -27,11 +25,9 @@ export default function DelegateCardList({
   fetchDelegates,
   isDelegatesCitizensFetching,
 }: Props) {
-  const { token } = Tenant.current();
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.data);
-  const { advancedDelegators } = useConnectedDelegate();
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
 
   useEffect(() => {

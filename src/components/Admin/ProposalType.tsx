@@ -22,6 +22,8 @@ import {
 } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { getVotingModuleTypeForProposalType } from "@/lib/utils";
+import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 
 type Props = {
   proposalType: ProposalType;
@@ -87,32 +89,15 @@ export default function ProposalType({
     });
 
   const formValues = form.watch();
-  const setProposalTypeArgs = [
-    BigInt(index),
-    Math.round(formValues.quorum * 100),
-    Math.round(formValues.approval_threshold * 100),
-    formValues.name,
-  ];
-
-  // TODO: Replace this with a governor-level flag
-  // TODO: Aso add proposal type configurator version flag.
-  if (namespace === TENANT_NAMESPACES.CYBER) {
-    setProposalTypeArgs.push("0x" + "0".repeat(40));
-  }
-
-  const { data: setProposalTypeConfig, isError: setProposalTypeError } =
-    useSimulateContract({
-      address: contracts.proposalTypesConfigurator!.address as `0x${string}`,
-      abi: contracts.proposalTypesConfigurator!.abi,
-      functionName: "setProposalType",
-      args: setProposalTypeArgs,
-    });
 
   const {
     data: resultSetProposalType,
     writeContract: writeSetProposalType,
     isPending: isLoadingSetProposalType,
+    isError: isErrorSetProposalType,
+    error: setProposalTypeError,
   } = useWriteContract();
+
   const { isLoading: isLoadingSetProposalTypeTransaction } =
     useWaitForTransactionReceipt({
       hash: resultSetProposalType,
@@ -125,7 +110,34 @@ export default function ProposalType({
   const isDisabled = isLoading || name == "Optimistic";
 
   function onSubmit(values: z.infer<typeof proposalTypeSchema>) {
-    writeSetProposalType(setProposalTypeConfig!.request);
+    const name = values.name;
+    const votingModuleType = getVotingModuleTypeForProposalType({
+      quorum,
+      approval_threshold,
+      name,
+    });
+
+    const proposalTypeAddress = getProposalTypeAddress(votingModuleType);
+
+    if (!proposalTypeAddress) {
+      throw new Error("Proposal type address not found");
+    }
+
+    const setProposalTypeArgs = [
+      BigInt(index),
+      Math.round(formValues.quorum * 100),
+      Math.round(formValues.approval_threshold * 100),
+      formValues.name,
+      formValues.description || "",
+      proposalTypeAddress,
+    ];
+
+    writeSetProposalType({
+      address: contracts.proposalTypesConfigurator?.address as `0x${string}`,
+      abi: contracts.proposalTypesConfigurator?.abi,
+      functionName: "setProposalType",
+      args: setProposalTypeArgs,
+    });
   }
 
   return (
@@ -133,14 +145,14 @@ export default function ProposalType({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 my-4">
         <div>
           <div className="flex justify-between items-center">
-            <p className="text-sm font-semibold text-primary">
+            <p className="text-sm font-semibold text-secondary">
               Proposal type {index + 1}
             </p>
             <Button
               size="icon"
               variant="ghost"
               className="hover:bg-destructive/10 group w-9 h-9"
-              disabled={isDisabled || setProposalTypeError}
+              disabled={isDisabled || isErrorSetProposalType}
               onClick={() => {
                 writeDeleteProposalType(deleteProposalTypeConfig!.request);
               }}
@@ -252,7 +264,7 @@ export default function ProposalType({
           className="w-full"
           variant="outline"
           loading={isLoading}
-          disabled={isDisabled || setProposalTypeError}
+          disabled={isDisabled || isErrorSetProposalType}
         >
           Set proposal type
         </Button>

@@ -1,3 +1,5 @@
+"use client";
+
 import { AdvancedDelegationDisplayAmount } from "./AdvancedDelegationDisplayAmount";
 import SubdelegationToRow from "./SubdelegationRow";
 import useAdvancedDelegation from "./useAdvancedDelegation";
@@ -30,6 +32,8 @@ import { resolveENSName } from "@/app/lib/ENSUtils";
 import { fetchDelegate } from "@/app/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
 import { config } from "@/app/Web3Provider";
+import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -60,7 +64,7 @@ export function AdvancedDelegateDialog({
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
   const { setOpen } = useModal();
   const params = useParams<{ addressOrENSName: string }>();
-  const { ui } = Tenant.current();
+  const { ui, slug } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const fetchData = useCallback(async () => {
@@ -159,6 +163,14 @@ export function AdvancedDelegateDialog({
 
     const tx = await writeAsync();
     await waitForTransactionReceipt(config, { hash: tx });
+    trackEvent({
+      event_name: ANALYTICS_EVENT_NAMES.ADVANCED_DELEGATE,
+      event_data: {
+        delegatees: delegatees,
+        delegator: address as `0x${string}`,
+        transaction_hash: tx,
+      },
+    });
 
     const { prevVotingPower, postVotingPower, pageDelegateeAddress } =
       await getVotingPowerPageDelegatee();
@@ -325,7 +337,7 @@ function InfoDialog({
           </div>
           {delegators?.map((delegator, index) => (
             <div
-              className="flex flex-row w-full items-center justify-between"
+              className="flex flex-row w-full items-center justify-between text-primary"
               key={index}
             >
               <p>

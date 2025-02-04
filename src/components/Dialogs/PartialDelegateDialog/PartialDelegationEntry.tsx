@@ -1,12 +1,12 @@
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import ENSAvatar from "@/components/shared/ENSAvatar";
-import HumanAddress from "@/components/shared/HumanAddress";
 import { useEnsName } from "wagmi";
 import { Input } from "@/components/ui/input";
 import Tenant from "@/lib/tenant/tenant";
 import { formatUnits } from "viem";
 import { useEffect, useState } from "react";
 import { formatPercentageWithPrecision } from "@/lib/utils";
+import ENSName from "@/components/shared/ENSName";
 
 interface Props {
   delegation: Delegation;
@@ -56,8 +56,8 @@ export const PartialDelegationEntry = ({
         <ENSAvatar ensName={ensName} className="h-10 w-10" />
         <div className="flex flex-col">
           <div className="text-xs font-medium text-secondary">Delegated to</div>
-          <div className="w-full font-medium text-ellipsis overflow-hidden max-w-[6rem] sm:max-w-[8rem]">
-            <HumanAddress address={delegation.to} />
+          <div className="text-primary w-full font-medium text-ellipsis overflow-hidden max-w-[6rem] sm:max-w-[8rem]">
+            <ENSName address={delegation.to} />
           </div>
         </div>
       </div>

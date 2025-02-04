@@ -21,6 +21,19 @@ export type StakedDeposit = {
   id: number;
 };
 
+export type ChartVote = {
+  voter: string;
+  support: string;
+  weight: string;
+  block_number: string;
+};
+
+export type VoterStats = {
+  voter: string;
+  total_proposals: number;
+  last_10_props: number;
+};
+
 export type TenantNamespace =
   (typeof TENANT_NAMESPACES)[keyof typeof TENANT_NAMESPACES];
 
@@ -84,3 +97,70 @@ export type RetroPGFProject = {
     description: string;
   }[];
 };
+
+// Analytics events
+export enum ANALYTICS_EVENT_NAMES {
+  STANDARD_VOTE = "standard_vote",
+  ADVANCED_VOTE = "advanced_vote",
+  DELEGATE = "delegate",
+  ADVANCED_DELEGATE = "advanced_delegate",
+  PARTIAL_DELEGATION = "partial_delegation",
+  CREATE_PROPOSAL = "create_proposal",
+}
+
+export type AnalyticsEvent =
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE;
+      event_data: {
+        proposal_id: string;
+        support: number;
+        voter: `0x${string}`;
+        transaction_hash: string;
+        reason?: string;
+        params?: `0x${string}`;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.ADVANCED_VOTE;
+      event_data: {
+        proposal_id: string;
+        support: number;
+        voter: `0x${string}`;
+        transaction_hash: string;
+        reason?: string;
+        params?: `0x${string}`;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.DELEGATE;
+      event_data: {
+        delegator: `0x${string}`;
+        delegate: `0x${string}`;
+        transaction_hash: string;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.ADVANCED_DELEGATE;
+      event_data: {
+        delegatees: DelegateChunk[];
+        delegator: `0x${string}`;
+        transaction_hash: string;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.CREATE_PROPOSAL;
+      event_data: {
+        transaction_hash: string;
+        uses_plm: boolean;
+        proposal_data: any;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.PARTIAL_DELEGATION;
+      event_data: {
+        transaction_hash: string;
+        delegatees: DelegateChunk[];
+        delegator: `0x${string}`;
+        is_scw: boolean;
+      };
+    };

@@ -10,7 +10,7 @@ interface Props {
 
 export const PartialDelegationSuccess = ({ hash, closeDialog }: Props) => {
   const { ui } = Tenant.current();
-  const faqLink = ui.link('faq');
+  const faqLink = ui.link("faq");
   return (
     <div>
       <div className="w-full">

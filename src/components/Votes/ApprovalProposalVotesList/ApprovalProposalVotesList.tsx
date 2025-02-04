@@ -6,43 +6,53 @@ import { useAccount } from "wagmi";
 import { type Vote } from "@/app/api/common/votes/vote";
 import ApprovalProposalSingleVote from "./ApprovalProposalSingleVote";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
+import { useProposalVotes } from "@/hooks/useProposalVotes";
+import { cn } from "@/lib/utils";
 
 type Props = {
-  initialProposalVotes: PaginatedResult<Vote[]>;
   fetchVotesForProposal: (
     proposalId: string,
     pagintation: PaginationParams
   ) => Promise<PaginatedResult<Vote[]>>;
   fetchUserVotes: (proposalId: string, address: string) => Promise<Vote[]>;
   proposalId: string;
+  isThresholdCriteria: boolean;
 };
 
+const LIMIT = 20;
+
 export default function ApprovalProposalVotesList({
-  initialProposalVotes,
   fetchVotesForProposal,
   fetchUserVotes,
   proposalId,
+  isThresholdCriteria,
 }: Props) {
+  const { data: fetchedVotes, isFetched } = useProposalVotes({
+    enabled: true,
+    limit: LIMIT,
+    offset: 0,
+    proposalId: proposalId,
+  });
+
   const fetching = useRef(false);
-  const [pages, setPages] = useState([initialProposalVotes]);
-  const [meta, setMeta] = useState(initialProposalVotes.meta);
+
+  const [pages, setPages] = useState<PaginatedResult<Vote[]>[]>([]);
+  const [meta, setMeta] = useState<PaginatedResult<Vote[]>["meta"]>();
+
   const [userVotes, setUserVotes] = useState<Vote[]>([]);
   const { address: connectedAddress } = useAccount();
 
-  const proposalVotes = pages.reduce(
-    (all: Vote[], page) => all.concat(page.data),
-    []
-  );
+  const proposalVotes = pages.flatMap((page) => page.data);
 
   const loadMore = async () => {
-    if (!fetching.current && meta.has_next) {
+    if (!fetching.current && meta?.has_next) {
       fetching.current = true;
       const data = await fetchVotesForProposal(proposalId, {
-        limit: 20,
+        limit: LIMIT,
         offset: meta.next_offset,
       });
       const existingIds = new Set(proposalVotes.map((v) => v.transactionHash));
-      const uniqueVotes = data.data.filter(
+      const uniqueVotes = data?.data?.filter(
         (v) => !existingIds.has(v.transactionHash)
       );
       setPages((prev) => [...prev, { ...data, votes: uniqueVotes }]);
@@ -64,6 +74,14 @@ export default function ApprovalProposalVotesList({
     [fetchUserVotes]
   );
 
+  // Set the initial votes list
+  useEffect(() => {
+    if (isFetched && fetchedVotes) {
+      setPages([fetchedVotes]);
+      setMeta(fetchedVotes.meta);
+    }
+  }, [fetchedVotes, isFetched]);
+
   useEffect(() => {
     if (connectedAddress) {
       fetchUserVoteAndSet(proposalId, connectedAddress);
@@ -73,9 +91,16 @@ export default function ApprovalProposalVotesList({
   }, [connectedAddress, proposalId, fetchUserVotes, fetchUserVoteAndSet]);
 
   return (
-    <div className={"overflow-y-scroll max-h-[calc(100vh-437px)]"}>
+    <div
+      className={cn(
+        "overflow-y-scroll",
+        isThresholdCriteria
+          ? "max-h-[calc(100vh-530px)]"
+          : "max-h-[calc(100vh-497px)]"
+      )}
+    >
       <InfiniteScroll
-        hasMore={meta.has_next}
+        hasMore={meta?.has_next}
         pageStart={1}
         loadMore={loadMore}
         useWindow={false}

@@ -2,7 +2,7 @@
 
 import { fetchAllForAdvancedDelegation as apiFetchAllForAdvancedDelegation } from "@/app/api/delegations/getDelegations";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { fetchVotesForDelegate as apiFetchVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import {
   fetchIsDelegatingToProxy,
@@ -24,17 +24,43 @@ import { createDelegateStatement } from "@/app/api/common/delegateStatement/crea
 import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
-export async function fetchDelegate(address: string) {
-  return apiFetchDelegate(address);
-}
 
-export async function fetchVoterStats(address: string, blockNumber?: number) {
-  return apiFetchVoterStats(address, blockNumber);
-}
+export const fetchDelegate = unstable_cache(
+  async (address: string) => {
+    return await apiFetchDelegate(address);
+  },
+  ["delegate"],
+  {
+    revalidate: 180, // 10 minute cache
+    tags: ["delegate"],
+  }
+);
 
-export async function fetchDelegateStatement(address: string) {
-  return apiFetchDelegateStatement(address);
-}
+export const fetchVoterStats = unstable_cache(
+  async (address: string, blockNumber?: number) => {
+    return apiFetchVoterStats(address, blockNumber);
+  },
+  ["voterStats"],
+  {
+    // Cache for 10 minutes unless invalidated by the block
+    // This cache will get invalidated by the block number update
+    revalidate: 600,
+    tags: ["voterStats"],
+  }
+);
+
+export const fetchDelegateStatement = unstable_cache(
+  async (address: string) => {
+    return apiFetchDelegateStatement(address);
+  },
+  ["delegateStatement"],
+  {
+    // Longer cache is acceptable since the statement is not expected to change
+    // often and invalidated with every delegate statement update
+    revalidate: 600, // 10 minute cache
+    tags: ["delegateStatement"],
+  }
+);
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(
@@ -79,6 +105,9 @@ export async function submitDelegateStatement({
     message,
     scwAddress,
   });
+
+  revalidateTag("delegate");
+  revalidateTag("delegateStatement");
   revalidatePath("/delegates/create", "page");
   return response;
 }
@@ -139,6 +168,7 @@ export const fetchConnectedDelegate = async (address: string) => {
 export const revalidateDelegateAddressPage = async (
   delegateAddress: string
 ) => {
+  revalidateTag("delegate");
   revalidatePath(`/delegates/${delegateAddress}`, "page");
 };
 

@@ -4,7 +4,6 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import HumanAddress from "@/components/shared/HumanAddress";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import { useAccount } from "wagmi";
 import { type Vote } from "@/app/api/common/votes/vote";
@@ -15,6 +14,7 @@ import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import ENSAvatar from "@/components/shared/ENSAvatar";
+import ENSName from "@/components/shared/ENSName";
 
 export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
   const { isAdvancedUser } = useIsAdvancedUser();
@@ -55,7 +55,7 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
           >
             <div className="text-primary font-semibold flex items-center">
               <ENSAvatar ensName={voterAddress} className="w-5 h-5 mr-1" />
-              <HumanAddress address={voterAddress} />
+              <ENSName address={voterAddress} />
               {address?.toLowerCase() === voterAddress && (
                 <span>&nbsp;(you)</span>
               )}

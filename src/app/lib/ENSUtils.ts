@@ -1,11 +1,33 @@
 import { truncateAddress } from "@/app/lib/utils/text";
 import { isAddress } from "viem";
-import { cache } from "react";
 import { AlchemyProvider } from "ethers";
+import { unstable_cache } from "next/cache";
+import { cache } from "react";
 
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID;
 const mainnetProvider = new AlchemyProvider("mainnet", alchemyId);
 
+export const ensNameToAddress = unstable_cache(
+  async (nameOrAddress) => {
+    if (isAddress(nameOrAddress)) {
+      return nameOrAddress;
+    }
+
+    const address = await mainnetProvider.resolveName(nameOrAddress);
+
+    if (!address) {
+      throw new Error("No address found for ENS name");
+    }
+
+    return address.toLowerCase();
+  },
+  [],
+  {
+    revalidate: 3600, // 1 hour cache
+  }
+);
+
+// Only used in OP delegation modal  - use ensNameToAddress instead
 export async function resolveENSName(nameOrAddress: string) {
   if (isAddress(nameOrAddress)) {
     return nameOrAddress;

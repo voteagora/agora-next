@@ -14,6 +14,8 @@ import { PartialDelegationSuccess } from "@/components/Dialogs/PartialDelegateDi
 import { formatPercentageWithPrecision } from "@/lib/utils";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { ScwPartialDelegationButton } from "@/components/Dialogs/PartialDelegateDialog/ScwPartialDelegationButton";
+import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 
 interface Props {
   delegate: DelegateChunk;
@@ -127,6 +129,19 @@ export function PartialDelegationDialog({
     setForceResetDelegations((prev) => prev + 1);
   };
 
+  const onSuccess = (hash: `0x${string}`) => {
+    trackEvent({
+      event_name: ANALYTICS_EVENT_NAMES.PARTIAL_DELEGATION,
+      event_data: {
+        transaction_hash: hash,
+        delegatees: delegations,
+        delegator: ownerAddress as `0x${string}`,
+        is_scw: isScwEnabled,
+      },
+    });
+    setSuccessHash(hash);
+  };
+
   const renderTokenBalance = () => {
     if (tokenBalance) {
       return (
@@ -177,13 +192,13 @@ export function PartialDelegationDialog({
         <div className="mt-4">
           {scwAddress ? (
             <ScwPartialDelegationButton
-              onSuccess={setSuccessHash}
+              onSuccess={onSuccess}
               disabled={totalPercentage > 1 || !isUnsaved}
               delegations={delegations}
             />
           ) : (
             <PartialDelegationButton
-              onSuccess={setSuccessHash}
+              onSuccess={onSuccess}
               disabled={totalPercentage > 1 || !isUnsaved}
               delegations={delegations}
             />

@@ -16,6 +16,7 @@ import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
+import { AbiCoder } from "ethers";
 
 /**
  * Vote primitives
@@ -118,12 +119,20 @@ export function parseParams(
   }
 
   try {
-    const parsedParams = JSON.parse(params);
-    return parsedParams[0].map((param: string) => {
-      const idx = Number(param);
+    const hexParams = params.startsWith("0x") ? params : `0x${params}`;
+
+    const decoded = new AbiCoder().decode(["uint256[]"], hexParams);
+
+    const selectedOptions = decoded[0];
+
+    const result = selectedOptions.map((optionIndex: bigint) => {
+      const idx = Number(optionIndex);
       return proposalData.kind.options[idx].description;
     });
+
+    return result;
   } catch (e) {
+    console.error("Error decoding params:", e);
     return null;
   }
 }

@@ -12,7 +12,6 @@ import { apiFetchDelegateWeights } from "@/app/api/analytics/top/delegates/getTo
 import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/getProposalVoteCounts";
 import { apiFetchMetricTS } from "@/app/api/analytics/metric/[metric_id]/[frequency]/getMetricsTS";
 import Hero from "@/components/Hero/Hero";
-import { MetricTimeSeriesValue } from "@/lib/types";
 
 export async function generateMetadata({}) {
   const tenant = Tenant.current();

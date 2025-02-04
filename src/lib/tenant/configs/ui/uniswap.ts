@@ -47,6 +47,11 @@ export const uniswapTenantUIConfig = new TenantUI({
       url: "/changelog",
     },
     {
+      name: "code-of-conduct",
+      title: "Delegate Code of Conduct",
+      url: "https://gov.uniswap.org/t/rfc-delegate-code-of-conduct/20913",
+    },
+    {
       name: "faq",
       title: "FAQ",
       url: OptimismFaqLink,
@@ -241,7 +246,6 @@ export const uniswapTenantUIConfig = new TenantUI({
       name: "sponsoredVote",
       enabled: true,
       config: {
-        version: "1",
         sponsorAddress:
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
             ? "0xc1B333d56Af681F4Db3194F8Dc6cEdF860a8c950"
@@ -253,7 +257,6 @@ export const uniswapTenantUIConfig = new TenantUI({
       name: "sponsoredDelegate",
       enabled: true,
       config: {
-        version: "1",
         sponsorAddress:
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
             ? "0xc1B333d56Af681F4Db3194F8Dc6cEdF860a8c950"

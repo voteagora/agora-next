@@ -63,8 +63,17 @@ const formSchema = z.object({
       .strict()
   ),
   notificationPreferences: z.object({
-    wants_proposal_created_email: z.boolean(),
-    wants_proposal_ending_soon_email: z.boolean(),
+    last_updated: z.string().optional(),
+    wants_proposal_created_email: z.union([
+      z.literal("prompt"),
+      z.literal("prompted"),
+      z.boolean(),
+    ]),
+    wants_proposal_ending_soon_email: z.union([
+      z.literal("prompt"),
+      z.literal("prompted"),
+      z.boolean(),
+    ]),
   }),
 });
 
@@ -153,20 +162,20 @@ export default function CurrentDelegateStatement() {
         (delegateStatement?.payload as { leastValuableProposals?: object[] })
           ?.leastValuableProposals || [],
       notificationPreferences: (delegateStatement?.notification_preferences as {
-        last_updated: string;
         wants_proposal_created_email: boolean;
         wants_proposal_ending_soon_email: boolean;
       }) || {
-        last_updated: new Date().toISOString(),
         wants_proposal_created_email: false,
         wants_proposal_ending_soon_email: false,
       },
+      last_updated: new Date().toISOString(),
     };
   };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: setDefaultValues(delegateStatement),
+    mode: "onChange",
   });
   const { reset } = form;
 

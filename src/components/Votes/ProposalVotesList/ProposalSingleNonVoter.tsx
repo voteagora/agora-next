@@ -1,8 +1,7 @@
-import { VStack, HStack } from "@/components/Layout/Stack";
-import HumanAddress from "@/components/shared/HumanAddress";
+import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
 import ENSAvatar from "@/components/shared/ENSAvatar";
-import { useEnsName, useAccount } from "wagmi";
+import { useAccount, useEnsName } from "wagmi";
 import discordIcon from "@/icons/discord.svg";
 import xIcon from "@/icons/x.svg";
 import warpcastIcon from "@/icons/warpcast.svg";
@@ -12,6 +11,7 @@ import { useGetVotes } from "@/hooks/useGetVotes";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import ENSName from "@/components/shared/ENSName";
 
 export function ProposalSingleNonVoter({
   voter,
@@ -52,7 +52,7 @@ export function ProposalSingleNonVoter({
       >
         <HStack gap={1} alignItems="items-center">
           <ENSAvatar ensName={data} className="w-5 h-5" />
-          <HumanAddress address={voter.delegate} />
+          <ENSName address={voter.delegate} />
           {voter.delegate === connectedAddress?.toLowerCase() && <p>(you)</p>}
           {voter.twitter && (
             <button

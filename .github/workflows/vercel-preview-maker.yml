@@ -1,0 +1,30 @@
+name: PR Comment Preview Build (Python)
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  preview-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'  # or whichever version you prefer
+        
+      - name: Install Python dependencies
+        run: pip install requests
+
+      - name: Run preview script
+        # We'll pass some data via environment variables and
+        # rely on GitHub's default "event payload" file for more details.
+        run: python .github/scripts/preview.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}  # the path to the event payload (JSON)

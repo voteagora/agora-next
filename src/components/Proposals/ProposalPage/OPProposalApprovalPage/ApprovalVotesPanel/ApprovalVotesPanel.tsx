@@ -14,11 +14,10 @@ import { Delegate } from "@/app/api/common/delegates/delegate";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
+import { ParsedProposalData } from "@/lib/proposalUtils";
 
 type Props = {
   proposal: Proposal;
-  initialProposalVotes: PaginatedResult<Vote[]>;
-  nonVoters: any;
   fetchVotesForProposal: (
     proposalId: string,
     pagination?: PaginationParams
@@ -41,8 +40,6 @@ type Props = {
 
 export default function ApprovalVotesPanel({
   proposal,
-  initialProposalVotes,
-  nonVoters,
   fetchVotesForProposal,
   fetchAllForVoting,
   fetchUserVotesForProposal,
@@ -55,6 +52,11 @@ export default function ApprovalVotesPanel({
       setActiveTab(index);
     });
   }
+
+  const isThresholdCriteria =
+    (proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"])
+      .proposalSettings.criteria === "THRESHOLD";
+
   return (
     <motion.div
       className="flex flex-col"
@@ -95,15 +97,15 @@ export default function ApprovalVotesPanel({
             </div>
             {showVoters ? (
               <ApprovalProposalVotesList
-                initialProposalVotes={initialProposalVotes}
                 fetchVotesForProposal={fetchVotesForProposal}
                 fetchUserVotes={fetchUserVotesForProposal}
                 proposalId={proposal.id}
+                isThresholdCriteria={isThresholdCriteria}
               />
             ) : (
               <ProposalNonVoterList
                 proposal={proposal}
-                initialNonVoters={nonVoters}
+                isApprovalProposal={true}
               />
             )}
           </>

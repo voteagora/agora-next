@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { Listbox } from "@headlessui/react";
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import { ChevronDown } from "lucide-react";
 
 export default function ProposalsFilter() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const filterParam = searchParams?.get("filter");
   const [selected, setSelected] = useState(
@@ -18,11 +19,14 @@ export default function ProposalsFilter() {
 
   useEffect(() => {
     const handleChanges = (value: string) => {
-      isRecentFilter ? router.push("/") : router.push(`/?filter=${value}`);
+      const basePath = pathname === "/" ? "/" : "/proposals";
+      isRecentFilter
+        ? router.push(basePath)
+        : router.push(`${basePath}?filter=${value}`);
     };
 
     handleChanges(selected);
-  }, [router, selected, isRecentFilter]);
+  }, [router, selected, isRecentFilter, pathname]);
 
   return (
     <div className="relative text-primary">

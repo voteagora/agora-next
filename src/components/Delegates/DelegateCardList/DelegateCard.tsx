@@ -6,7 +6,7 @@ import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { DelegateActions } from "../DelegateCard/DelegateActions";
 import Tenant from "@/lib/tenant/tenant";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
-import { useVotingStats } from "@/hooks/useVotingStats";
+import { useVoterStats } from "@/hooks/useVoterStats";
 
 const DelegateCard = ({
   delegate,
@@ -24,7 +24,7 @@ const DelegateCard = ({
   const { token } = Tenant.current();
   const { advancedDelegators } = useConnectedDelegate();
 
-  const { data: votingStats, isPending: isVotingStatsPending } = useVotingStats(
+  const { data: votingStats, isFetching: isVotingStatsPending } = useVoterStats(
     {
       address: delegate.address as `0x${string}`,
     }
@@ -61,7 +61,7 @@ const DelegateCard = ({
                 <span className="text-primary font-bold">
                   {((votingStats?.last_10_props || 0) /
                     Math.min(10, numProposals)) *
-                    100 || "0"}
+                    100}
                   % Participation
                 </span>
               )}

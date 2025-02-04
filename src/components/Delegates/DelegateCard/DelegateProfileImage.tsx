@@ -1,7 +1,6 @@
 "use client";
 
 import ENSAvatar from "../../shared/ENSAvatar";
-import HumanAddress from "@/components/shared/HumanAddress";
 import CopyableHumanAddress from "../../shared/CopyableHumanAddress";
 import { useEnsName } from "wagmi";
 import { formatNumber } from "@/lib/tokenUtils";
@@ -18,6 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
+import ENSName from "@/components/shared/ENSName";
 
 interface Props {
   address: string;
@@ -92,11 +92,11 @@ export function DelegateProfileImage({
       </div>
 
       <div className="flex flex-col">
-        <div className="text-base flex flex-row gap-1 font-semibold hover:opacity-90">
+        <div className="text-primary flex flex-row gap-1 font-semibold hover:opacity-90">
           {copyable ? (
             <CopyableHumanAddress address={address} />
           ) : (
-            <HumanAddress address={address} />
+            <ENSName address={address} />
           )}
           {endorsed && hasEndorsedFilter && endorsedToggle && (
             <TooltipProvider delayDuration={0}>

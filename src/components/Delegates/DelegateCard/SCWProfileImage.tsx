@@ -1,7 +1,5 @@
 "use client";
 
-import ENSAvatar from "../../shared/ENSAvatar";
-import HumanAddress from "@/components/shared/HumanAddress";
 import { formatNumber } from "@/lib/tokenUtils";
 import React from "react";
 import Tenant from "@/lib/tenant/tenant";
@@ -9,6 +7,7 @@ import { useTokenBalance } from "@/hooks/useTokenBalance";
 import CopyableHumanAddress from "@/components/shared/CopyableHumanAddress";
 import { CubeIcon } from "@/icons/CubeIcon";
 import { rgbStringToHex } from "@/app/lib/utils/color";
+import ENSName from "@/components/shared/ENSName";
 
 interface Props {
   address: string;
@@ -33,11 +32,11 @@ export function SCWProfileImage({ address, copyable = false }: Props) {
           </div>
         </div>
         <div className="flex flex-col">
-          <div className="text-base flex flex-row gap-1 font-semibold hover:opacity-90">
+          <div className="text-primary flex flex-row gap-1 font-semibold hover:opacity-90">
             {copyable ? (
               <CopyableHumanAddress address={address} />
             ) : (
-              <HumanAddress address={address} />
+              <ENSName address={address} />
             )}
           </div>
           {tokenBalance && (

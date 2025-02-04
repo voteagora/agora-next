@@ -1,28 +1,24 @@
 import { PaginationParams } from "@/app/lib/pagination";
 import DelegationsContainer from "./DelegationsContainer";
-import { resolveENSName } from "@/app/lib/ENSUtils";
 import {
   fetchCurrentDelegatees,
   fetchCurrentDelegators,
-  fetchDelegate,
 } from "@/app/delegates/actions";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 
-const DelegationsContainerWrapper = async ({
-  addressOrENSName,
-}: {
-  addressOrENSName: string;
-}) => {
-  const address = (await resolveENSName(addressOrENSName)) || addressOrENSName;
-  const delegate = await fetchDelegate(address);
+interface Props {
+  delegate: Delegate;
+}
 
+const DelegationsContainerWrapper = async ({ delegate }: Props) => {
   // Use scw address for the 'delegated to' if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
 
   const [delegatees, delegators] = await Promise.all([
     fetchCurrentDelegatees(
-      hasSCWAddress ? delegate.statement?.scw_address : address
+      hasSCWAddress ? delegate.statement?.scw_address : delegate.address
     ),
-    fetchCurrentDelegators(address),
+    fetchCurrentDelegators(delegate.address),
   ]);
   return (
     <DelegationsContainer
@@ -30,7 +26,7 @@ const DelegationsContainerWrapper = async ({
       initialDelegators={delegators}
       fetchDelegators={async (pagination: PaginationParams) => {
         "use server";
-        return fetchCurrentDelegators(addressOrENSName, pagination);
+        return fetchCurrentDelegators(delegate.address, pagination);
       }}
     />
   );

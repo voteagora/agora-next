@@ -1,11 +1,11 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import ENSAvatar from "@/components/shared/ENSAvatar";
-import HumanAddress from "@/components/shared/HumanAddress";
 import { Input } from "@/components/ui/input";
 import { useEnsName } from "wagmi";
 import { formatUnits } from "viem";
-import { useState, SetStateAction, useEffect, type Dispatch } from "react";
+import { type Dispatch, SetStateAction, useEffect, useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
+import ENSName from "@/components/shared/ENSName";
 
 function SubdelegationToRow({
   to,
@@ -131,8 +131,8 @@ function SubdelegationToRow({
           <ENSAvatar ensName={data} className="h-10 w-10" />
           <VStack>
             <p className="text-xs font-medium text-secondary">Delegated to</p>
-            <div className="w-full font-medium text-ellipsis overflow-hidden max-w-[6rem] sm:max-w-[8rem]">
-              <HumanAddress address={to} />
+            <div className="text-primary w-full font-medium text-ellipsis overflow-hidden max-w-[6rem] sm:max-w-[8rem]">
+              <ENSName address={to} />
             </div>
           </VStack>
         </HStack>

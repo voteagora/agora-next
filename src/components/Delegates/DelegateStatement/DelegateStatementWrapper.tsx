@@ -1,23 +1,16 @@
-import { fetchDelegate } from "@/app/delegates/actions";
-import { resolveENSName } from "@/app/lib/ENSUtils";
 import DelegateStatementContainer from "./DelegateStatementContainer";
 import TopStakeholders from "./TopStakeholders";
 import TopIssues from "./TopIssues";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 
-const DelegateStatementWrapper = async ({
-  addressOrENSName,
-}: {
-  addressOrENSName: string;
-}) => {
-  const address = await resolveENSName(addressOrENSName);
-  const delegate = await fetchDelegate(address);
+interface Props {
+  delegate: Delegate;
+}
 
+const DelegateStatementWrapper = async ({ delegate }: Props) => {
   return (
     <>
-      <DelegateStatementContainer
-        addressOrENSName={addressOrENSName}
-        statement={delegate.statement}
-      />
+      <DelegateStatementContainer delegate={delegate} />
       {delegate.statement && (
         <>
           <TopIssues statement={delegate.statement} />

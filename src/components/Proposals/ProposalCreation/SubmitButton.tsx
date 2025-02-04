@@ -17,6 +17,8 @@ import { disapprovalThreshold } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import { ProposalType } from "@/app/proposals/draft/types";
+import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 
 const { contracts, ui } = Tenant.current();
 
@@ -61,13 +63,21 @@ export default function SubmitButton({
     isPending: isLoading,
     isSuccess,
     isError,
-    writeContract: write,
+    writeContractAsync: writeAsync,
   } = useWriteContract();
 
   const openDialog = useOpenDialog();
 
-  function submitProposal() {
-    write(config!.request);
+  async function submitProposal() {
+    const txHash = await writeAsync(config!.request);
+    trackEvent({
+      event_name: ANALYTICS_EVENT_NAMES.CREATE_PROPOSAL,
+      event_data: {
+        transaction_hash: txHash,
+        uses_plm: false,
+        proposal_data: inputData,
+      },
+    });
     openDialog({
       type: "CAST_PROPOSAL",
       params: {

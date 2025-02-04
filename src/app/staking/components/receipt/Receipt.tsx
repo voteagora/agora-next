@@ -1,6 +1,5 @@
 import React from "react";
 import Image from "next/image";
-import { HStack, VStack } from "@/components/Layout/Stack";
 import ENSName from "@/components/shared/ENSName";
 import Tenant from "@/lib/tenant/tenant";
 import { formatNumber, numberToToken } from "@/lib/utils";
@@ -24,7 +23,7 @@ export const Receipt = ({
   const { token, ui } = Tenant.current();
 
   return (
-    <VStack className="font-code max-w-[408px] w-full px-[34px] py-8 mt-6 rounded-lg border border-gray-300 bg-neutral">
+    <div className="flex flex-col font-code max-w-[408px] w-full px-[34px] py-8 mt-6 rounded-lg border border-gray-300 bg-neutral">
       <Image
         src={ui.assets.delegate}
         alt="img"
@@ -33,57 +32,57 @@ export const Receipt = ({
         className="rounded-full filter grayscale bg-gray-400"
       />
       <h1 className="text-2xl text-primary leading-[30px] mt-5">{title}</h1>
-      <VStack className="w-full gap-[15px] mt-7">
-        <HStack className="w-full justify-between items-center text-primary">
+      <div className="flex flex-col w-full gap-[15px] mt-7">
+        <div className="flex flex-row w-full justify-between items-center text-primary">
           <p className="text-base leading-4">Your address</p>
           <p className="text-base leading-4">
             {depositor && <ENSName address={depositor} />}
           </p>
-        </HStack>
+        </div>
 
         {delegatee && (
-          <HStack className="w-full justify-between items-center text-primary">
+          <div className="flex flex-row w-full justify-between items-center text-primary">
             <p className="text-base leading-4">Delegating to</p>
             <p className="text-base leading-4">
               <ENSName address={delegatee} />
             </p>
-          </HStack>
+          </div>
         )}
 
         {amount !== undefined && (
-          <HStack className="w-full justify-between items-center text-primary">
+          <div className="flex flex-row w-full justify-between items-center text-primary">
             <p className="text-base leading-4">Depositing</p>
             <p className="text-base leading-4">
               {formatNumber(numberToToken(amount).toString(), token.decimals)}{" "}
               {token.symbol}
             </p>
-          </HStack>
+          </div>
         )}
 
         {deposit && (
           <>
             <div className="h-0.5 w-full border-t border-dashed border-gray-300 my-5"></div>
             {deposit.delegatee !== delegatee && (
-              <HStack className="w-full justify-between items-center text-primary">
+              <div className="flex flex-row w-full justify-between items-center text-primary">
                 <p className="text-base leading-4">Existing delegate</p>
                 <p className="text-base leading-4">
                   <ENSName address={deposit.delegatee} />
                 </p>
-              </HStack>
+              </div>
             )}
-            <HStack className="w-full justify-between items-center text-primary">
+            <div className="flex flex-row w-full justify-between items-center text-primary">
               <p className="text-base leading-4">Existing stake amount</p>
               <p className="text-base leading-4">
                 {formatNumber(deposit.amount, token.decimals)} {token.symbol}
               </p>
-            </HStack>
+            </div>
           </>
         )}
-      </VStack>
+      </div>
       <div className="h-0.5 w-full border-t border-dashed border-gray-300 mt-[46px]"></div>
       <p className=" text-xs font-normal italic text-center mt-1 text-gray-4f ">
         Thanking for staking using Uniswap Agora!
       </p>
-    </VStack>
+    </div>
   );
 };

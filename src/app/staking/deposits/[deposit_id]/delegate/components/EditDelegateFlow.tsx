@@ -4,12 +4,10 @@ import { type StakedDeposit } from "@/lib/types";
 import { useAccount } from "wagmi";
 import React, { useState } from "react";
 import { Breadcrumbs } from "@/app/staking/components/Breadcrumbs";
-import { HStack } from "@/components/Layout/Stack";
 import ReceiptContainer from "@/app/staking/components/receipt/ReceiptContainer";
 import { Receipt } from "@/app/staking/components/receipt/Receipt";
 import DelegateCardList from "@/app/staking/components/delegates/DelegateCardList";
 import { EditDelegateConfirm } from "@/app/staking/deposits/[deposit_id]/delegate/components/EditDelegateConfirm";
-import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
@@ -48,8 +46,8 @@ export const EditDelegateFlow = ({
 
       {step === 1 && (
         <>
-          <div className="border rounded-xl flex gap-4 w-full shadow-newDefault p-4 font-medium">
-            <div className={`p-1 rounded-lg bg-gray-200`}>
+          <div className="border border-line rounded-xl flex gap-4 w-full shadow-newDefault p-4 font-medium text-primary">
+            <div className={`p-1 rounded-lg bg-tertiary`}>
               <Image
                 src={icons.speakerCone}
                 alt="Uniswap voters manage staking rewards"
@@ -73,7 +71,7 @@ export const EditDelegateFlow = ({
       )}
 
       {step === 2 && (
-        <HStack className="grid grid-cols-1  sm:grid-cols-4 gap-5 sm:gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 sm:gap-10">
           <div className="sm:col-span-4">
             <ReceiptContainer>
               <Receipt
@@ -91,7 +89,7 @@ export const EditDelegateFlow = ({
               refreshPath={refreshPath}
             />
           </div>
-        </HStack>
+        </div>
       )}
     </div>
   );
