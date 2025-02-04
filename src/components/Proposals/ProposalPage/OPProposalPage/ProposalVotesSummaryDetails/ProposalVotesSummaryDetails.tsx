@@ -157,7 +157,11 @@ export default function ProposalVotesSummaryDetails({
         <StepperRow
           isLastStep
           label={`Proposal ${proposal.status?.toLocaleLowerCase()}`}
-          value={formatTime(proposal.endTime)}
+          value={
+            proposal.status === "EXECUTED"
+              ? formatTime(proposal.executedTime)
+              : formatTime(proposal.endTime)
+          }
         />
       </ol>
     </div>
