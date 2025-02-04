@@ -81,7 +81,7 @@ function DelegationsContainer({
                   <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
                     <TableRow>
                       <TableHead className="h-10 text-secondary">
-                        Allowance
+                        Voting Power
                       </TableHead>
                       <TableHead className="h-10 text-secondary">
                         Delegated on
@@ -133,7 +133,7 @@ function DelegationsContainer({
               <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
                 <TableRow>
                   <TableHead className="h-10 text-secondary">
-                    Allowance
+                    Voting Power
                   </TableHead>
                   <TableHead className="h-10 text-secondary">
                     Delegated on
