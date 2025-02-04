@@ -121,7 +121,10 @@ const SponsorActionPanel = ({
               Loading actions...
             </span>
           ) : canSponsor &&
-            (draftProposal.is_public || isUserApprovedSponsor) ? (
+            (draftProposal.is_public ||
+              isUserApprovedSponsor ||
+              draftProposal.author_address.toLowerCase() ===
+                address?.toLowerCase()) ? (
             <div className="flex flex-col gap-2 mt-6">
               <SponsorActions draftProposal={draftProposal} />
               {isUserApprovedSponsor && (

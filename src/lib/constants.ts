@@ -76,14 +76,14 @@ export const draftProposalsSortOptions = {
     value: "Oldest",
     sort: "oldest",
   },
-  //   mostVotes: {
-  //     value: "Most Votes",
-  //     sort: "most_votes",
-  //   },
-  //   leastVotes: {
-  //     value: "Least Votes",
-  //     sort: "least_votes",
-  //   },
+  mostVotes: {
+    value: "Most Votes",
+    sort: "most_votes",
+  },
+  leastVotes: {
+    value: "Least Votes",
+    sort: "least_votes",
+  },
 };
 
 export const myDraftsSortOptions = {

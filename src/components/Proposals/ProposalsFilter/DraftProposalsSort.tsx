@@ -6,6 +6,8 @@ import { Listbox } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useAddSearchParam } from "@/hooks/useAddSearchParam";
+import Tenant from "@/lib/tenant/tenant";
+import { PLMConfig } from "@/app/proposals/draft/types";
 
 const getSortOptionValue = (sort: string) => {
   const sortOption = Object.values(draftProposalsSortOptions).find(
@@ -23,6 +25,25 @@ export default function DraftProposalsSort() {
   const [selected, setSelected] = useState(
     sortParam || draftProposalsSortOptions.newest.sort
   );
+  const [sortOptions, setSortOptions] = useState<
+    Record<string, { value: string; sort: string }>
+  >(draftProposalsSortOptions);
+
+  const { ui } = Tenant.current();
+  const plmToggle = ui.toggle("proposal-lifecycle");
+  const proposalLifecycleConfig = plmToggle?.config as PLMConfig;
+  const tenantSupportsVotes = proposalLifecycleConfig?.votes;
+
+  useEffect(() => {
+    if (!tenantSupportsVotes) {
+      let updatedSortOptions: { [key: string]: any } = {
+        ...draftProposalsSortOptions,
+      };
+      delete updatedSortOptions.mostVotes;
+      delete updatedSortOptions.leastVotes;
+      setSortOptions(updatedSortOptions);
+    }
+  }, [tenantSupportsVotes]);
 
   useEffect(() => {
     const handleChanges = (value: string) => {
@@ -40,7 +61,7 @@ export default function DraftProposalsSort() {
           <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
         </Listbox.Button>
         <Listbox.Options className="mt-3 absolute bg-wash border border-line p-2 rounded-2xl flex flex-col gap-1 z-10 w-max">
-          {Object.values(draftProposalsSortOptions).map((option) => (
+          {Object.values(sortOptions).map((option) => (
             <Listbox.Option key={option.sort} value={option.sort}>
               {({ selected }) => (
                 <div

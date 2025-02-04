@@ -163,7 +163,7 @@ const CommentPanel = ({
 
   return (
     <>
-      <h3 className="font-black text-primary mt-6">Discussion</h3>
+      <h3 className="font-bold text-primary mt-6">Discussion</h3>
       <div className="space-y-6 mt-4">
         {nestedComments.map((comment) => (
           <CommentItem
@@ -173,7 +173,7 @@ const CommentPanel = ({
           />
         ))}
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-2">
         <Textarea placeholder="Add a comment..." {...register("comment")} />
         {comment && (
           <Button type="submit" className="w-fit">
