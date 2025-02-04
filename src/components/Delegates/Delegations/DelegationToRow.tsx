@@ -18,7 +18,8 @@ export default function DelegationToRow({
 }) {
   return (
     <TableRow>
-      {delegationModel == DELEGATION_MODEL.PARTIAL && (
+      {(delegationModel === DELEGATION_MODEL.PARTIAL ||
+        delegationModel === DELEGATION_MODEL.ADVANCED) && (
         <TableCell>
           {TokenAmountDisplay({
             amount: delegation.allowance,

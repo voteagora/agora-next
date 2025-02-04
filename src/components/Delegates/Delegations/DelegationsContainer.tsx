@@ -136,7 +136,9 @@ function DelegationsContainer({
             <Table>
               <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
                 <TableRow>
-                  {contracts.delegationModel == DELEGATION_MODEL.PARTIAL && (
+                  {(contracts.delegationModel === DELEGATION_MODEL.PARTIAL ||
+                    contracts.delegationModel ===
+                      DELEGATION_MODEL.ADVANCED) && (
                     <TableHead className="h-10 text-secondary">
                       Voting Power
                     </TableHead>
