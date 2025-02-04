@@ -60,7 +60,7 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
             </TabsTrigger>
           )}
         </TabsList>
-        <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit">
+        <div className="flex flex-col sm:flex-row justify-between gap-3 w-full sm:w-fit overflow-x-auto">
           <DelegatesSearch />
           {hasMyDelegatesFilter && <DelegateeFilter />}
           {hasStakeholdersFilter && tab !== "citizens" && (
@@ -70,10 +70,10 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
           {hasEndorsedFilter && tab !== "citizens" && <EndorsedFilter />}
           {tab === "citizens" ? <CitizensFilter /> : <DelegatesFilter />}
           {tab !== "citizens" && (
-            <div className="flex items-center gap-2 bg-wash rounded-full px-4 py-2">
+            <div className="flex items-center gap-2 bg-wash rounded-full px-4 py-2 shrink-0">
               <button
                 onClick={() => {
-                  setLayout("grid", { shallow: false });
+                  setLayout("grid", { shallow: true });
                 }}
                 disabled={layout === "grid"}
               >
@@ -83,7 +83,7 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
               </button>
               <button
                 onClick={() => {
-                  setLayout("list", { shallow: false });
+                  setLayout("list", { shallow: true });
                 }}
                 disabled={layout === "list"}
               >
