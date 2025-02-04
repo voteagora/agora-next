@@ -12,6 +12,7 @@ import { DraftProposal } from "../../draft/types";
 import { ackSponsorshipRequest } from "../actions/rejectSponsorshipRequest";
 import { cn } from "@/lib/utils";
 import SponsorActions from "./SponsorActions";
+import toast from "react-hot-toast";
 
 const SponsorActionPanel = ({
   draftProposal,
@@ -21,7 +22,8 @@ const SponsorActionPanel = ({
   };
 }) => {
   const { address } = useAccount();
-  const { data: canSponsor, status } = useCanSponsor(address);
+  const { data: canSponsor, status: canSponsorFetchStatus } =
+    useCanSponsor(address);
   const [_, startTransition] = useTransition();
   const [optimisticDraftProposal, setOptimisticDraftProposal] = useOptimistic<
     DraftProposal & { approved_sponsors: ProposalDraftApprovedSponsors[] },
@@ -36,6 +38,12 @@ const SponsorActionPanel = ({
       ),
     };
   });
+
+  const isUserApprovedSponsor =
+    draftProposal.approved_sponsors.find(
+      (sponsor) =>
+        sponsor.sponsor_address.toLowerCase() === address?.toLowerCase()
+    ) !== undefined;
 
   //   const renderDetails = () => {
   //     switch (draftProposal.voting_module_type) {
@@ -80,7 +88,7 @@ const SponsorActionPanel = ({
             <p className="text-tertiary mt-2">
               This is a private draft only viewable to invited users.
             </p>
-            <div className="flex flex-col gap-4 mt-3 max-h-[200px] overflow-y-scroll">
+            <div className="flex flex-col gap-4 mt-3 max-h-[200px] overflow-y-scroll scrollbar-hide">
               {optimisticDraftProposal.approved_sponsors.map((sponsor) => (
                 <>
                   <div
@@ -108,45 +116,57 @@ const SponsorActionPanel = ({
           <div className="mt-4 bg-tertiary/5 rounded-xl">
             <ProposalRequirements proposalDraft={draftProposal} />
           </div>
-          {status === "pending" ? (
+          {canSponsorFetchStatus === "pending" ? (
             <span className="w-full bg-tertiary/5 animate-pulse italic block mt-4 rounded-lg p-2 text-tertiary text-sm text-center">
               Loading actions...
             </span>
-          ) : canSponsor ? (
+          ) : canSponsor &&
+            (draftProposal.is_public || isUserApprovedSponsor) ? (
             <div className="flex flex-col gap-2 mt-6">
               <SponsorActions draftProposal={draftProposal} />
-              <UpdatedButton
-                type="secondary"
-                className="w-full"
-                onClick={(event: any) => {
-                  event.preventDefault();
-                  startTransition(async () => {
-                    const sponsor = draftProposal.approved_sponsors.find(
-                      (sponsor) => sponsor.sponsor_address === address
-                    ) as ProposalDraftApprovedSponsors;
+              {isUserApprovedSponsor && (
+                <UpdatedButton
+                  type="secondary"
+                  className="w-full"
+                  onClick={(event: any) => {
+                    event.preventDefault();
+                    startTransition(async () => {
+                      const sponsor = draftProposal.approved_sponsors.find(
+                        (sponsor) =>
+                          sponsor.sponsor_address.toLowerCase() ===
+                          address?.toLowerCase()
+                      ) as ProposalDraftApprovedSponsors;
 
-                    const newStatus =
-                      sponsor.status === "REJECTED" ? "PENDING" : "REJECTED";
+                      if (!sponsor) {
+                        // We shouldn't even get here?
+                        // You shouldn't be able to reject a sponsorship request is you are not an approved sponsor
+                        toast.error("You are not a sponsor of this proposal");
+                        return;
+                      }
 
-                    setOptimisticDraftProposal({
-                      ...sponsor,
-                      status: newStatus,
+                      const newStatus =
+                        sponsor.status === "REJECTED" ? "PENDING" : "REJECTED";
+
+                      setOptimisticDraftProposal({
+                        ...sponsor,
+                        status: newStatus,
+                      });
+
+                      await ackSponsorshipRequest({
+                        address: address as `0x${string}`,
+                        proposalId: draftProposal.id.toString(),
+                        status: newStatus,
+                      });
                     });
-
-                    await ackSponsorshipRequest({
-                      address: address as `0x${string}`,
-                      proposalId: draftProposal.id.toString(),
-                      status: newStatus,
-                    });
-                  });
-                }}
-              >
-                {optimisticDraftProposal.approved_sponsors.find(
-                  (sponsor) => sponsor.sponsor_address === address
-                )?.status === "REJECTED"
-                  ? "Un-decline sponsorship"
-                  : "Decline sponsorship"}
-              </UpdatedButton>
+                  }}
+                >
+                  {optimisticDraftProposal.approved_sponsors.find(
+                    (sponsor) => sponsor.sponsor_address === address
+                  )?.status === "REJECTED"
+                    ? "Un-decline sponsorship"
+                    : "Decline sponsorship"}
+                </UpdatedButton>
+              )}
             </div>
           ) : (
             <p className="text-secondary text-xs mt-4 text-center">

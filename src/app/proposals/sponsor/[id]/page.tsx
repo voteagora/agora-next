@@ -28,14 +28,6 @@ import { isPostSubmission } from "@/app/proposals/draft/utils/stages";
 import ApprovedTransactions from "@/components/Proposals/ProposalPage/ApprovedTransactions/ApprovedTransactions";
 import { parseProposalData } from "@/lib/proposalUtils";
 
-const PreText = ({ text }: { text: string }) => {
-  return (
-    <span className="bg-[#FAFAF2] border-[#ECE3CA] text-[#B16B19] inline-block px-1 py-0.5 rounded">
-      {text}
-    </span>
-  );
-};
-
 const getDraftProposal = async (id: number, slug: DaoSlug) => {
   const draftProposal = await prisma.proposalDraft.findUnique({
     where: {
@@ -114,7 +106,7 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
       <div className="flex flex-row items-end justify-between">
         <div className="flex flex-row items-center gap-4">
           <Link
-            className="cursor-pointer border border-agora-stone-100 bg-neutral rounded-full p-1 w-8 h-8 flex items-center justify-center shadow-newDefault"
+            className="cursor-pointer border border-line bg-neutral rounded-full p-1 w-8 h-8 flex items-center justify-center shadow-newDefault"
             href={`/`}
           >
             <ChevronLeftIcon className="h-6 w-6 text-secondary" />
@@ -131,18 +123,18 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="flex flex-row space-x-1 items-center mb-4">
-                  <span className="font-semibold capitalize">
+                  <span className="font-semibold capitalize text-primary">
                     {draftProposal.voting_module_type} proposal
                   </span>
                   <InformationCircleIcon className="h-4 w-4 text-secondary" />
                 </TooltipTrigger>
                 <TooltipContent
-                  className="text-sm max-w-[250px]"
+                  className="text-sm max-w-[250px] border border-line"
                   side="bottom"
                   align="start"
                 >
                   <div className="flex flex-col gap-1">
-                    <span className="font-semibold capitalize">
+                    <span className="font-semibold capitalize text-primary">
                       {draftProposal.voting_module_type} proposal
                     </span>
                     <span className="text-secondary text-xs">
@@ -197,10 +189,12 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
                 executedTransactionHash={undefined}
               />
             )}
-            <span className="font-semibold capitalize mt-6 block">
+            <span className="font-semibold capitalize text-primary mt-6 block">
               Description
             </span>
-            <p className="prose mt-1">{draftProposal.abstract}</p>
+            <p className="prose mt-1 text-secondary">
+              {draftProposal.abstract}
+            </p>
           </div>
 
           {/* Comments are coming in the next phase */}

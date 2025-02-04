@@ -8,6 +8,7 @@ import { TrashIcon } from "@heroicons/react/24/outline";
 import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
 const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
   const openDialog = useOpenDialog();
@@ -72,8 +73,11 @@ export const DeleteDraftProposalDialog = ({
           onClick={async () => {
             setIsPending(true);
             await deleteAction(proposalId);
-            // TODO: this is a hack to refresh the page after deleting a draft proposal
-            window.location.reload();
+            if (window.location.pathname === "/") {
+              window.location.reload();
+            } else {
+              window.location.href = "/";
+            }
           }}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
