@@ -9,6 +9,9 @@ import {
   DERIVE_TESTNET_RPC,
 } from "@/lib/tenant/configs/contracts/derive";
 import { ProposalType } from "../app/proposals/draft/types";
+import { AlchemyProvider } from "ethers";
+import { hexToBigInt } from "viem";
+import { unstable_cache } from "next/cache";
 
 const { token } = Tenant.current();
 
@@ -430,3 +433,25 @@ export const getVotingModuleTypeForProposalType = (proposalType: {
     return ProposalType.BASIC;
   }
 };
+
+export const mapArbitrumBlockToMainnetBlock = unstable_cache(
+  async (blockNumber: bigint) => {
+    const { contracts } = Tenant.current();
+    try {
+      const block = await (contracts.governor.provider as AlchemyProvider).send(
+        "eth_getBlockByNumber",
+        [`0x${blockNumber.toString(16)}`, false]
+      );
+
+      const l1BlockNumber = hexToBigInt(block.l1BlockNumber);
+
+      return l1BlockNumber;
+    } catch (error) {
+      return blockNumber;
+    }
+  },
+  ["mapArbitrumBlockToMainnetBlock"],
+  {
+    revalidate: 60 * 60 * 24 * 365, // 1 year cache
+  }
+);

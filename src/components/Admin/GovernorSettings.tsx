@@ -18,8 +18,8 @@ import { SECONDS_IN_HOUR } from "@/lib/constants";
 
 // TODO: Take init state values from the chain
 export default function GovernorSettings() {
-  const secondsPerBlock = getSecondsPerBlock();
   const { contracts } = Tenant.current();
+  const secondsPerBlock = getSecondsPerBlock(contracts.governor.chain.id);
 
   const govContract = {
     address: contracts.governor.address as `0x${string}`,

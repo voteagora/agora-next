@@ -17,6 +17,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
 import { AbiCoder } from "ethers";
+import { mapArbitrumBlockToMainnetBlock } from "./utils";
 
 /**
  * Vote primitives
@@ -154,11 +155,20 @@ export function parseSnapshotVote(vote: SnapshotVotePayload): SnapshotVote {
  * Parse votes into votes response
  */
 
-export function parseVote(
+export async function parseVote(
   vote: VotePayload,
   proposalData: ParsedProposalData[ProposalType],
   latestBlock: Block | null
-): Vote {
+): Promise<Vote> {
+  const { contracts } = Tenant.current();
+  let blockNumber = vote.block_number;
+  if (
+    contracts.governor.chain.id === 42161 ||
+    contracts.governor.chain.id === 421614
+  ) {
+    blockNumber = await mapArbitrumBlockToMainnetBlock(blockNumber);
+  }
+
   return {
     transactionHash: vote.transaction_hash,
     address: vote.voter,
@@ -170,9 +180,7 @@ export function parseVote(
     proposalValue: getProposalTotalValue(proposalData) || BigInt(0),
     proposalTitle: getTitleFromProposalDescription(vote.description || ""),
     proposalType: vote.proposal_type,
-    timestamp: latestBlock
-      ? getHumanBlockTime(vote.block_number, latestBlock)
-      : null,
+    timestamp: latestBlock ? getHumanBlockTime(blockNumber, latestBlock) : null,
   };
 }
 

@@ -14,7 +14,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Prisma } from "@prisma/client";
 import { findAdvancedDelegatee, findDelagatee } from "@/lib/prismaUtils";
 import { DELEGATION_MODEL } from "@/lib/constants";
-import { Block } from "ethers";
+import { mapArbitrumBlockToMainnetBlock } from "@/lib/utils";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -68,27 +68,52 @@ async function getCurrentDelegateesForAddress({
     ]);
   }
 
-  const latestBlock = ui.toggle("use-l1-block-number")?.enabled
-    ? await contracts.providerForTime?.getBlock("latest")
-    : await contracts.token.provider.getBlock("latest");
+  const latestBlock = await contracts.token.provider.getBlock("latest");
 
-  const advancedDelegateesData = advancedDelegatees.map(
-    (advancedDelegatee) => ({
-      from: advancedDelegatee.from,
-      to: advancedDelegatee.to,
-      allowance: advancedDelegatee.delegated_amount.toFixed(0),
-      percentage: advancedDelegatee.delegated_share.toString(),
-      timestamp: latestBlock
-        ? getHumanBlockTime(advancedDelegatee.block_number, latestBlock)
-        : null,
-      type: "ADVANCED" as const,
-      amount:
-        Number(advancedDelegatee.delegated_share.toFixed(3)) === 1
-          ? ("FULL" as const)
-          : ("PARTIAL" as const),
-      transaction_hash: advancedDelegatee.transaction_hash || "",
-    })
+  const advancedDelegateesDataPromises = advancedDelegatees.map(
+    async (advancedDelegatee) => {
+      let blockNumber = advancedDelegatee.block_number;
+      if (
+        contracts.governor.chain.id === 42161 ||
+        contracts.governor.chain.id === 421614
+      ) {
+        blockNumber = await mapArbitrumBlockToMainnetBlock(
+          advancedDelegatee.block_number
+        );
+      }
+      return {
+        from: advancedDelegatee.from,
+        to: advancedDelegatee.to,
+        allowance: advancedDelegatee.delegated_amount.toFixed(0),
+        percentage: advancedDelegatee.delegated_share.toString(),
+        timestamp: latestBlock
+          ? getHumanBlockTime(blockNumber, latestBlock, true)
+          : null,
+        type: "ADVANCED" as const,
+        amount:
+          Number(advancedDelegatee.delegated_share.toFixed(3)) === 1
+            ? ("FULL" as const)
+            : ("PARTIAL" as const),
+        transaction_hash: advancedDelegatee.transaction_hash || "",
+      };
+    }
   );
+
+  const advancedDelegateesData = await Promise.all(
+    advancedDelegateesDataPromises
+  );
+
+  let directDelegateeBlockNumber = directDelegatee?.block_number;
+
+  if (
+    (contracts.governor.chain.id === 42161 ||
+      contracts.governor.chain.id === 421614) &&
+    directDelegatee
+  ) {
+    directDelegateeBlockNumber = await mapArbitrumBlockToMainnetBlock(
+      directDelegatee.block_number
+    );
+  }
 
   const directDelegateeData = directDelegatee && {
     from: directDelegatee.delegator,
@@ -96,7 +121,11 @@ async function getCurrentDelegateesForAddress({
     allowance: directDelegatee.balance.toFixed(),
     percentage: "0", // Only used in Agora token partial delegation
     timestamp: latestBlock
-      ? getHumanBlockTime(directDelegatee.block_number, latestBlock)
+      ? getHumanBlockTime(
+          directDelegateeBlockNumber as bigint,
+          latestBlock,
+          true
+        )
       : null,
     type: "DIRECT" as const,
     amount: "FULL" as const,
@@ -131,7 +160,7 @@ async function getCurrentDelegatorsForAddress({
   address: string;
   pagination?: PaginationParams;
 }): Promise<PaginatedResult<Delegation[]>> {
-  const { namespace, contracts, ui } = Tenant.current();
+  const { namespace, contracts } = Tenant.current();
 
   let advancedDelegatorsSubQry: string;
   let directDelegatorsSubQry: string;
@@ -256,11 +285,6 @@ async function getCurrentDelegatorsForAddress({
             transaction_index DESC`;
   }
 
-  const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
-    ?.enabled
-    ? contracts.providerForTime?.getBlock("latest")
-    : contracts.token.provider.getBlock("latest");
-
   const [delegators, latestBlock] = await Promise.all([
     paginateResult(async (skip: number, take: number) => {
       return prisma.$queryRawUnsafe<
@@ -291,7 +315,7 @@ async function getCurrentDelegatorsForAddress({
         take
       );
     }, pagination),
-    latestBlockPromise,
+    contracts.token.provider.getBlock("latest"),
   ]);
 
   const delagtorsData = await Promise.all(
@@ -306,7 +330,7 @@ async function getCurrentDelegatorsForAddress({
             ).toString(),
       percentage: "0", // Only used in Agora token partial delegation
       timestamp: latestBlock
-        ? getHumanBlockTime(delegator.block_number, latestBlock)
+        ? getHumanBlockTime(delegator.block_number, latestBlock, true)
         : null,
       type: delegator.type,
       amount: delegator.amount,
@@ -352,12 +376,7 @@ async function getCurrentAdvancedDelegatorsForAddress({
 }: {
   address: string;
 }): Promise<Delegation[]> {
-  const { namespace, contracts, ui } = Tenant.current();
-
-  const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
-    ?.enabled
-    ? contracts.providerForTime?.getBlock("latest")
-    : contracts.token.provider.getBlock("latest");
+  const { namespace, contracts } = Tenant.current();
 
   const [advancedDelegators, latestBlock] = await Promise.all([
     findAdvancedDelegatee({
@@ -365,24 +384,43 @@ async function getCurrentAdvancedDelegatorsForAddress({
       address,
       contract: contracts.alligator?.address,
     }),
-    latestBlockPromise,
+    contracts.token.provider.getBlock("latest"),
   ]);
 
-  return advancedDelegators.map((advancedDelegator) => ({
-    from: advancedDelegator.from,
-    to: advancedDelegator.to,
-    allowance: advancedDelegator.delegated_amount.toFixed(0),
-    percentage: "0", // Only used in Agora token partial delegation
-    timestamp: latestBlock
-      ? getHumanBlockTime(advancedDelegator.block_number, latestBlock)
-      : null,
-    type: "ADVANCED",
-    amount:
-      Number(advancedDelegator.delegated_share.toFixed(3)) === 1
-        ? "FULL"
-        : "PARTIAL",
-    transaction_hash: advancedDelegator.transaction_hash || "",
-  }));
+  const advancedDelegatorsDataPromises = advancedDelegators.map(
+    async (advancedDelegator) => {
+      let blockNumber = advancedDelegator.block_number;
+      if (
+        contracts.governor.chain.id === 42161 ||
+        contracts.governor.chain.id === 421614
+      ) {
+        blockNumber = await mapArbitrumBlockToMainnetBlock(
+          advancedDelegator.block_number
+        );
+      }
+      return {
+        from: advancedDelegator.from,
+        to: advancedDelegator.to,
+        allowance: advancedDelegator.delegated_amount.toFixed(0),
+        percentage: "0", // Only used in Agora token partial delegation
+        timestamp: latestBlock
+          ? getHumanBlockTime(blockNumber, latestBlock, true)
+          : null,
+        type: "ADVANCED" as const,
+        amount:
+          Number(advancedDelegator.delegated_share.toFixed(3)) === 1
+            ? ("FULL" as const)
+            : ("PARTIAL" as const),
+        transaction_hash: advancedDelegator.transaction_hash || "",
+      };
+    }
+  );
+
+  const advancedDelegatorsData = await Promise.all(
+    advancedDelegatorsDataPromises
+  );
+
+  return advancedDelegatorsData;
 }
 
 /**

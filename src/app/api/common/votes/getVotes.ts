@@ -142,15 +142,18 @@ async function getVotesForDelegateForAddress({
     ? await contracts.providerForTime?.getBlock("latest")
     : await contracts.token.provider.getBlock("latest");
 
-  return {
-    meta,
-    data: votes.map((vote) => {
+  const data = await Promise.all(
+    votes.map((vote) => {
       const proposalData = parseProposalData(
         JSON.stringify(vote.proposal_data || {}),
         vote.proposal_type
       );
       return parseVote(vote, proposalData, latestBlock);
-    }),
+    })
+  );
+  return {
+    meta,
+    data,
   };
 }
 
@@ -406,9 +409,13 @@ async function getVotesForProposal({
     votes[0]?.proposal_type
   );
 
+  const data = await Promise.all(
+    votes.map((vote) => parseVote(vote, proposalData, latestBlock))
+  );
+
   return {
     meta,
-    data: votes.map((vote) => parseVote(vote, proposalData, latestBlock)),
+    data,
   };
 }
 
@@ -450,16 +457,20 @@ async function getUserVotesForProposal({
     ? await contracts.providerForTime?.getBlock("latest")
     : await contracts.token.provider.getBlock("latest");
 
-  return votes.map((vote) =>
-    parseVote(
-      vote,
-      parseProposalData(
-        JSON.stringify(vote.proposal_data || {}),
-        vote.proposal_type
-      ),
-      latestBlock
+  const data = Promise.all(
+    votes.map((vote) =>
+      parseVote(
+        vote,
+        parseProposalData(
+          JSON.stringify(vote.proposal_data || {}),
+          vote.proposal_type
+        ),
+        latestBlock
+      )
     )
   );
+
+  return data;
 }
 
 async function getVotesForProposalAndDelegate({
@@ -480,16 +491,20 @@ async function getVotesForProposalAndDelegate({
     ? await contracts.providerForTime?.getBlock("latest")
     : await contracts.token.provider.getBlock("latest");
 
-  return votes.map((vote: VotePayload) =>
-    parseVote(
-      vote,
-      parseProposalData(
-        JSON.stringify(vote.proposal_data || {}),
-        vote.proposal_type
-      ),
-      latestBlock
+  const data = await Promise.all(
+    votes.map((vote: VotePayload) =>
+      parseVote(
+        vote,
+        parseProposalData(
+          JSON.stringify(vote.proposal_data || {}),
+          vote.proposal_type
+        ),
+        latestBlock
+      )
     )
   );
+
+  return data;
 }
 
 export const fetchVotesForDelegate = cache(getVotesForDelegate);
