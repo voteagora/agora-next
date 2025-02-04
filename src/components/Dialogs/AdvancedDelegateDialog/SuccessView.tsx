@@ -17,7 +17,7 @@ export function SuccessView({
   };
 }) {
   const { ui } = Tenant.current();
-  const faqLink = ui.link("faq");
+  const faqLink = ui.link("advanced-delegation-faq");
   const { refetchDelegate } = useConnectButtonContext();
 
   useEffect(() => {

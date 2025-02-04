@@ -15,7 +15,6 @@ import favicon16x16 from "@/assets/tenant/scroll_favicon/favicon-16x16.png";
 import shortcutIcon from "@/assets/tenant/scroll_favicon/favicon.ico";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
-import { OptimismFaqLink } from "./optimism";
 
 export const scrollTenantUIConfig = new TenantUI({
   title: "Scroll Governance",
@@ -67,9 +66,9 @@ export const scrollTenantUIConfig = new TenantUI({
       url: "https://agora.xyz",
     },
     {
-      name: "faq",
+      name: "partial-delegation-faq",
       title: "FAQ",
-      url: OptimismFaqLink,
+      url: "https://agoraxyz.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c",
     },
   ],
 

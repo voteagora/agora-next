@@ -4,7 +4,6 @@ import pguildHero from "@/assets/tenant/pguild_hero.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import { OptimismFaqLink } from "./optimism";
 
 export const protocolGuildTenantUIConfig = new TenantUI({
   title: "Protocol Guild",
@@ -39,11 +38,6 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       name: "changelog",
       title: "Change log",
       url: "/changelog",
-    },
-    {
-      name: "faq",
-      title: "FAQ",
-      url: OptimismFaqLink,
     },
   ],
   pages: [

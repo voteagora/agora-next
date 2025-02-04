@@ -11,7 +11,6 @@ import infoPageCard04 from "@/assets/tenant/cyber_info_4.png";
 import infoPageHero from "@/assets/tenant/cyber_info_hero.png";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import { OptimismFaqLink } from "./optimism";
 
 export const cyberTenantUIConfig = new TenantUI({
   title: "Cyber Agora",
@@ -58,11 +57,6 @@ export const cyberTenantUIConfig = new TenantUI({
       name: "changelog",
       title: "Change log",
       url: "/changelog",
-    },
-    {
-      name: "faq",
-      title: "FAQ",
-      url: OptimismFaqLink,
     },
   ],
 

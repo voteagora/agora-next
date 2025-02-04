@@ -7,7 +7,6 @@ import delegateImage from "@/assets/tenant/boost_logo.svg";
 
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import { OptimismFaqLink } from "./optimism";
 
 export const boostTenantUIConfig = new TenantUI({
   title: "Boost Agora",
@@ -52,11 +51,6 @@ export const boostTenantUIConfig = new TenantUI({
       name: "discord",
       title: "Discord",
       url: "https://discord.com/invite/53c3CxDneJ",
-    },
-    {
-      name: "faq",
-      title: "FAQ",
-      url: OptimismFaqLink,
     },
   ],
 

@@ -54,9 +54,9 @@ export const deriveTenantUIConfig = new TenantUI({
       url: "https://discord.com/invite/Derive",
     },
     {
-      name: "faq",
+      name: "partial-delegation-faq",
       title: "FAQ",
-      url: OptimismFaqLink,
+      url: "https://agoraxyz.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c",
     },
   ],
 
