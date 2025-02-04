@@ -54,7 +54,6 @@ const DraftProposalListClient = ({
   };
 
   const proposals = pages.flatMap((page) => page.data);
-  console.log(proposals);
 
   // optimistically updates vote weight
   // (JUST UPDATES UI SO CHANGE IS REFLECTED IMMEDIATELY)
