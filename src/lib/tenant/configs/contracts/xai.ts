@@ -1,7 +1,7 @@
 import {
   AgoraGovernor__factory,
   AgoraTimelock__factory,
-  Membership__factory,
+  ERC20__factory,
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
@@ -57,12 +57,12 @@ export const xaiTenantConfig = ({
 
   return {
     token: createTokenContract({
-      abi: Membership__factory.abi,
+      abi: ERC20__factory.abi,
       address: TOKEN as `0x${string}`,
       chain,
-      contract: Membership__factory.connect(TOKEN, provider),
+      contract: ERC20__factory.connect(TOKEN, provider),
       provider,
-      type: "erc721",
+      type: "erc20",
     }),
 
     governor: new TenantContract<IGovernorContract>({
