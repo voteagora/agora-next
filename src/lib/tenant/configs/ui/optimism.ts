@@ -71,6 +71,11 @@ export const optimismTenantUIConfig = new TenantUI({
       url: "https://calendar.google.com/calendar/ical/c_fnmtguh6noo6qgbni2gperid4k%40group.calendar.google.com/public/basic.ics",
     },
     {
+      name: "faq",
+      title: "FAQ",
+      url: "https://agoraxyz.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c",
+    },
+    {
       name: "advanced-delegation-faq",
       title: "FAQ",
       url: "https://agoraxyz.notion.site/Optimism-Agora-FAQ-3922ac9c66e54a21b5de16be9e0cf79c",
