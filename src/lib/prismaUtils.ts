@@ -121,7 +121,7 @@ export function findVotableSupply({
     case TENANT_NAMESPACES.BOOST:
       return prisma.boostVotableSupply.findFirst({});
     case TENANT_NAMESPACES.XAI:
-      return prisma.xaiVotableSupply.findFirst({});
+      return prisma.xaiVotableSupply.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
