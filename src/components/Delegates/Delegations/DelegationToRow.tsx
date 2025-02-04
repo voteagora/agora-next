@@ -7,20 +7,25 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import ENSName from "@/components/shared/ENSName";
+import { DELEGATION_MODEL } from "@/lib/constants";
 
 export default function DelegationToRow({
   delegation,
+  delegationModel,
 }: {
   delegation: Delegation;
+  delegationModel: string;
 }) {
   return (
     <TableRow>
-      <TableCell>
-        {TokenAmountDisplay({
-          amount: delegation.allowance,
-          maximumSignificantDigits: 3,
-        })}{" "}
-      </TableCell>
+      {delegationModel == DELEGATION_MODEL.PARTIAL && (
+        <TableCell>
+          {TokenAmountDisplay({
+            amount: delegation.allowance,
+            maximumSignificantDigits: 3,
+          })}{" "}
+        </TableCell>
+      )}
       <TableCell>{format(delegation.timestamp || 0, "MM/dd/yyyy")}</TableCell>
       <TableCell>
         <Link
