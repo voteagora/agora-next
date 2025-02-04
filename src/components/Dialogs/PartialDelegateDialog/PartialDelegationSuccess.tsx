@@ -2,7 +2,6 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import Tenant from "@/lib/tenant/tenant";
-import { OptimismFaqLink } from "@/lib/tenant/configs/ui/optimism";
 
 interface Props {
   closeDialog: () => void;
@@ -11,6 +10,7 @@ interface Props {
 
 export const PartialDelegationSuccess = ({ hash, closeDialog }: Props) => {
   const { ui } = Tenant.current();
+  const faqLink = ui.link('faq');
   return (
     <div>
       <div className="w-full">
@@ -30,7 +30,7 @@ export const PartialDelegationSuccess = ({ hash, closeDialog }: Props) => {
         be slightly different due to{" "}
         <a
           className="underline"
-          href={OptimismFaqLink}
+          href={faqLink?.url}
           target="_blank"
           rel="noopener noreferrer"
         >

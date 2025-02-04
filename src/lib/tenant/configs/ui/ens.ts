@@ -6,6 +6,7 @@ import pendingImage from "@/assets/tenant/ens_pending.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import { OptimismFaqLink } from "./optimism";
 
 export const ensTenantUIConfig = new TenantUI({
   title: "ENS Agora",
@@ -40,6 +41,11 @@ export const ensTenantUIConfig = new TenantUI({
       name: "changelog",
       title: "Change log",
       url: "/changelog",
+    },
+    {
+      name: "faq",
+      title: "FAQ",
+      url: OptimismFaqLink,
     },
   ],
   pages: [

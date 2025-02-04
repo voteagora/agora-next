@@ -15,6 +15,7 @@ import favicon16x16 from "@/assets/tenant/scroll_favicon/favicon-16x16.png";
 import shortcutIcon from "@/assets/tenant/scroll_favicon/favicon.ico";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { OptimismFaqLink } from "./optimism";
 
 export const scrollTenantUIConfig = new TenantUI({
   title: "Scroll Governance",
@@ -64,6 +65,11 @@ export const scrollTenantUIConfig = new TenantUI({
       name: "agora",
       title: "Powered by Agora",
       url: "https://agora.xyz",
+    },
+    {
+      name: "faq",
+      title: "FAQ",
+      url: OptimismFaqLink,
     },
   ],
 

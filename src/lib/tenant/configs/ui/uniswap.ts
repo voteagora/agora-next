@@ -9,6 +9,7 @@ import infoPageCard02 from "@/assets/tenant/uniswap_info_2.png";
 import infoPageCard03 from "@/assets/tenant/uniswap_info_3.png";
 import infoPageCard04 from "@/assets/tenant/uniswap_info_4.png";
 import infoPageHero from "@/assets/tenant/uniswap_info_hero.png";
+import { OptimismFaqLink } from "./optimism";
 
 export const uniswapTenantUIConfig = new TenantUI({
   title: "Uniswap Agora",
@@ -44,6 +45,11 @@ export const uniswapTenantUIConfig = new TenantUI({
       name: "changelog",
       title: "Change log",
       url: "/changelog",
+    },
+    {
+      name: "faq",
+      title: "FAQ",
+      url: OptimismFaqLink,
     },
   ],
 

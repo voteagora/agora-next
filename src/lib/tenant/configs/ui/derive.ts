@@ -11,6 +11,7 @@ import infoPageCard02 from "@/assets/tenant/derive_info_1.png";
 import infoPageCard03 from "@/assets/tenant/derive_info_2.png";
 import infoPageCard04 from "@/assets/tenant/derive_info_3.png";
 import infoPageHero from "@/assets/tenant/derive_gov.png";
+import { OptimismFaqLink } from "./optimism";
 
 const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
 export const deriveTenantUIConfig = new TenantUI({
@@ -51,6 +52,11 @@ export const deriveTenantUIConfig = new TenantUI({
       name: "discord",
       title: "Discord",
       url: "https://discord.com/invite/Derive",
+    },
+    {
+      name: "faq",
+      title: "FAQ",
+      url: OptimismFaqLink,
     },
   ],
 

@@ -4,6 +4,7 @@ import etherfiLogo from "@/assets/tenant/etherfi_logo.svg";
 import delegateImage from "@/assets/tenant/etherfi_delegate.svg";
 import successImage from "@/assets/tenant/etherfi_success.svg";
 import pendingImage from "@/assets/tenant/etherfi_pending.svg";
+import { OptimismFaqLink } from "./optimism";
 
 export const etherfiTenantUIConfig = new TenantUI({
   title: "ether.fi Agora",
@@ -75,6 +76,11 @@ export const etherfiTenantUIConfig = new TenantUI({
       name: "changelog",
       title: "Change log",
       url: "/changelog",
+    },
+    {
+      name: "faq",
+      title: "FAQ",
+      url: OptimismFaqLink,
     },
   ],
 
