@@ -54,9 +54,55 @@ const DraftProposalListClient = ({
   };
 
   const proposals = pages.flatMap((page) => page.data);
+  console.log(proposals);
 
-  const updateProposalVote = (proposalId: number, vote: any) => {
-    console.log("updateProposalVote", proposalId, vote);
+  // optimistically updates vote weight
+  // (JUST UPDATES UI SO CHANGE IS REFLECTED IMMEDIATELY)
+  const updateProposalVote = (
+    proposalId: number,
+    vote: {
+      voter: string;
+      weight: number;
+      direction: 1 | -1;
+    }
+  ) => {
+    setPages((prev) =>
+      prev.map((page) => ({
+        ...page,
+        data: page.data.map((proposal) => {
+          if (proposal.id !== proposalId) return proposal;
+
+          const existingVote = proposal.votes?.find(
+            (v: { voter: string }) => v.voter === vote.voter
+          );
+
+          // Case 1: No previous vote - add new vote
+          if (!existingVote) {
+            return {
+              ...proposal,
+              vote_weight:
+                Number(proposal.vote_weight) + vote.weight * vote.direction,
+              votes: [...(proposal.votes || []), vote],
+            };
+          }
+
+          // Case 2: Voting in opposite direction - update vote
+          if (existingVote.direction !== vote.direction) {
+            return {
+              ...proposal,
+              vote_weight:
+                Number(proposal.vote_weight) + 2 * vote.weight * vote.direction,
+              votes: proposal.votes.map((v: { voter: string }) =>
+                v.voter === vote.voter ? vote : v
+              ),
+            };
+          }
+
+          // Case 3: Same direction - no effect
+          return proposal;
+        }),
+      }))
+    );
   };
 
   return (

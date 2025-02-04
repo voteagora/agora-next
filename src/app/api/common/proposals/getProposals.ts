@@ -185,8 +185,8 @@ const getDraftProposalsV2 = async (
   const requestsYou = filter === draftProposalsFilterOptions.requestsYou.filter;
   const isNewestSort = sort === draftProposalsSortOptions.newest.sort;
   const isOldestSort = sort === draftProposalsSortOptions.oldest.sort;
-  //   const isMostVotesSort = sort === draftProposalsSortOptions.mostVotes.sort;
-  //   const isLeastVotesSort = sort === draftProposalsSortOptions.leastVotes.sort;
+  const isMostVotesSort = sort === draftProposalsSortOptions.mostVotes.sort;
+  const isLeastVotesSort = sort === draftProposalsSortOptions.leastVotes.sort;
 
   const { contracts } = Tenant.current();
 
@@ -228,10 +228,11 @@ const getDraftProposalsV2 = async (
     ? "p.created_at DESC"
     : isOldestSort
       ? "p.created_at ASC"
-      : "";
-  //   : isMostVotesSort
-  //     ? "vote_weight DESC"
-  //     : "vote_weight ASC";
+      : isMostVotesSort
+        ? "vote_weight DESC"
+        : isLeastVotesSort
+          ? "vote_weight ASC"
+          : "";
 
   // TODO: make sure the only owner stuff is correct
   const query = `
