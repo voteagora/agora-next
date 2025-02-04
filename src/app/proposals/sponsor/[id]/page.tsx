@@ -1,5 +1,5 @@
 import prisma from "@/app/lib/prisma";
-import { DraftProposal } from "../../../proposals/draft/types";
+import { DraftProposal, PLMConfig } from "../../../proposals/draft/types";
 import SponsorActionPanel from "../components/SponsorActionPanel";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
@@ -58,8 +58,11 @@ const getDraftProposal = async (id: number, slug: DaoSlug) => {
 };
 
 const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
-  const { slug } = await Tenant.current();
+  const { slug, ui } = await Tenant.current();
   const draftProposal = await getDraftProposal(parseInt(params.id), slug);
+  const plmToggle = ui.toggle("proposal-lifecycle");
+  const proposalLifecycleConfig = plmToggle?.config as PLMConfig;
+  const tenantSupportsComments = proposalLifecycleConfig?.comments;
 
   // Really janky way to parse the approval options so we can render
   // in "ApprovedTransactions" component. Not trivial because the indexed
@@ -196,12 +199,12 @@ const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
               {draftProposal.abstract}
             </p>
           </div>
-
-          {/* Comments are coming in the next phase */}
-          {/* <CommentPanel
-            comments={draftProposal.comments}
-            params={{ id: params.id }}
-          /> */}
+          {tenantSupportsComments && (
+            <CommentPanel
+              comments={draftProposal.comments}
+              params={{ id: params.id }}
+            />
+          )}
         </div>
         <div className="self-start hidden sm:block sticky top-6">
           <SponsorActionPanel draftProposal={draftProposal} />

@@ -8,6 +8,8 @@ import HumanAddress from "@/components/shared/CopyableHumanAddress";
 import { useAccount } from "wagmi";
 import { cn, formatFullDate } from "@/lib/utils";
 import DraftProposalVoteContainer from "./DraftProposalVoteContainer";
+import Tenant from "@/lib/tenant/tenant";
+import { PLMConfig } from "@/app/proposals/draft/types";
 
 const getDraftProposalStatus = (
   proposal: ProposalDraft & {
@@ -48,7 +50,11 @@ const DraftProposalCard = ({
   updateProposalVote: (proposalId: number, vote: any) => void;
 }) => {
   const { address } = useAccount();
+  const { ui } = Tenant.current();
   const status = getDraftProposalStatus(proposal, address);
+  const plmToggle = ui.toggle("proposal-lifecycle");
+  const proposalLifecycleConfig = plmToggle?.config as PLMConfig;
+  const tenantSupportsVotes = proposalLifecycleConfig?.votes;
 
   return (
     <Link
@@ -62,8 +68,12 @@ const DraftProposalCard = ({
           status === "You declined" ? "bg-tertiary/5" : ""
         )}
       >
-        {/* Voting component -- we are holding this until phase 2 */}
-        {/* <DraftProposalVoteContainer proposal={proposal} /> */}
+        {tenantSupportsVotes && (
+          <DraftProposalVoteContainer
+            proposal={proposal}
+            updateProposalVote={updateProposalVote}
+          />
+        )}
         <div className="w-full sm:w-[55%] flex flex-col justify-between gap-y-1">
           <div className="flex flex-row gap-1 text-xs text-tertiary">
             <div className="flex flex-row gap-1">
