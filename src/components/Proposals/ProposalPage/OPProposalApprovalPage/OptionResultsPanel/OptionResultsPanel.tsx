@@ -66,7 +66,7 @@ export default function OptionsResultsPanel({
     });
 
   return (
-    <div className="flex flex-col max-h-[calc(100vh-452px)] overflow-y-scroll flex-shrink px-4">
+    <div className="flex flex-col max-h-[calc(100vh-482px)] overflow-y-scroll flex-shrink px-4">
       {sortedOptions.map((option, index) => {
         let isApproved = false;
         const votesAmountBN = BigInt(option?.votes || 0);

@@ -1,113 +1,114 @@
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import { isWithinInterval, format, addDays } from "date-fns";
 
-type Event = {
-  SUMMARY: string;
-  ["DTSTART;VALUE=DATE"]: string;
-  ["DTEND;VALUE=DATE"]: string;
+type ICSEvent = {
+  summary: string;
+  startDate: Date;
+  endDate: Date;
 };
 
-const parseICSDates = (_startDate: string, _endDate: string) => {
-  const startDateTrim = _startDate.trim();
-  const endDateTrim = _endDate.trim();
+type GovernanceCalendar = {
+  title: string;
+  endDate: string;
+  reviewPeriod: boolean;
+  votingPeriod: boolean;
+} | null;
 
-  const startDate = new Date(
+const parseICSDate = (dateStr: string, timeZone: string): Date => {
+  const utcDate = new Date(
     Date.UTC(
-      parseInt(startDateTrim.substring(0, 4), 10), // Year
-      parseInt(startDateTrim.substring(4, 6), 10) - 1, // Month
-      parseInt(startDateTrim.substring(6, 8), 10) // Day
+      parseInt(dateStr.substring(0, 4), 10), // Year
+      parseInt(dateStr.substring(4, 6), 10) - 1, // Month
+      parseInt(dateStr.substring(6, 8), 10) // Day
     )
   );
 
-  const endDate = new Date(
-    Date.UTC(
-      parseInt(endDateTrim.substring(0, 4), 10), // Year
-      parseInt(endDateTrim.substring(4, 6), 10) - 1, // Month
-      parseInt(endDateTrim.substring(6, 8), 10) // Day
-    )
-  );
+  const zonedDate = new Date(utcDate.toLocaleString("en-US", { timeZone }));
 
-  return {
-    startDate,
-    endDate,
-  };
+  return zonedDate;
 };
 
-const isCurrentEvent = (startDate: Date, endDate: Date) => {
-  const now = new Date();
-  return now >= startDate && now <= endDate;
+const parseICSLine = (line: string): [string, string] | null => {
+  const separatorIndex = line.indexOf(":");
+  if (separatorIndex === -1) return null;
+
+  const key = line.slice(0, separatorIndex);
+  const value = line.slice(separatorIndex + 1);
+  return [key, value];
 };
 
-function parseICS(icsData: string) {
-  const lines = icsData.split("\n");
-  let event;
-  let currentEvent: Event | object = {};
+const parseICSEvents = (icsContent: string, timeZone: string): ICSEvent[] => {
+  const lines = icsContent.split("\n");
+  const events: ICSEvent[] = [];
+  let currentEvent: Partial<ICSEvent> = {};
 
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].startsWith("BEGIN:VEVENT")) {
+  for (const line of lines) {
+    if (line.startsWith("BEGIN:VEVENT")) {
       currentEvent = {};
-    } else if (lines[i].startsWith("END:VEVENT")) {
-      /**
-       * Check if today's date is between events date and it has the text "Voting Cycle", we only need one event,
-       * so in case we find it there is no need to loop more
-       */
-      if ((currentEvent as Event).SUMMARY.includes("Voting Cycle")) {
-        const { startDate, endDate } = parseICSDates(
-          (currentEvent as Event)["DTSTART;VALUE=DATE"],
-          (currentEvent as Event)["DTEND;VALUE=DATE"]
-        );
-        if (isCurrentEvent(startDate, endDate)) {
-          const reviewPeriod = (currentEvent as Event).SUMMARY.includes(
-            "Review Period"
-          );
-          if (!reviewPeriod) {
-            /**
-             * On voting period we should display the last day (the day voting ends). On review period we
-             * should display the next day (the day voting starts).
-             *
-             * Calendar provides one day extra
-             */
-            endDate.setDate(endDate.getDate() - 1);
-          }
-          const day = endDate.getDate();
-          const suffix =
-            day >= 11 && day <= 13
-              ? "th"
-              : ["st", "nd", "rd"][(day % 10) - 1] || "th";
+      continue;
+    }
 
-          const options: Intl.DateTimeFormatOptions = {
-            month: "long",
-            day: "numeric",
-          };
-
-          const formattedEndDate = new Intl.DateTimeFormat(
-            "en-US",
-            options
-          ).format(endDate);
-
-          event = {
-            title: (currentEvent as Event).SUMMARY.trim(),
-            endDate: formattedEndDate.replace(/\d+/, day + suffix),
-            reviewPeriod: (currentEvent as Event).SUMMARY.includes(
-              "Review Period"
-            ),
-          };
-          currentEvent = {};
-          break;
-        } else {
-          currentEvent = {};
-        }
-      } else {
-        currentEvent = {};
+    if (line.startsWith("END:VEVENT")) {
+      // Add the event only if it's a voting cycle
+      if (
+        currentEvent.summary?.includes("Voting Cycle") &&
+        currentEvent.startDate &&
+        currentEvent.endDate
+      ) {
+        events.push(currentEvent as ICSEvent);
       }
-    } else if (currentEvent) {
-      const [key, value] = lines[i].split(":");
-      (currentEvent as Event)[key as keyof Event] = value;
+      currentEvent = {};
+      continue;
+    }
+
+    const parsedLine = parseICSLine(line);
+    if (!parsedLine) continue;
+
+    const [key, value] = parsedLine;
+
+    if (key === "SUMMARY") {
+      currentEvent.summary = value;
+    } else if (key === "DTSTART;VALUE=DATE") {
+      currentEvent.startDate = parseICSDate(value, timeZone);
+    } else if (key === "DTEND;VALUE=DATE") {
+      currentEvent.endDate = parseICSDate(value, timeZone);
     }
   }
 
-  return event;
-}
+  return events;
+};
+
+const findCurrentEvent = (
+  events: ICSEvent[],
+  now: Date
+): GovernanceCalendar => {
+  // find any event that contains today
+  for (const event of events) {
+    if (
+      isWithinInterval(now, {
+        start: event.startDate,
+        end: event.endDate,
+      })
+    ) {
+      const summaryContainsReviewPeriod =
+        event.summary.includes("Review Period");
+      const summaryContainsVotingPeriod =
+        event.summary.includes("Voting Period");
+      const dateToUse = summaryContainsReviewPeriod
+        ? addDays(event.endDate, 1)
+        : event.endDate;
+
+      return {
+        title: event.summary,
+        endDate: format(dateToUse, "MMMM d"),
+        reviewPeriod: summaryContainsReviewPeriod,
+        votingPeriod: summaryContainsVotingPeriod,
+      };
+    }
+  }
+
+  return null;
+};
 
 export async function fetchGovernanceCalendar() {
   const { ui } = Tenant.current();
@@ -117,9 +118,14 @@ export async function fetchGovernanceCalendar() {
     return null;
   }
 
-  const response = await fetch(link.url, {
-    method: "GET",
-  });
-  const calendarICS = await response.text();
-  return parseICS(calendarICS);
+  const response = await fetch(link.url, { method: "GET" });
+  const icsContent = await response.text();
+
+  // Get user's timezone
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const now = new Date();
+
+  const events = parseICSEvents(icsContent, timeZone);
+  return findCurrentEvent(events, now);
 }

@@ -10,7 +10,7 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
 
   return (
-    <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem]">
+    <div className="flex flex-col static sm:sticky top-16 flex-shrink-0 width-[20rem]">
       <DelegateCardHeader delegate={delegate} />
       <div className="flex flex-col bg-wash border border-line shadow-newDefault rounded-xl">
         <div className="flex flex-col items-stretch p-4 border-b border-line">
@@ -89,6 +89,6 @@ export const PanelRow = ({
 
 export const DelegateCardSkeleton = () => {
   return (
-    <div className="flex flex-col sticky top-16 flex-shrink-0 width-[20rem] h-[300px] bg-tertiary/10 animate-pulse rounded-lg"></div>
+    <div className="flex flex-col static sm:sticky top-16 flex-shrink-0 width-[20rem] h-[300px] bg-tertiary/10 animate-pulse rounded-lg"></div>
   );
 };

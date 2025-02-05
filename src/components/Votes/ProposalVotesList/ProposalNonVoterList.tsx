@@ -63,9 +63,9 @@ const ProposalNonVoterList = ({ proposal, isApprovalProposal }: Props) => {
       className={cn(
         "px-4 pb-4 overflow-y-scroll",
         isThresholdCriteria
-          ? "max-h-[calc(100vh-530px)]"
+          ? "max-h-[calc(100vh-560px)]"
           : isApprovalProposal
-            ? "max-h-[calc(100vh-497px)]"
+            ? "max-h-[calc(100vh-527px)]"
             : "max-h-[calc(100vh-437px)]"
       )}
     >
