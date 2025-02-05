@@ -115,8 +115,6 @@ def main():
     
     with open(event_path, 'r', encoding='utf-8') as f:
         event = json.load(f)
-    
-    print(event)
 
     # We can comment on the same issue (PR) that triggered this
     issue_number = event.get("issue", {}).get("number")
@@ -141,7 +139,10 @@ def main():
         msg = vercel.deploy(issue_number)
     
     else:
+        msg = None
+        pass
 
+    if msg:
         # 6. Post a comment back to the PR indicating that we've started the preview
         github_token = os.environ.get("GITHUB_TOKEN")
         if not github_token:
