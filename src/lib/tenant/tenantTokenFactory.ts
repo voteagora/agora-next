@@ -69,7 +69,7 @@ export default class TenantTokenFactory {
         return {
           name: "Xai",
           symbol: "XAI",
-          decimals: 0,
+          decimals: 18,
         };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
