@@ -311,6 +311,20 @@ export const uniswapTenantUIConfig = new TenantUI({
   ## Proposal checklist
 
   **1. Create your proposal**
+
+  Get started by drafting your proposal directly in the Uniswap governance interface. Clearly outline your objectives, provide supporting details, and ensure your proposal aligns with Uniswap's governance standards.
+
+  **2. Request Sponsorship (If Threshold Not Met)**
+
+  If you don't meet the required voting power threshold, you can Request Sponsorship from existing delegates. This allows your proposal to gain visibility and the necessary backing from the community.
+
+  **3. Submit as Waiting for Sponsorship**
+
+  Proposals that haven't met the threshold will be listed as Waiting for Sponsorship. Delegates can review and choose to sponsor proposals they believe in. Once a sponsor is secured, they can push the proposal on-chain for voting.
+
+  **4. Submit On-Chain (If Threshold Met)**
+
+  If your proposal meets the voting power threshold, you can bypass the sponsorship phase and Submit On-Chain directly. This fast-tracks your proposal to the voting stage, giving the community the opportunity to decide on its implementation.
   `.trim(),
         },
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
