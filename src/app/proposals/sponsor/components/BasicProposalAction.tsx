@@ -24,9 +24,9 @@ const BasicProposalAction = ({
    * ENS (OZ gov): propose(address[] targets, uint256[] values, string[] calldatas, string description)
    * OP (Agora gov): proposeWithModule()
    * Cyber: tbd
-   * NewDAO: tbd *
+   * NewDAO: tbd
    * Linea: tbd
-   * Uni: tbd
+   * Uni: propose(address[] targets, uint256[] values, string[] signatures, bytes[] calldatas, string description)
    */
 
   // TODO: input data contains proposal type, but I don't think OZ based proposals have proposal type

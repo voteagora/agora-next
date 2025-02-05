@@ -20,7 +20,7 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const { data: blockNumber } = useBlockNumber();
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
-  const { data: accountVotes, error } = useGetVotes({
+  const { data: accountVotes } = useGetVotes({
     address: address as `0x${string}`,
     blockNumber: blockNumber ? blockNumber - BigInt(1) : BigInt(0),
     enabled: !!address && !!blockNumber,
