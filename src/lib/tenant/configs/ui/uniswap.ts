@@ -9,6 +9,8 @@ import infoPageCard02 from "@/assets/tenant/uniswap_info_2.png";
 import infoPageCard03 from "@/assets/tenant/uniswap_info_3.png";
 import infoPageCard04 from "@/assets/tenant/uniswap_info_4.png";
 import infoPageHero from "@/assets/tenant/uniswap_info_hero.png";
+import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 export const uniswapTenantUIConfig = new TenantUI({
   title: "Uniswap Agora",
@@ -269,7 +271,65 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "proposal-lifecycle",
-      enabled: false,
+      enabled: true,
+      config: {
+        stages: [
+          {
+            stage: PrismaProposalStage.DRAFTING,
+            order: 0,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.AWAITING_SUBMISSION,
+            order: 1,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.PENDING,
+            order: 2,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.QUEUED,
+            order: 3,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.EXECUTED,
+            order: 4,
+            isPreSubmission: false,
+          },
+        ],
+        proposalTypes: [
+          {
+            type: ProposalType?.BASIC,
+            prodAddress: null,
+            testnetAddress: null,
+          },
+        ],
+        copy: {
+          helperText: `
+  ## Proposal checklist
+
+  **1. Create your proposal**
+
+  Get started by drafting your proposal directly in the Uniswap governance interface. Clearly outline your objectives, provide supporting details, and ensure your proposal aligns with Uniswap's governance standards.
+
+  **2. Request Sponsorship (If Threshold Not Met)**
+
+  If you don't meet the required voting power threshold, you can Request Sponsorship from existing delegates. This allows your proposal to gain visibility and the necessary backing from the community.
+
+  **3. Submit as Waiting for Sponsorship**
+
+  Proposals that haven't met the threshold will be listed as Waiting for Sponsorship. Delegates can review and choose to sponsor proposals they believe in. Once a sponsor is secured, they can push the proposal on-chain for voting.
+
+  **4. Submit On-Chain (If Threshold Met)**
+
+  If your proposal meets the voting power threshold, you can bypass the sponsorship phase and Submit On-Chain directly. This fast-tracks your proposal to the voting stage, giving the community the opportunity to decide on its implementation.
+  `.trim(),
+        },
+        gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
+      },
     },
   ],
 });

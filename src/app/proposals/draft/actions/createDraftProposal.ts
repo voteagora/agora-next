@@ -31,6 +31,7 @@ const formDataByType = (
               target: transaction.target as string,
               value: transaction.value,
               calldata: transaction.calldata,
+              signature: transaction.signature,
               description: transaction.description,
               simulation_state: transaction.simulation_state,
               simulation_id: transaction.simulation_id,

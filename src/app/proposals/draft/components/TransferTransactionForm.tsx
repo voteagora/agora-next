@@ -76,6 +76,7 @@ const TransferTransactionForm = ({
         tenant.contracts.token.address as EthereumAddress
       );
       setValue(`${name}.${index}.value`, "0");
+      setValue(`${name}.${index}.signature`, "transfer(address,uint256)");
     }
   }, [recipient, amount, setValue]);
 
@@ -109,6 +110,7 @@ const TransferTransactionForm = ({
       <input type="hidden" {...register(`${name}.${index}.value`)} />
       <input type="hidden" {...register(`${name}.${index}.target`)} />
       <input type="hidden" {...register(`${name}.${index}.calldata`)} />
+      <input type="hidden" {...register(`${name}.${index}.signature`)} />
     </div>
   );
 };
