@@ -1,6 +1,7 @@
 import Link from "next/link";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 export function Button({ href = "", className = "", ...props }) {
   return (
@@ -64,7 +65,7 @@ export function UpdatedButton({
           </Link>
         </div>
       ) : (
-        <button
+        <motion.button
           className={cn(
             className,
             "font-semibold py-2 px-4 border border-line cursor-pointer",
@@ -76,7 +77,7 @@ export function UpdatedButton({
             type === "destructive" &&
               "bg-white text-red-500 hover:text-red-700",
             type === "disabled" &&
-              "bg-agora-stone-50 text-agora-stone-100 cursor-not-allowed",
+              "bg-wash text-tertiary/50 cursor-not-allowed",
             variant === "rounded" ? "rounded-full" : "rounded-lg",
             fullWidth && "w-full"
           )}
@@ -87,7 +88,7 @@ export function UpdatedButton({
             <span
               className={cn(
                 type === "primary" && "text-white",
-                type === "secondary" && "text-black",
+                type === "secondary" && "text-brandPrimary",
                 type === "destructive" && "text-red-500",
                 type === "link" && "",
                 "font-semibold flex flex-row space-x-2 items-center justify-center"
@@ -96,7 +97,7 @@ export function UpdatedButton({
               <LoadingSpinner
                 className={cn(
                   type === "primary" && "text-white",
-                  type === "secondary" && "text-black",
+                  type === "secondary" && "text-brandPrimary",
                   type === "destructive" && "text-red-500",
                   type === "link" && "",
                   "font-semibold"
@@ -107,7 +108,7 @@ export function UpdatedButton({
           ) : (
             children
           )}
-        </button>
+        </motion.button>
       )}
     </>
   );

@@ -41,12 +41,12 @@ export default function Proposal({
           )}
         >
           {proposal.proposalType === "SNAPSHOT" ? (
-            <div className="flex flex-row text-xs text-secondary gap-1">
+            <div className="flex flex-row text-xs text-tertiary gap-1">
               <p>Snapshot Proposal</p>
               <ArrowTopRightOnSquareIcon className="w-3 h-3 mt-1" />
             </div>
           ) : (
-            <div className="flex flex-row text-xs text-secondary gap-1">
+            <div className="flex flex-row text-xs text-tertiary gap-1">
               {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
               <div>
                 {proposalText}{" "}

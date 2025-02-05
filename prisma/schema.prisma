@@ -1190,6 +1190,7 @@ model ProposalDraft {
   dao_slug                 DaoSlug
   author_address           String
   sponsor_address          String
+  is_public                Boolean                    @default(false)
   stage                    ProposalStage
   start_date_social        DateTime?                  @db.Timestamp(6)
   end_date_social          DateTime?                  @db.Timestamp(6)
@@ -1210,8 +1211,40 @@ model ProposalDraft {
   social_options           ProposalSocialOption[]
   transactions             ProposalDraftTransaction[]
   approval_options         ProposalApprovalOption[]
+  approved_sponsors        ProposalDraftApprovedSponsors[]
+  votes                    ProposalDraftVote[]
+  comments                 ProposalDraftComment[]
 
   @@map("proposals")
+  @@schema("alltenant")
+}
+
+model ProposalDraftApprovedSponsors {
+  id               Int          @id @default(autoincrement())
+  proposal_id      Int
+  sponsor_address  String
+  status           String       @default("PENDING")
+  created_at       DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
+  proposal        ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([sponsor_address, proposal_id])
+  @@map("proposal_approved_sponsors")
+  @@schema("alltenant")
+}
+
+model ProposalDraftVote {
+  id           Int           @id @default(autoincrement())
+  proposal_id  Int
+  voter        String
+  weight       Decimal       @db.Decimal
+  direction    Int           @default(1)
+  created_at   DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
+  proposal     ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([voter, proposal_id])
+  @@map("proposal_votes")
   @@schema("alltenant")
 }
 
@@ -1274,6 +1307,19 @@ model ProposalChecklist {
   @@schema("alltenant")
 }
 
+model ProposalDraftComment {
+  id          Int           @id @default(autoincrement())
+  proposal_id Int
+  comment     String
+  author      String
+  parent_id   Int?
+  created_at  DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
+  proposal    ProposalDraft @relation(fields: [proposal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("proposal_comments")
+  @@schema("alltenant")
+}
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view advanced_voting_power_raw_snaps {
@@ -3518,6 +3564,7 @@ enum ProposalStage {
   DRAFTING
   ADDING_GITHUB_PR
   AWAITING_SUBMISSION
+  AWAITING_SPONSORSHIP
   PENDING
   ACTIVE
   EXECUTED

@@ -150,7 +150,7 @@ function SelectInput<
                 </Listbox>
               </div>
             ) : (
-              <span className="block py-2 pl-3 pr-10 text-left border bg-agora-stone-50 border-agora-stone-100 placeholder:text-agora-stone-500 text-tertiary p-2 rounded-lg w-full">
+              <span className="block py-2 pl-3 pr-10 text-left border bg-wash border-line placeholder:text-tertiary text-tertiary p-2 rounded-lg w-full">
                 {emptyCopy}
               </span>
             )}

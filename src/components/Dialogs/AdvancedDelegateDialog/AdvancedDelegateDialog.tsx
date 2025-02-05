@@ -31,7 +31,7 @@ import { useParams } from "next/navigation";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import { fetchDelegate } from "@/app/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
-import { config } from "@/app/Web3Provider";
+import { config } from "@/app/config";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 
