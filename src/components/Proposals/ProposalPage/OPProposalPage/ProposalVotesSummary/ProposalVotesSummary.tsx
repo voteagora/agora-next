@@ -86,6 +86,7 @@ export default function ProposalVotesSummary({ proposal }: Props) {
               proposalEndTime={proposal.endTime}
               proposalStatus={proposal.status}
               proposalCancelledTime={proposal.cancelledTime}
+              proposalExecutedTime={proposal.executedTime}
               cancelledTransactionHash={proposal.cancelledTransactionHash}
             />
           </div>

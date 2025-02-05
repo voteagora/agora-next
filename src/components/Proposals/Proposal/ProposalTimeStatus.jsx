@@ -9,6 +9,7 @@ export default function ProposalTimeStatus({
   proposalEndTime,
   proposalStartTime,
   proposalCancelledTime,
+  proposalExecutedTime,
 }) {
   const activeProposalEndTime = proposalEndTime
     ? format(proposalEndTime, "h:mm aaa MMM dd, yyyy")
@@ -23,6 +24,12 @@ export default function ProposalTimeStatus({
     ? format(proposalEndTime, "h:mm aaa MMM dd, yyyy")
     : null;
 
+  const _proposalExecutedTime =
+    proposalExecutedTime &&
+    new Intl.DateTimeFormat("en-US", finishOptions).format(
+      proposalExecutedTime
+    );
+
   switch (proposalStatus) {
     case "PENDING":
       return <HStack gap={1}>Starts {pendingProposalStartTime}</HStack>;
@@ -32,6 +39,9 @@ export default function ProposalTimeStatus({
 
     case "CANCELLED":
       return <HStack gap={1}>Cancelled {_proposalCancelledTime}</HStack>;
+
+    case "EXECUTED":
+      return <HStack gap={1}>Executed {_proposalExecutedTime}</HStack>;
 
     default:
       return <HStack gap={1}>Ended {finishProposalEndTime}</HStack>;
