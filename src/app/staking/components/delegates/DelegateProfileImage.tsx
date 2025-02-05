@@ -1,6 +1,6 @@
 import { useEnsName } from "wagmi";
 import ENSAvatar from "@/components/shared/ENSAvatar";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import ENSName from "@/components/shared/ENSName";
 
 interface DelegateProfileImageProps {
@@ -30,7 +30,7 @@ export const DelegateProfileImage = ({
         </div>
         {votingPower && (
           <div className="text-xs font-semibold text-secondary">
-            <TokenAmountDisplay amount={votingPower} />
+            <TokenAmountDecorated amount={votingPower} />
           </div>
         )}
       </div>

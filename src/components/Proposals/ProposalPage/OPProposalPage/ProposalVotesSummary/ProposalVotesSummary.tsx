@@ -2,7 +2,7 @@
 import { useState } from "react";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import {
@@ -34,10 +34,20 @@ export default function ProposalVotesSummary({ proposal }: Props) {
           <HoverCardTrigger className="w-full cursor-pointer flex flex-col gap-2 px-4 pt-2">
             <div className="flex flex-row justify-between mt-2">
               <div className="text-positive">
-                FOR <TokenAmountDisplay amount={results.for} />
+                FOR -{" "}
+                <TokenAmountDecorated
+                  amount={results.for}
+                  hideCurrency
+                  specialFormatting
+                />
               </div>
               <div className="text-negative">
-                AGAINST <TokenAmountDisplay amount={results.against} />
+                AGAINST -{" "}
+                <TokenAmountDecorated
+                  amount={results.against}
+                  hideCurrency
+                  specialFormatting
+                />
               </div>
             </div>
 
@@ -48,7 +58,12 @@ export default function ProposalVotesSummary({ proposal }: Props) {
                 <>
                   {proposal.quorum && (
                     <div>
-                      Quorum <TokenAmountDisplay amount={proposal.quorum} />
+                      Quorum{" "}
+                      <TokenAmountDecorated
+                        amount={proposal.quorum}
+                        hideCurrency
+                        specialFormatting
+                      />
                     </div>
                   )}
                 </>

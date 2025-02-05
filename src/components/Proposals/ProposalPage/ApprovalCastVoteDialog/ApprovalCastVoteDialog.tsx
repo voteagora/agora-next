@@ -7,7 +7,7 @@ import {
   NoStatementView,
   SuccessMessage,
 } from "../CastVoteDialog/CastVoteDialog";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { CheckIcon } from "lucide-react";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import useAdvancedVoting from "@/hooks/useAdvancedVoting";
@@ -56,7 +56,7 @@ export function ReviewApprovalVoteDialog({
           <div className="flex flex-col">
             <span className="text-xs self-end">with</span>
             <span className="mt-[2px]">
-              <TokenAmountDisplay amount={votingPower} />
+              <TokenAmountDecorated amount={votingPower} />
             </span>
           </div>
         </div>
@@ -98,7 +98,7 @@ export function ReviewApprovalVoteDialog({
         >
           Vote for {selectedOptions.length} option
           {selectedOptions.length > 1 && "s"} with{"\u00A0"}
-          {<TokenAmountDisplay amount={votingPower} />}
+          {<TokenAmountDecorated amount={votingPower} />}
         </Button>
       </div>
     </div>
@@ -222,7 +222,7 @@ export function ApprovalCastVoteDialog({
                       ) : (
                         <>
                           Requesting{"\u00A0"}
-                          <TokenAmountDisplay
+                          <TokenAmountDecorated
                             fragment={option.budgetTokensSpent}
                           />
                         </>
@@ -293,7 +293,7 @@ function CastVoteWithReason({
           <Button onClick={() => onVoteClick()}>
             Vote for {numberOfOptions} option
             {numberOfOptions > 1 && "s"} with{"\u00A0"}
-            {<TokenAmountDisplay amount={votingPower} />}
+            {<TokenAmountDecorated amount={votingPower} />}
           </Button>
         )}
         {!abstain && numberOfOptions === 0 && (
@@ -304,7 +304,7 @@ function CastVoteWithReason({
             {!copy ? (
               <>
                 Abstain from voting with{"\u00A0"}
-                <TokenAmountDisplay amount={votingPower} />
+                <TokenAmountDecorated amount={votingPower} />
               </>
             ) : (
               copy

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { useTotalSupply } from "@/hooks/useTotalSupply";
 import { useTotalStaked } from "@/hooks/useTotalStaked";
 import { useRewardPerToken } from "@/hooks/useRewardPerToken";
@@ -18,7 +18,7 @@ export const StakingStats = () => {
       <div className="flex flex-col text-center p-5">
         <div className="text-xs text-secondary">Total Supply</div>
         <div className="font-medium text-primary">
-          <TokenAmountDisplay amount={totalSupply || 0n} />
+          <TokenAmountDecorated amount={totalSupply || 0n} />
         </div>
       </div>
 
@@ -27,7 +27,7 @@ export const StakingStats = () => {
       <div className="flex flex-col text-center p-5">
         <div className="text-xs text-secondary">Total Staked</div>
         <div className="font-medium text-primary">
-          <TokenAmountDisplay amount={totalStaked || 0n} />
+          <TokenAmountDecorated amount={totalStaked || 0n} />
         </div>
       </div>
 
@@ -36,7 +36,10 @@ export const StakingStats = () => {
       <div className="flex flex-col text-center p-5">
         <div className="text-xs text-secondary">Rewards per token</div>
         <div className="font-medium text-primary">
-          <TokenAmountDisplay amount={rewardPerToken || 0n} currency={"WETH"} />
+          <TokenAmountDecorated
+            amount={rewardPerToken || 0n}
+            currency={"WETH"}
+          />
         </div>
       </div>
 

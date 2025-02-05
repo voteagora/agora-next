@@ -1,10 +1,13 @@
-import { HStack, VStack } from "@/components/Layout/Stack";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
 import { parseUnits } from "viem";
 import { tokenForContractAddress } from "@/lib/tokenUtils";
 import Tenant from "@/lib/tenant/tenant";
+import { cn } from "@/lib/utils";
+import { fontMapper } from "@/styles/fonts";
+
+const { contracts, ui } = Tenant.current();
 
 export default function OptionsResultsPanel({
   proposal,
@@ -14,7 +17,6 @@ export default function OptionsResultsPanel({
   // Note: Defaulting to optimism token for now since the contract-scoped token
   // was exactly the same as the optimism token.
 
-  const { contracts } = Tenant.current();
   const proposalData =
     proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
 
@@ -64,7 +66,7 @@ export default function OptionsResultsPanel({
     });
 
   return (
-    <VStack className="max-h-[calc(100vh-482px)] overflow-y-scroll flex-shrink px-4">
+    <div className="flex flex-col max-h-[calc(100vh-482px)] overflow-y-scroll flex-shrink px-4">
       {sortedOptions.map((option, index) => {
         let isApproved = false;
         const votesAmountBN = BigInt(option?.votes || 0);
@@ -105,7 +107,7 @@ export default function OptionsResultsPanel({
           />
         );
       })}
-    </VStack>
+    </div>
   );
 }
 
@@ -145,30 +147,37 @@ function SingleOption({
   }
 
   return (
-    <VStack gap={1} className="last:mb-2">
+    <div className="flex flex-col gap-1 last:mb-2">
       {" "}
-      <HStack
-        justifyContent="justify-between"
-        className="font-semibold text-sm mb-1"
-      >
-        <div className="overflow-ellipsis overflow-hidden whitespace-nowrap max-w-[12rem]">
+      <div className="flex justify-between font-semibold text-sm mb-1">
+        <div className="overflow-ellipsis overflow-hidden whitespace-nowrap max-w-[12rem] text-primary">
           {description}
         </div>
-        <div className="text-secondary">
-          <TokenAmountDisplay amount={votes} />
-          <span className="ml-1">
+        <div className="text-primary flex items-center gap-1">
+          <TokenAmountDecorated
+            amount={votes}
+            className={fontMapper[ui?.customization?.tokenAmountFont || ""]}
+            specialFormatting
+            hideCurrency
+          />
+          <span
+            className={cn(
+              "ml-1 text-tertiary",
+              fontMapper[ui?.customization?.tokenAmountFont || ""]
+            )}
+          >
             {percentage === 0n
-              ? "(0%)"
-              : "(" + Math.round(Number(percentage) / 100).toString() + "%)"}
+              ? "0%"
+              : (Number(percentage) / 100).toFixed(2) + "%"}
           </span>
         </div>
-      </HStack>
+      </div>
       <ProgressBar
         barPercentage={barPercentage}
         isApproved={isApproved}
         thresholdPosition={thresholdPosition}
       />
-    </VStack>
+    </div>
   );
 }
 
@@ -187,10 +196,10 @@ export function ProgressBar({
       Number(barPercentage) !== 0 ? 1 : 0
     ).toFixed(2) + "%";
 
-  const progressBarColor = isApproved ? "bg-green-positive" : "bg-secondary";
+  const progressBarColor = isApproved ? "bg-positive" : "bg-tertiary";
 
   return (
-    <HStack>
+    <div className="flex">
       {" "}
       <div className="w-full h-[6px] rounded-[10px] bg-line relative mb-3">
         <div
@@ -204,7 +213,7 @@ export function ProgressBar({
           ></div>
         )}
       </div>
-    </HStack>
+    </div>
   );
 }
 

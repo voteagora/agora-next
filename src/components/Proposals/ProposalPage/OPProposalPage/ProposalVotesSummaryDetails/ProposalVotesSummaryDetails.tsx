@@ -3,7 +3,7 @@ import checkIcon from "@/icons/check.svg";
 import linkIcon from "@/icons/link.svg";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -22,7 +22,8 @@ function AmountAndPercent({
     total > 0 ? ((Number(amount) / Number(total)) * 100).toFixed(2) : undefined;
   return (
     <span>
-      <TokenAmountDisplay amount={amount} /> {percent && `(${percent}%)`}
+      <TokenAmountDecorated amount={amount} hideCurrency specialFormatting />
+      {percent && `(${percent}%)`}
     </span>
   );
 }
@@ -110,16 +111,18 @@ export default function ProposalVotesSummaryDetails({
                 />
               )}
               <p className="text-xs font-semibold text-secondary">
-                <TokenAmountDisplay
+                <TokenAmountDecorated
                   amount={quorumVotes}
                   decimals={token.decimals}
-                  currency={""}
+                  hideCurrency
+                  specialFormatting
                 />{" "}
                 /{" "}
-                <TokenAmountDisplay
+                <TokenAmountDecorated
                   amount={proposal.quorum}
                   decimals={token.decimals}
-                  currency={""}
+                  hideCurrency
+                  specialFormatting
                 />{" "}
                 Required
               </p>

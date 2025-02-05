@@ -1,24 +1,29 @@
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { useAccount } from "wagmi";
 import { type Vote } from "@/app/api/common/votes/vote";
-import VoterHoverCard from "../VoterHoverCard";
 import { useState } from "react";
-import { getBlockScanUrl, timeout } from "@/lib/utils";
-import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
-import useConnectedDelegate from "@/hooks/useConnectedDelegate";
+import {
+  capitalizeFirstLetter,
+  formatNumber,
+  getBlockScanUrl,
+  timeout,
+} from "@/lib/utils";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipContent } from "@/components/ui/tooltip";
+import { Tooltip } from "@/components/ui/tooltip";
+import { TooltipTrigger } from "@/components/ui/tooltip";
+import Tenant from "@/lib/tenant/tenant";
+import { fontMapper } from "@/styles/fonts";
+import Link from "next/link";
+import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
+
+const { token, ui } = Tenant.current();
 
 export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
-  const { isAdvancedUser } = useIsAdvancedUser();
-  const { advancedDelegators } = useConnectedDelegate();
   const { address } = useAccount();
   const {
     address: voterAddress,
@@ -55,11 +60,14 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
           >
             <div className="text-primary font-semibold flex items-center">
               <ENSAvatar ensName={voterAddress} className="w-5 h-5 mr-1" />
-              <ENSName address={voterAddress} />
+              <div className="text-primary hover:underline">
+                <Link href={`/delegates/${voterAddress}`}>
+                  <ENSName address={voterAddress} />
+                </Link>
+              </div>
               {address?.toLowerCase() === voterAddress && (
-                <span>&nbsp;(you)</span>
+                <span className="text-primary">&nbsp;(you)</span>
               )}
-              <span>&nbsp;voted for</span>
               {hovered && (
                 <>
                   <a
@@ -81,18 +89,29 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
                 </>
               )}
             </div>
-            <div className={"font-semibold text-secondary"}>
-              <TokenAmountDisplay amount={weight} />
+            <div className={"font-semibold text-primary"}>
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>
+                      <TokenAmountDecorated
+                        amount={weight}
+                        hideCurrency
+                        specialFormatting
+                        className={
+                          fontMapper[ui?.customization?.tokenAmountFont || ""]
+                        }
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="p-4">
+                    {`${formatNumber(vote.weight, token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </HStack>
         </HoverCardTrigger>
-        <HoverCardContent className="w-full shadow" side="left" sideOffset={3}>
-          <VoterHoverCard
-            address={vote.address}
-            isAdvancedUser={isAdvancedUser}
-            delegators={advancedDelegators}
-          />
-        </HoverCardContent>
       </HoverCard>
       <VStack className={"text-xs leading-4 mb-2"}>
         {params?.map((option: string, index: number) => (
