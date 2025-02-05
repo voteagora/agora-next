@@ -9,6 +9,7 @@ import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { useManager } from "@/hooks/useManager";
 import { DraftProposal, PLMConfig, ProposalGatingType } from "../../types";
 import Tenant from "@/lib/tenant/tenant";
+import { useGetVotes } from "@/hooks/useGetVotes";
 
 const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const tenant = Tenant.current();
@@ -17,20 +18,13 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
 
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber();
-
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
-
-  const { data: accountVotes } = useReadContract({
-    chainId: tenant.contracts.governor.chain.id,
-    abi: tenant.contracts.governor.abi,
-    address: tenant.contracts.governor.address as `0x${string}`,
-    functionName: "getVotes",
-    args: [
-      address as `0x${string}`,
-      blockNumber ? (blockNumber - BigInt(1)).toString() : "0",
-    ],
-  }) as { data: bigint };
+  const { data: accountVotes, error } = useGetVotes({
+    address: address as `0x${string}`,
+    blockNumber: blockNumber ? blockNumber - BigInt(1) : BigInt(0),
+    enabled: !!address && !!blockNumber,
+  });
 
   const canSponsor = () => {
     switch (gatingType) {

@@ -18,4 +18,5 @@ export { ProposalTypesConfigurator__factory } from "./ProposalTypesConfigurator_
 export { UniswapGovernor__factory } from "./UniswapGovernor__factory";
 export { UniswapStaker__factory } from "./UniswapStaker__factory";
 export { UniswapTimelock__factory } from "./UniswapTimelock__factory";
+export { UniswapToken__factory } from "./UniswapToken__factory";
 export { VotableSupplyOracle__factory } from "./VotableSupplyOracle__factory";
