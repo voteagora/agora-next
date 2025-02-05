@@ -14,7 +14,7 @@ const FormCardSection = ({
 }) => {
   return (
     <div
-      className={`p-6 border-b border-line border-x first-of-type:border-t first-of-type:rounded-t-2xl last-of-type:rounded-b-2xl last-of-type:shadow-newDefault z-20 relative bg-wash ${className}`}
+      className={`p-6 border-b border-line border-x first-of-type:border-t first-of-type:rounded-t-2xl last-of-type:rounded-b-2xl last-of-type:shadow-newDefault z-20 relative bg-neutral ${className}`}
     >
       {children}
     </div>
