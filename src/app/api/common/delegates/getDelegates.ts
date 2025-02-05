@@ -19,6 +19,7 @@ import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSup
 import { doInSpan } from "@/app/lib/logging";
 import { DELEGATION_MODEL, TENANT_NAMESPACES } from "@/lib/constants";
 import { getProxyAddress } from "@/lib/alligatorUtils";
+import { calculateBigIntRatio } from "../utils/bigIntRatio";
 
 /*
  * Fetches a list of delegates
@@ -522,6 +523,11 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
         )
       : cachedNumOfDelegators;
 
+  const relativeVotingPowerToVotableSupply = calculateBigIntRatio(
+    totalVotingPower,
+    BigInt(votableSupply)
+  );
+
   // Build out delegate JSON response
   return {
     address: address,
@@ -549,6 +555,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     numOfDelegators: usedNumOfDelegators,
     totalProposals: delegate?.total_proposals || 0,
     statement: delegate?.statement || null,
+    relativeVotingPowerToVotableSupply,
   };
 }
 

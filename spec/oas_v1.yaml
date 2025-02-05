@@ -282,6 +282,7 @@ components:
           summary: Delegate's voting power relative to votable supply
           description: The delegate's voting power relative to the votable supply.
           type: number
+          deprecated: true
         votingPowerRelativeToQuorum:
           summary: Delegate's voting power relative to quorum
           description: The delegate's voting power relative to the quorum.
@@ -317,6 +318,10 @@ components:
         numOfDelegators:
           summary: Number of delegators
           description: The number of delegators.
+          type: string
+        relativeVotingPowerToVotableSupply:
+          summary: Delegate's voting power relative to votable supply
+          description: The delegate's voting power relative to the votable supply.
           type: string
     DelegateStatement:
       summary: A delegate's statement
