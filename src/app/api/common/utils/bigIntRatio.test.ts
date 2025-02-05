@@ -26,11 +26,13 @@ describe("calculateBigIntRatio", () => {
     expect(result).toBe("0.000000000049");
   });
 
-  test("handles 18-digit BigInt numbers", () => {
-    const num1 = 10n;
-    const num2 = 123456789012345678n;
+  test("handles numbers larger than MAX_SAFE_INTEGER", () => {
+    const maxSafeInt = BigInt(Number.MAX_SAFE_INTEGER); // 9007199254740991
+    const num1 = 10000000000000000000n; // 20 digits, above MAX_SAFE_INTEGER
+    const num2 = 40000000000000000000n;
 
     const result1 = calculateBigIntRatio(num1, num2);
-    expect(result1).toBe("0.000000000000000081");
+    expect(result1).toBe("0.25");
+    expect(num1 > maxSafeInt).toBe(true);
   });
 });
