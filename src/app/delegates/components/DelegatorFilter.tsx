@@ -9,6 +9,17 @@ import FilterListbox from "@/components/common/FilterListbox";
 const FILTER_PARAM = "delegatorFilter";
 const DEFAULT_FILTER = "all_delegates";
 
+const delegateeFilterOptions = [
+  {
+    value: "All delegates",
+    sort: "all_delegates",
+  },
+  {
+    value: "My delegates",
+    sort: "my_delegates",
+  },
+];
+
 export default function DelegatorFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -19,17 +30,6 @@ export default function DelegatorFilter() {
 
   const currentParam = searchParams?.get(FILTER_PARAM);
   const filterParam = currentParam ? "my_delegates" : "all_delegates";
-
-  const delegateeFilterOptions = [
-    {
-      value: "All delegates",
-      sort: "all_delegates",
-    },
-    {
-      value: "My delegates",
-      sort: "my_delegates",
-    },
-  ];
 
   const handleChange = (value: string) => {
     setIsDelegatesFiltering(true);

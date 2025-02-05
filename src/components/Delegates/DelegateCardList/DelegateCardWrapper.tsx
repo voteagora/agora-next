@@ -42,13 +42,13 @@ const DelegateCardWrapper = async ({ searchParams }: { searchParams: any }) => {
   const { ui } = Tenant.current();
 
   const sort =
-    delegatesFilterOptions[
-      searchParams.orderBy as keyof typeof delegatesFilterOptions
-    ]?.sort || delegatesFilterOptions.weightedRandom.sort;
+    Object.entries(delegatesFilterOptions).find(
+      ([, value]) => value.sort === searchParams.orderBy
+    )?.[1]?.sort || delegatesFilterOptions.weightedRandom.sort;
   const citizensSort =
-    citizensFilterOptions[
-      searchParams.citizensOrderBy as keyof typeof citizensFilterOptions
-    ]?.value || citizensFilterOptions.shuffle.sort;
+    Object.entries(citizensFilterOptions).find(
+      ([, value]) => value.sort === searchParams.citizensOrderBy
+    )?.[1]?.sort || citizensFilterOptions.shuffle.sort;
 
   const filters = {
     ...(searchParams.delegatorFilter && {
