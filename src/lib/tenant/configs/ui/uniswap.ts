@@ -294,18 +294,23 @@ export const uniswapTenantUIConfig = new TenantUI({
             isPreSubmission: true,
           },
           {
-            stage: PrismaProposalStage.PENDING,
+            stage: PrismaProposalStage.AWAITING_SPONSORSHIP,
             order: 2,
-            isPreSubmission: false,
+            isPreSubmission: true,
           },
           {
-            stage: PrismaProposalStage.QUEUED,
+            stage: PrismaProposalStage.PENDING,
             order: 3,
             isPreSubmission: false,
           },
           {
-            stage: PrismaProposalStage.EXECUTED,
+            stage: PrismaProposalStage.QUEUED,
             order: 4,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.EXECUTED,
+            order: 5,
             isPreSubmission: false,
           },
         ],
@@ -337,6 +342,9 @@ export const uniswapTenantUIConfig = new TenantUI({
   If your proposal meets the voting power threshold, you can bypass the sponsorship phase and Submit On-Chain directly. This fast-tracks your proposal to the voting stage, giving the community the opportunity to decide on its implementation.
   `.trim(),
         },
+        public: true,
+        comments: false,
+        votes: false,
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
       },
     },
