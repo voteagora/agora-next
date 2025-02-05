@@ -21,6 +21,13 @@ export type StakedDeposit = {
   id: number;
 };
 
+export type ChartVote = {
+  voter: string;
+  support: string;
+  weight: string;
+  block_number: string;
+};
+
 export type VoterStats = {
   voter: string;
   total_proposals: number;

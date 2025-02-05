@@ -1,32 +1,48 @@
 import { Vote } from "@/app/api/common/votes/vote";
 import { useAccount, useEnsName } from "wagmi";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
-import VoteText from "../VoteText/VoteText";
-import VoterHoverCard from "../VoterHoverCard";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
-import { getBlockScanUrl, timeout } from "@/lib/utils";
+import {
+  capitalizeFirstLetter,
+  formatNumber,
+  getBlockScanUrl,
+  timeout,
+} from "@/lib/utils";
 import { useState } from "react";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
+import { Support } from "@/lib/voteUtils";
+import { CheckIcon, MinusIcon, X } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import Tenant from "@/lib/tenant/tenant";
+import { fontMapper } from "@/styles/fonts";
+import Link from "next/link";
+import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 
-export function ProposalSingleVote({
-  vote,
-  isAdvancedUser,
-  delegators,
-}: {
-  vote: Vote;
-  isAdvancedUser: boolean;
-  delegators: string[] | null;
-}) {
+const { token, ui } = Tenant.current();
+
+// Using Lucide icons instead of Heroicons for better support of strokeWidth
+const SUPPORT_TO_ICON: Record<Support, React.ReactNode> = {
+  ["FOR"]: <CheckIcon strokeWidth={4} className="w-3 h-3 text-positive" />,
+  ["AGAINST"]: <X strokeWidth={4} className="w-3 h-3 text-negative" />,
+  ["ABSTAIN"]: <MinusIcon strokeWidth={4} className="w-3 h-3 text-tertiary" />,
+};
+
+export function ProposalSingleVote({ vote }: { vote: Vote }) {
   const { address: connectedAddress } = useAccount();
   const [hovered, setHovered] = useState(false);
   const [hash1, hash2] = vote.transactionHash.split("|");
+
+  const { data } = useEnsName({
+    chainId: 1,
+    address: vote.address as `0x${string}`,
+  });
 
   const _onOpenChange = async (open: boolean) => {
     if (open) {
@@ -36,11 +52,6 @@ export function ProposalSingleVote({
       setHovered(open);
     }
   };
-
-  const { data } = useEnsName({
-    chainId: 1,
-    address: vote.address as `0x${string}`,
-  });
 
   return (
     <VStack
@@ -61,11 +72,14 @@ export function ProposalSingleVote({
             >
               <HStack gap={1} alignItems="items-center">
                 <ENSAvatar ensName={data} className="w-5 h-5" />
-                <ENSName address={vote.address} />
+                <div className="text-primary hover:underline">
+                  <Link href={`/delegates/${vote.address}`}>
+                    <ENSName address={vote.address} />
+                  </Link>
+                </div>
                 {vote.address === connectedAddress?.toLowerCase() && (
-                  <p>(you)</p>
+                  <p className="text-primary">(you)</p>
                 )}
-                <VoteText support={vote.support} />
                 {hovered && (
                   <>
                     <a
@@ -88,24 +102,41 @@ export function ProposalSingleVote({
                 )}
               </HStack>
               <HStack alignItems="items-center">
-                <TokenAmountDisplay amount={vote.weight} />
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div
+                        className={
+                          vote.support === "AGAINST"
+                            ? "text-negative"
+                            : vote.support === "FOR"
+                              ? "text-positive"
+                              : "text-tertiary"
+                        }
+                      >
+                        <TokenAmountDecorated
+                          amount={vote.weight}
+                          hideCurrency
+                          specialFormatting
+                          className={
+                            fontMapper[ui?.customization?.tokenAmountFont || ""]
+                              ?.variable
+                          }
+                          icon={SUPPORT_TO_ICON[vote.support as Support]}
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="p-4">
+                      {`${formatNumber(vote.weight, token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </HStack>
             </HStack>
           </HoverCardTrigger>
-          <HoverCardContent
-            className="w-full shadow hidden sm:block"
-            side="left"
-            sideOffset={3}
-          >
-            <VoterHoverCard
-              address={vote.address}
-              isAdvancedUser={isAdvancedUser}
-              delegators={delegators}
-            />
-          </HoverCardContent>
         </HoverCard>
       </VStack>
-      <pre className="text-xs font-medium whitespace-pre-wrap text-tertiary w-fit break-all font-sans">
+      <pre className="text-xs font-medium whitespace-pre-wrap text-secondary w-fit break-all font-sans">
         {vote.reason}
       </pre>
     </VStack>

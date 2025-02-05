@@ -1,9 +1,12 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+
 type Props = {
   onSelectionChanged: (newSelection: any) => void;
   selection: string;
   options: string[];
+  className?: string;
 };
 
 const optionStyle =
@@ -11,9 +14,19 @@ const optionStyle =
 
 const selectedStyle = "bg-tertiary/20 text-secondary font-semibold";
 
-export function Switch({ onSelectionChanged, selection, options }: Props) {
+export function Switch({
+  onSelectionChanged,
+  selection,
+  options,
+  className,
+}: Props) {
   return (
-    <div className="flex text-sm flex-row gap-2 rounded-md border border-line overflow-hidden w-full p-1">
+    <div
+      className={cn(
+        "flex text-sm flex-row gap-2 rounded-md border border-line overflow-hidden w-full p-1",
+        className
+      )}
+    >
       {options.map((option, index) => (
         <div
           key={index}

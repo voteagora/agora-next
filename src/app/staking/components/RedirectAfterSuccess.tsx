@@ -25,9 +25,9 @@ export const RedirectAfterSuccess = ({
   }, []);
 
   return (
-    <div className="rounded-lg bg-green-200 border border-green-300 p-4">
-      <div className="text-sm font-semibold">{message}</div>
-      <div className="text-sm text-gray-700">
+    <div className="rounded-lg bg-positive/10 border border-positive p-4">
+      <div className="text-sm font-semibold text-positive">{message}</div>
+      <div className="text-sm text-primary">
         {isIndexing ? (
           "Indexing transaction..."
         ) : (

@@ -79,6 +79,7 @@ export default function Proposal({
                 proposalStartTime={proposal.startTime}
                 proposalEndTime={proposal.endTime}
                 proposalCancelledTime={proposal.cancelledTime}
+                proposalExecutedTime={proposal.executedTime}
               />
             </div>
             <ProposalStatus proposal={proposal} />

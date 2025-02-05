@@ -3,13 +3,12 @@ import checkIcon from "@/icons/check.svg";
 import linkIcon from "@/icons/link.svg";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import { format } from "date-fns";
 import Link from "next/link";
 
 import Tenant from "@/lib/tenant/tenant";
-import { Vote } from "@/app/api/common/votes/vote";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
 function AmountAndPercent({
@@ -23,17 +22,16 @@ function AmountAndPercent({
     total > 0 ? ((Number(amount) / Number(total)) * 100).toFixed(2) : undefined;
   return (
     <span>
-      <TokenAmountDisplay amount={amount} /> {percent && `(${percent}%)`}
+      <TokenAmountDecorated amount={amount} hideCurrency specialFormatting />
+      {percent && `(${percent}%)`}
     </span>
   );
 }
 
 export default function ProposalVotesSummaryDetails({
   proposal,
-  votes,
 }: {
   proposal: Proposal;
-  votes?: Vote[];
 }) {
   const { token, namespace } = Tenant.current();
   const results =
@@ -81,7 +79,7 @@ export default function ProposalVotesSummaryDetails({
 
   return (
     <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[317px] sm:min-w-[317px] bg-wash">
-      <ProposalVotesBar proposal={proposal} votes={votes} />
+      <ProposalVotesBar proposal={proposal} />
 
       <div className="flex flex-col gap-2 w-full mt-4">
         <div className="flex justify-between text-positive">
@@ -113,16 +111,18 @@ export default function ProposalVotesSummaryDetails({
                 />
               )}
               <p className="text-xs font-semibold text-secondary">
-                <TokenAmountDisplay
+                <TokenAmountDecorated
                   amount={quorumVotes}
                   decimals={token.decimals}
-                  currency={""}
+                  hideCurrency
+                  specialFormatting
                 />{" "}
                 /{" "}
-                <TokenAmountDisplay
+                <TokenAmountDecorated
                   amount={proposal.quorum}
                   decimals={token.decimals}
-                  currency={""}
+                  hideCurrency
+                  specialFormatting
                 />{" "}
                 Required
               </p>
@@ -160,7 +160,11 @@ export default function ProposalVotesSummaryDetails({
         <StepperRow
           isLastStep
           label={`Proposal ${proposal.status?.toLocaleLowerCase()}`}
-          value={formatTime(proposal.endTime)}
+          value={
+            proposal.status === "EXECUTED"
+              ? formatTime(proposal.executedTime)
+              : formatTime(proposal.endTime)
+          }
         />
       </ol>
     </div>

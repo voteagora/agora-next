@@ -12,7 +12,7 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import { useReadContract } from "wagmi";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import {
   Tooltip,
   TooltipContent,
@@ -126,7 +126,7 @@ const GovernorSettingsProposalTypes = ({
               className={`${isQuorumSupportedByGovernor ? "rounded-none" : "rounded-br-xl"}`}
             >
               {isThresholdFetched && threshold !== undefined && (
-                <TokenAmountDisplay
+                <TokenAmountDecorated
                   amount={BigInt(threshold.toString())}
                   currency={token.symbol}
                   decimals={token.decimals}
@@ -136,7 +136,7 @@ const GovernorSettingsProposalTypes = ({
             {isQuorumSupportedByGovernor && (
               <TableCell colSpan={4} className="rounded-br-xl">
                 {isQuorumFetched && quorum && (
-                  <TokenAmountDisplay
+                  <TokenAmountDecorated
                     amount={BigInt(quorum.toString())}
                     currency={token.symbol}
                     decimals={token.decimals}

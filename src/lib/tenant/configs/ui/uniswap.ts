@@ -37,6 +37,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     negative: "226 54 54",
     brandPrimary: "0 0 0",
     brandSecondary: "255 255 255",
+    tokenAmountFont: "font-chivoMono",
   },
 
   links: [
@@ -44,6 +45,11 @@ export const uniswapTenantUIConfig = new TenantUI({
       name: "changelog",
       title: "Change log",
       url: "/changelog",
+    },
+    {
+      name: "code-of-conduct",
+      title: "Delegate Code of Conduct",
+      url: "https://gov.uniswap.org/t/rfc-delegate-code-of-conduct/20913",
     },
   ],
 

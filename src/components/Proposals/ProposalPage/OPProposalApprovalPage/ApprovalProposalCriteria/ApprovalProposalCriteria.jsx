@@ -1,5 +1,5 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import { getProposalCurrentQuorum } from "@/lib/proposalUtils";
 
@@ -16,10 +16,20 @@ export default function ApprovalProposalCriteria({ proposal }) {
           className="text-xs font-semibold text-secondary py-2"
         >
           <div>
-            Quorum <TokenAmountDisplay amount={proposal.quorum} />
+            Quorum{" "}
+            <TokenAmountDecorated
+              amount={proposal.quorum}
+              hideCurrency
+              specialFormatting
+            />
           </div>
           <div>
-            Current <TokenAmountDisplay amount={currentQuorum} />
+            Current{" "}
+            <TokenAmountDecorated
+              amount={currentQuorum}
+              hideCurrency
+              specialFormatting
+            />
           </div>
         </HStack>
         <ProposalStatusDetail
@@ -27,6 +37,7 @@ export default function ApprovalProposalCriteria({ proposal }) {
           proposalEndTime={proposal.endTime}
           proposalStartTime={proposal.startTime}
           proposalCancelledTime={proposal.cancelledTime}
+          proposalExecutedTime={proposal.executedTime}
           cancelledTransactionHash={proposal.cancelledTransactionHash}
         />
       </div>
@@ -44,10 +55,10 @@ export default function ApprovalProposalCriteria({ proposal }) {
           <p>
             In this threshold-based proposal, all options passing the approval
             threshold of{" "}
-            <TokenAmountDisplay amount={proposalSettings.criteriaValue} /> votes
-            will be executed in order from most to least popular, until the
-            total budget of{" "}
-            <TokenAmountDisplay amount={proposalSettings.budgetAmount} /> runs
+            <TokenAmountDecorated amount={proposalSettings.criteriaValue} />{" "}
+            votes will be executed in order from most to least popular, until
+            the total budget of{" "}
+            <TokenAmountDecorated amount={proposalSettings.budgetAmount} /> runs
             out. Voters can select up to {proposalSettings.maxApprovals}{" "}
             options. If the quorum is not met, no options will be executed.
           </p>

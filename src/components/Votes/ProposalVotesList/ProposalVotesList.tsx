@@ -1,7 +1,6 @@
 "use client";
 
 import InfiniteScroll from "react-infinite-scroller";
-import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { useAccount } from "wagmi";
 import { ProposalSingleVote } from "./ProposalSingleVote";
 import { Vote } from "@/app/api/common/votes/vote";
@@ -10,7 +9,6 @@ import {
   fetchProposalVotes,
   fetchUserVotesForProposal,
 } from "@/app/proposals/actions";
-import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { PaginatedResult } from "@/app/lib/pagination";
 import { useProposalVotes } from "@/hooks/useProposalVotes";
 
@@ -18,7 +16,7 @@ interface Props {
   proposalId: string;
 }
 
-const LIMIT = 20;
+const LIMIT = 10;
 
 export default function ProposalVotesList({ proposalId }: Props) {
   const { data: fetchedVotes, isFetched } = useProposalVotes({
@@ -29,7 +27,6 @@ export default function ProposalVotesList({ proposalId }: Props) {
   });
 
   const { address: connectedAddress } = useAccount();
-  const { advancedDelegators } = useConnectedDelegate();
   const fetching = useRef(false);
 
   const [voteState, setVoteState] = useState<{
@@ -90,8 +87,6 @@ export default function ProposalVotesList({ proposalId }: Props) {
     }
   }, [proposalId, voteState.meta]);
 
-  const { isAdvancedUser } = useIsAdvancedUser();
-
   return (
     <div className="px-4 pb-4 overflow-y-scroll max-h-[calc(100vh-437px)]">
       {isFetched && fetchedVotes ? (
@@ -110,11 +105,7 @@ export default function ProposalVotesList({ proposalId }: Props) {
           <ul className="flex flex-col">
             {userVotes.map((vote) => (
               <li key={vote.transactionHash}>
-                <ProposalSingleVote
-                  vote={vote}
-                  isAdvancedUser={isAdvancedUser}
-                  delegators={advancedDelegators}
-                />
+                <ProposalSingleVote vote={vote} />
               </li>
             ))}
             {proposalVotes.map((vote) => (
@@ -124,11 +115,7 @@ export default function ProposalVotesList({ proposalId }: Props) {
                   connectedAddress?.toLowerCase() === vote.address && "hidden"
                 }`}
               >
-                <ProposalSingleVote
-                  vote={vote}
-                  isAdvancedUser={isAdvancedUser}
-                  delegators={advancedDelegators}
-                />
+                <ProposalSingleVote vote={vote} />
               </li>
             ))}
           </ul>

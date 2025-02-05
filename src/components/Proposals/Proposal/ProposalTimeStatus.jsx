@@ -2,56 +2,33 @@
 "use client";
 
 import { HStack } from "@/components/Layout/Stack";
+import { format } from "date-fns";
 
 export default function ProposalTimeStatus({
   proposalStatus,
   proposalEndTime,
   proposalStartTime,
   proposalCancelledTime,
+  proposalExecutedTime,
 }) {
-  const activeOptions = {
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    timeZoneName: "short",
-  };
+  const activeProposalEndTime = proposalEndTime
+    ? format(proposalEndTime, "h:mm aaa MMM dd, yyyy")
+    : null;
+  const pendingProposalStartTime = proposalStartTime
+    ? format(proposalStartTime, "h:mm aaa MMM dd, yyyy")
+    : null;
+  const _proposalCancelledTime = proposalCancelledTime
+    ? format(proposalCancelledTime, "h:mm aaa MMM dd, yyyy")
+    : null;
+  const finishProposalEndTime = proposalEndTime
+    ? format(proposalEndTime, "h:mm aaa MMM dd, yyyy")
+    : null;
 
-  const activeProposalEndTime = new Intl.DateTimeFormat(
-    "en-US",
-    activeOptions
-  ).format(proposalEndTime);
-
-  const pendingOptions = {
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    timeZoneName: "short",
-  };
-
-  const pendingProposalStartTime = new Intl.DateTimeFormat(
-    "en-US",
-    pendingOptions
-  ).format(proposalStartTime);
-
-  const finishOptions = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-  };
-
-  const finishProposalEndTime = new Intl.DateTimeFormat(
-    "en-US",
-    finishOptions
-  ).format(proposalEndTime);
-
-  const _proposalCancelledTime = new Intl.DateTimeFormat(
-    "en-US",
-    finishOptions
-  ).format(proposalCancelledTime);
+  const _proposalExecutedTime =
+    proposalExecutedTime &&
+    new Intl.DateTimeFormat("en-US", finishOptions).format(
+      proposalExecutedTime
+    );
 
   switch (proposalStatus) {
     case "PENDING":
@@ -62,6 +39,9 @@ export default function ProposalTimeStatus({
 
     case "CANCELLED":
       return <HStack gap={1}>Cancelled {_proposalCancelledTime}</HStack>;
+
+    case "EXECUTED":
+      return <HStack gap={1}>Executed {_proposalExecutedTime}</HStack>;
 
     default:
       return <HStack gap={1}>Ended {finishProposalEndTime}</HStack>;

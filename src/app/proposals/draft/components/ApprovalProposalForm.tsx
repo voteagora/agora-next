@@ -261,11 +261,11 @@ const ApprovalProposalForm = () => {
           skip this step no transactions will be added.
         </p>
         <div className="mt-6 space-y-12">
-          {options.map((_field, index) => {
+          {options.map((field, index) => {
             return (
               <div
                 className="p-4 border border-agora-stone-100 rounded-lg"
-                key={index}
+                key={field.id}
               >
                 <div className="flex flex-col mb-6">
                   <div className="flex flex-row justify-between mb-4">
@@ -273,9 +273,9 @@ const ApprovalProposalForm = () => {
                       Option #{index + 1}
                     </h2>
                     <span
-                      onClick={() => {
-                        removeOption(index);
-                      }}
+                      onClick={() => removeOption(index)}
+                      role="button"
+                      aria-label={`Remove option ${index + 1}`}
                     >
                       <XCircleIcon className="w-5 h-5 text-red-500 cursor-pointer" />
                     </span>

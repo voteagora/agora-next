@@ -33,7 +33,7 @@ class VercelClient:
                 "repo": self.repo,
                 "ref": f"refs/pull/{pr}/head"
             },
-            "target": "staging"  # Deploy as a preview deployment
+            "target": "preview"  # Deploy as a preview deployment
         }
 
         # Headers with authentication
@@ -45,16 +45,17 @@ class VercelClient:
         # Make the request
         response = requests.post(VERCEL_DEPLOY_URL, json=payload, headers=headers)
 
+        print(response.json())
+
         # Check response
         if response.status_code == 200:
             print("Deployment triggered successfully!")
             url = response.json().get("url")
             print("Deployment URL:", url)
-            print(response.json())
+            return f"[Preview Link]({url})"
         else:
             print("Failed to trigger deployment:", response.text)
             
-        return f"[Preview Link]({url})"
 
     def set_envvar(self, key, val, branch):
 
@@ -108,14 +109,12 @@ def main():
 
     # 5. Deploy to Vercel if /preview is invoked
     VERCEL_TOKEN = os.environ.get("VERCEL_TOKEN")
-    if not vercel_token:
+    if not VERCEL_TOKEN:
         print("VERCEL_TOKEN not found in environment. Exiting.")
         return
     
     with open(event_path, 'r', encoding='utf-8') as f:
         event = json.load(f)
-    
-    print(event)
 
     # We can comment on the same issue (PR) that triggered this
     issue_number = event.get("issue", {}).get("number")
@@ -140,7 +139,10 @@ def main():
         msg = vercel.deploy(issue_number)
     
     else:
+        msg = None
+        pass
 
+    if msg:
         # 6. Post a comment back to the PR indicating that we've started the preview
         github_token = os.environ.get("GITHUB_TOKEN")
         if not github_token:
