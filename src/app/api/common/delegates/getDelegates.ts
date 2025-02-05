@@ -19,6 +19,7 @@ import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSup
 import { doInSpan } from "@/app/lib/logging";
 import { DELEGATION_MODEL, TENANT_NAMESPACES } from "@/lib/constants";
 import { getProxyAddress } from "@/lib/alligatorUtils";
+import { calculateBigIntRatio } from "../utils/bigIntRatio";
 
 /*
  * Fetches a list of delegates
@@ -521,12 +522,10 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
         )
       : cachedNumOfDelegators;
 
-  const votingPowerRatio =
-    votableSupply && BigInt(votableSupply) > 0n
-      ? (Number(totalVotingPower) / Number(votableSupply)).toExponential(3)
-      : 0;
-
-  const votingPowerRelativeToVotableSupply = Number(votingPowerRatio);
+  const relativeVotingPowerToVotableSupply = calculateBigIntRatio(
+    totalVotingPower,
+    BigInt(votableSupply)
+  );
 
   // Build out delegate JSON response
   return {
@@ -537,7 +536,10 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       direct: delegate?.voting_power?.toString() || "0",
       advanced: delegate?.advanced_vp?.toFixed(0) || "0",
     },
-    votingPowerRelativeToVotableSupply,
+    votingPowerRelativeToVotableSupply:
+      votableSupply && BigInt(votableSupply) > 0n
+        ? Number(totalVotingPower / BigInt(votableSupply || 0))
+        : 0,
     votingPowerRelativeToQuorum:
       quorum && quorum > 0n
         ? Number((totalVotingPower * 10000n) / quorum) / 10000
@@ -552,6 +554,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     numOfDelegators: usedNumOfDelegators,
     totalProposals: delegate?.total_proposals || 0,
     statement: delegate?.statement || null,
+    relativeVotingPowerToVotableSupply,
   };
 }
 
