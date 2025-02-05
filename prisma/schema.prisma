@@ -7,7 +7,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "uniswap", "xai"]
+  schemas  = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "uniswap", "xai", "b3"]
 }
 
 model DelegateStatements {
@@ -3788,6 +3788,7 @@ enum DaoSlug {
   PGUILD
   BOOST
   XAI
+  B3
 
   @@map("dao_slug")
   @@schema("config")
