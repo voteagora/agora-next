@@ -108,7 +108,7 @@ def main():
 
     # 5. Deploy to Vercel if /preview is invoked
     VERCEL_TOKEN = os.environ.get("VERCEL_TOKEN")
-    if not vercel_token:
+    if not VERCEL_TOKEN:
         print("VERCEL_TOKEN not found in environment. Exiting.")
         return
     
