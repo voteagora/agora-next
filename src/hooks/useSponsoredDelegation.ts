@@ -87,22 +87,6 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
 
     const hash = await response.json();
 
-    const { status } = await waitForTransactionReceipt(config, {
-      hash: hash,
-      chainId: contracts.governor.chain.id,
-    });
-
-    if (status === "success") {
-      trackEvent({
-        event_name: ANALYTICS_EVENT_NAMES.DELEGATE,
-        event_data: {
-          delegate: delegate.address as `0x${string}`,
-          delegator: address as `0x${string}`,
-          transaction_hash: hash,
-        },
-      });
-    }
-
     setTxHash(hash);
     setIsFetching(false);
     setIsFetched(true);

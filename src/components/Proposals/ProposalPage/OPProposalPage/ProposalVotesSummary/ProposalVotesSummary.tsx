@@ -2,7 +2,7 @@
 import { useState } from "react";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { ParsedProposalResults } from "@/lib/proposalUtils";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import {
@@ -10,8 +10,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import ProposalVotesSummaryDetails from "../ProposalVotesSummaryDetails/ProposalVotesSummaryDetails";
-import { useProposalVotes } from "@/hooks/useProposalVotes";
+import ProposalVotesSummaryDetails from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesSummaryDetails/ProposalVotesSummaryDetails";
 
 interface Props {
   proposal: Proposal;
@@ -23,13 +22,6 @@ export default function ProposalVotesSummary({ proposal }: Props) {
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
-  const { data: fetchedVotes, isFetched } = useProposalVotes({
-    enabled: true,
-    limit: 250,
-    offset: 0,
-    proposalId: proposal.id,
-  });
-
   return (
     <HoverCard
       open={showDetails}
@@ -38,25 +30,40 @@ export default function ProposalVotesSummary({ proposal }: Props) {
       closeDelay={0}
     >
       <div style={{ position: "relative" }}>
-        <HoverCardTrigger className="w-full cursor-pointer block">
-          <div className="flex flex-col gap-2 pt-2 px-4 rounded-md font-bold shrink-0 text-xs border border-line mx-4 shadow-newDefault">
+        <div className="flex flex-col rounded-md font-bold shrink-0 text-xs border border-line mx-4 shadow-newDefault">
+          <HoverCardTrigger className="w-full cursor-pointer flex flex-col gap-2 px-4 pt-2">
             <div className="flex flex-row justify-between mt-2">
               <div className="text-positive">
-                FOR <TokenAmountDisplay amount={results.for} />
+                FOR -{" "}
+                <TokenAmountDecorated
+                  amount={results.for}
+                  hideCurrency
+                  specialFormatting
+                />
               </div>
               <div className="text-negative">
-                AGAINST <TokenAmountDisplay amount={results.against} />
+                AGAINST -{" "}
+                <TokenAmountDecorated
+                  amount={results.against}
+                  hideCurrency
+                  specialFormatting
+                />
               </div>
             </div>
 
-            <ProposalVotesBar proposal={proposal} votes={fetchedVotes?.data} />
+            <ProposalVotesBar proposal={proposal} />
 
             <div className="flex flex-col font-medium">
               <div className="flex flex-row text-secondary pb-2 justify-between">
                 <>
                   {proposal.quorum && (
                     <div>
-                      Quorum <TokenAmountDisplay amount={proposal.quorum} />
+                      Quorum{" "}
+                      <TokenAmountDecorated
+                        amount={proposal.quorum}
+                        hideCurrency
+                        specialFormatting
+                      />
                     </div>
                   )}
                 </>
@@ -70,27 +77,28 @@ export default function ProposalVotesSummary({ proposal }: Props) {
                   )}
                 </>
               </div>
-              <ProposalStatusDetail
-                proposalStartTime={proposal.startTime}
-                proposalEndTime={proposal.endTime}
-                proposalStatus={proposal.status}
-                proposalCancelledTime={proposal.cancelledTime}
-                cancelledTransactionHash={proposal.cancelledTransactionHash}
-              />
             </div>
-          </div>
+          </HoverCardTrigger>
 
-          <HoverCardContent
-            className="pb-0 absolute w-auto ml-4 mt-1"
-            side="top"
-            align={"start"}
-          >
-            <ProposalVotesSummaryDetails
-              proposal={proposal}
-              votes={fetchedVotes?.data}
+          <div className="px-4 font-medium">
+            <ProposalStatusDetail
+              proposalStartTime={proposal.startTime}
+              proposalEndTime={proposal.endTime}
+              proposalStatus={proposal.status}
+              proposalCancelledTime={proposal.cancelledTime}
+              proposalExecutedTime={proposal.executedTime}
+              cancelledTransactionHash={proposal.cancelledTransactionHash}
             />
-          </HoverCardContent>
-        </HoverCardTrigger>
+          </div>
+        </div>
+
+        <HoverCardContent
+          className="pb-0 absolute w-auto mt-1"
+          side="top"
+          align={"start"}
+        >
+          <ProposalVotesSummaryDetails proposal={proposal} />
+        </HoverCardContent>
       </div>
     </HoverCard>
   );

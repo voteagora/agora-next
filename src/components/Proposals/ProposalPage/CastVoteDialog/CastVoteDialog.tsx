@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useState } from "react";
-import TokenAmountDisplay from "@/components/shared/TokenAmountDisplay";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import Image from "next/image";
 import Link from "next/link";
 import useAdvancedVoting from "../../../../hooks/useAdvancedVoting";
@@ -84,7 +84,7 @@ const SCWVoteDialog = ({
             </div>
             <div className="flex flex-col items-end text-primary">
               <div className="text-xs text-tertiary font-medium">with</div>
-              <TokenAmountDisplay amount={vpToDisplay} />
+              <TokenAmountDecorated amount={vpToDisplay} />
             </div>
           </div>
           <div>
@@ -101,7 +101,7 @@ const SCWVoteDialog = ({
           <div>
             <VoteButton onClick={write}>
               Vote {supportType.toLowerCase()} with{"\u00A0"}
-              <TokenAmountDisplay amount={vpToDisplay} />
+              <TokenAmountDecorated amount={vpToDisplay} />
             </VoteButton>
           </div>
         </div>
@@ -183,7 +183,7 @@ const BasicVoteDialog = ({
             </div>
             <div className="flex flex-col items-end text-primary">
               <div className="text-xs text-tertiary font-medium">with</div>
-              <TokenAmountDisplay amount={vpToDisplay} />
+              <TokenAmountDecorated amount={vpToDisplay} />
             </div>
           </div>
           <div>
@@ -201,7 +201,7 @@ const BasicVoteDialog = ({
             {delegate.statement ? (
               <VoteButton onClick={write}>
                 Vote {supportType.toLowerCase()} with{"\u00A0"}
-                <TokenAmountDisplay amount={vpToDisplay} />
+                <TokenAmountDecorated amount={vpToDisplay} />
               </VoteButton>
             ) : (
               <NoStatementView closeDialog={closeDialog} />
@@ -293,7 +293,7 @@ function AdvancedVoteDialog({
             </div>
             <div className="flex flex-col items-end text-primary">
               <div className="text-xs text-tertiary font-medium">with</div>
-              <TokenAmountDisplay amount={vpToDisplay} />
+              <TokenAmountDecorated amount={vpToDisplay} />
             </div>
           </div>
           <div>
@@ -311,7 +311,7 @@ function AdvancedVoteDialog({
             {delegate.statement ? (
               <VoteButton onClick={write}>
                 Vote {supportType.toLowerCase()} with{"\u00A0"}
-                <TokenAmountDisplay amount={vpToDisplay} />
+                <TokenAmountDecorated amount={vpToDisplay} />
               </VoteButton>
             ) : (
               <NoStatementView closeDialog={closeDialog} />

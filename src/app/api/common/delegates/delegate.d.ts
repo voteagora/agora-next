@@ -21,6 +21,7 @@ export type Delegate = {
   totalProposals: number;
   numOfDelegators: bigint;
   statement: DelegateStatement | null;
+  relativeVotingPowerToVotableSupply: string;
 };
 
 export type DelegateChunk = Pick<

@@ -50,6 +50,7 @@ export const scrollTenantUIConfig = new TenantUI({
     negative: "255 104 75",
     brandPrimary: "255 104 75",
     brandSecondary: "255 248 243",
+    tokenAmountFont: "font-chivoMono",
   },
 
   favicon: {

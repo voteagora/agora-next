@@ -1,3 +1,5 @@
+"use client";
+
 import React, { ReactNode, useState } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { useAccount, useDisconnect } from "wagmi";
@@ -5,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import ENSAvatar from "../shared/ENSAvatar";
 import { pluralizeAddresses, shortAddress } from "@/lib/utils";
 import Link from "next/link";
-import TokenAmountDisplay from "../shared/TokenAmountDisplay";
+import TokenAmountDecorated from "../shared/TokenAmountDecorated";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import Tenant from "@/lib/tenant/tenant";
 import CreateProposalDraftButton from "../Proposals/ProposalsList/CreateProposalDraftButton";
@@ -193,7 +195,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                         title="My token balance"
                         detail={
                           <RowSkeletonWrapper isLoading={isFetching}>
-                            <TokenAmountDisplay
+                            <TokenAmountDecorated
                               amount={tokenBalance || BigInt(0)}
                             />
                           </RowSkeletonWrapper>
@@ -219,7 +221,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                         title="My voting power"
                         detail={
                           <RowSkeletonWrapper isLoading={isFetching}>
-                            <TokenAmountDisplay
+                            <TokenAmountDecorated
                               amount={delegate?.votingPower.total || BigInt(0)}
                             />
                           </RowSkeletonWrapper>

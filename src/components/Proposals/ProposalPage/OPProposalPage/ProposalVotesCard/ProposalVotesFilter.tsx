@@ -25,6 +25,7 @@ const ProposalVotesFilter = ({
     <Switch
       options={Object.entries(voteFilterOptions).map(([key]) => key)}
       selection={value}
+      className="text-xs"
       onSelectionChanged={(value: any) => {
         setValue(value);
         onSelectionChange(value);

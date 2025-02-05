@@ -44,6 +44,7 @@ export const deriveTenantUIConfig = new TenantUI({
     negative: "246 62 88",
     brandPrimary: "244 62 88",
     brandSecondary: "0 0 0 ",
+    tokenAmountFont: "font-chivoMono",
   },
 
   links: [

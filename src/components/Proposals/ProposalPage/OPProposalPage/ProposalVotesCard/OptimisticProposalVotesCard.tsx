@@ -50,7 +50,7 @@ const OptimisticProposalVotesCard = ({
           </HStack>
         </button>
         <div>
-          <div className="py-0 px-4 font-semibold mb-2">Proposal votes</div>
+          <div className="py-0 px-4 font-semibold mb-2">Voting activity</div>
           <div className="pt-4 px-4 rounded-md shrink-0 text-xs border border-line mx-4 shadow-newDefault flex flex-col gap-1">
             {proposal.status === "CANCELLED" ? (
               <p className="text-red-negative font-bold">
@@ -81,6 +81,7 @@ const OptimisticProposalVotesCard = ({
               proposalEndTime={proposal.endTime}
               proposalStartTime={proposal.startTime}
               proposalCancelledTime={proposal.cancelledTime}
+              proposalExecutedTime={proposal.executedTime}
               cancelledTransactionHash={proposal.cancelledTransactionHash}
             />
           </div>

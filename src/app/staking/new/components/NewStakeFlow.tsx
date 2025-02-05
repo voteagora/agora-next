@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { Breadcrumbs } from "@/app/staking/components/Breadcrumbs";
-import { HStack } from "@/components/Layout/Stack";
 import ReceiptContainer from "@/app/staking/components/receipt/ReceiptContainer";
 import { Receipt } from "@/app/staking/components/receipt/Receipt";
 import { PanelSetStakeAmount } from "@/app/staking/components/PanelSetStakeAmount";
@@ -38,7 +37,7 @@ export const NewStakeFlow = ({
   const [delegate, setDelegate] = useState<string | undefined>();
 
   if (!address) {
-    return <div>Connect your wallet to stake</div>;
+    return <div className="text-primary">Connect your wallet to stake</div>;
   }
 
   return (
@@ -51,7 +50,7 @@ export const NewStakeFlow = ({
       />
 
       {step === 1 && (
-        <HStack className="grid grid-cols-1  sm:grid-cols-4 gap-5 sm:gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 sm:gap-10">
           <div className="sm:col-span-4">
             <ReceiptContainer>
               <Receipt
@@ -68,12 +67,12 @@ export const NewStakeFlow = ({
               onClick={() => setStep(2)}
             />
           </div>
-        </HStack>
+        </div>
       )}
 
       {step === 2 && (
         <>
-          <div className="border rounded-xl w-full shadow-newDefault p-4 text-sm font-medium">
+          <div className="border border-line bg-wash rounded-xl w-full shadow-newDefault p-4 text-sm font-medium text-primary">
             Uniswap voters manage staking rewards. Choose your delegate
             carefully to represent you in Uniswap governance.
           </div>
@@ -90,7 +89,7 @@ export const NewStakeFlow = ({
       )}
 
       {step === 3 && (
-        <HStack className="grid grid-cols-1  sm:grid-cols-4 gap-5 sm:gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 sm:gap-10">
           <div className="sm:col-span-4">
             <ReceiptContainer>
               <Receipt
@@ -113,7 +112,7 @@ export const NewStakeFlow = ({
               "Something went wrong!"
             )}
           </div>
-        </HStack>
+        </div>
       )}
     </div>
   );

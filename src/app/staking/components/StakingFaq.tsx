@@ -1,10 +1,12 @@
 export default function StakingFaq() {
   return (
-    <div className="mt-10 font-inter">
+    <div className="mt-10">
       <h1 className="font-black text-2xl text-primary">FAQ</h1>
       <div className="mt-[18px]">
-        <h2 className="font-semibold mt-4 ">What is Uniswap staking?</h2>
-        <p className="mt-2">
+        <h2 className="font-semibold mt-4 text-primary">
+          What is Uniswap staking?
+        </h2>
+        <p className="mt-2 text-secondary">
           The Uniswap protocol can collect a small fee on trades through some of
           its liquidity pools. If collected, those fees are distributed in WETH
           to UNI token holders as a reward for delegating their votes and
@@ -19,7 +21,7 @@ export default function StakingFaq() {
           general?
         </h2>
 
-        <p className="mt-2">
+        <p className="mt-2 text-secondary">
           The Uniswap Governance Process is described{" "}
           <a
             className="underline"
@@ -36,7 +38,7 @@ export default function StakingFaq() {
           ultimately posted.
         </p>
 
-        <p className="mt-2">
+        <p className="mt-2 text-secondary">
           Stakers receive their pro-rata share of rewards earned while they
           stake. The rate of rewards varies on a number of factors, including
           how much volume is flowing through the protocol. There is no time
@@ -50,7 +52,7 @@ export default function StakingFaq() {
         <h2 className="font-semibold mt-8 text-primary">
           Which pools earn fees?
         </h2>
-        <p className="mt-2">
+        <p className="mt-2 text-secondary">
           Currently, fees have not yet been turned on, so no rewards will accrue
           to stakers just yet. The roll-out of protocol fees will be incremental
           and data-driven. Gauntlet has suggested a framework to guide this

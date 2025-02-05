@@ -13,6 +13,7 @@ export const useDepositorTotalStaked = (address?: string) => {
         address as `0x${string}`
       );
     },
+    staleTime: 180000, // 3 minute cache
   });
 
   return { data, isFetching, isFetched };
