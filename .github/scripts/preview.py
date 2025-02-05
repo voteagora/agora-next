@@ -45,16 +45,17 @@ class VercelClient:
         # Make the request
         response = requests.post(VERCEL_DEPLOY_URL, json=payload, headers=headers)
 
+        print(response.json())
+
         # Check response
         if response.status_code == 200:
             print("Deployment triggered successfully!")
             url = response.json().get("url")
             print("Deployment URL:", url)
-            print(response.json())
+            return f"[Preview Link]({url})"
         else:
             print("Failed to trigger deployment:", response.text)
             
-        return f"[Preview Link]({url})"
 
     def set_envvar(self, key, val, branch):
 
