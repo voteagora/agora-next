@@ -33,7 +33,7 @@ class VercelClient:
                 "repo": self.repo,
                 "ref": f"refs/pull/{pr}/head"
             },
-            "target": "staging"  # Deploy as a preview deployment
+            "target": "preview"  # Deploy as a preview deployment
         }
 
         # Headers with authentication
