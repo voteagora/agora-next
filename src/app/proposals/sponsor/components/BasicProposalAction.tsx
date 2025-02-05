@@ -9,6 +9,7 @@ import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { parseError } from "../../draft/utils/stages";
 
 const BasicProposalAction = ({
   draftProposal,
@@ -34,6 +35,7 @@ const BasicProposalAction = ({
   const {
     data: config,
     isError: onPrepareError,
+    isPending: isSimulating,
     error,
   } = useSimulateContract({
     address: contracts.governor.address as `0x${string}`,
@@ -49,7 +51,7 @@ const BasicProposalAction = ({
   return (
     <>
       <UpdatedButton
-        isLoading={isWriteLoading}
+        isLoading={isWriteLoading || isSimulating}
         fullWidth={true}
         type={onPrepareError ? "disabled" : "primary"}
         onClick={async () => {
@@ -91,8 +93,8 @@ const BasicProposalAction = ({
       </UpdatedButton>
 
       {onPrepareError && (
-        <div className="p-4 border border-line bg-wash rounded mt-4 text-sm text-tertiary break-words hyphens-auto">
-          {error?.message}
+        <div className="p-4 border border-negative bg-negative/10 rounded mt-4 text-sm text-negative break-words hyphens-auto">
+          {parseError(error)}
         </div>
       )}
     </>
