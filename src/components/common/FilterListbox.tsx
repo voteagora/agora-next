@@ -30,7 +30,10 @@ export default function FilterListbox({
     if (Array.isArray(options)) {
       return options.find((opt) => opt.sort === value)?.value;
     }
-    return options[value]?.value;
+    return (
+      options[value]?.value ||
+      Object.values(options).find((opt) => opt.sort === value)?.value
+    );
   };
 
   return (

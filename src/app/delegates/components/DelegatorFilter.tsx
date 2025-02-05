@@ -17,7 +17,9 @@ export default function DelegatorFilter() {
   const { setIsDelegatesFiltering } = useAgoraContext();
   const { address } = useAccount();
 
-  const filterParam = searchParams?.get(FILTER_PARAM) || DEFAULT_FILTER;
+  const currentParam = searchParams?.get(FILTER_PARAM);
+  const filterParam = currentParam ? "my_delegates" : "all_delegates";
+
   const delegateeFilterOptions = [
     {
       value: "All delegates",

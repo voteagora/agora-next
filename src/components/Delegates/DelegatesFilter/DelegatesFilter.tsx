@@ -17,7 +17,7 @@ export default function DelegatesFilter() {
   const handleChange = (value: string) => {
     setIsDelegatesFiltering(true);
     router.push(
-      value === delegatesFilterOptions.weightedRandom.value
+      value === delegatesFilterOptions.weightedRandom.sort
         ? deleteSearchParam({ name: "orderBy" })
         : addSearchParam({ name: "orderBy", value }),
       { scroll: false }
