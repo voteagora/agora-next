@@ -36,6 +36,7 @@ const defaults = {
   brandPrimary: "23 23 23",
   brandSecondary: "255 255 255",
   font: "var(--font-inter)",
+  letterSpacing: "0",
 };
 
 const defaultFavicons = {
@@ -64,6 +65,8 @@ export default async function RootLayout({
   const brandPrimary = ui?.customization?.brandPrimary || defaults.brandPrimary;
   const brandSecondary =
     ui?.customization?.brandSecondary || defaults.brandSecondary;
+  const letterSpacing =
+    ui?.customization?.letterSpacing || defaults.letterSpacing;
   const font =
     fontMapper[ui?.customization?.font || ""]?.style.fontFamily ||
     inter.style.fontFamily;
@@ -89,6 +92,7 @@ export default async function RootLayout({
     "--brand-primary": brandPrimary,
     "--brand-secondary": brandSecondary,
     fontFamily: font,
+    letterSpacing: letterSpacing,
   } as React.CSSProperties;
 
   return (
