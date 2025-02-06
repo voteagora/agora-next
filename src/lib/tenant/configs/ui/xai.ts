@@ -65,7 +65,7 @@ export const xaiTenantUIConfig = new TenantUI({
     {
       name: "discord",
       title: "Discord",
-      url: "https://discord.com/invite/53c3CxDneJ",
+      url: "https://discord.com/invite/xaigames",
     },
   ],
 
