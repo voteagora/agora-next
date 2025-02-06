@@ -41,6 +41,7 @@ export const xaiTenantUIConfig = new TenantUI({
     brandPrimary: "255 0 48",
     brandSecondary: "12 10 9",
     font: "font-rajdhani",
+    letterSpacing: "0.02em",
   },
 
   // TODO
