@@ -11,9 +11,12 @@ export function calculateBigIntRatio(
 
   const result =
     Number(numerator * scalingFactor) / Number(denominator * scalingFactor);
+
+  const safeMaxDigits = Math.min(magnitude, 20);
+
   return result.toLocaleString("fullwide", {
     useGrouping: false,
     minimumFractionDigits: 0,
-    maximumFractionDigits: magnitude,
+    maximumFractionDigits: safeMaxDigits,
   });
 }
