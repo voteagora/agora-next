@@ -24,7 +24,6 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
       : undefined,
   });
 
-
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
   const { data: accountVotes } = useGetVotes({

@@ -20,7 +20,6 @@ import MarkdownPreview from "@uiw/react-markdown-preview";
 import { rgbStringToHex } from "@/app/lib/utils/color";
 import { useGetVotes } from "@/hooks/useGetVotes";
 
-
 const PreText = ({ text }: { text: string }) => {
   return (
     <pre className="bg-[#FAFAF2] border-[#ECE3CA] text-[#B16B19] inline-block px-1 py-0.5 rounded">
@@ -55,7 +54,6 @@ const DraftPreview = ({
     blockNumber: blockNumber ? blockNumber - BigInt(1) : BigInt(0),
     enabled: !!address && !!blockNumber,
   });
-
 
   const canSponsor = () => {
     switch (gatingType) {
