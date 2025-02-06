@@ -1,5 +1,5 @@
 import {
-  ERC20__factory,
+  UniswapToken__factory,
   UniswapGovernor__factory,
   UniswapStaker__factory,
   UniswapTimelock__factory,
@@ -55,10 +55,10 @@ export const uniswapTenantContractConfig = ({
 
   return {
     token: createTokenContract({
-      abi: ERC20__factory.abi,
+      abi: UniswapToken__factory.abi,
       address: TOKEN as `0x${string}`,
       chain,
-      contract: ERC20__factory.connect(TOKEN, provider),
+      contract: UniswapToken__factory.connect(TOKEN, provider),
       provider,
       type: "erc20",
     }),

@@ -1224,6 +1224,7 @@ model ProposalDraftTransaction {
   value            String        @db.VarChar(255)
   calldata         String
   description      String
+  signature        String?
   simulation_state String        @default("UNCONFIRMED") @db.VarChar(255)
   simulation_id    String?       @db.VarChar(255)
   created_at       DateTime      @default(now()) @db.Timestamptz(6)

@@ -120,3 +120,10 @@ export const getProposalTypeAddress = (
 
   return tenant.isProd ? proposalType.prodAddress : proposalType.testnetAddress;
 };
+
+export const parseError = (error: any) => {
+  if (error.message.includes("one live proposal per proposer")) {
+    return "You have an outstanding proposal that has not yet completed. Please wait for it to be processed before submitting or sponsoring a new one. ";
+  }
+  return error.message;
+};

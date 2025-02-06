@@ -19,6 +19,7 @@ const transaction = z.object({
   target: ethereumAddressSchema,
   value: z.string().min(1),
   calldata: z.string().min(1, { message: "Calldata cannot be empty" }),
+  signature: z.string().optional(),
   description: z.string().min(1, { message: "Description cannot be empty" }),
   simulation_state: z.string(), // unconfirmed, valid, invalid
   simulation_id: z.string().nullable(),

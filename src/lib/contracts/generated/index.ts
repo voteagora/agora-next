@@ -18,6 +18,7 @@ export type { ProposalTypesConfigurator } from "./ProposalTypesConfigurator";
 export type { UniswapGovernor } from "./UniswapGovernor";
 export type { UniswapStaker } from "./UniswapStaker";
 export type { UniswapTimelock } from "./UniswapTimelock";
+export type { UniswapToken } from "./UniswapToken";
 export type { VotableSupplyOracle } from "./VotableSupplyOracle";
 export * as factories from "./factories";
 export { AgoraGovernor__factory } from "./factories/AgoraGovernor__factory";
@@ -37,4 +38,5 @@ export { ProposalTypesConfigurator__factory } from "./factories/ProposalTypesCon
 export { UniswapGovernor__factory } from "./factories/UniswapGovernor__factory";
 export { UniswapStaker__factory } from "./factories/UniswapStaker__factory";
 export { UniswapTimelock__factory } from "./factories/UniswapTimelock__factory";
+export { UniswapToken__factory } from "./factories/UniswapToken__factory";
 export { VotableSupplyOracle__factory } from "./factories/VotableSupplyOracle__factory";

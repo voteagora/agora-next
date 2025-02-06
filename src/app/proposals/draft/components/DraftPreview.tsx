@@ -18,6 +18,8 @@ import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import toast from "react-hot-toast";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import { rgbStringToHex } from "@/app/lib/utils/color";
+import { useGetVotes } from "@/hooks/useGetVotes";
+
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -41,22 +43,19 @@ const DraftPreview = ({
   const { address } = useAccount();
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
+
   const { data: blockNumber } = useBlockNumber({
     chainId: tenant.ui.toggle("use-l1-block-number")?.enabled
       ? tenant.contracts.chainForTime?.id
       : undefined,
   });
 
-  const { data: accountVotes } = useReadContract({
-    chainId: tenant.contracts.governor.chain.id,
-    abi: tenant.contracts.governor.abi,
-    address: tenant.contracts.governor.address as `0x${string}`,
-    functionName: "getVotes",
-    args: [
-      address as `0x${string}`,
-      blockNumber ? (blockNumber - BigInt(1)).toString() : "0",
-    ],
-  }) as { data: bigint };
+  const { data: accountVotes } = useGetVotes({
+    address: address as `0x${string}`,
+    blockNumber: blockNumber ? blockNumber - BigInt(1) : BigInt(0),
+    enabled: !!address && !!blockNumber,
+  });
+
 
   const canSponsor = () => {
     switch (gatingType) {
