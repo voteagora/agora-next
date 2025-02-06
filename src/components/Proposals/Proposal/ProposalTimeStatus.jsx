@@ -4,6 +4,14 @@
 import { HStack } from "@/components/Layout/Stack";
 import { format } from "date-fns";
 
+const finishOptions = {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  hour: "numeric",
+  minute: "numeric",
+};
+
 export default function ProposalTimeStatus({
   proposalStatus,
   proposalEndTime,
