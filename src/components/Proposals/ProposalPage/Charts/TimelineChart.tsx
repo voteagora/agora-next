@@ -4,6 +4,7 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -143,6 +144,20 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
               },
             ]}
           />
+          {!!proposal.quorum && (
+            <ReferenceLine
+              y={+proposal.quorum.toString()}
+              strokeWidth={1}
+              strokeDasharray="3 3"
+              stroke="#4F4F4F"
+              label={{
+                position: "insideBottomLeft",
+                value: "QUORUM",
+                className: "text-xs font-inter font-semibold",
+                fill: "#565656",
+              }}
+            />
+          )}
 
           <Tooltip
             content={<CustomTooltip quorum={proposal.quorum} />}
