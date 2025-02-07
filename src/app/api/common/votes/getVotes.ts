@@ -19,6 +19,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { doInSpan } from "@/app/lib/logging";
 import { findVotes } from "@/lib/prismaUtils";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { Block } from "ethers";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -38,7 +39,7 @@ async function getVotesForDelegateForAddress({
   address: string;
   pagination?: PaginationParams;
 }) {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
 
   let eventsViewName;
 
@@ -137,17 +138,22 @@ async function getVotesForDelegateForAddress({
     };
   }
 
-  const latestBlock = await contracts.token.provider.getBlock("latest");
+  const latestBlock = ui.toggle("use-l1-block-number")?.enabled
+    ? await contracts.providerForTime?.getBlock("latest")
+    : await contracts.token.provider.getBlock("latest");
 
-  return {
-    meta,
-    data: votes.map((vote) => {
+  const data = await Promise.all(
+    votes.map((vote) => {
       const proposalData = parseProposalData(
         JSON.stringify(vote.proposal_data || {}),
         vote.proposal_type
       );
       return parseVote(vote, proposalData, latestBlock);
-    }),
+    })
+  );
+  return {
+    meta,
+    data,
   };
 }
 
@@ -294,7 +300,7 @@ async function getVotesForProposal({
   pagination?: PaginationParams;
   sort?: VotesSort;
 }): Promise<PaginatedResult<Vote[]>> {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
 
   let eventsViewName;
 
@@ -379,11 +385,16 @@ async function getVotesForProposal({
     );
   };
 
+  const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
+    ?.enabled
+    ? contracts.providerForTime?.getBlock("latest")
+    : contracts.token.provider.getBlock("latest");
+
   const [{ meta, data: votes }, latestBlock] = await Promise.all([
     doInSpan({ name: "getVotesForProposal" }, async () =>
       paginateResult(queryFunction, pagination)
     ),
-    contracts.token.provider.getBlock("latest"),
+    latestBlockPromise,
   ]);
 
   if (!votes || votes.length === 0) {
@@ -398,9 +409,13 @@ async function getVotesForProposal({
     votes[0]?.proposal_type
   );
 
+  const data = await Promise.all(
+    votes.map((vote) => parseVote(vote, proposalData, latestBlock))
+  );
+
   return {
     meta,
-    data: votes.map((vote) => parseVote(vote, proposalData, latestBlock)),
+    data,
   };
 }
 
@@ -411,7 +426,7 @@ async function getUserVotesForProposal({
   proposalId: string;
   address: string;
 }) {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
   const queryFunciton = prisma.$queryRawUnsafe<VotePayload[]>(
     `
     SELECT
@@ -438,18 +453,24 @@ async function getUserVotesForProposal({
     async () => queryFunciton
   );
 
-  const latestBlock = await contracts.token.provider.getBlock("latest");
+  const latestBlock = ui.toggle("use-l1-block-number")?.enabled
+    ? await contracts.providerForTime?.getBlock("latest")
+    : await contracts.token.provider.getBlock("latest");
 
-  return votes.map((vote) =>
-    parseVote(
-      vote,
-      parseProposalData(
-        JSON.stringify(vote.proposal_data || {}),
-        vote.proposal_type
-      ),
-      latestBlock
+  const data = Promise.all(
+    votes.map((vote) =>
+      parseVote(
+        vote,
+        parseProposalData(
+          JSON.stringify(vote.proposal_data || {}),
+          vote.proposal_type
+        ),
+        latestBlock
+      )
     )
   );
+
+  return data;
 }
 
 async function getVotesForProposalAndDelegate({
@@ -459,25 +480,31 @@ async function getVotesForProposalAndDelegate({
   proposalId: string;
   address: string;
 }) {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
   const votes = await findVotes({
     namespace,
     proposalId,
     voter: address.toLowerCase(),
   });
 
-  const latestBlock = await contracts.token.provider.getBlock("latest");
+  const latestBlock = ui.toggle("use-l1-block-number")?.enabled
+    ? await contracts.providerForTime?.getBlock("latest")
+    : await contracts.token.provider.getBlock("latest");
 
-  return votes.map((vote: VotePayload) =>
-    parseVote(
-      vote,
-      parseProposalData(
-        JSON.stringify(vote.proposal_data || {}),
-        vote.proposal_type
-      ),
-      latestBlock
+  const data = await Promise.all(
+    votes.map((vote: VotePayload) =>
+      parseVote(
+        vote,
+        parseProposalData(
+          JSON.stringify(vote.proposal_data || {}),
+          vote.proposal_type
+        ),
+        latestBlock
+      )
     )
   );
+
+  return data;
 }
 
 export const fetchVotesForDelegate = cache(getVotesForDelegate);

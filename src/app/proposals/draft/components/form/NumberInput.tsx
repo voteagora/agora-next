@@ -55,7 +55,7 @@ function NumberInput<
                 )}
               </TooltipTrigger>
               {!!tooltip && (
-                <TooltipContent className="text-sm max-w-[200px]">
+                <TooltipContent className="text-sm max-w-[200px] text-secondary">
                   {tooltip}
                 </TooltipContent>
               )}

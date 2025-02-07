@@ -120,6 +120,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                           specialFormatting
                           className={
                             fontMapper[ui?.customization?.tokenAmountFont || ""]
+                              ?.variable
                           }
                           icon={SUPPORT_TO_ICON[vote.support as Support]}
                         />

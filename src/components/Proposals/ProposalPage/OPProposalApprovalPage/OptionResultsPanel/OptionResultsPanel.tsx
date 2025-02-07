@@ -156,14 +156,16 @@ function SingleOption({
         <div className="text-primary flex items-center gap-1">
           <TokenAmountDecorated
             amount={votes}
-            className={fontMapper[ui?.customization?.tokenAmountFont || ""]}
+            className={
+              fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
+            }
             specialFormatting
             hideCurrency
           />
           <span
             className={cn(
               "ml-1 text-tertiary",
-              fontMapper[ui?.customization?.tokenAmountFont || ""]
+              fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
             )}
           >
             {percentage === 0n

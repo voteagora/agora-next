@@ -17,7 +17,13 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
 
   const { address } = useAccount();
-  const { data: blockNumber } = useBlockNumber();
+
+  const { data: blockNumber } = useBlockNumber({
+    chainId: tenant.ui.toggle("use-l1-block-number")?.enabled
+      ? tenant.contracts.chainForTime?.id
+      : undefined,
+  });
+
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
   const { data: accountVotes } = useGetVotes({

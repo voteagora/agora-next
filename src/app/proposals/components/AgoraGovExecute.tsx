@@ -68,7 +68,11 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
           {!canExecute ? (
             <>
               <TooltipTrigger>
-                <Button disabled={true} variant="outline">
+                <Button
+                  className="text-neutral"
+                  disabled={true}
+                  variant="outline"
+                >
                   Execute
                 </Button>
               </TooltipTrigger>
@@ -86,6 +90,7 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
                     })
                   }
                   loading={isLoading}
+                  className="text-neutral"
                 >
                   Execute
                 </Button>
@@ -93,7 +98,7 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
             </>
           )}
           <TooltipContent>
-            <div className="flex flex-col gap-1 p-2">
+            <div className="flex flex-col gap-1 p-2 text-secondary">
               <div>
                 This proposal can be executed on{" "}
                 {new Date(executeTimeInSeconds * 1000).toLocaleString()}

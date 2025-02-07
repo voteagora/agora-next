@@ -4,7 +4,8 @@ import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData, keccak256 } from "viem";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
-import { Block, ethers, toUtf8Bytes } from "ethers";
+import { Block, toUtf8Bytes } from "ethers";
+import { mapArbitrumBlockToMainnetBlock } from "./utils";
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -178,6 +179,32 @@ export async function parseProposal(
   quorum: bigint | null,
   votableSupply: bigint
 ): Promise<Proposal> {
+  const { contracts } = Tenant.current();
+  let startBlock: bigint | string = proposal.start_block;
+  let endBlock: bigint | string | null = proposal.end_block;
+  let queuedBlock: bigint | string | null = proposal.queued_block;
+  let executedBlock: bigint | string | null = proposal.executed_block;
+  let cancelledBlock: bigint | string | null = proposal.cancelled_block;
+  let createdBlock: bigint | string | null = proposal.created_block;
+
+  if (
+    contracts.governor.chain.id === 42161 ||
+    contracts.governor.chain.id === 421614
+  ) {
+    queuedBlock = queuedBlock
+      ? await mapArbitrumBlockToMainnetBlock(BigInt(queuedBlock))
+      : null;
+    executedBlock = executedBlock
+      ? await mapArbitrumBlockToMainnetBlock(executedBlock)
+      : null;
+    cancelledBlock = cancelledBlock
+      ? await mapArbitrumBlockToMainnetBlock(cancelledBlock)
+      : null;
+    createdBlock = createdBlock
+      ? await mapArbitrumBlockToMainnetBlock(createdBlock)
+      : null;
+  }
+
   const proposalData = parseProposalData(
     JSON.stringify(proposal.proposal_data || {}),
     proposal.proposal_type as ProposalType
@@ -185,7 +212,7 @@ export async function parseProposal(
   const proposalResuts = parseProposalResults(
     JSON.stringify(proposal.proposal_results || {}),
     proposalData,
-    proposal.start_block
+    String(startBlock)
   );
 
   const proposalTypeData =
@@ -194,42 +221,42 @@ export async function parseProposal(
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
-    snapshotBlockNumber: Number(proposal.created_block),
+    snapshotBlockNumber: Number(createdBlock),
     createdTime:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.created_ts * 1000)
         : latestBlock
-          ? getHumanBlockTime(proposal.created_block ?? 0, latestBlock)
+          ? getHumanBlockTime(createdBlock ?? 0, latestBlock)
           : null,
     startTime:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.start_ts * 1000)
         : latestBlock
-          ? getHumanBlockTime(proposal.start_block, latestBlock)
+          ? getHumanBlockTime(startBlock, latestBlock)
           : null,
     endTime:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.end_ts * 1000)
         : latestBlock
-          ? getHumanBlockTime(proposal.end_block ?? 0, latestBlock)
+          ? getHumanBlockTime(endBlock ?? 0, latestBlock)
           : null,
     cancelledTime:
       proposalData.key === "SNAPSHOT"
         ? null
         : latestBlock && proposal.cancelled_block
-          ? getHumanBlockTime(proposal.cancelled_block, latestBlock)
+          ? getHumanBlockTime(cancelledBlock ?? 0, latestBlock)
           : null,
     executedTime:
       proposalData.key === "SNAPSHOT"
         ? null
         : latestBlock && proposal.executed_block
-          ? getHumanBlockTime(proposal.executed_block, latestBlock)
+          ? getHumanBlockTime(executedBlock ?? 0, latestBlock)
           : null,
     queuedTime:
       proposalData.key === "SNAPSHOT"
         ? null
         : latestBlock && proposal.queued_block
-          ? getHumanBlockTime(proposal.queued_block, latestBlock)
+          ? getHumanBlockTime(queuedBlock ?? 0, latestBlock)
           : null,
     markdowntitle:
       (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
@@ -723,8 +750,6 @@ export async function getProposalStatus(
       }
     }
   }
-
-  return "QUEUED";
 }
 
 export const proposalToCallArgs = (proposal: Proposal) => {

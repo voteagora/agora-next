@@ -109,7 +109,7 @@ function AddressInput<
               <input
                 {...field}
                 type="text"
-                className={`border bg-wash border-line placeholder:text-tertiary p-2 rounded-lg w-full`}
+                className={`border bg-wash border-line placeholder:text-tertiary text-primary p-2 rounded-lg w-full`}
                 onBlur={() => {
                   if (!isAddress(address) && ensAddress != null) {
                     setValue(name, ensAddress as any);

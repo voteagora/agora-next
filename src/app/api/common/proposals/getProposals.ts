@@ -19,6 +19,7 @@ import {
   findProposalsQuery,
   getProposalsCount,
 } from "@/lib/prismaUtils";
+import { Block } from "ethers";
 
 async function getProposals({
   filter,
@@ -27,7 +28,7 @@ async function getProposals({
   filter: string;
   pagination: PaginationParams;
 }): Promise<PaginatedResult<Proposal[]>> {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
 
   const getProposalsExecution = doInSpan({ name: "getProposals" }, async () =>
     paginateResult(
@@ -43,9 +44,14 @@ async function getProposals({
     )
   );
 
+  const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
+    ?.enabled
+    ? contracts.providerForTime?.getBlock("latest")
+    : contracts.token.provider.getBlock("latest");
+
   const [proposals, latestBlock, votableSupply] = await Promise.all([
     getProposalsExecution,
-    contracts.token.provider.getBlock("latest"),
+    latestBlockPromise,
     fetchVotableSupply(),
   ]);
 
@@ -68,7 +74,13 @@ async function getProposals({
 }
 
 async function getProposal(proposalId: string) {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
+
+  const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
+    ?.enabled
+    ? contracts.providerForTime?.getBlock("latest")
+    : contracts.token.provider.getBlock("latest");
+
   const getProposalExecution = doInSpan({ name: "getProposal" }, async () =>
     findProposal({
       namespace,
@@ -87,7 +99,7 @@ async function getProposal(proposalId: string) {
   }
 
   const [latestBlock, quorum] = await Promise.all([
-    contracts.token.provider.getBlock("latest"),
+    latestBlockPromise,
     fetchQuorumForProposal(proposal),
   ]);
 

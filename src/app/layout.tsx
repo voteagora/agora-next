@@ -5,7 +5,7 @@ import Header from "@/components/Header/Header";
 import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import Tenant from "@/lib/tenant/tenant";
-import { inter } from "@/styles/fonts";
+import { fontMapper, inter } from "@/styles/fonts";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
@@ -36,6 +36,7 @@ const defaults = {
   brandPrimary: "23 23 23",
   brandSecondary: "255 255 255",
   font: "var(--font-inter)",
+  letterSpacing: "0",
 };
 
 const defaultFavicons = {
@@ -64,7 +65,11 @@ export default async function RootLayout({
   const brandPrimary = ui?.customization?.brandPrimary || defaults.brandPrimary;
   const brandSecondary =
     ui?.customization?.brandSecondary || defaults.brandSecondary;
-  const font = ui?.customization?.font || inter.style.fontFamily;
+  const letterSpacing =
+    ui?.customization?.letterSpacing || defaults.letterSpacing;
+  const font =
+    fontMapper[ui?.customization?.font || ""]?.style.fontFamily ||
+    inter.style.fontFamily;
 
   const favicons = {
     appleTouchIcon:
@@ -87,6 +92,7 @@ export default async function RootLayout({
     "--brand-primary": brandPrimary,
     "--brand-secondary": brandSecondary,
     fontFamily: font,
+    letterSpacing: letterSpacing,
   } as React.CSSProperties;
 
   return (

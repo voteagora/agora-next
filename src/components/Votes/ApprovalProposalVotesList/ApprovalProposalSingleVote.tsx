@@ -100,6 +100,7 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
                         specialFormatting
                         className={
                           fontMapper[ui?.customization?.tokenAmountFont || ""]
+                            ?.variable
                         }
                       />
                     </div>

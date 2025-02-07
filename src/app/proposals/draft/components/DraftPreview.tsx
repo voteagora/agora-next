@@ -17,6 +17,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import toast from "react-hot-toast";
 import MarkdownPreview from "@uiw/react-markdown-preview";
+import { rgbStringToHex } from "@/app/lib/utils/color";
 import { useGetVotes } from "@/hooks/useGetVotes";
 
 const PreText = ({ text }: { text: string }) => {
@@ -41,7 +42,13 @@ const DraftPreview = ({
   const { address } = useAccount();
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
-  const { data: blockNumber } = useBlockNumber();
+
+  const { data: blockNumber } = useBlockNumber({
+    chainId: tenant.ui.toggle("use-l1-block-number")?.enabled
+      ? tenant.contracts.chainForTime?.id
+      : undefined,
+  });
+
   const { data: accountVotes } = useGetVotes({
     address: address as `0x${string}`,
     blockNumber: blockNumber ? blockNumber - BigInt(1) : BigInt(0),
@@ -245,6 +252,7 @@ const DraftPreview = ({
             className={`h-full text-primary py-3 px-4 rounded-t-lg max-w-full bg-transparent prose prose-table:overflow-x-auto prose-td:min-w-[140px]`}
             style={{
               backgroundColor: "transparent",
+              color: rgbStringToHex(tenant.ui.customization?.secondary),
             }}
             wrapperElement={{
               "data-color-mode": "light",

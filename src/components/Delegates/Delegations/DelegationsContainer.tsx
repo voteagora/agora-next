@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/table";
 import { PaginatedResult } from "@/app/lib/pagination";
 import { useEffect, useRef, useState } from "react";
+import Tenant from "@/lib/tenant/tenant";
+import { DELEGATION_MODEL } from "@/lib/constants";
 
 function DelegationsContainer({
   delegatees,
@@ -26,6 +28,8 @@ function DelegationsContainer({
     limit: number;
   }) => Promise<PaginatedResult<Delegation[]>>;
 }) {
+  const { contracts } = Tenant.current();
+
   const [meta, setMeta] = useState(initialDelegators.meta);
   const [delegators, setDelegators] = useState(initialDelegators.data);
 
@@ -81,7 +85,7 @@ function DelegationsContainer({
                   <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
                     <TableRow>
                       <TableHead className="h-10 text-secondary">
-                        Allowance
+                        Voting Power
                       </TableHead>
                       <TableHead className="h-10 text-secondary">
                         Delegated on
@@ -132,9 +136,14 @@ function DelegationsContainer({
             <Table>
               <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
                 <TableRow>
-                  <TableHead className="h-10 text-secondary">
-                    Allowance
-                  </TableHead>
+                  {(contracts.delegationModel === DELEGATION_MODEL.PARTIAL ||
+                    contracts.delegationModel ===
+                      DELEGATION_MODEL.ADVANCED) && (
+                    <TableHead className="h-10 text-secondary">
+                      Voting Power
+                    </TableHead>
+                  )}
+
                   <TableHead className="h-10 text-secondary">
                     Delegated on
                   </TableHead>
@@ -159,6 +168,7 @@ function DelegationsContainer({
                     <DelegationToRow
                       key={delegation.to}
                       delegation={delegation}
+                      delegationModel={contracts.delegationModel}
                     />
                   ))
                 )}

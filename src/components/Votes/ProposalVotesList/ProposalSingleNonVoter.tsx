@@ -117,7 +117,9 @@ export function ProposalSingleNonVoter({
             amount={pastVotes || voter.direct_vp}
             hideCurrency
             specialFormatting
-            className={fontMapper[ui?.customization?.tokenAmountFont || ""]}
+            className={
+              fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
+            }
           />
         </HStack>
       </HStack>

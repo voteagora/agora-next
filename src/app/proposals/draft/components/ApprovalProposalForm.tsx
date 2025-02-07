@@ -143,7 +143,7 @@ const TransactionFormItem = ({
   return (
     <div className="">
       <div className="flex flex-row justify-between items-center mb-6">
-        <h2 className="text-agora-stone-900 font-semibold">
+        <h2 className="text-secondary font-semibold">
           Transaction #{transactionIndex + 1}
         </h2>
         <span
@@ -206,8 +206,8 @@ const ApprovalProposalForm = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-stone-900 font-semibold">Approval parameters</h3>
-        <p className="mt-2 stone-700">
+        <h3 className="text-secondary font-semibold">Approval parameters</h3>
+        <p className="mt-2 text-secondary">
           Use the following settings to set the parameters of this vote as well
           as the methodology for determining which options can be executed.
         </p>
@@ -255,8 +255,8 @@ const ApprovalProposalForm = () => {
         )}
       </div>
       <div>
-        <h3 className="text-stone-900 font-semibold">Proposed transactions</h3>
-        <p className="mt-2 stone-700">
+        <h3 className="text-secondary font-semibold">Proposed transactions</h3>
+        <p className="mt-2 text-secondary">
           Proposed transactions will execute if your proposal passes. If you
           skip this step no transactions will be added.
         </p>
@@ -269,7 +269,7 @@ const ApprovalProposalForm = () => {
               >
                 <div className="flex flex-col mb-6">
                   <div className="flex flex-row justify-between mb-4">
-                    <h2 className="text-agora-stone-900 font-semibold">
+                    <h2 className="text-secondary font-semibold">
                       Option #{index + 1}
                     </h2>
                     <span

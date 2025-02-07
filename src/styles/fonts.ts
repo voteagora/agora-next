@@ -1,9 +1,17 @@
+import { NextFont, NextFontWithVariable } from "next/dist/compiled/@next/font";
 import { Inter } from "next/font/google";
+import { Rajdhani } from "next/font/google";
 import { Chivo_Mono } from "next/font/google";
 
 export const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+});
+
+export const rajdhani = Rajdhani({
+  variable: "--font-rajdhani",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const chivoMono = Chivo_Mono({
@@ -12,6 +20,7 @@ export const chivoMono = Chivo_Mono({
 });
 
 export const fontMapper = {
-  "font-inter": inter.variable,
-  "font-chivoMono": chivoMono.variable,
-} as Record<string, string>;
+  "font-inter": inter,
+  "font-rajdhani": rajdhani,
+  "font-chivoMono": chivoMono,
+} as Record<string, NextFontWithVariable>;
