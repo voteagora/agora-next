@@ -242,7 +242,7 @@ const DraftPreview = ({
         <div className="mt-2 p-4 bg-wash border border-line rounded-lg text-primary">
           <MarkdownPreview
             source={proposalDraft.abstract}
-            className={`h-full text-primary py-3 px-4 rounded-t-lg max-w-full bg-transparent prose`}
+            className={`h-full text-primary py-3 px-4 rounded-t-lg max-w-full bg-transparent prose prose-table:overflow-x-auto prose-td:min-w-[140px]`}
             style={{
               backgroundColor: "transparent",
             }}
