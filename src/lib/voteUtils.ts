@@ -143,7 +143,7 @@ export function parseSnapshotVote(vote: SnapshotVotePayload): SnapshotVote {
     id: vote.id,
     title: vote.title || "",
     address: vote.voter,
-    createdAt: new Date(Number(vote.created)),
+    createdAt: new Date(Number(vote.created) * 1000), // Convert seconds to milliseconds for Date
     choice: vote.choice,
     votingPower: vote.vp,
     reason: vote.reason || "",
