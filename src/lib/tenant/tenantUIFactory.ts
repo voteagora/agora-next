@@ -28,7 +28,7 @@ export default class TenantUIFactory {
         return uniswapTenantUIConfig;
 
       case TENANT_NAMESPACES.CYBER:
-        return scrollTenantUIConfig;
+        return cyberTenantUIConfig;
 
       case TENANT_NAMESPACES.DERIVE:
         return deriveTenantUIConfig;
