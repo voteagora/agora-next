@@ -39,7 +39,8 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
       namespace === TENANT_NAMESPACES.SCROLL ||
       namespace === TENANT_NAMESPACES.OPTIMISM ||
       namespace === TENANT_NAMESPACES.DERIVE ||
-      namespace === TENANT_NAMESPACES.UNISWAP);
+      namespace === TENANT_NAMESPACES.UNISWAP ||
+      namespace === TENANT_NAMESPACES.B3);
 
   const { data: adminAddress } = useGovernorAdmin({ enabled: isCancellable });
 
@@ -136,6 +137,7 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
     case TENANT_NAMESPACES.DERIVE:
+    case TENANT_NAMESPACES.B3:
       return (
         <div className="flex flex-row gap-2">
           <AgoraGovCancel proposal={proposal} />
@@ -175,6 +177,7 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
     case TENANT_NAMESPACES.DERIVE:
+    case TENANT_NAMESPACES.B3:
       return <AgoraGovExecute proposal={proposal} />;
 
     case TENANT_NAMESPACES.OPTIMISM:
@@ -202,6 +205,7 @@ const activeStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
     case TENANT_NAMESPACES.DERIVE:
+    case TENANT_NAMESPACES.B3:
       return <AgoraGovCancel proposal={proposal} />;
 
     case TENANT_NAMESPACES.OPTIMISM:

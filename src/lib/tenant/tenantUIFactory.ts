@@ -10,6 +10,7 @@ import { scrollTenantUIConfig } from "@/lib/tenant/configs/ui/scroll";
 import { protocolGuildTenantUIConfig } from "@/lib/tenant/configs/ui/protocol-guild";
 import { boostTenantUIConfig } from "@/lib/tenant/configs/ui/boost";
 import { xaiTenantUIConfig } from "@/lib/tenant/configs/ui/xai";
+import { b3TenantUIConfig } from "@/lib/tenant/configs/ui/b3";
 
 export default class TenantUIFactory {
   public static create(namespace: TenantNamespace): any {
@@ -43,6 +44,9 @@ export default class TenantUIFactory {
 
       case TENANT_NAMESPACES.XAI:
         return xaiTenantUIConfig;
+
+      case TENANT_NAMESPACES.B3:
+        return b3TenantUIConfig;
 
       default:
         throw new Error(`Invalid namespace: ${namespace}`);

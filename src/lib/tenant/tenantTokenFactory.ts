@@ -71,6 +71,12 @@ export default class TenantTokenFactory {
           symbol: "XAI",
           decimals: 18,
         };
+      case TENANT_NAMESPACES.B3:
+        return {
+          name: "B3",
+          symbol: "B3",
+          decimals: 18,
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
