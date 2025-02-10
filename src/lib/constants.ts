@@ -41,6 +41,7 @@ export const TENANT_NAMESPACES = {
   BOOST: "boost",
   XAI: "xai",
   B3: "b3",
+  DEMO: "demo",
 } as const;
 
 export const proposalsFilterOptions = {

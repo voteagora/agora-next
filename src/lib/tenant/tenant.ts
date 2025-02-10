@@ -15,6 +15,7 @@ const BRAND_NAME_MAPPINGS: Record<string, string> = {
   etherfi: "EtherFi",
   pguild: "PGuild",
   boost: "Boost",
+  demo: "{Brand name}",
 };
 
 export default class Tenant {

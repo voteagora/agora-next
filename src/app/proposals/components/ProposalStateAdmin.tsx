@@ -36,6 +36,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
       proposal.status === PROPOSAL_STATUS.QUEUED) &&
     (namespace === TENANT_NAMESPACES.CYBER ||
       namespace === TENANT_NAMESPACES.XAI ||
+      namespace === TENANT_NAMESPACES.DEMO ||
       namespace === TENANT_NAMESPACES.SCROLL ||
       namespace === TENANT_NAMESPACES.OPTIMISM ||
       namespace === TENANT_NAMESPACES.DERIVE ||
@@ -136,6 +137,7 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
+    case TENANT_NAMESPACES.DEMO:
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.B3:
       return (
@@ -176,6 +178,7 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
+    case TENANT_NAMESPACES.DEMO:
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.B3:
       return <AgoraGovExecute proposal={proposal} />;
@@ -204,6 +207,7 @@ const activeStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
+    case TENANT_NAMESPACES.DEMO:
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.B3:
       return <AgoraGovCancel proposal={proposal} />;

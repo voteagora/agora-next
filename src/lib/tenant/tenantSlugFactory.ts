@@ -27,6 +27,8 @@ export default class TenantSlugFactory {
         return "XAI";
       case TENANT_NAMESPACES.B3:
         return "B3";
+      case TENANT_NAMESPACES.DEMO:
+        return "DEMO";
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
