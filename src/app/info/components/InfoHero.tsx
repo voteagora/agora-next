@@ -76,7 +76,7 @@ const Card = ({
     >
       <div
         className={`relative w-full sm:h-[150px] sm:w-[150px] ${
-          linkText === "B3.fun" ? "" : "aspect-square"
+          linkText === "B3.fun" ? "h-full" : "aspect-square"
         }`}
       >
         <Image
