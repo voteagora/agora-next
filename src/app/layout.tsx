@@ -37,6 +37,7 @@ const defaults = {
   brandSecondary: "255 255 255",
   font: "var(--font-inter)",
   letterSpacing: "0",
+  backgroundImage: "none",
 };
 
 const defaultFavicons = {
@@ -70,6 +71,7 @@ export default async function RootLayout({
   const font =
     fontMapper[ui?.customization?.font || ""]?.style.fontFamily ||
     inter.style.fontFamily;
+  const backgroundImage = ui?.customization?.backgroundImage;
 
   const favicons = {
     appleTouchIcon:
@@ -93,6 +95,7 @@ export default async function RootLayout({
     "--brand-secondary": brandSecondary,
     fontFamily: font,
     letterSpacing: letterSpacing,
+    "--background-image": backgroundImage ? `url(${backgroundImage})` : "none",
   } as React.CSSProperties;
 
   return (

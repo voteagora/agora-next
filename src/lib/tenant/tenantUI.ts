@@ -119,6 +119,7 @@ type TenantUIParams = {
     font?: string;
     tokenAmountFont?: string;
     letterSpacing?: string;
+    backgroundImage?: String;
   };
   favicon?: {
     "apple-touch-icon"?: string;
@@ -155,6 +156,7 @@ export class TenantUI {
     font?: string;
     tokenAmountFont?: string;
     letterSpacing?: string;
+    backgroundImage?: string;
   };
   private _favicon?: {
     "apple-touch-icon"?: string;
@@ -253,6 +255,7 @@ export class TenantUI {
         font?: string;
         tokenAmountFont?: string;
         letterSpacing?: string;
+        backgroundImage?: string;
       }
     | undefined {
     return this._customization;

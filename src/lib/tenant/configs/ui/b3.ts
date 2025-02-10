@@ -1,13 +1,14 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import b3Logo from "@/assets/tenant/b3_logo.svg";
 import delegateImage from "@/assets/tenant/b3_delegate.svg";
-import successImage from "@/assets/tenant/cyber_success.svg";
-import pendingImage from "@/assets/tenant/cyber_pending.svg";
+import successImage from "@/assets/tenant/b3_success.svg";
+import pendingImage from "@/assets/tenant/b3_pending.svg";
 import infoPageCard01 from "@/assets/tenant/b3_info_1.png";
 import infoPageCard02 from "@/assets/tenant/b3_info_2.png";
 import infoPageCard03 from "@/assets/tenant/b3_info_3.png";
 import infoPageCard04 from "@/assets/tenant/b3_info_4.png";
 import infoPageHero from "@/assets/tenant/b3_info_hero.png";
+import b3Background from "@/assets/tenant/b3_background.png";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
@@ -44,6 +45,7 @@ export const b3TenantUIConfig = new TenantUI({
     negative: "239 76 76",
     brandPrimary: "51 104 239",
     brandSecondary: "242 242 242",
+    backgroundImage: b3Background.src,
   },
 
   links: [
