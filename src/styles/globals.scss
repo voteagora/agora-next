@@ -194,11 +194,6 @@ input[type="number"] {
   }
   body {
     @apply bg-brandSecondary text-foreground;
-    background-image: var(--background-image, none);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    min-height: 100vh;
     font-feature-settings:
       "rlig" 1,
       "calt" 1;
