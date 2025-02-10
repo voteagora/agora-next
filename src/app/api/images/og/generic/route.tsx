@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 
   const title = searchParams.get("title") || "Agora Proposal";
   const description =
-    searchParams.get("description") || "My default description";
+    searchParams.get("description") || "Home of token governance";
 
   const interBoldFont = await fetch(
     new URL("../assets/Inter-Black.ttf", import.meta.url)
