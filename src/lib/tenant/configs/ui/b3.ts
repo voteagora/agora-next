@@ -15,7 +15,7 @@ export const b3TenantUIConfig = new TenantUI({
   title: "B3 Agora",
   logo: b3Logo,
 
-  googleAnalytics: "G-KZ3G1HV72Y",
+  googleAnalytics: "G-WDBYC8751R",
 
   assets: {
     success: successImage,
