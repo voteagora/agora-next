@@ -140,6 +140,7 @@ export default function BubbleChart({
   const [transform, setTransform] = useState(() =>
     d3.zoomIdentity.translate(0, 0).scale(1)
   );
+
   const [hasMoreVotes, setHasMoreVotes] = useState(false);
 
   const svgRef = useRef<SVGSVGElement>(null);
@@ -182,6 +183,12 @@ export default function BubbleChart({
     if (!svg) return;
 
     setHasMoreVotes(votes.length > CHART_DIMENSIONS.maxVotes);
+
+    if (votes.length === 0) {
+      setNodes([]);
+      setTransform(d3.zoomIdentity.translate(0, 0).scale(1));
+      return;
+    }
 
     const bubbleData = transformVotesToBubbleData(votes);
     const pack = d3
