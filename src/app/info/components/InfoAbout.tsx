@@ -74,10 +74,12 @@ const InfoAbout = () => {
             </h3>
             <p className="text-secondary mt-3">{page.description}</p>
             {/* So the image doesn't look smooshed for scroll :eye-roll: */}
-            {namespace === TENANT_NAMESPACES.SCROLL ||
-              (namespace === TENANT_NAMESPACES.B3 && (
-                <div className="sm:h-[105px] block"></div>
-              ))}
+            {namespace === TENANT_NAMESPACES.SCROLL && (
+              <div className="sm:h-[105px] block"></div>
+            )}
+            {namespace === TENANT_NAMESPACES.B3 && (
+              <div className="sm:h-[140px] block"></div>
+            )}
           </div>
         </div>
         {namespace === TENANT_NAMESPACES.SCROLL && (
