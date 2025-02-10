@@ -74,11 +74,21 @@ const Card = ({
       href={link}
       className={`flex flex-col sm:w-fit grow-0 p-1.5 bg-neutral border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)]} hover:rotate-0 transition-all hover:z-10 hover:scale-110 ${className}`}
     >
-      <div className="relative w-full sm:h-[150px] sm:w-[150px] aspect-square">
+      <div
+        className={`relative w-full sm:h-[150px] sm:w-[150px] ${
+          linkText === "B3.fun" ? "h-full" : "aspect-square"
+        }`}
+      >
         <Image
           src={image}
-          className="w-full rounded scale"
-          fill={true}
+          className={`${
+            linkText === "B3.fun"
+              ? "w-full h-auto object-contain absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+              : "object-cover"
+          }`}
+          fill={linkText !== "B3.fun"}
+          width={linkText === "B3.fun" ? 150 : undefined}
+          height={linkText === "B3.fun" ? 150 : undefined}
           alt=""
         />
       </div>

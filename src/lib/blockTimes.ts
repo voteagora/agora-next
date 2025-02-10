@@ -41,6 +41,9 @@ export function getSecondsPerBlock(chainId: number | undefined): number {
     case 1: // Eth Mainnet
     case 11155111: // Sepolia Testnet
       return 12;
+    
+    case 8453: // Base Mainnet
+      return 2;
 
     default:
       throw new Error(`Block time for chain:${chainId} not specified`);
