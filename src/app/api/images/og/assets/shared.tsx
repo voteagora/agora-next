@@ -1,6 +1,7 @@
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { TenantNamespace } from "@/lib/types";
+import b3Logo from "@/assets/tenant/b3_logo.svg";
 
 export const LogoPill = () => {
   const { namespace } = Tenant.current();
@@ -355,5 +356,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
           </defs>
         </svg>
       );
+    case TENANT_NAMESPACES.B3:
+      return b3Logo;
   }
 };

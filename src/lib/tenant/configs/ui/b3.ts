@@ -68,47 +68,55 @@ export const b3TenantUIConfig = new TenantUI({
       description:
         "Delegates represent the B3 ecosystem, guiding governance decisions on behalf of B3 token holders. Delegate your voting power, or vote directly on proposals to move the ecosystem forward.",
       meta: {
-        title: "Welcome to B3 governance",
-        description: "Home of token governance",
-        imageTitle: "IN IMAGE",
-        imageDescription: "IN IMAGE DESCRIPTION",
+        title: "B3 Agora",
+        description:
+          "Delegates represent the B3 ecosystem, guiding governance decisions on behalf of B3 token holders. Delegate your voting power, or vote directly on proposals to move the ecosystem forward.",
+        imageTitle: "B3 Agora",
+        imageDescription:
+          "Delegates represent the B3 ecosystem, guiding governance decisions on behalf of B3 token holders. Delegate your voting power, or vote directly on proposals to move the ecosystem forward.",
       },
     },
     {
       route: "delegates",
-      title: "Welcome to the home of Cyber voters",
-      description:
-        "Cyber delegates are the stewards of CyberDAO. They are volunteers and members of the Cyber community who have been elected to represent other token holders and make governance decisions on their behalf.",
-      meta: {
-        title: "Contribute to CyberDAO with your staked CYBER",
-        description:
-          "Cyber Agora is a unified and dedicated delegate portal for CyberDAO governance. Cyber Agora is where all protocol improvement votes are executed. After the discussion phase, all official CyberDAO governance activities occur on the Cyber Agora portal. This includes member delegation, voting, and other matters related to CyberDAO's decentralized governance.",
-        imageTitle: "Cyber Governance",
-        imageDescription: "Participate in CyberDAO",
-      },
-    },
-    {
-      route: "proposals",
-      title: "Welcome to Cyber governance",
-      description:
-        "Cyber delegates are the stewards of the Cyber DAO, appointed by token holders to make governance decisions on their behalf.",
-      meta: {
-        title: "Voter on Agora",
-        description: "Delegate your voting power to a trusted representative",
-        imageTitle: "IN IMAGE",
-        imageDescription: "IN IMAGE DESCRIPTION",
-      },
-    },
-    {
-      route: "info",
       title: "Welcome to the B3 Community",
       description:
         "Delegates represent the B3 ecosystem, guiding governance decisions on behalf of B3 token holders. Delegate your voting power, or vote directly on proposals to move the ecosystem forward.",
       meta: {
-        title: "Cyber Agora",
-        description: "Home of Cyber governance",
-        imageTitle: "Cyber Agora",
-        imageDescription: "Home of Cyber governance",
+        title: "B3 Agora",
+        description:
+          "Delegates represent the B3 ecosystem, guiding governance decisions on behalf of B3 token holders. Delegate your voting power, or vote directly on proposals to move the ecosystem forward.",
+        imageTitle: "B3 Agora",
+        imageDescription:
+          "Delegates represent the B3 ecosystem, guiding governance decisions on behalf of B3 token holders. Delegate your voting power, or vote directly on proposals to move the ecosystem forward.",
+      },
+    },
+    {
+      route: "proposals",
+      title: "Welcome to the B3 Community",
+      description:
+        "Cyber delegates are the stewards of the Cyber DAO, appointed by token holders to make governance decisions on their behalf.",
+      meta: {
+        title: "B3 Agora",
+        description:
+          "Delegates represent the B3 ecosystem, guiding governance decisions on behalf of B3 token holders. Delegate your voting power, or vote directly on proposals to move the ecosystem forward.",
+        imageTitle: "B3 Agora",
+        imageDescription:
+          "Delegates represent the B3 ecosystem, guiding governance decisions on behalf of B3 token holders. Delegate your voting power, or vote directly on proposals to move the ecosystem forward.",
+      },
+    },
+    {
+      route: "info",
+      title: "About B3",
+      hero: infoPageHero,
+      description:
+        "Created by the ex-base team, B3 is the first horizontally scaled, hyper-operable ecosystem of gamechains, powering the future of gaming.",
+      meta: {
+        title: "B3 Agora",
+        description:
+          "Created by the ex-base team, B3 is the first horizontally scaled, hyper-operable ecosystem of gamechains, powering the future of gaming.",
+        imageTitle: "B3 Agora",
+        imageDescription:
+          "Created by the ex-base team, B3 is the first horizontally scaled, hyper-operable ecosystem of gamechains, powering the future of gaming.",
       },
       links: [
         {
@@ -144,10 +152,12 @@ export const b3TenantUIConfig = new TenantUI({
       description:
         "Created by the ex-base team, B3 is the first horizontally scaled, hyper-operable ecosystem of gamechains, powering the future of gaming.",
       meta: {
-        title: "Info of Agora",
-        description: "Welcome to the B3",
-        imageTitle: "",
-        imageDescription: "",
+        title: "B3 Agora",
+        description:
+          "Created by the ex-base team, B3 is the first horizontally scaled, hyper-operable ecosystem of gamechains, powering the future of gaming.",
+        imageTitle: "B3 Agora",
+        imageDescription:
+          "Created by the ex-base team, B3 is the first horizontally scaled, hyper-operable ecosystem of gamechains, powering the future of gaming.",
       },
     },
   ],
