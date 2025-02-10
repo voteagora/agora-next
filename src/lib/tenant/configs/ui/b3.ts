@@ -1,8 +1,8 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import b3Logo from "@/assets/tenant/b3_logo.svg";
 import delegateImage from "@/assets/tenant/b3_delegate.svg";
-import successImage from "@/assets/tenant/cyber_success.svg";
-import pendingImage from "@/assets/tenant/cyber_pending.svg";
+import successImage from "@/assets/tenant/b3_success.svg";
+import pendingImage from "@/assets/tenant/b3_pending.svg";
 import infoPageCard01 from "@/assets/tenant/b3_info_1.png";
 import infoPageCard02 from "@/assets/tenant/b3_info_2.png";
 import infoPageCard03 from "@/assets/tenant/b3_info_3.png";
@@ -53,6 +53,16 @@ export const b3TenantUIConfig = new TenantUI({
       url: "https://forum.b3.fun/t/delegate-code-of-conduct/17",
     },
     {
+      name: "bugs",
+      title: "Report bugs & feedback",
+      url: "https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc",
+    },
+    {
+      name: "discord",
+      title: "Discord",
+      url: "https://discord.com/invite/Derive",
+    },
+    {
       name: "changelog",
       title: "Change log",
       url: "/changelog",
@@ -78,7 +88,7 @@ export const b3TenantUIConfig = new TenantUI({
     },
     {
       route: "delegates",
-      title: "Welcome to the B3 Community",
+      title: "Welcome to the B3 Governance",
       description:
         "Delegates represent the B3 ecosystem, guiding governance decisions on behalf of B3 token holders. Delegate your voting power, or vote directly on proposals to move the ecosystem forward.",
       meta: {
@@ -92,7 +102,7 @@ export const b3TenantUIConfig = new TenantUI({
     },
     {
       route: "proposals",
-      title: "Welcome to the B3 Community",
+      title: "Welcome to the B3 Governance",
       description:
         "Cyber delegates are the stewards of the Cyber DAO, appointed by token holders to make governance decisions on their behalf.",
       meta: {
@@ -106,7 +116,7 @@ export const b3TenantUIConfig = new TenantUI({
     },
     {
       route: "info",
-      title: "About B3",
+      title: "Welcome to the B3 Community",
       hero: infoPageHero,
       description:
         "Created by the ex-base team, B3 is the first horizontally scaled, hyper-operable ecosystem of gamechains, powering the future of gaming.",
@@ -147,7 +157,7 @@ export const b3TenantUIConfig = new TenantUI({
     },
     {
       route: "info/about",
-      title: "About B3",
+      title: "Welcome to the B3 Governance",
       hero: infoPageHero,
       description:
         "Created by the ex-base team, B3 is the first horizontally scaled, hyper-operable ecosystem of gamechains, powering the future of gaming.",
@@ -239,6 +249,7 @@ export const b3TenantUIConfig = new TenantUI({
             testnetAddress: "0xb09A941C4843f79423c8f2C8562aeD1691cbe674",
           },
         ],
+
         copy: {
           helperText: `
 ## Proposal checklist
