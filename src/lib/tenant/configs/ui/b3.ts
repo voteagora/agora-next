@@ -53,16 +53,6 @@ export const b3TenantUIConfig = new TenantUI({
       url: "https://forum.b3.fun/t/delegate-code-of-conduct/17",
     },
     {
-      name: "bugs",
-      title: "Report bugs & feedback",
-      url: "https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc",
-    },
-    {
-      name: "discord",
-      title: "Discord",
-      url: "https://discord.com/invite/Derive",
-    },
-    {
       name: "changelog",
       title: "Change log",
       url: "/changelog",
