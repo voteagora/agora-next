@@ -249,6 +249,7 @@ export const b3TenantUIConfig = new TenantUI({
             testnetAddress: "0xb09A941C4843f79423c8f2C8562aeD1691cbe674",
           },
         ],
+
         copy: {
           helperText: `
 ## Proposal checklist
