@@ -331,7 +331,7 @@ function generateVoteBars(
   );
 }
 
-export const SuccessMessageCard = ({
+const SuccessMessageCard = ({
   namespace,
   forPercentage,
   againstPercentage,
