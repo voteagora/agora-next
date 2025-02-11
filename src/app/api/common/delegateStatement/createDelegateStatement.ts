@@ -34,11 +34,15 @@ export async function createDelegateStatement({
     throw new Error("Invalid signature");
   }
 
+  console.log("Original statement:", delegateStatement.delegateStatement);
+
   // Sanitize the statement before storing
   const sanitizedStatement = {
     ...delegateStatement,
     delegateStatement: sanitizeContent(delegateStatement.delegateStatement),
   };
+
+  console.log("Sanitized statement:", sanitizedStatement.delegateStatement);
 
   const data = {
     address: address.toLowerCase(),
