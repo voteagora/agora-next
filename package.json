@@ -73,6 +73,7 @@
     "faker": "4.1.0",
     "framer-motion": "^10.16.5",
     "ipdata": "^2.2.4",
+    "isomorphic-dompurify": "^2.21.0",
     "jose": "^5.2.4",
     "lodash": "^4.17.0",
     "lokijs": "^1.5.12",
