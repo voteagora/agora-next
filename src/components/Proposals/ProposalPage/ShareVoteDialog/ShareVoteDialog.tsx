@@ -1,0 +1,333 @@
+import { ArrowDownToLine } from "lucide-react";
+import warpcastIcon from "@/icons/warpcast.svg";
+import xIcon from "@/icons/x.svg";
+import { cn } from "@/lib/utils";
+import Tenant from "@/lib/tenant/tenant";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import OptionsResultsPanel from "../OPProposalApprovalPage/OptionResultsPanel/OptionResultsPanel";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import agoraLogo from "@/icons/agoraIconWithText.svg";
+import blockIcon from "@/icons/block.svg";
+import { ogLogoForShareVote } from "./TenantLogo";
+import { Vote } from "@/app/api/common/votes/vote";
+
+function generateVoteBars(
+  forPercentage: number,
+  againstPercentage: number,
+  proposalType: "OPTIMISTIC" | "STANDARD" | "APPROVAL" | "SNAPSHOT"
+) {
+  const totalBars = 56;
+  const bars = [];
+  const forBars =
+    proposalType === "OPTIMISTIC"
+      ? 0
+      : Math.round((totalBars * forPercentage) / 100);
+  const againstBars = Math.round((totalBars * againstPercentage) / 100);
+  const abstainBars = totalBars - forBars - againstBars;
+
+  const className = "h-2 sm:h-3 w-[1.5px] sm:w-[3px] rounded-full shrink-0";
+
+  // Generate FOR bars
+  for (let i = 0; i < forBars; i++) {
+    bars.push(
+      <div key={`for-${i}`} className={cn(className, "bg-positive")} />
+    );
+  }
+
+  for (let i = 0; i < abstainBars; i++) {
+    bars.push(
+      <div key={`neutral-${i}`} className={cn(className, "bg-tertiary")} />
+    );
+  }
+
+  for (let i = 0; i < againstBars; i++) {
+    bars.push(
+      <div key={`against-${i}`} className={cn(className, "bg-negative")} />
+    );
+  }
+
+  return (
+    <div className="flex items-center justify-center w-full gap-[3px] sm:gap-[4px]">
+      {bars}
+    </div>
+  );
+}
+
+const SuccessMessageCard = ({
+  forPercentage,
+  againstPercentage,
+  blockNumber,
+  endsIn,
+  voteDate,
+  supportType,
+  proposalType,
+  proposal,
+}: {
+  forPercentage: number;
+  againstPercentage: number;
+  blockNumber: string | null;
+  endsIn: string | null;
+  voteDate: string | null;
+  supportType: "FOR" | "AGAINST" | "ABSTAIN";
+  proposalType: "OPTIMISTIC" | "STANDARD" | "APPROVAL" | "SNAPSHOT";
+  proposal: Proposal;
+}) => {
+  const { namespace, brandName } = Tenant.current();
+  return (
+    <div
+      className="h-full w-full flex flex-col p-4 bg-[#F3F3EF] relative rounded-lg"
+      style={{
+        backgroundImage: "url(/images/grid-share.png)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* Main Content Container */}
+      <div className="flex flex-col w-full h-full">
+        {/* Header Section */}
+        <div className="flex justify-between items-start w-full">
+          <div className="flex flex-col gap-0 sm:gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-base sm:text-2xl font-bold">I voted</span>
+              <span
+                className={cn(
+                  "text-base sm:text-2xl font-bold",
+                  supportType === "FOR"
+                    ? "text-positive"
+                    : supportType === "AGAINST"
+                      ? "text-negative"
+                      : "text-tertiary"
+                )}
+              >
+                {supportType}
+              </span>
+            </div>
+            <span className="text-xs sm:text-lg text-secondary font-normal">
+              on a proposal on {brandName} Agora
+            </span>
+          </div>
+
+          {/* Tenant Logo */}
+          {ogLogoForShareVote(namespace)}
+        </div>
+
+        {/* Vote Stats Section */}
+        <div className="flex flex-col bg-white gap-3 sm:gap-0 rounded-lg border border-line mt-3">
+          {proposalType === "APPROVAL" ? (
+            <div className="py-2">
+              <OptionsResultsPanel proposal={proposal} showAllOptions={false} />
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2 p-3 sm:p-4 pb-0">
+              <div className="flex justify-between w-full">
+                <span className="text-[10px] sm:text-xs font-semibold text-positive">
+                  {proposalType === "STANDARD" ? "FOR" : ""}
+                </span>
+                <span className="text-[10px] sm:text-xs font-semibold text-negative">
+                  AGAINST
+                </span>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="w-full relative flex">
+                {generateVoteBars(
+                  forPercentage,
+                  againstPercentage,
+                  proposalType
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Transaction Info */}
+          <div className="flex justify-between items-center bg-[#fafafa] px-3 sm:px-4 py-2 border-t border-line rounded-b-lg text-[8px] sm:text-[10px] text-secondary font-semibold">
+            <div className="flex items-center">
+              <span className="flex items-center gap-1 sm:gap-2">
+                <div className="w-4 h-4 sm:w-[18px] sm:h-[18px]">
+                  <Image
+                    src={blockIcon.src}
+                    alt="Block"
+                    width={18}
+                    height={18}
+                  />
+                </div>
+                {blockNumber} · {voteDate}
+              </span>
+            </div>
+            <span>{endsIn}</span>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex justify-between items-center mt-3 sm:mt-4">
+          <div className="w-[48px] h-[12px] sm:w-[62px] sm:h-[16px]">
+            <Image
+              src={agoraLogo.src}
+              alt="Agora Logo"
+              width={62}
+              height={16}
+            />
+          </div>
+
+          <span className="text-[10px] sm:text-xs text-secondary font-semibold">
+            www.agora.xyz
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export function ShareDialog({
+  forPercentage,
+  againstPercentage,
+  blockNumber,
+  endsIn,
+  voteDate,
+  supportType,
+  voteReason,
+  proposalLink,
+  proposalTitle,
+  proposalType,
+  proposal,
+  totalOptions,
+  options,
+  votes,
+}: {
+  forPercentage: number;
+  againstPercentage: number;
+  blockNumber: string | null;
+  endsIn: string | null;
+  voteDate: string | null;
+  supportType: "FOR" | "AGAINST" | "ABSTAIN";
+  voteReason: string;
+  proposalLink: string;
+  proposalTitle: string;
+  proposalType: "STANDARD" | "OPTIMISTIC" | "APPROVAL" | "SNAPSHOT";
+  proposal: Proposal;
+  totalOptions: number;
+  options: {
+    description: string;
+    votes: string;
+    votesAmountBN: string;
+    totalVotingPower: string;
+    proposalSettings: any;
+    thresholdPosition: number;
+    isApproved: boolean;
+  }[];
+  votes: Vote[];
+}) {
+  const { namespace } = Tenant.current();
+
+  let text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)} ${supportType === "ABSTAIN" ? "on" : ""} ${proposalTitle} ${proposalLink}\n\n${voteReason}`;
+
+  if (proposalType === "OPTIMISTIC") {
+    text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)} ${supportType === "ABSTAIN" ? "on" : ""} the optimistic proposal ${proposalTitle} ${proposalLink}\n\n${voteReason}`;
+  }
+
+  if (proposalType === "APPROVAL") {
+    const params = votes?.[0]?.params;
+    const paramsString = params
+      ?.map((option: string, index: number) => `${++index}. ${option}`)
+      .join("\n");
+    text = `${supportType === "ABSTAIN" ? "I abstained from voting on" : ""} ${proposalTitle} ${proposalLink}\n\n${paramsString ? `I voted for:\n${paramsString}` : ""}\n\n${voteReason}`;
+  }
+
+  return (
+    <div className="mt-3 sm:mt-4">
+      <SuccessMessageCard
+        forPercentage={forPercentage}
+        againstPercentage={againstPercentage}
+        blockNumber={blockNumber}
+        endsIn={endsIn}
+        voteDate={voteDate}
+        supportType={supportType}
+        proposalType={proposalType}
+        proposal={proposal}
+      />
+
+      <div className="pt-4 space-y-4">
+        <div className="text-center space-y-1">
+          <h3 className="text-xl sm:text-2xl font-bold text-primary">
+            Your vote is in!
+          </h3>
+          <p className="text-sm sm:text-base text-secondary font-medium">
+            Let others know how you voted.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Button
+            variant="outline"
+            className="w-full justify-center gap-2 font-semibold text-sm sm:text-base"
+            onClick={() => {
+              window.open(
+                `https://warpcast.com/~/compose?text=${encodeURIComponent(
+                  text
+                )}`,
+                "_blank"
+              );
+            }}
+          >
+            <Image
+              height={20}
+              width={20}
+              className="w-5 h-5"
+              src={warpcastIcon.src}
+              alt="Warpcast icon"
+            />
+            Share on Warpcast
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full justify-center gap-2 font-semibold text-sm sm:text-base"
+            onClick={() => {
+              window.open(
+                `https://x.com/intent/post?text=${encodeURIComponent(text)}`,
+                "_blank"
+              );
+            }}
+          >
+            <Image
+              height={20}
+              width={20}
+              className="w-5 h-5"
+              src={xIcon.src}
+              alt="X icon"
+            />
+            Share on X
+          </Button>
+
+          <Button
+            variant="link"
+            className="w-full justify-center gap-2 text-secondary font-semibold text-sm sm:text-base"
+            onClick={async () => {
+              try {
+                const stringifiedOptions = JSON.stringify(options);
+                const response = await fetch(
+                  `/api/images/og/share-my-vote?namespace=${namespace.toUpperCase()}&supportType=${supportType}&blockNumber=${blockNumber}&voteDate=${voteDate}&endsIn=${endsIn}&forPercentage=${forPercentage}&againstPercentage=${againstPercentage}&proposalType=${proposal.proposalType}&options=${stringifiedOptions}&totalOptions=${totalOptions}`
+                );
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${namespace}-${proposalTitle}-vote.png`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+              } catch (error) {
+                console.error("Error downloading image:", error);
+              }
+            }}
+          >
+            <ArrowDownToLine className="sm:h-5 sm:w-5" />
+            Download and share
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

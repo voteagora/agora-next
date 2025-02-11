@@ -12,8 +12,9 @@ import {
   checkMissingVoteForDelegate,
   getVpToDisplay,
   MissingVote,
+  calculateVoteMetadata,
 } from "@/lib/voteUtils";
-import { TokenAmountDisplay } from "@/lib/utils";
+import { cn, TokenAmountDisplay } from "@/lib/utils";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import CastVoteContextProvider, {
   SupportTextProps,
@@ -25,7 +26,7 @@ import { icons } from "@/icons/icons";
 import Image from "next/image";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
-import { formatEther } from "viem";
+import { formatEther, formatUnits } from "viem";
 import {
   Tooltip,
   TooltipContent,
@@ -35,6 +36,10 @@ import {
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import shareIcon from "@/icons/share.svg";
+import { format } from "date-fns";
+import { useVotableSupply } from "@/hooks/useVotableSupply";
 
 type Props = {
   proposal: Proposal;
@@ -215,7 +220,9 @@ function CastVoteInputContent({
       {isGasRelayLive && !showSuccessMessage && !fallbackToStandardVote && (
         <VotingBanner />
       )}
-      {showSuccessMessage && <SuccessMessage />}
+      {showSuccessMessage && (
+        <SuccessMessage proposal={proposal} votes={votes} />
+      )}
     </VStack>
   );
 }
@@ -354,31 +361,98 @@ function LoadingVote() {
   );
 }
 
-function SuccessMessage() {
-  const { data, support } = useCastVoteContext();
+const { token } = Tenant.current();
+
+export function SuccessMessage({
+  proposal,
+  votes,
+  className,
+}: {
+  proposal: Proposal;
+  votes: Vote[];
+  className?: string;
+}) {
+  const { data } = useCastVoteContext();
+  const openDialog = useOpenDialog();
+  const { data: votableSupply } = useVotableSupply({ enabled: true });
+
+  const {
+    support,
+    blockNumber,
+    timestamp,
+    address,
+    endsIn,
+    forPercentage,
+    againstPercentage,
+    reason,
+    transactionHash,
+    options,
+    totalOptions,
+  } = calculateVoteMetadata({
+    proposal,
+    votes,
+    votableSupply,
+  });
 
   const supportColor =
     support?.toLowerCase() === "for"
       ? "text-positive"
       : support?.toLowerCase() === "against"
         ? "text-negative"
-        : "text-secondary";
+        : "text-tertiary";
 
   return (
-    <VStack className="w-full text-sm text-secondary font-medium py-2 px-4 bg-wash border-b border-line rounded-b-lg">
-      <div className="text-sm text-secondary">
-        You{" "}
-        <span className={supportColor}>
-          voted {support?.toLowerCase() + (support === "ABSTAIN" ? " in" : "")}
-        </span>{" "}
-        this proposal
-      </div>
+    <div
+      className={cn(
+        "flex flex-col w-full text-sm text-secondary font-medium py-2 px-4 bg-transparent rounded-b-lg",
+        className
+      )}
+    >
+      <Button
+        onClick={() =>
+          openDialog({
+            className: "sm:w-[32rem]",
+            type: "SHARE_VOTE",
+            params: {
+              againstPercentage: againstPercentage,
+              forPercentage: forPercentage,
+              endsIn: endsIn,
+              blockNumber: blockNumber?.toString() || null,
+              voteDate: timestamp
+                ? format(new Date(timestamp), "MMM d, yyyy h:mm a")
+                : "",
+              supportType: support || "ABSTAIN",
+              voteReason: reason || "",
+              proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}`,
+              proposalTitle: proposal.markdowntitle,
+              proposalType: proposal.proposalType ?? "STANDARD",
+              proposal: proposal,
+              options: options,
+              totalOptions: totalOptions,
+              votes,
+            },
+          })
+        }
+        variant="outline"
+        className="w-full text-secondary font-semibold text-xs gap-2 rounded-[0.5rem] h-8"
+      >
+        <Image src={shareIcon.src} alt="Share icon" height={18} width={18} />
+        <span>
+          Share you voted{" "}
+          <span className={supportColor}>
+            {support?.toUpperCase() + (support === "ABSTAIN" ? " in" : "")}
+          </span>{" "}
+          this proposal
+        </span>
+      </Button>
       <BlockScanUrls
-        className="pt-2"
-        hash1={data?.sponsoredVoteTxHash || data?.standardTxHash}
+        className="pt-2 text-tertiary font-medium mx-auto"
+        hash1={
+          data?.sponsoredVoteTxHash || data?.standardTxHash || transactionHash
+        }
         hash2={data?.advancedTxHash}
       />
-    </VStack>
+    </div>
   );
 }
 

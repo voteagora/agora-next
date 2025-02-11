@@ -20,7 +20,7 @@ import {
   getProposalsCount,
 } from "@/lib/prismaUtils";
 import { Block } from "ethers";
-
+import { unstable_cache } from "next/cache";
 async function getProposals({
   filter,
   pagination,
@@ -182,3 +182,7 @@ export const fetchDraftProposals = cache(getDraftProposals);
 export const fetchProposals = cache(getProposals);
 export const fetchProposal = cache(getProposal);
 export const fetchProposalTypes = cache(getProposalTypes);
+export const fetchProposalUnstableCache = unstable_cache(getProposal, [], {
+  tags: ["proposal"],
+  revalidate: 3600, // 1 hour
+});
