@@ -1,3 +1,4 @@
+/// <reference types="dompurify" />
 import DOMPurify from "isomorphic-dompurify";
 
 export function sanitizeContent(content: string): string {
