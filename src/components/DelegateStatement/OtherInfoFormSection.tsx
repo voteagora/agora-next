@@ -43,8 +43,16 @@ export default function OtherInfoFormSection({
           name="email"
           form={form}
         />
-        {requireCodeOfConduct && <DelegateStatementBoolSelector form={form} />}
-        {supportsNotifications && <NotificationSelector form={form} />}
+        {requireCodeOfConduct && (
+          <div className="col-span-full">
+            <DelegateStatementBoolSelector form={form} />
+          </div>
+        )}
+        {supportsNotifications && (
+          <div className="col-span-full">
+            <NotificationSelector form={form} />
+          </div>
+        )}
       </div>
     </div>
   );

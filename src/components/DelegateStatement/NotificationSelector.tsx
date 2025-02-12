@@ -1,8 +1,9 @@
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type UseFormReturn } from "react-hook-form";
-import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import { useState, useEffect } from "react";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { Checkbox } from "@/components/ui/checkbox";
+
+import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 
 export default function NotificationSelector({
   form,
@@ -41,30 +42,20 @@ export default function NotificationSelector({
 
   return (
     <div className="flex flex-col">
-      <h4 className="font-bold text-xs mb-2">
+      <h4 className="flex items-center mb-2 text-primary">
         Agree to receive proposal updates via email
       </h4>
 
-      <Tabs>
-        <TabsList variant="bool">
-          <TabsTrigger
-            variant="bool"
-            value="yes"
-            data-state={subscribed ? "active" : "inactive"}
-            onClick={() => handleChange(true)}
-          >
-            Yes
-          </TabsTrigger>
-          <TabsTrigger
-            variant="bool"
-            value="no"
-            data-state={!subscribed ? "active" : "inactive"}
-            onClick={() => handleChange(false)}
-          >
-            No
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <label className="flex items-center mb-2 font-bold text-primary">
+        <Checkbox
+          checked={subscribed}
+          onCheckedChange={(checked) =>
+            handleChange(checked === true ? true : false)
+          }
+          className="mr-2"
+        />
+        Yes, I want to receive emails
+      </label>
     </div>
   );
 }

@@ -1,8 +1,9 @@
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type UseFormReturn } from "react-hook-form";
-import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import { useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
+import { Checkbox } from "@/components/ui/checkbox";
+
+import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 
 export default function DelegateStatementBoolSelector({
   form,
@@ -22,33 +23,24 @@ export default function DelegateStatementBoolSelector({
   return (
     <div className="flex flex-col">
       {codeOfConductLink && (
-        <h4 className="font-bold text-xs mb-2">
-          Agree with{" "}
-          <a href={codeOfConductLink.url} target="_blank">
-            {codeOfConductLink.title}
-          </a>
-        </h4>
+        <>
+          <span>
+            <label className="flex items-center mb-2 text-primary">
+              Agree with the {codeOfConductLink.title}
+            </label>
+          </span>
+          <label className="flex items-center mb-2 font-bold text-primary">
+            <Checkbox
+              checked={agreeCodeConduct}
+              onCheckedChange={(checked) =>
+                handleAgreeCodeConduct(checked === true ? true : false)
+              }
+              className="mr-2"
+            />
+            Yes, I agree with the {codeOfConductLink.title}
+          </label>
+        </>
       )}
-      <Tabs>
-        <TabsList variant="bool">
-          <TabsTrigger
-            variant="bool"
-            value="yes"
-            data-state={agreeCodeConduct ? "active" : "inactive"}
-            onClick={() => handleAgreeCodeConduct(true)}
-          >
-            Yes
-          </TabsTrigger>
-          <TabsTrigger
-            variant="bool"
-            value="no"
-            data-state={!agreeCodeConduct ? "active" : "inactive"}
-            onClick={() => handleAgreeCodeConduct(false)}
-          >
-            No
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
     </div>
   );
 }
