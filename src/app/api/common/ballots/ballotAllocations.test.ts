@@ -1,7 +1,7 @@
 // import { Ballot } from "./ballot";
 import { Ballot } from "./ballot";
 import { calculateAllocations } from "./ballotAllocations";
-import { expect } from "@jest/globals";
+import { expect, describe, it } from "vitest";
 
 const ballot = [
   {
