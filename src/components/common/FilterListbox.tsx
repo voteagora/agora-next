@@ -40,7 +40,7 @@ export default function FilterListbox({
     <Listbox as="div" value={value} onChange={onChange}>
       <Listbox.Button
         className={cn(
-          `w-full sm:${width} text-sm font-medium border border-line rounded-full py-2 px-4 flex items-center justify-between`,
+          `w-full sm:${width} text-sm font-medium border border-line rounded-full py-2 px-4 flex items-center justify-between text-secondary`,
           buttonClassName
         )}
       >
