@@ -38,6 +38,7 @@ type ProposalType = {
   quorum: number;
   approval_threshold: number;
   name: string;
+  isClientSide: boolean;
 };
 
 const proposalTypeSchema = z.object({
