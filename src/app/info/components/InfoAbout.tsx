@@ -78,7 +78,7 @@ const InfoAbout = () => {
               <div className="sm:h-[105px] block"></div>
             )}
             {namespace === TENANT_NAMESPACES.B3 && (
-              <div className="sm:h-[140px] block"></div>
+              <div className="sm:h-[120px] block"></div>
             )}
           </div>
         </div>
