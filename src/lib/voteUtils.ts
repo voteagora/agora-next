@@ -109,13 +109,22 @@ export function parseParams(
   if (params === null || proposalData.key !== "APPROVAL") {
     return null;
   }
+  const parsedParams =
+    typeof params === "string" && params.startsWith("[")
+      ? JSON.parse(params)
+      : params;
 
   try {
-    const hexParams = params.startsWith("0x") ? params : `0x${params}`;
+    let selectedOptions = [];
+    if (typeof parsedParams === "string") {
+      const hexParams = params.startsWith("0x") ? params : `0x${params}`;
 
-    const decoded = new AbiCoder().decode(["uint256[]"], hexParams);
+      const decoded = new AbiCoder().decode(["uint256[]"], hexParams);
 
-    const selectedOptions = decoded[0];
+      selectedOptions = decoded[0];
+    } else {
+      selectedOptions = parsedParams?.flat();
+    }
 
     const result = selectedOptions.map((optionIndex: bigint) => {
       const idx = Number(optionIndex);
