@@ -17,6 +17,8 @@ export const xaiTenantUIConfig = new TenantUI({
   title: "Xai Agora",
   logo: xaiLogo,
 
+  googleAnalytics: "G-BSFWRZVGEB",
+
   assets: {
     success: successImage as unknown as string,
     pending: pendingImage as unknown as string,

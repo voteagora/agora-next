@@ -32,7 +32,13 @@ const GovernorSettingsProposalTypes = ({
   // TODO: Refactor this to use the governor types
   const isQuorumSupportedByGovernor =
     namespace !== TENANT_NAMESPACES.CYBER &&
-    namespace !== TENANT_NAMESPACES.PGUILD;
+    namespace !== TENANT_NAMESPACES.BOOST &&
+    namespace !== TENANT_NAMESPACES.PGUILD &&
+    namespace !== TENANT_NAMESPACES.DERIVE &&
+    namespace !== TENANT_NAMESPACES.DEMO &&
+    namespace !== TENANT_NAMESPACES.B3 &&
+    namespace !== TENANT_NAMESPACES.XAI &&
+    namespace !== TENANT_NAMESPACES.SCROLL;
 
   const { data: quorum, isFetched: isQuorumFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
@@ -162,7 +168,13 @@ const GovernorSettingsProposalTypes = ({
               {Number(proposalType.approval_threshold) / 100} %
             </TableCell>
             <TableCell colSpan={3} className="rounded-bl-xl">
-              {threshold && formatNumber(threshold)}
+              {isThresholdFetched && threshold !== undefined && (
+                <TokenAmountDecorated
+                  amount={BigInt(threshold.toString())}
+                  currency={token.symbol}
+                  decimals={token.decimals}
+                />
+              )}
             </TableCell>
             <TableCell colSpan={4} className="rounded-br-xl">
               {Number(proposalType.quorum) / 100} %
