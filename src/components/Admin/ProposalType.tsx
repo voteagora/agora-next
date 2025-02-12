@@ -24,11 +24,14 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getVotingModuleTypeForProposalType } from "@/lib/utils";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
+import { useEffect } from "react";
 
 type Props = {
   proposalType: ProposalType;
   index: number;
   votableSupply: string;
+  onDelete: (id: number) => void;
+  onSuccessSetProposalType: (id: number) => void;
 };
 
 type ProposalType = {
@@ -45,9 +48,11 @@ const proposalTypeSchema = z.object({
 });
 
 export default function ProposalType({
-  proposalType: { quorum, approval_threshold, name },
+  proposalType: { quorum, approval_threshold, name, isClientSide },
   index,
   votableSupply,
+  onDelete,
+  onSuccessSetProposalType,
 }: Props) {
   const { namespace, contracts, token } = Tenant.current();
 
@@ -65,12 +70,22 @@ export default function ProposalType({
     BigInt(votableSupply) / BigInt(10 ** 18)
   );
 
-  const deleteProposalTypeArgs = [BigInt(index), 0, 0, ""];
+  const formValues = form.watch();
+
+  const deleteProposalTypeArgs = [
+    BigInt(index),
+    Math.round(formValues.quorum * 100),
+    Math.round(formValues.approval_threshold * 100),
+    "",
+  ];
+
   // TODO: Replace this with a governor-level flag
   // TODO: Aso add proposal type configurator version flag
-  if (namespace === TENANT_NAMESPACES.CYBER) {
-    deleteProposalTypeArgs.push("0x" + "0".repeat(40));
+  if (namespace !== TENANT_NAMESPACES.CYBER) {
+    deleteProposalTypeArgs.push(""); // Cyber proposal types don't have description field
   }
+
+  deleteProposalTypeArgs.push("0x" + "0".repeat(40));
 
   const { data: deleteProposalTypeConfig } = useSimulateContract({
     address: contracts.proposalTypesConfigurator!.address as `0x${string}`,
@@ -78,25 +93,38 @@ export default function ProposalType({
     functionName: "setProposalType",
     args: deleteProposalTypeArgs,
   });
+
   const {
     data: resultDeleteProposalType,
     writeContract: writeDeleteProposalType,
     isPending: isLoadingDeleteProposalType,
+    isSuccess: isSuccessDeleteProposalType,
   } = useWriteContract();
   const { isLoading: isLoadingDeleteProposalTypeTransaction } =
     useWaitForTransactionReceipt({
       hash: resultDeleteProposalType,
     });
 
-  const formValues = form.watch();
+  useEffect(() => {
+    if (isSuccessDeleteProposalType) {
+      onDelete(index); // Call onDelete to remove the row
+    }
+  }, [isSuccessDeleteProposalType, onDelete, index]);
 
   const {
     data: resultSetProposalType,
     writeContract: writeSetProposalType,
     isPending: isLoadingSetProposalType,
     isError: isErrorSetProposalType,
+    isSuccess: isSuccessSetProposalType,
     error: setProposalTypeError,
   } = useWriteContract();
+
+  useEffect(() => {
+    if (isSuccessSetProposalType) {
+      onSuccessSetProposalType(index);
+    }
+  }, [isSuccessSetProposalType, onSuccessSetProposalType, index]);
 
   const { isLoading: isLoadingSetProposalTypeTransaction } =
     useWaitForTransactionReceipt({
@@ -154,7 +182,11 @@ export default function ProposalType({
               className="hover:bg-destructive/10 group w-9 h-9"
               disabled={isDisabled || isErrorSetProposalType}
               onClick={() => {
-                writeDeleteProposalType(deleteProposalTypeConfig!.request);
+                if (isClientSide) {
+                  onDelete(index);
+                } else {
+                  writeDeleteProposalType(deleteProposalTypeConfig!.request);
+                }
               }}
               type="button"
             >
