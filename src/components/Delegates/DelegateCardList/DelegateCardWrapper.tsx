@@ -81,7 +81,6 @@ const DelegateCardWrapper = async ({ searchParams }: { searchParams: any }) => {
     <DelegateTabs>
       <TabsContent value="delegates">
         <DelegateContent
-          isDelegatesCitizensFetching={tab === "citizens"}
           initialDelegates={delegates}
           fetchDelegates={async (pagination, seed) => {
             "use server";
@@ -93,7 +92,6 @@ const DelegateCardWrapper = async ({ searchParams }: { searchParams: any }) => {
       </TabsContent>
       <TabsContent value="citizens">
         <CitizenCardList
-          isDelegatesCitizensFetching={tab !== "citizens"}
           initialDelegates={delegates}
           fetchDelegates={async (pagination, seed) => {
             "use server";
