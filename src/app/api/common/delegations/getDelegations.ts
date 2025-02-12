@@ -14,7 +14,6 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Prisma } from "@prisma/client";
 import { findAdvancedDelegatee, findDelagatee } from "@/lib/prismaUtils";
 import { DELEGATION_MODEL } from "@/lib/constants";
-import { mapArbitrumBlockToMainnetBlock } from "@/lib/utils";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -72,22 +71,13 @@ async function getCurrentDelegateesForAddress({
 
   const advancedDelegateesDataPromises = advancedDelegatees.map(
     async (advancedDelegatee) => {
-      let blockNumber = advancedDelegatee.block_number;
-      if (
-        contracts.governor.chain.id === 42161 ||
-        contracts.governor.chain.id === 421614
-      ) {
-        blockNumber = await mapArbitrumBlockToMainnetBlock(
-          advancedDelegatee.block_number
-        );
-      }
       return {
         from: advancedDelegatee.from,
         to: advancedDelegatee.to,
         allowance: advancedDelegatee.delegated_amount.toFixed(0),
         percentage: advancedDelegatee.delegated_share.toString(),
         timestamp: latestBlock
-          ? getHumanBlockTime(blockNumber, latestBlock, true)
+          ? getHumanBlockTime(advancedDelegatee.block_number, latestBlock, true)
           : null,
         type: "ADVANCED" as const,
         amount:
@@ -103,18 +93,6 @@ async function getCurrentDelegateesForAddress({
     advancedDelegateesDataPromises
   );
 
-  let directDelegateeBlockNumber = directDelegatee?.block_number;
-
-  if (
-    (contracts.governor.chain.id === 42161 ||
-      contracts.governor.chain.id === 421614) &&
-    directDelegatee
-  ) {
-    directDelegateeBlockNumber = await mapArbitrumBlockToMainnetBlock(
-      directDelegatee.block_number
-    );
-  }
-
   const directDelegateeData = directDelegatee && {
     from: directDelegatee.delegator,
     to: directDelegatee.delegatee,
@@ -122,7 +100,7 @@ async function getCurrentDelegateesForAddress({
     percentage: "0", // Only used in Agora token partial delegation
     timestamp: latestBlock
       ? getHumanBlockTime(
-          directDelegateeBlockNumber as bigint,
+          directDelegatee.block_number as bigint,
           latestBlock,
           true
         )
@@ -389,22 +367,13 @@ async function getCurrentAdvancedDelegatorsForAddress({
 
   const advancedDelegatorsDataPromises = advancedDelegators.map(
     async (advancedDelegator) => {
-      let blockNumber = advancedDelegator.block_number;
-      if (
-        contracts.governor.chain.id === 42161 ||
-        contracts.governor.chain.id === 421614
-      ) {
-        blockNumber = await mapArbitrumBlockToMainnetBlock(
-          advancedDelegator.block_number
-        );
-      }
       return {
         from: advancedDelegator.from,
         to: advancedDelegator.to,
         allowance: advancedDelegator.delegated_amount.toFixed(0),
         percentage: "0", // Only used in Agora token partial delegation
         timestamp: latestBlock
-          ? getHumanBlockTime(blockNumber, latestBlock, true)
+          ? getHumanBlockTime(advancedDelegator.block_number, latestBlock, true)
           : null,
         type: "ADVANCED" as const,
         amount:
