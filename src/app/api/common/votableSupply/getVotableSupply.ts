@@ -1,6 +1,7 @@
 import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
 import { findVotableSupply } from "@/lib/prismaUtils";
+import { unstable_cache } from "next/cache";
 
 async function getVotableSupply() {
   const { namespace, contracts } = Tenant.current();
@@ -18,3 +19,11 @@ async function getVotableSupply() {
 }
 
 export const fetchVotableSupply = cache(getVotableSupply);
+export const fetchVotableSupplyUnstableCache = unstable_cache(
+  getVotableSupply,
+  [],
+  {
+    tags: ["votableSupply"],
+    revalidate: 604800, // 1 week
+  }
+);

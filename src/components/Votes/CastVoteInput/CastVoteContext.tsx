@@ -5,17 +5,24 @@ import useAdvancedVoting from "@/hooks/useAdvancedVoting";
 import useSponsoredVoting from "@/hooks/useSponsoredVoting";
 import useStandardVoting from "@/hooks/useStandardVoting";
 import Tenant from "@/lib/tenant/tenant";
-import { checkMissingVoteForDelegate } from "@/lib/voteUtils";
+import {
+  calculateVoteMetadataMinified,
+  checkMissingVoteForDelegate,
+} from "@/lib/voteUtils";
 import {
   createContext,
   type Dispatch,
   SetStateAction,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { formatEther } from "viem";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import useEffectEvent from "@/hooks/useEffectEvent";
+import { useAccount } from "wagmi";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
@@ -67,18 +74,22 @@ const CastVoteContextProvider = ({
   chains,
   votingPower,
   children,
+  votableSupply,
 }: {
   proposal: Proposal;
   votes: Vote[];
   chains: string[][];
   votingPower: VotingPowerData;
   children: React.ReactNode;
+  votableSupply?: string;
 }) => {
   const [reason, setReason] = useState<string | null>(null);
   const [support, setSupport] = useState<
     SupportTextProps["supportType"] | null
   >(null);
   const [fallbackToStandardVote, setFallbackToStandardVote] = useState(false);
+  const openDialog = useOpenDialog();
+  const { address } = useAccount();
 
   const { ui, contracts } = Tenant.current();
 
@@ -128,6 +139,41 @@ const CastVoteContextProvider = ({
     }
     return standardVoteValues;
   })();
+
+  const { againstPercentage, forPercentage, endsIn } =
+    calculateVoteMetadataMinified({
+      proposal,
+      votableSupply: votableSupply,
+    });
+
+  const openShareVoteDialog = useEffectEvent(() => {
+    openDialog({
+      className: "sm:w-[32rem]",
+      type: "SHARE_VOTE",
+      params: {
+        againstPercentage: againstPercentage,
+        forPercentage: forPercentage,
+        endsIn: endsIn,
+        blockNumber: null,
+        voteDate: null,
+        supportType: support || "ABSTAIN",
+        voteReason: reason || "",
+        proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}`,
+        proposalTitle: proposal.markdowntitle,
+        proposalType: proposal.proposalType ?? "STANDARD",
+        proposal: proposal,
+        options: [],
+        totalOptions: 0,
+        votes,
+      },
+    });
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      openShareVoteDialog();
+    }
+  }, [isSuccess]);
 
   return (
     <CastVoteContext.Provider

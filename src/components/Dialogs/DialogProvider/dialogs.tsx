@@ -29,6 +29,8 @@ import { StakedDeposit } from "@/lib/types";
 import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
 import SubscribeDialog from "@/components/Notifications/SubscribeDialog";
+import { ShareDialog as ShareVoteDialog } from "@/components/Proposals/ProposalPage/ShareVoteDialog/ShareVoteDialog";
+import { Vote } from "@/app/api/common/votes/vote";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -47,7 +49,8 @@ export type DialogType =
   | UndelegateDialogType
   | UpdateDraftProposalDialog
   | OpenGithubPRDialog
-  | SubscribeDialog;
+  | SubscribeDialog
+  | ShareVoteDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -153,6 +156,35 @@ export type CastVoteDialogProps = {
 export type CastVoteDialogType = {
   type: "CAST_VOTE";
   params: Omit<CastVoteDialogProps, "closeDialog">;
+};
+
+export type ShareVoteDialogType = {
+  type: "SHARE_VOTE";
+  params: {
+    forPercentage: number;
+    againstPercentage: number;
+    blockNumber: string | null;
+    endsIn: string | null;
+    voteDate: string | null;
+    supportType: SupportTextProps["supportType"];
+    voteReason: string;
+    proposalLink: string;
+    proposalTitle: string;
+    proposalType: "OPTIMISTIC" | "STANDARD" | "APPROVAL" | "SNAPSHOT";
+    proposal: Proposal;
+    totalOptions: number;
+    votes: Vote[];
+    options: {
+      description: string;
+      votes: string;
+      votesAmountBN: string;
+      totalVotingPower: string;
+      proposalSettings: any;
+      thresholdPosition: number;
+      isApproved: boolean;
+    }[];
+  };
+  className?: string;
 };
 
 export type ApprovalCastVoteDialogProps = {
@@ -298,6 +330,41 @@ export const dialogs: DialogDefinitions<DialogType> = {
         votingPower={votingPower}
         authorityChains={authorityChains}
         missingVote={missingVote}
+      />
+    );
+  },
+  SHARE_VOTE: ({
+    forPercentage,
+    againstPercentage,
+    blockNumber,
+    endsIn,
+    voteDate,
+    supportType,
+    voteReason,
+    proposalLink,
+    proposalTitle,
+    proposalType,
+    proposal,
+    totalOptions,
+    options,
+    votes,
+  }) => {
+    return (
+      <ShareVoteDialog
+        forPercentage={forPercentage}
+        againstPercentage={againstPercentage}
+        blockNumber={blockNumber}
+        endsIn={endsIn}
+        voteDate={voteDate}
+        supportType={supportType}
+        voteReason={voteReason}
+        proposalLink={proposalLink}
+        proposalTitle={proposalTitle}
+        proposalType={proposalType}
+        proposal={proposal}
+        totalOptions={totalOptions}
+        options={options}
+        votes={votes}
       />
     );
   },
