@@ -24,6 +24,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getVotingModuleTypeForProposalType } from "@/lib/utils";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
+import { useState, useEffect } from "react";
 
 type Props = {
   proposalType: ProposalType;
@@ -50,6 +51,23 @@ export default function ProposalType({
   votableSupply,
 }: Props) {
   const { namespace, contracts, token } = Tenant.current();
+  const [totalSupply, setTotalSupply] = useState<bigint>(0n);
+
+  useEffect(() => {
+    async function fetchTotalSupply() {
+      if (namespace === TENANT_NAMESPACES.SCROLL && contracts.token.isERC20()) {
+        const supply = await contracts.token.contract.totalSupply();
+        setTotalSupply(supply);
+      }
+    }
+    fetchTotalSupply();
+  }, [namespace, contracts.token.contract]);
+
+  const formattedSupply = Number(
+    (namespace === TENANT_NAMESPACES.SCROLL
+      ? totalSupply
+      : BigInt(votableSupply)) / BigInt(10 ** 18)
+  );
 
   const form = useForm<z.infer<typeof proposalTypeSchema>>({
     resolver: zodResolver(proposalTypeSchema),
@@ -60,10 +78,6 @@ export default function ProposalType({
       description: "",
     },
   });
-
-  const formattedVotableSupply = Number(
-    BigInt(votableSupply) / BigInt(10 ** 18)
-  );
 
   const deleteProposalTypeArgs = [BigInt(index), 0, 0, ""];
   // TODO: Replace this with a governor-level flag
@@ -209,7 +223,7 @@ export default function ProposalType({
                       <p className="text-[0.8rem] col-span-3">
                         {formatNumber(
                           Math.floor(
-                            (formattedVotableSupply * formValues.quorum) / 100
+                            (formattedSupply * formValues.quorum) / 100
                           ).toString(),
                           0,
                           1
