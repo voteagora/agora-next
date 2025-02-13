@@ -61,7 +61,7 @@ async function getCurrentDelegateesForAddress({
       findAdvancedDelegatee({
         namespace,
         address,
-        contract: contracts.token.address,
+        contract: contracts.alligator?.address || contracts.token.address,
       }),
       getDirectDelegatee(),
     ]);
@@ -360,7 +360,7 @@ async function getCurrentAdvancedDelegatorsForAddress({
     findAdvancedDelegatee({
       namespace,
       address,
-      contract: contracts.alligator?.address,
+      contract: contracts.alligator?.address || contracts.token.address,
     }),
     contracts.token.provider.getBlock("latest"),
   ]);
