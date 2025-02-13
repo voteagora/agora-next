@@ -218,7 +218,13 @@ export default function ProposalType({
                       }}
                     />
                     <div className="absolute right-[12px] text-sm text-muted-foreground flex gap-2 text-center items-center">
-                      <p>% of votable supply</p>
+                      <p>
+                        % of{" "}
+                        {namespace === TENANT_NAMESPACES.SCROLL
+                          ? "total"
+                          : "votable"}{" "}
+                        supply
+                      </p>
                       <div className="mx-auto w-[1px] bg-muted-foreground/40 h-4" />
                       <p className="text-[0.8rem] col-span-3">
                         {formatNumber(
