@@ -25,11 +25,11 @@ export default function DelegateStatementBoolSelector({
       {codeOfConductLink && (
         <>
           <span>
-            <label className="flex items-center mb-2 text-primary">
+            <label className="flex items-center mb-3 text-tertiary font-semibold text-xs leading-4">
               Agree with the {codeOfConductLink.title}
             </label>
           </span>
-          <label className="flex items-center mb-2 font-bold text-primary">
+          <label className="flex items-center mb-4 font-semibold text-primary">
             <Checkbox
               checked={agreeCodeConduct}
               onCheckedChange={(checked) =>

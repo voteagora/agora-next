@@ -42,11 +42,11 @@ export default function NotificationSelector({
 
   return (
     <div className="flex flex-col">
-      <h4 className="flex items-center mb-2 text-primary">
+      <h4 className="flex items-center mb-3 text-tertiary font-semibold text-xs leading-4">
         Agree to receive proposal updates via email
       </h4>
 
-      <label className="flex items-center mb-2 font-bold text-primary">
+      <label className="flex items-center mb-4 font-semibold text-primary">
         <Checkbox
           checked={subscribed}
           onCheckedChange={(checked) =>
