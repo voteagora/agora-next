@@ -148,6 +148,16 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
       );
 
     case TENANT_NAMESPACES.OPTIMISM:
+      // Check if proposal was created after the execution launch date
+      const proposalDate = proposal.createdTime
+        ? new Date(proposal.createdTime)
+        : new Date();
+      const executionLaunchDate = new Date("2024-12-01");
+
+      if (proposalDate < executionLaunchDate) {
+        return null;
+      }
+
       if (
         proposal.proposalType === "STANDARD" ||
         proposal.proposalType === "APPROVAL"
@@ -184,6 +194,16 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
       return <AgoraGovExecute proposal={proposal} />;
 
     case TENANT_NAMESPACES.OPTIMISM:
+      // Check if proposal was created after the execution launch date
+      const proposalDate = proposal.createdTime
+        ? new Date(proposal.createdTime)
+        : new Date();
+      const executionLaunchDate = new Date("2024-12-01");
+
+      if (proposalDate < executionLaunchDate) {
+        return null;
+      }
+
       return (
         <div className="flex flex-row gap-2">
           <AgoraOptimismGovCancel proposal={proposal} />
