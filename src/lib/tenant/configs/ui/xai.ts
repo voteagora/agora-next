@@ -46,6 +46,10 @@ export const xaiTenantUIConfig = new TenantUI({
     letterSpacing: "0.02em",
   },
 
+  tacticalStrings: {
+    myBalance: "Aggregate votable balance",
+  },
+
   // TODO
   governanceIssues: [
     // {

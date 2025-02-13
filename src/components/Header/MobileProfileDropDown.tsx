@@ -163,7 +163,9 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                       </div>
 
                       <PanelRow
-                        title="My token balance"
+                        title={
+                          ui.tacticalStrings?.myBalance || "My token balance"
+                        }
                         detail={
                           <RowSkeletonWrapper isLoading={isFetching}>
                             <TokenAmountDecorated

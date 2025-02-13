@@ -68,7 +68,7 @@ export default class TenantTokenFactory {
       case TENANT_NAMESPACES.XAI:
         return {
           name: "Xai",
-          symbol: "XAI",
+          symbol: "avXAI",
           decimals: 18,
         };
       case TENANT_NAMESPACES.B3:
