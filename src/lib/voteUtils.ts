@@ -287,7 +287,7 @@ export function calculateVoteMetadata({
 
   const formattedVotableSupply = votableSupply
     ? Number(BigInt(votableSupply) / BigInt(10 ** token.decimals))
-    : 0;
+    : Number(115000000);
 
   const endsIn = proposal.endTime
     ? `ENDS ~${format(new Date(proposal.endTime), "MMM d")}`
@@ -433,10 +433,57 @@ export function calculateVoteMetadata({
     endsIn,
     forPercentage,
     againstPercentage,
-    parsedOptions,
     totalOptions,
     options: parsedOptions,
     reason: vote?.reason,
     transactionHash: vote?.transactionHash,
+  };
+}
+
+export function calculateVoteMetadataMinified({
+  proposal,
+  votableSupply,
+}: {
+  proposal: Proposal;
+  votableSupply?: string;
+}) {
+  const { token } = Tenant.current();
+
+  const formattedVotableSupply = votableSupply
+    ? Number(BigInt(votableSupply) / BigInt(10 ** token.decimals))
+    : Number(115000000);
+
+  const endsIn = proposal.endTime
+    ? `ENDS ~${format(new Date(proposal.endTime), "MMM d")}`
+    : "";
+
+  const results =
+    proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
+
+  const forPercentage =
+    proposal.proposalType === "OPTIMISTIC"
+      ? 0
+      : (Number(results.for) /
+          (Number(results.for) +
+            Number(results.against) +
+            Number(results.abstain))) *
+        100;
+
+  const againstPercentage =
+    proposal.proposalType === "OPTIMISTIC"
+      ? (Number(formatUnits(results.against, token.decimals)) /
+          // Disapproval threshold is in percentage, so we need to convert it to the same unit
+          ((disapprovalThreshold * formattedVotableSupply) / 100)) *
+        100
+      : (Number(results.against) /
+          (Number(results.for) +
+            Number(results.against) +
+            Number(results.abstain))) *
+        100;
+
+  return {
+    endsIn,
+    forPercentage,
+    againstPercentage,
   };
 }

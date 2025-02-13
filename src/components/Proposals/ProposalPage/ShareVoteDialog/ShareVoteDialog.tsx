@@ -11,6 +11,8 @@ import agoraLogo from "@/icons/agoraIconWithText.svg";
 import blockIcon from "@/icons/block.svg";
 import { ogLogoForShareVote } from "./TenantLogo";
 import { Vote } from "@/app/api/common/votes/vote";
+import { format } from "date-fns";
+import { useLatestBlock } from "@/hooks/useLatestBlock";
 
 function generateVoteBars(
   forPercentage: number,
@@ -218,12 +220,16 @@ export function ShareDialog({
   }[];
   votes: Vote[];
 }) {
+  const latestBlock = useLatestBlock({ enabled: true });
+  const voteDateToUse = voteDate ?? format(new Date(), "MMM d, yyyy h:mm a");
+  const blockNumberToUse =
+    blockNumber ?? latestBlock?.data?.number.toString() ?? null;
   const { namespace } = Tenant.current();
 
-  let text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)} ${supportType === "ABSTAIN" ? "on" : ""} ${proposalTitle} ${proposalLink}\n\n${voteReason}`;
+  let text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)} ${supportType === "ABSTAIN" ? "on" : ""} ${proposalTitle} ${proposalLink} \n\n${voteReason}`;
 
   if (proposalType === "OPTIMISTIC") {
-    text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)} ${supportType === "ABSTAIN" ? "on" : ""} the optimistic proposal ${proposalTitle} ${proposalLink}\n\n${voteReason}`;
+    text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)} ${supportType === "ABSTAIN" ? "on" : ""} the optimistic proposal ${proposalTitle} ${proposalLink} \n\n${voteReason}`;
   }
 
   if (proposalType === "APPROVAL") {
@@ -231,7 +237,7 @@ export function ShareDialog({
     const paramsString = params
       ?.map((option: string, index: number) => `${++index}. ${option}`)
       .join("\n");
-    text = `${supportType === "ABSTAIN" ? "I abstained from voting on" : ""} ${proposalTitle} ${proposalLink}\n\n${paramsString ? `I voted for:\n${paramsString}` : ""}\n\n${voteReason}`;
+    text = `${supportType === "ABSTAIN" ? "I abstained from voting on" : ""} ${proposalTitle} ${proposalLink} \n\n${paramsString ? `I voted for:\n${paramsString}` : ""}\n\n${voteReason}`;
   }
 
   return (
@@ -239,9 +245,9 @@ export function ShareDialog({
       <SuccessMessageCard
         forPercentage={forPercentage}
         againstPercentage={againstPercentage}
-        blockNumber={blockNumber}
+        blockNumber={blockNumberToUse}
         endsIn={endsIn}
-        voteDate={voteDate}
+        voteDate={voteDateToUse}
         supportType={supportType}
         proposalType={proposalType}
         proposal={proposal}
@@ -307,7 +313,7 @@ export function ShareDialog({
               try {
                 const stringifiedOptions = JSON.stringify(options);
                 const response = await fetch(
-                  `/api/images/og/share-my-vote?namespace=${namespace.toUpperCase()}&supportType=${supportType}&blockNumber=${blockNumber}&voteDate=${voteDate}&endsIn=${endsIn}&forPercentage=${forPercentage}&againstPercentage=${againstPercentage}&proposalType=${proposal.proposalType}&options=${stringifiedOptions}&totalOptions=${totalOptions}`
+                  `/api/images/og/share-my-vote?namespace=${namespace.toUpperCase()}&supportType=${supportType}&blockNumber=${blockNumberToUse}&voteDate=${voteDateToUse}&endsIn=${endsIn}&forPercentage=${forPercentage}&againstPercentage=${againstPercentage}&proposalType=${proposal.proposalType}&options=${stringifiedOptions}&totalOptions=${totalOptions}`
                 );
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);

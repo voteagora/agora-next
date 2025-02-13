@@ -1,6 +1,5 @@
 "use client";
 
-import { HStack, VStack } from "@/components/Layout/Stack";
 import { ReactNode } from "react";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
@@ -58,6 +57,7 @@ export default function CastVoteInput({
     proposal,
     blockNumber: isOptimismTenant ? proposal.snapshotBlockNumber : undefined,
   });
+  const { data: votableSupply } = useVotableSupply({ enabled: true });
 
   const chains = data?.chains;
   const delegate = data?.delegate;
@@ -96,6 +96,7 @@ export default function CastVoteInput({
       votes={votes}
       chains={chains}
       votingPower={votingPower}
+      votableSupply={votableSupply}
     >
       <CastVoteInputContent
         proposal={proposal}
@@ -155,19 +156,15 @@ function CastVoteInputContent({
     !reason;
 
   return (
-    <VStack className="flex-shrink bg-wash">
-      <VStack
-        className={`bg-neutral border-b border-line rounded-b-lg flex-shrink ${isGasRelayLive && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
+    <div className="flex flex-col flex-shrink bg-wash">
+      <div
+        className={`flex flex-col bg-neutral border-b border-line rounded-b-lg flex-shrink ${isGasRelayLive && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
       >
-        <VStack
-          justifyContent="justify-between"
-          alignItems="items-stretch"
-          className="pb-3 pt-1"
-        >
+        <div className="flex flex-col items-stretch justify-between pb-3 pt-1">
           {!isError && !showSuccessMessage && (
-            <VStack className="bg-neutral border-t border-line px-3 ">
+            <div className="bg-neutral border-t border-line px-3 ">
               {!isLoading && (
-                <VStack gap={2}>
+                <div className="flex flex-col gap-2">
                   <textarea
                     placeholder="I believe..."
                     value={reason || undefined}
@@ -179,7 +176,7 @@ function CastVoteInputContent({
                     proposalStatus={proposal.status}
                     isOptimistic={isOptimistic}
                   />
-                </VStack>
+                </div>
               )}
               {isLoading && <LoadingVote />}
               {!isLoading && (
@@ -190,7 +187,7 @@ function CastVoteInputContent({
                   proposal={proposal}
                 />
               )}
-            </VStack>
+            </div>
           )}
           {isError && (!isGasRelayLive || fallbackToStandardVote) && (
             <ErrorState
@@ -215,15 +212,15 @@ function CastVoteInputContent({
               button2={{ message: "Try again", action: write }}
             />
           )}
-        </VStack>
-      </VStack>
+        </div>
+      </div>
       {isGasRelayLive && !showSuccessMessage && !fallbackToStandardVote && (
         <VotingBanner />
       )}
       {showSuccessMessage && (
         <SuccessMessage proposal={proposal} votes={votes} />
       )}
-    </VStack>
+    </div>
   );
 }
 
@@ -345,7 +342,7 @@ const SubmitButton = ({
 
 function LoadingVote() {
   return (
-    <VStack className="w-full pt-3">
+    <div className="flex flex-col w-full pt-3">
       <div className="mb-2 text-sm text-secondary font-medium">
         Casting your vote
       </div>
@@ -357,11 +354,9 @@ function LoadingVote() {
           Writing your vote to the chain...
         </Button>
       </div>
-    </VStack>
+    </div>
   );
 }
-
-const { token } = Tenant.current();
 
 export function SuccessMessage({
   proposal,
@@ -468,7 +463,7 @@ function VoteButtons({
   }
 
   return (
-    <HStack gap={2} className="pt-1">
+    <div className="flex flex-row gap-2 pt-1">
       {(isOptimistic ? ["AGAINST"] : ["FOR", "AGAINST", "ABSTAIN"]).map(
         (supportType) => (
           <VoteButton
@@ -477,7 +472,7 @@ function VoteButtons({
           />
         )
       )}
-    </HStack>
+    </div>
   );
 }
 
@@ -515,7 +510,7 @@ function DisabledVoteButton({ reason }: { reason: string }) {
 
 function NoStatementView() {
   return (
-    <VStack gap={3}>
+    <div className="flex flex-col gap-3">
       <div className="py-2 px-4 bg-line text-xs text-secondary rounded-lg flex items-center gap-2">
         <Image src={icons.info} alt="Info" width={24} height={24} />
         Voting requires a delegate statement. Set yours one now to participate.
@@ -526,7 +521,7 @@ function NoStatementView() {
       >
         Set up statement
       </Button>
-    </VStack>
+    </div>
   );
 }
 
@@ -540,7 +535,7 @@ function ErrorState({
   button2: { message: string; action: () => void };
 }) {
   return (
-    <VStack gap={3} className="p-3 border-t border-line">
+    <div className="flex flex-col gap-3 p-3 border-t border-line">
       <div className="py-2 px-4 bg-red-300 text-xs text-red-700 font-medium rounded-lg flex items-center gap-2">
         <Image
           src={icons.infoRed}
@@ -551,7 +546,7 @@ function ErrorState({
         />
         {message}
       </div>
-      <HStack gap={2}>
+      <div className="flex flex-row gap-2">
         <Button
           className="w-full"
           variant="elevatedOutline"
@@ -562,7 +557,7 @@ function ErrorState({
         <Button className="w-full" onClick={button2.action}>
           {button2.message}
         </Button>
-      </HStack>
-    </VStack>
+      </div>
+    </div>
   );
 }

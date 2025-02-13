@@ -1,10 +1,9 @@
 import { calculateVoteMetadata } from "../voteUtils";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
-import { expect } from "@jest/globals";
-// import { expect, describe, it, vi } from "vitest";
+import { expect, describe, it, vi } from "vitest";
 
-jest.mock("../tenant/tenant", () => ({
+vi.mock("../tenant/tenant", () => ({
   default: {
     current: () => ({
       namespace: "OPTIMISM",
