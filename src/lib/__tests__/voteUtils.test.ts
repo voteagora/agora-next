@@ -222,10 +222,10 @@ describe("calculateVoteMetadata", () => {
         votes: [baseVote],
       });
 
-      expect(result.parsedOptions).toHaveLength(2);
-      expect(result.parsedOptions[0].isApproved).toBe(true);
-      expect(result.parsedOptions[0].description).toBe("Option 1");
-      expect(result.parsedOptions[1].isApproved).toBe(false);
+      expect(result.options).toHaveLength(2);
+      expect(result.options[0].isApproved).toBe(true);
+      expect(result.options[0].description).toBe("Option 1");
+      expect(result.options[1].isApproved).toBe(false);
       expect(result.totalOptions).toBe(2);
     });
 
@@ -288,11 +288,11 @@ describe("calculateVoteMetadata", () => {
         votes: [baseVote],
       });
 
-      expect(result.parsedOptions).toHaveLength(3);
-      expect(result.parsedOptions[0].isApproved).toBe(true);
-      expect(result.parsedOptions[0].description).toBe("Option 1");
-      expect(result.parsedOptions[1].isApproved).toBe(true);
-      expect(result.parsedOptions[2].isApproved).toBe(false);
+      expect(result.options).toHaveLength(3);
+      expect(result.options[0].isApproved).toBe(true);
+      expect(result.options[0].description).toBe("Option 1");
+      expect(result.options[1].isApproved).toBe(true);
+      expect(result.options[2].isApproved).toBe(false);
       expect(result.totalOptions).toBe(3);
     });
 
@@ -345,9 +345,9 @@ describe("calculateVoteMetadata", () => {
         votes: [baseVote],
       });
 
-      expect(result.parsedOptions).toHaveLength(2);
-      expect(result.parsedOptions[0].isApproved).toBe(true);
-      expect(result.parsedOptions[1].isApproved).toBe(false);
+      expect(result.options).toHaveLength(2);
+      expect(result.options[0].isApproved).toBe(true);
+      expect(result.options[1].isApproved).toBe(false);
     });
 
     it("should handle approval proposal with more than 7 options", () => {
@@ -391,7 +391,7 @@ describe("calculateVoteMetadata", () => {
         votes: [baseVote],
       });
 
-      expect(result.parsedOptions).toHaveLength(7);
+      expect(result.options).toHaveLength(7);
       expect(result.totalOptions).toBe(10);
     });
   });
