@@ -271,7 +271,7 @@ export function ShareDialog({
               window.open(
                 `https://warpcast.com/~/compose?text=${encodeURIComponent(
                   text
-                )}`,
+                )}&embeds[]=${proposalLink}`,
                 "_blank"
               );
             }}
