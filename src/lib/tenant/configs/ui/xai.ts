@@ -152,7 +152,7 @@ export const xaiTenantUIConfig = new TenantUI({
         {
           name: "Governance Forums",
           title: "Governance Forums",
-          url: "",
+          url: "https://discord.com/channels/870683519230308372/1276309888921899008",
           image: infoPageCard02,
         },
         {
