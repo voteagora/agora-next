@@ -208,6 +208,7 @@ export const xaiTenantUIConfig = new TenantUI({
       name: "proposal-lifecycle",
       enabled: true,
       config: {
+        protocolLevelCreateProposalButtonCheck: true,
         stages: [
           {
             stage: PrismaProposalStage.DRAFTING,

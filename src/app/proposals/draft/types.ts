@@ -224,6 +224,8 @@ export type PLMConfig = {
   // Agora gov 0.1 (OP): manager
   // Agora gov 1.0+ (everyone else): manager or voting threshold
   gatingType: ProposalGatingType;
+  // Whether to show the create proposal button conditionally with a check
+  protocolLevelCreateProposalButtonCheck?: boolean;
 };
 
 export type BaseProposal = ProposalDraft & {
