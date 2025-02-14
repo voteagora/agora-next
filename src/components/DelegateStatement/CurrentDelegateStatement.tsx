@@ -20,6 +20,7 @@ export type DelegateStatementFormValues = z.infer<typeof formSchema>;
 
 const formSchema = z.object({
   agreeCodeConduct: z.boolean(),
+  agreeDaoPrinciples: z.boolean(),
   daoSlug: z.string(),
   discord: z.string(),
   delegateStatement: z.string(),
@@ -98,10 +99,12 @@ export default function CurrentDelegateStatement() {
 
   const requireCodeOfConduct = !!ui.toggle("delegates/code-of-conduct")
     ?.enabled;
+  const requireDaoPrinciples = !!ui.toggle("delegates/dao-principles")?.enabled;
 
   const setDefaultValues = (delegateStatement: DelegateStatement | null) => {
     return {
       agreeCodeConduct: !requireCodeOfConduct,
+      agreeDaoPrinciples: !requireDaoPrinciples,
       daoSlug,
       discord: delegateStatement?.discord || "",
       delegateStatement:
