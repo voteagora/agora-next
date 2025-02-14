@@ -18,7 +18,7 @@ export default function OtherInfoFormSection({
     <div className="py-8 px-6 border-b border-line">
       <h3 className="font-bold text-primary">Other info</h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
         <DelegateStatementInputGroup
           title="X (formerly Twitter)"
           placeholder="@yourname"
@@ -43,8 +43,12 @@ export default function OtherInfoFormSection({
           name="email"
           form={form}
         />
-        {requireCodeOfConduct && <DelegateStatementBoolSelector form={form} />}
-        {supportsNotifications && <NotificationSelector form={form} />}
+        <div className="col-span-full">
+          {requireCodeOfConduct && (
+            <DelegateStatementBoolSelector form={form} />
+          )}
+          {supportsNotifications && <NotificationSelector form={form} />}
+        </div>
       </div>
     </div>
   );
