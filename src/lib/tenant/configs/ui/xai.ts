@@ -53,7 +53,7 @@ export const xaiTenantUIConfig = new TenantUI({
   },
 
   tacticalStrings: {
-    myBalance: "Aggregate votable balance",
+    myBalance: "My XAI + esXAI (incl. Staked) balance",
   },
 
   // TODO
