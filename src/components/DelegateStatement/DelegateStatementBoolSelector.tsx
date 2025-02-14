@@ -44,3 +44,43 @@ export default function DelegateStatementBoolSelector({
     </div>
   );
 }
+
+export function DelegateStatementDaoPrinciplesSelector({
+  form,
+}: {
+  form: UseFormReturn<DelegateStatementFormValues>;
+}) {
+  const [agreeDaoPrinciples, setAgreeDaoPrinciples] = useState(false);
+  const { ui } = Tenant.current();
+
+  const handleAgreeDaoPrinciples = (agreeDaoPrinciples: boolean) => {
+    setAgreeDaoPrinciples(agreeDaoPrinciples);
+    form.setValue("agreeDaoPrinciples", agreeDaoPrinciples);
+  };
+
+  const daoPrinciplesLink = ui.link("dao-principles");
+
+  return (
+    <div className="flex flex-col">
+      {daoPrinciplesLink && (
+        <>
+          <span>
+            <label className="flex items-center mb-3 text-secondary font-semibold text-xs leading-4">
+              Agree with the {daoPrinciplesLink.title}
+            </label>
+          </span>
+          <label className="flex items-center mb-4 font-semibold text-primary">
+            <Checkbox
+              checked={agreeDaoPrinciples}
+              onCheckedChange={(checked) =>
+                handleAgreeDaoPrinciples(checked === true ? true : false)
+              }
+              className="mr-2"
+            />
+            Yes, I agree with the {daoPrinciplesLink.title}
+          </label>
+        </>
+      )}
+    </div>
+  );
+}
