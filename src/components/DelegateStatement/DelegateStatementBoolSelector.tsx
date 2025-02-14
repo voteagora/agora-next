@@ -25,7 +25,7 @@ export default function DelegateStatementBoolSelector({
       {codeOfConductLink && (
         <>
           <span>
-            <label className="flex items-center mb-3 text-tertiary font-semibold text-xs leading-4">
+            <label className="flex items-center mb-3 text-secondary font-semibold text-xs leading-4">
               Agree with the {codeOfConductLink.title}
             </label>
           </span>

@@ -42,7 +42,7 @@ export default function NotificationSelector({
 
   return (
     <div className="flex flex-col">
-      <h4 className="flex items-center mb-3 text-tertiary font-semibold text-xs leading-4">
+      <h4 className="flex items-center mb-3 text-secondary font-semibold text-xs leading-4">
         Agree to receive proposal updates via email
       </h4>
 
