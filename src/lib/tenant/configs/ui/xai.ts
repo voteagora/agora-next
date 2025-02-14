@@ -158,13 +158,13 @@ export const xaiTenantUIConfig = new TenantUI({
         {
           name: "Protocol Docs",
           title: "Protocol Docs",
-          url: "https://xai-foundation.gitbook.io/xai-network",
+          url: "https://xai-foundation.gitbook.io/xai-network/about-xai/xai-governance",
           image: infoPageCard03,
         },
         {
           name: "Xai Vision",
           title: "Xai Vision",
-          url: "https://xai.games/",
+          url: "https://xai-foundation.gitbook.io/xai-network/about-xai/xai-introduction/xai-blockchain",
           image: infoPageCard04,
         },
       ],
