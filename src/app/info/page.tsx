@@ -95,7 +95,7 @@ export default async function Page() {
   } else {
     return (
       <div>
-        <Hero />
+        <Hero page="info" />
         <div>
           <div className="flex gap-6">
             <div className="bg-gradient-to-b from-stone-300 to-white w-[1px] relative top-2"></div>
