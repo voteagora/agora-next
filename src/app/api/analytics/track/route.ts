@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 
 export async function POST(request: NextRequest) {
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   const { event_name, event_data } = await request.json();
 
   try {
-    await prisma.analyticsEvent.create({
+    await prismaWeb2Client.analyticsEvent.create({
       data: {
         event_name,
         event_data,

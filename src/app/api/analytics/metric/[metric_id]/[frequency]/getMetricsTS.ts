@@ -1,7 +1,7 @@
 import { MetricTimeSeriesValue } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 import { frequencyToLookbackDayCount } from "@/app/api/common/utils/frequencyHandling";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { cache } from "react";
 
 async function getMetricTS(
@@ -83,7 +83,7 @@ async function getMetricTS(
   }
 
   const data: MetricTimeSeriesValue[] =
-    await prisma.$queryRawUnsafe<MetricTimeSeriesValue[]>(QRY);
+    await prismaWeb2Client.$queryRawUnsafe<MetricTimeSeriesValue[]>(QRY);
 
   return { result: data };
 }

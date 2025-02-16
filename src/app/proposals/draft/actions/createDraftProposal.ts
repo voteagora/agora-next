@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { ProposalType } from "../types";
 import { DraftProposalSchema } from "../schemas/DraftProposalSchema";
 import { ProposalDraftTransaction } from "@prisma/client";
@@ -137,7 +137,7 @@ export async function onSubmitAction(
       proposal_type: parsed.data.proposalConfigType,
     };
 
-    const updateDraft = prisma.proposalDraft.update({
+    const updateDraft = prismaWeb2Client.proposalDraft.update({
       where: {
         id: data.draftProposalId,
       },
@@ -152,7 +152,7 @@ export async function onSubmitAction(
     if ("transactions" in data && data.transactions.length > 0) {
       const transactionLink = `https://tdly.co/shared/simulation/${data.transactions[0].simulation_id}`;
       const updateTransactionSimulationChecklist =
-        prisma.proposalChecklist.create({
+        prismaWeb2Client.proposalChecklist.create({
           data: {
             title: "Transactions simulated",
             completed_by: data.creatorAddress,
@@ -168,7 +168,10 @@ export async function onSubmitAction(
       additionalDatabaseWrites.push(updateTransactionSimulationChecklist);
     }
 
-    await prisma.$transaction([updateDraft, ...additionalDatabaseWrites]);
+    await prismaWeb2Client.$transaction([
+      updateDraft,
+      ...additionalDatabaseWrites,
+    ]);
 
     return {
       ok: true,
