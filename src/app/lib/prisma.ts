@@ -8,8 +8,6 @@ declare global {
 
 const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
 const envSuffix = isProd ? "PROD" : "DEV";
-// const readWriteWeb2Url = process.env.DATABASE_URL;
-// const readOnlyWeb3Url = process.env.DATABASE_URL;
 const readWriteWeb2Url =
   process.env[`READ_WRITE_WEB2_DATABASE_URL_${envSuffix}`];
 const readOnlyWeb3Url = process.env[`READ_ONLY_WEB3_DATABASE_URL_${envSuffix}`];
