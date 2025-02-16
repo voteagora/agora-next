@@ -1,4 +1,4 @@
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { DaoSlug } from "@prisma/client";
 import { NextRequest } from "next/server";
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
       for await (const proposal of proposals) {
         proposal.snapshot = proposal.snapshot.toString();
 
-        await prisma.snapshotProposal.upsert({
+        await prismaWeb2Client.snapshotProposal.upsert({
           where: { id: proposal.id },
           update: { ...proposal, dao_slug: slug },
           create: { ...proposal, dao_slug: slug },

@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { cache } from "react";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 
@@ -10,7 +10,7 @@ const isCitizen = async (addressOrEnsName: string) =>
 async function isCitizenForAddress({ address }: { address: string }) {
   const { slug } = Tenant.current();
 
-  const citizen = await prisma.$queryRaw<
+  const citizen = await prismaWeb2Client.$queryRaw<
     {
       address: string;
     }[]
