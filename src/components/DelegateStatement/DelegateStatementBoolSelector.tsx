@@ -3,7 +3,7 @@ import { useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
 
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
-import CheckboxWithTitle from "../ui/CheckboxWithTitle/CheckboxWithTitlte";
+import CheckboxWithTitle from "../ui/CheckboxWithTitle/CheckboxWithTitle";
 
 export default function DelegateStatementBoolSelector({
   form,

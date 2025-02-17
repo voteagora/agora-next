@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
-import CheckboxWithTitle from "../ui/CheckboxWithTitle/CheckboxWithTitlte";
+import CheckboxWithTitle from "../ui/CheckboxWithTitle/CheckboxWithTitle";
 
 export default function NotificationSelector({
   form,
