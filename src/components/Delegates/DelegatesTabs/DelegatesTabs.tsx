@@ -4,7 +4,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DelegatesFilter from "@/components/Delegates/DelegatesFilter/DelegatesFilter";
 import CitizensFilter from "@/components/Delegates/DelegatesFilter/CitizensFilter";
 import DelegatesSearch from "@/components/Delegates/DelegatesSearch/DelegatesSearch";
-import { type ReactNode } from "react";
+import { useTransition, type ReactNode } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import StakeholdersFilter from "@/app/delegates/components/StakeholdersFilter";
 import IssuesFilter from "@/app/delegates/components/IssuesFilter";
@@ -12,13 +12,18 @@ import EndorsedFilter from "@/app/delegates/components/EndorsedFilter";
 import DelegateeFilter from "@/app/delegates/components/DelegatorFilter";
 import { LayoutGrid, AlignJustify } from "lucide-react";
 import { useQueryState } from "nuqs";
+import { cn } from "@/lib/utils";
 
 export default function DelegateTabs({ children }: { children: ReactNode }) {
+  const [isPending, startTransition] = useTransition();
   const [tab, setTab] = useQueryState("tab", {
     defaultValue: "delegates",
+    shallow: false,
+    startTransition,
   });
   const [layout, setLayout] = useQueryState("layout", {
     defaultValue: "grid",
+    shallow: true,
   });
 
   const { ui } = Tenant.current();
@@ -73,7 +78,7 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
             <div className="flex items-center gap-2 bg-wash rounded-full px-4 py-2 shrink-0">
               <button
                 onClick={() => {
-                  setLayout("grid", { shallow: true });
+                  setLayout("grid");
                 }}
                 disabled={layout === "grid"}
               >
@@ -83,7 +88,7 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
               </button>
               <button
                 onClick={() => {
-                  setLayout("list", { shallow: true });
+                  setLayout("list");
                 }}
                 disabled={layout === "list"}
               >
@@ -95,7 +100,7 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
           )}
         </div>
       </div>
-      {children}
+      <div className={cn(isPending && "animate-pulse")}>{children}</div>
     </Tabs>
   );
 }

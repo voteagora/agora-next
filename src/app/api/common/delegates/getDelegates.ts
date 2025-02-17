@@ -393,7 +393,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     LEFT JOIN
       ${namespace + ".advanced_voting_power"} av ON av.delegate = $1 AND av.contract = $2
     LEFT JOIN
-        (SELECT num_of_delegators FROM ${namespace + ".delegates"} nd WHERE delegate = $1 LIMIT 1) b ON TRUE
+        (SELECT num_of_delegators FROM ${namespace + ".delegates"} nd WHERE delegate = $1 AND nd.contract = $5 LIMIT 1) b ON TRUE
     LEFT JOIN
         (SELECT * FROM ${namespace + ".voting_power"} vp WHERE vp.delegate = $1 AND vp.contract = $5 LIMIT 1) c ON TRUE
     LEFT JOIN
@@ -452,7 +452,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     numOfDirectDelegationsQuery = `        SELECT
         SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
       FROM ${namespace + ".delegate_changed_events"}
-      WHERE to_delegate=$1 OR from_delegate=$1`;
+      WHERE (to_delegate=$1 OR from_delegate=$1) AND address=$2`;
   } else if (contracts.token.isERC721()) {
     numOfDirectDelegationsQuery = `with latest_delegations AS (
                                           SELECT DISTINCT ON (delegator)

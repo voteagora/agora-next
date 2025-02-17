@@ -1,4 +1,4 @@
-import { expect } from "@jest/globals";
+import { expect, describe, test } from "vitest";
 
 import { calculateBigIntRatio } from "./bigIntRatio";
 

@@ -5,6 +5,7 @@ import { DelegateStatementFormValues } from "@/components/DelegateStatement/Curr
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { Prisma } from "@prisma/client";
+import { sanitizeContent } from "@/lib/sanitizationUtils";
 
 export async function createDelegateStatement({
   address,
@@ -33,11 +34,17 @@ export async function createDelegateStatement({
     throw new Error("Invalid signature");
   }
 
+  // Sanitize the statement before storing
+  const sanitizedStatement = {
+    ...delegateStatement,
+    delegateStatement: sanitizeContent(delegateStatement.delegateStatement),
+  };
+
   const data = {
     address: address.toLowerCase(),
     dao_slug: slug,
     signature,
-    payload: delegateStatement as Prisma.InputJsonValue,
+    payload: sanitizedStatement as Prisma.InputJsonValue,
     twitter,
     warpcast,
     discord,

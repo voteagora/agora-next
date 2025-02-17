@@ -37,7 +37,7 @@ export async function generateMetadata({}, parent) {
 export default async function Page({ searchParams }) {
   return (
     <section>
-      <Hero />
+      <Hero page="delegates" />
       <Suspense fallback={<DelegateCardLoadingState />}>
         <DelegateCardWrapper searchParams={searchParams} />
       </Suspense>

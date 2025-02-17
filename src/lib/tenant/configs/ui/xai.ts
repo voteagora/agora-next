@@ -13,6 +13,12 @@ import infoPageHero from "@/assets/tenant/xai_info_page_hero.svg";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
+const PROPOSAL_PAGE_TEXT =
+  "Governance decisions are initiated as proposals, providing insights into the priorities of the community. Proposals can be submitted for community discussion in Xai Discord in the #ecosystem-proposals channel.  Proposals are voted on by delegates. Voting power is given to delegates based on XAI + esXAI + staked esXAI. We aggregate each of these to calculate vXAI";
+const ROOT_PAGE_TEXT = PROPOSAL_PAGE_TEXT;
+const DELEGATE_PAGE_TEXT = `Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.  Voting power is based on owned XAI + esXAI + staked esXAI. We aggregate each of these to calculate vXAI.`;
+const INFO_PAGE_TEXT = `Xai Gov is the home of Xai DAO governance, where Xai tokenholders delegate, vote, and make decisions to steward the future of the ecosystem.  Voting power is based on owned XAI + esXAI + staked esXAI. We aggregate each of these to calculate vXAI.`;
+
 export const xaiTenantUIConfig = new TenantUI({
   title: "Xai Agora",
   logo: xaiLogo,
@@ -46,6 +52,10 @@ export const xaiTenantUIConfig = new TenantUI({
     letterSpacing: "0.02em",
   },
 
+  tacticalStrings: {
+    myBalance: "My XAI + esXAI (incl. Staked) balance",
+  },
+
   // TODO
   governanceIssues: [
     // {
@@ -76,46 +86,37 @@ export const xaiTenantUIConfig = new TenantUI({
     {
       route: "/",
       title: "WELCOME TO XAI GOVERNANCE",
-      description:
-        "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
+      description: ROOT_PAGE_TEXT,
       hero: xaiHero,
       meta: {
         title: "Xai Agora",
-        description:
-          "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
+        description: ROOT_PAGE_TEXT,
         imageTitle: "Xai Agora",
-        imageDescription:
-          "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
+        imageDescription: ROOT_PAGE_TEXT,
       },
     },
     {
       route: "proposals",
       title: "WELCOME TO XAI GOVERNANCE",
-      description:
-        "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
+      description: PROPOSAL_PAGE_TEXT,
       hero: xaiHero,
       meta: {
         title: "Xai Agora",
-        description:
-          "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
+        description: PROPOSAL_PAGE_TEXT,
         imageTitle: "Xai Agora",
-        imageDescription:
-          "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
+        imageDescription: PROPOSAL_PAGE_TEXT,
       },
     },
     {
       route: "delegates",
       title: "WELCOME TO XAI GOVERNANCE",
-      description:
-        "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
+      description: DELEGATE_PAGE_TEXT,
       hero: xaiHero,
       meta: {
         title: "Voter on Agora",
-        description:
-          "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
+        description: DELEGATE_PAGE_TEXT,
         imageTitle: "Voter on Agora",
-        imageDescription:
-          "Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.",
+        imageDescription: DELEGATE_PAGE_TEXT,
       },
     },
     {
@@ -134,8 +135,7 @@ export const xaiTenantUIConfig = new TenantUI({
     {
       route: "info",
       title: "WELCOME TO THE XAI COMMUNITY",
-      description:
-        "Agora is your home for onchain proposals, voting, and governance",
+      description: INFO_PAGE_TEXT,
       meta: {
         title: "Xai Governance",
         description: "Home of Xai Governance",
@@ -152,19 +152,19 @@ export const xaiTenantUIConfig = new TenantUI({
         {
           name: "Governance Forums",
           title: "Governance Forums",
-          url: "",
+          url: "https://discord.com/channels/870683519230308372/1276309888921899008",
           image: infoPageCard02,
         },
         {
           name: "Protocol Docs",
           title: "Protocol Docs",
-          url: "https://xai-foundation.gitbook.io/xai-network",
+          url: "https://xai-foundation.gitbook.io/xai-network/about-xai/xai-governance",
           image: infoPageCard03,
         },
         {
           name: "Xai Vision",
           title: "Xai Vision",
-          url: "https://xai.games/",
+          url: "https://xai-foundation.gitbook.io/xai-network/about-xai/xai-introduction/xai-blockchain",
           image: infoPageCard04,
         },
       ],
