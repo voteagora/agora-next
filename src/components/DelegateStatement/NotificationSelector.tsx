@@ -1,9 +1,9 @@
 import { type UseFormReturn } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import { Checkbox } from "@/components/ui/checkbox";
 
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
+import CheckboxWithTitle from "../ui/CheckboxWithTitle/CheckboxWithTitlte";
 
 export default function NotificationSelector({
   form,
@@ -42,20 +42,12 @@ export default function NotificationSelector({
 
   return (
     <div className="flex flex-col">
-      <h4 className="flex items-center mb-3 text-secondary font-semibold text-xs leading-4">
-        Agree to receive proposal updates via email
-      </h4>
-
-      <label className="flex items-center mb-4 font-semibold text-primary">
-        <Checkbox
-          checked={subscribed}
-          onCheckedChange={(checked) =>
-            handleChange(checked === true ? true : false)
-          }
-          className="mr-2"
-        />
-        Yes, I want to receive emails
-      </label>
+      <CheckboxWithTitle
+        label="Yes, I want to receive emails"
+        checked={subscribed}
+        onChange={handleChange}
+        title="Agree to receive proposal updates via email"
+      />
     </div>
   );
 }
