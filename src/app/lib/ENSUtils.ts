@@ -96,3 +96,70 @@ export async function processAddressOrEnsName(addressOrENSName: string) {
     return null;
   }
 }
+
+/*
+  Returns the ENS text record for the addressOrENSName if it exists, otherwise returns null
+*/
+export const resolveENSTextRecords: (
+  addressOrENSName: string,
+  keys: string[]
+) => Promise<Record<string, string> | null> = unstable_cache(
+  async (addressOrENSName: string, keys: string[]) => {
+    let name;
+    if (isAddress(addressOrENSName)) {
+      name = await reverseResolveENSName(addressOrENSName);
+    } else {
+      name = addressOrENSName;
+    }
+
+    if (!name) {
+      return null;
+    }
+
+    const resolver = await mainnetProvider.getResolver(name);
+
+    if (!resolver) {
+      return null;
+    }
+
+    const values = await Promise.all(
+      keys.map((key) => {
+        try {
+          return resolver.getText(key);
+        } catch (error) {
+          return null;
+        }
+      })
+    );
+
+    const textRecords: Record<string, string> = {};
+
+    for (let i = 0; i < keys.length; i++) {
+      if (values[i] !== null) {
+        textRecords[keys[i]] = values[i] as string;
+      }
+    }
+
+    return textRecords;
+  },
+  [],
+  {
+    revalidate: 86400, // 1 day
+    tags: ["resolveENSTextRecords"],
+  }
+);
+
+/*
+  Returns the EFP stats for the addressOrENSName if it exists
+*/
+export const resolveEFPStats = unstable_cache(
+  async (addressOrENSName: string) => {
+    const response = await fetch(
+      `https://api.ethfollow.xyz/api/v1/users/${addressOrENSName}/stats`
+    );
+    const data = await response.json();
+    return data;
+  },
+  ["resolveEFPStats"],
+  { revalidate: 86400 } // 1 day
+);
