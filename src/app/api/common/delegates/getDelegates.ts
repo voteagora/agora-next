@@ -20,24 +20,102 @@ import { doInSpan } from "@/app/lib/logging";
 import { DELEGATION_MODEL, TENANT_NAMESPACES } from "@/lib/constants";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { calculateBigIntRatio } from "../utils/bigIntRatio";
+import { Prisma } from "@prisma/client";
 
-/*
- * Fetches a list of delegates
- * @param page - the page number to fetch
- * @param sort - the sort order
- * @param seed - the seed for random sorting
- * @returns - a list of delegates
- */
-async function getDelegates({
-  pagination = {
-    limit: 20,
-    offset: 0,
-  },
+type Web2DelegateData = {
+  delegate: string;
+  citizen: boolean;
+  statement: string;
+};
+
+async function getWeb2DelegateData(
+  delegates: string[],
+  slug: string,
+  filters?: {
+    delegator?: `0x${string}`;
+    issues?: string;
+    stakeholders?: string;
+    endorsed?: boolean;
+  }
+): Promise<Web2DelegateData[]> {
+  const endorsedFilterQuery = filters?.endorsed
+    ? `AND endorsed = true AND dao_slug = '${slug}'`
+    : "";
+
+  // The top issues filter supports multiple selection
+  const topIssuesParam = filters?.issues || "";
+  const topIssuesArray = topIssuesParam
+    ? topIssuesParam.split(",").map((issue) => issue.trim())
+    : [];
+
+  const topIssuesFilterQuery =
+    topIssuesParam && topIssuesParam !== ""
+      ? `
+      AND jsonb_array_length(payload -> 'topIssues') > 0
+      AND EXISTS (
+        SELECT 1
+        FROM jsonb_array_elements(payload -> 'topIssues') elem
+        WHERE elem ->> 'type' IN (${topIssuesArray.map((issue) => `'${issue}'`).join(", ")})
+        AND elem ->> 'value' IS NOT NULL
+        AND elem ->> 'value' <> ''
+      )
+      `
+      : "";
+
+  const topStakeholdersParam = filters?.stakeholders || "";
+  const topStakeholdersFilterQuery =
+    topStakeholdersParam && topStakeholdersParam !== ""
+      ? `
+      AND jsonb_array_length(payload -> 'topStakeholders') > 0
+      AND EXISTS (
+        SELECT 1
+        FROM jsonb_array_elements(payload -> 'topStakeholders') elem
+        WHERE elem ->> 'type' = '${topStakeholdersParam}'
+      )
+      `
+      : "";
+
+  const web2Query = `
+    SELECT 
+      address as delegate,
+      CASE
+        WHEN EXISTS (
+          SELECT 1
+          FROM agora.citizens
+          WHERE LOWER(address) = LOWER(ds.address) 
+          AND dao_slug = '${slug}'
+        ) THEN TRUE
+        ELSE FALSE
+      END AS citizen,
+      row_to_json(ds.*) as statement
+    FROM agora.delegate_statements ds
+    WHERE ds.address = ANY($1)
+    AND ds.dao_slug = '${slug}'
+    ${endorsedFilterQuery}
+    ${topIssuesFilterQuery}
+    ${topStakeholdersFilterQuery}
+  `;
+
+  return prismaWeb2Client.$queryRawUnsafe(web2Query, delegates);
+}
+
+type Web3DelegateData = {
+  delegate: string;
+  num_of_delegators: number;
+  direct_vp: Prisma.Decimal;
+  advanced_vp: Prisma.Decimal;
+  voting_power: Prisma.Decimal;
+};
+
+async function getWeb3DelegateData({
+  pagination,
   sort,
   seed,
   filters,
+  namespace,
+  tokenAddress,
 }: {
-  pagination?: PaginationParams;
+  pagination: PaginationParams;
   sort: string;
   seed?: number;
   filters?: {
@@ -46,8 +124,10 @@ async function getDelegates({
     stakeholders?: string;
     endorsed?: boolean;
   };
-}): Promise<PaginatedResult<DelegateChunk[]>> {
-  const { namespace, ui, slug, contracts } = Tenant.current();
+  namespace: string;
+  tokenAddress: string;
+}): Promise<Web3DelegateData[]> {
+  const { ui, slug, contracts } = Tenant.current();
 
   const allowList = ui.delegates?.allowed || [];
 
@@ -105,7 +185,6 @@ async function getDelegates({
       : "";
 
   let delegateUniverseCTE: string;
-  const tokenAddress = contracts.token.address;
   const proxyAddress = filters?.delegator
     ? await getProxyAddress(filters?.delegator?.toLowerCase())
     : null;
@@ -202,171 +281,115 @@ async function getDelegates({
       from filtered_delegates d
     )`;
   }
-  // Applies allow-list filtering to the delegate list
-  const paginatedAllowlistQuery = async (skip: number, take: number) => {
-    const allowListString = allowList.map((value) => `'${value}'`).join(", ");
 
-    switch (sort) {
-      case "most_delegators":
-        const QRY1 = `
-          ${delegateUniverseCTE}
-          SELECT *,
-            CASE
-              WHEN EXISTS (
-                SELECT 1
-                FROM agora.citizens
-                WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
-              ) THEN TRUE
-              ELSE FALSE
-            END AS citizen,
-            (SELECT row_to_json(sub)
-              FROM (
-                SELECT
-                  signature,
-                  payload,
-                  twitter,
-                  discord,
-                  created_at,
-                  updated_at,
-                  warpcast,
-                  endorsed
-                FROM agora.delegate_statements s
-                WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
-                ${endorsedFilterQuery}
-                ${topIssuesFilterQuery}
-                ${topStakeholdersFilterQuery}
-                LIMIT 1
-              ) sub
-            ) AS statement
-          FROM del_card_universe d
-          WHERE num_of_delegators IS NOT NULL
-          AND (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR d.delegate = ANY(ARRAY[${allowListString}]::text[]))
-          ${delegateStatementFiler}
-          ORDER BY num_of_delegators DESC, d.delegate
-          OFFSET $1
-          LIMIT $2;
-        `;
-        return prismaWeb3Client.$queryRawUnsafe<DelegatesGetPayload[]>(
-          QRY1,
-          skip,
-          take
-        );
+  const query = `
+    ${delegateUniverseCTE}
+    SELECT 
+      d.delegate,
+      d.num_of_delegators,
+      d.direct_vp,
+      d.advanced_vp,
+      d.voting_power
+    FROM del_card_universe d
+    ORDER BY ${
+      sort === "most_delegators"
+        ? "num_of_delegators DESC"
+        : sort === "weighted_random"
+          ? "-log(random()) / NULLIF(voting_power, 0)"
+          : "voting_power DESC"
+    }, 
+            d.delegate
+    OFFSET $1
+    LIMIT $2
+  `;
 
-      case "weighted_random":
-        await prismaWeb3Client.$executeRawUnsafe(`SELECT setseed($1);`, seed);
+  if (sort === "weighted_random") {
+    await prismaWeb3Client.$executeRawUnsafe(`SELECT setseed($1);`, seed);
+  }
 
-        const QRY2 = ` ${delegateUniverseCTE}
-          SELECT *,
-            CASE
-              WHEN EXISTS (
-                SELECT 1
-                FROM agora.citizens
-                WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
-              ) THEN TRUE
-              ELSE FALSE
-            END AS citizen,
-            (SELECT row_to_json(sub)
-              FROM (
-                SELECT
-                  signature,
-                  payload,
-                  twitter,
-                  discord,
-                  created_at,
-                  updated_at,
-                  warpcast,
-                  endorsed
-                FROM agora.delegate_statements s
-                WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
-                ${endorsedFilterQuery}
-                ${topIssuesFilterQuery}
-                ${topStakeholdersFilterQuery}
-                LIMIT 1
-              ) sub
-            ) AS statement
-          FROM del_card_universe d
-          WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
-          ${delegateStatementFiler}
-         ORDER BY -log(random()) / NULLIF(voting_power, 0)
-          OFFSET $1
-          LIMIT $2;
-          `;
-        return prismaWeb3Client.$queryRawUnsafe<DelegatesGetPayload[]>(
-          QRY2,
-          skip,
-          take
-        );
-
-      default:
-        const QRY3 = `
-          ${delegateUniverseCTE}
-          SELECT *,
-            CASE
-              WHEN EXISTS (
-                SELECT 1
-                FROM agora.citizens
-                WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
-              ) THEN TRUE
-              ELSE FALSE
-            END AS citizen,
-            (SELECT row_to_json(sub)
-              FROM (
-                SELECT
-                  signature,
-                  payload,
-                  twitter,
-                  discord,
-                  created_at,
-                  updated_at,
-                  warpcast,
-                  endorsed
-                FROM agora.delegate_statements s
-                WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
-                ${endorsedFilterQuery}
-                ${topIssuesFilterQuery}
-                ${topStakeholdersFilterQuery}
-                LIMIT 1
-              ) sub
-            ) AS statement
-          FROM del_card_universe d
-          WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
-          ${delegateStatementFiler}
-          ORDER BY voting_power DESC, d.delegate
-          OFFSET $1
-          LIMIT $2;
-          `;
-        return prismaWeb3Client.$queryRawUnsafe<DelegatesGetPayload[]>(
-          QRY3,
-          skip,
-          take
-        );
-    }
-  };
-
-  const { meta, data: delegates } = await doInSpan(
-    { name: "getDelegates" },
-    async () =>
-      await paginateResult<DelegatesGetPayload>(
-        paginatedAllowlistQuery,
-        pagination
-      )
+  return prismaWeb3Client.$queryRawUnsafe(
+    query,
+    pagination.offset,
+    pagination.limit
   );
+}
 
-  // Voting power detail added for use with API, so as to not break existing
-  // components
-  return {
-    meta,
-    data: delegates.map((delegate) => ({
+async function getDelegates({
+  pagination = {
+    limit: 20,
+    offset: 0,
+  },
+  sort,
+  seed,
+  filters,
+}: {
+  pagination?: PaginationParams;
+  sort: string;
+  seed?: number;
+  filters?: {
+    delegator?: `0x${string}`;
+    issues?: string;
+    stakeholders?: string;
+    endorsed?: boolean;
+  };
+}): Promise<PaginatedResult<DelegateChunk[]>> {
+  const { namespace, ui, slug, contracts } = Tenant.current();
+  const allowList = ui.delegates?.allowed || [];
+
+  // Get web3 data first
+  const web3Data = await getWeb3DelegateData({
+    pagination,
+    sort,
+    seed,
+    filters,
+    namespace,
+    tokenAddress: contracts.token.address,
+  });
+
+  // Get web2 data for the delegates we found
+  const delegateAddresses = web3Data.map((d) => d.delegate);
+  const web2Data = await getWeb2DelegateData(delegateAddresses, slug, filters);
+
+  // Create a map for quick lookup of web2 data
+  const web2DataMap = new Map(web2Data.map((d) => [d.delegate, d]));
+
+  // Combine the data
+  const delegates = web3Data.map((delegate) => {
+    const web2Info = web2DataMap.get(delegate.delegate) || {
+      citizen: false,
+      statement: null,
+    };
+
+    return {
       address: delegate.delegate,
       votingPower: {
         total: delegate.voting_power?.toFixed(0) || "0",
         direct: delegate.direct_vp?.toFixed(0) || "0",
         advanced: delegate.advanced_vp?.toFixed(0) || "0",
       },
-      citizen: delegate.citizen,
-      statement: delegate.statement,
+      citizen: web2Info.citizen,
+      statement: web2Info.statement,
       numOfDelegators: BigInt(delegate.num_of_delegators || "0"),
-    })),
+    };
+  });
+
+  // Filter out delegates not in allowList if it exists
+  const filteredDelegates =
+    allowList.length > 0
+      ? delegates.filter((d) =>
+          allowList
+            .map((a) => a.toLowerCase())
+            .includes(d.address.toLowerCase())
+        )
+      : delegates;
+
+  return {
+    meta: {
+      has_next: filteredDelegates.length === pagination.limit,
+      total_returned: filteredDelegates.length,
+      next_offset: pagination.offset + pagination.limit,
+    },
+    data: filteredDelegates,
     seed,
   };
 }
