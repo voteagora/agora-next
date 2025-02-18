@@ -28,29 +28,30 @@ type Web2DelegateData = {
   statement: string;
 };
 
-async function getWeb2DelegateData(
-  delegates: string[],
-  slug: string,
-  filters?: {
-    delegator?: `0x${string}`;
-    issues?: string;
-    stakeholders?: string;
-    endorsed?: boolean;
-  }
-): Promise<Web2DelegateData[]> {
-  const endorsedFilterQuery = filters?.endorsed
-    ? `AND endorsed = true AND dao_slug = '${slug}'`
-    : "";
+const getWeb2DelegateDataCached = cache(
+  async (
+    delegates: string[],
+    slug: string,
+    filters?: {
+      delegator?: `0x${string}`;
+      issues?: string;
+      stakeholders?: string;
+      endorsed?: boolean;
+    }
+  ): Promise<Web2DelegateData[]> => {
+    const endorsedFilterQuery = filters?.endorsed
+      ? `AND endorsed = true AND dao_slug = '${slug}'`
+      : "";
 
-  // The top issues filter supports multiple selection
-  const topIssuesParam = filters?.issues || "";
-  const topIssuesArray = topIssuesParam
-    ? topIssuesParam.split(",").map((issue) => issue.trim())
-    : [];
+    // The top issues filter supports multiple selection
+    const topIssuesParam = filters?.issues || "";
+    const topIssuesArray = topIssuesParam
+      ? topIssuesParam.split(",").map((issue) => issue.trim())
+      : [];
 
-  const topIssuesFilterQuery =
-    topIssuesParam && topIssuesParam !== ""
-      ? `
+    const topIssuesFilterQuery =
+      topIssuesParam && topIssuesParam !== ""
+        ? `
       AND jsonb_array_length(payload -> 'topIssues') > 0
       AND EXISTS (
         SELECT 1
@@ -60,12 +61,12 @@ async function getWeb2DelegateData(
         AND elem ->> 'value' <> ''
       )
       `
-      : "";
+        : "";
 
-  const topStakeholdersParam = filters?.stakeholders || "";
-  const topStakeholdersFilterQuery =
-    topStakeholdersParam && topStakeholdersParam !== ""
-      ? `
+    const topStakeholdersParam = filters?.stakeholders || "";
+    const topStakeholdersFilterQuery =
+      topStakeholdersParam && topStakeholdersParam !== ""
+        ? `
       AND jsonb_array_length(payload -> 'topStakeholders') > 0
       AND EXISTS (
         SELECT 1
@@ -73,9 +74,9 @@ async function getWeb2DelegateData(
         WHERE elem ->> 'type' = '${topStakeholdersParam}'
       )
       `
-      : "";
+        : "";
 
-  const web2Query = `
+    const web2Query = `
     SELECT 
       address as delegate,
       CASE
@@ -96,8 +97,9 @@ async function getWeb2DelegateData(
     ${topStakeholdersFilterQuery}
   `;
 
-  return prismaWeb2Client.$queryRawUnsafe(web2Query, delegates);
-}
+    return prismaWeb2Client.$queryRawUnsafe(web2Query, delegates);
+  }
+);
 
 type Web3DelegateData = {
   delegate: string;
@@ -348,7 +350,11 @@ async function getDelegates({
 
   // Get web2 data for the delegates we found
   const delegateAddresses = web3Data.map((d) => d.delegate);
-  const web2Data = await getWeb2DelegateData(delegateAddresses, slug, filters);
+  const web2Data = await getWeb2DelegateDataCached(
+    delegateAddresses,
+    slug,
+    filters
+  );
 
   // Create a map for quick lookup of web2 data
   const web2DataMap = new Map(web2Data.map((d) => [d.delegate, d]));
