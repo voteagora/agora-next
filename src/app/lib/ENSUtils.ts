@@ -105,42 +105,44 @@ export const resolveENSTextRecords: (
   keys: string[]
 ) => Promise<Record<string, string> | null> = unstable_cache(
   async (addressOrENSName: string, keys: string[]) => {
-    let name;
-    if (isAddress(addressOrENSName)) {
-      name = await reverseResolveENSName(addressOrENSName);
-    } else {
-      name = addressOrENSName;
-    }
-
-    if (!name) {
-      return null;
-    }
-
-    const resolver = await mainnetProvider.getResolver(name);
-
-    if (!resolver) {
-      return null;
-    }
-
-    const values = await Promise.all(
-      keys.map((key) => {
-        try {
-          return resolver.getText(key);
-        } catch (error) {
-          return null;
-        }
-      })
-    );
-
-    const textRecords: Record<string, string> = {};
-
-    for (let i = 0; i < keys.length; i++) {
-      if (values[i] !== null) {
-        textRecords[keys[i]] = values[i] as string;
+    try {
+      let name;
+      if (isAddress(addressOrENSName)) {
+        name = await reverseResolveENSName(addressOrENSName);
+      } else {
+        name = addressOrENSName;
       }
-    }
 
-    return textRecords;
+      if (!name) {
+        return null;
+      }
+
+      const resolver = await mainnetProvider.getResolver(name);
+
+      if (!resolver) {
+        return null;
+      }
+
+      const textRecords: Record<string, string> = {};
+
+      for (const key of keys) {
+        try {
+          const value = await resolver.getText(key);
+          if (value !== null) {
+            textRecords[key] = value;
+          }
+        } catch (error) {
+          console.error(`Error fetching ${key} text record:`, error);
+          // Skip failed records and continue with others
+          continue;
+        }
+      }
+
+      return textRecords;
+    } catch (error) {
+      console.error("Error in resolving ENS text records:", error);
+      return null;
+    }
   },
   [],
   {
@@ -154,11 +156,16 @@ export const resolveENSTextRecords: (
 */
 export const resolveEFPStats = unstable_cache(
   async (addressOrENSName: string) => {
-    const response = await fetch(
-      `https://api.ethfollow.xyz/api/v1/users/${addressOrENSName}/stats`
-    );
-    const data = await response.json();
-    return data;
+    try {
+      const response = await fetch(
+        `https://api.ethfollow.xyz/api/v1/users/${addressOrENSName}/stats`
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error in resolving EFP stats:", error);
+      return null;
+    }
   },
   ["resolveEFPStats"],
   { revalidate: 86400 } // 1 day
