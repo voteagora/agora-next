@@ -1,7 +1,13 @@
 import React from "react";
 
-const HumanVote = ({ support }) => {
-  let color;
+type VoteType = "FOR" | "AGAINST" | "ABSTAIN";
+
+interface HumanVoteProps {
+  support: VoteType;
+}
+
+const HumanVote: React.FC<HumanVoteProps> = ({ support }) => {
+  let color: string;
   switch (support) {
     case "FOR":
       color = "green";

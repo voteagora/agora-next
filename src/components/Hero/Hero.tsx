@@ -1,9 +1,13 @@
 import Tenant from "@/lib/tenant/tenant";
 import Image from "next/image";
 
-export default function Hero({ page }) {
+interface HeroProps {
+  page: string;
+}
+
+export default function Hero({ page }: HeroProps) {
   const { namespace, ui } = Tenant.current();
-  const { title, description, hero } = ui.page(page);
+  const { title = "", description = "", hero = "" } = ui.page(page) ?? {};
 
   return (
     <div className="flex flex-col sm:flex-row justify-between mt-12 mb-0 sm:my-12 w-[76rem] max-w-full sm:max-w-[76rem]">

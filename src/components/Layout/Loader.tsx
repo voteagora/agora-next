@@ -1,6 +1,6 @@
 import { HStack } from "./Stack";
 
-export default function Loader() {
+const Loader: React.FC = () => {
   return (
     <HStack
       key="loader"
@@ -9,4 +9,6 @@ export default function Loader() {
       Loading...
     </HStack>
   );
-}
+};
+
+export default Loader;

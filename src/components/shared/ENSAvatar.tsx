@@ -5,19 +5,24 @@ import Image from "next/image";
 import { useEnsAvatar } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 
-const imageLoader = ({ src }) => {
+interface ENSAvatarProps {
+  ensName: string;
+  className?: string;
+}
+
+const imageLoader = ({ src }: { src: string }) => {
   return src;
 };
 
 // TODO: Might be better to load the avatar on the server
-export default function ENSAvatar({ ensName, className = "" }) {
+export default function ENSAvatar({ ensName, className = "" }: ENSAvatarProps) {
   const { ui } = Tenant.current();
   const { data } = useEnsAvatar({
     chainId: 1,
     name: ensName,
   });
 
-  const [avatar, setAvatar] = useState(ui.assets.delegate);
+  const [avatar, setAvatar] = useState<string>(ui.assets.delegate);
 
   useEffect(() => {
     if (data) {

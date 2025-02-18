@@ -4,12 +4,16 @@ import CreateProposalForm from "@/components/Proposals/ProposalCreation/CreatePr
 import InfoPanel from "@/components/Proposals/ProposalCreation/InfoPanel";
 import Tenant from "@/lib/tenant/tenant";
 
-async function getProposalSettingsList() {
+type ProposalSettings = {
+  [key: string]: any;
+};
+
+async function getProposalSettingsList(): Promise<ProposalSettings[]> {
   "use server";
   return await fetchProposalTypes();
 }
 
-export default async function CreateProposalPage() {
+export default async function CreateProposalPage(): Promise<JSX.Element> {
   const { ui } = Tenant.current();
 
   if (!ui.toggle("proposals/create")) {
@@ -25,7 +29,7 @@ export default async function CreateProposalPage() {
       className="w-full max-w-[76rem] mt-12 mb-8 flex flex-col-reverse items-center sm:flex-row sm:items-start"
     >
       <CreateProposalForm proposalSettingsList={proposalSettingsList} />
-      <div className=" shrink-0 w-full sm:w-[24rem]">
+      <div className="shrink-0 w-full sm:w-[24rem]">
         <InfoPanel />
       </div>
     </HStack>

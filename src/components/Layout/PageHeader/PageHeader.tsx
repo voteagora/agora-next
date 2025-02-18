@@ -1,6 +1,10 @@
 import { HStack } from "@/components/Layout/Stack";
 
-export default function PageHeader({ headerText }) {
+interface PageHeaderProps {
+  headerText: string;
+}
+
+export default function PageHeader({ headerText }: PageHeaderProps) {
   return (
     <HStack
       justifyContent="justify-between"
@@ -9,7 +13,6 @@ export default function PageHeader({ headerText }) {
       <h1 className="text-primary text-2xl font-extrabold mb-0">
         {headerText}
       </h1>
-      <HStack gap={4}></HStack>
     </HStack>
   );
 }

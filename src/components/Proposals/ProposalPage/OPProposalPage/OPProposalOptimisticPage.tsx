@@ -5,12 +5,23 @@ import { formatUnits } from "ethers";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
 import OptimisticProposalVotesCard from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/OptimisticProposalVotesCard";
+import { Proposal } from "@/app/api/common/proposals/proposal";
 
-export default async function OPProposalPage({ proposal }) {
+interface OPProposalPageProps {
+  proposal: Proposal;
+}
+
+export default async function OPProposalPage({
+  proposal,
+}: OPProposalPageProps) {
   const votableSupply = await fetchVotableSupply();
   const formattedVotableSupply = Number(
     BigInt(votableSupply) / BigInt(10 ** 18)
   );
+
+  if (!("against" in proposal.proposalResults)) {
+    throw new Error("Invalid proposal results type");
+  }
 
   const againstLengthString = formatNumber(
     proposal.proposalResults.against,
@@ -22,11 +33,14 @@ export default async function OPProposalPage({ proposal }) {
     formatUnits(proposal.proposalResults.against, 18)
   );
 
-  const againstRelativeAmount = parseFloat(
-    ((againstLength / formattedVotableSupply) * 100).toFixed(2)
-  );
+  const againstRelativeAmount = (
+    (againstLength / formattedVotableSupply) *
+    100
+  ).toFixed(2);
   const status =
-    againstRelativeAmount <= disapprovalThreshold ? "approved" : "defeated";
+    parseFloat(againstRelativeAmount) <= disapprovalThreshold
+      ? "approved"
+      : "defeated";
 
   return (
     <div className="flex flex-col">

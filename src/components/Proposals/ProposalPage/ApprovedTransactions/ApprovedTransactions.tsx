@@ -7,11 +7,34 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { getBlockScanUrl } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 
+interface FunctionArgsName {
+  functionName: string;
+  functionArgs: any[]; // You might want to make this more specific based on your needs
+}
+
+interface Option {
+  description?: string;
+  calldatas: string[];
+  values: bigint[];
+  targets: string[];
+  functionArgsName: FunctionArgsName[];
+}
+
+interface ProposalData {
+  options: Option[];
+}
+
+interface ApprovedTransactionsProps {
+  proposalData: ProposalData;
+  proposalType: "STANDARD" | "APPROVAL";
+  executedTransactionHash?: string;
+}
+
 export default function ApprovedTransactions({
   proposalData,
   proposalType,
   executedTransactionHash,
-}) {
+}: ApprovedTransactionsProps) {
   const [displayedOptions, setDisplayedOptions] = useState(1);
   const toggleElements = () => {
     displayedOptions === 1

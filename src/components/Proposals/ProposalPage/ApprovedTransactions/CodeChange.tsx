@@ -1,7 +1,7 @@
 import { isAddress } from "viem";
 import { getBlockScanAddress } from "@/lib/utils";
 
-function linkIfAddress(content) {
+function linkIfAddress(content: string) {
   // TODO: This doesn't handle ENS addresses
   if (isAddress(content)) {
     return (
@@ -13,12 +13,19 @@ function linkIfAddress(content) {
   return <span>{content}</span>;
 }
 
+interface CodeChangeProps {
+  target: string;
+  valueETH?: string;
+  functionName: string;
+  functionArgs: (string | number | boolean)[];
+}
+
 export default function CodeChange({
   target,
   valueETH,
   functionName,
   functionArgs,
-}) {
+}: CodeChangeProps) {
   return (
     <div className="break-all text-xs font-mono font-medium text-secondary leading-4 my-2 pl-2 border-l border-line">
       {linkIfAddress(target)}.{functionName}
@@ -26,7 +33,7 @@ export default function CodeChange({
       <br />
       <span className="ml-2">
         {functionArgs.map((arg, index) => (
-          <span key={arg}>
+          <span key={arg?.toString()}>
             {arg?.toString()}
             {index !== functionArgs.length - 1 && ", "}
           </span>

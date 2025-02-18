@@ -1,7 +1,22 @@
 import { formatUnits } from "ethers";
 import { disapprovalThreshold } from "@/lib/constants";
 
-function formatNumber(amount, decimals = 0, maximumSignificantDigits = 4) {
+interface Proposal {
+  proposalResults: {
+    against: bigint;
+  };
+}
+
+interface OPOptimisticProposalStatusProps {
+  proposal: Proposal;
+  votableSupply: string | bigint;
+}
+
+function formatNumber(
+  amount: bigint,
+  decimals = 0,
+  maximumSignificantDigits = 4
+) {
   const standardUnitAmount = Number(formatUnits(amount, decimals));
   return standardUnitAmount;
 }
@@ -9,7 +24,7 @@ function formatNumber(amount, decimals = 0, maximumSignificantDigits = 4) {
 export default function OPOptimisticProposalStatus({
   proposal,
   votableSupply,
-}) {
+}: OPOptimisticProposalStatusProps) {
   const formattedVotableSupply = Number(
     BigInt(votableSupply) / BigInt(10 ** 18)
   );

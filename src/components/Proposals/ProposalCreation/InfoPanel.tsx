@@ -1,10 +1,10 @@
 import { VStack } from "@/components/Layout/Stack";
 
-export default function InfoPanel() {
+const InfoPanel: React.FC = () => {
   return (
     <VStack className="bg-wash rounded-xl border border-line p-6">
       <h2 className="text-2xl font-extrabold mb-4 text-primary">
-        Manager’s handbook
+        Manager's handbook
       </h2>
       <div>
         <p className="text-secondary">
@@ -38,7 +38,7 @@ export default function InfoPanel() {
             4. Get signatures for your SAFE
           </span>
           <br />
-          If you&apos;re using the OP Foundation multisig, you can queue several
+          If you're using the OP Foundation multisig, you can queue several
           proposals at once so that your co-signers can sign all the
           transactions in one sitting. Proposals will appear in chronological
           order in the final UI, so the last proposal you put in will show up on
@@ -49,4 +49,6 @@ export default function InfoPanel() {
       </div>
     </VStack>
   );
-}
+};
+
+export default InfoPanel;

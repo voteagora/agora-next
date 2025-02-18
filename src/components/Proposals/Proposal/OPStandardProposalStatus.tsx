@@ -1,12 +1,24 @@
 import { TokenAmountDisplay } from "@/lib/utils";
 import { formatUnits } from "ethers";
 
-function formatNumber(amount, decimals) {
+interface ProposalResults {
+  for: bigint;
+  against: bigint;
+  abstain: bigint;
+}
+
+interface ProposalProps {
+  proposal: {
+    proposalResults: ProposalResults;
+  };
+}
+
+function formatNumber(amount: bigint, decimals: number = 18): number {
   const standardUnitAmount = Number(formatUnits(amount, decimals));
   return standardUnitAmount;
 }
 
-export default function OPStandardProposalStatus({ proposal }) {
+export default function OPStandardProposalStatus({ proposal }: ProposalProps) {
   const forLength = formatNumber(proposal.proposalResults.for);
   const againstLength = formatNumber(proposal.proposalResults.against);
   const abstainLength = formatNumber(proposal.proposalResults.abstain);

@@ -14,7 +14,16 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 
-export default function DAOMetricsHeader({ metrics }) {
+interface Metrics {
+  votableSupply: number;
+  totalSupply: number;
+}
+
+interface DAOMetricsHeaderProps {
+  metrics: Metrics;
+}
+
+export default function DAOMetricsHeader({ metrics }: DAOMetricsHeaderProps) {
   const { token, ui, contracts } = Tenant.current();
   const [isClient, setIsClient] = useState(false);
 
@@ -35,8 +44,8 @@ export default function DAOMetricsHeader({ metrics }) {
   }, []);
 
   const formattedMetrics = {
-    votableSupply: formatNumber(metrics.votableSupply),
-    totalSupply: formatNumber(metrics.totalSupply),
+    votableSupply: formatNumber(BigInt(metrics.votableSupply)),
+    totalSupply: formatNumber(BigInt(metrics.totalSupply)),
   };
 
   if (!isClient) {

@@ -1,4 +1,6 @@
-export function Logo(props) {
+import { FC, SVGProps } from "react";
+
+export const Logo: FC<SVGProps<SVGSVGElement>> = (props) => {
   return (
     <svg
       width="16"
@@ -6,6 +8,7 @@ export function Logo(props) {
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <g clipPath="url(#clip0_379_1614)">
         <ellipse
@@ -48,4 +51,4 @@ export function Logo(props) {
       </defs>
     </svg>
   );
-}
+};

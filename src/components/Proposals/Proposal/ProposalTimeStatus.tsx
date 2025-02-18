@@ -4,13 +4,21 @@
 import { HStack } from "@/components/Layout/Stack";
 import { format } from "date-fns";
 
-const finishOptions = {
+const finishOptions: Intl.DateTimeFormatOptions = {
   year: "numeric",
   month: "long",
   day: "numeric",
   hour: "numeric",
   minute: "numeric",
-};
+} as const;
+
+interface ProposalTimeStatusProps {
+  proposalStatus: "PENDING" | "ACTIVE" | "CANCELLED" | "EXECUTED" | string;
+  proposalEndTime: Date | null;
+  proposalStartTime: Date | null;
+  proposalCancelledTime: Date | null;
+  proposalExecutedTime: Date | null;
+}
 
 export default function ProposalTimeStatus({
   proposalStatus,
@@ -18,7 +26,7 @@ export default function ProposalTimeStatus({
   proposalStartTime,
   proposalCancelledTime,
   proposalExecutedTime,
-}) {
+}: ProposalTimeStatusProps) {
   const activeProposalEndTime = proposalEndTime
     ? format(proposalEndTime, "h:mm aaa MMM dd, yyyy")
     : null;

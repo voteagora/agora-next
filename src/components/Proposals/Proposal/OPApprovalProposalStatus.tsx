@@ -1,6 +1,21 @@
 import { pluralize } from "@/lib/utils";
 
-export default function OPApprovalProposalStatus({ proposal }) {
+interface ProposalSettings {
+  maxApprovals: number;
+}
+
+interface ProposalData {
+  proposalSettings: ProposalSettings;
+  options: any[]; // You might want to define a more specific type for options
+}
+
+interface ProposalProps {
+  proposal: {
+    proposalData: ProposalData;
+  };
+}
+
+export default function OPApprovalProposalStatus({ proposal }: ProposalProps) {
   const maxOptions = proposal.proposalData.proposalSettings.maxApprovals;
   return (
     <div className="flex flex-col items-end">

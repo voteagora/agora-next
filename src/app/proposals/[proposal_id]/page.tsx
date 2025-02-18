@@ -4,11 +4,24 @@ import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPPropos
 import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
 import StandardProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/StandardProposalPage";
 import React from "react";
+import { Metadata } from "next";
 
-export async function generateMetadata({ params }, parent) {
+type PageProps = {
+  params: {
+    proposal_id: string;
+  };
+};
+
+export async function generateMetadata(
+  { params }: PageProps,
+  parent: any
+): Promise<Metadata> {
   const proposal = await fetchProposal(params.proposal_id);
   const title = truncateString(cleanString(proposal.markdowntitle), 40);
-  const description = truncateString(cleanString(proposal.description), 80);
+  const description = truncateString(
+    cleanString(proposal.description ?? ""),
+    80
+  );
 
   const preview = `/api/images/og/generic?title=${encodeURIComponent(
     title
@@ -34,7 +47,7 @@ export async function generateMetadata({ params }, parent) {
   };
 }
 
-export default async function Page({ params: { proposal_id } }) {
+export default async function Page({ params: { proposal_id } }: PageProps) {
   const proposal = await fetchProposal(proposal_id);
 
   let RenderComponent;

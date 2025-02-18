@@ -10,15 +10,22 @@ import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import { revalidatePath } from "next/cache";
 import { StakingIntro } from "@/app/staking/components/StakingIntro";
 import { RouteNotSupported } from "@/components/shared/RouteNotSupported";
+import { Metadata } from "next";
 
-async function fetchDeposits(address) {
+async function fetchDeposits(address: string) {
   "use server";
   return apiFetchStakedDeposits({ address });
 }
 
-export async function generateMetadata({}) {
+type PageProps = {
+  params: {
+    addressOrENSName: string;
+  };
+};
+
+export async function generateMetadata(): Promise<Metadata> {
   const tenant = Tenant.current();
-  const page = tenant.ui.page("/");
+  const page = tenant.ui.page("/") ?? { meta: { title: "", description: "" } };
 
   const { title, description } = page.meta;
 
@@ -46,9 +53,11 @@ export async function generateMetadata({}) {
   };
 }
 
-export default async function Page({ params: { addressOrENSName } }) {
+export default async function Page({
+  params: { addressOrENSName },
+}: PageProps) {
   const { ui, token } = Tenant.current();
-  if (!ui.toggle("staking").enabled) {
+  if (!ui.toggle("staking")?.enabled) {
     return <RouteNotSupported />;
   }
 
@@ -67,7 +76,7 @@ export default async function Page({ params: { addressOrENSName } }) {
 
             <DepositList
               deposits={deposits}
-              refreshPath={async (path) => {
+              refreshPath={async (path: string) => {
                 "use server";
                 revalidatePath(path);
               }}

@@ -1,6 +1,15 @@
 import { cn } from "@/lib/utils";
 
-export default function ProposalStatus({ proposal }) {
+interface Proposal {
+  id: string;
+  status: string;
+}
+
+interface ProposalStatusProps {
+  proposal: Proposal;
+}
+
+export default function ProposalStatus({ proposal }: ProposalStatusProps) {
   const testProposals = [
     "90839767999322802375479087567202389126141447078032129455920633707568400402209",
     "103606400798595803012644966342403441743733355496979747669804254618774477345292",
@@ -20,12 +29,12 @@ export default function ProposalStatus({ proposal }) {
     statusClass = "status-succeeded";
   }
 
-  const approved = ["succeeded", "executed", "queued"];
-  const rejected = ["defeated", "expired", "cancelled", "vetoed"];
-  const pending = ["pending", "failed"];
-  const active = ["active"];
-  const test = ["test"];
-  const closed = ["closed"];
+  const approved: string[] = ["succeeded", "executed", "queued"];
+  const rejected: string[] = ["defeated", "expired", "cancelled", "vetoed"];
+  const pending: string[] = ["pending", "failed"];
+  const active: string[] = ["active"];
+  const test: string[] = ["test"];
+  const closed: string[] = ["closed"];
 
   return (
     <div
