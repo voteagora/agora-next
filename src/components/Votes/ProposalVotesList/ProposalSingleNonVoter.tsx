@@ -52,7 +52,7 @@ export function ProposalSingleNonVoter({
         className="font-semibold text-secondary"
       >
         <HStack gap={1} alignItems="items-center">
-          <ENSAvatar ensName={data} className="w-5 h-5" />
+          <ENSAvatar ensName={data || ""} className="w-5 h-5" />
           <div className="text-primary">
             <ENSName address={voter.delegate} />
           </div>

@@ -71,7 +71,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
               className="font-semibold text-secondary"
             >
               <HStack gap={1} alignItems="items-center">
-                <ENSAvatar ensName={data} className="w-5 h-5" />
+                <ENSAvatar ensName={data || ""} className="w-5 h-5" />
                 <div className="text-primary hover:underline">
                   <Link href={`/delegates/${vote.address}`}>
                     <ENSName address={vote.address} />

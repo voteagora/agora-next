@@ -1,15 +1,15 @@
 import { pluralize } from "@/lib/utils";
 
-interface ProposalSettings {
+export interface ProposalSettings {
   maxApprovals: number;
 }
 
-interface ProposalData {
+export interface ProposalData {
   proposalSettings: ProposalSettings;
-  options: any[]; // You might want to define a more specific type for options
+  options: any[];
 }
 
-interface ProposalProps {
+export interface ProposalProps {
   proposal: {
     proposalData: ProposalData;
   };

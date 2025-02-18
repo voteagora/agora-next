@@ -77,7 +77,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
             >
               <div className="text-primary flex items-center gap-3">
                 <div className="w-6 h-6 shadow-newDefault rounded-full">
-                  <ENSAvatar ensName={ensName} />
+                  <ENSAvatar ensName={ensName || ""} />
                 </div>
                 {address && <ENSName address={address} />}
               </div>
@@ -116,7 +116,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                           >
                             <ENSAvatar
                               className="w-[44px] h-[44px] rounded-full"
-                              ensName={ensName}
+                              ensName={ensName || ""}
                             />
                           </div>
                           <div className="flex flex-col justify-center">

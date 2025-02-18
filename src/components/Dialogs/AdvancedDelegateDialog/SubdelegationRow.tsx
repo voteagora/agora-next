@@ -128,7 +128,7 @@ function SubdelegationToRow({
     >
       <div className="flex flex-row justify-between items-center border-b border-dashed border-line py-4 last:border-b-0">
         <HStack gap={3}>
-          <ENSAvatar ensName={data} className="h-10 w-10" />
+          <ENSAvatar ensName={data || ""} className="h-10 w-10" />
           <VStack>
             <p className="text-xs font-medium text-secondary">Delegated to</p>
             <div className="text-primary w-full font-medium text-ellipsis overflow-hidden max-w-[6rem] sm:max-w-[8rem]">

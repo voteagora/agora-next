@@ -10,13 +10,13 @@ interface ProposalSettings {
   budgetAmount?: string;
 }
 
-interface ProposalData {
+export interface ProposalData {
   proposalSettings: ProposalSettings;
 }
 
 interface Proposal {
   proposalData: ProposalData;
-  proposalResults: any; // You may want to type this more specifically
+  proposalResults: any;
   quorum: string;
   status: string;
   endTime: string;

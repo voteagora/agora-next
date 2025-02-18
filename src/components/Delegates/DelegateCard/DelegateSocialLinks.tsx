@@ -7,7 +7,17 @@ import toast from "react-hot-toast";
 const ICON_HEIGHT = 24;
 const ICON_WIDTH = 24;
 
-export function DelegateSocialLinks({ discord, twitter, warpcast }) {
+interface DelegateSocialLinksProps {
+  discord?: string;
+  twitter?: string;
+  warpcast?: string;
+}
+
+export function DelegateSocialLinks({
+  discord,
+  twitter,
+  warpcast,
+}: DelegateSocialLinksProps) {
   const warpcastUsername = warpcast?.replace(/@/g, "");
   return (
     <div className="flex flex-row gap-4 h-auto items-center justify-center">

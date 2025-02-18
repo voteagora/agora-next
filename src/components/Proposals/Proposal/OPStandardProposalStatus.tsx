@@ -1,7 +1,7 @@
 import { TokenAmountDisplay } from "@/lib/utils";
 import { formatUnits } from "ethers";
 
-interface ProposalResults {
+export interface ProposalResults {
   for: bigint;
   against: bigint;
   abstain: bigint;

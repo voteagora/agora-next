@@ -4,7 +4,7 @@ import { HStack, VStack } from "../Layout/Stack";
 import LogoLink from "./LogoLink";
 import { ConnectButton } from "./ConnectButton";
 
-export default function Header() {
+const Header: React.FC = () => {
   return (
     <VStack>
       <HStack className="flex flex-row w-full items-center gap-1">
@@ -20,4 +20,6 @@ export default function Header() {
       </HStack>
     </VStack>
   );
-}
+};
+
+export default Header;

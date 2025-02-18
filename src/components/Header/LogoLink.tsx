@@ -5,7 +5,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { AgoraIcon } from "@/icons/AgoraIcon";
 import { rgbStringToHex } from "@/app/lib/utils/color";
 
-export default function LogoLink() {
+export default function LogoLink(): JSX.Element {
   const { namespace, ui, isProd } = Tenant.current();
 
   return (
@@ -14,7 +14,7 @@ export default function LogoLink() {
         {namespace !== TENANT_NAMESPACES.SCROLL && (
           <>
             <AgoraIcon
-              fill={rgbStringToHex(ui.customization.primary)}
+              fill={rgbStringToHex(ui.customization?.primary ?? "#000000")}
               className="hidden sm:block w-[20px] h-[20px]"
             />
             <div className="h-3 w-[2px] bg-line rounded-full hidden sm:block"></div>
@@ -23,8 +23,8 @@ export default function LogoLink() {
         <Image
           src={ui.logo}
           alt="logo"
-          width="24"
-          height="24"
+          width={24}
+          height={24}
           className="h-[24px] w-auto"
         />
         <span className="hidden sm:block font-medium text-primary">{`${ui.title}`}</span>

@@ -1,7 +1,11 @@
 import Link from "next/link";
 import ProposalStatus from "../ProposalStatus/ProposalStatus";
-import OPStandardProposalStatus from "./OPStandardProposalStatus";
-import OPApprovalProposalStatus from "./OPApprovalProposalStatus";
+import OPStandardProposalStatus, {
+  ProposalResults,
+} from "./OPStandardProposalStatus";
+import OPApprovalProposalStatus, {
+  ProposalData,
+} from "./OPApprovalProposalStatus";
 import ProposalTimeStatus from "./ProposalTimeStatus";
 import { cn, getProposalTypeText } from "@/lib/utils";
 import OPOptimisticProposalStatus from "./OPOptimisticProposalStatus";
@@ -61,7 +65,9 @@ export default function Proposal({
                 </span>
               </div>
               <div className="block sm:hidden">
-                <ProposalStatus proposal={proposal} />
+                <ProposalStatus
+                  proposal={{ ...proposal, status: proposal.status ?? "" }}
+                />
               </div>
             </div>
           )}
@@ -75,14 +81,16 @@ export default function Proposal({
           <div className="flex flex-col items-end">
             <div className="text-xs text-secondary">
               <ProposalTimeStatus
-                proposalStatus={proposal.status}
+                proposalStatus={proposal.status ?? ""}
                 proposalStartTime={proposal.startTime}
                 proposalEndTime={proposal.endTime}
                 proposalCancelledTime={proposal.cancelledTime}
                 proposalExecutedTime={proposal.executedTime}
               />
             </div>
-            <ProposalStatus proposal={proposal} />
+            <ProposalStatus
+              proposal={{ ...proposal, status: proposal.status ?? "" }}
+            />
           </div>
         </div>
         <div className="flex-col whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[25%] flex-start justify-center hidden sm:block">
@@ -92,17 +100,23 @@ export default function Proposal({
             )}
             {proposal.proposalType === "STANDARD" &&
               proposal.proposalResults && (
-                <OPStandardProposalStatus proposal={proposal} />
+                <OPStandardProposalStatus
+                  proposal={proposal as { proposalResults: ProposalResults }}
+                />
               )}
             {proposal.proposalType === "OPTIMISTIC" &&
               proposal.proposalResults && (
                 <OPOptimisticProposalStatus
-                  proposal={proposal}
+                  proposal={
+                    proposal as { proposalResults: { against: bigint } }
+                  }
                   votableSupply={votableSupply}
                 />
               )}
             {proposal.proposalType === "APPROVAL" && proposal.proposalData && (
-              <OPApprovalProposalStatus proposal={proposal} />
+              <OPApprovalProposalStatus
+                proposal={proposal as { proposalData: ProposalData }}
+              />
             )}
           </div>
         </div>
