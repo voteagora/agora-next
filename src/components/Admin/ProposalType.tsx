@@ -24,7 +24,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getVotingModuleTypeForProposalType } from "@/lib/utils";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
-import { useState, useEffect } from "react";
+import { useTotalSupply } from "@/hooks/useTotalSupply";
+import { formatUnits } from "viem";
 
 type Props = {
   proposalType: ProposalType;
@@ -51,22 +52,13 @@ export default function ProposalType({
   votableSupply,
 }: Props) {
   const { namespace, contracts, token } = Tenant.current();
-  const [totalSupply, setTotalSupply] = useState<bigint>(0n);
+  const totalSupply = useTotalSupply({ enabled: true });
 
-  useEffect(() => {
-    async function fetchTotalSupply() {
-      if (namespace === TENANT_NAMESPACES.SCROLL && contracts.token.isERC20()) {
-        const supply = await contracts.token.contract.totalSupply();
-        setTotalSupply(supply);
-      }
-    }
-    fetchTotalSupply();
-  }, [namespace, contracts.token.contract]);
-
-  const formattedSupply = Number(
-    (namespace === TENANT_NAMESPACES.SCROLL
-      ? totalSupply
-      : BigInt(votableSupply)) / BigInt(10 ** 18)
+  const formattedSupply = formatUnits(
+    namespace === TENANT_NAMESPACES.SCROLL
+      ? (totalSupply.data ?? BigInt(votableSupply))
+      : BigInt(votableSupply),
+    token.decimals
   );
 
   const form = useForm<z.infer<typeof proposalTypeSchema>>({
