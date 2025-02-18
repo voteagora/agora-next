@@ -3,7 +3,7 @@ import {
   paginateResult,
   type PaginationParams,
 } from "@/app/lib/pagination";
-import { prismaWeb3Client } from "@/app/lib/prisma";
+import { prismaWeb2Client, prismaWeb3Client } from "@/app/lib/prisma";
 import { cache } from "react";
 import { isAddress } from "viem";
 import { ensNameToAddress } from "@/app/lib/ENSUtils";
