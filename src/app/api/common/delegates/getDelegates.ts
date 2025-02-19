@@ -77,6 +77,7 @@ const getWeb2DelegateDataCached = cache(
         : "";
 
     const web2Query = `
+    /* agora_delegate_web2_data */
     SELECT 
       address as delegate,
       CASE
@@ -285,6 +286,7 @@ async function getWeb3DelegateData({
   }
 
   const query = `
+    /* agora_delegate_web3_data */
     ${delegateUniverseCTE}
     SELECT 
       d.delegate,
