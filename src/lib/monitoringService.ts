@@ -1,4 +1,4 @@
-import { StatsD } from "hot-shots";
+import https from "https";
 import Tenant from "./tenant/tenant";
 
 interface MetricOptions {
@@ -8,40 +8,22 @@ interface MetricOptions {
 }
 
 class MonitoringService {
-  private client: StatsD;
   private enabled: boolean;
   private namespace: string;
+  private apiKey!: string;
 
   constructor() {
-    const isVercel = process.env.VERCEL === "1";
     this.enabled = process.env.ENABLE_METRICS === "true";
     this.namespace = `agora-next.${Tenant.current().namespace}`;
 
-    this.client = new StatsD({
-      // host: isVercel
-      //   ? "datadoghq.com"
-      //   : process.env.DD_AGENT_HOST || "localhost",
-      host: "datadoghq.com",
-      // port: isVercel ? 443 : Number(process.env.DD_AGENT_PORT) || 8125,
-      port: 8125,
-      prefix: `${this.namespace}.`,
-      errorHandler: (error) => {
-        console.error("StatsD error:", error);
-      },
-      // protocol: isVercel ? "tcp" : "udp",
-      protocol: "tcp",
-      sampleRate: 1,
-      // useDefaultRoute: true,
-      bufferFlushInterval: 1000,
-      maxBufferSize: 1000,
-    });
-
-    // Ensure clean shutdown
-    if (typeof process !== "undefined") {
-      process.on("beforeExit", () => {
-        this.client.close();
-      });
+    const apiKey = process.env.DD_API_KEY;
+    if (!apiKey) {
+      console.error("DD_API_KEY environment variable is not set!");
+      this.enabled = false;
+      return;
     }
+
+    this.apiKey = apiKey;
   }
 
   async recordMetric(options: MetricOptions) {
@@ -54,29 +36,78 @@ class MonitoringService {
       return;
     }
 
-    // Convert labels to Datadog tags format
     const tags = Object.entries(options.labels || {}).map(
       ([key, value]) => `${key}:${value}`
     );
 
-    // Log the metric being sent
+    // Add global tags
+    tags.push(
+      `env:${process.env.VERCEL_ENV || process.env.NODE_ENV || "development"}`,
+      "service:agora-next"
+    );
+
+    const metricName = `${this.namespace}.${options.name}`;
+
+    const payload = JSON.stringify({
+      series: [
+        {
+          metric: metricName,
+          points: [[Math.floor(Date.now() / 1000), options.value]],
+          type: "gauge",
+          tags: tags,
+        },
+      ],
+    });
+
     console.log("Sending metric to Datadog:", {
-      metric: `${this.namespace}.${options.name}`,
+      metric: metricName,
       value: options.value,
       tags: tags,
     });
 
-    // Send metric to Datadog
-    this.client.gauge(options.name, options.value, tags, (error) => {
-      if (error) {
-        console.error("Error sending metric to Datadog:", error);
-      } else {
-        console.log("Successfully sent metric to Datadog:", {
-          metric: `${this.namespace}.${options.name}`,
-          value: options.value,
-          tags: tags,
+    const requestOptions = {
+      method: "POST",
+      hostname: "api.datadoghq.com",
+      path: "/api/v1/series",
+      headers: {
+        "Content-Type": "application/json",
+        "DD-API-KEY": this.apiKey,
+      },
+    };
+
+    return new Promise((resolve, reject) => {
+      const req = https.request(requestOptions, (res) => {
+        let data = "";
+
+        res.on("data", (chunk) => {
+          data += chunk;
         });
-      }
+
+        res.on("end", () => {
+          if (res.statusCode === 202) {
+            console.log("Successfully sent metric to Datadog:", {
+              metric: metricName,
+              value: options.value,
+              tags: tags,
+            });
+            resolve(true);
+          } else {
+            console.error("Datadog API Error:", {
+              statusCode: res.statusCode,
+              response: data,
+            });
+            reject(new Error(`HTTP ${res.statusCode}: ${data}`));
+          }
+        });
+      });
+
+      req.on("error", (error) => {
+        console.error("Datadog API Request Error:", error);
+        reject(error);
+      });
+
+      req.write(payload);
+      req.end();
     });
   }
 }
