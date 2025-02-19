@@ -274,6 +274,7 @@ type VoteMetadataParams = {
   votes: Vote[];
   votableSupply?: string;
   address?: string;
+  newVote?: Pick<Vote, "support" | "reason" | "weight" | "params">;
 };
 
 export function calculateVoteMetadata({
@@ -281,6 +282,7 @@ export function calculateVoteMetadata({
   votes,
   votableSupply,
   address,
+  newVote,
 }: VoteMetadataParams) {
   const vote = votes?.[0];
   const { token, contracts } = Tenant.current();
@@ -296,25 +298,40 @@ export function calculateVoteMetadata({
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
+  const adjustedResults = {
+    for: BigInt(results.for),
+    against: BigInt(results.against),
+    abstain: BigInt(results.abstain),
+  };
+
+  if (newVote) {
+    const newVoteWeight = BigInt(newVote.weight);
+    if (newVote.support === "FOR") adjustedResults.for += newVoteWeight;
+    else if (newVote.support === "AGAINST")
+      adjustedResults.against += newVoteWeight;
+    else if (newVote.support === "ABSTAIN")
+      adjustedResults.abstain += newVoteWeight;
+  }
+
   const forPercentage =
     proposal.proposalType === "OPTIMISTIC"
       ? 0
-      : (Number(results.for) /
-          (Number(results.for) +
-            Number(results.against) +
-            Number(results.abstain))) *
+      : (Number(adjustedResults.for) /
+          (Number(adjustedResults.for) +
+            Number(adjustedResults.against) +
+            Number(adjustedResults.abstain))) *
         100;
 
   const againstPercentage =
     proposal.proposalType === "OPTIMISTIC"
-      ? (Number(formatUnits(results.against, token.decimals)) /
+      ? (Number(formatUnits(adjustedResults.against, token.decimals)) /
           // Disapproval threshold is in percentage, so we need to convert it to the same unit
           ((disapprovalThreshold * formattedVotableSupply) / 100)) *
         100
-      : (Number(results.against) /
-          (Number(results.for) +
-            Number(results.against) +
-            Number(results.abstain))) *
+      : (Number(adjustedResults.against) /
+          (Number(adjustedResults.for) +
+            Number(adjustedResults.against) +
+            Number(adjustedResults.abstain))) *
         100;
 
   let parsedOptions: {
@@ -341,10 +358,14 @@ export function calculateVoteMetadata({
     const proposalSettings = proposalData.proposalSettings;
     const options = proposalResults.options;
 
-    const totalVotingPower =
+    let totalVotingPower =
       BigInt(proposalResults.for) +
       BigInt(proposalResults.abstain) +
       BigInt(proposalResults.against);
+
+    if (newVote) {
+      totalVotingPower += BigInt(newVote.weight);
+    }
 
     // Same calculation as in OptionResultsPanel.tsx
     const thresholdPosition = (() => {
@@ -367,10 +388,18 @@ export function calculateVoteMetadata({
 
     const mutableOptions = [...options];
     const sortedOptions = mutableOptions
-      .map((option, i) => ({
-        ...option,
-        ...proposalData.options[i],
-      }))
+      .map((option, i) => {
+        const votes = BigInt(option.votes || 0);
+        const newVoteForOption = newVote?.params?.includes(option.option)
+          ? BigInt(newVote.weight)
+          : BigInt(0);
+
+        return {
+          ...option,
+          ...proposalData.options[i],
+          votes: (votes + newVoteForOption).toString(),
+        };
+      })
       .sort((a, b) =>
         BigInt(b.votes || 0) > BigInt(a.votes || 0)
           ? 1
@@ -424,7 +453,7 @@ export function calculateVoteMetadata({
   }
 
   return {
-    support: vote?.support,
+    support: vote?.support || newVote?.support,
     blockNumber: vote?.blockNumber,
     timestamp: vote?.timestamp
       ? format(new Date(vote.timestamp), "MMM d, yyyy h:mm a")
@@ -435,7 +464,7 @@ export function calculateVoteMetadata({
     againstPercentage,
     totalOptions,
     options: parsedOptions,
-    reason: vote?.reason,
+    reason: vote?.reason || newVote?.reason,
     transactionHash: vote?.transactionHash,
   };
 }
@@ -443,9 +472,11 @@ export function calculateVoteMetadata({
 export function calculateVoteMetadataMinified({
   proposal,
   votableSupply,
+  newVote,
 }: {
   proposal: Proposal;
   votableSupply?: string;
+  newVote?: Pick<Vote, "support" | "reason" | "weight" | "params">;
 }) {
   const { token } = Tenant.current();
 
@@ -460,25 +491,40 @@ export function calculateVoteMetadataMinified({
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
+  const adjustedResults = {
+    for: BigInt(results.for),
+    against: BigInt(results.against),
+    abstain: BigInt(results.abstain),
+  };
+
+  if (newVote) {
+    const newVoteWeight = BigInt(newVote.weight);
+    if (newVote.support === "FOR") adjustedResults.for += newVoteWeight;
+    else if (newVote.support === "AGAINST")
+      adjustedResults.against += newVoteWeight;
+    else if (newVote.support === "ABSTAIN")
+      adjustedResults.abstain += newVoteWeight;
+  }
+
   const forPercentage =
     proposal.proposalType === "OPTIMISTIC"
       ? 0
-      : (Number(results.for) /
-          (Number(results.for) +
-            Number(results.against) +
-            Number(results.abstain))) *
+      : (Number(adjustedResults.for) /
+          (Number(adjustedResults.for) +
+            Number(adjustedResults.against) +
+            Number(adjustedResults.abstain))) *
         100;
 
   const againstPercentage =
     proposal.proposalType === "OPTIMISTIC"
-      ? (Number(formatUnits(results.against, token.decimals)) /
+      ? (Number(formatUnits(adjustedResults.against, token.decimals)) /
           // Disapproval threshold is in percentage, so we need to convert it to the same unit
           ((disapprovalThreshold * formattedVotableSupply) / 100)) *
         100
-      : (Number(results.against) /
-          (Number(results.for) +
-            Number(results.against) +
-            Number(results.abstain))) *
+      : (Number(adjustedResults.against) /
+          (Number(adjustedResults.for) +
+            Number(adjustedResults.against) +
+            Number(adjustedResults.abstain))) *
         100;
 
   return {

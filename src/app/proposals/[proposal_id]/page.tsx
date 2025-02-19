@@ -5,6 +5,7 @@ import {
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { fetchVotableSupplyUnstableCache } from "@/app/api/common/votableSupply/getVotableSupply";
 import { fetchVotesForProposalAndDelegateUnstableCache } from "@/app/api/common/votes/getVotes";
+import { Vote } from "@/app/api/common/votes/vote";
 import { cleanString, truncateString } from "@/app/lib/utils/text";
 import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
 import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
@@ -18,7 +19,8 @@ async function generateVoterMetadata(
   proposal: Proposal,
   voter: string,
   title: string,
-  description: string
+  description: string,
+  newVote?: Pick<Vote, "support" | "reason" | "weight" | "params">
 ) {
   const { namespace } = Tenant.current();
   const votes = await fetchVotesForProposalAndDelegateUnstableCache({
@@ -40,6 +42,7 @@ async function generateVoterMetadata(
     proposal,
     votes,
     votableSupply,
+    newVote,
   });
 
   const stringifiedOptions = JSON.stringify(options);
@@ -79,9 +82,17 @@ export async function generateMetadata({
     80
   );
   const voter = searchParams.voter as string;
+  const newVote = searchParams.newVote as string;
+  const newVoteParsed = newVote ? JSON.parse(newVote) : undefined;
 
   if (voter) {
-    return generateVoterMetadata(proposal, voter, title, description);
+    return generateVoterMetadata(
+      proposal,
+      voter,
+      title,
+      description,
+      newVoteParsed
+    );
   }
 
   const preview = `/api/images/og/generic?title=${encodeURIComponent(

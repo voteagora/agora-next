@@ -177,10 +177,20 @@ export function ApprovalCastVoteDialog({
     setEncodedParams(encoded);
   }, [selectedOptions, abstain]);
 
+  const newVote = {
+    support: abstain ? "ABSTAIN" : "FOR",
+    reason: reason,
+    params: selectedOptions.map(
+      (option) => proposalData.options[option].description
+    ),
+    weight: votingPower.directVP || votingPower.advancedVP,
+  };
+
   const { againstPercentage, forPercentage, endsIn, options, totalOptions } =
     calculateVoteMetadata({
       proposal,
       votes: [],
+      newVote,
     });
 
   const openShareVoteDialog = () =>
@@ -195,7 +205,7 @@ export function ApprovalCastVoteDialog({
         voteDate: null,
         supportType: abstain ? "ABSTAIN" : "FOR",
         voteReason: reason || "",
-        proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}`,
+        proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}&newVote=${JSON.stringify(newVote)}`,
         proposalTitle: proposal.markdowntitle,
         proposalType: proposal.proposalType ?? "STANDARD",
         proposal: proposal,

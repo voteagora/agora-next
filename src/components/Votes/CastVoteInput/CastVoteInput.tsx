@@ -136,6 +136,7 @@ function CastVoteInputContent({
   const { ui } = Tenant.current();
 
   const missingVote = checkMissingVoteForDelegate(votes, votingPower);
+  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
   const showSuccessMessage = isSuccess || missingVote === "NONE";
 
@@ -218,7 +219,11 @@ function CastVoteInputContent({
         <VotingBanner />
       )}
       {showSuccessMessage && (
-        <SuccessMessage proposal={proposal} votes={votes} />
+        <SuccessMessage
+          proposal={proposal}
+          votes={votes}
+          votingPower={vpToDisplay}
+        />
       )}
     </div>
   );
@@ -362,14 +367,27 @@ export function SuccessMessage({
   proposal,
   votes,
   className,
+  votingPower,
 }: {
   proposal: Proposal;
   votes: Vote[];
   className?: string;
+  votingPower?: string;
 }) {
-  const { data } = useCastVoteContext();
+  const {
+    data,
+    support: supportFromContext,
+    reason: reasonFromContext,
+  } = useCastVoteContext();
   const openDialog = useOpenDialog();
   const { data: votableSupply } = useVotableSupply({ enabled: true });
+
+  const newVote = {
+    support: supportFromContext,
+    reason: reasonFromContext,
+    params: [],
+    weight: votingPower || "",
+  };
 
   const {
     support,
@@ -387,6 +405,7 @@ export function SuccessMessage({
     proposal,
     votes,
     votableSupply,
+    newVote,
   });
 
   const supportColor =
@@ -418,7 +437,7 @@ export function SuccessMessage({
                 : "",
               supportType: support || "ABSTAIN",
               voteReason: reason || "",
-              proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}`,
+              proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}&newVote=${JSON.stringify(newVote)}`,
               proposalTitle: proposal.markdowntitle,
               proposalType: proposal.proposalType ?? "STANDARD",
               proposal: proposal,

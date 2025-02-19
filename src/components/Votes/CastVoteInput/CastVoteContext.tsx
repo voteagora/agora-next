@@ -140,10 +140,18 @@ const CastVoteContextProvider = ({
     return standardVoteValues;
   })();
 
+  const newVote = {
+    support: support,
+    reason: reason,
+    params: [],
+    weight: votingPower.directVP || votingPower.advancedVP,
+  };
+
   const { againstPercentage, forPercentage, endsIn } =
     calculateVoteMetadataMinified({
       proposal,
       votableSupply: votableSupply,
+      newVote,
     });
 
   const openShareVoteDialog = useEffectEvent(() => {
@@ -158,7 +166,7 @@ const CastVoteContextProvider = ({
         voteDate: null,
         supportType: support || "ABSTAIN",
         voteReason: reason || "",
-        proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}`,
+        proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}&newVote=${JSON.stringify(newVote)}`,
         proposalTitle: proposal.markdowntitle,
         proposalType: proposal.proposalType ?? "STANDARD",
         proposal: proposal,
