@@ -25,19 +25,16 @@ export default function DelegateStatementBoolSelector({
       {codeOfConductLink && (
         <>
           <CheckboxWithTitle
-            label={
-              <>
-                Yes, I agree with the&nbsp;
-                <a
-                  href={codeOfConductLink.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {codeOfConductLink.title}
-                </a>
-              </>
+            label={`Yes, I agree with the ${codeOfConductLink.title}`}
+            title={
+              <a
+                href={codeOfConductLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Agree with the {codeOfConductLink.title}
+              </a>
             }
-            title={`Agree with the ${codeOfConductLink.title}`}
             checked={agreeCodeConduct}
             onChange={handleAgreeCodeConduct}
           />

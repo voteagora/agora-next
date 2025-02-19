@@ -2,8 +2,8 @@ import { useId } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface CheckboxWithTitleProps {
-  title: string;
-  label: string | React.ReactNode; // Allow label to be a string or React node
+  title: string | React.ReactNode;
+  label: string;
   checked: boolean;
   onChange: (value: boolean) => void;
 }
@@ -22,7 +22,7 @@ const CheckboxWithTitle: React.FC<CheckboxWithTitleProps> = ({
         {title}
       </h4>
       <div className="flex items-center mb-4 font-semibold text-primary">
-        <label htmlFor={id} className="flex items-center">
+        <label htmlFor={id} className="flex items-center cursor-pointer">
           {" "}
           <Checkbox
             id={id}
