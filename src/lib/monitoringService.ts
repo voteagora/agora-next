@@ -29,7 +29,7 @@ class MonitoringService {
         console.error("StatsD error:", error);
       },
       // protocol: isVercel ? "tcp" : "udp",
-      protocol: "udp",
+      protocol: "tcp",
       sampleRate: 1,
       // useDefaultRoute: true,
       bufferFlushInterval: 1000,
