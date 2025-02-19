@@ -19,7 +19,7 @@ class MonitoringService {
 
     this.client = new StatsD({
       host: isVercel
-        ? "https://api.datadoghq.com"
+        ? "api.datadoghq.com"
         : process.env.DD_AGENT_HOST || "localhost",
       port: isVercel ? 443 : Number(process.env.DD_AGENT_PORT) || 8125,
       prefix: `${this.namespace}.`,
