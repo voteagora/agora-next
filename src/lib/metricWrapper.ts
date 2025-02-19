@@ -13,7 +13,7 @@ export async function withMetrics<T>(
     // Record success metrics
     const duration = Date.now() - startTime;
     await monitoring.recordMetric({
-      name: "api_duration_ms",
+      name: "api.duration",
       value: duration,
       labels: {
         api,
@@ -23,7 +23,7 @@ export async function withMetrics<T>(
     });
 
     await monitoring.recordMetric({
-      name: "api_count",
+      name: "api.requests",
       value: 1,
       labels: {
         api,
@@ -37,7 +37,7 @@ export async function withMetrics<T>(
     // Record error metrics
     const duration = Date.now() - startTime;
     await monitoring.recordMetric({
-      name: "api_duration_ms",
+      name: "api.duration",
       value: duration,
       labels: {
         api,
@@ -47,7 +47,7 @@ export async function withMetrics<T>(
     });
 
     await monitoring.recordMetric({
-      name: "api_count",
+      name: "api.requests",
       value: 1,
       labels: {
         api,

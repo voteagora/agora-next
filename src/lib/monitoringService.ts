@@ -1,4 +1,5 @@
-import { GoogleAuth } from "google-auth-library";
+import { StatsD } from "hot-shots";
+import Tenant from "./tenant/tenant";
 
 interface MetricOptions {
   name: string;
@@ -7,117 +8,60 @@ interface MetricOptions {
 }
 
 class MonitoringService {
-  private batchSize: number;
-  private batchDelayMs: number;
-  private metricsBatch: MetricOptions[] = [];
-  private batchTimeout: NodeJS.Timeout | null = null;
-  private projectId: string;
-  private auth: GoogleAuth;
+  private client: StatsD;
   private enabled: boolean;
+  private namespace: string;
 
   constructor() {
-    // Check if metrics are enabled
     this.enabled = process.env.ENABLE_METRICS === "true";
+    this.namespace = `agora-next.${Tenant.current().namespace}`;
 
-    this.projectId = process.env.GOOGLE_CLOUD_PROJECT!;
-    const credentials = JSON.parse(
-      Buffer.from(process.env.GOOGLE_CLOUD_CREDENTIALS!, "base64").toString()
-    );
-
-    this.auth = new GoogleAuth({
-      credentials,
-      scopes: ["https://www.googleapis.com/auth/monitoring.write"],
+    this.client = new StatsD({
+      host: process.env.DD_AGENT_HOST || "localhost",
+      port: Number(process.env.DD_AGENT_PORT) || 8125,
+      prefix: `${this.namespace}.`,
+      errorHandler: (error) => {
+        console.error("StatsD error:", error);
+      },
+      sampleRate: 1,
+      useDefaultRoute: true,
     });
-
-    this.batchSize = Number(process.env.MONITORING_BATCH_SIZE) || 20;
-    this.batchDelayMs = Number(process.env.MONITORING_BATCH_DELAY_MS) || 1000;
   }
 
   async recordMetric(options: MetricOptions) {
     if (!this.enabled) {
+      console.log("Metrics disabled, skipping metric:", {
+        name: options.name,
+        value: options.value,
+        labels: options.labels,
+      });
       return;
     }
 
-    this.metricsBatch.push(options);
+    // Convert labels to Datadog tags format
+    const tags = Object.entries(options.labels || {}).map(
+      ([key, value]) => `${key}:${value}`
+    );
 
-    if (this.metricsBatch.length >= this.batchSize) {
-      await this.flushMetrics();
-    } else if (!this.batchTimeout) {
-      this.batchTimeout = setTimeout(
-        () => this.flushMetrics(),
-        this.batchDelayMs
-      );
-    }
-  }
+    // Log the metric being sent
+    console.log("Sending metric to Datadog:", {
+      metric: `${this.namespace}.${options.name}`,
+      value: options.value,
+      tags: tags,
+    });
 
-  private async flushMetrics() {
-    if (this.metricsBatch.length === 0) return;
-
-    const timeSeriesData = this.metricsBatch.map((metric) => ({
-      metric: {
-        type: `custom.googleapis.com/agora/${metric.name}`,
-        labels: metric.labels || {},
-      },
-      resource: {
-        type: "global",
-        labels: {},
-      },
-      points: [
-        {
-          interval: {
-            endTime: {
-              seconds: Math.floor(Date.now() / 1000),
-            },
-          },
-          value: {
-            doubleValue: metric.value,
-          },
-        },
-      ],
-    }));
-
-    try {
-      console.log(
-        `Sending ${this.metricsBatch.length} metrics to GCP:`,
-        this.metricsBatch.map((m) => `${m.name}=${m.value}`)
-      );
-
-      const client = await this.auth.getClient();
-      const token = await client.getAccessToken();
-
-      const response = await fetch(
-        `https://monitoring.googleapis.com/v3/projects/${this.projectId}/timeSeries`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token.token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ timeSeries: timeSeriesData }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(
-          `HTTP error! status: ${response.status}, body: ${errorBody}`
-        );
+    // Send metric to Datadog
+    this.client.gauge(options.name, options.value, tags, (error) => {
+      if (error) {
+        console.error("Error sending metric to Datadog:", error);
+      } else {
+        console.log("Successfully sent metric to Datadog:", {
+          metric: `${this.namespace}.${options.name}`,
+          value: options.value,
+          tags: tags,
+        });
       }
-      console.log("Metrics sent successfully");
-    } catch (error) {
-      console.error("Error sending metrics to GCP:", error);
-      // Log the actual time series data being sent for debugging
-      console.error(
-        "Time series data:",
-        JSON.stringify(timeSeriesData, null, 2)
-      );
-    }
-
-    this.metricsBatch = [];
-    if (this.batchTimeout) {
-      clearTimeout(this.batchTimeout);
-      this.batchTimeout = null;
-    }
+    });
   }
 }
 
