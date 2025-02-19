@@ -136,7 +136,7 @@ export default function ProposalType({
     isLoadingDeleteProposalTypeTransaction ||
     isLoadingSetProposalType ||
     isLoadingSetProposalTypeTransaction;
-  const isDisabled = isLoading || name == "Optimistic";
+  const isDisabled = isLoading;
 
   function onSubmit(values: z.infer<typeof proposalTypeSchema>) {
     const name = values.name;
