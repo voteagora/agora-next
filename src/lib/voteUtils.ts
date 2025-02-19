@@ -457,7 +457,7 @@ export function calculateVoteMetadata({
     blockNumber: vote?.blockNumber,
     timestamp: vote?.timestamp
       ? format(new Date(vote.timestamp), "MMM d, yyyy h:mm a")
-      : "",
+      : format(new Date(), "MMM d, yyyy h:mm a"),
     address: address || vote?.address,
     endsIn,
     forPercentage,

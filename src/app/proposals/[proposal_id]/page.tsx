@@ -22,12 +22,13 @@ async function generateVoterMetadata(
   description: string,
   newVote?: Pick<Vote, "support" | "reason" | "weight" | "params">
 ) {
-  const { namespace } = Tenant.current();
+  const { namespace, contracts } = Tenant.current();
   const votes = await fetchVotesForProposalAndDelegateUnstableCache({
     proposalId: proposal.id,
     address: voter,
   });
   const votableSupply = await fetchVotableSupplyUnstableCache();
+  const latestBlock = await contracts.token.provider.getBlock("latest");
 
   const {
     support,
@@ -46,7 +47,7 @@ async function generateVoterMetadata(
   });
 
   const stringifiedOptions = JSON.stringify(options);
-  const preview = `/api/images/og/share-my-vote?namespace=${namespace.toUpperCase()}&supportType=${support}&blockNumber=${blockNumber}&voteDate=${timestamp}&endsIn=${endsIn}&forPercentage=${forPercentage}&againstPercentage=${againstPercentage}&proposalType=${proposal.proposalType}&options=${stringifiedOptions}&totalOptions=${totalOptions}`;
+  const preview = `/api/images/og/share-my-vote?namespace=${namespace.toUpperCase()}&supportType=${support}&blockNumber=${blockNumber ?? latestBlock?.number}&voteDate=${timestamp}&endsIn=${endsIn}&forPercentage=${forPercentage}&againstPercentage=${againstPercentage}&proposalType=${proposal.proposalType}&options=${stringifiedOptions}&totalOptions=${totalOptions}`;
 
   return {
     title: title,

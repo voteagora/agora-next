@@ -395,4 +395,125 @@ describe("calculateVoteMetadata", () => {
       expect(result.totalOptions).toBe(10);
     });
   });
+
+  describe("with newVote prop", () => {
+    it("should adjust vote percentages for standard proposal with new FOR vote", () => {
+      const proposal: Proposal = {
+        ...baseProposal,
+        proposalType: "STANDARD" as any,
+        proposalResults: {
+          for: BigInt(600),
+          against: BigInt(300),
+          abstain: BigInt(100),
+        },
+      };
+
+      const result = calculateVoteMetadata({
+        proposal,
+        votes: [],
+        newVote: {
+          support: "FOR",
+          weight: "100",
+          reason: "New vote reason",
+          params: [],
+        },
+      });
+
+      // Total votes: 1100 (600 + 300 + 100 + 100 new)
+      // For votes: 700 (600 + 100 new)
+      expect(result.forPercentage).toBeCloseTo(63.64); // 700/1100
+      expect(result.againstPercentage).toBeCloseTo(27.27); // 300/1100
+      expect(result.reason).toBe("New vote reason");
+    });
+
+    it("should adjust vote percentages for optimistic proposal with new AGAINST vote", () => {
+      const proposal: Proposal = {
+        ...baseProposal,
+        proposalType: "OPTIMISTIC" as any,
+        proposalResults: {
+          for: BigInt(0),
+          against: BigInt(120000000000000000000), // 120 tokens
+          abstain: BigInt(0),
+        },
+      };
+
+      const result = calculateVoteMetadata({
+        proposal,
+        votes: [],
+        votableSupply: "1000000000000000000000", // 1000 tokens
+        newVote: {
+          support: "AGAINST",
+          weight: "30000000000000000000", // 30 tokens
+          reason: "",
+          params: [],
+        },
+      });
+
+      expect(result.forPercentage).toBe(0);
+      // 150 tokens against out of 120 token threshold (12% of 1000)
+      expect(result.againstPercentage).toBeCloseTo(125);
+    });
+
+    it("should adjust approval proposal option votes with new vote", () => {
+      const proposal: Proposal = {
+        ...baseProposal,
+        proposalType: "APPROVAL" as any,
+        proposalData: {
+          ...baseProposal.proposalData,
+          type: "APPROVAL",
+          proposalSettings: {
+            criteria: "THRESHOLD",
+            criteriaValue: BigInt(500),
+            budgetToken: "0x789",
+            budgetAmount: BigInt(1000),
+            maxApprovals: 2,
+          },
+          options: [
+            {
+              description: "Option 1",
+              budgetTokensSpent: BigInt(300),
+              targets: [],
+              values: [],
+              calldatas: [],
+              functionArgsName: [],
+            },
+            {
+              description: "Option 2",
+              budgetTokensSpent: BigInt(400),
+              targets: [],
+              values: [],
+              calldatas: [],
+              functionArgsName: [],
+            },
+          ],
+        },
+        proposalResults: {
+          for: BigInt(1000),
+          against: BigInt(0),
+          abstain: BigInt(0),
+          options: [
+            { option: "Option 1", votes: BigInt(400) },
+            { option: "Option 2", votes: BigInt(600) },
+          ],
+        },
+      };
+
+      const result = calculateVoteMetadata({
+        proposal,
+        votes: [],
+        newVote: {
+          support: "FOR",
+          weight: "200",
+          reason: "",
+          params: ["Option 1"],
+        },
+      });
+
+      expect(result.options).toHaveLength(2);
+      expect(result.options[0].votes).toBe("600"); // Option 1: 400 + 200
+      expect(result.options[0].isApproved).toBe(true);
+      expect(result.options[1].votes).toBe("600"); // Option 2: unchanged
+      expect(result.options[1].isApproved).toBe(true);
+    });
+  });
 });
