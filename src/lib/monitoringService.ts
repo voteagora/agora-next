@@ -13,16 +13,20 @@ class MonitoringService {
   private namespace: string;
 
   constructor() {
+    const isVercel = process.env.VERCEL === "1";
     this.enabled = process.env.ENABLE_METRICS === "true";
     this.namespace = `agora-next.${Tenant.current().namespace}`;
 
     this.client = new StatsD({
-      host: process.env.DD_AGENT_HOST || "localhost",
-      port: Number(process.env.DD_AGENT_PORT) || 8125,
+      host: isVercel
+        ? "https://api.datadoghq.com"
+        : process.env.DD_AGENT_HOST || "localhost",
+      port: isVercel ? 443 : Number(process.env.DD_AGENT_PORT) || 8125,
       prefix: `${this.namespace}.`,
       errorHandler: (error) => {
         console.error("StatsD error:", error);
       },
+      protocol: isVercel ? "tcp" : "udp",
       sampleRate: 1,
       useDefaultRoute: true,
     });
