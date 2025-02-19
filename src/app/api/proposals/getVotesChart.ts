@@ -42,7 +42,7 @@ export async function getVotesChart({
       WHERE proposal_id = $1 AND contract = $2
     ) t
     GROUP BY voter, support
-    ORDER BY block_number DESC;
+    ORDER BY block_number ASC;
   `;
 
   return await prisma.$queryRawUnsafe<VotePayload[]>(

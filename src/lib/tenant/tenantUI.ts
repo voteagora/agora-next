@@ -126,6 +126,9 @@ type TenantUIParams = {
     icon16x16?: string;
     "shortcut-icon"?: string;
   };
+  tacticalStrings?: {
+    myBalance?: string;
+  };
 };
 
 export class TenantUI {
@@ -167,6 +170,9 @@ export class TenantUI {
   private _togglesCache: { [key: string]: UIToggle | undefined } = {};
 
   private _smartAccountConfig?: UISmartAccountConfig;
+  private _tacticalStrings?: {
+    myBalance?: string;
+  };
 
   constructor({
     assets,
@@ -184,6 +190,7 @@ export class TenantUI {
     smartAccountConfig,
     title,
     toggles,
+    tacticalStrings,
   }: TenantUIParams) {
     this._assets = assets;
     this._customization = customization;
@@ -200,6 +207,7 @@ export class TenantUI {
     this._smartAccountConfig = smartAccountConfig;
     this._title = title;
     this._toggles = toggles;
+    this._tacticalStrings = tacticalStrings;
   }
 
   public get assets(): UIAssets {
@@ -301,5 +309,13 @@ export class TenantUI {
 
   public get smartAccountConfig(): UISmartAccountConfig | undefined {
     return this._smartAccountConfig;
+  }
+
+  public get tacticalStrings():
+    | {
+        myBalance?: string;
+      }
+    | undefined {
+    return this._tacticalStrings;
   }
 }
