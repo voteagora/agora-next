@@ -209,7 +209,6 @@ async function getDelegates({
     switch (sort) {
       case "most_delegators":
         const QRY1 = `
-          /* agora_delegates_most_delegators */
           ${delegateUniverseCTE}
           SELECT *,
             CASE
@@ -257,7 +256,6 @@ async function getDelegates({
         await prismaWeb3Client.$executeRawUnsafe(`SELECT setseed($1);`, seed);
 
         const QRY2 = `
-          /* agora_delegates_weighted_random */
           ${delegateUniverseCTE}
           SELECT *,
             CASE
@@ -302,7 +300,6 @@ async function getDelegates({
 
       default:
         const QRY3 = `
-          /* agora_delegates_voting_power */
           ${delegateUniverseCTE}
           SELECT *,
             CASE
