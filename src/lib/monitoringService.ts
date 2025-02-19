@@ -29,7 +29,16 @@ class MonitoringService {
       protocol: isVercel ? "tcp" : "udp",
       sampleRate: 1,
       useDefaultRoute: true,
+      bufferFlushInterval: 1000,
+      maxBufferSize: 1000,
     });
+
+    // Ensure clean shutdown
+    if (typeof process !== "undefined") {
+      process.on("beforeExit", () => {
+        this.client.close();
+      });
+    }
   }
 
   async recordMetric(options: MetricOptions) {
