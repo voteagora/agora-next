@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { PLMConfig } from "@/app/proposals/draft/types";
 
@@ -17,7 +17,7 @@ async function createProposalDraft(address: `0x${string}`) {
   const config = plmToggle.config as PLMConfig;
   const firstStage = config.stages[0];
 
-  const proposal = await prisma.proposalDraft.create({
+  const proposal = await prismaWeb2Client.proposalDraft.create({
     data: {
       contract:
         tenant.contracts.governor.address.toLowerCase() as `0x${string}`,

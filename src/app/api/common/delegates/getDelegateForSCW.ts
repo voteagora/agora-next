@@ -1,6 +1,6 @@
 import "server-only";
 
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { unstable_cache } from "next/cache";
 
@@ -8,7 +8,7 @@ import { unstable_cache } from "next/cache";
 async function getDelegateForSCW(address: string) {
   const { slug } = Tenant.current();
 
-  return prisma.delegateStatements
+  return prismaWeb2Client.delegateStatements
     .findFirst({
       where: { scw_address: address.toLowerCase(), dao_slug: slug },
     })

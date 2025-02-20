@@ -1,6 +1,6 @@
 import "server-only";
 
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { cache } from "react";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -25,7 +25,7 @@ async function getDelegateStatementForAddress({
 }) {
   const { slug } = Tenant.current();
 
-  return prisma.delegateStatements
+  return prismaWeb2Client.delegateStatements
     .findFirst({ where: { address: address.toLowerCase(), dao_slug: slug } })
     .catch((error) => console.error(error));
 }
