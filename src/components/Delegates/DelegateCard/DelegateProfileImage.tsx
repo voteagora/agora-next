@@ -88,7 +88,10 @@ export function DelegateProfileImage({
             alt="citizen badge"
           />
         )}
-        <ENSAvatar className="rounded-full w-[44px] h-[44px]" ensName={data} />
+        <ENSAvatar
+          className="rounded-full w-[44px] h-[44px]"
+          ensName={data || ""}
+        />
       </div>
 
       <div className="flex flex-col">

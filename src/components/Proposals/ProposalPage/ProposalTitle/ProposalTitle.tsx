@@ -1,34 +1,27 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { getBlockScanUrl, getProposalTypeText } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
-import { Proposal } from "@/app/api/common/proposals/proposal";
-import ENSName from "@/components/shared/ENSName";
+
+interface ProposalTitleProps {
+  title: string;
+  proposalType: string;
+  createdTransactionHash: string;
+}
 
 export default function ProposalTitle({
   title,
-  proposal,
-}: {
-  title: string;
-  proposal: Proposal;
-}) {
-  const proposalText = getProposalTypeText(proposal.proposalType ?? "");
+  proposalType,
+  createdTransactionHash,
+}: ProposalTitleProps) {
+  const proposalText = getProposalTypeText(proposalType);
   const { ui } = Tenant.current();
 
   return (
     <div className="flex-col items-start">
       <div className="text-xs font-semibold text-secondary flex items-center">
-        {proposalText} by
-        {Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM ? (
-          ` The ${ui.organization?.title}`
-        ) : (
-          <>
-            &nbsp;
-            <ENSName address={proposal.proposer} />{" "}
-          </>
-        )}
+        {proposalText} by The {ui.organization?.title}
         <a
-          href={getBlockScanUrl(proposal.createdTransactionHash ?? "")}
+          href={getBlockScanUrl(createdTransactionHash)}
           target="_blank"
           rel="noreferrer noopener"
         >

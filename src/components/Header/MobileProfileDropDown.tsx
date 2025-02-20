@@ -74,7 +74,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
               onClick={() => setShouldHydrate(true)}
             >
               <div className="w-6 h-6 shadow-newDefault rounded-full">
-                <ENSAvatar ensName={ensName} />
+                <ENSAvatar ensName={ensName || ""} />
               </div>
             </Popover.Button>
 
@@ -110,7 +110,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                               isFetching && "animate-pulse"
                             }`}
                           >
-                            <ENSAvatar ensName={ensName} />
+                            <ENSAvatar ensName={ensName || ""} />
                           </div>
                           <div className="flex flex-col flex-1">
                             {ensName ? (

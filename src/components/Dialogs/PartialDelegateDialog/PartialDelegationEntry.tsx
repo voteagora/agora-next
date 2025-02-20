@@ -53,7 +53,7 @@ export const PartialDelegationEntry = ({
   return (
     <div className="flex flex-row justify-between border-b border-dashed border-line py-4 last:border-b-0">
       <div className="flex flex-row gap-4">
-        <ENSAvatar ensName={ensName} className="h-10 w-10" />
+        <ENSAvatar ensName={ensName || ""} className="h-10 w-10" />
         <div className="flex flex-col">
           <div className="text-xs font-medium text-secondary">Delegated to</div>
           <div className="text-primary w-full font-medium text-ellipsis overflow-hidden max-w-[6rem] sm:max-w-[8rem]">

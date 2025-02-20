@@ -232,7 +232,10 @@ export function DelegateDialog({
             </div>
             <div className="flex flex-col relative w-full">
               <div className="flex flex-row items-center gap-3 p-2 pb-4 pl-0 border-b border-line">
-                <ENSAvatar ensName={delegateeEnsName} className="h-10 w-10" />
+                <ENSAvatar
+                  ensName={delegateeEnsName || ""}
+                  className="h-10 w-10"
+                />
                 <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
                     Currently delegated to
@@ -246,7 +249,10 @@ export function DelegateDialog({
                 <ArrowDownIcon className="w-4 h-4 text-primary" />
               </div>
               <div className="flex flex-row items-center gap-3 p-2 pt-4 pl-0">
-                <ENSAvatar ensName={delegateEnsName} className="h-10 w-10" />
+                <ENSAvatar
+                  ensName={delegateEnsName || ""}
+                  className="h-10 w-10"
+                />
                 <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
                     Delegating to
@@ -283,7 +289,10 @@ export function DelegateDialog({
                 <ArrowDownIcon className="w-4 h-4 text-primary" />
               </div>
               <div className="flex flex-row gap-3 items-center p-2">
-                <ENSAvatar ensName={delegateEnsName} className="w-10 h-10" />
+                <ENSAvatar
+                  ensName={delegateEnsName || ""}
+                  className="w-10 h-10"
+                />
 
                 <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">

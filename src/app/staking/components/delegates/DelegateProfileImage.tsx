@@ -21,7 +21,10 @@ export const DelegateProfileImage = ({
   return (
     <div className="flex flex-row gap-4">
       <div className="relative aspect-square text">
-        <ENSAvatar className="w-[44px] h-[44px] rounded-full" ensName={data} />
+        <ENSAvatar
+          className="w-[44px] h-[44px] rounded-full"
+          ensName={data || ""}
+        />
       </div>
 
       <div className="flex flex-col">

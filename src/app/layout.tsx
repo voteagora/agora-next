@@ -135,7 +135,12 @@ export default async function RootLayout({
         <ClientLayout>
           <Header />
           {children}
-          <DAOMetricsHeader metrics={metrics} />
+          <DAOMetricsHeader
+            metrics={{
+              votableSupply: Number(metrics.votableSupply),
+              totalSupply: Number(metrics.totalSupply),
+            }}
+          />
         </ClientLayout>
       </NuqsAdapter>
       {ui.googleAnalytics && <GoogleAnalytics gaId={ui.googleAnalytics} />}

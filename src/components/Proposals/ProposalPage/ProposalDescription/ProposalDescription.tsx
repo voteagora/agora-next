@@ -54,7 +54,11 @@ export default function ProposalDescription({
 
   return (
     <div className={`flex flex-col gap-4 ${styles.proposal_description}`}>
-      <ProposalTitle title={shortTitle} proposal={proposal} />
+      <ProposalTitle
+        title={shortTitle}
+        proposalType={proposal.proposalType ?? ""}
+        createdTransactionHash={proposal.createdTransactionHash ?? ""}
+      />
       <ProposalChart proposal={proposal} />
 
       <div className="flex flex-col gap-2">
@@ -70,9 +74,9 @@ export default function ProposalDescription({
           />
         ) : (
           <ApprovedTransactions
-            proposalData={proposal.proposalData}
-            proposalType={proposal.proposalType}
-            executedTransactionHash={proposal.executedTransactionHash}
+            proposalData={proposal.proposalData as any}
+            proposalType={proposal.proposalType as "STANDARD" | "APPROVAL"}
+            executedTransactionHash={proposal.executedTransactionHash ?? ""}
           />
         )}
         <div className={styles.proposal_description_md}>
