@@ -54,11 +54,13 @@ export default function ProposalType({
   const { namespace, contracts, token } = Tenant.current();
   const totalSupply = useTotalSupply({ enabled: true });
 
-  const formattedSupply = formatUnits(
-    namespace === TENANT_NAMESPACES.SCROLL
-      ? (totalSupply.data ?? BigInt(votableSupply))
-      : BigInt(votableSupply),
-    token.decimals
+  const formattedSupply = Number(
+    formatUnits(
+      namespace === TENANT_NAMESPACES.SCROLL
+        ? (totalSupply.data ?? BigInt(votableSupply))
+        : BigInt(votableSupply),
+      token.decimals
+    )
   );
 
   const form = useForm<z.infer<typeof proposalTypeSchema>>({
