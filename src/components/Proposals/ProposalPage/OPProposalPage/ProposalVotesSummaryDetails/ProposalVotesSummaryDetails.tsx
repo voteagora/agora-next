@@ -4,12 +4,38 @@ import linkIcon from "@/icons/link.svg";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
-import { ParsedProposalResults } from "@/lib/proposalUtils";
+import {
+  isProposalCreatedBeforeUpgradeCheck,
+  ParsedProposalResults,
+} from "@/lib/proposalUtils";
 import { format } from "date-fns";
 import Link from "next/link";
 
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { QuestionMarkCircleIcon } from "@heroicons/react/20/solid";
+
+export const QuorumTooltip = () => {
+  return (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger className="ml-1">
+          <QuestionMarkCircleIcon className="h-4 w-4 text-yellow-500" />
+        </TooltipTrigger>
+        <TooltipContent className="text-secondary text-sm max-w-xs">
+          Due to a governor upgrade on Jan 08, 2024, this quorum value is no
+          longer valid. The onchain state of the proposal is unaffected
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 function AmountAndPercent({
   amount,
@@ -77,6 +103,9 @@ export default function ProposalVotesSummaryDetails({
 
   const hasMetThreshold = Boolean(voteThresholdPercent >= apprThresholdPercent);
 
+  const isProposalCreatedBeforeUpgrade =
+    isProposalCreatedBeforeUpgradeCheck(proposal);
+
   return (
     <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[317px] sm:min-w-[317px] bg-wash">
       <ProposalVotesBar proposal={proposal} />
@@ -99,6 +128,7 @@ export default function ProposalVotesSummaryDetails({
         <div className="flex justify-between">
           <div className="flex items-center gap-1 text-secondary font-semibold text-xs">
             Quorum
+            {isProposalCreatedBeforeUpgrade && <QuorumTooltip />}
           </div>
           {proposal.quorum && (
             <div className="flex items-center gap-1 ">
@@ -123,8 +153,8 @@ export default function ProposalVotesSummaryDetails({
                   decimals={token.decimals}
                   hideCurrency
                   specialFormatting
-                />{" "}
-                Required
+                />
+                {isProposalCreatedBeforeUpgrade && "0"} Required
               </p>
             </div>
           )}
