@@ -28,6 +28,87 @@ type Web2DelegateData = {
   statement: string;
 };
 
+// First, let's create a new type for the cached data
+type AllWeb2DelegateData = {
+  delegate: string;
+  citizen: boolean;
+  statement: string;
+};
+
+// Create a new cache function for all delegate statements
+const getAllWeb2DelegateDataCached = cache(
+  async (
+    slug: string,
+    filters?: {
+      endorsed?: boolean;
+      issues?: string;
+      stakeholders?: string;
+    }
+  ): Promise<AllWeb2DelegateData[]> => {
+    const endorsedFilterQuery = filters?.endorsed
+      ? `AND endorsed = true AND dao_slug = '${slug}'`
+      : "";
+
+    const topIssuesParam = filters?.issues || "";
+    const topIssuesArray = topIssuesParam
+      ? topIssuesParam.split(",").map((issue) => issue.trim())
+      : [];
+
+    const topIssuesFilterQuery =
+      topIssuesParam && topIssuesParam !== ""
+        ? `
+        AND jsonb_array_length(payload -> 'topIssues') > 0
+        AND EXISTS (
+          SELECT 1
+          FROM jsonb_array_elements(payload -> 'topIssues') elem
+          WHERE elem ->> 'type' IN (${topIssuesArray.map((issue) => `'${issue}'`).join(", ")})
+          AND elem ->> 'value' IS NOT NULL
+          AND elem ->> 'value' <> ''
+        )
+        `
+        : "";
+
+    const topStakeholdersParam = filters?.stakeholders || "";
+    const topStakeholdersFilterQuery =
+      topStakeholdersParam && topStakeholdersParam !== ""
+        ? `
+        AND jsonb_array_length(payload -> 'topStakeholders') > 0
+        AND EXISTS (
+          SELECT 1
+          FROM jsonb_array_elements(payload -> 'topStakeholders') elem
+          WHERE elem ->> 'type' = '${topStakeholdersParam}'
+        )
+        `
+        : "";
+
+    const web2Query = `
+    WITH delegate_statements_enriched AS (
+      SELECT 
+        address as delegate,
+        CASE
+          WHEN EXISTS (
+            SELECT 1
+            FROM agora.citizens
+            WHERE LOWER(address) = LOWER(ds.address) 
+            AND dao_slug = '${slug}'
+          ) THEN TRUE
+          ELSE FALSE
+        END AS citizen,
+        row_to_json(ds.*) as statement
+      FROM agora.delegate_statements ds
+      WHERE ds.dao_slug = '${slug}'
+      ${endorsedFilterQuery}
+      ${topIssuesFilterQuery}
+      ${topStakeholdersFilterQuery}
+    )
+    SELECT * FROM delegate_statements_enriched
+    `;
+
+    return prismaWeb2Client.$queryRawUnsafe(web2Query);
+  }
+);
+
+// Modify the existing getWeb2DelegateDataCached to use the cached results
 const getWeb2DelegateDataCached = cache(
   async (
     delegates: string[],
@@ -39,65 +120,14 @@ const getWeb2DelegateDataCached = cache(
       endorsed?: boolean;
     }
   ): Promise<Web2DelegateData[]> => {
-    const endorsedFilterQuery = filters?.endorsed
-      ? `AND endorsed = true AND dao_slug = '${slug}'`
-      : "";
+    const allDelegateData = await getAllWeb2DelegateDataCached(slug, filters);
 
-    // The top issues filter supports multiple selection
-    const topIssuesParam = filters?.issues || "";
-    const topIssuesArray = topIssuesParam
-      ? topIssuesParam.split(",").map((issue) => issue.trim())
-      : [];
-
-    const topIssuesFilterQuery =
-      topIssuesParam && topIssuesParam !== ""
-        ? `
-      AND jsonb_array_length(payload -> 'topIssues') > 0
-      AND EXISTS (
-        SELECT 1
-        FROM jsonb_array_elements(payload -> 'topIssues') elem
-        WHERE elem ->> 'type' IN (${topIssuesArray.map((issue) => `'${issue}'`).join(", ")})
-        AND elem ->> 'value' IS NOT NULL
-        AND elem ->> 'value' <> ''
-      )
-      `
-        : "";
-
-    const topStakeholdersParam = filters?.stakeholders || "";
-    const topStakeholdersFilterQuery =
-      topStakeholdersParam && topStakeholdersParam !== ""
-        ? `
-      AND jsonb_array_length(payload -> 'topStakeholders') > 0
-      AND EXISTS (
-        SELECT 1
-        FROM jsonb_array_elements(payload -> 'topStakeholders') elem
-        WHERE elem ->> 'type' = '${topStakeholdersParam}'
-      )
-      `
-        : "";
-
-    const web2Query = `
-    SELECT 
-      address as delegate,
-      CASE
-        WHEN EXISTS (
-          SELECT 1
-          FROM agora.citizens
-          WHERE LOWER(address) = LOWER(ds.address) 
-          AND dao_slug = '${slug}'
-        ) THEN TRUE
-        ELSE FALSE
-      END AS citizen,
-      row_to_json(ds.*) as statement
-    FROM agora.delegate_statements ds
-    WHERE ds.address = ANY($1)
-    AND ds.dao_slug = '${slug}'
-    ${endorsedFilterQuery}
-    ${topIssuesFilterQuery}
-    ${topStakeholdersFilterQuery}
-  `;
-
-    return prismaWeb2Client.$queryRawUnsafe(web2Query, delegates);
+    // Filter the cached results for the requested delegates
+    return allDelegateData.filter((d) =>
+      delegates
+        .map((addr) => addr.toLowerCase())
+        .includes(d.delegate.toLowerCase())
+    );
   }
 );
 
