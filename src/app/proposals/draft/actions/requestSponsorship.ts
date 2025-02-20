@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { schema as RequestSponsorshipSchema } from "../schemas/requestSponsorshipSchema";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 
 export type FormState = {
   ok: boolean;
@@ -22,7 +22,7 @@ export async function onSubmitAction(
   }
 
   try {
-    await prisma.proposalDraft.update({
+    await prismaWeb2Client.proposalDraft.update({
       where: {
         id: data.draftProposalId,
       },

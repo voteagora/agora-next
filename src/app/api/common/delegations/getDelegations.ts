@@ -1,7 +1,7 @@
 import { type Delegation } from "./delegation";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { cache } from "react";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
@@ -265,7 +265,7 @@ async function getCurrentDelegatorsForAddress({
 
   const [delegators, latestBlock] = await Promise.all([
     paginateResult(async (skip: number, take: number) => {
-      return prisma.$queryRawUnsafe<
+      return prismaWeb2Client.$queryRawUnsafe<
         {
           from: string;
           to: string;
@@ -434,7 +434,9 @@ async function getAllDelegatorsInChainsForAddress({
   address: string;
 }) {
   const { namespace, contracts } = Tenant.current();
-  const allAddresess = await prisma.$queryRawUnsafe<{ addresses: string[] }[]>(
+  const allAddresess = await prismaWeb2Client.$queryRawUnsafe<
+    { addresses: string[] }[]
+  >(
     `
     SELECT array_agg(DISTINCT u.element) AS addresses
     FROM ${namespace + ".authority_chains"}, unnest(chain) as u(element)
