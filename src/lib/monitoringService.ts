@@ -14,6 +14,7 @@ class MonitoringService {
 
   constructor() {
     this.enabled = process.env.ENABLE_METRICS === "true";
+    console.log("API metrics are: " + this.enabled);
     this.namespace = `agora-next.${Tenant.current().namespace}`;
 
     const apiKey = process.env.DD_API_KEY;
@@ -28,11 +29,6 @@ class MonitoringService {
 
   async recordMetric(options: MetricOptions) {
     if (!this.enabled) {
-      console.log("Metrics disabled, skipping metric:", {
-        name: options.name,
-        value: options.value,
-        labels: options.labels,
-      });
       return;
     }
 
@@ -42,7 +38,7 @@ class MonitoringService {
 
     // Add global tags
     tags.push(
-      `env:${process.env.VERCEL_ENV || process.env.NODE_ENV || "development"}`,
+      `env:${process.env.VERCEL_ENV === "production" ? "production" : "development"}`,
       "service:agora-next"
     );
 
@@ -57,12 +53,6 @@ class MonitoringService {
           tags: tags,
         },
       ],
-    });
-
-    console.log("Sending metric to Datadog:", {
-      metric: metricName,
-      value: options.value,
-      tags: tags,
     });
 
     const requestOptions = {
@@ -85,11 +75,6 @@ class MonitoringService {
 
         res.on("end", () => {
           if (res.statusCode === 202) {
-            console.log("Successfully sent metric to Datadog:", {
-              metric: metricName,
-              value: options.value,
-              tags: tags,
-            });
             resolve(true);
           } else {
             console.error("Datadog API Error:", {
