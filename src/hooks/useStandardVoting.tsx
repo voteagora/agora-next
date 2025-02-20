@@ -2,11 +2,12 @@ import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useState } from "react";
 import { useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
-import { waitForTransactionReceipt } from "wagmi/actions";
 import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
 import { useAccount } from "wagmi";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
+import { getPublicClient } from "@/lib/viem";
 
 const useStandardVoting = ({
   proposalId,
@@ -25,6 +26,7 @@ const useStandardVoting = ({
   const { address } = useAccount();
   const { writeContractAsync: standardVote, isError: _standardVoteError } =
     useWriteContract();
+  const publicClient = getPublicClient();
 
   const [standardVoteError, setStandardVoteError] =
     useState(_standardVoteError);
@@ -50,9 +52,13 @@ const useStandardVoting = ({
         chainId: contracts.governor.chain.id,
       });
       try {
-        const { status } = await waitForTransactionReceipt(config, {
-          hash: directTx,
-        });
+        const { status } = await wrappedWaitForTransactionReceipt(
+          publicClient,
+          {
+            hash: directTx,
+            address: address as `0x${string}`,
+          }
+        );
 
         if (status === "success") {
           setStandardTxHash(directTx);
