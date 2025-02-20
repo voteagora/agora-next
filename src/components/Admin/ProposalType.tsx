@@ -24,6 +24,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getVotingModuleTypeForProposalType } from "@/lib/utils";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
+import { useTotalSupply } from "@/hooks/useTotalSupply";
+import { formatUnits } from "viem";
 import { useEffect } from "react";
 
 type Props = {
@@ -56,6 +58,18 @@ export default function ProposalType({
   onSuccessSetProposalType,
 }: Props) {
   const { namespace, contracts, token } = Tenant.current();
+  const totalSupply = useTotalSupply({
+    enabled: namespace === TENANT_NAMESPACES.SCROLL,
+  });
+
+  const formattedSupply = Number(
+    formatUnits(
+      namespace === TENANT_NAMESPACES.SCROLL
+        ? (totalSupply.data ?? BigInt(votableSupply))
+        : BigInt(votableSupply),
+      token.decimals
+    )
+  );
 
   const form = useForm<z.infer<typeof proposalTypeSchema>>({
     resolver: zodResolver(proposalTypeSchema),
@@ -237,12 +251,18 @@ export default function ProposalType({
                       }}
                     />
                     <div className="absolute right-[12px] text-sm text-muted-foreground flex gap-2 text-center items-center">
-                      <p>% of votable supply</p>
+                      <p>
+                        % of{" "}
+                        {namespace === TENANT_NAMESPACES.SCROLL
+                          ? "total"
+                          : "votable"}{" "}
+                        supply
+                      </p>
                       <div className="mx-auto w-[1px] bg-muted-foreground/40 h-4" />
                       <p className="text-[0.8rem] col-span-3">
                         {formatNumber(
                           Math.floor(
-                            (formattedVotableSupply * formValues.quorum) / 100
+                            (formattedSupply * formValues.quorum) / 100
                           ).toString(),
                           0,
                           1
