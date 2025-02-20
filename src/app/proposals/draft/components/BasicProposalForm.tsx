@@ -16,7 +16,7 @@ import toast from "react-hot-toast";
 
 type FormType = z.output<typeof BasicProposalSchema>;
 
-const TENDERLY_VALID_CHAINS = [
+export const TENDERLY_VALID_CHAINS = [
   1, 10, 11155111, 8453, 84532, 11155420, 59144, 59141,
 ];
 
@@ -54,7 +54,7 @@ const TransactionFormItem = ({
           {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
             (simulationState === "INVALID" ? (
               <a
-                href={`https://tdly.co/shared/simulation/${simulationId}`}
+                href={`https://dashboard.tenderly.co/shared/simulation/${simulationId}`}
                 target="_blank"
                 rel="noreferrer"
               >
