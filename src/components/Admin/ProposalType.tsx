@@ -58,7 +58,9 @@ export default function ProposalType({
   onSuccessSetProposalType,
 }: Props) {
   const { namespace, contracts, token } = Tenant.current();
-  const totalSupply = useTotalSupply({ enabled: true });
+  const totalSupply = useTotalSupply({
+    enabled: namespace === TENANT_NAMESPACES.SCROLL,
+  });
 
   const formattedSupply = Number(
     formatUnits(
