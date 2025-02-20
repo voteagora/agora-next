@@ -11,13 +11,11 @@ import { sanitizeContent } from "@/lib/sanitizationUtils";
 
 const DelegateCard = ({
   delegate,
-  isDelegatesCitizensFetching,
   isDelegatesFiltering,
   isAdvancedUser,
   truncatedStatement,
 }: {
   delegate: DelegateChunk;
-  isDelegatesCitizensFetching: boolean;
   isDelegatesFiltering: boolean;
   isAdvancedUser: boolean;
   truncatedStatement: string;
@@ -40,9 +38,7 @@ const DelegateCard = ({
       key={delegate.address}
       className={cn(
         "flex flex-col",
-        isDelegatesCitizensFetching || isDelegatesFiltering
-          ? "animate-pulse"
-          : ""
+        isDelegatesFiltering ? "animate-pulse" : ""
       )}
     >
       <Link href={`/delegates/${delegate.address}`}>

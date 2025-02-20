@@ -17,7 +17,10 @@ import CustomTransactionForm from "./CustomTransactionForm";
 import { UpdatedButton } from "@/components/Button";
 import TextInput from "./form/TextInput";
 import { XCircleIcon } from "@heroicons/react/20/solid";
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { toast } from "react-hot-toast";
+import Tenant from "@/lib/tenant/tenant";
+import { TENDERLY_VALID_CHAINS } from "./BasicProposalForm";
 
 type FormType = z.output<typeof ApprovalProposalSchema>;
 
@@ -116,17 +119,6 @@ const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
   );
 };
 
-/**
- * Dev note (MG):
- * I am deciding to take out simulation for approval type transactions.
- * To be honest, it feels too complex to warrent time effort right now.
- * In order to properly simulate transactions we would need to look at
- * threshold, top choices, etc and simulate every possible permutation of
- * choices to make sure no permuation is invalid. Simulating ALL of the
- * transactions sequentially doesn't make sense because that is not
- * guaranteed to happen. If we are going to simulate, we might as well
- * do it right, but doing it right at this time is too much work to justify.
- */
 const TransactionFormItem = ({
   optionIndex,
   transactionIndex,
@@ -138,14 +130,49 @@ const TransactionFormItem = ({
   remove: UseFieldArrayRemove;
   children: React.ReactNode;
 }) => {
-  const { register } = useFormContext<FormType>();
+  const { contracts } = Tenant.current();
+  const { register, watch } = useFormContext<FormType>();
+
+  const simulationState = watch(
+    `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_state`
+  );
+  const simulationId = watch(
+    `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_id`
+  );
 
   return (
     <div className="">
       <div className="flex flex-row justify-between items-center mb-6">
-        <h2 className="text-secondary font-semibold">
-          Transaction #{transactionIndex + 1}
-        </h2>
+        <div className="flex flex-row items-center space-x-2">
+          <h2 className="text-secondary font-semibold">
+            Transaction #{transactionIndex + 1}
+          </h2>
+          {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
+            (simulationState === "INVALID" ? (
+              <a
+                href={`https://dashboard.tenderly.co/shared/simulation/${simulationId}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className="bg-red-100 text-negative rounded-lg px-2 py-1 text-xs font-semibold">
+                  Invalid
+                </span>
+              </a>
+            ) : simulationState === "UNCONFIRMED" ? (
+              <span className="bg-gray-100 text-tertiary px-2 py-1 rounded-lg text-xs font-semibold">
+                No simulation
+              </span>
+            ) : (
+              <a
+                href={`https://dashboard.tenderly.co/shared/simulation/${simulationId}`}
+                target="_blank"
+                rel="noreferrer"
+                className="bg-green-100 text-positive px-2 py-1 rounded-lg text-xs font-semibold"
+              >
+                Valid
+              </a>
+            ))}
+        </div>
         <span
           className="text-red-500 text-sm hover:underline cursor-pointer"
           onClick={() => {
@@ -177,9 +204,13 @@ const ApprovalProposalForm = () => {
     control,
     watch,
     setValue,
+    getValues,
     formState: { defaultValues },
   } = useFormContext<FormType>();
+  const [simulationPending, setSimulationPending] = useState(false);
   const criteria = watch("approvalProposal.criteria");
+  const topChoices = watch("approvalProposal.topChoices");
+  const optionsWatched = watch("approvalProposal.options");
 
   useEffect(() => {
     if (!defaultValues?.approvalProposal?.criteria) {
@@ -202,6 +233,155 @@ const ApprovalProposalForm = () => {
       },
     },
   });
+
+  // Helper to generate all possible winning combinations
+  const generateWinningCombinations = useCallback(() => {
+    if (!optionsWatched?.length) return [];
+
+    const combinations: number[][] = [];
+
+    if (criteria === ApprovalProposalType.THRESHOLD) {
+      // For threshold, we need to test:
+      // 1. All options passing threshold
+      // 2. Each possible subset of options passing threshold
+      const indices = optionsWatched.map((_, i) => i);
+
+      for (let k = 1; k <= indices.length; k++) {
+        const getCombinations = (arr: number[], k: number): number[][] => {
+          if (k === 0) return [[]];
+          if (arr.length === 0) return [];
+
+          const first = arr[0];
+          const rest = arr.slice(1);
+
+          const combsWithFirst = getCombinations(rest, k - 1).map((comb) => [
+            first,
+            ...comb,
+          ]);
+          const combsWithoutFirst = getCombinations(rest, k);
+
+          return [...combsWithFirst, ...combsWithoutFirst];
+        };
+
+        combinations.push(...getCombinations(indices, k));
+      }
+    } else if (criteria === ApprovalProposalType.TOP_CHOICES) {
+      // For top choices, we only need to test the exact number of winning options
+      if (!topChoices) return [];
+
+      const indices = optionsWatched.map((_, i) => i);
+      const numTopChoices = parseInt(topChoices as string, 10);
+
+      if (isNaN(numTopChoices)) return [];
+
+      const getCombinations = (arr: number[], k: number): number[][] => {
+        if (k === 0) return [[]];
+        if (arr.length === 0) return [];
+
+        const first = arr[0];
+        const rest = arr.slice(1);
+
+        const combsWithFirst = getCombinations(rest, k - 1).map((comb) => [
+          first,
+          ...comb,
+        ]);
+        const combsWithoutFirst = getCombinations(rest, k);
+
+        return [...combsWithFirst, ...combsWithoutFirst];
+      };
+
+      combinations.push(...getCombinations(indices, numTopChoices));
+    }
+
+    return combinations;
+  }, [criteria, optionsWatched, topChoices]);
+
+  const simulateAllPossibleCombinations = async () => {
+    setSimulationPending(true);
+    const combinations = generateWinningCombinations();
+
+    try {
+      // Reset all simulation states
+      optionsWatched.forEach((option, optionIndex) => {
+        option.transactions.forEach((_, transactionIndex) => {
+          setValue(
+            `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_state`,
+            "UNCONFIRMED"
+          );
+        });
+      });
+
+      // Simulate each combination and collect results
+      const simulationResults = await Promise.all(
+        combinations.map(async (combination) => {
+          const transactionsToSimulate = combination.flatMap((optionIndex) =>
+            optionsWatched[optionIndex].transactions.map(
+              (tx, transactionIndex) => ({
+                ...tx,
+                optionIndex,
+                transactionIndex,
+              })
+            )
+          );
+
+          const response = await fetch("/api/simulate-bundle", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              transactions: transactionsToSimulate,
+              networkId: Tenant.current().contracts.governor.chain.id,
+              from: Tenant.current().contracts.timelock!.address,
+            }),
+          });
+
+          const res = await response.json();
+          return { combination, results: res.response.simulation_results };
+        })
+      );
+
+      // Process all results and update states
+      optionsWatched.forEach((option, optionIndex) => {
+        option.transactions.forEach((_, transactionIndex) => {
+          let isValid = true;
+          const lastSimulationResult =
+            simulationResults[simulationResults.length - 1];
+          const simulationId =
+            lastSimulationResult.results[
+              lastSimulationResult.results.length - 1
+            ]?.simulation.id;
+
+          // Check if this transaction is invalid in any winning combination
+          for (const { combination, results } of simulationResults) {
+            if (combination.includes(optionIndex)) {
+              const hasFailure = results.findIndex(
+                (result: any) => !result.transaction.status
+              );
+
+              if (hasFailure !== -1) {
+                isValid = false;
+              }
+            }
+          }
+
+          setValue(
+            `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_state`,
+            isValid ? "VALID" : "INVALID"
+          );
+          setValue(
+            `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_id`,
+            simulationId
+          );
+        });
+      });
+    } catch (e) {
+      console.error(e);
+      toast.error("Error simulating transactions");
+    } finally {
+      setSimulationPending(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -302,6 +482,29 @@ const ApprovalProposalForm = () => {
           </UpdatedButton>
         </div>
       </div>
+      {options?.length > 0 &&
+        TENDERLY_VALID_CHAINS.includes(
+          Tenant.current().contracts.governor.chain.id
+        ) && (
+          <div className="mt-6">
+            <UpdatedButton
+              isLoading={simulationPending}
+              isSubmit={false}
+              type="secondary"
+              fullWidth={true}
+              onClick={simulateAllPossibleCombinations}
+            >
+              Simulate all possible winning combinations
+            </UpdatedButton>
+            <p className="mt-2 text-sm text-tertiary">
+              This will simulate all possible combinations of winning options
+              based on your selected criteria.
+              {criteria === ApprovalProposalType.THRESHOLD
+                ? " All options that meet the threshold could potentially win together."
+                : " The top choices will be executed together."}
+            </p>
+          </div>
+        )}
     </div>
   );
 };

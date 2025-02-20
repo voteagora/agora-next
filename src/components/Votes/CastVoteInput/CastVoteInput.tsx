@@ -177,7 +177,7 @@ function CastVoteInputContent({
                 </VStack>
               )}
               {isLoading && <LoadingVote />}
-              {!isLoading && (
+              {!isLoading && proposal.status === "ACTIVE" && (
                 <VoteSubmitButton
                   supportType={support}
                   votingPower={votingPower}
@@ -255,64 +255,58 @@ function VoteSubmitButton({
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
 
-  if (!supportType) {
+  if (!supportType && isOptimismTenant) {
     return (
       <div className="pt-3">
-        {isOptimismTenant ? (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger className="w-full flex items-center justify-center gap-1 text-primary font-medium cursor-help">
-                <span className="flex items-center text-xs font-semibold text-primary">
-                  Proposal voting power{"\u00A0"}
-                  <TokenAmountDisplay amount={vpToDisplay} />
-                  <InformationCircleIcon className="w-4 h-4 ml-1" />
-                </span>
-              </TooltipTrigger>
-              <TooltipContent
-                side="top"
-                align="center"
-                className="bg-neutral p-4 rounded-lg border border-line shadow-newDefault w-[calc(100vw-32px)] sm:w-[400px]"
-              >
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <div className="text-sm font-semibold text-primary">
-                      Proposal launched
-                    </div>
-                    <div className="text-sm font-semibold text-primary">
-                      {new Intl.DateTimeFormat("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                        hour: "numeric",
-                        minute: "numeric",
-                        timeZoneName: "short",
-                      }).format(new Date(proposal.startTime ?? ""))}
-                    </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger className="w-full flex items-center justify-center gap-1 text-primary font-medium cursor-help">
+              <span className="flex items-center text-xs font-semibold text-primary">
+                Proposal voting power{"\u00A0"}
+                <TokenAmountDisplay amount={vpToDisplay} />
+                <InformationCircleIcon className="w-4 h-4 ml-1" />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent
+              side="top"
+              align="center"
+              className="bg-neutral p-4 rounded-lg border border-line shadow-newDefault w-[calc(100vw-32px)] sm:w-[400px]"
+            >
+              <div className="flex flex-col gap-4">
+                <div>
+                  <div className="text-sm font-semibold text-primary">
+                    Proposal launched
                   </div>
-                  <div className="text-sm font-medium text-primary">
-                    Your voting power is captured when proposals launch based on
-                    your token holdings and delegations at that time.
-                  </div>
-                  <div className="text-sm font-medium text-primary">
-                    Any changes to your holdings after launch will not affect
-                    voting on this proposal.
+                  <div className="text-sm font-semibold text-primary">
+                    {new Intl.DateTimeFormat("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                      hour: "numeric",
+                      minute: "numeric",
+                      timeZoneName: "short",
+                    }).format(new Date(proposal.startTime ?? ""))}
                   </div>
                 </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ) : (
-          <SubmitButton onClick={write} disabled={false}>
-            Cast your vote
-          </SubmitButton>
-        )}
+                <div className="text-sm font-medium text-primary">
+                  Your voting power is captured when proposals launch based on
+                  your token holdings and delegations at that time.
+                </div>
+                <div className="text-sm font-medium text-primary">
+                  Any changes to your holdings after launch will not affect
+                  voting on this proposal.
+                </div>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     );
   }
 
   return (
     <div className="pt-3">
-      <SubmitButton onClick={write} disabled={false}>
+      <SubmitButton onClick={write} disabled={!supportType}>
         Submit vote with{"\u00A0"}
         <TokenAmountDisplay amount={vpToDisplay} />
       </SubmitButton>
