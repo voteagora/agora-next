@@ -1,4 +1,4 @@
-import prisma from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/prisma";
 import { cache } from "react";
 import {
   getProxyAddress,
@@ -44,7 +44,9 @@ async function getVotingPowerForProposalByAddress({
   proposalId: string;
 }): Promise<VotingPowerData> {
   const { namespace, contracts } = Tenant.current();
-  const votingPowerQuery = prisma.$queryRawUnsafe<VotingPowerSnapsPayload[]>(
+  const votingPowerQuery = prismaWeb3Client.$queryRawUnsafe<
+    VotingPowerSnapsPayload[]
+  >(
     `
     SELECT
       *
@@ -61,7 +63,7 @@ async function getVotingPowerForProposalByAddress({
   );
 
   // This query pulls only partially delegated voting power
-  const advancedVotingPowerQuery = prisma.$queryRawUnsafe<
+  const advancedVotingPowerQuery = prismaWeb3Client.$queryRawUnsafe<
     AuhtorityChainsAggregate[]
   >(
     `

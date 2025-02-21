@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import { LogoPill } from "@/app/api/images/og/assets/shared";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { loadFont, loadImage } from "@/app/lib/utils/og";
 
 export const size = {
@@ -10,7 +10,7 @@ export const size = {
 export const contentType = "image/png";
 
 const getDraftProposal = async (id: number) => {
-  const draftProposal = await prisma.proposalDraft.findUnique({
+  const draftProposal = await prismaWeb2Client.proposalDraft.findUnique({
     where: {
       id: id,
     },

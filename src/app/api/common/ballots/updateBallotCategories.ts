@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchBallot } from "./getBallots";
 import { autobalanceAllocations } from "./autobalance";
 import { Prisma } from "@prisma/client";
@@ -39,7 +39,7 @@ async function updateBallotCategoryForAddress({
   address: string;
 }) {
   // Create ballot if it doesn't exist
-  await prisma.ballots.upsert({
+  await prismaWeb2Client.ballots.upsert({
     where: {
       address_round: {
         address,
@@ -56,7 +56,7 @@ async function updateBallotCategoryForAddress({
   });
 
   // Add or update allocation
-  await prisma.categoryAllocations.upsert({
+  await prismaWeb2Client.categoryAllocations.upsert({
     where: {
       address_round_category_slug: {
         category_slug: data.category_slug,
@@ -90,13 +90,13 @@ async function autobalanceCategories(
   categoryToSkip: string
 ) {
   const [curAllocations, categories] = await Promise.all([
-    prisma.categoryAllocations.findMany({
+    prismaWeb2Client.categoryAllocations.findMany({
       where: {
         address,
         round: roundId,
       },
     }),
-    prisma.categories.findMany({
+    prismaWeb2Client.categories.findMany({
       where: {
         round: roundId,
       },
@@ -121,7 +121,7 @@ async function autobalanceCategories(
 
   await Promise.all(
     autobalancedAllocations.map(async (allocation) => {
-      await prisma.categoryAllocations.upsert({
+      await prismaWeb2Client.categoryAllocations.upsert({
         where: {
           address_round_category_slug: {
             category_slug: allocation.id,

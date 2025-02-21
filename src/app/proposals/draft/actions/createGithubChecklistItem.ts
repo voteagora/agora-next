@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import {
   getStageByIndex,
   getStageIndexForTenant,
@@ -19,7 +19,7 @@ export async function onSubmitAction(data: {
   const currentIndex = getStageIndexForTenant("ADDING_GITHUB_PR") as number;
   try {
     const nextStage = getStageByIndex(currentIndex + 1);
-    const updateDraft = prisma.proposalDraft.update({
+    const updateDraft = prismaWeb2Client.proposalDraft.update({
       where: {
         id: data.draftProposalId,
       },
@@ -28,7 +28,7 @@ export async function onSubmitAction(data: {
       },
     });
 
-    const updateChecklist = prisma.proposalChecklist.create({
+    const updateChecklist = prismaWeb2Client.proposalChecklist.create({
       data: {
         title: "Docs updated",
         completed_by: data.creatorAddress,
@@ -41,7 +41,7 @@ export async function onSubmitAction(data: {
       },
     });
 
-    await prisma.$transaction([updateDraft, updateChecklist]);
+    await prismaWeb2Client.$transaction([updateDraft, updateChecklist]);
 
     return {
       ok: true,

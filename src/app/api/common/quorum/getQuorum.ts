@@ -1,5 +1,4 @@
 import { cache } from "react";
-import prisma from "@/app/lib/prisma";
 import { ProposalPayload } from "../proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";

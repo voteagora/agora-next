@@ -1,5 +1,5 @@
 import { cache } from "react";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { ImpactMetricComment } from "./impactMetricComment";
 
 async function createImpactMetricCommentApi({
@@ -11,7 +11,7 @@ async function createImpactMetricCommentApi({
   address: string;
   comment: string;
 }): Promise<ImpactMetricComment> {
-  const newComment = await prisma.metrics_comments.create({
+  const newComment = await prismaWeb2Client.metrics_comments.create({
     data: {
       comment,
       metric_id: metricId,

@@ -1,6 +1,6 @@
 import { PaginatedResult, paginateResult } from "@/app/lib/pagination";
 import { cache } from "react";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import {
   ImpactMetrciCommentPayload,
   ImpactMetricComment,
@@ -23,7 +23,7 @@ async function getImpactMetricCommentsApi({
     (skip: number, take: number) => {
       switch (sort) {
         case "votes":
-          return prisma.$queryRawUnsafe<ImpactMetrciCommentPayload[]>(
+          return prismaWeb2Client.$queryRawUnsafe<ImpactMetrciCommentPayload[]>(
             `
           SELECT mc.*, 
           COALESCE(SUM(mcv.vote),0) AS votes_count, 
@@ -45,7 +45,7 @@ async function getImpactMetricCommentsApi({
             impactMetricId
           );
         default:
-          return prisma.metrics_comments.findMany({
+          return prismaWeb2Client.metrics_comments.findMany({
             where: {
               metric_id: impactMetricId,
             },
@@ -93,7 +93,7 @@ async function getImpactMetricCommentsApi({
 async function getImpactMetricCommentApi(
   commentId: number
 ): Promise<ImpactMetricComment> {
-  const comment = await prisma.metrics_comments.findFirst({
+  const comment = await prismaWeb2Client.metrics_comments.findFirst({
     where: {
       comment_id: commentId,
     },

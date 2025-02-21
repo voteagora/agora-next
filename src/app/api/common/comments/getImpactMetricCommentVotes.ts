@@ -1,13 +1,13 @@
 import { cache } from "react";
 import { ImpactMetricCommentVote } from "./impactMetricComment";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 
 async function getImpactMetricCommentVotesApi({
   commentId,
 }: {
   commentId: number;
 }): Promise<ImpactMetricCommentVote[]> {
-  const votes = await prisma.metrics_comments_votes.findMany({
+  const votes = await prismaWeb2Client.metrics_comments_votes.findMany({
     where: {
       comment_id: commentId,
     },

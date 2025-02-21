@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 
 export type FormState = {
   ok: boolean;
@@ -14,7 +14,7 @@ export async function onSubmitAction(
 ): Promise<FormState> {
   try {
     // TODO: maybe we don't delete, we just flag isDeleted
-    await prisma.proposalDraft.delete({
+    await prismaWeb2Client.proposalDraft.delete({
       where: {
         id: draftProposalId,
       },
