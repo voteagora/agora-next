@@ -1,12 +1,19 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
-import { getProposalCurrentQuorum } from "@/lib/proposalUtils";
+import {
+  getProposalCurrentQuorum,
+  isProposalCreatedBeforeUpgradeCheck,
+} from "@/lib/proposalUtils";
+import { QuorumTooltip } from "../../OPProposalPage/ProposalVotesSummaryDetails/ProposalVotesSummaryDetails";
 
 export default function ApprovalProposalCriteria({ proposal }) {
   const proposalData = proposal.proposalData;
   const currentQuorum = getProposalCurrentQuorum(proposal.proposalResults);
   const proposalSettings = proposalData.proposalSettings;
+
+  const isProposalCreatedBeforeUpgrade =
+    isProposalCreatedBeforeUpgradeCheck(proposal);
 
   return (
     <VStack className="p-4 pb-2 border-t border-line">
@@ -22,6 +29,12 @@ export default function ApprovalProposalCriteria({ proposal }) {
               hideCurrency
               specialFormatting
             />
+            {isProposalCreatedBeforeUpgrade && (
+              <span className="inline-flex items-center">
+                0
+                <QuorumTooltip />
+              </span>
+            )}
           </div>
           <div>
             Current{" "}

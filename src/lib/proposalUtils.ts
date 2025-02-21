@@ -792,3 +792,12 @@ export function getProposalCurrentQuorum(
       return BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
   }
 }
+
+export function isProposalCreatedBeforeUpgradeCheck(proposal: Proposal) {
+  const { namespace } = Tenant.current();
+  return (
+    namespace === TENANT_NAMESPACES.OPTIMISM &&
+    proposal.createdTime &&
+    new Date(proposal.createdTime) < new Date("2024-01-08")
+  );
+}
