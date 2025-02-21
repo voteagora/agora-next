@@ -21,13 +21,23 @@ const GovernorSettingsParams = () => {
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "votingDelay",
+    chainId: contracts.governor.chain.id,
   });
 
   const { data: votingPeriod, isFetched: isPeriodFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "votingPeriod",
+    chainId: contracts.governor.chain.id,
   });
+
+  const { data: timeLockDelay, isFetched: isTimeLockDelayFetched } =
+    useReadContract({
+      address: contracts.timelock?.address as `0x${string}`,
+      abi: contracts.timelock?.abi,
+      functionName: "getMinDelay",
+      chainId: contracts.timelock?.chain.id,
+    });
 
   const secondsToHuman = (seconds: number) => {
     const hrs = Math.round(Number(seconds) / SECONDS_IN_HOUR);
@@ -67,6 +77,18 @@ const GovernorSettingsParams = () => {
               : "Loading..."}
           </TableCell>
         </TableRow>
+        {contracts.timelock && (
+          <TableRow>
+            <TableCell className="text-base font-semibold text-left text-secondary">
+              Timelock Delay
+            </TableCell>
+            <TableCell className="text-base font-semibold text-right text-primary">
+              {isTimeLockDelayFetched && timeLockDelay !== undefined
+                ? secondsToHuman(blocksToSeconds(Number(timeLockDelay)))
+                : "Loading..."}
+            </TableCell>
+          </TableRow>
+        )}
       </TableBody>
     </Table>
   );
