@@ -1,11 +1,23 @@
-import { DelegateProfileImage } from "./DelegateProfileImage";
+import { DelegateProfileImageWithMetadata } from "./DelegateProfileImage";
 import DelegateCardClient from "./DelegateCardClient";
 import { formatNumber } from "@/lib/tokenUtils";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import { SCWProfileImage } from "@/components/Delegates/DelegateCard/SCWProfileImage";
 import { DelegateCardHeader } from "@/components/Delegates/DelegateCard/DelegateCardHeader";
 
-export default function DelegateCard({ delegate }: { delegate: Delegate }) {
+export default function DelegateCard({
+  delegate,
+  description,
+  location,
+  followersCount,
+  followingCount,
+}: {
+  delegate: Delegate;
+  description?: string;
+  location?: string;
+  followersCount?: string;
+  followingCount?: string;
+}) {
   // Display SCW if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
 
@@ -14,12 +26,16 @@ export default function DelegateCard({ delegate }: { delegate: Delegate }) {
       <DelegateCardHeader delegate={delegate} />
       <div className="flex flex-col bg-wash border border-line shadow-newDefault rounded-xl">
         <div className="flex flex-col items-stretch p-4 border-b border-line">
-          <DelegateProfileImage
+          <DelegateProfileImageWithMetadata
             endorsed={delegate.statement?.endorsed}
             address={delegate.address}
             citizen={delegate.citizen}
             votingPower={delegate.votingPower.total}
             copyable={true}
+            description={description}
+            location={location}
+            followersCount={followersCount}
+            followingCount={followingCount}
           />
         </div>
         {hasSCWAddress && (

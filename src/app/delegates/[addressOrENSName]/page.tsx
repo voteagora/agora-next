@@ -3,7 +3,12 @@ import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { fetchDelegate } from "@/app/delegates/actions";
 import { formatNumber } from "@/lib/tokenUtils";
-import { ensNameToAddress, processAddressOrEnsName } from "@/app/lib/ENSUtils";
+import {
+  ensNameToAddress,
+  processAddressOrEnsName,
+  resolveENSTextRecords,
+  resolveEFPStats,
+} from "@/app/lib/ENSUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { Suspense } from "react";
 import DelegateStatementWrapper, {
@@ -79,6 +84,11 @@ export default async function Page({
 }) {
   const address = await ensNameToAddress(addressOrENSName);
   const delegate = await fetchDelegate(address);
+  const textRecords = await resolveENSTextRecords(address, [
+    "description",
+    "location",
+  ]);
+  const efpStats = await resolveEFPStats(address);
 
   if (!delegate) {
     return (
@@ -89,7 +99,13 @@ export default async function Page({
   return (
     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
       <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
-        <DelegateCard delegate={delegate} />
+        <DelegateCard
+          delegate={delegate}
+          description={textRecords?.description}
+          location={textRecords?.location}
+          followersCount={efpStats?.followers_count}
+          followingCount={efpStats?.following_count}
+        />
       </div>
       <div className="flex flex-col sm:ml-12 min-w-0 flex-1 max-w-full gap-8">
         <SCWRedirect address={address} />
