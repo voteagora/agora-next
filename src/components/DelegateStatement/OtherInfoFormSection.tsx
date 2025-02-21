@@ -1,5 +1,7 @@
 import DelegateStatementInputGroup from "./DelegateStatementInputGroup";
-import DelegateStatementBoolSelector from "./DelegateStatementBoolSelector";
+import DelegateStatementBoolSelector, {
+  DelegateStatementDaoPrinciplesSelector,
+} from "./DelegateStatementBoolSelector";
 import { type UseFormReturn } from "react-hook-form";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import NotificationSelector from "./NotificationSelector";
@@ -12,13 +14,14 @@ export default function OtherInfoFormSection({
 }) {
   const { ui } = Tenant.current();
   const requireCodeOfConduct = ui.toggle("delegates/code-of-conduct")?.enabled;
+  const requireDaoPrinciples = ui.toggle("delegates/dao-principles")?.enabled;
   const supportsNotifications = ui.toggle("email-subscriptions")?.enabled;
 
   return (
     <div className="py-8 px-6 border-b border-line">
       <h3 className="font-bold text-primary">Other info</h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
         <DelegateStatementInputGroup
           title="X (formerly Twitter)"
           placeholder="@yourname"
@@ -43,8 +46,15 @@ export default function OtherInfoFormSection({
           name="email"
           form={form}
         />
-        {requireCodeOfConduct && <DelegateStatementBoolSelector form={form} />}
-        {supportsNotifications && <NotificationSelector form={form} />}
+        <div className="col-span-full">
+          {requireCodeOfConduct && (
+            <DelegateStatementBoolSelector form={form} />
+          )}
+          {requireDaoPrinciples && (
+            <DelegateStatementDaoPrinciplesSelector form={form} />
+          )}
+          {supportsNotifications && <NotificationSelector form={form} />}
+        </div>
       </div>
     </div>
   );
