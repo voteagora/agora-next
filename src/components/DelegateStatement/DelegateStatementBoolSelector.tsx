@@ -63,21 +63,20 @@ export function DelegateStatementDaoPrinciplesSelector({
     <div className="flex flex-col">
       {daoPrinciplesLink && (
         <>
-          <span>
-            <label className="flex items-center mb-3 text-secondary font-semibold text-xs leading-4">
-              Agree with the {daoPrinciplesLink.title}
-            </label>
-          </span>
-          <label className="flex items-center mb-4 font-semibold text-primary">
-            <Checkbox
-              checked={agreeDaoPrinciples}
-              onCheckedChange={(checked) =>
-                handleAgreeDaoPrinciples(checked === true ? true : false)
-              }
-              className="mr-2"
-            />
-            Yes, I agree with the {daoPrinciplesLink.title}
-          </label>
+          <CheckboxWithTitle
+            label={`Yes, I agree with the ${daoPrinciplesLink.title}`}
+            title={
+              <a
+                href={daoPrinciplesLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Agree with the {daoPrinciplesLink.title}
+              </a>
+            }
+            checked={agreeDaoPrinciples}
+            onChange={handleAgreeDaoPrinciples}
+          />
         </>
       )}
     </div>
