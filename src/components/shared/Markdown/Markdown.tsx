@@ -47,10 +47,28 @@ export default function Markdown({ content }: { content: string }) {
             "--color-border-muted": toRGBA(line, 1),
             "--color-canvas-subtle": toRGBA(tertiary, 0.05),
             "--color-prettylights-syntax-entity-tag": toRGBA(positive, 1),
+            "--tw-prose-bold": toRGBA(secondary, 1),
             fontFamily: defaults.font,
           } as React.CSSProperties
         }
-        className={`h-full py-3 max-w-full bg-transparent prose prose-code:bg-wash prose-code:text-tertiary prose-pre:text-tertiary prose-table:overflow-x-auto prose-td:min-w-[140px]`}
+        className={`
+          h-full
+          py-3
+          max-w-full
+          bg-transparent
+          prose
+          prose-code:bg-wash
+          prose-code:text-tertiary
+          prose-pre:text-tertiary
+          prose-table:overflow-x-auto
+          prose-td:min-w-[140px]
+          prose-h1:text-primary
+          prose-h2:text-primary
+          prose-h3:text-secondary
+          prose-h4:text-secondary
+          prose-h5:text-secondary
+          prose-h6:text-secondary
+          `}
         wrapperElement={{
           "data-color-mode": "light",
         }}

@@ -16,9 +16,8 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import toast from "react-hot-toast";
-import MarkdownPreview from "@uiw/react-markdown-preview";
-import { rgbStringToHex } from "@/app/lib/utils/color";
 import { useGetVotes } from "@/hooks/useGetVotes";
+import Markdown from "@/components/shared/Markdown/Markdown";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -247,17 +246,7 @@ const DraftPreview = ({
 
         <h3 className="text-primary font-semibold mt-6">Description</h3>
         <div className="mt-2 p-4 bg-wash border border-line rounded-lg text-primary">
-          <MarkdownPreview
-            source={proposalDraft.abstract}
-            className={`h-full text-primary py-3 px-4 rounded-t-lg max-w-full bg-transparent prose prose-table:overflow-x-auto prose-td:min-w-[140px]`}
-            style={{
-              backgroundColor: "transparent",
-              color: rgbStringToHex(tenant.ui.customization?.secondary),
-            }}
-            wrapperElement={{
-              "data-color-mode": "light",
-            }}
-          />
+          <Markdown content={proposalDraft.abstract} />
         </div>
       </FormCard.Section>
       <FormCard.Section className="z-0">
