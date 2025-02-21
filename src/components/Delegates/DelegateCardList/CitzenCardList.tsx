@@ -15,7 +15,6 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 
 interface Props {
-  isDelegatesCitizensFetching: boolean;
   initialDelegates: PaginatedResult<DelegateChunk[]>;
   fetchDelegates: (
     pagination: PaginationParams,
@@ -27,7 +26,6 @@ interface Props {
 export default function CitizenCardList({
   initialDelegates,
   fetchDelegates,
-  isDelegatesCitizensFetching,
 }: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
@@ -88,9 +86,7 @@ export default function CitizenCardList({
               key={delegate.address}
               className={cn(
                 "flex flex-col",
-                isDelegatesCitizensFetching || isDelegatesFiltering
-                  ? "animate-pulse"
-                  : ""
+                isDelegatesFiltering ? "animate-pulse" : ""
               )}
             >
               <Link href={`/delegates/${delegate.address}`}>

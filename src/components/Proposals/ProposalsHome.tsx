@@ -62,7 +62,7 @@ export default async function ProposalsHome() {
   return (
     <div className="flex flex-col">
       {supportsNotifications && <SubscribeDialogLauncher />}
-      <Hero />
+      <Hero page="proposals" />
       {plmEnabled && (
         <>
           <MyDraftProposals

@@ -8,7 +8,6 @@ import { Delegation } from "@/app/api/common/delegations/delegation";
 import { useQueryState } from "nuqs";
 
 interface Props {
-  isDelegatesCitizensFetching: boolean;
   initialDelegates: PaginatedResult<DelegateChunk[]>;
   fetchDelegates: (
     pagination: PaginationParams,
@@ -20,7 +19,6 @@ interface Props {
 export default function DelegateContent({
   initialDelegates,
   fetchDelegates,
-  isDelegatesCitizensFetching,
   fetchDelegators,
 }: Props) {
   const [layout] = useQueryState("layout", {
@@ -28,7 +26,6 @@ export default function DelegateContent({
   });
   return layout === "grid" ? (
     <DelegateCardList
-      isDelegatesCitizensFetching={isDelegatesCitizensFetching}
       initialDelegates={initialDelegates}
       fetchDelegates={fetchDelegates}
       fetchDelegators={fetchDelegators}

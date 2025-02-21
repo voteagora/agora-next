@@ -11,7 +11,6 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import DelegateCard from "./DelegateCard";
 
 interface Props {
-  isDelegatesCitizensFetching: boolean;
   initialDelegates: PaginatedResult<DelegateChunk[]>;
   fetchDelegates: (
     pagination: PaginationParams,
@@ -23,7 +22,6 @@ interface Props {
 export default function DelegateCardList({
   initialDelegates,
   fetchDelegates,
-  isDelegatesCitizensFetching,
 }: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
@@ -84,7 +82,6 @@ export default function DelegateCardList({
               key={idx}
               delegate={delegate}
               truncatedStatement={truncatedStatement}
-              isDelegatesCitizensFetching={isDelegatesCitizensFetching}
               isDelegatesFiltering={isDelegatesFiltering}
               isAdvancedUser={isAdvancedUser}
             />

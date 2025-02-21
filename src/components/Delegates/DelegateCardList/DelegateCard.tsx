@@ -7,16 +7,15 @@ import { DelegateActions } from "../DelegateCard/DelegateActions";
 import Tenant from "@/lib/tenant/tenant";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { useVoterStats } from "@/hooks/useVoterStats";
+import { sanitizeContent } from "@/lib/sanitizationUtils";
 
 const DelegateCard = ({
   delegate,
-  isDelegatesCitizensFetching,
   isDelegatesFiltering,
   isAdvancedUser,
   truncatedStatement,
 }: {
   delegate: DelegateChunk;
-  isDelegatesCitizensFetching: boolean;
   isDelegatesFiltering: boolean;
   isAdvancedUser: boolean;
   truncatedStatement: string;
@@ -30,6 +29,8 @@ const DelegateCard = ({
     }
   );
 
+  const sanitizedTruncatedStatement = sanitizeContent(truncatedStatement);
+
   const numProposals = votingStats?.total_proposals || 0;
 
   return (
@@ -37,9 +38,7 @@ const DelegateCard = ({
       key={delegate.address}
       className={cn(
         "flex flex-col",
-        isDelegatesCitizensFetching || isDelegatesFiltering
-          ? "animate-pulse"
-          : ""
+        isDelegatesFiltering ? "animate-pulse" : ""
       )}
     >
       <Link href={`/delegates/${delegate.address}`}>
@@ -72,7 +71,7 @@ const DelegateCard = ({
               )}
             </div>
             <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2 px-4">
-              {truncatedStatement}
+              {sanitizedTruncatedStatement}
             </p>
           </div>
           <div className="min-h-[24px] px-4 pb-4">

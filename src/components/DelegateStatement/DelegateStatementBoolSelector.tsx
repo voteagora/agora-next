@@ -1,9 +1,9 @@
 import { type UseFormReturn } from "react-hook-form";
 import { useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
-import { Checkbox } from "@/components/ui/checkbox";
 
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
+import CheckboxWithTitle from "../ui/CheckboxWithTitle/CheckboxWithTitle";
 
 export default function DelegateStatementBoolSelector({
   form,
@@ -24,21 +24,20 @@ export default function DelegateStatementBoolSelector({
     <div className="flex flex-col">
       {codeOfConductLink && (
         <>
-          <span>
-            <label className="flex items-center mb-3 text-secondary font-semibold text-xs leading-4">
-              Agree with the {codeOfConductLink.title}
-            </label>
-          </span>
-          <label className="flex items-center mb-4 font-semibold text-primary">
-            <Checkbox
-              checked={agreeCodeConduct}
-              onCheckedChange={(checked) =>
-                handleAgreeCodeConduct(checked === true ? true : false)
-              }
-              className="mr-2"
-            />
-            Yes, I agree with the {codeOfConductLink.title}
-          </label>
+          <CheckboxWithTitle
+            label={`Yes, I agree with the ${codeOfConductLink.title}`}
+            title={
+              <a
+                href={codeOfConductLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Agree with the {codeOfConductLink.title}
+              </a>
+            }
+            checked={agreeCodeConduct}
+            onChange={handleAgreeCodeConduct}
+          />
         </>
       )}
     </div>
