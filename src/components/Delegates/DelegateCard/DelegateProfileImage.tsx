@@ -209,11 +209,13 @@ export function DelegateProfileImageWithMetadata({
                 address={address}
                 copyENSName
               />
-              <CopyableHumanAddress
-                className="text-xs font-medium"
-                address={address}
-                useAddress={true}
-              />
+              {data ? ( // Only show address if ENS name is available and displayed in the above CopyableHumanAddress
+                <CopyableHumanAddress
+                  className="text-xs font-medium"
+                  address={address}
+                  useAddress={true}
+                />
+              ) : null}
             </div>
             {endorsed && hasEndorsedFilter && endorsedToggle && (
               <TooltipProvider delayDuration={0}>
