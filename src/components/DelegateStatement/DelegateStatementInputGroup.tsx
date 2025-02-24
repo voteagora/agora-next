@@ -21,7 +21,7 @@ export default function DelegateStatementInputGroup({
       name={name}
       render={({ field }) => (
         <Label variant="black">
-          <h4 className="font-bold text-xs mb-2">{title}</h4>
+          <h4 className="font-semibold text-xs mb-1 text-secondary">{title}</h4>
           <Input
             variant="bgGray100"
             inputSize="md"

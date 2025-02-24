@@ -53,6 +53,11 @@ export const uniswapTenantUIConfig = new TenantUI({
       title: "Delegate Code of Conduct",
       url: "https://gov.uniswap.org/t/rfc-delegate-code-of-conduct/20913",
     },
+    {
+      name: "dao-principles",
+      title: "Uniswap DAO Principles",
+      url: "https://vote.uniswapfoundation.org/proposals/78#uniswap-dao-principles",
+    },
   ],
 
   governanceStakeholders: [
@@ -213,6 +218,10 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "delegates/code-of-conduct",
+      enabled: true,
+    },
+    {
+      name: "delegates/dao-principles",
       enabled: true,
     },
     {
