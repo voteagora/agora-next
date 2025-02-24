@@ -20,6 +20,7 @@ import { doInSpan } from "@/app/lib/logging";
 import { findVotes } from "@/lib/prismaUtils";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
+import { isAddress, getAddress } from "viem";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -481,10 +482,11 @@ async function getVotesForProposalAndDelegate({
   address: string;
 }) {
   const { namespace, contracts, ui } = Tenant.current();
+  const checkSummedAddress = isAddress(address) ? getAddress(address) : address;
   const votes = await findVotes({
     namespace,
     proposalId,
-    voter: address.toLowerCase(),
+    voter: checkSummedAddress,
   });
 
   const latestBlock = ui.toggle("use-l1-block-number")?.enabled
