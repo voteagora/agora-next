@@ -22,9 +22,6 @@ import { getPublicClient } from "./viem";
 import {
   arbitrum,
   base,
-  baseGoerli,
-  baseSepolia,
-  gnosis,
   goerli,
   mainnet,
   optimism,
