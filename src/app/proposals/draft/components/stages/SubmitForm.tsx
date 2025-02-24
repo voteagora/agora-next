@@ -29,7 +29,7 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const { data: accountVotes } = useGetVotes({
     address: address as `0x${string}`,
     blockNumber: blockNumber ? blockNumber - BigInt(1) : BigInt(0),
-    enabled: !!address && !!blockNumber,
+    enabled: !!address,
   });
 
   const canSponsor = () => {
