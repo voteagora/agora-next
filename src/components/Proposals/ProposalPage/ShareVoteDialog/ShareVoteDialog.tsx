@@ -1,4 +1,4 @@
-import { ArrowDownToLine } from "lucide-react";
+import { ArrowDownToLine, Copy } from "lucide-react";
 import warpcastIcon from "@/icons/warpcast.svg";
 import xIcon from "@/icons/x.svg";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,10 @@ import { ogLogoForShareVote } from "./TenantLogo";
 import { Vote } from "@/app/api/common/votes/vote";
 import { format } from "date-fns";
 import { useLatestBlock } from "@/hooks/useLatestBlock";
+import { useState, useEffect } from "react";
+import { useAccount } from "wagmi";
+import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 
 function generateVoteBars(
   forPercentage: number,
@@ -220,11 +224,25 @@ export function ShareDialog({
   }[];
   votes: Vote[];
 }) {
+  const { address: accountAddress } = useAccount();
   const latestBlock = useLatestBlock({ enabled: true });
   const voteDateToUse = voteDate ?? format(new Date(), "MMM d, yyyy h:mm a");
   const blockNumberToUse =
     blockNumber ?? latestBlock?.data?.number.toString() ?? null;
   const { namespace } = Tenant.current();
+
+  const [isInCopiedState, setIsInCopiedState] = useState<boolean>(false);
+  useEffect(() => {
+    let id: NodeJS.Timeout | number | null = null;
+    if (isInCopiedState) {
+      id = setTimeout(() => {
+        setIsInCopiedState(false);
+      }, 750);
+    }
+    return () => {
+      if (id) clearTimeout(id);
+    };
+  }, [isInCopiedState]);
 
   let text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)} ${supportType === "ABSTAIN" ? "on" : ""} ${proposalTitle} ${proposalLink} \n\n${voteReason}`;
 
@@ -239,6 +257,19 @@ export function ShareDialog({
       .join("\n");
     text = `${supportType === "ABSTAIN" ? "I abstained from voting on" : ""} ${proposalTitle} ${proposalLink} \n\n${paramsString ? `I voted for:\n${paramsString}` : ""}\n\n${voteReason}`;
   }
+
+  const trackShareVote = (
+    type: "X" | "COPY_LINK" | "DOWNLOAD_IMAGE" | "WARPCAST"
+  ) => {
+    trackEvent({
+      event_name: ANALYTICS_EVENT_NAMES.SHARE_VOTE,
+      event_data: {
+        proposal_id: proposal.id,
+        address: accountAddress,
+        type,
+      },
+    });
+  };
 
   return (
     <div className="mt-3 sm:mt-4">
@@ -274,6 +305,7 @@ export function ShareDialog({
                 )}&embeds[]=${proposalLink}`,
                 "_blank"
               );
+              trackShareVote("WARPCAST");
             }}
           >
             <Image
@@ -294,6 +326,7 @@ export function ShareDialog({
                 `https://x.com/intent/post?text=${encodeURIComponent(text)}`,
                 "_blank"
               );
+              trackShareVote("X");
             }}
           >
             <Image
@@ -305,7 +338,6 @@ export function ShareDialog({
             />
             Share on X
           </Button>
-
           <Button
             variant="link"
             className="w-full justify-center gap-2 text-secondary font-semibold text-sm sm:text-base"
@@ -327,10 +359,23 @@ export function ShareDialog({
               } catch (error) {
                 console.error("Error downloading image:", error);
               }
+              trackShareVote("DOWNLOAD_IMAGE");
             }}
           >
-            <ArrowDownToLine className="sm:h-5 sm:w-5" />
+            <ArrowDownToLine className="h-5 w-5" />
             Download and share
+          </Button>
+          <Button
+            variant="link"
+            className="w-full justify-center gap-2 text-secondary font-semibold text-sm sm:text-base"
+            onClick={() => {
+              navigator.clipboard.writeText(proposalLink);
+              setIsInCopiedState(true);
+              trackShareVote("COPY_LINK");
+            }}
+          >
+            <Copy className="h-5 w-5" />
+            {isInCopiedState ? "Copied!" : "Copy link"}
           </Button>
         </div>
       </div>
