@@ -82,11 +82,28 @@ export async function generateMetadata({
     cleanString(proposal.description || ""),
     80
   );
-  const voter = searchParams.voter as string;
-  const newVote = searchParams.newVote as string;
-  const newVoteParsed = newVote
-    ? JSON.parse(decodeURIComponent(newVote))
-    : undefined;
+
+  const voteDataParam = searchParams.v as string;
+
+  let voter, newVoteParsed;
+
+  if (voteDataParam) {
+    try {
+      const voteData = JSON.parse(decodeURIComponent(voteDataParam));
+
+      // Convert the simplified format back to the full format
+      newVoteParsed = {
+        support: voteData.s, // support
+        reason: voteData.r, // reason
+        params: voteData.p || [], // params
+        weight: voteData.w || "0", // weight
+      };
+
+      voter = voteData.a;
+    } catch (e) {
+      console.error("Failed to parse vote data parameter:", e);
+    }
+  }
 
   if (voter) {
     return generateVoterMetadata(

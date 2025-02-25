@@ -155,6 +155,18 @@ const CastVoteContextProvider = ({
     });
 
   const openShareVoteDialog = useEffectEvent(() => {
+    const voteData = {
+      s: newVote?.support,
+      r: newVote?.reason,
+      p: newVote?.params,
+      w: newVote?.weight,
+      a: address,
+    };
+
+    const baseUrl = `${window.location.origin}/proposals/${proposal.id}`;
+
+    const shareableLink = `${baseUrl}?v=${encodeURIComponent(JSON.stringify(voteData))}`;
+
     openDialog({
       className: "sm:w-[32rem]",
       type: "SHARE_VOTE",
@@ -166,9 +178,7 @@ const CastVoteContextProvider = ({
         voteDate: null,
         supportType: support || "ABSTAIN",
         voteReason: reason || "",
-        proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}&newVote=${encodeURIComponent(
-          JSON.stringify(newVote)
-        )}`,
+        proposalLink: shareableLink,
         proposalTitle: proposal.markdowntitle,
         proposalType: proposal.proposalType ?? "STANDARD",
         proposal: proposal,
