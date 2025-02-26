@@ -11,11 +11,11 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import { useReadContract } from "wagmi";
 import { pluralize } from "@/lib/utils";
-import { SECONDS_IN_HOUR } from "@/lib/constants";
+import { SECONDS_IN_HOUR, TENANT_NAMESPACES } from "@/lib/constants";
 import { blocksToSeconds } from "@/lib/blockTimes";
 
 const GovernorSettingsParams = () => {
-  const { contracts } = Tenant.current();
+  const { contracts, namespace } = Tenant.current();
 
   const { data: votingDelay, isFetched: isDelayFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
@@ -35,7 +35,8 @@ const GovernorSettingsParams = () => {
     useReadContract({
       address: contracts.timelock?.address as `0x${string}`,
       abi: contracts.timelock?.abi,
-      functionName: "getMinDelay",
+      functionName:
+        namespace === TENANT_NAMESPACES.UNISWAP ? "delay" : "getMinDelay",
       chainId: contracts.timelock?.chain.id,
     });
 
