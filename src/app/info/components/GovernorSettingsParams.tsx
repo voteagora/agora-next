@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import Tenant from "@/lib/tenant/tenant";
 import { useReadContract } from "wagmi";
-import { pluralize } from "@/lib/utils";
+import { cn, pluralize } from "@/lib/utils";
 import { SECONDS_IN_HOUR, TENANT_NAMESPACES } from "@/lib/constants";
 import { blocksToSeconds } from "@/lib/blockTimes";
 
@@ -69,10 +69,20 @@ const GovernorSettingsParams = () => {
           </TableCell>
         </TableRow>
         <TableRow>
-          <TableCell className="text-base font-semibold text-left text-secondary rounded-bl-xl">
+          <TableCell
+            className={cn(
+              "text-base font-semibold text-left text-secondary",
+              !contracts.timelock && "rounded-bl-xl"
+            )}
+          >
             Voting Period
           </TableCell>
-          <TableCell className="text-base font-semibold text-right text-primary rounded-br-xl">
+          <TableCell
+            className={cn(
+              "text-base font-semibold text-right text-primary",
+              !contracts.timelock && "rounded-br-xl"
+            )}
+          >
             {isPeriodFetched && votingPeriod !== undefined
               ? secondsToHuman(blocksToSeconds(Number(votingPeriod)))
               : "Loading..."}
@@ -80,10 +90,10 @@ const GovernorSettingsParams = () => {
         </TableRow>
         {contracts.timelock && (
           <TableRow>
-            <TableCell className="text-base font-semibold text-left text-secondary">
+            <TableCell className="text-base font-semibold text-left text-secondary rounded-bl-xl">
               Timelock Delay
             </TableCell>
-            <TableCell className="text-base font-semibold text-right text-primary">
+            <TableCell className="text-base font-semibold text-right text-primary rounded-br-xl">
               {isTimeLockDelayFetched && timeLockDelay !== undefined
                 ? secondsToHuman(blocksToSeconds(Number(timeLockDelay)))
                 : "Loading..."}
