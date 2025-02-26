@@ -58,7 +58,7 @@ const GovernorSettingsProposalTypes = ({
     <Table>
       <TableHeader>
         <TableRow className="text-base font-semibold text-left text-secondary bg-wash">
-          <TableHead colSpan={3} className="rounded-tl-xl text-secondary">
+          <TableHead colSpan={3} className="text-secondary">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="flex flex-row space-x-1 items-center">
@@ -72,7 +72,7 @@ const GovernorSettingsProposalTypes = ({
               </Tooltip>
             </TooltipProvider>
           </TableHead>
-          <TableHead colSpan={3} className="rounded-tl-xl text-secondary">
+          <TableHead colSpan={3} className="text-secondary">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="flex flex-row space-x-1 items-center">
@@ -85,10 +85,7 @@ const GovernorSettingsProposalTypes = ({
               </Tooltip>
             </TooltipProvider>
           </TableHead>
-          <TableHead
-            colSpan={4}
-            className={`text-secondary ${isQuorumSupportedByGovernor ? "rounded-none" : "rounded-tr-xl"}`}
-          >
+          <TableHead colSpan={4} className="text-secondary">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="flex flex-row space-x-1 items-center">
@@ -103,7 +100,7 @@ const GovernorSettingsProposalTypes = ({
             </TooltipProvider>
           </TableHead>
           {(isQuorumSupportedByGovernor || proposalTypes.length > 0) && (
-            <TableHead colSpan={4} className="text-secondary rounded-tr-xl">
+            <TableHead colSpan={4} className="text-secondary">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger className="flex flex-row space-x-1 items-center">
@@ -124,13 +121,8 @@ const GovernorSettingsProposalTypes = ({
       <TableBody>
         {isQuorumSupportedByGovernor && (
           <TableRow className="text-base font-semibold text-secondary">
-            <TableCell colSpan={3} className="rounded-bl-xl">
-              Default
-            </TableCell>
-            <TableCell
-              colSpan={4}
-              className={`${isQuorumSupportedByGovernor ? "rounded-none" : "rounded-br-xl"}`}
-            >
+            <TableCell colSpan={3}>Default</TableCell>
+            <TableCell colSpan={4}>
               {isThresholdFetched && threshold !== undefined && (
                 <TokenAmountDecorated
                   amount={BigInt(threshold.toString())}
@@ -140,7 +132,7 @@ const GovernorSettingsProposalTypes = ({
               )}
             </TableCell>
             {isQuorumSupportedByGovernor && (
-              <TableCell colSpan={4} className="rounded-br-xl">
+              <TableCell colSpan={4}>
                 {isQuorumFetched && quorum && (
                   <TokenAmountDecorated
                     amount={BigInt(quorum.toString())}
@@ -157,17 +149,12 @@ const GovernorSettingsProposalTypes = ({
             key={`proposal-type-${proposalType.id}`}
             className="text-base font-semibold text-secondary"
           >
-            <TableCell colSpan={3} className="rounded-bl-xl">
-              {proposalType.name}
-            </TableCell>
+            <TableCell colSpan={3}>{proposalType.name}</TableCell>
 
-            <TableCell
-              colSpan={4}
-              className={`${isQuorumSupportedByGovernor ? "rounded-none" : "rounded-br-xl"}`}
-            >
+            <TableCell colSpan={4}>
               {Number(proposalType.approval_threshold) / 100} %
             </TableCell>
-            <TableCell colSpan={3} className="rounded-bl-xl">
+            <TableCell colSpan={3}>
               {isThresholdFetched && threshold !== undefined && (
                 <TokenAmountDecorated
                   amount={BigInt(threshold.toString())}
@@ -176,7 +163,7 @@ const GovernorSettingsProposalTypes = ({
                 />
               )}
             </TableCell>
-            <TableCell colSpan={4} className="rounded-br-xl">
+            <TableCell colSpan={4}>
               {Number(proposalType.quorum) / 100} %
             </TableCell>
           </TableRow>
