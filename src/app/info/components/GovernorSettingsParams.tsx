@@ -38,10 +38,10 @@ const GovernorSettingsParams = () => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="text-base font-semibold text-left text-secondary bg-wash rounded-tl-xl">
+          <TableHead className="text-base font-semibold text-left text-secondary bg-wash rounded-tl-lg">
             Parameter
           </TableHead>
-          <TableHead className="text-base font-semibold text-secondary text-right bg-wash rounded-tr-xl">
+          <TableHead className="text-base font-semibold text-secondary text-right bg-wash rounded-tr-lg">
             Value
           </TableHead>
         </TableRow>
@@ -58,10 +58,10 @@ const GovernorSettingsParams = () => {
           </TableCell>
         </TableRow>
         <TableRow>
-          <TableCell className="text-base font-semibold text-left text-secondary rounded-bl-xl">
+          <TableCell className="text-base font-semibold text-left text-secondary rounded-bl-lg">
             Voting Period
           </TableCell>
-          <TableCell className="text-base font-semibold text-right text-primary rounded-br-xl">
+          <TableCell className="text-base font-semibold text-right text-primary rounded-br-lg">
             {isPeriodFetched && votingPeriod !== undefined
               ? secondsToHuman(blocksToSeconds(Number(votingPeriod)))
               : "Loading..."}

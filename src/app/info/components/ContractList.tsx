@@ -32,7 +32,7 @@ const ContractList = () => {
         <TableRow>
           <TableHead
             colSpan={4}
-            className="font-semibold text-secondary bg-wash rounded-t-xl"
+            className="font-semibold text-secondary bg-wash rounded-t-lg"
           >
             Contracts
           </TableHead>
@@ -43,7 +43,7 @@ const ContractList = () => {
           <TableRow key={index}>
             <TableCell
               className={`pr-1 font-semibold text-secondary ${
-                index === list.length - 1 && "rounded-bl-xl"
+                index === list.length - 1 && "rounded-bl-lg"
               }`}
             >
               {contract.title}
@@ -52,7 +52,7 @@ const ContractList = () => {
               {contract.address}
             </TableCell>
             <TableCell
-              className={`px-1 ${index === list.length - 1 && "rounded-br-xl"}`}
+              className={`px-1 ${index === list.length - 1 && "rounded-br-lg"}`}
             >
               <Link
                 href={getBlockScanAddress(contract.address)}
