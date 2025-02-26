@@ -10,24 +10,35 @@ import {
 } from "@/components/ui/table";
 import Tenant from "@/lib/tenant/tenant";
 import { useReadContract } from "wagmi";
-import { pluralize } from "@/lib/utils";
-import { SECONDS_IN_HOUR } from "@/lib/constants";
+import { cn, pluralize } from "@/lib/utils";
+import { SECONDS_IN_HOUR, TENANT_NAMESPACES } from "@/lib/constants";
 import { blocksToSeconds } from "@/lib/blockTimes";
 
 const GovernorSettingsParams = () => {
-  const { contracts } = Tenant.current();
+  const { contracts, namespace } = Tenant.current();
 
   const { data: votingDelay, isFetched: isDelayFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "votingDelay",
+    chainId: contracts.governor.chain.id,
   });
 
   const { data: votingPeriod, isFetched: isPeriodFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "votingPeriod",
+    chainId: contracts.governor.chain.id,
   });
+
+  const { data: timeLockDelay, isFetched: isTimeLockDelayFetched } =
+    useReadContract({
+      address: contracts.timelock?.address as `0x${string}`,
+      abi: contracts.timelock?.abi,
+      functionName:
+        namespace === TENANT_NAMESPACES.UNISWAP ? "delay" : "getMinDelay",
+      chainId: contracts.timelock?.chain.id,
+    });
 
   const secondsToHuman = (seconds: number) => {
     const hrs = Math.round(Number(seconds) / SECONDS_IN_HOUR);
@@ -58,15 +69,37 @@ const GovernorSettingsParams = () => {
           </TableCell>
         </TableRow>
         <TableRow>
-          <TableCell className="text-base font-semibold text-left text-secondary rounded-bl-xl">
+          <TableCell
+            className={cn(
+              "text-base font-semibold text-left text-secondary",
+              !contracts.timelock && "rounded-bl-xl"
+            )}
+          >
             Voting Period
           </TableCell>
-          <TableCell className="text-base font-semibold text-right text-primary rounded-br-xl">
+          <TableCell
+            className={cn(
+              "text-base font-semibold text-right text-primary",
+              !contracts.timelock && "rounded-br-xl"
+            )}
+          >
             {isPeriodFetched && votingPeriod !== undefined
               ? secondsToHuman(blocksToSeconds(Number(votingPeriod)))
               : "Loading..."}
           </TableCell>
         </TableRow>
+        {contracts.timelock && (
+          <TableRow>
+            <TableCell className="text-base font-semibold text-left text-secondary rounded-bl-xl">
+              Timelock Delay
+            </TableCell>
+            <TableCell className="text-base font-semibold text-right text-primary rounded-br-xl">
+              {isTimeLockDelayFetched && timeLockDelay !== undefined
+                ? secondsToHuman(blocksToSeconds(Number(timeLockDelay)))
+                : "Loading..."}
+            </TableCell>
+          </TableRow>
+        )}
       </TableBody>
     </Table>
   );
