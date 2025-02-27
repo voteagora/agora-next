@@ -105,14 +105,10 @@ export async function middleware(request: NextRequest) {
     return setCorsHeaders(request, NextResponse.next());
   }
 
-  if (path.startsWith("/api/images/og")) {
-    return setCorsHeaders(request, NextResponse.next());
-  }
-
   // For non-API routes, just call next() without setting CORS headers
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/api/v1/:path*", "/api/images/og/:path*"],
+  matcher: ["/", "/api/v1/:path*"],
 };

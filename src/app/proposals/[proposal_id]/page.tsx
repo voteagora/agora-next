@@ -108,13 +108,14 @@ export async function generateMetadata({
   }
 
   if (voter) {
-    return generateVoterMetadata(
+    const awaitedMetadata = await generateVoterMetadata(
       proposal,
       voter,
       title,
       description,
       newVoteParsed
     );
+    return awaitedMetadata;
   }
 
   const preview = `/api/images/og/generic?title=${encodeURIComponent(

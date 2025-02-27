@@ -198,7 +198,7 @@ export function ApprovalCastVoteDialog({
       s: newVote?.support,
       r: newVote?.reason,
       p: newVote?.params,
-      w: newVote?.weight,
+      w: newVote?.weight || null,
       a: address,
     };
 
