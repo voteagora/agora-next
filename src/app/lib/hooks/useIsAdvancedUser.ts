@@ -86,10 +86,11 @@ const useIsAdvancedUser = () => {
   const isAdvancedUser = useMemo(() => {
     if (!isBalanceFetched) return false;
     if (!address) return false;
+    if (!balance) return false;
     const allowedBalance = parseUnits("100000", 18);
     return isProd
-      ? (balance || BigInt(0)) >= allowedBalance || allowList.includes(address)
-      : allowList.includes(address);
+      ? allowList.includes(address)
+      : balance >= allowedBalance || allowList.includes(address);
   }, [address, balance, isBalanceFetched, isProd]);
 
   return { isAdvancedUser };
