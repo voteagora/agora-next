@@ -19,18 +19,23 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { QuestionMarkCircleIcon } from "@heroicons/react/20/solid";
+import { AlertTriangle } from "lucide-react";
 
 export const QuorumTooltip = () => {
   return (
     <TooltipProvider delayDuration={300}>
       <Tooltip>
         <TooltipTrigger className="ml-1">
-          <QuestionMarkCircleIcon className="h-4 w-4 text-yellow-500" />
+          <AlertTriangle className="h-4 w-4 text-negative" />
         </TooltipTrigger>
-        <TooltipContent className="text-secondary text-sm max-w-xs">
-          Due to a governor upgrade on Jan 08, 2024, this quorum value is no
-          longer valid. The onchain state of the proposal is unaffected
+        <TooltipContent className="text-primary text-xs max-w-xs font-semibold">
+          <div className="flex flex-col gap-1">
+            <AlertTriangle className="h-5 w-5 text-negative" />
+            <span>
+              Due to a governor upgrade on Jan 08, 2024, this quorum value is no
+              longer valid. The onchain state of the proposal is unaffected
+            </span>
+          </div>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
