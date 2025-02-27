@@ -111,11 +111,12 @@ const CastVoteContextProvider = ({
     enabled: isGasRelayEnabled,
     address: gasRelayConfig?.sponsorAddress,
   });
-  // Gas relay is only LIVE when it is enabled in the settings and the sponsor meets minimum eth requirements
+  // Gas relay is only LIVE when it is enabled in the settings and the sponsor meets minimum eth requirements and the user has enough VP
   const isGasRelayLive =
     isGasRelayEnabled &&
     Number(formatEther(sponsorBalance || 0n)) >=
       Number(gasRelayConfig.minBalance) &&
+    Number(votingPower.totalVP) > Number(gasRelayConfig?.minVPToUseGasRelay) &&
     !reason &&
     !fallbackToStandardVote;
 
