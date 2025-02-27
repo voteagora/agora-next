@@ -14,6 +14,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { calculateVoteMetadata } from "@/lib/voteUtils";
 import React from "react";
 
+export const dynamic = "force-dynamic";
+
 // Share my vote metadata
 async function generateVoterMetadata(
   proposal: Proposal,
