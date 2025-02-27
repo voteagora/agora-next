@@ -92,7 +92,7 @@ export const PartialDelegationEntry = ({
               }
             }}
             type="text"
-            inputMode="numeric"
+            inputMode="decimal"
           />
           <div className="flex items-center pr-2 pl-1 w-[100px]">
             <p className="text-secondary text-sm">{token.symbol}</p>
