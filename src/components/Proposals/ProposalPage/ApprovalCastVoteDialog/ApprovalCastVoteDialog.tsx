@@ -194,18 +194,6 @@ export function ApprovalCastVoteDialog({
     });
 
   const openShareVoteDialog = () => {
-    const voteData = {
-      s: newVote?.support,
-      r: newVote?.reason,
-      p: newVote?.params,
-      w: newVote?.weight || null,
-      a: address,
-    };
-
-    const baseUrl = `${window.location.origin}/proposals/${proposal.id}`;
-
-    const shareableLink = `${baseUrl}?v=${encodeURIComponent(JSON.stringify(voteData))}`;
-
     openDialog({
       className: "sm:w-[32rem]",
       type: "SHARE_VOTE",
@@ -217,7 +205,9 @@ export function ApprovalCastVoteDialog({
         voteDate: null,
         supportType: abstain ? "ABSTAIN" : "FOR",
         voteReason: reason || "",
-        proposalLink: shareableLink,
+        proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}&newVote=${encodeURIComponent(
+          JSON.stringify(newVote)
+        )}`,
         proposalTitle: proposal.markdowntitle,
         proposalType: proposal.proposalType ?? "STANDARD",
         proposal: proposal,
