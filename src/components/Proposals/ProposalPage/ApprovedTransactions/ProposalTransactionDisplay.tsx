@@ -864,6 +864,7 @@ function getFunctionSignature(decodedData: any): string | null {
     );
     signature += paramTypes.join(",");
     signature += ")";
+
     return signature;
   } catch (error) {
     return null;
