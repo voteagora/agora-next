@@ -27,7 +27,7 @@ import { Block } from "ethers";
 import { useLatestBlock } from "@/hooks/useLatestBlock";
 import { useEffect, useState } from "react";
 import { ChartSkeleton } from "@/components/Proposals/ProposalPage/ProposalChart/ProposalChart";
-
+import { isProposalCreatedBeforeUpgradeCheck } from "@/lib/proposalUtils";
 const { token, namespace, ui } = Tenant.current();
 
 interface Props {
@@ -46,6 +46,9 @@ type ChartData = {
 export const TimelineChart = ({ votes, proposal }: Props) => {
   const { data: block } = useLatestBlock({ enabled: true });
   const [chartData, setChartData] = useState<ChartData[] | null>(null);
+
+  const isProposalCreatedBeforeUpgrade =
+    isProposalCreatedBeforeUpgradeCheck(proposal);
 
   let stackIds: { [key: string]: string } = {
     for: "1",
@@ -144,7 +147,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
               },
             ]}
           />
-          {!!proposal.quorum && (
+          {!!proposal.quorum && !isProposalCreatedBeforeUpgrade && (
             <ReferenceLine
               y={+proposal.quorum.toString()}
               strokeWidth={1}
@@ -160,7 +163,11 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
           )}
 
           <Tooltip
-            content={<CustomTooltip quorum={proposal.quorum} />}
+            content={
+              <CustomTooltip
+                quorum={isProposalCreatedBeforeUpgrade ? null : proposal.quorum}
+              />
+            }
             cursor={{ stroke: "#666", strokeWidth: 1, strokeDasharray: "4 4" }}
           />
           <Area
