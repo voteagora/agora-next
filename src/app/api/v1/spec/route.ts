@@ -6,6 +6,7 @@ import yaml from "yaml";
 
 import fs from "fs";
 import path from "path";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 function getBaseUrl(request: NextRequest): string {
   const host = request.headers.get("host") || "localhost:3000";
@@ -16,7 +17,7 @@ function getBaseUrl(request: NextRequest): string {
 export async function GET(request: NextRequest) {
   try {
     const tenant = Tenant.current();
-    const specFile = tenant.namespace === "optimism" ? "oas_v1.yaml" : "api_v1.yaml";
+    const specFile = tenant.namespace === TENANT_NAMESPACES.OPTIMISM ? "oas_v1.yaml" : "api_v1.yaml";
     const fp = path.join(process.cwd(), "spec", specFile);
     const data = fs.readFileSync(fp, "utf8");
 
