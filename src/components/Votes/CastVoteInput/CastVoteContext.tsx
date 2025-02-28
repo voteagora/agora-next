@@ -166,7 +166,7 @@ const CastVoteContextProvider = ({
         voteDate: null,
         supportType: support || "ABSTAIN",
         voteReason: reason || "",
-        proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}&newVote=${encodeURIComponent(
+        proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}newVote=${encodeURIComponent(
           JSON.stringify(newVote)
         )}`,
         proposalTitle: proposal.markdowntitle,

@@ -85,8 +85,14 @@ export async function generateMetadata({
     80
   );
 
-  const voter = searchParams.voter as string;
-  const newVote = searchParams.newVote as string;
+  const voterSearchParams = searchParams.voter as string;
+
+  const voter = voterSearchParams
+    ? voterSearchParams?.split("newVote=")[0]
+    : null;
+  const newVote = voterSearchParams
+    ? voterSearchParams?.split("newVote=")[1]
+    : null;
   const newVoteParsed = newVote
     ? JSON.parse(decodeURIComponent(newVote))
     : undefined;
