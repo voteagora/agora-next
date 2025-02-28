@@ -496,6 +496,10 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         </svg>
       );
     case TENANT_NAMESPACES.PGUILD:
-      return PGuildLogo;
+      return (
+        <div>
+          <PGuildLogo />
+        </div>
+      );
   }
 };
