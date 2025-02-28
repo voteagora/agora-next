@@ -20,7 +20,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { QuestionMarkCircleIcon } from "@heroicons/react/20/solid";
-import { formatNumber } from "@/lib/tokenUtils";
+import { cn } from "@/lib/utils";
 
 const GovernorSettingsProposalTypes = ({
   proposalTypes,
@@ -54,11 +54,13 @@ const GovernorSettingsProposalTypes = ({
     functionName: "proposalThreshold",
   }) as { data: bigint | undefined; isFetched: boolean };
 
+  const showQuorum = isQuorumSupportedByGovernor || proposalTypes.length > 0;
+
   return (
     <Table>
       <TableHeader>
         <TableRow className="text-base font-semibold text-left text-secondary bg-wash">
-          <TableHead colSpan={3} className="rounded-tl-xl text-secondary">
+          <TableHead colSpan={3} className="text-secondary rounded-tl-lg">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="flex flex-row space-x-1 items-center">
@@ -72,7 +74,7 @@ const GovernorSettingsProposalTypes = ({
               </Tooltip>
             </TooltipProvider>
           </TableHead>
-          <TableHead colSpan={3} className="rounded-tl-xl text-secondary">
+          <TableHead colSpan={3} className="text-secondary">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="flex flex-row space-x-1 items-center">
@@ -87,7 +89,7 @@ const GovernorSettingsProposalTypes = ({
           </TableHead>
           <TableHead
             colSpan={4}
-            className={`text-secondary ${isQuorumSupportedByGovernor ? "rounded-none" : "rounded-tr-xl"}`}
+            className={cn("text-secondary", showQuorum ? "" : "rounded-tr-lg")}
           >
             <TooltipProvider>
               <Tooltip>
@@ -102,8 +104,8 @@ const GovernorSettingsProposalTypes = ({
               </Tooltip>
             </TooltipProvider>
           </TableHead>
-          {(isQuorumSupportedByGovernor || proposalTypes.length > 0) && (
-            <TableHead colSpan={4} className="text-secondary rounded-tr-xl">
+          {showQuorum && (
+            <TableHead colSpan={4} className="text-secondary rounded-tr-lg">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger className="flex flex-row space-x-1 items-center">
@@ -124,13 +126,13 @@ const GovernorSettingsProposalTypes = ({
       <TableBody>
         {isQuorumSupportedByGovernor && (
           <TableRow className="text-base font-semibold text-secondary">
-            <TableCell colSpan={3} className="rounded-bl-xl">
+            <TableCell
+              className={cn(!proposalTypes?.length && "rounded-bl-lg")}
+              colSpan={3}
+            >
               Default
             </TableCell>
-            <TableCell
-              colSpan={4}
-              className={`${isQuorumSupportedByGovernor ? "rounded-none" : "rounded-br-xl"}`}
-            >
+            <TableCell colSpan={4}>
               {isThresholdFetched && threshold !== undefined && (
                 <TokenAmountDecorated
                   amount={BigInt(threshold.toString())}
@@ -139,35 +141,35 @@ const GovernorSettingsProposalTypes = ({
                 />
               )}
             </TableCell>
-            {isQuorumSupportedByGovernor && (
-              <TableCell colSpan={4} className="rounded-br-xl">
-                {isQuorumFetched && quorum && (
-                  <TokenAmountDecorated
-                    amount={BigInt(quorum.toString())}
-                    currency={token.symbol}
-                    decimals={token.decimals}
-                  />
-                )}
-              </TableCell>
-            )}
+            <TableCell
+              className={cn(!proposalTypes?.length && "rounded-br-lg")}
+              colSpan={4}
+            >
+              {isQuorumFetched && quorum && (
+                <TokenAmountDecorated
+                  amount={BigInt(quorum.toString())}
+                  currency={token.symbol}
+                  decimals={token.decimals}
+                />
+              )}
+            </TableCell>
           </TableRow>
         )}
-        {proposalTypes.map((proposalType) => (
+        {proposalTypes.map((proposalType, i) => (
           <TableRow
             key={`proposal-type-${proposalType.id}`}
             className="text-base font-semibold text-secondary"
           >
-            <TableCell colSpan={3} className="rounded-bl-xl">
+            <TableCell
+              className={cn(i === proposalTypes.length - 1 && "rounded-bl-lg")}
+              colSpan={3}
+            >
               {proposalType.name}
             </TableCell>
-
-            <TableCell
-              colSpan={4}
-              className={`${isQuorumSupportedByGovernor ? "rounded-none" : "rounded-br-xl"}`}
-            >
+            <TableCell colSpan={4}>
               {Number(proposalType.approval_threshold) / 100} %
             </TableCell>
-            <TableCell colSpan={3} className="rounded-bl-xl">
+            <TableCell colSpan={3}>
               {isThresholdFetched && threshold !== undefined && (
                 <TokenAmountDecorated
                   amount={BigInt(threshold.toString())}
@@ -176,7 +178,10 @@ const GovernorSettingsProposalTypes = ({
                 />
               )}
             </TableCell>
-            <TableCell colSpan={4} className="rounded-br-xl">
+            <TableCell
+              className={cn(i === proposalTypes.length - 1 && "rounded-br-lg")}
+              colSpan={4}
+            >
               {Number(proposalType.quorum) / 100} %
             </TableCell>
           </TableRow>
