@@ -31,7 +31,7 @@ async function generateVoterMetadata(
   const votableSupply = await fetchVotableSupplyUnstableCache();
   const latestBlock = await contracts.token.provider.getBlock("latest");
   const voteDateToUse = newVote?.timestamp
-    ? format(new Date(newVote.timestamp), "MMM d, yyyy h:mm a")
+    ? format(new Date(Number(newVote.timestamp)), "MMM d, yyyy h:mm a")
     : null;
 
   const {
@@ -94,7 +94,9 @@ export async function generateMetadata({
   const timestamp = searchParams.timestamp as string;
 
   if (support) {
-    const voteParamsParsed = JSON.parse(decodeURIComponent(voteParams));
+    const voteParamsParsed = voteParams
+      ? JSON.parse(decodeURIComponent(voteParams))
+      : undefined;
     const newVote = {
       support,
       reason,
