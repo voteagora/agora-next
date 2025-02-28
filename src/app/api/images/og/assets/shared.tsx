@@ -497,9 +497,9 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
     case TENANT_NAMESPACES.PGUILD:
       return (
         <svg
-          width="100"
-          height="51"
-          viewBox="0 0 100 51"
+          width="63"
+          height="32"
+          viewBox="0 0 63 32"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           xmlnsXlink="http://www.w3.org/1999/xlink"
