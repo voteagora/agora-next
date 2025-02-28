@@ -86,15 +86,28 @@ export async function generateMetadata({
     80
   );
 
-  const vote = searchParams.vote as string;
+  const support = searchParams.support as string;
+  const reason = searchParams.reason as string;
+  const weight = searchParams.weight as string;
+  const voteParams = searchParams.params as string;
+  const blockNumber = searchParams.blockNumber as string;
+  const timestamp = searchParams.timestamp as string;
 
-  if (vote) {
-    const newVoteParsed = JSON.parse(decodeURIComponent(vote));
+  if (support) {
+    const voteParamsParsed = JSON.parse(decodeURIComponent(voteParams));
+    const newVote = {
+      support,
+      reason,
+      weight,
+      params: voteParamsParsed,
+      blockNumber: blockNumber as any,
+      timestamp: timestamp as any,
+    };
     const awaitedMetadata = await generateVoterMetadata(
       proposal,
       title,
       description,
-      newVoteParsed
+      newVote
     );
     return awaitedMetadata;
   }

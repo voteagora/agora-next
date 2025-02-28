@@ -239,12 +239,10 @@ export function ShareDialog({
     blockNumber ?? latestBlock?.data?.number.toString() ?? null;
   const { namespace } = Tenant.current();
 
-  const proposalLink = `${window.location.origin}/proposals/${proposalId}?vote=${encodeURIComponent(
-    JSON.stringify({
-      ...newVote,
-      blockNumber: blockNumberToUse,
-      timestamp: timestampToUse,
-    })
+  const proposalLink = `${window.location.origin}/proposals/${proposalId}?support=${newVote.support}&reason=${encodeURIComponent(
+    newVote.reason
+  )}&weight=${newVote.weight}&blockNumber=${blockNumberToUse}&timestamp=${timestampToUse}&params=${encodeURIComponent(
+    JSON.stringify(newVote.params)
   )}`;
 
   const [isInCopiedState, setIsInCopiedState] = useState<boolean>(false);
