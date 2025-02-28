@@ -1,7 +1,7 @@
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { TenantNamespace } from "@/lib/types";
-import PGuildLogo from '@/assets/tenant/pguild_logo.svg';
+import PGuildLogo from "@/assets/tenant/pguild_logo.svg";
 
 export const LogoPill = () => {
   const { namespace } = Tenant.current();
@@ -496,6 +496,6 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         </svg>
       );
     case TENANT_NAMESPACES.PGUILD:
-      return <PGuildLogo />;
+      return PGuildLogo;
   }
 };
