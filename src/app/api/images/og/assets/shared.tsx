@@ -1,6 +1,7 @@
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { TenantNamespace } from "@/lib/types";
+import PGuildLogo from '@/assets/tenant/pguild_logo.svg';
 
 export const LogoPill = () => {
   const { namespace } = Tenant.current();
@@ -9,7 +10,7 @@ export const LogoPill = () => {
     <div tw="flex">
       <div tw="flex flex-row items-center border border-gray-300 rounded-full px-[26px] py-[14px]">
         <svg
-          style={{ width: "30px", height: "30px" }}
+          style={{ width: "32px", height: "32px" }}
           viewBox="0 0 16 16"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -494,5 +495,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
           </defs>
         </svg>
       );
+    case TENANT_NAMESPACES.PGUILD:
+      return <PGuildLogo />;
   }
 };
