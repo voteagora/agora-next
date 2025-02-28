@@ -81,7 +81,12 @@ const decodeHex = (data: BytesLike): Uint8Array => {
     data = data.substring(2);
   }
   if (typeof data === "string" && !/^([0-9a-fA-F]{2})*$/.test(data)) {
-    throw new Error("invalid hex input");
+    console.error(
+      "Invalid hex input:",
+      typeof data === "string" ? data.substring(0, 50) + "..." : String(data)
+    );
+    // Return empty array instead of throwing to prevent crashes
+    return new Uint8Array(0);
   }
   const result = new Uint8Array(typeof data === "string" ? data.length / 2 : 0);
   if (typeof data === "string") {
@@ -511,14 +516,29 @@ const inferTypes = (
 };
 
 export const guessAbiEncodedData = (bytes: BytesLike): ParamType[] | null => {
-  const data = decodeHex(bytes);
-  const params = decodeWellFormedTuple(0, data, 0, [], data.length, null, null);
-  if (!params) return null;
   try {
-    const decoded = AbiCoder.defaultAbiCoder().decode(params, data);
-    return inferTypes(params, decoded);
-  } catch (e) {
-    return params;
+    const data = decodeHex(bytes);
+    if (data.length === 0) return null;
+
+    const params = decodeWellFormedTuple(
+      0,
+      data,
+      0,
+      [],
+      data.length,
+      null,
+      null
+    );
+    if (!params) return null;
+
+    try {
+      const decoded = AbiCoder.defaultAbiCoder().decode(params, data);
+      return inferTypes(params, decoded);
+    } catch (e) {
+      return params;
+    }
+  } catch (error) {
+    return null;
   }
 };
 
@@ -1087,97 +1107,112 @@ async function decodeEnhanced(
     }
     try {
       if (functionSignature) {
-        const decoded = decodeArgsWithSignature(
-          functionSignature,
-          ethers.getBytes(calldata).slice(4)
-        );
-        if (decoded) {
-          formattedOutput.function = decoded.functionFragment.name;
-          formattedOutput.usedMethod = "signature_fallback";
-          for (let index = 0; index < decoded.values.length; index++) {
-            const value = decoded.values[index];
-            const paramName =
-              decoded.functionFragment.inputs[index].name ||
-              `${decoded.functionFragment.inputs[index].type} ${index}`;
-            const paramType = decoded.functionFragment.inputs[index].type;
-            if (paramType.startsWith("tuple")) {
-              formattedOutput.parameters[paramName] = {
-                type: paramType,
-                components: formatSignatureDecodedValue(
-                  value.value,
-                  decoded.functionFragment.inputs[index]
-                ),
-              };
-            } else if (paramType === "bytes" && value.value) {
-              formattedOutput.parameters[paramName] = {
-                type: paramType,
-                value: value.value,
-              };
-              const bytesValue = value.value;
-              if (bytesValue && bytesValue.length >= 10) {
-                const nestedFunction = await cachedDecodeNestedCall(bytesValue);
-                if (nestedFunction) {
-                  formattedOutput.parameters[paramName].nestedFunction =
-                    nestedFunction;
+        try {
+          const decoded = decodeArgsWithSignature(
+            functionSignature,
+            ethers.getBytes(calldata).slice(4)
+          );
+          if (decoded) {
+            formattedOutput.function = decoded.functionFragment.name;
+            formattedOutput.usedMethod = "signature_fallback";
+            for (let index = 0; index < decoded.values.length; index++) {
+              const value = decoded.values[index];
+              const paramName =
+                decoded.functionFragment.inputs[index].name ||
+                `${decoded.functionFragment.inputs[index].type} ${index}`;
+              const paramType = decoded.functionFragment.inputs[index].type;
+              if (paramType.startsWith("tuple")) {
+                formattedOutput.parameters[paramName] = {
+                  type: paramType,
+                  components: formatSignatureDecodedValue(
+                    value.value,
+                    decoded.functionFragment.inputs[index]
+                  ),
+                };
+              } else if (paramType === "bytes" && value.value) {
+                formattedOutput.parameters[paramName] = {
+                  type: paramType,
+                  value: value.value,
+                };
+                const bytesValue = value.value;
+                if (bytesValue && bytesValue.length >= 10) {
+                  const nestedFunction =
+                    await cachedDecodeNestedCall(bytesValue);
+                  if (nestedFunction) {
+                    formattedOutput.parameters[paramName].nestedFunction =
+                      nestedFunction;
+                  }
                 }
-              }
-            } else {
-              formattedOutput.parameters[paramName] = {
-                type: paramType,
-                value:
-                  typeof value.value === "bigint"
-                    ? value.value.toString()
-                    : value.value,
-              };
-            }
-          }
-          return formattedOutput;
-        }
-      }
-      const guessedFragment = guessFragment(calldata);
-      if (guessedFragment) {
-        formattedOutput.function = guessedFragment.name;
-        formattedOutput.usedMethod = "guessed";
-        const abiCoder = new ethers.AbiCoder();
-        const decodedParams = abiCoder.decode(
-          guessedFragment.inputs,
-          ethers.getBytes(calldata).slice(4)
-        );
-        for (let i = 0; i < guessedFragment.inputs.length; i++) {
-          const input = guessedFragment.inputs[i];
-          const paramName = `${input.type} ${i}`;
-          const paramValue = decodedParams[i];
-          if (input.type.startsWith("tuple")) {
-            formattedOutput.parameters[paramName] = {
-              type: input.type,
-              components: {},
-            };
-          } else if (input.type === "bytes" && paramValue) {
-            formattedOutput.parameters[paramName] = {
-              type: input.type,
-              value: paramValue,
-            };
-            if (typeof paramValue === "string" && paramValue.length >= 10) {
-              const nestedFunction = await cachedDecodeNestedCall(paramValue);
-              if (nestedFunction) {
-                formattedOutput.parameters[paramName].nestedFunction =
-                  nestedFunction;
+              } else {
+                formattedOutput.parameters[paramName] = {
+                  type: paramType,
+                  value:
+                    typeof value.value === "bigint"
+                      ? value.value.toString()
+                      : value.value,
+                };
               }
             }
-          } else {
-            formattedOutput.parameters[paramName] = {
-              type: input.type,
-              value:
-                typeof paramValue === "bigint"
-                  ? paramValue.toString()
-                  : paramValue,
-            };
+            return formattedOutput;
+          }
+        } catch (signatureError) {
+          console.warn("Error in signature-based decoding:", signatureError);
+        }
+      }
+
+      try {
+        const guessedFragment = guessFragment(calldata);
+        if (guessedFragment) {
+          formattedOutput.function = guessedFragment.name;
+          formattedOutput.usedMethod = "guessed";
+          try {
+            const abiCoder = new ethers.AbiCoder();
+            const decodedParams = abiCoder.decode(
+              guessedFragment.inputs,
+              ethers.getBytes(calldata).slice(4)
+            );
+            for (let i = 0; i < guessedFragment.inputs.length; i++) {
+              const input = guessedFragment.inputs[i];
+              const paramName = `${input.type} ${i}`;
+              const paramValue = decodedParams[i];
+              if (input.type.startsWith("tuple")) {
+                formattedOutput.parameters[paramName] = {
+                  type: input.type,
+                  components: {},
+                };
+              } else if (input.type === "bytes" && paramValue) {
+                formattedOutput.parameters[paramName] = {
+                  type: input.type,
+                  value: paramValue,
+                };
+                if (typeof paramValue === "string" && paramValue.length >= 10) {
+                  const nestedFunction =
+                    await cachedDecodeNestedCall(paramValue);
+                  if (nestedFunction) {
+                    formattedOutput.parameters[paramName].nestedFunction =
+                      nestedFunction;
+                  }
+                }
+              } else {
+                formattedOutput.parameters[paramName] = {
+                  type: input.type,
+                  value:
+                    typeof paramValue === "bigint"
+                      ? paramValue.toString()
+                      : paramValue,
+                };
+              }
+            }
+            return formattedOutput;
+          } catch (decodeError) {
+            console.warn("Error decoding guessed fragment:", decodeError);
           }
         }
-        return formattedOutput;
+      } catch (guessError) {
+        console.warn("Error guessing fragment:", guessError);
       }
-    } catch (guessError) {
-      console.error("Error in fallback/guessing methods:", guessError);
+    } catch (fallbackError) {
+      console.error("Error in fallback/guessing methods:", fallbackError);
     }
     formattedOutput.usedMethod = "failed";
     return formattedOutput;

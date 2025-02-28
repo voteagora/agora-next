@@ -15,6 +15,9 @@ import {
 } from "@/components/ui/tooltip";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { useTransactionDecoding } from "@/hooks/useTransactionDecoding";
+import ENSName from "@/components/shared/ENSName";
+import Tenant from "@/lib/tenant/tenant";
+import { formatNumber } from "@/lib/tokenUtils";
 
 const ProposalTransactionDisplay = ({
   targets,
@@ -218,6 +221,8 @@ const ActionSummary = ({
   isLoading: boolean;
   error: string | null;
 }) => {
+  const { token, contracts } = Tenant.current();
+  const targetIsToken = contracts.token.address === target;
   if (isLoading) {
     return (
       <div className="flex flex-col gap-y-2 font-semibold text-primary text-base">
@@ -271,11 +276,16 @@ const ActionSummary = ({
       decodedData?.parameters?.value?.value ||
       decodedData?.parameters?.rawAmount?.value ||
       decodedData?.parameters?.amount?.value ||
+      (Object.values(decodedData?.parameters || {})?.[1] as any)?.value ||
       value;
     return (
       <div className="flex justify-between items-center font-semibold text-primary text-base">
         <div>Transfer</div>
-        <div className="text-xs">{safelyFormatEther(valueToUse)}</div>
+        <div className="text-xs">
+          {targetIsToken
+            ? `${formatNumber(valueToUse, 2)} ${token.symbol}`
+            : safelyFormatEther(valueToUse)}
+        </div>
       </div>
     );
   }
@@ -326,6 +336,8 @@ const ActionDetails = ({
   isLoading: boolean;
   error: string | null;
 }) => {
+  const { contracts, token } = Tenant.current();
+  const targetIsToken = contracts.token.address === target;
   if (isLoading) {
     return (
       <div className="text-primary text-xs font-semibold">
@@ -378,6 +390,7 @@ const ActionDetails = ({
       decodedData?.parameters?.value?.value ||
       decodedData?.parameters?.rawAmount?.value ||
       decodedData?.parameters?.amount?.value ||
+      (Object.values(decodedData?.parameters || {})?.[1] as any)?.value ||
       value;
     const amount = safelyFormatEther(valueToUse);
     const note = decodedData?.parameters?.note?.value || "";
@@ -398,7 +411,10 @@ const ActionDetails = ({
       <div className="text-base text-primary font-semibold">
         <div className="flex flex-col gap-y-2">
           <span>Transfer:</span>
-          <span className="text-xs">{amount}</span>
+          <span className="text-xs">
+            {targetIsToken ? formatNumber(amount, 2) : amount}{" "}
+            {targetIsToken ? token.symbol : ""}
+          </span>
 
           <span>To:</span>
           <div className="text-xs">
@@ -411,7 +427,7 @@ const ActionDetails = ({
                 target="_blank"
                 rel="noreferrer noopener"
               >
-                {recipient}
+                <ENSName address={recipient} truncate={false} />
               </a>
             )}
           </div>
