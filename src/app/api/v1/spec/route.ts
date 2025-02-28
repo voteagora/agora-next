@@ -1,18 +1,48 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import Tenant from "@/lib/tenant/tenant";
+import yaml from "yaml";
 
 import fs from "fs";
 import path from "path";
 
+function getBaseUrl(request: NextRequest): string {
+  const host = request.headers.get("host") || "localhost:3000";
+  const proto = request.headers.get("x-forwarded-proto") || "http";
+  return `${proto}://${host}`;
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const fp = path.join(process.cwd(), "spec/oas_v1.yaml");
+    const tenant = Tenant.current();
+    const specFile = tenant.namespace === "optimism" ? "oas_v1.yaml" : "api_v1.yaml";
+    const fp = path.join(process.cwd(), "spec", specFile);
     const data = fs.readFileSync(fp, "utf8");
-    // set headers
+
+    // If using the new API spec, inject the base URL
+    if (specFile === "api_v1.yaml") {
+      const baseUrl = getBaseUrl(request);
+      const spec = yaml.parse(data);
+      
+      // Inject the server URL
+      spec.servers = [{ url: baseUrl }];
+      
+      // Convert back to YAML
+      const modifiedData = yaml.stringify(spec);
+      
+      // set headers and return
+      const headers = new Headers();
+      headers.set("Content-Type", "application/x-yaml");
+      return new Response(modifiedData, {
+        headers,
+        status: 200,
+      });
+    }
+
+    // For the original spec, return as is
     const headers = new Headers();
     headers.set("Content-Type", "application/x-yaml");
-
     return new Response(data, {
       headers,
       status: 200,
