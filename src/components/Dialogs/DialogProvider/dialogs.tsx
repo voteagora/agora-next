@@ -168,10 +168,16 @@ export type ShareVoteDialogType = {
     voteDate: string | null;
     supportType: SupportTextProps["supportType"];
     voteReason: string;
-    proposalLink: string;
+    proposalId: string;
     proposalTitle: string;
     proposalType: "OPTIMISTIC" | "STANDARD" | "APPROVAL" | "SNAPSHOT";
     proposal: Proposal;
+    newVote: {
+      support: string;
+      reason: string;
+      params: string[];
+      weight: string;
+    };
     totalOptions: number;
     votes: Vote[];
     options: {
@@ -341,13 +347,14 @@ export const dialogs: DialogDefinitions<DialogType> = {
     voteDate,
     supportType,
     voteReason,
-    proposalLink,
+    proposalId,
     proposalTitle,
     proposalType,
     proposal,
     totalOptions,
     options,
     votes,
+    newVote,
   }) => {
     return (
       <ShareVoteDialog
@@ -358,10 +365,11 @@ export const dialogs: DialogDefinitions<DialogType> = {
         voteDate={voteDate}
         supportType={supportType}
         voteReason={voteReason}
-        proposalLink={proposalLink}
+        proposalId={proposalId}
         proposalTitle={proposalTitle}
         proposalType={proposalType}
         proposal={proposal}
+        newVote={newVote}
         totalOptions={totalOptions}
         options={options}
         votes={votes}

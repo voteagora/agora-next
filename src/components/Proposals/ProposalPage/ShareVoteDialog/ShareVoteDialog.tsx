@@ -193,13 +193,14 @@ export function ShareDialog({
   voteDate,
   supportType,
   voteReason,
-  proposalLink,
+  proposalId,
   proposalTitle,
   proposalType,
   proposal,
   totalOptions,
   options,
   votes,
+  newVote,
 }: {
   forPercentage: number;
   againstPercentage: number;
@@ -208,11 +209,17 @@ export function ShareDialog({
   voteDate: string | null;
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
   voteReason: string;
-  proposalLink: string;
+  proposalId: string;
   proposalTitle: string;
   proposalType: "STANDARD" | "OPTIMISTIC" | "APPROVAL" | "SNAPSHOT";
   proposal: Proposal;
   totalOptions: number;
+  newVote: {
+    support: string;
+    reason: string;
+    params: string[];
+    weight: string;
+  };
   options: {
     description: string;
     votes: string;
@@ -227,9 +234,18 @@ export function ShareDialog({
   const { address: accountAddress } = useAccount();
   const latestBlock = useLatestBlock({ enabled: true });
   const voteDateToUse = voteDate ?? format(new Date(), "MMM d, yyyy h:mm a");
+  const timestampToUse = new Date(voteDateToUse).getTime();
   const blockNumberToUse =
     blockNumber ?? latestBlock?.data?.number.toString() ?? null;
   const { namespace } = Tenant.current();
+
+  const proposalLink = `${window.location.origin}/proposals/${proposalId}?vote=${encodeURIComponent(
+    JSON.stringify({
+      ...newVote,
+      blockNumber: blockNumberToUse,
+      timestamp: timestampToUse,
+    })
+  )}`;
 
   const [isInCopiedState, setIsInCopiedState] = useState<boolean>(false);
   useEffect(() => {

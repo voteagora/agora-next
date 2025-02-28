@@ -12,6 +12,7 @@ import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProp
 import StandardProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/StandardProposalPage";
 import Tenant from "@/lib/tenant/tenant";
 import { calculateVoteMetadata } from "@/lib/voteUtils";
+import { format } from "date-fns";
 import React from "react";
 
 export const dynamic = "force-dynamic";
@@ -19,18 +20,19 @@ export const dynamic = "force-dynamic";
 // Share my vote metadata
 async function generateVoterMetadata(
   proposal: Proposal,
-  voter: string,
   title: string,
   description: string,
-  newVote?: Pick<Vote, "support" | "reason" | "weight" | "params">
+  newVote?: Pick<
+    Vote,
+    "support" | "reason" | "weight" | "params" | "blockNumber" | "timestamp"
+  >
 ) {
   const { namespace, contracts } = Tenant.current();
-  const votes = await fetchVotesForProposalAndDelegateUnstableCache({
-    proposalId: proposal.id,
-    address: voter,
-  });
   const votableSupply = await fetchVotableSupplyUnstableCache();
   const latestBlock = await contracts.token.provider.getBlock("latest");
+  const voteDateToUse = newVote?.timestamp
+    ? format(new Date(newVote.timestamp), "MMM d, yyyy h:mm a")
+    : null;
 
   const {
     support,
@@ -43,13 +45,12 @@ async function generateVoterMetadata(
     options,
   } = calculateVoteMetadata({
     proposal,
-    votes,
     votableSupply,
     newVote,
   });
 
   const stringifiedOptions = JSON.stringify(options);
-  const preview = `/api/images/og/share-my-vote?namespace=${namespace.toUpperCase()}&supportType=${support}&blockNumber=${blockNumber ?? latestBlock?.number}&voteDate=${timestamp}&endsIn=${endsIn}&forPercentage=${forPercentage}&againstPercentage=${againstPercentage}&proposalType=${proposal.proposalType}&options=${stringifiedOptions}&totalOptions=${totalOptions}`;
+  const preview = `/api/images/og/share-my-vote?namespace=${namespace.toUpperCase()}&supportType=${support}&blockNumber=${newVote?.blockNumber ?? blockNumber ?? latestBlock?.number}&voteDate=${voteDateToUse ?? timestamp}&endsIn=${endsIn}&forPercentage=${forPercentage}&againstPercentage=${againstPercentage}&proposalType=${proposal.proposalType}&options=${stringifiedOptions}&totalOptions=${totalOptions}`;
 
   return {
     title: title,
@@ -85,22 +86,12 @@ export async function generateMetadata({
     80
   );
 
-  const voterSearchParams = searchParams.voter as string;
+  const vote = searchParams.vote as string;
 
-  const voter = voterSearchParams
-    ? voterSearchParams?.split("newVote=")[0]
-    : null;
-  const newVote = voterSearchParams
-    ? voterSearchParams?.split("newVote=")[1]
-    : null;
-  const newVoteParsed = newVote
-    ? JSON.parse(decodeURIComponent(newVote))
-    : undefined;
-
-  if (voter) {
+  if (vote) {
+    const newVoteParsed = JSON.parse(decodeURIComponent(vote));
     const awaitedMetadata = await generateVoterMetadata(
       proposal,
-      voter,
       title,
       description,
       newVoteParsed

@@ -141,8 +141,8 @@ const CastVoteContextProvider = ({
   })();
 
   const newVote = {
-    support: support,
-    reason: reason,
+    support: support || "",
+    reason: reason || "",
     params: [],
     weight: votingPower.directVP || votingPower.advancedVP,
   };
@@ -166,9 +166,8 @@ const CastVoteContextProvider = ({
         voteDate: null,
         supportType: support || "ABSTAIN",
         voteReason: reason || "",
-        proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}newVote=${encodeURIComponent(
-          JSON.stringify(newVote)
-        )}`,
+        proposalId: proposal.id,
+        newVote: newVote,
         proposalTitle: proposal.markdowntitle,
         proposalType: proposal.proposalType ?? "STANDARD",
         proposal: proposal,

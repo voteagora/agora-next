@@ -205,12 +205,11 @@ export function ApprovalCastVoteDialog({
         voteDate: null,
         supportType: abstain ? "ABSTAIN" : "FOR",
         voteReason: reason || "",
-        proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}newVote=${encodeURIComponent(
-          JSON.stringify(newVote)
-        )}`,
+        proposalId: proposal.id,
         proposalTitle: proposal.markdowntitle,
         proposalType: proposal.proposalType ?? "STANDARD",
         proposal: proposal,
+        newVote: newVote,
         options: options,
         totalOptions: totalOptions,
         votes: [

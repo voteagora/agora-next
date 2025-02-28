@@ -377,8 +377,8 @@ export function SuccessMessage({
   const { data: votableSupply } = useVotableSupply({ enabled: true });
 
   const newVote = {
-    support: supportFromContext,
-    reason: reasonFromContext,
+    support: supportFromContext || "",
+    reason: reasonFromContext || "",
     params: [],
     weight: votingPower || "",
   };
@@ -431,15 +431,14 @@ export function SuccessMessage({
                 : "",
               supportType: support || "ABSTAIN",
               voteReason: reason || "",
-              proposalLink: `${window.location.origin}/proposals/${proposal.id}?voter=${address}newVote=${encodeURIComponent(
-                JSON.stringify(newVote)
-              )}`,
+              proposalId: proposal.id,
               proposalTitle: proposal.markdowntitle,
               proposalType: proposal.proposalType ?? "STANDARD",
               proposal: proposal,
               options: options,
               totalOptions: totalOptions,
               votes,
+              newVote,
             },
           });
         }}
