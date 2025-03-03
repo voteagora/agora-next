@@ -19,18 +19,21 @@ const RestrictedCallout = () => {
     address: contracts.governor?.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "manager",
+    chainId: contracts.governor?.chain.id,
   }) as { data: `0x${string}` };
 
   const { data: adminAddress } = useReadContract({
     address: contracts.governor?.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "admin",
+    chainId: contracts.governor?.chain.id,
   }) as { data: `0x${string}` };
 
   const { data: timelockAddress } = useReadContract({
     address: contracts.governor?.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "timelock",
+    chainId: contracts.governor?.chain.id,
   }) as { data: `0x${string}` };
 
   let addressesToRender = [

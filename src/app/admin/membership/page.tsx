@@ -13,6 +13,7 @@ const AdminMembershipPage = () => {
     abi: tenant.contracts.token.abi,
     functionName: "balanceOf",
     args: [address as `0x${string}`],
+    chainId: tenant.contracts.token.chain.id,
   });
 
   const { writeContract: addMember, error: addMemberError } =

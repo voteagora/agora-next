@@ -76,6 +76,7 @@ const useIsAdvancedUser = () => {
       enabled: !!address,
     },
     args: [address!],
+    chainId: contracts.token.chain.id,
   }) as { data: bigint | undefined; isFetched: boolean };
 
   /**

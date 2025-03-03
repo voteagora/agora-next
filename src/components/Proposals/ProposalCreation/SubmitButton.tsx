@@ -57,6 +57,7 @@ export default function SubmitButton({
     address: governorContract.address as `0x${string}`,
     abi: governorContract.abi,
     functionName: "manager",
+    chainId: governorContract.chain.id,
   });
   const {
     data,
