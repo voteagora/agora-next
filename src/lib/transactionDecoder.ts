@@ -147,6 +147,7 @@ const countTrailingZeros = (arr: Uint8Array) => {
 };
 
 const formatParams = (params: ParamType[]): string => {
+  if (!params || !Array.isArray(params)) return "";
   return `${params.map((v) => v.format()).join(",")}`;
 };
 

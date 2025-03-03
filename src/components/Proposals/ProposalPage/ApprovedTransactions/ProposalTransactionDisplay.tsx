@@ -17,7 +17,20 @@ import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { useTransactionDecoding } from "@/hooks/useTransactionDecoding";
 import ENSName from "@/components/shared/ENSName";
 import Tenant from "@/lib/tenant/tenant";
-import { formatNumber } from "@/lib/tokenUtils";
+import { formatUnits } from "viem";
+
+const { contracts, token } = Tenant.current();
+
+const tokenSymbolsToCheck = {
+  [`${contracts.token.address.toLowerCase()}`]: {
+    symbol: token.symbol,
+    decimals: token.decimals,
+  },
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": {
+    symbol: "USDC",
+    decimals: 6,
+  },
+};
 
 const ProposalTransactionDisplay = ({
   targets,
@@ -186,6 +199,7 @@ const TransactionItem = ({
           target={target}
           value={value}
           isLoading={isLoading}
+          calldata={calldata}
           error={error ? (error as Error).message : null}
         />
 
@@ -214,15 +228,17 @@ const ActionSummary = ({
   value,
   isLoading,
   error,
+  calldata,
 }: {
   decodedData: any;
   target: string;
   value: string;
   isLoading: boolean;
   error: string | null;
+  calldata: `0x${string}`;
 }) => {
-  const { token, contracts } = Tenant.current();
-  const targetIsToken = contracts.token.address === target;
+  const normalizedTarget = target.toLowerCase();
+  const targetIsToken = tokenSymbolsToCheck[normalizedTarget];
   if (isLoading) {
     return (
       <div className="flex flex-col gap-y-2 font-semibold text-primary text-base">
@@ -242,7 +258,9 @@ const ActionSummary = ({
               <div className="text-xs">Error</div>
             </TooltipTrigger>
             <TooltipContent>
-              <div className="text-xs">{error}</div>
+              <div className="text-xs break-all max-w-[400px] max-h-[300px] overflow-auto">
+                Raw calldata: {calldata}
+              </div>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -255,14 +273,25 @@ const ActionSummary = ({
       <div className="flex flex-col gap-y-2 font-semibold text-primary text-base">
         <div>Raw Transaction</div>
         <div className="text-xs">
-          <a
-            className="hover:underline"
-            href={getBlockScanAddress(target)}
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            {shortAddress(target)}
-          </a>
+          <TooltipProvider delayDuration={300}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <a
+                  className="hover:underline"
+                  href={getBlockScanAddress(target)}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  {shortAddress(target)}
+                </a>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="text-xs break-all max-w-[400px] max-h-[300px] overflow-auto">
+                  Raw calldata: {calldata}
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           {!!value && BigInt(value) > 0n && (
             <span className="ml-2 text-xs">{safelyFormatEther(value)}</span>
           )}
@@ -283,7 +312,7 @@ const ActionSummary = ({
         <div>Transfer</div>
         <div className="text-xs">
           {targetIsToken
-            ? `${formatNumber(valueToUse, 2)} ${token.symbol}`
+            ? `${formatUnits(BigInt(valueToUse), targetIsToken.decimals)} ${targetIsToken.symbol}`
             : safelyFormatEther(valueToUse)}
         </div>
       </div>
@@ -312,9 +341,24 @@ const ActionSummary = ({
         </TooltipProvider>
       ) : (
         <div className="truncate text-xs break-all">
-          {decodedData.function === "unknown" || !decodedData.function
-            ? "Function Call"
-            : formatFunctionName(decodedData.function)}
+          {decodedData.function === "unknown" || !decodedData.function ? (
+            <div>
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>Function Call</div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <div className="text-xs break-all max-w-[400px] max-h-[300px] overflow-auto">
+                      Raw calldata: {calldata}
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          ) : (
+            formatFunctionName(decodedData.function)
+          )}
         </div>
       )}
     </div>
@@ -336,8 +380,8 @@ const ActionDetails = ({
   isLoading: boolean;
   error: string | null;
 }) => {
-  const { contracts, token } = Tenant.current();
-  const targetIsToken = contracts.token.address === target;
+  const normalizedTarget = target.toLowerCase();
+  const targetIsToken = tokenSymbolsToCheck[normalizedTarget];
   if (isLoading) {
     return (
       <div className="text-primary text-xs font-semibold">
@@ -355,7 +399,9 @@ const ActionDetails = ({
               <div className="text-negative">Error</div>
             </TooltipTrigger>
             <TooltipContent>
-              <div className="text-xs">{error}</div>
+              <div className="text-xs break-all max-w-[400px] max-h-[300px] overflow-auto">
+                {error}
+              </div>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -412,8 +458,10 @@ const ActionDetails = ({
         <div className="flex flex-col gap-y-2">
           <span>Transfer:</span>
           <span className="text-xs">
-            {targetIsToken ? formatNumber(amount, 2) : amount}{" "}
-            {targetIsToken ? token.symbol : ""}
+            {targetIsToken
+              ? formatUnits(BigInt(amount), targetIsToken.decimals)
+              : amount}{" "}
+            {targetIsToken ? targetIsToken.symbol : ""}
           </span>
 
           <span>To:</span>
@@ -451,7 +499,7 @@ const ActionDetails = ({
   }
 
   if (!decodedData) {
-    if ((calldata && calldata !== "0x") || (value && BigInt(value) > 0n)) {
+    if (!!calldata || (value && BigInt(value) > 0n)) {
       return (
         <div className="text-base text-primary font-semibold">
           <div className="flex flex-col gap-y-2">
@@ -481,7 +529,7 @@ const ActionDetails = ({
               </>
             )}
 
-            {calldata && calldata !== "0x" && (
+            {!!calldata && (
               <>
                 <span>Calldata:</span>
                 <div className="text-xs break-all overflow-hidden">
