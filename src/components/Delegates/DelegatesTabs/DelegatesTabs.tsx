@@ -56,11 +56,19 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
     >
       <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2">
         <TabsList>
-          <TabsTrigger className="text-2xl" value="delegates">
+          <TabsTrigger
+            variant={
+              tab === "delegates" || tab === null ? "newActive" : "newInactive"
+            }
+            value="delegates"
+          >
             Delegates
           </TabsTrigger>
           {hasCitizens && (
-            <TabsTrigger className="text-2xl" value="citizens">
+            <TabsTrigger
+              variant={tab === "citizens" ? "newActive" : "newInactive"}
+              value="citizens"
+            >
               Citizens
             </TabsTrigger>
           )}

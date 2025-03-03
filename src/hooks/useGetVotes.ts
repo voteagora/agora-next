@@ -3,7 +3,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { getPublicClient } from "@/lib/viem";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
-export const VOTES_QK = "proposalThreshold";
+export const VOTES_QK = "votes";
 
 export const useGetVotes = ({
   address,

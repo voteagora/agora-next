@@ -54,6 +54,52 @@ export const proposalsFilterOptions = {
     filter: "everything",
   },
 };
+
+export const draftProposalsFilterOptions = {
+  allDrafts: {
+    value: "All drafts",
+    filter: "all_drafts",
+  },
+  myDrafts: {
+    value: "My drafts",
+    filter: "my_drafts",
+  },
+  requestsYou: {
+    value: "Requests you",
+    filter: "requests_you",
+  },
+};
+
+export const draftProposalsSortOptions = {
+  newest: {
+    value: "Newest",
+    sort: "newest",
+  },
+  oldest: {
+    value: "Oldest",
+    sort: "oldest",
+  },
+  mostVotes: {
+    value: "Most Votes",
+    sort: "most_votes",
+  },
+  leastVotes: {
+    value: "Least Votes",
+    sort: "least_votes",
+  },
+};
+
+export const myDraftsSortOptions = {
+  newest: {
+    value: "Newest",
+    sort: "newest",
+  },
+  oldest: {
+    value: "Oldest",
+    sort: "oldest",
+  },
+};
+
 export const delegatesFilterOptions = {
   weightedRandom: {
     sort: "weighted_random",

@@ -45,7 +45,7 @@ const TransactionFormItem = ({
   const simulationId = watch(`transactions.${index}.simulation_id`);
 
   return (
-    <div className="p-4 border border-agora-stone-100 rounded-lg">
+    <div className="p-4 border border-line rounded-lg">
       <div className="flex flex-row justify-between items-center mb-6">
         <div className="flex flex-row items-center space-x-2">
           <h2 className="text-secondary font-semibold">
