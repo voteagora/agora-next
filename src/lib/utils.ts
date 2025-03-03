@@ -567,11 +567,11 @@ export const resolveSafeTx = async (
 };
 
 export const wrappedWaitForTransactionReceipt = async (
-  publicClient: PublicClient,
   params: WaitForTransactionReceiptParameters & {
     address: Address;
   }
 ): Promise<WaitForTransactionReceiptReturnType> => {
+  const publicClient = getPublicClient();
   if (!publicClient.chain) {
     throw new Error("no chain on public client");
   }

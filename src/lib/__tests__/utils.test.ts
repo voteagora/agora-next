@@ -154,10 +154,7 @@ describe("Safe Transaction Utils", () => {
         address: "0xaddress" as `0x${string}`,
       };
 
-      const result = await wrappedWaitForTransactionReceipt(
-        mockPublicClient as any,
-        params
-      );
+      const result = await wrappedWaitForTransactionReceipt(params);
 
       expect(mockPublicClient.waitForTransactionReceipt).toHaveBeenCalledWith(
         params
@@ -199,10 +196,7 @@ describe("Safe Transaction Utils", () => {
         address: "0xaddress" as `0x${string}`,
       };
 
-      const result = await wrappedWaitForTransactionReceipt(
-        mockPublicClient as any,
-        params
-      );
+      const result = await wrappedWaitForTransactionReceipt(params);
 
       expect(mockPublicClient.waitForTransactionReceipt).toHaveBeenCalledWith({
         hash: mockResolvedTx,
@@ -215,14 +209,16 @@ describe("Safe Transaction Utils", () => {
         chain: null,
       };
 
+      (getPublicClient as any).mockReturnValue(mockPublicClient);
+
       const params = {
         hash: "0xtxhash" as `0x${string}`,
         address: "0xaddress" as `0x${string}`,
       };
 
-      await expect(
-        wrappedWaitForTransactionReceipt(mockPublicClient as any, params)
-      ).rejects.toThrow("no chain on public client");
+      await expect(wrappedWaitForTransactionReceipt(params)).rejects.toThrow(
+        "no chain on public client"
+      );
     });
   });
 });
