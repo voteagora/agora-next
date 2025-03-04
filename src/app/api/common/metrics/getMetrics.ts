@@ -3,31 +3,36 @@ import { cache } from "react";
 import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
 import { getPublicClient } from "@/lib/viem";
 import { findVotableSupply } from "@/lib/prismaUtils";
+import { unstable_cache } from "next/cache";
 
 async function getMetrics() {
   const { namespace, contracts, ui } = Tenant.current();
 
   try {
-    let totalSupply;
-    if (contracts.token.isERC20()) {
-      totalSupply = await contracts.token.contract.totalSupply();
-    } else if (contracts.token.isERC721()) {
-      const token = contracts.token.contract as IMembershipContract;
-      const publicClient = getPublicClient(
-        ui.toggle("use-l1-block-number")?.enabled
-          ? contracts.chainForTime
-          : contracts.token.chain
-      );
-      const blockNumber = await publicClient.getBlockNumber();
-      totalSupply = await token.getPastTotalSupply(Number(blockNumber) - 1);
-    } else {
-      totalSupply = 0;
-    }
+    const getTotalSupply = async () => {
+      if (contracts.token.isERC20()) {
+        return contracts.token.contract.totalSupply();
+      } else if (contracts.token.isERC721()) {
+        const token = contracts.token.contract as IMembershipContract;
+        const publicClient = getPublicClient(
+          ui.toggle("use-l1-block-number")?.enabled
+            ? contracts.chainForTime
+            : contracts.token.chain
+        );
+        const blockNumber = await publicClient.getBlockNumber();
+        return token.getPastTotalSupply(Number(blockNumber) - 1);
+      } else {
+        return 0;
+      }
+    };
 
-    const votableSupply = await findVotableSupply({
-      namespace,
-      address: contracts.token.address,
-    });
+    const [totalSupply, votableSupply] = await Promise.all([
+      getTotalSupply(),
+      findVotableSupply({
+        namespace,
+        address: contracts.token.address,
+      }),
+    ]);
 
     return {
       votableSupply: votableSupply?.votable_supply || "0",
@@ -42,4 +47,8 @@ async function getMetrics() {
   }
 }
 
-export const fetchMetrics = cache(getMetrics);
+export const fetchMetrics = unstable_cache(
+  getMetrics,
+  ["daoMetrics"],
+  { revalidate: 3600 } // 1 hour cache
+);
