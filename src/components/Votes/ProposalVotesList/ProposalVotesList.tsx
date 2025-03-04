@@ -88,7 +88,7 @@ export default function ProposalVotesList({ proposalId }: Props) {
   }, [proposalId, voteState.meta]);
 
   return (
-    <div className="px-4 pb-4 overflow-y-scroll max-h-[calc(100vh-437px)]">
+    <div className="px-4 pb-4 overflow-y-auto max-h-[calc(100vh-437px)]">
       {isFetched && fetchedVotes ? (
         <InfiniteScroll
           hasMore={voteState.meta?.has_next}
