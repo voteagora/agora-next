@@ -57,7 +57,11 @@ async function getProposals({
 
   const resolvedProposals = await Promise.all(
     proposals.data.map(async (proposal: ProposalPayload) => {
-      const quorum = await fetchQuorumForProposal(proposal);
+      const isPending =
+        !proposal.start_block ||
+        !latestBlock ||
+        Number(proposal.start_block) > latestBlock.number;
+      const quorum = isPending ? null : await fetchQuorumForProposal(proposal);
       return parseProposal(
         proposal,
         latestBlock,
@@ -98,10 +102,14 @@ async function getProposal(proposalId: string) {
     return notFound();
   }
 
-  const [latestBlock, quorum] = await Promise.all([
-    latestBlockPromise,
-    fetchQuorumForProposal(proposal),
-  ]);
+  const latestBlock = await latestBlockPromise;
+
+  const isPending =
+    !proposal.start_block ||
+    !latestBlock ||
+    Number(proposal.start_block) > latestBlock.number;
+
+  const quorum = isPending ? null : await fetchQuorumForProposal(proposal);
 
   return parseProposal(
     proposal,
