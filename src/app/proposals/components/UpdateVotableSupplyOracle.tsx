@@ -8,7 +8,6 @@ import {
   useWriteContract,
 } from "wagmi";
 
-import Tenant from "@/lib/tenant/tenant";
 import {
   VOTABLE_SUPPLY_QK,
   useGetVotableSupply,
@@ -18,43 +17,69 @@ import { Card, CardContent } from "@/components/ui/card";
 import { formatNumber } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { UpdatedButton } from "@/components/Button";
+import { IVotableSupplyOracleContract } from "@/lib/contracts/common/interfaces/IVotableSupplyOracleContract";
+import { TenantContract } from "@/lib/tenant/tenantContract";
 
-export const UpdateVotableSupplyOracle = () => {
+export const UpdateVotableSupplyOracle = ({
+  votableSupplyOracle,
+  tokenDecimal,
+}: {
+  votableSupplyOracle: TenantContract<IVotableSupplyOracleContract>;
+  tokenDecimal: number;
+}) => {
   const { address } = useAccount();
   const { data: presentVotableSupply } = useGetVotableSupply();
   const queryClient = useQueryClient();
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
 
-  const { contracts } = Tenant.current();
-
   const { writeContractAsync, isPending } = useWriteContract();
+  const chainId = votableSupplyOracle.chain.id;
+  const oracleAddress = votableSupplyOracle.address as `0x${string}`;
+  const abi = votableSupplyOracle.abi;
 
-  const { data: votableSupplyOracle, refetch: refetchVotableSupplyOracle } =
-    useReadContract({
-      address: contracts.votableSupplyOracle?.address as `0x${string}`,
-      abi: contracts.votableSupplyOracle?.abi,
-      functionName: "votableSupply",
-    });
+  const {
+    data: votableSupplyOracleValue,
+    refetch: refetchVotableSupplyOracle,
+  } = useReadContract({
+    address: oracleAddress,
+    abi,
+    functionName: "votableSupply",
+    chainId,
+  });
 
   const { data: ownerAddress } = useReadContract({
-    address: contracts.votableSupplyOracle?.address as `0x${string}`,
-    abi: contracts.votableSupplyOracle?.abi,
+    address: oracleAddress,
+    abi,
     functionName: "owner",
+    chainId,
   });
 
   const { isSuccess: isTxConfirmed } = useWaitForTransactionReceipt({
     hash: txHash,
+    chainId,
   });
 
   // Format the votableSupplyOracle for display
   const formattedOracleSupply =
-    votableSupplyOracle !== undefined && votableSupplyOracle !== null
-      ? formatNumber(votableSupplyOracle.toString(), 18, 4, false, false)
+    votableSupplyOracleValue !== undefined && votableSupplyOracleValue !== null
+      ? formatNumber(
+          votableSupplyOracleValue.toString(),
+          tokenDecimal,
+          4,
+          false,
+          false
+        )
       : "0";
 
   const formattedPresentVotableSupply =
     presentVotableSupply !== undefined && presentVotableSupply !== null
-      ? formatNumber(presentVotableSupply.toString(), 18, 4, false, false)
+      ? formatNumber(
+          presentVotableSupply.toString(),
+          18,
+          tokenDecimal,
+          false,
+          false
+        )
       : "0";
 
   useEffect(() => {
@@ -71,10 +96,11 @@ export const UpdateVotableSupplyOracle = () => {
       const supplyInWei = BigInt(presentVotableSupply);
 
       const hash = await writeContractAsync({
-        address: contracts.votableSupplyOracle!.address as `0x${string}`,
-        abi: contracts.votableSupplyOracle!.abi,
+        address: oracleAddress,
+        abi,
         functionName: "_updateVotableSupply",
         args: [supplyInWei],
+        chainId,
       });
 
       // Store the transaction hash to track confirmation

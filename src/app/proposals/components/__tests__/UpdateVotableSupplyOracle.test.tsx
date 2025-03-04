@@ -11,6 +11,9 @@ import {
   UseWriteContractReturnType,
 } from "wagmi";
 import { QueryClient } from "@tanstack/react-query";
+import { TenantContract } from "@/lib/tenant/tenantContract";
+import { IVotableSupplyOracleContract } from "@/lib/contracts/common/interfaces/IVotableSupplyOracleContract";
+import { optimism } from "viem/chains";
 
 vi.mock("wagmi");
 vi.mock("@tanstack/react-query");
@@ -30,21 +33,23 @@ vi.mock("@/lib/utils", () => ({
   cn: vi.fn(() => "cn"), // this is used in button component
 }));
 
-// Mock Tenant using module factory pattern
-vi.mock("@/lib/tenant/tenant", () => {
-  return {
-    default: {
-      current: vi.fn().mockImplementation(() => ({
-        contracts: {
-          votableSupplyOracle: {
-            address: "0xvotableSupplyOracle" as `0x${string}`,
-            abi: [],
-          },
-        },
-      })),
-    },
-  };
-});
+const mockVotableSupplyOracleData =
+  new TenantContract<IVotableSupplyOracleContract>({
+    address: "0xvotablesupplyoracle" as `0x${string}`,
+    abi: [],
+    chain: optimism,
+    contract: {
+      votableSupply: vi
+        .fn()
+        .mockImplementation(() => BigInt("116799799048035407924717724")),
+      owner: vi.fn().mockImplementation(() => "0x123"),
+      _updateVotableSupply: vi.fn(),
+      "votableSupply()": vi
+        .fn()
+        .mockImplementation(() => BigInt("116799799048035407924717724")),
+    } as unknown as IVotableSupplyOracleContract,
+    provider: {} as any,
+  });
 
 describe("UpdateVotableSupplyOracle", () => {
   // Setup common mocks
@@ -65,7 +70,7 @@ describe("UpdateVotableSupplyOracle", () => {
   const mockAddress = "0x123" as `0x${string}`;
   const mockOwnerAddress = "0x123" as `0x${string}`;
   const mockPresentVotableSupply = "116799850939014514601948447";
-  const mockVotableSupplyOracle = "116799799048035407924717724";
+  const mockVotableSupplyOracleValue = "116799799048035407924717724";
   const mockTxHash = "0xabc" as `0x${string}`;
   const mockQueryClient = {
     invalidateQueries: vi.fn(),
@@ -87,7 +92,7 @@ describe("UpdateVotableSupplyOracle", () => {
 
       if (functionName === "votableSupply") {
         return {
-          data: mockVotableSupplyOracle,
+          data: mockVotableSupplyOracleValue,
           refetch: mockRefetch,
         } as unknown as UseReadContractReturnType<any, any>;
       }
@@ -125,7 +130,12 @@ describe("UpdateVotableSupplyOracle", () => {
   });
 
   test("renders correctly with data", () => {
-    render(<UpdateVotableSupplyOracle />);
+    render(
+      <UpdateVotableSupplyOracle
+        votableSupplyOracle={mockVotableSupplyOracleData}
+        tokenDecimal={18}
+      />
+    );
 
     // Check if the component renders the formatted supply values
     expect(screen.getByText(/Current votable supply:/)).toBeDefined();
@@ -138,22 +148,33 @@ describe("UpdateVotableSupplyOracle", () => {
       address: "0x456" as `0x${string}`, // Different from owner
     } as UseAccountReturnType);
 
-    const { container } = render(<UpdateVotableSupplyOracle />);
+    const { container } = render(
+      <UpdateVotableSupplyOracle
+        votableSupplyOracle={mockVotableSupplyOracleData}
+        tokenDecimal={18}
+      />
+    );
     expect(container.firstChild).toBeNull();
   });
 
   test("handles update supply correctly", async () => {
-    render(<UpdateVotableSupplyOracle />);
+    render(
+      <UpdateVotableSupplyOracle
+        votableSupplyOracle={mockVotableSupplyOracleData}
+        tokenDecimal={18}
+      />
+    );
 
     // Click the update button using testId instead of text
     fireEvent.click(screen.getByTestId("update-supply-button"));
 
     // Check if writeContractAsync was called with correct arguments
     expect(mockWriteContractAsync).toHaveBeenCalledWith({
-      address: "0xvotableSupplyOracle",
+      address: "0xvotablesupplyoracle",
       abi: [],
       functionName: "_updateVotableSupply",
       args: [BigInt(mockPresentVotableSupply)],
+      chainId: optimism.id,
     });
   });
 
@@ -163,7 +184,12 @@ describe("UpdateVotableSupplyOracle", () => {
       isPending: true,
     } as unknown as UseWriteContractReturnType<any>);
 
-    render(<UpdateVotableSupplyOracle />);
+    render(
+      <UpdateVotableSupplyOracle
+        votableSupplyOracle={mockVotableSupplyOracleData}
+        tokenDecimal={18}
+      />
+    );
 
     // Check if the button shows loading state using testId
     const button = screen.getByTestId("update-supply-button");
@@ -172,7 +198,12 @@ describe("UpdateVotableSupplyOracle", () => {
   });
 
   test("refreshes data after transaction confirmation", async () => {
-    const { rerender } = render(<UpdateVotableSupplyOracle />);
+    const { rerender } = render(
+      <UpdateVotableSupplyOracle
+        votableSupplyOracle={mockVotableSupplyOracleData}
+        tokenDecimal={18}
+      />
+    );
 
     // Simulate transaction confirmation with type assertion
     mockUseWaitForTransactionReceipt.mockReturnValue({
@@ -181,7 +212,12 @@ describe("UpdateVotableSupplyOracle", () => {
     } as UseWaitForTransactionReceiptReturnType<any, any, any>);
 
     // Re-render with confirmed transaction
-    rerender(<UpdateVotableSupplyOracle />);
+    rerender(
+      <UpdateVotableSupplyOracle
+        votableSupplyOracle={mockVotableSupplyOracleData}
+        tokenDecimal={18}
+      />
+    );
 
     // Check if data was refreshed
     expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
