@@ -75,8 +75,8 @@ export const UpdateVotableSupplyOracle = ({
     presentVotableSupply !== undefined && presentVotableSupply !== null
       ? formatNumber(
           presentVotableSupply.toString(),
-          18,
           tokenDecimal,
+          4,
           false,
           false
         )
