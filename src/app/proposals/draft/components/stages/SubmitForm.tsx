@@ -10,6 +10,7 @@ import { useManager } from "@/hooks/useManager";
 import { DraftProposal, PLMConfig, ProposalGatingType } from "../../types";
 import Tenant from "@/lib/tenant/tenant";
 import { useGetVotes } from "@/hooks/useGetVotes";
+import { UpdateVotableSupplyOracle } from "@/app/proposals/components/UpdateVotableSupplyOracle";
 
 const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const tenant = Tenant.current();
@@ -56,6 +57,12 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
 
   return (
     <div className="mt-6">
+      {tenant.contracts.votableSupplyOracle?.address && (
+        <UpdateVotableSupplyOracle
+          votableSupplyOracle={tenant.contracts.votableSupplyOracle}
+          tokenDecimal={tenant.token.decimals}
+        />
+      )}
       {canAddressSponsor ? (
         <SponsorActions draftProposal={proposalDraft} />
       ) : (

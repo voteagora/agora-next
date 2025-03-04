@@ -45,6 +45,7 @@ export type TenantContracts = {
     isERC721: () => this is TenantContract<IMembershipContract>;
   };
 
+  votableSupplyOracle?: TenantContract<IVotableSupplyOracleContract>;
   staker?: TenantContract<IStaker>;
   timelock?: TenantContract<BaseContract>;
   alligator?: TenantContract<IAlligatorContract>;
