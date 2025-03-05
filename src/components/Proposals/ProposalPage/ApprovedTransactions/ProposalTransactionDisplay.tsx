@@ -5,6 +5,7 @@ import {
   getBlockScanUrl,
   getBlockScanAddress,
   shortAddress,
+  cn,
 } from "@/lib/utils";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import {
@@ -172,6 +173,8 @@ const TransactionItem = ({
     enabled: index === 0 || !collapsed,
   });
 
+  const isTransfer = decodedData?.function === "transfer";
+
   return (
     <div className={`${index > 0 ? "pt-4" : ""}`}>
       {description && (
@@ -193,7 +196,12 @@ const TransactionItem = ({
         </a>
       </div>
 
-      <div className="flex flex-col gap-y-10 border-line border rounded-lg p-4 bg-wash">
+      <div
+        className={cn(
+          "flex flex-col gap-y-10 rounded-lg p-4",
+          !isTransfer && "bg-wash border-line border"
+        )}
+      >
         <ActionSummary
           decodedData={decodedData}
           target={target}
@@ -203,7 +211,7 @@ const TransactionItem = ({
           error={error ? (error as Error).message : null}
         />
 
-        {!collapsed && (
+        {!collapsed && decodedData?.function !== "transfer" && (
           <ActionDetails
             decodedData={decodedData}
             target={target}
@@ -300,21 +308,95 @@ const ActionSummary = ({
     );
   }
 
-  if (decodedData.function === "transfer") {
+  if (decodedData && decodedData.function === "transfer") {
+    const recipient =
+      decodedData?.parameters?.to?.value ||
+      decodedData?.parameters?.dst?.value ||
+      decodedData?.parameters?.recipient?.value ||
+      target;
     const valueToUse =
       decodedData?.parameters?.value?.value ||
       decodedData?.parameters?.rawAmount?.value ||
       decodedData?.parameters?.amount?.value ||
-      (Object.values(decodedData?.parameters || {})?.[1] as any)?.value ||
+      decodedData?.parameters?.wad?.value ||
       value;
+    const amount = safelyFormatEther(valueToUse);
+    const note =
+      decodedData?.parameters?.note?.value ||
+      decodedData?.parameters?.memo?.value ||
+      decodedData?.parameters?.data?.value ||
+      decodedData?.parameters?.message?.value ||
+      "";
+    const from =
+      decodedData?.parameters?.from?.value ||
+      decodedData?.parameters?.src?.value ||
+      decodedData?.parameters?.sender?.value ||
+      "";
+
+    const isMultiRecipient =
+      recipient.includes(",") ||
+      (decodedData?.parameters?.recipients?.value &&
+        Array.isArray(decodedData.parameters.recipients.value));
+
+    const recipientCount = isMultiRecipient
+      ? Array.isArray(decodedData?.parameters?.recipients?.value)
+        ? decodedData.parameters.recipients.value.length
+        : "multiple"
+      : 1;
+
     return (
-      <div className="flex justify-between items-center font-semibold text-primary text-base">
-        <div>Transfer</div>
-        <div className="text-xs">
-          {targetIsToken
-            ? `${formatUnits(BigInt(valueToUse), targetIsToken.decimals)} ${targetIsToken.symbol}`
-            : safelyFormatEther(valueToUse)}
+      <div className="text-xs text-primary font-semibold flex flex-col gap-y-2">
+        <div className="flex gap-4 items-center">
+          <div className="flex gap-2 items-center">
+            <span className="w-16">Transfer:</span>
+            <span className="bg-wash p-2 rounded-sm shrink-0">
+              {targetIsToken
+                ? formatUnits(BigInt(amount), targetIsToken.decimals)
+                : amount}{" "}
+              {targetIsToken ? targetIsToken.symbol : ""}
+            </span>
+          </div>
+
+          <div className="flex gap-2 items-center">
+            <span>To:</span>
+            <div className="bg-wash p-2 rounded-sm shrink-0">
+              {isMultiRecipient ? (
+                <span>{recipientCount} wallets</span>
+              ) : (
+                <a
+                  className="hover:underline"
+                  href={getBlockScanAddress(recipient)}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <ENSName address={recipient} truncate={false} />
+                </a>
+              )}
+            </div>
+          </div>
+
+          {from && (
+            <div className="flex gap-2 items-center">
+              <span>From:</span>
+              <span className="bg-wash p-2 rounded-sm">
+                <a
+                  className="hover:underline"
+                  href={getBlockScanAddress(from)}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <ENSName address={from} truncate={true} />
+                </a>
+              </span>
+            </div>
+          )}
         </div>
+        {note && (
+          <div className="flex gap-2 items-center">
+            <span className="w-16">With Note:</span>
+            <span className="bg-wash p-2 rounded-sm">{note}</span>
+          </div>
+        )}
       </div>
     );
   }
@@ -421,78 +503,6 @@ const ActionDetails = ({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        </div>
-      </div>
-    );
-  }
-
-  if (decodedData && decodedData.function === "transfer") {
-    const recipient =
-      decodedData?.parameters?.to?.value ||
-      decodedData?.parameters?.dst?.value ||
-      decodedData?.parameters?.recipient?.value ||
-      target;
-    const valueToUse =
-      decodedData?.parameters?.value?.value ||
-      decodedData?.parameters?.rawAmount?.value ||
-      decodedData?.parameters?.amount?.value ||
-      (Object.values(decodedData?.parameters || {})?.[1] as any)?.value ||
-      value;
-    const amount = safelyFormatEther(valueToUse);
-    const note = decodedData?.parameters?.note?.value || "";
-    const from = "";
-
-    const isMultiRecipient =
-      recipient.includes(",") ||
-      (decodedData?.parameters?.recipients?.value &&
-        Array.isArray(decodedData.parameters.recipients.value));
-
-    const recipientCount = isMultiRecipient
-      ? Array.isArray(decodedData?.parameters?.recipients?.value)
-        ? decodedData.parameters.recipients.value.length
-        : "multiple"
-      : 1;
-
-    return (
-      <div className="text-base text-primary font-semibold">
-        <div className="flex flex-col gap-y-2">
-          <span>Transfer:</span>
-          <span className="text-xs">
-            {targetIsToken
-              ? formatUnits(BigInt(amount), targetIsToken.decimals)
-              : amount}{" "}
-            {targetIsToken ? targetIsToken.symbol : ""}
-          </span>
-
-          <span>To:</span>
-          <div className="text-xs">
-            {isMultiRecipient ? (
-              <span>{recipientCount} wallets</span>
-            ) : (
-              <a
-                className="hover:underline"
-                href={getBlockScanAddress(recipient)}
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <ENSName address={recipient} truncate={false} />
-              </a>
-            )}
-          </div>
-
-          {from && (
-            <>
-              <span>From:</span>
-              <span className="text-xs">{from}</span>
-            </>
-          )}
-
-          {note && (
-            <>
-              <span>Note:</span>
-              <span className="text-xs">{note}</span>
-            </>
-          )}
         </div>
       </div>
     );
