@@ -37,6 +37,7 @@ export const OZGovExecute = ({ proposal }: Props) => {
       "0xd8aa0f3194971a2a116679f7c2090f6939c8d4e01a2a8d7e41d55e5351469e63", // EXECUTOR_ROLE
       address as `0x${string}`,
     ],
+    chainId: contracts.timelock!.chain.id,
   });
 
   // Check whether time has passed
@@ -44,6 +45,7 @@ export const OZGovExecute = ({ proposal }: Props) => {
     address: contracts.timelock!.address as `0x${string}`,
     abi: contracts.timelock!.abi,
     functionName: "getMinDelay",
+    chainId: contracts.timelock!.chain.id,
   });
 
   const { data, writeContract: write } = useWriteContract();

@@ -30,6 +30,7 @@ export const BravoGovExecute = ({ proposal }: Props) => {
       address: contracts.timelock!.address as `0x${string}`,
       abi: contracts.timelock!.abi,
       functionName: "delay",
+      chainId: contracts.timelock!.chain.id,
     });
 
   const { data, writeContract } = useWriteContract();

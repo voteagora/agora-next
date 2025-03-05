@@ -46,12 +46,14 @@ const GovernorSettingsProposalTypes = ({
     functionName:
       namespace === TENANT_NAMESPACES.UNISWAP ? "quorumVotes" : "quorum",
     query: { enabled: isQuorumSupportedByGovernor },
+    chainId: contracts.governor.chain.id,
   }) as { data: bigint | undefined; isFetched: boolean };
 
   const { data: threshold, isFetched: isThresholdFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "proposalThreshold",
+    chainId: contracts.governor.chain.id,
   }) as { data: bigint | undefined; isFetched: boolean };
 
   const showQuorum = isQuorumSupportedByGovernor || proposalTypes.length > 0;
