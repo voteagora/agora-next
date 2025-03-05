@@ -1,6 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { NextRequest } from "next/server";
 import Tenant from "@/lib/tenant/tenant";
 import yaml from "yaml";
 
