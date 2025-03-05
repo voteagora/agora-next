@@ -3,11 +3,9 @@ import { cache } from "react";
 import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
 import { getPublicClient } from "@/lib/viem";
 import { findVotableSupply } from "@/lib/prismaUtils";
-import { unstable_cache } from "next/cache";
 
 async function getMetrics() {
   const { namespace, contracts, ui } = Tenant.current();
-
   try {
     const getTotalSupply = async () => {
       if (contracts.token.isERC20()) {
@@ -47,8 +45,4 @@ async function getMetrics() {
   }
 }
 
-export const fetchMetrics = unstable_cache(
-  getMetrics,
-  ["daoMetrics"],
-  { revalidate: 3600 } // 1 hour cache
-);
+export const fetchMetrics = cache(getMetrics);
