@@ -82,13 +82,15 @@ export default async function Page({
 }: {
   params: { addressOrENSName: string };
 }) {
+  const { ui } = Tenant.current();
   const address = await ensNameToAddress(addressOrENSName);
   const delegate = await fetchDelegate(address);
-  const textRecords = await resolveENSTextRecords(address, [
-    "description",
-    "location",
-  ]);
-  const efpStats = await resolveEFPStats(address);
+  const textRecords = ui.toggle("show-ens-text-records")?.enabled
+    ? await resolveENSTextRecords(address, ["description", "location"])
+    : null;
+  const efpStats = ui.toggle("show-efp-stats")?.enabled
+    ? await resolveEFPStats(address)
+    : null;
 
   if (!delegate) {
     return (
