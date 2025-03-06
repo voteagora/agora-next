@@ -15,7 +15,7 @@ const fetchMetrics = async () => {
 
 export function useDAOMetrics() {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["daoMetrics"],
+    queryKey: ["tokenMetrics"],
     queryFn: fetchMetrics,
     cacheTime: 300,
     refetchOnWindowFocus: true,
