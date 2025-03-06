@@ -324,17 +324,17 @@ export const uniswapTenantUIConfig = new TenantUI({
 
   Get started by drafting your proposal directly in the Uniswap governance interface. Clearly outline your objectives, provide supporting details, and ensure your proposal aligns with Uniswap's governance standards.
 
-  **2. Request Sponsorship (If Threshold Not Met)**
+  **2. Request sponsorship (if threshold not met)**
 
-  If you don't meet the required voting power threshold, you can Request Sponsorship from existing delegates. This allows your proposal to gain visibility and the necessary backing from the community.
+  If you don't meet the required voting power threshold, you can request sponsorship from existing delegates. This allows your proposal to gain visibility and the necessary backing from the community.
 
-  **3. Submit as Waiting for Sponsorship**
+  **3. Submit as waiting for sponsorship**
 
-  Proposals that haven't met the threshold will be listed as Waiting for Sponsorship. Delegates can review and choose to sponsor proposals they believe in. Once a sponsor is secured, they can push the proposal on-chain for voting.
+  If you don’t have the voting power to post the proposal yourself, you can request a delegate with enough voting power to sponsor it. The delegate you choose can review your proposal and choose to sponsor it if they support it, pushing it onchain for voting. One note - you should coordinate with sponsor delegates so they know you’re looking for sponsorship!.
 
-  **4. Submit On-Chain (If Threshold Met)**
+  **4. Submit onchain (If threshold met)**
 
-  If your proposal meets the voting power threshold, you can bypass the sponsorship phase and Submit On-Chain directly. This fast-tracks your proposal to the voting stage, giving the community the opportunity to decide on its implementation.
+  If you meet the voting power threshold, you can bypass the sponsorship phase and submit it onchain directly. This fast-tracks your proposal to the voting stage, giving the community the opportunity to decide on its implementation.
   `.trim(),
         },
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
