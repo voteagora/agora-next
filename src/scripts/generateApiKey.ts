@@ -7,7 +7,6 @@
     The hashed API Key will be stored in the database.
 */
 
-import { PrismaClient } from "@prisma/client";
 import prisma from "@/app/lib/prisma";
 import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";
