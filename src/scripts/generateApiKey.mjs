@@ -1,35 +1,39 @@
 /*
     This script is used to generate an API Key for the Agora SDK and add the user to the database.
     You can run this script by using the following command:
-    `ts-node src/scripts/generateApiKey.ts --email user@example.com --address 0x123... --chain-id 1 --description "API access for..."`
+    `tsx src/scripts/generateApiKey.mjs --email user@example.com --address 0x123... --chain-id 1 --description "API access for..."`
 
     The generated API Key will be printed to the console. This is what will be shared with the API User.
     The hashed API Key will be stored in the database.
 */
 
-import prisma from "@/app/lib/prisma";
+// Prevent Next.js instrumentation from loading
+process.env.NEXT_RUNTIME = "edge";
+
+import { PrismaClient } from "@prisma/client";
 import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";
 import { createHash } from "crypto";
 import { v4 as uuidv4 } from "uuid";
 
+const prisma = new PrismaClient();
 const HASH_FN = "sha256";
 
 function generateApiKey() {
   return uuidv4();
 }
 
-function hashApiKey(apiKey: string) {
+function hashApiKey(apiKey) {
   const hash = createHash(HASH_FN);
   hash.update(apiKey);
   return hash.digest("hex");
 }
 
 async function generateApiKeyAndCreateUser(
-  email: string,
-  address: string,
-  chainId: string,
-  description?: string
+  email,
+  address,
+  chainId,
+  description
 ) {
   try {
     const apiKey = generateApiKey();
