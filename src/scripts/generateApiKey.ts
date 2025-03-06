@@ -50,7 +50,7 @@ async function generateApiKeyAndCreateUser(
     console.log("API Key (save this, it won't be shown again):", apiKey);
     console.log("User ID:", user.id);
     console.log(`Hashed API Key (${HASH_FN}):`, hashedApiKey);
-    
+
     return user;
   } catch (error) {
     console.error("Error creating API user:", error);
@@ -81,8 +81,7 @@ async function main() {
       type: "string",
       description: "Description of the API user's purpose",
     })
-    .help()
-    .argv;
+    .help().argv;
 
   await generateApiKeyAndCreateUser(
     argv.email,
