@@ -198,5 +198,5 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 Agora Staff can generate API keys using:
 
 ```
-ts-node src/scripts/generateApiKey.ts --email "test@example.com" --address "0x123456789" --chain-id "1" --description "Test API User"
+npm run generate-apikey -- --email user@example.com --address 0x123345 --chain-id 1 --description "API access for..."
 ```
