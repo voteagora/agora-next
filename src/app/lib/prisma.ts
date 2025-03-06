@@ -1,10 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { time_this } from "@/app/lib/logging";
 
-declare global {
-  var prisma: PrismaClient;
-}
-
 let prisma: PrismaClient;
 
 // Logging middleware
