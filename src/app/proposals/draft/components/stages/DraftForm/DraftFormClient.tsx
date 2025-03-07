@@ -1,7 +1,7 @@
 "use client";
 
 import { useAccount } from "wagmi";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
@@ -19,7 +19,6 @@ import {
   ProposalTypeMetadata,
   parseProposalToForm,
   DraftProposal,
-  PLMConfig,
 } from "../../../types";
 import BasicProposalForm from "../../BasicProposalForm";
 import SocialProposalForm from "../../SocialProposalForm";
@@ -29,7 +28,7 @@ import SwitchInput from "../../form/SwitchInput";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
-import Tenant from "@/lib/tenant/tenant";
+import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
 
 const DEFAULT_FORM = {
   type: ProposalType.BASIC,
@@ -85,12 +84,8 @@ const DraftFormClient = ({
   const [validProposalTypes, setValidProposalTypes] = useState<any[]>(
     getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
   );
-
   const router = useRouter();
   const { address } = useAccount();
-
-  const { ui } = Tenant.current();
-  const plmToggle = ui.toggle("proposal-lifecycle");
 
   const methods = useForm<z.output<typeof DraftProposalSchema>>({
     resolver: zodResolver(DraftProposalSchema),
@@ -102,7 +97,10 @@ const DraftFormClient = ({
   const { watch, handleSubmit, control } = methods;
 
   const votingModuleType = watch("type");
-
+  const enabledProposalTypesFromConfigAndAPI = useMemo(
+    () => getProposalTypeMetaDataForTenant(proposalTypes),
+    [proposalTypes]
+  );
   const stageIndex = getStageIndexForTenant("DRAFTING") as number;
 
   useEffect(() => {
@@ -162,11 +160,7 @@ const DraftFormClient = ({
                   control={control}
                   label="Voting module"
                   required={true}
-                  options={[
-                    ...(
-                      (plmToggle?.config as PLMConfig)?.proposalTypes || []
-                    ).map((pt) => pt.type),
-                  ]}
+                  options={enabledProposalTypesFromConfigAndAPI}
                   name="type"
                 />
 
