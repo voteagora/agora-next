@@ -10,9 +10,10 @@ type Props = {
 };
 
 const optionStyle =
-  "p-[5px] flex-1 text-center cursor-pointer rounded text-primary/30 font-medium hover:bg-line hover:font-semibold transition-all";
+  "p-[5px] flex-1 text-center cursor-pointer rounded text-primary/30 font-medium hover:bg-line hover:font-semibold transition-colors transition-shadow";
 
-const selectedStyle = "bg-tertiary/20 text-secondary font-semibold";
+const selectedStyle =
+  "bg-tertiary/20 text-secondary font-semibold border border-line shadow-md transition-colors transition-shadow";
 
 export function Switch({
   onSelectionChanged,
