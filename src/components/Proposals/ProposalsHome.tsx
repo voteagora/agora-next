@@ -49,15 +49,13 @@ export default async function ProposalsHome() {
   const plmEnabled = ui.toggle("proposal-lifecycle")?.enabled;
   const supportsNotifications = ui.toggle("email-subscriptions")?.enabled;
 
-  const governanceCalendar = await fetchGovernanceCalendar();
-  const relevalntProposals = await fetchProposals(
-    proposalsFilterOptions.relevant.filter
-  );
-  const allProposals = await fetchProposals(
-    proposalsFilterOptions.everything.filter
-  );
-
-  const votableSupply = await fetchVotableSupply();
+  const [governanceCalendar, relevalntProposals, allProposals, votableSupply] =
+    await Promise.all([
+      fetchGovernanceCalendar(),
+      fetchProposals(proposalsFilterOptions.relevant.filter),
+      fetchProposals(proposalsFilterOptions.everything.filter),
+      fetchVotableSupply(),
+    ]);
 
   return (
     <div className="flex flex-col">
