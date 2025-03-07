@@ -330,7 +330,7 @@ export const uniswapTenantUIConfig = new TenantUI({
 
   **3. Submit as waiting for sponsorship**
 
-  If you don’t have the voting power to post the proposal yourself, you can request a delegate with enough voting power to sponsor it. The delegate you choose can review your proposal and choose to sponsor it if they support it, pushing it onchain for voting. One note - you should coordinate with sponsor delegates so they know you’re looking for sponsorship!.
+  If you don’t have the voting power to post the proposal yourself, you can request a delegate with enough voting power to sponsor it. The delegate you choose can review your proposal and choose to sponsor it if they support it, pushing it onchain for voting. One note - you should coordinate with sponsor delegates so they know you’re looking for sponsorship!
 
   **4. Submit onchain (If threshold met)**
 
