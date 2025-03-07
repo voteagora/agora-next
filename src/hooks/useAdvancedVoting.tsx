@@ -3,10 +3,9 @@ import { useCallback, useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
-import { waitForTransactionReceipt } from "wagmi/actions";
-import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -25,7 +24,7 @@ const useAdvancedVoting = ({
   params?: `0x${string}`;
   missingVote: MissingVote;
 }) => {
-  const { contracts, slug } = Tenant.current();
+  const { contracts } = Tenant.current();
   const { address } = useAccount();
   const { writeContractAsync: advancedVote, isError: _advancedVoteError } =
     useWriteContract();
@@ -70,8 +69,9 @@ const useAdvancedVoting = ({
         chainId: contracts.governor.chain.id,
       });
       try {
-        const { status } = await waitForTransactionReceipt(config, {
+        const { status } = await wrappedWaitForTransactionReceipt({
           hash: directTx,
+          address: address as `0x${string}`,
         });
         if (status === "success") {
           await trackEvent({
@@ -113,8 +113,9 @@ const useAdvancedVoting = ({
         chainId: contracts.alligator?.chain.id,
       });
       try {
-        const { status } = await waitForTransactionReceipt(config, {
+        const { status } = await wrappedWaitForTransactionReceipt({
           hash: advancedTx,
+          address: address as `0x${string}`,
         });
         if (status === "success") {
           await trackEvent({
