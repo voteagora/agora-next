@@ -11,8 +11,14 @@ const { contracts, ui } = Tenant.current();
 
 export default function OptionsResultsPanel({
   proposal,
+  className,
+  optionsToShow = 5,
+  showAllOptions = true,
 }: {
   proposal: Proposal;
+  className?: string;
+  optionsToShow?: number;
+  showAllOptions?: boolean;
 }) {
   // Note: Defaulting to optimism token for now since the contract-scoped token
   // was exactly the same as the optimism token.
@@ -66,47 +72,59 @@ export default function OptionsResultsPanel({
     });
 
   return (
-    <div className="flex flex-col max-h-[calc(100vh-482px)] overflow-y-scroll flex-shrink px-4">
-      {sortedOptions.map((option, index) => {
-        let isApproved = false;
-        const votesAmountBN = BigInt(option?.votes || 0);
+    <div
+      className={cn(
+        "flex flex-col max-h-[calc(100vh-482px)] overflow-y-scroll flex-shrink px-4",
+        className
+      )}
+    >
+      {sortedOptions
+        .slice(0, showAllOptions ? sortedOptions.length : optionsToShow)
+        .map((option, index) => {
+          let isApproved = false;
+          const votesAmountBN = BigInt(option?.votes || 0);
 
-        const optionBudget =
-          (proposal?.createdTime as Date) >
-          contracts.governor.optionBudgetChangeDate!
-            ? BigInt(option?.budgetTokensSpent || 0)
-            : parseUnits(
-                option?.budgetTokensSpent?.toString() || "0",
-                contractTokenDecimals
-              );
-        if (proposalSettings.criteria === "TOP_CHOICES") {
-          isApproved = index < Number(proposalSettings.criteriaValue);
-        } else if (proposalSettings.criteria === "THRESHOLD") {
-          const threshold = BigInt(proposalSettings.criteriaValue);
-          isApproved =
-            !isExceeded &&
-            votesAmountBN >= threshold &&
-            availableBudget >= optionBudget;
-          if (isApproved) {
-            availableBudget = availableBudget - optionBudget;
-          } else {
-            isExceeded = true;
+          const optionBudget =
+            (proposal?.createdTime as Date) >
+            contracts.governor.optionBudgetChangeDate!
+              ? BigInt(option?.budgetTokensSpent || 0)
+              : parseUnits(
+                  option?.budgetTokensSpent?.toString() || "0",
+                  contractTokenDecimals
+                );
+          if (proposalSettings.criteria === "TOP_CHOICES") {
+            isApproved = index < Number(proposalSettings.criteriaValue);
+          } else if (proposalSettings.criteria === "THRESHOLD") {
+            const threshold = BigInt(proposalSettings.criteriaValue);
+            isApproved =
+              !isExceeded &&
+              votesAmountBN >= threshold &&
+              availableBudget >= optionBudget;
+            if (isApproved) {
+              availableBudget = availableBudget - optionBudget;
+            } else {
+              isExceeded = true;
+            }
           }
-        }
 
-        return (
-          <SingleOption
-            key={index}
-            description={option.option}
-            votes={option.votes}
-            votesAmountBN={votesAmountBN}
-            totalVotingPower={totalVotingPower}
-            proposalSettings={proposalSettings}
-            thresholdPosition={thresholdPosition}
-            isApproved={isApproved}
-          />
-        );
-      })}
+          return (
+            <SingleOption
+              key={index}
+              description={option.option}
+              votes={option.votes}
+              votesAmountBN={votesAmountBN}
+              totalVotingPower={totalVotingPower}
+              proposalSettings={proposalSettings}
+              thresholdPosition={thresholdPosition}
+              isApproved={isApproved}
+            />
+          );
+        })}
+      {!showAllOptions && sortedOptions.length > optionsToShow && (
+        <div className="flex justify-center items-center text-primary bg-wash rounded-lg p-2 w-24 ml-auto">
+          +{sortedOptions.length - optionsToShow} more
+        </div>
+      )}
     </div>
   );
 }
@@ -219,7 +237,7 @@ export function ProgressBar({
   );
 }
 
-function getScaledBarPercentage({
+export function getScaledBarPercentage({
   threshold,
   totalVotingPower,
   votesAmountBN,
