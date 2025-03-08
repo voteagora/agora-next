@@ -899,51 +899,6 @@ components:
         minimum: 2000000
         maximum: 8000000
 paths:
-  /auth/nonce:
-    get:
-      summary: Gets nonce for SIWE authentication
-      description: Gets nonce for SIWE authentication.
-      operationId: getNonce
-      tags:
-        - auth
-      responses:
-        "200":
-          description: OK
-          content:
-            text/plain:
-              schema:
-                type: string
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
-  /auth/verify:
-    post:
-      summary: Posts SIWE verification payload
-      description: Posts SIWE message and signature.
-      operationId: postSiweVerificationMessage
-      tags:
-        - auth
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SIWEVerificationBody"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthToken"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
   /delegates:
     get:
       summary: Gets a list of delegates
