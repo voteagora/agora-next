@@ -1,14 +1,14 @@
 openapi: 3.1.0
 info:
-  title: Agora's Governance API (Alpha)
+  title: Agora Governance API
   description: |-
     Welcome to the Agora Governance API documentation. This API provides various endpoints to interact with the Agora Governance client.
 
     ### Current Status
-    - **Alpha**: This API is currently in alpha.  It is recommended for production use cases only in consultation with Agora.
+    This API is currently undergoing material enhancements.  It is recommended for production use cases only in consultation with Agora.
 
     ### API Categories
-    Live and stable. 
+
     - **delegates**: Delegates data
     - **delegations**: Delegations data
     - **proposals**: Proposal data
