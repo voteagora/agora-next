@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       const spec = yaml.parse(data);
 
       // Inject the server URL
-      spec.servers = [{ url: baseUrl }];
+      spec.servers = [{ url: baseUrl + "/api/v1" }];
 
       // Convert back to YAML
       const modifiedData = yaml.stringify(spec);
