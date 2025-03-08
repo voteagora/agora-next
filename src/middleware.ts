@@ -80,6 +80,24 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(ROOT_PATH, request.url));
   }
 
+  // Handle manifest.json for Gnosis Safe App
+  if (path === "/manifest.json") {
+    // Serve the manifest with CORS headers
+    const manifestUrl = new URL("/manifest.json", request.url);
+    const manifestResponse = await fetch(manifestUrl);
+    const manifestData = await manifestResponse.json();
+
+    return NextResponse.json(manifestData, {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers":
+          "X-Requested-With, Content-Type, Authorization",
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
   // Handle preflight OPTIONS requests
   if (request.method === "OPTIONS") {
     return setOptionsCorsHeaders(request);
@@ -110,5 +128,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/api/v1/:path*"],
+  matcher: ["/", "/api/v1/:path*", "/manifest.json"],
 };

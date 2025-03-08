@@ -16,6 +16,12 @@ import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import Tenant from "@/lib/tenant/tenant";
 import { getTransportForChain } from "@/lib/utils";
 import { hashFn } from "@wagmi/core/query";
+import {
+  safe,
+  walletConnect,
+  coinbaseWallet,
+  injected,
+} from "wagmi/connectors";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,6 +51,22 @@ export const config = createConfig(
         contracts.token.chain.id
       )!,
     },
+    connectors: [
+      safe({
+        debug: true,
+        allowedDomains: [
+          /gnosis-safe.io$/,
+          /app.safe.global$/,
+          /safe.global$/,
+          /localhost:.*/,
+        ],
+      }),
+      coinbaseWallet(),
+      walletConnect({
+        projectId: projectId,
+      }),
+      injected(),
+    ],
     appName: metadata.name,
     appDescription: metadata.description,
     appUrl: metadata.url,

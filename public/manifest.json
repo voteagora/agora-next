@@ -1,0 +1,14 @@
+{
+  "name": "Agora Next",
+  "description": "The on-chain governance company",
+  "iconPath": "/favicon.ico",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48 32x32 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "safe_apps_permissions": [],
+  "iconUrl": "/favicon.ico"
+}
