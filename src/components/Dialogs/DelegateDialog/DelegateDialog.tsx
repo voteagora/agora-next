@@ -1,9 +1,4 @@
-import {
-  useAccount,
-  useEnsName,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useAccount, useEnsName, useWriteContract } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/Button";
 import { Button as ShadcnButton } from "@/components/ui/button";
@@ -27,6 +22,8 @@ import { formatEther } from "viem";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { useIsSafeAddress } from "@/hooks/useIsSafeAddress";
+import { useWaitForTransactionReceiptWithSafe } from "@/hooks/useWaitForTransactionReceiptWithSafe";
 
 export function DelegateDialog({
   delegate,
@@ -45,8 +42,9 @@ export function DelegateDialog({
   const [isReady, setIsReady] = useState(false);
   const { ui, contracts, token, slug } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
-
+  const chainId = contracts.token.chain.id;
   const { address: accountAddress } = useAccount();
+  const { data: isSafeWallet } = useIsSafeAddress(accountAddress, chainId);
 
   const { data: tokenBalance } = useTokenBalance(accountAddress);
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
@@ -101,18 +99,30 @@ export function DelegateDialog({
     isLoading: isProcessingDelegation,
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
-  } = useWaitForTransactionReceipt({
+    onChainTxHash: finalTxHash,
+  } = useWaitForTransactionReceiptWithSafe({
     hash: isGasRelayLive ? sponsoredTxnHash : delegateTxHash,
+    isSafeWallet: !!isSafeWallet,
+    chainId,
   });
 
-  const fetchData = async () => {
-    if (shouldFetchData.current && accountAddress) {
-      shouldFetchData.current = false;
-      const direct = await fetchDirectDelegatee(accountAddress);
-      setDelegatee(direct);
-      setIsReady(true);
+  useEffect(() => {
+    if (!isReady || !accountAddress) return;
+
+    async function fetchData() {
+      try {
+        const delegateeData = await fetchDirectDelegatee(accountAddress);
+        setDelegatee(delegateeData);
+      } catch (error) {
+        console.error("Error fetching delegatee:", error);
+      }
     }
-  };
+
+    if (shouldFetchData.current) {
+      shouldFetchData.current = false;
+      fetchData();
+    }
+  }, [isReady, accountAddress, fetchDirectDelegatee]);
 
   useEffect(() => {
     if (didProcessDelegation) {
@@ -121,13 +131,11 @@ export function DelegateDialog({
         event_data: {
           delegate: delegate.address as `0x${string}`,
           delegator: accountAddress as `0x${string}`,
-          transaction_hash: (isGasRelayLive
-            ? sponsoredTxnHash
-            : delegateTxHash) as `0x${string}`,
+          transaction_hash: finalTxHash as `0x${string}`,
         },
       });
     }
-  }, [didProcessDelegation]);
+  }, [didProcessDelegation, finalTxHash]);
 
   async function executeDelegate() {
     if (isGasRelayLive) {
@@ -177,9 +185,7 @@ export function DelegateDialog({
           <Button className="w-full" disabled={false}>
             Delegation completed!
           </Button>
-          <BlockScanUrls
-            hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
-          />
+          <BlockScanUrls hash1={finalTxHash} />
         </div>
       );
     }
@@ -193,6 +199,14 @@ export function DelegateDialog({
       accountAddress &&
       tokenBalance !== undefined
     ) {
+      const fetchData = async () => {
+        try {
+          const delegateeData = await fetchDirectDelegatee(accountAddress);
+          setDelegatee(delegateeData);
+        } catch (error) {
+          console.error("Error fetching delegatee:", error);
+        }
+      };
       fetchData();
     }
 
@@ -205,7 +219,15 @@ export function DelegateDialog({
         });
       }
     }
-  }, [didProcessDelegation, delegate, tokenBalance, accountAddress]);
+  }, [
+    didProcessDelegation,
+    didProcessSponsoredDelegation,
+    delegate,
+    tokenBalance,
+    accountAddress,
+    fetchDirectDelegatee,
+    setRefetchDelegate,
+  ]);
 
   if (!isReady) {
     return (

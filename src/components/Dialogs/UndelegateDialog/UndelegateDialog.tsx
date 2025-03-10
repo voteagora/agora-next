@@ -120,14 +120,6 @@ export function UndelegateDialog({
       );
     }
 
-    if (sameDelegatee) {
-      return (
-        <ShadcnButton variant="outline" className="cursor-not-allowed">
-          You are already delegated to yourself
-        </ShadcnButton>
-      );
-    }
-
     if (isError || didFailDelegation) {
       return (
         <Button disabled={false} onClick={executeDelegate}>
