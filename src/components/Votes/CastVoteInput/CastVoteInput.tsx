@@ -1,6 +1,5 @@
 "use client";
 
-import { HStack, VStack } from "@/components/Layout/Stack";
 import { ReactNode } from "react";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
@@ -12,8 +11,9 @@ import {
   checkMissingVoteForDelegate,
   getVpToDisplay,
   MissingVote,
+  calculateVoteMetadata,
 } from "@/lib/voteUtils";
-import { TokenAmountDisplay } from "@/lib/utils";
+import { cn, TokenAmountDisplay } from "@/lib/utils";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import CastVoteContextProvider, {
   SupportTextProps,
@@ -25,7 +25,7 @@ import { icons } from "@/icons/icons";
 import Image from "next/image";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
-import { formatEther } from "viem";
+import { formatEther, formatUnits } from "viem";
 import {
   Tooltip,
   TooltipContent,
@@ -35,6 +35,10 @@ import {
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import shareIcon from "@/icons/share.svg";
+import { format } from "date-fns";
+import { useVotableSupply } from "@/hooks/useVotableSupply";
 
 type Props = {
   proposal: Proposal;
@@ -53,6 +57,7 @@ export default function CastVoteInput({
     proposal,
     blockNumber: isOptimismTenant ? proposal.snapshotBlockNumber : undefined,
   });
+  const { data: votableSupply } = useVotableSupply({ enabled: true });
 
   const chains = data?.chains;
   const delegate = data?.delegate;
@@ -91,6 +96,7 @@ export default function CastVoteInput({
       votes={votes}
       chains={chains}
       votingPower={votingPower}
+      votableSupply={votableSupply}
     >
       <CastVoteInputContent
         proposal={proposal}
@@ -130,6 +136,7 @@ function CastVoteInputContent({
   const { ui } = Tenant.current();
 
   const missingVote = checkMissingVoteForDelegate(votes, votingPower);
+  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
   const showSuccessMessage = isSuccess || missingVote === "NONE";
 
@@ -151,19 +158,15 @@ function CastVoteInputContent({
     !reason;
 
   return (
-    <VStack className="flex-shrink bg-wash">
-      <VStack
-        className={`bg-neutral border-b border-line rounded-b-lg flex-shrink ${isGasRelayLive && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
+    <div className="flex flex-col flex-shrink bg-wash">
+      <div
+        className={`flex flex-col bg-neutral border-b border-line rounded-b-lg flex-shrink ${isGasRelayLive && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
       >
-        <VStack
-          justifyContent="justify-between"
-          alignItems="items-stretch"
-          className="pb-3 pt-1"
-        >
+        <div className="flex flex-col items-stretch justify-between pb-3 pt-1">
           {!isError && !showSuccessMessage && (
-            <VStack className="bg-neutral border-t border-line px-3 ">
+            <div className="bg-neutral border-t border-line px-3 ">
               {!isLoading && (
-                <VStack gap={2}>
+                <div className="flex flex-col gap-2">
                   <textarea
                     placeholder="I believe..."
                     value={reason || undefined}
@@ -175,7 +178,7 @@ function CastVoteInputContent({
                     proposalStatus={proposal.status}
                     isOptimistic={isOptimistic}
                   />
-                </VStack>
+                </div>
               )}
               {isLoading && <LoadingVote />}
               {!isLoading && proposal.status === "ACTIVE" && (
@@ -186,7 +189,7 @@ function CastVoteInputContent({
                   proposal={proposal}
                 />
               )}
-            </VStack>
+            </div>
           )}
           {isError && (!isGasRelayLive || fallbackToStandardVote) && (
             <ErrorState
@@ -211,13 +214,19 @@ function CastVoteInputContent({
               button2={{ message: "Try again", action: write }}
             />
           )}
-        </VStack>
-      </VStack>
+        </div>
+      </div>
       {isGasRelayLive && !showSuccessMessage && !fallbackToStandardVote && (
         <VotingBanner />
       )}
-      {showSuccessMessage && <SuccessMessage />}
-    </VStack>
+      {showSuccessMessage && (
+        <SuccessMessage
+          proposal={proposal}
+          votes={votes}
+          votingPower={vpToDisplay}
+        />
+      )}
+    </div>
   );
 }
 
@@ -333,7 +342,7 @@ const SubmitButton = ({
 
 function LoadingVote() {
   return (
-    <VStack className="w-full pt-3">
+    <div className="flex flex-col w-full pt-3">
       <div className="mb-2 text-sm text-secondary font-medium">
         Casting your vote
       </div>
@@ -345,35 +354,115 @@ function LoadingVote() {
           Writing your vote to the chain...
         </Button>
       </div>
-    </VStack>
+    </div>
   );
 }
 
-function SuccessMessage() {
-  const { data, support } = useCastVoteContext();
+export function SuccessMessage({
+  proposal,
+  votes,
+  className,
+  votingPower,
+}: {
+  proposal: Proposal;
+  votes: Vote[];
+  className?: string;
+  votingPower?: string;
+}) {
+  const {
+    data,
+    support: supportFromContext,
+    reason: reasonFromContext,
+  } = useCastVoteContext();
+  const openDialog = useOpenDialog();
+  const { data: votableSupply } = useVotableSupply({ enabled: true });
+
+  const newVote = {
+    support: supportFromContext || "",
+    reason: reasonFromContext || "",
+    params: [],
+    weight: votingPower || "",
+  };
+
+  const {
+    support,
+    blockNumber,
+    timestamp,
+    address,
+    endsIn,
+    forPercentage,
+    againstPercentage,
+    reason,
+    transactionHash,
+    options,
+    totalOptions,
+  } = calculateVoteMetadata({
+    proposal,
+    votes,
+    votableSupply,
+    newVote,
+  });
 
   const supportColor =
     support?.toLowerCase() === "for"
       ? "text-positive"
       : support?.toLowerCase() === "against"
         ? "text-negative"
-        : "text-secondary";
+        : "text-tertiary";
 
   return (
-    <VStack className="w-full text-sm text-secondary font-medium py-2 px-4 bg-wash border-b border-line rounded-b-lg">
-      <div className="text-sm text-secondary">
-        You{" "}
-        <span className={supportColor}>
-          voted {support?.toLowerCase() + (support === "ABSTAIN" ? " in" : "")}
-        </span>{" "}
-        this proposal
-      </div>
+    <div
+      className={cn(
+        "flex flex-col w-full text-sm text-secondary font-medium py-2 px-4 bg-transparent rounded-b-lg",
+        className
+      )}
+    >
+      <Button
+        onClick={() => {
+          openDialog({
+            className: "sm:w-[32rem]",
+            type: "SHARE_VOTE",
+            params: {
+              againstPercentage: againstPercentage,
+              forPercentage: forPercentage,
+              endsIn: endsIn,
+              blockNumber: blockNumber?.toString() || null,
+              voteDate: timestamp
+                ? format(new Date(timestamp), "MMM d, yyyy h:mm a")
+                : "",
+              supportType: support || "ABSTAIN",
+              voteReason: reason || "",
+              proposalId: proposal.id,
+              proposalTitle: proposal.markdowntitle,
+              proposalType: proposal.proposalType ?? "STANDARD",
+              proposal: proposal,
+              options: options,
+              totalOptions: totalOptions,
+              votes,
+              newVote,
+            },
+          });
+        }}
+        variant="outline"
+        className="w-full text-secondary font-semibold text-xs gap-2 rounded-[0.5rem] h-8"
+      >
+        <Image src={shareIcon.src} alt="Share icon" height={18} width={18} />
+        <span>
+          Share you voted{" "}
+          <span className={supportColor}>
+            {support?.toUpperCase() + (support === "ABSTAIN" ? " in" : "")}
+          </span>{" "}
+          this proposal
+        </span>
+      </Button>
       <BlockScanUrls
-        className="pt-2"
-        hash1={data?.sponsoredVoteTxHash || data?.standardTxHash}
+        className="pt-2 text-tertiary font-medium mx-auto"
+        hash1={
+          data?.sponsoredVoteTxHash || data?.standardTxHash || transactionHash
+        }
         hash2={data?.advancedTxHash}
       />
-    </VStack>
+    </div>
   );
 }
 
@@ -389,7 +478,7 @@ function VoteButtons({
   }
 
   return (
-    <HStack gap={2} className="pt-1">
+    <div className="flex flex-row gap-2 pt-1">
       {(isOptimistic ? ["AGAINST"] : ["FOR", "AGAINST", "ABSTAIN"]).map(
         (supportType) => (
           <VoteButton
@@ -398,7 +487,7 @@ function VoteButtons({
           />
         )
       )}
-    </HStack>
+    </div>
   );
 }
 
@@ -436,7 +525,7 @@ function DisabledVoteButton({ reason }: { reason: string }) {
 
 function NoStatementView() {
   return (
-    <VStack gap={3}>
+    <div className="flex flex-col gap-3">
       <div className="py-2 px-4 bg-line text-xs text-secondary rounded-lg flex items-center gap-2">
         <Image src={icons.info} alt="Info" width={24} height={24} />
         Voting requires a delegate statement. Set yours one now to participate.
@@ -447,7 +536,7 @@ function NoStatementView() {
       >
         Set up statement
       </Button>
-    </VStack>
+    </div>
   );
 }
 
@@ -461,7 +550,7 @@ function ErrorState({
   button2: { message: string; action: () => void };
 }) {
   return (
-    <VStack gap={3} className="p-3 border-t border-line">
+    <div className="flex flex-col gap-3 p-3 border-t border-line">
       <div className="py-2 px-4 bg-red-300 text-xs text-red-700 font-medium rounded-lg flex items-center gap-2">
         <Image
           src={icons.infoRed}
@@ -472,7 +561,7 @@ function ErrorState({
         />
         {message}
       </div>
-      <HStack gap={2}>
+      <div className="flex flex-row gap-2">
         <Button
           className="w-full"
           variant="elevatedOutline"
@@ -483,7 +572,7 @@ function ErrorState({
         <Button className="w-full" onClick={button2.action}>
           {button2.message}
         </Button>
-      </HStack>
-    </VStack>
+      </div>
+    </div>
   );
 }

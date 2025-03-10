@@ -13,9 +13,11 @@ import { ParsedProposalData } from "@/lib/proposalUtils";
 import useAdvancedVoting from "@/hooks/useAdvancedVoting";
 import { Button } from "@/components/ui/button";
 import { ApprovalCastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
-import { getVpToDisplay } from "@/lib/voteUtils";
+import { calculateVoteMetadata, getVpToDisplay } from "@/lib/voteUtils";
 import { useEnsName, useAccount } from "wagmi";
 import { truncateAddress } from "@/app/lib/utils/text";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { Vote } from "@/app/api/common/votes/vote";
 
 const abiCoder = new AbiCoder();
 
@@ -122,6 +124,8 @@ export function ApprovalCastVoteDialog({
   const [encodedParams, setEncodedParams] = useState<`0x${string}`>("0x");
   const maxChecked = proposalData.proposalSettings.maxApprovals;
   const abstainOptionId = proposalData.options.length; // Abstain option is always last
+  const openDialog = useOpenDialog();
+  const { address } = useAccount();
 
   const handleOnChange = (optionId: number) => {
     if (optionId === abstainOptionId) {
@@ -173,6 +177,52 @@ export function ApprovalCastVoteDialog({
     setEncodedParams(encoded);
   }, [selectedOptions, abstain]);
 
+  const newVote = {
+    support: abstain ? "ABSTAIN" : "FOR",
+    reason: reason,
+    params: selectedOptions.map(
+      (option) => proposalData.options[option].description
+    ),
+    weight: votingPower.directVP || votingPower.advancedVP,
+  };
+
+  const { againstPercentage, forPercentage, endsIn, options, totalOptions } =
+    calculateVoteMetadata({
+      proposal,
+      votes: [],
+      newVote,
+    });
+
+  const openShareVoteDialog = () => {
+    openDialog({
+      className: "sm:w-[32rem]",
+      type: "SHARE_VOTE",
+      params: {
+        againstPercentage: againstPercentage,
+        forPercentage: forPercentage,
+        endsIn: endsIn,
+        blockNumber: null,
+        voteDate: null,
+        supportType: abstain ? "ABSTAIN" : "FOR",
+        voteReason: reason || "",
+        proposalId: proposal.id,
+        proposalTitle: proposal.markdowntitle,
+        proposalType: proposal.proposalType ?? "STANDARD",
+        proposal: proposal,
+        newVote: newVote,
+        options: options,
+        totalOptions: totalOptions,
+        votes: [
+          {
+            params: selectedOptions.map(
+              (option) => proposalData.options[option].description
+            ),
+          } as Vote,
+        ],
+      },
+    });
+  };
+
   if (inReviewStep) {
     return (
       <ReviewApprovalVoteDialog
@@ -183,6 +233,7 @@ export function ApprovalCastVoteDialog({
         votingPower={vpToDisplay}
         onClose={() => {
           setInReviewStep(false);
+          openShareVoteDialog();
         }}
       />
     );
