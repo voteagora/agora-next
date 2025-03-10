@@ -4,9 +4,9 @@ import {
 } from "@/app/api/common/proposals/getProposals";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { fetchVotableSupplyUnstableCache } from "@/app/api/common/votableSupply/getVotableSupply";
-import { fetchVotesForProposalAndDelegateUnstableCache } from "@/app/api/common/votes/getVotes";
 import { Vote } from "@/app/api/common/votes/vote";
 import { cleanString, truncateString } from "@/app/lib/utils/text";
+import CopelandProposalPage from "@/components/Proposals/ProposalPage/CopelandProposalPage/CopelandProposalPage";
 import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
 import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
 import StandardProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/StandardProposalPage";
@@ -156,6 +156,12 @@ export default async function Page({
       break;
     case "APPROVAL":
       RenderComponent = OPProposalApprovalPage;
+      break;
+    case "SNAPSHOT":
+      //TODO: if (proposal.proposalData?.type === "copeland") {
+      if (true) {
+        RenderComponent = CopelandProposalPage;
+      }
       break;
     default:
       // Default to standard proposal page
