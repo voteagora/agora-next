@@ -113,6 +113,7 @@ export const ensTenantUIConfig = new TenantUI({
             ? "0x7735C385081568e9338aEc70492Debfd2d5c3450"
             : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
         minBalance: "0.001",
+        minVPToUseGasRelay: "10",
       },
     },
     {
@@ -127,6 +128,7 @@ export const ensTenantUIConfig = new TenantUI({
             ? "0x7735C385081568e9338aEc70492Debfd2d5c3450"
             : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
         minBalance: "0.001",
+        minVPToUseGasRelay: "10",
       },
     },
     {
