@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/table";
 import { PaginatedResult } from "@/app/lib/pagination";
 import { useEffect, useRef, useState } from "react";
-import Tenant from "@/lib/tenant/tenant";
-import { DELEGATION_MODEL } from "@/lib/constants";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
 
 function DelegationsContainer({
   delegatees,
@@ -28,11 +27,10 @@ function DelegationsContainer({
     limit: number;
   }) => Promise<PaginatedResult<Delegation[]>>;
 }) {
-  const { contracts } = Tenant.current();
-
   const [meta, setMeta] = useState(initialDelegators.meta);
   const [delegators, setDelegators] = useState(initialDelegators.data);
 
+  const { data: tokenBalance } = useTokenBalance(delegatees[0]?.from);
   const isLoadingRef = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -136,14 +134,9 @@ function DelegationsContainer({
             <Table>
               <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
                 <TableRow>
-                  {(contracts.delegationModel === DELEGATION_MODEL.PARTIAL ||
-                    contracts.delegationModel ===
-                      DELEGATION_MODEL.ADVANCED) && (
-                    <TableHead className="h-10 text-secondary">
-                      Voting Power
-                    </TableHead>
-                  )}
-
+                  <TableHead className="h-10 text-secondary">
+                    Current Token Balance
+                  </TableHead>
                   <TableHead className="h-10 text-secondary">
                     Delegated on
                   </TableHead>
@@ -166,9 +159,9 @@ function DelegationsContainer({
                 ) : (
                   delegatees.map((delegation) => (
                     <DelegationToRow
+                      tokenBalance={tokenBalance}
                       key={delegation.to}
                       delegation={delegation}
-                      delegationModel={contracts.delegationModel}
                     />
                   ))
                 )}
