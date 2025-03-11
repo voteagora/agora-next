@@ -105,7 +105,6 @@ export function getInputData(proposal: DraftProposal): {
           targets.push(ethers.getAddress(t.target) as `0x${string}`);
           values.push(parseInt(t.value) || 0);
           calldatas.push(t.calldata as `0x${string}`);
-          signatures.push(t.signature || "");
         });
       }
 

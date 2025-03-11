@@ -306,6 +306,7 @@ function getInputData(form: Form): {
 
 function encodeTransfer(to: string, amount: bigint): string {
   return (
+    "0xa9059cbb" +
     abiCoder
       .encode(["address", "uint256"], [ethers.getAddress(to), amount])
       .slice(2)
