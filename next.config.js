@@ -8,6 +8,27 @@ const nextConfig = {
   async redirects() {
     return [];
   },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY'
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
+          },
+        ]
+      }
+    ];
+  },
   images: {
     remotePatterns: [
       {
@@ -15,6 +36,8 @@ const nextConfig = {
         hostname: "**",
       },
     ],
+    dangerouslyAllowSVG: false,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   webpack: (config) => {
     config.resolve.fallback = { fs: false, net: false, tls: false };
