@@ -28,6 +28,36 @@ vi.mock("@/hooks/useSponsoredVoting");
 vi.mock("@/hooks/useStandardVoting");
 vi.mock("@/hooks/useAdvancedVoting");
 
+vi.mock("wagmi", async (importOriginal) => {
+  const actual: any = await importOriginal();
+  return {
+    ...actual,
+    useAccount: () => ({
+      address: "0xMockedAddress",
+      isConnected: true,
+    }),
+    useConfig: () => ({}),
+  };
+});
+
+vi.mock("@/lib/voteUtils", async (importOriginal) => {
+  const actual: any = await importOriginal();
+  return {
+    ...actual,
+    calculateVoteMetadataMinified: () => ({
+      for: BigInt(0),
+      against: BigInt(0),
+      abstain: BigInt(0),
+      quorum: BigInt(0),
+      participation: 0,
+      support: 0,
+      supportRequired: 0,
+      quorumRequired: BigInt(0),
+      votingPower: BigInt(0),
+    }),
+  };
+});
+
 let mockVotingPower = {
   totalVP: "0",
   directVP: "0",
