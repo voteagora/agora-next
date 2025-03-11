@@ -33,7 +33,15 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**",
+        hostname: "cdn4.iconfinder.com",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn3.iconfinder.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.pinimg.com",
       },
     ],
     dangerouslyAllowSVG: false,
