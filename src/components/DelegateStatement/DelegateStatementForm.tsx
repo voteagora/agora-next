@@ -127,10 +127,10 @@ export default function DelegateStatementForm({
     !!agreeDaoPrinciples;
 
   return (
-    <div className="flex flex-col sm:flex-row-reverse items-center sm:items-start gap-16 justify-between mt-12 w-full max-w-full">
+    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-16 justify-between mt-12 w-full max-w-full">
       {delegate && (
-        <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
-          <DelegateCard delegate={delegate} />
+        <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-[350px]">
+          <DelegateCard delegate={delegate} isEditMode />
         </div>
       )}
       <div className="flex flex-col w-full">

@@ -195,7 +195,7 @@ export function DelegateProfileImageWithMetadata({
             />
           )}
           <ENSAvatar
-            className="rounded-full w-[44px] h-[44px] sm:w-[88px] sm:h-[88px]"
+            className="rounded-full w-[44px] h-[44px]"
             ensName={data}
             size={88}
           />
