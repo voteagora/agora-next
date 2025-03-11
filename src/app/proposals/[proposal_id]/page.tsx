@@ -10,6 +10,7 @@ import CopelandProposalPage from "@/components/Proposals/ProposalPage/CopelandPr
 import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
 import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
 import StandardProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/StandardProposalPage";
+import { ParsedProposalData } from "@/lib/proposalUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { calculateVoteMetadata } from "@/lib/voteUtils";
 import { format } from "date-fns";
@@ -158,8 +159,10 @@ export default async function Page({
       RenderComponent = OPProposalApprovalPage;
       break;
     case "SNAPSHOT":
-      //TODO: if (proposal.proposalData?.type === "copeland") {
-      if (true) {
+      if (
+        (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
+          ?.type === "copeland"
+      ) {
         RenderComponent = CopelandProposalPage;
       }
       break;

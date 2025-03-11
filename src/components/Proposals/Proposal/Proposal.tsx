@@ -21,12 +21,17 @@ export default function Proposal({
   votableSupply: string;
 }) {
   const { ui } = Tenant.current();
-  const proposalText = getProposalTypeText(proposal.proposalType ?? "");
+  const proposalText = getProposalTypeText(
+    proposal.proposalType ?? "",
+    proposal.proposalType === "SNAPSHOT"
+      ? (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
+      : undefined
+  );
 
-  // TODO
-  const shouldNavigateToSnapshot = false;
-  // proposal.proposalType === "SNAPSHOT" &&
-  // proposalText !== "Ranked Choice Proposal";
+  const shouldNavigateToSnapshot =
+    proposal.proposalType === "SNAPSHOT" &&
+    (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])?.type !==
+      "copeland";
 
   return (
     <Link

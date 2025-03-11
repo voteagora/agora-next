@@ -1,9 +1,6 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import {
-  CopelandResult,
-  simulateCopelandVoting,
-} from "@/lib/copelandCalculation";
+import { CopelandResult } from "@/lib/copelandCalculation";
 import {
   Accordion,
   AccordionContent,
@@ -17,8 +14,8 @@ import { fontMapper } from "@/styles/fonts";
 import { Tooltip, TooltipContent } from "@/components/ui/tooltip";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
-
 const { ui } = Tenant.current();
+import { useCalculateCopelandResult } from "@/hooks/useCalculateCopelandResult";
 
 export default function OptionsResultsPanel({
   proposal,
@@ -26,19 +23,35 @@ export default function OptionsResultsPanel({
   proposal: Proposal;
 }) {
   const isProposalActive = proposal.status === "ACTIVE";
-  const proposalResults = simulateCopelandVoting();
+  const { data: proposalResults, isFetching } = useCalculateCopelandResult({
+    proposalId: proposal.id,
+  });
 
   return (
-    <div className="flex flex-col flex-1 max-h-[calc(100vh-482px)] overflow-y-scroll flex-shrink px-4 mt-1 [&::-webkit-scrollbar]:hidden">
+    <div className="flex flex-col flex-1 max-h-[calc(100vh-532px)] overflow-y-scroll flex-shrink px-4 mt-1 [&::-webkit-scrollbar]:hidden">
       <Accordion type="single" collapsible className="w-full">
-        {proposalResults.map((result, index) => (
-          <OptionRow
-            key={result.letter}
-            result={result}
-            index={index}
-            isProposalActive={isProposalActive}
-          />
-        ))}
+        {isFetching ? (
+          <div className="text-center text-sm text-tertiary">Loading...</div>
+        ) : proposalResults && proposalResults.length > 0 ? (
+          <div>
+            {" "}
+            {proposalResults.map((result, index) => (
+              <OptionRow
+                key={result.letter}
+                result={result}
+                index={index}
+                isProposalActive={isProposalActive}
+                isFunding={proposal.markdowntitle.includes(
+                  "Service Provider Stream"
+                )}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center text-sm text-tertiary">
+            No results available
+          </div>
+        )}
       </Accordion>
     </div>
   );
@@ -48,17 +61,19 @@ const OptionRow = ({
   result,
   index,
   isProposalActive,
+  isFunding,
 }: {
   result: CopelandResult;
   index: number;
   isProposalActive: boolean;
+  isFunding: boolean;
 }) => {
   const resultValue = result.letter
     .slice((result.letter.indexOf(":") || 0) + 1)
     .trim()
     .split("/");
-  const ext2yResultValue = resultValue[0].trim();
-  const ext1yResultValue = resultValue[1].trim();
+  const ext2yResultValue = resultValue?.[0]?.trim();
+  const ext1yResultValue = resultValue?.[1]?.trim();
   const fundingTypeResultValue =
     result.fundingType === "EXT 2Y"
       ? ext2yResultValue
@@ -91,44 +106,46 @@ const OptionRow = ({
                 {result.letter.split(":")[0].trim()}
               </span>
               <div className="flex items-center gap-4">
-                {result.fundingType !== "None" ? (
-                  <>
-                    <div
-                      className={cn(
-                        "border border-[#008425] bg-positive/20 text-positive px-2 py-1 rounded-sm font-semibold",
-                        result.fundingType === "EXT 2Y" &&
-                          "bg-[#008425]/60 text-wash"
-                      )}
-                    >
-                      {result.fundingType}
-                    </div>
+                {isFunding ? (
+                  result.fundingType !== "None" ? (
+                    <>
+                      <div
+                        className={cn(
+                          "border border-[#008425] bg-positive/20 text-positive px-2 py-1 rounded-sm font-semibold",
+                          result.fundingType === "EXT 2Y" &&
+                            "bg-[#008425]/60 text-wash"
+                        )}
+                      >
+                        {result.fundingType}
+                      </div>
+                      <span
+                        className={cn(
+                          "text-positive font-semibold flex items-center",
+                          fontMapper[ui?.customization?.tokenAmountFont || ""]
+                            ?.variable
+                        )}
+                      >
+                        {fundingTypeResultValue &&
+                          fundingTypeResultValue.replace(
+                            /(\d)(?=(\d{3})+(?!\d))/g,
+                            "$1,"
+                          )}
+                        /y
+                        <Check strokeWidth={4} className="h-3 w-3 ml-1" />
+                      </span>
+                    </>
+                  ) : result.fundingType === "None" ? (
                     <span
                       className={cn(
-                        "text-positive font-semibold flex items-center",
+                        "text-tertiary flex items-center font-semibold",
                         fontMapper[ui?.customization?.tokenAmountFont || ""]
                           ?.variable
                       )}
                     >
-                      {fundingTypeResultValue &&
-                        fundingTypeResultValue.replace(
-                          /(\d)(?=(\d{3})+(?!\d))/g,
-                          "$1,"
-                        )}
-                      /y
-                      <Check strokeWidth={4} className="h-3 w-3 ml-1" />
+                      NONE <X strokeWidth={4} className="h-3 w-3 ml-1" />
                     </span>
-                  </>
-                ) : (
-                  <span
-                    className={cn(
-                      "text-tertiary flex items-center font-semibold",
-                      fontMapper[ui?.customization?.tokenAmountFont || ""]
-                        ?.variable
-                    )}
-                  >
-                    NONE <X strokeWidth={4} className="h-3 w-3 ml-1" />
-                  </span>
-                )}
+                  ) : null
+                ) : null}
               </div>
             </div>
           </AccordionTrigger>
@@ -136,34 +153,50 @@ const OptionRow = ({
       </div>
       <div className="ml-5 w-[calc(100%-1.25rem)]">
         <AccordionContent className="text-xs font-medium py-0 border border-t-0 border-line bg-wash rounded-b-sm">
-          <div className="border-b border-line py-3 px-3">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-xs font-semibold">Extended ask</span>
-              <span
-                className={cn(
-                  "text-xs font-semibold",
-                  fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
+          {isFunding ? (
+            ext2yResultValue || ext1yResultValue ? (
+              <div className="border-b border-line py-3 px-3">
+                {ext2yResultValue && (
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-xs font-semibold">Extended ask</span>
+                    <span
+                      className={cn(
+                        "text-xs font-semibold",
+                        fontMapper[ui?.customization?.tokenAmountFont || ""]
+                          ?.variable
+                      )}
+                    >
+                      {ext2yResultValue &&
+                        ext2yResultValue.replace(
+                          /(\d)(?=(\d{3})+(?!\d))/g,
+                          "$1,"
+                        )}
+                      /Y
+                    </span>
+                  </div>
                 )}
-              >
-                {ext2yResultValue &&
-                  ext2yResultValue.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
-                /Y
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-semibold">Standard ask</span>
-              <span
-                className={cn(
-                  "text-xs font-semibold",
-                  fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
+                {ext1yResultValue && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-semibold">Standard ask</span>
+                    <span
+                      className={cn(
+                        "text-xs font-semibold",
+                        fontMapper[ui?.customization?.tokenAmountFont || ""]
+                          ?.variable
+                      )}
+                    >
+                      {ext1yResultValue &&
+                        ext1yResultValue.replace(
+                          /(\d)(?=(\d{3})+(?!\d))/g,
+                          "$1,"
+                        )}
+                      /Y
+                    </span>
+                  </div>
                 )}
-              >
-                {ext1yResultValue &&
-                  ext1yResultValue.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
-                /Y
-              </span>
-            </div>
-          </div>
+              </div>
+            ) : null
+          ) : null}
 
           <div className="border-b border-line py-3 px-3">
             <div className="flex justify-between items-center mb-4">

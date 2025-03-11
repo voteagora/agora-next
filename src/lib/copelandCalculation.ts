@@ -8,12 +8,8 @@
  * @param options Array of available options
  * @returns Object containing calculated Copeland scores, winners, and details
  */
-interface Vote {
-  id: string;
-  voter: string;
-  choice: number[];
-  vp: number;
-}
+
+import { SnapshotVote } from "@/app/api/common/votes/vote";
 
 interface PairwiseComparison {
   option1: string;
@@ -33,8 +29,8 @@ export interface CopelandResult {
   avgVotingPowerAgainst: number;
 }
 
-function calculateCopelandVote(
-  votes: Vote[],
+export function calculateCopelandVote(
+  votes: SnapshotVote[],
   options: string[]
 ): CopelandResult[] {
   const scores: Record<string, number> = {};
@@ -58,14 +54,19 @@ function calculateCopelandVote(
   });
 
   votes.forEach((vote) => {
-    totalVotingPower += vote.vp;
+    totalVotingPower += vote.votingPower;
 
     const noneIndex = options.findIndex((choice) => choice === "NONE BELOW");
 
     const optionRanks: Record<string, number> = {};
 
     options.forEach((option, index) => {
-      const rank = vote.choice.findIndex((choice) => choice === index + 1);
+      const parsedChoice = vote.choice?.startsWith("[")
+        ? JSON.parse(vote.choice)
+        : vote.choice;
+      const rank = (parsedChoice as number[]).findIndex(
+        (choice) => choice === index + 1
+      );
 
       // Only consider options that are ranked higher than "NONE BELOW"
       // or options that are valid if "NONE BELOW" isn't in options
@@ -94,27 +95,27 @@ function calculateCopelandVote(
 
         // If option1 is below "NONE BELOW", it loses to option2
         if (!(option1 in optionRanks) || optionRanks[option1] === -1) {
-          pairwiseWins[option2][option1] += vote.vp;
+          pairwiseWins[option2][option1] += vote.votingPower;
           continue;
         }
 
         // If option2 is below "NONE BELOW", it loses to option1
         if (!(option2 in optionRanks) || optionRanks[option2] === -1) {
-          pairwiseWins[option1][option2] += vote.vp;
+          pairwiseWins[option1][option2] += vote.votingPower;
           continue;
         }
 
         // Both options are above "NONE BELOW", compare their ranks
         // Lower rank is better (1 is better than 2)
         if (optionRanks[option1] < optionRanks[option2]) {
-          pairwiseWins[option1][option2] += vote.vp;
+          pairwiseWins[option1][option2] += vote.votingPower;
         } else if (optionRanks[option1] > optionRanks[option2]) {
-          pairwiseWins[option2][option1] += vote.vp;
+          pairwiseWins[option2][option1] += vote.votingPower;
         } else {
           // If tied, track voting power for this pair
-          pairwiseVotingPower[option1][option2].total += vote.vp;
+          pairwiseVotingPower[option1][option2].total += vote.votingPower;
           pairwiseVotingPower[option1][option2].count += 1;
-          pairwiseVotingPower[option2][option1].total += vote.vp;
+          pairwiseVotingPower[option2][option1].total += vote.votingPower;
           pairwiseVotingPower[option2][option1].count += 1;
         }
       }
@@ -235,7 +236,10 @@ function calculateCopelandVote(
       });
 
       const numVotesForThisOption = votes.filter((vote) => {
-        return vote.choice.some((choice) => {
+        const parsedChoice = vote.choice?.startsWith("[")
+          ? JSON.parse(vote.choice)
+          : vote.choice;
+        return (parsedChoice as number[]).some((choice) => {
           const noneIndex = options.findIndex((o) => o === "NONE BELOW");
           return (
             options[choice - 1] === option &&
@@ -266,60 +270,3 @@ function calculateCopelandVote(
 
   return results;
 }
-
-const options = [
-  "Epsilon Co: $500,000 / $250,000",
-  "Delta Innovations: $400,000 / $200,000",
-  "Gamma Corp: $300,000 / $150,000",
-  "Beta Ltd: $200,000 / $100,000",
-  "Alpha Inc: $450,000 / $225,000",
-  "Omega Co: $350,000 / $175,000",
-  "Zeta Co: $250,000 / $125,000",
-  "Globex Corp: $325,000 / $162,500",
-  "Omega Enterprises: $375,000 / $187,500",
-  "Theta Systems: $425,000 / $212,500",
-  "NONE BELOW",
-];
-
-/**
- * Generate random votes for simulation
- * @param numVotes Number of votes to generate
- * @param options Available options
- * @returns Array of randomly generated votes
- */
-function generateRandomVotes(numVotes: number, options: string[]): Vote[] {
-  const votes: Vote[] = [];
-
-  for (let i = 0; i < numVotes; i++) {
-    const shuffledOptions = [...options].sort(() => Math.random() - 0.5);
-
-    const rankings: number[] = new Array(options.length);
-
-    for (let j = 0; j < options.length; j++) {
-      const option = shuffledOptions[j];
-      const originalIndex = options.indexOf(option);
-
-      rankings[originalIndex] = j + 1;
-    }
-
-    const votingPower = Math.floor(Math.random() * 900000) + 100000;
-
-    votes.push({
-      id: `vote-${i}-${Math.random().toString(36).substring(2, 15)}`,
-      voter: `0x${Math.random().toString(36).substring(2, 15)}`,
-      choice: rankings,
-      vp: votingPower,
-    });
-  }
-
-  return votes;
-}
-
-export const simulateCopelandVoting = () => {
-  const simulatedVotes = generateRandomVotes(25, options);
-  const result = calculateCopelandVote(simulatedVotes, options);
-  // TODO: remove this
-  console.log("simulatedVotes:", JSON.stringify(simulatedVotes, null, 2));
-  console.log("options:", options);
-  return result;
-};
