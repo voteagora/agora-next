@@ -292,6 +292,36 @@ async function getVotersWhoHaveNotVotedForProposal({
   };
 }
 
+async function getSnapshotVotesForProposal({
+  proposalId,
+  pagination = { offset: 0, limit: 20 },
+  sort = "vp",
+}: {
+  proposalId: string;
+  pagination?: PaginationParams;
+  sort?: string;
+}) {
+  const { slug } = Tenant.current();
+
+  const queryFunction = (skip: number, take: number) => {
+    const query = `
+      SELECT * FROM "snapshot".votes WHERE proposal_id = $1 AND dao_slug = '${slug}'
+      ORDER BY ${sort} DESC
+      OFFSET $2 LIMIT $3;`;
+
+    return prisma.$queryRawUnsafe<SnapshotVotePayload[]>(
+      query,
+      proposalId,
+      skip,
+      take
+    );
+  };
+
+  const { meta, data: votes } = await paginateResult(queryFunction, pagination);
+
+  return { meta, data: votes.map((vote) => parseSnapshotVote(vote)) };
+}
+
 async function getVotesForProposal({
   proposalId,
   pagination = { offset: 0, limit: 20 },
@@ -420,6 +450,32 @@ async function getVotesForProposal({
   };
 }
 
+async function getUserSnapshotVotesForProposal({
+  proposalId,
+  address,
+}: {
+  proposalId: string;
+  address: string;
+}) {
+  const { slug } = Tenant.current();
+
+  const queryFunction = prisma.$queryRawUnsafe<SnapshotVotePayload[]>(
+    `
+      SELECT * FROM "snapshot".votes WHERE proposal_id = $1 AND dao_slug = '${slug}' AND voter = $2`,
+    proposalId,
+    address.toLowerCase()
+  );
+
+  const votes = await doInSpan(
+    { name: "getUserSnapshotVotesForProposal" },
+    async () => queryFunction
+  );
+
+  const data = Promise.all(votes.map((vote) => parseSnapshotVote(vote)));
+
+  return data;
+}
+
 async function getUserVotesForProposal({
   proposalId,
   address,
@@ -525,4 +581,8 @@ export const fetchVotesForProposalAndDelegateUnstableCache = unstable_cache(
     tags: ["votesForProposalAndDelegate"],
     revalidate: 86400, // 1 day
   }
+);
+export const fetchSnapshotVotesForProposal = cache(getSnapshotVotesForProposal);
+export const fetchSnapshotUserVotesForProposal = cache(
+  getUserSnapshotVotesForProposal
 );

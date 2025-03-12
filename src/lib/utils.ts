@@ -12,6 +12,7 @@ import { ProposalType } from "../app/proposals/draft/types";
 import { AlchemyProvider } from "ethers";
 import { hexToBigInt } from "viem";
 import { unstable_cache } from "next/cache";
+import { ParsedProposalData } from "./proposalUtils";
 
 const { token } = Tenant.current();
 
@@ -30,20 +31,24 @@ export function bpsToString(bps: number) {
   return `${(Math.round(bps * 100) / 100).toFixed(2)}%`;
 }
 
-export const getProposalTypeText = (proposalType: string) => {
-  if (Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM) {
-    switch (proposalType) {
-      case "OPTIMISTIC":
-        return "Optimistic Proposal";
-      case "STANDARD":
-        return "Standard Proposal";
-      case "APPROVAL":
-        return "Approval Vote Proposal";
-      default:
-        return "Proposal";
-    }
+export const getProposalTypeText = (
+  proposalType: string,
+  proposalData?: ParsedProposalData["SNAPSHOT"]["kind"]
+) => {
+  switch (proposalType) {
+    case "OPTIMISTIC":
+      return "Optimistic Proposal";
+    case "STANDARD":
+      return "Standard Proposal";
+    case "APPROVAL":
+      return "Approval Vote Proposal";
+    case "SNAPSHOT":
+      if (proposalData?.type === "copeland") {
+        return "Ranked Choice Proposal";
+      }
+    default:
+      return "Proposal";
   }
-  return "Proposal";
 };
 
 const format = new Intl.NumberFormat("en", {

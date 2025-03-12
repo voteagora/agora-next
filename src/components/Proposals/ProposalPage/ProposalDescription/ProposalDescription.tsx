@@ -61,7 +61,8 @@ export default function ProposalDescription({
         {/* Right now I'm only sure this better decoded component works for standard proposals */}
         {/* This is a feature for ENS, they use standard only, so we should be good for now */}
         {/* TODO: abstract this into better decoding for all proposal types */}
-        {proposal.proposalType === "STANDARD" && !!option ? (
+        {proposal.proposalType === "SNAPSHOT" ? null : proposal.proposalType ===
+            "STANDARD" && !!option ? (
           <ProposalTransactionDisplay
             targets={option.targets}
             calldatas={option.calldatas}

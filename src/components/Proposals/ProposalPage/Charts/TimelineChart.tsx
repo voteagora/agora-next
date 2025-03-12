@@ -76,6 +76,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
       const transformedData = transformVotesToChartData({
         votes: votes,
         block,
+        proposalType: proposal.proposalType ?? undefined,
       });
 
       setChartData([
@@ -129,7 +130,9 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
             tick={{
               fill: rgbStringToHex(ui.customization?.tertiary),
             }}
-            tickFormatter={yTickFormatter}
+            tickFormatter={(value, index) =>
+              yTickFormatter(value, index, proposal.proposalType === "SNAPSHOT")
+            }
             tickLine={false}
             axisLine={false}
             tickCount={6}
@@ -206,26 +209,35 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
 const transformVotesToChartData = ({
   votes,
   block,
+  proposalType,
 }: {
   votes: ChartVote[];
   block: Block;
+  proposalType?: string;
 }) => {
   let forCount = 0;
   let abstain = 0;
   let against = 0;
+  let timestamp = null;
 
   return votes.map((vote) => {
     forCount = vote.support === "1" ? forCount + Number(vote.weight) : forCount;
     abstain = vote.support === "2" ? abstain + Number(vote.weight) : abstain;
     against = vote.support === "0" ? against + Number(vote.weight) : against;
+    if (proposalType === "SNAPSHOT") {
+      timestamp = new Date(Number(vote.created) * 1000);
+    } else {
+      timestamp = getHumanBlockTime(vote.block_number, block);
+    }
 
     return {
       weight: Number(vote.weight),
       for: forCount,
       abstain: abstain,
       against: against,
-      timestamp: getHumanBlockTime(vote.block_number, block),
+      timestamp: timestamp,
       total: forCount + abstain + against,
+      isSnapshot: proposalType === "SNAPSHOT",
     };
   });
 };
@@ -238,15 +250,16 @@ const tickFormatter = (timeStr: string, index: number) => {
   return `${formattedDate} ${metaText}`;
 };
 
-const yTickFormatter = (value: any) => {
+const yTickFormatter = (value: any, _: number, isSnapshot = false) => {
   const roundedValue = Math.round(value);
   const isSciNotation = isScientificNotation(roundedValue.toString());
+  const decimals = isSnapshot ? 0 : token.decimals;
 
   return formatNumber(
     isSciNotation
       ? formatNumberWithScientificNotation(roundedValue)
       : BigInt(roundedValue),
-    token.decimals,
+    decimals,
     roundedValue > 1_000_000 ? 2 : 4
   );
 };
@@ -269,29 +282,34 @@ const CustomTooltip = ({ active, payload, label, quorum }: any) => {
   const againstVotes = payload.find((p: any) => p.name === "Against");
   const abstainVotes = payload.find((p: any) => p.name === "Abstain");
   const voteOrder = ["For", "Against", "Abstain"];
+  const isSnapshot = payload[0]?.payload?.isSnapshot;
 
   if (active && payload && payload.length) {
     const sortedPayload = [...payload].sort(
       (a, b) => voteOrder.indexOf(a.name) - voteOrder.indexOf(b.name)
     );
 
+    const integerForVotes = Math.round(Number(forVotes.value));
+    const integerAgainstVotes = Math.round(Number(againstVotes.value));
+    const integerAbstainVotes = Math.round(Number(abstainVotes.value));
+
     let quorumVotes =
-      BigInt(forVotes.value) +
-      BigInt(abstainVotes.value) +
-      BigInt(againstVotes.value);
+      BigInt(integerForVotes) +
+      BigInt(integerAbstainVotes) +
+      BigInt(integerAgainstVotes);
 
     /**
      * ENS does not count against votes in the quorum calculation.
      */
     if (namespace === TENANT_NAMESPACES.ENS) {
-      quorumVotes = quorumVotes - BigInt(againstVotes.value);
+      quorumVotes = quorumVotes - BigInt(integerAgainstVotes);
     }
 
     /**
      * Only FOR votes are counted towards quorum for Uniswap.
      */
     if (namespace === TENANT_NAMESPACES.UNISWAP) {
-      quorumVotes = BigInt(forVotes.value);
+      quorumVotes = BigInt(integerForVotes);
     }
 
     return (
@@ -309,8 +327,8 @@ const CustomTooltip = ({ active, payload, label, quorum }: any) => {
             </span>
             <span className="font-mono text-primary">
               {formatNumber(
-                BigInt(entry.value),
-                token.decimals,
+                BigInt(Math.round(Number(entry.value))),
+                isSnapshot ? 0 : token.decimals,
                 entry.value > 1_000_000 ? 2 : 4
               )}
             </span>
@@ -327,7 +345,7 @@ const CustomTooltip = ({ active, payload, label, quorum }: any) => {
               >
                 {formatNumber(
                   BigInt(quorumVotes),
-                  token.decimals,
+                  isSnapshot ? 0 : token.decimals,
                   quorumVotes > 1_000_000 ? 2 : 4
                 )}
               </span>
@@ -335,7 +353,7 @@ const CustomTooltip = ({ active, payload, label, quorum }: any) => {
               <span className="font-mono text-primary">
                 {formatNumber(
                   BigInt(quorum),
-                  token.decimals,
+                  isSnapshot ? 0 : token.decimals,
                   quorum > 1_000_000 ? 2 : 4
                 )}
               </span>
