@@ -13,7 +13,6 @@ import { AlchemyProvider } from "ethers";
 import {
   Address,
   hexToBigInt,
-  PublicClient,
   WaitForTransactionReceiptParameters,
   WaitForTransactionReceiptReturnType,
 } from "viem";
@@ -27,6 +26,7 @@ import {
   optimism,
   polygon,
   sepolia,
+  scroll,
 } from "viem/chains";
 
 const { token } = Tenant.current();
@@ -522,6 +522,7 @@ const apiNetworkName: Record<number, string> = {
   [arbitrum.id]: "arbitrum",
   [goerli.id]: "goerli",
   [sepolia.id]: "sepolia",
+  [scroll.id]: "scroll",
 };
 
 export const resolveSafeTx = async (
