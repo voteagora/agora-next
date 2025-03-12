@@ -5,7 +5,6 @@ import { Delegate } from "@/app/api/common/delegates/delegate";
 import { SCWProfileImage } from "@/components/Delegates/DelegateCard/SCWProfileImage";
 import { DelegateCardHeader } from "@/components/Delegates/DelegateCard/DelegateCardHeader";
 import { DelegateCardEditProfile } from "./DelegateCardEditProfile";
-import { headers } from "next/headers";
 
 export default function DelegateCard({
   delegate,
@@ -39,16 +38,9 @@ export default function DelegateCard({
             location={location}
             followersCount={followersCount}
             followingCount={followingCount}
+            scwAddress={delegate.statement?.scw_address}
           />
         </div>
-        {hasSCWAddress && (
-          <div className="flex flex-col items-stretch p-4 border-b border-line">
-            <SCWProfileImage
-              address={delegate.statement?.scw_address}
-              copyable={true}
-            />
-          </div>
-        )}
         {!isEditMode && (
           <div className="flex flex-col p-7 border-t border-line">
             <div className="flex flex-col gap-4">

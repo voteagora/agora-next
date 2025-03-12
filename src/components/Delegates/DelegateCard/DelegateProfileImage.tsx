@@ -19,6 +19,7 @@ import {
 import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
 import ENSName from "@/components/shared/ENSName";
 import { CollapsibleText } from "@/components/shared/CollapsibleText";
+import { SCWProfileImage } from "./SCWProfileImage";
 
 interface Props {
   address: string;
@@ -26,6 +27,7 @@ interface Props {
   copyable?: boolean;
   endorsed: boolean;
   votingPower: string;
+  scwAddress?: string;
 }
 
 export function DelegateProfileImage({
@@ -133,6 +135,7 @@ export function DelegateProfileImageWithMetadata({
   location,
   followersCount,
   followingCount,
+  scwAddress,
 }: Props & {
   description?: string;
   location?: string;
@@ -146,9 +149,7 @@ export function DelegateProfileImageWithMetadata({
   }, [votingPower]);
 
   const endorsedToggle = ui.toggle("delegates/endorsed-filter");
-  const hasEndorsedFilter = Boolean(
-    endorsedToggle?.enabled && endorsedToggle?.config !== undefined
-  );
+  const hasEndorsedFilter = true;
 
   const { data } = useEnsName({
     chainId: 1,
@@ -195,12 +196,11 @@ export function DelegateProfileImageWithMetadata({
             />
           )}
           <ENSAvatar
-            className="rounded-full w-[44px] h-[44px]"
+            className="rounded-full w-[48px] h-[48px]"
             ensName={data}
-            size={88}
+            size={48}
           />
         </div>
-
         <div className="flex flex-col">
           <div className="text-primary flex flex-row gap-1 font-semibold hover:opacity-90">
             <div className="flex flex-col">
@@ -248,6 +248,15 @@ export function DelegateProfileImageWithMetadata({
           )}
         </div>
       </div>
+      {scwAddress && (
+        <>
+          <div className="flex flex-col items-stretch pl-2 relative">
+            <SCWProfileImage address={scwAddress} copyable={true} />
+            <div className="h-[14px] border-l border-line border-dotted absolute left-[22px] top-[-14px] height-[14px]" />
+          </div>
+        </>
+      )}
+
       {!!description && (
         <div className="text-sm text-secondary">
           <CollapsibleText text={description} />
