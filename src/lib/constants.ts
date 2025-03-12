@@ -1,3 +1,5 @@
+import { TenantNamespace } from "./types";
+
 export const INDEXER_DELAY = 3000;
 
 export const SECONDS_IN_HOUR = 3600;
@@ -122,3 +124,5 @@ export const retroPGFSort = {
 };
 
 export const disapprovalThreshold = 12;
+
+export const GOV_BRAVO_TENANTS: TenantNamespace[] = [TENANT_NAMESPACES.UNISWAP];
