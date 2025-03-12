@@ -1,5 +1,4 @@
 import "@/styles/globals.scss";
-import "@/styles/globals.scss";
 import ClientLayout from "./Web3Provider";
 import Header from "@/components/Header/Header";
 import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
@@ -51,7 +50,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const metrics = await fetchDaoMetrics();
   const { ui } = Tenant.current();
 
   const primary = ui?.customization?.primary || defaults.primary;
@@ -135,7 +133,7 @@ export default async function RootLayout({
         <ClientLayout>
           <Header />
           {children}
-          <DAOMetricsHeader metrics={metrics} />
+          <DAOMetricsHeader />
         </ClientLayout>
       </NuqsAdapter>
       {ui.googleAnalytics && <GoogleAnalytics gaId={ui.googleAnalytics} />}

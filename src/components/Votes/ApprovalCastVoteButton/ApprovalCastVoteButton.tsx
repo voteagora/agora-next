@@ -20,6 +20,7 @@ import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
+import { SuccessMessage } from "../CastVoteInput/CastVoteInput";
 
 type Props = {
   proposal: Proposal;
@@ -95,6 +96,7 @@ export default function ApprovalCastVoteButton({ proposal }: Props) {
             })
           }
           proposalStatus={proposal.status}
+          proposal={proposal}
           delegateVotes={data?.votes}
           isReady={isSuccess}
           votingPower={data?.votingPower}
@@ -110,15 +112,36 @@ function VoteButton({
   delegateVotes,
   isReady,
   votingPower,
+  proposal,
 }: {
   onClick: (missingVote: MissingVote) => void;
   proposalStatus: Proposal["status"];
   delegateVotes: Vote[];
   isReady: boolean;
   votingPower: VotingPowerData;
+  proposal: Proposal;
 }) {
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
+
+  const missingVote = checkMissingVoteForDelegate(
+    delegateVotes ?? [],
+    votingPower ?? {
+      totalVP: "0",
+      directVP: "0",
+      advancedVP: "0",
+    }
+  );
+
+  if (missingVote === "NONE") {
+    return (
+      <SuccessMessage
+        proposal={proposal}
+        votes={delegateVotes}
+        className="px-0 pb-0"
+      />
+    );
+  }
 
   if (proposalStatus !== "ACTIVE") {
     return <DisabledVoteButton reason="Not open to voting" />;
@@ -134,12 +157,6 @@ function VoteButton({
 
   if (!isReady) {
     return <DisabledVoteButton reason="Loading..." />;
-  }
-
-  const missingVote = checkMissingVoteForDelegate(delegateVotes, votingPower);
-
-  if (missingVote === "NONE") {
-    return <DisabledVoteButton reason="Already voted" />;
   }
 
   return (

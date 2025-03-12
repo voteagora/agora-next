@@ -1,7 +1,7 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useCallback } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OptimismProposalTypes } from "@prisma/client";
@@ -19,18 +19,21 @@ const RestrictedCallout = () => {
     address: contracts.governor?.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "manager",
+    chainId: contracts.governor?.chain.id,
   }) as { data: `0x${string}` };
 
   const { data: adminAddress } = useReadContract({
     address: contracts.governor?.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "admin",
+    chainId: contracts.governor?.chain.id,
   }) as { data: `0x${string}` };
 
   const { data: timelockAddress } = useReadContract({
     address: contracts.governor?.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName: "timelock",
+    chainId: contracts.governor?.chain.id,
   }) as { data: `0x${string}` };
 
   let addressesToRender = [
@@ -86,14 +89,35 @@ export default function ProposalTypeSettings({
   proposalTypes: OptimismProposalTypes[];
 }) {
   const fmtPropTypes = proposalTypes.map(
-    ({ quorum, approval_threshold, name }) => ({
+    ({ quorum, approval_threshold, name, proposal_type_id }) => ({
       name,
       quorum: Number(quorum) / 100,
       approval_threshold: Number(approval_threshold) / 100,
+      proposal_type_id: Number(proposal_type_id), // This will be of the format "0", "1", "2", etc.
+      isClientSide: false,
     })
   );
 
   const [propTypes, setPropTypes] = useState(fmtPropTypes);
+
+  const handleDeleteProposalType = useCallback((id: number) => {
+    setPropTypes((prevPropTypes) =>
+      prevPropTypes.filter(
+        (proposalType) => id !== proposalType.proposal_type_id
+      )
+    );
+  }, []);
+
+  const handleSuccessSetProposalType = useCallback((id: number) => {
+    setPropTypes((prevPropTypes) =>
+      prevPropTypes.map((proposalType) => {
+        if (proposalType.proposal_type_id === id) {
+          return { ...proposalType, isClientSide: false }; // Toggle the isClientSide flag only for the matching id
+        }
+        return proposalType;
+      })
+    );
+  }, []);
 
   return (
     <section className="gl_box bg-neutral">
@@ -104,12 +128,14 @@ export default function ProposalTypeSettings({
         Create and manage different types of proposals
       </p>
       <RestrictedCallout />
-      {propTypes.map((proposalType, key) => (
-        <Fragment key={key}>
+      {propTypes.map((proposalType) => (
+        <Fragment key={proposalType.proposal_type_id}>
           <ProposalType
             votableSupply={votableSupply}
             proposalType={proposalType}
-            index={key}
+            index={proposalType.proposal_type_id}
+            onDelete={handleDeleteProposalType}
+            onSuccessSetProposalType={handleSuccessSetProposalType}
           />
           <Separator className="my-8" />
         </Fragment>
@@ -120,7 +146,13 @@ export default function ProposalTypeSettings({
         onClick={() => {
           setPropTypes((prevPropTypes) => [
             ...prevPropTypes,
-            { quorum: 50, approval_threshold: 50, name: "" },
+            {
+              quorum: 50,
+              approval_threshold: 50,
+              name: "",
+              proposal_type_id: prevPropTypes.length,
+              isClientSide: true,
+            },
           ]);
         }}
       >

@@ -208,6 +208,7 @@ export const xaiTenantUIConfig = new TenantUI({
       name: "proposal-lifecycle",
       enabled: true,
       config: {
+        protocolLevelCreateProposalButtonCheck: true,
         stages: [
           {
             stage: PrismaProposalStage.DRAFTING,
@@ -262,7 +263,7 @@ export const xaiTenantUIConfig = new TenantUI({
 If you need help creating transactions / calldata, please see this [video](https://www.loom.com/share/33b000ef682c4129995c8fa4bc35db57).
 `.trim(),
         },
-        gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
+        gatingType: ProposalGatingType?.MANAGER,
       },
     },
   ],

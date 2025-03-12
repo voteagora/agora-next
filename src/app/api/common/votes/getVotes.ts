@@ -21,6 +21,7 @@ import { findVotes } from "@/lib/prismaUtils";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
 import { isAddress, getAddress } from "viem";
+import { unstable_cache } from "next/cache";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -518,4 +519,12 @@ export const fetchVotesForProposalAndDelegate = cache(
 );
 export const fetchVotersWhoHaveNotVotedForProposal = cache(
   getVotersWhoHaveNotVotedForProposal
+);
+export const fetchVotesForProposalAndDelegateUnstableCache = unstable_cache(
+  getVotesForProposalAndDelegate,
+  [],
+  {
+    tags: ["votesForProposalAndDelegate"],
+    revalidate: 86400, // 1 day
+  }
 );

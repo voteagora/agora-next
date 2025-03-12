@@ -10,7 +10,7 @@ import TenantUIFactory from "@/lib/tenant/tenantUIFactory";
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import { type DaoSlug } from "@prisma/client";
 
-const BRAND_NAME_MAPPINGS: Record<string, string> = {
+export const BRAND_NAME_MAPPINGS: Record<string, string> = {
   ens: "ENS",
   etherfi: "EtherFi",
   pguild: "PGuild",

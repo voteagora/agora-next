@@ -45,6 +45,7 @@ export type TenantContracts = {
     isERC721: () => this is TenantContract<IMembershipContract>;
   };
 
+  votableSupplyOracle?: TenantContract<IVotableSupplyOracleContract>;
   staker?: TenantContract<IStaker>;
   timelock?: TenantContract<BaseContract>;
   alligator?: TenantContract<IAlligatorContract>;
@@ -108,6 +109,7 @@ export enum ANALYTICS_EVENT_NAMES {
   ADVANCED_DELEGATE = "advanced_delegate",
   PARTIAL_DELEGATION = "partial_delegation",
   CREATE_PROPOSAL = "create_proposal",
+  SHARE_VOTE = "share_vote",
 }
 
 export type AnalyticsEvent =
@@ -164,5 +166,13 @@ export type AnalyticsEvent =
         delegatees: DelegateChunk[];
         delegator: `0x${string}`;
         is_scw: boolean;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.SHARE_VOTE;
+      event_data: {
+        proposal_id: string;
+        address?: `0x${string}`;
+        type: "X" | "COPY_LINK" | "DOWNLOAD_IMAGE" | "WARPCAST";
       };
     };

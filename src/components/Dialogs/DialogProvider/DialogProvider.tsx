@@ -10,6 +10,7 @@ import React, {
 import { dialogs, DialogType } from "./dialogs";
 import { motion, AnimatePresence } from "framer-motion";
 import { XMarkIcon } from "@heroicons/react/20/solid";
+import { cn } from "@/lib/utils";
 
 const DialogContext = createContext<(dialog: DialogType | null) => void>(
   () => {}
@@ -24,8 +25,9 @@ const Modal: FC<
     open: boolean;
     onClose: () => void;
     transparent: boolean | undefined;
+    className?: string;
   } & Props
-> = ({ open, children, onClose, transparent }) => {
+> = ({ open, children, onClose, transparent, className }) => {
   if (!open) return null;
 
   return (
@@ -47,11 +49,12 @@ const Modal: FC<
             animate={{ scale: 1, y: 0 }}
             transition={{ duration: 0.1, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()}
-            className={
+            className={cn(
               transparent
                 ? "bg-transparent p-6 rounded-xl m-0 w-full sm:w-auto relative"
-                : "border border-line bg-neutral p-6 rounded-xl m-0 z-[1100] shadow-newDefault w-full sm:w-[28rem] relative"
-            }
+                : "border border-line bg-neutral p-6 rounded-xl m-0 z-[1100] shadow-newDefault w-full sm:w-[28rem] relative",
+              className
+            )}
           >
             <XMarkIcon
               className="h-5 w-5 text-secondary cursor-pointer absolute right-2 top-2"
@@ -82,6 +85,7 @@ export const DialogProvider: FC<Props> = ({ children }) => {
           currentDialog?.type !== "SWITCH_NETWORK" && setCurrentDialog(null)
         }
         transparent={(currentDialog as { transparent?: boolean })?.transparent}
+        className={(currentDialog as { className?: string })?.className}
       >
         {renderedDialog}
       </Modal>
