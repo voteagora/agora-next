@@ -221,7 +221,7 @@ export async function parseProposal(
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
-    snapshotBlockNumber: Number(createdBlock),
+    snapshotBlockNumber: Number(proposal.created_block),
     createdTime:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.created_ts * 1000)
