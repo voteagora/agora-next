@@ -47,13 +47,14 @@ const useStandardVoting = ({
         chainId: contracts.governor.chain.id,
       });
       try {
-        const { status } = await wrappedWaitForTransactionReceipt({
-          hash: directTx,
-          address: address as `0x${string}`,
-        });
+        const { status, transactionHash } =
+          await wrappedWaitForTransactionReceipt({
+            hash: directTx,
+            address: address as `0x${string}`,
+          });
 
         if (status === "success") {
-          setStandardTxHash(directTx);
+          setStandardTxHash(transactionHash);
 
           await trackEvent({
             event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
@@ -63,7 +64,7 @@ const useStandardVoting = ({
               reason: reason,
               params: params,
               voter: address as `0x${string}`,
-              transaction_hash: directTx,
+              transaction_hash: transactionHash,
             },
           });
           setStandardVoteSuccess(true);
