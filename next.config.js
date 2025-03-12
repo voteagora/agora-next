@@ -8,13 +8,44 @@ const nextConfig = {
   async redirects() {
     return [];
   },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY'
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
+          },
+        ]
+      }
+    ];
+  },
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**",
+        hostname: "cdn4.iconfinder.com",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn3.iconfinder.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.pinimg.com",
       },
     ],
+    dangerouslyAllowSVG: false,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   webpack: (config) => {
     config.resolve.fallback = { fs: false, net: false, tls: false };
