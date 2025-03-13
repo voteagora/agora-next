@@ -16,6 +16,8 @@ import {
   polygon,
   optimism,
   arbitrum,
+  base,
+  scroll,
 } from "viem/chains";
 import { unstable_cache } from "next/cache";
 
@@ -30,12 +32,19 @@ const NETWORKS = {
   polygon,
   optimism,
   arbitrum,
+  base,
+  scroll,
 };
 
 const EXPLORER_DOMAINS = {
-  mainnet: "api.etherscan.io",
-  sepolia: "api-sepolia.etherscan.io",
-  optimism: "api-optimistic.etherscan.io",
+  mainnet: "https://api.etherscan.io/api",
+  sepolia: "https://api-sepolia.etherscan.io/api",
+  optimism: "https://api-optimistic.etherscan.io/api",
+  arbitrum: "https://api.arbiscan.io/api",
+  base: "https://api.basescan.org/api",
+  scroll: "https://api.scrollscan.com/api",
+  derive: "https://explorer.derive.xyz/api",
+  cyber: "https://api.socialscan.io/cyber",
 };
 
 interface AbiItem {
@@ -218,8 +227,9 @@ function getChainByName(chainName: string): Chain {
 
 function getExplorerDomain(networkName: string): string {
   return (
-    EXPLORER_DOMAINS[networkName as keyof typeof EXPLORER_DOMAINS] ||
-    "api.etherscan.io"
+    EXPLORER_DOMAINS[
+      networkName.toLowerCase() as keyof typeof EXPLORER_DOMAINS
+    ] || "https://api.etherscan.io/api"
   );
 }
 
@@ -581,9 +591,13 @@ async function getContractAbi(
   network: string = "mainnet"
 ): Promise<AbiItem[] | null> {
   const domain = getExplorerDomain(network);
-  const url = `https://${domain}/api?module=contract&action=getabi&address=${contractAddress}&apikey=${etherscanApiKey}`;
+  const url = `${domain}?module=contract&action=getabi&address=${contractAddress}&apikey=${etherscanApiKey}`;
   try {
-    const response = await axios.get(url);
+    const response = await axios.get(url, {
+      headers: {
+        "x-api-key": etherscanApiKey,
+      },
+    });
     if (response.data.status === "1") {
       return JSON.parse(response.data.result);
     } else {
@@ -607,6 +621,10 @@ async function getProxyImplementation(
     rpcUrl = `https://arb-mainnet.g.alchemy.com/v2/${alchemyApiKey}`;
   } else if (network === "optimism") {
     rpcUrl = `https://opt-mainnet.g.alchemy.com/v2/${alchemyApiKey}`;
+  } else if (network === "base") {
+    rpcUrl = `https://base-mainnet.g.alchemy.com/v2/${alchemyApiKey}`;
+  } else if (network === "scroll") {
+    rpcUrl = `https://scroll-mainnet.g.alchemy.com/v2/${alchemyApiKey}`;
   } else {
     rpcUrl = `https://eth-${network}.g.alchemy.com/v2/${alchemyApiKey}`;
   }

@@ -210,6 +210,7 @@ const DraftPreview = ({
                 state: (proposalDraft as BasicProposal).transactions[0]
                   ?.simulation_state,
               }}
+              network={tenant.contracts.governor.chain.name}
             />
           )}
         </div>
