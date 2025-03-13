@@ -20,29 +20,18 @@ import {
   scroll,
 } from "viem/chains";
 import { unstable_cache } from "next/cache";
+import { getPublicClient } from "./viem";
 
 const DEFAULT_ETHERSCAN_API_KEY = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY;
-const DEFAULT_ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_ID;
 const SIGNATURE_DB_URL = "https://api.openchain.xyz/signature-database/v1/";
 
-const NETWORKS = {
-  mainnet,
-  goerli,
-  sepolia,
-  polygon,
-  optimism,
-  arbitrum,
-  base,
-  scroll,
-};
-
 const EXPLORER_DOMAINS = {
-  mainnet: "https://api.etherscan.io/api",
-  sepolia: "https://api-sepolia.etherscan.io/api",
-  optimism: "https://api-optimistic.etherscan.io/api",
-  arbitrum: "https://api.arbiscan.io/api",
-  base: "https://api.basescan.org/api",
-  scroll: "https://api.scrollscan.com/api",
+  [mainnet.name]: "https://api.etherscan.io/api",
+  [sepolia.name]: "https://api-sepolia.etherscan.io/api",
+  [optimism.name]: "https://api-optimistic.etherscan.io/api",
+  [arbitrum.name]: "https://api.arbiscan.io/api",
+  [base.name]: "https://api.basescan.org/api",
+  [scroll.name]: "https://api.scrollscan.com/api",
   derive: "https://explorer.derive.xyz/api",
   cyber: "https://api.socialscan.io/cyber",
 };
@@ -216,14 +205,6 @@ const mergeTypes = (types: Array<ParamType>): ParamType => {
 // -----------------------------------------------------------------------------
 // Chain & Explorer Helpers
 // -----------------------------------------------------------------------------
-
-function getChainByName(chainName: string): Chain {
-  const network = NETWORKS[chainName as keyof typeof NETWORKS];
-  if (!network) {
-    throw new Error(`Unsupported network: ${chainName}`);
-  }
-  return network;
-}
 
 function getExplorerDomain(networkName: string): string {
   return (
@@ -609,29 +590,9 @@ async function getContractAbi(
 }
 
 async function getProxyImplementation(
-  contractAddress: string,
-  alchemyApiKey: string,
-  network: string = "mainnet"
+  contractAddress: string
 ): Promise<string | null> {
-  const chain = getChainByName(network);
-  let rpcUrl;
-  if (network === "polygon") {
-    rpcUrl = `https://polygon-mainnet.g.alchemy.com/v2/${alchemyApiKey}`;
-  } else if (network === "arbitrum") {
-    rpcUrl = `https://arb-mainnet.g.alchemy.com/v2/${alchemyApiKey}`;
-  } else if (network === "optimism") {
-    rpcUrl = `https://opt-mainnet.g.alchemy.com/v2/${alchemyApiKey}`;
-  } else if (network === "base") {
-    rpcUrl = `https://base-mainnet.g.alchemy.com/v2/${alchemyApiKey}`;
-  } else if (network === "scroll") {
-    rpcUrl = `https://scroll-mainnet.g.alchemy.com/v2/${alchemyApiKey}`;
-  } else {
-    rpcUrl = `https://eth-${network}.g.alchemy.com/v2/${alchemyApiKey}`;
-  }
-  const client = createPublicClient({
-    chain,
-    transport: http(rpcUrl),
-  });
+  const client = getPublicClient();
   const normalizedAddress = getAddress(contractAddress);
   const EIP1967_IMPLEMENTATION_SLOT =
     "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc";
@@ -984,7 +945,6 @@ async function decodeEnhanced(
   target: string,
   calldata: string,
   etherscanApiKey = DEFAULT_ETHERSCAN_API_KEY,
-  alchemyApiKey = DEFAULT_ALCHEMY_API_KEY,
   network: string = "mainnet"
 ): Promise<{
   function: string;
@@ -1003,7 +963,7 @@ async function decodeEnhanced(
   usedMethod: string;
   error?: string;
 }> {
-  if (!etherscanApiKey || !alchemyApiKey) throw new Error("Missing API key");
+  if (!etherscanApiKey) throw new Error("Missing API key");
   calldata = calldata.startsWith("0x") ? calldata : "0x" + calldata;
   const functionSelector = calldata.slice(0, 10);
   const formattedOutput = {
@@ -1024,11 +984,7 @@ async function decodeEnhanced(
   };
 
   try {
-    const implementationAddress = await cachedGetProxyImplementation(
-      target,
-      alchemyApiKey,
-      network
-    );
+    const implementationAddress = await cachedGetProxyImplementation(target);
     let functionSignature = await cachedLookupFunction(functionSelector);
     let functionName = functionSignature
       ? functionSignature.split("(")[0]

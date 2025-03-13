@@ -34,7 +34,6 @@ export const useTransactionDecoding = (
         target,
         calldata,
         process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY as string,
-        process.env.NEXT_PUBLIC_ALCHEMY_ID as string,
         network
       );
     },
