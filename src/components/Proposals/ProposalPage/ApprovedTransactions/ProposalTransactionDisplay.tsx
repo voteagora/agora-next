@@ -309,17 +309,21 @@ const ActionSummary = ({
   }
 
   if (decodedData && decodedData.function === "transfer") {
-    const recipient =
-      decodedData?.parameters?.to?.value ||
-      decodedData?.parameters?.dst?.value ||
-      decodedData?.parameters?.recipient?.value ||
-      target;
-    const valueToUse =
-      decodedData?.parameters?.value?.value ||
-      decodedData?.parameters?.rawAmount?.value ||
-      decodedData?.parameters?.amount?.value ||
-      decodedData?.parameters?.wad?.value ||
-      value;
+    const entries = Object.entries(decodedData?.parameters || {});
+    const addressValue =
+      (
+        entries?.find(
+          ([, value]: [string, any]) => value.type === "address"
+        )?.[1] as { type: string; value: string }
+      )?.value || target;
+    const amountValue =
+      (
+        entries?.find(
+          ([, value]: [string, any]) => value.type === "uint256"
+        )?.[1] as { type: string; value: string }
+      )?.value || value;
+    const recipient = addressValue;
+    const valueToUse = amountValue;
     const amount = safelyFormatEther(valueToUse);
     const note =
       decodedData?.parameters?.note?.value ||
