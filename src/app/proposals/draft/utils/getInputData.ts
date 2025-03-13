@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { DraftProposal, ProposalType } from "../types";
 import { decodeFunctionData, encodeAbiParameters, parseEther } from "viem";
 import Tenant from "@/lib/tenant/tenant";
-import { GOV_BRAVO_TENANTS, TENANT_NAMESPACES } from "@/lib/constants";
+import { GOVERNOR_TYPE, TENANT_NAMESPACES } from "@/lib/constants";
 import { disapprovalThreshold } from "@/lib/constants";
 import { getProposalTypeAddress } from "./stages";
 
@@ -99,7 +99,7 @@ export function getInputData(proposal: DraftProposal): {
         targets.push(governorAddress as `0x${string}`);
         values.push(0);
         calldatas.push("0x" as `0x${string}`);
-        if (!GOV_BRAVO_TENANTS.includes(namespace)) {
+        if (contracts.governorType !== GOVERNOR_TYPE.BRAVO) {
           signatures.push("");
         }
       } else {
@@ -108,7 +108,7 @@ export function getInputData(proposal: DraftProposal): {
           values.push(parseInt(t.value) || 0);
           calldatas.push(t.calldata as `0x${string}`);
           // Bravo Governor can't handle signatures + calldata first 4 bytes signature. One of the two must be empty.
-          if (!GOV_BRAVO_TENANTS.includes(namespace)) {
+          if (contracts.governorType !== GOVERNOR_TYPE.BRAVO) {
             signatures.push(t.signature || "");
           }
         });

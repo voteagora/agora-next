@@ -11,7 +11,7 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { AlchemyProvider, BaseContract } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
-import { DELEGATION_MODEL } from "@/lib/constants";
+import { DELEGATION_MODEL, GOVERNOR_TYPE } from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -93,5 +93,6 @@ export const protocolGuildTenantContractConfig = ({
     treasury: TREASURY,
 
     delegationModel: DELEGATION_MODEL.FULL,
+    governorType: GOVERNOR_TYPE.AGORA,
   };
 };

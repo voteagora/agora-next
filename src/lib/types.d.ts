@@ -52,6 +52,7 @@ export type TenantContracts = {
   treasury?: string[]; // We don't interact with them, but maybe one day we will.
   governorApprovalModule?: string;
   delegationModel?: DELEGATION_MODEL;
+  governorType?: GOVERNOR_TYPE;
   chainForTime?: Chain;
   providerForTime?: AlchemyProvider;
 };

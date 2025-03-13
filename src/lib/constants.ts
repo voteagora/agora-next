@@ -125,4 +125,9 @@ export const retroPGFSort = {
 
 export const disapprovalThreshold = 12;
 
-export const GOV_BRAVO_TENANTS: TenantNamespace[] = [TENANT_NAMESPACES.UNISWAP];
+export enum GOVERNOR_TYPE {
+  AGORA = "AGORA",
+  ALLIGATOR = "ALLIGATOR",
+  BRAVO = "BRAVO",
+  ENS = "ENS",
+}
