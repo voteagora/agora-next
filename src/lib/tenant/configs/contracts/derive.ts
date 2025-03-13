@@ -11,7 +11,11 @@ import { BaseContract, JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { Chain } from "viem/chains";
-import { DELEGATION_MODEL, GOVERNOR_TYPE } from "@/lib/constants";
+import {
+  DELEGATION_MODEL,
+  GOVERNOR_TYPE,
+  TIMELOCK_TYPE,
+} from "@/lib/constants";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 
 export const DERIVE_TESTNET_RPC = `https://rpc-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`;
@@ -159,5 +163,7 @@ export const deriveTenantConfig = ({
 
     delegationModel: DELEGATION_MODEL.PARTIAL,
     governorType: GOVERNOR_TYPE.AGORA,
+    timelockType:
+      TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
   };
 };

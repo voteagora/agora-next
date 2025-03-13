@@ -11,7 +11,11 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { AlchemyProvider, BaseContract } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
-import { DELEGATION_MODEL, GOVERNOR_TYPE } from "@/lib/constants";
+import {
+  DELEGATION_MODEL,
+  GOVERNOR_TYPE,
+  TIMELOCK_TYPE,
+} from "@/lib/constants";
 import { base } from "viem/chains";
 
 interface Props {
@@ -84,5 +88,7 @@ export const b3TenantConfig = ({
 
     delegationModel: DELEGATION_MODEL.FULL,
     governorType: GOVERNOR_TYPE.AGORA,
+    timelockType:
+      TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
   };
 };

@@ -53,6 +53,7 @@ export type TenantContracts = {
   governorApprovalModule?: string;
   delegationModel?: DELEGATION_MODEL;
   governorType?: GOVERNOR_TYPE;
+  timelockType?: TIMELOCK_TYPE;
   chainForTime?: Chain;
   providerForTime?: AlchemyProvider;
 };

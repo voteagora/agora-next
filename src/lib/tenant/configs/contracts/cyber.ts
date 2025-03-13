@@ -11,7 +11,11 @@ import { BaseContract, JsonRpcProvider } from "ethers";
 import { defineChain } from "viem";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
-import { DELEGATION_MODEL, GOVERNOR_TYPE } from "@/lib/constants";
+import {
+  DELEGATION_MODEL,
+  GOVERNOR_TYPE,
+  TIMELOCK_TYPE,
+} from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -124,5 +128,7 @@ export const cyberTenantConfig = ({
 
     delegationModel: DELEGATION_MODEL.FULL,
     governorType: GOVERNOR_TYPE.AGORA,
+    timelockType:
+      TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
   };
 };

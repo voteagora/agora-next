@@ -8,7 +8,11 @@ import { mainnet } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { AlchemyProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
-import { DELEGATION_MODEL, GOVERNOR_TYPE } from "@/lib/constants";
+import {
+  DELEGATION_MODEL,
+  GOVERNOR_TYPE,
+  TIMELOCK_TYPE,
+} from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -47,5 +51,7 @@ export const etherfiTenantContractConfig = ({
 
     delegationModel: DELEGATION_MODEL.FULL,
     governorType: GOVERNOR_TYPE.AGORA,
+    timelockType:
+      TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
   };
 };
