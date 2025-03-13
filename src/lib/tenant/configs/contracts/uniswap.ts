@@ -12,7 +12,11 @@ import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
 import { AlchemyProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
-import { DELEGATION_MODEL } from "@/lib/constants";
+import {
+  DELEGATION_MODEL,
+  GOVERNOR_TYPE,
+  TIMELOCK_TYPE,
+} from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -90,5 +94,7 @@ export const uniswapTenantContractConfig = ({
     treasury: TREASURY,
 
     delegationModel: DELEGATION_MODEL.FULL,
+    governorType: GOVERNOR_TYPE.BRAVO,
+    timelockType: TIMELOCK_TYPE.TIMELOCK_NO_ACCESS_CONTROL,
   };
 };
