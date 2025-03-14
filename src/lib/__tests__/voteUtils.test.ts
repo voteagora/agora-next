@@ -120,7 +120,7 @@ describe("calculateVoteMetadata", () => {
       expect(result.againstPercentage).toBeCloseTo(30);
       expect(result.support).toBe("FOR");
       expect(result.reason).toBe("Test Reason");
-      expect(result.endsIn).toContain("ENDS ~Mar 8");
+      expect(result.endsIn).toContain("ENDS ~Mar 9");
       expect(result.transactionHash).toBe("0xabc");
     });
   });

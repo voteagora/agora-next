@@ -1,20 +1,21 @@
 "use client";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import DelegatesFilter from "@/components/Delegates/DelegatesFilter/DelegatesFilter";
-import CitizensFilter from "@/components/Delegates/DelegatesFilter/CitizensFilter";
-import DelegatesSearch from "@/components/Delegates/DelegatesSearch/DelegatesSearch";
+import DelegatesSearch from "@/components/Delegates/DelegatesTabs/DelegatesSearch";
 import { useTransition, type ReactNode } from "react";
 import Tenant from "@/lib/tenant/tenant";
-import StakeholdersFilter from "@/app/delegates/components/StakeholdersFilter";
-import IssuesFilter from "@/app/delegates/components/IssuesFilter";
-import EndorsedFilter from "@/app/delegates/components/EndorsedFilter";
-import DelegateeFilter from "@/app/delegates/components/DelegatorFilter";
 import { LayoutGrid, AlignJustify } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { cn } from "@/lib/utils";
 
-export default function DelegateTabs({ children }: { children: ReactNode }) {
+import DelegatesSortFilter from "@/components/Delegates/DelegatesFilter/DelegatesSortFilter";
+import CitizensSortFilter from "@/components/Delegates/DelegatesFilter/CitizensSortFilter";
+import { DelegatesFilter } from "@/components/Delegates/DelegatesFilter/DelegatesFilter";
+import { MobileDelegatesFilter } from "@/components/Delegates/DelegatesFilter/MobileDelegatesFilter";
+
+import { DelegatesFilterChips } from "@/components/Delegates/DelegatesTabs/DelegatesFilterChips";
+
+export default function DelegatesTabs({ children }: { children: ReactNode }) {
   const [isPending, startTransition] = useTransition();
   const [tab, setTab] = useQueryState("tab", {
     defaultValue: "delegates",
@@ -27,20 +28,6 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
   });
 
   const { ui } = Tenant.current();
-
-  const hasIssuesFilter = Boolean(
-    ui.governanceIssues && ui.governanceIssues.length > 0
-  );
-  const hasStakeholdersFilter = Boolean(
-    ui.governanceStakeholders && ui.governanceStakeholders.length > 0
-  );
-  const hasEndorsedFilter = Boolean(
-    ui.toggle("delegates/endorsed-filter")?.enabled
-  );
-
-  const hasMyDelegatesFilter = Boolean(
-    ui.toggle("delegates/my-delegates-filter")?.enabled
-  );
 
   const hasCitizens = ui.toggle("citizens")?.enabled;
 
@@ -65,40 +52,55 @@ export default function DelegateTabs({ children }: { children: ReactNode }) {
             </TabsTrigger>
           )}
         </TabsList>
-        <div className="flex flex-col sm:flex-row justify-between gap-3 w-full sm:w-fit overflow-x-auto">
-          <DelegatesSearch />
-          {hasMyDelegatesFilter && <DelegateeFilter />}
-          {hasStakeholdersFilter && tab !== "citizens" && (
-            <StakeholdersFilter />
-          )}
-          {hasIssuesFilter && tab !== "citizens" && <IssuesFilter />}
-          {hasEndorsedFilter && tab !== "citizens" && <EndorsedFilter />}
-          {tab === "citizens" ? <CitizensFilter /> : <DelegatesFilter />}
-          {tab !== "citizens" && (
-            <div className="flex items-center gap-2 bg-wash rounded-full px-4 py-2 shrink-0">
-              <button
-                onClick={() => {
-                  setLayout("grid");
-                }}
-                disabled={layout === "grid"}
-              >
-                <LayoutGrid
-                  className={`h-6 w-6 ${layout === "grid" ? "text-secondary" : "text-secondary/30"}`}
-                />
-              </button>
-              <button
-                onClick={() => {
-                  setLayout("list");
-                }}
-                disabled={layout === "list"}
-              >
-                <AlignJustify
-                  className={`h-6 w-6 ${layout === "list" ? "text-primary" : "text-secondary/30"}`}
-                />
-              </button>
-            </div>
-          )}
+        <div className="flex flex-row self-end sm:justify-between gap-3 w-fit">
+          <div className="flex items-center gap-2">
+            <DelegatesSearch />
+          </div>
+          <div className="flex items-center gap-2 flex-row-reverse sm:flex-row">
+            {tab === "citizens" ? (
+              <CitizensSortFilter />
+            ) : (
+              <>
+                <div className="items-center gap-2 hidden sm:flex">
+                  <DelegatesSortFilter />
+                  <DelegatesFilter />
+                </div>
+                <div className="block sm:hidden">
+                  <MobileDelegatesFilter />
+                </div>
+              </>
+            )}
+            {tab !== "citizens" && (
+              <div className="flex items-center gap-2 bg-wash rounded-sm sm:rounded-lg border border-line px-3 py-3 shrink-0">
+                <button
+                  onClick={() => {
+                    setLayout("grid");
+                  }}
+                  className={layout === "grid" ? "hidden sm:block" : ""}
+                  disabled={layout === "grid"}
+                >
+                  <LayoutGrid
+                    className={`h-4 w-4 text-primary sm:${layout === "list" ? "text-primary" : "text-secondary/30"}`}
+                  />
+                </button>
+                <button
+                  onClick={() => {
+                    setLayout("list");
+                  }}
+                  className={layout === "list" ? "hidden sm:block" : ""}
+                  disabled={layout === "list"}
+                >
+                  <AlignJustify
+                    className={`h-4 w-4 text-primary sm:${layout === "list" ? "text-primary" : "text-secondary/30"}`}
+                  />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
+      </div>
+      <div>
+        <DelegatesFilterChips />
       </div>
       <div className={cn(isPending && "animate-pulse")}>{children}</div>
     </Tabs>

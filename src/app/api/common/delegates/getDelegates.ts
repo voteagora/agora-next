@@ -46,6 +46,7 @@ async function getDelegates({
     issues?: string;
     stakeholders?: string;
     endorsed?: boolean;
+    hasStatement?: boolean;
   };
 }): Promise<PaginatedResult<DelegateChunk[]>> {
   return withMetrics(
@@ -96,8 +97,23 @@ async function getDelegates({
         `
           : "";
 
-      const delegateStatementFiler =
-        filters?.endorsed || filters?.issues || filters?.stakeholders
+      // Add hasStatement filter condition
+      const hasStatementFilterQuery = filters?.hasStatement
+        ? `
+          AND s.payload IS NOT NULL
+          AND s.payload != '{}'::jsonb
+          AND s.payload ? 'delegateStatement'
+          AND s.payload ->> 'delegateStatement' != ''
+          AND s.dao_slug = '${slug}'
+        `
+        : "";
+
+      // Combine all statement-related filters
+      const delegateStatementFilter =
+        filters?.endorsed ||
+        filters?.issues ||
+        filters?.stakeholders ||
+        filters?.hasStatement
           ? `AND EXISTS (
             SELECT 1
             FROM agora.delegate_statements s
@@ -105,6 +121,7 @@ async function getDelegates({
             ${endorsedFilterQuery}
             ${topIssuesFilterQuery}
             ${topStakeholdersFilterQuery}
+            ${hasStatementFilterQuery}
           )`
           : "";
 
@@ -241,13 +258,14 @@ async function getDelegates({
                     ${endorsedFilterQuery}
                     ${topIssuesFilterQuery}
                     ${topStakeholdersFilterQuery}
+                    ${hasStatementFilterQuery}
                     LIMIT 1
                   ) sub
                 ) AS statement
               FROM del_card_universe d
               WHERE num_of_delegators IS NOT NULL
               AND (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR d.delegate = ANY(ARRAY[${allowListString}]::text[]))
-              ${delegateStatementFiler}
+              ${delegateStatementFilter}
               ORDER BY num_of_delegators DESC, d.delegate
               OFFSET $1
               LIMIT $2;
@@ -287,12 +305,13 @@ async function getDelegates({
                     ${endorsedFilterQuery}
                     ${topIssuesFilterQuery}
                     ${topStakeholdersFilterQuery}
+                    ${hasStatementFilterQuery}
                     LIMIT 1
                   ) sub
                 ) AS statement
               FROM del_card_universe d
               WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
-              ${delegateStatementFiler}
+              ${delegateStatementFilter}
              ORDER BY -log(random()) / NULLIF(voting_power, 0)
               OFFSET $1
               LIMIT $2;
@@ -331,12 +350,13 @@ async function getDelegates({
                     ${endorsedFilterQuery}
                     ${topIssuesFilterQuery}
                     ${topStakeholdersFilterQuery}
+                    ${hasStatementFilterQuery}
                     LIMIT 1
                   ) sub
                 ) AS statement
               FROM del_card_universe d
               WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
-              ${delegateStatementFiler}
+              ${delegateStatementFilter}
               ORDER BY voting_power DESC, d.delegate
               OFFSET $1
               LIMIT $2;
