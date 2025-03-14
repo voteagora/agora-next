@@ -260,7 +260,7 @@ const yTickFormatter = (value: any, _: number, isSnapshot = false) => {
       ? formatNumberWithScientificNotation(roundedValue)
       : BigInt(roundedValue),
     decimals,
-    roundedValue > 1_000_000 ? 2 : 4
+    2
   );
 };
 
