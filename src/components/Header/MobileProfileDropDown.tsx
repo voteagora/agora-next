@@ -5,7 +5,7 @@ import { Popover, Transition } from "@headlessui/react";
 import { useAccount, useDisconnect } from "wagmi";
 import { AnimatePresence, motion } from "framer-motion";
 import ENSAvatar from "../shared/ENSAvatar";
-import { pluralizeAddresses, shortAddress } from "@/lib/utils";
+import { shortAddress } from "@/lib/utils";
 import Link from "next/link";
 import TokenAmountDecorated from "../shared/TokenAmountDecorated";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
@@ -16,6 +16,7 @@ import { rgbStringToHex } from "@/app/lib/utils/color";
 import { PowerIcon } from "@/icons/PowerIcon";
 import { useDelegate } from "@/hooks/useDelegate";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { Logout } from "@/icons/logout";
 
 type Props = {
   ensName: string | undefined;
@@ -102,9 +103,9 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                     variants={variants}
                     transition={{ duration: 0.2 }}
                   >
-                    <div className="flex flex-col gap-3 min-h-[325px] justify-center mb-10">
+                    <div className="flex flex-col gap-3 min-h-[280px] justify-center">
                       <div className="flex flex-col">
-                        <div className="flex flex-row items-center gap-2 mb-1">
+                        <div className="flex flex-row items-center gap-4 mb-1">
                           <div
                             className={`relative aspect-square ${
                               isFetching && "animate-pulse"
@@ -127,15 +128,6 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                                 </span>
                               </>
                             )}
-                          </div>
-                          <div
-                            onClick={() => disconnect()}
-                            className="bg-wash border border-line p-0.5 rounded-sm"
-                          >
-                            <PowerIcon
-                              fill={rgbStringToHex(ui?.customization?.primary)}
-                              className={"cursor-pointer"}
-                            />
                           </div>
                         </div>
                         {scwAddress && (
@@ -162,93 +154,69 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                         )}
                       </div>
 
-                      <PanelRow
-                        title={
-                          ui.tacticalStrings?.myBalance || "My token balance"
-                        }
-                        detail={
-                          <RowSkeletonWrapper isLoading={isFetching}>
-                            <TokenAmountDecorated
-                              amount={tokenBalance || BigInt(0)}
-                            />
-                          </RowSkeletonWrapper>
-                        }
-                      />
+                      <div className="self-stretch py-8 flex flex-col gap-6">
+                        <PanelRow
+                          title={
+                            ui.tacticalStrings?.myBalance || "My token balance"
+                          }
+                          detail={
+                            <RowSkeletonWrapper isLoading={isFetching}>
+                              <TokenAmountDecorated
+                                amount={tokenBalance || BigInt(0)}
+                              />
+                            </RowSkeletonWrapper>
+                          }
+                        />
+                        <PanelRow
+                          title="My voting power"
+                          detail={
+                            <RowSkeletonWrapper isLoading={isFetching}>
+                              <TokenAmountDecorated
+                                amount={
+                                  delegate?.votingPower.total || BigInt(0)
+                                }
+                              />
+                            </RowSkeletonWrapper>
+                          }
+                        />
 
-                      <PanelRow
-                        title="Delegated to"
-                        detail={
-                          <RowSkeletonWrapper isLoading={isFetching}>
-                            <Link
-                              href={`/delegates/${delegate?.address}`}
-                              onClick={() => close()}
-                              className="underline"
-                            >
-                              View more
-                            </Link>
-                          </RowSkeletonWrapper>
-                        }
-                      />
-
-                      <PanelRow
-                        title="My voting power"
-                        detail={
-                          <RowSkeletonWrapper isLoading={isFetching}>
-                            <TokenAmountDecorated
-                              amount={delegate?.votingPower.total || BigInt(0)}
-                            />
-                          </RowSkeletonWrapper>
-                        }
-                      />
-
-                      <PanelRow
-                        title="Delegated from"
-                        detail={
-                          <RowSkeletonWrapper isLoading={isFetching}>
-                            {pluralizeAddresses(
-                              Number(delegate?.numOfDelegators || 0)
+                        {isFetching ? (
+                          <div className="animate-pulse bg-tertiary/10 h-[50px] mt-1 w-full rounded-2xl"></div>
+                        ) : (
+                          <>
+                            {canCreateDelegateStatement && !hasStatement && (
+                              <Link
+                                href={`/delegates/create`}
+                                className="rounded-lg py-3 px-2 bg-brandPrimary hover:bg-none text-neutral flex justify-center mt-1"
+                                onClick={() => close()}
+                              >
+                                Create delegate statement
+                              </Link>
                             )}
-                          </RowSkeletonWrapper>
-                        }
-                      />
 
-                      {isFetching ? (
-                        <div className="animate-pulse bg-tertiary/10 h-[50px] mt-1 w-full rounded-2xl"></div>
-                      ) : (
-                        <>
-                          {canCreateDelegateStatement && (
-                            <>
-                              {hasStatement ? (
-                                <Link
-                                  href={`/delegates/edit`}
-                                  className="rounded-lg border border-line py-3 px-2 text-primary bg-wash flex justify-center mt-1 hover:bg-primary"
-                                  onClick={() => close()}
-                                >
-                                  Edit delegate statement
-                                </Link>
-                              ) : (
-                                <Link
-                                  href={`/delegates/create`}
-                                  className="rounded-lg border border-line py-3 px-2 text-primary bg-wash flex justify-center mt-1 hover:bg-primary"
-                                  onClick={() => close()}
-                                >
-                                  Create delegate statement
-                                </Link>
-                              )}
-                            </>
-                          )}
-
-                          {hasStatement && (
-                            <Link
-                              href={`/delegates/${ensName ?? address}`}
-                              onClick={() => close()}
-                              className="rounded-lg py-3 px-2 text-neutral bg-brandPrimary hover:bg-brandPrimary/90 mt-1 flex justify-center"
-                            >
-                              View my profile
-                            </Link>
-                          )}
-                        </>
-                      )}
+                            {hasStatement && (
+                              <Link
+                                href={`/delegates/${ensName ?? address}`}
+                                onClick={() => close()}
+                                className="px-5 py-3 rounded-lg shadow-[0px_2px_2px_0px_rgba(0,0,0,0.03)] border border-neutral-200 flex justify-center"
+                              >
+                                <span className="text-primary text-base font-semibold">
+                                  View my profile
+                                </span>
+                              </Link>
+                            )}
+                          </>
+                        )}
+                      </div>
+                      <div className="py-4 border-t border-line bg-neutral rounded-[0px_0px_12px_12px]">
+                        <div onClick={() => disconnect()} className="flex">
+                          <Logout
+                            fill={rgbStringToHex(ui?.customization?.primary)}
+                            className={"cursor-pointer mr-[10px] self-center"}
+                          />
+                          <span className="text-primary">Logout</span>
+                        </div>
+                      </div>
                     </div>
                   </motion.div>
                 )}
