@@ -335,10 +335,6 @@ export type ParsedProposalData = {
         values: string[];
         signatures: string[];
         calldatas: string[];
-        functionArgsName: {
-          functionName: string;
-          functionArgs: string[];
-        }[];
       }[];
     };
   };
@@ -375,6 +371,16 @@ export function parseIfNecessary(obj: string | object) {
   return typeof obj === "string" ? JSON.parse(obj) : obj;
 }
 
+function parseMultipleStringsSeparatedByComma(obj: string | object) {
+  return typeof obj === "string"
+    ? obj.split(",")
+    : Array.isArray(obj)
+      ? obj
+          .map((item) => (typeof item === "string" ? item.split(",") : item))
+          .flat()
+      : obj;
+}
+
 export function parseProposalData(
   proposalData: string,
   proposalType: ProposalType
@@ -400,11 +406,18 @@ export function parseProposalData(
     case "STANDARD": {
       const parsedProposalData = JSON.parse(proposalData);
       try {
-        const calldatas = parseIfNecessary(parsedProposalData.calldatas);
-        const functionArgsName = decodeCalldata(calldatas);
-        const targets = parseIfNecessary(parsedProposalData.targets);
-        const values = parseIfNecessary(parsedProposalData.values);
-        const signatures = parseIfNecessary(parsedProposalData.signatures);
+        const calldatas: any = parseMultipleStringsSeparatedByComma(
+          parseIfNecessary(parsedProposalData.calldatas)
+        );
+        const targets: any = parseMultipleStringsSeparatedByComma(
+          parseIfNecessary(parsedProposalData.targets)
+        );
+        const values: any = parseMultipleStringsSeparatedByComma(
+          parseIfNecessary(parsedProposalData.values)
+        );
+        const signatures: any = parseMultipleStringsSeparatedByComma(
+          parseIfNecessary(parsedProposalData.signatures)
+        );
 
         return {
           key: "STANDARD",
@@ -415,7 +428,6 @@ export function parseProposalData(
                 values,
                 signatures,
                 calldatas,
-                functionArgsName,
               },
             ],
           },

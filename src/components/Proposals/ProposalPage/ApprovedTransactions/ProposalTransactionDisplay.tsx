@@ -41,12 +41,14 @@ const ProposalTransactionDisplay = ({
   executedTransactionHash,
   simulationDetails,
   network = "mainnet",
+  signatures,
 }: {
   targets: string[];
   calldatas: `0x${string}`[];
   values: string[];
   descriptions?: string[];
   executedTransactionHash?: string | null;
+  signatures?: string[];
   simulationDetails?: {
     id?: string | null;
     state?: string | null;
@@ -128,6 +130,11 @@ const ProposalTransactionDisplay = ({
                 }
                 collapsed={collapsed}
                 network={network}
+                signature={
+                  signatures && idx < signatures.length
+                    ? signatures[idx]
+                    : undefined
+                }
                 index={idx}
               />
             )
@@ -156,6 +163,7 @@ const TransactionItem = ({
   collapsed,
   network,
   index,
+  signature,
 }: {
   target: string;
   calldata: `0x${string}`;
@@ -164,12 +172,13 @@ const TransactionItem = ({
   collapsed: boolean;
   network: string;
   index: number;
+  signature?: string;
 }) => {
   const {
     data: decodedData,
     isLoading,
     error,
-  } = useTransactionDecoding(target, calldata, value, network, {
+  } = useTransactionDecoding(target, calldata, value, network, signature, {
     enabled: index === 0 || !collapsed,
   });
 
@@ -177,10 +186,6 @@ const TransactionItem = ({
 
   return (
     <div className={`${index > 0 ? "pt-4" : ""}`}>
-      {description && (
-        <div className="text-tertiary mb-2 text-xs italic">{`// ${description}`}</div>
-      )}
-
       <div className="flex justify-between items-center mb-2">
         <div className="text-base font-semibold text-primary">
           Action {index + 1}

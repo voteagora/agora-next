@@ -694,10 +694,11 @@ function decodeArgsWithSignature(signature: string, calldata: Uint8Array) {
     const decoded = decoder.decode(functionFragment.inputs, calldata);
     return {
       functionFragment,
-      values: functionFragment.inputs.map((type, index) => ({
-        type,
-        value: decoded[index],
-      })),
+      values:
+        functionFragment.inputs?.map((type, index) => ({
+          type,
+          value: decoded[index],
+        })) || [],
     };
   } catch (error) {
     return null;
