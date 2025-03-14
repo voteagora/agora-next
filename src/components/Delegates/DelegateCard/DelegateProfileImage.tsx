@@ -149,7 +149,9 @@ export function DelegateProfileImageWithMetadata({
   }, [votingPower]);
 
   const endorsedToggle = ui.toggle("delegates/endorsed-filter");
-  const hasEndorsedFilter = true;
+  const hasEndorsedFilter = Boolean(
+    endorsedToggle?.enabled && endorsedToggle?.config !== undefined
+  );
 
   const { data } = useEnsName({
     chainId: 1,
