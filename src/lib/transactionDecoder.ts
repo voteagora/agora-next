@@ -8,12 +8,10 @@ import {
   ethers,
 } from "ethers";
 import axios from "axios";
-import { createPublicClient, http, getAddress, Chain } from "viem";
+import { getAddress } from "viem";
 import {
   mainnet,
-  goerli,
   sepolia,
-  polygon,
   optimism,
   arbitrum,
   base,
@@ -592,11 +590,11 @@ async function getContractAbi(
 async function getProxyImplementation(
   contractAddress: string
 ): Promise<string | null> {
-  const client = getPublicClient();
-  const normalizedAddress = getAddress(contractAddress);
-  const EIP1967_IMPLEMENTATION_SLOT =
-    "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc";
   try {
+    const client = getPublicClient();
+    const normalizedAddress = getAddress(contractAddress);
+    const EIP1967_IMPLEMENTATION_SLOT =
+      "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc";
     const implementationSlot = await client.getStorageAt({
       address: normalizedAddress,
       slot: EIP1967_IMPLEMENTATION_SLOT,

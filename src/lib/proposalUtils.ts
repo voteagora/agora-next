@@ -419,12 +419,8 @@ export function parseProposalData(
         const targets: any = parseMultipleStringsSeparatedByComma(
           parseIfNecessary(parsedProposalData.targets)
         );
-        const values: any = parseMultipleStringsSeparatedByComma(
-          parseIfNecessary(parsedProposalData.values)
-        );
-        const signatures: any = parseMultipleStringsSeparatedByComma(
-          parseIfNecessary(parsedProposalData.signatures)
-        );
+        const values = parseIfNecessary(parsedProposalData.values);
+        const signatures = parseIfNecessary(parsedProposalData.signatures);
         const functionArgsName = decodeCalldata(calldatas);
 
         return {
