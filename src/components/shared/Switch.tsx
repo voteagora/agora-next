@@ -10,7 +10,7 @@ type Props = {
 };
 
 const optionStyle =
-  "p-[5px] flex-1 text-center cursor-pointer rounded font-medium hover:bg-line hover:font-semibold text-primary/30 transition-colors transition-shadow";
+  "p-[5px] flex-1 text-center cursor-pointer rounded font-medium hover:bg-neutral hover:font-semibold text-primary/30 transition-colors transition-shadow";
 
 const selectedStyle =
   "text-primary font-semibold border border-line shadow-switcher transition-colors transition-shadow bg-neutral";
@@ -24,7 +24,7 @@ export function Switch({
   return (
     <div
       className={cn(
-        "flex text-sm flex-row gap-2 rounded-md border border-line overflow-hidden w-full p-1 bg-line",
+        "flex text-sm flex-row gap-2 rounded-md border border-line overflow-hidden w-full p-1 bg-line/50",
         className
       )}
     >
