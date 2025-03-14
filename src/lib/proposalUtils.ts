@@ -108,14 +108,17 @@ const knownAbis: Record<string, Abi> = {
 
 const decodeCalldata = (calldatas: `0x${string}`[]) => {
   return calldatas.map((calldata) => {
-    const abi = knownAbis[calldata.slice(0, 10)];
+    const parsedCalldata: `0x${string}` = calldata.startsWith("0x")
+      ? calldata
+      : (("0x" + calldata) as `0x${string}`);
+    const abi = knownAbis[parsedCalldata.slice(0, 10)];
     let functionName = "unknown";
     let functionArgs = [] as string[];
 
     if (abi) {
       const decodedData = decodeFunctionData({
         abi: abi,
-        data: calldata,
+        data: parsedCalldata,
       });
       functionName = decodedData.functionName;
       functionArgs = decodedData.args as string[];
@@ -335,6 +338,10 @@ export type ParsedProposalData = {
         values: string[];
         signatures: string[];
         calldatas: string[];
+        functionArgsName: {
+          functionName: string;
+          functionArgs: string[];
+        }[];
       }[];
     };
   };
@@ -418,6 +425,7 @@ export function parseProposalData(
         const signatures: any = parseMultipleStringsSeparatedByComma(
           parseIfNecessary(parsedProposalData.signatures)
         );
+        const functionArgsName = decodeCalldata(calldatas);
 
         return {
           key: "STANDARD",
@@ -428,6 +436,7 @@ export function parseProposalData(
                 values,
                 signatures,
                 calldatas,
+                functionArgsName,
               },
             ],
           },
