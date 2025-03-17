@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { DraftProposal, ProposalType } from "../types";
 import { decodeFunctionData, encodeAbiParameters, parseEther } from "viem";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import { TIMELOCK_TYPE, TENANT_NAMESPACES } from "@/lib/constants";
 import { disapprovalThreshold } from "@/lib/constants";
 import { getProposalTypeAddress } from "./stages";
 
@@ -99,13 +99,22 @@ export function getInputData(proposal: DraftProposal): {
         targets.push(governorAddress as `0x${string}`);
         values.push(0);
         calldatas.push("0x" as `0x${string}`);
-        signatures.push("");
+        if (
+          contracts.timelockType !== TIMELOCK_TYPE.TIMELOCK_NO_ACCESS_CONTROL
+        ) {
+          signatures.push("");
+        }
       } else {
         proposal.transactions.forEach((t) => {
           targets.push(ethers.getAddress(t.target) as `0x${string}`);
           values.push(parseInt(t.value) || 0);
           calldatas.push(t.calldata as `0x${string}`);
-          signatures.push(t.signature || "");
+          // TIMELOCK_TYPE.TIMELOCK_NO_ACCESS_CONTROL can't handle signatures + calldata first 4 bytes signature. One of the two must be empty.
+          if (
+            contracts.timelockType !== TIMELOCK_TYPE.TIMELOCK_NO_ACCESS_CONTROL
+          ) {
+            signatures.push(t.signature || "");
+          }
         });
       }
 

@@ -5,13 +5,11 @@ import { Popover, Transition } from "@headlessui/react";
 import { useAccount, useDisconnect } from "wagmi";
 import { AnimatePresence, motion } from "framer-motion";
 import ENSAvatar from "../shared/ENSAvatar";
-import { pluralizeAddresses, shortAddress } from "@/lib/utils";
+import { shortAddress } from "@/lib/utils";
 import Link from "next/link";
 import TokenAmountDecorated from "../shared/TokenAmountDecorated";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import Tenant from "@/lib/tenant/tenant";
-import CreateProposalDraftButton from "../Proposals/ProposalsList/CreateProposalDraftButton";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { CubeIcon } from "@/icons/CubeIcon";
 import {
@@ -21,17 +19,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { rgbStringToHex } from "@/app/lib/utils/color";
-import { PowerIcon } from "@/icons/PowerIcon";
 import ENSName from "@/components/shared/ENSName";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useDelegate } from "@/hooks/useDelegate";
+import { Logout } from "@/icons/logout";
 
 type Props = {
   ensName: string | undefined;
 };
 
 export const DesktopProfileDropDown = ({ ensName }: Props) => {
-  const { namespace, ui } = Tenant.current();
+  const { ui } = Tenant.current();
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
 
@@ -105,47 +103,38 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
             >
               <Popover.Panel>
                 {({ close }) => (
-                  <div className="bg-neutral border border-line py-8 px-6 mt-4 mr-[-16px] rounded-xl w-[350px]">
-                    <div className="flex flex-col gap-3 min-h-[250px] justify-center">
+                  <div className="bg-wash border border-line rounded-xl w-[350px]">
+                    <div className="flex flex-col min-h-[250px]">
                       <div className="flex flex-col">
-                        <div className="flex flex-row items-center">
-                          <div
-                            className={`relative aspect-square mr-4 ${
-                              isFetching && "animate-pulse"
-                            }`}
-                          >
-                            <ENSAvatar
-                              className="w-[44px] h-[44px] rounded-full"
-                              ensName={ensName}
-                            />
-                          </div>
-                          <div className="flex flex-col justify-center">
-                            {ensName ? (
-                              <>
-                                <span className="text-primary">{ensName}</span>
-                                <span className="text-xs text-secondary">
-                                  {shortAddress(address!)}
-                                </span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="text-primary">
-                                  {shortAddress(address!)}
-                                </span>
-                              </>
-                            )}
-                          </div>
-                          <div className="ml-auto">
+                        <div className="p-4 border-b border-line">
+                          <div className="flex flex-row items-center px-4 py-3">
                             <div
-                              onClick={() => disconnect()}
-                              className="bg-wash border border-line p-0.5 rounded-sm"
+                              className={`relative aspect-square mr-4 ${
+                                isFetching && "animate-pulse"
+                              }`}
                             >
-                              <PowerIcon
-                                fill={rgbStringToHex(
-                                  ui?.customization?.primary
-                                )}
-                                className={"cursor-pointer"}
+                              <ENSAvatar
+                                className="w-[44px] h-[44px] rounded-full"
+                                ensName={ensName}
                               />
+                            </div>
+                            <div className="flex flex-col justify-center">
+                              {ensName ? (
+                                <>
+                                  <span className="text-primary">
+                                    {ensName}
+                                  </span>
+                                  <span className="text-xs text-secondary">
+                                    {shortAddress(address!)}
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-primary">
+                                    {shortAddress(address!)}
+                                  </span>
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -190,101 +179,78 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                           </div>
                         )}
                       </div>
+                      <div className="self-stretch py-8 px-4 flex flex-col gap-6">
+                        <div className="flex flex-col gap-4">
+                          <PanelRow
+                            title={
+                              ui.tacticalStrings?.myBalance || "My balance"
+                            }
+                            detail={
+                              <RowSkeletonWrapper isLoading={isFetching}>
+                                <TokenAmountDecorated
+                                  amount={tokenBalance || BigInt(0)}
+                                />
+                              </RowSkeletonWrapper>
+                            }
+                            className="w-[300px] justify-between"
+                          />
 
-                      <PanelRow
-                        title={
-                          ui.tacticalStrings?.myBalance || "My token balance"
-                        }
-                        detail={
-                          <RowSkeletonWrapper isLoading={isFetching}>
-                            <TokenAmountDecorated
-                              amount={tokenBalance || BigInt(0)}
-                            />
-                          </RowSkeletonWrapper>
-                        }
-                      />
-
-                      <PanelRow
-                        title="Delegated to"
-                        detail={
-                          <RowSkeletonWrapper isLoading={isFetching}>
-                            <Link
-                              href={`/delegates/${delegate?.address}`}
-                              onClick={() => close()}
-                              className="underline"
-                            >
-                              View more
-                            </Link>
-                          </RowSkeletonWrapper>
-                        }
-                      />
-
-                      <PanelRow
-                        title="My voting power"
-                        detail={
-                          <RowSkeletonWrapper isLoading={isFetching}>
-                            <TokenAmountDecorated
-                              amount={delegate?.votingPower.total || BigInt(0)}
-                            />
-                          </RowSkeletonWrapper>
-                        }
-                      />
-
-                      <PanelRow
-                        title="Delegated from"
-                        detail={
-                          <RowSkeletonWrapper isLoading={isFetching}>
-                            {pluralizeAddresses(
-                              Number(delegate?.numOfDelegators || 0)
-                            )}
-                          </RowSkeletonWrapper>
-                        }
-                      />
-                      {isFetching ? (
-                        <div className="animate-pulse bg-primary/30 h-[50px] mt-1 w-full rounded-2xl"></div>
-                      ) : (
-                        <>
-                          {canCreateDelegateStatement && (
-                            <>
-                              {hasStatement ? (
+                          <PanelRow
+                            title="My voting power"
+                            detail={
+                              <RowSkeletonWrapper isLoading={isFetching}>
+                                <TokenAmountDecorated
+                                  amount={
+                                    delegate?.votingPower.total || BigInt(0)
+                                  }
+                                />
+                              </RowSkeletonWrapper>
+                            }
+                            className="w-[300px] justify-between"
+                          />
+                        </div>
+                        {isFetching ? (
+                          <div className="animate-pulse bg-tertiary/10 h-[50px] mt-1 w-full rounded-2xl"></div>
+                        ) : (
+                          <>
+                            {hasStatement && (
+                              <div className="">
                                 <Link
-                                  href={`/delegates/edit`}
-                                  className="rounded-lg py-3 px-2 border border-line bg-wash hover:bg-none text-primary flex justify-center mt-1"
+                                  href={`/delegates/${ensName ?? address}`}
+                                  className="px-5 py-3 rounded-lg shadow-[0px_2px_2px_0px_rgba(0,0,0,0.03)] border border-neutral-200 flex justify-center"
                                   onClick={() => close()}
                                 >
-                                  Edit delegate statement
+                                  <span className="text-neutral-900 text-base font-semibold">
+                                    View my profile
+                                  </span>
                                 </Link>
-                              ) : (
-                                <Link
-                                  href={`/delegates/create`}
-                                  className="rounded-lg py-3 px-2 border border-line bg-wash hover:bg-none text-primary flex justify-center mt-1"
-                                  onClick={() => close()}
-                                >
-                                  Create delegate statement
-                                </Link>
-                              )}
-                            </>
-                          )}
-
-                          {hasStatement && (
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                      {canCreateDelegateStatement &&
+                        !hasStatement &&
+                        !isFetching && (
+                          <div className="px-4 py-6 border-t border-line inline-flex flex-col">
                             <Link
-                              href={`/delegates/${ensName ?? address}`}
-                              className="rounded-lg py-3 px-2 text-neutral bg-brandPrimary hover:bg-brandPrimary/90 mt-1 flex justify-center"
+                              href={`/delegates/create`}
+                              className="rounded-lg py-3 px-2 border border-line bg-brandPrimary hover:bg-none text-neutral flex justify-center mt-1"
                               onClick={() => close()}
                             >
-                              View my profile
+                              Create delegate statement
                             </Link>
-                          )}
-                          {/* little temporary hack for the manager to test secret links for users to create a draft */}
-                          {namespace === TENANT_NAMESPACES.OPTIMISM &&
-                            address && (
-                              <CreateProposalDraftButton
-                                address={address}
-                                className="opacity-0 cursor-default hidden sm:block"
-                              />
-                            )}
-                        </>
-                      )}
+                          </div>
+                        )}
+                      <div className="p-4 border-t border-line bg-neutral rounded-[0px_0px_12px_12px]">
+                        <div onClick={() => disconnect()} className="flex">
+                          <Logout
+                            fill={rgbStringToHex(ui?.customization?.primary)}
+                            className={"cursor-pointer mr-[10px] self-center"}
+                          />
+                          <span>Logout</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}

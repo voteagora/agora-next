@@ -44,8 +44,15 @@ export default function DelegateStatementForm({
     name: "agreeCodeConduct",
   });
 
+  const agreeDaoPrinciples = useWatch({
+    control: form.control,
+    name: "agreeDaoPrinciples",
+  });
+
   async function onSubmit(values: DelegateStatementFormValues) {
-    if (!agreeCodeConduct) {
+    /* agreeCodeConduct and agreeDaoPrinciples default values are !enabled so if it's not enabled for a tenant, it will be true, skipping the check below.
+    If enabled, it will be false by default and the user will need to check the box. */
+    if (!agreeCodeConduct && !agreeDaoPrinciples) {
       return;
     }
     if (!walletClient) {
@@ -69,6 +76,7 @@ export default function DelegateStatementForm({
     // User will only sign what they are seeing on the frontend
     const body = {
       agreeCodeConduct: values.agreeCodeConduct,
+      agreeDaoPrinciples: values.agreeDaoPrinciples,
       daoSlug,
       discord,
       delegateStatement,
@@ -115,13 +123,14 @@ export default function DelegateStatementForm({
     !!walletClient &&
     !form.formState.isSubmitting &&
     !!form.formState.isValid &&
-    !!agreeCodeConduct;
+    !!agreeCodeConduct &&
+    !!agreeDaoPrinciples;
 
   return (
-    <div className="flex flex-col sm:flex-row-reverse items-center sm:items-start gap-16 justify-between mt-12 w-full max-w-full">
+    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-16 justify-between mt-12 w-full max-w-full">
       {delegate && (
-        <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-xs">
-          <DelegateCard delegate={delegate} />
+        <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-[350px]">
+          <DelegateCard delegate={delegate} isEditMode />
         </div>
       )}
       <div className="flex flex-col w-full">
@@ -150,6 +159,11 @@ export default function DelegateStatementForm({
                 {form.formState.isSubmitted && !agreeCodeConduct && (
                   <span className="text-red-700 text-sm">
                     You must agree with the code of conduct to continue
+                  </span>
+                )}
+                {form.formState.isSubmitted && !agreeDaoPrinciples && (
+                  <span className="text-red-700 text-sm">
+                    You must agree with the DAO principles to continue
                   </span>
                 )}
                 {submissionError && (

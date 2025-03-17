@@ -10,8 +10,24 @@ import {
 } from "@/lib/tenant/configs/contracts/derive";
 import { ProposalType } from "../app/proposals/draft/types";
 import { AlchemyProvider } from "ethers";
-import { hexToBigInt } from "viem";
+import {
+  Address,
+  hexToBigInt,
+  WaitForTransactionReceiptParameters,
+  WaitForTransactionReceiptReturnType,
+} from "viem";
 import { unstable_cache } from "next/cache";
+import { getPublicClient } from "./viem";
+import {
+  arbitrum,
+  base,
+  goerli,
+  mainnet,
+  optimism,
+  polygon,
+  sepolia,
+  scroll,
+} from "viem/chains";
 
 const { token } = Tenant.current();
 
@@ -469,3 +485,107 @@ export const mapArbitrumBlockToMainnetBlock = unstable_cache(
     revalidate: 60 * 60 * 24 * 365, // 1 year cache
   }
 );
+
+const isContractWallet = async (address: Address) => {
+  const publicClient = getPublicClient();
+  const bytecode = await publicClient.getCode({ address });
+
+  return bytecode && bytecode !== "0x" ? true : false;
+};
+
+function delay(milliseconds: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+}
+
+type TxServiceApiTransactionResponse = {
+  safe: Address;
+  to: Address;
+  data: `0x${string}`;
+  blockNumber: number;
+  transactionHash: `0x${string}`;
+  safeTxHash: `0x${string}`;
+  executor: Address;
+  isExecuted: boolean;
+  isSuccessful: boolean;
+  confirmations: Array<{
+    owner: Address;
+  }>;
+};
+
+const apiNetworkName: Record<number, string> = {
+  [mainnet.id]: "mainnet",
+  [optimism.id]: "optimism",
+  [polygon.id]: "polygon",
+  [base.id]: "base",
+  [arbitrum.id]: "arbitrum",
+  [goerli.id]: "goerli",
+  [sepolia.id]: "sepolia",
+  [scroll.id]: "scroll",
+};
+
+export const resolveSafeTx = async (
+  networkId: number,
+  safeTxHash: `0x${string}`,
+  attempt = 1,
+  maxAttempts = 10
+): Promise<`0x${string}` | undefined> => {
+  const networkName = apiNetworkName[networkId];
+  if (attempt >= maxAttempts) {
+    throw new Error(
+      `timeout: couldn't find safeTx [${safeTxHash}] on [${networkName}]`
+    );
+  }
+
+  const endpoint = `https://safe-transaction-${networkName}.safe.global`;
+  const url = `${endpoint}/api/v1/multisig-transactions/${safeTxHash}`;
+
+  const response = await fetch(url);
+
+  const responseJson = <TxServiceApiTransactionResponse>await response.json();
+
+  console.debug(
+    `[${attempt}] looking up [${safeTxHash}] on [${networkName}]`,
+    response
+  );
+  if (response.status == 404) {
+    console.warn(
+      `didn't find safe tx [${safeTxHash}], assuming it's already the real one`
+    );
+    return safeTxHash;
+  }
+
+  if (responseJson.isSuccessful === null) {
+    await delay(1000 * attempt ** 1.75);
+    return resolveSafeTx(networkId, safeTxHash, attempt + 1, maxAttempts);
+  }
+
+  if (!responseJson.isSuccessful) {
+    return undefined;
+  }
+  return responseJson.transactionHash;
+};
+
+export const wrappedWaitForTransactionReceipt = async (
+  params: WaitForTransactionReceiptParameters & {
+    address: Address;
+  }
+): Promise<WaitForTransactionReceiptReturnType> => {
+  const publicClient = getPublicClient();
+  if (!publicClient.chain) {
+    throw new Error("no chain on public client");
+  }
+
+  const isSafe = await isContractWallet(params.address);
+
+  if (isSafe) {
+    //try to resolve the underlying transaction
+    const resolvedTx = await resolveSafeTx(publicClient.chain.id, params.hash);
+    if (!resolvedTx) throw new Error("couldn't resolve safe tx");
+
+    return publicClient.waitForTransactionReceipt({ hash: resolvedTx });
+  } else {
+    return publicClient.waitForTransactionReceipt(params);
+  }
+};

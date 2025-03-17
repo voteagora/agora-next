@@ -3,14 +3,19 @@ import { useState } from "react";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
-import { ParsedProposalResults } from "@/lib/proposalUtils";
+import {
+  isProposalCreatedBeforeUpgradeCheck,
+  ParsedProposalResults,
+} from "@/lib/proposalUtils";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import ProposalVotesSummaryDetails from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesSummaryDetails/ProposalVotesSummaryDetails";
+import ProposalVotesSummaryDetails, {
+  QuorumTooltip,
+} from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesSummaryDetails/ProposalVotesSummaryDetails";
 
 interface Props {
   proposal: Proposal;
@@ -21,6 +26,9 @@ export default function ProposalVotesSummary({ proposal }: Props) {
 
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
+
+  const isProposalCreatedBeforeUpgrade =
+    isProposalCreatedBeforeUpgradeCheck(proposal);
 
   return (
     <HoverCard
@@ -64,6 +72,12 @@ export default function ProposalVotesSummary({ proposal }: Props) {
                         hideCurrency
                         specialFormatting
                       />
+                      {isProposalCreatedBeforeUpgrade && (
+                        <span className="inline-flex items-center">
+                          0
+                          <QuorumTooltip />
+                        </span>
+                      )}
                     </div>
                   )}
                 </>

@@ -24,14 +24,14 @@ export function SCWProfileImage({ address, copyable = false }: Props) {
     <div>
       <div className="flex flex-row gap-4">
         <div className="relative aspect-square">
-          <div className="flex items-center justify-center rounded-full border border-line w-[44px] h-[44px]">
+          <div className="flex items-center justify-center rounded-full border border-line w-[30px] h-[30px]">
             <CubeIcon
-              className="w-6 h-6"
+              className="w-[21px] h-[21px]"
               fill={rgbStringToHex(ui.customization?.primary)}
             />
           </div>
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col items-center">
           <div className="text-primary flex flex-row gap-1 font-semibold hover:opacity-90">
             {copyable ? (
               <CopyableHumanAddress address={address} />
@@ -46,9 +46,6 @@ export function SCWProfileImage({ address, copyable = false }: Props) {
             </div>
           )}
         </div>
-      </div>
-      <div className="text-xs leading-5 mt-4 text-secondary">
-        {`This is a smart account which is used to enable gasless delegation.`}
       </div>
     </div>
   );

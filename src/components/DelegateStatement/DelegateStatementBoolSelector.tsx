@@ -1,8 +1,9 @@
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type UseFormReturn } from "react-hook-form";
-import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import { useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
+
+import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
+import CheckboxWithTitle from "../ui/CheckboxWithTitle/CheckboxWithTitle";
 
 export default function DelegateStatementBoolSelector({
   form,
@@ -22,33 +23,62 @@ export default function DelegateStatementBoolSelector({
   return (
     <div className="flex flex-col">
       {codeOfConductLink && (
-        <h4 className="font-bold text-xs mb-2">
-          Agree with{" "}
-          <a href={codeOfConductLink.url} target="_blank">
-            {codeOfConductLink.title}
-          </a>
-        </h4>
+        <>
+          <CheckboxWithTitle
+            label={`Yes, I agree with the ${codeOfConductLink.title}`}
+            title={
+              <a
+                href={codeOfConductLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Agree with the {codeOfConductLink.title}
+              </a>
+            }
+            checked={agreeCodeConduct}
+            onChange={handleAgreeCodeConduct}
+          />
+        </>
       )}
-      <Tabs>
-        <TabsList variant="bool">
-          <TabsTrigger
-            variant="bool"
-            value="yes"
-            data-state={agreeCodeConduct ? "active" : "inactive"}
-            onClick={() => handleAgreeCodeConduct(true)}
-          >
-            Yes
-          </TabsTrigger>
-          <TabsTrigger
-            variant="bool"
-            value="no"
-            data-state={!agreeCodeConduct ? "active" : "inactive"}
-            onClick={() => handleAgreeCodeConduct(false)}
-          >
-            No
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+    </div>
+  );
+}
+
+export function DelegateStatementDaoPrinciplesSelector({
+  form,
+}: {
+  form: UseFormReturn<DelegateStatementFormValues>;
+}) {
+  const [agreeDaoPrinciples, setAgreeDaoPrinciples] = useState(false);
+  const { ui } = Tenant.current();
+
+  const handleAgreeDaoPrinciples = (agreeDaoPrinciples: boolean) => {
+    setAgreeDaoPrinciples(agreeDaoPrinciples);
+    form.setValue("agreeDaoPrinciples", agreeDaoPrinciples);
+  };
+
+  const daoPrinciplesLink = ui.link("dao-principles");
+
+  return (
+    <div className="flex flex-col">
+      {daoPrinciplesLink && (
+        <>
+          <CheckboxWithTitle
+            label={`Yes, I agree with the ${daoPrinciplesLink.title}`}
+            title={
+              <a
+                href={daoPrinciplesLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Agree with the {daoPrinciplesLink.title}
+              </a>
+            }
+            checked={agreeDaoPrinciples}
+            onChange={handleAgreeDaoPrinciples}
+          />
+        </>
+      )}
     </div>
   );
 }

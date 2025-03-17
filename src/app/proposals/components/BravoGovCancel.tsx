@@ -19,8 +19,10 @@ export const BravoGovCancel = ({ proposal }: Props) => {
   const { address } = useAccount();
 
   const { data: adminAddress } = useGovernorAdmin({ enabled: true });
+  const proposer = proposal.proposer;
   const canCancel =
-    adminAddress?.toString().toLowerCase() === address?.toLowerCase();
+    adminAddress?.toString().toLowerCase() === address?.toLowerCase() ||
+    proposer?.toString().toLowerCase() === address?.toLowerCase();
 
   const { data, writeContract: write } = useWriteContract();
 

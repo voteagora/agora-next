@@ -9,6 +9,7 @@ import { Delegation } from "@/app/api/common/delegations/delegation";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import DelegateCard from "./DelegateCard";
+import { stripMarkdown } from "@/lib/sanitizationUtils";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -74,7 +75,9 @@ export default function DelegateCardList({
             const delegateStatement = (
               delegate?.statement?.payload as { delegateStatement: string }
             ).delegateStatement;
-            truncatedStatement = delegateStatement.slice(0, 120);
+
+            const plainTextStatement = stripMarkdown(delegateStatement);
+            truncatedStatement = plainTextStatement.slice(0, 120);
           }
 
           return (

@@ -24,17 +24,23 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getVotingModuleTypeForProposalType } from "@/lib/utils";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
+import { useTotalSupply } from "@/hooks/useTotalSupply";
+import { formatUnits } from "viem";
+import { useEffect } from "react";
 
 type Props = {
   proposalType: ProposalType;
   index: number;
   votableSupply: string;
+  onDelete: (id: number) => void;
+  onSuccessSetProposalType: (id: number) => void;
 };
 
 type ProposalType = {
   quorum: number;
   approval_threshold: number;
   name: string;
+  isClientSide: boolean;
 };
 
 const proposalTypeSchema = z.object({
@@ -45,11 +51,25 @@ const proposalTypeSchema = z.object({
 });
 
 export default function ProposalType({
-  proposalType: { quorum, approval_threshold, name },
+  proposalType: { quorum, approval_threshold, name, isClientSide },
   index,
   votableSupply,
+  onDelete,
+  onSuccessSetProposalType,
 }: Props) {
   const { namespace, contracts, token } = Tenant.current();
+  const totalSupply = useTotalSupply({
+    enabled: namespace === TENANT_NAMESPACES.SCROLL,
+  });
+
+  const formattedSupply = Number(
+    formatUnits(
+      namespace === TENANT_NAMESPACES.SCROLL
+        ? (totalSupply.data ?? BigInt(votableSupply))
+        : BigInt(votableSupply),
+      token.decimals
+    )
+  );
 
   const form = useForm<z.infer<typeof proposalTypeSchema>>({
     resolver: zodResolver(proposalTypeSchema),
@@ -65,12 +85,22 @@ export default function ProposalType({
     BigInt(votableSupply) / BigInt(10 ** 18)
   );
 
-  const deleteProposalTypeArgs = [BigInt(index), 0, 0, ""];
+  const formValues = form.watch();
+
+  const deleteProposalTypeArgs = [
+    BigInt(index),
+    Math.round(formValues.quorum * 100),
+    Math.round(formValues.approval_threshold * 100),
+    "",
+  ];
+
   // TODO: Replace this with a governor-level flag
   // TODO: Aso add proposal type configurator version flag
-  if (namespace === TENANT_NAMESPACES.CYBER) {
-    deleteProposalTypeArgs.push("0x" + "0".repeat(40));
+  if (namespace !== TENANT_NAMESPACES.CYBER) {
+    deleteProposalTypeArgs.push(""); // Cyber proposal types don't have description field
   }
+
+  deleteProposalTypeArgs.push("0x" + "0".repeat(40));
 
   const { data: deleteProposalTypeConfig } = useSimulateContract({
     address: contracts.proposalTypesConfigurator!.address as `0x${string}`,
@@ -78,25 +108,38 @@ export default function ProposalType({
     functionName: "setProposalType",
     args: deleteProposalTypeArgs,
   });
+
   const {
     data: resultDeleteProposalType,
     writeContract: writeDeleteProposalType,
     isPending: isLoadingDeleteProposalType,
+    isSuccess: isSuccessDeleteProposalType,
   } = useWriteContract();
   const { isLoading: isLoadingDeleteProposalTypeTransaction } =
     useWaitForTransactionReceipt({
       hash: resultDeleteProposalType,
     });
 
-  const formValues = form.watch();
+  useEffect(() => {
+    if (isSuccessDeleteProposalType) {
+      onDelete(index); // Call onDelete to remove the row
+    }
+  }, [isSuccessDeleteProposalType, onDelete, index]);
 
   const {
     data: resultSetProposalType,
     writeContract: writeSetProposalType,
     isPending: isLoadingSetProposalType,
     isError: isErrorSetProposalType,
+    isSuccess: isSuccessSetProposalType,
     error: setProposalTypeError,
   } = useWriteContract();
+
+  useEffect(() => {
+    if (isSuccessSetProposalType) {
+      onSuccessSetProposalType(index);
+    }
+  }, [isSuccessSetProposalType, onSuccessSetProposalType, index]);
 
   const { isLoading: isLoadingSetProposalTypeTransaction } =
     useWaitForTransactionReceipt({
@@ -107,7 +150,7 @@ export default function ProposalType({
     isLoadingDeleteProposalTypeTransaction ||
     isLoadingSetProposalType ||
     isLoadingSetProposalTypeTransaction;
-  const isDisabled = isLoading || name == "Optimistic";
+  const isDisabled = isLoading;
 
   function onSubmit(values: z.infer<typeof proposalTypeSchema>) {
     const name = values.name;
@@ -154,7 +197,11 @@ export default function ProposalType({
               className="hover:bg-destructive/10 group w-9 h-9"
               disabled={isDisabled || isErrorSetProposalType}
               onClick={() => {
-                writeDeleteProposalType(deleteProposalTypeConfig!.request);
+                if (isClientSide) {
+                  onDelete(index);
+                } else {
+                  writeDeleteProposalType(deleteProposalTypeConfig!.request);
+                }
               }}
               type="button"
             >
@@ -204,12 +251,18 @@ export default function ProposalType({
                       }}
                     />
                     <div className="absolute right-[12px] text-sm text-muted-foreground flex gap-2 text-center items-center">
-                      <p>% of votable supply</p>
+                      <p>
+                        % of{" "}
+                        {namespace === TENANT_NAMESPACES.SCROLL
+                          ? "total"
+                          : "votable"}{" "}
+                        supply
+                      </p>
                       <div className="mx-auto w-[1px] bg-muted-foreground/40 h-4" />
                       <p className="text-[0.8rem] col-span-3">
                         {formatNumber(
                           Math.floor(
-                            (formattedVotableSupply * formValues.quorum) / 100
+                            (formattedSupply * formValues.quorum) / 100
                           ).toString(),
                           0,
                           1
