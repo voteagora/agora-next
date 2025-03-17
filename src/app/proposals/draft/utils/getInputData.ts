@@ -99,11 +99,7 @@ export function getInputData(proposal: DraftProposal): {
         targets.push(governorAddress as `0x${string}`);
         values.push(0);
         calldatas.push("0x" as `0x${string}`);
-        if (
-          contracts.timelockType !== TIMELOCK_TYPE.TIMELOCK_NO_ACCESS_CONTROL
-        ) {
-          signatures.push("");
-        }
+        signatures.push("");
       } else {
         proposal.transactions.forEach((t) => {
           targets.push(ethers.getAddress(t.target) as `0x${string}`);
@@ -114,6 +110,8 @@ export function getInputData(proposal: DraftProposal): {
             contracts.timelockType !== TIMELOCK_TYPE.TIMELOCK_NO_ACCESS_CONTROL
           ) {
             signatures.push(t.signature || "");
+          } else {
+            signatures.push("");
           }
         });
       }
