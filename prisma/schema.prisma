@@ -398,7 +398,7 @@ view OptimismVotes {
   params           String?
   start_block      String?
   description      String?
-  proposal_data    Json
+  proposal_data    Json?
   proposal_type    ProposalType
   contract         String?      @db.VarChar(42)
   chain_id         Int?
@@ -666,7 +666,7 @@ view ensVotes {
   params           String?
   start_block      String?
   description      String?
-  proposal_data    Json
+  proposal_data    Json?
   proposal_type    ProposalType
   contract         String?
   chain_id         Int?
@@ -886,7 +886,7 @@ view etherfiVotes {
   params           String?
   start_block      String?
   description      String?
-  proposal_data    Json
+  proposal_data    Json?
   proposal_type    ProposalType
   contract         String?
   chain_id         Int?
@@ -1084,7 +1084,7 @@ view uniswapVotes {
   params           String?
   start_block      String?
   description      String?
-  proposal_data    Json
+  proposal_data    Json?
   proposal_type    ProposalType
   contract         String?      @db.VarChar(42)
   chain_id         Int?
@@ -2094,7 +2094,7 @@ view cyberVotes {
   params           String?
   start_block      String?
   description      String?
-  proposal_data    Json
+  proposal_data    Json?
   proposal_type    ProposalType
   contract         String?       @db.VarChar(42)
   chain_id         Int?
@@ -2431,7 +2431,7 @@ view scrollVotes {
   params           String?
   start_block      String?
   description      String?
-  proposal_data    Json
+  proposal_data    Json?
   proposal_type    ProposalType
   contract         String?       @db.VarChar(42)
   chain_id         Int?
@@ -2757,7 +2757,7 @@ view deriveVotes {
   params           String?
   start_block      String?
   description      String?
-  proposal_data    Json
+  proposal_data    Json?
   proposal_type    ProposalType
   contract         String?       @db.VarChar(42)
   chain_id         Int?
@@ -3082,7 +3082,7 @@ view pguildVotes {
   params           String?
   start_block      String?
   description      String?
-  proposal_data    Json
+  proposal_data    Json?
   proposal_type    ProposalType
   contract         String?       @db.VarChar(42)
   chain_id         Int?
@@ -3407,7 +3407,7 @@ view boostVotes {
   params           String?
   start_block      String?
   description      String?
-  proposal_data    Json
+  proposal_data    Json?
   proposal_type    ProposalType
   contract         String?       @db.VarChar(42)
   chain_id         Int?
@@ -3731,7 +3731,7 @@ view xaiVotes {
   params           String?
   start_block      String?
   description      String?
-  proposal_data    Json
+  proposal_data    Json?
   proposal_type    ProposalType
   contract         String?       @db.VarChar(42)
   chain_id         Int?
@@ -3936,7 +3936,7 @@ view b3Votes {
   params           String?
   start_block      String?
   description      String?
-  proposal_data    Json
+  proposal_data    Json?
   proposal_type    ProposalType
   contract         String?       @db.VarChar(42)
   chain_id         Int?
@@ -4239,7 +4239,7 @@ view demoVotes {
   params           String?
   start_block      String?
   description      String?
-  proposal_data    Json
+  proposal_data    Json?
   proposal_type    ProposalType
   contract         String?      @db.VarChar(42)
   chain_id         Int?
