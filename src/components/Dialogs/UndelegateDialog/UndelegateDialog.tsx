@@ -137,7 +137,9 @@ export function UndelegateDialog({
 
     if (sameDelegatee) {
       return (
-        <ShadcnButton onClick={executeDelegate}>Remove your own delegation</ShadcnButton>
+        <ShadcnButton onClick={executeDelegate}>
+          Remove your own delegation
+        </ShadcnButton>
       );
     }
 
