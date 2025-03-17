@@ -28,6 +28,7 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
     address: contracts.timelock!.address as `0x${string}`,
     abi: contracts.timelock!.abi,
     functionName: "getMinDelay",
+    chainId: contracts.timelock!.chain.id,
   });
 
   let canExecute = false;

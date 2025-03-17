@@ -13,10 +13,12 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { useDAOMetrics } from "@/hooks/useDAOMetrics";
 
-export default function DAOMetricsHeader({ metrics }) {
+export default function DAOMetricsHeader() {
   const { token, ui, contracts } = Tenant.current();
   const [isClient, setIsClient] = useState(false);
+  const { votableSupply, totalSupply, isLoading } = useDAOMetrics();
 
   const governanceForumLink = ui.link("governance-forum");
   const bugsLink = ui.link("bugs");
@@ -35,8 +37,8 @@ export default function DAOMetricsHeader({ metrics }) {
   }, []);
 
   const formattedMetrics = {
-    votableSupply: formatNumber(metrics.votableSupply),
-    totalSupply: formatNumber(metrics.totalSupply),
+    votableSupply: formatNumber(votableSupply),
+    totalSupply: formatNumber(totalSupply),
   };
 
   if (!isClient) {
@@ -59,7 +61,8 @@ export default function DAOMetricsHeader({ metrics }) {
                   <HoverCard openDelay={100} closeDelay={100}>
                     <HoverCardTrigger>
                       <span className="cursor-default">
-                        {formattedMetrics.totalSupply} {token.symbol} total
+                        {isLoading ? "-" : formattedMetrics.totalSupply}{" "}
+                        {token.symbol} total
                         <span className="hidden sm:inline">&nbsp;supply</span>
                       </span>
                     </HoverCardTrigger>
@@ -75,8 +78,8 @@ export default function DAOMetricsHeader({ metrics }) {
                     <HoverCard openDelay={100} closeDelay={100}>
                       <HoverCardTrigger>
                         <span className="cursor-default">
-                          {formattedMetrics.votableSupply} {token.symbol}{" "}
-                          votable
+                          {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
+                          {token.symbol} votable
                           <span className="hidden sm:inline">&nbsp;supply</span>
                         </span>
                       </HoverCardTrigger>

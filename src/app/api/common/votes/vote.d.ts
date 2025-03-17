@@ -19,6 +19,7 @@ export type Vote = {
   proposalTitle: string;
   proposalType: ProposalType;
   timestamp: Date | null;
+  blockNumber?: bigint;
 };
 
 export type SnapshotVotePayload = {

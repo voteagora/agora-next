@@ -49,8 +49,8 @@ const ballot = [
 ];
 
 describe("ballotAllocations", () => {
-  it("should calcualte allocations", () => {
-    const parsedBalot = ballot.map((b) => {
+  it("should calculate allocations", () => {
+    const parsedBallot = ballot.map((b) => {
       return {
         ...b,
         status: b.status as Ballot["status"],
@@ -59,7 +59,7 @@ describe("ballotAllocations", () => {
       };
     });
 
-    const adjustedAllocations = calculateAllocations(parsedBalot, 0.4);
+    const adjustedAllocations = calculateAllocations(parsedBallot, 0.4);
 
     expect(adjustedAllocations).toEqual({
       address: "0x123",
@@ -67,6 +67,7 @@ describe("ballotAllocations", () => {
       status: "SUBMITTED",
       updated_at: new Date("2021-10-01"),
       created_at: new Date("2021-10-01"),
+      published_at: new Date("2021-10-01"),
       os_only: false,
       os_multiplier: 3,
       allocations: [
@@ -93,14 +94,14 @@ describe("ballotAllocations", () => {
           image: "",
           is_os: false,
           allocation: 4000000,
-          allocation_per_metric: [
-            {
-              metric_id: "monthly_active_addresses",
-              allocation: 1200000,
-            },
+          allocations_per_metric: [
             {
               metric_id: "trusted_recurring_users",
               allocation: 2000000,
+            },
+            {
+              metric_id: "monthly_active_addresses",
+              allocation: 1200000,
             },
             {
               metric_id: "gas_fees",
@@ -114,14 +115,14 @@ describe("ballotAllocations", () => {
           image: "",
           is_os: true,
           allocation: 3000000,
-          allocation_per_metric: [
-            {
-              metric_id: "monthly_active_addresses",
-              allocation: 900000,
-            },
+          allocations_per_metric: [
             {
               metric_id: "trusted_recurring_users",
               allocation: 1500000,
+            },
+            {
+              metric_id: "monthly_active_addresses",
+              allocation: 900000,
             },
             {
               metric_id: "gas_fees",
@@ -135,14 +136,14 @@ describe("ballotAllocations", () => {
           image: "",
           is_os: false,
           allocation: 3000000,
-          allocation_per_metric: [
-            {
-              metric_id: "monthly_active_addresses",
-              allocation: 900000,
-            },
+          allocations_per_metric: [
             {
               metric_id: "trusted_recurring_users",
               allocation: 1500000,
+            },
+            {
+              metric_id: "monthly_active_addresses",
+              allocation: 900000,
             },
             {
               metric_id: "gas_fees",

@@ -221,7 +221,7 @@ export async function parseProposal(
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
-    snapshotBlockNumber: Number(createdBlock),
+    snapshotBlockNumber: Number(proposal.created_block),
     createdTime:
       proposalData.key === "SNAPSHOT"
         ? new Date(proposalData.kind.created_ts * 1000)
@@ -791,4 +791,13 @@ export function getProposalCurrentQuorum(
     default:
       return BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
   }
+}
+
+export function isProposalCreatedBeforeUpgradeCheck(proposal: Proposal) {
+  const { namespace } = Tenant.current();
+  return (
+    namespace === TENANT_NAMESPACES.OPTIMISM &&
+    proposal.createdTime &&
+    new Date(proposal.createdTime) < new Date("2024-01-08")
+  );
 }

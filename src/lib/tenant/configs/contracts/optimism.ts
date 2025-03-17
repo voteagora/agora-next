@@ -4,6 +4,7 @@ import {
   OptimismGovernor__factory,
   ProposalTypesConfigurator__factory,
   AgoraTimelock__factory,
+  VotableSupplyOracle__factory,
 } from "@/lib/contracts/generated";
 import { AlchemyProvider, BaseContract } from "ethers";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
@@ -13,7 +14,12 @@ import { TenantContracts } from "@/lib/types";
 import { optimism } from "viem/chains";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
-import { DELEGATION_MODEL } from "@/lib/constants";
+import {
+  DELEGATION_MODEL,
+  GOVERNOR_TYPE,
+  TIMELOCK_TYPE,
+} from "@/lib/constants";
+import { IVotableSupplyOracleContract } from "@/lib/contracts/common/interfaces/IVotableSupplyOracleContract";
 
 interface Props {
   isProd: boolean;
@@ -41,6 +47,10 @@ export const optimismTenantContractConfig = ({
   const TIMELOCK = isProd
     ? "0x0eDd4B2cCCf41453D8B5443FBB96cc577d1d06bF"
     : "0x85c118971C058677DC502854d56A483BF5548042";
+
+  const VOTABLE_ORACLE = isProd
+    ? "0x1b7CA7437748375302bAA8954A2447fC3FBE44CC"
+    : "0x73b07b799Abfb7965f2C1014120019CbffaAcae7";
 
   const provider = new AlchemyProvider("optimism", alchemyId);
   const chain = optimism;
@@ -89,6 +99,17 @@ export const optimismTenantContractConfig = ({
       provider,
     }),
 
+    votableSupplyOracle: new TenantContract<IVotableSupplyOracleContract>({
+      abi: VotableSupplyOracle__factory.abi,
+      address: VOTABLE_ORACLE,
+      chain,
+      contract: VotableSupplyOracle__factory.connect(VOTABLE_ORACLE, provider),
+      provider,
+    }),
+
     delegationModel: DELEGATION_MODEL.ADVANCED,
+    governorType: GOVERNOR_TYPE.ALLIGATOR,
+    timelockType:
+      TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
   };
 };

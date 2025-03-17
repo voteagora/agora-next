@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/tooltip";
 import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
 import ENSName from "@/components/shared/ENSName";
+import { CollapsibleText } from "@/components/shared/CollapsibleText";
+import { SCWProfileImage } from "./SCWProfileImage";
 
 interface Props {
   address: string;
@@ -25,6 +27,7 @@ interface Props {
   copyable?: boolean;
   endorsed: boolean;
   votingPower: string;
+  scwAddress?: string;
 }
 
 export function DelegateProfileImage({
@@ -119,6 +122,148 @@ export function DelegateProfileImage({
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+export function DelegateProfileImageWithMetadata({
+  address,
+  citizen,
+  endorsed,
+  votingPower,
+  description,
+  location,
+  followersCount,
+  followingCount,
+  scwAddress,
+}: Props & {
+  description?: string;
+  location?: string;
+  followersCount?: string;
+  followingCount?: string;
+}) {
+  const { ui } = Tenant.current();
+  const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
+  const formattedNumber = useMemo(() => {
+    return formatNumber(votingPower);
+  }, [votingPower]);
+
+  const endorsedToggle = ui.toggle("delegates/endorsed-filter");
+  const hasEndorsedFilter = Boolean(
+    endorsedToggle?.enabled && endorsedToggle?.config !== undefined
+  );
+
+  const { data } = useEnsName({
+    chainId: 1,
+    address: address as `0x${string}`,
+  });
+
+  useEffect(() => {
+    /**
+     * When formatted voting power is different from refetch it means it has been updated
+     */
+    if (
+      refetchDelegate?.address === address &&
+      refetchDelegate?.prevVotingPowerDelegatee
+    ) {
+      const _votingPowerFormatted = Number(
+        formatEther(BigInt(refetchDelegate?.prevVotingPowerDelegatee))
+      ).toFixed(2);
+      const _formattedNumber = Number(formattedNumber).toFixed(2);
+      if (_votingPowerFormatted !== _formattedNumber) {
+        setRefetchDelegate(null);
+      }
+    }
+
+    return () => {
+      // If this component unmounts for a given address there is no point to refetch it when it is not on the UI anymore
+      if (
+        refetchDelegate?.address === address &&
+        refetchDelegate?.prevVotingPowerDelegatee
+      ) {
+        setRefetchDelegate(null);
+      }
+    };
+  }, [address, formattedNumber, refetchDelegate, setRefetchDelegate]);
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-row gap-4 items-center">
+        <div className="relative aspect-square">
+          {citizen && (
+            <Image
+              className="absolute bottom-[-5px] right-[-7px] z-10"
+              src={icons.badge}
+              alt="citizen badge"
+            />
+          )}
+          <ENSAvatar
+            className="rounded-full w-[48px] h-[48px]"
+            ensName={data}
+            size={48}
+          />
+        </div>
+        <div className="flex flex-col">
+          <div className="text-primary flex flex-row gap-1 font-semibold hover:opacity-90">
+            <div className="flex flex-col">
+              <CopyableHumanAddress
+                className="font-bold"
+                address={address}
+                copyENSName
+              />
+              {data ? ( // Only show address if ENS name is available and displayed in the above CopyableHumanAddress
+                <CopyableHumanAddress
+                  className="text-xs font-medium"
+                  address={address}
+                  useAddress={true}
+                />
+              ) : null}
+            </div>
+            {endorsed && hasEndorsedFilter && endorsedToggle && (
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Image
+                      src={icons.endorsed}
+                      alt={(endorsedToggle.config as UIEndorsedConfig).tooltip}
+                      className="w-4 h-4"
+                    />
+                  </TooltipTrigger>
+
+                  <TooltipContent>
+                    <div className="text-xs">
+                      {(endorsedToggle.config as UIEndorsedConfig).tooltip}
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+          {!!location && (
+            <div className="text-sm text-secondary">{location}</div>
+          )}
+          {!!followersCount && !!followingCount && (
+            <div className="text-xs text-primary font-medium">
+              <span className="font-bold">{followingCount}</span> following ·{" "}
+              <span className="font-bold">{followersCount}</span> followers
+            </div>
+          )}
+        </div>
+      </div>
+      {scwAddress && (
+        <>
+          <div className="flex flex-col items-stretch pl-2 relative">
+            <SCWProfileImage address={scwAddress} copyable={true} />
+            <div className="h-[14px] border-l border-line border-dotted absolute left-[22px] top-[-14px] height-[14px]" />
+          </div>
+        </>
+      )}
+
+      {!!description && (
+        <div className="text-sm text-secondary">
+          <CollapsibleText text={description} />
+        </div>
+      )}
     </div>
   );
 }

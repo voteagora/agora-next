@@ -20,7 +20,7 @@ import {
   getProposalsCount,
 } from "@/lib/prismaUtils";
 import { Block } from "ethers";
-
+import { unstable_cache } from "next/cache";
 async function getProposals({
   filter,
   pagination,
@@ -57,7 +57,11 @@ async function getProposals({
 
   const resolvedProposals = await Promise.all(
     proposals.data.map(async (proposal: ProposalPayload) => {
-      const quorum = await fetchQuorumForProposal(proposal);
+      const isPending =
+        !proposal.start_block ||
+        !latestBlock ||
+        Number(proposal.start_block) > latestBlock.number;
+      const quorum = isPending ? null : await fetchQuorumForProposal(proposal);
       return parseProposal(
         proposal,
         latestBlock,
@@ -98,10 +102,14 @@ async function getProposal(proposalId: string) {
     return notFound();
   }
 
-  const [latestBlock, quorum] = await Promise.all([
-    latestBlockPromise,
-    fetchQuorumForProposal(proposal),
-  ]);
+  const latestBlock = await latestBlockPromise;
+
+  const isPending =
+    !proposal.start_block ||
+    !latestBlock ||
+    Number(proposal.start_block) > latestBlock.number;
+
+  const quorum = isPending ? null : await fetchQuorumForProposal(proposal);
 
   return parseProposal(
     proposal,
@@ -182,3 +190,7 @@ export const fetchDraftProposals = cache(getDraftProposals);
 export const fetchProposals = cache(getProposals);
 export const fetchProposal = cache(getProposal);
 export const fetchProposalTypes = cache(getProposalTypes);
+export const fetchProposalUnstableCache = unstable_cache(getProposal, [], {
+  tags: ["proposal"],
+  revalidate: 3600, // 1 hour
+});
