@@ -258,12 +258,12 @@ export function ShareDialog({
     };
   }, [isInCopiedState]);
 
-  let text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)} ${supportType === "ABSTAIN" ? "on" : ""} ${proposalTitle} ${proposalLink} \n\n${voteReason}`;
+  let text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)}${supportType === "ABSTAIN" ? " on" : ""} ${proposalTitle} ${proposalLink} \n\n${voteReason}`;
   let textWithoutLinkForWarpcast = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)}${supportType === "ABSTAIN" ? " on" : ""} ${proposalTitle} \n\n${voteReason}`;
 
   if (proposalType === "OPTIMISTIC") {
-    text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)} ${supportType === "ABSTAIN" ? "on" : ""} the optimistic proposal ${proposalTitle} ${proposalLink} \n\n${voteReason}`;
-    textWithoutLinkForWarpcast = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)} ${supportType === "ABSTAIN" ? "on" : ""} the optimistic proposal ${proposalTitle} \n\n${voteReason}`;
+    text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)}${supportType === "ABSTAIN" ? " on" : ""} the optimistic proposal ${proposalTitle} ${proposalLink} \n\n${voteReason}`;
+    textWithoutLinkForWarpcast = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)}${supportType === "ABSTAIN" ? " on" : ""} the optimistic proposal ${proposalTitle} \n\n${voteReason}`;
   }
 
   if (proposalType === "APPROVAL") {
@@ -271,8 +271,8 @@ export function ShareDialog({
     const paramsString = params
       ?.map((option: string, index: number) => `${++index}. ${option}`)
       .join("\n");
-    text = `${supportType === "ABSTAIN" ? "I abstained from voting on" : ""} ${proposalTitle} ${proposalLink} \n\n${paramsString ? `I voted for:\n${paramsString}` : ""}\n\n${voteReason}`;
-    textWithoutLinkForWarpcast = `${supportType === "ABSTAIN" ? "I abstained from voting on" : ""} ${proposalTitle} \n\n${paramsString ? `I voted for:\n${paramsString}` : ""}\n\n${voteReason}`;
+    text = `${supportType === "ABSTAIN" ? "I abstained from voting on " : ""}${proposalTitle} ${proposalLink} \n\n${paramsString ? `I voted for:\n${paramsString}` : ""}\n\n${voteReason}`;
+    textWithoutLinkForWarpcast = `${supportType === "ABSTAIN" ? "I abstained from voting on " : ""}${proposalTitle} \n\n${paramsString ? `I voted for:\n${paramsString}` : ""}\n\n${voteReason}`;
   }
 
   const trackShareVote = (
