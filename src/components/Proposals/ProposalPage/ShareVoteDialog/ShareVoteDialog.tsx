@@ -259,7 +259,7 @@ export function ShareDialog({
   }, [isInCopiedState]);
 
   let text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)} ${supportType === "ABSTAIN" ? "on" : ""} ${proposalTitle} ${proposalLink} \n\n${voteReason}`;
-  let textWithoutLinkForWarpcast = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)} ${supportType === "ABSTAIN" ? "on" : ""} ${proposalTitle} \n\n${voteReason}`;
+  let textWithoutLinkForWarpcast = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)}${supportType === "ABSTAIN" ? " on" : ""} ${proposalTitle} \n\n${voteReason}`;
 
   if (proposalType === "OPTIMISTIC") {
     text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)} ${supportType === "ABSTAIN" ? "on" : ""} the optimistic proposal ${proposalTitle} ${proposalLink} \n\n${voteReason}`;

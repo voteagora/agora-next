@@ -496,7 +496,7 @@ const SuccessMessageCard = ({
                 fontSize: proposalType !== "APPROVAL" ? "20px" : "10px",
                 padding: proposalType !== "APPROVAL" ? "16px 24px" : "8px 16px",
               }}
-              tw="flex justify-between items-center bg-[#fafafa] border-t rounded-b-lg font-semibold"
+              tw="flex justify-between items-center bg-[#fafafa] border-t border-b rounded-b-lg font-semibold"
             >
               <div tw="flex items-center">
                 <span style={{ gap: "8px" }} tw="flex items-center">
@@ -621,6 +621,7 @@ const SuccessMessageCard = ({
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
+  console.log(searchParams);
   const namespace = searchParams.get("namespace") as TenantNamespace;
   const forPercentage = Number(searchParams.get("forPercentage"));
   const againstPercentage = Number(searchParams.get("againstPercentage"));
