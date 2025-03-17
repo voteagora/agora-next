@@ -621,7 +621,6 @@ const SuccessMessageCard = ({
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  console.log(searchParams);
   const namespace = searchParams.get("namespace") as TenantNamespace;
   const forPercentage = Number(searchParams.get("forPercentage"));
   const againstPercentage = Number(searchParams.get("againstPercentage"));
