@@ -145,7 +145,7 @@ export function findVotableSupply({
   }
 }
 
-export function findProposalsQuery({
+export function findProposalsQueryFromDB({
   namespace,
   skip,
   take,
@@ -167,6 +167,39 @@ export function findProposalsQuery({
     where: {
       contract,
       cancelled_block: filter === "relevant" ? null : undefined,
+    },
+    select: {
+      // Required by ProposalPayload type
+      // contract: true,
+      proposal_id: true,
+      proposer: true,
+      description: true,
+      // ordinal: true,
+      created_block: true,
+      start_block: true,
+      end_block: true,
+      cancelled_block: true,
+      executed_block: true,
+      queued_block: true,
+      proposal_data: true,
+      // proposal_data_raw: true,
+      proposal_results: true,
+      proposal_type: true,
+      // proposal_type_data: true,
+      // created_transaction_hash: true,
+      // cancelled_transaction_hash: true,
+      // executed_transaction_hash: true,
+      // queued_transaction_hash: true
+
+      // Required by UI components
+      // id: true,
+      // markdowntitle: true,
+      //status: true,
+      //startTime: true,
+      //endTime: true,
+      //cancelledTime: true,
+      //executedTime: true,
+      // queuedTime: true
     },
   };
 
