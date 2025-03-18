@@ -74,7 +74,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
               onClick={() => setShouldHydrate(true)}
             >
               <div className="text-primary flex items-center gap-3">
-                <div className="w-6 h-6 shadow-newDefault rounded-full">
+                <div className="w-6 h-6 shadow-newDefault rounded-full flex">
                   <ENSAvatar ensName={ensName} />
                 </div>
                 {address && <ENSName address={address} />}
