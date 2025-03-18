@@ -13,7 +13,7 @@ class MonitoringService {
   private apiKey!: string;
 
   constructor() {
-    this.enabled = process.env.ENABLE_METRICS === "true";
+    this.enabled = process.env.ENABLE_DD_METRICS === "true";
     console.log("API metrics are: " + this.enabled);
     this.namespace = `agora-next.${Tenant.current().namespace}`;
 
