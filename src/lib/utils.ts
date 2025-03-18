@@ -391,40 +391,45 @@ export const isURL = (value: string) => {
 let GOV_CLIENT_NODE_RPC = process.env.GOV_CLIENT_NODE_RPC!;
 
 export const getTransportForChain = (chainId: number) => {
-
-  console.log("Using : ", GOV_CLIENT_NODE_RPC || `https://eth-mainnet.g.alchemy.com/v2/...`);
+  console.log(
+    "Using : ",
+    GOV_CLIENT_NODE_RPC || `https://eth-mainnet.g.alchemy.com/v2/...`
+  );
   switch (chainId) {
     // mainnet
     case 1:
-      const httpThing = http(
-        GOV_CLIENT_NODE_RPC
-      );
-      console.log(GOV_CLIENT_NODE_RPC)
-      return httpThing
+      const httpThing = http(GOV_CLIENT_NODE_RPC);
+      console.log(GOV_CLIENT_NODE_RPC);
+      return httpThing;
     // optimism
     case 10:
       return http(
-        GOV_CLIENT_NODE_RPC || `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        GOV_CLIENT_NODE_RPC ||
+          `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // base
     case 8453:
       return http(
-        GOV_CLIENT_NODE_RPC || `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        GOV_CLIENT_NODE_RPC ||
+          `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // arbitrum one
     case 42161:
       return http(
-        GOV_CLIENT_NODE_RPC || `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        GOV_CLIENT_NODE_RPC ||
+          `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // arbitrum sepolia
     case 421614:
       return http(
-        GOV_CLIENT_NODE_RPC || `https://arb-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        GOV_CLIENT_NODE_RPC ||
+          `https://arb-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // sepolia
     case 11155111:
       return http(
-        GOV_CLIENT_NODE_RPC || `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        GOV_CLIENT_NODE_RPC ||
+          `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // cyber
     case 7560:
@@ -436,7 +441,10 @@ export const getTransportForChain = (chainId: number) => {
     // scroll
     case 534_352:
       return fallback([
-        http(GOV_CLIENT_NODE_RPC || "https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}"),
+        http(
+          GOV_CLIENT_NODE_RPC ||
+            "https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}"
+        ),
         http(GOV_CLIENT_NODE_RPC || "https://rpc.scroll.io"),
       ]);
 

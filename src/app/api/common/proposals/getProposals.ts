@@ -21,7 +21,7 @@ import {
 } from "@/lib/prismaUtils";
 import { Block } from "ethers";
 import { unstable_cache } from "next/cache";
-import Decimal from 'decimal.js';
+import Decimal from "decimal.js";
 
 interface DAONodeAPIResponse {
   block_number: number;
@@ -52,10 +52,12 @@ interface DAONodeAPIResponse {
   proposal_results: Record<string, string>;
 }
 
-function adaptDAONodeResponse(apiResponse: DAONodeAPIResponse): ProposalPayload {
+function adaptDAONodeResponse(
+  apiResponse: DAONodeAPIResponse
+): ProposalPayload {
   return {
     proposal_id: apiResponse.id,
-    contract: process.env.DAONODE_CONTRACT_ADDRESS ?? '',
+    contract: process.env.DAONODE_CONTRACT_ADDRESS ?? "",
     proposer: apiResponse.proposer.toLowerCase(),
     description: apiResponse.description,
     ordinal: new Decimal(apiResponse.block_number),
@@ -63,32 +65,39 @@ function adaptDAONodeResponse(apiResponse: DAONodeAPIResponse): ProposalPayload 
     start_block: apiResponse.start_block.toString(),
     end_block: apiResponse.end_block.toString(),
     cancelled_block: null,
-    executed_block: apiResponse.execute_event ? BigInt(apiResponse.execute_event.block_number) : null,
-    queued_block: apiResponse.queue_event ? BigInt(apiResponse.queue_event.block_number) : null,
+    executed_block: apiResponse.execute_event
+      ? BigInt(apiResponse.execute_event.block_number)
+      : null,
+    queued_block: apiResponse.queue_event
+      ? BigInt(apiResponse.queue_event.block_number)
+      : null,
     proposal_data: {
       values: apiResponse.values,
       targets: apiResponse.targets,
       calldatas: apiResponse.calldatas,
-      signatures: apiResponse.signatures
+      signatures: apiResponse.signatures,
     },
     proposal_data_raw: JSON.stringify({
       values: apiResponse.values,
       targets: apiResponse.targets,
       calldatas: apiResponse.calldatas,
-      signatures: apiResponse.signatures
+      signatures: apiResponse.signatures,
     }),
-    proposal_type: 'STANDARD',
+    proposal_type: "STANDARD",
     proposal_type_data: null,
     proposal_results: {
-      standard: Object.entries(apiResponse.proposal_results).reduce((acc, [key, value]) => {
-        acc[key] = Number(value);
-        return acc;
-      }, {} as Record<string, number>)
+      standard: Object.entries(apiResponse.proposal_results).reduce(
+        (acc, [key, value]) => {
+          acc[key] = Number(value);
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
     },
     created_transaction_hash: null,
     cancelled_transaction_hash: null,
     queued_transaction_hash: null,
-    executed_transaction_hash: null
+    executed_transaction_hash: null,
   };
 }
 
@@ -96,7 +105,7 @@ async function fetchProposalsFromDAONodeApi({
   namespace,
   skip,
   take,
-  filter
+  filter,
 }: {
   namespace: string;
   skip: number;
@@ -104,24 +113,23 @@ async function fetchProposalsFromDAONodeApi({
   filter: string;
 }): Promise<{ data: ProposalPayload[] }> {
   try {
-    const response = await fetch(`${process.env.DAONODE_API_URL}/proposals?set=relevant`)
-    
+    const response = await fetch(
+      `${process.env.DAONODE_API_URL}/proposals?set=relevant`
+    );
+
     if (!response.ok) {
       throw new Error(`API responded with status: ${response.status}`);
     }
-    
+
     const result = await response.json();
     const adaptedData = result.proposals.map(adaptDAONodeResponse);
     return {
-      data: adaptedData
+      data: adaptedData,
     };
   } catch (error) {
-    console.error('Failed to fetch from REST API:', error);
+    console.error("Failed to fetch from REST API:", error);
     throw error;
   }
-
-
-
 
   /* 
   CURRENT DAO NODE REPONSE:
@@ -197,7 +205,6 @@ async function fetchProposalsFromDAONodeApi({
     proposal_type: 'STANDARD'
   }
   */
-
 }
 
 async function getProposals({
@@ -211,7 +218,7 @@ async function getProposals({
 
   const getProposalsExecution = doInSpan({ name: "getProposals" }, async () => {
     const useRestApi = ui.toggle("use-daonode-for-proposals")?.enabled ?? false;
-    
+
     let proposalsResult;
     if (useRestApi) {
       try {
@@ -221,18 +228,18 @@ async function getProposals({
               namespace,
               skip,
               take,
-              filter
+              filter,
             });
             return result.data;
           },
           pagination
         );
       } catch (error) {
-        console.warn('REST API failed, falling back to DB:', error);
+        console.warn("REST API failed, falling back to DB:", error);
         proposalsResult = null;
       }
     }
-    
+
     // Fallback to DB or default path if REST API is disabled or failed
     if (!proposalsResult) {
       proposalsResult = await paginateResult(
@@ -251,7 +258,7 @@ async function getProposals({
     // for (const proposal of proposalsResult.data) {
     //  console.log(proposal);
     // }
-    
+
     return proposalsResult;
   });
 

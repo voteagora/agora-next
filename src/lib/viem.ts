@@ -1,4 +1,10 @@
-import { Chain, createPublicClient, createWalletClient, custom, http } from "viem";
+import {
+  Chain,
+  createPublicClient,
+  createWalletClient,
+  custom,
+  http,
+} from "viem";
 import { cyber, mainnet, optimism, scroll, sepolia } from "viem/chains";
 
 import "viem/window";
@@ -10,12 +16,10 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 
 export const getWalletClient = (chainId: number) => {
-
   if (!process.env.GOV_CLIENT_NODE_RPC) {
-
     throw new Error("GOV_CLIENT_NODE_RPC environment variable is not defined");
   }
- 
+
   switch (chainId) {
     case mainnet.id:
       return createWalletClient({

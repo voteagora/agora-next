@@ -51,7 +51,7 @@ export const uniswapTenantContractConfig = ({
     "0x3D30B1aB88D487B0F3061F40De76845Bec3F1e94",
   ];
 
-  const provider = new JsonRpcProvider(process.env.GOV_CLIENT_NODE_RPC)
+  const provider = new JsonRpcProvider(process.env.GOV_CLIENT_NODE_RPC);
 
   const chain = isProd ? mainnet : sepolia;
 

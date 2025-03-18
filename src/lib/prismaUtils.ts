@@ -194,7 +194,7 @@ export function findProposalsQueryFromDB({
       //cancelledTime: true,
       //executedTime: true,
       // queuedTime: true
-    }
+    },
   };
 
   switch (namespace) {
