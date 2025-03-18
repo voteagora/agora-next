@@ -6,10 +6,10 @@ import {
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
-import { mainnet, sepolia } from "viem/chains";
+import { Chain, mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
-import { AlchemyProvider } from "ethers";
+import { JsonRpcProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 import {
@@ -51,9 +51,7 @@ export const uniswapTenantContractConfig = ({
     "0x3D30B1aB88D487B0F3061F40De76845Bec3F1e94",
   ];
 
-  const provider = isProd
-    ? new AlchemyProvider("mainnet", alchemyId)
-    : new AlchemyProvider("sepolia", alchemyId);
+  const provider = new JsonRpcProvider(process.env.NEXT_PUBLIC_GOV_CLIENT_NODE_RPC);
 
   const chain = isProd ? mainnet : sepolia;
 
