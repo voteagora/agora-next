@@ -37,7 +37,7 @@ export default function ENSAvatar({
       {avatar ? (
         <img
           alt="ENS Avatar"
-          className={`animate-in w-[${size}px] h-[${size}px]`}
+          className={`animate-in w-[${size}px] h-[${size}px] object-contain`}
           src={avatar}
         />
       ) : (
