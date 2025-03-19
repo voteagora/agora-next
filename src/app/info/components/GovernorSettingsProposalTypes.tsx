@@ -44,12 +44,12 @@ const GovernorSettingsProposalTypes = ({
     namespace !== TENANT_NAMESPACES.XAI &&
     namespace !== TENANT_NAMESPACES.SCROLL;
 
+  const { data: blockNumber } = useBlockNumber({
+    chainId: contracts.governor.chain.id,
+  });
+  
   let args;
   if (namespace === TENANT_NAMESPACES.ENS) {
-    const { data: blockNumber } = useBlockNumber({
-      chainId: contracts.governor.chain.id,
-    });
-
     args = [BigInt(blockNumber || 0)];
   } else {
     args = undefined;
