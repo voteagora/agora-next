@@ -16,10 +16,9 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 
 export const getWalletClient = (chainId: number) => {
-
   let transport;
 
-  const FORK_NODE_URL = process.env.NEXT_PUBLIC_GOV_CLIENT_NODE_RPC
+  const FORK_NODE_URL = process.env.NEXT_PUBLIC_FORK_NODE_URL;
 
   if (FORK_NODE_URL) {
     transport = http(FORK_NODE_URL);

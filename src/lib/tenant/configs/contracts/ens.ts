@@ -37,7 +37,13 @@ export const ensTenantContractConfig = ({
     ? "0xFe89cc7aBB2C4183683ab71653C4cdc9B02D44b7"
     : "0x1E9BE5E89AE5ccBf047477Ac01D3d4b0eBFB328e";
 
-  const provider = new JsonRpcProvider(process.env.NEXT_PUBLIC_GOV_CLIENT_NODE_RPC);
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : isProd
+      ? new AlchemyProvider("mainnet", alchemyId)
+      : new AlchemyProvider("sepolia", alchemyId);
 
   const chain = isProd ? mainnet : sepolia;
 

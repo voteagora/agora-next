@@ -388,15 +388,16 @@ export const isURL = (value: string) => {
   return value === "" || urlRegExp.test(value);
 };
 
-const FORK_NODE_URL = process.env.NEXT_PUBLIC_GOV_CLIENT_NODE_RPC!;
+const FORK_NODE_URL = process.env.NEXT_PUBLIC_FORK_NODE_URL!;
 
 export const getTransportForChain = (chainId: number) => {
   switch (chainId) {
     // mainnet
     case 1:
-      const httpThing = http(FORK_NODE_URL);
-      console.log(FORK_NODE_URL);
-      return httpThing;
+      return http(
+        FORK_NODE_URL ||
+          `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
     // optimism
     case 10:
       return http(
