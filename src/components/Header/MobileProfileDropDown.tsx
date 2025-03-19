@@ -209,10 +209,13 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
                         )}
                       </div>
                       <div className="py-4 border-t border-line bg-neutral rounded-[0px_0px_12px_12px]">
-                        <div onClick={() => disconnect()} className="flex">
+                        <div
+                          onClick={() => disconnect()}
+                          className="cursor-pointer flex"
+                        >
                           <Logout
                             fill={rgbStringToHex(ui?.customization?.primary)}
-                            className={"cursor-pointer mr-[10px] self-center"}
+                            className={"mr-[10px] self-center"}
                           />
                           <span className="text-primary">Logout</span>
                         </div>
