@@ -165,7 +165,7 @@ describe("useDelegatesFilter", () => {
 
   it("should remove delegate filters when toggleFilter is called with 'all'", () => {
     mockDeleteSearchParam.mockReturnValue(
-      "delete-multiple-endorsed,myDelegates"
+      "delete-multiple-endorsed,myDelegates,hasStatement"
     );
 
     const { result } = renderHook(() => useDelegatesFilter());
@@ -176,10 +176,14 @@ describe("useDelegatesFilter", () => {
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
     expect(mockDeleteSearchParam).toHaveBeenCalledWith({
-      names: [ENDORSED_FILTER_PARAM, MY_DELEGATES_FILTER_PARAM],
+      names: [
+        ENDORSED_FILTER_PARAM,
+        MY_DELEGATES_FILTER_PARAM,
+        HAS_STATEMENT_FILTER_PARAM,
+      ],
     });
     expect(mockRouter.push).toHaveBeenCalledWith(
-      "delete-multiple-endorsed,myDelegates",
+      "delete-multiple-endorsed,myDelegates,hasStatement",
       { scroll: false }
     );
   });

@@ -4,26 +4,40 @@ import { DelegatesFilter } from "../DelegatesFilter";
 import { useDelegatesFilter } from "../useDelegatesFilter";
 import {
   ENDORSED_FILTER_PARAM,
-  HAS_STATEMENT_FILTER_PARAM,
   MY_DELEGATES_FILTER_PARAM,
 } from "@/lib/constants";
 
-// Mock dependencies
 vi.mock("@/lib/utils", () => ({
   cn: (...classes: any[]) => classes.filter(Boolean).join(" "),
 }));
 
 vi.mock("../useDelegatesFilter");
+
 vi.mock("../DelegatesIssuesFilter", () => ({
   default: () => <div data-testid="delegates-issues-filter">Issues Filter</div>,
 }));
+
 vi.mock("../DelegatesStakeholdersFilter", () => ({
-  default: () => <div data-testid="delegates-stakeholders-filter">Stakeholders Filter</div>,
+  default: () => (
+    <div data-testid="delegates-stakeholders-filter">Stakeholders Filter</div>
+  ),
 }));
+
 vi.mock("@/components/common/FilterResetListbox", () => ({
-  default: ({ children, triggerLabel, triggerIcon, onReset, onOpenChange, isOpen, activeCount }: any) => (
+  default: ({
+    children,
+    triggerLabel,
+    triggerIcon,
+    onReset,
+    onOpenChange,
+    isOpen,
+    activeCount,
+  }: any) => (
     <div data-testid="filter-reset-listbox" data-active-count={activeCount}>
-      <button data-testid="trigger-button" onClick={() => onOpenChange(!isOpen)}>
+      <button
+        data-testid="trigger-button"
+        onClick={() => onOpenChange(!isOpen)}
+      >
         {triggerLabel}
         {triggerIcon && <div data-testid="filter-icon">{triggerIcon}</div>}
       </button>
@@ -34,11 +48,21 @@ vi.mock("@/components/common/FilterResetListbox", () => ({
     </div>
   ),
 }));
+
 vi.mock("@/icons/filter", () => ({
-  FilterIcon: ({ className }: any) => <div data-testid="filter-icon-svg" className={className}>FilterIcon</div>,
+  FilterIcon: ({ className }: any) => (
+    <div data-testid="filter-icon-svg" className={className}>
+      FilterIcon
+    </div>
+  ),
 }));
+
 vi.mock("@/icons/CheckMark", () => ({
-  CheckMark: ({ className }: any) => <div data-testid="check-mark" className={className}>CheckMark</div>,
+  CheckMark: ({ className }: any) => (
+    <div data-testid="check-mark" className={className}>
+      CheckMark
+    </div>
+  ),
 }));
 
 describe("DelegatesFilter", () => {
@@ -69,31 +93,29 @@ describe("DelegatesFilter", () => {
 
   it("should render with default state", () => {
     render(<DelegatesFilter />);
-    
+
     expect(screen.getByTestId("filter-reset-listbox")).toBeInTheDocument();
     expect(screen.getByTestId("trigger-button")).toHaveTextContent("Filter");
     expect(screen.getByTestId("filter-icon")).toBeInTheDocument();
-    
+
     // Dropdown should be closed by default
     expect(screen.queryByTestId("dropdown-content")).not.toBeInTheDocument();
   });
 
   it("should open dropdown when trigger button is clicked", () => {
     render(<DelegatesFilter />);
-    
-    // Click the trigger button
+
+    // Click the trigger button to open dropdown
     fireEvent.click(screen.getByTestId("trigger-button"));
-    
+
     // Dropdown should be open
     expect(screen.getByTestId("dropdown-content")).toBeInTheDocument();
   });
 
   it("should render filter buttons correctly", () => {
     render(<DelegatesFilter />);
-    
-    // Open dropdown
     fireEvent.click(screen.getByTestId("trigger-button"));
-    
+
     // Check filter buttons
     expect(screen.getByText("All Delegates")).toBeInTheDocument();
     expect(screen.getByText("My Delegates")).toBeInTheDocument();
@@ -103,36 +125,34 @@ describe("DelegatesFilter", () => {
 
   it("should call toggleFilter with correct parameter when filter button is clicked", () => {
     render(<DelegatesFilter />);
-    
-    // Open dropdown
     fireEvent.click(screen.getByTestId("trigger-button"));
-    
+
     // Click "My Delegates" filter
     fireEvent.click(screen.getByText("My Delegates"));
-    
+
     // Check if toggleFilter was called with correct parameter
-    expect(defaultMockValues.toggleFilter).toHaveBeenCalledWith(MY_DELEGATES_FILTER_PARAM);
+    expect(defaultMockValues.toggleFilter).toHaveBeenCalledWith(
+      MY_DELEGATES_FILTER_PARAM
+    );
   });
 
   it("should call toggleFilter with 'all' when 'All Delegates' button is clicked", () => {
     render(<DelegatesFilter />);
-    
-    // Open dropdown
     fireEvent.click(screen.getByTestId("trigger-button"));
-    
+
     // Click "All Delegates" filter
     fireEvent.click(screen.getByText("All Delegates"));
-    
+
     // Check if toggleFilter was called with 'all'
     expect(defaultMockValues.toggleFilter).toHaveBeenCalledWith("all");
   });
 
   it("should call resetFilters when reset button is clicked", () => {
     render(<DelegatesFilter />);
-    
+
     // Click reset button
     fireEvent.click(screen.getByTestId("reset-button"));
-    
+
     // Check if resetFilters was called
     expect(defaultMockValues.resetFilters).toHaveBeenCalled();
   });
@@ -143,17 +163,19 @@ describe("DelegatesFilter", () => {
       ...defaultMockValues,
       activeFilters: [MY_DELEGATES_FILTER_PARAM, ENDORSED_FILTER_PARAM],
     });
-    
+
     render(<DelegatesFilter />);
-    
-    // Open dropdown
     fireEvent.click(screen.getByTestId("trigger-button"));
-    
+
     // Get filter buttons
-    const allDelegatesButton = screen.getByText("All Delegates").closest("button");
-    const myDelegatesButton = screen.getByText("My Delegates").closest("button");
+    const allDelegatesButton = screen
+      .getByText("All Delegates")
+      .closest("button");
+    const myDelegatesButton = screen
+      .getByText("My Delegates")
+      .closest("button");
     const endorsedButton = screen.getByText("Endorsed").closest("button");
-    
+
     // Check active state styling
     expect(allDelegatesButton).toHaveClass("bg-neutral");
     expect(myDelegatesButton).toHaveClass("bg-brandPrimary");
@@ -168,11 +190,14 @@ describe("DelegatesFilter", () => {
       issuesFromUrl: ["issue1", "issue2"],
       stakeholdersFromUrl: ["stakeholder1"],
     });
-    
+
     render(<DelegatesFilter />);
-    
+
     // Check active count (2 active filters + 2 issues + 1 stakeholder = 5)
-    expect(screen.getByTestId("filter-reset-listbox")).toHaveAttribute("data-active-count", "5");
+    expect(screen.getByTestId("filter-reset-listbox")).toHaveAttribute(
+      "data-active-count",
+      "5"
+    );
   });
 
   it("should render issues filter when hasIssues is true", () => {
@@ -180,12 +205,10 @@ describe("DelegatesFilter", () => {
       ...defaultMockValues,
       hasIssues: true,
     });
-    
+
     render(<DelegatesFilter />);
-    
-    // Open dropdown
     fireEvent.click(screen.getByTestId("trigger-button"));
-    
+
     // Check if issues filter is rendered
     expect(screen.getByTestId("delegates-issues-filter")).toBeInTheDocument();
   });
@@ -195,14 +218,14 @@ describe("DelegatesFilter", () => {
       ...defaultMockValues,
       hasIssues: false,
     });
-    
+
     render(<DelegatesFilter />);
-    
-    // Open dropdown
     fireEvent.click(screen.getByTestId("trigger-button"));
-    
+
     // Check if issues filter is not rendered
-    expect(screen.queryByTestId("delegates-issues-filter")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("delegates-issues-filter")
+    ).not.toBeInTheDocument();
   });
 
   it("should render stakeholders filter when hasStakeholders is true", () => {
@@ -210,14 +233,14 @@ describe("DelegatesFilter", () => {
       ...defaultMockValues,
       hasStakeholders: true,
     });
-    
+
     render(<DelegatesFilter />);
-    
-    // Open dropdown
     fireEvent.click(screen.getByTestId("trigger-button"));
-    
+
     // Check if stakeholders filter is rendered
-    expect(screen.getByTestId("delegates-stakeholders-filter")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("delegates-stakeholders-filter")
+    ).toBeInTheDocument();
   });
 
   it("should not render stakeholders filter when hasStakeholders is false", () => {
@@ -225,14 +248,14 @@ describe("DelegatesFilter", () => {
       ...defaultMockValues,
       hasStakeholders: false,
     });
-    
+
     render(<DelegatesFilter />);
-    
-    // Open dropdown
     fireEvent.click(screen.getByTestId("trigger-button"));
-    
+
     // Check if stakeholders filter is not rendered
-    expect(screen.queryByTestId("delegates-stakeholders-filter")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("delegates-stakeholders-filter")
+    ).not.toBeInTheDocument();
   });
 
   it("should not render endorsed filter when hasEndorsedFilter is false", () => {
@@ -240,12 +263,10 @@ describe("DelegatesFilter", () => {
       ...defaultMockValues,
       hasEndorsedFilter: false,
     });
-    
+
     render(<DelegatesFilter />);
-    
-    // Open dropdown
     fireEvent.click(screen.getByTestId("trigger-button"));
-    
+
     // Check if endorsed filter is not rendered
     expect(screen.queryByText("Endorsed")).not.toBeInTheDocument();
   });

@@ -16,15 +16,6 @@ const mockAddSearchParam = vi.fn();
 const mockDeleteSearchParam = vi.fn();
 const mockSetIsDelegatesFiltering = vi.fn();
 
-// Mock Tenant
-const mockTenant = {
-  ui: {
-    customization: {
-      primary: "rgb(0, 0, 255)",
-    },
-  },
-};
-
 // Setup mocks
 vi.mock("next/navigation", () => ({
   useRouter: () => mockRouter,
@@ -42,9 +33,16 @@ vi.mock("@/contexts/AgoraContext", () => ({
   }),
 }));
 
+// Fix: Define the tenant mock directly in the mock function
 vi.mock("@/lib/tenant/tenant", () => ({
   default: {
-    current: () => mockTenant,
+    current: () => ({
+      ui: {
+        customization: {
+          primary: "rgb(0, 0, 255)",
+        },
+      },
+    }),
   },
 }));
 

@@ -24,6 +24,7 @@ export const useDelegatesFilter = () => {
   const hasIssues = Boolean(
     ui.governanceIssues && ui.governanceIssues.length > 0
   );
+
   const hasStakeholders = Boolean(
     ui.governanceStakeholders && ui.governanceStakeholders.length > 0
   );

@@ -10,10 +10,8 @@ export const useDelegatesSort = () => {
   const deleteSearchParam = useDeleteSearchParam();
   const { setIsDelegatesFiltering } = useAgoraContext();
 
-  // Get current sort from URL
   const orderByParam = searchParams?.get("orderBy") || "weighted_random";
 
-  // Handle sort change
   const handleSortChange = (value: string) => {
     setIsDelegatesFiltering(true);
     router.push(
@@ -24,7 +22,6 @@ export const useDelegatesSort = () => {
     );
   };
 
-  // Reset sort
   const resetSort = () => {
     setIsDelegatesFiltering(true);
     router.push(deleteSearchParam({ name: "orderBy" }), { scroll: false });
