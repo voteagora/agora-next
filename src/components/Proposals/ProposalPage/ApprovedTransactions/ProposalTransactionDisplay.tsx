@@ -56,6 +56,7 @@ const ProposalTransactionDisplay = ({
   network?: string;
 }) => {
   const [collapsed, setCollapsed] = useState(true);
+  const [viewMode, setViewMode] = useState<"summary" | "raw">("summary");
 
   if (targets.length === 0) {
     return (
@@ -82,65 +83,82 @@ const ProposalTransactionDisplay = ({
     <div>
       <div className="flex flex-col border rounded-t-lg border-line text-xs text-primary break-words overflow-hidden">
         <div className="w-full flex items-center justify-between mb-2 border-b border-line px-4 py-3">
-          <span className="text-xs font-semibold text-primary">Actions</span>
-          {executedTransactionHash && (
-            <a
-              href={getBlockScanUrl(executedTransactionHash)}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="text-primary hover:text-primary/80 transition-colors"
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-primary">Actions</span>
+            {executedTransactionHash && (
+              <a
+                href={getBlockScanUrl(executedTransactionHash)}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-primary hover:text-primary/80 transition-colors"
+              >
+                <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+              </a>
+            )}
+          </div>
+          <div className="flex">
+            <button
+              className={`px-2 py-1 text-xs font-semibold ${viewMode === "summary" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
+              onClick={() => setViewMode("summary")}
             >
-              <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-            </a>
-          )}
-          {simulationDetails?.id && simulationDetails?.state && (
-            <>
-              {simulationDetails.state === "UNCONFIRMED" ? (
-                <div className="bg-neutral/20 text-secondary rounded-lg px-3 py-1.5 text-xs font-medium flex items-center gap-x-1">
-                  <span>Simulation {simulationDetails.state}</span>
-                </div>
-              ) : (
-                <a
-                  href={`https://dashboard.tenderly.co/shared/simulation/${simulationDetails.id}`}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className={`
-                ${simulationDetails.state === "VALID" ? "bg-positive/20 hover:bg-positive/30 text-positive" : simulationDetails.state === "INVALID" ? "bg-negative/20 hover:bg-negative/30 text-negative" : "bg-neutral text-secondary"}
-                transition-colors cursor-pointer rounded-lg px-3 py-1.5 text-xs font-medium flex items-center gap-x-1`}
-                >
-                  <span>Simulation {simulationDetails.state}</span>
-                  <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5 ml-1" />
-                </a>
-              )}
-            </>
-          )}
+              Summary
+            </button>
+            <button
+              className={`px-2 py-1 text-xs font-semibold ${viewMode === "raw" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
+              onClick={() => setViewMode("raw")}
+            >
+              Raw
+            </button>
+          </div>
         </div>
+
         <div className="p-4 pt-2">
-          {(collapsed ? [targets[0]] : targets.slice(0, normalizedLength)).map(
-            (target, idx) => (
-              <TransactionItem
-                key={idx}
-                target={target}
-                calldata={idx < calldatas.length ? calldatas[idx] : "0x"}
-                value={idx < values.length ? values[idx] : "0"}
-                description={
-                  descriptions && idx < descriptions.length
-                    ? descriptions[idx]
-                    : undefined
-                }
-                collapsed={collapsed}
-                network={network}
-                signature={
-                  signatures && idx < signatures.length
-                    ? signatures[idx]
-                    : undefined
-                }
-                index={idx}
-              />
-            )
+          {viewMode === "summary" ? (
+            <div>
+              {(collapsed
+                ? [targets[0]]
+                : targets.slice(0, normalizedLength)
+              ).map((target, idx) => (
+                <TransactionItem
+                  key={idx}
+                  target={target}
+                  calldata={idx < calldatas.length ? calldatas[idx] : "0x"}
+                  value={idx < values.length ? values[idx] : "0"}
+                  description={
+                    descriptions && idx < descriptions.length
+                      ? descriptions[idx]
+                      : undefined
+                  }
+                  collapsed={collapsed}
+                  network={network}
+                  signature={
+                    signatures && idx < signatures.length
+                      ? signatures[idx]
+                      : undefined
+                  }
+                  index={idx}
+                />
+              ))}
+            </div>
+          ) : (
+            <div>
+              {(collapsed
+                ? [targets[0]]
+                : targets.slice(0, normalizedLength)
+              ).map((target, idx) => (
+                <RawTransactionItem
+                  key={idx}
+                  target={target}
+                  calldata={idx < calldatas.length ? calldatas[idx] : "0x"}
+                  value={idx < values.length ? values[idx] : "0"}
+                  index={idx}
+                />
+              ))}
+            </div>
           )}
         </div>
       </div>
+
       <div
         className="border border-t-0 border-line rounded-b-lg p-4 cursor-pointer text-sm text-tertiary font-medium hover:bg-neutral/10 transition-colors flex justify-center"
         onClick={() => {
@@ -225,6 +243,58 @@ const TransactionItem = ({
             isLoading={isLoading}
             error={error ? (error as Error).message : null}
           />
+        )}
+      </div>
+    </div>
+  );
+};
+
+const RawTransactionItem = ({
+  target,
+  calldata,
+  value,
+  index,
+}: {
+  target: string;
+  calldata: `0x${string}`;
+  value: string;
+  index: number;
+}) => {
+  return (
+    <div>
+      <h3 className="text-xs font-semibold mb-2">Action {index + 1}</h3>
+
+      <div className="bg-wash rounded-lg p-4 space-y-6">
+        <div>
+          <div className="text-xs text-secondary font-semibold">Target:</div>
+          <a
+            className="text-xs break-all block hover:underline font-medium text-secondary"
+            href={getBlockScanAddress(target)}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            {target}
+          </a>
+        </div>
+
+        {BigInt(value) > 0n && (
+          <div>
+            <div className="text-xs text-secondary font-semibold">Value:</div>
+            <div className="text-xs break-all font-medium text-secondary">
+              {value}
+            </div>
+          </div>
+        )}
+
+        {calldata && calldata !== "0x" && (
+          <div>
+            <div className="text-xs text-secondary font-semibold">
+              Calldata:
+            </div>
+            <div className="text-xs break-all font-medium text-secondary">
+              {calldata}
+            </div>
+          </div>
         )}
       </div>
     </div>

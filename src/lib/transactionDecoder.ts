@@ -6,6 +6,8 @@ import {
   ParamType,
   BytesLike,
   ethers,
+  hexlify,
+  getBytes,
 } from "ethers";
 import axios from "axios";
 import { getAddress } from "viem";
@@ -72,11 +74,9 @@ interface DecodedParameter {
 // -----------------------------------------------------------------------------
 
 const decodeHex = (data: BytesLike): Uint8Array => {
-  if (data instanceof Uint8Array) return data;
-  if (typeof data === "string" && data.startsWith("0x")) {
-    data = data.substring(2);
-  }
-  if (typeof data === "string" && !/^([0-9a-fA-F]{2})*$/.test(data)) {
+  try {
+    return getBytes(data);
+  } catch (error) {
     console.error(
       "Invalid hex input:",
       typeof data === "string" ? data.substring(0, 50) + "..." : String(data)
@@ -84,29 +84,12 @@ const decodeHex = (data: BytesLike): Uint8Array => {
     // Return empty array instead of throwing to prevent crashes
     return new Uint8Array(0);
   }
-  const result = new Uint8Array(typeof data === "string" ? data.length / 2 : 0);
-  if (typeof data === "string") {
-    for (let i = 0; i < result.length; i++) {
-      result[i] = parseInt(data.substring(i * 2, i * 2 + 2), 16);
-    }
-  }
-  return result;
 };
-
-const encodeHex = (() => {
-  const lut: Array<string> = new Array(0x100);
-  for (let i = 0; i < 0x100; i++) lut[i] = i.toString(16).padStart(2, "0");
-  return (data: Uint8Array): string => {
-    const result = new Array(data.length);
-    for (let i = 0; i < data.length; i++) result[i] = lut[data[i]];
-    return "0x" + result.join("");
-  };
-})();
 
 const tryParseOffset = (data: Uint8Array, pos: number): number | null => {
   const word = data.slice(pos, pos + 32);
   if (word.length === 0) return null;
-  const bigOffset = BigInt(encodeHex(word));
+  const bigOffset = BigInt(hexlify(word));
   if (bigOffset > BigInt(Number.MAX_SAFE_INTEGER)) return null;
   const offset = Number(bigOffset);
   if (offset <= pos || offset >= data.length) return null;
@@ -117,7 +100,7 @@ const tryParseOffset = (data: Uint8Array, pos: number): number | null => {
 const tryParseLength = (data: Uint8Array, offset: number): number | null => {
   const word = data.slice(offset, offset + 32);
   if (word.length === 0) return null;
-  const bigLength = BigInt(encodeHex(word));
+  const bigLength = BigInt(hexlify(word));
   if (bigLength > BigInt(Number.MAX_SAFE_INTEGER)) return null;
   const length = Number(bigLength);
   if (offset + 32 + length > data.length) return null;
@@ -537,7 +520,6 @@ export const guessFragment = (calldata: BytesLike): FunctionFragment | null => {
   if (bytes.length < 4) return null;
   const params = guessAbiEncodedData(bytes.slice(4));
   if (!params) return null;
-  const selector = encodeHex(bytes.slice(0, 4)).substring(2);
   return FunctionFragment.from(`unknown(${formatParams(params)})`);
 };
 
