@@ -1,7 +1,7 @@
 "use client";
 
 import { FC, PropsWithChildren } from "react";
-import { createConfig, WagmiProvider } from "wagmi";
+import { createConfig, WagmiProvider, type Transport } from "wagmi";
 import { inter } from "@/styles/fonts";
 import { mainnet } from "wagmi/chains";
 import Footer from "@/components/Footer";

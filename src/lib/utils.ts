@@ -388,61 +388,70 @@ export const isURL = (value: string) => {
   return value === "" || urlRegExp.test(value);
 };
 
+const FORK_NODE_URL = process.env.NEXT_PUBLIC_FORK_NODE_URL!;
+
 export const getTransportForChain = (chainId: number) => {
   switch (chainId) {
     // mainnet
     case 1:
       return http(
-        `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL ||
+          `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // optimism
     case 10:
       return http(
-        `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL ||
+          `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // base
     case 8453:
       return http(
-        `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL ||
+          `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // arbitrum one
     case 42161:
       return http(
-        `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL ||
+          `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // arbitrum sepolia
     case 421614:
       return http(
-        `https://arb-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL ||
+          `https://arb-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // sepolia
     case 11155111:
       return http(
-        `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL ||
+          `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // cyber
     case 7560:
       return fallback([
-        http("https://rpc.cyber.co"),
-        http("https://cyber.alt.technology"),
+        http(FORK_NODE_URL || "https://rpc.cyber.co"),
+        http(FORK_NODE_URL || "https://cyber.alt.technology"),
       ]);
 
     // scroll
     case 534_352:
       return fallback([
         http(
-          `https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+          FORK_NODE_URL ||
+            "https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}"
         ),
-        http("https://rpc.scroll.io"),
+        http(FORK_NODE_URL || "https://rpc.scroll.io"),
       ]);
 
     // derive mainnet
     case 957:
-      http(DERIVE_MAINNET_RPC);
+      return http(FORK_NODE_URL || DERIVE_MAINNET_RPC);
 
     // derive testnet
     case 901:
-      return http(DERIVE_TESTNET_RPC);
+      return http(FORK_NODE_URL || DERIVE_TESTNET_RPC);
 
     // for each new dao with a new chainId add them here
     default:
