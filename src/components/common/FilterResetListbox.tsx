@@ -102,7 +102,7 @@ const FilterResetListbox = ({
                 onClick={() => handleOpenChange(false)}
               />
               <motion.div
-                className="bg-neutral w-full fixed bottom-0 left-0 max-h-[90vh] overflow-y-auto z-[70]"
+                className="bg-wash w-full fixed bottom-0 left-0 max-h-[90vh] overflow-y-auto z-[70]"
                 initial="hidden"
                 animate="show"
                 exit="exit"
@@ -113,7 +113,7 @@ const FilterResetListbox = ({
                   <div
                     className={cn(
                       "self-stretch h-16 px-4 py-2 inline-flex justify-between items-center",
-                      borderBelowLabel && "border-b border-neutral-200"
+                      borderBelowLabel && "border-b border-line"
                     )}
                   >
                     <div className="text-secondary text-base font-semibold leading-normal">
@@ -121,7 +121,7 @@ const FilterResetListbox = ({
                     </div>
                     <button
                       onClick={handleReset}
-                      className="justify-center text-neutral-900 text-xs font-medium leading-none cursor-pointer"
+                      className="justify-center text-primary text-xs font-medium leading-none cursor-pointer"
                     >
                       Reset
                     </button>
@@ -183,11 +183,11 @@ const FilterResetListbox = ({
 
       <DropdownMenu.Portal>
         <DropdownMenuContent>
-          <div className="grid w-full">
+          <div className="grid w-full bg-wash">
             <div
               className={cn(
                 "self-stretch h-16 px-4 py-2 inline-flex justify-between items-center",
-                borderBelowLabel && "border-b border-neutral-200"
+                borderBelowLabel && "border-b border-line"
               )}
             >
               <div className="text-secondary text-base font-semibold leading-normal">
@@ -195,7 +195,7 @@ const FilterResetListbox = ({
               </div>
               <button
                 onClick={handleReset}
-                className="justify-center text-neutral-900 text-xs font-medium leading-none cursor-pointer"
+                className="justify-center text-primary text-xs font-medium leading-none cursor-pointer"
               >
                 Reset
               </button>

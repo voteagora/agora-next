@@ -118,17 +118,17 @@ const DelegatesIssuesFilter = () => {
       onOpenChange={setIsIssuesOpen}
       className="self-stretch"
     >
-      <div className="bg-white flex flex-col justify-start items-start gap-2.5">
+      <div className="bg-wash flex flex-col justify-start items-start gap-2.5">
         <Collapsible.Trigger asChild>
           <div className="self-stretch inline-flex justify-between items-start cursor-pointer">
-            <div className="justify-center text-primary text-base font-semibold leading-normal inline-flex gap-2">
+            <div className="justify-center text-secondary text-base font-semibold leading-normal inline-flex gap-2">
               Issue Categories{" "}
               {selectedIssueCategoriesCount > 0 && (
                 <CountBadge count={selectedIssueCategoriesCount} />
               )}
             </div>
             <button className="w-6 h-6 flex items-center justify-center">
-              <ChevronUpDownIcon />
+              <ChevronUpDownIcon className="stroke-primary" />
             </button>
           </div>
         </Collapsible.Trigger>

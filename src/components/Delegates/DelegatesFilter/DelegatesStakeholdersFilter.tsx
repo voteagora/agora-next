@@ -128,7 +128,7 @@ const DelegatesStakeholdersFilter = () => {
               )}
             </div>
             <button className="w-6 h-6 flex items-center justify-center">
-              <ChevronUpDownIcon />
+              <ChevronUpDownIcon className="stroke-primary" />
             </button>
           </div>
         </Collapsible.Trigger>

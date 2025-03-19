@@ -138,12 +138,12 @@ export const MobileDelegatesFilter = () => {
           </div>
           <button
             onClick={resetFilters}
-            className="justify-center text-neutral-900 text-xs font-medium leading-none cursor-pointer"
+            className="justify-center text-primary text-xs font-medium leading-none cursor-pointer"
           >
             Reset
           </button>
         </div>
-        <div className="self-stretch px-2.5 pb-6 bg-white flex flex-col justify-start items-start gap-2.5">
+        <div className="self-stretch px-2.5 pb-6 bg-wash flex flex-col justify-start items-start gap-2.5">
           <div className="self-stretch inline-flex justify-start items-start gap-2.5 flex-wrap content-start">
             <FilterButton
               label="All Delegates"
