@@ -16,48 +16,55 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 
 export const getWalletClient = (chainId: number) => {
-  if (!process.env.NEXT_PUBLIC_GOV_CLIENT_NODE_RPC) {
-    throw new Error("NEXT_PUBLIC_GOV_CLIENT_NODE_RPC environment variable is not defined");
+
+  let transport;
+
+  const FORK_NODE_URL = process.env.NEXT_PUBLIC_GOV_CLIENT_NODE_RPC
+
+  if (FORK_NODE_URL) {
+    transport = http(FORK_NODE_URL);
+  } else {
+    transport = custom(window.ethereum!);
   }
 
   switch (chainId) {
     case mainnet.id:
       return createWalletClient({
         chain: mainnet,
-        transport: http(process.env.NEXT_PUBLIC_GOV_CLIENT_NODE_RPC!),
+        transport,
       });
     case sepolia.id:
       return createWalletClient({
         chain: sepolia,
-        transport: custom(window.ethereum!),
+        transport,
       });
     case optimism.id:
       return createWalletClient({
         chain: optimism,
-        transport: custom(window.ethereum!),
+        transport,
       });
     case cyber.id:
       return createWalletClient({
         chain: cyber,
-        transport: custom(window.ethereum!),
+        transport,
       });
 
     case deriveTestnet.id:
       return createWalletClient({
         chain: deriveTestnet,
-        transport: custom(window.ethereum!),
+        transport,
       });
 
     case deriveMainnet.id:
       return createWalletClient({
         chain: deriveMainnet,
-        transport: custom(window.ethereum!),
+        transport,
       });
 
     case scroll.id:
       return createWalletClient({
         chain: scroll,
-        transport: custom(window.ethereum!),
+        transport,
       });
 
     default:
