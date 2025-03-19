@@ -1,22 +1,21 @@
 openapi: 3.1.0
 info:
-  title: Agora's Governance API (Beta)
+  title: Agora Governance API
   description: |-
     Welcome to the Agora Governance API documentation. This API provides various endpoints to interact with the Agora Governance client.
 
     ### Current Status
-    - **Alpha**: This API is currently in alpha.  It is recommended for production use cases only in consultation with Agora.  Reach out, and chat about your needs!
+    This API is currently undergoing material enhancements.  It is recommended for production use cases only in consultation with Agora.
 
     ### API Categories
-    Live and stable. 
-    - **auth**: Authenticate with the Agora API
+
     - **delegates**: Delegates data
     - **delegations**: Delegations data
     - **proposals**: Proposal data
     - **votes**: Vote data
     - **contracts**: Data for the current onchain contracts
 
-  version: 0.3.1
+  version: 1.0.0-alpha
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
@@ -24,8 +23,6 @@ servers:
   - url: https://localhost:3000/api/v1
     description: Base URL for V1 API
 tags:
-  - name: auth
-    description: Authenticate with the Agora API
   - name: delegates
     description: Delegates data
   - name: delegations
@@ -66,21 +63,6 @@ components:
           summary: Expiration time of the token
           description: The time after which the token will expire, in seconds.
           type: integer
-    SIWEVerificationBody:
-      summary: Body of SIWE /verify request
-      description: >
-        Body SIWE verification requests containing message and signature per 
-        (EIP-4361)[https://eips.ethereum.org/EIPS/eip-4361]
-      type: object
-      properties:
-        message:
-          summary: SIWE message for verification
-          type: string
-        signature:
-          summary: SIWE message signature for verification
-          type: string
-        nonce:
-          type: string
     PageMetadata:
       summary: Pagination metadata
       description: Metadata associated with paginated requests.
@@ -917,71 +899,6 @@ components:
         minimum: 2000000
         maximum: 8000000
 paths:
-  /spec:
-    get:
-      summary: Gets this specification
-      description: Retrieves the full OAS/Swagger spec for the API in YAML.
-      operationId: getSpec
-      tags:
-        - spec
-      responses:
-        "200":
-          description: OK
-          content:
-            text/plain:
-              schema:
-                type: string
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
-  /auth/nonce:
-    get:
-      summary: Gets nonce for SIWE authentication
-      description: Gets nonce for SIWE authentication.
-      operationId: getNonce
-      tags:
-        - auth
-      responses:
-        "200":
-          description: OK
-          content:
-            text/plain:
-              schema:
-                type: string
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
-  /auth/verify:
-    post:
-      summary: Posts SIWE verification payload
-      description: Posts SIWE message and signature.
-      operationId: postSiweVerificationMessage
-      tags:
-        - auth
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SIWEVerificationBody"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthToken"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
   /delegates:
     get:
       summary: Gets a list of delegates
@@ -1272,27 +1189,6 @@ paths:
       description: >
         Retrieves the address of the governor contract on chain.
       operationId: getGovernorContract
-      tags:
-        - contracts
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Contract"
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
-  /contracts/alligator:
-    get:
-      summary: Gets the alligator contract address
-      description: >
-        Retrieves the address of the alligator contract on chain.
-      operationId: getAlligatorContract
       tags:
         - contracts
       responses:
