@@ -10,8 +10,10 @@ interface ENSNameProps {
 }
 
 // This component will display the ENS name for a given address
-export default function ENSName({ address, truncate }: ENSNameProps) {
-  const [ensName, setEnsName] = useState(truncateAddress(address || ""));
+export default function ENSName({ address, truncate = true }: ENSNameProps) {
+  const [ensName, setEnsName] = useState(
+    truncate ? truncateAddress(address || "") : address || ""
+  );
 
   const { data } = useEnsName({
     chainId: 1,
@@ -22,9 +24,9 @@ export default function ENSName({ address, truncate }: ENSNameProps) {
     if (data) {
       setEnsName(data); // Set ENS name if available
     } else {
-      setEnsName(truncateAddress(address)); // Fallback to truncated address
+      setEnsName(truncate ? truncateAddress(address) : address); // Fallback
     }
-  }, [data, address]);
+  }, [data, address, truncate]);
 
   return truncate
     ? ensName || `${address.slice(0, 6)}...${address.slice(-4)}`

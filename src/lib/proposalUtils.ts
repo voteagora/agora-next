@@ -108,14 +108,17 @@ const knownAbis: Record<string, Abi> = {
 
 const decodeCalldata = (calldatas: `0x${string}`[]) => {
   return calldatas.map((calldata) => {
-    const abi = knownAbis[calldata.slice(0, 10)];
+    const parsedCalldata: `0x${string}` = calldata.startsWith("0x")
+      ? calldata
+      : (("0x" + calldata) as `0x${string}`);
+    const abi = knownAbis[parsedCalldata.slice(0, 10)];
     let functionName = "unknown";
     let functionArgs = [] as string[];
 
     if (abi) {
       const decodedData = decodeFunctionData({
         abi: abi,
-        data: calldata,
+        data: parsedCalldata,
       });
       functionName = decodedData.functionName;
       functionArgs = decodedData.args as string[];
@@ -375,6 +378,16 @@ export function parseIfNecessary(obj: string | object) {
   return typeof obj === "string" ? JSON.parse(obj) : obj;
 }
 
+function parseMultipleStringsSeparatedByComma(obj: string | object) {
+  return typeof obj === "string"
+    ? obj.split(",")
+    : Array.isArray(obj)
+      ? obj
+          .map((item) => (typeof item === "string" ? item.split(",") : item))
+          .flat()
+      : obj;
+}
+
 export function parseProposalData(
   proposalData: string,
   proposalType: ProposalType
@@ -400,11 +413,15 @@ export function parseProposalData(
     case "STANDARD": {
       const parsedProposalData = JSON.parse(proposalData);
       try {
-        const calldatas = parseIfNecessary(parsedProposalData.calldatas);
-        const functionArgsName = decodeCalldata(calldatas);
-        const targets = parseIfNecessary(parsedProposalData.targets);
+        const calldatas: any = parseMultipleStringsSeparatedByComma(
+          parseIfNecessary(parsedProposalData.calldatas)
+        );
+        const targets: any = parseMultipleStringsSeparatedByComma(
+          parseIfNecessary(parsedProposalData.targets)
+        );
         const values = parseIfNecessary(parsedProposalData.values);
         const signatures = parseIfNecessary(parsedProposalData.signatures);
+        const functionArgsName = decodeCalldata(calldatas);
 
         return {
           key: "STANDARD",
