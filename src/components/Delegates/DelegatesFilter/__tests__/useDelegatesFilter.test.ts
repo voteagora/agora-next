@@ -261,59 +261,59 @@ describe("useDelegatesFilter", () => {
 
   it("should apply multiple filters when applyFiltersToUrl is called", () => {
     mockAddSearchParam.mockReturnValue("url-with-multiple-filters");
-    
+
     const { result } = renderHook(() => useDelegatesFilter());
-    
+
     const filters = {
       [MY_DELEGATES_FILTER_PARAM]: true,
       [ENDORSED_FILTER_PARAM]: true,
       [ISSUES_FILTER_PARAM]: "issue1,issue2",
     };
-    
+
     act(() => {
       result.current.applyFiltersToUrl(filters);
     });
-    
+
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-    expect(mockRouter.push).toHaveBeenCalledWith("url-with-multiple-filters", { 
-      scroll: false 
+    expect(mockRouter.push).toHaveBeenCalledWith("url-with-multiple-filters", {
+      scroll: false,
     });
   });
 
   it("should add a single filter to URL when addFilterToUrl is called", () => {
     mockAddSearchParam.mockReturnValue("url-with-added-filter");
-    
+
     const { result } = renderHook(() => useDelegatesFilter());
-    
+
     act(() => {
       result.current.addFilterToUrl(ISSUES_FILTER_PARAM, "issue1,issue2");
     });
-    
+
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
     expect(mockAddSearchParam).toHaveBeenCalledWith({
       name: ISSUES_FILTER_PARAM,
-      value: "issue1,issue2"
+      value: "issue1,issue2",
     });
-    expect(mockRouter.push).toHaveBeenCalledWith("url-with-added-filter", { 
-      scroll: false 
+    expect(mockRouter.push).toHaveBeenCalledWith("url-with-added-filter", {
+      scroll: false,
     });
   });
 
   it("should remove a single filter from URL when removeFilterToUrl is called", () => {
     mockDeleteSearchParam.mockReturnValue("url-with-removed-filter");
-    
+
     const { result } = renderHook(() => useDelegatesFilter());
-    
+
     act(() => {
       result.current.removeFilterToUrl(ISSUES_FILTER_PARAM);
     });
-    
+
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
     expect(mockDeleteSearchParam).toHaveBeenCalledWith({
-      name: ISSUES_FILTER_PARAM
+      name: ISSUES_FILTER_PARAM,
     });
-    expect(mockRouter.push).toHaveBeenCalledWith("url-with-removed-filter", { 
-      scroll: false 
+    expect(mockRouter.push).toHaveBeenCalledWith("url-with-removed-filter", {
+      scroll: false,
     });
   });
 });

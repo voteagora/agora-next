@@ -58,11 +58,12 @@ async function getDelegates({
 
       // The top issues filter supports multiple selection - a comma separated list of issues
       const topIssuesParam = filters?.issues || "";
+      const topStakeholdersParam = filters?.stakeholders || "";
+
       const topIssuesArray = topIssuesParam
         ? topIssuesParam.split(",").map((issue) => issue.trim())
         : [];
 
-      // Define each filter condition separately for better readability
       const endorsedCondition = filters?.endorsed ? `AND endorsed = true` : "";
 
       const issuesCondition =
@@ -81,7 +82,6 @@ async function getDelegates({
 
       // Note: There is an inconsistency between top stakeholders and top issues. Top issues are filtered by a value
       // where the top stakeholders are filtered on type. We need to make this consistent and clean up the data and UI.
-      const topStakeholdersParam = filters?.stakeholders || "";
       const stakeholdersCondition =
         topStakeholdersParam && topStakeholdersParam !== ""
           ? `

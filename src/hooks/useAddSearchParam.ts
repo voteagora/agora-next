@@ -22,7 +22,7 @@ export const useAddSearchParam = () => {
       const urlParams = new URLSearchParams(
         clean ? undefined : searchParams?.toString()
       );
-      
+
       if (params) {
         // Add multiple parameters
         Object.entries(params).forEach(([key, val]) => {
@@ -32,7 +32,7 @@ export const useAddSearchParam = () => {
         // Add single parameter
         urlParams.set(name, value);
       }
-      
+
       return pathname + "?" + urlParams.toString();
     },
     [searchParams, pathname]
