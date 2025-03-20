@@ -8,6 +8,7 @@ declare global {
 
 const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
 const envSuffix = isProd ? "PROD" : "DEV";
+console.log("Env Suffix: " + envSuffix);
 const readWriteWeb2Url =
   process.env[`READ_WRITE_WEB2_DATABASE_URL_${envSuffix}`];
 const readOnlyWeb3Url = process.env[`READ_ONLY_WEB3_DATABASE_URL_${envSuffix}`];
@@ -69,6 +70,8 @@ if (process.env.NODE_ENV === "production") {
   prismaWeb3Client = makePrismaClient(readOnlyWeb3Url) as PrismaClient;
 } else {
   if (!global.prismaWeb2Client) {
+    console.log(readWriteWeb2Url);
+    console.log(readOnlyWeb3Url);
     if (!readWriteWeb2Url || !readOnlyWeb3Url) {
       throw new Error("Database URLs are not defined in environment variables");
     }
