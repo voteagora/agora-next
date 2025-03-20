@@ -24,9 +24,34 @@ console.log(
 const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
 // const envSuffix = isProd ? "PROD" : "DEV";
 console.log("Env Suffix: " + envSuffix);
+
+// Add these lines to see the actual values (length only for security)
+console.log(
+  "Web2 URL type:",
+  typeof process.env[`READ_WRITE_WEB2_DATABASE_URL_${envSuffix}`]
+);
+console.log(
+  "Web3 URL type:",
+  typeof process.env[`READ_ONLY_WEB3_DATABASE_URL_${envSuffix}`]
+);
+console.log(
+  "Web2 URL length:",
+  process.env[`READ_WRITE_WEB2_DATABASE_URL_${envSuffix}`]?.length || 0
+);
+console.log(
+  "Web3 URL length:",
+  process.env[`READ_ONLY_WEB3_DATABASE_URL_${envSuffix}`]?.length || 0
+);
+
 const readWriteWeb2Url =
   process.env[`READ_WRITE_WEB2_DATABASE_URL_${envSuffix}`];
 const readOnlyWeb3Url = process.env[`READ_ONLY_WEB3_DATABASE_URL_${envSuffix}`];
+
+// Log the variables after assignment
+console.log("readWriteWeb2Url type:", typeof readWriteWeb2Url);
+console.log("readOnlyWeb3Url type:", typeof readOnlyWeb3Url);
+console.log("readWriteWeb2Url exists:", !!readWriteWeb2Url);
+console.log("readOnlyWeb3Url exists:", !!readOnlyWeb3Url);
 
 let prismaWeb2Client: PrismaClient;
 let prismaWeb3Client: PrismaClient;
