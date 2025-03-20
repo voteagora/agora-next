@@ -98,18 +98,24 @@ const FilterResetListbox = ({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.2 }}
                 exit={{ opacity: 0 }}
-                className="z-[60] bg-black fixed top-0 left-0 right-0 bottom-0"
+                className="z-[1000] bg-black fixed top-0 left-0 right-0 bottom-0"
                 onClick={() => handleOpenChange(false)}
               />
               <motion.div
-                className="bg-wash w-full fixed bottom-0 left-0 max-h-[90vh] overflow-y-auto z-[70]"
+                className="bg-wash w-full fixed bottom-0 left-0 max-h-[100%] overflow-y-auto z-[1001]"
                 initial="hidden"
                 animate="show"
                 exit="exit"
                 variants={variants}
                 transition={{ duration: 0.2 }}
               >
-                <div className="grid w-full">
+                <div className="grid w-full relative">
+                  <div className="h-16 px-4 py-2 flex items-center justify-end sticky top-0">
+                    <button onClick={() => handleOpenChange(false)}>
+                      <CloseIcon className="h-6 w-6 text-primary" />
+                    </button>
+                  </div>
+
                   <div
                     className={cn(
                       "self-stretch h-16 px-4 py-2 inline-flex justify-between items-center",
@@ -163,26 +169,30 @@ const FilterResetListbox = ({
           >
             {triggerLabel}
           </span>
-          {hasActiveFilters && (
-            <>
-              <MobileCountIndicator
-                count={activeCount}
-                className="inline-block sm:hidden"
-              />
-              <div className="hidden sm:flex items-center gap-[6px]">
-                <CountBadge count={activeCount} />
-                <div className="h-[18px] w-[1px] bg-tertiary" />
-                <div onClick={handleReset} className="cursor-pointer">
-                  <CloseIcon className="text-tertiary w-3 h-3" />
-                </div>
-              </div>
-            </>
-          )}
         </button>
       </DropdownMenu.Trigger>
+      {hasActiveFilters && (
+        <div className="h-10 bg-black rounded-lg flex -ml-2.5 relative left-[-10px] mr-[-10px]">
+          <MobileCountIndicator
+            count={activeCount}
+            className="inline-block sm:hidden"
+          />
+          <div className="hidden sm:flex items-center gap-[6px]">
+            <CountBadge count={activeCount} />
+            <div className="h-[18px] w-[1px] bg-tertiary" />
+            <div onClick={handleReset} className="cursor-pointer pr-[10px]">
+              <CloseIcon className="text-tertiary w-3 h-3" />
+            </div>
+          </div>
+        </div>
+      )}
 
       <DropdownMenu.Portal>
-        <DropdownMenuContent>
+        <DropdownMenuContent
+          side="bottom"
+          align="end"
+          alignOffset={hasActiveFilters ? -50 : 0}
+        >
           <div className="grid w-full bg-wash">
             <div
               className={cn(

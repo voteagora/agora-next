@@ -188,7 +188,7 @@ export const MobileDelegatesFilter = () => {
       </div>
 
       {/* Apply button at the bottom */}
-      <div className="px-2.5 py-6 border-t border-line">
+      <div className="px-2.5 py-6 border-t border-line sticky bottom-0 bg-wash">
         <button
           onClick={() => setIsOpen(false)}
           className="w-full rounded-lg py-3 px-2 text-neutral bg-brandPrimary hover:bg-brandPrimary/90 flex justify-center"

@@ -117,10 +117,10 @@ const DelegatesStakeholdersFilter = () => {
       onOpenChange={setIsStakeholdersOpen}
       className="self-stretch"
     >
-      <div className="bg-white flex flex-col justify-start items-start gap-2.5">
+      <div className="bg-wash flex flex-col justify-start items-start gap-2.5">
         <Collapsible.Trigger asChild>
           <div className="self-stretch inline-flex justify-between items-start cursor-pointer">
-            <div className="justify-center text-primary text-base font-semibold leading-normal inline-flex gap-2">
+            <div className="justify-center text-secondary text-base font-semibold leading-normal inline-flex gap-2">
               Stakeholders{" "}
               {selectedStakeholdersCount > 0 && (
                 <CountBadge count={selectedStakeholdersCount} />
@@ -133,7 +133,7 @@ const DelegatesStakeholdersFilter = () => {
         </Collapsible.Trigger>
 
         <Collapsible.Content className="self-stretch">
-          <div className="w-full p-3 bg-white flex flex-col justify-start items-start gap-2.5">
+          <div className="w-full p-3 bg-wash flex flex-col justify-start items-start gap-2.5">
             <div className="w-full flex flex-col justify-start items-start gap-5">
               <DelegateFilterCheckBoxItem
                 label="All Stakeholders"
