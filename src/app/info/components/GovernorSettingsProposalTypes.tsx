@@ -47,7 +47,7 @@ const GovernorSettingsProposalTypes = ({
   const { data: blockNumber } = useBlockNumber({
     chainId: contracts.governor.chain.id,
   });
-  
+
   let args;
   if (namespace === TENANT_NAMESPACES.ENS) {
     args = [BigInt(blockNumber || 0)];
