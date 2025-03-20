@@ -8,6 +8,13 @@ on:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
+
+    env:
+      READ_WRITE_WEB2_DATABASE_URL_PROD: ${{ secrets.READ_WRITE_WEB2_DATABASE_URL_PROD}}
+      READ_ONLY_WEB3_DATABASE_URL_PROD: ${{ secrets.READ_WRITE_WEB3_DATABASE_URL_PROD}}
+      READ_WRITE_WEB2_DATABASE_URL_DEV: ${{ secrets.READ_WRITE_WEB2_DATABASE_URL_DEV}}
+      READ_ONLY_WEB3_DATABASE_URL_DEV: ${{ secrets.READ_WRITE_WEB3_DATABASE_URL_DEV}}
+
     steps:
       - uses: actions/checkout@v4
 
