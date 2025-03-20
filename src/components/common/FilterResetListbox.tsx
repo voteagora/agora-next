@@ -172,16 +172,16 @@ const FilterResetListbox = ({
         </button>
       </DropdownMenu.Trigger>
       {hasActiveFilters && (
-        <div className="h-10 bg-black rounded-lg flex -ml-2.5 relative left-[-10px] mr-[-10px]">
+        <div className="h-10 bg-brandPrimary rounded-lg flex -ml-2.5 relative left-[-10px] mr-[-10px]">
           <MobileCountIndicator
             count={activeCount}
             className="inline-block sm:hidden"
           />
           <div className="hidden sm:flex items-center gap-[6px]">
             <CountBadge count={activeCount} />
-            <div className="h-[18px] w-[1px] bg-tertiary" />
+            <div className="h-[18px] w-[1px] bg-neutral" />
             <div onClick={handleReset} className="cursor-pointer pr-[10px]">
-              <CloseIcon className="text-tertiary w-3 h-3" />
+              <CloseIcon className="text-neutral w-3 h-3" />
             </div>
           </div>
         </div>

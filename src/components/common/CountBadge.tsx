@@ -11,7 +11,6 @@ export const CountBadge = ({ count, className }: CountBadgeProps) => (
     className={cn(
       "rounded-full flex justify-center",
       "h-6 w-6 bg-neutral",
-      "border border-line",
       className
     )}
   >
