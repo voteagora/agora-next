@@ -1,6 +1,6 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
-import { useAccount } from "wagmi";
+import { useAccount, useEnsName } from "wagmi";
 import { type Vote } from "@/app/api/common/votes/vote";
 import { useState } from "react";
 import {
@@ -36,6 +36,11 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
   const [hovered, setHovered] = useState(false);
   const [hash1, hash2] = transactionHash.split("|");
 
+  const { data } = useEnsName({
+    chainId: 1,
+    address: voterAddress as `0x${string}`,
+  });
+
   const _onOpenChange = async (open: boolean) => {
     if (open) {
       setHovered(open);
@@ -59,7 +64,7 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
             className="mb-2 text-xs leading-4"
           >
             <div className="text-primary font-semibold flex items-center">
-              <ENSAvatar ensName={voterAddress} className="w-5 h-5 mr-1" />
+              <ENSAvatar ensName={data} className="w-5 h-5 mr-1" />
               <div className="text-primary hover:underline">
                 <Link href={`/delegates/${voterAddress}`}>
                   <ENSName address={voterAddress} />

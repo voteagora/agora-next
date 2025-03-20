@@ -87,6 +87,7 @@ function MarkdownTextareaInput<
             <div className="flex flex-col">
               <div className="min-h-[215px] w-full border border-line rounded-t-lg bg-wash text-primary">
                 <textarea
+                  name="proposalDescription"
                   className={`py-3 px-4 border-0 placeholder-gray-af w-full bg-wash rounded-t-lg focus:outline-none focus:ring-0 resize-none
                 ${selectedMode === "write" ? "visible" : "hidden"}`}
                   placeholder={placeholder}

@@ -20,6 +20,8 @@ import {
   getProposalsCount,
 } from "@/lib/prismaUtils";
 import { Block } from "ethers";
+import { withMetrics } from "@/lib/metricWrapper";
+
 import { unstable_cache } from "next/cache";
 async function getProposals({
   filter,
@@ -28,159 +30,178 @@ async function getProposals({
   filter: string;
   pagination: PaginationParams;
 }): Promise<PaginatedResult<Proposal[]>> {
-  const { namespace, contracts, ui } = Tenant.current();
+  return withMetrics(
+    "getProposals",
+    async () => {
+      try {
+        const { namespace, contracts, ui } = Tenant.current();
 
-  const getProposalsExecution = doInSpan({ name: "getProposals" }, async () =>
-    paginateResult(
-      (skip: number, take: number) =>
-        findProposalsQuery({
-          namespace,
-          skip,
-          take,
-          filter,
-          contract: contracts.governor.address,
-        }),
-      pagination
-    )
+        const getProposalsExecution = doInSpan(
+          { name: "getProposals" },
+          async () =>
+            paginateResult(
+              (skip: number, take: number) =>
+                findProposalsQuery({
+                  namespace,
+                  skip,
+                  take,
+                  filter,
+                  contract: contracts.governor.address,
+                }),
+              pagination
+            )
+        );
+
+        const latestBlockPromise: Promise<Block> = ui.toggle(
+          "use-l1-block-number"
+        )?.enabled
+          ? contracts.providerForTime?.getBlock("latest")
+          : contracts.token.provider.getBlock("latest");
+
+        const [proposals, latestBlock, votableSupply] = await Promise.all([
+          getProposalsExecution,
+          latestBlockPromise,
+          fetchVotableSupply(),
+        ]);
+
+        const resolvedProposals = await Promise.all(
+          proposals.data.map(async (proposal: ProposalPayload) => {
+            const quorum = await fetchQuorumForProposal(proposal);
+            return parseProposal(
+              proposal,
+              latestBlock,
+              quorum ?? null,
+              BigInt(votableSupply)
+            );
+          })
+        );
+
+        return {
+          meta: proposals.meta,
+          data: resolvedProposals,
+        };
+      } catch (error) {
+        throw error;
+      }
+    },
+    { filter }
   );
-
-  const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
-    ?.enabled
-    ? contracts.providerForTime?.getBlock("latest")
-    : contracts.token.provider.getBlock("latest");
-
-  const [proposals, latestBlock, votableSupply] = await Promise.all([
-    getProposalsExecution,
-    latestBlockPromise,
-    fetchVotableSupply(),
-  ]);
-
-  const resolvedProposals = await Promise.all(
-    proposals.data.map(async (proposal: ProposalPayload) => {
-      const isPending =
-        !proposal.start_block ||
-        !latestBlock ||
-        Number(proposal.start_block) > latestBlock.number;
-      const quorum = isPending ? null : await fetchQuorumForProposal(proposal);
-      return parseProposal(
-        proposal,
-        latestBlock,
-        quorum ?? null,
-        BigInt(votableSupply)
-      );
-    })
-  );
-
-  return {
-    meta: proposals.meta,
-    data: resolvedProposals,
-  };
 }
 
 async function getProposal(proposalId: string) {
-  const { namespace, contracts, ui } = Tenant.current();
+  return withMetrics("getProposal", async () => {
+    const { namespace, contracts, ui } = Tenant.current();
 
-  const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
-    ?.enabled
-    ? contracts.providerForTime?.getBlock("latest")
-    : contracts.token.provider.getBlock("latest");
+    const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
+      ?.enabled
+      ? contracts.providerForTime?.getBlock("latest")
+      : contracts.token.provider.getBlock("latest");
 
-  const getProposalExecution = doInSpan({ name: "getProposal" }, async () =>
-    findProposal({
-      namespace,
-      proposalId,
-      contract: contracts.governor.address,
-    })
-  );
+    const getProposalExecution = doInSpan({ name: "getProposal" }, async () =>
+      findProposal({
+        namespace,
+        proposalId,
+        contract: contracts.governor.address,
+      })
+    );
 
-  const [proposal, votableSupply] = await Promise.all([
-    getProposalExecution,
-    fetchVotableSupply(),
-  ]);
+    const [proposal, votableSupply] = await Promise.all([
+      getProposalExecution,
+      fetchVotableSupply(),
+    ]);
 
-  if (!proposal) {
-    return notFound();
-  }
+    if (!proposal) {
+      return notFound();
+    }
 
-  const latestBlock = await latestBlockPromise;
+    const latestBlock = await latestBlockPromise;
 
-  const isPending =
-    !proposal.start_block ||
-    !latestBlock ||
-    Number(proposal.start_block) > latestBlock.number;
+    const isPending =
+      !proposal.start_block ||
+      !latestBlock ||
+      Number(proposal.start_block) > latestBlock.number;
 
-  const quorum = isPending ? null : await fetchQuorumForProposal(proposal);
+    const quorum = isPending ? null : await fetchQuorumForProposal(proposal);
 
-  return parseProposal(
-    proposal,
-    latestBlock,
-    quorum ?? null,
-    BigInt(votableSupply)
-  );
+    return parseProposal(
+      proposal,
+      latestBlock,
+      quorum ?? null,
+      BigInt(votableSupply)
+    );
+  });
 }
 
 async function getProposalTypes() {
-  const { namespace, contracts } = Tenant.current();
+  return withMetrics("getProposalTypes", async () => {
+    const { namespace, contracts } = Tenant.current();
 
-  if (!contracts.proposalTypesConfigurator) {
-    return [];
-  }
+    if (!contracts.proposalTypesConfigurator) {
+      return [];
+    }
 
-  return await findProposalType({
-    namespace,
-    contract: contracts.proposalTypesConfigurator.address,
+    return await findProposalType({
+      namespace,
+      contract: contracts.proposalTypesConfigurator.address,
+    });
   });
 }
 
 async function getDraftProposals(address: `0x${string}`) {
-  const { contracts } = Tenant.current();
-  return await prismaWeb2Client.proposalDraft.findMany({
-    where: {
-      author_address: address,
-      chain_id: contracts.governor.chain.id,
-      contract: contracts.governor.address.toLowerCase(),
-      stage: {
-        in: [
-          PrismaProposalStage.ADDING_TEMP_CHECK,
-          PrismaProposalStage.DRAFTING,
-          PrismaProposalStage.ADDING_GITHUB_PR,
-          PrismaProposalStage.AWAITING_SUBMISSION,
-        ],
+  return withMetrics("getDraftProposals", async () => {
+    const { contracts } = Tenant.current();
+    return await prismaWeb2Client.proposalDraft.findMany({
+      where: {
+        author_address: address,
+        chain_id: contracts.governor.chain.id,
+        contract: contracts.governor.address.toLowerCase(),
+        stage: {
+          in: [
+            PrismaProposalStage.ADDING_TEMP_CHECK,
+            PrismaProposalStage.DRAFTING,
+            PrismaProposalStage.ADDING_GITHUB_PR,
+            PrismaProposalStage.AWAITING_SUBMISSION,
+          ],
+        },
       },
-    },
-    include: {
-      transactions: true,
-    },
+      include: {
+        transactions: true,
+      },
+    });
   });
 }
 
 async function getDraftProposalForSponsor(address: `0x${string}`) {
-  const { contracts } = Tenant.current();
-  return await prismaWeb2Client.proposalDraft.findMany({
-    where: {
-      sponsor_address: address,
-      chain_id: contracts.governor.chain.id,
-      contract: contracts.governor.address.toLowerCase(),
-      stage: {
-        in: [
-          PrismaProposalStage.ADDING_TEMP_CHECK,
-          PrismaProposalStage.DRAFTING,
-          PrismaProposalStage.ADDING_GITHUB_PR,
-          PrismaProposalStage.AWAITING_SUBMISSION,
-        ],
+  return withMetrics("getDraftProposalForSponsor", async () => {
+    const { contracts } = Tenant.current();
+    return await prismaWeb2Client.proposalDraft.findMany({
+      where: {
+        sponsor_address: address,
+        chain_id: contracts.governor.chain.id,
+        contract: contracts.governor.address.toLowerCase(),
+        stage: {
+          in: [
+            PrismaProposalStage.ADDING_TEMP_CHECK,
+            PrismaProposalStage.DRAFTING,
+            PrismaProposalStage.ADDING_GITHUB_PR,
+            PrismaProposalStage.AWAITING_SUBMISSION,
+          ],
+        },
       },
-    },
-    include: {
-      transactions: true,
-    },
+      include: {
+        transactions: true,
+      },
+    });
   });
 }
 
 async function getTotalProposalsCount(): Promise<number> {
-  const { namespace, contracts } = Tenant.current();
-  return getProposalsCount({
-    namespace,
-    contract: contracts.governor.address,
+  return withMetrics("getTotalProposalsCount", async () => {
+    const { namespace, contracts } = Tenant.current();
+    return getProposalsCount({
+      namespace,
+      contract: contracts.governor.address,
+    });
   });
 }
 

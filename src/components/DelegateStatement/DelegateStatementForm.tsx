@@ -16,6 +16,7 @@ import Tenant from "@/lib/tenant/tenant";
 import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeholdersFormSection";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { useDelegate } from "@/hooks/useDelegate";
+import { useDelegateStatementStore } from "@/stores/delegateStatement";
 
 export default function DelegateStatementForm({
   form,
@@ -48,6 +49,10 @@ export default function DelegateStatementForm({
     control: form.control,
     name: "agreeDaoPrinciples",
   });
+
+  const setSaveSuccess = useDelegateStatementStore(
+    (state) => state.setSaveSuccess
+  );
 
   async function onSubmit(values: DelegateStatementFormValues) {
     /* agreeCodeConduct and agreeDaoPrinciples default values are !enabled so if it's not enabled for a tenant, it will be true, skipping the check below.
@@ -116,7 +121,8 @@ export default function DelegateStatementForm({
       return;
     }
 
-    router.push(`/delegates/${address}?dssave=true`);
+    setSaveSuccess(true);
+    router.push(`/delegates/${address}`);
   }
 
   const canSubmit =
