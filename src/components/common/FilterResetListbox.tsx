@@ -178,7 +178,7 @@ const FilterResetListbox = ({
             className="inline-block sm:hidden"
           />
           <div className="hidden sm:flex items-center gap-[6px]">
-            <CountBadge count={activeCount} />
+            <CountBadge count={activeCount} border={false} />
             <div className="h-[18px] w-[1px] bg-neutral" />
             <div onClick={handleReset} className="cursor-pointer pr-[10px]">
               <CloseIcon className="text-neutral w-3 h-3" />
@@ -191,7 +191,7 @@ const FilterResetListbox = ({
         <DropdownMenuContent
           side="bottom"
           align="end"
-          alignOffset={hasActiveFilters ? -50 : 0}
+          alignOffset={hasActiveFilters ? -47 : 0}
         >
           <div className="grid w-full bg-wash">
             <div

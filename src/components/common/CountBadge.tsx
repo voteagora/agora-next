@@ -6,11 +6,16 @@ type CountBadgeProps = {
   className?: string;
 };
 
-export const CountBadge = ({ count, className }: CountBadgeProps) => (
+export const CountBadge = ({
+  count,
+  className,
+  border = true,
+}: CountBadgeProps) => (
   <div
     className={cn(
       "rounded-full flex justify-center",
       "h-6 w-6 bg-neutral",
+      border && "border border-line",
       className
     )}
   >

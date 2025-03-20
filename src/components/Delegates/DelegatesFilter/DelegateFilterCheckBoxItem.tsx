@@ -11,8 +11,11 @@ export const DelegateFilterCheckBoxItem = ({
   checked,
   onChange,
 }: DelegateFilterCheckBoxItemProps) => (
-  <div className="inline-flex justify-start items-center gap-3">
-    <div onClick={onChange} className="w-5 h-5 relative cursor-pointer">
+  <div
+    className="inline-flex justify-start items-center gap-3 cursor-pointer"
+    onClick={onChange}
+  >
+    <div className="w-5 h-5 relative">
       {checked ? (
         <div className="w-5 h-5 left-0 top-0 absolute bg-positive rounded">
           <div className="w-3.5 h-3.5 left-[3px] top-[3px] absolute">
