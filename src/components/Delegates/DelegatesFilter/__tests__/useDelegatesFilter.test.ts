@@ -35,6 +35,7 @@ const mockTenant = {
 vi.mock("next/navigation", () => ({
   useRouter: () => mockRouter,
   useSearchParams: () => mockSearchParams,
+  usePathname: () => "/delegates",
 }));
 
 vi.mock("@/hooks", () => ({
@@ -163,7 +164,7 @@ describe("useDelegatesFilter", () => {
     ]);
   });
 
-  it("should remove delegate filters when toggleFilter is called with 'all'", () => {
+  it("should remove delegate filters when toggleFilterToUrl is called with 'all'", () => {
     mockDeleteSearchParam.mockReturnValue(
       "delete-multiple-endorsed,myDelegates,hasStatement"
     );
@@ -171,7 +172,7 @@ describe("useDelegatesFilter", () => {
     const { result } = renderHook(() => useDelegatesFilter());
 
     act(() => {
-      result.current.toggleFilter("all");
+      result.current.toggleFilterToUrl("all");
     });
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
@@ -188,7 +189,7 @@ describe("useDelegatesFilter", () => {
     );
   });
 
-  it("should remove a filter when toggleFilter is called with an active filter", () => {
+  it("should remove a filter when toggleFilterToUrl is called with an active filter", () => {
     // Setup active filter
     mockSearchParams.get.mockImplementation((param) => {
       if (param === ENDORSED_FILTER_PARAM) return "true";
@@ -203,7 +204,7 @@ describe("useDelegatesFilter", () => {
     act(() => {});
 
     act(() => {
-      result.current.toggleFilter(ENDORSED_FILTER_PARAM);
+      result.current.toggleFilterToUrl(ENDORSED_FILTER_PARAM);
     });
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
@@ -215,13 +216,13 @@ describe("useDelegatesFilter", () => {
     });
   });
 
-  it("should add a filter when toggleFilter is called with an inactive filter", () => {
+  it("should add a filter when toggleFilterToUrl is called with an inactive filter", () => {
     mockAddSearchParam.mockReturnValue("add-hasStatement-true");
 
     const { result } = renderHook(() => useDelegatesFilter());
 
     act(() => {
-      result.current.toggleFilter(HAS_STATEMENT_FILTER_PARAM);
+      result.current.toggleFilterToUrl(HAS_STATEMENT_FILTER_PARAM);
     });
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
@@ -234,13 +235,13 @@ describe("useDelegatesFilter", () => {
     });
   });
 
-  it("should reset all filters when resetFilters is called", () => {
+  it("should reset all filters when resetAllFiltersToUrl is called", () => {
     mockDeleteSearchParam.mockReturnValue("delete-all-filters");
 
     const { result } = renderHook(() => useDelegatesFilter());
 
     act(() => {
-      result.current.resetFilters();
+      result.current.resetAllFiltersToUrl();
     });
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
@@ -255,6 +256,64 @@ describe("useDelegatesFilter", () => {
     });
     expect(mockRouter.push).toHaveBeenCalledWith("delete-all-filters", {
       scroll: false,
+    });
+  });
+
+  it("should apply multiple filters when applyFiltersToUrl is called", () => {
+    mockAddSearchParam.mockReturnValue("url-with-multiple-filters");
+    
+    const { result } = renderHook(() => useDelegatesFilter());
+    
+    const filters = {
+      [MY_DELEGATES_FILTER_PARAM]: true,
+      [ENDORSED_FILTER_PARAM]: true,
+      [ISSUES_FILTER_PARAM]: "issue1,issue2",
+    };
+    
+    act(() => {
+      result.current.applyFiltersToUrl(filters);
+    });
+    
+    expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
+    expect(mockRouter.push).toHaveBeenCalledWith("url-with-multiple-filters", { 
+      scroll: false 
+    });
+  });
+
+  it("should add a single filter to URL when addFilterToUrl is called", () => {
+    mockAddSearchParam.mockReturnValue("url-with-added-filter");
+    
+    const { result } = renderHook(() => useDelegatesFilter());
+    
+    act(() => {
+      result.current.addFilterToUrl(ISSUES_FILTER_PARAM, "issue1,issue2");
+    });
+    
+    expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
+    expect(mockAddSearchParam).toHaveBeenCalledWith({
+      name: ISSUES_FILTER_PARAM,
+      value: "issue1,issue2"
+    });
+    expect(mockRouter.push).toHaveBeenCalledWith("url-with-added-filter", { 
+      scroll: false 
+    });
+  });
+
+  it("should remove a single filter from URL when removeFilterToUrl is called", () => {
+    mockDeleteSearchParam.mockReturnValue("url-with-removed-filter");
+    
+    const { result } = renderHook(() => useDelegatesFilter());
+    
+    act(() => {
+      result.current.removeFilterToUrl(ISSUES_FILTER_PARAM);
+    });
+    
+    expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
+    expect(mockDeleteSearchParam).toHaveBeenCalledWith({
+      name: ISSUES_FILTER_PARAM
+    });
+    expect(mockRouter.push).toHaveBeenCalledWith("url-with-removed-filter", { 
+      scroll: false 
     });
   });
 });

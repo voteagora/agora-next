@@ -2,21 +2,21 @@ import { useState, useEffect, useMemo } from "react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import Tenant from "@/lib/tenant/tenant";
 import { CountBadge } from "@/components/common/CountBadge";
-import { useRouter } from "next/navigation";
-import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { DelegateFilterCheckBoxItem } from "@/components/Delegates/DelegatesFilter/DelegateFilterCheckBoxItem";
 import { useDelegatesFilter } from "./useDelegatesFilter";
 import { ISSUES_FILTER_PARAM } from "@/lib/constants";
 import { ExpandCollapseIcon } from "@/icons/ExpandCollapseIcon";
 
-const DelegatesIssuesFilter = () => {
+const DelegatesIssuesFilter = ({
+  handleIssueChange,
+}: {
+  handleIssueChange?: (selectedIssues: string[]) => void;
+}) => {
   const { ui } = Tenant.current();
-  const router = useRouter();
-  const addSearchParam = useAddSearchParam();
-  const deleteSearchParam = useDeleteSearchParam();
   const { setIsDelegatesFiltering } = useAgoraContext();
-  const { issuesFromUrl } = useDelegatesFilter();
+  const { issuesFromUrl, removeFilterToUrl, applyFiltersToUrl } =
+    useDelegatesFilter();
 
   // Collapsible state
   const [isIssuesOpen, setIsIssuesOpen] = useState(false);
@@ -60,11 +60,11 @@ const DelegatesIssuesFilter = () => {
 
     if (newValue) {
       // If "All issues" is checked, remove issues param from URL
-      router.push(deleteSearchParam({ name: ISSUES_FILTER_PARAM }), {
-        scroll: false,
-      });
-
-      // Reset issue categories
+      if (!handleIssueChange) {
+        removeFilterToUrl(ISSUES_FILTER_PARAM);
+      } else {
+        handleIssueChange([]);
+      }
 
       const resetIssues: Record<string, boolean> = { all: true };
       ui.governanceIssues!.forEach((issue) => {
@@ -90,17 +90,19 @@ const DelegatesIssuesFilter = () => {
       .map(([key]) => key);
 
     if (selectedIssues.length > 0) {
-      router.push(
-        addSearchParam({
-          name: ISSUES_FILTER_PARAM,
-          value: selectedIssues.join(","),
-        }),
-        { scroll: false }
-      );
+      if (!handleIssueChange) {
+        applyFiltersToUrl({ [ISSUES_FILTER_PARAM]: selectedIssues.join(",") });
+      }
+      if (handleIssueChange) {
+        handleIssueChange(selectedIssues);
+      }
     } else {
-      router.push(deleteSearchParam({ name: ISSUES_FILTER_PARAM }), {
-        scroll: false,
-      });
+      if (!handleIssueChange) {
+        removeFilterToUrl(ISSUES_FILTER_PARAM);
+      }
+      if (handleIssueChange) {
+        handleIssueChange([]);
+      }
     }
   };
 

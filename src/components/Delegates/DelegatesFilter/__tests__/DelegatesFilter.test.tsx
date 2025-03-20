@@ -77,8 +77,11 @@ describe("DelegatesFilter", () => {
     endorsedToggleConfig: {
       showFilterLabel: "Endorsed",
     },
-    toggleFilter: vi.fn(),
-    resetFilters: vi.fn(),
+    toggleFilterToUrl: vi.fn(),
+    resetAllFiltersToUrl: vi.fn(),
+    applyFiltersToUrl: vi.fn(),
+    addFilterToUrl: vi.fn(),
+    removeFilterToUrl: vi.fn(),
   };
 
   beforeEach(() => {
@@ -123,38 +126,38 @@ describe("DelegatesFilter", () => {
     expect(screen.getByText("Has statement")).toBeInTheDocument();
   });
 
-  it("should call toggleFilter with correct parameter when filter button is clicked", () => {
+  it("should call toggleFilterToUrl with correct parameter when filter button is clicked", () => {
     render(<DelegatesFilter />);
     fireEvent.click(screen.getByTestId("trigger-button"));
 
     // Click "My Delegates" filter
     fireEvent.click(screen.getByText("My Delegates"));
 
-    // Check if toggleFilter was called with correct parameter
-    expect(defaultMockValues.toggleFilter).toHaveBeenCalledWith(
+    // Check if toggleFilterToUrl was called with correct parameter
+    expect(defaultMockValues.toggleFilterToUrl).toHaveBeenCalledWith(
       MY_DELEGATES_FILTER_PARAM
     );
   });
 
-  it("should call toggleFilter with 'all' when 'All Delegates' button is clicked", () => {
+  it("should call toggleFilterToUrl with 'all' when 'All Delegates' button is clicked", () => {
     render(<DelegatesFilter />);
     fireEvent.click(screen.getByTestId("trigger-button"));
 
     // Click "All Delegates" filter
     fireEvent.click(screen.getByText("All Delegates"));
 
-    // Check if toggleFilter was called with 'all'
-    expect(defaultMockValues.toggleFilter).toHaveBeenCalledWith("all");
+    // Check if toggleFilterToUrl was called with 'all'
+    expect(defaultMockValues.toggleFilterToUrl).toHaveBeenCalledWith("all");
   });
 
-  it("should call resetFilters when reset button is clicked", () => {
+  it("should call resetAllFiltersToUrl when reset button is clicked", () => {
     render(<DelegatesFilter />);
 
     // Click reset button
     fireEvent.click(screen.getByTestId("reset-button"));
 
-    // Check if resetFilters was called
-    expect(defaultMockValues.resetFilters).toHaveBeenCalled();
+    // Check if resetAllFiltersToUrl was called
+    expect(defaultMockValues.resetAllFiltersToUrl).toHaveBeenCalled();
   });
 
   it("should render active filters with correct styling", () => {

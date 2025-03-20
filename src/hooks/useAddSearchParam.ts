@@ -11,17 +11,29 @@ export const useAddSearchParam = () => {
     ({
       name,
       value,
+      params,
       clean,
     }: {
-      name: string;
-      value: string;
+      name?: string;
+      value?: string;
+      params?: Record<string, string>;
       clean?: boolean;
     }) => {
-      const params = new URLSearchParams(
+      const urlParams = new URLSearchParams(
         clean ? undefined : searchParams?.toString()
       );
-      params.set(name, value);
-      return pathname + "?" + params.toString();
+      
+      if (params) {
+        // Add multiple parameters
+        Object.entries(params).forEach(([key, val]) => {
+          urlParams.set(key, val);
+        });
+      } else if (name && value) {
+        // Add single parameter
+        urlParams.set(name, value);
+      }
+      
+      return pathname + "?" + urlParams.toString();
     },
     [searchParams, pathname]
   );

@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FilterIcon } from "@/icons/filter";
 import FilterResetListbox from "@/components/common/FilterResetListbox";
 import {
   ENDORSED_FILTER_PARAM,
   HAS_STATEMENT_FILTER_PARAM,
+  ISSUES_FILTER_PARAM,
   MY_DELEGATES_FILTER_PARAM,
+  STAKEHOLDERS_FILTER_PARAM,
   delegatesFilterOptions,
 } from "@/lib/constants";
 import { FilterButton } from "./DelegatesFilter";
@@ -50,6 +52,14 @@ const SortOption = ({ label, checked, onClick }: SortOptionProps) => (
 
 export const MobileDelegatesFilter = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedIssues, setSelectedIssues] = useState<string[]>([]);
+  const [selectedStakeholders, setSelectedStakeholders] = useState<string[]>(
+    []
+  );
+  const [tempMyDelegates, setTempMyDelegates] = useState(false);
+  const [tempEndorsed, setTempEndorsed] = useState(false);
+  const [tempHasStatement, setTempHasStatement] = useState(false);
+  const [tempSortParam, setTempSortParam] = useState("weighted_random");
 
   // Use shared hooks for filter and sort functionality
   const {
@@ -60,32 +70,110 @@ export const MobileDelegatesFilter = () => {
     stakeholdersFromUrl,
     hasEndorsedFilter,
     endorsedToggleConfig,
-    toggleFilter,
-    resetFilters,
+    resetAllFiltersToUrl,
+    applyFiltersToUrl,
   } = useDelegatesFilter();
 
-  const { orderByParam, handleSortChange, resetSort } = useDelegatesSort();
+  const { orderByParam } = useDelegatesSort();
 
-  // Calculate total active filters count
+  useEffect(() => {
+    // Initialize temp states from URL on component mount
+    setTempMyDelegates(activeFilters.includes(MY_DELEGATES_FILTER_PARAM));
+    setTempEndorsed(activeFilters.includes(ENDORSED_FILTER_PARAM));
+    setTempHasStatement(activeFilters.includes(HAS_STATEMENT_FILTER_PARAM));
+    setSelectedIssues(issuesFromUrl);
+    setSelectedStakeholders(stakeholdersFromUrl);
+    setTempSortParam(orderByParam);
+  }, [activeFilters, issuesFromUrl, stakeholdersFromUrl, orderByParam]);
+
   const getTotalActiveFiltersCount = () => {
     let count = activeFilters.length;
-
-    // Count selected issue categories
     if (hasIssues && issuesFromUrl.length > 0) {
       count += issuesFromUrl.length;
     }
-
-    // Count selected stakeholders
     if (hasStakeholders && stakeholdersFromUrl.length > 0) {
       count += stakeholdersFromUrl.length;
     }
-
-    // Count sort if not default
     if (orderByParam !== "weighted_random") {
       count += 1;
     }
 
     return count;
+  };
+
+  const handleIssuesChange = (issues: string[]) => {
+    setSelectedIssues(issues);
+  };
+
+  const handleStakeholdersChange = (stakeholders: string[]) => {
+    setSelectedStakeholders(stakeholders);
+  };
+
+  // Convert array to comma-separated string for the filter components
+  const getIssuesString = (issues: string[]) => {
+    return issues.join(",");
+  };
+
+  const getStakeholdersString = (stakeholders: string[]) => {
+    return stakeholders.join(",");
+  };
+
+  const handleToggleFilter = (filter: string) => {
+    if (filter === "all") {
+      setTempMyDelegates(false);
+      setTempEndorsed(false);
+      setTempHasStatement(false);
+      setSelectedIssues([]);
+      setSelectedStakeholders([]);
+    } else if (filter === MY_DELEGATES_FILTER_PARAM) {
+      setTempMyDelegates(!tempMyDelegates);
+    } else if (filter === ENDORSED_FILTER_PARAM) {
+      setTempEndorsed(!tempEndorsed);
+    } else if (filter === HAS_STATEMENT_FILTER_PARAM) {
+      setTempHasStatement(!tempHasStatement);
+    }
+  };
+
+  const handleTempSortChange = (sortValue: string) => {
+    setTempSortParam(sortValue);
+  };
+
+  const resetTempSort = () => {
+    setTempSortParam("weighted_random");
+  };
+
+  const applyAllFilters = () => {
+    // Apply sort parameter if it's not the default
+    if (tempSortParam !== "weighted_random") {
+      applyFiltersToUrl({
+        orderBy: tempSortParam,
+        [MY_DELEGATES_FILTER_PARAM]: tempMyDelegates,
+        [ENDORSED_FILTER_PARAM]: tempEndorsed,
+        [HAS_STATEMENT_FILTER_PARAM]: tempHasStatement,
+        [ISSUES_FILTER_PARAM]:
+          selectedIssues.length > 0 ? getIssuesString(selectedIssues) : "",
+        [STAKEHOLDERS_FILTER_PARAM]:
+          selectedStakeholders.length > 0
+            ? getStakeholdersString(selectedStakeholders)
+            : "",
+      });
+    } else {
+      // If sort is default, remove the orderBy parameter
+      applyFiltersToUrl({
+        orderBy: false, // This will remove the parameter
+        [MY_DELEGATES_FILTER_PARAM]: tempMyDelegates,
+        [ENDORSED_FILTER_PARAM]: tempEndorsed,
+        [HAS_STATEMENT_FILTER_PARAM]: tempHasStatement,
+        [ISSUES_FILTER_PARAM]:
+          selectedIssues.length > 0 ? getIssuesString(selectedIssues) : "",
+        [STAKEHOLDERS_FILTER_PARAM]:
+          selectedStakeholders.length > 0
+            ? getStakeholdersString(selectedStakeholders)
+            : "",
+      });
+    }
+
+    setIsOpen(false);
   };
 
   const totalActiveFiltersCount = getTotalActiveFiltersCount();
@@ -101,7 +189,7 @@ export const MobileDelegatesFilter = () => {
         />
       }
       activeCount={totalActiveFiltersCount}
-      onReset={resetSort}
+      onReset={resetTempSort}
       isOpen={isOpen}
       onOpenChange={setIsOpen}
       borderBelowLabel={false}
@@ -121,8 +209,8 @@ export const MobileDelegatesFilter = () => {
                   key={key}
                   label={option.value}
                   value={option.sort}
-                  checked={option.sort === orderByParam}
-                  onClick={() => handleSortChange(option.sort)}
+                  checked={option.sort === tempSortParam}
+                  onClick={() => handleTempSortChange(option.sort)}
                 />
               );
             })}
@@ -137,7 +225,7 @@ export const MobileDelegatesFilter = () => {
             Filter
           </div>
           <button
-            onClick={resetFilters}
+            onClick={resetAllFiltersToUrl}
             className="justify-center text-primary text-xs font-medium leading-none cursor-pointer"
           >
             Reset
@@ -147,23 +235,23 @@ export const MobileDelegatesFilter = () => {
           <div className="self-stretch inline-flex justify-start items-start gap-2.5 flex-wrap content-start">
             <FilterButton
               label="All Delegates"
-              isActive={activeFilters.length === 0}
-              onClick={() => toggleFilter("all")}
+              isActive={!tempMyDelegates && !tempEndorsed && !tempHasStatement}
+              onClick={() => handleToggleFilter("all")}
             />
             <FilterButton
               label="My Delegates"
-              isActive={activeFilters.includes(MY_DELEGATES_FILTER_PARAM)}
-              onClick={() => toggleFilter(MY_DELEGATES_FILTER_PARAM)}
+              isActive={tempMyDelegates}
+              onClick={() => handleToggleFilter(MY_DELEGATES_FILTER_PARAM)}
             />
             {hasEndorsedFilter && (
               <FilterButton
                 label={endorsedToggleConfig.showFilterLabel}
-                isActive={activeFilters.includes(ENDORSED_FILTER_PARAM)}
-                onClick={() => toggleFilter(ENDORSED_FILTER_PARAM)}
+                isActive={tempEndorsed}
+                onClick={() => handleToggleFilter(ENDORSED_FILTER_PARAM)}
                 icon={
                   <CheckMark
                     className={
-                      activeFilters.includes(ENDORSED_FILTER_PARAM)
+                      tempEndorsed
                         ? "fill-brandPrimary stroke-neutral"
                         : "fill-primary stroke-neutral"
                     }
@@ -173,16 +261,22 @@ export const MobileDelegatesFilter = () => {
             )}
             <FilterButton
               label="Has statement"
-              isActive={activeFilters.includes(HAS_STATEMENT_FILTER_PARAM)}
-              onClick={() => toggleFilter(HAS_STATEMENT_FILTER_PARAM)}
+              isActive={tempHasStatement}
+              onClick={() => handleToggleFilter(HAS_STATEMENT_FILTER_PARAM)}
             />
           </div>
         </div>
         {/* Issue Categories Filter */}
         {(hasIssues || hasStakeholders) && (
           <div className="pl-4 py-7 pr-2.5 flex flex-col gap-8 w-full">
-            {hasIssues && <DelegatesIssuesFilter />}
-            {hasStakeholders && <DelegatesStakeholdersFilter />}
+            {hasIssues && (
+              <DelegatesIssuesFilter handleIssueChange={handleIssuesChange} />
+            )}
+            {hasStakeholders && (
+              <DelegatesStakeholdersFilter
+                handleStakeholdersChange={handleStakeholdersChange}
+              />
+            )}
           </div>
         )}
       </div>
@@ -190,7 +284,7 @@ export const MobileDelegatesFilter = () => {
       {/* Apply button at the bottom */}
       <div className="px-2.5 py-6 border-t border-line sticky bottom-0 bg-wash">
         <button
-          onClick={() => setIsOpen(false)}
+          onClick={applyAllFilters}
           className="w-full rounded-lg py-3 px-2 text-neutral bg-brandPrimary hover:bg-brandPrimary/90 flex justify-center"
         >
           Apply

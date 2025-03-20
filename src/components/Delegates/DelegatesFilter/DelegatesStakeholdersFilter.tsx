@@ -2,21 +2,21 @@ import { useState, useEffect, useMemo } from "react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import Tenant from "@/lib/tenant/tenant";
 import { CountBadge } from "@/components/common/CountBadge";
-import { useRouter } from "next/navigation";
-import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { DelegateFilterCheckBoxItem } from "@/components/Delegates/DelegatesFilter/DelegateFilterCheckBoxItem";
 import { STAKEHOLDERS_FILTER_PARAM } from "@/lib/constants";
 import { useDelegatesFilter } from "./useDelegatesFilter";
 import { ExpandCollapseIcon } from "@/icons/ExpandCollapseIcon";
 
-const DelegatesStakeholdersFilter = () => {
+const DelegatesStakeholdersFilter = ({
+  handleStakeholdersChange,
+}: {
+  handleStakeholdersChange?: (selectedStakeholders: string[]) => void;
+}) => {
   const { ui } = Tenant.current();
-  const router = useRouter();
-  const addSearchParam = useAddSearchParam();
-  const deleteSearchParam = useDeleteSearchParam();
   const { setIsDelegatesFiltering } = useAgoraContext();
-  const { stakeholdersFromUrl } = useDelegatesFilter();
+  const { stakeholdersFromUrl, removeFilterToUrl, applyFiltersToUrl } =
+    useDelegatesFilter();
   // Collapsible state
   const [isStakeholdersOpen, setIsStakeholdersOpen] = useState(false);
 
@@ -59,10 +59,12 @@ const DelegatesStakeholdersFilter = () => {
     setAllStakeholdersChecked(newValue);
 
     if (newValue) {
-      // If "All stakeholders" is checked, remove stakeholders param from URL
-      router.push(deleteSearchParam({ name: STAKEHOLDERS_FILTER_PARAM }), {
-        scroll: false,
-      });
+      if (!handleStakeholdersChange) {
+        // If "All stakeholders" is checked, remove stakeholders param from URL
+        removeFilterToUrl(STAKEHOLDERS_FILTER_PARAM);
+      } else {
+        handleStakeholdersChange([]);
+      }
 
       // Reset stakeholders
       const resetStakeholders: Record<string, boolean> = { all: true };
@@ -89,17 +91,19 @@ const DelegatesStakeholdersFilter = () => {
       .map(([key]) => key);
 
     if (selectedStakeholders.length > 0) {
-      router.push(
-        addSearchParam({
-          name: STAKEHOLDERS_FILTER_PARAM,
-          value: selectedStakeholders.join(","),
-        }),
-        { scroll: false }
-      );
+      if (!handleStakeholdersChange) {
+        applyFiltersToUrl({
+          [STAKEHOLDERS_FILTER_PARAM]: selectedStakeholders.join(","),
+        });
+      } else {
+        handleStakeholdersChange(selectedStakeholders);
+      }
     } else {
-      router.push(deleteSearchParam({ name: STAKEHOLDERS_FILTER_PARAM }), {
-        scroll: false,
-      });
+      if (!handleStakeholdersChange) {
+        removeFilterToUrl(STAKEHOLDERS_FILTER_PARAM);
+      } else {
+        handleStakeholdersChange([]);
+      }
     }
   };
 

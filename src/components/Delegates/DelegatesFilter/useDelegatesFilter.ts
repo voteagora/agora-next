@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 import Tenant from "@/lib/tenant/tenant";
 import { useAgoraContext } from "@/contexts/AgoraContext";
@@ -16,6 +16,7 @@ export const useDelegatesFilter = () => {
   const { ui } = Tenant.current();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const addSearchParam = useAddSearchParam();
   const deleteSearchParam = useDeleteSearchParam();
   const { setIsDelegatesFiltering } = useAgoraContext();
@@ -80,7 +81,7 @@ export const useDelegatesFilter = () => {
     router.push(url, { scroll: false });
   };
 
-  const toggleFilter = (filter: string) => {
+  const toggleFilterToUrl = (filter: string) => {
     setIsDelegatesFiltering(true);
     if (filter === "all") {
       removeDelegateFilters();
@@ -93,7 +94,37 @@ export const useDelegatesFilter = () => {
     }
   };
 
-  const resetFilters = () => {
+  const applyFiltersToUrl = (filters: Record<string, string | boolean>) => {
+    setIsDelegatesFiltering(true);
+
+    // Create a new URLSearchParams object
+    const urlParams = new URLSearchParams(searchParams?.toString());
+
+    // Process each filter
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value && value !== "false") {
+        // Add or update parameter
+        urlParams.set(
+          key,
+          typeof value === "boolean" ? "true" : value.toString()
+        );
+      } else {
+        // Remove parameter
+        urlParams.delete(key);
+      }
+    });
+
+    // Use addSearchParam with clean=true and our processed parameters
+    const processedParams: Record<string, string> = {};
+    urlParams.forEach((value, key) => {
+      processedParams[key] = value;
+    });
+
+    const url = addSearchParam({ params: processedParams, clean: true });
+    router.push(url, { scroll: false });
+  };
+
+  const resetAllFiltersToUrl = () => {
     setIsDelegatesFiltering(true);
 
     const filterParams = [
@@ -111,6 +142,18 @@ export const useDelegatesFilter = () => {
     router.push(url, { scroll: false });
   };
 
+  const addFilterToUrl = (filter: string, value: string) => {
+    setIsDelegatesFiltering(true);
+    router.push(addSearchParam({ name: filter, value }), {
+      scroll: false,
+    });
+  };
+
+  const removeFilterToUrl = (filter: string) => {
+    setIsDelegatesFiltering(true);
+    router.push(deleteSearchParam({ name: filter }), { scroll: false });
+  };
+
   return {
     activeFilters,
     hasIssues,
@@ -119,7 +162,10 @@ export const useDelegatesFilter = () => {
     stakeholdersFromUrl,
     hasEndorsedFilter,
     endorsedToggleConfig,
-    toggleFilter,
-    resetFilters,
+    toggleFilterToUrl,
+    resetAllFiltersToUrl,
+    applyFiltersToUrl,
+    addFilterToUrl,
+    removeFilterToUrl,
   };
 };

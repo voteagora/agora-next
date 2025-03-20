@@ -51,8 +51,8 @@ export const DelegatesFilter = () => {
     stakeholdersFromUrl,
     hasEndorsedFilter,
     endorsedToggleConfig,
-    toggleFilter,
-    resetFilters,
+    toggleFilterToUrl,
+    resetAllFiltersToUrl,
   } = useDelegatesFilter();
 
   // Calculate total active filters count (excluding "all" options)
@@ -91,7 +91,7 @@ export const DelegatesFilter = () => {
         />
       }
       activeCount={totalActiveFiltersCount}
-      onReset={resetFilters}
+      onReset={resetAllFiltersToUrl}
       isOpen={isOpen}
       onOpenChange={onFilterClose}
     >
@@ -101,18 +101,18 @@ export const DelegatesFilter = () => {
           <FilterButton
             label="All Delegates"
             isActive={activeFilters.length === 0}
-            onClick={() => toggleFilter("all")}
+            onClick={() => toggleFilterToUrl("all")}
           />
           <FilterButton
             label="My Delegates"
             isActive={activeFilters.includes(MY_DELEGATES_FILTER_PARAM)}
-            onClick={() => toggleFilter(MY_DELEGATES_FILTER_PARAM)}
+            onClick={() => toggleFilterToUrl(MY_DELEGATES_FILTER_PARAM)}
           />
           {hasEndorsedFilter && (
             <FilterButton
               label={endorsedToggleConfig.showFilterLabel}
               isActive={activeFilters.includes(ENDORSED_FILTER_PARAM)}
-              onClick={() => toggleFilter(ENDORSED_FILTER_PARAM)}
+              onClick={() => toggleFilterToUrl(ENDORSED_FILTER_PARAM)}
               icon={
                 <CheckMark
                   className={
@@ -127,7 +127,7 @@ export const DelegatesFilter = () => {
           <FilterButton
             label="Has statement"
             isActive={activeFilters.includes(HAS_STATEMENT_FILTER_PARAM)}
-            onClick={() => toggleFilter(HAS_STATEMENT_FILTER_PARAM)}
+            onClick={() => toggleFilterToUrl(HAS_STATEMENT_FILTER_PARAM)}
           />
         </div>
       </div>
