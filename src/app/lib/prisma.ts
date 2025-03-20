@@ -21,6 +21,8 @@ console.log(
   !!process.env[`READ_ONLY_WEB3_DATABASE_URL_${envSuffix}`]
 );
 
+console.log("CARL_TEST URL exists:", !!process.env[`CARL_TEST`]);
+
 const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
 // const envSuffix = isProd ? "PROD" : "DEV";
 console.log("Env Suffix: " + envSuffix);
@@ -42,6 +44,7 @@ console.log(
   "Web3 URL length:",
   process.env[`READ_ONLY_WEB3_DATABASE_URL_${envSuffix}`]?.length || 0
 );
+console.log("CARL_TEST URL length:", process.env[`CARL_TEST`]?.length || 0);
 
 const readWriteWeb2Url =
   process.env[`READ_WRITE_WEB2_DATABASE_URL_${envSuffix}`];
