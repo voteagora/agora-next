@@ -6,8 +6,23 @@ declare global {
   var prismaWeb3Client: PrismaClient;
 }
 
+// Temporarily hardcode the suffix for testing
+const envSuffix = "DEV";
+console.log("Looking for:", `READ_WRITE_WEB2_DATABASE_URL_${envSuffix}`);
+console.log("Looking for:", `READ_ONLY_WEB3_DATABASE_URL_${envSuffix}`);
+
+// Log whether each variable exists (without revealing values)
+console.log(
+  "Web2 URL exists:",
+  !!process.env[`READ_WRITE_WEB2_DATABASE_URL_${envSuffix}`]
+);
+console.log(
+  "Web3 URL exists:",
+  !!process.env[`READ_ONLY_WEB3_DATABASE_URL_${envSuffix}`]
+);
+
 const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
-const envSuffix = isProd ? "PROD" : "DEV";
+// const envSuffix = isProd ? "PROD" : "DEV";
 console.log("Env Suffix: " + envSuffix);
 const readWriteWeb2Url =
   process.env[`READ_WRITE_WEB2_DATABASE_URL_${envSuffix}`];

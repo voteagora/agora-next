@@ -30,7 +30,10 @@ jobs:
         run: yarn generate-typechain
 
       - name: Debug environment variables
-        run: env | sort
+        run: |
+          echo "Environment suffix: ${{ env.NEXT_PUBLIC_AGORA_ENV }}"
+          echo "Web2 URL defined: ${{ env.READ_WRITE_WEB2_DATABASE_URL_DEV != '' }}"
+          echo "Web3 URL defined: ${{ env.READ_ONLY_WEB3_DATABASE_URL_DEV != '' }}"
 
       - name: Run unit tests
         run: yarn test
