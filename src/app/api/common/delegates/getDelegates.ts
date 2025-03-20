@@ -56,17 +56,16 @@ async function getDelegates({
 
       const allowList = ui.delegates?.allowed || [];
 
-      const endorsedFilterQuery = filters?.endorsed
-        ? `AND endorsed = true AND s.dao_slug = '${slug}'`
-        : "";
-
       // The top issues filter supports multiple selection - a comma separated list of issues
       const topIssuesParam = filters?.issues || "";
       const topIssuesArray = topIssuesParam
         ? topIssuesParam.split(",").map((issue) => issue.trim())
         : [];
 
-      const topIssuesFilterQuery =
+      // Define each filter condition separately for better readability
+      const endorsedCondition = filters?.endorsed ? `AND endorsed = true` : "";
+
+      const issuesCondition =
         topIssuesParam && topIssuesParam !== ""
           ? `
           AND jsonb_array_length(s.payload -> 'topIssues') > 0
@@ -77,14 +76,13 @@ async function getDelegates({
             AND elem ->> 'value' IS NOT NULL
             AND elem ->> 'value' <> ''
           )
-          AND s.dao_slug = '${slug}'
         `
           : "";
 
       // Note: There is an inconsistency between top stakeholders and top issues. Top issues are filtered by a value
       // where the top stakeholders are filtered on type. We need to make this consistent and clean up the data and UI.
       const topStakeholdersParam = filters?.stakeholders || "";
-      const topStakeholdersFilterQuery =
+      const stakeholdersCondition =
         topStakeholdersParam && topStakeholdersParam !== ""
           ? `
           AND jsonb_array_length(s.payload -> 'topStakeholders') > 0
@@ -93,18 +91,16 @@ async function getDelegates({
             FROM jsonb_array_elements(s.payload -> 'topStakeholders') elem
             WHERE elem ->> 'type' = '${topStakeholdersParam}'
           )
-          AND s.dao_slug = '${slug}'
         `
           : "";
 
       // Add hasStatement filter condition
-      const hasStatementFilterQuery = filters?.hasStatement
+      const hasStatementCondition = filters?.hasStatement
         ? `
           AND s.payload IS NOT NULL
           AND s.payload != '{}'::jsonb
           AND s.payload ? 'delegateStatement'
           AND s.payload ->> 'delegateStatement' != ''
-          AND s.dao_slug = '${slug}'
         `
         : "";
 
@@ -115,14 +111,15 @@ async function getDelegates({
         filters?.stakeholders ||
         filters?.hasStatement
           ? `AND EXISTS (
-            SELECT 1
-            FROM agora.delegate_statements s
-            WHERE s.address = d.delegate
-            ${endorsedFilterQuery}
-            ${topIssuesFilterQuery}
-            ${topStakeholdersFilterQuery}
-            ${hasStatementFilterQuery}
-          )`
+              SELECT 1
+              FROM agora.delegate_statements s
+              WHERE s.address = d.delegate
+              AND s.dao_slug = '${slug}'
+              ${endorsedCondition}
+              ${issuesCondition}
+              ${stakeholdersCondition}
+              ${hasStatementCondition}
+            )`
           : "";
 
       let delegateUniverseCTE: string;
@@ -255,10 +252,10 @@ async function getDelegates({
                       endorsed
                     FROM agora.delegate_statements s
                     WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
-                    ${endorsedFilterQuery}
-                    ${topIssuesFilterQuery}
-                    ${topStakeholdersFilterQuery}
-                    ${hasStatementFilterQuery}
+                    ${endorsedCondition}
+                    ${issuesCondition}
+                    ${stakeholdersCondition}
+                    ${hasStatementCondition}
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -302,10 +299,10 @@ async function getDelegates({
                       endorsed
                     FROM agora.delegate_statements s
                     WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
-                    ${endorsedFilterQuery}
-                    ${topIssuesFilterQuery}
-                    ${topStakeholdersFilterQuery}
-                    ${hasStatementFilterQuery}
+                    ${endorsedCondition}
+                    ${issuesCondition}
+                    ${stakeholdersCondition}
+                    ${hasStatementCondition}
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -347,10 +344,10 @@ async function getDelegates({
                       endorsed
                     FROM agora.delegate_statements s
                     WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
-                    ${endorsedFilterQuery}
-                    ${topIssuesFilterQuery}
-                    ${topStakeholdersFilterQuery}
-                    ${hasStatementFilterQuery}
+                    ${endorsedCondition}
+                    ${issuesCondition}
+                    ${stakeholdersCondition}
+                    ${hasStatementCondition}
                     LIMIT 1
                   ) sub
                 ) AS statement

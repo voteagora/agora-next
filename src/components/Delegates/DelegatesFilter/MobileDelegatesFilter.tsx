@@ -180,7 +180,7 @@ export const MobileDelegatesFilter = () => {
         </div>
         {/* Issue Categories Filter */}
         {(hasIssues || hasStakeholders) && (
-          <div className="pl-4 py-7 pr-10 flex flex-col gap-8 w-full">
+          <div className="pl-4 py-7 pr-2.5 flex flex-col gap-8 w-full">
             {hasIssues && <DelegatesIssuesFilter />}
             {hasStakeholders && <DelegatesStakeholdersFilter />}
           </div>

@@ -1,19 +1,18 @@
 import { useState, useEffect, useMemo } from "react";
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import Tenant from "@/lib/tenant/tenant";
 import { CountBadge } from "@/components/common/CountBadge";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { DelegateFilterCheckBoxItem } from "@/components/Delegates/DelegatesFilter/DelegateFilterCheckBoxItem";
 import { STAKEHOLDERS_FILTER_PARAM } from "@/lib/constants";
 import { useDelegatesFilter } from "./useDelegatesFilter";
+import { ExpandCollapseIcon } from "@/icons/ExpandCollapseIcon";
 
 const DelegatesStakeholdersFilter = () => {
   const { ui } = Tenant.current();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const addSearchParam = useAddSearchParam();
   const deleteSearchParam = useDeleteSearchParam();
   const { setIsDelegatesFiltering } = useAgoraContext();
@@ -128,7 +127,7 @@ const DelegatesStakeholdersFilter = () => {
               )}
             </div>
             <button className="w-6 h-6 flex items-center justify-center">
-              <ChevronUpDownIcon className="stroke-primary" />
+              <ExpandCollapseIcon className="stroke-primary" />
             </button>
           </div>
         </Collapsible.Trigger>
