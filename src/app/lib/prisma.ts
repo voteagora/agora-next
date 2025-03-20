@@ -70,6 +70,8 @@ if (process.env.NODE_ENV === "production") {
   prismaWeb3Client = makePrismaClient(readOnlyWeb3Url) as PrismaClient;
 } else {
   if (!global.prismaWeb2Client) {
+    console.log("web 2 url state: " + !readWriteWeb2Url);
+    console.log("web 3 url state: " + !readOnlyWeb3Url);
     console.log(readWriteWeb2Url);
     console.log(readOnlyWeb3Url);
     if (!readWriteWeb2Url || !readOnlyWeb3Url) {
