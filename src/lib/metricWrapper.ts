@@ -1,17 +1,18 @@
 import { monitoring } from "./monitoringService";
+import { performance } from "perf_hooks";
 
 export async function withMetrics<T>(
   api: string,
   fn: () => Promise<T>,
   labels: Record<string, string> = {}
 ): Promise<T> {
-  const startTime = Date.now();
+  const startTime = performance.now();
 
   try {
     const result = await fn();
 
     // Record success metrics
-    const duration = Date.now() - startTime;
+    const duration = performance.now() - startTime;
     console.log("############################");
     console.log("Duration: " + duration);
     await monitoring.recordMetric({
@@ -39,7 +40,7 @@ export async function withMetrics<T>(
     return result;
   } catch (error) {
     // Record error metrics
-    const duration = Date.now() - startTime;
+    const duration = performance.now() - startTime;
     await monitoring.recordMetric({
       name: "api.duration",
       value: duration,
