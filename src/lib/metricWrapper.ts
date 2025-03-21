@@ -20,6 +20,7 @@ export async function withMetrics<T>(
         result: "success",
         ...labels,
       },
+      type: "distribution",
     });
 
     await monitoring.recordMetric({
@@ -30,6 +31,7 @@ export async function withMetrics<T>(
         result: "success",
         ...labels,
       },
+      type: "count",
     });
 
     return result;
@@ -44,6 +46,7 @@ export async function withMetrics<T>(
         result: "error",
         ...labels,
       },
+      type: "distribution",
     });
 
     await monitoring.recordMetric({
@@ -54,6 +57,7 @@ export async function withMetrics<T>(
         result: "error",
         ...labels,
       },
+      type: "count",
     });
 
     throw error;
