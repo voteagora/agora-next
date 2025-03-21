@@ -11,11 +11,7 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import { useReadContract } from "wagmi";
 import { cn, pluralize } from "@/lib/utils";
-import {
-  SECONDS_IN_HOUR,
-  TENANT_NAMESPACES,
-  TIMELOCK_TYPE,
-} from "@/lib/constants";
+import { SECONDS_IN_HOUR, TENANT_NAMESPACES } from "@/lib/constants";
 import { blocksToSeconds } from "@/lib/blockTimes";
 
 const GovernorSettingsParams = () => {
@@ -48,15 +44,6 @@ const GovernorSettingsParams = () => {
     const hrs = Math.round(Number(seconds) / SECONDS_IN_HOUR);
     return hrs === 0 ? "Less than 1 hour" : pluralize("hour", hrs);
   };
-
-  let friendlyTimeLockDelay;
-  if (contracts.timelockType === TIMELOCK_TYPE.TIMELOCK_NO_ACCESS_CONTROL) {
-    friendlyTimeLockDelay = secondsToHuman(
-      blocksToSeconds(Number(timeLockDelay))
-    );
-  } else {
-    friendlyTimeLockDelay = secondsToHuman(Number(timeLockDelay));
-  }
 
   return (
     <Table>
@@ -108,7 +95,7 @@ const GovernorSettingsParams = () => {
             </TableCell>
             <TableCell className="text-base font-semibold text-right text-primary rounded-br-xl">
               {isTimeLockDelayFetched && timeLockDelay !== undefined
-                ? friendlyTimeLockDelay
+                ? secondsToHuman(blocksToSeconds(Number(timeLockDelay)))
                 : "Loading..."}
             </TableCell>
           </TableRow>
