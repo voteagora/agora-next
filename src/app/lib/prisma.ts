@@ -6,12 +6,32 @@ declare global {
   var prismaWeb3Client: PrismaClient;
 }
 
-const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
-const envSuffix = isProd ? "PROD" : "DEV";
+// Determine environment based on DATABASE_URL first, then fall back to NEXT_PUBLIC_AGORA_ENV
+let envSuffix: string;
+if (process.env.DATABASE_URL === "dev") {
+  envSuffix = "DEV";
+} else if (process.env.DATABASE_URL === "prod") {
+  envSuffix = "PROD";
+} else {
+  const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
+  envSuffix = isProd ? "PROD" : "DEV";
+}
 
-const readWriteWeb2Url =
-  process.env[`READ_WRITE_WEB2_DATABASE_URL_${envSuffix}`];
-const readOnlyWeb3Url = process.env[`READ_ONLY_WEB3_DATABASE_URL_${envSuffix}`];
+const resolveDbUrl = (type: "WEB2" | "WEB3") => {
+  const databaseUrl = process.env.DATABASE_URL;
+
+  // If DATABASE_URL is set but not to 'dev' or 'prod', use it directly for both clients
+  if (databaseUrl && databaseUrl !== "dev" && databaseUrl !== "prod") {
+    return databaseUrl;
+  }
+
+  return process.env[
+    `${type === "WEB2" ? "READ_WRITE_WEB2" : "READ_ONLY_WEB3"}_DATABASE_URL_${envSuffix}`
+  ];
+};
+
+const readWriteWeb2Url = resolveDbUrl("WEB2");
+const readOnlyWeb3Url = resolveDbUrl("WEB3");
 
 let prismaWeb2Client: PrismaClient;
 let prismaWeb3Client: PrismaClient;
