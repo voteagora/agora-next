@@ -102,7 +102,7 @@ const OptionRow = ({
             className="border border-line bg-wash text-primary font-semibold hover:no-underline py-3 px-4 rounded-sm w-full data-[state=open]:rounded-b-none h-10"
           >
             <div className="w-full flex justify-between items-center text-xs">
-              <span className="font-semibold truncate max-w-[84px]">
+              <span className="font-semibold text-left truncate w-[84px]">
                 {result.letter.split(":")[0].trim()}
               </span>
               <div className="flex items-center gap-4">
@@ -120,7 +120,7 @@ const OptionRow = ({
                       </div>
                       <span
                         className={cn(
-                          "text-positive font-semibold flex items-center",
+                          "text-positive font-semibold flex items-center justify-end w-[88px]",
                           fontMapper[ui?.customization?.tokenAmountFont || ""]
                             ?.variable
                         )}
