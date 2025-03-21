@@ -4,7 +4,7 @@ import {
   PaginationParams,
 } from "@/app/lib/pagination";
 import { cache } from "react";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/prisma";
 import { Project } from "./project";
 
 const filterMap = {
@@ -29,7 +29,7 @@ async function getProjectsApi({
   const projects = await paginateResult(async (skip, take) => {
     if (round) {
       return (
-        await prisma.projectApplicants.findMany({
+        await prismaWeb3Client.projectApplicants.findMany({
           where: {
             round: round,
             ...(filterMap[category] && {
@@ -76,7 +76,7 @@ async function getProjectsApi({
     }
 
     return (
-      await prisma.projects.findMany({
+      await prismaWeb3Client.projects.findMany({
         skip,
         take,
       })
@@ -134,7 +134,7 @@ async function getProjectApi({
   round: string;
   projectId: string;
 }) {
-  const project = await prisma.projectApplicants.findUnique({
+  const project = await prismaWeb3Client.projectApplicants.findUnique({
     where: {
       application_id: projectId,
     },

@@ -6,7 +6,7 @@ import {
   paginateResult,
   PaginationParams,
 } from "@/app/lib/pagination";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { DelegateChunk, DelegatesGetPayload } from "../delegates/delegate";
 
@@ -24,7 +24,7 @@ async function getCitizens({
   const { meta, data: citizens } = await paginateResult(
     (skip: number, take: number) => {
       if (sort === "shuffle") {
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+        return prismaWeb2Client.$queryRawUnsafe<DelegatesGetPayload[]>(
           `
           SELECT
             citizens.address AS delegate,
@@ -62,7 +62,7 @@ async function getCitizens({
           take
         );
       } else {
-        return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+        return prismaWeb2Client.$queryRawUnsafe<DelegatesGetPayload[]>(
           `
             SELECT
               citizens.address AS delegate,

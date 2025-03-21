@@ -1,5 +1,5 @@
 import Tenant from "@/lib/tenant/tenant";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/prisma";
 import { cache } from "react";
 
 type ProposalCount = {
@@ -39,7 +39,7 @@ async function getProposalVoteCounts() {
                 ON        pc.proposal_id::text = p.proposal_id 
                 ORDER BY  p.start_block`;
 
-  const result = await prisma.$queryRawUnsafe<ProposalCount[]>(QRY);
+  const result = await prismaWeb3Client.$queryRawUnsafe<ProposalCount[]>(QRY);
 
   return { result };
 }

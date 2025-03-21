@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { schema as tempCheckSchema } from "../schemas/tempCheckSchema";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import {
   getStageByIndex,
   getStageIndexForTenant,
@@ -34,8 +34,8 @@ export async function onSubmitAction(
     const nextStage = getStageByIndex(currentIndex + 1);
 
     try {
-      await prisma.$transaction([
-        prisma.proposalDraft.update({
+      await prismaWeb2Client.$transaction([
+        prismaWeb2Client.proposalDraft.update({
           where: {
             id: data.draftProposalId,
           },
@@ -44,7 +44,7 @@ export async function onSubmitAction(
             temp_check_link: parsed.data.temp_check_link || "",
           },
         }),
-        prisma.proposalChecklist.create({
+        prismaWeb2Client.proposalChecklist.create({
           data: {
             title: "Temp check",
             completed_by: data.creatorAddress,

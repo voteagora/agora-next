@@ -13,7 +13,7 @@ import {
   VotePayload,
   VotesSort,
 } from "./vote";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 import { doInSpan } from "@/app/lib/logging";
@@ -120,7 +120,7 @@ async function getVotesForDelegateForAddress({
             OFFSET $3
             LIMIT $4;
             `;
-      return prisma.$queryRawUnsafe<VotePayload[]>(
+      return prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
         query,
         address,
         contracts.governor.address.toLowerCase(),
@@ -209,7 +209,11 @@ async function getSnapshotVotesForDelegateForAddress({
           OFFSET ${skip}
           LIMIT ${take};
         `;
-      return prisma.$queryRawUnsafe<SnapshotVotePayload[]>(query, skip, take);
+      return prismaWeb3Client.$queryRawUnsafe<SnapshotVotePayload[]>(
+        query,
+        skip,
+        take
+      );
     };
 
     const { meta, data: votes } = await paginateResult(
@@ -273,7 +277,7 @@ async function getVotersWhoHaveNotVotedForProposal({
                 ORDER BY del.voting_power DESC
                 OFFSET $4 LIMIT $5;`;
 
-      return prisma.$queryRawUnsafe<VotePayload[]>(
+      return prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
         notVotedQuery,
         proposalId,
         contracts.token.address.toLowerCase(),
@@ -390,7 +394,7 @@ async function getVotesForProposal({
           OFFSET $3
           LIMIT $4;`;
 
-        return prisma.$queryRawUnsafe<VotePayload[]>(
+        return prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
           query,
           proposalId,
           contracts.governor.address.toLowerCase(),
@@ -446,7 +450,7 @@ async function getUserVotesForProposal({
 }) {
   return withMetrics("getUserVotesForProposal", async () => {
     const { namespace, contracts, ui } = Tenant.current();
-    const queryFunciton = prisma.$queryRawUnsafe<VotePayload[]>(
+    const queryFunciton = prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
       `
       SELECT
         STRING_AGG(transaction_hash,'|') as transaction_hash,

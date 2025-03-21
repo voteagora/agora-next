@@ -2,13 +2,42 @@ import { PrismaClient } from "@prisma/client";
 import { time_this } from "@/app/lib/logging";
 
 declare global {
-  var prisma: PrismaClient;
+  var prismaWeb2Client: PrismaClient;
+  var prismaWeb3Client: PrismaClient;
 }
 
-let prisma: PrismaClient;
+// Determine environment based on DATABASE_URL first, then fall back to NEXT_PUBLIC_AGORA_ENV
+let envSuffix: string;
+if (process.env.DATABASE_URL === "dev") {
+  envSuffix = "DEV";
+} else if (process.env.DATABASE_URL === "prod") {
+  envSuffix = "PROD";
+} else {
+  const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
+  envSuffix = isProd ? "PROD" : "DEV";
+}
+
+const resolveDbUrl = (type: "WEB2" | "WEB3") => {
+  const databaseUrl = process.env.DATABASE_URL;
+
+  // If DATABASE_URL is set but not to 'dev' or 'prod', use it directly for both clients
+  if (databaseUrl && databaseUrl !== "dev" && databaseUrl !== "prod") {
+    return databaseUrl;
+  }
+
+  return process.env[
+    `${type === "WEB2" ? "READ_WRITE_WEB2" : "READ_ONLY_WEB3"}_DATABASE_URL_${envSuffix}`
+  ];
+};
+
+const readWriteWeb2Url = resolveDbUrl("WEB2");
+const readOnlyWeb3Url = resolveDbUrl("WEB3");
+
+let prismaWeb2Client: PrismaClient;
+let prismaWeb3Client: PrismaClient;
 
 // Logging middleware
-const makePrismaClient = () => {
+const makePrismaClient = (databaseUrl: string) => {
   const execRaw = async (
     query: (args: any) => Promise<any>,
     args: any,
@@ -19,7 +48,13 @@ const makePrismaClient = () => {
       args,
     });
   };
-  return new PrismaClient().$extends({
+  return new PrismaClient({
+    datasources: {
+      db: {
+        url: databaseUrl,
+      },
+    },
+  }).$extends({
     query: {
       $allModels: {
         async $allOperations({ operation, model, args, query }) {
@@ -47,15 +82,29 @@ const makePrismaClient = () => {
 };
 
 if (process.env.NODE_ENV === "production") {
-  prisma = makePrismaClient() as PrismaClient;
-} else {
-  if (!global.prisma) {
-    global.prisma = makePrismaClient() as PrismaClient;
+  if (!readWriteWeb2Url || !readOnlyWeb3Url) {
+    throw new Error("Database URLs are not defined in environment variables");
   }
-  prisma = global.prisma;
+
+  prismaWeb2Client = makePrismaClient(readWriteWeb2Url) as PrismaClient;
+  prismaWeb3Client = makePrismaClient(readOnlyWeb3Url) as PrismaClient;
+} else {
+  if (!global.prismaWeb2Client) {
+    if (!readWriteWeb2Url || !readOnlyWeb3Url) {
+      throw new Error("Database URLs are not defined in environment variables");
+    }
+
+    global.prismaWeb2Client = makePrismaClient(
+      readWriteWeb2Url
+    ) as PrismaClient;
+    global.prismaWeb3Client = makePrismaClient(readOnlyWeb3Url) as PrismaClient;
+  }
+
+  prismaWeb2Client = global.prismaWeb2Client;
+  prismaWeb3Client = global.prismaWeb3Client;
 }
 
-export default prisma;
+export { prismaWeb2Client, prismaWeb3Client };
 
 // Prisma BigInt serialization
 BigInt.prototype.toJSON = function () {

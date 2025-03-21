@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { fetchBallot } from "./getBallots";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 
 const updateBallotProjectAllocationApi = async (
   allocation: string,
@@ -35,7 +35,7 @@ async function updateBallotProjectAllocationForAddress({
   address: string;
 }) {
   // Create ballot if it doesn't exist
-  await prisma.ballots.upsert({
+  await prismaWeb2Client.ballots.upsert({
     where: {
       address_round: {
         address,
@@ -52,7 +52,7 @@ async function updateBallotProjectAllocationForAddress({
   });
 
   try {
-    await prisma.projectAllocations.update({
+    await prismaWeb2Client.projectAllocations.update({
       where: {
         address_round_project_id: {
           project_id: projectId,
@@ -116,7 +116,7 @@ async function updateBallotProjectImpactForAddress({
   address: string;
 }) {
   // Create ballot if it doesn't exist
-  await prisma.ballots.upsert({
+  await prismaWeb2Client.ballots.upsert({
     where: {
       address_round: {
         address,
@@ -132,7 +132,7 @@ async function updateBallotProjectImpactForAddress({
     },
   });
 
-  await prisma.$queryRawUnsafe(
+  await prismaWeb2Client.$queryRawUnsafe(
     `
       WITH current_group AS (
           SELECT
@@ -221,7 +221,7 @@ async function updateBallotProjectPositionForAddress({
   address: string;
 }) {
   // Create ballot if it doesn't exist
-  await prisma.ballots.upsert({
+  await prismaWeb2Client.ballots.upsert({
     where: {
       address_round: {
         address,
@@ -238,7 +238,7 @@ async function updateBallotProjectPositionForAddress({
   });
 
   // In SQL position is 1-indexed. In JS it's 0-indexed, so we need to add 1
-  await prisma.$queryRawUnsafe(
+  await prismaWeb2Client.$queryRawUnsafe(
     `
       WITH ranked_projects AS (
           SELECT
@@ -375,7 +375,7 @@ async function updateAllProjectsInBallotForAddress({
   roundId: number;
   address: string;
 }) {
-  const categoryProjects = await prisma.projectApplicants.findMany({
+  const categoryProjects = await prismaWeb2Client.projectApplicants.findMany({
     where: {
       application_category: category,
     },
@@ -400,7 +400,7 @@ async function updateAllProjectsInBallotForAddress({
   );
 
   // Create ballot if it doesn't exist
-  await prisma.ballots.upsert({
+  await prismaWeb2Client.ballots.upsert({
     where: {
       address_round: {
         address,
@@ -418,7 +418,7 @@ async function updateAllProjectsInBallotForAddress({
 
   await Promise.all(
     projects.map((project, i) =>
-      prisma.projectAllocations.upsert({
+      prismaWeb2Client.projectAllocations.upsert({
         where: {
           address_round_project_id: {
             project_id: project.project_id,

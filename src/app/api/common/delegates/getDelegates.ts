@@ -3,7 +3,7 @@ import {
   paginateResult,
   type PaginationParams,
 } from "@/app/lib/pagination";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/prisma";
 import { cache } from "react";
 import { isAddress } from "viem";
 import { ensNameToAddress } from "@/app/lib/ENSUtils";
@@ -252,14 +252,17 @@ async function getDelegates({
               OFFSET $1
               LIMIT $2;
             `;
-            return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+            return prismaWeb3Client.$queryRawUnsafe<DelegatesGetPayload[]>(
               QRY1,
               skip,
               take
             );
 
           case "weighted_random":
-            await prisma.$executeRawUnsafe(`SELECT setseed($1);`, seed);
+            await prismaWeb3Client.$executeRawUnsafe(
+              `SELECT setseed($1);`,
+              seed
+            );
 
             const QRY2 = ` ${delegateUniverseCTE}
               SELECT *,
@@ -297,7 +300,7 @@ async function getDelegates({
               OFFSET $1
               LIMIT $2;
               `;
-            return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+            return prismaWeb3Client.$queryRawUnsafe<DelegatesGetPayload[]>(
               QRY2,
               skip,
               take
@@ -341,7 +344,7 @@ async function getDelegates({
               OFFSET $1
               LIMIT $2;
               `;
-            return prisma.$queryRawUnsafe<DelegatesGetPayload[]>(
+            return prismaWeb3Client.$queryRawUnsafe<DelegatesGetPayload[]>(
               QRY3,
               skip,
               take
@@ -391,7 +394,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     // we are already relying on getVoterStats below
     // but this voter_stats view includes things like for/against/abstain
     // so we can't totally pull it out
-    const delegateQuery = prisma.$queryRawUnsafe<DelegateStats[]>(
+    const delegateQuery = prismaWeb3Client.$queryRawUnsafe<DelegateStats[]>(
       `
         SELECT
           voter,
@@ -504,7 +507,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       : contracts.token.address;
 
     if (contracts.alligator) {
-      numOfDelegationsQuery = prisma.$queryRawUnsafe<
+      numOfDelegationsQuery = prismaWeb3Client.$queryRawUnsafe<
         { num_of_delegators: BigInt }[]
       >(
         `
@@ -520,11 +523,11 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
         partialDelegationContract
       );
     } else if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
-      numOfDelegationsQuery = prisma.$queryRawUnsafe<
+      numOfDelegationsQuery = prismaWeb3Client.$queryRawUnsafe<
         { num_of_delegators: BigInt }[]
       >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);
     } else {
-      numOfDelegationsQuery = prisma.$queryRawUnsafe<
+      numOfDelegationsQuery = prismaWeb3Client.$queryRawUnsafe<
         { num_of_delegators: BigInt }[]
       >(numOfDirectDelegationsQuery, address, partialDelegationContract);
     }
@@ -592,7 +595,7 @@ async function getVoterStats(
       ? addressOrENSName.toLowerCase()
       : await ensNameToAddress(addressOrENSName);
 
-    const statsQuery = await prisma.$queryRawUnsafe<
+    const statsQuery = await prismaWeb3Client.$queryRawUnsafe<
       Pick<DelegateStats, "voter" | "last_10_props">[]
     >(
       `
