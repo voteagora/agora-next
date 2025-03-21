@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
         },
         sort,
       });
+
       return NextResponse.json(delegatesResult);
     } catch (e: any) {
       if (e instanceof ZodError) {
