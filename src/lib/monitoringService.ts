@@ -1,4 +1,3 @@
-import https from "https";
 import Tenant from "./tenant/tenant";
 
 interface MetricOptions {

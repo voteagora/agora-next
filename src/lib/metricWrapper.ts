@@ -12,6 +12,8 @@ export async function withMetrics<T>(
 
     // Record success metrics
     const duration = Date.now() - startTime;
+    console.log("############################");
+    console.log("Duration: " + duration);
     await monitoring.recordMetric({
       name: "api.duration",
       value: duration,
