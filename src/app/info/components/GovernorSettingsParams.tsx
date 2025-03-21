@@ -51,11 +51,11 @@ const GovernorSettingsParams = () => {
 
   let friendlyTimeLockDelay;
   if (contracts.timelockType === TIMELOCK_TYPE.TIMELOCK_NO_ACCESS_CONTROL) {
-    friendlyTimeLockDelay = secondsToHuman(Number(timeLockDelay));
-  } else {
     friendlyTimeLockDelay = secondsToHuman(
       blocksToSeconds(Number(timeLockDelay))
     );
+  } else {
+    friendlyTimeLockDelay = secondsToHuman(Number(timeLockDelay));
   }
 
   return (
