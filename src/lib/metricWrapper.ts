@@ -7,12 +7,16 @@ export async function withMetrics<T>(
   labels: Record<string, string> = {}
 ): Promise<T> {
   const startTime = performance.now();
+  console.log("### StartTime: " + startTime);
 
   try {
     const result = await fn();
 
     // Record success metrics
-    const duration = performance.now() - startTime;
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    console.log("### EndTime: " + startTime);
+    console.log("### Duration: " + duration);
     await monitoring.recordMetric({
       name: "api.duration",
       value: duration,
@@ -38,7 +42,10 @@ export async function withMetrics<T>(
     return result;
   } catch (error) {
     // Record error metrics
-    const duration = performance.now() - startTime;
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    console.log("### EndTime: " + startTime);
+    console.log("### Duration: " + duration);
     await monitoring.recordMetric({
       name: "api.duration",
       value: duration,
