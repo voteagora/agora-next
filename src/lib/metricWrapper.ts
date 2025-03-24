@@ -18,7 +18,8 @@ export async function withMetrics<T>(
   labels: Record<string, string> = {}
 ): Promise<T> {
   const startTime = Date.now();
-  const requestId = uuidv4();
+  // Add timestamp to make the ID more unique and traceable
+  const requestId = `${startTime}-${uuidv4()}`;
   const context: TimingContext = { startTime, api, labels, requestId };
 
   // Log with ISO timestamp and request ID for better debugging
@@ -36,10 +37,7 @@ export async function withMetrics<T>(
       const duration = endTime - currentContext.startTime;
 
       console.log(
-        `[${currentContext.requestId}] ### ${api} ended at ${new Date(endTime).toISOString()} (${endTime}ms)`
-      );
-      console.log(
-        `[${currentContext.requestId}] ### ${api} duration: ${duration}ms`
+        `[${currentContext.requestId}] ### ${api} succeeded at ${new Date(endTime).toISOString()} (${endTime}ms) - duration: ${duration}ms`
       );
 
       await monitoring.recordMetric({
@@ -71,10 +69,7 @@ export async function withMetrics<T>(
       const duration = endTime - currentContext.startTime;
 
       console.log(
-        `[${currentContext.requestId}] ### ${api} failed at ${new Date(endTime).toISOString()} (${endTime}ms)`
-      );
-      console.log(
-        `[${currentContext.requestId}] ### ${api} duration: ${duration}ms`
+        `[${currentContext.requestId}] ### ${api} failed at ${new Date(endTime).toISOString()} (${endTime}ms) - duration: ${duration}ms`
       );
 
       await monitoring.recordMetric({
