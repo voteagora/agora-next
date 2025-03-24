@@ -48,7 +48,6 @@ export async function withMetrics<T>(
         labels: {
           api,
           result: "success",
-          request_id: currentContext.requestId,
           ...labels,
         },
         type: "distribution",
@@ -60,7 +59,6 @@ export async function withMetrics<T>(
         labels: {
           api,
           result: "success",
-          request_id: currentContext.requestId,
           ...labels,
         },
         type: "count",
@@ -85,7 +83,6 @@ export async function withMetrics<T>(
         labels: {
           api,
           result: "error",
-          request_id: currentContext.requestId,
           ...labels,
         },
         type: "distribution",
@@ -97,7 +94,6 @@ export async function withMetrics<T>(
         labels: {
           api,
           result: "error",
-          request_id: currentContext.requestId,
           ...labels,
         },
         type: "count",
