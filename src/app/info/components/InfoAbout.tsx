@@ -14,7 +14,7 @@ const tabs = [
     icon: (
       <CoinsIcon
         className="w-[24px] h-[24px]"
-        stroke={rgbStringToHex(ui.customization?.secondary)}
+        stroke={rgbStringToHex(ui.customization?.brandPrimary)}
       />
     ),
     title: "Delegate voting power",
@@ -25,7 +25,7 @@ const tabs = [
     icon: (
       <NotificationIcon
         className="w-[24px] h-[24px]"
-        stroke={rgbStringToHex(ui.customization?.secondary)}
+        stroke={rgbStringToHex(ui.customization?.brandPrimary)}
       />
     ),
     title: "Browse proposals",
@@ -36,7 +36,7 @@ const tabs = [
     icon: (
       <CheckCircleBrokenIcon
         className="w-[24px] h-[24px]"
-        stroke={rgbStringToHex(ui.customization?.secondary)}
+        stroke={rgbStringToHex(ui.customization?.brandPrimary)}
       />
     ),
     title: "Vote on proposals",
@@ -70,7 +70,9 @@ const InfoAbout = () => {
           </div>
           <div className="sm:w-1/2">
             <h3 className="text-lg font-bold text-primary capitalize">
-              About {namespace}
+              {namespace === TENANT_NAMESPACES.DEMO
+                ? "About Canopy"
+                : "About " + namespace}
             </h3>
             <p className="text-secondary mt-3">{page.description}</p>
             {/* So the image doesn't look smooshed for scroll :eye-roll: */}

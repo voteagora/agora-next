@@ -1,21 +1,26 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import demoHero from "@/assets/tenant/demo_hero.png";
-import demoHeroV2 from "@/assets/tenant/demo_hero_v2.svg";
+import demoHeroV2 from "@/assets/tenant/demo_logo.svg";
+import demoDelegate from "@/assets/tenant/demo_delegate.svg";
+import demoDocs from "@/assets/tenant/demo_docs.png";
+import demoVision from "@/assets/tenant/demo_vision.png";
+import demoForum from "@/assets/tenant/demo_forum.png";
+import demoDiscord from "@/assets/tenant/demo_discord.png";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 export const demoTenantUIConfig = new TenantUI({
-  title: "{Brand name} Agora",
+  title: "Canopy Agora",
   logo: demoHeroV2,
 
   assets: {
     success: demoHeroV2,
     pending: demoHeroV2,
-    delegate: demoHeroV2,
+    delegate: demoDelegate,
   },
 
   organization: {
-    title: "{Brand name}",
+    title: "Canopy Agora",
   },
 
   delegates: {
@@ -28,12 +33,12 @@ export const demoTenantUIConfig = new TenantUI({
     primary: "23 23 23",
     secondary: "64 64 64",
     tertiary: "115 115 115",
-    neutral: "250 250 250",
+    neutral: "252 251 247",
     wash: "255 255 255",
     line: "223 223 223",
-    positive: "97 209 97",
-    negative: "226 54 54",
-    brandPrimary: "174 11 229",
+    positive: "66 122 43",
+    negative: "182 13 13",
+    brandPrimary: "144 193 41",
     brandSecondary: "242 242 242",
   },
 
@@ -81,10 +86,10 @@ export const demoTenantUIConfig = new TenantUI({
   pages: [
     {
       route: "/",
-      title: "Welcome to the Community",
+      title: "Welcome to TKN governance",
       hero: demoHero,
       description:
-        "Agora is your home for onchain proposals, voting, and governance",
+        "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
       meta: {
         title: "Welcome to {Brand name} governance",
         description: "Home of token governance",
@@ -94,7 +99,7 @@ export const demoTenantUIConfig = new TenantUI({
     },
     {
       route: "delegates",
-      title: "Welcome to {Brand name} governance",
+      title: "Welcome to TKN governance",
       description:
         "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
       hero: demoHero,
@@ -108,7 +113,7 @@ export const demoTenantUIConfig = new TenantUI({
     },
     {
       route: "proposals",
-      title: "Welcome to {Brand name} governance",
+      title: "Welcome to TKN governance",
       description:
         "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
       hero: demoHero,
@@ -135,37 +140,37 @@ export const demoTenantUIConfig = new TenantUI({
           name: "Community Discord",
           title: "Community Discord",
           url: "https://www.agora.xyz/deploy",
-          image: demoHero,
+          image: demoDiscord,
         },
         {
           name: "Governance Forums",
           title: "Governance Forums",
           url: "https://www.agora.xyz/deploy",
-          image: demoHero,
+          image: demoForum,
         },
         {
           name: "Protocol Docs",
           title: "Protocol Docs",
           url: "https://www.agora.xyz/deploy",
-          image: demoHero,
+          image: demoDocs,
         },
         {
           name: "Protocol Vision",
           title: "Protocol Vision",
           url: "https://www.agora.xyz/deploy",
-          image: demoHero,
+          image: demoVision,
         },
       ],
     },
     {
       route: "info/about",
-      title: "About {Brand name}",
+      title: "About Canopy",
       hero: demoHero,
       description:
         "At vero eos et accusamus et iust odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
       meta: {
-        title: "Info of Agora",
-        description: "Welcome to the {Brand name} Agora",
+        title: "Info of Canopy",
+        description: "Welcome to the Canopy Agora",
         imageTitle: "",
         imageDescription: "",
       },
