@@ -91,7 +91,7 @@ export const demoTenantUIConfig = new TenantUI({
       description:
         "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
       meta: {
-        title: "Welcome to {Brand name} governance",
+        title: "Welcome to Canopy governance",
         description: "Home of token governance",
         imageTitle: "IN IMAGE",
         imageDescription: "IN IMAGE DESCRIPTION",
@@ -104,11 +104,11 @@ export const demoTenantUIConfig = new TenantUI({
         "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
       hero: demoHero,
       meta: {
-        title: "Contribute to {Brand name} with your staked {Token name}",
+        title: "Contribute to Canopy with your staked TKN",
         description:
-          "{Brand name} is a unified and dedicated delegate portal for {Brand name} governance. {Brand name} is where all protocol improvement votes are executed. After the discussion phase, all official {Brand name} governance activities occur on the {Brand name} portal. This includes member delegation, voting, and other matters related to {Brand name}'s decentralized governance.",
-        imageTitle: "{Brand name} Governance",
-        imageDescription: "Participate in {Brand name}",
+          "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
+        imageTitle: "Canopy Governance",
+        imageDescription: "Participate in Canopy Governance",
       },
     },
     {
@@ -118,22 +118,22 @@ export const demoTenantUIConfig = new TenantUI({
         "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
       hero: demoHero,
       meta: {
-        title: "Voter on Agora",
+        title: "Voter on Canopy",
         description: "Delegate your voting power to a trusted representative",
-        imageTitle: "IN IMAGE",
-        imageDescription: "IN IMAGE DESCRIPTION",
+        imageTitle: "Canopy Governance",
+        imageDescription: "Participate in Canopy Governance",
       },
     },
     {
       route: "info",
       title: "Welcome to the Community",
       description:
-        "Agora is your home for onchain proposals, voting, and governance",
+        "Canopy is your home for onchain proposals, voting, and governance",
       meta: {
-        title: "{Brand name} Agora",
-        description: "Home of {Brand name} governance",
-        imageTitle: "{Brand name} Agora",
-        imageDescription: "Home of {Brand name} governance",
+        title: "Canopy Agora",
+        description: "Home of Canopy governance",
+        imageTitle: "Canopy Agora",
+        imageDescription: "Home of Canopy governance",
       },
       links: [
         {
@@ -169,7 +169,7 @@ export const demoTenantUIConfig = new TenantUI({
       description:
         "At vero eos et accusamus et iust odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
       meta: {
-        title: "Info of Canopy",
+        title: "Info about Canopy",
         description: "Welcome to the Canopy Agora",
         imageTitle: "",
         imageDescription: "",
