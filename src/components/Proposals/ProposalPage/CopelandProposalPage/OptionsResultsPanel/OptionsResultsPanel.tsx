@@ -16,6 +16,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
 const { ui } = Tenant.current();
 import { useCalculateCopelandResult } from "@/hooks/useCalculateCopelandResult";
+import React from "react";
 
 export default function OptionsResultsPanel({
   proposal,
@@ -27,9 +28,36 @@ export default function OptionsResultsPanel({
     proposalId: proposal.id,
   });
 
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
   return (
-    <div className="flex flex-col flex-1 max-h-[calc(100vh-532px)] overflow-y-scroll flex-shrink px-4 mt-1 [&::-webkit-scrollbar]:hidden">
-      <Accordion type="single" collapsible className="w-full">
+    <div
+      ref={containerRef}
+      className="flex flex-col flex-1 max-h-[calc(100vh-532px)] overflow-y-scroll flex-shrink px-4 mt-1 [&::-webkit-scrollbar]:hidden"
+    >
+      <Accordion
+        type="single"
+        collapsible
+        className="w-full"
+        onValueChange={(value) => {
+          if (value) {
+            setTimeout(() => {
+              const element = document.querySelector(`[data-state="open"]`);
+              if (element && containerRef.current) {
+                const container = containerRef.current;
+                const elementTop = element.getBoundingClientRect().top;
+                const containerTop = container.getBoundingClientRect().top;
+                const scrollDistance = elementTop - containerTop;
+
+                container.scrollTo({
+                  top: container.scrollTop + scrollDistance,
+                  behavior: "smooth",
+                });
+              }
+            }, 300);
+          }
+        }}
+      >
         {isFetching ? (
           <div className="text-center text-sm text-tertiary">Loading...</div>
         ) : proposalResults && proposalResults.length > 0 ? (
@@ -99,10 +127,10 @@ const OptionRow = ({
         <div className="flex-grow">
           <AccordionTrigger
             icon={ChevronsUpDown}
-            className="border border-line bg-wash text-primary font-semibold hover:no-underline py-3 px-4 rounded-sm w-full data-[state=open]:rounded-b-none h-10"
+            className="border border-line bg-wash text-primary font-semibold hover:no-underline py-3 pr-0 pl-3 rounded-sm w-full data-[state=open]:rounded-b-none h-10"
           >
             <div className="w-full flex justify-between items-center text-xs">
-              <span className="font-semibold text-left truncate w-[84px]">
+              <span className="font-semibold text-left truncate w-[100px]">
                 {result.letter.split(":")[0].trim()}
               </span>
               <div className="flex items-center gap-4">
@@ -111,7 +139,7 @@ const OptionRow = ({
                     <>
                       <div
                         className={cn(
-                          "border border-[#008425] bg-positive/20 text-positive px-2 py-1 rounded-sm font-semibold",
+                          "border border-[#008425] bg-[#008425]/20 text-positive px-2 py-1 rounded-sm font-semibold",
                           result.fundingType === "EXT 2Y" &&
                             "bg-[#008425]/60 text-wash"
                         )}
@@ -250,7 +278,7 @@ const OptionRow = ({
           <div className="py-3 px-3">
             <div className="grid grid-cols-3 gap-4 mb-4">
               <div className="font-semibold text-xs">Challenger</div>
-              <div className="font-semibold text-xs text-center">Disfavor</div>
+              <div className="font-semibold text-xs text-right">Disfavor</div>
               <div className="font-semibold text-xs text-right">Favor</div>
             </div>
 
@@ -284,7 +312,9 @@ const OptionRow = ({
                     )}
                   >
                     {disfavorVotes.toLocaleString()}
-                    {!isWinner && comparison.winner && <span> 🏆</span>}
+                    <span className="w-4">
+                      {!isWinner && comparison.winner && "🏆"}
+                    </span>
                   </div>
                   <div
                     className={cn(
@@ -295,7 +325,7 @@ const OptionRow = ({
                     )}
                   >
                     {favorVotes.toLocaleString()}
-                    {isWinner && <span> 🏆</span>}
+                    <span className="w-4">{isWinner && "🏆"}</span>
                   </div>
                 </div>
               );

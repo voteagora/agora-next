@@ -39,7 +39,7 @@ export default function ProposalStatusDetail({
           </p>
         )}
         {proposalStatus === "CLOSED" && (
-          <p className="text-blue-600 bg-sky-200 rounded-sm px-1 py-0.5 font-semibold">
+          <p className="text-wash bg-tertiary rounded-sm px-1 py-0.5 font-semibold">
             CLOSED
           </p>
         )}
