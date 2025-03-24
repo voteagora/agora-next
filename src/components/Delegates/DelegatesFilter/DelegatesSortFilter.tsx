@@ -6,29 +6,9 @@ import FilterResetListbox from "@/components/common/FilterResetListbox";
 import { SortIcon } from "@/icons/Sort";
 import Tenant from "@/lib/tenant/tenant";
 import { rgbStringToHex } from "@/app/lib/utils/color";
-import { DropdownMenuRadioItem } from "@/components/ui/dropdown-menu";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { SortOption } from "./FilterSortOption";
 import { useDelegatesSort } from "./useDelegatesSort";
-import { cn } from "@/lib/utils";
-
-type SortOptionProps = {
-  label: string;
-  value: string;
-  checked: boolean;
-};
-
-const SortOption = ({ label, value, checked }: SortOptionProps) => (
-  <DropdownMenuRadioItem
-    value={value}
-    checked={checked}
-    className={cn(
-      "relative flex cursor-pointer select-none items-center rounded-lg p-3 text-base outline-none transition-colors hover:bg-neutral/50",
-      checked ? "text-primary" : "text-secondary"
-    )}
-  >
-    {label}
-  </DropdownMenuRadioItem>
-);
 
 export default function DelegatesSortFilter() {
   const { ui } = Tenant.current();

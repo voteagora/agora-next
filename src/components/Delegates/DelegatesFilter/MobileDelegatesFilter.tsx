@@ -16,39 +16,8 @@ import { useDelegatesFilter } from "./useDelegatesFilter";
 import { useDelegatesSort } from "./useDelegatesSort";
 import DelegatesIssuesFilter from "./DelegatesIssuesFilter";
 import DelegatesStakeholdersFilter from "./DelegatesStakeholdersFilter";
-import { cn } from "@/lib/utils";
 import { CheckMark } from "@/icons/CheckMark";
-
-type SortOptionProps = {
-  label: string;
-  value: string;
-  checked: boolean;
-  onClick: () => void;
-};
-
-const SortOption = ({ label, checked, onClick }: SortOptionProps) => (
-  <button
-    onClick={onClick}
-    className={cn(
-      "relative flex cursor-pointer select-none items-center rounded-lg text-base outline-none transition-colors hover:bg-neutral/50",
-      checked ? "text-primary" : "text-secondary"
-    )}
-  >
-    <span className="flex h-[20px] w-[20px] items-center justify-center mr-[12px]">
-      <div
-        className={cn(
-          "w-[20px] h-[20px] rounded-full border transition-colors",
-          checked ? "border-positive" : "border-line"
-        )}
-      >
-        {checked && (
-          <div className="w-2.5 h-2.5 absolute top-[7px] left-[5px] bg-positive rounded-full" />
-        )}
-      </div>
-    </span>
-    {label}
-  </button>
-);
+import { MobileSortOption } from "./FilterSortOption";
 
 export const MobileDelegatesFilter = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -56,6 +25,7 @@ export const MobileDelegatesFilter = () => {
   const [selectedStakeholders, setSelectedStakeholders] = useState<string[]>(
     []
   );
+
   const [tempMyDelegates, setTempMyDelegates] = useState(false);
   const [tempEndorsed, setTempEndorsed] = useState(false);
   const [tempHasStatement, setTempHasStatement] = useState(false);
@@ -205,10 +175,9 @@ export const MobileDelegatesFilter = () => {
                   key as keyof typeof delegatesFilterOptions
                 ];
               return (
-                <SortOption
+                <MobileSortOption
                   key={key}
                   label={option.value}
-                  value={option.sort}
                   checked={option.sort === tempSortParam}
                   onClick={() => handleTempSortChange(option.sort)}
                 />
