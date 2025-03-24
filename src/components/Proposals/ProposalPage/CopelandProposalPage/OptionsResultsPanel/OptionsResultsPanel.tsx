@@ -127,7 +127,10 @@ const OptionRow = ({
         <div className="flex-grow">
           <AccordionTrigger
             icon={ChevronsUpDown}
-            className="border border-line bg-wash text-primary font-semibold hover:no-underline py-3 pr-0 pl-3 rounded-sm w-full data-[state=open]:rounded-b-none h-10"
+            className={cn(
+              "border border-line bg-wash text-primary font-semibold hover:no-underline py-3 pr-0 pl-3 rounded-sm w-full data-[state=open]:rounded-b-none h-10",
+              result.fundingType === "None" && "data-[state=closed]:bg-neutral"
+            )}
           >
             <div className="w-full flex justify-between items-center text-xs">
               <span className="font-semibold text-left truncate w-[100px]">
@@ -297,6 +300,8 @@ const OptionRow = ({
               const isWinner =
                 (isOption1 && comparison.winner === comparison.option1) ||
                 (!isOption1 && comparison.winner === comparison.option2);
+              const lostAtLeastOne = result.totalLosses > 0;
+              const wonAtLeastOne = result.totalWins > 0;
 
               return (
                 <div key={idx} className="grid grid-cols-3 gap-4 py-2">
@@ -312,7 +317,7 @@ const OptionRow = ({
                     )}
                   >
                     {disfavorVotes.toLocaleString()}
-                    <span className="w-4">
+                    <span className={cn("w-4", !lostAtLeastOne && "w-0")}>
                       {!isWinner && comparison.winner && "🏆"}
                     </span>
                   </div>
@@ -325,7 +330,9 @@ const OptionRow = ({
                     )}
                   >
                     {favorVotes.toLocaleString()}
-                    <span className="w-4">{isWinner && "🏆"}</span>
+                    <span className={cn("w-4", !wonAtLeastOne && "w-0")}>
+                      {isWinner && "🏆"}
+                    </span>
                   </div>
                 </div>
               );
