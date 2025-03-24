@@ -1,5 +1,6 @@
 import { monitoring } from "./monitoringService";
 import { AsyncLocalStorage } from "async_hooks";
+import { v4 as uuidv4 } from "uuid";
 
 // Create a request context storage
 const asyncLocalStorage = new AsyncLocalStorage();
@@ -8,6 +9,7 @@ interface TimingContext {
   startTime: number;
   api: string;
   labels: Record<string, string>;
+  requestId: string;
 }
 
 export async function withMetrics<T>(
@@ -16,11 +18,12 @@ export async function withMetrics<T>(
   labels: Record<string, string> = {}
 ): Promise<T> {
   const startTime = Date.now();
-  const context: TimingContext = { startTime, api, labels };
+  const requestId = uuidv4();
+  const context: TimingContext = { startTime, api, labels, requestId };
 
-  // Log with ISO timestamp for better debugging
+  // Log with ISO timestamp and request ID for better debugging
   console.log(
-    `### ${api} started at ${new Date(startTime).toISOString()} (${startTime}ms)`
+    `[${requestId}] ### ${api} started at ${new Date(startTime).toISOString()} (${startTime}ms)`
   );
 
   return asyncLocalStorage.run(context, async () => {
@@ -33,9 +36,11 @@ export async function withMetrics<T>(
       const duration = endTime - currentContext.startTime;
 
       console.log(
-        `### ${api} ended at ${new Date(endTime).toISOString()} (${endTime}ms)`
+        `[${currentContext.requestId}] ### ${api} ended at ${new Date(endTime).toISOString()} (${endTime}ms)`
       );
-      console.log(`### ${api} duration: ${duration}ms`);
+      console.log(
+        `[${currentContext.requestId}] ### ${api} duration: ${duration}ms`
+      );
 
       await monitoring.recordMetric({
         name: "api.duration",
@@ -43,6 +48,7 @@ export async function withMetrics<T>(
         labels: {
           api,
           result: "success",
+          request_id: currentContext.requestId,
           ...labels,
         },
         type: "distribution",
@@ -54,6 +60,7 @@ export async function withMetrics<T>(
         labels: {
           api,
           result: "success",
+          request_id: currentContext.requestId,
           ...labels,
         },
         type: "count",
@@ -66,9 +73,11 @@ export async function withMetrics<T>(
       const duration = endTime - currentContext.startTime;
 
       console.log(
-        `### ${api} failed at ${new Date(endTime).toISOString()} (${endTime}ms)`
+        `[${currentContext.requestId}] ### ${api} failed at ${new Date(endTime).toISOString()} (${endTime}ms)`
       );
-      console.log(`### ${api} duration: ${duration}ms`);
+      console.log(
+        `[${currentContext.requestId}] ### ${api} duration: ${duration}ms`
+      );
 
       await monitoring.recordMetric({
         name: "api.duration",
@@ -76,6 +85,7 @@ export async function withMetrics<T>(
         labels: {
           api,
           result: "error",
+          request_id: currentContext.requestId,
           ...labels,
         },
         type: "distribution",
@@ -87,6 +97,7 @@ export async function withMetrics<T>(
         labels: {
           api,
           result: "error",
+          request_id: currentContext.requestId,
           ...labels,
         },
         type: "count",
