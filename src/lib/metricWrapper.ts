@@ -23,9 +23,9 @@ export async function withMetrics<T>(
   const context: TimingContext = { startTime, api, labels, requestId };
 
   // Log with ISO timestamp and request ID for better debugging
-  console.log(
-    `[${requestId}] ### ${api} started at ${new Date(startTime).toISOString()} (${startTime}ms)`
-  );
+  // console.log(
+  //   `[${requestId}] ### ${api} started at ${new Date(startTime).toISOString()} (${startTime}ms)`
+  // );
 
   return asyncLocalStorage.run(context, async () => {
     try {
@@ -36,9 +36,10 @@ export async function withMetrics<T>(
       const endTime = Date.now();
       const duration = endTime - currentContext.startTime;
 
-      console.log(
-        `[${currentContext.requestId}] ### ${api} succeeded at ${new Date(endTime).toISOString()} (${endTime}ms) - duration: ${duration}ms`
-      );
+      // Used to debug log timing
+      // console.log(
+      //   `[${currentContext.requestId}] ### ${api} succeeded at ${new Date(endTime).toISOString()} (${endTime}ms) - duration: ${duration}ms`
+      // );
 
       await monitoring.recordMetric({
         name: "api.duration",
@@ -68,9 +69,10 @@ export async function withMetrics<T>(
       const endTime = Date.now();
       const duration = endTime - currentContext.startTime;
 
-      console.log(
-        `[${currentContext.requestId}] ### ${api} failed at ${new Date(endTime).toISOString()} (${endTime}ms) - duration: ${duration}ms`
-      );
+      // Used to debug log timing
+      // console.log(
+      //   `[${currentContext.requestId}] ### ${api} failed at ${new Date(endTime).toISOString()} (${endTime}ms) - duration: ${duration}ms`
+      // );
 
       await monitoring.recordMetric({
         name: "api.duration",
