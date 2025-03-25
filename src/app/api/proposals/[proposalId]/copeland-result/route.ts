@@ -8,14 +8,16 @@ export async function GET(
   route: { params: { proposalId: string } }
 ) {
   try {
-    const proposal = await fetchProposalUnstableCache(route.params.proposalId);
-    const snapshotVotes = await fetchSnapshotVotesForProposal({
-      proposalId: route.params.proposalId,
-      pagination: {
-        offset: 0,
-        limit: 100000,
-      },
-    });
+    const [proposal, snapshotVotes] = await Promise.all([
+      fetchProposalUnstableCache(route.params.proposalId),
+      fetchSnapshotVotesForProposal({
+        proposalId: route.params.proposalId,
+        pagination: {
+          offset: 0,
+          limit: 100000,
+        },
+      }),
+    ]);
     const result = calculateCopelandVote(
       snapshotVotes.data,
       (
