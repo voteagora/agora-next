@@ -323,7 +323,7 @@ async function getSnapshotVotesForProposal({
       ORDER BY ${sort} DESC
       OFFSET $2 LIMIT $3;`;
 
-    return prisma.$queryRawUnsafe<SnapshotVotePayload[]>(
+    return prismaWeb3Client.$queryRawUnsafe<SnapshotVotePayload[]>(
       query,
       proposalId,
       skip,
@@ -480,7 +480,7 @@ async function getUserSnapshotVotesForProposal({
 }) {
   const { slug } = Tenant.current();
 
-  const queryFunction = prisma.$queryRawUnsafe<SnapshotVotePayload[]>(
+  const queryFunction = prismaWeb3Client.$queryRawUnsafe<SnapshotVotePayload[]>(
     `
       SELECT * FROM "snapshot".votes WHERE proposal_id = $1 AND dao_slug = '${slug}' AND voter = $2`,
     proposalId,
