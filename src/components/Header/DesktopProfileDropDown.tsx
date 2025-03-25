@@ -249,7 +249,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                         >
                           <Logout
                             fill={rgbStringToHex(ui?.customization?.primary)}
-                            className={"mr-[10px] self-center"}
+                            className={"mr-[10px] self-center cursor-pointer"}
                           />
                           <span>Logout</span>
                         </div>
