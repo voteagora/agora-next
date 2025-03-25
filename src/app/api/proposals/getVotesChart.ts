@@ -1,6 +1,6 @@
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/prisma";
 import { VotePayload } from "@/app/api/common/votes/vote";
 
 export async function getVotesChart({
@@ -45,7 +45,7 @@ export async function getVotesChart({
     ORDER BY block_number ASC;
   `;
 
-  return await prisma.$queryRawUnsafe<VotePayload[]>(
+  return await prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
     query,
     proposalId,
     contracts.governor.address.toLowerCase()

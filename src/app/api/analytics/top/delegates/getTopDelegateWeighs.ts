@@ -1,5 +1,5 @@
 import Tenant from "@/lib/tenant/tenant";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/prisma";
 import { cache } from "react";
 
 type AddressWeight = {
@@ -32,7 +32,7 @@ async function getTopDelegateWeights() {
                 ORDER  BY fraction_of_voting_power DESC
                 LIMIT 10; `;
 
-  const result = await prisma.$queryRawUnsafe<AddressWeight[]>(QRY);
+  const result = await prismaWeb3Client.$queryRawUnsafe<AddressWeight[]>(QRY);
   return { result };
 }
 

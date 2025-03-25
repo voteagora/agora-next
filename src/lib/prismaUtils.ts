@@ -1,4 +1,4 @@
-import prisma from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/prisma";
 import { TENANT_NAMESPACES } from "./constants";
 import { TenantNamespace } from "./types";
 
@@ -20,29 +20,29 @@ export function findDelagatee({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prisma.optimismDelegatees.findFirst(condition);
+      return prismaWeb3Client.optimismDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.ENS:
-      return prisma.ensDelegatees.findFirst(condition);
+      return prismaWeb3Client.ensDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.ETHERFI:
-      return prisma.etherfiDelegatees.findFirst(condition);
+      return prismaWeb3Client.etherfiDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.UNISWAP:
-      return prisma.uniswapDelegatees.findFirst(condition);
+      return prismaWeb3Client.uniswapDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.CYBER:
-      return prisma.cyberDelegatees.findFirst(condition);
+      return prismaWeb3Client.cyberDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.SCROLL:
-      return prisma.scrollDelegatees.findFirst(condition);
+      return prismaWeb3Client.scrollDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.DERIVE:
-      return prisma.deriveDelegatees.findFirst(condition);
+      return prismaWeb3Client.deriveDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
-      return prisma.pguildDelegatees.findFirst(condition);
+      return prismaWeb3Client.pguildDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.BOOST:
-      return prisma.boostDelegatees.findFirst(condition);
+      return prismaWeb3Client.boostDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.XAI:
-      return prisma.xaiDelegatees.findFirst(condition);
+      return prismaWeb3Client.xaiDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.B3:
-      return prisma.b3Delegatees.findFirst(condition);
+      return prismaWeb3Client.b3Delegatees.findFirst(condition);
     case TENANT_NAMESPACES.DEMO:
-      return prisma.demoDelegatees.findFirst(condition);
+      return prismaWeb3Client.demoDelegatees.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -67,29 +67,29 @@ export function findAdvancedDelegatee({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prisma.optimismAdvancedDelegatees.findMany(condition);
+      return prismaWeb3Client.optimismAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.ENS:
-      return prisma.ensAdvancedDelegatees.findMany(condition);
+      return prismaWeb3Client.ensAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.ETHERFI:
-      return prisma.etherfiAdvancedDelegatees.findMany(condition);
+      return prismaWeb3Client.etherfiAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.UNISWAP:
-      return prisma.uniswapAdvancedDelegatees.findMany(condition);
+      return prismaWeb3Client.uniswapAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.CYBER:
-      return prisma.cyberAdvancedDelegatees.findMany(condition);
+      return prismaWeb3Client.cyberAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.SCROLL:
-      return prisma.scrollAdvancedDelegatees.findMany(condition);
+      return prismaWeb3Client.scrollAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.DERIVE:
-      return prisma.deriveAdvancedDelegatees.findMany(condition);
+      return prismaWeb3Client.deriveAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
-      return prisma.pguildAdvancedDelegatees.findMany(condition);
+      return prismaWeb3Client.pguildAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.BOOST:
-      return prisma.boostAdvancedDelegatees.findMany(condition);
+      return prismaWeb3Client.boostAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.XAI:
-      return prisma.xaiAdvancedDelegatees.findMany(condition);
+      return prismaWeb3Client.xaiAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.B3:
-      return prisma.b3AdvancedDelegatees.findMany(condition);
+      return prismaWeb3Client.b3AdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.DEMO:
-      return prisma.demoAdvancedDelegatees.findMany(condition);
+      return prismaWeb3Client.demoAdvancedDelegatees.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -111,29 +111,29 @@ export function findVotableSupply({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prisma.optimismVotableSupply.findFirst({});
+      return prismaWeb3Client.optimismVotableSupply.findFirst({});
     case TENANT_NAMESPACES.ENS:
-      return prisma.ensVotableSupply.findFirst({});
+      return prismaWeb3Client.ensVotableSupply.findFirst({});
     case TENANT_NAMESPACES.ETHERFI:
-      return prisma.etherfiVotableSupply.findFirst({});
+      return prismaWeb3Client.etherfiVotableSupply.findFirst({});
     case TENANT_NAMESPACES.UNISWAP:
-      return prisma.uniswapVotableSupply.findFirst({});
+      return prismaWeb3Client.uniswapVotableSupply.findFirst({});
     case TENANT_NAMESPACES.CYBER:
-      return prisma.cyberVotableSupply.findFirst({});
+      return prismaWeb3Client.cyberVotableSupply.findFirst({});
     case TENANT_NAMESPACES.SCROLL:
-      return prisma.scrollVotableSupply.findFirst({});
+      return prismaWeb3Client.scrollVotableSupply.findFirst({});
     case TENANT_NAMESPACES.DERIVE:
-      return prisma.deriveVotableSupply.findFirst(condition);
+      return prismaWeb3Client.deriveVotableSupply.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
-      return prisma.pguildVotableSupply.findFirst({});
+      return prismaWeb3Client.pguildVotableSupply.findFirst({});
     case TENANT_NAMESPACES.BOOST:
-      return prisma.boostVotableSupply.findFirst({});
+      return prismaWeb3Client.boostVotableSupply.findFirst({});
     case TENANT_NAMESPACES.XAI:
-      return prisma.xaiVotableSupply.findFirst(condition);
+      return prismaWeb3Client.xaiVotableSupply.findFirst(condition);
     case TENANT_NAMESPACES.B3:
-      return prisma.b3VotableSupply.findFirst({});
+      return prismaWeb3Client.b3VotableSupply.findFirst({});
     case TENANT_NAMESPACES.DEMO:
-      return prisma.demoVotableSupply.findFirst({});
+      return prismaWeb3Client.demoVotableSupply.findFirst({});
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -166,29 +166,29 @@ export function findProposalsQuery({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prisma.optimismProposals.findMany(condition);
+      return prismaWeb3Client.optimismProposals.findMany(condition);
     case TENANT_NAMESPACES.ENS:
-      return prisma.ensProposals.findMany(condition);
+      return prismaWeb3Client.ensProposals.findMany(condition);
     case TENANT_NAMESPACES.ETHERFI:
-      return prisma.etherfiProposals.findMany(condition);
+      return prismaWeb3Client.etherfiProposals.findMany(condition);
     case TENANT_NAMESPACES.UNISWAP:
-      return prisma.uniswapProposals.findMany(condition);
+      return prismaWeb3Client.uniswapProposals.findMany(condition);
     case TENANT_NAMESPACES.CYBER:
-      return prisma.cyberProposals.findMany(condition);
+      return prismaWeb3Client.cyberProposals.findMany(condition);
     case TENANT_NAMESPACES.SCROLL:
-      return prisma.scrollProposals.findMany(condition);
+      return prismaWeb3Client.scrollProposals.findMany(condition);
     case TENANT_NAMESPACES.DERIVE:
-      return prisma.deriveProposals.findMany(condition);
+      return prismaWeb3Client.deriveProposals.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
-      return prisma.pguildProposals.findMany(condition);
+      return prismaWeb3Client.pguildProposals.findMany(condition);
     case TENANT_NAMESPACES.BOOST:
-      return prisma.boostProposals.findMany(condition);
+      return prismaWeb3Client.boostProposals.findMany(condition);
     case TENANT_NAMESPACES.XAI:
-      return prisma.xaiProposals.findMany(condition);
+      return prismaWeb3Client.xaiProposals.findMany(condition);
     case TENANT_NAMESPACES.B3:
-      return prisma.b3Proposals.findMany(condition);
+      return prismaWeb3Client.b3Proposals.findMany(condition);
     case TENANT_NAMESPACES.DEMO:
-      return prisma.demoProposals.findMany(condition);
+      return prismaWeb3Client.demoProposals.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -209,29 +209,29 @@ export function findProposal({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prisma.optimismProposals.findFirst(condition);
+      return prismaWeb3Client.optimismProposals.findFirst(condition);
     case TENANT_NAMESPACES.ENS:
-      return prisma.ensProposals.findFirst(condition);
+      return prismaWeb3Client.ensProposals.findFirst(condition);
     case TENANT_NAMESPACES.ETHERFI:
-      return prisma.etherfiProposals.findFirst(condition);
+      return prismaWeb3Client.etherfiProposals.findFirst(condition);
     case TENANT_NAMESPACES.UNISWAP:
-      return prisma.uniswapProposals.findFirst(condition);
+      return prismaWeb3Client.uniswapProposals.findFirst(condition);
     case TENANT_NAMESPACES.CYBER:
-      return prisma.cyberProposals.findFirst(condition);
+      return prismaWeb3Client.cyberProposals.findFirst(condition);
     case TENANT_NAMESPACES.SCROLL:
-      return prisma.scrollProposals.findFirst(condition);
+      return prismaWeb3Client.scrollProposals.findFirst(condition);
     case TENANT_NAMESPACES.DERIVE:
-      return prisma.deriveProposals.findFirst(condition);
+      return prismaWeb3Client.deriveProposals.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
-      return prisma.pguildProposals.findFirst(condition);
+      return prismaWeb3Client.pguildProposals.findFirst(condition);
     case TENANT_NAMESPACES.BOOST:
-      return prisma.boostProposals.findFirst(condition);
+      return prismaWeb3Client.boostProposals.findFirst(condition);
     case TENANT_NAMESPACES.XAI:
-      return prisma.xaiProposals.findFirst(condition);
+      return prismaWeb3Client.xaiProposals.findFirst(condition);
     case TENANT_NAMESPACES.B3:
-      return prisma.b3Proposals.findFirst(condition);
+      return prismaWeb3Client.b3Proposals.findFirst(condition);
     case TENANT_NAMESPACES.DEMO:
-      return prisma.demoProposals.findFirst(condition);
+      return prismaWeb3Client.demoProposals.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -255,29 +255,29 @@ export function findProposalType({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prisma.optimismProposalTypes.findMany(condition);
+      return prismaWeb3Client.optimismProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.ENS:
-      return prisma.ensProposalTypes.findMany(condition);
+      return prismaWeb3Client.ensProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.ETHERFI:
-      return prisma.etherfiProposalTypes.findMany(condition);
+      return prismaWeb3Client.etherfiProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.UNISWAP:
-      return prisma.uniswapProposalTypes.findMany(condition);
+      return prismaWeb3Client.uniswapProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.CYBER:
-      return prisma.cyberProposalTypes.findMany(condition);
+      return prismaWeb3Client.cyberProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.SCROLL:
-      return prisma.scrollProposalTypes.findMany(condition);
+      return prismaWeb3Client.scrollProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.DERIVE:
-      return prisma.deriveProposalTypes.findMany(condition);
+      return prismaWeb3Client.deriveProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
-      return prisma.pguildProposalTypes.findMany(condition);
+      return prismaWeb3Client.pguildProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.BOOST:
-      return prisma.boostProposalTypes.findMany(condition);
+      return prismaWeb3Client.boostProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.XAI:
-      return prisma.xaiProposalTypes.findMany(condition);
+      return prismaWeb3Client.xaiProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.B3:
-      return prisma.b3ProposalTypes.findMany(condition);
+      return prismaWeb3Client.b3ProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.DEMO:
-      return prisma.demoProposalTypes.findMany(condition);
+      return prismaWeb3Client.demoProposalTypes.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -298,29 +298,29 @@ export function findVotes({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prisma.optimismVotes.findMany(condition);
+      return prismaWeb3Client.optimismVotes.findMany(condition);
     case TENANT_NAMESPACES.ENS:
-      return prisma.ensVotes.findMany(condition);
+      return prismaWeb3Client.ensVotes.findMany(condition);
     case TENANT_NAMESPACES.ETHERFI:
-      return prisma.etherfiVotes.findMany(condition);
+      return prismaWeb3Client.etherfiVotes.findMany(condition);
     case TENANT_NAMESPACES.UNISWAP:
-      return prisma.uniswapVotes.findMany(condition);
+      return prismaWeb3Client.uniswapVotes.findMany(condition);
     case TENANT_NAMESPACES.CYBER:
-      return prisma.cyberVotes.findMany(condition);
+      return prismaWeb3Client.cyberVotes.findMany(condition);
     case TENANT_NAMESPACES.SCROLL:
-      return prisma.scrollVotes.findMany(condition);
+      return prismaWeb3Client.scrollVotes.findMany(condition);
     case TENANT_NAMESPACES.DERIVE:
-      return prisma.deriveVotes.findMany(condition);
+      return prismaWeb3Client.deriveVotes.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
-      return prisma.pguildVotes.findMany(condition);
+      return prismaWeb3Client.pguildVotes.findMany(condition);
     case TENANT_NAMESPACES.BOOST:
-      return prisma.boostVotes.findMany(condition);
+      return prismaWeb3Client.boostVotes.findMany(condition);
     case TENANT_NAMESPACES.XAI:
-      return prisma.xaiVotes.findMany(condition);
+      return prismaWeb3Client.xaiVotes.findMany(condition);
     case TENANT_NAMESPACES.B3:
-      return prisma.b3Votes.findMany(condition);
+      return prismaWeb3Client.b3Votes.findMany(condition);
     case TENANT_NAMESPACES.DEMO:
-      return prisma.demoVotes.findMany(condition);
+      return prismaWeb3Client.demoVotes.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -344,29 +344,29 @@ export function findVotingPower({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prisma.optimismVotingPower.findFirst(condition);
+      return prismaWeb3Client.optimismVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.ENS:
-      return prisma.ensVotingPower.findFirst(condition);
+      return prismaWeb3Client.ensVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.ETHERFI:
-      return prisma.etherfiVotingPower.findFirst(condition);
+      return prismaWeb3Client.etherfiVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.UNISWAP:
-      return prisma.uniswapVotingPower.findFirst(condition);
+      return prismaWeb3Client.uniswapVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.CYBER:
-      return prisma.cyberVotingPower.findFirst(condition);
+      return prismaWeb3Client.cyberVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.SCROLL:
-      return prisma.scrollVotingPower.findFirst(condition);
+      return prismaWeb3Client.scrollVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.DERIVE:
-      return prisma.deriveVotingPower.findFirst(condition);
+      return prismaWeb3Client.deriveVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
-      return prisma.pguildVotingPower.findFirst(condition);
+      return prismaWeb3Client.pguildVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.BOOST:
-      return prisma.boostVotingPower.findFirst(condition);
+      return prismaWeb3Client.boostVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.XAI:
-      return prisma.xaiVotingPower.findFirst(condition);
+      return prismaWeb3Client.xaiVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.B3:
-      return prisma.b3VotingPower.findFirst(condition);
+      return prismaWeb3Client.b3VotingPower.findFirst(condition);
     case TENANT_NAMESPACES.DEMO:
-      return prisma.demoVotingPower.findFirst(condition);
+      return prismaWeb3Client.demoVotingPower.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -390,29 +390,29 @@ export function findAdvancedVotingPower({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prisma.optimismAdvancedVotingPower.findFirst(condition);
+      return prismaWeb3Client.optimismAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.ENS:
-      return prisma.ensAdvancedVotingPower.findFirst(condition);
+      return prismaWeb3Client.ensAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.ETHERFI:
-      return prisma.etherfiAdvancedVotingPower.findFirst(condition);
+      return prismaWeb3Client.etherfiAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.UNISWAP:
-      return prisma.uniswapAdvancedVotingPower.findFirst(condition);
+      return prismaWeb3Client.uniswapAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.CYBER:
-      return prisma.cyberAdvancedVotingPower.findFirst(condition);
+      return prismaWeb3Client.cyberAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.SCROLL:
-      return prisma.scrollAdvancedVotingPower.findFirst(condition);
+      return prismaWeb3Client.scrollAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.DERIVE:
-      return prisma.deriveAdvancedVotingPower.findFirst(condition);
+      return prismaWeb3Client.deriveAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
-      return prisma.pguildAdvancedVotingPower.findFirst(condition);
+      return prismaWeb3Client.pguildAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.BOOST:
-      return prisma.boostAdvancedVotingPower.findFirst(condition);
+      return prismaWeb3Client.boostAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.XAI:
-      return prisma.xaiAdvancedVotingPower.findFirst(condition);
+      return prismaWeb3Client.xaiAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.B3:
-      return prisma.b3AdvancedVotingPower.findFirst(condition);
+      return prismaWeb3Client.b3AdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.DEMO:
-      return prisma.demoAdvancedVotingPower.findFirst(condition);
+      return prismaWeb3Client.demoAdvancedVotingPower.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -433,29 +433,29 @@ export async function findStakedDeposit({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prisma.optimismStakedDeposits.findFirst(condition);
+      return prismaWeb3Client.optimismStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.ENS:
-      return prisma.ensStakedDeposits.findFirst(condition);
+      return prismaWeb3Client.ensStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.ETHERFI:
-      return prisma.etherfiStakedDeposits.findFirst(condition);
+      return prismaWeb3Client.etherfiStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.UNISWAP:
-      return prisma.uniswapStakedDeposits.findFirst(condition);
+      return prismaWeb3Client.uniswapStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.CYBER:
-      return prisma.cyberStakedDeposits.findFirst(condition);
+      return prismaWeb3Client.cyberStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.SCROLL:
-      return prisma.scrollStakedDeposits.findFirst(condition);
+      return prismaWeb3Client.scrollStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.DERIVE:
-      return prisma.deriveStakedDeposits.findFirst(condition);
+      return prismaWeb3Client.deriveStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
-      return prisma.pguildStakedDeposits.findFirst(condition);
+      return prismaWeb3Client.pguildStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.BOOST:
-      return prisma.boostStakedDeposits.findFirst(condition);
+      return prismaWeb3Client.boostStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.XAI:
-      return prisma.xaiStakedDeposits.findFirst(condition);
+      return prismaWeb3Client.xaiStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.B3:
-      return prisma.b3StakedDeposits.findFirst(condition);
+      return prismaWeb3Client.b3StakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.DEMO:
-      return prisma.demoStakedDeposits.findFirst(condition);
+      return prismaWeb3Client.demoStakedDeposits.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -488,29 +488,29 @@ export function findStakedDeposits({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prisma.optimismStakedDeposits.findMany(condition);
+      return prismaWeb3Client.optimismStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.ENS:
-      return prisma.ensStakedDeposits.findMany(condition);
+      return prismaWeb3Client.ensStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.ETHERFI:
-      return prisma.etherfiStakedDeposits.findMany(condition);
+      return prismaWeb3Client.etherfiStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.UNISWAP:
-      return prisma.uniswapStakedDeposits.findMany(condition);
+      return prismaWeb3Client.uniswapStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.CYBER:
-      return prisma.cyberStakedDeposits.findMany(condition);
+      return prismaWeb3Client.cyberStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.SCROLL:
-      return prisma.scrollStakedDeposits.findMany(condition);
+      return prismaWeb3Client.scrollStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.DERIVE:
-      return prisma.deriveStakedDeposits.findMany(condition);
+      return prismaWeb3Client.deriveStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
-      return prisma.pguildStakedDeposits.findMany(condition);
+      return prismaWeb3Client.pguildStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.BOOST:
-      return prisma.boostStakedDeposits.findMany(condition);
+      return prismaWeb3Client.boostStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.XAI:
-      return prisma.xaiStakedDeposits.findMany(condition);
+      return prismaWeb3Client.xaiStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.B3:
-      return prisma.b3StakedDeposits.findMany(condition);
+      return prismaWeb3Client.b3StakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.DEMO:
-      return prisma.demoStakedDeposits.findMany(condition);
+      return prismaWeb3Client.demoStakedDeposits.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -532,29 +532,29 @@ export function getProposalsCount({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prisma.optimismProposals.count(condition);
+      return prismaWeb3Client.optimismProposals.count(condition);
     case TENANT_NAMESPACES.ENS:
-      return prisma.ensProposals.count(condition);
+      return prismaWeb3Client.ensProposals.count(condition);
     case TENANT_NAMESPACES.ETHERFI:
-      return prisma.etherfiProposals.count(condition);
+      return prismaWeb3Client.etherfiProposals.count(condition);
     case TENANT_NAMESPACES.UNISWAP:
-      return prisma.uniswapProposals.count(condition);
+      return prismaWeb3Client.uniswapProposals.count(condition);
     case TENANT_NAMESPACES.CYBER:
-      return prisma.cyberProposals.count(condition);
+      return prismaWeb3Client.cyberProposals.count(condition);
     case TENANT_NAMESPACES.SCROLL:
-      return prisma.scrollProposals.count(condition);
+      return prismaWeb3Client.scrollProposals.count(condition);
     case TENANT_NAMESPACES.DERIVE:
-      return prisma.deriveProposals.count(condition);
+      return prismaWeb3Client.deriveProposals.count(condition);
     case TENANT_NAMESPACES.PGUILD:
-      return prisma.pguildProposals.count(condition);
+      return prismaWeb3Client.pguildProposals.count(condition);
     case TENANT_NAMESPACES.BOOST:
-      return prisma.boostProposals.count(condition);
+      return prismaWeb3Client.boostProposals.count(condition);
     case TENANT_NAMESPACES.XAI:
-      return prisma.xaiProposals.count(condition);
+      return prismaWeb3Client.xaiProposals.count(condition);
     case TENANT_NAMESPACES.B3:
-      return prisma.b3Proposals.count(condition);
+      return prismaWeb3Client.b3Proposals.count(condition);
     case TENANT_NAMESPACES.DEMO:
-      return prisma.demoProposals.count(condition);
+      return prismaWeb3Client.demoProposals.count(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }

@@ -1,6 +1,6 @@
 import { parseProposal } from "@/lib/proposalUtils";
 import { cache } from "react";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalPayload } from "./proposal";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
@@ -29,7 +29,7 @@ async function getNeedsMyVoteProposals(address: string) {
     const prodDataOnly =
       process.env.NEXT_PUBLIC_AGORA_ENV === "prod" ? `AND contract = $3` : "";
 
-    const proposals = await prisma.$queryRawUnsafe<ProposalPayload[]>(
+    const proposals = await prismaWeb3Client.$queryRawUnsafe<ProposalPayload[]>(
       `
         SELECT p.*
         FROM (

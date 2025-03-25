@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import verifyMessage from "@/lib/serverVerifyMessage";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import {
   MetricsBallotSubmission,
   ProjectsBallotSubmission,
@@ -38,7 +38,7 @@ async function submitBallotForAddress({
     throw new Error("Invalid signature");
   }
 
-  const submission = await prisma.ballotSubmittions.upsert({
+  const submission = await prismaWeb2Client.ballotSubmittions.upsert({
     where: {
       address_round: {
         address,

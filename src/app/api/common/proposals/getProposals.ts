@@ -6,7 +6,7 @@ import {
   PaginationParams,
 } from "@/app/lib/pagination";
 import { parseProposal } from "@/lib/proposalUtils";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
@@ -150,7 +150,7 @@ async function getProposalTypes() {
 async function getDraftProposals(address: `0x${string}`) {
   return withMetrics("getDraftProposals", async () => {
     const { contracts } = Tenant.current();
-    return await prisma.proposalDraft.findMany({
+    return await prismaWeb2Client.proposalDraft.findMany({
       where: {
         author_address: address,
         chain_id: contracts.governor.chain.id,
@@ -174,7 +174,7 @@ async function getDraftProposals(address: `0x${string}`) {
 async function getDraftProposalForSponsor(address: `0x${string}`) {
   return withMetrics("getDraftProposalForSponsor", async () => {
     const { contracts } = Tenant.current();
-    return await prisma.proposalDraft.findMany({
+    return await prismaWeb2Client.proposalDraft.findMany({
       where: {
         sponsor_address: address,
         chain_id: contracts.governor.chain.id,
