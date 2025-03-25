@@ -3,10 +3,13 @@ import { AnalyticsEvent } from "./types";
 
 const { contracts, slug, ui } = Tenant.current();
 
+const isBiMetricsCaptureEnabled =
+  process.env.NEXT_PUBLIC_ENABLE_BI_METRICS_CAPTURE === "true";
 // If a tenant explicitly sets analytics to disabled, we don't track events
-const hasAnalyticsEnabled = ui.toggle("analytics")
-  ? ui.toggle("analytics")?.enabled
-  : true;
+// Also respect the ENABLE_BI_METRICS_CAPTURE environment variable
+const hasAnalyticsEnabled =
+  isBiMetricsCaptureEnabled &&
+  (ui.toggle("analytics") ? ui.toggle("analytics")?.enabled : true);
 
 interface AnalyticsService {
   trackEvent(event: any): Promise<void>;

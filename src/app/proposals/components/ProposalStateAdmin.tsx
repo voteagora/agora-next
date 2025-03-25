@@ -191,7 +191,12 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.DEMO:
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.B3:
-      return <AgoraGovExecute proposal={proposal} />;
+      return (
+        <div className="flex flex-row gap-2">
+          <AgoraGovCancel proposal={proposal} />
+          <AgoraGovExecute proposal={proposal} />
+        </div>
+      );
 
     case TENANT_NAMESPACES.OPTIMISM:
       // Check if proposal was created after the execution launch date

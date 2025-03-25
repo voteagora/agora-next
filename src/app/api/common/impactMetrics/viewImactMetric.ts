@@ -1,5 +1,5 @@
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 
 const viewImpactMetric = async ({
   addressOrENSName,
@@ -19,7 +19,7 @@ async function viewImpactMetricForAddress({
   address: string;
   metricId: string;
 }) {
-  return prisma.metrics_views.upsert({
+  return prismaWeb2Client.metrics_views.upsert({
     where: {
       metric_id_address: {
         metric_id: metricId,

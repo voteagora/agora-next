@@ -5,7 +5,7 @@ export default function DelegateStatement({ statement }) {
   const sanitizedStatement = sanitizeContent(statement);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       <h2 className="text-2xl font-bold text-primary">Delegate Statement</h2>
       <Markdown content={sanitizedStatement} />
     </div>

@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { fetchBallot } from "./getBallots";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 
 export enum DistributionStrategy {
   IMPACT_GROUPS = "IMPACT_GROUPS",
@@ -38,15 +38,17 @@ async function applyDistributionStrategyForAddress({
   address: string;
 }) {
   // Get projects allocation
-  const projectsAllocation = await prisma.projectAllocations.findMany({
-    where: {
-      round: roundId,
-      address,
-    },
-    orderBy: {
-      rank: "desc",
-    },
-  });
+  const projectsAllocation = await prismaWeb2Client.projectAllocations.findMany(
+    {
+      where: {
+        round: roundId,
+        address,
+      },
+      orderBy: {
+        rank: "desc",
+      },
+    }
+  );
 
   const n = projectsAllocation.reduce(
     (acc, project) => acc + (project.impact ? 1 : 0),
@@ -162,7 +164,7 @@ async function applyDistributionStrategyForAddress({
   // Save projects allocations
   await Promise.all(
     normalizeAllocation(newProjectsAllocation).map((p) =>
-      prisma.projectAllocations.update({
+      prismaWeb2Client.projectAllocations.update({
         where: {
           address_round_project_id: {
             project_id: p.project_id,

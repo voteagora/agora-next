@@ -1,12 +1,8 @@
 "use client";
 
 import { AbiCoder } from "ethers";
-import { useMemo, useState } from "react";
-import {
-  LoadingVote,
-  NoStatementView,
-  SuccessMessage,
-} from "../CastVoteDialog/CastVoteDialog";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { LoadingVote, NoStatementView } from "../CastVoteDialog/CastVoteDialog";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { CheckIcon } from "lucide-react";
 import { ParsedProposalData } from "@/lib/proposalUtils";
@@ -177,14 +173,16 @@ export function ApprovalCastVoteDialog({
     setEncodedParams(encoded);
   }, [selectedOptions, abstain]);
 
-  const newVote = {
-    support: abstain ? "ABSTAIN" : "FOR",
-    reason: reason,
-    params: selectedOptions.map(
-      (option) => proposalData.options[option].description
-    ),
-    weight: votingPower.directVP || votingPower.advancedVP,
-  };
+  const newVote = useMemo(() => {
+    return {
+      support: abstain ? "ABSTAIN" : "FOR",
+      reason: reason,
+      params: selectedOptions.map(
+        (option) => proposalData.options[option].description
+      ),
+      weight: votingPower.directVP || votingPower.advancedVP,
+    };
+  }, [abstain, reason, selectedOptions, proposalData, votingPower]);
 
   const { againstPercentage, forPercentage, endsIn, options, totalOptions } =
     calculateVoteMetadata({
@@ -193,7 +191,7 @@ export function ApprovalCastVoteDialog({
       newVote,
     });
 
-  const openShareVoteDialog = () => {
+  const openShareVoteDialog = useCallback(() => {
     openDialog({
       className: "sm:w-[32rem]",
       type: "SHARE_VOTE",
@@ -221,7 +219,26 @@ export function ApprovalCastVoteDialog({
         ],
       },
     });
-  };
+  }, [
+    openDialog,
+    proposal,
+    proposalData,
+    selectedOptions,
+    againstPercentage,
+    forPercentage,
+    endsIn,
+    abstain,
+    reason,
+    newVote,
+    options,
+    totalOptions,
+  ]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      openShareVoteDialog();
+    }
+  }, [isSuccess, openShareVoteDialog]);
 
   if (inReviewStep) {
     return (
@@ -233,7 +250,6 @@ export function ApprovalCastVoteDialog({
         votingPower={vpToDisplay}
         onClose={() => {
           setInReviewStep(false);
-          openShareVoteDialog();
         }}
       />
     );
@@ -242,9 +258,6 @@ export function ApprovalCastVoteDialog({
   return (
     <div style={{ transformStyle: "preserve-3d" }}>
       {hasStatement && isLoading && <LoadingVote />}
-      {hasStatement && isSuccess && (
-        <SuccessMessage closeDialog={closeDialog} data={data} />
-      )}
       {hasStatement && isError && <p>Something went wrong</p>}
       {!hasStatement && <NoStatementView closeDialog={closeDialog} />}
       {hasStatement && !isLoading && !isSuccess && (

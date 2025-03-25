@@ -7,6 +7,9 @@ import ProposalTransactionDisplay from "../ApprovedTransactions/ProposalTransact
 import ProposalChart from "../ProposalChart/ProposalChart";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Markdown from "@/components/shared/Markdown/Markdown";
+import Tenant from "@/lib/tenant/tenant";
+
+const { contracts } = Tenant.current();
 
 export default function ProposalDescription({
   proposal,
@@ -68,6 +71,8 @@ export default function ProposalDescription({
             calldatas={option.calldatas}
             values={option.values}
             executedTransactionHash={proposal.executedTransactionHash}
+            network={contracts.governor.chain.name}
+            signatures={option.signatures}
           />
         ) : (
           <ApprovedTransactions

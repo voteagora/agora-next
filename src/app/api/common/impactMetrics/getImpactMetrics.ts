@@ -1,8 +1,8 @@
 import { cache } from "react";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 
 async function getImpactMetricsApi(roundId: string) {
-  const impactMetrics = await prisma.$queryRawUnsafe<
+  const impactMetrics = await prismaWeb2Client.$queryRawUnsafe<
     {
       metric_id: number;
       name: string;
@@ -108,7 +108,7 @@ async function getImpactMetricsApi(roundId: string) {
 }
 
 async function getImpactMetricApi(impactMetricId: string, roundId: string) {
-  const impactMetric = await prisma.$queryRawUnsafe<
+  const impactMetric = await prismaWeb2Client.$queryRawUnsafe<
     {
       metric_id: number;
       name: string;

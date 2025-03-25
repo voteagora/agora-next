@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchBallot } from "./getBallots";
 import { autobalanceAllocations } from "./autobalance";
 
@@ -30,7 +30,7 @@ async function updateBallotMetricForAddress({
   address: string;
 }) {
   // Create ballot if it doesn't exist
-  await prisma.ballots.upsert({
+  await prismaWeb2Client.ballots.upsert({
     where: {
       address_round: {
         address,
@@ -47,7 +47,7 @@ async function updateBallotMetricForAddress({
   });
 
   // Add or update allocation
-  await prisma.allocations.upsert({
+  await prismaWeb2Client.allocations.upsert({
     where: {
       address_round_metric_id: {
         metric_id: data.metric_id,
@@ -94,7 +94,7 @@ async function deleteBallotMetricForAddress({
   roundId: number;
   address: string;
 }) {
-  await prisma.allocations.deleteMany({
+  await prismaWeb2Client.allocations.deleteMany({
     where: {
       metric_id: metricId,
       address,
@@ -113,7 +113,7 @@ async function autobalanceMetricsAllocations(
   metricToSkip: string
 ) {
   const allocations = (
-    await prisma.allocations.findMany({
+    await prismaWeb2Client.allocations.findMany({
       where: {
         address,
         round: roundId,
@@ -132,7 +132,7 @@ async function autobalanceMetricsAllocations(
 
   await Promise.all(
     autobalancedAllocations.map(async (allocation) => {
-      await prisma.allocations.update({
+      await prismaWeb2Client.allocations.update({
         where: {
           address_round_metric_id: {
             metric_id: allocation.id,
@@ -172,7 +172,7 @@ async function updateBallotOsMultiplierForAddress({
   roundId: number;
   address: string;
 }) {
-  await prisma.ballots.upsert({
+  await prismaWeb2Client.ballots.upsert({
     where: {
       address_round: {
         address,
@@ -212,7 +212,7 @@ async function updateBallotOsOnlyForAddress({
   roundId: number;
   address: string;
 }) {
-  await prisma.ballots.upsert({
+  await prismaWeb2Client.ballots.upsert({
     where: {
       address_round: {
         address,
@@ -256,7 +256,7 @@ async function updateBallotBudgetForAddress({
   budget: number;
   category: string;
 }) {
-  await prisma.ballots.upsert({
+  await prismaWeb2Client.ballots.upsert({
     where: {
       address_round: {
         address,

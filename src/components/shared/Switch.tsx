@@ -10,9 +10,10 @@ type Props = {
 };
 
 const optionStyle =
-  "p-[5px] flex-1 text-center cursor-pointer rounded text-primary/30 font-medium hover:bg-line hover:font-semibold transition-all";
+  "p-[5px] flex-1 text-center cursor-pointer rounded font-medium hover:bg-neutral hover:font-semibold text-primary/30 transition-colors transition-shadow";
 
-const selectedStyle = "bg-tertiary/20 text-secondary font-semibold";
+const selectedStyle =
+  "text-primary font-semibold border border-line shadow-switcher transition-colors transition-shadow bg-neutral";
 
 export function Switch({
   onSelectionChanged,
@@ -23,7 +24,7 @@ export function Switch({
   return (
     <div
       className={cn(
-        "flex text-sm flex-row gap-2 rounded-md border border-line overflow-hidden w-full p-1",
+        "flex text-sm flex-row gap-2 rounded-md border border-line overflow-hidden w-full p-1 bg-line/50",
         className
       )}
     >
@@ -34,9 +35,7 @@ export function Switch({
             e.preventDefault();
             onSelectionChanged(option);
           }}
-          className={`${optionStyle}  ${
-            selection === option ? selectedStyle : ""
-          }`}
+          className={cn(optionStyle, selection === option && selectedStyle)}
         >
           {option}
         </div>
