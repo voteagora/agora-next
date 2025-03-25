@@ -64,7 +64,7 @@ const ProposalTransactionDisplay = ({
     state?: string | null;
   };
   network?: string;
-  proposal: Proposal;
+  proposal?: Proposal;
 }) => {
   const [collapsed, setCollapsed] = useState(true);
   const [simulationReport, setSimulationReport] =
@@ -96,6 +96,9 @@ const ProposalTransactionDisplay = ({
 
   const simulateTransactions = async () => {
     try {
+      if (!proposal) {
+        throw new Error("Proposal is required");
+      }
       setIsSimulating(true);
       const report = await checkExistingProposal({
         existingProposal: proposal,
