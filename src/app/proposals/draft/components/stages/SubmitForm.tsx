@@ -94,6 +94,8 @@ const Actions = memo(
   }
 );
 
+Actions.displayName = "Actions";
+
 const SubmitForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const methods = useForm({});
   return (
@@ -107,5 +109,6 @@ const SubmitForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
     </FormProvider>
   );
 };
+SubmitForm.displayName = "SubmitForm";
 
 export default SubmitForm;

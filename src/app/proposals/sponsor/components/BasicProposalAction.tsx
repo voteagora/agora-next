@@ -101,5 +101,5 @@ const BasicProposalAction = memo(
     return prevProps.draftProposal.id === nextProps.draftProposal.id;
   }
 );
-
+BasicProposalAction.displayName = "BasicProposalAction";
 export default BasicProposalAction;
