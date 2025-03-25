@@ -6,6 +6,7 @@ import {
   getBlockScanAddress,
   shortAddress,
   cn,
+  getFunctionSignature,
 } from "@/lib/utils";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import {
@@ -19,6 +20,14 @@ import { useTransactionDecoding } from "@/hooks/useTransactionDecoding";
 import ENSName from "@/components/shared/ENSName";
 import Tenant from "@/lib/tenant/tenant";
 import { formatUnits } from "viem";
+import { StructuredSimulationReport } from "@/lib/seatbelt/types";
+import { toast } from "react-hot-toast";
+import { checkExistingProposal } from "@/lib/seatbelt/checkProposal";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import { TENDERLY_VALID_CHAINS } from "@/app/proposals/draft/components/BasicProposalForm";
+import { StructuredReport } from "@/components/Simulation/StructuredReport";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { Button } from "@/components/ui/button";
 
 const { contracts, token } = Tenant.current();
 
@@ -42,6 +51,7 @@ const ProposalTransactionDisplay = ({
   simulationDetails,
   network = "mainnet",
   signatures,
+  proposal,
 }: {
   targets: string[];
   calldatas: `0x${string}`[];
@@ -54,9 +64,14 @@ const ProposalTransactionDisplay = ({
     state?: string | null;
   };
   network?: string;
+  proposal: Proposal;
 }) => {
   const [collapsed, setCollapsed] = useState(true);
+  const [simulationReport, setSimulationReport] =
+    useState<StructuredSimulationReport | null>(null);
   const [viewMode, setViewMode] = useState<"summary" | "raw">("summary");
+  const [isSimulating, setIsSimulating] = useState(false);
+  const openDialog = useOpenDialog();
 
   if (targets.length === 0) {
     return (
@@ -79,8 +94,33 @@ const ProposalTransactionDisplay = ({
     values.length
   );
 
+  const simulateTransactions = async () => {
+    try {
+      setIsSimulating(true);
+      const report = await checkExistingProposal({
+        existingProposal: proposal,
+      });
+
+      setSimulationReport(report?.structuredReport ?? null);
+
+      openDialog({
+        type: "SIMULATION_REPORT",
+        params: {
+          report: report?.structuredReport ?? null,
+        },
+        className: "sm:w-[40rem]",
+      });
+    } catch (e) {
+      console.error(e);
+      toast.error("Error simulating transactions");
+    } finally {
+      setIsSimulating(false);
+    }
+  };
+
   return (
     <div>
+      {simulationReport && <StructuredReport report={simulationReport} />}
       <div className="flex flex-col border rounded-t-lg border-line text-xs text-primary break-words overflow-hidden">
         <div className="w-full flex items-center justify-between mb-2 border-b border-line px-4 py-3">
           <div className="flex items-center gap-2">
@@ -95,6 +135,18 @@ const ProposalTransactionDisplay = ({
                 <ArrowTopRightOnSquareIcon className="w-4 h-4" />
               </a>
             )}
+            {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
+              !!proposal?.id && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={simulateTransactions}
+                  disabled={isSimulating}
+                  className="flex items-center gap-2"
+                >
+                  {isSimulating ? "Simulating..." : "Simulate transactions"}
+                </Button>
+              )}
           </div>
           <div className="flex">
             <button
@@ -997,31 +1049,6 @@ function formatFunctionName(name: string): string {
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase())
     .trim();
-}
-
-function getFunctionSignature(decodedData: any): string | null {
-  if (
-    !decodedData ||
-    !decodedData.function ||
-    decodedData.function === "unknown"
-  ) {
-    return null;
-  }
-
-  try {
-    let signature = `${decodedData.function}(`;
-    const paramTypes = Object.entries(decodedData.parameters).map(
-      ([_, param]: [string, any]) => {
-        return param.type || "unknown";
-      }
-    );
-    signature += paramTypes.join(",");
-    signature += ")";
-
-    return signature;
-  } catch (error) {
-    return null;
-  }
 }
 
 export default ProposalTransactionDisplay;
