@@ -2,7 +2,7 @@
 
 import FormCard from "./form/FormCard";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
-import { useAccount, useBlockNumber, useReadContract } from "wagmi";
+import { useAccount, useBlockNumber } from "wagmi";
 import { formatUnits } from "viem";
 import AvatarAddress from "./AvatarAdress";
 import { formatFullDate } from "@/lib/utils";

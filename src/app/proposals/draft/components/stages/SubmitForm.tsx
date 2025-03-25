@@ -1,8 +1,8 @@
 "use client";
 
-import { memo, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DraftPreview from "../DraftPreview";
-import { useAccount, useBlockNumber, useReadContract } from "wagmi";
+import { useAccount, useBlockNumber } from "wagmi";
 import RequestSponsorshipForm from "../RequestSponsorshipForm";
 import { useForm, FormProvider } from "react-hook-form";
 import SponsorActions from "../../../sponsor/components/SponsorActions";
@@ -13,7 +13,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { UpdateVotableSupplyOracle } from "@/app/proposals/components/UpdateVotableSupplyOracle";
 
-const Actions = memo(({ proposalDraft }: { proposalDraft: DraftProposal }) => {
+const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
@@ -86,7 +86,7 @@ const Actions = memo(({ proposalDraft }: { proposalDraft: DraftProposal }) => {
       )}
     </div>
   );
-});
+};
 
 const SubmitForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const methods = useForm({});
