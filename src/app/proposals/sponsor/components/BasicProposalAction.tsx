@@ -22,6 +22,19 @@ const BasicProposalAction = ({
   const { inputData } = getInputData(draftProposal);
   const [proposalCreated, setProposalCreated] = useState(false);
 
+  /**
+   * Notes on proposal methods per governor:
+   * ENS (OZ gov): propose(address[] targets, uint256[] values, string[] calldatas, string description)
+   * OP (Agora gov): proposeWithModule()
+   * Cyber: tbd
+   * NewDAO: tbd
+   * Linea: tbd
+   * Uni: propose(address[] targets, uint256[] values, string[] signatures, bytes[] calldatas, string description)
+   */
+
+  // TODO: input data contains proposal type, but I don't think OZ based proposals have proposal type
+  // So we need to check which type of governor we are dealing with, based on the tenant, and act accordingly.
+
   const {
     data: config,
     isError: onPrepareError,
