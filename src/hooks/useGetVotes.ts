@@ -41,6 +41,7 @@ export const useGetVotes = ({
 
       return votes;
     },
+    refetchOnWindowFocus: false,
   });
 
   return { ...res };
