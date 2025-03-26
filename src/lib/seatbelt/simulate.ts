@@ -6,7 +6,7 @@ import { toUtf8Bytes } from "@ethersproject/strings";
 
 import Tenant from "../tenant/tenant";
 import { getPublicClient } from "../viem";
-import { GOVERNOR_TYPE } from "../constants";
+import { GOVERNOR_TYPE, TIMELOCK_TYPE } from "../constants";
 import {
   ProposalData,
   ProposalEvent,
@@ -42,6 +42,7 @@ const provider = tenant.contracts.governor.provider;
 const governor = tenant.contracts.governor;
 const timelock = tenant.contracts.timelock;
 const governorType = tenant.contracts.governorType;
+const timelockType = tenant.contracts.timelockType;
 const votingToken = tenant.contracts.token;
 
 type TenderlyError = {
@@ -425,7 +426,9 @@ export async function simulateProposed(
     governorType === GOVERNOR_TYPE.BRAVO
       ? BigInt(latestBlock.timestamp) +
         (simBlock - BigInt(proposal.endBlock!)) * 12n
-      : BigInt(proposal.endTime!.getTime() + 1);
+      : timelockType === TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL
+        ? BigInt(proposal.endTime!.getTime() / 1000 + 1)
+        : BigInt(proposal.endTime!.getTime() + 1);
 
   const eta = simTimestamp; // set proposal eta to be equal to the timestamp we simulate at
 

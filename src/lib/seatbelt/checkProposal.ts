@@ -134,7 +134,7 @@ export async function checkExistingProposal({
   const { targets, signatures: sigs, calldatas, values } = option;
   const proposalEvent = {
     targets: targets.map((target) => target as `0x${string}`),
-    values: values.map((value) => BigInt(value.toString())),
+    values: values.map((value) => BigInt(value)),
     signatures: sigs,
     calldatas: calldatas.map((data) => data as `0x${string}`),
     id: BigInt(existingProposal.id),
