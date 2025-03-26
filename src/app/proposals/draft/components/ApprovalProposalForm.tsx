@@ -150,7 +150,7 @@ const TransactionFormItem = ({
           {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
             (simulationState === "INVALID" ? (
               <a
-                href={`https://dashboard.tenderly.co/shared/simulation/${simulationId}`}
+                href={`https://tdly.co/shared/simulation/${simulationId}`}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -164,7 +164,7 @@ const TransactionFormItem = ({
               </span>
             ) : (
               <a
-                href={`https://dashboard.tenderly.co/shared/simulation/${simulationId}`}
+                href={`https://tdly.co/shared/simulation/${simulationId}`}
                 target="_blank"
                 rel="noreferrer"
                 className="bg-green-100 text-positive px-2 py-1 rounded-lg text-xs font-semibold"
