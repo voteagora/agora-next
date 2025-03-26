@@ -4,7 +4,7 @@ import {
   paginateResult,
   PaginationParams,
 } from "@/app/lib/pagination";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { DaoSlug } from "@prisma/client";
 import { Changelog } from "./changelog";
 
@@ -16,7 +16,7 @@ async function getChangelogsForDAO({
   pagination: PaginationParams;
 }): Promise<PaginatedResult<Changelog[]>> {
   const getChangelogsQuery = async (skip: number, take: number) => {
-    return prisma.changelog.findMany({
+    return prismaWeb2Client.changelog.findMany({
       where: {
         dao_slug: daoSlug,
       },

@@ -2,9 +2,10 @@
 
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
-import { useSearchParams } from "next/navigation";
 import DelegateStatement from "./DelegateStatement";
 import { Delegate } from "@/app/api/common/delegates/delegate";
+import { useDelegateStatementStore } from "@/stores/delegateStatement";
+import { useEffect } from "react";
 
 interface Props {
   delegate: Delegate;
@@ -13,14 +14,26 @@ interface Props {
 export default function DelegateStatementContainer({ delegate }: Props) {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
+  const showSuccessMessage = useDelegateStatementStore(
+    (state) => state.showSaveSuccess
+  );
+  const setSaveSuccess = useDelegateStatementStore(
+    (state) => state.setSaveSuccess
+  );
 
   const delegateStatement = (
     delegate?.statement?.payload as { delegateStatement: string }
   )?.delegateStatement;
 
-  const searchParams = useSearchParams();
-  const dssave = searchParams ? searchParams.get("dssave") : null;
-  const showSuccessMessage = dssave === "true";
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      setSaveSuccess(false);
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [setSaveSuccess]);
 
   return (
     <>

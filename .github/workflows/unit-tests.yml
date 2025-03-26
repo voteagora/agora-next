@@ -8,6 +8,12 @@ on:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
+
+    env:
+      READ_WRITE_WEB2_DATABASE_URL_DEV: ${{ secrets.READ_WRITE_WEB2_DATABASE_URL_DEV }}
+      READ_ONLY_WEB3_DATABASE_URL_DEV: ${{ secrets.READ_ONLY_WEB3_DATABASE_URL_DEV }}
+      NEXT_PUBLIC_AGORA_ENV: "dev"
+
     steps:
       - uses: actions/checkout@v4
 

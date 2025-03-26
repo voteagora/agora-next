@@ -7,10 +7,14 @@ import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { AlchemyProvider } from "ethers";
+import { AlchemyProvider, JsonRpcProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
-import { DELEGATION_MODEL } from "@/lib/constants";
+import {
+  DELEGATION_MODEL,
+  GOVERNOR_TYPE,
+  TIMELOCK_TYPE,
+} from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -33,9 +37,13 @@ export const ensTenantContractConfig = ({
     ? "0xFe89cc7aBB2C4183683ab71653C4cdc9B02D44b7"
     : "0x1E9BE5E89AE5ccBf047477Ac01D3d4b0eBFB328e";
 
-  const provider = isProd
-    ? new AlchemyProvider("mainnet", alchemyId)
-    : new AlchemyProvider("sepolia", alchemyId);
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : isProd
+      ? new AlchemyProvider("mainnet", alchemyId)
+      : new AlchemyProvider("sepolia", alchemyId);
 
   const chain = isProd ? mainnet : sepolia;
 
@@ -66,5 +74,7 @@ export const ensTenantContractConfig = ({
     }),
 
     delegationModel: DELEGATION_MODEL.FULL,
+    governorType: GOVERNOR_TYPE.ENS,
+    timelockType: TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL,
   };
 };

@@ -1,4 +1,4 @@
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import SponsorForm from "../components/SponsorForm";
 import Image from "next/image";
 import { icons } from "@/icons/icons";
@@ -9,7 +9,7 @@ import ArchivedDraftProposal from "../../draft/components/ArchivedDraftProposal"
 import { DraftProposal } from "../../../proposals/draft/types";
 
 const getDraftProposal = async (id: number) => {
-  const draftProposal = await prisma.proposalDraft.findUnique({
+  const draftProposal = await prismaWeb2Client.proposalDraft.findUnique({
     where: {
       id: id,
     },

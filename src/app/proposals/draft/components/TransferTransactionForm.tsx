@@ -13,6 +13,7 @@ import {
 } from "./../schemas/DraftProposalSchema";
 import Tenant from "@/lib/tenant/tenant";
 import { EthereumAddress } from "../types";
+import { TIMELOCK_TYPE } from "@/lib/constants";
 
 const transferABI = [
   {
@@ -76,7 +77,13 @@ const TransferTransactionForm = ({
         tenant.contracts.token.address as EthereumAddress
       );
       setValue(`${name}.${index}.value`, "0");
-      setValue(`${name}.${index}.signature`, "transfer(address,uint256)");
+      setValue(
+        `${name}.${index}.signature`,
+        tenant.contracts.timelockType !==
+          TIMELOCK_TYPE.TIMELOCK_NO_ACCESS_CONTROL
+          ? "transfer(address,uint256)"
+          : ""
+      );
     }
   }, [recipient, amount, setValue]);
 

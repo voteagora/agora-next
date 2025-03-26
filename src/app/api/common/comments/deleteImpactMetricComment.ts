@@ -1,12 +1,12 @@
 import { cache } from "react";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 
 async function deleteImpactMetricCommentApi({
   commentId,
 }: {
   commentId: number;
 }) {
-  const deletedComment = await prisma.metrics_comments.delete({
+  const deletedComment = await prismaWeb2Client.metrics_comments.delete({
     where: {
       comment_id: commentId,
     },

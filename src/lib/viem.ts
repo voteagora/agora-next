@@ -1,4 +1,10 @@
-import { Chain, createPublicClient, createWalletClient, custom } from "viem";
+import {
+  Chain,
+  createPublicClient,
+  createWalletClient,
+  custom,
+  http,
+} from "viem";
 import { cyber, mainnet, optimism, scroll, sepolia } from "viem/chains";
 
 import "viem/window";
@@ -10,44 +16,54 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 
 export const getWalletClient = (chainId: number) => {
+  let transport;
+
+  const FORK_NODE_URL = process.env.NEXT_PUBLIC_FORK_NODE_URL;
+
+  if (FORK_NODE_URL) {
+    transport = http(FORK_NODE_URL);
+  } else {
+    transport = custom(window.ethereum!);
+  }
+
   switch (chainId) {
     case mainnet.id:
       return createWalletClient({
         chain: mainnet,
-        transport: custom(window.ethereum!),
+        transport,
       });
     case sepolia.id:
       return createWalletClient({
         chain: sepolia,
-        transport: custom(window.ethereum!),
+        transport,
       });
     case optimism.id:
       return createWalletClient({
         chain: optimism,
-        transport: custom(window.ethereum!),
+        transport,
       });
     case cyber.id:
       return createWalletClient({
         chain: cyber,
-        transport: custom(window.ethereum!),
+        transport,
       });
 
     case deriveTestnet.id:
       return createWalletClient({
         chain: deriveTestnet,
-        transport: custom(window.ethereum!),
+        transport,
       });
 
     case deriveMainnet.id:
       return createWalletClient({
         chain: deriveMainnet,
-        transport: custom(window.ethereum!),
+        transport,
       });
 
     case scroll.id:
       return createWalletClient({
         chain: scroll,
-        transport: custom(window.ethereum!),
+        transport,
       });
 
     default:

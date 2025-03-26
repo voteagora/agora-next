@@ -1,4 +1,4 @@
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { AuthorityChainsSnaps } from "./authorityChains";
 import { validateChain } from "@/lib/alligatorUtils";
 import Tenant from "@/lib/tenant/tenant";
@@ -12,7 +12,7 @@ async function getAuthorityChains({
   blockNumber: number;
 }): Promise<Array<string[]>> {
   const { namespace, contracts, ui } = Tenant.current();
-  const chainsQuery = prisma.$queryRawUnsafe<AuthorityChainsSnaps[]>(
+  const chainsQuery = prismaWeb2Client.$queryRawUnsafe<AuthorityChainsSnaps[]>(
     `
     SELECT
       ac.chain,

@@ -14,7 +14,11 @@ import { TenantContracts } from "@/lib/types";
 import { optimism } from "viem/chains";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
-import { DELEGATION_MODEL } from "@/lib/constants";
+import {
+  DELEGATION_MODEL,
+  GOVERNOR_TYPE,
+  TIMELOCK_TYPE,
+} from "@/lib/constants";
 import { IVotableSupplyOracleContract } from "@/lib/contracts/common/interfaces/IVotableSupplyOracleContract";
 
 interface Props {
@@ -104,5 +108,8 @@ export const optimismTenantContractConfig = ({
     }),
 
     delegationModel: DELEGATION_MODEL.ADVANCED,
+    governorType: GOVERNOR_TYPE.ALLIGATOR,
+    timelockType:
+      TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
   };
 };

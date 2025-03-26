@@ -95,7 +95,7 @@ const GovernorSettingsParams = () => {
             </TableCell>
             <TableCell className="text-base font-semibold text-right text-primary rounded-br-xl">
               {isTimeLockDelayFetched && timeLockDelay !== undefined
-                ? secondsToHuman(blocksToSeconds(Number(timeLockDelay)))
+                ? secondsToHuman(Number(timeLockDelay))
                 : "Loading..."}
             </TableCell>
           </TableRow>

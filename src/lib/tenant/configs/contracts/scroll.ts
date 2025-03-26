@@ -11,7 +11,11 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { FallbackProvider, JsonRpcProvider, BaseContract } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
-import { DELEGATION_MODEL } from "@/lib/constants";
+import {
+  DELEGATION_MODEL,
+  GOVERNOR_TYPE,
+  TIMELOCK_TYPE,
+} from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -97,5 +101,8 @@ export const scrollTenantContractConfig = ({
     treasury: TREASURY,
 
     delegationModel: DELEGATION_MODEL.FULL,
+    governorType: GOVERNOR_TYPE.AGORA,
+    timelockType:
+      TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
   };
 };

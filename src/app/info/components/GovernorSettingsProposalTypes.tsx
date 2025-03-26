@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Tenant from "@/lib/tenant/tenant";
-import { useReadContract } from "wagmi";
+import { useReadContract, useBlockNumber } from "wagmi";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import {
@@ -29,6 +29,10 @@ const GovernorSettingsProposalTypes = ({
 }) => {
   const { contracts, namespace, token } = Tenant.current();
 
+  const isApprovalThresholdSupportedbyGovernor =
+    namespace !== TENANT_NAMESPACES.UNISWAP &&
+    namespace !== TENANT_NAMESPACES.ENS;
+
   // TODO: Refactor this to use the governor types
   const isQuorumSupportedByGovernor =
     namespace !== TENANT_NAMESPACES.CYBER &&
@@ -40,12 +44,24 @@ const GovernorSettingsProposalTypes = ({
     namespace !== TENANT_NAMESPACES.XAI &&
     namespace !== TENANT_NAMESPACES.SCROLL;
 
+  const { data: blockNumber } = useBlockNumber({
+    chainId: contracts.governor.chain.id,
+  });
+
+  let args;
+  if (namespace === TENANT_NAMESPACES.ENS) {
+    args = [BigInt(blockNumber || 0)];
+  } else {
+    args = undefined;
+  }
+
   const { data: quorum, isFetched: isQuorumFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
     functionName:
       namespace === TENANT_NAMESPACES.UNISWAP ? "quorumVotes" : "quorum",
     query: { enabled: isQuorumSupportedByGovernor },
+    args,
     chainId: contracts.governor.chain.id,
   }) as { data: bigint | undefined; isFetched: boolean };
 
@@ -76,19 +92,21 @@ const GovernorSettingsProposalTypes = ({
               </Tooltip>
             </TooltipProvider>
           </TableHead>
-          <TableHead colSpan={3} className="text-secondary">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger className="flex flex-row space-x-1 items-center">
-                  <span>Approval threshold</span>
-                  <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
-                </TooltipTrigger>
-                <TooltipContent className="text-primary text-sm max-w-[200px]">
-                  {`For votes as a percentage of (For + Against) required for a vote to be approved ("pass").`}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </TableHead>
+          {isApprovalThresholdSupportedbyGovernor && (
+            <TableHead colSpan={3} className="text-secondary">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger className="flex flex-row space-x-1 items-center">
+                    <span>Approval threshold</span>
+                    <QuestionMarkCircleIcon className="h-4 w-4 text-secondary" />
+                  </TooltipTrigger>
+                  <TooltipContent className="text-primary text-sm max-w-[200px]">
+                    {`For votes as a percentage of (For + Against) required for a vote to be approved ("pass").`}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </TableHead>
+          )}
           <TableHead
             colSpan={4}
             className={cn("text-secondary", showQuorum ? "" : "rounded-tr-lg")}
