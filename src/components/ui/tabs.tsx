@@ -44,6 +44,8 @@ const tabsTriggerVariants = cva(
         newActive: "sm:text-xl mb-0 text-primary border-b-2 border-primary",
         newInactive:
           "sm:text-xl mb-0 text-primary/40 hover:text-primary/80 transition-colors",
+        underlined:
+          "pb-2 text-neutral-500 text-base font-medium flex gap-2.5 data-[state=active]:text-neutral-900 data-[state=active]:border-b-2 data-[state=active]:border-neutral-900 data-[state=active]:pb-[6px]",
       },
     },
     defaultVariants: {

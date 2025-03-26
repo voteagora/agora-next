@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { schema as SponsorProposalSchema } from "../schemas/sponsorProposalSchema";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import {
   getStageByIndex,
   getStageIndexForTenant,
@@ -31,7 +31,7 @@ export async function onSubmitAction(
 
   try {
     const nextStage = getStageByIndex(currentIndex + 1);
-    const updateDraft = prisma.proposalDraft.update({
+    const updateDraft = prismaWeb2Client.proposalDraft.update({
       where: {
         id: data.draftProposalId,
       },
@@ -46,7 +46,7 @@ export async function onSubmitAction(
       },
     });
 
-    await prisma.$transaction([updateDraft]);
+    await prismaWeb2Client.$transaction([updateDraft]);
 
     return {
       ok: true,

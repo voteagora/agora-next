@@ -20,8 +20,10 @@ import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
 import { revalidateData } from "./revalidateAction";
-import { zeroAddress } from "viem";
+import { formatEther, zeroAddress } from "viem";
 import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
+import { useEthBalance } from "@/hooks/useEthBalance";
+import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 
 export function UndelegateDialog({
   delegate,
@@ -48,6 +50,19 @@ export function UndelegateDialog({
 
   const isDisabledInTenant = ui.toggle("delegates/delegate")?.enabled === false;
   const isGasRelayEnabled = ui.toggle("sponsoredDelegate")?.enabled === true;
+  const gasRelayConfig = ui.toggle("sponsoredDelegate")
+    ?.config as UIGasRelayConfig;
+
+  const { data: sponsorBalance } = useEthBalance({
+    enabled: isGasRelayEnabled,
+    address: gasRelayConfig?.sponsorAddress,
+  });
+
+  const isGasRelayLive =
+    isGasRelayEnabled &&
+    Number(formatEther(sponsorBalance || 0n)) >=
+      Number(gasRelayConfig?.minBalance) &&
+    Number(votingPower) > Number(gasRelayConfig?.minVPToUseGasRelay);
 
   const { data: delegateeEnsName } = useEnsName({
     chainId: 1,
@@ -80,7 +95,7 @@ export function UndelegateDialog({
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
   } = useWaitForTransactionReceipt({
-    hash: isGasRelayEnabled ? sponsoredTxnHash : delegateTxHash,
+    hash: isGasRelayLive ? sponsoredTxnHash : delegateTxHash,
   });
 
   const fetchData = useCallback(async () => {
@@ -99,7 +114,7 @@ export function UndelegateDialog({
   }, [fetchBalanceForDirectDelegation, accountAddress, fetchDirectDelegatee]);
 
   const executeDelegate = async () => {
-    if (isGasRelayEnabled) {
+    if (isGasRelayLive) {
       await call();
     } else {
       write({
@@ -122,8 +137,8 @@ export function UndelegateDialog({
 
     if (sameDelegatee) {
       return (
-        <ShadcnButton variant="outline" className="cursor-not-allowed">
-          You are already delegated to yourself
+        <ShadcnButton onClick={executeDelegate}>
+          Remove your own delegation
         </ShadcnButton>
       );
     }
@@ -149,7 +164,7 @@ export function UndelegateDialog({
             Undelegation completed!
           </Button>
           <BlockScanUrls
-            hash1={isGasRelayEnabled ? sponsoredTxnHash : delegateTxHash}
+            hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
           />
         </div>
       );

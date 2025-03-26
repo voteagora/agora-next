@@ -2,12 +2,13 @@
 
 import { z } from "zod";
 import { schema as RequestSponsorshipSchema } from "../schemas/requestSponsorshipSchema";
-import prisma from "@/app/lib/prisma";
 import {
   getStageByIndex,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
 import { Visibility } from "../types";
+import { prismaWeb2Client } from "@/app/lib/prisma";
+
 export type FormState = {
   ok: boolean;
   message: string;
@@ -30,7 +31,7 @@ export async function onSubmitAction(
 
   try {
     const nextStage = getStageByIndex(currentIndex + 1);
-    await prisma.proposalDraft.update({
+    await prismaWeb2Client.proposalDraft.update({
       where: {
         id: data.draftProposalId,
       },

@@ -21,6 +21,7 @@ export type UIGasRelayConfig = {
   };
   minBalance: string;
   sponsorAddress: `0x${string}`;
+  minVPToUseGasRelay: string;
 };
 
 // UI config exists to give tenant specifc config options to a UI toggle
@@ -120,6 +121,7 @@ type TenantUIParams = {
     tokenAmountFont?: string;
     letterSpacing?: string;
   };
+  theme?: "light" | "dark";
   favicon?: {
     "apple-touch-icon"?: string;
     icon32x32?: string;
@@ -159,6 +161,7 @@ export class TenantUI {
     tokenAmountFont?: string;
     letterSpacing?: string;
   };
+  private _theme: "light" | "dark";
   private _favicon?: {
     "apple-touch-icon"?: string;
     icon32x32?: string;
@@ -191,6 +194,7 @@ export class TenantUI {
     title,
     toggles,
     tacticalStrings,
+    theme,
   }: TenantUIParams) {
     this._assets = assets;
     this._customization = customization;
@@ -208,6 +212,7 @@ export class TenantUI {
     this._title = title;
     this._toggles = toggles;
     this._tacticalStrings = tacticalStrings;
+    this._theme = theme ?? "light";
   }
 
   public get assets(): UIAssets {
@@ -264,6 +269,10 @@ export class TenantUI {
       }
     | undefined {
     return this._customization;
+  }
+
+  public get theme(): "light" | "dark" {
+    return this._theme;
   }
 
   public get favicon():

@@ -16,18 +16,20 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 interface Props {
   proposal: Proposal;
 }
 
 export const AgoraGovExecute = ({ proposal }: Props) => {
-  const { contracts } = Tenant.current();
+  const { contracts, ui } = Tenant.current();
 
   const { data: delayInSeconds } = useReadContract({
     address: contracts.timelock!.address as `0x${string}`,
     abi: contracts.timelock!.abi,
     functionName: "getMinDelay",
+    chainId: contracts.timelock!.chain.id,
   });
 
   let canExecute = false;
@@ -69,7 +71,7 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
             <>
               <TooltipTrigger>
                 <Button
-                  className="text-neutral"
+                  className={cn(ui.theme === "dark" && "text-neutral")}
                   disabled={true}
                   variant="outline"
                 >
@@ -90,7 +92,7 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
                     })
                   }
                   loading={isLoading}
-                  className="text-neutral"
+                  className={cn(ui.theme === "dark" && "text-neutral")}
                 >
                   Execute
                 </Button>

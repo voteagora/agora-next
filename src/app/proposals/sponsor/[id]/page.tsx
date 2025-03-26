@@ -1,4 +1,4 @@
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { DraftProposal, PLMConfig } from "../../../proposals/draft/types";
 import SponsorActionPanel from "../components/SponsorActionPanel";
 import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
@@ -29,7 +29,7 @@ import ApprovedTransactions from "@/components/Proposals/ProposalPage/ApprovedTr
 import { parseProposalData } from "@/lib/proposalUtils";
 
 const getDraftProposal = async (id: number, slug: DaoSlug) => {
-  const draftProposal = await prisma.proposalDraft.findUnique({
+  const draftProposal = await prismaWeb2Client.proposalDraft.findUnique({
     where: {
       id: id,
       dao_slug: slug,

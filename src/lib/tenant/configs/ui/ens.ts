@@ -4,6 +4,10 @@ import ensHero from "@/assets/tenant/ens_hero.svg";
 import successImage from "@/assets/tenant/ens_success.svg";
 import pendingImage from "@/assets/tenant/ens_pending.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
+import infoPageHero from "@/assets/tenant/ens_info_hero.png";
+import infoPageCard00 from "@/assets/tenant/ens_info_0.png";
+import infoPageCard01 from "@/assets/tenant/ens_info_1.png";
+import infoPageCard02 from "@/assets/tenant/ens_info_2.png";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
@@ -82,11 +86,60 @@ export const ensTenantUIConfig = new TenantUI({
           "Delegate your voting power to a trusted representative",
       },
     },
+    {
+      route: "info",
+      title: "Welcome to the Community",
+      description:
+        "Agora is the home of ENS governance, where ENS stakers delegate, vote, and make decisions to steward the future of the ENS ecosystem.",
+      meta: {
+        title: "ENS Agora",
+        description: "Home of ENS governance",
+        imageTitle: "ENS Agora",
+        imageDescription: "Home of ENS governance",
+      },
+      links: [
+        {
+          name: "Governance Forums",
+          title: "Governance Forums",
+          url: "https://discuss.ens.domains/",
+          image: infoPageCard01,
+        },
+        {
+          name: "Governance Docs",
+          title: "Protocol Docs",
+          url: "https://docs.ens.domains/dao",
+          image: infoPageCard02,
+        },
+        {
+          name: "Community Discord",
+          title: "Community Discord",
+          url: "https://chat.ens.domains/",
+          image: infoPageCard00,
+        },
+      ],
+    },
+    {
+      route: "info/about",
+      title: "About ENS",
+      hero: infoPageHero,
+      description:
+        "ENS is the Ethereum Name Service. ENS is a naming system that creates domains on the Ethereum blockchain, allowing you to link your wallet address to a human-readable ENS name. ENS names are domains, NFTs, and usernames for your digital identity across the internet.",
+      meta: {
+        title: "ENS Agora",
+        description: "Home of ENS governance",
+        imageTitle: "ENS Agora",
+        imageDescription: "Home of ENS governance",
+      },
+    },
   ],
 
   toggles: [
     {
       name: "proposals",
+      enabled: true,
+    },
+    {
+      name: "info",
       enabled: true,
     },
     {
@@ -113,6 +166,7 @@ export const ensTenantUIConfig = new TenantUI({
             ? "0x7735C385081568e9338aEc70492Debfd2d5c3450"
             : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
         minBalance: "0.001",
+        minVPToUseGasRelay: "10",
       },
     },
     {
@@ -127,6 +181,7 @@ export const ensTenantUIConfig = new TenantUI({
             ? "0x7735C385081568e9338aEc70492Debfd2d5c3450"
             : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
         minBalance: "0.001",
+        minVPToUseGasRelay: "10",
       },
     },
     {
@@ -135,6 +190,14 @@ export const ensTenantUIConfig = new TenantUI({
     },
     {
       name: "email-subscriptions",
+      enabled: true,
+    },
+    {
+      name: "show-efp-stats",
+      enabled: true,
+    },
+    {
+      name: "show-ens-text-records",
       enabled: true,
     },
     {

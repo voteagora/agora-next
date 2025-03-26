@@ -10,8 +10,24 @@ import {
 } from "@/lib/tenant/configs/contracts/derive";
 import { ProposalType } from "../app/proposals/draft/types";
 import { AlchemyProvider } from "ethers";
-import { hexToBigInt } from "viem";
+import {
+  Address,
+  hexToBigInt,
+  WaitForTransactionReceiptParameters,
+  WaitForTransactionReceiptReturnType,
+} from "viem";
 import { unstable_cache } from "next/cache";
+import { getPublicClient } from "./viem";
+import {
+  arbitrum,
+  base,
+  goerli,
+  mainnet,
+  optimism,
+  polygon,
+  sepolia,
+  scroll,
+} from "viem/chains";
 
 const { token } = Tenant.current();
 
@@ -372,61 +388,70 @@ export const isURL = (value: string) => {
   return value === "" || urlRegExp.test(value);
 };
 
+const FORK_NODE_URL = process.env.NEXT_PUBLIC_FORK_NODE_URL!;
+
 export const getTransportForChain = (chainId: number) => {
   switch (chainId) {
     // mainnet
     case 1:
       return http(
-        `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL ||
+          `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // optimism
     case 10:
       return http(
-        `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL ||
+          `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // base
     case 8453:
       return http(
-        `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL ||
+          `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // arbitrum one
     case 42161:
       return http(
-        `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL ||
+          `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // arbitrum sepolia
     case 421614:
       return http(
-        `https://arb-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL ||
+          `https://arb-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // sepolia
     case 11155111:
       return http(
-        `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL ||
+          `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // cyber
     case 7560:
       return fallback([
-        http("https://rpc.cyber.co"),
-        http("https://cyber.alt.technology"),
+        http(FORK_NODE_URL || "https://rpc.cyber.co"),
+        http(FORK_NODE_URL || "https://cyber.alt.technology"),
       ]);
 
     // scroll
     case 534_352:
       return fallback([
         http(
-          `https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+          FORK_NODE_URL ||
+            "https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}"
         ),
-        http("https://rpc.scroll.io"),
+        http(FORK_NODE_URL || "https://rpc.scroll.io"),
       ]);
 
     // derive mainnet
     case 957:
-      http(DERIVE_MAINNET_RPC);
+      return http(FORK_NODE_URL || DERIVE_MAINNET_RPC);
 
     // derive testnet
     case 901:
-      return http(DERIVE_TESTNET_RPC);
+      return http(FORK_NODE_URL || DERIVE_TESTNET_RPC);
 
     // for each new dao with a new chainId add them here
     default:
@@ -469,3 +494,107 @@ export const mapArbitrumBlockToMainnetBlock = unstable_cache(
     revalidate: 60 * 60 * 24 * 365, // 1 year cache
   }
 );
+
+const isContractWallet = async (address: Address) => {
+  const publicClient = getPublicClient();
+  const bytecode = await publicClient.getCode({ address });
+
+  return bytecode && bytecode !== "0x" ? true : false;
+};
+
+function delay(milliseconds: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+}
+
+type TxServiceApiTransactionResponse = {
+  safe: Address;
+  to: Address;
+  data: `0x${string}`;
+  blockNumber: number;
+  transactionHash: `0x${string}`;
+  safeTxHash: `0x${string}`;
+  executor: Address;
+  isExecuted: boolean;
+  isSuccessful: boolean;
+  confirmations: Array<{
+    owner: Address;
+  }>;
+};
+
+const apiNetworkName: Record<number, string> = {
+  [mainnet.id]: "mainnet",
+  [optimism.id]: "optimism",
+  [polygon.id]: "polygon",
+  [base.id]: "base",
+  [arbitrum.id]: "arbitrum",
+  [goerli.id]: "goerli",
+  [sepolia.id]: "sepolia",
+  [scroll.id]: "scroll",
+};
+
+export const resolveSafeTx = async (
+  networkId: number,
+  safeTxHash: `0x${string}`,
+  attempt = 1,
+  maxAttempts = 10
+): Promise<`0x${string}` | undefined> => {
+  const networkName = apiNetworkName[networkId];
+  if (attempt >= maxAttempts) {
+    throw new Error(
+      `timeout: couldn't find safeTx [${safeTxHash}] on [${networkName}]`
+    );
+  }
+
+  const endpoint = `https://safe-transaction-${networkName}.safe.global`;
+  const url = `${endpoint}/api/v1/multisig-transactions/${safeTxHash}`;
+
+  const response = await fetch(url);
+
+  const responseJson = <TxServiceApiTransactionResponse>await response.json();
+
+  console.debug(
+    `[${attempt}] looking up [${safeTxHash}] on [${networkName}]`,
+    response
+  );
+  if (response.status == 404) {
+    console.warn(
+      `didn't find safe tx [${safeTxHash}], assuming it's already the real one`
+    );
+    return safeTxHash;
+  }
+
+  if (responseJson.isSuccessful === null) {
+    await delay(1000 * attempt ** 1.75);
+    return resolveSafeTx(networkId, safeTxHash, attempt + 1, maxAttempts);
+  }
+
+  if (!responseJson.isSuccessful) {
+    return undefined;
+  }
+  return responseJson.transactionHash;
+};
+
+export const wrappedWaitForTransactionReceipt = async (
+  params: WaitForTransactionReceiptParameters & {
+    address: Address;
+  }
+): Promise<WaitForTransactionReceiptReturnType> => {
+  const publicClient = getPublicClient();
+  if (!publicClient.chain) {
+    throw new Error("no chain on public client");
+  }
+
+  const isSafe = await isContractWallet(params.address);
+
+  if (isSafe) {
+    //try to resolve the underlying transaction
+    const resolvedTx = await resolveSafeTx(publicClient.chain.id, params.hash);
+    if (!resolvedTx) throw new Error("couldn't resolve safe tx");
+
+    return publicClient.waitForTransactionReceipt({ hash: resolvedTx });
+  } else {
+    return publicClient.waitForTransactionReceipt(params);
+  }
+};

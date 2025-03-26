@@ -3,10 +3,9 @@ import { useCallback, useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
-import { waitForTransactionReceipt } from "wagmi/actions";
-import { config } from "@/app/config";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -25,7 +24,7 @@ const useAdvancedVoting = ({
   params?: `0x${string}`;
   missingVote: MissingVote;
 }) => {
-  const { contracts, slug } = Tenant.current();
+  const { contracts } = Tenant.current();
   const { address } = useAccount();
   const { writeContractAsync: advancedVote, isError: _advancedVoteError } =
     useWriteContract();
@@ -70,9 +69,11 @@ const useAdvancedVoting = ({
         chainId: contracts.governor.chain.id,
       });
       try {
-        const { status } = await waitForTransactionReceipt(config, {
-          hash: directTx,
-        });
+        const { status, transactionHash } =
+          await wrappedWaitForTransactionReceipt({
+            hash: directTx,
+            address: address as `0x${string}`,
+          });
         if (status === "success") {
           await trackEvent({
             event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
@@ -82,10 +83,10 @@ const useAdvancedVoting = ({
               reason: reason,
               params: params,
               voter: address as `0x${string}`,
-              transaction_hash: directTx,
+              transaction_hash: transactionHash,
             },
           });
-          setStandardTxHash(directTx);
+          setStandardTxHash(transactionHash);
           setStandardVoteSuccess(true);
         }
       } catch (error) {
@@ -113,9 +114,11 @@ const useAdvancedVoting = ({
         chainId: contracts.alligator?.chain.id,
       });
       try {
-        const { status } = await waitForTransactionReceipt(config, {
-          hash: advancedTx,
-        });
+        const { status, transactionHash } =
+          await wrappedWaitForTransactionReceipt({
+            hash: advancedTx,
+            address: address as `0x${string}`,
+          });
         if (status === "success") {
           await trackEvent({
             event_name: ANALYTICS_EVENT_NAMES.ADVANCED_VOTE,
@@ -125,10 +128,10 @@ const useAdvancedVoting = ({
               reason: reason,
               params: params,
               voter: address as `0x${string}`,
-              transaction_hash: advancedTx,
+              transaction_hash: transactionHash,
             },
           });
-          setAdvancedTxHash(advancedTx);
+          setAdvancedTxHash(transactionHash);
           setAdvancedVoteSuccess(true);
         }
       } catch (error) {

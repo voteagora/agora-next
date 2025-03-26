@@ -47,6 +47,8 @@ export const deriveTenantUIConfig = new TenantUI({
     tokenAmountFont: "font-chivoMono",
   },
 
+  theme: "dark",
+
   links: [
     {
       name: "discord",

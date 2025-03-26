@@ -1,5 +1,5 @@
 import { cache } from "react";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { ImpactMetricComment } from "./impactMetricComment";
 
 async function updateImpactMetricCommentApi({
@@ -13,7 +13,7 @@ async function updateImpactMetricCommentApi({
   address: string;
   comment: string;
 }): Promise<ImpactMetricComment> {
-  const updatedComment = await prisma.metrics_comments.update({
+  const updatedComment = await prismaWeb2Client.metrics_comments.update({
     where: {
       comment_id: commentId,
     },

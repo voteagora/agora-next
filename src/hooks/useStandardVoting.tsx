@@ -2,11 +2,10 @@ import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useState } from "react";
 import { useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
-import { waitForTransactionReceipt } from "wagmi/actions";
 import { trackEvent } from "@/lib/analytics";
 import { useAccount } from "wagmi";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
-import { config } from "@/app/config";
+import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 
 const useStandardVoting = ({
   proposalId,
@@ -21,7 +20,7 @@ const useStandardVoting = ({
   params?: `0x${string}`;
   missingVote: MissingVote;
 }) => {
-  const { contracts, slug } = Tenant.current();
+  const { contracts } = Tenant.current();
   const { address } = useAccount();
   const { writeContractAsync: standardVote, isError: _standardVoteError } =
     useWriteContract();
@@ -33,9 +32,7 @@ const useStandardVoting = ({
   const [standardTxHash, setStandardTxHash] = useState<string | undefined>(
     undefined
   );
-  const [advancedTxHash, setAdvancedTxHash] = useState<string | undefined>(
-    undefined
-  );
+  const [advancedTxHash] = useState<string | undefined>(undefined);
 
   const write = useCallback(() => {
     const _standardVote = async () => {
@@ -50,12 +47,14 @@ const useStandardVoting = ({
         chainId: contracts.governor.chain.id,
       });
       try {
-        const { status } = await waitForTransactionReceipt(config, {
-          hash: directTx,
-        });
+        const { status, transactionHash } =
+          await wrappedWaitForTransactionReceipt({
+            hash: directTx,
+            address: address as `0x${string}`,
+          });
 
         if (status === "success") {
-          setStandardTxHash(directTx);
+          setStandardTxHash(transactionHash);
 
           await trackEvent({
             event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
@@ -65,7 +64,7 @@ const useStandardVoting = ({
               reason: reason,
               params: params,
               voter: address as `0x${string}`,
-              transaction_hash: directTx,
+              transaction_hash: transactionHash,
             },
           });
           setStandardVoteSuccess(true);
