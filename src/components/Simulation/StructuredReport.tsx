@@ -395,7 +395,7 @@ function ExpandableCheckItem({
                       href={getBlockScanAddress(address)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-mono text-xs bg-muted p-2 rounded hover:underline inline-flex items-center"
+                      className="font-mono text-xs bg-wash p-2 rounded hover:underline inline-flex items-center"
                     >
                       {address}
                       <ExternalLinkIcon className="h-3 w-3 ml-1" />
@@ -442,7 +442,7 @@ function ExpandableCheckItem({
                   key={`calldata-${formattedLine.substring(0, 30)}`}
                   className="mb-3"
                 >
-                  <code className="block font-mono text-xs bg-muted p-3 rounded whitespace-pre-wrap overflow-x-auto">
+                  <code className="block font-mono text-xs bg-wash p-3 rounded whitespace-pre-wrap overflow-x-auto">
                     <span className="flex flex-wrap gap-2 items-center">
                       <a
                         href={getBlockScanAddress(fromAddress)}
@@ -477,7 +477,7 @@ function ExpandableCheckItem({
                 key={`calldata-${formattedLine.substring(0, 30)}`}
                 className="mb-3"
               >
-                <code className="block font-mono text-xs bg-muted p-3 rounded whitespace-pre-wrap overflow-x-auto">
+                <code className="block font-mono text-xs bg-wash p-3 rounded whitespace-pre-wrap overflow-x-auto">
                   {formattedLine}
                 </code>
               </div>
@@ -496,7 +496,7 @@ function ExpandableCheckItem({
                   key={`event-${eventText.substring(0, 30)}-${index}`}
                   className="mb-3"
                 >
-                  <code className="block font-mono text-xs bg-muted p-3 rounded whitespace-pre-wrap overflow-x-auto">
+                  <code className="block font-mono text-xs bg-wash p-3 rounded whitespace-pre-wrap overflow-x-auto">
                     {eventText}
                   </code>
                 </div>
@@ -573,7 +573,7 @@ function ExpandableCheckItem({
     <div className="border border-line rounded-md overflow-hidden shadow-sm">
       <button
         type="button"
-        className="w-full p-4 text-left hover:bg-wash transition-colors cursor-pointer flex justify-between items-start bg-card"
+        className="w-full p-4 text-left hover:bg-wash transition-colors cursor-pointer flex justify-between items-start bg-wash"
         onClick={toggleExpanded}
         aria-expanded={isExpanded}
       >
@@ -848,13 +848,13 @@ function StateChangeItem({
           <div className="mt-4 grid grid-cols-2 gap-4">
             <div>
               <span className="text-tertiary font-medium">Old Value: </span>
-              <div className="font-mono text-xs break-all mt-2 bg-card p-3 rounded-md border border-line/30">
+              <div className="font-mono text-xs break-all mt-2 bg-wash p-3 rounded-md border border-line/30">
                 {stateChange.oldValue}
               </div>
             </div>
             <div>
               <span className="text-tertiary font-medium">New Value: </span>
-              <div className="font-mono text-xs break-all mt-2 bg-card p-3 rounded-md border border-line/30">
+              <div className="font-mono text-xs break-all mt-2 bg-wash p-3 rounded-md border border-line/30">
                 {stateChange.newValue}
               </div>
             </div>

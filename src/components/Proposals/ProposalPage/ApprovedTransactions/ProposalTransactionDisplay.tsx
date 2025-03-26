@@ -25,7 +25,6 @@ import { toast } from "react-hot-toast";
 import { checkExistingProposal } from "@/lib/seatbelt/checkProposal";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { TENDERLY_VALID_CHAINS } from "@/app/proposals/draft/components/BasicProposalForm";
-import { StructuredReport } from "@/components/Simulation/StructuredReport";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Button } from "@/components/ui/button";
 
@@ -123,7 +122,6 @@ const ProposalTransactionDisplay = ({
 
   return (
     <div>
-      {simulationReport && <StructuredReport report={simulationReport} />}
       <div className="flex flex-col border rounded-t-lg border-line text-xs text-primary break-words overflow-hidden">
         <div className="w-full flex items-center justify-between mb-2 border-b border-line px-4 py-3">
           <div className="flex items-center gap-2">
