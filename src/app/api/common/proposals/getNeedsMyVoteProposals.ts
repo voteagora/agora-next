@@ -12,6 +12,10 @@ async function getNeedsMyVoteProposals(address: string) {
   return withMetrics("getNeedsMyVoteProposals", async () => {
     const { namespace, contracts, ui } = Tenant.current();
 
+    const isTimeStampBasedTenant = ui.toggle(
+      "use-timestamp-for-proposals"
+    )?.enabled;
+
     const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
       ?.enabled
       ? contracts.providerForTime?.getBlock("latest")
@@ -35,8 +39,13 @@ async function getNeedsMyVoteProposals(address: string) {
         FROM (
           SELECT *
           FROM ${namespace + ".proposals_v2"}
-          WHERE CAST(start_block AS INTEGER) < $1
-            AND CAST(end_block AS INTEGER) > $1
+          WHERE ${
+            isTimeStampBasedTenant
+              ? `CAST(start_timestamp AS INTEGER) < $1
+                 AND CAST(end_timestamp AS INTEGER) > $1`
+              : `CAST(start_block AS INTEGER) < $1
+                 AND CAST(end_block AS INTEGER) > $1`
+          }
             AND cancelled_block IS NULL
             ${prodDataOnly}
         ) AS p
@@ -46,7 +55,7 @@ async function getNeedsMyVoteProposals(address: string) {
         WHERE v.proposal_id IS NULL
         ORDER BY p.ordinal DESC;
         `,
-      latestBlock.number,
+      isTimeStampBasedTenant ? latestBlock.timestamp : latestBlock.number,
       address.toLowerCase(),
       contracts.governor.address
     );

@@ -233,11 +233,6 @@ export const b3TenantUIConfig = new TenantUI({
             prodAddress: "0x4990CcE6e8CD9596305b83C4860D4C0f3Bf4e8fa",
             testnetAddress: "0x1986516d07ABEddF8107F98b443F21ECFEE1d164",
           },
-          {
-            type: ProposalType?.OPTIMISTIC,
-            prodAddress: "0xf8D15c3132eFA557989A1C9331B6667Ca8Caa3a9",
-            testnetAddress: "0xb09A941C4843f79423c8f2C8562aeD1691cbe674",
-          },
         ],
 
         copy: {

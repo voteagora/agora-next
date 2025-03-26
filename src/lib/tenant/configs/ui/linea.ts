@@ -1,21 +1,26 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
-import demoHero from "@/assets/tenant/demo_hero.png";
-import demoHeroV2 from "@/assets/tenant/demo_hero_v2.svg";
+import lineaLogo from "@/assets/tenant/linea_logo.svg";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import infoPageCard01 from "@/assets/tenant/linea_info_1.png";
+import infoPageCard02 from "@/assets/tenant/linea_info_2.png";
+import infoPageCard03 from "@/assets/tenant/linea_info_3.png";
+import infoPageCard04 from "@/assets/tenant/linea_info_4.png";
+import infoPageHero from "@/assets/tenant/linea_info_hero.png";
+import delegateImage from "@/assets/tenant/linea_delegate.svg";
 
-export const demoTenantUIConfig = new TenantUI({
-  title: "{Brand name} Agora",
-  logo: demoHeroV2,
+export const lineaTenantUIConfig = new TenantUI({
+  title: "Linea Agora",
+  logo: lineaLogo,
 
   assets: {
-    success: demoHeroV2,
-    pending: demoHeroV2,
-    delegate: demoHeroV2,
+    success: lineaLogo,
+    pending: lineaLogo,
+    delegate: delegateImage,
   },
 
   organization: {
-    title: "{Brand name}",
+    title: "Linea",
   },
 
   delegates: {
@@ -25,16 +30,16 @@ export const demoTenantUIConfig = new TenantUI({
   },
 
   customization: {
-    primary: "23 23 23",
+    primary: "25 0 102",
     secondary: "64 64 64",
-    tertiary: "115 115 115",
-    neutral: "250 250 250",
+    tertiary: "195 195 195",
+    neutral: "255 255 255",
     wash: "255 255 255",
     line: "223 223 223",
     positive: "97 209 97",
-    negative: "226 54 54",
-    brandPrimary: "174 11 229",
-    brandSecondary: "242 242 242",
+    negative: "242 84 91",
+    brandPrimary: "23 23 23",
+    brandSecondary: "248 247 242",
   },
 
   links: [
@@ -81,91 +86,91 @@ export const demoTenantUIConfig = new TenantUI({
   pages: [
     {
       route: "/",
-      title: "Welcome to the Community",
-      hero: demoHero,
+      title: "Welcome to Linea governance",
       description:
-        "Agora is your home for onchain proposals, voting, and governance",
+        "Linea is the home network for the world, empowering users, builders, and communities to live onchain with high-performance zkEVM technology, robust security, and seamless web3 experiences.",
       meta: {
-        title: "Welcome to {Brand name} governance",
-        description: "Home of token governance",
+        title: "Welcome to Linea governance",
+        description:
+          "Linea is the home network for the world, empowering users, builders, and communities to live onchain with high-performance zkEVM technology, robust security, and seamless web3 experiences.",
         imageTitle: "IN IMAGE",
         imageDescription: "IN IMAGE DESCRIPTION",
       },
     },
     {
       route: "delegates",
-      title: "Welcome to {Brand name} governance",
+      title: "Welcome to Linea governance",
       description:
-        "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
-      hero: demoHero,
+        "Linea is the home network for the world, empowering users, builders, and communities to live onchain with high-performance zkEVM technology, robust security, and seamless web3 experiences.",
       meta: {
-        title: "Contribute to {Brand name} with your staked {Token name}",
+        title: "Contribute to Linea with your staked {Token name}",
         description:
-          "{Brand name} is a unified and dedicated delegate portal for {Brand name} governance. {Brand name} is where all protocol improvement votes are executed. After the discussion phase, all official {Brand name} governance activities occur on the {Brand name} portal. This includes member delegation, voting, and other matters related to {Brand name}'s decentralized governance.",
-        imageTitle: "{Brand name} Governance",
-        imageDescription: "Participate in {Brand name}",
+          "Linea is a unified and dedicated delegate portal for Linea governance. Linea is where all protocol improvement votes are executed. After the discussion phase, all official Linea governance activities occur on the Linea portal. This includes member delegation, voting, and other matters related to Linea's decentralized governance.",
+        imageTitle: "Linea Governance",
+        imageDescription: "Participate in Linea",
       },
     },
     {
       route: "proposals",
-      title: "Welcome to {Brand name} governance",
+      title: "Welcome to Linea governance",
       description:
-        "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
-      hero: demoHero,
+        "Linea is the home network for the world, empowering users, builders, and communities to live onchain with high-performance zkEVM technology, robust security, and seamless web3 experiences.",
       meta: {
         title: "Voter on Agora",
-        description: "Delegate your voting power to a trusted representative",
+        description:
+          "Linea is the home network for the world, empowering users, builders, and communities to live onchain with high-performance zkEVM technology, robust security, and seamless web3 experiences.",
         imageTitle: "IN IMAGE",
         imageDescription: "IN IMAGE DESCRIPTION",
       },
     },
     {
       route: "info",
-      title: "Welcome to the Community",
+      title: "Welcome to Linea governance",
       description:
-        "Agora is your home for onchain proposals, voting, and governance",
+        "Linea is the home network for the world, empowering users, builders, and communities to live onchain with high-performance zkEVM technology, robust security, and seamless web3 experiences.",
       meta: {
-        title: "{Brand name} Agora",
-        description: "Home of {Brand name} governance",
-        imageTitle: "{Brand name} Agora",
-        imageDescription: "Home of {Brand name} governance",
+        title: "Welcome to Linea governance",
+        description:
+          "Linea is the home network for the world, empowering users, builders, and communities to live onchain with high-performance zkEVM technology, robust security, and seamless web3 experiences.",
+        imageTitle: "Linea Agora",
+        imageDescription: "Home of Linea governance",
       },
       links: [
         {
           name: "Community Discord",
           title: "Community Discord",
           url: "https://www.agora.xyz/deploy",
-          image: demoHero,
+          image: infoPageCard01,
         },
         {
           name: "Governance Forums",
           title: "Governance Forums",
           url: "https://www.agora.xyz/deploy",
-          image: demoHero,
+          image: infoPageCard02,
         },
         {
           name: "Protocol Docs",
           title: "Protocol Docs",
           url: "https://www.agora.xyz/deploy",
-          image: demoHero,
+          image: infoPageCard03,
         },
         {
           name: "Protocol Vision",
           title: "Protocol Vision",
           url: "https://www.agora.xyz/deploy",
-          image: demoHero,
+          image: infoPageCard04,
         },
       ],
     },
     {
       route: "info/about",
-      title: "About {Brand name}",
-      hero: demoHero,
+      title: "Welcome to Linea governance",
+      hero: infoPageHero,
       description:
-        "At vero eos et accusamus et iust odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
+        "In moving toward our mission to empower everyone to live onchain, Linea’s approach has been to take web3 user, builder, and community experience to higher levels. With innovations in security, digital identity, payments, and DeFi, as well as community nurturing and organization, we’ve aimed to lower barriers to entry, create the most secure environment, streamline everyday processes, and elevate the whole web3 experience.",
       meta: {
-        title: "Info of Agora",
-        description: "Welcome to the {Brand name} Agora",
+        title: "",
+        description: "Welcome to the Linea Agora",
         imageTitle: "",
         imageDescription: "",
       },
@@ -199,6 +204,10 @@ export const demoTenantUIConfig = new TenantUI({
     },
     {
       name: "proposal-execute",
+      enabled: true,
+    },
+    {
+      name: "use-timestamp-for-proposals", // For proposal start_block and end_block
       enabled: true,
     },
     {
@@ -240,8 +249,8 @@ export const demoTenantUIConfig = new TenantUI({
           },
           {
             type: ProposalType?.APPROVAL,
-            prodAddress: "0x05a9C4a400cfA64C9639cc2f00B2CF95710f9af1",
-            testnetAddress: "0x05a9C4a400cfA64C9639cc2f00B2CF95710f9af1",
+            prodAddress: "0x7751f14e211150F54D9ADD4727f7D6E9a07d4cDb",
+            testnetAddress: "0x7751f14e211150F54D9ADD4727f7D6E9a07d4cDb",
           },
           {
             type: ProposalType?.OPTIMISTIC,
