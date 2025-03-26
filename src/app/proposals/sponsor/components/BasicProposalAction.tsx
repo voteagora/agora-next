@@ -96,7 +96,7 @@ const BasicProposalAction = ({
           }
         }}
       >
-        Sponsor
+        Submit proposal
       </UpdatedButton>
 
       {onPrepareError && !proposalCreated && (
