@@ -24,7 +24,10 @@ const ProposalRequirements = ({
     let requirements = [];
     if (votingModuleType === ProposalType.SOCIAL) {
       requirements.push(
-        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4">
+        <div
+          key={ProposalType.SOCIAL}
+          className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4"
+        >
           <p className="flex-grow text-primary">Token balance</p>
           <span className="text-secondary font-mono text-xs">
             {"> "}
@@ -40,7 +43,10 @@ const ProposalRequirements = ({
       gatingType === ProposalGatingType.GOVERNOR_V1
     ) {
       requirements.push(
-        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4">
+        <div
+          key={ProposalGatingType.MANAGER || ProposalGatingType.GOVERNOR_V1}
+          className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4"
+        >
           <p className="flex-grow text-primary">Manager address</p>
           <span className="text-secondary font-mono text-xs">
             {truncateAddress(manager?.toString() ?? "")}
@@ -54,7 +60,12 @@ const ProposalRequirements = ({
       gatingType === ProposalGatingType.GOVERNOR_V1
     ) {
       requirements.push(
-        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4">
+        <div
+          key={
+            ProposalGatingType.TOKEN_THRESHOLD || ProposalGatingType.GOVERNOR_V1
+          }
+          className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl px-4 py-3 flex flex-row items-center space-x-4"
+        >
           <p className="flex-grow text-primary">Token balance</p>
           <span className="text-secondary font-mono text-xs">
             {"> "}
