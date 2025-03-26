@@ -38,7 +38,10 @@ const TENDERLY_FETCH_OPTIONS = {
 const DEFAULT_FROM = "0xD73a92Be73EfbFcF3854433A5FcbAbF9c1316073"; // arbitrary EOA not used on-chain
 
 const tenant = Tenant.current();
+const useL1BlockNumber = tenant.ui.toggle("use-l1-block-number")?.enabled;
 const provider = tenant.contracts.governor.provider;
+const providerForTime = tenant.contracts.providerForTime;
+const chainIdForTime = tenant.contracts.chainForTime?.id;
 const governor = tenant.contracts.governor;
 const timelock = tenant.contracts.timelock;
 const governorType = tenant.contracts.governorType;
@@ -139,9 +142,20 @@ export async function simulateNew(
   // --- Get details about the proposal we're simulating ---
   const network = await provider.getNetwork();
 
-  const blockNumberToUse = (await getLatestBlock(network.chainId)) - 3;
+  const blockNumberToUse =
+    useL1BlockNumber && chainIdForTime
+      ? (await getLatestBlock(BigInt(chainIdForTime))) - 3
+      : (await getLatestBlock(network.chainId)) - 3;
 
-  const latestBlock = await provider.getBlock(blockNumberToUse);
+  const latestBlock =
+    useL1BlockNumber && providerForTime
+      ? await providerForTime.getBlock(blockNumberToUse)
+      : await provider.getBlock(blockNumberToUse);
+
+  const latestBlockL2 =
+    useL1BlockNumber && chainIdForTime
+      ? (await getLatestBlock(network.chainId)) - 3
+      : null;
 
   const proposalId = await generateProposalId({
     targets,
@@ -307,7 +321,7 @@ export async function simulateNew(
 
   const simulationPayload: TenderlyPayload = {
     network_id: network.chainId.toString(),
-    block_number: latestBlock.number,
+    block_number: latestBlockL2 ? latestBlockL2 : latestBlock.number,
     from: DEFAULT_FROM,
     to: governor.address,
     input: encodeFunctionData({
@@ -377,9 +391,20 @@ export async function simulateProposed(
   // --- Get details about the proposal we're simulating ---
   const network = await provider.getNetwork();
 
-  const blockNumberToUse = (await getLatestBlock(network.chainId)) - 3; // subtracting a few blocks to ensure tenderly has the block
+  const blockNumberToUse =
+    useL1BlockNumber && chainIdForTime
+      ? (await getLatestBlock(BigInt(chainIdForTime))) - 3
+      : (await getLatestBlock(network.chainId)) - 3; // subtracting a few blocks to ensure tenderly has the block
 
-  const latestBlock = await provider.getBlock(blockNumberToUse);
+  const latestBlock =
+    useL1BlockNumber && providerForTime
+      ? await providerForTime.getBlock(blockNumberToUse)
+      : await provider.getBlock(blockNumberToUse);
+
+  const latestBlockL2 =
+    useL1BlockNumber && chainIdForTime
+      ? (await getLatestBlock(network.chainId)) - 3
+      : null;
 
   const options = (
     proposal.proposalData as ParsedProposalData["STANDARD"]["kind"]
@@ -602,7 +627,7 @@ export async function simulateProposed(
   const simulationPayload: TenderlyPayload = {
     network_id: network.chainId.toString(),
     // this field represents the block state to simulate against, so we use the latest block number
-    block_number: latestBlock.number,
+    block_number: latestBlockL2 ? latestBlockL2 : latestBlock.number,
     from,
     to: governor.address,
     input: encodeFunctionData({

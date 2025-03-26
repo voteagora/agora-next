@@ -28,7 +28,7 @@ import { TENDERLY_VALID_CHAINS } from "@/app/proposals/draft/components/BasicPro
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Button } from "@/components/ui/button";
 
-const { contracts, token } = Tenant.current();
+const { contracts, token, ui } = Tenant.current();
 
 const tokenSymbolsToCheck = {
   [`${contracts.token.address.toLowerCase()}`]: {
@@ -66,11 +66,18 @@ const ProposalTransactionDisplay = ({
   proposal?: Proposal;
 }) => {
   const [collapsed, setCollapsed] = useState(true);
-  const [simulationReport, setSimulationReport] =
-    useState<StructuredSimulationReport | null>(null);
   const [viewMode, setViewMode] = useState<"summary" | "raw">("summary");
   const [isSimulating, setIsSimulating] = useState(false);
   const openDialog = useOpenDialog();
+
+  const hasRealCalldatas = calldatas.some((calldata) => calldata !== "0x");
+  const hasNonEmptySignatures = signatures?.some(
+    (signature) => signature !== ""
+  );
+  const hasNonEmptyValues = values.some((value) => Number(value) !== 0);
+
+  const hasRealActions =
+    hasRealCalldatas || hasNonEmptySignatures || hasNonEmptyValues;
 
   if (targets.length === 0) {
     return (
@@ -102,8 +109,6 @@ const ProposalTransactionDisplay = ({
       const report = await checkExistingProposal({
         existingProposal: proposal,
       });
-
-      setSimulationReport(report?.structuredReport ?? null);
 
       openDialog({
         type: "SIMULATION_REPORT",
@@ -137,13 +142,17 @@ const ProposalTransactionDisplay = ({
               </a>
             )}
             {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
-              !!proposal?.id && (
+              !!proposal?.id &&
+              hasRealActions && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={simulateTransactions}
                   disabled={isSimulating}
-                  className="flex items-center gap-2"
+                  className={cn(
+                    "flex items-center gap-2",
+                    ui.theme === "dark" && "text-neutral"
+                  )}
                 >
                   {isSimulating ? "Simulating..." : "Simulate transactions"}
                 </Button>
