@@ -46,7 +46,7 @@ const tabs = [
 ];
 
 const InfoAbout = () => {
-  const { namespace, ui } = Tenant.current();
+  const { namespace, ui, brandName } = Tenant.current();
   const page = ui.page("info/about");
 
   if (!page) {
@@ -69,10 +69,10 @@ const InfoAbout = () => {
             />
           </div>
           <div className="sm:w-1/2">
-            <h3 className="text-lg font-bold text-primary capitalize">
+            <h3 className="text-lg font-bold text-primary">
               {namespace === TENANT_NAMESPACES.DEMO
                 ? "About Canopy"
-                : "About " + namespace}
+                : "About " + brandName}
             </h3>
             <p className="text-secondary mt-3">{page.description}</p>
             {/* So the image doesn't look smooshed for scroll :eye-roll: */}
