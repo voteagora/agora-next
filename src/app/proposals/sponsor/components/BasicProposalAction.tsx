@@ -54,6 +54,7 @@ const BasicProposalAction = ({
         isLoading={isWriteLoading || isSimulating}
         fullWidth={true}
         type={onPrepareError ? "disabled" : "primary"}
+        className="whitespace-nowrap min-w-[184px]"
         onClick={async () => {
           try {
             const data = await writeAsync(config!.request);

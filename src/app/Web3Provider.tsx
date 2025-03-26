@@ -3,7 +3,6 @@
 import { FC, PropsWithChildren } from "react";
 import { createConfig, WagmiProvider, type Transport } from "wagmi";
 import { inter } from "@/styles/fonts";
-import { mainnet } from "wagmi/chains";
 import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
 import { ConnectKitProvider, getDefaultConfig, SIWEProvider } from "connectkit";
@@ -14,7 +13,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import Tenant from "@/lib/tenant/tenant";
-import { getTransportForChain } from "@/lib/utils";
+import { configItems } from "./config";
 import { hashFn } from "@wagmi/core/query";
 
 const queryClient = new QueryClient({
@@ -32,27 +31,25 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
-const { contracts, ui } = Tenant.current();
+const { ui } = Tenant.current();
 const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
 export const config = createConfig(
   getDefaultConfig({
     walletConnectProjectId: projectId,
-    chains: [contracts.token.chain, mainnet],
-    transports: {
-      [mainnet.id]: getTransportForChain(mainnet.id)!,
-      [contracts.token.chain.id]: getTransportForChain(
-        contracts.token.chain.id
-      )!,
-    },
+    ...configItems,
     appName: metadata.name,
     appDescription: metadata.description,
     appUrl: metadata.url,
   })
 );
 
-const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
-  <WagmiProvider config={config}>
+const Web3Provider: FC<
+  PropsWithChildren<{
+    initialWAGMIState: any;
+  }>
+> = ({ children, initialWAGMIState }) => (
+  <WagmiProvider config={config} initialState={initialWAGMIState}>
     <QueryClientProvider client={queryClient}>
       <SIWEProvider {...siweProviderConfig}>
         <ConnectKitProvider options={{ enforceSupportedChains: false }}>
