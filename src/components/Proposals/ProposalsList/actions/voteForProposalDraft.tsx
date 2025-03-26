@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 
 async function voteForProposalDraft({
   address,
@@ -11,7 +11,7 @@ async function voteForProposalDraft({
   proposalId: string;
   direction: 1 | -1;
 }) {
-  return await prisma.proposalDraftVote.upsert({
+  return await prismaWeb2Client.proposalDraftVote.upsert({
     where: {
       voter_proposal_id: {
         voter: address,

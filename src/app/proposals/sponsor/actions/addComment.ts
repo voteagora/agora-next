@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function addComment({
@@ -14,7 +14,7 @@ export async function addComment({
   address: `0x${string}`;
   parentId?: number;
 }) {
-  await prisma.proposalDraftComment.create({
+  await prismaWeb2Client.proposalDraftComment.create({
     data: {
       proposal_id: parseInt(proposalId),
       comment,

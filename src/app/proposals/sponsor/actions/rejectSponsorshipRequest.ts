@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function ackSponsorshipRequest({
@@ -12,7 +12,7 @@ export async function ackSponsorshipRequest({
   proposalId: string;
   status: "PENDING" | "REJECTED";
 }) {
-  await prisma.proposalDraftApprovedSponsors.update({
+  await prismaWeb2Client.proposalDraftApprovedSponsors.update({
     where: {
       sponsor_address_proposal_id: {
         sponsor_address: address,

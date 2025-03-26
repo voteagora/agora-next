@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 
 const action = async (address: `0x${string}` | undefined) => {
@@ -22,7 +22,7 @@ const action = async (address: `0x${string}` | undefined) => {
     AND p.contract = $3
 `;
 
-  const count = await prisma.$queryRawUnsafe<{ count: number }[]>(
+  const count = await prismaWeb2Client.$queryRawUnsafe<{ count: number }[]>(
     query,
     address,
     chainId,
