@@ -33,7 +33,7 @@ export async function authenticateApiUser(
   request: NextRequest
 ): Promise<AuthInfo> {
   const prismaModule = require("@/app/lib/prisma");
-  const prisma = prismaModule.default as PrismaClient;
+  const prisma = prismaModule.prismaWeb2Client as PrismaClient;
   let authResponse: AuthInfo = await validateBearerToken(request);
 
   if (!authResponse.authenticated) {
