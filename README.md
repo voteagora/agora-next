@@ -8,6 +8,10 @@
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Environment Variables
+
+* *NEXT_PUBLIC_FORK_NODE_URL* - The URL of an optional node, most likely a fork, for testing purposes.  Leave blank to use alchemy.
+
 ## About this repo
 
 You will find a mix of different styles at work in this repo. We are a small team and will be settling on standards in the coming months as we move more and more of the multi-tennant / instance style of Agora, into one codebase.

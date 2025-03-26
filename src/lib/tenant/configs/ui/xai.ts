@@ -52,6 +52,8 @@ export const xaiTenantUIConfig = new TenantUI({
     letterSpacing: "0.02em",
   },
 
+  theme: "dark",
+
   tacticalStrings: {
     myBalance: "My XAI + esXAI (incl. Staked) balance",
   },

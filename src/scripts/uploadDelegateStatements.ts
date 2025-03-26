@@ -1,15 +1,13 @@
-const { PrismaClient } = require("@prisma/client");
 const { DaoSlug } = require("@prisma/client");
 const fs = require("fs");
 const readline = require("readline");
+import { prismaWeb3Client } from "@/app/lib/prisma";
 
 async function main(
   filePath: string,
   daoSlug: typeof DaoSlug,
   checkExisting = true // use if Postges has been used as primary DB for the DAO. Otherwise, use false
 ) {
-  const prisma = new PrismaClient({});
-
   const fileStream = fs.createReadStream(filePath);
   const rl = readline.createInterface({
     input: fileStream,
@@ -38,7 +36,7 @@ async function main(
     const existingIds = checkExisting
       ? new Set(
           (
-            await prisma.delegateStatements.findMany({
+            await prismaWeb3Client.delegateStatements.findMany({
               select: { address: true },
               where: {
                 address: {
@@ -60,7 +58,7 @@ async function main(
 
     // Bulk insert create records
     if (newStatements.length > 0) {
-      await prisma.delegateStatements.createMany({
+      await prismaWeb3Client.delegateStatements.createMany({
         data: newStatements,
         skipDuplicates: true, // This ensures we skip duplicates if any exist
       });
@@ -71,7 +69,7 @@ async function main(
   } catch (error) {
     console.error("Error processing the JSONL file:", error);
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb3Client.$disconnect();
   }
 }
 

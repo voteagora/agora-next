@@ -122,10 +122,10 @@ export default async function Page({
           <Tabs defaultValue={"statement"} className="w-full">
             <TabsList className="mb-8">
               <TabsTrigger value="statement" variant="underlined">
-                My Statement
+                Statement
               </TabsTrigger>
               <TabsTrigger value="participation" variant="underlined">
-                My Participation
+                Participation
               </TabsTrigger>
               <TabsTrigger value="delegations" variant="underlined">
                 Delegations

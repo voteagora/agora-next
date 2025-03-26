@@ -10,6 +10,7 @@ import EnvelopeBottom from "./DialogImage/EnvelopeBottom";
 import EnvelopePaper from "./DialogImage/EnvelopePaper";
 import EnvelopeTop from "./DialogImage/EnvelopeTop";
 import StarIcon from "./DialogImage/Star";
+import Link from "next/link";
 
 const HeroImage = ({ isHovering }: { isHovering: boolean }) => {
   return (
@@ -110,10 +111,20 @@ const SubscribeDialog = ({
             } catch (error) {
               toast.error("Error updating notification preferences.");
               console.error(error);
+            } finally {
+              toast.success(
+                <span>
+                  No problem! We won&apos;t bug you again. You can change your
+                  preferences in{" "}
+                  <Link className="underline" href={`/delegates/${address}`}>
+                    your profile
+                  </Link>
+                </span>
+              );
             }
           }}
         >
-          Maybe later
+          No thanks
         </Button>
         <Button
           className="w-full"
