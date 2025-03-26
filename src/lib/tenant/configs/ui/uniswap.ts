@@ -324,25 +324,28 @@ export const uniswapTenantUIConfig = new TenantUI({
           },
         ],
         copy: {
-          helperText: `
-  ## Proposal checklist
-
-  **1. Create your proposal**
-
-  Get started by drafting your proposal directly in the Uniswap governance interface. Clearly outline your objectives, provide supporting details, and ensure your proposal aligns with Uniswap's governance standards.
-
-  **2. Request sponsorship (if threshold not met)**
-
-  If you don't meet the required voting power threshold, you can request sponsorship from existing delegates. This allows your proposal to gain visibility and the necessary backing from the community.
-
-  **3. Submit as waiting for sponsorship**
-
-  If you don’t have the voting power to post the proposal yourself, you can request a delegate with enough voting power to sponsor it. The delegate you choose can review your proposal and choose to sponsor it if they support it, pushing it onchain for voting. One note - you should coordinate with sponsor delegates so they know you’re looking for sponsorship!
-
-  **4. Submit onchain (If threshold met)**
-
-  If you meet the voting power threshold, you can bypass the sponsorship phase and submit it onchain directly. This fast-tracks your proposal to the voting stage, giving the community the opportunity to decide on its implementation.
-  `.trim(),
+          draftSteps: [
+            {
+              title: "Select the proposal type",
+              description:
+                "Proposal types set the quorum and approval thresholds for your proposal. Select the correct type for the proposal that you're making.",
+            },
+            {
+              title: "Choose your vote type",
+              description:
+                "This determines if your proposal will be a simple yes/no or a multiple choice.",
+            },
+            {
+              title: "Create your proposal draft",
+              description:
+                "Now that the vote and proposal type are set, you can create your proposal by giving it a title, description, and optionally a set of transactions to execute.",
+            },
+            {
+              title: "Submit your draft onchain",
+              description:
+                "If you meet the proposal threshold or are the manager of the governor, then you can submit your draft onchain as a proposal. If you do not meet these requirements, you can find a sponsor for your proposal who does.",
+            },
+          ],
         },
         public: true,
         comments: false,

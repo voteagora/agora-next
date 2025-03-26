@@ -26,15 +26,12 @@ import {
   getProposalsCount,
 } from "@/lib/prismaUtils";
 import { Block } from "ethers";
-<<<<<<< HEAD
 import {
   draftProposalsFilterOptions,
   draftProposalsSortOptions,
   myDraftsSortOptions,
 } from "@/lib/constants";
-=======
 import { withMetrics } from "@/lib/metricWrapper";
->>>>>>> main
 
 import { unstable_cache } from "next/cache";
 async function getProposals({
@@ -351,7 +348,7 @@ const getDraftProposalsV2 = async (
   `;
 
   const rawQuery = async (skip: number, take: number) =>
-    prisma.$queryRawUnsafe<
+    prismaWeb2Client.$queryRawUnsafe<
       (ProposalDraft & {
         transactions: ProposalDraftTransaction[];
         approved_sponsors: ProposalDraftApprovedSponsors[];
@@ -410,7 +407,7 @@ const getMyDraftProposals = async (
   `;
 
   const rawQuery = async (skip: number, take: number) =>
-    prisma.$queryRawUnsafe<ProposalDraft[]>(
+    prismaWeb2Client.$queryRawUnsafe<ProposalDraft[]>(
       query,
       address,
       chainId,
