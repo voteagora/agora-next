@@ -48,7 +48,7 @@ export default function DelegatesTabs({ children }: { children: ReactNode }) {
       value={tab}
       onValueChange={(value) => handleTabChange(value)}
     >
-      <div className="flex flex-row justify-between items-baseline gap-2">
+      <div className="flex flex-row justify-between items-baseline gap-2 mt-3 sm:mt-0">
         <TabsList>
           <TabsTrigger className="" value="delegates">
             Delegates

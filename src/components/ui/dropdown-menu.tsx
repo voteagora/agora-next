@@ -89,11 +89,11 @@ const DropdownMenuRadioItem = React.forwardRef<
         <div
           className={cn(
             "w-[20px] h-[20px] rounded-full border transition-colors",
-            checked ? "border-positive" : "border-line"
+            checked ? "border-brandPrimary" : "border-line"
           )}
         />
         <DropdownMenuPrimitive.ItemIndicator>
-          <div className="w-2.5 h-2.5 absolute top-[19px] left-[17px] bg-positive rounded-full" />
+          <div className="w-2.5 h-2.5 absolute top-[19px] left-[17px] bg-brandPrimary rounded-full" />
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
       {children}

@@ -42,11 +42,11 @@ export const MobileSortOption = ({
       <div
         className={cn(
           "w-[20px] h-[20px] rounded-full border transition-colors",
-          checked ? "border-positive" : "border-line"
+          checked ? "border-brandPrimary" : "border-line"
         )}
       >
         {checked && (
-          <div className="w-2.5 h-2.5 absolute top-[7px] left-[5px] bg-positive rounded-full" />
+          <div className="w-2.5 h-2.5 absolute top-[7px] left-[5px] bg-brandPrimary rounded-full" />
         )}
       </div>
     </span>

@@ -31,7 +31,7 @@ describe("DelegateFilterCheckBoxItem", () => {
     expect(screen.queryByTestId("check-icon")).not.toBeInTheDocument();
 
     // Verify border is present for unchecked state
-    const uncheckedBox = container.querySelector(".border-positive");
+    const uncheckedBox = container.querySelector(".border-brandPrimary");
     expect(uncheckedBox).toBeInTheDocument();
   });
 
@@ -52,7 +52,7 @@ describe("DelegateFilterCheckBoxItem", () => {
     expect(screen.getByTestId("check-icon")).toBeInTheDocument();
 
     // Verify background color for checked state
-    const checkedBox = container.querySelector(".bg-positive");
+    const checkedBox = container.querySelector(".bg-brandPrimary");
     expect(checkedBox).toBeInTheDocument();
   });
 
