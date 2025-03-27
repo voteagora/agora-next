@@ -693,7 +693,7 @@ export function parseProposalResults(
 
       const standardResults = (() => {
         if (
-          String(namespace) === "UNISWAP" &&
+          namespace.toString() === "uniswap" &&
           contracts.governor.v6UpgradeBlock &&
           Number(startBlock) < contracts.governor.v6UpgradeBlock
         ) {
@@ -771,15 +771,39 @@ export async function getProposalStatus(
     return "QUEUED";
   }
 
-  if (
-    !proposal.start_block ||
-    !latestBlock ||
-    Number(proposal.start_block) > latestBlock.number
-  ) {
-    return "PENDING";
-  }
-  if (!proposal.end_block || Number(proposal.end_block) > latestBlock.number) {
-    return "ACTIVE";
+  const { ui } = Tenant.current();
+  const isTimeStampBasedTenant = ui.toggle(
+    "use-timestamp-for-proposals"
+  )?.enabled;
+
+  if (isTimeStampBasedTenant && isTimestampBasedProposal(proposal)) {
+    const startTimestamp = getStartTimestamp(proposal);
+    const endTimestamp = getEndTimestamp(proposal);
+
+    if (
+      !startTimestamp ||
+      !latestBlock ||
+      Number(startTimestamp) > latestBlock.timestamp
+    ) {
+      return "PENDING";
+    }
+    if (!endTimestamp || Number(endTimestamp) > latestBlock.timestamp) {
+      return "ACTIVE";
+    }
+  } else if (isBlockBasedProposal(proposal)) {
+    const startBlock = getStartBlock(proposal);
+    const endBlock = getEndBlock(proposal);
+
+    if (
+      !startBlock ||
+      !latestBlock ||
+      Number(startBlock) > latestBlock.number
+    ) {
+      return "PENDING";
+    }
+    if (!endBlock || Number(endBlock) > latestBlock.number) {
+      return "ACTIVE";
+    }
   }
 
   switch (proposalResults.key) {
@@ -847,7 +871,7 @@ export const proposalToCallArgs = (proposal: Proposal) => {
     "options" in proposalData ? proposalData.options[0].targets : "",
     "options" in proposalData ? proposalData.options[0].values : "",
     "options" in proposalData ? proposalData.options[0].calldatas : "",
-    keccak256(proposal.description!),
+    keccak256(proposal.description! as `0x${string}`),
   ];
 };
 
@@ -870,7 +894,7 @@ export function getProposalCurrentQuorum(
   const { namespace } = Tenant.current();
 
   switch (namespace) {
-    case "UNISWAP":
+    case "uniswap":
       return BigInt(proposalResults.for);
 
     default:
@@ -881,7 +905,7 @@ export function getProposalCurrentQuorum(
 export function isProposalCreatedBeforeUpgradeCheck(proposal: Proposal) {
   const { namespace } = Tenant.current();
   return (
-    String(namespace) === "OPTIMISM" &&
+    namespace === "optimism" &&
     proposal.createdTime &&
     new Date(proposal.createdTime) < new Date("2024-01-08")
   );
