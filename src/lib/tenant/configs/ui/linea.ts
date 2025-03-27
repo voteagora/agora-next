@@ -249,13 +249,8 @@ export const lineaTenantUIConfig = new TenantUI({
           },
           {
             type: ProposalType?.APPROVAL,
-            prodAddress: "0x7751f14e211150F54D9ADD4727f7D6E9a07d4cDb",
-            testnetAddress: "0x7751f14e211150F54D9ADD4727f7D6E9a07d4cDb",
-          },
-          {
-            type: ProposalType?.OPTIMISTIC,
-            prodAddress: "0x368723068b6C762b416e5A7d506a605E8b816C22",
-            testnetAddress: "0x368723068b6C762b416e5A7d506a605E8b816C22",
+            prodAddress: "0xF23C23d65fDDD549818CF81E37A32D15f44048C8",
+            testnetAddress: "0xF23C23d65fDDD549818CF81E37A32D15f44048C8",
           },
         ],
         copy: {

@@ -7,7 +7,7 @@ import {
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { AlchemyProvider, BaseContract, JsonRpcProvider } from "ethers";
+import { BaseContract, JsonRpcProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 import {
@@ -27,24 +27,24 @@ export const lineaTenantConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd
-    ? "0x75F37F4cFE214Dce167AAAa3455Bd1223b52BAFd"
-    : "0x75F37F4cFE214Dce167AAAa3455Bd1223b52BAFd";
+    ? "0xDa235d2fa0089F38e756c70a10fF6c6e33b2616f"
+    : "0xDa235d2fa0089F38e756c70a10fF6c6e33b2616f";
 
   const GOVERNOR = isProd
-    ? "0x1Fe07cd62bD330bD0899bA9959A2B8C1b98360F8"
-    : "0x1Fe07cd62bD330bD0899bA9959A2B8C1b98360F8";
+    ? "0x89527f98815A981bc54c75853135348b3d0f7838"
+    : "0x89527f98815A981bc54c75853135348b3d0f7838";
 
   const TYPES = isProd
-    ? "0x7a0f7659103cfc42f3Eeb265EDb0205bE9B25490"
-    : "0x7a0f7659103cfc42f3Eeb265EDb0205bE9B25490";
+    ? "0x50E86399DDb16E9DbbeD6A9E9DF07CC724d31fEA"
+    : "0x50E86399DDb16E9DbbeD6A9E9DF07CC724d31fEA";
 
   const TIMELOCK = isProd
-    ? "0x7ca4a290a00A99829CdD6ED9D25D6e77e5544499"
-    : "0x7ca4a290a00A99829CdD6ED9D25D6e77e5544499";
+    ? "0x375039472E76B393b6ea945eeb1478c869CF8618"
+    : "0x375039472E76B393b6ea945eeb1478c869CF8618";
 
   const APPROVAL_MODULE = isProd
-    ? "0x7751f14e211150F54D9ADD4727f7D6E9a07d4cDb"
-    : "0x7751f14e211150F54D9ADD4727f7D6E9a07d4cDb";
+    ? "0xF23C23d65fDDD549818CF81E37A32D15f44048C8"
+    : "0xF23C23d65fDDD549818CF81E37A32D15f44048C8";
 
   const provider = new JsonRpcProvider(
     isProd

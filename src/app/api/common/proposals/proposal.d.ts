@@ -14,7 +14,7 @@ import { Decimal } from "@prisma/client/runtime";
 export type ProposalPayload = OptimismProposals | lineaProposals;
 
 // Interface for proposals with start_timestamp
-export interface TimestampBasedProposal extends ProposalCommon {
+export interface TimestampBasedProposal {
   start_timestamp: string;
   end_timestamp: string;
   start_block?: never;
@@ -22,7 +22,7 @@ export interface TimestampBasedProposal extends ProposalCommon {
 }
 
 // Interface for proposals with start_block
-export interface BlockBasedProposal extends ProposalCommon {
+export interface BlockBasedProposal {
   start_block: string;
   end_block: string | null;
   start_timestamp?: never;
