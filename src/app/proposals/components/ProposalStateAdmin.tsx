@@ -70,7 +70,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
       case PROPOSAL_STATUS.PENDING:
         return "This proposal can still be cancelled by the admin.";
       case PROPOSAL_STATUS.SUCCEEDED:
-        if (namespace === TENANT_NAMESPACES.OPTIMISM) {
+        if (namespace === TENANT_NAMESPACES.DEMO) {
           if (
             proposal.proposalType === "APPROVAL" ||
             proposal.proposalType === "STANDARD"
@@ -137,7 +137,6 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
-    case TENANT_NAMESPACES.DEMO:
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.B3:
       return (
@@ -147,7 +146,7 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
         </div>
       );
 
-    case TENANT_NAMESPACES.OPTIMISM:
+    case TENANT_NAMESPACES.DEMO:
       // Check if proposal was created after the execution launch date
       const proposalDate = proposal.createdTime
         ? new Date(proposal.createdTime)
@@ -188,7 +187,6 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
-    case TENANT_NAMESPACES.DEMO:
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.B3:
       return (
@@ -198,7 +196,7 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
         </div>
       );
 
-    case TENANT_NAMESPACES.OPTIMISM:
+    case TENANT_NAMESPACES.DEMO:
       // Check if proposal was created after the execution launch date
       const proposalDate = proposal.createdTime
         ? new Date(proposal.createdTime)
@@ -232,12 +230,11 @@ const activeStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.SCROLL:
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
-    case TENANT_NAMESPACES.DEMO:
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.B3:
       return <AgoraGovCancel proposal={proposal} />;
 
-    case TENANT_NAMESPACES.OPTIMISM:
+    case TENANT_NAMESPACES.DEMO:
       return <AgoraOptimismGovCancel proposal={proposal} />;
 
     case TENANT_NAMESPACES.ENS:
