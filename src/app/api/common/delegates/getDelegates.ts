@@ -97,10 +97,11 @@ async function getDelegates({
       // Add hasStatement filter condition
       const hasStatementCondition = filters?.hasStatement
         ? `
-          AND s.payload IS NOT NULL
+          AND s.payload IS NOT NULL 
           AND s.payload != '{}'::jsonb
           AND s.payload ? 'delegateStatement'
           AND s.payload ->> 'delegateStatement' != ''
+          AND LENGTH(s.payload ->> 'delegateStatement') >= 10
         `
         : "";
 
