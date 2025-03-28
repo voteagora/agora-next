@@ -49,3 +49,9 @@ export type SnapshotVote = {
   reason: string;
   choiceLabels: Record<string, any>;
 };
+
+export type DelegatesSort =
+  | "most_delegators"
+  | "weighted_random"
+  | "voting_power"
+  | "least_voting_power";

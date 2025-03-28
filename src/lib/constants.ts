@@ -65,6 +65,10 @@ export const delegatesFilterOptions = {
     sort: "most_voting_power",
     value: "Most voting power",
   },
+  leastVotingPower: {
+    sort: "least_voting_power",
+    value: "Least voting power",
+  },
   mostDelegators: {
     sort: "most_delegators",
     value: "Most delegators",

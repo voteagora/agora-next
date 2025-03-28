@@ -320,6 +320,8 @@ async function getDelegates({
             );
 
           default:
+            const sortDirection =
+              sort === "least_voting_power" ? "ASC" : "DESC";
             const QRY3 = `
               ${delegateUniverseCTE}
               SELECT *,
@@ -354,7 +356,7 @@ async function getDelegates({
               FROM del_card_universe d
               WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
               ${delegateStatementFilter}
-              ORDER BY voting_power DESC, d.delegate
+              ORDER BY voting_power ${sortDirection}, d.delegate
               OFFSET $1
               LIMIT $2;
               `;
