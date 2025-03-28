@@ -25,7 +25,7 @@ export default function ApprovalProposalCriteria({ proposal }) {
           <div>
             Quorum{" "}
             <TokenAmountDecorated
-              amount={proposal.quorum}
+              amount={proposal.quorum || "0"}
               hideCurrency
               specialFormatting
             />
