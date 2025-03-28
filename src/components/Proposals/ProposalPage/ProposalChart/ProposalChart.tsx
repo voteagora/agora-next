@@ -16,6 +16,7 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
   const { data: votes } = useProposalVotesChart({
     enabled: showChart,
     proposalId: proposal.id,
+    proposalType: proposal.proposalType ?? undefined,
   });
 
   const tabs = [

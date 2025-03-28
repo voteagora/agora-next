@@ -1,7 +1,7 @@
 import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
 import { type ProposalStatus } from "@/lib/proposalUtils";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
-import { getBlockScanUrl } from "@/lib/utils";
+import { cn, getBlockScanUrl } from "@/lib/utils";
 
 export default function ProposalStatusDetail({
   proposalStatus,
@@ -10,6 +10,7 @@ export default function ProposalStatusDetail({
   proposalCancelledTime,
   proposalExecutedTime,
   cancelledTransactionHash,
+  className,
 }: {
   proposalStatus: ProposalStatus | null;
   proposalEndTime: Date | null;
@@ -17,9 +18,15 @@ export default function ProposalStatusDetail({
   proposalCancelledTime: Date | null;
   proposalExecutedTime: Date | null;
   cancelledTransactionHash: string | null;
+  className?: string;
 }) {
   return (
-    <div className="flex flex-row justify-between items-center gap-4 bg-wash border-t border-line -mx-4 px-4 py-2 text-secondary rounded-b-md text-xs">
+    <div
+      className={cn(
+        "flex flex-row justify-between items-center gap-4 bg-wash border-t border-line -mx-4 px-4 py-2 text-secondary rounded-b-md text-xs",
+        className
+      )}
+    >
       <div>
         {proposalStatus === "ACTIVE" && (
           <p className="text-blue-600 bg-sky-200 rounded-sm px-1 py-0.5 font-semibold">
@@ -29,6 +36,11 @@ export default function ProposalStatusDetail({
         {proposalStatus === "QUEUED" && (
           <p className="text-blue-600 bg-blue-200 rounded-sm px-1 py-0.5 font-semibold">
             QUEUED
+          </p>
+        )}
+        {proposalStatus === "CLOSED" && (
+          <p className="text-wash bg-tertiary rounded-sm px-1 py-0.5 font-semibold">
+            CLOSED
           </p>
         )}
         {proposalStatus === "EXECUTED" && (
