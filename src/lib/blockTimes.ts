@@ -45,6 +45,10 @@ export function getSecondsPerBlock(chainId: number | undefined): number {
     case 8453: // Base Mainnet
       return 2;
 
+    case 59144: // Linea Mainnet
+    case 59141: // Linea Testnet
+      return 2;
+
     default:
       throw new Error(`Block time for chain:${chainId} not specified`);
   }
@@ -132,6 +136,14 @@ export function getHumanBlockTime(
       const estEthSecondsDiff =
         (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
       return new Date((latestBlock.timestamp - estEthSecondsDiff) * 1000);
+    }
+
+    case 59144:
+    case 59141: {
+      const blockSeconds = getSecondsPerBlock(chainIdToUse);
+      const estLineaSecondsDiff =
+        (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
+      return new Date((latestBlock.timestamp - estLineaSecondsDiff) * 1000);
     }
 
     default:
