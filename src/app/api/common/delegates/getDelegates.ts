@@ -97,10 +97,11 @@ async function getDelegates({
       // Add hasStatement filter condition
       const hasStatementCondition = filters?.hasStatement
         ? `
-          AND s.payload IS NOT NULL
+          AND s.payload IS NOT NULL 
           AND s.payload != '{}'::jsonb
           AND s.payload ? 'delegateStatement'
           AND s.payload ->> 'delegateStatement' != ''
+          AND LENGTH(s.payload ->> 'delegateStatement') >= 10
         `
         : "";
 
@@ -320,6 +321,8 @@ async function getDelegates({
             );
 
           default:
+            const sortDirection =
+              sort === "least_voting_power" ? "ASC" : "DESC";
             const QRY3 = `
               ${delegateUniverseCTE}
               SELECT *,
@@ -354,7 +357,7 @@ async function getDelegates({
               FROM del_card_universe d
               WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
               ${delegateStatementFilter}
-              ORDER BY voting_power DESC, d.delegate
+              ORDER BY voting_power ${sortDirection}, d.delegate
               OFFSET $1
               LIMIT $2;
               `;

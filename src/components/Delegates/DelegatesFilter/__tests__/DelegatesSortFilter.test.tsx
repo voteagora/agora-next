@@ -180,4 +180,20 @@ describe("DelegatesSortFilter", () => {
       expect(getByTestId(`sort-option-${option.sort}`)).toBeInTheDocument();
     });
   });
+
+  it("should handle least voting power sort option", () => {
+    (useDelegatesSort as any).mockReturnValue({
+      orderByParam: "least_voting_power",
+      handleSortChange: vi.fn(),
+      resetSort: vi.fn(),
+    });
+
+    const { getByTestId } = render(<DelegatesSortFilter />);
+
+    // Check that the radio group has the correct value
+    expect(getByTestId("radio-group")).toHaveAttribute(
+      "data-value",
+      "least_voting_power"
+    );
+  });
 });
