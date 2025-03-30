@@ -1,8 +1,5 @@
 /**
  * Calculates Copeland voting scores based on ranked preferences with constraints:
- * - Each letter represents a single option with both EXT 2Y and EXT 1Y values
- * - The top 2 scoring letters receive EXT 2Y funding
- * - The next 4 scoring letters receive EXT 1Y funding
  *
  * @param votes Array of vote objects containing voter info and choices
  * @param options Array of available options
@@ -15,23 +12,32 @@ interface PairwiseComparison {
   option1: string;
   option2: string;
   winner: string | null;
-  option1Wins: number;
-  option2Wins: number;
+  option1VotingPower: number;
+  option2VotingPower: number;
+}
+
+interface FundingInfo {
+  ext: number;
+  std: number;
+  isEligibleFor2Y: boolean;
 }
 
 export interface CopelandResult {
-  letter: string;
-  fundingType: "EXT 2Y" | "EXT 1Y" | "None";
+  option: string;
+  fundingType: "EXT2Y" | "EXT1Y" | "STD" | "None";
   comparisons: PairwiseComparison[];
   totalWins: number;
   totalLosses: number;
   avgVotingPowerFor: number;
   avgVotingPowerAgainst: number;
+  fundingInfo: FundingInfo;
 }
 
 export function calculateCopelandVote(
   votes: SnapshotVote[],
-  options: string[]
+  options: string[],
+  budget: number,
+  fundingInfo: Record<string, FundingInfo>
 ): CopelandResult[] {
   const scores: Record<string, number> = {};
   const pairwiseWins: Record<string, Record<string, number>> = {};
@@ -56,61 +62,76 @@ export function calculateCopelandVote(
   votes.forEach((vote) => {
     totalVotingPower += vote.votingPower;
 
-    const noneIndex = options.findIndex((choice) => choice === "NONE BELOW");
+    const parsedChoice = vote.choice?.startsWith("[")
+      ? JSON.parse(vote.choice)
+      : vote.choice;
+
+    const noneRank = (parsedChoice as number[]).findIndex(
+      (choice) => choice === options.findIndex((o) => o === "NONE BELOW") + 1
+    );
 
     const optionRanks: Record<string, number> = {};
 
+    // First, initialize all options as unranked
+    options.forEach((option) => {
+      optionRanks[option] = -1;
+    });
+
+    // Then, process the voter's choices
     options.forEach((option, index) => {
-      const parsedChoice = vote.choice?.startsWith("[")
-        ? JSON.parse(vote.choice)
-        : vote.choice;
       const rank = (parsedChoice as number[]).findIndex(
         (choice) => choice === index + 1
       );
-
-      // Only consider options that are ranked higher than "NONE BELOW"
-      // or options that are valid if "NONE BELOW" isn't in options
-      if (noneIndex === -1 || rank < noneIndex) {
-        optionRanks[option] = rank;
-      } else {
-        optionRanks[option] = -1;
+      // If the option is found in the voter's choices
+      if (rank !== -1) {
+        // If NONE BELOW exists and this option is after it, mark as below NONE BELOW
+        if (noneRank !== -1 && rank > noneRank) {
+          optionRanks[option] = -2; // Use -2 to indicate below NONE BELOW
+        } else {
+          optionRanks[option] = rank;
+        }
       }
+      // If option not found in choices, it stays as -1 (unranked)
     });
 
     for (let i = 0; i < options.length; i++) {
       const option1 = options[i];
 
-      // Skip "NONE BELOW" itself from comparisons
-      if (option1 === "NONE BELOW") {
-        continue;
-      }
-
       for (let j = i + 1; j < options.length; j++) {
         const option2 = options[j];
 
-        // Skip "NONE BELOW" itself from comparisons
-        if (option2 === "NONE BELOW") {
+        // Skip if both options are below "NONE BELOW"
+        if (optionRanks[option1] === -2 && optionRanks[option2] === -2) {
           continue;
         }
 
-        // If option1 is below "NONE BELOW", it loses to option2
-        if (!(option1 in optionRanks) || optionRanks[option1] === -1) {
-          pairwiseWins[option2][option1] += vote.votingPower;
+        // Skip if either option is unranked (-1)
+        if (optionRanks[option1] === -1 || optionRanks[option2] === -1) {
           continue;
         }
 
-        // If option2 is below "NONE BELOW", it loses to option1
-        if (!(option2 in optionRanks) || optionRanks[option2] === -1) {
-          pairwiseWins[option1][option2] += vote.votingPower;
+        // If option1 is below "NONE BELOW", option2 wins
+        if (optionRanks[option1] === -2) {
+          pairwiseVotingPower[option2][option1].total += vote.votingPower;
+          pairwiseVotingPower[option2][option1].count += 1;
           continue;
         }
 
-        // Both options are above "NONE BELOW", compare their ranks
+        // If option2 is below "NONE BELOW", option1 wins
+        if (optionRanks[option2] === -2) {
+          pairwiseVotingPower[option1][option2].total += vote.votingPower;
+          pairwiseVotingPower[option1][option2].count += 1;
+          continue;
+        }
+
+        // For all other cases (including when one option is "NONE BELOW"), compare ranks normally
         // Lower rank is better (1 is better than 2)
         if (optionRanks[option1] < optionRanks[option2]) {
-          pairwiseWins[option1][option2] += vote.votingPower;
+          pairwiseVotingPower[option1][option2].total += vote.votingPower;
+          pairwiseVotingPower[option1][option2].count += 1;
         } else if (optionRanks[option1] > optionRanks[option2]) {
-          pairwiseWins[option2][option1] += vote.votingPower;
+          pairwiseVotingPower[option2][option1].total += vote.votingPower;
+          pairwiseVotingPower[option2][option1].count += 1;
         } else {
           // If tied, track voting power for this pair
           pairwiseVotingPower[option1][option2].total += vote.votingPower;
@@ -127,20 +148,23 @@ export function calculateCopelandVote(
   options.forEach((option1) => {
     options.forEach((option2) => {
       if (option1 !== option2 && option1 < option2) {
-        const option1Wins = pairwiseWins[option1][option2] || 0;
-        const option2Wins = pairwiseWins[option2][option1] || 0;
+        const option1VotingPower = pairwiseVotingPower[option1][option2];
+        const option2VotingPower = pairwiseVotingPower[option2][option1];
 
-        // If tied, use average voting power for this specific pair as tiebreaker
-        if (option1Wins === option2Wins) {
+        // First compare total voting power
+        if (option1VotingPower.total > option2VotingPower.total) {
+          scores[option1]++;
+        } else if (option2VotingPower.total > option1VotingPower.total) {
+          scores[option2]++;
+        } else {
+          // If tied on total voting power, use average as tiebreaker
           const option1AvgVP =
-            pairwiseVotingPower[option1][option2].count > 0
-              ? pairwiseVotingPower[option1][option2].total /
-                pairwiseVotingPower[option1][option2].count
+            option1VotingPower.count > 0
+              ? option1VotingPower.total / option1VotingPower.count
               : 0;
           const option2AvgVP =
-            pairwiseVotingPower[option2][option1].count > 0
-              ? pairwiseVotingPower[option2][option1].total /
-                pairwiseVotingPower[option2][option1].count
+            option2VotingPower.count > 0
+              ? option2VotingPower.total / option2VotingPower.count
               : 0;
 
           if (option1AvgVP > option2AvgVP) {
@@ -148,125 +172,238 @@ export function calculateCopelandVote(
           } else if (option2AvgVP > option1AvgVP) {
             scores[option2]++;
           }
-        } else if (option1Wins > option2Wins) {
-          scores[option1]++;
-        } else if (option1Wins < option2Wins) {
-          scores[option2]++;
         }
 
         pairwiseComparisons.push({
           option1,
           option2,
           winner:
-            option1Wins > option2Wins
+            option1VotingPower.total > option2VotingPower.total
               ? option1
-              : option2Wins > option1Wins
+              : option2VotingPower.total > option1VotingPower.total
                 ? option2
-                : null,
-          option1Wins,
-          option2Wins,
+                : option1VotingPower.count > 0 && option2VotingPower.count > 0
+                  ? option1VotingPower.total / option1VotingPower.count >
+                    option2VotingPower.total / option2VotingPower.count
+                    ? option1
+                    : option2VotingPower.total / option2VotingPower.count >
+                        option1VotingPower.total / option1VotingPower.count
+                      ? option2
+                      : null
+                  : null,
+          option1VotingPower: option1VotingPower.total,
+          option2VotingPower: option2VotingPower.total,
         });
       }
     });
   });
 
-  const letterOptions = options.filter((option) => option !== "NONE BELOW");
+  const results = options.map((option) => {
+    const comparisons = pairwiseComparisons
+      .filter((comp) => comp.option1 === option || comp.option2 === option)
+      .map((comp) => {
+        const isOption1 = comp.option1 === option;
+        const winMargin = isOption1
+          ? comp.option1VotingPower - comp.option2VotingPower
+          : comp.option2VotingPower - comp.option1VotingPower;
 
-  const sortedOptions = letterOptions
-    .map((option) => ({ option, score: scores[option] }))
-    .sort((a, b) => b.score - a.score);
+        return {
+          ...comp,
+          winMargin,
+        };
+      })
+      .sort((a, b) => b.winMargin - a.winMargin);
 
-  const ext2yWinners = sortedOptions.slice(0, 2).map((item) => item.option);
+    const totalWins = comparisons.filter(
+      (comp) =>
+        (comp.option1 === option &&
+          comp.option1VotingPower > comp.option2VotingPower) ||
+        (comp.option2 === option &&
+          comp.option2VotingPower > comp.option1VotingPower)
+    ).length;
 
-  const ext1yWinners = sortedOptions.slice(2, 6).map((item) => item.option);
+    const totalLosses = comparisons.filter(
+      (comp) =>
+        (comp.option1 === option &&
+          comp.option1VotingPower < comp.option2VotingPower) ||
+        (comp.option2 === option &&
+          comp.option2VotingPower < comp.option1VotingPower)
+    ).length;
 
-  const results = sortedOptions
+    let totalVotingPowerFor = 0;
+    let totalVotingPowerAgainst = 0;
+
+    comparisons.forEach((comp) => {
+      if (comp.option1 === option) {
+        totalVotingPowerFor += comp.option1VotingPower;
+        totalVotingPowerAgainst += comp.option2VotingPower;
+      } else if (comp.option2 === option) {
+        totalVotingPowerFor += comp.option2VotingPower;
+        totalVotingPowerAgainst += comp.option1VotingPower;
+      }
+    });
+
+    const numVotesForThisOption = votes.filter((vote) => {
+      const parsedChoice = vote.choice?.startsWith("[")
+        ? JSON.parse(vote.choice)
+        : vote.choice;
+      return (parsedChoice as number[]).some((choice) => {
+        const noneIndex = options.findIndex((o) => o === "NONE BELOW");
+        return (
+          options[choice - 1] === option &&
+          (noneIndex === -1 || choice - 1 < noneIndex)
+        );
+      });
+    }).length;
+
+    const avgVotingPowerFor =
+      numVotesForThisOption > 0
+        ? totalVotingPowerFor / numVotesForThisOption
+        : 0;
+    const avgVotingPowerAgainst =
+      numVotesForThisOption > 0
+        ? totalVotingPowerAgainst / numVotesForThisOption
+        : 0;
+
+    return {
+      comparisons,
+      totalWins,
+      totalLosses,
+      avgVotingPowerFor,
+      avgVotingPowerAgainst,
+      option,
+      fundingInfo: fundingInfo[option] || {
+        ext: 0,
+        std: 0,
+        isEligibleFor2Y: false,
+      },
+    };
+  });
+
+  const sortedOptions = [...options]
+    .map((option) => ({
+      option,
+      score: scores[option],
+      avgVotingPower:
+        results.find((r) => r.option === option)?.avgVotingPowerFor || 0,
+    }))
+    .sort((a, b) => {
+      if (b.score !== a.score) {
+        return b.score - a.score;
+      }
+      return b.avgVotingPower - a.avgVotingPower;
+    });
+
+  // Find the position of NONE BELOW in the sorted options
+  const noneBelowPosition = sortedOptions.findIndex(
+    (option) => option.option === "NONE BELOW"
+  );
+
+  // Calculate funding allocations based on 2 buckets
+  const TOTAL_BUDGET = 4500000; // $4.5M total
+  const EXT2Y_BUDGET = 1500000; // $1.5M for 2Y bucket
+  const EXT1Y_BUDGET = 3000000; // $3M for 1Y bucket
+
+  let remaining2YBudget = EXT2Y_BUDGET;
+  let remaining1YBudget = EXT1Y_BUDGET;
+
+  // First pass: Allocate funding based on priority rules
+  const resultsWithFunding = sortedOptions
     .map((option) => option.option)
-    .map((option) => {
-      let fundingType: "EXT 2Y" | "EXT 1Y" | "None" = "None";
-      if (ext2yWinners.includes(option)) {
-        fundingType = "EXT 2Y";
-      } else if (ext1yWinners.includes(option)) {
-        fundingType = "EXT 1Y";
+    .map((option, index) => {
+      const info = fundingInfo[option] || {
+        ext: 0,
+        std: 0,
+        isEligibleFor2Y: false,
+      };
+      let fundingType: "EXT2Y" | "EXT1Y" | "STD" | "None" = "None";
+
+      // NONE BELOW option always gets None funding type
+      if (option === "NONE BELOW") {
+        return {
+          ...results.find((r) => r.option === option)!,
+          fundingType: "None" as const,
+        };
       }
 
-      const comparisons = pairwiseComparisons
-        .filter(
-          (comp) =>
-            (comp.option1 === option || comp.option2 === option) &&
-            comp.option1 !== "NONE BELOW" &&
-            comp.option2 !== "NONE BELOW"
-        )
-        .map((comp) => {
-          const isOption1 = comp.option1 === option;
-          const winMargin = isOption1
-            ? comp.option1Wins - comp.option2Wins
-            : comp.option2Wins - comp.option1Wins;
+      // Check if the option is above NONE BELOW
+      const isAboveNoneBelow =
+        noneBelowPosition === -1 || index < noneBelowPosition;
 
-          return {
-            ...comp,
-            winMargin,
-          };
-        })
-        .sort((a, b) => b.winMargin - a.winMargin);
-
-      const totalWins = comparisons.filter(
-        (comp) =>
-          (comp.option1 === option && comp.option1Wins > comp.option2Wins) ||
-          (comp.option2 === option && comp.option2Wins > comp.option1Wins)
-      ).length;
-
-      const totalLosses = comparisons.filter(
-        (comp) =>
-          (comp.option1 === option && comp.option1Wins < comp.option2Wins) ||
-          (comp.option2 === option && comp.option2Wins < comp.option1Wins)
-      ).length;
-
-      let totalVotingPowerFor = 0;
-      let totalVotingPowerAgainst = 0;
-
-      comparisons.forEach((comp) => {
-        if (comp.option1 === option) {
-          totalVotingPowerFor += comp.option1Wins;
-          totalVotingPowerAgainst += comp.option2Wins;
-        } else if (comp.option2 === option) {
-          totalVotingPowerFor += comp.option2Wins;
-          totalVotingPowerAgainst += comp.option1Wins;
+      // Only allocate funding if the option is above NONE BELOW
+      if (isAboveNoneBelow) {
+        // Check if eligible for 2Y funding and has budget remaining
+        if (info.isEligibleFor2Y && remaining2YBudget >= info.ext) {
+          fundingType = "EXT2Y";
+          remaining2YBudget -= info.ext;
+        } else if (remaining1YBudget >= info.ext) {
+          fundingType = "EXT1Y";
+          remaining1YBudget -= info.ext;
+        } else if (remaining1YBudget >= info.std) {
+          fundingType = "STD";
+          remaining1YBudget -= info.std;
         }
-      });
-
-      const numVotesForThisOption = votes.filter((vote) => {
-        const parsedChoice = vote.choice?.startsWith("[")
-          ? JSON.parse(vote.choice)
-          : vote.choice;
-        return (parsedChoice as number[]).some((choice) => {
-          const noneIndex = options.findIndex((o) => o === "NONE BELOW");
-          return (
-            options[choice - 1] === option &&
-            (noneIndex === -1 || choice - 1 < noneIndex)
-          );
-        });
-      }).length;
-
-      const avgVotingPowerFor =
-        numVotesForThisOption > 0
-          ? totalVotingPowerFor / numVotesForThisOption
-          : 0;
-      const avgVotingPowerAgainst =
-        numVotesForThisOption > 0
-          ? totalVotingPowerAgainst / numVotesForThisOption
-          : 0;
+      }
 
       return {
-        comparisons,
-        totalWins,
-        totalLosses,
-        avgVotingPowerFor,
-        avgVotingPowerAgainst,
+        ...results.find((r) => r.option === option)!,
         fundingType,
-        letter: option,
       };
     });
 
-  return results;
+  // Second pass: Move remaining 2Y budget to 1Y bucket if no more eligible candidates
+  const hasMoreEligible2YCandidates = resultsWithFunding.some(
+    (result, index) =>
+      result.fundingType === "None" &&
+      result.fundingInfo.isEligibleFor2Y &&
+      result.fundingInfo.ext <= remaining2YBudget &&
+      (noneBelowPosition === -1 || index < noneBelowPosition)
+  );
+
+  if (!hasMoreEligible2YCandidates && remaining2YBudget > 0) {
+    remaining1YBudget += remaining2YBudget;
+    remaining2YBudget = 0;
+  }
+
+  // Sort options for 1Y funding based on total wins
+  const sortedFor1Y = resultsWithFunding
+    .filter(
+      (result, index) =>
+        result.fundingType === "None" &&
+        result.option !== "NONE BELOW" &&
+        index < noneBelowPosition // Ensure option is above NONE BELOW
+    )
+    .sort((a, b) => {
+      if (b.totalWins !== a.totalWins) {
+        return b.totalWins - a.totalWins;
+      }
+      return b.avgVotingPowerFor - a.avgVotingPowerFor;
+    });
+
+  // Create a mutable copy of results for 1Y allocation
+  const mutableResults: CopelandResult[] = [...resultsWithFunding];
+
+  // Allocate remaining 1Y funding
+  for (const result of sortedFor1Y) {
+    if (
+      remaining1YBudget >= result.fundingInfo.std &&
+      result.option !== "NONE BELOW"
+    ) {
+      const resultIndex = mutableResults.findIndex(
+        (r) => r.option === result.option
+      );
+      if (resultIndex !== -1) {
+        // Double check that the option is still above NONE BELOW in final results
+        if (resultIndex < noneBelowPosition) {
+          mutableResults[resultIndex] = {
+            ...mutableResults[resultIndex],
+            fundingType: "STD" as const,
+          };
+          remaining1YBudget -= result.fundingInfo.std;
+        }
+      }
+    }
+  }
+
+  return mutableResults;
 }

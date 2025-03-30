@@ -13,6 +13,8 @@ import CopelandProposalCriteria from "../CopelandProposalCriteria/CopelandPropos
 import CopelandProposalVotesList from "@/components/Votes/CopelandProposalVotesList/CopelandProposalVotesList";
 import OptionsResultsPanel from "../OptionsResultsPanel/OptionsResultsPanel";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
 
 type Props = {
   proposal: Proposal;
@@ -42,6 +44,23 @@ export default function CopelandVotesPanel({
     });
   }
 
+  const handleDownloadCSV = async () => {
+    try {
+      const response = await fetch(`/api/proposals/${proposal.id}/votes-csv`);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `votes-${proposal.id}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Error downloading CSV:", error);
+    }
+  };
+
   return (
     <motion.div
       className="flex flex-col flex-1"
@@ -67,6 +86,17 @@ export default function CopelandVotesPanel({
               </span>
             </div>
           ))}
+          <div className="flex justify-end ml-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDownloadCSV}
+              className="flex items-center gap-2 px-1"
+            >
+              <Download className="h-4 w-4" />
+              Download Votes
+            </Button>
+          </div>
         </div>
         <ProposalStatusDetail
           proposalStatus={proposal.status}

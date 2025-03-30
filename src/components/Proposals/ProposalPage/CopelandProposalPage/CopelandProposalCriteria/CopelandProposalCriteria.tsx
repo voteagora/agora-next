@@ -16,7 +16,7 @@ export default function CopelandProposalCriteria() {
         >
           <AccordionTrigger
             icon={ChevronsUpDown}
-            className="text-primary font-semibold hover:no-underline py-3"
+            className="text-primary font-semibold hover:no-underline py-0 pr-0"
           >
             Details
           </AccordionTrigger>

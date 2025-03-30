@@ -18,6 +18,24 @@ const { ui } = Tenant.current();
 import { useCalculateCopelandResult } from "@/hooks/useCalculateCopelandResult";
 import React from "react";
 
+const FUNDING_VALUES: Record<
+  string,
+  { ext: number; std: number; isEligibleFor2Y: boolean }
+> = {
+  Alpha: { ext: 500000, std: 300000, isEligibleFor2Y: true },
+  Beta: { ext: 600000, std: 300000, isEligibleFor2Y: true },
+  Charlie: { ext: 600000, std: 300000, isEligibleFor2Y: false },
+  Delta: { ext: 700000, std: 300000, isEligibleFor2Y: true },
+  Echo: { ext: 600000, std: 300000, isEligibleFor2Y: true },
+  Fox: { ext: 500000, std: 300000, isEligibleFor2Y: true },
+  Gamma: { ext: 400000, std: 300000, isEligibleFor2Y: false },
+  Hotel: { ext: 900000, std: 500000, isEligibleFor2Y: true },
+  India: { ext: 1200000, std: 700000, isEligibleFor2Y: false },
+  Juliet: { ext: 1100000, std: 300000, isEligibleFor2Y: true },
+  Kilo: { ext: 1000000, std: 300000, isEligibleFor2Y: false },
+  Lima: { ext: 600000, std: 300000, isEligibleFor2Y: true },
+} as const;
+
 export default function OptionsResultsPanel({
   proposal,
 }: {
@@ -65,7 +83,7 @@ export default function OptionsResultsPanel({
             {" "}
             {proposalResults.map((result, index) => (
               <OptionRow
-                key={result.letter}
+                key={result.option}
                 result={result}
                 index={index}
                 isProposalActive={isProposalActive}
@@ -96,18 +114,18 @@ const OptionRow = ({
   isProposalActive: boolean;
   isFunding: boolean;
 }) => {
-  const resultValue = result.letter
-    .slice((result.letter.indexOf(":") || 0) + 1)
-    .trim()
-    .split("/");
-  const ext2yResultValue = resultValue?.[0]?.trim();
-  const ext1yResultValue = resultValue?.[1]?.trim();
-  const fundingTypeResultValue =
-    result.fundingType === "EXT 2Y"
-      ? ext2yResultValue
-      : result.fundingType === "EXT 1Y"
-        ? ext1yResultValue
-        : null;
+  const optionName = result.option;
+  const fundingInfo = FUNDING_VALUES[optionName];
+
+  const fundingTypeResultValue = fundingInfo
+    ? result.fundingType === "EXT2Y"
+      ? fundingInfo.ext
+      : result.fundingType === "EXT1Y"
+        ? fundingInfo.ext
+        : result.fundingType === "STD"
+          ? fundingInfo.std
+          : null
+    : null;
 
   const totalVotes = result.avgVotingPowerFor + result.avgVotingPowerAgainst;
   const forPercentage = Math.round(
@@ -115,9 +133,22 @@ const OptionRow = ({
   );
   const againstPercentage = 100 - forPercentage;
 
+  const getFundingTypeStyle = (fundingType: string) => {
+    switch (fundingType) {
+      case "EXT2Y":
+        return "bg-[#008425]/60 text-wash";
+      case "EXT1Y":
+        return "bg-[#008425]/20 text-positive";
+      case "STD":
+        return "bg-[#F5F5F5] text-[#666666] border-[#E0E0E0]";
+      default:
+        return "";
+    }
+  };
+
   return (
     <AccordionItem
-      value={result.letter}
+      value={result.option}
       className="border-none w-full mb-2 overflow-hidden first-of-type:rounded-sm last-of-type:rounded-sm"
     >
       <div className="flex items-center w-full">
@@ -134,7 +165,7 @@ const OptionRow = ({
           >
             <div className="w-full flex justify-between items-center text-xs">
               <span className="font-semibold text-left truncate w-[100px]">
-                {result.letter.split(":")[0].trim()}
+                {optionName}
               </span>
               <div className="flex items-center gap-4">
                 {isFunding ? (
@@ -142,9 +173,8 @@ const OptionRow = ({
                     <>
                       <div
                         className={cn(
-                          "border border-[#008425] bg-[#008425]/20 text-positive px-2 py-1 rounded-sm font-semibold",
-                          result.fundingType === "EXT 2Y" &&
-                            "bg-[#008425]/60 text-wash"
+                          "border px-2 py-1 rounded-sm font-semibold border-[#008425]",
+                          getFundingTypeStyle(result.fundingType)
                         )}
                       >
                         {result.fundingType}
@@ -156,12 +186,7 @@ const OptionRow = ({
                             ?.variable
                         )}
                       >
-                        {fundingTypeResultValue &&
-                          fundingTypeResultValue.replace(
-                            /(\d)(?=(\d{3})+(?!\d))/g,
-                            "$1,"
-                          )}
-                        /y
+                        {fundingTypeResultValue?.toLocaleString()}/y
                         <Check strokeWidth={4} className="h-3 w-3 ml-1" />
                       </span>
                     </>
@@ -184,49 +209,33 @@ const OptionRow = ({
       </div>
       <div className="ml-5 w-[calc(100%-1.25rem)]">
         <AccordionContent className="text-xs font-medium py-0 border border-t-0 border-line bg-wash rounded-b-sm">
-          {isFunding ? (
-            ext2yResultValue || ext1yResultValue ? (
-              <div className="border-b border-line py-3 px-3">
-                {ext2yResultValue && (
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-xs font-semibold">Extended ask</span>
-                    <span
-                      className={cn(
-                        "text-xs font-semibold",
-                        fontMapper[ui?.customization?.tokenAmountFont || ""]
-                          ?.variable
-                      )}
-                    >
-                      {ext2yResultValue &&
-                        ext2yResultValue.replace(
-                          /(\d)(?=(\d{3})+(?!\d))/g,
-                          "$1,"
-                        )}
-                      /Y
-                    </span>
-                  </div>
-                )}
-                {ext1yResultValue && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-semibold">Standard ask</span>
-                    <span
-                      className={cn(
-                        "text-xs font-semibold",
-                        fontMapper[ui?.customization?.tokenAmountFont || ""]
-                          ?.variable
-                      )}
-                    >
-                      {ext1yResultValue &&
-                        ext1yResultValue.replace(
-                          /(\d)(?=(\d{3})+(?!\d))/g,
-                          "$1,"
-                        )}
-                      /Y
-                    </span>
-                  </div>
-                )}
+          {isFunding && fundingInfo ? (
+            <div className="border-b border-line py-3 px-3">
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-xs font-semibold">Extended ask</span>
+                <span
+                  className={cn(
+                    "text-xs font-semibold",
+                    fontMapper[ui?.customization?.tokenAmountFont || ""]
+                      ?.variable
+                  )}
+                >
+                  {fundingInfo.ext.toLocaleString()}/y
+                </span>
               </div>
-            ) : null
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-semibold">Standard ask</span>
+                <span
+                  className={cn(
+                    "text-xs font-semibold",
+                    fontMapper[ui?.customization?.tokenAmountFont || ""]
+                      ?.variable
+                  )}
+                >
+                  {fundingInfo.std.toLocaleString()}/y
+                </span>
+              </div>
+            </div>
           ) : null}
 
           <div className="border-b border-line py-3 px-3">
@@ -280,23 +289,23 @@ const OptionRow = ({
 
           <div className="py-3 px-3">
             <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="font-semibold text-xs">Challenger</div>
-              <div className="font-semibold text-xs text-right">Disfavor</div>
-              <div className="font-semibold text-xs text-right">Favor</div>
+              <div className="font-semibold text-xs">PROVIDER</div>
+              <div className="font-semibold text-xs text-right">CHALLENGER</div>
+              <div className="font-semibold text-xs text-right">CANDIDATE</div>
             </div>
 
             {result.comparisons.map((comparison, idx) => {
-              const isOption1 = comparison.option1 === result.letter;
+              const isOption1 = comparison.option1 === result.option;
               const opponentOption = isOption1
                 ? comparison.option2
                 : comparison.option1;
               const opponentName = opponentOption.split(":")[0].trim();
               const favorVotes = isOption1
-                ? comparison.option1Wins
-                : comparison.option2Wins;
+                ? comparison.option1VotingPower
+                : comparison.option2VotingPower;
               const disfavorVotes = isOption1
-                ? comparison.option2Wins
-                : comparison.option1Wins;
+                ? comparison.option2VotingPower
+                : comparison.option1VotingPower;
               const isWinner =
                 (isOption1 && comparison.winner === comparison.option1) ||
                 (!isOption1 && comparison.winner === comparison.option2);
