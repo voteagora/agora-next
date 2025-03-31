@@ -37,8 +37,8 @@ export const fetchDelegate = unstable_cache(
 );
 
 export const fetchVoterStats = unstable_cache(
-  async (address: string, blockNumber?: number) => {
-    return apiFetchVoterStats(address, blockNumber);
+  async (address: string, blockNumberOrTimestamp?: number) => {
+    return apiFetchVoterStats(address, blockNumberOrTimestamp);
   },
   ["voterStats"],
   {

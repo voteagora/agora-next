@@ -83,6 +83,12 @@ export default class TenantTokenFactory {
           symbol: "DEMO",
           decimals: 18,
         };
+      case TENANT_NAMESPACES.LINEA:
+        return {
+          name: "Linea",
+          symbol: "LINEA",
+          decimals: 18,
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
