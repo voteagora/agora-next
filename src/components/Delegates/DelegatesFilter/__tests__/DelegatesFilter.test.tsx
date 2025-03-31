@@ -6,6 +6,9 @@ import {
   ENDORSED_FILTER_PARAM,
   MY_DELEGATES_FILTER_PARAM,
 } from "@/lib/constants";
+import { useAccount } from "wagmi";
+
+const mockConnectedAddress = "0x1234567890abcdef1234567890abcdef12345678";
 
 vi.mock("@/lib/utils", () => ({
   cn: (...classes: any[]) => classes.filter(Boolean).join(" "),
@@ -65,6 +68,9 @@ vi.mock("@/icons/CheckMark", () => ({
   ),
 }));
 
+// Mock wagmi's useAccount hook
+vi.mock("wagmi");
+
 describe("DelegatesFilter", () => {
   // Default mock values
   const defaultMockValues = {
@@ -87,6 +93,12 @@ describe("DelegatesFilter", () => {
   beforeEach(() => {
     // Setup default mock implementation
     (useDelegatesFilter as any).mockReturnValue(defaultMockValues);
+
+    // Setup default useAccount mock
+    vi.mocked(useAccount).mockReturnValue({
+      address: mockConnectedAddress,
+      isConnected: true,
+    } as any);
   });
 
   afterEach(() => {
@@ -124,6 +136,35 @@ describe("DelegatesFilter", () => {
     expect(screen.getByText("My Delegate(s)")).toBeInTheDocument();
     expect(screen.getByText("Endorsed")).toBeInTheDocument();
     expect(screen.getByText("Has statement")).toBeInTheDocument();
+  });
+
+  it("should not render 'My Delegate(s)' button when no address is connected", () => {
+    // Mock useAccount to return no address - need to clear previous mocks first
+    vi.mocked(useAccount).mockClear();
+    vi.mocked(useAccount).mockReturnValue({
+      address: undefined,
+      isConnected: false,
+    } as any);
+
+    render(<DelegatesFilter />);
+    fireEvent.click(screen.getByTestId("trigger-button"));
+
+    // Check that 'My Delegate(s)' button is not rendered
+    expect(screen.queryByText("My Delegate(s)")).not.toBeInTheDocument();
+  });
+
+  it("should render 'My Delegate(s)' button when user is connected", () => {
+    // Mock useAccount to return a connected address
+    vi.mocked(useAccount).mockReturnValueOnce({
+      address: mockConnectedAddress,
+      isConnected: true,
+    } as any);
+
+    render(<DelegatesFilter />);
+    fireEvent.click(screen.getByTestId("trigger-button"));
+
+    // Check that 'My Delegate(s)' button is rendered
+    expect(screen.getByText("My Delegate(s)")).toBeInTheDocument();
   });
 
   it("should call toggleFilterToUrl with correct parameter when filter button is clicked", () => {

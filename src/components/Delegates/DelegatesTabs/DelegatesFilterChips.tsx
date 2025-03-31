@@ -76,8 +76,10 @@ export const DelegatesFilterChips = () => {
       });
     }
 
-    const myDelegates = searchParams?.get(MY_DELEGATES_FILTER_PARAM);
-    if (myDelegates === "true") {
+    const myDelegatesAddress =
+      searchParams?.get(MY_DELEGATES_FILTER_PARAM) || "";
+    const hasMyDelegates = myDelegatesAddress !== "";
+    if (hasMyDelegates) {
       filters.push({
         label: "My delegate(s)",
         param: MY_DELEGATES_FILTER_PARAM,

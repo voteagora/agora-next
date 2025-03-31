@@ -18,6 +18,7 @@ import DelegatesIssuesFilter from "./DelegatesIssuesFilter";
 import DelegatesStakeholdersFilter from "./DelegatesStakeholdersFilter";
 import { CheckMark } from "@/icons/CheckMark";
 import { MobileSortOption } from "./FilterSortOption";
+import { useAccount } from "wagmi";
 
 export const MobileDelegatesFilter = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,6 +26,7 @@ export const MobileDelegatesFilter = () => {
   const [selectedStakeholders, setSelectedStakeholders] = useState<string[]>(
     []
   );
+  const { address: connectedAddress } = useAccount();
 
   const [tempMyDelegates, setTempMyDelegates] = useState(false);
   const [tempEndorsed, setTempEndorsed] = useState(false);
@@ -117,7 +119,9 @@ export const MobileDelegatesFilter = () => {
     if (tempSortParam !== "weighted_random") {
       applyFiltersToUrl({
         orderBy: tempSortParam,
-        [MY_DELEGATES_FILTER_PARAM]: tempMyDelegates,
+        [MY_DELEGATES_FILTER_PARAM]: tempMyDelegates
+          ? connectedAddress || ""
+          : false, // this should only be shown if there is a connected address
         [ENDORSED_FILTER_PARAM]: tempEndorsed,
         [HAS_STATEMENT_FILTER_PARAM]: tempHasStatement,
         [ISSUES_FILTER_PARAM]:
@@ -131,7 +135,9 @@ export const MobileDelegatesFilter = () => {
       // If sort is default, remove the orderBy parameter
       applyFiltersToUrl({
         orderBy: false, // This will remove the parameter
-        [MY_DELEGATES_FILTER_PARAM]: tempMyDelegates,
+        [MY_DELEGATES_FILTER_PARAM]: tempMyDelegates
+          ? connectedAddress || ""
+          : false,
         [ENDORSED_FILTER_PARAM]: tempEndorsed,
         [HAS_STATEMENT_FILTER_PARAM]: tempHasStatement,
         [ISSUES_FILTER_PARAM]:
@@ -207,11 +213,13 @@ export const MobileDelegatesFilter = () => {
               isActive={!tempMyDelegates && !tempEndorsed && !tempHasStatement}
               onClick={() => handleToggleFilter("all")}
             />
-            <FilterButton
-              label="My Delegates"
-              isActive={tempMyDelegates}
-              onClick={() => handleToggleFilter(MY_DELEGATES_FILTER_PARAM)}
-            />
+            {connectedAddress && (
+              <FilterButton
+                label="My Delegate(s)"
+                isActive={tempMyDelegates}
+                onClick={() => handleToggleFilter(MY_DELEGATES_FILTER_PARAM)}
+              />
+            )}
             {hasEndorsedFilter && (
               <FilterButton
                 label={endorsedToggleConfig.showFilterLabel}

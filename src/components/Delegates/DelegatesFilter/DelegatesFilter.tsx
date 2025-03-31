@@ -11,6 +11,7 @@ import {
 import DelegatesIssuesFilter from "./DelegatesIssuesFilter";
 import DelegatesStakeholdersFilter from "./DelegatesStakeholdersFilter";
 import { useDelegatesFilter } from "./useDelegatesFilter";
+import { useAccount } from "wagmi";
 
 type FilterButtonProps = {
   label: string;
@@ -42,7 +43,7 @@ export const FilterButton = ({
 export const DelegatesFilter = () => {
   // Filter state
   const [isOpen, setIsOpen] = useState(false);
-
+  const { address: connectedAddress } = useAccount();
   const {
     activeFilters,
     hasIssues,
@@ -103,11 +104,13 @@ export const DelegatesFilter = () => {
             isActive={activeFilters.length === 0}
             onClick={() => toggleFilterToUrl("all")}
           />
-          <FilterButton
-            label="My Delegate(s)"
-            isActive={activeFilters.includes(MY_DELEGATES_FILTER_PARAM)}
-            onClick={() => toggleFilterToUrl(MY_DELEGATES_FILTER_PARAM)}
-          />
+          {connectedAddress && (
+            <FilterButton
+              label="My Delegate(s)"
+              isActive={activeFilters.includes(MY_DELEGATES_FILTER_PARAM)}
+              onClick={() => toggleFilterToUrl(MY_DELEGATES_FILTER_PARAM)}
+            />
+          )}
           {hasEndorsedFilter && (
             <FilterButton
               label={endorsedToggleConfig.showFilterLabel}
