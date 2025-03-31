@@ -21,6 +21,7 @@ const mockSearchParams = {
 const mockAddSearchParam = vi.fn();
 const mockDeleteSearchParam = vi.fn();
 const mockSetIsDelegatesFiltering = vi.fn();
+const mockConnectedAddress = "0x1234567890abcdef1234567890abcdef12345678";
 
 // Mock Tenant
 const mockTenant = {
@@ -46,6 +47,13 @@ vi.mock("@/hooks", () => ({
 vi.mock("@/contexts/AgoraContext", () => ({
   useAgoraContext: () => ({
     setIsDelegatesFiltering: mockSetIsDelegatesFiltering,
+  }),
+}));
+
+vi.mock("wagmi", () => ({
+  useAccount: () => ({
+    address: mockConnectedAddress,
+    isConnected: true,
   }),
 }));
 
@@ -123,6 +131,7 @@ describe("useDelegatesFilter", () => {
     mockSearchParams.get.mockImplementation((param) => {
       if (param === ENDORSED_FILTER_PARAM) return "true";
       if (param === HAS_STATEMENT_FILTER_PARAM) return "true";
+      if (param === MY_DELEGATES_FILTER_PARAM) return mockConnectedAddress;
       return null;
     });
 
@@ -133,9 +142,7 @@ describe("useDelegatesFilter", () => {
 
     expect(result.current.activeFilters).toContain(ENDORSED_FILTER_PARAM);
     expect(result.current.activeFilters).toContain(HAS_STATEMENT_FILTER_PARAM);
-    expect(result.current.activeFilters).not.toContain(
-      MY_DELEGATES_FILTER_PARAM
-    );
+    expect(result.current.activeFilters).toContain(MY_DELEGATES_FILTER_PARAM);
   });
 
   it("should parse issues from URL", () => {
@@ -233,6 +240,28 @@ describe("useDelegatesFilter", () => {
     expect(mockRouter.push).toHaveBeenCalledWith("add-hasStatement-true", {
       scroll: false,
     });
+  });
+
+  it("should add MY_DELEGATES_FILTER_PARAM with connected wallet address", () => {
+    mockAddSearchParam.mockReturnValue(
+      `add-${MY_DELEGATES_FILTER_PARAM}-${mockConnectedAddress.toLowerCase()}`
+    );
+
+    const { result } = renderHook(() => useDelegatesFilter());
+
+    act(() => {
+      result.current.toggleFilterToUrl(MY_DELEGATES_FILTER_PARAM);
+    });
+
+    expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
+    expect(mockAddSearchParam).toHaveBeenCalledWith({
+      name: MY_DELEGATES_FILTER_PARAM,
+      value: mockConnectedAddress.toLowerCase(),
+    });
+    expect(mockRouter.push).toHaveBeenCalledWith(
+      `add-${MY_DELEGATES_FILTER_PARAM}-${mockConnectedAddress.toLowerCase()}`,
+      { scroll: false }
+    );
   });
 
   it("should reset all filters when resetAllFiltersToUrl is called", () => {

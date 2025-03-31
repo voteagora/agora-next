@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 import Tenant from "@/lib/tenant/tenant";
 import { useAgoraContext } from "@/contexts/AgoraContext";
@@ -11,15 +11,16 @@ import {
   STAKEHOLDERS_FILTER_PARAM,
 } from "@/lib/constants";
 import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
+import { useAccount } from "wagmi";
 
 export const useDelegatesFilter = () => {
   const { ui } = Tenant.current();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const pathname = usePathname();
   const addSearchParam = useAddSearchParam();
   const deleteSearchParam = useDeleteSearchParam();
   const { setIsDelegatesFiltering } = useAgoraContext();
+  const { address: connectedAddress } = useAccount();
 
   // UI config
   const hasIssues = Boolean(
@@ -41,8 +42,8 @@ export const useDelegatesFilter = () => {
   const endorsed = searchParams?.get(ENDORSED_FILTER_PARAM) === "true";
 
   const hasStatement = searchParams?.get(HAS_STATEMENT_FILTER_PARAM) === "true";
-  const hasMyDelegates =
-    searchParams?.get(MY_DELEGATES_FILTER_PARAM) === "true";
+  const myDelegatesAddress = searchParams?.get(MY_DELEGATES_FILTER_PARAM) || "";
+  const hasMyDelegates = myDelegatesAddress !== "";
 
   // Set active filters based on URL params
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
@@ -88,9 +89,22 @@ export const useDelegatesFilter = () => {
     } else if (activeFilters.includes(filter)) {
       router.push(deleteSearchParam({ name: filter }), { scroll: false });
     } else {
-      router.push(addSearchParam({ name: filter, value: "true" }), {
-        scroll: false,
-      });
+      // For MY_DELEGATES_FILTER_PARAM add connected wallet address in params
+      if (filter === MY_DELEGATES_FILTER_PARAM) {
+        if (connectedAddress) {
+          router.push(
+            addSearchParam({
+              name: filter,
+              value: connectedAddress.toLowerCase(),
+            }),
+            { scroll: false }
+          );
+        }
+      } else {
+        router.push(addSearchParam({ name: filter, value: "true" }), {
+          scroll: false,
+        });
+      }
     }
   };
 
