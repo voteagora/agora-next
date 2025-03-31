@@ -489,7 +489,7 @@ export const ogLogoForShareVote = (namespace: TenantNamespace) => {
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M0 14.9055H14V0.905525H0V14.9055Z"
+            d="M0 52.9055H52V0.905525H0V52.9055Z"
             fill="url(#pattern0_105_565)"
           />
           <defs>
