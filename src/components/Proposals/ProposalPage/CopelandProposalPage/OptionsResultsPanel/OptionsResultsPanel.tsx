@@ -140,7 +140,7 @@ const OptionRow = ({
       case "EXT1Y":
         return "bg-[#008425]/20 text-positive";
       case "STD":
-        return "bg-[#F5F5F5] text-[#666666] border-[#E0E0E0]";
+        return "bg-[#008425]/10 text-[#008425]";
       default:
         return "";
     }
@@ -173,7 +173,7 @@ const OptionRow = ({
                     <>
                       <div
                         className={cn(
-                          "border px-2 py-1 rounded-sm font-semibold border-[#008425]",
+                          "border px-2 py-1 rounded-sm font-semibold border-[#008425] w-14",
                           getFundingTypeStyle(result.fundingType)
                         )}
                       >

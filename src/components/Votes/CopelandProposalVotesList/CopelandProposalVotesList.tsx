@@ -90,7 +90,7 @@ export default function CopelandProposalVotesList({
   }, [connectedAddress, proposalId, fetchUserVotes, fetchUserVoteAndSet]);
 
   return (
-    <div className={cn("overflow-y-scroll max-h-[calc(100vh-527px)]")}>
+    <div className={cn("overflow-y-scroll max-h-[calc(100vh-560px)]")}>
       <InfiniteScroll
         hasMore={meta?.has_next}
         pageStart={1}

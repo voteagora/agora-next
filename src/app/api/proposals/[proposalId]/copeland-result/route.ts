@@ -48,7 +48,7 @@ function shuffleArray(array: number[]): number[] {
   return shuffled;
 }
 
-export const HARDCODED_VOTES: SnapshotVote[] = Array.from(
+const HARDCODED_VOTES: SnapshotVote[] = Array.from(
   { length: 50 },
   (_, index) => {
     const shuffledChoices = shuffleArray([

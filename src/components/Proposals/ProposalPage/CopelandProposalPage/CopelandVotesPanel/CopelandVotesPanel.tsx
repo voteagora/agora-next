@@ -14,7 +14,7 @@ import CopelandProposalVotesList from "@/components/Votes/CopelandProposalVotesL
 import OptionsResultsPanel from "../OptionsResultsPanel/OptionsResultsPanel";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, Check } from "lucide-react";
 
 type Props = {
   proposal: Proposal;
@@ -38,6 +38,9 @@ export default function CopelandVotesPanel({
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
   const proposalState = proposal.status;
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
+
   function handleTabsChange(index: number) {
     startTransition(() => {
       setActiveTab(index);
@@ -46,6 +49,8 @@ export default function CopelandVotesPanel({
 
   const handleDownloadCSV = async () => {
     try {
+      setIsDownloading(true);
+      setDownloadSuccess(false);
       const response = await fetch(`/api/proposals/${proposal.id}/votes-csv`);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -56,8 +61,15 @@ export default function CopelandVotesPanel({
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      setDownloadSuccess(true);
+      // Reset success state after 2 seconds
+      setTimeout(() => {
+        setDownloadSuccess(false);
+      }, 2000);
     } catch (error) {
       console.error("Error downloading CSV:", error);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -91,10 +103,19 @@ export default function CopelandVotesPanel({
               variant="outline"
               size="sm"
               onClick={handleDownloadCSV}
+              disabled={isDownloading}
               className="flex items-center gap-2 px-1"
             >
-              <Download className="h-4 w-4" />
-              Download Votes
+              {downloadSuccess ? (
+                <Check className="h-4 w-4 text-positive" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              {isDownloading 
+                ? "Downloading..." 
+                : downloadSuccess 
+                ? "Downloaded!" 
+                : "Download Votes"}
             </Button>
           </div>
         </div>

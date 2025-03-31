@@ -3,6 +3,8 @@
  *
  * @param votes Array of vote objects containing voter info and choices
  * @param options Array of available options
+ * @param budget Total budget for funding
+ * @param fundingInfo Object containing funding information for each option
  * @returns Object containing calculated Copeland scores, winners, and details
  */
 
@@ -85,6 +87,7 @@ export function calculateCopelandVote(
       // If the option is found in the voter's choices
       if (rank !== -1) {
         // If NONE BELOW exists and this option is after it, mark as below NONE BELOW
+        // The lower the rank, the better
         if (noneRank !== -1 && rank > noneRank) {
           optionRanks[option] = -2; // Use -2 to indicate below NONE BELOW
         } else {
@@ -105,7 +108,7 @@ export function calculateCopelandVote(
           continue;
         }
 
-        // Skip if either option is unranked (-1)
+        // Skip if either option is unranked (-1) => should not happen as all options will be included in the vote
         if (optionRanks[option1] === -1 || optionRanks[option2] === -1) {
           continue;
         }
@@ -251,7 +254,7 @@ export function calculateCopelandVote(
         const noneIndex = options.findIndex((o) => o === "NONE BELOW");
         return (
           options[choice - 1] === option &&
-          (noneIndex === -1 || choice - 1 < noneIndex)
+          (noneIndex === -1 || choice - 1 <= noneIndex)
         );
       });
     }).length;
@@ -300,9 +303,8 @@ export function calculateCopelandVote(
   );
 
   // Calculate funding allocations based on 2 buckets
-  const TOTAL_BUDGET = 4500000; // $4.5M total
-  const EXT2Y_BUDGET = 1500000; // $1.5M for 2Y bucket
-  const EXT1Y_BUDGET = 3000000; // $3M for 1Y bucket
+  const EXT2Y_BUDGET = budget * 0.333; // $1.5M for 2Y bucket
+  const EXT1Y_BUDGET = budget * 0.666; // $3M for 1Y bucket
 
   let remaining2YBudget = EXT2Y_BUDGET;
   let remaining1YBudget = EXT1Y_BUDGET;
@@ -356,7 +358,7 @@ export function calculateCopelandVote(
     (result, index) =>
       result.fundingType === "None" &&
       result.fundingInfo.isEligibleFor2Y &&
-      result.fundingInfo.ext <= remaining2YBudget &&
+      result.fundingInfo.ext < remaining2YBudget &&
       (noneBelowPosition === -1 || index < noneBelowPosition)
   );
 
@@ -365,7 +367,7 @@ export function calculateCopelandVote(
     remaining2YBudget = 0;
   }
 
-  // Sort options for 1Y funding based on total wins
+  // Sort options for 1Y funding based on total wins => removing options that got funding in the first pass
   const sortedFor1Y = resultsWithFunding
     .filter(
       (result, index) =>
@@ -393,14 +395,11 @@ export function calculateCopelandVote(
         (r) => r.option === result.option
       );
       if (resultIndex !== -1) {
-        // Double check that the option is still above NONE BELOW in final results
-        if (resultIndex < noneBelowPosition) {
           mutableResults[resultIndex] = {
             ...mutableResults[resultIndex],
             fundingType: "STD" as const,
           };
           remaining1YBudget -= result.fundingInfo.std;
-        }
       }
     }
   }
