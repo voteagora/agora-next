@@ -104,7 +104,7 @@ export const DelegatesFilter = () => {
             onClick={() => toggleFilterToUrl("all")}
           />
           <FilterButton
-            label="My Delegates"
+            label="My Delegate(s)"
             isActive={activeFilters.includes(MY_DELEGATES_FILTER_PARAM)}
             onClick={() => toggleFilterToUrl(MY_DELEGATES_FILTER_PARAM)}
           />

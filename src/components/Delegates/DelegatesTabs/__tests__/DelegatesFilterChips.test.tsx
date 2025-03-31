@@ -258,7 +258,7 @@ describe("DelegatesFilterChips", () => {
       vi.runAllTimers();
     });
 
-    const myDelegatesChip = screen.getByText("My delegates");
+    const myDelegatesChip = screen.getByText("My delegate(s)");
     expect(myDelegatesChip).toBeInTheDocument();
 
     const chipButton = myDelegatesChip.closest("button");

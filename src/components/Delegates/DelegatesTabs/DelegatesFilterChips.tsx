@@ -79,7 +79,7 @@ export const DelegatesFilterChips = () => {
     const myDelegates = searchParams?.get(MY_DELEGATES_FILTER_PARAM);
     if (myDelegates === "true") {
       filters.push({
-        label: "My delegates",
+        label: "My delegate(s)",
         param: MY_DELEGATES_FILTER_PARAM,
       });
     }

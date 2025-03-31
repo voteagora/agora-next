@@ -121,7 +121,7 @@ describe("DelegatesFilter", () => {
 
     // Check filter buttons
     expect(screen.getByText("All Delegates")).toBeInTheDocument();
-    expect(screen.getByText("My Delegates")).toBeInTheDocument();
+    expect(screen.getByText("My Delegate(s)")).toBeInTheDocument();
     expect(screen.getByText("Endorsed")).toBeInTheDocument();
     expect(screen.getByText("Has statement")).toBeInTheDocument();
   });
@@ -131,7 +131,7 @@ describe("DelegatesFilter", () => {
     fireEvent.click(screen.getByTestId("trigger-button"));
 
     // Click "My Delegates" filter
-    fireEvent.click(screen.getByText("My Delegates"));
+    fireEvent.click(screen.getByText("My Delegate(s)"));
 
     // Check if toggleFilterToUrl was called with correct parameter
     expect(defaultMockValues.toggleFilterToUrl).toHaveBeenCalledWith(
@@ -175,7 +175,7 @@ describe("DelegatesFilter", () => {
       .getByText("All Delegates")
       .closest("button");
     const myDelegatesButton = screen
-      .getByText("My Delegates")
+      .getByText("My Delegate(s)")
       .closest("button");
     const endorsedButton = screen.getByText("Endorsed").closest("button");
 
