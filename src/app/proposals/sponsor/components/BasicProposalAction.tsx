@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
+import { useSimulateContract, useWriteContract } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
 import { BasicProposal } from "../../../proposals/draft/types";
-import { useSimulateContract, useWriteContract } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
@@ -19,6 +20,7 @@ const BasicProposalAction = ({
   const openDialog = useOpenDialog();
   const { contracts } = Tenant.current();
   const { inputData } = getInputData(draftProposal);
+  const [proposalCreated, setProposalCreated] = useState(false);
 
   /**
    * Notes on proposal methods per governor:
@@ -32,6 +34,7 @@ const BasicProposalAction = ({
 
   // TODO: input data contains proposal type, but I don't think OZ based proposals have proposal type
   // So we need to check which type of governor we are dealing with, based on the tenant, and act accordingly.
+
   const {
     data: config,
     isError: onPrepareError,
@@ -43,6 +46,9 @@ const BasicProposalAction = ({
     abi: contracts.governor.abi,
     functionName: "propose",
     args: inputData as any,
+    query: {
+      enabled: !proposalCreated,
+    },
   });
 
   const { writeContractAsync: writeAsync, isPending: isWriteLoading } =
@@ -53,7 +59,7 @@ const BasicProposalAction = ({
       <UpdatedButton
         isLoading={isWriteLoading || isSimulating}
         fullWidth={true}
-        type={onPrepareError ? "disabled" : "primary"}
+        type={onPrepareError && !proposalCreated ? "disabled" : "primary"}
         onClick={async () => {
           try {
             const data = await writeAsync(config!.request);
@@ -62,6 +68,8 @@ const BasicProposalAction = ({
               console.log(error);
               return;
             }
+
+            setProposalCreated(true);
 
             trackEvent({
               event_name: ANALYTICS_EVENT_NAMES.CREATE_PROPOSAL,
@@ -76,7 +84,6 @@ const BasicProposalAction = ({
               draftProposalId: draftProposal.id,
               onchain_transaction_hash: data,
             });
-
             openDialog({
               type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL",
               params: {
@@ -92,7 +99,7 @@ const BasicProposalAction = ({
         Submit proposal
       </UpdatedButton>
 
-      {onPrepareError && (
+      {onPrepareError && !proposalCreated && (
         <div className="p-4 border border-negative bg-negative/10 rounded mt-4 text-sm text-negative break-words hyphens-auto">
           {parseError(error)}
         </div>

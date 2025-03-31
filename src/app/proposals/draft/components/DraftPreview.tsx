@@ -2,7 +2,7 @@
 
 import FormCard from "./form/FormCard";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
-import { useAccount, useBlockNumber, useReadContract } from "wagmi";
+import { useAccount, useBlockNumber } from "wagmi";
 import { formatUnits } from "viem";
 import AvatarAddress from "./AvatarAdress";
 import { formatFullDate } from "@/lib/utils";
@@ -18,6 +18,7 @@ import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
 import toast from "react-hot-toast";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import Markdown from "@/components/shared/Markdown/Markdown";
+import { useEffect, useState } from "react";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -54,19 +55,36 @@ const DraftPreview = ({
     enabled: !!address && !!blockNumber,
   });
 
+  const [lastValidVotes, setLastValidVotes] = useState<bigint | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    if (accountVotes !== undefined) {
+      setLastValidVotes(accountVotes);
+    }
+  }, [accountVotes]);
+
+  // Use either the current votes or the last valid votes
+  // This is to prevent re mounting of component since accountVotes is for a brief sec
+  // after blockNumber is fetched and this causes the component to re render and few child components to mount again
+
+  const effectiveVotes =
+    accountVotes !== undefined ? accountVotes : lastValidVotes;
+
   const canSponsor = () => {
     switch (gatingType) {
       case ProposalGatingType.MANAGER:
         return manager === address;
       case ProposalGatingType.TOKEN_THRESHOLD:
-        return accountVotes !== undefined && threshold !== undefined
-          ? accountVotes >= threshold
+        return effectiveVotes !== undefined && threshold !== undefined
+          ? effectiveVotes >= threshold
           : false;
       case ProposalGatingType.GOVERNOR_V1:
         return (
           manager === address ||
-          (accountVotes !== undefined && threshold !== undefined
-            ? accountVotes >= threshold
+          (effectiveVotes !== undefined && threshold !== undefined
+            ? effectiveVotes >= threshold
             : false)
         );
       default:
