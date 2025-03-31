@@ -165,11 +165,11 @@ export default function CurrentDelegateStatement() {
         (delegateStatement?.payload as { leastValuableProposals?: object[] })
           ?.leastValuableProposals || [],
       notificationPreferences: (delegateStatement?.notification_preferences as {
-        wants_proposal_created_email: boolean;
-        wants_proposal_ending_soon_email: boolean;
+        wants_proposal_created_email: "prompt" | "prompted" | boolean;
+        wants_proposal_ending_soon_email: "prompt" | "prompted" | boolean;
       }) || {
-        wants_proposal_created_email: false,
-        wants_proposal_ending_soon_email: false,
+        wants_proposal_created_email: "prompt",
+        wants_proposal_ending_soon_email: "prompt",
       },
       last_updated: new Date().toISOString(),
     };

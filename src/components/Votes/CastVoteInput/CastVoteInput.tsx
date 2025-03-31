@@ -167,13 +167,15 @@ function CastVoteInputContent({
             <div className="bg-neutral border-t border-line px-3 ">
               {!isLoading && (
                 <div className="flex flex-col gap-2">
-                  <textarea
-                    placeholder="I believe..."
-                    value={reason || undefined}
-                    onChange={(e) => setReason(e.target.value)}
-                    rows={reason ? undefined : 1}
-                    className="text-sm text-primary bg-neutral resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
-                  />
+                  {proposal.status === "ACTIVE" && (
+                    <textarea
+                      placeholder="I believe..."
+                      value={reason || undefined}
+                      onChange={(e) => setReason(e.target.value)}
+                      rows={reason ? undefined : 1}
+                      className="text-sm text-primary bg-neutral resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
+                    />
+                  )}
                   <VoteButtons
                     proposalStatus={proposal.status}
                     isOptimistic={isOptimistic}

@@ -1,9 +1,9 @@
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { DraftProposal } from "@/app/proposals/draft/types";
 import { cache } from "react";
 
 const getDraftProposal = async (id: number) => {
-  const draftProposal = await prisma.proposalDraft.findUnique({
+  const draftProposal = await prismaWeb2Client.proposalDraft.findUnique({
     where: {
       id: id,
     },

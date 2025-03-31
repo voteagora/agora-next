@@ -123,7 +123,7 @@ export const ensTenantUIConfig = new TenantUI({
       title: "About ENS",
       hero: infoPageHero,
       description:
-        "Agora is the home of ENS governance, where ENS stakers delegate, vote, and make decisions to steward the future of the ENS ecosystem.",
+        "ENS is the Ethereum Name Service. ENS is a naming system that creates domains on the Ethereum blockchain, allowing you to link your wallet address to a human-readable ENS name. ENS names are domains, NFTs, and usernames for your digital identity across the internet.",
       meta: {
         title: "ENS Agora",
         description: "Home of ENS governance",

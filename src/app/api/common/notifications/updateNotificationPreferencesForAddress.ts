@@ -1,4 +1,4 @@
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
 import { z } from "zod";
@@ -35,7 +35,7 @@ const updateNotificationPreferencesForAddress = async (
     });
     const { slug } = Tenant.current();
 
-    return prisma.delegateStatements.update({
+    return prismaWeb2Client.delegateStatements.update({
       where: {
         address_dao_slug: {
           address: validatedData.address.toLowerCase(),

@@ -1,5 +1,5 @@
 import { cache } from "react";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { ImpactMetricCommentVote } from "./impactMetricComment";
 
 async function updateImpactMetricCommentVoteApi({
@@ -11,20 +11,22 @@ async function updateImpactMetricCommentVoteApi({
   address: string;
   vote: number;
 }): Promise<ImpactMetricCommentVote> {
-  const existingVote = await prisma.metrics_comments_votes.findUnique({
-    where: {
-      comment_id_voter: {
-        comment_id: commentId,
-        voter: address,
+  const existingVote = await prismaWeb2Client.metrics_comments_votes.findUnique(
+    {
+      where: {
+        comment_id_voter: {
+          comment_id: commentId,
+          voter: address,
+        },
       },
-    },
-  });
+    }
+  );
 
   const voteValue = existingVote
     ? Math.max(-1, Math.min(1, existingVote.vote + vote))
     : vote;
 
-  const commentVote = await prisma.metrics_comments_votes.upsert({
+  const commentVote = await prismaWeb2Client.metrics_comments_votes.upsert({
     where: {
       comment_id_voter: {
         comment_id: commentId,

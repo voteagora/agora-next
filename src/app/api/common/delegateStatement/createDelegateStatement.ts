@@ -1,6 +1,6 @@
 import "server-only";
 
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
@@ -56,7 +56,7 @@ export async function createDelegateStatement({
     },
   };
 
-  return prisma.delegateStatements.upsert({
+  return prismaWeb2Client.delegateStatements.upsert({
     where: {
       address_dao_slug: {
         address: address.toLowerCase(),

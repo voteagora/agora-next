@@ -98,9 +98,10 @@ export const cyberTenantUIConfig = new TenantUI({
         "Cyber stakers participate in CyberDAO's governance by proposing initiatives, voting directly, or electing delegates to represent their interests.",
       meta: {
         title: "Welcome to Cyber governance",
-        description: "Home of token governance",
-        imageTitle: "IN IMAGE",
-        imageDescription: "IN IMAGE DESCRIPTION",
+        description:
+          "Cyber Agora is a unified and dedicated delegate portal for CyberDAO governance. Cyber Agora is where all protocol improvement votes are executed. After the discussion phase, all official CyberDAO governance activities occur on the Cyber Agora portal. This includes member delegation, voting, and other matters related to CyberDAO's decentralized governance.",
+        imageTitle: "Cyber Governance",
+        imageDescription: "Home of Cyber governance",
       },
     },
     {
@@ -121,13 +122,14 @@ export const cyberTenantUIConfig = new TenantUI({
       route: "proposals",
       title: "Welcome to Cyber governance",
       description:
-        "Cyber delegates are the stewards of the Cyber DAO, appointed by token holders to make governance decisions on their behalf.",
+        "Cyber stakers participate in CyberDAO's governance by proposing initiatives, voting directly, or electing delegates to represent their interests.",
       hero: cyberHero,
       meta: {
-        title: "Voter on Agora",
-        description: "Delegate your voting power to a trusted representative",
-        imageTitle: "IN IMAGE",
-        imageDescription: "IN IMAGE DESCRIPTION",
+        title: "Welcome to Cyber governance",
+        description:
+          "Cyber Agora is a unified and dedicated delegate portal for CyberDAO governance. Cyber Agora is where all protocol improvement votes are executed. After the discussion phase, all official CyberDAO governance activities occur on the Cyber Agora portal. This includes member delegation, voting, and other matters related to CyberDAO's decentralized governance.",
+        imageTitle: "Cyber Governance",
+        imageDescription: "Home of Cyber governance",
       },
     },
     {

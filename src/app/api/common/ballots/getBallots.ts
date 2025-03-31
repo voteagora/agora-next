@@ -3,7 +3,7 @@ import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { Ballots, Prisma, ProjectApplicants } from "@prisma/client";
 import { Ballot } from "./ballot";
-import prisma from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 import { calculateAllocations } from "./ballotAllocations";
 
 async function getBallotsApi({
@@ -17,7 +17,7 @@ async function getBallotsApi({
 }) {
   return paginateResult(
     (skip: number, take: number) => {
-      return prisma.$queryRawUnsafe<Ballots[]>(
+      return prismaWeb2Client.$queryRawUnsafe<Ballots[]>(
         `
           SELECT 
             *,
@@ -95,7 +95,7 @@ async function getR5Ballot({
   category: string;
 }) {
   const [ballot, projects, ballotSubmission] = await Promise.all([
-    prisma.ballots.findFirst({
+    prismaWeb2Client.ballots.findFirst({
       where: {
         round: roundId,
         address,
@@ -116,7 +116,7 @@ async function getR5Ballot({
         },
       },
     }),
-    prisma.$queryRaw<ProjectApplicants[]>`
+    prismaWeb2Client.$queryRaw<ProjectApplicants[]>`
       SELECT 
         *
       FROM 
@@ -124,7 +124,7 @@ async function getR5Ballot({
       WHERE application_category = ${category}
       ORDER BY RANDOM();
     `,
-    prisma.ballotSubmittions.findFirst({
+    prismaWeb2Client.ballotSubmittions.findFirst({
       where: {
         address,
         round: roundId,
@@ -221,7 +221,7 @@ async function getR4Ballot({
   roundId: number;
   address: string;
 }) {
-  const ballot = await prisma.$queryRawUnsafe<Ballot[]>(
+  const ballot = await prismaWeb2Client.$queryRawUnsafe<Ballot[]>(
     `
   SELECT 
     b.address,

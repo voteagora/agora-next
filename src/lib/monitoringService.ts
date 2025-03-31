@@ -1,10 +1,10 @@
-import https from "https";
 import Tenant from "./tenant/tenant";
 
 interface MetricOptions {
   name: string;
   value: number;
   labels?: Record<string, string>;
+  type?: "count" | "distribution";
 }
 
 class MonitoringService {
@@ -43,57 +43,58 @@ class MonitoringService {
     );
 
     const metricName = `${this.namespace}.${options.name}`;
+    const metricType = options.type;
 
-    const payload = JSON.stringify({
-      series: [
-        {
-          metric: metricName,
-          points: [[Math.floor(Date.now() / 1000), options.value]],
-          type: "gauge",
-          tags: tags,
+    // Determine endpoint and payload based on metric type
+    const endpoint =
+      metricType === "distribution"
+        ? "https://api.datadoghq.com/api/v1/distribution_points"
+        : "https://api.datadoghq.com/api/v1/series";
+
+    // Create appropriate payload based on metric type
+    let payload;
+    if (metricType === "distribution") {
+      payload = JSON.stringify({
+        series: [
+          {
+            metric: metricName,
+            points: [[Math.floor(Date.now() / 1000), [options.value]]], // Nested array for distribution
+            tags: tags,
+          },
+        ],
+      });
+    } else {
+      payload = JSON.stringify({
+        series: [
+          {
+            metric: metricName,
+            points: [[Math.floor(Date.now() / 1000), options.value]],
+            type: metricType,
+            tags: tags,
+          },
+        ],
+      });
+    }
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "DD-API-KEY": this.apiKey,
         },
-      ],
-    });
-
-    const requestOptions = {
-      method: "POST",
-      hostname: "api.datadoghq.com",
-      path: "/api/v1/series",
-      headers: {
-        "Content-Type": "application/json",
-        "DD-API-KEY": this.apiKey,
-      },
-    };
-
-    return new Promise((resolve, reject) => {
-      const req = https.request(requestOptions, (res) => {
-        let data = "";
-
-        res.on("data", (chunk) => {
-          data += chunk;
-        });
-
-        res.on("end", () => {
-          if (res.statusCode === 202) {
-            resolve(true);
-          } else {
-            console.error("Datadog API Error:", {
-              statusCode: res.statusCode,
-              response: data,
-            });
-            reject(new Error(`HTTP ${res.statusCode}: ${data}`));
-          }
-        });
+        body: payload,
       });
 
-      req.on("error", (error) => {
-        console.error("Datadog API Request Error:", error);
-        reject(error);
-      });
-
-      req.write(payload);
-      req.end();
-    });
+      if (!response.ok) {
+        console.error(
+          `Failed to send ${metricType} metric to Datadog`,
+          await response.text()
+        );
+      }
+    } catch (error) {
+      console.error(`Error sending ${metricType} metric to Datadog`, error);
+    }
   }
 }
 
