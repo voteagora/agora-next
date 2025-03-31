@@ -1,4 +1,5 @@
 import { registerOTel } from "@vercel/otel";
+import * as Sentry from "@sentry/nextjs";
 
 export const SERVICE_NAME = "agora-app";
 
@@ -20,4 +21,10 @@ export async function register() {
       },
     });
   }
+
+  if (process.env.NEXT_RUNTIME === "edge") {
+    await import("../sentry.edge.config");
+  }
 }
+
+export const onRequestError = Sentry.captureRequestError;
