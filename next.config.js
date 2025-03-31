@@ -1,3 +1,5 @@
+const { withSentryConfig } = require("@sentry/nextjs");
+
 /** @type {import('next').NextConfig} */
 const path = require("path");
 
@@ -80,14 +82,4 @@ const sentryWebpackPluginOptions = {
   silent: true, // Suppresses all logs
 };
 
-module.exports = nextConfig;
-
-// Injected content via Sentry wizard below
-
-const { withSentryConfig } = require("@sentry/nextjs");
-
-module.exports = withSentryConfig(nextConfig, {
-  silent: true,
-  disableServerWebpackPlugin: true,
-  disableClientWebpackPlugin: false,
-});
+module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOptions);

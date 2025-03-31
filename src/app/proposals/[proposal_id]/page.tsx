@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import {
   fetchProposal,
   fetchProposalUnstableCache,
@@ -143,6 +144,12 @@ export default async function Page({
 }: {
   params: { proposal_id: string };
 }) {
+  try {
+    throw new Error("Fatal error loading proposal data");
+  } catch (error) {
+    console.log("Manually capturing error");
+    Sentry.captureException(error);
+  }
   const proposal = await fetchProposal(proposal_id);
 
   let RenderComponent;
