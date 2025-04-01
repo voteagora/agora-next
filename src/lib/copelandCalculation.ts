@@ -19,7 +19,7 @@ interface PairwiseComparison {
 }
 
 interface FundingInfo {
-  ext: number;
+  ext: number | null;
   std: number;
   isEligibleFor2Y: boolean;
 }
@@ -335,10 +335,10 @@ export function calculateCopelandVote(
       // Only allocate funding if the option is above NONE BELOW
       if (isAboveNoneBelow) {
         // Check if eligible for 2Y funding and has budget remaining
-        if (info.isEligibleFor2Y && remaining2YBudget >= info.ext) {
+        if (info.isEligibleFor2Y && !!info.ext && remaining2YBudget >= info.ext) {
           fundingType = "EXT2Y";
           remaining2YBudget -= info.ext;
-        } else if (remaining1YBudget >= info.ext) {
+        } else if (!!info.ext && remaining1YBudget >= info.ext) {
           fundingType = "EXT1Y";
           remaining1YBudget -= info.ext;
         } else if (remaining1YBudget >= info.std) {
@@ -358,6 +358,7 @@ export function calculateCopelandVote(
     (result, index) =>
       result.fundingType === "None" &&
       result.fundingInfo.isEligibleFor2Y &&
+      !!result.fundingInfo.ext &&
       result.fundingInfo.ext < remaining2YBudget &&
       (noneBelowPosition === -1 || index < noneBelowPosition)
   );
