@@ -1,5 +1,5 @@
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import Tenant from "@/lib/tenant/tenant";
+import { TenantNamespace } from "@/lib/types";
 import optimismLogo from "@/assets/tenant/optimism_share_logo.svg";
 import scrollLogo from "@/assets/tenant/scroll_logo.svg";
 import deriveLogo from "@/assets/tenant/derive_logo.svg";
@@ -12,9 +12,9 @@ import boostLogo from "@/assets/tenant/boost_logo.svg";
 import b3Logo from "@/assets/tenant/b3_logo.svg";
 import pguildLogo from "@/assets/tenant/pguild_logo.svg";
 import Image from "next/image";
-export const ogLogoForShareVote = () => {
-  const { namespace } = Tenant.current();
-  switch (namespace) {
+export const ogLogoForShareVote = (namespace: TenantNamespace) => {
+  const normalizedNamespace = namespace?.toLowerCase();
+  switch (normalizedNamespace) {
     case TENANT_NAMESPACES.SCROLL:
       return (
         <Image
