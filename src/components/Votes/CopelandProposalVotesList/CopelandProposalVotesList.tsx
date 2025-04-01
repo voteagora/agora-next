@@ -89,6 +89,8 @@ export default function CopelandProposalVotesList({
     }
   }, [connectedAddress, proposalId, fetchUserVotes, fetchUserVoteAndSet]);
 
+  const hasNoVotes = isFetched && proposalVotes.length === 0 && userVotes.length === 0;
+
   return (
     <div className={cn("overflow-y-scroll max-h-[calc(100vh-560px)]")}>
       <InfiniteScroll
@@ -105,8 +107,16 @@ export default function CopelandProposalVotesList({
           </div>
         }
       >
-        <ul className="flex flex-col divide-y">
-          {userVotes.map((vote) => (
+        {hasNoVotes ? (
+          <div
+          className="flex text-xs font-medium text-secondary justify-center pb-2"
+          key={0}
+        >
+            No votes yet
+          </div>
+        ) : (
+          <ul className="flex flex-col divide-y">
+            {userVotes.map((vote) => (
             <li key={vote.id} className={`p-4`}>
               <CopelandProposalSingleVote vote={vote} />
             </li>
@@ -120,8 +130,9 @@ export default function CopelandProposalVotesList({
             >
               <CopelandProposalSingleVote vote={vote} />
             </li>
-          ))}
-        </ul>
+            ))}
+          </ul>
+        )}
       </InfiniteScroll>
     </div>
   );

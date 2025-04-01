@@ -38,6 +38,7 @@ export default function CopelandVotesPanel({
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
   const proposalState = proposal.status;
+  const hasVotes = (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"]).votes.length > 0;
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
@@ -98,13 +99,14 @@ export default function CopelandVotesPanel({
               </span>
             </div>
           ))}
-          <div className="flex justify-end ml-auto">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDownloadCSV}
-              disabled={isDownloading}
-              className="flex items-center gap-2 px-1"
+          {hasVotes && (
+            <div className="flex justify-end ml-auto">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDownloadCSV}
+                disabled={isDownloading}
+                className="flex items-center gap-2 px-1"
             >
               {downloadSuccess ? (
                 <Check className="h-4 w-4 text-positive" />
@@ -116,8 +118,9 @@ export default function CopelandVotesPanel({
                 : downloadSuccess 
                 ? "Downloaded!" 
                 : "Download Votes"}
-            </Button>
-          </div>
+              </Button>
+            </div>
+          )}
         </div>
         <ProposalStatusDetail
           proposalStatus={proposal.status}

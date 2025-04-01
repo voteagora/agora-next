@@ -41,6 +41,24 @@ export function calculateCopelandVote(
   budget: number,
   fundingInfo: Record<string, FundingInfo>
 ): CopelandResult[] {
+  // Early return if no votes
+  if (!votes || votes.length === 0) {
+    return options.map(option => ({
+      option,
+      fundingType: "None" as const,
+      comparisons: [],
+      totalWins: 0,
+      totalLosses: 0,
+      avgVotingPowerFor: 0,
+      avgVotingPowerAgainst: 0,
+      fundingInfo: fundingInfo[option] || {
+        ext: 0,
+        std: 0,
+        isEligibleFor2Y: false,
+      }
+    }));
+  }
+
   const scores: Record<string, number> = {};
   const pairwiseWins: Record<string, Record<string, number>> = {};
   const pairwiseVotingPower: Record<
