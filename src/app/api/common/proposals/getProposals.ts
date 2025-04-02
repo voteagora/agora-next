@@ -105,16 +105,15 @@ async function getProposal(proposalId: string) {
       })
     );
 
-    const [proposal, votableSupply] = await Promise.all([
+    const [proposal, votableSupply, latestBlock] = await Promise.all([
       getProposalExecution,
       fetchVotableSupply(),
+      latestBlockPromise,
     ]);
 
     if (!proposal) {
       return notFound();
     }
-
-    const latestBlock = await latestBlockPromise;
 
     const isPending =
       !proposal.start_block ||
