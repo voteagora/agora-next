@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchDelegate } from "@/app/delegates/actions";
 import { Delegate } from "@/app/api/common/delegates/delegate";
+import { useCallback } from "react";
 
 const CACHE_TIME = 180000; // 3 minute cache
 
@@ -10,7 +11,7 @@ interface Props {
 export const DELEGATE_QK = "delegate";
 
 export const useDelegate = ({ address }: Props) => {
-  const { data, isFetching, isFetched } = useQuery({
+  const { data, isFetching, isFetched, refetch } = useQuery({
     enabled: !!address,
     queryKey: [DELEGATE_QK, address],
     queryFn: async () => {
@@ -19,5 +20,5 @@ export const useDelegate = ({ address }: Props) => {
     staleTime: CACHE_TIME,
   });
 
-  return { data, isFetching, isFetched };
+  return { data, isFetching, isFetched, refetch };
 };
