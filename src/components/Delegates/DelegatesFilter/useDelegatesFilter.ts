@@ -175,6 +175,7 @@ export const useDelegatesFilter = () => {
     issuesFromUrl,
     stakeholdersFromUrl,
     hasEndorsedFilter,
+    hasMyDelegates,
     endorsedToggleConfig,
     toggleFilterToUrl,
     resetAllFiltersToUrl,
