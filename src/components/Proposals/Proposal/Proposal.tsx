@@ -101,6 +101,7 @@ export default function Proposal({
                   votableSupply={votableSupply}
                 />
               )}
+
             {proposal.proposalType === "APPROVAL" && proposal.proposalData && (
               <OPApprovalProposalStatus proposal={proposal} />
             )}
