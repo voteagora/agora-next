@@ -23,69 +23,80 @@ import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 
 import { unstable_cache } from "next/cache";
-async function getProposals({
+
+export async function getProposals({
   filter,
   pagination,
 }: {
   filter: string;
   pagination: PaginationParams;
 }): Promise<PaginatedResult<Proposal[]>> {
-  return withMetrics(
-    "getProposals",
+  return unstable_cache(
     async () => {
-      try {
-        const { namespace, contracts, ui } = Tenant.current();
+      return withMetrics(
+        "getProposals",
+        async () => {
+          try {
+            console.time("getProposals");
+            const { namespace, contracts, ui } = Tenant.current();
 
-        const getProposalsExecution = doInSpan(
-          { name: "getProposals" },
-          async () =>
-            paginateResult(
-              (skip: number, take: number) =>
-                findProposalsQuery({
-                  namespace,
-                  skip,
-                  take,
-                  filter,
-                  contract: contracts.governor.address,
-                }),
-              pagination
-            )
-        );
-
-        const latestBlockPromise: Promise<Block> = ui.toggle(
-          "use-l1-block-number"
-        )?.enabled
-          ? contracts.providerForTime?.getBlock("latest")
-          : contracts.token.provider.getBlock("latest");
-
-        const [proposals, latestBlock, votableSupply] = await Promise.all([
-          getProposalsExecution,
-          latestBlockPromise,
-          fetchVotableSupply(),
-        ]);
-
-        const resolvedProposals = await Promise.all(
-          proposals.data.map(async (proposal: ProposalPayload) => {
-            const quorum = await fetchQuorumForProposal(proposal);
-            return parseProposal(
-              proposal,
-              latestBlock,
-              quorum ?? null,
-              BigInt(votableSupply)
+            const getProposalsExecution = doInSpan(
+              { name: "getProposals" },
+              async () =>
+                paginateResult(
+                  (skip: number, take: number) =>
+                    findProposalsQuery({
+                      namespace,
+                      skip,
+                      take,
+                      filter,
+                      contract: contracts.governor.address,
+                    }),
+                  pagination
+                )
             );
-          })
-        );
 
-        return {
-          meta: proposals.meta,
-          data: resolvedProposals,
-        };
-      } catch (error) {
-        throw error;
-      }
+            const latestBlockPromise: Promise<Block> = ui.toggle(
+              "use-l1-block-number"
+            )?.enabled
+              ? contracts.providerForTime?.getBlock("latest")
+              : contracts.token.provider.getBlock("latest");
+
+            const [proposals, latestBlock, votableSupply] = await Promise.all([
+              getProposalsExecution,
+              latestBlockPromise,
+              fetchVotableSupply(),
+            ]);
+
+            const resolvedProposals = await Promise.all(
+              proposals.data.map(async (proposal: ProposalPayload) => {
+                const quorum = await fetchQuorumForProposal(proposal);
+                return parseProposal(
+                  proposal,
+                  latestBlock,
+                  quorum ?? null,
+                  BigInt(votableSupply)
+                );
+              })
+            );
+            console.timeEnd("getProposals");
+            return {
+              meta: proposals.meta,
+              data: resolvedProposals,
+            };
+          } catch (error) {
+            throw error;
+          }
+        },
+        { filter }
+      );
     },
-    { filter }
-  );
+    [`proposals-${filter}-${pagination.offset}-${pagination.limit}`],
+    {
+      revalidate: 60, // Cache for 1 minute
+      tags: ["proposals"],
+    }
+  )();
 }
 
 async function getProposal(proposalId: string) {
@@ -207,7 +218,7 @@ async function getTotalProposalsCount(): Promise<number> {
 export const fetchProposalsCount = cache(getTotalProposalsCount);
 export const fetchDraftProposalForSponsor = cache(getDraftProposalForSponsor);
 export const fetchDraftProposals = cache(getDraftProposals);
-export const fetchProposals = cache(getProposals);
+export const fetchProposals = getProposals; 
 export const fetchProposal = cache(getProposal);
 export const fetchProposalTypes = cache(getProposalTypes);
 export const fetchProposalUnstableCache = unstable_cache(getProposal, [], {
