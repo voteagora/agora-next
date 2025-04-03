@@ -62,7 +62,7 @@ const allowList = [
   "0x416a0343470ac6694D39e2fCd6C494eeEF39BeEB", // SAFE QA 3
   "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB", // Michael test
   "0x8d5237037A590A2dB531F3CfB8f42605cF306f34", // Pedro test
-  "0xa7813c9F0B1972E856eEa87F0F33AD43D727D784", // Bryan 
+  "0xa7813c9F0B1972E856eEa87F0F33AD43D727D784", // Bryan
 ] as `0x${string}`[];
 
 const useIsAdvancedUser = () => {
