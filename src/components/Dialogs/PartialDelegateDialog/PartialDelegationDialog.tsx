@@ -48,9 +48,7 @@ export function PartialDelegationDialog({
   const [forceResetDelegations, setForceResetDelegations] = useState(0);
 
   const totalPercentage = delegations.reduce(
-    (acc, curr) => {
-      return acc + Number(curr.percentage)
-    },
+    (acc, curr) => acc + Number(curr.percentage),
     0
   );
 
@@ -113,7 +111,10 @@ export function PartialDelegationDialog({
   const updateDelegations = (updatedDelegation: Delegation) => {
     setDelegations((prev) => {
       return prev.map((delegation) =>
-        delegation.to === updatedDelegation.to && delegation.type === updatedDelegation.type ? updatedDelegation : delegation
+        delegation.to === updatedDelegation.to &&
+        delegation.type === updatedDelegation.type
+          ? updatedDelegation
+          : delegation
       );
     });
     setIsUnsaved(true);
