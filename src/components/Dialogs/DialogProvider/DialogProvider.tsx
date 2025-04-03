@@ -85,7 +85,10 @@ export const DialogProvider: FC<Props> = ({ children }) => {
           currentDialog?.type !== "SWITCH_NETWORK" && setCurrentDialog(null)
         }
         transparent={(currentDialog as { transparent?: boolean })?.transparent}
-        className={(currentDialog as { className?: string })?.className}
+        className={cn(
+          "max-h-[95vh] overflow-y-auto",
+          currentDialog as { className?: string },
+        )}
       >
         {renderedDialog}
       </Modal>
