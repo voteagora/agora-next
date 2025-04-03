@@ -13,12 +13,13 @@ import {
 import TransferTransactionForm from "./TransferTransactionForm";
 import CustomTransactionForm from "./CustomTransactionForm";
 import toast from "react-hot-toast";
+import { checkNewProposal } from "@/lib/seatbelt/checkProposal";
+import { StructuredSimulationReport } from "@/lib/seatbelt/types";
+import { StructuredReport } from "@/components/Simulation/StructuredReport";
 
 type FormType = z.output<typeof BasicProposalSchema>;
 
-export const TENDERLY_VALID_CHAINS = [
-  1, 10, 11155111, 8453, 84532, 11155420, 59144, 59141,
-];
+export const TENDERLY_VALID_CHAINS = [1, 10, 11155111, 8453, 42161, 534352];
 
 // just the parts of the transaction that actually matter on-chain
 const stringifyTransactionDetails = (transaction: any) => {
@@ -54,7 +55,7 @@ const TransactionFormItem = ({
           {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
             (simulationState === "INVALID" ? (
               <a
-                href={`https://dashboard.tenderly.co/shared/simulation/${simulationId}`}
+                href={`https://tdly.co/shared/simulation/${simulationId}`}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -84,7 +85,7 @@ const TransactionFormItem = ({
               </span>
             ) : (
               <a
-                href={`https://dashboard.tenderly.co/shared/simulation/${simulationId}`}
+                href={`https://tdly.co/shared/simulation/${simulationId}`}
                 target="_blank"
                 rel="noreferrer noopener"
                 className="bg-green-100 text-green-500 px-2 py-1 rounded-lg text-xs font-semibold flex flex-row items-center space-x-1"
@@ -137,6 +138,8 @@ const BasicProposalForm = () => {
   const [allTransactionFieldsValid, setAllTransactionFieldsValid] =
     useState(true);
   const [simulationPending, setSimulationPending] = useState(false);
+  const [simulationReport, setSimulationReport] =
+    useState<StructuredSimulationReport | null>(null);
 
   const { control, setValue, getValues, formState, trigger, watch } =
     useFormContext<FormType>();
@@ -229,29 +232,21 @@ const BasicProposalForm = () => {
     const transactions = getValues("transactions");
 
     try {
-      const response = await fetch("/api/simulate-bundle", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          transactions,
-          networkId: contracts.governor.chain.id,
-          from: contracts.timelock!.address,
-        }),
+      const report = await checkNewProposal({
+        targets: transactions.map((transaction) => transaction.target),
+        values: transactions.map((transaction) => BigInt(transaction.value)),
+        calldatas: transactions.map((transaction) => transaction.calldata),
+        signatures: transactions.map(
+          (transaction) => transaction.signature || ""
+        ),
+        draftId: "1", // todo use correct draft id => used for storing simulation results
+        title: getValues("title"),
       });
-      const res = await response.json();
-      res.response.simulation_results.forEach((result: any, index: number) => {
-        if (result.transaction.status) {
-          setValue(`transactions.${index}.simulation_state`, "VALID");
-          setValue(`transactions.${index}.simulation_id`, result.simulation.id);
-          currentlyValidatedTransactions.current[index] =
-            stringifyTransactionDetails(transactions[index]);
-        } else {
-          setValue(`transactions.${index}.simulation_state`, "INVALID");
-          setValue(`transactions.${index}.simulation_id`, result.simulation.id);
-        }
-      });
+
+      setSimulationReport(report?.structuredReport ?? null);
+
+      // todo remove console.log
+      console.log(report);
     } catch (e) {
       console.error(e);
       toast.error("Error simulating transactions");
@@ -356,6 +351,9 @@ const BasicProposalForm = () => {
         >
           Create a custom transaction
         </UpdatedButton>
+      </div>
+      <div className="mt-6">
+        {simulationReport && <StructuredReport report={simulationReport} />}
       </div>
     </div>
   );
