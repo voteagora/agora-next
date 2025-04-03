@@ -11,7 +11,7 @@ import { UpdatedButton } from "@/components/Button";
 import { ConnectKitButton } from "connectkit";
 import { type SyntheticEvent } from "react";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import { DELEGATION_MODEL } from "@/lib/constants";
 import { useGetDelegatee } from "@/hooks/useGetDelegatee";
 import { PartialDelegateButton } from "./PartialDelegateButton";
 
@@ -48,13 +48,12 @@ export function DelegateActions({
     : DelegateButton;
 
   const delegationButton = () => {
-    switch (namespace) {
-      case TENANT_NAMESPACES.DERIVE:
-      case TENANT_NAMESPACES.SCROLL:
+    switch (contracts.delegationModel) {
+      case DELEGATION_MODEL.PARTIAL:
         return <PartialDelegateButton full={false} delegate={delegate} />;
 
       // Optimism in the only tenant currently supporting advanced delegation
-      case TENANT_NAMESPACES.OPTIMISM:
+      case DELEGATION_MODEL.ADVANCED:
         if (isAdvancedUser && hasAlligator) {
           return (
             <AdvancedDelegateButton

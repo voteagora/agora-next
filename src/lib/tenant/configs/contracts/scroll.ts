@@ -100,7 +100,7 @@ export const scrollTenantContractConfig = ({
 
     treasury: TREASURY,
 
-    delegationModel: DELEGATION_MODEL.FULL,
+    delegationModel: DELEGATION_MODEL.PARTIAL,
     governorType: GOVERNOR_TYPE.AGORA,
     timelockType:
       TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
