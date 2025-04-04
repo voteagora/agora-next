@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function LogoLink() {
-  const { ui, isProd } = Tenant.current();
+  const { ui } = Tenant.current();
 
   return (
     <Link href="/" className="flex flex-row justify-between w-full">

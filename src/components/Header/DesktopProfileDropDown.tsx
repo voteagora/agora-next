@@ -3,7 +3,6 @@
 import React, { ReactNode, useState } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { useAccount, useDisconnect } from "wagmi";
-import { AnimatePresence, motion } from "framer-motion";
 import ENSAvatar from "../shared/ENSAvatar";
 import { shortAddress } from "@/lib/utils";
 import Link from "next/link";

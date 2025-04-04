@@ -69,9 +69,12 @@ export function Drawer({
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className={cn(
               "fixed z-50 flex flex-col bg-wash border-line shadow-lg",
-              effectivePosition === "left" && "inset-y-0 left-0 w-5/6 max-w-sm border-r",
-              effectivePosition === "right" && "inset-y-0 right-0 w-5/6 max-w-sm border-l",
-              effectivePosition === "bottom" && "inset-x-0 bottom-0 rounded-t-xl border-t",
+              effectivePosition === "left" &&
+                "inset-y-0 left-0 w-5/6 max-w-sm border-r",
+              effectivePosition === "right" &&
+                "inset-y-0 right-0 w-5/6 max-w-sm border-l",
+              effectivePosition === "bottom" &&
+                "inset-x-0 bottom-0 rounded-t-xl border-t",
               className
             )}
           >
