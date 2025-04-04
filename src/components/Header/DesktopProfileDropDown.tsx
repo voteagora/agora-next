@@ -65,8 +65,8 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
     ui?.toggle("delegates/edit")?.enabled === true;
 
   return (
-    <Popover className="relative cursor-auto">
-      {({ open }) => {
+    <Popover className="relative cursor-auto shadow-popover">
+      {({}) => {
         return (
           <>
             <Popover.Button
@@ -81,17 +81,6 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
               </div>
             </Popover.Button>
 
-            {open && (
-              <AnimatePresence>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.2 }}
-                  exit={{ opacity: 0 }}
-                  className="z-[60] bg-black fixed top-0 bottom-0 right-0 left-0"
-                />
-              </AnimatePresence>
-            )}
-
             <Transition
               className="absolute right-0 z-[100]"
               enter="transition duration-00 ease-out"
@@ -103,11 +92,11 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
             >
               <Popover.Panel>
                 {({ close }) => (
-                  <div className="bg-wash border border-line rounded-xl w-[350px]">
+                  <div className="bg-wash border border-line rounded-2xl w-[350px] shadow-popover">
                     <div className="flex flex-col min-h-[250px]">
                       <div className="flex flex-col">
-                        <div className="p-4 border-b border-line">
-                          <div className="flex flex-row items-center px-4 py-3">
+                        <div className="p-6 py-4 border-b border-line">
+                          <div className="flex flex-row items-center">
                             <div
                               className={`relative aspect-square mr-4 ${
                                 isFetching && "animate-pulse"
@@ -179,8 +168,8 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                           </div>
                         )}
                       </div>
-                      <div className="self-stretch py-8 px-4 flex flex-col gap-6">
-                        <div className="flex flex-col gap-4">
+                      <div className="self-stretch flex flex-col gap-6">
+                        <div className="flex flex-col py-8 px-6 border-b border-line gap-4">
                           <PanelRow
                             title={
                               ui.tacticalStrings?.myBalance || "My balance"
@@ -192,7 +181,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                                 />
                               </RowSkeletonWrapper>
                             }
-                            className="w-[300px] justify-between"
+                            className="w-[300px] justify-between font-semibold"
                           />
 
                           <PanelRow
@@ -206,43 +195,43 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                                 />
                               </RowSkeletonWrapper>
                             }
-                            className="w-[300px] justify-between"
+                            className="w-[300px] justify-between font-semibold"
                           />
                         </div>
+                      </div>
+                      <div className="flex flex-col p-6">
                         {isFetching ? (
-                          <div className="animate-pulse bg-tertiary/10 h-[50px] mt-1 w-full rounded-2xl"></div>
+                          <div className="animate-pulse bg-tertiary/10 h-[50px] w-full rounded-full"></div>
                         ) : (
                           <>
                             {hasStatement && (
                               <div className="">
                                 <Link
                                   href={`/delegates/${ensName ?? address}`}
-                                  className="px-5 py-3 rounded-lg shadow-[0px_2px_2px_0px_rgba(0,0,0,0.03)] border border-neutral-200 flex justify-center"
+                                  className="px-[20] py-3 rounded-full border border-primary flex justify-center"
                                   onClick={() => close()}
                                 >
-                                  <span className="text-neutral-900 text-base font-semibold">
+                                  <span className="text-primary text-base font-semibold">
                                     View my profile
                                   </span>
+                                </Link>
+                              </div>
+                            )}
+                            {canCreateDelegateStatement && !hasStatement && (
+                              <div className="">
+                                <Link
+                                  href={`/delegates/create`}
+                                  className="rounded-full py-3 px-2 border border-line bg-brandPrimary hover:bg-none text-neutral flex justify-center mt-1"
+                                  onClick={() => close()}
+                                >
+                                  Create delegate statement
                                 </Link>
                               </div>
                             )}
                           </>
                         )}
                       </div>
-                      {canCreateDelegateStatement &&
-                        !hasStatement &&
-                        !isFetching && (
-                          <div className="px-4 py-6 border-t border-line inline-flex flex-col">
-                            <Link
-                              href={`/delegates/create`}
-                              className="rounded-lg py-3 px-2 border border-line bg-brandPrimary hover:bg-none text-neutral flex justify-center mt-1"
-                              onClick={() => close()}
-                            >
-                              Create delegate statement
-                            </Link>
-                          </div>
-                        )}
-                      <div className="p-4 border-t border-line bg-neutral rounded-[0px_0px_12px_12px]">
+                      <div className="p-6 border-t border-line">
                         <div
                           onClick={() => disconnect()}
                           className="cursor-pointer flex"
