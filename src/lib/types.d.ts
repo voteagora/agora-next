@@ -26,6 +26,7 @@ export type ChartVote = {
   support: string;
   weight: string;
   block_number: string;
+  created?: string;
 };
 
 export type VoterStats = {
