@@ -24,26 +24,30 @@ const FUNDING_VALUES: Record<
 > = {
   "Eth Limo": { ext: 800000, std: 700000, isEligibleFor2Y: true },
   "Lighthouse Labs": { ext: null, std: 400000, isEligibleFor2Y: false },
-  "PYOR": { ext: null, std: 300000, isEligibleFor2Y: false },
-  "JustaName": { ext: 600000, std: 400000, isEligibleFor2Y: false },
-  "Ethereum Identity Foundation": { ext: 700000, std: 500000, isEligibleFor2Y: true },
-  "Agora": { ext: 400000, std: 300000, isEligibleFor2Y: false },
+  PYOR: { ext: null, std: 300000, isEligibleFor2Y: false },
+  JustaName: { ext: 600000, std: 400000, isEligibleFor2Y: false },
+  "Ethereum Identity Foundation": {
+    ext: 700000,
+    std: 500000,
+    isEligibleFor2Y: true,
+  },
+  Agora: { ext: 400000, std: 300000, isEligibleFor2Y: false },
   "Alpha Growth": { ext: 800000, std: 400000, isEligibleFor2Y: false },
-  "web3bio": { ext: null, std: 500000, isEligibleFor2Y: false },
-  "GovPal": { ext: null, std: 300000, isEligibleFor2Y: false },
+  web3bio: { ext: null, std: 500000, isEligibleFor2Y: false },
+  GovPal: { ext: null, std: 300000, isEligibleFor2Y: false },
   "dWeb.host": { ext: 400000, std: 300000, isEligibleFor2Y: false },
-  "Namespace": { ext: 700000, std: 500000, isEligibleFor2Y: true },
+  Namespace: { ext: 700000, std: 500000, isEligibleFor2Y: true },
   "ZK Email": { ext: 800000, std: 400000, isEligibleFor2Y: false },
-  "Namestone": { ext: null, std: 800000, isEligibleFor2Y: true },
-  "Blockful": { ext: 700000, std: 400000, isEligibleFor2Y: false },
+  Namestone: { ext: null, std: 800000, isEligibleFor2Y: true },
+  Blockful: { ext: 700000, std: 400000, isEligibleFor2Y: false },
   "x23.ai": { ext: null, std: 300000, isEligibleFor2Y: false },
   "Unicorn.eth": { ext: null, std: 300000, isEligibleFor2Y: true },
-  "WebHash": { ext: null, std: 300000, isEligibleFor2Y: false },
+  WebHash: { ext: null, std: 300000, isEligibleFor2Y: false },
   "Curia Lab": { ext: null, std: 300000, isEligibleFor2Y: false },
   "Enscribe, Web3 Labs": { ext: null, std: 400000, isEligibleFor2Y: false },
   "Wildcard Labs": { ext: 400000, std: 300000, isEligibleFor2Y: false },
-  "Unruggable": { ext: 700000, std: 400000, isEligibleFor2Y: true },
-  "Tally": { ext: null, std: 300000, isEligibleFor2Y: false }
+  Unruggable: { ext: 700000, std: 400000, isEligibleFor2Y: true },
+  Tally: { ext: null, std: 300000, isEligibleFor2Y: false },
 } as const;
 
 export default function OptionsResultsPanel({
@@ -97,9 +101,7 @@ export default function OptionsResultsPanel({
                 result={result}
                 index={index}
                 isProposalActive={isProposalActive}
-                isFunding={proposal.markdowntitle.includes(
-                  "Service Provider"
-                )}
+                isFunding={proposal.markdowntitle.includes("Service Provider")}
               />
             ))}
           </div>
@@ -230,7 +232,9 @@ const OptionRow = ({
                       ?.variable
                   )}
                 >
-                  {fundingInfo.ext ? fundingInfo.ext.toLocaleString() : "N/A"}/y
+                  {fundingInfo.ext
+                    ? `${fundingInfo.ext.toLocaleString()}/y`
+                    : "N/A"}
                 </span>
               </div>
               <div className="flex justify-between items-center">
