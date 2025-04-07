@@ -2,7 +2,8 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
 import { z } from "zod";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateDelegateAddressPage } from "@/app/delegates/actions";
 
 const NotificationPreferencesOptionsSchema = z.object({
   wants_proposal_created_email: z.union([
@@ -55,8 +56,7 @@ const updateNotificationPreferencesForAddress = async (
       },
     });
 
-    // Invalidate the delegate cache for this specific address
-    revalidateTag(`delegate-${validatedAddress}`);
+    revalidateDelegateAddressPage(validatedAddress);
 
     return result;
   } catch (error) {

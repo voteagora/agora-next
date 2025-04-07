@@ -115,8 +115,7 @@ export async function submitDelegateStatement({
     scwAddress,
   });
 
-  revalidateTag("delegate");
-  revalidateTag("delegateStatement");
+  revalidateDelegateAddressPage(address.toLowerCase());
   revalidatePath("/delegates/create", "page");
   return response;
 }
@@ -177,7 +176,7 @@ export const fetchConnectedDelegate = async (address: string) => {
 export const revalidateDelegateAddressPage = async (
   delegateAddress: string
 ) => {
-  revalidateTag("delegate");
+  revalidateTag(`delegate-${delegateAddress}`);
   revalidatePath(`/delegates/${delegateAddress}`, "page");
 };
 
