@@ -259,12 +259,60 @@ async function getDelegates({
                     ${hasStatementCondition}
                     LIMIT 1
                   ) sub
-                ) AS statement
+                ) AS statement,
+                CASE
+                  WHEN d.num_of_delegators < 1000 THEN (
+                    WITH advanced_delegations AS (
+                      SELECT COUNT(*) as count
+                      FROM ${namespace}.advanced_delegatees
+                      WHERE "to" = d.delegate
+                      AND contract = '${contracts.alligator?.address || contracts.token.address}'
+                      AND delegated_amount > 0
+                    ),
+                    direct_delegations AS (
+                      ${
+                        contracts.token.isERC20()
+                          ? `SELECT
+                          SUM((CASE WHEN to_delegate = d.delegate THEN 1 ELSE 0 END) -
+                              (CASE WHEN from_delegate = d.delegate THEN 1 ELSE 0 END)) as count
+                        FROM ${namespace}.delegate_changed_events
+                        WHERE (to_delegate = d.delegate OR from_delegate = d.delegate)
+                        AND address = '${contracts.token.address}'`
+                          : `SELECT COUNT(*) as count
+                        FROM (
+                          SELECT DISTINCT ON (delegator)
+                            delegator,
+                            to_delegate
+                          FROM ${namespace}.delegate_changed_events
+                          WHERE address = '${contracts.token.address}'
+                          ORDER BY
+                            delegator,
+                            block_number DESC,
+                            transaction_index DESC,
+                            log_index DESC
+                        ) latest_delegations
+                        WHERE to_delegate = d.delegate`
+                      }
+                    )
+                    SELECT
+                      CASE
+                        WHEN ${contracts.alligator ? "TRUE" : "FALSE"} THEN
+                          COALESCE((SELECT count FROM advanced_delegations), 0) +
+                          COALESCE((SELECT count FROM direct_delegations), 0)
+                        WHEN '${contracts.delegationModel}' = 'PARTIAL' THEN
+                          COALESCE((SELECT count FROM advanced_delegations), 0)
+                        ELSE
+                          COALESCE((SELECT count FROM direct_delegations), 0)
+                      END as total_count
+                  )
+                  ELSE d.num_of_delegators
+                END AS calculated_delegators
               FROM del_card_universe d
-              WHERE num_of_delegators IS NOT NULL
-              AND (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR d.delegate = ANY(ARRAY[${allowListString}]::text[]))
+              WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR d.delegate = ANY(ARRAY[${allowListString}]::text[]))
               ${delegateStatementFilter}
-              ORDER BY num_of_delegators DESC, d.delegate
+              ORDER BY
+                calculated_delegators DESC,
+                d.delegate
               OFFSET $1
               LIMIT $2;
             `;
