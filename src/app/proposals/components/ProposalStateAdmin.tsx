@@ -158,19 +158,14 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
         return null;
       }
 
-      if (
-        proposal.proposalType === "STANDARD" ||
-        proposal.proposalType === "APPROVAL"
-      ) {
+      if (proposal.proposalType !== "OPTIMISTIC") {
         return (
           <div className="flex flex-row gap-2">
             <AgoraOptimismGovCancel proposal={proposal} />
             <AgoraOptimismGovQueue proposal={proposal} />
           </div>
         );
-      } else {
-        return <AgoraOptimismGovCancel proposal={proposal} />;
-      }
+      } else return null;
 
     case TENANT_NAMESPACES.UNISWAP:
       return <BravoGovQueue proposal={proposal} />;
@@ -238,7 +233,10 @@ const activeStateActions = ({ proposal, namespace }: ActionProps) => {
       return <AgoraGovCancel proposal={proposal} />;
 
     case TENANT_NAMESPACES.OPTIMISM:
-      return <AgoraOptimismGovCancel proposal={proposal} />;
+      // Cancel only standard and approval proposals
+      if (proposal.proposalType === "STANDARD") {
+        return <AgoraOptimismGovCancel proposal={proposal} />;
+      } else return null;
 
     case TENANT_NAMESPACES.ENS:
       // Cancelling proposals is not supported for ENS
