@@ -158,13 +158,18 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
         return null;
       }
 
-      if (proposal.proposalType !== "OPTIMISTIC") {
+      // Standard proposals can be queued or cancelled
+      // Approval proposals can only be cancelled once they are in the timelock
+      // Optimistic proposals can't be cancelled
+      if (proposal.proposalType === "STANDARD") {
         return (
           <div className="flex flex-row gap-2">
             <AgoraOptimismGovCancel proposal={proposal} />
             <AgoraOptimismGovQueue proposal={proposal} />
           </div>
         );
+      } else if (proposal.proposalType === "APPROVAL") {
+        return <AgoraOptimismGovQueue proposal={proposal} />;
       } else return null;
 
     case TENANT_NAMESPACES.UNISWAP:
@@ -204,6 +209,7 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
         return null;
       }
 
+      // Any proposal type that is in the timelock, can be queued or cancelled
       return (
         <div className="flex flex-row gap-2">
           <AgoraOptimismGovCancel proposal={proposal} />
