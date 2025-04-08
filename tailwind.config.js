@@ -352,6 +352,7 @@ module.exports = {
         switcher:
           "0px 4px 12px 0px rgba(0, 0, 0, 0.04), 0px 4px 8px 0px rgba(0, 0, 0, 0.06)",
         none: "none",
+        popover: "0px 4px 8px 0px rgba(0, 0, 0, 0.11)",
       },
       maxWidth: {
         // max-w-{var}

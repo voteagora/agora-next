@@ -8,7 +8,7 @@ import infoPageCard01 from "@/assets/tenant/optimism_info_1.png";
 import infoPageCard02 from "@/assets/tenant/optimism_info_2.png";
 import infoPageCard03 from "@/assets/tenant/optimism_info_3.png";
 import infoPageCard04 from "@/assets/tenant/optimism_info_4.png";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 export const optimismTenantUIConfig = new TenantUI({
