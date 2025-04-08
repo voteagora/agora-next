@@ -17,8 +17,9 @@ import {
   TenderlySimulation,
   TenderlyContract,
   StorageEncodingResponse,
+  SimulationConfigNewApproval,
 } from "./types";
-import { encodeFunctionData } from "viem";
+import { encodeFunctionData, StateOverride } from "viem";
 import { ParsedProposalData } from "../proposalUtils";
 import { delay as delayUtils } from "../utils";
 import { encodeState } from "./encode-state";
@@ -727,6 +728,306 @@ export async function simulateProposed(
   };
 
   return { sim, latestBlock, deps };
+}
+
+export async function simulateNewApproval(
+  config: SimulationConfigNewApproval
+): Promise<SimulationResult> {
+  const client = getPublicClient();
+
+  // --- Validate config ---
+  const {
+    unformattedProposalData,
+    description,
+    moduleAddress,
+    combination,
+    totalNumOfOptions,
+    settings,
+  } = config;
+
+  if (!moduleAddress) {
+    throw new Error("moduleAddress is required for approval proposals");
+  }
+
+  // --- Get details about the proposal we're simulating ---
+  const network = await provider.getNetwork();
+
+  const blockNumberToUse =
+    useL1BlockNumber && chainIdForTime
+      ? (await getLatestBlock(BigInt(chainIdForTime))) - 3
+      : (await getLatestBlock(network.chainId)) - 3;
+
+  const latestBlock =
+    useL1BlockNumber && providerForTime
+      ? await providerForTime.getBlock(blockNumberToUse)
+      : await provider.getBlock(blockNumberToUse);
+
+  const latestBlockL2 =
+    useL1BlockNumber && chainIdForTime
+      ? (await getLatestBlock(network.chainId)) - 3
+      : null;
+
+  // Generate proposal ID using the module address
+  const descriptionHash = keccak256(toUtf8Bytes(description));
+  const proposalId = BigInt(
+    keccak256(
+      defaultAbiCoder.encode(
+        ["address", "address", "bytes", "bytes32"],
+        [
+          governor.address,
+          moduleAddress,
+          unformattedProposalData,
+          descriptionHash,
+        ]
+      )
+    )
+  );
+
+  if (!latestBlock) {
+    throw new Error("latestBlock is null");
+  }
+
+  if (!timelock) {
+    throw new Error("timelock is null");
+  }
+
+  const startBlock = BigInt(latestBlock.number - 100);
+
+  // todo
+  const proposal: ProposalEvent = {
+    id: proposalId,
+    proposalId,
+    proposer: DEFAULT_FROM,
+    startBlock,
+    endBlock: startBlock + 1n,
+    description,
+    targets: [],
+    values: [],
+    signatures: [],
+    calldatas: [],
+  };
+
+  // --- Prepare simulation configuration ---
+  const votingTokenSupply = (await client.readContract({
+    address: votingToken.address as `0x${string}`,
+    abi: votingToken.abi,
+    functionName: "totalSupply",
+    args: [],
+  })) as unknown as bigint;
+
+  const from = DEFAULT_FROM;
+
+  const simBlock = proposal.endBlock! + 1n;
+  const simTimestamp = BigInt(latestBlock.timestamp + 1);
+
+  // Get execution parameters from the module
+  const storageObjForFormatExecuteParams = await encodeState({
+    networkID: network.chainId.toString(),
+    stateOverrides: {
+      [moduleAddress.toLowerCase()]: {
+        value: {
+          [`proposals[${proposalId.toString()}].governor`]: governor.address,
+          ...Object.fromEntries(
+            Array.from({ length: totalNumOfOptions || 0 }, (_, i) => {
+              return [
+                `proposals[${proposalId.toString()}].optionVotes[${i}]`,
+                combination?.includes(i)
+                  ? settings.criteriaValue + BigInt(1)
+                  : BigInt(0),
+              ];
+            })
+          ),
+        },
+      },
+    },
+  });
+
+  // Dev note PF: Why the below is needed? This is the length of the optionVotes array. There isn't an easy way to access this with object.keys notation, this is a hacky solution
+  // Get the governor slot from the encoded state and add 2
+  const governorSlot = Object.keys(
+    storageObjForFormatExecuteParams.stateOverrides[moduleAddress.toLowerCase()]
+      ?.value || {}
+  )[0];
+
+  if (!governorSlot) {
+    throw new Error("Could not find governor slot in encoded state");
+  }
+
+  // Convert the slot to a number, add 2, and convert back to hex
+  const slotNumber = BigInt(governorSlot);
+  const targetSlot = slotNumber + 2n;
+  const targetSlotHex = "0x" + targetSlot.toString(16).padStart(64, "0");
+
+  // Add the new storage slot to the state overrides
+  storageObjForFormatExecuteParams.stateOverrides[
+    moduleAddress.toLowerCase()
+  ].value[targetSlotHex] =
+    "0x" +
+    BigInt(totalNumOfOptions || 0)
+      .toString(16)
+      .padStart(64, "0");
+
+  const stateOverride: StateOverride = [
+    {
+      address: moduleAddress as `0x${string}`,
+      stateDiff: Object.entries(
+        storageObjForFormatExecuteParams.stateOverrides[
+          moduleAddress.toLowerCase()
+        ]?.value || {}
+      ).map(([slot, value]) => ({
+        slot: slot as `0x${string}`,
+        value: value as `0x${string}`,
+      })),
+    },
+  ];
+
+  let result;
+  try {
+    const response = await client.simulateContract({
+      address: moduleAddress as `0x${string}`,
+      abi: [
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "proposalId",
+              type: "uint256",
+            },
+            {
+              internalType: "bytes",
+              name: "proposalData",
+              type: "bytes",
+            },
+          ],
+          name: "_formatExecuteParams",
+          outputs: [
+            {
+              internalType: "address[]",
+              name: "targets",
+              type: "address[]",
+            },
+            {
+              internalType: "uint256[]",
+              name: "values",
+              type: "uint256[]",
+            },
+            {
+              internalType: "bytes[]",
+              name: "calldatas",
+              type: "bytes[]",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ],
+      functionName: "_formatExecuteParams",
+      account: governor.address as `0x${string}`,
+      stateOverride: stateOverride,
+      args: [proposalId, unformattedProposalData as `0x${string}`],
+    });
+
+    result = response.result;
+  } catch (error) {
+    throw error;
+  }
+
+  const [targets, values, calldatas] = result;
+
+  // Generate the state object needed to mark the transactions as queued in the Timelock's storage
+  const timelockStorageObj: Record<string, string> = {};
+
+  const id = hashOperationBatchOz(
+    [...targets],
+    [...values],
+    [...calldatas],
+    HashZero,
+    keccak256(toUtf8Bytes(description))
+  );
+
+  timelockStorageObj[`_timestamps[${"0x" + id.toString(16)}]`] =
+    simTimestamp.toString();
+
+  const governorStateOverrides: Record<string, string> = {
+    [`_proposals[${proposalId.toString()}].voteEnd._deadline`]: (
+      simBlock - 1n
+    ).toString(),
+    [`_proposals[${proposalId.toString()}].voteStart._deadline`]: (
+      simBlock - 10000n
+    ).toString(),
+    [`_proposals[${proposalId.toString()}].canceled`]: "false",
+    [`_proposals[${proposalId.toString()}].executed`]: "false",
+    [`_proposalVotes[${proposalId.toString()}].forVotes`]:
+      votingTokenSupply.toString(),
+    [`_proposalVotes[${proposalId.toString()}].againstVotes`]: "0",
+    [`_proposalVotes[${proposalId.toString()}].abstainVotes`]: "0",
+    [`_timelockIds[${proposalId.toString()}]`]: "0x" + id.toString(16),
+  };
+
+  const stateOverrides: StateOverridesPayload = {
+    networkID: network.chainId.toString(),
+    stateOverrides: {
+      [timelock.address]: {
+        value: timelockStorageObj,
+      },
+      [governor.address]: {
+        value: governorStateOverrides,
+      },
+    },
+  };
+
+  const storageObj = await encodeState(stateOverrides);
+
+  // --- Simulate it ---
+  const simulationPayload: TenderlyPayload = {
+    network_id: network.chainId.toString(),
+    block_number: latestBlockL2 ? latestBlockL2 : latestBlock.number,
+    from,
+    to: governor.address,
+    input: encodeFunctionData({
+      abi: governor.abi,
+      functionName: "executeWithModule",
+      args: [moduleAddress, unformattedProposalData, descriptionHash],
+    }),
+    gas: BLOCK_GAS_LIMIT,
+    gas_price: "0",
+    value: "0",
+    save_if_fails: true,
+    save: true,
+    generate_access_list: true,
+    block_header: {
+      number: `0x${simBlock.toString(16)}`,
+      timestamp: `0x${simTimestamp.toString(16)}`,
+    },
+    state_objects: {
+      [from]: { balance: "0" },
+      [timelock.address]: {
+        storage:
+          storageObj.stateOverrides[timelock.address.toLowerCase()]?.value,
+      },
+      [governor.address]: {
+        storage:
+          storageObj.stateOverrides[governor.address.toLowerCase()]?.value,
+      },
+      [moduleAddress]: {
+        storage:
+          storageObjForFormatExecuteParams.stateOverrides[
+            moduleAddress.toLowerCase()
+          ]?.value,
+      },
+    },
+  };
+
+  // Run the simulation
+  const sim = await sendSimulation(simulationPayload);
+
+  const deps: ProposalData = {
+    governor,
+    timelock,
+    provider,
+  };
+
+  return { sim, proposal, latestBlock, deps };
 }
 
 // --- Helper methods ---

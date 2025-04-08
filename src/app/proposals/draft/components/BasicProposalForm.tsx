@@ -39,12 +39,6 @@ const TransactionFormItem = ({
   remove: UseFieldArrayRemove;
   children: React.ReactNode;
 }) => {
-  const { contracts } = Tenant.current();
-  const { register, watch } = useFormContext<FormType>();
-
-  const simulationState = watch(`transactions.${index}.simulation_state`);
-  const simulationId = watch(`transactions.${index}.simulation_id`);
-
   return (
     <div className="p-4 border border-agora-stone-100 rounded-lg">
       <div className="flex flex-row justify-between items-center mb-6">
@@ -52,63 +46,6 @@ const TransactionFormItem = ({
           <h2 className="text-secondary font-semibold">
             Transaction #{index + 1}
           </h2>
-          {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
-            (simulationState === "INVALID" ? (
-              <a
-                href={`https://tdly.co/shared/simulation/${simulationId}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span className="bg-red-100 text-red-500 rounded-lg px-2 py-1 text-xs font-semibold flex flex-row items-center space-x-1">
-                  <span>Invalid</span>
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="mb-[1px]"
-                  >
-                    <path
-                      d="M9 6.5V9.5C9 9.76522 8.89464 10.0196 8.70711 10.2071C8.51957 10.3946 8.26522 10.5 8 10.5H2.5C2.23478 10.5 1.98043 10.3946 1.79289 10.2071C1.60536 10.0196 1.5 9.76522 1.5 9.5V4C1.5 3.73478 1.60536 3.48043 1.79289 3.29289C1.98043 3.10536 2.23478 3 2.5 3H5.5M7.5 1.5H10.5M10.5 1.5V4.5M10.5 1.5L5 7"
-                      stroke="currentColor"
-                      strokeWidth="1.3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-              </a>
-            ) : simulationState === "UNCONFIRMED" ? (
-              <span className="bg-gray-100 text-gray-500 px-2 py-1 rounded-lg text-xs font-semibold">
-                <span>No simulation</span>
-              </span>
-            ) : (
-              <a
-                href={`https://tdly.co/shared/simulation/${simulationId}`}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="bg-green-100 text-green-500 px-2 py-1 rounded-lg text-xs font-semibold flex flex-row items-center space-x-1"
-              >
-                <span>Valid</span>
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="mb-[1px]"
-                >
-                  <path
-                    d="M9 6.5V9.5C9 9.76522 8.89464 10.0196 8.70711 10.2071C8.51957 10.3946 8.26522 10.5 8 10.5H2.5C2.23478 10.5 1.98043 10.3946 1.79289 10.2071C1.60536 10.0196 1.5 9.76522 1.5 9.5V4C1.5 3.73478 1.60536 3.48043 1.79289 3.29289C1.98043 3.10536 2.23478 3 2.5 3H5.5M7.5 1.5H10.5M10.5 1.5V4.5M10.5 1.5L5 7"
-                    stroke="currentColor"
-                    strokeWidth="1.3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </a>
-            ))}
         </div>
         <span
           className="text-red-500 text-sm hover:underline cursor-pointer"
@@ -120,14 +57,6 @@ const TransactionFormItem = ({
         </span>
       </div>
       {children}
-      <input
-        type="hidden"
-        {...register(`transactions.${index}.simulation_state`)}
-      />
-      <input
-        type="hidden"
-        {...register(`transactions.${index}.simulation_id`)}
-      />
     </div>
   );
 };
@@ -173,18 +102,18 @@ const BasicProposalForm = () => {
   }, [trigger]);
 
   const updateSimulationState = useCallback(
-    (index: number, transaction: any) => {
-      const currentStringified = stringifyTransactionDetails(transaction);
+    (index: number, transactions: any) => {
+      const currentStringified = stringifyTransactionDetails(transactions);
       const previousStringified = currentlyValidatedTransactions.current[index];
 
       if (currentStringified !== previousStringified) {
-        setValue(`transactions.${index}.simulation_state`, "UNCONFIRMED");
+        setValue(`simulation_state`, "UNCONFIRMED");
         setFormDirty(true);
       } else if (previousStringified) {
         setFormDirty(false);
         setValue(
-          `transactions.${index}.simulation_state`,
-          formState.defaultValues?.transactions?.[index]?.simulation_state!
+          `simulation_state`,
+          formState.defaultValues?.simulation_state!
         );
       }
     },
@@ -201,7 +130,7 @@ const BasicProposalForm = () => {
         const field = parts[2];
 
         // skip if the transaction has not been simulated yet
-        const simulationState = value.transactions?.[index]?.simulation_state;
+        const simulationState = value.simulation_state;
         if (simulationState !== "CONFIRMED") {
           return;
         }
@@ -218,8 +147,8 @@ const BasicProposalForm = () => {
         ) {
           validateTransactionForms();
           const updatedTransactions = value.transactions;
-          if (updatedTransactions && updatedTransactions[index]) {
-            updateSimulationState(index, updatedTransactions[index]);
+          if (updatedTransactions) {
+            updateSimulationState(index, updatedTransactions);
           }
         }
       }
@@ -244,6 +173,8 @@ const BasicProposalForm = () => {
       });
 
       setSimulationReport(report?.structuredReport ?? null);
+      setValue("simulation_state", report?.status ?? "UNCONFIRMED");
+      setValue("simulation_id", report?.structuredReport.simulation.simulation.id ?? "");
 
       // todo remove console.log
       console.log(report);
@@ -256,12 +187,8 @@ const BasicProposalForm = () => {
     }
   };
 
-  const allFieldsValid = fields.every(
-    (field) => field.simulation_state === "VALID"
-  );
-
   const isSimulationButtonEnabled =
-    allTransactionFieldsValid && (formDirty || !allFieldsValid);
+    allTransactionFieldsValid && (formDirty);
 
   return (
     <div>

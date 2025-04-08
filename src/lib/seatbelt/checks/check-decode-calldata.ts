@@ -164,50 +164,6 @@ function getDescription(
 }
 
 /**
- * Format arguments for human-readable display
- */
-function formatArgs(
-  args: {
-    type: string;
-    components?: any;
-    value?: any;
-    nestedFunction?: {
-      name: string;
-      parameters: any;
-    };
-  }[]
-): string {
-  if (!args.length) return "";
-
-  // If there's only one argument and it's undefined, return an empty string
-  if (args.length === 1 && args[0] === undefined) {
-    return "";
-  }
-
-  return args
-    .map((arg) => {
-      const { type, value } = arg;
-      if (value === undefined) return "undefined";
-      if (typeof value === "bigint") {
-        return value.toString();
-      }
-      if (typeof value === "object" && value !== null) {
-        try {
-          // Handle objects with BigInt values by converting them to strings
-          return JSON.stringify(value, (_, value) =>
-            typeof value === "bigint" ? value.toString() : value
-          );
-        } catch {
-          // If JSON.stringify fails, return a simple string representation
-          return "[Complex Object]";
-        }
-      }
-      return String(arg);
-    })
-    .join(", ");
-}
-
-/**
  * Given a call, return a human-readable description of the call
  */
 async function prettifyCalldata(

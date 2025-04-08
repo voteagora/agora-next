@@ -315,6 +315,7 @@ function to32ByteHex(value: any): string {
       return "0x" + "0".repeat(62) + "01";
     }
 
+    // For non-hex strings, hash them
     return keccak256(toUtf8Bytes(value));
   }
 
@@ -327,6 +328,18 @@ function to32ByteHex(value: any): string {
       return hex;
     }
     // For shorter byte arrays, pad to 32 bytes
+    return "0x" + hex.slice(2).padStart(64, "0");
+  }
+
+  // Handle arrays of bytes
+  if (
+    Array.isArray(value) &&
+    value.every((v) => typeof v === "number" && v >= 0 && v <= 255)
+  ) {
+    const hex = toHex(new Uint8Array(value));
+    if (hex.length > 66) {
+      return hex;
+    }
     return "0x" + hex.slice(2).padStart(64, "0");
   }
 
@@ -552,10 +565,21 @@ export const encodeState = async ({
             }
 
             const slot = computeDynamicStorageSlot(storageLayout, prop);
+            const value = state[prop];
 
-            const hexValue = to32ByteHex(state[prop]);
-
-            output.stateOverrides[contractAddr].value![slot] = hexValue;
+            // If the value is a function call (starts with 0x and is longer than 32 bytes),
+            // use it directly without encoding
+            if (
+              typeof value === "string" &&
+              value.startsWith("0x") &&
+              value.length > 66
+            ) {
+              output.stateOverrides[contractAddr].value![slot] = value;
+            } else {
+              // For all other values, encode them as 32-byte hex
+              const hexValue = to32ByteHex(value);
+              output.stateOverrides[contractAddr].value![slot] = hexValue;
+            }
           } catch (err: any) {
             console.error("Error processing property", prop, err);
           }

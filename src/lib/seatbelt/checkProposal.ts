@@ -1,16 +1,21 @@
 "use server";
 
+import { ProposalType } from "@/app/proposals/draft/types";
 import { ParsedProposalData } from "../proposalUtils";
 import Tenant from "../tenant/tenant";
 import ALL_CHECKS from "./checks";
 import { generateAndSaveReports } from "./report";
-import { simulateNew, simulateProposed } from "./simulate";
+import { simulateNew, simulateProposed, simulateNewApproval } from "./simulate";
 import {
   AllCheckResults,
   SimulationConfigNew,
   SimulationConfigProposed,
+  SimulationConfigNewApproval,
+  ApprovalProposalSettings,
+  ApprovalProposalOption,
 } from "./types";
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 
 export async function checkNewProposal({
   targets,
@@ -77,10 +82,10 @@ export async function checkNewProposal({
 
   // Generate markdown report
   const [startBlock, endBlock] = await Promise.all([
-    Number(proposal.startBlock) <= latestBlock.number
+    proposal.startBlock && Number(proposal.startBlock) <= latestBlock.number
       ? provider.getBlock(Number(proposal.startBlock))
       : null,
-    Number(proposal.endBlock) <= latestBlock.number
+    proposal.endBlock && Number(proposal.endBlock) <= latestBlock.number
       ? provider.getBlock(Number(proposal.endBlock))
       : null,
   ]);
@@ -165,9 +170,11 @@ export async function checkExistingProposal({
 
   // Generate markdown report
   const [startBlock, endBlock] = await Promise.all([
+    existingProposal.startBlock &&
     Number(existingProposal.startBlock) <= latestBlock.number
       ? provider.getBlock(Number(existingProposal.startBlock))
       : null,
+    existingProposal.endBlock &&
     Number(existingProposal.endBlock) <= latestBlock.number
       ? provider.getBlock(Number(existingProposal.endBlock))
       : null,
@@ -179,6 +186,99 @@ export async function checkExistingProposal({
   const report = await generateAndSaveReports(
     { start: startBlock, end: endBlock, current: latestBlock },
     proposalEvent,
+    checkResults,
+    dir,
+    sim
+  );
+
+  return report;
+}
+
+export async function checkNewApprovalProposal({
+  unformattedProposalData,
+  description,
+  draftId,
+  options,
+  settings,
+  title,
+  combination,
+  totalNumOfOptions,
+}: {
+  unformattedProposalData: `0x${string}`;
+  description: string;
+  draftId: string;
+  title?: string;
+  options: ApprovalProposalOption[];
+  settings: ApprovalProposalSettings;
+  combination?: number[];
+  totalNumOfOptions?: number;
+}) {
+  const tenant = Tenant.current();
+  const governor = tenant.contracts.governor;
+  const provider = tenant.contracts.governor.provider;
+  const governorType = tenant.contracts.governorType;
+
+  const moduleAddress = getProposalTypeAddress(ProposalType.APPROVAL);
+
+  const config: SimulationConfigNewApproval = {
+    governorType: governorType,
+    unformattedProposalData,
+    description,
+    moduleAddress: moduleAddress as `0x${string}`,
+    options,
+    settings,
+    combination,
+    totalNumOfOptions,
+  };
+
+  // Generate the proposal data and dependencies needed by checks
+  const proposalData = {
+    governor,
+    provider,
+    timelock: tenant.contracts.timelock!,
+  };
+
+  // Run simulation
+  const { sim, proposal, latestBlock } = await simulateNewApproval(config);
+
+  if (!proposal) {
+    throw new Error("Proposal not correctly simulated");
+  }
+
+  proposal.title = title;
+
+  // Run checks
+  const checkResults: AllCheckResults = Object.fromEntries(
+    await Promise.all(
+      Object.keys(ALL_CHECKS).map(async (checkId) => [
+        checkId,
+        {
+          name: ALL_CHECKS[checkId].name,
+          result: await ALL_CHECKS[checkId].checkProposal(
+            proposal,
+            sim,
+            proposalData
+          ),
+        },
+      ])
+    )
+  );
+
+  // Generate markdown report
+  const [startBlock, endBlock] = await Promise.all([
+    proposal.startBlock && Number(proposal.startBlock) <= latestBlock.number
+      ? provider.getBlock(Number(proposal.startBlock))
+      : null,
+    proposal.endBlock && Number(proposal.endBlock) <= latestBlock.number
+      ? provider.getBlock(Number(proposal.endBlock))
+      : null,
+  ]);
+
+  // Save markdown report to a file
+  const dir = `./reports/${tenant.namespace}/${governor.address}`;
+  const report = await generateAndSaveReports(
+    { start: startBlock, end: endBlock, current: latestBlock },
+    proposal,
     checkResults,
     dir,
     sim

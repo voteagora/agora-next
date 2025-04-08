@@ -6,6 +6,22 @@ import { IGovernorContract } from "../contracts/common/interfaces/IGovernorContr
 import { ITimelockContract } from "../contracts/common/interfaces/ITimelockContract";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 
+export interface ApprovalProposalOption {
+  budgetTokensSpent: bigint;
+  targets: string[];
+  values: bigint[];
+  calldatas: string[];
+  description: string;
+}
+
+export interface ApprovalProposalSettings {
+  maxApprovals: number;
+  criteria: number;
+  budgetToken: string;
+  criteriaValue: bigint;
+  budgetAmount: bigint;
+}
+
 // --- Simulation configurations ---
 
 interface SimulationConfigBase {
@@ -24,6 +40,17 @@ export interface SimulationConfigNew extends SimulationConfigBase {
   signatures: string[];
   calldatas: string[];
   description: string;
+}
+
+export interface SimulationConfigNewApproval {
+  governorType: GOVERNOR_TYPE;
+  unformattedProposalData: string;
+  description: string;
+  moduleAddress: `0x${string}`;
+  options: ApprovalProposalOption[];
+  settings: ApprovalProposalSettings;
+  combination?: number[];
+  totalNumOfOptions?: number;
 }
 
 export interface SimulationResult {

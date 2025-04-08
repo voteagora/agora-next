@@ -1,4 +1,3 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   SimulationCheck,
   SimulationStateChange,
@@ -12,7 +11,6 @@ import {
   ChevronUpIcon,
   ExternalLinkIcon,
   InfoIcon,
-  HistoryIcon,
 } from "lucide-react";
 import type React from "react";
 import { useMemo, useState } from "react";
@@ -40,7 +38,6 @@ function StateChanges({ stateChanges }: StateChangesProps) {
             // Contract always exists on change but may be generic
             const contractName = change.contract;
 
-            // We'll keep the original contract name in the key for grouping
             const key = `${contractName}|${change.contractAddress || ""}`;
 
             if (!acc[key]) {
@@ -55,7 +52,6 @@ function StateChanges({ stateChanges }: StateChangesProps) {
         const [contractName, contractAddress] = contractKey.split("|");
         return (
           <div key={contractKey} className="space-y-3">
-            {/* Contract header */}
             <div className="flex items-center gap-2 mb-2 p-2 bg-wash rounded-md border-l-4 border-brandPrimary">
               <h3 className="text-base font-semibold">
                 {contractName === "balances"
@@ -103,7 +99,7 @@ interface StructuredReportProps {
 
 export function StructuredReport({ report }: StructuredReportProps) {
   return (
-    <div className="w-full border border-line rounded-md shadow-sm max-h-[600px] overflow-y-auto">
+    <div className="w-full border border-line rounded-md shadow-sm max-h-[600px] overflow-y-auto scrollbar-hide">
       <div className="bg-wash p-6 border-b border-line">
         <h2 className="text-2xl font-bold text-primary">Simulation</h2>
         <div className="flex items-center mt-3">
@@ -129,66 +125,33 @@ export function StructuredReport({ report }: StructuredReportProps) {
           href={`https://tdly.co/shared/simulation/${report.simulation.simulation.id}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm flex gap-1 items-center mt-3 text-tertiary hover:underline"
+          className="text-sm flex gap-1 items-center mt-3 text-tertiary hover:underline font-semibold"
         >
           <span>View simulation on Tenderly</span>
           <ExternalLinkIcon className="h-3 w-3" />
         </a>
       </div>
 
-      <Tabs defaultValue="checks" className="w-full">
-        <TabsList className="w-full border-b border-line p-0 rounded-none bg-transparent justify-start py-2 h-16 pl-6">
-          <div className="flex justify-start overflow-x-auto gap-1">
-            <TabsTrigger
-              value="checks"
-              className="flex items-center gap-2 data-[state=active]:bg-brandPrimary data-[state=active]:text-white rounded-full px-4 py-2 text-sm"
-            >
-              <CheckCircleIcon className="h-4 w-4" />
-              Checks
-            </TabsTrigger>
-            <TabsTrigger
-              value="state-changes"
-              className="flex items-center gap-2 data-[state=active]:bg-brandPrimary data-[state=active]:text-white rounded-full px-4 py-2 text-sm"
-            >
-              <HistoryIcon className="h-4 w-4" />
-              State Changes
-            </TabsTrigger>
-          </div>
-        </TabsList>
-
-        <div className="overflow-y-auto">
-          <TabsContent
-            value="checks"
-            className="mt-4 overflow-y-auto pb-8 px-6"
-          >
-            <div className="space-y-4">
-              {report.checks.length === 0 ? (
-                <div className="flex items-center justify-center p-6 text-tertiary border border-line rounded-md bg-wash/30">
-                  <InfoIcon className="h-4 w-4 mr-2 text-tertiary" />
-                  <span>No checks found in the report</span>
-                </div>
-              ) : (
-                report.checks.map((check: SimulationCheck, index: number) => (
-                  <ExpandableCheckItem
-                    key={`check-${check.title}-${index}`}
-                    check={check}
-                    stateChanges={report.stateChanges}
-                  />
-                ))
-              )}
+      <div className="overflow-y-auto">
+        <div className="p-4">
+          {report.checks.length === 0 ? (
+            <div className="flex items-center justify-center p-6 text-tertiary border border-line rounded-md bg-wash/30">
+              <InfoIcon className="h-4 w-4 mr-2 text-tertiary" />
+              <span>No checks found in the report</span>
             </div>
-          </TabsContent>
-
-          <TabsContent
-            value="state-changes"
-            className="mt-4 overflow-y-auto pb-8 px-6"
-          >
+          ) : (
             <div className="space-y-4">
-              <StateChanges stateChanges={report.stateChanges} />
+              {report.checks.map((check: SimulationCheck, index: number) => (
+                <ExpandableCheckItem
+                  key={`check-${check.title}-${index}`}
+                  check={check}
+                  stateChanges={report.stateChanges}
+                />
+              ))}
             </div>
-          </TabsContent>
+          )}
         </div>
-      </Tabs>
+      </div>
     </div>
   );
 }
@@ -583,17 +546,20 @@ function ExpandableCheckItem({
         </div>
         <div className="flex items-center gap-3">
           {getStatusBadge()}
-          {check.details &&
-            (isExpanded ? (
-              <ChevronUpIcon className="h-4 w-4 text-tertiary" />
-            ) : (
-              <ChevronDownIcon className="h-4 w-4 text-tertiary" />
-            ))}
+          {isExpanded ? (
+            <ChevronUpIcon className="h-4 w-4 text-tertiary" />
+          ) : (
+            <ChevronDownIcon className="h-4 w-4 text-tertiary" />
+          )}
         </div>
       </button>
-      {isExpanded && check.details && (
+      {isExpanded && (
         <div className="p-5 pt-4 pl-11 text-sm border-t border-line bg-wash/50">
-          {isStateChangesCheck ? (
+          {!check.details ? (
+            <div className="mt-3">
+              <span>No details available</span>
+            </div>
+          ) : isStateChangesCheck ? (
             <div className="mt-3">
               {stateChanges && stateChanges.length > 0 ? (
                 <StateChanges stateChanges={stateChanges} />
@@ -812,29 +778,11 @@ function StateChangeItem({
         aria-expanded={isExpanded}
       >
         <div className="flex items-start gap-2">
-          {stateChange.key.startsWith("0x") && (
-            <div className="text-xs bg-tertiary/10 px-2 py-1 rounded-md text-tertiary">
-              Balance
-            </div>
-          )}
+          <div className="text-xs bg-tertiary/10 px-2 py-1 rounded-md text-tertiary">
+            {stateChange.key.startsWith("0x") ? "Balance" : "State change"}
+          </div>
         </div>
         <div className="flex items-center gap-2">
-          <code className="text-xs bg-wash px-2 py-1 rounded-md border border-line/30">
-            {stateChange.key.startsWith("0x") ? (
-              <a
-                href={getBlockScanAddress(stateChange.key)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-tertiary transition-colors inline-flex items-center"
-                onClick={(e) => e.stopPropagation()} // Prevent toggling when clicking the link
-              >
-                {stateChange.key}
-                <ExternalLinkIcon className="h-3 w-3 ml-1 text-tertiary" />
-              </a>
-            ) : (
-              stateChange.key
-            )}
-          </code>
           {isExpanded ? (
             <ChevronUpIcon className="h-4 w-4 text-tertiary" />
           ) : (

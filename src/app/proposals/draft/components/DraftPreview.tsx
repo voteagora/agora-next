@@ -204,12 +204,6 @@ const DraftPreview = ({
               values={(proposalDraft as BasicProposal).transactions.map(
                 (t) => t.value
               )}
-              simulationDetails={{
-                id: (proposalDraft as BasicProposal).transactions[0]
-                  ?.simulation_id,
-                state: (proposalDraft as BasicProposal).transactions[0]
-                  ?.simulation_state,
-              }}
               network={tenant.contracts.governor.chain.name}
             />
           )}
