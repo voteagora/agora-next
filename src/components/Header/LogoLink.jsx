@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function LogoLink() {
-  const { ui } = Tenant.current();
+  const { ui, isProd } = Tenant.current();
 
   return (
     <Link href="/" className="flex flex-row justify-between w-full">
@@ -15,15 +15,14 @@ export default function LogoLink() {
           height="46"
           className="h-[46px] w-auto"
         />
-        <span className="hidden sm:block font-medium text-primary text-[36px]">{`${ui.title}`}</span>
-        {/* {!isProd && (
+        {!isProd && (
           <>
             <div className="h-3 w-[2px] bg-line rounded-full hidden sm:block"></div>
             <span className="hidden sm:block font-semibold text-primary bg-tertiary/10 px-1.5 py-0.5 rounded-lg text-xs border border-line">
               Test contracts mode
             </span>
           </>
-        )} */}
+        )}
       </div>
     </Link>
   );
