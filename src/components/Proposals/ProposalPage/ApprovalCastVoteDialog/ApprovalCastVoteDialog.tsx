@@ -14,6 +14,7 @@ import { useEnsName, useAccount } from "wagmi";
 import { truncateAddress } from "@/app/lib/utils/text";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Vote } from "@/app/api/common/votes/vote";
+import { cn } from "@/lib/utils";
 
 const abiCoder = new AbiCoder();
 
@@ -66,7 +67,9 @@ export function ReviewApprovalVoteDialog({
                 className="flex flex-row items-center justify-between relative"
                 key={`option-${index}`}
               >
-                <p className="font-medium">{option.description}</p>
+                <p className="font-medium max-w-[calc(100%-24px)]">
+                  {option.description}
+                </p>
                 <div
                   className={
                     "border border-line bg-primary absolute right-0 top-1/2 -translate-y-1/2 rounded-sm w-4 h-4 flex items-center justify-center transition-all"
@@ -398,11 +401,10 @@ function CheckCard({
   return (
     <div className="py-2 cursor-pointer relative" onClick={onClick}>
       <p
-        className={
-          checked
-            ? "text-primary font-medium transition-all"
-            : "text-secondary font-normal transition-all"
-        }
+        className={cn(
+          "transition-all max-w-[calc(100%-24px)]",
+          checked ? "text-primary font-medium" : "text-secondary font-normal"
+        )}
       >
         {title}
       </p>
