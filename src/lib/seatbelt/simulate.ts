@@ -666,7 +666,11 @@ export async function simulateProposed(
   const simulationPayload: TenderlyPayload = {
     network_id: network.chainId.toString(),
     // this field represents the block state to simulate against, so we use the latest block number
-    block_number: latestBlockL2 ? latestBlockL2 : latestBlock.number,
+    block_number: proposal.executedBlock
+      ? Number(BigInt(proposal.executedBlock) - BigInt(10))
+      : latestBlockL2
+        ? latestBlockL2
+        : latestBlock.number,
     from,
     to: governor.address,
     input: encodeFunctionData({
@@ -1089,8 +1093,6 @@ async function getLatestBlock(chainId: bigint): Promise<number> {
     const data = await res.json();
     return data.block_number as number;
   } catch (err) {
-    console.log("logging getLatestBlock error");
-    console.log(JSON.stringify(err, null, 2));
     throw err;
   }
 }

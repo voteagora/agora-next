@@ -180,6 +180,28 @@ async function prettifyCalldata(
     return `\`${call.from}\` transfers ${ethAmount} ETH to \`${target}\` (formatted)`;
   }
 
+  // Validate calldata format
+  if (
+    !call.input ||
+    typeof call.input !== "string" ||
+    !call.input.startsWith("0x")
+  ) {
+    warnings.push(`Invalid calldata format for target ${target}`);
+    return `\`${call.from}\` calls unknown function on ${contract ? getContractName(contract) : `\`${target}\``} (invalid calldata)`;
+  }
+
+  // Ensure calldata has at least 10 characters (4 bytes for selector + '0x' prefix)
+  if (call.input.length < 10) {
+    warnings.push(`Calldata too short for target ${target}`);
+    return `\`${call.from}\` calls unknown function on ${contract ? getContractName(contract) : `\`${target}\``} (calldata too short)`;
+  }
+
+  // Ensure calldata has even length (each byte is 2 hex characters)
+  if (call.input.length % 2 !== 0) {
+    warnings.push(`Invalid calldata length for target ${target}`);
+    return `\`${call.from}\` calls unknown function on ${contract ? getContractName(contract) : `\`${target}\``} (invalid calldata length)`;
+  }
+
   // Get the function selector (first 4 bytes of the calldata)
   const selector = call.input.slice(0, 10);
 
@@ -190,24 +212,15 @@ async function prettifyCalldata(
 
   // Try to decode using Etherscan ABI first
   try {
-    console.log(
-      `[DEBUG] Trying to decode using Etherscan ABI for ${target} with selector ${selector}`
-    );
     const decoded = await cachedDecodeEnhanced(
       target,
       call.input as `0x${string}`
     );
     if (decoded && decoded.usedMethod !== "failed") {
-      console.log(
-        `[DEBUG] Successfully decoded using Etherscan ABI: ${decoded.function}`
-      );
-
       const signature = getFunctionSignature(decoded);
-
       return `\`${call.from}\` calls \`${signature}\` on ${contractIdentifier} (decoded from ABI)`;
     }
 
-    console.log(`[DEBUG] Failed to decode using Etherscan ABI for ${target}`);
     warnings.push(
       `Failed to decode function with selector ${selector} for contract ${target} using Etherscan ABI`
     );
@@ -221,7 +234,6 @@ async function prettifyCalldata(
   // Handle token-related actions
   const isTokenAction = selector in TOKEN_HANDLERS;
   if (isTokenAction) {
-    console.log(`[DEBUG] Using token handler for selector ${selector}`);
     const { symbol, decimals } = Tenant.current().token;
     return TOKEN_HANDLERS[selector](
       call,
@@ -232,9 +244,6 @@ async function prettifyCalldata(
   }
 
   // Generic handling for non-token actions
-  console.log(
-    `[DEBUG] Using generic handling for ${target} with selector ${selector}`
-  );
   const sig = getSignature(call);
   return getDescription(contractIdentifier, sig, call);
 }
@@ -255,12 +264,16 @@ const TOKEN_HANDLERS: Record<
     symbol: string | null,
     contractIdentifier: string
   ) => {
-    const { args } = decodeFunctionData({
-      abi: [parseAbiItem("function approve(address spender, uint256 value)")],
-      data: call.input as `0x${string}`,
-    });
-    const [spender, value] = args;
-    return `\`${call.from}\` approves \`${getAddress(spender)}\` to spend ${formatUnits(value, decimals)} ${symbol} on ${contractIdentifier} (formatted)`;
+    try {
+      const { args } = decodeFunctionData({
+        abi: [parseAbiItem("function approve(address spender, uint256 value)")],
+        data: call.input as `0x${string}`,
+      });
+      const [spender, value] = args;
+      return `\`${call.from}\` approves \`${getAddress(spender)}\` to spend ${formatUnits(value, decimals)} ${symbol} on ${contractIdentifier} (formatted)`;
+    } catch (error) {
+      return `\`${call.from}\` calls approve on ${contractIdentifier} (failed to decode)`;
+    }
   },
   [toFunctionSelector("transfer(address,uint256)")]: (
     call: FluffyCall,
@@ -268,12 +281,16 @@ const TOKEN_HANDLERS: Record<
     symbol: string | null,
     contractIdentifier: string
   ) => {
-    const { args } = decodeFunctionData({
-      abi: [parseAbiItem("function transfer(address to, uint256 value)")],
-      data: call.input as `0x${string}`,
-    });
-    const [to, value] = args;
-    return `\`${call.from}\` transfers ${formatUnits(value, decimals)} ${symbol} to \`${getAddress(to)}\` on ${contractIdentifier} (formatted)`;
+    try {
+      const { args } = decodeFunctionData({
+        abi: [parseAbiItem("function transfer(address to, uint256 value)")],
+        data: call.input as `0x${string}`,
+      });
+      const [to, value] = args;
+      return `\`${call.from}\` transfers ${formatUnits(value, decimals)} ${symbol} to \`${getAddress(to)}\` on ${contractIdentifier} (formatted)`;
+    } catch (error) {
+      return `\`${call.from}\` calls transfer on ${contractIdentifier} (failed to decode)`;
+    }
   },
   [toFunctionSelector("transferFrom(address,address,uint256)")]: (
     call: FluffyCall,
@@ -281,15 +298,19 @@ const TOKEN_HANDLERS: Record<
     symbol: string | null,
     contractIdentifier: string
   ) => {
-    const { args } = decodeFunctionData({
-      abi: [
-        parseAbiItem(
-          "function transferFrom(address from, address to, uint256 value)"
-        ),
-      ],
-      data: call.input as `0x${string}`,
-    });
-    const [from, to, value] = args;
-    return `\`${call.from}\` transfers ${formatUnits(value, decimals)} ${symbol} from \`${getAddress(from)}\` to \`${getAddress(to)}\` on ${contractIdentifier} (formatted)`;
+    try {
+      const { args } = decodeFunctionData({
+        abi: [
+          parseAbiItem(
+            "function transferFrom(address from, address to, uint256 value)"
+          ),
+        ],
+        data: call.input as `0x${string}`,
+      });
+      const [from, to, value] = args;
+      return `\`${call.from}\` transfers ${formatUnits(value, decimals)} ${symbol} from \`${getAddress(from)}\` to \`${getAddress(to)}\` on ${contractIdentifier} (formatted)`;
+    } catch (error) {
+      return `\`${call.from}\` calls transferFrom on ${contractIdentifier} (failed to decode)`;
+    }
   },
 };

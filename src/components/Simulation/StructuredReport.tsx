@@ -746,20 +746,14 @@ function StateChangeItem({
           <div className="bg-wash p-3 rounded-md mt-4 border border-line/30 overflow-hidden">
             <div className="text-sm flex items-center justify-between">
               <span className="text-tertiary">Change</span>
-              <div className="flex flex-col items-end">
-                <span
-                  className={`font-bold ${isPositive ? "text-positive" : isNegative ? "text-negative" : ""}`}
-                >
+              <div
+                className={`block text-right max-w-[50%] text-ellipsis overflow-hidden ${isPositive ? "text-positive" : isNegative ? "text-negative" : ""}`}
+              >
+                <span className={`font-bold `}>
                   {isPositive ? "+" : isNegative ? "-" : ""}
                   {formattedDiff}
                 </span>
-                {percentageDisplay && (
-                  <span
-                    className={`text-xs ${isPositive ? "text-positive" : isNegative ? "text-negative" : ""}`}
-                  >
-                    {percentageDisplay}
-                  </span>
-                )}
+                {percentageDisplay && <span>{percentageDisplay}</span>}
               </div>
             </div>
           </div>
@@ -1030,6 +1024,15 @@ function EthBalanceChanges({ details }: { details: string }) {
         });
       }
     }
+  }
+
+  if (transfers.length === 0 && balanceChanges.length === 0) {
+    return (
+      <div className="flex items-center justify-center p-6 text-tertiary border border-line rounded-md bg-wash/30">
+        <InfoIcon className="h-4 w-4 mr-2 text-tertiary" />
+        <span>No ETH balance changes found</span>
+      </div>
+    );
   }
 
   return (

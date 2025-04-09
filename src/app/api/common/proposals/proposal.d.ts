@@ -19,6 +19,7 @@ export type Proposal = {
   endBlock: bigint | string | null;
   cancelledTime: Date | null;
   executedTime: Date | null;
+  executedBlock: bigint | string | null;
   queuedTime: Date | null;
   markdowntitle: string;
   description: string | null;

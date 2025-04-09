@@ -257,6 +257,7 @@ export async function parseProposal(
         : latestBlock && proposal.executed_block
           ? getHumanBlockTime(executedBlock ?? 0, latestBlock)
           : null,
+    executedBlock: proposalData.key === "SNAPSHOT" ? null : executedBlock,
     queuedTime:
       proposalData.key === "SNAPSHOT"
         ? null
