@@ -277,7 +277,7 @@ export async function parseProposal(
       return new Date(proposalData.kind.start_ts * 1000);
     } else if (isTimeStampBasedTenant && isTimestampBasedProposal(proposal)) {
       const timestamp: string | undefined = getStartTimestamp(proposal);
-      return timestamp ? new Date(timestamp) : null;
+      return timestamp ? new Date(Number(timestamp) * 1000) : null;
     } else if (latestBlock && startBlock !== null) {
       return getHumanBlockTime(startBlock, latestBlock);
     }
@@ -289,7 +289,7 @@ export async function parseProposal(
       return new Date(proposalData.kind.end_ts * 1000);
     } else if (isTimeStampBasedTenant && isTimestampBasedProposal(proposal)) {
       const timestamp: string | undefined = getEndTimestamp(proposal);
-      return timestamp ? new Date(timestamp) : null;
+      return timestamp ? new Date(Number(timestamp) * 1000) : null;
     } else if (latestBlock && endBlock !== null) {
       return getHumanBlockTime(endBlock, latestBlock);
     }

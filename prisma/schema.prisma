@@ -4537,7 +4537,7 @@ view lineaVotes {
   reason           String?
   block_number     BigInt
   params           String?
-  start_block      String?
+  start_timestamp  String?
   description      String?
   proposal_data    Json
   proposal_type    ProposalType
