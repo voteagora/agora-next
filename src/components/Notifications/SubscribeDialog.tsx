@@ -59,7 +59,7 @@ const SubscribeDialog = ({
   const { address } = useAccount();
   const [isHovering, setIsHovering] = useState(false);
   const [email, setEmail] = useState<string | undefined>(undefined);
-  const { data: delegate } = useDelegate({ address: address });
+  const { data: delegate, refetch } = useDelegate({ address: address });
   const existingEmail = delegate?.statement.email;
   const hasEmail = existingEmail && existingEmail !== "";
 
@@ -107,6 +107,8 @@ const SubscribeDialog = ({
                   wants_proposal_ending_soon_email: "prompted",
                 }
               );
+              // refresh delegate data
+              await refetch();
               closeDialog();
             } catch (error) {
               toast.error("Error updating notification preferences.");
@@ -127,6 +129,7 @@ const SubscribeDialog = ({
           No thanks
         </Button>
         <Button
+          disabled={!(existingEmail || email)}
           className="w-full"
           onMouseOver={() => {
             setIsHovering(true);
@@ -144,6 +147,8 @@ const SubscribeDialog = ({
                   wants_proposal_ending_soon_email: true,
                 }
               );
+              // refresh delegate data
+              await refetch();
               closeDialog();
               toast.success("Preferences saved.");
             } catch (error) {
