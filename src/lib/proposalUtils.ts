@@ -382,10 +382,14 @@ export function parseIfNecessary(obj: string | object) {
 
 function parseMultipleStringsSeparatedByComma(obj: string | object) {
   return typeof obj === "string"
-    ? obj.split(",")
+    ? obj.split(",").map((item) => item.replace(/^['"]|['"]$/g, ""))
     : Array.isArray(obj)
       ? obj
-          .map((item) => (typeof item === "string" ? item.split(",") : item))
+          .map((item) =>
+            typeof item === "string"
+              ? item.split(",").map((i) => i.replace(/^['"]|['"]$/g, ""))
+              : item
+          )
           .flat()
       : obj;
 }
@@ -422,7 +426,9 @@ export function parseProposalData(
           parseIfNecessary(parsedProposalData.targets)
         );
         const values = parseIfNecessary(parsedProposalData.values);
-        const signatures = parseIfNecessary(parsedProposalData.signatures);
+        const signatures: any = parseMultipleStringsSeparatedByComma(
+          parseIfNecessary(parsedProposalData.signatures)
+        );
         const functionArgsName = decodeCalldata(calldatas);
 
         return {

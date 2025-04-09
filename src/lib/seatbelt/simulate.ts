@@ -161,7 +161,9 @@ export async function simulateNew(
   const proposalId = await generateProposalId({
     targets,
     values,
-    calldatas,
+    calldatas: calldatas.map((calldata) =>
+      calldata.startsWith("0x") ? calldata : `0x${calldata}`
+    ),
     description,
   });
 
@@ -185,7 +187,9 @@ export async function simulateNew(
     targets,
     values,
     signatures,
-    calldatas,
+    calldatas: calldatas.map((calldata) =>
+      calldata.startsWith("0x") ? calldata : `0x${calldata}`
+    ),
   };
 
   // --- Prepare simulation configuration ---
@@ -214,7 +218,13 @@ export async function simulateNew(
     return keccak256(
       defaultAbiCoder.encode(
         ["address", "uint256", "string", "bytes", "uint256"],
-        [target, valBigInt.toString(), sig, calldata, eta]
+        [
+          target,
+          valBigInt.toString(),
+          sig,
+          calldata.startsWith("0x") ? calldata : `0x${calldata}`,
+          eta,
+        ]
       )
     );
   });
@@ -226,7 +236,9 @@ export async function simulateNew(
     const id = hashOperationBatchOz(
       targets,
       values,
-      calldatas,
+      calldatas.map((calldata) =>
+        calldata.startsWith("0x") ? calldata : `0x${calldata}`
+      ),
       HashZero,
       keccak256(toUtf8Bytes(description))
     );
@@ -271,7 +283,9 @@ export async function simulateNew(
     const id = hashOperationBatchOz(
       targets,
       values,
-      calldatas,
+      calldatas.map((calldata) =>
+        calldata.startsWith("0x") ? calldata : `0x${calldata}`
+      ),
       HashZero,
       keccak256(toUtf8Bytes(description))
     );
@@ -318,7 +332,14 @@ export async function simulateNew(
   const executeInputs =
     governorType === GOVERNOR_TYPE.BRAVO
       ? [proposalId.toString()]
-      : [targets, values, calldatas, descriptionHash];
+      : [
+          targets,
+          values,
+          calldatas.map((calldata) =>
+            calldata.startsWith("0x") ? calldata : `0x${calldata}`
+          ),
+          descriptionHash,
+        ];
 
   const simulationPayload: TenderlyPayload = {
     network_id: network.chainId.toString(),
@@ -465,7 +486,13 @@ export async function simulateProposed(
     return keccak256(
       defaultAbiCoder.encode(
         ["address", "uint256", "string", "bytes", "uint256"],
-        [target, valBigInt.toString(), sig, calldata, eta]
+        [
+          target,
+          valBigInt.toString(),
+          sig,
+          calldata.startsWith("0x") ? calldata : `0x${calldata}`,
+          eta,
+        ]
       )
     );
   });
@@ -511,7 +538,9 @@ export async function simulateProposed(
             throw new Error(`Invalid number format: ${str}`);
           }
         }),
-        calldatas,
+        calldatas.map((calldata) =>
+          calldata.startsWith("0x") ? calldata : `0x${calldata}`
+        ),
         HashZero,
         descHash
       );
@@ -573,7 +602,9 @@ export async function simulateProposed(
           throw new Error(`Invalid number format: ${str}`);
         }
       }),
-      calldatas,
+      calldatas.map((calldata) =>
+        calldata.startsWith("0x") ? calldata : `0x${calldata}`
+      ),
       HashZero,
       keccak256(toUtf8Bytes(proposal.description || ""))
     );
@@ -623,7 +654,14 @@ export async function simulateProposed(
   const executeInputs =
     governorType === GOVERNOR_TYPE.BRAVO
       ? [BigInt(proposalId)]
-      : [targets, values, calldatas, descriptionHash];
+      : [
+          targets,
+          values,
+          calldatas.map((calldata) =>
+            calldata.startsWith("0x") ? calldata : `0x${calldata}`
+          ),
+          descriptionHash,
+        ];
 
   const simulationPayload: TenderlyPayload = {
     network_id: network.chainId.toString(),
