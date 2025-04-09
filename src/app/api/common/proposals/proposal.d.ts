@@ -11,7 +11,22 @@ import {
 import { BigNumberish } from "ethers";
 import { Decimal } from "@prisma/client/runtime";
 
-export type ProposalPayload = OptimismProposals | lineaProposals;
+export type ProposalPayloadFromDB = {
+  proposal_id: string;
+  proposer: string;
+  description: string | null;
+  created_block: bigint | null;
+  start_block: string;
+  end_block: string | null;
+  cancelled_block: bigint | null;
+  executed_block: bigint | null;
+  queued_block: bigint | null;
+  proposal_data: any;
+  proposal_results: any;
+  proposal_type: ProposalType;
+};
+
+export type ProposalPayload = ProposalPayloadFromDB | lineaProposals;
 
 // Interface for proposals with start_timestamp
 export interface TimestampBasedProposal {

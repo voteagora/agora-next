@@ -122,7 +122,7 @@ async function fetchProposalsFromDAONodeApi({
 }): Promise<{ data: ProposalPayload[] }> {
   try {
     const response = await fetch(
-      `${process.env.DAONODE_API_URL}/proposals?set=relevant`
+      `${process.env.DAONODE_API_URL}/v1/proposals?set=relevant`
     );
 
     if (!response.ok) {
