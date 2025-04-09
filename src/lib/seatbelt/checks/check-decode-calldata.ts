@@ -19,7 +19,9 @@ export const checkDecodeCalldata: ProposalCheck = {
     const calldatas = proposal.signatures.map((sig, i) => {
       return sig
         ? `${toFunctionSelector(sig)}${proposal.calldatas[i].slice(2)}`
-        : proposal.calldatas[i];
+        : proposal.calldatas[i].startsWith("0x")
+          ? proposal.calldatas[i]
+          : `0x${proposal.calldatas[i]}`;
     });
 
     // Find the call with that calldata and parse it
@@ -195,7 +197,7 @@ async function prettifyCalldata(
       target,
       call.input as `0x${string}`
     );
-    if (decoded) {
+    if (decoded && decoded.usedMethod !== "failed") {
       console.log(
         `[DEBUG] Successfully decoded using Etherscan ABI: ${decoded.function}`
       );

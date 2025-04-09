@@ -382,12 +382,16 @@ export function parseIfNecessary(obj: string | object) {
 
 function parseMultipleStringsSeparatedByComma(obj: string | object) {
   return typeof obj === "string"
-    ? obj.split(",").map((item) => item.replace(/^['"]|['"]$/g, ""))
+    ? obj
+        .split(/(?![^(]*\)),\s*/)
+        .map((item) => item.replace(/^['"]|['"]$/g, ""))
     : Array.isArray(obj)
       ? obj
           .map((item) =>
             typeof item === "string"
-              ? item.split(",").map((i) => i.replace(/^['"]|['"]$/g, ""))
+              ? item
+                  .split(/(?![^(]*\)),\s*/)
+                  .map((i) => i.replace(/^['"]|['"]$/g, ""))
               : item
           )
           .flat()
