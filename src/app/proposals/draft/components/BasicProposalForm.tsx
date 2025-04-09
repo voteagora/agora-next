@@ -103,10 +103,13 @@ const BasicProposalForm = () => {
 
   const updateSimulationState = useCallback(
     (index: number, transactions: any) => {
-      const currentStringified = stringifyTransactionDetails(transactions);
+      const currentStringified = transactions.map(stringifyTransactionDetails);
       const previousStringified = currentlyValidatedTransactions.current[index];
 
-      if (currentStringified !== previousStringified) {
+      if (
+        JSON.stringify(currentStringified) !==
+        JSON.stringify(previousStringified)
+      ) {
         setValue(`simulation_state`, "UNCONFIRMED");
         setFormDirty(true);
       } else if (previousStringified) {
@@ -174,10 +177,13 @@ const BasicProposalForm = () => {
 
       setSimulationReport(report?.structuredReport ?? null);
       setValue("simulation_state", report?.status ?? "UNCONFIRMED");
-      setValue("simulation_id", report?.structuredReport.simulation.simulation.id ?? "");
-
-      // todo remove console.log
-      console.log(report);
+      setValue(
+        "simulation_id",
+        report?.structuredReport.simulation.simulation.id ?? ""
+      );
+      currentlyValidatedTransactions.current = transactions.map(
+        stringifyTransactionDetails
+      );
     } catch (e) {
       console.error(e);
       toast.error("Error simulating transactions");
@@ -187,8 +193,12 @@ const BasicProposalForm = () => {
     }
   };
 
+  const allFieldsValid = fields.every(
+    (field) => field.simulation_state === "success"
+  );
+
   const isSimulationButtonEnabled =
-    allTransactionFieldsValid && (formDirty);
+    allTransactionFieldsValid && (formDirty || !allFieldsValid);
 
   return (
     <div>
