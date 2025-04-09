@@ -14,7 +14,7 @@ import favicon32x32 from "@/assets/tenant/scroll_favicon/favicon-32x32.png";
 import favicon16x16 from "@/assets/tenant/scroll_favicon/favicon-16x16.png";
 import shortcutIcon from "@/assets/tenant/scroll_favicon/favicon.ico";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import { ProposalGatingType } from "@/app/proposals/draft/types";
+import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 
 export const scrollTenantUIConfig = new TenantUI({
   title: "Scroll Governance",
@@ -283,12 +283,12 @@ export const scrollTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [
           {
-            type: "basic",
+            type: ProposalType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
           },
           {
-            type: "approval",
+            type: ProposalType?.APPROVAL,
             prodAddress: "0xe5bAF6359d200C144A9e52E3361efA6Dc5780cC9",
             testnetAddress: "0x678dEbd4B7bEB0412B2848FfEcbE761D39b961c4",
           },

@@ -1,6 +1,5 @@
 "use server";
 
-import { ProposalType } from "@/app/proposals/draft/types";
 import { ParsedProposalData } from "../proposalUtils";
 import Tenant from "../tenant/tenant";
 import ALL_CHECKS from "./checks";
@@ -218,7 +217,8 @@ export async function checkNewApprovalProposal({
   const provider = tenant.contracts.governor.provider;
   const governorType = tenant.contracts.governorType;
 
-  const moduleAddress = getProposalTypeAddress(ProposalType.APPROVAL);
+  // Avoiding importing ProposalType from @/app/proposals/draft/types to avoid circular dependency
+  const moduleAddress = getProposalTypeAddress("approval" as any);
 
   const config: SimulationConfigNewApproval = {
     governorType: governorType,
