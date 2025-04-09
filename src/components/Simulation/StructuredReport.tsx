@@ -211,6 +211,11 @@ function ExpandableCheckItem({
   const FormattedDetails = useMemo(() => {
     if (!check.details) return null;
 
+    // Check if this is an ETH balance changes check
+    if (check.title.toLowerCase().includes("eth balance changes")) {
+      return <EthBalanceChanges details={check.details} />;
+    }
+
     // Pre-process the raw details to remove all instances of "**Info**:" and similar patterns
     let preprocessedDetails = check.details;
 
@@ -581,6 +586,15 @@ function ExpandableCheckItem({
   );
 }
 
+const isJsonObject = (value: string): boolean => {
+  try {
+    const parsed = JSON.parse(value);
+    return typeof parsed === "object" && parsed !== null;
+  } catch {
+    return false;
+  }
+};
+
 function StateChangeItem({
   stateChange,
 }: {
@@ -592,13 +606,64 @@ function StateChangeItem({
     setIsExpanded(!isExpanded);
   };
 
-  // Clean values by removing quotes if they exist
   const cleanValue = (value: string): string => {
     // If the value is wrapped in quotes (like JSON strings often are)
     if (value.startsWith('"') && value.endsWith('"')) {
       return value.slice(1, -1);
     }
     return value;
+  };
+
+  const formatJsonDiff = (oldValue: string, newValue: string) => {
+    try {
+      const oldJson = JSON.parse(oldValue);
+      const newJson = JSON.parse(newValue);
+
+      const changes: { key: string; old: any; new: any }[] = [];
+
+      // Find all keys in both objects
+      const allKeys = new Set([
+        ...Object.keys(oldJson),
+        ...Object.keys(newJson),
+      ]);
+
+      for (const key of allKeys) {
+        const oldVal = oldJson[key];
+        const newVal = newJson[key];
+
+        // Only include if values are different
+        if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+          changes.push({ key, old: oldVal, new: newVal });
+        }
+      }
+
+      return (
+        <div className="bg-wash p-3 rounded-md mt-4 border border-line/30 overflow-hidden">
+          <div className="text-sm text-tertiary mb-2">JSON Changes</div>
+          <div className="space-y-2">
+            {changes.map((change, index) => (
+              <div key={index} className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-tertiary">
+                  {change.key}
+                </span>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                  <code className="w-full sm:w-1/2 font-mono text-xs bg-negative/10 px-2 py-1 rounded whitespace-pre-wrap break-all overflow-x-auto">
+                    {JSON.stringify(change.old, null, 2)}
+                  </code>
+                  <span className="text-tertiary hidden sm:block">→</span>
+                  <code className="w-full sm:w-1/2 font-mono text-xs bg-positive/10 px-2 py-1 rounded whitespace-pre-wrap break-all overflow-x-auto">
+                    {JSON.stringify(change.new, null, 2)}
+                  </code>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    } catch (error) {
+      console.error("Error formatting JSON diff:", error);
+      return null;
+    }
   };
 
   const oldValueCleaned = cleanValue(stateChange.oldValue);
@@ -613,9 +678,15 @@ function StateChangeItem({
   const isBooleanChange =
     (oldValueCleaned === "true" || oldValueCleaned === "false") &&
     (newValueCleaned === "true" || newValueCleaned === "false");
+  const isJsonChange =
+    isJsonObject(oldValueCleaned) && isJsonObject(newValueCleaned);
 
   // Calculate difference for numeric values
   const getDifference = () => {
+    if (isJsonChange) {
+      return formatJsonDiff(oldValueCleaned, newValueCleaned);
+    }
+
     if (isNumericChange) {
       try {
         // Parse the values as BigInt to handle very large numbers
@@ -672,7 +743,7 @@ function StateChangeItem({
         }
 
         return (
-          <div className="bg-wash p-3 rounded-md mt-4 border border-line/30">
+          <div className="bg-wash p-3 rounded-md mt-4 border border-line/30 overflow-hidden">
             <div className="text-sm flex items-center justify-between">
               <span className="text-tertiary">Change</span>
               <div className="flex flex-col items-end">
@@ -697,7 +768,7 @@ function StateChangeItem({
         // Fallback for any parsing errors
         console.error("Error calculating difference:", error);
         return (
-          <div className="bg-wash p-3 rounded-md mt-4 border border-line/30">
+          <div className="bg-wash p-3 rounded-md mt-4 border border-line/30 overflow-hidden">
             <div className="text-sm text-tertiary">Change</div>
             <div className="font-medium text-xs">Value changed</div>
           </div>
@@ -707,7 +778,7 @@ function StateChangeItem({
 
     if (isBooleanChange) {
       return (
-        <div className="bg-wash p-3 rounded-md mt-4 border border-line/30">
+        <div className="bg-wash p-3 rounded-md mt-4 border border-line/30 overflow-hidden">
           <div className="text-sm flex items-center justify-between">
             <span className="text-tertiary">Change</span>
             <span
@@ -722,35 +793,35 @@ function StateChangeItem({
 
     if (isAddressChange) {
       return (
-        <div className="bg-wash p-3 rounded-md mt-4 border border-line/30">
+        <div className="bg-wash p-3 rounded-md mt-4 border border-line/30 overflow-hidden">
           <div className="text-sm text-tertiary">Address Change</div>
           <div className="font-medium text-xs">
             <div className="flex flex-col gap-1 mt-2">
-              <span>
+              <span className="break-all">
                 From:{" "}
-                <code className="bg-tertiary/10 px-1 py-0.5 rounded-md">
+                <code className="bg-tertiary/10 px-1 py-0.5 rounded-md break-all">
                   <a
                     href={getBlockScanAddress(oldValueCleaned)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-tertiary transition-colors inline-flex items-center"
+                    className="hover:text-tertiary transition-colors inline-flex items-center break-all"
                   >
                     {oldValueCleaned}
-                    <ExternalLinkIcon className="h-3 w-3 ml-1 text-tertiary" />
+                    <ExternalLinkIcon className="h-3 w-3 ml-1 text-tertiary shrink-0" />
                   </a>
                 </code>
               </span>
-              <span>
+              <span className="break-all">
                 To:{" "}
-                <code className="bg-tertiary/10 px-1 py-0.5 rounded-md">
+                <code className="bg-tertiary/10 px-1 py-0.5 rounded-md break-all">
                   <a
                     href={getBlockScanAddress(newValueCleaned)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-tertiary transition-colors inline-flex items-center"
+                    className="hover:text-tertiary transition-colors inline-flex items-center break-all"
                   >
                     {newValueCleaned}
-                    <ExternalLinkIcon className="h-3 w-3 ml-1 text-tertiary" />
+                    <ExternalLinkIcon className="h-3 w-3 ml-1 text-tertiary shrink-0" />
                   </a>
                 </code>
               </span>
@@ -762,9 +833,31 @@ function StateChangeItem({
 
     // For other types of changes, show a generic difference indicator
     return (
-      <div className="bg-wash p-3 rounded-md mt-4 border border-line/30">
+      <div className="bg-wash p-3 rounded-md mt-4 border border-line/30 overflow-hidden">
         <div className="text-sm text-tertiary">Change</div>
         <div className="font-medium text-xs">Value changed</div>
+      </div>
+    );
+  };
+
+  // Format the key to show decoded storage path if available
+  const formatKey = () => {
+    if (stateChange.isRawSlot) {
+      return (
+        <div className="flex flex-col gap-1">
+          <span className="text-tertiary text-xs">Storage Slot:</span>
+          <code className="font-mono text-xs bg-tertiary/10 px-2 py-1 rounded break-all">
+            {stateChange.key}
+          </code>
+        </div>
+      );
+    }
+    return (
+      <div className="flex flex-col gap-1">
+        <span className="text-tertiary text-xs">Variable:</span>
+        <code className="font-mono text-xs bg-tertiary/10 px-2 py-1 rounded break-all">
+          {stateChange.key}
+        </code>
       </div>
     );
   };
@@ -777,12 +870,10 @@ function StateChangeItem({
         onClick={toggleExpanded}
         aria-expanded={isExpanded}
       >
-        <div className="flex items-start gap-2">
-          <div className="text-xs bg-tertiary/10 px-2 py-1 rounded-md text-tertiary">
-            {stateChange.key.startsWith("0x") ? "Balance" : "State change"}
-          </div>
+        <div className="flex items-start gap-2 min-w-0 flex-1">
+          {formatKey()}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {isExpanded ? (
             <ChevronUpIcon className="h-4 w-4 text-tertiary" />
           ) : (
@@ -794,19 +885,171 @@ function StateChangeItem({
         <div className="p-5 pt-0 pl-11 text-sm border-t border-line bg-wash/50">
           {getDifference()}
           <div className="mt-4 grid grid-cols-2 gap-4">
-            <div>
+            <div className="overflow-hidden">
               <span className="text-tertiary font-medium">Old Value: </span>
-              <div className="font-mono text-xs break-all mt-2 bg-wash p-3 rounded-md border border-line/30">
+              <div className="font-mono text-xs break-all mt-2 bg-wash p-3 rounded-md border border-line/30 overflow-auto max-h-[200px]">
                 {stateChange.oldValue}
               </div>
             </div>
-            <div>
+            <div className="overflow-hidden">
               <span className="text-tertiary font-medium">New Value: </span>
-              <div className="font-mono text-xs break-all mt-2 bg-wash p-3 rounded-md border border-line/30">
+              <div className="font-mono text-xs break-all mt-2 bg-wash p-3 rounded-md border border-line/30 overflow-auto max-h-[200px]">
                 {stateChange.newValue}
               </div>
             </div>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface EthTransferProps {
+  from: string;
+  to: string;
+  amount: string;
+  description?: string;
+}
+
+function EthTransfer({ from, to, amount, description }: EthTransferProps) {
+  return (
+    <div className="p-3 bg-wash rounded-md border border-line/30 space-y-2">
+      <div className="flex items-center gap-2">
+        <a
+          href={getBlockScanAddress(from)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono text-xs bg-tertiary/10 px-2 py-1 rounded hover:bg-tertiary/20 transition-colors inline-flex items-center break-all w-full"
+        >
+          {from}
+          <ExternalLinkIcon className="h-3 w-3 ml-1 text-tertiary shrink-0" />
+        </a>
+        <span className="text-tertiary shrink-0">→</span>
+        <a
+          href={getBlockScanAddress(to)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono text-xs bg-tertiary/10 px-2 py-1 rounded hover:bg-tertiary/20 transition-colors inline-flex items-center break-all w-full"
+        >
+          {to}
+          <ExternalLinkIcon className="h-3 w-3 ml-1 text-tertiary shrink-0" />
+        </a>
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="font-mono text-sm font-medium text-primary">
+          {amount} ETH
+        </div>
+        {description && (
+          <span className="text-tertiary text-xs">{description}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface EthBalanceChangeProps {
+  address: string;
+  description: string;
+  change: string;
+}
+
+function EthBalanceChange({
+  address,
+  description,
+  change,
+}: EthBalanceChangeProps) {
+  const isPositive = change.startsWith("+");
+  const isNegative = change.startsWith("-");
+
+  return (
+    <div className="p-3 bg-wash rounded-md border border-line/30 space-y-2">
+      <a
+        href={getBlockScanAddress(address)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="font-mono text-xs bg-tertiary/10 px-2 py-1 rounded hover:bg-tertiary/20 transition-colors inline-flex items-center break-all w-full"
+      >
+        {address}
+        <ExternalLinkIcon className="h-3 w-3 ml-1 text-tertiary shrink-0" />
+      </a>
+      <div className="flex items-center justify-between">
+        <span className="text-tertiary text-xs">{description}</span>
+        <div
+          className={`font-mono text-sm font-medium shrink-0 ${
+            isPositive
+              ? "text-positive"
+              : isNegative
+                ? "text-negative"
+                : "text-tertiary"
+          }`}
+        >
+          {change}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EthBalanceChanges({ details }: { details: string }) {
+  const transfers: EthTransferProps[] = [];
+  const balanceChanges: EthBalanceChangeProps[] = [];
+  let currentSection = "";
+
+  const lines = details.split("\n");
+  for (const line of lines) {
+    if (line.startsWith("•")) {
+      // Parse transfer line
+      const transferMatch = line.match(
+        /• (.*?) sent ([\d.]+) ETH to (.*?)(?: as part of the proposal execution| for proposal execution)?$/
+      );
+      if (transferMatch) {
+        const [_, from, amount, to] = transferMatch;
+        transfers.push({
+          from: from.match(/\[(.*?)\]\(.*?\)/)?.[1] || from,
+          to: to.match(/\[(.*?)\]\(.*?\)/)?.[1] || to,
+          amount,
+          description: line.includes("as part of the proposal execution")
+            ? "Part of proposal execution"
+            : line.includes("for proposal execution")
+              ? "For proposal execution"
+              : undefined,
+        });
+      }
+    } else if (line.includes("ETH Balance Changes")) {
+      currentSection = "balance";
+    } else if (currentSection === "balance" && line.includes("|")) {
+      const balanceMatch = line.match(
+        /\| `(0x[a-fA-F0-9]{40})` \| (.*?) \| <span style="color:(.*?)">([+-]?[\d.]+) ETH<\/span> \|/
+      );
+      if (balanceMatch) {
+        const [_, address, description, color, amount] = balanceMatch;
+        balanceChanges.push({
+          address,
+          description,
+          change: `${amount} ETH`,
+        });
+      }
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      {transfers.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-tertiary">ETH Transfers</h4>
+          {transfers.map((transfer, index) => (
+            <EthTransfer key={index} {...transfer} />
+          ))}
+        </div>
+      )}
+      {balanceChanges.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-tertiary">
+            ETH Balance Changes
+          </h4>
+          {balanceChanges.map((change, index) => (
+            <EthBalanceChange key={index} {...change} />
+          ))}
         </div>
       )}
     </div>

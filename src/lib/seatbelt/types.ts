@@ -745,6 +745,7 @@ export interface SimulationStateChange {
   key: string;
   oldValue: string;
   newValue: string;
+  isRawSlot?: boolean;
 }
 
 export interface SimulationEvent {

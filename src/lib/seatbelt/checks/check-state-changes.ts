@@ -2,6 +2,7 @@ import { getAddress } from "@ethersproject/address";
 import { bullet } from "../report";
 import type { ProposalCheck, StateDiff } from "../types";
 import { getContractName } from "../simulate";
+import { decodeStorageSlot } from "../../seatbelt/encode-state";
 
 /**
  * Reports all state changes from the proposal
@@ -95,19 +96,45 @@ export const checkStateChanges: ProposalCheck = {
             const newVal = JSON.stringify(w.dirty);
             const changeKey = `${w.key}:${oldVal}:${newVal}`;
             if (!processedChanges.has(changeKey)) {
-              info.push(
-                bullet(
-                  `Slot \`${w.key}\` changed from \`${oldVal}\` to \`${newVal}\``,
-                  1
-                )
-              );
+              // Try to decode the storage slot
+              const decodedPath = contract
+                ? await decodeStorageSlot(
+                    contract.address,
+                    w.key,
+                    sim.transaction.network_id
+                  )
+                : null;
+
+              if (decodedPath) {
+                // If we successfully decoded the path, show it in a more readable format
+                info.push(
+                  bullet(
+                    `\`${decodedPath}\` (slot \`${w.key}\`) changed from \`${oldVal}\` to \`${newVal}\``,
+                    1
+                  )
+                );
+              } else {
+                // If decoding failed, show the raw slot
+                info.push(
+                  bullet(
+                    `Storage slot \`${w.key}\` changed from \`${oldVal}\` to \`${newVal}\``,
+                    1
+                  )
+                );
+              }
               processedChanges.add(changeKey);
             }
           }
         } else if (diff.soltype.simple_type) {
           // This is a simple type with a single changed value
-          const oldVal = JSON.parse(JSON.stringify(diff.original));
-          const newVal = JSON.parse(JSON.stringify(diff.dirty));
+          const oldVal =
+            typeof diff.original === "object"
+              ? JSON.stringify(diff.original)
+              : String(diff.original);
+          const newVal =
+            typeof diff.dirty === "object"
+              ? JSON.stringify(diff.dirty)
+              : String(diff.dirty);
           const changeKey = `${diff.soltype.name}:${oldVal}:${newVal}`;
           if (!processedChanges.has(changeKey)) {
             info.push(
@@ -148,24 +175,47 @@ export const checkStateChanges: ProposalCheck = {
             }
           }
         } else {
-          // TODO arrays and nested mapping are currently not well supported -- find a transaction
-          // that changes state of these types to inspect the Tenderly simulation response and
-          // handle it accordingly. In the meantime we show the raw state changes and print a
-          // warning about decoding the data
+          // For complex types that we can't decode directly, try to decode each raw slot
           for (const w of diff.raw) {
-            const oldVal = JSON.stringify(w.original);
-            const newVal = JSON.stringify(w.dirty);
+            // Ensure we properly stringify object values
+            const oldVal =
+              typeof w.original === "object"
+                ? JSON.stringify(w.original)
+                : String(w.original);
+            const newVal =
+              typeof w.dirty === "object"
+                ? JSON.stringify(w.dirty)
+                : String(w.dirty);
+
             const changeKey = `${w.key}:${oldVal}:${newVal}`;
             if (!processedChanges.has(changeKey)) {
-              info.push(
-                bullet(
-                  `Slot \`${w.key}\` changed from \`${oldVal}\` to \`${newVal}\``,
-                  1
-                )
-              );
-              warnings.push(
-                `Could not parse state: add support for formatting type ${diff.soltype?.type} (slot ${w.key})`
-              );
+              // Try to decode the storage slot
+              const decodedPath = contract
+                ? await decodeStorageSlot(
+                    contract.address,
+                    w.key,
+                    sim.transaction.network_id
+                  )
+                : null;
+
+              if (decodedPath) {
+                info.push(
+                  bullet(
+                    `\`${decodedPath}\` (slot \`${w.key}\`) changed from \`${oldVal}\` to \`${newVal}\``,
+                    1
+                  )
+                );
+              } else {
+                info.push(
+                  bullet(
+                    `Storage slot \`${w.key}\` changed from \`${oldVal}\` to \`${newVal}\``,
+                    1
+                  )
+                );
+                warnings.push(
+                  `Could not parse state: add support for formatting type ${diff.soltype?.type} (slot ${w.key})`
+                );
+              }
               processedChanges.add(changeKey);
             }
           }

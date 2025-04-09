@@ -14,6 +14,7 @@ import type {
 } from "./types";
 import { Block } from "ethers";
 import { getBlockScanAddress, getBlockScanRawUrl } from "../utils";
+import { decodeStorageSlot } from "./encode-state";
 
 // --- Markdown helpers ---
 
@@ -119,12 +120,12 @@ function estimateTime(current: Block, block: bigint): number {
 /**
  * Generate a structured report from the check results
  */
-function generateStructuredReport(
+async function generateStructuredReport(
   blocks: { current: Block; start: Block | null; end: Block | null },
   proposal: ProposalEvent,
   checks: AllCheckResults,
   sim: TenderlySimulation
-): StructuredSimulationReport {
+): Promise<StructuredSimulationReport> {
   // Extract title and proposal text
   const title = getProposalTitle(proposal.description.trim(), proposal.title);
   const proposalText = proposal.description.trim();
@@ -196,13 +197,17 @@ function generateStructuredReport(
         /`(.+?)`\s+key\s+`(.+?)`\s+changed\s+from\s+`(.+?)`\s+to\s+`(.+?)`/
       );
       if (mappingStateChangeMatch) {
-        // Use the current contract name and address if available
+        const [_, mappingName, mappingKey, oldValue, newValue] =
+          mappingStateChangeMatch;
+
+        // Handle all mappings consistently
         stateChanges.push({
-          contract: currentContract || mappingStateChangeMatch[1],
-          contractAddress: currentContractAddress || undefined,
-          key: mappingStateChangeMatch[2],
-          oldValue: mappingStateChangeMatch[3],
-          newValue: mappingStateChangeMatch[4],
+          contract: currentContract,
+          contractAddress: currentContractAddress,
+          key: `${mappingName.startsWith("_") ? mappingName.slice(1) : mappingName}[${mappingKey}]`,
+          oldValue,
+          newValue,
+          isRawSlot: false,
         });
         continue;
       }
@@ -219,6 +224,44 @@ function generateStructuredReport(
           key: simpleStateChangeMatch[1],
           oldValue: simpleStateChangeMatch[2],
           newValue: simpleStateChangeMatch[3],
+          isRawSlot: false,
+        });
+      }
+
+      // Try to extract raw slot changes with decoded paths
+      const rawSlotChangeMatch = infoMsg.match(
+        /`(.+?)`\s+\(slot\s+`(0x[a-fA-F0-9]{64})`\)\s+changed\s+from\s+`(.+?)`\s+to\s+`(.+?)`/
+      );
+      if (rawSlotChangeMatch && currentContractAddress) {
+        stateChanges.push({
+          contract: currentContract,
+          contractAddress: currentContractAddress,
+          key: rawSlotChangeMatch[1],
+          oldValue: rawSlotChangeMatch[3],
+          newValue: rawSlotChangeMatch[4],
+          isRawSlot: false,
+        });
+      }
+
+      // Try to extract raw slot changes without decoded paths
+      const rawSlotOnlyMatch = infoMsg.match(
+        /Storage slot `(0x[a-fA-F0-9]{64})` changed from `(.+?)` to `(.+?)`/
+      );
+      if (rawSlotOnlyMatch && currentContractAddress) {
+        // Try to decode the storage slot
+        const decodedPath = await decodeStorageSlot(
+          currentContractAddress,
+          rawSlotOnlyMatch[1],
+          sim.transaction.network_id
+        );
+
+        stateChanges.push({
+          contract: currentContract,
+          contractAddress: currentContractAddress,
+          key: decodedPath || rawSlotOnlyMatch[1],
+          oldValue: rawSlotOnlyMatch[2],
+          newValue: rawSlotOnlyMatch[3],
+          isRawSlot: !decodedPath,
         });
       }
     }
@@ -296,7 +339,7 @@ export async function generateAndSaveReports(
   // Also write the report data to the frontend/public directory
   try {
     // Generate the structured report
-    const structuredReport = generateStructuredReport(
+    const structuredReport = await generateStructuredReport(
       blocks,
       proposal,
       checks,

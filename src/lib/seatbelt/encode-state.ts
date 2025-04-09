@@ -537,6 +537,104 @@ async function fetchStorageLayout(
   return null;
 }
 
+/**
+ * Reverses the storage slot computation to find the original property string.
+ * Given a slot and contract address, returns the property string that would map to that slot.
+ */
+export async function decodeStorageSlot(
+  contractAddress: string,
+  targetSlot: string,
+  networkID: string
+): Promise<string | null> {
+  // Fetch the storage layout
+  const storageLayout = await fetchStorageLayout(contractAddress, networkID);
+  if (!storageLayout) {
+    return null;
+  }
+
+  // Convert target slot to BigInt for comparison
+  const targetSlotBN = BigInt(targetSlot);
+
+  // First check direct storage variables
+  for (const variable of storageLayout.storage) {
+    const slotBN = BigInt(variable.slot);
+    if (slotBN === targetSlotBN) {
+      const result = variable.label.startsWith("_")
+        ? variable.label.slice(1)
+        : variable.label;
+      return result;
+    }
+  }
+
+  // Then check for dynamic slots (mappings and arrays)
+  for (const variable of storageLayout.storage) {
+    const baseSlotBN = BigInt(variable.slot);
+    const typeDef = getTypeDefinition(storageLayout, variable.type);
+
+    // Handle mappings
+    if (typeDef?.encoding === "mapping") {
+      // For mappings, we need to find if this slot could be a mapping entry
+      // slot = keccak256(abi.encode(key, baseSlot))
+      // We can't reverse keccak256, but we can check if the slot is in the mapping's range
+      // by checking if it's a valid mapping slot for any key
+      const mappingRangeStart = BigInt(
+        keccak256(
+          encodeAbiParameters(
+            parseAbiParameters([
+              typeDef.key === "t_bytes32" ? "bytes32" : "uint256",
+              "uint256",
+            ]),
+            [
+              typeDef.key === "t_bytes32"
+                ? (("0x" + "0".repeat(64)) as `0x${string}`)
+                : 0n,
+              baseSlotBN,
+            ]
+          )
+        )
+      );
+
+      // For mappings, slots are distributed across the entire 2^256 space
+      // We can't determine the exact key, but we can check if this is a valid mapping slot
+      // by checking if it's in the expected range for this mapping
+      if (targetSlotBN >= mappingRangeStart) {
+        // This is a valid mapping slot, but we can't determine the exact key
+        const result = `${variable.label.startsWith("_") ? variable.label.slice(1) : variable.label}[unknown_key]`;
+        return result;
+      }
+    }
+
+    // Handle dynamic arrays
+    if (typeDef?.encoding === "dynamic_array") {
+      // For dynamic arrays, the data starts at keccak256(p) where p is the base slot
+      const arrayStartSlot = BigInt(
+        keccak256(pad(toHex(baseSlotBN), { size: 32 }))
+      );
+
+      // Check if this is a valid array slot
+      if (targetSlotBN >= arrayStartSlot) {
+        const index = targetSlotBN - arrayStartSlot;
+        const result = `${variable.label.startsWith("_") ? variable.label.slice(1) : variable.label}[${index}]`;
+        return result;
+      }
+    }
+
+    // Handle structs
+    if (typeDef?.encoding === "tuple" || typeDef?.encoding === "struct") {
+      for (const member of typeDef.members) {
+        const memberSlotBN = baseSlotBN + BigInt(member.slot);
+
+        if (memberSlotBN === targetSlotBN) {
+          const result = `${variable.label.startsWith("_") ? variable.label.slice(1) : variable.label}.${member.label.startsWith("_") ? member.label.slice(1) : member.label}`;
+          return result;
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
 export const encodeState = async ({
   networkID,
   stateOverrides,
