@@ -58,6 +58,9 @@ const DelegateCardWrapper = async ({ searchParams }: { searchParams: any }) => {
     ...(searchParams.stakeholderFilter && {
       stakeholders: searchParams.stakeholderFilter,
     }),
+    ...(searchParams.hasStatement && {
+      hasStatement: searchParams.hasStatement,
+    }),
   };
 
   const endorsedToggle = ui.toggle("delegates/endorsed-filter");
