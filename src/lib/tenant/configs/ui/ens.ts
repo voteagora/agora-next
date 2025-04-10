@@ -10,10 +10,13 @@ import infoPageCard01 from "@/assets/tenant/ens_info_1.png";
 import infoPageCard02 from "@/assets/tenant/ens_info_2.png";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export const ensTenantUIConfig = new TenantUI({
   title: "ENS Agora",
   logo: ensLogo,
+  tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.ENS)],
 
   assets: {
     // TODO: Replace success and pending images

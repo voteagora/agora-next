@@ -11,10 +11,21 @@ import infoPageCard04 from "@/assets/tenant/cyber_info_4.png";
 import infoPageHero from "@/assets/tenant/cyber_info_hero.png";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export const cyberTenantUIConfig = new TenantUI({
   title: "Cyber Agora",
   logo: cyberLogo,
+  tokens: [
+    {
+      name: "Cyber",
+      address: "0x14778860e937f509e651192a90589de711fb88a9",
+      symbol: "CYBER",
+      decimals: 18,
+    },
+    TenantTokenFactory.create(TENANT_NAMESPACES.CYBER),
+  ],
 
   googleAnalytics: "G-KZ3G1HV72Y",
 

@@ -12,6 +12,8 @@ import infoPageHero from "@/assets/tenant/xai_info_page_hero.svg";
 
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const PROPOSAL_PAGE_TEXT =
   "Governance decisions are initiated as proposals, providing insights into the priorities of the community. Proposals can be submitted for community discussion in Xai Discord in the #ecosystem-proposals channel.  Proposals are voted on by delegates. Voting power is given to delegates based on XAI + esXAI + staked esXAI. We aggregate each of these to calculate vXAI";
@@ -22,6 +24,7 @@ const INFO_PAGE_TEXT = `Xai Gov is the home of Xai DAO governance, where Xai tok
 export const xaiTenantUIConfig = new TenantUI({
   title: "Xai Agora",
   logo: xaiLogo,
+  tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.XAI)],
 
   googleAnalytics: "G-BSFWRZVGEB",
 
@@ -126,7 +129,7 @@ export const xaiTenantUIConfig = new TenantUI({
       title: "About Xai",
       hero: infoPageHero,
       description:
-        "Xai is the world’s first Layer 3 solution for Indie gaming. Powered by Offchain Labs’ Arbitrum Technology with games from Ex Populus and other game developers, Xai is set to transform the gaming industry. Join the community, compete with the best, and be part of the revolutionary Vanguard League.",
+        "Xai is the world's first Layer 3 solution for Indie gaming. Powered by Offchain Labs' Arbitrum Technology with games from Ex Populus and other game developers, Xai is set to transform the gaming industry. Join the community, compete with the best, and be part of the revolutionary Vanguard League.",
       meta: {
         title: "About Xai Governance",
         description: "Home of Xai Governance",

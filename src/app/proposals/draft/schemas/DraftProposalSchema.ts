@@ -32,6 +32,13 @@ const transaction = z.object({
     .optional(),
   // part of transfer transaction -- gets filtered out of form
   amount: z.string().min(1, { message: "Amount cannot be empty" }).optional(),
+  // part of transfer transaction -- gets filtered out of form
+  customTokenAddress: z
+    .string()
+    .refine((value) => !value || isAddress(value), {
+      message: "Custom token address must be a valid Ethereum address.",
+    })
+    .optional(),
 });
 
 const approval_option = z.object({
