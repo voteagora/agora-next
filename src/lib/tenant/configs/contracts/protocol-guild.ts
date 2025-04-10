@@ -27,11 +27,11 @@ export const protocolGuildTenantContractConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd
-    ? "0x95fc87e77977a70b08c76b0a7714069d8ff0ff2b"
-    : "0x380afD534539ad1C43c3268E7Cb71BAa766aE6f9";
+    ? "0xB3E34f8eFE825dD84137124f4A552c049BB0EC42"
+    : "0xB3E34f8eFE825dD84137124f4A552c049BB0EC42";
 
   const GOVERNOR = isProd
-    ? "0xb3e34f8efe825dd84137124f4a552c049bb0ec42"
+    ? "0x5cA68E30dFf2A96C1e06eE1bF8609096a806f692"
     : "0x1ec062fc98be10314cf902d5aa101403d2acbf73";
 
   const TIMELOCK = isProd
