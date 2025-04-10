@@ -1,12 +1,13 @@
+import { useState, useEffect } from "react";
 import { VStack } from "@/components/Layout/Stack";
 import { useRouter } from "next/navigation";
-import { useWaitForTransactionReceipt } from "wagmi";
+import { useAccount } from "wagmi";
 import Image from "next/image";
 import Link from "next/link";
 import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
 import { UpdatedButton } from "@/components/Button";
-import { getBlockScanUrl } from "@/lib/utils";
+import { getBlockScanUrl, wrappedWaitForTransactionReceipt } from "@/lib/utils";
 
 const SponsorOnchainProposalDialog = ({
   redirectUrl,
@@ -18,10 +19,29 @@ const SponsorOnchainProposalDialog = ({
   closeDialog: () => void;
 }) => {
   const tenant = Tenant.current();
-  const { isLoading } = useWaitForTransactionReceipt({
-    hash: txHash,
-  });
+  const { address } = useAccount();
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const waitForTransaction = async () => {
+      if (!address) return;
+
+      try {
+        await wrappedWaitForTransactionReceipt({
+          hash: txHash,
+          address: address as `0x${string}`,
+        });
+      } catch (error) {
+        console.error("Error waiting for transaction:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    waitForTransaction();
+  }, [txHash, address]);
+
   return (
     <VStack alignItems="items-center">
       <VStack className="w-full bg-neutral rounded-xl">

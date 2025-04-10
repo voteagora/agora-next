@@ -2,6 +2,8 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
 import { z } from "zod";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateDelegateAddressPage } from "@/app/delegates/actions";
 
 const NotificationPreferencesOptionsSchema = z.object({
   wants_proposal_created_email: z.union([
@@ -34,11 +36,11 @@ const updateNotificationPreferencesForAddress = async (
       options,
     });
     const { slug } = Tenant.current();
-
-    return prismaWeb2Client.delegateStatements.update({
+    const validatedAddress = validatedData.address.toLowerCase();
+    const result = await prismaWeb2Client.delegateStatements.update({
       where: {
         address_dao_slug: {
-          address: validatedData.address.toLowerCase(),
+          address: validatedAddress,
           dao_slug: slug,
         },
       },
@@ -53,6 +55,10 @@ const updateNotificationPreferencesForAddress = async (
         },
       },
     });
+
+    revalidateDelegateAddressPage(validatedAddress);
+
+    return result;
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new Error(

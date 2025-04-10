@@ -1,24 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-  getBlockScanUrl,
-  getBlockScanAddress,
-  shortAddress,
-  cn,
-  getFunctionSignature,
-} from "@/lib/utils";
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import ENSName from "@/components/shared/ENSName";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { useTransactionDecoding } from "@/hooks/useTransactionDecoding";
-import ENSName from "@/components/shared/ENSName";
 import Tenant from "@/lib/tenant/tenant";
+import {
+  cn,
+  getBlockScanAddress,
+  getBlockScanUrl,
+  shortAddress,
+  getFunctionSignature,
+} from "@/lib/utils";
+import {
+  ArrowTopRightOnSquareIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+} from "@heroicons/react/20/solid";
+import React, { useState } from "react";
 import { formatUnits } from "viem";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { toast } from "react-hot-toast";
@@ -658,14 +661,16 @@ const ActionDetails = ({
             <TooltipProvider delayDuration={300}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <a
-                    className="hover:underline truncate inline-block text-xs"
-                    href={getBlockScanAddress(target)}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >
-                    {target}
-                  </a>
+                  <div className="overflow-hidden max-w-full">
+                    <a
+                      className="hover:underline text-xs break-all inline-block w-full"
+                      href={getBlockScanAddress(target)}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                    >
+                      {target}
+                    </a>
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent>
                   <div className="text-xs break-all">{target}</div>

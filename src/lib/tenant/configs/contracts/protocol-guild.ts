@@ -31,16 +31,16 @@ export const protocolGuildTenantContractConfig = ({
     : "0x380afD534539ad1C43c3268E7Cb71BAa766aE6f9";
 
   const GOVERNOR = isProd
-    ? "0x42baa004ff081ba7e3b2b810e7a9b4e0e35e8b01"
-    : "0x8fFF4C5ABcb31fAc43DcE92f77920F3cB9854fB8";
+    ? "0xb3e34f8efe825dd84137124f4a552c049bb0ec42"
+    : "0x1ec062fc98be10314cf902d5aa101403d2acbf73";
 
   const TIMELOCK = isProd
     ? "0x0cabe65b0adc1634f56ea66a36abb70f2d4232c5"
     : "0xeba09e62142052831fe0ccdd73476ca5ce84b2f1";
 
   const TYPES = isProd
-    ? "0xa78db4a8efccd5812e0044496edcc571da3d24c6"
-    : "0x966daa9da3c7ef86c0f9fd678bd5d8cb1b856577";
+    ? "0x368723068b6c762b416e5a7d506a605e8b816c22"
+    : "0xf8d15c3132efa557989a1c9331b6667ca8caa3a9";
 
   const TREASURY = isProd
     ? [
