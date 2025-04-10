@@ -23,7 +23,6 @@ import {
 } from "@heroicons/react/20/solid";
 import React, { useState } from "react";
 import { formatUnits } from "viem";
-import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { toast } from "react-hot-toast";
 import { checkExistingProposal } from "@/lib/seatbelt/checkProposal";
 import { Proposal } from "@/app/api/common/proposals/proposal";

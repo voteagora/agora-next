@@ -16,8 +16,6 @@ import {
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 
-export const maxDuration = 60;
-
 export async function checkNewProposal({
   targets,
   values,
