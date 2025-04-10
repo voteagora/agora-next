@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import Tenant from "@/lib/tenant/tenant";
 import { CountBadge } from "@/components/common/CountBadge";
@@ -17,25 +17,31 @@ const DelegatesIssuesFilter = ({
   const { setIsDelegatesFiltering } = useAgoraContext();
   const { issuesFromUrl, removeFilterToUrl, applyFiltersToUrl } =
     useDelegatesFilter();
+  
+  // Ref to track previous issues from URL
+  const prevIssuesRef = useRef<string[]>([]);
 
   // Collapsible state
   const [isIssuesOpen, setIsIssuesOpen] = useState(false);
 
+  // No need for memoization since we're comparing with prevIssuesRef
+  const issuesArray = issuesFromUrl || [];
+
   const initialIssueCategories: Record<string, boolean> = useMemo(() => {
     const categories: Record<string, boolean> = {
-      all: issuesFromUrl.length === 0,
+      all: issuesArray.length === 0,
     };
 
     ui.governanceIssues!.forEach((issue) => {
-      categories[issue.key] = issuesFromUrl.includes(issue.key);
+      categories[issue.key] = issuesArray.includes(issue.key);
     });
 
     return categories;
-  }, [issuesFromUrl, ui.governanceIssues]);
+  }, [issuesArray, ui.governanceIssues]);
 
   // Checkbox states
   const [allIssuesChecked, setAllIssuesChecked] = useState(
-    issuesFromUrl.length === 0
+    issuesArray.length === 0
   );
   const [issueCategories, setIssueCategories] = useState(
     initialIssueCategories
@@ -43,15 +49,25 @@ const DelegatesIssuesFilter = ({
 
   // Update state when URL parameters change
   useEffect(() => {
+    // Compare current issues with previous issues to avoid unnecessary updates
+    if (JSON.stringify(prevIssuesRef.current) === JSON.stringify(issuesArray)) {
+      return;
+    }
+    
+    // Update the ref with current issues
+    prevIssuesRef.current = [...issuesArray];
+    
     const newIssueCategories: Record<string, boolean> = {
-      all: issuesFromUrl.length === 0,
+      all: issuesArray.length === 0,
     };
+    
     ui.governanceIssues!.forEach((issue) => {
-      newIssueCategories[issue.key] = issuesFromUrl.includes(issue.key);
+      newIssueCategories[issue.key] = issuesArray.includes(issue.key);
     });
+    
     setIssueCategories(newIssueCategories);
-    setAllIssuesChecked(issuesFromUrl.length === 0);
-  }, [issuesFromUrl, ui.governanceIssues]);
+    setAllIssuesChecked(issuesArray.length === 0);
+  }, [issuesArray, ui.governanceIssues]);
 
   const toggleAllIssues = () => {
     setIsDelegatesFiltering(true);

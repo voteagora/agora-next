@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FilterIcon } from "@/icons/filter";
 import FilterResetListbox from "@/components/common/FilterResetListbox";
 import {
@@ -73,13 +73,13 @@ export const MobileDelegatesFilter = () => {
     return count;
   };
 
-  const handleIssuesChange = (issues: string[]) => {
+  const handleIssuesChange = useCallback((issues: string[]) => {
     setSelectedIssues(issues);
-  };
+  }, []);
 
-  const handleStakeholdersChange = (stakeholders: string[]) => {
+  const handleStakeholdersChange = useCallback((stakeholders: string[]) => {
     setSelectedStakeholders(stakeholders);
-  };
+  }, []);
 
   // Convert array to comma-separated string for the filter components
   const getIssuesString = (issues: string[]) => {

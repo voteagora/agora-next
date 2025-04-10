@@ -81,7 +81,7 @@ export default function DelegatesTabs({ children }: { children: ReactNode }) {
                 <DelegatesFilter />
               </div>
               <div className="block sm:hidden">
-                <MobileDelegatesFilter />
+                {/* <MobileDelegatesFilter /> */}
               </div>
             </>
           )}

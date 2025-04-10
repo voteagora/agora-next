@@ -1,6 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
+import { useRouter } from "next/navigation";
+import {
+  useQueryState,
+  parseAsBoolean,
+  parseAsString,
+  parseAsArrayOf,
+} from "nuqs";
 import Tenant from "@/lib/tenant/tenant";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import {
@@ -15,12 +20,34 @@ import { useAccount } from "wagmi";
 
 export const useDelegatesFilter = () => {
   const { ui } = Tenant.current();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const addSearchParam = useAddSearchParam();
-  const deleteSearchParam = useDeleteSearchParam();
   const { setIsDelegatesFiltering } = useAgoraContext();
   const { address: connectedAddress } = useAccount();
+
+  // Setup nuqs query parameters
+  const [endorsed, setEndorsed] = useQueryState(
+    ENDORSED_FILTER_PARAM,
+    parseAsBoolean.withDefault(false)
+  );
+
+  const [hasStatement, setHasStatement] = useQueryState(
+    HAS_STATEMENT_FILTER_PARAM,
+    parseAsBoolean.withDefault(false)
+  );
+
+  const [myDelegatesAddress, setMyDelegatesAddress] = useQueryState(
+    MY_DELEGATES_FILTER_PARAM,
+    parseAsString.withDefault("")
+  );
+
+  const [issuesParam, setIssuesParam] = useQueryState(
+    ISSUES_FILTER_PARAM,
+    parseAsArrayOf(parseAsString).withDefault([])
+  );
+
+  const [stakeholdersParam, setStakeholdersParam] = useQueryState(
+    STAKEHOLDERS_FILTER_PARAM,
+    parseAsArrayOf(parseAsString).withDefault([])
+  );
 
   // UI config
   const hasIssues = Boolean(
@@ -38,11 +65,7 @@ export const useDelegatesFilter = () => {
 
   const endorsedToggleConfig = endorsedToggle?.config as UIEndorsedConfig;
 
-  // Get filters from URL
-  const endorsed = searchParams?.get(ENDORSED_FILTER_PARAM) === "true";
-
-  const hasStatement = searchParams?.get(HAS_STATEMENT_FILTER_PARAM) === "true";
-  const myDelegatesAddress = searchParams?.get(MY_DELEGATES_FILTER_PARAM) || "";
+  // Derived state
   const hasMyDelegates = myDelegatesAddress !== "";
 
   // Set active filters based on URL params
@@ -56,124 +79,151 @@ export const useDelegatesFilter = () => {
     setActiveFilters(filters);
   }, [endorsed, hasStatement, hasMyDelegates]);
 
-  // Get issue categories from URL
-  const issuesParam = searchParams?.get(ISSUES_FILTER_PARAM);
-  const issuesFromUrl = useMemo(
-    () => (issuesParam ? issuesParam.split(",") : []),
-    [issuesParam]
-  );
-
-  // Get stakeholders from URL
-  const stakeholdersParam = searchParams?.get(STAKEHOLDERS_FILTER_PARAM);
-  const stakeholdersFromUrl = useMemo(
-    () => (stakeholdersParam ? stakeholdersParam.split(",") : []),
-    [stakeholdersParam]
-  );
-
   // Filter handlers
-  const removeDelegateFilters = () => {
-    const url = deleteSearchParam({
-      names: [
-        ENDORSED_FILTER_PARAM,
-        MY_DELEGATES_FILTER_PARAM,
-        HAS_STATEMENT_FILTER_PARAM,
-      ],
-    });
-    router.push(url, { scroll: false });
+  const removeDelegateFilters = async () => {
+    setIsDelegatesFiltering(true);
+    await Promise.all([
+      setEndorsed(false, { scroll: false }),
+      setHasStatement(false, { scroll: false }),
+      setMyDelegatesAddress(null, { scroll: false }),
+    ]);
   };
 
-  const toggleFilterToUrl = (filter: string) => {
+  const toggleFilterToUrl = async (filter: string) => {
     setIsDelegatesFiltering(true);
+
     if (filter === "all") {
-      removeDelegateFilters();
+      await removeDelegateFilters();
     } else if (activeFilters.includes(filter)) {
-      router.push(deleteSearchParam({ name: filter }), { scroll: false });
+      // Remove the filter
+      switch (filter) {
+        case ENDORSED_FILTER_PARAM:
+          await setEndorsed(false, { scroll: false });
+          break;
+        case HAS_STATEMENT_FILTER_PARAM:
+          await setHasStatement(false, { scroll: false });
+          break;
+        case MY_DELEGATES_FILTER_PARAM:
+          await setMyDelegatesAddress(null, { scroll: false });
+          break;
+      }
     } else {
-      // For MY_DELEGATES_FILTER_PARAM add connected wallet address in params
-      if (filter === MY_DELEGATES_FILTER_PARAM) {
-        if (connectedAddress) {
-          router.push(
-            addSearchParam({
-              name: filter,
-              value: connectedAddress.toLowerCase(),
-            }),
-            { scroll: false }
-          );
-        }
-      } else {
-        router.push(addSearchParam({ name: filter, value: "true" }), {
-          scroll: false,
-        });
+      // Add the filter
+      switch (filter) {
+        case ENDORSED_FILTER_PARAM:
+          await setEndorsed(true, { scroll: false });
+          break;
+        case HAS_STATEMENT_FILTER_PARAM:
+          await setHasStatement(true, { scroll: false });
+          break;
+        case MY_DELEGATES_FILTER_PARAM:
+          if (connectedAddress) {
+            await setMyDelegatesAddress(connectedAddress.toLowerCase(), {
+              scroll: false,
+            });
+          }
+          break;
       }
     }
   };
 
-  const applyFiltersToUrl = (filters: Record<string, string | boolean>) => {
+  const applyFiltersToUrl = async (
+    filters: Record<string, string | boolean>
+  ) => {
     setIsDelegatesFiltering(true);
 
-    // Create a new URLSearchParams object
-    const urlParams = new URLSearchParams(searchParams?.toString());
+    const updates = [];
 
-    // Process each filter
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value && value !== "false") {
-        // Add or update parameter
-        urlParams.set(
-          key,
-          typeof value === "boolean" ? "true" : value.toString()
+    if (ENDORSED_FILTER_PARAM in filters) {
+      updates.push(
+        setEndorsed(!!filters[ENDORSED_FILTER_PARAM], { scroll: false })
+      );
+    }
+
+    if (HAS_STATEMENT_FILTER_PARAM in filters) {
+      updates.push(
+        setHasStatement(!!filters[HAS_STATEMENT_FILTER_PARAM], {
+          scroll: false,
+        })
+      );
+    }
+
+    if (MY_DELEGATES_FILTER_PARAM in filters) {
+      const value = filters[MY_DELEGATES_FILTER_PARAM];
+      updates.push(
+        setMyDelegatesAddress(value ? String(value) : null, { scroll: false })
+      );
+    }
+
+    if (ISSUES_FILTER_PARAM in filters) {
+      const value = filters[ISSUES_FILTER_PARAM];
+      if (typeof value === "string") {
+        updates.push(
+          setIssuesParam(value ? value.split(",") : [], { scroll: false })
         );
-      } else {
-        // Remove parameter
-        urlParams.delete(key);
       }
-    });
+    }
 
-    // Use addSearchParam with clean=true and our processed parameters
-    const processedParams: Record<string, string> = {};
-    urlParams.forEach((value, key) => {
-      processedParams[key] = value;
-    });
+    if (STAKEHOLDERS_FILTER_PARAM in filters) {
+      const value = filters[STAKEHOLDERS_FILTER_PARAM];
+      if (typeof value === "string") {
+        updates.push(
+          setStakeholdersParam(value ? value.split(",") : [], { scroll: false })
+        );
+      }
+    }
 
-    const url = addSearchParam({ params: processedParams, clean: true });
-    router.push(url, { scroll: false });
+    await Promise.all(updates);
   };
 
-  const resetAllFiltersToUrl = () => {
+  const resetAllFiltersToUrl = async () => {
     setIsDelegatesFiltering(true);
 
-    const filterParams = [
-      ENDORSED_FILTER_PARAM,
-      HAS_STATEMENT_FILTER_PARAM,
-      ISSUES_FILTER_PARAM,
-      STAKEHOLDERS_FILTER_PARAM,
-      MY_DELEGATES_FILTER_PARAM,
-    ];
-
-    const url = deleteSearchParam({
-      names: filterParams,
-    });
-
-    router.push(url, { scroll: false });
+    await Promise.all([
+      setEndorsed(false, { scroll: false }),
+      setHasStatement(false, { scroll: false }),
+      setMyDelegatesAddress(null, { scroll: false }),
+      setIssuesParam([], { scroll: false }),
+      setStakeholdersParam([], { scroll: false }),
+    ]);
   };
 
-  const addFilterToUrl = (filter: string, value: string) => {
+  const addFilterToUrl = async (filter: string, value: string) => {
     setIsDelegatesFiltering(true);
-    router.push(addSearchParam({ name: filter, value }), {
-      scroll: false,
-    });
+
+    switch (filter) {
+      case ISSUES_FILTER_PARAM:
+        await setIssuesParam((prev) => [...(prev || []), value], {
+          scroll: false,
+        });
+        break;
+      case STAKEHOLDERS_FILTER_PARAM:
+        await setStakeholdersParam((prev) => [...(prev || []), value], {
+          scroll: false,
+        });
+        break;
+    }
   };
 
-  const removeFilterToUrl = (filter: string) => {
+  const removeFilterToUrl = async (filter: string) => {
     setIsDelegatesFiltering(true);
-    router.push(deleteSearchParam({ name: filter }), { scroll: false });
+
+    switch (filter) {
+      case ISSUES_FILTER_PARAM:
+        await setIssuesParam([], { scroll: false });
+        break;
+      case STAKEHOLDERS_FILTER_PARAM:
+        await setStakeholdersParam([], { scroll: false });
+        break;
+    }
   };
 
   return {
     activeFilters,
     hasIssues,
     hasStakeholders,
-    issuesFromUrl,
-    stakeholdersFromUrl,
+    issuesFromUrl: issuesParam ?? [],
+    stakeholdersFromUrl: stakeholdersParam ?? [],
     hasEndorsedFilter,
     hasMyDelegates,
     endorsedToggleConfig,
