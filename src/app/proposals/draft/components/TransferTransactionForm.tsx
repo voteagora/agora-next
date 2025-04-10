@@ -146,9 +146,7 @@ const TransferTransactionForm = ({
                   <SelectItem key={token.address} value={token.address}>
                     <div className="flex flex-col">
                       <span>{token.symbol}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {token.address}
-                      </span>
+                      <span className="text-xs">{token.address}</span>
                     </div>
                   </SelectItem>
                 ))}

@@ -14,16 +14,22 @@ import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
+const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
+
+const prodTokens = [
+  {
+    name: "Cyber",
+    address: "0x14778860e937f509e651192a90589de711fb88a9",
+    symbol: "CYBER",
+    decimals: 18,
+  },
+];
+
 export const cyberTenantUIConfig = new TenantUI({
   title: "Cyber Agora",
   logo: cyberLogo,
   tokens: [
-    {
-      name: "Cyber",
-      address: "0x14778860e937f509e651192a90589de711fb88a9",
-      symbol: "CYBER",
-      decimals: 18,
-    },
+    ...(isProd ? prodTokens : []),
     TenantTokenFactory.create(TENANT_NAMESPACES.CYBER),
   ],
 

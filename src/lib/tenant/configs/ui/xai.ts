@@ -21,11 +21,36 @@ const ROOT_PAGE_TEXT = PROPOSAL_PAGE_TEXT;
 const DELEGATE_PAGE_TEXT = `Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.  Voting power is based on owned XAI + esXAI + staked esXAI. We aggregate each of these to calculate vXAI.`;
 const INFO_PAGE_TEXT = `Xai Gov is the home of Xai DAO governance, where Xai tokenholders delegate, vote, and make decisions to steward the future of the ecosystem.  Voting power is based on owned XAI + esXAI + staked esXAI. We aggregate each of these to calculate vXAI.`;
 
+const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
+
+const prodTokens = [
+  {
+    address: "0x4cb9a7ae498cedcbb5eae9f25736ae7d428c9d66",
+    symbol: "XAI",
+    decimals: 18,
+    name: "XAI",
+  },
+  {
+    address: "0x4c749d097832de2fecc989ce18fdc5f1bd76700c",
+    symbol: "esXAI",
+    decimals: 18,
+    name: "esXAI",
+  },
+  {
+    address: "0xab5c23bdbe99d75a7ae4756e7ccefd0a97b37e78",
+    symbol: "stXAI",
+    decimals: 18,
+    name: "stXAI",
+  },
+];
+
 export const xaiTenantUIConfig = new TenantUI({
   title: "Xai Agora",
   logo: xaiLogo,
-  tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.XAI)],
-
+  tokens: [
+    ...(isProd ? prodTokens : []),
+    TenantTokenFactory.create(TENANT_NAMESPACES.XAI),
+  ],
   googleAnalytics: "G-BSFWRZVGEB",
 
   assets: {
