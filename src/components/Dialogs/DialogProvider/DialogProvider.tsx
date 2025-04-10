@@ -87,7 +87,7 @@ export const DialogProvider: FC<Props> = ({ children }) => {
         transparent={(currentDialog as { transparent?: boolean })?.transparent}
         className={cn(
           "max-h-[95vh] overflow-y-auto",
-          currentDialog as { className?: string }
+          (currentDialog as { className?: string })?.className
         )}
       >
         {renderedDialog}
