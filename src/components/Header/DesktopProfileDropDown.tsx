@@ -17,7 +17,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
   const { setShouldHydrate } = useProfileData();
 
   return (
-    <Popover className="relative cursor-auto shadow-popover">
+    <Popover className="relative cursor-auto">
       {({}) => {
         return (
           <>
@@ -44,7 +44,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
             >
               <Popover.Panel>
                 {({ close }) => (
-                  <div className="bg-wash border border-line rounded-2xl w-[350px] shadow-popover">
+                  <div className="bg-wash border border-line rounded-[16px] w-[350px] shadow-popover">
                     <div className="flex flex-col min-h-[250px]">
                       <ProfileDropDownContent
                         ensName={ensName}
@@ -61,16 +61,3 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
     </Popover>
   );
 };
-
-const RowSkeletonWrapper = ({
-  children,
-  isLoading,
-}: {
-  children: ReactNode;
-  isLoading: boolean;
-}) =>
-  isLoading ? (
-    <div className="animate-pulse bg-tertiary/10 h-5 w-[90px] rounded-2xl"></div>
-  ) : (
-    <div className="text-primary">{children}</div>
-  );

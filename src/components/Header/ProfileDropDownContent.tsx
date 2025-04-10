@@ -134,7 +134,7 @@ export const ProfileDropDownContent = ({
           </div>
         ) : (
           <div className="flex flex-col p-6">
-            {canCreateDelegateStatement && !hasStatement ? (
+            {canCreateDelegateStatement && hasStatement ? (
               <Link
                 href={`/delegates/create`}
                 className="rounded-full py-3 px-2 border border-line bg-brandPrimary hover:bg-none text-neutral flex justify-center mt-1"
@@ -147,14 +147,14 @@ export const ProfileDropDownContent = ({
                 <Link
                   href={`/delegates/${ensName ?? address}`}
                   onClick={handleCloseDrawer}
-                  className="self-stretch h-12 pl-4 flex items-center"
+                  className="self-stretch h-12 pl-4 flex items-center hover:bg-neutral hover:font-bold hover:rounded-md"
                 >
                   View my profile
                 </Link>
                 <Link
                   href={`/delegates/create`}
                   onClick={handleCloseDrawer}
-                  className="self-stretch h-12 pl-4 flex items-center"
+                  className="self-stretch h-12 pl-4 flex items-center hover:bg-neutral hover:font-bold hover:rounded-md"
                 >
                   Edit delegate statement
                 </Link>
@@ -163,7 +163,7 @@ export const ProfileDropDownContent = ({
           </div>
         )}
       </div>
-      <div className="p-6 py-[30px] border-t border-line bg-neutral">
+      <div className="p-6 py-[30px] border-t border-line bg-neutral sm:rounded-bl-[16px] sm:rounded-br-[16px]">
         <div
           onClick={() => {
             disconnect();
