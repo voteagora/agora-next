@@ -8,10 +8,13 @@ import demoForum from "@/assets/tenant/demo_forum.png";
 import demoDiscord from "@/assets/tenant/demo_discord.png";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export const demoTenantUIConfig = new TenantUI({
   title: "Canopy Agora",
   logo: demoHeroV2,
+  tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.DEMO)],
 
   assets: {
     success: demoHeroV2,

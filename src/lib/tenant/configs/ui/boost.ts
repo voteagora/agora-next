@@ -4,6 +4,8 @@ import boostBanner from "@/assets/tenant/boost_banner.png";
 import successImage from "@/assets/tenant/boost_banner.png";
 import pendingImage from "@/assets/tenant/boost_banner.png";
 import delegateImage from "@/assets/tenant/boost_logo.svg";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
@@ -11,6 +13,7 @@ import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 export const boostTenantUIConfig = new TenantUI({
   title: "Boost Agora",
   logo: boostLogo,
+  tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.BOOST)],
 
   assets: {
     success: successImage as unknown as string,

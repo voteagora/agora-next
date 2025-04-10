@@ -11,11 +11,14 @@ import infoPageCard02 from "@/assets/tenant/derive_info_1.png";
 import infoPageCard03 from "@/assets/tenant/derive_info_2.png";
 import infoPageCard04 from "@/assets/tenant/derive_info_3.png";
 import infoPageHero from "@/assets/tenant/derive_gov.png";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
 export const deriveTenantUIConfig = new TenantUI({
   title: "Derive Agora",
   logo: deriveLogo,
+  tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.DERIVE)],
 
   assets: {
     success: successImage,
