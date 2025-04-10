@@ -198,7 +198,7 @@ export function formatNumber(
       bigIntAmount = BigInt(amount);
     }
   } else {
-    bigIntAmount = amount;
+    bigIntAmount = amount || 0n;
   }
 
   // Convert to standard unit
