@@ -1,11 +1,11 @@
-import { OptimismVotes } from "@prisma/client";
+import { OptimismVotes, LineaVotes } from "@prisma/client";
 import { ParsedParams } from "@/lib/voteUtils";
 import { ProposalType } from "@prisma/client";
 
 export type VotesSortOrder = "asc" | "desc";
 export type VotesSort = "weight" | "block_number";
 
-export type VotePayload = OptimismVotes;
+export type VotePayload = OptimismVotes | LineaVotes;
 
 export type Vote = {
   transactionHash: string;
