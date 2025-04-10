@@ -613,6 +613,7 @@ async function getVoterStats(
                 : `end_block::INTEGER <= $3`
             }
             AND cancelled_block IS NULL
+            AND proposal_type <> 'OPTIMISTIC'
             ORDER BY ordinal DESC
             LIMIT 10
         ),

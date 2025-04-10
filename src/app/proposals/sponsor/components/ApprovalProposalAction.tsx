@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
 import { useSimulateContract, useWriteContract } from "wagmi";
@@ -18,6 +19,7 @@ const ApprovalProposalAction = ({
   const openDialog = useOpenDialog();
   const { contracts } = Tenant.current();
   const { inputData } = getInputData(draftProposal);
+  const [proposalCreated, setProposalCreated] = useState(false);
 
   const {
     data: config,
@@ -28,6 +30,9 @@ const ApprovalProposalAction = ({
     abi: contracts.governor.abi,
     functionName: "proposeWithModule",
     args: inputData as any,
+    query: {
+      enabled: !proposalCreated,
+    },
   });
 
   const { writeContractAsync: writeAsync, isPending: isWriteLoading } =
@@ -47,6 +52,7 @@ const ApprovalProposalAction = ({
               console.log(error);
               return;
             }
+            setProposalCreated(true);
 
             trackEvent({
               event_name: ANALYTICS_EVENT_NAMES.CREATE_PROPOSAL,

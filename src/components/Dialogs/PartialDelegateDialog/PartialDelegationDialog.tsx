@@ -111,7 +111,10 @@ export function PartialDelegationDialog({
   const updateDelegations = (updatedDelegation: Delegation) => {
     setDelegations((prev) => {
       return prev.map((delegation) =>
-        delegation.to === updatedDelegation.to ? updatedDelegation : delegation
+        delegation.to === updatedDelegation.to &&
+        delegation.type === updatedDelegation.type
+          ? updatedDelegation
+          : delegation
       );
     });
     setIsUnsaved(true);

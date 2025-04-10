@@ -155,20 +155,21 @@ const DraftFormClient = ({
         <FormCard>
           <FormCard.Section>
             <div className="flex flex-col space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <SwitchInput
-                  control={control}
-                  label="Voting module"
-                  required={true}
-                  options={enabledProposalTypesFromConfigAndAPI}
-                  name="type"
-                />
+              {validProposalTypes.length > 0 && (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <SwitchInput
+                    control={control}
+                    label="Voting module"
+                    required={true}
+                    options={enabledProposalTypesFromConfigAndAPI}
+                    name="type"
+                  />
 
-                <p className="text-sm self-center text-agora-stone-700 mt-6">
-                  {ProposalTypeMetadata[votingModuleType].description}
-                </p>
-              </div>
-
+                  <p className="text-sm self-center text-agora-stone-700 mt-6">
+                    {ProposalTypeMetadata[votingModuleType].description}
+                  </p>
+                </div>
+              )}
               {validProposalTypes.length > 1 ? (
                 <div className="relative">
                   <SelectInput

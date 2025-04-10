@@ -25,16 +25,25 @@ import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
 
-export const fetchDelegate = unstable_cache(
-  async (address: string) => {
-    return await apiFetchDelegate(address);
-  },
-  ["delegate"],
-  {
-    revalidate: 180, // 10 minute cache
-    tags: ["delegate"],
+export const fetchDelegate = async (address: string) => {
+  try {
+    const cachedFetchDelegate = unstable_cache(
+      async () => {
+        return await apiFetchDelegate(address);
+      },
+      [`delegate-${address.toLowerCase()}`],
+      {
+        revalidate: 180, // 3 minutes
+        tags: [`delegate-${address.toLowerCase()}`],
+      }
+    );
+
+    return await cachedFetchDelegate();
+  } catch (error) {
+    console.error("Error fetching delegate data:", error);
+    throw error;
   }
-);
+};
 
 export const fetchVoterStats = unstable_cache(
   async (address: string, blockNumberOrTimestamp?: number) => {
@@ -106,8 +115,7 @@ export async function submitDelegateStatement({
     scwAddress,
   });
 
-  revalidateTag("delegate");
-  revalidateTag("delegateStatement");
+  revalidateDelegateAddressPage(address.toLowerCase());
   revalidatePath("/delegates/create", "page");
   return response;
 }
@@ -168,7 +176,7 @@ export const fetchConnectedDelegate = async (address: string) => {
 export const revalidateDelegateAddressPage = async (
   delegateAddress: string
 ) => {
-  revalidateTag("delegate");
+  revalidateTag(`delegate-${delegateAddress}`);
   revalidatePath(`/delegates/${delegateAddress}`, "page");
 };
 

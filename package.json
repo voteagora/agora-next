@@ -10,7 +10,7 @@
     "cypress": "cypress open",
     "generate-typechain": "typechain --target ethers-v6 --out-dir src/lib/contracts/generated src/lib/contracts/abis/*.json && prettier -w src/lib/contracts/generated",
     "typecheck": "tsc --pretty --noEmit",
-    "generate-apikey": "ts-node src/scripts/generateApiKey.ts",
+    "generate-apikey": "tsx src/scripts/generateApiKey.mjs",
     "generate-jwt": "tsx src/scripts/generateJwt.ts",
     "check-prettier": "prettier --check src/",
     "prettier-src": "prettier -w src/",
@@ -103,6 +103,7 @@
     "uuid": "^9.0.1",
     "viem": "2.21.16",
     "wagmi": "^2.13.0",
+    "yargs": "^17.7.2",
     "zod": "^3.22.4",
     "zustand": "^5.0.3"
   },
