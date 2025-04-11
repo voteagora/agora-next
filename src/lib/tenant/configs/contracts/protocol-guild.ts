@@ -27,20 +27,20 @@ export const protocolGuildTenantContractConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd
-    ? "0xB3E34f8eFE825dD84137124f4A552c049BB0EC42"
-    : "0xB3E34f8eFE825dD84137124f4A552c049BB0EC42";
+    ? "0x27b0031c64f4231f0aff28e668553d73f48125f3"
+    : "0x27b0031c64f4231f0aff28e668553d73f48125f3";
 
   const GOVERNOR = isProd
-    ? "0x5cA68E30dFf2A96C1e06eE1bF8609096a806f692"
-    : "0x1ec062fc98be10314cf902d5aa101403d2acbf73";
+    ? "0xe35caf04cd55192c04c93f3b1779a13f503e5942"
+    : "0xa6388314fe37484883266970967ab918996f3bf0";
 
   const TIMELOCK = isProd
     ? "0x0cabe65b0adc1634f56ea66a36abb70f2d4232c5"
     : "0xeba09e62142052831fe0ccdd73476ca5ce84b2f1";
 
   const TYPES = isProd
-    ? "0x368723068b6c762b416e5a7d506a605e8b816c22"
-    : "0xf8d15c3132efa557989a1c9331b6667ca8caa3a9";
+    ? "0x7ca4a290a00a99829cdd6ed9d25d6e77e5544499"
+    : "0xb7687e62d6b2cafb3ed3c3c81b0b6cf0a3884602";
 
   const TREASURY = isProd
     ? [
