@@ -156,7 +156,9 @@ const ProposalTransactionDisplay = ({
                     ui.theme === "dark" && "text-neutral"
                   )}
                 >
-                  {isSimulating ? "Simulating..." : "Simulate transactions"}
+                  {isSimulating
+                    ? "Simulating..."
+                    : "Simulate transactions (Beta)"}
                 </Button>
               )}
           </div>

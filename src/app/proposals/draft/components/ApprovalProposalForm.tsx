@@ -491,7 +491,7 @@ const ApprovalProposalForm = () => {
               fullWidth={true}
               onClick={simulateAllPossibleCombinations}
             >
-              Simulate all possible winning combinations
+              Simulate all possible winning combinations (Beta)
             </UpdatedButton>
             <p className="mt-2 text-sm text-tertiary">
               This will simulate all possible combinations of winning options
