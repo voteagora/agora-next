@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import Tenant from "@/lib/tenant/tenant";
 import { getSecondsPerBlock } from "@/lib/blockTimes";
 import { SECONDS_IN_HOUR } from "@/lib/constants";
+import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
 
 // TODO: Take init state values from the chain
 export default function GovernorSettings() {
@@ -24,6 +25,7 @@ export default function GovernorSettings() {
     : contracts.token.chain.id;
 
   const secondsPerBlock = getSecondsPerBlock(chainIdToUse);
+  const { data: adminAddress } = useGovernorAdmin({ enabled: true });
 
   const govContract = {
     address: contracts.governor.address as `0x${string}`,
@@ -123,7 +125,7 @@ export default function GovernorSettings() {
         </h1>
         <p className="text-secondary">Set how all proposals work</p>
       </section>
-      <div className="space-y-8 my-4">
+      <div className="my-4">
         <div className="space-y-4 sm:space-y-0 sm:flex sm:justify-between sm:gap-4">
           <div className="flex-1">
             <Label>Voting period</Label>
@@ -197,6 +199,15 @@ export default function GovernorSettings() {
             <Lock className="w-4 h-4 text-primary/30" />
           </div>
           <p className="text-secondary truncate">{manager}</p>
+        </div>
+        <div className="text-sm sm:flex sm:justify-between sm:items-center sm:px-2 mt-4">
+          <div className="flex items-center gap-2">
+            <p className="text-secondary">Admin Address</p>
+            <Lock className="w-4 h-4 text-primary/30" />
+          </div>
+          <p className="text-secondary truncate">
+            {adminAddress ? adminAddress : "0x..."}
+          </p>
         </div>
       </div>
     </div>
