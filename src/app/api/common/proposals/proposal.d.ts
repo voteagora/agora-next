@@ -14,9 +14,12 @@ export type Proposal = {
   snapshotBlockNumber: number;
   createdTime: Date | null;
   startTime: Date | null;
+  startBlock: bigint | string | null;
   endTime: Date | null;
+  endBlock: bigint | string | null;
   cancelledTime: Date | null;
   executedTime: Date | null;
+  executedBlock: bigint | string | null;
   queuedTime: Date | null;
   markdowntitle: string;
   description: string | null;

@@ -4,7 +4,6 @@ import {
 } from "@/app/api/common/proposals/getProposals";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { fetchVotableSupplyUnstableCache } from "@/app/api/common/votableSupply/getVotableSupply";
-import { fetchVotesForProposalAndDelegateUnstableCache } from "@/app/api/common/votes/getVotes";
 import { Vote } from "@/app/api/common/votes/vote";
 import { cleanString, truncateString } from "@/app/lib/utils/text";
 import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
@@ -16,6 +15,7 @@ import { format } from "date-fns";
 import React from "react";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 // Share my vote metadata
 async function generateVoterMetadata(

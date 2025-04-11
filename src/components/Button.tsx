@@ -1,6 +1,11 @@
 import Link from "next/link";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { cn } from "@/lib/utils";
+import Tenant from "@/lib/tenant/tenant";
+
+const { ui } = Tenant.current();
+
+const themeIsDark = ui.theme === "dark";
 
 export function Button({ href = "", className = "", ...props }) {
   return (
@@ -86,18 +91,18 @@ export function UpdatedButton({
           {isLoading ? (
             <span
               className={cn(
-                type === "primary" && "text-white",
-                type === "secondary" && "text-black",
-                type === "destructive" && "text-red-500",
+                type === "primary" && !themeIsDark && "text-white",
+                type === "secondary" && !themeIsDark && "text-black",
+                type === "destructive" && !themeIsDark && "text-red-500",
                 type === "link" && "",
                 "font-semibold flex flex-row space-x-2 items-center justify-center"
               )}
             >
               <LoadingSpinner
                 className={cn(
-                  type === "primary" && "text-white",
-                  type === "secondary" && "text-black",
-                  type === "destructive" && "text-red-500",
+                  type === "primary" && !themeIsDark && "text-white",
+                  type === "secondary" && !themeIsDark && "text-black",
+                  type === "destructive" && !themeIsDark && "text-red-500",
                   type === "link" && "",
                   "font-semibold"
                 )}

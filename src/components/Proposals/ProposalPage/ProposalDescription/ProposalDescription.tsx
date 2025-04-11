@@ -72,6 +72,7 @@ export default function ProposalDescription({
             executedTransactionHash={proposal.executedTransactionHash}
             network={contracts.governor.chain.name}
             signatures={option.signatures}
+            proposal={proposal}
           />
         ) : (
           <ApprovedTransactions

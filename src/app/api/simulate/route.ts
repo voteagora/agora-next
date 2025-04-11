@@ -30,6 +30,17 @@ export async function POST(request: Request) {
     );
     const res = await response.json();
 
+    // Enable sharing on the simulation
+    await fetch(
+      `https://api.tenderly.co/api/v1/account/${user}/project/${project}/simulations/${res.simulation.id}/share`,
+      {
+        method: "POST",
+        headers: {
+          "X-Access-Key": process.env.TENDERLY_ACCESS_KEY as string,
+        },
+      }
+    );
+
     return new Response(JSON.stringify({ response: res }), {
       status: 200,
     });
