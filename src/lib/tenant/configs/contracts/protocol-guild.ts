@@ -90,5 +90,6 @@ export const protocolGuildTenantContractConfig = ({
     governorType: GOVERNOR_TYPE.AGORA,
     timelockType:
       TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
+    supportScopes: true,
   };
 };

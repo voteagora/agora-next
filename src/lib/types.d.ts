@@ -56,6 +56,7 @@ export type TenantContracts = {
   timelockType?: TIMELOCK_TYPE;
   chainForTime?: Chain;
   providerForTime?: AlchemyProvider;
+  supportScopes?: boolean;
 };
 
 export type TenantToken = {
