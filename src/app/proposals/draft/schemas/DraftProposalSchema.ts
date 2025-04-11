@@ -124,6 +124,8 @@ const BaseProposalSchema = z.object({
   proposalConfigType: z.string().optional(),
   title: z.string().min(1, { message: "Title cannot be empty" }),
   abstract: z.string().min(1, { message: "Description cannot be empty" }),
+  simulation_state: z.string(), // unconfirmed, valid, invalid
+  simulation_id: z.string().nullable(),
 });
 
 export const BasicProposalSchema = BaseProposalSchema.extend({

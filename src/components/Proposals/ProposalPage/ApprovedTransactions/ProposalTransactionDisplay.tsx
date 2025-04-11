@@ -14,6 +14,7 @@ import {
   getBlockScanAddress,
   getBlockScanUrl,
   shortAddress,
+  getFunctionSignature,
 } from "@/lib/utils";
 import {
   ArrowTopRightOnSquareIcon,
@@ -22,8 +23,14 @@ import {
 } from "@heroicons/react/20/solid";
 import React, { useState } from "react";
 import { formatUnits } from "viem";
+import { toast } from "react-hot-toast";
+import { checkExistingProposal } from "@/lib/seatbelt/checkProposal";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import { TENDERLY_VALID_CHAINS } from "@/app/proposals/draft/components/BasicProposalForm";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { Button } from "@/components/ui/button";
 
-const { contracts, token } = Tenant.current();
+const { contracts, token, ui } = Tenant.current();
 
 const tokenSymbolsToCheck = {
   [`${contracts.token.address.toLowerCase()}`]: {
@@ -45,6 +52,7 @@ const ProposalTransactionDisplay = ({
   simulationDetails,
   network = "mainnet",
   signatures,
+  proposal,
 }: {
   targets: string[];
   calldatas: `0x${string}`[];
@@ -57,9 +65,21 @@ const ProposalTransactionDisplay = ({
     state?: string | null;
   };
   network?: string;
+  proposal?: Proposal;
 }) => {
   const [collapsed, setCollapsed] = useState(true);
   const [viewMode, setViewMode] = useState<"summary" | "raw">("summary");
+  const [isSimulating, setIsSimulating] = useState(false);
+  const openDialog = useOpenDialog();
+
+  const hasRealCalldatas = calldatas.some((calldata) => calldata !== "0x");
+  const hasNonEmptySignatures = signatures?.some(
+    (signature) => signature !== ""
+  );
+  const hasNonEmptyValues = values.some((value) => Number(value) !== 0);
+
+  const hasRealActions =
+    hasRealCalldatas || hasNonEmptySignatures || hasNonEmptyValues;
 
   if (targets.length === 0) {
     return (
@@ -82,6 +102,31 @@ const ProposalTransactionDisplay = ({
     values.length
   );
 
+  const simulateTransactions = async () => {
+    try {
+      if (!proposal) {
+        throw new Error("Proposal is required");
+      }
+      setIsSimulating(true);
+      const report = await checkExistingProposal({
+        existingProposal: proposal,
+      });
+
+      openDialog({
+        type: "SIMULATION_REPORT",
+        params: {
+          report: report?.structuredReport ?? null,
+        },
+        className: "sm:w-[40rem]",
+      });
+    } catch (e) {
+      console.error(e);
+      toast.error("Error simulating transactions");
+    } finally {
+      setIsSimulating(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex flex-col border rounded-t-lg border-line text-xs text-primary break-words overflow-hidden">
@@ -98,6 +143,24 @@ const ProposalTransactionDisplay = ({
                 <ArrowTopRightOnSquareIcon className="w-4 h-4" />
               </a>
             )}
+            {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
+              !!proposal?.id &&
+              hasRealActions && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={simulateTransactions}
+                  disabled={isSimulating}
+                  className={cn(
+                    "flex items-center gap-2",
+                    ui.theme === "dark" && "text-neutral"
+                  )}
+                >
+                  {isSimulating
+                    ? "Simulating..."
+                    : "Simulate transactions (Beta)"}
+                </Button>
+              )}
           </div>
           <div className="flex">
             <button
@@ -1002,31 +1065,6 @@ function formatFunctionName(name: string): string {
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase())
     .trim();
-}
-
-function getFunctionSignature(decodedData: any): string | null {
-  if (
-    !decodedData ||
-    !decodedData.function ||
-    decodedData.function === "unknown"
-  ) {
-    return null;
-  }
-
-  try {
-    let signature = `${decodedData.function}(`;
-    const paramTypes = Object.entries(decodedData.parameters).map(
-      ([_, param]: [string, any]) => {
-        return param.type || "unknown";
-      }
-    );
-    signature += paramTypes.join(",");
-    signature += ")";
-
-    return signature;
-  } catch (error) {
-    return null;
-  }
 }
 
 export default ProposalTransactionDisplay;

@@ -1197,6 +1197,8 @@ model ProposalDraft {
   updated_at               DateTime                   @default(now()) @updatedAt @db.Timestamptz(6)
   onchain_transaction_hash String?                    @db.VarChar(255)
   snapshot_link            String?
+  simulation_state String        @default("UNCONFIRMED") @db.VarChar(255)
+  simulation_id    String?       @db.VarChar(255)
   // approval type
   max_options              Int?
   top_choices              Int?

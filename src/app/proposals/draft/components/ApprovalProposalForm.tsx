@@ -21,7 +21,10 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import Tenant from "@/lib/tenant/tenant";
 import { TENDERLY_VALID_CHAINS } from "./BasicProposalForm";
-
+import { encodeAbiParameters, parseEther } from "viem";
+import { StructuredSimulationReport } from "@/lib/seatbelt/types";
+import { checkNewApprovalProposal } from "@/lib/seatbelt/checkProposal";
+import { StructuredReport } from "@/components/Simulation/StructuredReport";
 type FormType = z.output<typeof ApprovalProposalSchema>;
 
 const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
@@ -119,6 +122,8 @@ const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
   );
 };
 
+const { contracts } = Tenant.current();
+
 const TransactionFormItem = ({
   optionIndex,
   transactionIndex,
@@ -130,15 +135,7 @@ const TransactionFormItem = ({
   remove: UseFieldArrayRemove;
   children: React.ReactNode;
 }) => {
-  const { contracts } = Tenant.current();
   const { register, watch } = useFormContext<FormType>();
-
-  const simulationState = watch(
-    `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_state`
-  );
-  const simulationId = watch(
-    `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_id`
-  );
 
   return (
     <div className="">
@@ -147,31 +144,6 @@ const TransactionFormItem = ({
           <h2 className="text-secondary font-semibold">
             Transaction #{transactionIndex + 1}
           </h2>
-          {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
-            (simulationState === "INVALID" ? (
-              <a
-                href={`https://dashboard.tenderly.co/shared/simulation/${simulationId}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span className="bg-red-100 text-negative rounded-lg px-2 py-1 text-xs font-semibold">
-                  Invalid
-                </span>
-              </a>
-            ) : simulationState === "UNCONFIRMED" ? (
-              <span className="bg-gray-100 text-tertiary px-2 py-1 rounded-lg text-xs font-semibold">
-                No simulation
-              </span>
-            ) : (
-              <a
-                href={`https://dashboard.tenderly.co/shared/simulation/${simulationId}`}
-                target="_blank"
-                rel="noreferrer"
-                className="bg-green-100 text-positive px-2 py-1 rounded-lg text-xs font-semibold"
-              >
-                Valid
-              </a>
-            ))}
         </div>
         <span
           className="text-red-500 text-sm hover:underline cursor-pointer"
@@ -183,18 +155,6 @@ const TransactionFormItem = ({
         </span>
       </div>
       {children}
-      <input
-        type="hidden"
-        {...register(
-          `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_state`
-        )}
-      />
-      <input
-        type="hidden"
-        {...register(
-          `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_id`
-        )}
-      />
     </div>
   );
 };
@@ -211,6 +171,9 @@ const ApprovalProposalForm = () => {
   const criteria = watch("approvalProposal.criteria");
   const topChoices = watch("approvalProposal.topChoices");
   const optionsWatched = watch("approvalProposal.options");
+  const [simulationReports, setSimulationReports] = useState<
+    StructuredSimulationReport[]
+  >([]);
 
   useEffect(() => {
     if (!defaultValues?.approvalProposal?.criteria) {
@@ -301,80 +264,114 @@ const ApprovalProposalForm = () => {
     const combinations = generateWinningCombinations();
 
     try {
-      // Reset all simulation states
-      optionsWatched.forEach((option, optionIndex) => {
-        option.transactions.forEach((_, transactionIndex) => {
-          setValue(
-            `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_state`,
-            "UNCONFIRMED"
-          );
+      const totalNumOfOptions = optionsWatched.length;
+
+      // Format all options for simulation
+      const allOptions = optionsWatched.map((option) => {
+        const targets: `0x${string}`[] = [];
+        const values: bigint[] = [];
+        const calldatas: `0x${string}`[] = [];
+        let budgetTokensSpent = 0n;
+
+        option.transactions.forEach((tx) => {
+          if (tx.type === TransactionType.TRANSFER) {
+            const amount = tx.amount || "0";
+            budgetTokensSpent += BigInt(amount);
+            targets.push(contracts.token.address as `0x${string}`);
+            values.push(0n);
+            calldatas.push(tx.calldata as `0x${string}`);
+          } else {
+            targets.push(tx.target as `0x${string}`);
+            values.push(parseEther(tx.value || "0"));
+            calldatas.push(tx.calldata as `0x${string}`);
+          }
         });
+
+        return {
+          budgetTokensSpent,
+          targets,
+          values,
+          calldatas,
+          description: option.title,
+        };
       });
+
+      const maxOptions = getValues("approvalProposal.maxOptions");
+      const criteria = getValues("approvalProposal.criteria");
+      const budget = getValues("approvalProposal.budget");
+      const threshold = getValues("approvalProposal.threshold");
+      const topChoices = getValues("approvalProposal.topChoices");
+
+      const settings = {
+        maxApprovals: parseInt(maxOptions || "0"),
+        criteria: criteria === "Threshold" ? 0 : 1,
+        budgetToken:
+          parseInt(budget || "0") > 0
+            ? (contracts.token.address as `0x${string}`)
+            : ("0x0000000000000000000000000000000000000000" as `0x${string}`),
+        criteriaValue:
+          criteria === "Threshold"
+            ? BigInt(threshold?.toString() || "0")
+            : BigInt(topChoices || "0"),
+        budgetAmount: BigInt(budget?.toString() || "0"),
+      };
+
+      const unformattedProposalData = encodeAbiParameters(
+        [
+          {
+            name: "proposalOptions",
+            type: "tuple[]",
+            components: [
+              { name: "budgetTokensSpent", type: "uint256" },
+              { name: "targets", type: "address[]" },
+              { name: "values", type: "uint256[]" },
+              { name: "calldatas", type: "bytes[]" },
+              { name: "description", type: "string" },
+            ],
+          },
+          {
+            name: "proposalSettings",
+            type: "tuple",
+            components: [
+              { name: "maxApprovals", type: "uint8" },
+              { name: "criteria", type: "uint8" },
+              { name: "budgetToken", type: "address" },
+              { name: "criteriaValue", type: "uint128" },
+              { name: "budgetAmount", type: "uint128" },
+            ],
+          },
+        ],
+        [allOptions, settings]
+      );
 
       // Simulate each combination and collect results
       const simulationResults = await Promise.all(
         combinations.map(async (combination) => {
-          const transactionsToSimulate = combination.flatMap((optionIndex) =>
-            optionsWatched[optionIndex].transactions.map(
-              (tx, transactionIndex) => ({
-                ...tx,
-                optionIndex,
-                transactionIndex,
-              })
-            )
-          );
-
-          const response = await fetch("/api/simulate-bundle", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              transactions: transactionsToSimulate,
-              networkId: Tenant.current().contracts.governor.chain.id,
-              from: Tenant.current().contracts.timelock!.address,
-            }),
+          const report = await checkNewApprovalProposal({
+            unformattedProposalData,
+            description: "Approval Proposal",
+            draftId: "1",
+            options: allOptions,
+            settings,
+            combination,
+            totalNumOfOptions,
+            title:
+              "Simulation of options with index: " + combination?.join(", "),
           });
 
-          const res = await response.json();
-          return { combination, results: res.response.simulation_results };
+          return report?.structuredReport;
         })
       );
 
-      // Process all results and update states
-      optionsWatched.forEach((option, optionIndex) => {
-        option.transactions.forEach((_, transactionIndex) => {
-          let isValid = true;
-          const lastSimulationResult =
-            simulationResults[simulationResults.length - 1];
-          const simulationId =
-            lastSimulationResult.results[
-              lastSimulationResult.results.length - 1
-            ]?.simulation.id;
+      setSimulationReports(
+        simulationResults.filter(Boolean) as StructuredSimulationReport[]
+      );
 
-          // Check if this transaction is invalid in any winning combination
-          for (const { combination, results } of simulationResults) {
-            if (combination.includes(optionIndex)) {
-              const hasFailure = results.findIndex(
-                (result: any) => !result.transaction.status
-              );
+      const anyInvalid = simulationResults.some(
+        (report) => report?.status === "error"
+      );
 
-              if (hasFailure !== -1) {
-                isValid = false;
-              }
-            }
-          }
-
-          setValue(
-            `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_state`,
-            isValid ? "VALID" : "INVALID"
-          );
-          setValue(
-            `approvalProposal.options.${optionIndex}.transactions.${transactionIndex}.simulation_id`,
-            simulationId
-          );
-        });
-      });
+      setValue("simulation_state", anyInvalid ? "INVALID" : "VALID");
     } catch (e) {
       console.error(e);
       toast.error("Error simulating transactions");
@@ -494,7 +491,7 @@ const ApprovalProposalForm = () => {
               fullWidth={true}
               onClick={simulateAllPossibleCombinations}
             >
-              Simulate all possible winning combinations
+              Simulate all possible winning combinations (Beta)
             </UpdatedButton>
             <p className="mt-2 text-sm text-tertiary">
               This will simulate all possible combinations of winning options
@@ -505,6 +502,23 @@ const ApprovalProposalForm = () => {
             </p>
           </div>
         )}
+      {simulationReports.length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-secondary font-semibold">Simulation results</h3>
+          <p className="mt-2 text-secondary">
+            These are the results of the simulation for all possible winning
+            combinations.
+          </p>
+          {simulationReports.map((report, index) => {
+            return (
+              <div className="my-4" key={index}>
+                <h4 className="text-secondary font-semibold">{report.title}</h4>
+                <StructuredReport report={report} />
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

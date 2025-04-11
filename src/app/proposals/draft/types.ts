@@ -289,8 +289,6 @@ const parseTransaction = (t: ProposalDraftTransaction) => {
       description: t.description,
       recipient,
       amount: formatUnits(amount, tenant.token.decimals),
-      simulation_state: t.simulation_state,
-      simulation_id: t.simulation_id,
     };
   } else {
     return {
@@ -299,8 +297,6 @@ const parseTransaction = (t: ProposalDraftTransaction) => {
       calldata: t.calldata,
       description: t.description,
       type: TransactionType.CUSTOM,
-      simulation_state: t.simulation_state,
-      simulation_id: t.simulation_id,
     };
   }
 };
