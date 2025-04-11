@@ -16,9 +16,9 @@ import { checkValueRequired } from "./check-value-required";
 const ALL_CHECKS: {
   [checkId: string]: ProposalCheck;
 } = {
+  checkLogs,
   checkStateChanges,
   checkDecodeCalldata,
-  checkLogs,
   checkTargetsVerifiedEtherscan,
   checkTouchedContractsVerifiedEtherscan,
   checkTargetsNoSelfdestruct,
