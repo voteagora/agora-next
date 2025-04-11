@@ -130,52 +130,74 @@ const ProposalTransactionDisplay = ({
   return (
     <div>
       <div className="flex flex-col border rounded-t-lg border-line text-xs text-primary break-words overflow-hidden">
-        <div className="w-full flex items-center justify-between mb-2 border-b border-line px-4 py-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-primary">Actions</span>
-            {executedTransactionHash && (
-              <a
-                href={getBlockScanUrl(executedTransactionHash)}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="text-primary hover:text-primary/80 transition-colors"
-              >
-                <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-              </a>
-            )}
-            {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
-              !!proposal?.id &&
-              hasRealActions && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={simulateTransactions}
-                  disabled={isSimulating}
-                  className={cn(
-                    "flex items-center gap-2",
-                    ui.theme === "dark" && "text-neutral"
-                  )}
+        <div className="w-full flex flex-col sm:flex-row mb-2 border-b border-line px-4 py-3">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-primary">
+                Actions
+              </span>
+              {executedTransactionHash && (
+                <a
+                  href={getBlockScanUrl(executedTransactionHash)}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-primary hover:text-primary/80 transition-colors"
                 >
-                  {isSimulating
-                    ? "Simulating..."
-                    : "Simulate transactions (Beta)"}
-                </Button>
+                  <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                </a>
               )}
+              {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
+                !!proposal?.id &&
+                hasRealActions && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={simulateTransactions}
+                    disabled={isSimulating}
+                    className={cn(
+                      "hidden sm:flex items-center gap-2",
+                      ui.theme === "dark" && "text-neutral"
+                    )}
+                  >
+                    {isSimulating
+                      ? "Simulating..."
+                      : "Simulate transactions (Beta)"}
+                  </Button>
+                )}
+            </div>
+            <div className="flex">
+              <button
+                className={`px-2 py-1 text-xs font-semibold ${viewMode === "summary" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
+                onClick={() => setViewMode("summary")}
+              >
+                Summary
+              </button>
+              <button
+                className={`px-2 py-1 text-xs font-semibold ${viewMode === "raw" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
+                onClick={() => setViewMode("raw")}
+              >
+                Raw
+              </button>
+            </div>
           </div>
-          <div className="flex">
-            <button
-              className={`px-2 py-1 text-xs font-semibold ${viewMode === "summary" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
-              onClick={() => setViewMode("summary")}
-            >
-              Summary
-            </button>
-            <button
-              className={`px-2 py-1 text-xs font-semibold ${viewMode === "raw" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
-              onClick={() => setViewMode("raw")}
-            >
-              Raw
-            </button>
-          </div>
+          {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
+            !!proposal?.id &&
+            hasRealActions && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={simulateTransactions}
+                disabled={isSimulating}
+                className={cn(
+                  "flex items-center gap-2 sm:hidden mt-2",
+                  ui.theme === "dark" && "text-neutral"
+                )}
+              >
+                {isSimulating
+                  ? "Simulating..."
+                  : "Simulate transactions (Beta)"}
+              </Button>
+            )}
         </div>
 
         <div className="p-4 pt-2">
@@ -491,7 +513,7 @@ const ActionSummary = ({
 
     return (
       <div className="text-xs text-primary font-semibold flex flex-col gap-y-2">
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
           <div className="flex gap-2 items-center">
             <span className="w-16">Transfer:</span>
             <span className="bg-wash p-2 rounded-sm shrink-0">
@@ -514,7 +536,12 @@ const ActionSummary = ({
                   target="_blank"
                   rel="noreferrer noopener"
                 >
-                  <ENSName address={recipient} truncate={false} />
+                  <div className="hidden sm:block">
+                    <ENSName address={recipient} truncate={false} />
+                  </div>
+                  <div className="block sm:hidden">
+                    <ENSName address={recipient} truncate={true} />
+                  </div>
                 </a>
               )}
             </div>
@@ -722,7 +749,7 @@ const ActionDetails = ({
   }
 
   return (
-    <div className="text-base text-primary font-semibold">
+    <div className="text-base text-primary font-semibold max-w-full overflow-x-auto">
       <div className="flex flex-col gap-y-10">
         {hasParameters && (
           <div>
