@@ -53,7 +53,10 @@ export const AgoraOptimismGovQueue = ({ proposal }: Props) => {
       );
     }
     if (isError) {
-      toast.error(`Error queuing proposal ${error?.message}`, {
+      const errorMessage =
+        "shortMessage" in error ? error.shortMessage : error.message;
+
+      toast.error(`Error queuing proposal ${errorMessage}`, {
         duration: 10000,
       });
     }
