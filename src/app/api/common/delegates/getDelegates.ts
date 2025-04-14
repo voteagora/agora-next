@@ -614,6 +614,7 @@ async function getVoterStats(
             FROM ${namespace}.proposals_v2
             WHERE contract = $2
             AND cancelled_block IS NULL
+            AND end_block::INTEGER <= $3
         )
         SELECT
             COALESCE(v.voter, $1) as voter,
