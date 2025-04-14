@@ -8,18 +8,9 @@ import {
   MY_DELEGATES_FILTER_PARAM,
   STAKEHOLDERS_FILTER_PARAM,
 } from "@/lib/constants";
+import { withNuqsTestingAdapter } from "nuqs/adapters/testing";
 
 // Mock the required dependencies
-const mockRouter = {
-  push: vi.fn(),
-};
-
-const mockSearchParams = {
-  get: vi.fn(),
-};
-
-const mockAddSearchParam = vi.fn();
-const mockDeleteSearchParam = vi.fn();
 const mockSetIsDelegatesFiltering = vi.fn();
 const mockConnectedAddress = "0x1234567890abcdef1234567890abcdef12345678";
 
@@ -33,17 +24,6 @@ const mockTenant = {
 };
 
 // Setup mocks
-vi.mock("next/navigation", () => ({
-  useRouter: () => mockRouter,
-  useSearchParams: () => mockSearchParams,
-  usePathname: () => "/delegates",
-}));
-
-vi.mock("@/hooks", () => ({
-  useAddSearchParam: () => mockAddSearchParam,
-  useDeleteSearchParam: () => mockDeleteSearchParam,
-}));
-
 vi.mock("@/contexts/AgoraContext", () => ({
   useAgoraContext: () => ({
     setIsDelegatesFiltering: mockSetIsDelegatesFiltering,
@@ -67,22 +47,6 @@ describe("useDelegatesFilter", () => {
   beforeEach(() => {
     vi.resetAllMocks();
 
-    // Setup default mock implementations
-    mockRouter.push.mockImplementation(() => {});
-    mockSearchParams.get.mockImplementation(() => null);
-    mockAddSearchParam.mockImplementation(
-      (params) => `add-${params.name}-${params.value}`
-    );
-    mockDeleteSearchParam.mockImplementation((params) => {
-      if (params.name) {
-        return `delete-${params.name}`;
-      }
-      if (params.names) {
-        return `delete-multiple-${params.names.join(",")}`;
-      }
-      return "";
-    });
-
     // Reset tenant mock
     mockTenant.ui.governanceIssues = [];
     mockTenant.ui.governanceStakeholders = [];
@@ -95,7 +59,9 @@ describe("useDelegatesFilter", () => {
   });
 
   it("should initialize with correct default values", () => {
-    const { result } = renderHook(() => useDelegatesFilter());
+    const { result } = renderHook(() => useDelegatesFilter(), {
+      wrapper: withNuqsTestingAdapter({ searchParams: "" }),
+    });
 
     expect(result.current.activeFilters).toEqual([]);
     expect(result.current.hasIssues).toBe(false);
@@ -109,7 +75,9 @@ describe("useDelegatesFilter", () => {
     mockTenant.ui.governanceIssues = ["issue1", "issue2"];
     mockTenant.ui.governanceStakeholders = ["stakeholder1"];
 
-    const { result } = renderHook(() => useDelegatesFilter());
+    const { result } = renderHook(() => useDelegatesFilter(), {
+      wrapper: withNuqsTestingAdapter({ searchParams: "" }),
+    });
 
     expect(result.current.hasIssues).toBe(true);
     expect(result.current.hasStakeholders).toBe(true);
@@ -121,24 +89,20 @@ describe("useDelegatesFilter", () => {
       config: { label: "Endorsed" },
     });
 
-    const { result } = renderHook(() => useDelegatesFilter());
+    const { result } = renderHook(() => useDelegatesFilter(), {
+      wrapper: withNuqsTestingAdapter({ searchParams: "" }),
+    });
 
     expect(result.current.hasEndorsedFilter).toBe(true);
     expect(result.current.endorsedToggleConfig).toEqual({ label: "Endorsed" });
   });
 
   it("should set active filters based on URL params", () => {
-    mockSearchParams.get.mockImplementation((param) => {
-      if (param === ENDORSED_FILTER_PARAM) return "true";
-      if (param === HAS_STATEMENT_FILTER_PARAM) return "true";
-      if (param === MY_DELEGATES_FILTER_PARAM) return mockConnectedAddress;
-      return null;
+    const searchParams = `?${ENDORSED_FILTER_PARAM}=true&${HAS_STATEMENT_FILTER_PARAM}=true&${MY_DELEGATES_FILTER_PARAM}=${mockConnectedAddress}`;
+
+    const { result } = renderHook(() => useDelegatesFilter(), {
+      wrapper: withNuqsTestingAdapter({ searchParams }),
     });
-
-    const { result } = renderHook(() => useDelegatesFilter());
-
-    // Run the effect
-    act(() => {});
 
     expect(result.current.activeFilters).toContain(ENDORSED_FILTER_PARAM);
     expect(result.current.activeFilters).toContain(HAS_STATEMENT_FILTER_PARAM);
@@ -146,24 +110,21 @@ describe("useDelegatesFilter", () => {
   });
 
   it("should parse issues from URL", () => {
-    mockSearchParams.get.mockImplementation((param) => {
-      if (param === ISSUES_FILTER_PARAM) return "issue1,issue2";
-      return null;
-    });
+    const searchParams = `?${ISSUES_FILTER_PARAM}=issue1,issue2`;
 
-    const { result } = renderHook(() => useDelegatesFilter());
+    const { result } = renderHook(() => useDelegatesFilter(), {
+      wrapper: withNuqsTestingAdapter({ searchParams }),
+    });
 
     expect(result.current.issuesFromUrl).toEqual(["issue1", "issue2"]);
   });
 
   it("should parse stakeholders from URL", () => {
-    mockSearchParams.get.mockImplementation((param) => {
-      if (param === STAKEHOLDERS_FILTER_PARAM)
-        return "stakeholder1,stakeholder2";
-      return null;
-    });
+    const searchParams = `?${STAKEHOLDERS_FILTER_PARAM}=stakeholder1,stakeholder2`;
 
-    const { result } = renderHook(() => useDelegatesFilter());
+    const { result } = renderHook(() => useDelegatesFilter(), {
+      wrapper: withNuqsTestingAdapter({ searchParams }),
+    });
 
     expect(result.current.stakeholdersFromUrl).toEqual([
       "stakeholder1",
@@ -171,178 +132,101 @@ describe("useDelegatesFilter", () => {
     ]);
   });
 
-  it("should remove delegate filters when toggleFilterToUrl is called with 'all'", () => {
-    mockDeleteSearchParam.mockReturnValue(
-      "delete-multiple-endorsed,myDelegates,hasStatement"
-    );
+  it("should toggle filter when toggleFilterToUrl is called with 'all'", async () => {
+    const searchParams = `?${ENDORSED_FILTER_PARAM}=true&${MY_DELEGATES_FILTER_PARAM}=${mockConnectedAddress}&${HAS_STATEMENT_FILTER_PARAM}=true`;
 
-    const { result } = renderHook(() => useDelegatesFilter());
+    const { result } = renderHook(() => useDelegatesFilter(), {
+      wrapper: withNuqsTestingAdapter({ searchParams }),
+    });
 
-    act(() => {
-      result.current.toggleFilterToUrl("all");
+    await act(async () => {
+      await result.current.toggleFilterToUrl("all");
     });
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-    expect(mockDeleteSearchParam).toHaveBeenCalledWith({
-      names: [
-        ENDORSED_FILTER_PARAM,
-        MY_DELEGATES_FILTER_PARAM,
-        HAS_STATEMENT_FILTER_PARAM,
-      ],
-    });
-    expect(mockRouter.push).toHaveBeenCalledWith(
-      "delete-multiple-endorsed,myDelegates,hasStatement",
-      { scroll: false }
-    );
+
+    // After toggling 'all', the active filters should be empty
+    expect(result.current.activeFilters).toEqual([]);
   });
 
-  it("should remove a filter when toggleFilterToUrl is called with an active filter", () => {
-    // Setup active filter
-    mockSearchParams.get.mockImplementation((param) => {
-      if (param === ENDORSED_FILTER_PARAM) return "true";
-      return null;
+  it("should remove a filter when toggleFilterToUrl is called with an active filter", async () => {
+    const searchParams = `?${ENDORSED_FILTER_PARAM}=true`;
+
+    const { result } = renderHook(() => useDelegatesFilter(), {
+      wrapper: withNuqsTestingAdapter({ searchParams }),
     });
 
-    mockDeleteSearchParam.mockReturnValue("delete-endorsed");
+    expect(result.current.activeFilters).toContain(ENDORSED_FILTER_PARAM);
 
-    const { result } = renderHook(() => useDelegatesFilter());
-
-    // Run the effect to update activeFilters
-    act(() => {});
-
-    act(() => {
-      result.current.toggleFilterToUrl(ENDORSED_FILTER_PARAM);
+    await act(async () => {
+      await result.current.toggleFilterToUrl(ENDORSED_FILTER_PARAM);
     });
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-    expect(mockDeleteSearchParam).toHaveBeenCalledWith({
-      name: ENDORSED_FILTER_PARAM,
-    });
-    expect(mockRouter.push).toHaveBeenCalledWith("delete-endorsed", {
-      scroll: false,
-    });
+    expect(result.current.activeFilters).not.toContain(ENDORSED_FILTER_PARAM);
   });
 
-  it("should add a filter when toggleFilterToUrl is called with an inactive filter", () => {
-    mockAddSearchParam.mockReturnValue("add-hasStatement-true");
+  it("should add a filter when toggleFilterToUrl is called with an inactive filter", async () => {
+    const { result } = renderHook(() => useDelegatesFilter(), {
+      wrapper: withNuqsTestingAdapter({ searchParams: "" }),
+    });
 
-    const { result } = renderHook(() => useDelegatesFilter());
-
-    act(() => {
-      result.current.toggleFilterToUrl(HAS_STATEMENT_FILTER_PARAM);
+    await act(async () => {
+      await result.current.toggleFilterToUrl(HAS_STATEMENT_FILTER_PARAM);
     });
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-    expect(mockAddSearchParam).toHaveBeenCalledWith({
-      name: HAS_STATEMENT_FILTER_PARAM,
-      value: "true",
-    });
-    expect(mockRouter.push).toHaveBeenCalledWith("add-hasStatement-true", {
-      scroll: false,
-    });
+    expect(result.current.activeFilters).toContain(HAS_STATEMENT_FILTER_PARAM);
   });
 
-  it("should add MY_DELEGATES_FILTER_PARAM with connected wallet address", () => {
-    mockAddSearchParam.mockReturnValue(
-      `add-${MY_DELEGATES_FILTER_PARAM}-${mockConnectedAddress.toLowerCase()}`
-    );
+  it("should add MY_DELEGATES_FILTER_PARAM with connected wallet address", async () => {
+    const { result } = renderHook(() => useDelegatesFilter(), {
+      wrapper: withNuqsTestingAdapter({ searchParams: "" }),
+    });
 
-    const { result } = renderHook(() => useDelegatesFilter());
-
-    act(() => {
-      result.current.toggleFilterToUrl(MY_DELEGATES_FILTER_PARAM);
+    await act(async () => {
+      await result.current.toggleFilterToUrl(MY_DELEGATES_FILTER_PARAM);
     });
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-    expect(mockAddSearchParam).toHaveBeenCalledWith({
-      name: MY_DELEGATES_FILTER_PARAM,
-      value: mockConnectedAddress.toLowerCase(),
-    });
-    expect(mockRouter.push).toHaveBeenCalledWith(
-      `add-${MY_DELEGATES_FILTER_PARAM}-${mockConnectedAddress.toLowerCase()}`,
-      { scroll: false }
-    );
+    expect(result.current.activeFilters).toContain(MY_DELEGATES_FILTER_PARAM);
   });
 
-  it("should reset all filters when resetAllFiltersToUrl is called", () => {
-    mockDeleteSearchParam.mockReturnValue("delete-all-filters");
+  it("should reset all filters when resetAllFiltersToUrl is called", async () => {
+    const searchParams = `?${ENDORSED_FILTER_PARAM}=true&${HAS_STATEMENT_FILTER_PARAM}=true&${ISSUES_FILTER_PARAM}=issue1&${STAKEHOLDERS_FILTER_PARAM}=stakeholder1&${MY_DELEGATES_FILTER_PARAM}=${mockConnectedAddress}`;
 
-    const { result } = renderHook(() => useDelegatesFilter());
+    const { result } = renderHook(() => useDelegatesFilter(), {
+      wrapper: withNuqsTestingAdapter({ searchParams }),
+    });
 
-    act(() => {
-      result.current.resetAllFiltersToUrl();
+    await act(async () => {
+      await result.current.resetAllFiltersToUrl();
     });
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-    expect(mockDeleteSearchParam).toHaveBeenCalledWith({
-      names: [
-        ENDORSED_FILTER_PARAM,
-        HAS_STATEMENT_FILTER_PARAM,
-        ISSUES_FILTER_PARAM,
-        STAKEHOLDERS_FILTER_PARAM,
-        MY_DELEGATES_FILTER_PARAM,
-      ],
-    });
-    expect(mockRouter.push).toHaveBeenCalledWith("delete-all-filters", {
-      scroll: false,
-    });
+    expect(result.current.activeFilters).toEqual([]);
+    expect(result.current.issuesFromUrl).toEqual([]);
+    expect(result.current.stakeholdersFromUrl).toEqual([]);
   });
 
-  it("should apply multiple filters when applyFiltersToUrl is called", () => {
-    mockAddSearchParam.mockReturnValue("url-with-multiple-filters");
-
-    const { result } = renderHook(() => useDelegatesFilter());
+  it("should apply multiple filters when applyFiltersToUrl is called", async () => {
+    const { result } = renderHook(() => useDelegatesFilter(), {
+      wrapper: withNuqsTestingAdapter({ searchParams: "" }),
+    });
 
     const filters = {
-      [MY_DELEGATES_FILTER_PARAM]: true,
-      [ENDORSED_FILTER_PARAM]: true,
+      [MY_DELEGATES_FILTER_PARAM]: mockConnectedAddress.toLowerCase(),
+      [ENDORSED_FILTER_PARAM]: "true",
       [ISSUES_FILTER_PARAM]: "issue1,issue2",
     };
 
-    act(() => {
-      result.current.applyFiltersToUrl(filters);
+    await act(async () => {
+      await result.current.applyFiltersToUrl(filters);
     });
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-    expect(mockRouter.push).toHaveBeenCalledWith("url-with-multiple-filters", {
-      scroll: false,
-    });
-  });
-
-  it("should add a single filter to URL when addFilterToUrl is called", () => {
-    mockAddSearchParam.mockReturnValue("url-with-added-filter");
-
-    const { result } = renderHook(() => useDelegatesFilter());
-
-    act(() => {
-      result.current.addFilterToUrl(ISSUES_FILTER_PARAM, "issue1,issue2");
-    });
-
-    expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-    expect(mockAddSearchParam).toHaveBeenCalledWith({
-      name: ISSUES_FILTER_PARAM,
-      value: "issue1,issue2",
-    });
-    expect(mockRouter.push).toHaveBeenCalledWith("url-with-added-filter", {
-      scroll: false,
-    });
-  });
-
-  it("should remove a single filter from URL when removeFilterToUrl is called", () => {
-    mockDeleteSearchParam.mockReturnValue("url-with-removed-filter");
-
-    const { result } = renderHook(() => useDelegatesFilter());
-
-    act(() => {
-      result.current.removeFilterToUrl(ISSUES_FILTER_PARAM);
-    });
-
-    expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-    expect(mockDeleteSearchParam).toHaveBeenCalledWith({
-      name: ISSUES_FILTER_PARAM,
-    });
-    expect(mockRouter.push).toHaveBeenCalledWith("url-with-removed-filter", {
-      scroll: false,
-    });
+    expect(result.current.activeFilters).toContain(MY_DELEGATES_FILTER_PARAM);
+    expect(result.current.activeFilters).toContain(ENDORSED_FILTER_PARAM);
+    expect(result.current.issuesFromUrl).toEqual(["issue1", "issue2"]);
   });
 });

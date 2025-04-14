@@ -1,9 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { useAgoraContext } from "@/contexts/AgoraContext";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useDeleteSearchParam, useAddSearchParam } from "@/hooks";
 import { CloseIcon } from "@/components/shared/CloseIcon";
 import Tenant from "@/lib/tenant/tenant";
 import {
@@ -13,7 +10,7 @@ import {
   MY_DELEGATES_FILTER_PARAM,
   STAKEHOLDERS_FILTER_PARAM,
 } from "@/lib/constants";
-import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
+import { useDelegatesFilter } from "@/components/Delegates/DelegatesFilter/useDelegatesFilter";
 
 type FilterChipProps = {
   label: string;
@@ -46,40 +43,37 @@ export const DelegatesFilterChips = () => {
   const [activeFilters, setActiveFilters] = useState<
     { label: string; param: string; key?: string }[]
   >([]);
-  const { setIsDelegatesFiltering } = useAgoraContext();
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const deleteSearchParam = useDeleteSearchParam();
-  const addSearchParam = useAddSearchParam();
   const { ui } = Tenant.current();
-
-  const endorsedToggle = ui.toggle("delegates/endorsed-filter");
-  const endorsedToggleConfig = endorsedToggle?.config as UIEndorsedConfig;
+  const {
+    activeFilters: activeFilterParams,
+    issuesFromUrl,
+    stakeholdersFromUrl,
+    endorsedToggleConfig,
+    removeFilterToUrl,
+  } = useDelegatesFilter();
 
   useEffect(() => {
     const filters: { label: string; param: string; key?: string }[] = [];
 
     // Check for filter params
-    const endorsed = searchParams?.get(ENDORSED_FILTER_PARAM);
-    if (endorsed === "true" && endorsedToggleConfig?.showFilterLabel) {
+    if (
+      activeFilterParams.includes(ENDORSED_FILTER_PARAM) &&
+      endorsedToggleConfig?.showFilterLabel
+    ) {
       filters.push({
         label: endorsedToggleConfig.showFilterLabel,
         param: ENDORSED_FILTER_PARAM,
       });
     }
 
-    const hasStatement = searchParams?.get(HAS_STATEMENT_FILTER_PARAM);
-    if (hasStatement === "true") {
+    if (activeFilterParams.includes(HAS_STATEMENT_FILTER_PARAM)) {
       filters.push({
         label: "Has statement",
         param: HAS_STATEMENT_FILTER_PARAM,
       });
     }
 
-    const myDelegatesAddress =
-      searchParams?.get(MY_DELEGATES_FILTER_PARAM) || "";
-    const hasMyDelegates = myDelegatesAddress !== "";
-    if (hasMyDelegates) {
+    if (activeFilterParams.includes(MY_DELEGATES_FILTER_PARAM)) {
       filters.push({
         label: "My delegate(s)",
         param: MY_DELEGATES_FILTER_PARAM,
@@ -87,81 +81,59 @@ export const DelegatesFilterChips = () => {
     }
 
     // Check for issues param
-    const issuesParam = searchParams?.get(ISSUES_FILTER_PARAM);
-    if (issuesParam) {
-      const issues = issuesParam.split(",");
-      issues.forEach((issue) => {
-        if (ui.governanceIssues) {
-          const issueConfig = ui.governanceIssues.find((i) => i.key === issue);
-          if (issueConfig) {
-            filters.push({
-              label: `${issueConfig.title}`,
-              param: ISSUES_FILTER_PARAM,
-              key: issue,
-            });
-          }
+    issuesFromUrl.forEach((issue) => {
+      if (ui.governanceIssues) {
+        const issueConfig = ui.governanceIssues.find((i) => i.key === issue);
+        if (issueConfig) {
+          filters.push({
+            label: `${issueConfig.title}`,
+            param: ISSUES_FILTER_PARAM,
+            key: issue,
+          });
         }
-      });
-    }
+      }
+    });
 
     // Check for stakeholders param
-    const stakeholdersParam = searchParams?.get(STAKEHOLDERS_FILTER_PARAM);
-    if (stakeholdersParam) {
-      const stakeholdersList = stakeholdersParam.split(",");
-      stakeholdersList.forEach((stakeholder) => {
-        if (ui.governanceStakeholders) {
-          const stakeholderConfig = ui.governanceStakeholders.find(
-            (s) => s.key === stakeholder
-          );
-          if (stakeholderConfig) {
-            filters.push({
-              label: `${stakeholderConfig.title}`,
-              param: STAKEHOLDERS_FILTER_PARAM,
-              key: stakeholder,
-            });
-          }
+    stakeholdersFromUrl.forEach((stakeholder) => {
+      if (ui.governanceStakeholders) {
+        const stakeholderConfig = ui.governanceStakeholders.find(
+          (s) => s.key === stakeholder
+        );
+        if (stakeholderConfig) {
+          filters.push({
+            label: `${stakeholderConfig.title}`,
+            param: STAKEHOLDERS_FILTER_PARAM,
+            key: stakeholder,
+          });
         }
-      });
-    }
+      }
+    });
 
     setActiveFilters(filters);
   }, [
+    activeFilterParams,
+    issuesFromUrl,
+    stakeholdersFromUrl,
     endorsedToggleConfig?.showFilterLabel,
-    searchParams,
     ui.governanceIssues,
     ui.governanceStakeholders,
   ]);
 
   const clearFilter = (param: string, key?: string) => {
-    setIsDelegatesFiltering(true);
-
-    if (
-      (param === ISSUES_FILTER_PARAM || param === STAKEHOLDERS_FILTER_PARAM) &&
-      key
-    ) {
-      // For issues and stakeholders, we need to remove the specific item
-      const currentValue = searchParams?.get(param);
-      if (!currentValue) return;
-
-      const values = currentValue.split(",");
-      const newValues = values.filter((v) => v !== key);
-
-      if (newValues.length === 0) {
-        // If no values left, remove the parameter
-        router.push(deleteSearchParam({ name: param }), { scroll: false });
-      } else {
-        // Update with remaining values
-        router.push(
-          addSearchParam({
-            name: param,
-            value: newValues.join(","),
-          }),
-          { scroll: false }
-        );
-      }
+    if (key) {
+      removeFilterToUrl(param, key);
     } else {
-      // For other filters, just remove the parameter
-      router.push(deleteSearchParam({ name: param }), { scroll: false });
+      // For non-array params, we can just set them to false/empty
+      switch (param) {
+        case ENDORSED_FILTER_PARAM:
+        case HAS_STATEMENT_FILTER_PARAM:
+          removeFilterToUrl(param, "false");
+          break;
+        case MY_DELEGATES_FILTER_PARAM:
+          removeFilterToUrl(param, "");
+          break;
+      }
     }
   };
 

@@ -69,7 +69,6 @@ export const DelegatesFilter = () => {
     if (hasStakeholders && stakeholdersFromUrl.length > 0) {
       count += stakeholdersFromUrl.length;
     }
-
     return count;
   };
 

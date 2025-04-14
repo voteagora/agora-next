@@ -1,15 +1,14 @@
 import { fetchCitizens as apiFetchCitizens } from "@/app/api/common/citizens/getCitizens";
 import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/getDelegates";
-import { fetchCurrentDelegators as apiFetchCurrentDelegators } from "@/app/api/common/delegations/getDelegations";
-import CitizenCardList from "@/components/Delegates/DelegateCardList/CitzenCardList";
-import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
 import { TabsContent } from "@/components/ui/tabs";
-import { citizensFilterOptions, delegatesFilterOptions } from "@/lib/constants";
-import Tenant from "@/lib/tenant/tenant";
-import React from "react";
-import { PaginationParams } from "@/app/lib/pagination";
-import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
 import DelegateContent from "./DelegateContent";
+import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
+import { loadDelegatesSearchParams } from "@/app/delegates/search-params";
+
+import { PaginationParams } from "@/app/lib/pagination";
+import { SearchParams } from "nuqs/server";
+import { buildDelegateFilters } from "./delegateUtils";
+import CitizenCardList from "./CitzenCardList";
 
 async function fetchCitizens(
   sort: string,
@@ -22,92 +21,74 @@ async function fetchCitizens(
 }
 
 async function fetchDelegates(
-  sort: string,
   seed: number,
-  filters: any,
+  sort?: string,
+  filters?: any,
   pagination?: PaginationParams
 ) {
   "use server";
-
-  return apiFetchDelegates({ pagination, seed, sort, filters });
+  return apiFetchDelegates({ pagination, seed, sort: sort || "", filters });
 }
+const DelegateCardWrapper = async ({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) => {
+  const parsedParams = loadDelegatesSearchParams(searchParams);
 
-async function fetchDelegators(address: string) {
-  "use server";
+  // Get sort values directly from parsed params
+  const sort = parsedParams.orderBy;
+  const citizensSort = parsedParams.citizensOrderBy;
 
-  return apiFetchCurrentDelegators(address);
-}
+  // Use the utility function to build filters from parsed params
+  const filters = buildDelegateFilters(parsedParams);
 
-const DelegateCardWrapper = async ({ searchParams }: { searchParams: any }) => {
-  const { ui } = Tenant.current();
-
-  const sort =
-    Object.entries(delegatesFilterOptions).find(
-      ([, value]) => value.sort === searchParams.orderBy
-    )?.[1]?.sort || delegatesFilterOptions.weightedRandom.sort;
-  const citizensSort =
-    Object.entries(citizensFilterOptions).find(
-      ([, value]) => value.sort === searchParams.citizensOrderBy
-    )?.[1]?.sort || citizensFilterOptions.shuffle.sort;
-
-  const filters = {
-    ...(searchParams.delegatorFilter && {
-      delegator: searchParams.delegatorFilter,
-    }),
-    ...(searchParams.issueFilter && { issues: searchParams.issueFilter }),
-    ...(searchParams.stakeholderFilter && {
-      stakeholders: searchParams.stakeholderFilter,
-    }),
-    ...(searchParams.hasStatement && {
-      hasStatement: searchParams.hasStatement,
-    }),
-  };
-
-  const endorsedToggle = ui.toggle("delegates/endorsed-filter");
-  if (endorsedToggle?.enabled) {
-    const defaultFilter = (endorsedToggle.config as UIEndorsedConfig)
-      .defaultFilter;
-    filters.endorsed =
-      searchParams?.endorsedFilter === undefined
-        ? defaultFilter
-        : searchParams.endorsedFilter === "true";
-  }
-
-  const tab = searchParams.tab;
+  const tab = parsedParams.tab;
   const seed = Math.random();
   const delegates =
     tab === "citizens"
       ? await fetchCitizens(citizensSort, seed)
-      : await fetchDelegates(sort, seed, filters);
-
+      : await fetchDelegates(seed, sort, filters);
+  console.log(filters);
   return (
     <DelegateTabs>
       <TabsContent value="delegates">
         <DelegateContent
           initialDelegates={delegates}
-          fetchDelegates={async (pagination, seed) => {
+          fetchDelegates={async (
+            pagination: PaginationParams,
+            seed?: number,
+            clientSort?: string,
+            clientFilters?: any
+          ) => {
             "use server";
-            return apiFetchDelegates({ pagination, seed, sort, filters });
+            return apiFetchDelegates({
+              pagination,
+              seed,
+              sort: clientSort || "",
+              filters: clientFilters,
+            });
           }}
-          // @ts-ignore
-          fetchDelegators={fetchDelegators}
         />
       </TabsContent>
       <TabsContent value="citizens">
         <CitizenCardList
           initialDelegates={delegates}
-          fetchDelegates={async (pagination, seed) => {
+          fetchDelegates={async (
+            pagination: PaginationParams,
+            seed?: number
+          ) => {
             "use server";
-
+            // Handle the case where seed might be undefined
             return apiFetchCitizens({ pagination, seed, sort: citizensSort });
           }}
-          // @ts-ignore
-          fetchDelegators={fetchDelegators}
         />
       </TabsContent>
     </DelegateTabs>
   );
 };
+
+export default DelegateCardWrapper;
 
 export const DelegateCardLoadingState = () => {
   return (
@@ -134,5 +115,3 @@ export const DelegateCardLoadingState = () => {
     </div>
   );
 };
-
-export default DelegateCardWrapper;

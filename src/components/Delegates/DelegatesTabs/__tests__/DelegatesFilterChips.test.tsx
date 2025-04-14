@@ -5,15 +5,13 @@ import {
   DelegateFilterChip,
 } from "../DelegatesFilterChips";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useDeleteSearchParam, useAddSearchParam } from "@/hooks";
 import Tenant from "@/lib/tenant/tenant";
 import {
   ENDORSED_FILTER_PARAM,
   HAS_STATEMENT_FILTER_PARAM,
-  ISSUES_FILTER_PARAM,
   MY_DELEGATES_FILTER_PARAM,
-  STAKEHOLDERS_FILTER_PARAM,
 } from "@/lib/constants";
 
 // Mock the hooks and modules
@@ -29,6 +27,29 @@ vi.mock("@/hooks", () => ({
 
 vi.mock("@/contexts/AgoraContext", () => ({
   useAgoraContext: vi.fn(),
+}));
+
+// Mock wagmi
+vi.mock("wagmi", () => ({
+  useAccount: () => ({
+    address: "0x1234567890abcdef1234567890abcdef12345678",
+    isConnected: true,
+  }),
+}));
+
+// Mock the useDelegatesFilter hook
+const mockRemoveFilterToUrl = vi.fn();
+const mockUseDelegatesFilter = vi.fn().mockReturnValue({
+  activeFilters: [],
+  issuesFromUrl: [],
+  stakeholdersFromUrl: [],
+  endorsedToggleConfig: null,
+  removeFilterToUrl: mockRemoveFilterToUrl,
+});
+
+// Important: Mock this module before importing any components that use it
+vi.mock("@/components/Delegates/DelegatesFilter/useDelegatesFilter", () => ({
+  useDelegatesFilter: () => mockUseDelegatesFilter(),
 }));
 
 vi.mock("@/lib/tenant/tenant", () => ({
@@ -166,6 +187,16 @@ describe("DelegatesFilterChips", () => {
     (useAgoraContext as any).mockReturnValue({
       setIsDelegatesFiltering: mockSetIsDelegatesFiltering,
     });
+
+    // Reset the mock
+    mockRemoveFilterToUrl.mockClear();
+    mockUseDelegatesFilter.mockReturnValue({
+      activeFilters: [],
+      issuesFromUrl: [],
+      stakeholdersFromUrl: [],
+      endorsedToggleConfig: null,
+      removeFilterToUrl: mockRemoveFilterToUrl,
+    });
   });
 
   afterEach(() => {
@@ -173,8 +204,12 @@ describe("DelegatesFilterChips", () => {
   });
 
   it("renders nothing when no active filters", () => {
-    (useSearchParams as any).mockReturnValue({
-      get: vi.fn().mockReturnValue(null),
+    mockUseDelegatesFilter.mockReturnValue({
+      activeFilters: [],
+      issuesFromUrl: [],
+      stakeholdersFromUrl: [],
+      endorsedToggleConfig: null,
+      removeFilterToUrl: mockRemoveFilterToUrl,
     });
 
     const { container } = render(<DelegatesFilterChips />);
@@ -189,13 +224,12 @@ describe("DelegatesFilterChips", () => {
   it("renders endorsed filter chip when search params have endorsedFilter param", () => {
     setupTenantMock({ showFilterLabel: "Endorsed" });
 
-    const mockGet = vi.fn((param) => {
-      if (param === ENDORSED_FILTER_PARAM) return "true";
-      return null;
-    });
-
-    (useSearchParams as any).mockReturnValue({
-      get: mockGet,
+    mockUseDelegatesFilter.mockReturnValue({
+      activeFilters: [ENDORSED_FILTER_PARAM],
+      issuesFromUrl: [],
+      stakeholdersFromUrl: [],
+      endorsedToggleConfig: { showFilterLabel: "Endorsed" },
+      removeFilterToUrl: mockRemoveFilterToUrl,
     });
 
     render(<DelegatesFilterChips />);
@@ -209,20 +243,17 @@ describe("DelegatesFilterChips", () => {
 
     const chipButton = endorsedChip.closest("button");
     expect(chipButton).toBeInTheDocument();
-
-    expect(mockGet).toHaveBeenCalledWith(ENDORSED_FILTER_PARAM);
   });
 
   it("renders has statement filter chip when hasStatement param is true", () => {
     setupTenantMock();
 
-    const mockGet = vi.fn((param) => {
-      if (param === HAS_STATEMENT_FILTER_PARAM) return "true";
-      return null;
-    });
-
-    (useSearchParams as any).mockReturnValue({
-      get: mockGet,
+    mockUseDelegatesFilter.mockReturnValue({
+      activeFilters: [HAS_STATEMENT_FILTER_PARAM],
+      issuesFromUrl: [],
+      stakeholdersFromUrl: [],
+      endorsedToggleConfig: null,
+      removeFilterToUrl: mockRemoveFilterToUrl,
     });
 
     render(<DelegatesFilterChips />);
@@ -236,20 +267,17 @@ describe("DelegatesFilterChips", () => {
 
     const chipButton = hasStatementChip.closest("button");
     expect(chipButton).toBeInTheDocument();
-
-    expect(mockGet).toHaveBeenCalledWith(HAS_STATEMENT_FILTER_PARAM);
   });
 
   it("renders my delegates filter chip when myDelegates param is true", () => {
     setupTenantMock();
 
-    const mockGet = vi.fn((param) => {
-      if (param === MY_DELEGATES_FILTER_PARAM) return "true";
-      return null;
-    });
-
-    (useSearchParams as any).mockReturnValue({
-      get: mockGet,
+    mockUseDelegatesFilter.mockReturnValue({
+      activeFilters: [MY_DELEGATES_FILTER_PARAM],
+      issuesFromUrl: [],
+      stakeholdersFromUrl: [],
+      endorsedToggleConfig: null,
+      removeFilterToUrl: mockRemoveFilterToUrl,
     });
 
     render(<DelegatesFilterChips />);
@@ -263,8 +291,6 @@ describe("DelegatesFilterChips", () => {
 
     const chipButton = myDelegatesChip.closest("button");
     expect(chipButton).toBeInTheDocument();
-
-    expect(mockGet).toHaveBeenCalledWith(MY_DELEGATES_FILTER_PARAM);
   });
 
   it("renders issues filter chips when issues param is present", () => {
@@ -275,13 +301,12 @@ describe("DelegatesFilterChips", () => {
 
     setupTenantMock({ governanceIssues: mockIssues });
 
-    const mockGet = vi.fn((param) => {
-      if (param === ISSUES_FILTER_PARAM) return "issue1,issue2";
-      return null;
-    });
-
-    (useSearchParams as any).mockReturnValue({
-      get: mockGet,
+    mockUseDelegatesFilter.mockReturnValue({
+      activeFilters: [],
+      issuesFromUrl: ["issue1", "issue2"],
+      stakeholdersFromUrl: [],
+      endorsedToggleConfig: null,
+      removeFilterToUrl: mockRemoveFilterToUrl,
     });
 
     render(<DelegatesFilterChips />);
@@ -294,8 +319,6 @@ describe("DelegatesFilterChips", () => {
     const issue2Chip = screen.getByText("Issue 2");
     expect(issue1Chip).toBeInTheDocument();
     expect(issue2Chip).toBeInTheDocument();
-
-    expect(mockGet).toHaveBeenCalledWith(ISSUES_FILTER_PARAM);
   });
 
   it("renders stakeholders filter chips when stakeholders param is present", () => {
@@ -306,14 +329,12 @@ describe("DelegatesFilterChips", () => {
 
     setupTenantMock({ governanceStakeholders: mockStakeholders });
 
-    const mockGet = vi.fn((param) => {
-      if (param === STAKEHOLDERS_FILTER_PARAM)
-        return "stakeholder1,stakeholder2";
-      return null;
-    });
-
-    (useSearchParams as any).mockReturnValue({
-      get: mockGet,
+    mockUseDelegatesFilter.mockReturnValue({
+      activeFilters: [],
+      issuesFromUrl: [],
+      stakeholdersFromUrl: ["stakeholder1", "stakeholder2"],
+      endorsedToggleConfig: null,
+      removeFilterToUrl: mockRemoveFilterToUrl,
     });
 
     render(<DelegatesFilterChips />);
@@ -326,20 +347,17 @@ describe("DelegatesFilterChips", () => {
     const stakeholder2Chip = screen.getByText("Stakeholder 2");
     expect(stakeholder1Chip).toBeInTheDocument();
     expect(stakeholder2Chip).toBeInTheDocument();
-
-    expect(mockGet).toHaveBeenCalledWith(STAKEHOLDERS_FILTER_PARAM);
   });
 
   it("removes a filter when its chip is clicked", () => {
     setupTenantMock({ showFilterLabel: "Endorsed" });
 
-    const mockGet = vi.fn((param) => {
-      if (param === ENDORSED_FILTER_PARAM) return "true";
-      return null;
-    });
-
-    (useSearchParams as any).mockReturnValue({
-      get: mockGet,
+    mockUseDelegatesFilter.mockReturnValue({
+      activeFilters: [ENDORSED_FILTER_PARAM],
+      issuesFromUrl: [],
+      stakeholdersFromUrl: [],
+      endorsedToggleConfig: { showFilterLabel: "Endorsed" },
+      removeFilterToUrl: mockRemoveFilterToUrl,
     });
 
     const { container } = render(<DelegatesFilterChips />);
@@ -352,14 +370,10 @@ describe("DelegatesFilterChips", () => {
 
     if (buttons.length > 0) {
       fireEvent.click(buttons[0]);
-
-      expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-      expect(mockDeleteSearchParam).toHaveBeenCalledWith({
-        name: ENDORSED_FILTER_PARAM,
-      });
-      expect(mockRouter.push).toHaveBeenCalledWith("/delegates", {
-        scroll: false,
-      });
+      expect(mockRemoveFilterToUrl).toHaveBeenCalledWith(
+        ENDORSED_FILTER_PARAM,
+        "false"
+      );
     }
   });
 });

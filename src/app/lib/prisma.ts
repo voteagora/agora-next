@@ -54,30 +54,6 @@ const makePrismaClient = (databaseUrl: string) => {
         url: databaseUrl,
       },
     },
-  }).$extends({
-    query: {
-      $allModels: {
-        async $allOperations({ operation, model, args, query }) {
-          return await time_this(async () => await query(args), {
-            model,
-            operation,
-            args,
-          });
-        },
-      },
-      async $queryRaw({ args, query, operation }) {
-        return await execRaw(query, args, operation);
-      },
-      async $executeRaw({ args, query, operation }) {
-        return await execRaw(query, args, operation);
-      },
-      async $queryRawUnsafe({ args, query, operation }) {
-        return await execRaw(query, args, operation);
-      },
-      async $executeRawUnsafe({ args, query, operation }) {
-        return await execRaw(query, args, operation);
-      },
-    },
   });
 };
 

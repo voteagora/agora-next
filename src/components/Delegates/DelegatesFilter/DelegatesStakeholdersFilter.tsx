@@ -61,7 +61,7 @@ const DelegatesStakeholdersFilter = ({
     if (newValue) {
       if (!handleStakeholdersChange) {
         // If "All stakeholders" is checked, remove stakeholders param from URL
-        removeFilterToUrl(STAKEHOLDERS_FILTER_PARAM);
+        removeFilterToUrl(STAKEHOLDERS_FILTER_PARAM, "");
       } else {
         handleStakeholdersChange([]);
       }
@@ -100,7 +100,7 @@ const DelegatesStakeholdersFilter = ({
       }
     } else {
       if (!handleStakeholdersChange) {
-        removeFilterToUrl(STAKEHOLDERS_FILTER_PARAM);
+        removeFilterToUrl(STAKEHOLDERS_FILTER_PARAM, "");
       } else {
         handleStakeholdersChange([]);
       }

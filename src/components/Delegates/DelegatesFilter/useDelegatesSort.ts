@@ -1,30 +1,26 @@
-import { useRouter, useSearchParams } from "next/navigation";
-import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
+import { useQueryState } from "nuqs";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { delegatesFilterOptions } from "@/lib/constants";
 
 export const useDelegatesSort = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const addSearchParam = useAddSearchParam();
-  const deleteSearchParam = useDeleteSearchParam();
   const { setIsDelegatesFiltering } = useAgoraContext();
 
-  const orderByParam = searchParams?.get("orderBy") || "weighted_random";
+  const [orderByParam, setOrderByParam] = useQueryState("orderBy", {
+    defaultValue: delegatesFilterOptions.weightedRandom.sort,
+    clearOnDefault: true,
+  });
 
   const handleSortChange = (value: string) => {
     setIsDelegatesFiltering(true);
-    router.push(
-      value === delegatesFilterOptions.weightedRandom.sort
-        ? deleteSearchParam({ name: "orderBy" })
-        : addSearchParam({ name: "orderBy", value }),
+    setOrderByParam(
+      value === delegatesFilterOptions.weightedRandom.sort ? null : value,
       { scroll: false }
     );
   };
 
   const resetSort = () => {
     setIsDelegatesFiltering(true);
-    router.push(deleteSearchParam({ name: "orderBy" }), { scroll: false });
+    setOrderByParam(null, { scroll: false });
   };
 
   return {
