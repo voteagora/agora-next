@@ -271,6 +271,17 @@ async function getCurrentDelegatorsForAddress({
                 transaction_index DESC`;
     }
 
+
+    const delegatorsQry = `
+        WITH advanced_delegatees AS ( ${advancedDelegatorsSubQry} ),
+             direct_delegatees AS ( ${directDelegatorsSubQry} )
+        SELECT * FROM advanced_delegatees
+        UNION ALL
+        SELECT * FROM direct_delegatees
+        OFFSET $4
+        LIMIT $5;
+      `
+
     const [delegators, latestBlock] = await Promise.all([
       paginateResult(async (skip: number, take: number) => {
         return prismaWeb2Client.$queryRawUnsafe<
@@ -284,16 +295,7 @@ async function getCurrentDelegatorsForAddress({
             transaction_hash: string;
           }[]
         >(
-          `
-            WITH advanced_delegatees AS ( ${advancedDelegatorsSubQry} )
-
-            , direct_delegatees AS ( ${directDelegatorsSubQry} )
-            SELECT * FROM advanced_delegatees
-            UNION ALL
-            SELECT * FROM direct_delegatees
-            OFFSET $4
-            LIMIT $5;
-          `,
+          delegatorsQry,
           address,
           contractAddress,
           contracts.token.address,
