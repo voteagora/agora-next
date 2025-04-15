@@ -384,16 +384,24 @@ async function getDelegates({
 }
 
 async function getDelegate(addressOrENSName: string): Promise<Delegate> {
-  return withMetrics("getDelegate", async () => {
+  return withMetrics("getDelegate", async (requestId) => {
     const { namespace, contracts, slug } = Tenant.current();
+
+    console.log(
+      `[${requestId}] Processing getDelegate for address/ENS: ${addressOrENSName}`
+    );
+
     const address = isAddress(addressOrENSName)
       ? addressOrENSName.toLowerCase()
       : await ensNameToAddress(addressOrENSName);
+
+    console.log(`[${requestId}] Resolved address: ${address}`);
 
     // Eventually want to deprecate voter_stats from this query
     // we are already relying on getVoterStats below
     // but this voter_stats view includes things like for/against/abstain
     // so we can't totally pull it out
+    console.log(`[${requestId}] Fetching delegate data from database`);
     const delegateQuery = prismaWeb3Client.$queryRawUnsafe<DelegateStats[]>(
       `
         SELECT
@@ -462,11 +470,18 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       contracts.token.address
     );
 
+    console.log(
+      `[${requestId}] Fetching additional data (votable supply, quorum)`
+    );
     const [delegate, votableSupply, quorum] = await Promise.all([
       delegateQuery.then((result) => result?.[0] || undefined),
       fetchVotableSupply(),
       fetchCurrentQuorum(),
     ]);
+
+    console.log(
+      `[${requestId}] Delegate data retrieved, fetching delegation counts`
+    );
 
     const numOfAdvancedDelegationsQuery = `SELECT count(*) as num_of_delegators
             FROM ${namespace + ".advanced_delegatees"}
@@ -498,6 +513,9 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
 
                                               SELECT count(*) as num_of_delegators from latest_delegations where to_delegate = LOWER($1);`;
     } else {
+      console.error(
+        `[${requestId}] Error: Token contract is neither ERC20 nor ERC721`
+      );
       throw new Error("Token contract is neither ERC20 nor ERC721?");
     }
     var numOfDelegationsQuery;
@@ -506,6 +524,9 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       ? contracts.alligator.address
       : contracts.token.address;
 
+    console.log(
+      `[${requestId}] Executing delegation count query for delegation model: ${contracts.delegationModel}`
+    );
     if (contracts.alligator) {
       numOfDelegationsQuery = prismaWeb3Client.$queryRawUnsafe<
         { num_of_delegators: BigInt }[]
@@ -540,6 +561,9 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       delegate.num_of_delegators?.toFixed() || "0"
     );
 
+    console.log(
+      `[${requestId}] Determining number of delegators (cached: ${cachedNumOfDelegators})`
+    );
     const usedNumOfDelegators =
       cachedNumOfDelegators < 1000n
         ? BigInt(
@@ -548,11 +572,16 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
           )
         : cachedNumOfDelegators;
 
+    console.log(
+      `[${requestId}] Final number of delegators: ${usedNumOfDelegators}`
+    );
+
     const relativeVotingPowerToVotableSupply = calculateBigIntRatio(
       totalVotingPower,
       BigInt(votableSupply)
     );
 
+    console.log(`[${requestId}] Building delegate response object`);
     // Build out delegate JSON response
     return {
       address: address,
