@@ -148,7 +148,7 @@ describe("CitizensSortFilter", () => {
 
   it("should call handleSortChange when a non-default sort option is selected", () => {
     const mockHandleSortChange = vi.fn();
-    
+
     // Mock the hook to return default values and our mock function
     (useCitizensSort as any).mockReturnValue({
       orderByParam: "shuffle",
@@ -180,7 +180,7 @@ describe("CitizensSortFilter", () => {
 
   it("should call handleSortChange when the default sort option is selected", () => {
     const mockHandleSortChange = vi.fn();
-    
+
     // Mock the hook to return a non-default value and our mock function
     (useCitizensSort as any).mockReturnValue({
       orderByParam: "votes",
@@ -200,7 +200,7 @@ describe("CitizensSortFilter", () => {
 
   it("should call resetSort when reset is clicked", () => {
     const mockResetSort = vi.fn();
-    
+
     // Mock the hook to return a non-default value and our mock function
     (useCitizensSort as any).mockReturnValue({
       orderByParam: "votes",
