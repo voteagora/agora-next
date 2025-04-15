@@ -226,6 +226,10 @@ export const deriveTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "dao-node/delegate/addr",
+      enabled: true,
+    },
+    {
       name: "proposal-execute",
       enabled: true,
     },

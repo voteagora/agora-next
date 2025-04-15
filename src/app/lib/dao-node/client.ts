@@ -422,4 +422,25 @@ export const getDelegateDataFromDaoNode = async (
     console.error("Error in getDelegateDataFromDaoNode:", error);
     return null;
   }
+
+
+export const getDelegateFromDaoNode = async (address: string) => {
+  const { namespace, ui } = Tenant.current();
+  const url = getDaoNodeURLForNamespace(namespace);
+  const isDaoNodeDelegateAddressEnabled = ui.toggle(
+    "dao-node/delegate/addr"
+  )?.enabled;
+  if (!url || !isDaoNodeDelegateAddressEnabled) {
+    return null;
+  }
+
+  try {
+    const response = await fetch(`${url}v1/delegate/${address}`);
+    const data: DaoNodeDelegate = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 };
