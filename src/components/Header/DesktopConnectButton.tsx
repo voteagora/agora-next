@@ -11,15 +11,16 @@ export function DesktopConnectButton() {
           <div
             onClick={!isConnected ? () => show?.() : undefined}
             className={cn(
-              "border text-primary bg-neutral py-2 px-4 rounded-full cursor-pointer hidden sm:flex items-center transition-all hover:shadow-newDefault h-[48px]",
-              isConnected ? "border-line" : "border-primary"
+              "lg:border text-primary lg:bg-neutral py-2 px-4 rounded-full cursor-pointer hidden sm:flex items-center transition-all hover:shadow-newDefault h-[48px]",
+              isConnected ? "lg:border-line" : "lg:border-primary"
             )}
           >
             {isConnected ? (
               <DesktopProfileDropDown ensName={ensName} />
             ) : (
               <>
-                {"Connect Wallet"} <ArrowRight className="ml-3 mr-1" />
+                {"Connect Wallet"}{" "}
+                <ArrowRight className="ml-3 mr-1 hidden lg:block" />
               </>
             )}
           </div>

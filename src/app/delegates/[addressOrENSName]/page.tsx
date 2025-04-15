@@ -15,9 +15,16 @@ import Tenant from "@/lib/tenant/tenant";
 import { redirect } from "next/navigation";
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import DelegateStatementWrapper from "@/components/Delegates/DelegateStatement/DelegateStatementWrapper";
-import DelegationsContainerWrapper from "@/components/Delegates/Delegations/DelegationsContainerWrapper";
-import VotesContainerWrapper from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
+import DelegateStatementWrapper, {
+  DelegateStatementSkeleton,
+} from "@/components/Delegates/DelegateStatement/DelegateStatementWrapper";
+import DelegationsContainerWrapper, {
+  DelegationsContainerSkeleton,
+} from "@/components/Delegates/Delegations/DelegationsContainerWrapper";
+import VotesContainerWrapper, {
+  VotesContainerSkeleton,
+} from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
+import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -107,8 +114,8 @@ export default async function Page({
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
-      <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-[350px]">
+    <div className="flex flex-col md:flex-row items-center md:items-start gap-6 justify-between mt-12 w-full max-w-full">
+      <div className="flex flex-col static md:sticky top-16 shrink-0 w-full md:max-w-[330px] lg:max-w-[350px]">
         <DelegateCard
           delegate={delegate}
           description={textRecords?.description}
@@ -118,7 +125,7 @@ export default async function Page({
         />
       </div>
       {!scwDelegate ? (
-        <div className="flex flex-col sm:ml-12 min-w-0 flex-1 max-w-full">
+        <div className="flex flex-col md:ml-8 lg:ml-12 min-w-0 flex-1 max-w-full">
           <Tabs defaultValue={"statement"} className="w-full">
             <TabsList className="mb-8">
               <TabsTrigger value="statement" variant="underlined">
@@ -133,13 +140,19 @@ export default async function Page({
             </TabsList>
 
             <TabsContent value="statement">
-              <DelegateStatementWrapper delegate={delegate} />
+              <Suspense fallback={<DelegateStatementSkeleton />}>
+                <DelegateStatementWrapper delegate={delegate} />
+              </Suspense>
             </TabsContent>
             <TabsContent value="participation">
-              <VotesContainerWrapper delegate={delegate} />
+              <Suspense fallback={<VotesContainerSkeleton />}>
+                <VotesContainerWrapper delegate={delegate} />
+              </Suspense>
             </TabsContent>
             <TabsContent value="delegations">
-              <DelegationsContainerWrapper delegate={delegate} />
+              <Suspense fallback={<DelegationsContainerSkeleton />}>
+                <DelegationsContainerWrapper delegate={delegate} />
+              </Suspense>
             </TabsContent>
           </Tabs>{" "}
         </div>

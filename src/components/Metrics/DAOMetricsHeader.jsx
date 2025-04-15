@@ -69,7 +69,7 @@ export default function DAOMetricsHeader() {
                     width={82}
                     height={21}
                   />
-                  <span className="text-base text-primary font-medium">
+                  <span className="text-base text-primary font-medium hidden lg:inline">
                     Onchain Governance
                   </span>
                 </div>
@@ -108,7 +108,10 @@ export default function DAOMetricsHeader() {
                     </a>
                   )}
                   {changeLogLink && (
-                    <Link href={changeLogLink.url} className="text-center">
+                    <Link
+                      href={changeLogLink.url}
+                      className="text-center hidden lg:inline"
+                    >
                       {changeLogLink.title}
                     </Link>
                   )}
@@ -117,7 +120,7 @@ export default function DAOMetricsHeader() {
                       href={faqLink.url}
                       rel="noreferrer nonopener"
                       target="_blank"
-                      className="text-center"
+                      className="text-center hidden lg:inline"
                     >
                       {faqLink.title}
                     </a>

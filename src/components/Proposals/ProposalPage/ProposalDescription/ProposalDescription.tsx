@@ -56,7 +56,7 @@ export default function ProposalDescription({
   const option = options?.[0];
 
   return (
-    <div className={`flex flex-col gap-4 ${styles.proposal_description}`}>
+    <div className={`flex flex-col gap-4`}>
       <ProposalTitle title={shortTitle} proposal={proposal} />
       <ProposalChart proposal={proposal} />
 

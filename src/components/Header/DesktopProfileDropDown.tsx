@@ -26,10 +26,12 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
               onClick={() => setShouldHydrate(true)}
             >
               <div className="text-primary flex items-center gap-3">
-                <div className="w-6 h-6 shadow-newDefault rounded-full flex">
+                <div className="w-[30px] h-[30px] lg:w-6 lg:h-6 shadow-newDefault rounded-full flex">
                   <ENSAvatar ensName={ensName} />
                 </div>
-                {address && <ENSName address={address} />}
+                <div className="hidden lg:inline">
+                  {address && <ENSName address={address} />}
+                </div>
               </div>
             </Popover.Button>
 

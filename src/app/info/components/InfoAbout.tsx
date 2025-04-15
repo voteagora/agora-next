@@ -115,7 +115,7 @@ const InfoAbout = () => {
                 key={index}
                 className="flex flex-row gap-3 justify-center items-center mt-3"
               >
-                <div className="min-w-[72px] h-[72px] flex justify-center items-center rounded-full border border-line bg-tertiary/10">
+                <div className="min-w-[72px] h-[72px] flex justify-center items-center rounded-full border border-line bg-tertiary/10 flex sm:hidden lg:flex">
                   {item.icon}
                 </div>
                 <div>
