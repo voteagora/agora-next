@@ -4,7 +4,6 @@ import DelegateCardWrapper, {
   DelegateCardLoadingState,
 } from "@/components/Delegates/DelegateCardList/DelegateCardWrapper";
 import Hero from "@/components/Hero/Hero";
-import { loadDelegatesSearchParams } from "./search-params";
 
 export async function generateMetadata({}, parent) {
   const { ui } = Tenant.current();
@@ -36,7 +35,6 @@ export async function generateMetadata({}, parent) {
 }
 
 export default async function Page({ searchParams }) {
-  // Load the search params using nuqs server loader
   return (
     <section>
       <Hero page="delegates" />

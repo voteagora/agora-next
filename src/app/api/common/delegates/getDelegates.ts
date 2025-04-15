@@ -385,203 +385,22 @@ async function getDelegates({
       // components
       return {
         meta,
-        data: await processDelegatesWithDelegators(
-          delegates,
-          namespace,
-          contracts
-        ),
+        data: delegates.map((delegate) => ({
+          address: delegate.delegate,
+          votingPower: {
+            total: delegate.voting_power?.toFixed(0) || "0",
+            direct: delegate.direct_vp?.toFixed(0) || "0",
+            advanced: delegate.advanced_vp?.toFixed(0) || "0",
+          },
+          citizen: delegate.citizen,
+          statement: delegate.statement,
+          numOfDelegators: BigInt(delegate.num_of_delegators || "0"),
+        })),
         seed,
       };
     },
     { sort }
   );
-}
-
-async function processDelegatesWithDelegators(
-  delegates: DelegatesGetPayload[],
-  namespace: string,
-  contracts: any
-) {
-  // Prepare queries once for all delegates
-  const numOfAdvancedDelegationsQuery = `SELECT count(*) as num_of_delegators, "to" as delegate_address
-    FROM ${namespace + ".advanced_delegatees"}
-    WHERE "to" = ANY($1) AND contract=$2 AND delegated_amount > 0
-    GROUP BY "to"`;
-
-  let numOfDirectDelegationsQuery;
-  if (contracts.token.isERC20()) {
-    numOfDirectDelegationsQuery = `
-      SELECT 
-        delegate_address,
-        SUM(num_delegators) as num_of_delegators
-      FROM (
-        SELECT 
-          to_delegate as delegate_address,
-          COUNT(*) as num_delegators
-        FROM ${namespace + ".delegate_changed_events"}
-        WHERE to_delegate = ANY($1) AND address=$2
-        GROUP BY to_delegate
-        
-        UNION ALL
-        
-        SELECT 
-          from_delegate as delegate_address,
-          -COUNT(*) as num_delegators
-        FROM ${namespace + ".delegate_changed_events"}
-        WHERE from_delegate = ANY($1) AND address=$2
-        GROUP BY from_delegate
-      ) t
-      GROUP BY delegate_address`;
-  } else if (contracts.token.isERC721()) {
-    numOfDirectDelegationsQuery = `
-      WITH latest_delegations AS (
-        SELECT DISTINCT ON (delegator)
-            delegator,
-            to_delegate,
-            chain_id,
-            address,
-            block_number,
-            transaction_index,
-            log_index
-        FROM
-            ${namespace}.delegate_changed_events 
-        WHERE address = $2 AND to_delegate = ANY($1)
-        ORDER BY
-            delegator,
-            block_number DESC,
-            transaction_index DESC,
-            log_index DESC
-      )
-      SELECT to_delegate as delegate_address, count(*) as num_of_delegators 
-      FROM latest_delegations 
-      GROUP BY to_delegate`;
-  } else {
-    throw new Error("Token contract is neither ERC20 nor ERC721?");
-  }
-
-  const partialDelegationContract = contracts.alligator
-    ? contracts.alligator.address
-    : contracts.token.address;
-
-  // Filter delegates that need recalculation (cached count < 1000)
-  const delegatesNeedingRecalculation = delegates.filter(
-    (delegate) => BigInt(delegate.num_of_delegators || "0") < 1000n
-  );
-
-  // If no delegates need recalculation, return the processed delegates with cached counts
-  if (delegatesNeedingRecalculation.length === 0) {
-    return delegates.map((delegate) => ({
-      address: delegate.delegate,
-      votingPower: {
-        total: delegate.voting_power?.toFixed(0) || "0",
-        direct: delegate.direct_vp?.toFixed(0) || "0",
-        advanced: delegate.advanced_vp?.toFixed(0) || "0",
-      },
-      citizen: delegate.citizen,
-      statement: delegate.statement,
-      numOfDelegators: BigInt(delegate.num_of_delegators || "0"),
-    }));
-  }
-
-  // Extract addresses for batch query
-  const delegateAddresses = delegatesNeedingRecalculation.map(
-    (d) => d.delegate
-  );
-
-  // Execute the appropriate batch query based on contract type
-  let delegatorCounts: Record<string, bigint> = {};
-
-  if (contracts.alligator) {
-    // For alligator contracts, we need to combine both queries
-    const advancedQuery = await prismaWeb3Client.$queryRawUnsafe<
-      { num_of_delegators: BigInt; delegate_address: string }[]
-    >(
-      numOfAdvancedDelegationsQuery,
-      delegateAddresses,
-      partialDelegationContract
-    );
-
-    const directQuery = await prismaWeb3Client.$queryRawUnsafe<
-      { num_of_delegators: BigInt; delegate_address: string }[]
-    >(
-      numOfDirectDelegationsQuery,
-      delegateAddresses,
-      partialDelegationContract
-    );
-
-    // Combine results from both queries
-    const combinedResults: Record<string, bigint> = {};
-
-    advancedQuery.forEach((row) => {
-      const address = row.delegate_address.toLowerCase();
-      combinedResults[address] =
-        (combinedResults[address] || 0n) +
-        BigInt(row.num_of_delegators.toString() || "0");
-    });
-
-    directQuery.forEach((row) => {
-      const address = row.delegate_address.toLowerCase();
-      combinedResults[address] =
-        (combinedResults[address] || 0n) +
-        BigInt(row.num_of_delegators.toString() || "0");
-    });
-
-    delegatorCounts = combinedResults;
-  } else if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
-    // For partial delegation model, use advanced delegations query
-    const results = await prismaWeb3Client.$queryRawUnsafe<
-      { num_of_delegators: BigInt; delegate_address: string }[]
-    >(
-      numOfAdvancedDelegationsQuery,
-      delegateAddresses,
-      partialDelegationContract
-    );
-
-    results.forEach((row) => {
-      delegatorCounts[row.delegate_address.toLowerCase()] = BigInt(
-        row.num_of_delegators.toString() || "0"
-      );
-    });
-  } else {
-    // For direct delegation model, use direct delegations query
-    const results = await prismaWeb3Client.$queryRawUnsafe<
-      { num_of_delegators: BigInt; delegate_address: string }[]
-    >(
-      numOfDirectDelegationsQuery,
-      delegateAddresses,
-      partialDelegationContract
-    );
-
-    results.forEach((row) => {
-      delegatorCounts[row.delegate_address.toLowerCase()] = BigInt(
-        row.num_of_delegators.toString() || "0"
-      );
-    });
-  }
-
-  // Process all delegates with the batch results
-  return delegates.map((delegate) => {
-    const delegateAddress = delegate.delegate.toLowerCase();
-    const cachedNumOfDelegators = BigInt(delegate.num_of_delegators || "0");
-
-    // Use the batch result if available, otherwise use cached value
-    const numOfDelegators =
-      cachedNumOfDelegators < 1000n
-        ? delegatorCounts[delegateAddress] || 0n
-        : cachedNumOfDelegators;
-
-    return {
-      address: delegate.delegate,
-      votingPower: {
-        total: delegate.voting_power?.toFixed(0) || "0",
-        direct: delegate.direct_vp?.toFixed(0) || "0",
-        advanced: delegate.advanced_vp?.toFixed(0) || "0",
-      },
-      citizen: delegate.citizen,
-      statement: delegate.statement,
-      numOfDelegators,
-    };
-  });
 }
 
 async function getDelegate(addressOrENSName: string): Promise<Delegate> {

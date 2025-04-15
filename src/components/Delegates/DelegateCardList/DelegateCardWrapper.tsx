@@ -65,7 +65,7 @@ const DelegateCardWrapper = async ({
           initialDelegates={delegates}
           fetchDelegates={async (
             pagination: PaginationParams,
-            seed?: number
+            seed: number
           ) => {
             "use server";
             // Handle the case where seed might be undefined
@@ -80,8 +80,6 @@ const DelegateCardWrapper = async ({
     </DelegateTabs>
   );
 };
-
-export default DelegateCardWrapper;
 
 export const DelegateCardLoadingState = () => {
   return (
@@ -109,3 +107,5 @@ export const DelegateCardLoadingState = () => {
     </div>
   );
 };
+
+export default DelegateCardWrapper;

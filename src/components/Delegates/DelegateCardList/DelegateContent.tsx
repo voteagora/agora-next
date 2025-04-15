@@ -10,9 +10,7 @@ interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
   fetchDelegates: (
     pagination: PaginationParams,
-    seed?: number,
-    clientSort?: string,
-    clientFilters?: any
+    seed?: number
   ) => Promise<PaginatedResult<DelegateChunk[]>>;
 }
 
