@@ -1,10 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { citizensFilterOptions } from "@/lib/constants";
-import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
-import { useRouter } from "next/navigation";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import FilterResetListbox from "@/components/common/FilterResetListbox";
 import { SortIcon } from "@/icons/Sort";
@@ -12,34 +9,18 @@ import Tenant from "@/lib/tenant/tenant";
 import { rgbStringToHex } from "@/app/lib/utils/color";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { SortOption } from "./FilterSortOption";
+import { useCitizensSort } from "./useCitizensSort";
 
 export default function CitizensSortFilter() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const addSearchParam = useAddSearchParam();
-  const deleteSearchParam = useDeleteSearchParam();
-  const { ui } = Tenant.current();
   const { setIsDelegatesFiltering } = useAgoraContext();
-
+  const { ui } = Tenant.current();
   const [isOpen, setIsOpen] = useState(false);
-  const orderByParam = searchParams?.get("citizensOrderBy") || "shuffle";
+  const { orderByParam, handleSortChange, resetSort } = useCitizensSort();
 
   const handleChange = (value: string) => {
     setIsDelegatesFiltering(true);
-    router.push(
-      value !== "shuffle"
-        ? addSearchParam({ name: "citizensOrderBy", value })
-        : deleteSearchParam({ name: "citizensOrderBy" }),
-      { scroll: false }
-    );
+    handleSortChange(value);
     setIsOpen(false);
-  };
-
-  const resetSort = (e: React.MouseEvent) => {
-    setIsDelegatesFiltering(true);
-    router.push(deleteSearchParam({ name: "citizensOrderBy" }), {
-      scroll: false,
-    });
   };
 
   return (
@@ -55,7 +36,7 @@ export default function CitizensSortFilter() {
     >
       <div className="self-stretch p-3 flex flex-col gap-2">
         <DropdownMenu.RadioGroup
-          value={orderByParam}
+          value={orderByParam || "shuffle"}
           onValueChange={(value) => handleChange(value)}
         >
           {Object.keys(citizensFilterOptions).map((key) => (
@@ -71,7 +52,7 @@ export default function CitizensSortFilter() {
               }
               checked={
                 citizensFilterOptions[key as keyof typeof citizensFilterOptions]
-                  .sort === orderByParam
+                  .sort === (orderByParam || "shuffle")
               }
             />
           ))}

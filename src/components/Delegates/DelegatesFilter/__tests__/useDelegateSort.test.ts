@@ -44,7 +44,9 @@ describe("useDelegatesSort", () => {
     });
 
     await act(async () => {
-      await result.current.handleSortChange(delegatesFilterOptions.weightedRandom.sort);
+      await result.current.handleSortChange(
+        delegatesFilterOptions.weightedRandom.sort
+      );
     });
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
@@ -60,7 +62,7 @@ describe("useDelegatesSort", () => {
     });
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-    
+
     // Check that the orderByParam was updated
     expect(result.current.orderByParam).toBe("votes");
   });
@@ -78,7 +80,7 @@ describe("useDelegatesSort", () => {
     });
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-    
+
     // Verify the value was reset
     expect(result.current.orderByParam).toBe("weighted_random");
   });
