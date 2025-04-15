@@ -3,30 +3,18 @@ import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import CitizensSortFilter from "../CitizensSortFilter";
 import { citizensFilterOptions } from "@/lib/constants";
 
+// Mock the useCitizensSort hook
+vi.mock("../useCitizensSort", () => ({
+  useCitizensSort: vi.fn(),
+}));
+
+// Import the actual hook implementation for type checking
+import { useCitizensSort } from "../useCitizensSort";
+
 // Mock dependencies
-const mockRouter = {
-  push: vi.fn(),
-};
-
-const mockSearchParams = {
-  get: vi.fn(),
-};
-
-const mockAddSearchParam = vi.fn();
-const mockDeleteSearchParam = vi.fn();
 const mockSetIsDelegatesFiltering = vi.fn();
 
 // Setup mocks
-vi.mock("next/navigation", () => ({
-  useRouter: () => mockRouter,
-  useSearchParams: () => mockSearchParams,
-}));
-
-vi.mock("@/hooks", () => ({
-  useAddSearchParam: () => mockAddSearchParam,
-  useDeleteSearchParam: () => mockDeleteSearchParam,
-}));
-
 vi.mock("@/contexts/AgoraContext", () => ({
   useAgoraContext: () => ({
     setIsDelegatesFiltering: mockSetIsDelegatesFiltering,
@@ -98,14 +86,8 @@ vi.mock("@/components/ui/dropdown-menu", () => ({
 describe("CitizensSortFilter", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    mockRouter.push.mockImplementation(() => {});
-    mockSearchParams.get.mockImplementation(() => null);
-    mockAddSearchParam.mockImplementation(
-      (params) => `add-${params.name}-${params.value}`
-    );
-    mockDeleteSearchParam.mockImplementation(
-      (params) => `delete-${params.name}`
-    );
+    // Reset the mock implementation for useCitizensSort
+    (useCitizensSort as any).mockReset();
   });
 
   afterEach(() => {
@@ -113,7 +95,12 @@ describe("CitizensSortFilter", () => {
   });
 
   it("should render with default sort option", () => {
-    mockSearchParams.get.mockReturnValue(null);
+    // Mock the hook to return default values
+    (useCitizensSort as any).mockReturnValue({
+      orderByParam: "shuffle",
+      handleSortChange: vi.fn(),
+      resetSort: vi.fn(),
+    });
 
     render(<CitizensSortFilter />);
 
@@ -122,7 +109,12 @@ describe("CitizensSortFilter", () => {
   });
 
   it("should use 'shuffle' as the default sort option when no search param exists", () => {
-    mockSearchParams.get.mockReturnValue(null);
+    // Mock the hook to return default values
+    (useCitizensSort as any).mockReturnValue({
+      orderByParam: "shuffle",
+      handleSortChange: vi.fn(),
+      resetSort: vi.fn(),
+    });
 
     render(<CitizensSortFilter />);
 
@@ -136,21 +128,34 @@ describe("CitizensSortFilter", () => {
     );
   });
 
-  it("should use the sort option from search params when it exists", () => {
-    mockSearchParams.get.mockReturnValue("votes");
+  it("should use the sort option from hook when it exists", () => {
+    // Mock the hook to return a specific value
+    (useCitizensSort as any).mockReturnValue({
+      orderByParam: "votes",
+      handleSortChange: vi.fn(),
+      resetSort: vi.fn(),
+    });
 
     render(<CitizensSortFilter />);
     fireEvent.click(screen.getByTestId("trigger-button"));
 
-    // The radio group should have the value from search params
+    // The radio group should have the value from the hook
     expect(screen.getByTestId("radio-group")).toHaveAttribute(
       "data-value",
       "votes"
     );
   });
 
-  it("should call setIsDelegatesFiltering and router.push with addSearchParam when a non-default sort option is selected", () => {
-    mockSearchParams.get.mockReturnValue(null);
+  it("should call handleSortChange when a non-default sort option is selected", () => {
+    const mockHandleSortChange = vi.fn();
+    
+    // Mock the hook to return default values and our mock function
+    (useCitizensSort as any).mockReturnValue({
+      orderByParam: "shuffle",
+      handleSortChange: mockHandleSortChange,
+      resetSort: vi.fn(),
+    });
+
     const nonDefaultOption = Object.keys(citizensFilterOptions).find(
       (key) =>
         citizensFilterOptions[key as keyof typeof citizensFilterOptions]
@@ -163,8 +168,6 @@ describe("CitizensSortFilter", () => {
         ].sort
       : "most_voting_power";
 
-    mockAddSearchParam.mockReturnValue(`add-citizensOrderBy-${optionValue}`);
-
     render(<CitizensSortFilter />);
     fireEvent.click(screen.getByTestId("trigger-button"));
 
@@ -172,19 +175,18 @@ describe("CitizensSortFilter", () => {
     fireEvent.click(screen.getByTestId(`radio-option-${optionValue}`));
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-    expect(mockAddSearchParam).toHaveBeenCalledWith({
-      name: "citizensOrderBy",
-      value: optionValue,
-    });
-    expect(mockRouter.push).toHaveBeenCalledWith(
-      `add-citizensOrderBy-${optionValue}`,
-      { scroll: false }
-    );
+    expect(mockHandleSortChange).toHaveBeenCalledWith(optionValue);
   });
 
-  it("should call setIsDelegatesFiltering and router.push with deleteSearchParam when the default sort option is selected", () => {
-    mockSearchParams.get.mockReturnValue("votes");
-    mockDeleteSearchParam.mockReturnValue("delete-citizensOrderBy");
+  it("should call handleSortChange when the default sort option is selected", () => {
+    const mockHandleSortChange = vi.fn();
+    
+    // Mock the hook to return a non-default value and our mock function
+    (useCitizensSort as any).mockReturnValue({
+      orderByParam: "votes",
+      handleSortChange: mockHandleSortChange,
+      resetSort: vi.fn(),
+    });
 
     render(<CitizensSortFilter />);
     fireEvent.click(screen.getByTestId("trigger-button"));
@@ -193,32 +195,32 @@ describe("CitizensSortFilter", () => {
     fireEvent.click(screen.getByTestId("radio-option-shuffle"));
 
     expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-    expect(mockDeleteSearchParam).toHaveBeenCalledWith({
-      name: "citizensOrderBy",
-    });
-    expect(mockRouter.push).toHaveBeenCalledWith("delete-citizensOrderBy", {
-      scroll: false,
-    });
+    expect(mockHandleSortChange).toHaveBeenCalledWith("shuffle");
   });
 
-  it("should call setIsDelegatesFiltering and router.push with deleteSearchParam when reset is clicked", () => {
-    mockSearchParams.get.mockReturnValue("votes");
-    mockDeleteSearchParam.mockReturnValue("delete-citizensOrderBy");
+  it("should call resetSort when reset is clicked", () => {
+    const mockResetSort = vi.fn();
+    
+    // Mock the hook to return a non-default value and our mock function
+    (useCitizensSort as any).mockReturnValue({
+      orderByParam: "votes",
+      handleSortChange: vi.fn(),
+      resetSort: mockResetSort,
+    });
 
     render(<CitizensSortFilter />);
     fireEvent.click(screen.getByTestId("reset-button"));
 
-    expect(mockSetIsDelegatesFiltering).toHaveBeenCalledWith(true);
-    expect(mockDeleteSearchParam).toHaveBeenCalledWith({
-      name: "citizensOrderBy",
-    });
-    expect(mockRouter.push).toHaveBeenCalledWith("delete-citizensOrderBy", {
-      scroll: false,
-    });
+    expect(mockResetSort).toHaveBeenCalled();
   });
 
   it("should render all sort options from citizensFilterOptions", () => {
-    mockSearchParams.get.mockReturnValue(null);
+    // Mock the hook to return default values
+    (useCitizensSort as any).mockReturnValue({
+      orderByParam: "shuffle",
+      handleSortChange: vi.fn(),
+      resetSort: vi.fn(),
+    });
 
     render(<CitizensSortFilter />);
     fireEvent.click(screen.getByTestId("trigger-button"));
@@ -234,7 +236,13 @@ describe("CitizensSortFilter", () => {
   });
 
   it("should close the dropdown after selecting an option", () => {
-    mockSearchParams.get.mockReturnValue(null);
+    // Mock the hook to return default values
+    (useCitizensSort as any).mockReturnValue({
+      orderByParam: "shuffle",
+      handleSortChange: vi.fn(),
+      resetSort: vi.fn(),
+    });
+
     const nonDefaultOption = Object.keys(citizensFilterOptions).find(
       (key) =>
         citizensFilterOptions[key as keyof typeof citizensFilterOptions]
