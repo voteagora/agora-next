@@ -188,7 +188,23 @@ async function getCurrentDelegatorsForAddress({
                                     AND ghost."from" = $2`;
     }
 
-    if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
+    if (namespace === TENANT_NAMESPACES.OPTIMISM) { // This case is actually, just any tenant that has a delegatees_mat view working and compatible.
+      directDelegatorsSubQry = `  SELECT
+                                    "from",
+                                    "to",
+                                    NULL::numeric AS allowance,
+                                    'DIRECT' AS type,
+                                    block_number,
+                                    'FULL' AS amount,
+                                    transaction_hash
+                                  FROM
+                                    ${namespace}.delegatees_mat
+                                  WHERE
+                                      address = $3 AND
+                                      "to" = $1
+                                  ORDER BY
+                                    block_number DESC`
+    } else if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
       directDelegatorsSubQry = `WITH ghost as (SELECT
                   null::text as "from",
                   null::text as "to",
