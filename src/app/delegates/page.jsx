@@ -37,7 +37,6 @@ export async function generateMetadata({}, parent) {
 
 export default async function Page({ searchParams }) {
   // Load the search params using nuqs server loader
-  const parsedParams = loadDelegatesSearchParams(searchParams);
   return (
     <section>
       <Hero page="delegates" />

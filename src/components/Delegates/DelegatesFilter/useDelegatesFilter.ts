@@ -18,6 +18,10 @@ import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
 import { useAccount } from "wagmi";
 
 const emptyArray: string[] = [];
+const nuqsOptions = {
+  scroll: false,
+  shallow: false,
+};
 
 export const useDelegatesFilter = () => {
   const { ui } = Tenant.current();
@@ -87,24 +91,25 @@ export const useDelegatesFilter = () => {
       // Remove the filter
       switch (filter) {
         case ENDORSED_FILTER_PARAM:
-          return setEndorsed(false, { scroll: false });
+          return setEndorsed(false, nuqsOptions);
         case HAS_STATEMENT_FILTER_PARAM:
-          return setHasStatement(false, { scroll: false });
+          return setHasStatement(false, nuqsOptions);
         case MY_DELEGATES_FILTER_PARAM:
-          return setMyDelegatesAddress(null, { scroll: false });
+          return setMyDelegatesAddress(null, nuqsOptions);
       }
     } else {
       // Add the filter
       switch (filter) {
         case ENDORSED_FILTER_PARAM:
-          return setEndorsed(true, { scroll: false });
+          return setEndorsed(true, nuqsOptions);
         case HAS_STATEMENT_FILTER_PARAM:
-          return setHasStatement(true, { scroll: false });
+          return setHasStatement(true, nuqsOptions);
         case MY_DELEGATES_FILTER_PARAM:
           if (connectedAddress) {
-            return setMyDelegatesAddress(connectedAddress.toLowerCase(), {
-              scroll: false,
-            });
+            return setMyDelegatesAddress(
+              connectedAddress.toLowerCase(),
+              nuqsOptions
+            );
           }
           break;
       }
@@ -122,22 +127,20 @@ export const useDelegatesFilter = () => {
 
       if (ENDORSED_FILTER_PARAM in filters) {
         updates.push(
-          setEndorsed(!!filters[ENDORSED_FILTER_PARAM], { scroll: false })
+          setEndorsed(!!filters[ENDORSED_FILTER_PARAM], nuqsOptions)
         );
       }
 
       if (HAS_STATEMENT_FILTER_PARAM in filters) {
         updates.push(
-          setHasStatement(!!filters[HAS_STATEMENT_FILTER_PARAM], {
-            scroll: false,
-          })
+          setHasStatement(!!filters[HAS_STATEMENT_FILTER_PARAM], nuqsOptions)
         );
       }
 
       if (MY_DELEGATES_FILTER_PARAM in filters) {
         const value = filters[MY_DELEGATES_FILTER_PARAM];
         updates.push(
-          setMyDelegatesAddress(value ? String(value) : null, { scroll: false })
+          setMyDelegatesAddress(value ? String(value) : null, nuqsOptions)
         );
       }
 
@@ -145,7 +148,7 @@ export const useDelegatesFilter = () => {
         const value = filters[ISSUES_FILTER_PARAM];
         if (typeof value === "string") {
           updates.push(
-            setIssuesParam(value ? value.split(",") : [], { scroll: false })
+            setIssuesParam(value ? value.split(",") : [], nuqsOptions)
           );
         }
       }
@@ -154,9 +157,7 @@ export const useDelegatesFilter = () => {
         const value = filters[STAKEHOLDERS_FILTER_PARAM];
         if (typeof value === "string") {
           updates.push(
-            setStakeholdersParam(value ? value.split(",") : [], {
-              scroll: false,
-            })
+            setStakeholdersParam(value ? value.split(",") : [], nuqsOptions)
           );
         }
       }
@@ -180,11 +181,11 @@ export const useDelegatesFilter = () => {
     setIsDelegatesFiltering(true);
 
     const updates = [
-      setEndorsed(false, { scroll: false }),
-      setHasStatement(false, { scroll: false }),
-      setMyDelegatesAddress(null, { scroll: false }),
-      setIssuesParam([], { scroll: false }),
-      setStakeholdersParam([], { scroll: false }),
+      setEndorsed(false, nuqsOptions),
+      setHasStatement(false, nuqsOptions),
+      setMyDelegatesAddress(null, nuqsOptions),
+      setIssuesParam([], nuqsOptions),
+      setStakeholdersParam([], nuqsOptions),
     ];
 
     return Promise.all(updates).then(([endorsedParams]) => {
@@ -198,25 +199,15 @@ export const useDelegatesFilter = () => {
 
     switch (filter) {
       case ISSUES_FILTER_PARAM:
-        return setIssuesParam(
-          (prev) => {
-            const prevArray = prev || [];
-            return [...prevArray, value];
-          },
-          {
-            scroll: false,
-          }
-        );
+        return setIssuesParam((prev) => {
+          const prevArray = prev || [];
+          return [...prevArray, value];
+        }, nuqsOptions);
       case STAKEHOLDERS_FILTER_PARAM:
-        return setStakeholdersParam(
-          (prev) => {
-            const prevArray = prev || [];
-            return [...prevArray, value];
-          },
-          {
-            scroll: false,
-          }
-        );
+        return setStakeholdersParam((prev) => {
+          const prevArray = prev || [];
+          return [...prevArray, value];
+        }, nuqsOptions);
     }
 
     // Return a resolved promise if no action was taken
@@ -229,21 +220,15 @@ export const useDelegatesFilter = () => {
 
       switch (filter) {
         case ISSUES_FILTER_PARAM:
-          return setIssuesParam(
-            (prev) => {
-              const prevArray = prev || [];
-              return prevArray.filter((v) => v !== value);
-            },
-            { scroll: false }
-          );
+          return setIssuesParam((prev) => {
+            const prevArray = prev || [];
+            return prevArray.filter((v) => v !== value);
+          }, nuqsOptions);
         case STAKEHOLDERS_FILTER_PARAM:
-          return setStakeholdersParam(
-            (prev) => {
-              const prevArray = prev || [];
-              return prevArray.filter((v) => v !== value);
-            },
-            { scroll: false }
-          );
+          return setStakeholdersParam((prev) => {
+            const prevArray = prev || [];
+            return prevArray.filter((v) => v !== value);
+          }, nuqsOptions);
       }
       // Return a resolved promise if no action was taken
       return Promise.resolve(new URLSearchParams());

@@ -14,13 +14,13 @@ export const useDelegatesSort = () => {
     setIsDelegatesFiltering(true);
     setOrderByParam(
       value === delegatesFilterOptions.weightedRandom.sort ? null : value,
-      { scroll: false }
+      { scroll: false, shallow: false }
     );
   };
 
   const resetSort = () => {
     setIsDelegatesFiltering(true);
-    setOrderByParam(null, { scroll: false });
+    setOrderByParam(null, { scroll: false, shallow: false });
   };
 
   return {

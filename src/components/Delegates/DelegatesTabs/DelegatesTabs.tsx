@@ -26,7 +26,7 @@ export default function DelegatesTabs({ children }: { children: ReactNode }) {
   });
   const [layout, setLayout] = useQueryState("layout", {
     defaultValue: "grid",
-    shallow: true,
+    shallow: false,
   });
 
   const { ui } = Tenant.current();

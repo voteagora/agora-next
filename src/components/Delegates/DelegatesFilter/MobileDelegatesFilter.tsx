@@ -115,39 +115,20 @@ export const MobileDelegatesFilter = () => {
   };
 
   const applyAllFilters = () => {
-    // Apply sort parameter if it's not the default
-    if (tempSortParam !== "weighted_random") {
-      applyFiltersToUrl({
-        orderBy: tempSortParam,
-        [MY_DELEGATES_FILTER_PARAM]: tempMyDelegates
-          ? connectedAddress || ""
-          : false, // this should only be shown if there is a connected address
-        [ENDORSED_FILTER_PARAM]: tempEndorsed,
-        [HAS_STATEMENT_FILTER_PARAM]: tempHasStatement,
-        [ISSUES_FILTER_PARAM]:
-          selectedIssues.length > 0 ? getIssuesString(selectedIssues) : "",
-        [STAKEHOLDERS_FILTER_PARAM]:
-          selectedStakeholders.length > 0
-            ? getStakeholdersString(selectedStakeholders)
-            : "",
-      });
-    } else {
-      // If sort is default, remove the orderBy parameter
-      applyFiltersToUrl({
-        orderBy: false, // This will remove the parameter
-        [MY_DELEGATES_FILTER_PARAM]: tempMyDelegates
-          ? connectedAddress || ""
-          : false,
-        [ENDORSED_FILTER_PARAM]: tempEndorsed,
-        [HAS_STATEMENT_FILTER_PARAM]: tempHasStatement,
-        [ISSUES_FILTER_PARAM]:
-          selectedIssues.length > 0 ? getIssuesString(selectedIssues) : "",
-        [STAKEHOLDERS_FILTER_PARAM]:
-          selectedStakeholders.length > 0
-            ? getStakeholdersString(selectedStakeholders)
-            : "",
-      });
-    }
+    applyFiltersToUrl({
+      orderBy: tempSortParam !== "weighted_random" ? tempSortParam : false,
+      [MY_DELEGATES_FILTER_PARAM]: tempMyDelegates
+        ? connectedAddress || ""
+        : false,
+      [ENDORSED_FILTER_PARAM]: tempEndorsed,
+      [HAS_STATEMENT_FILTER_PARAM]: tempHasStatement,
+      [ISSUES_FILTER_PARAM]:
+        selectedIssues.length > 0 ? getIssuesString(selectedIssues) : "",
+      [STAKEHOLDERS_FILTER_PARAM]:
+        selectedStakeholders.length > 0
+          ? getStakeholdersString(selectedStakeholders)
+          : "",
+    });
 
     setIsOpen(false);
   };

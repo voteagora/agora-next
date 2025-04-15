@@ -49,26 +49,16 @@ const DelegateCardWrapper = async ({
     tab === "citizens"
       ? await fetchCitizens(citizensSort, seed)
       : await fetchDelegates(seed, sort, filters);
-  console.log(filters);
   return (
     <DelegateTabs>
       <TabsContent value="delegates">
         <DelegateContent
           initialDelegates={delegates}
-          fetchDelegates={async (
-            pagination: PaginationParams,
-            seed?: number,
-            clientSort?: string,
-            clientFilters?: any
-          ) => {
+          fetchDelegates={async (pagination, seed) => {
             "use server";
-            return apiFetchDelegates({
-              pagination,
-              seed,
-              sort: clientSort || "",
-              filters: clientFilters,
-            });
+            return apiFetchDelegates({ pagination, seed, sort, filters });
           }}
+          activeTab={tab}
         />
       </TabsContent>
       <TabsContent value="citizens">
@@ -76,11 +66,16 @@ const DelegateCardWrapper = async ({
           initialDelegates={delegates}
           fetchDelegates={async (
             pagination: PaginationParams,
-            seed?: number
+            seed?: number,
+            clientSort?: string
           ) => {
             "use server";
             // Handle the case where seed might be undefined
-            return apiFetchCitizens({ pagination, seed, sort: citizensSort });
+            return apiFetchCitizens({
+              pagination,
+              seed,
+              sort: clientSort || "",
+            });
           }}
         />
       </TabsContent>
@@ -96,9 +91,10 @@ export const DelegateCardLoadingState = () => {
       <div className="flex flex-row justify-between items-center">
         <h1 className="text-2xl text-primary font-bold">Delegates</h1>
         <div className="flex flex-row gap-2">
-          <span className="block w-[150px] h-[36px] rounded-full bg-tertiary/10 animate-pulse"></span>
-          <span className="block w-[150px] h-[36px] rounded-full bg-tertiary/10 animate-pulse"></span>
-          <span className="block w-[150px] h-[36px] rounded-full bg-tertiary/10 animate-pulse"></span>
+          <span className="block w-[228px] h-[42px] rounded-md bg-tertiary/10 animate-pulse"></span>
+          <span className="block w-[115px] h-[42px] rounded-md bg-tertiary/10 animate-pulse"></span>
+          <span className="block w-[98px] h-[42px] rounded-md bg-tertiary/10 animate-pulse"></span>
+          <span className="block w-[66px] h-[42px] rounded-md bg-tertiary/10 animate-pulse"></span>
         </div>
       </div>
       <div className="grid grid-flow-row grid-cols-1 sm:grid-cols-3 justify-around sm:justify-between py-4 gap-4 sm:gap-8">
