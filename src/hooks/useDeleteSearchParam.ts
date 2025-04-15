@@ -8,31 +8,11 @@ export const useDeleteSearchParam = () => {
   const pathname = usePathname();
 
   return useCallback(
-    ({
-      name,
-      names,
-      clean,
-    }: {
-      name?: string;
-      names?: string[];
-      clean?: boolean;
-    }) => {
+    ({ name, clean }: { name: string; clean?: boolean }) => {
       const params = new URLSearchParams(
         clean ? undefined : searchParams?.toString()
       );
-
-      // Delete a single parameter if provided
-      if (name) {
-        params.delete(name);
-      }
-
-      // Delete multiple parameters if provided
-      if (names && names.length > 0) {
-        names.forEach((paramName) => {
-          params.delete(paramName);
-        });
-      }
-
+      params.delete(name);
       return pathname + "?" + params.toString();
     },
     [searchParams, pathname]

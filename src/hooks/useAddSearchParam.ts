@@ -3,16 +3,24 @@
 import { useSearchParams, usePathname } from "next/navigation";
 import { useCallback } from "react";
 
-export const useDeleteSearchParam = () => {
+export const useAddSearchParam = () => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
   return useCallback(
-    ({ name, clean }: { name: string; clean?: boolean }) => {
+    ({
+      name,
+      value,
+      clean,
+    }: {
+      name: string;
+      value: string;
+      clean?: boolean;
+    }) => {
       const params = new URLSearchParams(
         clean ? undefined : searchParams?.toString()
       );
-      params.delete(name);
+      params.set(name, value);
       return pathname + "?" + params.toString();
     },
     [searchParams, pathname]

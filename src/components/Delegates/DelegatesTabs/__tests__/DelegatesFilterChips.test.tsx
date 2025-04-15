@@ -5,8 +5,6 @@ import {
   DelegateFilterChip,
 } from "../DelegatesFilterChips";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { useRouter } from "next/navigation";
-import { useDeleteSearchParam, useAddSearchParam } from "@/hooks";
 import Tenant from "@/lib/tenant/tenant";
 import {
   ENDORSED_FILTER_PARAM,
@@ -14,22 +12,7 @@ import {
   MY_DELEGATES_FILTER_PARAM,
 } from "@/lib/constants";
 
-// Mock the hooks and modules
-vi.mock("next/navigation", () => ({
-  useSearchParams: vi.fn(),
-  useRouter: vi.fn(),
-}));
-
-vi.mock("@/hooks", () => ({
-  useDeleteSearchParam: vi.fn(),
-  useAddSearchParam: vi.fn(),
-}));
-
-vi.mock("@/contexts/AgoraContext", () => ({
-  useAgoraContext: vi.fn(),
-}));
-
-// Mock wagmi
+// Mock wagmi to avoid WagmiProviderNotFoundError
 vi.mock("wagmi", () => ({
   useAccount: () => ({
     address: "0x1234567890abcdef1234567890abcdef12345678",
@@ -52,6 +35,12 @@ vi.mock("@/components/Delegates/DelegatesFilter/useDelegatesFilter", () => ({
   useDelegatesFilter: () => mockUseDelegatesFilter(),
 }));
 
+// Mock the AgoraContext
+vi.mock("@/contexts/AgoraContext", () => ({
+  useAgoraContext: vi.fn(),
+}));
+
+// Mock Tenant
 vi.mock("@/lib/tenant/tenant", () => ({
   default: {
     current: vi.fn().mockReturnValue({
@@ -167,22 +156,11 @@ describe("DelegateFilterChip", () => {
 });
 
 describe("DelegatesFilterChips", () => {
-  const mockRouter = {
-    push: vi.fn(),
-  };
-
-  const mockDeleteSearchParam = vi.fn().mockReturnValue("/delegates");
-  const mockAddSearchParam = vi.fn().mockReturnValue("/delegates?param=value");
-
   const mockSetIsDelegatesFiltering = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
-
-    (useRouter as any).mockReturnValue(mockRouter);
-    (useDeleteSearchParam as any).mockReturnValue(mockDeleteSearchParam);
-    (useAddSearchParam as any).mockReturnValue(mockAddSearchParam);
 
     (useAgoraContext as any).mockReturnValue({
       setIsDelegatesFiltering: mockSetIsDelegatesFiltering,
