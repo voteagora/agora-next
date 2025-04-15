@@ -58,7 +58,6 @@ const DelegateCardWrapper = async ({
             "use server";
             return apiFetchDelegates({ pagination, seed, sort, filters });
           }}
-          activeTab={tab}
         />
       </TabsContent>
       <TabsContent value="citizens">
@@ -66,15 +65,14 @@ const DelegateCardWrapper = async ({
           initialDelegates={delegates}
           fetchDelegates={async (
             pagination: PaginationParams,
-            seed?: number,
-            clientSort?: string
+            seed?: number
           ) => {
             "use server";
             // Handle the case where seed might be undefined
             return apiFetchCitizens({
               pagination,
               seed,
-              sort: clientSort || "",
+              sort: citizensSort,
             });
           }}
         />
