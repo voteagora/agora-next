@@ -217,6 +217,10 @@ export const cyberTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "dao-node/delegate/addr",
+      enabled: true,
+    },
+    {
       name: "info",
       enabled: true,
     },
