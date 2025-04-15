@@ -446,7 +446,7 @@ export const getTransportForChain = (chainId: number) => {
       return fallback([
         http(
           FORK_NODE_URL ||
-            "https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}"
+            `https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
         ),
         http(FORK_NODE_URL || "https://rpc.scroll.io"),
       ]);

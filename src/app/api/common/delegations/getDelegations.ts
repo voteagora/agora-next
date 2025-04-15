@@ -15,6 +15,7 @@ import { Prisma } from "@prisma/client";
 import { findAdvancedDelegatee, findDelagatee } from "@/lib/prismaUtils";
 import { DELEGATION_MODEL } from "@/lib/constants";
 import { withMetrics } from "@/lib/metricWrapper";
+import { getDelegateFromDaoNode } from "@/lib/dao-node/client";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -153,6 +154,48 @@ async function getCurrentDelegatorsForAddress({
     let contractAddress = contracts.alligator
       ? contracts.alligator.address
       : contracts.token.address;
+
+    let balanceFilter = BigInt(0);
+
+    if (contracts.token.isERC20()) {
+      balanceFilter = BigInt(1e15);
+    } else if (contracts.token.isERC721()) {
+      balanceFilter = BigInt(0);
+    } else {
+      throw new Error(
+        "Token is neither ERC20 nor ERC721, therefore unsupported."
+      );
+    }
+
+    const daoNodeDelegate = await getDelegateFromDaoNode(address);
+
+    if (daoNodeDelegate) {
+      const delegatorsData = daoNodeDelegate.delegate.from_list.map(
+        (delegator) => ({
+          from: delegator[0],
+          to: address,
+          allowance: delegator[1],
+          percentage: "0", // Only used in Agora token partial delegation
+          timestamp: null,
+          type: "DIRECT" as const,
+          amount: "FULL" as const,
+          transaction_hash: "",
+        })
+      );
+
+      const filteredDelegatorsData = delegatorsData.filter(
+        (delegator) => BigInt(delegator.allowance) > balanceFilter // filter out delegators with 0 (or close to 0) balance
+      );
+
+      return {
+        meta: {
+          has_next: false,
+          next_offset: 0,
+          total_returned: filteredDelegatorsData.length,
+        },
+        data: filteredDelegatorsData,
+      };
+    }
 
     // Replace with the Agora Governor flag
     if (
@@ -323,18 +366,6 @@ async function getCurrentDelegatorsForAddress({
         transaction_hash: delegator.transaction_hash,
       }))
     );
-
-    var balanceFilter = BigInt(0);
-
-    if (contracts.token.isERC20()) {
-      balanceFilter = BigInt(1e15);
-    } else if (contracts.token.isERC721()) {
-      balanceFilter = BigInt(0);
-    } else {
-      throw new Error(
-        "Token is neither ERC20 nor ERC721, therefore unsupported."
-      );
-    }
 
     const filteredDelegatorsData = delagtorsData.filter(
       (delegator) => BigInt(delegator.allowance) > balanceFilter // filter out delegators with 0 (or close to 0) balance
