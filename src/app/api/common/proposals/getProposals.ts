@@ -89,14 +89,19 @@ async function getProposals({
 }
 
 async function getProposal(proposalId: string) {
-  return withMetrics("getProposal", async () => {
+  return withMetrics("getProposal", async (requestId) => {
     const { namespace, contracts, ui } = Tenant.current();
+
+    console.log(
+      `[${requestId}] Processing getProposal for proposal ID: ${proposalId}`
+    );
 
     const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
       ?.enabled
       ? contracts.providerForTime?.getBlock("latest")
       : contracts.token.provider.getBlock("latest");
 
+    console.log(`[${requestId}] Fetching proposal data from database`);
     const getProposalExecution = doInSpan({ name: "getProposal" }, async () =>
       findProposal({
         namespace,
@@ -105,15 +110,18 @@ async function getProposal(proposalId: string) {
       })
     );
 
+    console.log(`[${requestId}] Fetching proposal and votable supply`);
     const [proposal, votableSupply] = await Promise.all([
       getProposalExecution,
       fetchVotableSupply(),
     ]);
 
     if (!proposal) {
+      console.log(`[${requestId}] Proposal not found: ${proposalId}`);
       return notFound();
     }
 
+    console.log(`[${requestId}] Fetching latest block`);
     const latestBlock = await latestBlockPromise;
 
     const isPending =
@@ -121,14 +129,23 @@ async function getProposal(proposalId: string) {
       !latestBlock ||
       Number(proposal.start_block) > latestBlock.number;
 
+    console.log(
+      `[${requestId}] Proposal status: ${isPending ? "pending" : "active/completed"}`
+    );
+
+    console.log(`[${requestId}] Fetching quorum for proposal`);
     const quorum = isPending ? null : await fetchQuorumForProposal(proposal);
 
-    return parseProposal(
+    console.log(`[${requestId}] Parsing proposal data`);
+    const result = parseProposal(
       proposal,
       latestBlock,
       quorum ?? null,
       BigInt(votableSupply)
     );
+
+    console.log(`[${requestId}] Completed processing proposal: ${proposalId}`);
+    return result;
   });
 }
 

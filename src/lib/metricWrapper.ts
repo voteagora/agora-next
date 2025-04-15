@@ -14,7 +14,7 @@ interface TimingContext {
 
 export async function withMetrics<T>(
   api: string,
-  fn: () => Promise<T>,
+  fn: (requestId?: string) => Promise<T>,
   labels: Record<string, string> = {}
 ): Promise<T> {
   const startTime = Date.now();
@@ -23,13 +23,14 @@ export async function withMetrics<T>(
   const context: TimingContext = { startTime, api, labels, requestId };
 
   // Log with ISO timestamp and request ID for better debugging
-  // console.log(
-  //   `[${requestId}] ### ${api} started at ${new Date(startTime).toISOString()} (${startTime}ms)`
-  // );
+  console.log(
+    `[${requestId}] ### ${api} started at ${new Date(startTime).toISOString()} (${startTime}ms)`
+  );
 
   return asyncLocalStorage.run(context, async () => {
     try {
-      const result = await fn();
+      // Pass the requestId to the function
+      const result = await fn(requestId);
 
       // Get timing from the context
       const currentContext = asyncLocalStorage.getStore() as TimingContext;
@@ -37,9 +38,9 @@ export async function withMetrics<T>(
       const duration = endTime - currentContext.startTime;
 
       // Used to debug log timing
-      // console.log(
-      //   `[${currentContext.requestId}] ### ${api} succeeded at ${new Date(endTime).toISOString()} (${endTime}ms) - duration: ${duration}ms`
-      // );
+      console.log(
+        `[${currentContext.requestId}] ### ${api} succeeded at ${new Date(endTime).toISOString()} (${endTime}ms) - duration: ${duration}ms`
+      );
 
       await monitoring.recordMetric({
         name: "api.duration",
@@ -99,4 +100,9 @@ export async function withMetrics<T>(
       throw error;
     }
   });
+}
+
+// Add this helper function to get the current request context
+export function getCurrentContext(): TimingContext | undefined {
+  return asyncLocalStorage.getStore() as TimingContext | undefined;
 }
