@@ -16,7 +16,19 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
 const { ui } = Tenant.current();
 import { useCalculateCopelandResult } from "@/hooks/useCalculateCopelandResult";
-import React from "react";
+import React, { useMemo } from "react";
+
+// Helper function to check if an option is an extended version
+const EXTENDED_SUFFIX = " (Extended)";
+function isExtendedOption(option: string): boolean {
+  return option.endsWith(EXTENDED_SUFFIX);
+}
+
+function getBaseOptionName(option: string): string {
+  return isExtendedOption(option)
+    ? option.slice(0, -EXTENDED_SUFFIX.length)
+    : option;
+}
 
 const FUNDING_VALUES: Record<
   string,
@@ -65,6 +77,12 @@ export default function OptionsResultsPanel({
 
   const containerRef = React.useRef<HTMLDivElement>(null);
 
+  // Filter out extended options to avoid duplicate rows
+  const filteredResults = React.useMemo(() => {
+    if (!proposalResults) return [];
+    return proposalResults.filter((result) => !isExtendedOption(result.option));
+  }, [proposalResults]);
+
   return (
     <div
       ref={containerRef}
@@ -97,16 +115,27 @@ export default function OptionsResultsPanel({
           <div className="text-center text-sm text-tertiary">Loading...</div>
         ) : proposalResults && proposalResults.length > 0 ? (
           <div>
-            {" "}
-            {proposalResults.map((result, index) => (
-              <OptionRow
-                key={result.option}
-                result={result}
-                index={index}
-                isProposalActive={isProposalActive}
-                isFunding={proposal.markdowntitle.includes("Service Provider")}
-              />
-            ))}
+            {filteredResults.map((result, index) => {
+              // Find corresponding extended option if it exists
+              const extendedOption = proposalResults.find(
+                (r) =>
+                  isExtendedOption(r.option) &&
+                  getBaseOptionName(r.option) === result.option
+              );
+
+              return (
+                <OptionRow
+                  key={result.option}
+                  result={result}
+                  extendedResult={extendedOption}
+                  index={index}
+                  isProposalActive={isProposalActive}
+                  isFunding={proposal.markdowntitle.includes(
+                    "Service Provider"
+                  )}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="text-center text-sm text-tertiary">
@@ -120,11 +149,13 @@ export default function OptionsResultsPanel({
 
 const OptionRow = ({
   result,
+  extendedResult,
   index,
   isProposalActive,
   isFunding,
 }: {
   result: CopelandResult;
+  extendedResult?: CopelandResult;
   index: number;
   isProposalActive: boolean;
   isFunding: boolean;
@@ -132,15 +163,28 @@ const OptionRow = ({
   const optionName = result.option;
   const fundingInfo = FUNDING_VALUES[optionName];
 
-  const fundingTypeResultValue = fundingInfo
-    ? result.fundingType === "EXT2Y"
-      ? fundingInfo.ext
-      : result.fundingType === "EXT1Y"
-        ? fundingInfo.ext
-        : result.fundingType === "STD"
-          ? fundingInfo.std
-          : null
-    : null;
+  const extendedResultGotFunding =
+    extendedResult && extendedResult.fundingType !== "None";
+
+  const fundingType = useMemo(() => {
+    if (extendedResultGotFunding) {
+      return extendedResult.fundingType;
+    } else {
+      return result.fundingType;
+    }
+  }, [extendedResultGotFunding, extendedResult, result]);
+
+  const fundingTypeResultValue = useMemo(() => {
+    if (!fundingInfo) return null;
+    if (extendedResultGotFunding && fundingInfo.ext) {
+      return extendedResult.fundingType === "EXT2Y" ||
+        extendedResult.fundingType === "EXT1Y"
+        ? fundingInfo.ext + fundingInfo.std
+        : null;
+    } else {
+      return result.fundingType === "STD" ? fundingInfo.std : null;
+    }
+  }, [extendedResultGotFunding, fundingInfo, extendedResult, result]);
 
   const totalVotes = result.avgVotingPowerFor + result.avgVotingPowerAgainst;
   const forPercentage = Math.round(
@@ -184,15 +228,15 @@ const OptionRow = ({
               </span>
               <div className="flex items-center gap-4">
                 {isFunding ? (
-                  result.fundingType !== "None" ? (
+                  fundingType !== "None" ? (
                     <>
                       <div
                         className={cn(
                           "border px-2 py-1 rounded-sm font-semibold border-[#008425] w-14",
-                          getFundingTypeStyle(result.fundingType)
+                          getFundingTypeStyle(fundingType)
                         )}
                       >
-                        {result.fundingType}
+                        {fundingType}
                       </div>
                       <span
                         className={cn(
@@ -205,7 +249,7 @@ const OptionRow = ({
                         <Check strokeWidth={4} className="h-3 w-3 ml-1" />
                       </span>
                     </>
-                  ) : result.fundingType === "None" ? (
+                  ) : fundingType === "None" ? (
                     <span
                       className={cn(
                         "text-tertiary flex items-center font-semibold",
@@ -311,58 +355,68 @@ const OptionRow = ({
               <div className="font-semibold text-xs text-right">CANDIDATE</div>
             </div>
 
-            {result.comparisons.map((comparison, idx) => {
-              const isOption1 = comparison.option1 === result.option;
-              const opponentOption = isOption1
-                ? comparison.option2
-                : comparison.option1;
-              const opponentName = opponentOption.split(":")[0].trim();
-              const favorVotes = isOption1
-                ? comparison.option1VotingPower
-                : comparison.option2VotingPower;
-              const disfavorVotes = isOption1
-                ? comparison.option2VotingPower
-                : comparison.option1VotingPower;
-              const isWinner =
-                (isOption1 && comparison.winner === comparison.option1) ||
-                (!isOption1 && comparison.winner === comparison.option2);
-              const lostAtLeastOne = result.totalLosses > 0;
-              const wonAtLeastOne = result.totalWins > 0;
+            {result.comparisons
+              .filter(
+                (comparison) =>
+                  !(
+                    (comparison.option1 === result.option &&
+                      comparison.option2 === extendedResult?.option) ||
+                    (comparison.option2 === result.option &&
+                      comparison.option1 === extendedResult?.option)
+                  )
+              )
+              .map((comparison, idx) => {
+                const isOption1 = comparison.option1 === result.option;
+                const opponentOption = isOption1
+                  ? comparison.option2
+                  : comparison.option1;
+                const opponentName = opponentOption;
+                const favorVotes = isOption1
+                  ? comparison.option1VotingPower
+                  : comparison.option2VotingPower;
+                const disfavorVotes = isOption1
+                  ? comparison.option2VotingPower
+                  : comparison.option1VotingPower;
+                const isWinner =
+                  (isOption1 && comparison.winner === comparison.option1) ||
+                  (!isOption1 && comparison.winner === comparison.option2);
+                const lostAtLeastOne = result.totalLosses > 0;
+                const wonAtLeastOne = result.totalWins > 0;
 
-              return (
-                <div key={idx} className="grid grid-cols-3 gap-4 py-2">
-                  <div className="font-semibold truncate max-w-[100px]">
-                    {opponentName}
+                return (
+                  <div key={idx} className="grid grid-cols-3 gap-4 py-2">
+                    <div className="font-semibold truncate max-w-[100px]">
+                      {opponentName}
+                    </div>
+                    <div
+                      className={cn(
+                        "text-right text-tertiary font-semibold flex items-center justify-end gap-1",
+                        !isWinner && "text-positive",
+                        fontMapper[ui?.customization?.tokenAmountFont || ""]
+                          ?.variable
+                      )}
+                    >
+                      {disfavorVotes.toLocaleString()}
+                      <span className={cn("w-4", !lostAtLeastOne && "w-0")}>
+                        {!isWinner && comparison.winner && "🏆"}
+                      </span>
+                    </div>
+                    <div
+                      className={cn(
+                        "text-right text-tertiary font-semibold flex items-center justify-end gap-1",
+                        isWinner && "text-positive",
+                        fontMapper[ui?.customization?.tokenAmountFont || ""]
+                          ?.variable
+                      )}
+                    >
+                      {favorVotes.toLocaleString()}
+                      <span className={cn("w-4", !wonAtLeastOne && "w-0")}>
+                        {isWinner && "🏆"}
+                      </span>
+                    </div>
                   </div>
-                  <div
-                    className={cn(
-                      "text-right text-tertiary font-semibold flex items-center justify-end gap-1",
-                      !isWinner && "text-positive",
-                      fontMapper[ui?.customization?.tokenAmountFont || ""]
-                        ?.variable
-                    )}
-                  >
-                    {disfavorVotes.toLocaleString()}
-                    <span className={cn("w-4", !lostAtLeastOne && "w-0")}>
-                      {!isWinner && comparison.winner && "🏆"}
-                    </span>
-                  </div>
-                  <div
-                    className={cn(
-                      "text-right text-tertiary font-semibold flex items-center justify-end gap-1",
-                      isWinner && "text-positive",
-                      fontMapper[ui?.customization?.tokenAmountFont || ""]
-                        ?.variable
-                    )}
-                  >
-                    {favorVotes.toLocaleString()}
-                    <span className={cn("w-4", !wonAtLeastOne && "w-0")}>
-                      {isWinner && "🏆"}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
 
           <div className="flex justify-between items-center w-full">

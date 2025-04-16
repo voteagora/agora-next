@@ -225,10 +225,8 @@ describe("Copeland Calculation", () => {
       expect(teamA).toBeDefined();
       expect(teamB).toBeDefined();
 
-      // Team A should still win due to higher voting power
-      expect(teamA!.avgVotingPowerFor).toBeGreaterThan(
-        teamB!.avgVotingPowerFor
-      );
+      // Team A should still win due to higher voting power in pairwise comparisons
+      expect(teamA!.totalWins).toBeGreaterThan(teamB!.totalWins);
       expect(teamA!.totalWins).toBe(6);
     });
   });

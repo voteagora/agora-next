@@ -167,12 +167,10 @@ export function calculateCopelandVote(
       const extendedRank = optionRanks[extendedOption];
       const standardRank = optionRanks[standardOption];
 
-      // Only process if both options are ranked (not unranked or below none)
-      // and if extended is ranked higher (lower number) than standard
+      // Only process if extended is ranked higher (lower number) than standard
       if (
-        extendedRank >= 0 &&
-        standardRank >= 0 &&
-        extendedRank < standardRank
+        extendedRank < standardRank ||
+        (standardRank < 0 && extendedRank >= 0)
       ) {
         // Move standard option to be just above extended
         const oldStandardRank = standardRank;
@@ -242,7 +240,7 @@ export function calculateCopelandVote(
           pairwiseVotingPower[option2][option1].total += vote.votingPower;
           pairwiseVotingPower[option2][option1].count += 1;
         } else {
-          // Tie (should be rare)
+          // Tie (should be impossible as this is in the vote)
           pairwiseVotingPower[option1][option2].total += vote.votingPower;
           pairwiseVotingPower[option1][option2].count += 1;
           pairwiseVotingPower[option2][option1].total += vote.votingPower;
@@ -320,6 +318,7 @@ export function calculateCopelandVote(
     });
   });
 
+  // Create results for each option
   const results = options.map((option) => {
     const comparisons = pairwiseComparisons
       .filter((comp) => comp.option1 === option || comp.option2 === option)
@@ -365,26 +364,78 @@ export function calculateCopelandVote(
       }
     });
 
-    const numVotesForThisOption = votes.filter((vote) => {
+    // Count the number of votes that ranked this option ABOVE NONE BELOW
+    const votesForThisOption = votes.filter((vote) => {
       const parsedChoice = vote.choice?.startsWith("[")
         ? JSON.parse(vote.choice)
         : vote.choice;
-      return (parsedChoice as number[]).some((choice) => {
-        const noneIndex = options.findIndex((o) => o === "NONE BELOW");
-        return (
-          options[choice - 1] === option &&
-          (noneIndex === -1 || choice - 1 <= noneIndex)
-        );
-      });
-    }).length;
 
+      // Find the index of NONE BELOW in the options array
+      const noneIndex = options.findIndex((o) => o === NONE_BELOW);
+
+      // Find the rank of NONE BELOW in this vote
+      const noneRank =
+        noneIndex !== -1
+          ? (parsedChoice as number[]).findIndex(
+              (choice) => choice === noneIndex + 1
+            )
+          : -1;
+
+      // Find the rank of this option in this vote
+      const optionIndex = options.findIndex((o) => o === option);
+      const optionRank = (parsedChoice as number[]).findIndex(
+        (choice) => choice === optionIndex + 1
+      );
+
+      // Check if this option is a standard option that might have been moved up
+      const isStandardOption = !isExtendedOption(option);
+
+      // If this is a standard option, check if it has an extended version
+      const hasExtendedVersion =
+        isStandardOption && options.includes(`${option}${EXTENDED_SUFFIX}`);
+
+      if (isStandardOption && hasExtendedVersion) {
+        // Find the extended version of this option
+        const extendedOption = `${option}${EXTENDED_SUFFIX}`;
+        const extendedIndex = options.findIndex((o) => o === extendedOption);
+        const extendedRank = (parsedChoice as number[]).findIndex(
+          (choice) => choice === extendedIndex + 1
+        );
+
+        // If the extended version is ranked above NONE BELOW, then the standard version
+        // should also be considered valid (since it would have been moved up)
+        if (
+          extendedRank !== -1 &&
+          (noneRank === -1 || extendedRank < noneRank)
+        ) {
+          return true;
+        }
+      }
+
+      // Standard check: Option must be ranked AND (NONE BELOW not ranked OR option ranked above NONE BELOW)
+      return optionRank !== -1 && (noneRank === -1 || optionRank < noneRank);
+    });
+
+    // Calculate total voting power of valid votes for this option
+    const totalVotingPowerOfValidVotes = votesForThisOption.reduce(
+      (sum, vote) => sum + vote.votingPower,
+      0
+    );
+
+    // Count of valid votes
+    const validVoteCount = votesForThisOption.length;
+
+    // Calculate average voting power - divide the total voting power by the number of valid votes
     const avgVotingPowerFor =
-      numVotesForThisOption > 0
-        ? totalVotingPowerFor / numVotesForThisOption
-        : 0;
+      validVoteCount > 0 ? totalVotingPowerOfValidVotes / validVoteCount : 0;
+
+    // Calculate average voting power against
+    const totalVotingPowerAgainstOption =
+      totalVotingPower - totalVotingPowerOfValidVotes;
+    const invalidVoteCount = votes.length - validVoteCount;
     const avgVotingPowerAgainst =
-      numVotesForThisOption > 0
-        ? totalVotingPowerAgainst / numVotesForThisOption
+      invalidVoteCount > 0
+        ? totalVotingPowerAgainstOption / invalidVoteCount
         : 0;
 
     return {
