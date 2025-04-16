@@ -10,6 +10,17 @@
 
 import { SnapshotVote } from "@/app/api/common/votes/vote";
 
+// Constants
+const NONE_BELOW = "NONE BELOW";
+const EXTENDED_SUFFIX = " (Extended)";
+
+// Rank values
+const RANK_UNRANKED = -1;
+const RANK_BELOW_NONE = -2;
+
+// Funding types
+type FundingType = "EXT2Y" | "EXT1Y" | "STD" | "None";
+
 interface PairwiseComparison {
   option1: string;
   option2: string;
@@ -26,13 +37,34 @@ interface FundingInfo {
 
 export interface CopelandResult {
   option: string;
-  fundingType: "EXT2Y" | "EXT1Y" | "STD" | "None";
+  fundingType: FundingType;
   comparisons: PairwiseComparison[];
   totalWins: number;
   totalLosses: number;
   avgVotingPowerFor: number;
   avgVotingPowerAgainst: number;
   fundingInfo: FundingInfo;
+}
+
+/**
+ * Identifies if an option is an extended version of a standard option
+ * @param option The option to check
+ * @returns The base option name if it's an extended option, null otherwise
+ */
+function getBaseOptionFromExtended(option: string): string | null {
+  if (option.endsWith(EXTENDED_SUFFIX)) {
+    return option.slice(0, -EXTENDED_SUFFIX.length);
+  }
+  return null;
+}
+
+/**
+ * Checks if an option is an extended version
+ * @param option The option to check
+ * @returns True if the option is an extended version, false otherwise
+ */
+function isExtendedOption(option: string): boolean {
+  return option.endsWith(EXTENDED_SUFFIX);
 }
 
 export function calculateCopelandVote(
@@ -43,9 +75,9 @@ export function calculateCopelandVote(
 ): CopelandResult[] {
   // Early return if no votes
   if (!votes || votes.length === 0) {
-    return options.map(option => ({
+    return options.map((option) => ({
       option,
-      fundingType: "None" as const,
+      fundingType: "None",
       comparisons: [],
       totalWins: 0,
       totalLosses: 0,
@@ -55,9 +87,19 @@ export function calculateCopelandVote(
         ext: 0,
         std: 0,
         isEligibleFor2Y: false,
-      }
+      },
     }));
   }
+
+  // Create a map of extended options to their standard counterparts
+  const extendedToStandardMap = new Map<string, string>();
+
+  options.forEach((option) => {
+    const baseOption = getBaseOptionFromExtended(option);
+    if (baseOption) {
+      extendedToStandardMap.set(option, baseOption);
+    }
+  });
 
   const scores: Record<string, number> = {};
   const pairwiseWins: Record<string, Record<string, number>> = {};
@@ -86,15 +128,19 @@ export function calculateCopelandVote(
       ? JSON.parse(vote.choice)
       : vote.choice;
 
-    const noneRank = (parsedChoice as number[]).findIndex(
-      (choice) => choice === options.findIndex((o) => o === "NONE BELOW") + 1
-    );
+    const noneIndex = options.findIndex((o) => o === NONE_BELOW);
+    const noneRank =
+      noneIndex !== -1
+        ? (parsedChoice as number[]).findIndex(
+            (choice) => choice === noneIndex + 1
+          )
+        : -1;
 
     const optionRanks: Record<string, number> = {};
 
     // First, initialize all options as unranked
     options.forEach((option) => {
-      optionRanks[option] = -1;
+      optionRanks[option] = RANK_UNRANKED;
     });
 
     // Then, process the voter's choices
@@ -107,12 +153,45 @@ export function calculateCopelandVote(
         // If NONE BELOW exists and this option is after it, mark as below NONE BELOW
         // The lower the rank, the better
         if (noneRank !== -1 && rank > noneRank) {
-          optionRanks[option] = -2; // Use -2 to indicate below NONE BELOW
+          optionRanks[option] = RANK_BELOW_NONE;
         } else {
           optionRanks[option] = rank;
         }
       }
-      // If option not found in choices, it stays as -1 (unranked)
+      // If option not found in choices, it stays as unranked
+    });
+
+    // Apply the rule: if a voter ranks a team's extended budget above its basic budget,
+    // move the basic entry directly above the extended
+    extendedToStandardMap.forEach((standardOption, extendedOption) => {
+      const extendedRank = optionRanks[extendedOption];
+      const standardRank = optionRanks[standardOption];
+
+      // Only process if both options are ranked (not unranked or below none)
+      // and if extended is ranked higher (lower number) than standard
+      if (
+        extendedRank >= 0 &&
+        standardRank >= 0 &&
+        extendedRank < standardRank
+      ) {
+        // Move standard option to be just above extended
+        const oldStandardRank = standardRank;
+        optionRanks[standardOption] = extendedRank;
+
+        // Adjust ranks of options between old standard position and new position
+        options.forEach((opt) => {
+          const optRank = optionRanks[opt];
+          if (
+            opt !== standardOption &&
+            optRank >= 0 &&
+            optRank >= extendedRank &&
+            optRank < oldStandardRank
+          ) {
+            // Shift these options down by 1
+            optionRanks[opt] += 1;
+          }
+        });
+      }
     });
 
     for (let i = 0; i < options.length; i++) {
@@ -121,40 +200,49 @@ export function calculateCopelandVote(
       for (let j = i + 1; j < options.length; j++) {
         const option2 = options[j];
 
-        // Skip if both options are below "NONE BELOW"
-        if (optionRanks[option1] === -2 && optionRanks[option2] === -2) {
+        const optionRank1 = optionRanks[option1];
+        const optionRank2 = optionRanks[option2];
+
+        // Skip if both options are below NONE_BELOW
+        if (
+          optionRank1 === RANK_BELOW_NONE &&
+          optionRank2 === RANK_BELOW_NONE
+        ) {
           continue;
         }
 
-        // Skip if either option is unranked (-1) => should not happen as all options will be included in the vote
-        if (optionRanks[option1] === -1 || optionRanks[option2] === -1) {
+        // Skip if either option is unranked => should not happen as all options will be included in the vote
+        if (optionRank1 === RANK_UNRANKED || optionRank2 === RANK_UNRANKED) {
           continue;
         }
 
-        // If option1 is below "NONE BELOW", option2 wins
-        if (optionRanks[option1] === -2) {
+        // If option1 is below NONE_BELOW, option2 wins
+        if (optionRank1 === RANK_BELOW_NONE) {
           pairwiseVotingPower[option2][option1].total += vote.votingPower;
           pairwiseVotingPower[option2][option1].count += 1;
           continue;
         }
 
-        // If option2 is below "NONE BELOW", option1 wins
-        if (optionRanks[option2] === -2) {
+        // If option2 is below NONE_BELOW, option1 wins
+        if (optionRank2 === RANK_BELOW_NONE) {
           pairwiseVotingPower[option1][option2].total += vote.votingPower;
           pairwiseVotingPower[option1][option2].count += 1;
           continue;
         }
 
-        // For all other cases (including when one option is "NONE BELOW"), compare ranks normally
-        // Lower rank is better (1 is better than 2)
-        if (optionRanks[option1] < optionRanks[option2]) {
+        // For all other cases (including when one option is NONE_BELOW), compare ranks normally
+        // Lower rank is better (0 is better than 1)
+
+        if (optionRank1 < optionRank2) {
+          // Option 1 is ranked higher
           pairwiseVotingPower[option1][option2].total += vote.votingPower;
           pairwiseVotingPower[option1][option2].count += 1;
-        } else if (optionRanks[option1] > optionRanks[option2]) {
+        } else if (optionRank1 > optionRank2) {
+          // Option 2 is ranked higher
           pairwiseVotingPower[option2][option1].total += vote.votingPower;
           pairwiseVotingPower[option2][option1].count += 1;
         } else {
-          // If tied, track voting power for this pair
+          // Tie (should be rare)
           pairwiseVotingPower[option1][option2].total += vote.votingPower;
           pairwiseVotingPower[option1][option2].count += 1;
           pairwiseVotingPower[option2][option1].total += vote.votingPower;
@@ -172,48 +260,61 @@ export function calculateCopelandVote(
         const option1VotingPower = pairwiseVotingPower[option1][option2];
         const option2VotingPower = pairwiseVotingPower[option2][option1];
 
+        const votePower1 = option1VotingPower.total;
+        const votePower2 = option2VotingPower.total;
+
         // First compare total voting power
-        if (option1VotingPower.total > option2VotingPower.total) {
+        if (votePower1 > votePower2) {
           scores[option1]++;
-        } else if (option2VotingPower.total > option1VotingPower.total) {
+        } else if (votePower2 > votePower1) {
           scores[option2]++;
         } else {
           // If tied on total voting power, use average as tiebreaker
-          const option1AvgVP =
-            option1VotingPower.count > 0
-              ? option1VotingPower.total / option1VotingPower.count
-              : 0;
-          const option2AvgVP =
-            option2VotingPower.count > 0
-              ? option2VotingPower.total / option2VotingPower.count
-              : 0;
+          const count1 = option1VotingPower.count;
+          const count2 = option2VotingPower.count;
 
-          if (option1AvgVP > option2AvgVP) {
+          const avg1 = count1 > 0 ? votePower1 / count1 : 0;
+          const avg2 = count2 > 0 ? votePower2 / count2 : 0;
+
+          if (avg1 > avg2) {
             scores[option1]++;
-          } else if (option2AvgVP > option1AvgVP) {
+          } else if (avg2 > avg1) {
             scores[option2]++;
+          }
+          // If still tied, neither gets a point => almost impossible to happen
+        }
+
+        // Determine the winner
+        let winner: string | null = null;
+
+        if (votePower1 > votePower2) {
+          winner = option1;
+        } else if (votePower2 > votePower1) {
+          winner = option2;
+        } else {
+          // If tied on total voting power, use average as tiebreaker
+          const count1 = option1VotingPower.count;
+          const count2 = option2VotingPower.count;
+
+          if (count1 > 0 && count2 > 0) {
+            const avg1 = votePower1 / count1;
+            const avg2 = votePower2 / count2;
+
+            if (avg1 > avg2) {
+              winner = option1;
+            } else if (avg2 > avg1) {
+              winner = option2;
+            }
+            // If still tied, winner remains null => almost impossible to happen
           }
         }
 
         pairwiseComparisons.push({
           option1,
           option2,
-          winner:
-            option1VotingPower.total > option2VotingPower.total
-              ? option1
-              : option2VotingPower.total > option1VotingPower.total
-                ? option2
-                : option1VotingPower.count > 0 && option2VotingPower.count > 0
-                  ? option1VotingPower.total / option1VotingPower.count >
-                    option2VotingPower.total / option2VotingPower.count
-                    ? option1
-                    : option2VotingPower.total / option2VotingPower.count >
-                        option1VotingPower.total / option1VotingPower.count
-                      ? option2
-                      : null
-                  : null,
-          option1VotingPower: option1VotingPower.total,
-          option2VotingPower: option2VotingPower.total,
+          winner,
+          option1VotingPower: votePower1,
+          option2VotingPower: votePower2,
         });
       }
     });
@@ -327,8 +428,14 @@ export function calculateCopelandVote(
   let remaining2YBudget = EXT2Y_BUDGET;
   let remaining1YBudget = EXT1Y_BUDGET;
 
+  // Determine if an option is in the top 10 (for 2Y eligibility)
+  const isInTop10 = (option: string): boolean => {
+    const position = sortedOptions.findIndex((opt) => opt.option === option);
+    return position < 10;
+  };
+
   // First pass: Allocate funding based on priority rules
-  const resultsWithFunding = sortedOptions
+  const resultsWithFunding: CopelandResult[] = sortedOptions
     .map((option) => option.option)
     .map((option, index) => {
       const info = fundingInfo[option] || {
@@ -336,13 +443,13 @@ export function calculateCopelandVote(
         std: 0,
         isEligibleFor2Y: false,
       };
-      let fundingType: "EXT2Y" | "EXT1Y" | "STD" | "None" = "None";
+      let fundingType: FundingType = "None";
 
-      // NONE BELOW option always gets None funding type
-      if (option === "NONE BELOW") {
+      // NONE_BELOW option always gets None funding type
+      if (option === NONE_BELOW) {
         return {
           ...results.find((r) => r.option === option)!,
-          fundingType: "None" as const,
+          fundingType: "None" as FundingType,
         };
       }
 
@@ -350,18 +457,29 @@ export function calculateCopelandVote(
       const isAboveNoneBelow =
         noneBelowPosition === -1 || index < noneBelowPosition;
 
-      // Only allocate funding if the option is above NONE BELOW
+      // Only allocate funding if the option is above NONE_BELOW
       if (isAboveNoneBelow) {
-        // Check if eligible for 2Y funding and has budget remaining
-        if (info.isEligibleFor2Y && !!info.ext && remaining2YBudget >= info.ext) {
-          fundingType = "EXT2Y";
-          remaining2YBudget -= info.ext;
-        } else if (!!info.ext && remaining1YBudget >= info.ext) {
-          fundingType = "EXT1Y";
-          remaining1YBudget -= info.ext;
-        } else if (remaining1YBudget >= info.std) {
-          fundingType = "STD";
-          remaining1YBudget -= info.std;
+        // Check if this is an extended option
+        const isExtended = isExtendedOption(option);
+
+        // Check if eligible for 2Y funding (must be in top 10 AND marked as eligible)
+        const canGet2Y = info.isEligibleFor2Y && isInTop10(option);
+
+        if (isExtended) {
+          // Extended options can only get EXT2Y or EXT1Y funding
+          if (canGet2Y && info.ext !== null && remaining2YBudget >= info.ext) {
+            fundingType = "EXT2Y";
+            remaining2YBudget -= info.ext;
+          } else if (info.ext !== null && remaining1YBudget >= info.ext) {
+            fundingType = "EXT1Y";
+            remaining1YBudget -= info.ext;
+          }
+        } else {
+          // Non-extended options can only get STD funding
+          if (remaining1YBudget >= info.std) {
+            fundingType = "STD";
+            remaining1YBudget -= info.std;
+          }
         }
       }
 
@@ -373,12 +491,18 @@ export function calculateCopelandVote(
 
   // Second pass: Move remaining 2Y budget to 1Y bucket if no more eligible candidates
   const hasMoreEligible2YCandidates = resultsWithFunding.some(
-    (result, index) =>
-      result.fundingType === "None" &&
-      result.fundingInfo.isEligibleFor2Y &&
-      !!result.fundingInfo.ext &&
-      result.fundingInfo.ext < remaining2YBudget &&
-      (noneBelowPosition === -1 || index < noneBelowPosition)
+    (result, index) => {
+      const isAboveNoneBelow =
+        noneBelowPosition === -1 || index < noneBelowPosition;
+      return (
+        result.fundingType === "None" &&
+        result.fundingInfo.isEligibleFor2Y &&
+        isInTop10(result.option) &&
+        result.fundingInfo.ext !== null &&
+        result.fundingInfo.ext <= remaining2YBudget &&
+        isAboveNoneBelow
+      );
+    }
   );
 
   if (!hasMoreEligible2YCandidates && remaining2YBudget > 0) {
@@ -406,19 +530,36 @@ export function calculateCopelandVote(
 
   // Allocate remaining 1Y funding
   for (const result of sortedFor1Y) {
-    if (
-      remaining1YBudget >= result.fundingInfo.std &&
-      result.option !== "NONE BELOW"
-    ) {
-      const resultIndex = mutableResults.findIndex(
-        (r) => r.option === result.option
-      );
-      if (resultIndex !== -1) {
-          mutableResults[resultIndex] = {
-            ...mutableResults[resultIndex],
-            fundingType: "STD" as const,
-          };
-          remaining1YBudget -= result.fundingInfo.std;
+    // Skip NONE_BELOW options
+    if (result.option === NONE_BELOW) continue;
+
+    const isExtended = isExtendedOption(result.option);
+    const resultIndex = mutableResults.findIndex(
+      (r) => r.option === result.option
+    );
+
+    // Skip if result not found in mutableResults
+    if (resultIndex === -1) continue;
+
+    if (isExtended) {
+      // Extended options can only get EXT1Y funding
+      const extFunding = result.fundingInfo.ext;
+      if (extFunding !== null && remaining1YBudget >= extFunding) {
+        mutableResults[resultIndex] = {
+          ...mutableResults[resultIndex],
+          fundingType: "EXT1Y" as FundingType,
+        };
+        remaining1YBudget -= extFunding;
+      }
+    } else {
+      // Non-extended options can only get STD funding
+      const stdFunding = result.fundingInfo.std;
+      if (remaining1YBudget >= stdFunding) {
+        mutableResults[resultIndex] = {
+          ...mutableResults[resultIndex],
+          fundingType: "STD" as FundingType,
+        };
+        remaining1YBudget -= stdFunding;
       }
     }
   }
