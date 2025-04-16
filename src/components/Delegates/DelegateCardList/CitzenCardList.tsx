@@ -7,7 +7,6 @@ import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import Link from "next/link";
-import { Delegation } from "@/app/api/common/delegations/delegation";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { cn } from "@/lib/utils";
 import { useAgoraContext } from "@/contexts/AgoraContext";
@@ -20,7 +19,6 @@ interface Props {
     pagination: PaginationParams,
     seed: number
   ) => Promise<PaginatedResult<DelegateChunk[]>>;
-  fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
 
 export default function CitizenCardList({

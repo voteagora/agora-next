@@ -10,7 +10,7 @@
     "cypress": "cypress open",
     "generate-typechain": "typechain --target ethers-v6 --out-dir src/lib/contracts/generated src/lib/contracts/abis/*.json && prettier -w src/lib/contracts/generated",
     "typecheck": "tsc --pretty --noEmit",
-    "generate-apikey": "ts-node src/scripts/generateApiKey.ts",
+    "generate-apikey": "tsx src/scripts/generateApiKey.mjs",
     "generate-jwt": "tsx src/scripts/generateJwt.ts",
     "check-prettier": "prettier --check src/",
     "prettier-src": "prettier -w src/",
@@ -94,6 +94,8 @@
     "react-markdown": "^8.0.7",
     "react-responsive": "^9.0.2",
     "recharts": "^2.12.7",
+    "remark": "^15.0.1",
+    "remark-toc": "^9.0.0",
     "siwe": "^2.3.2",
     "swagger-ui-react": "5.16.2",
     "tailwind-merge": "^1.13.2",
@@ -103,6 +105,7 @@
     "uuid": "^9.0.1",
     "viem": "2.21.16",
     "wagmi": "^2.13.0",
+    "yargs": "^17.7.2",
     "zod": "^3.22.4",
     "zustand": "^5.0.3"
   },
@@ -137,6 +140,5 @@
     "typescript": "^5.4.5",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.0.5"
-  },
-  "packageManager": "yarn@1.22.19+sha512.ff4579ab459bb25aa7c0ff75b62acebe576f6084b36aa842971cf250a5d8c6cd3bc9420b22ce63c7f93a0857bc6ef29291db39c3e7a23aab5adfd5a4dd6c5d71"
+  }
 }

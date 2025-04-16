@@ -33,8 +33,6 @@ const formDataByType = (
               calldata: transaction.calldata,
               signature: transaction.signature,
               description: transaction.description,
-              simulation_state: transaction.simulation_state,
-              simulation_id: transaction.simulation_id,
             } as ProposalDraftTransaction;
             return asTransaction;
           }),
@@ -89,8 +87,6 @@ const formDataByType = (
                     value: transaction.value,
                     calldata: transaction.calldata,
                     description: transaction.description,
-                    simulation_state: transaction.simulation_state,
-                    simulation_id: transaction.simulation_id,
                     proposal: { connect: { id } },
                   };
                   return asTransaction;

@@ -1,12 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAccount } from "wagmi";
 import ENSAvatar from "../shared/ENSAvatar";
-import Tenant from "@/lib/tenant/tenant";
-import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
-import { useDelegate } from "@/hooks/useDelegate";
-import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { Drawer } from "../ui/Drawer";
 import { ProfileDropDownContent } from "./ProfileDropDownContent";
 import { useProfileData } from "@/hooks/useProfileData";

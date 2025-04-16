@@ -15,7 +15,7 @@ const DEFAULT_LIMIT = 20;
 const DEFAULT_OFFSET = 0;
 
 const sortValidator = createOptionalStringValidator(
-  ["most_delegators", "weighted_random", "voting_power"],
+  ["most_delegators", "weighted_random", "voting_power", "least_voting_power"],
   DEFAULT_SORT
 );
 const limitValidator = createOptionalNumberValidator(
@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
         },
         sort,
       });
+
       return NextResponse.json(delegatesResult);
     } catch (e: any) {
       if (e instanceof ZodError) {

@@ -4,10 +4,9 @@ import { useState } from "react";
 import { TimelineChart } from "@/components/Proposals/ProposalPage/Charts/TimelineChart";
 import TreeMapChart from "../TreeMapChart/TreeMapChart";
 import BubbleChart from "../BubbleChart/BubbleChart";
-import { icons } from "@/icons/icons";
-import Image from "next/image";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useProposalVotesChart } from "@/hooks/useProposalVotesChart";
+import { ExpandCollapseIcon } from "@/icons/ExpandCollapseIcon";
 
 export default function ProposalChart({ proposal }: { proposal: Proposal }) {
   const [tabIndex, setTabIndex] = useState(0);
@@ -46,7 +45,7 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
       >
         <div className="flex gap-1 py-1 text-secondary">
           Proposal Visualization{" "}
-          <Image src={icons.chevronSelectorVertical} alt="chevronIcon" />
+          <ExpandCollapseIcon className="stroke-tertiary h-3 w-3 self-center" />
         </div>
         <div className="flex gap-x-2 items-center">
           {tabs.map((tab) => (

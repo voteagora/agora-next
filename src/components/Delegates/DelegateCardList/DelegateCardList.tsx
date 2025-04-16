@@ -5,7 +5,6 @@ import InfiniteScroll from "react-infinite-scroller";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
-import { Delegation } from "@/app/api/common/delegations/delegation";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import DelegateCard from "./DelegateCard";
@@ -17,7 +16,6 @@ interface Props {
     pagination: PaginationParams,
     seed?: number
   ) => Promise<PaginatedResult<DelegateChunk[]>>;
-  fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
 
 export default function DelegateCardList({

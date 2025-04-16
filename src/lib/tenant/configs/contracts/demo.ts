@@ -2,7 +2,7 @@ import {
   AgoraGovernor__factory,
   AgoraTimelock__factory,
   ProposalTypesConfigurator__factory,
-  ERC20__factory,
+  AgoraToken__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
@@ -37,10 +37,10 @@ export const demoTenantConfig = ({ alchemyId }: Props): TenantContracts => {
 
   return {
     token: createTokenContract({
-      abi: ERC20__factory.abi,
+      abi: AgoraToken__factory.abi,
       address: TOKEN as `0x${string}`,
       chain,
-      contract: ERC20__factory.connect(TOKEN, provider),
+      contract: AgoraToken__factory.connect(TOKEN, provider),
       provider,
       type: "erc20",
     }),
