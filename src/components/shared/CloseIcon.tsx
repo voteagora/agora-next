@@ -1,5 +1,6 @@
 type Props = {
   className: string;
+  onClick?: (e: React.MouseEvent) => void;
 };
 
 export function CloseIcon(props: Props) {
