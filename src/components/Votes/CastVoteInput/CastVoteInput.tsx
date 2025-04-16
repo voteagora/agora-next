@@ -158,7 +158,7 @@ function CastVoteInputContent({
     !reason;
 
   return (
-    <div className="flex flex-col flex-shrink bg-wash">
+    <div className="flex flex-col flex-shrink rounded-b-lg">
       <div
         className={`flex flex-col bg-neutral border-b border-line rounded-b-lg flex-shrink ${isGasRelayLive && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
       >
@@ -176,10 +176,12 @@ function CastVoteInputContent({
                       className="text-sm text-primary bg-neutral resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
                     />
                   )}
-                  <VoteButtons
-                    proposalStatus={proposal.status}
-                    isOptimistic={isOptimistic}
-                  />
+                  <div className={cn(proposal.status !== "ACTIVE" && "mt-3")}>
+                    <VoteButtons
+                      proposalStatus={proposal.status}
+                      isOptimistic={isOptimistic}
+                    />
+                  </div>
                 </div>
               )}
               {isLoading && <LoadingVote />}
