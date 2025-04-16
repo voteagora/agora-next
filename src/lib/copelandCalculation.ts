@@ -473,8 +473,8 @@ export function calculateCopelandVote(
   );
 
   // Calculate funding allocations based on 2 buckets
-  const EXT2Y_BUDGET = budget * 0.333; // $1.5M for 2Y bucket
-  const EXT1Y_BUDGET = budget * 0.666; // $3M for 1Y bucket
+  const EXT2Y_BUDGET = 1500000; // $1.5M for 2Y bucket
+  const EXT1Y_BUDGET = 3000000; // $3M for 1Y bucket
 
   let remaining2YBudget = EXT2Y_BUDGET;
   let remaining1YBudget = EXT1Y_BUDGET;
@@ -513,11 +513,15 @@ export function calculateCopelandVote(
       if (isAboveNoneBelow) {
         // Check if this is an extended option
         const isExtended = isExtendedOption(option);
+        const canGet2Y = info.isEligibleFor2Y && isInTop10(option);
 
         // Process standard options first
         if (!isExtended) {
           // Non-extended options can only get STD funding
-          if (remaining1YBudget >= info.std) {
+          if (canGet2Y && remaining2YBudget >= info.std) {
+            fundingType = "STD";
+            remaining2YBudget -= info.std;
+          } else if (remaining1YBudget >= info.std) {
             fundingType = "STD";
             remaining1YBudget -= info.std;
           }
