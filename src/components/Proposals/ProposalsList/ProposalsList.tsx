@@ -37,14 +37,9 @@ export default function ProposalsList({
   } | null;
 }) {
   const { address } = useAccount();
-  const { ui, slug } = Tenant.current();
+  const { ui } = Tenant.current();
   let tenantSupportsProposalLifecycle =
     ui.toggle("proposal-lifecycle")?.enabled;
-
-  if (slug === DaoSlug.OP) {
-    tenantSupportsProposalLifecycle =
-      address === "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8" || false;
-  }
 
   const filter = useSearchParams()?.get("filter") || "relevant";
   const fetching = useRef(false);
