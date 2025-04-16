@@ -188,7 +188,8 @@ async function getCurrentDelegatorsForAddress({
                                     AND ghost."from" = $2`;
     }
 
-    if (namespace === TENANT_NAMESPACES.OPTIMISM) { // This case is actually, just any tenant that has a delegatees_mat view working and compatible.
+    if (namespace === TENANT_NAMESPACES.OPTIMISM) {
+      // This case is actually, just any tenant that has a delegatees_mat view working and compatible.
       directDelegatorsSubQry = `  SELECT
                                     "from",
                                     "to",
@@ -203,7 +204,7 @@ async function getCurrentDelegatorsForAddress({
                                       address = $3 AND
                                       "to" = $1
                                   ORDER BY
-                                    block_number DESC`
+                                    block_number DESC`;
     } else if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
       directDelegatorsSubQry = `WITH ghost as (SELECT
                   null::text as "from",
@@ -287,7 +288,6 @@ async function getCurrentDelegatorsForAddress({
                 transaction_index DESC`;
     }
 
-
     const delegatorsQry = `
         WITH advanced_delegatees AS ( ${advancedDelegatorsSubQry} ),
              direct_delegatees AS ( ${directDelegatorsSubQry} )
@@ -296,7 +296,7 @@ async function getCurrentDelegatorsForAddress({
         SELECT * FROM direct_delegatees
         OFFSET $4
         LIMIT $5;
-      `
+      `;
 
     const [delegators, latestBlock] = await Promise.all([
       paginateResult(async (skip: number, take: number) => {
