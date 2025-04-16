@@ -70,7 +70,8 @@ function isExtendedOption(option: string): boolean {
 export function calculateCopelandVote(
   votes: SnapshotVote[],
   options: string[],
-  budget: number,
+  budget_2y: number,
+  budget_1y: number,
   fundingInfo: Record<string, FundingInfo>
 ): CopelandResult[] {
   // Early return if no votes
@@ -472,12 +473,8 @@ export function calculateCopelandVote(
     (option) => option.option === "NONE BELOW"
   );
 
-  // Calculate funding allocations based on 2 buckets
-  const EXT2Y_BUDGET = 1500000; // $1.5M for 2Y bucket
-  const EXT1Y_BUDGET = 3000000; // $3M for 1Y bucket
-
-  let remaining2YBudget = EXT2Y_BUDGET;
-  let remaining1YBudget = EXT1Y_BUDGET;
+  let remaining2YBudget = budget_2y;
+  let remaining1YBudget = budget_1y;
 
   // Determine if an option is in the top 10 (for 2Y eligibility)
   const isInTop10 = (option: string): boolean => {

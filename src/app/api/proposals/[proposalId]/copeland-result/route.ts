@@ -37,7 +37,8 @@ const FUNDING_VALUES = {
 } as const;
 
 // Total budget of $4.5M for 12 months
-const TOTAL_BUDGET = 4500000;
+const BUDGET_2Y = 1500000;
+const BUDGET_1Y = 3000000;
 
 export async function GET(
   request: NextRequest,
@@ -59,7 +60,8 @@ export async function GET(
       (
         proposal.proposalData as unknown as ParsedProposalData["SNAPSHOT"]["kind"]
       ).choices,
-      TOTAL_BUDGET,
+      BUDGET_2Y,
+      BUDGET_1Y,
       FUNDING_VALUES
     );
     return NextResponse.json(result);

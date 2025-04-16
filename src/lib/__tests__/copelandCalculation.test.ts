@@ -26,7 +26,8 @@ describe("Copeland Calculation", () => {
   ];
 
   // Total budget
-  const budget = 4500000;
+  const BUDGET_2Y = 1500000;
+  const BUDGET_1Y = 3000000;
 
   describe("Extended vs Standard option ranking", () => {
     it("should move standard option above extended when extended is ranked higher", () => {
@@ -49,7 +50,8 @@ describe("Copeland Calculation", () => {
       const results = calculateCopelandVote(
         votes,
         options,
-        budget,
+        BUDGET_2Y,
+        BUDGET_1Y,
         fundingInfo
       );
 
@@ -84,7 +86,8 @@ describe("Copeland Calculation", () => {
       const results = calculateCopelandVote(
         votes,
         options,
-        budget,
+        BUDGET_2Y,
+        BUDGET_1Y,
         fundingInfo
       );
 
@@ -122,7 +125,8 @@ describe("Copeland Calculation", () => {
       const results = calculateCopelandVote(
         votes,
         options,
-        budget,
+        BUDGET_2Y,
+        BUDGET_1Y,
         fundingInfo
       );
 
@@ -160,7 +164,8 @@ describe("Copeland Calculation", () => {
       const results = calculateCopelandVote(
         votes,
         options,
-        budget,
+        BUDGET_2Y,
+        BUDGET_1Y,
         fundingInfo
       );
 
@@ -214,7 +219,8 @@ describe("Copeland Calculation", () => {
       const results = calculateCopelandVote(
         votes,
         options,
-        budget,
+        BUDGET_2Y,
+        BUDGET_1Y,
         fundingInfo
       );
 
@@ -254,9 +260,6 @@ describe("Copeland Calculation", () => {
       "NONE BELOW": { ext: null, std: 0, isEligibleFor2Y: false },
     };
 
-    // Total budget
-    const budget = 2000000;
-
     it("should only give extended funding if standard option received funding", () => {
       // Create votes to establish a clear ranking
       const votes: SnapshotVote[] = [
@@ -274,12 +277,13 @@ describe("Copeland Calculation", () => {
       ];
 
       // Set a budget that's enough for Team A and Team A (Extended) but not for Team B
-      const smallBudget = 500000;
-
+      const BUDGET_2Y = 500000 * 0.333;
+      const BUDGET_1Y = 500000 * 0.666;
       const results = calculateCopelandVote(
         votes,
         options,
-        smallBudget,
+        BUDGET_2Y,
+        BUDGET_1Y,
         fundingInfo
       );
 
@@ -327,11 +331,14 @@ describe("Copeland Calculation", () => {
 
       // Set a very small budget so that no options can be funded
       const tinyBudget = 100000;
+      const BUDGET_2Y = tinyBudget * 0.333;
+      const BUDGET_1Y = tinyBudget * 0.666;
 
       const results = calculateCopelandVote(
         votes,
         options,
-        tinyBudget,
+        BUDGET_2Y,
+        BUDGET_1Y,
         fundingInfo
       );
 
@@ -409,7 +416,8 @@ describe("Copeland Calculation", () => {
       const results = calculateCopelandVote(
         votes,
         options,
-        budget,
+        BUDGET_2Y,
+        BUDGET_1Y,
         fundingInfo
       );
 
@@ -489,7 +497,8 @@ describe("Copeland Calculation", () => {
       const results = calculateCopelandVote(
         votes,
         options,
-        budget,
+        BUDGET_2Y,
+        BUDGET_1Y,
         fundingInfo
       );
 
@@ -557,7 +566,8 @@ describe("Copeland Calculation", () => {
       const results = calculateCopelandVote(
         votes,
         extendedOptions,
-        budget,
+        BUDGET_2Y,
+        BUDGET_1Y,
         extendedFundingInfo
       );
 
