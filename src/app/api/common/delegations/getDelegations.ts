@@ -244,7 +244,7 @@ async function getCurrentDelegatorsForAddress({
                                                      'DIRECT' as type,
                                                      block_number,
                                                      'FULL' as amount,
-                                                     transaction_hash from latest_delegations where to_delegate = LOWER($1) or delegator = LOWER($1)`;
+                                                     transaction_hash from latest_delegations where LOWER(to_delegate) = LOWER($1)`;
     } else {
       directDelegatorsSubQry = `
               SELECT
