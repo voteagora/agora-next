@@ -77,7 +77,7 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
         quorum = await contracts.governor.contract.quorum!(
           proposal.proposal_id
         );
-      } catch (error) {
+      } catch {
         // this is a hack, because...git // https://linear.app/agora-app/issue/AGORA-3246/quorum-isnt-known-for-proposal-before-its-snapshot
         quorum = await findVotableSupply({
           namespace,

@@ -46,14 +46,13 @@ async function getProposals({
           { name: "getProposals" },
           async () =>
             paginateResult(async (skip: number, take: number) => {
-              const proposals = await findProposalsQuery({
+              return findProposalsQuery({
                 namespace,
                 skip,
                 take,
                 filter,
                 contract: contracts.governor.address,
               });
-              return proposals as ProposalPayload[];
             }, pagination)
         );
 

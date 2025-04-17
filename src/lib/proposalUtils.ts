@@ -1,5 +1,5 @@
 import { ProposalType } from "@prisma/client";
-import { blocksToSeconds, getHumanBlockTime } from "./blockTimes";
+import { getHumanBlockTime } from "./blockTimes";
 import {
   Proposal,
   BlockBasedProposal,
@@ -8,8 +8,9 @@ import {
 } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData, keccak256 } from "viem";
 import Tenant from "./tenant/tenant";
-import { Block } from "ethers";
+import { Block, toUtf8Bytes } from "ethers";
 import { mapArbitrumBlockToMainnetBlock } from "./utils";
+import { TENANT_NAMESPACES } from "./constants";
 
 // Type guards
 export function isTimestampBasedProposal(
@@ -706,7 +707,7 @@ export function parseProposalResults(
 
       const standardResults = (() => {
         if (
-          namespace.toString() === "uniswap" &&
+          namespace === TENANT_NAMESPACES.OPTIMISM &&
           contracts.governor.v6UpgradeBlock &&
           Number(startBlock) < contracts.governor.v6UpgradeBlock
         ) {
@@ -884,7 +885,7 @@ export const proposalToCallArgs = (proposal: Proposal) => {
     "options" in proposalData ? proposalData.options[0].targets : "",
     "options" in proposalData ? proposalData.options[0].values : "",
     "options" in proposalData ? proposalData.options[0].calldatas : "",
-    keccak256(proposal.description! as `0x${string}`),
+    keccak256(toUtf8Bytes(proposal.description!)),
   ];
 };
 
@@ -907,7 +908,7 @@ export function getProposalCurrentQuorum(
   const { namespace } = Tenant.current();
 
   switch (namespace) {
-    case "uniswap":
+    case TENANT_NAMESPACES.UNISWAP:
       return BigInt(proposalResults.for);
 
     default:
@@ -918,7 +919,7 @@ export function getProposalCurrentQuorum(
 export function isProposalCreatedBeforeUpgradeCheck(proposal: Proposal) {
   const { namespace } = Tenant.current();
   return (
-    namespace === "optimism" &&
+    namespace === TENANT_NAMESPACES.OPTIMISM &&
     proposal.createdTime &&
     new Date(proposal.createdTime) < new Date("2024-01-08")
   );
