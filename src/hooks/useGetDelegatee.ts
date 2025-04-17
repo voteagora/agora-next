@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchDirectDelegatee } from "@/app/delegates/actions";
+import { fetchCurrentDelegatees } from "@/app/delegates/actions";
 
 export const DELEGATEE_QK = "delegatee";
 
-export const useGetDelegatee = ({
+export const useGetDelegatees = ({
   address,
 }: {
   address: `0x${string}` | undefined;
@@ -12,8 +12,8 @@ export const useGetDelegatee = ({
     enabled: !!address,
     queryKey: [DELEGATEE_QK, address],
     queryFn: async () => {
-      const delegatee = await fetchDirectDelegatee(address as `0x${string}`);
-      return delegatee;
+      const delegatees = await fetchCurrentDelegatees(address as `0x${string}`);
+      return delegatees;
     },
   });
 
