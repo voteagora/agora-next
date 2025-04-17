@@ -14,6 +14,7 @@ import {
   getBlockScanAddress,
   getBlockScanUrl,
   shortAddress,
+  getFunctionSignature,
 } from "@/lib/utils";
 import {
   ArrowTopRightOnSquareIcon,
@@ -22,8 +23,14 @@ import {
 } from "@heroicons/react/20/solid";
 import React, { useState } from "react";
 import { formatUnits } from "viem";
+import { toast } from "react-hot-toast";
+import { checkExistingProposal } from "@/lib/seatbelt/checkProposal";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import { TENDERLY_VALID_CHAINS } from "@/app/proposals/draft/components/BasicProposalForm";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { Button } from "@/components/ui/button";
 
-const { contracts, token } = Tenant.current();
+const { contracts, token, ui } = Tenant.current();
 
 const tokenSymbolsToCheck = {
   [`${contracts.token.address.toLowerCase()}`]: {
@@ -45,6 +52,7 @@ const ProposalTransactionDisplay = ({
   simulationDetails,
   network = "mainnet",
   signatures,
+  proposal,
 }: {
   targets: string[];
   calldatas: `0x${string}`[];
@@ -57,9 +65,21 @@ const ProposalTransactionDisplay = ({
     state?: string | null;
   };
   network?: string;
+  proposal?: Proposal;
 }) => {
   const [collapsed, setCollapsed] = useState(true);
   const [viewMode, setViewMode] = useState<"summary" | "raw">("summary");
+  const [isSimulating, setIsSimulating] = useState(false);
+  const openDialog = useOpenDialog();
+
+  const hasRealCalldatas = calldatas.some((calldata) => calldata !== "0x");
+  const hasNonEmptySignatures = signatures?.some(
+    (signature) => signature !== ""
+  );
+  const hasNonEmptyValues = values.some((value) => Number(value) !== 0);
+
+  const hasRealActions =
+    hasRealCalldatas || hasNonEmptySignatures || hasNonEmptyValues;
 
   if (targets.length === 0) {
     return (
@@ -82,37 +102,102 @@ const ProposalTransactionDisplay = ({
     values.length
   );
 
+  const simulateTransactions = async () => {
+    try {
+      if (!proposal) {
+        throw new Error("Proposal is required");
+      }
+      setIsSimulating(true);
+      const report = await checkExistingProposal({
+        existingProposal: proposal,
+      });
+
+      openDialog({
+        type: "SIMULATION_REPORT",
+        params: {
+          report: report?.structuredReport ?? null,
+        },
+        className: "sm:w-[40rem]",
+      });
+    } catch (e) {
+      console.error(e);
+      toast.error("Error simulating transactions");
+    } finally {
+      setIsSimulating(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex flex-col border rounded-t-lg border-line text-xs text-primary break-words overflow-hidden">
-        <div className="w-full flex items-center justify-between mb-2 border-b border-line px-4 py-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-primary">Actions</span>
-            {executedTransactionHash && (
-              <a
-                href={getBlockScanUrl(executedTransactionHash)}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="text-primary hover:text-primary/80 transition-colors"
+        <div className="w-full flex flex-col sm:flex-row mb-2 border-b border-line px-4 py-3">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-primary">
+                Actions
+              </span>
+              {executedTransactionHash && (
+                <a
+                  href={getBlockScanUrl(executedTransactionHash)}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-primary hover:text-primary/80 transition-colors"
+                >
+                  <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                </a>
+              )}
+              {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
+                !!proposal?.id &&
+                hasRealActions && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={simulateTransactions}
+                    disabled={isSimulating}
+                    className={cn(
+                      "hidden sm:flex items-center gap-2",
+                      ui.theme === "dark" && "text-neutral"
+                    )}
+                  >
+                    {isSimulating
+                      ? "Simulating..."
+                      : "Simulate transactions (Beta)"}
+                  </Button>
+                )}
+            </div>
+            <div className="flex">
+              <button
+                className={`px-2 py-1 text-xs font-semibold ${viewMode === "summary" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
+                onClick={() => setViewMode("summary")}
               >
-                <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-              </a>
+                Summary
+              </button>
+              <button
+                className={`px-2 py-1 text-xs font-semibold ${viewMode === "raw" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
+                onClick={() => setViewMode("raw")}
+              >
+                Raw
+              </button>
+            </div>
+          </div>
+          {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
+            !!proposal?.id &&
+            hasRealActions && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={simulateTransactions}
+                disabled={isSimulating}
+                className={cn(
+                  "flex items-center gap-2 sm:hidden mt-2",
+                  ui.theme === "dark" && "text-neutral"
+                )}
+              >
+                {isSimulating
+                  ? "Simulating..."
+                  : "Simulate transactions (Beta)"}
+              </Button>
             )}
-          </div>
-          <div className="flex">
-            <button
-              className={`px-2 py-1 text-xs font-semibold ${viewMode === "summary" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
-              onClick={() => setViewMode("summary")}
-            >
-              Summary
-            </button>
-            <button
-              className={`px-2 py-1 text-xs font-semibold ${viewMode === "raw" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
-              onClick={() => setViewMode("raw")}
-            >
-              Raw
-            </button>
-          </div>
         </div>
 
         <div className="p-4 pt-2">
@@ -428,7 +513,7 @@ const ActionSummary = ({
 
     return (
       <div className="text-xs text-primary font-semibold flex flex-col gap-y-2">
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
           <div className="flex gap-2 items-center">
             <span className="w-16">Transfer:</span>
             <span className="bg-wash p-2 rounded-sm shrink-0">
@@ -451,7 +536,12 @@ const ActionSummary = ({
                   target="_blank"
                   rel="noreferrer noopener"
                 >
-                  <ENSName address={recipient} truncate={false} />
+                  <div className="hidden sm:block">
+                    <ENSName address={recipient} truncate={false} />
+                  </div>
+                  <div className="block sm:hidden">
+                    <ENSName address={recipient} truncate={true} />
+                  </div>
                 </a>
               )}
             </div>
@@ -659,7 +749,7 @@ const ActionDetails = ({
   }
 
   return (
-    <div className="text-base text-primary font-semibold">
+    <div className="text-base text-primary font-semibold max-w-full overflow-x-auto">
       <div className="flex flex-col gap-y-10">
         {hasParameters && (
           <div>
@@ -1002,31 +1092,6 @@ function formatFunctionName(name: string): string {
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase())
     .trim();
-}
-
-function getFunctionSignature(decodedData: any): string | null {
-  if (
-    !decodedData ||
-    !decodedData.function ||
-    decodedData.function === "unknown"
-  ) {
-    return null;
-  }
-
-  try {
-    let signature = `${decodedData.function}(`;
-    const paramTypes = Object.entries(decodedData.parameters).map(
-      ([_, param]: [string, any]) => {
-        return param.type || "unknown";
-      }
-    );
-    signature += paramTypes.join(",");
-    signature += ")";
-
-    return signature;
-  } catch (error) {
-    return null;
-  }
 }
 
 export default ProposalTransactionDisplay;

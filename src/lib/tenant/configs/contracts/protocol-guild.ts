@@ -27,32 +27,22 @@ export const protocolGuildTenantContractConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd
-    ? "0x95fc87e77977a70b08c76b0a7714069d8ff0ff2b"
-    : "0x380afD534539ad1C43c3268E7Cb71BAa766aE6f9";
+    ? "0x27b0031c64f4231f0aff28e668553d73f48125f3"
+    : "0x27b0031c64f4231f0aff28e668553d73f48125f3";
 
   const GOVERNOR = isProd
-    ? "0xb3e34f8efe825dd84137124f4a552c049bb0ec42"
-    : "0x1ec062fc98be10314cf902d5aa101403d2acbf73";
+    ? "0xe35caf04cd55192c04c93f3b1779a13f503e5942"
+    : "0xa6388314fe37484883266970967ab918996f3bf0";
 
   const TIMELOCK = isProd
-    ? "0x0cabe65b0adc1634f56ea66a36abb70f2d4232c5"
-    : "0xeba09e62142052831fe0ccdd73476ca5ce84b2f1";
+    ? "0x7751f14e211150F54D9ADD4727f7D6E9a07d4cDb"
+    : "0x184ad2fD9959b8F5C247Ff1188114Dffd12069a0";
 
   const TYPES = isProd
-    ? "0x368723068b6c762b416e5a7d506a605e8b816c22"
-    : "0xf8d15c3132efa557989a1c9331b6667ca8caa3a9";
+    ? "0x7ca4a290a00a99829cdd6ed9d25d6e77e5544499"
+    : "0xb7687e62d6b2cafb3ed3c3c81b0b6cf0a3884602";
 
-  const TREASURY = isProd
-    ? [
-        TIMELOCK,
-        "0x14c7dd468a86c4bd722927a815e923e60565c1b2",
-        "0x25941dc771bb64514fc8abbce970307fb9d477e9",
-      ]
-    : [
-        TIMELOCK,
-        "0x14c7dd468a86c4bd722927a815e923e60565c1b2",
-        "0x25941dc771bb64514fc8abbce970307fb9d477e9",
-      ];
+  const TREASURY = [TIMELOCK];
 
   const provider = isProd
     ? new AlchemyProvider("mainnet", alchemyId)
@@ -100,5 +90,6 @@ export const protocolGuildTenantContractConfig = ({
     governorType: GOVERNOR_TYPE.AGORA,
     timelockType:
       TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
+    supportScopes: true,
   };
 };

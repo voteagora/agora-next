@@ -368,6 +368,12 @@ export function getBlockScanUrl(hash: string | `0x${string}`) {
   return `${url}/tx/${hash}`;
 }
 
+export function getBlockScanRawUrl() {
+  const { contracts } = Tenant.current();
+  const url = contracts.token.chain.blockExplorers?.default.url;
+  return url;
+}
+
 export const getTextWidth = (text: string, font = "14px inter") => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
@@ -516,7 +522,7 @@ const isContractWallet = async (address: Address) => {
   return bytecode && bytecode !== "0x" ? true : false;
 };
 
-function delay(milliseconds: number) {
+export function delay(milliseconds: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, milliseconds);
   });
@@ -612,3 +618,28 @@ export const wrappedWaitForTransactionReceipt = async (
     return publicClient.waitForTransactionReceipt(params);
   }
 };
+
+export function getFunctionSignature(decodedData: any): string | null {
+  if (
+    !decodedData ||
+    !decodedData.function ||
+    decodedData.function === "unknown"
+  ) {
+    return null;
+  }
+
+  try {
+    let signature = `${decodedData.function}(`;
+    const paramTypes = Object.entries(decodedData.parameters).map(
+      ([_, param]: [string, any]) => {
+        return param.type || "unknown";
+      }
+    );
+    signature += paramTypes.join(",");
+    signature += ")";
+
+    return signature;
+  } catch (error) {
+    return null;
+  }
+}

@@ -188,7 +188,24 @@ async function getCurrentDelegatorsForAddress({
                                     AND ghost."from" = $2`;
     }
 
-    if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
+    if (namespace === TENANT_NAMESPACES.OPTIMISM) {
+      // This case is actually, just any tenant that has a delegatees_mat view working and compatible.
+      directDelegatorsSubQry = `  SELECT
+                                    "from",
+                                    "to",
+                                    NULL::numeric AS allowance,
+                                    'DIRECT' AS type,
+                                    block_number,
+                                    'FULL' AS amount,
+                                    transaction_hash
+                                  FROM
+                                    ${namespace}.delegatees_mat
+                                  WHERE
+                                      address = $3 AND
+                                      "to" = $1
+                                  ORDER BY
+                                    block_number DESC`;
+    } else if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
       directDelegatorsSubQry = `WITH ghost as (SELECT
                   null::text as "from",
                   null::text as "to",
@@ -271,6 +288,16 @@ async function getCurrentDelegatorsForAddress({
                 transaction_index DESC`;
     }
 
+    const delegatorsQry = `
+        WITH advanced_delegatees AS ( ${advancedDelegatorsSubQry} ),
+             direct_delegatees AS ( ${directDelegatorsSubQry} )
+        SELECT * FROM advanced_delegatees
+        UNION ALL
+        SELECT * FROM direct_delegatees
+        OFFSET $4
+        LIMIT $5;
+      `;
+
     const [delegators, latestBlock] = await Promise.all([
       paginateResult(async (skip: number, take: number) => {
         return prismaWeb2Client.$queryRawUnsafe<
@@ -284,16 +311,7 @@ async function getCurrentDelegatorsForAddress({
             transaction_hash: string;
           }[]
         >(
-          `
-            WITH advanced_delegatees AS ( ${advancedDelegatorsSubQry} )
-
-            , direct_delegatees AS ( ${directDelegatorsSubQry} )
-            SELECT * FROM advanced_delegatees
-            UNION ALL
-            SELECT * FROM direct_delegatees
-            OFFSET $4
-            LIMIT $5;
-          `,
+          delegatorsQry,
           address,
           contractAddress,
           contracts.token.address,

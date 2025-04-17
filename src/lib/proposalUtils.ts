@@ -311,6 +311,7 @@ export async function parseProposal(
           : null,
     startTime: calculateStartTime(),
     endTime: calculateEndTime(),
+    endBlock: proposalData.key === "SNAPSHOT" ? null : endBlock,
     cancelledTime:
       proposalData.key === "SNAPSHOT"
         ? null
@@ -323,6 +324,7 @@ export async function parseProposal(
         : latestBlock && proposal.executed_block
           ? getHumanBlockTime(executedBlock ?? 0, latestBlock)
           : null,
+    executedBlock: proposalData.key === "SNAPSHOT" ? null : executedBlock,
     queuedTime:
       proposalData.key === "SNAPSHOT"
         ? null
@@ -448,10 +450,18 @@ export function parseIfNecessary(obj: string | object) {
 
 function parseMultipleStringsSeparatedByComma(obj: string | object) {
   return typeof obj === "string"
-    ? obj.split(",")
+    ? obj
+        .split(/(?![^(]*\)),\s*/)
+        .map((item) => item.replace(/^['"]|['"]$/g, ""))
     : Array.isArray(obj)
       ? obj
-          .map((item) => (typeof item === "string" ? item.split(",") : item))
+          .map((item) =>
+            typeof item === "string"
+              ? item
+                  .split(/(?![^(]*\)),\s*/)
+                  .map((i) => i.replace(/^['"]|['"]$/g, ""))
+              : item
+          )
           .flat()
       : obj;
 }
@@ -488,7 +498,9 @@ export function parseProposalData(
           parseIfNecessary(parsedProposalData.targets)
         );
         const values = parseIfNecessary(parsedProposalData.values);
-        const signatures = parseIfNecessary(parsedProposalData.signatures);
+        const signatures: any = parseMultipleStringsSeparatedByComma(
+          parseIfNecessary(parsedProposalData.signatures)
+        );
         const functionArgsName = decodeCalldata(calldatas);
 
         return {

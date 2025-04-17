@@ -57,6 +57,7 @@ export type TenantContracts = {
   supportScopes?: boolean;
   chainForTime?: Chain;
   providerForTime?: AlchemyProvider;
+  supportScopes?: boolean;
 };
 
 export type TenantToken = {
