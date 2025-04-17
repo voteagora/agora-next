@@ -410,6 +410,12 @@ export const getTransportForChain = (chainId: number) => {
         FORK_NODE_URL ||
           `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
+    // optimism sepolia
+    case 11155420:
+      return http(
+        FORK_NODE_URL ||
+          `https://opt-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
     // base
     case 8453:
       return http(
