@@ -512,6 +512,7 @@ view OptimismProposalTypes {
   quorum             String
   approval_threshold String
   name               String
+  module             String
   inputs             Json
 
   @@map("proposal_types")
@@ -748,6 +749,7 @@ view ensProposalTypes {
   quorum             String
   approval_threshold String
   name               String
+  module             String
   inputs             Json
 
   @@map("proposal_types")
@@ -946,6 +948,7 @@ view etherfiProposalTypes {
   quorum             String
   approval_threshold String
   name               String
+  module             String
   inputs             Json
 
   @@map("proposal_types")
@@ -1144,6 +1147,7 @@ view uniswapProposalTypes {
   quorum             String
   approval_threshold String
   name               String
+  module             String
   inputs             Json
 
   @@map("proposal_types")
@@ -1984,6 +1988,7 @@ view cyberProposalTypes {
   quorum             String
   approval_threshold String
   name               String
+  module             String
   inputs             Json
 
   @@schema("cyber")
@@ -2321,6 +2326,7 @@ view scrollProposalTypes {
   quorum             String
   approval_threshold String
   name               String
+  module             String
   inputs             Json
 
   @@schema("scroll")
@@ -2646,6 +2652,7 @@ view deriveProposalTypes {
   quorum             String
   approval_threshold String
   name               String
+  module             String
   inputs             Json
 
   @@schema("derive")
@@ -2972,6 +2979,7 @@ view pguildProposalTypes {
   quorum             String
   approval_threshold String
   name               String
+  module             String
   inputs             Json
 
   @@schema("pguild")
@@ -3297,6 +3305,7 @@ view boostProposalTypes {
   quorum             String
   approval_threshold String
   name               String
+  module             String
   inputs             Json
 
   @@schema("boost")
@@ -3620,6 +3629,7 @@ view xaiProposalTypes {
   quorum             String
   approval_threshold String
   name               String
+  module             String
   inputs             Json
 
   @@schema("xai")
@@ -3862,6 +3872,7 @@ view b3ProposalTypes {
   quorum             String
   approval_threshold String
   name               String
+  module             String
   inputs             Json
 
   @@schema("b3")
@@ -4136,6 +4147,7 @@ view demoProposalTypes {
   quorum             String
   approval_threshold String
   name               String
+  module             String
   inputs             Json
   @@map("proposal_types")
   @@schema("demo")
