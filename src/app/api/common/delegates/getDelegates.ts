@@ -468,85 +468,13 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       fetchCurrentQuorum(),
     ]);
 
-    const numOfAdvancedDelegationsQuery = `SELECT count(*) as num_of_delegators
-            FROM ${namespace + ".advanced_delegatees"}
-            WHERE "to"=$1 AND contract=$2 AND delegated_amount > 0`;
-    var numOfDirectDelegationsQuery;
-
-    if (contracts.token.isERC20()) {
-      numOfDirectDelegationsQuery = `        SELECT
-            SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
-          FROM ${namespace + ".delegate_changed_events"}
-          WHERE (to_delegate=$1 OR from_delegate=$1) AND address=$2`;
-    } else if (contracts.token.isERC721()) {
-      numOfDirectDelegationsQuery = `with latest_delegations AS (
-                                              SELECT DISTINCT ON (delegator)
-                                                  delegator,
-                                                  to_delegate,
-                                                  chain_id,
-                                                  address,
-                                                  block_number,
-                                                  transaction_index,
-                                                  log_index
-                                              FROM
-                                                  ${namespace}.delegate_changed_events WHERE address = $2
-                                              ORDER BY
-                                                  delegator,
-                                                  block_number DESC,
-                                                  transaction_index DESC,
-                                                  log_index DESC)
-
-                                              SELECT count(*) as num_of_delegators from latest_delegations where to_delegate = LOWER($1);`;
-    } else {
-      throw new Error("Token contract is neither ERC20 nor ERC721?");
-    }
-    var numOfDelegationsQuery;
-
-    const partialDelegationContract = contracts.alligator
-      ? contracts.alligator.address
-      : contracts.token.address;
-
-    if (contracts.alligator) {
-      numOfDelegationsQuery = prismaWeb3Client.$queryRawUnsafe<
-        { num_of_delegators: BigInt }[]
-      >(
-        `
-          SELECT
-            SUM(num_of_delegators) as num_of_delegators
-          FROM (
-            ${numOfAdvancedDelegationsQuery}
-            UNION ALL
-            ${numOfDirectDelegationsQuery}
-          ) t;
-          `,
-        address,
-        partialDelegationContract
-      );
-    } else if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
-      numOfDelegationsQuery = prismaWeb3Client.$queryRawUnsafe<
-        { num_of_delegators: BigInt }[]
-      >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);
-    } else {
-      numOfDelegationsQuery = prismaWeb3Client.$queryRawUnsafe<
-        { num_of_delegators: BigInt }[]
-      >(numOfDirectDelegationsQuery, address, partialDelegationContract);
-    }
-
     const totalVotingPower =
       BigInt(delegate?.voting_power || 0) +
       BigInt(delegate?.advanced_vp?.toFixed(0) || 0);
 
-    const cachedNumOfDelegators = BigInt(
-      delegate.num_of_delegators?.toFixed() || "0"
+    const numOfDelegators = BigInt(
+      delegate?.num_of_delegators?.toFixed() || "0"
     );
-
-    const usedNumOfDelegators =
-      cachedNumOfDelegators < 1000n
-        ? BigInt(
-            (await numOfDelegationsQuery)?.[0]?.num_of_delegators?.toString() ||
-              "0"
-          )
-        : cachedNumOfDelegators;
 
     const relativeVotingPowerToVotableSupply = calculateBigIntRatio(
       totalVotingPower,
@@ -577,7 +505,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       votedAbstain: delegate?.abstain?.toString() || "0",
       votingParticipation: delegate?.participation_rate || 0,
       lastTenProps: delegate?.last_10_props?.toFixed() || "0",
-      numOfDelegators: usedNumOfDelegators,
+      numOfDelegators: numOfDelegators,
       totalProposals: delegate?.total_proposals || 0,
       statement: delegate?.statement || null,
       relativeVotingPowerToVotableSupply,
