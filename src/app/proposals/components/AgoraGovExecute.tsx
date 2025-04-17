@@ -6,7 +6,6 @@ import {
   useWriteContract,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 
@@ -17,6 +16,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import {
+  getProposalCallArgs,
+  getProposalFunctionName,
+} from "@/app/proposals/utils/moduleProposalUtils";
 
 interface Props {
   proposal: Proposal;
@@ -66,6 +69,11 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
     }
   }, [isSuccess, isError, error]);
 
+  // Note: Optimistic proposals are not executed
+  if (proposal.proposalType === "OPTIMISTIC") {
+    return null;
+  }
+
   return (
     <div>
       <TooltipProvider delayDuration={0}>
@@ -90,8 +98,11 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
                     write({
                       address: contracts.governor.address as `0x${string}`,
                       abi: contracts.governor.abi,
-                      functionName: "execute",
-                      args: proposalToCallArgs(proposal),
+                      functionName: getProposalFunctionName(
+                        proposal.proposalType!,
+                        "execute"
+                      ),
+                      args: getProposalCallArgs(proposal),
                     })
                   }
                   loading={isLoading}

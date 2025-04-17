@@ -2,9 +2,12 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
+import {
+  getProposalCallArgs,
+  getProposalFunctionName,
+} from "@/app/proposals/utils/moduleProposalUtils";
 
 interface Props {
   proposal: Proposal;
@@ -19,6 +22,7 @@ export const AgoraGovQueue = ({ proposal }: Props) => {
     useWaitForTransactionReceipt({
       hash: data,
     });
+
 
   useEffect(() => {
     if (isSuccess) {
@@ -37,6 +41,11 @@ export const AgoraGovQueue = ({ proposal }: Props) => {
     }
   }, [isSuccess, isError, error]);
 
+  // Note: Optimistic proposals are not queued
+  if (proposal.proposalType === "OPTIMISTIC") {
+    return null;
+  }
+
   return (
     <>
       {!isFetched && (
@@ -46,8 +55,11 @@ export const AgoraGovQueue = ({ proposal }: Props) => {
             write({
               address: contracts.governor.address as `0x${string}`,
               abi: contracts.governor.abi,
-              functionName: "queue",
-              args: proposalToCallArgs(proposal),
+              functionName: getProposalFunctionName(
+                proposal.proposalType!,
+                "queue"
+              ),
+              args: getProposalCallArgs(proposal),
             })
           }
         >

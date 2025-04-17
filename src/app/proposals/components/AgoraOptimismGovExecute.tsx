@@ -6,7 +6,6 @@ import {
   useWriteContract,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 
@@ -16,10 +15,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
-import { ProposalType } from "@/app/proposals/draft/types";
-import { keccak256 } from "viem";
-import { toUtf8Bytes } from "ethers";
+import {
+  getProposalCallArgs,
+  getProposalFunctionName,
+} from "@/app/proposals/utils/moduleProposalUtils";
 
 interface Props {
   proposal: Proposal;
@@ -51,27 +50,6 @@ export const AgoraOptimismGovExecute = ({ proposal }: Props) => {
 
   const { isLoading, isSuccess, isError, isFetched, error } =
     useWaitForTransactionReceipt({ hash: data });
-
-  const isStandardType = proposal.proposalType === "STANDARD";
-
-  const callArgs = () => {
-    if (isStandardType) {
-      return proposalToCallArgs(proposal);
-    } else {
-      const moduleAddress = getProposalTypeAddress(ProposalType.APPROVAL);
-
-      if (!moduleAddress) {
-        throw new Error(
-          `Module address not found for tenant ${Tenant.current().namespace}`
-        );
-      }
-      return [
-        moduleAddress,
-        proposal.unformattedProposalData,
-        keccak256(toUtf8Bytes(proposal.description!)),
-      ];
-    }
-  };
 
   useEffect(() => {
     if (isSuccess) {
@@ -115,10 +93,11 @@ export const AgoraOptimismGovExecute = ({ proposal }: Props) => {
                     write({
                       address: contracts.governor.address as `0x${string}`,
                       abi: contracts.governor.abi,
-                      functionName: isStandardType
-                        ? "execute"
-                        : "executeWithModule",
-                      args: callArgs(),
+                      functionName: getProposalFunctionName(
+                        proposal.proposalType!,
+                        "execute"
+                      ),
+                      args: getProposalCallArgs(proposal),
                     })
                   }
                   loading={isLoading}

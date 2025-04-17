@@ -6,14 +6,13 @@ import {
   useWriteContract,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
-import { ProposalType } from "@/app/proposals/draft/types";
-import { keccak256 } from "viem";
-import { toUtf8Bytes } from "ethers";
 import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
+import {
+  getProposalCallArgs,
+  getProposalFunctionName,
+} from "@/app/proposals/utils/moduleProposalUtils";
 
 interface Props {
   proposal: Proposal;
@@ -34,42 +33,6 @@ export const AgoraOptimismGovCancel = ({ proposal }: Props) => {
       hash: data,
     });
 
-  const isStandardType = proposal.proposalType === "STANDARD";
-
-  const callArgs = () => {
-    if (isStandardType) {
-      return proposalToCallArgs(proposal);
-    } else {
-      const approvalModuleAddress = getProposalTypeAddress(
-        ProposalType.APPROVAL
-      );
-      const optimisticModuleAddress = getProposalTypeAddress(
-        ProposalType.OPTIMISTIC
-      );
-
-      const moduleAddress =
-        proposal.proposalType === "APPROVAL"
-          ? approvalModuleAddress
-          : optimisticModuleAddress;
-
-      // When using cancelWithModule, the proposal data needs to be a hex string otherwise the bytecode
-      // won't match the proposal and the transaction will fail.
-      const proposalData = proposal.unformattedProposalData?.startsWith("0x")
-        ? proposal.unformattedProposalData
-        : `0x${proposal.unformattedProposalData}`;
-
-      if (!moduleAddress) {
-        throw new Error(
-          `Module address not found for tenant ${Tenant.current().namespace}`
-        );
-      }
-      return [
-        moduleAddress,
-        proposalData,
-        keccak256(toUtf8Bytes(proposal.description!)),
-      ];
-    }
-  };
 
   useEffect(() => {
     if (isSuccess) {
@@ -100,8 +63,11 @@ export const AgoraOptimismGovCancel = ({ proposal }: Props) => {
             write({
               address: contracts.governor.address as `0x${string}`,
               abi: contracts.governor.abi,
-              functionName: isStandardType ? "cancel" : "cancelWithModule",
-              args: callArgs(),
+              functionName: getProposalFunctionName(
+                proposal.proposalType!,
+                "cancel"
+              ),
+              args: getProposalCallArgs(proposal),
             })
           }
           variant="outline"
