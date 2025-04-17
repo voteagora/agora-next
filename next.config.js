@@ -75,11 +75,13 @@ const nextConfig = {
 // For all available options, see:
 // https://github.com/getsentry/sentry-webpack-plugin#options
 const sentryWebpackPluginOptions = {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
+  org: "agora-ph",
+  project: "agora-testing",
   // Auth tokens can be obtained from https://sentry.io/settings/account/api/auth-tokens/
-  authToken: process.env.SENTRY_AUTH_TOKEN,
-  silent: true, // Suppresses all logs
+  authToken:
+    "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",
+  // authToken: process.env.SENTRY_AUTH_TOKEN,
+  // silent: true, // Suppresses all logs
 };
 
 module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOptions);
