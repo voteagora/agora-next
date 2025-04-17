@@ -45,17 +45,16 @@ async function getProposals({
         const getProposalsExecution = doInSpan(
           { name: "getProposals" },
           async () =>
-            paginateResult(
-              (skip: number, take: number) =>
-                findProposalsQuery({
-                  namespace,
-                  skip,
-                  take,
-                  filter,
-                  contract: contracts.governor.address,
-                }),
-              pagination
-            )
+            paginateResult(async (skip: number, take: number) => {
+              const proposals = await findProposalsQuery({
+                namespace,
+                skip,
+                take,
+                filter,
+                contract: contracts.governor.address,
+              });
+              return proposals as ProposalPayload[];
+            }, pagination)
         );
 
         const latestBlockPromise: Promise<Block> = ui.toggle(
