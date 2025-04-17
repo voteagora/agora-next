@@ -32,8 +32,8 @@ type Props = {
   proposalType: ProposalType;
   index: number;
   votableSupply: string;
-  onDelete: (id: number) => void;
-  onSuccessSetProposalType: (id: number) => void;
+  onDelete: (id: number, hash?: string) => void;
+  onSuccessSetProposalType: (id: number, hash?: string) => void;
 };
 
 type ProposalType = {
@@ -81,10 +81,6 @@ export default function ProposalType({
     },
   });
 
-  const formattedVotableSupply = Number(
-    BigInt(votableSupply) / BigInt(10 ** 18)
-  );
-
   const formValues = form.watch();
 
   const deleteProposalTypeArgs = [
@@ -122,7 +118,7 @@ export default function ProposalType({
 
   useEffect(() => {
     if (isSuccessDeleteProposalType) {
-      onDelete(index); // Call onDelete to remove the row
+      onDelete(index, resultDeleteProposalType); // Call onDelete to remove the row
     }
   }, [isSuccessDeleteProposalType, onDelete, index]);
 
@@ -132,12 +128,11 @@ export default function ProposalType({
     isPending: isLoadingSetProposalType,
     isError: isErrorSetProposalType,
     isSuccess: isSuccessSetProposalType,
-    error: setProposalTypeError,
   } = useWriteContract();
 
   useEffect(() => {
     if (isSuccessSetProposalType) {
-      onSuccessSetProposalType(index);
+      onSuccessSetProposalType(index, resultSetProposalType);
     }
   }, [isSuccessSetProposalType, onSuccessSetProposalType, index]);
 
@@ -198,7 +193,7 @@ export default function ProposalType({
               disabled={isDisabled || isErrorSetProposalType}
               onClick={() => {
                 if (isClientSide) {
-                  onDelete(index);
+                  onDelete(index, resultDeleteProposalType);
                 } else {
                   writeDeleteProposalType(deleteProposalTypeConfig!.request);
                 }
