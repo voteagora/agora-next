@@ -14,7 +14,7 @@ export const getProposalTypeMetaDataForTenant = (proposalTypes: any[]) => {
 
   proposalTypes.forEach((proposalType) => {
     const name = proposalType.name.toLowerCase();
-    const module = proposalType.module.toLowerCase();
+    const moduleAddress = proposalType.module?.toLowerCase();
 
     let optimisticModuleAddress: string | null = null;
     let approvalModuleAddress: string | null = null;
@@ -32,12 +32,12 @@ export const getProposalTypeMetaDataForTenant = (proposalTypes: any[]) => {
     if (name.includes("social")) {
       proposalTypeMap.set("social", true);
     } else if (
-      (module && module === approvalModuleAddress) ||
+      (moduleAddress && moduleAddress === approvalModuleAddress) ||
       name.includes("approval")
     ) {
       proposalTypeMap.set("approval", true);
     } else if (
-      (module && module === optimisticModuleAddress) ||
+      (moduleAddress && moduleAddress === optimisticModuleAddress) ||
       name.includes("optimistic")
     ) {
       proposalTypeMap.set("optimistic", true);
