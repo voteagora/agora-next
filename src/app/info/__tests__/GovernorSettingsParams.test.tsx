@@ -103,15 +103,15 @@ describe("GovernorSettingsParams", () => {
   it("displays mixed days and hours correctly", () => {
     vi.mocked(useReadContract)
       .mockReturnValueOnce({
-        data: BigInt(9000), //9000 blocks voting period (108000 seconds = 1 day, 6 hours)
+        data: BigInt(9000), // 9000 blocks voting delay (108000 seconds = 1 day, 6 hours)
         isFetched: true,
       } as any)
       .mockReturnValueOnce({
-        data: BigInt(175 * 3600), //175 * 3600 seconds timelock delay (175 hours = 7 days, 7 hours)
+        data: BigInt(9000), // 9000 blocks voting period (108000 seconds = 1 day, 6 hours)
         isFetched: true,
       } as any)
       .mockReturnValueOnce({
-        data: BigInt(175 * 3600),
+        data: BigInt(175 * 3600), // 175 * 3600 seconds timelock delay (175 hours = 7 days, 7 hours)
         isFetched: true,
       } as any);
 
@@ -124,7 +124,7 @@ describe("GovernorSettingsParams", () => {
   it("displays hours and minutes correctly for partial hours", () => {
     vi.mocked(useReadContract)
       .mockReturnValueOnce({
-        data: BigInt(2520), //2520 blocks voting delay (30240 seconds = 8 hours, 24 minutes)
+        data: BigInt(2520), // 2520 blocks voting delay (30240 seconds = 8 hours, 24 minutes)
         isFetched: true,
       } as any)
       .mockReturnValueOnce({
