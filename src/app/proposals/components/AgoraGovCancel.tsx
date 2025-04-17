@@ -5,11 +5,15 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { Button } from "@/components/ui/button";
-import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
+
+import { Button } from "@/components/ui/button";
 import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
+import {
+  getProposalCallArgs,
+  getProposalFunctionName,
+} from "@/app/proposals/utils/moduleProposalUtils";
 
 interface Props {
   proposal: Proposal;
@@ -28,6 +32,7 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
     useWaitForTransactionReceipt({
       hash: data,
     });
+
 
   useEffect(() => {
     if (isSuccess) {
@@ -59,8 +64,11 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
             write({
               address: contracts.governor.address as `0x${string}`,
               abi: contracts.governor.abi,
-              functionName: "cancel",
-              args: proposalToCallArgs(proposal),
+              functionName: getProposalFunctionName(
+                proposal.proposalType!,
+                "cancel"
+              ),
+              args: getProposalCallArgs(proposal),
             })
           }
           variant="outline"
