@@ -310,6 +310,7 @@ export async function parseProposal(
           ? getHumanBlockTime(createdBlock ?? 0, latestBlock)
           : null,
     startTime: calculateStartTime(),
+    startBlock: proposalData.key === "SNAPSHOT" ? null : startBlock,
     endTime: calculateEndTime(),
     endBlock: proposalData.key === "SNAPSHOT" ? null : endBlock,
     cancelledTime:
