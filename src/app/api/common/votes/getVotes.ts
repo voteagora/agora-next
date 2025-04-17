@@ -53,14 +53,6 @@ async function getVotesForDelegateForAddress({
     }
 
     const queryFunction = (skip: number, take: number) => {
-      // Determine which column to use based on the tenant
-      const isTimeStampBasedProposal = ui.toggle(
-        "use-timestamp-for-proposals"
-      )?.enabled;
-      const timeColumn = isTimeStampBasedProposal
-        ? "start_timestamp"
-        : "start_block";
-
       const query = `
             SELECT
               transaction_hash,
@@ -71,7 +63,6 @@ async function getVotesForDelegateForAddress({
               reason,
               block_number,
               params,
-              ${timeColumn} as start_block,
               description,
               proposal_data,
               proposal_type
@@ -115,7 +106,6 @@ async function getVotesForDelegateForAddress({
               ) av
               LEFT JOIN LATERAL (
                 SELECT
-                  ${isTimeStampBasedProposal ? "null as start_block, proposals.start_timestamp" : "proposals.start_block, null as start_timestamp"},
                   proposals.description,
                   proposals.proposal_data,
                   proposals.proposal_type::config.proposal_type AS proposal_type
