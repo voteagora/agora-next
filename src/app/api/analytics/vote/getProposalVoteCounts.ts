@@ -10,7 +10,9 @@ type ProposalCount = {
 };
 
 async function getProposalVoteCounts() {
-  const { slug, contracts } = Tenant.current();
+  const { slug, contracts, ui } = Tenant.current();
+
+  const isTimeStampBasedTenant = ui.toggle("timestamp-for-proposals")?.enabled;
 
   const govContract = contracts.governor.address;
 
@@ -31,13 +33,13 @@ async function getProposalVoteCounts() {
                       FROM   uniswap.proposals_v2
                       WHERE  contract = '${govContract}')
 
-                SELECT    ROW_NUMBER() OVER (ORDER BY p.start_block) AS position,
+                SELECT    ROW_NUMBER() OVER (ORDER BY ${isTimeStampBasedTenant ? "p.start_timestamp" : "p.start_block"}) AS position,
                           pc.proposal_id, 
                           pc.voter_count,
                           split_part(p.description, e'\n', 1)
                 FROM      proposal_counts pc left join relevant_proposals p 
                 ON        pc.proposal_id::text = p.proposal_id 
-                ORDER BY  p.start_block`;
+                ORDER BY  ${isTimeStampBasedTenant ? "p.start_timestamp" : "p.start_block"}`;
 
   const result = await prismaWeb3Client.$queryRawUnsafe<ProposalCount[]>(QRY);
 

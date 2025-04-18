@@ -1,5 +1,7 @@
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { TenantNamespace } from "@/lib/types";
+import Image from "next/image";
+import lineaLogo from "@/assets/tenant/linea_logo.svg";
 
 export const ogLogoForShareVote = (namespace: TenantNamespace) => {
   switch (namespace) {
@@ -478,6 +480,14 @@ export const ogLogoForShareVote = (namespace: TenantNamespace) => {
             </linearGradient>
           </defs>
         </svg>
+      );
+    case TENANT_NAMESPACES.LINEA:
+      return (
+        <Image
+          src={lineaLogo}
+          alt="Linea Logo"
+          className="w-[52px] h-[52px] sm:w-[80px] sm:h-[80px]"
+        />
       );
     case TENANT_NAMESPACES.DEMO:
       return (

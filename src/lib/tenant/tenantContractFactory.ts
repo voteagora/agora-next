@@ -12,6 +12,7 @@ import { boostTenantConfig } from "./configs/contracts/boost";
 import { xaiTenantConfig } from "./configs/contracts/xai";
 import { b3TenantConfig } from "./configs/contracts/b3";
 import { demoTenantConfig } from "./configs/contracts/demo";
+import { lineaTenantConfig } from "./configs/contracts/linea";
 
 export default class TenantContractFactory {
   public static create(
@@ -44,6 +45,8 @@ export default class TenantContractFactory {
         return b3TenantConfig({ isProd, alchemyId });
       case TENANT_NAMESPACES.DEMO:
         return demoTenantConfig({ isProd, alchemyId });
+      case TENANT_NAMESPACES.LINEA:
+        return lineaTenantConfig({ isProd, alchemyId });
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

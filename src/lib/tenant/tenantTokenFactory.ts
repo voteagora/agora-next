@@ -115,6 +115,12 @@ export default class TenantTokenFactory {
           decimals: 18,
           address: "0xd5741323b3ddfe5556C3477961B5160600C29c53",
         };
+      case TENANT_NAMESPACES.LINEA:
+        return {
+          name: "Linea",
+          symbol: "LINEA",
+          decimals: 18,
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

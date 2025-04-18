@@ -54,6 +54,7 @@ export type TenantContracts = {
   delegationModel?: DELEGATION_MODEL;
   governorType?: GOVERNOR_TYPE;
   timelockType?: TIMELOCK_TYPE;
+  supportScopes?: boolean;
   chainForTime?: Chain;
   providerForTime?: AlchemyProvider;
   supportScopes?: boolean;
