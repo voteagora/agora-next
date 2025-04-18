@@ -1,5 +1,5 @@
 import { ProposalType } from "@prisma/client";
-import { blocksToSeconds, getHumanBlockTime } from "./blockTimes";
+import { getHumanBlockTime } from "./blockTimes";
 import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData, keccak256 } from "viem";
 import Tenant from "./tenant/tenant";
@@ -267,7 +267,9 @@ export async function parseProposal(
     markdowntitle:
       (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
       getTitleFromProposalDescription(proposal.description || ""),
-    description: proposal.description,
+    description:
+      (proposalData.key === "SNAPSHOT" && proposalData.kind.body) ||
+      proposal.description,
     quorum,
     approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
     proposalData: proposalData.kind,
@@ -331,6 +333,8 @@ export type ParsedProposalData = {
       type: string;
       votes: string;
       state: "pending" | "active" | "closed";
+      body: string;
+      choices: string[];
     };
   };
   STANDARD: {
@@ -418,6 +422,8 @@ export function parseProposalData(
           type: parsedProposalData.type ?? "",
           votes: parsedProposalData.votes ?? "",
           state: parsedProposalData.state ?? "",
+          body: parsedProposalData.body ?? "",
+          choices: parsedProposalData.choices ?? [],
         },
       };
     }
