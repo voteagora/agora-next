@@ -202,6 +202,11 @@ export const protocolGuildTenantUIConfig = new TenantUI({
             prodAddress: null,
             testnetAddress: null,
           },
+          {
+            type: "optimistic",
+            prodAddress: null,
+            testnetAddress: "0x4414D030cFfEC5Edc011a27c653Ce21704b12d85",
+          },
         ],
         copy: {
           helperText: `
