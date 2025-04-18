@@ -271,20 +271,6 @@ const OptionRow = ({
           {isFunding && fundingInfo ? (
             <div className="border-b border-line py-3 px-3">
               <div className="flex justify-between items-center mb-4">
-                <span className="text-xs font-semibold">Extended ask</span>
-                <span
-                  className={cn(
-                    "text-xs font-semibold",
-                    fontMapper[ui?.customization?.tokenAmountFont || ""]
-                      ?.variable
-                  )}
-                >
-                  {fundingInfo.ext
-                    ? `${fundingInfo.ext.toLocaleString()}/y`
-                    : "N/A"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
                 <span className="text-xs font-semibold">Standard ask</span>
                 <span
                   className={cn(
@@ -294,6 +280,20 @@ const OptionRow = ({
                   )}
                 >
                   {fundingInfo.std.toLocaleString()}/y
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-semibold">Extended ask</span>
+                <span
+                  className={cn(
+                    "text-xs font-semibold",
+                    fontMapper[ui?.customization?.tokenAmountFont || ""]
+                      ?.variable
+                  )}
+                >
+                  {fundingInfo.ext
+                    ? `+${fundingInfo.ext.toLocaleString()}/y`
+                    : "N/A"}
                 </span>
               </div>
             </div>

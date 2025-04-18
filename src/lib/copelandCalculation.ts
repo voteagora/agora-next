@@ -268,19 +268,9 @@ export function calculateCopelandVote(
         } else if (votePower2 > votePower1) {
           scores[option2]++;
         } else {
-          // If tied on total voting power, use average as tiebreaker
-          const count1 = option1VotingPower.count;
-          const count2 = option2VotingPower.count;
-
-          const avg1 = count1 > 0 ? votePower1 / count1 : 0;
-          const avg2 = count2 > 0 ? votePower2 / count2 : 0;
-
-          if (avg1 > avg2) {
-            scores[option1]++;
-          } else if (avg2 > avg1) {
-            scores[option2]++;
-          }
-          // If still tied, neither gets a point => almost impossible to happen
+          // If tied on total voting power, award 0.5 points to each
+          scores[option1] += 0.5;
+          scores[option2] += 0.5;
         }
 
         // Determine the winner
@@ -290,23 +280,8 @@ export function calculateCopelandVote(
           winner = option1;
         } else if (votePower2 > votePower1) {
           winner = option2;
-        } else {
-          // If tied on total voting power, use average as tiebreaker
-          const count1 = option1VotingPower.count;
-          const count2 = option2VotingPower.count;
-
-          if (count1 > 0 && count2 > 0) {
-            const avg1 = votePower1 / count1;
-            const avg2 = votePower2 / count2;
-
-            if (avg1 > avg2) {
-              winner = option1;
-            } else if (avg2 > avg1) {
-              winner = option2;
-            }
-            // If still tied, winner remains null => almost impossible to happen
-          }
         }
+        // If tied, winner remains null
 
         pairwiseComparisons.push({
           option1,
@@ -455,17 +430,32 @@ export function calculateCopelandVote(
   });
 
   const sortedOptions = [...options]
-    .map((option) => ({
-      option,
-      score: scores[option],
-      avgVotingPower:
-        results.find((r) => r.option === option)?.avgVotingPowerFor || 0,
-    }))
+    .map((option) => {
+      const result = results.find((r) => r.option === option)!;
+      // Calculate average support across all matches
+      const totalSupport = result.comparisons.reduce((sum, comp) => {
+        if (comp.option1 === option) {
+          return sum + comp.option1VotingPower;
+        } else {
+          return sum + comp.option2VotingPower;
+        }
+      }, 0);
+      const avgSupport =
+        result.comparisons.length > 0
+          ? totalSupport / result.comparisons.length
+          : 0;
+
+      return {
+        option,
+        score: scores[option],
+        avgSupport,
+      };
+    })
     .sort((a, b) => {
       if (b.score !== a.score) {
         return b.score - a.score;
       }
-      return b.avgVotingPower - a.avgVotingPower;
+      return b.avgSupport - a.avgSupport;
     });
 
   // Find the position of NONE BELOW in the sorted options
@@ -482,8 +472,10 @@ export function calculateCopelandVote(
     return position < 10;
   };
 
+  let resultsWithFunding: CopelandResult[] = [];
+
   // First pass: Allocate funding based on priority rules
-  const resultsWithFunding: CopelandResult[] = sortedOptions
+  resultsWithFunding = sortedOptions
     .map((option) => option.option)
     .map((option, index) => {
       const baseOption = getBaseOptionFromExtended(option);
@@ -508,13 +500,33 @@ export function calculateCopelandVote(
 
       // Only allocate funding if the option is above NONE_BELOW
       if (isAboveNoneBelow) {
-        // Check if this is an extended option
         const isExtended = isExtendedOption(option);
         const canGet2Y = info.isEligibleFor2Y && isInTop10(option);
 
-        // Process standard options first
-        if (!isExtended) {
-          // Non-extended options can only get STD funding
+        if (isExtended) {
+          // For extended options, check if the standard option has received funding
+          const standardOption = getBaseOptionFromExtended(option);
+          if (standardOption) {
+            const standardResult = resultsWithFunding.find(
+              (r) => r.option === standardOption
+            );
+            // Only allocate funding to extended option if standard option has received funding
+            if (standardResult && standardResult.fundingType === "STD") {
+              if (
+                canGet2Y &&
+                info.ext !== null &&
+                remaining2YBudget >= info.ext
+              ) {
+                fundingType = "EXT2Y";
+                remaining2YBudget -= info.ext;
+              } else if (info.ext !== null && remaining1YBudget >= info.ext) {
+                fundingType = "EXT1Y";
+                remaining1YBudget -= info.ext;
+              }
+            }
+          }
+        } else {
+          // Standard options can only get STD funding
           if (canGet2Y && remaining2YBudget >= info.std) {
             fundingType = "STD";
             remaining2YBudget -= info.std;
@@ -531,88 +543,35 @@ export function calculateCopelandVote(
       };
     });
 
-  // Second pass: Process extended options only if their standard option has received funding
-  const mutableResultsFirstPass = [...resultsWithFunding];
-
-  for (const result of resultsWithFunding) {
-    const option = result.option;
-    const isExtended = isExtendedOption(option);
-
-    // Only process extended options
-    if (isExtended) {
-      const baseOption = getBaseOptionFromExtended(option);
-      if (!baseOption) continue;
-
-      const standardResult = resultsWithFunding.find(
-        (r) => r.option === baseOption
-      );
-
-      // Only allocate funding to extended option if standard option has received funding
-      if (standardResult && standardResult.fundingType === "STD") {
-        const info = fundingInfo[baseOption] || {
-          ext: 0,
-          std: 0,
-          isEligibleFor2Y: false,
-        };
-
-        // Check if eligible for 2Y funding (must be in top 10 AND marked as eligible)
-        const canGet2Y = info.isEligibleFor2Y && isInTop10(option);
-
-        const resultIndex = mutableResultsFirstPass.findIndex(
-          (r) => r.option === option
-        );
-        if (resultIndex === -1) continue;
-
-        // Extended options can only get EXT2Y or EXT1Y funding
-        if (canGet2Y && info.ext !== null && remaining2YBudget >= info.ext) {
-          mutableResultsFirstPass[resultIndex] = {
-            ...mutableResultsFirstPass[resultIndex],
-            fundingType: "EXT2Y" as FundingType,
-          };
-          remaining2YBudget -= info.ext;
-        } else if (info.ext !== null && remaining1YBudget >= info.ext) {
-          mutableResultsFirstPass[resultIndex] = {
-            ...mutableResultsFirstPass[resultIndex],
-            fundingType: "EXT1Y" as FundingType,
-          };
-          remaining1YBudget -= info.ext;
-        }
-      }
-    }
-  }
-
-  // Third pass: Move remaining 2Y budget to 1Y bucket if no more eligible candidates
-  const hasMoreEligible2YCandidates = mutableResultsFirstPass.some(
+  // Move remaining 2Y budget to 1Y bucket if no more eligible candidates
+  const hasMoreEligible2YCandidates = resultsWithFunding.filter(
     (result, index) => {
       const isAboveNoneBelow =
         noneBelowPosition === -1 || index < noneBelowPosition;
 
-      const baseOption =
-        getBaseOptionFromExtended(result.option) || result.option;
-
-      const standardResult = mutableResultsFirstPass.find(
-        (r) => r.option === baseOption
-      );
-      if (!standardResult || standardResult.fundingType !== "STD") return false;
+      const isExtended = isExtendedOption(result.option);
+      const hasBudget = isExtended
+        ? result.fundingInfo.ext !== null &&
+          result.fundingInfo.ext <= remaining2YBudget
+        : result.fundingInfo.std <= remaining2YBudget;
 
       return (
         result.fundingType === "None" &&
         result.fundingInfo.isEligibleFor2Y &&
         isInTop10(result.option) &&
-        result.fundingInfo.ext !== null &&
-        result.fundingInfo.ext <= remaining2YBudget &&
+        hasBudget &&
         isAboveNoneBelow
       );
     }
   );
 
-  if (!hasMoreEligible2YCandidates && remaining2YBudget > 0) {
+  if (!hasMoreEligible2YCandidates.length && remaining2YBudget > 0) {
     remaining1YBudget += remaining2YBudget;
     remaining2YBudget = 0;
   }
 
-  // Sort options for 1Y funding based on total wins => removing options that got funding in the first or second pass
-  const sortedFor1Y = mutableResultsFirstPass
+  // Sort options for 1Y funding based on total wins
+  const sortedFor1Y = resultsWithFunding
     .filter(
       (result, index) =>
         result.fundingType === "None" &&
@@ -626,57 +585,50 @@ export function calculateCopelandVote(
       return b.avgVotingPowerFor - a.avgVotingPowerFor;
     });
 
-  // Create a mutable copy of results for 1Y allocation
-  const mutableResults: CopelandResult[] = [...mutableResultsFirstPass];
-
   // Allocate remaining 1Y funding
   for (const result of sortedFor1Y) {
     // Skip NONE_BELOW options
     if (result.option === NONE_BELOW) continue;
 
-    const isExtended = isExtendedOption(result.option);
-    const resultIndex = mutableResults.findIndex(
+    const resultIndex = resultsWithFunding.findIndex(
       (r) => r.option === result.option
     );
 
-    // Skip if result not found in mutableResults
     if (resultIndex === -1) continue;
 
-    if (!isExtended) {
-      // Non-extended options can only get STD funding
-      const stdFunding = result.fundingInfo.std;
+    const isExtended = isExtendedOption(result.option);
 
-      if (remaining1YBudget >= stdFunding) {
-        mutableResults[resultIndex] = {
-          ...mutableResults[resultIndex],
-          fundingType: "STD" as FundingType,
-        };
-        remaining1YBudget -= stdFunding;
+    if (isExtended) {
+      // For extended options, check if the standard option has received funding
+      const standardOption = getBaseOptionFromExtended(result.option);
+      if (standardOption) {
+        const standardResult = resultsWithFunding.find(
+          (r) => r.option === standardOption
+        );
+        // Only allocate funding to extended option if standard option has received funding
+        if (standardResult && standardResult.fundingType === "STD") {
+          const fundingAmount = result.fundingInfo.ext;
+          if (fundingAmount !== null && remaining1YBudget >= fundingAmount) {
+            resultsWithFunding[resultIndex] = {
+              ...resultsWithFunding[resultIndex],
+              fundingType: "EXT1Y" as FundingType,
+            };
+            remaining1YBudget -= fundingAmount;
+          }
+        }
       }
     } else {
-      // For extended options, check if the standard option has received funding
-      const baseOption = getBaseOptionFromExtended(result.option);
-      if (!baseOption) continue;
-
-      // Find the standard option result
-      const standardResult = mutableResults.find(
-        (r) => r.option === baseOption
-      );
-
-      // Only allocate funding to extended option if standard option has received funding
-      if (standardResult && standardResult.fundingType === "STD") {
-        // Extended options can only get EXT1Y funding
-        const extFunding = result.fundingInfo.ext;
-        if (extFunding !== null && remaining1YBudget >= extFunding) {
-          mutableResults[resultIndex] = {
-            ...mutableResults[resultIndex],
-            fundingType: "EXT1Y" as FundingType,
-          };
-          remaining1YBudget -= extFunding;
-        }
+      // Standard options can only get STD funding
+      const fundingAmount = result.fundingInfo.std;
+      if (remaining1YBudget >= fundingAmount) {
+        resultsWithFunding[resultIndex] = {
+          ...resultsWithFunding[resultIndex],
+          fundingType: "STD" as FundingType,
+        };
+        remaining1YBudget -= fundingAmount;
       }
     }
   }
 
-  return mutableResults;
+  return resultsWithFunding;
 }
