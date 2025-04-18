@@ -235,9 +235,7 @@ export function ShareDialog({
     blockNumber ?? latestBlock?.data?.number.toString() ?? null;
   const { namespace } = Tenant.current();
 
-  const proposalLink = `${window.location.origin}/proposals/${proposalId}?support=${newVote.support}&reason=${encodeURIComponent(
-    newVote.reason
-  )}&weight=${newVote.weight}&blockNumber=${blockNumberToUse}&timestamp=${timestampToUse}&params=${encodeURIComponent(
+  const proposalLink = `${window.location.origin}/proposals/${proposalId}?support=${newVote.support || supportType}&weight=${newVote.weight}&blockNumber=${blockNumberToUse}&timestamp=${timestampToUse}&params=${encodeURIComponent(
     JSON.stringify(newVote.params)
   )}`;
 
