@@ -1,5 +1,6 @@
 import { formatUnits } from "ethers";
 import { disapprovalThreshold } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
 
 function formatNumber(amount, decimals = 0, maximumSignificantDigits = 4) {
   const standardUnitAmount = Number(formatUnits(amount, decimals));
@@ -10,10 +11,15 @@ export default function OPOptimisticProposalStatus({
   proposal,
   votableSupply,
 }) {
+  const tokenDecimals = Tenant.current().token.decimals;
   const formattedVotableSupply = Number(
-    BigInt(votableSupply) / BigInt(10 ** 18)
+    BigInt(votableSupply) / BigInt(10 ** tokenDecimals)
   );
-  const againstLength = formatNumber(proposal.proposalResults.against, 18, 0);
+  const againstLength = formatNumber(
+    proposal.proposalResults.against,
+    tokenDecimals,
+    0
+  );
   const againstRelativeAmount =
     (Math.floor(againstLength / formattedVotableSupply) * 100) / 100;
   const status =
