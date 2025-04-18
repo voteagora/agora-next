@@ -484,25 +484,42 @@ export const ogLogoForShareVote = (namespace: TenantNamespace) => {
         <svg
           width="52"
           height="52"
-          viewBox="0 0 52 52"
+          className="w-[52px] h-[52px] sm:w-[80px] sm:h-[80px]"
+          viewBox="0 0 80 80"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
+          xmlnsXlink="http://www.w3.org/1999/xlink"
         >
-          <path
-            d="M0 52.9055H52V0.905525H0V52.9055Z"
-            fill="url(#pattern0_105_565)"
+          <g clip-path="url(#clip0_4148_6915)" transform="scale(1.25)">
+            <rect width="64" height="64" rx="32" fill="#F4F2EC" />
+            <path
+              d="M16 47.7852H48V15.7852H16V47.7852Z"
+              fill="url(#pattern0_4148_6915)"
+            />
+          </g>
+          <rect
+            x="0.5"
+            y="0.5"
+            width="63"
+            height="63"
+            rx="31.5"
+            stroke="black"
+            transform="scale(1.25)"
           />
           <defs>
             <pattern
-              id="pattern0_105_565"
+              id="pattern0_4148_6915"
               patternContentUnits="objectBoundingBox"
               width="1"
               height="1"
             >
-              <use xlinkHref="#image0_105_565" transform="scale(0.00625)" />
+              <use xlinkHref="#image0_4148_6915" transform="scale(0.00625)" />
             </pattern>
+            <clipPath id="clip0_4148_6915">
+              <rect width="64" height="64" rx="32" fill="white" />
+            </clipPath>
             <image
-              id="image0_105_565"
+              id="image0_4148_6915"
               width="160"
               height="160"
               preserveAspectRatio="none"
