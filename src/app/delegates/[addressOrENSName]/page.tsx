@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { Metadata, ResolvingMetadata } from "next";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
@@ -16,8 +18,12 @@ import { redirect } from "next/navigation";
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import DelegateStatementWrapper from "@/components/Delegates/DelegateStatement/DelegateStatementWrapper";
-import DelegationsContainerWrapper from "@/components/Delegates/Delegations/DelegationsContainerWrapper";
-import VotesContainerWrapper from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
+import DelegationsContainerWrapper, {
+  DelegationsContainerSkeleton,
+} from "@/components/Delegates/Delegations/DelegationsContainerWrapper";
+import VotesContainerWrapper, {
+  VotesContainerSkeleton,
+} from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -136,10 +142,14 @@ export default async function Page({
               <DelegateStatementWrapper delegate={delegate} />
             </TabsContent>
             <TabsContent value="participation">
-              <VotesContainerWrapper delegate={delegate} />
+              <Suspense fallback={<VotesContainerSkeleton />}>
+                <VotesContainerWrapper delegate={delegate} />
+              </Suspense>
             </TabsContent>
             <TabsContent value="delegations">
-              <DelegationsContainerWrapper delegate={delegate} />
+              <Suspense fallback={<DelegationsContainerSkeleton />}>
+                <DelegationsContainerWrapper delegate={delegate} />
+              </Suspense>
             </TabsContent>
           </Tabs>{" "}
         </div>
