@@ -17,6 +17,15 @@ export default function DelegateTableRow({
     address: delegate.address as `0x${string}`,
   });
 
+  const numProposals = voterStats?.total_proposals || 0;
+  const participation = Number(
+    Math.round(
+      ((voterStats?.last_10_props || 0) / Math.min(10, numProposals)) *
+        100 *
+        100
+    ) / 100
+  ).toFixed(2);
+
   return (
     <TableRow
       className="font-semibold cursor-pointer bg-neutral text-secondary"
@@ -34,7 +43,7 @@ export default function DelegateTableRow({
       </TableCell>
       <TableCell>{formatNumber(delegate.votingPower.total)}</TableCell>
       <TableCell>
-        {!isVoterStatsPending && `${(voterStats?.last_10_props || 0) * 10}%`}
+        {!isVoterStatsPending && numProposals > 0 && `${participation}%`}
       </TableCell>
       {/* @ts-ignore */}
       <TableCell>
