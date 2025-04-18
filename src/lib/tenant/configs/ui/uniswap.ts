@@ -233,6 +233,10 @@ export const uniswapTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "dao-node/delegate/addr",
+      enabled: true,
+    },
+    {
       name: "proposals",
       enabled: true,
     },
