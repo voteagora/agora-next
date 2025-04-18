@@ -475,7 +475,7 @@ export function calculateCopelandVote(
   let resultsWithFunding: CopelandResult[] = [];
 
   // First pass: Allocate funding based on priority rules
-  resultsWithFunding = sortedOptions
+  sortedOptions
     .map((option) => option.option)
     .map((option, index) => {
       const baseOption = getBaseOptionFromExtended(option);
@@ -488,10 +488,11 @@ export function calculateCopelandVote(
 
       // NONE_BELOW option always gets None funding type
       if (option === NONE_BELOW) {
-        return {
+        resultsWithFunding.push({
           ...results.find((r) => r.option === option)!,
           fundingType: "None" as FundingType,
-        };
+        });
+        return;
       }
 
       // Check if the option is above NONE BELOW
@@ -537,10 +538,10 @@ export function calculateCopelandVote(
         }
       }
 
-      return {
+      resultsWithFunding.push({
         ...results.find((r) => r.option === option)!,
         fundingType,
-      };
+      });
     });
 
   // Move remaining 2Y budget to 1Y bucket if no more eligible candidates
