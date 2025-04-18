@@ -56,7 +56,7 @@ export default function CitizenCardList({
     <DialogProvider>
       {/* @ts-ignore */}
       <InfiniteScroll
-        className="grid grid-flow-row grid-cols-1 sm:grid-cols-3 justify-around sm:justify-between py-4 gap-4 sm:gap-8"
+        className="grid grid-flow-row grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-around sm:justify-between py-4 gap-4 sm:gap-8"
         hasMore={meta.has_next}
         pageStart={1}
         loadMore={loadMore}

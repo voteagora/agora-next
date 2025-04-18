@@ -12,6 +12,10 @@ module.exports = {
   theme: {
     screens: {
       sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
     },
     container: {
       center: true,
@@ -352,6 +356,7 @@ module.exports = {
         switcher:
           "0px 4px 12px 0px rgba(0, 0, 0, 0.04), 0px 4px 8px 0px rgba(0, 0, 0, 0.06)",
         none: "none",
+        popover: "0px 4px 8px 0px rgba(0, 0, 0, 0.11)",
       },
       maxWidth: {
         // max-w-{var}

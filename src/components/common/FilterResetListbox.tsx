@@ -64,9 +64,9 @@ const FilterResetListbox = ({
       <div className="relative">
         <button
           className={cn(
-            "px-[12px] sm:p-[10px] rounded-sm sm:rounded-lg border border-line inline-flex gap-[6px] items-center leading-none h-[42px] relative",
+            "px-[12px] md:p-[10px] rounded-sm md:rounded-lg border border-line inline-flex gap-[6px] items-center leading-none h-[42px] relative",
             hasActiveFilters
-              ? "bg-wash sm:bg-brandPrimary"
+              ? "bg-wash md:bg-brandPrimary"
               : "bg-wash text-primary"
           )}
           aria-label="Open filter options"
@@ -75,7 +75,7 @@ const FilterResetListbox = ({
           {triggerIcon}
           <span
             className={cn(
-              "hidden px-2 sm:inline-block",
+              "hidden px-2 md:inline-block",
               hasActiveFilters ? "text-neutral" : "text-primary leading-none"
             )}
           >
@@ -85,7 +85,7 @@ const FilterResetListbox = ({
             <>
               <MobileCountIndicator
                 count={activeCount}
-                className="inline-block sm:hidden"
+                className="inline-block md:hidden"
               />
             </>
           )}
@@ -153,9 +153,9 @@ const FilterResetListbox = ({
       <DropdownMenu.Trigger asChild>
         <button
           className={cn(
-            "px-[12px] sm:p-[10px] rounded-sm sm:rounded-lg border border-line inline-flex gap-[6px] items-center leading-none h-[42px] relative",
+            "px-[12px] md:p-[10px] rounded-sm md:rounded-lg border border-line inline-flex gap-[6px] items-center leading-none h-[42px] relative",
             hasActiveFilters
-              ? "bg-wash sm:bg-brandPrimary"
+              ? "bg-wash md:bg-brandPrimary"
               : "bg-wash text-primary"
           )}
           aria-label="Open filter options"
@@ -163,7 +163,7 @@ const FilterResetListbox = ({
           {triggerIcon}
           <span
             className={cn(
-              "hidden px-2 sm:inline-block",
+              "hidden px-2 md:inline-block",
               hasActiveFilters ? "text-neutral" : "text-primary leading-none"
             )}
           >
@@ -175,9 +175,9 @@ const FilterResetListbox = ({
         <div className="h-10 bg-brandPrimary rounded-lg flex -ml-2.5 relative left-[-10px] mr-[-10px]">
           <MobileCountIndicator
             count={activeCount}
-            className="inline-block sm:hidden"
+            className="inline-block md:hidden"
           />
-          <div className="hidden sm:flex items-center gap-[6px]">
+          <div className="hidden md:flex items-center gap-[6px]">
             <CountBadge count={activeCount} border={false} />
             <div className="h-[18px] w-[1px] bg-neutral" />
             <div onClick={handleReset} className="cursor-pointer pr-[10px]">

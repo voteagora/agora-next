@@ -133,13 +133,13 @@ export default function DelegateStatementForm({
     !!agreeDaoPrinciples;
 
   return (
-    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-16 justify-between mt-12 w-full max-w-full">
+    <div className="flex flex-col md:flex-row items-center md:items-start lg:gap-16 md:gap-8 justify-between mt-12 w-full max-w-full">
       {delegate && (
-        <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-[350px]">
+        <div className="flex flex-col static md:sticky top-16 shrink-0 w-full lg:max-w-[350px] md:max-w-[300px]">
           <DelegateCard delegate={delegate} isEditMode />
         </div>
       )}
-      <div className="flex flex-col w-full">
+      <div className="flex flex-col w-full mt-6 lg:mt-0">
         <div className="flex flex-col bg-neutral border rounded-xl border-line shadow-newDefault">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>

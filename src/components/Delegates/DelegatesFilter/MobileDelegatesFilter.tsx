@@ -46,7 +46,7 @@ export const MobileDelegatesFilter = () => {
     applyFiltersToUrl,
   } = useDelegatesFilter();
 
-  const { orderByParam } = useDelegatesSort();
+  const { orderByParam, handleSortChange } = useDelegatesSort();
 
   useEffect(() => {
     // Initialize temp states from URL on component mount
@@ -116,7 +116,6 @@ export const MobileDelegatesFilter = () => {
 
   const applyAllFilters = () => {
     applyFiltersToUrl({
-      orderBy: tempSortParam !== "weighted_random" ? tempSortParam : false,
       [MY_DELEGATES_FILTER_PARAM]: tempMyDelegates
         ? connectedAddress || ""
         : false,
@@ -129,7 +128,7 @@ export const MobileDelegatesFilter = () => {
           ? getStakeholdersString(selectedStakeholders)
           : "",
     });
-
+    handleSortChange(tempSortParam);
     setIsOpen(false);
   };
 

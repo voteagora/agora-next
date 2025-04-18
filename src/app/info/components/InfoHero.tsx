@@ -18,8 +18,8 @@ export const InfoHero = () => {
   ];
 
   return (
-    <div className="flex flex-col sm:flex-row mt-12 gap-y-6 sm:gap-y-0 gap-x-0 sm:gap-x-6 flex-wrap sm:flex-nowrap">
-      <div className="flex flex-col w-full sm:w-2/5">
+    <div className="flex flex-col md:flex-col mt-12 gap-y-6 sm:gap-y-0 gap-x-0 sm:gap-x-6 flex-wrap sm:flex-nowrap lg:flex-row">
+      <div className="flex flex-col w-full lg:w-2/5">
         <h1 className="text-4xl leading-[36px] sm:text-[40px] sm:leading-[40px] font-black text-primary">
           {page!.title}
         </h1>
@@ -42,7 +42,7 @@ export const InfoHero = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 sm:flex sm:flex-row self-start justify-between sm:justify-end w-full sm:w-3/5 gap-4">
+      <div className="grid grid-cols-2 sm:flex sm:flex-row md:w-fit md:flex-auto md:mx-auto self-start justify-between sm:justify-end w-full gap-4 sm:mt-4 lg:mt-0">
         {page!.links!.map((link, idx) => (
           <Card
             className={rotationClasses[idx % rotationClasses.length]}
@@ -72,9 +72,9 @@ const Card = ({
     <Link
       target="_blank"
       href={link}
-      className={`flex flex-col sm:w-fit grow-0 p-1.5 bg-neutral border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)]} hover:rotate-0 transition-all hover:z-10 hover:scale-110 ${className}`}
+      className={`flex flex-col grow-0 p-1.5 bg-neutral border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)]} hover:rotate-0 transition-all hover:z-10 hover:scale-110 ${className}`}
     >
-      <div className="relative w-full sm:h-[150px] sm:w-[150px] aspect-square">
+      <div className="relative w-full sm:h-[130px] sm:w-[130px] lg:h-[150px] lg:w-[150px] aspect-square">
         <Image
           src={image}
           className="w-full rounded scale"

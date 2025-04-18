@@ -21,7 +21,7 @@ export default function OtherInfoFormSection({
     <div className="py-8 px-6 border-b border-line">
       <h3 className="font-bold text-primary">Other info</h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
         <DelegateStatementInputGroup
           title="X (formerly Twitter)"
           placeholder="@yourname"
