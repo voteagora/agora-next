@@ -11,10 +11,13 @@ import infoPageCard04 from "@/assets/tenant/uniswap_info_4.png";
 import infoPageHero from "@/assets/tenant/uniswap_info_hero.png";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export const uniswapTenantUIConfig = new TenantUI({
   title: "Uniswap Agora",
   logo: uniswapLogo,
+  tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.UNISWAP)],
 
   googleAnalytics: "G-KBG8GS1R45",
 
@@ -332,7 +335,7 @@ export const uniswapTenantUIConfig = new TenantUI({
 
   **3. Submit as waiting for sponsorship**
 
-  If you don’t have the voting power to post the proposal yourself, you can request a delegate with enough voting power to sponsor it. The delegate you choose can review your proposal and choose to sponsor it if they support it, pushing it onchain for voting. One note - you should coordinate with sponsor delegates so they know you’re looking for sponsorship!
+  If you don't have the voting power to post the proposal yourself, you can request a delegate with enough voting power to sponsor it. The delegate you choose can review your proposal and choose to sponsor it if they support it, pushing it onchain for voting. One note - you should coordinate with sponsor delegates so they know you're looking for sponsorship!
 
   **4. Submit onchain (If threshold met)**
 

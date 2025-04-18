@@ -1,6 +1,7 @@
 import { StaticImageData } from "next/image";
 import { icons } from "@/icons/icons";
 import { PLMConfig } from "@/app/proposals/draft/types";
+import { TenantToken } from "../types";
 
 type UIToggle = {
   name: string;
@@ -106,6 +107,7 @@ type TenantUIParams = {
   smartAccountConfig?: UISmartAccountConfig;
   title: string;
   toggles?: UIToggle[];
+  tokens?: TenantToken[];
   customization?: {
     primary?: string;
     secondary?: string;
@@ -146,6 +148,7 @@ export class TenantUI {
   private _pages?: UIPage[];
   private _title: string;
   private _toggles?: UIToggle[];
+  private _tokens?: TenantToken[];
   private _customization?: {
     primary?: string;
     secondary?: string;
@@ -195,6 +198,7 @@ export class TenantUI {
     toggles,
     tacticalStrings,
     theme,
+    tokens,
   }: TenantUIParams) {
     this._assets = assets;
     this._customization = customization;
@@ -213,6 +217,7 @@ export class TenantUI {
     this._toggles = toggles;
     this._tacticalStrings = tacticalStrings;
     this._theme = theme ?? "light";
+    this._tokens = tokens;
   }
 
   public get assets(): UIAssets {
@@ -249,6 +254,10 @@ export class TenantUI {
 
   public get organization(): UIOrganization | undefined {
     return this._organization;
+  }
+
+  public get tokens(): TenantToken[] | undefined {
+    return this._tokens;
   }
 
   public get customization():
