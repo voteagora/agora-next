@@ -14,7 +14,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { useDAOMetrics } from "@/hooks/useDAOMetrics";
-import agoraLogo from "@/icons/agoraIconWithText.svg";
+import { AgoraIconWithText } from "@/icons/AgoraIconWithText";
 
 export default function DAOMetricsHeader() {
   const { token, ui, contracts } = Tenant.current();
@@ -63,12 +63,7 @@ export default function DAOMetricsHeader() {
             <div className="flex items-center px-8 gap-8 justify-start h-14">
               <div className="flex gap-8">
                 <div className="flex items-center gap-2">
-                  <Image
-                    src={agoraLogo.src}
-                    alt="Agora Logo"
-                    width={82}
-                    height={21}
-                  />
+                  <AgoraIconWithText className="fill-primary h-[21px] w-[82px]" />
                   <span className="text-base text-primary font-medium hidden lg:inline">
                     Onchain Governance
                   </span>

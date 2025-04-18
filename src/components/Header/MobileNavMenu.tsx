@@ -99,7 +99,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   return (
     <Drawer isOpen={isOpen} onClose={onClose} side="left" title="Menu">
       <div className="flex flex-col h-full">
-        <div className="pl-4 pr-6 py-8 flex flex-col justify-start items-start">
+        <div className="pl-4 pr-6 py-8 flex flex-col justify-start items-start text-primary">
           {navItems.map((item) => (
             <Link
               key={item.name}

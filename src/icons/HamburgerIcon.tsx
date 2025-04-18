@@ -18,7 +18,7 @@ export const HamburgerIcon = ({
   >
     <path
       d="M3 12H21M3 6H21M3 18H15"
-      stroke="#171717"
+      stroke="inherit"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"

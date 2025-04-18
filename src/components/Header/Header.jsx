@@ -22,7 +22,7 @@ export default function Header() {
       <VStack className="px-4 sm:px-8">
         <HStack className="flex flex-row w-full items-center gap-1  justify-between">
           <HamburgerIcon
-            className="w-[24px] h-[24px] sm:hidden cursor-pointer"
+            className="w-[24px] h-[24px] sm:hidden cursor-pointer stroke-primary"
             onClick={toggleMobileMenu}
           />
           <div className="sm:w-full flex justify-start">
