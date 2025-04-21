@@ -20,7 +20,7 @@ export function DesktopConnectButton() {
             ) : (
               <>
                 {"Connect Wallet"}{" "}
-                <ArrowRight className="ml-3 mr-1 hidden lg:block" />
+                <ArrowRight className="ml-3 mr-1 hidden lg:block stroke-primary" />
               </>
             )}
           </div>

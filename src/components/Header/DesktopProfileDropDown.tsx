@@ -46,7 +46,7 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
             >
               <Popover.Panel>
                 {({ close }) => (
-                  <div className="bg-wash border border-line rounded-[16px] w-[350px] shadow-popover">
+                  <div className="bg-wash border border-line rounded-[16px] w-[350px] shadow-newPopover">
                     <div className="flex flex-col min-h-[250px]">
                       <ProfileDropDownContent
                         ensName={ensName}

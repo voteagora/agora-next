@@ -339,6 +339,8 @@ module.exports = {
       boxShadow: {
         // shadow-{var}
         // ie: shadow-inner
+        newPopover: "0px 4px 8px 0px rgba(var(--neutral), 0.11)",
+
         newDefault:
           "0px 4px 12px rgba(0, 0, 0, 0.02), 0px 2px 2px rgba(0, 0, 0, 0.03)",
         newHover:
@@ -356,7 +358,6 @@ module.exports = {
         switcher:
           "0px 4px 12px 0px rgba(0, 0, 0, 0.04), 0px 4px 8px 0px rgba(0, 0, 0, 0.06)",
         none: "none",
-        popover: "0px 4px 8px 0px rgba(0, 0, 0, 0.11)",
       },
       maxWidth: {
         // max-w-{var}
