@@ -134,7 +134,7 @@ export const ProfileDropDownContent = ({
           </div>
         ) : (
           <div className="flex flex-col p-6">
-            {canCreateDelegateStatement && hasStatement ? (
+            {canCreateDelegateStatement && !hasStatement ? (
               <Link
                 href={`/delegates/create`}
                 className="rounded-full py-3 px-2 border border-line bg-brandPrimary hover:bg-none text-neutral flex justify-center mt-1"
