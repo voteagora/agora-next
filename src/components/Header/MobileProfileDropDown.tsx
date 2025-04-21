@@ -4,19 +4,16 @@ import React, { useState } from "react";
 import ENSAvatar from "../shared/ENSAvatar";
 import { Drawer } from "../ui/Drawer";
 import { ProfileDropDownContent } from "./ProfileDropDownContent";
-import { useProfileData } from "@/hooks/useProfileData";
 
 type Props = {
   ensName: string | undefined;
 };
 
 export const MobileProfileDropDown = ({ ensName }: Props) => {
-  const { setShouldHydrate } = useProfileData();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpenDrawer = () => {
     setIsOpen(true);
-    setShouldHydrate(true);
   };
 
   const handleCloseDrawer = () => {

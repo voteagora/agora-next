@@ -8,11 +8,10 @@ import { useTokenBalance } from "@/hooks/useTokenBalance";
 export const useProfileData = () => {
   const { ui } = Tenant.current();
   const { address } = useAccount();
-  const [shouldHydrate, setShouldHydrate] = useState(false);
   const isSmartAccountEnabled = ui?.smartAccountConfig?.factoryAddress;
 
   const { data: delegate, isFetching } = useDelegate({
-    address: shouldHydrate ? address : undefined,
+    address,
   });
 
   const { data: scwAddress } = useSmartAccountAddress({
@@ -22,8 +21,8 @@ export const useProfileData = () => {
   const { data: tokenBalance } = useTokenBalance(
     delegate ? (isSmartAccountEnabled ? scwAddress : address) : undefined
   );
-
   const hasStatement = !!delegate?.statement;
+
   const canCreateDelegateStatement =
     ui?.toggle("delegates/edit")?.enabled === true;
 
@@ -35,6 +34,5 @@ export const useProfileData = () => {
     scwAddress,
     hasStatement,
     canCreateDelegateStatement,
-    setShouldHydrate,
   };
 };

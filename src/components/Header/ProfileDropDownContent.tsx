@@ -67,7 +67,7 @@ export const ProfileDropDownContent = ({
           </div>
         </div>
         {scwAddress && (
-          <div className="hidden">
+          <div className="block sm:hidden">
             <div className="w-[60px] flex justify-center items-center">
               <div className="border-l border-dashed border-line h-2"></div>
             </div>
@@ -89,7 +89,19 @@ export const ProfileDropDownContent = ({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="flex flex-row space-x-1 items-center">
-                  <div className="text-primary">{shortAddress(scwAddress)}</div>
+                  <div className="flex flex-row items-center gap-2">
+                    <div className="w-[60px] flex justify-center items-center">
+                      <div className="flex items-center justify-center rounded-full border border-line w-[30px] h-[30px]">
+                        <CubeIcon
+                          className="w-5 h-5"
+                          fill={rgbStringToHex(ui?.customization?.primary)}
+                        />
+                      </div>
+                    </div>
+                    <div className="text-primary">
+                      {shortAddress(scwAddress)}
+                    </div>
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent className="text-xs max-w-[250px] p-3">
                   <div className="text-primary">Smart Contract Wallet</div>
