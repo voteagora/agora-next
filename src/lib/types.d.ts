@@ -180,3 +180,15 @@ export type AnalyticsEvent =
         type: "X" | "COPY_LINK" | "DOWNLOAD_IMAGE" | "WARPCAST";
       };
     };
+
+export type ScopeData = {
+  proposal_type_id: number;
+  scope_key: string;
+  selector?: string;
+  description: string;
+  disabled?: boolean;
+  parameters?: string[];
+  comparators?: number[];
+  types?: number[];
+  exists?: boolean;
+};

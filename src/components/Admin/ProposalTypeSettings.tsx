@@ -1,7 +1,7 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import { Fragment, useState, useCallback } from "react";
+import { Fragment, useState, useCallback, useMemo, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OptimismProposalTypes } from "@prisma/client";
@@ -12,6 +12,16 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import toast from "react-hot-toast";
 import BlockScanUrls from "../shared/BlockScanUrl";
+import { ScopeData } from "@/lib/types";
+
+export interface FormattedProposalType {
+  name: string;
+  quorum: number;
+  approval_threshold: number;
+  proposal_type_id: number;
+  isClientSide: boolean;
+  scopes?: ScopeData[];
+}
 
 const RestrictedCallout = () => {
   const { address, isConnected } = useAccount();
@@ -86,21 +96,36 @@ const RestrictedCallout = () => {
 export default function ProposalTypeSettings({
   votableSupply,
   proposalTypes,
+  scopes,
 }: {
   votableSupply: string;
   proposalTypes: OptimismProposalTypes[];
+  scopes: ScopeData[];
 }) {
-  const fmtPropTypes = proposalTypes.map(
-    ({ quorum, approval_threshold, name, proposal_type_id }) => ({
-      name,
-      quorum: Number(quorum) / 100,
-      approval_threshold: Number(approval_threshold) / 100,
-      proposal_type_id: Number(proposal_type_id), // This will be of the format "0", "1", "2", etc.
-      isClientSide: false,
-    })
+  const fmtPropTypes = useMemo(
+    () =>
+      proposalTypes.map(
+        ({ quorum, approval_threshold, name, proposal_type_id }) => {
+          const ptId = Number(proposal_type_id);
+          const relevantScopes = scopes?.filter(
+            (scope) => scope.proposal_type_id === ptId
+          );
+          return {
+            name,
+            quorum: Number(quorum) / 100,
+            approval_threshold: Number(approval_threshold) / 100,
+            proposal_type_id: ptId,
+            isClientSide: false,
+            scopes: relevantScopes,
+          };
+        }
+      ),
+    [proposalTypes, scopes]
   );
 
-  const [propTypes, setPropTypes] = useState(fmtPropTypes);
+  const [propTypes, setPropTypes] = useState<FormattedProposalType[]>(
+    fmtPropTypes ?? []
+  );
 
   const handleDeleteProposalType = useCallback((id: number, hash?: string) => {
     toast.success(
@@ -153,6 +178,7 @@ export default function ProposalTypeSettings({
             index={proposalType.proposal_type_id}
             onDelete={handleDeleteProposalType}
             onSuccessSetProposalType={handleSuccessSetProposalType}
+            availableScopes={scopes ?? []}
           />
           <Separator className="my-8" />
         </Fragment>
@@ -169,6 +195,7 @@ export default function ProposalTypeSettings({
               name: "",
               proposal_type_id: prevPropTypes.length,
               isClientSide: true,
+              scopes: [],
             },
           ]);
         }}

@@ -5,15 +5,18 @@ import DraftFormClient from "./stages/DraftForm/DraftFormClient";
 import SubmitForm from "./stages/SubmitForm";
 import GithubPRForm from "./stages/GithubPRForm";
 import { DraftProposal } from "../types";
+import { ScopeData } from "@/lib/types";
 
 export default function DraftProposalForm({
   stage,
   draftProposal,
   proposalTypes,
+  scopes,
 }: {
   stage: ProposalStage;
   draftProposal: DraftProposal;
   proposalTypes: any[];
+  scopes: ScopeData[];
 }) {
   const renderStage = (stage: ProposalStage) => {
     switch (stage) {
@@ -25,6 +28,7 @@ export default function DraftProposalForm({
             <DraftFormClient
               proposalTypes={proposalTypes}
               draftProposal={draftProposal}
+              scopes={scopes}
             />
           </Suspense>
         );

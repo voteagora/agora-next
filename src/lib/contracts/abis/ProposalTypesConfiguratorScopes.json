@@ -1,0 +1,669 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "_governor",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "_proposalTypesInit",
+        "type": "tuple[]",
+        "components": [
+          {
+            "name": "quorum",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "approvalThreshold",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "description",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "module",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "exists",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ],
+        "internalType": "struct IProposalTypesConfigurator.ProposalType[]"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "Invalid4ByteSelector",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "InvalidApprovalThreshold",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "InvalidCalldata",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "InvalidCalldatasLength",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "InvalidGovernor",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "InvalidParamNotEqual",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "InvalidParamRange",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "InvalidParameterConditions",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "InvalidProposalType",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "InvalidProposedTxForType",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "InvalidQuorum",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "InvalidScope",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "MaxScopeLengthReached",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "NotAdmin",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "NotAdminOrTimelock",
+    "type": "error",
+    "inputs": []
+  },
+  {
+    "name": "ProposalTypeSet",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "indexed": true,
+        "internalType": "uint8"
+      },
+      {
+        "name": "quorum",
+        "type": "uint16",
+        "indexed": false,
+        "internalType": "uint16"
+      },
+      {
+        "name": "approvalThreshold",
+        "type": "uint16",
+        "indexed": false,
+        "internalType": "uint16"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "module",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "ScopeCreated",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "indexed": true,
+        "internalType": "uint8"
+      },
+      {
+        "name": "scopeKey",
+        "type": "bytes24",
+        "indexed": true,
+        "internalType": "bytes24"
+      },
+      {
+        "name": "selector",
+        "type": "bytes4",
+        "indexed": false,
+        "internalType": "bytes4"
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "ScopeDeleted",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "indexed": true,
+        "internalType": "uint8"
+      },
+      {
+        "name": "scopeKey",
+        "type": "bytes24",
+        "indexed": true,
+        "internalType": "bytes24"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "ScopeDisabled",
+    "type": "event",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "indexed": true,
+        "internalType": "uint8"
+      },
+      {
+        "name": "scopeKey",
+        "type": "bytes24",
+        "indexed": true,
+        "internalType": "bytes24"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "name": "GOVERNOR",
+    "type": "function",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IAgoraGovernor"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "MAX_SCOPE_LENGTH",
+    "type": "function",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "PERCENT_DIVISOR",
+    "type": "function",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint16",
+        "internalType": "uint16"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "addScopeForProposalType",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "scope",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "key",
+            "type": "bytes24",
+            "internalType": "bytes24"
+          },
+          {
+            "name": "selector",
+            "type": "bytes4",
+            "internalType": "bytes4"
+          },
+          {
+            "name": "parameters",
+            "type": "bytes[]",
+            "internalType": "bytes[]"
+          },
+          {
+            "name": "comparators",
+            "type": "uint8[]",
+            "internalType": "enum IProposalTypesConfigurator.Comparators[]"
+          },
+          {
+            "name": "types",
+            "type": "uint8[]",
+            "internalType": "enum IProposalTypesConfigurator.SupportedTypes[]"
+          },
+          {
+            "name": "proposalTypeId",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "description",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "exists",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ],
+        "internalType": "struct IProposalTypesConfigurator.Scope"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "assignedScopes",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "scopeKey",
+        "type": "bytes24",
+        "internalType": "bytes24"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple[]",
+        "components": [
+          {
+            "name": "key",
+            "type": "bytes24",
+            "internalType": "bytes24"
+          },
+          {
+            "name": "selector",
+            "type": "bytes4",
+            "internalType": "bytes4"
+          },
+          {
+            "name": "parameters",
+            "type": "bytes[]",
+            "internalType": "bytes[]"
+          },
+          {
+            "name": "comparators",
+            "type": "uint8[]",
+            "internalType": "enum IProposalTypesConfigurator.Comparators[]"
+          },
+          {
+            "name": "types",
+            "type": "uint8[]",
+            "internalType": "enum IProposalTypesConfigurator.SupportedTypes[]"
+          },
+          {
+            "name": "proposalTypeId",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "description",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "exists",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ],
+        "internalType": "struct IProposalTypesConfigurator.Scope[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "deleteScope",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "scopeKey",
+        "type": "bytes24",
+        "internalType": "bytes24"
+      },
+      {
+        "name": "idx",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "disableScope",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "scopeKey",
+        "type": "bytes24",
+        "internalType": "bytes24"
+      },
+      {
+        "name": "idx",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "getSelector",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "key",
+        "type": "bytes24",
+        "internalType": "bytes24"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "selector",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "proposalTypes",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "quorum",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "approvalThreshold",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "description",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "module",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "exists",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ],
+        "internalType": "struct IProposalTypesConfigurator.ProposalType"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "scopeExists",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "bytes24",
+        "internalType": "bytes24"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "name": "setProposalType",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "quorum",
+        "type": "uint16",
+        "internalType": "uint16"
+      },
+      {
+        "name": "approvalThreshold",
+        "type": "uint16",
+        "internalType": "uint16"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "module",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "setScopeForProposalType",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "key",
+        "type": "bytes24",
+        "internalType": "bytes24"
+      },
+      {
+        "name": "selector",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      },
+      {
+        "name": "parameters",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "comparators",
+        "type": "uint8[]",
+        "internalType": "enum IProposalTypesConfigurator.Comparators[]"
+      },
+      {
+        "name": "types",
+        "type": "uint8[]",
+        "internalType": "enum IProposalTypesConfigurator.SupportedTypes[]"
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "name": "validateProposalData",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "targets",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "calldatas",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "view"
+  },
+  {
+    "name": "validateProposedTx",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "proposedTx",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "proposalTypeId",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "key",
+        "type": "bytes24",
+        "internalType": "bytes24"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "view"
+  }
+]

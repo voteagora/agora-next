@@ -21,8 +21,10 @@ import {
 } from "@/lib/prismaUtils";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
-
 import { unstable_cache } from "next/cache";
+import { ScopeData } from "@/lib/types";
+import { getPublicClient } from "@/lib/viem";
+
 async function getProposals({
   filter,
   pagination,
@@ -147,6 +149,65 @@ async function getProposalTypes() {
   });
 }
 
+async function getScopes() {
+  return withMetrics("getScopes", async () => {
+    const { contracts } = Tenant.current();
+    if (!contracts.supportScopes) {
+      return [];
+    }
+    const configuratorContract = contracts.proposalTypesConfigurator;
+    // TODO: remove this once we have a real endpoint
+    const response = await fetch("http://localhost:8004/v1/scopes");
+    const data = await response.json();
+
+    const enriched = await Promise.all(
+      data.scopes?.map(async (scope: ScopeData) => {
+        const config = {
+          address: configuratorContract?.address as `0x${string}`,
+          abi: configuratorContract?.abi,
+          functionName: "assignedScopes",
+          args: [scope.proposal_type_id, `0x${scope.scope_key}`],
+          chainId: configuratorContract?.chain.id,
+        };
+        const client = getPublicClient();
+        const contractData = await client.readContract(config);
+
+        if (!contractData) {
+          return {
+            ...scope,
+            parameters: [],
+            comparators: [],
+            types: [],
+            exists: false,
+          };
+        }
+
+        const scopes = contractData as any[];
+        const firstScope = scopes[0];
+
+        if (!firstScope) {
+          return {
+            ...scope,
+            parameters: [],
+            comparators: [],
+            types: [],
+            exists: false,
+          };
+        }
+
+        return {
+          ...scope,
+          parameters: firstScope.parameters || [],
+          comparators: firstScope.comparators || [],
+          types: firstScope.types || [],
+          exists: firstScope.exists || false,
+        };
+      })
+    );
+    return enriched as ScopeData[];
+  });
+}
+
 async function getDraftProposals(address: `0x${string}`) {
   return withMetrics("getDraftProposals", async () => {
     const { contracts } = Tenant.current();
@@ -211,6 +272,7 @@ export const fetchDraftProposals = cache(getDraftProposals);
 export const fetchProposals = cache(getProposals);
 export const fetchProposal = cache(getProposal);
 export const fetchProposalTypes = cache(getProposalTypes);
+export const fetchScopes = cache(getScopes);
 export const fetchProposalUnstableCache = unstable_cache(getProposal, [], {
   tags: ["proposal"],
   revalidate: 3600, // 1 hour

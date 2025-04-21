@@ -11,7 +11,10 @@ import ArchivedDraftProposal from "../components/ArchivedDraftProposal";
 import DeleteDraftButton from "../components/DeleteDraftButton";
 import ReactMarkdown from "react-markdown";
 import { fetchDraftProposal } from "@/app/api/common/draftProposals/getDraftProposals";
-import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
+import {
+  fetchProposalTypes,
+  fetchScopes,
+} from "@/app/api/common/proposals/getProposals";
 import { PLMConfig } from "@/app/proposals/draft/types";
 
 export const maxDuration = 60;
@@ -33,6 +36,7 @@ export default async function DraftProposalPage({
 
   const draftProposal = await fetchDraftProposal(parseInt(params.id));
   const proposalTypes = await fetchProposalTypes();
+  const scopes = await fetchScopes();
 
   const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
 
@@ -73,6 +77,7 @@ export default async function DraftProposalPage({
               proposalTypes={proposalTypes}
               stage={stageObject.stage}
               draftProposal={draftProposal}
+              scopes={scopes}
             />
           </section>
           <section className="col-span-1">

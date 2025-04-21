@@ -33,6 +33,7 @@ import { ShareDialog as ShareVoteDialog } from "@/components/Proposals/ProposalP
 import { Vote } from "@/app/api/common/votes/vote";
 import { SimulationReportDialog } from "../SimulationReportDialog/SimulationReportDialog";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
+import { CreateScopeDialog } from "@/components/Admin/CreateScopeDialog";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -53,7 +54,8 @@ export type DialogType =
   | OpenGithubPRDialog
   | SubscribeDialog
   | ShareVoteDialogType
-  | SimulationReportDialogType;
+  | SimulationReportDialogType
+  | CreateScopeDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -249,6 +251,15 @@ export type SimulationReportDialogType = {
   type: "SIMULATION_REPORT";
   params: {
     report: StructuredSimulationReport | null;
+  };
+  className?: string;
+};
+
+export type CreateScopeDialogType = {
+  type: "CREATE_SCOPE";
+  params: {
+    proposalTypeId: number;
+    onSuccess: () => void;
   };
   className?: string;
 };
@@ -459,6 +470,15 @@ export const dialogs: DialogDefinitions<DialogType> = {
   SIMULATION_REPORT: ({ report }, closeDialog) => (
     <SimulationReportDialog report={report} closeDialog={closeDialog} />
   ),
+  CREATE_SCOPE: ({ proposalTypeId, onSuccess }, closeDialog) => {
+    return (
+      <CreateScopeDialog
+        proposalTypeId={proposalTypeId}
+        onSuccess={onSuccess}
+        closeDialog={closeDialog}
+      />
+    );
+  },
   // FAQ: () => {
   //   return <FaqDialog />;
   // },

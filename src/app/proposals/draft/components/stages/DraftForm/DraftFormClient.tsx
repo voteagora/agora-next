@@ -29,6 +29,8 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
 import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
+import { ScopeData } from "@/lib/types";
+import { ScopeDetails } from "@/components/Admin/ScopeDetails";
 
 const DEFAULT_FORM = {
   type: ProposalType.BASIC,
@@ -76,9 +78,11 @@ const getValidProposalTypesForVotingType = (
 const DraftFormClient = ({
   draftProposal,
   proposalTypes,
+  scopes,
 }: {
   draftProposal: DraftProposal;
   proposalTypes: any[];
+  scopes: ScopeData[];
 }) => {
   const [isPending, setIsPending] = useState<boolean>(false);
   const [validProposalTypes, setValidProposalTypes] = useState<any[]>(
@@ -97,6 +101,7 @@ const DraftFormClient = ({
   const { watch, handleSubmit, control } = methods;
 
   const votingModuleType = watch("type");
+  const proposalTypeId = watch("proposalConfigType");
   const enabledProposalTypesFromConfigAndAPI = useMemo(
     () => getProposalTypeMetaDataForTenant(proposalTypes),
     [proposalTypes]
@@ -149,6 +154,12 @@ const DraftFormClient = ({
     }
   };
 
+  const scopesForProposalType = useMemo(() => {
+    return scopes.filter(
+      (scope) => scope.proposal_type_id === Number(proposalTypeId)
+    );
+  }, [scopes, proposalTypeId]);
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -192,6 +203,19 @@ const DraftFormClient = ({
                   name="proposalConfigType"
                   value={validProposalTypes[0]?.proposal_type_id || null}
                 />
+              )}
+              {scopesForProposalType.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <span className="text-sm font-medium">Scopes</span>
+                  {scopesForProposalType.map((scope) => (
+                    <div
+                      key={scope.scope_key}
+                      className="text-sm bg-wash p-2 rounded-md"
+                    >
+                      <ScopeDetails scope={scope} />
+                    </div>
+                  ))}
+                </div>
               )}
 
               <TextInput
