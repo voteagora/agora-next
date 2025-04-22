@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import DelegateTableRow from "./DelegateTableRow";
+import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -55,6 +56,8 @@ export default function DelegateTable({
 
   return (
     <DialogProvider>
+      <DelegateToSelfBanner />
+
       <div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg mt-6">
         <Table className="min-w-full">
           <TableHeader className="text-sm text-secondary sticky top-0 bg-neutral z-10 rounded-t-lg">

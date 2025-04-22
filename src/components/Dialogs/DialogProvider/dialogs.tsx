@@ -33,6 +33,7 @@ import { ShareDialog as ShareVoteDialog } from "@/components/Proposals/ProposalP
 import { Vote } from "@/app/api/common/votes/vote";
 import { SimulationReportDialog } from "../SimulationReportDialog/SimulationReportDialog";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
+import { EncourageConnectWalletDialog } from "@/components/Delegates/Delegations/EncourageConnectWalletDialog";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -53,7 +54,8 @@ export type DialogType =
   | OpenGithubPRDialog
   | SubscribeDialog
   | ShareVoteDialogType
-  | SimulationReportDialogType;
+  | SimulationReportDialogType
+  | EncourageConnectWalletDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -251,6 +253,11 @@ export type SimulationReportDialogType = {
     report: StructuredSimulationReport | null;
   };
   className?: string;
+};
+
+export type EncourageConnectWalletDialogType = {
+  type: "ENCOURAGE_CONNECT_WALLET";
+  params: {};
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -458,6 +465,9 @@ export const dialogs: DialogDefinitions<DialogType> = {
   },
   SIMULATION_REPORT: ({ report }, closeDialog) => (
     <SimulationReportDialog report={report} closeDialog={closeDialog} />
+  ),
+  ENCOURAGE_CONNECT_WALLET: ({}, closeDialog) => (
+    <EncourageConnectWalletDialog closeDialog={closeDialog} />
   ),
   // FAQ: () => {
   //   return <FaqDialog />;

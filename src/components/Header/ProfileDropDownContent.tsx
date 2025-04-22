@@ -17,11 +17,66 @@ import TokenAmountDecorated from "../shared/TokenAmountDecorated";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
+import { ExclamationCircleIcon } from "@/icons/ExclamationCircleIcon";
+import { Delegation } from "@/app/api/common/delegations/delegation";
+import { useEnsName } from "wagmi";
+import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { DelegateToSelf } from "../Delegates/Delegations/DelegateToSelf";
 
 interface Props {
   ensName: string | undefined;
   handleCloseDrawer: () => void;
 }
+
+const DelegatePanelRow = ({ delegate }: { delegate: Delegation }) => {
+  const { data: ensName } = useEnsName({
+    chainId: 1,
+    address: delegate.to as `0x${string}`,
+  });
+
+  return (
+    <div className="inline-flex justify-start text-neutral-900 items-center gap-2">
+      <div className="flex justify-start items-end">
+        <ENSAvatar ensName={ensName} size={30} />
+      </div>
+      <div className="inline-flex flex-col justify-start items-start">
+        <div className="text-base font-bold leading-normal">{ensName}</div>
+        <div className="text-xs font-normal  leading-[18px]">
+          {shortAddress(delegate.to)}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const RenderDelegateToSelf = ({ delegate }: { delegate: DelegateChunk }) => {
+  return (
+    <div className="p-4 rounded-lg border border-line gap-2 bg-neutral">
+      <div className="flex flex-col text-neutral-900 leading-normal">
+        <div className="flex inline-flex gap-2">
+          <ExclamationCircleIcon className="w-6 h-6 stroke-negative" />
+          <div className="flex-1 inline-flex flex-col justify-start items-start gap-4">
+            <div className="flex flex-col justify-start items-start gap-1">
+              <div className="text-base font-bold">
+                Your tokens can't be voted with!
+              </div>
+              <div className="text-sm font-medium leading-[21px]">
+                Make sure to delegate to yourself or to another active community
+                member to ensure your votes count!
+              </div>
+            </div>
+          </div>
+        </div>
+        <DelegateToSelf
+          variant="rounded"
+          className="outline outline-1 gap-2 justify-center mt-6 font-bold"
+          delegate={delegate}
+          label="Delegate tokens to myself"
+        />
+      </div>
+    </div>
+  );
+};
 
 export const ProfileDropDownContent = ({
   ensName,
@@ -36,9 +91,32 @@ export const ProfileDropDownContent = ({
     scwAddress,
     hasStatement,
     canCreateDelegateStatement,
+    delegatees,
   } = useProfileData();
 
   const { ui } = Tenant.current();
+  const hasDelegated = !!delegatees?.length;
+
+  const renderDelegteesInfo = () => {
+    if (!hasDelegated) return null;
+    return (
+      <div className="flex flex-col p-6 border-b border-line">
+        <PanelRow
+          title="My Delegate"
+          detail={
+            <>
+              {delegatees.map((delegate) => (
+                <DelegatePanelRow
+                  key={delegate.transaction_hash}
+                  delegate={delegate}
+                />
+              ))}
+            </>
+          }
+        />
+      </div>
+    );
+  };
 
   return (
     <>
@@ -137,7 +215,11 @@ export const ProfileDropDownContent = ({
               </RowSkeletonWrapper>
             }
           />
+          {!hasDelegated && tokenBalance && tokenBalance > BigInt(0) && (
+            <RenderDelegateToSelf delegate={delegate as DelegateChunk} />
+          )}
         </div>
+        {renderDelegteesInfo()}
 
         {isFetching ? (
           <div className="flex flex-col p-6">
