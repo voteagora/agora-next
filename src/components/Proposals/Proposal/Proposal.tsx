@@ -71,7 +71,7 @@ export default function Proposal({
               : proposal.markdowntitle}
           </div>
         </div>
-        <div className="flex-col whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[20%] flex-start justify-center hidden sm:block">
+        <div className="flex-col whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 md:w-[45%] lg:w-[20%] sm:w-[45%] flex-start justify-center hidden sm:block">
           <div className="flex flex-col items-end">
             <div className="text-xs text-secondary">
               <ProposalTimeStatus
@@ -85,7 +85,7 @@ export default function Proposal({
             <ProposalStatus proposal={proposal} />
           </div>
         </div>
-        <div className="flex-col whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[25%] flex-start justify-center hidden sm:block">
+        <div className="flex-col whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[25%] flex-start justify-center hidden lg:block">
           <div className="overflow-hidden overflow-ellipsis">
             {proposal.proposalType === "SNAPSHOT" && (
               <SnapshotProposalStatus proposal={proposal} />

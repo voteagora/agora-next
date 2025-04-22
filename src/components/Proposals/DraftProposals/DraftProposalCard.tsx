@@ -25,14 +25,14 @@ const DraftProposalCard = ({ proposal }: { proposal: ProposalDraft }) => {
 
   return (
     <div className="bg-wash border border-line rounded-2xl p-2 shadow-sm">
-      <div className="flex flex-col sm:flex-row justify-between bg-neutral border border-line rounded-2xl px-6 py-5 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between bg-neutral border border-line rounded-2xl px-6 py-5 shadow-sm flex-wrap sm:flex-normal">
         <div>
           <p className="font-semibold text-secondary text-xs">{`By ${proposal.author_address}`}</p>
           <p className="font-medium text-primary">
             {proposal.title || "[Title pending]"}
           </p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-x-16 space-y-4 sm:space-y-0 mt-4 sm:mt-0">
+        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 mt-4 sm:mt-0 sm:gap-x-4 gap-x-1">
           <div className="w-[140px]">
             <p className="font-semibold text-secondary text-xs">{`Status`}</p>
             <p className="font-medium text-primary">

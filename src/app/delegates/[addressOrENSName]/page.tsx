@@ -113,8 +113,8 @@ export default async function Page({
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between mt-12 w-full max-w-full">
-      <div className="flex flex-col static sm:sticky top-16 shrink-0 w-full sm:max-w-[350px]">
+    <div className="flex flex-col md:flex-row items-center md:items-start gap-6 justify-between mt-12 w-full max-w-full">
+      <div className="flex flex-col static md:sticky top-16 shrink-0 w-full md:max-w-[330px] lg:max-w-[350px]">
         <DelegateCard
           delegate={delegate}
           description={textRecords?.description}
@@ -124,7 +124,7 @@ export default async function Page({
         />
       </div>
       {!scwDelegate ? (
-        <div className="flex flex-col sm:ml-12 min-w-0 flex-1 max-w-full">
+        <div className="flex flex-col md:ml-8 lg:ml-12 min-w-0 flex-1 max-w-full">
           <Tabs defaultValue={"statement"} className="w-full">
             <TabsList className="mb-8">
               <TabsTrigger value="statement" variant="underlined">
