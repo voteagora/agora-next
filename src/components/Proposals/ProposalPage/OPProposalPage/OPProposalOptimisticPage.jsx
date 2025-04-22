@@ -5,23 +5,23 @@ import { formatUnits } from "ethers";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
 import OptimisticProposalVotesCard from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/OptimisticProposalVotesCard";
+import Tenant from "@/lib/tenant/tenant";
 
 export default async function OPProposalPage({ proposal }) {
   const votableSupply = await fetchVotableSupply();
+  const tokenDecimals = Tenant.current().token.decimals;
   const formattedVotableSupply = Number(
-    BigInt(votableSupply) / BigInt(10 ** 18)
+    BigInt(votableSupply) / BigInt(10 ** tokenDecimals)
   );
-
   const againstLengthString = formatNumber(
     proposal.proposalResults.against,
-    18,
+    tokenDecimals,
     0,
     true
   );
   const againstLength = Number(
-    formatUnits(proposal.proposalResults.against, 18)
+    formatUnits(proposal.proposalResults.against, tokenDecimals)
   );
-
   const againstRelativeAmount = parseFloat(
     ((againstLength / formattedVotableSupply) * 100).toFixed(2)
   );
