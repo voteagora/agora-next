@@ -34,6 +34,7 @@ export function useContractAbi(address: string) {
         return {
           name: item.name || "",
           selector,
+          type: item.type || "",
           inputs: item.inputs || [],
         };
       });

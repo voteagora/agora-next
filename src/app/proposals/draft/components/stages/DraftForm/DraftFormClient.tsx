@@ -29,8 +29,8 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
 import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
-import { ScopeData } from "@/lib/types";
 import { ScopeDetails } from "@/components/Admin/ScopeDetails";
+import { FormattedProposalType } from "@/lib/types";
 
 const DEFAULT_FORM = {
   type: ProposalType.BASIC,
@@ -78,11 +78,9 @@ const getValidProposalTypesForVotingType = (
 const DraftFormClient = ({
   draftProposal,
   proposalTypes,
-  scopes,
 }: {
   draftProposal: DraftProposal;
-  proposalTypes: any[];
-  scopes: ScopeData[];
+  proposalTypes: FormattedProposalType[];
 }) => {
   const [isPending, setIsPending] = useState<boolean>(false);
   const [validProposalTypes, setValidProposalTypes] = useState<any[]>(
@@ -154,11 +152,11 @@ const DraftFormClient = ({
     }
   };
 
-  const scopesForProposalType = useMemo(() => {
-    return scopes.filter(
-      (scope) => scope.proposal_type_id === Number(proposalTypeId)
+  const selectedProposalType = useMemo(() => {
+    return proposalTypes.find(
+      (type) => type.proposal_type_id === Number(proposalTypeId)
     );
-  }, [scopes, proposalTypeId]);
+  }, [proposalTypeId]);
 
   return (
     <FormProvider {...methods}>
@@ -204,13 +202,13 @@ const DraftFormClient = ({
                   value={validProposalTypes[0]?.proposal_type_id || null}
                 />
               )}
-              {scopesForProposalType.length > 0 && (
+              {(selectedProposalType?.scopes?.length || 0) > 0 && (
                 <div className="flex flex-col gap-2">
                   <span className="text-sm font-medium">Scopes</span>
-                  {scopesForProposalType.map((scope) => (
+                  {selectedProposalType?.scopes?.map((scope) => (
                     <div
                       key={scope.scope_key}
-                      className="text-sm bg-wash p-2 rounded-md"
+                      className="flex flex-col gap-4 text-sm p-2 rounded-md border border-line rounded-lg p-4 w-full"
                     >
                       <ScopeDetails scope={scope} />
                     </div>

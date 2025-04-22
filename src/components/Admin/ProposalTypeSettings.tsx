@@ -1,10 +1,9 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import { Fragment, useState, useCallback, useMemo, useEffect } from "react";
+import { Fragment, useState, useCallback, useMemo } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { OptimismProposalTypes } from "@prisma/client";
 import ProposalType from "./ProposalType";
 import { useReadContract } from "wagmi";
 import { useAccount } from "wagmi";
@@ -12,16 +11,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import toast from "react-hot-toast";
 import BlockScanUrls from "../shared/BlockScanUrl";
-import { ScopeData } from "@/lib/types";
-
-export interface FormattedProposalType {
-  name: string;
-  quorum: number;
-  approval_threshold: number;
-  proposal_type_id: number;
-  isClientSide: boolean;
-  scopes?: ScopeData[];
-}
+import { FormattedProposalType } from "@/lib/types";
 
 const RestrictedCallout = () => {
   const { address, isConnected } = useAccount();
@@ -96,31 +86,27 @@ const RestrictedCallout = () => {
 export default function ProposalTypeSettings({
   votableSupply,
   proposalTypes,
-  scopes,
 }: {
   votableSupply: string;
-  proposalTypes: OptimismProposalTypes[];
-  scopes: ScopeData[];
+  proposalTypes: FormattedProposalType[];
 }) {
+  const allScopes = useMemo(() => {
+    return proposalTypes.flatMap((proposalType) => proposalType.scopes ?? []);
+  }, [proposalTypes]);
+
   const fmtPropTypes = useMemo(
     () =>
       proposalTypes.map(
-        ({ quorum, approval_threshold, name, proposal_type_id }) => {
-          const ptId = Number(proposal_type_id);
-          const relevantScopes = scopes?.filter(
-            (scope) => scope.proposal_type_id === ptId
-          );
-          return {
-            name,
-            quorum: Number(quorum) / 100,
-            approval_threshold: Number(approval_threshold) / 100,
-            proposal_type_id: ptId,
-            isClientSide: false,
-            scopes: relevantScopes,
-          };
-        }
+        ({ quorum, approval_threshold, name, proposal_type_id, scopes }) => ({
+          name,
+          quorum: Number(quorum) / 100,
+          approval_threshold: Number(approval_threshold) / 100,
+          proposal_type_id: Number(proposal_type_id), // This will be of the format "0", "1", "2", etc.
+          isClientSide: false,
+          scopes,
+        })
       ),
-    [proposalTypes, scopes]
+    []
   );
 
   const [propTypes, setPropTypes] = useState<FormattedProposalType[]>(
@@ -178,7 +164,7 @@ export default function ProposalTypeSettings({
             index={proposalType.proposal_type_id}
             onDelete={handleDeleteProposalType}
             onSuccessSetProposalType={handleSuccessSetProposalType}
-            availableScopes={scopes ?? []}
+            availableScopes={allScopes ?? []}
           />
           <Separator className="my-8" />
         </Fragment>

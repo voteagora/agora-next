@@ -37,8 +37,7 @@ import { Separator } from "../ui/separator";
 import toast from "react-hot-toast";
 import BlockScanUrls from "../shared/BlockScanUrl";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { ScopeData } from "@/lib/types";
-import { FormattedProposalType } from "./ProposalTypeSettings";
+import { ScopeData, FormattedProposalType } from "@/lib/types";
 import { ScopeDetails } from "./ScopeDetails";
 
 type Props = {
@@ -236,11 +235,18 @@ export default function ProposalType({
   const handleAddScope = async (scopeToAdd: ScopeData) => {
     setPopoverOpen(false);
 
+    if (!scopeToAdd.selector) {
+      toast.error("Scope has no selector");
+      return;
+    }
+
     const scopeArg = {
       key: scopeToAdd.scope_key.startsWith("0x")
         ? (scopeToAdd.scope_key as `0x${string}`)
         : (`0x${scopeToAdd.scope_key}` as `0x${string}`),
-      selector: scopeToAdd.selector || "00000000",
+      selector: scopeToAdd.selector.startsWith("0x")
+        ? (scopeToAdd.selector as `0x${string}`)
+        : (`0x${scopeToAdd.selector}` as `0x${string}`),
       parameters: scopeToAdd.parameters || [],
       comparators: scopeToAdd.comparators || [],
       types: scopeToAdd.types || [],
@@ -254,12 +260,31 @@ export default function ProposalType({
     try {
       toast.loading("Adding scope...");
 
-      await writeAddScope({
-        address: configuratorContract?.address as `0x${string}`,
-        abi: configuratorContract?.abi,
-        functionName: "addScopeForProposalType",
-        args: addArgs,
-      });
+      await writeAddScope(
+        {
+          address: configuratorContract?.address as `0x${string}`,
+          abi: configuratorContract?.abi,
+          functionName: "addScopeForProposalType",
+          args: addArgs,
+        },
+        {
+          onSuccess: (hash) => {
+            toast.dismiss(); // Dismiss loading toast
+            toast.success(
+              <div className="flex flex-col items-center gap-2 p-1">
+                <span className="text-sm font-semibold">Scope added</span>
+                {hash || resultAddScope ? (
+                  <BlockScanUrls hash1={hash || resultAddScope} />
+                ) : null}
+              </div>
+            );
+          },
+          onError: (error: any) => {
+            toast.dismiss();
+            toast.error(`Failed to add scope: ${error.message}`);
+          },
+        }
+      );
 
       setAssignedScopes((prev) => [...prev, scopeToAdd]);
     } catch (e) {
@@ -268,72 +293,67 @@ export default function ProposalType({
     }
   };
 
-  useEffect(() => {
-    if (isSuccessAddScope) {
-      toast.dismiss(); // Dismiss loading toast
-      toast.success(
-        <div className="flex flex-col items-center gap-2 p-1">
-          <span className="text-sm font-semibold">Scope added</span>
-          {resultAddScope && <BlockScanUrls hash1={resultAddScope} />}
-        </div>
+  const handleRemoveScope = async (scopeToRemove: ScopeData) => {
+    const scopesWithKey = assignedScopes.filter(
+      (scope) => scope.scope_key === scopeToRemove.scope_key
+    );
+    if (scopesWithKey.length > 1) {
+      toast.error(
+        `Multiple scopes with the same key found. You will need to execute this transaction ${scopesWithKey.length} times. If you stop in the middle there will be issues with the proposal type.`
       );
     }
-    if (errorAddScope) {
-      toast.dismiss(); // Dismiss loading toast
-      toast.error(`Failed to add scope: ${errorAddScope.message}`);
-    }
-  }, [isSuccessAddScope, errorAddScope, resultAddScope]);
+    const promises = scopesWithKey.map(async (_, idx) => {
+      const deleteArgs = [
+        BigInt(proposalTypeId),
+        scopeToRemove.scope_key.startsWith("0x")
+          ? (scopeToRemove.scope_key as `0x${string}`)
+          : (`0x${scopeToRemove.scope_key}` as `0x${string}`),
+        BigInt(idx),
+      ];
 
-  const handleRemoveScope = async (scopeToRemove: ScopeData, idx: number) => {
-    const deleteArgs = [
-      BigInt(proposalTypeId),
-      scopeToRemove.scope_key.startsWith("0x")
-        ? (scopeToRemove.scope_key as `0x${string}`)
-        : (`0x${scopeToRemove.scope_key}` as `0x${string}`),
-      BigInt(idx),
-    ];
+      try {
+        toast.loading("Removing scope...");
 
-    try {
-      toast.loading("Removing scope...");
-
-      await writeDeleteScope({
-        address: configuratorContract?.address as `0x${string}`,
-        abi: configuratorContract?.abi,
-        functionName: "deleteScope",
-        args: deleteArgs,
-      });
-
-      setAssignedScopes((prev) => prev.filter((s, i) => i !== idx));
-    } catch (e) {
-      console.error("Error removing scope:", e);
-      toast.error("Failed to initiate remove scope transaction.");
-    }
+        await writeDeleteScope(
+          {
+            address: configuratorContract?.address as `0x${string}`,
+            abi: configuratorContract?.abi,
+            functionName: "deleteScope",
+            args: deleteArgs,
+          },
+          {
+            onSuccess: (hash) => {
+              toast.dismiss();
+              toast.success(
+                <div className="flex flex-col items-center gap-2 p-1">
+                  <span className="text-sm font-semibold">Scope removed</span>
+                  {hash || resultDeleteScope ? (
+                    <BlockScanUrls hash1={hash || resultDeleteScope} />
+                  ) : null}
+                </div>
+              );
+            },
+            onError: (error: any) => {
+              toast.dismiss();
+              toast.error(`Failed to remove scope: ${error.message}`);
+            },
+          }
+        );
+        setAssignedScopes((prev) => prev.filter((s, i) => i !== idx));
+      } catch (e) {
+        console.error("Error removing scope:", e);
+        toast.error("Failed to initiate remove scope transaction.");
+      }
+    });
+    await Promise.all(promises);
   };
-
-  useEffect(() => {
-    if (isSuccessDeleteScope) {
-      toast.dismiss();
-      toast.success(
-        <div className="flex flex-col items-center gap-2 p-1">
-          <span className="text-sm font-semibold">Scope removed</span>
-          {resultDeleteScope && <BlockScanUrls hash1={resultDeleteScope} />}
-        </div>
-      );
-    }
-    if (errorDeleteScope) {
-      toast.dismiss();
-      toast.error(`Failed to remove scope: ${errorDeleteScope.message}`);
-    }
-  }, [isSuccessDeleteScope, errorDeleteScope, resultDeleteScope]);
 
   const handleCreateScope = () => {
     openDialog({
       type: "CREATE_SCOPE",
       params: {
         proposalTypeId: proposalTypeId,
-        onSuccess: () => {
-          toast.success("Scope created successfully");
-        },
+        onSuccess: () => {},
       },
       className: "sm:w-[32rem]",
     });
@@ -507,7 +527,7 @@ export default function ProposalType({
 
               <div className="grid gap-3">
                 {assignedScopes.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center p-6 border rounded-lg bg-wash/50">
+                  <div className="flex flex-col items-center justify-center p-6 border rounded-lg bg-wash">
                     <p className="text-sm text-tertiary mb-2">
                       No scopes assigned yet
                     </p>
@@ -523,20 +543,17 @@ export default function ProposalType({
                   </div>
                 ) : (
                   <div className="grid gap-2">
-                    {assignedScopes.map((scope, idx) => (
+                    {assignedScopes.map((scope) => (
                       <div
                         key={scope.scope_key}
-                        className="flex items-center justify-between p-3 border rounded-lg bg-card hover:bg-accent/5 transition-colors"
+                        className="flex items-center justify-between bg-card hover:bg-accent/5 transition-colors border border-line rounded-lg p-4 w-full"
                       >
-                        <div className="space-y-1">
-                          <p className="font-medium">{scope.description}</p>
-                          <ScopeDetails scope={scope} />
-                        </div>
+                        <ScopeDetails scope={scope} />
                         <Button
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 text-tertiary hover:text-destructive"
-                          onClick={() => handleRemoveScope(scope, idx)}
+                          onClick={() => handleRemoveScope(scope)}
                           disabled={isLoadingDeleteScope || isLoading}
                           type="button"
                         >
@@ -563,10 +580,7 @@ export default function ProposalType({
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent
-                      className="w-[300px] sm:w-[400px] p-0"
-                      align="start"
-                    >
+                    <PopoverContent className="w-[400px] p-0" align="start">
                       <div className="flex flex-col">
                         <div className="max-h-[300px] overflow-auto">
                           <div className="divide-y">
@@ -576,12 +590,7 @@ export default function ProposalType({
                                 className="w-full p-3 text-left hover:bg-accent/50 transition-colors"
                                 onClick={() => handleAddScope(scope)}
                               >
-                                <div className="space-y-1">
-                                  <p className="font-medium">
-                                    {scope.description}
-                                  </p>
-                                  <ScopeDetails scope={scope} />
-                                </div>
+                                <ScopeDetails scope={scope} />
                               </button>
                             ))}
                           </div>

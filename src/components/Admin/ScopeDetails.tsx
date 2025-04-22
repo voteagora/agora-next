@@ -14,73 +14,88 @@ export function ScopeDetails({ scope }: ScopeDetailsProps) {
   );
 
   return (
-    <div className="flex flex-col items-start gap-2 text-sm text-tertiary">
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2">
-          <span className="font-medium">Target:</span>
-          <code className="text-xs bg-wash px-2 py-0.5 rounded">
-            {`0x${scope.scope_key.slice(0, 40)}`}
-          </code>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="font-medium">Function:</span>
-          <code className="text-xs bg-wash px-2 py-0.5 rounded">
-            {isLoading
-              ? "Loading..."
-              : `${functionInfo?.name} (${functionInfo?.inputs.map((i) => i.type).join(", ")})` ||
-                `0x${scope.selector}`}
-          </code>
+    <div className="space-y-1">
+      <span className="font-medium text-base">{scope.description}</span>
+      <div className="w-full max-w-xl bg-wash p-4 rounded-lg">
+        <h3 className="text-base font-medium mb-4 break-all border-b border-line pb-2">
+          Scope with key:{" "}
+          <span className="text-sm font-normal">{`${scope.scope_key}`}</span>
+        </h3>
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-secondary min-w-[60px]">Target</span>
+            <code className="text-sm px-2 py-1 rounded text-tertiary break-all">
+              {`0x${scope.scope_key.slice(0, 40)}`}
+            </code>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-secondary min-w-[60px]">
+              Function
+            </span>
+            <code className="text-sm px-2 py-1 rounded text-tertiary">
+              {isLoading
+                ? "Loading..."
+                : `${functionInfo?.name} (${functionInfo?.inputs.map((i) => i.type).join(", ")})` ||
+                  `0x${scope.selector}`}
+            </code>
+          </div>
+
+          {scope.parameters && scope.parameters.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-medium text-primary">Parameters</h3>
+              {scope.parameters.map((param: string, idx: number) => (
+                <div key={idx} className="space-y-2">
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-secondary min-w-[60px]">
+                      Value
+                    </span>
+                    <span className="text-sm text-tertiary break-all">
+                      {param}
+                    </span>
+                  </div>
+                  {scope.comparators &&
+                    scope.comparators[idx] !== undefined && (
+                      <div className="flex items-center gap-4">
+                        <span className="text-sm text-secondary min-w-[60px]">
+                          Compare
+                        </span>
+                        <span className="text-sm text-tertiary">
+                          {
+                            ["Empty", "Equal", "Less Than", "Greater Than"][
+                              scope.comparators[idx]
+                            ]
+                          }
+                        </span>
+                      </div>
+                    )}
+                  {scope.types && scope.types[idx] !== undefined && (
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm text-secondary min-w-[60px]">
+                        Type
+                      </span>
+                      <span className="text-sm text-tertiary">
+                        {
+                          [
+                            "None",
+                            "Uint8",
+                            "Uint16",
+                            "Uint32",
+                            "Uint64",
+                            "Uint128",
+                            "Uint256",
+                            "Address",
+                            "Bytes32",
+                          ][scope.types[idx]]
+                        }
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-      {scope.parameters && scope.parameters.length > 0 && (
-        <div className="flex flex-col gap-1">
-          <span className="font-medium">Parameters:</span>
-          <div className="flex flex-col gap-1">
-            {scope.parameters.map((param, idx) => (
-              <div key={idx} className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-tertiary">Value:</span>
-                  <code className="text-xs bg-wash px-2 py-0.5 rounded">
-                    {param}
-                  </code>
-                </div>
-                {scope.comparators && scope.comparators[idx] !== undefined && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-tertiary">Comparison:</span>
-                    <span className="text-xs text-tertiary">
-                      {
-                        ["Empty", "Equal", "Less Than", "Greater Than"][
-                          scope.comparators[idx]
-                        ]
-                      }
-                    </span>
-                  </div>
-                )}
-                {scope.types && scope.types[idx] !== undefined && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-tertiary">Type:</span>
-                    <span className="text-xs text-tertiary">
-                      {
-                        [
-                          "None",
-                          "Uint8",
-                          "Uint16",
-                          "Uint32",
-                          "Uint64",
-                          "Uint128",
-                          "Uint256",
-                          "Address",
-                          "Bytes32",
-                        ][scope.types[idx]]
-                      }
-                    </span>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

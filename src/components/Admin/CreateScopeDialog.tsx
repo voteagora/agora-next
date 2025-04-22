@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createScopeMutation } from "@/hooks/useFetchScopes";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -21,9 +19,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import Tenant from "@/lib/tenant/tenant";
 import { isAddress } from "viem";
 import { useContractAbi } from "@/hooks/useContractAbi";
+import { Trash } from "lucide-react";
+import toast from "react-hot-toast";
+import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import Tenant from "@/lib/tenant/tenant";
+import BlockScanUrls from "../shared/BlockScanUrl";
 
 const COMPARATORS = [
   { value: 0, label: "Empty" },
@@ -66,8 +68,6 @@ const formSchema = z.object({
   types: z.array(z.number()).default([]),
 });
 
-const { contracts } = Tenant.current();
-
 export const CreateScopeDialog = ({
   proposalTypeId,
   onSuccess,
@@ -77,8 +77,21 @@ export const CreateScopeDialog = ({
   onSuccess: () => void;
   closeDialog: () => void;
 }) => {
-  const { mutateAsync: createScope, isPending: isCreating } =
-    createScopeMutation();
+  const { contracts } = Tenant.current();
+  const configuratorContract = contracts.proposalTypesConfigurator;
+
+  const {
+    data: resultCreateScope,
+    writeContractAsync: writeCreateScope,
+    isPending: isLoadingCreateScope,
+  } = useWriteContract();
+
+  const { isLoading: isLoadingCreateScopeTransaction } =
+    useWaitForTransactionReceipt({
+      hash: resultCreateScope,
+    });
+
+  const isLoading = isLoadingCreateScope || isLoadingCreateScopeTransaction;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -99,6 +112,10 @@ export const CreateScopeDialog = ({
 
   const { data: functions, isLoading: isLoadingAbi } =
     useContractAbi(contractAddress);
+
+  const filteredFunctions = functions?.filter(
+    (f) => f.inputs.length > 0 && f.type === "function"
+  );
 
   const selector = useWatch({
     control: form.control,
@@ -124,6 +141,25 @@ export const CreateScopeDialog = ({
     const currentParams = form.getValues("parameters");
     currentParams[index] = value;
     form.setValue("parameters", currentParams);
+  };
+
+  const handleDeleteParameter = (index: number) => {
+    const currentParams = form.getValues("parameters");
+    const currentComparators = form.getValues("comparators");
+    const currentTypes = form.getValues("types");
+
+    form.setValue(
+      "parameters",
+      currentParams.filter((_, i) => i !== index)
+    );
+    form.setValue(
+      "comparators",
+      currentComparators.filter((_, i) => i !== index)
+    );
+    form.setValue(
+      "types",
+      currentTypes.filter((_, i) => i !== index)
+    );
   };
 
   const handleComparatorChange = (index: number, value: string) => {
@@ -174,7 +210,9 @@ export const CreateScopeDialog = ({
         `Invalid selector format (expected 0x followed by 8 hex chars): ${selector}`
       );
     }
-    return `${address.toLowerCase().slice(2)}:${selector.toLowerCase().slice(2)}`;
+    const addressPart = address.toLowerCase().slice(2);
+    const selectorPart = selector.toLowerCase().slice(2, 10);
+    return `0x${addressPart}${selectorPart}`;
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -184,23 +222,70 @@ export const CreateScopeDialog = ({
     const scopeKey = packScopeKey(values.contractAddress, values.selector);
 
     try {
-      await createScope({
+      toast.loading("Creating scope...");
+
+      const config = {
         proposal_type_id: proposalTypeId,
-        scope_key: scopeKey,
-        selector: values.selector,
+        scope_key: scopeKey.startsWith("0x") ? scopeKey : `0x${scopeKey}`,
+        selector: values.selector.startsWith("0x")
+          ? values.selector
+          : `0x${values.selector}`,
         description: values.description,
-        parameters: values.parameters,
+        parameters: values.parameters.map((param) => {
+          if (param.startsWith("0x")) {
+            return param.padEnd(66, "0"); // Pad to 32 bytes (64 chars) + 0x
+          }
+          try {
+            const num = BigInt(param);
+            return `0x${num.toString(16).padStart(64, "0")}`;
+          } catch {
+            return `0x${param.padStart(64, "0")}`;
+          }
+        }),
         comparators: values.comparators,
         types: values.types,
-      });
+      };
 
-      onSuccess();
-      closeDialog();
+      await writeCreateScope(
+        {
+          address: configuratorContract?.address as `0x${string}`,
+          abi: configuratorContract?.abi,
+          functionName: "setScopeForProposalType",
+          args: [
+            config.proposal_type_id,
+            config.scope_key,
+            config.selector,
+            config.parameters,
+            config.comparators,
+            config.types,
+            config.description,
+          ],
+        },
+        {
+          onSuccess: (hash) => {
+            toast.dismiss();
+            toast.success(
+              <div className="flex flex-col items-center gap-2 p-1">
+                <span className="text-sm font-semibold">Scope created</span>
+                {hash || resultCreateScope ? (
+                  <BlockScanUrls hash1={hash || resultCreateScope} />
+                ) : null}
+              </div>
+            );
+            onSuccess();
+            closeDialog();
+          },
+          onError: (error: any) => {
+            toast.dismiss();
+            toast.error(`Error creating scope: ${error.message}`);
+          },
+        }
+      );
     } catch (error: unknown) {
       if (error instanceof Error) {
-        alert(`Error creating scope: ${error.message}`);
+        toast.error(`Error creating scope: ${error.message}`);
       } else {
-        alert("An unknown error occurred while creating the scope.");
+        toast.error("An unknown error occurred while creating the scope.");
       }
     }
   };
@@ -213,6 +298,10 @@ export const CreateScopeDialog = ({
       form.setValue("types", []);
     }
   });
+
+  const parameters = form.watch("parameters");
+  const comparators = form.watch("comparators");
+  const types = form.watch("types");
 
   const abiFound = (functions?.length || 0) > 0;
 
@@ -309,7 +398,7 @@ export const CreateScopeDialog = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="z-[2000]">
-                    {functions?.map((func) => (
+                    {filteredFunctions?.map((func) => (
                       <SelectItem key={func.selector} value={func.selector}>
                         {func.name} ({func.selector})
                       </SelectItem>
@@ -349,70 +438,83 @@ export const CreateScopeDialog = ({
                 Add Parameter
               </Button>
             </div>
-            {form.getValues("parameters").map((_, index) => (
-              <div key={index} className="grid grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Value</Label>
-                  <Input
-                    value={form.getValues("parameters")[index]}
-                    onChange={(e) =>
-                      handleParameterChange(index, e.target.value)
-                    }
-                    placeholder="Param value"
-                    className="h-10"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">
-                    Comparison
-                  </Label>
-                  <Select
-                    value={form.getValues("comparators")[index].toString()}
-                    onValueChange={(value) =>
-                      handleComparatorChange(index, value)
-                    }
+            {parameters.map((_, index) => (
+              <div key={index} className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-medium">
+                    Parameter {index + 1}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteParameter(index)}
+                    className="h-8 w-8 p-0"
                   >
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="Select comparator" />
-                    </SelectTrigger>
-                    <SelectContent className="z-[2000]">
-                      {COMPARATORS.map((comp) => (
-                        <SelectItem
-                          key={comp.value}
-                          value={comp.value.toString()}
-                        >
-                          {comp.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <Trash className="w-4 h-4 text-negative" />
+                  </Button>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Type</Label>
-                  <Select
-                    value={form.getValues("types")[index].toString()}
-                    onValueChange={(value) => handleTypeChange(index, value)}
-                    disabled={
-                      !!(
-                        selector &&
-                        functions?.some((f) => f.selector === selector)
-                      )
-                    }
-                  >
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent className="z-[2000]">
-                      {TYPES.map((type) => (
-                        <SelectItem
-                          key={type.value}
-                          value={type.value.toString()}
-                        >
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <Label className="text-xs text-tertiary">Value</Label>
+                    <Input
+                      value={parameters[index]}
+                      onChange={(e) =>
+                        handleParameterChange(index, e.target.value)
+                      }
+                      placeholder="Param value"
+                      className="h-10"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-tertiary">Comparison</Label>
+                    <Select
+                      value={comparators[index].toString()}
+                      onValueChange={(value) =>
+                        handleComparatorChange(index, value)
+                      }
+                    >
+                      <SelectTrigger className="h-10">
+                        <SelectValue placeholder="Select comparator" />
+                      </SelectTrigger>
+                      <SelectContent className="z-[2000]">
+                        {COMPARATORS.map((comp) => (
+                          <SelectItem
+                            key={comp.value}
+                            value={comp.value.toString()}
+                          >
+                            {comp.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-tertiary">Type</Label>
+                    <Select
+                      value={types[index].toString()}
+                      onValueChange={(value) => handleTypeChange(index, value)}
+                      disabled={
+                        !!(
+                          selector &&
+                          functions?.some((f) => f.selector === selector)
+                        )
+                      }
+                    >
+                      <SelectTrigger className="h-10">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent className="z-[2000]">
+                        {TYPES.map((type) => (
+                          <SelectItem
+                            key={type.value}
+                            value={type.value.toString()}
+                          >
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
             ))}
@@ -425,15 +527,16 @@ export const CreateScopeDialog = ({
             onClick={closeDialog}
             className="h-10"
             type="button"
+            disabled={isLoading}
           >
             Cancel
           </Button>
           <Button
             type="submit"
             className="h-10 disabled:pointer-events-auto disabled:cursor-not-allowed"
-            disabled={isCreating || !form.formState.isValid}
+            disabled={isLoading || !form.formState.isValid}
           >
-            {isCreating ? "Creating..." : "Create Scope"}
+            {isLoading ? "Creating..." : "Create Scope"}
           </Button>
         </div>
       </form>

@@ -186,9 +186,19 @@ export type ScopeData = {
   scope_key: string;
   selector?: string;
   description: string;
-  disabled?: boolean;
+  disabled_event: any;
+  deleted_event: any;
+  status: "created" | "disabled" | "deleted";
   parameters?: string[];
   comparators?: number[];
   types?: number[];
-  exists?: boolean;
 };
+
+export interface FormattedProposalType {
+  name: string;
+  quorum: number;
+  approval_threshold: number;
+  proposal_type_id: number;
+  isClientSide?: boolean;
+  scopes?: ScopeData[];
+}
