@@ -3621,7 +3621,6 @@ view xaiProposalTypes {
   quorum             String
   approval_threshold String
   name               String
-  module             String?
   inputs             Json
 
   @@schema("xai")
