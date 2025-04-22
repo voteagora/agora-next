@@ -219,6 +219,12 @@ export const useDelegatesFilter = () => {
       setIsDelegatesFiltering(true);
 
       switch (filter) {
+        case MY_DELEGATES_FILTER_PARAM:
+          return setMyDelegatesAddress(null, nuqsOptions);
+        case ENDORSED_FILTER_PARAM:
+          return setEndorsed(false, nuqsOptions);
+        case HAS_STATEMENT_FILTER_PARAM:
+          return setHasStatement(false, nuqsOptions);
         case ISSUES_FILTER_PARAM:
           return setIssuesParam((prev) => {
             const prevArray = prev || [];
