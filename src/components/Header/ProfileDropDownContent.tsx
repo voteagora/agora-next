@@ -181,7 +181,7 @@ export const ProfileDropDownContent = ({
             disconnect();
             handleCloseDrawer();
           }}
-          className="cursor-pointer flex"
+          className="cursor-pointer flex font-bold"
         >
           <Logout
             fill={rgbStringToHex(ui?.customization?.primary)}
