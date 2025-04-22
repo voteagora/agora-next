@@ -1,11 +1,21 @@
 import Tenant from "@/lib/tenant/tenant";
-import { AgoraLoader as Loader } from "@/icons/AgoraLoader";
 import Image from "next/image";
+import { icons } from "@/icons/icons";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+
+let loaderForTenant = icons.agoraLoaderDark;
+const { namespace } = Tenant.current();
+if (
+  namespace === TENANT_NAMESPACES.XAI ||
+  namespace === TENANT_NAMESPACES.DERIVE
+) {
+  loaderForTenant = icons.agoraLoaderLight;
+}
 
 export default function AgoraLoader() {
   return (
     <div className="flex flex-col justify-center items-center  h-[calc(100vh-268px)]">
-      <Loader className="w-[120px] h-[120px] animate-[spin_5s_linear_infinite]" />
+      <Image src={loaderForTenant} alt="loading" width={120} height={120} />
     </div>
   );
 }
@@ -13,7 +23,7 @@ export default function AgoraLoader() {
 export function AgoraLoaderSmall() {
   return (
     <div className="flex flex-col justify-center items-center w-full h-full">
-      <Loader className="w-[48px] h-[48px] animate-[spin_5s_linear_infinite]" />
+      <Image src={loaderForTenant} alt="loading" width={48} height={48} />
     </div>
   );
 }
