@@ -58,7 +58,7 @@ const RenderDelegateToSelf = ({ delegate }: { delegate: DelegateChunk }) => {
           <div className="flex-1 inline-flex flex-col justify-start items-start gap-4">
             <div className="flex flex-col justify-start items-start gap-1">
               <div className="text-base font-bold">
-                Your tokens can't be voted with!
+                Your tokens can&apos;t be voted with!
               </div>
               <div className="text-sm font-medium leading-[21px]">
                 Make sure to delegate to yourself or to another active community
