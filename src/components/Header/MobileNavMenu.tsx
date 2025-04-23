@@ -209,7 +209,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
               width={82}
               height={21}
             />
-            <div className="justify-start text-primary font-normal">
+            <div className="justify-start text-primary font-normal text-sm">
               Onchain Governance
             </div>
           </div>
