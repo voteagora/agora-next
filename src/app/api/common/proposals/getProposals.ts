@@ -5,7 +5,12 @@ import {
   paginateResult,
   PaginationParams,
 } from "@/app/lib/pagination";
-import { parseProposal } from "@/lib/proposalUtils";
+import {
+  parseProposal,
+  isTimestampBasedProposal,
+  getStartTimestamp,
+  getStartBlock,
+} from "@/lib/proposalUtils";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
@@ -41,17 +46,16 @@ async function getProposals({
         const getProposalsExecution = doInSpan(
           { name: "getProposals" },
           async () =>
-            paginateResult(
-              (skip: number, take: number) =>
-                findProposalsQuery({
-                  namespace,
-                  skip,
-                  take,
-                  filter,
-                  contract: contracts.governor.address,
-                }),
-              pagination
-            )
+            paginateResult(async (skip: number, take: number) => {
+              const proposals = await findProposalsQuery({
+                namespace,
+                skip,
+                take,
+                filter,
+                contract: contracts.governor.address,
+              });
+              return proposals as ProposalPayload[];
+            }, pagination)
         );
 
         const latestBlockPromise: Promise<Block> = ui.toggle(
@@ -99,6 +103,10 @@ async function getProposal(proposalId: string) {
       ? contracts.providerForTime?.getBlock("latest")
       : contracts.token.provider.getBlock("latest");
 
+    const isTimeStampBasedTenant = ui.toggle(
+      "use-timestamp-for-proposals"
+    )?.enabled;
+
     const getProposalExecution = doInSpan({ name: "getProposal" }, async () =>
       findProposal({
         namespace,
@@ -119,9 +127,10 @@ async function getProposal(proposalId: string) {
     const latestBlock = await latestBlockPromise;
 
     const isPending =
-      !proposal.start_block ||
-      !latestBlock ||
-      Number(proposal.start_block) > latestBlock.number;
+      (isTimeStampBasedTenant
+        ? !isTimestampBasedProposal(proposal) ||
+          Number(getStartTimestamp(proposal)) > latestBlock.timestamp
+        : Number(getStartBlock(proposal)) > latestBlock.number) || !latestBlock;
 
     const quorum = isPending ? null : await fetchQuorumForProposal(proposal);
 

@@ -83,8 +83,11 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
           namespace,
           address: contracts.token.address,
         });
-      }
 
+        if (namespace === TENANT_NAMESPACES.LINEA) {
+          return BigInt(Number(quorum?.votable_supply));
+        }
+      }
       return BigInt(Number(quorum));
   }
 }

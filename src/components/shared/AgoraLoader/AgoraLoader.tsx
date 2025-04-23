@@ -1,27 +1,29 @@
 import Tenant from "@/lib/tenant/tenant";
-import { rgbStringToHex } from "@/app/lib/utils/color";
-import { AgoraIcon } from "@/icons/AgoraIcon";
 import Image from "next/image";
+import { icons } from "@/icons/icons";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
-const { ui } = Tenant.current();
+let loaderForTenant = icons.agoraLoaderDark;
+const { namespace } = Tenant.current();
+if (
+  namespace === TENANT_NAMESPACES.XAI ||
+  namespace === TENANT_NAMESPACES.DERIVE
+) {
+  loaderForTenant = icons.agoraLoaderLight;
+}
+
 export default function AgoraLoader() {
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen animate-pulse">
-      <AgoraIcon
-        fill={rgbStringToHex(ui.customization?.primary)}
-        className="w-[24px] h-[24px]"
-      />
+    <div className="flex flex-col justify-center items-center  h-[calc(100vh-268px)]">
+      <Image src={loaderForTenant} alt="loading" width={120} height={120} />
     </div>
   );
 }
 
 export function AgoraLoaderSmall() {
   return (
-    <div className="flex flex-col justify-center items-center w-full h-full animate-pulse">
-      <AgoraIcon
-        fill={rgbStringToHex(ui.customization?.primary)}
-        className="w-[24px] h-[24px]"
-      />
+    <div className="flex flex-col justify-center items-center w-full h-full">
+      <Image src={loaderForTenant} alt="loading" width={48} height={48} />
     </div>
   );
 }
