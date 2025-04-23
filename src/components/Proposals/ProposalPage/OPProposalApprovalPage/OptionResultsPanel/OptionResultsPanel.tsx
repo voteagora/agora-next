@@ -168,7 +168,7 @@ function SingleOption({
     <div className="flex flex-col gap-1 last:mb-2">
       {" "}
       <div className="flex justify-between font-semibold text-sm mb-1">
-        <div className="overflow-ellipsis overflow-hidden whitespace-nowrap max-w-[12rem] text-primary">
+        <div className="whitespace-normal max-w-[12rem] text-primary">
           {description}
         </div>
         <div className="text-primary flex items-center gap-1">

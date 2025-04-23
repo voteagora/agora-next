@@ -15,6 +15,9 @@ export function findDelagatee({
     where: {
       delegator: address.toLowerCase(),
       contract,
+      delegatee: {
+        not: "0x0000000000000000000000000000000000000000",
+      },
     },
   };
 

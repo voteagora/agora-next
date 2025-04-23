@@ -46,6 +46,7 @@ async function getDelegates({
     issues?: string;
     stakeholders?: string;
     endorsed?: boolean;
+    hasStatement?: boolean;
   };
 }): Promise<PaginatedResult<DelegateChunk[]>> {
   return withMetrics(
@@ -54,17 +55,17 @@ async function getDelegates({
       const { namespace, ui, slug, contracts } = Tenant.current();
       const allowList = ui.delegates?.allowed || [];
 
-      const endorsedFilterQuery = filters?.endorsed
-        ? `AND endorsed = true AND s.dao_slug = '${slug}'`
-        : "";
-
       // The top issues filter supports multiple selection - a comma separated list of issues
       const topIssuesParam = filters?.issues || "";
+      const topStakeholdersParam = filters?.stakeholders || "";
+
       const topIssuesArray = topIssuesParam
         ? topIssuesParam.split(",").map((issue) => issue.trim())
         : [];
 
-      const topIssuesFilterQuery =
+      const endorsedCondition = filters?.endorsed ? `AND endorsed = true` : "";
+
+      const issuesCondition =
         topIssuesParam && topIssuesParam !== ""
           ? `
           AND jsonb_array_length(s.payload -> 'topIssues') > 0
@@ -75,14 +76,12 @@ async function getDelegates({
             AND elem ->> 'value' IS NOT NULL
             AND elem ->> 'value' <> ''
           )
-          AND s.dao_slug = '${slug}'
         `
           : "";
 
       // Note: There is an inconsistency between top stakeholders and top issues. Top issues are filtered by a value
       // where the top stakeholders are filtered on type. We need to make this consistent and clean up the data and UI.
-      const topStakeholdersParam = filters?.stakeholders || "";
-      const topStakeholdersFilterQuery =
+      const stakeholdersCondition =
         topStakeholdersParam && topStakeholdersParam !== ""
           ? `
           AND jsonb_array_length(s.payload -> 'topStakeholders') > 0
@@ -91,20 +90,36 @@ async function getDelegates({
             FROM jsonb_array_elements(s.payload -> 'topStakeholders') elem
             WHERE elem ->> 'type' = '${topStakeholdersParam}'
           )
-          AND s.dao_slug = '${slug}'
         `
           : "";
 
-      const delegateStatementFiler =
-        filters?.endorsed || filters?.issues || filters?.stakeholders
+      // Add hasStatement filter condition
+      const hasStatementCondition = filters?.hasStatement
+        ? `
+          AND s.payload IS NOT NULL 
+          AND s.payload != '{}'::jsonb
+          AND s.payload ? 'delegateStatement'
+          AND s.payload ->> 'delegateStatement' != ''
+          AND LENGTH(s.payload ->> 'delegateStatement') >= 10
+        `
+        : "";
+
+      // Combine all statement-related filters
+      const delegateStatementFilter =
+        filters?.endorsed ||
+        filters?.issues ||
+        filters?.stakeholders ||
+        filters?.hasStatement
           ? `AND EXISTS (
-            SELECT 1
-            FROM agora.delegate_statements s
-            WHERE s.address = d.delegate
-            ${endorsedFilterQuery}
-            ${topIssuesFilterQuery}
-            ${topStakeholdersFilterQuery}
-          )`
+              SELECT 1
+              FROM agora.delegate_statements s
+              WHERE s.address = d.delegate
+              AND s.dao_slug = '${slug}'
+              ${endorsedCondition}
+              ${issuesCondition}
+              ${stakeholdersCondition}
+              ${hasStatementCondition}
+            )`
           : "";
 
       let delegateUniverseCTE: string;
@@ -237,16 +252,17 @@ async function getDelegates({
                       endorsed
                     FROM agora.delegate_statements s
                     WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
-                    ${endorsedFilterQuery}
-                    ${topIssuesFilterQuery}
-                    ${topStakeholdersFilterQuery}
+                    ${endorsedCondition}
+                    ${issuesCondition}
+                    ${stakeholdersCondition}
+                    ${hasStatementCondition}
                     LIMIT 1
                   ) sub
                 ) AS statement
               FROM del_card_universe d
               WHERE num_of_delegators IS NOT NULL
               AND (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR d.delegate = ANY(ARRAY[${allowListString}]::text[]))
-              ${delegateStatementFiler}
+              ${delegateStatementFilter}
               ORDER BY num_of_delegators DESC, d.delegate
               OFFSET $1
               LIMIT $2;
@@ -286,15 +302,16 @@ async function getDelegates({
                       endorsed
                     FROM agora.delegate_statements s
                     WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
-                    ${endorsedFilterQuery}
-                    ${topIssuesFilterQuery}
-                    ${topStakeholdersFilterQuery}
+                    ${endorsedCondition}
+                    ${issuesCondition}
+                    ${stakeholdersCondition}
+                    ${hasStatementCondition}
                     LIMIT 1
                   ) sub
                 ) AS statement
               FROM del_card_universe d
               WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
-              ${delegateStatementFiler}
+              ${delegateStatementFilter}
              ORDER BY -log(random()) / NULLIF(voting_power, 0)
               OFFSET $1
               LIMIT $2;
@@ -306,6 +323,8 @@ async function getDelegates({
             );
 
           default:
+            const sortDirection =
+              sort === "least_voting_power" ? "ASC" : "DESC";
             const QRY3 = `
               ${delegateUniverseCTE}
               SELECT *,
@@ -330,16 +349,17 @@ async function getDelegates({
                       endorsed
                     FROM agora.delegate_statements s
                     WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
-                    ${endorsedFilterQuery}
-                    ${topIssuesFilterQuery}
-                    ${topStakeholdersFilterQuery}
+                    ${endorsedCondition}
+                    ${issuesCondition}
+                    ${stakeholdersCondition}
+                    ${hasStatementCondition}
                     LIMIT 1
                   ) sub
                 ) AS statement
               FROM del_card_universe d
               WHERE (ARRAY_LENGTH(ARRAY[${allowListString}]::text[], 1) IS NULL OR delegate = ANY(ARRAY[${allowListString}]::text[]))
-              ${delegateStatementFiler}
-              ORDER BY voting_power DESC, d.delegate
+              ${delegateStatementFilter}
+              ORDER BY voting_power ${sortDirection}, d.delegate
               OFFSET $1
               LIMIT $2;
               `;
@@ -642,7 +662,6 @@ async function getVoterStats(
       contracts.governor.address.toLowerCase(),
       blockNumberOrTimestamp || 0
     );
-
     return (
       statsQuery?.[0] || {
         voter: address,

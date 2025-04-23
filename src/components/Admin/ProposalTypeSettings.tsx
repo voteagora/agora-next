@@ -10,6 +10,8 @@ import { useReadContract } from "wagmi";
 import { useAccount } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import toast from "react-hot-toast";
+import BlockScanUrls from "../shared/BlockScanUrl";
 
 const RestrictedCallout = () => {
   const { address, isConnected } = useAccount();
@@ -100,7 +102,13 @@ export default function ProposalTypeSettings({
 
   const [propTypes, setPropTypes] = useState(fmtPropTypes);
 
-  const handleDeleteProposalType = useCallback((id: number) => {
+  const handleDeleteProposalType = useCallback((id: number, hash?: string) => {
+    toast.success(
+      <div className="flex flex-col items-center gap-2 p-1">
+        <span className="text-sm font-semibold">Proposal type deleted</span>
+        {hash && <BlockScanUrls hash1={hash} />}
+      </div>
+    );
     setPropTypes((prevPropTypes) =>
       prevPropTypes.filter(
         (proposalType) => id !== proposalType.proposal_type_id
@@ -108,16 +116,25 @@ export default function ProposalTypeSettings({
     );
   }, []);
 
-  const handleSuccessSetProposalType = useCallback((id: number) => {
-    setPropTypes((prevPropTypes) =>
-      prevPropTypes.map((proposalType) => {
-        if (proposalType.proposal_type_id === id) {
-          return { ...proposalType, isClientSide: false }; // Toggle the isClientSide flag only for the matching id
-        }
-        return proposalType;
-      })
-    );
-  }, []);
+  const handleSuccessSetProposalType = useCallback(
+    (id: number, hash?: string) => {
+      toast.success(
+        <div className="flex flex-col items-center gap-2 p-1">
+          <span className="text-sm font-semibold">Proposal type updated</span>
+          {hash && <BlockScanUrls hash1={hash} />}
+        </div>
+      );
+      setPropTypes((prevPropTypes) =>
+        prevPropTypes.map((proposalType) => {
+          if (proposalType.proposal_type_id === id) {
+            return { ...proposalType, isClientSide: false }; // Toggle the isClientSide flag only for the matching id
+          }
+          return proposalType;
+        })
+      );
+    },
+    []
+  );
 
   return (
     <section className="gl_box bg-neutral">

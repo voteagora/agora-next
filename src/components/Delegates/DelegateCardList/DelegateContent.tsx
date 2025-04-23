@@ -4,8 +4,7 @@ import DelegateCardList from "./DelegateCardList";
 import DelegateTable from "./DelegateTable";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
-import { Delegation } from "@/app/api/common/delegations/delegation";
-import { useQueryState } from "nuqs";
+import { useQueryState, parseAsString } from "nuqs";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -13,22 +12,18 @@ interface Props {
     pagination: PaginationParams,
     seed?: number
   ) => Promise<PaginatedResult<DelegateChunk[]>>;
-  fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
 
 export default function DelegateContent({
   initialDelegates,
   fetchDelegates,
-  fetchDelegators,
 }: Props) {
-  const [layout] = useQueryState("layout", {
-    defaultValue: "grid",
-  });
+  const [layout] = useQueryState("layout", parseAsString.withDefault("grid"));
+
   return layout === "grid" ? (
     <DelegateCardList
       initialDelegates={initialDelegates}
       fetchDelegates={fetchDelegates}
-      fetchDelegators={fetchDelegators}
     />
   ) : (
     <DelegateTable

@@ -12,6 +12,8 @@ import infoPageHero from "@/assets/tenant/xai_info_page_hero.svg";
 
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const PROPOSAL_PAGE_TEXT =
   "Governance decisions are initiated as proposals, providing insights into the priorities of the community. Proposals can be submitted for community discussion in Xai Discord in the #ecosystem-proposals channel.  Proposals are voted on by delegates. Voting power is given to delegates based on XAI + esXAI + staked esXAI. We aggregate each of these to calculate vXAI";
@@ -19,10 +21,36 @@ const ROOT_PAGE_TEXT = PROPOSAL_PAGE_TEXT;
 const DELEGATE_PAGE_TEXT = `Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.  Voting power is based on owned XAI + esXAI + staked esXAI. We aggregate each of these to calculate vXAI.`;
 const INFO_PAGE_TEXT = `Xai Gov is the home of Xai DAO governance, where Xai tokenholders delegate, vote, and make decisions to steward the future of the ecosystem.  Voting power is based on owned XAI + esXAI + staked esXAI. We aggregate each of these to calculate vXAI.`;
 
+const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
+
+const prodTokens = [
+  {
+    address: "0x4cb9a7ae498cedcbb5eae9f25736ae7d428c9d66",
+    symbol: "XAI",
+    decimals: 18,
+    name: "XAI",
+  },
+  {
+    address: "0x4c749d097832de2fecc989ce18fdc5f1bd76700c",
+    symbol: "esXAI",
+    decimals: 18,
+    name: "esXAI",
+  },
+  {
+    address: "0xab5c23bdbe99d75a7ae4756e7ccefd0a97b37e78",
+    symbol: "stXAI",
+    decimals: 18,
+    name: "stXAI",
+  },
+];
+
 export const xaiTenantUIConfig = new TenantUI({
   title: "Xai Agora",
   logo: xaiLogo,
-
+  tokens: [
+    ...(isProd ? prodTokens : []),
+    TenantTokenFactory.create(TENANT_NAMESPACES.XAI),
+  ],
   googleAnalytics: "G-BSFWRZVGEB",
 
   assets: {
@@ -126,7 +154,7 @@ export const xaiTenantUIConfig = new TenantUI({
       title: "About Xai",
       hero: infoPageHero,
       description:
-        "Xai is the world’s first Layer 3 solution for Indie gaming. Powered by Offchain Labs’ Arbitrum Technology with games from Ex Populus and other game developers, Xai is set to transform the gaming industry. Join the community, compete with the best, and be part of the revolutionary Vanguard League.",
+        "Xai is the world's first Layer 3 solution for Indie gaming. Powered by Offchain Labs' Arbitrum Technology with games from Ex Populus and other game developers, Xai is set to transform the gaming industry. Join the community, compete with the best, and be part of the revolutionary Vanguard League.",
       meta: {
         title: "About Xai Governance",
         description: "Home of Xai Governance",

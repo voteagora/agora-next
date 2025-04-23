@@ -96,7 +96,12 @@ export function getInputData(proposal: DraftProposal): {
       if (proposal.transactions.length === 0) {
         // empty eth transfer from governor
         const governorAddress = contracts.governor.address;
-        targets.push(governorAddress as `0x${string}`);
+        const timelockAddress = contracts.timelock?.address;
+        targets.push(
+          contracts.supportScopes && timelockAddress
+            ? (timelockAddress as `0x${string}`)
+            : (governorAddress as `0x${string}`)
+        );
         values.push(0);
         calldatas.push(
           contracts.supportScopes ? "0xf27a0c92" : ("0x" as `0x${string}`)

@@ -27,7 +27,10 @@ import OptimisticProposalForm from "../../OptimisticProposalForm";
 import SwitchInput from "../../form/SwitchInput";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
+import {
+  getProposalTypeAddress,
+  getStageIndexForTenant,
+} from "@/app/proposals/draft/utils/stages";
 import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
 
 const DEFAULT_FORM = {
@@ -47,20 +50,49 @@ const getValidProposalTypesForVotingType = (
   proposalTypes: any[],
   proposalType: ProposalType
 ) => {
+  let optimisticModuleAddress: string | null = null;
+  let approvalModuleAddress: string | null = null;
+
+  try {
+    optimisticModuleAddress =
+      getProposalTypeAddress(ProposalType.OPTIMISTIC)?.toLowerCase() || null;
+
+    approvalModuleAddress =
+      getProposalTypeAddress(ProposalType.APPROVAL)?.toLowerCase() || null;
+  } catch (error) {
+    // ignore
+  }
+
   switch (proposalType) {
     case ProposalType.APPROVAL:
       return proposalTypes.filter((type) => {
-        return type.name.toLowerCase().includes("approval");
+        return (
+          (type.module &&
+            type.module.toLowerCase() ===
+              approvalModuleAddress?.toLowerCase()) ||
+          type.name.toLowerCase().includes("approval")
+        );
       });
 
     case ProposalType.OPTIMISTIC:
       return proposalTypes.filter((type) => {
-        return type.name.toLowerCase().includes("optimistic");
+        return (
+          (type.module &&
+            type.module.toLowerCase() ===
+              optimisticModuleAddress?.toLowerCase()) ||
+          type.name.toLowerCase().includes("optimistic")
+        );
       });
 
     case ProposalType.BASIC:
       return proposalTypes.filter((type) => {
         return (
+          (!type.module ||
+            type.module?.toLowerCase() !==
+              approvalModuleAddress?.toLowerCase()) &&
+          (!type.module ||
+            type.module?.toLowerCase() !==
+              optimisticModuleAddress?.toLowerCase()) &&
           !type.name.toLowerCase().includes("approval") &&
           !type.name.toLowerCase().includes("optimistic")
         );

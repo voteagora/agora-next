@@ -97,7 +97,7 @@ export const PanelRow = ({
       className={`flex flex-row gap-2 justify-between items-center ${className}`}
     >
       <span className="whitespace-nowrap text-secondary">{title}</span>
-      <span className="text-right text-secondary font-bold">{detail}</span>
+      <span className="text-right text-secondary font-semibold">{detail}</span>
     </div>
   );
 };
