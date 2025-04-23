@@ -198,7 +198,7 @@ export function formatNumber(
       bigIntAmount = BigInt(amount);
     }
   } else {
-    bigIntAmount = amount;
+    bigIntAmount = amount || 0n;
   }
 
   // Convert to standard unit
@@ -446,7 +446,7 @@ export const getTransportForChain = (chainId: number) => {
       return fallback([
         http(
           FORK_NODE_URL ||
-            "https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}"
+            `https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
         ),
         http(FORK_NODE_URL || "https://rpc.scroll.io"),
       ]);
@@ -458,6 +458,20 @@ export const getTransportForChain = (chainId: number) => {
     // derive testnet
     case 901:
       return http(FORK_NODE_URL || DERIVE_TESTNET_RPC);
+
+    // linea
+    case 59144:
+      return http(
+        FORK_NODE_URL ||
+          `https://linea-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
+
+    // linea sepolia
+    case 59141:
+      return http(
+        FORK_NODE_URL ||
+          `https://linea-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
 
     // for each new dao with a new chainId add them here
     default:

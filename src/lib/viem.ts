@@ -5,7 +5,15 @@ import {
   custom,
   http,
 } from "viem";
-import { cyber, mainnet, optimism, scroll, sepolia } from "viem/chains";
+import {
+  cyber,
+  mainnet,
+  optimism,
+  scroll,
+  sepolia,
+  linea,
+  lineaSepolia,
+} from "viem/chains";
 
 import "viem/window";
 import { getTransportForChain } from "./utils";
@@ -63,6 +71,18 @@ export const getWalletClient = (chainId: number) => {
     case scroll.id:
       return createWalletClient({
         chain: scroll,
+        transport,
+      });
+
+    case linea.id:
+      return createWalletClient({
+        chain: linea,
+        transport,
+      });
+
+    case lineaSepolia.id:
+      return createWalletClient({
+        chain: lineaSepolia,
         transport,
       });
 
