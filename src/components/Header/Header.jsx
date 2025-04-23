@@ -2,6 +2,7 @@
 
 // Header component
 import { useState } from "react";
+
 import Navbar from "./Navbar";
 import { HStack, VStack } from "../Layout/Stack";
 import LogoLink from "./LogoLink";
@@ -13,12 +14,11 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {
-    console.log("toggle");
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   return (
-    <div className="w-full h-[56px] sm:h-[92px] content-center rounded-full bg-wash border-line">
+    <div className="h-[56px] sm:h-[80px] content-center rounded-full bg-wash border-line my-3 sm:my-4 mx-3 sm:mx-8">
       <VStack className="px-4 sm:px-8">
         <HStack className="flex flex-row w-full items-center gap-1  justify-between">
           <HamburgerIcon
@@ -37,7 +37,6 @@ export default function Header() {
         </HStack>
       </VStack>
 
-      {/* Mobile Navigation Menu */}
       <MobileNavMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}

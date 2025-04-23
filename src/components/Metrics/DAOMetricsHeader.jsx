@@ -64,7 +64,7 @@ export default function DAOMetricsHeader() {
               <div className="flex gap-8">
                 <div className="flex items-center gap-2">
                   <AgoraIconWithText className="fill-primary h-[21px] w-[82px]" />
-                  <span className="text-base text-primary font-medium hidden lg:inline">
+                  <span className="text-sm text-primary font-medium hidden lg:inline">
                     Onchain Governance
                   </span>
                 </div>
