@@ -34,6 +34,7 @@ import { Vote } from "@/app/api/common/votes/vote";
 import { SimulationReportDialog } from "../SimulationReportDialog/SimulationReportDialog";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { CreateScopeDialog } from "@/components/Admin/CreateScopeDialog";
+import { ScopeData } from "@/lib/types";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -259,7 +260,7 @@ export type CreateScopeDialogType = {
   type: "CREATE_SCOPE";
   params: {
     proposalTypeId: number;
-    onSuccess: () => void;
+    onSuccess: (scope: ScopeData) => void;
   };
   className?: string;
 };

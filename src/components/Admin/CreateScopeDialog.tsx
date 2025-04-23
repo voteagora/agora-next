@@ -26,6 +26,7 @@ import toast from "react-hot-toast";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import BlockScanUrls from "../shared/BlockScanUrl";
+import { ScopeData } from "@/lib/types";
 
 const COMPARATORS = [
   { value: 0, label: "Empty" },
@@ -74,7 +75,7 @@ export const CreateScopeDialog = ({
   closeDialog,
 }: {
   proposalTypeId: number;
-  onSuccess: () => void;
+  onSuccess: (scope: ScopeData) => void;
   closeDialog: () => void;
 }) => {
   const { contracts } = Tenant.current();
@@ -272,7 +273,18 @@ export const CreateScopeDialog = ({
                 ) : null}
               </div>
             );
-            onSuccess();
+            onSuccess({
+              scope_key: config.scope_key,
+              selector: config.selector,
+              parameters: config.parameters,
+              comparators: config.comparators,
+              types: config.types,
+              description: config.description,
+              proposal_type_id: config.proposal_type_id,
+              disabled_event: {},
+              deleted_event: {},
+              status: "created",
+            });
             closeDialog();
           },
           onError: (error: any) => {
@@ -358,7 +370,7 @@ export const CreateScopeDialog = ({
           <div className="text-sm text-wash">Fetching ABI...</div>
         )}
 
-        {!abiFound &&
+        {(!abiFound || !filteredFunctions || filteredFunctions.length === 0) &&
           !isLoadingAbi &&
           contractAddress &&
           isAddress(contractAddress, { strict: false }) && (
@@ -377,7 +389,7 @@ export const CreateScopeDialog = ({
             />
           )}
 
-        {abiFound && (
+        {abiFound && filteredFunctions && filteredFunctions.length > 0 ? (
           <FormField
             control={form.control}
             name="selector"
@@ -409,7 +421,7 @@ export const CreateScopeDialog = ({
               </FormItem>
             )}
           />
-        )}
+        ) : null}
 
         {selector && selector.length > 0 && (
           <div className="space-y-4">

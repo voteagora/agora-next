@@ -89,6 +89,9 @@ export function ScopeDetails({ scope }: ScopeDetailsProps) {
                       </span>
                     </div>
                   )}
+                  {idx < (scope.parameters?.length ?? 0) - 1 && (
+                    <div className="border-t border-line my-4" />
+                  )}
                 </div>
               ))}
             </div>

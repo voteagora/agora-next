@@ -353,7 +353,9 @@ export default function ProposalType({
       type: "CREATE_SCOPE",
       params: {
         proposalTypeId: proposalTypeId,
-        onSuccess: () => {},
+        onSuccess: (newScope: ScopeData) => {
+          setAssignedScopes((prev) => [...prev, newScope]);
+        },
       },
       className: "sm:w-[32rem]",
     });
