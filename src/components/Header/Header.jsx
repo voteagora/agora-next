@@ -2,7 +2,6 @@
 
 // Header component
 import { useState } from "react";
-import { createPortal } from "react-dom";
 
 import Navbar from "./Navbar";
 import { HStack, VStack } from "../Layout/Stack";
@@ -19,34 +18,29 @@ export default function Header() {
   };
 
   return (
-    <>
-      {createPortal(
-        <div className="h-[56px] sm:h-[92px] content-center rounded-full bg-wash border-line mx-auto my-3 sm:my-4 mx-3 sm:mx-8">
-          <VStack className="px-4 sm:px-8">
-            <HStack className="flex flex-row w-full items-center gap-1  justify-between">
-              <HamburgerIcon
-                className="w-[24px] h-[24px] sm:hidden cursor-pointer stroke-primary"
-                onClick={toggleMobileMenu}
-              />
-              <div className="sm:w-full flex justify-start">
-                <LogoLink />
-              </div>
-              <div className="w-full justify-center hidden sm:flex">
-                <Navbar />
-              </div>
-              <div className="min-w-[24px] sm:w-full flex justify-end content-end">
-                <ConnectButton />
-              </div>
-            </HStack>
-          </VStack>
-
-          <MobileNavMenu
-            isOpen={isMobileMenuOpen}
-            onClose={() => setIsMobileMenuOpen(false)}
+    <div className="h-[56px] sm:h-[92px] content-center rounded-full bg-wash border-line mx-auto my-3 sm:my-4 mx-3 sm:mx-8">
+      <VStack className="px-4 sm:px-8">
+        <HStack className="flex flex-row w-full items-center gap-1  justify-between">
+          <HamburgerIcon
+            className="w-[24px] h-[24px] sm:hidden cursor-pointer stroke-primary"
+            onClick={toggleMobileMenu}
           />
-        </div>,
-        document.body
-      )}
-    </>
+          <div className="sm:w-full flex justify-start">
+            <LogoLink />
+          </div>
+          <div className="w-full justify-center hidden sm:flex">
+            <Navbar />
+          </div>
+          <div className="min-w-[24px] sm:w-full flex justify-end content-end">
+            <ConnectButton />
+          </div>
+        </HStack>
+      </VStack>
+
+      <MobileNavMenu
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+      />
+    </div>
   );
 }
