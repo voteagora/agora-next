@@ -7,11 +7,9 @@ interface ScopeDetailsProps {
 
 export function ScopeDetails({ scope }: ScopeDetailsProps) {
   const { data: functions = [], isLoading } = useContractAbi(
-    `0x${scope.scope_key.slice(0, 40)}`
+    scope.scope_key.slice(0, 42)
   );
-  const functionInfo = functions.find(
-    (f) => f.selector === `0x${scope.selector}`
-  );
+  const functionInfo = functions.find((f) => f.selector === scope.selector);
 
   return (
     <div className="space-y-1">
@@ -19,13 +17,13 @@ export function ScopeDetails({ scope }: ScopeDetailsProps) {
       <div className="w-full max-w-xl bg-wash p-4 rounded-lg">
         <h3 className="text-base font-medium mb-4 break-all border-b border-line pb-2">
           Scope with key:{" "}
-          <span className="text-sm font-normal">{`${scope.scope_key}`}</span>
+          <span className="text-sm font-normal">{scope.scope_key}</span>
         </h3>
         <div className="space-y-4">
           <div className="flex items-center gap-4">
             <span className="text-sm text-secondary min-w-[60px]">Target</span>
             <code className="text-sm px-2 py-1 rounded text-tertiary break-all">
-              {`0x${scope.scope_key.slice(0, 40)}`}
+              {scope.scope_key.slice(0, 42)}
             </code>
           </div>
           <div className="flex items-center gap-4">
@@ -35,8 +33,9 @@ export function ScopeDetails({ scope }: ScopeDetailsProps) {
             <code className="text-sm px-2 py-1 rounded text-tertiary">
               {isLoading
                 ? "Loading..."
-                : `${functionInfo?.name} (${functionInfo?.inputs.map((i) => i.type).join(", ")})` ||
-                  `0x${scope.selector}`}
+                : functionInfo
+                  ? `${functionInfo.name} (${functionInfo.inputs.map((i) => i.type).join(", ")})`
+                  : `${scope.selector}`}
             </code>
           </div>
 

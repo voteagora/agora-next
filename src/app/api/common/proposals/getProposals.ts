@@ -153,10 +153,27 @@ async function getProposalTypes() {
       return [];
     }
 
-    const types = await findProposalType({
-      namespace,
-      contract: configuratorContract.address,
-    });
+    let types = [];
+
+    const typesFromApi = await getProposalTypesFromDaoNode();
+
+    if (typesFromApi) {
+      const parsedTypes = Object.entries(typesFromApi.proposal_types)?.map(
+        ([proposalTypeId, type]: any) => ({
+          ...type,
+          proposal_type_id: Number(proposalTypeId),
+          quorum: Number(type.quorum),
+          approval_threshold: Number(type.approval_threshold),
+          isClientSide: false,
+        })
+      );
+      types = parsedTypes;
+    } else {
+      types = await findProposalType({
+        namespace,
+        contract: configuratorContract.address,
+      });
+    }
 
     if (!contracts.supportScopes) {
       const formattedTypes = types.map((type) => {
@@ -172,8 +189,6 @@ async function getProposalTypes() {
       return formattedTypes;
     }
 
-    const typesFromApi = await getProposalTypesFromDaoNode();
-
     const formattedTypes = await Promise.all(
       types.map(async (type) => {
         const scopes =
@@ -187,7 +202,7 @@ async function getProposalTypes() {
           deleted_event: string;
           status: string;
         }[] = scopes
-          ? scopes?.map((scope: any) => ({
+          ? scopes.map((scope: any) => ({
               proposal_type_id: type.proposal_type_id,
               scope_key: scope.scope_key,
               selector: scope.selector,
