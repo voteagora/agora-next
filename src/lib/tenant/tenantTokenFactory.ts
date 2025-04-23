@@ -120,6 +120,7 @@ export default class TenantTokenFactory {
           name: "Linea",
           symbol: "LINEA",
           decimals: 18,
+          address: "0x03A61C68BF297aDffF451426ea8C491bb8F87c65",
         };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
