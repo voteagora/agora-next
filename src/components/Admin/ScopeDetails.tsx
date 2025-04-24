@@ -1,5 +1,11 @@
 import { useContractAbi } from "@/hooks/useContractAbi";
 import { ScopeData } from "@/lib/types";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 interface ScopeDetailsProps {
   scope: ScopeData;
@@ -15,10 +21,6 @@ export function ScopeDetails({ scope }: ScopeDetailsProps) {
     <div className="space-y-1">
       <span className="font-medium text-base">{scope.description}</span>
       <div className="w-full max-w-xl bg-wash p-4 rounded-lg">
-        <h3 className="text-base font-medium mb-4 break-all border-b border-line pb-2">
-          Scope with key:{" "}
-          <span className="text-sm font-normal">{scope.scope_key}</span>
-        </h3>
         <div className="space-y-4">
           <div className="flex items-center gap-4">
             <span className="text-sm text-secondary min-w-[60px]">Target</span>
@@ -30,13 +32,22 @@ export function ScopeDetails({ scope }: ScopeDetailsProps) {
             <span className="text-sm text-secondary min-w-[60px]">
               Function
             </span>
-            <code className="text-sm px-2 py-1 rounded text-tertiary">
-              {isLoading
-                ? "Loading..."
-                : functionInfo
-                  ? `${functionInfo.name} (${functionInfo.inputs.map((i) => i.type).join(", ")})`
-                  : `${scope.selector}`}
-            </code>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger>
+                  <code className="text-sm px-2 py-1 rounded text-tertiary">
+                    {isLoading
+                      ? "Loading..."
+                      : functionInfo
+                        ? `${functionInfo.name} (${functionInfo.inputs.map((i) => i.type).join(", ")})`
+                        : `${scope.selector}`}
+                  </code>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{scope?.selector}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
 
           {scope.parameters && scope.parameters.length > 0 && (
