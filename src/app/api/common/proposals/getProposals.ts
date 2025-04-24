@@ -202,62 +202,67 @@ async function getProposalTypes() {
           deleted_event: string;
           status: string;
         }[] = scopes
-          ? scopes.map((scope: any) => ({
-              proposal_type_id: type.proposal_type_id,
-              scope_key: scope.scope_key,
-              selector: scope.selector,
-              description: scope.description,
-              disabled_event: scope.disabled_event,
-              deleted_event: scope.deleted_event,
-              status: scope.status,
-            }))
+          ? scopes
+              .filter((scope: any) => scope.status === "created")
+              .reduce((unique: any[], scope: any) => {
+                if (!unique.find((s) => s.scope_key === scope.scope_key)) {
+                  unique.push({
+                    proposal_type_id: type.proposal_type_id,
+                    scope_key: scope.scope_key,
+                    selector: scope.selector,
+                    description: scope.description,
+                    disabled_event: scope.disabled_event,
+                    deleted_event: scope.deleted_event,
+                    status: scope.status,
+                  });
+                }
+                return unique;
+              }, [])
           : [];
 
         const enriched = await Promise.all(
-          formattedScopes
-            ?.filter((scope) => scope.status === "created")
-            ?.map(async (scope) => {
-              const config = {
-                address: configuratorContract?.address as `0x${string}`,
-                abi: configuratorContract?.abi,
-                functionName: "assignedScopes",
-                args: [scope.proposal_type_id, `0x${scope.scope_key}`],
-                chainId: configuratorContract?.chain.id,
-              };
-              const client = getPublicClient();
-              const contractData = await client.readContract(config);
+          formattedScopes?.map(async (scope) => {
+            const config = {
+              address: configuratorContract?.address as `0x${string}`,
+              abi: configuratorContract?.abi,
+              functionName: "assignedScopes",
+              args: [scope.proposal_type_id, `0x${scope.scope_key}`],
+              chainId: configuratorContract?.chain.id,
+            };
+            const client = getPublicClient();
+            const contractData = await client.readContract(config);
 
-              if (!contractData) {
-                return {
-                  ...scope,
-                  parameters: [],
-                  comparators: [],
-                  types: [],
-                  exists: false,
-                };
-              }
-
-              const scopes = contractData as any[];
-
-              if (!scopes.length) {
-                return {
-                  ...scope,
-                  parameters: [],
-                  comparators: [],
-                  types: [],
-                  exists: false,
-                };
-              }
-
-              return scopes.map((scope) => ({
+            if (!contractData) {
+              return {
                 ...scope,
-                scope_key: scope.key,
-                parameters: scope.parameters || [],
-                comparators: scope.comparators || [],
-                types: scope.types || [],
-                exists: scope.exists || false,
-              }));
-            })
+                parameters: [],
+                comparators: [],
+                types: [],
+                exists: false,
+              };
+            }
+
+            const scopes = contractData as any[];
+
+            if (!scopes.length) {
+              return {
+                ...scope,
+                parameters: [],
+                comparators: [],
+                types: [],
+                exists: false,
+              };
+            }
+
+            return scopes.map((scope) => ({
+              ...scope,
+              scope_key: scope.key,
+              parameters: scope.parameters || [],
+              comparators: scope.comparators || [],
+              types: scope.types || [],
+              exists: scope.exists || false,
+            }));
+          })
         );
 
         return {

@@ -299,16 +299,17 @@ export default function ProposalType({
     );
     if (scopesWithKey.length > 1) {
       toast.error(
-        `Multiple scopes with the same key found. You will need to execute this transaction ${scopesWithKey.length} times. If you stop in the middle there will be issues with the proposal type.`
+        `Found ${scopesWithKey.length} scopes with the same key. Complete all transactions to avoid proposal type issues.`
       );
     }
-    const promises = scopesWithKey.map(async (_, idx) => {
+
+    for (let idx = 0; idx < scopesWithKey.length; idx++) {
       const deleteArgs = [
         BigInt(proposalTypeId),
         scopeToRemove.scope_key.startsWith("0x")
           ? (scopeToRemove.scope_key as `0x${string}`)
           : (`0x${scopeToRemove.scope_key}` as `0x${string}`),
-        BigInt(idx),
+        BigInt(0), // Always delete the first scope until there is none. After deleting 0 then 1 becomes 0 and so on.
       ];
 
       try {
@@ -339,13 +340,12 @@ export default function ProposalType({
             },
           }
         );
-        setAssignedScopes((prev) => prev.filter((s, i) => i !== idx));
+        setAssignedScopes((prev) => prev.filter((s, i) => i !== 0));
       } catch (e) {
         console.error("Error removing scope:", e);
         toast.error("Failed to initiate remove scope transaction.");
       }
-    });
-    await Promise.all(promises);
+    }
   };
 
   const handleCreateScope = () => {
