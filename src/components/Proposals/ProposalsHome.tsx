@@ -52,8 +52,10 @@ export default async function ProposalsHome() {
   const [governanceCalendar, relevalntProposals, allProposals, votableSupply] =
     await Promise.all([
       fetchGovernanceCalendar(),
-      fetchProposals(proposalsFilterOptions.relevant.filter),
-      fetchProposals(proposalsFilterOptions.everything.filter),
+      [],
+      [],
+      // fetchProposals(proposalsFilterOptions.relevant.filter),
+      // fetchProposals(proposalsFilterOptions.everything.filter),
       fetchVotableSupply(),
     ]);
 
@@ -82,7 +84,9 @@ export default async function ProposalsHome() {
         votableSupply={votableSupply}
       />
       <ProposalsList
+        // @ts-ignore
         initRelevantProposals={relevalntProposals}
+        // @ts-ignore
         initAllProposals={allProposals}
         fetchProposals={async (
           pagination: PaginationParams,
