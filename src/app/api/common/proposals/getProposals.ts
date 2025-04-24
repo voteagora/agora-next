@@ -165,6 +165,7 @@ async function getProposalTypes() {
           quorum: Number(type.quorum),
           approval_threshold: Number(type.approval_threshold),
           isClientSide: false,
+          module: type.module,
         })
       );
       types = parsedTypes;
@@ -183,6 +184,7 @@ async function getProposalTypes() {
           quorum: Number(type.quorum),
           approval_threshold: Number(type.approval_threshold),
           isClientSide: false,
+          module: type.module,
           scopes: [],
         };
       });
@@ -271,6 +273,7 @@ async function getProposalTypes() {
           quorum: Number(type.quorum),
           approval_threshold: Number(type.approval_threshold),
           isClientSide: false,
+          module: type.module,
           scopes: enriched?.flat(),
         };
       })
