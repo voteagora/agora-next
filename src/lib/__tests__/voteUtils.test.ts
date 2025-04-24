@@ -41,6 +41,9 @@ describe("calculateVoteMetadata", () => {
     cancelledTime: new Date(0),
     executedTime: new Date(0),
     queuedTime: new Date(0),
+    startBlock: BigInt(1),
+    endBlock: BigInt(1),
+    executedBlock: BigInt(1),
     markdowntitle: "Test Proposal",
     description: "Test Description",
     quorum: BigInt(0),
@@ -450,8 +453,8 @@ describe("calculateVoteMetadata", () => {
       });
 
       expect(result.forPercentage).toBe(0);
-      // 150 tokens against out of 120 token threshold (12% of 1000)
-      expect(result.againstPercentage).toBeCloseTo(125);
+      // 150 tokens against out of 120 token threshold (12% of 1000) => 125% but capped at 100%
+      expect(result.againstPercentage).toBeCloseTo(100);
     });
 
     it("should adjust approval proposal option votes with new vote", () => {
