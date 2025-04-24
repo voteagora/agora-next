@@ -17,6 +17,7 @@ import { TooltipTrigger } from "@/components/ui/tooltip";
 const { ui } = Tenant.current();
 import { useCalculateCopelandResult } from "@/hooks/useCalculateCopelandResult";
 import React, { useMemo } from "react";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 
 // Helper function to check if an option is an extended version
 const EXTENDED_SUFFIX = " (Extended)";
@@ -396,7 +397,12 @@ const OptionRow = ({
                           ?.variable
                       )}
                     >
-                      {disfavorVotes.toLocaleString()}
+                      <TokenAmountDecorated
+                        amount={BigInt(Math.round(disfavorVotes))}
+                        decimals={0}
+                        hideCurrency
+                        specialFormatting
+                      />
                       <span className={cn("w-4", !lostAtLeastOne && "w-0")}>
                         {!isWinner && comparison.winner && "🏆"}
                       </span>
@@ -409,7 +415,12 @@ const OptionRow = ({
                           ?.variable
                       )}
                     >
-                      {favorVotes.toLocaleString()}
+                      <TokenAmountDecorated
+                        amount={BigInt(Math.round(favorVotes))}
+                        decimals={0}
+                        hideCurrency
+                        specialFormatting
+                      />
                       <span className={cn("w-4", !wonAtLeastOne && "w-0")}>
                         {isWinner && "🏆"}
                       </span>
@@ -427,7 +438,7 @@ const OptionRow = ({
             <div className="bg-white rounded-full border border-line -mr-4 w-8 h-8" />
           </div>
 
-          <div className="flex items-center justify-between py-3 px-3">
+          <div className="flex flex-col items-start py-3 px-3 gap-1">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-1">
                 <span className="text-xs font-semibold">Total Matches</span>
@@ -450,13 +461,17 @@ const OptionRow = ({
                 </TooltipProvider>
               </div>
             </div>
-            <div className="flex justify-end flex-1 gap-2">
-              <div className="bg-white border border-line rounded-sm px-2 py-1 font-semibold">
+            <div className="flex justify-end flex-1 gap-2 w-full">
+              <div className="bg-white border border-line rounded-sm px-2 py-1 font-semibold w-1/3">
                 {isProposalActive ? "~" : null}
                 {result.totalLosses}{" "}
                 {result.totalLosses === 1 ? "Loss" : "Losses"}
               </div>
-              <div className="bg-white border border-line rounded-sm px-2 py-1 font-semibold flex items-center text-positive">
+              <div className="bg-white border border-line rounded-sm px-2 py-1 font-semibold w-1/3">
+                {isProposalActive ? "~" : null}
+                {result.totalTies} {result.totalTies === 1 ? "Tie" : "Ties"}
+              </div>
+              <div className="bg-white border border-line rounded-sm px-2 py-1 font-semibold flex items-center text-positive w-1/3">
                 {isProposalActive ? "~" : null}
                 {result.totalWins} {result.totalWins === 1 ? "Win" : "Wins"} 🏆
               </div>

@@ -41,6 +41,7 @@ export interface CopelandResult {
   comparisons: PairwiseComparison[];
   totalWins: number;
   totalLosses: number;
+  totalTies: number;
   avgVotingPowerFor: number;
   avgVotingPowerAgainst: number;
   fundingInfo: FundingInfo;
@@ -82,6 +83,7 @@ export function calculateCopelandVote(
       comparisons: [],
       totalWins: 0,
       totalLosses: 0,
+      totalTies: 0,
       avgVotingPowerFor: 0,
       avgVotingPowerAgainst: 0,
       fundingInfo: fundingInfo[getBaseOptionFromExtended(option) || option] || {
@@ -95,13 +97,6 @@ export function calculateCopelandVote(
   // Create a map of extended options to their standard counterparts
   const extendedToStandardMap = new Map<string, string>();
 
-  options.forEach((option) => {
-    const baseOption = getBaseOptionFromExtended(option);
-    if (baseOption) {
-      extendedToStandardMap.set(option, baseOption);
-    }
-  });
-
   const scores: Record<string, number> = {};
   const pairwiseWins: Record<string, Record<string, number>> = {};
   const pairwiseVotingPower: Record<
@@ -111,6 +106,10 @@ export function calculateCopelandVote(
   let totalVotingPower = 0;
 
   options.forEach((option) => {
+    const baseOption = getBaseOptionFromExtended(option);
+    if (baseOption) {
+      extendedToStandardMap.set(option, baseOption);
+    }
     scores[option] = 0;
     pairwiseWins[option] = {};
     pairwiseVotingPower[option] = {};
@@ -262,26 +261,20 @@ export function calculateCopelandVote(
         const votePower1 = option1VotingPower.total;
         const votePower2 = option2VotingPower.total;
 
+        let winner: string | null = null;
+
         // First compare total voting power
         if (votePower1 > votePower2) {
           scores[option1]++;
+          winner = option1;
         } else if (votePower2 > votePower1) {
           scores[option2]++;
+          winner = option2;
         } else {
           // If tied on total voting power, award 0.5 points to each
           scores[option1] += 0.5;
           scores[option2] += 0.5;
         }
-
-        // Determine the winner
-        let winner: string | null = null;
-
-        if (votePower1 > votePower2) {
-          winner = option1;
-        } else if (votePower2 > votePower1) {
-          winner = option2;
-        }
-        // If tied, winner remains null
 
         pairwiseComparisons.push({
           option1,
@@ -311,26 +304,22 @@ export function calculateCopelandVote(
       })
       .sort((a, b) => b.winMargin - a.winMargin);
 
-    const totalWins = comparisons.filter(
-      (comp) =>
-        (comp.option1 === option &&
-          comp.option1VotingPower > comp.option2VotingPower) ||
-        (comp.option2 === option &&
-          comp.option2VotingPower > comp.option1VotingPower)
-    ).length;
-
-    const totalLosses = comparisons.filter(
-      (comp) =>
-        (comp.option1 === option &&
-          comp.option1VotingPower < comp.option2VotingPower) ||
-        (comp.option2 === option &&
-          comp.option2VotingPower < comp.option1VotingPower)
-    ).length;
+    let totalWins = 0;
+    let totalLosses = 0;
+    let totalTies = 0;
 
     let totalVotingPowerFor = 0;
     let totalVotingPowerAgainst = 0;
 
     comparisons.forEach((comp) => {
+      if (comp.winner && comp.winner === option) {
+        totalWins++;
+      } else if (comp.winner && comp.winner !== option) {
+        totalLosses++;
+      } else {
+        totalTies++;
+      }
+
       if (comp.option1 === option) {
         totalVotingPowerFor += comp.option1VotingPower;
         totalVotingPowerAgainst += comp.option2VotingPower;
@@ -418,6 +407,7 @@ export function calculateCopelandVote(
       comparisons,
       totalWins,
       totalLosses,
+      totalTies,
       avgVotingPowerFor,
       avgVotingPowerAgainst,
       option,
