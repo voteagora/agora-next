@@ -1,7 +1,6 @@
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import {
   fetchAllForAdvancedDelegation,
-  fetchBalanceForDirectDelegation,
   fetchCurrentDelegatees,
   fetchDirectDelegatee,
 } from "@/app/delegates/actions";
@@ -10,7 +9,7 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { Button } from "@/components/ui/button";
 import { DELEGATION_MODEL } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
-// outline outline-1 gap-2 justify-center mt-6
+
 export const DelegateToSelf = ({
   variant = "default",
   className,
@@ -34,6 +33,7 @@ export const DelegateToSelf = ({
         params: {
           delegate,
           fetchCurrentDelegatees,
+          isDelegationEncouragement: true,
         },
       });
     } else if (contracts.delegationModel === DELEGATION_MODEL.ADVANCED) {
@@ -43,6 +43,7 @@ export const DelegateToSelf = ({
           params: {
             target: delegate.address,
             fetchAllForAdvancedDelegation,
+            isDelegationEncouragement: true,
           },
         });
       } else {
@@ -50,8 +51,8 @@ export const DelegateToSelf = ({
           type: "DELEGATE",
           params: {
             delegate,
-            fetchBalanceForDirectDelegation,
             fetchDirectDelegatee,
+            isDelegationEncouragement: true,
           },
         });
       }

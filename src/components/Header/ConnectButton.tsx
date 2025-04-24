@@ -6,15 +6,11 @@ import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useEffect } from "react";
 import Tenant from "@/lib/tenant/tenant";
-import { useGetDelegatees } from "@/hooks/useGetDelegatee";
 
 export function ConnectButton() {
   const { contracts } = Tenant.current();
   const { chain, address } = useAccount();
   const openDialog = useOpenDialog();
-  const { data: delegatees } = useGetDelegatees({ address });
-
-  const hasNotDelegated = !delegatees?.length;
 
   useEffect(() => {
     if (!address) return;
@@ -30,8 +26,8 @@ export function ConnectButton() {
 
   return (
     <div>
-      <MobileConnectButton hasNotDelegated={hasNotDelegated} />
-      <DesktopConnectButton hasNotDelegated={hasNotDelegated} />
+      <MobileConnectButton />
+      <DesktopConnectButton />
     </div>
   );
 }

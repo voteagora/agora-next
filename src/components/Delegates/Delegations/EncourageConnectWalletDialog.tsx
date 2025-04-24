@@ -1,11 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { ConnectKitButton } from "connectkit";
+import { useEffect } from "react";
+import { useAccount } from "wagmi";
 
 export const EncourageConnectWalletDialog = ({
   closeDialog,
 }: {
   closeDialog: () => void;
 }) => {
+  const { address } = useAccount();
+  useEffect(() => {
+    if (address) {
+      closeDialog();
+    }
+  }, [address, closeDialog]);
   return (
     <div className="flex flex-col gap-7 justify-center ">
       <div>

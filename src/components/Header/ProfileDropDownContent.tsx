@@ -22,6 +22,7 @@ import { Delegation } from "@/app/api/common/delegations/delegation";
 import { useEnsName } from "wagmi";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { DelegateToSelf } from "../Delegates/Delegations/DelegateToSelf";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface Props {
   ensName: string | undefined;
@@ -93,10 +94,14 @@ export const ProfileDropDownContent = ({
     canCreateDelegateStatement,
     delegatees,
   } = useProfileData();
-
+  console.log(delegate);
   const { ui } = Tenant.current();
   const hasDelegated = !!delegatees?.length;
-
+  const isOptimism = Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
+  const shouldEncourageDelegation =
+    tokenBalance !== BigInt(0) &&
+    delegate?.votingPower?.total === "0" &&
+    isOptimism;
   const renderDelegteesInfo = () => {
     if (!hasDelegated) return null;
     return (
@@ -215,7 +220,7 @@ export const ProfileDropDownContent = ({
               </RowSkeletonWrapper>
             }
           />
-          {!hasDelegated && tokenBalance && tokenBalance > BigInt(0) && (
+          {shouldEncourageDelegation && (
             <RenderDelegateToSelf delegate={delegate as DelegateChunk} />
           )}
         </div>

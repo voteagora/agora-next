@@ -2,12 +2,13 @@ import { ConnectKitButton } from "connectkit";
 import { DesktopProfileDropDown } from "./DesktopProfileDropDown";
 import { ArrowRight } from "@/icons/ArrowRight";
 import { cn } from "@/lib/utils";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import EncourageDelegationDot from "./EncourageDelegationDot";
 
-export function DesktopConnectButton({
-  hasNotDelegated,
-}: {
-  hasNotDelegated: boolean;
-}) {
+export function DesktopConnectButton() {
+  const isOptimism = Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
+
   return (
     <ConnectKitButton.Custom>
       {({ isConnected, show, ensName }) => {
@@ -22,8 +23,8 @@ export function DesktopConnectButton({
             {isConnected ? (
               <>
                 <DesktopProfileDropDown ensName={ensName} />
-                {hasNotDelegated && (
-                  <div className="w-[10px] h-[10px] bg-negative rounded-full absolute left-9 top-3"></div>
+                {isOptimism && (
+                  <EncourageDelegationDot className="left-8 top-[10px]" />
                 )}
               </>
             ) : (

@@ -114,6 +114,7 @@ export enum ANALYTICS_EVENT_NAMES {
   PARTIAL_DELEGATION = "partial_delegation",
   CREATE_PROPOSAL = "create_proposal",
   SHARE_VOTE = "share_vote",
+  DELEGATION_ENCOURAGEMENT = "delegation_encouragement",
 }
 
 export type AnalyticsEvent =
@@ -178,5 +179,12 @@ export type AnalyticsEvent =
         proposal_id: string;
         address?: `0x${string}`;
         type: "X" | "COPY_LINK" | "DOWNLOAD_IMAGE" | "WARPCAST";
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.DELEGATION_ENCOURAGEMENT;
+      event_data: {
+        transaction_hash: string;
+        delegator: `0x${string}`;
       };
     };

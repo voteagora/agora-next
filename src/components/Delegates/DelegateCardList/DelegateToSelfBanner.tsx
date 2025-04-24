@@ -4,9 +4,13 @@ import { useProfileData } from "@/hooks/useProfileData";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 
 export const DelegateToSelfBanner = () => {
-  const { delegate, tokenBalance, delegatees } = useProfileData();
-  const hasDelegated = !!delegatees?.length;
-  if (hasDelegated || !tokenBalance || tokenBalance === BigInt(0)) {
+  const { delegate, tokenBalance } = useProfileData();
+
+  if (
+    !tokenBalance ||
+    tokenBalance === BigInt(0) ||
+    (tokenBalance > BigInt(0) && delegate?.votingPower.total !== "0")
+  ) {
     return null;
   }
 

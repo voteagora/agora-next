@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/table";
 import DelegateTableRow from "./DelegateTableRow";
 import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -34,6 +36,7 @@ export default function DelegateTable({
   const fetching = useRef(false);
 
   const { setIsDelegatesFiltering } = useAgoraContext();
+  const isOptimism = Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
 
   useEffect(() => {
     setIsDelegatesFiltering(false);
@@ -56,7 +59,7 @@ export default function DelegateTable({
 
   return (
     <DialogProvider>
-      <DelegateToSelfBanner />
+      {isOptimism && <DelegateToSelfBanner />}
 
       <div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg mt-6">
         <Table className="min-w-full">

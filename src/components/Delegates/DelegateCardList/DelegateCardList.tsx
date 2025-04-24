@@ -10,6 +10,8 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import DelegateCard from "./DelegateCard";
 import { stripMarkdown } from "@/lib/sanitizationUtils";
 import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -46,12 +48,13 @@ export default function DelegateCardList({
       fetching.current = false;
     }
   };
+  const isOptimism = Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
 
   const { isAdvancedUser } = useIsAdvancedUser();
 
   return (
     <DialogProvider>
-      <DelegateToSelfBanner />
+      {isOptimism && <DelegateToSelfBanner />}
       {/* @ts-ignore */}
       <InfiniteScroll
         className="grid grid-flow-row grid-cols-1 md:grid-cols-2 lg:grid-cols-3  justify-around sm:justify-between py-4 gap-4 sm:gap-8"

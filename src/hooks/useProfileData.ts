@@ -1,5 +1,4 @@
 import { useAccount } from "wagmi";
-import { useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { useDelegate } from "@/hooks/useDelegate";

@@ -8,6 +8,8 @@ import { useQueryState, parseAsString } from "nuqs";
 import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -25,10 +27,11 @@ export default function DelegateContent({
   const { address } = useAccount();
   const [showDialog, setShowDialog] = useState(false);
   const openDialog = useOpenDialog();
+  const isOptimism = Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (!address && !showDialog) {
+      if (!address && !showDialog && isOptimism) {
         openDialog({
           type: "ENCOURAGE_CONNECT_WALLET",
           params: {},
@@ -38,8 +41,6 @@ export default function DelegateContent({
     }, 900);
     return () => clearTimeout(timer);
   }, [address, showDialog, openDialog]);
-
-  useEffect;
 
   return layout === "grid" ? (
     <DelegateCardList

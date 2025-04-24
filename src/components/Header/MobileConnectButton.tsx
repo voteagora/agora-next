@@ -4,11 +4,7 @@ import { ConnectKitButton } from "connectkit";
 import { WalletIcon } from "@/icons/walletIcon";
 import { MobileProfileDropDown } from "./MobileProfileDropDown";
 
-export function MobileConnectButton({
-  hasNotDelegated,
-}: {
-  hasNotDelegated: boolean;
-}) {
+export function MobileConnectButton() {
   return (
     <ConnectKitButton.Custom>
       {({ isConnected, show, ensName }) => {
