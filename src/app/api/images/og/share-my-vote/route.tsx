@@ -272,19 +272,15 @@ function generateVoteBars(
   forPercentage: number,
   againstPercentage: number,
   namespace: TenantNamespace,
-  proposalType: "STANDARD" | "OPTIMISTIC" | "APPROVAL" | "SNAPSHOT"
+  proposalType: "STANDARD" | "OPTIMISTIC" | "APPROVAL" | "SNAPSHOT",
+  supportType: "FOR" | "AGAINST" | "ABSTAIN"
 ) {
   const tenantUI: TenantUI = TenantUIFactory.create(
     TENANT_NAMESPACES[namespace as keyof typeof TENANT_NAMESPACES]
   );
   const totalBars = 71;
   const bars = [];
-  const forBars =
-    proposalType === "OPTIMISTIC"
-      ? 0
-      : Math.round((totalBars * forPercentage) / 100);
-  const againstBars = Math.round((totalBars * againstPercentage) / 100);
-  const abstainBars = totalBars - forBars - againstBars;
+  const totalVotes = forPercentage + againstPercentage;
 
   const positiveColor = tenantUI.customization?.positive
     ? rgbStringToHex(tenantUI.customization?.positive)
@@ -298,37 +294,64 @@ function generateVoteBars(
 
   const className = "flex h-7 w-[5px] rounded-full shrink-0";
 
-  // Generate FOR bars
-  for (let i = 0; i < forBars; i++) {
-    bars.push(
-      <div
-        key={`for-${i}`}
-        style={{ backgroundColor: positiveColor }}
-        tw={className}
-      />
-    );
-  }
+  if (totalVotes === 0) {
+    // If no votes, show all bars as user's vote
+    for (let i = 0; i < totalBars; i++) {
+      bars.push(
+        <div
+          key={`${supportType}-${i}`}
+          style={{
+            backgroundColor:
+              supportType === "FOR"
+                ? positiveColor
+                : supportType === "AGAINST"
+                  ? againstColor
+                  : abstainColor,
+          }}
+          tw={className}
+        />
+      );
+    }
+  } else {
+    const forBars =
+      proposalType === "OPTIMISTIC"
+        ? 0
+        : Math.round((totalBars * forPercentage) / 100);
+    const againstBars = Math.round((totalBars * againstPercentage) / 100);
+    const abstainBars = totalBars - forBars - againstBars;
 
-  // Generate abstain bars
-  for (let i = 0; i < abstainBars; i++) {
-    bars.push(
-      <div
-        key={`abstain-${i}`}
-        style={{ backgroundColor: abstainColor }}
-        tw={className}
-      />
-    );
-  }
+    // Generate FOR bars
+    for (let i = 0; i < forBars; i++) {
+      bars.push(
+        <div
+          key={`for-${i}`}
+          style={{ backgroundColor: positiveColor }}
+          tw={className}
+        />
+      );
+    }
 
-  // Generate AGAINST bars
-  for (let i = 0; i < againstBars; i++) {
-    bars.push(
-      <div
-        key={`against-${i}`}
-        style={{ backgroundColor: againstColor }}
-        tw={className}
-      />
-    );
+    // Generate abstain bars
+    for (let i = 0; i < abstainBars; i++) {
+      bars.push(
+        <div
+          key={`abstain-${i}`}
+          style={{ backgroundColor: abstainColor }}
+          tw={className}
+        />
+      );
+    }
+
+    // Generate AGAINST bars
+    for (let i = 0; i < againstBars; i++) {
+      bars.push(
+        <div
+          key={`against-${i}`}
+          style={{ backgroundColor: againstColor }}
+          tw={className}
+        />
+      );
+    }
   }
 
   return (
@@ -361,7 +384,7 @@ const SuccessMessageCard = ({
   blockNumber: string | null;
   endsIn: string | null;
   voteDate: string | null;
-  supportType: "FOR" | "AGAINST" | "NEUTRAL";
+  supportType: "FOR" | "AGAINST" | "ABSTAIN";
   proposalType: "STANDARD" | "OPTIMISTIC" | "APPROVAL" | "SNAPSHOT";
   options: {
     description: string;
@@ -502,7 +525,8 @@ const SuccessMessageCard = ({
                     forPercentage,
                     againstPercentage,
                     namespace,
-                    proposalType
+                    proposalType,
+                    supportType
                   )}
                 </div>
               </div>
@@ -646,7 +670,7 @@ export async function GET(req: NextRequest) {
   const supportType = searchParams.get("supportType") as
     | "FOR"
     | "AGAINST"
-    | "NEUTRAL";
+    | "ABSTAIN";
 
   const bgData = await fetch(
     new URL("../assets/grid-share.png", import.meta.url)

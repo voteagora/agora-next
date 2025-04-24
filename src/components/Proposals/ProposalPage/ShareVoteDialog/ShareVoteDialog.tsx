@@ -21,36 +21,58 @@ import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 function generateVoteBars(
   forPercentage: number,
   againstPercentage: number,
-  proposalType: "OPTIMISTIC" | "STANDARD" | "APPROVAL" | "SNAPSHOT"
+  proposalType: "OPTIMISTIC" | "STANDARD" | "APPROVAL" | "SNAPSHOT",
+  supportType: "FOR" | "AGAINST" | "ABSTAIN"
 ) {
   const totalBars = 56;
   const bars = [];
-  const forBars =
-    proposalType === "OPTIMISTIC"
-      ? 0
-      : Math.round((totalBars * forPercentage) / 100);
-  const againstBars = Math.round((totalBars * againstPercentage) / 100);
-  const abstainBars = totalBars - forBars - againstBars;
+  const totalVotes = forPercentage + againstPercentage;
 
   const className = "h-2.5 sm:h-3 w-[2px] sm:w-[3px] rounded-full shrink-0";
 
-  // Generate FOR bars
-  for (let i = 0; i < forBars; i++) {
-    bars.push(
-      <div key={`for-${i}`} className={cn(className, "bg-positive")} />
-    );
-  }
+  if (totalVotes === 0) {
+    // If no votes, show all bars as the user's vote
+    for (let i = 0; i < totalBars; i++) {
+      bars.push(
+        <div
+          key={`${supportType}-${i}`}
+          className={cn(
+            className,
+            supportType === "FOR"
+              ? "bg-positive"
+              : supportType === "AGAINST"
+                ? "bg-negative"
+                : "bg-tertiary"
+          )}
+        />
+      );
+    }
+  } else {
+    const forBars =
+      proposalType === "OPTIMISTIC"
+        ? 0
+        : Math.round((totalBars * forPercentage) / 100);
+    const againstBars = Math.round((totalBars * againstPercentage) / 100);
+    const abstainBars = totalBars - forBars - againstBars;
 
-  for (let i = 0; i < abstainBars; i++) {
-    bars.push(
-      <div key={`neutral-${i}`} className={cn(className, "bg-tertiary")} />
-    );
-  }
+    // Generate FOR bars
+    for (let i = 0; i < forBars; i++) {
+      bars.push(
+        <div key={`for-${i}`} className={cn(className, "bg-positive")} />
+      );
+    }
 
-  for (let i = 0; i < againstBars; i++) {
-    bars.push(
-      <div key={`against-${i}`} className={cn(className, "bg-negative")} />
-    );
+    for (let i = 0; i < abstainBars; i++) {
+      bars.push(
+        <div key={`neutral-${i}`} className={cn(className, "bg-tertiary")} />
+      );
+    }
+
+    for (let i = 0; i < againstBars; i++) {
+      bars.push(
+        <div key={`against-${i}`} className={cn(className, "bg-negative")} />
+      );
+    }
   }
 
   return (
@@ -140,7 +162,8 @@ const SuccessMessageCard = ({
                 {generateVoteBars(
                   forPercentage,
                   againstPercentage,
-                  proposalType
+                  proposalType,
+                  supportType
                 )}
               </div>
             </div>
