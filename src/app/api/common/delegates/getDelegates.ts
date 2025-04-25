@@ -21,7 +21,7 @@ import { DELEGATION_MODEL, TENANT_NAMESPACES } from "@/lib/constants";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { calculateBigIntRatio } from "../utils/bigIntRatio";
 import { withMetrics } from "@/lib/metricWrapper";
-import { getDelegateFromDaoNode } from "@/lib/dao-node/client";
+import { getDelegateFromDaoNode } from "@/app/lib/dao-node/client";
 
 /*
  * Fetches a list of delegates

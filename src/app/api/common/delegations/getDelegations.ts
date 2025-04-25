@@ -15,7 +15,7 @@ import { Prisma } from "@prisma/client";
 import { findAdvancedDelegatee, findDelagatee } from "@/lib/prismaUtils";
 import { DELEGATION_MODEL } from "@/lib/constants";
 import { withMetrics } from "@/lib/metricWrapper";
-import { getDelegateFromDaoNode } from "@/lib/dao-node/client";
+import { getDelegateFromDaoNode } from "@/app/lib/dao-node/client";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
