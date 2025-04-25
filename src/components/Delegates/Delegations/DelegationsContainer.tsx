@@ -14,6 +14,9 @@ import {
 import { PaginatedResult } from "@/app/lib/pagination";
 import { useEffect, useRef, useState } from "react";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { useQueryState } from "nuqs";
+
+const SUBTAB_PARAM = "subtab";
 
 function DelegationsContainer({
   delegatees,
@@ -29,6 +32,16 @@ function DelegationsContainer({
 }) {
   const [meta, setMeta] = useState(initialDelegators.meta);
   const [delegators, setDelegators] = useState(initialDelegators.data);
+
+  const [subtab, setSubtab] = useQueryState(SUBTAB_PARAM, {
+    defaultValue: "delegatedFrom",
+    history: "push",
+    shallow: true,
+  });
+
+  const handleSubtabChange = (value: string) => {
+    setSubtab(value);
+  };
 
   const { data: tokenBalance } = useTokenBalance(delegatees[0]?.from);
   const isLoadingRef = useRef(false);
@@ -64,7 +77,11 @@ function DelegationsContainer({
 
   return (
     <div className="max-w-full text-primary">
-      <Tabs className="max-w-full mb-8" defaultValue="delegatedFrom">
+      <Tabs
+        className="max-w-full mb-8"
+        value={subtab}
+        onValueChange={handleSubtabChange}
+      >
         <div className="flex flex-row items-center justify-between">
           <TabsList>
             <TabsTrigger className="text-2xl" value="delegatedFrom">
