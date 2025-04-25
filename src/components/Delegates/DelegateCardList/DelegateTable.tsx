@@ -82,9 +82,7 @@ export default function DelegateTable({
               <TableHead className="h-10 text-secondary">
                 Delegated from
               </TableHead>
-              <TableHead className="h-10 text-secondary min-w-[80px]">
-                Info
-              </TableHead>
+              <TableHead className="h-10 text-secondary">Info</TableHead>
               <TableHead className="h-10 text-secondary"></TableHead>
             </TableRow>
           </TableHeader>
