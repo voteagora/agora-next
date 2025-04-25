@@ -12,6 +12,7 @@ import {
 } from "viem/chains";
 import axios from "axios";
 import { unstable_cache } from "next/cache";
+import Tenant from "./tenant/tenant";
 
 const EXPLORER_DOMAINS = {
   [mainnet.name.toLowerCase()]: "https://api.etherscan.io/api",
@@ -56,6 +57,21 @@ function getExplorerDomain(networkName: string): string {
   );
 }
 
+const { contracts } = Tenant.current();
+
+const fallbackGetContractAbi = async (
+  contractAddress: string
+): Promise<AbiItem[] | null> => {
+  const fallbackUrl = `${process.env.STORAGE_BUCKET_URL}${contracts.governor.chain.id}/${contractAddress}.json`;
+  const fallbackResponse = await axios.get(fallbackUrl);
+  const fallbackData = fallbackResponse.data;
+  if (fallbackResponse.status === 200) {
+    return fallbackData;
+  } else {
+    return null;
+  }
+};
+
 async function getContractAbi(
   contractAddress: string,
   etherscanApiKey: string,
@@ -72,10 +88,10 @@ async function getContractAbi(
     if (response.data.status === "1") {
       return JSON.parse(response.data.result);
     } else {
-      return null;
+      return await fallbackGetContractAbi(contractAddress);
     }
   } catch (error) {
-    return null;
+    return await fallbackGetContractAbi(contractAddress);
   }
 }
 

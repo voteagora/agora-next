@@ -367,7 +367,7 @@ export const CreateScopeDialog = ({
         />
 
         {isLoadingAbi && (
-          <div className="text-sm text-wash">Fetching ABI...</div>
+          <div className="text-sm text-tertiary">Fetching ABI...</div>
         )}
 
         {(!abiFound || !filteredFunctions || filteredFunctions.length === 0) &&
