@@ -11,7 +11,6 @@ import DelegateCard from "./DelegateCard";
 import { stripMarkdown } from "@/lib/sanitizationUtils";
 import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -29,6 +28,10 @@ export default function DelegateCardList({
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.data);
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
+  const { ui } = Tenant.current();
+  const isDelegationEncouragementEnabled = ui.toggle(
+    "delegation-encouragement"
+  )?.enabled;
 
   useEffect(() => {
     setIsDelegatesFiltering(false);
@@ -48,13 +51,12 @@ export default function DelegateCardList({
       fetching.current = false;
     }
   };
-  const isOptimism = Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
 
   const { isAdvancedUser } = useIsAdvancedUser();
 
   return (
     <DialogProvider>
-      {isOptimism && <DelegateToSelfBanner />}
+      {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
       {/* @ts-ignore */}
       <InfiniteScroll
         className="grid grid-flow-row grid-cols-1 md:grid-cols-2 lg:grid-cols-3  justify-around sm:justify-between py-4 gap-4 sm:gap-8"

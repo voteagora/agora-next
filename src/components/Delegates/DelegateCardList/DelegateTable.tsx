@@ -16,7 +16,8 @@ import {
 import DelegateTableRow from "./DelegateTableRow";
 import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
+import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -35,8 +36,14 @@ export default function DelegateTable({
 
   const fetching = useRef(false);
 
+  const { ui } = Tenant.current();
+  const isDelegationEncouragementEnabled = ui.toggle(
+    "delegation-encouragement"
+  )?.enabled;
+  const { isAdvancedUser } = useIsAdvancedUser();
+  const { advancedDelegators } = useConnectedDelegate();
+
   const { setIsDelegatesFiltering } = useAgoraContext();
-  const isOptimism = Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
 
   useEffect(() => {
     setIsDelegatesFiltering(false);
@@ -59,7 +66,7 @@ export default function DelegateTable({
 
   return (
     <DialogProvider>
-      {isOptimism && <DelegateToSelfBanner />}
+      {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
 
       <div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg mt-6">
         <Table className="min-w-full">
@@ -75,6 +82,8 @@ export default function DelegateTable({
               <TableHead className="h-10 text-secondary">
                 Delegated from
               </TableHead>
+              <TableHead className="h-10 text-secondary">Info</TableHead>
+              <TableHead className="h-10 text-secondary"></TableHead>
             </TableRow>
           </TableHeader>
           <InfiniteScroll
@@ -110,6 +119,8 @@ export default function DelegateTable({
                   delegate={
                     delegate as DelegateChunk & { numOfDelegators: bigint }
                   }
+                  isAdvancedUser={isAdvancedUser}
+                  delegators={advancedDelegators}
                 />
               ))
             )}

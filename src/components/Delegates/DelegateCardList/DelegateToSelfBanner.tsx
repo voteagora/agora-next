@@ -19,7 +19,7 @@ export const DelegateToSelfBanner = () => {
       <ExclamationCircleIcon className="w-6 h-6 stroke-negative" />
       <div className="flex-1 flex-col justify-start items-start gap-1 text-neutral-900">
         <div className="text-base font-bold leading-normal">
-          Your tokens can&#x27;t be voted with!
+          Your tokens can&#39;t be voted with!
         </div>
         <div className="text-sm font-medium leading-[21px]">
           Make your vote count, delegate to yourself or someone else in the

@@ -9,7 +9,6 @@ import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -27,11 +26,14 @@ export default function DelegateContent({
   const { address } = useAccount();
   const [showDialog, setShowDialog] = useState(false);
   const openDialog = useOpenDialog();
-  const isOptimism = Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
+  const { ui } = Tenant.current();
+  const isDelegationEncouragementEnabled = ui.toggle(
+    "delegation-encouragement"
+  )?.enabled;
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (!address && !showDialog && isOptimism) {
+      if (!address && !showDialog && isDelegationEncouragementEnabled) {
         openDialog({
           type: "ENCOURAGE_CONNECT_WALLET",
           params: {},

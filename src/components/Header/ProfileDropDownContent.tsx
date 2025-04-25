@@ -22,21 +22,30 @@ import { Delegation } from "@/app/api/common/delegations/delegation";
 import { useEnsName } from "wagmi";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { DelegateToSelf } from "../Delegates/Delegations/DelegateToSelf";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface Props {
   ensName: string | undefined;
   handleCloseDrawer: () => void;
 }
 
-const DelegatePanelRow = ({ delegate }: { delegate: Delegation }) => {
+const DelegatePanelRow = ({
+  delegate,
+  onClick,
+}: {
+  delegate: Delegation;
+  onClick: () => void;
+}) => {
   const { data: ensName } = useEnsName({
     chainId: 1,
     address: delegate.to as `0x${string}`,
   });
 
   return (
-    <div className="inline-flex justify-start text-neutral-900 items-center gap-2">
+    <Link
+      href={`/delegates/${delegate.to}`}
+      className="flex justify-start text-neutral-900 items-center gap-2"
+      onClick={onClick}
+    >
       <div className="flex justify-start items-end">
         <ENSAvatar ensName={ensName} size={30} />
       </div>
@@ -46,7 +55,7 @@ const DelegatePanelRow = ({ delegate }: { delegate: Delegation }) => {
           {shortAddress(delegate.to)}
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
@@ -94,29 +103,51 @@ export const ProfileDropDownContent = ({
     canCreateDelegateStatement,
     delegatees,
   } = useProfileData();
-  console.log(delegate);
+
   const { ui } = Tenant.current();
   const hasDelegated = !!delegatees?.length;
-  const isOptimism = Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
+  const isDelegationEncouragementEnabled = ui.toggle(
+    "delegation-encouragement"
+  )?.enabled;
   const shouldEncourageDelegation =
     tokenBalance !== BigInt(0) &&
     delegate?.votingPower?.total === "0" &&
-    isOptimism;
+    isDelegationEncouragementEnabled;
+
   const renderDelegteesInfo = () => {
     if (!hasDelegated) return null;
+
+    if (
+      delegatees.length === 1 &&
+      delegatees[0].to.toLowerCase() === address?.toLowerCase()
+    ) {
+      // dont show the section for self delegation.
+      return null;
+    }
+
     return (
       <div className="flex flex-col p-6 border-b border-line">
         <PanelRow
-          title="My Delegate"
+          title={delegatees.length > 1 ? "My Delegates" : "My Delegate"}
           detail={
-            <>
-              {delegatees.map((delegate) => (
+            <div className="flex flex-col gap-4">
+              {delegatees.slice(0, 3).map((delegate) => (
                 <DelegatePanelRow
                   key={delegate.transaction_hash}
                   delegate={delegate}
+                  onClick={handleCloseDrawer}
                 />
               ))}
-            </>
+              {delegatees.length > 3 && (
+                <Link
+                  href={`/delegates/${address}`}
+                  onClick={handleCloseDrawer}
+                  className="text-sm text-tertiary font-xs border border-line self-end rounded-full px-2 py-1 "
+                >
+                  +{delegatees.length - 3}
+                </Link>
+              )}
+            </div>
           }
         />
       </div>
