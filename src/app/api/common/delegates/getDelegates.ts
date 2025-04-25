@@ -53,7 +53,6 @@ async function getDelegates({
     "getDelegates",
     async () => {
       const { namespace, ui, slug, contracts } = Tenant.current();
-
       const allowList = ui.delegates?.allowed || [];
 
       // The top issues filter supports multiple selection - a comma separated list of issues
@@ -607,10 +606,15 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
 
 async function getVoterStats(
   addressOrENSName: string,
-  blockNumber?: number
+  blockNumberOrTimestamp?: number
 ): Promise<any> {
   return withMetrics("getVoterStats", async () => {
-    const { namespace, contracts } = Tenant.current();
+    const { namespace, contracts, ui } = Tenant.current();
+
+    const isTimeStampBasedTenant = ui.toggle(
+      "use-timestamp-for-proposals"
+    )?.enabled;
+
     const address = isAddress(addressOrENSName)
       ? addressOrENSName.toLowerCase()
       : await ensNameToAddress(addressOrENSName);
@@ -623,7 +627,11 @@ async function getVoterStats(
             SELECT proposal_id
             FROM ${namespace}.proposals_v2
             WHERE contract = $2
-            AND end_block::INTEGER <= $3
+            AND ${
+              isTimeStampBasedTenant
+                ? `end_timestamp::INTEGER <= $3`
+                : `end_block::INTEGER <= $3`
+            }
             AND cancelled_block IS NULL
             AND proposal_type <> 'OPTIMISTIC'
             ORDER BY ordinal DESC
@@ -652,7 +660,7 @@ async function getVoterStats(
         `,
       address,
       contracts.governor.address.toLowerCase(),
-      blockNumber || 0
+      blockNumberOrTimestamp || 0
     );
     return (
       statsQuery?.[0] || {

@@ -231,7 +231,7 @@ export const ProfileDropDownContent = ({
         )}
       </div>
 
-      <div className="self-stretch flex flex-col">
+      <div className="self-stretch flex flex-col font-medium">
         <div className="py-8 px-6 flex gap-4 flex-col border-b border-line">
           <PanelRow
             title={ui.tacticalStrings?.myBalance || "My token balance"}
@@ -263,7 +263,7 @@ export const ProfileDropDownContent = ({
             <div className="self-stretch h-12 pl-6 flex items-center animate-pulse bg-tertiary/10 rounded-lg mt-2"></div>
           </div>
         ) : (
-          <div className="flex flex-col p-6">
+          <div className="flex flex-col p-6 font-medium">
             {canCreateDelegateStatement && !hasStatement ? (
               <Link
                 href={`/delegates/create`}
@@ -299,7 +299,7 @@ export const ProfileDropDownContent = ({
             disconnect();
             handleCloseDrawer();
           }}
-          className="cursor-pointer flex"
+          className="cursor-pointer flex font-bold"
         >
           <Logout
             fill={rgbStringToHex(ui?.customization?.primary)}

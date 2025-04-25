@@ -18,8 +18,8 @@ export function DesktopConnectButton() {
           <div
             onClick={!isConnected ? () => show?.() : undefined}
             className={cn(
-              "lg:border text-primary lg:bg-neutral py-2 px-4 rounded-full cursor-pointer hidden sm:flex items-center transition-all hover:shadow-newDefault h-[48px] relative",
-              isConnected ? "lg:border-line" : "lg:border-primary"
+              "border text-primary lg:bg-neutral py-2 px-4 rounded-full cursor-pointer hidden sm:flex items-center transition-all hover:shadow-newDefault h-[48px] relative",
+              isConnected ? "border-line" : "border-primary"
             )}
           >
             {isConnected ? (
@@ -31,8 +31,9 @@ export function DesktopConnectButton() {
               </>
             ) : (
               <>
-                {"Connect Wallet"}{" "}
-                <ArrowRight className="ml-3 mr-1 hidden lg:block stroke-primary" />
+                {"Connect\u00A0"}
+                <div className="hidden lg:inline-block"> {"Wallet"}</div>
+                <ArrowRight className="ml-3 mr-1 stroke-primary" />
               </>
             )}
           </div>

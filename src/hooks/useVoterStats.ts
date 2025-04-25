@@ -29,10 +29,16 @@ export const useVoterStats = ({
       // Intentionally caching the block number for 3 minutes to avoid
       // unnecessary requests. The tradeoff is that the most recent voting activity
       // won't be immediately reflected in the UI.
-      const blockNumber = await publicClient.getBlockNumber({
-        cacheTime: CACHE_TIME,
-      });
-      return await fetchVoterStats(address!, Number(blockNumber));
+      let blockNumberOrTimestamp: number;
+      if (ui.toggle("use-timestamp-for-proposal")?.enabled) {
+        blockNumberOrTimestamp = Math.floor(Date.now() / 1000);
+      } else {
+        const blockNumber = await publicClient.getBlockNumber({
+          cacheTime: CACHE_TIME,
+        });
+        blockNumberOrTimestamp = Number(blockNumber);
+      }
+      return await fetchVoterStats(address!, blockNumberOrTimestamp);
     },
     staleTime: CACHE_TIME,
   });

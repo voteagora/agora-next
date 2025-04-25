@@ -10,7 +10,7 @@ export const HeaderLink = ({ className, children, href, target, isActive }) => {
     <Link
       href={href}
       target={target}
-      className={`px-4 rounded-full text-sm sm:text-base h-[48px] content-center ${activeClass} ${className || ""}`}
+      className={`px-4 rounded-full text-sm sm:text-base h-[40px] content-center ${activeClass} ${className || ""}`}
     >
       {children}
     </Link>
