@@ -18,7 +18,7 @@ export default function Header() {
   };
 
   return (
-    <div className="h-[56px] sm:h-[80px] content-center rounded-full bg-wash border-line my-3 sm:my-4 mx-3 sm:mx-8">
+    <div className="h-[56px] sm:h-[80px] content-center rounded-full bg-wash border border-line my-3 sm:my-4 mx-3 sm:mx-8">
       <VStack className="px-4 sm:px-8">
         <HStack className="flex flex-row w-full items-center gap-1  justify-between">
           <HamburgerIcon

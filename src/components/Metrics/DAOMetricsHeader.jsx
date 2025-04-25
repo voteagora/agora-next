@@ -53,7 +53,7 @@ export default function DAOMetricsHeader() {
   return (
     <>
       {createPortal(
-        <div className="sticky z-50 bottom-0 hidden sm:flex left-0 justify-center">
+        <div className="sticky z-50 bottom-0 hidden sm:flex left-0 justify-center border-t border-line">
           <div
             className={cn(
               "flex flex-row w-full bg-wash border-wash justify-between",
