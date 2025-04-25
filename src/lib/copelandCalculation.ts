@@ -454,7 +454,7 @@ export function calculateCopelandVote(
   );
 
   let remaining2YBudget = budget_2y;
-  let remaining1YBudget = budget_1y;
+  let remainingTotalBudget = budget_1y + budget_2y;
 
   // Determine if an option is in the top 10 (for 2Y eligibility)
   const isInTop10 = (option: string): boolean => {
@@ -510,9 +510,19 @@ export function calculateCopelandVote(
               ) {
                 fundingType = "EXT2Y";
                 remaining2YBudget -= info.ext;
-              } else if (info.ext !== null && remaining1YBudget >= info.ext) {
+                remainingTotalBudget -= info.ext;
+              } else if (
+                info.ext !== null &&
+                remainingTotalBudget >= info.ext
+              ) {
                 fundingType = "EXT1Y";
-                remaining1YBudget -= info.ext;
+                let missingFunding = info.ext;
+                if (canGet2Y) {
+                  missingFunding -= remaining2YBudget;
+                  remainingTotalBudget -= remaining2YBudget;
+                  remaining2YBudget = 0;
+                }
+                remainingTotalBudget -= missingFunding;
               }
             }
           }
@@ -521,9 +531,16 @@ export function calculateCopelandVote(
           if (canGet2Y && remaining2YBudget >= info.std) {
             fundingType = "STD";
             remaining2YBudget -= info.std;
-          } else if (remaining1YBudget >= info.std) {
+            remainingTotalBudget -= info.std;
+          } else if (remainingTotalBudget >= info.std) {
             fundingType = "STD";
-            remaining1YBudget -= info.std;
+            let missingFunding = info.std;
+            if (canGet2Y) {
+              missingFunding -= remaining2YBudget;
+              remainingTotalBudget -= remaining2YBudget;
+              remaining2YBudget = 0;
+            }
+            remainingTotalBudget -= missingFunding;
           }
         }
       }
@@ -533,33 +550,6 @@ export function calculateCopelandVote(
         fundingType,
       });
     });
-
-  // Move remaining 2Y budget to 1Y bucket if no more eligible candidates
-  const hasMoreEligible2YCandidates = resultsWithFunding.filter(
-    (result, index) => {
-      const isAboveNoneBelow =
-        noneBelowPosition === -1 || index < noneBelowPosition;
-
-      const isExtended = isExtendedOption(result.option);
-      const hasBudget = isExtended
-        ? result.fundingInfo.ext !== null &&
-          result.fundingInfo.ext <= remaining2YBudget
-        : result.fundingInfo.std <= remaining2YBudget;
-
-      return (
-        result.fundingType === "None" &&
-        result.fundingInfo.isEligibleFor2Y &&
-        isInTop10(result.option) &&
-        hasBudget &&
-        isAboveNoneBelow
-      );
-    }
-  );
-
-  if (!hasMoreEligible2YCandidates.length && remaining2YBudget > 0) {
-    remaining1YBudget += remaining2YBudget;
-    remaining2YBudget = 0;
-  }
 
   // Sort options for 1Y funding based on total wins
   const sortedFor1Y = resultsWithFunding
@@ -599,24 +589,24 @@ export function calculateCopelandVote(
         // Only allocate funding to extended option if standard option has received funding
         if (standardResult && standardResult.fundingType === "STD") {
           const fundingAmount = result.fundingInfo.ext;
-          if (fundingAmount !== null && remaining1YBudget >= fundingAmount) {
+          if (fundingAmount !== null && remainingTotalBudget >= fundingAmount) {
             resultsWithFunding[resultIndex] = {
               ...resultsWithFunding[resultIndex],
               fundingType: "EXT1Y" as FundingType,
             };
-            remaining1YBudget -= fundingAmount;
+            remainingTotalBudget -= fundingAmount;
           }
         }
       }
     } else {
       // Standard options can only get STD funding
       const fundingAmount = result.fundingInfo.std;
-      if (remaining1YBudget >= fundingAmount) {
+      if (remainingTotalBudget >= fundingAmount) {
         resultsWithFunding[resultIndex] = {
           ...resultsWithFunding[resultIndex],
           fundingType: "STD" as FundingType,
         };
-        remaining1YBudget -= fundingAmount;
+        remainingTotalBudget -= fundingAmount;
       }
     }
   }
