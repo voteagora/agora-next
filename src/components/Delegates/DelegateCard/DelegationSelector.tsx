@@ -23,8 +23,6 @@ export function DelegationSelector({
 }) {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
-  const twitter = delegate?.statement?.twitter;
-  const discord = delegate?.statement?.discord;
 
   const { contracts } = Tenant.current();
   const hasAlligator = contracts?.alligator;
