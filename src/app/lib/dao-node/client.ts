@@ -24,3 +24,76 @@ export const getProposalTypesFromDaoNode = async () => {
 
   return data;
 };
+
+
+export const getProposalsFromDaoNode = async (
+  skip : number,
+  take : number,
+  filter : string
+) => {
+
+  const url = getDaoNodeURLForNamespace(namespace);
+
+  console.log("url", url);
+
+  try {
+    const response = await fetch(
+      `${url}v1/proposals` //?set=${filter}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`API responded with status: ${response.status} (${url})`);
+    }
+
+    const data = await response.json() as {proposals: any[]};
+
+    console.log("data.proposals", data.proposals);
+    console.log("type of data.proposals:", typeof data.proposals);
+    console.log("is array:", Array.isArray(data.proposals));
+
+    // Ensure we have an array to work with
+    const proposalsArray = Array.isArray(data.proposals) ? data.proposals : [];
+
+    const slicedData = proposalsArray.slice(skip, skip + take);
+    
+    return slicedData;
+
+  } catch (error) {
+    console.error("Failed to fetch from DAO Node API:", error);
+    throw error;
+  }
+}
+  /* 
+
+   DB RECORD RESPONSE:
+
+  /*{
+    proposal_id: '62',
+    proposer: '0xecc2a9240268bc7a26386ecb49e1befca2706ac9',
+    description: '# Mobilizing the Uniswap Treasury\n' +
+      'The UTWG will also try to collaborate with those working on various legal developments including the recent [<u>Wyoming Decentralized Unincorporated Nonprofit Association (DUNA) Act</u>](https://a16zcrypto.com/posts/article/duna-for-daos/). This process may fall outside of the jurisdiction of the treasury committee and may require outsourcing entirely to another party. It’s vital that this treasury research is analyzed in the context of potential legal structures, and we won’t move forward with implementing our research unless there are proper legal frameworks in place. The Uniswap DAO has yet t'... 5635 more characters,
+    created_block: 19748314n,
+    start_block: '19761454',
+    end_block: '19801774',
+    cancelled_block: null,
+    executed_block: 19816075n,
+    queued_block: 19801776n,
+    proposal_data: {
+      values: [ 0 ],
+      targets: [ '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984' ],
+      calldatas: [
+        '0xa9059cbb0000000000000000000000003b59c6d0034490093460787566dc5d6ce17f2f9c00000000000000000000000000000000000000000000014542ba12a337c00000'
+      ],
+      signatures: [ '' ]
+    },
+    proposal_results: {
+      standard: {
+        '0': 4.6242347731945804e+22,
+        '1': 4.20659862829919e+25,
+        '2': 304963417219416640
+      },
+      approval: null
+    },
+    proposal_type: 'STANDARD'
+  }
+  */
