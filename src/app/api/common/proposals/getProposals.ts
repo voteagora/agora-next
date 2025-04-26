@@ -224,8 +224,6 @@ async function getProposals({
           fetchVotableSupply(),
         ]);
 
-        console.log("proposals", proposals);
-
         const resolvedProposals = await Promise.all(
           proposals.data.map(async (proposal: ProposalPayload) => {
             const quorum = await fetchQuorumForProposal(proposal);
