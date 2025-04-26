@@ -61,7 +61,11 @@ export const getCachedAllProposalsFromDaoNode = cache(getAllProposalsFromDaoNode
 
 export const getProposalsFromDaoNode = async (skip: number, take: number, filter: string) => {
   console.log(`getProposalsFromDaoNode: skip=${skip}, take=${take}, filter=${filter}`);
-  return (await getCachedAllProposalsFromDaoNode(filter)).slice(skip, take);
+  const out = (await getCachedAllProposalsFromDaoNode(filter))
+
+  console.log("out", out.length);
+  
+  return out.slice(skip, skip + take);
 } 
 
   /* 
