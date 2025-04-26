@@ -7,8 +7,8 @@ async function getVotableSupply() {
   const { namespace, contracts } = Tenant.current();
   const address = contracts.token.address;
   try {
-    const votableSupply = await findVotableSupply({ namespace, address });
-    return votableSupply?.votable_supply || "0";
+    // const votableSupply = await findVotableSupply({ namespace, address });
+    return "0" //votableSupply?.votable_supply || "0";
   } catch (error) {
     console.log("Error fetching votable supply:", error);
 
