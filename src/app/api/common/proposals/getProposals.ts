@@ -170,7 +170,7 @@ async function getProposals({
 
             let proposalsResult;
             
-            if (!useRestApi) {
+            if (useRestApi) {
                 proposalsResult = await paginateResult(
                   async (skip: number, take: number) => {
 

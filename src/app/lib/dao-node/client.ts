@@ -27,15 +27,13 @@ export const getProposalTypesFromDaoNode = async () => {
 };
 
 
-export const getAllProposalsFromDaoNode = async (
-  filter : string
-) => {
+export const getAllProposalsFromDaoNode = async () => {
 
   const url = getDaoNodeURLForNamespace(namespace);
 
   try {
     const response = await fetch(
-      `${url}v1/proposals` //?set=${filter}`
+      `${url}v1/proposals?set=everything` //?set=${filter}`
     );
 
     const startTime = Date.now();
@@ -65,9 +63,14 @@ export const getCachedAllProposalsFromDaoNode = cache(getAllProposalsFromDaoNode
 
 export const getProposalsFromDaoNode = async (skip: number, take: number, filter: string) => {
   console.log(`getProposalsFromDaoNode: skip=${skip}, take=${take}, filter=${filter}`);
-  const out = (await getCachedAllProposalsFromDaoNode(filter))
 
-  console.log("out", out.length);
+  let out = (await getCachedAllProposalsFromDaoNode())
+
+  if (filter == 'relevant') {
+    out = out.filter(proposal => {
+      return !proposal.cancel_event;
+    })
+  }
   
   return out.slice(skip, skip + take);
 } 
