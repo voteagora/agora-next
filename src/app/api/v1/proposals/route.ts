@@ -37,18 +37,20 @@ export async function GET(request: NextRequest) {
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     const params = request.nextUrl.searchParams;
+
+    throw new Error("Not implemented");
     try {
       const filter = filterValidator.parse(params.get("filter"));
       const limit = limitValidator.parse(params.get("limit"));
       const offset = offsetValidator.parse(params.get("offset"));
-      const delegatesResult = await fetchProposals({
+      const proposalsResult = await fetchProposals({
         pagination: {
           limit,
           offset,
         },
         filter,
       });
-      return NextResponse.json(delegatesResult);
+      return NextResponse.json(proposalsResult);
     } catch (e: any) {
       if (e instanceof ZodError) {
         return new Response("Invalid query parameters: " + e.toString(), {
