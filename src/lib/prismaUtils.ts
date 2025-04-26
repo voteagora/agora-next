@@ -163,6 +163,7 @@ export function findProposalsQuery({
 }) {
   const condition = {
     take,
+    skip,
     orderBy: {
       ordinal: "desc" as const,
     },
