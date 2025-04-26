@@ -179,7 +179,16 @@ async function getProposals({
                       take,
                       filter
                     );
-                    return result.map(adaptDAONodeResponse);
+
+                    const startTime = Date.now();
+
+                    const out = result.map(adaptDAONodeResponse);
+
+                    const endTime = Date.now();
+
+                    console.log(`adaptDAONodeResponse took ${endTime - startTime}ms`);
+
+                    return out
                   },
                   pagination
                 );
