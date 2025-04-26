@@ -170,36 +170,43 @@ async function getProposals({
 
             let proposalsResult;
             
-            if (useRestApi) {
-              try {
+            if (!useRestApi) {
                 proposalsResult = await paginateResult(
                   async (skip: number, take: number) => {
-                    const result = await getProposalsFromDaoNode(
-                      skip,
-                      take,
-                      filter
-                    );
 
-                    const startTime = Date.now();
+                    try {
+                      const result = await getProposalsFromDaoNode(
+                        skip,
+                        take,
+                        filter
+                      );
 
-                    const out = result.map(adaptDAONodeResponse);
+                      const startTime = Date.now();
 
-                    const endTime = Date.now();
+                      const out = result.map(adaptDAONodeResponse);
 
-                    console.log(`adaptDAONodeResponse took ${endTime - startTime}ms`);
+                      const endTime = Date.now();
 
-                    return out
+                      console.log(`adaptDAONodeResponse took ${endTime - startTime}ms`);
+
+                      return out
+                    } catch (error) {
+                        console.warn("REST API failed, falling back to DB:", error);
+                    }
+
+                    const result = await findProposalsQueryFromDB({
+                          namespace,
+                          skip,
+                          take,
+                          filter,
+                          contract: contracts.governor.address,
+                        });
+
+                    return result;
                   },
                   pagination
                 );
-              } catch (error) {
-                console.warn("REST API failed, falling back to DB:", error);
-                proposalsResult = null;
-              }
-            }
-
-            // Fallback to DB or default path if REST API is disabled or failed
-            if (!proposalsResult) {
+              } else {
               proposalsResult = await paginateResult(
                 (skip: number, take: number) =>
                   findProposalsQueryFromDB({
@@ -212,10 +219,6 @@ async function getProposals({
                 pagination
               );
             }
-
-            // for (const proposal of proposalsResult.data) {
-            //  console.log(proposal);
-            // }
 
             return proposalsResult;
           }
