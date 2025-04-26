@@ -51,15 +51,14 @@ const unicornIconSrc =
 // Note: The chain specified here is for the smart account functionality as per Unicorn docs.
 const unicornConnector = inAppWalletConnector({
   client,
-  // auth: {
-  //   options: ["wallet"],
-  // },
   smartAccount: {
     sponsorGas: true, // or false based on your needs / Unicorn requirements
     chain: thirdwebDefineChain(mainnet.id),
     factoryAddress: unicornFactoryAddress,
   },
   metadata: {
+    name: "Unicorn.eth",
+    icon: unicornIconSrc,
     image: {
       src: unicornIconSrc,
       alt: "Unicorn.eth",
@@ -68,13 +67,6 @@ const unicornConnector = inAppWalletConnector({
     },
   },
 });
-
-// --- FIX START ---
-// Manually add the `icon` property that ConnectKit expects
-// We use `any` here because the standard Connector type doesn't strictly define `icon`
-// but ConnectKit's `useWallets` hook checks for it.
-(unicornConnector as any).icon = unicornIconSrc;
-// --- FIX END ---
 
 const metadata = {
   name: "Agora Next",

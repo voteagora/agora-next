@@ -73,18 +73,18 @@ export default function ProposalsList({
     fetching.current = false;
   };
 
-  // const proposals = pages.flatMap((page) => page.data);
+  const proposals = pages.flatMap((page) => page.data);
 
   return (
     <div className="flex flex-col max-w-[76rem]">
       {/* {address && <NonVotedProposalsList address={address} />} */}
-      <div className="flex flex-col items-baseline justify-between gap-2 mb-4 sm:flex-row sm:mb-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
         <PageHeader headerText="All Proposals" />
-        <div className="flex flex-col items-center justify-between w-full gap-4 sm:flex-row sm:w-fit">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit items-center">
           <ProposalsFilter />
-          {/* {tenantSupportsProposalLifecycle && address && (
+          {tenantSupportsProposalLifecycle && address && (
             <CreateProposalDraftButton address={address} />
-          )} */}
+          )}
         </div>
       </div>
 
@@ -96,22 +96,21 @@ export default function ProposalsList({
           votingPeriod={governanceCalendar.votingPeriod}
         />
       )}
-      <div className="flex flex-col overflow-hidden border rounded-lg bg-neutral border-line shadow-newDefault">
+      <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
         <div>
-          {true ? (
+          {proposals.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">
               No proposals currently
             </div>
           ) : (
             <InfiniteScroll
-              hasMore={false}
-              // hasMore={meta.has_next}
+              hasMore={meta.has_next}
               pageStart={0}
               loadMore={loadMore}
               loader={
                 <div key={0}>
                   <div
-                    className="flex flex-row justify-center py-6 text-sm gl_loader text-secondary"
+                    className="flex flex-row gl_loader justify-center py-6 text-sm text-secondary"
                     key="loader"
                   >
                     Loading...
@@ -120,13 +119,13 @@ export default function ProposalsList({
               }
               element="main"
             >
-              {/* {proposals.map((proposal) => (
+              {proposals.map((proposal) => (
                 <Proposal
                   key={`${proposal.id}_${proposal.status}`}
                   proposal={proposal}
                   votableSupply={votableSupply}
                 />
-              ))} */}
+              ))}
             </InfiniteScroll>
           )}
         </div>
