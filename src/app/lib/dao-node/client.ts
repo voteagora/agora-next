@@ -1,4 +1,5 @@
 import Tenant from "@/lib/tenant/tenant";
+import { cache } from "react";
 
 const { contracts, namespace } = Tenant.current();
 
@@ -26,20 +27,18 @@ export const getProposalTypesFromDaoNode = async () => {
 };
 
 
-export const getProposalsFromDaoNode = async (
-  skip : number,
-  take : number,
+export const getAllProposalsFromDaoNode = async (
   filter : string
 ) => {
 
   const url = getDaoNodeURLForNamespace(namespace);
 
-  console.log("url", url);
-
   try {
     const response = await fetch(
       `${url}v1/proposals` //?set=${filter}`
     );
+
+    const startTime = Date.now();
 
     if (!response.ok) {
       throw new Error(`API responded with status: ${response.status} (${url})`);
@@ -47,22 +46,28 @@ export const getProposalsFromDaoNode = async (
 
     const data = await response.json() as {proposals: any[]};
 
-    console.log("data.proposals", data.proposals);
-    console.log("type of data.proposals:", typeof data.proposals);
-    console.log("is array:", Array.isArray(data.proposals));
-
     // Ensure we have an array to work with
     const proposalsArray = Array.isArray(data.proposals) ? data.proposals : [];
-
-    const slicedData = proposalsArray.slice(skip, skip + take);
     
-    return slicedData;
+    const endTime = Date.now();
+    
+    console.log(`getAllProposalsFromDaoNode took ${endTime - startTime}ms`);
+    
+    return proposalsArray;
 
   } catch (error) {
     console.error("Failed to fetch from DAO Node API:", error);
     throw error;
   }
 }
+
+export const getCachedAllProposalsFromDaoNode = cache(getAllProposalsFromDaoNode);
+
+export const getProposalsFromDaoNode = async (skip: number, take: number, filter: string) => {
+  console.log(`getProposalsFromDaoNode: skip=${skip}, take=${take}, filter=${filter}`);
+  return (await getCachedAllProposalsFromDaoNode(filter)).slice(skip, take);
+} 
+
   /* 
 
    DB RECORD RESPONSE:
