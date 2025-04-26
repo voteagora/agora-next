@@ -2,7 +2,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
 import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
 import { getPublicClient } from "@/lib/viem";
-import { findVotableSupply } from "@/lib/prismaUtils";
+import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 
 async function getMetrics() {
   const { namespace, contracts, ui } = Tenant.current();
@@ -26,14 +26,11 @@ async function getMetrics() {
 
     const [totalSupply, votableSupply] = await Promise.all([
       getTotalSupply(),
-      findVotableSupply({
-        namespace,
-        address: contracts.token.address,
-      }),
+      fetchVotableSupply(),
     ]);
 
     return {
-      votableSupply: votableSupply?.votable_supply || "0",
+      votableSupply: votableSupply || "0",
       totalSupply: totalSupply.toString(),
     };
   } catch (e) {
