@@ -29,7 +29,6 @@ import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
 import { getPublicClient } from "@/lib/viem";
 import { getProposalTypesFromDaoNode, getProposalsFromDaoNode } from "@/app/lib/dao-node/client";
-import Decimal from "decimal.js";
 
 interface DAONodeAPIResponse {
   block_number: number;
@@ -165,12 +164,12 @@ async function getProposals({
           { name: "getProposals" },
           async () => {
 
-            const useRestApi =
+            const useDaoNode =
               ui.toggle("use-daonode-for-proposals")?.enabled ?? false;
 
             let proposalsResult;
             
-            if (useRestApi) {
+            if (useDaoNode) {
                 proposalsResult = await paginateResult(
                   async (skip: number, take: number) => {
 
@@ -181,13 +180,9 @@ async function getProposals({
                         filter
                       );
 
-                      const startTime = Date.now();
-
+                      // this takes 0ms for Uniswap.  It's gross, but
+                      // not slow.
                       const out = result.map(adaptDAONodeResponse);
-
-                      const endTime = Date.now();
-
-                      console.log(`adaptDAONodeResponse took ${endTime - startTime}ms`);
 
                       return out
                     } catch (error) {
