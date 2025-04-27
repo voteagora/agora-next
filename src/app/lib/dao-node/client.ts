@@ -1,8 +1,83 @@
+import { ProposalPayloadFromDAONode, ProposalPayloadFromDB } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
+import { PaginatedResult } from "../pagination";
+import { ProposalType } from "@prisma/client";
 
 const { contracts, namespace } = Tenant.current();
+
+function adaptDAONodeResponse(
+  apiResponse: ProposalPayloadFromDAONode
+): ProposalPayloadFromDB {
+  const votingModuleName = apiResponse.voting_module_name;
+
+  let proposalResults;
+
+  if (votingModuleName == "standard") {
+    proposalResults = {
+      standard: {
+        "0": BigInt(apiResponse.totals["no-param"]?.["0"] ?? "0"),
+        "1": BigInt(apiResponse.totals["no-param"]?.["1"] ?? "0"),
+        "2": BigInt(apiResponse.totals["no-param"]?.["2"] ?? "0"),
+      },
+      approval: null,
+    };
+  } else if (votingModuleName == "approval") {
+    const approvalVotes = Object.entries(apiResponse.totals)
+      .filter(([key]) => key !== "no-param")
+      .map(([param, votes]) => ({
+        param,
+        votes: BigInt(votes["1"]),
+      }));
+
+    proposalResults = {
+      approval: approvalVotes,
+      standard: {
+        "0": BigInt(apiResponse.totals["no-param"]?.["0"] ?? "0"),
+        "1": approvalVotes.reduce((sum, vote) => sum + vote.votes, BigInt(0)),
+        "2": BigInt(apiResponse.totals["no-param"]?.["2"] ?? "0"),
+      },
+    };
+  } else if (votingModuleName == "optimistic") {
+    proposalResults = {
+      standard: {
+        "0": BigInt(apiResponse.totals["no-param"]?.["0"] ?? "0"),
+      },
+      approval: null,
+    };
+  } else {
+    throw new Error(`Unknown voting module name: ${votingModuleName}`);
+  }
+
+  return {
+    proposal_id: apiResponse.id,
+    proposer: apiResponse.proposer.toLowerCase(),
+    description: apiResponse.description,
+    created_block: BigInt(apiResponse.block_number),
+    start_block: apiResponse.start_block.toString(),
+    end_block: apiResponse.end_block.toString(),
+    cancelled_block: apiResponse.cancel_event
+    ? BigInt(apiResponse.cancel_event.block_number)
+    : null,
+    executed_block: apiResponse.execute_event
+      ? BigInt(apiResponse.execute_event.block_number)
+      : null,
+    queued_block: apiResponse.queue_event
+      ? BigInt(apiResponse.queue_event.block_number)
+      : null,
+    proposal_data: {
+      values: apiResponse.values,
+      targets: apiResponse.targets,
+      calldatas: apiResponse.calldatas,
+      signatures: apiResponse.signatures,
+    },
+    proposal_type: apiResponse.voting_module_name.toUpperCase() as ProposalType,
+    proposal_type_data: null,
+    proposal_results: proposalResults,
+  };
+}
+
 
 export const getDaoNodeURLForNamespace = (namespace: string) => {
   const url = process.env.DAONODE_URL_TEMPLATE;
@@ -176,16 +251,26 @@ export const getProposalsFromDaoNode = async (
   skip: number,
   take: number,
   filter: string
-) => {
-  let out = await getCachedAllProposalsFromDaoNode();
+) : Promise<ProposalPayloadFromDAONode[]> => {
+  let data = await getCachedAllProposalsFromDaoNode();
 
   if (filter == "relevant") {
-    out = out.filter((proposal) => {
+    data = data.filter((proposal) => {
       return !proposal.cancel_event;
     });
   }
 
-  return out.slice(skip, skip + take);
+  // const has_next: boolean = data.length > skip + take;
+  // const total_returned: number = data.length;
+  // const next_offset: number = skip + take;
+
+  // this takes 0ms for Uniswap.  It's gross, but
+  // not slow.
+  data = data.slice(skip, skip + take)
+  
+  data = data.map(adaptDAONodeResponse);
+
+  return data;
 };
 
 /* 
