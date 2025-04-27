@@ -75,6 +75,13 @@ function adaptDAONodeResponse(
     proposal_type: apiResponse.voting_module_name.toUpperCase() as ProposalType,
     proposal_type_data: null,
     proposal_results: proposalResults,
+    
+    proposal_data_raw: null,
+
+    created_transaction_hash: null,
+    cancelled_transaction_hash: null,
+    queued_transaction_hash: null,
+    executed_transaction_hash: null
   };
 }
 
