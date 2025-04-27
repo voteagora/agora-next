@@ -7,15 +7,15 @@ import { getVotableSupplyFromDaoNode } from "@/app/lib/dao-node/client";
 async function getVotableSupply() {
   const { namespace, contracts, ui } = Tenant.current();
   const address = contracts.token.address;
-  
-  const useDaoNode = ui.toggle("use-daonode-for-votable-supply")?.enabled ?? false;
+
+  const useDaoNode =
+    ui.toggle("use-daonode-for-votable-supply")?.enabled ?? false;
 
   try {
-
     if (useDaoNode) {
       return await getVotableSupplyFromDaoNode();
     }
-    
+
     const votableSupply = await findVotableSupply({ namespace, address });
     return votableSupply?.votable_supply || "0";
   } catch (error) {
