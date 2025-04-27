@@ -15,8 +15,8 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
-import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import { Proposal, ProposalPayload } from "./proposal";
+import { ProposalStage as PrismaProposalStage, ProposalType } from "@prisma/client";
+import { Proposal, ProposalPayload, ProposalPayloadFromDAONode, ProposalPayloadFromDB } from "./proposal";
 import { doInSpan } from "@/app/lib/logging";
 import {
   findProposal,
@@ -33,116 +33,6 @@ import {
   getProposalsFromDaoNode,
 } from "@/app/lib/dao-node/client";
 
-interface DAONodeAPIResponse {
-  block_number: number;
-  transaction_index: number;
-  log_index: number;
-  id: string;
-  proposer: string;
-  targets: string[];
-  values: number[];
-  signatures: string[];
-  calldatas: string[];
-  start_block: number;
-  end_block: number;
-  description: string;
-  queue_event?: {
-    block_number: number;
-    transaction_index: number;
-    log_index: number;
-    id: string;
-    eta: number;
-  };
-  execute_event?: {
-    block_number: number;
-    transaction_index: number;
-    log_index: number;
-    id: string;
-  };
-  totals: Record<string, string>;
-  voting_module_name: string;
-}
-
-function adaptDAONodeResponse(
-  apiResponse: DAONodeAPIResponse
-): ProposalPayload {
-  const votingModuleName = apiResponse.voting_module_name;
-
-  let proposalResults;
-
-  if (votingModuleName == "standard") {
-    proposalResults = {
-      standard: {
-        "0": BigInt(apiResponse.totals["no-param"]?.["0"] ?? "0"),
-        "1": BigInt(apiResponse.totals["no-param"]?.["1"] ?? "0"),
-        "2": BigInt(apiResponse.totals["no-param"]?.["2"] ?? "0"),
-      },
-      approval: null,
-    };
-  } else if (votingModuleName == "approval") {
-    const approvalVotes = Object.entries(apiResponse.totals)
-      .filter(([key]) => key !== "no-param")
-      .map(([param, votes]) => ({
-        param,
-        votes: BigInt(votes["1"]),
-      }));
-
-    proposalResults = {
-      approval: approvalVotes,
-      standard: {
-        "0": BigInt(apiResponse.totals["no-param"]?.["0"] ?? "0"),
-        "1": approvalVotes.reduce((sum, vote) => sum + vote.votes, BigInt(0)),
-        "2": BigInt(apiResponse.totals["no-param"]?.["2"] ?? "0"),
-      },
-    };
-  } else if (votingModuleName == "optimistic") {
-    proposalResults = {
-      standard: {
-        "0": BigInt(apiResponse.totals["no-param"]?.["0"] ?? "0"),
-      },
-      approval: null,
-    };
-  } else {
-    throw new Error(`Unknown voting module name: ${votingModuleName}`);
-  }
-
-  return {
-    proposal_id: apiResponse.id,
-    contract: null,
-    proposer: apiResponse.proposer.toLowerCase(),
-    description: apiResponse.description,
-    ordinal: null,
-    created_block: BigInt(apiResponse.block_number),
-    start_block: apiResponse.start_block.toString(),
-    end_block: apiResponse.end_block.toString(),
-    cancelled_block: null,
-    executed_block: apiResponse.execute_event
-      ? BigInt(apiResponse.execute_event.block_number)
-      : null,
-    queued_block: apiResponse.queue_event
-      ? BigInt(apiResponse.queue_event.block_number)
-      : null,
-    proposal_data: {
-      values: apiResponse.values,
-      targets: apiResponse.targets,
-      calldatas: apiResponse.calldatas,
-      signatures: apiResponse.signatures,
-    },
-    proposal_data_raw: JSON.stringify({
-      values: apiResponse.values,
-      targets: apiResponse.targets,
-      calldatas: apiResponse.calldatas,
-      signatures: apiResponse.signatures,
-    }),
-    proposal_type: apiResponse.voting_module_name.toUpperCase(),
-    proposal_type_data: null,
-    proposal_results: proposalResults,
-    created_transaction_hash: null,
-    cancelled_transaction_hash: null,
-    queued_transaction_hash: null,
-    executed_transaction_hash: null,
-  };
-}
 
 async function getProposals({
   filter,
@@ -175,11 +65,7 @@ async function getProposals({
                       filter
                     );
 
-                    // this takes 0ms for Uniswap.  It's gross, but
-                    // not slow.
-                    const out = result.map(adaptDAONodeResponse);
-
-                    return out;
+                    return (result as unknown) as ProposalPayload[];
                   } catch (error) {
                     console.warn("REST API failed, falling back to DB:", error);
                   }
@@ -192,25 +78,28 @@ async function getProposals({
                     contract: contracts.governor.address,
                   });
 
-                  return result;
+                  return result as ProposalPayload[];
                 },
                 pagination
               );
             } else {
               proposalsResult = await paginateResult(
-                (skip: number, take: number) =>
-                  findProposalsQueryFromDB({
+                async (skip: number, take: number) => {
+                  const result = await findProposalsQueryFromDB({
                     namespace,
                     skip,
                     take,
                     filter,
                     contract: contracts.governor.address,
-                  }),
+                  });
+
+                  return result as ProposalPayload[];
+                },
                 pagination
               );
             }
 
-            return proposalsResult;
+            return proposalsResult as PaginatedResult<ProposalPayload[]>;
           }
         );
 
