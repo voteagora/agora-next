@@ -105,7 +105,6 @@ export type ProposalPayloadFromDB = {
 
   proposer: string;
   description: string | null;
-
   created_block: bigint | null;
   start_block: string;
   end_block: string | null;

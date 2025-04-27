@@ -15,10 +15,7 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
-import {
-  ProposalStage as PrismaProposalStage,
-  ProposalType,
-} from "@prisma/client";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import { Proposal, ProposalPayload } from "./proposal";
 import { doInSpan } from "@/app/lib/logging";
 import {

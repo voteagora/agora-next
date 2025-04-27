@@ -270,6 +270,32 @@ export const getCachedAllProposalsFromDaoNode = cache(
 //revalidate: 15, // seconds
 //});
 
+export const getProposalsFromDaoNode = async (
+  skip: number,
+  take: number,
+  filter: string
+): Promise<ProposalPayloadFromDAONode[]> => {
+  let data = await getCachedAllProposalsFromDaoNode();
+
+  if (filter == "relevant") {
+    data = data.filter((proposal) => {
+      return !proposal.cancel_event;
+    });
+  }
+
+  // const has_next: boolean = data.length > skip + take;
+  // const total_returned: number = data.length;
+  // const next_offset: number = skip + take;
+
+  // this takes 0ms for Uniswap.  It's gross, but
+  // not slow.
+  data = data.slice(skip, skip + take);
+
+  data = data.map(adaptDAONodeResponse);
+
+  return data;
+};
+
 /* 
 
    DB RECORD RESPONSE:
