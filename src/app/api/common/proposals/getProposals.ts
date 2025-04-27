@@ -28,7 +28,10 @@ import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
 import { getPublicClient } from "@/lib/viem";
-import { getProposalTypesFromDaoNode, getProposalsFromDaoNode } from "@/app/lib/dao-node/client";
+import {
+  getProposalTypesFromDaoNode,
+  getProposalsFromDaoNode,
+} from "@/app/lib/dao-node/client";
 
 interface DAONodeAPIResponse {
   block_number: number;
@@ -63,48 +66,42 @@ interface DAONodeAPIResponse {
 function adaptDAONodeResponse(
   apiResponse: DAONodeAPIResponse
 ): ProposalPayload {
-
-  const votingModuleName = apiResponse.voting_module_name
+  const votingModuleName = apiResponse.voting_module_name;
 
   let proposalResults;
-  
-  if (votingModuleName == 'standard') {
 
+  if (votingModuleName == "standard") {
     proposalResults = {
       standard: {
-        "0": BigInt(apiResponse.totals['no-param']?.['0'] ?? '0'),
-        "1": BigInt(apiResponse.totals['no-param']?.['1'] ?? '0'),
-        "2": BigInt(apiResponse.totals['no-param']?.['2'] ?? '0')
+        "0": BigInt(apiResponse.totals["no-param"]?.["0"] ?? "0"),
+        "1": BigInt(apiResponse.totals["no-param"]?.["1"] ?? "0"),
+        "2": BigInt(apiResponse.totals["no-param"]?.["2"] ?? "0"),
       },
-      approval: null
-    }
-
-  } else if (votingModuleName == 'approval') {
-
+      approval: null,
+    };
+  } else if (votingModuleName == "approval") {
     const approvalVotes = Object.entries(apiResponse.totals)
-      .filter(([key]) => key !== 'no-param')
+      .filter(([key]) => key !== "no-param")
       .map(([param, votes]) => ({
         param,
-        votes: BigInt(votes['1'])
+        votes: BigInt(votes["1"]),
       }));
-    
+
     proposalResults = {
       approval: approvalVotes,
       standard: {
-        "0": BigInt(apiResponse.totals['no-param']?.['0'] ?? '0'),
+        "0": BigInt(apiResponse.totals["no-param"]?.["0"] ?? "0"),
         "1": approvalVotes.reduce((sum, vote) => sum + vote.votes, BigInt(0)),
-        "2": BigInt(apiResponse.totals['no-param']?.['2'] ?? '0')
-      }
+        "2": BigInt(apiResponse.totals["no-param"]?.["2"] ?? "0"),
+      },
     };
-  } else if (votingModuleName == 'optimistic') {
-    
+  } else if (votingModuleName == "optimistic") {
     proposalResults = {
       standard: {
-        "0": BigInt(apiResponse.totals['no-param']?.['0'] ?? '0'),
+        "0": BigInt(apiResponse.totals["no-param"]?.["0"] ?? "0"),
       },
-      approval: null
-    }
-
+      approval: null,
+    };
   } else {
     throw new Error(`Unknown voting module name: ${votingModuleName}`);
   }
@@ -163,45 +160,43 @@ async function getProposals({
         const getProposalsExecution = doInSpan(
           { name: "getProposals" },
           async () => {
-
             const useDaoNode =
               ui.toggle("use-daonode-for-proposals")?.enabled ?? false;
 
             let proposalsResult;
-            
+
             if (useDaoNode) {
-                proposalsResult = await paginateResult(
-                  async (skip: number, take: number) => {
+              proposalsResult = await paginateResult(
+                async (skip: number, take: number) => {
+                  try {
+                    const result = await getProposalsFromDaoNode(
+                      skip,
+                      take,
+                      filter
+                    );
 
-                    try {
-                      const result = await getProposalsFromDaoNode(
-                        skip,
-                        take,
-                        filter
-                      );
+                    // this takes 0ms for Uniswap.  It's gross, but
+                    // not slow.
+                    const out = result.map(adaptDAONodeResponse);
 
-                      // this takes 0ms for Uniswap.  It's gross, but
-                      // not slow.
-                      const out = result.map(adaptDAONodeResponse);
+                    return out;
+                  } catch (error) {
+                    console.warn("REST API failed, falling back to DB:", error);
+                  }
 
-                      return out
-                    } catch (error) {
-                        console.warn("REST API failed, falling back to DB:", error);
-                    }
+                  const result = await findProposalsQueryFromDB({
+                    namespace,
+                    skip,
+                    take,
+                    filter,
+                    contract: contracts.governor.address,
+                  });
 
-                    const result = await findProposalsQueryFromDB({
-                          namespace,
-                          skip,
-                          take,
-                          filter,
-                          contract: contracts.governor.address,
-                        });
-
-                    return result;
-                  },
-                  pagination
-                );
-              } else {
+                  return result;
+                },
+                pagination
+              );
+            } else {
               proposalsResult = await paginateResult(
                 (skip: number, take: number) =>
                   findProposalsQueryFromDB({

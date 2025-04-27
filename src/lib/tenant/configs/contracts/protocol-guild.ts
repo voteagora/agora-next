@@ -80,10 +80,7 @@ export const protocolGuildTenantContractConfig = ({
       abi: ProposalTypesConfigurator__factory.abi,
       address: TYPES,
       chain,
-      contract: ProposalTypesConfigurator__factory.connect(
-        TYPES,
-        provider
-      ),
+      contract: ProposalTypesConfigurator__factory.connect(TYPES, provider),
       provider,
     }),
 
