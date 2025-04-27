@@ -1,4 +1,5 @@
 import Tenant from "@/lib/tenant/tenant";
+import { unstable_cache } from "next/cache";
 import { cache } from "react";
 
 const { contracts, namespace } = Tenant.current();
@@ -28,24 +29,31 @@ export const getAllProposalsFromDaoNode = async () => {
   const url = getDaoNodeURLForNamespace(namespace);
 
   try {
+
+    const startTime = Date.now();
+
+    const emoji = ["😀", "😂", "😍", "😎", "🤔", "🙌", "🎉", "🚀", "🌟", "🐶", "🐱", "🐼", "🍕", "🍔", "🍣", "🍩", "⚽", "🏀", "🎮", "🎵", "📚", "✈️", "🌍", "🌈", "🔥", "💎", "🧠", "🕺", "💃", "🥳", "🤖", "👑"][Math.floor(Math.random() * 32)];
+    const startTimeS = new Date(startTime).toLocaleString();
+
+    console.log(`${startTimeS} ${emoji} -> getAllProposalsFromDaoNode`);
+
     const response = await fetch(
       `${url}v1/proposals?set=everything` //?set=${filter}`
     );
-
-    const startTime = Date.now();
 
     if (!response.ok) {
       throw new Error(`API responded with status: ${response.status} (${url})`);
     }
 
+
     const data = await response.json() as {proposals: any[]};
 
-    // Ensure we have an array to work with
     const proposalsArray = Array.isArray(data.proposals) ? data.proposals : [];
     
     const endTime = Date.now();
-    
-    console.log(`getAllProposalsFromDaoNode took ${endTime - startTime}ms`);
+    const endTimeS = new Date(endTime).toLocaleString();
+
+    console.log(`${endTimeS} ${emoji} <- getAllProposalsFromDaoNode took ${endTime - startTime}ms`);
     
     return proposalsArray;
 
@@ -55,11 +63,52 @@ export const getAllProposalsFromDaoNode = async () => {
   }
 }
 
-export const getCachedAllProposalsFromDaoNode = cache(getAllProposalsFromDaoNode);
+export const getVotableSupplyFromDaoNode = async () => {
+
+  const url = getDaoNodeURLForNamespace(namespace);
+
+  try {
+
+
+    const startTime = Date.now();
+
+    const response = await fetch(
+      `${url}v1/voting_power`
+    );
+
+    const emoji = ["😀", "😂", "😍", "😎", "🤔", "🙌", "🎉", "🚀", "🌟", "🐶", "🐱", "🐼", "🍕", "🍔", "🍣", "🍩", "⚽", "🏀", "🎮", "🎵", "📚", "✈️", "🌍", "🌈", "🔥", "💎", "🧠", "🕺", "💃", "🥳", "🤖", "👑"][Math.floor(Math.random() * 32)];
+    const startTimeS = new Date(startTime).toLocaleString();
+
+    console.log(`${startTimeS} ${emoji} -> getVotableSupplyFromDaoNode`);
+
+    if (!response.ok) {
+      throw new Error(`API responded with status: ${response.status} (${url})`);
+    }
+
+    const data = await response.json() as {voting_power: string};
+
+    const votableSupply = data.voting_power;
+    
+    const endTime = Date.now();
+    const endTimeS = new Date(endTime).toLocaleString();
+
+    console.log(`${endTimeS} ${emoji} <- getVotableSupplyFromDaoNode took ${endTime - startTime}ms`);
+    
+    return votableSupply;
+
+  } catch (error) {
+    console.error("Failed to fetch from DAO Node API:", error);
+    throw error;
+  }
+}
+
+export const getCachedAllProposalsFromDaoNode = cache(getAllProposalsFromDaoNode) //, [], {
+  //tags: ["getAllProposalsFromDaoNode"],
+  //revalidate: 15, // seconds
+//});
 
 export const getProposalsFromDaoNode = async (skip: number, take: number, filter: string) => {
-  console.log(`getProposalsFromDaoNode: skip=${skip}, take=${take}, filter=${filter}`);
-
+  
   let out = (await getCachedAllProposalsFromDaoNode())
 
   if (filter == 'relevant') {
