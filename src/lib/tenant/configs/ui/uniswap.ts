@@ -288,6 +288,10 @@ export const uniswapTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "use-daonode-for-votable-supply",
+      enabled: true,
+    },
+    {
       name: "proposal-lifecycle",
       enabled: true,
       config: {
