@@ -101,6 +101,12 @@ export type ProposalPayloadFromDB = {
   proposal_results: Prisma.JsonValue | null;
   proposal_type: ProposalType;
   proposal_type_data:  Prisma.JsonValue | null;
+  proposal_data_raw: string | null;
+
+  created_transaction_hash: string | null
+  cancelled_transaction_hash: string | null
+  queued_transaction_hash: string | null
+  executed_transaction_hash: string | null
 };
 
 export type ProposalPayload = ProposalPayloadFromDB | lineaProposals;
