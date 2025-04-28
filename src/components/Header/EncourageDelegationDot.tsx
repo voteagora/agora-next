@@ -7,7 +7,7 @@ import { useAccount } from "wagmi";
 const EncourageDelegationDot = ({ className }: { className?: string }) => {
   const { tokenBalance, delegate, delegatees } = useProfileData();
   const { address } = useAccount();
-  const hasDelegated = !delegatees?.length;
+  const hasDelegated = !!delegatees?.length;
   const canEncourageDelegationBecauseOfVP =
     tokenBalance !== BigInt(0) && delegate?.votingPower?.total === "0";
 
