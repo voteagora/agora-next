@@ -248,7 +248,7 @@ export function ShareDialog({
     thresholdPosition: number;
     isApproved: boolean;
   }[];
-  votes: Vote[];
+  votes: Vote[] | null;
 }) {
   const { address: accountAddress } = useAccount();
   const latestBlock = useLatestBlock({ enabled: true });

@@ -271,7 +271,7 @@ export function getVpToDisplay(
 
 type VoteMetadataParams = {
   proposal: Proposal;
-  votes?: Vote[];
+  votes?: Vote[] | null;
   votableSupply?: string;
   address?: string;
   newVote?: Pick<Vote, "support" | "reason" | "weight" | "params">;
