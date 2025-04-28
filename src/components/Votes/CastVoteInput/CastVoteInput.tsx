@@ -53,7 +53,7 @@ export default function CastVoteInput({
   const { setOpen } = useModal();
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
-  const { data, isSuccess } = useFetchAllForVoting({
+  const { data, isSuccess, isPending } = useFetchAllForVoting({
     proposal,
     blockNumber: isOptimismTenant ? proposal.snapshotBlockNumber : undefined,
   });
@@ -74,7 +74,7 @@ export default function CastVoteInput({
     );
   }
 
-  if (!isSuccess || !chains || !delegate || !votes || !votingPower) {
+  if (isPending) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
         <DisabledVoteButton reason="Loading..." />
@@ -82,7 +82,7 @@ export default function CastVoteInput({
     );
   }
 
-  if (!delegate.statement) {
+  if (isSuccess && !delegate?.statement) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
         <NoStatementView />
@@ -93,15 +93,15 @@ export default function CastVoteInput({
   return (
     <CastVoteContextProvider
       proposal={proposal}
-      votes={votes}
-      chains={chains}
-      votingPower={votingPower}
+      votes={votes ?? null}
+      chains={chains ?? null}
+      votingPower={votingPower ?? null}
       votableSupply={votableSupply}
     >
       <CastVoteInputContent
         proposal={proposal}
-        votes={votes}
-        votingPower={votingPower}
+        votes={votes ?? null}
+        votingPower={votingPower ?? null}
         isOptimistic={isOptimistic}
       />
     </CastVoteContextProvider>
@@ -115,8 +115,8 @@ function CastVoteInputContent({
   isOptimistic,
 }: {
   proposal: Proposal;
-  votes: Vote[];
-  votingPower: VotingPowerData;
+  votes: Vote[] | null;
+  votingPower: VotingPowerData | null;
   isOptimistic: boolean;
 }) {
   const {
@@ -135,8 +135,22 @@ function CastVoteInputContent({
 
   const { ui } = Tenant.current();
 
-  const missingVote = checkMissingVoteForDelegate(votes, votingPower);
-  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+  const missingVote = checkMissingVoteForDelegate(
+    votes ?? [],
+    votingPower ?? {
+      advancedVP: "0",
+      directVP: "0",
+      totalVP: "0",
+    }
+  );
+  const vpToDisplay = getVpToDisplay(
+    votingPower ?? {
+      advancedVP: "0",
+      directVP: "0",
+      totalVP: "0",
+    },
+    missingVote
+  );
 
   const showSuccessMessage = isSuccess || missingVote === "NONE";
 
@@ -154,7 +168,8 @@ function CastVoteInputContent({
     isGasRelayEnabled &&
     Number(formatEther(sponsorBalance || 0n)) >=
       Number(gasRelayConfig.minBalance) &&
-    Number(votingPower.totalVP) > Number(gasRelayConfig?.minVPToUseGasRelay) &&
+    Number(votingPower?.totalVP ?? "0") >
+      Number(gasRelayConfig?.minVPToUseGasRelay) &&
     !reason;
 
   return (
@@ -188,8 +203,14 @@ function CastVoteInputContent({
               {!isLoading && proposal.status === "ACTIVE" && (
                 <VoteSubmitButton
                   supportType={support}
-                  votingPower={votingPower}
-                  missingVote={checkMissingVoteForDelegate(votes, votingPower)}
+                  votingPower={
+                    votingPower ?? {
+                      advancedVP: "0",
+                      directVP: "0",
+                      totalVP: "0",
+                    }
+                  }
+                  missingVote={missingVote}
                   proposal={proposal}
                 />
               )}
@@ -369,7 +390,7 @@ export function SuccessMessage({
   votingPower,
 }: {
   proposal: Proposal;
-  votes: Vote[];
+  votes: Vote[] | null;
   className?: string;
   votingPower?: string;
 }) {
@@ -381,13 +402,13 @@ export function SuccessMessage({
   const openDialog = useOpenDialog();
   const { data: votableSupply } = useVotableSupply({ enabled: true });
 
-  const lastVote = votes[votes.length - 1];
+  const lastVote = votes?.[votes.length - 1];
 
   const newVote = {
     support: supportFromContext || lastVote?.support,
     reason: reasonFromContext || lastVote?.reason || "",
     params: lastVote?.params || [],
-    weight: votingPower || lastVote?.weight,
+    weight: votingPower || lastVote?.weight || "",
   };
 
   const {

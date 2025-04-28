@@ -43,11 +43,29 @@ const makePrismaClient = (databaseUrl: string) => {
     args: any,
     operation: string
   ) => {
-    return await time_this(async () => await query(args), {
-      operation,
-      args,
-    });
+    const maxRetries = 2;
+    let lastError: Error | null = null;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await time_this(async () => await query(args), {
+          operation,
+          args,
+        });
+      } catch (error) {
+        lastError = error as Error;
+        if (error instanceof Error && error.message.includes("P1017")) {
+          if (attempt < maxRetries) {
+            await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+            continue;
+          }
+        }
+        throw error;
+      }
+    }
+    throw lastError;
   };
+
   return new PrismaClient({
     datasources: {
       db: {
@@ -58,11 +76,30 @@ const makePrismaClient = (databaseUrl: string) => {
     query: {
       $allModels: {
         async $allOperations({ operation, model, args, query }) {
-          return await time_this(async () => await query(args), {
-            model,
-            operation,
-            args,
-          });
+          const maxRetries = 2;
+          let lastError: Error | null = null;
+
+          for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+              return await time_this(async () => await query(args), {
+                model,
+                operation,
+                args,
+              });
+            } catch (error) {
+              lastError = error as Error;
+              if (error instanceof Error && error.message.includes("P1017")) {
+                if (attempt < maxRetries) {
+                  await new Promise((resolve) =>
+                    setTimeout(resolve, 1000 * attempt)
+                  );
+                  continue;
+                }
+              }
+              throw error;
+            }
+          }
+          throw lastError;
         },
       },
       async $queryRaw({ args, query, operation }) {

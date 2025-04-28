@@ -185,7 +185,7 @@ export type ShareVoteDialogType = {
       weight: string;
     };
     totalOptions: number;
-    votes: Vote[];
+    votes: Vote[] | null;
     options: {
       description: string;
       votes: string;
@@ -203,7 +203,7 @@ export type ApprovalCastVoteDialogProps = {
   proposal: Proposal;
   hasStatement: boolean;
   votingPower: VotingPowerData;
-  authorityChains: string[][];
+  authorityChains: string[][] | null;
   missingVote: MissingVote;
   closeDialog: () => void;
 };
