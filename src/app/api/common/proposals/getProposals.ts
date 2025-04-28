@@ -161,7 +161,7 @@ async function getProposalTypes() {
       const parsedTypes = Object.entries(typesFromApi.proposal_types)?.map(
         ([proposalTypeId, type]: any) => ({
           ...type,
-          proposal_type_id: Number(proposalTypeId),
+          proposal_type_id: String(proposalTypeId),
           quorum: Number(type.quorum),
           approval_threshold: Number(type.approval_threshold),
           isClientSide: false,
@@ -180,7 +180,7 @@ async function getProposalTypes() {
       const formattedTypes = types.map((type) => {
         return {
           ...type,
-          proposal_type_id: Number(type.proposal_type_id),
+          proposal_type_id: String(type.proposal_type_id),
           quorum: Number(type.quorum),
           approval_threshold: Number(type.approval_threshold),
           isClientSide: false,
@@ -196,7 +196,7 @@ async function getProposalTypes() {
         const scopes =
           typesFromApi?.proposal_types?.[type.proposal_type_id]?.scopes;
         const formattedScopes: {
-          proposal_type_id: number;
+          proposal_type_id: string;
           scope_key: string;
           selector: string;
           description: string;
@@ -269,7 +269,7 @@ async function getProposalTypes() {
 
         return {
           name: type.name,
-          proposal_type_id: Number(type.proposal_type_id),
+          proposal_type_id: String(type.proposal_type_id),
           quorum: Number(type.quorum),
           approval_threshold: Number(type.approval_threshold),
           isClientSide: false,
