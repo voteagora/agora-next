@@ -315,5 +315,13 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
         gatingType: ProposalGatingType?.MANAGER,
       },
     },
+    {
+      name: "use-daonode-for-proposals",
+      enabled: true,
+    },
+    {
+      name: "use-daonode-for-votable-supply",
+      enabled: true,
+    },
   ],
 });
