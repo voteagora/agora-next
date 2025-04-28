@@ -105,11 +105,13 @@ export default function ApprovalCastVoteButton({ proposal }: Props) {
           proposal={proposal}
           delegateVotes={data?.votes ?? []}
           isReady={isSuccess}
-          votingPower={data?.votingPower ?? {
-            advancedVP: "0",
-            directVP: "0",
-            totalVP: "0",
-          }}
+          votingPower={
+            data?.votingPower ?? {
+              advancedVP: "0",
+              directVP: "0",
+              totalVP: "0",
+            }
+          }
         />
       </VStack>
     </VStack>
