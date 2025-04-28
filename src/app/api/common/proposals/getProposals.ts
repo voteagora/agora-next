@@ -26,8 +26,9 @@ import {
 } from "@/lib/prismaUtils";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
-
 import { unstable_cache } from "next/cache";
+import { getPublicClient } from "@/lib/viem";
+import { getProposalTypesFromDaoNode } from "@/app/lib/dao-node/client";
 
 async function getProposals({
   filter,
@@ -146,14 +147,139 @@ async function getProposalTypes() {
   return withMetrics("getProposalTypes", async () => {
     const { namespace, contracts } = Tenant.current();
 
-    if (!contracts.proposalTypesConfigurator) {
+    const configuratorContract = contracts.proposalTypesConfigurator;
+
+    if (!configuratorContract) {
       return [];
     }
 
-    return await findProposalType({
-      namespace,
-      contract: contracts.proposalTypesConfigurator.address,
-    });
+    let types = [];
+
+    const typesFromApi = await getProposalTypesFromDaoNode();
+
+    if (typesFromApi) {
+      const parsedTypes = Object.entries(typesFromApi.proposal_types)?.map(
+        ([proposalTypeId, type]: any) => ({
+          ...type,
+          proposal_type_id: Number(proposalTypeId),
+          quorum: Number(type.quorum),
+          approval_threshold: Number(type.approval_threshold),
+          isClientSide: false,
+          module: type.module,
+        })
+      );
+      types = parsedTypes;
+    } else {
+      types = await findProposalType({
+        namespace,
+        contract: configuratorContract.address,
+      });
+    }
+
+    if (!contracts.supportScopes) {
+      const formattedTypes = types.map((type) => {
+        return {
+          ...type,
+          proposal_type_id: Number(type.proposal_type_id),
+          quorum: Number(type.quorum),
+          approval_threshold: Number(type.approval_threshold),
+          isClientSide: false,
+          module: type.module,
+          scopes: [],
+        };
+      });
+      return formattedTypes;
+    }
+
+    const formattedTypes = await Promise.all(
+      types.map(async (type) => {
+        const scopes =
+          typesFromApi?.proposal_types?.[type.proposal_type_id]?.scopes;
+        const formattedScopes: {
+          proposal_type_id: number;
+          scope_key: string;
+          selector: string;
+          description: string;
+          disabled_event: string;
+          deleted_event: string;
+          status: string;
+        }[] = scopes
+          ? scopes
+              .filter((scope: any) => scope.status === "created")
+              .reduce((unique: any[], scope: any) => {
+                if (!unique.find((s) => s.scope_key === scope.scope_key)) {
+                  unique.push({
+                    proposal_type_id: type.proposal_type_id,
+                    scope_key: scope.scope_key,
+                    selector: scope.selector,
+                    description: scope.description,
+                    disabled_event: scope.disabled_event,
+                    deleted_event: scope.deleted_event,
+                    status: scope.status,
+                  });
+                }
+                return unique;
+              }, [])
+          : [];
+
+        const enriched = await Promise.all(
+          formattedScopes?.map(async (scope) => {
+            const config = {
+              address: configuratorContract?.address as `0x${string}`,
+              abi: configuratorContract?.abi,
+              functionName: "assignedScopes",
+              args: [scope.proposal_type_id, `0x${scope.scope_key}`],
+              chainId: configuratorContract?.chain.id,
+            };
+            const client = getPublicClient();
+            const contractData = await client.readContract(config);
+
+            if (!contractData) {
+              return {
+                ...scope,
+                parameters: [],
+                comparators: [],
+                types: [],
+                exists: false,
+              };
+            }
+
+            const scopes = contractData as any[];
+
+            if (!scopes.length) {
+              return {
+                ...scope,
+                parameters: [],
+                comparators: [],
+                types: [],
+                exists: false,
+              };
+            }
+
+            return scopes.map((scope) => ({
+              ...scope,
+              scope_key: scope.key,
+              parameters: scope.parameters || [],
+              comparators: scope.comparators || [],
+              types: scope.types || [],
+              exists: scope.exists || false,
+            }));
+          })
+        );
+
+        return {
+          name: type.name,
+          proposal_type_id: Number(type.proposal_type_id),
+          quorum: Number(type.quorum),
+          approval_threshold: Number(type.approval_threshold),
+          isClientSide: false,
+          module: type.module,
+          scopes: enriched?.flat(),
+        };
+      })
+    );
+
+    return formattedTypes;
   });
 }
 

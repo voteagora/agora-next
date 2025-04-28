@@ -1,7 +1,7 @@
 import {
   AgoraGovernor_11__factory,
   AgoraTimelock__factory,
-  ProposalTypesConfigurator__factory,
+  ProposalTypesConfiguratorScopes__factory,
   Membership__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
@@ -77,10 +77,13 @@ export const protocolGuildTenantContractConfig = ({
     }),
 
     proposalTypesConfigurator: new TenantContract<BaseContract>({
-      abi: ProposalTypesConfigurator__factory.abi,
+      abi: ProposalTypesConfiguratorScopes__factory.abi,
       address: TYPES,
       chain,
-      contract: ProposalTypesConfigurator__factory.connect(TYPES, provider),
+      contract: ProposalTypesConfiguratorScopes__factory.connect(
+        TYPES,
+        provider
+      ),
       provider,
     }),
 

@@ -13,7 +13,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { XCircle } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import { XCircle, PlusCircle, ChevronsUpDown } from "lucide-react";
 import { formatNumber } from "@/lib/utils";
 import {
   useWriteContract,
@@ -26,21 +32,21 @@ import { getVotingModuleTypeForProposalType } from "@/lib/utils";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import { useTotalSupply } from "@/hooks/useTotalSupply";
 import { formatUnits } from "viem";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Separator } from "../ui/separator";
+import toast from "react-hot-toast";
+import BlockScanUrls from "../shared/BlockScanUrl";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { ScopeData, FormattedProposalType } from "@/lib/types";
+import { ScopeDetails } from "./ScopeDetails";
 
 type Props = {
-  proposalType: ProposalType;
+  proposalType: FormattedProposalType;
   index: number;
   votableSupply: string;
+  availableScopes: ScopeData[];
   onDelete: (id: number, hash?: string) => void;
   onSuccessSetProposalType: (id: number, hash?: string) => void;
-};
-
-type ProposalType = {
-  quorum: number;
-  approval_threshold: number;
-  name: string;
-  isClientSide: boolean;
 };
 
 const proposalTypeSchema = z.object({
@@ -51,13 +57,26 @@ const proposalTypeSchema = z.object({
 });
 
 export default function ProposalType({
-  proposalType: { quorum, approval_threshold, name, isClientSide },
+  proposalType,
   index,
   votableSupply,
+  availableScopes,
   onDelete,
   onSuccessSetProposalType,
 }: Props) {
+  const { quorum, approval_threshold, name, isClientSide, scopes } =
+    proposalType;
+  const proposalTypeId = index;
+  const openDialog = useOpenDialog();
+
   const { namespace, contracts, token } = Tenant.current();
+  const configuratorContract = contracts.proposalTypesConfigurator;
+
+  const [assignedScopes, setAssignedScopes] = useState<ScopeData[]>(
+    scopes ?? []
+  );
+  const [popoverOpen, setPopoverOpen] = useState(false);
+
   const totalSupply = useTotalSupply({
     enabled: namespace === TENANT_NAMESPACES.SCROLL,
   });
@@ -99,8 +118,8 @@ export default function ProposalType({
   deleteProposalTypeArgs.push("0x" + "0".repeat(40));
 
   const { data: deleteProposalTypeConfig } = useSimulateContract({
-    address: contracts.proposalTypesConfigurator!.address as `0x${string}`,
-    abi: contracts.proposalTypesConfigurator!.abi,
+    address: configuratorContract!.address as `0x${string}`,
+    abi: configuratorContract!.abi,
     functionName: "setProposalType",
     args: deleteProposalTypeArgs,
   });
@@ -140,12 +159,47 @@ export default function ProposalType({
     useWaitForTransactionReceipt({
       hash: resultSetProposalType,
     });
+
+  const {
+    data: resultAddScope,
+    writeContractAsync: writeAddScope,
+    isPending: isLoadingAddScope,
+    isSuccess: isSuccessAddScope,
+    error: errorAddScope,
+  } = useWriteContract();
+
+  const { isLoading: isLoadingAddScopeTransaction } =
+    useWaitForTransactionReceipt({
+      hash: resultAddScope,
+    });
+
+  const {
+    data: resultDeleteScope,
+    writeContractAsync: writeDeleteScope,
+    isPending: isLoadingDeleteScope,
+    isSuccess: isSuccessDeleteScope,
+    error: errorDeleteScope,
+  } = useWriteContract();
+
+  const { isLoading: isLoadingDeleteScopeTransaction } =
+    useWaitForTransactionReceipt({
+      hash: resultDeleteScope,
+    });
+
+  // --- Loading States ---
   const isLoading =
     isLoadingDeleteProposalType ||
     isLoadingDeleteProposalTypeTransaction ||
     isLoadingSetProposalType ||
-    isLoadingSetProposalTypeTransaction;
+    isLoadingSetProposalTypeTransaction ||
+    isLoadingAddScope ||
+    isLoadingAddScopeTransaction ||
+    isLoadingDeleteScope ||
+    isLoadingDeleteScopeTransaction;
+
   const isDisabled = isLoading;
+
+  // --- Handlers ---
 
   function onSubmit(values: z.infer<typeof proposalTypeSchema>) {
     const name = values.name;
@@ -171,12 +225,153 @@ export default function ProposalType({
     ];
 
     writeSetProposalType({
-      address: contracts.proposalTypesConfigurator?.address as `0x${string}`,
-      abi: contracts.proposalTypesConfigurator?.abi,
+      address: configuratorContract?.address as `0x${string}`,
+      abi: configuratorContract?.abi,
       functionName: "setProposalType",
       args: setProposalTypeArgs,
     });
   }
+
+  const handleAddScope = async (scopeToAdd: ScopeData) => {
+    setPopoverOpen(false);
+
+    if (!scopeToAdd.selector) {
+      toast.error("Scope has no selector");
+      return;
+    }
+
+    const scopeArg = {
+      key: scopeToAdd.scope_key.startsWith("0x")
+        ? (scopeToAdd.scope_key as `0x${string}`)
+        : (`0x${scopeToAdd.scope_key}` as `0x${string}`),
+      selector: scopeToAdd.selector.startsWith("0x")
+        ? (scopeToAdd.selector as `0x${string}`)
+        : (`0x${scopeToAdd.selector}` as `0x${string}`),
+      parameters: scopeToAdd.parameters || [],
+      comparators: scopeToAdd.comparators || [],
+      types: scopeToAdd.types || [],
+      proposalTypeId: proposalTypeId,
+      description: scopeToAdd.description,
+      exists: true,
+    };
+
+    const addArgs = [BigInt(proposalTypeId), scopeArg];
+
+    try {
+      toast.loading("Adding scope...");
+
+      await writeAddScope(
+        {
+          address: configuratorContract?.address as `0x${string}`,
+          abi: configuratorContract?.abi,
+          functionName: "addScopeForProposalType",
+          args: addArgs,
+        },
+        {
+          onSuccess: (hash) => {
+            toast.dismiss(); // Dismiss loading toast
+            toast.success(
+              <div className="flex flex-col items-center gap-2 p-1">
+                <span className="text-sm font-semibold">Scope added</span>
+                {hash || resultAddScope ? (
+                  <BlockScanUrls hash1={hash || resultAddScope} />
+                ) : null}
+              </div>
+            );
+          },
+          onError: (error: any) => {
+            toast.dismiss();
+            toast.error(`Failed to add scope: ${error.message}`);
+          },
+        }
+      );
+
+      setAssignedScopes((prev) => [...prev, scopeToAdd]);
+    } catch (e) {
+      console.error("Error adding scope:", e);
+      toast.error("Failed to initiate add scope transaction.");
+    }
+  };
+
+  const handleRemoveScope = async (scopeToRemove: ScopeData) => {
+    const scopesWithKey = assignedScopes.filter(
+      (scope) => scope.scope_key === scopeToRemove.scope_key
+    );
+    if (scopesWithKey.length > 1) {
+      toast.error(
+        `Found ${scopesWithKey.length} scopes with the same key. Complete all transactions to avoid proposal type issues.`
+      );
+    }
+
+    for (let idx = 0; idx < scopesWithKey.length; idx++) {
+      const deleteArgs = [
+        BigInt(proposalTypeId),
+        scopeToRemove.scope_key.startsWith("0x")
+          ? (scopeToRemove.scope_key as `0x${string}`)
+          : (`0x${scopeToRemove.scope_key}` as `0x${string}`),
+        BigInt(0), // Always delete the first scope until there is none. After deleting 0 then 1 becomes 0 and so on.
+      ];
+
+      try {
+        toast.loading("Removing scope...");
+
+        await writeDeleteScope(
+          {
+            address: configuratorContract?.address as `0x${string}`,
+            abi: configuratorContract?.abi,
+            functionName: "deleteScope",
+            args: deleteArgs,
+          },
+          {
+            onSuccess: (hash) => {
+              toast.dismiss();
+              toast.success(
+                <div className="flex flex-col items-center gap-2 p-1">
+                  <span className="text-sm font-semibold">Scope removed</span>
+                  {hash || resultDeleteScope ? (
+                    <BlockScanUrls hash1={hash || resultDeleteScope} />
+                  ) : null}
+                </div>
+              );
+            },
+            onError: (error: any) => {
+              toast.dismiss();
+              toast.error(`Failed to remove scope: ${error.message}`);
+            },
+          }
+        );
+        setAssignedScopes((prev) => prev.filter((s, i) => i !== 0));
+      } catch (e) {
+        console.error("Error removing scope:", e);
+        toast.error("Failed to initiate remove scope transaction.");
+      }
+    }
+  };
+
+  const handleCreateScope = () => {
+    openDialog({
+      type: "CREATE_SCOPE",
+      params: {
+        proposalTypeId: proposalTypeId,
+        onSuccess: (newScope: ScopeData) => {
+          setAssignedScopes((prev) => [...prev, newScope]);
+        },
+      },
+      className: "sm:w-[32rem]",
+    });
+  };
+
+  // Filter available scopes to show only those not already assigned
+  const unassignedScopes = useMemo(
+    () =>
+      availableScopes.filter(
+        (availScope) =>
+          !assignedScopes.some(
+            (assignedScope) => assignedScope.scope_key === availScope.scope_key
+          )
+      ),
+    [availableScopes, assignedScopes]
+  );
 
   return (
     <Form {...form}>
@@ -307,6 +502,111 @@ export default function ProposalType({
             )}
           />
         </div>
+
+        {/* Scopes Section */}
+        {contracts.supportScopes && (
+          <>
+            <Separator className="my-4" />
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <div className="space-y-1">
+                  <h3 className="text-lg font-semibold">Scopes</h3>
+                  <p className="text-sm text-tertiary">
+                    Define what this proposal type can access and modify
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCreateScope}
+                  className="gap-2 py-4"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span className="hidden sm:block">Create New Scope</span>
+                </Button>
+              </div>
+
+              <div className="grid gap-3">
+                {assignedScopes.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center p-6 border rounded-lg bg-wash">
+                    <p className="text-sm text-tertiary mb-2">
+                      No scopes assigned yet
+                    </p>
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      size="sm"
+                      onClick={handleCreateScope}
+                      className="text-primary"
+                    >
+                      Add your first scope
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="grid gap-2">
+                    {assignedScopes.map((scope) => (
+                      <div
+                        key={scope.scope_key}
+                        className="flex items-center justify-between bg-card hover:bg-accent/5 transition-colors border border-line rounded-lg p-4 w-full"
+                      >
+                        <ScopeDetails scope={scope} />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-tertiary hover:text-destructive"
+                          onClick={() => handleRemoveScope(scope)}
+                          disabled={isLoadingDeleteScope || isLoading}
+                          type="button"
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add Scope Popover */}
+                {unassignedScopes.length > 0 && (
+                  <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        role="combobox"
+                        aria-expanded={popoverOpen}
+                        className="w-full justify-between py-4"
+                        disabled={isLoadingAddScope || isLoading}
+                      >
+                        Add Existing Scope
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[400px] p-0" align="start">
+                      <div className="flex flex-col">
+                        <div className="max-h-[300px] overflow-auto">
+                          <div className="divide-y">
+                            {unassignedScopes.map((scope) => (
+                              <button
+                                key={scope.scope_key}
+                                className="w-full p-3 text-left hover:bg-accent/50 transition-colors"
+                                onClick={() => handleAddScope(scope)}
+                              >
+                                <ScopeDetails scope={scope} />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
+              </div>
+            </div>
+            <Separator className="my-4" />
+          </>
+        )}
+
         <Button
           type="submit"
           className="w-full"
