@@ -21,40 +21,62 @@ import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 function generateVoteBars(
   forPercentage: number,
   againstPercentage: number,
-  proposalType: "OPTIMISTIC" | "STANDARD" | "APPROVAL" | "SNAPSHOT"
+  proposalType: "OPTIMISTIC" | "STANDARD" | "APPROVAL" | "SNAPSHOT",
+  supportType: "FOR" | "AGAINST" | "ABSTAIN"
 ) {
   const totalBars = 56;
   const bars = [];
-  const forBars =
-    proposalType === "OPTIMISTIC"
-      ? 0
-      : Math.round((totalBars * forPercentage) / 100);
-  const againstBars = Math.round((totalBars * againstPercentage) / 100);
-  const abstainBars = totalBars - forBars - againstBars;
+  const totalVotes = forPercentage + againstPercentage;
 
-  const className = "h-2 sm:h-3 w-[1.5px] sm:w-[3px] rounded-full shrink-0";
+  const className = "h-2.5 sm:h-3 w-[2px] sm:w-[3px] rounded-full shrink-0";
 
-  // Generate FOR bars
-  for (let i = 0; i < forBars; i++) {
-    bars.push(
-      <div key={`for-${i}`} className={cn(className, "bg-positive")} />
-    );
-  }
+  if (totalVotes === 0) {
+    // If no votes, show all bars as the user's vote
+    for (let i = 0; i < totalBars; i++) {
+      bars.push(
+        <div
+          key={`${supportType}-${i}`}
+          className={cn(
+            className,
+            supportType === "FOR"
+              ? "bg-positive"
+              : supportType === "AGAINST"
+                ? "bg-negative"
+                : "bg-tertiary"
+          )}
+        />
+      );
+    }
+  } else {
+    const forBars =
+      proposalType === "OPTIMISTIC"
+        ? 0
+        : Math.round((totalBars * forPercentage) / 100);
+    const againstBars = Math.round((totalBars * againstPercentage) / 100);
+    const abstainBars = totalBars - forBars - againstBars;
 
-  for (let i = 0; i < abstainBars; i++) {
-    bars.push(
-      <div key={`neutral-${i}`} className={cn(className, "bg-tertiary")} />
-    );
-  }
+    // Generate FOR bars
+    for (let i = 0; i < forBars; i++) {
+      bars.push(
+        <div key={`for-${i}`} className={cn(className, "bg-positive")} />
+      );
+    }
 
-  for (let i = 0; i < againstBars; i++) {
-    bars.push(
-      <div key={`against-${i}`} className={cn(className, "bg-negative")} />
-    );
+    for (let i = 0; i < abstainBars; i++) {
+      bars.push(
+        <div key={`neutral-${i}`} className={cn(className, "bg-tertiary")} />
+      );
+    }
+
+    for (let i = 0; i < againstBars; i++) {
+      bars.push(
+        <div key={`against-${i}`} className={cn(className, "bg-negative")} />
+      );
+    }
   }
 
   return (
-    <div className="flex items-center justify-center w-full gap-[3px] sm:gap-[4px]">
+    <div className="flex items-center justify-center w-full gap-[2.5px] sm:gap-[4px]">
       {bars}
     </div>
   );
@@ -94,11 +116,11 @@ const SuccessMessageCard = ({
         {/* Header Section */}
         <div className="flex justify-between items-start w-full">
           <div className="flex flex-col gap-0 sm:gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-base sm:text-2xl font-bold">I voted</span>
+            <div className="flex items-center gap-[6px]">
+              <span className="text-lg sm:text-2xl font-bold">I voted</span>
               <span
                 className={cn(
-                  "text-base sm:text-2xl font-bold",
+                  "text-lg sm:text-2xl font-bold",
                   supportType === "FOR"
                     ? "text-positive"
                     : supportType === "AGAINST"
@@ -109,7 +131,7 @@ const SuccessMessageCard = ({
                 {supportType}
               </span>
             </div>
-            <span className="text-xs sm:text-lg text-secondary font-normal">
+            <span className="text-sm sm:text-lg text-primary font-normal">
               on a proposal on {brandName} Agora
             </span>
           </div>
@@ -119,7 +141,7 @@ const SuccessMessageCard = ({
         </div>
 
         {/* Vote Stats Section */}
-        <div className="flex flex-col bg-white gap-3 sm:gap-0 rounded-lg border border-line mt-3">
+        <div className="flex flex-col bg-white gap-3 sm:gap-0 rounded-lg border border-line mt-4 sm:mt-6">
           {proposalType === "APPROVAL" ? (
             <div className="py-2">
               <OptionsResultsPanel proposal={proposal} showAllOptions={false} />
@@ -127,10 +149,10 @@ const SuccessMessageCard = ({
           ) : (
             <div className="flex flex-col gap-2 p-3 sm:p-4 pb-0">
               <div className="flex justify-between w-full">
-                <span className="text-[10px] sm:text-xs font-semibold text-positive">
+                <span className="text-xs font-semibold text-positive">
                   {proposalType === "STANDARD" ? "FOR" : ""}
                 </span>
-                <span className="text-[10px] sm:text-xs font-semibold text-negative">
+                <span className="text-xs font-semibold text-negative">
                   AGAINST
                 </span>
               </div>
@@ -140,14 +162,15 @@ const SuccessMessageCard = ({
                 {generateVoteBars(
                   forPercentage,
                   againstPercentage,
-                  proposalType
+                  proposalType,
+                  supportType
                 )}
               </div>
             </div>
           )}
 
           {/* Transaction Info */}
-          <div className="flex justify-between items-center bg-[#fafafa] px-3 sm:px-4 py-2 border-t border-line rounded-b-lg text-[8px] sm:text-[10px] text-secondary font-semibold">
+          <div className="flex justify-between items-center bg-[#fafafa] px-3 sm:px-4 py-2 border-t border-line rounded-b-lg text-[8px] sm:text-[10px] text-primary font-semibold">
             <div className="flex items-center">
               <span className="flex items-center gap-1 sm:gap-2">
                 <div className="w-4 h-4 sm:w-[18px] sm:h-[18px]">
@@ -166,7 +189,7 @@ const SuccessMessageCard = ({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-between items-center mt-3 sm:mt-4">
+        <div className="flex justify-end items-center mt-4 sm:mt-6">
           <div className="w-[48px] h-[12px] sm:w-[62px] sm:h-[16px]">
             <Image
               src={agoraLogo.src}
@@ -175,10 +198,6 @@ const SuccessMessageCard = ({
               height={16}
             />
           </div>
-
-          <span className="text-[10px] sm:text-xs text-secondary font-semibold">
-            www.agora.xyz
-          </span>
         </div>
       </div>
     </div>
@@ -239,9 +258,7 @@ export function ShareDialog({
     blockNumber ?? latestBlock?.data?.number.toString() ?? null;
   const { namespace } = Tenant.current();
 
-  const proposalLink = `${window.location.origin}/proposals/${proposalId}?support=${newVote.support}&reason=${encodeURIComponent(
-    newVote.reason
-  )}&weight=${newVote.weight}&blockNumber=${blockNumberToUse}&timestamp=${timestampToUse}&params=${encodeURIComponent(
+  const proposalLink = `${window.location.origin}/proposals/${proposalId}?support=${newVote.support || supportType}&weight=${newVote.weight}&blockNumber=${blockNumberToUse}&timestamp=${timestampToUse}&params=${encodeURIComponent(
     JSON.stringify(newVote.params)
   )}`;
 
@@ -301,7 +318,7 @@ export function ShareDialog({
         proposal={proposal}
       />
 
-      <div className="pt-4 space-y-4">
+      <div className="pt-2 sm:pt-4 space-y-2 sm:space-y-4">
         <div className="text-center space-y-1">
           <h3 className="text-xl sm:text-2xl font-bold text-primary">
             Your vote is in!

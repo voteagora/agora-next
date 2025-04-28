@@ -381,18 +381,19 @@ export function SuccessMessage({
   const openDialog = useOpenDialog();
   const { data: votableSupply } = useVotableSupply({ enabled: true });
 
+  const lastVote = votes[votes.length - 1];
+
   const newVote = {
-    support: supportFromContext || "",
-    reason: reasonFromContext || "",
-    params: [],
-    weight: votingPower || "",
+    support: supportFromContext || lastVote?.support,
+    reason: reasonFromContext || lastVote?.reason || "",
+    params: lastVote?.params || [],
+    weight: votingPower || lastVote?.weight,
   };
 
   const {
     support,
     blockNumber,
     timestamp,
-    address,
     endsIn,
     forPercentage,
     againstPercentage,

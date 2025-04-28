@@ -313,26 +313,52 @@ export function calculateVoteMetadata({
       adjustedResults.abstain += newVoteWeight;
   }
 
+  const totalVotes =
+    adjustedResults.for + adjustedResults.against + adjustedResults.abstain;
+
+  const calculatePercentage = (value: bigint, total: bigint): number => {
+    if (total === BigInt(0)) return 0;
+    try {
+      const percentage = (Number(value) / Number(total)) * 100;
+      return isFinite(percentage) ? percentage : 0;
+    } catch {
+      return 0;
+    }
+  };
+
+  const calculateOptimisticAgainstPercentage = (): number => {
+    try {
+      const againstAmount = Number(
+        formatUnits(adjustedResults.against, token.decimals)
+      );
+      const thresholdAmount =
+        (disapprovalThreshold * Number(formattedVotableSupply)) / 100;
+
+      if (thresholdAmount === 0) return 0;
+
+      const percentage = (againstAmount / thresholdAmount) * 100;
+      return isFinite(percentage) ? percentage : 0;
+    } catch {
+      return 0;
+    }
+  };
+
   const forPercentage =
     proposal.proposalType === "OPTIMISTIC"
       ? 0
-      : (Number(adjustedResults.for) /
-          (Number(adjustedResults.for) +
-            Number(adjustedResults.against) +
-            Number(adjustedResults.abstain))) *
-        100;
+      : calculatePercentage(adjustedResults.for, totalVotes);
 
   const againstPercentage =
     proposal.proposalType === "OPTIMISTIC"
-      ? (Number(formatUnits(adjustedResults.against, token.decimals)) /
-          // Disapproval threshold is in percentage, so we need to convert it to the same unit
-          ((disapprovalThreshold * formattedVotableSupply) / 100)) *
-        100
-      : (Number(adjustedResults.against) /
-          (Number(adjustedResults.for) +
-            Number(adjustedResults.against) +
-            Number(adjustedResults.abstain))) *
-        100;
+      ? calculateOptimisticAgainstPercentage()
+      : calculatePercentage(adjustedResults.against, totalVotes);
+
+  // Ensure percentages are within bounds
+  const boundedForPercentage = Math.min(Math.max(forPercentage, 0), 100);
+  const boundedAgainstPercentage = Math.min(
+    Math.max(againstPercentage, 0),
+    100
+  );
 
   let parsedOptions: {
     description: string;
@@ -460,8 +486,8 @@ export function calculateVoteMetadata({
       : format(new Date(), "MMM d, yyyy h:mm a"),
     address: address || vote?.address,
     endsIn,
-    forPercentage,
-    againstPercentage,
+    forPercentage: boundedForPercentage,
+    againstPercentage: boundedAgainstPercentage,
     totalOptions,
     options: parsedOptions,
     reason: vote?.reason || newVote?.reason,
@@ -506,30 +532,56 @@ export function calculateVoteMetadataMinified({
       adjustedResults.abstain += newVoteWeight;
   }
 
+  const totalVotes =
+    adjustedResults.for + adjustedResults.against + adjustedResults.abstain;
+
+  const calculatePercentage = (value: bigint, total: bigint): number => {
+    if (total === BigInt(0)) return 0;
+    try {
+      const percentage = (Number(value) / Number(total)) * 100;
+      return isFinite(percentage) ? percentage : 0;
+    } catch {
+      return 0;
+    }
+  };
+
+  const calculateOptimisticAgainstPercentage = (): number => {
+    try {
+      const againstAmount = Number(
+        formatUnits(adjustedResults.against, token.decimals)
+      );
+      const thresholdAmount =
+        (disapprovalThreshold * Number(formattedVotableSupply)) / 100;
+
+      if (thresholdAmount === 0) return 0;
+
+      const percentage = (againstAmount / thresholdAmount) * 100;
+      return isFinite(percentage) ? percentage : 0;
+    } catch {
+      return 0;
+    }
+  };
+
   const forPercentage =
     proposal.proposalType === "OPTIMISTIC"
       ? 0
-      : (Number(adjustedResults.for) /
-          (Number(adjustedResults.for) +
-            Number(adjustedResults.against) +
-            Number(adjustedResults.abstain))) *
-        100;
+      : calculatePercentage(adjustedResults.for, totalVotes);
 
   const againstPercentage =
     proposal.proposalType === "OPTIMISTIC"
-      ? (Number(formatUnits(adjustedResults.against, token.decimals)) /
-          // Disapproval threshold is in percentage, so we need to convert it to the same unit
-          ((disapprovalThreshold * formattedVotableSupply) / 100)) *
-        100
-      : (Number(adjustedResults.against) /
-          (Number(adjustedResults.for) +
-            Number(adjustedResults.against) +
-            Number(adjustedResults.abstain))) *
-        100;
+      ? calculateOptimisticAgainstPercentage()
+      : calculatePercentage(adjustedResults.against, totalVotes);
+
+  // Ensure percentages are within bounds
+  const boundedForPercentage = Math.min(Math.max(forPercentage, 0), 100);
+  const boundedAgainstPercentage = Math.min(
+    Math.max(againstPercentage, 0),
+    100
+  );
 
   return {
     endsIn,
-    forPercentage,
-    againstPercentage,
+    forPercentage: boundedForPercentage,
+    againstPercentage: boundedAgainstPercentage,
   };
 }
