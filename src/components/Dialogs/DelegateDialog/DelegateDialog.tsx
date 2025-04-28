@@ -128,7 +128,7 @@ export function DelegateDialog({
       });
       if (isDelegationEncouragement) {
         trackEvent({
-          event_name: ANALYTICS_EVENT_NAMES.DELEGATION_ENCOURAGEMENT,
+          event_name: ANALYTICS_EVENT_NAMES.DELEGATION_ENCOURAGEMENT_CTA,
           event_data: {
             delegator: accountAddress as `0x${string}`,
             transaction_hash: (isGasRelayLive

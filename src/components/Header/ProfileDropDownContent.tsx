@@ -109,10 +109,15 @@ export const ProfileDropDownContent = ({
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
-  const shouldEncourageDelegation =
+  const canEncourageDelegationBecauseOfVP =
     tokenBalance !== BigInt(0) &&
     delegate?.votingPower?.total === "0" &&
     isDelegationEncouragementEnabled;
+
+  const canEncourageDelegationBecauseOfNoDelegation =
+    tokenBalance !== BigInt(0) &&
+    isDelegationEncouragementEnabled &&
+    !hasDelegated;
 
   const renderDelegteesInfo = () => {
     if (!hasDelegated) return null;
@@ -251,9 +256,10 @@ export const ProfileDropDownContent = ({
               </RowSkeletonWrapper>
             }
           />
-          {shouldEncourageDelegation && (
-            <RenderDelegateToSelf delegate={delegate as DelegateChunk} />
-          )}
+          {canEncourageDelegationBecauseOfVP &&
+            canEncourageDelegationBecauseOfNoDelegation && (
+              <RenderDelegateToSelf delegate={delegate as DelegateChunk} />
+            )}
         </div>
         {renderDelegteesInfo()}
 

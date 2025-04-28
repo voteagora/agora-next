@@ -175,7 +175,7 @@ export function AdvancedDelegateDialog({
     });
     if (isDelegationEncouragement) {
       trackEvent({
-        event_name: ANALYTICS_EVENT_NAMES.DELEGATION_ENCOURAGEMENT,
+        event_name: ANALYTICS_EVENT_NAMES.DELEGATION_ENCOURAGEMENT_CTA,
         event_data: {
           delegator: address as `0x${string}`,
           transaction_hash: tx,
