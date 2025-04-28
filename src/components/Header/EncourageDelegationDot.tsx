@@ -7,12 +7,13 @@ import { useAccount } from "wagmi";
 const EncourageDelegationDot = ({ className }: { className?: string }) => {
   const { tokenBalance, delegate, delegatees } = useProfileData();
   const { address } = useAccount();
-  const hasDelegated = !!delegatees?.length;
+
+  const hasDelegated = delegatees && delegatees.length > 0;
   const canEncourageDelegationBecauseOfVP =
     tokenBalance !== BigInt(0) && delegate?.votingPower?.total === "0";
 
   const canEncourageDelegationBecauseOfNoDelegation =
-    tokenBalance !== BigInt(0) && !hasDelegated;
+    tokenBalance !== BigInt(0) && delegatees !== undefined && !hasDelegated;
 
   const shouldShowDot =
     canEncourageDelegationBecauseOfVP ||
@@ -27,7 +28,7 @@ const EncourageDelegationDot = ({ className }: { className?: string }) => {
         },
       });
     }
-  }, [shouldShowDot, address]);
+  }, [shouldShowDot, address, tokenBalance, delegate, delegatees]);
 
   if (!shouldShowDot) return null;
 

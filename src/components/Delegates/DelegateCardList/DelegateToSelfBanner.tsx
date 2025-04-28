@@ -5,13 +5,13 @@ import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 
 export const DelegateToSelfBanner = () => {
   const { delegate, tokenBalance, delegatees } = useProfileData();
-  const hasDelegated = !!delegatees?.length;
+  const hasDelegated = delegatees && delegatees.length > 0;
 
   const canEncourageDelegationBecauseOfVP =
     tokenBalance !== BigInt(0) && delegate?.votingPower?.total === "0";
 
   const canEncourageDelegationBecauseOfNoDelegation =
-    tokenBalance !== BigInt(0) && !hasDelegated;
+    tokenBalance !== BigInt(0) && delegatees !== undefined && !hasDelegated;
 
   if (
     !canEncourageDelegationBecauseOfVP &&

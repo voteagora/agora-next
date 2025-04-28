@@ -105,7 +105,7 @@ export const ProfileDropDownContent = ({
   } = useProfileData();
 
   const { ui } = Tenant.current();
-  const hasDelegated = !!delegatees?.length;
+  const hasDelegated = delegatees && delegatees.length > 0;
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
@@ -117,6 +117,7 @@ export const ProfileDropDownContent = ({
   const canEncourageDelegationBecauseOfNoDelegation =
     tokenBalance !== BigInt(0) &&
     isDelegationEncouragementEnabled &&
+    delegatees !== undefined &&
     !hasDelegated;
 
   const renderDelegteesInfo = () => {
