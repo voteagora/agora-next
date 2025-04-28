@@ -284,14 +284,6 @@ export const uniswapTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "use-daonode-for-proposals",
-      enabled: true,
-    },
-    {
-      name: "use-daonode-for-votable-supply",
-      enabled: true,
-    },
-    {
       name: "proposal-lifecycle",
       enabled: true,
       config: {
@@ -352,6 +344,14 @@ export const uniswapTenantUIConfig = new TenantUI({
         },
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
       },
+    },
+    {
+      name: "use-daonode-for-proposals",
+      enabled: true,
+    },
+    {
+      name: "use-daonode-for-votable-supply",
+      enabled: true,
     },
   ],
 });
