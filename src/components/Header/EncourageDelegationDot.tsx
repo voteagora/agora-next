@@ -1,7 +1,7 @@
 import { useProfileData } from "@/hooks/useProfileData";
 import { useEffect } from "react";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { useAccount } from "wagmi";
 
 const EncourageDelegationDot = ({ className }: { className?: string }) => {
@@ -9,13 +9,14 @@ const EncourageDelegationDot = ({ className }: { className?: string }) => {
   const { address } = useAccount();
   const hasDelegated = !delegatees?.length;
   const canEncourageDelegationBecauseOfVP =
-    tokenBalance !== BigInt(0) &&
-    delegate?.votingPower?.total === "0";
+    tokenBalance !== BigInt(0) && delegate?.votingPower?.total === "0";
 
   const canEncourageDelegationBecauseOfNoDelegation =
     tokenBalance !== BigInt(0) && !hasDelegated;
 
-  const shouldShowDot = canEncourageDelegationBecauseOfVP || canEncourageDelegationBecauseOfNoDelegation;
+  const shouldShowDot =
+    canEncourageDelegationBecauseOfVP ||
+    canEncourageDelegationBecauseOfNoDelegation;
 
   useEffect(() => {
     if (shouldShowDot && address) {
@@ -29,7 +30,7 @@ const EncourageDelegationDot = ({ className }: { className?: string }) => {
   }, [shouldShowDot, address]);
 
   if (!shouldShowDot) return null;
-  
+
   return (
     <div
       className={`w-[10px] h-[10px] bg-negative rounded-full absolute ${className || ""}`}
