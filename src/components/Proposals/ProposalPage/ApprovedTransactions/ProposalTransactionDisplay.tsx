@@ -583,12 +583,12 @@ const ActionSummary = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="truncate text-xs break-all">
-                {functionSignature}
+                {functionSignature.stringValue}
               </div>
             </TooltipTrigger>
             <TooltipContent>
               <div className="text-xs break-all max-w-[400px]">
-                {functionSignature}
+                {functionSignature.stringValue}
               </div>
             </TooltipContent>
           </Tooltip>

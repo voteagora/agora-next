@@ -619,7 +619,14 @@ export const wrappedWaitForTransactionReceipt = async (
   }
 };
 
-export function getFunctionSignature(decodedData: any): string | null {
+interface FunctionSignature {
+  stringValue: string;
+  paramValues?: [string, string][] | null;
+}
+
+export function getFunctionSignature(
+  decodedData: any
+): FunctionSignature | null {
   if (
     !decodedData ||
     !decodedData.function ||
@@ -629,22 +636,38 @@ export function getFunctionSignature(decodedData: any): string | null {
   }
 
   try {
-    let signature = `${decodedData.function}(`;
-    const paramTypes = Object.entries(decodedData.parameters).map(
-      // Takes the object name of the parameter and the value supplied and concatenates a string value
+    const paramTypes: {
+      stringValue: string;
+      paramValues: [string, string] | null;
+    }[] = Object.entries(decodedData.parameters).map(
       ([paramName, paramValue]: [string, any]) => {
-        // Force unknown if undefined
+        // Force "unknown" if undefined
         if (paramName === undefined || paramValue.value === undefined) {
-          return "unknown";
+          return { stringValue: "unknown", paramValues: null };
         }
-        return ` ${paramName.toString()}=${paramValue.value}`;
+        return {
+          stringValue: `${paramName.toString()}=${paramValue.value}`,
+          paramValues: [paramName, paramValue.value],
+        };
       }
     );
-    signature += paramTypes.join(",");
+
+    let signature = `${decodedData.function}(`;
+    signature += paramTypes.map(p => p.stringValue).join(",");
     signature += ")";
 
-    return signature;
+    // Filter out null values from the param values
+    const paramValues = paramTypes
+      .map(p => p.paramValues)
+      .filter((p): p is [string, string] => p !== null);
+
+      return {
+        stringValue: signature,
+        paramValues: paramValues
+      };
+
   } catch (error) {
+    console.error(error);
     return null;
   }
 }
