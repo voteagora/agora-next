@@ -67,6 +67,21 @@ function getBaseOptionFromExtended(
   return null;
 }
 
+const findFundingInfo = (
+  option: string,
+  options: string[],
+  fundingInfo: Record<string, FundingInfo>
+) => {
+  const baseOption = getBaseOptionFromExtended(option, options) ?? option;
+  const optionWithoutSuffix = baseOption.split("-")?.[0]?.trim();
+  return (
+    fundingInfo[optionWithoutSuffix] || {
+      ext: 0,
+      std: 0,
+      isEligibleFor2Y: false,
+    }
+  );
+};
 /**
  * Checks if an option is an extended version
  * @param option The option to check
@@ -94,13 +109,7 @@ export function calculateCopelandVote(
       totalTies: 0,
       avgVotingPowerFor: 0,
       avgVotingPowerAgainst: 0,
-      fundingInfo: fundingInfo[
-        getBaseOptionFromExtended(option, options) || option
-      ] || {
-        ext: 0,
-        std: 0,
-        isEligibleFor2Y: false,
-      },
+      fundingInfo: findFundingInfo(option, options, fundingInfo),
     }));
   }
 
@@ -424,13 +433,7 @@ export function calculateCopelandVote(
       avgVotingPowerFor,
       avgVotingPowerAgainst,
       option,
-      fundingInfo: fundingInfo[
-        getBaseOptionFromExtended(option, options) || option
-      ] || {
-        ext: 0,
-        std: 0,
-        isEligibleFor2Y: false,
-      },
+      fundingInfo: findFundingInfo(option, options, fundingInfo),
     };
   });
 
@@ -483,12 +486,7 @@ export function calculateCopelandVote(
   sortedOptions
     .map((option) => option.option)
     .map((option, index) => {
-      const baseOption = getBaseOptionFromExtended(option, options);
-      const info = fundingInfo[baseOption || option] || {
-        ext: 0,
-        std: 0,
-        isEligibleFor2Y: false,
-      };
+      const info = findFundingInfo(option, options, fundingInfo);
       let fundingType: FundingType = "None";
 
       // NONE_BELOW option always gets None funding type
