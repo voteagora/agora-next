@@ -34,6 +34,8 @@ import { Vote } from "@/app/api/common/votes/vote";
 import { SimulationReportDialog } from "../SimulationReportDialog/SimulationReportDialog";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { EncourageConnectWalletDialog } from "@/components/Delegates/Delegations/EncourageConnectWalletDialog";
+import { CreateScopeDialog } from "@/components/Admin/CreateScopeDialog";
+import { ScopeData } from "@/lib/types";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -55,7 +57,8 @@ export type DialogType =
   | SubscribeDialog
   | ShareVoteDialogType
   | SimulationReportDialogType
-  | EncourageConnectWalletDialogType;
+  | EncourageConnectWalletDialogType
+  | CreateScopeDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -184,7 +187,7 @@ export type ShareVoteDialogType = {
       weight: string;
     };
     totalOptions: number;
-    votes: Vote[];
+    votes: Vote[] | null;
     options: {
       description: string;
       votes: string;
@@ -202,7 +205,7 @@ export type ApprovalCastVoteDialogProps = {
   proposal: Proposal;
   hasStatement: boolean;
   votingPower: VotingPowerData;
-  authorityChains: string[][];
+  authorityChains: string[][] | null;
   missingVote: MissingVote;
   closeDialog: () => void;
 };
@@ -258,6 +261,15 @@ export type SimulationReportDialogType = {
 export type EncourageConnectWalletDialogType = {
   type: "ENCOURAGE_CONNECT_WALLET";
   params: {};
+};
+
+export type CreateScopeDialogType = {
+  type: "CREATE_SCOPE";
+  params: {
+    proposalTypeId: number;
+    onSuccess: (scope: ScopeData) => void;
+  };
+  className?: string;
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -474,6 +486,15 @@ export const dialogs: DialogDefinitions<DialogType> = {
   ENCOURAGE_CONNECT_WALLET: ({}, closeDialog) => (
     <EncourageConnectWalletDialog closeDialog={closeDialog} />
   ),
+  CREATE_SCOPE: ({ proposalTypeId, onSuccess }, closeDialog) => {
+    return (
+      <CreateScopeDialog
+        proposalTypeId={proposalTypeId}
+        onSuccess={onSuccess}
+        closeDialog={closeDialog}
+      />
+    );
+  },
   // FAQ: () => {
   //   return <FaqDialog />;
   // },

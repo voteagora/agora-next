@@ -6,6 +6,7 @@ import React, {
   useContext,
   useState,
   FC,
+  useEffect,
 } from "react";
 import { dialogs, DialogType } from "./dialogs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -70,6 +71,17 @@ const Modal: FC<
 
 export const DialogProvider: FC<Props> = ({ children }) => {
   const [currentDialog, setCurrentDialog] = useState<DialogType | null>(null);
+
+  useEffect(() => {
+    if (currentDialog) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [currentDialog]);
 
   const renderedDialog =
     currentDialog &&

@@ -643,3 +643,14 @@ export function getFunctionSignature(decodedData: any): string | null {
     return null;
   }
 }
+
+export function getCanonicalType(input: any): string {
+  if (input.type.startsWith("tuple")) {
+    const arraySuffix = input.type.slice("tuple".length);
+    const innerTypes = input.components
+      ? input.components.map(getCanonicalType).join(",")
+      : "";
+    return `(${innerTypes})${arraySuffix}`;
+  }
+  return input.type;
+}

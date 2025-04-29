@@ -196,3 +196,25 @@ export type AnalyticsEvent =
         address: `0x${string}`;
       };
     };
+
+export type ScopeData = {
+  proposal_type_id: number;
+  scope_key: string;
+  selector?: string;
+  description: string;
+  disabled_event: any;
+  deleted_event: any;
+  status: "created" | "disabled" | "deleted";
+  parameters?: string[];
+  comparators?: number[];
+  types?: number[];
+};
+
+export interface FormattedProposalType {
+  name: string;
+  quorum: number;
+  approval_threshold: number;
+  proposal_type_id: number;
+  isClientSide?: boolean;
+  scopes?: ScopeData[];
+}

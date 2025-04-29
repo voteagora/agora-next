@@ -15,9 +15,6 @@ export function findDelagatee({
     where: {
       delegator: address.toLowerCase(),
       contract,
-      delegatee: {
-        not: "0x0000000000000000000000000000000000000000",
-      },
     },
   };
 
@@ -163,6 +160,7 @@ export function findProposalsQuery({
 }) {
   const condition = {
     take,
+    skip,
     orderBy: {
       ordinal: "desc" as const,
     },

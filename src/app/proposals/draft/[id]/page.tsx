@@ -15,6 +15,7 @@ import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 import { PLMConfig } from "@/app/proposals/draft/types";
 
 export const maxDuration = 60;
+export const dynamic = "force-dynamic";
 
 export default async function DraftProposalPage({
   params,
