@@ -1,4 +1,7 @@
-import { ProposalPayloadFromDAONode, ProposalPayloadFromDB } from "@/app/api/common/proposals/proposal";
+import {
+  ProposalPayloadFromDAONode,
+  ProposalPayloadFromDB,
+} from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
@@ -58,8 +61,8 @@ function adaptDAONodeResponse(
     start_block: apiResponse.start_block.toString(),
     end_block: apiResponse.end_block.toString(),
     cancelled_block: apiResponse.cancel_event
-    ? BigInt(apiResponse.cancel_event.block_number)
-    : null,
+      ? BigInt(apiResponse.cancel_event.block_number)
+      : null,
     executed_block: apiResponse.execute_event
       ? BigInt(apiResponse.execute_event.block_number)
       : null,
@@ -75,16 +78,15 @@ function adaptDAONodeResponse(
     proposal_type: apiResponse.voting_module_name.toUpperCase() as ProposalType,
     proposal_type_data: null,
     proposal_results: proposalResults,
-    
+
     proposal_data_raw: null,
 
     created_transaction_hash: null,
     cancelled_transaction_hash: null,
     queued_transaction_hash: null,
-    executed_transaction_hash: null
+    executed_transaction_hash: null,
   };
 }
-
 
 export const getDaoNodeURLForNamespace = (namespace: string) => {
   const url = process.env.DAONODE_URL_TEMPLATE;
@@ -258,7 +260,7 @@ export const getProposalsFromDaoNode = async (
   skip: number,
   take: number,
   filter: string
-) : Promise<ProposalPayloadFromDAONode[]> => {
+): Promise<ProposalPayloadFromDAONode[]> => {
   let data = await getCachedAllProposalsFromDaoNode();
 
   if (filter == "relevant") {
@@ -273,8 +275,8 @@ export const getProposalsFromDaoNode = async (
 
   // this takes 0ms for Uniswap.  It's gross, but
   // not slow.
-  data = data.slice(skip, skip + take)
-  
+  data = data.slice(skip, skip + take);
+
   data = data.map(adaptDAONodeResponse);
 
   return data;

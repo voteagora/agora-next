@@ -15,8 +15,16 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
-import { ProposalStage as PrismaProposalStage, ProposalType } from "@prisma/client";
-import { Proposal, ProposalPayload, ProposalPayloadFromDAONode, ProposalPayloadFromDB } from "./proposal";
+import {
+  ProposalStage as PrismaProposalStage,
+  ProposalType,
+} from "@prisma/client";
+import {
+  Proposal,
+  ProposalPayload,
+  ProposalPayloadFromDAONode,
+  ProposalPayloadFromDB,
+} from "./proposal";
 import { doInSpan } from "@/app/lib/logging";
 import {
   findProposal,
@@ -32,7 +40,6 @@ import {
   getProposalTypesFromDaoNode,
   getProposalsFromDaoNode,
 } from "@/app/lib/dao-node/client";
-
 
 async function getProposals({
   filter,
@@ -65,7 +72,7 @@ async function getProposals({
                       filter
                     );
 
-                    return (result as unknown) as ProposalPayload[];
+                    return result as unknown as ProposalPayload[];
                   } catch (error) {
                     console.warn("REST API failed, falling back to DB:", error);
                   }
