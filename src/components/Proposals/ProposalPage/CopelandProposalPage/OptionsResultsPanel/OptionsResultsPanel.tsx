@@ -14,24 +14,33 @@ import { fontMapper } from "@/styles/fonts";
 import { Tooltip, TooltipContent } from "@/components/ui/tooltip";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
-const { ui } = Tenant.current();
 import { useCalculateCopelandResult } from "@/hooks/useCalculateCopelandResult";
 import React, { useMemo } from "react";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
+import { ParsedProposalData } from "@/lib/proposalUtils";
+
+const { ui, isProd } = Tenant.current();
 
 // Helper function to check if an option is an extended version
-const EXTENDED_SUFFIX = " (Extended)";
+const EXTENDED_SUFFIX = " - ext";
 function isExtendedOption(option: string): boolean {
   return option.endsWith(EXTENDED_SUFFIX);
 }
 
-function getBaseOptionName(option: string): string {
-  return isExtendedOption(option)
-    ? option.slice(0, -EXTENDED_SUFFIX.length)
-    : option;
+function getBaseOptionName(option: string, options: string[]): string | null {
+  if (!isExtendedOption(option)) return option;
+  const optionWithoutSuffix = option.split("-")?.[0]?.trim();
+  if (optionWithoutSuffix) {
+    return (
+      options.find(
+        (o) => o.startsWith(optionWithoutSuffix) && !o.endsWith(EXTENDED_SUFFIX)
+      ) || null
+    );
+  }
+  return null;
 }
 
-const FUNDING_VALUES: Record<
+const FUNDING_VALUES_PROD: Record<
   string,
   { ext: number | null; std: number; isEligibleFor2Y: boolean }
 > = {
@@ -66,6 +75,22 @@ const FUNDING_VALUES: Record<
   Decent: { ext: null, std: 300000, isEligibleFor2Y: false },
 } as const;
 
+const FUNDING_VALUES_DEV: Record<
+  string,
+  { ext: number | null; std: number; isEligibleFor2Y: boolean }
+> = {
+  "ENSRegistry": { ext: null, std: 300000, isEligibleFor2Y: true },
+  "ResolutionProtocol": { ext: 100000, std: 300000, isEligibleFor2Y: false },
+  "NameWrapper": { ext: null, std: 400000, isEligibleFor2Y: false },
+  "EthDNS": { ext: 400000, std: 400000, isEligibleFor2Y: false },
+  "SubgraphIndex": { ext: 300000, std: 400000, isEligibleFor2Y: true },
+  "MetaResolver": { ext: null, std: 800000, isEligibleFor2Y: true },
+  "Ethereum Name Improvers": { ext: null, std: 300000, isEligibleFor2Y: true },
+  "A long name foundation": { ext: null, std: 400000, isEligibleFor2Y: false },
+}
+
+const FUNDING_VALUES = isProd ? FUNDING_VALUES_PROD : FUNDING_VALUES_DEV;
+
 export default function OptionsResultsPanel({
   proposal,
 }: {
@@ -75,6 +100,9 @@ export default function OptionsResultsPanel({
   const { data: proposalResults, isFetching } = useCalculateCopelandResult({
     proposalId: proposal.id,
   });
+  const options = (
+    proposal.proposalData as unknown as ParsedProposalData["SNAPSHOT"]["kind"]
+  ).choices
 
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -121,7 +149,7 @@ export default function OptionsResultsPanel({
               const extendedOption = proposalResults.find(
                 (r) =>
                   isExtendedOption(r.option) &&
-                  getBaseOptionName(r.option) === result.option
+                  getBaseOptionName(r.option, options) === result.option
               );
 
               return (
@@ -161,7 +189,7 @@ const OptionRow = ({
   isProposalActive: boolean;
   isFunding: boolean;
 }) => {
-  const optionName = result.option;
+  const optionName = result.option.split("-")?.[0]?.trim();
   const fundingInfo = FUNDING_VALUES[optionName];
 
   const extendedResultGotFunding =
