@@ -81,15 +81,14 @@ export type ProposalPayloadFromDAONode = {
 
   totals: Record<string, string>;
   voting_module_name: string;
-}
-
+};
 
 export type ProposalPayloadFromDB = {
   proposal_id: string;
 
   proposer: string;
   description: string | null;
-  
+
   created_block: bigint | null;
   start_block: string;
   end_block: string | null;
@@ -97,16 +96,16 @@ export type ProposalPayloadFromDB = {
   executed_block: bigint | null;
   queued_block: bigint | null;
 
-  proposal_data:  Prisma.JsonValue | null;
+  proposal_data: Prisma.JsonValue | null;
   proposal_results: Prisma.JsonValue | null;
   proposal_type: ProposalType;
-  proposal_type_data:  Prisma.JsonValue | null;
+  proposal_type_data: Prisma.JsonValue | null;
   proposal_data_raw: string | null;
 
-  created_transaction_hash: string | null
-  cancelled_transaction_hash: string | null
-  queued_transaction_hash: string | null
-  executed_transaction_hash: string | null
+  created_transaction_hash: string | null;
+  cancelled_transaction_hash: string | null;
+  queued_transaction_hash: string | null;
+  executed_transaction_hash: string | null;
 };
 
 export type ProposalPayload = ProposalPayloadFromDB | lineaProposals;
