@@ -24,6 +24,6 @@ export const fetchVotableSupplyUnstableCache = unstable_cache(
   [],
   {
     tags: ["votableSupply"],
-    revalidate: 120, // 2 minutes
+    revalidate: 60 * 60 * 24 * 7, // 1 week
   }
 );
