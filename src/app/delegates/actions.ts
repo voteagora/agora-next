@@ -33,7 +33,7 @@ export const fetchDelegate = async (address: string) => {
       },
       [`delegate-${address.toLowerCase()}`],
       {
-        revalidate: 180, // 3 minutes
+        revalidate: 60, // 1 minute
         tags: [`delegate-${address.toLowerCase()}`],
       }
     );

@@ -539,11 +539,3 @@ export const fetchVotesForProposalAndDelegate = cache(
 export const fetchVotersWhoHaveNotVotedForProposal = cache(
   getVotersWhoHaveNotVotedForProposal
 );
-export const fetchVotesForProposalAndDelegateUnstableCache = unstable_cache(
-  getVotesForProposalAndDelegate,
-  [],
-  {
-    tags: ["votesForProposalAndDelegate"],
-    revalidate: 86400, // 1 day
-  }
-);
