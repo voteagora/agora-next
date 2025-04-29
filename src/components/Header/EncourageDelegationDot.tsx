@@ -34,7 +34,7 @@ const EncourageDelegationDot = ({ className }: { className?: string }) => {
 
   return (
     <div
-      className={`w-[10px] h-[10px] bg-negative rounded-full absolute ${className || ""}`}
+      className={`w-[10px] h-[10px] bg-negative rounded-full absolute border border-white ${className || ""}`}
     />
   );
 };

@@ -274,7 +274,7 @@ export const ProfileDropDownContent = ({
             {canCreateDelegateStatement && !hasStatement ? (
               <Link
                 href={`/delegates/create`}
-                className="rounded-full py-3 px-2 border border-line bg-brandPrimary hover:bg-none text-neutral flex justify-center mt-1"
+                className="self-stretch h-12 pl-4 text-secondary flex items-center hover:bg-neutral hover:font-bold hover:rounded-md"
                 onClick={handleCloseDrawer}
               >
                 Create delegate statement
