@@ -620,6 +620,7 @@ export const wrappedWaitForTransactionReceipt = async (
 };
 
 interface FunctionSignature {
+  functionName: string;
   stringValue: string;
   paramValues?: [string, string][] | null;
 }
@@ -652,7 +653,9 @@ export function getFunctionSignature(
       }
     );
 
-    let signature = `${decodedData.function}(`;
+    const functionName = decodedData.function.toString();
+
+    let signature = `${functionName}(`;
     signature += paramTypes.map(p => p.stringValue).join(",");
     signature += ")";
 
@@ -662,6 +665,7 @@ export function getFunctionSignature(
       .filter((p): p is [string, string] => p !== null);
 
       return {
+        functionName: functionName,
         stringValue: signature,
         paramValues: paramValues
       };
