@@ -621,7 +621,7 @@ export const wrappedWaitForTransactionReceipt = async (
 
 interface FunctionSignature {
   functionName: string;
-  toStringValue: () => string;
+  toStringValue: () => string | null;
   paramValues?: [string, string][] | null;
 }
 
@@ -638,16 +638,14 @@ export function getFunctionSignature(
 
   try {
     const paramTypes: {
-      stringValue: string;
       paramValues: [string, string] | null;
     }[] = Object.entries(decodedData.parameters).map(
       ([paramName, paramValue]: [string, any]) => {
-        // Force "unknown" if undefined
+        // Force null if undefined
         if (paramName === undefined || paramValue.value === undefined) {
-          return { stringValue: "unknown", paramValues: null };
+          return { paramValues: null };
         }
         return {
-          stringValue: `${paramName.toString()}=${paramValue.value}`,
           paramValues: [paramName, paramValue.value],
         };
       }
@@ -656,11 +654,21 @@ export function getFunctionSignature(
     const functionName = decodedData.function.toString();
 
     const toStringValue = () => {
+      if (!paramTypes) {
+        return null;
+      }
+
+      // Filter out null values
+      const filteredParams: [string, string][] = paramTypes
+        .map(p => p.paramValues)
+        .filter((p): p is [string, string] => p !== null)
+
+      // Build the function signature
       let signature = `${functionName}(`;
-      signature += paramTypes.map(p => p.stringValue).join(",");
+      signature += filteredParams.map(p => `${p[0]}=${p[1]}`).join(",");
       signature += ")";
       return signature;
-    }
+    };
 
     // Filter out null values from the param values
     const paramValues = paramTypes
