@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { useMemo } from "react";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
-import { http, fallback } from "wagmi";
+import { fallback, http } from "wagmi";
 import {
   DERIVE_MAINNET_RPC,
   DERIVE_TESTNET_RPC,
@@ -25,8 +25,8 @@ import {
   mainnet,
   optimism,
   polygon,
-  sepolia,
   scroll,
+  sepolia,
 } from "viem/chains";
 
 const { token } = Tenant.current();
@@ -631,8 +631,13 @@ export function getFunctionSignature(decodedData: any): string | null {
   try {
     let signature = `${decodedData.function}(`;
     const paramTypes = Object.entries(decodedData.parameters).map(
-      ([_, param]: [string, any]) => {
-        return param.type || "unknown";
+      // Takes the object name of the parameter and the value supplied and concatenates a string value
+      ([paramName, paramValue]: [string, any]) => {
+        // Force unknown if undefined
+        if (paramName === undefined || paramValue.value === undefined) {
+          return "unknown";
+        }
+        return ` ${paramName.toString()}=${paramValue.value}`;
       }
     );
     signature += paramTypes.join(",");
