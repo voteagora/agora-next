@@ -595,7 +595,7 @@ const ActionSummary = ({
             </TooltipTrigger>
             <TooltipContent>
               <div className="text-xs break-all max-w-[400px]">
-                {functionSignature.stringValue}
+                {functionSignature.toStringValue()}
               </div>
             </TooltipContent>
           </Tooltip>

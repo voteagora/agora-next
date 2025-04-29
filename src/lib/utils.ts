@@ -621,7 +621,7 @@ export const wrappedWaitForTransactionReceipt = async (
 
 interface FunctionSignature {
   functionName: string;
-  stringValue: string;
+  toStringValue: () => string;
   paramValues?: [string, string][] | null;
 }
 
@@ -655,9 +655,12 @@ export function getFunctionSignature(
 
     const functionName = decodedData.function.toString();
 
-    let signature = `${functionName}(`;
-    signature += paramTypes.map(p => p.stringValue).join(",");
-    signature += ")";
+    const toStringValue = () => {
+      let signature = `${functionName}(`;
+      signature += paramTypes.map(p => p.stringValue).join(",");
+      signature += ")";
+      return signature;
+    }
 
     // Filter out null values from the param values
     const paramValues = paramTypes
@@ -666,7 +669,7 @@ export function getFunctionSignature(
 
       return {
         functionName: functionName,
-        stringValue: signature,
+        toStringValue: toStringValue,
         paramValues: paramValues
       };
 
