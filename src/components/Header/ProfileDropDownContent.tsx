@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import { useDisconnect } from "wagmi";
 import { shortAddress } from "@/lib/utils";
 import { rgbStringToHex } from "@/app/lib/utils/color";
@@ -105,7 +105,14 @@ export const ProfileDropDownContent = ({
   } = useProfileData();
 
   const { ui } = Tenant.current();
-  const hasDelegated = delegatees && delegatees.length > 0;
+  const filteredDelegations = useMemo(() => {
+    return delegatees?.filter(
+      (delegation) =>
+        delegation.to !== "0x0000000000000000000000000000000000000000"
+    );
+  }, [delegatees]);
+  const hasDelegated = filteredDelegations && filteredDelegations.length > 0;
+
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
@@ -117,15 +124,14 @@ export const ProfileDropDownContent = ({
   const canEncourageDelegationBecauseOfNoDelegation =
     tokenBalance !== BigInt(0) &&
     isDelegationEncouragementEnabled &&
-    delegatees !== undefined &&
     !hasDelegated;
 
   const renderDelegteesInfo = () => {
     if (!hasDelegated) return null;
 
     if (
-      delegatees.length === 1 &&
-      delegatees[0].to.toLowerCase() === address?.toLowerCase()
+      filteredDelegations?.length === 1 &&
+      filteredDelegations[0].to.toLowerCase() === address?.toLowerCase()
     ) {
       // dont show the section for self delegation.
       return null;
@@ -134,23 +140,27 @@ export const ProfileDropDownContent = ({
     return (
       <div className="flex flex-col p-6 border-b border-line">
         <PanelRow
-          title={delegatees.length > 1 ? "My Delegates" : "My Delegate"}
+          title={
+            filteredDelegations?.length > 1 ? "My Delegates" : "My Delegate"
+          }
           detail={
             <div className="flex flex-col gap-4">
-              {delegatees.slice(0, 3).map((delegate) => (
-                <DelegatePanelRow
-                  key={delegate.transaction_hash}
-                  delegate={delegate}
-                  onClick={handleCloseDrawer}
-                />
-              ))}
-              {delegatees.length > 3 && (
+              {filteredDelegations
+                ?.slice(0, 3)
+                .map((delegate) => (
+                  <DelegatePanelRow
+                    key={delegate.transaction_hash}
+                    delegate={delegate}
+                    onClick={handleCloseDrawer}
+                  />
+                ))}
+              {filteredDelegations?.length > 3 && (
                 <Link
                   href={`/delegates/${address}`}
                   onClick={handleCloseDrawer}
                   className="text-sm text-tertiary font-xs border border-line self-end rounded-full px-2 py-1 "
                 >
-                  +{delegatees.length - 3}
+                  +{filteredDelegations?.length - 3}
                 </Link>
               )}
             </div>

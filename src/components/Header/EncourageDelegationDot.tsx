@@ -1,5 +1,5 @@
 import { useProfileData } from "@/hooks/useProfileData";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { useAccount } from "wagmi";
@@ -7,13 +7,18 @@ import { useAccount } from "wagmi";
 const EncourageDelegationDot = ({ className }: { className?: string }) => {
   const { tokenBalance, delegate, delegatees } = useProfileData();
   const { address } = useAccount();
-
-  const hasDelegated = delegatees && delegatees.length > 0;
+  const filteredDelegations = useMemo(() => {
+    return delegatees?.filter(
+      (delegation) =>
+        delegation.to !== "0x0000000000000000000000000000000000000000"
+    );
+  }, [delegatees]);
+  const hasDelegated = filteredDelegations && filteredDelegations.length > 0;
   const canEncourageDelegationBecauseOfVP =
     tokenBalance !== BigInt(0) && delegate?.votingPower?.total === "0";
 
   const canEncourageDelegationBecauseOfNoDelegation =
-    tokenBalance !== BigInt(0) && delegatees !== undefined && !hasDelegated;
+    tokenBalance !== BigInt(0) && !hasDelegated;
 
   const shouldShowDot =
     canEncourageDelegationBecauseOfVP ||
@@ -28,7 +33,7 @@ const EncourageDelegationDot = ({ className }: { className?: string }) => {
         },
       });
     }
-  }, [shouldShowDot, address, tokenBalance, delegate, delegatees]);
+  }, [shouldShowDot, address]);
 
   if (!shouldShowDot) return null;
 

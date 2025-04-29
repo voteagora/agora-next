@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import { ExclamationCircleIcon } from "@/icons/ExclamationCircleIcon";
 import { DelegateToSelf } from "../Delegations/DelegateToSelf";
 import { useProfileData } from "@/hooks/useProfileData";
@@ -5,13 +7,19 @@ import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 
 export const DelegateToSelfBanner = () => {
   const { delegate, tokenBalance, delegatees } = useProfileData();
-  const hasDelegated = delegatees && delegatees.length > 0;
+  const filteredDelegations = useMemo(() => {
+    return delegatees?.filter(
+      (delegation) =>
+        delegation.to !== "0x0000000000000000000000000000000000000000"
+    );
+  }, [delegatees]);
+  const hasDelegated = filteredDelegations && filteredDelegations.length > 0;
 
   const canEncourageDelegationBecauseOfVP =
     tokenBalance !== BigInt(0) && delegate?.votingPower?.total === "0";
 
   const canEncourageDelegationBecauseOfNoDelegation =
-    tokenBalance !== BigInt(0) && delegatees !== undefined && !hasDelegated;
+    tokenBalance !== BigInt(0) && !hasDelegated;
 
   if (
     !canEncourageDelegationBecauseOfVP &&
