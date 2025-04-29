@@ -16,8 +16,16 @@ function adaptDAONodeResponse(
   const votingModuleName = apiResponse.voting_module_name;
 
   let proposalResults;
+  let proposalData;
 
   if (votingModuleName == "standard") {
+    proposalData = {
+      values: apiResponse.values,
+      targets: apiResponse.targets,
+      signatures: apiResponse.signatures,
+      calldatas: apiResponse.calldatas.map((c) => "0x" + c),
+    };
+
     proposalResults = {
       standard: {
         "0": BigInt(apiResponse.totals["no-param"]?.["0"] ?? "0"),
@@ -27,11 +35,13 @@ function adaptDAONodeResponse(
       approval: null,
     };
   } else if (votingModuleName == "approval") {
+    proposalData = apiResponse.decoded_proposal_data;
+
     const approvalVotes = Object.entries(apiResponse.totals)
       .filter(([key]) => key !== "no-param")
       .map(([param, votes]) => ({
         param,
-        votes: BigInt(votes["1"]),
+        votes: BigInt(votes["1"] ?? "0"),
       }));
 
     proposalResults = {
@@ -43,6 +53,8 @@ function adaptDAONodeResponse(
       },
     };
   } else if (votingModuleName == "optimistic") {
+    proposalData = apiResponse.decoded_proposal_data;
+
     proposalResults = {
       standard: {
         "0": BigInt(apiResponse.totals["no-param"]?.["0"] ?? "0"),
@@ -69,17 +81,12 @@ function adaptDAONodeResponse(
     queued_block: apiResponse.queue_event
       ? BigInt(apiResponse.queue_event.block_number)
       : null,
-    proposal_data: {
-      values: apiResponse.values,
-      targets: apiResponse.targets,
-      calldatas: apiResponse.calldatas,
-      signatures: apiResponse.signatures,
-    },
+    proposal_data: proposalData,
     proposal_type: apiResponse.voting_module_name.toUpperCase() as ProposalType,
     proposal_type_data: null,
     proposal_results: proposalResults,
 
-    proposal_data_raw: null,
+    proposal_data_raw: apiResponse.proposal_data,
 
     created_transaction_hash: null,
     cancelled_transaction_hash: null,
@@ -170,11 +177,19 @@ export const getAllProposalsFromDaoNode = async () => {
     const endTime = Date.now();
     const endTimeS = new Date(endTime).toLocaleString();
 
+    // Optimization: We shouldnt need to sort here
+    // DAO Node should be able to do this for us.
+    // We'll handle this once/if we add
+    // Snapshot to either DAO Node or Agora-Next
+    const sortedProposalsArray = proposalsArray.sort((a, b) => {
+      return b.start_block - a.start_block;
+    });
+
     console.log(
       `${endTimeS} ${emoji} <- getAllProposalsFromDaoNode took ${endTime - startTime}ms`
     );
 
-    return proposalsArray;
+    return sortedProposalsArray;
   } catch (error) {
     console.error("Failed to fetch from DAO Node API:", error);
     throw error;
@@ -267,6 +282,10 @@ export const getProposalsFromDaoNode = async (
     data = data.filter((proposal) => {
       return !proposal.cancel_event;
     });
+  }
+
+  for (const proposal of data) {
+    console.log(proposal.id);
   }
 
   // const has_next: boolean = data.length > skip + take;

@@ -81,6 +81,23 @@ export type ProposalPayloadFromDAONode = {
 
   totals: Record<string, string>;
   voting_module_name: string;
+
+  // this is a string representing bytes, without 0x prefix.
+  // It's the old proposal_data_raw -- Jeff M, 2025-04-29
+  proposal_data: string | null;
+
+  // this is the abi decode version of proposal_data,
+  // cast to integers and strings.
+  // The old DB proposal_data field overloaded and conflated proposal_data
+  // with transaction header information (Eg. targets, values, signatures, calldatas)
+  // for standard votes (only).
+  // We're not going to do that in DAO Node, instead we're going to correct it throughout
+  // agora-next to use the correct treatment.
+  // The one issue that isn't fully resolved is during the decoding,
+  // some large numbers get corrupted by Typescript's JSON treatment.
+  // So, DAO Node might be forced to re-cast large integers as strings, where they exist.
+  // We'll make this decision later, after tests are up and running. -- Jeff M, 2025-04-29
+  decoded_proposal_data?: Object;
 };
 
 export type ProposalPayloadFromDB = {
