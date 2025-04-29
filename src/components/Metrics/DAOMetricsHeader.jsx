@@ -28,14 +28,14 @@ export default function DAOMetricsHeader() {
   const discordLink = ui.link("discord");
   const agoraLink = ui.link("agora");
 
-  // Check if there are any links to display
-  const hasLinks =
-    !!governanceForumLink ||
-    !!bugsLink ||
-    !!changeLogLink ||
-    !!faqLink ||
-    !!discordLink ||
-    !!agoraLink;
+  const links = [
+    governanceForumLink,
+    bugsLink,
+    changeLogLink,
+    faqLink,
+    agoraLink,
+  ].filter(Boolean);
+  const needToHideLinksOnSmallScreens = links.length >= 4;
 
   useEffect(() => {
     setIsClient(true);
@@ -71,7 +71,7 @@ export default function DAOMetricsHeader() {
               </div>
             </div>
             <div className="flex items-center">
-              {hasLinks && (
+              {links.length > 0 && (
                 <div className="flex justify-end items-center text-tertiary px-6 gap-6 h-14 border-l border-line">
                   {discordLink && (
                     <a
@@ -105,7 +105,7 @@ export default function DAOMetricsHeader() {
                   {changeLogLink && (
                     <Link
                       href={changeLogLink.url}
-                      className="text-center hidden lg:inline"
+                      className={`text-center ${needToHideLinksOnSmallScreens ? "hidden lg:inline" : ""}`}
                     >
                       {changeLogLink.title}
                     </Link>
@@ -115,7 +115,7 @@ export default function DAOMetricsHeader() {
                       href={faqLink.url}
                       rel="noreferrer nonopener"
                       target="_blank"
-                      className="text-center hidden lg:inline"
+                      className={`text-center ${needToHideLinksOnSmallScreens ? "hidden lg:inline" : ""}`}
                     >
                       {faqLink.title}
                     </a>

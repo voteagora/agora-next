@@ -11,7 +11,7 @@ export function DesktopConnectButton() {
           <div
             onClick={!isConnected ? () => show?.() : undefined}
             className={cn(
-              "border text-primary lg:bg-neutral py-2 px-4 rounded-full cursor-pointer hidden sm:flex items-center transition-all hover:shadow-newDefault h-[48px]",
+              "border-none lg:border border-solid text-primary lg:bg-neutral p-0 lg:px-4 lg:py-2 rounded-full cursor-pointer hidden md:flex items-center transition-all hover:shadow-newDefault h-[48px]",
               isConnected ? "border-line" : "border-primary"
             )}
           >
