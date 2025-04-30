@@ -14,6 +14,10 @@ import Tenant from "@/lib/tenant/tenant";
 import { useScwVoting } from "@/hooks/useScwVoting";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import ENSName from "@/components/shared/ENSName";
+import { getBalance } from '@wagmi/core'
+import { useAccount } from 'wagmi'
+import { bigint, ZodBigInt } from "zod";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
@@ -123,6 +127,14 @@ const BasicVoteDialog = ({
   const openDialog = useOpenDialog();
   const [hasShownVoteEmailDialog, setHasShownVoteEmailDialog] =
     useState<boolean>(false);
+  const [hasNativeAsset, setHasNativeAsset] = useState<boolean>(false);
+
+  const { address } = useAccount();
+  const userTokenBalance = useTokenBalance(address);
+  const hasNativeAssetBalance =  () => {
+    if (!userTokenBalance || !userTokenBalance.data || userTokenBalance.data <= 0) return false;
+    return true;
+  }
 
   useEffect(() => {
     setHasShownVoteEmailDialog(
@@ -135,6 +147,12 @@ const BasicVoteDialog = ({
     reason,
     missingVote,
   });
+
+  useEffect(() => {
+    setHasNativeAsset(
+      hasNativeAssetBalance()
+    )
+  }, []);
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
@@ -308,14 +326,16 @@ function AdvancedVoteDialog({
             )}
           </div>
           <div>
-            {delegate.statement ? (
-              <VoteButton onClick={write}>
-                Vote {supportType.toLowerCase()} with{"\u00A0"}
-                <TokenAmountDecorated amount={vpToDisplay} />
-              </VoteButton>
-            ) : (
+            if (!delegate.statement) {
               <NoStatementView closeDialog={closeDialog} />
-            )}
+            } else if (!hasNativeAssetBalance) {
+              <NoNativeAssetView closeDialog={closeDialog} />
+            } else {
+                <VoteButton onClick={write}>
+                  Vote {supportType.toLowerCase()} with{"\u00A0"}
+                  <TokenAmountDecorated amount={vpToDisplay} />
+                </VoteButton>
+              }
           </div>
         </div>
       )}
@@ -430,6 +450,21 @@ export function NoStatementView({ closeDialog }: { closeDialog: () => void }) {
         onClick={closeDialog}
       >
         Please set one up to vote.
+      </Link>
+    </div>
+  );
+}
+
+export function NoNativeAssetView({ closeDialog }: { closeDialog: () => void }) {
+  return (
+    <div className="py-2 px-4 z-[1099] bg-line text-xs text-secondary rounded-lg">
+      You do not have !! Native Asset !! to submit the transaction.{" "}
+      <Link
+        href={"/delegates/create"}
+        className="underline"
+        onClick={closeDialog}
+      >
+        RevGen Option?
       </Link>
     </div>
   );
