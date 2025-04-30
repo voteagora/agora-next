@@ -673,10 +673,10 @@ export function getFunctionSignature(
       let signature = `${functionName}(`;
       signature += filteredParams.map(p => {
         let formattedValue;
-        if (p[0] && p[1]) {formattedValue = `${p[0]}=${p[1]}`} // Default, has both name and value
-        else if (p[0] && !p[1]) {formattedValue = `${p[0]}`} // Has only name
+        if (p[0] && p[1]) {formattedValue = `${p[0]}=${p[1]}`} // Default, has both Name and Value
+        else if (p[0] && !p[1]) {formattedValue = `${p[0]}`} // Has only Name
         else if (!p[0] && p[1]) {formattedValue = `${p[1]}`} // Has only Value
-        else if (!p[0] && !p[1]) {formattedValue = `${p[1]}`} // Has neither name nor value, fallback type
+        else if (!p[0] && !p[1]) {formattedValue = `${p[1]}`} // Has neither Name nor Value, fallback to Type
         return formattedValue;
       }).join(",");
       signature += ")";
