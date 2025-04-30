@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { useEnsName } from "wagmi";
 import { truncateAddress } from "@/app/lib/utils/text";
+import Tenant from "@/lib/tenant/tenant";
+
+const { contracts } = Tenant.current();
 
 interface ENSNameProps {
   address: string;
@@ -16,7 +19,7 @@ export default function ENSName({ address, truncate = true }: ENSNameProps) {
   );
 
   const { data } = useEnsName({
-    chainId: 1,
+    chainId: contracts?.token.chain.id || 1,
     address: address as `0x${string}`,
   });
 
