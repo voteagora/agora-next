@@ -638,12 +638,12 @@ export function getFunctionSignature(
 
   try {
     const paramTypes: {
-      paramValues: [string | null, string] | null;
+      paramValues: [string | null, string | null];
     }[] = Object.entries(decodedData.parameters).map(
       ([paramName, paramValue]: [string, any]) => {
         // Force null if param value is undefined
-        if (paramValue.value === undefined) {
-          return { paramValues: null };
+        if (paramName && paramValue.value === undefined) {
+          return { paramValues: [paramName, null] };
         //   Case where there is no name, but is a value, use value only
         } else if (!paramName && paramValue.value) {
           return { paramValues: [null, paramValue.value]}
