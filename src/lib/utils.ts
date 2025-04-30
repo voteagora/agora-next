@@ -671,7 +671,14 @@ export function getFunctionSignature(
 
       // Build the function signature
       let signature = `${functionName}(`;
-      signature += filteredParams.map(p => `${p[0]}=${p[1]}`).join(",");
+      signature += filteredParams.map(p => {
+        let formattedValue;
+        if (p[0] && p[1]) {formattedValue = `${p[0]}=${p[1]}`} // Default, has both name and value
+        else if (p[0] && !p[1]) {formattedValue = `${p[0]}`} // Has only name
+        else if (!p[0] && p[1]) {formattedValue = `${p[1]}`} // Has only Value
+        else if (!p[0] && !p[1]) {formattedValue = `${p[1]}`} // Has neither name nor value, fallback type
+        return formattedValue;
+      }).join(",");
       signature += ")";
       return signature;
     };
