@@ -641,7 +641,7 @@ export function getFunctionSignature(
       paramValues: [string | null, string | null];
     }[] = Object.entries(decodedData.parameters).map(
       ([paramName, paramValue]: [string, any]) => {
-        // Force null if param value is undefined
+        //   Case where there is a name, but is no value, use name only
         if (paramName && paramValue.value === undefined) {
           return { paramValues: [paramName, null] };
         //   Case where there is no name, but is a value, use value only
