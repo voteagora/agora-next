@@ -583,7 +583,10 @@ const ActionSummary = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="truncate text-xs break-all">
-                <p>{functionSignature.functionName}(</p>
+                <p>
+                  {functionSignature.functionName}(
+                  {functionSignature.paramValues && functionSignature.paramValues.length === 0 && <span>)</span>}
+                </p>
                 {functionSignature.paramValues &&
                   functionSignature.paramValues.slice(0, 3).map( (param, idx) => (
                   <p key={idx} className="font-medium" style={{ marginLeft: '1em' }}
@@ -593,7 +596,9 @@ const ActionSummary = ({
                 {functionSignature.paramValues && functionSignature.paramValues.length > 3 &&
                   <p className="font-medium" style={{ marginLeft: '1em' }}>...</p>
                 }
-                <p>)</p>
+                {functionSignature.paramValues && functionSignature.paramValues.length > 0 &&
+                  <p>)</p>
+                }
               </div>
             </TooltipTrigger>
             <TooltipContent>
