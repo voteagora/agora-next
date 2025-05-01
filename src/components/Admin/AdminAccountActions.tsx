@@ -14,6 +14,8 @@ export default function AdminAccountActions() {
     });
   };
 
+  // TODO - Conditional check governor contract for handling manager account transfer
+
   return (
     <section className="gl_box bg-neutral">
       <h1 className="font-extrabold text-2xl text-primary">Account Actions</h1>
