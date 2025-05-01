@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 export function CreateAccountActionDialog() {
   const form = useForm({
@@ -21,28 +21,32 @@ export function CreateAccountActionDialog() {
   const [acknowledged, setAcknowledged] = useState(false);
 
   return (
-    <Form {...form}>
-      <form className="space-y-8 max-w-2xl mx-auto">
-        <FormField
-          control={form.control}
-          name="contractAddress"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Contract Address</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="0x..." className="h-10" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+    <Fragment>
+      <Form {...form}>
+        <form className="space-y-8 max-w-2xl mx-auto">
+          <FormField
+            control={form.control}
+            name="contractAddress"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Contract Address</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="0x..." className="h-10" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {acknowledged ? (
+            <Button>Transfer</Button>
+          ) : (
+            <Aknowledgement
+              handleAcknowledgement={() => setAcknowledged(true)}
+            />
           )}
-        />
-        {acknowledged ? (
-          <Button>Transfer</Button>
-        ) : (
-          <Aknowledgement handleAcknowledgement={() => setAcknowledged(true)} />
-        )}
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </Fragment>
   );
 }
 
@@ -53,8 +57,14 @@ function Aknowledgement({
 }) {
   return (
     <div>
-      <p>Warning: This is irreversible</p>
-      <Button variant="outline" onClick={handleAcknowledgement}>
+      <p>
+        <span className="text-orange-500">Warning</span>: This is irreversible
+      </p>
+      <Button
+        variant="outline"
+        className="bg-red-100 border-red-500 text-red-500 hover:bg-red-200"
+        onClick={handleAcknowledgement}
+      >
         Acknowledge
       </Button>
     </div>
