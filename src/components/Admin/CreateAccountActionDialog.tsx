@@ -26,6 +26,7 @@ export function CreateAccountActionDialog() {
     name: "contractAddress",
   });
 
+  // This could be validated further if required
   const addressSupplied = !!contractAddress;
 
   return (
