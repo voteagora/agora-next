@@ -66,19 +66,9 @@ export const etherfiTenantUIConfig = new TenantUI({
       url: "https://discord.gg/vBJkUYBuwX",
     },
     {
-      name: "bugs",
-      title: "Report bugs & feedback",
-      url: "https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc",
-    },
-    {
       name: "governance-forum",
       title: "Governance Forum",
       url: "https://governance.ether.fi/",
-    },
-    {
-      name: "changelog",
-      title: "Change log",
-      url: "/changelog",
     },
   ],
 
@@ -125,7 +115,6 @@ export const etherfiTenantUIConfig = new TenantUI({
     },
     {
       route: "proposals",
-      href: "https://snapshot.org/#/etherfi-dao.eth",
       title: "Agora is the home of ether.fi delegates",
       description:
         "ETHER.FI voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
