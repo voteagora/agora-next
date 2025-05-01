@@ -123,74 +123,21 @@ export default function GovernorSettings() {
         <h1 className="font-extrabold text-2xl text-primary">
           Governor settings
         </h1>
-        <p className="text-secondary">Set how all proposals work</p>
       </section>
       <div className="my-4">
-        <div className="space-y-4 sm:space-y-0 sm:flex sm:justify-between sm:gap-4">
-          <div className="flex-1">
-            <Label>Voting period</Label>
-            <div className="relative flex items-center">
-              <Input
-                min={0}
-                value={votingPeriod}
-                onChange={(e) => setVotingPeriod(e.target.value)}
-                disabled={/* isInitializing || */ isDisabledSetVotingPeriod}
-                step={0.01}
-                type="number"
-              />
-              <p className="absolute text-sm text-tertiary right-[96px]">
-                Hours
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="absolute right-[6px] rounded-sm"
-                loading={isDisabledSetVotingPeriod}
-                disabled={
-                  /* isInitializing || */ isDisabledSetVotingPeriod ||
-                  setVotingPeriodError ||
-                  votingPeriod === ""
-                }
-                onClick={() => {
-                  writeSetVotingPeriod(setVotingPeriodConfig!.request);
-                }}
-              >
-                Update
-              </Button>
-            </div>
+        <div className="space-y-1 sm:space-y-0 text-sm sm:flex sm:justify-between sm:items-center sm:px-2">
+          <div className="flex items-center gap-2">
+            <p className="text-secondary">Voting Period</p>
+            <Lock className="w-4 h-4 text-primary/30" />
           </div>
-          <div className="flex-1">
-            <Label>Voting delay</Label>
-            <div className="relative flex items-center">
-              <Input
-                min={0}
-                value={votingDelay}
-                onChange={(e) => setVotingDelay(e.target.value)}
-                disabled={/* isInitializing || */ isDisabledSetVotingDelay}
-                step={0.01}
-                type="number"
-              />
-              <p className="absolute text-sm text-tertiary right-[96px]">
-                Hours
-              </p>
-              <Button
-                className="absolute right-[6px] rounded-sm"
-                variant="outline"
-                size="sm"
-                loading={isDisabledSetVotingDelay}
-                disabled={
-                  /* isInitializing || */ isDisabledSetVotingDelay ||
-                  setVotingDelayError ||
-                  votingDelay === ""
-                }
-                onClick={() => {
-                  writeSetVotingDelay(setVotingDelayConfig!.request);
-                }}
-              >
-                Update
-              </Button>
-            </div>
+          <p className="text-secondary truncate">{votingPeriod}</p>
+        </div>
+        <div className="text-sm sm:flex sm:justify-between sm:items-center sm:px-2 mt-4">
+          <div className="flex items-center gap-2">
+            <p className="text-secondary">Voting Delay</p>
+            <Lock className="w-4 h-4 text-primary/30" />
           </div>
+          <p className="text-secondary truncate">{votingDelay}</p>
         </div>
         <Separator className="my-8" />
         <div className="space-y-1 sm:space-y-0 text-sm sm:flex sm:justify-between sm:items-center sm:px-2">
