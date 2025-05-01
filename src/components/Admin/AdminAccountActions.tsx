@@ -2,9 +2,17 @@
 
 import { Button } from "@/components/ui/button";
 import { Fragment } from "react";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
 export default function AdminAccountActions() {
-  const handleAccountTransfer = () => {};
+  const openDialog = useOpenDialog();
+
+  const handleAccountTransfer = () => {
+    openDialog({
+      type: "ACCOUNT_ACTION",
+      params: {},
+    });
+  };
 
   return (
     <section className="gl_box bg-neutral">
