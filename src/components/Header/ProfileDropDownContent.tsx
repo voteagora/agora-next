@@ -158,7 +158,7 @@ export const ProfileDropDownContent = ({
                 ))}
               {filteredDelegations?.length > 3 && (
                 <Link
-                  href={`/delegates/${address}`}
+                  href={`/delegates/${address}?tab=delegations&subtab=delegatedTo`}
                   onClick={handleCloseDrawer}
                   className="text-sm text-tertiary font-xs border border-line self-end rounded-full px-2 py-1 "
                 >

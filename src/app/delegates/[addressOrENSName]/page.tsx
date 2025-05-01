@@ -16,7 +16,8 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import { redirect } from "next/navigation";
 
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { TabsContent } from "@/components/ui/tabs";
+import { ProfileTabs } from "./ProfileTabs";
 import DelegateStatementWrapper from "@/components/Delegates/DelegateStatement/DelegateStatementWrapper";
 import DelegationsContainerWrapper, {
   DelegationsContainerSkeleton,
@@ -24,6 +25,7 @@ import DelegationsContainerWrapper, {
 import VotesContainerWrapper, {
   VotesContainerSkeleton,
 } from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
+import { loadProfileSearchParams } from "@/app/delegates/[addressOrENSName]/params";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -83,11 +85,18 @@ export async function generateMetadata(
 
 export default async function Page({
   params: { addressOrENSName },
+  searchParams,
 }: {
   params: { addressOrENSName: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const { ui } = Tenant.current();
   const address = await ensNameToAddress(addressOrENSName);
+
+  // Parse the tab parameter from URL
+  const { tab } = loadProfileSearchParams(searchParams);
+
+  const activeTab = tab || "statement";
 
   // Check if this is a SCW address
   const scwConfig = ui.smartAccountConfig;
@@ -125,19 +134,7 @@ export default async function Page({
       </div>
       {!scwDelegate ? (
         <div className="flex flex-col md:ml-8 lg:ml-12 min-w-0 flex-1 max-w-full">
-          <Tabs defaultValue={"statement"} className="w-full">
-            <TabsList className="mb-8">
-              <TabsTrigger value="statement" variant="underlined">
-                Statement
-              </TabsTrigger>
-              <TabsTrigger value="participation" variant="underlined">
-                Participation
-              </TabsTrigger>
-              <TabsTrigger value="delegations" variant="underlined">
-                Delegations
-              </TabsTrigger>
-            </TabsList>
-
+          <ProfileTabs initialTab={activeTab}>
             <TabsContent value="statement">
               <DelegateStatementWrapper delegate={delegate} />
             </TabsContent>
@@ -151,7 +148,7 @@ export default async function Page({
                 <DelegationsContainerWrapper delegate={delegate} />
               </Suspense>
             </TabsContent>
-          </Tabs>{" "}
+          </ProfileTabs>
         </div>
       ) : (
         <DelegateStatementWrapper delegate={delegate} />
