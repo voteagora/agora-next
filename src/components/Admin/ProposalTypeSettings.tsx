@@ -63,7 +63,7 @@ const RestrictedCallout = () => {
     !addressesToRender.some((addr) => addr.address === address)
   ) {
     return (
-      <div className="text-sm w-[800px] rounded border-2 p-4 bg-negative/10 border-negative text-negative mt-4">
+      <div className="text-sm max-w-[800px] rounded border-2 p-4 bg-negative/10 border-negative text-negative mt-4 overflow-x-auto overflow-y-hidden">
         Only the following addresses can create or update proposal types:
         <ul className="list-disc list-inside">
           {addressesToRender.map((addr) => (
