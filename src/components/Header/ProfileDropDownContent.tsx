@@ -117,11 +117,13 @@ export const ProfileDropDownContent = ({
     "delegation-encouragement"
   )?.enabled;
   const canEncourageDelegationBecauseOfVP =
+    tokenBalance !== undefined &&
     tokenBalance !== BigInt(0) &&
     delegate?.votingPower?.total === "0" &&
     isDelegationEncouragementEnabled;
 
   const canEncourageDelegationBecauseOfNoDelegation =
+    tokenBalance !== undefined &&
     tokenBalance !== BigInt(0) &&
     isDelegationEncouragementEnabled &&
     !hasDelegated;

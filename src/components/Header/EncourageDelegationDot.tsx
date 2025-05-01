@@ -15,15 +15,16 @@ const EncourageDelegationDot = ({ className }: { className?: string }) => {
   }, [delegatees]);
   const hasDelegated = filteredDelegations && filteredDelegations.length > 0;
   const canEncourageDelegationBecauseOfVP =
-    tokenBalance !== BigInt(0) && delegate?.votingPower?.total === "0";
+    tokenBalance !== undefined &&
+    tokenBalance !== BigInt(0) &&
+    delegate?.votingPower?.total === "0";
 
   const canEncourageDelegationBecauseOfNoDelegation =
-    tokenBalance !== BigInt(0) && !hasDelegated;
+    tokenBalance !== undefined && tokenBalance !== BigInt(0) && !hasDelegated;
 
   const shouldShowDot =
     canEncourageDelegationBecauseOfVP ||
     canEncourageDelegationBecauseOfNoDelegation;
-
   useEffect(() => {
     if (shouldShowDot && address) {
       trackEvent({
