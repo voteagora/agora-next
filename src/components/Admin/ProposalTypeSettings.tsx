@@ -150,7 +150,7 @@ export default function ProposalTypeSettings({
   return (
     <section className="gl_box bg-neutral">
       <h1 className="font-extrabold text-2xl text-primary">
-        Proposal type settings
+        Proposal Type Settings
       </h1>
       <p className="text-secondary">
         Create and manage different types of proposals

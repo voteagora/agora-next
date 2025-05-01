@@ -121,7 +121,7 @@ export default function GovernorSettings() {
     <div className="gl_box bg-neutral">
       <section>
         <h1 className="font-extrabold text-2xl text-primary">
-          Governor settings
+          Governor Settings
         </h1>
       </section>
       <div className="my-4">
