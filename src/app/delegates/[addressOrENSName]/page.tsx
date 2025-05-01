@@ -112,11 +112,18 @@ export default async function Page({
     );
   }
 
+  const parsedDelegate = Object.assign({}, delegate, {
+    statement: {
+      ...delegate.statement,
+      email: null,
+    },
+  });
+
   return (
     <div className="flex flex-col md:flex-row items-center md:items-start gap-6 justify-between mt-12 w-full max-w-full">
       <div className="flex flex-col static md:sticky top-16 shrink-0 w-full md:max-w-[330px] lg:max-w-[350px]">
         <DelegateCard
-          delegate={delegate}
+          delegate={parsedDelegate}
           description={textRecords?.description}
           location={textRecords?.location}
           followersCount={efpStats?.followers_count}
@@ -139,22 +146,22 @@ export default async function Page({
             </TabsList>
 
             <TabsContent value="statement">
-              <DelegateStatementWrapper delegate={delegate} />
+              <DelegateStatementWrapper delegate={parsedDelegate} />
             </TabsContent>
             <TabsContent value="participation">
               <Suspense fallback={<VotesContainerSkeleton />}>
-                <VotesContainerWrapper delegate={delegate} />
+                <VotesContainerWrapper delegate={parsedDelegate} />
               </Suspense>
             </TabsContent>
             <TabsContent value="delegations">
               <Suspense fallback={<DelegationsContainerSkeleton />}>
-                <DelegationsContainerWrapper delegate={delegate} />
+                <DelegationsContainerWrapper delegate={parsedDelegate} />
               </Suspense>
             </TabsContent>
           </Tabs>{" "}
         </div>
       ) : (
-        <DelegateStatementWrapper delegate={delegate} />
+        <DelegateStatementWrapper delegate={parsedDelegate} />
       )}
     </div>
   );
