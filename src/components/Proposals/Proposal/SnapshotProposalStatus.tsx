@@ -7,7 +7,7 @@ export default function SnapshotProposalStatus({
   proposal: Proposal;
 }) {
   return (
-    <VStack className="text-right">
+    <VStack className="text-right text-primary">
       <p>{(proposal.proposalData as any).scores.length} Choices</p>
     </VStack>
   );
