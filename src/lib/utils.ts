@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { useMemo } from "react";
 import Tenant from "./tenant/tenant";
 import { TENANT_NAMESPACES } from "./constants";
-import { http, fallback } from "wagmi";
+import { fallback, http } from "wagmi";
 import {
   DERIVE_MAINNET_RPC,
   DERIVE_TESTNET_RPC,
@@ -25,8 +25,8 @@ import {
   mainnet,
   optimism,
   polygon,
-  sepolia,
   scroll,
+  sepolia,
 } from "viem/chains";
 
 const { token } = Tenant.current();
@@ -619,7 +619,15 @@ export const wrappedWaitForTransactionReceipt = async (
   }
 };
 
-export function getFunctionSignature(decodedData: any): string | null {
+interface FunctionSignature {
+  functionName: string;
+  toStringValue: () => string | null;
+  paramValues?: [string, string][] | null;
+}
+
+export function getFunctionSignature(
+  decodedData: any
+): FunctionSignature | null {
   if (
     !decodedData ||
     !decodedData.function ||
@@ -629,17 +637,65 @@ export function getFunctionSignature(decodedData: any): string | null {
   }
 
   try {
-    let signature = `${decodedData.function}(`;
-    const paramTypes = Object.entries(decodedData.parameters).map(
-      ([_, param]: [string, any]) => {
-        return param.type || "unknown";
+    const paramTypes: {
+      paramValues: [string | null, string | null];
+    }[] = Object.entries(decodedData.parameters).map(
+      ([paramName, paramValue]: [string, any]) => {
+        //   Case where there is a name, but is no value, use name only
+        if (paramName && paramValue.value === undefined) {
+          return { paramValues: [paramName, null] };
+        //   Case where there is no name, but is a value, use value only
+        } else if (!paramName && paramValue.value) {
+          return { paramValues: [null, paramValue.value]}
+        //   Case where neither name nor value, fall back to type as value
+        } else if (!paramName && paramValue.value === undefined) {
+          return { paramValues: [null, paramValue.type]}
+        }
+        return {
+          paramValues: [paramName, paramValue.value],
+        };
       }
     );
-    signature += paramTypes.join(",");
-    signature += ")";
 
-    return signature;
+    const functionName = decodedData.function.toString();
+
+    const toStringValue = () => {
+      if (!paramTypes) {
+        return null;
+      }
+
+      // Filter out null values
+      const filteredParams: [string, string][] = paramTypes
+        .map(p => p.paramValues)
+        .filter((p): p is [string, string] => p !== null)
+
+      // Build the function signature
+      let signature = `${functionName}(`;
+      signature += filteredParams.map(p => {
+        let formattedValue;
+        if (p[0] && p[1]) {formattedValue = `${p[0]}=${p[1]}`} // Default, has both Name and Value
+        else if (p[0] && !p[1]) {formattedValue = `${p[0]}`} // Has only Name
+        else if (!p[0] && p[1]) {formattedValue = `${p[1]}`} // Has only Value
+        else if (!p[0] && !p[1]) {formattedValue = `${p[1]}`} // Has neither Name nor Value, fallback to Type
+        return formattedValue;
+      }).join(",");
+      signature += ")";
+      return signature;
+    };
+
+    // Filter out null values from the param values
+    const paramValues = paramTypes
+      .map(p => p.paramValues)
+      .filter((p): p is [string, string] => p !== null);
+
+      return {
+        functionName: functionName,
+        toStringValue: toStringValue,
+        paramValues: paramValues
+      };
+
   } catch (error) {
+    console.error(error);
     return null;
   }
 }

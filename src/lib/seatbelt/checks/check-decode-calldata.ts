@@ -217,7 +217,9 @@ async function prettifyCalldata(
       call.input as `0x${string}`
     );
     if (decoded && decoded.usedMethod !== "failed") {
-      const signature = getFunctionSignature(decoded);
+      const signatureRaw = getFunctionSignature(decoded);
+      // Will try string value, followed by just the function name, falling back to unknown.
+      const signature = signatureRaw?.toStringValue() ?? signatureRaw?.functionName?? 'unknown';
       return `\`${call.from}\` calls \`${signature}\` on ${contractIdentifier} (decoded from ABI)`;
     }
 
