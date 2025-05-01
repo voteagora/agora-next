@@ -1,9 +1,8 @@
 "use client";
 
-import { FC, PropsWithChildren } from "react";
+import { FC, PropsWithChildren, useState, useEffect } from "react";
 import { createConfig, WagmiProvider, type Transport } from "wagmi";
 import { inter } from "@/styles/fonts";
-import { mainnet } from "wagmi/chains";
 import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
 import { ConnectKitProvider, getDefaultConfig, SIWEProvider } from "connectkit";
@@ -16,6 +15,11 @@ import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import Tenant from "@/lib/tenant/tenant";
 import { getTransportForChain } from "@/lib/utils";
 import { hashFn } from "@wagmi/core/query";
+
+import { mainnet } from "viem/chains";
+import SafeApiKitProvider from "@/contexts/SafeApiKitContext";
+import SafeProtocolKitProvider from "@/contexts/SafeProtocolKit";
+import SelectedWalletProvider from "@/contexts/SelectedWalletContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,7 +42,7 @@ const shouldHideAgoraBranding = ui.hideAgoraBranding;
 export const config = createConfig(
   getDefaultConfig({
     walletConnectProjectId: projectId,
-    chains: [contracts.token.chain, mainnet],
+    chains: [contracts.token.chain, mainnet as any],
     transports: {
       [mainnet.id]: getTransportForChain(mainnet.id)!,
       [contracts.token.chain.id]: getTransportForChain(
@@ -56,19 +60,27 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
     <QueryClientProvider client={queryClient}>
       <SIWEProvider {...siweProviderConfig}>
         <ConnectKitProvider options={{ enforceSupportedChains: false }}>
-          <body className={inter.variable}>
-            <noscript>You need to enable JavaScript to run this app.</noscript>
-            {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
-            {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
-            <ConnectButtonProvider>
-              <PageContainer>
-                <Toaster />
-                <AgoraProvider>{children}</AgoraProvider>
-              </PageContainer>
-            </ConnectButtonProvider>
-            {!shouldHideAgoraBranding && <Footer />}
-            <SpeedInsights />
-          </body>
+          <SelectedWalletProvider>
+            <SafeApiKitProvider>
+              <SafeProtocolKitProvider>
+                <body className={inter.variable}>
+                  <noscript>
+                    You need to enable JavaScript to run this app.
+                  </noscript>
+                  {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
+                  {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
+                  <ConnectButtonProvider>
+                    <PageContainer>
+                      <Toaster />
+                      <AgoraProvider>{children}</AgoraProvider>
+                    </PageContainer>
+                  </ConnectButtonProvider>
+                  {!shouldHideAgoraBranding && <Footer />}
+                  <SpeedInsights />
+                </body>
+              </SafeProtocolKitProvider>
+            </SafeApiKitProvider>
+          </SelectedWalletProvider>
         </ConnectKitProvider>
       </SIWEProvider>
     </QueryClientProvider>
