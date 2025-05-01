@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -20,6 +20,14 @@ export function CreateAccountActionDialog() {
 
   const [acknowledged, setAcknowledged] = useState(false);
 
+  // Watch the contractAddress field
+  const contractAddress = useWatch({
+    control: form.control,
+    name: "contractAddress",
+  });
+
+  const addressSupplied = !!contractAddress;
+
   return (
     <Fragment>
       <Form {...form}>
@@ -38,9 +46,16 @@ export function CreateAccountActionDialog() {
             )}
           />
           {acknowledged ? (
-            <Button>Transfer</Button>
+            <div>
+              {!addressSupplied && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Please supply an address
+                </p>
+              )}
+              <Button disabled={!addressSupplied}>Transfer</Button>
+            </div>
           ) : (
-            <Aknowledgement
+            <Acknowledgement
               handleAcknowledgement={() => setAcknowledged(true)}
             />
           )}
@@ -50,7 +65,7 @@ export function CreateAccountActionDialog() {
   );
 }
 
-function Aknowledgement({
+function Acknowledgement({
   handleAcknowledgement,
 }: {
   handleAcknowledgement: () => void;
