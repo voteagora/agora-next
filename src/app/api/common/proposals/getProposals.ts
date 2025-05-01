@@ -19,17 +19,13 @@ import {
   ProposalStage as PrismaProposalStage,
   ProposalType,
 } from "@prisma/client";
-import {
-  Proposal,
-  ProposalPayload,
-  ProposalPayloadFromDAONode,
-  ProposalPayloadFromDB,
-} from "./proposal";
+import { Proposal, ProposalPayload } from "./proposal";
 import { doInSpan } from "@/app/lib/logging";
 import {
   findProposal,
   findProposalType,
   findProposalsQueryFromDB,
+  findSnapshotProposalsQueryFromDb,
   getProposalsCount,
 } from "@/lib/prismaUtils";
 import { Block } from "ethers";
@@ -37,9 +33,21 @@ import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
 import { getPublicClient } from "@/lib/viem";
 import {
+  adaptDAONodeResponse,
+  getCachedAllProposalsFromDaoNode,
   getProposalTypesFromDaoNode,
-  getProposalsFromDaoNode,
 } from "@/app/lib/dao-node/client";
+
+function getSnapshotProposalsFromDB() {
+  const { namespace, contracts } = Tenant.current();
+
+  return findSnapshotProposalsQueryFromDb({
+    namespace,
+    contract: contracts.governor.address,
+  });
+}
+
+const fetchSnapshotProposalsFromDB = cache(getSnapshotProposalsFromDB);
 
 async function getProposals({
   filter,
@@ -60,19 +68,40 @@ async function getProposals({
             const useDaoNode =
               ui.toggle("use-daonode-for-proposals")?.enabled ?? false;
 
+            const useSnapshot = ui.toggle("snapshotVotes")?.enabled ?? false;
+
             let proposalsResult;
 
             if (useDaoNode) {
               proposalsResult = await paginateResult(
                 async (skip: number, take: number) => {
                   try {
-                    const result = await getProposalsFromDaoNode(
-                      skip,
-                      take,
-                      filter
-                    );
+                    let data = await getCachedAllProposalsFromDaoNode();
 
-                    return result as unknown as ProposalPayload[];
+                    if (filter == "relevant") {
+                      data = data.filter((proposal) => {
+                        return !proposal.cancel_event;
+                      });
+                    }
+
+                    // We could do this in the cache,
+                    // but it's tech-debt I don't want the client
+                    // to absorbe.
+                    data = data.map(adaptDAONodeResponse);
+
+                    if (useSnapshot) {
+                      const snapshotData = await fetchSnapshotProposalsFromDB();
+                      data = [...data, ...snapshotData];
+
+                      // TODO - Feeling like more and more, the client should handle the sort.
+                      data.sort((a, b) => {
+                        return b.start_block - a.start_block;
+                      });
+                    }
+
+                    data = data.slice(skip, skip + take);
+
+                    return data as unknown as ProposalPayload[];
                   } catch (error) {
                     console.warn("REST API failed, falling back to DB:", error);
                   }
