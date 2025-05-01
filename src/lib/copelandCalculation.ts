@@ -9,10 +9,14 @@
  */
 
 import { SnapshotVote } from "@/app/api/common/votes/vote";
+import Tenant from "./tenant/tenant";
+
+const { isProd } = Tenant.current();
 
 // Constants
 const NONE_BELOW = "none below";
-const EXTENDED_SUFFIX = " - ext";
+const EXTENDED_SUFFIX = isProd ? "(Ext)" : " - ext";
+const SEPARATOR = isProd ? "(" : "-";
 
 // Rank values
 const RANK_UNRANKED = -1;
@@ -56,7 +60,7 @@ function getBaseOptionFromExtended(
   option: string,
   options: string[]
 ): string | null {
-  const optionWithoutSuffix = option.split("-")?.[0]?.trim();
+  const optionWithoutSuffix = option.split(SEPARATOR)?.[0]?.trim();
   if (optionWithoutSuffix) {
     return (
       options.find(
@@ -73,7 +77,7 @@ const findFundingInfo = (
   fundingInfo: Record<string, FundingInfo>
 ) => {
   const baseOption = getBaseOptionFromExtended(option, options) ?? option;
-  const optionWithoutSuffix = baseOption.split("-")?.[0]?.trim();
+  const optionWithoutSuffix = baseOption.split(SEPARATOR)?.[0]?.trim();
   return (
     fundingInfo[optionWithoutSuffix] || {
       ext: 0,
@@ -126,7 +130,7 @@ export function calculateCopelandVote(
 
   options.forEach((option) => {
     const baseOption = getBaseOptionFromExtended(option, options);
-    if (baseOption) {
+    if (baseOption && isExtendedOption(option)) {
       extendedToStandardMap.set(option, baseOption);
     }
     scores[option] = 0;
@@ -147,7 +151,7 @@ export function calculateCopelandVote(
       ? JSON.parse(vote.choice)
       : vote.choice;
 
-    const noneIndex = options.findIndex((o) => o === NONE_BELOW);
+    const noneIndex = options.findIndex((o) => o.toLowerCase() === NONE_BELOW);
     const noneRank =
       noneIndex !== -1
         ? (parsedChoice as number[]).findIndex(
@@ -379,11 +383,13 @@ export function calculateCopelandVote(
       // If this is a standard option, check if it has an extended version
       const hasExtendedVersion =
         isStandardOption &&
-        options.includes(`${option.split("-")?.[0]?.trim()}${EXTENDED_SUFFIX}`);
+        options.includes(
+          `${option.split(SEPARATOR)?.[0]?.trim()}${EXTENDED_SUFFIX}`
+        );
 
       if (isStandardOption && hasExtendedVersion) {
         // Find the extended version of this option
-        const extendedOption = `${option.split("-")?.[0]?.trim()}${EXTENDED_SUFFIX}`;
+        const extendedOption = `${option.split(SEPARATOR)?.[0]?.trim()}${EXTENDED_SUFFIX}`;
         const extendedIndex = options.findIndex((o) => o === extendedOption);
         const extendedRank = (parsedChoice as number[]).findIndex(
           (choice) => choice === extendedIndex + 1
@@ -490,7 +496,7 @@ export function calculateCopelandVote(
       let fundingType: FundingType = "None";
 
       // NONE_BELOW option always gets None funding type
-      if (option === NONE_BELOW) {
+      if (option.toLowerCase() === NONE_BELOW) {
         resultsWithFunding.push({
           ...results.find((r) => r.option === option)!,
           fundingType: "None" as FundingType,
@@ -582,7 +588,7 @@ export function calculateCopelandVote(
   // Allocate remaining 1Y funding
   for (const result of sortedFor1Y) {
     // Skip NONE_BELOW options
-    if (result.option === NONE_BELOW) continue;
+    if (result.option.toLowerCase() === NONE_BELOW) continue;
 
     const resultIndex = resultsWithFunding.findIndex(
       (r) => r.option === result.option

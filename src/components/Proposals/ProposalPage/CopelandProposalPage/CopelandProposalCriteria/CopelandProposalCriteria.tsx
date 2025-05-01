@@ -26,6 +26,10 @@ export default function CopelandProposalCriteria() {
             a point for a win. Candidates are stack ranked based on number of
             wins. Ties are broken using average voting support across every
             matchup.
+            <br />
+            <br />
+            Read the snapshot proposal description for details about how and where
+            to vote.
           </AccordionContent>
         </AccordionItem>
       </Accordion>

@@ -8,7 +8,6 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import { ParsedProposalData } from "@/lib/proposalUtils";
-import Link from "next/link";
 import CopelandProposalCriteria from "../CopelandProposalCriteria/CopelandProposalCriteria";
 import CopelandProposalVotesList from "@/components/Votes/CopelandProposalVotesList/CopelandProposalVotesList";
 import OptionsResultsPanel from "../OptionsResultsPanel/OptionsResultsPanel";
@@ -160,21 +159,6 @@ export default function CopelandVotesPanel({
           </>
         )}
         <CopelandProposalCriteria />
-        {proposalState === "ACTIVE" && (
-          <div className="px-4 pb-6">
-            <Link
-              href={
-                (
-                  proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"]
-                ).link
-              }
-              target="_blank"
-              className={`bg-primary hover:bg-primary/90 rounded-lg text-base cursor-pointer py-3 px-5 transition-all text-neutral font-semibold active:shadow-none h-10 capitalize flex items-center justify-center flex-1`}
-            >
-              Vote
-            </Link>
-          </div>
-        )}
       </div>
     </motion.div>
   );
