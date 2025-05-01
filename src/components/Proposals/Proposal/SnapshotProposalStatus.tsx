@@ -23,7 +23,7 @@ export default function SnapshotProposalStatus({
   }
 
   return (
-    <div className="flex flex-col items-end">
+    <div className="flex flex-col items-end text-primary">
       {(proposal.proposalData as any).choices.length} Choices
     </div>
   );
