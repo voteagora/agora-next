@@ -125,38 +125,32 @@ export default function GovernorSettings() {
         </h1>
       </section>
       <div className="my-4">
-        <div className="space-y-1 sm:space-y-0 text-sm sm:flex sm:justify-between sm:items-center sm:px-2">
-          <div className="flex items-center gap-2">
-            <p className="text-secondary">Voting Period</p>
-            <Lock className="w-4 h-4 text-primary/30" />
-          </div>
-          <p className="text-secondary truncate">{votingPeriod}</p>
-        </div>
-        <div className="text-sm sm:flex sm:justify-between sm:items-center sm:px-2 mt-4">
-          <div className="flex items-center gap-2">
-            <p className="text-secondary">Voting Delay</p>
-            <Lock className="w-4 h-4 text-primary/30" />
-          </div>
-          <p className="text-secondary truncate">{votingDelay}</p>
-        </div>
+        <GovernorLockedSetting name={"Voting Period"} value={votingPeriod} />
+        <GovernorLockedSetting name={"Voting Delay"} value={votingDelay} />
         <Separator className="my-8" />
-        <div className="space-y-1 sm:space-y-0 text-sm sm:flex sm:justify-between sm:items-center sm:px-2">
-          <div className="flex items-center gap-2">
-            <p className="text-secondary">Manager Address</p>
-            <Lock className="w-4 h-4 text-primary/30" />
-          </div>
-          <p className="text-secondary truncate">{manager}</p>
-        </div>
-        <div className="text-sm sm:flex sm:justify-between sm:items-center sm:px-2 mt-4">
-          <div className="flex items-center gap-2">
-            <p className="text-secondary">Admin Address</p>
-            <Lock className="w-4 h-4 text-primary/30" />
-          </div>
-          <p className="text-secondary truncate">
-            {adminAddress ? adminAddress : "0x..."}
-          </p>
-        </div>
+        <GovernorLockedSetting name={"Manager Address"} value={manager} />
+        {adminAddress && (
+          <GovernorLockedSetting name={"Admin Address"} value={adminAddress} />
+        )}
       </div>
+    </div>
+  );
+}
+
+function GovernorLockedSetting({
+  name,
+  value,
+}: {
+  name: string;
+  value: string;
+}) {
+  return (
+    <div className="space-y-1 sm:space-y-0 text-sm sm:flex sm:justify-between sm:items-center sm:px-2 mb-4">
+      <div className="flex items-center gap-2">
+        <p className="text-secondary">{name}</p>
+        <Lock className="w-4 h-4 text-primary/30" />
+      </div>
+      <p className="text-secondary truncate">{value}</p>
     </div>
   );
 }
