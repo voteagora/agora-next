@@ -13,10 +13,13 @@ import { Fragment, useState } from "react";
 import toast from "react-hot-toast";
 import Tenant from "@/lib/tenant/tenant";
 import { useWriteContract } from "wagmi";
+import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 export function CreateAccountActionDialog({
+  onSuccess,
   closeDialog,
 }: {
+  onSuccess: () => void;
   closeDialog: () => void;
 }) {
   const { contracts } = Tenant.current();
@@ -40,6 +43,7 @@ export function CreateAccountActionDialog({
 
   // This could be validated further if required
   const addressSupplied = !!managerAddress;
+  console.log(`Gov contract address: ${govContract?.address}`);
 
   const onSubmit = async () => {
     try {
@@ -47,12 +51,26 @@ export function CreateAccountActionDialog({
       const values = form.getValues();
       const managerAddressValue = values.managerAddress;
 
-      await writeContractAsync({
-        address: govContract?.address as `0x${string}`,
-        abi: govContract?.abi,
-        functionName: "setManager",
-        args: [managerAddressValue],
-      });
+      await writeContractAsync(
+        {
+          address: govContract?.address as `0x${string}`,
+          abi: govContract?.abi,
+          functionName: "setManager",
+          args: [managerAddressValue],
+        },
+        {
+          onSuccess: (hash) => {
+            toast.dismiss();
+            toast.success(
+              <div className="flex flex-col items-center gap-2 p-1">
+                <span className="text-sm font-semibold">Scope created</span>
+                {hash ? <BlockScanUrls hash1={hash} /> : null}
+              </div>
+            );
+            closeDialog();
+          },
+        }
+      );
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(`Error Transferring Role: ${error.message}`);
@@ -65,7 +83,10 @@ export function CreateAccountActionDialog({
   return (
     <Fragment>
       <Form {...form}>
-        <form className="space-y-8 max-w-2xl mx-auto">
+        <form
+          className="space-y-8 max-w-2xl mx-auto"
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
           <FormField
             control={form.control}
             name="managerAddress"
@@ -86,7 +107,9 @@ export function CreateAccountActionDialog({
                   Please supply an address
                 </p>
               )}
-              <Button disabled={!addressSupplied}>Transfer</Button>
+              <Button disabled={!addressSupplied} type="submit">
+                Transfer
+              </Button>
             </div>
           ) : (
             <Acknowledgement
