@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 type CountBadgeProps = {
-  count: number;
+  count: number | string;
   border?: boolean;
   className?: string;
 };

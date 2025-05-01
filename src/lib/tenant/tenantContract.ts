@@ -15,7 +15,7 @@ type TenantContractParams<ContractType> = {
 export class TenantContract<ContractType> {
   private _address: Address;
   public abi: any;
-  public chain: Chain;
+  public chain: any;
   public contract: ContractType;
   public optionBudgetChangeDate?: Date;
   public provider: Provider;

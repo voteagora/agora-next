@@ -1,22 +1,16 @@
 import { ReactNode } from "react";
-import { useDisconnect } from "wagmi";
-import { shortAddress } from "@/lib/utils";
+import { useAccount, useDisconnect } from "wagmi";
 import { rgbStringToHex } from "@/app/lib/utils/color";
-import { CubeIcon } from "@/icons/CubeIcon";
 import { Logout } from "@/icons/logout";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useProfileData } from "@/hooks/useProfileData";
-
-import ENSAvatar from "../shared/ENSAvatar";
 import TokenAmountDecorated from "../shared/TokenAmountDecorated";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
+import { useGetSafesForAddress } from "@/hooks/useGetSafesForAddress";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { ProfileScwContent } from "./ProfileScwContent";
+import { ProfileHeader } from "./ProfileHeader";
 
 interface Props {
   ensName: string | undefined;
@@ -28,93 +22,23 @@ export const ProfileDropDownContent = ({
   handleCloseDrawer,
 }: Props) => {
   const { disconnect } = useDisconnect();
+  const { selectedWalletAddress } = useSelectedWallet();
+  const { address } = useAccount();
   const {
-    address,
     isFetching,
     tokenBalance,
     delegate,
     scwAddress,
     hasStatement,
     canCreateDelegateStatement,
-  } = useProfileData();
-
+  } = useProfileData(selectedWalletAddress);
   const { ui } = Tenant.current();
 
   return (
     <>
       <div className="flex flex-col px-6 py-4 border-b border-line">
-        <div className="flex flex-row items-center gap-2 text-primary">
-          <div
-            className={`relative aspect-square ${
-              isFetching && "animate-pulse"
-            }`}
-          >
-            <ENSAvatar ensName={ensName} size={60} />
-          </div>
-          <div className="flex flex-col flex-1">
-            {ensName ? (
-              <>
-                <span className="text-primary font-bold">{ensName}</span>
-                <span className="text-xs text-secondary">
-                  {shortAddress(address!)}
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="text-primary">{shortAddress(address!)}</span>
-              </>
-            )}
-          </div>
-        </div>
-        {scwAddress && (
-          <div className="block sm:hidden">
-            <div className="w-[60px] flex justify-center items-center">
-              <div className="border-l border-dashed border-line h-2"></div>
-            </div>
-            <div className="flex flex-row items-center gap-2">
-              <div className="w-[60px] flex justify-center items-center">
-                <div className="flex items-center justify-center rounded-full border border-line w-[30px] h-[30px]">
-                  <CubeIcon
-                    className="w-5 h-5"
-                    fill={rgbStringToHex(ui?.customization?.primary)}
-                  />
-                </div>
-              </div>
-              <div className="text-primary">{shortAddress(scwAddress)}</div>
-            </div>
-          </div>
-        )}
-        {scwAddress && (
-          <div className="hidden sm:block">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger className="flex flex-row space-x-1 items-center">
-                  <div className="flex flex-row items-center gap-2">
-                    <div className="w-[60px] flex justify-center items-center">
-                      <div className="flex items-center justify-center rounded-full border border-line w-[30px] h-[30px]">
-                        <CubeIcon
-                          className="w-5 h-5"
-                          fill={rgbStringToHex(ui?.customization?.primary)}
-                        />
-                      </div>
-                    </div>
-                    <div className="text-primary">
-                      {shortAddress(scwAddress)}
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent className="text-xs max-w-[250px] p-3">
-                  <div className="text-primary">Smart Contract Wallet</div>
-                  <div className="text-xs text-secondary font-light">
-                    Your SCW is where your governance power comes from. Your
-                    stkDRV tokens establish your voting power or how much you
-                    can delegate to another member.
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        )}
+        <ProfileHeader address={address} ensName={ensName} />
+        {scwAddress && <ProfileScwContent scwAddress={scwAddress} />}
       </div>
 
       <div className="self-stretch flex flex-col font-medium">
