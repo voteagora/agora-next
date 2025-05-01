@@ -488,8 +488,8 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
-  ACCOUNT_ACTION: ({}) => {
-    return <CreateAccountActionDialog />;
+  ACCOUNT_ACTION: ({}, closeDialog) => {
+    return <CreateAccountActionDialog closeDialog={closeDialog} />;
   },
   // FAQ: () => {
   //   return <FaqDialog />;

@@ -11,7 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Fragment, useState } from "react";
 
-export function CreateAccountActionDialog() {
+export function CreateAccountActionDialog({
+  closeDialog,
+}: {
+  closeDialog: () => void;
+}) {
   const form = useForm({
     defaultValues: {
       contractAddress: "" as `0x${string}`,
