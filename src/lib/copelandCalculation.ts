@@ -192,7 +192,7 @@ export function calculateCopelandVote(
 
       // Only process if extended is ranked higher (lower number) than standard
       if (
-        extendedRank < standardRank ||
+        (extendedRank < standardRank && extendedRank >= 0) ||
         (standardRank < 0 && extendedRank >= 0)
       ) {
         // Move standard option to be just above extended
