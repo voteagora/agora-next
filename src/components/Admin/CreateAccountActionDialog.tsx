@@ -10,28 +10,57 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Fragment, useState } from "react";
+import toast from "react-hot-toast";
+import Tenant from "@/lib/tenant/tenant";
+import { useWriteContract } from "wagmi";
 
 export function CreateAccountActionDialog({
   closeDialog,
 }: {
   closeDialog: () => void;
 }) {
+  const { contracts } = Tenant.current();
+  // Get contract to make calls against
+  const govContract = contracts.governor;
+  const { writeContractAsync } = useWriteContract();
+
   const form = useForm({
     defaultValues: {
-      contractAddress: "" as `0x${string}`,
+      managerAddress: "" as `0x${string}`,
     },
   });
 
   const [acknowledged, setAcknowledged] = useState(false);
 
-  // Watch the contractAddress field
-  const contractAddress = useWatch({
+  // Watch the managerAddress field
+  const managerAddress = useWatch({
     control: form.control,
-    name: "contractAddress",
+    name: "managerAddress",
   });
 
   // This could be validated further if required
-  const addressSupplied = !!contractAddress;
+  const addressSupplied = !!managerAddress;
+
+  const onSubmit = async () => {
+    try {
+      toast.loading("Transferring Role...");
+      const values = form.getValues();
+      const managerAddressValue = values.managerAddress;
+
+      await writeContractAsync({
+        address: govContract?.address as `0x${string}`,
+        abi: govContract?.abi,
+        functionName: "setManager",
+        args: [managerAddressValue],
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(`Error Transferring Role: ${error.message}`);
+      } else {
+        toast.error("An unknown error occurred while creating the scope.");
+      }
+    }
+  };
 
   return (
     <Fragment>
@@ -39,10 +68,10 @@ export function CreateAccountActionDialog({
         <form className="space-y-8 max-w-2xl mx-auto">
           <FormField
             control={form.control}
-            name="contractAddress"
+            name="managerAddress"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Contract Address</FormLabel>
+                <FormLabel>New Manager Address</FormLabel>
                 <FormControl>
                   <Input {...field} placeholder="0x..." className="h-10" />
                 </FormControl>
