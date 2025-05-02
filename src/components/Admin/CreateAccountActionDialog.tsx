@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Fragment, useState } from "react";
 import toast from "react-hot-toast";
 import Tenant from "@/lib/tenant/tenant";
-import { useWriteContract } from "wagmi";
+import { useDisconnect, useWriteContract } from "wagmi";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 export function CreateAccountActionDialog({
@@ -26,6 +26,7 @@ export function CreateAccountActionDialog({
   // Get contract to make calls against
   const govContract = contracts.governor;
   const { writeContractAsync } = useWriteContract();
+  const { disconnect } = useDisconnect();
 
   const form = useForm({
     defaultValues: {
@@ -43,7 +44,6 @@ export function CreateAccountActionDialog({
 
   // This could be validated further if required
   const addressSupplied = !!managerAddress;
-  console.log(`Gov contract address: ${govContract?.address}`);
 
   const onSubmit = async () => {
     try {
@@ -68,6 +68,7 @@ export function CreateAccountActionDialog({
               </div>
             );
             closeDialog();
+            disconnect();
           },
         }
       );
