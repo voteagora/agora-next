@@ -269,8 +269,9 @@ export type CreateScopeDialogType = {
 
 export type AccountActionDialogType = {
   type: "ACCOUNT_ACTION";
-  //TODO
-  params: {};
+  params: {
+    onSuccess: () => void;
+  };
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -488,8 +489,13 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
-  ACCOUNT_ACTION: ({}, closeDialog) => {
-    return <CreateAccountActionDialog closeDialog={closeDialog} />;
+  ACCOUNT_ACTION: ({ onSuccess }, closeDialog) => {
+    return (
+      <CreateAccountActionDialog
+        closeDialog={closeDialog}
+        onSuccess={onSuccess}
+      />
+    );
   },
   // FAQ: () => {
   //   return <FaqDialog />;

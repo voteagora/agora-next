@@ -17,8 +17,10 @@ import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 export function CreateAccountActionDialog({
   closeDialog,
+  onSuccess,
 }: {
   closeDialog: () => void;
+  onSuccess: () => void;
 }) {
   const { contracts } = Tenant.current();
   // Get contract to make calls against
@@ -69,6 +71,7 @@ export function CreateAccountActionDialog({
             );
             closeDialog();
             disconnect();
+            onSuccess();
           },
         }
       );
@@ -76,6 +79,7 @@ export function CreateAccountActionDialog({
       toast.dismiss();
       if (error instanceof Error) {
         toast.error(`Error Transferring Role: ${error.message}`);
+        console.error(error);
       } else {
         toast.error("An unknown error occurred while creating the scope.");
       }

@@ -5,6 +5,7 @@ import { Fragment } from "react";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
 import { useAccount, useReadContract } from "wagmi";
+import { useRouter } from "next/router";
 
 export default function AdminAccountActions() {
   const openDialog = useOpenDialog();
@@ -13,11 +14,22 @@ export default function AdminAccountActions() {
   };
   const { slug, contracts } = Tenant.current();
   const { address } = useAccount();
+  const router = useRouter();
+
+  const rerouteHome = () => {
+    try {
+      router.push("/");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleAccountTransfer = () => {
     openDialog({
       type: "ACCOUNT_ACTION",
-      params: {},
+      params: {
+        onSuccess: rerouteHome,
+      },
     });
   };
   const actionsToRender = [];
