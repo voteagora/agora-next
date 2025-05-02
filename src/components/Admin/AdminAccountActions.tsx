@@ -14,6 +14,14 @@ export default function AdminAccountActions() {
   const { slug, contracts } = Tenant.current();
   const { address } = useAccount();
 
+  const handleAccountTransfer = () => {
+    openDialog({
+      type: "ACCOUNT_ACTION",
+      params: {},
+    });
+  };
+  const actionsToRender = [];
+
   // Get the Manager and Admin Accounts to determine if features should render
   const { data: managerAddress } = useReadContract({
     address: contracts.governor?.address as `0x${string}`,
@@ -36,14 +44,6 @@ export default function AdminAccountActions() {
         accountActionToggles.transfer = true;
       }
   }
-
-  const handleAccountTransfer = () => {
-    openDialog({
-      type: "ACCOUNT_ACTION",
-      params: {},
-    });
-  };
-  const actionsToRender = [];
 
   if (accountActionToggles.transfer) {
     actionsToRender.push(
