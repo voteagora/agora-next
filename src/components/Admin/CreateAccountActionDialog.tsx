@@ -16,10 +16,8 @@ import { useDisconnect, useWriteContract } from "wagmi";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 export function CreateAccountActionDialog({
-  onSuccess,
   closeDialog,
 }: {
-  onSuccess: () => void;
   closeDialog: () => void;
 }) {
   const { contracts } = Tenant.current();
