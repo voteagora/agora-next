@@ -168,19 +168,27 @@ async function getCurrentDelegatorsForAddress({
     }
 
     const daoNodeDelegate = await getDelegateFromDaoNode(address);
+    const latestBlock = await contracts.token.provider.getBlock("latest");
 
     if (daoNodeDelegate) {
       const delegatorsData = daoNodeDelegate.delegate.from_list.map(
-        (delegator) => ({
-          from: delegator[0],
-          to: address,
-          allowance: delegator[1],
-          percentage: "0", // Only used in Agora token partial delegation
-          timestamp: null,
-          type: "DIRECT" as const,
-          amount: "FULL" as const,
-          transaction_hash: "",
-        })
+        (delegator) => {
+          const timestamp = latestBlock
+            ? getHumanBlockTime(delegator.bn, latestBlock, true)
+            : null;
+          return {
+            from: delegator.delegator,
+            to: address,
+            allowance: delegator.balance,
+            percentage: "0", // Only used in Agora token partial delegation
+            timestamp: timestamp,
+            type: "DIRECT" as const,
+            amount: "FULL" as const,
+            transaction_hash: null,
+            bn: delegator.bn,
+            tid: delegator.tid,
+          };
+        }
       );
 
       const filteredDelegatorsData = delegatorsData.filter(
@@ -341,8 +349,8 @@ async function getCurrentDelegatorsForAddress({
         LIMIT $5;
       `;
 
-    const [delegators, latestBlock] = await Promise.all([
-      paginateResult(async (skip: number, take: number) => {
+    const delegators = await paginateResult(
+      async (skip: number, take: number) => {
         return prismaWeb2Client.$queryRawUnsafe<
           {
             from: string;
@@ -361,9 +369,9 @@ async function getCurrentDelegatorsForAddress({
           skip,
           take
         );
-      }, pagination),
-      contracts.token.provider.getBlock("latest"),
-    ]);
+      },
+      pagination
+    );
 
     const delagtorsData = await Promise.all(
       delegators.data.map(async (delegator) => ({

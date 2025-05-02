@@ -7,14 +7,27 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import ENSName from "@/components/shared/ENSName";
+import { useBnAndTidToHash } from "@/hooks/useBnAndTidToHash";
+import { useInView } from "react-intersection-observer";
 
 export default function DelegationFromRow({
   delegation,
 }: {
   delegation: Delegation;
 }) {
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+
+  const { data: hash, isPending } = useBnAndTidToHash({
+    blockNumber: delegation.bn,
+    transactionIndex: delegation.tid,
+    enabled: inView && !!delegation.bn && !!delegation.tid,
+  });
+
   return (
-    <TableRow>
+    <TableRow ref={ref}>
       <TableCell>
         {TokenAmountDisplay({
           amount: delegation.allowance,
@@ -35,15 +48,19 @@ export default function DelegationFromRow({
         </Link>
       </TableCell>
       <TableCell>
-        {delegation.transaction_hash ? (
+        {delegation.transaction_hash || hash ? (
           <a
-            href={getBlockScanUrl(delegation.transaction_hash)}
+            href={getBlockScanUrl(
+              delegation.transaction_hash ?? (hash as `0x${string}`)
+            )}
             target="_blank"
             rel="noreferrer noopener"
           >
             View
             <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-2 inline align-text-bottom" />
           </a>
+        ) : isPending ? (
+          "Loading..."
         ) : (
           "Not Found"
         )}
