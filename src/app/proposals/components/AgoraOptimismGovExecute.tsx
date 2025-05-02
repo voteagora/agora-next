@@ -81,7 +81,10 @@ export const AgoraOptimismGovExecute = ({ proposal }: Props) => {
       );
     }
     if (isError) {
-      toast.error(`Error executing proposal ${error?.message}`, {
+      const errorMessage =
+        "shortMessage" in error ? error.shortMessage : error.message;
+
+      toast.error(`Error executing proposal ${errorMessage}`, {
         duration: 10000,
       });
     }

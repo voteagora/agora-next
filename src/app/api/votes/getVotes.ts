@@ -9,17 +9,24 @@ async function getAllForVoting(
   blockNumber: number,
   proposalId: string
 ) {
-  const [votingPower, authorityChains, delegate, votesForProposalAndDelegate] =
-    await Promise.all([
-      fetchVotingPowerForProposal({
-        addressOrENSName: address,
-        blockNumber,
-        proposalId,
-      }),
-      fetchAuthorityChains({ address, blockNumber }),
-      fetchDelegate(address),
-      fetchVotesForProposalAndDelegate({ proposalId, address }),
-    ]);
+  const results = await Promise.allSettled([
+    fetchVotingPowerForProposal({
+      addressOrENSName: address,
+      blockNumber,
+      proposalId,
+    }),
+    fetchAuthorityChains({ address, blockNumber }),
+    fetchDelegate(address),
+    fetchVotesForProposalAndDelegate({ proposalId, address }),
+  ]);
+
+  const votingPower =
+    results[0].status === "fulfilled" ? results[0].value : null;
+  const authorityChains =
+    results[1].status === "fulfilled" ? results[1].value : null;
+  const delegate = results[2].status === "fulfilled" ? results[2].value : null;
+  const votesForProposalAndDelegate =
+    results[3].status === "fulfilled" ? results[3].value : null;
 
   return {
     votingPower,

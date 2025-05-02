@@ -44,6 +44,7 @@ export const TENANT_NAMESPACES = {
   XAI: "xai",
   B3: "b3",
   DEMO: "demo",
+  LINEA: "linea",
 } as const;
 
 export const proposalsFilterOptions = {
@@ -59,11 +60,15 @@ export const proposalsFilterOptions = {
 export const delegatesFilterOptions = {
   weightedRandom: {
     sort: "weighted_random",
-    value: "Weighted random",
+    value: "Random (default)",
   },
   mostVotingPower: {
     sort: "most_voting_power",
     value: "Most voting power",
+  },
+  leastVotingPower: {
+    sort: "least_voting_power",
+    value: "Least voting power",
   },
   mostDelegators: {
     sort: "most_delegators",
@@ -137,3 +142,8 @@ export enum TIMELOCK_TYPE {
   TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL = "TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL",
   TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115 = "TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115",
 }
+export const ENDORSED_FILTER_PARAM = "endorsedFilter";
+export const HAS_STATEMENT_FILTER_PARAM = "hasStatement";
+export const MY_DELEGATES_FILTER_PARAM = "delegatorFilter";
+export const ISSUES_FILTER_PARAM = "issueFilter";
+export const STAKEHOLDERS_FILTER_PARAM = "stakeholderFilter";

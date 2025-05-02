@@ -15,10 +15,13 @@ import favicon16x16 from "@/assets/tenant/scroll_favicon/favicon-16x16.png";
 import shortcutIcon from "@/assets/tenant/scroll_favicon/favicon.ico";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export const scrollTenantUIConfig = new TenantUI({
   title: "Scroll Governance",
   logo: scrollLogo,
+  tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.SCROLL)],
 
   googleAnalytics: "G-SV1E7HY7YZ",
 

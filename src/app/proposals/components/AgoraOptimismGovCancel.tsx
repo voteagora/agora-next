@@ -79,7 +79,10 @@ export const AgoraOptimismGovCancel = ({ proposal }: Props) => {
       );
     }
     if (isError) {
-      toast.error(`Error cancelling proposal ${error?.message}`, {
+      const errorMessage =
+        "shortMessage" in error ? error.shortMessage : error.message;
+
+      toast.error(`Error cancelling proposal ${errorMessage}`, {
         duration: 5000,
       });
     }

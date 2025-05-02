@@ -77,9 +77,9 @@ const CastVoteContextProvider = ({
   votableSupply,
 }: {
   proposal: Proposal;
-  votes: Vote[];
-  chains: string[][];
-  votingPower: VotingPowerData;
+  votes: Vote[] | null;
+  chains: string[][] | null;
+  votingPower: VotingPowerData | null;
   children: React.ReactNode;
   votableSupply?: string;
 }) => {
@@ -93,8 +93,14 @@ const CastVoteContextProvider = ({
 
   const { ui, contracts } = Tenant.current();
 
-  const missingVote = checkMissingVoteForDelegate(votes, votingPower);
-
+  const missingVote = checkMissingVoteForDelegate(
+    votes ?? [],
+    votingPower ?? {
+      advancedVP: "0",
+      directVP: "0",
+      totalVP: "0",
+    }
+  );
   const sponsoredVotingValues = useSponsoredVoting({
     proposalId: proposal.id,
     support: support === "FOR" ? 1 : support === "AGAINST" ? 0 : 2,
@@ -110,8 +116,8 @@ const CastVoteContextProvider = ({
   const advancedVoteValues = useAdvancedVoting({
     proposalId: proposal.id,
     support: support === "FOR" ? 1 : support === "AGAINST" ? 0 : 2,
-    advancedVP: BigInt(votingPower.advancedVP),
-    authorityChains: chains,
+    advancedVP: votingPower?.advancedVP ? BigInt(votingPower.advancedVP) : null,
+    authorityChains: chains ?? null,
     reason: reason || "",
     missingVote,
   });
@@ -127,7 +133,8 @@ const CastVoteContextProvider = ({
     isGasRelayEnabled &&
     Number(formatEther(sponsorBalance || 0n)) >=
       Number(gasRelayConfig.minBalance) &&
-    Number(votingPower.totalVP) > Number(gasRelayConfig?.minVPToUseGasRelay) &&
+    Number(votingPower?.totalVP ?? "0") >
+      Number(gasRelayConfig?.minVPToUseGasRelay) &&
     !reason &&
     !fallbackToStandardVote;
 
@@ -145,7 +152,7 @@ const CastVoteContextProvider = ({
     support: support || "",
     reason: reason || "",
     params: [],
-    weight: votingPower.directVP || votingPower.advancedVP,
+    weight: votingPower?.directVP || votingPower?.advancedVP || "0",
   };
 
   const { againstPercentage, forPercentage, endsIn } =
@@ -190,7 +197,7 @@ const CastVoteContextProvider = ({
       value={{
         reason,
         setReason,
-        support: missingVote === "NONE" ? votes[0].support : support,
+        support: missingVote === "NONE" ? votes?.[0]?.support : support,
         setSupport,
         write,
         isLoading,
@@ -206,8 +213,8 @@ const CastVoteContextProvider = ({
         data:
           missingVote === "NONE"
             ? {
-                standardTxHash: votes[0]?.transactionHash,
-                advancedTxHash: votes[1]?.transactionHash,
+                standardTxHash: votes?.[0]?.transactionHash,
+                advancedTxHash: votes?.[1]?.transactionHash,
               }
             : data,
       }}

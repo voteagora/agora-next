@@ -33,6 +33,8 @@ import { ShareDialog as ShareVoteDialog } from "@/components/Proposals/ProposalP
 import { Vote } from "@/app/api/common/votes/vote";
 import { SimulationReportDialog } from "../SimulationReportDialog/SimulationReportDialog";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
+import { CreateScopeDialog } from "@/components/Admin/CreateScopeDialog";
+import { ScopeData } from "@/lib/types";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -53,7 +55,8 @@ export type DialogType =
   | OpenGithubPRDialog
   | SubscribeDialog
   | ShareVoteDialogType
-  | SimulationReportDialogType;
+  | SimulationReportDialogType
+  | CreateScopeDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -182,7 +185,7 @@ export type ShareVoteDialogType = {
       weight: string;
     };
     totalOptions: number;
-    votes: Vote[];
+    votes: Vote[] | null;
     options: {
       description: string;
       votes: string;
@@ -200,7 +203,7 @@ export type ApprovalCastVoteDialogProps = {
   proposal: Proposal;
   hasStatement: boolean;
   votingPower: VotingPowerData;
-  authorityChains: string[][];
+  authorityChains: string[][] | null;
   missingVote: MissingVote;
   closeDialog: () => void;
 };
@@ -249,6 +252,15 @@ export type SimulationReportDialogType = {
   type: "SIMULATION_REPORT";
   params: {
     report: StructuredSimulationReport | null;
+  };
+  className?: string;
+};
+
+export type CreateScopeDialogType = {
+  type: "CREATE_SCOPE";
+  params: {
+    proposalTypeId: number;
+    onSuccess: (scope: ScopeData) => void;
   };
   className?: string;
 };
@@ -459,6 +471,15 @@ export const dialogs: DialogDefinitions<DialogType> = {
   SIMULATION_REPORT: ({ report }, closeDialog) => (
     <SimulationReportDialog report={report} closeDialog={closeDialog} />
   ),
+  CREATE_SCOPE: ({ proposalTypeId, onSuccess }, closeDialog) => {
+    return (
+      <CreateScopeDialog
+        proposalTypeId={proposalTypeId}
+        onSuccess={onSuccess}
+        closeDialog={closeDialog}
+      />
+    );
+  },
   // FAQ: () => {
   //   return <FaqDialog />;
   // },

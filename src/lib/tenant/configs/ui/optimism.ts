@@ -8,12 +8,15 @@ import infoPageCard01 from "@/assets/tenant/optimism_info_1.png";
 import infoPageCard02 from "@/assets/tenant/optimism_info_2.png";
 import infoPageCard03 from "@/assets/tenant/optimism_info_3.png";
 import infoPageCard04 from "@/assets/tenant/optimism_info_4.png";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export const optimismTenantUIConfig = new TenantUI({
   title: "Optimism Agora",
   logo: optimismLogo,
+  tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.OPTIMISM)],
 
   assets: {
     success: successImage,
@@ -294,7 +297,7 @@ export const optimismTenantUIConfig = new TenantUI({
 
 **1. Select proposal type**
 
-Proposal types set the quorum and approval thresholds for your proposal. You can view, edit, or create a new one via the [admin panel](https://vote.optimism.io/admin).
+Proposal types set the quorum and approval thresholds for your proposal. You can view, edit, or create a new one via the [admin panel](https://vote.optimism.io/admin).
 
 **2. Choose your vote type**
 

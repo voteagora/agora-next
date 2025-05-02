@@ -23,6 +23,7 @@ import { encodeFunctionData, StateOverride } from "viem";
 import { ParsedProposalData } from "../proposalUtils";
 import { delay as delayUtils } from "../utils";
 import { encodeState } from "./encode-state";
+import { IMembershipContract } from "../contracts/common/interfaces/IMembershipContract";
 
 const BLOCK_GAS_LIMIT = 30_000_000;
 const TENDERLY_BASE_URL = "https://api.tenderly.co/api/v1";
@@ -39,15 +40,16 @@ const TENDERLY_FETCH_OPTIONS = {
 const DEFAULT_FROM = "0xD73a92Be73EfbFcF3854433A5FcbAbF9c1316073"; // arbitrary EOA not used on-chain
 
 const tenant = Tenant.current();
-const useL1BlockNumber = tenant.ui.toggle("use-l1-block-number")?.enabled;
-const provider = tenant.contracts.governor.provider;
-const providerForTime = tenant.contracts.providerForTime;
-const chainIdForTime = tenant.contracts.chainForTime?.id;
-const governor = tenant.contracts.governor;
-const timelock = tenant.contracts.timelock;
-const governorType = tenant.contracts.governorType;
-const timelockType = tenant.contracts.timelockType;
-const votingToken = tenant.contracts.token;
+const { contracts, ui, namespace } = tenant;
+const useL1BlockNumber = ui.toggle("use-l1-block-number")?.enabled;
+const provider = contracts.governor.provider;
+const providerForTime = contracts.providerForTime;
+const chainIdForTime = contracts.chainForTime?.id;
+const governor = contracts.governor;
+const timelock = contracts.timelock;
+const governorType = contracts.governorType;
+const timelockType = contracts.timelockType;
+const votingToken = contracts.token;
 
 type TenderlyError = {
   statusCode?: number;
@@ -118,6 +120,21 @@ function hashOperationBatchOz(
     )
   );
 }
+
+const getTotalSupply = async () => {
+  if (contracts.token.isERC20()) {
+    return contracts.token.contract.totalSupply();
+  } else if (contracts.token.isERC721()) {
+    const token = contracts.token.contract as IMembershipContract;
+    const publicClient = getPublicClient(
+      useL1BlockNumber ? contracts.chainForTime : contracts.token.chain
+    );
+    const blockNumber = await publicClient.getBlockNumber();
+    return token.getPastTotalSupply(Number(blockNumber) - 1);
+  } else {
+    return 0;
+  }
+};
 
 // --- Simulation methods ---
 /**
@@ -193,12 +210,7 @@ export async function simulateNew(
   };
 
   // --- Prepare simulation configuration ---
-  const votingTokenSupply = (await client.readContract({
-    address: votingToken.address as `0x${string}`,
-    abi: votingToken.abi,
-    functionName: "totalSupply",
-    args: [],
-  })) as unknown as bigint;
+  const votingTokenSupply = await getTotalSupply();
 
   const from = DEFAULT_FROM;
 
@@ -438,12 +450,7 @@ export async function simulateProposed(
 
   // --- Prepare simulation configuration ---
   // Get voting token and total supply
-  const votingTokenSupply = (await client.readContract({
-    address: votingToken.address as `0x${string}`,
-    abi: votingToken.abi,
-    functionName: "totalSupply",
-    args: [],
-  })) as unknown as bigint;
+  const votingTokenSupply = await getTotalSupply();
 
   // Set `from` arbitrarily.
   const from = DEFAULT_FROM;
@@ -473,9 +480,7 @@ export async function simulateProposed(
     governorType === GOVERNOR_TYPE.BRAVO
       ? BigInt(latestBlock.timestamp) +
         (simBlock - BigInt(proposal.endBlock!)) * 12n
-      : timelockType === TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL
-        ? BigInt(proposal.endTime!.getTime() / 1000 + 1)
-        : BigInt(proposal.endTime!.getTime() + 1);
+      : BigInt(proposal.endTime!.getTime() / 1000 + 1);
 
   const eta = simTimestamp; // set proposal eta to be equal to the timestamp we simulate at
 
@@ -850,12 +855,7 @@ export async function simulateNewApproval(
   };
 
   // --- Prepare simulation configuration ---
-  const votingTokenSupply = (await client.readContract({
-    address: votingToken.address as `0x${string}`,
-    abi: votingToken.abi,
-    functionName: "totalSupply",
-    args: [],
-  })) as unknown as bigint;
+  const votingTokenSupply = await getTotalSupply();
 
   const from = DEFAULT_FROM;
 

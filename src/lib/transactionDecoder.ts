@@ -9,54 +9,14 @@ import {
   hexlify,
   getBytes,
 } from "ethers";
-import axios from "axios";
 import { getAddress } from "viem";
-import {
-  mainnet,
-  sepolia,
-  optimism,
-  arbitrum,
-  base,
-  scroll,
-} from "viem/chains";
 import { unstable_cache } from "next/cache";
 import { getPublicClient } from "./viem";
+import { cachedGetContractAbi } from "./abiUtils";
+import { getCanonicalType } from "./utils";
 
 const DEFAULT_ETHERSCAN_API_KEY = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY;
 const SIGNATURE_DB_URL = "https://api.openchain.xyz/signature-database/v1/";
-
-const EXPLORER_DOMAINS = {
-  [mainnet.name]: "https://api.etherscan.io/api",
-  [sepolia.name]: "https://api-sepolia.etherscan.io/api",
-  [optimism.name]: "https://api-optimistic.etherscan.io/api",
-  [arbitrum.name]: "https://api.arbiscan.io/api",
-  [base.name]: "https://api.basescan.org/api",
-  [scroll.name]: "https://api.scrollscan.com/api",
-  derive: "https://explorer.derive.xyz/api",
-  cyber: "https://api.socialscan.io/cyber",
-};
-
-interface AbiItem {
-  type: string;
-  name?: string;
-  inputs?: Array<{
-    name: string;
-    type: string;
-    indexed?: boolean;
-    internalType?: string;
-    components?: any[];
-  }>;
-  outputs?: Array<{
-    name: string;
-    type: string;
-    internalType?: string;
-    components?: any[];
-  }>;
-  stateMutability?: string;
-  constant?: boolean;
-  payable?: boolean;
-  anonymous?: boolean;
-}
 
 interface DecodedParameter {
   name: string;
@@ -182,18 +142,6 @@ const mergeTypes = (types: Array<ParamType>): ParamType => {
   }
   return ParamType.from("bytes32");
 };
-
-// -----------------------------------------------------------------------------
-// Chain & Explorer Helpers
-// -----------------------------------------------------------------------------
-
-function getExplorerDomain(networkName: string): string {
-  return (
-    EXPLORER_DOMAINS[
-      networkName.toLowerCase() as keyof typeof EXPLORER_DOMAINS
-    ] || "https://api.etherscan.io/api"
-  );
-}
 
 // -----------------------------------------------------------------------------
 // ABI Guessing & Decoding Helpers
@@ -546,29 +494,6 @@ async function lookupFunction(selector: string): Promise<string | null> {
   }
 }
 
-async function getContractAbi(
-  contractAddress: string,
-  etherscanApiKey: string,
-  network: string = "mainnet"
-): Promise<AbiItem[] | null> {
-  const domain = getExplorerDomain(network);
-  const url = `${domain}?module=contract&action=getabi&address=${contractAddress}&apikey=${etherscanApiKey}`;
-  try {
-    const response = await axios.get(url, {
-      headers: {
-        "x-api-key": etherscanApiKey,
-      },
-    });
-    if (response.data.status === "1") {
-      return JSON.parse(response.data.result);
-    } else {
-      return null;
-    }
-  } catch (error) {
-    return null;
-  }
-}
-
 async function getProxyImplementation(
   contractAddress: string
 ): Promise<string | null> {
@@ -605,17 +530,6 @@ async function getProxyImplementation(
   } catch (error) {
     return null;
   }
-}
-
-function getCanonicalType(input: any): string {
-  if (input.type.startsWith("tuple")) {
-    const arraySuffix = input.type.slice("tuple".length);
-    const innerTypes = input.components
-      ? input.components.map(getCanonicalType).join(",")
-      : "";
-    return `(${innerTypes})${arraySuffix}`;
-  }
-  return input.type;
 }
 
 function findFunctionBySelector(abi: any[], selector: string): string | null {
@@ -1275,10 +1189,6 @@ const cachedLookupFunction = unstable_cache(
   ["function-lookup"],
   { revalidate: 86400 } // Cache for 24 hours
 );
-
-const cachedGetContractAbi = unstable_cache(getContractAbi, ["contract-abi"], {
-  revalidate: 86400,
-});
 
 const cachedGetProxyImplementation = unstable_cache(
   getProxyImplementation,

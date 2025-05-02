@@ -63,7 +63,6 @@ async function getVotesForDelegateForAddress({
               reason,
               block_number,
               params,
-              start_block,
               description,
               proposal_data,
               proposal_type
@@ -107,7 +106,6 @@ async function getVotesForDelegateForAddress({
               ) av
               LEFT JOIN LATERAL (
                 SELECT
-                  proposals.start_block,
                   proposals.description,
                   proposals.proposal_data,
                   proposals.proposal_type::config.proposal_type AS proposal_type
@@ -339,7 +337,6 @@ async function getVotesForProposal({
             reason,
             block_number,
             params,
-            start_block,
             description,
             proposal_data,
             proposal_type
@@ -383,7 +380,6 @@ async function getVotesForProposal({
             ) av
             LEFT JOIN LATERAL (
               SELECT
-                proposals.start_block,
                 proposals.description,
                 proposals.proposal_data,
                 proposals.proposal_type::config.proposal_type AS proposal_type
@@ -542,12 +538,4 @@ export const fetchVotesForProposalAndDelegate = cache(
 );
 export const fetchVotersWhoHaveNotVotedForProposal = cache(
   getVotersWhoHaveNotVotedForProposal
-);
-export const fetchVotesForProposalAndDelegateUnstableCache = unstable_cache(
-  getVotesForProposalAndDelegate,
-  [],
-  {
-    tags: ["votesForProposalAndDelegate"],
-    revalidate: 86400, // 1 day
-  }
 );

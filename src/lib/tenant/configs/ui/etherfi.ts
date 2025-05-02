@@ -4,10 +4,13 @@ import etherfiLogo from "@/assets/tenant/etherfi_logo.svg";
 import delegateImage from "@/assets/tenant/etherfi_delegate.svg";
 import successImage from "@/assets/tenant/etherfi_success.svg";
 import pendingImage from "@/assets/tenant/etherfi_pending.svg";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export const etherfiTenantUIConfig = new TenantUI({
   title: "ether.fi Agora",
   logo: etherfiLogo,
+  tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.ETHERFI)],
 
   assets: {
     // TODO: Replace success and pending images

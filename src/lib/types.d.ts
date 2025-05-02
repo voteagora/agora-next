@@ -54,6 +54,7 @@ export type TenantContracts = {
   delegationModel?: DELEGATION_MODEL;
   governorType?: GOVERNOR_TYPE;
   timelockType?: TIMELOCK_TYPE;
+  supportScopes?: boolean;
   chainForTime?: Chain;
   providerForTime?: AlchemyProvider;
   supportScopes?: boolean;
@@ -63,6 +64,7 @@ export type TenantToken = {
   name: string;
   symbol: string;
   decimals: number;
+  address: string;
 };
 
 export type RetroPGFProject = {
@@ -179,3 +181,25 @@ export type AnalyticsEvent =
         type: "X" | "COPY_LINK" | "DOWNLOAD_IMAGE" | "WARPCAST";
       };
     };
+
+export type ScopeData = {
+  proposal_type_id: number;
+  scope_key: string;
+  selector?: string;
+  description: string;
+  disabled_event: any;
+  deleted_event: any;
+  status: "created" | "disabled" | "deleted";
+  parameters?: string[];
+  comparators?: number[];
+  types?: number[];
+};
+
+export interface FormattedProposalType {
+  name: string;
+  quorum: number;
+  approval_threshold: number;
+  proposal_type_id: number;
+  isClientSide?: boolean;
+  scopes?: ScopeData[];
+}

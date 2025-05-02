@@ -54,6 +54,11 @@ function DelegationsContainer({
     }
   };
 
+  delegatees = delegatees.filter(
+    (delegation) =>
+      delegation.to !== "0x0000000000000000000000000000000000000000"
+  );
+
   if (delegatees.length === 0 && delegators.length === 0) {
     return (
       <div className="p-8 text-center text-secondary align-middle bg-wash rounded-xl">

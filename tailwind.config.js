@@ -12,6 +12,10 @@ module.exports = {
   theme: {
     screens: {
       sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
     },
     container: {
       center: true,
@@ -335,6 +339,8 @@ module.exports = {
       boxShadow: {
         // shadow-{var}
         // ie: shadow-inner
+        newPopover: "0px 4px 8px 0px rgba(var(--neutral), 0.11)",
+
         newDefault:
           "0px 4px 12px rgba(0, 0, 0, 0.02), 0px 2px 2px rgba(0, 0, 0, 0.03)",
         newHover:

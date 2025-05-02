@@ -11,7 +11,8 @@ import { protocolGuildTenantUIConfig } from "@/lib/tenant/configs/ui/protocol-gu
 import { boostTenantUIConfig } from "@/lib/tenant/configs/ui/boost";
 import { xaiTenantUIConfig } from "@/lib/tenant/configs/ui/xai";
 import { b3TenantUIConfig } from "@/lib/tenant/configs/ui/b3";
-import { demoTenantUIConfig } from "./configs/ui/demo";
+import { demoTenantUIConfig } from "@/lib/tenant/configs/ui/demo";
+import { lineaTenantUIConfig } from "@/lib/tenant/configs/ui/linea";
 
 export default class TenantUIFactory {
   public static create(namespace: TenantNamespace): any {
@@ -52,6 +53,8 @@ export default class TenantUIFactory {
       case TENANT_NAMESPACES.DEMO:
         return demoTenantUIConfig;
 
+      case TENANT_NAMESPACES.LINEA:
+        return lineaTenantUIConfig;
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

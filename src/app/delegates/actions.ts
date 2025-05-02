@@ -33,7 +33,7 @@ export const fetchDelegate = async (address: string) => {
       },
       [`delegate-${address.toLowerCase()}`],
       {
-        revalidate: 180, // 3 minutes
+        revalidate: 60, // 1 minute
         tags: [`delegate-${address.toLowerCase()}`],
       }
     );
@@ -46,8 +46,8 @@ export const fetchDelegate = async (address: string) => {
 };
 
 export const fetchVoterStats = unstable_cache(
-  async (address: string, blockNumber?: number) => {
-    return apiFetchVoterStats(address, blockNumber);
+  async (address: string, blockNumberOrTimestamp?: number) => {
+    return apiFetchVoterStats(address, blockNumberOrTimestamp);
   },
   ["voterStats"],
   {
