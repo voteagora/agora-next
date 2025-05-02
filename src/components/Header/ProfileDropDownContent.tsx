@@ -79,9 +79,8 @@ const RenderDelegateToSelf = ({ delegate }: { delegate: DelegateChunk }) => {
         </div>
         <DelegateToSelf
           variant="rounded"
-          className="outline outline-1 gap-2 justify-center mt-6 font-bold"
+          className="outline outline-1 gap-2 justify-center mt-6 font-bold bg-primary text-neutral"
           delegate={delegate}
-          label="Delegate tokens to myself"
         />
       </div>
     </div>
@@ -111,7 +110,8 @@ export const ProfileDropDownContent = ({
         delegation.to !== "0x0000000000000000000000000000000000000000"
     );
   }, [delegatees]);
-  const hasDelegated = filteredDelegations && filteredDelegations.length > 0;
+  const hasDelegated =
+    Array.isArray(filteredDelegations) && filteredDelegations.length > 0;
 
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
@@ -126,6 +126,7 @@ export const ProfileDropDownContent = ({
     tokenBalance !== undefined &&
     tokenBalance !== BigInt(0) &&
     isDelegationEncouragementEnabled &&
+    filteredDelegations !== undefined &&
     !hasDelegated;
 
   const renderDelegteesInfo = () => {
@@ -286,7 +287,7 @@ export const ProfileDropDownContent = ({
             {canCreateDelegateStatement && !hasStatement ? (
               <Link
                 href={`/delegates/create`}
-                className="self-stretch h-12 pl-4 text-secondary flex items-center hover:bg-neutral hover:font-bold hover:rounded-md"
+                className="self-stretch h-12 pl-4 text-secondary flex items-center hover:bg-neutral hover:rounded-md"
                 onClick={handleCloseDrawer}
               >
                 Create delegate statement

@@ -13,7 +13,8 @@ export const DelegateToSelfBanner = () => {
         delegation.to !== "0x0000000000000000000000000000000000000000"
     );
   }, [delegatees]);
-  const hasDelegated = filteredDelegations && filteredDelegations.length > 0;
+  const hasDelegated =
+    Array.isArray(filteredDelegations) && filteredDelegations.length > 0;
 
   const canEncourageDelegationBecauseOfVP =
     tokenBalance !== undefined &&
@@ -21,7 +22,10 @@ export const DelegateToSelfBanner = () => {
     delegate?.votingPower?.total === "0";
 
   const canEncourageDelegationBecauseOfNoDelegation =
-    tokenBalance !== undefined && tokenBalance !== BigInt(0) && !hasDelegated;
+    tokenBalance !== undefined &&
+    tokenBalance !== BigInt(0) &&
+    filteredDelegations !== undefined &&
+    !hasDelegated;
 
   if (
     !canEncourageDelegationBecauseOfVP &&
@@ -31,7 +35,7 @@ export const DelegateToSelfBanner = () => {
   }
 
   return (
-    <div className="w-full p-4 rounded-lg border border-negative inline-flex justify-start items-start gap-4 mt-2 mb-3">
+    <div className="w-full p-4 rounded-lg border border-negative inline-flex justify-start items-start gap-4 mt-3 mb-1">
       <ExclamationCircleIcon className="w-6 h-6 stroke-negative" />
       <div className="flex-1 flex-col justify-start items-start gap-1 text-neutral-900">
         <div className="text-base font-bold leading-normal">
@@ -44,7 +48,7 @@ export const DelegateToSelfBanner = () => {
       </div>
       <DelegateToSelf
         delegate={delegate as DelegateChunk}
-        className="font-medium px-[20px] py-3"
+        className="font-medium px-[20px] py-3 h-full"
       />
     </div>
   );
