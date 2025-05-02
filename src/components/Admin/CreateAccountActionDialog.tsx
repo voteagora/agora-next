@@ -17,10 +17,8 @@ import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 export function CreateAccountActionDialog({
   closeDialog,
-  onSuccess,
 }: {
   closeDialog: () => void;
-  onSuccess: () => void;
 }) {
   const { contracts } = Tenant.current();
   // Get contract to make calls against
@@ -71,7 +69,6 @@ export function CreateAccountActionDialog({
             );
             closeDialog();
             disconnect();
-            onSuccess();
           },
         }
       );
