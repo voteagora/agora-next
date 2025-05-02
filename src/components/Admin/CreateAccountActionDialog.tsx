@@ -61,7 +61,9 @@ export function CreateAccountActionDialog({
             toast.dismiss();
             toast.success(
               <div className="flex flex-col items-center gap-2 p-1">
-                <span className="text-sm font-semibold">Scope created</span>
+                <span className="text-sm font-semibold">
+                  Manager Account Transferred
+                </span>
                 {hash ? <BlockScanUrls hash1={hash} /> : null}
               </div>
             );
@@ -71,6 +73,7 @@ export function CreateAccountActionDialog({
         }
       );
     } catch (error: unknown) {
+      toast.dismiss();
       if (error instanceof Error) {
         toast.error(`Error Transferring Role: ${error.message}`);
       } else {
