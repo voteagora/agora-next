@@ -132,7 +132,8 @@ function Acknowledgement({
   return (
     <div>
       <p>
-        <span className="text-orange-500">Warning</span>: This is irreversible
+        <span className="text-orange-500">Warning</span>: This action is
+        irreversible!
       </p>
       <Button
         variant="outline"
