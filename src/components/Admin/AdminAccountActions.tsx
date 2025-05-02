@@ -3,9 +3,39 @@
 import { Button } from "@/components/ui/button";
 import { Fragment } from "react";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import Tenant from "@/lib/tenant/tenant";
+import { useAccount, useReadContract } from "wagmi";
 
 export default function AdminAccountActions() {
   const openDialog = useOpenDialog();
+  const accountActionToggles = {
+    transfer: false,
+  };
+  const { slug, contracts } = Tenant.current();
+  const { address } = useAccount();
+
+  // Get the Manager and Admin Accounts to determine if features should render
+  const { data: managerAddress } = useReadContract({
+    address: contracts.governor?.address as `0x${string}`,
+    abi: contracts.governor.abi,
+    functionName: "manager",
+    chainId: contracts.governor?.chain.id,
+  }) as { data: `0x${string}` };
+
+  const { data: adminAddress } = useReadContract({
+    address: contracts.governor?.address as `0x${string}`,
+    abi: contracts.governor.abi,
+    functionName: "admin",
+    chainId: contracts.governor?.chain.id,
+  }) as { data: `0x${string}` };
+
+  // Can move to a util map if used elsewhere
+  switch (slug.toUpperCase()) {
+    case "OP":
+      if (address === managerAddress) {
+        accountActionToggles.transfer = true;
+      }
+  }
 
   const handleAccountTransfer = () => {
     openDialog({
@@ -13,8 +43,17 @@ export default function AdminAccountActions() {
       params: {},
     });
   };
+  const actionsToRender = [];
 
-  // TODO - Conditional check governor contract for handling manager account transfer
+  if (accountActionToggles.transfer) {
+    actionsToRender.push(
+      <AccountActions
+        title={"Transfer"}
+        description={"Transfer account role to another address"}
+        actions={[{ title: "Transfer", onClick: handleAccountTransfer }]}
+      />
+    );
+  }
 
   return (
     <section className="gl_box bg-neutral">
@@ -22,11 +61,11 @@ export default function AdminAccountActions() {
       <p className="text-secondary">
         Perform administrative actions on your account
       </p>
-      <AccountActions
-        title={"Transfer"}
-        description={"Transfer account role to another address"}
-        actions={[{ title: "Transfer", onClick: handleAccountTransfer }]}
-      />
+      {actionsToRender.length > 0
+        ? actionsToRender.map((action, index) => (
+            <Fragment key={index}>{action}</Fragment>
+          ))
+        : "No account actions for this account"}
     </section>
   );
 }
