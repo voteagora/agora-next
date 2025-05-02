@@ -91,11 +91,7 @@ export default function ApprovalCastVoteButton({ proposal }: Props) {
               params: {
                 proposal: proposal,
                 hasStatement: !!data?.delegate?.statement,
-                votingPower: data?.votingPower ?? {
-                  advancedVP: "0",
-                  directVP: "0",
-                  totalVP: "0",
-                },
+                votingPower: data?.votingPower ?? null,
                 authorityChains: data?.chains ?? null,
                 missingVote,
               },
@@ -106,11 +102,7 @@ export default function ApprovalCastVoteButton({ proposal }: Props) {
           delegateVotes={data?.votes ?? []}
           isReady={isSuccess}
           votingPower={
-            data?.votingPower ?? {
-              advancedVP: "0",
-              directVP: "0",
-              totalVP: "0",
-            }
+            data?.votingPower ?? null
           }
         />
       </VStack>
@@ -130,7 +122,7 @@ function VoteButton({
   proposalStatus: Proposal["status"];
   delegateVotes: Vote[];
   isReady: boolean;
-  votingPower: VotingPowerData;
+  votingPower: VotingPowerData | null;
   proposal: Proposal;
 }) {
   const { isConnected } = useAgoraContext();
