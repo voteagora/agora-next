@@ -35,6 +35,7 @@ import { SimulationReportDialog } from "../SimulationReportDialog/SimulationRepo
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { CreateScopeDialog } from "@/components/Admin/CreateScopeDialog";
 import { ScopeData } from "@/lib/types";
+import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActionDialog";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -56,7 +57,8 @@ export type DialogType =
   | SubscribeDialog
   | ShareVoteDialogType
   | SimulationReportDialogType
-  | CreateScopeDialogType;
+  | CreateScopeDialogType
+  | AccountActionDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -263,6 +265,11 @@ export type CreateScopeDialogType = {
     onSuccess: (scope: ScopeData) => void;
   };
   className?: string;
+};
+
+export type AccountActionDialogType = {
+  type: "ACCOUNT_ACTION";
+  params: {};
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -479,6 +486,9 @@ export const dialogs: DialogDefinitions<DialogType> = {
         closeDialog={closeDialog}
       />
     );
+  },
+  ACCOUNT_ACTION: ({}, closeDialog) => {
+    return <CreateAccountActionDialog closeDialog={closeDialog} />;
   },
   // FAQ: () => {
   //   return <FaqDialog />;
