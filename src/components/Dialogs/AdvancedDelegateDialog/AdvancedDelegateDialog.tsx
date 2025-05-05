@@ -37,6 +37,7 @@ import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
+  isDelegationEncouragement?: boolean;
 };
 
 type Delegatee = Omit<Delegation, "transaction_hash">;
@@ -45,6 +46,7 @@ export function AdvancedDelegateDialog({
   target,
   fetchAllForAdvancedDelegation,
   completeDelegation,
+  isDelegationEncouragement,
 }: Params) {
   const [overflowDelegation, setOverFlowDelegation] = useState(false);
   const [allowance, setAllowance] = useState<number[]>([]);
@@ -171,6 +173,15 @@ export function AdvancedDelegateDialog({
         transaction_hash: tx,
       },
     });
+    if (isDelegationEncouragement) {
+      trackEvent({
+        event_name: ANALYTICS_EVENT_NAMES.DELEGATION_ENCOURAGEMENT_CTA,
+        event_data: {
+          delegator: address as `0x${string}`,
+          transaction_hash: tx,
+        },
+      });
+    }
 
     const { prevVotingPower, postVotingPower, pageDelegateeAddress } =
       await getVotingPowerPageDelegatee();

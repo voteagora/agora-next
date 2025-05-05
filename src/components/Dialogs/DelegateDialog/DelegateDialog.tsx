@@ -30,16 +30,14 @@ import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 
 export function DelegateDialog({
   delegate,
-  fetchBalanceForDirectDelegation,
   fetchDirectDelegatee,
+  isDelegationEncouragement,
 }: {
   delegate: DelegateChunk;
-  fetchBalanceForDirectDelegation: (
-    addressOrENSName: string
-  ) => Promise<bigint>;
   fetchDirectDelegatee: (
     addressOrENSName: string
   ) => Promise<DelegateePayload | null>;
+  isDelegationEncouragement?: boolean;
 }) {
   const shouldFetchData = useRef(true);
   const [isReady, setIsReady] = useState(false);
@@ -128,6 +126,17 @@ export function DelegateDialog({
             : delegateTxHash) as `0x${string}`,
         },
       });
+      if (isDelegationEncouragement) {
+        trackEvent({
+          event_name: ANALYTICS_EVENT_NAMES.DELEGATION_ENCOURAGEMENT_CTA,
+          event_data: {
+            delegator: accountAddress as `0x${string}`,
+            transaction_hash: (isGasRelayLive
+              ? sponsoredTxnHash
+              : delegateTxHash) as `0x${string}`,
+          },
+        });
+      }
     }
   }, [didProcessDelegation]);
 
