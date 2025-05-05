@@ -115,10 +115,10 @@ export default async function Page({
 
   const parsedDelegate = Object.assign({}, delegate, {
     statement: delegate.statement
-      ? {
+      ? ({
           ...delegate.statement,
           email: null,
-        } as DelegateStatement
+        } as DelegateStatement)
       : null,
   });
 

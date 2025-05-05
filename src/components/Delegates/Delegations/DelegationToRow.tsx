@@ -34,12 +34,12 @@ export default function DelegationToRow({
       </TableCell>
       <TableCell>
         {delegation.transaction_hash ? (
-        <a
-          href={getBlockScanUrl(delegation.transaction_hash)}
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          View
+          <a
+            href={getBlockScanUrl(delegation.transaction_hash)}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            View
             <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-2 inline align-text-bottom" />
           </a>
         ) : (
