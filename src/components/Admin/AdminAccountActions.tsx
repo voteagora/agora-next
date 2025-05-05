@@ -5,13 +5,14 @@ import { Fragment } from "react";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
 import { useAccount, useReadContract } from "wagmi";
+import { GOVERNOR_TYPE } from "@/lib/constants";
 
 export default function AdminAccountActions() {
   const openDialog = useOpenDialog();
   const accountActionToggles = {
     transfer: false,
   };
-  const { slug, contracts } = Tenant.current();
+  const { contracts } = Tenant.current();
   const { address } = useAccount();
 
   const handleAccountTransfer = () => {
@@ -37,12 +38,24 @@ export default function AdminAccountActions() {
     chainId: contracts.governor?.chain.id,
   }) as { data: `0x${string}` };
 
-  // Can move to a util map if used elsewhere
-  switch (slug.toUpperCase()) {
-    case "OP":
-      if (address === managerAddress) {
-        accountActionToggles.transfer = true;
-      }
+  // Compare governor_type to derive transfer authority
+  const getTransferAuthority = () => {
+    switch (contracts.governorType) {
+      case GOVERNOR_TYPE.AGORA:
+        return adminAddress;
+      case GOVERNOR_TYPE.ALLIGATOR:
+        return managerAddress;
+      case GOVERNOR_TYPE.ENS:
+      //     todo
+      case GOVERNOR_TYPE.BRAVO:
+      //     todo
+      default:
+        return adminAddress;
+    }
+  };
+
+  if (address === getTransferAuthority()) {
+    accountActionToggles.transfer = true;
   }
 
   if (accountActionToggles.transfer) {
