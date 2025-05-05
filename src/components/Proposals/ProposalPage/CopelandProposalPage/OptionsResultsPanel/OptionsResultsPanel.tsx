@@ -79,15 +79,15 @@ const FUNDING_VALUES_DEV: Record<
   string,
   { ext: number | null; std: number; isEligibleFor2Y: boolean }
 > = {
-  "ENSRegistry": { ext: null, std: 300000, isEligibleFor2Y: true },
-  "ResolutionProtocol": { ext: 100000, std: 300000, isEligibleFor2Y: false },
-  "NameWrapper": { ext: null, std: 400000, isEligibleFor2Y: false },
-  "EthDNS": { ext: 400000, std: 400000, isEligibleFor2Y: false },
-  "SubgraphIndex": { ext: 300000, std: 400000, isEligibleFor2Y: true },
-  "MetaResolver": { ext: null, std: 800000, isEligibleFor2Y: true },
+  ENSRegistry: { ext: null, std: 300000, isEligibleFor2Y: true },
+  ResolutionProtocol: { ext: 100000, std: 300000, isEligibleFor2Y: false },
+  NameWrapper: { ext: null, std: 400000, isEligibleFor2Y: false },
+  EthDNS: { ext: 400000, std: 400000, isEligibleFor2Y: false },
+  SubgraphIndex: { ext: 300000, std: 400000, isEligibleFor2Y: true },
+  MetaResolver: { ext: null, std: 800000, isEligibleFor2Y: true },
   "Ethereum Name Improvers": { ext: null, std: 300000, isEligibleFor2Y: true },
   "A long name foundation": { ext: null, std: 400000, isEligibleFor2Y: false },
-}
+};
 
 const FUNDING_VALUES = isProd ? FUNDING_VALUES_PROD : FUNDING_VALUES_DEV;
 
@@ -102,7 +102,7 @@ export default function OptionsResultsPanel({
   });
   const options = (
     proposal.proposalData as unknown as ParsedProposalData["SNAPSHOT"]["kind"]
-  ).choices
+  ).choices;
 
   const containerRef = React.useRef<HTMLDivElement>(null);
 

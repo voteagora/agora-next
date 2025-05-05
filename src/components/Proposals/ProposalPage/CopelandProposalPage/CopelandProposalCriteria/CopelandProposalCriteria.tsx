@@ -28,8 +28,8 @@ export default function CopelandProposalCriteria() {
             matchup.
             <br />
             <br />
-            Read the snapshot proposal description for details about how and where
-            to vote.
+            Read the snapshot proposal description for details about how and
+            where to vote.
           </AccordionContent>
         </AccordionItem>
       </Accordion>
