@@ -10,6 +10,7 @@ import {
   useWriteContract,
   useSimulateContract,
   useWaitForTransactionReceipt,
+  useAccount,
 } from "wagmi";
 import { Separator } from "@/components/ui/separator";
 import Tenant from "@/lib/tenant/tenant";
@@ -26,6 +27,7 @@ export default function GovernorSettings() {
 
   const secondsPerBlock = getSecondsPerBlock(chainIdToUse);
   const { data: adminAddress } = useGovernorAdmin({ enabled: true });
+  const { address } = useAccount();
 
   const govContract = {
     address: contracts.governor.address as `0x${string}`,
@@ -117,6 +119,11 @@ export default function GovernorSettings() {
   const isDisabledSetVotingDelay =
     isLoadingSetVotingDelay || isLoadingSetVotingDelayTransaction;
 
+  const isAdmin = address === adminAddress;
+  console.log(
+    `Is Admin ${isAdmin}\nAddress: ${address}\nAdmin Address: ${adminAddress}`
+  );
+
   return (
     <div className="gl_box bg-neutral">
       <section>
@@ -125,12 +132,58 @@ export default function GovernorSettings() {
         </h1>
       </section>
       <div className="my-4">
-        <GovernorLockedSetting name={"Voting Period"} value={votingPeriod} />
-        <GovernorLockedSetting name={"Voting Delay"} value={votingDelay} />
+        {isAdmin ? (
+          <div className="space-y-4 sm:space-y-0 sm:flex sm:justify-between sm:gap-4 flex-column">
+            <GovernorUnlockedSetting
+              name={"Voting Period"}
+              value={votingPeriod}
+              setValue={setVotingPeriod}
+              disabled={isDisabledSetVotingPeriod}
+              min={0}
+              step={0.01}
+              writeContract={writeSetVotingPeriod}
+              setConfig={setVotingPeriodConfig}
+              period={"hours"}
+            />
+            <GovernorUnlockedSetting
+              name={"Voting Delay"}
+              value={votingDelay}
+              setValue={setVotingDelay}
+              disabled={isDisabledSetVotingDelay}
+              min={0}
+              step={0.01}
+              writeContract={writeSetVotingDelay}
+              setConfig={setVotingDelayConfig}
+              period={"hours"}
+            />
+          </div>
+        ) : (
+          <div className="space-y-4 sm:space-y-0 sm:flex sm:justify-between sm:gap-4">
+            <GovernorLockedSetting
+              name={"Voting Period"}
+              value={votingPeriod}
+              period={"hours"}
+            />
+            <GovernorLockedSetting
+              name={"Voting Delay"}
+              value={votingDelay}
+              period={"hours"}
+            />
+          </div>
+        )}
+
         <Separator className="my-8" />
-        <GovernorLockedSetting name={"Manager Address"} value={manager} />
+        <GovernorLockedSetting
+          name={"Manager Address"}
+          value={manager}
+          period={""}
+        />
         {adminAddress && (
-          <GovernorLockedSetting name={"Admin Address"} value={adminAddress} />
+          <GovernorLockedSetting
+            name={"Admin Address"}
+            value={adminAddress}
+            period={""}
+          />
         )}
       </div>
     </div>
@@ -140,17 +193,67 @@ export default function GovernorSettings() {
 function GovernorLockedSetting({
   name,
   value,
-}: {
-  name: string;
-  value: string;
-}) {
+  period,
+}: GovernLockSettingProps) {
   return (
     <div className="space-y-1 sm:space-y-0 text-sm sm:flex sm:justify-between sm:items-center sm:px-2 mb-4">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mr-1">
         <p className="text-secondary">{name}</p>
         <Lock className="w-4 h-4 text-primary/30" />
       </div>
-      <p className="text-secondary truncate">{value}</p>
+      <p className="text-secondary truncate font-bold">
+        {value}
+        <span className="text-secondary font-medium"> {period}</span>
+      </p>
+    </div>
+  );
+}
+
+interface GovernLockSettingProps {
+  name: string;
+  value: string;
+  period: string;
+  setValue?: (value: any) => void;
+  disabled?: boolean;
+  min?: number;
+  step?: number;
+  writeContract?: any;
+  setConfig?: any;
+}
+
+function GovernorUnlockedSetting(props: GovernLockSettingProps) {
+  return (
+    <div className="flex-1">
+      <Label>{props.name}</Label>
+      <div className="relative flex items-center">
+        <Input
+          min={props.min}
+          value={props.value}
+          onChange={(e) => props.setValue!(e.target.value)}
+          disabled={/* isInitializing || */ props.disabled}
+          step={props.step}
+          type="number"
+        />
+        <p className="absolute text-sm text-tertiary right-[96px]">
+          {props.period}
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="absolute right-[6px] rounded-sm"
+          loading={props.disabled}
+          disabled={
+            /* isInitializing || */ props.disabled ||
+            // setVotingPeriodError ||
+            props.value === ""
+          }
+          onClick={() => {
+            props.writeContract(props.setConfig!.request);
+          }}
+        >
+          Update
+        </Button>
+      </div>
     </div>
   );
 }
