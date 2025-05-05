@@ -20,6 +20,7 @@ export type Vote = {
   proposalType: ProposalType;
   timestamp: Date | null;
   blockNumber?: bigint;
+  transaction_index?: number;
   citizenType: string | null;
   voterMetadata: Record<{
     name: string;
@@ -54,6 +55,17 @@ export type SnapshotVote = {
   title: string;
   reason: string;
   choiceLabels: Record<string, any>;
+};
+
+export type DaoNodeVote = {
+  block_number: number;
+  transaction_index: number;
+  voter: string;
+  proposal_id: string;
+  support: number;
+  weight: number;
+  reason: string;
+  params?: number[];
 };
 
 export type DelegatesSort =

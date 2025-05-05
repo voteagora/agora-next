@@ -13,6 +13,7 @@ export default function BlockScanUrls({
   className?: string | undefined;
   isEas?: boolean;
 }) {
+  // Shouldn't happen, but just in case
   if (!hash1 && !hash2) {
     return null;
   }

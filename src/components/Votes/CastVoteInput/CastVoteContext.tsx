@@ -217,8 +217,8 @@ const CastVoteContextProvider = ({
         data:
           missingVote === "NONE"
             ? {
-                standardTxHash: votes?.[0]?.transactionHash,
-                advancedTxHash: votes?.[1]?.transactionHash,
+                standardTxHash: votes?.[0]?.transactionHash ?? undefined,
+                advancedTxHash: votes?.[1]?.transactionHash ?? undefined,
               }
             : data,
       }}

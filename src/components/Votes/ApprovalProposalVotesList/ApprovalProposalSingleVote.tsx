@@ -20,6 +20,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
+import { useBnAndTidToHash } from "@/hooks/useBnAndTidToHash";
+import { useInView } from "react-intersection-observer";
 
 const { token, ui } = Tenant.current();
 
@@ -35,6 +37,16 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
   } = vote;
   const [hovered, setHovered] = useState(false);
   const [hash1, hash2] = transactionHash?.split("|") || [];
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+
+  const { data: hash } = useBnAndTidToHash({
+    blockNumber: Number(vote.blockNumber),
+    transactionIndex: vote.transaction_index,
+    enabled: inView && !!vote.blockNumber && !!vote.transaction_index,
+  });
 
   const { data } = useEnsName({
     chainId: 1,
@@ -51,7 +63,7 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
   };
 
   return (
-    <VStack>
+    <div className="flex flex-col" ref={ref}>
       <HoverCard
         openDelay={100}
         closeDelay={100}
@@ -75,13 +87,15 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
               )}
               {hovered && (
                 <>
-                  <a
-                    href={getBlockScanUrl(hash1)}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >
-                    <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
-                  </a>
+                  {hash1 || hash ? (
+                    <a
+                      href={getBlockScanUrl(hash1 || (hash as string))}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                    >
+                      <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+                    </a>
+                  ) : null}
                   {hash2 && (
                     <a
                       href={getBlockScanUrl(hash2)}
@@ -147,6 +161,6 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
           </p>
         </div>
       )}
-    </VStack>
+    </div>
   );
 }
