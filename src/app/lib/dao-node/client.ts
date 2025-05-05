@@ -9,7 +9,10 @@ import { cache } from "react";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { DelegateStats } from "@/lib/types";
 
+
 const { namespace, ui } = Tenant.current();
+import { DaoNodeVote } from "@/app/api/common/votes/vote";
+
 
 // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL TODO BELOW IS HANDLED
 export function adaptDAONodeResponse(
@@ -276,6 +279,7 @@ export const getCachedAllProposalsFromDaoNode = cache(
   }
   */
 
+
 export const getDelegatesFromDaoNode = async (options?: {
   sortBy?: string;
   reverse?: boolean;
@@ -443,4 +447,27 @@ export const getDelegateFromDaoNode = async (address: string) => {
     console.error(error);
     return null;
   }
+};
+
+export const getProposalFromDaoNode = unstable_cache(
+  async (proposalId: string) => {
+    const url = getDaoNodeURLForNamespace(namespace);
+    const response = await fetch(`${url}v1/proposal/${proposalId}`);
+    const data: {
+      proposal: ProposalPayloadFromDAONode;
+    } = await response.json();
+    return data;
+  },
+  ["proposalFromDaoNode"],
+  {
+    tags: ["proposalFromDaoNode"],
+    revalidate: 60, // 1 minute
+  }
+);
+
+export const getVotingHistoryFromDaoNode = async (address: string) => {
+  const url = getDaoNodeURLForNamespace(namespace);
+  const response = await fetch(`${url}v1/delegate/${address}/voting_history`);
+  const data: { voting_history: DaoNodeVote[] } = await response.json();
+  return data;
 };

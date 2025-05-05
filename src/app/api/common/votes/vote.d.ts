@@ -8,7 +8,7 @@ export type VotesSort = "weight" | "block_number";
 export type VotePayload = OptimismVotes | LineaVotes;
 
 export type Vote = {
-  transactionHash: string;
+  transactionHash: string | null;
   address: string;
   proposalId: string;
   support: Support;
@@ -20,6 +20,7 @@ export type Vote = {
   proposalType: ProposalType;
   timestamp: Date | null;
   blockNumber?: bigint;
+  transaction_index?: number;
 };
 
 export type SnapshotVotePayload = {
@@ -48,6 +49,17 @@ export type SnapshotVote = {
   title: string;
   reason: string;
   choiceLabels: Record<string, any>;
+};
+
+export type DaoNodeVote = {
+  block_number: number;
+  transaction_index: number;
+  voter: string;
+  proposal_id: string;
+  support: number;
+  weight: number;
+  reason: string;
+  params?: number[];
 };
 
 export type DelegatesSort =

@@ -9,6 +9,7 @@ import { useGovernorName } from "@/hooks/useGovernorName";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { useAccount } from "wagmi";
+import { revalidateTag } from "next/cache";
 
 const types = {
   Ballot: [
@@ -86,6 +87,7 @@ const useSponsoredVoting = ({
         });
 
         if (status === "success") {
+          revalidateTag("proposalFromDaoNode");
           setSponsoredVoteTxHash(voteTxHash);
           setSponsoredVoteSuccess(true);
           trackEvent({

@@ -483,7 +483,10 @@ export function SuccessMessage({
       <BlockScanUrls
         className="pt-2 text-tertiary font-medium mx-auto"
         hash1={
-          data?.sponsoredVoteTxHash || data?.standardTxHash || transactionHash
+          data?.sponsoredVoteTxHash ||
+          data?.standardTxHash ||
+          transactionHash ||
+          undefined
         }
         hash2={data?.advancedTxHash}
       />
