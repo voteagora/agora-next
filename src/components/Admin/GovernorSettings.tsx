@@ -166,7 +166,14 @@ export default function GovernorSettings() {
     if (periodTXError) {
       console.error("Transaction error - period:", periodTXError);
     }
-  }, [delayTXStatus, delayTXerror, periodTXStatus, periodTXError]);
+  }, [
+    delayTXStatus,
+    delayTXerror,
+    periodTXStatus,
+    periodTXError,
+    resultSetVotingDelay,
+    resultSetVotingPeriod,
+  ]);
 
   return (
     <div className="gl_box bg-neutral">
