@@ -21,6 +21,7 @@ import { DELEGATION_MODEL, TENANT_NAMESPACES } from "@/lib/constants";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { calculateBigIntRatio } from "../utils/bigIntRatio";
 import { withMetrics } from "@/lib/metricWrapper";
+import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
 
 /*
  * Fetches a list of delegates
@@ -52,6 +53,13 @@ async function getDelegates({
   return withMetrics(
     "getDelegates",
     async () => {
+      // Call the DAO node API to get delegates data
+      const daoNodeDelegates = await getDelegatesFromDaoNode();
+      console.log(
+        "DAO Node Delegates data fetched:",
+        daoNodeDelegates ? "success" : "failed"
+      );
+
       const { namespace, ui, slug, contracts } = Tenant.current();
       const allowList = ui.delegates?.allowed || [];
 

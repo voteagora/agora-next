@@ -20,3 +20,28 @@ export const getProposalTypesFromDaoNode = async () => {
 
   return data;
 };
+
+export const getDelegatesFromDaoNode = async () => {
+  const url = getDaoNodeURLForNamespace(namespace);
+  console.log(url);
+  if (!url) {
+    return null;
+  }
+
+  try {
+    const response = await fetch(`${url}/v1/delegates`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch delegates: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Print the data for debugging
+    console.log("Delegates data:", JSON.stringify(data, null, 2));
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching delegates:", error);
+    return null;
+  }
+};
