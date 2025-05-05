@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { Lock } from "lucide-react";
+import toast from "react-hot-toast";
+import BlockScanUrls from "../shared/BlockScanUrl";
 import {
   useReadContracts,
   useWriteContract,
@@ -93,10 +95,13 @@ export default function GovernorSettings() {
     writeContract: writeSetVotingPeriod,
     isPending: isLoadingSetVotingPeriod,
   } = useWriteContract();
-  const { isLoading: isLoadingSetVotingPeriodTransaction } =
-    useWaitForTransactionReceipt({
-      hash: resultSetVotingPeriod,
-    });
+  const {
+    isLoading: isLoadingSetVotingPeriodTransaction,
+    status: periodTXStatus,
+    error: periodTXError,
+  } = useWaitForTransactionReceipt({
+    hash: resultSetVotingPeriod,
+  });
   const isDisabledSetVotingPeriod =
     isLoadingSetVotingPeriod || isLoadingSetVotingPeriodTransaction;
 
@@ -112,14 +117,56 @@ export default function GovernorSettings() {
     writeContract: writeSetVotingDelay,
     isPending: isLoadingSetVotingDelay,
   } = useWriteContract();
-  const { isLoading: isLoadingSetVotingDelayTransaction } =
-    useWaitForTransactionReceipt({
-      hash: resultSetVotingDelay,
-    });
+  const {
+    isLoading: isLoadingSetVotingDelayTransaction,
+    status: delayTXStatus,
+    error: delayTXerror,
+  } = useWaitForTransactionReceipt({
+    hash: resultSetVotingDelay,
+    confirmations: 1,
+  });
   const isDisabledSetVotingDelay =
     isLoadingSetVotingDelay || isLoadingSetVotingDelayTransaction;
 
   const isAdmin = address === adminAddress;
+
+  // For working with updating the values
+  useEffect(() => {
+    const triggerToast = ({
+      success,
+      hash,
+    }: {
+      success: boolean;
+      hash?: string;
+    }) => {
+      success
+        ? toast.success(
+            <div className="flex flex-col items-center gap-2 p-1">
+              <span className="text-sm font-semibold">
+                Updated Successfully!
+              </span>
+              {hash ? <BlockScanUrls hash1={hash} /> : null}
+            </div>
+          )
+        : toast.error("Transaction failed.");
+    };
+
+    if (delayTXStatus === "success") {
+      triggerToast({ success: true, hash: resultSetVotingDelay });
+    } else if (periodTXStatus === "success") {
+      triggerToast({ success: true, hash: resultSetVotingPeriod });
+    } else if (delayTXStatus === "error" || periodTXStatus === "error") {
+      triggerToast({ success: false });
+    }
+
+    // Debugging for undefined errors
+    if (delayTXerror) {
+      console.error("Transaction error - delay:", delayTXerror);
+    }
+    if (periodTXError) {
+      console.error("Transaction error - period:", periodTXError);
+    }
+  }, [delayTXStatus, delayTXerror, periodTXStatus, periodTXError]);
 
   return (
     <div className="gl_box bg-neutral">
