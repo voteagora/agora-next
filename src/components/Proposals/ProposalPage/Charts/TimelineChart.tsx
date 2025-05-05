@@ -243,6 +243,7 @@ const transformVotesToChartData = ({
 };
 
 const tickFormatter = (timeStr: string, index: number) => {
+  if (!timeStr) return "";
   const date = new Date(timeStr);
   const formattedDate = format(date, "MM/dd h:mm a");
 

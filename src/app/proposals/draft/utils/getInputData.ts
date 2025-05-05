@@ -96,9 +96,16 @@ export function getInputData(proposal: DraftProposal): {
       if (proposal.transactions.length === 0) {
         // empty eth transfer from governor
         const governorAddress = contracts.governor.address;
-        targets.push(governorAddress as `0x${string}`);
+        const timelockAddress = contracts.timelock?.address;
+        targets.push(
+          contracts.supportScopes && timelockAddress
+            ? (timelockAddress as `0x${string}`)
+            : (governorAddress as `0x${string}`)
+        );
         values.push(0);
-        calldatas.push("0x" as `0x${string}`);
+        calldatas.push(
+          contracts.supportScopes ? "0xf27a0c92" : ("0x" as `0x${string}`)
+        ); // 0xf27a0c92 is the calldata to call the getMinDelay read function on the timelock => its only purpose is to allow for empty signal only proposals
         signatures.push("");
       } else {
         proposal.transactions.forEach((t) => {

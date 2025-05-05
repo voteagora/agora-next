@@ -27,8 +27,13 @@ import OptimisticProposalForm from "../../OptimisticProposalForm";
 import SwitchInput from "../../form/SwitchInput";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
+import {
+  getProposalTypeAddress,
+  getStageIndexForTenant,
+} from "@/app/proposals/draft/utils/stages";
 import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
+import { ScopeDetails } from "@/components/Admin/ScopeDetails";
+import { FormattedProposalType } from "@/lib/types";
 
 const DEFAULT_FORM = {
   type: ProposalType.BASIC,
@@ -47,20 +52,49 @@ const getValidProposalTypesForVotingType = (
   proposalTypes: any[],
   proposalType: ProposalType
 ) => {
+  let optimisticModuleAddress: string | null = null;
+  let approvalModuleAddress: string | null = null;
+
+  try {
+    optimisticModuleAddress =
+      getProposalTypeAddress(ProposalType.OPTIMISTIC)?.toLowerCase() || null;
+
+    approvalModuleAddress =
+      getProposalTypeAddress(ProposalType.APPROVAL)?.toLowerCase() || null;
+  } catch (error) {
+    // ignore
+  }
+
   switch (proposalType) {
     case ProposalType.APPROVAL:
       return proposalTypes.filter((type) => {
-        return type.name.toLowerCase().includes("approval");
+        return (
+          (type.module &&
+            type.module.toLowerCase() ===
+              approvalModuleAddress?.toLowerCase()) ||
+          type.name.toLowerCase().includes("approval")
+        );
       });
 
     case ProposalType.OPTIMISTIC:
       return proposalTypes.filter((type) => {
-        return type.name.toLowerCase().includes("optimistic");
+        return (
+          (type.module &&
+            type.module.toLowerCase() ===
+              optimisticModuleAddress?.toLowerCase()) ||
+          type.name.toLowerCase().includes("optimistic")
+        );
       });
 
     case ProposalType.BASIC:
       return proposalTypes.filter((type) => {
         return (
+          (!type.module ||
+            type.module?.toLowerCase() !==
+              approvalModuleAddress?.toLowerCase()) &&
+          (!type.module ||
+            type.module?.toLowerCase() !==
+              optimisticModuleAddress?.toLowerCase()) &&
           !type.name.toLowerCase().includes("approval") &&
           !type.name.toLowerCase().includes("optimistic")
         );
@@ -78,7 +112,7 @@ const DraftFormClient = ({
   proposalTypes,
 }: {
   draftProposal: DraftProposal;
-  proposalTypes: any[];
+  proposalTypes: FormattedProposalType[];
 }) => {
   const [isPending, setIsPending] = useState<boolean>(false);
   const [validProposalTypes, setValidProposalTypes] = useState<any[]>(
@@ -97,6 +131,7 @@ const DraftFormClient = ({
   const { watch, handleSubmit, control } = methods;
 
   const votingModuleType = watch("type");
+  const proposalTypeId = watch("proposalConfigType");
   const enabledProposalTypesFromConfigAndAPI = useMemo(
     () => getProposalTypeMetaDataForTenant(proposalTypes),
     [proposalTypes]
@@ -149,26 +184,33 @@ const DraftFormClient = ({
     }
   };
 
+  const selectedProposalType = useMemo(() => {
+    return proposalTypes.find(
+      (type) => type.proposal_type_id === Number(proposalTypeId)
+    );
+  }, [proposalTypeId]);
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormCard>
           <FormCard.Section>
             <div className="flex flex-col space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <SwitchInput
-                  control={control}
-                  label="Voting module"
-                  required={true}
-                  options={enabledProposalTypesFromConfigAndAPI}
-                  name="type"
-                />
+              {validProposalTypes.length > 0 && (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <SwitchInput
+                    control={control}
+                    label="Voting module"
+                    required={true}
+                    options={enabledProposalTypesFromConfigAndAPI}
+                    name="type"
+                  />
 
-                <p className="text-sm self-center text-agora-stone-700 mt-6">
-                  {ProposalTypeMetadata[votingModuleType].description}
-                </p>
-              </div>
-
+                  <p className="text-sm self-center text-agora-stone-700 mt-6">
+                    {ProposalTypeMetadata[votingModuleType].description}
+                  </p>
+                </div>
+              )}
               {validProposalTypes.length > 1 ? (
                 <div className="relative">
                   <SelectInput
@@ -191,6 +233,19 @@ const DraftFormClient = ({
                   name="proposalConfigType"
                   value={validProposalTypes[0]?.proposal_type_id || null}
                 />
+              )}
+              {(selectedProposalType?.scopes?.length || 0) > 0 && (
+                <div className="flex flex-col gap-2">
+                  <span className="text-sm font-medium">Scopes</span>
+                  {selectedProposalType?.scopes?.map((scope) => (
+                    <div
+                      key={scope.scope_key}
+                      className="flex flex-col gap-4 text-sm p-2 rounded-md border border-line rounded-lg p-4 w-full"
+                    >
+                      <ScopeDetails scope={scope} />
+                    </div>
+                  ))}
+                </div>
               )}
 
               <TextInput

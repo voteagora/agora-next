@@ -10,10 +10,13 @@ import infoPageCard04 from "@/assets/tenant/b3_info_4.png";
 import infoPageHero from "@/assets/tenant/b3_info_hero.png";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export const b3TenantUIConfig = new TenantUI({
   title: "B3 Agora",
   logo: b3Logo,
+  tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.B3)],
 
   googleAnalytics: "G-WDBYC8751R",
 

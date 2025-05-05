@@ -53,7 +53,7 @@ export default function CastVoteInput({
   const { setOpen } = useModal();
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
-  const { data, isSuccess } = useFetchAllForVoting({
+  const { data, isSuccess, isPending } = useFetchAllForVoting({
     proposal,
     blockNumber: isOptimismTenant ? proposal.snapshotBlockNumber : undefined,
   });
@@ -74,7 +74,7 @@ export default function CastVoteInput({
     );
   }
 
-  if (!isSuccess || !chains || !delegate || !votes || !votingPower) {
+  if (isPending) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
         <DisabledVoteButton reason="Loading..." />
@@ -82,7 +82,7 @@ export default function CastVoteInput({
     );
   }
 
-  if (!delegate.statement) {
+  if (isSuccess && !delegate?.statement) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
         <NoStatementView />
@@ -93,15 +93,15 @@ export default function CastVoteInput({
   return (
     <CastVoteContextProvider
       proposal={proposal}
-      votes={votes}
-      chains={chains}
-      votingPower={votingPower}
+      votes={votes ?? null}
+      chains={chains ?? null}
+      votingPower={votingPower ?? null}
       votableSupply={votableSupply}
     >
       <CastVoteInputContent
         proposal={proposal}
-        votes={votes}
-        votingPower={votingPower}
+        votes={votes ?? null}
+        votingPower={votingPower ?? null}
         isOptimistic={isOptimistic}
       />
     </CastVoteContextProvider>
@@ -115,8 +115,8 @@ function CastVoteInputContent({
   isOptimistic,
 }: {
   proposal: Proposal;
-  votes: Vote[];
-  votingPower: VotingPowerData;
+  votes: Vote[] | null;
+  votingPower: VotingPowerData | null;
   isOptimistic: boolean;
 }) {
   const {
@@ -135,8 +135,22 @@ function CastVoteInputContent({
 
   const { ui } = Tenant.current();
 
-  const missingVote = checkMissingVoteForDelegate(votes, votingPower);
-  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+  const missingVote = checkMissingVoteForDelegate(
+    votes ?? [],
+    votingPower ?? {
+      advancedVP: "0",
+      directVP: "0",
+      totalVP: "0",
+    }
+  );
+  const vpToDisplay = getVpToDisplay(
+    votingPower ?? {
+      advancedVP: "0",
+      directVP: "0",
+      totalVP: "0",
+    },
+    missingVote
+  );
 
   const showSuccessMessage = isSuccess || missingVote === "NONE";
 
@@ -154,11 +168,12 @@ function CastVoteInputContent({
     isGasRelayEnabled &&
     Number(formatEther(sponsorBalance || 0n)) >=
       Number(gasRelayConfig.minBalance) &&
-    Number(votingPower.totalVP) > Number(gasRelayConfig?.minVPToUseGasRelay) &&
+    Number(votingPower?.totalVP ?? "0") >
+      Number(gasRelayConfig?.minVPToUseGasRelay) &&
     !reason;
 
   return (
-    <div className="flex flex-col flex-shrink bg-wash">
+    <div className="flex flex-col flex-shrink rounded-b-lg">
       <div
         className={`flex flex-col bg-neutral border-b border-line rounded-b-lg flex-shrink ${isGasRelayLive && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
       >
@@ -176,18 +191,26 @@ function CastVoteInputContent({
                       className="text-sm text-primary bg-neutral resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
                     />
                   )}
-                  <VoteButtons
-                    proposalStatus={proposal.status}
-                    isOptimistic={isOptimistic}
-                  />
+                  <div className={cn(proposal.status !== "ACTIVE" && "mt-3")}>
+                    <VoteButtons
+                      proposalStatus={proposal.status}
+                      isOptimistic={isOptimistic}
+                    />
+                  </div>
                 </div>
               )}
               {isLoading && <LoadingVote />}
               {!isLoading && proposal.status === "ACTIVE" && (
                 <VoteSubmitButton
                   supportType={support}
-                  votingPower={votingPower}
-                  missingVote={checkMissingVoteForDelegate(votes, votingPower)}
+                  votingPower={
+                    votingPower ?? {
+                      advancedVP: "0",
+                      directVP: "0",
+                      totalVP: "0",
+                    }
+                  }
+                  missingVote={missingVote}
                   proposal={proposal}
                 />
               )}
@@ -367,7 +390,7 @@ export function SuccessMessage({
   votingPower,
 }: {
   proposal: Proposal;
-  votes: Vote[];
+  votes: Vote[] | null;
   className?: string;
   votingPower?: string;
 }) {
@@ -379,18 +402,19 @@ export function SuccessMessage({
   const openDialog = useOpenDialog();
   const { data: votableSupply } = useVotableSupply({ enabled: true });
 
+  const lastVote = votes?.[votes.length - 1];
+
   const newVote = {
-    support: supportFromContext || "",
-    reason: reasonFromContext || "",
-    params: [],
-    weight: votingPower || "",
+    support: supportFromContext || lastVote?.support,
+    reason: reasonFromContext || lastVote?.reason || "",
+    params: lastVote?.params || [],
+    weight: votingPower || lastVote?.weight || "",
   };
 
   const {
     support,
     blockNumber,
     timestamp,
-    address,
     endsIn,
     forPercentage,
     againstPercentage,

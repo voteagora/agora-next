@@ -39,16 +39,22 @@ function OptionsResultsPanel({
   const tenantUI = TenantUIFactory.create(
     TENANT_NAMESPACES[namespace as keyof typeof TENANT_NAMESPACES]
   );
-  const primary = tenantUI.customization?.primary
-    ? rgbStringToHex(tenantUI.customization?.primary)
-    : rgbStringToHex("0 0 0");
-  const wash = tenantUI.customization?.wash
-    ? rgbStringToHex(tenantUI.customization?.wash)
-    : rgbStringToHex("250 250 250");
+  const primary =
+    tenantUI.theme === "dark"
+      ? rgbStringToHex("0 0 0")
+      : tenantUI.customization?.primary
+        ? rgbStringToHex(tenantUI.customization?.primary)
+        : rgbStringToHex("0 0 0");
+  const wash =
+    tenantUI.theme === "dark"
+      ? rgbStringToHex("250 250 250")
+      : tenantUI.customization?.wash
+        ? rgbStringToHex(tenantUI.customization?.wash)
+        : rgbStringToHex("250 250 250");
 
   return (
     <div tw={"flex flex-col flex-shrink px-4"}>
-      {options.map((option, index) => {
+      {options.slice(0, 5).map((option, index) => {
         return (
           <SingleOption
             key={index}
@@ -63,7 +69,7 @@ function OptionsResultsPanel({
           />
         );
       })}
-      {totalOptions > 7 && (
+      {totalOptions > 5 && (
         <div
           style={{
             color: primary,
@@ -71,7 +77,7 @@ function OptionsResultsPanel({
           }}
           tw="flex justify-center items-center rounded-lg p-2 w-24 ml-auto"
         >
-          +{totalOptions - 7} more
+          +{totalOptions - 5} more
         </div>
       )}
     </div>
@@ -123,12 +129,18 @@ function SingleOption({
   const tenantToken = TenantTokenFactory.create(
     TENANT_NAMESPACES[namespace as keyof typeof TENANT_NAMESPACES]
   );
-  const primary = tenantUI.customization?.primary
-    ? rgbStringToHex(tenantUI.customization?.primary)
-    : rgbStringToHex("0 0 0");
-  const tertiary = tenantUI.customization?.tertiary
-    ? rgbStringToHex(tenantUI.customization?.tertiary)
-    : rgbStringToHex("115 115 115");
+  const primary =
+    tenantUI.theme === "dark"
+      ? rgbStringToHex("0 0 0")
+      : tenantUI.customization?.primary
+        ? rgbStringToHex(tenantUI.customization?.primary)
+        : rgbStringToHex("0 0 0");
+  const tertiary =
+    tenantUI.theme === "dark"
+      ? rgbStringToHex("115 115 115")
+      : tenantUI.customization?.tertiary
+        ? rgbStringToHex(tenantUI.customization?.tertiary)
+        : rgbStringToHex("115 115 115");
 
   return (
     <div
@@ -260,19 +272,15 @@ function generateVoteBars(
   forPercentage: number,
   againstPercentage: number,
   namespace: TenantNamespace,
-  proposalType: "STANDARD" | "OPTIMISTIC" | "APPROVAL" | "SNAPSHOT"
+  proposalType: "STANDARD" | "OPTIMISTIC" | "APPROVAL" | "SNAPSHOT",
+  supportType: "FOR" | "AGAINST" | "ABSTAIN"
 ) {
   const tenantUI: TenantUI = TenantUIFactory.create(
     TENANT_NAMESPACES[namespace as keyof typeof TENANT_NAMESPACES]
   );
-  const totalBars = 114;
+  const totalBars = 71;
   const bars = [];
-  const forBars =
-    proposalType === "OPTIMISTIC"
-      ? 0
-      : Math.round((totalBars * forPercentage) / 100);
-  const againstBars = Math.round((totalBars * againstPercentage) / 100);
-  const abstainBars = totalBars - forBars - againstBars;
+  const totalVotes = forPercentage + againstPercentage;
 
   const positiveColor = tenantUI.customization?.positive
     ? rgbStringToHex(tenantUI.customization?.positive)
@@ -284,46 +292,73 @@ function generateVoteBars(
     ? rgbStringToHex(tenantUI.customization?.negative)
     : rgbStringToHex("226 54 54");
 
-  const className = "flex h-6 w-[6px] rounded-full shrink-0";
+  const className = "flex h-7 w-[5px] rounded-full shrink-0";
 
-  // Generate FOR bars
-  for (let i = 0; i < forBars; i++) {
-    bars.push(
-      <div
-        key={`for-${i}`}
-        style={{ backgroundColor: positiveColor }}
-        tw={className}
-      />
-    );
-  }
+  if (totalVotes === 0) {
+    // If no votes, show all bars as user's vote
+    for (let i = 0; i < totalBars; i++) {
+      bars.push(
+        <div
+          key={`${supportType}-${i}`}
+          style={{
+            backgroundColor:
+              supportType === "FOR"
+                ? positiveColor
+                : supportType === "AGAINST"
+                  ? againstColor
+                  : abstainColor,
+          }}
+          tw={className}
+        />
+      );
+    }
+  } else {
+    const forBars =
+      proposalType === "OPTIMISTIC"
+        ? 0
+        : Math.round((totalBars * forPercentage) / 100);
+    const againstBars = Math.round((totalBars * againstPercentage) / 100);
+    const abstainBars = totalBars - forBars - againstBars;
 
-  // Generate abstain bars
-  for (let i = 0; i < abstainBars; i++) {
-    bars.push(
-      <div
-        key={`abstain-${i}`}
-        style={{ backgroundColor: abstainColor }}
-        tw={className}
-      />
-    );
-  }
+    // Generate FOR bars
+    for (let i = 0; i < forBars; i++) {
+      bars.push(
+        <div
+          key={`for-${i}`}
+          style={{ backgroundColor: positiveColor }}
+          tw={className}
+        />
+      );
+    }
 
-  // Generate AGAINST bars
-  for (let i = 0; i < againstBars; i++) {
-    bars.push(
-      <div
-        key={`against-${i}`}
-        style={{ backgroundColor: againstColor }}
-        tw={className}
-      />
-    );
+    // Generate abstain bars
+    for (let i = 0; i < abstainBars; i++) {
+      bars.push(
+        <div
+          key={`abstain-${i}`}
+          style={{ backgroundColor: abstainColor }}
+          tw={className}
+        />
+      );
+    }
+
+    // Generate AGAINST bars
+    for (let i = 0; i < againstBars; i++) {
+      bars.push(
+        <div
+          key={`against-${i}`}
+          style={{ backgroundColor: againstColor }}
+          tw={className}
+        />
+      );
+    }
   }
 
   return (
     <div
       tw="flex items-center justify-center w-full"
       style={{
-        gap: "4px",
+        gap: "10px",
       }}
     >
       {bars}
@@ -349,7 +384,7 @@ const SuccessMessageCard = ({
   blockNumber: string | null;
   endsIn: string | null;
   voteDate: string | null;
-  supportType: "FOR" | "AGAINST" | "NEUTRAL";
+  supportType: "FOR" | "AGAINST" | "ABSTAIN";
   proposalType: "STANDARD" | "OPTIMISTIC" | "APPROVAL" | "SNAPSHOT";
   options: {
     description: string;
@@ -368,12 +403,18 @@ const SuccessMessageCard = ({
   const positive = tenantUI.customization?.positive
     ? rgbStringToHex(tenantUI.customization?.positive)
     : rgbStringToHex("97 209 97");
-  const primary = tenantUI.customization?.primary
-    ? rgbStringToHex(tenantUI.customization?.primary)
-    : rgbStringToHex("0 0 0");
-  const secondary = tenantUI.customization?.secondary
-    ? rgbStringToHex(tenantUI.customization?.secondary)
-    : rgbStringToHex("64 64 64");
+  const primary =
+    tenantUI.theme === "dark"
+      ? rgbStringToHex("0 0 0")
+      : tenantUI.customization?.primary
+        ? rgbStringToHex(tenantUI.customization?.primary)
+        : rgbStringToHex("0 0 0");
+  const secondary =
+    tenantUI.theme === "dark"
+      ? rgbStringToHex("115 115 115")
+      : tenantUI.customization?.secondary
+        ? rgbStringToHex(tenantUI.customization?.secondary)
+        : rgbStringToHex("64 64 64");
   const line = tenantUI.customization?.line
     ? rgbStringToHex(tenantUI.customization?.line)
     : rgbStringToHex("229 229 229");
@@ -382,18 +423,23 @@ const SuccessMessageCard = ({
     : rgbStringToHex("226 54 54");
 
   return (
-    <div tw="h-full w-full flex flex-col p-4 relative rounded-lg">
+    <div tw="h-full w-full flex flex-col p-8 relative rounded-lg">
       {/* Main Content Container */}
       <div tw="flex flex-col justify-between w-full h-full">
         <div tw="flex flex-col">
           {/* Header Section */}
           <div tw="flex justify-between items-start w-full">
-            <div tw="flex flex-col" style={{ gap: "8px" }}>
+            <div
+              tw="flex flex-col"
+              style={{
+                gap: "8px",
+                fontSize: proposalType !== "APPROVAL" ? "54px" : "44px",
+              }}
+            >
               <div tw="flex items-center" style={{ gap: "8px" }}>
                 <span
                   style={{
                     color: primary,
-                    fontSize: proposalType !== "APPROVAL" ? "48px" : "24px",
                   }}
                   tw="font-bold"
                 >
@@ -407,7 +453,6 @@ const SuccessMessageCard = ({
                         : supportType === "AGAINST"
                           ? negative
                           : secondary,
-                    fontSize: proposalType !== "APPROVAL" ? "48px" : "24px",
                   }}
                   tw="font-bold"
                 >
@@ -416,8 +461,8 @@ const SuccessMessageCard = ({
               </div>
               <span
                 style={{
-                  color: secondary,
-                  fontSize: proposalType !== "APPROVAL" ? "36px" : "18px",
+                  color: primary,
+                  fontSize: proposalType !== "APPROVAL" ? "40px" : "32px",
                 }}
                 tw="font-normal"
               >
@@ -429,8 +474,10 @@ const SuccessMessageCard = ({
             <div
               tw="flex"
               style={{
-                transform: proposalType !== "APPROVAL" ? "scale(1.5)" : "",
+                transform:
+                  proposalType !== "APPROVAL" ? "scale(2)" : "scale(1.75)",
                 transformOrigin: "top right",
+                marginTop: "-10px",
               }}
             >
               {ogLogoForShareVote(namespace)}
@@ -441,7 +488,7 @@ const SuccessMessageCard = ({
           <div
             style={{
               borderColor: line,
-              marginTop: proposalType !== "APPROVAL" ? "2rem" : "0.75rem",
+              marginTop: proposalType !== "APPROVAL" ? "88px" : "40px",
             }}
             tw="flex flex-col bg-white rounded-lg border"
           >
@@ -454,35 +501,32 @@ const SuccessMessageCard = ({
                 />
               </div>
             ) : (
-              <div tw="flex flex-col p-4" style={{ gap: "8px" }}>
-                <div tw="flex justify-between w-full">
+              <div tw="flex flex-col p-9" style={{ gap: "8px" }}>
+                <div tw="flex justify-between w-full text-3xl font-semibold">
                   <span
                     style={{
                       color: positive,
-                      fontSize: "18px",
                     }}
-                    tw="font-semibold"
                   >
                     {proposalType === "STANDARD" ? "FOR" : ""}
                   </span>
                   <span
                     style={{
                       color: negative,
-                      fontSize: "18px",
                     }}
-                    tw="font-semibold"
                   >
                     AGAINST
                   </span>
                 </div>
 
                 {/* Progress Bar */}
-                <div tw="w-full relative flex">
+                <div tw="w-full relative flex mt-4">
                   {generateVoteBars(
                     forPercentage,
                     againstPercentage,
                     namespace,
-                    proposalType
+                    proposalType,
+                    supportType
                   )}
                 </div>
               </div>
@@ -493,10 +537,9 @@ const SuccessMessageCard = ({
               style={{
                 borderColor: line,
                 color: primary,
-                fontSize: proposalType !== "APPROVAL" ? "20px" : "10px",
-                padding: proposalType !== "APPROVAL" ? "16px 24px" : "8px 16px",
+                fontSize: proposalType !== "APPROVAL" ? "24px" : "18px",
               }}
-              tw="flex justify-between items-center bg-[#fafafa] border-t border-b rounded-b-lg font-semibold"
+              tw="flex justify-between items-center bg-[#fafafa] border-t border-b rounded-b-lg font-semibold py-4 px-6"
             >
               <div tw="flex items-center">
                 <span style={{ gap: "8px" }} tw="flex items-center">
@@ -504,8 +547,8 @@ const SuccessMessageCard = ({
                   <div
                     tw="flex"
                     style={{
-                      width: proposalType !== "APPROVAL" ? "30px" : "18px",
-                      height: proposalType !== "APPROVAL" ? "30px" : "18px",
+                      width: "30px",
+                      height: "30px",
                     }}
                   >
                     <svg
@@ -542,12 +585,12 @@ const SuccessMessageCard = ({
         </div>
 
         {/* Footer */}
-        <div tw="flex justify-between items-center mt-4">
+        <div tw="flex justify-end items-center">
           <div
             tw="flex"
             style={{
-              width: proposalType !== "APPROVAL" ? "155px" : "93px",
-              height: proposalType !== "APPROVAL" ? "40px" : "24px",
+              width: "155px",
+              height: "40px",
             }}
           >
             {/* Agora Logo */}
@@ -598,21 +641,11 @@ const SuccessMessageCard = ({
               </g>
               <defs>
                 <clipPath id="clip0_4184_3154">
-                  <rect width="62" height="16" fill="white" />
+                  <rect width="143" height="36" fill="white" />
                 </clipPath>
               </defs>
             </svg>
           </div>
-
-          <span
-            style={{
-              color: primary,
-              fontSize: proposalType !== "APPROVAL" ? "32px" : "16px",
-            }}
-            tw="font-semibold"
-          >
-            www.agora.xyz
-          </span>
         </div>
       </div>
     </div>
@@ -637,7 +670,7 @@ export async function GET(req: NextRequest) {
   const supportType = searchParams.get("supportType") as
     | "FOR"
     | "AGAINST"
-    | "NEUTRAL";
+    | "ABSTAIN";
 
   const bgData = await fetch(
     new URL("../assets/grid-share.png", import.meta.url)

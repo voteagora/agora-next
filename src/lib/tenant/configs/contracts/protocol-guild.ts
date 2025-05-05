@@ -1,7 +1,7 @@
 import {
   AgoraGovernor_11__factory,
   AgoraTimelock__factory,
-  ProposalTypesConfigurator__factory,
+  ProposalTypesConfiguratorScopes__factory,
   Membership__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
@@ -27,32 +27,22 @@ export const protocolGuildTenantContractConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd
-    ? "0x95fc87e77977a70b08c76b0a7714069d8ff0ff2b"
-    : "0x380afD534539ad1C43c3268E7Cb71BAa766aE6f9";
+    ? "0xD6e705292f293Df65c9FB9C28f67C3794fC66D5F"
+    : "0x27b0031c64f4231f0aff28e668553d73f48125f3";
 
   const GOVERNOR = isProd
-    ? "0x42baa004ff081ba7e3b2b810e7a9b4e0e35e8b01"
-    : "0x8fFF4C5ABcb31fAc43DcE92f77920F3cB9854fB8";
+    ? "0x4CEF361ACd29eA0E3b39Fd33fc6Dfa7c3BB83820"
+    : "0xa6388314fe37484883266970967ab918996f3bf0";
 
   const TIMELOCK = isProd
-    ? "0x0cabe65b0adc1634f56ea66a36abb70f2d4232c5"
-    : "0xeba09e62142052831fe0ccdd73476ca5ce84b2f1";
+    ? "0xb09A941C4843f79423c8f2C8562aeD1691cbe674"
+    : "0x184ad2fD9959b8F5C247Ff1188114Dffd12069a0";
 
   const TYPES = isProd
-    ? "0xa78db4a8efccd5812e0044496edcc571da3d24c6"
-    : "0x966daa9da3c7ef86c0f9fd678bd5d8cb1b856577";
+    ? "0x1986516d07ABEddF8107F98b443F21ECFEE1d164"
+    : "0xb7687e62d6b2cafb3ed3c3c81b0b6cf0a3884602";
 
-  const TREASURY = isProd
-    ? [
-        TIMELOCK,
-        "0x14c7dd468a86c4bd722927a815e923e60565c1b2",
-        "0x25941dc771bb64514fc8abbce970307fb9d477e9",
-      ]
-    : [
-        TIMELOCK,
-        "0x14c7dd468a86c4bd722927a815e923e60565c1b2",
-        "0x25941dc771bb64514fc8abbce970307fb9d477e9",
-      ];
+  const TREASURY = [TIMELOCK];
 
   const provider = isProd
     ? new AlchemyProvider("mainnet", alchemyId)
@@ -87,10 +77,13 @@ export const protocolGuildTenantContractConfig = ({
     }),
 
     proposalTypesConfigurator: new TenantContract<BaseContract>({
-      abi: ProposalTypesConfigurator__factory.abi,
+      abi: ProposalTypesConfiguratorScopes__factory.abi,
       address: TYPES,
       chain,
-      contract: ProposalTypesConfigurator__factory.connect(TYPES, provider),
+      contract: ProposalTypesConfiguratorScopes__factory.connect(
+        TYPES,
+        provider
+      ),
       provider,
     }),
 
@@ -100,5 +93,6 @@ export const protocolGuildTenantContractConfig = ({
     governorType: GOVERNOR_TYPE.AGORA,
     timelockType:
       TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
+    supportScopes: true,
   };
 };

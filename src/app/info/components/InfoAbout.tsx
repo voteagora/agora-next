@@ -14,7 +14,7 @@ const tabs = [
     icon: (
       <CoinsIcon
         className="w-[24px] h-[24px]"
-        stroke={rgbStringToHex(ui.customization?.secondary)}
+        stroke={rgbStringToHex(ui.customization?.brandPrimary)}
       />
     ),
     title: "Delegate voting power",
@@ -25,7 +25,7 @@ const tabs = [
     icon: (
       <NotificationIcon
         className="w-[24px] h-[24px]"
-        stroke={rgbStringToHex(ui.customization?.secondary)}
+        stroke={rgbStringToHex(ui.customization?.brandPrimary)}
       />
     ),
     title: "Browse proposals",
@@ -36,7 +36,7 @@ const tabs = [
     icon: (
       <CheckCircleBrokenIcon
         className="w-[24px] h-[24px]"
-        stroke={rgbStringToHex(ui.customization?.secondary)}
+        stroke={rgbStringToHex(ui.customization?.brandPrimary)}
       />
     ),
     title: "Vote on proposals",
@@ -46,7 +46,7 @@ const tabs = [
 ];
 
 const InfoAbout = () => {
-  const { namespace, ui } = Tenant.current();
+  const { namespace, ui, brandName } = Tenant.current();
   const page = ui.page("info/about");
 
   if (!page) {
@@ -69,8 +69,10 @@ const InfoAbout = () => {
             />
           </div>
           <div className="sm:w-1/2">
-            <h3 className="text-lg font-bold text-primary capitalize">
-              About {namespace}
+            <h3 className="text-lg font-bold text-primary">
+              {namespace === TENANT_NAMESPACES.DEMO
+                ? "About Canopy"
+                : "About " + brandName}
             </h3>
             <p className="text-secondary mt-3">{page.description}</p>
             {/* So the image doesn't look smooshed for scroll :eye-roll: */}
@@ -113,7 +115,7 @@ const InfoAbout = () => {
                 key={index}
                 className="flex flex-row gap-3 justify-center items-center mt-3"
               >
-                <div className="min-w-[72px] h-[72px] flex justify-center items-center rounded-full border border-line bg-tertiary/10">
+                <div className="min-w-[72px] h-[72px] flex justify-center items-center rounded-full border border-line bg-tertiary/10 flex sm:hidden lg:flex">
                   {item.icon}
                 </div>
                 <div>

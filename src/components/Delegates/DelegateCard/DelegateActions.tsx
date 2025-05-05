@@ -11,8 +11,8 @@ import { UpdatedButton } from "@/components/Button";
 import { ConnectKitButton } from "connectkit";
 import { type SyntheticEvent } from "react";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
-import { useGetDelegatee } from "@/hooks/useGetDelegatee";
+import { DELEGATION_MODEL } from "@/lib/constants";
+import { useGetDelegatees } from "@/hooks/useGetDelegatee";
 import { PartialDelegateButton } from "./PartialDelegateButton";
 
 export function DelegateActions({
@@ -39,22 +39,29 @@ export function DelegateActions({
     delegate.address.toLowerCase() as `0x${string}`
   );
 
-  // gets the delegatee for the connected account
-  const { data: delegatee } = useGetDelegatee({ address });
-  const isConnectedAccountDelegate = delegatee?.delegatee === delegate.address;
+  // gets the delegatees for the connected account
+  const { data: delegatees } = useGetDelegatees({ address });
+  const isConnectedAccountDelegate = !!delegatees?.find(
+    (delegatee) => delegatee.to === delegate.address
+  );
 
   const ButtonToShow = isConnectedAccountDelegate
     ? UndelegateButton
     : DelegateButton;
 
   const delegationButton = () => {
-    switch (namespace) {
-      case TENANT_NAMESPACES.DERIVE:
-      case TENANT_NAMESPACES.SCROLL:
-        return <PartialDelegateButton full={false} delegate={delegate} />;
+    switch (contracts.delegationModel) {
+      case DELEGATION_MODEL.PARTIAL:
+        return (
+          <PartialDelegateButton
+            full={false}
+            delegate={delegate}
+            isConnectedAccountDelegate={isConnectedAccountDelegate}
+          />
+        );
 
       // Optimism in the only tenant currently supporting advanced delegation
-      case TENANT_NAMESPACES.OPTIMISM:
+      case DELEGATION_MODEL.ADVANCED:
         if (isAdvancedUser && hasAlligator) {
           return (
             <AdvancedDelegateButton

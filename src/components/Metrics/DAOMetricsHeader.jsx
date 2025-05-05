@@ -14,6 +14,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { useDAOMetrics } from "@/hooks/useDAOMetrics";
+import { AgoraIconWithText } from "@/icons/AgoraIconWithText";
 
 export default function DAOMetricsHeader() {
   const { token, ui, contracts } = Tenant.current();
@@ -27,10 +28,14 @@ export default function DAOMetricsHeader() {
   const discordLink = ui.link("discord");
   const agoraLink = ui.link("agora");
 
-  // discord + agora are hidden on mobile
-  const hasLinksMobile =
-    !!governanceForumLink || !!bugsLink || !!changeLogLink || !!faqLink;
-  const hasLinksDesktop = hasLinksMobile || !!discordLink || !!agoraLink;
+  // Check if there are any links to display
+  const hasLinks =
+    !!governanceForumLink ||
+    !!bugsLink ||
+    !!changeLogLink ||
+    !!faqLink ||
+    !!discordLink ||
+    !!agoraLink;
 
   useEffect(() => {
     setIsClient(true);
@@ -43,132 +48,128 @@ export default function DAOMetricsHeader() {
 
   if (!isClient) {
     return null;
-  } else {
-    return (
-      <>
-        {createPortal(
-          <div className="sm:min-w-desktop sticky z-50 bottom-0 sm:bottom-0 left-0 flex justify-center">
-            <div
-              className={cn(
-                "flex flex-col sm:flex-row w-full sm:w-[1268px] bg-wash shadow-newDefault",
-                "border-t border-r border-l border-line rounded-tl-2xl rounded-tr-2xl",
-                "text-xs text-secondary font-inter font-medium",
-                `transition-all duration-200 ease-in-out transform sm:transition-none sm:translate-y-0`
+  }
+
+  return (
+    <>
+      {createPortal(
+        <div className="sticky z-50 bottom-0 hidden sm:flex left-0 justify-center border-t border-line">
+          <div
+            className={cn(
+              "flex flex-row w-full bg-wash border-wash justify-between",
+              "text-xs text-secondary font-inter font-medium"
+            )}
+          >
+            <div className="flex items-center px-8 gap-8 justify-start h-14">
+              <div className="flex gap-8">
+                <div className="flex items-center gap-2">
+                  <AgoraIconWithText className="fill-primary h-[21px] w-[82px]" />
+                  <span className="text-sm text-primary font-medium hidden lg:inline">
+                    Onchain Governance
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center">
+              {hasLinks && (
+                <div className="flex justify-end items-center text-tertiary px-6 gap-6 h-14 border-l border-line">
+                  {discordLink && (
+                    <a
+                      href={discordLink.url}
+                      rel="noreferrer nonopener"
+                      target="_blank"
+                    >
+                      <Image src={discord} alt={discordLink.title} />
+                    </a>
+                  )}
+                  {governanceForumLink && (
+                    <a
+                      href={governanceForumLink.url}
+                      rel="noreferrer nonopener"
+                      target="_blank"
+                      className="text-center"
+                    >
+                      {governanceForumLink.title}
+                    </a>
+                  )}
+                  {bugsLink && (
+                    <a
+                      href={bugsLink.url}
+                      rel="noreferrer nonopener"
+                      target="_blank"
+                      className="text-center"
+                    >
+                      {bugsLink.title}
+                    </a>
+                  )}
+                  {changeLogLink && (
+                    <Link
+                      href={changeLogLink.url}
+                      className="text-center hidden lg:inline"
+                    >
+                      {changeLogLink.title}
+                    </Link>
+                  )}
+                  {faqLink && (
+                    <a
+                      href={faqLink.url}
+                      rel="noreferrer nonopener"
+                      target="_blank"
+                      className="text-center hidden lg:inline"
+                    >
+                      {faqLink.title}
+                    </a>
+                  )}
+                  {agoraLink && (
+                    <a
+                      href={agoraLink.url}
+                      rel="noreferrer nonopener"
+                      target="_blank"
+                    >
+                      {agoraLink.title}
+                    </a>
+                  )}
+                </div>
               )}
-            >
-              <div className="w-full sm:w-3/5 flex items-center px-6 sm:px-8 gap-8 justify-between sm:justify-start h-10">
-                <div className="flex gap-6 sm:gap-8">
+              <div className="flex px-6 gap-6 h-14 border-l border-line text-tertiary">
+                <HoverCard openDelay={100} closeDelay={100}>
+                  <HoverCardTrigger className="flex">
+                    <span className="cursor-default content-center">
+                      {isLoading ? "-" : formattedMetrics.totalSupply}{" "}
+                      {token.symbol} total supply
+                    </span>
+                  </HoverCardTrigger>
+                  <HoverCardContent
+                    className="w-full shadow"
+                    side="bottom"
+                    sideOffset={3}
+                  >
+                    <span>Total amount of {token.symbol} in existence</span>
+                  </HoverCardContent>
+                </HoverCard>
+                {contracts.token.isERC20() && (
                   <HoverCard openDelay={100} closeDelay={100}>
-                    <HoverCardTrigger>
-                      <span className="cursor-default">
-                        {isLoading ? "-" : formattedMetrics.totalSupply}{" "}
-                        {token.symbol} total
-                        <span className="hidden sm:inline">&nbsp;supply</span>
+                    <HoverCardTrigger className="flex">
+                      <span className="cursor-default content-center">
+                        {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
+                        {token.symbol} votable supply
                       </span>
                     </HoverCardTrigger>
                     <HoverCardContent
-                      className="w-full shadow text-primary"
+                      className="w-full shadow"
                       side="bottom"
                       sideOffset={3}
                     >
-                      <span>Total amount of {token.symbol} in existence</span>
+                      <span>{token.symbol} currently delegated to a voter</span>
                     </HoverCardContent>
                   </HoverCard>
-                  {contracts.token.isERC20() && (
-                    <HoverCard openDelay={100} closeDelay={100}>
-                      <HoverCardTrigger>
-                        <span className="cursor-default">
-                          {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
-                          {token.symbol} votable
-                          <span className="hidden sm:inline">&nbsp;supply</span>
-                        </span>
-                      </HoverCardTrigger>
-                      <HoverCardContent
-                        className="w-full shadow text-primary"
-                        side="bottom"
-                        sideOffset={3}
-                      >
-                        <span>
-                          {token.symbol} currently delegated to a voter
-                        </span>
-                      </HoverCardContent>
-                    </HoverCard>
-                  )}
-                </div>
-              </div>
-              <div className="block bg-line w-full sm:w-[1px] h-[1px] sm:h-10"></div>
-              <div
-                className={`w-full sm:w-2/5 justify-end items-center px-6 sm:px-8 gap-4 h-10 ${
-                  hasLinksMobile
-                    ? "flex"
-                    : hasLinksDesktop
-                      ? "hidden sm:flex"
-                      : "hidden"
-                }`}
-              >
-                {governanceForumLink && (
-                  <a
-                    href={governanceForumLink.url}
-                    rel="noreferrer nonopener"
-                    target="_blank"
-                    className="text-center"
-                  >
-                    {governanceForumLink.title}
-                  </a>
-                )}
-                {bugsLink && (
-                  <a
-                    href={bugsLink.url}
-                    rel="noreferrer nonopener"
-                    target="_blank"
-                    className="text-center"
-                  >
-                    {bugsLink.title}
-                  </a>
-                )}
-                {changeLogLink && (
-                  <Link href={changeLogLink.url} className="text-center">
-                    {changeLogLink.title}
-                  </Link>
-                )}
-                {faqLink && (
-                  <a
-                    href={faqLink.url}
-                    rel="noreferrer nonopener"
-                    target="_blank"
-                    className="text-center"
-                  >
-                    {faqLink.title}
-                  </a>
-                )}
-
-                {discordLink && (
-                  <a
-                    href={discordLink.url}
-                    rel="noreferrer nonopener"
-                    target="_blank"
-                    className="hidden sm:inline"
-                  >
-                    <Image src={discord} alt={discordLink.title} />
-                  </a>
-                )}
-
-                {agoraLink && (
-                  <a
-                    href={agoraLink.url}
-                    rel="noreferrer nonopener"
-                    target="_blank"
-                    className="hidden sm:inline"
-                  >
-                    {agoraLink.title}
-                  </a>
                 )}
               </div>
             </div>
-          </div>,
-          document.body
-        )}
-      </>
-    );
-  }
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
+  );
 }

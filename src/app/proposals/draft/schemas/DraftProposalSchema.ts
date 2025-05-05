@@ -32,6 +32,13 @@ const transaction = z.object({
     .optional(),
   // part of transfer transaction -- gets filtered out of form
   amount: z.string().min(1, { message: "Amount cannot be empty" }).optional(),
+  // part of transfer transaction -- gets filtered out of form
+  customTokenAddress: z
+    .string()
+    .refine((value) => !value || isAddress(value), {
+      message: "Custom token address must be a valid Ethereum address.",
+    })
+    .optional(),
 });
 
 const approval_option = z.object({
@@ -124,6 +131,8 @@ const BaseProposalSchema = z.object({
   proposalConfigType: z.string().optional(),
   title: z.string().min(1, { message: "Title cannot be empty" }),
   abstract: z.string().min(1, { message: "Description cannot be empty" }),
+  simulation_state: z.string().optional(), // unconfirmed, valid, invalid
+  simulation_id: z.string().optional(),
 });
 
 export const BasicProposalSchema = BaseProposalSchema.extend({

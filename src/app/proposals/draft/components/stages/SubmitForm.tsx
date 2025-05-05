@@ -1,7 +1,8 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import DraftPreview from "../DraftPreview";
-import { useAccount, useBlockNumber, useReadContract } from "wagmi";
+import { useAccount, useBlockNumber } from "wagmi";
 import RequestSponsorshipForm from "../RequestSponsorshipForm";
 import { useForm, FormProvider } from "react-hook-form";
 import SponsorActions from "../../../sponsor/components/SponsorActions";
@@ -17,8 +18,9 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
 
+  // Get wallet data with stable references
   const { address } = useAccount();
-
+  // Stabilize hook calls
   const { data: blockNumber } = useBlockNumber({
     chainId: tenant.ui.toggle("use-l1-block-number")?.enabled
       ? tenant.contracts.chainForTime?.id
@@ -26,35 +28,49 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   });
 
   const { data: threshold } = useProposalThreshold();
+
   const { data: manager } = useManager();
+
+  const [lastValidVotes, setLastValidVotes] = useState<bigint | undefined>(
+    undefined
+  );
+
   const { data: accountVotes } = useGetVotes({
     address: address as `0x${string}`,
     blockNumber: blockNumber ? blockNumber - BigInt(1) : BigInt(0),
     enabled: !!address,
   });
 
-  const canSponsor = () => {
+  // Update lastValidVotes when accountVotes changes and is defined
+  useEffect(() => {
+    if (accountVotes !== undefined) {
+      setLastValidVotes(accountVotes);
+    }
+  }, [accountVotes]);
+
+  // Use either the current votes or the last valid votes
+  const stableAccountVotes =
+    accountVotes !== undefined ? accountVotes : lastValidVotes;
+
+  const canAddressSponsor = useMemo(() => {
     switch (gatingType) {
       case ProposalGatingType.MANAGER:
         return manager === address;
       case ProposalGatingType.TOKEN_THRESHOLD:
-        return accountVotes !== undefined && threshold !== undefined
-          ? accountVotes >= threshold
+        return stableAccountVotes !== undefined && threshold !== undefined
+          ? stableAccountVotes >= threshold
           : false;
       case ProposalGatingType.GOVERNOR_V1:
         return (
           manager === address ||
-          (accountVotes !== undefined && threshold !== undefined
-            ? accountVotes >= threshold
+          (stableAccountVotes !== undefined && threshold !== undefined
+            ? stableAccountVotes >= threshold
             : false)
         );
       default:
         return false;
     }
-  };
-
-  const canAddressSponsor = canSponsor();
-
+  }, [gatingType, manager, address, stableAccountVotes, threshold]);
   return (
     <div className="mt-6">
       {tenant.contracts.votableSupplyOracle?.address && (

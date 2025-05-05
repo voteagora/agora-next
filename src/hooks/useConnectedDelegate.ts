@@ -46,7 +46,7 @@ const useConnectedDelegate = () => {
             queryKey: [DELEGATE_QK, address],
           }),
         ]).finally(() => {
-          revalidateDelegateAddressPage(refetchDelegate.address);
+          revalidateDelegateAddressPage(refetchDelegate.address.toLowerCase());
         });
       }
       setLastVotingPower(delegate.votingPower.total);

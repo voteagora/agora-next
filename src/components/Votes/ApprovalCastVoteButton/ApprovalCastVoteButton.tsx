@@ -43,7 +43,9 @@ export default function ApprovalCastVoteButton({ proposal }: Props) {
                 <TooltipTrigger className="w-full flex items-center justify-center gap-1 text-primary font-medium cursor-help">
                   <span className="flex items-center text-xs font-semibold text-primary">
                     Proposal voting power{"\u00A0"}
-                    <TokenAmountDisplay amount={data?.votingPower.totalVP} />
+                    {data?.votingPower?.totalVP && (
+                      <TokenAmountDisplay amount={data?.votingPower.totalVP} />
+                    )}
                     <InformationCircleIcon className="w-4 h-4 ml-1" />
                   </span>
                 </TooltipTrigger>
@@ -89,17 +91,27 @@ export default function ApprovalCastVoteButton({ proposal }: Props) {
               params: {
                 proposal: proposal,
                 hasStatement: !!data?.delegate?.statement,
-                votingPower: data?.votingPower,
-                authorityChains: data?.chains,
+                votingPower: data?.votingPower ?? {
+                  advancedVP: "0",
+                  directVP: "0",
+                  totalVP: "0",
+                },
+                authorityChains: data?.chains ?? null,
                 missingVote,
               },
             })
           }
           proposalStatus={proposal.status}
           proposal={proposal}
-          delegateVotes={data?.votes}
+          delegateVotes={data?.votes ?? []}
           isReady={isSuccess}
-          votingPower={data?.votingPower}
+          votingPower={
+            data?.votingPower ?? {
+              advancedVP: "0",
+              directVP: "0",
+              totalVP: "0",
+            }
+          }
         />
       </VStack>
     </VStack>

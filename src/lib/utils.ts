@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useMemo } from "react";
 import Tenant from "./tenant/tenant";
-import { http, fallback } from "wagmi";
+import { fallback, http } from "wagmi";
 import {
   DERIVE_MAINNET_RPC,
   DERIVE_TESTNET_RPC,
@@ -25,8 +25,8 @@ import {
   mainnet,
   optimism,
   polygon,
-  sepolia,
   scroll,
+  sepolia,
 } from "viem/chains";
 
 const { token } = Tenant.current();
@@ -202,7 +202,7 @@ export function formatNumber(
       bigIntAmount = BigInt(amount);
     }
   } else {
-    bigIntAmount = amount;
+    bigIntAmount = amount || 0n;
   }
 
   // Convert to standard unit
@@ -372,6 +372,12 @@ export function getBlockScanUrl(hash: string | `0x${string}`) {
   return `${url}/tx/${hash}`;
 }
 
+export function getBlockScanRawUrl() {
+  const { contracts } = Tenant.current();
+  const url = contracts.token.chain.blockExplorers?.default.url;
+  return url;
+}
+
 export const getTextWidth = (text: string, font = "14px inter") => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
@@ -444,7 +450,7 @@ export const getTransportForChain = (chainId: number) => {
       return fallback([
         http(
           FORK_NODE_URL ||
-            "https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}"
+            `https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
         ),
         http(FORK_NODE_URL || "https://rpc.scroll.io"),
       ]);
@@ -456,6 +462,20 @@ export const getTransportForChain = (chainId: number) => {
     // derive testnet
     case 901:
       return http(FORK_NODE_URL || DERIVE_TESTNET_RPC);
+
+    // linea
+    case 59144:
+      return http(
+        FORK_NODE_URL ||
+          `https://linea-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
+
+    // linea sepolia
+    case 59141:
+      return http(
+        FORK_NODE_URL ||
+          `https://linea-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
 
     // for each new dao with a new chainId add them here
     default:
@@ -506,7 +526,7 @@ const isContractWallet = async (address: Address) => {
   return bytecode && bytecode !== "0x" ? true : false;
 };
 
-function delay(milliseconds: number) {
+export function delay(milliseconds: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, milliseconds);
   });
@@ -602,3 +622,104 @@ export const wrappedWaitForTransactionReceipt = async (
     return publicClient.waitForTransactionReceipt(params);
   }
 };
+
+interface FunctionSignature {
+  functionName: string;
+  toStringValue: () => string | null;
+  paramValues?: [string, string][] | null;
+}
+
+export function getFunctionSignature(
+  decodedData: any
+): FunctionSignature | null {
+  if (
+    !decodedData ||
+    !decodedData.function ||
+    decodedData.function === "unknown"
+  ) {
+    return null;
+  }
+
+  try {
+    const paramTypes: {
+      paramValues: [string | null, string | null];
+    }[] = Object.entries(decodedData.parameters).map(
+      ([paramName, paramValue]: [string, any]) => {
+        //   Case where there is a name, but is no value, use name only
+        if (paramName && paramValue.value === undefined) {
+          return { paramValues: [paramName, null] };
+          //   Case where there is no name, but is a value, use value only
+        } else if (!paramName && paramValue.value) {
+          return { paramValues: [null, paramValue.value] };
+          //   Case where neither name nor value, fall back to type as value
+        } else if (!paramName && paramValue.value === undefined) {
+          return { paramValues: [null, paramValue.type] };
+        }
+        return {
+          paramValues: [paramName, paramValue.value],
+        };
+      }
+    );
+
+    const functionName = decodedData.function.toString();
+
+    const toStringValue = () => {
+      if (!paramTypes) {
+        return null;
+      }
+
+      // Filter out null values
+      const filteredParams: [string, string][] = paramTypes
+        .map((p) => p.paramValues)
+        .filter((p): p is [string, string] => p !== null);
+
+      // Build the function signature
+      let signature = `${functionName}(`;
+      signature += filteredParams
+        .map((p) => {
+          let formattedValue;
+          if (p[0] && p[1]) {
+            formattedValue = `${p[0]}=${p[1]}`;
+          } // Default, has both Name and Value
+          else if (p[0] && !p[1]) {
+            formattedValue = `${p[0]}`;
+          } // Has only Name
+          else if (!p[0] && p[1]) {
+            formattedValue = `${p[1]}`;
+          } // Has only Value
+          else if (!p[0] && !p[1]) {
+            formattedValue = `${p[1]}`;
+          } // Has neither Name nor Value, fallback to Type
+          return formattedValue;
+        })
+        .join(",");
+      signature += ")";
+      return signature;
+    };
+
+    // Filter out null values from the param values
+    const paramValues = paramTypes
+      .map((p) => p.paramValues)
+      .filter((p): p is [string, string] => p !== null);
+
+    return {
+      functionName: functionName,
+      toStringValue: toStringValue,
+      paramValues: paramValues,
+    };
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export function getCanonicalType(input: any): string {
+  if (input.type.startsWith("tuple")) {
+    const arraySuffix = input.type.slice("tuple".length);
+    const innerTypes = input.components
+      ? input.components.map(getCanonicalType).join(",")
+      : "";
+    return `(${innerTypes})${arraySuffix}`;
+  }
+  return input.type;
+}

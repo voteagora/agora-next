@@ -6,6 +6,7 @@ import React, {
   useContext,
   useState,
   FC,
+  useEffect,
 } from "react";
 import { dialogs, DialogType } from "./dialogs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -71,6 +72,17 @@ const Modal: FC<
 export const DialogProvider: FC<Props> = ({ children }) => {
   const [currentDialog, setCurrentDialog] = useState<DialogType | null>(null);
 
+  useEffect(() => {
+    if (currentDialog) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [currentDialog]);
+
   const renderedDialog =
     currentDialog &&
     dialogs[currentDialog.type](currentDialog.params as any, () =>
@@ -85,7 +97,10 @@ export const DialogProvider: FC<Props> = ({ children }) => {
           currentDialog?.type !== "SWITCH_NETWORK" && setCurrentDialog(null)
         }
         transparent={(currentDialog as { transparent?: boolean })?.transparent}
-        className={(currentDialog as { className?: string })?.className}
+        className={cn(
+          "max-h-[95vh] overflow-y-auto",
+          (currentDialog as { className?: string })?.className
+        )}
       >
         {renderedDialog}
       </Modal>

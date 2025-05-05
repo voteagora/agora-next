@@ -15,6 +15,7 @@ export { Membership__factory } from "./Membership__factory";
 export { NounsGovernor__factory } from "./NounsGovernor__factory";
 export { OptimismGovernor__factory } from "./OptimismGovernor__factory";
 export { ProposalTypesConfigurator__factory } from "./ProposalTypesConfigurator__factory";
+export { ProposalTypesConfiguratorScopes__factory } from "./ProposalTypesConfiguratorScopes__factory";
 export { UniswapGovernor__factory } from "./UniswapGovernor__factory";
 export { UniswapStaker__factory } from "./UniswapStaker__factory";
 export { UniswapTimelock__factory } from "./UniswapTimelock__factory";

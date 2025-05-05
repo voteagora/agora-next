@@ -7,7 +7,6 @@ import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import Link from "next/link";
-import { Delegation } from "@/app/api/common/delegations/delegation";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { cn } from "@/lib/utils";
 import { useAgoraContext } from "@/contexts/AgoraContext";
@@ -20,7 +19,6 @@ interface Props {
     pagination: PaginationParams,
     seed: number
   ) => Promise<PaginatedResult<DelegateChunk[]>>;
-  fetchDelegators: (addressOrENSName: string) => Promise<Delegation[] | null>;
 }
 
 export default function CitizenCardList({
@@ -58,7 +56,7 @@ export default function CitizenCardList({
     <DialogProvider>
       {/* @ts-ignore */}
       <InfiniteScroll
-        className="grid grid-flow-row grid-cols-1 sm:grid-cols-3 justify-around sm:justify-between py-4 gap-4 sm:gap-8"
+        className="grid grid-flow-row grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-around sm:justify-between py-4 gap-4 sm:gap-8"
         hasMore={meta.has_next}
         pageStart={1}
         loadMore={loadMore}

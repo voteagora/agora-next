@@ -52,6 +52,12 @@ export const AgoraOptimismGovCancel = ({ proposal }: Props) => {
           ? approvalModuleAddress
           : optimisticModuleAddress;
 
+      // When using cancelWithModule, the proposal data needs to be a hex string otherwise the bytecode
+      // won't match the proposal and the transaction will fail.
+      const proposalData = proposal.unformattedProposalData?.startsWith("0x")
+        ? proposal.unformattedProposalData
+        : `0x${proposal.unformattedProposalData}`;
+
       if (!moduleAddress) {
         throw new Error(
           `Module address not found for tenant ${Tenant.current().namespace}`
@@ -59,7 +65,7 @@ export const AgoraOptimismGovCancel = ({ proposal }: Props) => {
       }
       return [
         moduleAddress,
-        proposal.unformattedProposalData,
+        proposalData,
         keccak256(toUtf8Bytes(proposal.description!)),
       ];
     }
@@ -73,7 +79,10 @@ export const AgoraOptimismGovCancel = ({ proposal }: Props) => {
       );
     }
     if (isError) {
-      toast.error(`Error cancelling proposal ${error?.message}`, {
+      const errorMessage =
+        "shortMessage" in error ? error.shortMessage : error.message;
+
+      toast.error(`Error cancelling proposal ${errorMessage}`, {
         duration: 5000,
       });
     }

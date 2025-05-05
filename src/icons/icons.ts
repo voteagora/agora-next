@@ -56,6 +56,8 @@ import testTubeEmoji from "./emoji/test-tube.png";
 import worldEmoji from "./emoji/world.png";
 import freeGasMegaphon from "./freeGasMegaphon.gif";
 import infoRed from "./infoRed.svg";
+import agoraLoaderDark from "./agoraLoaderDark.gif";
+import agoraLoaderLight from "./agoraLoaderLight.gif";
 
 export const icons = {
   hammerEmoji,
@@ -116,4 +118,6 @@ export const icons = {
   wrenchScrewdriverIcon,
   x,
   freeGasMegaphon,
+  agoraLoaderDark,
+  agoraLoaderLight,
 };

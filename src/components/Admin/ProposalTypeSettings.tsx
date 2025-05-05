@@ -1,15 +1,17 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import { Fragment, useState, useCallback } from "react";
+import { Fragment, useState, useCallback, useMemo } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { OptimismProposalTypes } from "@prisma/client";
 import ProposalType from "./ProposalType";
 import { useReadContract } from "wagmi";
 import { useAccount } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import toast from "react-hot-toast";
+import BlockScanUrls from "../shared/BlockScanUrl";
+import { FormattedProposalType } from "@/lib/types";
 
 const RestrictedCallout = () => {
   const { address, isConnected } = useAccount();
@@ -86,21 +88,38 @@ export default function ProposalTypeSettings({
   proposalTypes,
 }: {
   votableSupply: string;
-  proposalTypes: OptimismProposalTypes[];
+  proposalTypes: FormattedProposalType[];
 }) {
-  const fmtPropTypes = proposalTypes.map(
-    ({ quorum, approval_threshold, name, proposal_type_id }) => ({
-      name,
-      quorum: Number(quorum) / 100,
-      approval_threshold: Number(approval_threshold) / 100,
-      proposal_type_id: Number(proposal_type_id), // This will be of the format "0", "1", "2", etc.
-      isClientSide: false,
-    })
+  const allScopes = useMemo(() => {
+    return proposalTypes.flatMap((proposalType) => proposalType.scopes ?? []);
+  }, [proposalTypes]);
+
+  const fmtPropTypes = useMemo(
+    () =>
+      proposalTypes.map(
+        ({ quorum, approval_threshold, name, proposal_type_id, scopes }) => ({
+          name,
+          quorum: Number(quorum) / 100,
+          approval_threshold: Number(approval_threshold) / 100,
+          proposal_type_id: Number(proposal_type_id), // This will be of the format "0", "1", "2", etc.
+          isClientSide: false,
+          scopes,
+        })
+      ),
+    []
   );
 
-  const [propTypes, setPropTypes] = useState(fmtPropTypes);
+  const [propTypes, setPropTypes] = useState<FormattedProposalType[]>(
+    fmtPropTypes ?? []
+  );
 
-  const handleDeleteProposalType = useCallback((id: number) => {
+  const handleDeleteProposalType = useCallback((id: number, hash?: string) => {
+    toast.success(
+      <div className="flex flex-col items-center gap-2 p-1">
+        <span className="text-sm font-semibold">Proposal type deleted</span>
+        {hash && <BlockScanUrls hash1={hash} />}
+      </div>
+    );
     setPropTypes((prevPropTypes) =>
       prevPropTypes.filter(
         (proposalType) => id !== proposalType.proposal_type_id
@@ -108,16 +127,25 @@ export default function ProposalTypeSettings({
     );
   }, []);
 
-  const handleSuccessSetProposalType = useCallback((id: number) => {
-    setPropTypes((prevPropTypes) =>
-      prevPropTypes.map((proposalType) => {
-        if (proposalType.proposal_type_id === id) {
-          return { ...proposalType, isClientSide: false }; // Toggle the isClientSide flag only for the matching id
-        }
-        return proposalType;
-      })
-    );
-  }, []);
+  const handleSuccessSetProposalType = useCallback(
+    (id: number, hash?: string) => {
+      toast.success(
+        <div className="flex flex-col items-center gap-2 p-1">
+          <span className="text-sm font-semibold">Proposal type updated</span>
+          {hash && <BlockScanUrls hash1={hash} />}
+        </div>
+      );
+      setPropTypes((prevPropTypes) =>
+        prevPropTypes.map((proposalType) => {
+          if (proposalType.proposal_type_id === id) {
+            return { ...proposalType, isClientSide: false }; // Toggle the isClientSide flag only for the matching id
+          }
+          return proposalType;
+        })
+      );
+    },
+    []
+  );
 
   return (
     <section className="gl_box bg-neutral">
@@ -136,6 +164,7 @@ export default function ProposalTypeSettings({
             index={proposalType.proposal_type_id}
             onDelete={handleDeleteProposalType}
             onSuccessSetProposalType={handleSuccessSetProposalType}
+            availableScopes={allScopes ?? []}
           />
           <Separator className="my-8" />
         </Fragment>
@@ -152,6 +181,7 @@ export default function ProposalTypeSettings({
               name: "",
               proposal_type_id: prevPropTypes.length,
               isClientSide: true,
+              scopes: [],
             },
           ]);
         }}

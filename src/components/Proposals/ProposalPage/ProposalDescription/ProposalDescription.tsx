@@ -56,7 +56,9 @@ export default function ProposalDescription({
   const option = options?.[0];
 
   return (
-    <div className={`flex flex-col gap-4 ${styles.proposal_description}`}>
+    <div
+      className={`flex flex-col gap-4 sm:w-[48rem] w-full max-w-[calc(100vw-2rem)] sm:max-w-none`}
+    >
       <ProposalTitle title={shortTitle} proposal={proposal} />
       <ProposalChart proposal={proposal} />
 
@@ -73,6 +75,7 @@ export default function ProposalDescription({
             executedTransactionHash={proposal.executedTransactionHash}
             network={contracts.governor.chain.name}
             signatures={option.signatures}
+            proposal={proposal}
           />
         ) : (
           <ApprovedTransactions

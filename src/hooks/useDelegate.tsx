@@ -10,7 +10,7 @@ interface Props {
 export const DELEGATE_QK = "delegate";
 
 export const useDelegate = ({ address }: Props) => {
-  const { data, isFetching, isFetched } = useQuery({
+  const { data, isFetching, isFetched, refetch } = useQuery({
     enabled: !!address,
     queryKey: [DELEGATE_QK, address],
     queryFn: async () => {
@@ -19,5 +19,5 @@ export const useDelegate = ({ address }: Props) => {
     staleTime: CACHE_TIME,
   });
 
-  return { data, isFetching, isFetched };
+  return { data, isFetching, isFetched, refetch };
 };

@@ -6,6 +6,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -18,8 +19,8 @@ const useAdvancedVoting = ({
 }: {
   proposalId: string;
   support: number;
-  advancedVP: bigint;
-  authorityChains: string[][];
+  advancedVP: bigint | null;
+  authorityChains: string[][] | null;
   reason?: string;
   params?: `0x${string}`;
   missingVote: MissingVote;
@@ -98,6 +99,10 @@ const useAdvancedVoting = ({
     };
 
     const _advancedVote = async () => {
+      if (!authorityChains || !advancedVP) {
+        toast.error("No authority chains or advanced VP found");
+        return;
+      }
       setAdvancedVoteLoading(true);
       const advancedTx = await advancedVote({
         address: contracts.alligator!.address as `0x${string}`,

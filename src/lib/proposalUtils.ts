@@ -1,11 +1,61 @@
 import { ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
-import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
+import {
+  Proposal,
+  BlockBasedProposal,
+  TimestampBasedProposal,
+  ProposalPayload,
+} from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData, keccak256 } from "viem";
 import Tenant from "./tenant/tenant";
-import { TENANT_NAMESPACES } from "./constants";
 import { Block, toUtf8Bytes } from "ethers";
 import { mapArbitrumBlockToMainnetBlock } from "./utils";
+import { TENANT_NAMESPACES } from "./constants";
+
+// Type guards
+export function isTimestampBasedProposal(
+  proposal: ProposalPayload
+): proposal is ProposalPayload & TimestampBasedProposal {
+  return (
+    "start_timestamp" in proposal &&
+    typeof proposal.start_timestamp === "string"
+  );
+}
+
+export function isBlockBasedProposal(
+  proposal: ProposalPayload
+): proposal is ProposalPayload & BlockBasedProposal {
+  return "start_block" in proposal && typeof proposal.start_block === "string";
+}
+
+// Safe accessor functions
+export function getStartTimestamp(
+  proposal: ProposalPayload
+): string | undefined {
+  return isTimestampBasedProposal(proposal)
+    ? proposal.start_timestamp
+    : undefined;
+}
+
+export function getEndTimestamp(proposal: ProposalPayload): string | undefined {
+  return isTimestampBasedProposal(proposal)
+    ? proposal.end_timestamp
+    : undefined;
+}
+
+export function getStartBlock(proposal: ProposalPayload): string | undefined {
+  if (isBlockBasedProposal(proposal)) {
+    return proposal.start_block;
+  }
+  return undefined;
+}
+
+export function getEndBlock(proposal: ProposalPayload): string | undefined {
+  if (isBlockBasedProposal(proposal)) {
+    return proposal.end_block || undefined;
+  }
+  return undefined;
+}
 
 const knownAbis: Record<string, Abi> = {
   "0x5ef2c7f0": [
@@ -182,9 +232,14 @@ export async function parseProposal(
   quorum: bigint | null,
   votableSupply: bigint
 ): Promise<Proposal> {
-  const { contracts } = Tenant.current();
-  let startBlock: bigint | string = proposal.start_block;
-  let endBlock: bigint | string | null = proposal.end_block;
+  const { contracts, ui } = Tenant.current();
+  const isTimeStampBasedTenant = ui.toggle(
+    "use-timestamp-for-proposals"
+  )?.enabled;
+
+  // Use the safe accessor functions
+  let startBlock: bigint | string | null = getStartBlock(proposal) || null;
+  let endBlock: bigint | string | null = getEndBlock(proposal) || null;
   let queuedBlock: bigint | string | null = proposal.queued_block;
   let executedBlock: bigint | string | null = proposal.executed_block;
   let cancelledBlock: bigint | string | null = proposal.cancelled_block;
@@ -218,6 +273,30 @@ export async function parseProposal(
     String(startBlock)
   );
 
+  const calculateStartTime = (): Date | null => {
+    if (proposalData.key === "SNAPSHOT") {
+      return new Date(proposalData.kind.start_ts * 1000);
+    } else if (isTimeStampBasedTenant && isTimestampBasedProposal(proposal)) {
+      const timestamp: string | undefined = getStartTimestamp(proposal);
+      return timestamp ? new Date(Number(timestamp) * 1000) : null;
+    } else if (latestBlock && startBlock !== null) {
+      return getHumanBlockTime(startBlock, latestBlock);
+    }
+    return null;
+  };
+
+  const calculateEndTime = (): Date | null => {
+    if (proposalData.key === "SNAPSHOT") {
+      return new Date(proposalData.kind.end_ts * 1000);
+    } else if (isTimeStampBasedTenant && isTimestampBasedProposal(proposal)) {
+      const timestamp: string | undefined = getEndTimestamp(proposal);
+      return timestamp ? new Date(Number(timestamp) * 1000) : null;
+    } else if (latestBlock && endBlock !== null) {
+      return getHumanBlockTime(endBlock, latestBlock);
+    }
+    return null;
+  };
+
   const proposalTypeData =
     proposal.proposal_type_data as ProposalTypeData | null;
 
@@ -231,18 +310,10 @@ export async function parseProposal(
         : latestBlock
           ? getHumanBlockTime(createdBlock ?? 0, latestBlock)
           : null,
-    startTime:
-      proposalData.key === "SNAPSHOT"
-        ? new Date(proposalData.kind.start_ts * 1000)
-        : latestBlock
-          ? getHumanBlockTime(startBlock, latestBlock)
-          : null,
-    endTime:
-      proposalData.key === "SNAPSHOT"
-        ? new Date(proposalData.kind.end_ts * 1000)
-        : latestBlock
-          ? getHumanBlockTime(endBlock ?? 0, latestBlock)
-          : null,
+    startTime: calculateStartTime(),
+    startBlock: proposalData.key === "SNAPSHOT" ? null : startBlock,
+    endTime: calculateEndTime(),
+    endBlock: proposalData.key === "SNAPSHOT" ? null : endBlock,
     cancelledTime:
       proposalData.key === "SNAPSHOT"
         ? null
@@ -255,6 +326,7 @@ export async function parseProposal(
         : latestBlock && proposal.executed_block
           ? getHumanBlockTime(executedBlock ?? 0, latestBlock)
           : null,
+    executedBlock: proposalData.key === "SNAPSHOT" ? null : executedBlock,
     queuedTime:
       proposalData.key === "SNAPSHOT"
         ? null
@@ -384,10 +456,18 @@ export function parseIfNecessary(obj: string | object) {
 
 function parseMultipleStringsSeparatedByComma(obj: string | object) {
   return typeof obj === "string"
-    ? obj.split(",")
+    ? obj
+        .split(/(?![^(]*\)),\s*/)
+        .map((item) => item.replace(/^['"]|['"]$/g, ""))
     : Array.isArray(obj)
       ? obj
-          .map((item) => (typeof item === "string" ? item.split(",") : item))
+          .map((item) =>
+            typeof item === "string"
+              ? item
+                  .split(/(?![^(]*\)),\s*/)
+                  .map((i) => i.replace(/^['"]|['"]$/g, ""))
+              : item
+          )
           .flat()
       : obj;
 }
@@ -426,7 +506,9 @@ export function parseProposalData(
           parseIfNecessary(parsedProposalData.targets)
         );
         const values = parseIfNecessary(parsedProposalData.values);
-        const signatures = parseIfNecessary(parsedProposalData.signatures);
+        const signatures: any = parseMultipleStringsSeparatedByComma(
+          parseIfNecessary(parsedProposalData.signatures)
+        );
         const functionArgsName = decodeCalldata(calldatas);
 
         return {
@@ -709,15 +791,39 @@ export async function getProposalStatus(
     return "QUEUED";
   }
 
-  if (
-    !proposal.start_block ||
-    !latestBlock ||
-    Number(proposal.start_block) > latestBlock.number
-  ) {
-    return "PENDING";
-  }
-  if (!proposal.end_block || Number(proposal.end_block) > latestBlock.number) {
-    return "ACTIVE";
+  const { ui } = Tenant.current();
+  const isTimeStampBasedTenant = ui.toggle(
+    "use-timestamp-for-proposals"
+  )?.enabled;
+
+  if (isTimeStampBasedTenant && isTimestampBasedProposal(proposal)) {
+    const startTimestamp = getStartTimestamp(proposal);
+    const endTimestamp = getEndTimestamp(proposal);
+
+    if (
+      !startTimestamp ||
+      !latestBlock ||
+      Number(startTimestamp) > latestBlock.timestamp
+    ) {
+      return "PENDING";
+    }
+    if (!endTimestamp || Number(endTimestamp) > latestBlock.timestamp) {
+      return "ACTIVE";
+    }
+  } else if (isBlockBasedProposal(proposal)) {
+    const startBlock = getStartBlock(proposal);
+    const endBlock = getEndBlock(proposal);
+
+    if (
+      !startBlock ||
+      !latestBlock ||
+      Number(startBlock) > latestBlock.number
+    ) {
+      return "PENDING";
+    }
+    if (!endBlock || Number(endBlock) > latestBlock.number) {
+      return "ACTIVE";
+    }
   }
 
   switch (proposalResults.key) {
