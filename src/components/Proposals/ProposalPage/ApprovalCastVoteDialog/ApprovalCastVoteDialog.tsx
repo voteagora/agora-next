@@ -52,12 +52,14 @@ export function ReviewApprovalVoteDialog({
               {selectedOptions.length > 1 && "s"}
             </p>
           </div>
-          {votingPower ? <div className="flex flex-col">
-            <span className="text-xs self-end">with</span>
-            <span className="mt-[2px]">
-              <TokenAmountDecorated amount={votingPower} />
-            </span>
-          </div> : null}
+          {votingPower ? (
+            <div className="flex flex-col">
+              <span className="text-xs self-end">with</span>
+              <span className="mt-[2px]">
+                <TokenAmountDecorated amount={votingPower} />
+              </span>
+            </div>
+          ) : null}
         </div>
         <div className="border border-line rounded-lg p-4 space-y-4 mt-6">
           {selectedOptions.map((optionId, index) => {
@@ -99,7 +101,12 @@ export function ReviewApprovalVoteDialog({
         >
           Vote for {selectedOptions.length} option
           {selectedOptions.length > 1 && "s"}
-          {votingPower ? <> with{"\u00A0"} <TokenAmountDecorated amount={votingPower} /></> : null}
+          {votingPower ? (
+            <>
+              {" "}
+              with{"\u00A0"} <TokenAmountDecorated amount={votingPower} />
+            </>
+          ) : null}
         </Button>
       </div>
     </div>
@@ -164,7 +171,9 @@ export function ApprovalCastVoteDialog({
     missingVote,
   });
 
-  const vpToDisplay = votingPower ? getVpToDisplay(votingPower, missingVote) : null;
+  const vpToDisplay = votingPower
+    ? getVpToDisplay(votingPower, missingVote)
+    : null;
 
   useMemo(() => {
     const encoded = abstain
@@ -360,7 +369,12 @@ function CastVoteWithReason({
           <Button onClick={() => onVoteClick()}>
             Vote for {numberOfOptions} option
             {numberOfOptions > 1 && "s"}
-            {votingPower ? <> with{"\u00A0"} <TokenAmountDecorated amount={votingPower} /></> : null}
+            {votingPower ? (
+              <>
+                {" "}
+                with{"\u00A0"} <TokenAmountDecorated amount={votingPower} />
+              </>
+            ) : null}
           </Button>
         )}
         {!abstain && numberOfOptions === 0 && (
@@ -370,8 +384,13 @@ function CastVoteWithReason({
           <Button onClick={() => onVoteClick()}>
             {!copy ? (
               <>
-                Abstain from voting 
-                {votingPower ? <> with{"\u00A0"} <TokenAmountDecorated amount={votingPower} /></> : null}
+                Abstain from voting
+                {votingPower ? (
+                  <>
+                    {" "}
+                    with{"\u00A0"} <TokenAmountDecorated amount={votingPower} />
+                  </>
+                ) : null}
               </>
             ) : (
               copy

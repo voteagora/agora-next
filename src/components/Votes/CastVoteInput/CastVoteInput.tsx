@@ -143,7 +143,9 @@ function CastVoteInputContent({
       totalVP: "0",
     }
   );
-  const vpToDisplay = votingPower ? getVpToDisplay(votingPower, missingVote) : null;
+  const vpToDisplay = votingPower
+    ? getVpToDisplay(votingPower, missingVote)
+    : null;
 
   const showSuccessMessage = isSuccess || missingVote === "NONE";
 
@@ -196,9 +198,7 @@ function CastVoteInputContent({
               {!isLoading && proposal.status === "ACTIVE" && (
                 <VoteSubmitButton
                   supportType={support}
-                  votingPower={
-                    votingPower
-                  }
+                  votingPower={votingPower}
                   missingVote={missingVote}
                   proposal={proposal}
                 />
@@ -275,7 +275,9 @@ function VoteSubmitButton({
   proposal: Proposal;
 }) {
   const { write } = useCastVoteContext();
-  const vpToDisplay = votingPower ? getVpToDisplay(votingPower, missingVote) : null;
+  const vpToDisplay = votingPower
+    ? getVpToDisplay(votingPower, missingVote)
+    : null;
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
 
@@ -332,7 +334,12 @@ function VoteSubmitButton({
     <div className="pt-3">
       <SubmitButton onClick={write} disabled={!supportType}>
         Submit vote
-        {vpToDisplay ? <> with{"\u00A0"} <TokenAmountDisplay amount={vpToDisplay} /></> : null}
+        {vpToDisplay ? (
+          <>
+            {" "}
+            with{"\u00A0"} <TokenAmountDisplay amount={vpToDisplay} />
+          </>
+        ) : null}
       </SubmitButton>
     </div>
   );
