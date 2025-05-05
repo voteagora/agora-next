@@ -6,6 +6,7 @@ import { trackEvent } from "@/lib/analytics";
 import { useAccount } from "wagmi";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
+import { revalidateTag } from "next/cache";
 
 const useStandardVoting = ({
   proposalId,
@@ -55,6 +56,7 @@ const useStandardVoting = ({
 
         if (status === "success") {
           setStandardTxHash(transactionHash);
+          revalidateTag("proposalFromDaoNode");
 
           await trackEvent({
             event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
