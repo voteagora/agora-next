@@ -120,9 +120,6 @@ export default function GovernorSettings() {
     isLoadingSetVotingDelay || isLoadingSetVotingDelayTransaction;
 
   const isAdmin = address === adminAddress;
-  console.log(
-    `Is Admin ${isAdmin}\nAddress: ${address}\nAdmin Address: ${adminAddress}`
-  );
 
   return (
     <div className="gl_box bg-neutral">
