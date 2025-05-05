@@ -11,6 +11,11 @@ export default function BlockScanUrls({
   hash2?: string | undefined;
   className?: string | undefined;
 }) {
+  // Shouldn't happen, but just in case
+  if (!hash1 && !hash2) {
+    return null;
+  }
+
   return (
     <div className={cn("pt-4 text-xs text-secondary", className)}>
       {hash2 && hash1 ? (
