@@ -146,8 +146,8 @@ describe("Copeland Calculation", () => {
       expect(teamC).toBeDefined();
 
       // Standard options should only get STD funding
-      expect(teamA!.fundingType).toBe("STD");
-      expect(teamB!.fundingType).toBe("STD");
+      expect(teamA!.fundingType).toBe("STD2Y");
+      expect(teamB!.fundingType).toBe("STD2Y");
       expect(teamC!.fundingType).toBe("STD");
     });
 
@@ -441,28 +441,25 @@ describe("Copeland Calculation", () => {
       // - In Vote 1: Ranked 1st with voting power 100
       // - In Vote 2: Ranked 2nd with voting power 200
       // - In Vote 3: Below NONE BELOW (should not count)
-      // Total voting power for: 300 (100 + 200)
-      // Total votes that count: 2
-      // Expected avgVotingPowerFor: 150 (300/2)
-      expect(optionA!.avgVotingPowerFor).toBeCloseTo(150);
+      // Total voting power for: 1000
+      // Total comparisons: 4
+      expect(optionA!.avgVotingPowerFor).toBeCloseTo(250);
 
       // Option B:
       // - In Vote 1: Ranked 2nd with voting power 100
       // - In Vote 2: Ranked 1st with voting power 200
       // - In Vote 3: Below NONE BELOW (should not count)
-      // Total voting power for: 300 (100 + 200)
-      // Total votes that count: 2
-      // Expected avgVotingPowerFor: 150 (300/2)
-      expect(optionB!.avgVotingPowerFor).toBeCloseTo(150);
+      // Total voting power for: 1100
+      // Total comparisons: 4
+      expect(optionB!.avgVotingPowerFor).toBeCloseTo(275);
 
       // Option C:
       // - In Vote 1: Ranked 3rd with voting power 100
       // - In Vote 2: Ranked 3rd with voting power 200
       // - In Vote 3: Ranked 1st with voting power 300
-      // Total voting power for: 600 (100 + 200 + 300)
-      // Total votes that count: 3
-      // Expected avgVotingPowerFor: 200 (600/3)
-      expect(optionC!.avgVotingPowerFor).toBeCloseTo(200);
+      // Total voting power for: 1800
+      // Total comparisons: 4
+      expect(optionC!.avgVotingPowerFor).toBeCloseTo(450);
 
       // Option D:
       // - In Vote 1: Below NONE BELOW

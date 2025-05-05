@@ -23,7 +23,7 @@ const RANK_UNRANKED = -1;
 const RANK_BELOW_NONE = -2;
 
 // Funding types
-type FundingType = "EXT2Y" | "EXT1Y" | "STD" | "None";
+type FundingType = "EXT2Y" | "EXT1Y" | "STD" | "STD2Y" | "None";
 
 interface PairwiseComparison {
   option1: string;
@@ -126,7 +126,6 @@ export function calculateCopelandVote(
     string,
     Record<string, { total: number; count: number }>
   > = {};
-  let totalVotingPower = 0;
 
   options.forEach((option) => {
     const baseOption = getBaseOptionFromExtended(option, options);
@@ -145,8 +144,6 @@ export function calculateCopelandVote(
   });
 
   votes.forEach((vote) => {
-    totalVotingPower += vote.votingPower;
-
     const parsedChoice = vote.choice?.startsWith("[")
       ? JSON.parse(vote.choice)
       : vote.choice;
@@ -353,83 +350,24 @@ export function calculateCopelandVote(
     });
 
     // Count the number of votes that ranked this option ABOVE NONE BELOW
-    const votesForThisOption = votes.filter((vote) => {
-      const parsedChoice = vote.choice?.startsWith("[")
-        ? JSON.parse(vote.choice)
-        : vote.choice;
-
-      // Find the index of NONE BELOW in the options array
-      const noneIndex = options.findIndex(
-        (o) => o.toLowerCase() === NONE_BELOW
-      );
-
-      // Find the rank of NONE BELOW in this vote
-      const noneRank =
-        noneIndex !== -1
-          ? (parsedChoice as number[]).findIndex(
-              (choice) => choice === noneIndex + 1
-            )
-          : -1;
-
-      // Find the rank of this option in this vote
-      const optionIndex = options.findIndex((o) => o === option);
-      const optionRank = (parsedChoice as number[]).findIndex(
-        (choice) => choice === optionIndex + 1
-      );
-
-      // Check if this option is a standard option that might have been moved up
-      const isStandardOption = !isExtendedOption(option);
-
-      // If this is a standard option, check if it has an extended version
-      const hasExtendedVersion =
-        isStandardOption &&
-        options.includes(
-          `${option.split(SEPARATOR)?.[0]?.trim()}${EXTENDED_SUFFIX}`
-        );
-
-      if (isStandardOption && hasExtendedVersion) {
-        // Find the extended version of this option
-        const extendedOption = `${option.split(SEPARATOR)?.[0]?.trim()}${EXTENDED_SUFFIX}`;
-        const extendedIndex = options.findIndex((o) => o === extendedOption);
-        const extendedRank = (parsedChoice as number[]).findIndex(
-          (choice) => choice === extendedIndex + 1
-        );
-
-        // If the extended version is ranked above NONE BELOW, then the standard version
-        // should also be considered valid (since it would have been moved up)
-        if (
-          extendedRank !== -1 &&
-          (noneRank === -1 || extendedRank < noneRank)
-        ) {
-          return true;
-        }
+    let votesForThisOption = 0;
+    let votesAgainstThisOption = 0;
+    comparisons.forEach((c) => {
+      if (c.option1 === option) {
+        votesForThisOption += c.option1VotingPower;
+        votesAgainstThisOption += c.option2VotingPower;
+      } else if (c.option2 === option) {
+        votesForThisOption += c.option2VotingPower;
+        votesAgainstThisOption += c.option1VotingPower;
       }
-
-      // Standard check: Option must be ranked AND (NONE BELOW not ranked OR option ranked above NONE BELOW)
-      return optionRank !== -1 && (noneRank === -1 || optionRank < noneRank);
     });
-
-    // Calculate total voting power of valid votes for this option
-    const totalVotingPowerOfValidVotes = votesForThisOption.reduce(
-      (sum, vote) => sum + vote.votingPower,
-      0
-    );
-
-    // Count of valid votes
-    const validVoteCount = votesForThisOption.length;
-
     // Calculate average voting power - divide the total voting power by the number of valid votes
     const avgVotingPowerFor =
-      validVoteCount > 0 ? totalVotingPowerOfValidVotes / validVoteCount : 0;
+      comparisons.length > 0 ? votesForThisOption / comparisons.length : 0;
 
     // Calculate average voting power against
-    const totalVotingPowerAgainstOption =
-      totalVotingPower - totalVotingPowerOfValidVotes;
-    const invalidVoteCount = votes.length - validVoteCount;
     const avgVotingPowerAgainst =
-      invalidVoteCount > 0
-        ? totalVotingPowerAgainstOption / invalidVoteCount
-        : 0;
+      comparisons.length > 0 ? votesAgainstThisOption / comparisons.length : 0;
 
     return {
       comparisons,
@@ -521,7 +459,10 @@ export function calculateCopelandVote(
               (r) => r.option === standardOption
             );
             // Only allocate funding to extended option if standard option has received funding
-            if (standardResult && standardResult.fundingType === "STD") {
+            if (
+              standardResult &&
+              standardResult.fundingType.startsWith("STD")
+            ) {
               if (
                 canGet2Y &&
                 info.ext !== null &&
@@ -548,7 +489,7 @@ export function calculateCopelandVote(
         } else {
           // Standard options can only get STD funding
           if (canGet2Y && remaining2YBudget >= info.std) {
-            fundingType = "STD";
+            fundingType = "STD2Y";
             remaining2YBudget -= info.std;
             remainingTotalBudget -= info.std;
           } else if (remainingTotalBudget >= info.std) {
@@ -606,7 +547,7 @@ export function calculateCopelandVote(
           (r) => r.option === standardOption
         );
         // Only allocate funding to extended option if standard option has received funding
-        if (standardResult && standardResult.fundingType === "STD") {
+        if (standardResult && standardResult.fundingType.startsWith("STD")) {
           const fundingAmount = result.fundingInfo.ext;
           if (fundingAmount !== null && remainingTotalBudget >= fundingAmount) {
             resultsWithFunding[resultIndex] = {

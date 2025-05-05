@@ -211,7 +211,7 @@ const OptionRow = ({
         ? fundingInfo.ext + fundingInfo.std
         : null;
     } else {
-      return result.fundingType === "STD" ? fundingInfo.std : null;
+      return result.fundingType.startsWith("STD") ? fundingInfo.std : null;
     }
   }, [extendedResultGotFunding, fundingInfo, extendedResult, result]);
 
@@ -228,6 +228,7 @@ const OptionRow = ({
       case "EXT1Y":
         return "bg-[#008425]/20 text-positive";
       case "STD":
+      case "STD2Y":
         return "bg-[#008425]/10 text-[#008425]";
       default:
         return "";
@@ -300,10 +301,23 @@ const OptionRow = ({
           {isFunding && fundingInfo ? (
             <div className="border-b border-line py-3 px-3">
               <div className="flex justify-between items-center mb-4">
-                <span className="text-xs font-semibold">Standard ask</span>
+                <span className="text-xs font-semibold w-1/3">Standard ask</span>
+                <div className="text-positive font-semibold">
+                  {result.fundingType === "STD2Y" ? (
+                    <span className="flex items-center gap-1">
+                      2Y <Check strokeWidth={4} className="h-3 w-3" />
+                    </span>
+                  ) : result.fundingType === "STD" ? (
+                    <span className="flex items-center gap-1">
+                      1Y <Check strokeWidth={4} className="h-3 w-3" />
+                    </span>
+                  ) : (
+                    <X strokeWidth={4} className="h-3 w-3 text-negative" />
+                  )}
+                </div>
                 <span
                   className={cn(
-                    "text-xs font-semibold",
+                    "text-xs font-semibold w-1/3 text-right",
                     fontMapper[ui?.customization?.tokenAmountFont || ""]
                       ?.variable
                   )}
@@ -312,10 +326,23 @@ const OptionRow = ({
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs font-semibold">Extended ask</span>
+                <span className="text-xs font-semibold w-1/3">Extended ask</span>
+                <div className="text-positive font-semibold">
+                  {extendedResult?.fundingType === "EXT2Y" ? (
+                    <span className="flex items-center gap-1">
+                      2Y <Check strokeWidth={4} className="h-3 w-3" />
+                    </span>
+                  ) : extendedResult?.fundingType === "EXT1Y" ? (
+                    <span className="flex items-center gap-1">
+                      1Y <Check strokeWidth={4} className="h-3 w-3" />
+                    </span>
+                  ) : fundingInfo.ext ? (
+                    <X strokeWidth={4} className="h-3 w-3 text-negative" />
+                  ) : null}
+                </div>
                 <span
                   className={cn(
-                    "text-xs font-semibold",
+                    "text-xs font-semibold w-1/3 text-right",
                     fontMapper[ui?.customization?.tokenAmountFont || ""]
                       ?.variable
                   )}
