@@ -45,10 +45,10 @@ export default function AdminAccountActions() {
         return adminAddress;
       case GOVERNOR_TYPE.ALLIGATOR:
         return managerAddress;
-      case GOVERNOR_TYPE.ENS:
-      //     todo
-      case GOVERNOR_TYPE.BRAVO:
-      //     todo
+      // case GOVERNOR_TYPE.ENS:
+      // // Not Implemented
+      // case GOVERNOR_TYPE.BRAVO:
+      // // Not Implemented
       default:
         return adminAddress;
     }
