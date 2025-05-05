@@ -81,7 +81,7 @@ export default function GovernorSettings() {
     );
   }
 
-  const { data: setVotingPeriodConfig, isError: setVotingPeriodError } =
+  const { data: votingPeriodConfig, isError: votingPeriodError } =
     useSimulateContract({
       ...govContract,
       functionName: "setVotingPeriod",
@@ -101,7 +101,7 @@ export default function GovernorSettings() {
     isLoadingSetVotingPeriod || isLoadingSetVotingPeriodTransaction;
 
   const [votingDelay, setVotingDelay] = useState("");
-  const { data: setVotingDelayConfig, isError: setVotingDelayError } =
+  const { data: votingDelayConfig, isError: votingDelayError } =
     useSimulateContract({
       ...govContract,
       functionName: "setVotingDelay",
@@ -142,8 +142,9 @@ export default function GovernorSettings() {
               min={0}
               step={0.01}
               writeContract={writeSetVotingPeriod}
-              setConfig={setVotingPeriodConfig}
+              setConfig={votingPeriodConfig}
               period={"hours"}
+              isError={votingPeriodError}
             />
             <GovernorUnlockedSetting
               name={"Voting Delay"}
@@ -153,8 +154,9 @@ export default function GovernorSettings() {
               min={0}
               step={0.01}
               writeContract={writeSetVotingDelay}
-              setConfig={setVotingDelayConfig}
+              setConfig={votingDelayConfig}
               period={"hours"}
+              isError={votingDelayError}
             />
           </div>
         ) : (
@@ -219,6 +221,7 @@ interface GovernLockSettingProps {
   step?: number;
   writeContract?: any;
   setConfig?: any;
+  isError?: boolean;
 }
 
 function GovernorUnlockedSetting(props: GovernLockSettingProps) {
@@ -230,7 +233,7 @@ function GovernorUnlockedSetting(props: GovernLockSettingProps) {
           min={props.min}
           value={props.value}
           onChange={(e) => props.setValue!(e.target.value)}
-          disabled={/* isInitializing || */ props.disabled}
+          disabled={/* isInitializing || */ props.disabled || props.isError}
           step={props.step}
           type="number"
         />
@@ -244,7 +247,7 @@ function GovernorUnlockedSetting(props: GovernLockSettingProps) {
           loading={props.disabled}
           disabled={
             /* isInitializing || */ props.disabled ||
-            // setVotingPeriodError ||
+            props.isError ||
             props.value === ""
           }
           onClick={() => {
