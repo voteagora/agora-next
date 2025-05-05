@@ -2,13 +2,35 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { SnapshotVotePayload, VotePayload } from "@/app/api/common/votes/vote";
 import { prismaWeb3Client } from "@/app/lib/prisma";
+import { getProposalFromDaoNode } from "@/app/lib/dao-node/client";
 
 export async function getVotesChart({
   proposalId,
 }: {
   proposalId: string;
 }): Promise<any[]> {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
+  const useDaoNode = ui.toggle("dao-node/votes-chart")?.enabled ?? false;
+  if (useDaoNode) {
+    try {
+      const proposal = (await getProposalFromDaoNode(proposalId)).proposal;
+      if (!proposal) {
+        // Will be caught and ignored below and move on to DB fallback
+        throw new Error("Proposal not found");
+      }
+      const votes = proposal.voting_record?.map((vote) => {
+        return {
+          voter: vote.voter,
+          support: String(vote.support),
+          weight: vote.votes.toString(),
+          block_number: String(vote.block_number),
+        };
+      });
+      return votes;
+    } catch (error) {
+      // skip error
+    }
+  }
 
   let eventsViewName;
 

@@ -327,5 +327,13 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
       name: "use-daonode-for-votable-supply",
       enabled: false,
     },
+    {
+      name: "dao-node/votes-chart", // No approval vote support yet
+      enabled: false,
+    },
+    {
+      name: "dao-node/proposal-votes",
+      enabled: false,
+    },
   ],
 });

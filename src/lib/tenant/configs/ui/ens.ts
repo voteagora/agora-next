@@ -292,5 +292,13 @@ For a full walkthrough of the proposal process, check out the [ENS DAO docs](htt
       name: "use-daonode-for-votable-supply",
       enabled: false,
     },
+    {
+      name: "dao-node/votes-chart",
+      enabled: true,
+    },
+    {
+      name: "dao-node/proposal-votes",
+      enabled: true,
+    },
   ],
 });
