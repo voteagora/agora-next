@@ -2,7 +2,10 @@
 
 import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
-import { fetchDelegateStatement } from "@/app/delegates/actions";
+import {
+  fetchDelegateStatement,
+  fetchDelegateStatements,
+} from "@/app/delegates/actions";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
 import * as z from "zod";
@@ -194,9 +197,19 @@ export default function CurrentDelegateStatement() {
       setLoading(false);
     }
 
+    async function _getDelegateStatements() {
+      const _stmnts = await fetchDelegateStatements(
+        address as string,
+        stageStatus.PUBLISHED
+      ).catch((error) => console.error(error));
+
+      console.log(`STATEMENTS: ${_stmnts}`);
+    }
+
     if (address) {
       setLoading(true);
       _getDelegateStatement();
+      _getDelegateStatements();
     }
   }, [address, reset]);
 
