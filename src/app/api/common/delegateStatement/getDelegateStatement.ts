@@ -30,7 +30,6 @@ async function getDelegateStatementForAddress({
       where: {
         address: address.toLowerCase(),
         dao_slug: slug,
-        stage: "published",
       },
     })
     .catch((error) => console.error(error));
@@ -46,7 +45,7 @@ export const getDelegateStatements = (addressOrENSName: string) => {
     {
       name: "getDelegateStatements",
     },
-    () => getDelegateStatementForAddress({ address: addressOrENSName })
+    () => getDelegateStatementsForAddress({ address: addressOrENSName })
   );
 };
 
