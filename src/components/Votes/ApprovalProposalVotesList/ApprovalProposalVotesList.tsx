@@ -93,7 +93,7 @@ export default function ApprovalProposalVotesList({
   return (
     <div
       className={cn(
-        "overflow-y-scroll",
+        "overflow-y-scroll min-h-[36px]",
         isThresholdCriteria
           ? "max-h-[calc(100vh-560px)]"
           : "max-h-[calc(100vh-527px)]"
