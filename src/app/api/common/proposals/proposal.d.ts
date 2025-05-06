@@ -45,8 +45,9 @@ interface VotingRecord {
   transaction_index: number;
   voter: string;
   support: number;
-  votes: number;
+  weight: number;
   reason: string;
+  params?: number[];
 }
 
 export type ProposalPayloadFromDAONode = {
