@@ -23,9 +23,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
   return (
     <div className="relative cursor-auto flex inline-flex">
       <button className="outline-none" onClick={handleOpenDrawer}>
-        <div className="w-[30px] h-[30px] rounded-full">
-          <ENSAvatar ensName={ensName} />
-        </div>
+        <ENSAvatar ensName={ensName} size={30} className="rounded-full" />
       </button>
 
       <Drawer
