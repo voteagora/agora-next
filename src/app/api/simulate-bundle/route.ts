@@ -1,24 +1,37 @@
-export async function POST(request: Request) {
-  const body = await request.json();
-  const user = process.env.TENDERLY_USER;
-  const project = process.env.TENDERLY_PROJECT;
+import { NextRequest, NextResponse } from "next/server";
 
-  const transactions = body?.transactions.map((transaction: any) => {
-    return {
-      to: transaction.target,
-      input: transaction.calldata,
-      value: transaction.value,
-      gas: 8000000,
-      gas_price: 0,
-      network_id: body?.networkId || "1",
-      from: body?.from || "", // governor address
-      save: true, // if true simulation is saved and shows up in the dashboard
-      save_if_fails: true, // if true, reverting simulations show up in the dashboard
-      simulation_type: "quick", // full or quick (full is default)
-    };
-  });
+export async function POST(request: NextRequest) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { default: Tenant } = await import("@/lib/tenant/tenant");
+
+  const authResponse = await authenticateApiUser(request);
+
+  if (!authResponse.authenticated) {
+    return new Response(authResponse.failReason, { status: 401 });
+  }
+
+  const { namespace } = Tenant.current();
 
   try {
+    const body = await request.json();
+    const user = process.env.TENDERLY_USER;
+    const project = process.env.TENDERLY_PROJECT;
+
+    const transactions = body?.transactions.map((transaction: any) => {
+      return {
+        to: transaction.target,
+        input: transaction.calldata,
+        value: transaction.value,
+        gas: 8000000,
+        gas_price: 0,
+        network_id: body?.networkId || "1",
+        from: body?.from || "", // governor address
+        save: true, // if true simulation is saved and shows up in the dashboard
+        save_if_fails: true, // if true, reverting simulations show up in the dashboard
+        simulation_type: "quick", // full or quick (full is default)
+      };
+    });
+
     const response = await fetch(
       `https://api.tenderly.co/api/v1/account/${user}/project/${project}/simulate-bundle`,
       {
@@ -54,9 +67,7 @@ export async function POST(request: Request) {
       })
     );
 
-    return new Response(JSON.stringify({ response: res }), {
-      status: 200,
-    });
+    return NextResponse.json({ response: res });
   } catch (e: any) {
     return new Response(
       JSON.stringify({

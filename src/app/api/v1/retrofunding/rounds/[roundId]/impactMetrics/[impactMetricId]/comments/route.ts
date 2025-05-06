@@ -1,110 +1,104 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
-
-import { fetchImpactMetricComments } from "@/app/api/common/comments/getImpactMetricComments";
-import { createImpactMetricComment } from "@/app/api/common/comments/createImpactMetricComment";
-import {
-  createOptionalNumberValidator,
-  createOptionalStringValidator,
-} from "@/app/api/common/utils/validators";
-
-const DEFAULT_SORT = "newest";
-const DEFAULT_MAX_LIMIT = 100;
-const DEFAULT_LIMIT = 20;
-const DEFAULT_OFFSET = 0;
-
-const sortValidator = createOptionalStringValidator(
-  ["newest", "votes"],
-  DEFAULT_SORT
-);
-const limitValidator = createOptionalNumberValidator(
-  1,
-  DEFAULT_MAX_LIMIT,
-  DEFAULT_LIMIT
-);
-const offsetValidator = createOptionalNumberValidator(
-  0,
-  Number.MAX_SAFE_INTEGER,
-  DEFAULT_OFFSET
-);
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  route: { params: { roundId: string; impactMetricId: string } }
+  { params }: { params: { roundId: string; impactMetricId: string } }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { default: Tenant } = await import("@/lib/tenant/tenant");
+  const { prismaWeb2Client } = await import("@/app/lib/prisma");
+  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
-    return new Response(authResponse.failReason, { status: 401 });
+    return NextResponse.json(
+      { error: authResponse.failReason },
+      { status: 401 }
+    );
   }
 
+  const { namespace } = Tenant.current();
+
   return await traceWithUserId(authResponse.userId as string, async () => {
-    const { roundId, impactMetricId } = route.params;
-
-    const searchParams = request.nextUrl.searchParams;
     try {
-      const sort = sortValidator.parse(searchParams.get("sort"));
-      const limit = limitValidator.parse(searchParams.get("limit"));
-      const offest = offsetValidator.parse(searchParams.get("offset"));
+      const { roundId, impactMetricId } = params;
 
-      const comments = await fetchImpactMetricComments({
-        roundId,
-        impactMetricId,
-        sort,
-        limit,
-        offset: offest,
+      const comments = await prismaWeb2Client.metrics_comments.findMany({
+        where: {
+          metric_id: impactMetricId,
+        },
+        orderBy: {
+          created_at: "desc",
+        },
       });
+
       return NextResponse.json(comments);
     } catch (e: any) {
-      return new Response("Internal server error: " + e.toString(), {
-        status: 500,
-      });
+      return NextResponse.json(
+        { error: "Internal server error: " + e.toString() },
+        { status: 500 }
+      );
     }
   });
 }
 
-export async function PUT(
+export async function POST(
   request: NextRequest,
-  route: { params: { roundId: string; impactMetricId: string } }
+  { params }: { params: { roundId: string; impactMetricId: string } }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { default: Tenant } = await import("@/lib/tenant/tenant");
+  const { prismaWeb2Client } = await import("@/app/lib/prisma");
+  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+  const { z } = await import("zod");
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
-    return new Response(authResponse.failReason, { status: 401 });
+    return NextResponse.json(
+      { error: authResponse.failReason },
+      { status: 401 }
+    );
   }
 
   if (!authResponse.userId) {
-    return new Response("Can't get user address from auth token", {
-      status: 401,
-    });
+    return NextResponse.json(
+      { error: "User ID not found in auth response" },
+      { status: 401 }
+    );
   }
 
-  if (!authResponse.scope?.includes("badgeholder")) {
-    return new Response("Only badgeholder can vote on a comment", {
-      status: 401,
-    });
-  }
+  const { namespace } = Tenant.current();
 
   return await traceWithUserId(authResponse.userId, async () => {
-    const { roundId, impactMetricId } = route.params;
-
-    const body = await request.json();
-    if (!body.comment) {
-      return new Response("Missing comment in request body", { status: 400 });
-    }
-
     try {
-      const retrievedComment = await createImpactMetricComment({
-        metricId: impactMetricId,
-        address: authResponse.userId!,
-        comment: body.comment,
+      const { roundId, impactMetricId } = params;
+      const { comment } = await request.json();
+
+      const CommentSchema = z.object({
+        comment: z.string().min(1),
       });
-      return NextResponse.json(retrievedComment);
+
+      const validatedData = CommentSchema.parse({ comment });
+
+      const newComment = await prismaWeb2Client.metrics_comments.create({
+        data: {
+          metric_id: impactMetricId,
+          address: authResponse.userId,
+          content: validatedData.comment,
+        },
+      });
+
+      return NextResponse.json(newComment);
     } catch (e: any) {
-      return new Response("Internal server error: " + e.toString(), {
-        status: 500,
-      });
+      if (e instanceof z.ZodError) {
+        return NextResponse.json({ error: e.toString() }, { status: 400 });
+      }
+      return NextResponse.json(
+        { error: "Internal server error: " + e.toString() },
+        { status: 500 }
+      );
     }
   });
 }

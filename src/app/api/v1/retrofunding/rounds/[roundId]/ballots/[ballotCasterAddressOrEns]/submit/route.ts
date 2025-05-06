@@ -1,8 +1,15 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import { submitBallot } from "@/app/api/common/ballots/submitBallot";
-import { z } from "zod";
-import { fetchBadgeholder } from "@/app/api/common/badgeholders/getBadgeholders";
+import { NextRequest, NextResponse } from "next/server";
+
+const traceWithUserId = async(
+  await import("@/app/api/v1/apiUtils")
+).traceWithUserId;
+const submitBallot = async(
+  await import("@/app/api/common/ballots/submitBallot")
+).submitBallot;
+const fetchBadgeholder = async(
+  await import("@/app/api/common/badgeholders/getBadgeholders")
+).fetchBadgeholder;
+const z = (await import("zod")).default;
 
 const METRICS_BASED_ROUNDS = ["4"];
 const PROJECTS_BASED_ROUNDS = ["5", "6"];
@@ -42,35 +49,99 @@ export type ProjectsBallotSubmission = z.infer<
 
 export async function POST(
   request: NextRequest,
-  route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
+  { params }: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
-  if (route.params.roundId === "4" || route.params.roundId === "5") {
-    return new Response("Ballot submission for Round 4 is closed", {
-      status: 403,
-    });
+  const { authenticateApiUser, validateAddressScope } = await import(
+    "@/app/lib/auth/serverAuth"
+  );
+
+  const authResponse = await authenticateApiUser(request);
+
+  if (!authResponse.authenticated) {
+    return NextResponse.json(
+      { error: authResponse.failReason },
+      { status: 401 }
+    );
   }
 
-  return await traceWithUserId(
-    route.params.ballotCasterAddressOrEns as string,
-    async () => {
-      const { roundId, ballotCasterAddressOrEns } = route.params;
-      try {
-        const payload = await request.json();
+  const { roundId, ballotCasterAddressOrEns } = params;
 
-        const parsedPayload = METRICS_BASED_ROUNDS.includes(roundId)
-          ? metricsBallotSubmissionSchema.parse(payload)
-          : projectsBallotSubmissionSchema.parse(payload);
-        const ballot = await submitBallot(
-          parsedPayload,
-          Number(roundId),
-          ballotCasterAddressOrEns
-        );
-        return NextResponse.json(ballot);
-      } catch (e: any) {
-        return new Response("Internal server error: " + e.toString(), {
-          status: 500,
-        });
-      }
-    }
+  if (roundId === "4" || roundId === "5") {
+    return NextResponse.json(
+      { error: "Ballot submission for Round 4 is closed" },
+      { status: 403 }
+    );
+  }
+
+  const scopeError = await validateAddressScope(
+    ballotCasterAddressOrEns,
+    authResponse
   );
+
+  if (scopeError) {
+    return NextResponse.json({ error: scopeError }, { status: 403 });
+  }
+
+  return await traceWithUserId(authResponse.userId as string, async () => {
+    try {
+      const payload = await request.json();
+
+      const VoteSchema = z.object({
+        projectId: z.string(),
+        amount: z.number(),
+      });
+
+      const VotesSchema = z.array(VoteSchema);
+      const validatedVotes = VotesSchema.parse(payload.votes);
+
+      const badgeholder = await fetchBadgeholder(ballotCasterAddressOrEns);
+      if (!badgeholder) {
+        return NextResponse.json(
+          { error: "Badgeholder not found" },
+          { status: 404 }
+        );
+      }
+
+      if (METRICS_BASED_ROUNDS.includes(roundId)) {
+        // Validate metrics-based round votes
+        for (const vote of validatedVotes) {
+          if (vote.amount < 0 || vote.amount > 100) {
+            return NextResponse.json(
+              { error: "Vote amount must be between 0 and 100" },
+              { status: 400 }
+            );
+          }
+        }
+      } else if (PROJECTS_BASED_ROUNDS.includes(roundId)) {
+        // Validate projects-based round votes
+        const totalVotes = validatedVotes.reduce(
+          (sum, vote) => sum + vote.amount,
+          0
+        );
+        if (totalVotes !== 100) {
+          return NextResponse.json(
+            { error: "Total votes must sum to 100" },
+            { status: 400 }
+          );
+        }
+      }
+
+      const ballot = await submitBallot({
+        roundId,
+        signature: payload.signature,
+        votes: validatedVotes,
+        casterAddress: badgeholder.address,
+      });
+
+      return NextResponse.json(ballot);
+    } catch (e: any) {
+      if (e instanceof z.ZodError) {
+        return NextResponse.json({ error: e.toString() }, { status: 400 });
+      }
+      return NextResponse.json(
+        { error: "Internal server error: " + e.toString() },
+        { status: 500 }
+      );
+    }
+  });
 }

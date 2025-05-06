@@ -1,23 +1,21 @@
-import { NextResponse, type NextRequest } from "next/server";
-import {
-  authenticateApiUser,
-  getCategoryScope,
-  validateAddressScope,
-} from "@/app/lib/auth/serverAuth";
-import { fetchBallot } from "@/app/api/common/ballots/getBallots";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { NextResponse, NextRequest } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
+  { params }: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
+  const { authenticateApiUser, getCategoryScope, validateAddressScope } =
+    await import("@/app/lib/auth/serverAuth");
+  const { fetchBallot } = await import("@/app/api/common/ballots/getBallots");
+  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
     return new Response(authResponse.failReason, { status: 401 });
   }
 
-  const { roundId, ballotCasterAddressOrEns } = route.params;
+  const { roundId, ballotCasterAddressOrEns } = params;
   const scopeError = await validateAddressScope(
     ballotCasterAddressOrEns,
     authResponse

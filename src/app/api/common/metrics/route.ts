@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server";
-import { fetchMetrics } from "./getMetrics";
 
 export async function GET() {
+  const { fetchMetrics } = await import("./getMetrics");
+
   try {
     const metrics = await fetchMetrics();
     return NextResponse.json(metrics);
-  } catch (error) {
-    console.error("Error fetching metrics:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch metrics" },
-      { status: 500 }
-    );
+  } catch (e: any) {
+    return new Response("Internal server error: " + e.toString(), {
+      status: 500,
+    });
   }
 }
