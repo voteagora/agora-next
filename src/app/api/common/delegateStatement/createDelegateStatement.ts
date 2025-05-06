@@ -35,21 +35,20 @@ export async function createDelegateStatement({
     throw new Error("Invalid signature");
   }
 
+  // Hash message for storage
+  const messageHash = createHash("sha256").update(message).digest("hex");
+
   // Sanitize the statement before storing
   const sanitizedStatement = {
     ...delegateStatement,
     delegateStatement: sanitizeContent(delegateStatement.delegateStatement),
   };
 
-  const stopGapMessageHash = createHash("sha256")
-    .update(sanitizedStatement.delegateStatement)
-    .digest("hex");
-
   const data = {
     address: address.toLowerCase(),
     dao_slug: slug,
-    message_hash: stopGapMessageHash,
     signature,
+    message_hash: messageHash,
     payload: sanitizedStatement as Prisma.InputJsonValue,
     twitter,
     warpcast,
@@ -67,7 +66,8 @@ export async function createDelegateStatement({
       address_dao_slug_message_hash: {
         address: address.toLowerCase(),
         dao_slug: slug,
-        message_hash: stopGapMessageHash,
+        message_hash: messageHash,
+        stage: stage,
       },
     },
     update: data,
