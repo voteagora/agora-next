@@ -204,7 +204,7 @@ export type ShareVoteDialogType = {
 export type ApprovalCastVoteDialogProps = {
   proposal: Proposal;
   hasStatement: boolean;
-  votingPower: VotingPowerData;
+  votingPower: VotingPowerData | null;
   authorityChains: string[][] | null;
   missingVote: MissingVote;
   closeDialog: () => void;
