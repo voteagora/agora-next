@@ -18,10 +18,15 @@ export const getDelegateFromDaoNode = async (address: string) => {
     return null;
   }
 
-  const response = await fetch(`${url}v1/delegate/${address}`);
-  const data: DaoNodeDelegate = await response.json();
+  try {
+    const response = await fetch(`${url}v1/delegate/${address}`);
+    const data: DaoNodeDelegate = await response.json();
 
-  return data;
+    return data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 };
 
 export const getProposalTypesFromDaoNode = async () => {
