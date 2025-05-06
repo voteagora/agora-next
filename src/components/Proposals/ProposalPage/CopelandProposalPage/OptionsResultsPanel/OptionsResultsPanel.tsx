@@ -346,7 +346,7 @@ const OptionRow = ({
                 </AccordionItem>
                 <AccordionItem value="extended" className="border-none w-full">
                   <AccordionTrigger
-                    className="[&[disabled]>svg]:hidden p-0 pt-3 mt-3 pr-2 border-t border-line hover:no-underline"
+                    className="[&[disabled]>svg]:hidden [&[disabled]]:opacity-50 [&[disabled]]:cursor-not-allowed p-0 pt-3 mt-3 pr-2 border-t border-line hover:no-underline"
                     disabled={!extendedResult}
                   >
                     <div className="flex justify-between items-center w-[calc(100%-1.5rem)]">
