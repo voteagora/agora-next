@@ -11,23 +11,32 @@ datasource db {
 }
 
 model DelegateStatements {
-  address   String
-  dao_slug  DaoSlug
-  signature String
-  payload   Json
-  twitter   String?
-  discord   String?
-  email     String?
-  createdAt DateTime? @default(now()) @map("created_at") @db.Date
-  updatedAt DateTime? @default(now()) @map("updated_at") @db.Date
-  warpcast  String?
-  endorsed  Boolean   @default(false)
-  scw_address  String?
+  address                  String
+  dao_slug                 DaoSlug
+  stage                    StageStatus @default(PUBLISHED)
+  signature                String
+  payload                  Json
+  twitter                  String?
+  discord                  String?
+  email                    String?
+  createdAt                DateTime?   @default(now()) @map("created_at") @db.Date
+  updatedAt                DateTime?   @default(now()) @map("updated_at") @db.Date
+  warpcast                 String?
+  endorsed                 Boolean     @default(false)
+  scw_address              String?
+  message_hash             String?     @db.Text
   notification_preferences Json?
 
-  @@id([address, dao_slug])
+  @@id([address, dao_slug, stage])
   @@index([email], map: "idx_delegate_statements_email")
   @@map("delegate_statements")
+  @@schema("agora")
+}
+
+enum StageStatus {
+  DRAFT
+  PUBLISHED
+
   @@schema("agora")
 }
 
