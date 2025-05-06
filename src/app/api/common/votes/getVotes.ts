@@ -28,7 +28,9 @@ import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
 import {
   adaptDAONodeResponse,
+  getCachedAllProposalsFromDaoNode,
   getProposalFromDaoNode,
+  getVotingHistoryFromDaoNode,
 } from "@/app/lib/dao-node/client";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 
@@ -52,6 +54,55 @@ async function getVotesForDelegateForAddress({
 }) {
   return withMetrics("getVotesForDelegateForAddress", async () => {
     const { namespace, contracts, ui } = Tenant.current();
+
+    const useDaoNode = ui.toggle("dao-node/proposal-votes")?.enabled ?? false;
+
+    const latestBlock = ui.toggle("use-l1-block-number")?.enabled
+      ? await contracts.providerForTime?.getBlock("latest")
+      : await contracts.token.provider.getBlock("latest");
+
+    if (useDaoNode) {
+      try {
+        const votingHistory = (await getVotingHistoryFromDaoNode(address))
+          .voting_history;
+        if (votingHistory.length) {
+          const proposals = await getCachedAllProposalsFromDaoNode();
+          const parsedProposals = proposals.map(adaptDAONodeResponse);
+          const parsedVotes = await Promise.all(
+            votingHistory.map(async (vote) => {
+              const proposal = parsedProposals.find(
+                (p) => p.proposal_id === vote.proposal_id
+              );
+              return await parseVote(
+                {
+                  ...vote,
+                  weight: Number(vote.weight).toLocaleString("fullwide", {
+                    useGrouping: false,
+                  }),
+                },
+                proposal
+                  ? parseProposalData(
+                      JSON.stringify(proposal.proposal_data || {}),
+                      proposal.proposal_type
+                    )
+                  : null,
+                latestBlock
+              );
+            })
+          );
+          return {
+            meta: {
+              has_next: false,
+              total_returned: votingHistory.length,
+              next_offset: 0,
+            },
+            data: parsedVotes,
+          };
+        }
+      } catch (error) {
+        // skip error
+      }
+    }
 
     let eventsViewName;
 
@@ -147,10 +198,6 @@ async function getVotesForDelegateForAddress({
         data: [],
       };
     }
-
-    const latestBlock = ui.toggle("use-l1-block-number")?.enabled
-      ? await contracts.providerForTime?.getBlock("latest")
-      : await contracts.token.provider.getBlock("latest");
 
     const data = await Promise.all(
       votes.map((vote) => {
