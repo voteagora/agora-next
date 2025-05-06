@@ -61,7 +61,7 @@ const ProposalNonVoterList = ({ proposal, isApprovalProposal }: Props) => {
   return (
     <div
       className={cn(
-        "px-4 pb-4 overflow-y-auto",
+        "px-4 pb-4 overflow-y-auto min-h-[36px]",
         isThresholdCriteria
           ? "max-h-[calc(100vh-560px)]"
           : isApprovalProposal
