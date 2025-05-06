@@ -37,7 +37,7 @@ export function ProposalSingleNonVoter({
 
   const { data: pastVotes } = useGetVotes({
     address: voter.delegate as `0x${string}`,
-    blockNumber: BigInt(proposal.snapshotBlockNumber),
+    blockNumber: BigInt(0),
     enabled: namespace !== TENANT_NAMESPACES.UNISWAP,
   });
 
