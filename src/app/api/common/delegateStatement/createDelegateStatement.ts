@@ -6,6 +6,7 @@ import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { Prisma } from "@prisma/client";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
+import { createHash } from "crypto";
 
 export async function createDelegateStatement({
   address,
@@ -34,6 +35,9 @@ export async function createDelegateStatement({
     throw new Error("Invalid signature");
   }
 
+  // Hash message for storage
+  const messageHash = createHash("sha256").update(message).digest("hex");
+
   // Sanitize the statement before storing
   const sanitizedStatement = {
     ...delegateStatement,
@@ -44,6 +48,7 @@ export async function createDelegateStatement({
     address: address.toLowerCase(),
     dao_slug: slug,
     signature,
+    message_hash: messageHash,
     payload: sanitizedStatement as Prisma.InputJsonValue,
     twitter,
     warpcast,
@@ -61,6 +66,8 @@ export async function createDelegateStatement({
       address_dao_slug: {
         address: address.toLowerCase(),
         dao_slug: slug,
+        message_hash: messageHash,
+        stage: stage,
       },
     },
     update: data,
