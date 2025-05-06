@@ -1,5 +1,5 @@
 import Tenant from "@/lib/tenant/tenant";
-import { prismaWeb3Client } from "@/app/lib/prisma";
+import { fetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
 
 const { contracts, namespace } = Tenant.current();
 
@@ -37,63 +37,71 @@ export const getDelegatesFromDaoNode = async () => {
 
     const data = await response.json();
 
-    // If we have delegates data, fetch their statements from the database
+    // If we have delegates data, fetch statements for the first 10 delegates
     if (data && data.delegates && data.delegates.length > 0) {
-      const delegateAddresses = data.delegates.map((delegate) =>
-        delegate.address.toLowerCase()
+      // Take only the first 10 delegates
+      const top10Delegates = data.delegates.slice(0, 10);
+      const delegateAddresses = top10Delegates.map((delegate) =>
+        delegate.addr.toLowerCase()
       );
 
-      // Fetch statements for all delegates in a single query
-      const statements = await prismaWeb3Client.$queryRawUnsafe(
-        `
-        SELECT 
-          address,
-          row_to_json(sub) as statement
-        FROM (
-          SELECT 
-            address,
-            (SELECT row_to_json(stmt)
-              FROM (
-                SELECT
-                  signature,
-                  payload,
-                  twitter,
-                  discord,
-                  created_at,
-                  updated_at,
-                  warpcast,
-                  endorsed
-                FROM agora.delegate_statements s
-                WHERE s.address = d.address AND s.dao_slug = $1::config.dao_slug
-                LIMIT 1
-              ) stmt
-            ) AS statement
-          FROM unnest($2::text[]) AS d(address)
-        ) sub
-        WHERE statement IS NOT NULL
-      `,
-        slug,
-        delegateAddresses
+      // Fetch statements for top 10 delegates using the fetchDelegateStatement function
+      const statements = await Promise.all(
+        delegateAddresses.map(async (address) => {
+          try {
+            const statement = await fetchDelegateStatement(address);
+            return statement ? { address, statement } : null;
+          } catch (error) {
+            console.error(
+              `Error fetching statement for address ${address}:`,
+              error
+            );
+            return null;
+          }
+        })
       );
 
-      // Create a map of address to statement for easy lookup
+      // Filter out null values and create a map of address to statement
       const statementMap = new Map();
-      statements.forEach((item) => {
+      statements.filter(Boolean).forEach((item) => {
         statementMap.set(item.address, item.statement);
       });
 
       // Merge the statements with the delegate data
-      data.delegates = data.delegates.map((delegate) => ({
-        ...delegate,
-        statement: statementMap.get(delegate.address.toLowerCase()) || null,
-      }));
-    }
+      data.delegates = data.delegates.map((delegate) => {
+        const lowerCaseAddress = delegate.addr.toLowerCase();
+        // Only add statements for the top 10 delegates
+        if (delegateAddresses.includes(lowerCaseAddress)) {
+          return {
+            address: lowerCaseAddress,
+            votingPower: {
+              total: delegate.votingPower || "0",
+              direct: "0",
+              advanced: "0",
+            },
+            statement: statementMap.get(lowerCaseAddress) || null,
+          };
+        }
+        return {
+          address: lowerCaseAddress,
+          votingPower: {
+            total: delegate.votingPower || "0",
+            direct: "0",
+            advanced: "0",
+          },
+          statement: null,
+        };
+      });
 
-    // Print the data for debugging
-    console.log(
-      "Delegates data with statements:",
-      JSON.stringify(data, null, 2)
-    );
+      // Limit the response to only the top 10 delegates
+      data.delegates = data.delegates.slice(0, 10);
+
+      // Print the data for debugging
+      // console.log(
+      //   "Delegates data with statements:",
+      //   JSON.stringify(data, null, 2)
+      // );
+    }
 
     return data;
   } catch (error) {

@@ -60,6 +60,191 @@ async function getDelegates({
         daoNodeDelegates ? "success" : "failed"
       );
 
+      // Print sample delegate structure if available
+      if (
+        daoNodeDelegates &&
+        daoNodeDelegates.delegates &&
+        daoNodeDelegates.delegates.length > 0
+      ) {
+        console.log(
+          "Sample DAO node delegate structure:",
+          JSON.stringify(daoNodeDelegates.delegates[0], null, 2)
+        );
+      }
+
+      // If we have valid data from the DAO node, use it instead of database query
+      if (
+        daoNodeDelegates &&
+        daoNodeDelegates.delegates &&
+        daoNodeDelegates.delegates.length > 0
+      ) {
+        console.log("Using DAO node data instead of database query");
+
+        // Apply sorting based on the sort parameter
+        let sortedDelegates = [...daoNodeDelegates.delegates];
+
+        if (sort === "most_delegators") {
+          sortedDelegates.sort(
+            (a, b) =>
+              parseInt(b.numDelegators || "0") -
+                parseInt(a.numDelegators || "0") || a.addr.localeCompare(b.addr)
+          );
+        } else if (sort === "weighted_random" && seed) {
+          // Simple random sort for now
+          sortedDelegates.sort(() => Math.random() - 0.5);
+        } else if (sort === "least_voting_power") {
+          sortedDelegates.sort(
+            (a, b) =>
+              parseInt(a.votingPower || "0") - parseInt(b.votingPower || "0") ||
+              a.addr.localeCompare(b.addr)
+          );
+        } else {
+          // Default: most voting power
+          sortedDelegates.sort(
+            (a, b) =>
+              parseInt(b.votingPower || "0") - parseInt(a.votingPower || "0") ||
+              a.addr.localeCompare(b.addr)
+          );
+        }
+
+        // Apply pagination
+        const paginatedDelegates = sortedDelegates.slice(
+          pagination.offset,
+          pagination.offset + pagination.limit
+        );
+
+        // Transform to expected format
+        const transformedDelegates = paginatedDelegates.map((delegate) => {
+          // Log the delegate to see its structure
+          console.log(
+            "Processing delegate:",
+            JSON.stringify(delegate, null, 2)
+          );
+
+          // Check if delegate has the expected properties
+          if (!delegate || typeof delegate !== "object") {
+            console.error("Invalid delegate object:", delegate);
+            return {
+              address: "unknown",
+              votingPower: {
+                total: "0",
+                direct: "0",
+                advanced: "0",
+              },
+              citizen: false,
+              statement: null,
+              numOfDelegators: BigInt(0),
+            };
+          }
+
+          // Use safe property access with fallbacks
+          const address = delegate.addr || delegate.address || "unknown";
+
+          // Ensure voting power values are strings
+          let totalVp = "0";
+          let directVp = "0";
+          let advancedVp = "0";
+
+          // Handle voting power - check if it's already an object
+          if (
+            delegate.votingPower &&
+            typeof delegate.votingPower === "object"
+          ) {
+            totalVp = delegate.votingPower.total || "0";
+            directVp = delegate.votingPower.direct || "0";
+            advancedVp = delegate.votingPower.advanced || "0";
+          } else {
+            // Handle voting power as a string or number
+            if (delegate.votingPower !== undefined) {
+              totalVp =
+                typeof delegate.votingPower === "string"
+                  ? delegate.votingPower
+                  : String(delegate.votingPower || 0);
+            } else if (delegate.voting_power !== undefined) {
+              totalVp =
+                typeof delegate.voting_power === "string"
+                  ? delegate.voting_power
+                  : String(delegate.voting_power || 0);
+            }
+
+            // Handle direct voting power
+            if (delegate.directVp !== undefined) {
+              directVp =
+                typeof delegate.directVp === "string"
+                  ? delegate.directVp
+                  : String(delegate.directVp || 0);
+            } else if (delegate.direct_vp !== undefined) {
+              directVp =
+                typeof delegate.direct_vp === "string"
+                  ? delegate.direct_vp
+                  : String(delegate.direct_vp || 0);
+            }
+
+            // Handle advanced voting power
+            if (delegate.advancedVp !== undefined) {
+              advancedVp =
+                typeof delegate.advancedVp === "string"
+                  ? delegate.advancedVp
+                  : String(delegate.advancedVp || 0);
+            } else if (delegate.advanced_vp !== undefined) {
+              advancedVp =
+                typeof delegate.advanced_vp === "string"
+                  ? delegate.advanced_vp
+                  : String(delegate.advanced_vp || 0);
+            }
+          }
+
+          // Log the voting power values for debugging
+          console.log("Voting power values:", {
+            totalVp,
+            directVp,
+            advancedVp,
+            originalTotal: delegate.votingPower || delegate.voting_power,
+            originalDirect: delegate.directVp || delegate.direct_vp,
+            originalAdvanced: delegate.advancedVp || delegate.advanced_vp,
+          });
+
+          return {
+            address:
+              typeof address === "string"
+                ? address.toLowerCase()
+                : String(address).toLowerCase(),
+            votingPower: {
+              total: totalVp,
+              direct: directVp,
+              advanced: advancedVp,
+            },
+            citizen: !!delegate.citizen,
+            statement: delegate.statement || null,
+            numOfDelegators: BigInt(
+              String(delegate.numDelegators || delegate.num_of_delegators || 0)
+            ),
+          };
+        });
+
+        // Log a complete transformed delegate for debugging
+        if (transformedDelegates.length > 0) {
+          console.log(
+            "Sample transformed delegate:",
+            JSON.stringify(transformedDelegates[0], null, 2)
+          );
+        }
+
+        return {
+          meta: {
+            has_next:
+              pagination.offset + pagination.limit <
+              daoNodeDelegates.delegates.length,
+            next_offset: pagination.offset + pagination.limit,
+            total_returned: transformedDelegates.length,
+            total_count: daoNodeDelegates.delegates.length,
+          },
+          data: transformedDelegates,
+          seed,
+        };
+      }
+
+      // If no DAO node data, continue with the original database query
       const { namespace, ui, slug, contracts } = Tenant.current();
       const allowList = ui.delegates?.allowed || [];
 
