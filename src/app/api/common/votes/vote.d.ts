@@ -51,6 +51,16 @@ export type SnapshotVote = {
   choiceLabels: Record<string, any>;
 };
 
+export type DaoNodeVote = {
+  block_number: number;
+  transaction_index: number;
+  voter: string;
+  proposal_id: string;
+  support: number;
+  weight: number;
+  reason: string;
+};
+
 export type DelegatesSort =
   | "most_delegators"
   | "weighted_random"
