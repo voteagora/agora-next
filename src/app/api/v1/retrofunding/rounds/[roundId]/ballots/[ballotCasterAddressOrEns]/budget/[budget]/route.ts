@@ -19,6 +19,7 @@ export async function POST(
   const { updateBallotBudget } = await import(
     "@/app/api/common/ballots/updateBallot"
   );
+  const { getCategoryScope } = await import("@/app/lib/auth/serverAuth");
 
   const authResponse = await authenticateApiUser(request);
 
