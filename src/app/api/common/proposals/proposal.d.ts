@@ -40,6 +40,16 @@ export type OptimismProposals = {
 }
 */
 
+interface VotingRecord {
+  block_number: number;
+  transaction_index: number;
+  voter: string;
+  support: number;
+  weight: number;
+  reason: string;
+  params?: number[];
+}
+
 export type ProposalPayloadFromDAONode = {
   id: string;
 
@@ -98,6 +108,8 @@ export type ProposalPayloadFromDAONode = {
   // So, DAO Node might be forced to re-cast large integers as strings, where they exist.
   // We'll make this decision later, after tests are up and running. -- Jeff M, 2025-04-29
   decoded_proposal_data?: Object;
+  voting_record: VotingRecord[];
+  proposal_type?: number;
 };
 
 export type ProposalPayloadFromDB = {

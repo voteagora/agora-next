@@ -4,8 +4,9 @@ import {
 } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
-import { PaginatedResult } from "../pagination";
 import { ProposalType } from "@prisma/client";
+import { unstable_cache } from "next/cache";
+import { DaoNodeVote } from "@/app/api/common/votes/vote";
 
 const { contracts, namespace } = Tenant.current();
 
@@ -300,3 +301,26 @@ export const getCachedAllProposalsFromDaoNode = cache(
     proposal_type: 'STANDARD'
   }
   */
+
+export const getProposalFromDaoNode = unstable_cache(
+  async (proposalId: string) => {
+    const url = getDaoNodeURLForNamespace(namespace);
+    const response = await fetch(`${url}v1/proposal/${proposalId}`);
+    const data: {
+      proposal: ProposalPayloadFromDAONode;
+    } = await response.json();
+    return data;
+  },
+  ["proposalFromDaoNode"],
+  {
+    tags: ["proposalFromDaoNode"],
+    revalidate: 60, // 1 minute
+  }
+);
+
+export const getVotingHistoryFromDaoNode = async (address: string) => {
+  const url = getDaoNodeURLForNamespace(namespace);
+  const response = await fetch(`${url}v1/delegate/${address}/voting_history`);
+  const data: { voting_history: DaoNodeVote[] } = await response.json();
+  return data;
+};
