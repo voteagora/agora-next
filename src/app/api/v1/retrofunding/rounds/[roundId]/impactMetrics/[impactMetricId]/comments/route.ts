@@ -29,10 +29,11 @@ export async function GET(
   request: NextRequest,
   route: { params: { roundId: string; impactMetricId: string } }
 ) {
-
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
-  const { fetchImpactMetricComments } = await import("@/app/api/common/comments/getImpactMetricComments");
+  const { fetchImpactMetricComments } = await import(
+    "@/app/api/common/comments/getImpactMetricComments"
+  );
 
   const authResponse = await authenticateApiUser(request);
 
@@ -71,7 +72,9 @@ export async function PUT(
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
-  const { createImpactMetricComment } = await import("@/app/api/common/comments/createImpactMetricComment");
+  const { createImpactMetricComment } = await import(
+    "@/app/api/common/comments/createImpactMetricComment"
+  );
 
   const authResponse = await authenticateApiUser(request);
 

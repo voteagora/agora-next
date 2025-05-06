@@ -1,7 +1,4 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import { fetchProjectsApi } from "@/app/api/common/projects/getProjects";
 import { createOptionalNumberValidator } from "../../common/utils/validators";
 
 const DEFAULT_MAX_LIMIT = 100;
@@ -20,6 +17,12 @@ const offsetValidator = createOptionalNumberValidator(
 );
 
 export async function GET(request: NextRequest) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+  const { fetchProjectsApi } = await import(
+    "@/app/api/common/projects/getProjects"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

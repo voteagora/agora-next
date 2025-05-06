@@ -40,8 +40,9 @@ export async function POST(
   request: NextRequest,
   route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
-
-  const { submitBallot } = await import("@/app/api/common/ballots/submitBallot");
+  const { submitBallot } = await import(
+    "@/app/api/common/ballots/submitBallot"
+  );
   const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
 
   if (route.params.roundId === "4" || route.params.roundId === "5") {
