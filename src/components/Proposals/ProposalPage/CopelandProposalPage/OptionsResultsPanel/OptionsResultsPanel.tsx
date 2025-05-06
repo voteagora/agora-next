@@ -299,241 +299,314 @@ const OptionRow = ({
       <div className="ml-5 w-[calc(100%-1.25rem)]">
         <AccordionContent className="text-xs font-medium py-0 border border-t-0 border-line bg-wash rounded-b-sm">
           {isFunding && fundingInfo ? (
-            <div className="border-b border-line py-3 px-3">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-xs font-semibold w-1/3">Standard ask</span>
-                <div className="text-positive font-semibold">
-                  {result.fundingType === "STD2Y" ? (
-                    <span className="flex items-center gap-1">
-                      2Y <Check strokeWidth={4} className="h-3 w-3" />
-                    </span>
-                  ) : result.fundingType === "STD" ? (
-                    <span className="flex items-center gap-1">
-                      1Y <Check strokeWidth={4} className="h-3 w-3" />
-                    </span>
-                  ) : (
-                    <X strokeWidth={4} className="h-3 w-3 text-negative" />
-                  )}
-                </div>
-                <span
-                  className={cn(
-                    "text-xs font-semibold w-1/3 text-right",
-                    fontMapper[ui?.customization?.tokenAmountFont || ""]
-                      ?.variable
-                  )}
-                >
-                  {fundingInfo.std.toLocaleString()}/y
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-semibold w-1/3">Extended ask</span>
-                <div className="text-positive font-semibold">
-                  {extendedResult?.fundingType === "EXT2Y" ? (
-                    <span className="flex items-center gap-1">
-                      2Y <Check strokeWidth={4} className="h-3 w-3" />
-                    </span>
-                  ) : extendedResult?.fundingType === "EXT1Y" ? (
-                    <span className="flex items-center gap-1">
-                      1Y <Check strokeWidth={4} className="h-3 w-3" />
-                    </span>
-                  ) : fundingInfo.ext ? (
-                    <X strokeWidth={4} className="h-3 w-3 text-negative" />
-                  ) : null}
-                </div>
-                <span
-                  className={cn(
-                    "text-xs font-semibold w-1/3 text-right",
-                    fontMapper[ui?.customization?.tokenAmountFont || ""]
-                      ?.variable
-                  )}
-                >
-                  {fundingInfo.ext
-                    ? `+${fundingInfo.ext.toLocaleString()}/y`
-                    : "N/A"}
-                </span>
-              </div>
-            </div>
-          ) : null}
-
-          <div className="border-b border-line py-3 px-3">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-xs font-semibold">Avg Support votes</span>
-              <span
-                className={cn(
-                  "text-xs font-semibold",
-                  fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
-                )}
-              >
-                {Math.round(result.avgVotingPowerFor).toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between items-center mb-4">
-              <span
-                className={cn(
-                  "text-positive font-semibold",
-                  fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
-                )}
-              >
-                For-{Math.round(result.avgVotingPowerFor).toLocaleString()}
-              </span>
-              <span
-                className={cn(
-                  "text-negative font-semibold",
-                  fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
-                )}
-              >
-                Against-
-                {Math.round(result.avgVotingPowerAgainst).toLocaleString()}
-              </span>
-            </div>
-            <div className="h-2 w-full bg-line rounded-full overflow-hidden">
-              <div className="flex h-full">
-                <div
-                  className="bg-positive h-full"
-                  style={{
-                    width: `${forPercentage}%`,
-                  }}
-                ></div>
-                <div
-                  className="bg-negative h-full"
-                  style={{
-                    width: `${againstPercentage}%`,
-                  }}
-                ></div>
-              </div>
-            </div>
-          </div>
-
-          <div className="py-3 px-3">
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="font-semibold text-xs">PROVIDER</div>
-              <div className="font-semibold text-xs text-right">CHALLENGER</div>
-              <div className="font-semibold text-xs text-right">CANDIDATE</div>
-            </div>
-
-            {result.comparisons
-              .filter(
-                (comparison) =>
-                  !(
-                    (comparison.option1 === result.option &&
-                      comparison.option2 === extendedResult?.option) ||
-                    (comparison.option2 === result.option &&
-                      comparison.option1 === extendedResult?.option)
-                  )
-              )
-              .map((comparison, idx) => {
-                const isOption1 = comparison.option1 === result.option;
-                const opponentOption = isOption1
-                  ? comparison.option2
-                  : comparison.option1;
-                const opponentName = opponentOption;
-                const favorVotes = isOption1
-                  ? comparison.option1VotingPower
-                  : comparison.option2VotingPower;
-                const disfavorVotes = isOption1
-                  ? comparison.option2VotingPower
-                  : comparison.option1VotingPower;
-                const isWinner =
-                  (isOption1 && comparison.winner === comparison.option1) ||
-                  (!isOption1 && comparison.winner === comparison.option2);
-                const lostAtLeastOne = result.totalLosses > 0;
-                const wonAtLeastOne = result.totalWins > 0;
-
-                return (
-                  <div key={idx} className="grid grid-cols-3 gap-4 py-2">
-                    <div className="font-semibold truncate max-w-[100px]">
-                      {opponentName}
-                    </div>
-                    <div
-                      className={cn(
-                        "text-right text-tertiary font-semibold flex items-center justify-end gap-1",
-                        !isWinner && "text-positive",
-                        fontMapper[ui?.customization?.tokenAmountFont || ""]
-                          ?.variable
-                      )}
-                    >
-                      <TokenAmountDecorated
-                        amount={BigInt(Math.round(disfavorVotes))}
-                        decimals={0}
-                        hideCurrency
-                        specialFormatting
-                      />
-                      <span className={cn("w-4", !lostAtLeastOne && "w-0")}>
-                        {!isWinner && comparison.winner && "🏆"}
+            <Accordion type="single" collapsible>
+              <div className="py-4">
+                <AccordionItem value="standard" className="border-none w-full">
+                  <AccordionTrigger className="p-0 pr-2 hover:no-underline">
+                    <div className="flex justify-between items-center w-[calc(100%-1.5rem)]">
+                      <span className="text-xs font-semibold w-1/3">
+                        Standard ask
                       </span>
-                    </div>
-                    <div
-                      className={cn(
-                        "text-right text-tertiary font-semibold flex items-center justify-end gap-1",
-                        isWinner && "text-positive",
-                        fontMapper[ui?.customization?.tokenAmountFont || ""]
-                          ?.variable
-                      )}
-                    >
-                      <TokenAmountDecorated
-                        amount={BigInt(Math.round(favorVotes))}
-                        decimals={0}
-                        hideCurrency
-                        specialFormatting
-                      />
-                      <span className={cn("w-4", !wonAtLeastOne && "w-0")}>
-                        {isWinner && "🏆"}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
-
-          <div className="flex justify-between items-center w-full">
-            <div className="bg-white rounded-full border border-line -ml-4 w-8 h-8" />
-            {Array.from({ length: 20 }).map((_, idx) => (
-              <div key={idx} className="bg-line h-0.5 w-1.5" />
-            ))}
-            <div className="bg-white rounded-full border border-line -mr-4 w-8 h-8" />
-          </div>
-
-          <div className="flex flex-col items-start py-3 px-3 gap-1">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-1">
-                <span className="text-xs font-semibold">Total Matches</span>
-                <TooltipProvider delayDuration={300}>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Info className="h-3 w-3 text-secondary" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <div className="max-w-xs font-medium text-xs">
-                        Ranked choice voting (using the Copeland method)
-                        compares every candidate in head-to-head matchups. For
-                        each pair, a candidate earns a point for a win.
-                        Candidates are stack ranked based on number of wins.
-                        Ties are broken using average voting support across
-                        every matchup.
+                      <div className="text-positive font-semibold">
+                        {result.fundingType === "STD2Y" ? (
+                          <span className="flex items-center gap-1 w-20 justify-end">
+                            2Y <Check strokeWidth={4} className="h-3 w-3" />
+                          </span>
+                        ) : result.fundingType === "STD" ? (
+                          <span className="flex items-center gap-1 w-20 justify-end">
+                            1Y <Check strokeWidth={4} className="h-3 w-3" />
+                          </span>
+                        ) : (
+                          <div className="flex items-center gap-1 w-20 justify-end">
+                            <X
+                              strokeWidth={4}
+                              className="h-3 w-3 text-negative"
+                            />
+                          </div>
+                        )}
                       </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                      <span
+                        className={cn(
+                          "text-xs font-semibold w-1/3 text-right",
+                          fontMapper[ui?.customization?.tokenAmountFont || ""]
+                            ?.variable
+                        )}
+                      >
+                        {fundingInfo.std.toLocaleString()}/y
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent parentClassName="overflow-visible">
+                    <OptionRowDetails
+                      result={result}
+                      extendedResult={extendedResult}
+                      isProposalActive={isProposalActive}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="extended" className="border-none w-full">
+                  <AccordionTrigger
+                    className="[&[disabled]>svg]:hidden p-0 pt-3 mt-3 pr-2 border-t border-line hover:no-underline"
+                    disabled={!extendedResult}
+                  >
+                    <div className="flex justify-between items-center w-[calc(100%-1.5rem)]">
+                      <span className="text-xs font-semibold w-1/3">
+                        Extended ask
+                      </span>
+                      <div className="text-positive font-semibold">
+                        {extendedResult?.fundingType === "EXT2Y" ? (
+                          <span className="flex items-center gap-1 w-20 justify-end">
+                            2Y <Check strokeWidth={4} className="h-3 w-3" />
+                          </span>
+                        ) : extendedResult?.fundingType === "EXT1Y" ? (
+                          <span className="flex items-center gap-1 w-20 justify-end">
+                            1Y <Check strokeWidth={4} className="h-3 w-3" />
+                          </span>
+                        ) : fundingInfo.ext ? (
+                          <div className="flex items-center gap-1 w-20 justify-end">
+                            <X
+                              strokeWidth={4}
+                              className="h-3 w-3 text-negative"
+                            />
+                          </div>
+                        ) : null}
+                      </div>
+                      <span
+                        className={cn(
+                          "text-xs font-semibold w-1/3 text-right",
+                          fontMapper[ui?.customization?.tokenAmountFont || ""]
+                            ?.variable
+                        )}
+                      >
+                        {fundingInfo.ext
+                          ? `${fundingInfo.ext.toLocaleString()}/y`
+                          : "N/A"}
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  {extendedResult && (
+                    <AccordionContent
+                      className="pb-0"
+                      parentClassName="overflow-visible"
+                    >
+                      <OptionRowDetails
+                        result={extendedResult}
+                        extendedResult={result}
+                        isProposalActive={isProposalActive}
+                      />
+                    </AccordionContent>
+                  )}
+                </AccordionItem>
               </div>
-            </div>
-            <div className="flex justify-end flex-1 gap-2 w-full">
-              <div className="bg-white border border-line rounded-sm px-2 py-1 font-semibold w-1/3">
-                {isProposalActive ? "~" : null}
-                {result.totalLosses}{" "}
-                {result.totalLosses === 1 ? "Loss" : "Losses"}
-              </div>
-              <div className="bg-white border border-line rounded-sm px-2 py-1 font-semibold w-1/3">
-                {isProposalActive ? "~" : null}
-                {result.totalTies} {result.totalTies === 1 ? "Tie" : "Ties"}
-              </div>
-              <div className="bg-white border border-line rounded-sm px-2 py-1 font-semibold flex items-center text-positive w-1/3">
-                {isProposalActive ? "~" : null}
-                {result.totalWins} {result.totalWins === 1 ? "Win" : "Wins"} 🏆
-              </div>
-            </div>
-          </div>
+            </Accordion>
+          ) : null}
         </AccordionContent>
       </div>
     </AccordionItem>
+  );
+};
+
+const OptionRowDetails = ({
+  result,
+  extendedResult,
+  isProposalActive,
+}: {
+  result: CopelandResult;
+  extendedResult?: CopelandResult;
+  isProposalActive: boolean;
+}) => {
+  const totalVotes = result.avgVotingPowerFor + result.avgVotingPowerAgainst;
+  const forPercentage = Math.round(
+    (result.avgVotingPowerFor / totalVotes) * 100
+  );
+  const againstPercentage = 100 - forPercentage;
+
+  return (
+    <>
+      <div className="border-y border-line py-3 px-3 mt-4">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-xs font-semibold">Avg Support votes</span>
+          <span
+            className={cn(
+              "text-xs font-semibold",
+              fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
+            )}
+          >
+            {Math.round(result.avgVotingPowerFor).toLocaleString()}
+          </span>
+        </div>
+        <div className="flex justify-between items-center mb-4 text-xs">
+          <span
+            className={cn(
+              "text-positive font-semibold",
+              fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
+            )}
+          >
+            For-{Math.round(result.avgVotingPowerFor).toLocaleString()}
+          </span>
+          <span
+            className={cn(
+              "text-negative font-semibold",
+              fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
+            )}
+          >
+            Against-
+            {Math.round(result.avgVotingPowerAgainst).toLocaleString()}
+          </span>
+        </div>
+        <div className="h-2 w-full bg-line rounded-full overflow-hidden">
+          <div className="flex h-full">
+            <div
+              className="bg-positive h-full"
+              style={{
+                width: `${forPercentage}%`,
+              }}
+            ></div>
+            <div
+              className="bg-negative h-full"
+              style={{
+                width: `${againstPercentage}%`,
+              }}
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <div className="py-3 px-3">
+        <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="font-semibold text-xs">PROVIDER</div>
+          <div className="font-semibold text-xs text-right">CHALLENGER</div>
+          <div className="font-semibold text-xs text-right">CANDIDATE</div>
+        </div>
+
+        {result.comparisons
+          .filter(
+            (comparison) =>
+              !(
+                (comparison.option1 === result.option &&
+                  comparison.option2 === extendedResult?.option) ||
+                (comparison.option2 === result.option &&
+                  comparison.option1 === extendedResult?.option)
+              )
+          )
+          .map((comparison, idx) => {
+            const isOption1 = comparison.option1 === result.option;
+            const opponentOption = isOption1
+              ? comparison.option2
+              : comparison.option1;
+            const opponentName = opponentOption;
+            const favorVotes = isOption1
+              ? comparison.option1VotingPower
+              : comparison.option2VotingPower;
+            const disfavorVotes = isOption1
+              ? comparison.option2VotingPower
+              : comparison.option1VotingPower;
+            const isWinner =
+              (isOption1 && comparison.winner === comparison.option1) ||
+              (!isOption1 && comparison.winner === comparison.option2);
+            const lostAtLeastOne = result.totalLosses > 0;
+            const wonAtLeastOne = result.totalWins > 0;
+
+            return (
+              <div key={idx} className="grid grid-cols-3 gap-4 py-2">
+                <TooltipProvider delayDuration={300}>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className="font-semibold truncate max-w-[100px] text-left text-xs">
+                        {opponentName}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div>{opponentName}</div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <div
+                  className={cn(
+                    "text-right text-tertiary font-semibold flex items-center justify-end gap-1 text-xs",
+                    !isWinner && "text-positive",
+                    fontMapper[ui?.customization?.tokenAmountFont || ""]
+                      ?.variable
+                  )}
+                >
+                  <TokenAmountDecorated
+                    amount={BigInt(Math.round(disfavorVotes))}
+                    decimals={0}
+                    hideCurrency
+                    specialFormatting
+                  />
+                  <span className={cn("w-4", !lostAtLeastOne && "w-0")}>
+                    {!isWinner && comparison.winner && "🏆"}
+                  </span>
+                </div>
+                <div
+                  className={cn(
+                    "text-right text-tertiary font-semibold flex items-center justify-end gap-1 text-xs",
+                    isWinner && "text-positive",
+                    fontMapper[ui?.customization?.tokenAmountFont || ""]
+                      ?.variable
+                  )}
+                >
+                  <TokenAmountDecorated
+                    amount={BigInt(Math.round(favorVotes))}
+                    decimals={0}
+                    hideCurrency
+                    specialFormatting
+                  />
+                  <span className={cn("w-4", !wonAtLeastOne && "w-0")}>
+                    {isWinner && "🏆"}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+      </div>
+
+      <div className="flex justify-between items-center w-full">
+        <div className="bg-white rounded-full border border-line -ml-4 w-8 h-8" />
+        {Array.from({ length: 20 }).map((_, idx) => (
+          <div key={idx} className="bg-line h-0.5 w-1.5" />
+        ))}
+        <div className="bg-white rounded-full border border-line -mr-4 w-8 h-8" />
+      </div>
+
+      <div className="flex flex-col items-start py-3 px-3 gap-1">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-1">
+            <span className="text-xs font-semibold">Total Matches</span>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info className="h-3 w-3 text-secondary" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="max-w-xs font-medium text-xs">
+                    Ranked choice voting (using the Copeland method) compares
+                    every candidate in head-to-head matchups. For each pair, a
+                    candidate earns a point for a win. Candidates are stack
+                    ranked based on number of wins. Ties are broken using
+                    average voting support across every matchup.
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
+        <div className="flex justify-end flex-1 gap-2 w-full">
+          <div className="bg-white border border-line rounded-sm px-2 py-1 font-semibold w-1/3 text-xs">
+            {isProposalActive ? "~" : null}
+            {result.totalLosses} {result.totalLosses === 1 ? "Loss" : "Losses"}
+          </div>
+          <div className="bg-white border border-line rounded-sm px-2 py-1 font-semibold w-1/3 text-xs">
+            {isProposalActive ? "~" : null}
+            {result.totalTies} {result.totalTies === 1 ? "Tie" : "Ties"}
+          </div>
+          <div className="bg-white border border-line rounded-sm px-2 py-1 font-semibold flex items-center text-positive w-1/3 text-xs">
+            {isProposalActive ? "~" : null}
+            {result.totalWins} {result.totalWins === 1 ? "Win" : "Wins"} 🏆
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
