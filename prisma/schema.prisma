@@ -13,18 +13,18 @@ datasource db {
 model DelegateStatements {
   address                  String
   dao_slug                 DaoSlug
-  stage                    StageStatus @default(PUBLISHED)
+  stage                    StageStatus @default(published)
   signature                String
   payload                  Json
   twitter                  String?
   discord                  String?
   email                    String?
+  message_hash             String?
   createdAt                DateTime?   @default(now()) @map("created_at") @db.Date
   updatedAt                DateTime?   @default(now()) @map("updated_at") @db.Date
   warpcast                 String?
   endorsed                 Boolean     @default(false)
   scw_address              String?
-  message_hash             String?     @db.Text
   notification_preferences Json?
 
   @@id([address, dao_slug, stage])
@@ -34,8 +34,8 @@ model DelegateStatements {
 }
 
 enum StageStatus {
-  DRAFT
-  PUBLISHED
+  draft
+  published
 
   @@schema("agora")
 }
