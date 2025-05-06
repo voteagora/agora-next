@@ -19,6 +19,7 @@ export async function POST(
   const { DistributionStrategy } = await import(
     "@/app/api/common/ballots/ballotDistributionStrategy"
   );
+  const { getCategoryScope } = await import("@/app/lib/auth/serverAuth");
 
   const distributionMethodValidator = z.enum(
     Object.values(DistributionStrategy) as [string, ...string[]]
