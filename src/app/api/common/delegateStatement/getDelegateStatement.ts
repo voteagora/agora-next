@@ -26,8 +26,49 @@ async function getDelegateStatementForAddress({
   const { slug } = Tenant.current();
 
   return prismaWeb2Client.delegateStatements
-    .findFirst({ where: { address: address.toLowerCase(), dao_slug: slug } })
+    .findFirst({
+      where: {
+        address: address.toLowerCase(),
+        dao_slug: slug,
+        stage: "published",
+      },
+    })
     .catch((error) => console.error(error));
 }
 
 export const fetchDelegateStatement = cache(getDelegateStatement);
+
+// This section will handle fetching multiple delegates as drafts become permissible.
+// The above will remain for now to maintain reverse compatibility, but may be depricated in the future.
+
+export const getDelegateStatements = (addressOrENSName: string) => {
+  return doInSpan(
+    {
+      name: "getDelegateStatements",
+    },
+    () => getDelegateStatementForAddress({ address: addressOrENSName })
+  );
+};
+
+/*
+  Gets delegate statements from Postgres
+*/
+async function getDelegateStatementsForAddress({
+  address,
+}: {
+  address: string;
+}) {
+  const { slug } = Tenant.current();
+
+  return prismaWeb2Client.delegateStatements
+    .findMany({
+      where: {
+        address: address.toLowerCase(),
+        dao_slug: slug,
+        stage: "published",
+      },
+    })
+    .catch((error) => console.error(error));
+}
+
+export const fetchDelegateStatements = cache(getDelegateStatements);
