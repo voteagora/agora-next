@@ -52,7 +52,6 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-RUN apt-get update && apt-get install -y openssl
 RUN corepack enable && corepack prepare yarn@stable --activate && \
     groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 nextjs
