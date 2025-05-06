@@ -59,6 +59,7 @@ export type DaoNodeVote = {
   support: number;
   weight: number;
   reason: string;
+  params?: number[];
 };
 
 export type DelegatesSort =

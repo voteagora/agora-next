@@ -8,7 +8,12 @@ import {
   getTitleFromProposalDescription,
   parseProposalData,
 } from "@/lib/proposalUtils";
-import { parseSnapshotVote, parseSupport, parseVote } from "@/lib/voteUtils";
+import {
+  parseParams,
+  parseSnapshotVote,
+  parseSupport,
+  parseVote,
+} from "@/lib/voteUtils";
 import { cache } from "react";
 import {
   SnapshotVote,
@@ -420,6 +425,10 @@ async function getVotesForProposal({
             throw new Error("Proposal not found");
           }
           const parsedProposal = adaptDAONodeResponse(proposal);
+          const proposalData = parseProposalData(
+            JSON.stringify(parsedProposal.proposal_data || {}),
+            parsedProposal.proposal_type
+          );
           const latestBlock = await latestBlockPromise;
           const votes = proposal.voting_record
             ?.map((vote) => {
@@ -432,12 +441,14 @@ async function getVotesForProposal({
                   parsedProposal.proposal_type,
                   String(proposal.start_block)
                 ),
-                weight: vote.votes.toString(),
+                weight: vote.weight.toLocaleString("fullwide", {
+                  useGrouping: false,
+                }),
                 reason: vote.reason,
-                params: [],
-                proposalValue:
-                  getProposalTotalValue(parsedProposal.proposal_data) ??
-                  BigInt(0),
+                params: vote.params
+                  ? parseParams(JSON.stringify(vote.params), proposalData)
+                  : [],
+                proposalValue: getProposalTotalValue(proposalData) ?? BigInt(0),
                 proposalTitle: getTitleFromProposalDescription(
                   proposal.description
                 ),
@@ -623,6 +634,10 @@ async function getUserVotesForProposal({
           throw new Error("Proposal not found");
         }
         const parsedProposal = adaptDAONodeResponse(proposal);
+        const proposalData = parseProposalData(
+          JSON.stringify(parsedProposal.proposal_data || {}),
+          parsedProposal.proposal_type
+        );
         const votes = proposal.voting_record
           ?.filter((vote) => vote.voter === address.toLowerCase())
           .map((vote) => {
@@ -635,12 +650,14 @@ async function getUserVotesForProposal({
                 parsedProposal.proposal_type,
                 String(proposal.start_block)
               ),
-              weight: vote.votes.toString(),
+              weight: vote.weight.toLocaleString("fullwide", {
+                useGrouping: false,
+              }),
               reason: vote.reason,
-              params: [],
-              proposalValue:
-                getProposalTotalValue(parsedProposal.proposal_data) ??
-                BigInt(0),
+              params: vote.params
+                ? parseParams(JSON.stringify(vote.params), proposalData)
+                : [],
+              proposalValue: getProposalTotalValue(proposalData) ?? BigInt(0),
               proposalTitle: getTitleFromProposalDescription(
                 proposal.description
               ),

@@ -22,7 +22,9 @@ export async function getVotesChart({
         return {
           voter: vote.voter,
           support: String(vote.support),
-          weight: vote.votes.toString(),
+          weight: vote.weight.toLocaleString("fullwide", {
+            useGrouping: false,
+          }),
           block_number: String(vote.block_number),
         };
       });

@@ -316,12 +316,12 @@ If you meet the proposal threshold or are the manager of the governor, then you 
       enabled: false,
     },
     {
-      name: "dao-node/votes-chart", // No approval vote support yet
-      enabled: false,
+      name: "dao-node/votes-chart",
+      enabled: true,
     },
     {
       name: "dao-node/proposal-votes",
-      enabled: false,
+      enabled: true,
     },
   ],
 });

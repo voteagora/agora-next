@@ -328,12 +328,12 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
       enabled: false,
     },
     {
-      name: "dao-node/votes-chart", // No approval vote support yet
-      enabled: false,
+      name: "dao-node/votes-chart",
+      enabled: true,
     },
     {
       name: "dao-node/proposal-votes",
-      enabled: false,
+      enabled: true,
     },
   ],
 });
