@@ -14,7 +14,7 @@ export function MobileConnectButton() {
               <MobileProfileDropDown ensName={ensName} />
             ) : (
               <div onClick={show}>
-                <WalletIcon />
+                <WalletIcon className="stroke-primary" />
               </div>
             )}
           </div>

@@ -78,6 +78,7 @@ export default function DAOMetricsHeader() {
                       href={discordLink.url}
                       rel="noreferrer nonopener"
                       target="_blank"
+                      className="min-w-[24px]"
                     >
                       <Image src={discord} alt={discordLink.title} />
                     </a>
