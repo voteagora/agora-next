@@ -1,7 +1,5 @@
-import { fetchImpactMetricCommentVotes } from "@/app/api/common/comments/getImpactMetricCommentVotes";
-import { updateImpactMetricCommentVote } from "@/app/api/common/comments/updateImpactMetricCommentVote";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
+
+
 import { NextRequest, NextResponse } from "next/server";
 import { createOptionalNumberValidator } from "@/app/api/common/utils/validators";
 
@@ -13,6 +11,11 @@ export async function GET(
     params: { roundId: string; impactMetricId: string; commentId: string };
   }
 ) {
+
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+  const { fetchImpactMetricCommentVotes } = await import("@/app/api/common/comments/getImpactMetricCommentVotes");
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
@@ -40,6 +43,11 @@ export async function PUT(
     params: { roundId: string; impactMetricId: string; commentId: string };
   }
 ) {
+
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+  const { updateImpactMetricCommentVote } = await import("@/app/api/common/comments/updateImpactMetricCommentVote");
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
