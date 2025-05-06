@@ -1,13 +1,4 @@
-import { updateBallotOsMultiplier } from "@/app/api/common/ballots/updateBallot";
-import { createOptionalFloatNumberValidator } from "@/app/api/common/utils/validators";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import {
-  authenticateApiUser,
-  validateAddressScope,
-} from "@/app/lib/auth/serverAuth";
 import { NextRequest, NextResponse } from "next/server";
-
-const multiplierValidator = createOptionalFloatNumberValidator(1, 5, 1);
 
 export async function POST(
   request: NextRequest,
@@ -19,7 +10,19 @@ export async function POST(
     };
   }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { validateAddressScope } = await import("@/app/lib/auth/serverAuth");
+  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+  const { updateBallotOsMultiplier } = await import(
+    "@/app/api/common/ballots/updateBallot"
+  );
+  const { createOptionalFloatNumberValidator } = await import(
+    "@/app/api/common/utils/validators"
+  );
+
   const authResponse = await authenticateApiUser(request);
+
+  const multiplierValidator = createOptionalFloatNumberValidator(1, 5, 1);
 
   if (!authResponse.authenticated) {
     return new Response(authResponse.failReason, { status: 401 });

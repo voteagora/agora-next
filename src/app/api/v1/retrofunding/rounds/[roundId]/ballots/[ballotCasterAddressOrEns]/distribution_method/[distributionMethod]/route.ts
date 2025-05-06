@@ -1,18 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import {
-  authenticateApiUser,
-  getCategoryScope,
-} from "@/app/lib/auth/serverAuth";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import {
-  applyDistributionStrategy,
-  DistributionStrategy,
-} from "@/app/api/common/ballots/ballotDistributionStrategy";
 import { z } from "zod";
-
-const distributionMethodValidator = z.enum(
-  Object.values(DistributionStrategy) as [string, ...string[]]
-);
 
 export async function POST(
   request: NextRequest,
@@ -24,6 +11,19 @@ export async function POST(
     };
   }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+  const { applyDistributionStrategy } = await import(
+    "@/app/api/common/ballots/ballotDistributionStrategy"
+  );
+  const { DistributionStrategy } = await import(
+    "@/app/api/common/ballots/ballotDistributionStrategy"
+  );
+
+  const distributionMethodValidator = z.enum(
+    Object.values(DistributionStrategy) as [string, ...string[]]
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

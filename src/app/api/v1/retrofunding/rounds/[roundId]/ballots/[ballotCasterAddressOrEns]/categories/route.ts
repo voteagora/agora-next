@@ -1,12 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import {
-  authenticateApiUser,
-  getCategoryScope,
-  validateAddressScope,
-} from "@/app/lib/auth/serverAuth";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { z } from "zod";
-import { updateBallotCategory } from "@/app/api/common/ballots/updateBallotCategories";
 
 const ballotPayloadSchema = z.object({
   category_slug: z.string(),
@@ -18,6 +11,13 @@ export async function POST(
   request: NextRequest,
   route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { validateAddressScope } = await import("@/app/lib/auth/serverAuth");
+  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+  const { updateBallotCategory } = await import(
+    "@/app/api/common/ballots/updateBallotCategories"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
