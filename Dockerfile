@@ -41,6 +41,9 @@ ENV NEXT_PUBLIC_FORK_NODE_URL=$NEXT_PUBLIC_FORK_NODE_URL
 ENV NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=$NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
 ENV NEXT_PUBLIC_AGORA_INSTANCE_NAME=$NEXT_PUBLIC_AGORA_INSTANCE_NAME
 
+# this line is uncomments the export const dynamic = 'force-dynamic'; for e2e tests, sprinkled throughout the app
+RUN find . -type f -name "*.ts" -o -name "*.tsx" | xargs sed -i '/\/\/ export const dynamic = .*/s/^...//'
+
 # Build
 RUN npx prisma generate
 RUN yarn generate-typechain

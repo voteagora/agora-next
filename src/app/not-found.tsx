@@ -1,6 +1,6 @@
-import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
 
-export const dynamic = 'force-dynamic'
+import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 
 export default function NotFound() {
   return <ResourceNotFound />;

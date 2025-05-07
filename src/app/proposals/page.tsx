@@ -1,6 +1,6 @@
-import ProposalsHome from "@/components/Proposals/ProposalsHome";
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
 
-export const dynamic = 'force-dynamic'
+import ProposalsHome from "@/components/Proposals/ProposalsHome";
 
 export const revalidate = 60;
 

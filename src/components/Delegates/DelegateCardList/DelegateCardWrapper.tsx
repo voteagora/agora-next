@@ -1,5 +1,3 @@
-// import { fetchCitizens as apiFetchCitizens } from "@/app/api/common/citizens/getCitizens";
-// import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/getDelegates";
 import { TabsContent } from "@/components/ui/tabs";
 import DelegateContent from "./DelegateContent";
 import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";

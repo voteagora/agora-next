@@ -1,3 +1,4 @@
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
 
 import {
   fetchProposal,
@@ -15,7 +16,6 @@ import { calculateVoteMetadata } from "@/lib/voteUtils";
 import { format } from "date-fns";
 import React from "react";
 
-export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 // Share my vote metadata

@@ -1,3 +1,5 @@
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
+
 import Tenant from "@/lib/tenant/tenant";
 import DraftProposalForm from "../components/DraftProposalForm";
 import BackButton from "../components/BackButton";
@@ -15,7 +17,6 @@ import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 import { PLMConfig } from "@/app/proposals/draft/types";
 
 export const maxDuration = 60;
-export const dynamic = "force-dynamic";
 
 export default async function DraftProposalPage({
   params,

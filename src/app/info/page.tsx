@@ -1,3 +1,5 @@
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
+
 import React from "react";
 import InfoAbout from "@/app/info/components/InfoAbout";
 import { InfoHero } from "@/app/info/components/InfoHero";
@@ -12,8 +14,6 @@ import { apiFetchDelegateWeights } from "@/app/api/analytics/top/delegates/getTo
 import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/getProposalVoteCounts";
 import { apiFetchMetricTS } from "@/app/api/analytics/metric/[metric_id]/[frequency]/getMetricsTS";
 import Hero from "@/components/Hero/Hero";
-
-export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({}) {
   const tenant = Tenant.current();

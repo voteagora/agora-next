@@ -1,7 +1,7 @@
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
+
 import Tenant from "@/lib/tenant/tenant";
 import ProposalsHome from "@/components/Proposals/ProposalsHome";
-
-export const dynamic = 'force-dynamic'
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;

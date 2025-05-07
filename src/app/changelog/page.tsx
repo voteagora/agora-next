@@ -1,5 +1,4 @@
-
-export const dynamic = 'force-dynamic'
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
 
 import { fetchChangelogForDAO } from "@/app/api/common/changelogs/getChangelogs";
 import ChangelogList from "@/components/Changelog/ChangelogList";

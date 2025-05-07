@@ -1,9 +1,10 @@
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
+
 import AdminForm from "@/components/Admin/AdminForm";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { fetchProposalTypes } from "@/app/admin/actions";
 import Tenant from "@/lib/tenant/tenant";
 
-export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 async function fetchVotableSupply() {

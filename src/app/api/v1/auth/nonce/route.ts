@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export const dynamic = "force-dynamic";
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
 
 export async function GET() {
   const { generateNonce } = await import("siwe");

@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
 
 import CurrentDelegateStatement from "@/components/DelegateStatement/CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
