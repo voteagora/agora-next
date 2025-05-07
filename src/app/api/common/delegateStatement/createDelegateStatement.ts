@@ -7,6 +7,9 @@ import Tenant from "@/lib/tenant/tenant";
 import { Prisma } from "@prisma/client";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
 import { createHash } from "crypto";
+import { stageStatus } from "@/app/lib/sharedEnums";
+
+const { slug } = Tenant.current();
 
 export async function createDelegateStatement({
   address,
@@ -14,16 +17,18 @@ export async function createDelegateStatement({
   signature,
   message,
   scwAddress,
+  // used if wallet is multisig
+  stage,
 }: {
   address: `0x${string}`;
   delegateStatement: DelegateStatementFormValues;
   signature: `0x${string}`;
   message: string;
   scwAddress?: string;
+  stage?: stageStatus;
 }) {
   const { twitter, warpcast, discord, email, notificationPreferences } =
     delegateStatement;
-  const { slug } = Tenant.current();
 
   const valid = await verifyMessage({
     address,
@@ -44,6 +49,8 @@ export async function createDelegateStatement({
     delegateStatement: sanitizeContent(delegateStatement.delegateStatement),
   };
 
+  stage = stage ?? stageStatus.PUBLISHED;
+
   const data = {
     address: address.toLowerCase(),
     dao_slug: slug,
@@ -59,18 +66,39 @@ export async function createDelegateStatement({
       ...notificationPreferences,
       last_updated: new Date().toISOString(),
     },
+    stage,
   };
 
-  return prismaWeb2Client.delegateStatements.upsert({
-    where: {
-      address_dao_slug_message_hash: {
-        address: address.toLowerCase(),
-        dao_slug: slug,
-        message_hash: messageHash,
-        stage: stage,
-      },
-    },
-    update: data,
-    create: data,
-  });
+  return prismaWeb2Client.delegateStatements.create({ data });
 }
+
+/** This function is used to update an existing draft statement.
+ * This function is likely to transition a multisig delegate statement from 'draft' to 'published'.
+ * @param ${address} address - The address of the delegate
+ * @param ${daoSlug} daoSlug - slug of DAO site
+ * */
+const publishDelegateStatementDraft = ({
+  address,
+}: {
+  address: string;
+  daoSlug: string;
+}) => {
+  try {
+    return prismaWeb2Client.delegateStatements.update({
+      where: {
+        address_dao_slug_stage: {
+          address: address.toLowerCase(),
+          dao_slug: slug,
+          stage: stageStatus.DRAFT, // Ensures we're only updating drafts
+        },
+      },
+      data: {
+        stage: stageStatus.PUBLISHED, // Transition to published
+      },
+    });
+  } catch (error) {
+    // Graceful error handling
+    console.error("Error updating draft to published:", error);
+    throw new Error("Could not publish the delegate statement draft.");
+  }
+};
