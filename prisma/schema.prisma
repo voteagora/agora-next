@@ -13,7 +13,7 @@ datasource db {
 model DelegateStatements {
   address                  String
   dao_slug                 DaoSlug
-  stage                    StageStatus @default(published)
+  stage                    stageStatus @default(published)
   signature                String
   payload                  Json
   twitter                  String?
@@ -33,7 +33,7 @@ model DelegateStatements {
   @@schema("agora")
 }
 
-enum StageStatus {
+enum stageStatus {
   draft
   published
 
