@@ -81,23 +81,18 @@ export const getDelegatesFromDaoNode = async (options?: {
 
     // Apply pagination in memory before processing delegate statements
     if (data && data.delegates) {
-      // Apply offset and limit to the data
       const paginatedDelegates = data.delegates.slice(
         offset,
         limit ? offset + limit : undefined
       );
-
-      // Replace the original delegates array with the paginated one
       data.delegates = paginatedDelegates;
     }
 
-    // If we have delegates data, fetch statements for the delegates
     if (data && data.delegates && data.delegates.length > 0) {
       const delegateAddresses = data.delegates.map((delegate) =>
         delegate.addr.toLowerCase()
       );
 
-      // Fetch statements for delegates using the fetchDelegateStatement function
       const statements = await Promise.all(
         delegateAddresses.map(async (address) => {
           try {
@@ -113,7 +108,6 @@ export const getDelegatesFromDaoNode = async (options?: {
         })
       );
 
-      // Filter out null values and create a map of address to statement
       const statementMap = new Map();
       statements.filter(Boolean).forEach((item) => {
         statementMap.set(item.address, item.statement);
