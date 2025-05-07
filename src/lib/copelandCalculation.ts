@@ -9,14 +9,11 @@
  */
 
 import { SnapshotVote } from "@/app/api/common/votes/vote";
-import Tenant from "./tenant/tenant";
-
-const { isProd } = Tenant.current();
 
 // Constants
 const NONE_BELOW = "none below";
-const EXTENDED_SUFFIX = isProd ? "(Ext)" : " - ext";
-const SEPARATOR = isProd ? "(" : "-";
+const EXTENDED_SUFFIX = " - Ext";
+const SEPARATOR = "-";
 
 // Rank values
 const RANK_UNRANKED = -1;
