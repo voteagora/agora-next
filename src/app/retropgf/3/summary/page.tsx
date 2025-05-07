@@ -1,3 +1,6 @@
+
+export const dynamic = 'force-dynamic'
+
 import { HStack, VStack } from "@/components/Layout/Stack";
 import badge from "@/icons/badge.svg";
 import sunny from "@/icons/sunny.svg";

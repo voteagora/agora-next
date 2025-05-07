@@ -1,3 +1,6 @@
+
+export const dynamic = 'force-dynamic'
+
 import { NextRequest } from "next/server";
 import Tenant from "@/lib/tenant/tenant";
 import yaml from "yaml";

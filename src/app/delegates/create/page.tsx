@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import CurrentDelegateStatement from "@/components/DelegateStatement/CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 

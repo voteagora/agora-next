@@ -2,6 +2,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import { fetchAllForVoting } from "@/app/api/votes/getVotes";
 
 export async function GET(request: NextRequest) {
+
+  const { fetchAllForVoting } = await import("@/app/api/votes/getVotes");
+
   const params = request.nextUrl.searchParams;
   const address = params.get("address");
   const blockNumber = params.get("blockNumber");

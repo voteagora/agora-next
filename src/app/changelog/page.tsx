@@ -1,6 +1,10 @@
+
+export const dynamic = 'force-dynamic'
+
 import { fetchChangelogForDAO } from "@/app/api/common/changelogs/getChangelogs";
 import ChangelogList from "@/components/Changelog/ChangelogList";
 import Tenant from "@/lib/tenant/tenant";
+
 
 export async function generateMetadata() {
   const { brandName } = Tenant.current();
