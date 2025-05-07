@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { fetchAllForVoting } from "@/app/api/votes/getVotes";
 
 export async function GET(request: NextRequest) {
 
