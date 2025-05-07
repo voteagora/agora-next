@@ -49,6 +49,7 @@ export async function createDelegateStatement({
     delegateStatement: sanitizeContent(delegateStatement.delegateStatement),
   };
 
+  // Default stage to published
   stage = stage ?? stageStatus.PUBLISHED;
 
   const data = {
@@ -69,6 +70,22 @@ export async function createDelegateStatement({
     stage,
   };
 
+  // Only update a draft proposal (can only be one)
+  if (stage === stageStatus.DRAFT) {
+    return prismaWeb2Client.delegateStatements.upsert({
+      where: {
+        address_dao_slug_stage: {
+          address: address.toLowerCase(),
+          dao_slug: slug,
+          stage: stage,
+        },
+      },
+      update: data,
+      create: data,
+    });
+  }
+
+  // Otherwise create a new published proposal
   return prismaWeb2Client.delegateStatements.create({ data });
 }
 
