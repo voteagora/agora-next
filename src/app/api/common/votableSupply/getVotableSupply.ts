@@ -2,11 +2,20 @@ import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
 import { findVotableSupply } from "@/lib/prismaUtils";
 import { unstable_cache } from "next/cache";
+import { getVotableSupplyFromDaoNode } from "@/app/lib/dao-node/client";
 
 async function getVotableSupply() {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
   const address = contracts.token.address;
+
+  const useDaoNode =
+    ui.toggle("use-daonode-for-votable-supply")?.enabled ?? false;
+
   try {
+    if (useDaoNode) {
+      return await getVotableSupplyFromDaoNode();
+    }
+
     const votableSupply = await findVotableSupply({ namespace, address });
     return votableSupply?.votable_supply || "0";
   } catch (error) {

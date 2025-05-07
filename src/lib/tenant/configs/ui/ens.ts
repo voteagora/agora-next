@@ -284,5 +284,13 @@ For a full walkthrough of the proposal process, check out the [ENS DAO docs](htt
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
       },
     },
+    {
+      name: "use-daonode-for-proposals",
+      enabled: true,
+    },
+    {
+      name: "use-daonode-for-votable-supply",
+      enabled: true,
+    },
   ],
 });
