@@ -17,7 +17,7 @@ export const getDelegateStatement = (
     () =>
       getDelegateStatementForAddress({
         address: addressOrENSName,
-        stage: stageStatus,
+        stage: stage,
       })
   );
 };
