@@ -1,15 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { z } from "zod";
-import { voteBySignatureApi } from "./castVote";
-
-const voteRequestSchema = z.object({
-  signature: z.string().regex(/^0x[a-fA-F0-9]+$/),
-  proposalId: z.string(),
-  support: z.number(),
-});
 
 export async function POST(request: NextRequest) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { z } = await import("zod");
+  const { voteBySignatureApi } = await import("./castVote");
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
@@ -18,6 +13,12 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
+
+    const voteRequestSchema = z.object({
+      signature: z.string().regex(/^0x[a-fA-F0-9]+$/),
+      proposalId: z.string(),
+      support: z.number(),
+    });
 
     const parsedBody = voteRequestSchema.parse(body);
 

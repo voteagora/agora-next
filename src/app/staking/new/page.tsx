@@ -1,4 +1,4 @@
-"use server";
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
 
 import React from "react";
 import { NewStakeFlow } from "@/app/staking/new/components/NewStakeFlow";

@@ -1,8 +1,11 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/getProposalVoteCounts";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { apiFetchProposalVoteCounts } = await import(
+    "@/app/api/analytics/vote/getProposalVoteCounts"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

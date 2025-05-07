@@ -1,27 +1,9 @@
-# ---------- Stage 1: base with deps ----------
-FROM node:22-bullseye-slim AS deps
-
-WORKDIR /app
-
-# Install OS deps only if really needed (prisma builds, etc.)
-RUN apt-get update && apt-get install -y \
-    openssl \
-    python3 \
-    build-essential \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy only what's needed to install deps
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
-
-# ---------- Stage 2: builder ----------
-FROM node:22-bullseye-slim AS builder
+FROM app-base AS builder
 
 WORKDIR /app
 
 # Reuse deps layer for faster rebuilds
-COPY --from=deps /app/node_modules ./node_modules
+# COPY /app/node_modules ./node_modules
 COPY . .
 
 # Set environment at build time
@@ -40,9 +22,6 @@ ENV DAONODE_URL_TEMPLATE=$DAONODE_URL_TEMPLATE
 ENV NEXT_PUBLIC_FORK_NODE_URL=$NEXT_PUBLIC_FORK_NODE_URL
 ENV NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=$NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
 ENV NEXT_PUBLIC_AGORA_INSTANCE_NAME=$NEXT_PUBLIC_AGORA_INSTANCE_NAME
-
-# this line is uncomments the export const dynamic = 'force-dynamic'; for e2e tests, sprinkled throughout the app
-RUN find src/app src/pages -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i '/\/\/ export const dynamic = .*/s/^...//' {} +
 
 # Build
 RUN npx prisma generate

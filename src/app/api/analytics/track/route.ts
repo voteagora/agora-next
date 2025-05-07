@@ -1,9 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { prismaWeb2Client } from "@/app/lib/prisma";
-import Tenant from "@/lib/tenant/tenant";
 
 export async function POST(request: NextRequest) {
+  const { default: Tenant } = await import("@/lib/tenant/tenant");
+  const { prismaWeb2Client } = await import("@/app/lib/prisma");
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+
   const { slug } = Tenant.current();
   const authResponse = await authenticateApiUser(request);
 

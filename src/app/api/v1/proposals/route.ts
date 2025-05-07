@@ -1,34 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  createOptionalNumberValidator,
-  createOptionalStringValidator,
-} from "../../common/utils/validators";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { traceWithUserId } from "../apiUtils";
-import { ZodError } from "zod";
-import { fetchProposals } from "../../common/proposals/getProposals";
 
 const DEFAULT_FILTER = "relevant";
 const DEFAULT_MAX_LIMIT = 50;
 const DEFAULT_LIMIT = 10;
 const DEFAULT_OFFSET = 0;
 
-const filterValidator = createOptionalStringValidator(
-  ["relevant", "everything"],
-  DEFAULT_FILTER
-);
-const limitValidator = createOptionalNumberValidator(
-  1,
-  DEFAULT_MAX_LIMIT,
-  DEFAULT_LIMIT
-);
-const offsetValidator = createOptionalNumberValidator(
-  0,
-  Number.MAX_SAFE_INTEGER,
-  DEFAULT_OFFSET
-);
-
 export async function GET(request: NextRequest) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { traceWithUserId } = await import("../apiUtils");
+  const { ZodError } = await import("zod");
+  const { fetchProposals } = await import(
+    "../../common/proposals/getProposals"
+  );
+  const { createOptionalNumberValidator, createOptionalStringValidator } =
+    await import("../../common/utils/validators");
+
+  const filterValidator = createOptionalStringValidator(
+    ["relevant", "everything"],
+    DEFAULT_FILTER
+  );
+  const limitValidator = createOptionalNumberValidator(
+    1,
+    DEFAULT_MAX_LIMIT,
+    DEFAULT_LIMIT
+  );
+  const offsetValidator = createOptionalNumberValidator(
+    0,
+    Number.MAX_SAFE_INTEGER,
+    DEFAULT_OFFSET
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

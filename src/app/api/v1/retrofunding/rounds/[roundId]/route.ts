@@ -1,13 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
-
-import { fetchRetroFundingRound } from "@/app/api/common/rounds/getRetroFundingRounds";
-
 export async function GET(
   request: NextRequest,
   route: { params: { roundId: string } }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+  const { fetchRetroFundingRound } = await import(
+    "@/app/api/common/rounds/getRetroFundingRounds"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

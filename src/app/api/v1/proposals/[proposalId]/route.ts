@@ -1,12 +1,15 @@
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { NextRequest, NextResponse } from "next/server";
-import { traceWithUserId } from "../../apiUtils";
-import { fetchProposal } from "../../../common/proposals/getProposals";
 
 export async function GET(
   request: NextRequest,
   route: { params: { proposalId: string } }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { traceWithUserId } = await import("../../apiUtils");
+  const { fetchProposal } = await import(
+    "../../../common/proposals/getProposals"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

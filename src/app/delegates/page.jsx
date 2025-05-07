@@ -5,9 +5,10 @@ import DelegateCardWrapper, {
 } from "@/components/Delegates/DelegateCardList/DelegateCardWrapper";
 import Hero from "@/components/Hero/Hero";
 
-export const dynamic = "auto"; //nuqs does not consider params changes for filters otherwise
+export const dynamic = "force-dynamic"; //nuqs does not consider params changes for filters otherwise
 
 export async function generateMetadata({}, parent) {
+
   const { ui } = Tenant.current();
   const page = ui.page("delegates");
   const { title, description, imageTitle, imageDescription } = page.meta;
