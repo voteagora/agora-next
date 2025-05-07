@@ -1,7 +1,7 @@
 import CurrentDelegateStatement from "@/components/DelegateStatement/CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 
-// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
+export const dynamic = 'force-dynamic'; // needed for app and e2e
 export const revalidate = 0;
 
 export async function generateMetadata({}) {

@@ -25,7 +25,7 @@ import VotesContainerWrapper, {
   VotesContainerSkeleton,
 } from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
 
-// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
+export const dynamic = 'force-dynamic'; // needed for both app and e2e
 export const revalidate = 0;
 
 export async function generateMetadata(

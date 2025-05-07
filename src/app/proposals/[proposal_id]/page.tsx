@@ -1,4 +1,4 @@
-// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
+export const dynamic = 'force-dynamic'; // needed for app and e2e
 
 import {
   fetchProposal,
