@@ -1,9 +1,11 @@
 export const dynamic = 'force-dynamic';
 
 import { NextResponse, type NextRequest } from "next/server";
-import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 
 export async function GET(request: NextRequest) {
+
+  const { fetchVotableSupply } = await import("@/app/api/common/votableSupply/getVotableSupply");
+
   try {
     const votable_supply = await fetchVotableSupply();
     return NextResponse.json({ votable_supply });

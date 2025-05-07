@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
+import type { DistributionStrategy as DistStrat } from "@/app/api/common/ballots/ballotDistributionStrategy";
+
 export async function POST(
   request: NextRequest,
   route: {
@@ -50,7 +52,7 @@ export async function POST(
       const ballot = await applyDistributionStrategy(
         distributionMethodValidator.parse(
           distributionMethod
-        ) as DistributionStrategy,
+        ) as DistStrat,
         Number(roundId),
         categoryScope,
         ballotCasterAddressOrEns

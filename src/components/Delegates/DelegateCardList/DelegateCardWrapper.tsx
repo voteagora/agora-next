@@ -1,5 +1,5 @@
-import { fetchCitizens as apiFetchCitizens } from "@/app/api/common/citizens/getCitizens";
-import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/getDelegates";
+// import { fetchCitizens as apiFetchCitizens } from "@/app/api/common/citizens/getCitizens";
+// import { fetchDelegates as apiFetchDelegates } from "@/app/api/common/delegates/getDelegates";
 import { TabsContent } from "@/components/ui/tabs";
 import DelegateContent from "./DelegateContent";
 import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
@@ -17,6 +17,8 @@ async function fetchCitizens(
 ) {
   "use server";
 
+  const { fetchCitizens: apiFetchCitizens } = await import("@/app/api/common/citizens/getCitizens");
+
   return apiFetchCitizens({ pagination, seed, sort });
 }
 
@@ -27,6 +29,9 @@ async function fetchDelegates(
   pagination?: PaginationParams
 ) {
   "use server";
+
+  const { fetchDelegates: apiFetchDelegates } = await import("@/app/api/common/delegates/getDelegates");
+
   return apiFetchDelegates({ pagination, seed, sort: sort || "", filters });
 }
 const DelegateCardWrapper = async ({
@@ -34,6 +39,13 @@ const DelegateCardWrapper = async ({
 }: {
   searchParams: SearchParams;
 }) => {
+
+
+  const { fetchCitizens: apiFetchCitizens } = await import("@/app/api/common/citizens/getCitizens");
+
+  const { fetchDelegates: apiFetchDelegates } = await import("@/app/api/common/delegates/getDelegates");
+
+
   const parsedParams = loadDelegatesSearchParams(searchParams);
 
   // Get sort values directly from parsed params

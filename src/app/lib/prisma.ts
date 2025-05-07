@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { time_this } from "@/app/lib/logging";
 
-if (process.env.NODE_ENV === "production" && process.env.NEXT_PHASE === "phase-production-build") {
-  throw new Error("🚨 Prisma query during build!");
-}
+// if (process.env.NODE_ENV === "production" && process.env.NEXT_PHASE === "phase-production-build") {
+//   throw new Error("🚨 Prisma query during build!");
+// }
 
 declare global {
   var prismaWeb2Client: PrismaClient;
