@@ -94,12 +94,7 @@ export async function createDelegateStatement({
  * @param ${address} address - The address of the delegate
  * @param ${daoSlug} daoSlug - slug of DAO site
  * */
-const publishDelegateStatementDraft = ({
-  address,
-}: {
-  address: string;
-  daoSlug: string;
-}) => {
+const publishDelegateStatementDraft = ({ address }: { address: string }) => {
   try {
     return prismaWeb2Client.delegateStatements.update({
       where: {
