@@ -181,6 +181,7 @@ async function getDelegates({
           select address
           from agora.delegate_statements
           where dao_slug='${slug}'
+          and status = 'published'
         ),
         filtered_delegates as (
           select d.*
