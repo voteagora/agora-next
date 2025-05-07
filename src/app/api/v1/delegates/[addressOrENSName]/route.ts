@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { addressOrENSName: string } }
+  route: { params: { addressOrENSName: string } }
 ) {
+
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { traceWithUserId } = await import("../../apiUtils");
   const { fetchDelegate } = await import(
@@ -16,13 +17,15 @@ export async function GET(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
-  try {
-    const { addressOrENSName } = params;
-    const delegate = await fetchDelegate(addressOrENSName);
-    return NextResponse.json(delegate);
-  } catch (e: any) {
-    return new Response("Internal server error: " + e.toString(), {
-      status: 500,
-    });
-  }
+  return await traceWithUserId(authResponse.userId as string, async () => {
+    try {
+      const { addressOrENSName } = route.params;
+      const delegate = await fetchDelegate(addressOrENSName);
+      return NextResponse.json(delegate);
+    } catch (e: any) {
+      return new Response("Internal server error: " + e.toString(), {
+        status: 500,
+      });
+    }
+  });
 }
