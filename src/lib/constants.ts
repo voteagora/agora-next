@@ -74,6 +74,18 @@ export const delegatesFilterOptions = {
     sort: "most_delegators",
     value: "Most delegators",
   },
+  mostRecentDelegation: {
+    sort: "most_recent_delegation",
+    value: "Most recently delegated",
+  },
+  oldestDelegation: {
+    sort: "oldest_delegation",
+    value: "Oldest delegation",
+  },
+  latestVotingBlock: {
+    sort: "latest_voting_block",
+    value: "Latest voting block",
+  },
 };
 
 export const citizensFilterOptions = {

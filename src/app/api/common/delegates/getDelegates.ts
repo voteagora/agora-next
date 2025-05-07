@@ -53,24 +53,48 @@ async function getDelegates({
   return withMetrics(
     "getDelegates",
     async () => {
-      // Call the DAO node API to get delegates data
-      const daoNodeDelegates = await getDelegatesFromDaoNode();
+      let daoNodeSortBy: string = "VP"; // Default to voting power
+      let reverse = true;
+
+      // VP = vote power (default)
+      // MRD = most recently delegated
+      // OLD = oldest delegation
+      // DC = delegator count
+      // LVB = latest voting block
+      if (sort === "most_delegators") {
+        daoNodeSortBy = "DC"; // delegator count
+      } else if (sort === "weighted_random" && seed) {
+        // For weighted_random, we'll still sort client-side
+        daoNodeSortBy = "VP"; // default
+      } else if (sort === "least_voting_power") {
+        daoNodeSortBy = "VP";
+        reverse = false;
+      } else if (sort === "most_recent_delegation") {
+        daoNodeSortBy = "MRD";
+      } else if (sort === "oldest_delegation") {
+        daoNodeSortBy = "OLD";
+      } else if (sort === "latest_voting_block") {
+        daoNodeSortBy = "LVB";
+      } else {
+        daoNodeSortBy = "VP";
+      }
+
+      console.log(
+        `Using sort parameter '${sort}', mapped to DAO node sort_by '${daoNodeSortBy}' with reverse=${reverse}`
+      );
+
+      // Call the DAO node API to get delegates data with sort options
+      const daoNodeDelegates = await getDelegatesFromDaoNode({
+        sortBy: daoNodeSortBy,
+        reverse: reverse,
+        limit: pagination.limit,
+        offset: pagination.offset,
+      });
+
       console.log(
         "DAO Node Delegates data fetched:",
         daoNodeDelegates ? "success" : "failed"
       );
-
-      // Print sample delegate structure if available
-      if (
-        daoNodeDelegates &&
-        daoNodeDelegates.delegates &&
-        daoNodeDelegates.delegates.length > 0
-      ) {
-        console.log(
-          "Sample DAO node delegate structure:",
-          JSON.stringify(daoNodeDelegates.delegates[0], null, 2)
-        );
-      }
 
       // If we have valid data from the DAO node, use it instead of database query
       if (
@@ -80,47 +104,18 @@ async function getDelegates({
       ) {
         console.log("Using DAO node data instead of database query");
 
-        // Apply sorting based on the sort parameter
         let sortedDelegates = [...daoNodeDelegates.delegates];
 
-        if (sort === "most_delegators") {
-          sortedDelegates.sort(
-            (a, b) =>
-              parseInt(b.numDelegators || "0") -
-                parseInt(a.numDelegators || "0") || a.addr.localeCompare(b.addr)
-          );
-        } else if (sort === "weighted_random" && seed) {
-          // Simple random sort for now
+        if (sort === "weighted_random" && seed) {
           sortedDelegates.sort(() => Math.random() - 0.5);
-        } else if (sort === "least_voting_power") {
-          sortedDelegates.sort(
-            (a, b) =>
-              parseInt(a.votingPower || "0") - parseInt(b.votingPower || "0") ||
-              a.addr.localeCompare(b.addr)
-          );
-        } else {
-          // Default: most voting power
-          sortedDelegates.sort(
-            (a, b) =>
-              parseInt(b.votingPower || "0") - parseInt(a.votingPower || "0") ||
-              a.addr.localeCompare(b.addr)
-          );
         }
 
-        // Apply pagination
         const paginatedDelegates = sortedDelegates.slice(
           pagination.offset,
           pagination.offset + pagination.limit
         );
 
-        // Transform to expected format
         const transformedDelegates = paginatedDelegates.map((delegate) => {
-          // Log the delegate to see its structure
-          console.log(
-            "Processing delegate:",
-            JSON.stringify(delegate, null, 2)
-          );
-
           // Check if delegate has the expected properties
           if (!delegate || typeof delegate !== "object") {
             console.error("Invalid delegate object:", delegate);
@@ -137,10 +132,8 @@ async function getDelegates({
             };
           }
 
-          // Use safe property access with fallbacks
-          const address = delegate.addr || delegate.address || "unknown";
+          const address = delegate.address;
 
-          // Ensure voting power values are strings
           let totalVp = "0";
           let directVp = "0";
           let advancedVp = "0";
@@ -194,16 +187,6 @@ async function getDelegates({
             }
           }
 
-          // Log the voting power values for debugging
-          console.log("Voting power values:", {
-            totalVp,
-            directVp,
-            advancedVp,
-            originalTotal: delegate.votingPower || delegate.voting_power,
-            originalDirect: delegate.directVp || delegate.direct_vp,
-            originalAdvanced: delegate.advancedVp || delegate.advanced_vp,
-          });
-
           return {
             address:
               typeof address === "string"
@@ -221,14 +204,6 @@ async function getDelegates({
             ),
           };
         });
-
-        // Log a complete transformed delegate for debugging
-        if (transformedDelegates.length > 0) {
-          console.log(
-            "Sample transformed delegate:",
-            JSON.stringify(transformedDelegates[0], null, 2)
-          );
-        }
 
         return {
           meta: {

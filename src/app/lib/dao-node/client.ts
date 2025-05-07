@@ -22,30 +22,82 @@ export const getProposalTypesFromDaoNode = async () => {
   return data;
 };
 
-export const getDelegatesFromDaoNode = async () => {
+export const getDelegatesFromDaoNode = async (options?: {
+  sortBy?: string;
+  reverse?: boolean;
+  limit?: number;
+  offset?: number;
+}) => {
   const url = getDaoNodeURLForNamespace(namespace);
-  console.log(url);
   if (!url) {
     return null;
   }
 
+  console.log("DAO Node fetch options:", {
+    sortBy: options?.sortBy || "VP",
+    reverse: options?.reverse ?? true,
+    offset: options?.offset || 0,
+    limit: options?.limit,
+  });
+
   try {
-    const response = await fetch(`${url}/v1/delegates`);
+    const sortBy = options?.sortBy || "VP";
+    const reverse = options?.reverse ?? true;
+    const offset = options?.offset || 0;
+    const limit = options?.limit;
+
+    const queryParams = new URLSearchParams({
+      sort_by: sortBy,
+      reverse: reverse.toString(),
+      include: "VP,DC,PR,LVB",
+    });
+
+    const response = await fetch(`${url}/v1/delegates?${queryParams}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch delegates: ${response.status}`);
     }
 
     const data = await response.json();
 
-    // If we have delegates data, fetch statements for the first 10 delegates
     if (data && data.delegates && data.delegates.length > 0) {
-      // Take only the first 10 delegates
-      const top10Delegates = data.delegates.slice(0, 10);
-      const delegateAddresses = top10Delegates.map((delegate) =>
+      console.log("First delegate entry (raw):", data.delegates[0]);
+    }
+
+    // Print the first ten entries in the data with voting power in e18 format
+    if (data && data.delegates && data.delegates.length > 0) {
+      const formattedDelegates = data.delegates
+        .slice(0, 10)
+        .map((delegate) => ({
+          ...delegate,
+          voting_power_e18: delegate.voting_power
+            ? (BigInt(delegate.voting_power) / BigInt(10 ** 18)).toString()
+            : "0",
+        }));
+      console.log(
+        "First ten delegate entries (with voting power in e18):",
+        formattedDelegates
+      );
+    }
+
+    // Apply pagination in memory before processing delegate statements
+    if (data && data.delegates) {
+      // Apply offset and limit to the data
+      const paginatedDelegates = data.delegates.slice(
+        offset,
+        limit ? offset + limit : undefined
+      );
+
+      // Replace the original delegates array with the paginated one
+      data.delegates = paginatedDelegates;
+    }
+
+    // If we have delegates data, fetch statements for the delegates
+    if (data && data.delegates && data.delegates.length > 0) {
+      const delegateAddresses = data.delegates.map((delegate) =>
         delegate.addr.toLowerCase()
       );
 
-      // Fetch statements for top 10 delegates using the fetchDelegateStatement function
+      // Fetch statements for delegates using the fetchDelegateStatement function
       const statements = await Promise.all(
         delegateAddresses.map(async (address) => {
           try {
@@ -70,37 +122,16 @@ export const getDelegatesFromDaoNode = async () => {
       // Merge the statements with the delegate data
       data.delegates = data.delegates.map((delegate) => {
         const lowerCaseAddress = delegate.addr.toLowerCase();
-        // Only add statements for the top 10 delegates
-        if (delegateAddresses.includes(lowerCaseAddress)) {
-          return {
-            address: lowerCaseAddress,
-            votingPower: {
-              total: delegate.votingPower || "0",
-              direct: "0",
-              advanced: "0",
-            },
-            statement: statementMap.get(lowerCaseAddress) || null,
-          };
-        }
         return {
           address: lowerCaseAddress,
           votingPower: {
-            total: delegate.votingPower || "0",
+            total: delegate.voting_power || "0",
             direct: "0",
             advanced: "0",
           },
-          statement: null,
+          statement: statementMap.get(lowerCaseAddress) || null,
         };
       });
-
-      // Limit the response to only the top 10 delegates
-      data.delegates = data.delegates.slice(0, 10);
-
-      // Print the data for debugging
-      // console.log(
-      //   "Delegates data with statements:",
-      //   JSON.stringify(data, null, 2)
-      // );
     }
 
     return data;
