@@ -12,7 +12,7 @@ import { SnapshotVote } from "@/app/api/common/votes/vote";
 
 // Constants
 const NONE_BELOW = "none below";
-const EXTENDED_SUFFIX = " - Ext";
+const EXTENDED_SUFFIX = " - ext";
 const SEPARATOR = "-";
 
 // Rank values
