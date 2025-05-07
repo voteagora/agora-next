@@ -33,18 +33,31 @@ const mockDelegateStatement = {
 
 describe("createDelegateStatement basic setup", () => {
   it("should call createDelegateStatement with the correct data", async () => {
+    const mockDelegateStatment = {
+      discord: null,
+      email: "mock-email@example.com",
+      twitter: null,
+      warpcast: null,
+      address: "0xabcdef1234567890" as `0x${string}`,
+      dao_slug: slug,
+      stage: stageStatus.published,
+      signature: "0xabcdef1234567890" as `0x${string}`,
+      payload: {},
+      message_hash: "value",
+      createdAt: new Date().toISOString(), // Serialize Date to ISO string
+      updatedAt: new Date().toISOString(),
+      notification_preferences: {
+        wants_proposal_created_email: "prompt",
+        wants_proposal_ending_soon_email: "prompt",
+        last_updated_at: new Date(),
+      },
+      endorsed: false,
+      scw_address: null,
+    };
+
     const args = {
       address: "0xabcdef1234567890" as `0x${string}`,
-      delegateStatement: {
-        discord: null,
-        email: "mock-email@example.com",
-        twitter: null,
-        warpcast: null,
-        notificationPreferences: {
-          wants_proposal_created_email: "prompt",
-          wants_proposal_ending_soon_email: "prompt",
-        },
-      },
+      delegateStatement: mockDelegateStatment,
       signature: "0xsomesignaturemock",
       message: "mock-message",
       stage: stageStatus.published,
@@ -52,7 +65,7 @@ describe("createDelegateStatement basic setup", () => {
 
     // Mock `createDelegateStatement` to resolve its Promise
     const mockedFn = vi.mocked(createDelegateStatement);
-    mockedFn.mockResolvedValueOnce(undefined); // Since the function resolves without a return
+    mockedFn.mockResolvedValueOnce(mockDelegateStatment); // Since the function resolves without a return
 
     // Call the function
     await createDelegateStatement(args);
