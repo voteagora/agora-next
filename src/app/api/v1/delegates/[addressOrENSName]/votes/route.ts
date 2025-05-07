@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { traceWithUserId } from "../../../apiUtils";
 
 export async function GET(
   request: NextRequest,
   route: { params: { addressOrENSName: string } }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
-  const { traceWithUserId } = await import("../../../apiUtils");
+  
   const { fetchVotesForDelegate } = await import(
     "../../../../common/votes/getVotes"
   );

@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
+import { traceWithUserId } from "@/app/api/v1/apiUtils";
+
 
 const ballotPayloadSchema = z.object({
   projects: z.array(
@@ -17,7 +19,7 @@ export async function POST(
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { validateAddressScope } = await import("@/app/lib/auth/serverAuth");
-  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+  
   const { updateAllProjectsInBallot } = await import(
     "@/app/api/common/ballots/updateBallotProject"
   );

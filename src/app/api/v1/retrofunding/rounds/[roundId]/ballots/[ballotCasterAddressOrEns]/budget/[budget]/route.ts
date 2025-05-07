@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
+import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
 const budgetParser = z.string(z.number().min(2000000).max(8000000)); // number between 2M and 8M
 
@@ -15,7 +16,7 @@ export async function POST(
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { validateAddressScope } = await import("@/app/lib/auth/serverAuth");
-  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+  
   const { updateBallotBudget } = await import(
     "@/app/api/common/ballots/updateBallot"
   );

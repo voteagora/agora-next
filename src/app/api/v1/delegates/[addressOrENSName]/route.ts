@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { traceWithUserId } from "../../apiUtils";
 
 export async function GET(
   request: NextRequest,
@@ -6,7 +7,6 @@ export async function GET(
 ) {
 
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
-  const { traceWithUserId } = await import("../../apiUtils");
   const { fetchDelegate } = await import(
     "@/app/api/common/delegates/getDelegates"
   );

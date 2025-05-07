@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { traceWithUserId } from "../../../apiUtils";
 import {
   createOptionalNumberValidator,
   createOptionalStringValidator,
@@ -30,7 +31,7 @@ export async function GET(
 ) {
 
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");  
-  const { traceWithUserId } = await import("../../../apiUtils");
+  
   const { fetchVotesForProposal } = await import(
     "../../../../common/votes/getVotes"
   );

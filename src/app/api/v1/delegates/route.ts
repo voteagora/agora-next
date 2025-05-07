@@ -1,42 +1,43 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { ZodError } from "zod";
+import { traceWithUserId } from "../apiUtils";
 
 import {
   createOptionalNumberValidator,
   createOptionalStringValidator,
 } from "@/app/api/common/utils/validators";
 
+const DEFAULT_SORT = "voting_power";
+const DEFAULT_MAX_LIMIT = 1500;
+const DEFAULT_LIMIT = 20;
+const DEFAULT_OFFSET = 0;
+
+const sortValidator = createOptionalStringValidator(
+  [
+    "most_delegators",
+    "weighted_random",
+    "voting_power",
+    "least_voting_power",
+  ],
+  DEFAULT_SORT
+);
+const limitValidator = createOptionalNumberValidator(
+  1,
+  DEFAULT_MAX_LIMIT,
+  DEFAULT_LIMIT
+);
+const offsetValidator = createOptionalNumberValidator(
+  0,
+  Number.MAX_SAFE_INTEGER,
+  DEFAULT_OFFSET
+);
+
 export async function GET(request: NextRequest) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { fetchDelegates } = await import(
     "@/app/api/common/delegates/getDelegates"
   );
-  const { traceWithUserId } = await import("../apiUtils");
 
-  const DEFAULT_SORT = "voting_power";
-  const DEFAULT_MAX_LIMIT = 1500;
-  const DEFAULT_LIMIT = 20;
-  const DEFAULT_OFFSET = 0;
-
-  const sortValidator = createOptionalStringValidator(
-    [
-      "most_delegators",
-      "weighted_random",
-      "voting_power",
-      "least_voting_power",
-    ],
-    DEFAULT_SORT
-  );
-  const limitValidator = createOptionalNumberValidator(
-    1,
-    DEFAULT_MAX_LIMIT,
-    DEFAULT_LIMIT
-  );
-  const offsetValidator = createOptionalNumberValidator(
-    0,
-    Number.MAX_SAFE_INTEGER,
-    DEFAULT_OFFSET
-  );
 
   const authResponse = await authenticateApiUser(request);
 

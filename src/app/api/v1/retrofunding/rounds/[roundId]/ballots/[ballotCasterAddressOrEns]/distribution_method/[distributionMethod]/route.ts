@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { z } from "zod";
 
 import type { DistributionStrategy as DistStrat } from "@/app/api/common/ballots/ballotDistributionStrategy";
@@ -14,7 +15,7 @@ export async function POST(
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
-  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+  
   const { applyDistributionStrategy } = await import(
     "@/app/api/common/ballots/ballotDistributionStrategy"
   );

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { traceWithUserId } from "../../apiUtils";
 
 export async function GET(request: NextRequest) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { default: Tenant } = await import("@/lib/tenant/tenant");
-  const { traceWithUserId } = await import("../../apiUtils");
   const { fetchMetrics } = await import("@/app/api/common/metrics/getMetrics");
 
   const authResponse = await authenticateApiUser(request);

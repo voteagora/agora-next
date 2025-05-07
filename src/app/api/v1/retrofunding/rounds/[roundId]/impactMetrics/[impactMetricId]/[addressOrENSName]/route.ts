@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { traceWithUserId } from "@/app/api/v1/apiUtils";
+
 
 export async function POST(
   request: NextRequest,
@@ -12,7 +14,7 @@ export async function POST(
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { validateAddressScope } = await import("@/app/lib/auth/serverAuth");
-  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+  
   const { viewImpactMetricApi } = await import(
     "@/app/api/common/impactMetrics/viewImactMetric"
   );

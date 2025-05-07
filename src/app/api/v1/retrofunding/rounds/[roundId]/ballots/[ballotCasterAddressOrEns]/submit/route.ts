@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
+import { traceWithUserId } from "@/app/api/v1/apiUtils";
+
 
 const METRICS_BASED_ROUNDS = ["4"];
 
@@ -43,7 +45,7 @@ export async function POST(
   const { submitBallot } = await import(
     "@/app/api/common/ballots/submitBallot"
   );
-  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+  
 
   if (route.params.roundId === "4" || route.params.roundId === "5") {
     return new Response("Ballot submission for Round 4 is closed", {

@@ -1,4 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { traceWithUserId } from "@/app/api/v1/apiUtils";
+
 
 export async function GET(
   request: NextRequest,
@@ -11,7 +13,7 @@ export async function GET(
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
-  const { traceWithUserId } = await import("@/app/api/v1/apiUtils");
+  
   const { fetchImpactMetricApi } = await import(
     "@/app/api/common/impactMetrics/getImpactMetrics"
   );
