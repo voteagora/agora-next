@@ -111,7 +111,7 @@ export function findVotableSupply({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prismaWeb3Client.optimismVotableSupply.findFirst({});
+      return prismaWeb3Client.optimismVotableSupply.findFirst(condition);
     case TENANT_NAMESPACES.ENS:
       return prismaWeb3Client.ensVotableSupply.findFirst({});
     case TENANT_NAMESPACES.ETHERFI:
