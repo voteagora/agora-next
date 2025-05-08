@@ -678,17 +678,23 @@ export function getFunctionSignature(
       signature += filteredParams
         .map((p) => {
           let formattedValue;
-          if (p[0] && p[1]) {
-            formattedValue = `${p[0]}=${p[1]}`;
+          const isArray = p[1] ? Array.isArray(p[1]) : false;
+          const parsedParam = isArray
+            ? (p[1] as unknown as any[])
+                .map((item) => JSON.stringify(item.value || {}))
+                .join(", ")
+            : p[1];
+          if (p[0] && parsedParam) {
+            formattedValue = `${p[0]}=${parsedParam}`;
           } // Default, has both Name and Value
-          else if (p[0] && !p[1]) {
+          else if (p[0] && !parsedParam) {
             formattedValue = `${p[0]}`;
           } // Has only Name
-          else if (!p[0] && p[1]) {
-            formattedValue = `${p[1]}`;
+          else if (!p[0] && parsedParam) {
+            formattedValue = `${parsedParam}`;
           } // Has only Value
-          else if (!p[0] && !p[1]) {
-            formattedValue = `${p[1]}`;
+          else if (!p[0] && !parsedParam) {
+            formattedValue = `${parsedParam}`;
           } // Has neither Name nor Value, fallback to Type
           return formattedValue;
         })
