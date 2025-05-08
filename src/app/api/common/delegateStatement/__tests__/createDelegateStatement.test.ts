@@ -159,7 +159,7 @@ const setDefaultValues = (delegateStatement: DelegateStatement | null) => {
 
 const mockDelegateStatementFV = setDefaultValues(mockDelegateStatement);
 
-describe("createDelegateStatement basic setup", () => {
+describe("createDelegateStatement happy path", () => {
   // afterEach(() => {
   //   vi.clearAllMocks();
   //   cleanup();
