@@ -58,8 +58,17 @@ export default function CopelandProposalSingleVote({
                   />
                 </div>
               </TooltipTrigger>
-              <TooltipContent className="p-4">
-                {`${formatNumber(String(Math.round(vote.votingPower)), 0, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.choice)}`}
+              <TooltipContent className="p-4 max-h-[300px] overflow-y-auto flex flex-col gap-2">
+                <span>
+                  {`${formatNumber(String(Math.round(vote.votingPower)), 0, 2, false, false)} ${token.symbol} Voted`}
+                </span>
+                <div className="flex flex-col gap-1">
+                  {choiceLabels?.map((option: string, index: number) => (
+                    <p key={index}>
+                      {++index}. {option}
+                    </p>
+                  ))}
+                </div>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

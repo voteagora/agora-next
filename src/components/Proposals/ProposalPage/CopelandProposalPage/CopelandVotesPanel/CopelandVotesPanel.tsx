@@ -36,10 +36,10 @@ export default function CopelandVotesPanel({
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
-  const proposalState = proposal.status;
   const hasVotes =
-    (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"]).votes
-      .length > 0;
+    Number(
+      (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"]).votes
+    ) > 0;
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
