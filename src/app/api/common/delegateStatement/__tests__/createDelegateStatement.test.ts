@@ -5,10 +5,9 @@ import Tenant from "@/lib/tenant/tenant";
 import { stageStatus } from "@/app/lib/sharedEnums";
 import { stageStatus as prismaStageStatus } from "@prisma/client";
 import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
-const { ui } = Tenant.current();
+const { ui, slug } = Tenant.current();
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { createHash } from "crypto";
-// import { cleanup } from "@testing-library/react";
 
 vi.mock("server-only", () => ({})); // Mock server-only module
 
@@ -16,6 +15,7 @@ vi.mock("server-only", () => ({})); // Mock server-only module
 //   createDelegateStatement: vi.fn(),
 // }));
 
+// Because we aren't signing a message onchain, we cannot verify, and most skip over this check.
 vi.mock("@/lib/serverVerifyMessage", () => ({
   default: vi.fn(),
 }));
@@ -24,7 +24,6 @@ vi.mock("@/lib/serverVerifyMessage", () => ({
 const mockAddress =
   "0xcC0B26236AFa80673b0859312a7eC16d2b72C1e3" as `0x${string}`;
 const mockStage = stageStatus.PUBLISHED as stageStatus;
-const mockSlug = "DEMO";
 
 // Define default values for the schema
 const mockDelegateStatement = {
@@ -55,7 +54,7 @@ const setDefaultValues = (delegateStatement: DelegateStatement | null) => {
   return {
     agreeCodeConduct: !requireCodeOfConduct,
     agreeDaoPrinciples: !requireDaoPrinciples,
-    daoSlug: mockSlug,
+    daoSlug: slug,
     discord: delegateStatement?.discord || "",
     delegateStatement:
       (delegateStatement?.payload as { delegateStatement?: string })
@@ -221,7 +220,7 @@ describe("createDelegateStatement basic setup", () => {
 
     // Assert the record exists and matches the input data
     expect(result?.address.toLowerCase()).toBe(args.address.toLowerCase());
-    expect(result?.dao_slug).toBe(mockSlug);
+    expect(result?.dao_slug).toBe(slug);
     expect(result?.stage).toBe(args.stage);
     expect(result?.signature).toBe(args.signature);
     expect(result?.message_hash).toBe(messageHash);
@@ -232,7 +231,7 @@ describe("createDelegateStatement basic setup", () => {
       where: {
         address_dao_slug_stage: {
           address: args.address,
-          dao_slug: mockSlug,
+          dao_slug: slug,
           stage: args.stage,
         },
       },
