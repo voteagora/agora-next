@@ -24,6 +24,7 @@ import DelegationsContainerWrapper, {
 import VotesContainerWrapper, {
   VotesContainerSkeleton,
 } from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
+import { DelegateStatement } from "@/app/api/common/delegates/delegate";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -113,10 +114,12 @@ export default async function Page({
   }
 
   const parsedDelegate = Object.assign({}, delegate, {
-    statement: {
-      ...delegate.statement,
-      email: null,
-    },
+    statement: delegate.statement
+      ? ({
+          ...delegate.statement,
+          email: null,
+        } as DelegateStatement)
+      : null,
   });
 
   return (

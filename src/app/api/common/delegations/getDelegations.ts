@@ -15,6 +15,7 @@ import { Prisma } from "@prisma/client";
 import { findAdvancedDelegatee, findDelagatee } from "@/lib/prismaUtils";
 import { DELEGATION_MODEL } from "@/lib/constants";
 import { withMetrics } from "@/lib/metricWrapper";
+import { getDelegateFromDaoNode } from "@/app/lib/dao-node/client";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -153,6 +154,56 @@ async function getCurrentDelegatorsForAddress({
     let contractAddress = contracts.alligator
       ? contracts.alligator.address
       : contracts.token.address;
+
+    let balanceFilter = BigInt(0);
+
+    if (contracts.token.isERC20()) {
+      balanceFilter = BigInt(1e15);
+    } else if (contracts.token.isERC721()) {
+      balanceFilter = BigInt(0);
+    } else {
+      throw new Error(
+        "Token is neither ERC20 nor ERC721, therefore unsupported."
+      );
+    }
+
+    const daoNodeDelegate = await getDelegateFromDaoNode(address);
+    const latestBlock = await contracts.token.provider.getBlock("latest");
+
+    if (daoNodeDelegate) {
+      const delegatorsData = daoNodeDelegate.delegate.from_list.map(
+        (delegator) => {
+          const timestamp = latestBlock
+            ? getHumanBlockTime(delegator.bn, latestBlock, true)
+            : null;
+          return {
+            from: delegator.delegator,
+            to: address,
+            allowance: delegator.balance,
+            percentage: "0", // Only used in Agora token partial delegation
+            timestamp: timestamp,
+            type: "DIRECT" as const,
+            amount: "FULL" as const,
+            transaction_hash: null,
+            bn: delegator.bn,
+            tid: delegator.tid,
+          };
+        }
+      );
+
+      const filteredDelegatorsData = delegatorsData.filter(
+        (delegator) => BigInt(delegator.allowance) > balanceFilter // filter out delegators with 0 (or close to 0) balance
+      );
+
+      return {
+        meta: {
+          has_next: false,
+          next_offset: 0,
+          total_returned: filteredDelegatorsData.length,
+        },
+        data: filteredDelegatorsData,
+      };
+    }
 
     // Replace with the Agora Governor flag
     if (
@@ -298,8 +349,8 @@ async function getCurrentDelegatorsForAddress({
         LIMIT $5;
       `;
 
-    const [delegators, latestBlock] = await Promise.all([
-      paginateResult(async (skip: number, take: number) => {
+    const delegators = await paginateResult(
+      async (skip: number, take: number) => {
         return prismaWeb2Client.$queryRawUnsafe<
           {
             from: string;
@@ -318,9 +369,9 @@ async function getCurrentDelegatorsForAddress({
           skip,
           take
         );
-      }, pagination),
-      contracts.token.provider.getBlock("latest"),
-    ]);
+      },
+      pagination
+    );
 
     const delagtorsData = await Promise.all(
       delegators.data.map(async (delegator) => ({
@@ -341,18 +392,6 @@ async function getCurrentDelegatorsForAddress({
         transaction_hash: delegator.transaction_hash,
       }))
     );
-
-    var balanceFilter = BigInt(0);
-
-    if (contracts.token.isERC20()) {
-      balanceFilter = BigInt(1e15);
-    } else if (contracts.token.isERC721()) {
-      balanceFilter = BigInt(0);
-    } else {
-      throw new Error(
-        "Token is neither ERC20 nor ERC721, therefore unsupported."
-      );
-    }
 
     const filteredDelegatorsData = delagtorsData.filter(
       (delegator) => BigInt(delegator.allowance) > balanceFilter // filter out delegators with 0 (or close to 0) balance
