@@ -229,12 +229,17 @@ describe("createDelegateStatement basic setup", () => {
     expect(result?.payload).toEqual(args.delegateStatement);
 
     // clean up after ourselves
-    prismaWeb2Client.delegateStatements.delete({
+    console.log("cleaning up");
+    console.log(
+      `Address: ${args.address}, DAO Slug: ${slug}, Message Hash: ${messageHash}, Stage: ${args.stage}`
+    );
+    await prismaWeb2Client.delegateStatements.delete({
       where: {
-        address_dao_slug_stage: {
-          address: args.address,
+        address_dao_slug_stage_message_hash: {
+          address: args.address.toLowerCase(),
           dao_slug: slug,
           stage: args.stage,
+          message_hash: messageHash,
         },
       },
     });
