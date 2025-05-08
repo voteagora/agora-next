@@ -19,7 +19,6 @@ model DelegateStatements {
   twitter                  String?
   discord                  String?
   email                    String?
-  message_hash             String?
   createdAt                DateTime?   @default(now()) @map("created_at") @db.Date
   updatedAt                DateTime?   @default(now()) @map("updated_at") @db.Date
   warpcast                 String?
