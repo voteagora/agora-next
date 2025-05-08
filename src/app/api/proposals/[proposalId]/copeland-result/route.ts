@@ -9,7 +9,7 @@ const FUNDING_VALUES_PROD = {
   "eth.limo": { ext: 100000, std: 700000, isEligibleFor2Y: true },
   "Lighthouse Labs": { ext: null, std: 300000, isEligibleFor2Y: false },
   PYOR: { ext: null, std: 300000, isEligibleFor2Y: false },
-  "Justa Name": { ext: null, std: 300000, isEligibleFor2Y: false },
+  JustaName: { ext: null, std: 300000, isEligibleFor2Y: false },
   "Ethereum Identity Fnd": { ext: 200000, std: 500000, isEligibleFor2Y: true },
   Agora: { ext: 100000, std: 300000, isEligibleFor2Y: false },
   AlphaGrowth: { ext: 400000, std: 400000, isEligibleFor2Y: false },
