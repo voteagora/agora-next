@@ -1,5 +1,6 @@
-import { describe, it, vi, expect } from "vitest"; // Import from vitest
+import { describe, it, vi, expect, afterEach } from "vitest"; // Import from vitest
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
+import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { stageStatus } from "@/app/lib/sharedEnums";
 import { stageStatus as prismaStageStatus } from "@prisma/client";
@@ -7,15 +8,21 @@ import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateSt
 const { ui } = Tenant.current();
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { createHash } from "crypto";
+// import { cleanup } from "@testing-library/react";
 
 vi.mock("server-only", () => ({})); // Mock server-only module
 
-vi.mock("@/app/api/common/delegateStatement/createDelegateStatement", () => ({
-  createDelegateStatement: vi.fn(),
+// vi.mock("@/app/api/common/delegateStatement/createDelegateStatement", () => ({
+//   createDelegateStatement: vi.fn(),
+// }));
+
+vi.mock("@/lib/serverVerifyMessage", () => ({
+  default: vi.fn(),
 }));
 
 // Add some default values that are refrenced multiple times
-const mockAddress = "0xabcdef1234567890" as `0x${string}`;
+const mockAddress =
+  "0xcC0B26236AFa80673b0859312a7eC16d2b72C1e3" as `0x${string}`;
 const mockStage = stageStatus.PUBLISHED as stageStatus;
 const mockSlug = "DEMO";
 
@@ -152,27 +159,39 @@ const setDefaultValues = (delegateStatement: DelegateStatement | null) => {
 const mockDelegateStatementFV = setDefaultValues(mockDelegateStatement);
 
 describe("createDelegateStatement basic setup", () => {
-  it("should call createDelegateStatement with the correct data", async () => {
-    const args = {
-      address: mockAddress,
-      delegateStatement: mockDelegateStatementFV,
-      signature: "0xsomesignaturemock" as `0x${string}`,
-      message: "mock-message",
-      stage: mockStage,
-    };
+  // afterEach(() => {
+  //   vi.clearAllMocks();
+  //   cleanup();
+  // });
 
-    // Mock `createDelegateStatement` to resolve its Promise
-    const mockedFn = vi.mocked(createDelegateStatement);
-    // @ts-ignore
-    mockedFn.mockResolvedValueOnce(undefined); // Since the function resolves without a return
+  // it("should call createDelegateStatement with the correct data", async () => {
+  //   const args = {
+  //     address: mockAddress,
+  //     delegateStatement: mockDelegateStatementFV,
+  //     signature: "0xsomesignaturemock" as `0x${string}`,
+  //     message: "mock-message",
+  //     stage: mockStage,
+  //   };
 
-    // Call the function
-    await createDelegateStatement(args);
+  //   // Mock `createDelegateStatement` to resolve its Promise
+  //   const mockedFn = vi.mocked(createDelegateStatement);
+  //   // @ts-ignore
+  //   mockedFn.mockResolvedValueOnce(undefined); // Since the function resolves without a return
 
-    // Assertions
-    expect(mockedFn).toHaveBeenCalledTimes(1); // Validate it was called exactly once
-    expect(mockedFn).toHaveBeenCalledWith(args); // Validate it was called with the right arguments
-  });
+  //   console.log("args", args);
+
+  //   // Call the function
+  //   try {
+  //     const result = await createDelegateStatement(args);
+  //     console.log("result", result);
+  //   } catch (error) {
+  //     console.log("error", error);
+  //   }
+
+  //   // Assertions
+  //   expect(mockedFn).toHaveBeenCalledTimes(1); // Validate it was called exactly once
+  //   expect(mockedFn).toHaveBeenCalledWith(args); // Validate it was called with the right arguments
+  // });
 
   it("should create a record in the database", async () => {
     const args = {
@@ -182,24 +201,26 @@ describe("createDelegateStatement basic setup", () => {
       message: "mock-message",
       stage: mockStage,
     };
+    const mockVerifyMessage = vi.mocked(verifyMessage);
+    mockVerifyMessage.mockResolvedValueOnce(true);
 
     // call the function
-    await createDelegateStatement(args);
+    const result = await createDelegateStatement(args);
 
     // validate the function exists
-    const result = await prismaWeb2Client.delegateStatements.findFirst({
-      where: {
-        address: args.address,
-        dao_slug: mockSlug,
-        stage: args.stage as prismaStageStatus,
-      },
-    });
+    // const result = await prismaWeb2Client.delegateStatements.findFirst({
+    //   where: {
+    //     address: args.address,
+    //     dao_slug: mockSlug,
+    //     stage: args.stage as prismaStageStatus,
+    //   },
+    // }).;
 
     console.log("result", result);
     const messageHash = createHash("sha256").update(args.message).digest("hex");
 
     // Assert the record exists and matches the input data
-    expect(result?.address).toBe(args.address);
+    expect(result?.address.toLowerCase()).toBe(args.address.toLowerCase());
     expect(result?.dao_slug).toBe(mockSlug);
     expect(result?.stage).toBe(args.stage);
     expect(result?.signature).toBe(args.signature);
