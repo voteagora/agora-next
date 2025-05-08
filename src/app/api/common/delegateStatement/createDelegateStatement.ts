@@ -117,7 +117,9 @@ const publishDelegateStatementDraft = ({ address }: { address: string }) => {
   }
 };
 
-export const getDraftMessageHash = async (address: string): string | null => {
+export const getDraftMessageHash = async (
+  address: string
+): Promise<string | null> => {
   try {
     const result = await prismaWeb2Client.delegateStatements.findFirst({
       where: {
@@ -126,10 +128,9 @@ export const getDraftMessageHash = async (address: string): string | null => {
         stage: stageStatus.DRAFT,
       },
     });
-    console.log(result);
-
+    // No result found, return null
     return result ? result.message_hash : null;
   } catch (error) {
-    console.log(error);
+    throw new Error("Error retrieving draft message hash");
   }
 };
