@@ -299,113 +299,125 @@ const OptionRow = ({
             <>
               {!isNoneBelow ? (
                 <>
-                <Accordion type="single" collapsible>
-                  <div className="py-4">
-                    <AccordionItem value="standard" className="border-none w-full">
-                  <AccordionTrigger className="p-0 pr-2 hover:no-underline">
-                    <div className="flex justify-between items-center w-[calc(100%-1.5rem)]">
-                      <span className="text-xs font-semibold w-1/3">
-                        Standard ask
-                      </span>
-                      <div className="text-positive font-semibold">
-                        {result.fundingType === "STD2Y" ? (
-                          <span className="flex items-center gap-1 w-20 justify-end">
-                            2Y <Check strokeWidth={4} className="h-3 w-3" />
-                          </span>
-                        ) : result.fundingType === "STD" ? (
-                          <span className="flex items-center gap-1 w-20 justify-end">
-                            1Y <Check strokeWidth={4} className="h-3 w-3" />
-                          </span>
-                        ) : (
-                          <div className="flex items-center gap-1 w-20 justify-end">
-                            <X
-                              strokeWidth={4}
-                              className="h-3 w-3 text-negative"
-                            />
-                          </div>
-                        )}
-                      </div>
-                      <span
-                        className={cn(
-                          "text-xs font-semibold w-1/3 text-right",
-                          fontMapper[ui?.customization?.tokenAmountFont || ""]
-                            ?.variable
-                        )}
+                  <Accordion type="single" collapsible>
+                    <div className="py-4">
+                      <AccordionItem
+                        value="standard"
+                        className="border-none w-full"
                       >
-                        {fundingInfo.std.toLocaleString()}/y
-                      </span>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent parentClassName="overflow-visible">
-                    <OptionRowDetails
-                      result={result}
-                      extendedResult={extendedResult}
-                      isProposalActive={isProposalActive}
-                    />
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="extended" className="border-none w-full">
-                  <AccordionTrigger
-                    className="[&[disabled]>svg]:hidden [&[disabled]]:opacity-50 [&[disabled]]:cursor-not-allowed p-0 pt-3 mt-3 pr-2 border-t border-line hover:no-underline"
-                    disabled={!extendedResult}
-                  >
-                    <div className="flex justify-between items-center w-[calc(100%-1.5rem)]">
-                      <span className="text-xs font-semibold w-1/3">
-                        Extended ask
-                      </span>
-                      <div className="text-positive font-semibold">
-                        {extendedResult?.fundingType === "EXT2Y" ? (
-                          <span className="flex items-center gap-1 w-20 justify-end">
-                            2Y <Check strokeWidth={4} className="h-3 w-3" />
-                          </span>
-                        ) : extendedResult?.fundingType === "EXT1Y" ? (
-                          <span className="flex items-center gap-1 w-20 justify-end">
-                            1Y <Check strokeWidth={4} className="h-3 w-3" />
-                          </span>
-                        ) : fundingInfo.ext ? (
-                          <div className="flex items-center gap-1 w-20 justify-end">
-                            <X
-                              strokeWidth={4}
-                              className="h-3 w-3 text-negative"
-                            />
+                        <AccordionTrigger className="p-0 pr-2 hover:no-underline">
+                          <div className="flex justify-between items-center w-[calc(100%-1.5rem)]">
+                            <span className="text-xs font-semibold w-1/3">
+                              Standard ask
+                            </span>
+                            <div className="text-positive font-semibold">
+                              {result.fundingType === "STD2Y" ? (
+                                <span className="flex items-center gap-1 w-20 justify-end">
+                                  2Y{" "}
+                                  <Check strokeWidth={4} className="h-3 w-3" />
+                                </span>
+                              ) : result.fundingType === "STD" ? (
+                                <span className="flex items-center gap-1 w-20 justify-end">
+                                  1Y{" "}
+                                  <Check strokeWidth={4} className="h-3 w-3" />
+                                </span>
+                              ) : (
+                                <div className="flex items-center gap-1 w-20 justify-end">
+                                  <X
+                                    strokeWidth={4}
+                                    className="h-3 w-3 text-negative"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                            <span
+                              className={cn(
+                                "text-xs font-semibold w-1/3 text-right",
+                                fontMapper[
+                                  ui?.customization?.tokenAmountFont || ""
+                                ]?.variable
+                              )}
+                            >
+                              {fundingInfo.std.toLocaleString()}/y
+                            </span>
                           </div>
-                        ) : null}
-                      </div>
-                      <span
-                        className={cn(
-                          "text-xs font-semibold w-1/3 text-right",
-                          fontMapper[ui?.customization?.tokenAmountFont || ""]
-                            ?.variable
-                        )}
+                        </AccordionTrigger>
+                        <AccordionContent parentClassName="overflow-visible">
+                          <OptionRowDetails
+                            result={result}
+                            extendedResult={extendedResult}
+                            isProposalActive={isProposalActive}
+                          />
+                        </AccordionContent>
+                      </AccordionItem>
+                      <AccordionItem
+                        value="extended"
+                        className="border-none w-full"
                       >
-                        {fundingInfo.ext
-                          ? `${fundingInfo.ext.toLocaleString()}/y`
-                          : "N/A"}
-                      </span>
+                        <AccordionTrigger
+                          className="[&[disabled]>svg]:hidden [&[disabled]]:opacity-50 [&[disabled]]:cursor-not-allowed p-0 pt-3 mt-3 pr-2 border-t border-line hover:no-underline"
+                          disabled={!extendedResult}
+                        >
+                          <div className="flex justify-between items-center w-[calc(100%-1.5rem)]">
+                            <span className="text-xs font-semibold w-1/3">
+                              Extended ask
+                            </span>
+                            <div className="text-positive font-semibold">
+                              {extendedResult?.fundingType === "EXT2Y" ? (
+                                <span className="flex items-center gap-1 w-20 justify-end">
+                                  2Y{" "}
+                                  <Check strokeWidth={4} className="h-3 w-3" />
+                                </span>
+                              ) : extendedResult?.fundingType === "EXT1Y" ? (
+                                <span className="flex items-center gap-1 w-20 justify-end">
+                                  1Y{" "}
+                                  <Check strokeWidth={4} className="h-3 w-3" />
+                                </span>
+                              ) : fundingInfo.ext ? (
+                                <div className="flex items-center gap-1 w-20 justify-end">
+                                  <X
+                                    strokeWidth={4}
+                                    className="h-3 w-3 text-negative"
+                                  />
+                                </div>
+                              ) : null}
+                            </div>
+                            <span
+                              className={cn(
+                                "text-xs font-semibold w-1/3 text-right",
+                                fontMapper[
+                                  ui?.customization?.tokenAmountFont || ""
+                                ]?.variable
+                              )}
+                            >
+                              {fundingInfo.ext
+                                ? `${fundingInfo.ext.toLocaleString()}/y`
+                                : "N/A"}
+                            </span>
+                          </div>
+                        </AccordionTrigger>
+                        {extendedResult && (
+                          <AccordionContent
+                            className="pb-0"
+                            parentClassName="overflow-visible"
+                          >
+                            <OptionRowDetails
+                              result={extendedResult}
+                              extendedResult={result}
+                              isProposalActive={isProposalActive}
+                            />
+                          </AccordionContent>
+                        )}
+                      </AccordionItem>
                     </div>
-                  </AccordionTrigger>
-                  {extendedResult && (
-                    <AccordionContent
-                      className="pb-0"
-                      parentClassName="overflow-visible"
-                    >
-                      <OptionRowDetails
-                        result={extendedResult}
-                        extendedResult={result}
-                        isProposalActive={isProposalActive}
-                      />
-                    </AccordionContent>
-                  )}
-                </AccordionItem>
-              </div>
-            </Accordion>
-            </>
-            ) : (
-              <OptionRowDetails
-                result={result}
-                isProposalActive={isProposalActive}
-              />
-            )}
+                  </Accordion>
+                </>
+              ) : (
+                <OptionRowDetails
+                  result={result}
+                  isProposalActive={isProposalActive}
+                />
+              )}
             </>
           ) : null}
         </AccordionContent>
@@ -433,10 +445,7 @@ const OptionRowDetails = ({
   return (
     <>
       <div
-        className={cn(
-          "py-3 px-3",
-          !isNoneBelow && "mt-4 border-y border-line"
-        )}
+        className={cn("py-3 px-3", !isNoneBelow && "mt-4 border-y border-line")}
       >
         <div className="flex justify-between items-center mb-4">
           <span className="text-xs font-semibold">Avg Support votes</span>
