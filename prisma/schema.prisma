@@ -19,7 +19,7 @@ model DelegateStatements {
   twitter                  String?
   discord                  String?
   email                    String?
-  message_hash             String?
+  message_hash             String
   createdAt                DateTime?   @default(now()) @map("created_at") @db.Date
   updatedAt                DateTime?   @default(now()) @map("updated_at") @db.Date
   warpcast                 String?
@@ -27,7 +27,7 @@ model DelegateStatements {
   scw_address              String?
   notification_preferences Json?
 
-  @@id([address, dao_slug, stage])
+  @@id([address, dao_slug, stage, message_hash])
   @@index([email], map: "idx_delegate_statements_email")
   @@map("delegate_statements")
   @@schema("agora")
