@@ -6,6 +6,7 @@ import { stageStatus as prismaStageStatus } from "@prisma/client";
 import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
 const { ui } = Tenant.current();
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import { createHash } from "crypto";
 
 vi.mock("server-only", () => ({})); // Mock server-only module
 
@@ -195,6 +196,15 @@ describe("createDelegateStatement basic setup", () => {
     });
 
     console.log("result", result);
+    const messageHash = createHash("sha256").update(args.message).digest("hex");
+
+    // Assert the record exists and matches the input data
+    expect(result?.address).toBe(args.address);
+    expect(result?.dao_slug).toBe(mockSlug);
+    expect(result?.stage).toBe(args.stage);
+    expect(result?.signature).toBe(args.signature);
+    expect(result?.message_hash).toBe(messageHash);
+    expect(result?.payload).toEqual(args.delegateStatement);
 
     // clean up after ourselves
     prismaWeb2Client.delegateStatements.delete({
