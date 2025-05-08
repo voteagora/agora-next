@@ -257,7 +257,8 @@ async function getVotersWhoHaveNotVotedForProposal({
                   SELECT voter FROM ${namespace}.vote_cast_events WHERE proposal_id = $1 and contract = $3
                   UNION ALL
                   SELECT voter FROM ${namespace}.${eventsViewName} WHERE proposal_id = $1 and contract = $3
-
+                  UNION ALL
+                  SELECT voter FROM "snapshot".votes WHERE proposal_id = $1 and dao_slug = '${slug}'
                 ),
                 relevant_delegates as (
                   SELECT * FROM ${namespace}.delegates where contract = $2
