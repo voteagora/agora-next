@@ -38,6 +38,7 @@ enum stageStatus {
   published
 
   @@schema("agora")
+  @@map("stage_status")
 }
 
 model Contracts {
