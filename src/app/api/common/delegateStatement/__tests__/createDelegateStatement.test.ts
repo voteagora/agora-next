@@ -2,6 +2,7 @@ import { describe, it, vi, expect } from "vitest"; // Import from vitest
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 import { stageStatus } from "@/app/lib/sharedEnums";
+import { stageStatus as prismaStageStatus } from "@prisma/client";
 import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
 const { ui } = Tenant.current();
 import { prismaWeb2Client } from "@/app/lib/prisma";
@@ -185,25 +186,25 @@ describe("createDelegateStatement basic setup", () => {
     await createDelegateStatement(args);
 
     // validate the function exists
-    // const result = await prismaWeb2Client.delegateStatements.findFirst({
-    //   where: {
-    //     address: args.address,
-    //     dao_slug: mockSlug,
-    //     stage: mockStage,
-    //   },
-    // });
-    //
-    // console.log("result", result);
+    const result = await prismaWeb2Client.delegateStatements.findFirst({
+      where: {
+        address: args.address,
+        dao_slug: mockSlug,
+        stage: args.stage as prismaStageStatus,
+      },
+    });
+
+    console.log("result", result);
 
     // clean up after ourselves
-    // prismaWeb2Client.delegateStatements.delete({
-    //   where: {
-    //     address_dao_slug_stage: {
-    //       address: args.address,
-    //       dao_slug: mockSlug,
-    //       stage: args.stage,
-    //     },
-    //   },
-    // });
+    prismaWeb2Client.delegateStatements.delete({
+      where: {
+        address_dao_slug_stage: {
+          address: args.address,
+          dao_slug: mockSlug,
+          stage: args.stage,
+        },
+      },
+    });
   });
 });
