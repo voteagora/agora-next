@@ -69,6 +69,7 @@ const FUNDING_VALUES_PROD: Record<
   "3DNS": { ext: 200000, std: 500000, isEligibleFor2Y: false },
   Decent: { ext: null, std: 300000, isEligibleFor2Y: false },
   "NameHash Labs": { ext: null, std: 1100000, isEligibleFor2Y: true },
+  "NONE BELOW": { ext: null, std: 0, isEligibleFor2Y: false },
 } as const;
 
 const FUNDING_VALUES_DEV: Record<
@@ -186,6 +187,7 @@ const OptionRow = ({
   isFunding: boolean;
 }) => {
   const optionName = result.option.split("-")?.[0]?.trim();
+  const isNoneBelow = optionName === "NONE BELOW";
   const fundingInfo = FUNDING_VALUES[optionName];
 
   const extendedResultGotFunding =
@@ -215,7 +217,6 @@ const OptionRow = ({
   const forPercentage = Math.round(
     (result.avgVotingPowerFor / totalVotes) * 100
   );
-  const againstPercentage = 100 - forPercentage;
 
   const getFundingTypeStyle = (fundingType: string) => {
     switch (fundingType) {
@@ -295,9 +296,12 @@ const OptionRow = ({
       <div className="ml-5 w-[calc(100%-1.25rem)]">
         <AccordionContent className="text-xs font-medium py-0 border border-t-0 border-line bg-wash rounded-b-sm">
           {isFunding && fundingInfo ? (
-            <Accordion type="single" collapsible>
-              <div className="py-4">
-                <AccordionItem value="standard" className="border-none w-full">
+            <>
+              {!isNoneBelow ? (
+                <>
+                <Accordion type="single" collapsible>
+                  <div className="py-4">
+                    <AccordionItem value="standard" className="border-none w-full">
                   <AccordionTrigger className="p-0 pr-2 hover:no-underline">
                     <div className="flex justify-between items-center w-[calc(100%-1.5rem)]">
                       <span className="text-xs font-semibold w-1/3">
@@ -395,6 +399,14 @@ const OptionRow = ({
                 </AccordionItem>
               </div>
             </Accordion>
+            </>
+            ) : (
+              <OptionRowDetails
+                result={result}
+                isProposalActive={isProposalActive}
+              />
+            )}
+            </>
           ) : null}
         </AccordionContent>
       </div>
@@ -416,10 +428,16 @@ const OptionRowDetails = ({
     (result.avgVotingPowerFor / totalVotes) * 100
   );
   const againstPercentage = 100 - forPercentage;
+  const isNoneBelow = result.option === "NONE BELOW";
 
   return (
     <>
-      <div className="border-y border-line py-3 px-3 mt-4">
+      <div
+        className={cn(
+          "py-3 px-3",
+          !isNoneBelow && "mt-4 border-y border-line"
+        )}
+      >
         <div className="flex justify-between items-center mb-4">
           <span className="text-xs font-semibold">Avg Support votes</span>
           <span
