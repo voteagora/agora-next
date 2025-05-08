@@ -1,8 +1,10 @@
 import { describe, it, vi, expect } from "vitest"; // Import from vitest
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
-import { stageStatus } from "@prisma/client";
-const { slug } = Tenant.current();
+import { stageStatus } from "@/app/lib/sharedEnums";
+import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
+const { ui } = Tenant.current();
+import { prismaWeb2Client } from "@/app/lib/prisma";
 
 vi.mock("server-only", () => ({})); // Mock server-only module
 
@@ -10,62 +12,157 @@ vi.mock("@/app/api/common/delegateStatement/createDelegateStatement", () => ({
   createDelegateStatement: vi.fn(),
 }));
 
+// Add some default values that are refrenced multiple times
+const mockAddress = "0xabcdef1234567890" as `0x${string}`;
+const mockStage = stageStatus.PUBLISHED as stageStatus;
+const mockSlug = "DEMO";
+
 // Define default values for the schema
 const mockDelegateStatement = {
-  discord: null,
-  email: "mock-email@example.com",
-  twitter: null,
-  warpcast: null,
-  address: "0xabcdef1234567890",
-  dao_slug: "OP", // Example DaoSlug
-  stage: stageStatus.published, // Example stage value
-  signature: "0xsomesignaturemock",
-  payload: {}, // Include this field (default to empty object for now)
-  message_hash: "mock-message-hash", // Mocked hash
-  createdAt: new Date().toISOString(), // Serialized Date
-  updatedAt: new Date().toISOString(), // Serialized Date
+  address: mockAddress,
+  stage: mockStage,
+  created_at: Date.now(),
+  discord: "discord",
+  endorsed: false,
+  payload: { delegateStatement: "A delegate, I am" },
+  signature: "0xstring" as `0x${string}`,
+  twitter: "twitter",
+  updated_at: Date.now(),
+  warpcast: "warpcast",
+  scw_address: null,
+  email: null,
   notification_preferences: {
     wants_proposal_created_email: "prompt",
     wants_proposal_ending_soon_email: "prompt",
-    last_updated_at: new Date().toISOString(),
+    last_updated_at: Date.now(),
   },
 };
+const requireCodeOfConduct = !!ui.toggle("delegates/code-of-conduct")?.enabled;
+const requireDaoPrinciples = !!ui.toggle("delegates/dao-principles")?.enabled;
+const topIssues = ui.governanceIssues;
+const defaultIssues = !topIssues;
+
+const setDefaultValues = (delegateStatement: DelegateStatement | null) => {
+  return {
+    agreeCodeConduct: !requireCodeOfConduct,
+    agreeDaoPrinciples: !requireDaoPrinciples,
+    daoSlug: mockSlug,
+    discord: delegateStatement?.discord || "",
+    delegateStatement:
+      (delegateStatement?.payload as { delegateStatement?: string })
+        ?.delegateStatement || "",
+    email: delegateStatement?.email || "",
+    twitter: delegateStatement?.twitter || "",
+    warpcast: delegateStatement?.warpcast || "",
+    scwAddress: delegateStatement?.scw_address || "",
+    topIssues: Array.isArray(
+      (
+        delegateStatement?.payload as {
+          topIssues: { value: string; type: string }[];
+        }
+      )?.topIssues
+    )
+      ? (
+          delegateStatement?.payload as {
+            topIssues: { value: string; type: string }[];
+          }
+        )?.topIssues
+      : defaultIssues
+        ? [] // Convert boolean `defaultIssues` to an empty array
+        : [],
+
+    topStakeholders:
+      (
+        delegateStatement?.payload as {
+          topStakeholders: {
+            value: string;
+            type: string;
+          }[];
+        }
+      )?.topStakeholders?.length > 0
+        ? (
+            delegateStatement?.payload as {
+              topStakeholders: {
+                value: string;
+                type: string;
+              }[];
+            }
+          )?.topStakeholders
+        : [],
+
+    openToSponsoringProposals:
+      (
+        delegateStatement?.payload as {
+          openToSponsoringProposals?: "yes" | "no" | null;
+        }
+      )?.openToSponsoringProposals || null,
+    mostValuableProposals: Array.isArray(
+      (
+        delegateStatement?.payload as {
+          mostValuableProposals?: { number: string }[];
+        }
+      )?.mostValuableProposals
+    )
+      ? (
+          (
+            delegateStatement?.payload as {
+              mostValuableProposals?: object[];
+            }
+          )?.mostValuableProposals as { number: string }[]
+        ).filter(
+          (proposal) =>
+            typeof proposal === "object" &&
+            "number" in proposal &&
+            typeof proposal.number === "string"
+        )
+      : [],
+    leastValuableProposals: Array.isArray(
+      (
+        delegateStatement?.payload as {
+          leastValuableProposals?: { number: string }[];
+        }
+      )?.leastValuableProposals
+    )
+      ? (
+          (
+            delegateStatement?.payload as {
+              leastValuableProposals?: object[];
+            }
+          )?.leastValuableProposals as { number: string }[]
+        ).filter(
+          (proposal) =>
+            typeof proposal === "object" &&
+            "number" in proposal &&
+            typeof proposal.number === "string"
+        )
+      : [],
+    notificationPreferences: (delegateStatement?.notification_preferences as {
+      wants_proposal_created_email: "prompt" | "prompted" | boolean;
+      wants_proposal_ending_soon_email: "prompt" | "prompted" | boolean;
+    }) || {
+      wants_proposal_created_email: "prompt",
+      wants_proposal_ending_soon_email: "prompt",
+    },
+    last_updated: new Date().toISOString(),
+  };
+};
+
+const mockDelegateStatementFV = setDefaultValues(mockDelegateStatement);
 
 describe("createDelegateStatement basic setup", () => {
   it("should call createDelegateStatement with the correct data", async () => {
-    const mockDelegateStatment = {
-      discord: null,
-      email: "mock-email@example.com",
-      twitter: null,
-      warpcast: null,
-      address: "0xabcdef1234567890" as `0x${string}`,
-      dao_slug: slug,
-      stage: stageStatus.published,
-      signature: "0xabcdef1234567890" as `0x${string}`,
-      payload: {},
-      message_hash: "value",
-      createdAt: new Date().toISOString(), // Serialize Date to ISO string
-      updatedAt: new Date().toISOString(),
-      notification_preferences: {
-        wants_proposal_created_email: "prompt",
-        wants_proposal_ending_soon_email: "prompt",
-        last_updated_at: new Date(),
-      },
-      endorsed: false,
-      scw_address: null,
-    };
-
     const args = {
-      address: "0xabcdef1234567890" as `0x${string}`,
-      delegateStatement: mockDelegateStatment,
-      signature: "0xsomesignaturemock",
+      address: mockAddress,
+      delegateStatement: mockDelegateStatementFV,
+      signature: "0xsomesignaturemock" as `0x${string}`,
       message: "mock-message",
-      stage: stageStatus.published,
+      stage: mockStage,
     };
 
     // Mock `createDelegateStatement` to resolve its Promise
     const mockedFn = vi.mocked(createDelegateStatement);
-    mockedFn.mockResolvedValueOnce(mockDelegateStatment); // Since the function resolves without a return
+    // @ts-ignore
+    mockedFn.mockResolvedValueOnce(undefined); // Since the function resolves without a return
 
     // Call the function
     await createDelegateStatement(args);
@@ -73,5 +170,40 @@ describe("createDelegateStatement basic setup", () => {
     // Assertions
     expect(mockedFn).toHaveBeenCalledTimes(1); // Validate it was called exactly once
     expect(mockedFn).toHaveBeenCalledWith(args); // Validate it was called with the right arguments
+  });
+
+  it("should create a record in the database", async () => {
+    const args = {
+      address: mockAddress,
+      delegateStatement: mockDelegateStatementFV,
+      signature: "0xsomesignaturemock" as `0x${string}`,
+      message: "mock-message",
+      stage: mockStage,
+    };
+
+    // call the function
+    await createDelegateStatement(args);
+
+    // validate the function exists
+    // const result = await prismaWeb2Client.delegateStatements.findFirst({
+    //   where: {
+    //     address: args.address,
+    //     dao_slug: mockSlug,
+    //     stage: mockStage,
+    //   },
+    // });
+    //
+    // console.log("result", result);
+
+    // clean up after ourselves
+    // prismaWeb2Client.delegateStatements.delete({
+    //   where: {
+    //     address_dao_slug_stage: {
+    //       address: args.address,
+    //       dao_slug: mockSlug,
+    //       stage: args.stage,
+    //     },
+    //   },
+    // });
   });
 });
