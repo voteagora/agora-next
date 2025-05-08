@@ -3,11 +3,12 @@ import { createDelegateStatement } from "@/app/api/common/delegateStatement/crea
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { stageStatus } from "@/app/lib/sharedEnums";
-import { stageStatus as prismaStageStatus } from "@prisma/client";
 import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
 const { ui, slug } = Tenant.current();
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { createHash } from "crypto";
+
+import { getDraftMessageHash } from "@/app/api/common/delegateStatement/createDelegateStatement";
 
 vi.mock("server-only", () => ({})); // Mock server-only module
 
@@ -22,8 +23,9 @@ vi.mock("@/lib/serverVerifyMessage", () => ({
 
 // Add some default values that are refrenced multiple times
 const mockAddress =
-  "0xcC0B26236AFa80673b0859312a7eC16d2b72C1e3" as `0x${string}`;
+  "0xcC0B26236AFa80673b0859312a7eC16d2b72C1e4" as `0x${string}`;
 const mockStage = stageStatus.PUBLISHED as stageStatus;
+const mockMessage = "test";
 
 // Define default values for the schema
 const mockDelegateStatement = {
@@ -197,7 +199,7 @@ describe("createDelegateStatement basic setup", () => {
       address: mockAddress,
       delegateStatement: mockDelegateStatementFV,
       signature: "0xsomesignaturemock" as `0x${string}`,
-      message: "mock-message",
+      message: mockMessage,
       stage: mockStage,
     };
     const mockVerifyMessage = vi.mocked(verifyMessage);
@@ -236,5 +238,18 @@ describe("createDelegateStatement basic setup", () => {
         },
       },
     });
+  });
+});
+
+describe("getDraftMessage", () => {
+  it("should return the message hash on a successful result", async () => {
+    const messageHash = createHash("sha256").update(mockMessage).digest("hex");
+
+    const response = await getDraftMessageHash(mockAddress);
+
+    console.log("response:", response);
+    console.log("messageHash:", messageHash);
+
+    expect(response!!.toLowerCase()).toBe(messageHash.toLowerCase());
   });
 });

@@ -74,10 +74,11 @@ export async function createDelegateStatement({
   if (stage === stageStatus.DRAFT) {
     return prismaWeb2Client.delegateStatements.upsert({
       where: {
-        address_dao_slug_stage: {
+        address_dao_slug_stage_message_hash: {
           address: address.toLowerCase(),
           dao_slug: slug,
           stage: stage,
+          message_hash: messageHash,
         },
       },
       update: data,
@@ -98,10 +99,11 @@ const publishDelegateStatementDraft = ({ address }: { address: string }) => {
   try {
     return prismaWeb2Client.delegateStatements.update({
       where: {
-        address_dao_slug_stage: {
+        address_dao_slug_stage_message_hash: {
           address: address.toLowerCase(),
           dao_slug: slug,
           stage: stageStatus.DRAFT, // Ensures we're only updating drafts
+          message_hash: "Test",
         },
       },
       data: {
@@ -112,5 +114,22 @@ const publishDelegateStatementDraft = ({ address }: { address: string }) => {
     // Graceful error handling
     console.error("Error updating draft to published:", error);
     throw new Error("Could not publish the delegate statement draft.");
+  }
+};
+
+export const getDraftMessageHash = async (address: string): string | null => {
+  try {
+    const result = await prismaWeb2Client.delegateStatements.findFirst({
+      where: {
+        address: address.toLowerCase(),
+        dao_slug: slug,
+        stage: stageStatus.DRAFT,
+      },
+    });
+    console.log(result);
+
+    return result ? result.message_hash : null;
+  } catch (error) {
+    console.log(error);
   }
 };
