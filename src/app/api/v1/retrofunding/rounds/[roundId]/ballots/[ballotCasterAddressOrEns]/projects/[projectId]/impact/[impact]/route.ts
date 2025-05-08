@@ -2,7 +2,6 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
-
 const impactParser = z.number().int().gte(0).lte(5); // integer between 0 and 5
 
 export async function POST(
@@ -18,7 +17,7 @@ export async function POST(
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { validateAddressScope } = await import("@/app/lib/auth/serverAuth");
-  
+
   const { updateBallotProjectImpact } = await import(
     "@/app/api/common/ballots/updateBallotProject"
   );

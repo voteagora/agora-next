@@ -1,13 +1,12 @@
 import { NextResponse, NextRequest } from "next/server";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
-
 export async function GET(
   request: NextRequest,
   { params }: { params: { roundId: string } }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
-  
+
   const { fetchImpactMetricsApi } = await import(
     "@/app/api/common/impactMetrics/getImpactMetrics"
   );

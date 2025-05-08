@@ -6,7 +6,7 @@ export async function GET(
   route: { params: { addressOrENSName: string } }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
-  
+
   const { fetchVotesForDelegate } = await import(
     "../../../../common/votes/getVotes"
   );

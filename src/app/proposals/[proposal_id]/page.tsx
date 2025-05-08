@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic'; // needed for app and e2e
+export const dynamic = "force-dynamic"; // needed for app and e2e
 
 import {
   fetchProposal,

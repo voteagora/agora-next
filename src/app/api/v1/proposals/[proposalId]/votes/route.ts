@@ -29,13 +29,12 @@ export async function GET(
   request: NextRequest,
   route: { params: { proposalId: string } }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
 
-  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");  
-  
   const { fetchVotesForProposal } = await import(
     "../../../../common/votes/getVotes"
   );
-  
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

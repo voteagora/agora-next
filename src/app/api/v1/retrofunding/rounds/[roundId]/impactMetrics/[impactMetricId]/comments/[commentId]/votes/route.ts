@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createOptionalNumberValidator } from "@/app/api/common/utils/validators";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
-
 const voteValidator = createOptionalNumberValidator(-1, 1, 0);
 
 export async function GET(
@@ -12,7 +11,7 @@ export async function GET(
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
-  
+
   const { fetchImpactMetricCommentVotes } = await import(
     "@/app/api/common/comments/getImpactMetricCommentVotes"
   );
@@ -45,7 +44,7 @@ export async function PUT(
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
-  
+
   const { updateImpactMetricCommentVote } = await import(
     "@/app/api/common/comments/updateImpactMetricCommentVote"
   );

@@ -9,7 +9,6 @@ export const size = {
 export const contentType = "image/png";
 
 const getDraftProposal = async (id: number) => {
-
   const { prismaWeb2Client } = await import("@/app/lib/prisma");
 
   const draftProposal = await prismaWeb2Client.proposalDraft.findUnique({

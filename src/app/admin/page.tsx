@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic'; // needed for both tests and e2e
+export const dynamic = "force-dynamic"; // needed for app and e2e
 
 import AdminForm from "@/components/Admin/AdminForm";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";

@@ -2,7 +2,6 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
-
 const allocationParser = z.string(z.number().min(0).max(100)); // number between 0 and 100
 
 export async function POST(
@@ -18,7 +17,7 @@ export async function POST(
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { validateAddressScope } = await import("@/app/lib/auth/serverAuth");
-  
+
   const { updateBallotProjectAllocation } = await import(
     "@/app/api/common/ballots/updateBallotProject"
   );

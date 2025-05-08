@@ -5,7 +5,6 @@ export async function GET(
   request: NextRequest,
   route: { params: { addressOrENSName: string } }
 ) {
-
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { fetchDelegate } = await import(
     "@/app/api/common/delegates/getDelegates"

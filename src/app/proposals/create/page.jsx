@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 import { HStack } from "@/components/Layout/Stack";

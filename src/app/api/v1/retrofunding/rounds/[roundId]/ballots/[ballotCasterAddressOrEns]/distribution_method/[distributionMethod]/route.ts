@@ -15,7 +15,7 @@ export async function POST(
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
-  
+
   const { applyDistributionStrategy } = await import(
     "@/app/api/common/ballots/ballotDistributionStrategy"
   );
@@ -51,9 +51,7 @@ export async function POST(
       }
 
       const ballot = await applyDistributionStrategy(
-        distributionMethodValidator.parse(
-          distributionMethod
-        ) as DistStrat,
+        distributionMethodValidator.parse(distributionMethod) as DistStrat,
         Number(roundId),
         categoryScope,
         ballotCasterAddressOrEns

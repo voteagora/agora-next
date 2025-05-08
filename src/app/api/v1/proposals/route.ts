@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { traceWithUserId } from "../apiUtils";
 import { ZodError } from "zod";
-import { createOptionalNumberValidator, createOptionalStringValidator } from "../../common/utils/validators";
+import {
+  createOptionalNumberValidator,
+  createOptionalStringValidator,
+} from "../../common/utils/validators";
 
 const DEFAULT_FILTER = "relevant";
 const DEFAULT_MAX_LIMIT = 50;
@@ -22,7 +25,6 @@ const offsetValidator = createOptionalNumberValidator(
   Number.MAX_SAFE_INTEGER,
   DEFAULT_OFFSET
 );
-
 
 export async function GET(request: NextRequest) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");

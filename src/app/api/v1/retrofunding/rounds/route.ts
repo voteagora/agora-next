@@ -6,7 +6,7 @@ export async function GET(
   route: { params: { roundId: string } }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
-  
+
   const { fetchRetroFundingRounds } = await import(
     "@/app/api/common/rounds/getRetroFundingRounds"
   );

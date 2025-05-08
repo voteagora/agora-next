@@ -8,7 +8,6 @@ export async function GET(
   const { authenticateApiUser, getCategoryScope, validateAddressScope } =
     await import("@/app/lib/auth/serverAuth");
   const { fetchBallot } = await import("@/app/api/common/ballots/getBallots");
-  
 
   const authResponse = await authenticateApiUser(request);
 

@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
-
 export async function DELETE(
   request: NextRequest,
   route: {
@@ -14,7 +13,7 @@ export async function DELETE(
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { validateAddressScope } = await import("@/app/lib/auth/serverAuth");
-  
+
   const { deleteBallotMetric } = await import(
     "@/app/api/common/ballots/updateBallot"
   );

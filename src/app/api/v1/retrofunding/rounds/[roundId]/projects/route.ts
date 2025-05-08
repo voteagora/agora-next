@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
-
 import {
   createOptionalNumberValidator,
   createOptionalStringValidator,
@@ -41,7 +40,7 @@ export async function GET(
   route: { params: { roundId: string } }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
-  
+
   const { fetchProjectsApi } = await import(
     "@/app/api/common/projects/getProjects"
   );

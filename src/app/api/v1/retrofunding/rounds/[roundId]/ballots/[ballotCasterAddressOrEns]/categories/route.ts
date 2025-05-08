@@ -14,7 +14,7 @@ export async function POST(
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { validateAddressScope } = await import("@/app/lib/auth/serverAuth");
-  
+
   const { updateBallotCategory } = await import(
     "@/app/api/common/ballots/updateBallotCategories"
   );

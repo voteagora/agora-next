@@ -3,8 +3,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
-
-  const { fetchVotableSupply } = await import("@/app/api/common/votableSupply/getVotableSupply");
+  const { fetchVotableSupply } = await import(
+    "@/app/api/common/votableSupply/getVotableSupply"
+  );
 
   try {
     const votable_supply = await fetchVotableSupply();

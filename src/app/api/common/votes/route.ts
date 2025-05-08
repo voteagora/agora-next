@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-
   const { fetchAllForVoting } = await import("@/app/api/votes/getVotes");
 
   const params = request.nextUrl.searchParams;

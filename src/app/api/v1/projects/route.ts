@@ -3,7 +3,7 @@ import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
 export async function GET(request: NextRequest) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
-  
+
   const { fetchProjectsApi } = await import(
     "@/app/api/common/projects/getProjects"
   );
@@ -25,7 +25,6 @@ export async function GET(request: NextRequest) {
     Number.MAX_SAFE_INTEGER,
     DEFAULT_OFFSET
   );
-
 
   const authResponse = await authenticateApiUser(request);
 

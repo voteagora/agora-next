@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Image from "next/image";
 import logo from "@/assets/agora_logo.svg";
