@@ -73,22 +73,32 @@ export async function createDelegateStatement({
 
   // Only update a draft proposal (can only be one)
   if (stage === stageStatus.DRAFT) {
-    return prismaWeb2Client.delegateStatements.upsert({
-      where: {
-        address_dao_slug_message_hash: {
-          address: address.toLowerCase(),
-          dao_slug: slug,
-          message_hash: messageHash,
+    try {
+      return prismaWeb2Client.delegateStatements.upsert({
+        where: {
+          address_dao_slug_message_hash: {
+            address: address.toLowerCase(),
+            dao_slug: slug,
+            message_hash: messageHash,
+          },
+          stage: stage,
         },
-        stage: stage,
-      },
-      update: data,
-      create: data,
-    });
+        update: data,
+        create: data,
+      });
+    } catch (error) {
+      console.error("Error updating draft:", error);
+      throw new Error("Could not update draft delegate statement.");
+    }
   }
 
   // Otherwise create a new published proposal
-  return prismaWeb2Client.delegateStatements.create({ data });
+  try {
+    return prismaWeb2Client.delegateStatements.create({ data });
+  } catch (error) {
+    console.error("Error creating published statement:", error);
+    throw new Error("Could not create delegate statement.");
+  }
 }
 
 /** This function is used to update an existing draft statement.
@@ -127,8 +137,16 @@ export const publishDelegateStatementDraft = ({
       },
     });
   } catch (error) {
+    if (error instanceof Error) {
+      if ((error as any).code === "P2025") {
+        throw new Error(
+          `No draft found for the given address (${address.toLowerCase()}), DAO (${slug}), and message hash (${messageHash}).`
+        );
+      }
+      throw new Error("Prisma failed to publish the delegate statement draft.");
+    }
     // Graceful error handling
-    console.error("Error updating draft to published:", error);
+    console.error("Unknown Error updating draft to published:", error);
     throw new Error("Could not publish the delegate statement draft.");
   }
 };

@@ -165,7 +165,7 @@ describe("publishDelegateStatementDraft", () => {
 
     expect(postResult!!.stage).toBe(stageStatus.PUBLISHED);
   });
-  it("should publish a draft with a message", async () => {
+  it("Should publish a draft with a message", async () => {
     // Given an address and a message hash, flip the stage to 'published'
 
     // The delegate statement should be draft before our call
@@ -192,5 +192,33 @@ describe("publishDelegateStatementDraft", () => {
     });
 
     expect(postResult!!.stage).toBe(stageStatus.PUBLISHED);
+  });
+
+  it("Gracefully handles a non-existent message", async () => {
+    // Call utility function with a message that doesn't exist - non-hashed
+    await expect(
+      publishDelegateStatementDraft({
+        address: mockAddress,
+        messageOrMessageHash: {
+          type: "MESSAGE",
+          value: "Non-existent message",
+        },
+      })
+    ).rejects.toThrow(
+      `No draft found for the given address (${mockAddress.toLowerCase()}), DAO (${slug}), and message hash (${messageHash}).`
+    );
+  });
+
+  it("Gracefull handles a non-existent message hash", async () => {
+    // Call utility function with a message that doesn't exist - non-hashed
+    await expect(
+      await publishDelegateStatementDraft({
+        address: mockAddress,
+        messageOrMessageHash: {
+          type: "MESSAGE_HASH",
+          value: "Non-existent message",
+        },
+      })
+    ).rejects.toThrow("Could not publish the delegate statement draft.");
   });
 });
