@@ -74,12 +74,12 @@ export async function createDelegateStatement({
   if (stage === stageStatus.DRAFT) {
     return prismaWeb2Client.delegateStatements.upsert({
       where: {
-        address_dao_slug_stage_message_hash: {
+        address_dao_slug_message_hash: {
           address: address.toLowerCase(),
           dao_slug: slug,
-          stage: stage,
           message_hash: messageHash,
         },
+        stage: stage,
       },
       update: data,
       create: data,
@@ -99,12 +99,12 @@ const publishDelegateStatementDraft = ({ address }: { address: string }) => {
   try {
     return prismaWeb2Client.delegateStatements.update({
       where: {
-        address_dao_slug_stage_message_hash: {
+        address_dao_slug_message_hash: {
           address: address.toLowerCase(),
           dao_slug: slug,
-          stage: stageStatus.DRAFT, // Ensures we're only updating drafts
           message_hash: "Test",
         },
+        stage: stageStatus.DRAFT, // Ensures we're only updating drafts
       },
       data: {
         stage: stageStatus.PUBLISHED, // Transition to published

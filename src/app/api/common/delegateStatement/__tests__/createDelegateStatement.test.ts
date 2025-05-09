@@ -126,10 +126,9 @@ describe("createDelegateStatement happy path", () => {
     );
     await prismaWeb2Client.delegateStatements.delete({
       where: {
-        address_dao_slug_stage_message_hash: {
+        address_dao_slug_message_hash: {
           address: args.address.toLowerCase(),
           dao_slug: slug,
-          stage: args.stage,
           message_hash: messageHash,
         },
       },

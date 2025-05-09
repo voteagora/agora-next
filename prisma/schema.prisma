@@ -27,7 +27,7 @@ model DelegateStatements {
   scw_address              String?
   notification_preferences Json?
 
-  @@id([address, dao_slug, stage, message_hash])
+  @@id([address, dao_slug, message_hash])
   @@index([email], map: "idx_delegate_statements_email")
   @@map("delegate_statements")
   @@schema("agora")
