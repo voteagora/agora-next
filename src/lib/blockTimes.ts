@@ -21,6 +21,7 @@ export function blocksToSeconds(blocks: number): number {
 export function getSecondsPerBlock(chainId: number | undefined): number {
   switch (chainId) {
     case 10: // Optimism
+    case 11155420: // Optimism sepolia
       return 2;
 
     case 534352: // Scroll
@@ -89,6 +90,14 @@ export function getHumanBlockTime(
       return new Date(
         (latestBlock.timestamp - timeBeforeBedrock - timeAfterBedrock) * 1000
       );
+    }
+
+    // Optimism sepolia
+    case 11155420: {
+      const blockSeconds = getSecondsPerBlock(chainIdToUse);
+      const estOptimismSecondsDiff =
+        (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
+      return new Date((latestBlock.timestamp - estOptimismSecondsDiff) * 1000);
     }
 
     //   Scroll
