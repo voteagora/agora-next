@@ -8,6 +8,7 @@ import { Prisma } from "@prisma/client";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
 import { createHash } from "crypto";
 import { stageStatus } from "@/app/lib/sharedEnums";
+import { MessageOrMessageHash } from "@/app/api/common/delegateStatement/delegateStatement";
 
 const { slug } = Tenant.current();
 
@@ -95,14 +96,29 @@ export async function createDelegateStatement({
  * @param ${address} address - The address of the delegate
  * @param ${daoSlug} daoSlug - slug of DAO site
  * */
-const publishDelegateStatementDraft = ({ address }: { address: string }) => {
+export const publishDelegateStatementDraft = ({
+  address,
+  messageOrMessageHash,
+}: {
+  address: string;
+  messageOrMessageHash: MessageOrMessageHash;
+}) => {
+  let messageHash: string;
+  if (messageOrMessageHash.type === "MESSAGE") {
+    messageHash = createHash("sha256")
+      .update(messageOrMessageHash.value)
+      .digest("hex");
+  } else {
+    messageHash = messageOrMessageHash.value;
+  }
+
   try {
     return prismaWeb2Client.delegateStatements.update({
       where: {
         address_dao_slug_message_hash: {
           address: address.toLowerCase(),
           dao_slug: slug,
-          message_hash: "Test",
+          message_hash: messageHash,
         },
         stage: stageStatus.DRAFT, // Ensures we're only updating drafts
       },
