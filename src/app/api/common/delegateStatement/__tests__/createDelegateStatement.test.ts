@@ -140,7 +140,7 @@ describe("publishDelegateStatementDraft", () => {
       messageHash: messageHash,
     });
   });
-  it("should publish a draft", async () => {
+  it("should publish a draft with a message hash", async () => {
     // Given an address and a message hash, flip the stage to 'published'
 
     // The delegate statement should be draft before our call
@@ -155,6 +155,34 @@ describe("publishDelegateStatementDraft", () => {
     await publishDelegateStatementDraft({
       address: mockAddress,
       messageOrMessageHash: { type: "MESSAGE_HASH", value: messageHash },
+    });
+
+    // Check the delegate statement is now published
+    const postResult = await getDelegateStatement(mockAddress, {
+      type: "MESSAGE_HASH",
+      value: messageHash,
+    });
+
+    expect(postResult!!.stage).toBe(stageStatus.PUBLISHED);
+  });
+  it("should publish a draft with a message", async () => {
+    // Given an address and a message hash, flip the stage to 'published'
+
+    // The delegate statement should be draft before our call
+    const preResult = await getDelegateStatement(mockAddress, {
+      type: "MESSAGE_HASH",
+      value: messageHash,
+    });
+
+    expect(preResult!!.stage).toBe(stageStatus.DRAFT);
+
+    // Call utility function with a non-hash message
+    await publishDelegateStatementDraft({
+      address: mockAddress,
+      messageOrMessageHash: {
+        type: "MESSAGE",
+        value: mockMessage,
+      },
     });
 
     // Check the delegate statement is now published
