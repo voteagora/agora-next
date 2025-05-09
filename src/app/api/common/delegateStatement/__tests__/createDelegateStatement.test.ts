@@ -1,5 +1,8 @@
-import { describe, it, vi, expect, afterEach } from "vitest"; // Import from vitest
-import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
+import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"; // Import from vitest
+import {
+  createDelegateStatement,
+  publishDelegateStatementDraft,
+} from "@/app/api/common/delegateStatement/createDelegateStatement";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { stageStatus } from "@/app/lib/sharedEnums";
@@ -9,6 +12,11 @@ import { createHash } from "crypto";
 import { setDefaultValues } from "@/app/api/common/delegateStatement/__tests__/sharedTestInfra";
 
 import { getDraftMessageHash } from "@/app/api/common/delegateStatement/createDelegateStatement";
+import { deleteDelegateStatement } from "@/app/api/common/delegateStatement/deleteDelegateStatement";
+import {
+  getDelegateStatement,
+  getDelegateStatements,
+} from "@/app/api/common/delegateStatement/getDelegateStatement";
 
 vi.mock("server-only", () => ({})); // Mock server-only module
 
@@ -50,41 +58,7 @@ const mockDelegateStatement = {
 
 const mockDelegateStatementFV = setDefaultValues(mockDelegateStatement);
 
-describe("createDelegateStatement happy path", () => {
-  // afterEach(() => {
-  //   vi.clearAllMocks();
-  //   cleanup();
-  // });
-
-  // it("should call createDelegateStatement with the correct data", async () => {
-  //   const args = {
-  //     address: mockAddress,
-  //     delegateStatement: mockDelegateStatementFV,
-  //     signature: "0xsomesignaturemock" as `0x${string}`,
-  //     message: "mock-message",
-  //     stage: mockStage,
-  //   };
-
-  //   // Mock `createDelegateStatement` to resolve its Promise
-  //   const mockedFn = vi.mocked(createDelegateStatement);
-  //   // @ts-ignore
-  //   mockedFn.mockResolvedValueOnce(undefined); // Since the function resolves without a return
-
-  //   console.log("args", args);
-
-  //   // Call the function
-  //   try {
-  //     const result = await createDelegateStatement(args);
-  //     console.log("result", result);
-  //   } catch (error) {
-  //     console.log("error", error);
-  //   }
-
-  //   // Assertions
-  //   expect(mockedFn).toHaveBeenCalledTimes(1); // Validate it was called exactly once
-  //   expect(mockedFn).toHaveBeenCalledWith(args); // Validate it was called with the right arguments
-  // });
-
+describe("createDelegateStatement", () => {
   it("should create a record in the database", async () => {
     const args = {
       address: mockAddress,
@@ -99,16 +73,6 @@ describe("createDelegateStatement happy path", () => {
     // call the function
     const result = await createDelegateStatement(args);
 
-    // validate the function exists
-    // const result = await prismaWeb2Client.delegateStatements.findFirst({
-    //   where: {
-    //     address: args.address,
-    //     dao_slug: mockSlug,
-    //     stage: args.stage as prismaStageStatus,
-    //   },
-    // }).;
-
-    console.log("result", result);
     const messageHash = createHash("sha256").update(args.message).digest("hex");
 
     // Assert the record exists and matches the input data
@@ -146,5 +110,59 @@ describe("getDraftMessage", () => {
     console.log("messageHash:", messageHash);
 
     expect(response!!.toLowerCase()).toBe(messageHash.toLowerCase());
+  });
+});
+
+describe("publishDelegateStatementDraft", () => {
+  const messageHash = createHash("sha256").update(mockMessage).digest("hex");
+
+  beforeEach(async () => {
+    // Create a delegate statement
+    const args = {
+      address: mockAddress,
+      delegateStatement: mockDelegateStatementFV,
+      signature: "0xsomesignaturemock" as `0x${string}`,
+      message: mockMessage,
+      // Ensure we pass a draft stage
+      stage: stageStatus.DRAFT as stageStatus,
+    };
+    const mockVerifyMessage = vi.mocked(verifyMessage);
+    mockVerifyMessage.mockResolvedValueOnce(true);
+
+    // Create a Delegate Statement
+    await createDelegateStatement(args);
+  });
+
+  afterEach(async () => {
+    // Delete the delegate statements to clean up
+    await deleteDelegateStatement({
+      address: mockAddress,
+      messageHash: messageHash,
+    });
+  });
+  it("should publish a draft", async () => {
+    // Given an address and a message hash, flip the stage to 'published'
+
+    // The delegate statement should be draft before our call
+    const preResult = await getDelegateStatement(mockAddress, {
+      type: "MESSAGE_HASH",
+      value: messageHash,
+    });
+
+    expect(preResult!!.stage).toBe(stageStatus.DRAFT);
+
+    // Call utility function
+    await publishDelegateStatementDraft({
+      address: mockAddress,
+      messageOrMessageHash: { type: "MESSAGE_HASH", value: messageHash },
+    });
+
+    // Check the delegate statement is now published
+    const postResult = await getDelegateStatement(mockAddress, {
+      type: "MESSAGE_HASH",
+      value: messageHash,
+    });
+
+    expect(postResult!!.stage).toBe(stageStatus.PUBLISHED);
   });
 });
