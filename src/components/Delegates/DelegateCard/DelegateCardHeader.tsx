@@ -13,11 +13,13 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
     return null;
   }
 
-  const percentParticipation = Number(
-    Math.round(
-      ((voterStats.last_10_props / Math.min(10, voterStats.total_proposals)) *
-        100 || 0) * 100
-    ) / 100
+  const percentParticipation = Math.round(
+    Number(
+      Math.round(
+        ((voterStats.last_10_props / Math.min(10, voterStats.total_proposals)) *
+          100 || 0) * 100
+      ) / 100
+    )
   );
 
   return percentParticipation > 50 ? (
