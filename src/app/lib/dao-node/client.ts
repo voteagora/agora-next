@@ -33,13 +33,6 @@ export const getDelegatesFromDaoNode = async (options?: {
     return null;
   }
 
-  console.log("DAO Node fetch options:", {
-    sortBy: options?.sortBy || "VP",
-    reverse: options?.reverse ?? true,
-    offset: options?.offset || 0,
-    limit: options?.limit,
-  });
-
   try {
     const sortBy = options?.sortBy || "VP";
     const reverse = options?.reverse ?? true;
@@ -49,35 +42,23 @@ export const getDelegatesFromDaoNode = async (options?: {
     const queryParams = new URLSearchParams({
       sort_by: sortBy,
       reverse: reverse.toString(),
-      include: "VP,DC,PR,LVB",
+      include: "VP,DC,PR,LVB,MRD",
     });
 
-    const response = await fetch(`${url}/v1/delegates?${queryParams}`);
+    // const response = await fetch(`${url}/v1/delegates?${queryParams}`);
+    const response = await fetch(`${url}/v1/delegates?${queryParams}`, {
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    });
     if (!response.ok) {
       throw new Error(`Failed to fetch delegates: ${response.status}`);
     }
 
     const data = await response.json();
-
-    if (data && data.delegates && data.delegates.length > 0) {
-      console.log("First delegate entry (raw):", data.delegates[0]);
-    }
-
-    // Print the first ten entries in the data with voting power in e18 format
-    if (data && data.delegates && data.delegates.length > 0) {
-      const formattedDelegates = data.delegates
-        .slice(0, 10)
-        .map((delegate) => ({
-          ...delegate,
-          voting_power_e18: delegate.voting_power
-            ? (BigInt(delegate.voting_power) / BigInt(10 ** 18)).toString()
-            : "0",
-        }));
-      console.log(
-        "First ten delegate entries (with voting power in e18):",
-        formattedDelegates
-      );
-    }
 
     // Apply pagination in memory before processing delegate statements
     if (data && data.delegates) {
@@ -124,6 +105,9 @@ export const getDelegatesFromDaoNode = async (options?: {
             advanced: "0",
           },
           statement: statementMap.get(lowerCaseAddress) || null,
+          numOfDelegators: delegate.from_cnt || "0",
+          mostRecentDelegationBlock: delegate.most_recent_block || "0",
+          lastVoteBlock: delegate.last_vote_block || "0",
         };
       });
     }

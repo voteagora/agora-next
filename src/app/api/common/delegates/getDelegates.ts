@@ -79,10 +79,6 @@ async function getDelegates({
         daoNodeSortBy = "VP";
       }
 
-      console.log(
-        `Using sort parameter '${sort}', mapped to DAO node sort_by '${daoNodeSortBy}' with reverse=${reverse}`
-      );
-
       // Call the DAO node API to get delegates data with sort options
       const daoNodeDelegates = await getDelegatesFromDaoNode({
         sortBy: daoNodeSortBy,
@@ -91,19 +87,12 @@ async function getDelegates({
         offset: pagination.offset,
       });
 
-      console.log(
-        "DAO Node Delegates data fetched:",
-        daoNodeDelegates ? "success" : "failed"
-      );
-
       // If we have valid data from the DAO node, use it instead of database query
       if (
         daoNodeDelegates &&
         daoNodeDelegates.delegates &&
         daoNodeDelegates.delegates.length > 0
       ) {
-        console.log("Using DAO node data instead of database query");
-
         let sortedDelegates = [...daoNodeDelegates.delegates];
 
         if (sort === "weighted_random" && seed) {
@@ -199,9 +188,11 @@ async function getDelegates({
             },
             citizen: !!delegate.citizen,
             statement: delegate.statement || null,
-            numOfDelegators: BigInt(
-              String(delegate.numDelegators || delegate.num_of_delegators || 0)
+            numOfDelegators: BigInt(String(delegate.numOfDelegators || 0)),
+            mostRecentDelegationBlock: BigInt(
+              String(delegate.mostRecentDelegationBlock || 0)
             ),
+            lastVoteBlock: BigInt(String(delegate.lastVoteBlock || 0)),
           };
         });
 
