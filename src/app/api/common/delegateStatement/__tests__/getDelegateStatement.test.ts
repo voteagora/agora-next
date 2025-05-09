@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest"; // Import from vitest
+import { describe, it, expect, beforeEach, afterEach } from "vitest"; // Import from vitest
 import { stageStatus } from "@/app/lib/sharedEnums";
 import { setDefaultValues } from "@/app/api/common/delegateStatement/__tests__/sharedTestInfra";
 import { vi } from "vitest";
@@ -47,18 +47,20 @@ const mockDelegateStatement = {
 const mockDelegateStatementFV = setDefaultValues(mockDelegateStatement);
 
 describe("getDelegteStatement", () => {
-  it("should return all delegate statements ", async () => {
-    let args = {
+  let messageHash1: string;
+  let messageHash2: string;
+
+  let args: any;
+
+  beforeEach(async () => {
+    args = {
       address: mockAddress,
       delegateStatement: mockDelegateStatementFV,
       signature: "0xsomesignaturemock" as `0x${string}`,
       message: mockMessage,
       stage: mockStage,
     };
-
-    const messageHash1 = createHash("sha256")
-      .update(args.message)
-      .digest("hex");
+    messageHash1 = createHash("sha256").update(args.message).digest("hex");
 
     const mockVerifyMessage = vi.mocked(verifyMessage);
     mockVerifyMessage.mockResolvedValueOnce(true);
@@ -70,24 +72,10 @@ describe("getDelegteStatement", () => {
     args.message = "second-message";
     await createDelegateStatement(args);
 
-    const messageHash2 = createHash("sha256")
-      .update(args.message)
-      .digest("hex");
+    messageHash2 = createHash("sha256").update(args.message).digest("hex");
+  });
 
-    // Get the statements
-    const delegateStatements = await getDelegateStatementsForAddress({
-      address: mockAddress,
-      stage: mockStage,
-    });
-
-    // Verify they are as expected, check message hashes
-    const expectedHashes = [messageHash1, messageHash2];
-
-    const statementHashes = delegateStatements!!.map(
-      (statement) => statement.message_hash
-    );
-    expect(statementHashes).toEqual(expectedHashes);
-
+  afterEach(async () => {
     // Delete the delegate statements to clean up
     await prismaWeb2Client.delegateStatements.delete({
       where: {
@@ -109,5 +97,21 @@ describe("getDelegteStatement", () => {
         },
       },
     });
+  });
+
+  it("should return all delegate statements ", async () => {
+    // Get the statements
+    const delegateStatements = await getDelegateStatementsForAddress({
+      address: mockAddress,
+      stage: mockStage,
+    });
+
+    // Verify they are as expected, check message hashes
+    const expectedHashes = [messageHash1, messageHash2];
+
+    const statementHashes = delegateStatements!!.map(
+      (statement) => statement.message_hash
+    );
+    expect(statementHashes).toEqual(expectedHashes);
   });
 });
