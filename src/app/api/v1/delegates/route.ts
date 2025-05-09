@@ -15,7 +15,15 @@ const DEFAULT_LIMIT = 20;
 const DEFAULT_OFFSET = 0;
 
 const sortValidator = createOptionalStringValidator(
-  ["most_delegators", "weighted_random", "voting_power", "least_voting_power"],
+  [
+    "most_delegators",
+    "weighted_random",
+    "voting_power",
+    "least_voting_power",
+    "most_recent_delegation",
+    "oldest_delegation",
+    "latest_voting_block",
+  ],
   DEFAULT_SORT
 );
 const limitValidator = createOptionalNumberValidator(
