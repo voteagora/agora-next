@@ -114,4 +114,6 @@ describe("getDelegteStatement", () => {
     );
     expect(statementHashes).toEqual(expectedHashes);
   });
+
+  it("should return a ");
 });
