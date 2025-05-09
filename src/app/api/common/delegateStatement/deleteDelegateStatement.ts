@@ -7,7 +7,7 @@ import { createHash } from "crypto";
 import { doInSpan } from "@/app/lib/logging";
 const { slug } = Tenant.current();
 
-async function deleteDelegateStatement({
+export async function deleteDelegateStatement({
   address,
   messageHash,
   stage,
@@ -19,12 +19,12 @@ async function deleteDelegateStatement({
   return prismaWeb2Client.delegateStatements
     .delete({
       where: {
-        address_dao_slug_stage: {
+        address_dao_slug_stage_message_hash: {
           address: address.toLowerCase(),
           dao_slug: slug,
           stage: stage,
+          message_hash: messageHash,
         },
-        message_hash: messageHash,
       },
     })
     .catch((error) => console.error(error));
