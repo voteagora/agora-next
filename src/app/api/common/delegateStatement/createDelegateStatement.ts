@@ -9,6 +9,7 @@ import { sanitizeContent } from "@/lib/sanitizationUtils";
 import { createHash } from "crypto";
 import { stageStatus } from "@/app/lib/sharedEnums";
 import { MessageOrMessageHash } from "@/app/api/common/delegateStatement/delegateStatement";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 const { slug } = Tenant.current();
 
@@ -123,29 +124,34 @@ export const publishDelegateStatementDraft = ({
   }
 
   try {
-    return prismaWeb2Client.delegateStatements.update({
-      where: {
-        address_dao_slug_message_hash: {
-          address: address.toLowerCase(),
-          dao_slug: slug,
-          message_hash: messageHash,
+    return prismaWeb2Client.delegateStatements
+      .update({
+        where: {
+          address_dao_slug_message_hash: {
+            address: address.toLowerCase(),
+            dao_slug: slug,
+            message_hash: messageHash,
+          },
+          stage: stageStatus.DRAFT, // Ensures we're only updating drafts
         },
-        stage: stageStatus.DRAFT, // Ensures we're only updating drafts
-      },
-      data: {
-        stage: stageStatus.PUBLISHED, // Transition to published
-      },
-    });
+        data: {
+          stage: stageStatus.PUBLISHED, // Transition to published
+        },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === "P2025") {
+            throw new Error(
+              `No draft found for the given address (${address.toLowerCase()}), DAO (${slug}), and message hash (${messageHash}).`
+            );
+          }
+          throw new Error(
+            "Prisma failed to publish the delegate statement draft."
+          );
+        }
+      });
   } catch (error) {
-    if (error instanceof Error) {
-      if ((error as any).code === "P2025") {
-        throw new Error(
-          `No draft found for the given address (${address.toLowerCase()}), DAO (${slug}), and message hash (${messageHash}).`
-        );
-      }
-      throw new Error("Prisma failed to publish the delegate statement draft.");
-    }
-    // Graceful error handling
+    // unkown error handling
     console.error("Unknown Error updating draft to published:", error);
     throw new Error("Could not publish the delegate statement draft.");
   }
