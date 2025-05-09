@@ -196,16 +196,20 @@ describe("publishDelegateStatementDraft", () => {
 
   it("Gracefully handles a non-existent message", async () => {
     // Call utility function with a message that doesn't exist - non-hashed
+    const nonExistentMessage = "Non-existent message";
+    const nonExistentMessageHash = createHash("sha256")
+      .update(nonExistentMessage)
+      .digest("hex");
     await expect(
       publishDelegateStatementDraft({
         address: mockAddress,
         messageOrMessageHash: {
           type: "MESSAGE",
-          value: "Non-existent message",
+          value: nonExistentMessage,
         },
       })
     ).rejects.toThrow(
-      `No draft found for the given address (${mockAddress.toLowerCase()}), DAO (${slug}), and message hash (${messageHash}).`
+      `No draft found for the given address (${mockAddress.toLowerCase()}), DAO (${slug}), and message hash (${nonExistentMessageHash}).`
     );
   });
 
