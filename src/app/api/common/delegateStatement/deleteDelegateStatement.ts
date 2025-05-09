@@ -10,19 +10,16 @@ const { slug } = Tenant.current();
 export async function deleteDelegateStatement({
   address,
   messageHash,
-  stage,
 }: {
   address: `0x${string}`;
   messageHash: string;
-  stage: stageStatus;
 }) {
   return prismaWeb2Client.delegateStatements
     .delete({
       where: {
-        address_dao_slug_stage_message_hash: {
+        address_dao_slug_message_hash: {
           address: address.toLowerCase(),
           dao_slug: slug,
-          stage: stage,
           message_hash: messageHash,
         },
       },
@@ -34,18 +31,15 @@ export async function deleteDelegateStatement({
  * @param ${address} address - The address of the delegate
  * @param ${daoSlug} daoSlug - Slug of DAO site
  * @param ${message} message - Textual message statement
- * @param ${stage} stage - Stage of message, usually 'published'
  * */
 export async function safeDeleteDelegateStatement({
   address,
   signature,
   message,
-  stage,
 }: {
   address: `0x${string}`;
   signature: `0x${string}`;
   message: string;
-  stage: stageStatus;
 }) {
   // Kick out if invalid
   const valid = await verifyMessage({
@@ -60,19 +54,17 @@ export async function safeDeleteDelegateStatement({
   // create messageHash for db matches
   const messageHash = createHash("sha256").update(message).digest("hex");
 
-  deleteDelegateStatement({ address, messageHash, stage });
+  deleteDelegateStatement({ address, messageHash });
 }
 
 export const safeDeleteDelegateStatementTracked = ({
   address,
   signature,
   message,
-  stage,
 }: {
   address: `0x${string}`;
   signature: `0x${string}`;
   message: string;
-  stage: stageStatus;
 }) => {
   return doInSpan(
     {
@@ -83,7 +75,6 @@ export const safeDeleteDelegateStatementTracked = ({
         address: address,
         signature: signature,
         message: message,
-        stage: stage,
       })
   );
 };
