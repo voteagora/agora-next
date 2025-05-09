@@ -85,6 +85,7 @@ export default function DelegateTable({
                 </TableCell>
               </TableRow>
             }
+            // References styles of TableBody
             className="[&_tr:last-child]:border-0"
             element="tbody"
             useWindow={false}
