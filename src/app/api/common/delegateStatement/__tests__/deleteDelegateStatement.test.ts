@@ -1,10 +1,14 @@
-import { describe, it, vi } from "vitest";
+import { describe, it, vi, expect } from "vitest";
 import { stageStatus } from "@/app/lib/sharedEnums";
 import { setDefaultValues } from "@/app/api/common/delegateStatement/__tests__/sharedTestInfra";
 import { createHash } from "crypto";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
 import { deleteDelegateStatement } from "@/app/api/common/delegateStatement/deleteDelegateStatement";
+import {
+  getDelegateStatementForAddress,
+  getDelegateStatementsForAddress,
+} from "@/app/api/common/delegateStatement/getDelegateStatement";
 
 vi.mock("server-only", () => ({})); // Mock server-only module
 
@@ -61,14 +65,26 @@ describe("deleteDelegateStatement", () => {
     await createDelegateStatement(args);
 
     // Check the value is found
+    const createRes = await getDelegateStatementForAddress({
+      address: args.address,
+      messageOrMessageHash: { type: "MESSAGE_HASH", value: messageHash },
+    });
+
+    expect(createRes).exist;
 
     // Delete the statement
     await deleteDelegateStatement({
       address: args.address,
       messageHash: messageHash,
-      stage: args.stage,
     });
 
     // Check the value is not found
+
+    const deleteRes = await getDelegateStatementForAddress({
+      address: args.address,
+      messageOrMessageHash: { type: "MESSAGE_HASH", value: messageHash },
+    });
+
+    expect(deleteRes).not.exist;
   });
 });
