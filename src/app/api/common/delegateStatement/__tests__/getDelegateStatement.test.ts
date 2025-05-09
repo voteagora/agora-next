@@ -1,4 +1,4 @@
-import { describe, it } from "vitest"; // Import from vitest
+import { describe, it, expect } from "vitest"; // Import from vitest
 import { stageStatus } from "@/app/lib/sharedEnums";
 import { setDefaultValues } from "@/app/api/common/delegateStatement/__tests__/sharedTestInfra";
 import { vi } from "vitest";
@@ -80,8 +80,13 @@ describe("getDelegteStatement", () => {
       stage: mockStage,
     });
 
-    // Verify they are as expected
-    // TODO
+    // Verify they are as expected, check message hashes
+    const expectedHashes = [messageHash1, messageHash2];
+
+    const statementHashes = delegateStatements!!.map(
+      (statement) => statement.message_hash
+    );
+    expect(statementHashes).toEqual(expectedHashes);
 
     // Delete the delegate statements to clean up
     await prismaWeb2Client.delegateStatements.delete({
