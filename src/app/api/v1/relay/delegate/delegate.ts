@@ -1,7 +1,7 @@
 import Tenant from "@/lib/tenant/tenant";
 import { getTransportForChain } from "@/lib/utils";
 import { getPublicClient } from "@/lib/viem";
-import { createWalletClient, parseSignature, isHex } from "viem";
+import { createWalletClient, parseSignature, isHex, Chain } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 const SPONSOR_PRIVATE_KEY = process.env.GAS_SPONSOR_PK;
@@ -28,7 +28,7 @@ export async function delegateBySignatureApi({
   const transport = getTransportForChain(governor.chain.id)!;
 
   const walletClient = createWalletClient({
-    chain: governor.chain,
+    chain: governor.chain as Chain,
     transport,
   });
 
