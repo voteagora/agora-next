@@ -6,6 +6,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { stageStatus } from "@/app/lib/sharedEnums";
 import { doInSpan } from "@/app/lib/logging";
 import { createHash } from "crypto";
+import { MessageOrMessageHash } from "@/app/api/common/delegateStatement/delegateStatement";
 
 export const getDelegateStatement = (
   addressOrENSName: string,
@@ -22,10 +23,6 @@ export const getDelegateStatement = (
       })
   );
 };
-
-type MessageOrMessageHash =
-  | { type: "MESSAGE"; value: string }
-  | { type: "MESSAGE_HASH"; value: string };
 
 /*
   Get a single delegate statement from Postgres or DynamoDB if not found
