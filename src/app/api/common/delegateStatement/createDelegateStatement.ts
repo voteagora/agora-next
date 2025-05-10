@@ -12,7 +12,14 @@ import { MessageOrMessageHash } from "@/app/api/common/delegateStatement/delegat
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 const { slug } = Tenant.current();
-
+/** This function is used to create a new delegate statement.
+ * @param address The address of the delegate
+ * @param daoSlug Slug of DAO site
+ * @param message Textual message statement
+ * @param signature Signature of the message
+ * @param scwAddress Optional SCW address
+ * @param stage Optional stage of the statement
+ * */
 export async function createDelegateStatement({
   address,
   delegateStatement,
@@ -162,6 +169,9 @@ export const publishDelegateStatementDraft = ({
   }
 };
 
+/** This function is to retrieve the draft message hash for a given address.
+ * @param address
+ * An address at the given DAO slug should have only one draft. */
 export const getDraftMessageHash = async (
   address: string
 ): Promise<string | null> => {
