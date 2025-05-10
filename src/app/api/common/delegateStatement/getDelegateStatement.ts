@@ -56,7 +56,7 @@ export async function getDelegateStatementForAddress({
     .catch((error) => console.error(error));
 }
 
-// export const fetchDelegateStatement = cache(getDelegateStatement);
+export const fetchDelegateStatement = cache(getDelegateStatement);
 
 // This section will handle fetching multiple delegates as drafts become permissible.
 // The above will remain for now to maintain reverse compatibility, but may be depricated in the future.
@@ -100,4 +100,4 @@ export async function getDelegateStatementsForAddress({
     .catch((error) => console.error(error));
 }
 
-// export const fetchDelegateStatements = cache(getDelegateStatements);
+export const fetchDelegateStatements = cache(getDelegateStatements);
