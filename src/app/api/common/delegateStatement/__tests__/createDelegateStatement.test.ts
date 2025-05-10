@@ -200,6 +200,7 @@ describe("publishDelegateStatementDraft", () => {
     const nonExistentMessageHash = createHash("sha256")
       .update(nonExistentMessage)
       .digest("hex");
+
     await expect(
       publishDelegateStatementDraft({
         address: mockAddress,
@@ -213,16 +214,23 @@ describe("publishDelegateStatementDraft", () => {
     );
   });
 
-  it("Gracefull handles a non-existent message hash", async () => {
+  it("Gracefully handles a non-existent message hash", async () => {
     // Call utility function with a message that doesn't exist - non-hashed
+    const nonExistentMessage = "Non-existent message";
+    const nonExistentMessageHash = createHash("sha256")
+      .update(nonExistentMessage)
+      .digest("hex");
+
     await expect(
-      await publishDelegateStatementDraft({
+      publishDelegateStatementDraft({
         address: mockAddress,
         messageOrMessageHash: {
           type: "MESSAGE_HASH",
-          value: "Non-existent message",
+          value: nonExistentMessageHash,
         },
       })
-    ).rejects.toThrow("Could not publish the delegate statement draft.");
+    ).rejects.toThrow(
+      `No draft found for the given address (${mockAddress.toLowerCase()}), DAO (${slug}), and message hash (${nonExistentMessageHash}).`
+    );
   });
 });
