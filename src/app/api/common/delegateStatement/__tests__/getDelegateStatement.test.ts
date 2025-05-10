@@ -14,6 +14,11 @@ import Tenant from "@/lib/tenant/tenant";
 const { slug } = Tenant.current();
 
 vi.mock("server-only", () => ({})); // Mock server-only module
+// Mock the `cache` function from React
+vi.mock("react", () => ({
+  // Provide a mock implementation of `cache` as a passthrough
+  cache: vi.fn((fn) => fn),
+}));
 
 // Because we aren't signing a message onchain, we cannot verify, and most skip over this check.
 vi.mock("@/lib/serverVerifyMessage", () => ({
