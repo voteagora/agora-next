@@ -140,14 +140,19 @@ export const publishDelegateStatementDraft = ({
       })
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
-          if (error.code === "P2025") {
-            throw new Error(
-              `No draft found for the given address (${address.toLowerCase()}), DAO (${slug}), and message hash (${messageHash}).`
-            );
+          switch (error.code) {
+            case "P2025":
+              throw new Error(
+                `No draft found for the given address (${address.toLowerCase()}), DAO (${slug}), and message hash (${messageHash}).`
+              );
+            case "P1001":
+              throw new Error("Cannot connect to database, please retry.");
+            default:
+              throw new Error(
+                "Prisma failed to publish the delegate statement draft with the following error: " +
+                  error.message
+              );
           }
-          throw new Error(
-            "Prisma failed to publish the delegate statement draft."
-          );
         }
       });
   } catch (error) {
