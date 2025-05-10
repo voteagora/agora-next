@@ -233,4 +233,21 @@ describe("publishDelegateStatementDraft", () => {
       `No draft found for the given address (${mockAddress.toLowerCase()}), DAO (${slug}), and message hash (${nonExistentMessageHash}).`
     );
   });
+
+  it("Gracefully handles a non-existent Address", async () => {
+    // Call utility function with an address that doesn't exist
+    const fakeAddress = "0x0000000000000000000000000000000000000000";
+
+    await expect(
+      publishDelegateStatementDraft({
+        address: fakeAddress,
+        messageOrMessageHash: {
+          type: "MESSAGE_HASH",
+          value: messageHash,
+        },
+      })
+    ).rejects.toThrow(
+      `No draft found for the given address (${fakeAddress.toLowerCase()}), DAO (${slug}), and message hash (${messageHash}).`
+    );
+  });
 });
