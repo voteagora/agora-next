@@ -250,4 +250,28 @@ describe("publishDelegateStatementDraft", () => {
       `No draft found for the given address (${fakeAddress.toLowerCase()}), DAO (${slug}), and message hash (${messageHash}).`
     );
   });
+
+  it("Should throw the appropriate error if the connection to the database fails", async () => {
+    // Mock the prisma db connection so that it fails to connect
+    const mockPrismaError = {
+      code: "P1001",
+      message: "The database server was unable to be reached.",
+      clientVersion: "5.2.0", // Example client version
+    };
+
+    vi.spyOn(
+      prismaWeb2Client.delegateStatements,
+      "update"
+    ).mockRejectedValueOnce(mockPrismaError);
+
+    await expect(
+      publishDelegateStatementDraft({
+        address: mockAddress,
+        messageOrMessageHash: {
+          type: "MESSAGE_HASH",
+          value: messageHash,
+        },
+      })
+    ).rejects.toThrow("Failed to connect to database");
+  });
 });
