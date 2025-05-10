@@ -5,7 +5,10 @@ import { vi } from "vitest";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
 import { createHash } from "crypto";
-import { getDelegateStatementsForAddress } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import {
+  getDelegateStatementForAddress,
+  getDelegateStatementsForAddress,
+} from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 const { slug } = Tenant.current();
@@ -114,6 +117,22 @@ describe("getDelegateStatementForAddress", () => {
   afterEach(async () => {
     // Delete the delegate statements to clean up
     await deleteTwoMockDelegateStatement();
+  });
+
+  it("should return a delegate statement given it's primary key attributes (hashed message)", async () => {
+    const delegateStatement = await getDelegateStatementForAddress({
+      address: mockAddress,
+      messageOrMessageHash: { type: "MESSAGE_HASH", value: messageHash1 },
+    });
+    expect(delegateStatement!!.message_hash).toBe(messageHash1);
+  });
+
+  it("should return a delegate statement given it's primary key attributes (non-hashed message)", async () => {
+    const delegateStatement = await getDelegateStatementForAddress({
+      address: mockAddress,
+      messageOrMessageHash: { type: "MESSAGE", value: mockMessage },
+    });
+    expect(delegateStatement!!.message_hash).toBe(messageHash1);
   });
 });
 describe("getDelegateStatements", () => {
