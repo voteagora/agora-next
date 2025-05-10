@@ -46,57 +46,97 @@ const mockDelegateStatement = {
 
 const mockDelegateStatementFV = setDefaultValues(mockDelegateStatement);
 
+let messageHash1: string;
+let messageHash2: string;
+let args: any;
+const createTwoMockDelegateStatement = async () => {
+  args = {
+    address: mockAddress,
+    delegateStatement: mockDelegateStatementFV,
+    signature: "0xsomesignaturemock" as `0x${string}`,
+    message: mockMessage,
+    stage: mockStage,
+  };
+  messageHash1 = createHash("sha256").update(args.message).digest("hex");
+
+  const mockVerifyMessage = vi.mocked(verifyMessage);
+  mockVerifyMessage.mockResolvedValueOnce(true);
+  mockVerifyMessage.mockResolvedValueOnce(true); // for second create
+
+  // Create a delegate statement
+  await createDelegateStatement(args);
+  // Create a second delegate statement
+  args.message = "second-message";
+  await createDelegateStatement(args);
+
+  messageHash2 = createHash("sha256").update(args.message).digest("hex");
+};
+
+const deleteTwoMockDelegateStatement = async () => {
+  await prismaWeb2Client.delegateStatements.delete({
+    where: {
+      address_dao_slug_message_hash: {
+        address: args.address.toLowerCase(),
+        dao_slug: slug,
+        message_hash: messageHash1,
+      },
+    },
+  });
+  await prismaWeb2Client.delegateStatements.delete({
+    where: {
+      address_dao_slug_message_hash: {
+        address: args.address.toLowerCase(),
+        dao_slug: slug,
+        message_hash: messageHash2,
+      },
+    },
+  });
+};
+
 describe("getDelegteStatement", () => {
-  let messageHash1: string;
-  let messageHash2: string;
-
-  let args: any;
-
   beforeEach(async () => {
-    args = {
-      address: mockAddress,
-      delegateStatement: mockDelegateStatementFV,
-      signature: "0xsomesignaturemock" as `0x${string}`,
-      message: mockMessage,
-      stage: mockStage,
-    };
-    messageHash1 = createHash("sha256").update(args.message).digest("hex");
-
-    const mockVerifyMessage = vi.mocked(verifyMessage);
-    mockVerifyMessage.mockResolvedValueOnce(true);
-    mockVerifyMessage.mockResolvedValueOnce(true); // for second create
-
-    // Create a delegate statement
-    await createDelegateStatement(args);
-    // Create a second delegate statement
-    args.message = "second-message";
-    await createDelegateStatement(args);
-
-    messageHash2 = createHash("sha256").update(args.message).digest("hex");
+    // Create a couple delegate statements
+    await createTwoMockDelegateStatement();
   });
 
   afterEach(async () => {
     // Delete the delegate statements to clean up
-    await prismaWeb2Client.delegateStatements.delete({
-      where: {
-        address_dao_slug_message_hash: {
-          address: args.address.toLowerCase(),
-          dao_slug: slug,
-          message_hash: messageHash1,
-        },
-      },
-    });
-    await prismaWeb2Client.delegateStatements.delete({
-      where: {
-        address_dao_slug_message_hash: {
-          address: args.address.toLowerCase(),
-          dao_slug: slug,
-          message_hash: messageHash2,
-        },
-      },
-    });
+    await deleteTwoMockDelegateStatement();
+  });
+});
+
+describe("getDelegateStatementForAddress", () => {
+  beforeEach(async () => {
+    // Create a couple delegate statements
+    await createTwoMockDelegateStatement();
   });
 
+  afterEach(async () => {
+    // Delete the delegate statements to clean up
+    await deleteTwoMockDelegateStatement();
+  });
+});
+describe("getDelegateStatements", () => {
+  beforeEach(async () => {
+    // Create a couple delegate statements
+    await createTwoMockDelegateStatement();
+  });
+
+  afterEach(async () => {
+    // Delete the delegate statements to clean up
+    await deleteTwoMockDelegateStatement();
+  });
+});
+describe("getDelegateStatementsForAddress", () => {
+  beforeEach(async () => {
+    // Create a couple delegate statements
+    await createTwoMockDelegateStatement();
+  });
+
+  afterEach(async () => {
+    // Delete the delegate statements to clean up
+    await deleteTwoMockDelegateStatement();
+  });
   it("should return all delegate statements ", async () => {
     // Get the statements
     const delegateStatements = await getDelegateStatementsForAddress({
@@ -112,6 +152,4 @@ describe("getDelegteStatement", () => {
     );
     expect(statementHashes).toEqual(expectedHashes);
   });
-
-  it("should return a ");
 });
