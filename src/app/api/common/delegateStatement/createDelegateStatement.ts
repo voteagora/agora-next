@@ -156,7 +156,7 @@ export const publishDelegateStatementDraft = ({
         }
       });
   } catch (error) {
-    // unkown error handling
+    // unknown error handling
     console.error("Unknown Error updating draft to published:", error);
     throw new Error("Could not publish the delegate statement draft.");
   }
