@@ -111,6 +111,12 @@ describe("getDraftMessage", () => {
 
     expect(response!!.toLowerCase()).toBe(messageHash.toLowerCase());
   });
+  it("should return null on a failed result", async () => {
+    const response = await getDraftMessageHash(
+      "0x0000000000000000000000000000000000000000"
+    );
+    expect(response).toBe(null);
+  });
 });
 
 describe("publishDelegateStatementDraft", () => {
