@@ -52,7 +52,7 @@ RUN yarn build
 # ---------- Stage 3: runner ----------
 FROM node:22-bullseye-slim AS runner
 WORKDIR /app
-ENV NODE_ENV=development
+ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 RUN corepack enable && corepack prepare yarn@stable --activate && \
