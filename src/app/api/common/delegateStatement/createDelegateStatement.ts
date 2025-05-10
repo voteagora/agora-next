@@ -166,16 +166,21 @@ export const getDraftMessageHash = async (
   address: string
 ): Promise<string | null> => {
   try {
-    const result = await prismaWeb2Client.delegateStatements.findFirst({
-      where: {
-        address: address.toLowerCase(),
-        dao_slug: slug,
-        stage: stageStatus.DRAFT,
-      },
-    });
+    const result = await prismaWeb2Client.delegateStatements
+      .findFirst({
+        where: {
+          address: address.toLowerCase(),
+          dao_slug: slug,
+          stage: stageStatus.DRAFT,
+        },
+      })
+      .catch((error) => {
+        console.error("Error retrieving draft message hash:", error);
+        throw new Error("Could not retrieve draft message hash.");
+      });
     // No result found, return null
     return result ? result.message_hash : null;
   } catch (error) {
-    throw new Error("Error retrieving draft message hash");
+    throw new Error(`Unknown Error retrieving draft message hash: ${error}`);
   }
 };
