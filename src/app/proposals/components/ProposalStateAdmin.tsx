@@ -77,6 +77,8 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
             proposal.proposalType === "STANDARD"
           ) {
             return "This proposal is now passed and can be queued for execution.";
+          } else if (proposal.proposalType === "OPTIMISTIC") {
+            return "This proposal has been optimistically passed.";
           }
           return "This proposal can still be cancelled by the admin.";
         }
