@@ -53,6 +53,7 @@ async function getDelegates({
   return withMetrics(
     "getDelegates",
     async () => {
+      console.time("getDelegates:total");
       let daoNodeSortBy: string = "VP"; // Default to voting power
       let reverse = true;
 
@@ -79,6 +80,7 @@ async function getDelegates({
         daoNodeSortBy = "VP";
       }
 
+      console.time("getDelegates:daoNodeFetch");
       // Call the DAO node API to get delegates data with sort options
       const daoNodeDelegates = await getDelegatesFromDaoNode({
         sortBy: daoNodeSortBy,
@@ -86,6 +88,7 @@ async function getDelegates({
         limit: pagination.limit,
         offset: pagination.offset,
       });
+      console.timeEnd("getDelegates:daoNodeFetch");
 
       // If we have valid data from the DAO node, use it instead of database query
       if (
@@ -93,6 +96,7 @@ async function getDelegates({
         daoNodeDelegates.delegates &&
         daoNodeDelegates.delegates.length > 0
       ) {
+        console.time("getDelegates:daoNodeTransform");
         let sortedDelegates = [...daoNodeDelegates.delegates];
 
         if (sort === "weighted_random" && seed) {
@@ -195,7 +199,9 @@ async function getDelegates({
             lastVoteBlock: BigInt(String(delegate.lastVoteBlock || 0)),
           };
         });
+        console.timeEnd("getDelegates:daoNodeTransform");
 
+        console.timeEnd("getDelegates:total");
         return {
           meta: {
             has_next:
@@ -211,6 +217,7 @@ async function getDelegates({
       }
 
       // If no DAO node data, continue with the original database query
+      console.time("getDelegates:dbFallback");
       const { namespace, ui, slug, contracts } = Tenant.current();
       const allowList = ui.delegates?.allowed || [];
 
@@ -532,16 +539,19 @@ async function getDelegates({
 
       const { meta, data: delegates } = await doInSpan(
         { name: "getDelegates" },
-        async () =>
-          await paginateResult<DelegatesGetPayload>(
+        async () => {
+          console.time("getDelegates:paginateResult");
+          const result = await paginateResult<DelegatesGetPayload>(
             paginatedAllowlistQuery,
             pagination
-          )
+          );
+          console.timeEnd("getDelegates:paginateResult");
+          return result;
+        }
       );
 
-      // Voting power detail added for use with API, so as to not break existing
-      // components
-      return {
+      console.time("getDelegates:transformDbResults");
+      const transformedResults = {
         meta,
         data: delegates.map((delegate) => ({
           address: delegate.delegate,
@@ -556,6 +566,11 @@ async function getDelegates({
         })),
         seed,
       };
+      console.timeEnd("getDelegates:transformDbResults");
+
+      console.timeEnd("getDelegates:dbFallback");
+      console.timeEnd("getDelegates:total");
+      return transformedResults;
     },
     { sort }
   );
