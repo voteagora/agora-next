@@ -11,9 +11,11 @@ import {
   getDelegateStatements,
   getDelegateStatementsForAddress,
   getLatestPublishedDelegateStatement,
+  getLatestPublishedDelegateStatementInSpan,
 } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
+import * as logging from "@/app/lib/logging";
 const { slug } = Tenant.current();
 
 vi.mock("server-only", () => ({})); // Mock server-only module
@@ -227,5 +229,18 @@ describe("getLatestPublishedDelegateStatement", async () => {
   it("Should get the latest published delegate statement", async () => {
     const res = await getLatestPublishedDelegateStatement(mockAddress);
     expect(res!!.message_hash).toBe(messageHash1);
+  });
+
+  it("Should get the latest published delegate statement in span", async () => {
+    const doInSpanSpy = vi.spyOn(logging, "doInSpan");
+
+    const res = await getLatestPublishedDelegateStatementInSpan(mockAddress);
+    expect(res!!.message_hash).toBe(messageHash1);
+
+    // Assert that doInSpan was called with the expected metadata
+    expect(doInSpanSpy).toHaveBeenCalledWith(
+      { name: "getLatestPublishedDelegateStatement" },
+      expect.any(Function) // Ensure that the second argument is any function
+    );
   });
 });
