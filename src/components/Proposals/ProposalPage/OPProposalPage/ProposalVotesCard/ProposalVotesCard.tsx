@@ -19,7 +19,7 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
 
   return (
     <div
-      className={`fixed flex justify-between gap-4 md:sticky top-[auto] md:top-20 md:max-h-[calc(100vh-220px)] max-h-[calc(100%-240px)] items-stretch flex-shrink md:w-[20rem] lg:w-[24rem] bg-neutral border border-line rounded-xl shadow-newDefault mb-8 transition-all ${isClicked ? "bottom-[60px]" : "bottom-[calc(-100%+350px)]"} overflow-y-auto`}
+      className={`fixed flex justify-between gap-4 md:sticky top-[auto] md:top-20 md:max-h-[calc(100vh-220px)] max-h-[calc(100%-160px)] items-stretch flex-shrink md:w-[20rem] lg:w-[24rem] bg-neutral border border-line rounded-xl shadow-newDefault mb-8 transition-all ${isClicked ? "bottom-[20px]" : "bottom-[calc(-100%+350px)]"} sm:overflow-y-auto`}
       style={{
         transition: "bottom 600ms cubic-bezier(0, 0.975, 0.015, 0.995)",
       }}
