@@ -6,6 +6,7 @@ import verifyMessage from "@/lib/serverVerifyMessage";
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
 import { createHash } from "crypto";
 import {
+  getDelegateStatement,
   getDelegateStatementForAddress,
   getDelegateStatementsForAddress,
 } from "@/app/api/common/delegateStatement/getDelegateStatement";
@@ -101,7 +102,7 @@ const deleteTwoMockDelegateStatement = async () => {
   });
 };
 
-describe("getDelegteStatement", () => {
+describe("getDelegateStatement", () => {
   beforeEach(async () => {
     // Create a couple delegate statements
     await createTwoMockDelegateStatement();
@@ -110,6 +111,16 @@ describe("getDelegteStatement", () => {
   afterEach(async () => {
     // Delete the delegate statements to clean up
     await deleteTwoMockDelegateStatement();
+  });
+
+  it("Should get a single delegate statement", async () => {
+    const res = await getDelegateStatement(mockAddress, {
+      type: "MESSAGE_HASH",
+      value: messageHash1,
+    });
+
+    expect(res!!.message_hash).toBe(messageHash1);
+    expect(res!!.address).toBe(mockAddress.toLowerCase());
   });
 });
 
