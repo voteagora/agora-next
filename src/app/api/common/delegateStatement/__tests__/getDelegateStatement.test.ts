@@ -8,6 +8,7 @@ import { createHash } from "crypto";
 import {
   getDelegateStatement,
   getDelegateStatementForAddress,
+  getDelegateStatements,
   getDelegateStatementsForAddress,
 } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { prismaWeb2Client } from "@/app/lib/prisma";
@@ -74,8 +75,9 @@ const createTwoMockDelegateStatement = async () => {
 
   // Create a delegate statement
   await createDelegateStatement(args);
-  // Create a second delegate statement
+  // Create a second delegate as draft statement
   args.message = "second-message";
+  args.stage = stageStatus.DRAFT;
   await createDelegateStatement(args);
 
   messageHash2 = createHash("sha256").update(args.message).digest("hex");
@@ -160,6 +162,27 @@ describe("getDelegateStatements", () => {
   afterEach(async () => {
     // Delete the delegate statements to clean up
     await deleteTwoMockDelegateStatement();
+  });
+
+  it("Should get all delegate statements at a given a published stage", async () => {
+    const res = await getDelegateStatements(mockAddress, stageStatus.PUBLISHED);
+    expect(res!!.length).toBe(1);
+    res!!.forEach((delegateStatement) => {
+      expect(delegateStatement.stage).toBe(stageStatus.PUBLISHED);
+    });
+  });
+
+  it("Should get all delegate statements at a given a draft stage", async () => {
+    const res = await getDelegateStatements(mockAddress, stageStatus.DRAFT);
+    expect(res!!.length).toBe(1);
+    res!!.forEach((delegateStatement) => {
+      expect(delegateStatement.stage).toBe(stageStatus.DRAFT);
+    });
+  });
+
+  it("Should get all delegate statements when no stage given", async () => {
+    const res = await getDelegateStatements(mockAddress);
+    expect(res!!.length).toBe(2);
   });
 });
 describe("getDelegateStatementsForAddress", () => {
