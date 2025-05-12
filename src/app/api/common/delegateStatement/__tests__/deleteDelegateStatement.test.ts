@@ -22,11 +22,6 @@ vi.mock("react", () => ({
   cache: vi.fn((fn) => fn),
 }));
 
-// Because we aren't signing a message onchain, we cannot verify, and most skip over this check.
-vi.mock("@/lib/serverVerifyMessage", () => ({
-  default: vi.fn(),
-}));
-
 // Add some default values that are referenced multiple times
 const mockAddress =
   "0xcC0B26236AFa80673b0859312a7eC16d2b72C1e4" as `0x${string}`;
@@ -121,6 +116,10 @@ describe("safeDeleteDelegateStatement", () => {
       message: mockMessage,
     });
 
+    // Mock the verifyMessage function to return true
+    const mockVerifyMessage = vi.mocked(verifyMessage);
+    mockVerifyMessage.mockResolvedValue(true);
+
     // Check the value is not found
     const deleteRes = await getDelegateStatementForAddress({
       address: args.address,
@@ -128,5 +127,20 @@ describe("safeDeleteDelegateStatement", () => {
     });
 
     expect(deleteRes).not.exist;
+  });
+
+  it("should throw an error when signature is invalid", async () => {
+    // Mock verifyMessage to return false
+    const mockVerifyMessage = vi.mocked(verifyMessage);
+    mockVerifyMessage.mockResolvedValue(false);
+
+    // Call safeDeleteDelegateStatement and expect an error to be thrown
+    await expect(
+      safeDeleteDelegateStatement({
+        address: args.address,
+        signature: args.signature,
+        message: args.message,
+      })
+    ).rejects.toThrowError("Invalid signature");
   });
 });
