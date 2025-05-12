@@ -30,4 +30,37 @@ async function getDelegateStatementForAddress({
     .catch((error) => console.error(error));
 }
 
+/**
+ * Gets delegate statements for multiple addresses
+ */
+export async function getDelegateStatementsForAddresses({
+  addresses,
+}: {
+  addresses: string[];
+}) {
+  const { slug } = Tenant.current();
+
+  return doInSpan(
+    {
+      name: "getDelegateStatementsForAddresses",
+    },
+    async () => {
+      const lowercasedAddresses = addresses.map((addr) => addr.toLowerCase());
+
+      return prismaWeb2Client.delegateStatements
+        .findMany({
+          where: {
+            address: { in: lowercasedAddresses },
+            dao_slug: slug,
+          },
+        })
+        .catch((error) => {
+          console.error(error);
+          return [];
+        });
+    }
+  );
+}
+
+export const fetchDelegateStatements = cache(getDelegateStatementsForAddresses);
 export const fetchDelegateStatement = cache(getDelegateStatement);

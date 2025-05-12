@@ -1,5 +1,5 @@
 import Tenant from "@/lib/tenant/tenant";
-import { fetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
 
 const { contracts, namespace } = Tenant.current();
 
@@ -73,24 +73,15 @@ export const getDelegatesFromDaoNode = async (options?: {
         (delegate: { addr: string }) => delegate.addr.toLowerCase()
       );
 
-      const statements = await Promise.all(
-        delegateAddresses.map(async (address: string) => {
-          try {
-            const statement = await fetchDelegateStatement(address);
-            return statement ? { address, statement } : null;
-          } catch (error) {
-            console.error(
-              `Error fetching statement for address ${address}:`,
-              error
-            );
-            return null;
-          }
-        })
-      );
+      const statements = await fetchDelegateStatements({
+        addresses: delegateAddresses,
+      });
 
       const statementMap = new Map();
-      statements.filter(Boolean).forEach((item) => {
-        statementMap.set(item.address, item.statement);
+      statements.forEach((statement) => {
+        if (statement) {
+          statementMap.set(statement.address.toLowerCase(), statement);
+        }
       });
 
       // Merge the statements with the delegate data
