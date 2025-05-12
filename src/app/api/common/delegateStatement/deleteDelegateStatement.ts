@@ -54,7 +54,7 @@ export async function safeDeleteDelegateStatement({
   // create messageHash for db matches
   const messageHash = createHash("sha256").update(message).digest("hex");
 
-  deleteDelegateStatement({ address, messageHash });
+  await deleteDelegateStatement({ address, messageHash });
 }
 
 export const safeDeleteDelegateStatementTracked = ({
