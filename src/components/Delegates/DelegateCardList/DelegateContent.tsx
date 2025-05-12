@@ -11,6 +11,7 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import Tenant from "@/lib/tenant/tenant";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { trackEvent } from "@/lib/analytics";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -28,7 +29,7 @@ export default function DelegateContent({
   const { address } = useAccount();
   const [showDialog, setShowDialog] = useState(false);
   const openDialog = useOpenDialog();
-  const { ui } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
@@ -47,7 +48,7 @@ export default function DelegateContent({
   }, [address, showDialog, openDialog]);
 
   useEffect(() => {
-    if (address) {
+    if (address && namespace === TENANT_NAMESPACES.OPTIMISM) {
       trackEvent({
         event_name: ANALYTICS_EVENT_NAMES.DELEGATE_PAGE_VIEW_WITH_WALLET,
         event_data: {
@@ -55,7 +56,7 @@ export default function DelegateContent({
         },
       });
     }
-  }, [address]);
+  }, [address, namespace]);
 
   return layout === "grid" ? (
     <DelegateCardList
