@@ -87,6 +87,8 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
 
       case PROPOSAL_STATUS.QUEUED:
         return "This proposal can be executed after the timelock passes, or cancelled by the admin.";
+      default:
+        return null;
     }
   };
 
