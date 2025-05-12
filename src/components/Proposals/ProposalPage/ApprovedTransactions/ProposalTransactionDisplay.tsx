@@ -593,15 +593,28 @@ const ActionSummary = ({
                 {functionSignature.paramValues &&
                   functionSignature.paramValues
                     .slice(0, 3)
-                    .map((param, idx) => (
-                      <p
-                        key={idx}
-                        className="font-medium"
-                        style={{ marginLeft: "1em" }}
-                      >
-                        {param[0]}={param[1]},
-                      </p>
-                    ))}
+                    .map((param, idx) => {
+                      const isArray = param[1]
+                        ? Array.isArray(param[1])
+                        : false;
+                      const parsedParam = isArray
+                        ? (param[1] as unknown as any[])
+                            .map((item) =>
+                              JSON.stringify(item.value || item || {})
+                            )
+                            .join(", ")
+                        : param[1];
+
+                      return (
+                        <p
+                          key={idx}
+                          className="font-medium"
+                          style={{ marginLeft: "1em" }}
+                        >
+                          {param[0]}={parsedParam},
+                        </p>
+                      );
+                    })}
                 {functionSignature.paramValues &&
                   functionSignature.paramValues.length > 3 && (
                     <p className="font-medium" style={{ marginLeft: "1em" }}>
@@ -613,7 +626,7 @@ const ActionSummary = ({
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <div className="text-xs break-all max-w-[400px]">
+              <div className="text-xs break-all max-w-[400px] max-h-[300px] overflow-auto">
                 {functionSignature.toStringValue()}
               </div>
             </TooltipContent>

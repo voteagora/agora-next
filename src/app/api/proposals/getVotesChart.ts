@@ -1,7 +1,7 @@
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { SnapshotVotePayload, VotePayload } from "@/app/api/common/votes/vote";
 import { prismaWeb3Client } from "@/app/lib/prisma";
-import { VotePayload } from "@/app/api/common/votes/vote";
 
 export async function getVotesChart({
   proposalId,
@@ -50,4 +50,34 @@ export async function getVotesChart({
     proposalId,
     contracts.governor.address.toLowerCase()
   );
+}
+
+export async function getSnapshotVotesChart({
+  proposalId,
+}: {
+  proposalId: string;
+}): Promise<any[]> {
+  const { slug } = Tenant.current();
+
+  const query = `
+    SELECT
+      voter,
+      created,
+      vp
+    FROM "snapshot".votes
+    WHERE proposal_id = $1 AND dao_slug = '${slug}'
+    ORDER BY created ASC;
+  `;
+
+  const data = await prismaWeb3Client.$queryRawUnsafe<SnapshotVotePayload[]>(
+    query,
+    proposalId,
+    slug
+  );
+
+  return data.map((vote) => ({
+    ...vote,
+    weight: Number(vote.vp),
+    support: "1",
+  }));
 }

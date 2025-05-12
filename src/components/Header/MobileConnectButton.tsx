@@ -9,12 +9,12 @@ export function MobileConnectButton() {
     <ConnectKitButton.Custom>
       {({ isConnected, show, ensName }) => {
         return (
-          <div className="sm:hidden flex items-center opacity-100 transition-all active:opacity-60 ">
+          <div className="md:hidden flex items-center opacity-100 transition-all active:opacity-60 ">
             {isConnected ? (
               <MobileProfileDropDown ensName={ensName} />
             ) : (
               <div onClick={show}>
-                <WalletIcon />
+                <WalletIcon className="stroke-primary" />
               </div>
             )}
           </div>
