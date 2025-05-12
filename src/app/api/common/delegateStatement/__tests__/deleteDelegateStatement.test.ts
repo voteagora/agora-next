@@ -1,14 +1,14 @@
-import { describe, it, vi, expect } from "vitest";
+import { describe, it, vi, expect, beforeEach } from "vitest";
 import { stageStatus } from "@/app/lib/sharedEnums";
 import { setDefaultValues } from "@/app/api/common/delegateStatement/__tests__/sharedTestInfra";
 import { createHash } from "crypto";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
-import { deleteDelegateStatement } from "@/app/api/common/delegateStatement/deleteDelegateStatement";
 import {
-  getDelegateStatementForAddress,
-  getDelegateStatementsForAddress,
-} from "@/app/api/common/delegateStatement/getDelegateStatement";
+  deleteDelegateStatement,
+  safeDeleteDelegateStatement,
+} from "@/app/api/common/delegateStatement/deleteDelegateStatement";
+import { getDelegateStatementForAddress } from "@/app/api/common/delegateStatement/getDelegateStatement";
 
 vi.mock("server-only", () => ({})); // Mock server-only module
 
@@ -17,7 +17,17 @@ vi.mock("@/lib/serverVerifyMessage", () => ({
   default: vi.fn(),
 }));
 
-// Add some default values that are refrenced multiple times
+vi.mock("react", () => ({
+  // Provide a mock implementation of `cache` as a passthrough
+  cache: vi.fn((fn) => fn),
+}));
+
+// Because we aren't signing a message onchain, we cannot verify, and most skip over this check.
+vi.mock("@/lib/serverVerifyMessage", () => ({
+  default: vi.fn(),
+}));
+
+// Add some default values that are referenced multiple times
 const mockAddress =
   "0xcC0B26236AFa80673b0859312a7eC16d2b72C1e4" as `0x${string}`;
 const mockStage = stageStatus.PUBLISHED as stageStatus;
@@ -46,24 +56,28 @@ const mockDelegateStatement = {
 
 const mockDelegateStatementFV = setDefaultValues(mockDelegateStatement);
 
+let args = {
+  address: mockAddress,
+  delegateStatement: mockDelegateStatementFV,
+  signature: "0xsomesignaturemock" as `0x${string}`,
+  message: mockMessage,
+  stage: mockStage,
+};
+const messageHash = createHash("sha256").update(args.message).digest("hex");
+
+const createMockDelegateStatement = async () => {
+  const mockVerifyMessage = vi.mocked(verifyMessage);
+  mockVerifyMessage.mockResolvedValueOnce(true);
+
+  // Create a delegate statement
+  await createDelegateStatement(args);
+};
+
 describe("deleteDelegateStatement", () => {
+  beforeEach(async () => {
+    await createMockDelegateStatement();
+  });
   it("should delete a specified delegate statement given it's primary key attributes", async () => {
-    let args = {
-      address: mockAddress,
-      delegateStatement: mockDelegateStatementFV,
-      signature: "0xsomesignaturemock" as `0x${string}`,
-      message: mockMessage,
-      stage: mockStage,
-    };
-
-    const messageHash = createHash("sha256").update(args.message).digest("hex");
-
-    const mockVerifyMessage = vi.mocked(verifyMessage);
-    mockVerifyMessage.mockResolvedValueOnce(true);
-
-    // Create a delegate statement
-    await createDelegateStatement(args);
-
     // Check the value is found
     const createRes = await getDelegateStatementForAddress({
       address: args.address,
@@ -79,7 +93,35 @@ describe("deleteDelegateStatement", () => {
     });
 
     // Check the value is not found
+    const deleteRes = await getDelegateStatementForAddress({
+      address: args.address,
+      messageOrMessageHash: { type: "MESSAGE_HASH", value: messageHash },
+    });
 
+    expect(deleteRes).not.exist;
+  });
+});
+
+describe("safeDeleteDelegateStatement", () => {
+  beforeEach(async () => {
+    await createMockDelegateStatement();
+  });
+
+  it("Should safely delete delegate statement given address, signature, and message", async () => {
+    // Check the value is found
+    const createRes = await getDelegateStatementForAddress({
+      address: args.address,
+      messageOrMessageHash: { type: "MESSAGE_HASH", value: messageHash },
+    });
+
+    expect(createRes).exist;
+    await safeDeleteDelegateStatement({
+      address: mockAddress,
+      signature: args.signature,
+      message: mockMessage,
+    });
+
+    // Check the value is not found
     const deleteRes = await getDelegateStatementForAddress({
       address: args.address,
       messageOrMessageHash: { type: "MESSAGE_HASH", value: messageHash },
