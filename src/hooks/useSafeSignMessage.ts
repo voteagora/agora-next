@@ -5,7 +5,10 @@ import { EIP712TypedData, SafeSignature } from "@safe-global/types-kit";
 import { useAccount } from "wagmi";
 import { useSafeProtocolKit } from "@/contexts/SafeProtocolKit";
 import { useSafeApiKit } from "@/contexts/SafeApiKitContext";
-import { buildSignatureBytes } from "@safe-global/protocol-kit";
+import {
+  buildSignatureBytes,
+  hashSafeMessage,
+} from "@safe-global/protocol-kit";
 
 // Enum for signing methods
 // Testing methods
@@ -67,16 +70,11 @@ export const useSafeSignMessage = () => {
           signature: buildSignatureBytes([signature as SafeSignature]),
         });
 
-        // const safeMessageHash = await protocolKit.getSafeMessageHash(
-        //   hashSafeMessage(message)
-        // );
-        // incase of second signature
-        // apiKit.addMessageSignature(
-        //   safeMessageHash,
-        //   buildSignatureBytes([signature as SafeSignature])
-        // );
+        const safeMessageHash = await protocolKit.getSafeMessageHash(
+          hashSafeMessage(message)
+        );
 
-        return signature;
+        return { safeMessageHash, signature };
       } catch (err) {
         console.error("Safe signing error:", err);
         const error = err instanceof Error ? err : new Error(String(err));

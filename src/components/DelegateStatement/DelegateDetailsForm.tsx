@@ -72,6 +72,7 @@ export default function DelegateDetailsForm({
           message: serializedBody,
         })
         .catch((error) => {
+          console.error("Error during signature:", error);
           return null;
         });
 
@@ -85,6 +86,8 @@ export default function DelegateDetailsForm({
         delegateStatement: body,
         signature,
         message: serializedBody,
+        stage,
+        messageHash,
       }).catch((error) => {
         console.error("Error during submission:", error);
         return null;

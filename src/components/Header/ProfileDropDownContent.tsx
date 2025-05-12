@@ -7,7 +7,6 @@ import TokenAmountDecorated from "../shared/TokenAmountDecorated";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
-import { useGetSafesForAddress } from "@/hooks/useGetSafesForAddress";
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 import { ProfileScwContent } from "./ProfileScwContent";
 import { ProfileHeader } from "./ProfileHeader";

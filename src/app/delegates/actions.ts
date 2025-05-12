@@ -117,24 +117,34 @@ export async function submitDelegateStatement({
   signature,
   message,
   scwAddress,
+  stage,
+  messageHash,
 }: {
   address: `0x${string}`;
   delegateStatement: DelegateStatementFormValues;
   signature: `0x${string}`;
   message: string;
   scwAddress?: string;
+  stage: stageStatus;
+  messageHash?: string;
 }) {
-  const response = await createDelegateStatement({
-    address,
-    delegateStatement,
-    signature,
-    message,
-    scwAddress,
-  });
-
-  revalidateDelegateAddressPage(address.toLowerCase());
-  revalidatePath("/delegates/create", "page");
-  return response;
+  try {
+    const response = await createDelegateStatement({
+      address,
+      delegateStatement,
+      signature,
+      message,
+      scwAddress,
+      stage,
+      messageHash,
+    });
+    revalidateDelegateAddressPage(address.toLowerCase());
+    revalidatePath("/delegates/create", "page");
+    return response;
+  } catch (error) {
+    console.error("Error submitting delegate statement:", error);
+    return null;
+  }
 }
 
 export async function fetchVotesForDelegate(

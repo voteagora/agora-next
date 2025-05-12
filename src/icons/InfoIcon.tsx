@@ -1,35 +1,20 @@
-export const InfoIcon = ({
-  className,
-  fill,
-}: {
-  className?: string;
-  fill?: string;
-}) => {
+export const InfoIcon = ({ className }: { className?: string }) => {
   return (
     <svg
-      className={className}
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      style={{
-        aspectRatio: "16 / 16",
-      }}
+      className={className}
     >
-      <g clip-path="url(#clip0_8777_3822)">
-        <path
-          d="M7.99992 10.6667V8.00004M7.99992 5.33337H8.00659M14.6666 8.00004C14.6666 11.6819 11.6818 14.6667 7.99992 14.6667C4.31802 14.6667 1.33325 11.6819 1.33325 8.00004C1.33325 4.31814 4.31802 1.33337 7.99992 1.33337C11.6818 1.33337 14.6666 4.31814 14.6666 8.00004Z"
-          stroke={fill}
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </g>
-      <defs>
-        <clipPath id="clip0_8777_3822">
-          <rect width="16" height="16" fill={fill} />
-        </clipPath>
-      </defs>
+      <path
+        d="M12 8V12M12 16H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+        stroke="inherit"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 };

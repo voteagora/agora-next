@@ -21,6 +21,8 @@ import DelegateStatementBoolSelector, {
   DelegateStatementDaoPrinciplesSelector,
 } from "./DelegateStatementBoolSelector";
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { stageStatus } from "@/app/lib/sharedEnums";
+import { DraftStatementDetails } from "./DraftStatementDetails";
 
 export default function DelegateStatementForm({
   form,
@@ -113,6 +115,7 @@ export default function DelegateStatementForm({
         signature,
         message: serializedBody,
         scwAddress,
+        stage: stageStatus.PUBLISHED,
       }).catch((error) => console.error(error));
 
       if (!response) {
@@ -126,32 +129,38 @@ export default function DelegateStatementForm({
       router.push(`/delegates/${address}`);
     } else {
       // Use Safe wallet signing for non-primary addresses
-      const signature = await safeMessageSigner
+      const signResponse = await safeMessageSigner
         .signMessage({
           message: serializedBody,
           safeAddress: address as `0x${string}`,
         })
         .catch((error) => console.error(error));
 
-      if (!signature) {
+      if (
+        !signResponse ||
+        !signResponse.signature ||
+        !signResponse.safeMessageHash
+      ) {
         setSubmissionError("Safe signature failed, please try again");
         return;
       }
 
-      // const response = await submitDelegateStatement({
-      //   address: address as `0x${string}`,
-      //   delegateStatement: body,
-      //   signature,
-      //   message: serializedBody,
-      //   scwAddress,
-      // }).catch((error) => console.error(error));
+      const response = await submitDelegateStatement({
+        address: address as `0x${string}`,
+        delegateStatement: body,
+        signature: signResponse.signature.data,
+        message: serializedBody,
+        scwAddress,
+        stage: stageStatus.DRAFT,
+        messageHash: signResponse.safeMessageHash,
+      }).catch((error) => console.error(error));
 
-      // if (!response) {
-      //   setSubmissionError(
-      //     "There was an error submitting your form, please try again"
-      //   );
-      //   return;
-      // }
+      if (!response) {
+        setSubmissionError(
+          "There was an error submitting your form, please try again"
+        );
+        return;
+      }
 
       setSaveSuccess(true);
       router.push(`/delegates/${address}`);
@@ -173,6 +182,7 @@ export default function DelegateStatementForm({
         </div>
       )}
       <div className="flex flex-col w-full mt-6 lg:mt-0">
+        {!isSelectedPrimaryAddress && <DraftStatementDetails />}
         <div className="flex flex-col bg-neutral rounded-xl shadow-newDefault">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>

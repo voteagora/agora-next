@@ -5,12 +5,10 @@ import { cache } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { stageStatus } from "@/app/lib/sharedEnums";
 import { doInSpan } from "@/app/lib/logging";
-import { createHash } from "crypto";
-import { MessageOrMessageHash } from "@/app/api/common/delegateStatement/delegateStatement";
 
 export const getDelegateStatement = (
   addressOrENSName: string,
-  messageOrMessageHash: MessageOrMessageHash
+  stage: stageStatus
 ) => {
   return doInSpan(
     {
@@ -19,7 +17,7 @@ export const getDelegateStatement = (
     () =>
       getDelegateStatementForAddress({
         address: addressOrENSName,
-        messageOrMessageHash: messageOrMessageHash,
+        stage: stage,
       })
   );
 };
@@ -29,28 +27,19 @@ export const getDelegateStatement = (
 */
 export async function getDelegateStatementForAddress({
   address,
-  messageOrMessageHash,
+  stage,
 }: {
   address: string;
-  messageOrMessageHash: MessageOrMessageHash;
+  stage: stageStatus;
 }) {
   const { slug } = Tenant.current();
-
-  let messageHash: string;
-  if (messageOrMessageHash.type === "MESSAGE") {
-    messageHash = createHash("sha256")
-      .update(messageOrMessageHash.value)
-      .digest("hex");
-  } else {
-    messageHash = messageOrMessageHash.value;
-  }
 
   return prismaWeb2Client.delegateStatements
     .findFirst({
       where: {
         address: address.toLowerCase(),
         dao_slug: slug,
-        message_hash: messageHash,
+        stage: stage,
       },
     })
     .catch((error) => console.error(error));

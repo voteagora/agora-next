@@ -14,6 +14,7 @@ import AgoraLoader, {
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 import DelegateDetailsForm from "@/components/DelegateStatement/DelegateDetailsForm";
 import { useDelegate } from "@/hooks/useDelegate";
+import { stageStatus } from "@/app/lib/sharedEnums";
 
 const { slug: daoSlug } = Tenant.current();
 
@@ -76,7 +77,8 @@ export default function DelegateDetailsPage() {
   useEffect(() => {
     async function _getDelegateStatement() {
       const _delegateStatement = await fetchDelegateStatement(
-        address as string
+        address as string,
+        stageStatus.PUBLISHED
       ).catch((error) => console.error(error));
       setDelegateStatement(_delegateStatement as DelegateStatement);
       reset(setDefaultValues(_delegateStatement as DelegateStatement));

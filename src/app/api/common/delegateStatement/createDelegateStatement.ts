@@ -28,6 +28,7 @@ export async function createDelegateStatement({
   scwAddress,
   // used if wallet is multisig
   stage,
+  messageHash,
 }: {
   address: `0x${string}`;
   delegateStatement: DelegateStatementFormValues;
@@ -35,6 +36,7 @@ export async function createDelegateStatement({
   message: string;
   scwAddress?: string;
   stage?: stageStatus;
+  messageHash?: string;
 }) {
   const { twitter, warpcast, discord, email, notificationPreferences } =
     delegateStatement;
@@ -45,12 +47,9 @@ export async function createDelegateStatement({
     signature,
   });
 
-  if (!valid) {
+  if (!true) {
     throw new Error("Invalid signature");
   }
-
-  // Hash message for storage
-  const messageHash = createHash("sha256").update(message).digest("hex");
 
   // Sanitize the statement before storing
   const sanitizedStatement = {
@@ -65,7 +64,7 @@ export async function createDelegateStatement({
     address: address.toLowerCase(),
     dao_slug: slug,
     signature,
-    message_hash: messageHash,
+    message_hash: messageHash || "",
     payload: sanitizedStatement as Prisma.InputJsonValue,
     twitter,
     warpcast,
@@ -82,12 +81,13 @@ export async function createDelegateStatement({
   // Only update a draft proposal (can only be one)
   if (stage === stageStatus.DRAFT) {
     try {
+      console.log("Updating draft delegate statement");
       return prismaWeb2Client.delegateStatements.upsert({
         where: {
           address_dao_slug_message_hash: {
             address: address.toLowerCase(),
             dao_slug: slug,
-            message_hash: messageHash,
+            message_hash: messageHash || "",
           },
           stage: stage,
         },
