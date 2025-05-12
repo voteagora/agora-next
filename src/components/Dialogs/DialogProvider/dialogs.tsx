@@ -36,6 +36,7 @@ import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { EncourageConnectWalletDialog } from "@/components/Delegates/Delegations/EncourageConnectWalletDialog";
 import { CreateScopeDialog } from "@/components/Admin/CreateScopeDialog";
 import { ScopeData } from "@/lib/types";
+import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActionDialog";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -58,7 +59,8 @@ export type DialogType =
   | ShareVoteDialogType
   | SimulationReportDialogType
   | EncourageConnectWalletDialogType
-  | CreateScopeDialogType;
+  | CreateScopeDialogType
+  | AccountActionDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -204,7 +206,7 @@ export type ShareVoteDialogType = {
 export type ApprovalCastVoteDialogProps = {
   proposal: Proposal;
   hasStatement: boolean;
-  votingPower: VotingPowerData;
+  votingPower: VotingPowerData | null;
   authorityChains: string[][] | null;
   missingVote: MissingVote;
   closeDialog: () => void;
@@ -270,6 +272,11 @@ export type CreateScopeDialogType = {
     onSuccess: (scope: ScopeData) => void;
   };
   className?: string;
+};
+
+export type AccountActionDialogType = {
+  type: "ACCOUNT_ACTION";
+  params: {};
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -494,6 +501,9 @@ export const dialogs: DialogDefinitions<DialogType> = {
         closeDialog={closeDialog}
       />
     );
+  },
+  ACCOUNT_ACTION: ({}, closeDialog) => {
+    return <CreateAccountActionDialog closeDialog={closeDialog} />;
   },
   // FAQ: () => {
   //   return <FaqDialog />;

@@ -143,14 +143,9 @@ function CastVoteInputContent({
       totalVP: "0",
     }
   );
-  const vpToDisplay = getVpToDisplay(
-    votingPower ?? {
-      advancedVP: "0",
-      directVP: "0",
-      totalVP: "0",
-    },
-    missingVote
-  );
+  const vpToDisplay = votingPower
+    ? getVpToDisplay(votingPower, missingVote)
+    : null;
 
   const showSuccessMessage = isSuccess || missingVote === "NONE";
 
@@ -203,13 +198,7 @@ function CastVoteInputContent({
               {!isLoading && proposal.status === "ACTIVE" && (
                 <VoteSubmitButton
                   supportType={support}
-                  votingPower={
-                    votingPower ?? {
-                      advancedVP: "0",
-                      directVP: "0",
-                      totalVP: "0",
-                    }
-                  }
+                  votingPower={votingPower}
                   missingVote={missingVote}
                   proposal={proposal}
                 />
@@ -281,16 +270,18 @@ function VoteSubmitButton({
   proposal,
 }: {
   supportType: SupportTextProps["supportType"] | null;
-  votingPower: VotingPowerData;
+  votingPower: VotingPowerData | null;
   missingVote: MissingVote;
   proposal: Proposal;
 }) {
   const { write } = useCastVoteContext();
-  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+  const vpToDisplay = votingPower
+    ? getVpToDisplay(votingPower, missingVote)
+    : null;
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
 
-  if (!supportType && isOptimismTenant) {
+  if (!supportType && isOptimismTenant && vpToDisplay) {
     return (
       <div className="pt-3">
         <TooltipProvider>
@@ -342,8 +333,13 @@ function VoteSubmitButton({
   return (
     <div className="pt-3">
       <SubmitButton onClick={write} disabled={!supportType}>
-        Submit vote with{"\u00A0"}
-        <TokenAmountDisplay amount={vpToDisplay} />
+        Submit vote
+        {vpToDisplay ? (
+          <>
+            {" "}
+            with{"\u00A0"} <TokenAmountDisplay amount={vpToDisplay} />
+          </>
+        ) : null}
       </SubmitButton>
     </div>
   );
@@ -392,7 +388,7 @@ export function SuccessMessage({
   proposal: Proposal;
   votes: Vote[] | null;
   className?: string;
-  votingPower?: string;
+  votingPower?: string | null;
 }) {
   const {
     data,

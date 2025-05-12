@@ -1800,17 +1800,6 @@ view uniswap_vote_cast_with_params_events {
   @@schema("uniswap")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view delgatees {
-  delegator    String?
-  delegatee    String?
-  block_number BigInt?
-  balance      Decimal? @db.Decimal
-
-  @@ignore
-  @@schema("optimism")
-}
-
 
 view cyberAdvancedDelegatees {
   pair             String   @unique

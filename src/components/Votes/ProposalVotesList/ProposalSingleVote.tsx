@@ -136,7 +136,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
           </HoverCardTrigger>
         </HoverCard>
       </VStack>
-      <pre className="text-xs font-medium whitespace-pre-wrap text-secondary w-fit break-all font-sans">
+      <pre className="text-xs font-medium text-secondary w-fit font-sans whitespace-pre-wrap [overflow-wrap:anywhere]">
         {vote.reason}
       </pre>
     </VStack>

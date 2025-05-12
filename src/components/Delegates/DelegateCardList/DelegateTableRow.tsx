@@ -27,13 +27,13 @@ export default function DelegateTableRow({
   const warpcast = delegate?.statement?.warpcast;
 
   const numProposals = voterStats?.total_proposals || 0;
-  const participation = Number(
+  const participation = Math.round(
     Math.round(
       ((voterStats?.last_10_props || 0) / Math.min(10, numProposals)) *
         100 *
         100
     ) / 100
-  ).toFixed(2);
+  );
 
   return (
     <TableRow
