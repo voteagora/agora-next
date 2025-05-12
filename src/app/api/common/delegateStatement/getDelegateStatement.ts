@@ -63,7 +63,7 @@ export const fetchDelegateStatement = cache(getDelegateStatement);
 
 export const getDelegateStatements = (
   addressOrENSName: string,
-  stage: stageStatus
+  stage?: stageStatus
 ) => {
   return doInSpan(
     {
@@ -85,19 +85,30 @@ export async function getDelegateStatementsForAddress({
   stage,
 }: {
   address: string;
-  stage: stageStatus;
+  stage?: stageStatus;
 }) {
   const { slug } = Tenant.current();
 
-  return prismaWeb2Client.delegateStatements
-    .findMany({
-      where: {
-        address: address.toLowerCase(),
-        dao_slug: slug,
-        stage: stage,
-      },
-    })
-    .catch((error) => console.error(error));
+  if (!stage) {
+    return prismaWeb2Client.delegateStatements
+      .findMany({
+        where: {
+          address: address.toLowerCase(),
+          dao_slug: slug,
+        },
+      })
+      .catch((error) => console.error(error));
+  } else {
+    return prismaWeb2Client.delegateStatements
+      .findMany({
+        where: {
+          address: address.toLowerCase(),
+          dao_slug: slug,
+          stage: stage,
+        },
+      })
+      .catch((error) => console.error(error));
+  }
 }
 
 export const fetchDelegateStatements = cache(getDelegateStatements);
