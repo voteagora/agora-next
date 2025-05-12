@@ -3,10 +3,12 @@ import { stageStatus } from "@/app/lib/sharedEnums";
 import { setDefaultValues } from "@/app/api/common/delegateStatement/__tests__/sharedTestInfra";
 import { createHash } from "crypto";
 import verifyMessage from "@/lib/serverVerifyMessage";
+import * as logging from "@/app/lib/logging"; // Import the whole module
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
 import {
   deleteDelegateStatement,
   safeDeleteDelegateStatement,
+  safeDeleteDelegateStatementTracked,
 } from "@/app/api/common/delegateStatement/deleteDelegateStatement";
 import { getDelegateStatementForAddress } from "@/app/api/common/delegateStatement/getDelegateStatement";
 
@@ -142,5 +144,58 @@ describe("safeDeleteDelegateStatement", () => {
         message: args.message,
       })
     ).rejects.toThrowError("Invalid signature");
+  });
+});
+
+describe("safeDeleteDelegateStatementTracked", () => {
+  beforeEach(async () => {
+    await createMockDelegateStatement();
+  });
+
+  it("should delete a delegate statement given it's primary key attributes", async () => {
+    // Check the value is found
+    const createRes = await getDelegateStatementForAddress({
+      address: args.address,
+      messageOrMessageHash: { type: "MESSAGE_HASH", value: messageHash },
+    });
+
+    // Mock the verifyMessage function to return true
+    const mockVerifyMessage = vi.mocked(verifyMessage);
+    mockVerifyMessage.mockResolvedValue(true);
+
+    expect(createRes).exist;
+    await safeDeleteDelegateStatementTracked({
+      address: mockAddress,
+      signature: args.signature,
+      message: mockMessage,
+    });
+
+    // Check the value is not found
+    const deleteRes = await getDelegateStatementForAddress({
+      address: args.address,
+      messageOrMessageHash: { type: "MESSAGE_HASH", value: messageHash },
+    });
+
+    expect(deleteRes).not.exist;
+  });
+
+  it("should call doInSpan with correct parameters", async () => {
+    const doInSpanSpy = vi.spyOn(logging, "doInSpan");
+
+    // Mock the verifyMessage function to return true
+    const mockVerifyMessage = vi.mocked(verifyMessage);
+    mockVerifyMessage.mockResolvedValue(true);
+
+    await safeDeleteDelegateStatementTracked({
+      address: mockAddress,
+      signature: args.signature,
+      message: mockMessage,
+    });
+
+    // Assert that doInSpan was called with the expected metadata
+    expect(doInSpanSpy).toHaveBeenCalledWith(
+      { name: "deleteDelegateStatement" },
+      expect.any(Function) // Ensure that the second argument is any function
+    );
   });
 });
