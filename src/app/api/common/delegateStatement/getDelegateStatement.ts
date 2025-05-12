@@ -8,6 +8,40 @@ import { doInSpan } from "@/app/lib/logging";
 import { createHash } from "crypto";
 import { MessageOrMessageHash } from "@/app/api/common/delegateStatement/delegateStatement";
 
+export const getLatestPublishedDelegateStatementInSpan = (
+  addressOrENSName: string
+) => {
+  return doInSpan(
+    {
+      name: "getLatestPublishedDelegateStatement",
+    },
+    () => getLatestPublishedDelegateStatement(addressOrENSName)
+  );
+};
+export const getLatestPublishedDelegateStatement = async (
+  addressOrENSName: string
+) => {
+  const { slug } = Tenant.current();
+
+  try {
+    return prismaWeb2Client.delegateStatements.findFirst({
+      where: {
+        address: addressOrENSName.toLowerCase(),
+        dao_slug: slug,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  } catch (error) {
+    return console.error(error);
+  }
+};
+
+export const fetchLatestPublishedDelegateStatement = cache(
+  cache(getLatestPublishedDelegateStatementInSpan)
+);
+
 export const getDelegateStatement = (
   addressOrENSName: string,
   messageOrMessageHash: MessageOrMessageHash

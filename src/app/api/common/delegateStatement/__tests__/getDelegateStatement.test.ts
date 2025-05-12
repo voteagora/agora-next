@@ -10,6 +10,7 @@ import {
   getDelegateStatementForAddress,
   getDelegateStatements,
   getDelegateStatementsForAddress,
+  getLatestPublishedDelegateStatement,
 } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
@@ -209,5 +210,22 @@ describe("getDelegateStatementsForAddress", () => {
       (statement) => statement.message_hash
     );
     expect(statementHashes).toEqual(expectedHashes);
+  });
+});
+
+describe("getLatestPublishedDelegateStatement", async () => {
+  beforeEach(async () => {
+    // Create a couple delegate statements
+    await createTwoMockDelegateStatement();
+  });
+
+  afterEach(async () => {
+    // Delete the delegate statements to clean up
+    await deleteTwoMockDelegateStatement();
+  });
+
+  it("Should get the latest published delegate statement", async () => {
+    const res = await getLatestPublishedDelegateStatement(mockAddress);
+    expect(res!!.message_hash).toBe(messageHash1);
   });
 });
