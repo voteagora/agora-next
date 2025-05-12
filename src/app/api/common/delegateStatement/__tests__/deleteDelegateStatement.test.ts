@@ -109,16 +109,16 @@ describe("safeDeleteDelegateStatement", () => {
       messageOrMessageHash: { type: "MESSAGE_HASH", value: messageHash },
     });
 
+    // Mock the verifyMessage function to return true
+    const mockVerifyMessage = vi.mocked(verifyMessage);
+    mockVerifyMessage.mockResolvedValue(true);
+
     expect(createRes).exist;
     await safeDeleteDelegateStatement({
       address: mockAddress,
       signature: args.signature,
       message: mockMessage,
     });
-
-    // Mock the verifyMessage function to return true
-    const mockVerifyMessage = vi.mocked(verifyMessage);
-    mockVerifyMessage.mockResolvedValue(true);
 
     // Check the value is not found
     const deleteRes = await getDelegateStatementForAddress({
