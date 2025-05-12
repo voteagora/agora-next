@@ -69,12 +69,12 @@ export const getDelegatesFromDaoNode = async (options?: {
     }
 
     if (data && data.delegates && data.delegates.length > 0) {
-      const delegateAddresses = data.delegates.map((delegate) =>
-        delegate.addr.toLowerCase()
+      const delegateAddresses = data.delegates.map(
+        (delegate: { addr: string }) => delegate.addr.toLowerCase()
       );
 
       const statements = await Promise.all(
-        delegateAddresses.map(async (address) => {
+        delegateAddresses.map(async (address: string) => {
           try {
             const statement = await fetchDelegateStatement(address);
             return statement ? { address, statement } : null;
@@ -94,21 +94,29 @@ export const getDelegatesFromDaoNode = async (options?: {
       });
 
       // Merge the statements with the delegate data
-      data.delegates = data.delegates.map((delegate) => {
-        const lowerCaseAddress = delegate.addr.toLowerCase();
-        return {
-          address: lowerCaseAddress,
-          votingPower: {
-            total: delegate.voting_power || "0",
-            direct: "0",
-            advanced: "0",
-          },
-          statement: statementMap.get(lowerCaseAddress) || null,
-          numOfDelegators: delegate.from_cnt || "0",
-          mostRecentDelegationBlock: delegate.most_recent_block || "0",
-          lastVoteBlock: delegate.last_vote_block || "0",
-        };
-      });
+      data.delegates = data.delegates.map(
+        (delegate: {
+          addr: string;
+          voting_power?: string;
+          from_cnt?: string;
+          most_recent_block?: string;
+          last_vote_block?: string;
+        }) => {
+          const lowerCaseAddress = delegate.addr.toLowerCase();
+          return {
+            address: lowerCaseAddress,
+            votingPower: {
+              total: delegate.voting_power || "0",
+              direct: "0",
+              advanced: "0",
+            },
+            statement: statementMap.get(lowerCaseAddress) || null,
+            numOfDelegators: delegate.from_cnt || "0",
+            mostRecentDelegationBlock: delegate.most_recent_block || "0",
+            lastVoteBlock: delegate.last_vote_block || "0",
+          };
+        }
+      );
     }
 
     return data;
