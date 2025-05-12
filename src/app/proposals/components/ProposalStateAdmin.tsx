@@ -78,7 +78,8 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
           ) {
             return "This proposal is now passed and can be queued for execution.";
           } else if (proposal.proposalType === "OPTIMISTIC") {
-            return "This proposal has been optimistically passed.";
+            // No banner for Optimistic proposals.
+            return null;
           }
           return "This proposal can still be cancelled by the admin.";
         }
@@ -124,7 +125,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
 
   const action = renderAction();
 
-  if (action) {
+  if (action && renderLabel()) {
     return (
       <div className="flex flex-row justify-between items-center align-middle border border-line p-2 mb-6 rounded-md bg-neutral text-sm text-primary">
         <div className="ml-4">{renderLabel()}</div>
