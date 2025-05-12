@@ -15,8 +15,6 @@ import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { trackEvent } from "@/lib/analytics";
 import { useAccount } from "wagmi";
-import { TENANT_NAMESPACES } from "@/lib/constants";
-import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -36,7 +34,6 @@ export default function CitizenCardList({
   const { advancedDelegators } = useConnectedDelegate();
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
   const { address } = useAccount();
-  const { namespace } = Tenant.current();
 
   useEffect(() => {
     setIsDelegatesFiltering(false);
@@ -60,7 +57,7 @@ export default function CitizenCardList({
   const { isAdvancedUser } = useIsAdvancedUser();
 
   useEffect(() => {
-    if (address && namespace === TENANT_NAMESPACES.OPTIMISM) {
+    if (address) {
       trackEvent({
         event_name: ANALYTICS_EVENT_NAMES.CITIZENS_PAGE_VIEW_WITH_WALLET,
         event_data: {
@@ -68,7 +65,7 @@ export default function CitizenCardList({
         },
       });
     }
-  }, [address, namespace]);
+  }, [address]);
 
   return (
     <DialogProvider>

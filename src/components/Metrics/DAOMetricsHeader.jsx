@@ -18,10 +18,9 @@ import { AgoraIconWithText } from "@/icons/AgoraIconWithText";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { useAccount } from "wagmi";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default function DAOMetricsHeader() {
-  const { token, ui, contracts, namespace } = Tenant.current();
+  const { token, ui, contracts } = Tenant.current();
   const [isClient, setIsClient] = useState(false);
   const { votableSupply, totalSupply, isLoading } = useDAOMetrics();
   const { address } = useAccount();
@@ -46,7 +45,7 @@ export default function DAOMetricsHeader() {
   }, []);
 
   useEffect(() => {
-    if (address && namespace === TENANT_NAMESPACES.OPTIMISM) {
+    if (address) {
       trackEvent({
         event_name: ANALYTICS_EVENT_NAMES.WALLET_CONNECTED,
         event_data: {
@@ -54,7 +53,7 @@ export default function DAOMetricsHeader() {
         },
       });
     }
-  }, [address, namespace]);
+  }, [address]);
 
   const formattedMetrics = {
     votableSupply: formatNumber(votableSupply),
