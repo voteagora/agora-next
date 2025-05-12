@@ -126,6 +126,7 @@ function CastVoteInputContent({
     isLoading,
     isSuccess,
     isError,
+    error,
     fallbackToStandardVote,
     setFallbackToStandardVote,
     reset,
@@ -208,6 +209,7 @@ function CastVoteInputContent({
           {isError && (!isGasRelayLive || fallbackToStandardVote) && (
             <ErrorState
               message="Error submitting vote"
+              error={error}
               button1={{ message: "Cancel", action: reset }}
               button2={{
                 message: "Try again",
@@ -218,6 +220,7 @@ function CastVoteInputContent({
           {isError && isGasRelayLive && !fallbackToStandardVote && (
             <ErrorState
               message="Error submitting vote"
+              error={error}
               button1={{
                 message: "Try regular vote",
                 action: () => {
@@ -566,35 +569,46 @@ function ErrorState({
   message,
   button1,
   button2,
+  error,
 }: {
   message: string;
   button1: { message: string; action: () => void };
   button2: { message: string; action: () => void };
+  error: any;
 }) {
   return (
-    <div className="flex flex-col gap-3 p-3 border-t border-line">
-      <div className="py-2 px-4 bg-red-300 text-xs text-red-700 font-medium rounded-lg flex items-center gap-2">
-        <Image
-          src={icons.infoRed}
-          alt="Info"
-          width={24}
-          height={24}
-          className="text-red-700"
-        />
-        {message}
-      </div>
-      <div className="flex flex-row gap-2">
-        <Button
-          className="w-full"
-          variant="elevatedOutline"
-          onClick={button1.action}
-        >
-          {button1.message}
-        </Button>
-        <Button className="w-full" onClick={button2.action}>
-          {button2.message}
-        </Button>
-      </div>
-    </div>
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger>
+          <div className="flex flex-col gap-3 p-3 border-t border-line">
+            <div className="py-2 px-4 bg-red-300 text-xs text-red-700 font-medium rounded-lg flex items-center gap-2">
+              <Image
+                src={icons.infoRed}
+                alt="Info"
+                width={24}
+                height={24}
+                className="text-red-700"
+              />
+              {message}
+            </div>
+            <div className="flex flex-row gap-2">
+              <Button
+                className="w-full"
+                variant="elevatedOutline"
+                onClick={button1.action}
+              >
+                {button1.message}
+              </Button>
+              <Button className="w-full" onClick={button2.action}>
+                {button2.message}
+              </Button>
+            </div>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <div>{JSON.stringify(error || {}, null, 2)}</div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
