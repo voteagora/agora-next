@@ -12,6 +12,9 @@ import { cn } from "@/lib/utils";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { trackEvent } from "@/lib/analytics";
+import { useAccount } from "wagmi";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -30,6 +33,7 @@ export default function CitizenCardList({
   const [delegates, setDelegates] = useState(initialDelegates.data);
   const { advancedDelegators } = useConnectedDelegate();
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
+  const { address } = useAccount();
 
   useEffect(() => {
     setIsDelegatesFiltering(false);
@@ -51,6 +55,17 @@ export default function CitizenCardList({
   };
 
   const { isAdvancedUser } = useIsAdvancedUser();
+
+  useEffect(() => {
+    if (address) {
+      trackEvent({
+        event_name: ANALYTICS_EVENT_NAMES.CITIZENS_PAGE_VIEW_WITH_WALLET,
+        event_data: {
+          address,
+        },
+      });
+    }
+  }, [address]);
 
   return (
     <DialogProvider>

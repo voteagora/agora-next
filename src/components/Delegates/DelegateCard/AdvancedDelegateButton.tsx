@@ -18,10 +18,8 @@ export function AdvancedDelegateButton({
   delegators: string[] | null;
 }) {
   const { address } = useAccount();
-
   const isSelfDelegation =
     address?.toLowerCase() === delegate.address?.toLowerCase();
-
   const isDisabled =
     !!address &&
     !!(

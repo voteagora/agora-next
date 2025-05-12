@@ -1,9 +1,9 @@
 import { useAccount } from "wagmi";
-import { useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { useDelegate } from "@/hooks/useDelegate";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { useGetDelegatees } from "./useGetDelegatee";
 
 export const useProfileData = () => {
   const { ui } = Tenant.current();
@@ -13,6 +13,8 @@ export const useProfileData = () => {
   const { data: delegate, isFetching } = useDelegate({
     address,
   });
+
+  const { data: delegatees } = useGetDelegatees({ address });
 
   const { data: scwAddress } = useSmartAccountAddress({
     owner: delegate ? (isSmartAccountEnabled ? address : undefined) : undefined,
@@ -34,5 +36,6 @@ export const useProfileData = () => {
     scwAddress,
     hasStatement,
     canCreateDelegateStatement,
+    delegatees,
   };
 };

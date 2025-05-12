@@ -15,12 +15,15 @@ import {
 } from "@/components/ui/hover-card";
 import { useDAOMetrics } from "@/hooks/useDAOMetrics";
 import { AgoraIconWithText } from "@/icons/AgoraIconWithText";
+import { trackEvent } from "@/lib/analytics";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { useAccount } from "wagmi";
 
 export default function DAOMetricsHeader() {
   const { token, ui, contracts } = Tenant.current();
   const [isClient, setIsClient] = useState(false);
   const { votableSupply, totalSupply, isLoading } = useDAOMetrics();
-
+  const { address } = useAccount();
   const governanceForumLink = ui.link("governance-forum");
   const bugsLink = ui.link("bugs");
   const changeLogLink = ui.link("changelog");
@@ -40,6 +43,17 @@ export default function DAOMetricsHeader() {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (address) {
+      trackEvent({
+        event_name: ANALYTICS_EVENT_NAMES.WALLET_CONNECTED,
+        event_data: {
+          address,
+        },
+      });
+    }
+  }, [address]);
 
   const formattedMetrics = {
     votableSupply: formatNumber(votableSupply),

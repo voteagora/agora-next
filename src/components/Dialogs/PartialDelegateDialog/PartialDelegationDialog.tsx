@@ -21,12 +21,14 @@ interface Props {
   delegate: DelegateChunk;
   fetchCurrentDelegatees: (addressOrENSName: string) => Promise<Delegation[]>;
   closeDialog: () => void;
+  isDelegationEncouragement?: boolean;
 }
 
 export function PartialDelegationDialog({
   delegate,
   fetchCurrentDelegatees,
   closeDialog,
+  isDelegationEncouragement,
 }: Props) {
   const { contracts, ui } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
@@ -143,6 +145,15 @@ export function PartialDelegationDialog({
       },
     });
     setSuccessHash(hash);
+    if (isDelegationEncouragement) {
+      trackEvent({
+        event_name: ANALYTICS_EVENT_NAMES.DELEGATION_ENCOURAGEMENT_CTA,
+        event_data: {
+          delegator: ownerAddress as `0x${string}`,
+          transaction_hash: hash,
+        },
+      });
+    }
   };
 
   const renderTokenBalance = () => {

@@ -116,6 +116,11 @@ export enum ANALYTICS_EVENT_NAMES {
   PARTIAL_DELEGATION = "partial_delegation",
   CREATE_PROPOSAL = "create_proposal",
   SHARE_VOTE = "share_vote",
+  DELEGATION_ENCOURAGEMENT_CTA = "delegation_encouragement_cta",
+  DELEGATION_ENCOURAGEMENT_DOT = "delegation_encouragement_dot",
+  WALLET_CONNECTED = "wallet_connected",
+  DELEGATE_PAGE_VIEW_WITH_WALLET = "delegate_page_view_with_wallet",
+  CITIZENS_PAGE_VIEW_WITH_WALLET = "citizens_page_view_with_wallet",
 }
 
 export type AnalyticsEvent =
@@ -180,6 +185,37 @@ export type AnalyticsEvent =
         proposal_id: string;
         address?: `0x${string}`;
         type: "X" | "COPY_LINK" | "DOWNLOAD_IMAGE" | "WARPCAST";
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.DELEGATION_ENCOURAGEMENT_CTA;
+      event_data: {
+        transaction_hash: string;
+        delegator: `0x${string}`;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.DELEGATION_ENCOURAGEMENT_DOT;
+      event_data: {
+        address: `0x${string}`;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.WALLET_CONNECTED;
+      event_data: {
+        address: `0x${string}`;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.DELEGATE_PAGE_VIEW_WITH_WALLET;
+      event_data: {
+        address: `0x${string}`;
+      };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.CITIZENS_PAGE_VIEW_WITH_WALLET;
+      event_data: {
+        address: `0x${string}`;
       };
     };
 

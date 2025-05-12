@@ -10,7 +10,7 @@ const ICON_WIDTH = 24;
 export function DelegateSocialLinks({ discord, twitter, warpcast }) {
   const warpcastUsername = warpcast?.replace(/@/g, "");
   return (
-    <div className="flex flex-row gap-4 h-auto items-center justify-center">
+    <div className="flex flex-row gap-4 h-auto w-max">
       {twitter && (
         <button
           onClick={(e) => {
