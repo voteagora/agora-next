@@ -9,6 +9,8 @@ import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { trackEvent } from "@/lib/analytics";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -43,6 +45,17 @@ export default function DelegateContent({
     }, 900);
     return () => clearTimeout(timer);
   }, [address, showDialog, openDialog]);
+
+  useEffect(() => {
+    if (address) {
+      trackEvent({
+        event_name: ANALYTICS_EVENT_NAMES.DELEGATE_PAGE_VIEW_WITH_WALLET,
+        event_data: {
+          address,
+        },
+      });
+    }
+  }, [address]);
 
   return layout === "grid" ? (
     <DelegateCardList
