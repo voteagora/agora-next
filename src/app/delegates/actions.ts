@@ -16,6 +16,7 @@ import {
 import {
   fetchDelegateStatement as apiFetchDelegateStatement,
   fetchDelegateStatements as apiFetchDelegateStatements,
+  fetchLatestPublishedDelegateStatement as apiFetchLatestPublishedDelegateStatement,
 } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import {
   fetchAllDelegatorsInChains,
@@ -28,6 +29,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
 import { stageStatus } from "@/app/lib/sharedEnums";
+import { MessageOrMessageHash } from "@/app/api/common/delegateStatement/delegateStatement";
 
 export const fetchDelegate = async (address: string) => {
   try {
@@ -63,8 +65,8 @@ export const fetchVoterStats = unstable_cache(
 );
 
 export const fetchDelegateStatement = unstable_cache(
-  async (address: string, stage: stageStatus) => {
-    return apiFetchDelegateStatement(address, stage);
+  async (address: string, messageOrMessageHash: MessageOrMessageHash) => {
+    return apiFetchDelegateStatement(address, messageOrMessageHash);
   },
   ["delegateStatement"],
   {
@@ -76,7 +78,7 @@ export const fetchDelegateStatement = unstable_cache(
 );
 
 export const fetchDelegateStatements = unstable_cache(
-  async (address: string, stage: stageStatus) => {
+  async (address: string, stage?: stageStatus) => {
     return apiFetchDelegateStatements(address, stage);
   },
   ["delegateStatements"],
@@ -85,6 +87,17 @@ export const fetchDelegateStatements = unstable_cache(
     // often and invalidated with every delegate statement update
     revalidate: 600, // 10 minute cache
     tags: ["delegateStatements"],
+  }
+);
+
+export const fetchLatestPublishedDelegateStatement = unstable_cache(
+  async (addressOrENSName: string) => {
+    return apiFetchLatestPublishedDelegateStatement(addressOrENSName);
+  },
+  ["latestPublishedDelegateStatement"],
+  {
+    revalidate: 600, // 10 minute cache
+    tags: ["latestPublishedDelegateStatement"],
   }
 );
 
