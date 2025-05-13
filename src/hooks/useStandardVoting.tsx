@@ -6,6 +6,7 @@ import { trackEvent } from "@/lib/analytics";
 import { useAccount } from "wagmi";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
+import { WriteContractErrorType } from "wagmi/actions";
 
 const useStandardVoting = ({
   proposalId,
@@ -22,11 +23,16 @@ const useStandardVoting = ({
 }) => {
   const { contracts } = Tenant.current();
   const { address } = useAccount();
-  const { writeContractAsync: standardVote, isError: _standardVoteError } =
-    useWriteContract();
+  const {
+    writeContractAsync: standardVote,
+    isError: _standardVoteError,
+    error: _error,
+  } = useWriteContract();
 
   const [standardVoteError, setStandardVoteError] =
     useState(_standardVoteError);
+  const [standardVoteErrorDetails, setStandardVoteErrorDetails] =
+    useState<WriteContractErrorType | null>(_error);
   const [standardVoteLoading, setStandardVoteLoading] = useState(false);
   const [standardVoteSuccess, setStandardVoteSuccess] = useState(false);
   const [standardTxHash, setStandardTxHash] = useState<string | undefined>(
@@ -71,6 +77,7 @@ const useStandardVoting = ({
         }
       } catch (error) {
         setStandardVoteError(true);
+        setStandardVoteErrorDetails(_error);
       } finally {
         setStandardVoteLoading(false);
       }
@@ -93,6 +100,7 @@ const useStandardVoting = ({
     resetError: () => setStandardVoteError(false),
     isSuccess: standardVoteSuccess,
     write,
+    error: standardVoteErrorDetails,
     data: { advancedTxHash, standardTxHash },
   };
 };

@@ -25,7 +25,7 @@ import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/
 import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOnchainProposalDialog";
 import SponsorSnapshotProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorSnapshotProposalDialog";
 import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithubPRDialog";
-import { StakedDeposit } from "@/lib/types";
+import { ANALYTICS_EVENT_NAMES, StakedDeposit } from "@/lib/types";
 import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
 import SubscribeDialog from "@/components/Notifications/SubscribeDialog";
@@ -33,8 +33,10 @@ import { ShareDialog as ShareVoteDialog } from "@/components/Proposals/ProposalP
 import { Vote } from "@/app/api/common/votes/vote";
 import { SimulationReportDialog } from "../SimulationReportDialog/SimulationReportDialog";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
+import { EncourageConnectWalletDialog } from "@/components/Delegates/Delegations/EncourageConnectWalletDialog";
 import { CreateScopeDialog } from "@/components/Admin/CreateScopeDialog";
 import { ScopeData } from "@/lib/types";
+import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActionDialog";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -56,19 +58,19 @@ export type DialogType =
   | SubscribeDialog
   | ShareVoteDialogType
   | SimulationReportDialogType
-  | CreateScopeDialogType;
+  | EncourageConnectWalletDialogType
+  | CreateScopeDialogType
+  | AccountActionDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
   type: "DELEGATE";
   params: {
     delegate: DelegateChunk;
-    fetchBalanceForDirectDelegation: (
-      addressOrENSName: string
-    ) => Promise<bigint>;
     fetchDirectDelegatee: (
       addressOrENSName: string
     ) => Promise<DelegateePayload | null>;
+    isDelegationEncouragement?: boolean;
   };
 };
 
@@ -90,6 +92,7 @@ export type AdvancedDelegateDialogType = {
   params: {
     target: string;
     fetchAllForAdvancedDelegation: typeof fetchAllForAdvancedDelegation;
+    isDelegationEncouragement?: boolean;
   };
 };
 
@@ -98,6 +101,7 @@ export type PartialDelegateDialogType = {
   params: {
     delegate: DelegateChunk;
     fetchCurrentDelegatees: (addressOrENSName: string) => Promise<Delegation[]>;
+    isDelegationEncouragement?: boolean;
   };
 };
 
@@ -202,7 +206,7 @@ export type ShareVoteDialogType = {
 export type ApprovalCastVoteDialogProps = {
   proposal: Proposal;
   hasStatement: boolean;
-  votingPower: VotingPowerData;
+  votingPower: VotingPowerData | null;
   authorityChains: string[][] | null;
   missingVote: MissingVote;
   closeDialog: () => void;
@@ -256,6 +260,11 @@ export type SimulationReportDialogType = {
   className?: string;
 };
 
+export type EncourageConnectWalletDialogType = {
+  type: "ENCOURAGE_CONNECT_WALLET";
+  params: {};
+};
+
 export type CreateScopeDialogType = {
   type: "CREATE_SCOPE";
   params: {
@@ -265,16 +274,21 @@ export type CreateScopeDialogType = {
   className?: string;
 };
 
+export type AccountActionDialogType = {
+  type: "ACCOUNT_ACTION";
+  params: {};
+};
+
 export const dialogs: DialogDefinitions<DialogType> = {
   DELEGATE: (
-    { delegate, fetchBalanceForDirectDelegation, fetchDirectDelegatee },
+    { delegate, fetchDirectDelegatee, isDelegationEncouragement },
     closeDialog
   ) => {
     return (
       <DelegateDialog
         delegate={delegate}
-        fetchBalanceForDirectDelegation={fetchBalanceForDirectDelegation}
         fetchDirectDelegatee={fetchDirectDelegatee}
+        isDelegationEncouragement={isDelegationEncouragement}
       />
     );
   },
@@ -290,17 +304,21 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
-  PARTIAL_DELEGATE: ({ delegate, fetchCurrentDelegatees }, closeDialog) => {
+  PARTIAL_DELEGATE: (
+    { delegate, fetchCurrentDelegatees, isDelegationEncouragement },
+    closeDialog
+  ) => {
     return (
       <PartialDelegationDialog
         closeDialog={closeDialog}
         delegate={delegate}
         fetchCurrentDelegatees={fetchCurrentDelegatees}
+        isDelegationEncouragement={isDelegationEncouragement}
       />
     );
   },
   ADVANCED_DELEGATE: (
-    { target, fetchAllForAdvancedDelegation },
+    { target, fetchAllForAdvancedDelegation, isDelegationEncouragement },
     closeDialog
   ) => {
     return (
@@ -308,6 +326,7 @@ export const dialogs: DialogDefinitions<DialogType> = {
         target={target}
         fetchAllForAdvancedDelegation={fetchAllForAdvancedDelegation}
         completeDelegation={closeDialog}
+        isDelegationEncouragement={isDelegationEncouragement}
       />
     );
   },
@@ -471,6 +490,9 @@ export const dialogs: DialogDefinitions<DialogType> = {
   SIMULATION_REPORT: ({ report }, closeDialog) => (
     <SimulationReportDialog report={report} closeDialog={closeDialog} />
   ),
+  ENCOURAGE_CONNECT_WALLET: ({}, closeDialog) => (
+    <EncourageConnectWalletDialog closeDialog={closeDialog} />
+  ),
   CREATE_SCOPE: ({ proposalTypeId, onSuccess }, closeDialog) => {
     return (
       <CreateScopeDialog
@@ -479,6 +501,9 @@ export const dialogs: DialogDefinitions<DialogType> = {
         closeDialog={closeDialog}
       />
     );
+  },
+  ACCOUNT_ACTION: ({}, closeDialog) => {
+    return <CreateAccountActionDialog closeDialog={closeDialog} />;
   },
   // FAQ: () => {
   //   return <FaqDialog />;

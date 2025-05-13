@@ -5,11 +5,14 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { Lock } from "lucide-react";
+import toast from "react-hot-toast";
+import BlockScanUrls from "../shared/BlockScanUrl";
 import {
   useReadContracts,
   useWriteContract,
   useSimulateContract,
   useWaitForTransactionReceipt,
+  useAccount,
 } from "wagmi";
 import { Separator } from "@/components/ui/separator";
 import Tenant from "@/lib/tenant/tenant";
@@ -26,6 +29,7 @@ export default function GovernorSettings() {
 
   const secondsPerBlock = getSecondsPerBlock(chainIdToUse);
   const { data: adminAddress } = useGovernorAdmin({ enabled: true });
+  const { address } = useAccount();
 
   const govContract = {
     address: contracts.governor.address as `0x${string}`,
@@ -79,7 +83,7 @@ export default function GovernorSettings() {
     );
   }
 
-  const { data: setVotingPeriodConfig, isError: setVotingPeriodError } =
+  const { data: votingPeriodConfig, isError: votingPeriodError } =
     useSimulateContract({
       ...govContract,
       functionName: "setVotingPeriod",
@@ -91,15 +95,18 @@ export default function GovernorSettings() {
     writeContract: writeSetVotingPeriod,
     isPending: isLoadingSetVotingPeriod,
   } = useWriteContract();
-  const { isLoading: isLoadingSetVotingPeriodTransaction } =
-    useWaitForTransactionReceipt({
-      hash: resultSetVotingPeriod,
-    });
+  const {
+    isLoading: isLoadingSetVotingPeriodTransaction,
+    status: periodTXStatus,
+    error: periodTXError,
+  } = useWaitForTransactionReceipt({
+    hash: resultSetVotingPeriod,
+  });
   const isDisabledSetVotingPeriod =
     isLoadingSetVotingPeriod || isLoadingSetVotingPeriodTransaction;
 
   const [votingDelay, setVotingDelay] = useState("");
-  const { data: setVotingDelayConfig, isError: setVotingDelayError } =
+  const { data: votingDelayConfig, isError: votingDelayError } =
     useSimulateContract({
       ...govContract,
       functionName: "setVotingDelay",
@@ -110,105 +117,196 @@ export default function GovernorSettings() {
     writeContract: writeSetVotingDelay,
     isPending: isLoadingSetVotingDelay,
   } = useWriteContract();
-  const { isLoading: isLoadingSetVotingDelayTransaction } =
-    useWaitForTransactionReceipt({
-      hash: resultSetVotingDelay,
-    });
+  const {
+    isLoading: isLoadingSetVotingDelayTransaction,
+    status: delayTXStatus,
+    error: delayTXerror,
+  } = useWaitForTransactionReceipt({
+    hash: resultSetVotingDelay,
+    confirmations: 1,
+  });
   const isDisabledSetVotingDelay =
     isLoadingSetVotingDelay || isLoadingSetVotingDelayTransaction;
+
+  const isAdmin = address === adminAddress;
+
+  // For working with updating the values
+  useEffect(() => {
+    const triggerToast = ({
+      success,
+      hash,
+    }: {
+      success: boolean;
+      hash?: string;
+    }) => {
+      success
+        ? toast.success(
+            <div className="flex flex-col items-center gap-2 p-1">
+              <span className="text-sm font-semibold">
+                Updated Successfully!
+              </span>
+              {hash ? <BlockScanUrls hash1={hash} /> : null}
+            </div>
+          )
+        : toast.error("Transaction failed.");
+    };
+
+    if (delayTXStatus === "success") {
+      triggerToast({ success: true, hash: resultSetVotingDelay });
+    } else if (periodTXStatus === "success") {
+      triggerToast({ success: true, hash: resultSetVotingPeriod });
+    } else if (delayTXStatus === "error" || periodTXStatus === "error") {
+      triggerToast({ success: false });
+    }
+
+    // Debugging for undefined errors
+    if (delayTXerror) {
+      console.error("Transaction error - delay:", delayTXerror);
+    }
+    if (periodTXError) {
+      console.error("Transaction error - period:", periodTXError);
+    }
+  }, [
+    delayTXStatus,
+    delayTXerror,
+    periodTXStatus,
+    periodTXError,
+    resultSetVotingDelay,
+    resultSetVotingPeriod,
+  ]);
 
   return (
     <div className="gl_box bg-neutral">
       <section>
         <h1 className="font-extrabold text-2xl text-primary">
-          Governor settings
+          Governor Settings
         </h1>
-        <p className="text-secondary">Set how all proposals work</p>
       </section>
       <div className="my-4">
-        <div className="space-y-4 sm:space-y-0 sm:flex sm:justify-between sm:gap-4">
-          <div className="flex-1">
-            <Label>Voting period</Label>
-            <div className="relative flex items-center">
-              <Input
-                min={0}
-                value={votingPeriod}
-                onChange={(e) => setVotingPeriod(e.target.value)}
-                disabled={/* isInitializing || */ isDisabledSetVotingPeriod}
-                step={0.01}
-                type="number"
-              />
-              <p className="absolute text-sm text-tertiary right-[96px]">
-                Hours
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="absolute right-[6px] rounded-sm"
-                loading={isDisabledSetVotingPeriod}
-                disabled={
-                  /* isInitializing || */ isDisabledSetVotingPeriod ||
-                  setVotingPeriodError ||
-                  votingPeriod === ""
-                }
-                onClick={() => {
-                  writeSetVotingPeriod(setVotingPeriodConfig!.request);
-                }}
-              >
-                Update
-              </Button>
-            </div>
+        {isAdmin ? (
+          <div className="space-y-4 sm:space-y-0 sm:flex sm:justify-between sm:gap-4 flex-column">
+            <GovernorUnlockedSetting
+              name={"Voting Period"}
+              value={votingPeriod}
+              setValue={setVotingPeriod}
+              disabled={isDisabledSetVotingPeriod}
+              min={0}
+              step={0.01}
+              writeContract={writeSetVotingPeriod}
+              setConfig={votingPeriodConfig}
+              period={"hours"}
+              isError={votingPeriodError}
+            />
+            <GovernorUnlockedSetting
+              name={"Voting Delay"}
+              value={votingDelay}
+              setValue={setVotingDelay}
+              disabled={isDisabledSetVotingDelay}
+              min={0}
+              step={0.01}
+              writeContract={writeSetVotingDelay}
+              setConfig={votingDelayConfig}
+              period={"hours"}
+              isError={votingDelayError}
+            />
           </div>
-          <div className="flex-1">
-            <Label>Voting delay</Label>
-            <div className="relative flex items-center">
-              <Input
-                min={0}
-                value={votingDelay}
-                onChange={(e) => setVotingDelay(e.target.value)}
-                disabled={/* isInitializing || */ isDisabledSetVotingDelay}
-                step={0.01}
-                type="number"
-              />
-              <p className="absolute text-sm text-tertiary right-[96px]">
-                Hours
-              </p>
-              <Button
-                className="absolute right-[6px] rounded-sm"
-                variant="outline"
-                size="sm"
-                loading={isDisabledSetVotingDelay}
-                disabled={
-                  /* isInitializing || */ isDisabledSetVotingDelay ||
-                  setVotingDelayError ||
-                  votingDelay === ""
-                }
-                onClick={() => {
-                  writeSetVotingDelay(setVotingDelayConfig!.request);
-                }}
-              >
-                Update
-              </Button>
-            </div>
+        ) : (
+          <div className="space-y-4 sm:space-y-0 sm:flex sm:justify-between sm:gap-4">
+            <GovernorLockedSetting
+              name={"Voting Period"}
+              value={votingPeriod}
+              period={"hours"}
+            />
+            <GovernorLockedSetting
+              name={"Voting Delay"}
+              value={votingDelay}
+              period={"hours"}
+            />
           </div>
-        </div>
+        )}
+
         <Separator className="my-8" />
-        <div className="space-y-1 sm:space-y-0 text-sm sm:flex sm:justify-between sm:items-center sm:px-2">
-          <div className="flex items-center gap-2">
-            <p className="text-secondary">Manager Address</p>
-            <Lock className="w-4 h-4 text-primary/30" />
-          </div>
-          <p className="text-secondary truncate">{manager}</p>
-        </div>
-        <div className="text-sm sm:flex sm:justify-between sm:items-center sm:px-2 mt-4">
-          <div className="flex items-center gap-2">
-            <p className="text-secondary">Admin Address</p>
-            <Lock className="w-4 h-4 text-primary/30" />
-          </div>
-          <p className="text-secondary truncate">
-            {adminAddress ? adminAddress : "0x..."}
-          </p>
-        </div>
+        <GovernorLockedSetting
+          name={"Manager Address"}
+          value={manager}
+          period={""}
+        />
+        {adminAddress && (
+          <GovernorLockedSetting
+            name={"Admin Address"}
+            value={adminAddress}
+            period={""}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function GovernorLockedSetting({
+  name,
+  value,
+  period,
+}: GovernLockSettingProps) {
+  return (
+    <div className="space-y-1 sm:space-y-0 text-sm sm:flex sm:justify-between sm:items-center sm:px-2 mb-4">
+      <div className="flex items-center gap-2 mr-1">
+        <p className="text-secondary">{name}</p>
+        <Lock className="w-4 h-4 text-primary/30" />
+      </div>
+      <p className="text-secondary truncate font-bold">
+        {value}
+        <span className="text-secondary font-medium"> {period}</span>
+      </p>
+    </div>
+  );
+}
+
+interface GovernLockSettingProps {
+  name: string;
+  value: string;
+  period: string;
+  setValue?: (value: any) => void;
+  disabled?: boolean;
+  min?: number;
+  step?: number;
+  writeContract?: any;
+  setConfig?: any;
+  isError?: boolean;
+}
+
+function GovernorUnlockedSetting(props: GovernLockSettingProps) {
+  return (
+    <div className="flex-1">
+      <Label>{props.name}</Label>
+      <div className="relative flex items-center">
+        <Input
+          min={props.min}
+          value={props.value}
+          onChange={(e) => props.setValue!(e.target.value)}
+          disabled={/* isInitializing || */ props.disabled || props.isError}
+          step={props.step}
+          type="number"
+        />
+        <p className="absolute text-sm text-tertiary right-[96px]">
+          {props.period}
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="absolute right-[6px] rounded-sm"
+          loading={props.disabled}
+          disabled={
+            /* isInitializing || */ props.disabled ||
+            props.isError ||
+            props.value === ""
+          }
+          onClick={() => {
+            props.writeContract(props.setConfig!.request);
+          }}
+        >
+          Update
+        </Button>
       </div>
     </div>
   );

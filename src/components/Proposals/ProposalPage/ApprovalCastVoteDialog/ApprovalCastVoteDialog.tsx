@@ -30,7 +30,7 @@ export function ReviewApprovalVoteDialog({
   options: ParsedProposalData["APPROVAL"]["kind"]["options"];
   reason: string;
   write: () => void;
-  votingPower: string;
+  votingPower: string | null;
   onClose: () => void;
 }) {
   const { address } = useAccount();
@@ -52,12 +52,14 @@ export function ReviewApprovalVoteDialog({
               {selectedOptions.length > 1 && "s"}
             </p>
           </div>
-          <div className="flex flex-col">
-            <span className="text-xs self-end">with</span>
-            <span className="mt-[2px]">
-              <TokenAmountDecorated amount={votingPower} />
-            </span>
-          </div>
+          {votingPower ? (
+            <div className="flex flex-col">
+              <span className="text-xs self-end">with</span>
+              <span className="mt-[2px]">
+                <TokenAmountDecorated amount={votingPower} />
+              </span>
+            </div>
+          ) : null}
         </div>
         <div className="border border-line rounded-lg p-4 space-y-4 mt-6">
           {selectedOptions.map((optionId, index) => {
@@ -98,8 +100,13 @@ export function ReviewApprovalVoteDialog({
           className="mt-6"
         >
           Vote for {selectedOptions.length} option
-          {selectedOptions.length > 1 && "s"} with{"\u00A0"}
-          {<TokenAmountDecorated amount={votingPower} />}
+          {selectedOptions.length > 1 && "s"}
+          {votingPower ? (
+            <>
+              {" "}
+              with{"\u00A0"} <TokenAmountDecorated amount={votingPower} />
+            </>
+          ) : null}
         </Button>
       </div>
     </div>
@@ -157,14 +164,16 @@ export function ApprovalCastVoteDialog({
   const { isLoading, isSuccess, write, isError, data } = useAdvancedVoting({
     proposalId: proposal.id,
     support: abstain ? 2 : 1,
-    advancedVP: BigInt(votingPower.advancedVP),
+    advancedVP: votingPower ? BigInt(votingPower.advancedVP) : null,
     authorityChains,
     reason,
     params: encodedParams,
     missingVote,
   });
 
-  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+  const vpToDisplay = votingPower
+    ? getVpToDisplay(votingPower, missingVote)
+    : null;
 
   useMemo(() => {
     const encoded = abstain
@@ -183,7 +192,7 @@ export function ApprovalCastVoteDialog({
       params: selectedOptions.map(
         (option) => proposalData.options[option].description
       ),
-      weight: votingPower.directVP || votingPower.advancedVP,
+      weight: votingPower?.directVP || votingPower?.advancedVP || "0",
     };
   }, [abstain, reason, selectedOptions, proposalData, votingPower]);
 
@@ -344,7 +353,7 @@ function CastVoteWithReason({
   setReason: React.Dispatch<React.SetStateAction<string>>;
   numberOfOptions: number;
   abstain: boolean;
-  votingPower: string;
+  votingPower: string | null;
   copy?: string;
 }) {
   return (
@@ -359,8 +368,13 @@ function CastVoteWithReason({
         {!abstain && numberOfOptions > 0 && (
           <Button onClick={() => onVoteClick()}>
             Vote for {numberOfOptions} option
-            {numberOfOptions > 1 && "s"} with{"\u00A0"}
-            {<TokenAmountDecorated amount={votingPower} />}
+            {numberOfOptions > 1 && "s"}
+            {votingPower ? (
+              <>
+                {" "}
+                with{"\u00A0"} <TokenAmountDecorated amount={votingPower} />
+              </>
+            ) : null}
           </Button>
         )}
         {!abstain && numberOfOptions === 0 && (
@@ -370,8 +384,13 @@ function CastVoteWithReason({
           <Button onClick={() => onVoteClick()}>
             {!copy ? (
               <>
-                Abstain from voting with{"\u00A0"}
-                <TokenAmountDecorated amount={votingPower} />
+                Abstain from voting
+                {votingPower ? (
+                  <>
+                    {" "}
+                    with{"\u00A0"} <TokenAmountDecorated amount={votingPower} />
+                  </>
+                ) : null}
               </>
             ) : (
               copy
