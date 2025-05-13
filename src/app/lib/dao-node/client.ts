@@ -45,7 +45,7 @@ export const getDelegatesFromDaoNode = async (options?: {
       include: "VP,DC,PR,LVB,MRD",
     });
 
-    const response = await fetch(`${url}/v1/delegates?${queryParams}`, {
+    const response = await fetch(`${url}v1/delegates?${queryParams}`, {
       cache: "no-store",
       headers: {
         "Cache-Control": "no-cache, no-store, must-revalidate",

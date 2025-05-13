@@ -83,8 +83,9 @@ async function getDelegates({
       const daoNodeDelegates = await getDelegatesFromDaoNode({
         sortBy: daoNodeSortBy,
         reverse: reverse,
-        limit: pagination.limit,
-        offset: pagination.offset,
+        ...(sort === "weighted_random" && seed
+          ? {}
+          : { limit: pagination.limit, offset: pagination.offset }),
       });
 
       // If we have valid data from the DAO node, use it instead of database query
@@ -97,14 +98,14 @@ async function getDelegates({
 
         if (sort === "weighted_random" && seed) {
           sortedDelegates.sort(() => Math.random() - 0.5);
+          // Apply pagination after sorting for weighted_random
+          sortedDelegates = sortedDelegates.slice(
+            pagination.offset,
+            pagination.offset + pagination.limit
+          );
         }
 
-        const paginatedDelegates = sortedDelegates.slice(
-          pagination.offset,
-          pagination.offset + pagination.limit
-        );
-
-        const transformedDelegates = paginatedDelegates.map((delegate) => {
+        const transformedDelegates = sortedDelegates.map((delegate) => {
           // Check if delegate has the expected properties
           if (!delegate || typeof delegate !== "object") {
             console.error("Invalid delegate object:", delegate);
@@ -196,14 +197,18 @@ async function getDelegates({
           };
         });
 
+        const hasNext = transformedDelegates.length >= pagination.limit;
+
         return {
           meta: {
-            has_next:
-              pagination.offset + pagination.limit <
-              daoNodeDelegates.delegates.length,
+            has_next: hasNext,
             next_offset: pagination.offset + pagination.limit,
             total_returned: transformedDelegates.length,
-            total_count: daoNodeDelegates.delegates.length,
+            total_count: hasNext
+              ? pagination.offset +
+                transformedDelegates.length +
+                pagination.limit
+              : pagination.offset + transformedDelegates.length,
           },
           data: transformedDelegates,
           seed,
