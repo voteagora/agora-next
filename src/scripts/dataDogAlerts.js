@@ -81,6 +81,7 @@ async function createOrUpdateApiErrorRateAlert({
       on_missing_data: "default",
       include_tags: false,
       new_host_delay: 300,
+      evaluation_delay: 900,
       ...additionalOptions,
     },
   };
