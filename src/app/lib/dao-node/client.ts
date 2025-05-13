@@ -98,7 +98,7 @@ export const getDelegatesFromDaoNode = async (options?: {
             address: lowerCaseAddress,
             votingPower: {
               total: delegate.voting_power || "0",
-              direct: "0",
+              direct: delegate.voting_power || "0",
               advanced: "0",
             },
             statement: statementMap.get(lowerCaseAddress) || null,
