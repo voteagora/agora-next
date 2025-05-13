@@ -159,9 +159,7 @@ const ProposalTransactionDisplay = ({
                       ui.theme === "dark" && "text-neutral"
                     )}
                   >
-                    {isSimulating
-                      ? "Simulating..."
-                      : "Simulate transactions (Beta)"}
+                    {isSimulating ? "Simulating..." : "Simulate transactions"}
                   </Button>
                 )}
             </div>
@@ -193,9 +191,7 @@ const ProposalTransactionDisplay = ({
                   ui.theme === "dark" && "text-neutral"
                 )}
               >
-                {isSimulating
-                  ? "Simulating..."
-                  : "Simulate transactions (Beta)"}
+                {isSimulating ? "Simulating..." : "Simulate transactions"}
               </Button>
             )}
         </div>

@@ -247,7 +247,7 @@ const BasicProposalForm = () => {
                 }
               }}
             >
-              Simulate transactions (Beta)
+              Simulate transactions
             </UpdatedButton>
           </div>
         )}

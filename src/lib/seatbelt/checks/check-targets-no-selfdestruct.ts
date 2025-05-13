@@ -1,6 +1,8 @@
 import { bullet, toAddressLink } from "../report";
 import type { ProposalCheck } from "../types";
 import { Provider } from "ethers";
+import { getCodeCached } from "./check-targets-verified-etherscan";
+
 /**
  * Check all targets with code if they contain selfdestruct.
  */
@@ -43,22 +45,39 @@ async function checkNoSelfdestructs(
   addresses: string[],
   provider: Provider
 ): Promise<{ info: string[]; warn: string[]; error: string[] }> {
+  const settledResults = await Promise.allSettled(
+    addresses.map(async (addr) => {
+      const status = await checkNoSelfdestruct(trustedAddrs, addr, provider);
+      const addressLink = toAddressLink(addr, false);
+      return { addressLink, status };
+    })
+  );
+
   const info: string[] = [];
   const warn: string[] = [];
   const error: string[] = [];
-  for (const addr of addresses) {
-    const status = await checkNoSelfdestruct(trustedAddrs, addr, provider);
-    const address = toAddressLink(addr, false);
-    if (status === "eoa") info.push(bullet(`${address}: EOA`));
-    else if (status === "empty")
-      warn.push(bullet(`${address}: EOA (may have code later)`));
-    else if (status === "safe")
-      info.push(bullet(`${address}: Contract (looks safe)`));
-    else if (status === "delegatecall")
-      warn.push(bullet(`${address}: Contract (with DELEGATECALL)`));
-    else if (status === "trusted")
-      info.push(bullet(`${address}: Trusted contract (not checked)`));
-    else error.push(bullet(`${address}: Contract (with SELFDESTRUCT)`));
+
+  for (const result of settledResults) {
+    if (result.status === "fulfilled") {
+      const res = result.value;
+      if (res.status === "eoa") info.push(bullet(`${res.addressLink}: EOA`));
+      else if (res.status === "empty")
+        warn.push(bullet(`${res.addressLink}: EOA (may have code later)`));
+      else if (res.status === "safe")
+        info.push(bullet(`${res.addressLink}: Contract (looks safe)`));
+      else if (res.status === "delegatecall")
+        warn.push(bullet(`${res.addressLink}: Contract (with DELEGATECALL)`));
+      else if (res.status === "trusted")
+        info.push(bullet(`${res.addressLink}: Trusted contract (not checked)`));
+      else
+        error.push(bullet(`${res.addressLink}: Contract (with SELFDESTRUCT)`));
+    } else {
+      console.error(
+        "Error checking selfdestruct for an address:",
+        result.reason
+      );
+      error.push(bullet(`Error processing an address for selfdestruct check.`));
+    }
   }
   return { info, warn, error };
 }
@@ -93,7 +112,7 @@ async function checkNoSelfdestruct(
     return "trusted";
 
   const [code, nonce] = await Promise.all([
-    provider.getCode(addr),
+    getCodeCached(provider, addr),
     provider.getTransactionCount(addr),
   ]);
 
