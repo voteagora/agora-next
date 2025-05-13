@@ -58,14 +58,14 @@ const DelegateCard = ({
               </span>
               {numProposals > 0 && !isVotingStatsPending && (
                 <span className="text-primary font-bold">
-                  {(
+                  {Math.round(
                     Math.round(
                       ((votingStats?.last_10_props || 0) /
                         Math.min(10, numProposals)) *
                         100 *
                         100
                     ) / 100
-                  ).toFixed(2)}
+                  )}
                   % Participation
                 </span>
               )}

@@ -14,6 +14,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import DelegateTableRow from "./DelegateTableRow";
+import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
+import Tenant from "@/lib/tenant/tenant";
+import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
+import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -31,6 +35,13 @@ export default function DelegateTable({
   const [delegates, setDelegates] = useState(initialDelegates.data);
 
   const fetching = useRef(false);
+
+  const { ui } = Tenant.current();
+  const isDelegationEncouragementEnabled = ui.toggle(
+    "delegation-encouragement"
+  )?.enabled;
+  const { isAdvancedUser } = useIsAdvancedUser();
+  const { advancedDelegators } = useConnectedDelegate();
 
   const { setIsDelegatesFiltering } = useAgoraContext();
 
@@ -55,6 +66,8 @@ export default function DelegateTable({
 
   return (
     <DialogProvider>
+      {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
+
       <div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg mt-6">
         <Table className="min-w-full">
           <TableHeader className="text-sm text-secondary sticky top-0 bg-neutral z-10 rounded-t-lg">
@@ -69,6 +82,8 @@ export default function DelegateTable({
               <TableHead className="h-10 text-secondary">
                 Delegated from
               </TableHead>
+              <TableHead className="h-10 text-secondary">Info</TableHead>
+              <TableHead className="h-10 text-secondary"></TableHead>
             </TableRow>
           </TableHeader>
           <InfiniteScroll
@@ -104,6 +119,8 @@ export default function DelegateTable({
                   delegate={
                     delegate as DelegateChunk & { numOfDelegators: bigint }
                   }
+                  isAdvancedUser={isAdvancedUser}
+                  delegators={advancedDelegators}
                 />
               ))
             )}

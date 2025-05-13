@@ -6,25 +6,34 @@ import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useVoterStats } from "@/hooks/useVoterStats";
 import { useRouter } from "next/navigation";
+import { DelegationSelector } from "../DelegateCard/DelegationSelector";
+import { DelegateSocialLinks } from "../DelegateCard/DelegateSocialLinks";
 
 export default function DelegateTableRow({
   delegate,
+  isAdvancedUser,
+  delegators,
 }: {
   delegate: DelegateChunk & { numOfDelegators: bigint };
+  isAdvancedUser: boolean;
+  delegators: string[] | null;
 }) {
   const router = useRouter();
   const { data: voterStats, isPending: isVoterStatsPending } = useVoterStats({
     address: delegate.address as `0x${string}`,
   });
+  const twitter = delegate?.statement?.twitter;
+  const discord = delegate?.statement?.discord;
+  const warpcast = delegate?.statement?.warpcast;
 
   const numProposals = voterStats?.total_proposals || 0;
-  const participation = Number(
+  const participation = Math.round(
     Math.round(
       ((voterStats?.last_10_props || 0) / Math.min(10, numProposals)) *
         100 *
         100
     ) / 100
-  ).toFixed(2);
+  );
 
   return (
     <TableRow
@@ -48,6 +57,20 @@ export default function DelegateTableRow({
       {/* @ts-ignore */}
       <TableCell>
         {delegate.numOfDelegators?.toString() || 0} addresses
+      </TableCell>
+      <TableCell className="justify-start">
+        <DelegateSocialLinks
+          discord={discord}
+          twitter={twitter}
+          warpcast={warpcast}
+        />
+      </TableCell>
+      <TableCell>
+        <DelegationSelector
+          delegate={delegate}
+          isAdvancedUser={isAdvancedUser}
+          delegators={delegators}
+        />
       </TableCell>
     </TableRow>
   );

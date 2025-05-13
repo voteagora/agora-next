@@ -138,7 +138,11 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
       </VStack>
       {reason && (
         <div>
-          <p className={"text-secondary font-medium text-xs leading-4"}>
+          <p
+            className={
+              "text-secondary font-medium text-xs leading-4 whitespace-pre-wrap [overflow-wrap:anywhere]"
+            }
+          >
             {reason}
           </p>
         </div>

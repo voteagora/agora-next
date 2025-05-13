@@ -45,6 +45,9 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   const retropgfToggle = ui.toggle("retropgf");
   const hasRetropgf = retropgfToggle !== undefined && retropgfToggle.enabled;
 
+  const infoToggle = ui.toggle("info");
+  const hasInfo = infoToggle !== undefined && infoToggle.enabled;
+
   // Format metrics
   const formattedMetrics = {
     votableSupply: formatNumber(votableSupply),
@@ -91,6 +94,16 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
             href: "/retropgf/3/summary",
             target: "_self",
             isActive: pathname.includes("retropgf/3/summary"),
+          },
+        ]
+      : []),
+    ...(hasInfo
+      ? [
+          {
+            name: "Info",
+            href: "/info",
+            target: "_self",
+            isActive: pathname.includes("info"),
           },
         ]
       : []),

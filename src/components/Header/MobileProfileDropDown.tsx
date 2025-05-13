@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import Tenant from "@/lib/tenant/tenant";
+
 import ENSAvatar from "../shared/ENSAvatar";
 import { Drawer } from "../ui/Drawer";
 import { ProfileDropDownContent } from "./ProfileDropDownContent";
+import EncourageDelegationDot from "./EncourageDelegationDot";
 
 type Props = {
   ensName: string | undefined;
@@ -11,6 +14,10 @@ type Props = {
 
 export const MobileProfileDropDown = ({ ensName }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { ui } = Tenant.current();
+  const isDelegationEncouragementEnabled = ui.toggle(
+    "delegation-encouragement"
+  )?.enabled;
 
   const handleOpenDrawer = () => {
     setIsOpen(true);
@@ -21,10 +28,13 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
   };
 
   return (
-    <div className="relative cursor-auto">
+    <div className="relative cursor-auto flex inline-flex">
       <button className="mt-1 outline-none" onClick={handleOpenDrawer}>
-        <div className="w-[30px] h-[30px] rounded-full">
-          <ENSAvatar ensName={ensName} />
+        <div className="w-[30px] h-[30px] rounded-full relative">
+          {isDelegationEncouragementEnabled && (
+            <EncourageDelegationDot className="right-[-3px]" />
+          )}
+          <ENSAvatar ensName={ensName} size={30} className="rounded-full" />
         </div>
       </button>
 

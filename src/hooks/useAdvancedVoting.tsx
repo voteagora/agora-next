@@ -7,6 +7,7 @@ import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import toast from "react-hot-toast";
+import { WriteContractErrorType } from "wagmi/actions";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -27,15 +28,25 @@ const useAdvancedVoting = ({
 }) => {
   const { contracts } = Tenant.current();
   const { address } = useAccount();
-  const { writeContractAsync: advancedVote, isError: _advancedVoteError } =
-    useWriteContract();
+  const {
+    writeContractAsync: advancedVote,
+    isError: _advancedVoteError,
+    error: _advancedVoteErrorDetails,
+  } = useWriteContract();
 
-  const { writeContractAsync: standardVote, isError: _standardVoteError } =
-    useWriteContract();
+  const {
+    writeContractAsync: standardVote,
+    isError: _standardVoteError,
+    error: _standardVoteErrorDetails,
+  } = useWriteContract();
   const [standardVoteError, setStandardVoteError] =
     useState(_standardVoteError);
+  const [standardVoteErrorDetails, setStandardVoteErrorDetails] =
+    useState<WriteContractErrorType | null>(_standardVoteErrorDetails);
   const [advancedVoteError, setAdvancedVoteError] =
     useState(_advancedVoteError);
+  const [advancedVoteErrorDetails, setAdvancedVoteErrorDetails] =
+    useState<WriteContractErrorType | null>(_advancedVoteErrorDetails);
   const [standardVoteLoading, setStandardVoteLoading] = useState(false);
   const [advancedVoteLoading, setAdvancedVoteLoading] = useState(false);
   const [standardVoteSuccess, setStandardVoteSuccess] = useState(false);
@@ -93,6 +104,7 @@ const useAdvancedVoting = ({
       } catch (error) {
         console.error(error);
         setStandardVoteError(true);
+        setStandardVoteErrorDetails(_standardVoteErrorDetails);
       } finally {
         setStandardVoteLoading(false);
       }
@@ -142,6 +154,7 @@ const useAdvancedVoting = ({
       } catch (error) {
         console.error(error);
         setAdvancedVoteError(true);
+        setAdvancedVoteErrorDetails(_advancedVoteErrorDetails);
       } finally {
         setAdvancedVoteLoading(false);
       }
@@ -206,6 +219,10 @@ const useAdvancedVoting = ({
      */
     isError: missingVote === "DIRECT" ? standardVoteError : advancedVoteError,
     resetError: () => setAdvancedVoteError(false),
+    error:
+      missingVote === "DIRECT"
+        ? standardVoteErrorDetails
+        : advancedVoteErrorDetails,
     isSuccess:
       missingVote === "DIRECT" ? standardVoteSuccess : advancedVoteSuccess,
     write,
