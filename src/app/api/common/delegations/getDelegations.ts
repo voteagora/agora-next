@@ -176,14 +176,25 @@ async function getCurrentDelegatorsForAddress({
           const timestamp = latestBlock
             ? getHumanBlockTime(delegator.bn, latestBlock, true)
             : null;
+          const isFull =
+            delegator.percentage === 10000 || !delegator.percentage;
+          const allowance = isFull
+            ? BigInt(delegator.balance || 0)
+            : delegator.percentage
+              ? (BigInt(delegator.balance || 0) *
+                  BigInt(delegator.percentage)) /
+                BigInt(10000)
+              : BigInt(delegator.balance || 0);
           return {
             from: delegator.delegator,
             to: address,
-            allowance: delegator.balance,
-            percentage: "0", // Only used in Agora token partial delegation
+            allowance: allowance.toString(),
+            percentage: delegator.percentage
+              ? delegator.percentage.toString()
+              : "0",
             timestamp: timestamp,
             type: "DIRECT" as const,
-            amount: "FULL" as const,
+            amount: isFull ? ("FULL" as const) : ("PARTIAL" as const),
             transaction_hash: null,
             bn: delegator.bn,
             tid: delegator.tid,

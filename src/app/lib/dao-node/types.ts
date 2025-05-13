@@ -5,7 +5,8 @@ interface DaoNodeDelegate {
     from_cnt: number;
     from_list: {
       delegator: string;
-      balance: string;
+      balance?: string;
+      percentage?: number;
       bn: number;
       tid: number;
     }[];
