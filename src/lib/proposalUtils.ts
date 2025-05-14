@@ -917,6 +917,12 @@ export function getProposalCurrentQuorum(
     case TENANT_NAMESPACES.UNISWAP:
       return BigInt(proposalResults.for);
 
+    case TENANT_NAMESPACES.SCROLL:
+      return (
+        BigInt(proposalResults.for) +
+        BigInt(proposalResults.against) +
+        BigInt(proposalResults.abstain)
+      );
     default:
       return BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
   }
