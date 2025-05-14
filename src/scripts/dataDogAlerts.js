@@ -66,7 +66,7 @@ async function createOrUpdateApiErrorRateAlert({
     throw new Error("Service name is required for API error rate alert");
   }
 
-  const query = `avg(last_${windowMinutes}m):sum:${service}.api.requests{result:error,env:production}.rollup(count, ${rollupSeconds}) / sum:${service}.api.requests{env:production}.rollup(count, ${rollupSeconds}) > ${threshold}`;
+  const query = `min(last_60m):sum:${service}.api.requests{result:error,env:production}.rollup(count, ${rollupSeconds}) / sum:${service}.api.requests{env:production}.rollup(count, ${rollupSeconds}) > ${threshold}`;
 
   const alertConfig = {
     name: name || `${service} API error rate over ${threshold * 100}%`,
@@ -114,7 +114,7 @@ async function createOrUpdateApiEndpointErrorRateAlert({
     );
   }
 
-  const query = `avg(last_${windowMinutes}m):sum:${service}.api.requests{result:error,env:production,api:${apiEndpoint}}.rollup(count, ${rollupSeconds}) / sum:${service}.api.requests{env:production,api:${apiEndpoint}}.rollup(count, ${rollupSeconds}) > ${threshold}`;
+  const query = `min(last_60m):sum:${service}.api.requests{result:error,env:production,api:${apiEndpoint}}.rollup(count, ${rollupSeconds}) / sum:${service}.api.requests{env:production,api:${apiEndpoint}}.rollup(count, ${rollupSeconds}) > ${threshold}`;
 
   const alertConfig = {
     name:
