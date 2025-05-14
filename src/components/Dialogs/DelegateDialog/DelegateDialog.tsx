@@ -27,6 +27,8 @@ import { formatEther } from "viem";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useWrappedWriteContract } from "@/hooks/useWrappedWriteContract";
 
 export function DelegateDialog({
   delegate,
@@ -41,10 +43,10 @@ export function DelegateDialog({
 }) {
   const shouldFetchData = useRef(true);
   const [isReady, setIsReady] = useState(false);
-  const { ui, contracts, token, slug } = Tenant.current();
+  const { ui, contracts, token } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
-  const { address: accountAddress } = useAccount();
+  const { selectedWalletAddress: accountAddress } = useSelectedWallet();
 
   const { data: tokenBalance } = useTokenBalance(accountAddress);
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
@@ -95,7 +97,7 @@ export function DelegateDialog({
     isError,
     writeContract: write,
     data: delegateTxHash,
-  } = useWriteContract();
+  } = useWrappedWriteContract();
 
   const {
     isLoading: isProcessingDelegation,
@@ -145,10 +147,10 @@ export function DelegateDialog({
       await call();
     } else {
       write({
-        address: contracts.token.address as any,
+        address: contracts.token.address as `0x${string}`,
         abi: contracts.token.abi,
         functionName: "delegate",
-        args: [delegate.address as any],
+        args: [delegate.address],
       });
     }
   }

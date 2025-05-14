@@ -7,8 +7,10 @@ import {
 } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
+import { SafeTxnTooltip } from "@/components/shared/SafeTxnTooltip";
 
 import {
   Tooltip,
@@ -49,6 +51,12 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
   const { isLoading, isSuccess, isError, isFetched, error } =
     useWaitForTransactionReceipt({ hash: data });
 
+  const { getExecuteProposalsForDescription } = useSafePendingTransactions();
+
+  const pendingExecuteProposals = useMemo(() => {
+    return getExecuteProposalsForDescription(proposal.description, proposal.id);
+  }, [getExecuteProposalsForDescription, proposal.description, proposal.id]);
+
   useEffect(() => {
     if (isSuccess) {
       toast.success(
@@ -65,6 +73,16 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
       });
     }
   }, [isSuccess, isError, error]);
+
+  if (pendingExecuteProposals?.[proposal.id]) {
+    return (
+      <SafeTxnTooltip className="inline-block">
+        <Button className="w-full bg-primary/90 cursor-none" disabled>
+          Pending Approval {pendingExecuteProposals[proposal.id]}
+        </Button>
+      </SafeTxnTooltip>
+    );
+  }
 
   return (
     <div>

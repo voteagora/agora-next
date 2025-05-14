@@ -4,6 +4,8 @@ import { formatUnits } from "viem";
 import { optimism } from "viem/chains";
 import { useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
+import { useWrappedWriteContract } from "@/hooks/useWrappedWriteContract";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 const allowanceType = 1; // 1 - relative; 0 - absolute
 
@@ -20,10 +22,11 @@ const useAdvancedDelegation = ({
   target: string | string[];
   allocation: number | number[];
 }) => {
+  console.log("proxyAddress", proxyAddress);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-
+  const { isSelectedPrimaryAddress } = useSelectedWallet();
   const { contracts } = Tenant.current();
 
   const availableBalanceNumber = Number(
@@ -36,7 +39,7 @@ const useAdvancedDelegation = ({
     isError: subdelegateIsError,
     isSuccess: subdelegateIsSuccess,
     data: subdelegateData,
-  } = useWriteContract();
+  } = useWrappedWriteContract();
 
   const {
     writeContractAsync: delegateToProxy,
@@ -44,12 +47,14 @@ const useAdvancedDelegation = ({
     isError: delegateToProxyIsError,
     isSuccess: delegateToProxyIsSuccess,
     data: delegateToProxyData,
-  } = useWriteContract();
+  } = useWrappedWriteContract();
 
   const writeAsync = useCallback(async () => {
-    setIsLoading(true);
-    setIsError(false);
-    setIsSuccess(false);
+    if (isSelectedPrimaryAddress) {
+      setIsLoading(true);
+      setIsError(false);
+      setIsSuccess(false);
+    }
 
     if (!isDelegatingToProxy) {
       await delegateToProxy({
@@ -111,7 +116,7 @@ const useAdvancedDelegation = ({
   };
 };
 
-function buildRules(
+export function buildRules(
   allocation: number | number[],
   availableBalanceNumber: number
 ) {

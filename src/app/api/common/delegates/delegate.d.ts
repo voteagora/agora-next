@@ -60,6 +60,8 @@ type DelegateStatement = {
     wants_proposal_ending_soon_email: "prompt" | "prompted" | true | false;
     last_updated_at: Date;
   };
+  stage: stageStatus;
+  message_hash: string | null;
 };
 
 export type DelegateStats = {

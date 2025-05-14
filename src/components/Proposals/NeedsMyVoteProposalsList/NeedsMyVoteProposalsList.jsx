@@ -5,13 +5,15 @@ import { VStack } from "@/components/Layout/Stack";
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import Proposal from "../Proposal/Proposal";
 import { useAccount } from "wagmi";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 export default function NeedsMyVoteProposalsList({
   fetchNeedsMyVoteProposals,
   votableSupply,
 }) {
   const [proposals, setProposals] = useState([]);
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
 
   const getProposals = useCallback(async () => {
     if (address) {

@@ -6,6 +6,7 @@ import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { Prisma } from "@prisma/client";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
+import { stageStatus } from "@/app/lib/sharedEnums";
 import { createHash } from "crypto";
 
 export async function createDelegateStatement({
@@ -14,12 +15,16 @@ export async function createDelegateStatement({
   signature,
   message,
   scwAddress,
+  stage,
+  message_hash,
 }: {
   address: `0x${string}`;
   delegateStatement: DelegateStatementFormValues;
   signature: `0x${string}`;
   message: string;
   scwAddress?: string;
+  stage: stageStatus;
+  message_hash?: string;
 }) {
   const { twitter, warpcast, discord, email, notificationPreferences } =
     delegateStatement;
@@ -41,14 +46,13 @@ export async function createDelegateStatement({
     delegateStatement: sanitizeContent(delegateStatement.delegateStatement),
   };
 
-  const stopGapMessageHash = createHash("sha256")
-    .update(sanitizedStatement.delegateStatement)
-    .digest("hex");
+  const messageHash =
+    message_hash || createHash("sha256").update(message).digest("hex");
 
   const data = {
     address: address.toLowerCase(),
     dao_slug: slug,
-    message_hash: stopGapMessageHash,
+    message_hash: messageHash,
     signature,
     payload: sanitizedStatement as Prisma.InputJsonValue,
     twitter,
@@ -60,6 +64,7 @@ export async function createDelegateStatement({
       ...notificationPreferences,
       last_updated: new Date().toISOString(),
     },
+    stage,
   };
 
   return prismaWeb2Client.delegateStatements.upsert({
@@ -67,8 +72,9 @@ export async function createDelegateStatement({
       address_dao_slug_message_hash: {
         address: address.toLowerCase(),
         dao_slug: slug,
-        message_hash: stopGapMessageHash,
+        message_hash: messageHash,
       },
+      stage: stage,
     },
     update: data,
     create: data,

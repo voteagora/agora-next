@@ -1,6 +1,5 @@
 import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useState } from "react";
-import { useAccount, useWriteContract } from "wagmi";
 import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
 import { trackEvent } from "@/lib/analytics";
@@ -8,6 +7,8 @@ import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { WriteContractErrorType } from "wagmi/actions";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useWrappedWriteContract } from "./useWrappedWriteContract";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -27,18 +28,20 @@ const useAdvancedVoting = ({
   missingVote: MissingVote;
 }) => {
   const { contracts } = Tenant.current();
-  const { address } = useAccount();
+  const { isSelectedPrimaryAddress, selectedWalletAddress: address } =
+    useSelectedWallet();
+
   const {
     writeContractAsync: advancedVote,
     isError: _advancedVoteError,
     error: _advancedVoteErrorDetails,
-  } = useWriteContract();
+  } = useWrappedWriteContract();
 
   const {
     writeContractAsync: standardVote,
     isError: _standardVoteError,
     error: _standardVoteErrorDetails,
-  } = useWriteContract();
+  } = useWrappedWriteContract();
   const [standardVoteError, setStandardVoteError] =
     useState(_standardVoteError);
   const [standardVoteErrorDetails, setStandardVoteErrorDetails] =
@@ -60,7 +63,9 @@ const useAdvancedVoting = ({
 
   const write = useCallback(() => {
     const _standardVote = async () => {
-      setStandardVoteLoading(true);
+      if (isSelectedPrimaryAddress) {
+        setStandardVoteLoading(true);
+      }
       const directTx = await standardVote({
         address: contracts.governor.address as `0x${string}`,
         abi: contracts.governor.abi,
@@ -115,7 +120,9 @@ const useAdvancedVoting = ({
         toast.error("No authority chains or advanced VP found");
         return;
       }
-      setAdvancedVoteLoading(true);
+      if (isSelectedPrimaryAddress) {
+        setAdvancedVoteLoading(true);
+      }
       const advancedTx = await advancedVote({
         address: contracts.alligator!.address as `0x${string}`,
         abi: contracts.alligator!.abi,

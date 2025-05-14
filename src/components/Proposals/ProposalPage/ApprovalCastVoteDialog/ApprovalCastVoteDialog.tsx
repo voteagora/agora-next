@@ -15,6 +15,7 @@ import { truncateAddress } from "@/app/lib/utils/text";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Vote } from "@/app/api/common/votes/vote";
 import { cn } from "@/lib/utils";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 const abiCoder = new AbiCoder();
 
@@ -38,6 +39,11 @@ export function ReviewApprovalVoteDialog({
     chainId: 1,
     address: address as `0x${string}`,
   });
+
+  const submitVote = () => {
+    write();
+    onClose();
+  };
 
   return (
     <div>
@@ -92,13 +98,7 @@ export function ReviewApprovalVoteDialog({
             </span>
           )}
         </div>
-        <Button
-          onClick={() => {
-            write();
-            onClose();
-          }}
-          className="mt-6"
-        >
+        <Button onClick={submitVote} className="mt-6">
           Vote for {selectedOptions.length} option
           {selectedOptions.length > 1 && "s"}
           {votingPower ? (
@@ -271,8 +271,8 @@ export function ApprovalCastVoteDialog({
     <div style={{ transformStyle: "preserve-3d" }}>
       {hasStatement && isLoading && <LoadingVote />}
       {hasStatement && isError && <p>Something went wrong</p>}
-      {!hasStatement && <NoStatementView closeDialog={closeDialog} />}
-      {hasStatement && !isLoading && !isSuccess && (
+      {/* {!hasStatement && <NoStatementView closeDialog={closeDialog} />} */}
+      {!isLoading && !isSuccess && (
         <>
           <div className="flex flex-col gap-3">
             <div className="flex flex-col">

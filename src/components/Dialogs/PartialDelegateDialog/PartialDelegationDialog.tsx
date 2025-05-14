@@ -16,6 +16,7 @@ import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { ScwPartialDelegationButton } from "@/components/Dialogs/PartialDelegateDialog/ScwPartialDelegationButton";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 interface Props {
   delegate: DelegateChunk;
@@ -34,11 +35,13 @@ export function PartialDelegationDialog({
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const { address } = useAccount();
+  const { selectedWalletAddress } = useSelectedWallet();
+
   const { data: scwAddress, enabled: isScwEnabled } = useSmartAccountAddress({
     owner: address,
   });
 
-  const ownerAddress = scwAddress || address;
+  const ownerAddress = scwAddress || selectedWalletAddress;
 
   const shouldFetchData = useRef(true);
 

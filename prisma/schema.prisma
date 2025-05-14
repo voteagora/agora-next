@@ -20,6 +20,7 @@ enum stage_status {
 model DelegateStatements {
   address                  String
   dao_slug                 DaoSlug
+  stage                    stageStatus @default(published)
   signature                String
   payload                  Json
   twitter                  String?
@@ -41,6 +42,13 @@ model DelegateStatements {
   @@index([dao_slug], map: "idx_delegate_statements_dao_slug")
   @@map("delegate_statements")
   @@schema("agora")
+}
+
+enum stageStatus {
+  draft
+  published
+  @@schema("agora")
+  @@map("stage_status")
 }
 
 model Contracts {
