@@ -177,6 +177,8 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
             <AgoraOptimismGovQueue proposal={proposal} />
           </div>
         );
+      } else if (proposal.proposalType === "OPTIMISTIC") {
+        return null;
       } else {
         return <AgoraOptimismGovCancel proposal={proposal} />;
       }
