@@ -15,10 +15,10 @@ export async function GET(
     const votes =
       proposalType === "SNAPSHOT"
         ? await getSnapshotVotesChart({
-            proposalId: route.params.proposalId,
+            proposalId: params.proposalId,
           })
         : await getVotesChart({
-            proposalId: route.params.proposalId,
+            proposalId: params.proposalId,
           });
     return NextResponse.json(votes);
   } catch (e: any) {
