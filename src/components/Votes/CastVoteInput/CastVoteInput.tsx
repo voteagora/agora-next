@@ -25,7 +25,7 @@ import { icons } from "@/icons/icons";
 import Image from "next/image";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
-import { formatEther, formatUnits } from "viem";
+import { formatEther } from "viem";
 import {
   Tooltip,
   TooltipContent,
@@ -39,6 +39,8 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import shareIcon from "@/icons/share.svg";
 import { format } from "date-fns";
 import { useVotableSupply } from "@/hooks/useVotableSupply";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
+import { SafeTxnTooltip } from "@/components/shared/SafeTxnTooltip";
 
 type Props = {
   proposal: Proposal;
@@ -58,12 +60,13 @@ export default function CastVoteInput({
     blockNumber: isOptimismTenant ? proposal.snapshotBlockNumber : undefined,
   });
   const { data: votableSupply } = useVotableSupply({ enabled: true });
+  const { pendingVotes } = useSafePendingTransactions();
 
   const chains = data?.chains;
   const delegate = data?.delegate;
   const votes = data?.votes;
   const votingPower = data?.votingPower;
-
+  console.log("pendingVotes", pendingVotes);
   if (!isConnected) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
@@ -82,11 +85,24 @@ export default function CastVoteInput({
     );
   }
 
-  if (isSuccess && !delegate?.statement) {
+  // if (isSuccess && !delegate?.statement) {
+  //   return (
+  //     <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+  //       <NoStatementView />
+  //     </div>
+  //   );
+  // }
+
+  const pendingVote = pendingVotes[proposal.id];
+  if (pendingVote) {
     return (
-      <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
-        <NoStatementView />
-      </div>
+      <SafeTxnTooltip className="inline-block">
+        <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+          <Button className="w-full bg-positive/90 cursor-none" disabled>
+            Pending Approval {pendingVote}
+          </Button>
+        </div>
+      </SafeTxnTooltip>
     );
   }
 
@@ -135,7 +151,6 @@ function CastVoteInputContent({
   } = useCastVoteContext();
 
   const { ui } = Tenant.current();
-
   const missingVote = checkMissingVoteForDelegate(
     votes ?? [],
     votingPower ?? {

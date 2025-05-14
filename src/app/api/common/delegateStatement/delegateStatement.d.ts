@@ -2,5 +2,10 @@ import { DelegateStatements } from "@prisma/client";
 
 export type DelegateStatement = Omit<
   DelegateStatements,
-  "createdAt" | "updatedAt" | "signature" | "dao_slug"
+  | "createdAt"
+  | "updatedAt"
+  | "signature"
+  | "dao_slug"
+  | "message_hash"
+  | "stage"
 >;

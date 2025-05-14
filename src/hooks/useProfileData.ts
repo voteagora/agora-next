@@ -1,13 +1,11 @@
-import { useAccount } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { useDelegate } from "@/hooks/useDelegate";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useGetDelegatees } from "./useGetDelegatee";
 
-export const useProfileData = () => {
+export const useProfileData = (address?: `0x${string}`) => {
   const { ui } = Tenant.current();
-  const { address } = useAccount();
   const isSmartAccountEnabled = ui?.smartAccountConfig?.factoryAddress;
 
   const { data: delegate, isFetching } = useDelegate({

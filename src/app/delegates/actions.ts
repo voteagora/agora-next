@@ -3,6 +3,7 @@
 import { fetchAllForAdvancedDelegation as apiFetchAllForAdvancedDelegation } from "@/app/api/delegations/getDelegations";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { stageStatus } from "@/app/lib/sharedEnums";
 import { fetchVotesForDelegate as apiFetchVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import {
   fetchIsDelegatingToProxy,
@@ -24,6 +25,7 @@ import { createDelegateStatement } from "@/app/api/common/delegateStatement/crea
 import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
+import { fetchDelegateStatements as apiFetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
 
 export const fetchDelegate = async (address: string) => {
   try {
@@ -71,6 +73,19 @@ export const fetchDelegateStatement = unstable_cache(
   }
 );
 
+export const fetchDelegateDraftStatements = unstable_cache(
+  async (address: string) => {
+    return apiFetchDelegateStatements(address, stageStatus.DRAFT);
+  },
+  ["delegateStatements-${address}-${stage}"],
+  {
+    // Longer cache is acceptable since the statement is not expected to change
+    // often and invalidated with every delegate statement update
+    revalidate: 600, // 10 minute cache
+    tags: ["delegateStatements-${address}-${stage}"],
+  }
+);
+
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(
   addressOrENSName: string
@@ -100,12 +115,16 @@ export async function submitDelegateStatement({
   signature,
   message,
   scwAddress,
+  stage = stageStatus.PUBLISHED,
+  message_hash,
 }: {
   address: `0x${string}`;
   delegateStatement: DelegateStatementFormValues;
   signature: `0x${string}`;
   message: string;
   scwAddress?: string;
+  stage: stageStatus;
+  message_hash?: string;
 }) {
   const response = await createDelegateStatement({
     address,
@@ -113,6 +132,8 @@ export async function submitDelegateStatement({
     signature,
     message,
     scwAddress,
+    stage,
+    message_hash,
   });
 
   revalidateDelegateAddressPage(address.toLowerCase());

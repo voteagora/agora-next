@@ -50,7 +50,7 @@ export default function TopStakeholdersFormSection({
   };
 
   return (
-    <div className="py-8 px-6 border-b border-line text-primary">
+    <div className="py-8 px-6 text-primary">
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-baseline">
         <h3 className="font-bold">Stakeholders I represent</h3>
         <DropdownMenu>

@@ -3,11 +3,10 @@
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateStatementFormSection from "./DelegateStatementFormSection";
 import TopIssuesFormSection from "./TopIssuesFormSection";
-import OtherInfoFormSection from "./OtherInfoFormSection";
 import { Button } from "@/components/ui/button";
 import { type UseFormReturn, useWatch } from "react-hook-form";
 import { Form } from "@/components/ui/form";
-import { useAccount, useSignMessage, useWalletClient } from "wagmi";
+import { useSignMessage, useWalletClient } from "wagmi";
 import { submitDelegateStatement } from "@/app/delegates/actions";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -17,6 +16,13 @@ import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeh
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { useDelegate } from "@/hooks/useDelegate";
 import { useDelegateStatementStore } from "@/stores/delegateStatement";
+import DelegateStatementBoolSelector, {
+  DelegateStatementDaoPrinciplesSelector,
+} from "./DelegateStatementBoolSelector";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useSignInWithSafeMessage } from "@/hooks/useSignInWithSafeMessage";
+import { DraftStatementDetails } from "../Delegates/DelegateStatement/DelegateDraftStatement";
+import { stageStatus } from "@/app/lib/sharedEnums";
 
 export default function DelegateStatementForm({
   form,
@@ -25,10 +31,15 @@ export default function DelegateStatementForm({
 }) {
   const router = useRouter();
   const { ui } = Tenant.current();
-  const { address } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
   const walletClient = useWalletClient();
   const messageSigner = useSignMessage();
+  const safeMessageSigner = useSignInWithSafeMessage();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const requireCodeOfConduct = ui.toggle("delegates/code-of-conduct")?.enabled;
+  const requireDaoPrinciples = ui.toggle("delegates/dao-principles")?.enabled;
+
+  const { isSelectedPrimaryAddress } = useSelectedWallet();
 
   const { data: scwAddress } = useSmartAccountAddress({ owner: address });
   const { data: delegate } = useDelegate({ address });
@@ -55,8 +66,6 @@ export default function DelegateStatementForm({
   );
 
   async function onSubmit(values: DelegateStatementFormValues) {
-    /* agreeCodeConduct and agreeDaoPrinciples default values are !enabled so if it's not enabled for a tenant, it will be true, skipping the check below.
-    If enabled, it will be false by default and the user will need to check the box. */
     if (!agreeCodeConduct && !agreeDaoPrinciples) {
       return;
     }
@@ -65,53 +74,63 @@ export default function DelegateStatementForm({
     }
 
     values.topIssues = values.topIssues.filter((issue) => issue.value !== "");
+    const originalDelegateStatement = delegate?.statement;
+    const { daoSlug, delegateStatement, topIssues, topStakeholders } = values;
 
-    const {
-      daoSlug,
-      discord,
-      delegateStatement,
-      email,
-      twitter,
-      warpcast,
-      topIssues,
-      topStakeholders,
-      notificationPreferences,
-    } = values;
-
-    // User will only sign what they are seeing on the frontend
     const body = {
       agreeCodeConduct: values.agreeCodeConduct,
       agreeDaoPrinciples: values.agreeDaoPrinciples,
       daoSlug,
-      discord,
       delegateStatement,
-      email,
-      twitter,
-      warpcast,
       topIssues,
       topStakeholders,
       scwAddress,
-      notificationPreferences,
+      discord: originalDelegateStatement?.discord || "",
+      email: originalDelegateStatement?.email || "",
+      twitter: originalDelegateStatement?.twitter || "",
+      warpcast: originalDelegateStatement?.warpcast || "",
+      notificationPreferences:
+        originalDelegateStatement?.notification_preferences || {
+          wants_proposal_created_email: "prompt",
+          wants_proposal_ending_soon_email: "prompt",
+        },
     };
 
     const serializedBody = JSON.stringify(body, undefined, "\t");
-    const signature = await messageSigner
-      .signMessageAsync({
-        message: serializedBody,
-      })
-      .catch((error) => console.error(error));
+    let signature;
+    if (isSelectedPrimaryAddress) {
+      signature = await messageSigner
+        .signMessageAsync({
+          message: serializedBody,
+        })
+        .catch((error) => console.error(error));
 
-    if (!signature) {
-      setSubmissionError("Signature failed, please try again");
-      return;
+      if (!signature) {
+        setSubmissionError("Signature failed, please try again");
+        return;
+      }
+    } else {
+      // Use Safe wallet signing for non-primary addresses
+      signature = await safeMessageSigner
+        .signMessage({
+          message: serializedBody,
+          safeAddress: address as `0x${string}`,
+        })
+        .catch((error) => console.error(error));
+
+      if (!signature) {
+        setSubmissionError("Safe signature failed, please try again");
+        return;
+      }
     }
 
     const response = await submitDelegateStatement({
       address: address as `0x${string}`,
-      delegateStatement: values,
+      delegateStatement: body,
       signature,
       message: serializedBody,
       scwAddress,
+      stage: stageStatus.PUBLISHED,
     }).catch((error) => console.error(error));
 
     if (!response) {
@@ -140,27 +159,37 @@ export default function DelegateStatementForm({
         </div>
       )}
       <div className="flex flex-col w-full mt-6 lg:mt-0">
-        <div className="flex flex-col bg-neutral border rounded-xl border-line shadow-newDefault">
+        {!isSelectedPrimaryAddress && <DraftStatementDetails />}
+        <div className="flex flex-col bg-neutral rounded-xl shadow-newDefault">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <DelegateStatementFormSection form={form} />
               {hasTopIssues && <TopIssuesFormSection form={form} />}
               {hasStakeholders && <TopStakeholdersFormSection form={form} />}
-              <OtherInfoFormSection form={form} />
-
-              <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 py-8 px-6 flex-wrap">
-                <span className="text-sm text-primary">
-                  Tip: you can always come back and edit your profile at any
-                  time.
-                </span>
+              <div className="py-8 px-6 ">
+                {requireCodeOfConduct && (
+                  <DelegateStatementBoolSelector form={form} />
+                )}
+                {requireDaoPrinciples && (
+                  <DelegateStatementDaoPrinciplesSelector form={form} />
+                )}
+              </div>
+              <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 py-8 px-6 flex-wrap border-t border-line">
+                <Button
+                  variant="outline"
+                  className="flex-1 py-3 px-4 text-primary rounded-full text-base"
+                  type="button"
+                >
+                  Cancel
+                </Button>
 
                 <Button
-                  variant="elevatedOutline"
-                  className="py-3 px-4 text-primary"
+                  variant="brand"
+                  className="flex-1 py-3 px-4 text-neutral text-base"
                   disabled={!canSubmit}
                   type="submit"
                 >
-                  Submit delegate profile
+                  Save
                 </Button>
                 {form.formState.isSubmitted && !agreeCodeConduct && (
                   <span className="text-red-700 text-sm">

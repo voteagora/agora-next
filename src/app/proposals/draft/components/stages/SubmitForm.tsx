@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import DraftPreview from "../DraftPreview";
-import { useAccount, useBlockNumber } from "wagmi";
+import { useBlockNumber } from "wagmi";
 import RequestSponsorshipForm from "../RequestSponsorshipForm";
 import { useForm, FormProvider } from "react-hook-form";
 import SponsorActions from "../../../sponsor/components/SponsorActions";
@@ -12,6 +12,7 @@ import { DraftProposal, PLMConfig, ProposalGatingType } from "../../types";
 import Tenant from "@/lib/tenant/tenant";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { UpdateVotableSupplyOracle } from "@/app/proposals/components/UpdateVotableSupplyOracle";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const tenant = Tenant.current();
@@ -19,7 +20,7 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
 
   // Get wallet data with stable references
-  const { address } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
   // Stabilize hook calls
   const { data: blockNumber } = useBlockNumber({
     chainId: tenant.ui.toggle("use-l1-block-number")?.enabled

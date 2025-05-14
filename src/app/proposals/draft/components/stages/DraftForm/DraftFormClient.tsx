@@ -1,6 +1,5 @@
 "use client";
 
-import { useAccount } from "wagmi";
 import { useState, useEffect, useMemo } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,6 +33,7 @@ import {
 import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
 import { ScopeDetails } from "@/components/Admin/ScopeDetails";
 import { FormattedProposalType } from "@/lib/types";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 const DEFAULT_FORM = {
   type: ProposalType.BASIC,
@@ -119,7 +119,7 @@ const DraftFormClient = ({
     getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
   );
   const router = useRouter();
-  const { address } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
 
   const methods = useForm<z.output<typeof DraftProposalSchema>>({
     resolver: zodResolver(DraftProposalSchema),

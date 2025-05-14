@@ -5,6 +5,7 @@ import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { onSubmitAction as deleteAction } from "../actions/deleteDraftProposal";
 import { TrashIcon } from "@heroicons/react/20/solid";
+import { useRouter } from "next/navigation";
 
 const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
   const openDialog = useOpenDialog();
@@ -35,6 +36,8 @@ export const DeleteDraftProposalDialog = ({
   closeDialog: () => void;
 }) => {
   const [isPending, setIsPending] = useState(false);
+  const router = useRouter();
+
   return (
     <div>
       <h3 className="text-center text-primary font-semibold text-lg mb-1">
@@ -60,7 +63,8 @@ export const DeleteDraftProposalDialog = ({
           onClick={async () => {
             setIsPending(true);
             await deleteAction(proposalId);
-            window.location.href = "/";
+            router.push("/");
+            closeDialog();
           }}
         >
           Yes
