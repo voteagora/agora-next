@@ -14,11 +14,12 @@ import {
   ProposalGatingType,
 } from "@/app/proposals/draft/types";
 import Tenant from "@/lib/tenant/tenant";
-import { ProposalType, BasicProposal } from "@/app/proposals/draft/types";
+import { ProposalType } from "@/app/proposals/draft/types";
 import toast from "react-hot-toast";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { useEffect, useState } from "react";
+import { getInputData } from "../utils/getInputData";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -38,6 +39,11 @@ const DraftPreview = ({
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
   const votingModuleType = proposalDraft.voting_module_type;
+  const { inputData } = getInputData(proposalDraft);
+  const targets = inputData?.[0];
+  const values = inputData?.[1];
+  const calldatas = inputData?.[2];
+  const description = inputData?.[3];
 
   const { address } = useAccount();
   const { data: threshold } = useProposalThreshold();
@@ -208,20 +214,10 @@ const DraftPreview = ({
         <div className="mt-6">
           {proposalDraft.voting_module_type === ProposalType.BASIC && (
             <ProposalTransactionDisplay
-              descriptions={(proposalDraft as BasicProposal).transactions.map(
-                (t) => t.description
-              )}
-              targets={(proposalDraft as BasicProposal).transactions.map(
-                (t) => t.target
-              )}
-              calldatas={
-                (proposalDraft as BasicProposal).transactions.map(
-                  (t) => t.calldata
-                ) as `0x${string}`[]
-              }
-              values={(proposalDraft as BasicProposal).transactions.map(
-                (t) => t.value
-              )}
+              descriptions={description as string[]}
+              targets={targets as `0x${string}`[]}
+              calldatas={calldatas as `0x${string}`[]}
+              values={(values as number[]).map((v) => v.toString())}
               network={tenant.contracts.governor.chain.name}
             />
           )}

@@ -24,7 +24,10 @@ import {
 import React, { useState } from "react";
 import { formatUnits } from "viem";
 import { toast } from "react-hot-toast";
-import { checkExistingProposal } from "@/lib/seatbelt/checkProposal";
+import {
+  checkExistingProposal,
+  checkNewProposal,
+} from "@/lib/seatbelt/checkProposal";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { TENDERLY_VALID_CHAINS } from "@/app/proposals/draft/components/BasicProposalForm";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
@@ -104,13 +107,21 @@ const ProposalTransactionDisplay = ({
 
   const simulateTransactions = async () => {
     try {
-      if (!proposal) {
-        throw new Error("Proposal is required");
-      }
       setIsSimulating(true);
-      const report = await checkExistingProposal({
-        existingProposal: proposal,
-      });
+      let report;
+      if (proposal?.id) {
+        report = await checkExistingProposal({
+          existingProposal: proposal,
+        });
+      } else {
+        report = await checkNewProposal({
+          targets,
+          values: values.map((v) => BigInt(v)),
+          signatures: signatures ?? Array(targets.length).fill(""),
+          calldatas,
+          draftId: "1",
+        });
+      }
 
       openDialog({
         type: "SIMULATION_REPORT",
@@ -146,24 +157,23 @@ const ProposalTransactionDisplay = ({
                   <ArrowTopRightOnSquareIcon className="w-4 h-4" />
                 </a>
               )}
-              {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
-                !!proposal?.id &&
-                hasRealActions && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={simulateTransactions}
-                    disabled={isSimulating}
-                    className={cn(
-                      "hidden sm:flex items-center gap-2",
-                      ui.theme === "dark" && "text-neutral"
-                    )}
-                  >
-                    {isSimulating
-                      ? "Simulating..."
-                      : "Simulate transactions (Beta)"}
-                  </Button>
-                )}
+              {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  onClick={simulateTransactions}
+                  disabled={isSimulating}
+                  className={cn(
+                    "hidden sm:flex items-center gap-2",
+                    ui.theme === "dark" && "text-neutral"
+                  )}
+                >
+                  {isSimulating
+                    ? "Simulating..."
+                    : "Simulate transactions (Beta)"}
+                </Button>
+              )}
             </div>
             <div className="flex">
               <button
@@ -180,24 +190,21 @@ const ProposalTransactionDisplay = ({
               </button>
             </div>
           </div>
-          {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) &&
-            !!proposal?.id &&
-            hasRealActions && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={simulateTransactions}
-                disabled={isSimulating}
-                className={cn(
-                  "flex items-center gap-2 sm:hidden mt-2",
-                  ui.theme === "dark" && "text-neutral"
-                )}
-              >
-                {isSimulating
-                  ? "Simulating..."
-                  : "Simulate transactions (Beta)"}
-              </Button>
-            )}
+          {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) && (
+            <Button
+              variant="outline"
+              size="sm"
+              type="button"
+              onClick={simulateTransactions}
+              disabled={isSimulating}
+              className={cn(
+                "flex items-center gap-2 sm:hidden mt-2",
+                ui.theme === "dark" && "text-neutral"
+              )}
+            >
+              {isSimulating ? "Simulating..." : "Simulate transactions (Beta)"}
+            </Button>
+          )}
         </div>
 
         <div className="p-4 pt-2">
