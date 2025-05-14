@@ -14,6 +14,7 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
 import Proposal from "../Proposal/Proposal";
 import { DaoSlug } from "@prisma/client";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 export default function ProposalsList({
   initRelevantProposals,
@@ -37,6 +38,7 @@ export default function ProposalsList({
   } | null;
 }) {
   const { address } = useAccount();
+  const { selectedWalletAddress } = useSelectedWallet();
   const { ui, slug } = Tenant.current();
   let tenantSupportsProposalLifecycle =
     ui.toggle("proposal-lifecycle")?.enabled;
@@ -82,8 +84,8 @@ export default function ProposalsList({
         <PageHeader headerText="All Proposals" />
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit items-center">
           <ProposalsFilter />
-          {tenantSupportsProposalLifecycle && address && (
-            <CreateProposalDraftButton address={address} />
+          {tenantSupportsProposalLifecycle && selectedWalletAddress && (
+            <CreateProposalDraftButton address={selectedWalletAddress} />
           )}
         </div>
       </div>

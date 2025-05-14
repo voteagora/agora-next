@@ -19,6 +19,7 @@ import toast from "react-hot-toast";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { useEffect, useState } from "react";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -40,6 +41,7 @@ const DraftPreview = ({
   const votingModuleType = proposalDraft.voting_module_type;
 
   const { address } = useAccount();
+  const { selectedWalletAddress } = useSelectedWallet();
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
 
@@ -50,9 +52,9 @@ const DraftPreview = ({
   });
 
   const { data: accountVotes } = useGetVotes({
-    address: address as `0x${string}`,
+    address: selectedWalletAddress as `0x${string}`,
     blockNumber: blockNumber ? blockNumber - BigInt(1) : BigInt(0),
-    enabled: !!address && !!blockNumber,
+    enabled: !!selectedWalletAddress && !!blockNumber,
   });
 
   const [lastValidVotes, setLastValidVotes] = useState<bigint | undefined>(

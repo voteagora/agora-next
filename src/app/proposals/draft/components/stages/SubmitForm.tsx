@@ -12,6 +12,7 @@ import { DraftProposal, PLMConfig, ProposalGatingType } from "../../types";
 import Tenant from "@/lib/tenant/tenant";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { UpdateVotableSupplyOracle } from "@/app/proposals/components/UpdateVotableSupplyOracle";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const tenant = Tenant.current();
@@ -20,6 +21,7 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
 
   // Get wallet data with stable references
   const { address } = useAccount();
+  const { selectedWalletAddress } = useSelectedWallet();
   // Stabilize hook calls
   const { data: blockNumber } = useBlockNumber({
     chainId: tenant.ui.toggle("use-l1-block-number")?.enabled
@@ -36,9 +38,9 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   );
 
   const { data: accountVotes } = useGetVotes({
-    address: address as `0x${string}`,
+    address: selectedWalletAddress as `0x${string}`,
     blockNumber: blockNumber ? blockNumber - BigInt(1) : BigInt(0),
-    enabled: !!address,
+    enabled: !!selectedWalletAddress,
   });
 
   // Update lastValidVotes when accountVotes changes and is defined
@@ -90,6 +92,7 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
 
 const SubmitForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const methods = useForm({});
+  console.log("draftProposal", draftProposal);
   return (
     <FormProvider {...methods}>
       <form>

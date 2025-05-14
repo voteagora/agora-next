@@ -25,7 +25,7 @@ import { icons } from "@/icons/icons";
 import Image from "next/image";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
-import { formatEther, formatUnits } from "viem";
+import { formatEther, formatUnits, getAddress } from "viem";
 import {
   Tooltip,
   TooltipContent,
@@ -39,6 +39,10 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import shareIcon from "@/icons/share.svg";
 import { format } from "date-fns";
 import { useVotableSupply } from "@/hooks/useVotableSupply";
+import { useSafeProtocolKit } from "@/contexts/SafeProtocolKit";
+import { useSafeApiKit } from "@/contexts/SafeApiKitContext";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useAccount } from "wagmi";
 
 type Props = {
   proposal: Proposal;
@@ -285,10 +289,74 @@ function VoteSubmitButton({
   missingVote: MissingVote;
   proposal: Proposal;
 }) {
-  const { write } = useCastVoteContext();
+  const { write, dataForSafeTxn, reason } = useCastVoteContext();
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
+
+  // Safe wallet integration
+  const { address } = useAccount();
+  const { protocolKit } = useSafeProtocolKit();
+  const { safeApiKit } = useSafeApiKit();
+  const { isSelectedPrimaryAddress, selectedWalletAddress } =
+    useSelectedWallet();
+
+  const proposeForSafe = async () => {
+    if (isSelectedPrimaryAddress) {
+      // If not using a Safe wallet or missing data, use regular voting
+      write();
+      return;
+    }
+
+    if (!safeApiKit || !protocolKit || !dataForSafeTxn) {
+      return;
+    }
+    try {
+      // Get the next nonce for the Safe transaction
+      const nextNonce = await safeApiKit.getNextNonce(
+        selectedWalletAddress as `0x${string}`
+      );
+
+      // Create transaction data for the vote function
+      // Use castVoteWithReason if reason is provided, otherwise use castVote
+      const calldata = reason
+        ? dataForSafeTxn.castVoteWithReason
+        : dataForSafeTxn.castVote;
+
+      // Create transaction data for the vote function
+      const transactions = [
+        {
+          to: getAddress(dataForSafeTxn.governorAddress),
+          value: "0",
+          data: calldata,
+        },
+      ];
+
+      // Create a Safe transaction
+      const safeTransaction = await protocolKit.createTransaction({
+        transactions,
+        onlyCalls: true,
+        nonce: nextNonce,
+      });
+
+      // Get the transaction hash
+      const safeTxHash = await protocolKit.getTransactionHash(safeTransaction);
+
+      // Sign transaction to verify that it's coming from the owner
+      const senderSignature = await protocolKit.signHash(safeTxHash);
+
+      // Propose the transaction to the Safe
+      await safeApiKit.proposeTransaction({
+        safeAddress: selectedWalletAddress as `0x${string}`,
+        safeTransactionData: safeTransaction.data,
+        safeTxHash: safeTxHash,
+        senderAddress: address as `0x${string}`,
+        senderSignature: senderSignature.data,
+      });
+    } catch (error) {
+      console.error("Safe transaction error:", error);
+    }
+  };
 
   if (!supportType && isOptimismTenant) {
     return (
@@ -341,8 +409,12 @@ function VoteSubmitButton({
 
   return (
     <div className="pt-3">
-      <SubmitButton onClick={write} disabled={!supportType}>
-        Submit vote with{"\u00A0"}
+      <SubmitButton
+        onClick={!isSelectedPrimaryAddress ? proposeForSafe : write}
+        disabled={!supportType}
+      >
+        {!isSelectedPrimaryAddress ? "Propose vote with" : "Submit vote with"}
+        {"\u00A0"}
         <TokenAmountDisplay amount={vpToDisplay} />
       </SubmitButton>
     </div>

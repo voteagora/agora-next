@@ -28,12 +28,6 @@ export const ProfileHeader = ({
     ? safes
     : [address as `0x${string}`];
 
-  console.log(
-    secondaryWallets,
-    isSelectedPrimaryAddress,
-    address,
-    selectedWalletAddress
-  );
   const [showSecondaryWallets, setShowSecondaryWallets] = useState(false);
   const walletIcon = () => {
     if (!isSelectedPrimaryAddress) {

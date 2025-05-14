@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useSimulateContract, useWriteContract } from "wagmi";
+import { useAccount, useSimulateContract, useWriteContract } from "wagmi";
+import { useSafeProtocolKit } from "@/contexts/SafeProtocolKit";
+import { useSafeApiKit } from "@/contexts/SafeApiKitContext";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { getAddress, encodeFunctionData } from "viem";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
 import { BasicProposal } from "../../../proposals/draft/types";
@@ -21,6 +25,12 @@ const BasicProposalAction = ({
   const { contracts } = Tenant.current();
   const { inputData } = getInputData(draftProposal);
   const [proposalCreated, setProposalCreated] = useState(false);
+  const { address } = useAccount();
+  const { protocolKit } = useSafeProtocolKit();
+  const { safeApiKit } = useSafeApiKit();
+  const { isSelectedPrimaryAddress, selectedWalletAddress } =
+    useSelectedWallet();
+  const [safeTxHash, setSafeTxHash] = useState<`0x${string}` | undefined>();
 
   /**
    * Notes on proposal methods per governor:
@@ -59,11 +69,70 @@ const BasicProposalAction = ({
       <UpdatedButton
         isLoading={isWriteLoading || isSimulating}
         fullWidth={true}
-        type={onPrepareError && !proposalCreated ? "disabled" : "primary"}
         onClick={async () => {
           try {
-            const data = await writeAsync(config!.request);
-            if (!data) {
+            let txHash;
+
+            if (!isSelectedPrimaryAddress && protocolKit && safeApiKit) {
+              try {
+                // Use viem's encodeFunctionData to properly encode the function call
+                // This is more reliable than manually constructing the calldata
+                const calldata = encodeFunctionData({
+                  abi: contracts.governor.abi,
+                  functionName: "propose",
+                  args: inputData as any,
+                });
+
+                console.log("Encoded calldata:", calldata);
+
+                // Create transaction data for the proposal creation function
+                const transactions = [
+                  {
+                    to: getAddress(contracts.governor.address as string),
+                    value: "0",
+                    data: calldata,
+                  },
+                ];
+                const nextNonce = await safeApiKit.getNextNonce(
+                  selectedWalletAddress as `0x${string}`
+                );
+                // Create a Safe transaction
+                const safeTransaction = await protocolKit.createTransaction({
+                  transactions,
+                  onlyCalls: true,
+                  nonce: nextNonce,
+                });
+
+                // Get the transaction hash
+                const safeTxHash =
+                  await protocolKit.getTransactionHash(safeTransaction);
+
+                // Sign transaction to verify that the transaction is coming from owner
+                const senderSignature = await protocolKit.signHash(safeTxHash);
+                console.log("senderSignature", safeTransaction);
+
+                // Propose the transaction to the Safe
+                await safeApiKit.proposeTransaction({
+                  safeAddress: selectedWalletAddress as `0x${string}`,
+                  safeTransactionData: safeTransaction.data,
+                  safeTxHash: safeTxHash,
+                  senderAddress: address as `0x${string}`,
+                  senderSignature: senderSignature.data,
+                });
+
+                // Store the Safe transaction hash
+                setSafeTxHash(safeTxHash);
+                txHash = safeTxHash;
+              } catch (error) {
+                console.error("Safe transaction error:", error);
+                throw error;
+              }
+            } else {
+              // Regular EOA wallet transaction
+              txHash = await writeAsync(config!.request);
+            }
+
+            if (!txHash) {
               // for dev
               console.log(error);
               return;
@@ -74,7 +143,7 @@ const BasicProposalAction = ({
             trackEvent({
               event_name: ANALYTICS_EVENT_NAMES.CREATE_PROPOSAL,
               event_data: {
-                transaction_hash: data,
+                transaction_hash: txHash,
                 uses_plm: true,
                 proposal_data: inputData,
               },
@@ -82,13 +151,13 @@ const BasicProposalAction = ({
 
             await sponsorDraftProposal({
               draftProposalId: draftProposal.id,
-              onchain_transaction_hash: data,
+              onchain_transaction_hash: txHash,
             });
             openDialog({
               type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL",
               params: {
                 redirectUrl: "/",
-                txHash: data,
+                txHash: safeTxHash || txHash,
               },
             });
           } catch (error) {

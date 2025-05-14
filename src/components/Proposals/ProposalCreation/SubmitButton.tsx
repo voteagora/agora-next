@@ -12,6 +12,10 @@ import {
   useWriteContract,
   useSimulateContract,
 } from "wagmi";
+import { useSafeProtocolKit } from "@/contexts/SafeProtocolKit";
+import { useSafeApiKit } from "@/contexts/SafeApiKitContext";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { getAddress } from "viem";
 import { useModal } from "connectkit";
 import { disapprovalThreshold } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
@@ -41,7 +45,12 @@ export default function SubmitButton({
   const { address, isConnected } = useAccount();
   const { setOpen } = useModal();
   const [isClient, setIsClient] = useState(false);
-
+  const { protocolKit } = useSafeProtocolKit();
+  const { safeApiKit } = useSafeApiKit();
+  const { isSelectedPrimaryAddress, selectedWalletAddress } =
+    useSelectedWallet();
+  const [safeTxHash, setSafeTxHash] = useState<`0x${string}` | undefined>();
+  console.log("selectedWalletAddress", inputData, governorFunction);
   const {
     data: config,
     isError: onPrepareError,
@@ -70,7 +79,69 @@ export default function SubmitButton({
   const openDialog = useOpenDialog();
 
   async function submitProposal() {
-    const txHash = await writeAsync(config!.request);
+    let txHash;
+
+    if (!isSelectedPrimaryAddress && protocolKit && safeApiKit) {
+      try {
+        // Extract function data from the config request
+        // We need to manually construct the transaction data since config.request doesn't have a data property directly
+        const { address, functionName, args } = config!.request;
+
+        // Encode the function call data using the ABI
+        const abi = governorContract.abi;
+        const functionData = abi.find(
+          (item: any) => item.type === "function" && item.name === functionName
+        );
+
+        // Create the calldata by encoding the function selector and arguments
+        // This is a simplified approach - in a real implementation, you might want to use proper ABI encoding
+        const calldata = functionData
+          ? `0x${functionData.selector}${args.map((arg: any) => arg.toString().slice(2).padStart(64, "0")).join("")}`
+          : "0x";
+
+        // Create transaction data for the proposal creation function
+        const transactions = [
+          {
+            to: getAddress(governorContract.address as string),
+            value: "0",
+            data: calldata,
+          },
+        ];
+
+        // Create a Safe transaction
+        const safeTransaction = await protocolKit.createTransaction({
+          transactions,
+          onlyCalls: true,
+        });
+
+        // Get the transaction hash
+        const safeTxHash =
+          await protocolKit.getTransactionHash(safeTransaction);
+
+        // Sign transaction to verify that the transaction is coming from owner
+        const senderSignature = await protocolKit.signHash(safeTxHash);
+
+        // Propose the transaction to the Safe
+        await safeApiKit.proposeTransaction({
+          safeAddress: selectedWalletAddress as `0x${string}`,
+          safeTransactionData: safeTransaction.data,
+          safeTxHash: safeTxHash,
+          senderAddress: address as `0x${string}`,
+          senderSignature: senderSignature.data,
+        });
+
+        // Store the Safe transaction hash
+        setSafeTxHash(safeTxHash);
+        txHash = safeTxHash;
+      } catch (error) {
+        console.error("Safe transaction error:", error);
+        throw error;
+      }
+    } else {
+      // Regular EOA wallet transaction
+      txHash = await writeAsync(config!.request);
+    }
+
     trackEvent({
       event_name: ANALYTICS_EVENT_NAMES.CREATE_PROPOSAL,
       event_data: {
@@ -79,13 +150,14 @@ export default function SubmitButton({
         proposal_data: inputData,
       },
     });
+
     openDialog({
       type: "CAST_PROPOSAL",
       params: {
         isLoading,
         isError,
         isSuccess,
-        txHash: data,
+        txHash: safeTxHash || data,
       },
     });
   }

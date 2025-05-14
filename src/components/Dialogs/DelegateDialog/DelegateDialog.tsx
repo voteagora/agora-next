@@ -4,6 +4,8 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
+import { useSafeProtocolKit } from "@/contexts/SafeProtocolKit";
+import { encodeAbiParameters, encodeFunctionData, getAddress } from "viem";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/Button";
 import { Button as ShadcnButton } from "@/components/ui/button";
@@ -27,26 +29,28 @@ import { formatEther } from "viem";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { useSafeApiKit } from "@/contexts/SafeApiKitContext";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 export function DelegateDialog({
   delegate,
-  fetchBalanceForDirectDelegation,
   fetchDirectDelegatee,
 }: {
   delegate: DelegateChunk;
-  fetchBalanceForDirectDelegation: (
-    addressOrENSName: string
-  ) => Promise<bigint>;
   fetchDirectDelegatee: (
     addressOrENSName: string
   ) => Promise<DelegateePayload | null>;
 }) {
   const shouldFetchData = useRef(true);
   const [isReady, setIsReady] = useState(false);
+  const [safeTxHash, setSafeTxHash] = useState<`0x${string}` | undefined>();
   const { ui, contracts, token, slug } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
-
+  const { isSelectedPrimaryAddress, selectedWalletAddress } =
+    useSelectedWallet();
   const { address: accountAddress } = useAccount();
+  const { protocolKit } = useSafeProtocolKit();
+  const { safeApiKit } = useSafeApiKit();
 
   const { data: tokenBalance } = useTokenBalance(accountAddress);
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
@@ -104,7 +108,7 @@ export function DelegateDialog({
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
   } = useWaitForTransactionReceipt({
-    hash: isGasRelayLive ? sponsoredTxnHash : delegateTxHash,
+    hash: isGasRelayLive ? sponsoredTxnHash : safeTxHash || delegateTxHash,
   });
 
   const fetchData = async () => {
@@ -134,6 +138,69 @@ export function DelegateDialog({
   async function executeDelegate() {
     if (isGasRelayLive) {
       await call();
+    } else if (!isSelectedPrimaryAddress) {
+      try {
+        // // Encode the function call data using viem's encodeFunctionData
+        // const data = encodeFunctionData({
+        //   abi: contracts.token.abi,
+        //   functionName: "delegate",
+        //   args: [delegate.address as `0x${string}`],
+        // });
+
+        // // Create transaction data for the delegate function
+        // const transactions = [
+        //   {
+        //     to: getAddress(contracts.token.address),
+        //     value: "0",
+        //     data,
+        //   },
+        // ];
+
+        // // Create a Safe transaction
+        // const safeTransaction = await protocolKit.createTransaction({
+        //   transactions,
+        //   onlyCalls: true,
+        // });
+
+        // const safeTxHash =
+        //   await protocolKit.getTransactionHash(safeTransaction);
+
+        // // Sign transaction to verify that the transaction is coming from owner 1
+        // const senderSignature = await protocolKit.signHash(safeTxHash);
+
+        // safeApiKit?.proposeTransaction({
+        //   safeAddress: selectedWalletAddress as `0x${string}`,
+        //   safeTransactionData: safeTransaction.data,
+        //   safeTxHash: safeTxHash,
+        //   senderAddress: accountAddress as `0x${string}`,
+        //   senderSignature: senderSignature.data,
+        // });
+        const transactions = await safeApiKit?.getPendingTransactions(
+          selectedWalletAddress as `0x${string}`
+        );
+        const messages = await safeApiKit?.getMessages(
+          selectedWalletAddress as `0x${string}`
+        );
+        console.log("transactions", transactions);
+        console.log("messages", messages);
+        // // // Execute the transaction
+        // const txResponse = await protocolKit.executeTransaction(
+        //   signedSafeTransaction
+        // );
+
+        // // Store the transaction hash for reference
+        // const txHash = txResponse.hash as `0x${string}`;
+
+        // // Update UI state to show transaction is being processed
+        // // Set the Safe transaction hash to be used for status tracking
+        // if (txHash) {
+        //   setSafeTxHash(txHash);
+        // }
+      } catch (error) {
+        console.error("Safe transaction error:", error);
+        // Re-throw to trigger error state
+        throw error;
+      }
     } else {
       write({
         address: contracts.token.address as any,
@@ -180,7 +247,9 @@ export function DelegateDialog({
             Delegation completed!
           </Button>
           <BlockScanUrls
-            hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
+            hash1={
+              isGasRelayLive ? sponsoredTxnHash : safeTxHash || delegateTxHash
+            }
           />
         </div>
       );

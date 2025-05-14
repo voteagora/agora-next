@@ -46,6 +46,16 @@ type CastVoteContextType = {
     advancedTxHash: string;
     sponsoredVoteTxHash: string;
   }>;
+  dataForSafeTxn?: {
+    castVote: `0x${string}`;
+    castVoteWithReason: `0x${string}`;
+    governorAddress: `0x${string}`;
+    params: {
+      proposalId: string;
+      support: number;
+      reason?: string;
+    };
+  };
 };
 
 const CastVoteContext = createContext<CastVoteContextType>({
@@ -62,6 +72,7 @@ const CastVoteContext = createContext<CastVoteContextType>({
   fallbackToStandardVote: false,
   setFallbackToStandardVote: (fallbackToStandardVote) => {},
   data: {},
+  dataForSafeTxn: undefined,
 });
 
 export function useCastVoteContext() {
@@ -217,6 +228,7 @@ const CastVoteContextProvider = ({
                 advancedTxHash: votes?.[1]?.transactionHash,
               }
             : data,
+        dataForSafeTxn: standardVoteValues.dataForSafeTxn,
       }}
     >
       {children}

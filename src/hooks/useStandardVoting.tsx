@@ -6,6 +6,7 @@ import { trackEvent } from "@/lib/analytics";
 import { useAccount } from "wagmi";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
+import { encodeFunctionData } from "viem";
 
 const useStandardVoting = ({
   proposalId,
@@ -94,6 +95,28 @@ const useStandardVoting = ({
     isSuccess: standardVoteSuccess,
     write,
     data: { advancedTxHash, standardTxHash },
+    dataForSafeTxn: {
+      // Encode castVote function data for Safe transaction
+      castVote: encodeFunctionData({
+        abi: contracts.governor.abi,
+        functionName: "castVote",
+        args: [BigInt(proposalId), BigInt(support)],
+      }),
+      // Encode castVoteWithReason function data for Safe transaction
+      castVoteWithReason: encodeFunctionData({
+        abi: contracts.governor.abi,
+        functionName: "castVoteWithReason",
+        args: [BigInt(proposalId), BigInt(support), reason || ""],
+      }),
+      // Contract address to call
+      governorAddress: contracts.governor.address as `0x${string}`,
+      // Parameters for reference
+      params: {
+        proposalId,
+        support,
+        reason,
+      },
+    },
   };
 };
 

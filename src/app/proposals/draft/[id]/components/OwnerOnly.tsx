@@ -1,5 +1,6 @@
 "use client";
 
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 import { useAccount } from "wagmi";
 
 const OnlyOwner = ({
@@ -10,7 +11,7 @@ const OnlyOwner = ({
   children: React.ReactNode;
 }) => {
   const { address, isConnecting, isReconnecting } = useAccount();
-
+  const { selectedWalletAddress } = useSelectedWallet();
   // causing jitter when loading... need to figure out a better long term solution
   //   if (isConnecting || isReconnecting) {
   //     return (
@@ -26,7 +27,7 @@ const OnlyOwner = ({
   //     );
   //   }
 
-  if (ownerAddress !== address) {
+  if (ownerAddress !== selectedWalletAddress) {
     return (
       <div className="text-primary">
         You are not the owner of this proposal.
