@@ -31,7 +31,7 @@ A message to the community and ecosystem:
 Discourse username:`;
 
   return (
-    <div className="flex flex-col py-8 px-6 border-b border-line text-primary">
+    <div className="flex flex-col py-8 px-6 text-primary">
       <Tabs defaultValue="write">
         <div className="flex flex-row gap-4 justify-between items-baseline">
           <div className="flex flex-row items-baseline gap-2">

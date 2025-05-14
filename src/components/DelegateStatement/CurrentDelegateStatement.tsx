@@ -1,6 +1,5 @@
 "use client";
 
-import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import { fetchDelegateStatement } from "@/app/delegates/actions";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
@@ -13,6 +12,8 @@ import AgoraLoader, {
   LogoLoader,
 } from "@/components/shared/AgoraLoader/AgoraLoader";
 import DelegateStatementForm from "@/components/DelegateStatement/DelegateStatementForm";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useAccount } from "wagmi";
 
 const { slug: daoSlug } = Tenant.current();
 
@@ -22,11 +23,7 @@ const formSchema = z.object({
   agreeCodeConduct: z.boolean(),
   agreeDaoPrinciples: z.boolean(),
   daoSlug: z.string(),
-  discord: z.string(),
   delegateStatement: z.string(),
-  email: z.string(),
-  twitter: z.string(),
-  warpcast: z.string(),
   scwAddress: z.string().optional(),
   topIssues: z.array(
     z
@@ -44,48 +41,16 @@ const formSchema = z.object({
       })
       .strict()
   ),
-  openToSponsoringProposals: z.union([
-    z.literal("yes"),
-    z.literal("no"),
-    z.null(),
-  ]),
-  mostValuableProposals: z.array(
-    z
-      .object({
-        number: z.string(),
-      })
-      .strict()
-  ),
-  leastValuableProposals: z.array(
-    z
-      .object({
-        number: z.string(),
-      })
-      .strict()
-  ),
-  notificationPreferences: z.object({
-    last_updated: z.string().optional(),
-    wants_proposal_created_email: z.union([
-      z.literal("prompt"),
-      z.literal("prompted"),
-      z.boolean(),
-    ]),
-    wants_proposal_ending_soon_email: z.union([
-      z.literal("prompt"),
-      z.literal("prompted"),
-      z.boolean(),
-    ]),
-  }),
 });
 
 export default function CurrentDelegateStatement() {
   const { ui } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
-  const { address, isConnected, isConnecting } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
   const [loading, setLoading] = useState<boolean>(true);
   const [delegateStatement, setDelegateStatement] =
     useState<DelegateStatement | null>(null);
-
+  const { isConnected, isConnecting } = useAccount();
   // Display the first two delegate issues as default values
   const topIssues = ui.governanceIssues;
   const defaultIssues = !topIssues
@@ -106,13 +71,9 @@ export default function CurrentDelegateStatement() {
       agreeCodeConduct: !requireCodeOfConduct,
       agreeDaoPrinciples: !requireDaoPrinciples,
       daoSlug,
-      discord: delegateStatement?.discord || "",
       delegateStatement:
         (delegateStatement?.payload as { delegateStatement?: string })
           ?.delegateStatement || "",
-      email: delegateStatement?.email || "",
-      twitter: delegateStatement?.twitter || "",
-      warpcast: delegateStatement?.warpcast || "",
       scwAddress: delegateStatement?.scw_address || "",
       topIssues:
         (
@@ -122,7 +83,7 @@ export default function CurrentDelegateStatement() {
               type: string;
             }[];
           }
-        )?.topIssues.length > 0
+        )?.topIssues?.length > 0
           ? (
               delegateStatement?.payload as {
                 topIssues: {
@@ -151,27 +112,6 @@ export default function CurrentDelegateStatement() {
               }
             )?.topStakeholders
           : [],
-
-      openToSponsoringProposals:
-        (
-          delegateStatement?.payload as {
-            openToSponsoringProposals?: "yes" | "no" | null;
-          }
-        )?.openToSponsoringProposals || null,
-      mostValuableProposals:
-        (delegateStatement?.payload as { mostValuableProposals?: object[] })
-          ?.mostValuableProposals || [],
-      leastValuableProposals:
-        (delegateStatement?.payload as { leastValuableProposals?: object[] })
-          ?.leastValuableProposals || [],
-      notificationPreferences: (delegateStatement?.notification_preferences as {
-        wants_proposal_created_email: "prompt" | "prompted" | boolean;
-        wants_proposal_ending_soon_email: "prompt" | "prompted" | boolean;
-      }) || {
-        wants_proposal_created_email: "prompt",
-        wants_proposal_ending_soon_email: "prompt",
-      },
-      last_updated: new Date().toISOString(),
     };
   };
 
@@ -197,10 +137,6 @@ export default function CurrentDelegateStatement() {
       _getDelegateStatement();
     }
   }, [address, reset]);
-
-  if (!isConnected && !isConnecting) {
-    return <ResourceNotFound message="Oops! Nothing's here" />;
-  }
 
   return loading ? (
     shouldHideAgoraBranding ? (

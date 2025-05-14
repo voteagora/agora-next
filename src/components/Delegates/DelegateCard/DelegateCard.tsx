@@ -25,7 +25,7 @@ export default function DelegateCard({
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
   return (
     <div className="flex flex-col static sm:sticky top-16 flex-shrink-0 width-[20rem]">
-      <DelegateCardHeader delegate={delegate} />
+      {isEditMode && <DelegateCardHeader delegate={delegate} />}
       <div className="flex flex-col bg-wash border border-line shadow-newDefault rounded-xl">
         <div className="flex flex-col items-stretch p-7">
           <DelegateProfileImageWithMetadata

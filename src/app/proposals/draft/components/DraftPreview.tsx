@@ -2,7 +2,7 @@
 
 import FormCard from "./form/FormCard";
 import ProposalTransactionDisplay from "@/components/Proposals/ProposalPage/ApprovedTransactions/ProposalTransactionDisplay";
-import { useAccount, useBlockNumber } from "wagmi";
+import { useBlockNumber } from "wagmi";
 import { formatUnits } from "viem";
 import AvatarAddress from "./AvatarAdress";
 import { formatFullDate } from "@/lib/utils";
@@ -20,6 +20,7 @@ import { useGetVotes } from "@/hooks/useGetVotes";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { useEffect, useState } from "react";
 import { getInputData } from "../utils/getInputData";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -45,7 +46,7 @@ const DraftPreview = ({
   const calldatas = inputData?.[2];
   const description = inputData?.[3];
 
-  const { address } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
   const { data: threshold } = useProposalThreshold();
   const { data: manager } = useManager();
 
@@ -99,7 +100,6 @@ const DraftPreview = ({
   };
 
   const canAddressSponsor = canSponsor();
-
   const renderProposalDescription = (proposal: DraftProposal) => {
     switch (proposal.voting_module_type) {
       case ProposalType.BASIC:

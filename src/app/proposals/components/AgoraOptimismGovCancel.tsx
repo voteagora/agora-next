@@ -1,19 +1,19 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import {
-  useAccount,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import { ProposalType } from "@/app/proposals/draft/types";
 import { keccak256 } from "viem";
 import { toUtf8Bytes } from "ethers";
 import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useWrappedWriteContract } from "@/hooks/useWrappedWriteContract";
+import { SafeTxnTooltip } from "@/components/shared/SafeTxnTooltip";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
 
 interface Props {
   proposal: Proposal;
@@ -21,20 +21,25 @@ interface Props {
 
 export const AgoraOptimismGovCancel = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
-  const { address } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
 
   const { data: adminAddress } = useGovernorAdmin({ enabled: true });
 
   const canCancel =
     adminAddress?.toString().toLowerCase() === address?.toLowerCase();
 
-  const { writeContract: write, data } = useWriteContract();
+  const { writeContract: write, data } = useWrappedWriteContract();
   const { isLoading, isSuccess, isError, isFetched, error } =
     useWaitForTransactionReceipt({
       hash: data,
     });
 
   const isStandardType = proposal.proposalType === "STANDARD";
+  const { getCancelProposalsForDescription } = useSafePendingTransactions();
+
+  const pendingCancelProposals = useMemo(() => {
+    return getCancelProposalsForDescription(proposal.description, proposal.id);
+  }, [getCancelProposalsForDescription, proposal.description, proposal.id]);
 
   const callArgs = () => {
     if (isStandardType) {
@@ -90,6 +95,16 @@ export const AgoraOptimismGovCancel = ({ proposal }: Props) => {
 
   if (!canCancel) {
     return null;
+  }
+
+  if (pendingCancelProposals[proposal.id]) {
+    return (
+      <SafeTxnTooltip className="inline-block">
+        <Button className="w-full bg-primary/90 cursor-none" disabled>
+          Pending Approval {pendingCancelProposals[proposal.id]}
+        </Button>
+      </SafeTxnTooltip>
+    );
   }
 
   return (

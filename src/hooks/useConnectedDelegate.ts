@@ -11,6 +11,7 @@ import { timeout } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import { ZERO_ADDRESS } from "@/lib/constants";
 import { DELEGATE_QK } from "@/hooks/useDelegate";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 /**
  * Define maximum number of retries, max retries 10 means 180 seconds waiting in total (advanced delegation voting power
@@ -26,7 +27,7 @@ const useConnectedDelegate = () => {
   const isTestToken = contracts.token.address === ZERO_ADDRESS;
 
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
-  const { address } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
   const [retries, setRetries] = useState<number>(0);
   const [lastVotingPower, setLastVotingPower] = useState<string | null>(null);
 

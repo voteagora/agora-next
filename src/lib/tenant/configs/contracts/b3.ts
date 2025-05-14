@@ -45,7 +45,7 @@ export const b3TenantConfig = ({
 
   const APPROVAL_MODULE = isProd
     ? "0x4990CcE6e8CD9596305b83C4860D4C0f3Bf4e8fa"
-    : "0x2c349e564037e184Fe787CA4906C53507c70A7E0";
+    : "0x1986516d07ABEddF8107F98b443F21ECFEE1d164";
 
   const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
 
