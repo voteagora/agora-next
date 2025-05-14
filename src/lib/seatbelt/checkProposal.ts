@@ -1,5 +1,6 @@
 "use server";
 
+import { unstable_cache } from "next/cache";
 import { ParsedProposalData } from "../proposalUtils";
 import Tenant from "../tenant/tenant";
 import ALL_CHECKS from "./checks";
@@ -15,6 +16,18 @@ import {
 } from "./types";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
+
+const ONE_HOUR_IN_SECONDS = 60 * 60;
+
+const tenant = Tenant.current();
+const { contracts } = tenant;
+const provider = contracts.governor.provider;
+
+const getBlockCached = unstable_cache(
+  async (p: typeof provider, blockNumber: number) => p.getBlock(blockNumber),
+  ["getBlock-checkProposal"],
+  { revalidate: ONE_HOUR_IN_SECONDS }
+);
 
 export async function checkNewProposal({
   targets,
@@ -82,10 +95,10 @@ export async function checkNewProposal({
   // Generate markdown report
   const [startBlock, endBlock] = await Promise.all([
     proposal.startBlock && Number(proposal.startBlock) <= latestBlock.number
-      ? provider.getBlock(Number(proposal.startBlock))
+      ? getBlockCached(provider, Number(proposal.startBlock))
       : null,
     proposal.endBlock && Number(proposal.endBlock) <= latestBlock.number
-      ? provider.getBlock(Number(proposal.endBlock))
+      ? getBlockCached(provider, Number(proposal.endBlock))
       : null,
   ]);
 
@@ -153,17 +166,20 @@ export async function checkExistingProposal({
   // Run checks
   const checkResults: AllCheckResults = Object.fromEntries(
     await Promise.all(
-      Object.keys(ALL_CHECKS).map(async (checkId) => [
-        checkId,
-        {
-          name: ALL_CHECKS[checkId].name,
-          result: await ALL_CHECKS[checkId].checkProposal(
-            proposalEvent,
-            sim,
-            proposalData
-          ),
-        },
-      ])
+      Object.keys(ALL_CHECKS).map(async (checkId) => {
+        const result = await ALL_CHECKS[checkId].checkProposal(
+          proposalEvent,
+          sim,
+          proposalData
+        );
+        return [
+          checkId,
+          {
+            name: ALL_CHECKS[checkId].name,
+            result,
+          },
+        ];
+      })
     )
   );
 
@@ -171,11 +187,11 @@ export async function checkExistingProposal({
   const [startBlock, endBlock] = await Promise.all([
     existingProposal.startBlock &&
     Number(existingProposal.startBlock) <= latestBlock.number
-      ? provider.getBlock(Number(existingProposal.startBlock))
+      ? getBlockCached(provider, Number(existingProposal.startBlock))
       : null,
     existingProposal.endBlock &&
     Number(existingProposal.endBlock) <= latestBlock.number
-      ? provider.getBlock(Number(existingProposal.endBlock))
+      ? getBlockCached(provider, Number(existingProposal.endBlock))
       : null,
   ]);
 
@@ -267,10 +283,10 @@ export async function checkNewApprovalProposal({
   // Generate markdown report
   const [startBlock, endBlock] = await Promise.all([
     proposal.startBlock && Number(proposal.startBlock) <= latestBlock.number
-      ? provider.getBlock(Number(proposal.startBlock))
+      ? getBlockCached(provider, Number(proposal.startBlock))
       : null,
     proposal.endBlock && Number(proposal.endBlock) <= latestBlock.number
-      ? provider.getBlock(Number(proposal.endBlock))
+      ? getBlockCached(provider, Number(proposal.endBlock))
       : null,
   ]);
 

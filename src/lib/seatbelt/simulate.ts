@@ -3,10 +3,11 @@ import { getAddress } from "@ethersproject/address";
 import { HashZero } from "@ethersproject/constants";
 import { keccak256 } from "@ethersproject/keccak256";
 import { toUtf8Bytes } from "@ethersproject/strings";
+import { unstable_cache } from "next/cache";
 
 import Tenant from "../tenant/tenant";
 import { getPublicClient } from "../viem";
-import { GOVERNOR_TYPE, TIMELOCK_TYPE } from "../constants";
+import { GOVERNOR_TYPE } from "../constants";
 import {
   ProposalData,
   ProposalEvent,
@@ -48,8 +49,6 @@ const chainIdForTime = contracts.chainForTime?.id;
 const governor = contracts.governor;
 const timelock = contracts.timelock;
 const governorType = contracts.governorType;
-const timelockType = contracts.timelockType;
-const votingToken = contracts.token;
 
 type TenderlyError = {
   statusCode?: number;
@@ -59,6 +58,16 @@ type StateOverridesPayload = {
   networkID: string;
   stateOverrides: Record<string, { value: Record<string, string> }>;
 };
+
+const ONE_WEEK_IN_SECONDS = 60 * 60 * 24 * 7;
+const ONE_MINUTE_IN_SECONDS_BLOCK = 60;
+const TEN_SECONDS_IN_SECONDS = 10;
+
+const getBlockCached = unstable_cache(
+  async (p: typeof provider, blockNumber: number) => p.getBlock(blockNumber),
+  ["getBlock-simulate"],
+  { revalidate: ONE_MINUTE_IN_SECONDS_BLOCK }
+);
 
 async function generateProposalId(
   {
@@ -95,7 +104,12 @@ async function generateProposalId(
     keccak256(
       defaultAbiCoder.encode(
         ["address[]", "uint256[]", "bytes[]", "bytes32"],
-        [targets, values, calldatas, keccak256(toUtf8Bytes(description))]
+        [
+          targets,
+          values,
+          calldatas.map(ensureHexPrefix),
+          keccak256(toUtf8Bytes(description)),
+        ]
       )
     )
   );
@@ -115,26 +129,34 @@ function hashOperationBatchOz(
     keccak256(
       defaultAbiCoder.encode(
         ["address[]", "uint256[]", "bytes[]", "bytes32", "bytes32"],
-        [targets, values, calldatas, predecessor, salt]
+        [targets, values, calldatas.map(ensureHexPrefix), predecessor, salt]
       )
     )
   );
 }
 
-const getTotalSupply = async () => {
-  if (contracts.token.isERC20()) {
-    return contracts.token.contract.totalSupply();
-  } else if (contracts.token.isERC721()) {
-    const token = contracts.token.contract as IMembershipContract;
-    const publicClient = getPublicClient(
-      useL1BlockNumber ? contracts.chainForTime : contracts.token.chain
-    );
-    const blockNumber = await publicClient.getBlockNumber();
-    return token.getPastTotalSupply(Number(blockNumber) - 1);
-  } else {
-    return 0;
-  }
-};
+const getTotalSupplyCached = unstable_cache(
+  async () => {
+    if (contracts.token.isERC20()) {
+      return contracts.token.contract.totalSupply();
+    } else if (contracts.token.isERC721()) {
+      const token = contracts.token.contract as IMembershipContract;
+      const publicClient = getPublicClient(
+        useL1BlockNumber ? contracts.chainForTime : contracts.token.chain
+      );
+      const blockNumber = await publicClient.getBlockNumber();
+      return token.getPastTotalSupply(Number(blockNumber) - 1);
+    } else {
+      return 0;
+    }
+  },
+  [
+    "getTotalSupply-simulate",
+    contracts.token.address,
+    String(contracts.token.chain?.id || "defaultChain"),
+  ],
+  { revalidate: ONE_WEEK_IN_SECONDS }
+);
 
 // --- Simulation methods ---
 /**
@@ -158,31 +180,40 @@ export async function simulateNew(
     throw new Error("targets and calldatas must be the same length");
 
   // --- Get details about the proposal we're simulating ---
-  const network = await provider.getNetwork();
+  const chainId = BigInt(governor.chain.id);
 
-  const blockNumberToUse =
-    useL1BlockNumber && chainIdForTime
-      ? (await getLatestBlock(BigInt(chainIdForTime))) - 3
-      : (await getLatestBlock(network.chainId)) - 3;
+  const [
+    blockNumberToUseRes,
+    latestBlockL2Res,
+    votingTokenSupplyRes,
+    proposalIdRes,
+  ] = await Promise.all([
+    (async () =>
+      useL1BlockNumber && chainIdForTime
+        ? (await getLatestBlockCached(BigInt(chainIdForTime))) - 3
+        : (await getLatestBlockCached(chainId)) - 3)(),
+    (async () =>
+      useL1BlockNumber && chainIdForTime
+        ? (await getLatestBlockCached(chainId)) - 3
+        : null)(),
+    getTotalSupplyCached(),
+    generateProposalId({
+      targets,
+      values,
+      calldatas: calldatas.map(ensureHexPrefix),
+      description,
+    }),
+  ]);
+
+  const blockNumberToUse = blockNumberToUseRes;
+  const latestBlockL2 = latestBlockL2Res;
+  const votingTokenSupply = votingTokenSupplyRes;
+  const proposalId = proposalIdRes;
 
   const latestBlock =
     useL1BlockNumber && providerForTime
-      ? await providerForTime.getBlock(blockNumberToUse)
-      : await provider.getBlock(blockNumberToUse);
-
-  const latestBlockL2 =
-    useL1BlockNumber && chainIdForTime
-      ? (await getLatestBlock(network.chainId)) - 3
-      : null;
-
-  const proposalId = await generateProposalId({
-    targets,
-    values,
-    calldatas: calldatas.map((calldata) =>
-      calldata.startsWith("0x") ? calldata : `0x${calldata}`
-    ),
-    description,
-  });
+      ? await getBlockCached(providerForTime, blockNumberToUse)
+      : await getBlockCached(provider, blockNumberToUse);
 
   if (!latestBlock) {
     throw new Error("latestBlock is null");
@@ -204,16 +235,10 @@ export async function simulateNew(
     targets,
     values,
     signatures,
-    calldatas: calldatas.map((calldata) =>
-      calldata.startsWith("0x") ? calldata : `0x${calldata}`
-    ),
+    calldatas: calldatas.map(ensureHexPrefix),
   };
 
   // --- Prepare simulation configuration ---
-  const votingTokenSupply = await getTotalSupply();
-
-  const from = DEFAULT_FROM;
-
   const simBlock = proposal.endBlock! + 1n;
 
   const simTimestamp =
@@ -248,9 +273,7 @@ export async function simulateNew(
     const id = hashOperationBatchOz(
       targets,
       values,
-      calldatas.map((calldata) =>
-        calldata.startsWith("0x") ? calldata : `0x${calldata}`
-      ),
+      calldatas.map(ensureHexPrefix),
       HashZero,
       keccak256(toUtf8Bytes(description))
     );
@@ -295,9 +318,7 @@ export async function simulateNew(
     const id = hashOperationBatchOz(
       targets,
       values,
-      calldatas.map((calldata) =>
-        calldata.startsWith("0x") ? calldata : `0x${calldata}`
-      ),
+      calldatas.map(ensureHexPrefix),
       HashZero,
       keccak256(toUtf8Bytes(description))
     );
@@ -316,7 +337,7 @@ export async function simulateNew(
   }
 
   const stateOverrides: StateOverridesPayload = {
-    networkID: network.chainId.toString(),
+    networkID: chainId.toString(),
     stateOverrides: {
       [timelock.address]: {
         value: timelockStorageObj,
@@ -333,9 +354,9 @@ export async function simulateNew(
   // sendEncodeRequest works better for Bravo governors but encodeState works better for others.
   // Ideal state would be to have a single encoding method that works for all governor types. But doesn't seem worth the effort right now.
   if (governorType === GOVERNOR_TYPE.BRAVO) {
-    storageObj = await sendEncodeRequest(stateOverrides);
+    storageObj = await sendEncodeRequestCached(stateOverrides);
   } else {
-    storageObj = await encodeState(stateOverrides);
+    storageObj = await encodeStateCached(stateOverrides);
   }
 
   // --- Simulate it ---
@@ -344,17 +365,10 @@ export async function simulateNew(
   const executeInputs =
     governorType === GOVERNOR_TYPE.BRAVO
       ? [proposalId.toString()]
-      : [
-          targets,
-          values,
-          calldatas.map((calldata) =>
-            calldata.startsWith("0x") ? calldata : `0x${calldata}`
-          ),
-          descriptionHash,
-        ];
+      : [targets, values, calldatas.map(ensureHexPrefix), descriptionHash];
 
   const simulationPayload: TenderlyPayload = {
-    network_id: network.chainId.toString(),
+    network_id: chainId.toString(),
     block_number: latestBlockL2 ? latestBlockL2 : latestBlock.number,
     from: DEFAULT_FROM,
     to: governor.address,
@@ -374,7 +388,7 @@ export async function simulateNew(
       timestamp: `0x${simTimestamp.toString(16)}`,
     },
     state_objects: {
-      [from]: { balance: "0" },
+      [DEFAULT_FROM]: { balance: "0" },
       [timelock.address]: {
         storage:
           storageObj.stateOverrides[timelock.address.toLowerCase()]?.value,
@@ -394,8 +408,8 @@ export async function simulateNew(
     if (!simulationPayload.state_objects) {
       simulationPayload.state_objects = {};
     }
-    simulationPayload.state_objects[from] = {
-      ...simulationPayload.state_objects[from],
+    simulationPayload.state_objects[DEFAULT_FROM] = {
+      ...simulationPayload.state_objects[DEFAULT_FROM],
       balance: totalValue.toString(),
     };
   }
@@ -419,26 +433,32 @@ export async function simulateNew(
 export async function simulateProposed(
   config: SimulationConfigProposed
 ): Promise<SimulationResult> {
-  const client = getPublicClient();
   const { governorType, proposalId, proposal } = config;
 
   // --- Get details about the proposal we're simulating ---
-  const network = await provider.getNetwork();
+  const chainId = BigInt(governor.chain.id);
 
-  const blockNumberToUse =
-    useL1BlockNumber && chainIdForTime
-      ? (await getLatestBlock(BigInt(chainIdForTime))) - 3
-      : (await getLatestBlock(network.chainId)) - 3; // subtracting a few blocks to ensure tenderly has the block
+  const [blockNumberToUseRes, latestBlockL2Res, votingTokenSupplyRes] =
+    await Promise.all([
+      (async () =>
+        useL1BlockNumber && chainIdForTime
+          ? (await getLatestBlockCached(BigInt(chainIdForTime))) - 3
+          : (await getLatestBlockCached(chainId)) - 3)(),
+      (async () =>
+        useL1BlockNumber && chainIdForTime
+          ? (await getLatestBlockCached(chainId)) - 3
+          : null)(),
+      getTotalSupplyCached(),
+    ]);
+
+  const blockNumberToUse = blockNumberToUseRes;
+  const latestBlockL2 = latestBlockL2Res;
+  const votingTokenSupply = votingTokenSupplyRes;
 
   const latestBlock =
     useL1BlockNumber && providerForTime
-      ? await providerForTime.getBlock(blockNumberToUse)
-      : await provider.getBlock(blockNumberToUse);
-
-  const latestBlockL2 =
-    useL1BlockNumber && chainIdForTime
-      ? (await getLatestBlock(network.chainId)) - 3
-      : null;
+      ? await getBlockCached(providerForTime, blockNumberToUse)
+      : await getBlockCached(provider, blockNumberToUse);
 
   const options = (
     proposal.proposalData as ParsedProposalData["STANDARD"]["kind"]
@@ -449,8 +469,6 @@ export async function simulateProposed(
   const { targets, signatures: sigs, calldatas, values } = option;
 
   // --- Prepare simulation configuration ---
-  // Get voting token and total supply
-  const votingTokenSupply = await getTotalSupply();
 
   // Set `from` arbitrarily.
   const from = DEFAULT_FROM;
@@ -514,38 +532,8 @@ export async function simulateProposed(
 
       const id = hashOperationBatchOz(
         targets,
-        values.map((v) => {
-          if (typeof v === "bigint") return v;
-          // Convert string value to BigInt, handling scientific notation
-          const str = v.toString();
-          try {
-            return BigInt(str);
-          } catch {
-            // If direct conversion fails, try to handle scientific notation
-            const parts = str.toLowerCase().split("e");
-            if (parts.length === 2) {
-              const base = parts[0];
-              const exponent = parseInt(parts[1]);
-              // Handle scientific notation by shifting the decimal point
-              const baseWithoutDecimal = base.replace(".", "");
-              const decimalIndex = base.indexOf(".");
-              const decimalPlaces =
-                decimalIndex === -1 ? 0 : base.length - decimalIndex - 1;
-              const shift = exponent - decimalPlaces;
-              if (shift >= 0) {
-                return BigInt(baseWithoutDecimal + "0".repeat(shift));
-              } else {
-                throw new Error(
-                  `Number too small to convert to BigInt: ${str}`
-                );
-              }
-            }
-            throw new Error(`Invalid number format: ${str}`);
-          }
-        }),
-        calldatas.map((calldata) =>
-          calldata.startsWith("0x") ? calldata : `0x${calldata}`
-        ),
+        values.map(stringToBigInt),
+        calldatas.map(ensureHexPrefix),
         HashZero,
         descHash
       );
@@ -580,36 +568,8 @@ export async function simulateProposed(
     const proposalVotesKey = `_proposalVotes[${proposalIdBn.toString()}]`;
     const id = hashOperationBatchOz(
       targets,
-      values.map((v) => {
-        if (typeof v === "bigint") return v;
-        // Convert string value to BigInt, handling scientific notation
-        const str = v.toString();
-        try {
-          return BigInt(str);
-        } catch {
-          // If direct conversion fails, try to handle scientific notation
-          const parts = str.toLowerCase().split("e");
-          if (parts.length === 2) {
-            const base = parts[0];
-            const exponent = parseInt(parts[1]);
-            // Handle scientific notation by shifting the decimal point
-            const baseWithoutDecimal = base.replace(".", "");
-            const decimalIndex = base.indexOf(".");
-            const decimalPlaces =
-              decimalIndex === -1 ? 0 : base.length - decimalIndex - 1;
-            const shift = exponent - decimalPlaces;
-            if (shift >= 0) {
-              return BigInt(baseWithoutDecimal + "0".repeat(shift));
-            } else {
-              throw new Error(`Number too small to convert to BigInt: ${str}`);
-            }
-          }
-          throw new Error(`Invalid number format: ${str}`);
-        }
-      }),
-      calldatas.map((calldata) =>
-        calldata.startsWith("0x") ? calldata : `0x${calldata}`
-      ),
+      values.map(stringToBigInt),
+      calldatas.map(ensureHexPrefix),
       HashZero,
       keccak256(toUtf8Bytes(proposal.description || ""))
     );
@@ -628,7 +588,7 @@ export async function simulateProposed(
   }
 
   const stateOverrides: StateOverridesPayload = {
-    networkID: network.chainId.toString(),
+    networkID: chainId.toString(),
     stateOverrides: {
       [timelock.address]: {
         value: timelockStorageObj,
@@ -642,9 +602,9 @@ export async function simulateProposed(
   let storageObj: StorageEncodingResponse;
 
   if (governorType === GOVERNOR_TYPE.BRAVO) {
-    storageObj = await sendEncodeRequest(stateOverrides);
+    storageObj = await sendEncodeRequestCached(stateOverrides);
   } else {
-    storageObj = await encodeState(stateOverrides);
+    storageObj = await encodeStateCached(stateOverrides);
   }
 
   // --- Simulate it ---
@@ -659,17 +619,10 @@ export async function simulateProposed(
   const executeInputs =
     governorType === GOVERNOR_TYPE.BRAVO
       ? [BigInt(proposalId)]
-      : [
-          targets,
-          values,
-          calldatas.map((calldata) =>
-            calldata.startsWith("0x") ? calldata : `0x${calldata}`
-          ),
-          descriptionHash,
-        ];
+      : [targets, values, calldatas.map(ensureHexPrefix), descriptionHash];
 
   const simulationPayload: TenderlyPayload = {
-    network_id: network.chainId.toString(),
+    network_id: chainId.toString(),
     // this field represents the block state to simulate against, so we use the latest block number
     block_number: proposal.executedBlock
       ? Number(BigInt(proposal.executedBlock) - BigInt(10))
@@ -715,36 +668,7 @@ export async function simulateProposed(
   try {
     let totalValue = 0n;
     for (const val of values) {
-      let valBigInt: bigint;
-      if (typeof val === "bigint") {
-        valBigInt = val;
-      } else {
-        const str = val.toString();
-        try {
-          valBigInt = BigInt(str);
-        } catch {
-          // If direct conversion fails, try to handle scientific notation
-          const parts = str.toLowerCase().split("e");
-          if (parts.length === 2) {
-            const base = parts[0];
-            const exponent = parseInt(parts[1]);
-            // Handle scientific notation by shifting the decimal point
-            const baseWithoutDecimal = base.replace(".", "");
-            const decimalIndex = base.indexOf(".");
-            const decimalPlaces =
-              decimalIndex === -1 ? 0 : base.length - decimalIndex - 1;
-            const shift = exponent - decimalPlaces;
-            if (shift >= 0) {
-              valBigInt = BigInt(baseWithoutDecimal + "0".repeat(shift));
-            } else {
-              throw new Error(`Number too small to convert to BigInt: ${str}`);
-            }
-          } else {
-            throw new Error(`Invalid number format: ${str}`);
-          }
-        }
-      }
-      totalValue += valBigInt;
+      totalValue += stringToBigInt(val);
     }
 
     if (totalValue !== 0n) {
@@ -797,22 +721,29 @@ export async function simulateNewApproval(
   }
 
   // --- Get details about the proposal we're simulating ---
-  const network = await provider.getNetwork();
+  const chainId = BigInt(governor.chain.id);
 
-  const blockNumberToUse =
-    useL1BlockNumber && chainIdForTime
-      ? (await getLatestBlock(BigInt(chainIdForTime))) - 3
-      : (await getLatestBlock(network.chainId)) - 3;
+  const [blockNumberToUseRes, latestBlockL2Res, votingTokenSupplyRes] =
+    await Promise.all([
+      (async () =>
+        useL1BlockNumber && chainIdForTime
+          ? (await getLatestBlockCached(BigInt(chainIdForTime))) - 3
+          : (await getLatestBlockCached(chainId)) - 3)(),
+      (async () =>
+        useL1BlockNumber && chainIdForTime
+          ? (await getLatestBlockCached(chainId)) - 3
+          : null)(),
+      getTotalSupplyCached(),
+    ]);
+
+  const blockNumberToUse = blockNumberToUseRes;
+  const latestBlockL2 = latestBlockL2Res;
+  const votingTokenSupply = votingTokenSupplyRes;
 
   const latestBlock =
     useL1BlockNumber && providerForTime
-      ? await providerForTime.getBlock(blockNumberToUse)
-      : await provider.getBlock(blockNumberToUse);
-
-  const latestBlockL2 =
-    useL1BlockNumber && chainIdForTime
-      ? (await getLatestBlock(network.chainId)) - 3
-      : null;
+      ? await getBlockCached(providerForTime, blockNumberToUse)
+      : await getBlockCached(provider, blockNumberToUse);
 
   // Generate proposal ID using the module address
   const descriptionHash = keccak256(toUtf8Bytes(description));
@@ -855,16 +786,14 @@ export async function simulateNewApproval(
   };
 
   // --- Prepare simulation configuration ---
-  const votingTokenSupply = await getTotalSupply();
-
   const from = DEFAULT_FROM;
 
   const simBlock = proposal.endBlock! + 1n;
   const simTimestamp = BigInt(latestBlock.timestamp + 1);
 
   // Get execution parameters from the module
-  const storageObjForFormatExecuteParams = await encodeState({
-    networkID: network.chainId.toString(),
+  const storageObjForFormatExecuteParams = await encodeStateCached({
+    networkID: chainId.toString(),
     stateOverrides: {
       [moduleAddress.toLowerCase()]: {
         value: {
@@ -873,9 +802,10 @@ export async function simulateNewApproval(
             Array.from({ length: totalNumOfOptions || 0 }, (_, i) => {
               return [
                 `proposals[${proposalId.toString()}].optionVotes[${i}]`,
-                combination?.includes(i)
+                (combination?.includes(i)
                   ? settings.criteriaValue + BigInt(1)
-                  : BigInt(0),
+                  : BigInt(0)
+                ).toString(),
               ];
             })
           ),
@@ -1007,7 +937,7 @@ export async function simulateNewApproval(
   };
 
   const stateOverrides: StateOverridesPayload = {
-    networkID: network.chainId.toString(),
+    networkID: chainId.toString(),
     stateOverrides: {
       [timelock.address]: {
         value: timelockStorageObj,
@@ -1018,11 +948,11 @@ export async function simulateNewApproval(
     },
   };
 
-  const storageObj = await encodeState(stateOverrides);
+  const storageObj = await encodeStateCached(stateOverrides);
 
   // --- Simulate it ---
   const simulationPayload: TenderlyPayload = {
-    network_id: network.chainId.toString(),
+    network_id: chainId.toString(),
     block_number: latestBlockL2 ? latestBlockL2 : latestBlock.number,
     from,
     to: governor.address,
@@ -1082,42 +1012,56 @@ const randomInt = (min: number, max: number) =>
  * Gets the latest block number known to Tenderly
  * @param chainId Chain ID to get block number for
  */
-async function getLatestBlock(chainId: bigint): Promise<number> {
-  try {
-    // Send simulation request
-    const url = `${TENDERLY_BASE_URL}/network/${chainId.toString()}/block-number`;
-    const res = await fetch(url, {
-      method: "GET",
-      headers: TENDERLY_FETCH_OPTIONS.headers as Record<string, string>,
-    });
-    const data = await res.json();
-    return data.block_number as number;
-  } catch (err) {
-    throw err;
-  }
-}
+const getLatestBlockCached = unstable_cache(
+  async (chainId: bigint) => {
+    try {
+      // Send simulation request
+      const url = `${TENDERLY_BASE_URL}/network/${chainId.toString()}/block-number`;
+      const res = await fetch(url, {
+        method: "GET",
+        headers: TENDERLY_FETCH_OPTIONS.headers as Record<string, string>,
+      });
+      const data = await res.json();
+      return data.block_number as number;
+    } catch (err) {
+      throw err;
+    }
+  },
+  ["getLatestBlock-simulate"],
+  { revalidate: TEN_SECONDS_IN_SECONDS }
+);
 
 /**
  * @notice Encode state overrides
  * @param payload State overrides to send
  */
-async function sendEncodeRequest(
-  payload: StateOverridesPayload
-): Promise<StorageEncodingResponse> {
-  try {
-    const response = await fetch(TENDERLY_ENCODE_URL, {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: TENDERLY_FETCH_OPTIONS.headers as Record<string, string>,
-    });
+const sendEncodeRequestCached = unstable_cache(
+  async (payload: StateOverridesPayload): Promise<StorageEncodingResponse> => {
+    try {
+      const response = await fetch(TENDERLY_ENCODE_URL, {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: TENDERLY_FETCH_OPTIONS.headers as Record<string, string>,
+      });
 
-    const sim = await response.json();
+      const sim = await response.json();
 
-    return sim;
-  } catch (err) {
-    throw err;
-  }
-}
+      return sim;
+    } catch (err) {
+      throw err;
+    }
+  },
+  ["sendEncodeRequest", TENDERLY_ENCODE_URL],
+  { revalidate: ONE_WEEK_IN_SECONDS }
+);
+
+const encodeStateCached = unstable_cache(
+  async (payload: StateOverridesPayload): Promise<StorageEncodingResponse> => {
+    return encodeState(payload);
+  },
+  ["encodeStateFromPayload"],
+  { revalidate: ONE_WEEK_IN_SECONDS }
+);
 
 /**
  * @notice Sends a transaction simulation request to the Tenderly API
@@ -1192,3 +1136,39 @@ export function getContractName(contract: TenderlyContract | undefined) {
   // Lastly, append the contract address and save it off
   return `${contractName} at \`${getAddress(contract.address)}\``;
 }
+
+function stringToBigInt(value: string | number | bigint): bigint {
+  if (typeof value === "bigint") {
+    return value;
+  }
+  const str = value.toString();
+  try {
+    return BigInt(str);
+  } catch {
+    // If direct conversion fails, try to handle scientific notation
+    const parts = str.toLowerCase().split("e");
+    if (parts.length === 2) {
+      const base = parts[0];
+      const exponent = parseInt(parts[1]);
+      // Handle scientific notation by shifting the decimal point
+      const baseWithoutDecimal = base.replace(".", "");
+      const decimalIndex = base.indexOf(".");
+      const decimalPlaces =
+        decimalIndex === -1 ? 0 : base.length - decimalIndex - 1;
+      const shift = exponent - decimalPlaces;
+      if (shift >= 0) {
+        return BigInt(baseWithoutDecimal + "0".repeat(shift));
+      } else {
+        if (baseWithoutDecimal.length + shift <= 0) return 0n;
+        return BigInt(
+          baseWithoutDecimal.slice(0, baseWithoutDecimal.length + shift)
+        );
+      }
+    }
+    throw new Error(`Invalid number format for BigInt conversion: ${str}`);
+  }
+}
+
+const ensureHexPrefix = (hex: string): `0x${string}` => {
+  return hex.startsWith("0x") ? (hex as `0x${string}`) : `0x${hex}`;
+};

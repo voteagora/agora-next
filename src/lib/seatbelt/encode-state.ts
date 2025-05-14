@@ -17,6 +17,7 @@ import {
 } from "viem/chains";
 import { getPublicClient } from "../viem";
 import { StorageEncodingResponse } from "./types";
+import { unstable_cache } from "next/cache";
 
 // --- Type Definitions ---
 
@@ -389,153 +390,161 @@ async function fetchStorageLayoutFromSourcify(
   }
 }
 
-/**
- * Fetches the storage layout for a verified contract using multiple sources.
- */
-async function fetchStorageLayout(
+const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365;
+
+const fetchStorageLayoutCached: (
   contractAddress: string,
   networkID: string
-): Promise<StorageLayout | null> {
-  const chains = {
-    "1": mainnet,
-    "11155111": sepolia,
-    "10": optimism,
-    "534352": scroll,
-    "8453": base,
-    "42161": arbitrum,
-  };
+) => Promise<StorageLayout | null> = unstable_cache(
+  async (
+    contractAddress: string,
+    networkID: string
+  ): Promise<StorageLayout | null> => {
+    const chains = {
+      "1": mainnet,
+      "11155111": sepolia,
+      "10": optimism,
+      "534352": scroll,
+      "8453": base,
+      "42161": arbitrum,
+    };
 
-  const chain = chains[networkID as keyof typeof chains];
-  if (!chain) {
-    console.error(`Network ${networkID} not supported`);
-    return null;
-  }
+    const chain = chains[networkID as keyof typeof chains];
+    if (!chain) {
+      console.error(`Network ${networkID} not supported`);
+      return null;
+    }
 
-  const client = getPublicClient();
+    const client = getPublicClient();
 
-  // Check for proxy implementation
-  const proxySlots = [
-    "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc",
-    "0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3",
-    "0x0000000000000000000000000000000000000000000000000000000000000002",
-  ] as const;
+    // Check for proxy implementation
+    const proxySlots = [
+      "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc",
+      "0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3",
+      "0x0000000000000000000000000000000000000000000000000000000000000002",
+    ] as const;
 
-  for (const slot of proxySlots) {
+    for (const slot of proxySlots) {
+      try {
+        const storageValue = await client.getStorageAt({
+          address: getAddress(contractAddress),
+          slot,
+        });
+
+        const storageValueBigInt = BigInt(storageValue ?? "0x0");
+        if (storageValueBigInt && storageValueBigInt !== 0n) {
+          const implAddress = "0x" + storageValueBigInt.toString(16).slice(-40);
+          if (
+            !implAddress.match(/^0x[0-9a-fA-F]{40}$/) ||
+            implAddress.includes("000000000000000")
+          ) {
+            continue;
+          }
+          try {
+            return fetchStorageLayoutCached(getAddress(implAddress), networkID);
+          } catch (e) {
+            continue;
+          }
+        }
+      } catch (e) {
+        console.error("Error checking for proxy:", e);
+      }
+    }
+
+    // Try Sourcify
     try {
-      const storageValue = await client.getStorageAt({
-        address: getAddress(contractAddress),
-        slot,
-      });
-
-      const storageValueBigInt = BigInt(storageValue ?? "0x0");
-      if (storageValueBigInt && storageValueBigInt !== 0n) {
-        const implAddress = "0x" + storageValueBigInt.toString(16).slice(-40);
-        if (
-          !implAddress.match(/^0x[0-9a-fA-F]{40}$/) ||
-          implAddress.includes("000000000000000")
-        ) {
-          continue;
-        }
-        try {
-          return fetchStorageLayout(getAddress(implAddress), networkID);
-        } catch (e) {
-          continue;
-        }
+      const sourcifyLayout = await fetchStorageLayoutFromSourcify(
+        contractAddress,
+        networkID
+      );
+      if (sourcifyLayout) {
+        return sourcifyLayout;
       }
     } catch (e) {
-      console.error("Error checking for proxy:", e);
+      console.error("Error fetching from Sourcify:", e);
     }
-  }
 
-  // Try Sourcify
-  try {
-    const sourcifyLayout = await fetchStorageLayoutFromSourcify(
-      contractAddress,
-      networkID
-    );
-    if (sourcifyLayout) {
-      return sourcifyLayout;
+    // Try Etherscan
+    const etherscanApiKey = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY;
+    if (!etherscanApiKey) {
+      console.log("No Etherscan API key found, skipping Etherscan attempt");
+      return null;
     }
-  } catch (e) {
-    console.error("Error fetching from Sourcify:", e);
-  }
 
-  // Try Etherscan
-  const etherscanApiKey = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY;
-  if (!etherscanApiKey) {
-    console.log("No Etherscan API key found, skipping Etherscan attempt");
-    return null;
-  }
+    const endpoints: { [key: string]: string } = {
+      "1": "https://api.etherscan.io/api",
+      "11155111": "https://api-sepolia.etherscan.io/api",
+      "10": "https://api-optimistic.etherscan.io/api",
+      "534352": "https://api.scrollscan.com/api",
+      "8453": "https://api.basescan.org/api",
+      "42161": "https://api.arbiscan.io/api",
+    };
 
-  const endpoints: { [key: string]: string } = {
-    "1": "https://api.etherscan.io/api",
-    "11155111": "https://api-sepolia.etherscan.io/api",
-    "10": "https://api-optimistic.etherscan.io/api",
-    "534352": "https://api.scrollscan.com/api",
-    "8453": "https://api.basescan.org/api",
-    "42161": "https://api.arbiscan.io/api",
-  };
+    const baseUrl = endpoints[networkID];
+    if (!baseUrl) {
+      console.error(`Network ${networkID} not supported by Etherscan`);
+      return null;
+    }
 
-  const baseUrl = endpoints[networkID];
-  if (!baseUrl) {
-    console.error(`Network ${networkID} not supported by Etherscan`);
-    return null;
-  }
+    const url = `${baseUrl}?module=contract&action=getsourcecode&address=${contractAddress}&apikey=${etherscanApiKey}`;
+    const response = await fetch(url);
+    const data = await response.json();
 
-  const url = `${baseUrl}?module=contract&action=getsourcecode&address=${contractAddress}&apikey=${etherscanApiKey}`;
-  const response = await fetch(url);
-  const data = await response.json();
+    if (data.status !== "1") {
+      console.error(
+        `Etherscan API error for ${contractAddress}: ${data.result}`
+      );
+      return null;
+    }
 
-  if (data.status !== "1") {
-    console.error(`Etherscan API error for ${contractAddress}: ${data.result}`);
-    return null;
-  }
+    let result = data.result[0];
 
-  let result = data.result[0];
+    // --- Handle Proxies ---
+    if (result.Proxy && result.Proxy === "1") {
+      let implAddress = result.Implementation;
+      if (!implAddress || implAddress === "") {
+        const slot =
+          "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc" as const;
+        const storageValue = await client.getStorageAt({
+          address: getAddress(contractAddress),
+          slot,
+        });
+        if (storageValue) {
+          const storageValueBigInt = BigInt(storageValue);
+          implAddress = getAddress(
+            "0x" + storageValueBigInt.toString(16).slice(-40)
+          );
+        }
+      }
+      if (implAddress) {
+        return fetchStorageLayoutCached(implAddress, networkID);
+      }
+    }
 
-  // --- Handle Proxies ---
-  if (result.Proxy && result.Proxy === "1") {
-    let implAddress = result.Implementation;
-    if (!implAddress || implAddress === "") {
-      const slot =
-        "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc" as const;
-      const storageValue = await client.getStorageAt({
-        address: getAddress(contractAddress),
-        slot,
-      });
-      if (storageValue) {
-        const storageValueBigInt = BigInt(storageValue);
-        implAddress = getAddress(
-          "0x" + storageValueBigInt.toString(16).slice(-40)
+    // Fourth try: Use Etherscan Metadata (if available)
+    if (result.Metadata) {
+      try {
+        const metadata = JSON.parse(result.Metadata);
+        if (metadata.output && metadata.output.storageLayout) {
+          return metadata.output.storageLayout;
+        }
+      } catch (e) {
+        console.error(
+          "Error parsing Metadata from Etherscan, falling back to source code",
+          e
         );
       }
     }
-    if (implAddress) {
-      return fetchStorageLayout(implAddress, networkID);
-    }
-  }
 
-  // Fourth try: Use Etherscan Metadata (if available)
-  if (result.Metadata) {
-    try {
-      const metadata = JSON.parse(result.Metadata);
-      if (metadata.output && metadata.output.storageLayout) {
-        return metadata.output.storageLayout;
-      }
-    } catch (e) {
-      console.error(
-        "Error parsing Metadata from Etherscan, falling back to source code",
-        e
-      );
-    }
-  }
-
-  // If we get here, we couldn't get the storage layout through normal means
-  console.error(
-    "No storage layout found through any method, will use fallback"
-  );
-  return null;
-}
+    // If we get here, we couldn't get the storage layout through normal means
+    console.error(
+      "No storage layout found through any method, will use fallback"
+    );
+    return null;
+  },
+  ["fetchStorageLayout"],
+  { revalidate: ONE_YEAR_IN_SECONDS }
+);
 
 /**
  * Reverses the storage slot computation to find the original property string.
@@ -546,9 +555,8 @@ export async function decodeStorageSlot(
   targetSlot: string,
   networkID: string
 ): Promise<string | null> {
-  // Fetch the storage layout
-  const storageLayout = await fetchStorageLayout(contractAddress, networkID);
-  if (!storageLayout) {
+  const layout = await fetchStorageLayoutCached(contractAddress, networkID);
+  if (!layout) {
     return null;
   }
 
@@ -556,7 +564,7 @@ export async function decodeStorageSlot(
   const targetSlotBN = BigInt(targetSlot);
 
   // First check direct storage variables
-  for (const variable of storageLayout.storage) {
+  for (const variable of layout.storage) {
     const slotBN = BigInt(variable.slot);
     if (slotBN === targetSlotBN) {
       const result = variable.label.startsWith("_")
@@ -567,9 +575,9 @@ export async function decodeStorageSlot(
   }
 
   // Then check for dynamic slots (mappings and arrays)
-  for (const variable of storageLayout.storage) {
+  for (const variable of layout.storage) {
     const baseSlotBN = BigInt(variable.slot);
-    const typeDef = getTypeDefinition(storageLayout, variable.type);
+    const typeDef = getTypeDefinition(layout, variable.type);
 
     // Handle mappings
     if (typeDef?.encoding === "mapping") {
@@ -651,7 +659,10 @@ export const encodeState = async ({
 
     for (const contractAddr in stateOverrides) {
       try {
-        let storageLayout = await fetchStorageLayout(contractAddr, networkID);
+        let storageLayout = await fetchStorageLayoutCached(
+          contractAddr,
+          networkID
+        );
 
         output.stateOverrides[contractAddr] = { value: {} };
         const state = stateOverrides[contractAddr].value;
