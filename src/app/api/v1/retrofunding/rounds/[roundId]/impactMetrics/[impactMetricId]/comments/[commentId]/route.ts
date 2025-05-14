@@ -1,9 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import { fetchImpactMetricComment } from "@/app/api/common/comments/getImpactMetricComments";
-import { updateImpactMetricComment } from "@/app/api/common/comments/updateImpactMetricComment";
-import { deleteImpactMetricComment } from "@/app/api/common/comments/deleteImpactMetricComment";
 
 export async function GET(
   request: NextRequest,
@@ -11,6 +7,12 @@ export async function GET(
     params: { roundId: string; impactMetricId: string; commentId: string };
   }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+
+  const { fetchImpactMetricComment } = await import(
+    "@/app/api/common/comments/getImpactMetricComments"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
@@ -36,6 +38,12 @@ export async function PUT(
     params: { roundId: string; impactMetricId: string; commentId: string };
   }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+
+  const { updateImpactMetricComment } = await import(
+    "@/app/api/common/comments/updateImpactMetricComment"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
@@ -78,6 +86,12 @@ export async function DELETE(
     params: { roundId: string; impactMetricId: string; commentId: string };
   }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+
+  const { deleteImpactMetricComment } = await import(
+    "@/app/api/common/comments/deleteImpactMetricComment"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

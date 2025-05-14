@@ -1,12 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import {
-  authenticateApiUser,
-  getCategoryScope,
-  validateAddressScope,
-  validateProjectCategoryScope,
-} from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import { updateBallotProjectPosition } from "@/app/api/common/ballots/updateBallotProject";
+
 import { z } from "zod";
 
 const impactParser = z.number().int().gte(0); // positive integer
@@ -22,6 +16,17 @@ export async function POST(
     };
   }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { validateAddressScope } = await import("@/app/lib/auth/serverAuth");
+
+  const { updateBallotProjectPosition } = await import(
+    "@/app/api/common/ballots/updateBallotProject"
+  );
+  const { validateProjectCategoryScope } = await import(
+    "@/app/lib/auth/serverAuth"
+  );
+  const { getCategoryScope } = await import("@/app/lib/auth/serverAuth");
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

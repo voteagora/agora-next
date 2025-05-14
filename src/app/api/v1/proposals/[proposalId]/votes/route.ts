@@ -1,7 +1,5 @@
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { NextRequest, NextResponse } from "next/server";
 import { traceWithUserId } from "../../../apiUtils";
-import { fetchVotesForProposal } from "../../../../common/votes/getVotes";
 import {
   createOptionalNumberValidator,
   createOptionalStringValidator,
@@ -31,6 +29,12 @@ export async function GET(
   request: NextRequest,
   route: { params: { proposalId: string } }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+
+  const { fetchVotesForProposal } = await import(
+    "../../../../common/votes/getVotes"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
@@ -44,12 +48,12 @@ export async function GET(
       const sort = sortValidator.parse(params.get("sort"));
       const limit = limitValidator.parse(params.get("limit"));
       const offset = offsetValidator.parse(params.get("offset"));
-      const proposal = await fetchVotesForProposal({
+      const votes = await fetchVotesForProposal({
         proposalId,
         pagination: { limit, offset },
         sort,
       });
-      return NextResponse.json(proposal);
+      return NextResponse.json(votes);
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,

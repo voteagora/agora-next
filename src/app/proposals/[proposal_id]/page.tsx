@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"; // needed for app and e2e
+
 import {
   fetchProposal,
   fetchProposalUnstableCache,
@@ -16,7 +18,6 @@ import { calculateVoteMetadata } from "@/lib/voteUtils";
 import { format } from "date-fns";
 import React from "react";
 
-export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 // Share my vote metadata

@@ -1,13 +1,16 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
+import { NextResponse, NextRequest } from "next/server";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
-
-import { fetchImpactMetricsApi } from "@/app/api/common/impactMetrics/getImpactMetrics";
 
 export async function GET(
   request: NextRequest,
-  route: { params: { roundId: string } }
+  { params }: { params: { roundId: string } }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+
+  const { fetchImpactMetricsApi } = await import(
+    "@/app/api/common/impactMetrics/getImpactMetrics"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
@@ -16,7 +19,7 @@ export async function GET(
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
-      const { roundId } = route.params;
+      const { roundId } = params;
       const impactMetrics = await fetchImpactMetricsApi(roundId);
       return NextResponse.json(impactMetrics);
     } catch (e: any) {

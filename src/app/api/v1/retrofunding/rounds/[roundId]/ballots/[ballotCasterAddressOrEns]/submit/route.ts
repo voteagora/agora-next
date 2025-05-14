@@ -1,11 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import { submitBallot } from "@/app/api/common/ballots/submitBallot";
 import { z } from "zod";
-import { fetchBadgeholder } from "@/app/api/common/badgeholders/getBadgeholders";
+import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
 const METRICS_BASED_ROUNDS = ["4"];
-const PROJECTS_BASED_ROUNDS = ["5", "6"];
 
 const metricsBallotContentSchema = z.object({
   allocations: z.array(z.record(z.string(), z.number())),
@@ -44,6 +41,10 @@ export async function POST(
   request: NextRequest,
   route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
+  const { submitBallot } = await import(
+    "@/app/api/common/ballots/submitBallot"
+  );
+
   if (route.params.roundId === "4" || route.params.roundId === "5") {
     return new Response("Ballot submission for Round 4 is closed", {
       status: 403,

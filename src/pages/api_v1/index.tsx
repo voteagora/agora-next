@@ -1,3 +1,5 @@
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
+
 import Head from "next/head";
 import { Inter } from "next/font/google";
 import SwaggerUI from "swagger-ui-react";
