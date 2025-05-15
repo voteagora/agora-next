@@ -165,7 +165,7 @@ const ProposalTransactionDisplay = ({
       {(hasRealActions || (!hasRealActions && showBenignExplanation)) && (
         <>
           {!hasRealActions && showBenignExplanation && (
-            <div className="p-4 border-x border-b border-line text-xs text-secondary">
+            <div className="p-4 pt-0 border-x border-b border-line text-xs text-secondary">
               <p className="mb-0">
                 This proposal does not have any substantive onchain transactions
                 that will execute automatically if the vote passes; it is meant
