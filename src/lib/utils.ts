@@ -400,6 +400,8 @@ export const isURL = (value: string) => {
 
 const FORK_NODE_URL = process.env.NEXT_PUBLIC_FORK_NODE_URL!;
 
+console.log("FORK_NODE_URL", FORK_NODE_URL);
+
 export const getTransportForChain = (chainId: number) => {
   switch (chainId) {
     // mainnet
