@@ -9,7 +9,7 @@ import { TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { optimism } from "viem/chains";
-import { AlchemyProvider, BaseContract } from "ethers";
+import { AlchemyProvider, BaseContract, JsonRpcProvider } from "ethers";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 import {
   DELEGATION_MODEL,
@@ -47,7 +47,12 @@ export const boostTenantConfig = ({
     ? "0x0cabe65b0adc1634f56ea66a36abb70f2d4232c5"
     : "0x7af51c3ed3b691a58a7ab2cd5876a33751d3bc6f";
 
-  const provider = new AlchemyProvider("optimism", alchemyId);
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : new AlchemyProvider("optimism", alchemyId);
+
   const chain = optimism;
 
   return {
