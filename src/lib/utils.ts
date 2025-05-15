@@ -412,9 +412,15 @@ export const getTransportForChain = (chainId: number) => {
       );
     // optimism
     case 10:
+
+      console.log("getTransportForChain.FORK_NODE_URL", FORK_NODE_URL);
+      console.log("getTransportForChain.NEXT_PUBLIC_ALCHEMY_ID", process.env.NEXT_PUBLIC_ALCHEMY_ID);
+      console.log("resolved URL:", FORK_NODE_URL ||
+        `https://g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`);
+
       return http(
         FORK_NODE_URL ||
-          `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+          `https://g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
     // base
     case 8453:
