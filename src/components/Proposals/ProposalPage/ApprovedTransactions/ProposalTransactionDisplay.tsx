@@ -74,6 +74,7 @@ const ProposalTransactionDisplay = ({
   const [viewMode, setViewMode] = useState<"summary" | "raw">("summary");
   const [isSimulating, setIsSimulating] = useState(false);
   const openDialog = useOpenDialog();
+  const [showBenignExplanation, setShowBenignExplanation] = useState(false);
 
   const hasRealCalldatas = calldatas.some((calldata) => calldata !== "0x");
   const hasNonEmptySignatures = signatures?.some(
@@ -140,23 +141,101 @@ const ProposalTransactionDisplay = ({
 
   return (
     <div>
-      <div className="flex flex-col border rounded-t-lg border-line text-xs text-primary break-words overflow-hidden">
-        <div className="w-full flex flex-col sm:flex-row mb-2 border-b border-line px-4 py-3">
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-primary">
-                Actions
-              </span>
-              {executedTransactionHash && (
-                <a
-                  href={getBlockScanUrl(executedTransactionHash)}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="text-primary hover:text-primary/80 transition-colors"
-                >
-                  <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-                </a>
-              )}
+      {!hasRealActions && (
+        <div
+          className={cn(
+            "flex items-center justify-between p-4 border border-line cursor-pointer hover:bg-neutral/10 transition-colors",
+            showBenignExplanation
+              ? "rounded-t-lg border-b-0"
+              : "rounded-lg mb-4"
+          )}
+          onClick={() => setShowBenignExplanation(!showBenignExplanation)}
+        >
+          <span className="text-sm text-secondary font-medium">
+            No substantive onchain transactions.
+          </span>
+          {showBenignExplanation ? (
+            <ChevronDownIcon className="w-5 h-5 text-secondary" />
+          ) : (
+            <ChevronRightIcon className="w-5 h-5 text-secondary" />
+          )}
+        </div>
+      )}
+
+      {(hasRealActions || (!hasRealActions && showBenignExplanation)) && (
+        <>
+          {!hasRealActions && showBenignExplanation && (
+            <div className="p-4 border-x border-b border-line text-xs text-secondary">
+              <p className="mb-0">
+                This proposal does not have any substantive onchain transactions
+                that will execute automatically if the vote passes; it is meant
+                as a signal/social proposal. However, all onchain votes require
+                transactions (e.g. a function call targeting the 0x0000000
+                address). The ‘benign’ transactions for this proposal are as
+                follows:
+              </p>
+            </div>
+          )}
+
+          <div
+            className={cn(
+              "flex flex-col text-xs text-primary break-words overflow-hidden",
+              hasRealActions
+                ? "border rounded-t-lg border-line"
+                : "border-x border-line"
+            )}
+          >
+            <div className="w-full flex flex-col sm:flex-row mb-2 border-b border-line px-4 py-3">
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-primary">
+                    Actions
+                  </span>
+                  {executedTransactionHash && (
+                    <a
+                      href={getBlockScanUrl(executedTransactionHash)}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="text-primary hover:text-primary/80 transition-colors"
+                    >
+                      <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                    </a>
+                  )}
+                  {TENDERLY_VALID_CHAINS.includes(
+                    contracts.governor.chain.id
+                  ) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      type="button"
+                      onClick={simulateTransactions}
+                      disabled={isSimulating}
+                      className={cn(
+                        "hidden sm:flex items-center gap-2",
+                        ui.theme === "dark" && "text-neutral"
+                      )}
+                    >
+                      {isSimulating
+                        ? "Simulating..."
+                        : "Simulate transactions (Beta)"}
+                    </Button>
+                  )}
+                </div>
+                <div className="flex">
+                  <button
+                    className={`px-2 py-1 text-xs font-semibold ${viewMode === "summary" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
+                    onClick={() => setViewMode("summary")}
+                  >
+                    Summary
+                  </button>
+                  <button
+                    className={`px-2 py-1 text-xs font-semibold ${viewMode === "raw" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
+                    onClick={() => setViewMode("raw")}
+                  >
+                    Raw
+                  </button>
+                </div>
+              </div>
               {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) && (
                 <Button
                   variant="outline"
@@ -165,7 +244,7 @@ const ProposalTransactionDisplay = ({
                   onClick={simulateTransactions}
                   disabled={isSimulating}
                   className={cn(
-                    "hidden sm:flex items-center gap-2",
+                    "flex items-center gap-2 sm:hidden mt-2",
                     ui.theme === "dark" && "text-neutral"
                   )}
                 >
@@ -175,95 +254,71 @@ const ProposalTransactionDisplay = ({
                 </Button>
               )}
             </div>
-            <div className="flex">
-              <button
-                className={`px-2 py-1 text-xs font-semibold ${viewMode === "summary" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
-                onClick={() => setViewMode("summary")}
-              >
-                Summary
-              </button>
-              <button
-                className={`px-2 py-1 text-xs font-semibold ${viewMode === "raw" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
-                onClick={() => setViewMode("raw")}
-              >
-                Raw
-              </button>
+
+            <div className="p-4 pt-2">
+              {viewMode === "summary" ? (
+                <div>
+                  {(collapsed
+                    ? [targets[0]]
+                    : targets.slice(0, normalizedLength)
+                  ).map((target, idx) => (
+                    <TransactionItem
+                      key={idx}
+                      target={target}
+                      calldata={idx < calldatas.length ? calldatas[idx] : "0x"}
+                      value={idx < values.length ? values[idx] : "0"}
+                      description={
+                        descriptions && idx < descriptions.length
+                          ? descriptions[idx]
+                          : undefined
+                      }
+                      collapsed={collapsed}
+                      network={network}
+                      signature={
+                        signatures && idx < signatures.length
+                          ? signatures[idx]
+                          : undefined
+                      }
+                      index={idx}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div>
+                  {(collapsed
+                    ? [targets[0]]
+                    : targets.slice(0, normalizedLength)
+                  ).map((target, idx) => (
+                    <RawTransactionItem
+                      key={idx}
+                      target={target}
+                      calldata={idx < calldatas.length ? calldatas[idx] : "0x"}
+                      value={idx < values.length ? values[idx] : "0"}
+                      index={idx}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-          {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) && (
-            <Button
-              variant="outline"
-              size="sm"
-              type="button"
-              onClick={simulateTransactions}
-              disabled={isSimulating}
-              className={cn(
-                "flex items-center gap-2 sm:hidden mt-2",
-                ui.theme === "dark" && "text-neutral"
-              )}
-            >
-              {isSimulating ? "Simulating..." : "Simulate transactions (Beta)"}
-            </Button>
-          )}
-        </div>
 
-        <div className="p-4 pt-2">
-          {viewMode === "summary" ? (
-            <div>
-              {(collapsed
-                ? [targets[0]]
-                : targets.slice(0, normalizedLength)
-              ).map((target, idx) => (
-                <TransactionItem
-                  key={idx}
-                  target={target}
-                  calldata={idx < calldatas.length ? calldatas[idx] : "0x"}
-                  value={idx < values.length ? values[idx] : "0"}
-                  description={
-                    descriptions && idx < descriptions.length
-                      ? descriptions[idx]
-                      : undefined
-                  }
-                  collapsed={collapsed}
-                  network={network}
-                  signature={
-                    signatures && idx < signatures.length
-                      ? signatures[idx]
-                      : undefined
-                  }
-                  index={idx}
-                />
-              ))}
-            </div>
-          ) : (
-            <div>
-              {(collapsed
-                ? [targets[0]]
-                : targets.slice(0, normalizedLength)
-              ).map((target, idx) => (
-                <RawTransactionItem
-                  key={idx}
-                  target={target}
-                  calldata={idx < calldatas.length ? calldatas[idx] : "0x"}
-                  value={idx < values.length ? values[idx] : "0"}
-                  index={idx}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div
-        className="border border-t-0 border-line rounded-b-lg p-4 cursor-pointer text-sm text-tertiary font-medium hover:bg-neutral/10 transition-colors flex justify-center"
-        onClick={() => {
-          setCollapsed(!collapsed);
-        }}
-      >
-        {collapsed
-          ? `Expand all actions (${normalizedLength})`
-          : "Collapse actions"}
-      </div>
+          <div
+            className={cn(
+              "p-4 cursor-pointer text-sm text-tertiary font-medium hover:bg-neutral/10 transition-colors flex justify-center",
+              hasRealActions
+                ? "border border-t-0 border-line rounded-b-lg"
+                : "border-x border-b border-t border-line rounded-b-lg"
+            )}
+            onClick={() => {
+              setCollapsed(!collapsed);
+            }}
+          >
+            {collapsed
+              ? `Expand all actions (${normalizedLength})`
+              : "Collapse actions"}
+          </div>
+        </>
+      )}
     </div>
   );
 };
