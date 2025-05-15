@@ -170,7 +170,7 @@ const ProposalTransactionDisplay = ({
                 This proposal does not have any substantive onchain transactions
                 that will execute automatically if the vote passes; it is meant
                 as a signal/social proposal. However, all onchain votes require
-                transactions (e.g. a function call targeting the 0x0000000
+                transactions (e.g. a function call targeting the 0x000...000
                 address). The ‘benign’ transactions for this proposal are as
                 follows:
               </p>
