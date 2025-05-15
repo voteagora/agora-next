@@ -6,7 +6,7 @@ import {
   AgoraTimelock__factory,
   VotableSupplyOracle__factory,
 } from "@/lib/contracts/generated";
-import { AlchemyProvider, BaseContract } from "ethers";
+import { AlchemyProvider, BaseContract, JsonRpcProvider } from "ethers";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
@@ -54,10 +54,14 @@ export const optimismTenantContractConfig = ({
     ? "0x1b7CA7437748375302bAA8954A2447fC3FBE44CC"
     : "0x2451dAF2153B1293Da2abF19C36c450321835C55";
 
-  const provider = new AlchemyProvider(
-    isProd ? "optimism" : "optimism-sepolia",
-    alchemyId
-  );
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : isProd
+      ? new AlchemyProvider("optimism", alchemyId)
+      : new AlchemyProvider("optimism-sepolia", alchemyId);
+
   const chain = isProd ? optimism : optimismSepolia;
 
   return {
