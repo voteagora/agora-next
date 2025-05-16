@@ -46,11 +46,17 @@ export const lineaTenantConfig = ({
     ? "0xD9B569a18FDA0B9e9b983eec885E065f032da1F7"
     : "0xD9B569a18FDA0B9e9b983eec885E065f032da1F7";
 
-  const provider = new JsonRpcProvider(
-    isProd
-      ? `https://linea-mainnet.g.alchemy.com/v2/${alchemyId}`
-      : `https://linea-sepolia.g.alchemy.com/v2/${alchemyId}`
-  );
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : isProd
+      ? new JsonRpcProvider(
+          "https://linea-mainnet.g.alchemy.com/v2/${alchemyId}"
+        )
+      : new JsonRpcProvider(
+          "https://linea-sepolia.g.alchemy.com/v2/${alchemyId}"
+        );
 
   const chain = isProd ? linea : lineaSepolia;
 

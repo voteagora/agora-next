@@ -9,7 +9,7 @@ import { TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { arbitrum, arbitrumSepolia, mainnet, sepolia } from "viem/chains";
-import { AlchemyProvider, BaseContract } from "ethers";
+import { AlchemyProvider, BaseContract, JsonRpcProvider } from "ethers";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 import {
   DELEGATION_MODEL,
@@ -47,17 +47,23 @@ export const xaiTenantConfig = ({
     ? "0x23C70cB62A7FC60AE7118c33068eF42c125654Bc"
     : "0x5d729d4c0bf5d0a2fa0f801c6e0023bd450c4fd6";
 
-  const provider = new AlchemyProvider(
-    isProd ? "arbitrum" : "arbitrum-sepolia",
-    alchemyId
-  );
-  const chain = isProd ? arbitrum : arbitrumSepolia;
-  const chainForTime = isProd ? mainnet : sepolia;
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
 
-  const providerForTime = new AlchemyProvider(
-    isProd ? "mainnet" : "sepolia",
-    alchemyId
-  );
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : isProd
+      ? new AlchemyProvider("arbitrum", alchemyId)
+      : new AlchemyProvider("arbitrum-sepolia", alchemyId);
+
+  const chain = isProd ? arbitrum : arbitrumSepolia;
+
+  const providerForTime = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL) // TODO: Setup a second anvil fork for actual time for E2E tests.  E2E tests related to time will just be wrong or fail for XAI until we fix this.
+    : isProd
+      ? new AlchemyProvider("mainnet", alchemyId)
+      : new AlchemyProvider("sepolia", alchemyId);
+
+  const chainForTime = isProd ? mainnet : sepolia;
 
   return {
     token: createTokenContract({
