@@ -50,7 +50,7 @@ export default function DelegateCardList({
         setDelegates(delegates.concat(data.data));
         setMeta(data.meta);
       } catch (error) {
-        console.error('Error loading more delegates:', error);
+        console.error("Error loading more delegates:", error);
       } finally {
         fetching.current = false;
       }

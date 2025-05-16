@@ -50,8 +50,17 @@ const DelegateCardWrapper = async ({
   const seed = Math.random();
   const delegates =
     tab === "citizens"
-      ? await fetchCitizensWithParams(citizensSort, { offset: 0, limit: 20 }, seed)
-      : await fetchDelegatesWithParams(sort, filters, { offset: 0, limit: 20 }, seed);
+      ? await fetchCitizensWithParams(
+          citizensSort,
+          { offset: 0, limit: 20 },
+          seed
+        )
+      : await fetchDelegatesWithParams(
+          sort,
+          filters,
+          { offset: 0, limit: 20 },
+          seed
+        );
   return (
     <DelegateTabs>
       <TabsContent value="delegates">
