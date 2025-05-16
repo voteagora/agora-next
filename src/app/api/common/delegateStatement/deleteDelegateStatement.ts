@@ -1,0 +1,80 @@
+import "server-only";
+
+import Tenant from "@/lib/tenant/tenant";
+import { stageStatus } from "@/app/lib/sharedEnums";
+import verifyMessage from "@/lib/serverVerifyMessage";
+import { createHash } from "crypto";
+import { doInSpan } from "@/app/lib/logging";
+const { slug } = Tenant.current();
+
+export async function deleteDelegateStatement({
+  address,
+  messageHash,
+}: {
+  address: `0x${string}`;
+  messageHash: string;
+}) {
+  return prismaWeb2Client.delegateStatements
+    .delete({
+      where: {
+        address_dao_slug_message_hash: {
+          address: address.toLowerCase(),
+          dao_slug: slug,
+          message_hash: messageHash,
+        },
+      },
+    })
+    .catch((error) => console.error(error));
+}
+
+/** This function is used to Delete an existing statement.
+ * @param ${address} address - The address of the delegate
+ * @param ${daoSlug} daoSlug - Slug of DAO site
+ * @param ${message} message - Textual message statement
+ * */
+export async function safeDeleteDelegateStatement({
+  address,
+  signature,
+  message,
+}: {
+  address: `0x${string}`;
+  signature: `0x${string}`;
+  message: string;
+}) {
+  // Kick out if invalid
+  const valid = await verifyMessage({
+    address,
+    message,
+    signature,
+  });
+  if (!valid) {
+    throw new Error("Invalid signature");
+  }
+
+  // create messageHash for db matches
+  const messageHash = createHash("sha256").update(message).digest("hex");
+
+  await deleteDelegateStatement({ address, messageHash });
+}
+
+export const safeDeleteDelegateStatementTracked = ({
+  address,
+  signature,
+  message,
+}: {
+  address: `0x${string}`;
+  signature: `0x${string}`;
+  message: string;
+}) => {
+  return doInSpan(
+    {
+      name: "deleteDelegateStatement",
+    },
+    () =>
+      safeDeleteDelegateStatement({
+        address: address,
+        signature: signature,
+        message: message,
+      })
+  );
+};
