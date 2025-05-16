@@ -159,7 +159,9 @@ export default function DelegateStatementForm({
         </div>
       )}
       <div className="flex flex-col w-full mt-6 lg:mt-0">
-        {!isSelectedPrimaryAddress && <DraftStatementDetails />}
+        {!isSelectedPrimaryAddress && (
+          <DraftStatementDetails delegateStatement={delegate?.statement} />
+        )}
         <div className="flex flex-col bg-neutral rounded-xl shadow-newDefault">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>

@@ -64,7 +64,7 @@ export const useSafePendingTransactions = () => {
             `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
         } else if (transaction.data?.slice(0, 10) === "0x5f398a14") {
           try {
-            // This appears to be a specialized voting function (possibly for approval voting)
+            // approval voting
             const inputData = transaction.data.slice(10);
 
             // Decode the parameters - this structure may need adjustment based on the actual function
@@ -78,10 +78,8 @@ export const useSafePendingTransactions = () => {
               `0x${inputData}` as `0x${string}`
             );
 
-            // Extract the proposal ID (may be bytes32 instead of uint256)
             const proposalIdBytes = decoded[0] as `0x${string}`;
 
-            // Convert bytes32 to BigInt and then to string
             const proposalIdBigInt = BigInt(proposalIdBytes);
             const proposalId = proposalIdBigInt.toString();
             acc[proposalId] =
@@ -100,7 +98,6 @@ export const useSafePendingTransactions = () => {
     if (!pendingTransactions?.results || !address) return {};
     return pendingTransactions.results.reduce(
       (acc, transaction) => {
-        // some times safe does decode the transaction data, use it in this case.
         if (
           transaction.dataDecoded?.method === "delegate" &&
           transaction.dataDecoded.parameters?.length >= 1
@@ -216,8 +213,6 @@ export const useSafePendingTransactions = () => {
               // Function signature: proposeWithModule(address,tuple,tuple[],tuple[],string)
               const inputData = transaction.data.slice(10);
 
-              // Decode the complex parameters - this is a simplified approach
-              // focusing on extracting the description which contains the title
               const decoded = decodeAbiParameters(
                 [
                   { type: "address", name: "approvalModuleAddress" },
@@ -287,10 +282,7 @@ export const useSafePendingTransactions = () => {
           try {
             const inputData = transaction.data.slice(10);
 
-            // Check if this transaction contains our description hash
             if (inputData.includes(descriptionHash.slice(2))) {
-              // This transaction is for our proposal
-              // Use the proposal ID as the key, not the description hash
               acc[proposalId] =
                 `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
               return acc; // Return early after finding a match
@@ -298,20 +290,21 @@ export const useSafePendingTransactions = () => {
           } catch (error) {
             console.warn("Failed to decode queue proposal data:", error);
           }
-        } else if(transaction.data?.slice(0, 10) === "0x3d12a85a") {
+        } else if (transaction.data?.slice(0, 10) === "0x3d12a85a") {
           // Check for queueWithModule transaction
           try {
             const inputData = transaction.data.slice(10);
-            
-            // Check if this transaction contains our description hash
+
             if (inputData.includes(descriptionHash.slice(2))) {
-              // This transaction is for our proposal with module
               acc[proposalId] =
                 `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
               return acc; // Return early after finding a match
             }
           } catch (error) {
-            console.warn("Failed to decode queueWithModule proposal data:", error);
+            console.warn(
+              "Failed to decode queueWithModule proposal data:",
+              error
+            );
           }
         }
         return acc;
@@ -336,10 +329,7 @@ export const useSafePendingTransactions = () => {
           try {
             const inputData = transaction.data.slice(10);
 
-            // Check if this transaction contains our description hash
             if (inputData.includes(descriptionHash.slice(2))) {
-              // This transaction is for our proposal
-              // Use the proposal ID as the key, not the description hash
               acc[proposalId] =
                 `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
               return acc; // Return early after finding a match
@@ -349,11 +339,10 @@ export const useSafePendingTransactions = () => {
           }
         } else if (transaction.data?.slice(0, 10) === "0x4bc93b96") {
           try {
+            // Check for cancelWithModule transaction
             const inputData = transaction.data.slice(10);
 
-            // Check if this transaction contains our description hash
             if (inputData.includes(descriptionHash.slice(2))) {
-              // This transaction is for our proposal with module
               acc[proposalId] =
                 `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
               return acc; // Return early after finding a match
@@ -389,10 +378,7 @@ export const useSafePendingTransactions = () => {
           try {
             const inputData = transaction.data.slice(10);
 
-            // Check if this transaction contains our description hash
             if (inputData.includes(descriptionHash.slice(2))) {
-              // This transaction is for our proposal
-              // Use the proposal ID as the key, not the description hash
               acc[proposalId] =
                 `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
               return acc; // Return early after finding a match
@@ -400,20 +386,21 @@ export const useSafePendingTransactions = () => {
           } catch (error) {
             console.warn("Failed to decode execute proposal data:", error);
           }
-        } else if(transaction.data?.slice(0, 10) === "0x5d2c2a0d") {
+        } else if (transaction.data?.slice(0, 10) === "0x5d2c2a0d") {
           // Check for executeWithModule transaction
           try {
             const inputData = transaction.data.slice(10);
-            
-            // Check if this transaction contains our description hash
+
             if (inputData.includes(descriptionHash.slice(2))) {
-              // This transaction is for our proposal with module
               acc[proposalId] =
                 `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
               return acc; // Return early after finding a match
             }
           } catch (error) {
-            console.warn("Failed to decode executeWithModule proposal data:", error);
+            console.warn(
+              "Failed to decode executeWithModule proposal data:",
+              error
+            );
           }
         }
         return acc;
