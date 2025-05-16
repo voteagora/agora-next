@@ -28,7 +28,7 @@ import VotesContainerWrapper, {
 import { loadProfileSearchParams } from "@/app/delegates/[addressOrENSName]/params";
 import { DelegateStatement } from "@/app/api/common/delegates/delegate";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"; // needed for both app and e2e
 export const revalidate = 0;
 
 export async function generateMetadata(

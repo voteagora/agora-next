@@ -85,8 +85,12 @@ export const cyberTenantConfig = ({
   //     export const cyberApprovalModuleAddress =
   //       "0x096F1e0e82CaD5540BF04bd95A6802C0350d8E49" as `0x${string}`;
 
-  // @dev: we are deploying all contracts on "mainnet" cyber, not testnet
-  const provider = new JsonRpcProvider("https://cyber.alt.technology");
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : new JsonRpcProvider("https://cyber.alt.technology");
+
   const chain = cyber;
 
   return {

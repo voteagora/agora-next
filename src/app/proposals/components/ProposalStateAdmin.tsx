@@ -79,12 +79,19 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
             proposal.proposalType === "STANDARD"
           ) {
             return "This proposal is now passed and can be queued for execution.";
+          } else if (proposal.proposalType === "OPTIMISTIC") {
+            // No banner for Optimistic proposals.
+            return null;
           }
           return "This proposal can still be cancelled by the admin.";
         }
+        // If succeeded but not Optimism, then proceed to queue
+        return "This proposal is now passed and can be queued for execution.";
 
       case PROPOSAL_STATUS.QUEUED:
         return "This proposal can be executed after the timelock passes, or cancelled by the admin.";
+      default:
+        return null;
     }
   };
 
@@ -120,7 +127,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
 
   const action = renderAction();
 
-  if (action) {
+  if (action && renderLabel()) {
     return (
       <div className="flex flex-row justify-between items-center align-middle border border-line p-2 mb-6 rounded-md bg-neutral text-sm text-primary">
         <div className="ml-4">{renderLabel()}</div>
@@ -172,6 +179,8 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
             <AgoraOptimismGovQueue proposal={proposal} />
           </div>
         );
+      } else if (proposal.proposalType === "OPTIMISTIC") {
+        return null;
       } else {
         return <AgoraOptimismGovCancel proposal={proposal} />;
       }

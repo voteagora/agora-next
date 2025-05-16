@@ -122,7 +122,12 @@ export const deriveTenantConfig = ({
 
   const rpcURL = isProd ? DERIVE_MAINNET_RPC : DERIVE_TESTNET_RPC;
 
-  const provider = new JsonRpcProvider(rpcURL);
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : new JsonRpcProvider(rpcURL);
+
   const chain = isProd ? deriveMainnet : deriveTestnet;
 
   return {

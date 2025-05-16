@@ -1,13 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import {
-  authenticateApiUser,
-  getCategoryScope,
-  validateAddressScope,
-  validateProjectCategoryScope,
-} from "@/app/lib/auth/serverAuth";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import { updateBallotProjectAllocation } from "@/app/api/common/ballots/updateBallotProject";
 import { z } from "zod";
+import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
 const allocationParser = z.string(z.number().min(0).max(100)); // number between 0 and 100
 
@@ -22,6 +15,17 @@ export async function POST(
     };
   }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { validateAddressScope } = await import("@/app/lib/auth/serverAuth");
+
+  const { updateBallotProjectAllocation } = await import(
+    "@/app/api/common/ballots/updateBallotProject"
+  );
+  const { validateProjectCategoryScope } = await import(
+    "@/app/lib/auth/serverAuth"
+  );
+  const { getCategoryScope } = await import("@/app/lib/auth/serverAuth");
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

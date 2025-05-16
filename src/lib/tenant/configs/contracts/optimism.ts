@@ -6,12 +6,12 @@ import {
   AgoraTimelock__factory,
   VotableSupplyOracle__factory,
 } from "@/lib/contracts/generated";
-import { AlchemyProvider, BaseContract } from "ethers";
+import { AlchemyProvider, BaseContract, JsonRpcProvider } from "ethers";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
-import { optimism } from "viem/chains";
+import { optimism, optimismSepolia } from "viem/chains";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 import {
@@ -30,30 +30,39 @@ export const optimismTenantContractConfig = ({
   isProd,
   alchemyId,
 }: Props): TenantContracts => {
-  const TOKEN = "0x4200000000000000000000000000000000000042";
+  const TOKEN = isProd
+    ? "0x4200000000000000000000000000000000000042"
+    : "0xd828b681F717E5a03C41540Bc6A31b146b5C1Ac6";
 
   const GOVERNOR = isProd
     ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
-    : "0x6E17cdef2F7c1598AD9DfA9A8acCF84B1303f43f";
+    : "0x368723068b6C762b416e5A7d506a605E8b816C22";
 
   const ALLIGATOR = isProd
     ? "0x7f08F3095530B67CdF8466B7a923607944136Df0"
-    : "0xfD6be5F4253Aa9fBB46B2BFacf9aa6F89822f4a6";
+    : "0x5d729d4c0BF5d0a2Fa0F801c6e0023BD450c4fd6";
 
   const TYPES = isProd
     ? "0xCE52b7cc490523B3e81C3076D5ae5Cca9a3e2D6F"
-    : "0x2e0C197f1fca7628ADfa2bdaabd1df4670186C06";
+    : "0xb88131610ff4D7D46050c9d1DEE413f8b6b8A5bd";
 
   const TIMELOCK = isProd
     ? "0x0eDd4B2cCCf41453D8B5443FBB96cc577d1d06bF"
-    : "0x85c118971C058677DC502854d56A483BF5548042";
+    : "0xf8D15c3132eFA557989A1C9331B6667Ca8Caa3a9";
 
   const VOTABLE_ORACLE = isProd
     ? "0x1b7CA7437748375302bAA8954A2447fC3FBE44CC"
-    : "0x73b07b799Abfb7965f2C1014120019CbffaAcae7";
+    : "0x2451dAF2153B1293Da2abF19C36c450321835C55";
 
-  const provider = new AlchemyProvider("optimism", alchemyId);
-  const chain = optimism;
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : isProd
+      ? new AlchemyProvider("optimism", alchemyId)
+      : new AlchemyProvider("optimism-sepolia", alchemyId);
+
+  const chain = isProd ? optimism : optimismSepolia;
 
   return {
     token: createTokenContract({

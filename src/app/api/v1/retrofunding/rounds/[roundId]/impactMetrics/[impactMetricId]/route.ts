@@ -1,8 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
-
-import { fetchImpactMetricApi } from "@/app/api/common/impactMetrics/getImpactMetrics";
 
 export async function GET(
   request: NextRequest,
@@ -14,6 +11,12 @@ export async function GET(
     };
   }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+
+  const { fetchImpactMetricApi } = await import(
+    "@/app/api/common/impactMetrics/getImpactMetrics"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

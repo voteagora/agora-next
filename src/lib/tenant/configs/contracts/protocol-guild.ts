@@ -8,7 +8,7 @@ import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { AlchemyProvider, BaseContract } from "ethers";
+import { AlchemyProvider, BaseContract, JsonRpcProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 import {
@@ -44,9 +44,13 @@ export const protocolGuildTenantContractConfig = ({
 
   const TREASURY = [TIMELOCK];
 
-  const provider = isProd
-    ? new AlchemyProvider("mainnet", alchemyId)
-    : new AlchemyProvider("sepolia", alchemyId);
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : isProd
+      ? new AlchemyProvider("mainnet", alchemyId)
+      : new AlchemyProvider("sepolia", alchemyId);
 
   const chain = isProd ? mainnet : sepolia;
 
