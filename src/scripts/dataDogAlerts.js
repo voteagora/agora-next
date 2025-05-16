@@ -448,7 +448,7 @@ async function main() {
         name: `${serviceName} ALL API error rate over ${config.overallThreshold * 100}%`,
         service: config.key,
         threshold: config.overallThreshold,
-        message: `${serviceName} API error rate is too high! @slack-carls-test`,
+        message: `${serviceName} API error rate is too high! @slack-bot-datadog-api-alerts`,
         monitorId: monitorIds[serviceName],
       });
     }
@@ -477,7 +477,7 @@ async function main() {
           service: config.key,
           apiEndpoint: endpoint,
           threshold: threshold,
-          message: `${serviceName} ${endpoint} API error rate is too high! @slack-carls-test`,
+          message: `${serviceName} ${endpoint} API error rate is too high! @slack-bot-datadog-api-alerts`,
           monitorId: monitorId,
         });
       }
