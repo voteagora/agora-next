@@ -672,6 +672,32 @@ async function getVoterStats(
   });
 }
 
-export const fetchDelegates = cache(getDelegates);
-export const fetchDelegate = cache(getDelegate);
-export const fetchVoterStats = cache(getVoterStats);
+export const fetchDelegates = cache(
+  async (args: {
+    pagination?: PaginationParams;
+    sort: string;
+    seed?: number;
+    filters?: {
+      delegator?: `0x${string}`;
+      issues?: string;
+      stakeholders?: string;
+      endorsed?: boolean;
+      hasStatement?: boolean;
+    };
+  }) => {
+    "use server";
+    return getDelegates(args);
+  }
+);
+
+export const fetchDelegate = cache(async (addressOrENSName: string) => {
+  "use server";
+  return getDelegate(addressOrENSName);
+});
+
+export const fetchVoterStats = cache(
+  async (addressOrENSName: string, blockNumberOrTimestamp?: number) => {
+    "use server";
+    return getVoterStats(addressOrENSName, blockNumberOrTimestamp);
+  }
+);
