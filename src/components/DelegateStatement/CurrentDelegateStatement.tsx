@@ -41,6 +41,24 @@ const formSchema = z.object({
       })
       .strict()
   ),
+  discord: z.string().optional(),
+  email: z.string().optional(),
+  twitter: z.string().optional(),
+  warpcast: z.string().optional(),
+  notificationPreferences: z
+    .object({
+      wants_proposal_created_email: z.union([
+        z.boolean(),
+        z.literal("prompt"),
+        z.literal("prompted"),
+      ]),
+      wants_proposal_ending_soon_email: z.union([
+        z.boolean(),
+        z.literal("prompt"),
+        z.literal("prompted"),
+      ]),
+    })
+    .optional(),
 });
 
 export default function CurrentDelegateStatement() {

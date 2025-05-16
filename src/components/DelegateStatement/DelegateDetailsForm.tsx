@@ -13,6 +13,7 @@ import { type DelegateDetailsFormValues } from "./DelegateDetailsPage";
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import { DelegateEmailDetails } from "./DelegateEmailDetails";
+import { stageStatus } from "@/app/lib/sharedEnums";
 
 export default function DelegateDetailsForm({
   form,
@@ -85,6 +86,7 @@ export default function DelegateDetailsForm({
         delegateStatement: body,
         signature,
         message: serializedBody,
+        stage: stageStatus.PUBLISHED,
       }).catch((error) => {
         console.error("Error during submission:", error);
         return null;
