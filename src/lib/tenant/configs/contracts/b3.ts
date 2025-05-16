@@ -8,7 +8,7 @@ import {
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { AlchemyProvider, BaseContract } from "ethers";
+import { AlchemyProvider, BaseContract, JsonRpcProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 import {
@@ -47,7 +47,12 @@ export const b3TenantConfig = ({
     ? "0x4990CcE6e8CD9596305b83C4860D4C0f3Bf4e8fa"
     : "0x2c349e564037e184Fe787CA4906C53507c70A7E0";
 
-  const provider = new AlchemyProvider("base", alchemyId);
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : new AlchemyProvider("base", alchemyId);
+
   const chain = base;
 
   return {
