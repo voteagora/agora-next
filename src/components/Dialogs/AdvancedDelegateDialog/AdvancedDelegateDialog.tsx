@@ -2,7 +2,7 @@
 
 import { AdvancedDelegationDisplayAmount } from "./AdvancedDelegationDisplayAmount";
 import SubdelegationToRow from "./SubdelegationRow";
-import useAdvancedDelegation from "./useAdvancedDelegation";
+import useAdvancedDelegation, { buildRules } from "./useAdvancedDelegation";
 import {
   Dispatch,
   SetStateAction,
@@ -17,7 +17,7 @@ import {
   AgoraLoaderSmall,
   LogoLoader,
 } from "@/components/shared/AgoraLoader/AgoraLoader";
-import { formatEther, formatUnits } from "viem";
+import { encodeFunctionData, formatEther, formatUnits, getAddress } from "viem";
 import { SuccessView } from "./SuccessView";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { waitForTransactionReceipt } from "wagmi/actions";
@@ -34,6 +34,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useOpenDialog } from "../DialogProvider/DialogProvider";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -58,7 +60,9 @@ export function AdvancedDelegateDialog({
   const [proxyAddress, setProxyAddress] = useState<string>("");
   const [isReady, setIsReady] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
-  const { address } = useAccount();
+
+  const { selectedWalletAddress: address, isSelectedPrimaryAddress } =
+    useSelectedWallet();
   const { setRefetchDelegate } = useConnectButtonContext();
   const [isLoading, setIsLoading] = useState(false);
   const [opBalance, setOpBalance] = useState<bigint>(0n);
@@ -66,8 +70,9 @@ export function AdvancedDelegateDialog({
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
   const { setOpen } = useModal();
   const params = useParams<{ addressOrENSName: string }>();
-  const { ui, slug } = Tenant.current();
+  const { ui, slug, contracts } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
+  const openDialog = useOpenDialog();
 
   const fetchData = useCallback(async () => {
     try {
@@ -162,7 +167,6 @@ export function AdvancedDelegateDialog({
   };
   const writeWithTracking = async () => {
     setIsLoading(true);
-
     const tx = await writeAsync();
     await waitForTransactionReceipt(config, { hash: tx });
     trackEvent({
@@ -202,7 +206,6 @@ export function AdvancedDelegateDialog({
     }
     setIsLoading(false);
   };
-
   return (
     <>
       <div className="flex flex-col w-full justify-center items-center">

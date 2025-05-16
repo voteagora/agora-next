@@ -3,13 +3,16 @@ import Tenant from "@/lib/tenant/tenant";
 import {
   useAccount,
   useReadContract,
-  useWriteContract,
   useWaitForTransactionReceipt,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useWrappedWriteContract } from "@/hooks/useWrappedWriteContract";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
+import { SafeTxnTooltip } from "@/components/shared/SafeTxnTooltip";
 
 import {
   Tooltip,
@@ -24,7 +27,7 @@ interface Props {
 
 export const OZGovExecute = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
-  const { address } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
   const [canExecute, setCanExecute] = useState(false);
   const [executeTime, setExecuteTime] = useState(new Date());
 
@@ -48,7 +51,7 @@ export const OZGovExecute = ({ proposal }: Props) => {
     chainId: contracts.timelock!.chain.id,
   });
 
-  const { data, writeContract: write } = useWriteContract();
+  const { data, writeContract: write } = useWrappedWriteContract();
 
   const { isLoading, isSuccess, isError, isFetched, error } =
     useWaitForTransactionReceipt({
@@ -86,6 +89,22 @@ export const OZGovExecute = ({ proposal }: Props) => {
       });
     }
   }, [isSuccess, isError, error]);
+
+  const { getExecuteProposalsForDescription } = useSafePendingTransactions();
+
+  const pendingExecuteProposals = useMemo(() => {
+    return getExecuteProposalsForDescription(proposal.description, proposal.id);
+  }, [getExecuteProposalsForDescription, proposal.description, proposal.id]);
+
+  if (pendingExecuteProposals?.[proposal.id]) {
+    return (
+      <SafeTxnTooltip className="inline-block">
+        <Button className="w-full bg-primary/90 cursor-none" disabled>
+          Pending Approval {pendingExecuteProposals[proposal.id]}
+        </Button>
+      </SafeTxnTooltip>
+    );
+  }
 
   return (
     <div>

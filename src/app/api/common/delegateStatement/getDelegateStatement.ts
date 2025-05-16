@@ -5,6 +5,37 @@ import { cache } from "react";
 import Tenant from "@/lib/tenant/tenant";
 
 import { doInSpan } from "@/app/lib/logging";
+import { stageStatus } from "@/app/lib/sharedEnums";
+
+export const getLatestPublishedDelegateStatementInSpan = (
+  addressOrENSName: string
+) => {
+  return doInSpan(
+    {
+      name: "getLatestPublishedDelegateStatement",
+    },
+    () => getLatestPublishedDelegateStatement(addressOrENSName)
+  );
+};
+export const getLatestPublishedDelegateStatement = async (
+  addressOrENSName: string
+) => {
+  const { slug } = Tenant.current();
+
+  try {
+    return prismaWeb2Client.delegateStatements.findFirst({
+      where: {
+        address: addressOrENSName.toLowerCase(),
+        dao_slug: slug,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  } catch (error) {
+    return console.error(error);
+  }
+};
 
 export const getDelegateStatement = (addressOrENSName: string) => {
   return doInSpan(
@@ -31,3 +62,81 @@ async function getDelegateStatementForAddress({
 }
 
 export const fetchDelegateStatement = cache(getDelegateStatement);
+export const fetchLatestPublishedDelegateStatement = cache(
+  cache(getLatestPublishedDelegateStatementInSpan)
+);
+
+export const getDelegateStatements = (
+  addressOrENSName: string,
+  stage?: stageStatus
+) => {
+  return doInSpan(
+    {
+      name: "getDelegateStatements",
+    },
+    () =>
+      getDelegateStatementsForAddress({
+        address: addressOrENSName,
+        stage: stage,
+      })
+  );
+};
+
+/*
+  Gets multiple delegate statements from Postgres
+*/
+export async function getDelegateStatementsForAddress({
+  address,
+  stage,
+}: {
+  address: string;
+  stage?: stageStatus;
+}) {
+  const { slug } = Tenant.current();
+
+  if (!stage) {
+    return prismaWeb2Client.delegateStatements
+      .findMany({
+        where: {
+          address: address.toLowerCase(),
+          dao_slug: slug,
+        },
+      })
+      .catch((error) => console.error(error));
+  } else {
+    return prismaWeb2Client.delegateStatements
+      .findMany({
+        where: {
+          address: address.toLowerCase(),
+          dao_slug: slug,
+          stage: stage,
+        },
+      })
+      .catch((error) => console.error(error));
+  }
+}
+
+export async function getDelegateStatementsForAddressWithStage({
+  address,
+  stage,
+}: {
+  address: string;
+  stage: stageStatus;
+}) {
+  const { slug } = Tenant.current();
+
+  return prismaWeb2Client.delegateStatements
+    .findMany({
+      where: {
+        address: address.toLowerCase(),
+        dao_slug: slug,
+        stage: stage,
+      },
+    })
+    .catch((error) => console.error(error));
+}
+
+export const fetchDelegateStatements = cache(getDelegateStatements);
+export const fetchDelegateStatementsForAddressWithStage = cache(
+  getDelegateStatementsForAddressWithStage
+);

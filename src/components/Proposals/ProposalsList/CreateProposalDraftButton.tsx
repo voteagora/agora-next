@@ -9,6 +9,8 @@ import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { PLMConfig } from "@/app/proposals/draft/types";
+import { useRouter } from "next/navigation";
+
 const CreateProposalDraftButton = ({
   address,
   className,
@@ -16,6 +18,7 @@ const CreateProposalDraftButton = ({
   address: `0x${string}`;
   className?: string;
 }) => {
+  const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const { ui } = Tenant.current();
@@ -62,7 +65,7 @@ const CreateProposalDraftButton = ({
       onClick={async () => {
         setIsPending(true);
         const proposal = await createProposalDraft(address);
-        window.location.href = `/proposals/draft/${proposal.id}`;
+        router.push(`/proposals/draft/${proposal.id}`);
       }}
     >
       Create proposal

@@ -1,15 +1,12 @@
-import {
-  useAccount,
-  useSimulateContract,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useSimulateContract, useWaitForTransactionReceipt } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { Button } from "@/components/ui/button";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import { useEffect } from "react";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useWrappedWriteContract } from "@/hooks/useWrappedWriteContract";
 
 interface Props {
   disabled: boolean;
@@ -23,8 +20,8 @@ export const PartialDelegationButton = ({
   onSuccess,
 }: Props) => {
   const { contracts } = Tenant.current();
-  const { address } = useAccount();
   const { setRefetchDelegate } = useConnectButtonContext();
+  const { selectedWalletAddress: address } = useSelectedWallet();
 
   // Prepare delegations for contract call
   // 1. Remove delegations without any allocation
@@ -55,7 +52,7 @@ export const PartialDelegationButton = ({
     args: [cleanDelegations],
   });
 
-  const { data, writeContract: write } = useWriteContract();
+  const { data, writeContractAsync: write } = useWrappedWriteContract();
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash: data });
 
   useEffect(() => {
@@ -64,6 +61,10 @@ export const PartialDelegationButton = ({
       onSuccess(data);
     }
   }, [data, isSuccess]);
+
+  const submit = async () => {
+    await write(simulateData);
+  };
 
   if (isSimulateError) {
     return (
@@ -88,7 +89,7 @@ export const PartialDelegationButton = ({
     <div>
       <Button
         className="w-full"
-        onClick={() => write(simulateData!.request)}
+        onClick={submit}
         disabled={isLoading || disabled || !simulateData?.request}
         loading={isLoading}
       >

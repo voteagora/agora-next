@@ -12,16 +12,14 @@ export default function OtherInfoFormSection({
 }: {
   form: UseFormReturn<DelegateStatementFormValues>;
 }) {
-  const { ui } = Tenant.current();
-  const requireCodeOfConduct = ui.toggle("delegates/code-of-conduct")?.enabled;
-  const requireDaoPrinciples = ui.toggle("delegates/dao-principles")?.enabled;
-  const supportsNotifications = ui.toggle("email-subscriptions")?.enabled;
-
   return (
-    <div className="py-8 px-6 border-b border-line">
-      <h3 className="font-bold text-primary">Other info</h3>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+    <div className="py-8 px-6">
+      <h3 className="font-bold text-primary">Social Accounts</h3>
+      <p>
+        Let your delegates get to know you better! Add your social accounts to
+        share your presence in the governance community.
+      </p>
+      <div className="grid grid-cols-1 gap-6 mt-4">
         <DelegateStatementInputGroup
           title="X (formerly Twitter)"
           placeholder="@yourname"
@@ -40,21 +38,6 @@ export default function OtherInfoFormSection({
           name="discord"
           form={form}
         />
-        <DelegateStatementInputGroup
-          title="Email (will not be public)"
-          placeholder="you@gmail.com"
-          name="email"
-          form={form}
-        />
-        <div className="col-span-full">
-          {requireCodeOfConduct && (
-            <DelegateStatementBoolSelector form={form} />
-          )}
-          {requireDaoPrinciples && (
-            <DelegateStatementDaoPrinciplesSelector form={form} />
-          )}
-          {supportsNotifications && <NotificationSelector form={form} />}
-        </div>
       </div>
     </div>
   );

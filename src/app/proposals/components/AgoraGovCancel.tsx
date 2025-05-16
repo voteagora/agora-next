@@ -1,15 +1,14 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import {
-  useAccount,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
 import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
+import { useWrappedWriteContract } from "@/hooks/useWrappedWriteContract";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
+import { SafeTxnTooltip } from "@/components/shared/SafeTxnTooltip";
 
 interface Props {
   proposal: Proposal;
@@ -23,11 +22,17 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
   const canCancel =
     adminAddress?.toString().toLowerCase() === address?.toLowerCase();
 
-  const { writeContract: write, data } = useWriteContract();
+  const { writeContract: write, data } = useWrappedWriteContract();
   const { isLoading, isSuccess, isError, isFetched, error } =
     useWaitForTransactionReceipt({
       hash: data,
     });
+
+  const { getCancelProposalsForDescription } = useSafePendingTransactions();
+
+  const pendingCancelProposals = useMemo(() => {
+    return getCancelProposalsForDescription(proposal.description, proposal.id);
+  }, [getCancelProposalsForDescription, proposal.description, proposal.id]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -48,6 +53,16 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
 
   if (!canCancel) {
     return null;
+  }
+
+  if (pendingCancelProposals[proposal.id]) {
+    return (
+      <SafeTxnTooltip className="inline-block">
+        <Button className="w-full bg-primary/90 cursor-none" disabled>
+          Pending Approval {pendingCancelProposals[proposal.id]}
+        </Button>
+      </SafeTxnTooltip>
+    );
   }
 
   return (

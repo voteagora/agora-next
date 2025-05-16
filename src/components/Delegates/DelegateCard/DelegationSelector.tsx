@@ -1,6 +1,5 @@
 import { DelegateButton } from "./DelegateButton";
 import { UndelegateButton } from "./UndelegateButton";
-import { useAccount } from "wagmi";
 import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
@@ -11,6 +10,11 @@ import Tenant from "@/lib/tenant/tenant";
 import { DELEGATION_MODEL } from "@/lib/constants";
 import { useGetDelegatees } from "@/hooks/useGetDelegatee";
 import { PartialDelegateButton } from "./PartialDelegateButton";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
+import { getAddress, zeroAddress } from "viem";
+import { Button } from "@/components/ui/button";
+import { SafeTxnTooltip } from "@/components/shared/SafeTxnTooltip";
 
 export function DelegationSelector({
   delegate,
@@ -22,11 +26,10 @@ export function DelegationSelector({
   delegators: string[] | null;
 }) {
   const { isConnected } = useAgoraContext();
-  const { address } = useAccount();
-
+  const { selectedWalletAddress: address } = useSelectedWallet();
+  const { pendingDelegations } = useSafePendingTransactions();
   const { contracts } = Tenant.current();
   const hasAlligator = contracts?.alligator;
-
   // gets the delegatees for the connected account
   const { data: delegatees } = useGetDelegatees({ address });
   const isConnectedAccountDelegate = !!delegatees?.find(
@@ -36,8 +39,27 @@ export function DelegationSelector({
   const ButtonToShow = isConnectedAccountDelegate
     ? UndelegateButton
     : DelegateButton;
-
   const delegationButton = () => {
+    const hasSafePendingTxn =
+      pendingDelegations[getAddress(delegate.address)] ||
+      (pendingDelegations[zeroAddress] && isConnectedAccountDelegate);
+
+    if (hasSafePendingTxn) {
+      const pendingTxnCount =
+        pendingDelegations[getAddress(delegate.address)] ||
+        pendingDelegations[zeroAddress];
+
+      return (
+        <SafeTxnTooltip>
+          <Button
+            disabled
+            className="font-semibold py-2 px-4 cursor-pointer bg-positive/90 text-neutral hover:shadow-newDefault rounded-lg"
+          >
+            Pending {pendingTxnCount}
+          </Button>
+        </SafeTxnTooltip>
+      );
+    }
     switch (contracts.delegationModel) {
       case DELEGATION_MODEL.PARTIAL:
         return (

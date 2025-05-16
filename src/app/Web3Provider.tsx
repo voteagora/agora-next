@@ -17,6 +17,10 @@ import Tenant from "@/lib/tenant/tenant";
 import { getTransportForChain } from "@/lib/utils";
 import { hashFn } from "@wagmi/core/query";
 
+import SafeApiKitProvider from "@/contexts/SafeApiKitContext";
+import SafeProtocolKitProvider from "@/contexts/SafeProtocolKitContext";
+import SelectedWalletProvider from "@/contexts/SelectedWalletContext";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -57,19 +61,27 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
     <QueryClientProvider client={queryClient}>
       <SIWEProvider {...siweProviderConfig}>
         <ConnectKitProvider options={{ enforceSupportedChains: false }}>
-          <body className={inter.variable}>
-            <noscript>You need to enable JavaScript to run this app.</noscript>
-            {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
-            {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
-            <ConnectButtonProvider>
-              <PageContainer>
-                <Toaster />
-                <AgoraProvider>{children}</AgoraProvider>
-              </PageContainer>
-            </ConnectButtonProvider>
-            {!shouldHideAgoraBranding && <Footer />}
-            <SpeedInsights />
-          </body>
+          <SelectedWalletProvider>
+            <SafeApiKitProvider>
+              <SafeProtocolKitProvider>
+                <body className={inter.variable}>
+                  <noscript>
+                    You need to enable JavaScript to run this app.
+                  </noscript>
+                  {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
+                  {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
+                  <ConnectButtonProvider>
+                    <PageContainer>
+                      <Toaster />
+                      <AgoraProvider>{children}</AgoraProvider>
+                    </PageContainer>
+                  </ConnectButtonProvider>
+                  {!shouldHideAgoraBranding && <Footer />}
+                  <SpeedInsights />
+                </body>
+              </SafeProtocolKitProvider>
+            </SafeApiKitProvider>
+          </SelectedWalletProvider>
         </ConnectKitProvider>
       </SIWEProvider>
     </QueryClientProvider>

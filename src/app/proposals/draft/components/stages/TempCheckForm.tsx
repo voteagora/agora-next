@@ -10,15 +10,15 @@ import TextInput from "../form/TextInput";
 import { UpdatedButton } from "@/components/Button";
 import { schema as tempCheckSchema } from "../../schemas/tempCheckSchema";
 import { onSubmitAction as tempCheckAction } from "../../actions/createTempCheck";
-import { useAccount } from "wagmi";
 import Image from "next/image";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
 import { DraftProposal } from "../../types";
 import toast from "react-hot-toast";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const router = useRouter();
-  const { address } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
   const [isSkipPending, setIsSkipPending] = useState(false);
   const [isSubmitPending, setIsSubmitPending] = useState(false);
   const methods = useForm<z.output<typeof tempCheckSchema>>({

@@ -21,6 +21,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
 import { SuccessMessage } from "../CastVoteInput/CastVoteInput";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
+import { SafeTxnTooltip } from "@/components/shared/SafeTxnTooltip";
 
 type Props = {
   proposal: Proposal;
@@ -126,6 +128,13 @@ function VoteButton({
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
 
+  const { pendingTransactions, pendingVotes } = useSafePendingTransactions();
+  // console.log(
+  //   "pendingTransactions",
+  //   pendingTransactions,
+  //   pendingVotes,
+  //   proposal
+  // );
   const missingVote = checkMissingVoteForDelegate(
     delegateVotes ?? [],
     votingPower ?? {
@@ -134,6 +143,18 @@ function VoteButton({
       advancedVP: "0",
     }
   );
+
+  if (pendingVotes[proposal.id]) {
+    return (
+      <SafeTxnTooltip className="inline-block">
+        <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+          <Button className="w-full bg-positive/90 cursor-none" disabled>
+            Pending Approval {pendingVotes[proposal.id]}
+          </Button>
+        </div>
+      </SafeTxnTooltip>
+    );
+  }
 
   if (missingVote === "NONE") {
     return (

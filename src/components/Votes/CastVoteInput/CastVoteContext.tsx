@@ -13,13 +13,14 @@ import {
   createContext,
   type Dispatch,
   SetStateAction,
+  useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
-import { formatEther } from "viem";
+import { encodeFunctionData, formatEther, getAddress } from "viem";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import useEffectEvent from "@/hooks/useEffectEvent";
 import { useAccount } from "wagmi";
