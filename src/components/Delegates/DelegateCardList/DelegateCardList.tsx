@@ -41,14 +41,19 @@ export default function DelegateCardList({
 
   const loadMore = async () => {
     if (!fetching.current && meta.has_next) {
-      fetching.current = true;
-      const data = await fetchDelegates(
-        { offset: meta.next_offset, limit: meta.total_returned },
-        initialDelegates.seed || Math.random()
-      );
-      setDelegates(delegates.concat(data.data));
-      setMeta(data.meta);
-      fetching.current = false;
+      try {
+        fetching.current = true;
+        const data = await fetchDelegates(
+          { offset: meta.next_offset, limit: meta.total_returned },
+          initialDelegates.seed || Math.random()
+        );
+        setDelegates(delegates.concat(data.data));
+        setMeta(data.meta);
+      } catch (error) {
+        console.error('Error loading more delegates:', error);
+      } finally {
+        fetching.current = false;
+      }
     }
   };
 
