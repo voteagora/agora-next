@@ -241,6 +241,10 @@ export const scrollTenantUIConfig = new TenantUI({
       enabled: false,
     },
     {
+      name: "dao-node/delegate/addr",
+      enabled: true,
+    },
+    {
       name: "info",
       enabled: true,
     },
