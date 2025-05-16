@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { fetchDelegateStatement } from "@/app/delegates/actions";
-import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,8 +11,8 @@ import AgoraLoader, {
   LogoLoader,
 } from "@/components/shared/AgoraLoader/AgoraLoader";
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
-import DelegateDetailsForm from "@/components/DelegateStatement/DelegateDetailsForm";
 import { useDelegate } from "@/hooks/useDelegate";
+import DelegateDetailsForm from "./DelegateDetailsForm";
 
 const { slug: daoSlug } = Tenant.current();
 
