@@ -5,33 +5,37 @@ import { loadDelegatesSearchParams } from "@/app/delegates/search-params";
 
 import { PaginationParams } from "@/app/lib/pagination";
 import { SearchParams } from "nuqs/server";
-import { buildDelegateFilters } from "./delegateUtils";
+import { buildDelegateFilters, DelegateFilters } from "./delegateUtils";
 import CitizenCardList from "./CitzenCardList";
 
-async function fetchDelegatesWithParams(
+async function fetchCitizensWithParams(
+  seed: number,
   sort: string,
-  filters: any,
-  pagination: PaginationParams,
-  seed: number | undefined
+  pagination: PaginationParams
 ) {
   "use server";
+
+  const { fetchCitizens: apiFetchCitizens } = await import(
+    "@/app/api/common/citizens/getCitizens"
+  );
+
+  return apiFetchCitizens({ pagination, seed, sort });
+}
+
+async function fetchDelegatesWithParams(
+  seed: number,
+  sort: string,
+  filters?: DelegateFilters,
+  pagination?: PaginationParams
+) {
+  "use server";
+
   const { fetchDelegates: apiFetchDelegates } = await import(
     "@/app/api/common/delegates/getDelegates"
   );
   return apiFetchDelegates({ pagination, seed, sort, filters });
 }
 
-async function fetchCitizensWithParams(
-  sort: string,
-  pagination: PaginationParams,
-  seed: number
-) {
-  "use server";
-  const { fetchCitizens: apiFetchCitizens } = await import(
-    "@/app/api/common/citizens/getCitizens"
-  );
-  return apiFetchCitizens({ pagination, seed, sort });
-}
 const DelegateCardWrapper = async ({
   searchParams,
 }: {
@@ -50,30 +54,25 @@ const DelegateCardWrapper = async ({
   const seed = Math.random();
   const delegates =
     tab === "citizens"
-      ? await fetchCitizensWithParams(
-          citizensSort,
-          { offset: 0, limit: 20 },
-          seed
-        )
-      : await fetchDelegatesWithParams(
-          sort,
-          filters,
-          { offset: 0, limit: 20 },
-          seed
-        );
+      ? await fetchCitizensWithParams(seed, citizensSort, {
+          offset: 0,
+          limit: 20,
+        })
+      : await fetchDelegatesWithParams(seed, sort, filters, {
+          offset: 0,
+          limit: 20,
+        });
   return (
     <DelegateTabs>
       <TabsContent value="delegates">
         <DelegateContent
           initialDelegates={delegates}
-          fetchDelegates={fetchDelegatesWithParams.bind(null, sort, filters)}
+          sort={sort}
+          filters={filters}
         />
       </TabsContent>
       <TabsContent value="citizens">
-        <CitizenCardList
-          initialDelegates={delegates}
-          fetchDelegates={fetchCitizensWithParams.bind(null, citizensSort)}
-        />
+        <CitizenCardList initialDelegates={delegates} sort={citizensSort} />
       </TabsContent>
     </DelegateTabs>
   );
