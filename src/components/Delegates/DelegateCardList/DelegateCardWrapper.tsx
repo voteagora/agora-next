@@ -5,7 +5,7 @@ import { loadDelegatesSearchParams } from "@/app/delegates/search-params";
 
 import { PaginationParams } from "@/app/lib/pagination";
 import { SearchParams } from "nuqs/server";
-import { buildDelegateFilters } from "./delegateUtils";
+import { buildDelegateFilters, DelegateFilters } from "./delegateUtils";
 import CitizenCardList from "./CitzenCardList";
 
 async function fetchCitizens(
@@ -24,8 +24,8 @@ async function fetchCitizens(
 
 async function fetchDelegates(
   seed: number,
-  sort?: string,
-  filters?: any,
+  sort: string,
+  filters?: DelegateFilters,
   pagination?: PaginationParams
 ) {
   "use server";
@@ -34,7 +34,7 @@ async function fetchDelegates(
     "@/app/api/common/delegates/getDelegates"
   );
 
-  return apiFetchDelegates({ pagination, seed, sort: sort || "", filters });
+  return apiFetchDelegates({ pagination, seed, sort, filters });
 }
 const DelegateCardWrapper = async ({
   searchParams,
@@ -69,28 +69,12 @@ const DelegateCardWrapper = async ({
       <TabsContent value="delegates">
         <DelegateContent
           initialDelegates={delegates}
-          fetchDelegates={async (pagination, seed) => {
-            "use server";
-            return apiFetchDelegates({ pagination, seed, sort, filters });
-          }}
+          sort={sort}
+          filters={filters}
         />
       </TabsContent>
       <TabsContent value="citizens">
-        <CitizenCardList
-          initialDelegates={delegates}
-          fetchDelegates={async (
-            pagination: PaginationParams,
-            seed: number
-          ) => {
-            "use server";
-            // Handle the case where seed might be undefined
-            return apiFetchCitizens({
-              pagination,
-              seed,
-              sort: citizensSort,
-            });
-          }}
-        />
+        <CitizenCardList initialDelegates={delegates} sort={citizensSort} />
       </TabsContent>
     </DelegateTabs>
   );

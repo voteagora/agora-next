@@ -11,18 +11,19 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import Tenant from "@/lib/tenant/tenant";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { trackEvent } from "@/lib/analytics";
+import { fetchDelegatesServerAction } from "./delegateActions";
+import { DelegateFilters } from "./delegateUtils";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
-  fetchDelegates: (
-    pagination: PaginationParams,
-    seed?: number
-  ) => Promise<PaginatedResult<DelegateChunk[]>>;
+  sort: string;
+  filters: DelegateFilters;
 }
 
 export default function DelegateContent({
   initialDelegates,
-  fetchDelegates,
+  sort,
+  filters,
 }: Props) {
   const [layout] = useQueryState("layout", parseAsString.withDefault("grid"));
   const { address } = useAccount();
@@ -57,15 +58,23 @@ export default function DelegateContent({
     }
   }, [address]);
 
+  // Create a wrapper function that uses the server action
+  const fetchDelegatesWrapper = async (
+    pagination: PaginationParams,
+    seed: number
+  ) => {
+    return fetchDelegatesServerAction(pagination, seed, sort, filters);
+  };
+
   return layout === "grid" ? (
     <DelegateCardList
       initialDelegates={initialDelegates}
-      fetchDelegates={fetchDelegates}
+      fetchDelegates={fetchDelegatesWrapper}
     />
   ) : (
     <DelegateTable
       initialDelegates={initialDelegates}
-      fetchDelegates={fetchDelegates}
+      fetchDelegates={fetchDelegatesWrapper}
     />
   );
 }

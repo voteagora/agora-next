@@ -15,19 +15,14 @@ import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { trackEvent } from "@/lib/analytics";
 import { useAccount } from "wagmi";
+import { fetchCitizensServerAction } from "./citizenActions";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
-  fetchDelegates: (
-    pagination: PaginationParams,
-    seed: number
-  ) => Promise<PaginatedResult<DelegateChunk[]>>;
+  sort: string;
 }
 
-export default function CitizenCardList({
-  initialDelegates,
-  fetchDelegates,
-}: Props) {
+export default function CitizenCardList({ initialDelegates, sort }: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.data);
@@ -41,10 +36,18 @@ export default function CitizenCardList({
     setMeta(initialDelegates.meta);
   }, [initialDelegates, setIsDelegatesFiltering]);
 
+  // Create a wrapper function that uses the server action
+  const fetchCitizensWrapper = async (
+    pagination: PaginationParams,
+    seed: number
+  ) => {
+    return fetchCitizensServerAction(pagination, seed, sort);
+  };
+
   const loadMore = async () => {
     if (!fetching.current && meta.has_next) {
       fetching.current = true;
-      const data = await fetchDelegates(
+      const data = await fetchCitizensWrapper(
         { limit: 20, offset: meta.next_offset },
         initialDelegates.seed || Math.random()
       );
