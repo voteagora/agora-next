@@ -35,7 +35,9 @@ Discourse username:`;
       <Tabs defaultValue="write">
         <div className="flex flex-row gap-4 justify-between items-baseline">
           <div className="flex flex-row items-baseline gap-2">
-            <h3 className="font-bold">Delegate statement</h3>
+            <h3 className="text-2xl font-bold text-primary">
+              Delegate statement
+            </h3>
             {templateLink && (
               <a href={templateLink.url} rel="noreferrer" target="_blank">
                 <p className="text-sm opacity-50">{templateLink.title}</p>

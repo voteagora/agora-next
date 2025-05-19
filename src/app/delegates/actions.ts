@@ -77,12 +77,12 @@ export const fetchDelegateDraftStatements = unstable_cache(
   async (address: string) => {
     return apiFetchDelegateStatements(address, stageStatus.DRAFT);
   },
-  ["delegateStatements-${address}-${stage}"],
+  ["delegateStatement-${address}-${stage}"],
   {
     // Longer cache is acceptable since the statement is not expected to change
     // often and invalidated with every delegate statement update
     revalidate: 600, // 10 minute cache
-    tags: ["delegateStatements-${address}-${stage}"],
+    tags: ["delegateStatement-${address}-${stage}"],
   }
 );
 
@@ -126,19 +126,23 @@ export async function submitDelegateStatement({
   stage: stageStatus;
   message_hash?: string;
 }) {
-  const response = await createDelegateStatement({
-    address,
-    delegateStatement,
-    signature,
-    message,
-    scwAddress,
-    stage,
-    message_hash,
-  });
-
-  revalidateDelegateAddressPage(address.toLowerCase());
-  revalidatePath("/delegates/create", "page");
-  return response;
+  try {
+    const response = await createDelegateStatement({
+      address,
+      delegateStatement,
+      signature,
+      message,
+      scwAddress,
+      stage,
+      message_hash,
+    });
+    revalidateDelegateAddressPage(address.toLowerCase());
+    revalidatePath("/delegates/create", "page");
+    return response;
+  } catch (error) {
+    console.error("Error submitting delegate statement:", error);
+    throw error;
+  }
 }
 
 export async function fetchVotesForDelegate(

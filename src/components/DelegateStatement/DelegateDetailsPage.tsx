@@ -13,6 +13,7 @@ import AgoraLoader, {
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 import { useDelegate } from "@/hooks/useDelegate";
 import DelegateDetailsForm from "./DelegateDetailsForm";
+import { useGetDelegateDraftStatement } from "@/hooks/useGetDelegateDraftStatement";
 
 const { slug: daoSlug } = Tenant.current();
 
@@ -47,6 +48,7 @@ export default function DelegateDetailsPage() {
   const [delegateStatement, setDelegateStatement] =
     useState<DelegateStatement | null>(null);
   const { data: delegate } = useDelegate({ address });
+  const { data: draftStatement } = useGetDelegateDraftStatement(address);
 
   const setDefaultValues = (delegateStatement: DelegateStatement | null) => {
     return {
@@ -69,6 +71,7 @@ export default function DelegateDetailsPage() {
     resolver: zodResolver(formSchema),
     defaultValues: setDefaultValues(delegateStatement),
     mode: "onChange",
+    disabled: !address,
   });
   const { reset } = form;
 
@@ -95,6 +98,10 @@ export default function DelegateDetailsPage() {
       <AgoraLoader />
     )
   ) : (
-    <DelegateDetailsForm form={form} delegate={delegate} />
+    <DelegateDetailsForm
+      form={form}
+      delegate={delegate}
+      canEdit={!draftStatement}
+    />
   );
 }

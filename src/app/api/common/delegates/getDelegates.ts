@@ -21,6 +21,7 @@ import { DELEGATION_MODEL, TENANT_NAMESPACES } from "@/lib/constants";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { calculateBigIntRatio } from "../utils/bigIntRatio";
 import { withMetrics } from "@/lib/metricWrapper";
+import { stageStatus } from "@/app/lib/sharedEnums";
 
 /*
  * Fetches a list of delegates
@@ -470,7 +471,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
                 notification_preferences,
                 message_hash
               FROM agora.delegate_statements s
-              WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug
+              WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug AND s.stage = $6::agora.stage_status
+              ORDER BY s.updated_at DESC
               LIMIT 1
             ) sub
           ) AS statement ON TRUE;
@@ -479,7 +481,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       contracts.alligator?.address || "",
       slug,
       contracts.governor.address,
-      contracts.token.address
+      contracts.token.address,
+      stageStatus.PUBLISHED
     );
 
     const [delegate, votableSupply, quorum] = await Promise.all([
