@@ -10,8 +10,9 @@ import { useRouter } from "next/navigation";
 export default function DelegateTableRow({
   delegate,
 }: {
-  delegate: DelegateChunk & { numOfDelegators: bigint };
+  delegate: DelegateChunk & { numOfDelegators: bigint; vpChange7d?: string };
 }) {
+  console.log("DelegateTableRow delegate:", delegate);
   const router = useRouter();
   const { data: voterStats, isPending: isVoterStatsPending } = useVoterStats({
     address: delegate.address as `0x${string}`,
@@ -42,6 +43,22 @@ export default function DelegateTableRow({
         />
       </TableCell>
       <TableCell>{formatNumber(delegate.votingPower.total)}</TableCell>
+      <TableCell>
+        {delegate.vpChange7d ? (
+          <span
+            className={
+              Number(delegate.vpChange7d) >= 0
+                ? "text-green-500"
+                : "text-red-500"
+            }
+          >
+            {Number(delegate.vpChange7d) >= 0 ? "+" : ""}
+            {formatNumber(delegate.vpChange7d)}
+          </span>
+        ) : (
+          "0"
+        )}
+      </TableCell>
       <TableCell>
         {!isVoterStatsPending && numProposals > 0 && `${participation}%`}
       </TableCell>

@@ -75,6 +75,8 @@ async function getDelegates({
         daoNodeSortBy = "OLD";
       } else if (sort === "latest_voting_block") {
         daoNodeSortBy = "LVB";
+      } else if (sort === "vp_change_7d") {
+        daoNodeSortBy = "VPC";
       } else {
         daoNodeSortBy = "VP";
       }
@@ -194,6 +196,7 @@ async function getDelegates({
               String(delegate.mostRecentDelegationBlock || 0)
             ),
             lastVoteBlock: BigInt(String(delegate.lastVoteBlock || 0)),
+            vpChange7d: BigInt(String(delegate.vpChange7d || 0)),
           };
         });
 

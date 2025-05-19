@@ -42,7 +42,7 @@ export const getDelegatesFromDaoNode = async (options?: {
     const queryParams = new URLSearchParams({
       sort_by: sortBy,
       reverse: reverse.toString(),
-      include: "VP,DC,PR,LVB,MRD",
+      include: "VP,DC,PR,LVB,MRD,VPC",
     });
 
     const response = await fetch(`${url}v1/delegates?${queryParams}`, {
@@ -88,23 +88,31 @@ export const getDelegatesFromDaoNode = async (options?: {
       data.delegates = data.delegates.map(
         (delegate: {
           addr: string;
-          voting_power?: string;
-          from_cnt?: string;
-          most_recent_block?: string;
-          last_vote_block?: string;
+          VP?: string;
+          DC?: number;
+          PR?: number;
+          VPC?: string;
         }) => {
           const lowerCaseAddress = delegate.addr.toLowerCase();
+          console.log("Delegate data:", {
+            address: lowerCaseAddress,
+            VP: delegate.VP,
+            VPC: delegate.VPC,
+            DC: delegate.DC,
+            PR: delegate.PR,
+          });
           return {
             address: lowerCaseAddress,
             votingPower: {
-              total: delegate.voting_power || "0",
-              direct: delegate.voting_power || "0",
+              total: delegate.VP || "0",
+              direct: delegate.VP || "0",
               advanced: "0",
             },
             statement: statementMap.get(lowerCaseAddress) || null,
-            numOfDelegators: delegate.from_cnt || "0",
-            mostRecentDelegationBlock: delegate.most_recent_block || "0",
-            lastVoteBlock: delegate.last_vote_block || "0",
+            numOfDelegators: delegate.DC?.toString() || "0",
+            mostRecentDelegationBlock: "0",
+            lastVoteBlock: "0",
+            vpChange7d: delegate.VPC || "0",
           };
         }
       );

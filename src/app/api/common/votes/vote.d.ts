@@ -57,4 +57,5 @@ export type DelegatesSort =
   | "least_voting_power"
   | "most_recent_delegation"
   | "oldest_delegation"
-  | "latest_voting_block";
+  | "latest_voting_block"
+  | "vp_change_7d";
