@@ -35,7 +35,6 @@ import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
-import { useOpenDialog } from "../DialogProvider/DialogProvider";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -72,7 +71,6 @@ export function AdvancedDelegateDialog({
   const params = useParams<{ addressOrENSName: string }>();
   const { ui, slug, contracts } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
-  const openDialog = useOpenDialog();
 
   const fetchData = useCallback(async () => {
     try {

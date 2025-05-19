@@ -2,6 +2,7 @@ import DelegateStatementContainer from "./DelegateStatementContainer";
 import TopStakeholders from "./TopStakeholders";
 import TopIssues from "./TopIssues";
 import { Delegate } from "@/app/api/common/delegates/delegate";
+import { DraftStatementDetails } from "./DelegateDraftStatement";
 
 interface Props {
   delegate: Delegate;
@@ -10,6 +11,7 @@ interface Props {
 const DelegateStatementWrapper = async ({ delegate }: Props) => {
   return (
     <>
+      <DraftStatementDetails delegateStatement={delegate.statement} />
       <DelegateStatementContainer delegate={delegate} />
       {delegate.statement && (
         <>

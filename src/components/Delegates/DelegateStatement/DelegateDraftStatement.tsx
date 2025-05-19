@@ -1,26 +1,37 @@
+"use client";
+
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 import { useGetDelegateDraftStatement } from "@/hooks/useGetDelegateDraftStatement";
 import { useGetSafeMessageDetails } from "@/hooks/useGetSafeMessageDetails";
 import { useGetSafeInfo } from "@/hooks/useGetSafeInfo";
 import { ExclamationCircleIcon } from "@/icons/ExclamationCircleIcon";
 import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
+import { useCallback, useEffect, useState } from "react";
+import { publishDelegateStatement } from "@/app/api/common/delegateStatement/publishDelegateStatement";
+import { useChainId } from "wagmi";
+import { useDelegate } from "@/hooks/useDelegate";
 
 export const DraftStatementDetails = ({
   delegateStatement,
 }: {
   delegateStatement: DelegateStatement;
 }) => {
+  const [submitDraft, setSubmitDraft] = useState(false);
   const { selectedWalletAddress } = useSelectedWallet();
 
-  const { data: draftStatement } = useGetDelegateDraftStatement(
+  const { data: draftStatement, refetch } = useGetDelegateDraftStatement(
     selectedWalletAddress
   );
-
   const { data: safeMessageDetails } = useGetSafeMessageDetails({
     messageHash: draftStatement?.message_hash,
   });
-  console.log("safeMessageDetails", delegateStatement);
+
+  const chainId = useChainId();
   const { data: safeInfo } = useGetSafeInfo(selectedWalletAddress);
+  const { refetch: refetchStatement } = useDelegate({
+    address: selectedWalletAddress,
+  });
+
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
       month: "long",
@@ -37,13 +48,58 @@ export const DraftStatementDetails = ({
     }).format(date);
   };
 
-  const currentDate = new Date();
-  const formattedDate = formatDate(currentDate);
-  const formattedTime = formatTime(currentDate).toLowerCase();
+  const date = new Date(safeMessageDetails?.created || new Date());
+  const formattedDate = formatDate(date);
+  const formattedTime = formatTime(date).toLowerCase();
 
   const confirmedSignatures = safeMessageDetails?.confirmations?.length || 0;
-  const requiredSignatures = safeInfo?.threshold;
+  const requiredSignatures = safeInfo?.threshold || 0;
   const signaturesDisplay = `${confirmedSignatures}/${requiredSignatures} signatures`;
+
+  const publishDraft = useCallback(async () => {
+    if (draftStatement?.message_hash) {
+      await publishDelegateStatement({
+        message_hash: draftStatement.message_hash,
+        chain_id: chainId,
+      });
+      refetch();
+      refetchStatement();
+    }
+  }, [draftStatement?.message_hash, chainId, refetch, refetchStatement]);
+
+  useEffect(() => {
+    if (
+      draftStatement?.message_hash &&
+      delegateStatement?.message_hash !== draftStatement?.message_hash &&
+      !submitDraft
+    ) {
+      if (confirmedSignatures >= requiredSignatures) {
+        setSubmitDraft(true);
+        publishDraft();
+      }
+    }
+  }, [
+    selectedWalletAddress,
+    draftStatement,
+    delegateStatement?.message_hash,
+    confirmedSignatures,
+    requiredSignatures,
+    submitDraft,
+    publishDraft,
+    refetch,
+    refetchStatement,
+  ]);
+
+  if (
+    selectedWalletAddress?.toLowerCase() !==
+    draftStatement?.address?.toLowerCase()
+  ) {
+    return null;
+  }
+
+  if (confirmedSignatures >= requiredSignatures) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col bg-neutral rounded-xl shadow-newDefault py-8 px-6 mb-4">

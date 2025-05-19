@@ -26,57 +26,66 @@ export async function createDelegateStatement({
   stage: stageStatus;
   message_hash?: string;
 }) {
-  const { twitter, warpcast, discord, email, notificationPreferences } =
-    delegateStatement;
-  const { slug } = Tenant.current();
+  try {
+    const { twitter, warpcast, discord, email, notificationPreferences } =
+      delegateStatement;
+    const { slug } = Tenant.current();
 
-  const valid = await verifyMessage({
-    address,
-    message,
-    signature,
-  });
+    let valid = false;
+    if (!message_hash) {
+      valid = await verifyMessage({
+        address,
+        message,
+        signature,
+      });
+    } else {
+      valid = true;
+    }
 
-  if (!valid) {
-    throw new Error("Invalid signature");
-  }
+    if (!valid) {
+      throw new Error("Invalid signature");
+    }
 
-  // Sanitize the statement before storing
-  const sanitizedStatement = {
-    ...delegateStatement,
-    delegateStatement: sanitizeContent(delegateStatement.delegateStatement),
-  };
+    // Sanitize the statement before storing
+    const sanitizedStatement = {
+      ...delegateStatement,
+      delegateStatement: sanitizeContent(delegateStatement.delegateStatement),
+    };
 
-  const messageHash =
-    message_hash || createHash("sha256").update(message).digest("hex");
+    const messageHash =
+      message_hash || createHash("sha256").update(message).digest("hex");
 
-  const data = {
-    address: address.toLowerCase(),
-    dao_slug: slug,
-    signature,
-    payload: sanitizedStatement as Prisma.InputJsonValue,
-    twitter,
-    warpcast,
-    discord,
-    email,
-    scw_address: scwAddress?.toLowerCase(),
-    notification_preferences: {
-      ...notificationPreferences,
-      last_updated: new Date().toISOString(),
-    },
-    message_hash: messageHash,
-    stage,
-  };
-
-  return prismaWeb2Client.delegateStatements.upsert({
-    where: {
-      address_dao_slug_message_hash: {
-        address: address.toLowerCase(),
-        dao_slug: slug,
-        message_hash: messageHash,
+    const data = {
+      address: address.toLowerCase(),
+      dao_slug: slug,
+      signature,
+      payload: sanitizedStatement as Prisma.InputJsonValue,
+      twitter,
+      warpcast,
+      discord,
+      email,
+      scw_address: scwAddress?.toLowerCase(),
+      notification_preferences: {
+        ...notificationPreferences,
+        last_updated: new Date().toISOString(),
       },
-      stage: stage,
-    },
-    update: data,
-    create: data,
-  });
+      message_hash: messageHash,
+      stage,
+    };
+
+    return prismaWeb2Client.delegateStatements.upsert({
+      where: {
+        address_dao_slug_message_hash: {
+          address: address.toLowerCase(),
+          dao_slug: slug,
+          message_hash: messageHash.toLowerCase(),
+        },
+      },
+      update: data,
+      create: data,
+    });
+  } catch (error) {
+    console.error("Error creating delegate statement:", error);
+    throw error;
+  }
 }
