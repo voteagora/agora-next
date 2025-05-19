@@ -10,6 +10,9 @@ import Tenant from "@/lib/tenant/tenant";
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 import { ProfileScwContent } from "./ProfileScwContent";
 import { ProfileHeader } from "./ProfileHeader";
+import { safe } from "wagmi/connectors";
+import { ExternalLinkIcon } from "@/icons/ExternalLink";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
 
 interface Props {
   ensName: string | undefined;
@@ -21,7 +24,8 @@ export const ProfileDropDownContent = ({
   handleCloseDrawer,
 }: Props) => {
   const { disconnect } = useDisconnect();
-  const { selectedWalletAddress } = useSelectedWallet();
+  const { selectedWalletAddress, isSelectedPrimaryAddress } =
+    useSelectedWallet();
   const { address } = useAccount();
   const {
     isFetching,
@@ -33,10 +37,16 @@ export const ProfileDropDownContent = ({
   } = useProfileData(selectedWalletAddress);
   const { ui } = Tenant.current();
 
+  const { pendingTransactionsForOwner } = useSafePendingTransactions();
+
   return (
     <>
       <div className="flex flex-col px-6 py-4 border-b border-line">
-        <ProfileHeader address={address} ensName={ensName} />
+        <ProfileHeader
+          address={address}
+          ensName={ensName}
+          hasPendingTransactions={pendingTransactionsForOwner.length > 0}
+        />
         {scwAddress && <ProfileScwContent scwAddress={scwAddress} />}
       </div>
 
@@ -69,6 +79,23 @@ export const ProfileDropDownContent = ({
           </div>
         ) : (
           <div className="flex flex-col p-6 font-medium">
+            {!isSelectedPrimaryAddress &&
+              pendingTransactionsForOwner.length > 0 && (
+                <Link
+                  href={`https://app.safe.global/transactions/queue?safe=${selectedWalletAddress}`}
+                  onClick={handleCloseDrawer}
+                  className="flex items-center gap-2 h-12"
+                  target="_blank"
+                >
+                  Pending Safe requests
+                  <ExternalLinkIcon className="stroke-primary" />
+                  <div className="px-3 py-1 rounded-full border border-line flex items-center gap-2 h-6 absolute right-6">
+                    <div className="text-center justify-center text-neutral-900 text-xs font-medium">
+                      {pendingTransactionsForOwner.length}
+                    </div>
+                  </div>
+                </Link>
+              )}
             {canCreateDelegateStatement && !hasStatement ? (
               <Link
                 href={`/delegates/create`}
@@ -80,16 +107,16 @@ export const ProfileDropDownContent = ({
             ) : (
               <>
                 <Link
-                  href={`/delegates/${ensName ?? address}`}
+                  href={`/delegates/${selectedWalletAddress}`}
                   onClick={handleCloseDrawer}
-                  className="self-stretch h-12 pl-4 text-secondary flex items-center hover:bg-neutral hover:font-bold hover:rounded-md"
+                  className="self-stretch h-12 text-secondary flex items-center hover:bg-neutral hover:font-bold hover:rounded-md"
                 >
                   View my profile
                 </Link>
                 <Link
                   href={`/delegates/create`}
                   onClick={handleCloseDrawer}
-                  className="self-stretch h-12 pl-4 flex text-secondary items-center hover:bg-neutral hover:font-bold hover:rounded-md"
+                  className="self-stretch h-12 flex text-secondary items-center hover:bg-neutral hover:font-bold hover:rounded-md"
                 >
                   Edit delegate statement
                 </Link>

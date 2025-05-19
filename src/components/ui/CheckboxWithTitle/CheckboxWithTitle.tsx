@@ -2,7 +2,7 @@ import { useId } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface CheckboxWithTitleProps {
-  title: string | React.ReactNode;
+  title?: string | React.ReactNode;
   label: string;
   checked: boolean;
   onChange: (value: boolean) => void;
@@ -18,9 +18,11 @@ const CheckboxWithTitle: React.FC<CheckboxWithTitleProps> = ({
 
   return (
     <>
-      <h4 className="flex items-center mb-3 text-secondary font-semibold text-xs leading-4">
-        {title}
-      </h4>
+      {title && (
+        <h4 className="flex items-center mb-3 text-secondary font-semibold text-xs leading-4">
+          {title}
+        </h4>
+      )}
       <div className="flex items-center mb-4 font-semibold text-primary">
         <label htmlFor={id} className="flex items-center cursor-pointer">
           {" "}

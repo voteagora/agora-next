@@ -12,9 +12,11 @@ import { useGetSafesForAddress } from "@/hooks/useGetSafesForAddress";
 export const ProfileHeader = ({
   address,
   ensName,
+  hasPendingTransactions,
 }: {
   address?: `0x${string}`;
   ensName?: string;
+  hasPendingTransactions?: boolean;
 }) => {
   const { connector } = useAccount();
   const { data: safes } = useGetSafesForAddress(address);
@@ -79,6 +81,9 @@ export const ProfileHeader = ({
             <>
               <span className="text-primary">
                 {shortAddress(selectedWalletAddress as string)}
+                {hasPendingTransactions && !isSelectedPrimaryAddress && (
+                  <div className="rounded-full h-[10px] w-[10px] bg-negative inline-block ml-2" />
+                )}
               </span>
             </>
           )}

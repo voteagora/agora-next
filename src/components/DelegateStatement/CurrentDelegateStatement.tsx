@@ -14,6 +14,7 @@ import AgoraLoader, {
 import DelegateStatementForm from "@/components/DelegateStatement/DelegateStatementForm";
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 import { useAccount } from "wagmi";
+import { useGetDelegateDraftStatement } from "@/hooks/useGetDelegateDraftStatement";
 
 const { slug: daoSlug } = Tenant.current();
 
@@ -68,6 +69,7 @@ export default function CurrentDelegateStatement() {
   const [loading, setLoading] = useState<boolean>(true);
   const [delegateStatement, setDelegateStatement] =
     useState<DelegateStatement | null>(null);
+  const { data: draftStatement } = useGetDelegateDraftStatement(address);
   const { isConnected, isConnecting } = useAccount();
   // Display the first two delegate issues as default values
   const topIssues = ui.governanceIssues;
@@ -137,6 +139,7 @@ export default function CurrentDelegateStatement() {
     resolver: zodResolver(formSchema),
     defaultValues: setDefaultValues(delegateStatement),
     mode: "onChange",
+    disabled: !!draftStatement,
   });
   const { reset } = form;
 
@@ -163,6 +166,6 @@ export default function CurrentDelegateStatement() {
       <AgoraLoader />
     )
   ) : (
-    <DelegateStatementForm form={form} />
+    <DelegateStatementForm form={form} canEdit={!draftStatement} />
   );
 }

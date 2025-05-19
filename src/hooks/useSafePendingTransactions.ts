@@ -6,12 +6,16 @@ import { useAccount } from "wagmi";
 import { decodeAbiParameters, getAddress } from "viem";
 import { getTitleFromProposalDescription } from "@/lib/proposalUtils";
 import { keccak256, toUtf8Bytes } from "ethers";
+import Tenant from "@/lib/tenant/tenant";
 
 export const useSafePendingTransactions = () => {
   const { safeApiKit } = useSafeApiKit();
   const { selectedWalletAddress, isSelectedPrimaryAddress } =
     useSelectedWallet();
   const { address } = useAccount();
+  const { slug } = Tenant.current(); // Get slug from tenant
+  const expectedOrigin = `Agora-${slug}`;
+
   const { data: pendingTransactions, refetch } = useQuery({
     queryKey: ["safe-pending-transactions", selectedWalletAddress],
     queryFn: async () => {
@@ -31,7 +35,7 @@ export const useSafePendingTransactions = () => {
     },
     enabled: !isSelectedPrimaryAddress && !!selectedWalletAddress,
   });
-
+  console.log("pendingTransactions", pendingTransactions);
   const pendingTransactionsForOwner = useMemo(() => {
     if (!pendingTransactions?.results || !address) return [];
 
@@ -42,12 +46,13 @@ export const useSafePendingTransactions = () => {
       );
 
       return (
-        !userConfirmed &&
-        transaction.proposer !== address &&
-        !transaction.isExecuted
+        !userConfirmed ||
+        (transaction.proposer !== address &&
+          !transaction.isExecuted &&
+          transaction.origin === expectedOrigin) // Filter by origin
       );
     });
-  }, [pendingTransactions, address]);
+  }, [pendingTransactions, address, expectedOrigin]);
 
   const pendingVotes = useMemo(() => {
     if (!pendingTransactions?.results || !address) return {};
@@ -92,7 +97,7 @@ export const useSafePendingTransactions = () => {
       },
       {} as Record<string, string>
     );
-  }, [pendingTransactions]);
+  }, [address, pendingTransactions?.results, expectedOrigin]);
 
   const pendingDelegations = useMemo(() => {
     if (!pendingTransactions?.results || !address) return {};
@@ -171,7 +176,7 @@ export const useSafePendingTransactions = () => {
       },
       {} as Record<string, string>
     );
-  }, [pendingTransactions]);
+  }, [pendingTransactions, expectedOrigin]);
 
   const pendingProposals = useMemo(() => {
     if (!pendingTransactions?.results || !address) return {};
@@ -264,7 +269,7 @@ export const useSafePendingTransactions = () => {
         }
       >
     );
-  }, [pendingTransactions, address]);
+  }, [pendingTransactions, address, expectedOrigin]);
 
   const getQueueProposalsForDescription = (
     description: string | null,

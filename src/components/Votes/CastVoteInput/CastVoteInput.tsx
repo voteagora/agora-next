@@ -66,7 +66,6 @@ export default function CastVoteInput({
   const delegate = data?.delegate;
   const votes = data?.votes;
   const votingPower = data?.votingPower;
-  console.log("pendingVotes", pendingVotes);
   if (!isConnected) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
@@ -85,13 +84,13 @@ export default function CastVoteInput({
     );
   }
 
-  // if (isSuccess && !delegate?.statement) {
-  //   return (
-  //     <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
-  //       <NoStatementView />
-  //     </div>
-  //   );
-  // }
+  if (isSuccess && !delegate?.statement) {
+    return (
+      <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+        <NoStatementView />
+      </div>
+    );
+  }
 
   const pendingVote = pendingVotes[proposal.id];
   if (pendingVote) {

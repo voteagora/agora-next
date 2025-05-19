@@ -38,6 +38,7 @@ import { CreateScopeDialog } from "@/components/Admin/CreateScopeDialog";
 import { ScopeData } from "@/lib/types";
 import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActionDialog";
 import { SafeWalletConfirmationDialog } from "../SafeWalletConfirmation";
+import { SafeSignConfirmationDialog } from "../SafeSignConfirmation";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -62,7 +63,9 @@ export type DialogType =
   | EncourageConnectWalletDialogType
   | CreateScopeDialogType
   | AccountActionDialogType
-  | SafeWalletConfirmationDialogType;
+  | SafeWalletConfirmationDialogType
+  | SafeSignConfirmationDialogType;
+
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -289,6 +292,13 @@ export type SafeWalletConfirmationDialogType = {
     onSubmitSafeTransaction?: () => Promise<void>;
   };
   className?: string;
+};
+
+export type SafeSignConfirmationDialogType = {
+  type: "SAFE_SIGN_CONFIRMATION";
+  params: {
+    onSubmit?: () => Promise<void>;
+  };
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -527,6 +537,14 @@ export const dialogs: DialogDefinitions<DialogType> = {
         data={data}
         address={address}
         onSubmitSafeTransaction={onSubmitSafeTransaction}
+      />
+    );
+  },
+  SAFE_SIGN_CONFIRMATION: ({ onSubmit }, closeDialog) => {
+    return (
+      <SafeSignConfirmationDialog
+        closeDialog={closeDialog}
+        onSubmit={onSubmit}
       />
     );
   },

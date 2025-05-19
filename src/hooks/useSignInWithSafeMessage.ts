@@ -3,7 +3,10 @@ import "client-only";
 import { useState, useCallback } from "react";
 import { EIP712TypedData, SafeSignature } from "@safe-global/types-kit";
 import { useAccount } from "wagmi";
-import { buildSignatureBytes } from "@safe-global/protocol-kit";
+import {
+  buildSignatureBytes,
+  hashSafeMessage,
+} from "@safe-global/protocol-kit";
 import { useSafeProtocolKit } from "@/contexts/SafeProtocolKitContext";
 import { useSafeApiKit } from "@/contexts/SafeApiKitContext";
 
@@ -58,7 +61,6 @@ export const useSignInWithSafeMessage = () => {
           safeMessage,
           SigningMethod.ETH_SIGN
         );
-
         const signature = signedMessage.getSignature(address);
         // Add message to Safe Transaction Service using the correct API format
         await safeApiKit?.addMessage(safeAddress, {
@@ -66,26 +68,20 @@ export const useSignInWithSafeMessage = () => {
           signature: buildSignatureBytes([signature as SafeSignature]),
         });
 
-        // const safeMessageHash = await protocolKit.getSafeMessageHash(
-        //   hashSafeMessage(message)
-        // );
-        // incase of second signature
-        // apiKit.addMessageSignature(
-        //   safeMessageHash,
-        //   buildSignatureBytes([signature as SafeSignature])
-        // );
-
-        return signature;
+        const safeMessageHash = await protocolKit.getSafeMessageHash(
+          hashSafeMessage(message)
+        );
+        return { signature, safeMessageHash };
       } catch (err) {
         console.error("Safe signing error:", err);
         const error = err instanceof Error ? err : new Error(String(err));
         setError(error);
-        return undefined;
+        return { signature: null, safeMessageHash: null };
       } finally {
         setIsLoading(false);
       }
     },
-    []
+    [address, protocolKit, safeApiKit]
   );
 
   return {

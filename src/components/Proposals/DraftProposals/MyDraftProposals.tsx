@@ -21,7 +21,6 @@ const MyDraftProposals = ({
   const [draftProposals, setDraftProposals] = useState<ProposalDraft[]>([]);
   const { pendingProposals, pendingTransactions } =
     useSafePendingTransactions();
-  console.log(pendingTransactions);
   const getDraftProposalsAndSet = useCallback(
     async (authorAddress: `0x${string}`) => {
       const proposals = await fetchDraftProposals(authorAddress);

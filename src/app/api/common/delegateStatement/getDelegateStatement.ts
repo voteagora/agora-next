@@ -116,27 +116,4 @@ export async function getDelegateStatementsForAddress({
   }
 }
 
-export async function getDelegateStatementsForAddressWithStage({
-  address,
-  stage,
-}: {
-  address: string;
-  stage: stageStatus;
-}) {
-  const { slug } = Tenant.current();
-
-  return prismaWeb2Client.delegateStatements
-    .findMany({
-      where: {
-        address: address.toLowerCase(),
-        dao_slug: slug,
-        stage: stage,
-      },
-    })
-    .catch((error) => console.error(error));
-}
-
 export const fetchDelegateStatements = cache(getDelegateStatements);
-export const fetchDelegateStatementsForAddressWithStage = cache(
-  getDelegateStatementsForAddressWithStage
-);

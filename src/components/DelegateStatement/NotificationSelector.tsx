@@ -46,7 +46,6 @@ export default function NotificationSelector({
         label="Yes, I want to receive emails"
         checked={subscribed}
         onChange={handleChange}
-        title="Agree to receive proposal updates via email"
       />
     </div>
   );
