@@ -23,6 +23,7 @@ const sortValidator = createOptionalStringValidator(
     "most_recent_delegation",
     "oldest_delegation",
     "latest_voting_block",
+    "vp_change_7d",
   ],
   DEFAULT_SORT
 );

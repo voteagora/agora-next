@@ -63,6 +63,7 @@ export default function DelegateTable({
               <TableHead className="h-10 text-secondary">
                 Voting power
               </TableHead>
+              <TableHead className="h-10 text-secondary">7d Change</TableHead>
               <TableHead className="h-10 text-secondary">
                 Participation
               </TableHead>

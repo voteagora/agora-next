@@ -86,6 +86,10 @@ export const delegatesFilterOptions = {
     sort: "latest_voting_block",
     value: "Latest voting block",
   },
+  vpChange7d: {
+    sort: "vp_change_7d",
+    value: "VP Change 7d",
+  },
 };
 
 export const citizensFilterOptions = {
