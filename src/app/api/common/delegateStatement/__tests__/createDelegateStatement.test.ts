@@ -20,9 +20,11 @@ import {
 
 vi.mock("server-only", () => ({})); // Mock server-only module
 
-// vi.mock("@/app/api/common/delegateStatement/createDelegateStatement", () => ({
-//   createDelegateStatement: vi.fn(),
-// }));
+// Mock the `cache` function from React
+vi.mock("react", () => ({
+  // Provide a mock implementation of `cache` as a passthrough
+  cache: vi.fn((fn) => fn),
+}));
 
 // Because we aren't signing a message onchain, we cannot verify, and most skip over this check.
 vi.mock("@/lib/serverVerifyMessage", () => ({
