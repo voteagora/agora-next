@@ -155,7 +155,9 @@ export default function DelegateStatementForm({
       return;
     }
 
-    setSaveSuccess(true);
+    if (!isSelectedPrimaryAddress) {
+      setSaveSuccess(true);
+    }
     refetch();
     router.push(`/delegates/${address}`);
   }
