@@ -67,7 +67,7 @@ export const ProfileHeader = ({
           ) : (
             <ENSAvatar size={60} />
           )}
-          {walletIcon()}
+          {safes && safes.length > 0 && walletIcon()}
         </div>
         <div className="flex flex-col flex-1">
           {ensName ? (
