@@ -8,8 +8,7 @@ import { Prisma } from "@prisma/client";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
 import { stageStatus } from "@/app/lib/sharedEnums";
 import { createHash } from "crypto";
-import Safe from "@safe-global/protocol-kit";
-import { getTransportForChain } from "@/lib/utils";
+import SafeApiKit from "@safe-global/api-kit";
 
 export async function createDelegateStatement({
   address,
@@ -17,7 +16,6 @@ export async function createDelegateStatement({
   signature,
   message,
   scwAddress,
-  stage,
   message_hash,
 }: {
   address: `0x${string}`;
@@ -25,14 +23,13 @@ export async function createDelegateStatement({
   signature: `0x${string}`;
   message: string;
   scwAddress?: string;
-  stage: stageStatus;
   message_hash?: string;
 }) {
   try {
     const { twitter, warpcast, discord, email, notificationPreferences } =
       delegateStatement;
     const { slug, contracts } = Tenant.current();
-
+    const stage = message_hash ? stageStatus.DRAFT : stageStatus.PUBLISHED;
     let valid = false;
     if (!message_hash) {
       valid = await verifyMessage({
@@ -41,15 +38,32 @@ export async function createDelegateStatement({
         signature,
       });
     } else {
-      // const protocolKit = await Safe.init({
-      //   provider: getTransportForChain(contracts.governor.chain.id),
-      //   safeAddress: address,
-      // });
-      // const isValidSignature = await protocolKit.isValidSignature(
-      //   message_hash,
-      //   signature
-      // );
-      valid = true;
+      try {
+        const apiKit = new SafeApiKit({
+          chainId: contracts.governor.chain.id as any,
+        });
+
+        const safeMessage = await apiKit.getMessage(message_hash);
+        if (safeMessage && safeMessage.preparedSignature === signature) {
+          valid = true;
+        } else {
+          valid = false;
+        }
+
+        if (
+          valid &&
+          safeMessage.message &&
+          typeof safeMessage.message === "string"
+        ) {
+          const parsedMessage = JSON.parse(safeMessage.message);
+          delegateStatement = {
+            ...delegateStatement,
+            ...parsedMessage,
+          };
+        }
+      } catch (safeApiError) {
+        throw new Error("Could not verify Safe signature with Safe API");
+      }
     }
 
     if (!valid) {

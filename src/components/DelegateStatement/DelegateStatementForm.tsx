@@ -142,9 +142,11 @@ export default function DelegateStatementForm({
       signature,
       message: serializedBody,
       scwAddress,
-      stage: messageHash ? stageStatus.DRAFT : stageStatus.PUBLISHED,
       message_hash: messageHash || "",
-    }).catch((error) => console.error(error));
+    }).catch((error) => {
+      console.error("Error submitting delegate statement:", error);
+      return null;
+    });
 
     if (!response) {
       setSubmissionError(
