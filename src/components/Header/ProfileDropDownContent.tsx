@@ -89,10 +89,13 @@ export const ProfileDropDownContent = ({
                 >
                   Pending Safe requests
                   <ExternalLinkIcon className="stroke-primary" />
-                  <div className="px-3 py-1 rounded-full border border-line flex items-center gap-2 h-6 absolute right-6">
-                    <div className="text-center justify-center text-neutral-900 text-xs font-medium">
-                      {pendingTransactionsForOwner.length}
+                  <div className="absolute right-6 flex items-center">
+                    <div className="px-3 py-1 rounded-full border border-line flex items-center gap-2 h-6">
+                      <div className="text-center justify-center text-neutral-900 text-xs font-medium">
+                        {pendingTransactionsForOwner.length}
+                      </div>
                     </div>
+                    <div className="rounded-full h-[10px] w-[10px] bg-negative inline-block ml-2 mr-[10px]" />
                   </div>
                 </Link>
               )}
