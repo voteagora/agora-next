@@ -767,6 +767,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       totalProposals: delegate?.total_proposals || 0,
       statement: delegate?.statement || null,
       relativeVotingPowerToVotableSupply,
+      vpChange7d: 0n,
     };
   });
 }
