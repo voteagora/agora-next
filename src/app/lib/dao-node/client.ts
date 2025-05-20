@@ -94,13 +94,6 @@ export const getDelegatesFromDaoNode = async (options?: {
           VPC?: string;
         }) => {
           const lowerCaseAddress = delegate.addr.toLowerCase();
-          console.log("Delegate data:", {
-            address: lowerCaseAddress,
-            VP: delegate.VP,
-            VPC: delegate.VPC,
-            DC: delegate.DC,
-            PR: delegate.PR,
-          });
           return {
             address: lowerCaseAddress,
             votingPower: {
