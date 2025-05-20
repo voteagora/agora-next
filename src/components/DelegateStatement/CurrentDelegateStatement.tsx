@@ -162,6 +162,7 @@ export default function CurrentDelegateStatement() {
     } else if (address && draftView) {
       setDelegateStatement(delegateStatementDraft as DelegateStatement);
       reset(setDefaultValues(delegateStatementDraft as DelegateStatement));
+      setLoading(false);
     }
   }, [address, reset, draftView, delegateStatementDraft]);
 

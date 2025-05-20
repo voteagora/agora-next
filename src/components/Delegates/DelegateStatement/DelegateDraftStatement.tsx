@@ -110,6 +110,10 @@ export const DraftStatementDetails = ({
     });
   }, [selectedWalletAddress, draftStatement?.message_hash]);
 
+  if (!selectedWalletAddress || !draftStatement?.address) {
+    return null;
+  }
+
   if (
     selectedWalletAddress?.toLowerCase() !==
     draftStatement?.address?.toLowerCase()
