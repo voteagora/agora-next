@@ -129,7 +129,6 @@ export async function submitDelegateStatement({
   signature,
   message,
   scwAddress,
-  stage = stageStatus.PUBLISHED,
   message_hash,
 }: {
   address: `0x${string}`;
@@ -137,7 +136,6 @@ export async function submitDelegateStatement({
   signature: `0x${string}`;
   message: string;
   scwAddress?: string;
-  stage: stageStatus;
   message_hash?: string;
 }) {
   try {
@@ -147,7 +145,6 @@ export async function submitDelegateStatement({
       signature,
       message,
       scwAddress,
-      stage,
       message_hash,
     });
     revalidateDelegateAddressPage(address.toLowerCase());
