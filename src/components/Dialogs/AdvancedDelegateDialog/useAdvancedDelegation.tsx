@@ -22,7 +22,6 @@ const useAdvancedDelegation = ({
   target: string | string[];
   allocation: number | number[];
 }) => {
-  console.log("proxyAddress", proxyAddress);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);

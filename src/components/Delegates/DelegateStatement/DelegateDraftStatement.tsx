@@ -10,6 +10,8 @@ import { useCallback, useEffect, useState } from "react";
 import { publishDelegateStatement } from "@/app/api/common/delegateStatement/publishDelegateStatement";
 import { useChainId } from "wagmi";
 import { useDelegate } from "@/hooks/useDelegate";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { useRouter } from "next/navigation";
 
 export const DraftStatementDetails = ({
   delegateStatement,
@@ -18,7 +20,8 @@ export const DraftStatementDetails = ({
 }) => {
   const [submitDraft, setSubmitDraft] = useState(false);
   const { selectedWalletAddress } = useSelectedWallet();
-
+  const openDialog = useOpenDialog();
+  const router = useRouter();
   const { data: draftStatement, refetch } = useGetDelegateDraftStatement(
     selectedWalletAddress
   );
@@ -52,8 +55,8 @@ export const DraftStatementDetails = ({
   const formattedDate = formatDate(date);
   const formattedTime = formatTime(date).toLowerCase();
 
-  const confirmedSignatures = safeMessageDetails?.confirmations?.length || 0;
-  const requiredSignatures = safeInfo?.threshold || 0;
+  const confirmedSignatures = safeMessageDetails?.confirmations?.length;
+  const requiredSignatures = safeInfo?.threshold;
   const signaturesDisplay = `${confirmedSignatures}/${requiredSignatures} signatures`;
 
   const publishDraft = useCallback(async () => {
@@ -73,7 +76,11 @@ export const DraftStatementDetails = ({
       delegateStatement?.message_hash !== draftStatement?.message_hash &&
       !submitDraft
     ) {
-      if (confirmedSignatures >= requiredSignatures) {
+      if (
+        confirmedSignatures &&
+        requiredSignatures &&
+        confirmedSignatures >= requiredSignatures
+      ) {
         setSubmitDraft(true);
         publishDraft();
       }
@@ -90,6 +97,19 @@ export const DraftStatementDetails = ({
     refetchStatement,
   ]);
 
+  const openDeleteDialog = useCallback(async () => {
+    if (!draftStatement?.message_hash || !selectedWalletAddress) {
+      return;
+    }
+    openDialog({
+      type: "SAFE_DELETE_DRAFT_STATEMENT",
+      params: {
+        address: selectedWalletAddress,
+        messageHash: draftStatement?.message_hash,
+      },
+    });
+  }, [selectedWalletAddress, draftStatement?.message_hash]);
+
   if (
     selectedWalletAddress?.toLowerCase() !==
     draftStatement?.address?.toLowerCase()
@@ -97,12 +117,20 @@ export const DraftStatementDetails = ({
     return null;
   }
 
-  if (confirmedSignatures >= requiredSignatures) {
+  if (
+    confirmedSignatures &&
+    requiredSignatures &&
+    confirmedSignatures >= requiredSignatures
+  ) {
     return null;
   }
 
+  const onClickViewEdits = () => {
+    router.push(`/delegates/create?draftView=true`);
+  };
+
   return (
-    <div className="flex flex-col bg-neutral rounded-xl shadow-newDefault py-8 px-6 mb-4">
+    <div className="flex flex-col bg-neutral rounded-xl py-8 px-6 mb-4 border border-line">
       <div className="inline-flex flex-col justify-start items-start gap-6">
         <div className="flex flex-col justify-start items-start gap-4">
           <div className="self-stretch inline-flex justify-between items-center">
@@ -134,9 +162,15 @@ export const DraftStatementDetails = ({
         <div className="inline-flex justify-start items-start gap-4">
           <button
             className="px-5 py-3 bg-white rounded-full shadow-[0px_4px_12px_0px_rgba(0,0,0,0.02)] shadow-[0px_2px_2px_0px_rgba(0,0,0,0.03)] outline outline-1 outline-offset-[-1px] outline-neutral-900 flex justify-center items-center gap-2"
-            onClick={() => {
-              console.log("Cancel request clicked");
-            }}
+            onClick={onClickViewEdits}
+          >
+            <div className="justify-center text-neutral-900 text-base font-medium leading-normal">
+              View edits
+            </div>
+          </button>
+          <button
+            className="px-5 py-3 bg-white rounded-full shadow-[0px_4px_12px_0px_rgba(0,0,0,0.02)] shadow-[0px_2px_2px_0px_rgba(0,0,0,0.03)] outline outline-1 outline-offset-[-1px] outline-neutral-900 flex justify-center items-center gap-2"
+            onClick={openDeleteDialog}
           >
             <div className="justify-center text-neutral-900 text-base font-medium leading-normal">
               Cancel request

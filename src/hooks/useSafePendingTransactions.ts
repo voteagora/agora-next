@@ -35,7 +35,7 @@ export const useSafePendingTransactions = () => {
     },
     enabled: !isSelectedPrimaryAddress && !!selectedWalletAddress,
   });
-  console.log("pendingTransactions", pendingTransactions);
+
   const pendingTransactionsForOwner = useMemo(() => {
     if (!pendingTransactions?.results || !address) return [];
 

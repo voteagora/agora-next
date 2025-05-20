@@ -31,7 +31,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { DelegateStatement } from "@/app/api/common/delegates/delegate";
 
 export default function DelegateStatementForm({
   form,
@@ -188,7 +187,7 @@ export default function DelegateStatementForm({
           <DelegateStatementFormSection form={form} />
           {hasTopIssues && <TopIssuesFormSection form={form} />}
           {hasStakeholders && <TopStakeholdersFormSection form={form} />}
-          <div className="py-8 px-6 ">
+          <div className="p-6 ">
             {requireCodeOfConduct && (
               <DelegateStatementBoolSelector form={form} />
             )}
@@ -196,10 +195,10 @@ export default function DelegateStatementForm({
               <DelegateStatementDaoPrinciplesSelector form={form} />
             )}
           </div>
-          <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 py-8 px-6 flex-wrap border-t border-line">
+          <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 p-6 flex-wrap border-t border-line">
             <Button
               variant="outline"
-              className="flex-1 py-3 px-4 text-primary rounded-full text-base"
+              className="flex-1 py-3 px-4 text-primary rounded-full text-base h-12"
               type="button"
             >
               Cancel
@@ -207,7 +206,7 @@ export default function DelegateStatementForm({
 
             <Button
               variant="brand"
-              className="flex-1 py-3 px-4 text-neutral text-base"
+              className="flex-1 py-3 px-4 text-neutral text-base h-12"
               disabled={!canSubmit}
               type="submit"
             >
@@ -233,7 +232,7 @@ export default function DelegateStatementForm({
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-center md:items-start lg:gap-16 md:gap-8 justify-between mt-12 w-full max-w-full">
+    <div className="flex flex-col md:flex-row items-center md:items-start lg:gap-16 md:gap-8 justify-between w-full max-w-full">
       {delegate && (
         <div className="flex flex-col static md:sticky top-16 shrink-0 w-full lg:max-w-[350px] md:max-w-[300px]">
           <DelegateCard delegate={delegate} isEditMode />

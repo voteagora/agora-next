@@ -128,13 +128,8 @@ function VoteButton({
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
 
-  const { pendingTransactions, pendingVotes } = useSafePendingTransactions();
-  // console.log(
-  //   "pendingTransactions",
-  //   pendingTransactions,
-  //   pendingVotes,
-  //   proposal
-  // );
+  const { pendingVotes } = useSafePendingTransactions();
+
   const missingVote = checkMissingVoteForDelegate(
     delegateVotes ?? [],
     votingPower ?? {
