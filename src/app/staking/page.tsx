@@ -1,3 +1,5 @@
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
+
 import React from "react";
 import { StakingStats } from "@/app/staking/components/StakingStats";
 import Tenant from "@/lib/tenant/tenant";

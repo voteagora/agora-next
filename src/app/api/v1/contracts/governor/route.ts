@@ -1,9 +1,10 @@
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { NextRequest, NextResponse } from "next/server";
 import { traceWithUserId } from "../../apiUtils";
-import Tenant from "@/lib/tenant/tenant";
 
 export async function GET(request: NextRequest) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { default: Tenant } = await import("@/lib/tenant/tenant");
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
@@ -13,9 +14,10 @@ export async function GET(request: NextRequest) {
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
       const { contracts } = Tenant.current();
-      const address = contracts.governor.address;
-      const chainId = contracts.governor.chain.id;
-      return NextResponse.json({ address, chainId });
+      return NextResponse.json({
+        address: contracts.governor.address,
+        abi: contracts.governor.abi,
+      });
     } catch (e: any) {
       return new Response("Internal server error: " + e.toString(), {
         status: 500,

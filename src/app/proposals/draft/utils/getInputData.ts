@@ -2,7 +2,11 @@ import { ethers } from "ethers";
 import { DraftProposal, ProposalType } from "../types";
 import { decodeFunctionData, encodeAbiParameters, parseEther } from "viem";
 import Tenant from "@/lib/tenant/tenant";
-import { TIMELOCK_TYPE, TENANT_NAMESPACES } from "@/lib/constants";
+import {
+  TIMELOCK_TYPE,
+  TENANT_NAMESPACES,
+  ZERO_ADDRESS,
+} from "@/lib/constants";
 import { disapprovalThreshold } from "@/lib/constants";
 import { getProposalTypeAddress } from "./stages";
 
@@ -94,13 +98,11 @@ export function getInputData(proposal: DraftProposal): {
       ];
 
       if (proposal.transactions.length === 0) {
-        // empty eth transfer from governor
-        const governorAddress = contracts.governor.address;
         const timelockAddress = contracts.timelock?.address;
         targets.push(
           contracts.supportScopes && timelockAddress
             ? (timelockAddress as `0x${string}`)
-            : (governorAddress as `0x${string}`)
+            : ZERO_ADDRESS
         );
         values.push(0);
         calldatas.push(

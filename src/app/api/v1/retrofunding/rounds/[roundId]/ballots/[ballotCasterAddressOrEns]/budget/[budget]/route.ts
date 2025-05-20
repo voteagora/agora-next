@@ -1,12 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import {
-  authenticateApiUser,
-  getCategoryScope,
-  validateAddressScope,
-} from "@/app/lib/auth/serverAuth";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { z } from "zod";
-import { updateBallotBudget } from "@/app/api/common/ballots/updateBallot";
+import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
 const budgetParser = z.string(z.number().min(2000000).max(8000000)); // number between 2M and 8M
 
@@ -20,6 +14,14 @@ export async function POST(
     };
   }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { validateAddressScope } = await import("@/app/lib/auth/serverAuth");
+
+  const { updateBallotBudget } = await import(
+    "@/app/api/common/ballots/updateBallot"
+  );
+  const { getCategoryScope } = await import("@/app/lib/auth/serverAuth");
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

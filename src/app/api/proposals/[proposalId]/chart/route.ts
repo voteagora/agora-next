@@ -1,23 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  getSnapshotVotesChart,
-  getVotesChart,
-} from "@/app/api/proposals/getVotesChart";
 
 export async function GET(
   request: NextRequest,
-  route: { params: { proposalId: string } }
+  { params }: { params: { proposalId: string } }
 ) {
+  const { getVotesChart } = await import("@/app/api/proposals/getVotesChart");
+  const { getSnapshotVotesChart } = await import(
+    "@/app/api/proposals/getVotesChart"
+  );
+
   const searchParams = request.nextUrl.searchParams;
   const proposalType = searchParams.get("proposalType");
   try {
     const votes =
       proposalType === "SNAPSHOT"
         ? await getSnapshotVotesChart({
-            proposalId: route.params.proposalId,
+            proposalId: params.proposalId,
           })
         : await getVotesChart({
-            proposalId: route.params.proposalId,
+            proposalId: params.proposalId,
           });
     return NextResponse.json(votes);
   } catch (e: any) {

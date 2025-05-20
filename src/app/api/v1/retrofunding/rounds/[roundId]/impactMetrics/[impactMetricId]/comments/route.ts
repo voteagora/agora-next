@@ -1,9 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
-import { fetchImpactMetricComments } from "@/app/api/common/comments/getImpactMetricComments";
-import { createImpactMetricComment } from "@/app/api/common/comments/createImpactMetricComment";
 import {
   createOptionalNumberValidator,
   createOptionalStringValidator,
@@ -33,6 +30,12 @@ export async function GET(
   request: NextRequest,
   route: { params: { roundId: string; impactMetricId: string } }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+
+  const { fetchImpactMetricComments } = await import(
+    "@/app/api/common/comments/getImpactMetricComments"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
@@ -68,6 +71,12 @@ export async function PUT(
   request: NextRequest,
   route: { params: { roundId: string; impactMetricId: string } }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+
+  const { createImpactMetricComment } = await import(
+    "@/app/api/common/comments/createImpactMetricComment"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

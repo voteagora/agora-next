@@ -1,4 +1,5 @@
-"use server";
+export const dynamic = "force-dynamic"; // needed for both app and e2e
+// Note this page used to be 'use server', but appears to function fine without this directive with the above enabled.
 
 import React from "react";
 import { NewStakeFlow } from "@/app/staking/new/components/NewStakeFlow";

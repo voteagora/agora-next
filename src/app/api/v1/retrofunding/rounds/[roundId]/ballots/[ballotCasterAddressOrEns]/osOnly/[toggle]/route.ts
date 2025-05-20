@@ -1,10 +1,5 @@
-import { updateBallotOsOnly } from "@/app/api/common/ballots/updateBallot";
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import {
-  authenticateApiUser,
-  validateAddressScope,
-} from "@/app/lib/auth/serverAuth";
 import { NextRequest, NextResponse } from "next/server";
+import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
 export async function POST(
   request: NextRequest,
@@ -16,6 +11,13 @@ export async function POST(
     };
   }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { validateAddressScope } = await import("@/app/lib/auth/serverAuth");
+
+  const { updateBallotOsOnly } = await import(
+    "@/app/api/common/ballots/updateBallot"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

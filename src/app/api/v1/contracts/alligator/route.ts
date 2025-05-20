@@ -1,9 +1,10 @@
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { NextRequest, NextResponse } from "next/server";
 import { traceWithUserId } from "../../apiUtils";
-import Tenant from "@/lib/tenant/tenant";
 
 export async function GET(request: NextRequest) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { default: Tenant } = await import("@/lib/tenant/tenant");
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

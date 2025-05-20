@@ -25,6 +25,83 @@ import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 
+interface UndelegateActionButtonsProps {
+  isDisabledInTenant: boolean;
+  tokenSymbol: string;
+  sameDelegatee: boolean;
+  executeDelegate: () => void;
+  isError: boolean;
+  didFailDelegation: boolean;
+  isProcessingDelegation: boolean;
+  isProcessingSponsoredUnelegation: boolean;
+  didProcessDelegation: boolean;
+  didProcessSponsoredUnelegation: boolean;
+  isGasRelayLive: boolean;
+  sponsoredTxnHash: `0x${string}` | undefined;
+  delegateTxHash: `0x${string}` | undefined;
+}
+
+const UndelegateActionButtons = ({
+  isDisabledInTenant,
+  tokenSymbol,
+  sameDelegatee,
+  executeDelegate,
+  isError,
+  didFailDelegation,
+  isProcessingDelegation,
+  isProcessingSponsoredUnelegation,
+  didProcessDelegation,
+  didProcessSponsoredUnelegation,
+  isGasRelayLive,
+  sponsoredTxnHash,
+  delegateTxHash,
+}: UndelegateActionButtonsProps) => {
+  if (isDisabledInTenant) {
+    return (
+      <Button disabled={true}>
+        {tokenSymbol} delegation is disabled at this time
+      </Button>
+    );
+  }
+
+  if (isError || didFailDelegation) {
+    return (
+      <Button disabled={false} onClick={executeDelegate}>
+        Undelegation failed - try again
+      </Button>
+    );
+  }
+
+  if (isProcessingDelegation || isProcessingSponsoredUnelegation) {
+    return (
+      <Button disabled={true}>Submitting your undelegation request...</Button>
+    );
+  }
+
+  if (didProcessDelegation || didProcessSponsoredUnelegation) {
+    return (
+      <div>
+        <Button className="w-full" disabled={false}>
+          Undelegation completed!
+        </Button>
+        <BlockScanUrls
+          hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
+        />
+      </div>
+    );
+  }
+
+  if (sameDelegatee) {
+    return (
+      <ShadcnButton onClick={executeDelegate}>
+        Remove your own delegation
+      </ShadcnButton>
+    );
+  }
+
+  return <ShadcnButton onClick={executeDelegate}>Undelegate</ShadcnButton>;
+};
+
 export function UndelegateDialog({
   delegate,
   fetchBalanceForDirectDelegation,
@@ -126,53 +203,6 @@ export function UndelegateDialog({
     }
   };
 
-  const renderActionButtons = () => {
-    if (isDisabledInTenant) {
-      return (
-        <Button disabled={true}>
-          {token.symbol} delegation is disabled at this time
-        </Button>
-      );
-    }
-
-    if (sameDelegatee) {
-      return (
-        <ShadcnButton onClick={executeDelegate}>
-          Remove your own delegation
-        </ShadcnButton>
-      );
-    }
-
-    if (isError || didFailDelegation) {
-      return (
-        <Button disabled={false} onClick={executeDelegate}>
-          Undelegation failed - try again
-        </Button>
-      );
-    }
-
-    if (isProcessingDelegation || isProcessingSponsoredUnelegation) {
-      return (
-        <Button disabled={true}>Submitting your undelegation request...</Button>
-      );
-    }
-
-    if (didProcessDelegation || didProcessSponsoredUnelegation) {
-      return (
-        <div>
-          <Button className="w-full" disabled={false}>
-            Undelegation completed!
-          </Button>
-          <BlockScanUrls
-            hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
-          />
-        </div>
-      );
-    }
-
-    return <ShadcnButton onClick={executeDelegate}>Undelegate</ShadcnButton>;
-  };
-
   useEffect(() => {
     if (!isReady) {
       fetchData();
@@ -248,7 +278,21 @@ export function UndelegateDialog({
           </div>
         )}
 
-        {renderActionButtons()}
+        <UndelegateActionButtons
+          isDisabledInTenant={isDisabledInTenant}
+          tokenSymbol={token.symbol}
+          sameDelegatee={sameDelegatee}
+          executeDelegate={executeDelegate}
+          isError={isError}
+          didFailDelegation={didFailDelegation}
+          isProcessingDelegation={isProcessingDelegation}
+          isProcessingSponsoredUnelegation={isProcessingSponsoredUnelegation}
+          didProcessDelegation={didProcessDelegation}
+          didProcessSponsoredUnelegation={didProcessSponsoredUnelegation}
+          isGasRelayLive={isGasRelayLive}
+          sponsoredTxnHash={sponsoredTxnHash}
+          delegateTxHash={delegateTxHash}
+        />
       </div>
     </div>
   );

@@ -4,7 +4,11 @@ const { contracts, namespace } = Tenant.current();
 
 export const getDaoNodeURLForNamespace = (namespace: string) => {
   const url = process.env.DAONODE_URL_TEMPLATE;
-  const parsedUrl = url?.replace("{TENANT_NAMESPACE}", namespace);
+  let parsedUrl = url?.replace("{TENANT_NAMESPACE}", namespace);
+  if (parsedUrl && !parsedUrl.endsWith("/")) {
+    parsedUrl = `${parsedUrl}/`;
+  }
+
   return parsedUrl;
 };
 

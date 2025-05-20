@@ -1,17 +1,23 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/getTreasuryBalanceTS";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { frequency: string } }
+) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { apiFetchTreasuryBalanceTS } = await import(
+    "@/app/api/balances/[frequency]/getTreasuryBalanceTS"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
     return new Response(authResponse.failReason, { status: 401 });
   }
 
-  const frequency = request.nextUrl.pathname.split("/")[3];
-
   try {
+    const frequency = request.nextUrl.pathname.split("/")[3];
+
     const communityInfo = await apiFetchTreasuryBalanceTS(frequency);
     return NextResponse.json(communityInfo);
   } catch (e: any) {
