@@ -10,6 +10,7 @@ import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 import { SafeIcon } from "@/icons/SafeIcon";
 import { MetamaskIcon } from "@/icons/MetamaskIcon";
 import { useGetSafesForAddress } from "@/hooks/useGetSafesForAddress";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
 
 type Props = {
   ensName: string | undefined;
@@ -23,6 +24,8 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
   const connectorIcon = connector?.icon;
   const connectorName = connector?.name;
   const { data: safes } = useGetSafesForAddress(address);
+  const { pendingTransactionsForOwner } = useSafePendingTransactions();
+
   const walletIcon = () => {
     if (!isSelectedPrimaryAddress) {
       return (
@@ -64,6 +67,10 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
                 <ENSName address={selectedWalletAddress} />
               )}
             </div>
+            {pendingTransactionsForOwner.length > 0 &&
+              !isSelectedPrimaryAddress && (
+                <div className="rounded-full h-[10px] w-[10px] bg-negative inline-block" />
+              )}
           </div>
         </Popover.Button>
 
