@@ -30,6 +30,7 @@ export async function publishDelegateStatement({
     revalidateTag(
       `delegateStatement-${message.safe.toLowerCase()}-${stageStatus.DRAFT}`
     );
+    revalidateTag("delegateStatement");
     revalidateDelegateAddressPage(message.safe.toLowerCase());
     return prismaWeb2Client.delegateStatements
       .update({

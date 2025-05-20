@@ -29,7 +29,7 @@ export const getLatestPublishedDelegateStatement = async (
         dao_slug: slug,
       },
       orderBy: {
-        createdAt: "desc",
+        updatedAt: "desc",
       },
     });
   } catch (error) {
@@ -57,7 +57,16 @@ async function getDelegateStatementForAddress({
   const { slug } = Tenant.current();
 
   return prismaWeb2Client.delegateStatements
-    .findFirst({ where: { address: address.toLowerCase(), dao_slug: slug } })
+    .findFirst({
+      where: {
+        address: address.toLowerCase(),
+        dao_slug: slug,
+        stage: stageStatus.PUBLISHED,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    })
     .catch((error) => console.error(error));
 }
 
@@ -101,6 +110,9 @@ export async function getDelegateStatementsForAddress({
           address: address.toLowerCase(),
           dao_slug: slug,
         },
+        orderBy: {
+          createdAt: "desc",
+        },
       })
       .catch((error) => console.error(error));
   } else {
@@ -110,6 +122,9 @@ export async function getDelegateStatementsForAddress({
           address: address.toLowerCase(),
           dao_slug: slug,
           stage: stage,
+        },
+        orderBy: {
+          createdAt: "desc",
         },
       })
       .catch((error) => console.error(error));

@@ -39,6 +39,7 @@ import { ScopeData } from "@/lib/types";
 import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActionDialog";
 import { SafeWalletConfirmationDialog } from "../SafeWalletConfirmation";
 import { SafeSignConfirmationDialog } from "../SafeSignConfirmation";
+import { SafeDeleteStatementDialog } from "../SafeDeleteStatement";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -64,7 +65,8 @@ export type DialogType =
   | CreateScopeDialogType
   | AccountActionDialogType
   | SafeWalletConfirmationDialogType
-  | SafeSignConfirmationDialogType;
+  | SafeSignConfirmationDialogType
+  | SafeDeleteStatementDialogType;
 
 // | FaqDialogType
 
@@ -298,6 +300,14 @@ export type SafeSignConfirmationDialogType = {
   type: "SAFE_SIGN_CONFIRMATION";
   params: {
     onSubmit?: () => Promise<void>;
+  };
+};
+
+export type SafeDeleteStatementDialogType = {
+  type: "SAFE_DELETE_DRAFT_STATEMENT";
+  params: {
+    address: string;
+    messageHash: string;
   };
 };
 
@@ -548,6 +558,13 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
+  SAFE_DELETE_DRAFT_STATEMENT: ({ address, messageHash }, closeDialog) => (
+    <SafeDeleteStatementDialog
+      closeDialog={closeDialog}
+      address={address}
+      messageHash={messageHash}
+    />
+  ),
   // FAQ: () => {
   //   return <FaqDialog />;
   // },

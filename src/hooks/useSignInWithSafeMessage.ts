@@ -63,6 +63,7 @@ export const useSignInWithSafeMessage = () => {
         );
         const signature = signedMessage.getSignature(address);
         // Add message to Safe Transaction Service using the correct API format
+
         await safeApiKit?.addMessage(safeAddress, {
           message,
           signature: buildSignatureBytes([signature as SafeSignature]),

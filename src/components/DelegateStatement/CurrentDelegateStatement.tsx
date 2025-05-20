@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { fetchDelegateStatement } from "@/app/delegates/actions";
-import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,7 +12,9 @@ import AgoraLoader, {
 } from "@/components/shared/AgoraLoader/AgoraLoader";
 import DelegateStatementForm from "@/components/DelegateStatement/DelegateStatementForm";
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
-import { useAccount } from "wagmi";
+import Link from "next/link";
+import { BackArrowIcon } from "@/icons/BackArrow";
+import { useSearchParams } from "next/navigation";
 import { useGetDelegateDraftStatement } from "@/hooks/useGetDelegateDraftStatement";
 
 const { slug: daoSlug } = Tenant.current();
@@ -69,8 +70,10 @@ export default function CurrentDelegateStatement() {
   const [loading, setLoading] = useState<boolean>(true);
   const [delegateStatement, setDelegateStatement] =
     useState<DelegateStatement | null>(null);
-  const { data: draftStatement } = useGetDelegateDraftStatement(address);
-  const { isConnected, isConnecting } = useAccount();
+  const searchParams = useSearchParams();
+  const draftView = searchParams?.get("draftView") === "true";
+  const { data: delegateStatementDraft } =
+    useGetDelegateDraftStatement(address);
   // Display the first two delegate issues as default values
   const topIssues = ui.governanceIssues;
   const defaultIssues = !topIssues
@@ -139,7 +142,7 @@ export default function CurrentDelegateStatement() {
     resolver: zodResolver(formSchema),
     defaultValues: setDefaultValues(delegateStatement),
     mode: "onChange",
-    disabled: !!draftStatement,
+    disabled: draftView,
   });
   const { reset } = form;
 
@@ -153,11 +156,14 @@ export default function CurrentDelegateStatement() {
       setLoading(false);
     }
 
-    if (address) {
+    if (address && !draftView) {
       setLoading(true);
       _getDelegateStatement();
+    } else if (address && draftView) {
+      setDelegateStatement(delegateStatementDraft as DelegateStatement);
+      reset(setDefaultValues(delegateStatementDraft as DelegateStatement));
     }
-  }, [address, reset]);
+  }, [address, reset, draftView, delegateStatementDraft]);
 
   return loading ? (
     shouldHideAgoraBranding ? (
@@ -166,6 +172,17 @@ export default function CurrentDelegateStatement() {
       <AgoraLoader />
     )
   ) : (
-    <DelegateStatementForm form={form} canEdit={!draftStatement} />
+    <>
+      <div className="flex items-center">
+        <Link
+          className="cursor-pointer border border-line rounded-full w-10 h-10 flex items-center justify-center mt-6 mb-6"
+          href={`/delegates/${address}`}
+        >
+          <BackArrowIcon className="h-6 w-6 stroke-primary" />
+        </Link>
+        <span className="text-primary font-bold pl-3">Back</span>
+      </div>
+      <DelegateStatementForm form={form} canEdit={!draftView} />
+    </>
   );
 }

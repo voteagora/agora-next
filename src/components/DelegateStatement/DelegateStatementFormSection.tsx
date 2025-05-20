@@ -31,10 +31,10 @@ A message to the community and ecosystem:
 Discourse username:`;
 
   return (
-    <div className="flex flex-col py-8 px-6 text-primary">
+    <div className="flex flex-col p-6 text-primary">
       <Tabs defaultValue="write">
-        <div className="flex flex-row gap-4 justify-between items-baseline">
-          <div className="flex flex-row items-baseline gap-2">
+        <div className="flex flex-row gap-4 justify-between items-center">
+          <div className="flex flex-row items-center gap-2">
             <h3 className="text-2xl font-bold text-primary">
               Delegate statement
             </h3>
@@ -53,13 +53,13 @@ Discourse username:`;
             </TabsTrigger>
           </TabsList>
         </div>
-        <TabsContent value="write">
+        <TabsContent value="write" className="mt-6">
           <FormField
             control={form.control}
             name="delegateStatement"
             render={({ field }) => (
               <Textarea
-                className="mt-2 min-h-[16rem]"
+                className="min-h-[16rem]"
                 onFocus={addDefaultValueOnFocus}
                 placeholder={defaultValue}
                 {...field}
