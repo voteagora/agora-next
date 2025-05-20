@@ -1,7 +1,7 @@
 "use client";
 
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
-import OtherInfoFormSection from "./OtherInfoFormSection";
+import SocialFormSection from "./SocialFormSection";
 import { Button } from "@/components/ui/button";
 import { type UseFormReturn } from "react-hook-form";
 import { Form } from "@/components/ui/form";
@@ -24,6 +24,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { PublicIcon } from "@/icons/PublicIcon";
+import { LockIcon } from "@/icons/lockIcon";
 
 export default function DelegateDetailsForm({
   form,
@@ -179,13 +181,32 @@ export default function DelegateDetailsForm({
       <Form {...form}>
         <form onSubmit={checkSafeConfirmation} className="text-left">
           <div className="flex flex-col bg-neutral rounded-xl border border-line mb-4">
-            <OtherInfoFormSection form={form as any} />
+            <div className="self-stretch px-6 py-3.5 bg-brandPrimary/10 border-b border-line inline-flex justify-start items-center gap-1.5">
+              <PublicIcon className="stroke-brandPrimary" />
+              <div className="flex justify-start items-start gap-1 justify-center text-xs leading-none">
+                <div className="font-semibold">Public:</div>
+                <div className="font-medium">
+                  This information is publicly visible on your delegate profile
+                  but not on-chain.
+                </div>
+              </div>
+            </div>
+            <SocialFormSection form={form as any} />
           </div>
           <div className="flex flex-col bg-neutral rounded-xl border border-line mb-4">
+            <div className="self-stretch px-6 py-3.5 bg-brandPrimary/10 border-b border-line inline-flex justify-start items-center gap-1.5">
+              <LockIcon className="stroke-brandPrimary" />
+              <div className="flex justify-start items-start gap-1 justify-center text-xs leading-none">
+                <div className="font-semibold">Private:</div>
+                <div className="font-medium">
+                  Your email is private and will never be shared publicly.
+                </div>
+              </div>
+            </div>
             <DelegateEmailDetails form={form as any} />
           </div>
           <div className="flex flex-col bg-neutral rounded-xl border border-line">
-            <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 py-8 px-6 flex-wrap">
+            <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 p-6 flex-wrap">
               <Button
                 variant="outline"
                 className="flex-1 py-3 px-4 text-primary rounded-full text-base h-12"
@@ -214,7 +235,7 @@ export default function DelegateDetailsForm({
   };
 
   return (
-    <div className="flex flex-col md:flex-row md:items-start lg:gap-16 md:gap-8 justify-between mt-12 w-full max-w-full">
+    <div className="flex flex-col md:flex-row md:items-start lg:gap-16 md:gap-8 justify-between w-full max-w-full">
       {delegate && (
         <div className="flex flex-col static md:sticky top-16 shrink-0 w-full lg:max-w-[350px] md:max-w-[300px]">
           <DelegateCard delegate={delegate} isEditMode />

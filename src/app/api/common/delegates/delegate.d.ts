@@ -1,4 +1,4 @@
-import { DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
+import { DelegateStatement as DelegateStatementType } from "@/app/api/delegateStatement/delegateStatement";
 import { Prisma } from "@prisma/client";
 
 export type Delegate = {
@@ -20,7 +20,7 @@ export type Delegate = {
   lastTenProps: string;
   totalProposals: number;
   numOfDelegators: bigint;
-  statement: DelegateStatement | null;
+  statement: DelegateStatementType | null;
   relativeVotingPowerToVotableSupply: string;
 };
 
@@ -41,14 +41,13 @@ export type DelegatesGetPayload = {
   advanced_vp: Prisma.Decimal;
   voting_power: Prisma.Decimal;
   citizen: boolean;
-  statement: DelegateStatement;
+  statement: DelegateStatementType;
 };
 
 type DelegateStatement = {
-  created_at: Date;
   discord: string | null;
   endorsed: boolean;
-  payload: { delegateStatement: string };
+  payload: DelegateStatementType;
   signature: string;
   twitter: string | null;
   updated_at: Date;
@@ -62,6 +61,8 @@ type DelegateStatement = {
   };
   stage: stageStatus;
   message_hash: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type DelegateStats = {

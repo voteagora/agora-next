@@ -14,6 +14,9 @@ import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 import { useDelegate } from "@/hooks/useDelegate";
 import DelegateDetailsForm from "./DelegateDetailsForm";
 import { useGetDelegateDraftStatement } from "@/hooks/useGetDelegateDraftStatement";
+import Link from "next/link";
+import { BackArrowIcon } from "@/icons/BackArrow";
+import { useSearchParams } from "next/navigation";
 
 const { slug: daoSlug } = Tenant.current();
 
@@ -49,6 +52,8 @@ export default function DelegateDetailsPage() {
     useState<DelegateStatement | null>(null);
   const { data: delegate } = useDelegate({ address });
   const { data: draftStatement } = useGetDelegateDraftStatement(address);
+  const searchParams = useSearchParams();
+  const draftView = searchParams?.get("draftView") === "true";
 
   const setDefaultValues = (delegateStatement: DelegateStatement | null) => {
     return {
@@ -71,7 +76,7 @@ export default function DelegateDetailsPage() {
     resolver: zodResolver(formSchema),
     defaultValues: setDefaultValues(delegateStatement),
     mode: "onChange",
-    disabled: !address,
+    disabled: draftView,
   });
   const { reset } = form;
 
@@ -85,11 +90,15 @@ export default function DelegateDetailsPage() {
       setLoading(false);
     }
 
-    if (address) {
+    if (address && !draftView) {
       setLoading(true);
       _getDelegateStatement();
+    } else if (address && draftView) {
+      setDelegateStatement(draftStatement as DelegateStatement);
+      reset(setDefaultValues(draftStatement as DelegateStatement));
+      setLoading(false);
     }
-  }, [address, reset]);
+  }, [address, reset, draftStatement, draftView]);
 
   return loading ? (
     shouldHideAgoraBranding ? (
@@ -98,10 +107,21 @@ export default function DelegateDetailsPage() {
       <AgoraLoader />
     )
   ) : (
-    <DelegateDetailsForm
-      form={form}
-      delegate={delegate}
-      canEdit={!draftStatement}
-    />
+    <>
+      <div className="flex items-center">
+        <Link
+          className="cursor-pointer border border-line rounded-full w-10 h-10 flex items-center justify-center mt-6 mb-6"
+          href={`/delegates/${address}`}
+        >
+          <BackArrowIcon className="h-6 w-6 stroke-primary" />
+        </Link>
+        <span className="text-primary font-bold pl-3">Back</span>
+      </div>
+      <DelegateDetailsForm
+        form={form}
+        delegate={delegate}
+        canEdit={!draftView}
+      />
+    </>
   );
 }

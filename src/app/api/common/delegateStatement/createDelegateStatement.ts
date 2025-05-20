@@ -8,6 +8,8 @@ import { Prisma } from "@prisma/client";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
 import { stageStatus } from "@/app/lib/sharedEnums";
 import { createHash } from "crypto";
+import Safe from "@safe-global/protocol-kit";
+import { getTransportForChain } from "@/lib/utils";
 
 export async function createDelegateStatement({
   address,
@@ -29,7 +31,7 @@ export async function createDelegateStatement({
   try {
     const { twitter, warpcast, discord, email, notificationPreferences } =
       delegateStatement;
-    const { slug } = Tenant.current();
+    const { slug, contracts } = Tenant.current();
 
     let valid = false;
     if (!message_hash) {
@@ -39,6 +41,14 @@ export async function createDelegateStatement({
         signature,
       });
     } else {
+      // const protocolKit = await Safe.init({
+      //   provider: getTransportForChain(contracts.governor.chain.id),
+      //   safeAddress: address,
+      // });
+      // const isValidSignature = await protocolKit.isValidSignature(
+      //   message_hash,
+      //   signature
+      // );
       valid = true;
     }
 

@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import SafeApiKit from "@safe-global/api-kit";
 import { useAccount, useChainId } from "wagmi";
+import { getTransportForChain } from "@/lib/utils";
+import Tenant from "@/lib/tenant/tenant";
 
 interface SafeApiKitContextType {
   safeApiKit: SafeApiKit | null;
@@ -27,6 +29,8 @@ export const SafeApiKitProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
+  const { contracts } = Tenant.current();
+
   useEffect(() => {
     const initSafeApiKit = async () => {
       if (!isConnected || !address) {
@@ -40,7 +44,7 @@ export const SafeApiKitProvider: React.FC<{ children: React.ReactNode }> = ({
 
         // Initialize the Safe API Kit
         const apiKit = new SafeApiKit({
-          chainId: BigInt(chainId),
+          chainId: contracts.governor.chain.id as any,
         });
 
         setSafeApiKit(apiKit);

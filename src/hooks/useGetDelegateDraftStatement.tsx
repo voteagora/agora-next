@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchDelegateDraftStatements } from "@/app/delegates/actions";
+import { fetchDelegateDraftStatement } from "@/app/delegates/actions";
 
 export const useGetDelegateDraftStatement = (
   address?: string | `0x${string}`
@@ -8,7 +8,7 @@ export const useGetDelegateDraftStatement = (
     queryKey: ["draftStatement", address],
     queryFn: async () => {
       if (!address) return null;
-      const statement = await fetchDelegateDraftStatements(
+      const statement = await fetchDelegateDraftStatement(
         address.toLowerCase()
       );
       return statement?.[0] || null;

@@ -73,18 +73,32 @@ export const fetchDelegateStatement = unstable_cache(
   }
 );
 
-export const fetchDelegateDraftStatements = unstable_cache(
-  async (address: string) => {
-    return apiFetchDelegateStatements(address, stageStatus.DRAFT);
-  },
-  ["delegateStatement-${address}-${stage}"],
-  {
-    // Longer cache is acceptable since the statement is not expected to change
-    // often and invalidated with every delegate statement update
-    revalidate: 600, // 10 minute cache
-    tags: ["delegateStatement-${address}-${stage}"],
+export const fetchDelegateDraftStatement = async (address: string) => {
+  try {
+    const cachedFetchDelegateDraft = unstable_cache(
+      async () => {
+        return apiFetchDelegateStatements(address, stageStatus.DRAFT);
+      },
+      [`delegateStatement-${address.toLowerCase()}-${stageStatus.DRAFT}`],
+      {
+        // Longer cache is acceptable since the statement is not expected to change
+        // often and invalidated with every delegate statement update
+        revalidate: 600, // 10 minute cache
+        tags: [
+          `delegateStatement-${address.toLowerCase()}-${stageStatus.DRAFT}`,
+        ],
+      }
+    );
+
+    return await cachedFetchDelegateDraft();
+  } catch (error) {
+    console.error(
+      `Error fetching delegate draft statements for ${address}:`,
+      error
+    );
+    throw error;
   }
-);
+};
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(

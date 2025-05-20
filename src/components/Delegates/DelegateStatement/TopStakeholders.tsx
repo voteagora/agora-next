@@ -1,24 +1,17 @@
-import { DelegateStatement as DelegateStatementType } from "@/app/api/common/delegateStatement/delegateStatement";
-import { icons } from "@/assets/icons/icons";
+import { icons } from "@/icons/icons";
 import Image from "next/image";
 import Tenant from "@/lib/tenant/tenant";
 import { capitalizeFirstLetter } from "@/lib/utils";
+import { DelegateStatement } from "@/app/api/common/delegates/delegate";
 
 interface Props {
-  statement: DelegateStatementType;
+  statement: DelegateStatement;
 }
 
 export default function TopStakeholders({ statement }: Props) {
   const { ui } = Tenant.current();
 
-  const stakeholders = (
-    statement.payload as {
-      topStakeholders: {
-        value: string;
-        type: string;
-      }[];
-    }
-  ).topStakeholders;
+  const stakeholders = statement.payload?.topStakeholders;
 
   if (
     !stakeholders ||
@@ -33,7 +26,7 @@ export default function TopStakeholders({ statement }: Props) {
       <h2 className="text-2xl font-bold">Represented Stakeholders</h2>
 
       <div className="flex flex-col gap-4">
-        {stakeholders.map((stakeholder, idx) => {
+        {stakeholders.map((stakeholder: any, idx: any) => {
           const definition = ui.governanceStakeholders!.find(
             (def) => stakeholder.type === def.key
           );
