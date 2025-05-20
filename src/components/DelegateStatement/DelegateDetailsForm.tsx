@@ -129,7 +129,6 @@ export default function DelegateDetailsForm({
         signature: signature as `0x${string}`,
         message: serializedBody,
         scwAddress: scwAddress, // Pass current scwAddress
-        stage: messageHash ? stageStatus.DRAFT : stageStatus.PUBLISHED,
         message_hash: messageHash || "",
       }).catch((error) => {
         console.error("Error during submission:", error);
