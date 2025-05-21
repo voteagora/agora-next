@@ -142,7 +142,7 @@ export default function CurrentDelegateStatement() {
     resolver: zodResolver(formSchema),
     defaultValues: setDefaultValues(delegateStatement),
     mode: "onChange",
-    disabled: draftView,
+    disabled: draftView || !!delegateStatementDraft,
   });
   const { reset } = form;
 
@@ -183,7 +183,10 @@ export default function CurrentDelegateStatement() {
         </Link>
         <span className="text-primary font-bold pl-3">Back</span>
       </div>
-      <DelegateStatementForm form={form} canEdit={!draftView} />
+      <DelegateStatementForm
+        form={form}
+        canEdit={!draftView && !delegateStatementDraft}
+      />
     </>
   );
 }

@@ -18,14 +18,9 @@ import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { useSignInWithSafeMessage } from "@/hooks/useSignInWithSafeMessage";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DraftStatementDetails } from "@/components/Delegates/DelegateStatement/DelegateDraftStatement";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { PublicIcon } from "@/icons/PublicIcon";
 import { LockIcon } from "@/icons/lockIcon";
+import { FormSectionWithTooltip } from "./FormSectionWithTooltip";
 
 export default function DelegateDetailsForm({
   form,
@@ -156,7 +151,9 @@ export default function DelegateDetailsForm({
   ) {
     event.preventDefault();
     event.stopPropagation();
-
+    if (!canEdit) {
+      return;
+    }
     const submissionHandler = form.handleSubmit(onSubmit);
 
     if (!isSelectedPrimaryAddress) {
@@ -179,35 +176,26 @@ export default function DelegateDetailsForm({
     return (
       <Form {...form}>
         <form onSubmit={checkSafeConfirmation} className="text-left">
-          <div className="flex flex-col bg-neutral rounded-xl border border-line mb-4">
-            <div className="self-stretch px-6 py-3.5 bg-brandPrimary/10 border-b border-line inline-flex justify-start items-center gap-1.5 rounded-tl-xl rounded-tr-xl">
+          <FormSectionWithTooltip
+            icon={
               <PublicIcon className="stroke-brandPrimary block md:hidden lg:block" />
-              <div className="flex justify-start items-start gap-1 justify-center text-xs leading-none">
-                <div className="font-semibold block md:hidden lg:block">
-                  Public:
-                </div>
-                <div className="font-medium">
-                  This information is publicly visible on your delegate profile
-                  but not on-chain.
-                </div>
-              </div>
-            </div>
+            }
+            title="Public:"
+            description="This information is publicly visible on your delegate profile but not on-chain."
+            canEdit={canEdit}
+          >
             <SocialFormSection form={form as any} />
-          </div>
-          <div className="flex flex-col bg-neutral rounded-xl border border-line mb-4">
-            <div className="self-stretch px-6 py-3.5 bg-brandPrimary/10 border-b border-line inline-flex justify-start items-center gap-1.5 rounded-tl-xl rounded-tr-xl">
+          </FormSectionWithTooltip>
+          <FormSectionWithTooltip
+            icon={
               <LockIcon className="stroke-brandPrimary block md:hidden lg:block" />
-              <div className="flex justify-start items-start gap-1 justify-center text-xs leading-none">
-                <div className="font-semibold block md:hidden lg:block">
-                  Private:
-                </div>
-                <div className="font-medium">
-                  Your email is private and will never be shared publicly.
-                </div>
-              </div>
-            </div>
+            }
+            title="Private:"
+            description="Your email is private and will never be shared publicly."
+            canEdit={canEdit}
+          >
             <DelegateEmailDetails form={form as any} />
-          </div>
+          </FormSectionWithTooltip>
           <div className="flex flex-col bg-neutral rounded-xl border border-line">
             <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 p-6 flex-wrap">
               <Button
@@ -248,24 +236,7 @@ export default function DelegateDetailsForm({
         {!isSelectedPrimaryAddress && (
           <DraftStatementDetails delegateStatement={delegate?.statement} />
         )}
-        <div className="flex flex-col rounded-xl">
-          {canEdit ? (
-            renderForm()
-          ) : (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger className="flex flex-col w-full">
-                  {renderForm()}
-                </TooltipTrigger>
-                <TooltipContent className="text-primary text-sm max-w-[200px]">
-                  This content cannot be edited as it is pending approval from a
-                  Safe Wallet. You can cancel this submission any time prior to
-                  approvals.
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-        </div>
+        <div className="flex flex-col rounded-xl">{renderForm()}</div>
       </div>
     </div>
   );

@@ -76,7 +76,7 @@ export default function DelegateDetailsPage() {
     resolver: zodResolver(formSchema),
     defaultValues: setDefaultValues(delegateStatement),
     mode: "onChange",
-    disabled: draftView,
+    disabled: draftView || !!draftStatement,
   });
   const { reset } = form;
 
@@ -120,7 +120,7 @@ export default function DelegateDetailsPage() {
       <DelegateDetailsForm
         form={form}
         delegate={delegate}
-        canEdit={!draftView}
+        canEdit={!draftView && !draftStatement}
       />
     </>
   );
