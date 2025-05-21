@@ -121,6 +121,7 @@ async function getDelegates({
               citizen: false,
               statement: null,
               numOfDelegators: BigInt(0),
+              participation: 0,
             };
           }
 
@@ -562,6 +563,7 @@ async function getDelegates({
           citizen: delegate.citizen,
           statement: delegate.statement,
           numOfDelegators: BigInt(delegate.num_of_delegators || "0"),
+          participation: 0,
         })),
         seed,
       };
