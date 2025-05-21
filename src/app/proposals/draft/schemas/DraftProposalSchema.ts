@@ -18,7 +18,13 @@ const transaction = z.object({
   type: z.nativeEnum(TransactionType).optional(),
   target: ethereumAddressSchema,
   value: z.string().min(1),
-  calldata: z.string().min(1, { message: "Calldata cannot be empty" }),
+  calldata: z
+    .string()
+    .min(1, { message: "Calldata cannot be empty" })
+    .regex(/^0x([0-9a-fA-F]{2})*$/, {
+      message:
+        "Calldata must be a valid hex string starting with 0x and have an even number of characters",
+    }),
   signature: z.string().optional(),
   description: z.string().min(1, { message: "Description cannot be empty" }),
   simulation_state: z.string(), // unconfirmed, valid, invalid

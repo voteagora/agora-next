@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/shared/Switch";
 import { TenantToken } from "@/lib/types";
+import { getPublicClient } from "@/lib/viem";
 
 const transferABI = [
   {
@@ -50,6 +51,18 @@ const transferABI = [
   },
 ] as const;
 
+const erc20DecimalsABI = [
+  {
+    constant: true,
+    inputs: [],
+    name: "decimals",
+    outputs: [{ name: "", type: "uint8" }],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+] as const;
+
 type FormType =
   | z.output<typeof BasicProposalSchema>
   | z.output<typeof ApprovalProposalSchema>;
@@ -70,13 +83,40 @@ const TransferTransactionForm = ({
   const { register, control, watch, setValue } = useFormContext<FormType>();
   const [useCustomToken, setUseCustomToken] = useState(false);
   const [selectedToken, setSelectedToken] = useState<TenantToken>(tokenToUse);
+  const [customTokenDecimals, setCustomTokenDecimals] = useState<number | null>(
+    null
+  );
 
   const recipient = watch(`${name}.${index}.recipient` as const);
   const amount = watch(`${name}.${index}.amount` as const);
   const customTokenAddress = watch(
     `${name}.${index}.customTokenAddress` as const
   );
-  const decimals = useCustomToken ? 18 : selectedToken.decimals; // Default to 18 for custom tokens
+  const decimals = useCustomToken
+    ? (customTokenDecimals ?? 18)
+    : selectedToken.decimals;
+
+  useEffect(() => {
+    if (useCustomToken && customTokenAddress && isAddress(customTokenAddress)) {
+      const fetchDecimals = async () => {
+        try {
+          const client = getPublicClient();
+          const tokenDecimals = await client.readContract({
+            address: customTokenAddress as `0x${string}`,
+            abi: erc20DecimalsABI,
+            functionName: "decimals",
+          });
+          setCustomTokenDecimals(Number(tokenDecimals));
+        } catch (error) {
+          console.error("Error fetching token decimals:", error);
+          setCustomTokenDecimals(18); // Fallback to 18 on error
+        }
+      };
+      fetchDecimals();
+    } else if (!useCustomToken) {
+      setCustomTokenDecimals(null); // Reset when not using custom token
+    }
+  }, [customTokenAddress, useCustomToken]);
 
   useEffect(() => {
     if (recipient && amount && isAddress(recipient)) {
@@ -115,6 +155,7 @@ const TransferTransactionForm = ({
     selectedToken,
     useCustomToken,
     setValue,
+    decimals,
   ]);
 
   return (

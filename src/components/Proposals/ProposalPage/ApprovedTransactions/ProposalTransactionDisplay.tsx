@@ -133,7 +133,9 @@ const ProposalTransactionDisplay = ({
       });
     } catch (e) {
       console.error(e);
-      toast.error("Error simulating transactions");
+      toast.error(
+        <span className="break-all">{`Error simulating transactions: ${e}`}</span>
+      );
     } finally {
       setIsSimulating(false);
     }
