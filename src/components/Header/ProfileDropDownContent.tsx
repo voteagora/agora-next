@@ -41,7 +41,7 @@ export const ProfileDropDownContent = ({
 
   return (
     <>
-      <div className="flex flex-col px-6 py-4 border-b border-line">
+      <div className="flex flex-col px-6 py-4 pr-4 border-b border-line">
         <ProfileHeader
           address={address}
           ensName={ensName}
@@ -95,7 +95,7 @@ export const ProfileDropDownContent = ({
                         {pendingTransactionsForOwner.length}
                       </div>
                     </div>
-                    <div className="rounded-full h-[10px] w-[10px] bg-negative inline-block ml-2 mr-[10px]" />
+                    <div className="rounded-full h-[10px] w-[10px] bg-negative inline-block mx-[14px]" />
                   </div>
                 </Link>
               )}

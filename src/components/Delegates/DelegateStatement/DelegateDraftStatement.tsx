@@ -108,7 +108,7 @@ export const DraftStatementDetails = ({
         messageHash: draftStatement?.message_hash,
       },
     });
-  }, [selectedWalletAddress, draftStatement?.message_hash]);
+  }, [selectedWalletAddress, draftStatement?.message_hash, openDialog]);
 
   if (!selectedWalletAddress || !draftStatement?.address) {
     return null;
@@ -137,7 +137,7 @@ export const DraftStatementDetails = ({
     <div className="flex flex-col bg-neutral rounded-xl py-8 px-6 mb-4 border border-line">
       <div className="inline-flex flex-col justify-start items-start gap-6">
         <div className="flex flex-col justify-start items-start gap-4">
-          <div className="self-stretch inline-flex justify-between items-center">
+          <div className="self-stretch inline-flex md:contents lg:inline-flex justify-between items-center">
             <div className="flex justify-start items-center gap-2">
               <div className="relative overflow-hidden">
                 <ExclamationCircleIcon className="stroke-primary w-[20px] h-[20px]" />

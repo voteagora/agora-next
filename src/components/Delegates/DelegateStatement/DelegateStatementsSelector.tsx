@@ -5,20 +5,12 @@ import TopIssues from "./TopIssues";
 import { useState, useEffect } from "react";
 import { DelegateStatement as DelegateStatementType } from "@/app/api/common/delegates/delegate";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { useAccount } from "wagmi";
 import { useDelegateStatementStore } from "@/stores/delegateStatement";
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
+
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
-import { HistoryIcon } from "@/icons/History";
+import { DelegateStatementHistoryDropdown } from "./DelegateStatementHistoryDropdown";
 
 interface Props {
   delegateStatements: DelegateStatementType[];
@@ -27,10 +19,8 @@ interface Props {
 export const DelegateStatementsSelector = ({ delegateStatements }: Props) => {
   const [selectedStatement, setSelectedStatement] =
     useState<DelegateStatementType>(delegateStatements?.[0]);
-
-  // From DelegateStatementContainer
+  console.log(selectedStatement);
   const { isConnected } = useAgoraContext();
-  const { address } = useAccount();
   const showSuccessMessage = useDelegateStatementStore(
     (state) => state.showSaveSuccess
   );
@@ -98,45 +88,11 @@ export const DelegateStatementsSelector = ({ delegateStatements }: Props) => {
           <div className="flex flex-col bg-neutral rounded-xl mb-4 p-6 gap-4 border border-line">
             <h2 className="text-2xl font-bold text-primary relative">
               Delegate Statement
-              {delegateStatements.length > 1 && (
-                <div className="mb-4 absolute right-0 top-0">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="md:w-auto flex items-center justify-between"
-                      >
-                        <HistoryIcon className="mr-2 h-4 w-4 stroke-primary" />
-                        <span>History</span>
-                        <ChevronDown className="ml-2 h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-auto">
-                      {delegateStatements.map((statement, index) => (
-                        <DropdownMenuItem
-                          key={statement.signature || index}
-                          onSelect={() => handleStatementSelect(statement)}
-                          className={`text-sm px-6 py-2 ${selectedStatement === statement ? "bg-muted" : ""}`}
-                        >
-                          {statement.updatedAt
-                            ? new Date(
-                                statement.updatedAt
-                              ).toLocaleDateString() +
-                              " " +
-                              new Date(statement.updatedAt).toLocaleTimeString(
-                                [],
-                                {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                }
-                              )
-                            : `Statement ${index + 1}`}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              )}
+              <DelegateStatementHistoryDropdown
+                delegateStatements={delegateStatements}
+                selectedStatementUpdatedAt={selectedStatement.updatedAt}
+                onStatementSelect={handleStatementSelect}
+              />
             </h2>
 
             <Markdown content={sanitizedStatement} />
