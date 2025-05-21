@@ -60,7 +60,8 @@ export const useSafePendingTransactions = () => {
       (acc, transaction) => {
         // Check if it's a castVote transaction
         if (
-          transaction.dataDecoded?.method === "castVote" &&
+          (transaction.dataDecoded?.method === "castVote" ||
+            transaction.dataDecoded?.method === "castVoteWithReason") &&
           transaction.dataDecoded.parameters?.length >= 1
         ) {
           // Get the proposalId from the first parameter
@@ -92,12 +93,13 @@ export const useSafePendingTransactions = () => {
           } catch (error) {
             console.warn("Failed to decode specialized vote data:", error);
           }
+        } else {
         }
         return acc;
       },
       {} as Record<string, string>
     );
-  }, [address, pendingTransactions?.results, expectedOrigin]);
+  }, [address, pendingTransactions?.results]);
 
   const pendingDelegations = useMemo(() => {
     if (!pendingTransactions?.results || !address) return {};
@@ -176,7 +178,7 @@ export const useSafePendingTransactions = () => {
       },
       {} as Record<string, string>
     );
-  }, [pendingTransactions, expectedOrigin]);
+  }, [pendingTransactions]);
 
   const pendingProposals = useMemo(() => {
     if (!pendingTransactions?.results || !address) return {};

@@ -1,10 +1,6 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import {
-  useReadContract,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useReadContract, useWaitForTransactionReceipt } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";

@@ -22,7 +22,14 @@ export function ConnectButton() {
         },
       });
     }
-  }, [chain?.id, contracts.token.chain.id, openDialog]);
+  }, [
+    chain?.id,
+    contracts.token.chain.id,
+    openDialog,
+    address,
+    chain,
+    contracts.token.chain,
+  ]);
 
   return (
     <div>

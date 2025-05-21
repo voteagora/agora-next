@@ -1,5 +1,4 @@
 import DelegateDetailsPage from "@/components/DelegateStatement/DelegateDetailsPage";
-// This import will work once the component is properly exported
 import Tenant from "@/lib/tenant/tenant";
 
 export async function generateMetadata() {

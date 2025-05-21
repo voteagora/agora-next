@@ -41,7 +41,7 @@ const SecondaryWalletsSelector: FC<SecondaryWalletsSelectorProps> = ({
   }
 
   return (
-    <div className="pt-6">
+    <div className="pt-6 max-h-[400px] overflow-auto">
       <span className="text-xs text-tertiary">
         {isSelectedPrimaryAddress ? "EOA WALLETS" : "SAFE WALLETS"}
       </span>
