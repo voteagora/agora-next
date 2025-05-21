@@ -7,6 +7,7 @@ import { ProposalType } from "@/lib/types";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
 
 const { namespace, ui } = Tenant.current();
 
@@ -238,7 +239,7 @@ export const getVotableSupplyFromDaoNode = async () => {
 
 export const cachedAllProposalsFromDaoNode = cache(getAllProposalsFromDaoNode);
 
-/* 
+/*
 
    DB RECORD RESPONSE:
 
