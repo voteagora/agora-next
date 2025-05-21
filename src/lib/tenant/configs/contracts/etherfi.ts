@@ -4,9 +4,9 @@ import {
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
-import { mainnet } from "viem/chains";
+import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { AlchemyProvider } from "ethers";
+import { AlchemyProvider, JsonRpcProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
 import {
   DELEGATION_MODEL,
@@ -26,9 +26,15 @@ export const etherfiTenantContractConfig = ({
   const TOKEN = "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB";
   const GOVERNOR = "0x0";
 
-  const provider = new AlchemyProvider("mainnet", alchemyId);
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
 
-  const chain = mainnet;
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : isProd
+      ? new AlchemyProvider("mainnet", alchemyId)
+      : new AlchemyProvider("sepolia", alchemyId);
+
+  const chain = isProd ? mainnet : sepolia;
 
   return {
     token: createTokenContract({

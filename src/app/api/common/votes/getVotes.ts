@@ -257,7 +257,8 @@ async function getVotersWhoHaveNotVotedForProposal({
                   SELECT voter FROM ${namespace}.vote_cast_events WHERE proposal_id = $1 and contract = $3
                   UNION ALL
                   SELECT voter FROM ${namespace}.${eventsViewName} WHERE proposal_id = $1 and contract = $3
-
+                  UNION ALL
+                  SELECT voter FROM "snapshot".votes WHERE proposal_id = $1 and dao_slug = '${slug}'
                 ),
                 relevant_delegates as (
                   SELECT * FROM ${namespace}.delegates where contract = $2
@@ -302,6 +303,36 @@ async function getVotersWhoHaveNotVotedForProposal({
       data: nonVoters,
     };
   });
+}
+
+async function getSnapshotVotesForProposal({
+  proposalId,
+  pagination = { offset: 0, limit: 20 },
+  sort = "vp",
+}: {
+  proposalId: string;
+  pagination?: PaginationParams;
+  sort?: string;
+}) {
+  const { slug } = Tenant.current();
+
+  const queryFunction = (skip: number, take: number) => {
+    const query = `
+      SELECT * FROM "snapshot".votes WHERE proposal_id = $1 AND dao_slug = '${slug}'
+      ORDER BY ${sort} DESC
+      OFFSET $2 LIMIT $3;`;
+
+    return prismaWeb3Client.$queryRawUnsafe<SnapshotVotePayload[]>(
+      query,
+      proposalId,
+      skip,
+      take
+    );
+  };
+
+  const { meta, data: votes } = await paginateResult(queryFunction, pagination);
+
+  return { meta, data: votes.map((vote) => parseSnapshotVote(vote)) };
 }
 
 async function getVotesForProposal({
@@ -437,6 +468,32 @@ async function getVotesForProposal({
   );
 }
 
+async function getUserSnapshotVotesForProposal({
+  proposalId,
+  address,
+}: {
+  proposalId: string;
+  address: string;
+}) {
+  const { slug } = Tenant.current();
+
+  const queryFunction = prismaWeb3Client.$queryRawUnsafe<SnapshotVotePayload[]>(
+    `
+      SELECT * FROM "snapshot".votes WHERE proposal_id = $1 AND dao_slug = '${slug}' AND voter = $2`,
+    proposalId,
+    address.toLowerCase()
+  );
+
+  const votes = await doInSpan(
+    { name: "getUserSnapshotVotesForProposal" },
+    async () => queryFunction
+  );
+
+  const data = Promise.all(votes.map((vote) => parseSnapshotVote(vote)));
+
+  return data;
+}
+
 async function getUserVotesForProposal({
   proposalId,
   address,
@@ -538,4 +595,16 @@ export const fetchVotesForProposalAndDelegate = cache(
 );
 export const fetchVotersWhoHaveNotVotedForProposal = cache(
   getVotersWhoHaveNotVotedForProposal
+);
+export const fetchVotesForProposalAndDelegateUnstableCache = unstable_cache(
+  getVotesForProposalAndDelegate,
+  [],
+  {
+    tags: ["votesForProposalAndDelegate"],
+    revalidate: 86400, // 1 day
+  }
+);
+export const fetchSnapshotVotesForProposal = cache(getSnapshotVotesForProposal);
+export const fetchSnapshotUserVotesForProposal = cache(
+  getUserSnapshotVotesForProposal
 );

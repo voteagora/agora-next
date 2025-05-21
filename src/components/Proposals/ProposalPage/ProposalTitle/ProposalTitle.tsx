@@ -4,6 +4,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ENSName from "@/components/shared/ENSName";
+import { ParsedProposalData } from "@/lib/proposalUtils";
 
 export default function ProposalTitle({
   title,
@@ -12,7 +13,14 @@ export default function ProposalTitle({
   title: string;
   proposal: Proposal;
 }) {
-  const proposalText = getProposalTypeText(proposal.proposalType ?? "");
+  const proposalData =
+    proposal.proposalType === "SNAPSHOT"
+      ? (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
+      : undefined;
+  const proposalText = getProposalTypeText(
+    proposal.proposalType ?? "",
+    proposalData
+  );
   const { ui } = Tenant.current();
 
   return (
@@ -28,7 +36,11 @@ export default function ProposalTitle({
           </>
         )}
         <a
-          href={getBlockScanUrl(proposal.createdTransactionHash ?? "")}
+          href={
+            proposal.proposalType === "SNAPSHOT"
+              ? proposalData?.link
+              : getBlockScanUrl(proposal.createdTransactionHash ?? "")
+          }
           target="_blank"
           rel="noreferrer noopener"
         >

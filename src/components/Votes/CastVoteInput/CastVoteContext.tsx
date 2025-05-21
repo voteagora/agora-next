@@ -37,6 +37,7 @@ type CastVoteContextType = {
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
+  error: any;
   reset: () => void;
   resetError: () => void;
   fallbackToStandardVote: boolean;
@@ -57,6 +58,7 @@ const CastVoteContext = createContext<CastVoteContextType>({
   isLoading: false,
   isSuccess: false,
   isError: false,
+  error: null,
   reset: () => {},
   resetError: () => {},
   fallbackToStandardVote: false,
@@ -138,15 +140,16 @@ const CastVoteContextProvider = ({
     !reason &&
     !fallbackToStandardVote;
 
-  const { write, isLoading, isSuccess, data, isError, resetError } = (() => {
-    if (isGasRelayLive) {
-      return sponsoredVotingValues;
-    }
-    if (contracts?.alligator) {
-      return advancedVoteValues;
-    }
-    return standardVoteValues;
-  })();
+  const { write, isLoading, isSuccess, data, isError, resetError, error } =
+    (() => {
+      if (isGasRelayLive) {
+        return sponsoredVotingValues;
+      }
+      if (contracts?.alligator) {
+        return advancedVoteValues;
+      }
+      return standardVoteValues;
+    })();
 
   const newVote = {
     support: support || "",
@@ -203,6 +206,7 @@ const CastVoteContextProvider = ({
         isLoading,
         isSuccess,
         isError,
+        error,
         reset: () => {
           setFallbackToStandardVote(false);
           resetError();

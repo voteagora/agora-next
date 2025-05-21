@@ -2,7 +2,6 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useMemo } from "react";
 import Tenant from "./tenant/tenant";
-import { TENANT_NAMESPACES } from "./constants";
 import { fallback, http } from "wagmi";
 import {
   DERIVE_MAINNET_RPC,
@@ -17,6 +16,7 @@ import {
   WaitForTransactionReceiptReturnType,
 } from "viem";
 import { unstable_cache } from "next/cache";
+import { ParsedProposalData } from "./proposalUtils";
 import { getPublicClient } from "./viem";
 import {
   arbitrum,
@@ -46,20 +46,24 @@ export function bpsToString(bps: number) {
   return `${(Math.round(bps * 100) / 100).toFixed(2)}%`;
 }
 
-export const getProposalTypeText = (proposalType: string) => {
-  if (Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM) {
-    switch (proposalType) {
-      case "OPTIMISTIC":
-        return "Optimistic Proposal";
-      case "STANDARD":
-        return "Standard Proposal";
-      case "APPROVAL":
-        return "Approval Vote Proposal";
-      default:
-        return "Proposal";
-    }
+export const getProposalTypeText = (
+  proposalType: string,
+  proposalData?: ParsedProposalData["SNAPSHOT"]["kind"]
+) => {
+  switch (proposalType) {
+    case "OPTIMISTIC":
+      return "Optimistic Proposal";
+    case "STANDARD":
+      return "Standard Proposal";
+    case "APPROVAL":
+      return "Approval Vote Proposal";
+    case "SNAPSHOT":
+      if (proposalData?.type === "copeland") {
+        return "Ranked Choice Proposal";
+      }
+    default:
+      return "Proposal";
   }
-  return "Proposal";
 };
 
 const format = new Intl.NumberFormat("en", {
@@ -410,6 +414,12 @@ export const getTransportForChain = (chainId: number) => {
         FORK_NODE_URL ||
           `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
+    // optimism sepolia
+    case 11155420:
+      return http(
+        FORK_NODE_URL ||
+          `https://opt-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
     // base
     case 8453:
       return http(
@@ -674,17 +684,23 @@ export function getFunctionSignature(
       signature += filteredParams
         .map((p) => {
           let formattedValue;
-          if (p[0] && p[1]) {
-            formattedValue = `${p[0]}=${p[1]}`;
+          const isArray = p[1] ? Array.isArray(p[1]) : false;
+          const parsedParam = isArray
+            ? (p[1] as unknown as any[])
+                .map((item) => JSON.stringify(item.value || {}))
+                .join(", ")
+            : p[1];
+          if (p[0] && parsedParam) {
+            formattedValue = `${p[0]}=${parsedParam}`;
           } // Default, has both Name and Value
-          else if (p[0] && !p[1]) {
+          else if (p[0] && !parsedParam) {
             formattedValue = `${p[0]}`;
           } // Has only Name
-          else if (!p[0] && p[1]) {
-            formattedValue = `${p[1]}`;
+          else if (!p[0] && parsedParam) {
+            formattedValue = `${parsedParam}`;
           } // Has only Value
-          else if (!p[0] && !p[1]) {
-            formattedValue = `${p[1]}`;
+          else if (!p[0] && !parsedParam) {
+            formattedValue = `${parsedParam}`;
           } // Has neither Name nor Value, fallback to Type
           return formattedValue;
         })

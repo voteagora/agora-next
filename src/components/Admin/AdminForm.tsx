@@ -2,6 +2,7 @@ import ProposalTypeSettings from "./ProposalTypeSettings";
 import GovernorSettings from "./GovernorSettings";
 import FAQs from "./FAQs";
 import { FormattedProposalType } from "@/lib/types";
+import AdminAccountActions from "@/components/Admin/AdminAccountActions";
 
 // TODO: Take init values from the chain
 export default function AdminForm({
@@ -19,6 +20,7 @@ export default function AdminForm({
           votableSupply={votableSupply}
           proposalTypes={proposalTypes}
         />
+        <AdminAccountActions />
       </div>
       <FAQs />
     </div>

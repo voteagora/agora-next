@@ -336,7 +336,9 @@ export async function parseProposal(
     markdowntitle:
       (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
       getTitleFromProposalDescription(proposal.description || ""),
-    description: proposal.description,
+    description:
+      (proposalData.key === "SNAPSHOT" && proposalData.kind.body) ||
+      proposal.description,
     quorum,
     approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
     proposalData: proposalData.kind,
@@ -400,6 +402,8 @@ export type ParsedProposalData = {
       type: string;
       votes: string;
       state: "pending" | "active" | "closed";
+      body: string;
+      choices: string[];
     };
   };
   STANDARD: {
@@ -487,6 +491,8 @@ export function parseProposalData(
           type: parsedProposalData.type ?? "",
           votes: parsedProposalData.votes ?? "",
           state: parsedProposalData.state ?? "",
+          body: parsedProposalData.body ?? "",
+          choices: parsedProposalData.choices ?? [],
         },
       };
     }
@@ -762,7 +768,8 @@ export type ProposalStatus =
   | "PENDING"
   | "QUEUED"
   | "EXECUTED"
-  | "CLOSED";
+  | "CLOSED"
+  | "PASSED";
 
 export async function getProposalStatus(
   proposal: ProposalPayload,
@@ -771,6 +778,91 @@ export async function getProposalStatus(
   quorum: bigint | null,
   votableSupply: bigint
 ): Promise<ProposalStatus> {
+  const TEN_DAYS_IN_SECONDS = 10 * 24 * 60 * 60;
+  const { contracts, ui } = Tenant.current();
+
+  const checkHasNoCalldata = (): boolean => {
+    if (
+      proposal.proposal_type === "SNAPSHOT" ||
+      proposal.proposal_type === "OPTIMISTIC"
+    ) {
+      return true;
+    }
+
+    if (!proposal.proposal_data) {
+      return true;
+    }
+
+    const dataAsString =
+      typeof proposal.proposal_data === "string"
+        ? proposal.proposal_data
+        : JSON.stringify(proposal.proposal_data);
+
+    if (dataAsString.trim() === "" || dataAsString.trim() === "{}") {
+      return true;
+    }
+
+    try {
+      const parsedProposalData = parseProposalData(
+        dataAsString,
+        proposal.proposal_type as ProposalType
+      );
+
+      if (parsedProposalData.key === "STANDARD") {
+        const options = parsedProposalData.kind.options[0];
+        if (!options) return true;
+        const noTargets =
+          !options.targets ||
+          options.targets.length === 0 ||
+          options.targets.every(
+            (t) =>
+              !t ||
+              t.trim() === "" ||
+              t.toLowerCase() === "0x0000000000000000000000000000000000000000"
+          );
+        const noCalldatas =
+          !options.calldatas ||
+          options.calldatas.length === 0 ||
+          options.calldatas.every(
+            (cd) => !cd || cd.trim() === "" || cd.toLowerCase() === "0x"
+          );
+        return noTargets || noCalldatas;
+      }
+      if (parsedProposalData.key === "APPROVAL") {
+        if (
+          !parsedProposalData.kind.options ||
+          parsedProposalData.kind.options.length === 0
+        )
+          return true;
+        return parsedProposalData.kind.options.every((opt) => {
+          const noTargets =
+            !opt.targets ||
+            opt.targets.length === 0 ||
+            opt.targets.every(
+              (t) =>
+                !t ||
+                t.trim() === "" ||
+                t.toLowerCase() === "0x0000000000000000000000000000000000000000"
+            );
+          const noCalldatas =
+            !opt.calldatas ||
+            opt.calldatas.length === 0 ||
+            opt.calldatas.every(
+              (cd) => !cd || cd.trim() === "" || cd.toLowerCase() === "0x"
+            );
+          return noTargets || noCalldatas;
+        });
+      }
+    } catch (e) {
+      console.error(
+        `Error parsing proposal_data in checkHasNoCalldata for proposal ID ${proposal.proposal_id}, type ${proposal.proposal_type}:`,
+        e
+      );
+      return true;
+    }
+    return true;
+  };
+
   if (proposalResults.key === "SNAPSHOT") {
     return proposalResults.kind.status.toUpperCase() as ProposalStatus;
   }
@@ -781,11 +873,45 @@ export async function getProposalStatus(
     return "EXECUTED";
   }
 
-  if (proposal.queued_block) {
+  if (proposal.queued_block && latestBlock) {
+    let queueEventTimeSeconds: number | null = null;
+    const isArb =
+      contracts.governor.chain.id === 42161 ||
+      contracts.governor.chain.id === 421614;
+    let blockNumForQueueTime: string | bigint | null = proposal.queued_block;
+
+    if (isArb && proposal.queued_block) {
+      const mappedBlock = await mapArbitrumBlockToMainnetBlock(
+        BigInt(proposal.queued_block)
+      );
+      if (mappedBlock) {
+        blockNumForQueueTime = mappedBlock;
+      } else {
+        blockNumForQueueTime = null;
+      }
+    }
+
+    if (blockNumForQueueTime) {
+      const queuedBlockTime = getHumanBlockTime(
+        blockNumForQueueTime.toString(),
+        latestBlock
+      );
+      if (queuedBlockTime) {
+        queueEventTimeSeconds = Math.floor(queuedBlockTime.getTime() / 1000);
+      }
+    }
+
+    if (
+      queueEventTimeSeconds &&
+      latestBlock.timestamp - queueEventTimeSeconds > TEN_DAYS_IN_SECONDS
+    ) {
+      if (checkHasNoCalldata()) {
+        return "PASSED";
+      }
+    }
     return "QUEUED";
   }
 
-  const { ui } = Tenant.current();
   const isTimeStampBasedTenant = ui.toggle(
     "use-timestamp-for-proposals"
   )?.enabled;
@@ -911,6 +1037,12 @@ export function getProposalCurrentQuorum(
     case TENANT_NAMESPACES.UNISWAP:
       return BigInt(proposalResults.for);
 
+    case TENANT_NAMESPACES.SCROLL:
+      return (
+        BigInt(proposalResults.for) +
+        BigInt(proposalResults.against) +
+        BigInt(proposalResults.abstain)
+      );
     default:
       return BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
   }

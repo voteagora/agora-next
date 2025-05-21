@@ -7,14 +7,21 @@ const CACHE_TIME = 60000; // 1 minute cache
 interface Props {
   enabled: boolean;
   proposalId: string;
+  proposalType?: string;
 }
 
-export const useProposalVotesChart = ({ proposalId, enabled }: Props) => {
+export const useProposalVotesChart = ({
+  proposalId,
+  enabled,
+  proposalType,
+}: Props) => {
   const { data, isFetching, isFetched } = useQuery({
     enabled: enabled,
-    queryKey: [QK, proposalId],
+    queryKey: [QK, proposalId, proposalType],
     queryFn: async (): Promise<ChartVote[]> => {
-      const response = await fetch(`/api/proposals/${proposalId}/chart`);
+      const response = await fetch(
+        `/api/proposals/${proposalId}/chart${proposalType === "SNAPSHOT" ? `?proposalType=${proposalType}` : ""}`
+      );
       return (await response.json()) as Promise<ChartVote[]>;
     },
     staleTime: CACHE_TIME,

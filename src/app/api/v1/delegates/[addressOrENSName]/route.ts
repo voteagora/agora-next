@@ -1,12 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { fetchDelegate } from "@/app/api/common/delegates/getDelegates";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "../../apiUtils";
 
 export async function GET(
   request: NextRequest,
   route: { params: { addressOrENSName: string } }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { fetchDelegate } = await import(
+    "@/app/api/common/delegates/getDelegates"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

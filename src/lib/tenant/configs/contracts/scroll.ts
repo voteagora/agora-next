@@ -46,7 +46,9 @@ export const scrollTenantContractConfig = ({
     ? "0x79D83D1518e2eAA64cdc0631df01b06e2762CC14"
     : "0xE27B7b6DB440b27249b49E3C0A686B82c36A0D7e";
 
-  const provider = new FallbackProvider([
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const liveNetProvider = new FallbackProvider([
     {
       provider: new JsonRpcProvider(
         `https://scroll-mainnet.g.alchemy.com/v2/${alchemyId}`
@@ -62,6 +64,10 @@ export const scrollTenantContractConfig = ({
       weight: 1,
     },
   ]);
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : liveNetProvider;
 
   return {
     token: createTokenContract({

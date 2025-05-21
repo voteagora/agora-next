@@ -126,6 +126,7 @@ function CastVoteInputContent({
     isLoading,
     isSuccess,
     isError,
+    error,
     fallbackToStandardVote,
     setFallbackToStandardVote,
     reset,
@@ -143,14 +144,9 @@ function CastVoteInputContent({
       totalVP: "0",
     }
   );
-  const vpToDisplay = getVpToDisplay(
-    votingPower ?? {
-      advancedVP: "0",
-      directVP: "0",
-      totalVP: "0",
-    },
-    missingVote
-  );
+  const vpToDisplay = votingPower
+    ? getVpToDisplay(votingPower, missingVote)
+    : null;
 
   const showSuccessMessage = isSuccess || missingVote === "NONE";
 
@@ -203,13 +199,7 @@ function CastVoteInputContent({
               {!isLoading && proposal.status === "ACTIVE" && (
                 <VoteSubmitButton
                   supportType={support}
-                  votingPower={
-                    votingPower ?? {
-                      advancedVP: "0",
-                      directVP: "0",
-                      totalVP: "0",
-                    }
-                  }
+                  votingPower={votingPower}
                   missingVote={missingVote}
                   proposal={proposal}
                 />
@@ -219,6 +209,7 @@ function CastVoteInputContent({
           {isError && (!isGasRelayLive || fallbackToStandardVote) && (
             <ErrorState
               message="Error submitting vote"
+              error={error}
               button1={{ message: "Cancel", action: reset }}
               button2={{
                 message: "Try again",
@@ -229,6 +220,7 @@ function CastVoteInputContent({
           {isError && isGasRelayLive && !fallbackToStandardVote && (
             <ErrorState
               message="Error submitting vote"
+              error={error}
               button1={{
                 message: "Try regular vote",
                 action: () => {
@@ -281,16 +273,18 @@ function VoteSubmitButton({
   proposal,
 }: {
   supportType: SupportTextProps["supportType"] | null;
-  votingPower: VotingPowerData;
+  votingPower: VotingPowerData | null;
   missingVote: MissingVote;
   proposal: Proposal;
 }) {
   const { write } = useCastVoteContext();
-  const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+  const vpToDisplay = votingPower
+    ? getVpToDisplay(votingPower, missingVote)
+    : null;
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
 
-  if (!supportType && isOptimismTenant) {
+  if (!supportType && isOptimismTenant && vpToDisplay) {
     return (
       <div className="pt-3">
         <TooltipProvider>
@@ -342,8 +336,13 @@ function VoteSubmitButton({
   return (
     <div className="pt-3">
       <SubmitButton onClick={write} disabled={!supportType}>
-        Submit vote with{"\u00A0"}
-        <TokenAmountDisplay amount={vpToDisplay} />
+        Submit vote
+        {vpToDisplay ? (
+          <>
+            {" "}
+            with{"\u00A0"} <TokenAmountDisplay amount={vpToDisplay} />
+          </>
+        ) : null}
       </SubmitButton>
     </div>
   );
@@ -392,7 +391,7 @@ export function SuccessMessage({
   proposal: Proposal;
   votes: Vote[] | null;
   className?: string;
-  votingPower?: string;
+  votingPower?: string | null;
 }) {
   const {
     data,
@@ -570,35 +569,46 @@ function ErrorState({
   message,
   button1,
   button2,
+  error,
 }: {
   message: string;
   button1: { message: string; action: () => void };
   button2: { message: string; action: () => void };
+  error: any;
 }) {
   return (
-    <div className="flex flex-col gap-3 p-3 border-t border-line">
-      <div className="py-2 px-4 bg-red-300 text-xs text-red-700 font-medium rounded-lg flex items-center gap-2">
-        <Image
-          src={icons.infoRed}
-          alt="Info"
-          width={24}
-          height={24}
-          className="text-red-700"
-        />
-        {message}
-      </div>
-      <div className="flex flex-row gap-2">
-        <Button
-          className="w-full"
-          variant="elevatedOutline"
-          onClick={button1.action}
-        >
-          {button1.message}
-        </Button>
-        <Button className="w-full" onClick={button2.action}>
-          {button2.message}
-        </Button>
-      </div>
-    </div>
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger>
+          <div className="flex flex-col gap-3 p-3 border-t border-line">
+            <div className="py-2 px-4 bg-red-300 text-xs text-red-700 font-medium rounded-lg flex items-center gap-2">
+              <Image
+                src={icons.infoRed}
+                alt="Info"
+                width={24}
+                height={24}
+                className="text-red-700"
+              />
+              {message}
+            </div>
+            <div className="flex flex-row gap-2">
+              <Button
+                className="w-full"
+                variant="elevatedOutline"
+                onClick={button1.action}
+              >
+                {button1.message}
+              </Button>
+              <Button className="w-full" onClick={button2.action}>
+                {button2.message}
+              </Button>
+            </div>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <div>{JSON.stringify(error || {}, null, 2)}</div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

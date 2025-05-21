@@ -7,7 +7,7 @@ import {
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { AlchemyProvider, BaseContract } from "ethers";
+import { AlchemyProvider, BaseContract, JsonRpcProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 import {
@@ -15,7 +15,7 @@ import {
   GOVERNOR_TYPE,
   TIMELOCK_TYPE,
 } from "@/lib/constants";
-import { optimism } from "viem/chains";
+import { optimism, optimismSepolia } from "viem/chains";
 
 interface Props {
   isProd: boolean;
@@ -32,7 +32,12 @@ export const demoTenantConfig = ({ alchemyId }: Props): TenantContracts => {
 
   const APPROVAL_MODULE = "0x05a9C4a400cfA64C9639cc2f00B2CF95710f9af1";
 
-  const provider = new AlchemyProvider("optimism", alchemyId);
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : new AlchemyProvider("optimism", alchemyId);
+
   const chain = optimism;
 
   return {

@@ -21,17 +21,27 @@ export default function Proposal({
   votableSupply: string;
 }) {
   const { ui } = Tenant.current();
-  const proposalText = getProposalTypeText(proposal.proposalType ?? "");
+  const proposalText = getProposalTypeText(
+    proposal.proposalType ?? "",
+    proposal.proposalType === "SNAPSHOT"
+      ? (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
+      : undefined
+  );
+
+  const shouldNavigateToSnapshot =
+    proposal.proposalType === "SNAPSHOT" &&
+    (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])?.type !==
+      "copeland";
 
   return (
     <Link
       href={
-        proposal.proposalType === "SNAPSHOT"
+        shouldNavigateToSnapshot
           ? (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
               .link
           : `/proposals/${proposal.id}`
       }
-      target={proposal.proposalType === "SNAPSHOT" ? "_blank" : ""}
+      target={shouldNavigateToSnapshot ? "_blank" : ""}
     >
       <div className="border-b border-line items-center flex flex-row bg-neutral">
         <div
@@ -40,7 +50,7 @@ export default function Proposal({
             "w-full sm:w-[55%] items-start justify-center"
           )}
         >
-          {proposal.proposalType === "SNAPSHOT" ? (
+          {shouldNavigateToSnapshot ? (
             <div className="flex flex-row text-xs text-secondary gap-1">
               <p>Snapshot Proposal</p>
               <ArrowTopRightOnSquareIcon className="w-3 h-3 mt-1" />

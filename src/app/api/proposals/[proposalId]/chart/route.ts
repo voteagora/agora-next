@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getVotesChart } from "@/app/api/proposals/getVotesChart";
 
 export async function GET(
   request: NextRequest,
-  route: { params: { proposalId: string } }
+  { params }: { params: { proposalId: string } }
 ) {
+  const { getVotesChart } = await import("@/app/api/proposals/getVotesChart");
+  const { getSnapshotVotesChart } = await import(
+    "@/app/api/proposals/getVotesChart"
+  );
+
+  const searchParams = request.nextUrl.searchParams;
+  const proposalType = searchParams.get("proposalType");
   try {
-    const votes = await getVotesChart({
-      proposalId: route.params.proposalId,
-    });
+    const votes =
+      proposalType === "SNAPSHOT"
+        ? await getSnapshotVotesChart({
+            proposalId: params.proposalId,
+          })
+        : await getVotesChart({
+            proposalId: params.proposalId,
+          });
     return NextResponse.json(votes);
   } catch (e: any) {
     return new Response("Internal server error: " + e.toString(), {

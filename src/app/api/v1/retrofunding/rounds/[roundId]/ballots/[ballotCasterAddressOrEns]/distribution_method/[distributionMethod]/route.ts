@@ -1,18 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
-import {
-  authenticateApiUser,
-  getCategoryScope,
-} from "@/app/lib/auth/serverAuth";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
-import {
-  applyDistributionStrategy,
-  DistributionStrategy,
-} from "@/app/api/common/ballots/ballotDistributionStrategy";
 import { z } from "zod";
 
-const distributionMethodValidator = z.enum(
-  Object.values(DistributionStrategy) as [string, ...string[]]
-);
+import type { DistributionStrategy as DistStrat } from "@/app/api/common/ballots/ballotDistributionStrategy";
 
 export async function POST(
   request: NextRequest,
@@ -24,6 +14,20 @@ export async function POST(
     };
   }
 ) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+
+  const { applyDistributionStrategy } = await import(
+    "@/app/api/common/ballots/ballotDistributionStrategy"
+  );
+  const { DistributionStrategy } = await import(
+    "@/app/api/common/ballots/ballotDistributionStrategy"
+  );
+  const { getCategoryScope } = await import("@/app/lib/auth/serverAuth");
+
+  const distributionMethodValidator = z.enum(
+    Object.values(DistributionStrategy) as [string, ...string[]]
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
@@ -47,9 +51,7 @@ export async function POST(
       }
 
       const ballot = await applyDistributionStrategy(
-        distributionMethodValidator.parse(
-          distributionMethod
-        ) as DistributionStrategy,
+        distributionMethodValidator.parse(distributionMethod) as DistStrat,
         Number(roundId),
         categoryScope,
         ballotCasterAddressOrEns

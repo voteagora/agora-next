@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"; // needed for app and e2e
+
 import {
   fetchProposal,
   fetchProposalUnstableCache,
@@ -6,15 +8,16 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { fetchVotableSupplyUnstableCache } from "@/app/api/common/votableSupply/getVotableSupply";
 import { Vote } from "@/app/api/common/votes/vote";
 import { cleanString, truncateString } from "@/app/lib/utils/text";
+import CopelandProposalPage from "@/components/Proposals/ProposalPage/CopelandProposalPage/CopelandProposalPage";
 import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
 import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
 import StandardProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/StandardProposalPage";
+import { ParsedProposalData } from "@/lib/proposalUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { calculateVoteMetadata } from "@/lib/voteUtils";
 import { format } from "date-fns";
 import React from "react";
 
-export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 // Share my vote metadata
@@ -156,6 +159,14 @@ export default async function Page({
       break;
     case "APPROVAL":
       RenderComponent = OPProposalApprovalPage;
+      break;
+    case "SNAPSHOT":
+      if (
+        (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
+          ?.type === "copeland"
+      ) {
+        RenderComponent = CopelandProposalPage;
+      }
       break;
     default:
       // Default to standard proposal page

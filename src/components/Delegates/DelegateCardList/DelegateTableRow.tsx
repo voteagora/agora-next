@@ -5,17 +5,27 @@ import { formatNumber } from "@/lib/tokenUtils";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useRouter } from "next/navigation";
+import { DelegationSelector } from "../DelegateCard/DelegationSelector";
+import { DelegateSocialLinks } from "../DelegateCard/DelegateSocialLinks";
 
 export default function DelegateTableRow({
   delegate,
+  isAdvancedUser,
+  delegators,
 }: {
   delegate: DelegateChunk & {
     numOfDelegators: bigint;
     vpChange7d?: string;
     participation: number;
   };
+  isAdvancedUser: boolean;
+  delegators: string[] | null;
 }) {
   const router = useRouter();
+
+  const twitter = delegate?.statement?.twitter;
+  const discord = delegate?.statement?.discord;
+  const warpcast = delegate?.statement?.warpcast;
 
   return (
     <TableRow
@@ -54,6 +64,20 @@ export default function DelegateTableRow({
       {/* @ts-ignore */}
       <TableCell>
         {delegate.numOfDelegators?.toString() || 0} addresses
+      </TableCell>
+      <TableCell className="justify-start">
+        <DelegateSocialLinks
+          discord={discord}
+          twitter={twitter}
+          warpcast={warpcast}
+        />
+      </TableCell>
+      <TableCell>
+        <DelegationSelector
+          delegate={delegate}
+          isAdvancedUser={isAdvancedUser}
+          delegators={delegators}
+        />
       </TableCell>
     </TableRow>
   );

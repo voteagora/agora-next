@@ -99,7 +99,7 @@ interface StructuredReportProps {
 
 export function StructuredReport({ report }: StructuredReportProps) {
   return (
-    <div className="w-full border border-line rounded-md shadow-sm max-h-[600px] overflow-y-auto scrollbar-hide">
+    <div className="w-full border border-line rounded-md shadow-sm max-h-[600px] overflow-y-auto">
       <div className="bg-wash p-6 border-b border-line">
         <h2 className="text-2xl font-bold text-primary">Simulation</h2>
         <div className="flex items-center mt-3">

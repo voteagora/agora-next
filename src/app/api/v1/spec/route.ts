@@ -1,3 +1,5 @@
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
+
 import { NextRequest } from "next/server";
 import Tenant from "@/lib/tenant/tenant";
 import yaml from "yaml";

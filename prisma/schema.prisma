@@ -417,9 +417,10 @@ view OptimismVotingPower {
 }
 
 view OptimismVotableSupply {
+  address String @unique
   votable_supply String @unique
 
-  @@map("votable_supply")
+  @@map("votable_supply_v2")
   @@schema("optimism")
 }
 
@@ -1798,17 +1799,6 @@ view uniswap_vote_cast_with_params_events {
   @@map("vote_cast_with_params_events")
   @@ignore
   @@schema("uniswap")
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view delgatees {
-  delegator    String?
-  delegatee    String?
-  block_number BigInt?
-  balance      Decimal? @db.Decimal
-
-  @@ignore
-  @@schema("optimism")
 }
 
 

@@ -1,13 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { ZodError } from "zod";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { fetchDelegates } from "@/app/api/common/delegates/getDelegates";
+import { traceWithUserId } from "../apiUtils";
 
 import {
   createOptionalNumberValidator,
   createOptionalStringValidator,
 } from "@/app/api/common/utils/validators";
-import { traceWithUserId } from "../apiUtils";
 
 const DEFAULT_SORT = "voting_power";
 const DEFAULT_MAX_LIMIT = 1500;
@@ -39,6 +37,11 @@ const offsetValidator = createOptionalNumberValidator(
 );
 
 export async function GET(request: NextRequest) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { fetchDelegates } = await import(
+    "@/app/api/common/delegates/getDelegates"
+  );
+
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {

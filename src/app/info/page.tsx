@@ -1,3 +1,5 @@
+// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
+
 import React from "react";
 import InfoAbout from "@/app/info/components/InfoAbout";
 import { InfoHero } from "@/app/info/components/InfoHero";
