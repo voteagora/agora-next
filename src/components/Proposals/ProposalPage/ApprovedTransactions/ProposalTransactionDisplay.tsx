@@ -213,7 +213,7 @@ const ProposalTransactionDisplay = ({
                       onClick={simulateTransactions}
                       disabled={isSimulating}
                       className={cn(
-                        "hidden sm:flex items-center gap-2",
+                        "hidden sm:flex items-center gap-2 md:text-xs lg:text-sm",
                         ui.theme === "dark" && "text-neutral"
                       )}
                     >

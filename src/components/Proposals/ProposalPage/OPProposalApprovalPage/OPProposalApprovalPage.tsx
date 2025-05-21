@@ -45,7 +45,7 @@ export default async function OPProposalApprovalPage({
       <div className="flex gap-16 justify-between items-start max-w-[76rem] flex-col sm:flex-row sm:items-start sm:justify-between">
         <ProposalDescription proposal={proposal} />
         <div>
-          <div className="flex flex-col gap-4 sticky top-20 flex-shrink max-w-[24rem] bg-neutral border-line border rounded-xl shadow-newDefault mb-8 items-stretch sm:items-start justify-end sm:justify-between w-full max-h-none h-auto">
+          <div className="flex flex-col gap-4 sticky top-20 flex-shrink md:max-w-[24rem] bg-neutral border-line border rounded-xl shadow-newDefault mb-8 items-stretch sm:items-start justify-end sm:justify-between w-full max-h-none h-auto">
             <div className="flex flex-col gap-4 w-full">
               {/* Show the results of the approval vote w/ a tab for votes */}
               <ApprovalVotesPanel

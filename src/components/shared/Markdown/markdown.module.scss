@@ -1,5 +1,13 @@
 @import "@/styles/variables.scss";
 
+.proposal_description_md {
+  :global(.wmde-markdown table) {
+    display: table !important;
+    width: 100% !important;
+    table-layout: fixed !important;
+  }
+}
+
 .agora_markdown {
   h1 {
     font-size: $font-size-2xl;
