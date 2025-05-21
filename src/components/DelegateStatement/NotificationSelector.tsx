@@ -7,8 +7,10 @@ import CheckboxWithTitle from "../ui/CheckboxWithTitle/CheckboxWithTitle";
 
 export default function NotificationSelector({
   form,
+  disabled,
 }: {
   form: UseFormReturn<DelegateStatementFormValues>;
+  disabled?: boolean;
 }) {
   const [subscribed, setSubscribed] = useState(false);
 
@@ -46,6 +48,7 @@ export default function NotificationSelector({
         label="Yes, I want to receive emails"
         checked={subscribed}
         onChange={handleChange}
+        disabled={disabled}
       />
     </div>
   );

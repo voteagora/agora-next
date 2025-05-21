@@ -6,6 +6,7 @@ interface CheckboxWithTitleProps {
   label: string;
   checked: boolean;
   onChange: (value: boolean) => void;
+  disabled?: boolean;
 }
 
 const CheckboxWithTitle: React.FC<CheckboxWithTitleProps> = ({
@@ -13,6 +14,7 @@ const CheckboxWithTitle: React.FC<CheckboxWithTitleProps> = ({
   label,
   checked,
   onChange,
+  disabled = false,
 }) => {
   const id = useId(); // Generate a unique ID
 
@@ -31,6 +33,7 @@ const CheckboxWithTitle: React.FC<CheckboxWithTitleProps> = ({
             checked={checked}
             onCheckedChange={onChange}
             className="mr-2"
+            disabled={disabled}
           />
           {label}
         </label>
