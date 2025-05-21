@@ -185,7 +185,8 @@ export default function DelegateStatementForm({
     !form.formState.isSubmitting &&
     !!form.formState.isValid &&
     !!agreeCodeConduct &&
-    !!agreeDaoPrinciples;
+    !!agreeDaoPrinciples &&
+    canEdit;
 
   const renderForm = () => {
     return (
@@ -196,10 +197,13 @@ export default function DelegateStatementForm({
           {hasStakeholders && <TopStakeholdersFormSection form={form} />}
           <div className="p-6 ">
             {requireCodeOfConduct && (
-              <DelegateStatementBoolSelector form={form} />
+              <DelegateStatementBoolSelector form={form} canEdit={canEdit} />
             )}
             {requireDaoPrinciples && (
-              <DelegateStatementDaoPrinciplesSelector form={form} />
+              <DelegateStatementDaoPrinciplesSelector
+                form={form}
+                canEdit={canEdit}
+              />
             )}
           </div>
           <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 p-6 flex-wrap border-t border-line">
@@ -258,7 +262,7 @@ export default function DelegateStatementForm({
                 <TooltipTrigger className="flex flex-col w-full items-center">
                   {renderForm()}
                 </TooltipTrigger>
-                <TooltipContent className="text-primary text-sm max-w-[200px]">
+                <TooltipContent className="text-primary text-sm max-w-[300px]">
                   This content cannot be edited as it is pending approval from a
                   Safe Wallet. You can cancel this submission any time prior to
                   approvals.
