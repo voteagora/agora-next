@@ -30,20 +30,31 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
       ) / 100
     )
   );
+  // TODO this will change, just need to get clarification on the dao-node endpoint
 
-  return percentParticipation > 50 ? (
-    <ActiveHeader
-      outOfTen={voterStats.last_10_props.toString()}
-      totalProposals={voterStats.total_proposals}
-      percentParticipation={percentParticipation}
-    />
-  ) : (
-    <InactiveHeader
-      outOfTen={voterStats.last_10_props.toString()}
-      totalProposals={voterStats.total_proposals}
-      percentParticipation={percentParticipation}
-    />
-  );
+  if (voterStats.total_proposals < 10) {
+    // Delegate has not had a chance to vote
+    return <PendingActivityHeader />;
+  } else if (percentParticipation > 50) {
+    return (
+      <ActiveHeader
+        outOfTen={voterStats.last_10_props.toString()}
+        totalProposals={voterStats.total_proposals}
+        percentParticipation={percentParticipation}
+      />
+    );
+  } else if (percentParticipation <= 50) {
+    return (
+      <InactiveHeader
+        outOfTen={voterStats.last_10_props.toString()}
+        totalProposals={voterStats.total_proposals}
+        percentParticipation={percentParticipation}
+      />
+    );
+  } else {
+    //   Fallback to pending if something goes wrong
+    return <PendingActivityHeader />;
+  }
 };
 
 const ActiveHeader = ({
@@ -78,6 +89,18 @@ const InactiveHeader = ({
       title="Inactive delegate"
       cornerTitle={`💤 ${percentParticipation}%`}
       subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
+    />
+  );
+};
+
+const PendingActivityHeader = () => {
+  return (
+    <CardHeader
+      title={"Gathering Data"}
+      cornerTitle={"🆕 -%"}
+      subtitle={
+        "This delegate hasn’t been eligible to vote on any recent proposals yet. Check back soon!"
+      }
     />
   );
 };
