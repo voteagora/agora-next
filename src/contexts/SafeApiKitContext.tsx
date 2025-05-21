@@ -57,7 +57,7 @@ export const SafeApiKitProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     initSafeApiKit();
-  }, [address, isConnected, chainId]);
+  }, [address, isConnected, chainId, contracts]);
 
   return (
     <SafeApiKitContext.Provider value={{ safeApiKit, isLoading, error }}>

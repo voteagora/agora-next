@@ -22,7 +22,6 @@ import DelegateStatementBoolSelector, {
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 import { useSignInWithSafeMessage } from "@/hooks/useSignInWithSafeMessage";
 import { DraftStatementDetails } from "../Delegates/DelegateStatement/DelegateDraftStatement";
-import { stageStatus } from "@/app/lib/sharedEnums";
 import { useOpenDialog } from "../Dialogs/DialogProvider/DialogProvider";
 import { useGetDelegateDraftStatement } from "@/hooks/useGetDelegateDraftStatement";
 import {
@@ -108,6 +107,7 @@ export default function DelegateStatementForm({
     const serializedBody = JSON.stringify(body, undefined, "\t");
     let signature;
     let messageHash;
+
     if (isSelectedPrimaryAddress) {
       signature = await messageSigner
         .signMessageAsync({
@@ -158,6 +158,7 @@ export default function DelegateStatementForm({
     if (!isSelectedPrimaryAddress) {
       setSaveSuccess(true);
     }
+
     refetch();
     router.push(`/delegates/${address}`);
   }
@@ -165,15 +166,17 @@ export default function DelegateStatementForm({
   const checkSafeConfirmation = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    const submissionHandler = form.handleSubmit(onSubmit);
+
     if (!isSelectedPrimaryAddress) {
       openDialog({
         type: "SAFE_SIGN_CONFIRMATION",
         params: {
-          onSubmit: form.handleSubmit(onSubmit),
+          onSubmit: submissionHandler,
         },
       });
     } else {
-      form.handleSubmit(onSubmit);
+      await submissionHandler();
     }
   };
 
@@ -242,7 +245,7 @@ export default function DelegateStatementForm({
           <DelegateCard delegate={delegate} isEditMode />
         </div>
       )}
-      <div className="flex flex-col w-full mt-6 lg:mt-0">
+      <div className="flex flex-col w-full mt-6 md:mt-0">
         {!isSelectedPrimaryAddress && (
           <DraftStatementDetails delegateStatement={delegate?.statement} />
         )}

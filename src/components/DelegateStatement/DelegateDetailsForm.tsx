@@ -181,9 +181,11 @@ export default function DelegateDetailsForm({
         <form onSubmit={checkSafeConfirmation} className="text-left">
           <div className="flex flex-col bg-neutral rounded-xl border border-line mb-4">
             <div className="self-stretch px-6 py-3.5 bg-brandPrimary/10 border-b border-line inline-flex justify-start items-center gap-1.5">
-              <PublicIcon className="stroke-brandPrimary" />
+              <PublicIcon className="stroke-brandPrimary block md:hidden lg:block" />
               <div className="flex justify-start items-start gap-1 justify-center text-xs leading-none">
-                <div className="font-semibold">Public:</div>
+                <div className="font-semibold block md:hidden lg:block">
+                  Public:
+                </div>
                 <div className="font-medium">
                   This information is publicly visible on your delegate profile
                   but not on-chain.
@@ -194,9 +196,11 @@ export default function DelegateDetailsForm({
           </div>
           <div className="flex flex-col bg-neutral rounded-xl border border-line mb-4">
             <div className="self-stretch px-6 py-3.5 bg-brandPrimary/10 border-b border-line inline-flex justify-start items-center gap-1.5">
-              <LockIcon className="stroke-brandPrimary" />
+              <LockIcon className="stroke-brandPrimary block md:hidden lg:block" />
               <div className="flex justify-start items-start gap-1 justify-center text-xs leading-none">
-                <div className="font-semibold">Private:</div>
+                <div className="font-semibold block md:hidden lg:block">
+                  Private:
+                </div>
                 <div className="font-medium">
                   Your email is private and will never be shared publicly.
                 </div>
@@ -240,7 +244,7 @@ export default function DelegateDetailsForm({
           <DelegateCard delegate={delegate} isEditMode />
         </div>
       )}
-      <div className="flex flex-col w-full mt-6 lg:mt-0 gap-6">
+      <div className="flex flex-col w-full mt-6 md:mt-0 gap-6">
         {!isSelectedPrimaryAddress && (
           <DraftStatementDetails delegateStatement={delegate?.statement} />
         )}
