@@ -6,7 +6,6 @@ import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { DelegateActions } from "../DelegateCard/DelegateActions";
 import Tenant from "@/lib/tenant/tenant";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
-import { useVoterStats } from "@/hooks/useVoterStats";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
 
 const DelegateCard = ({
@@ -23,15 +22,7 @@ const DelegateCard = ({
   const { token } = Tenant.current();
   const { advancedDelegators } = useConnectedDelegate();
 
-  const { data: votingStats, isFetching: isVotingStatsPending } = useVoterStats(
-    {
-      address: delegate.address as `0x${string}`,
-    }
-  );
-
   const sanitizedTruncatedStatement = sanitizeContent(truncatedStatement);
-
-  const numProposals = votingStats?.total_proposals || 0;
 
   return (
     <div
@@ -56,19 +47,9 @@ const DelegateCard = ({
               <span className="text-primary font-bold">
                 {formatNumber(delegate.votingPower.total)} {token.symbol}
               </span>
-              {numProposals > 0 && !isVotingStatsPending && (
-                <span className="text-primary font-bold">
-                  {(
-                    Math.round(
-                      ((votingStats?.last_10_props || 0) /
-                        Math.min(10, numProposals)) *
-                        100 *
-                        100
-                    ) / 100
-                  ).toFixed(2)}
-                  % Participation
-                </span>
-              )}
+              <span className="text-primary font-bold">
+                {Math.round(delegate.participation)}% Participation
+              </span>
             </div>
             <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2 px-4">
               {sanitizedTruncatedStatement}

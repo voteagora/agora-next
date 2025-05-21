@@ -103,7 +103,10 @@ export default function DelegateTable({
                 <DelegateTableRow
                   key={delegate.address}
                   delegate={
-                    delegate as DelegateChunk & { numOfDelegators: bigint }
+                    delegate as DelegateChunk & {
+                      numOfDelegators: bigint;
+                      participation: number;
+                    }
                   }
                 />
               ))

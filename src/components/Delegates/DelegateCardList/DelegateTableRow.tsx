@@ -4,28 +4,18 @@ import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { formatNumber } from "@/lib/tokenUtils";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { useVoterStats } from "@/hooks/useVoterStats";
 import { useRouter } from "next/navigation";
 
 export default function DelegateTableRow({
   delegate,
 }: {
-  delegate: DelegateChunk & { numOfDelegators: bigint; vpChange7d?: string };
+  delegate: DelegateChunk & {
+    numOfDelegators: bigint;
+    vpChange7d?: string;
+    participation: number;
+  };
 }) {
-  console.log("DelegateTableRow delegate:", delegate);
   const router = useRouter();
-  const { data: voterStats, isPending: isVoterStatsPending } = useVoterStats({
-    address: delegate.address as `0x${string}`,
-  });
-
-  const numProposals = voterStats?.total_proposals || 0;
-  const participation = Number(
-    Math.round(
-      ((voterStats?.last_10_props || 0) / Math.min(10, numProposals)) *
-        100 *
-        100
-    ) / 100
-  ).toFixed(2);
 
   return (
     <TableRow
@@ -59,9 +49,7 @@ export default function DelegateTableRow({
           "0"
         )}
       </TableCell>
-      <TableCell>
-        {!isVoterStatsPending && numProposals > 0 && `${participation}%`}
-      </TableCell>
+      <TableCell>{`${Math.round(delegate.participation)}%`}</TableCell>
       {/* @ts-ignore */}
       <TableCell>
         {delegate.numOfDelegators?.toString() || 0} addresses

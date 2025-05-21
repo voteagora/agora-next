@@ -197,6 +197,7 @@ async function getDelegates({
             ),
             lastVoteBlock: BigInt(String(delegate.lastVoteBlock || 0)),
             vpChange7d: BigInt(String(delegate.vpChange7d || 0)),
+            participation: delegate.PR || 0,
           };
         });
 
@@ -768,6 +769,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       statement: delegate?.statement || null,
       relativeVotingPowerToVotableSupply,
       vpChange7d: 0n,
+      participation: 0,
     };
   });
 }

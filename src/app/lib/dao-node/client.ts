@@ -106,6 +106,7 @@ export const getDelegatesFromDaoNode = async (options?: {
             mostRecentDelegationBlock: "0",
             lastVoteBlock: "0",
             vpChange7d: delegate.VPC || "0",
+            participation: delegate.PR || 0,
           };
         }
       );
