@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { useEnsAddress, useEnsName } from "wagmi";
 import { isAddress } from "viem";
+import { useEffect } from "react";
 
 type AddressInputProps = {
   label: string;
@@ -40,15 +41,24 @@ function AddressInput<
   placeholder,
   tooltip,
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> & AddressInputProps) {
-  const { watch, setValue } = useFormContext();
+  const { watch, setValue, trigger } = useFormContext();
 
   const address = watch(name);
 
-  const { data: ensAddress } = useEnsAddress({
+  const { data: ensAddress, isLoading: isLoadingEnsAddress } = useEnsAddress({
     chainId: 1,
     name: address?.trim(),
-    query: { enabled: address?.trim()?.split(".")?.[1] === "eth" },
+    query: {
+      enabled:
+        !!address && !isAddress(address.trim()) && address.trim().includes("."),
+    },
   });
+
+  useEffect(() => {
+    if (ensAddress && address !== ensAddress) {
+      setValue(name, ensAddress as any, { shouldValidate: true });
+    }
+  }, [ensAddress, name, setValue, address]);
 
   const { data: ensName } = useEnsName({
     chainId: 1,
@@ -57,6 +67,9 @@ function AddressInput<
   });
 
   const buildHint = () => {
+    if (isLoadingEnsAddress) {
+      return "Resolving ENS...";
+    }
     if (isAddress(address)) {
       if (ensName != null)
         return (
@@ -65,15 +78,17 @@ function AddressInput<
           </>
         );
     }
-
-    if (ensAddress != null) return ensAddress;
+    if (!isAddress(address) && ensAddress) return ensAddress;
+    return null;
   };
 
   const handleKeyDown = (event: any) => {
     if (event.key === "Enter") {
       event.preventDefault();
-      if (!isAddress(address) && ensAddress != null) {
-        setValue(name, ensAddress as any);
+      if (!isAddress(address) && ensAddress) {
+        setValue(name, ensAddress as any, { shouldValidate: true });
+      } else {
+        trigger(name);
       }
     }
   };
@@ -110,11 +125,6 @@ function AddressInput<
                 {...field}
                 type="text"
                 className={`border bg-wash border-line placeholder:text-tertiary text-primary p-2 rounded-lg w-full`}
-                onBlur={() => {
-                  if (!isAddress(address) && ensAddress != null) {
-                    setValue(name, ensAddress as any);
-                  }
-                }}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
               />

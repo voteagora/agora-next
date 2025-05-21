@@ -374,7 +374,9 @@ const ApprovalProposalForm = () => {
       setValue("simulation_state", anyInvalid ? "INVALID" : "VALID");
     } catch (e) {
       console.error(e);
-      toast.error("Error simulating transactions");
+      toast.error(
+        <span className="break-all">{`Error simulating transactions: ${e}`}</span>
+      );
     } finally {
       setSimulationPending(false);
     }
