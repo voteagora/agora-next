@@ -642,7 +642,7 @@ const ActionSummary = ({
         <TooltipProvider delayDuration={300}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="truncate text-xs break-all">
+              <div className="text-xs break-all">
                 <p>
                   {functionSignature.functionName}(
                   {functionSignature.paramValues &&
@@ -693,7 +693,7 @@ const ActionSummary = ({
           </Tooltip>
         </TooltipProvider>
       ) : (
-        <div className="truncate text-xs break-all">
+        <div className="text-xs break-all">
           {decodedData.function === "unknown" || !decodedData.function ? (
             <div>
               <TooltipProvider delayDuration={300}>
