@@ -164,7 +164,7 @@ export default function CurrentDelegateStatement() {
       reset(setDefaultValues(delegateStatementDraft as DelegateStatement));
       setLoading(false);
     }
-  }, [address, reset, draftView, delegateStatementDraft, setDefaultValues]);
+  }, [address, reset, draftView, delegateStatementDraft]);
 
   return loading ? (
     shouldHideAgoraBranding ? (
