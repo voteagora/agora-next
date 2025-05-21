@@ -180,7 +180,7 @@ export default function DelegateDetailsForm({
       <Form {...form}>
         <form onSubmit={checkSafeConfirmation} className="text-left">
           <div className="flex flex-col bg-neutral rounded-xl border border-line mb-4">
-            <div className="self-stretch px-6 py-3.5 bg-brandPrimary/10 border-b border-line inline-flex justify-start items-center gap-1.5">
+            <div className="self-stretch px-6 py-3.5 bg-brandPrimary/10 border-b border-line inline-flex justify-start items-center gap-1.5 rounded-tl-xl rounded-tr-xl">
               <PublicIcon className="stroke-brandPrimary block md:hidden lg:block" />
               <div className="flex justify-start items-start gap-1 justify-center text-xs leading-none">
                 <div className="font-semibold block md:hidden lg:block">
@@ -195,7 +195,7 @@ export default function DelegateDetailsForm({
             <SocialFormSection form={form as any} />
           </div>
           <div className="flex flex-col bg-neutral rounded-xl border border-line mb-4">
-            <div className="self-stretch px-6 py-3.5 bg-brandPrimary/10 border-b border-line inline-flex justify-start items-center gap-1.5">
+            <div className="self-stretch px-6 py-3.5 bg-brandPrimary/10 border-b border-line inline-flex justify-start items-center gap-1.5 rounded-tl-xl rounded-tr-xl">
               <LockIcon className="stroke-brandPrimary block md:hidden lg:block" />
               <div className="flex justify-start items-start gap-1 justify-center text-xs leading-none">
                 <div className="font-semibold block md:hidden lg:block">
