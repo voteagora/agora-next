@@ -22,11 +22,13 @@ export type Delegate = {
   numOfDelegators: bigint;
   statement: DelegateStatement | null;
   relativeVotingPowerToVotableSupply: string;
+  vpChange7d: bigint;
+  participation: number;
 };
 
 export type DelegateChunk = Pick<
   Delegate,
-  "address" | "votingPower" | "statement" | "citizen"
+  "address" | "votingPower" | "statement" | "citizen" | "participation"
 >;
 
 export type DelegatePayload = Delegate & {
