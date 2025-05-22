@@ -197,10 +197,7 @@ export const getVotableSupplyFromDaoNode = async () => {
 
 export const getCachedAllProposalsFromDaoNode = cache(
   getAllProposalsFromDaoNode
-); //, [], {
-//tags: ["getAllProposalsFromDaoNode"],
-//revalidate: 15, // seconds
-//});
+); 
 
 /* 
 

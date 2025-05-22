@@ -11,34 +11,6 @@ import {
 import { BigNumberish } from "ethers";
 import { Decimal } from "@prisma/client/runtime";
 
-/*
-export type OptimismProposals = {
-  proposal_id: string
-  contract: string
-  
-  proposer: string
-  description: string | null
-  
-  ordinal: Prisma.Decimal
-  created_block: bigint | null
-  start_block: string
-  end_block: string | null
-  cancelled_block: bigint | null
-  queued_block: bigint | null
-  executed_block: bigint | null
-  
-  proposal_data: Prisma.JsonValue | null
-  proposal_data_raw: string | null
-  proposal_type: $Enums.ProposalType
-  proposal_type_data: Prisma.JsonValue | null
-  proposal_results: Prisma.JsonValue | null
-
-  created_transaction_hash: string | null
-  cancelled_transaction_hash: string | null
-  queued_transaction_hash: string | null
-  executed_transaction_hash: string | null
-}
-*/
 
 export type ProposalPayloadFromDAONode = {
   id: string;
