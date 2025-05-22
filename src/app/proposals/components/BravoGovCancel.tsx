@@ -1,14 +1,14 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import {
-  useAccount,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
 import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useWrappedWriteContract } from "@/hooks/useWrappedWriteContract";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
+import { SafeTxnTooltip } from "@/components/shared/SafeTxnTooltip";
 
 interface Props {
   proposal: Proposal;
@@ -16,15 +16,14 @@ interface Props {
 
 export const BravoGovCancel = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
-  const { address } = useAccount();
-
+  const { selectedWalletAddress: address } = useSelectedWallet();
   const { data: adminAddress } = useGovernorAdmin({ enabled: true });
   const proposer = proposal.proposer;
   const canCancel =
     adminAddress?.toString().toLowerCase() === address?.toLowerCase() ||
     proposer?.toString().toLowerCase() === address?.toLowerCase();
 
-  const { data, writeContract: write } = useWriteContract();
+  const { data, writeContract: write } = useWrappedWriteContract();
 
   const { isLoading, isSuccess, isError, isFetched, error } =
     useWaitForTransactionReceipt({
@@ -47,6 +46,22 @@ export const BravoGovCancel = ({ proposal }: Props) => {
       });
     }
   }, [isSuccess, isError, error]);
+
+  const { getCancelProposalsForDescription } = useSafePendingTransactions();
+
+  const pendingCancelProposals = useMemo(() => {
+    return getCancelProposalsForDescription(proposal.description, proposal.id);
+  }, [getCancelProposalsForDescription, proposal.description, proposal.id]);
+
+  if (pendingCancelProposals?.[proposal.id]) {
+    return (
+      <SafeTxnTooltip className="inline-block">
+        <Button className="w-full bg-primary/90 cursor-none" disabled>
+          Pending Approval {pendingCancelProposals[proposal.id]}
+        </Button>
+      </SafeTxnTooltip>
+    );
+  }
 
   if (!canCancel) {
     return null;

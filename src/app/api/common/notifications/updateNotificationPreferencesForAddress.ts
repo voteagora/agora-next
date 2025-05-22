@@ -27,6 +27,7 @@ const UpdateNotificationPreferencesSchema = z.object({
 const updateNotificationPreferencesForAddress = async (
   address: `0x${string}`,
   email: string,
+  message_hash: string,
   options: z.infer<typeof NotificationPreferencesOptionsSchema>
 ) => {
   try {
@@ -39,9 +40,10 @@ const updateNotificationPreferencesForAddress = async (
     const validatedAddress = validatedData.address.toLowerCase();
     const result = await prismaWeb2Client.delegateStatements.update({
       where: {
-        address_dao_slug: {
+        address_dao_slug_message_hash: {
           address: validatedAddress,
           dao_slug: slug,
+          message_hash,
         },
       },
       data: {

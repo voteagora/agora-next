@@ -130,7 +130,6 @@ export default async function Page({
         } as DelegateStatement)
       : null,
   });
-
   return (
     <div className="flex flex-col md:flex-row items-center md:items-start gap-6 justify-between mt-12 w-full max-w-full">
       <div className="flex flex-col static md:sticky top-16 shrink-0 w-full md:max-w-[330px] lg:max-w-[350px]">
@@ -146,7 +145,7 @@ export default async function Page({
         <div className="flex flex-col md:ml-8 lg:ml-12 min-w-0 flex-1 max-w-full">
           <ProfileTabs initialTab={activeTab}>
             <TabsContent value="statement">
-              <DelegateStatementWrapper delegate={parsedDelegate} />
+              <DelegateStatementWrapper address={address} />
             </TabsContent>
             <TabsContent value="participation">
               <Suspense fallback={<VotesContainerSkeleton />}>
@@ -161,7 +160,7 @@ export default async function Page({
           </ProfileTabs>
         </div>
       ) : (
-        <DelegateStatementWrapper delegate={parsedDelegate} />
+        <DelegateStatementWrapper address={address} />
       )}
     </div>
   );

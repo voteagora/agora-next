@@ -2,6 +2,9 @@
 import DOMPurify from "isomorphic-dompurify";
 
 export function sanitizeContent(content: string): string {
+  if (!content) {
+    return "";
+  }
   // Remove dangerous content
   let cleaned = content
     .replace(/javascript:/gi, "")

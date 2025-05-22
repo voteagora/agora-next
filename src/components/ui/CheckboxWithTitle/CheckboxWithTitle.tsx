@@ -2,10 +2,11 @@ import { useId } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface CheckboxWithTitleProps {
-  title: string | React.ReactNode;
+  title?: string | React.ReactNode;
   label: string;
   checked: boolean;
   onChange: (value: boolean) => void;
+  disabled?: boolean;
 }
 
 const CheckboxWithTitle: React.FC<CheckboxWithTitleProps> = ({
@@ -13,14 +14,17 @@ const CheckboxWithTitle: React.FC<CheckboxWithTitleProps> = ({
   label,
   checked,
   onChange,
+  disabled = false,
 }) => {
   const id = useId(); // Generate a unique ID
 
   return (
     <>
-      <h4 className="flex items-center mb-3 text-secondary font-semibold text-xs leading-4">
-        {title}
-      </h4>
+      {title && (
+        <h4 className="flex items-center mb-3 text-secondary font-semibold text-xs leading-4">
+          {title}
+        </h4>
+      )}
       <div className="flex items-center mb-4 font-semibold text-primary">
         <label htmlFor={id} className="flex items-center cursor-pointer">
           {" "}
@@ -29,6 +33,7 @@ const CheckboxWithTitle: React.FC<CheckboxWithTitleProps> = ({
             checked={checked}
             onCheckedChange={onChange}
             className="mr-2"
+            disabled={disabled}
           />
           {label}
         </label>

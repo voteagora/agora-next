@@ -1,12 +1,8 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import {
-  useReadContract,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useReadContract, useWaitForTransactionReceipt } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
 import {
@@ -15,6 +11,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useWrappedWriteContract } from "@/hooks/useWrappedWriteContract";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
+import { SafeTxnTooltip } from "@/components/shared/SafeTxnTooltip";
 
 interface Props {
   proposal: Proposal;
@@ -33,7 +32,7 @@ export const BravoGovExecute = ({ proposal }: Props) => {
       chainId: contracts.timelock!.chain.id,
     });
 
-  const { data, writeContract } = useWriteContract();
+  const { data, writeContract } = useWrappedWriteContract();
 
   const { isLoading, isSuccess, isError, isFetched, error } =
     useWaitForTransactionReceipt({
@@ -70,6 +69,22 @@ export const BravoGovExecute = ({ proposal }: Props) => {
       });
     }
   }, [isSuccess, isError, error]);
+
+  const { getExecuteProposalsForDescription } = useSafePendingTransactions();
+
+  const pendingExecuteProposals = useMemo(() => {
+    return getExecuteProposalsForDescription(proposal.description, proposal.id);
+  }, [getExecuteProposalsForDescription, proposal.description, proposal.id]);
+
+  if (pendingExecuteProposals?.[proposal.id]) {
+    return (
+      <SafeTxnTooltip className="inline-block">
+        <Button className="w-full bg-primary/90 cursor-none" disabled>
+          Pending Approval {pendingExecuteProposals[proposal.id]}
+        </Button>
+      </SafeTxnTooltip>
+    );
+  }
 
   return (
     <div>

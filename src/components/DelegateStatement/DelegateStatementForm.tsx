@@ -3,11 +3,10 @@
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import DelegateStatementFormSection from "./DelegateStatementFormSection";
 import TopIssuesFormSection from "./TopIssuesFormSection";
-import OtherInfoFormSection from "./OtherInfoFormSection";
 import { Button } from "@/components/ui/button";
 import { type UseFormReturn, useWatch } from "react-hook-form";
 import { Form } from "@/components/ui/form";
-import { useAccount, useSignMessage, useWalletClient } from "wagmi";
+import { useSignMessage, useWalletClient } from "wagmi";
 import { submitDelegateStatement } from "@/app/delegates/actions";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -17,22 +16,42 @@ import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeh
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { useDelegate } from "@/hooks/useDelegate";
 import { useDelegateStatementStore } from "@/stores/delegateStatement";
+import DelegateStatementBoolSelector, {
+  DelegateStatementDaoPrinciplesSelector,
+} from "./DelegateStatementBoolSelector";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useSignInWithSafeMessage } from "@/hooks/useSignInWithSafeMessage";
+import { DraftStatementDetails } from "../Delegates/DelegateStatement/DelegateDraftStatement";
+import { useOpenDialog } from "../Dialogs/DialogProvider/DialogProvider";
+import { useGetDelegateDraftStatement } from "@/hooks/useGetDelegateDraftStatement";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 export default function DelegateStatementForm({
   form,
+  canEdit = true,
 }: {
   form: UseFormReturn<DelegateStatementFormValues>;
+  canEdit: boolean;
 }) {
   const router = useRouter();
   const { ui } = Tenant.current();
-  const { address } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
   const walletClient = useWalletClient();
   const messageSigner = useSignMessage();
+  const safeMessageSigner = useSignInWithSafeMessage();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
-
+  const requireCodeOfConduct = ui.toggle("delegates/code-of-conduct")?.enabled;
+  const requireDaoPrinciples = ui.toggle("delegates/dao-principles")?.enabled;
+  const openDialog = useOpenDialog();
+  const { isSelectedPrimaryAddress } = useSelectedWallet();
+  const { refetch } = useGetDelegateDraftStatement(address);
   const { data: scwAddress } = useSmartAccountAddress({ owner: address });
   const { data: delegate } = useDelegate({ address });
-
   const hasTopIssues = Boolean(
     ui.governanceIssues && ui.governanceIssues.length > 0
   );
@@ -55,8 +74,6 @@ export default function DelegateStatementForm({
   );
 
   async function onSubmit(values: DelegateStatementFormValues) {
-    /* agreeCodeConduct and agreeDaoPrinciples default values are !enabled so if it's not enabled for a tenant, it will be true, skipping the check below.
-    If enabled, it will be false by default and the user will need to check the box. */
     if (!agreeCodeConduct && !agreeDaoPrinciples) {
       return;
     }
@@ -65,41 +82,54 @@ export default function DelegateStatementForm({
     }
 
     values.topIssues = values.topIssues.filter((issue) => issue.value !== "");
+    const originalDelegateStatement = delegate?.statement;
+    const { daoSlug, delegateStatement, topIssues, topStakeholders } = values;
 
-    const {
-      daoSlug,
-      discord,
-      delegateStatement,
-      email,
-      twitter,
-      warpcast,
-      topIssues,
-      topStakeholders,
-      notificationPreferences,
-    } = values;
-
-    // User will only sign what they are seeing on the frontend
     const body = {
       agreeCodeConduct: values.agreeCodeConduct,
       agreeDaoPrinciples: values.agreeDaoPrinciples,
       daoSlug,
-      discord,
       delegateStatement,
-      email,
-      twitter,
-      warpcast,
       topIssues,
       topStakeholders,
       scwAddress,
-      notificationPreferences,
+      discord: originalDelegateStatement?.discord || "",
+      email: originalDelegateStatement?.email || "",
+      twitter: originalDelegateStatement?.twitter || "",
+      warpcast: originalDelegateStatement?.warpcast || "",
+      notificationPreferences:
+        originalDelegateStatement?.notification_preferences || {
+          wants_proposal_created_email: "prompt",
+          wants_proposal_ending_soon_email: "prompt",
+        },
     };
 
     const serializedBody = JSON.stringify(body, undefined, "\t");
-    const signature = await messageSigner
-      .signMessageAsync({
-        message: serializedBody,
-      })
-      .catch((error) => console.error(error));
+    let signature;
+    let messageHash;
+
+    if (isSelectedPrimaryAddress) {
+      signature = await messageSigner
+        .signMessageAsync({
+          message: serializedBody,
+        })
+        .catch((error) => console.error(error));
+    } else {
+      // Use Safe wallet signing for non-primary addresses
+      const data = await safeMessageSigner
+        .signMessage({
+          message: serializedBody,
+          safeAddress: address as `0x${string}`,
+        })
+        .catch((error) => console.error(error));
+      if (!data) {
+        setSubmissionError("Signature failed, please try again");
+        return;
+      }
+      const { signature: safeSignature, safeMessageHash } = data;
+      signature = safeSignature.data;
+      messageHash = safeMessageHash;
+    }
 
     if (!signature) {
       setSubmissionError("Signature failed, please try again");
@@ -108,11 +138,15 @@ export default function DelegateStatementForm({
 
     const response = await submitDelegateStatement({
       address: address as `0x${string}`,
-      delegateStatement: values,
+      delegateStatement: body,
       signature,
       message: serializedBody,
       scwAddress,
-    }).catch((error) => console.error(error));
+      message_hash: messageHash || "",
+    }).catch((error) => {
+      console.error("Error submitting delegate statement:", error);
+      return null;
+    });
 
     if (!response) {
       setSubmissionError(
@@ -121,65 +155,121 @@ export default function DelegateStatementForm({
       return;
     }
 
-    setSaveSuccess(true);
+    if (!isSelectedPrimaryAddress) {
+      setSaveSuccess(true);
+    }
+
+    refetch();
     router.push(`/delegates/${address}`);
   }
+
+  const checkSafeConfirmation = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const submissionHandler = form.handleSubmit(onSubmit);
+
+    if (!isSelectedPrimaryAddress) {
+      openDialog({
+        type: "SAFE_SIGN_CONFIRMATION",
+        params: {
+          onSubmit: submissionHandler,
+        },
+      });
+    } else {
+      await submissionHandler();
+    }
+  };
 
   const canSubmit =
     !!walletClient &&
     !form.formState.isSubmitting &&
     !!form.formState.isValid &&
     !!agreeCodeConduct &&
-    !!agreeDaoPrinciples;
+    !!agreeDaoPrinciples &&
+    canEdit;
+
+  const renderForm = () => {
+    return (
+      <Form {...form}>
+        <form onSubmit={checkSafeConfirmation} className="w-full">
+          <DelegateStatementFormSection form={form} />
+          {hasTopIssues && <TopIssuesFormSection form={form} />}
+          {hasStakeholders && <TopStakeholdersFormSection form={form} />}
+          <div className="p-6 ">
+            {requireCodeOfConduct && (
+              <DelegateStatementBoolSelector form={form} canEdit={canEdit} />
+            )}
+            {requireDaoPrinciples && (
+              <DelegateStatementDaoPrinciplesSelector
+                form={form}
+                canEdit={canEdit}
+              />
+            )}
+          </div>
+          <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 p-6 flex-wrap border-t border-line">
+            <Button
+              variant="outline"
+              className="flex-1 py-3 px-4 text-primary rounded-full text-base h-12"
+              type="button"
+            >
+              Cancel
+            </Button>
+
+            <Button
+              variant="brand"
+              className="flex-1 py-3 px-4 text-neutral text-base h-12"
+              disabled={!canSubmit}
+              type="submit"
+            >
+              Save
+            </Button>
+            {form.formState.isSubmitted && !agreeCodeConduct && (
+              <span className="text-red-700 text-sm">
+                You must agree with the code of conduct to continue
+              </span>
+            )}
+            {form.formState.isSubmitted && !agreeDaoPrinciples && (
+              <span className="text-red-700 text-sm">
+                You must agree with the DAO principles to continue
+              </span>
+            )}
+            {submissionError && (
+              <span className="text-red-700 text-sm">{submissionError}</span>
+            )}
+          </div>
+        </form>
+      </Form>
+    );
+  };
 
   return (
-    <div className="flex flex-col md:flex-row items-center md:items-start lg:gap-16 md:gap-8 justify-between mt-12 w-full max-w-full">
+    <div className="flex flex-col md:flex-row items-center md:items-start lg:gap-16 md:gap-8 justify-between w-full max-w-full">
       {delegate && (
         <div className="flex flex-col static md:sticky top-16 shrink-0 w-full lg:max-w-[350px] md:max-w-[300px]">
           <DelegateCard delegate={delegate} isEditMode />
         </div>
       )}
-      <div className="flex flex-col w-full mt-6 lg:mt-0">
-        <div className="flex flex-col bg-neutral border rounded-xl border-line shadow-newDefault">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <DelegateStatementFormSection form={form} />
-              {hasTopIssues && <TopIssuesFormSection form={form} />}
-              {hasStakeholders && <TopStakeholdersFormSection form={form} />}
-              <OtherInfoFormSection form={form} />
-
-              <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 py-8 px-6 flex-wrap">
-                <span className="text-sm text-primary">
-                  Tip: you can always come back and edit your profile at any
-                  time.
-                </span>
-
-                <Button
-                  variant="elevatedOutline"
-                  className="py-3 px-4 text-primary"
-                  disabled={!canSubmit}
-                  type="submit"
-                >
-                  Submit delegate profile
-                </Button>
-                {form.formState.isSubmitted && !agreeCodeConduct && (
-                  <span className="text-red-700 text-sm">
-                    You must agree with the code of conduct to continue
-                  </span>
-                )}
-                {form.formState.isSubmitted && !agreeDaoPrinciples && (
-                  <span className="text-red-700 text-sm">
-                    You must agree with the DAO principles to continue
-                  </span>
-                )}
-                {submissionError && (
-                  <span className="text-red-700 text-sm">
-                    {submissionError}
-                  </span>
-                )}
-              </div>
-            </form>
-          </Form>
+      <div className="flex flex-col w-full mt-6 md:mt-0">
+        {!isSelectedPrimaryAddress && (
+          <DraftStatementDetails delegateStatement={delegate?.statement} />
+        )}
+        <div className="flex flex-col bg-neutral rounded-xl border border-line">
+          {canEdit ? (
+            renderForm()
+          ) : (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger className="flex flex-col w-full items-center">
+                  {renderForm()}
+                </TooltipTrigger>
+                <TooltipContent className="text-primary text-sm max-w-[300px]">
+                  This content cannot be edited as it is pending approval from a
+                  Safe Wallet. You can cancel this submission any time prior to
+                  approvals.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
       </div>
     </div>

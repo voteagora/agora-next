@@ -198,14 +198,14 @@ const BasicVoteDialog = ({
             )}
           </div>
           <div>
-            {delegate.statement ? (
-              <VoteButton onClick={write}>
-                Vote {supportType.toLowerCase()} with{"\u00A0"}
-                <TokenAmountDecorated amount={vpToDisplay} />
-              </VoteButton>
-            ) : (
+            {/* {delegate.statement ? ( */}
+            <VoteButton onClick={write}>
+              Vote {supportType.toLowerCase()} with{"\u00A0"}
+              <TokenAmountDecorated amount={vpToDisplay} />
+            </VoteButton>
+            {/* ) : (
               <NoStatementView closeDialog={closeDialog} />
-            )}
+            )} */}
           </div>
         </div>
       )}
@@ -229,7 +229,6 @@ function AdvancedVoteDialog({
   const openDialog = useOpenDialog();
   const [hasShownVoteEmailDialog, setHasShownVoteEmailDialog] =
     useState<boolean>(false);
-
   useEffect(() => {
     setHasShownVoteEmailDialog(
       localStorage.getItem("agora-email-subscriptions--vote") === "prompted"
@@ -244,6 +243,11 @@ function AdvancedVoteDialog({
     reason,
     missingVote,
   });
+
+  const submitVote = () => {
+    write();
+    closeDialog();
+  };
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
@@ -308,14 +312,14 @@ function AdvancedVoteDialog({
             )}
           </div>
           <div>
-            {delegate.statement ? (
-              <VoteButton onClick={write}>
-                Vote {supportType.toLowerCase()} with{"\u00A0"}
-                <TokenAmountDecorated amount={vpToDisplay} />
-              </VoteButton>
-            ) : (
+            {/* {delegate.statement ? ( */}
+            <VoteButton onClick={submitVote}>
+              Vote {supportType.toLowerCase()} with{"\u00A0"}
+              <TokenAmountDecorated amount={vpToDisplay} />
+            </VoteButton>
+            {/* ) : (
               <NoStatementView closeDialog={closeDialog} />
-            )}
+            )} */}
           </div>
         </div>
       )}

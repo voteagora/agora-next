@@ -1,14 +1,17 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import { ProposalType } from "@/app/proposals/draft/types";
 import { keccak256 } from "viem";
 import { toUtf8Bytes } from "ethers";
+import { useWrappedWriteContract } from "@/hooks/useWrappedWriteContract";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
+import { SafeTxnTooltip } from "@/components/shared/SafeTxnTooltip";
 
 interface Props {
   proposal: Proposal;
@@ -16,7 +19,13 @@ interface Props {
 
 export const AgoraOptimismGovQueue = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
-  const { data, writeContract: write } = useWriteContract();
+  const { data, writeContract: write } = useWrappedWriteContract();
+
+  const { getQueueProposalsForDescription } = useSafePendingTransactions();
+
+  const pendingQueueProposals = useMemo(() => {
+    return getQueueProposalsForDescription(proposal.description, proposal.id);
+  }, [getQueueProposalsForDescription, proposal.description, proposal.id]);
 
   const { isLoading, isSuccess, isFetched, isError, error } =
     useWaitForTransactionReceipt({
@@ -65,6 +74,16 @@ export const AgoraOptimismGovQueue = ({ proposal }: Props) => {
   // Note: Optimistic proposals are not queued
   if (proposal.proposalType === "OPTIMISTIC") {
     return null;
+  }
+
+  if (pendingQueueProposals?.[proposal.id]) {
+    return (
+      <SafeTxnTooltip className="inline-block">
+        <Button className="w-full bg-primary/90 cursor-none" disabled>
+          Pending Approval {pendingQueueProposals[proposal.id]}
+        </Button>
+      </SafeTxnTooltip>
+    );
   }
 
   return (

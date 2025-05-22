@@ -1,10 +1,13 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
+import { useWrappedWriteContract } from "@/hooks/useWrappedWriteContract";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
+import { SafeTxnTooltip } from "@/components/shared/SafeTxnTooltip";
 
 interface Props {
   proposal: Proposal;
@@ -13,7 +16,7 @@ interface Props {
 export const OZGovQueue = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
 
-  const { data, writeContract: write } = useWriteContract();
+  const { data, writeContract: write } = useWrappedWriteContract();
 
   const { isLoading, isSuccess, isFetched, isError, error } =
     useWaitForTransactionReceipt({
@@ -36,6 +39,22 @@ export const OZGovQueue = ({ proposal }: Props) => {
       });
     }
   }, [isSuccess, isError, error]);
+
+  const { getQueueProposalsForDescription } = useSafePendingTransactions();
+
+  const pendingQueueProposals = useMemo(() => {
+    return getQueueProposalsForDescription(proposal.description, proposal.id);
+  }, [getQueueProposalsForDescription, proposal.description, proposal.id]);
+
+  if (pendingQueueProposals?.[proposal.id]) {
+    return (
+      <SafeTxnTooltip className="inline-block">
+        <Button className="w-full bg-primary/90 cursor-none" disabled>
+          Pending Approval {pendingQueueProposals[proposal.id]}
+        </Button>
+      </SafeTxnTooltip>
+    );
+  }
 
   return (
     <>

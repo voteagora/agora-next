@@ -62,6 +62,7 @@ const SubscribeDialog = ({
   const { data: delegate, refetch } = useDelegate({ address: address });
   const existingEmail = delegate?.statement.email;
   const hasEmail = existingEmail && existingEmail !== "";
+  const message_hash = delegate?.statement.message_hash;
 
   if (!address) return null;
 
@@ -102,6 +103,7 @@ const SubscribeDialog = ({
               await updateNotificationPreferencesForAddress(
                 address,
                 existingEmail || email,
+                message_hash,
                 {
                   wants_proposal_created_email: "prompted",
                   wants_proposal_ending_soon_email: "prompted",
@@ -142,6 +144,7 @@ const SubscribeDialog = ({
               await updateNotificationPreferencesForAddress(
                 address,
                 existingEmail || email,
+                message_hash,
                 {
                   wants_proposal_created_email: true,
                   wants_proposal_ending_soon_email: true,
