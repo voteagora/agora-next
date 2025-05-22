@@ -308,5 +308,13 @@ If you meet the proposal threshold or are the manager of the governor, then you 
       name: "use-daonode-for-votable-supply",
       enabled: false,
     },
+    {
+      name: "dao-node/votes-chart",
+      enabled: true,
+    },
+    {
+      name: "dao-node/proposal-votes",
+      enabled: true,
+    },
   ],
 });
