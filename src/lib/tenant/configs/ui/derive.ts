@@ -302,11 +302,11 @@ If you meet the proposal threshold or are the manager of the governor, then you 
     },
     {
       name: "use-daonode-for-proposals",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "use-daonode-for-votable-supply",
-      enabled: true,
+      enabled: false,
     },
   ],
 });

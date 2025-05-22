@@ -225,11 +225,11 @@ export const protocolGuildTenantUIConfig = new TenantUI({
     },
     {
       name: "use-daonode-for-proposals",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "use-daonode-for-votable-supply",
-      enabled: true,
+      enabled: false,
     },
   ],
 });
