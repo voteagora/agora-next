@@ -53,6 +53,10 @@ export default function DelegateCard({
                 detail={delegate.numOfDelegators.toString()}
               />
               <PanelRow
+                title="Participation rate"
+                detail={`${Math.round(delegate.participation)}%`}
+              />
+              <PanelRow
                 title="Proposals created"
                 detail={`${delegate.proposalsCreated}`}
               />
