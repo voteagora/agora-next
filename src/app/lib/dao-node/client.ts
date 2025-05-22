@@ -197,7 +197,7 @@ export const getVotableSupplyFromDaoNode = async () => {
 
 export const getCachedAllProposalsFromDaoNode = cache(
   getAllProposalsFromDaoNode
-); 
+);
 
 /* 
 

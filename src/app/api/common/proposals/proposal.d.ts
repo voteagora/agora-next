@@ -11,7 +11,6 @@ import {
 import { BigNumberish } from "ethers";
 import { Decimal } from "@prisma/client/runtime";
 
-
 export type ProposalPayloadFromDAONode = {
   id: string;
 
