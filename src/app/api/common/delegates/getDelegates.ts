@@ -198,7 +198,9 @@ async function getDelegates({
             ),
             lastVoteBlock: BigInt(String(delegate.lastVoteBlock || 0)),
             vpChange7d: BigInt(String(delegate.vpChange7d || 0)),
-            participation: delegate.PR || 0,
+            participation: delegate.participation
+              ? delegate.participation * 100.0
+              : 0,
           };
         });
 
