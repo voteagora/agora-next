@@ -123,43 +123,9 @@ export const getAllProposalsFromDaoNode = async () => {
   try {
     const startTime = Date.now();
 
-    const emoji = [
-      "😀",
-      "😂",
-      "😍",
-      "😎",
-      "🤔",
-      "🙌",
-      "🎉",
-      "🚀",
-      "🌟",
-      "🐶",
-      "🐱",
-      "🐼",
-      "🍕",
-      "🍔",
-      "🍣",
-      "🍩",
-      "⚽",
-      "🏀",
-      "🎮",
-      "🎵",
-      "📚",
-      "✈️",
-      "🌍",
-      "🌈",
-      "🔥",
-      "💎",
-      "🧠",
-      "🕺",
-      "💃",
-      "🥳",
-      "🤖",
-      "👑",
-    ][Math.floor(Math.random() * 32)];
     const startTimeS = new Date(startTime).toLocaleString();
 
-    console.log(`${startTimeS} ${emoji} -> getAllProposalsFromDaoNode`);
+    console.log(`${startTimeS} -> getAllProposalsFromDaoNode`);
 
     const response = await fetch(
       `${url}v1/proposals?set=everything` //?set=${filter}`
@@ -185,7 +151,7 @@ export const getAllProposalsFromDaoNode = async () => {
     });
 
     console.log(
-      `${endTimeS} ${emoji} <- getAllProposalsFromDaoNode took ${endTime - startTime}ms`
+      `${endTimeS} <- getAllProposalsFromDaoNode took ${endTime - startTime}ms`
     );
 
     return sortedProposalsArray;
@@ -203,43 +169,9 @@ export const getVotableSupplyFromDaoNode = async () => {
 
     const response = await fetch(`${url}v1/voting_power`);
 
-    const emoji = [
-      "😀",
-      "😂",
-      "😍",
-      "😎",
-      "🤔",
-      "🙌",
-      "🎉",
-      "🚀",
-      "🌟",
-      "🐶",
-      "🐱",
-      "🐼",
-      "🍕",
-      "🍔",
-      "🍣",
-      "🍩",
-      "⚽",
-      "🏀",
-      "🎮",
-      "🎵",
-      "📚",
-      "✈️",
-      "🌍",
-      "🌈",
-      "🔥",
-      "💎",
-      "🧠",
-      "🕺",
-      "💃",
-      "🥳",
-      "🤖",
-      "👑",
-    ][Math.floor(Math.random() * 32)];
     const startTimeS = new Date(startTime).toLocaleString();
 
-    console.log(`${startTimeS} ${emoji} -> getVotableSupplyFromDaoNode`);
+    console.log(`${startTimeS} -> getVotableSupplyFromDaoNode`);
 
     if (!response.ok) {
       throw new Error(`API responded with status: ${response.status} (${url})`);
@@ -253,7 +185,7 @@ export const getVotableSupplyFromDaoNode = async () => {
     const endTimeS = new Date(endTime).toLocaleString();
 
     console.log(
-      `${endTimeS} ${emoji} <- getVotableSupplyFromDaoNode took ${endTime - startTime}ms`
+      `${endTimeS} <- getVotableSupplyFromDaoNode took ${endTime - startTime}ms`
     );
 
     return votableSupply;
