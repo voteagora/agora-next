@@ -21,6 +21,8 @@ import { DraftStatementDetails } from "@/components/Delegates/DelegateStatement/
 import { PublicIcon } from "@/icons/PublicIcon";
 import { LockIcon } from "@/icons/lockIcon";
 import { FormSectionWithTooltip } from "./FormSectionWithTooltip";
+import { useGetDelegateDraftStatement } from "@/hooks/useGetDelegateDraftStatement";
+import { useDelegateStatementStore } from "@/stores/delegateStatement";
 
 export default function DelegateDetailsForm({
   form,
@@ -40,7 +42,10 @@ export default function DelegateDetailsForm({
   const openDialog = useOpenDialog();
   const { data: scwAddress } = useSmartAccountAddress({ owner: address });
   const [submissionError, setSubmissionError] = useState<string | null>(null);
-
+  const { refetch } = useGetDelegateDraftStatement(address);
+  const setSaveSuccess = useDelegateStatementStore(
+    (state) => state.setSaveSuccess
+  );
   async function onSubmit(values: DelegateDetailsFormValues) {
     try {
       if (!walletClient && isSelectedPrimaryAddress) {
@@ -137,7 +142,10 @@ export default function DelegateDetailsForm({
         );
         return;
       }
-
+      refetch();
+      if (!isSelectedPrimaryAddress) {
+        setSaveSuccess(true);
+      }
       router.push(`/delegates/${address}`);
     } catch (error) {
       setSubmissionError(
