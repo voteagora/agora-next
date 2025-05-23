@@ -1,5 +1,6 @@
 import { DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
 import { Prisma } from "@prisma/client";
+import { stageStatus } from "@/app/lib/sharedEnums";
 
 export type Delegate = {
   address: string;
@@ -60,6 +61,8 @@ type DelegateStatement = {
     wants_proposal_ending_soon_email: "prompt" | "prompted" | true | false;
     last_updated_at: Date;
   };
+  stage: stageStatus;
+  message_hash: string | null;
 };
 
 export type DelegateStats = {

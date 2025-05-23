@@ -13,7 +13,11 @@ import {
   fetchDelegate as apiFetchDelegate,
   fetchVoterStats as apiFetchVoterStats,
 } from "@/app/api/common/delegates/getDelegates";
-import { fetchDelegateStatement as apiFetchDelegateStatement } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import {
+  fetchDelegateStatement as apiFetchDelegateStatement,
+  fetchDelegateStatements as apiFetchDelegateStatements,
+  fetchLatestPublishedDelegateStatement as apiFetchLatestPublishedDelegateStatement,
+} from "@/app/api/common/delegateStatement/getDelegateStatement";
 import {
   fetchAllDelegatorsInChains,
   fetchCurrentDelegatees as apiFetchCurrentDelegatees,
@@ -24,6 +28,8 @@ import { createDelegateStatement } from "@/app/api/common/delegateStatement/crea
 import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
+import { stageStatus } from "@/app/lib/sharedEnums";
+import { MessageOrMessageHash } from "@/app/api/common/delegateStatement/delegateStatement";
 
 export const fetchDelegate = async (address: string) => {
   try {
@@ -59,8 +65,8 @@ export const fetchVoterStats = unstable_cache(
 );
 
 export const fetchDelegateStatement = unstable_cache(
-  async (address: string) => {
-    return apiFetchDelegateStatement(address);
+  async (address: string, messageOrMessageHash: MessageOrMessageHash) => {
+    return apiFetchDelegateStatement(address, messageOrMessageHash);
   },
   ["delegateStatement"],
   {
@@ -68,6 +74,30 @@ export const fetchDelegateStatement = unstable_cache(
     // often and invalidated with every delegate statement update
     revalidate: 600, // 10 minute cache
     tags: ["delegateStatement"],
+  }
+);
+
+export const fetchDelegateStatements = unstable_cache(
+  async (address: string, stage?: stageStatus) => {
+    return apiFetchDelegateStatements(address, stage);
+  },
+  ["delegateStatements"],
+  {
+    // Longer cache is acceptable since the statement is not expected to change
+    // often and invalidated with every delegate statement update
+    revalidate: 600, // 10 minute cache
+    tags: ["delegateStatements"],
+  }
+);
+
+export const fetchLatestPublishedDelegateStatement = unstable_cache(
+  async (addressOrENSName: string) => {
+    return apiFetchLatestPublishedDelegateStatement(addressOrENSName);
+  },
+  ["latestPublishedDelegateStatement"],
+  {
+    revalidate: 600, // 10 minute cache
+    tags: ["latestPublishedDelegateStatement"],
   }
 );
 

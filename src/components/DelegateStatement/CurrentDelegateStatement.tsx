@@ -13,6 +13,7 @@ import AgoraLoader, {
   LogoLoader,
 } from "@/components/shared/AgoraLoader/AgoraLoader";
 import DelegateStatementForm from "@/components/DelegateStatement/DelegateStatementForm";
+import { stageStatus } from "@/app/lib/sharedEnums";
 
 const { slug: daoSlug } = Tenant.current();
 
@@ -185,7 +186,8 @@ export default function CurrentDelegateStatement() {
   useEffect(() => {
     async function _getDelegateStatement() {
       const _delegateStatement = await fetchDelegateStatement(
-        address as string
+        address as string,
+        stageStatus.PUBLISHED
       ).catch((error) => console.error(error));
       setDelegateStatement(_delegateStatement as DelegateStatement);
       reset(setDefaultValues(_delegateStatement as DelegateStatement));
