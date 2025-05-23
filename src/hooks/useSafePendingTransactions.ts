@@ -91,9 +91,32 @@ export const useSafePendingTransactions = () => {
             acc[proposalId] =
               `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
           } catch (error) {
-            console.warn("Failed to decode specialized vote data:", error);
+            console.warn(
+              "Failed to decode castVoteWithReasonAndParams data:",
+              error
+            );
           }
-        } else {
+        } else if (transaction.data?.slice(0, 10) === "0x7b3c71d3") {
+          try {
+            // castVoteWithReason
+            const inputData = transaction.data.slice(10);
+            const decoded = decodeAbiParameters(
+              [
+                { type: "bytes32", name: "proposalId" },
+                { type: "uint8", name: "support" },
+                { type: "string", name: "reason" },
+              ],
+              `0x${inputData}` as `0x${string}`
+            );
+
+            const proposalIdBytes = decoded[0] as `0x${string}`;
+            const proposalIdBigInt = BigInt(proposalIdBytes);
+            const proposalId = proposalIdBigInt.toString();
+            acc[proposalId] =
+              `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
+          } catch (error) {
+            console.warn("Failed to decode castVoteWithReason data:", error);
+          }
         }
         return acc;
       },
@@ -178,7 +201,7 @@ export const useSafePendingTransactions = () => {
       },
       {} as Record<string, string>
     );
-  }, [pendingTransactions]);
+  }, [address, pendingTransactions?.results]);
 
   const pendingProposals = useMemo(() => {
     if (!pendingTransactions?.results || !address) return {};
@@ -271,7 +294,7 @@ export const useSafePendingTransactions = () => {
         }
       >
     );
-  }, [pendingTransactions, address, expectedOrigin]);
+  }, [pendingTransactions, address]);
 
   const getQueueProposalsForDescription = (
     description: string | null,
