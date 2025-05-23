@@ -139,6 +139,7 @@ const BaseProposalSchema = z.object({
   abstract: z.string().min(1, { message: "Description cannot be empty" }),
   simulation_state: z.string().optional(), // unconfirmed, valid, invalid
   simulation_id: z.string().optional(),
+  citizen_voting_enabled: z.boolean().optional(),
 });
 
 export const BasicProposalSchema = BaseProposalSchema.extend({
