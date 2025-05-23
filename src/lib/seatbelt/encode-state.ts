@@ -14,6 +14,8 @@ import {
   scroll,
   base,
   arbitrum,
+  optimismSepolia,
+  arbitrumSepolia,
 } from "viem/chains";
 import { getPublicClient } from "../viem";
 import { StorageEncodingResponse } from "./types";
@@ -404,9 +406,11 @@ const fetchStorageLayoutCached: (
       "1": mainnet,
       "11155111": sepolia,
       "10": optimism,
-      "534352": scroll,
-      "8453": base,
+      "11155420": optimismSepolia,
       "42161": arbitrum,
+      "421614": arbitrumSepolia,
+      "8453": base,
+      "534352": scroll,
     };
 
     const chain = chains[networkID as keyof typeof chains];
@@ -480,13 +484,9 @@ const fetchStorageLayoutCached: (
       "42161": "https://api.arbiscan.io/api",
     };
 
-    const baseUrl = endpoints[networkID];
-    if (!baseUrl) {
-      console.error(`Network ${networkID} not supported by Etherscan`);
-      return null;
-    }
+    const baseUrl = "https://api.etherscan.io/api";
 
-    const url = `${baseUrl}?module=contract&action=getsourcecode&address=${contractAddress}&apikey=${etherscanApiKey}`;
+    const url = `${baseUrl}?chainid=${networkID}&module=contract&action=getsourcecode&address=${contractAddress}&apikey=${etherscanApiKey}`;
     const response = await fetch(url);
     const data = await response.json();
 

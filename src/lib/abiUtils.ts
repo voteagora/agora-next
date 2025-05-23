@@ -16,15 +16,19 @@ import Tenant from "./tenant/tenant";
 
 const EXPLORER_DOMAINS = {
   [mainnet.name.toLowerCase()]: "https://api.etherscan.io/api",
-  [sepolia.name.toLowerCase()]: "https://api-sepolia.etherscan.io/api",
-  [optimism.name.toLowerCase()]: "https://api-optimistic.etherscan.io/api",
-  [arbitrum.name.toLowerCase()]: "https://api.arbiscan.io/api",
-  [arbitrumSepolia.name.toLowerCase()]: "https://api-sepolia.arbiscan.io/api",
-  [optimismSepolia.name.toLowerCase()]: "https://api-sepolia.optimism.io/api",
-  [base.name.toLowerCase()]: "https://api.basescan.org/api",
-  [scroll.name.toLowerCase()]: "https://api.scrollscan.com/api",
   derive: "https://explorer.derive.xyz/api",
   cyber: "https://api.socialscan.io/cyber",
+};
+
+const CHAIN_ID = {
+  [mainnet.name.toLowerCase()]: 1,
+  [sepolia.name.toLowerCase()]: 11155111,
+  [optimism.name.toLowerCase()]: 10,
+  [optimismSepolia.name.toLowerCase()]: 11155420,
+  [arbitrum.name.toLowerCase()]: 42161,
+  [arbitrumSepolia.name.toLowerCase()]: 421614,
+  [base.name.toLowerCase()]: 8453,
+  [scroll.name.toLowerCase()]: 534352,
 };
 
 interface AbiItem {
@@ -49,12 +53,20 @@ interface AbiItem {
   anonymous?: boolean;
 }
 
-function getExplorerDomain(networkName: string): string {
-  return (
+function getExplorerDomain(networkName: string): {
+  domain: string;
+  chainId: number | null;
+} {
+  const chainId =
+    CHAIN_ID[networkName.toLowerCase() as keyof typeof CHAIN_ID] || null;
+  const domain =
     EXPLORER_DOMAINS[
       networkName.toLowerCase() as keyof typeof EXPLORER_DOMAINS
-    ] || "https://api.etherscan.io/api"
-  );
+    ];
+  return {
+    domain,
+    chainId,
+  };
 }
 
 const { contracts } = Tenant.current();
@@ -62,7 +74,7 @@ const { contracts } = Tenant.current();
 const fallbackGetContractAbi = async (
   contractAddress: string
 ): Promise<AbiItem[] | null> => {
-  const fallbackUrl = `${process.env.STORAGE_BUCKET_URL}${contracts.governor.chain.id}/${contractAddress}.json`;
+  const fallbackUrl = `${process.env.STORAGE_BUCKET_URL}${contracts.governor.chain.id}/${contractAddress.toLowerCase()}.json`;
   const fallbackResponse = await axios.get(fallbackUrl);
   const fallbackData = fallbackResponse.data;
   if (fallbackResponse.status === 200) {
@@ -77,8 +89,8 @@ async function getContractAbi(
   etherscanApiKey: string,
   network: string = "mainnet"
 ): Promise<AbiItem[] | null> {
-  const domain = getExplorerDomain(network);
-  const url = `${domain}?module=contract&action=getabi&address=${contractAddress}&apikey=${etherscanApiKey}`;
+  const { domain, chainId } = getExplorerDomain(network);
+  const url = `${domain}${chainId ? `?chainid=${chainId}&` : "?"}module=contract&action=getabi&address=${contractAddress}&apikey=${etherscanApiKey}`;
   try {
     const response = await axios.get(url, {
       headers: {
