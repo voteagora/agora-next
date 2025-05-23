@@ -102,6 +102,7 @@ export const SafeWalletConfirmationDialog = ({
             onClick={onSubmit}
             loading={isSubmitting}
             disabled={isSubmitting}
+            data-testid="submit-for-approval"
           >
             Submit For Approval
           </Button>

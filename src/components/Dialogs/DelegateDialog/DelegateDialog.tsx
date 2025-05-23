@@ -197,7 +197,14 @@ export function DelegateDialog({
       );
     }
 
-    return <ShadcnButton onClick={executeDelegate}>Delegate</ShadcnButton>;
+    return (
+      <ShadcnButton
+        data-testid="delegate-modal-button"
+        onClick={executeDelegate}
+      >
+        Delegate
+      </ShadcnButton>
+    );
   };
 
   useEffect(() => {

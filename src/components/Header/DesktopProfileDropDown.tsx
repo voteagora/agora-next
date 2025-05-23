@@ -56,7 +56,10 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
   return (
     <Popover className="relative cursor-auto">
       <>
-        <Popover.Button className="flex outline-none">
+        <Popover.Button
+          className="flex outline-none"
+          data-testid="profile-dropdown-button"
+        >
           <div className="text-primary flex items-center gap-3">
             <div className="w-[30px] h-[30px] lg:w-6 lg:h-6 shadow-newDefault rounded-full flex relative">
               <ENSAvatar ensName={ensName} />
