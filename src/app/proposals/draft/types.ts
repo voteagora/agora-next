@@ -230,6 +230,7 @@ export type PLMConfig = {
 
 export type BaseProposal = ProposalDraft & {
   checklist_items: ProposalChecklist[];
+  citizen_voting_enabled?: boolean;
 };
 
 export type BasicProposal = BaseProposal & {
@@ -302,6 +303,10 @@ const parseTransaction = (t: ProposalDraftTransaction) => {
 };
 // Used to translate a draftProposal database record into its form representation
 export const parseProposalToForm = (proposal: DraftProposal) => {
+  const baseFields = {
+    citizen_voting_enabled: proposal.citizen_voting_enabled || false,
+  };
+
   switch (proposal.voting_module_type) {
     case ProposalType.BASIC:
       return {
@@ -309,6 +314,7 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         title: proposal.title,
         abstract: proposal.abstract,
         transactions: proposal.transactions.map((t) => parseTransaction(t)),
+        ...baseFields,
       };
     case ProposalType.SOCIAL:
       return {
@@ -321,6 +327,7 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
           end_date: proposal.end_date_social,
           options: proposal.social_options,
         },
+        ...baseFields,
       };
     case ProposalType.APPROVAL:
       return {
@@ -340,12 +347,14 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
             };
           }),
         },
+        ...baseFields,
       };
     case ProposalType.OPTIMISTIC:
       return {
         type: ProposalType.OPTIMISTIC,
         title: proposal.title,
         abstract: proposal.abstract,
+        ...baseFields,
       };
   }
 };
