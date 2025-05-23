@@ -164,8 +164,6 @@ export default function ProposalType({
     data: resultAddScope,
     writeContractAsync: writeAddScope,
     isPending: isLoadingAddScope,
-    isSuccess: isSuccessAddScope,
-    error: errorAddScope,
   } = useWriteContract();
 
   const { isLoading: isLoadingAddScopeTransaction } =
@@ -177,8 +175,6 @@ export default function ProposalType({
     data: resultDeleteScope,
     writeContractAsync: writeDeleteScope,
     isPending: isLoadingDeleteScope,
-    isSuccess: isSuccessDeleteScope,
-    error: errorDeleteScope,
   } = useWriteContract();
 
   const { isLoading: isLoadingDeleteScopeTransaction } =

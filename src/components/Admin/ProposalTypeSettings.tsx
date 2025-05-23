@@ -96,16 +96,18 @@ export default function ProposalTypeSettings({
 
   const fmtPropTypes = useMemo(
     () =>
-      proposalTypes.map(
-        ({ quorum, approval_threshold, name, proposal_type_id, scopes }) => ({
-          name,
-          quorum: Number(quorum) / 100,
-          approval_threshold: Number(approval_threshold) / 100,
-          proposal_type_id: Number(proposal_type_id), // This will be of the format "0", "1", "2", etc.
-          isClientSide: false,
-          scopes,
-        })
-      ),
+      proposalTypes
+        ?.filter((proposalType) => !!proposalType?.name)
+        .map(
+          ({ quorum, approval_threshold, name, proposal_type_id, scopes }) => ({
+            name,
+            quorum: Number(quorum) / 100,
+            approval_threshold: Number(approval_threshold) / 100,
+            proposal_type_id: Number(proposal_type_id), // This will be of the format "0", "1", "2", etc.
+            isClientSide: false,
+            scopes,
+          })
+        ),
     []
   );
 
