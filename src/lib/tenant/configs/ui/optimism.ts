@@ -331,5 +331,9 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
       name: "show-participation",
       enabled: true,
     },
+    {
+      name: "proposals/offchain",
+      enabled: true,
+    },
   ],
 });
