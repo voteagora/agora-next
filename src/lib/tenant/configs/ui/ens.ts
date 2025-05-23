@@ -286,11 +286,11 @@ For a full walkthrough of the proposal process, check out the [ENS DAO docs](htt
     },
     {
       name: "use-daonode-for-proposals",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "use-daonode-for-votable-supply",
-      enabled: false,
+      enabled: true,
     },
   ],
 });
