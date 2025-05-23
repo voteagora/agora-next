@@ -9,6 +9,8 @@ import ApprovalCriteriaRow from "./ApprovalCriteriaRow";
 import ApprovalOptionsRow from "./ApprovalOptionsRow";
 import StandardForm from "./StandardForm";
 import SubmitButton from "./SubmitButton";
+import JointHouseSettings from "./JointHouseSettings";
+import Tenant from "@/lib/tenant/tenant";
 
 type FormValues = {
   proposalType: "Basic" | "Approval" | "Optimistic";
@@ -21,6 +23,7 @@ type FormValues = {
   threshold: number;
   topChoices: number;
   options: Option[];
+  citizenVotingEnabled: boolean;
 };
 
 type Option = {
@@ -39,6 +42,10 @@ export type Transaction = {
 
 export type Form = UseForm<FormValues>;
 
+const { ui } = Tenant.current();
+
+const offchainProposals = ui.toggle("proposals/offchain")?.enabled;
+
 export default function CreateProposalForm({
   proposalSettingsList,
 }: {
@@ -55,6 +62,7 @@ export default function CreateProposalForm({
     threshold: 0,
     topChoices: 1,
     options: [{ title: "", transactions: [] }],
+    citizenVotingEnabled: false,
   };
   const form = useForm<FormValues>(() => initialFormValues);
   const formTarget = useRef<HTMLFormElement>(null);
@@ -93,6 +101,11 @@ export default function CreateProposalForm({
               <StandardForm form={form} />
             </div>
           )}
+          {offchainProposals ? (
+            <div className="p-8 border-b border-line">
+              <JointHouseSettings form={form} />
+            </div>
+          ) : null}
           <HStack
             justifyContent="justify-between"
             alignItems="items-center"
