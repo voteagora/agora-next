@@ -312,9 +312,13 @@ const parseTransaction = (t: ProposalDraftTransaction) => {
 // Used to translate a draftProposal database record into its form representation
 export const parseProposalToForm = (proposal: DraftProposal) => {
   const baseFields = {
+<<<<<<< HEAD
     proposal_scope: proposal.proposal_scope,
     tiers_enabled: proposal.tiers_enabled || proposal.tiers?.length > 0,
     tiers: proposal.tiers,
+=======
+    citizen_voting_enabled: proposal.citizen_voting_enabled || false,
+>>>>>>> c69cd10d (Joint house checkbox)
   };
 
   switch (proposal.voting_module_type) {
