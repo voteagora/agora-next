@@ -97,6 +97,7 @@ export const ProfileHeader = ({
             </div>
             <Chevron
               onClick={() => setShowSecondaryWallets((expanded) => !expanded)}
+              dataTestId="secondary-wallets-toggle"
               className={`stroke-primary transition-transform duration-200 cursor-pointer ${showSecondaryWallets ? "rotate-90" : "rotate-[270deg]"}`}
             />
           </>

@@ -1,9 +1,11 @@
 export const Chevron = ({
   className,
   onClick,
+  dataTestId,
 }: {
   className?: string;
   onClick?: () => void;
+  dataTestId?: string;
 }) => {
   return (
     <svg
@@ -14,6 +16,7 @@ export const Chevron = ({
       fill="none"
       className={className}
       onClick={onClick}
+      data-testid={dataTestId}
     >
       <path
         d="M15 18L9 12L15 6"

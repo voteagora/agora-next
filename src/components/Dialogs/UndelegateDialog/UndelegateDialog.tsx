@@ -90,7 +90,7 @@ const UndelegateActionButtons = ({
 
   if (sameDelegatee) {
     return (
-      <ShadcnButton onClick={executeDelegate}>
+      <ShadcnButton onClick={executeDelegate} data-testid="remove-delegation">
         Remove your own delegation
       </ShadcnButton>
     );

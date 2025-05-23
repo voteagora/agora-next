@@ -41,9 +41,12 @@ const SecondaryWalletsSelector: FC<SecondaryWalletsSelectorProps> = ({
   }
 
   return (
-    <div className="pt-6 max-h-[400px] overflow-auto">
+    <div
+      className="pt-6 max-h-[400px] overflow-auto"
+      data-testid="secondary-wallets"
+    >
       <span className="text-xs text-tertiary">
-        {isSelectedPrimaryAddress ? "EOA WALLETS" : "SAFE WALLETS"}
+        {isSelectedPrimaryAddress ? "SAFE WALLETS" : "EOA WALLETS"}
       </span>
       {wallets.map((safe) => (
         <div
