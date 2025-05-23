@@ -24,7 +24,7 @@ export const etherfiTenantContractConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB";
-  const GOVERNOR = "0x0";
+  const GOVERNOR = TOKEN;
 
   const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
 

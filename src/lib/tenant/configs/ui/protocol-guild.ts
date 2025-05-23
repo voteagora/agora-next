@@ -223,5 +223,13 @@ export const protocolGuildTenantUIConfig = new TenantUI({
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
       },
     },
+    {
+      name: "use-daonode-for-proposals",
+      enabled: false,
+    },
+    {
+      name: "use-daonode-for-votable-supply",
+      enabled: false,
+    },
   ],
 });

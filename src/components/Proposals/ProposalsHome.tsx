@@ -49,7 +49,7 @@ export default async function ProposalsHome() {
   const plmEnabled = ui.toggle("proposal-lifecycle")?.enabled;
   const supportsNotifications = ui.toggle("email-subscriptions")?.enabled;
 
-  const [governanceCalendar, relevalntProposals, allProposals, votableSupply] =
+  const [governanceCalendar, relevantProposals, allProposals, votableSupply] =
     await Promise.all([
       fetchGovernanceCalendar(),
       fetchProposals(proposalsFilterOptions.relevant.filter),
@@ -82,7 +82,7 @@ export default async function ProposalsHome() {
         votableSupply={votableSupply}
       />
       <ProposalsList
-        initRelevantProposals={relevalntProposals}
+        initRelevantProposals={relevantProposals}
         initAllProposals={allProposals}
         fetchProposals={async (
           pagination: PaginationParams,

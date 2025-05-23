@@ -15,20 +15,39 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
-import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import {
+  ProposalStage as PrismaProposalStage,
+  ProposalType,
+} from "@prisma/client";
 import { Proposal, ProposalPayload } from "./proposal";
 import { doInSpan } from "@/app/lib/logging";
 import {
   findProposal,
   findProposalType,
-  findProposalsQuery,
+  findProposalsQueryFromDB,
+  findSnapshotProposalsQueryFromDb,
   getProposalsCount,
 } from "@/lib/prismaUtils";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
 import { getPublicClient } from "@/lib/viem";
-import { getProposalTypesFromDaoNode } from "@/app/lib/dao-node/client";
+import {
+  adaptDAONodeResponse,
+  getCachedAllProposalsFromDaoNode,
+  getProposalTypesFromDaoNode,
+} from "@/app/lib/dao-node/client";
+
+function getSnapshotProposalsFromDB() {
+  const { namespace, contracts } = Tenant.current();
+
+  return findSnapshotProposalsQueryFromDb({
+    namespace,
+    contract: contracts.governor.address,
+  });
+}
+
+const fetchSnapshotProposalsFromDB = cache(getSnapshotProposalsFromDB);
 
 async function getProposals({
   filter,
@@ -45,17 +64,79 @@ async function getProposals({
 
         const getProposalsExecution = doInSpan(
           { name: "getProposals" },
-          async () =>
-            paginateResult(async (skip: number, take: number) => {
-              const proposals = await findProposalsQuery({
-                namespace,
-                skip,
-                take,
-                filter,
-                contract: contracts.governor.address,
-              });
-              return proposals as ProposalPayload[];
-            }, pagination)
+          async () => {
+            const useDaoNode =
+              ui.toggle("use-daonode-for-proposals")?.enabled ?? false;
+
+            const useSnapshot = ui.toggle("snapshotVotes")?.enabled ?? false;
+
+            let proposalsResult;
+
+            if (useDaoNode) {
+              proposalsResult = await paginateResult(
+                async (skip: number, take: number) => {
+                  try {
+                    let data = await getCachedAllProposalsFromDaoNode();
+
+                    if (filter == "relevant") {
+                      data = data.filter((proposal) => {
+                        return !proposal.cancel_event;
+                      });
+                    }
+
+                    // We could do this in the cache,
+                    // but it's tech-debt I don't want the client
+                    // to absorbe.
+                    data = data.map(adaptDAONodeResponse);
+
+                    if (useSnapshot) {
+                      const snapshotData = await fetchSnapshotProposalsFromDB();
+                      data = [...data, ...snapshotData];
+
+                      // TODO - Feeling like more and more, the client should handle the sort.
+                      data.sort((a, b) => {
+                        return b.start_block - a.start_block;
+                      });
+                    }
+
+                    data = data.slice(skip, skip + take);
+
+                    return data as unknown as ProposalPayload[];
+                  } catch (error) {
+                    console.warn("REST API failed, falling back to DB:", error);
+                  }
+
+                  const result = await findProposalsQueryFromDB({
+                    namespace,
+                    skip,
+                    take,
+                    filter,
+                    contract: contracts.governor.address,
+                  });
+
+                  return result as ProposalPayload[];
+                },
+                pagination
+              );
+            } else {
+              proposalsResult = await paginateResult(
+                async (skip: number, take: number) => {
+                  const result = await findProposalsQueryFromDB({
+                    namespace,
+                    skip,
+                    take,
+                    filter,
+                    contract: contracts.governor.address,
+                  });
+
+                  return result as ProposalPayload[];
+                },
+                pagination
+              );
+            }
+
+            return proposalsResult as PaginatedResult<ProposalPayload[]>;
+          }
         );
 
         const latestBlockPromise: Promise<Block> = ui.toggle(

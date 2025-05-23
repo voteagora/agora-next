@@ -11,7 +11,92 @@ import {
 import { BigNumberish } from "ethers";
 import { Decimal } from "@prisma/client/runtime";
 
-export type ProposalPayload = OptimismProposals | lineaProposals;
+export type ProposalPayloadFromDAONode = {
+  id: string;
+
+  proposer: string;
+  description: string;
+
+  block_number: number;
+  transaction_index: number;
+  log_index: number;
+
+  targets: string[];
+  values: number[];
+  signatures: string[];
+  calldatas: string[];
+  start_block: number;
+  end_block: number;
+
+  queue_event?: {
+    block_number: number;
+    transaction_index: number;
+    log_index: number;
+    id: string;
+    eta: number;
+  };
+
+  execute_event?: {
+    block_number: number;
+    transaction_index: number;
+    log_index: number;
+    id: string;
+  };
+
+  cancel_event?: {
+    block_number: number;
+    transaction_index: number;
+    log_index: number;
+    id: string;
+  };
+
+  totals: Record<string, string>;
+  voting_module_name: string;
+
+  // this is a string representing bytes, without 0x prefix.
+  // It's the old proposal_data_raw -- Jeff M, 2025-04-29
+  proposal_data: string | null;
+
+  // this is the abi decode version of proposal_data,
+  // cast to integers and strings.
+  // The old DB proposal_data field overloaded and conflated proposal_data
+  // with transaction header information (Eg. targets, values, signatures, calldatas)
+  // for standard votes (only).
+  // We're not going to do that in DAO Node, instead we're going to correct it throughout
+  // agora-next to use the correct treatment.
+  // The one issue that isn't fully resolved is during the decoding,
+  // some large numbers get corrupted by Typescript's JSON treatment.
+  // So, DAO Node might be forced to re-cast large integers as strings, where they exist.
+  // We'll make this decision later, after tests are up and running. -- Jeff M, 2025-04-29
+  decoded_proposal_data?: Object;
+};
+
+export type ProposalPayloadFromDB = {
+  proposal_id: string;
+
+  proposer: string;
+  description: string | null;
+
+  created_block: bigint | null;
+  start_block: string;
+  end_block: string | null;
+  cancelled_block: bigint | null;
+  executed_block: bigint | null;
+  queued_block: bigint | null;
+
+  proposal_data: Prisma.JsonValue | null;
+  proposal_results: Prisma.JsonValue | null;
+  proposal_type: ProposalType;
+  proposal_type_data: Prisma.JsonValue | null;
+  proposal_data_raw: string | null;
+
+  created_transaction_hash: string | null;
+  cancelled_transaction_hash: string | null;
+  queued_transaction_hash: string | null;
+  executed_transaction_hash: string | null;
+};
+
+export type ProposalPayload = ProposalPayloadFromDB | lineaProposals;
 
 // Interface for proposals with start_timestamp
 export interface TimestampBasedProposal {

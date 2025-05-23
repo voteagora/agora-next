@@ -526,7 +526,10 @@ export function parseProposalData(
           },
         };
       } catch (error) {
-        console.log("Error parsing proposal calldatas", error);
+        console.log(
+          `Error parsing proposal calldatas: '${proposalData}'`,
+          error
+        );
       }
     }
     case "OPTIMISTIC": {

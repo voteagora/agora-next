@@ -319,5 +319,13 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
       name: "delegation-encouragement",
       enabled: true,
     },
+    {
+      name: "use-daonode-for-proposals",
+      enabled: false,
+    },
+    {
+      name: "use-daonode-for-votable-supply",
+      enabled: false,
+    },
   ],
 });

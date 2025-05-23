@@ -222,6 +222,10 @@ export const deriveTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "snapshotVotes",
+      enabled: true,
+    },
+    {
       name: "proposal-execute",
       enabled: true,
     },
@@ -295,6 +299,14 @@ If you meet the proposal threshold or are the manager of the governor, then you 
         },
         gatingType: ProposalGatingType?.GOVERNOR_V1,
       },
+    },
+    {
+      name: "use-daonode-for-proposals",
+      enabled: false,
+    },
+    {
+      name: "use-daonode-for-votable-supply",
+      enabled: false,
     },
   ],
 });
