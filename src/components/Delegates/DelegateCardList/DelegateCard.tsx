@@ -19,10 +19,12 @@ const DelegateCard = ({
   isAdvancedUser: boolean;
   truncatedStatement: string;
 }) => {
-  const { token } = Tenant.current();
+  const { token, ui } = Tenant.current();
   const { advancedDelegators } = useConnectedDelegate();
 
   const sanitizedTruncatedStatement = sanitizeContent(truncatedStatement);
+
+  const showParticipation = ui.toggle("show-participation")?.enabled ?? false;
 
   return (
     <div
@@ -47,9 +49,12 @@ const DelegateCard = ({
               <span className="text-primary font-bold">
                 {formatNumber(delegate.votingPower.total)} {token.symbol}
               </span>
-              <span className="text-primary font-bold">
-                {Math.round(delegate.participation)}% Participation
-              </span>
+              {showParticipation && (
+                <span className="text-primary font-bold">
+                  {Math.round(delegate.participation)}% Participation
+                </span>
+              )}
+              <span className="text-primary font-bold"></span>
             </div>
             <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2 px-4">
               {sanitizedTruncatedStatement}

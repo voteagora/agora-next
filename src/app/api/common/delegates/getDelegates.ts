@@ -38,6 +38,7 @@ async function getDelegates({
   sort,
   seed,
   filters,
+  showParticipation,
 }: {
   pagination?: PaginationParams;
   sort: string;
@@ -49,6 +50,7 @@ async function getDelegates({
     endorsed?: boolean;
     hasStatement?: boolean;
   };
+  showParticipation?: boolean;
 }): Promise<PaginatedResult<DelegateChunk[]>> {
   return withMetrics(
     "getDelegates",
@@ -109,6 +111,7 @@ async function getDelegates({
           ? pagination.offset
           : undefined,
         performInternalPagination: performInternalPaginationInDaoNode,
+        withParticipation: showParticipation,
       });
 
       // If we have valid data from the DAO node, use it instead of database query
@@ -903,6 +906,7 @@ export const fetchDelegates = cache(
       endorsed?: boolean;
       hasStatement?: boolean;
     };
+    showParticipation?: boolean;
   }) => {
     "use server";
     return getDelegates(args);

@@ -23,7 +23,8 @@ interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
   fetchDelegates: (
     pagination: PaginationParams,
-    seed?: number
+    seed?: number,
+    showParticipation?: boolean
   ) => Promise<PaginatedResult<DelegateChunk[]>>;
 }
 
@@ -40,6 +41,7 @@ export default function DelegateTable({
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
+  const showParticipation = ui.toggle("show-participation")?.enabled ?? false;
   const { isAdvancedUser } = useIsAdvancedUser();
   const { advancedDelegators } = useConnectedDelegate();
 
@@ -57,7 +59,8 @@ export default function DelegateTable({
         fetching.current = true;
         const data = await fetchDelegates(
           { offset: meta.next_offset, limit: meta.total_returned },
-          initialDelegates.seed || Math.random()
+          initialDelegates.seed || Math.random(),
+          showParticipation
         );
         setDelegates(delegates.concat(data.data));
         setMeta(data.meta);
@@ -83,9 +86,11 @@ export default function DelegateTable({
               </TableHead>
               {/* Used for debugging purposes */}
               {/* <TableHead className="h-10 text-secondary">7d Change</TableHead> */}
-              <TableHead className="h-10 text-secondary">
-                Participation
-              </TableHead>
+              {showParticipation && (
+                <TableHead className="h-10 text-secondary">
+                  Participation
+                </TableHead>
+              )}
               <TableHead className="h-10 text-secondary">
                 Delegated from
               </TableHead>
@@ -130,6 +135,7 @@ export default function DelegateTable({
                   }
                   isAdvancedUser={isAdvancedUser}
                   delegators={advancedDelegators}
+                  showParticipation={showParticipation}
                 />
               ))
             )}

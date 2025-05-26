@@ -270,6 +270,7 @@ export const getDelegatesFromDaoNode = async (options?: {
     delegator?: `0x${string}`;
   };
   performInternalPagination?: boolean;
+  withParticipation?: boolean;
 }) => {
   const url = getDaoNodeURLForNamespace(namespace);
   if (!url) {
@@ -284,7 +285,8 @@ export const getDelegatesFromDaoNode = async (options?: {
     const queryParams = new URLSearchParams({
       sort_by: sortBy,
       reverse: reverse.toString(),
-      include: "VP,DC,PR,LVB,MRD,VPC",
+      include:
+        "VP,DC," + (options?.withParticipation ? "PR," : "") + "LVB,MRD,VPC",
     });
 
     if (filters?.delegator) {

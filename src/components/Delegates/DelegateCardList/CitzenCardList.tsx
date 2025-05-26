@@ -20,7 +20,8 @@ interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
   fetchDelegates: (
     pagination: PaginationParams,
-    seed: number
+    seed: number,
+    showParticipation?: boolean
   ) => Promise<PaginatedResult<DelegateChunk[]>>;
 }
 
@@ -46,7 +47,8 @@ export default function CitizenCardList({
       fetching.current = true;
       const data = await fetchDelegates(
         { limit: 20, offset: meta.next_offset },
-        initialDelegates.seed || Math.random()
+        initialDelegates.seed || Math.random(),
+        false
       );
       setDelegates(delegates.concat(data.data));
       setMeta(data.meta);
