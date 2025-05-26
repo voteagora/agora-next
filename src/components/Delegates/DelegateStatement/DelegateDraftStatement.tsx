@@ -28,7 +28,7 @@ export const DraftStatementDetails = ({
   const { data: safeMessageDetails } = useGetSafeMessageDetails({
     messageHash: draftStatement?.message_hash,
   });
-
+  console.log(draftStatement);
   const chainId = useChainId();
   const { data: safeInfo } = useGetSafeInfo(selectedWalletAddress);
   const { refetch: refetchStatement } = useDelegate({
