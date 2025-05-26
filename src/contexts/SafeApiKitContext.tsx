@@ -5,6 +5,7 @@ import SafeApiKit from "@safe-global/api-kit";
 import { useAccount, useChainId } from "wagmi";
 import { getTransportForChain } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
+import { scroll } from "viem/chains";
 
 interface SafeApiKitContextType {
   safeApiKit: SafeApiKit | null;
@@ -44,7 +45,7 @@ export const SafeApiKitProvider: React.FC<{ children: React.ReactNode }> = ({
 
         // Initialize the Safe API Kit
         const apiKit = new SafeApiKit({
-          chainId: contracts.governor.chain.id as any,
+          chainId: scroll.id as any,
         });
 
         setSafeApiKit(apiKit);
