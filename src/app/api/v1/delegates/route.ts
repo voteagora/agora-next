@@ -60,6 +60,7 @@ export async function GET(request: NextRequest) {
           offset,
         },
         sort,
+        showParticipation: true,
       });
 
       return NextResponse.json(delegatesResult);

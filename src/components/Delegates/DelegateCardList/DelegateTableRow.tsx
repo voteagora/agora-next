@@ -12,6 +12,7 @@ export default function DelegateTableRow({
   delegate,
   isAdvancedUser,
   delegators,
+  showParticipation,
 }: {
   delegate: DelegateChunk & {
     numOfDelegators: bigint;
@@ -20,6 +21,7 @@ export default function DelegateTableRow({
   };
   isAdvancedUser: boolean;
   delegators: string[] | null;
+  showParticipation: boolean;
 }) {
   const router = useRouter();
 
@@ -63,7 +65,9 @@ export default function DelegateTableRow({
           "0"
         )}
       </TableCell> */}
-      <TableCell>{`${Math.round(delegate.participation)}%`}</TableCell>
+      {showParticipation && (
+        <TableCell>{`${Math.round(delegate.participation)}%`}</TableCell>
+      )}
       {/* @ts-ignore */}
       <TableCell>
         {delegate.numOfDelegators?.toString() || 0} addresses
