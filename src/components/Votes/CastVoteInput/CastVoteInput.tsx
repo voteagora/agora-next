@@ -41,6 +41,7 @@ import { format } from "date-fns";
 import { useVotableSupply } from "@/hooks/useVotableSupply";
 import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
 import { SafeTxnTooltip } from "@/components/shared/SafeTxnTooltip";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 type Props = {
   proposal: Proposal;
@@ -150,6 +151,7 @@ function CastVoteInputContent({
   } = useCastVoteContext();
 
   const { ui } = Tenant.current();
+  const { isSelectedPrimaryAddress } = useSelectedWallet();
   const missingVote = checkMissingVoteForDelegate(
     votes ?? [],
     votingPower ?? {
@@ -180,7 +182,8 @@ function CastVoteInputContent({
       Number(gasRelayConfig.minBalance) &&
     Number(votingPower?.totalVP ?? "0") >
       Number(gasRelayConfig?.minVPToUseGasRelay) &&
-    !reason;
+    !reason &&
+    isSelectedPrimaryAddress;
 
   return (
     <div className="flex flex-col flex-shrink rounded-b-lg">
