@@ -81,36 +81,129 @@ async function getDelegates({
         daoNodeSortBy = "VP";
       }
 
-      // Call the DAO node API to get delegates data with sort options
-      const daoNodeDelegates = await getDelegatesFromDaoNode({
+      // Determine if filters or weighted_random sort are active
+      const hasFilters =
+        filters?.issues ||
+        filters?.stakeholders ||
+        filters?.endorsed ||
+        filters?.hasStatement;
+      const isWeightedRandomSort = sort === "weighted_random" && seed;
+
+      // Perform internal pagination in DAO node client only if no filters and not weighted_random
+      const performInternalPaginationInDaoNode =
+        !(
+          filters?.issues ||
+          filters?.stakeholders ||
+          filters?.endorsed ||
+          filters?.hasStatement
+        ) && !isWeightedRandomSort;
+
+      const daoNodeResult = await getDelegatesFromDaoNode({
         sortBy: daoNodeSortBy,
         reverse: reverse,
-        ...(sort === "weighted_random" && seed
-          ? {}
-          : { limit: pagination.limit, offset: pagination.offset }),
+        filters,
+        limit: performInternalPaginationInDaoNode
+          ? pagination.limit
+          : undefined,
+        offset: performInternalPaginationInDaoNode
+          ? pagination.offset
+          : undefined,
+        performInternalPagination: performInternalPaginationInDaoNode,
       });
 
       // If we have valid data from the DAO node, use it instead of database query
       if (
-        daoNodeDelegates &&
-        daoNodeDelegates.delegates &&
-        daoNodeDelegates.delegates.length > 0
+        daoNodeResult &&
+        daoNodeResult.delegates &&
+        (daoNodeResult.delegates.length > 0 ||
+          (daoNodeResult.delegates.length === 0 &&
+            (!performInternalPaginationInDaoNode || !!filters?.delegator)))
       ) {
-        let sortedDelegates = [...daoNodeDelegates.delegates];
+        let processedDelegates = [...daoNodeResult.delegates];
+        let currentTotalCount = daoNodeResult.totalBeforeInternalPagination;
 
-        if (sort === "weighted_random" && seed) {
-          sortedDelegates.sort(() => Math.random() - 0.5);
-          // Apply pagination after sorting for weighted_random
-          sortedDelegates = sortedDelegates.slice(
+        // Apply filters if they were not handled by delegator filter in DAO node and internal pagination was skipped
+        if (hasFilters) {
+          processedDelegates = processedDelegates.filter((delegate) => {
+            if (!delegate.statement) return false;
+            const statementPayload = delegate.statement.payload;
+            if (!statementPayload) return false;
+
+            if (filters.endorsed && !delegate.statement.endorsed) {
+              return false;
+            }
+            if (filters.hasStatement) {
+              const delegateStatementText = statementPayload.delegateStatement;
+              if (
+                !delegateStatementText ||
+                typeof delegateStatementText !== "string" ||
+                delegateStatementText.length < 10
+              ) {
+                return false;
+              }
+            }
+            if (filters.issues) {
+              const topIssuesArray = filters.issues
+                .split(",")
+                .map((issue) => issue.trim());
+              const delegateIssues = statementPayload.topIssues;
+              if (
+                !delegateIssues ||
+                !Array.isArray(delegateIssues) ||
+                delegateIssues.length === 0
+              )
+                return false;
+              const hasMatchingIssue = delegateIssues.some(
+                (issue) =>
+                  topIssuesArray.includes(issue.type) &&
+                  issue.value &&
+                  issue.value !== ""
+              );
+              if (!hasMatchingIssue) return false;
+            }
+            if (filters.stakeholders) {
+              const delegateStakeholders = statementPayload.topStakeholders;
+              if (
+                !delegateStakeholders ||
+                !Array.isArray(delegateStakeholders) ||
+                delegateStakeholders.length === 0
+              )
+                return false;
+              const hasMatchingStakeholder = delegateStakeholders.some(
+                (sh) => sh.type === filters.stakeholders
+              );
+              if (!hasMatchingStakeholder) return false;
+            }
+            return true;
+          });
+          currentTotalCount = processedDelegates.length;
+        }
+
+        if (isWeightedRandomSort) {
+          processedDelegates.sort(() => Math.random() - 0.5);
+        }
+
+        // Apply pagination here if it wasn't done in the DAO node client
+        // or if it needs to be re-applied after filters/weighted_random sort
+        let finalPaginatedDelegates = processedDelegates;
+        if (
+          !performInternalPaginationInDaoNode ||
+          hasFilters ||
+          isWeightedRandomSort
+        ) {
+          finalPaginatedDelegates = processedDelegates.slice(
             pagination.offset,
             pagination.offset + pagination.limit
           );
         }
 
-        const transformedDelegates = sortedDelegates.map((delegate) => {
+        const transformedDelegates = finalPaginatedDelegates.map((delegate) => {
           // Check if delegate has the expected properties
           if (!delegate || typeof delegate !== "object") {
-            console.error("Invalid delegate object:", delegate);
+            console.error(
+              "Invalid delegate object from DAO node processing:",
+              delegate
+            );
             return {
               address: "unknown",
               votingPower: {
@@ -118,7 +211,7 @@ async function getDelegates({
                 direct: "0",
                 advanced: "0",
               },
-              citizen: false,
+              citizen: false, // Citizen status is not available from the DAO node source
               statement: null,
               numOfDelegators: BigInt(0),
               participation: 0,
@@ -127,58 +220,11 @@ async function getDelegates({
 
           const address = delegate.address;
 
-          let totalVp = "0";
-          let directVp = "0";
-          let advancedVp = "0";
-
-          // Handle voting power - check if it's already an object
-          if (
-            delegate.votingPower &&
-            typeof delegate.votingPower === "object"
-          ) {
-            totalVp = delegate.votingPower.total || "0";
-            directVp = delegate.votingPower.direct || "0";
-            advancedVp = delegate.votingPower.advanced || "0";
-          } else {
-            // Handle voting power as a string or number
-            if (delegate.votingPower !== undefined) {
-              totalVp =
-                typeof delegate.votingPower === "string"
-                  ? delegate.votingPower
-                  : String(delegate.votingPower || 0);
-            } else if (delegate.voting_power !== undefined) {
-              totalVp =
-                typeof delegate.voting_power === "string"
-                  ? delegate.voting_power
-                  : String(delegate.voting_power || 0);
-            }
-
-            // Handle direct voting power
-            if (delegate.directVp !== undefined) {
-              directVp =
-                typeof delegate.directVp === "string"
-                  ? delegate.directVp
-                  : String(delegate.directVp || 0);
-            } else if (delegate.direct_vp !== undefined) {
-              directVp =
-                typeof delegate.direct_vp === "string"
-                  ? delegate.direct_vp
-                  : String(delegate.direct_vp || 0);
-            }
-
-            // Handle advanced voting power
-            if (delegate.advancedVp !== undefined) {
-              advancedVp =
-                typeof delegate.advancedVp === "string"
-                  ? delegate.advancedVp
-                  : String(delegate.advancedVp || 0);
-            } else if (delegate.advanced_vp !== undefined) {
-              advancedVp =
-                typeof delegate.advanced_vp === "string"
-                  ? delegate.advanced_vp
-                  : String(delegate.advanced_vp || 0);
-            }
-          }
+          const votingPower = delegate.votingPower || {
+            total: "0",
+            direct: "0",
+            advanced: "0",
+          };
 
           return {
             address:
@@ -186,11 +232,11 @@ async function getDelegates({
                 ? address.toLowerCase()
                 : String(address).toLowerCase(),
             votingPower: {
-              total: totalVp,
-              direct: directVp,
-              advanced: advancedVp,
+              total: votingPower.total || "0",
+              direct: votingPower.direct || "0",
+              advanced: votingPower.advanced || "0",
             },
-            citizen: !!delegate.citizen,
+            citizen: false,
             statement: delegate.statement || null,
             numOfDelegators: BigInt(String(delegate.numOfDelegators || 0)),
             mostRecentDelegationBlock: BigInt(
@@ -204,18 +250,16 @@ async function getDelegates({
           };
         });
 
-        const hasNext = transformedDelegates.length >= pagination.limit;
+        const hasNext =
+          pagination.offset + finalPaginatedDelegates.length <
+          currentTotalCount;
 
         return {
           meta: {
             has_next: hasNext,
             next_offset: pagination.offset + pagination.limit,
-            total_returned: transformedDelegates.length,
-            total_count: hasNext
-              ? pagination.offset +
-                transformedDelegates.length +
-                pagination.limit
-              : pagination.offset + transformedDelegates.length,
+            total_returned: finalPaginatedDelegates.length,
+            total_count: currentTotalCount,
           },
           data: transformedDelegates,
           seed,

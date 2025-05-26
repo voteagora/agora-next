@@ -35,12 +35,15 @@ export default function DelegateTableRow({
       }}
     >
       <TableCell>
-        <DelegateProfileImage
-          endorsed={delegate.statement?.endorsed}
-          address={delegate.address}
-          votingPower={delegate.votingPower.total}
-          citizen={delegate.citizen}
-        />
+        <div className="w-64">
+          <DelegateProfileImage
+            truncateText
+            endorsed={delegate.statement?.endorsed}
+            address={delegate.address}
+            votingPower={delegate.votingPower.total}
+            citizen={delegate.citizen}
+          />
+        </div>
       </TableCell>
       <TableCell>{formatNumber(delegate.votingPower.total)}</TableCell>
       {/* Used for debugging purposes */}
