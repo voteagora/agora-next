@@ -3,6 +3,7 @@
 import React, { createContext, useCallback, useContext, useState } from "react";
 import { useAccount } from "wagmi";
 import Safe from "@safe-global/protocol-kit";
+import { scroll } from "viem/chains";
 
 interface SafeProtocolKitContextType {
   protocolKit: Safe | null;
@@ -38,7 +39,9 @@ export const SafeProtocolKitProvider: React.FC<{
         setIsLoading(true);
         setError(null);
 
-        const provider = await connector?.getProvider();
+        const provider = await connector?.getProvider({
+          chainId: scroll.id,
+        });
         const safeSDK = await Safe.init({
           provider: provider as any,
           safeAddress,
