@@ -115,7 +115,7 @@ export function UndelegateDialog({
   const { ui, contracts, token } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
-  const { selectedWalletAddress: accountAddress } = useSelectedWallet();
+  const { selectedWalletAddress: accountAddress, isSelectedPrimaryAddress } = useSelectedWallet();
   const [votingPower, setVotingPower] = useState<string>("");
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
   const [isReady, setIsReady] = useState(false);
@@ -137,7 +137,8 @@ export function UndelegateDialog({
     isGasRelayEnabled &&
     Number(formatEther(sponsorBalance || 0n)) >=
       Number(gasRelayConfig?.minBalance) &&
-    Number(votingPower) > Number(gasRelayConfig?.minVPToUseGasRelay);
+    Number(votingPower) > Number(gasRelayConfig?.minVPToUseGasRelay) &&
+    isSelectedPrimaryAddress;
 
   const { data: delegateeEnsName } = useEnsName({
     chainId: 1,

@@ -13,17 +13,16 @@ import {
   createContext,
   type Dispatch,
   SetStateAction,
-  useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
-import { encodeFunctionData, formatEther, getAddress } from "viem";
+import { formatEther } from "viem";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import useEffectEvent from "@/hooks/useEffectEvent";
-import { useAccount } from "wagmi";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
@@ -92,7 +91,7 @@ const CastVoteContextProvider = ({
   >(null);
   const [fallbackToStandardVote, setFallbackToStandardVote] = useState(false);
   const openDialog = useOpenDialog();
-  const { address } = useAccount();
+  const {isSelectedPrimaryAddress} = useSelectedWallet();
 
   const { ui, contracts } = Tenant.current();
 
@@ -132,6 +131,7 @@ const CastVoteContextProvider = ({
     address: gasRelayConfig?.sponsorAddress,
   });
   // Gas relay is only LIVE when it is enabled in the settings and the sponsor meets minimum eth requirements and the user has enough VP
+  // and the user is using the primary address
   const isGasRelayLive =
     isGasRelayEnabled &&
     Number(formatEther(sponsorBalance || 0n)) >=
@@ -139,7 +139,8 @@ const CastVoteContextProvider = ({
     Number(votingPower?.totalVP ?? "0") >
       Number(gasRelayConfig?.minVPToUseGasRelay) &&
     !reason &&
-    !fallbackToStandardVote;
+    !fallbackToStandardVote &&
+    isSelectedPrimaryAddress;
 
   const { write, isLoading, isSuccess, data, isError, resetError, error } =
     (() => {

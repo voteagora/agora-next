@@ -46,7 +46,7 @@ export function DelegateDialog({
   const { ui, contracts, token } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
-  const { selectedWalletAddress: accountAddress } = useSelectedWallet();
+  const { selectedWalletAddress: accountAddress, isSelectedPrimaryAddress } = useSelectedWallet();
 
   const { data: tokenBalance } = useTokenBalance(accountAddress);
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
@@ -64,11 +64,13 @@ export function DelegateDialog({
   });
 
   // Gas relay is only LIVE when it is enabled in the settings and the sponsor meets minimum eth requirements and the user has enough token balance
+  // and the user is using the primary address
   const isGasRelayLive =
     isGasRelayEnabled &&
     Number(formatEther(sponsorBalance || 0n)) >=
       Number(gasRelayConfig?.minBalance) &&
-    Number(tokenBalance) > Number(gasRelayConfig?.minVPToUseGasRelay);
+    Number(tokenBalance) > Number(gasRelayConfig?.minVPToUseGasRelay) &&
+    isSelectedPrimaryAddress;
 
   const sameDelegatee = delegate.address === delegatee?.delegatee;
   const isDisabledInTenant = ui.toggle("delegates/delegate")?.enabled === false;
