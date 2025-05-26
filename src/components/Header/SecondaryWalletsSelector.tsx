@@ -18,7 +18,7 @@ const SecondaryWalletsSelector: FC<SecondaryWalletsSelectorProps> = ({
   const { setSelectedWalletAddress, isSelectedPrimaryAddress } =
     useSelectedWallet();
   const { address } = useAccount();
-  const { initAndConnectProtocolKit, disconnectSafeWallet } =
+  const { initAndConnectProtocolKit } =
     useSafeProtocolKit();
   const selectWallet = (safeAddress?: `0x${string}`) => {
     if (!safeAddress) {

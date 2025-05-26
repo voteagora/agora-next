@@ -56,12 +56,16 @@ export const useSignInWithSafeMessage = () => {
           );
         }
 
+        if (!protocolKit) {
+          throw new Error("Protocol Kit not initialized");
+        }
+
         const safeMessage = protocolKit.createMessage(message);
         const signedMessage = await protocolKit.signMessage(
           safeMessage,
           SigningMethod.ETH_SIGN
         );
-        const signature = signedMessage.getSignature(address);
+        const signature = signedMessage.getSignature(address as `0x${string}`);
         // Add message to Safe Transaction Service using the correct API format
 
         await safeApiKit?.addMessage(safeAddress, {

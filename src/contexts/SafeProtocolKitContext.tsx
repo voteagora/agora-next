@@ -8,14 +8,14 @@ interface SafeProtocolKitContextType {
   protocolKit: Safe | null;
   isLoading: boolean;
   error: Error | null;
-  initAndConnectProtocolKit: (safeAddress: string) => Promise<Safe>;
+  initAndConnectProtocolKit: (safeAddress: string) => Promise<void>;
 }
 
 const SafeProtocolKitContext = createContext<SafeProtocolKitContextType>({
   protocolKit: null,
   isLoading: true,
   error: null,
-  initAndConnectProtocolKit: async (safeAddress: string) => null,
+  initAndConnectProtocolKit: async (safeAddress: string) => {},
 });
 
 export const useSafeProtocolKit = () => useContext(SafeProtocolKitContext);

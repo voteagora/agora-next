@@ -127,8 +127,8 @@ export default function DelegateStatementForm({
         return;
       }
       const { signature: safeSignature, safeMessageHash } = data;
-      signature = safeSignature.data;
-      messageHash = safeMessageHash;
+      signature = safeSignature?.data;
+      messageHash = safeMessageHash ?? undefined;
     }
 
     if (!signature) {
@@ -139,7 +139,7 @@ export default function DelegateStatementForm({
     const response = await submitDelegateStatement({
       address: address as `0x${string}`,
       delegateStatement: body,
-      signature,
+      signature: signature as `0x${string}`,
       message: serializedBody,
       scwAddress,
       message_hash: messageHash || "",
