@@ -5,19 +5,17 @@ import { useAccount } from "wagmi";
 import Safe from "@safe-global/protocol-kit";
 
 interface SafeProtocolKitContextType {
-  protocolKit: any | null;
+  protocolKit: Safe | null;
   isLoading: boolean;
   error: Error | null;
-  initAndConnectProtocolKit: (safeAddress: string) => Promise<any>;
-  disconnectSafeWallet: () => Promise<void>;
+  initAndConnectProtocolKit: (safeAddress: string) => Promise<Safe>;
 }
 
 const SafeProtocolKitContext = createContext<SafeProtocolKitContextType>({
   protocolKit: null,
   isLoading: true,
   error: null,
-  initAndConnectProtocolKit: async (safeAddress: string) => {},
-  disconnectSafeWallet: async () => {},
+  initAndConnectProtocolKit: async (safeAddress: string) => null,
 });
 
 export const useSafeProtocolKit = () => useContext(SafeProtocolKitContext);
@@ -26,7 +24,7 @@ export const SafeProtocolKitProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const { address, isConnected, connector } = useAccount();
-  const [protocolKit, setProtocolKit] = useState<any | null>(null);
+  const [protocolKit, setProtocolKit] = useState<Safe | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -60,12 +58,6 @@ export const SafeProtocolKitProvider: React.FC<{
     [isConnected, address, connector]
   );
 
-  const disconnectSafeWallet = useCallback(async () => {
-    await protocolKit?.disconnect();
-    setProtocolKit(null);
-    setError(null);
-  }, [protocolKit]);
-
   return (
     <SafeProtocolKitContext.Provider
       value={{
@@ -73,7 +65,6 @@ export const SafeProtocolKitProvider: React.FC<{
         initAndConnectProtocolKit,
         isLoading,
         error,
-        disconnectSafeWallet,
       }}
     >
       {children}
