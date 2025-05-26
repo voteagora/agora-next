@@ -114,8 +114,8 @@ export default function DelegateDetailsForm({
           return;
         }
         const { signature: safeSignature, safeMessageHash } = data;
-        signature = safeSignature.data;
-        messageHash = safeMessageHash;
+        signature = safeSignature?.data;
+        messageHash = safeMessageHash ?? undefined;
       }
 
       if (!signature) {
