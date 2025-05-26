@@ -42,18 +42,31 @@ export const SafeWalletConfirmationDialog = ({
         selectedWalletAddress as `0x${string}`
       );
 
-      const safeTransaction = await protocolKit.createTransaction({
+      const safeTransaction = await protocolKit?.createTransaction({
         transactions,
         onlyCalls: true,
-        nonce: nextNonce,
+        options: {
+          nonce: Number(nextNonce),
+        },
       });
+      if (!safeTransaction) {
+        throw new Error("Failed to create safe transaction");
+      }
 
-      const safeTxHash = await protocolKit.getTransactionHash(safeTransaction);
+      const safeTxHash = await protocolKit?.getTransactionHash(safeTransaction);
 
-      const senderSignature = await protocolKit.signHash(safeTxHash);
+      if (!safeTxHash) {
+        throw new Error("Failed to get safe transaction hash");
+      }
+
+      const senderSignature = await protocolKit?.signHash(safeTxHash);
+      if (!senderSignature) {
+        throw new Error("Failed to sign safe transaction");
+      }
+
       safeApiKit?.proposeTransaction({
         safeAddress: selectedWalletAddress as `0x${string}`,
-        safeTransactionData: safeTransaction.data,
+        safeTransactionData: safeTransaction?.data,
         safeTxHash: safeTxHash,
         senderAddress: accountAddress as `0x${string}`,
         senderSignature: senderSignature.data,
