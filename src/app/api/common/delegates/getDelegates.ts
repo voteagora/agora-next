@@ -60,6 +60,7 @@ async function getDelegates({
 
       const { namespace, ui, slug, contracts } = Tenant.current();
       const allowList = ui.delegates?.allowed || [];
+      const isAllowListEnabled = allowList.length > 0;
 
       // VP = vote power (default)
       // MRD = most recently delegated
@@ -100,7 +101,8 @@ async function getDelegates({
           filters?.issues ||
           filters?.stakeholders ||
           filters?.endorsed ||
-          filters?.hasStatement
+          filters?.hasStatement ||
+          isAllowListEnabled
         ) && !isWeightedRandomSort;
 
       const daoNodeResult = await getDelegatesFromDaoNode({
