@@ -11,6 +11,7 @@ import StandardForm from "./StandardForm";
 import SubmitButton from "./SubmitButton";
 import JointHouseSettings from "./JointHouseSettings";
 import Tenant from "@/lib/tenant/tenant";
+import { ProposalScope } from "@/app/proposals/draft/types";
 
 type FormValues = {
   proposalType: "Basic" | "Approval" | "Optimistic";
@@ -23,7 +24,7 @@ type FormValues = {
   threshold: number;
   topChoices: number;
   options: Option[];
-  citizenVotingEnabled: boolean;
+  proposal_scope?: ProposalScope;
 };
 
 type Option = {
@@ -62,7 +63,7 @@ export default function CreateProposalForm({
     threshold: 0,
     topChoices: 1,
     options: [{ title: "", transactions: [] }],
-    citizenVotingEnabled: false,
+    proposal_scope: ProposalScope.ONCHAIN_ONLY,
   };
   const form = useForm<FormValues>(() => initialFormValues);
   const formTarget = useRef<HTMLFormElement>(null);
@@ -80,6 +81,11 @@ export default function CreateProposalForm({
               describe its intent to voters. Remember to proofread as proposals
               cannot be edited once published.
             </p>
+            {offchainProposals ? (
+              <div className="pt-8">
+                <JointHouseSettings form={form} />
+              </div>
+            ) : null}
             <ProposalTypeRow
               form={form}
               proposalSettingsList={proposalSettingsList}
@@ -98,14 +104,12 @@ export default function CreateProposalForm({
           )}
           {form.state.proposalType === "Basic" && (
             <div className="p-8 border-b border-line">
-              <StandardForm form={form} />
+              <StandardForm
+                form={form}
+                proposal_scope={form.state.proposal_scope}
+              />
             </div>
           )}
-          {offchainProposals ? (
-            <div className="p-8 border-b border-line">
-              <JointHouseSettings form={form} />
-            </div>
-          ) : null}
           <HStack
             justifyContent="justify-between"
             alignItems="items-center"

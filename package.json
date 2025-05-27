@@ -25,6 +25,7 @@
     "@alchemy/aa-core": "^3.19.0",
     "@babel/core": "^7.0.0-0",
     "@emotion/css": "^11.11.2",
+    "@ethereum-attestation-service/eas-sdk": "^2.7.0",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.3.4",
