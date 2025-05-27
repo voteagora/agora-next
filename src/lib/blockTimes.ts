@@ -155,6 +155,13 @@ export function getHumanBlockTime(
       return new Date((latestBlock.timestamp - estLineaSecondsDiff) * 1000);
     }
 
+    case 8453: {
+      const blockSeconds = getSecondsPerBlock(chainIdToUse);
+      const estBaseSecondsDiff =
+        (Number(latestBlock.number) - Number(blockNumber)) * blockSeconds;
+      return new Date((latestBlock.timestamp - estBaseSecondsDiff) * 1000);
+    }
+
     default:
       return new Date();
   }
