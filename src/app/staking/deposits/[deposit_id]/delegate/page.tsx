@@ -30,9 +30,9 @@ export default async function Page({ params: { deposit_id } }: Props) {
       <EditDelegateFlow
         deposit={deposit}
         delegates={delegates}
-        fetchDelegates={async (page, seed) => {
+        fetchDelegates={async (args) => {
           "use server";
-          return apiFetchDelegates({ seed, sort });
+          return apiFetchDelegates({ ...args, sort });
         }}
         refreshPath={async (path) => {
           "use server";
