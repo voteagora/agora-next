@@ -69,22 +69,29 @@ const getBlockCached = unstable_cache(
   { revalidate: ONE_MINUTE_IN_SECONDS_BLOCK }
 );
 
-async function generateProposalId(
+export async function generateProposalId(
   {
     targets,
     values,
     calldatas,
     description,
+    proposalType,
+    unformattedProposalData,
+    moduleAddress,
   }: {
     targets: string[];
     values: bigint[];
     calldatas: string[];
     description: string;
+    proposalType?: "basic" | "approval" | "optimistic";
+    unformattedProposalData?: string;
+    moduleAddress?: string;
   } = {
     targets: [],
     values: [],
     calldatas: [],
     description: "",
+    proposalType: "basic",
   }
 ): Promise<bigint> {
   const client = getPublicClient();
@@ -97,6 +104,23 @@ async function generateProposalId(
       args: [],
     })) as unknown as bigint;
     return count + 1n;
+  }
+
+  if (proposalType === "optimistic" || proposalType === "approval") {
+    const proposalId = BigInt(
+      keccak256(
+        defaultAbiCoder.encode(
+          ["address", "address", "bytes", "bytes32"],
+          [
+            governor.address,
+            moduleAddress,
+            unformattedProposalData,
+            keccak256(toUtf8Bytes(description)),
+          ]
+        )
+      )
+    );
+    return proposalId;
   }
 
   // Compute proposal ID from the tx data
