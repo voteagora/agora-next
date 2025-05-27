@@ -19,10 +19,11 @@ const PAGE_TITLE = [
 
 interface NewStakeFlowProps {
   delegates: PaginatedResult<DelegateChunk[]>;
-  fetchDelegates: (
-    pagination: PaginationParams,
-    seed: number
-  ) => Promise<PaginatedResult<DelegateChunk[]>>;
+  fetchDelegates: (args: {
+    pagination?: PaginationParams;
+    seed?: number;
+    showParticipation?: boolean;
+  }) => Promise<PaginatedResult<DelegateChunk[]>>;
   refreshPath: (path: string) => void;
 }
 

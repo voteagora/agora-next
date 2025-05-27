@@ -21,11 +21,11 @@ import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
-  fetchDelegates: (
-    pagination: PaginationParams,
-    seed?: number,
-    showParticipation?: boolean
-  ) => Promise<PaginatedResult<DelegateChunk[]>>;
+  fetchDelegates: (args: {
+    pagination?: PaginationParams;
+    seed?: number;
+    showParticipation?: boolean;
+  }) => Promise<PaginatedResult<DelegateChunk[]>>;
 }
 
 export default function DelegateTable({
@@ -57,11 +57,11 @@ export default function DelegateTable({
     if (!fetching.current && meta.has_next) {
       try {
         fetching.current = true;
-        const data = await fetchDelegates(
-          { offset: meta.next_offset, limit: meta.total_returned },
-          initialDelegates.seed || Math.random(),
-          showParticipation
-        );
+        const data = await fetchDelegates({
+          pagination: { offset: meta.next_offset, limit: meta.total_returned },
+          seed: initialDelegates.seed || Math.random(),
+          showParticipation,
+        });
         setDelegates(delegates.concat(data.data));
         setMeta(data.meta);
       } catch (error) {

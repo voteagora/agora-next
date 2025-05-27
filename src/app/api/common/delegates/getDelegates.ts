@@ -917,7 +917,8 @@ export const fetchDelegates = cache(
     showParticipation?: boolean;
   }) => {
     "use server";
-    return getDelegates(args);
+    const options = args;
+    return getDelegates(options);
   }
 );
 

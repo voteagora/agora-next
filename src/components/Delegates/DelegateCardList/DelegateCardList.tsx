@@ -14,10 +14,11 @@ import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
-  fetchDelegates: (
-    pagination: PaginationParams,
-    seed?: number
-  ) => Promise<PaginatedResult<DelegateChunk[]>>;
+  fetchDelegates: (args: {
+    pagination?: PaginationParams;
+    seed?: number;
+    showParticipation?: boolean;
+  }) => Promise<PaginatedResult<DelegateChunk[]>>;
 }
 
 export default function DelegateCardList({
@@ -32,6 +33,7 @@ export default function DelegateCardList({
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
+  const showParticipation = ui.toggle("show-participation")?.enabled || false;
 
   useEffect(() => {
     setIsDelegatesFiltering(false);
@@ -43,10 +45,14 @@ export default function DelegateCardList({
     if (!fetching.current && meta.has_next) {
       try {
         fetching.current = true;
-        const data = await fetchDelegates(
-          { offset: meta.next_offset, limit: meta.total_returned },
-          initialDelegates.seed || Math.random()
-        );
+
+        console.log("😍 showParticipation - B", showParticipation);
+
+        const data = await fetchDelegates({
+          pagination: { offset: meta.next_offset, limit: meta.total_returned },
+          seed: initialDelegates.seed || Math.random(),
+          showParticipation,
+        });
         setDelegates(delegates.concat(data.data));
         setMeta(data.meta);
       } catch (error) {
