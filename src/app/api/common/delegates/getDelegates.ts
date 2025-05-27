@@ -32,7 +32,7 @@ import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
  */
 async function getDelegates({
   pagination = {
-    limit: 20,
+    limit: 30,
     offset: 0,
   },
   sort,
