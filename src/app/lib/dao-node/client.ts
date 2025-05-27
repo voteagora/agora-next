@@ -279,11 +279,15 @@ export const getDelegatesFromDaoNode = async (options?: {
     const reverse = options?.reverse ?? true;
     const filters = options?.filters;
 
+    // TODO: Properly cache this... SMH
+    // entire point of DAO node is to serve up full state
+    // not give tiny little pages.
     const queryParams = new URLSearchParams({
       sort_by: sortBy,
       reverse: reverse.toString(),
       include:
         "VP,DC," + (options?.withParticipation ? "PR," : "") + "LVB,MRD,VPC",
+      page_size: "1000",
     });
 
     if (filters?.delegator) {

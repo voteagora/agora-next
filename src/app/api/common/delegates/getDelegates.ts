@@ -131,17 +131,17 @@ async function getDelegates({
         let currentTotalCount = daoNodeResult.totalBeforeInternalPagination;
 
         // Apply filters if they were not handled by delegator filter in DAO node and internal pagination was skipped
-        if (hasFilters) {
+        if (hasFilters || isAllowListEnabled) {
           processedDelegates = processedDelegates.filter((delegate) => {
-            if (!delegate.statement) return false;
-            const statementPayload = delegate.statement.payload;
-            if (!statementPayload) return false;
-
-            if (filters.endorsed && !delegate.statement.endorsed) {
+            const endorsed = delegate.statement?.endorsed || false;
+            if (filters?.endorsed && !endorsed) {
               return false;
             }
-            if (filters.hasStatement) {
-              const delegateStatementText = statementPayload.delegateStatement;
+
+            const statementPayload = delegate.statement?.payload;
+
+            if (filters?.hasStatement) {
+              const delegateStatementText = statementPayload?.delegateStatement;
               if (
                 !delegateStatementText ||
                 typeof delegateStatementText !== "string" ||
@@ -150,11 +150,12 @@ async function getDelegates({
                 return false;
               }
             }
-            if (filters.issues) {
+
+            if (filters?.issues) {
               const topIssuesArray = filters.issues
                 .split(",")
                 .map((issue) => issue.trim());
-              const delegateIssues = statementPayload.topIssues;
+              const delegateIssues = statementPayload?.topIssues;
               if (
                 !delegateIssues ||
                 !Array.isArray(delegateIssues) ||
@@ -169,8 +170,9 @@ async function getDelegates({
               );
               if (!hasMatchingIssue) return false;
             }
-            if (filters.stakeholders) {
-              const delegateStakeholders = statementPayload.topStakeholders;
+
+            if (filters?.stakeholders) {
+              const delegateStakeholders = statementPayload?.topStakeholders;
               if (
                 !delegateStakeholders ||
                 !Array.isArray(delegateStakeholders) ||
@@ -178,10 +180,15 @@ async function getDelegates({
               )
                 return false;
               const hasMatchingStakeholder = delegateStakeholders.some(
-                (sh) => sh.type === filters.stakeholders
+                (sh) => sh.type === filters?.stakeholders
               );
               if (!hasMatchingStakeholder) return false;
             }
+
+            if (allowList.length > 0) {
+              return allowList.includes(delegate.address as `0x${string}`);
+            }
+
             return true;
           });
           currentTotalCount = processedDelegates.length;
@@ -189,12 +196,6 @@ async function getDelegates({
 
         if (isWeightedRandomSort) {
           processedDelegates.sort(() => Math.random() - 0.5);
-        }
-
-        if (allowList.length > 0) {
-          processedDelegates = processedDelegates.filter((delegate) => {
-            return allowList.includes(delegate.address as `0x${string}`);
-          });
         }
 
         // Apply pagination here if it wasn't done in the DAO node client
