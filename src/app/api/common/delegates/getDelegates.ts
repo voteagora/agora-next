@@ -58,6 +58,9 @@ async function getDelegates({
       let daoNodeSortBy: string = "VP"; // Default to voting power
       let reverse = true;
 
+      const { namespace, ui, slug, contracts } = Tenant.current();
+      const allowList = ui.delegates?.allowed || [];
+
       // VP = vote power (default)
       // MRD = most recently delegated
       // OLD = oldest delegation
@@ -186,6 +189,12 @@ async function getDelegates({
           processedDelegates.sort(() => Math.random() - 0.5);
         }
 
+        if (allowList.length > 0) {
+          processedDelegates = processedDelegates.filter((delegate) => {
+            return allowList.includes(delegate.address as `0x${string}`);
+          });
+        }
+
         // Apply pagination here if it wasn't done in the DAO node client
         // or if it needs to be re-applied after filters/weighted_random sort
         let finalPaginatedDelegates = processedDelegates;
@@ -200,7 +209,7 @@ async function getDelegates({
           );
         }
 
-        const transformedDelegates = finalPaginatedDelegates.map((delegate) => {
+        let transformedDelegates = finalPaginatedDelegates.map((delegate) => {
           // Check if delegate has the expected properties
           if (!delegate || typeof delegate !== "object") {
             console.error(
@@ -270,9 +279,6 @@ async function getDelegates({
       }
 
       // If no DAO node data, continue with the original database query
-
-      const { namespace, ui, slug, contracts } = Tenant.current();
-      const allowList = ui.delegates?.allowed || [];
 
       // The top issues filter supports multiple selection - a comma separated list of issues
       const topIssuesParam = filters?.issues || "";
