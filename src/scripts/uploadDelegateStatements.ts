@@ -23,6 +23,7 @@ async function main(
       address: statement.SortKey.toLowerCase(),
       dao_slug: daoSlug,
       signature: statement.signature,
+      message_hash: statement.messageHash,
       payload: JSON.parse(statement.signedPayload),
       twitter: JSON.parse(statement.signedPayload)?.twitter,
       discord: JSON.parse(statement.signedPayload)?.discord,
