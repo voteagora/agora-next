@@ -156,6 +156,12 @@ export enum ApprovalProposalType {
   TOP_CHOICES = "Top choices",
 }
 
+export enum ProposalScope {
+  ONCHAIN_ONLY = "onchain_only",
+  OFFCHAIN_ONLY = "offchain_only",
+  HYBRID = "hybrid",
+}
+
 export enum ProposalType {
   // might make sense to move snapshot to something else since snapshot isn't really a "proposal"
   // It doesn't go through the governor
@@ -230,7 +236,7 @@ export type PLMConfig = {
 
 export type BaseProposal = ProposalDraft & {
   checklist_items: ProposalChecklist[];
-  citizen_voting_enabled?: boolean;
+  proposal_scope?: ProposalScope;
 };
 
 export type BasicProposal = BaseProposal & {
@@ -304,7 +310,7 @@ const parseTransaction = (t: ProposalDraftTransaction) => {
 // Used to translate a draftProposal database record into its form representation
 export const parseProposalToForm = (proposal: DraftProposal) => {
   const baseFields = {
-    citizen_voting_enabled: proposal.citizen_voting_enabled || false,
+    proposal_scope: proposal.proposal_scope,
   };
 
   switch (proposal.voting_module_type) {
