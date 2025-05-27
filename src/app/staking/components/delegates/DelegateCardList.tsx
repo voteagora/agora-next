@@ -12,11 +12,11 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 interface Props {
   address: string;
   initialDelegates: PaginatedResult<DelegateChunk[]>;
-  fetchDelegates: (
-    pagination: PaginationParams,
-    seed: number,
-    showParticipation?: boolean
-  ) => Promise<PaginatedResult<DelegateChunk[]>>;
+  fetchDelegates: (args: {
+    pagination?: PaginationParams;
+    seed?: number;
+    showParticipation?: boolean;
+  }) => Promise<PaginatedResult<DelegateChunk[]>>;
   onSelect: (address: string) => void;
 }
 
@@ -41,15 +41,16 @@ export default function DelegateCardList({
   const loadMore = async () => {
     if (!fetching.current && meta.has_next) {
       fetching.current = true;
+      console.log("🥵 showParticipation - C", showParticipation);
 
-      const data = await fetchDelegates(
-        {
+      const data = await fetchDelegates({
+        pagination: {
           limit: meta.total_returned,
           offset: meta.next_offset,
         },
-        initialDelegates.seed || Math.random(),
-        showParticipation
-      );
+        seed: initialDelegates.seed || Math.random(),
+        showParticipation,
+      });
 
       setDelegates(delegates.concat(data.data));
       setMeta(data.meta);
