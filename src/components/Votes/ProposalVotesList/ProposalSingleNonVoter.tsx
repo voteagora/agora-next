@@ -13,6 +13,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import ENSName from "@/components/shared/ENSName";
 import { fontMapper } from "@/styles/fonts";
+import Link from "next/link";
 
 export function ProposalSingleNonVoter({
   voter,
@@ -53,8 +54,10 @@ export function ProposalSingleNonVoter({
       >
         <HStack gap={1} alignItems="items-center">
           <ENSAvatar ensName={data} className="w-5 h-5" />
-          <div className="text-primary">
-            <ENSName address={voter.delegate} />
+          <div className="text-primary hover:underline">
+            <Link href={`/delegates/${voter.delegate}`}>
+              <ENSName address={voter.delegate} />
+            </Link>
           </div>
           {voter.delegate === connectedAddress?.toLowerCase() && (
             <p className="text-primary">(you)</p>
