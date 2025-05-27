@@ -290,7 +290,8 @@ export const getDelegatesFromDaoNode = async (options?: {
       reverse: reverse.toString(),
       include:
         "VP,DC," + (options?.withParticipation ? "PR," : "") + "LVB,MRD,VPC",
-      page_size: "1000",
+      page_size: options?.limit?.toString() || "1000",
+      offset: options?.offset?.toString() || "0",
     });
 
     if (filters?.delegator) {
