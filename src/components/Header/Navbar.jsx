@@ -25,13 +25,14 @@ export default function Navbar() {
           href={hasProposalsHref ? ui.page("proposals")?.href : "/proposals"}
           target={hasProposalsHref ? "_blank" : "_self"}
           isActive={pathname.includes("proposals") || pathname === "/"}
+          testId="proposals-tab-link"
         >
           Proposals
         </HeaderLink>
       )}
 
       {ui.toggle("delegates") && ui.toggle("delegates").enabled && (
-        <HeaderLink href="/delegates" isActive={pathname.includes("delegates")}>
+        <HeaderLink href="/delegates" isActive={pathname.includes("delegates")} testId="delegates-tab-link">
           Voters
         </HeaderLink>
       )}
