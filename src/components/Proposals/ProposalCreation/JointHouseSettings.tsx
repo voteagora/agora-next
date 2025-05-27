@@ -2,42 +2,61 @@
 
 import { Form } from "./CreateProposalForm";
 import { VStack } from "@/components/Layout/Stack";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/shared/Switch";
+import { ProposalScope } from "@/app/proposals/draft/types";
+
+const proposalScopeOptions = {
+  [ProposalScope.ONCHAIN_ONLY]: "On-Chain Only",
+  [ProposalScope.OFFCHAIN_ONLY]: "Off-Chain Only (Citizens)",
+  [ProposalScope.HYBRID]: "Hybrid (On-Chain & Off-Chain)",
+};
 
 function JointHouseSettings({ form }: { form: Form }) {
-  const { citizenVotingEnabled } = form.state;
+  const { proposal_scope } = form.state;
+
+  const handleScopeChange = (selectedOption: string) => {
+    const scope = Object.keys(proposalScopeOptions).find(
+      (key) => proposalScopeOptions[key as ProposalScope] === selectedOption
+    ) as ProposalScope | undefined;
+
+    if (scope) {
+      if (form.onChange.proposal_scope) {
+        form.onChange.proposal_scope(scope);
+      }
+    }
+  };
 
   return (
-    <VStack className="space-y-4">
-      <div>
+    <VStack>
+      <div className="mb-1">
         <h3 className="text-lg font-semibold mb-2 text-primary">
-          Joint-House Voting
+          Proposal Scope
         </h3>
-        <p className="text-sm text-secondary mb-4">
-          Enable parallel Citizen House voting alongside Token House voting via
-          EAS attestations.
+        <p className="text-sm text-secondary">
+          Select the voting mechanism for this proposal.
         </p>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="citizen-voting"
-          checked={citizenVotingEnabled}
-          onCheckedChange={(checked) =>
-            form.onChange.citizenVotingEnabled(checked as boolean)
-          }
-        />
-        <Label htmlFor="citizen-voting" className="text-sm font-medium">
-          Enable Citizen House voting
-        </Label>
-      </div>
+      <Switch
+        options={Object.values(proposalScopeOptions)}
+        selection={
+          proposal_scope
+            ? proposalScopeOptions[proposal_scope]
+            : proposalScopeOptions[ProposalScope.ONCHAIN_ONLY]
+        }
+        onSelectionChanged={handleScopeChange}
+      />
 
-      {citizenVotingEnabled && (
-        <div className="text-xs text-secondary bg-wash p-3 rounded border border-line">
+      {/* Display note if scope is off-chain or hybrid */}
+      {(proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
+        proposal_scope === ProposalScope.HYBRID) && (
+        <div className="text-xs text-secondary bg-wash p-3 rounded border border-line mt-2">
           <p>
-            <strong>Note:</strong> This proposal will include both on-chain
-            Token House voting and parallel EAS-based Citizen House voting.
+            <strong>Note:</strong>
+            {proposal_scope === ProposalScope.OFFCHAIN_ONLY &&
+              " This proposal will be voted on by the Citizen House using off-chain mechanisms."}
+            {proposal_scope === ProposalScope.HYBRID &&
+              " This proposal will include both on-chain Token House voting and parallel EAS-based Citizen House voting."}
           </p>
         </div>
       )}

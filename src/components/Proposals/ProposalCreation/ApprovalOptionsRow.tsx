@@ -5,8 +5,11 @@ import { XCircleIcon } from "@heroicons/react/20/solid";
 import { VStack } from "@/components/Layout/Stack";
 import InputBox from "@/components/shared/InputBox";
 import AddTransactionsDetails from "./AddTransactionsDetails";
+import { ProposalScope } from "@/app/proposals/draft/types";
 
 export default function ApprovalOptionsRow({ form }: { form: Form }) {
+  const { proposal_scope } = form.state;
+
   function addOption() {
     form.onChange.options([
       ...form.state.options,
@@ -38,10 +41,18 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
   return (
     <>
       <h4 className="font-semibold pb-1">Proposed Options</h4>
-      <p className="text-base text-secondary mb-4">
-        Proposed transactions will execute if your proposal passes. If you skip
-        this step no transactions will be added.
-      </p>
+      {proposal_scope !== ProposalScope.OFFCHAIN_ONLY && (
+        <p className="text-base text-secondary mb-4">
+          Proposed transactions will execute if your proposal passes. If you
+          skip this step no transactions will be added.
+        </p>
+      )}
+      {proposal_scope === ProposalScope.OFFCHAIN_ONLY && (
+        <p className="text-base text-secondary mb-4">
+          Options for an off-chain only proposal define choices for voters and
+          will not execute on-chain transactions.
+        </p>
+      )}
       {form.state.options.map((_option, index) => (
         <VStack
           gap={4}
@@ -67,7 +78,9 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
               onChange={(next) => update(index, { title: next })}
               required
             />
-            <AddTransactionsDetails optionIndex={index} form={form} />
+            {proposal_scope !== ProposalScope.OFFCHAIN_ONLY && (
+              <AddTransactionsDetails optionIndex={index} form={form} />
+            )}
           </VStack>
         </VStack>
       ))}
