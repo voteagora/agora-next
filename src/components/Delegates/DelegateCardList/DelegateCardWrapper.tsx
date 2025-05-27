@@ -79,19 +79,20 @@ const DelegateCardWrapper = async ({
       <TabsContent value="delegates">
         <DelegateContent
           initialDelegates={delegates}
-          fetchDelegates={({
+          fetchDelegates={async ({
             pagination = { offset: 0, limit: 20 },
             seed,
             showParticipation,
-          }) =>
-            fetchDelegatesWithParams(
+          }) => {
+            "use server";
+            return fetchDelegatesWithParams(
               sort,
               filters,
               pagination,
               seed,
               showParticipation
-            )
-          }
+            );
+          }}
         />
       </TabsContent>
     </DelegateTabs>
