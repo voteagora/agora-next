@@ -42,7 +42,6 @@ export function getSecondsPerBlock(chainId: number | undefined): number {
     case 11155111: // Sepolia Testnet
       return 12;
 
-
     default:
       throw new Error(`Block time for chain:${chainId} not specified`);
   }
@@ -60,7 +59,7 @@ export function getHumanBlockTime(
   forceTokenChain: boolean = false
 ) {
   const chainIdToUse = forceTokenChain ? forceTokenChainId : chainId;
-  
+
   // Special case for Optimism mainnet due to Bedrock upgrade
   if (chainIdToUse === 10) {
     const blockSeconds = getSecondsPerBlock(chainIdToUse);
