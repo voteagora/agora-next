@@ -249,6 +249,10 @@ export const scrollTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "show-participation",
+      enabled: true,
+    },
+    {
       name: "proposal-lifecycle",
       enabled: true,
       config: {

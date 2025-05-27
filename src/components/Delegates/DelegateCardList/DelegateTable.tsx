@@ -41,7 +41,7 @@ export default function DelegateTable({
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
-  const showParticipation = ui.toggle("show-participation")?.enabled ?? false;
+  const showParticipation = ui.toggle("show-participation")?.enabled || false;
   const { isAdvancedUser } = useIsAdvancedUser();
   const { advancedDelegators } = useConnectedDelegate();
 
