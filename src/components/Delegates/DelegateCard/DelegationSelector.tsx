@@ -54,6 +54,7 @@ export function DelegationSelector({
           <Button
             disabled
             className="font-semibold py-2 px-4 cursor-pointer bg-positive/90 text-neutral hover:shadow-newDefault rounded-lg"
+            data-testid="pending-delegation-button"
           >
             Pending {pendingTxnCount}
           </Button>

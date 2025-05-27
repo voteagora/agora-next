@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 
-export const HeaderLink = ({ className, children, href, target, isActive }) => {
+export const HeaderLink = ({ className, children, href, target, isActive, testId }) => {
   const activeClass = isActive
     ? "bg-primary text-inherit text-neutral"
     : "text-tertiary";
@@ -11,6 +11,7 @@ export const HeaderLink = ({ className, children, href, target, isActive }) => {
       href={href}
       target={target}
       className={`px-4 rounded-full text-sm sm:text-base h-[40px] content-center ${activeClass} ${className || ""}`}
+      data-testid={testId}
     >
       {children}
     </Link>

@@ -64,7 +64,7 @@ export const SafeWalletConfirmationDialog = ({
         throw new Error("Failed to sign safe transaction");
       }
 
-      safeApiKit?.proposeTransaction({
+      await safeApiKit?.proposeTransaction({
         safeAddress: selectedWalletAddress as `0x${string}`,
         safeTransactionData: safeTransaction?.data,
         safeTxHash: safeTxHash,

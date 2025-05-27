@@ -201,6 +201,7 @@ export function PartialDelegationDialog({
             <div
               className="hover:underline cursor-pointer"
               onClick={() => delegateEvenly()}
+              data-test-id="delegate-evenly-button"
             >
               Delegate Evenly
             </div>
