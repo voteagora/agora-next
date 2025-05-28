@@ -7,6 +7,7 @@ import { cache } from "react";
 import { PaginatedResult } from "../pagination";
 import { ProposalType } from "@prisma/client";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import { ParticipationStats } from "@/lib/types";
 
 const { contracts, namespace } = Tenant.current();
 
@@ -116,6 +117,47 @@ export const getProposalTypesFromDaoNode = async () => {
   const data = await response.json();
 
   return data;
+};
+
+/**
+ * Fetches participation statistics for a delegate address from the DAO node
+ * @param address The delegate address to fetch stats for
+ * @returns Participation stats or null if fetching fails
+ */
+export const getParticipationStatsFromDaoNode = async (
+  address: string
+): Promise<ParticipationStats | null> => {
+  const url = getDaoNodeURLForNamespace(namespace);
+  if (!url) {
+    return null;
+  }
+  try {
+    // Fetch delegate data for participation rate
+    const delegateRes = await fetch(`${url}v1/delegate/${address}`);
+    if (!delegateRes.ok) {
+      throw new Error(`Failed to fetch delegate: ${await delegateRes.text()}`);
+    }
+    const delegateData = await delegateRes.json();
+
+    // Fetch voting history to determine eligibility
+    const votingRes = await fetch(
+      `${url}v1/delegate/${address}/voting_history`
+    );
+    if (!votingRes.ok) {
+      throw new Error(
+        `Failed to fetch voting history: ${await votingRes.text()}`
+      );
+    }
+    const votingData = await votingRes.json();
+
+    return {
+      participationRate: delegateData.participation_rate,
+      eligible: votingData.voting_history.length > 10,
+    };
+  } catch (error) {
+    console.error("Error in getParticipationStatsFromDaoNode:", error);
+    return null;
+  }
 };
 
 export const getAllProposalsFromDaoNode = async () => {
