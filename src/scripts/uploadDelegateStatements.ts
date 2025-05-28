@@ -28,7 +28,6 @@ async function main(
       twitter: JSON.parse(statement.signedPayload)?.twitter,
       discord: JSON.parse(statement.signedPayload)?.discord,
       email: null,
-      message_hash: statement.message_hash,
     });
   }
 
