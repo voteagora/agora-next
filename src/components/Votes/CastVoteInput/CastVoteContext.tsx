@@ -91,7 +91,7 @@ const CastVoteContextProvider = ({
   >(null);
   const [fallbackToStandardVote, setFallbackToStandardVote] = useState(false);
   const openDialog = useOpenDialog();
-  const {isSelectedPrimaryAddress} = useSelectedWallet();
+  const { isSelectedPrimaryAddress } = useSelectedWallet();
 
   const { ui, contracts } = Tenant.current();
 

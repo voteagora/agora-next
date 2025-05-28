@@ -50,7 +50,7 @@ export const SafeProtocolKitProvider: React.FC<{
         });
         await safeSDK.connect({
           signer: address,
-          safeAddress,          
+          safeAddress,
         });
         setProtocolKit(safeSDK);
       } catch (err) {

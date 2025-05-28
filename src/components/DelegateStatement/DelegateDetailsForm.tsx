@@ -170,6 +170,7 @@ export default function DelegateDetailsForm({
         params: {
           onSubmit: submissionHandler,
         },
+        className: "sm:w-[512px]",
       });
     } else {
       await submissionHandler();

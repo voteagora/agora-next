@@ -46,7 +46,8 @@ export function DelegateDialog({
   const { ui, contracts, token } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
-  const { selectedWalletAddress: accountAddress, isSelectedPrimaryAddress } = useSelectedWallet();
+  const { selectedWalletAddress: accountAddress, isSelectedPrimaryAddress } =
+    useSelectedWallet();
 
   const { data: tokenBalance } = useTokenBalance(accountAddress);
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);

@@ -1,7 +1,14 @@
 import React from "react";
 import Link from "next/link";
 
-export const HeaderLink = ({ className, children, href, target, isActive, testId }) => {
+export const HeaderLink = ({
+  className,
+  children,
+  href,
+  target,
+  isActive,
+  testId,
+}) => {
   const activeClass = isActive
     ? "bg-primary text-inherit text-neutral"
     : "text-tertiary";

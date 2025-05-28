@@ -112,14 +112,14 @@ export const ProfileDropDownContent = ({
                 <Link
                   href={`/delegates/${selectedWalletAddress}`}
                   onClick={handleCloseDrawer}
-                  className="self-stretch h-12 text-secondary flex items-center hover:bg-neutral hover:font-bold hover:rounded-md"
+                  className="self-stretch h-12 text-secondary flex items-center hover:bg-neutral hover:font-bold hover:rounded-md hover:ml-[-8px] hover:pl-[8px]"
                 >
                   View my profile
                 </Link>
                 <Link
                   href={`/delegates/create`}
                   onClick={handleCloseDrawer}
-                  className="self-stretch h-12 flex text-secondary items-center hover:bg-neutral hover:font-bold hover:rounded-md"
+                  className="self-stretch h-12 flex text-secondary items-center hover:bg-neutral hover:font-bold hover:rounded-md hover:ml-[-8px] hover:pl-[8px]"
                 >
                   Edit delegate statement
                 </Link>

@@ -301,6 +301,7 @@ export type SafeSignConfirmationDialogType = {
   params: {
     onSubmit?: () => Promise<void>;
   };
+  className?: string;
 };
 
 export type SafeDeleteStatementDialogType = {
