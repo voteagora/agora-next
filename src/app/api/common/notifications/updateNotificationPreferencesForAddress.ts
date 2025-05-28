@@ -37,12 +37,10 @@ const updateNotificationPreferencesForAddress = async (
     });
     const { slug } = Tenant.current();
     const validatedAddress = validatedData.address.toLowerCase();
-    const result = await prismaWeb2Client.delegateStatements.update({
+    const result = await prismaWeb2Client.delegateStatements.updateMany({
       where: {
-        address_dao_slug: {
-          address: validatedAddress,
-          dao_slug: slug,
-        },
+        address: validatedAddress,
+        dao_slug: slug,
       },
       data: {
         email: validatedData.email,

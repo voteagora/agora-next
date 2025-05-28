@@ -10,23 +10,35 @@ datasource db {
   schemas  = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "uniswap", "xai", "b3", "demo", "linea"]
 }
 
-model DelegateStatements {
-  address   String
-  dao_slug  DaoSlug
-  signature String
-  payload   Json
-  twitter   String?
-  discord   String?
-  email     String?
-  createdAt DateTime? @default(now()) @map("created_at") @db.Date
-  updatedAt DateTime? @default(now()) @map("updated_at") @db.Date
-  warpcast  String?
-  endorsed  Boolean   @default(false)
-  scw_address  String?
-  notification_preferences Json?
+enum stage_status {
+  draft
+  published
 
-  @@id([address, dao_slug])
+  @@schema("agora")
+}
+
+model DelegateStatements {
+  address                  String
+  dao_slug                 DaoSlug
+  signature                String
+  payload                  Json
+  twitter                  String?
+  discord                  String?
+  email                    String?
+  createdAt                DateTime?    @default(dbgenerated("(CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text)")) @map("created_at") @db.Date
+  updatedAt                DateTime?    @default(dbgenerated("(CURRENT_TIMESTAMP AT TIME ZONE 'UTC'::text)")) @map("updated_at") @db.Date
+  warpcast                 String?
+  endorsed                 Boolean      @default(false)
+  scw_address              String?      @db.VarChar(42)
+  notification_preferences Json?        @default(dbgenerated("jsonb_build_object('wants_proposal_created_email', 'prompt', 'wants_proposal_ending_soon_email', 'prompt', 'last_updated', (now() AT TIME ZONE 'UTC'::text))"))
+  stage                    stage_status @default(published)
+  message_hash             String
+  created_at_ts            DateTime?    @default(now()) @db.Timestamptz(6)
+  updated_at_ts            DateTime?    @default(now()) @db.Timestamptz(6)
+
+  @@id([address, dao_slug, message_hash])
   @@index([email], map: "idx_delegate_statements_email")
+  @@index([dao_slug], map: "idx_delegate_statements_dao_slug")
   @@map("delegate_statements")
   @@schema("agora")
 }
