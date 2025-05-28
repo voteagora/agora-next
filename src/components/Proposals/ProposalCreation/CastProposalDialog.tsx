@@ -9,6 +9,7 @@ type Props = {
   isLoading: boolean;
   isSuccess: boolean;
   txHash?: string;
+  isEas?: boolean;
   closeDialog: () => void;
 };
 
@@ -17,6 +18,7 @@ export function CastProposalDialog({
   isLoading,
   isSuccess,
   txHash,
+  isEas,
   closeDialog,
 }: Props) {
   return (
@@ -32,7 +34,11 @@ export function CastProposalDialog({
           {isError && !txHash && <div>error</div>}
           {isLoading && <Loading />}
           {isSuccess && txHash && (
-            <SuccessMessage txHash={txHash} closeDialog={closeDialog} />
+            <SuccessMessage
+              txHash={txHash}
+              closeDialog={closeDialog}
+              isEas={isEas}
+            />
           )}
         </VStack>
       </VStack>
@@ -56,9 +62,11 @@ function Message({ text, image }: { text: string; image?: JSX.Element }) {
 export function SuccessMessage({
   closeDialog,
   txHash,
+  isEas,
 }: {
   closeDialog: () => void;
   txHash: string;
+  isEas?: boolean;
 }) {
   const { ui } = Tenant.current();
   return (
@@ -82,7 +90,7 @@ export function SuccessMessage({
           Got it
         </div>
       </div>
-      <BlockScanUrls hash1={txHash} />
+      <BlockScanUrls hash1={txHash} isEas={isEas} />
     </VStack>
   );
 }
