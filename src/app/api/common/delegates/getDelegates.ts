@@ -116,6 +116,8 @@ async function getDelegates({
               FROM agora.delegate_statements s
               WHERE s.address = d.delegate
               AND s.dao_slug = '${slug}'
+              AND s.stage = '${stageStatus.PUBLISHED}'
+              ORDER BY s.updated_at_ts DESC
               ${endorsedCondition}
               ${issuesCondition}
               ${stakeholdersCondition}
@@ -252,7 +254,8 @@ async function getDelegates({
                       warpcast,
                       endorsed
                     FROM agora.delegate_statements s
-                    WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
+                    WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug AND s.stage = '${stageStatus.PUBLISHED}'
+                    ORDER BY s.updated_at_ts DESC
                     ${endorsedCondition}
                     ${issuesCondition}
                     ${stakeholdersCondition}
@@ -302,7 +305,8 @@ async function getDelegates({
                       warpcast,
                       endorsed
                     FROM agora.delegate_statements s
-                    WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
+                    WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug AND s.stage = '${stageStatus.PUBLISHED}'
+                    ORDER BY s.updated_at_ts DESC
                     ${endorsedCondition}
                     ${issuesCondition}
                     ${stakeholdersCondition}
@@ -349,7 +353,8 @@ async function getDelegates({
                       warpcast,
                       endorsed
                     FROM agora.delegate_statements s
-                    WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
+                    WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug AND s.stage = '${stageStatus.PUBLISHED}'
+                    ORDER BY s.updated_at_ts DESC
                     ${endorsedCondition}
                     ${issuesCondition}
                     ${stakeholdersCondition}
@@ -471,8 +476,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
                 notification_preferences,
                 message_hash
               FROM agora.delegate_statements s
-              WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug AND s.stage = $6::agora.stage_status
-              ORDER BY s.updated_at DESC
+              WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug AND s.stage = '${stageStatus.PUBLISHED}'
+              ORDER BY s.updated_at_ts DESC
               LIMIT 1
             ) sub
           ) AS statement ON TRUE;
@@ -482,7 +487,6 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       slug,
       contracts.governor.address,
       contracts.token.address,
-      stageStatus.PUBLISHED
     );
 
     const [delegate, votableSupply, quorum] = await Promise.all([

@@ -9,6 +9,7 @@ import {
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { DelegateChunk, DelegatesGetPayload } from "../delegates/delegate";
+import { stageStatus } from "@/app/lib/sharedEnums";
 
 async function getCitizens({
   pagination = { limit: 10, offset: 0 },
@@ -42,7 +43,8 @@ async function getCitizens({
                   updated_at,
                   warpcast
                 FROM agora.delegate_statements s
-                WHERE s.address = LOWER(citizens.address) AND s.dao_slug = $1::config.dao_slug
+                WHERE s.address = LOWER(citizens.address) AND s.dao_slug = $1::config.dao_slug AND s.stage = '${stageStatus.PUBLISHED}'
+                ORDER BY s.updated_at_ts DESC
                 LIMIT 1
               ) sub
             ) AS statement
@@ -81,7 +83,8 @@ async function getCitizens({
                     updated_at,
                     warpcast
                   FROM agora.delegate_statements s
-                  WHERE s.address = LOWER(citizens.address) AND s.dao_slug = $1::config.dao_slug
+                  WHERE s.address = LOWER(citizens.address) AND s.dao_slug = $1::config.dao_slug AND s.stage = '${stageStatus.PUBLISHED}'
+                  ORDER BY s.updated_at_ts DESC
                   LIMIT 1
                 ) sub
               ) AS statement

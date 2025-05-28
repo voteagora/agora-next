@@ -34,7 +34,7 @@ async function getDelegateStatementForAddress({
         stage: stageStatus.PUBLISHED,
       },
       orderBy: {
-        updatedAt: "desc",
+        updated_at_ts: "desc",
       },
     })
     .catch((error) => console.error(error));
@@ -79,7 +79,7 @@ export async function getDelegateStatementsForAddress({
           stage: stageStatus.PUBLISHED,
         },
         orderBy: {
-          updatedAt: "desc",
+          updated_at_ts: "desc",
         },
       })
       .catch((error) => console.error(error));
@@ -92,7 +92,7 @@ export async function getDelegateStatementsForAddress({
           stage: stage,
         },
         orderBy: {
-          updatedAt: "desc",
+          updated_at_ts: "desc",
         },
       })
       .catch((error) => console.error(error));

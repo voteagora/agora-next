@@ -10,13 +10,6 @@ datasource db {
   schemas  = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "uniswap", "xai", "b3", "demo", "linea"]
 }
 
-enum stage_status {
-  draft
-  published
-
-  @@schema("agora")
-}
-
 model DelegateStatements {
   address                  String
   dao_slug                 DaoSlug
@@ -32,7 +25,6 @@ model DelegateStatements {
   endorsed                 Boolean      @default(false)
   scw_address              String?      @db.VarChar(42)
   notification_preferences Json?        @default(dbgenerated("jsonb_build_object('wants_proposal_created_email', 'prompt', 'wants_proposal_ending_soon_email', 'prompt', 'last_updated', (now() AT TIME ZONE 'UTC'::text))"))
-  stage                    stage_status @default(published)
   message_hash             String
   created_at_ts            DateTime?    @default(now()) @db.Timestamptz(6)
   updated_at_ts            DateTime?    @default(now()) @db.Timestamptz(6)

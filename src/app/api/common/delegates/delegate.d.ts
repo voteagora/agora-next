@@ -63,6 +63,8 @@ type DelegateStatement = {
   message_hash: string | null;
   createdAt: Date;
   updatedAt: Date;
+  updated_at_ts: number;
+  created_at_ts: number;
 };
 
 export type DelegateStats = {

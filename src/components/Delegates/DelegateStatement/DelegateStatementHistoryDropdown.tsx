@@ -139,8 +139,8 @@ export const DelegateStatementHistoryDropdown = ({
                 >
                   <div className="inline-flex flex-col justify-start items-start">
                     <div className="text-primary text-base font-medium leading-normal">
-                      {statement.updatedAt
-                        ? `${formatDate(new Date(statement.updatedAt))}, ${formatTime(new Date(statement.updatedAt))}`
+                      {statement.updated_at_ts
+                        ? `${formatDate(new Date(statement.updated_at_ts))}, ${formatTime(new Date(statement.updated_at_ts))}`
                         : `Version ${index + 1}`}
                     </div>
                     <div className="text-secondary text-xs font-medium leading-none">
