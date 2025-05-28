@@ -468,10 +468,9 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
                 warpcast,
                 endorsed,
                 scw_address,
-                notification_preferences,
-                message_hash
+                notification_preferences
               FROM agora.delegate_statements s
-              WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug AND s.stage = $6::agora.stage_status
+              WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug
               ORDER BY s.updated_at DESC
               LIMIT 1
             ) sub
@@ -482,7 +481,6 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       slug,
       contracts.governor.address,
       contracts.token.address,
-      stageStatus.PUBLISHED
     );
 
     const [delegate, votableSupply, quorum] = await Promise.all([
