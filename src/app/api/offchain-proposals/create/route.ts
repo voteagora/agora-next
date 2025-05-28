@@ -24,6 +24,7 @@ interface OffchainProposalRequestBody {
   proposalType: "basic" | "approval" | "optimistic";
   unformattedProposalData?: string;
   moduleAddress?: string;
+  offchainOnly?: boolean;
 }
 
 export async function POST(request: NextRequest) {
@@ -54,6 +55,7 @@ export async function POST(request: NextRequest) {
     proposalType,
     unformattedProposalData,
     moduleAddress,
+    offchainOnly,
   } = requestBody;
   const {
     proposer,
@@ -69,7 +71,7 @@ export async function POST(request: NextRequest) {
 
     let onchainProposalId: string | null = null;
 
-    if (targets && values && calldatas) {
+    if (targets && values && calldatas && !offchainOnly) {
       onchainProposalId = (
         await generateProposalId({
           targets,
