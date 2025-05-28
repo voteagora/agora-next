@@ -240,3 +240,8 @@ export interface FormattedProposalType {
   isClientSide?: boolean;
   scopes?: ScopeData[];
 }
+
+export interface ParticipationStats {
+  participationRate: number;
+  eligible: boolean;
+}
