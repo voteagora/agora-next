@@ -143,7 +143,7 @@ export default function DelegateDetailsForm({
         return;
       }
       refetch();
-      if (!isSelectedPrimaryAddress) {
+      if (isSelectedPrimaryAddress) {
         setSaveSuccess(true);
       }
       router.push(`/delegates/${address}`);

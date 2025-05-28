@@ -117,11 +117,12 @@ async function getDelegates({
               WHERE s.address = d.delegate
               AND s.dao_slug = '${slug}'
               AND s.stage = '${stageStatus.PUBLISHED}'
-              ORDER BY s.updated_at_ts DESC
               ${endorsedCondition}
               ${issuesCondition}
               ${stakeholdersCondition}
               ${hasStatementCondition}
+              ORDER BY s.updated_at_ts DESC
+              LIMIT 1
             )`
           : "";
 
@@ -255,11 +256,11 @@ async function getDelegates({
                       endorsed
                     FROM agora.delegate_statements s
                     WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug AND s.stage = '${stageStatus.PUBLISHED}'
-                    ORDER BY s.updated_at_ts DESC
                     ${endorsedCondition}
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -306,11 +307,11 @@ async function getDelegates({
                       endorsed
                     FROM agora.delegate_statements s
                     WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug AND s.stage = '${stageStatus.PUBLISHED}'
-                    ORDER BY s.updated_at_ts DESC
                     ${endorsedCondition}
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -354,11 +355,11 @@ async function getDelegates({
                       endorsed
                     FROM agora.delegate_statements s
                     WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug AND s.stage = '${stageStatus.PUBLISHED}'
-                    ORDER BY s.updated_at_ts DESC
                     ${endorsedCondition}
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -486,7 +487,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       contracts.alligator?.address || "",
       slug,
       contracts.governor.address,
-      contracts.token.address,
+      contracts.token.address
     );
 
     const [delegate, votableSupply, quorum] = await Promise.all([

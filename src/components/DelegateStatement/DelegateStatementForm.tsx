@@ -155,7 +155,7 @@ export default function DelegateStatementForm({
       return;
     }
 
-    if (!isSelectedPrimaryAddress) {
+    if (isSelectedPrimaryAddress) {
       setSaveSuccess(true);
     }
 
