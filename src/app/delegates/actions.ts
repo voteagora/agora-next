@@ -195,3 +195,7 @@ export async function updateNotificationPreferencesForAddress(
 export const fetchDelegateStats = async (address: string) => {
   return getDelegateDataFromDaoNode(address);
 };
+
+export const fetchParticipationStats = async (address: string) => {
+  return getParticipationStatsFromDaoNode(address);
+};
