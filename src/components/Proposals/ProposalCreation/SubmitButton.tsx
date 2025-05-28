@@ -23,9 +23,9 @@ import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import toast from "react-hot-toast";
 import { createProposalAttestation } from "@/lib/eas";
 import { getPublicClient } from "@/lib/viem";
+import { BrowserProvider, JsonRpcSigner } from "ethers";
 
-const { contracts } = Tenant.current();
-
+const { contracts, ui } = Tenant.current();
 const abiCoder = new AbiCoder();
 const governanceTokenContract = contracts.token;
 
@@ -36,7 +36,6 @@ export default function SubmitButton({
   formTarget: React.RefObject<HTMLFormElement>;
   form: Form;
 }) {
-  const { contracts, ui } = Tenant.current();
   const governorContract = contracts.governor;
 
   const { data: votingDelay } = useReadContract({
@@ -137,6 +136,13 @@ export default function SubmitButton({
     setOffchainSubmitError(null);
 
     try {
+      const network = {
+        chainId: chain.id,
+        name: chain.name,
+      };
+      const provider = new BrowserProvider(walletClient.transport, network);
+      const signer = new JsonRpcSigner(provider, address);
+
       const fullDescription =
         "# " + form.state.title + "\n" + form.state.description;
       const choices = form.state.options.map((opt) => opt.title);
@@ -163,23 +169,44 @@ export default function SubmitButton({
         proposal_type_id: rawProposalDataForBackend.proposal_type_id,
         start_block: rawProposalDataForBackend.start_block.toString(),
         end_block: rawProposalDataForBackend.end_block.toString(),
+        signer: signer,
       });
+
+      const unformattedProposalData = getUnformattedProposalData(form);
+
+      const apiKey = process.env.NEXT_PUBLIC_AGORA_API_KEY;
+
+      if (!apiKey) {
+        throw new Error("AGORA_API_KEY is not set");
+      }
 
       const response = await fetch("/api/offchain-proposals/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
         body: JSON.stringify({
-          proposalData: rawProposalDataForBackend,
+          proposalData: {
+            proposer: rawProposalDataForBackend.proposer,
+            description: rawProposalDataForBackend.description,
+            choices: rawProposalDataForBackend.choices,
+            proposal_type_id: rawProposalDataForBackend.proposal_type_id,
+            start_block: rawProposalDataForBackend.start_block.toString(),
+            end_block: rawProposalDataForBackend.end_block.toString(),
+          },
           id,
           transactionHash,
           proposalType: form.state.proposalType.toLowerCase(),
+          offchainOnly:
+            form.state.proposal_scope === ProposalScope.OFFCHAIN_ONLY,
           moduleAddress: getProposalTypeAddress(
             form.state.proposalType.toLowerCase() as ProposalType
           ),
-          unformattedProposalData: getUnformattedProposalData(form),
+          unformattedProposalData,
           targets: form.state.options[0].transactions.map((t) => t.target),
-          values: form.state.options[0].transactions.map((t) =>
-            ethers.parseEther(t.value.toString() || "0")
+          values: form.state.options[0].transactions.map(
+            (t) => t.value.toString() || "0"
           ),
           calldatas: form.state.options[0].transactions.map((t) => t.calldata),
         }),
@@ -199,6 +226,7 @@ export default function SubmitButton({
           isError: false,
           isSuccess: true,
           txHash: result.transactionHash,
+          isEas: true,
         },
       });
     } catch (e: any) {

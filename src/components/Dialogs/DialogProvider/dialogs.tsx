@@ -112,6 +112,7 @@ export type CastProposalDialogType = {
     isError: boolean;
     isSuccess: boolean;
     txHash?: string;
+    isEas?: boolean;
   };
 };
 
@@ -330,13 +331,17 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
-  CAST_PROPOSAL: ({ isError, isLoading, isSuccess, txHash }, closeDialog) => {
+  CAST_PROPOSAL: (
+    { isError, isLoading, isSuccess, txHash, isEas },
+    closeDialog
+  ) => {
     return (
       <CastProposalDialog
         isError={isError}
         isLoading={isLoading}
         isSuccess={isSuccess}
         txHash={txHash}
+        isEas={isEas}
         closeDialog={closeDialog}
       />
     );
