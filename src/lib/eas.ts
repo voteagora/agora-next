@@ -1,17 +1,18 @@
 import {
   SchemaEncoder,
   NO_EXPIRATION,
+  EAS,
+  ZERO_BYTES32,
 } from "@ethereum-attestation-service/eas-sdk";
-import { toUtf8Bytes } from "ethers";
+import { JsonRpcSigner, toUtf8Bytes } from "ethers";
 import Tenant from "./tenant/tenant";
 import { keccak256 } from "viem";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { useEthersSigner } from "@/hooks/useEthersSigner";
-import { getEAS } from "./eas-server";
+import { attestByDelegationServer } from "./eas-server";
 
 const { slug } = Tenant.current();
 
-export const CREATE_PROPOSAL_SCHEMA_ID =
+const CREATE_PROPOSAL_SCHEMA_ID =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
     ? "0xdc6fc01a5dd61a7f6af0b12018217b390593c5b01df4e89b365ec354734400ae"
     : "0xdc6fc01a5dd61a7f6af0b12018217b390593c5b01df4e89b365ec354734400ae";
@@ -19,6 +20,11 @@ export const CREATE_PROPOSAL_SCHEMA_ID =
 const schemaEncoder = new SchemaEncoder(
   "address contract,string id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block"
 );
+
+const eas =
+  process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
+    ? new EAS("0x4200000000000000000000000000000000000021")
+    : new EAS("0x4200000000000000000000000000000000000021");
 
 export async function createProposalAttestation({
   contract,
@@ -28,6 +34,7 @@ export async function createProposalAttestation({
   proposal_type_id,
   start_block,
   end_block,
+  signer,
 }: {
   contract: string;
   proposer: string;
@@ -36,8 +43,8 @@ export async function createProposalAttestation({
   proposal_type_id: number;
   start_block: string;
   end_block: string;
+  signer: JsonRpcSigner;
 }) {
-  const eas = getEAS();
   const id = keccak256(
     defaultAbiCoder.encode(
       ["bytes32", "bytes32"],
@@ -52,8 +59,8 @@ export async function createProposalAttestation({
     { name: "description", value: description, type: "string" },
     { name: "choices", value: choices, type: "string[]" },
     { name: "proposal_type_id", value: proposal_type_id, type: "uint8" },
-    { name: "start_block", value: start_block, type: "uint256" },
-    { name: "end_block", value: end_block, type: "uint256" },
+    { name: "start_block", value: BigInt(start_block), type: "uint256" },
+    { name: "end_block", value: BigInt(end_block), type: "uint256" },
   ]);
 
   const recipient = "0x0000000000000000000000000000000000000000";
@@ -65,35 +72,52 @@ export async function createProposalAttestation({
     recipient,
     expirationTime,
     revocable,
-    refUID: id,
+    refUID: ZERO_BYTES32,
     encodedData,
     deadline: expirationTime,
     value: 0n,
+    signer,
   });
 
-  const txResponse = await eas.attestByDelegation({
-    schema: CREATE_PROPOSAL_SCHEMA_ID,
-    data: {
-      recipient,
-      expirationTime,
-      revocable,
-      data: encodedData,
-    },
+  if (!signature) {
+    console.error("Failed to get signature");
+    throw new Error("Signature is required");
+  }
+  if (
+    typeof signature === "object" &&
+    "v" in signature &&
+    "r" in signature &&
+    "s" in signature
+  ) {
+    const { v, r, s } = signature;
+    if (
+      typeof v !== "number" ||
+      typeof r !== "string" ||
+      typeof s !== "string"
+    ) {
+      throw new Error("Invalid signature format");
+    }
+  } else {
+    throw new Error("Invalid signature format");
+  }
+
+  const receipt = await attestByDelegationServer({
+    recipient,
+    expirationTime,
+    revocable,
+    encodedData,
     signature,
     attester: proposer,
+    schema: CREATE_PROPOSAL_SCHEMA_ID,
   });
-
-  const receipt = await txResponse.wait(1);
 
   if (!receipt) {
     console.error(
       "Transaction failed or was not mined. Full response:",
-      txResponse
+      receipt
     );
     throw new Error("Transaction failed or was not mined.");
   }
-
-  console.log("receipt", receipt);
 
   return {
     transactionHash: receipt,
@@ -110,6 +134,7 @@ export const signDelegatedAttestation = async ({
   encodedData,
   deadline,
   value,
+  signer,
 }: {
   schema: string;
   recipient: string;
@@ -119,12 +144,10 @@ export const signDelegatedAttestation = async ({
   encodedData: string;
   deadline: bigint;
   value: bigint;
+  signer: JsonRpcSigner;
 }) => {
-  const eas = getEAS();
-  const signer = useEthersSigner();
-  if (!signer) {
-    throw new Error("No signer found");
-  }
+  eas.connect(signer as any);
+
   const delegated = await eas.getDelegated();
 
   const response = await delegated.signDelegatedAttestation(
