@@ -1,8 +1,7 @@
 "use client";
 
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { useVoterStats } from "@/hooks/useVoterStats";
-import Tenant from "@/lib/tenant/tenant";
+import { useVoterStats, useParticipationStats } from "@/hooks/useVoterStats";
 
 interface Props {
   delegate: Delegate;
@@ -10,45 +9,32 @@ interface Props {
 
 export const DelegateCardHeader = ({ delegate }: Props) => {
   const { data: voterStats } = useVoterStats({ address: delegate.address });
+  const { data: participationStats } = useParticipationStats({
+    address: delegate.address,
+  });
 
-  const showParticipation =
-    Tenant.current().ui.toggle("show-participation")?.enabled || false;
-
-  if (!showParticipation) {
+  if (!voterStats || !participationStats) {
     return null;
   }
 
-  if (!voterStats) {
-    return null;
-  }
-
-  const percentParticipation = Math.round(
-    Number(
-      Math.round(
-        ((voterStats.last_10_props / Math.min(10, voterStats.total_proposals)) *
-          100 || 0) * 100
-      ) / 100
-    )
-  );
-  // TODO this will change, just need to get clarification on the dao-node endpoint
-
-  if (voterStats.total_proposals < 10) {
-    // Delegate has not had a chance to vote
+  if (!participationStats.eligible) {
     return <PendingActivityHeader />;
-  } else if (percentParticipation > 50) {
+  }
+
+  if (participationStats.participationRate > 0.5) {
     return (
       <ActiveHeader
         outOfTen={voterStats.last_10_props.toString()}
         totalProposals={voterStats.total_proposals}
-        percentParticipation={percentParticipation}
+        percentParticipation={participationStats.participationRate}
       />
     );
-  } else if (percentParticipation <= 50) {
+  } else if (participationStats.participationRate <= 0.5) {
     return (
       <InactiveHeader
         outOfTen={voterStats.last_10_props.toString()}
         totalProposals={voterStats.total_proposals}
-        percentParticipation={percentParticipation}
+        percentParticipation={participationStats.participationRate}
       />
     );
   } else {
