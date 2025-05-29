@@ -18,7 +18,11 @@ export default function TopIssues({ statement }: Props) {
     }
   ).topIssues;
 
-  if (topIssues.length === 0 || !ui.governanceIssues) {
+  const filteredTopIssues = topIssues.filter((issue) => {
+    return issue.value.trim() !== "";
+  });
+
+  if (filteredTopIssues.length === 0 || !ui.governanceIssues) {
     return null;
   }
 
@@ -27,7 +31,7 @@ export default function TopIssues({ statement }: Props) {
       <h2 className="text-2xl font-bold text-primary">Top Issues</h2>
 
       <div className="flex flex-col gap-4">
-        {topIssues.map((issue, idx) => {
+        {filteredTopIssues.map((issue, idx) => {
           const issueDefinition = ui.governanceIssues!.find(
             (def) => issue.type === def.key
           );
