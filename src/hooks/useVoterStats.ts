@@ -1,6 +1,6 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { fetchDelegateStats, fetchVoterStats } from "@/app/delegates/actions";
-import { VoterStats, DelegateStats } from "@/lib/types";
+import { VoterStats, DelegateResponse } from "@/lib/types";
 import { getPublicClient } from "@/lib/viem";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -47,7 +47,7 @@ export const useVoterStats = ({
 
 export const useDelegateStats = ({
   address,
-}: Props): UseQueryResult<DelegateStats, Error> => {
+}: Props): UseQueryResult<DelegateResponse, Error> => {
   return useQuery({
     enabled: !!address,
     queryKey: [DELEGATE_STATS_QK, address],
