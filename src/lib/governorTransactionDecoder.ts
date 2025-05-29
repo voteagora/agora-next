@@ -5,37 +5,55 @@ import { getProposalTypeAddress } from "../app/proposals/draft/utils/stages";
 import { ProposalType } from "../app/proposals/draft/types";
 
 // Governor function categories as union types
-type ProposalFunctions = 
-  | "propose"
-  | "proposeWithModule";
+type ProposalFunctions = "propose" | "proposeWithModule";
 
-type VotingFunctions = 
+type VotingFunctions =
   | "castVote"
-  | "castVoteWithReason" 
-  | "castVoteWithReasonAndParams"
+  | "castVoteWithReason"
+  | "castVoteWithReasonAndParams";
 
-type LifecycleFunctions = 
+type LifecycleFunctions =
   | "queue"
-  | "execute" 
+  | "execute"
   | "cancel"
   | "queueWithModule"
   | "executeWithModule"
   | "cancelWithModule";
 
 // All governor functions union
-type GovernorFunctions = ProposalFunctions | VotingFunctions | LifecycleFunctions;
+type GovernorFunctions =
+  | ProposalFunctions
+  | VotingFunctions
+  | LifecycleFunctions;
 
 // Type guards for function categories
-const isProposalFunction = (functionName: string): functionName is ProposalFunctions => {
+const isProposalFunction = (
+  functionName: string
+): functionName is ProposalFunctions => {
   return ["propose", "proposeWithModule"].includes(functionName);
 };
 
-const isVotingFunction = (functionName: string): functionName is VotingFunctions => {
-  return ["castVote", "castVoteWithReason", "castVoteWithReasonAndParams"].includes(functionName);
+const isVotingFunction = (
+  functionName: string
+): functionName is VotingFunctions => {
+  return [
+    "castVote",
+    "castVoteWithReason",
+    "castVoteWithReasonAndParams",
+  ].includes(functionName);
 };
 
-const isLifecycleFunction = (functionName: string): functionName is LifecycleFunctions => {
-  return ["queue", "execute", "cancel", "queueWithModule", "executeWithModule", "cancelWithModule"].includes(functionName);
+const isLifecycleFunction = (
+  functionName: string
+): functionName is LifecycleFunctions => {
+  return [
+    "queue",
+    "execute",
+    "cancel",
+    "queueWithModule",
+    "executeWithModule",
+    "cancelWithModule",
+  ].includes(functionName);
 };
 
 interface DecodedGovernorTransaction {
@@ -62,15 +80,21 @@ export function decodeGovernorTransaction(
         const abiFragment: AbiFunction = {
           type: "function",
           name: fragment.name,
-          inputs: fragment.inputs.map(input => ({
+          inputs: fragment.inputs.map((input) => ({
             name: input.name || "",
             type: input.type,
           })),
-          outputs: fragment.outputs.map((output: { name?: string; type: string }) => ({
-            name: output.name || "",
-            type: output.type,
-          })),
-          stateMutability: fragment.stateMutability as "pure" | "view" | "nonpayable" | "payable",
+          outputs: fragment.outputs.map(
+            (output: { name?: string; type: string }) => ({
+              name: output.name || "",
+              type: output.type,
+            })
+          ),
+          stateMutability: fragment.stateMutability as
+            | "pure"
+            | "view"
+            | "nonpayable"
+            | "payable",
         };
 
         const decoded = decodeFunctionData({
@@ -132,20 +156,31 @@ export function decodeProposalTransaction(
     };
   } else {
     // proposeWithModule - determine if it's optimistic or approval based
-    const { module, proposalData, description, proposalType } = decoded.parameters;
-    
-    const optimisticModuleAddress = getProposalTypeAddress(ProposalType.OPTIMISTIC);
+    const { module, proposalData, description, proposalType } =
+      decoded.parameters;
+
+    const optimisticModuleAddress = getProposalTypeAddress(
+      ProposalType.OPTIMISTIC
+    );
     const approvalModuleAddress = getProposalTypeAddress(ProposalType.APPROVAL);
-    
+
     let detectedType = "approval"; //default
     const moduleAddress = module?.value?.toLowerCase();
-    
-    if (moduleAddress && optimisticModuleAddress && moduleAddress === optimisticModuleAddress.toLowerCase()) {
+
+    if (
+      moduleAddress &&
+      optimisticModuleAddress &&
+      moduleAddress === optimisticModuleAddress.toLowerCase()
+    ) {
       detectedType = "optimistic";
-    } else if (moduleAddress && approvalModuleAddress && moduleAddress === approvalModuleAddress.toLowerCase()) {
+    } else if (
+      moduleAddress &&
+      approvalModuleAddress &&
+      moduleAddress === approvalModuleAddress.toLowerCase()
+    ) {
       detectedType = "approval";
     }
-    
+
     return {
       type: detectedType,
       module: module.value,
@@ -164,14 +199,14 @@ export function decodeVoteTransaction(
   governorContract: IGovernorContract
 ) {
   const decoded = decodeGovernorTransaction(calldata, governorContract);
-  
+
   if (!decoded || !isVotingFunction(decoded.functionName)) {
     return null;
   }
 
   // Extract vote data based on the function type
   const { proposalId } = decoded.parameters;
-  
+
   return { proposalId: proposalId.value };
 }
 
@@ -183,7 +218,7 @@ export function decodeProposalActionTransaction(
   governorContract: IGovernorContract
 ) {
   const decoded = decodeGovernorTransaction(calldata, governorContract);
-  
+
   if (!decoded || !isLifecycleFunction(decoded.functionName)) {
     return null;
   }
@@ -193,7 +228,7 @@ export function decodeProposalActionTransaction(
     // Check if it's Uniswap-style (using proposalId) or OpenZeppelin-style (using descriptionHash)
     const proposalId = decoded.parameters?.proposalId;
     const descriptionHash = decoded.parameters?.descriptionHash;
-    
+
     if (proposalId?.value) {
       // Uniswap-style
       return {
@@ -210,10 +245,17 @@ export function decodeProposalActionTransaction(
   }
 
   // Handle module functions
-  if (["queueWithModule", "executeWithModule", "cancelWithModule"].includes(decoded.functionName)) {
+  if (
+    ["queueWithModule", "executeWithModule", "cancelWithModule"].includes(
+      decoded.functionName
+    )
+  ) {
     const descriptionHash = decoded.parameters?.descriptionHash;
     if (!descriptionHash?.value) {
-      console.error("Missing descriptionHash in decoded module transaction:", decoded);
+      console.error(
+        "Missing descriptionHash in decoded module transaction:",
+        decoded
+      );
       return null;
     }
     return {
@@ -223,4 +265,4 @@ export function decodeProposalActionTransaction(
   }
 
   return null;
-} 
+}

@@ -4,13 +4,12 @@ import { ITokenContract } from "./contracts/common/interfaces/ITokenContract";
 import { IMembershipContract } from "./contracts/common/interfaces/IMembershipContract";
 
 // Delegation function categories as union types
-type DelegateFunctions = 
-  | "delegate"
-  | "subdelegateBatched";
-
+type DelegateFunctions = "delegate" | "subdelegateBatched";
 
 // Type guards for function categories
-const isDelegateFunction = (functionName: string): functionName is DelegateFunctions => {
+const isDelegateFunction = (
+  functionName: string
+): functionName is DelegateFunctions => {
   return ["delegate", "subdelegateBatched"].includes(functionName);
 };
 
@@ -38,15 +37,21 @@ export function decodeDelegationTransaction(
         const abiFragment: AbiFunction = {
           type: "function",
           name: fragment.name,
-          inputs: fragment.inputs.map(input => ({
+          inputs: fragment.inputs.map((input) => ({
             name: input.name || "",
             type: input.type,
           })),
-          outputs: fragment.outputs.map((output: { name?: string; type: string }) => ({
-            name: output.name || "",
-            type: output.type,
-          })),
-          stateMutability: fragment.stateMutability as "pure" | "view" | "nonpayable" | "payable",
+          outputs: fragment.outputs.map(
+            (output: { name?: string; type: string }) => ({
+              name: output.name || "",
+              type: output.type,
+            })
+          ),
+          stateMutability: fragment.stateMutability as
+            | "pure"
+            | "view"
+            | "nonpayable"
+            | "payable",
         };
 
         const decoded = decodeFunctionData({
@@ -90,7 +95,7 @@ export function decodeDelegationTransactionWithDelegatees(
   tokenContract: ITokenContract | IMembershipContract
 ) {
   const decoded = decodeDelegationTransaction(calldata, tokenContract);
-  
+
   if (!decoded || !isDelegateFunction(decoded.functionName)) {
     return null;
   }
@@ -117,4 +122,4 @@ export function decodeDelegationTransactionWithDelegatees(
     parameters: decoded.parameters,
     rawData: decoded.rawData,
   };
-} 
+}

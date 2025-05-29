@@ -7,14 +7,21 @@ import { getAddress, decodeAbiParameters } from "viem";
 import { getTitleFromProposalDescription } from "@/lib/proposalUtils";
 import { keccak256, toUtf8Bytes } from "ethers";
 import Tenant from "@/lib/tenant/tenant";
-import { decodeVoteTransaction, decodeProposalTransaction, decodeProposalActionTransaction } from "@/lib/governorTransactionDecoder";
-import { decodeDelegationTransaction, decodeDelegationTransactionWithDelegatees } from "@/lib/delegationTransactionDecoder";
+import {
+  decodeVoteTransaction,
+  decodeProposalTransaction,
+  decodeProposalActionTransaction,
+} from "@/lib/governorTransactionDecoder";
+import {
+  decodeDelegationTransaction,
+  decodeDelegationTransactionWithDelegatees,
+} from "@/lib/delegationTransactionDecoder";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 
 export const useSafePendingTransactions = () => {
   const { safeApiKit } = useSafeApiKit();
   const { contracts } = Tenant.current();
- 
+
   const { selectedWalletAddress, isSelectedPrimaryAddress } =
     useSelectedWallet();
   const { address } = useAccount();
@@ -61,111 +68,152 @@ export const useSafePendingTransactions = () => {
   }, [pendingTransactions, address, expectedOrigin]);
 
   const pendingVotes = useMemo(() => {
-    if (!pendingTransactions?.results || !address || !governorContract) return {};
-    
-    return pendingTransactions.results.reduce((acc, transaction) => {
-      if (!transaction.data) return acc;
+    if (!pendingTransactions?.results || !address || !governorContract)
+      return {};
 
-      const decoded = decodeVoteTransaction(transaction.data as `0x${string}`, governorContract);
-      if (decoded) {
-        acc[decoded.proposalId] = `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
-      }
-      return acc;
-    }, {} as Record<string, string>);
+    return pendingTransactions.results.reduce(
+      (acc, transaction) => {
+        if (!transaction.data) return acc;
+
+        const decoded = decodeVoteTransaction(
+          transaction.data as `0x${string}`,
+          governorContract
+        );
+        if (decoded) {
+          acc[decoded.proposalId] =
+            `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
+        }
+        return acc;
+      },
+      {} as Record<string, string>
+    );
   }, [address, pendingTransactions?.results, governorContract]);
 
   const pendingDelegations = useMemo(() => {
     if (!pendingTransactions?.results || !address) return {};
-    
-    return pendingTransactions.results.reduce((acc, transaction) => {
-      if (!transaction.data) return acc;
 
-      // First check if it's a decoded transaction
-      if (transaction.dataDecoded?.method === "delegate" && transaction.dataDecoded.parameters?.length >= 1) {
-        const delegateAddress = transaction.dataDecoded.parameters[0].value as string;
-        acc[delegateAddress] = `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
+    return pendingTransactions.results.reduce(
+      (acc, transaction) => {
+        if (!transaction.data) return acc;
+
+        // First check if it's a decoded transaction
+        if (
+          transaction.dataDecoded?.method === "delegate" &&
+          transaction.dataDecoded.parameters?.length >= 1
+        ) {
+          const delegateAddress = transaction.dataDecoded.parameters[0]
+            .value as string;
+          acc[delegateAddress] =
+            `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
+          return acc;
+        }
+
+        // Then try to decode the raw transaction data
+        const decoded = decodeDelegationTransactionWithDelegatees(
+          transaction.data as `0x${string}`,
+          tokenContract
+        );
+        if (decoded) {
+          decoded.delegatees.forEach((delegateAddress) => {
+            acc[delegateAddress] =
+              `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
+          });
+        }
         return acc;
-      }
-
-      // Then try to decode the raw transaction data
-      const decoded = decodeDelegationTransactionWithDelegatees(transaction.data as `0x${string}`, tokenContract);
-      if (decoded) {
-        decoded.delegatees.forEach(delegateAddress => {
-          acc[delegateAddress] = `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
-        });
-      }
-      return acc;
-    }, {} as Record<string, string>);
+      },
+      {} as Record<string, string>
+    );
   }, [address, pendingTransactions?.results]);
 
   const pendingProposals = useMemo(() => {
-    if (!pendingTransactions?.results || !address || !governorContract) return {};
-    return pendingTransactions.results.reduce((acc, transaction) => {
-      if (!transaction.data) return acc;
+    if (!pendingTransactions?.results || !address || !governorContract)
+      return {};
+    return pendingTransactions.results.reduce(
+      (acc, transaction) => {
+        if (!transaction.data) return acc;
 
-      const decoded = decodeProposalTransaction(transaction.data as `0x${string}`, governorContract);
-      if (decoded) {
-        const title = getTitleFromProposalDescription(decoded.description);
-        acc[transaction.safeTxHash] = {
-          description: decoded.description,
-          status: `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`,
-          type: decoded.type,
-          transaction,
-          title,
-        };
-      }
-      return acc;
-    }, {} as Record<string, {
-      description: string;
-      status: string;
-      type: string;
-      transaction: any;
-      title: string;
-    }>);
+        const decoded = decodeProposalTransaction(
+          transaction.data as `0x${string}`,
+          governorContract
+        );
+        if (decoded) {
+          const title = getTitleFromProposalDescription(decoded.description);
+          acc[transaction.safeTxHash] = {
+            description: decoded.description,
+            status: `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`,
+            type: decoded.type,
+            transaction,
+            title,
+          };
+        }
+        return acc;
+      },
+      {} as Record<
+        string,
+        {
+          description: string;
+          status: string;
+          type: string;
+          transaction: any;
+          title: string;
+        }
+      >
+    );
   }, [pendingTransactions?.results, address, governorContract]);
 
   type ProposalAction = "queue" | "cancel" | "execute";
 
   const getProposalsForDescription = useMemo(
-    () => (
-      description: string | null,
-      proposalId: string,
-      action: ProposalAction
-    ) => {
-      if (!description || !governorContract) return {};
-      if (!pendingTransactions?.results) return {};
-      if (action !== "execute" && !address) return {};
+    () =>
+      (
+        description: string | null,
+        proposalId: string,
+        action: ProposalAction
+      ) => {
+        if (!description || !governorContract) return {};
+        if (!pendingTransactions?.results) return {};
+        if (action !== "execute" && !address) return {};
 
-      const descriptionHash = keccak256(toUtf8Bytes(description));
-      const transactions = pendingTransactions.results;
+        const descriptionHash = keccak256(toUtf8Bytes(description));
+        const transactions = pendingTransactions.results;
 
-      return transactions.reduce((acc, transaction) => {
-        if (!transaction.data) return acc;
+        return transactions.reduce(
+          (acc, transaction) => {
+            if (!transaction.data) return acc;
 
-        const decoded = decodeProposalActionTransaction(transaction.data as `0x${string}`, governorContract);
-        if (decoded?.action === action && transaction.data.includes(descriptionHash.slice(2))) {
-          acc[proposalId] = `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
-        }
-        return acc;
-      }, {} as Record<string, string>);
-    },
+            const decoded = decodeProposalActionTransaction(
+              transaction.data as `0x${string}`,
+              governorContract
+            );
+            if (
+              decoded?.action === action &&
+              transaction.data.includes(descriptionHash.slice(2))
+            ) {
+              acc[proposalId] =
+                `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
+            }
+            return acc;
+          },
+          {} as Record<string, string>
+        );
+      },
     [governorContract, pendingTransactions?.results, address]
   );
 
   const memoizedGetQueueProposals = useMemo(
-    () => (description: string | null, proposalId: string) => 
+    () => (description: string | null, proposalId: string) =>
       getProposalsForDescription(description, proposalId, "queue"),
     [getProposalsForDescription]
   );
 
   const memoizedGetCancelProposals = useMemo(
-    () => (description: string | null, proposalId: string) => 
+    () => (description: string | null, proposalId: string) =>
       getProposalsForDescription(description, proposalId, "cancel"),
     [getProposalsForDescription]
   );
 
   const memoizedGetExecuteProposals = useMemo(
-    () => (description: string | null, proposalId: string) => 
+    () => (description: string | null, proposalId: string) =>
       getProposalsForDescription(description, proposalId, "execute"),
     [getProposalsForDescription]
   );

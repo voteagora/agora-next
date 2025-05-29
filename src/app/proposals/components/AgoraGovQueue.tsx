@@ -17,8 +17,7 @@ export const AgoraGovQueue = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
 
   const { data, writeContract: write } = useWrappedWriteContract();
-  const { getQueueProposalsForDescription } =
-    useSafePendingTransactions();
+  const { getQueueProposalsForDescription } = useSafePendingTransactions();
 
   const { isLoading, isSuccess, isFetched, isError, error } =
     useWaitForTransactionReceipt({

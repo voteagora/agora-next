@@ -115,7 +115,8 @@ export function UndelegateDialog({
   const { ui, contracts, token } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
-  const { selectedWalletAddress: accountAddress, isSelectedPrimaryAddress } = useSelectedWallet();
+  const { selectedWalletAddress: accountAddress, isSelectedPrimaryAddress } =
+    useSelectedWallet();
   const [votingPower, setVotingPower] = useState<string>("");
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
   const [isReady, setIsReady] = useState(false);

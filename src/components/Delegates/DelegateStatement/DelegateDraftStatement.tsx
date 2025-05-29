@@ -24,9 +24,8 @@ export const DraftStatementDetails = ({
   const { selectedWalletAddress } = useSelectedWallet();
   const openDialog = useOpenDialog();
   const router = useRouter();
-  const { data: draftStatement, refetch } = useGetDelegateDraftStatement(
-    address
-  );
+  const { data: draftStatement, refetch } =
+    useGetDelegateDraftStatement(address);
   const { data: safeMessageDetails } = useGetSafeMessageDetails({
     messageHash: draftStatement?.message_hash,
   });
