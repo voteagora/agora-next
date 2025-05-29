@@ -134,7 +134,15 @@ export const getDelegateDataFromDaoNode = async (
   try {
     // Fetch delegate data for participation rate
     const delegateRes = await fetch(`${url}v1/delegate/${address}`);
-    return await delegateRes.json();
+    // Check if the response was successful
+    if (!delegateRes.ok) {
+      console.error(
+        `Failed to fetch delegate data: ${delegateRes.status} ${delegateRes.statusText}`
+      );
+      return null;
+    }
+
+    return (await delegateRes.json()) as DelegateStats;
   } catch (error) {
     console.error("Error in getDelegateDataFromDaoNode:", error);
     return null;
