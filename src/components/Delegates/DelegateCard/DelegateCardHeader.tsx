@@ -75,7 +75,7 @@ const ActiveHeader = ({
     <CardHeader
       title="Active delegate"
       cornerTitle={`🎉 ${percentParticipation}%`}
-      subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
+      subtitle={`Voted in ${outOfTen}/${totalProposals} of the most recent proposals`}
     />
   );
 };
@@ -93,7 +93,7 @@ const InactiveHeader = ({
     <CardHeader
       title="Inactive delegate"
       cornerTitle={`💤 ${percentParticipation}%`}
-      subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
+      subtitle={`Voted in ${outOfTen}/${totalProposals} of the most recent proposals`}
     />
   );
 };
