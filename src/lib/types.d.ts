@@ -241,7 +241,10 @@ export interface FormattedProposalType {
   scopes?: ScopeData[];
 }
 
-export interface ParticipationStats {
-  participationRate: number;
-  eligible: boolean;
+export interface DelegateStats {
+  addr: string;
+  from_cnt: number;
+  from_list: object[];
+  voting_power: string;
+  participation_rate: number;
 }

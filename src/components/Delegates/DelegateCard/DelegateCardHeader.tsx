@@ -1,7 +1,7 @@
 "use client";
 
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { useVoterStats, useParticipationStats } from "@/hooks/useVoterStats";
+import { useVoterStats, useDelegateStats } from "@/hooks/useVoterStats";
 
 interface Props {
   delegate: Delegate;
@@ -9,32 +9,37 @@ interface Props {
 
 export const DelegateCardHeader = ({ delegate }: Props) => {
   const { data: voterStats } = useVoterStats({ address: delegate.address });
-  const { data: participationStats } = useParticipationStats({
+  const { data: delegateStats, error: delegateStatsError } = useDelegateStats({
     address: delegate.address,
   });
 
-  if (!voterStats || !participationStats) {
+  console.log("Delegate stats: ", delegateStats);
+
+  if (!voterStats || !delegateStats || delegateStatsError) {
     return null;
   }
 
-  if (!participationStats.eligible) {
+  const eligible = delegateStats.from_cnt > 10;
+  const participationRate = delegateStats.participation_rate;
+
+  if (!eligible) {
     return <PendingActivityHeader />;
   }
 
-  if (participationStats.participationRate > 0.5) {
+  if (participationRate > 0.5) {
     return (
       <ActiveHeader
         outOfTen={voterStats.last_10_props.toString()}
         totalProposals={voterStats.total_proposals}
-        percentParticipation={participationStats.participationRate}
+        percentParticipation={participationRate}
       />
     );
-  } else if (participationStats.participationRate <= 0.5) {
+  } else if (participationRate <= 0.5) {
     return (
       <InactiveHeader
         outOfTen={voterStats.last_10_props.toString()}
         totalProposals={voterStats.total_proposals}
-        percentParticipation={participationStats.participationRate}
+        percentParticipation={participationRate}
       />
     );
   } else {
