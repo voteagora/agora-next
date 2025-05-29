@@ -8,33 +8,34 @@ import { ExclamationCircleIcon } from "@/icons/ExclamationCircleIcon";
 import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
 import { useCallback, useEffect, useState } from "react";
 import { publishDelegateStatement } from "@/app/api/common/delegateStatement/publishDelegateStatement";
-import { useChainId } from "wagmi";
 import { useDelegate } from "@/hooks/useDelegate";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useRouter } from "next/navigation";
+import Tenant from "@/lib/tenant/tenant";
 
 export const DraftStatementDetails = ({
   delegateStatement,
+  address,
 }: {
   delegateStatement: DelegateStatement;
+  address?: `0x${string}`;
 }) => {
   const [submitDraft, setSubmitDraft] = useState(false);
   const { selectedWalletAddress } = useSelectedWallet();
   const openDialog = useOpenDialog();
   const router = useRouter();
   const { data: draftStatement, refetch } = useGetDelegateDraftStatement(
-    selectedWalletAddress
+    address
   );
   const { data: safeMessageDetails } = useGetSafeMessageDetails({
     messageHash: draftStatement?.message_hash,
   });
-  console.log(draftStatement);
-  const chainId = useChainId();
-  const { data: safeInfo } = useGetSafeInfo(selectedWalletAddress);
-  const { refetch: refetchStatement } = useDelegate({
-    address: selectedWalletAddress,
-  });
 
+  const chainId = Tenant.current().contracts.governor.chain.id;
+  const { data: safeInfo } = useGetSafeInfo(address);
+  const { refetch: refetchStatement } = useDelegate({
+    address,
+  });
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
       month: "long",

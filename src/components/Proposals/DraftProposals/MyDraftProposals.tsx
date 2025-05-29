@@ -19,7 +19,7 @@ const MyDraftProposals = ({
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const { selectedWalletAddress: address } = useSelectedWallet();
   const [draftProposals, setDraftProposals] = useState<ProposalDraft[]>([]);
-  const { pendingProposals, pendingTransactions } =
+  const { pendingProposals } =
     useSafePendingTransactions();
   const getDraftProposalsAndSet = useCallback(
     async (authorAddress: `0x${string}`) => {
@@ -34,7 +34,7 @@ const MyDraftProposals = ({
     getDraftProposalsAndSet(address);
   }, [fetchDraftProposals, address, getDraftProposalsAndSet]);
 
-  if (!draftProposals.length) {
+  if (!draftProposals.length && Object.entries(pendingProposals).length === 0) {
     return null;
   }
 

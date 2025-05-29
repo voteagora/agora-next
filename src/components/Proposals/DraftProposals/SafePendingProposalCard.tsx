@@ -18,6 +18,8 @@ export const SafePendingProposalCard = ({
   const isPendingExecution =
     proposal.transaction.confirmations.length ===
     proposal.transaction.confirmationsRequired;
+
+  console.log("proposal", proposal);
   return (
     <div className="bg-wash border border-line rounded-2xl p-2 shadow-sm">
       <div className="flex flex-col sm:flex-row justify-between bg-neutral border border-line rounded-2xl px-6 py-5 shadow-sm flex-wrap sm:flex-normal">

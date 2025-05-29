@@ -33,11 +33,6 @@ export const SafeApiKitProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const initSafeApiKit = async () => {
-      if (!isConnected || !address) {
-        setIsLoading(false);
-        return;
-      }
-
       try {
         setIsLoading(true);
         setError(null);

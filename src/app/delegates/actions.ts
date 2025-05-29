@@ -148,7 +148,6 @@ export async function submitDelegateStatement({
       message_hash,
     });
     revalidateDelegateAddressPage(address.toLowerCase());
-    revalidatePath("/delegates/create", "page");
     return response;
   } catch (error) {
     console.error("Error submitting delegate statement:", error);

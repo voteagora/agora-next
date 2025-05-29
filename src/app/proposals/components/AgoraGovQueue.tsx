@@ -17,7 +17,7 @@ export const AgoraGovQueue = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
 
   const { data, writeContract: write } = useWrappedWriteContract();
-  const { pendingTransactions, getQueueProposalsForDescription } =
+  const { getQueueProposalsForDescription } =
     useSafePendingTransactions();
 
   const { isLoading, isSuccess, isFetched, isError, error } =

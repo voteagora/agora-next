@@ -35,7 +35,6 @@ export function DelegationSelector({
   const isConnectedAccountDelegate = !!delegatees?.find(
     (delegatee) => delegatee.to === delegate.address
   );
-
   const ButtonToShow = isConnectedAccountDelegate
     ? UndelegateButton
     : DelegateButton;

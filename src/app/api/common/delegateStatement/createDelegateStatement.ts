@@ -9,6 +9,8 @@ import { sanitizeContent } from "@/lib/sanitizationUtils";
 import { stageStatus } from "@/app/lib/sharedEnums";
 import { createHash } from "crypto";
 import SafeApiKit from "@safe-global/api-kit";
+import { revalidateTag } from "next/cache";
+import { revalidateDelegateAddressPage } from "@/app/delegates/actions";
 
 export async function createDelegateStatement({
   address,
@@ -96,6 +98,12 @@ export async function createDelegateStatement({
       message_hash: messageHash,
       stage,
     };
+
+    if (stage === stageStatus.DRAFT) {
+      revalidateTag(
+        `delegateStatement-${address.toLowerCase()}-${stageStatus.DRAFT}`
+      );
+    }
 
     return prismaWeb2Client.delegateStatements.upsert({
       where: {

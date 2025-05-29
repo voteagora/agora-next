@@ -8,8 +8,8 @@ import { getTitleFromProposalDescription } from "@/lib/proposalUtils";
 import { keccak256, toUtf8Bytes } from "ethers";
 import Tenant from "@/lib/tenant/tenant";
 import { decodeVoteTransaction, decodeProposalTransaction, decodeProposalActionTransaction } from "@/lib/governorTransactionDecoder";
-import { decodeDelegationTransaction } from "@/lib/delegationTransactionDecoder";
-import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
+import { decodeDelegationTransaction, decodeDelegationTransactionWithDelegatees } from "@/lib/delegationTransactionDecoder";
+import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 
 export const useSafePendingTransactions = () => {
   const { safeApiKit } = useSafeApiKit();
@@ -20,8 +20,8 @@ export const useSafePendingTransactions = () => {
   const { address } = useAccount();
   const { slug } = Tenant.current(); // Get slug from tenant
   const expectedOrigin = `Agora-${slug}`;
-  const governorContract = contracts.governor.contract as IGovernorContract;
-
+  const governorContract = contracts.governor.contract;
+  const tokenContract = contracts.token.contract;
   const { data: pendingTransactions, refetch } = useQuery({
     queryKey: ["safe-pending-transactions", selectedWalletAddress],
     queryFn: async () => {
@@ -88,7 +88,7 @@ export const useSafePendingTransactions = () => {
       }
 
       // Then try to decode the raw transaction data
-      const decoded = decodeDelegationTransaction(transaction.data as `0x${string}`);
+      const decoded = decodeDelegationTransactionWithDelegatees(transaction.data as `0x${string}`, tokenContract);
       if (decoded) {
         decoded.delegatees.forEach(delegateAddress => {
           acc[delegateAddress] = `${transaction.confirmations?.length}/${transaction.confirmationsRequired}`;
@@ -100,7 +100,6 @@ export const useSafePendingTransactions = () => {
 
   const pendingProposals = useMemo(() => {
     if (!pendingTransactions?.results || !address || !governorContract) return {};
-
     return pendingTransactions.results.reduce((acc, transaction) => {
       if (!transaction.data) return acc;
 

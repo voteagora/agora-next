@@ -19,7 +19,6 @@ interface Props {
 export const DelegateStatementsSelector = ({ delegateStatements }: Props) => {
   const [selectedStatement, setSelectedStatement] =
     useState<DelegateStatementType>(delegateStatements?.[0]);
-  console.log(selectedStatement);
   const { isConnected } = useAgoraContext();
   const showSuccessMessage = useDelegateStatementStore(
     (state) => state.showSaveSuccess
@@ -64,7 +63,7 @@ export const DelegateStatementsSelector = ({ delegateStatements }: Props) => {
           </div>
         )}
 
-        {!delegateStatement && selectedStatement && (
+        {!delegateStatement && !selectedStatement && (
           <div className="p-8 text-center text-secondary align-middle bg-wash rounded-xl">
             <p className="break-words">
               No delegate statement for this account

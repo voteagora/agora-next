@@ -159,7 +159,7 @@ export default function DelegateStatementForm({
       setSaveSuccess(true);
     }
 
-    refetch();
+    await refetch();
     router.push(`/delegates/${address}`);
   }
 
@@ -252,7 +252,10 @@ export default function DelegateStatementForm({
       )}
       <div className="flex flex-col w-full mt-6 md:mt-0">
         {!isSelectedPrimaryAddress && (
-          <DraftStatementDetails delegateStatement={delegate?.statement} />
+          <DraftStatementDetails
+            delegateStatement={delegate?.statement}
+            address={address}
+          />
         )}
         <div className="flex flex-col bg-neutral rounded-xl border border-line">
           {canEdit ? (

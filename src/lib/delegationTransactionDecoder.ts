@@ -1,94 +1,120 @@
-import { decodeAbiParameters } from "viem";
+import { decodeFunctionData, Abi, AbiFunction } from "viem";
+import { FunctionFragment } from "ethers";
+import { ITokenContract } from "./contracts/common/interfaces/ITokenContract";
+import { IMembershipContract } from "./contracts/common/interfaces/IMembershipContract";
 
-// Common delegation function selectors
-const DELEGATION_FUNCTION_SELECTORS = {
-  delegate: "0x5c19a95c", // delegate(address)
-  delegatePartial: "0xaf7b3857", // delegate(PartialDelegation[])
-  subdelegateBatched: "0x72b9db46", // subdelegateBatched(address[],uint256[])
-} as const;
+// Delegation function categories as union types
+type DelegateFunctions = 
+  | "delegate"
+  | "subdelegateBatched";
 
-type DelegationFunctionName = keyof typeof DELEGATION_FUNCTION_SELECTORS;
+
+// Type guards for function categories
+const isDelegateFunction = (functionName: string): functionName is DelegateFunctions => {
+  return ["delegate", "subdelegateBatched"].includes(functionName);
+};
 
 interface DecodedDelegationTransaction {
-  functionName: DelegationFunctionName;
-  delegatees: string[];
+  functionName: string;
+  parameters: Record<string, { type: string; value: any }>;
   rawData: string;
 }
 
-interface PartialDelegation {
-  _delegatee: `0x${string}`;
-  _numerator: bigint;
-}
-
 /**
- * Decodes a delegation transaction
+ * Decodes a delegation transaction using the token contract ABI
  */
 export function decodeDelegationTransaction(
-  calldata: `0x${string}`
+  calldata: `0x${string}`,
+  tokenContract: ITokenContract | IMembershipContract
 ): DecodedDelegationTransaction | null {
   try {
-    // Get the function selector (first 4 bytes)
-    const selector = calldata.slice(0, 10);
-    
-    // Find the matching function name
-    const functionName = Object.entries(DELEGATION_FUNCTION_SELECTORS).find(
-      ([_, value]) => value === selector
-    )?.[0] as DelegationFunctionName | undefined;
+    // Get all function fragments from the contract ABI
+    const functionFragments = tokenContract.interface.fragments.filter(
+      (f) => f.type === "function"
+    ) as FunctionFragment[];
 
-    if (!functionName) {
-      return null;
-    }
+    for (const fragment of functionFragments) {
+      try {
+        const abiFragment: AbiFunction = {
+          type: "function",
+          name: fragment.name,
+          inputs: fragment.inputs.map(input => ({
+            name: input.name || "",
+            type: input.type,
+          })),
+          outputs: fragment.outputs.map((output: { name?: string; type: string }) => ({
+            name: output.name || "",
+            type: output.type,
+          })),
+          stateMutability: fragment.stateMutability as "pure" | "view" | "nonpayable" | "payable",
+        };
 
-    const inputData = calldata.slice(10);
-    let delegatees: string[] = [];
+        const decoded = decodeFunctionData({
+          abi: [abiFragment] as Abi,
+          data: calldata,
+        });
 
-    switch (functionName) {
-      case "delegate": {
-        const decoded = decodeAbiParameters(
-          [{ type: "address", name: "delegatee" }],
-          `0x${inputData}` as `0x${string}`
-        );
-        delegatees = [decoded[0] as string];
-        break;
-      }
-      case "delegatePartial": {
-        const decoded = decodeAbiParameters(
-          [
-            {
-              type: "tuple[]",
-              name: "_partialDelegations",
-              components: [
-                { name: "_delegatee", type: "address" },
-                { name: "_numerator", type: "uint96" },
-              ],
-            },
-          ],
-          `0x${inputData}` as `0x${string}`
-        );
-        const partialDelegations = decoded[0] as readonly PartialDelegation[];
-        delegatees = partialDelegations.map(d => d._delegatee);
-        break;
-      }
-      case "subdelegateBatched": {
-        const decoded = decodeAbiParameters(
-          [
-            { type: "address[]", name: "delegatees" },
-            { type: "uint256[]", name: "rules" },
-          ],
-          `0x${inputData}` as `0x${string}`
-        );
-        delegatees = decoded[0] as string[];
-        break;
+        if (decoded.args) {
+          const parameters: Record<string, { type: string; value: any }> = {};
+          decoded.args.forEach((value, index) => {
+            const param = abiFragment.inputs[index];
+            parameters[param.name || `param${index}`] = {
+              type: param.type,
+              value: value,
+            };
+          });
+
+          return {
+            functionName: fragment.name,
+            parameters,
+            rawData: calldata,
+          };
+        }
+      } catch (error) {
+        continue;
       }
     }
 
-    return {
-      functionName,
-      delegatees,
-      rawData: calldata,
-    };
+    return null;
   } catch (error) {
     console.error("Error decoding delegation transaction:", error);
     return null;
   }
+}
+
+/**
+ * Decodes a delegation transaction and returns the decoded data with delegatees
+ */
+export function decodeDelegationTransactionWithDelegatees(
+  calldata: `0x${string}`,
+  tokenContract: ITokenContract | IMembershipContract
+) {
+  const decoded = decodeDelegationTransaction(calldata, tokenContract);
+  
+  if (!decoded || !isDelegateFunction(decoded.functionName)) {
+    return null;
+  }
+
+  let delegatees: string[] = [];
+
+  // Extract delegatees based on the function type
+  switch (decoded.functionName) {
+    case "delegate": {
+      const { delegatee } = decoded.parameters;
+      delegatees = [delegatee.value];
+      break;
+    }
+    case "subdelegateBatched": {
+      const { delegatees: delegateesParam } = decoded.parameters;
+      delegatees = delegateesParam.value;
+      break;
+    }
+  }
+
+  return {
+    functionName: decoded.functionName,
+    delegatees,
+    parameters: decoded.parameters,
+    rawData: decoded.rawData,
+  };
 } 

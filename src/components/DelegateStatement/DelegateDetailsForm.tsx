@@ -243,7 +243,10 @@ export default function DelegateDetailsForm({
       )}
       <div className="flex flex-col w-full mt-6 md:mt-0 gap-6">
         {!isSelectedPrimaryAddress && (
-          <DraftStatementDetails delegateStatement={delegate?.statement} />
+          <DraftStatementDetails
+            delegateStatement={delegate?.statement}
+            address={address}
+          />
         )}
         <div className="flex flex-col rounded-xl">{renderForm()}</div>
       </div>

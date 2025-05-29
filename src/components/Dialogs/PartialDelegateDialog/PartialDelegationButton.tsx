@@ -50,6 +50,7 @@ export const PartialDelegationButton = ({
     abi: contracts.token.abi,
     functionName: "delegate",
     args: [cleanDelegations],
+    account: address,
   });
 
   const { data, writeContractAsync: write } = useWrappedWriteContract();

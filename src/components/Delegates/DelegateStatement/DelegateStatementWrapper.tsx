@@ -13,7 +13,10 @@ const DelegateStatementWrapper = async ({ address }: Props) => {
 
   return (
     <>
-      <DraftStatementDetails delegateStatement={delegate?.payload as any} />
+      <DraftStatementDetails
+        delegateStatement={delegate?.payload as any}
+        address={address as `0x${string}`}
+      />
       <DelegateStatementsSelector
         delegateStatements={
           delegateStatements as unknown as DelegateStatement[]
