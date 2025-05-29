@@ -27,6 +27,8 @@ import { formatEther } from "viem";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useWrappedWriteContract } from "@/hooks/useWrappedWriteContract";
 
 export function DelegateDialog({
   delegate,
@@ -41,10 +43,11 @@ export function DelegateDialog({
 }) {
   const shouldFetchData = useRef(true);
   const [isReady, setIsReady] = useState(false);
-  const { ui, contracts, token, slug } = Tenant.current();
+  const { ui, contracts, token } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
-  const { address: accountAddress } = useAccount();
+  const { selectedWalletAddress: accountAddress, isSelectedPrimaryAddress } =
+    useSelectedWallet();
 
   const { data: tokenBalance } = useTokenBalance(accountAddress);
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
@@ -62,11 +65,13 @@ export function DelegateDialog({
   });
 
   // Gas relay is only LIVE when it is enabled in the settings and the sponsor meets minimum eth requirements and the user has enough token balance
+  // and the user is using the primary address
   const isGasRelayLive =
     isGasRelayEnabled &&
     Number(formatEther(sponsorBalance || 0n)) >=
       Number(gasRelayConfig?.minBalance) &&
-    Number(tokenBalance) > Number(gasRelayConfig?.minVPToUseGasRelay);
+    Number(tokenBalance) > Number(gasRelayConfig?.minVPToUseGasRelay) &&
+    isSelectedPrimaryAddress;
 
   const sameDelegatee = delegate.address === delegatee?.delegatee;
   const isDisabledInTenant = ui.toggle("delegates/delegate")?.enabled === false;
@@ -95,7 +100,7 @@ export function DelegateDialog({
     isError,
     writeContract: write,
     data: delegateTxHash,
-  } = useWriteContract();
+  } = useWrappedWriteContract();
 
   const {
     isLoading: isProcessingDelegation,
@@ -145,10 +150,10 @@ export function DelegateDialog({
       await call();
     } else {
       write({
-        address: contracts.token.address as any,
+        address: contracts.token.address as `0x${string}`,
         abi: contracts.token.abi,
         functionName: "delegate",
-        args: [delegate.address as any],
+        args: [delegate.address],
       });
     }
   }
@@ -195,7 +200,14 @@ export function DelegateDialog({
       );
     }
 
-    return <ShadcnButton onClick={executeDelegate}>Delegate</ShadcnButton>;
+    return (
+      <ShadcnButton
+        data-testid="delegate-modal-button"
+        onClick={executeDelegate}
+      >
+        Delegate
+      </ShadcnButton>
+    );
   };
 
   useEffect(() => {

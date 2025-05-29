@@ -1,9 +1,7 @@
 "use client";
 
-import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import { fetchDelegateStatement } from "@/app/delegates/actions";
-import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +11,11 @@ import AgoraLoader, {
   LogoLoader,
 } from "@/components/shared/AgoraLoader/AgoraLoader";
 import DelegateStatementForm from "@/components/DelegateStatement/DelegateStatementForm";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import Link from "next/link";
+import { BackArrowIcon } from "@/icons/BackArrow";
+import { useSearchParams } from "next/navigation";
+import { useGetDelegateDraftStatement } from "@/hooks/useGetDelegateDraftStatement";
 
 const { slug: daoSlug } = Tenant.current();
 
@@ -22,11 +25,7 @@ const formSchema = z.object({
   agreeCodeConduct: z.boolean(),
   agreeDaoPrinciples: z.boolean(),
   daoSlug: z.string(),
-  discord: z.string(),
   delegateStatement: z.string(),
-  email: z.string(),
-  twitter: z.string(),
-  warpcast: z.string(),
   scwAddress: z.string().optional(),
   topIssues: z.array(
     z
@@ -44,48 +43,37 @@ const formSchema = z.object({
       })
       .strict()
   ),
-  openToSponsoringProposals: z.union([
-    z.literal("yes"),
-    z.literal("no"),
-    z.null(),
-  ]),
-  mostValuableProposals: z.array(
-    z
-      .object({
-        number: z.string(),
-      })
-      .strict()
-  ),
-  leastValuableProposals: z.array(
-    z
-      .object({
-        number: z.string(),
-      })
-      .strict()
-  ),
-  notificationPreferences: z.object({
-    last_updated: z.string().optional(),
-    wants_proposal_created_email: z.union([
-      z.literal("prompt"),
-      z.literal("prompted"),
-      z.boolean(),
-    ]),
-    wants_proposal_ending_soon_email: z.union([
-      z.literal("prompt"),
-      z.literal("prompted"),
-      z.boolean(),
-    ]),
-  }),
+  discord: z.string().optional(),
+  email: z.string().optional(),
+  twitter: z.string().optional(),
+  warpcast: z.string().optional(),
+  notificationPreferences: z
+    .object({
+      wants_proposal_created_email: z.union([
+        z.boolean(),
+        z.literal("prompt"),
+        z.literal("prompted"),
+      ]),
+      wants_proposal_ending_soon_email: z.union([
+        z.boolean(),
+        z.literal("prompt"),
+        z.literal("prompted"),
+      ]),
+    })
+    .optional(),
 });
 
 export default function CurrentDelegateStatement() {
   const { ui } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
-  const { address, isConnected, isConnecting } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
   const [loading, setLoading] = useState<boolean>(true);
   const [delegateStatement, setDelegateStatement] =
     useState<DelegateStatement | null>(null);
-
+  const searchParams = useSearchParams();
+  const draftView = searchParams?.get("draftView") === "true";
+  const { data: delegateStatementDraft } =
+    useGetDelegateDraftStatement(address);
   // Display the first two delegate issues as default values
   const topIssues = ui.governanceIssues;
   const defaultIssues = !topIssues
@@ -106,13 +94,9 @@ export default function CurrentDelegateStatement() {
       agreeCodeConduct: !requireCodeOfConduct,
       agreeDaoPrinciples: !requireDaoPrinciples,
       daoSlug,
-      discord: delegateStatement?.discord || "",
       delegateStatement:
         (delegateStatement?.payload as { delegateStatement?: string })
           ?.delegateStatement || "",
-      email: delegateStatement?.email || "",
-      twitter: delegateStatement?.twitter || "",
-      warpcast: delegateStatement?.warpcast || "",
       scwAddress: delegateStatement?.scw_address || "",
       topIssues:
         (
@@ -122,7 +106,7 @@ export default function CurrentDelegateStatement() {
               type: string;
             }[];
           }
-        )?.topIssues.length > 0
+        )?.topIssues?.length > 0
           ? (
               delegateStatement?.payload as {
                 topIssues: {
@@ -151,27 +135,6 @@ export default function CurrentDelegateStatement() {
               }
             )?.topStakeholders
           : [],
-
-      openToSponsoringProposals:
-        (
-          delegateStatement?.payload as {
-            openToSponsoringProposals?: "yes" | "no" | null;
-          }
-        )?.openToSponsoringProposals || null,
-      mostValuableProposals:
-        (delegateStatement?.payload as { mostValuableProposals?: object[] })
-          ?.mostValuableProposals || [],
-      leastValuableProposals:
-        (delegateStatement?.payload as { leastValuableProposals?: object[] })
-          ?.leastValuableProposals || [],
-      notificationPreferences: (delegateStatement?.notification_preferences as {
-        wants_proposal_created_email: "prompt" | "prompted" | boolean;
-        wants_proposal_ending_soon_email: "prompt" | "prompted" | boolean;
-      }) || {
-        wants_proposal_created_email: "prompt",
-        wants_proposal_ending_soon_email: "prompt",
-      },
-      last_updated: new Date().toISOString(),
     };
   };
 
@@ -179,6 +142,7 @@ export default function CurrentDelegateStatement() {
     resolver: zodResolver(formSchema),
     defaultValues: setDefaultValues(delegateStatement),
     mode: "onChange",
+    disabled: draftView || !!delegateStatementDraft,
   });
   const { reset } = form;
 
@@ -192,15 +156,15 @@ export default function CurrentDelegateStatement() {
       setLoading(false);
     }
 
-    if (address) {
+    if (address && !draftView) {
       setLoading(true);
       _getDelegateStatement();
+    } else if (address && draftView) {
+      setDelegateStatement(delegateStatementDraft as DelegateStatement);
+      reset(setDefaultValues(delegateStatementDraft as DelegateStatement));
+      setLoading(false);
     }
-  }, [address, reset]);
-
-  if (!isConnected && !isConnecting) {
-    return <ResourceNotFound message="Oops! Nothing's here" />;
-  }
+  }, [address, reset, draftView, delegateStatementDraft]);
 
   return loading ? (
     shouldHideAgoraBranding ? (
@@ -209,6 +173,20 @@ export default function CurrentDelegateStatement() {
       <AgoraLoader />
     )
   ) : (
-    <DelegateStatementForm form={form} />
+    <>
+      <div className="flex items-center">
+        <Link
+          className="cursor-pointer border border-line rounded-full w-10 h-10 flex items-center justify-center mt-6 mb-6"
+          href={`/delegates/${address}`}
+        >
+          <BackArrowIcon className="h-6 w-6 stroke-primary" />
+        </Link>
+        <span className="text-primary font-bold pl-3">Back</span>
+      </div>
+      <DelegateStatementForm
+        form={form}
+        canEdit={!draftView && !delegateStatementDraft}
+      />
+    </>
   );
 }

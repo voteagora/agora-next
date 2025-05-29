@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { useAccount } from "wagmi";
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFilter";
 import InfiniteScroll from "react-infinite-scroller";
@@ -14,6 +13,7 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
 import Proposal from "../Proposal/Proposal";
 import { DaoSlug } from "@prisma/client";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 export default function ProposalsList({
   initRelevantProposals,
@@ -36,7 +36,7 @@ export default function ProposalsList({
     votingPeriod: boolean;
   } | null;
 }) {
-  const { address } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
   const { ui, slug } = Tenant.current();
   let tenantSupportsProposalLifecycle =
     ui.toggle("proposal-lifecycle")?.enabled;

@@ -1,12 +1,12 @@
 import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useState } from "react";
-import { useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { trackEvent } from "@/lib/analytics";
-import { useAccount } from "wagmi";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import { WriteContractErrorType } from "wagmi/actions";
+import { useWrappedWriteContract } from "./useWrappedWriteContract";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 const useStandardVoting = ({
   proposalId,
@@ -22,12 +22,14 @@ const useStandardVoting = ({
   missingVote: MissingVote;
 }) => {
   const { contracts } = Tenant.current();
-  const { address } = useAccount();
+  const { isSelectedPrimaryAddress, selectedWalletAddress: address } =
+    useSelectedWallet();
+
   const {
     writeContractAsync: standardVote,
     isError: _standardVoteError,
     error: _error,
-  } = useWriteContract();
+  } = useWrappedWriteContract();
 
   const [standardVoteError, setStandardVoteError] =
     useState(_standardVoteError);
@@ -42,7 +44,9 @@ const useStandardVoting = ({
 
   const write = useCallback(() => {
     const _standardVote = async () => {
-      setStandardVoteLoading(true);
+      if (isSelectedPrimaryAddress) {
+        setStandardVoteLoading(true);
+      }
       const directTx = await standardVote({
         address: contracts.governor.address as `0x${string}`,
         abi: contracts.governor.abi,

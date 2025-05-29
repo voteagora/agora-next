@@ -1,24 +1,16 @@
-import { DelegateStatement as DelegateStatementType } from "@/app/api/common/delegateStatement/delegateStatement";
 import { icons } from "@/icons/icons";
 import Image from "next/image";
 import Tenant from "@/lib/tenant/tenant";
+import { DelegateStatement } from "@/app/api/common/delegates/delegate";
 
 interface Props {
-  statement: DelegateStatementType;
+  statement: DelegateStatement;
 }
 
 export default function TopIssues({ statement }: Props) {
   const { ui } = Tenant.current();
-  const topIssues = (
-    statement.payload as {
-      topIssues: {
-        value: string;
-        type: string;
-      }[];
-    }
-  ).topIssues;
 
-  if (topIssues.length === 0 || !ui.governanceIssues) {
+  if (statement.payload?.topIssues?.length === 0 || !ui.governanceIssues) {
     return null;
   }
 
@@ -27,7 +19,7 @@ export default function TopIssues({ statement }: Props) {
       <h2 className="text-2xl font-bold text-primary">Top Issues</h2>
 
       <div className="flex flex-col gap-4">
-        {topIssues.map((issue, idx) => {
+        {statement.payload?.topIssues?.map((issue: any, idx: any) => {
           const issueDefinition = ui.governanceIssues!.find(
             (def) => issue.type === def.key
           );

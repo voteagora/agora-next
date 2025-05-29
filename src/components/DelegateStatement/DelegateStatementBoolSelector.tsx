@@ -7,8 +7,10 @@ import CheckboxWithTitle from "../ui/CheckboxWithTitle/CheckboxWithTitle";
 
 export default function DelegateStatementBoolSelector({
   form,
+  canEdit,
 }: {
   form: UseFormReturn<DelegateStatementFormValues>;
+  canEdit: boolean;
 }) {
   const [agreeCodeConduct, setAgreeCodeConduct] = useState(false);
   const { ui } = Tenant.current();
@@ -36,6 +38,7 @@ export default function DelegateStatementBoolSelector({
               </a>
             }
             checked={agreeCodeConduct}
+            disabled={!canEdit}
             onChange={handleAgreeCodeConduct}
           />
         </>
@@ -46,8 +49,10 @@ export default function DelegateStatementBoolSelector({
 
 export function DelegateStatementDaoPrinciplesSelector({
   form,
+  canEdit,
 }: {
   form: UseFormReturn<DelegateStatementFormValues>;
+  canEdit: boolean;
 }) {
   const [agreeDaoPrinciples, setAgreeDaoPrinciples] = useState(false);
   const { ui } = Tenant.current();
@@ -75,6 +80,7 @@ export function DelegateStatementDaoPrinciplesSelector({
               </a>
             }
             checked={agreeDaoPrinciples}
+            disabled={!canEdit}
             onChange={handleAgreeDaoPrinciples}
           />
         </>

@@ -6,6 +6,7 @@ import { type Proposal } from "@/app/api/common/proposals/proposal";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import { Vote } from "@/app/api/common/votes/vote";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 const useFetchAllForVoting = ({
   proposal,
@@ -14,7 +15,7 @@ const useFetchAllForVoting = ({
   proposal: Proposal;
   blockNumber?: number;
 }) => {
-  const { address } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
   const finalBlockNumber = blockNumber ?? proposal.snapshotBlockNumber;
 
   const { data, isSuccess, isPending } = useQuery<{

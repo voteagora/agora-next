@@ -37,6 +37,9 @@ import { EncourageConnectWalletDialog } from "@/components/Delegates/Delegations
 import { CreateScopeDialog } from "@/components/Admin/CreateScopeDialog";
 import { ScopeData } from "@/lib/types";
 import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActionDialog";
+import { SafeWalletConfirmationDialog } from "../SafeWalletConfirmation";
+import { SafeSignConfirmationDialog } from "../SafeSignConfirmation";
+import { SafeDeleteStatementDialog } from "../SafeDeleteStatement";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -60,7 +63,11 @@ export type DialogType =
   | SimulationReportDialogType
   | EncourageConnectWalletDialogType
   | CreateScopeDialogType
-  | AccountActionDialogType;
+  | AccountActionDialogType
+  | SafeWalletConfirmationDialogType
+  | SafeSignConfirmationDialogType
+  | SafeDeleteStatementDialogType;
+
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -277,6 +284,32 @@ export type CreateScopeDialogType = {
 export type AccountActionDialogType = {
   type: "ACCOUNT_ACTION";
   params: {};
+};
+
+export type SafeWalletConfirmationDialogType = {
+  type: "SAFE_WALLET_CONFIRMATION";
+  params: {
+    data: string;
+    address: string;
+    onSubmitSafeTransaction?: () => Promise<void>;
+  };
+  className?: string;
+};
+
+export type SafeSignConfirmationDialogType = {
+  type: "SAFE_SIGN_CONFIRMATION";
+  params: {
+    onSubmit?: () => Promise<void>;
+  };
+  className?: string;
+};
+
+export type SafeDeleteStatementDialogType = {
+  type: "SAFE_DELETE_DRAFT_STATEMENT";
+  params: {
+    address: string;
+    messageHash: string;
+  };
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -505,6 +538,34 @@ export const dialogs: DialogDefinitions<DialogType> = {
   ACCOUNT_ACTION: ({}, closeDialog) => {
     return <CreateAccountActionDialog closeDialog={closeDialog} />;
   },
+  SAFE_WALLET_CONFIRMATION: (
+    { data, address, onSubmitSafeTransaction },
+    closeDialog
+  ) => {
+    return (
+      <SafeWalletConfirmationDialog
+        closeDialog={closeDialog}
+        data={data}
+        address={address}
+        onSubmitSafeTransaction={onSubmitSafeTransaction}
+      />
+    );
+  },
+  SAFE_SIGN_CONFIRMATION: ({ onSubmit }, closeDialog) => {
+    return (
+      <SafeSignConfirmationDialog
+        closeDialog={closeDialog}
+        onSubmit={onSubmit}
+      />
+    );
+  },
+  SAFE_DELETE_DRAFT_STATEMENT: ({ address, messageHash }, closeDialog) => (
+    <SafeDeleteStatementDialog
+      closeDialog={closeDialog}
+      address={address}
+      messageHash={messageHash}
+    />
+  ),
   // FAQ: () => {
   //   return <FaqDialog />;
   // },

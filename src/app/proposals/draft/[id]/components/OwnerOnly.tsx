@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount } from "wagmi";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 const OnlyOwner = ({
   ownerAddress,
@@ -9,8 +9,7 @@ const OnlyOwner = ({
   ownerAddress: `0x${string}`;
   children: React.ReactNode;
 }) => {
-  const { address, isConnecting, isReconnecting } = useAccount();
-
+  const { selectedWalletAddress: address } = useSelectedWallet();
   // causing jitter when loading... need to figure out a better long term solution
   //   if (isConnecting || isReconnecting) {
   //     return (

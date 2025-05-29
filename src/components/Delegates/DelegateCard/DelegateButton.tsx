@@ -15,6 +15,7 @@ export function DelegateButton({
   return (
     <UpdatedButton
       type="secondary"
+      data-testid="delegate"
       onClick={(e: any) => {
         e.preventDefault();
         openDialog({

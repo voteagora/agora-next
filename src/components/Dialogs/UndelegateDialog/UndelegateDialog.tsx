@@ -1,9 +1,4 @@
-import {
-  useAccount,
-  useEnsName,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useEnsName, useWaitForTransactionReceipt } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/Button";
 import { Button as ShadcnButton } from "@/components/ui/button";
@@ -24,6 +19,8 @@ import { formatEther, zeroAddress } from "viem";
 import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useWrappedWriteContract } from "@/hooks/useWrappedWriteContract";
 
 interface UndelegateActionButtonsProps {
   isDisabledInTenant: boolean;
@@ -93,7 +90,7 @@ const UndelegateActionButtons = ({
 
   if (sameDelegatee) {
     return (
-      <ShadcnButton onClick={executeDelegate}>
+      <ShadcnButton onClick={executeDelegate} data-testid="remove-delegation">
         Remove your own delegation
       </ShadcnButton>
     );
@@ -117,7 +114,9 @@ export function UndelegateDialog({
 }) {
   const { ui, contracts, token } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
-  const { address: accountAddress } = useAccount();
+
+  const { selectedWalletAddress: accountAddress, isSelectedPrimaryAddress } =
+    useSelectedWallet();
   const [votingPower, setVotingPower] = useState<string>("");
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
   const [isReady, setIsReady] = useState(false);
@@ -139,7 +138,8 @@ export function UndelegateDialog({
     isGasRelayEnabled &&
     Number(formatEther(sponsorBalance || 0n)) >=
       Number(gasRelayConfig?.minBalance) &&
-    Number(votingPower) > Number(gasRelayConfig?.minVPToUseGasRelay);
+    Number(votingPower) > Number(gasRelayConfig?.minVPToUseGasRelay) &&
+    isSelectedPrimaryAddress;
 
   const { data: delegateeEnsName } = useEnsName({
     chainId: 1,
@@ -163,9 +163,9 @@ export function UndelegateDialog({
 
   const {
     isError,
-    writeContract: write,
+    writeContractAsync: write,
     data: delegateTxHash,
-  } = useWriteContract();
+  } = useWrappedWriteContract();
 
   const {
     isLoading: isProcessingDelegation,

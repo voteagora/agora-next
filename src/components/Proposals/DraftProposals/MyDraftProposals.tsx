@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useAccount } from "wagmi";
 import { useEffect, useState, useCallback } from "react";
 import { ProposalDraft } from "@prisma/client";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
 import DraftProposalCard from "./DraftProposalCard";
 import Tenant from "@/lib/tenant/tenant";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
+import { SafePendingProposalCard } from "./SafePendingProposalCard";
 
 const MyDraftProposals = ({
   fetchDraftProposals,
@@ -15,9 +17,9 @@ const MyDraftProposals = ({
 }) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-  const { address } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
   const [draftProposals, setDraftProposals] = useState<ProposalDraft[]>([]);
-
+  const { pendingProposals } = useSafePendingTransactions();
   const getDraftProposalsAndSet = useCallback(
     async (authorAddress: `0x${string}`) => {
       const proposals = await fetchDraftProposals(authorAddress);
@@ -31,7 +33,7 @@ const MyDraftProposals = ({
     getDraftProposalsAndSet(address);
   }, [fetchDraftProposals, address, getDraftProposalsAndSet]);
 
-  if (!draftProposals.length) {
+  if (!draftProposals.length && Object.entries(pendingProposals).length === 0) {
     return null;
   }
 
@@ -45,6 +47,17 @@ const MyDraftProposals = ({
         My proposals
       </h1>
       <div className="space-y-6">
+        {Object.entries(pendingProposals).length > 0 && (
+          <>
+            {Object.entries(pendingProposals).map(([txHash, proposal]) => (
+              <SafePendingProposalCard
+                key={txHash}
+                proposal={proposal}
+                txHash={txHash}
+              />
+            ))}
+          </>
+        )}
         {draftProposals.map((proposal) => {
           return (
             <Link

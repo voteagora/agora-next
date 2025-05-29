@@ -30,6 +30,7 @@ export const PartialDelegateButton = ({
         });
       }}
       className={full ? "w-full" : undefined}
+      data-testid={`partial-delegate-${delegate.address}`}
     >
       {isConnectedAccountDelegate ? "Undelegate" : "Delegate"}
     </UpdatedButton>

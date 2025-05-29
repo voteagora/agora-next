@@ -77,6 +77,7 @@ export default function DelegateCardList({
           </div>
         }
         element="div"
+        data-testid="delegate-card-list"
       >
         {delegates?.map((delegate, idx) => {
           let truncatedStatement = "";

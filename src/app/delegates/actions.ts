@@ -3,6 +3,7 @@
 import { fetchAllForAdvancedDelegation as apiFetchAllForAdvancedDelegation } from "@/app/api/delegations/getDelegations";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { stageStatus } from "@/app/lib/sharedEnums";
 import { fetchVotesForDelegate as apiFetchVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import {
   fetchIsDelegatingToProxy,
@@ -24,6 +25,7 @@ import { createDelegateStatement } from "@/app/api/common/delegateStatement/crea
 import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
+import { fetchDelegateStatements as apiFetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
 
 export const fetchDelegate = async (address: string) => {
   try {
@@ -71,6 +73,33 @@ export const fetchDelegateStatement = unstable_cache(
   }
 );
 
+export const fetchDelegateDraftStatement = async (address: string) => {
+  try {
+    const cachedFetchDelegateDraft = unstable_cache(
+      async () => {
+        return apiFetchDelegateStatements(address, stageStatus.DRAFT);
+      },
+      [`delegateStatement-${address.toLowerCase()}-${stageStatus.DRAFT}`],
+      {
+        // Longer cache is acceptable since the statement is not expected to change
+        // often and invalidated with every delegate statement update
+        revalidate: 600, // 10 minute cache
+        tags: [
+          `delegateStatement-${address.toLowerCase()}-${stageStatus.DRAFT}`,
+        ],
+      }
+    );
+
+    return await cachedFetchDelegateDraft();
+  } catch (error) {
+    console.error(
+      `Error fetching delegate draft statements for ${address}:`,
+      error
+    );
+    throw error;
+  }
+};
+
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(
   addressOrENSName: string
@@ -100,24 +129,30 @@ export async function submitDelegateStatement({
   signature,
   message,
   scwAddress,
+  message_hash,
 }: {
   address: `0x${string}`;
   delegateStatement: DelegateStatementFormValues;
   signature: `0x${string}`;
   message: string;
   scwAddress?: string;
+  message_hash?: string;
 }) {
-  const response = await createDelegateStatement({
-    address,
-    delegateStatement,
-    signature,
-    message,
-    scwAddress,
-  });
-
-  revalidateDelegateAddressPage(address.toLowerCase());
-  revalidatePath("/delegates/create", "page");
-  return response;
+  try {
+    const response = await createDelegateStatement({
+      address,
+      delegateStatement,
+      signature,
+      message,
+      scwAddress,
+      message_hash,
+    });
+    revalidateDelegateAddressPage(address.toLowerCase());
+    return response;
+  } catch (error) {
+    console.error("Error submitting delegate statement:", error);
+    throw error;
+  }
 }
 
 export async function fetchVotesForDelegate(
@@ -183,10 +218,16 @@ export const revalidateDelegateAddressPage = async (
 export async function updateNotificationPreferencesForAddress(
   address: `0x${string}`,
   email: string,
+  message_hash: string,
   options: {
     wants_proposal_created_email: "prompt" | "prompted" | true | false;
     wants_proposal_ending_soon_email: "prompt" | "prompted" | true | false;
   }
 ) {
-  return fetchUpdateNotificationPreferencesForAddress(address, email, options);
+  return fetchUpdateNotificationPreferencesForAddress(
+    address,
+    email,
+    message_hash,
+    options
+  );
 }

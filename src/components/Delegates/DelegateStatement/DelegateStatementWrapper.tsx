@@ -1,22 +1,27 @@
-import DelegateStatementContainer from "./DelegateStatementContainer";
-import TopStakeholders from "./TopStakeholders";
-import TopIssues from "./TopIssues";
-import { Delegate } from "@/app/api/common/delegates/delegate";
+import { DraftStatementDetails } from "./DelegateDraftStatement";
+import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import { DelegateStatementsSelector } from "./DelegateStatementsSelector";
+import { DelegateStatement } from "@/app/api/common/delegates/delegate";
 
 interface Props {
-  delegate: Delegate;
+  address: string;
 }
 
-const DelegateStatementWrapper = async ({ delegate }: Props) => {
+const DelegateStatementWrapper = async ({ address }: Props) => {
+  const delegateStatements = await fetchDelegateStatements(address);
+  const delegate = delegateStatements?.[0];
+
   return (
     <>
-      <DelegateStatementContainer delegate={delegate} />
-      {delegate.statement && (
-        <>
-          <TopIssues statement={delegate.statement} />
-          <TopStakeholders statement={delegate.statement} />
-        </>
-      )}
+      <DraftStatementDetails
+        delegateStatement={delegate?.payload as any}
+        address={address as `0x${string}`}
+      />
+      <DelegateStatementsSelector
+        delegateStatements={
+          delegateStatements as unknown as DelegateStatement[]
+        }
+      />
     </>
   );
 };

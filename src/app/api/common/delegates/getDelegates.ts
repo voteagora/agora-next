@@ -21,6 +21,7 @@ import { DELEGATION_MODEL, TENANT_NAMESPACES } from "@/lib/constants";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { calculateBigIntRatio } from "../utils/bigIntRatio";
 import { withMetrics } from "@/lib/metricWrapper";
+import { stageStatus } from "@/app/lib/sharedEnums";
 
 /*
  * Fetches a list of delegates
@@ -115,10 +116,13 @@ async function getDelegates({
               FROM agora.delegate_statements s
               WHERE s.address = d.delegate
               AND s.dao_slug = '${slug}'
+              AND s.stage = '${stageStatus.PUBLISHED}'
               ${endorsedCondition}
               ${issuesCondition}
               ${stakeholdersCondition}
               ${hasStatementCondition}
+              ORDER BY s.updated_at_ts DESC
+              LIMIT 1
             )`
           : "";
 
@@ -251,11 +255,12 @@ async function getDelegates({
                       warpcast,
                       endorsed
                     FROM agora.delegate_statements s
-                    WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
+                    WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug AND s.stage = '${stageStatus.PUBLISHED}'
                     ${endorsedCondition}
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -301,11 +306,12 @@ async function getDelegates({
                       warpcast,
                       endorsed
                     FROM agora.delegate_statements s
-                    WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
+                    WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug AND s.stage = '${stageStatus.PUBLISHED}'
                     ${endorsedCondition}
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -348,11 +354,12 @@ async function getDelegates({
                       warpcast,
                       endorsed
                     FROM agora.delegate_statements s
-                    WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug
+                    WHERE s.address = d.delegate AND s.dao_slug = '${slug}'::config.dao_slug AND s.stage = '${stageStatus.PUBLISHED}'
                     ${endorsedCondition}
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -467,9 +474,11 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
                 warpcast,
                 endorsed,
                 scw_address,
-                notification_preferences
+                notification_preferences,
+                message_hash
               FROM agora.delegate_statements s
-              WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug
+              WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug AND s.stage = '${stageStatus.PUBLISHED}'
+              ORDER BY s.updated_at_ts DESC
               LIMIT 1
             ) sub
           ) AS statement ON TRUE;

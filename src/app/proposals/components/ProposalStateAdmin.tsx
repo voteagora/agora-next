@@ -17,6 +17,7 @@ import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
 import { AgoraOptimismGovCancel } from "@/app/proposals/components/AgoraOptimismGovCancel";
 import { AgoraOptimismGovQueue } from "@/app/proposals/components/AgoraOptimismGovQueue";
 import { AgoraOptimismGovExecute } from "@/app/proposals/components/AgoraOptimismGovExecute";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 interface Props {
   proposal: Proposal;
@@ -24,7 +25,8 @@ interface Props {
 
 export const ProposalStateAdmin = ({ proposal }: Props) => {
   const { ui } = Tenant.current();
-  const { isConnected, address } = useAccount();
+  const { isConnected } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
   const { namespace } = Tenant.current();
 
   const hasProposalLifecycle = Boolean(ui.toggle("proposal-execute")?.enabled);

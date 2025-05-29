@@ -25,7 +25,7 @@ import { icons } from "@/icons/icons";
 import Image from "next/image";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
-import { formatEther, formatUnits } from "viem";
+import { formatEther } from "viem";
 import {
   Tooltip,
   TooltipContent,
@@ -39,6 +39,9 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import shareIcon from "@/icons/share.svg";
 import { format } from "date-fns";
 import { useVotableSupply } from "@/hooks/useVotableSupply";
+import { useSafePendingTransactions } from "@/hooks/useSafePendingTransactions";
+import { SafeTxnTooltip } from "@/components/shared/SafeTxnTooltip";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 type Props = {
   proposal: Proposal;
@@ -58,12 +61,12 @@ export default function CastVoteInput({
     blockNumber: isOptimismTenant ? proposal.snapshotBlockNumber : undefined,
   });
   const { data: votableSupply } = useVotableSupply({ enabled: true });
+  const { pendingVotes } = useSafePendingTransactions();
 
   const chains = data?.chains;
   const delegate = data?.delegate;
   const votes = data?.votes;
   const votingPower = data?.votingPower;
-
   if (!isConnected) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
@@ -87,6 +90,19 @@ export default function CastVoteInput({
       <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
         <NoStatementView />
       </div>
+    );
+  }
+
+  const pendingVote = pendingVotes[proposal.id];
+  if (pendingVote) {
+    return (
+      <SafeTxnTooltip className="inline-block">
+        <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+          <Button className="w-full bg-positive/90 cursor-none" disabled>
+            Pending Approval {pendingVote}
+          </Button>
+        </div>
+      </SafeTxnTooltip>
     );
   }
 
@@ -135,7 +151,7 @@ function CastVoteInputContent({
   } = useCastVoteContext();
 
   const { ui } = Tenant.current();
-
+  const { isSelectedPrimaryAddress } = useSelectedWallet();
   const missingVote = checkMissingVoteForDelegate(
     votes ?? [],
     votingPower ?? {
@@ -166,7 +182,8 @@ function CastVoteInputContent({
       Number(gasRelayConfig.minBalance) &&
     Number(votingPower?.totalVP ?? "0") >
       Number(gasRelayConfig?.minVPToUseGasRelay) &&
-    !reason;
+    !reason &&
+    isSelectedPrimaryAddress;
 
   return (
     <div className="flex flex-col flex-shrink rounded-b-lg">

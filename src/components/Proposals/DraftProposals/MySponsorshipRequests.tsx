@@ -1,16 +1,16 @@
 "use client";
 import Link from "next/link";
-import { useAccount } from "wagmi";
 import { useEffect, useState, useCallback } from "react";
 import { ProposalDraft } from "@prisma/client";
 import DraftProposalCard from "./DraftProposalCard";
+import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
 
 const MySponsorshipRequests = ({
   fetchDraftProposals,
 }: {
   fetchDraftProposals: (address: `0x${string}`) => Promise<ProposalDraft[]>;
 }) => {
-  const { address } = useAccount();
+  const { selectedWalletAddress: address } = useSelectedWallet();
   const [draftProposals, setDraftProposals] = useState<ProposalDraft[]>([]);
 
   const getDraftProposalsAndSet = useCallback(
