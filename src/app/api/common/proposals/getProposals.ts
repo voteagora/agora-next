@@ -31,7 +31,7 @@ import { unstable_cache } from "next/cache";
 import { getPublicClient } from "@/lib/viem";
 import {
   adaptDAONodeResponse,
-  getCachedAllProposalsFromDaoNode,
+  cachedAllProposalsFromDaoNode,
   getProposalTypesFromDaoNode,
 } from "@/app/lib/dao-node/client";
 
@@ -76,7 +76,7 @@ async function getProposals({
                 async (skip: number, take: number) => {
                   try {
                     let [data, typesFromApi] = await Promise.all([
-                      getCachedAllProposalsFromDaoNode(),
+                      cachedAllProposalsFromDaoNode(),
                       getProposalTypesFromDaoNode(),
                     ]);
 
