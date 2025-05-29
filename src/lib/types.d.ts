@@ -241,12 +241,16 @@ export interface FormattedProposalType {
   scopes?: ScopeData[];
 }
 
+export interface DelegateResponse {
+  delegate: DelegateStats;
+}
+
 export interface DelegateStats {
   addr: string;
   from_cnt: number;
   from_list: object[];
   voting_power: string;
-  participation_rate: number;
+  participation: [number, number];
 }
 
 export type ProposalType =
