@@ -1,14 +1,11 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import {
-  fetchParticipationStats,
-  fetchVoterStats,
-} from "@/app/delegates/actions";
-import { VoterStats, ParticipationStats } from "@/lib/types";
+import { fetchDelegateStats, fetchVoterStats } from "@/app/delegates/actions";
+import { VoterStats, DelegateStats } from "@/lib/types";
 import { getPublicClient } from "@/lib/viem";
 import Tenant from "@/lib/tenant/tenant";
 
 export const VOTER_STATS_QK = "voterStats";
-export const PARTICIPATION_STATS_QK = "participationStats";
+export const DELEGATE_STATS_QK = "participationStats";
 
 const CACHE_TIME = 180000; // 3 minute cache
 
@@ -48,14 +45,14 @@ export const useVoterStats = ({
   });
 };
 
-export const useParticipationStats = ({
+export const useDelegateStats = ({
   address,
-}: Props): UseQueryResult<ParticipationStats, Error> => {
+}: Props): UseQueryResult<DelegateStats, Error> => {
   return useQuery({
     enabled: !!address,
-    queryKey: [PARTICIPATION_STATS_QK, address],
+    queryKey: [DELEGATE_STATS_QK, address],
     queryFn: async () => {
-      return await fetchParticipationStats(address!);
+      return await fetchDelegateStats(address!);
     },
     staleTime: CACHE_TIME,
   });
