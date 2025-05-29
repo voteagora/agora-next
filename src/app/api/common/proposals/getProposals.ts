@@ -34,7 +34,7 @@ import { unstable_cache } from "next/cache";
 import { getPublicClient } from "@/lib/viem";
 import {
   adaptDAONodeResponse,
-  getCachedAllProposalsFromDaoNode,
+  cachedAllProposalsFromDaoNode,
   getProposalTypesFromDaoNode,
 } from "@/app/lib/dao-node/client";
 
@@ -76,7 +76,7 @@ async function getProposals({
               proposalsResult = await paginateResult(
                 async (skip: number, take: number) => {
                   try {
-                    let data = await getCachedAllProposalsFromDaoNode();
+                    let data = await cachedAllProposalsFromDaoNode();
 
                     if (filter == "relevant") {
                       data = data.filter((proposal) => {
