@@ -366,7 +366,18 @@ export function getBlockScanAddress(address: string) {
   return `${url}/address/${address}`;
 }
 
-export function getBlockScanUrl(hash: string | `0x${string}`) {
+export function getBlockScanUrl(hash: string | `0x${string}`, isEas?: boolean) {
+  const chainId = Tenant.current().contracts.token.chain.id;
+  if (isEas) {
+    switch (chainId) {
+      case 10:
+        return `https://optimism.easscan.org/attestation/view/${hash}`;
+      case 11155420:
+        return `https://optimism-sepolia.easscan.org/attestation/view/${hash}`;
+      default:
+        return `https://optimism.easscan.org/attestation/view/${hash}`;
+    }
+  }
   const { contracts } = Tenant.current();
   const url = contracts.token.chain.blockExplorers?.default.url;
   return `${url}/tx/${hash}`;
