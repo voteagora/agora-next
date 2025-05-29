@@ -8,7 +8,7 @@ import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
-import { ParticipationStats } from "@/lib/types";
+import { DelegateStats } from "@/lib/types";
 
 const { namespace, ui } = Tenant.current();
 
@@ -165,9 +165,9 @@ export const getProposalTypesFromDaoNode = unstable_cache(
  * @param address The delegate address to fetch stats for
  * @returns Participation stats or null if fetching fails
  */
-export const getParticipationStatsFromDaoNode = async (
+export const getDelegateDataFromDaoNode = async (
   address: string
-): Promise<ParticipationStats | null> => {
+): Promise<DelegateStats | null> => {
   const url = getDaoNodeURLForNamespace(namespace);
   if (!url) {
     return null;
@@ -175,28 +175,9 @@ export const getParticipationStatsFromDaoNode = async (
   try {
     // Fetch delegate data for participation rate
     const delegateRes = await fetch(`${url}v1/delegate/${address}`);
-    if (!delegateRes.ok) {
-      throw new Error(`Failed to fetch delegate: ${await delegateRes.text()}`);
-    }
-    const delegateData = await delegateRes.json();
-
-    // Fetch voting history to determine eligibility
-    const votingRes = await fetch(
-      `${url}v1/delegate/${address}/voting_history`
-    );
-    if (!votingRes.ok) {
-      throw new Error(
-        `Failed to fetch voting history: ${await votingRes.text()}`
-      );
-    }
-    const votingData = await votingRes.json();
-
-    return {
-      participationRate: delegateData.participation_rate,
-      eligible: votingData.voting_history.length > 10,
-    };
+    return await delegateRes.json();
   } catch (error) {
-    console.error("Error in getParticipationStatsFromDaoNode:", error);
+    console.error("Error in getDelegateDataFromDaoNode:", error);
     return null;
   }
 };
