@@ -20,18 +20,21 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
 
   const delegateStats = delegateResponse.delegate;
 
+  const numRecentVotes = delegateStats.participation[0];
+  const numRecentProposals = delegateStats.participation[1];
+
   console.log("Delegate stats: ", delegateStats);
   console.log("Voter stats: ", voterStats);
 
-  const eligible = voterStats.total_proposals >= 10;
+  const eligible = numRecentProposals >= 10;
 
   if (!eligible) {
     return <PendingActivityHeader />;
   }
 
   const participationRate =
-    voterStats.last_10_props / // Numerator
-    10; // Denominator
+    numRecentVotes / // Numerator
+    numRecentProposals; // Denominator
 
   const participationString = Math.floor(participationRate * 100);
 
@@ -40,16 +43,16 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
   if (participationRate > 0.5) {
     return (
       <ActiveHeader
-        outOfTen={voterStats.last_10_props.toString()}
-        totalProposals={voterStats.total_proposals}
+        outOfTen={numRecentVotes.toString()}
+        totalProposals={numRecentProposals}
         percentParticipation={participationString}
       />
     );
   } else if (participationRate <= 0.5) {
     return (
       <InactiveHeader
-        outOfTen={voterStats.last_10_props.toString()}
-        totalProposals={voterStats.total_proposals}
+        outOfTen={numRecentVotes.toString()}
+        totalProposals={numRecentProposals}
         percentParticipation={participationString}
       />
     );
