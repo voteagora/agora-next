@@ -9,29 +9,40 @@ interface Props {
 
 export const DelegateCardHeader = ({ delegate }: Props) => {
   const { data: voterStats } = useVoterStats({ address: delegate.address });
-  const { data: delegateStats, error: delegateStatsError } = useDelegateStats({
-    address: delegate.address,
-  });
+  const { data: delegateResponse, error: delegateStatsError } =
+    useDelegateStats({
+      address: delegate.address,
+    });
 
-  console.log("Delegate stats: ", delegateStats);
-
-  if (!voterStats || !delegateStats || delegateStatsError) {
+  if (!voterStats || !delegateResponse || delegateStatsError) {
     return null;
   }
 
-  const eligible = delegateStats.from_cnt > 10;
-  const participationRate = delegateStats.participation_rate;
+  const delegateStats = delegateResponse.delegate;
+
+  console.log("Delegate stats: ", delegateStats);
+  console.log("Voter stats: ", voterStats);
+
+  const eligible = voterStats.total_proposals >= 10;
 
   if (!eligible) {
     return <PendingActivityHeader />;
   }
+
+  const participationRate =
+    voterStats.last_10_props / // Numerator
+    10; // Denominator
+
+  const participationString = Math.floor(participationRate * 100);
+
+  console.log("Participation rate: ", participationRate);
 
   if (participationRate > 0.5) {
     return (
       <ActiveHeader
         outOfTen={voterStats.last_10_props.toString()}
         totalProposals={voterStats.total_proposals}
-        percentParticipation={participationRate}
+        percentParticipation={participationString}
       />
     );
   } else if (participationRate <= 0.5) {
@@ -39,7 +50,7 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
       <InactiveHeader
         outOfTen={voterStats.last_10_props.toString()}
         totalProposals={voterStats.total_proposals}
-        percentParticipation={participationRate}
+        percentParticipation={participationString}
       />
     );
   } else {
