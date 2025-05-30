@@ -270,7 +270,9 @@ async function getDelegates({
 
         const hasNext =
           pagination.offset + finalPaginatedDelegates.length <
-          currentTotalCount;
+            currentTotalCount ||
+          (performInternalPaginationInDaoNode &&
+            finalPaginatedDelegates.length === pagination.limit);
 
         return {
           meta: {
