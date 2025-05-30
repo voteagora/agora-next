@@ -8,9 +8,11 @@ import { ZERO_ADDRESS } from "@/lib/constants";
 
 export const DelegateToSelfBanner = () => {
   const { delegate, tokenBalance, delegatees } = useProfileData();
+
   const filteredDelegations = useMemo(() => {
     return delegatees?.filter((delegation) => delegation.to !== ZERO_ADDRESS);
   }, [delegatees]);
+
   const hasDelegated =
     Array.isArray(filteredDelegations) && filteredDelegations.length > 0;
 
