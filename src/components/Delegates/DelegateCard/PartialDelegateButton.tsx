@@ -18,7 +18,8 @@ export const PartialDelegateButton = ({
 
   return (
     <UpdatedButton
-      type={isConnectedAccountDelegate ? "primary" : "secondary"}
+      type={isConnectedAccountDelegate ? "primary" : "primary"}
+      variant="rounded"
       onClick={(e: any) => {
         e.preventDefault();
         openDialog({

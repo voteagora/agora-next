@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import { checkNewProposal } from "@/lib/seatbelt/checkProposal";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { StructuredReport } from "@/components/Simulation/StructuredReport";
+import { DSButton } from "@/components/design-system/Button";
 
 type FormType = z.output<typeof BasicProposalSchema>;
 
@@ -240,11 +241,12 @@ const BasicProposalForm = () => {
       {fields.length > 0 &&
         TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) && (
           <div className="mt-6">
-            <UpdatedButton
-              isLoading={simulationPending}
-              isSubmit={false}
-              type={isSimulationButtonEnabled ? "secondary" : "disabled"}
+            <DSButton
+              variant={isSimulationButtonEnabled ? "secondary" : "secondary"}
+              size="small"
               fullWidth={true}
+              loading={simulationPending}
+              disabled={!isSimulationButtonEnabled}
               onClick={() => {
                 if (isSimulationButtonEnabled) {
                   simulateTransactions();
@@ -252,13 +254,13 @@ const BasicProposalForm = () => {
               }}
             >
               Simulate transactions
-            </UpdatedButton>
+            </DSButton>
           </div>
         )}
       <div className="flex flex-row space-x-2 w-full mt-6">
-        <UpdatedButton
-          isSubmit={false}
-          type="secondary"
+        <DSButton
+          variant="secondary"
+          size="small"
           className="flex-grow"
           onClick={() => {
             append({
@@ -273,10 +275,10 @@ const BasicProposalForm = () => {
           }}
         >
           Transfer from the treasury
-        </UpdatedButton>
-        <UpdatedButton
-          isSubmit={false}
-          type="secondary"
+        </DSButton>
+        <DSButton
+          variant="secondary"
+          size="small"
           className="flex-grow"
           onClick={() => {
             append({
@@ -291,7 +293,7 @@ const BasicProposalForm = () => {
           }}
         >
           Create a custom transaction
-        </UpdatedButton>
+        </DSButton>
       </div>
       <div className="mt-6">
         {simulationReport && <StructuredReport report={simulationReport} />}

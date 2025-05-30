@@ -1,4 +1,4 @@
-import { UpdatedButton } from "@/components/Button";
+import { DSButton } from "@/components/design-system/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { fetchDirectDelegatee } from "@/app/delegates/actions";
@@ -13,8 +13,10 @@ export function DelegateButton({
   const openDialog = useOpenDialog();
 
   return (
-    <UpdatedButton
-      type="secondary"
+    <DSButton
+      variant="primary"
+      size="small"
+      fullWidth={full}
       onClick={(e: any) => {
         e.preventDefault();
         openDialog({
@@ -25,9 +27,8 @@ export function DelegateButton({
           },
         });
       }}
-      className={full ? "w-full" : undefined}
     >
       Delegate
-    </UpdatedButton>
+    </DSButton>
   );
 }

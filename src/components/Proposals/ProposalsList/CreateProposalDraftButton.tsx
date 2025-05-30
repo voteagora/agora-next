@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UpdatedButton } from "@/components/Button";
+import { DSButton } from "@/components/design-system/Button";
 import createProposalDraft from "./actions/createProposalDraft";
 import classNames from "classnames";
 import Tenant from "@/lib/tenant/tenant";
@@ -54,10 +54,11 @@ const CreateProposalDraftButton = ({
   }
 
   return (
-    <UpdatedButton
-      variant="rounded"
-      type="primary"
-      isLoading={isPending}
+    <DSButton
+      variant="primary"
+      size="small"
+      fullWidth
+      loading={isPending}
       className={classNames(className)}
       onClick={async () => {
         setIsPending(true);
@@ -66,7 +67,7 @@ const CreateProposalDraftButton = ({
       }}
     >
       Create proposal
-    </UpdatedButton>
+    </DSButton>
   );
 };
 
