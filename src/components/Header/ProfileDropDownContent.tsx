@@ -22,6 +22,7 @@ import { Delegation } from "@/app/api/common/delegations/delegation";
 import { useEnsName } from "wagmi";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { DelegateToSelf } from "../Delegates/Delegations/DelegateToSelf";
+import { ZERO_ADDRESS } from "@/lib/constants";
 
 interface Props {
   ensName: string | undefined;
@@ -105,10 +106,7 @@ export const ProfileDropDownContent = ({
 
   const { ui } = Tenant.current();
   const filteredDelegations = useMemo(() => {
-    return delegatees?.filter(
-      (delegation) =>
-        delegation.to !== "0x0000000000000000000000000000000000000000"
-    );
+    return delegatees?.filter((delegation) => delegation.to !== ZERO_ADDRESS);
   }, [delegatees]);
   const hasDelegated =
     Array.isArray(filteredDelegations) && filteredDelegations.length > 0;
@@ -116,16 +114,10 @@ export const ProfileDropDownContent = ({
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
-  const canEncourageDelegationBecauseOfVP =
-    tokenBalance !== undefined &&
-    tokenBalance !== BigInt(0) &&
-    delegate?.votingPower?.total === "0" &&
-    isDelegationEncouragementEnabled;
 
-  const canEncourageDelegationBecauseOfNoDelegation =
+  const shouldShowDelegateToSelfButton =
     tokenBalance !== undefined &&
     tokenBalance !== BigInt(0) &&
-    isDelegationEncouragementEnabled &&
     filteredDelegations !== undefined &&
     !hasDelegated;
 
@@ -270,8 +262,8 @@ export const ProfileDropDownContent = ({
               </RowSkeletonWrapper>
             }
           />
-          {canEncourageDelegationBecauseOfVP &&
-            canEncourageDelegationBecauseOfNoDelegation && (
+          {shouldShowDelegateToSelfButton &&
+            isDelegationEncouragementEnabled && (
               <RenderDelegateToSelf delegate={delegate as DelegateChunk} />
             )}
         </div>
