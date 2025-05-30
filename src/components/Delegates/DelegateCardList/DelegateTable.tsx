@@ -34,6 +34,7 @@ export default function DelegateTable({
 }: Props) {
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.data);
+  const [tableKey, setTableKey] = useState<number>(0);
 
   const fetching = useRef(false);
 
@@ -51,6 +52,7 @@ export default function DelegateTable({
     setIsDelegatesFiltering(false);
     setDelegates(initialDelegates.data);
     setMeta(initialDelegates.meta);
+    setTableKey((prev) => prev + 1);
   }, [initialDelegates, setIsDelegatesFiltering]);
 
   const loadMore = async () => {
@@ -94,6 +96,7 @@ export default function DelegateTable({
             </TableRow>
           </TableHeader>
           <InfiniteScroll
+            key={tableKey}
             hasMore={meta.has_next}
             pageStart={1}
             loadMore={loadMore}
