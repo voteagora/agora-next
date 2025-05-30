@@ -81,19 +81,14 @@ export default function DelegateTable({
           <TableHeader className="text-sm text-secondary sticky top-0 bg-neutral z-10 rounded-t-lg">
             <TableRow className="bg-tertiary/5">
               <TableHead className="h-10 text-secondary">Name</TableHead>
-              <TableHead className="h-10 text-secondary">
-                Voting power
-              </TableHead>
-              {/* Used for debugging purposes */}
-              {/* <TableHead className="h-10 text-secondary">7d Change</TableHead> */}
+              <TableHead className="h-10 text-secondary">Voting power</TableHead>
+              <TableHead className="h-10 text-secondary">7d Change</TableHead>
               {showParticipation && (
                 <TableHead className="h-10 text-secondary">
                   Participation
                 </TableHead>
               )}
-              <TableHead className="h-10 text-secondary">
-                Delegated from
-              </TableHead>
+              <TableHead className="h-10 text-secondary"># of Delegators</TableHead>
               <TableHead className="h-10 text-secondary">Info</TableHead>
               <TableHead className="h-10 text-secondary"></TableHead>
             </TableRow>
