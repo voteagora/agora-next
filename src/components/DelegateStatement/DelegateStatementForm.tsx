@@ -207,37 +207,39 @@ export default function DelegateStatementForm({
               />
             )}
           </div>
-          <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 p-6 flex-wrap border-t border-line">
-            <Button
-              variant="outline"
-              className="flex-1 py-3 px-4 text-primary rounded-full text-base h-12"
-              type="button"
-            >
-              Cancel
-            </Button>
+          {canEdit && (
+            <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 p-6 flex-wrap border-t border-line">
+              <Button
+                variant="outline"
+                className="flex-1 py-3 px-4 text-primary rounded-full text-base h-12"
+                type="button"
+              >
+                Cancel
+              </Button>
 
-            <Button
-              variant="brand"
-              className="flex-1 py-3 px-4 text-neutral text-base h-12"
-              disabled={!canSubmit}
-              type="submit"
-            >
-              Save
-            </Button>
-            {form.formState.isSubmitted && !agreeCodeConduct && (
-              <span className="text-red-700 text-sm">
-                You must agree with the code of conduct to continue
-              </span>
-            )}
-            {form.formState.isSubmitted && !agreeDaoPrinciples && (
-              <span className="text-red-700 text-sm">
-                You must agree with the DAO principles to continue
-              </span>
-            )}
-            {submissionError && (
-              <span className="text-red-700 text-sm">{submissionError}</span>
-            )}
-          </div>
+              <Button
+                variant="brand"
+                className="flex-1 py-3 px-4 text-neutral text-base h-12"
+                disabled={!canSubmit}
+                type="submit"
+              >
+                Save
+              </Button>
+              {form.formState.isSubmitted && !agreeCodeConduct && (
+                <span className="text-red-700 text-sm">
+                  You must agree with the code of conduct to continue
+                </span>
+              )}
+              {form.formState.isSubmitted && !agreeDaoPrinciples && (
+                <span className="text-red-700 text-sm">
+                  You must agree with the DAO principles to continue
+                </span>
+              )}
+              {submissionError && (
+                <span className="text-red-700 text-sm">{submissionError}</span>
+              )}
+            </div>
+          )}
         </form>
       </Form>
     );

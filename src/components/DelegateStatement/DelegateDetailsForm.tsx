@@ -205,30 +205,36 @@ export default function DelegateDetailsForm({
           >
             <DelegateEmailDetails form={form as any} />
           </FormSectionWithTooltip>
-          <div className="flex flex-col bg-neutral rounded-xl border border-line">
-            <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 p-6 flex-wrap">
-              <Button
-                variant="outline"
-                className="flex-1 py-3 px-4 text-primary rounded-full text-base h-12"
-                type="button"
-                onClick={handleCancel}
-              >
-                Cancel
-              </Button>
+          {canEdit && (
+            <>
+              <div className="flex flex-col bg-neutral rounded-xl border border-line">
+                <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 p-6 flex-wrap">
+                  <Button
+                    variant="outline"
+                    className="flex-1 py-3 px-4 text-primary rounded-full text-base h-12"
+                    type="button"
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </Button>
 
-              <Button
-                variant="brand"
-                className="flex-1 py-3 px-4 text-neutral text-base h-12"
-                type="submit"
-                disabled={!canEdit} // Disable button if not editable
-              >
-                Save
-              </Button>
-              {submissionError && (
-                <span className="text-red-700 text-sm">{submissionError}</span>
-              )}
-            </div>
-          </div>
+                  <Button
+                    variant="brand"
+                    className="flex-1 py-3 px-4 text-neutral text-base h-12"
+                    type="submit"
+                    disabled={!canEdit} // Disable button if not editable
+                  >
+                    Save
+                  </Button>
+                  {submissionError && (
+                    <span className="text-red-700 text-sm">
+                      {submissionError}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </form>
       </Form>
     );

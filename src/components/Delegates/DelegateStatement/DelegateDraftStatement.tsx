@@ -12,6 +12,7 @@ import { useDelegate } from "@/hooks/useDelegate";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useRouter } from "next/navigation";
 import Tenant from "@/lib/tenant/tenant";
+import { useSearchParams } from "next/navigation";
 
 export const DraftStatementDetails = ({
   delegateStatement,
@@ -24,11 +25,13 @@ export const DraftStatementDetails = ({
   const { selectedWalletAddress } = useSelectedWallet();
   const openDialog = useOpenDialog();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: draftStatement, refetch } =
     useGetDelegateDraftStatement(address);
   const { data: safeMessageDetails } = useGetSafeMessageDetails({
     messageHash: draftStatement?.message_hash,
   });
+  const draftView = searchParams?.get("draftView") === "true";
 
   const chainId = Tenant.current().contracts.governor.chain.id;
   const { data: safeInfo } = useGetSafeInfo(address);
@@ -164,14 +167,16 @@ export const DraftStatementDetails = ({
           </div>
         </div>
         <div className="inline-flex justify-start items-start gap-4">
-          <button
-            className="px-5 py-3 bg-white rounded-full shadow-[0px_4px_12px_0px_rgba(0,0,0,0.02)] shadow-[0px_2px_2px_0px_rgba(0,0,0,0.03)] outline outline-1 outline-offset-[-1px] outline-neutral-900 flex justify-center items-center gap-2"
-            onClick={onClickViewEdits}
-          >
-            <div className="justify-center text-neutral-900 text-base font-medium leading-normal">
-              View edits
-            </div>
-          </button>
+          {!draftView && (
+            <button
+              className="px-5 py-3 bg-white rounded-full shadow-[0px_4px_12px_0px_rgba(0,0,0,0.02)] shadow-[0px_2px_2px_0px_rgba(0,0,0,0.03)] outline outline-1 outline-offset-[-1px] outline-neutral-900 flex justify-center items-center gap-2"
+              onClick={onClickViewEdits}
+            >
+              <div className="justify-center text-neutral-900 text-base font-medium leading-normal">
+                View edits
+              </div>
+            </button>
+          )}
           <button
             className="px-5 py-3 bg-white rounded-full shadow-[0px_4px_12px_0px_rgba(0,0,0,0.02)] shadow-[0px_2px_2px_0px_rgba(0,0,0,0.03)] outline outline-1 outline-offset-[-1px] outline-neutral-900 flex justify-center items-center gap-2"
             onClick={openDeleteDialog}
