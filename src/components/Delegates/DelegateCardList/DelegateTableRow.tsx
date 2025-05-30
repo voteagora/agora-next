@@ -48,8 +48,7 @@ export default function DelegateTableRow({
         </div>
       </TableCell>
       <TableCell>{formatNumber(delegate.votingPower.total)}</TableCell>
-      {/* Used for debugging purposes */}
-      {/* <TableCell>
+      <TableCell>
         {delegate.vpChange7d ? (
           <span
             className={
@@ -64,7 +63,7 @@ export default function DelegateTableRow({
         ) : (
           "0"
         )}
-      </TableCell> */}
+      </TableCell>
       {showParticipation && (
         <TableCell>{`${Math.round(delegate.participation)}%`}</TableCell>
       )}

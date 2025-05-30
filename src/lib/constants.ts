@@ -88,7 +88,11 @@ export const delegatesFilterOptions = {
   },
   vpChange7d: {
     sort: "vp_change_7d",
-    value: "VP Change 7d",
+    value: "7d VP Change Increase",
+  },
+  vpChange7dDesc: {
+    sort: "vp_change_7d_desc",
+    value: "7d VP Change Decrease",
   },
 };
 

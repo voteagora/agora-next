@@ -83,6 +83,9 @@ async function getDelegates({
         daoNodeSortBy = "LVB";
       } else if (sort === "vp_change_7d") {
         daoNodeSortBy = "VPC";
+      } else if (sort === "vp_change_7d_desc") {
+        daoNodeSortBy = "VPC";
+        reverse = false;
       } else {
         daoNodeSortBy = "VP";
       }
