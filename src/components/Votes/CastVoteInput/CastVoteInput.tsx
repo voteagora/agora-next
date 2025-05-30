@@ -39,6 +39,7 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import shareIcon from "@/icons/share.svg";
 import { format } from "date-fns";
 import { useVotableSupply } from "@/hooks/useVotableSupply";
+import { DSButton } from "@/components/design-system/Button";
 
 type Props = {
   proposal: Proposal;
@@ -518,33 +519,36 @@ function VoteButtons({
 
 function VoteButton({ action }: { action: SupportTextProps["supportType"] }) {
   const actionString = action.toLowerCase();
-
   const { support, setSupport } = useCastVoteContext();
 
-  const selectedStyle =
-    support === action
-      ? actionString === "for"
-        ? "border-positive bg-positive/10"
-        : actionString === "against"
-          ? "border-negative bg-negative/10"
-          : "border-secondary bg-secondary/10"
-      : "bg-neutral";
+  // Map FOR to primary, AGAINST/ABSTAIN to secondary
+  const buttonVariant = actionString === "for" ? "primary" : "secondary";
 
   return (
-    <button
-      className={`${actionString === "for" ? "text-positive" : actionString === "against" ? "text-negative" : "text-secondary"} ${selectedStyle} rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
+    <DSButton
+      variant={buttonVariant}
+      size="small"
+      fullWidth={false}
       onClick={() => setSupport(support === action ? null : action)}
+      aria-pressed={support === action}
+      type="button"
     >
       {action.toLowerCase()}
-    </button>
+    </DSButton>
   );
 }
 
 function DisabledVoteButton({ reason }: { reason: string }) {
   return (
-    <Button className="w-full" disabled={true}>
+    <DSButton
+      variant="secondary"
+      size="small"
+      fullWidth={false}
+      disabled
+      type="button"
+    >
       {reason}
-    </Button>
+    </DSButton>
   );
 }
 
