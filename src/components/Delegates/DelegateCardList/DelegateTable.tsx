@@ -81,6 +81,8 @@ export default function DelegateTable({
               <TableHead className="h-10 text-secondary">
                 Voting power
               </TableHead>
+              {/* Used for debugging purposes */}
+              {/* <TableHead className="h-10 text-secondary">7d Change</TableHead> */}
               <TableHead className="h-10 text-secondary">
                 Participation
               </TableHead>
@@ -108,7 +110,6 @@ export default function DelegateTable({
             // References styles of TableBody
             className="[&_tr:last-child]:border-0"
             element="tbody"
-            useWindow={false}
           >
             {delegates.length === 0 ? (
               <td
@@ -122,7 +123,10 @@ export default function DelegateTable({
                 <DelegateTableRow
                   key={delegate.address}
                   delegate={
-                    delegate as DelegateChunk & { numOfDelegators: bigint }
+                    delegate as DelegateChunk & {
+                      numOfDelegators: bigint;
+                      participation: number;
+                    }
                   }
                   isAdvancedUser={isAdvancedUser}
                   delegators={advancedDelegators}

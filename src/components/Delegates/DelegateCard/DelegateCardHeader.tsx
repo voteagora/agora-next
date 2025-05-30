@@ -1,7 +1,7 @@
 "use client";
 
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { useVoterStats } from "@/hooks/useVoterStats";
+import { useVoterStats, useDelegateStats } from "@/hooks/useVoterStats";
 
 interface Props {
   delegate: Delegate;
@@ -9,32 +9,57 @@ interface Props {
 
 export const DelegateCardHeader = ({ delegate }: Props) => {
   const { data: voterStats } = useVoterStats({ address: delegate.address });
-  if (!voterStats) {
+  const { data: delegateResponse, error: delegateStatsError } =
+    useDelegateStats({
+      address: delegate.address,
+    });
+
+  if (!voterStats || !delegateResponse || delegateStatsError) {
     return null;
   }
 
-  const percentParticipation = Math.round(
-    Number(
-      Math.round(
-        ((voterStats.last_10_props / Math.min(10, voterStats.total_proposals)) *
-          100 || 0) * 100
-      ) / 100
-    )
-  );
+  const delegateStats = delegateResponse.delegate;
 
-  return percentParticipation > 50 ? (
-    <ActiveHeader
-      outOfTen={voterStats.last_10_props.toString()}
-      totalProposals={voterStats.total_proposals}
-      percentParticipation={percentParticipation}
-    />
-  ) : (
-    <InactiveHeader
-      outOfTen={voterStats.last_10_props.toString()}
-      totalProposals={voterStats.total_proposals}
-      percentParticipation={percentParticipation}
-    />
-  );
+  const numRecentVotes = delegateStats.participation[0];
+  const numRecentProposals = delegateStats.participation[1];
+
+  console.log("Delegate stats: ", delegateStats);
+  console.log("Voter stats: ", voterStats);
+
+  const eligible = numRecentProposals >= 10;
+
+  if (!eligible) {
+    return <PendingActivityHeader />;
+  }
+
+  const participationRate =
+    numRecentVotes / // Numerator
+    numRecentProposals; // Denominator
+
+  const participationString = Math.floor(participationRate * 100);
+
+  console.log("Participation rate: ", participationRate);
+
+  if (participationRate > 0.5) {
+    return (
+      <ActiveHeader
+        outOfTen={numRecentVotes.toString()}
+        totalProposals={numRecentProposals}
+        percentParticipation={participationString}
+      />
+    );
+  } else if (participationRate <= 0.5) {
+    return (
+      <InactiveHeader
+        outOfTen={numRecentVotes.toString()}
+        totalProposals={numRecentProposals}
+        percentParticipation={participationString}
+      />
+    );
+  } else {
+    //   Fallback to pending if something goes wrong
+    return <PendingActivityHeader />;
+  }
 };
 
 const ActiveHeader = ({
@@ -50,7 +75,7 @@ const ActiveHeader = ({
     <CardHeader
       title="Active delegate"
       cornerTitle={`🎉 ${percentParticipation}%`}
-      subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
+      subtitle={`Voted in ${outOfTen}/${totalProposals} of the most recent proposals`}
     />
   );
 };
@@ -68,7 +93,19 @@ const InactiveHeader = ({
     <CardHeader
       title="Inactive delegate"
       cornerTitle={`💤 ${percentParticipation}%`}
-      subtitle={`Voted in ${outOfTen}/${Math.min(10, totalProposals)} of the most recent proposals`}
+      subtitle={`Voted in ${outOfTen}/${totalProposals} of the most recent proposals`}
+    />
+  );
+};
+
+const PendingActivityHeader = () => {
+  return (
+    <CardHeader
+      title={"Gathering Data"}
+      cornerTitle={"🆕 -%"}
+      subtitle={
+        "This delegate hasn’t been eligible to vote on any recent proposals yet. Check back soon!"
+      }
     />
   );
 };
