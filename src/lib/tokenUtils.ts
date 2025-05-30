@@ -64,6 +64,17 @@ export function formatNumber(
     number = Number(ethers.formatUnits(amount.toString(), 18));
   }
 
+  // If the number is very small (e.g., smaller than what maximumSignificantDigits
+  // can effectively represent without many leading zeros after the decimal point),
+  // display it as "0". This helps avoid outputs like "0.00000001".
+  // For example, if maximumSignificantDigits is 4, the threshold is 0.0001.
+  // Any non-zero number like 0.00005 or 0.00000001 will be returned as "0".
+  // The original number 0 will be handled by Intl.NumberFormat and also result in "0".
+  const displayThreshold = Math.pow(10, -maximumSignificantDigits);
+  if (number !== 0 && Math.abs(number) < displayThreshold) {
+    return "0";
+  }
+
   const numberFormat = new Intl.NumberFormat("en", {
     style: "currency",
     currency: "USD",

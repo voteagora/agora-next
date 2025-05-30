@@ -18,10 +18,11 @@ import { useAccount } from "wagmi";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
-  fetchDelegates: (
-    pagination: PaginationParams,
-    seed: number
-  ) => Promise<PaginatedResult<DelegateChunk[]>>;
+  fetchDelegates: (args: {
+    pagination?: PaginationParams;
+    seed?: number;
+    showParticipation?: boolean;
+  }) => Promise<PaginatedResult<DelegateChunk[]>>;
 }
 
 export default function CitizenCardList({
@@ -44,10 +45,11 @@ export default function CitizenCardList({
   const loadMore = async () => {
     if (!fetching.current && meta.has_next) {
       fetching.current = true;
-      const data = await fetchDelegates(
-        { limit: 20, offset: meta.next_offset },
-        initialDelegates.seed || Math.random()
-      );
+      const data = await fetchDelegates({
+        pagination: { limit: 20, offset: meta.next_offset },
+        seed: initialDelegates.seed || Math.random(),
+        showParticipation: false,
+      });
       setDelegates(delegates.concat(data.data));
       setMeta(data.meta);
       fetching.current = false;

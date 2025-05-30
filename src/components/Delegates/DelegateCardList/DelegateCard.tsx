@@ -6,7 +6,6 @@ import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { DelegateActions } from "../DelegateCard/DelegateActions";
 import Tenant from "@/lib/tenant/tenant";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
-import { useVoterStats } from "@/hooks/useVoterStats";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
 
 const DelegateCard = ({
@@ -20,18 +19,12 @@ const DelegateCard = ({
   isAdvancedUser: boolean;
   truncatedStatement: string;
 }) => {
-  const { token } = Tenant.current();
+  const { token, ui } = Tenant.current();
   const { advancedDelegators } = useConnectedDelegate();
-
-  const { data: votingStats, isFetching: isVotingStatsPending } = useVoterStats(
-    {
-      address: delegate.address as `0x${string}`,
-    }
-  );
 
   const sanitizedTruncatedStatement = sanitizeContent(truncatedStatement);
 
-  const numProposals = votingStats?.total_proposals || 0;
+  const showParticipation = ui.toggle("show-participation")?.enabled || false;
 
   return (
     <div
@@ -56,19 +49,12 @@ const DelegateCard = ({
               <span className="text-primary font-bold">
                 {formatNumber(delegate.votingPower.total)} {token.symbol}
               </span>
-              {numProposals > 0 && !isVotingStatsPending && (
+              {showParticipation && (
                 <span className="text-primary font-bold">
-                  {Math.round(
-                    Math.round(
-                      ((votingStats?.last_10_props || 0) /
-                        Math.min(10, numProposals)) *
-                        100 *
-                        100
-                    ) / 100
-                  )}
-                  % Participation
+                  {Math.round(delegate.participation)}% Participation
                 </span>
               )}
+              <span className="text-primary font-bold"></span>
             </div>
             <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2 px-4">
               {sanitizedTruncatedStatement}

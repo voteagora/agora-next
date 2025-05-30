@@ -2,6 +2,7 @@
 
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import { useVoterStats } from "@/hooks/useVoterStats";
+import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
   delegate: Delegate;
@@ -9,6 +10,14 @@ interface Props {
 
 export const DelegateCardHeader = ({ delegate }: Props) => {
   const { data: voterStats } = useVoterStats({ address: delegate.address });
+
+  const showParticipation =
+    Tenant.current().ui.toggle("show-participation")?.enabled || false;
+
+  if (!showParticipation) {
+    return null;
+  }
+
   if (!voterStats) {
     return null;
   }
