@@ -5,6 +5,7 @@ import {
 } from "@/app/lib/pagination";
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { isAddress } from "viem";
 import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import {
@@ -22,6 +23,16 @@ import { getProxyAddress } from "@/lib/alligatorUtils";
 import { calculateBigIntRatio } from "../utils/bigIntRatio";
 import { withMetrics } from "@/lib/metricWrapper";
 import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
+
+// Create a cached version of getDelegatesFromDaoNode
+const cachedGetDelegatesFromDaoNode = unstable_cache(
+  getDelegatesFromDaoNode,
+  ["delegates-dao-node"],
+  {
+    revalidate: 30, // Cache for 5 minutes
+    tags: ["delegates"],
+  }
+);
 
 /*
  * Fetches a list of delegates
