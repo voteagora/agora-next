@@ -98,29 +98,17 @@ async function getDelegates({
         filters?.hasStatement;
       const isWeightedRandomSort = sort === "weighted_random" && seed;
 
-      // Perform internal pagination in DAO node client only if no filters and not weighted_random
-      const performInternalPaginationInDaoNode =
-        !(
-          filters?.issues ||
-          filters?.stakeholders ||
-          filters?.endorsed ||
-          filters?.hasStatement ||
-          isAllowListEnabled
-        ) && !isWeightedRandomSort;
+      console.log({filters, isAllowListEnabled, isWeightedRandomSort, sort,seed})
 
-      const daoNodeResult = await getDelegatesFromDaoNode({
+      const args = {
         sortBy: daoNodeSortBy,
         reverse: reverse,
         filters,
-        limit: performInternalPaginationInDaoNode
-          ? pagination.limit
-          : undefined,
-        offset: performInternalPaginationInDaoNode
-          ? pagination.offset
-          : undefined,
-        performInternalPagination: performInternalPaginationInDaoNode,
+        limit: undefined,
+        offset: undefined,
         withParticipation: showParticipation,
-      });
+      }
+      const daoNodeResult = await getDelegatesFromDaoNode(args);
 
       // If we have valid data from the DAO node, use it instead of database query
       if (
@@ -128,7 +116,7 @@ async function getDelegates({
         daoNodeResult.delegates &&
         (daoNodeResult.delegates.length > 0 ||
           (daoNodeResult.delegates.length === 0 &&
-            (!performInternalPaginationInDaoNode || !!filters?.delegator)))
+            !!filters?.delegator))
       ) {
         let processedDelegates = [...daoNodeResult.delegates];
         let currentTotalCount = daoNodeResult.totalBeforeInternalPagination;
@@ -201,19 +189,12 @@ async function getDelegates({
           processedDelegates.sort(() => Math.random() - 0.5);
         }
 
-        // Apply pagination here if it wasn't done in the DAO node client
-        // or if it needs to be re-applied after filters/weighted_random sort
         let finalPaginatedDelegates = processedDelegates;
-        if (
-          !performInternalPaginationInDaoNode ||
-          hasFilters ||
-          isWeightedRandomSort
-        ) {
-          finalPaginatedDelegates = processedDelegates.slice(
-            pagination.offset,
-            pagination.offset + pagination.limit
-          );
-        }
+
+        finalPaginatedDelegates = processedDelegates.slice(
+          pagination.offset,
+          pagination.offset + pagination.limit);
+
 
         let transformedDelegates = finalPaginatedDelegates.map((delegate) => {
           // Check if delegate has the expected properties
@@ -270,9 +251,7 @@ async function getDelegates({
 
         const hasNext =
           pagination.offset + finalPaginatedDelegates.length <
-            currentTotalCount ||
-          (performInternalPaginationInDaoNode &&
-            finalPaginatedDelegates.length === pagination.limit);
+            currentTotalCount;
 
         return {
           meta: {

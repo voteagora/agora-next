@@ -285,13 +285,21 @@ export const getDelegatesFromDaoNode = async (options?: {
     // TODO: Properly cache this... SMH
     // entire point of DAO node is to serve up full state
     // not give tiny little pages.
+    // We're setting this at 1000, and gambling that
+    // nothing above 1000 will be needed in any given 
+    // page passed onto the client.
+
+    // if this functions, we can either have DAO-node return a full count
+    // and use that intelligence to properly detect when 1000 is insufficient
+    // or we can have DAO-node return a "hasMore" boolean or something.
+
     const queryParams = new URLSearchParams({
       sort_by: sortBy,
       reverse: reverse.toString(),
       include:
         "VP,DC," + (options?.withParticipation ? "PR," : "") + "LVB,MRD,VPC",
-      page_size: options?.limit?.toString() || "1000",
-      offset: options?.offset?.toString() || "0",
+      page_size: "1000",
+      offset: "0",
     });
 
     if (filters?.delegator) {
@@ -311,15 +319,10 @@ export const getDelegatesFromDaoNode = async (options?: {
 
       let delegatesToFetchStatementsFor = [...allRawDelegatesFromApi];
 
-      const offset = options?.offset ?? 0;
-      const limit = options?.limit;
-
-      if (options?.performInternalPagination) {
-        delegatesToFetchStatementsFor = allRawDelegatesFromApi.slice(
-          offset,
-          limit ? offset + limit : undefined
-        );
-      }
+      delegatesToFetchStatementsFor = allRawDelegatesFromApi.slice(
+        0,
+        1000
+      );
 
       let mappedDelegates: MappedDelegate[] = [];
 
