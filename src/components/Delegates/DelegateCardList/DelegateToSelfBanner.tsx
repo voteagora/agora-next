@@ -7,30 +7,24 @@ import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 
 export const DelegateToSelfBanner = () => {
   const { delegate, tokenBalance, delegatees } = useProfileData();
+
   const filteredDelegations = useMemo(() => {
     return delegatees?.filter(
       (delegation) =>
         delegation.to !== "0x0000000000000000000000000000000000000000"
     );
   }, [delegatees]);
+
   const hasDelegated =
     Array.isArray(filteredDelegations) && filteredDelegations.length > 0;
 
-  const canEncourageDelegationBecauseOfVP =
-    tokenBalance !== undefined &&
-    tokenBalance !== BigInt(0) &&
-    delegate?.votingPower?.total === "0";
-
-  const canEncourageDelegationBecauseOfNoDelegation =
+  const shouldShowBanner =
     tokenBalance !== undefined &&
     tokenBalance !== BigInt(0) &&
     filteredDelegations !== undefined &&
     !hasDelegated;
 
-  if (
-    !canEncourageDelegationBecauseOfVP &&
-    !canEncourageDelegationBecauseOfNoDelegation
-  ) {
+  if (!shouldShowBanner) {
     return null;
   }
 
