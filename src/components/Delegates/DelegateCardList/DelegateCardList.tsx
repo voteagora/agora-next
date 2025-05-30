@@ -41,13 +41,14 @@ export default function DelegateCardList({
   const showParticipation = ui.toggle("show-participation")?.enabled || false;
 
   useEffect(() => {
-    setIsDelegatesFiltering(false);
     setDelegates(initialDelegates.data.slice(0, batchSize));
     setMeta(initialDelegates.meta);
+    setDataFromServer(initialDelegates.data);
+    setIsDelegatesFiltering(false);
   }, [initialDelegates, setIsDelegatesFiltering]);
 
   const loadMore = async () => {
-    if (!fetching.current && meta.has_next) {
+    if (!fetching.current && meta.has_next && !isDelegatesFiltering) {
       try {
         fetching.current = true;
 
@@ -121,7 +122,7 @@ export default function DelegateCardList({
 
           return (
             <DelegateCard
-              key={idx}
+              key={delegate.address + idx}
               delegate={delegate}
               truncatedStatement={truncatedStatement}
               isDelegatesFiltering={isDelegatesFiltering}

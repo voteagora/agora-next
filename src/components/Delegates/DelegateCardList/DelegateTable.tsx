@@ -49,16 +49,17 @@ export default function DelegateTable({
   const { isAdvancedUser } = useIsAdvancedUser();
   const { advancedDelegators } = useConnectedDelegate();
 
-  const { setIsDelegatesFiltering } = useAgoraContext();
+  const { setIsDelegatesFiltering, isDelegatesFiltering } = useAgoraContext();
 
   useEffect(() => {
-    setIsDelegatesFiltering(false);
     setDelegates(initialDelegates.data.slice(0, batchSize));
     setMeta(initialDelegates.meta);
+    setDataFromServer(initialDelegates.data);
+    setIsDelegatesFiltering(false);
   }, [initialDelegates, setIsDelegatesFiltering]);
 
   const loadMore = async () => {
-    if (!fetching.current && meta.has_next) {
+    if (!fetching.current && meta.has_next && !isDelegatesFiltering) {
       try {
         fetching.current = true;
 
@@ -80,8 +81,8 @@ export default function DelegateTable({
             seed: initialDelegates.seed || Math.random(),
             showParticipation,
           });
-          setDataFromServer((prev) => [...prev, ...data.data]);
           setDelegates((prev) => [...prev, ...data.data.slice(0, batchSize)]);
+          setDataFromServer((prev) => [...prev, ...data.data]);
           setMeta(data.meta);
         }
       } catch (error) {
@@ -143,9 +144,9 @@ export default function DelegateTable({
                 None found
               </td>
             ) : (
-              delegates.map((delegate) => (
+              delegates.map((delegate, index) => (
                 <DelegateTableRow
-                  key={delegate.address}
+                  key={delegate.address + index}
                   delegate={
                     delegate as DelegateChunk & {
                       numOfDelegators: bigint;
