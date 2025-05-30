@@ -5,6 +5,7 @@ import {
 } from "@/app/lib/pagination";
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { isAddress } from "viem";
 import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import {
@@ -23,6 +24,16 @@ import { calculateBigIntRatio } from "../utils/bigIntRatio";
 import { withMetrics } from "@/lib/metricWrapper";
 import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
 
+// Create a cached version of getDelegatesFromDaoNode
+const cachedGetDelegatesFromDaoNode = unstable_cache(
+  getDelegatesFromDaoNode,
+  ["delegates-dao-node-filters"],
+  {
+    revalidate: 30, // Cache for 30 seconds
+    tags: ["delegates-dao-node-filters"],
+  }
+);
+
 /*
  * Fetches a list of delegates
  * @param page - the page number to fetch
@@ -32,7 +43,7 @@ import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
  */
 async function getDelegates({
   pagination = {
-    limit: 30,
+    limit: 500,
     offset: 0,
   },
   sort,
@@ -98,7 +109,13 @@ async function getDelegates({
         filters?.hasStatement;
       const isWeightedRandomSort = sort === "weighted_random" && seed;
 
-      console.log({filters, isAllowListEnabled, isWeightedRandomSort, sort,seed})
+      console.log({
+        filters,
+        isAllowListEnabled,
+        isWeightedRandomSort,
+        sort,
+        seed,
+      });
 
       const args = {
         sortBy: daoNodeSortBy,
@@ -107,16 +124,15 @@ async function getDelegates({
         limit: undefined,
         offset: undefined,
         withParticipation: showParticipation,
-      }
-      const daoNodeResult = await getDelegatesFromDaoNode(args);
+      };
+      const daoNodeResult = await cachedGetDelegatesFromDaoNode(args);
 
       // If we have valid data from the DAO node, use it instead of database query
       if (
         daoNodeResult &&
         daoNodeResult.delegates &&
         (daoNodeResult.delegates.length > 0 ||
-          (daoNodeResult.delegates.length === 0 &&
-            !!filters?.delegator))
+          (daoNodeResult.delegates.length === 0 && !!filters?.delegator))
       ) {
         let processedDelegates = [...daoNodeResult.delegates];
         let currentTotalCount = daoNodeResult.totalBeforeInternalPagination;
@@ -193,8 +209,8 @@ async function getDelegates({
 
         finalPaginatedDelegates = processedDelegates.slice(
           pagination.offset,
-          pagination.offset + pagination.limit);
-
+          pagination.offset + pagination.limit
+        );
 
         let transformedDelegates = finalPaginatedDelegates.map((delegate) => {
           // Check if delegate has the expected properties
@@ -251,7 +267,7 @@ async function getDelegates({
 
         const hasNext =
           pagination.offset + finalPaginatedDelegates.length <
-            currentTotalCount;
+          currentTotalCount;
 
         return {
           meta: {

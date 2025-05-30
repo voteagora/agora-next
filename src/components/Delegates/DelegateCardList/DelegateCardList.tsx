@@ -21,13 +21,17 @@ interface Props {
   }) => Promise<PaginatedResult<DelegateChunk[]>>;
 }
 
+const batchSize = 50;
+
 export default function DelegateCardList({
   initialDelegates,
   fetchDelegates,
 }: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
-  const [delegates, setDelegates] = useState(initialDelegates.data);
+  const [delegates, setDelegates] = useState(
+    initialDelegates.data.slice(0, batchSize)
+  );
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
   const { ui } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
@@ -37,7 +41,7 @@ export default function DelegateCardList({
 
   useEffect(() => {
     setIsDelegatesFiltering(false);
-    setDelegates(initialDelegates.data);
+    setDelegates(initialDelegates.data.slice(0, batchSize));
     setMeta(initialDelegates.meta);
   }, [initialDelegates, setIsDelegatesFiltering]);
 
@@ -46,15 +50,28 @@ export default function DelegateCardList({
       try {
         fetching.current = true;
 
-        console.log("😍 showParticipation - B", showParticipation);
+        // Check if we have more initial data to show
+        const remainingInitialData = initialDelegates.data.slice(
+          delegates.length
+        );
 
-        const data = await fetchDelegates({
-          pagination: { offset: meta.next_offset, limit: meta.total_returned },
-          seed: initialDelegates.seed || Math.random(),
-          showParticipation,
-        });
-        setDelegates(delegates.concat(data.data));
-        setMeta(data.meta);
+        if (remainingInitialData.length > 0) {
+          const nextBatch = remainingInitialData.slice(0, batchSize);
+          setDelegates((prev) => [...prev, ...nextBatch]);
+
+        } else {
+          // No more initial data, fetch from API
+          const data = await fetchDelegates({
+            pagination: {
+              offset: meta.next_offset,
+              limit: meta.total_returned,
+            },
+            seed: initialDelegates.seed || Math.random(),
+            showParticipation,
+          });
+          setDelegates((prev) => [...prev, ...data.data]);
+          setMeta(data.meta);
+        }
       } catch (error) {
         console.error("Error loading more delegates:", error);
       } finally {

@@ -64,13 +64,13 @@ const DelegateCardWrapper = async ({
     tab === "citizens"
       ? await fetchCitizensWithParams(
           citizensSort,
-          { offset: 0, limit: 20 },
+          { offset: 0, limit: 500 },
           seed
         )
       : await fetchDelegatesWithParams(
           sort,
           filters,
-          { offset: 0, limit: 20 },
+          { offset: 0, limit: 500 },
           seed,
           showParticipation
         );
@@ -80,7 +80,7 @@ const DelegateCardWrapper = async ({
         <DelegateContent
           initialDelegates={delegates}
           fetchDelegates={async ({
-            pagination = { offset: 0, limit: 20 },
+            pagination = { offset: 0, limit: 500 },
             seed,
             showParticipation,
           }) => {

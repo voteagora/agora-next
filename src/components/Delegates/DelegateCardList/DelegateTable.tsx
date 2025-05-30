@@ -28,12 +28,16 @@ interface Props {
   }) => Promise<PaginatedResult<DelegateChunk[]>>;
 }
 
+const batchSize = 50;
+
 export default function DelegateTable({
   initialDelegates,
   fetchDelegates,
 }: Props) {
   const [meta, setMeta] = useState(initialDelegates.meta);
-  const [delegates, setDelegates] = useState(initialDelegates.data);
+  const [delegates, setDelegates] = useState(
+    initialDelegates.data.slice(0, batchSize)
+  );
 
   const fetching = useRef(false);
 
@@ -49,7 +53,7 @@ export default function DelegateTable({
 
   useEffect(() => {
     setIsDelegatesFiltering(false);
-    setDelegates(initialDelegates.data);
+    setDelegates(initialDelegates.data.slice(0, batchSize));
     setMeta(initialDelegates.meta);
   }, [initialDelegates, setIsDelegatesFiltering]);
 
@@ -57,13 +61,28 @@ export default function DelegateTable({
     if (!fetching.current && meta.has_next) {
       try {
         fetching.current = true;
-        const data = await fetchDelegates({
-          pagination: { offset: meta.next_offset, limit: meta.total_returned },
-          seed: initialDelegates.seed || Math.random(),
-          showParticipation,
-        });
-        setDelegates(delegates.concat(data.data));
-        setMeta(data.meta);
+
+        // Check if we have more initial data to show
+        const remainingInitialData = initialDelegates.data.slice(
+          delegates.length
+        );
+
+        if (remainingInitialData.length > 0) {
+          const nextBatch = remainingInitialData.slice(0, batchSize);
+          setDelegates((prev) => [...prev, ...nextBatch]);
+        } else {
+          // No more initial data, fetch from API
+          const data = await fetchDelegates({
+            pagination: {
+              offset: meta.next_offset,
+              limit: meta.total_returned,
+            },
+            seed: initialDelegates.seed || Math.random(),
+            showParticipation,
+          });
+          setDelegates((prev) => [...prev, ...data.data]);
+          setMeta(data.meta);
+        }
       } catch (error) {
         console.error("Error loading more delegates:", error);
       } finally {
@@ -81,14 +100,18 @@ export default function DelegateTable({
           <TableHeader className="text-sm text-secondary sticky top-0 bg-neutral z-10 rounded-t-lg">
             <TableRow className="bg-tertiary/5">
               <TableHead className="h-10 text-secondary">Name</TableHead>
-              <TableHead className="h-10 text-secondary">Voting power</TableHead>
+              <TableHead className="h-10 text-secondary">
+                Voting power
+              </TableHead>
               <TableHead className="h-10 text-secondary">7d Change</TableHead>
               {showParticipation && (
                 <TableHead className="h-10 text-secondary">
                   Participation
                 </TableHead>
               )}
-              <TableHead className="h-10 text-secondary"># of Delegators</TableHead>
+              <TableHead className="h-10 text-secondary">
+                # of Delegators
+              </TableHead>
               <TableHead className="h-10 text-secondary">Info</TableHead>
               <TableHead className="h-10 text-secondary"></TableHead>
             </TableRow>
