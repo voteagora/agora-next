@@ -32,6 +32,7 @@ export default function DelegateCardList({
   const [delegates, setDelegates] = useState(
     initialDelegates.data.slice(0, batchSize)
   );
+  const [dataFromServer, setDataFromServer] = useState<DelegateChunk[]>(initialDelegates.data);
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
   const { ui } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
@@ -51,14 +52,18 @@ export default function DelegateCardList({
         fetching.current = true;
 
         // Check if we have more initial data to show
-        const remainingInitialData = initialDelegates.data.slice(
+        const remainingInitialData = dataFromServer.slice(
           delegates.length
         );
 
         if (remainingInitialData.length > 0) {
           const nextBatch = remainingInitialData.slice(0, batchSize);
           setDelegates((prev) => [...prev, ...nextBatch]);
-
+          setMeta((prev) => ({
+            ...prev,
+            has_next: remainingInitialData.length > batchSize,
+            next_offset: meta.next_offset + nextBatch.length,
+          }));
         } else {
           // No more initial data, fetch from API
           const data = await fetchDelegates({
@@ -69,7 +74,8 @@ export default function DelegateCardList({
             seed: initialDelegates.seed || Math.random(),
             showParticipation,
           });
-          setDelegates((prev) => [...prev, ...data.data]);
+          setDataFromServer((prev) => [...prev, ...data.data]);
+          setDelegates((prev) => [...prev, ...data.data.slice(0, batchSize)]);
           setMeta(data.meta);
         }
       } catch (error) {

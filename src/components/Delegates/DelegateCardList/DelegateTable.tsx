@@ -38,7 +38,7 @@ export default function DelegateTable({
   const [delegates, setDelegates] = useState(
     initialDelegates.data.slice(0, batchSize)
   );
-
+  const [dataFromServer, setDataFromServer] = useState<DelegateChunk[]>(initialDelegates.data);
   const fetching = useRef(false);
 
   const { ui } = Tenant.current();
@@ -63,7 +63,7 @@ export default function DelegateTable({
         fetching.current = true;
 
         // Check if we have more initial data to show
-        const remainingInitialData = initialDelegates.data.slice(
+        const remainingInitialData = dataFromServer.slice(
           delegates.length
         );
 
@@ -80,7 +80,8 @@ export default function DelegateTable({
             seed: initialDelegates.seed || Math.random(),
             showParticipation,
           });
-          setDelegates((prev) => [...prev, ...data.data]);
+          setDataFromServer((prev) => [...prev, ...data.data]);
+          setDelegates((prev) => [...prev, ...data.data.slice(0, batchSize)]);
           setMeta(data.meta);
         }
       } catch (error) {
