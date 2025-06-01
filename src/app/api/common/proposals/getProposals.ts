@@ -38,6 +38,8 @@ import {
   getProposalTypesFromDaoNode,
 } from "@/app/lib/dao-node/client";
 
+// Is this working? Not sure, but i don't think so.
+// TODO: Check before enabling DAO-NODE PROPOSALS
 function getSnapshotProposalsFromDB() {
   const { namespace, contracts } = Tenant.current();
 
