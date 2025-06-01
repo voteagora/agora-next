@@ -9,6 +9,7 @@ import { ProposalType } from "@prisma/client";
 
 const { contracts, namespace } = Tenant.current();
 
+// DO NOT ENABLE DAO-NODE PROPOSALS UNTIL TODO BELOW IS HANDLED
 export function adaptDAONodeResponse(
   apiResponse: ProposalPayloadFromDAONode
 ): ProposalPayloadFromDB {
@@ -82,6 +83,8 @@ export function adaptDAONodeResponse(
       : null,
     proposal_data: proposalData,
     proposal_type: apiResponse.voting_module_name.toUpperCase() as ProposalType,
+    // TODO: Add proposal type data
+    // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL THIS IS HANDLED
     proposal_type_data: null,
     proposal_results: proposalResults,
 
