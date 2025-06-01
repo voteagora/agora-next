@@ -234,7 +234,7 @@ export function findProposalsQueryFromDB({
       // proposal_data_raw: true,
       proposal_results: true,
       proposal_type: true,
-      // proposal_type_data: true,
+      proposal_type_data: true,
       // created_transaction_hash: true,
       // cancelled_transaction_hash: true,
       // executed_transaction_hash: true,
