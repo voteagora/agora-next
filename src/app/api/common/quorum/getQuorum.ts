@@ -56,9 +56,15 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       if (contracts.token.isERC20()) {
         let totalSupply = await contracts.token.contract.totalSupply();
 
-        const quorumSplit = await contracts.governor.contract.quorum!(
-          proposal.proposal_id
-        );
+        let quorumSplit = 2100000000000000000000000n;
+
+        try {
+          quorumSplit = await contracts.governor.contract.quorum!(
+            proposal.proposal_id
+          );
+        } catch {
+          console.log("quorumSplit", quorumSplit);
+        }
 
         return (totalSupply * quorumSplit) / 1000000000000000000000000000n;
       }
