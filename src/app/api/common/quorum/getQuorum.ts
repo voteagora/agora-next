@@ -52,19 +52,6 @@ async function getQuorumForProposal(proposal: ProposalPayload) {
       votableSupply = await fetchVotableSupplyUnstableCache();
       return (BigInt(Number(votableSupply)) * 30n) / 100n;
 
-    case TENANT_NAMESPACES.SCROLL:
-      if (contracts.token.isERC20()) {
-        let totalSupply = await contracts.token.contract.totalSupply();
-
-        const quorumSplit = await contracts.governor.contract.quorum!(
-          proposal.proposal_id
-        );
-
-        return (totalSupply * quorumSplit) / 1000000000000000000000000000n;
-      }
-
-      return BigInt(Number(quorum));
-
     default:
       try {
         quorum = await contracts.governor.contract.quorum!(
