@@ -51,9 +51,11 @@ const fetchSnapshotProposalsFromDB = cache(getSnapshotProposalsFromDB);
 async function getProposals({
   filter,
   pagination,
+  type,
 }: {
   filter: string;
   pagination: PaginationParams;
+  type?: string;
 }): Promise<PaginatedResult<Proposal[]>> {
   return withMetrics(
     "getProposals",
@@ -133,6 +135,7 @@ async function getProposals({
                     skip,
                     take,
                     filter,
+                    type,
                     contract: contracts.governor.address,
                   });
 

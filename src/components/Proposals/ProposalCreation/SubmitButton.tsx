@@ -18,6 +18,7 @@ import { disapprovalThreshold } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import { ProposalScope, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalType as ProposalTypeLib } from "@/lib/types";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import toast from "react-hot-toast";
@@ -152,6 +153,17 @@ export default function SubmitButton({
       const startBlock = latestBlock + BigInt((votingDelay as any) ?? 0);
       const endBlock = startBlock + BigInt((votingPeriod as any) ?? 0);
 
+      const tiersEnabled =
+        form.state.tiers_enabled &&
+        form.state.proposalType === "Optimistic" &&
+        form.state.proposal_scope !== ProposalScope.ONCHAIN_ONLY;
+
+      const parsedProposalType = tiersEnabled
+        ? "OPTIMISTIC_TIERED"
+        : form.state.proposalType.toLowerCase() === "basic"
+          ? ("STANDARD" as ProposalTypeLib)
+          : (form.state.proposalType.toUpperCase() as ProposalTypeLib);
+
       const rawProposalDataForBackend = {
         proposer: address,
         description: fullDescription,
@@ -159,6 +171,8 @@ export default function SubmitButton({
         proposal_type_id: Number(form.state.proposalSettings),
         start_block: startBlock,
         end_block: endBlock,
+        proposal_type: parsedProposalType,
+        tiers: form.state.tiers,
       };
 
       const { id, transactionHash } = await createProposalAttestation({
@@ -169,6 +183,8 @@ export default function SubmitButton({
         proposal_type_id: rawProposalDataForBackend.proposal_type_id,
         start_block: rawProposalDataForBackend.start_block.toString(),
         end_block: rawProposalDataForBackend.end_block.toString(),
+        proposal_type: parsedProposalType,
+        tiers: form.state.tiers || [],
         signer: signer,
       });
 
@@ -194,6 +210,8 @@ export default function SubmitButton({
             proposal_type_id: rawProposalDataForBackend.proposal_type_id,
             start_block: rawProposalDataForBackend.start_block.toString(),
             end_block: rawProposalDataForBackend.end_block.toString(),
+            proposal_type: rawProposalDataForBackend.proposal_type,
+            tiers: rawProposalDataForBackend.tiers,
           },
           id,
           transactionHash,

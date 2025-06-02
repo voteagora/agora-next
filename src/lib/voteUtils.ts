@@ -100,21 +100,21 @@ export type ParsedParams = {
     key: "SNAPSHOT";
     kind: null;
   };
-  OFFCHAIN_STANDARD: {
-    key: "OFFCHAIN_STANDARD";
-    kind: null;
-  };
-  OFFCHAIN_APPROVAL: {
-    key: "OFFCHAIN_APPROVAL";
+  OFFCHAIN_OPTIMISTIC_TIERED: {
+    key: "OFFCHAIN_OPTIMISTIC_TIERED";
     kind: null;
   };
   OFFCHAIN_OPTIMISTIC: {
     key: "OFFCHAIN_OPTIMISTIC";
     kind: null;
   };
-  OFFCHAIN_OPTIMISTIC_TIERED: {
-    key: "OFFCHAIN_OPTIMISTIC_TIERED";
+  OFFCHAIN_STANDARD: {
+    key: "OFFCHAIN_STANDARD";
     kind: null;
+  };
+  OFFCHAIN_APPROVAL: {
+    key: "OFFCHAIN_APPROVAL";
+    kind: string[];
   };
 };
 

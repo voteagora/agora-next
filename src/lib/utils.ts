@@ -61,6 +61,13 @@ export const getProposalTypeText = (
       if (proposalData?.type === "copeland") {
         return "Ranked Choice Proposal";
       }
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED":
+      return "Optimistic Proposal (Offchain)";
+    case "OFFCHAIN_STANDARD":
+      return "Standard Proposal (Offchain)";
+    case "OFFCHAIN_APPROVAL":
+      return "Approval Vote Proposal (Offchain)";
     default:
       return "Proposal";
   }

@@ -1475,7 +1475,7 @@ view proposals_wrapper {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType?
+  proposal_type              String?
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?       @db.VarChar(66)
@@ -1531,7 +1531,7 @@ view ens_proposals_wrapper {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType?
+  proposal_type              String?
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?       @db.VarChar
@@ -4644,6 +4644,7 @@ enum ProposalType {
   APPROVAL
   OPTIMISTIC
   SNAPSHOT
+  OFFCHAIN
 
   @@map("proposal_type")
   @@schema("config")
@@ -4677,6 +4678,8 @@ model OffchainProposals {
   choices                    String[]
   proposal_results           Json?
   proposal_type_id           String?
+  proposal_type              String?
+  tiers                      Int[]
   start_block                String?
   end_block                  String?
   created_block              BigInt?

@@ -14,12 +14,19 @@ const { slug } = Tenant.current();
 
 const CREATE_PROPOSAL_SCHEMA_ID =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? "0xdc6fc01a5dd61a7f6af0b12018217b390593c5b01df4e89b365ec354734400ae"
-    : "0xdc6fc01a5dd61a7f6af0b12018217b390593c5b01df4e89b365ec354734400ae";
+    ? "0xb7d3c3baaf4b76cd4b4a14e87fc9660b3ad07b7b962a589dcd073aae407e759e"
+    : "0xb7d3c3baaf4b76cd4b4a14e87fc9660b3ad07b7b962a589dcd073aae407e759e";
+
+const CANCEL_PROPOSAL_SCHEMA_ID =
+  process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
+    ? "0x93dbaf80a47c49a96e9ad6e038a064088d322f9b42d4e4bd8e78efb947b448ad"
+    : "0x93dbaf80a47c49a96e9ad6e038a064088d322f9b42d4e4bd8e78efb947b448ad";
 
 const schemaEncoder = new SchemaEncoder(
-  "address contract,string id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block"
+  "address contract,string id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block, string proposal_type, uint256[] tiers"
 );
+
+const schemaEncoderCancel = new SchemaEncoder("string id");
 
 const eas =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
@@ -35,6 +42,8 @@ export async function createProposalAttestation({
   start_block,
   end_block,
   signer,
+  proposal_type,
+  tiers,
 }: {
   contract: string;
   proposer: string;
@@ -43,6 +52,8 @@ export async function createProposalAttestation({
   proposal_type_id: number;
   start_block: string;
   end_block: string;
+  proposal_type: string;
+  tiers: number[];
   signer: JsonRpcSigner;
 }) {
   const id = keccak256(
@@ -61,6 +72,8 @@ export async function createProposalAttestation({
     { name: "proposal_type_id", value: proposal_type_id, type: "uint8" },
     { name: "start_block", value: BigInt(start_block), type: "uint256" },
     { name: "end_block", value: BigInt(end_block), type: "uint256" },
+    { name: "proposal_type", value: proposal_type, type: "string" },
+    { name: "tiers", value: tiers, type: "uint256[]" },
   ]);
 
   const recipient = "0x0000000000000000000000000000000000000000";
@@ -109,6 +122,81 @@ export async function createProposalAttestation({
     signature,
     attester: proposer,
     schema: CREATE_PROPOSAL_SCHEMA_ID,
+  });
+
+  if (!receipt) {
+    console.error(
+      "Transaction failed or was not mined. Full response:",
+      receipt
+    );
+    throw new Error("Transaction failed or was not mined.");
+  }
+
+  return {
+    transactionHash: receipt,
+    id,
+  };
+}
+
+export async function cancelProposalAttestation({
+  id,
+  signer,
+  canceller,
+}: {
+  id: string;
+  signer: JsonRpcSigner;
+  canceller: string;
+}) {
+  const encodedData = schemaEncoderCancel.encodeData([
+    { name: "id", value: id, type: "string" },
+  ]);
+
+  const recipient = "0x0000000000000000000000000000000000000000";
+  const expirationTime = NO_EXPIRATION;
+  const revocable = false;
+
+  const signature = await signDelegatedAttestation({
+    schema: CANCEL_PROPOSAL_SCHEMA_ID,
+    recipient,
+    expirationTime,
+    revocable,
+    refUID: ZERO_BYTES32,
+    encodedData,
+    deadline: expirationTime,
+    value: 0n,
+    signer,
+  });
+
+  if (!signature) {
+    console.error("Failed to get signature");
+    throw new Error("Signature is required");
+  }
+  if (
+    typeof signature === "object" &&
+    "v" in signature &&
+    "r" in signature &&
+    "s" in signature
+  ) {
+    const { v, r, s } = signature;
+    if (
+      typeof v !== "number" ||
+      typeof r !== "string" ||
+      typeof s !== "string"
+    ) {
+      throw new Error("Invalid signature format");
+    }
+  } else {
+    throw new Error("Invalid signature format");
+  }
+
+  const receipt = await attestByDelegationServer({
+    recipient,
+    expirationTime,
+    revocable,
+    encodedData,
+    signature,
+    attester: canceller,
+    schema: CANCEL_PROPOSAL_SCHEMA_ID,
   });
 
   if (!receipt) {

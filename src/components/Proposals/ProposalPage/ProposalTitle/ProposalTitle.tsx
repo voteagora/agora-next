@@ -13,6 +13,7 @@ export default function ProposalTitle({
   title: string;
   proposal: Proposal;
 }) {
+  const isOffchain = proposal.proposalType?.startsWith("OFFCHAIN");
   const proposalData =
     proposal.proposalType === "SNAPSHOT"
       ? (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
@@ -39,7 +40,10 @@ export default function ProposalTitle({
           href={
             proposal.proposalType === "SNAPSHOT"
               ? proposalData?.link
-              : getBlockScanUrl(proposal.createdTransactionHash ?? "")
+              : getBlockScanUrl(
+                  proposal.createdTransactionHash ?? "",
+                  isOffchain
+                )
           }
           target="_blank"
           rel="noreferrer noopener"
