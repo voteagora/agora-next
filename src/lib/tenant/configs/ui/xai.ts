@@ -296,5 +296,9 @@ If you need help creating transactions / calldata, please see this [video](https
         gatingType: ProposalGatingType?.MANAGER,
       },
     },
+    {
+      name: "use-daonode-for-proposal-types",
+      enabled: false,
+    },
   ],
 });
