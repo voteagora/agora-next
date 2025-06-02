@@ -448,6 +448,22 @@ export type ParsedProposalData = {
     key: "OPTIMISTIC";
     kind: { options: [] };
   };
+  OFFCHAIN_STANDARD: {
+    key: "OFFCHAIN_STANDARD";
+    kind: { options: [] };
+  };
+  OFFCHAIN_APPROVAL: {
+    key: "OFFCHAIN_APPROVAL";
+    kind: { options: [] };
+  };
+  OFFCHAIN_OPTIMISTIC: {
+    key: "OFFCHAIN_OPTIMISTIC";
+    kind: { options: [] };
+  };
+  OFFCHAIN_OPTIMISTIC_TIERED: {
+    key: "OFFCHAIN_OPTIMISTIC_TIERED";
+    kind: { options: [] };
+  };
 };
 
 export function parseIfNecessary(obj: string | object) {
@@ -599,6 +615,15 @@ export function parseProposalData(
         },
       };
     }
+    case "OFFCHAIN_STANDARD":
+    case "OFFCHAIN_APPROVAL":
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED": {
+      return {
+        key: proposalType,
+        kind: { options: [] },
+      };
+    }
     default: {
       throw new Error(`unknown type ${proposalType}`);
     }
@@ -657,6 +682,22 @@ export type ParsedProposalResults = {
       criteria: "THRESHOLD" | "TOP_CHOICES";
       criteriaValue: bigint;
     };
+  };
+  OFFCHAIN_STANDARD: {
+    key: "OFFCHAIN_STANDARD";
+    kind: null;
+  };
+  OFFCHAIN_APPROVAL: {
+    key: "OFFCHAIN_APPROVAL";
+    kind: null;
+  };
+  OFFCHAIN_OPTIMISTIC: {
+    key: "OFFCHAIN_OPTIMISTIC";
+    kind: null;
+  };
+  OFFCHAIN_OPTIMISTIC_TIERED: {
+    key: "OFFCHAIN_OPTIMISTIC_TIERED";
+    kind: null;
   };
 };
 
@@ -755,6 +796,15 @@ export function parseProposalResults(
         },
       };
     }
+    case "OFFCHAIN_STANDARD":
+    case "OFFCHAIN_APPROVAL":
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED": {
+      return {
+        key: proposalData.key,
+        kind: null,
+      };
+    }
   }
 }
 
@@ -787,7 +837,8 @@ export async function getProposalStatus(
   const checkHasNoCalldata = (): boolean => {
     if (
       proposal.proposal_type === "SNAPSHOT" ||
-      proposal.proposal_type === "OPTIMISTIC"
+      proposal.proposal_type === "OPTIMISTIC" ||
+      proposal.proposal_type.startsWith("OFFCHAIN_")
     ) {
       return true;
     }
@@ -1000,6 +1051,12 @@ export async function getProposalStatus(
       } else {
         return "SUCCEEDED";
       }
+    }
+    case "OFFCHAIN_STANDARD":
+    case "OFFCHAIN_APPROVAL":
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED": {
+      return "PENDING";
     }
   }
 }
