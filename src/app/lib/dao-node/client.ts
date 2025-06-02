@@ -4,6 +4,7 @@ import {
 } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalType } from "@/lib/types";
+import { unstable_cache } from "next/cache";
 import { cache } from "react";
 
 const { namespace, ui } = Tenant.current();
@@ -112,20 +113,26 @@ export const getDaoNodeURLForNamespace = (namespace: string) => {
   return parsedUrl;
 };
 
-export const getProposalTypesFromDaoNode = async () => {
-  const url = getDaoNodeURLForNamespace(namespace);
-  const useDaoNodeForProposalTypes = ui.toggle(
-    "use-daonode-for-proposal-types"
-  )?.enabled;
-  if (!url || !useDaoNodeForProposalTypes) {
-    return null;
+export const getProposalTypesFromDaoNode = unstable_cache(
+  async () => {
+    const url = getDaoNodeURLForNamespace(namespace);
+    const useDaoNodeForProposalTypes = ui.toggle(
+      "use-daonode-for-proposal-types"
+    )?.enabled;
+    if (!url || !useDaoNodeForProposalTypes) {
+      return null;
+    }
+
+    const response = await fetch(`${url}v1/proposal_types`);
+    const data = await response.json();
+
+    return data;
+  },
+  ["proposal-types"],
+  {
+    revalidate: 60, // 1 minute
   }
-
-  const response = await fetch(`${url}v1/proposal_types`);
-  const data = await response.json();
-
-  return data;
-};
+);
 
 export const getAllProposalsFromDaoNode = async () => {
   const url = getDaoNodeURLForNamespace(namespace);

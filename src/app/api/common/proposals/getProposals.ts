@@ -75,8 +75,10 @@ async function getProposals({
               proposalsResult = await paginateResult(
                 async (skip: number, take: number) => {
                   try {
-                    let data = await getCachedAllProposalsFromDaoNode();
-                    const typesFromApi = await getProposalTypesFromDaoNode();
+                    let [data, typesFromApi] = await Promise.all([
+                      getCachedAllProposalsFromDaoNode(),
+                      getProposalTypesFromDaoNode(),
+                    ]);
 
                     if (filter == "relevant") {
                       data = data.filter((proposal) => {
