@@ -1,4 +1,3 @@
-import { ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import {
   Proposal,
@@ -11,6 +10,7 @@ import Tenant from "./tenant/tenant";
 import { Block, toUtf8Bytes } from "ethers";
 import { mapArbitrumBlockToMainnetBlock } from "./utils";
 import { TENANT_NAMESPACES } from "./constants";
+import { ProposalType } from "./types";
 
 // Type guards
 export function isTimestampBasedProposal(

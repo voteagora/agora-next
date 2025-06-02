@@ -3,15 +3,15 @@ import {
   ProposalPayloadFromDB,
 } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
+import { ProposalType } from "@/lib/types";
 import { cache } from "react";
-import { PaginatedResult } from "../pagination";
-import { ProposalType } from "@prisma/client";
 
-const { contracts, namespace } = Tenant.current();
+const { namespace, ui } = Tenant.current();
 
 // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL TODO BELOW IS HANDLED
 export function adaptDAONodeResponse(
-  apiResponse: ProposalPayloadFromDAONode
+  apiResponse: ProposalPayloadFromDAONode,
+  proposalTypes: any
 ): ProposalPayloadFromDB {
   const votingModuleName = apiResponse.voting_module_name;
 
@@ -65,6 +65,11 @@ export function adaptDAONodeResponse(
     throw new Error(`Unknown voting module name: ${votingModuleName}`);
   }
 
+  const proposalType = proposalTypes[String(apiResponse.proposal_type)];
+  const parsedProposalType = Object.assign(proposalType, {
+    proposal_type_id: String(apiResponse.proposal_type),
+  });
+
   return {
     proposal_id: apiResponse.id,
     proposer: apiResponse.proposer.toLowerCase(),
@@ -85,7 +90,7 @@ export function adaptDAONodeResponse(
     proposal_type: apiResponse.voting_module_name.toUpperCase() as ProposalType,
     // TODO: Add proposal type data
     // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL THIS IS HANDLED
-    proposal_type_data: null,
+    proposal_type_data: parsedProposalType,
     proposal_results: proposalResults,
 
     proposal_data_raw: apiResponse.proposal_data,
@@ -109,8 +114,10 @@ export const getDaoNodeURLForNamespace = (namespace: string) => {
 
 export const getProposalTypesFromDaoNode = async () => {
   const url = getDaoNodeURLForNamespace(namespace);
-  const supportScopes = contracts.supportScopes;
-  if (!url || !supportScopes) {
+  const useDaoNodeForProposalTypes = ui.toggle(
+    "use-daonode-for-proposal-types"
+  )?.enabled;
+  if (!url || !useDaoNodeForProposalTypes) {
     return null;
   }
 

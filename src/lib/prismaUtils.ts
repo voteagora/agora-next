@@ -1,7 +1,6 @@
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { TENANT_NAMESPACES } from "./constants";
 import { TenantNamespace } from "./types";
-import { $Enums, ProposalType } from "@prisma/client";
 
 export function findDelagatee({
   namespace,
@@ -156,9 +155,7 @@ export function findSnapshotProposalsQueryFromDb({
   const condition = {
     where: {
       contract,
-      proposal_type: {
-        equals: ProposalType.SNAPSHOT,
-      },
+      proposal_type: "SNAPSHOT",
     },
   };
 

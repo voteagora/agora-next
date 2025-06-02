@@ -1,4 +1,3 @@
-import { ProposalType } from "@prisma/client";
 import {
   getProposalTotalValue,
   getTitleFromProposalDescription,
@@ -22,6 +21,7 @@ import { formatUnits, parseUnits } from "viem";
 import { format } from "date-fns";
 import { tokenForContractAddress } from "./tokenUtils";
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import { ProposalType } from "./types";
 
 /**
  * Vote primitives

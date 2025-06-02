@@ -3,13 +3,10 @@ import {
   ProposalStatus,
   ParsedProposalResults,
 } from "@/lib/proposalUtils";
-import {
-  OptimismProposals,
-  ProposalType,
-  lineaProposals,
-} from "@prisma/client";
+import { OptimismProposals, lineaProposals } from "@prisma/client";
 import { BigNumberish } from "ethers";
 import { Decimal } from "@prisma/client/runtime";
+import { ProposalType } from "@/lib/types";
 
 export type ProposalPayloadFromDAONode = {
   id: string;
@@ -51,6 +48,7 @@ export type ProposalPayloadFromDAONode = {
   };
 
   totals: Record<string, string>;
+  proposal_type: number;
   voting_module_name: string;
 
   // this is a string representing bytes, without 0x prefix.
