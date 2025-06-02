@@ -32,7 +32,9 @@ export default function DelegateCardList({
   const [delegates, setDelegates] = useState(
     initialDelegates.data.slice(0, batchSize)
   );
-  const [dataFromServer, setDataFromServer] = useState<DelegateChunk[]>(initialDelegates.data);
+  const [dataFromServer, setDataFromServer] = useState<DelegateChunk[]>(
+    initialDelegates.data
+  );
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
   const { ui } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
@@ -53,9 +55,7 @@ export default function DelegateCardList({
         fetching.current = true;
 
         // Check if we have more initial data to show
-        const remainingInitialData = dataFromServer.slice(
-          delegates.length
-        );
+        const remainingInitialData = dataFromServer.slice(delegates.length);
 
         if (remainingInitialData.length > 0) {
           const nextBatch = remainingInitialData.slice(0, batchSize);

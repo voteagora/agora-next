@@ -38,7 +38,9 @@ export default function DelegateTable({
   const [delegates, setDelegates] = useState(
     initialDelegates.data.slice(0, batchSize)
   );
-  const [dataFromServer, setDataFromServer] = useState<DelegateChunk[]>(initialDelegates.data);
+  const [dataFromServer, setDataFromServer] = useState<DelegateChunk[]>(
+    initialDelegates.data
+  );
   const fetching = useRef(false);
 
   const { ui } = Tenant.current();
@@ -64,9 +66,7 @@ export default function DelegateTable({
         fetching.current = true;
 
         // Check if we have more initial data to show
-        const remainingInitialData = dataFromServer.slice(
-          delegates.length
-        );
+        const remainingInitialData = dataFromServer.slice(delegates.length);
 
         if (remainingInitialData.length > 0) {
           const nextBatch = remainingInitialData.slice(0, batchSize);

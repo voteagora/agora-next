@@ -286,7 +286,7 @@ export const getDelegatesFromDaoNode = async (options?: {
     // entire point of DAO node is to serve up full state
     // not give tiny little pages.
     // We're setting this at 1000, and gambling that
-    // nothing above 1000 will be needed in any given 
+    // nothing above 1000 will be needed in any given
     // page passed onto the client.
 
     // if this functions, we can either have DAO-node return a full count
@@ -319,10 +319,7 @@ export const getDelegatesFromDaoNode = async (options?: {
 
       let delegatesToFetchStatementsFor = [...allRawDelegatesFromApi];
 
-      delegatesToFetchStatementsFor = allRawDelegatesFromApi.slice(
-        0,
-        1000
-      );
+      delegatesToFetchStatementsFor = allRawDelegatesFromApi.slice(0, 1000);
 
       let mappedDelegates: MappedDelegate[] = [];
 
