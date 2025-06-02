@@ -15,6 +15,22 @@ const filterValidator = createOptionalStringValidator(
   ["relevant", "everything"],
   DEFAULT_FILTER
 );
+
+const typeValidator = createOptionalStringValidator(
+  [
+    "SNAPSHOT",
+    "STANDARD",
+    "APPROVAL",
+    "OPTIMISTIC",
+    "OFFCHAIN_OPTIMISTIC",
+    "OFFCHAIN_OPTIMISTIC_TIERED",
+    "OFFCHAIN_STANDARD",
+    "OFFCHAIN_APPROVAL",
+    "OFFCHAIN",
+  ],
+  ""
+);
+
 const limitValidator = createOptionalNumberValidator(
   1,
   DEFAULT_MAX_LIMIT,
@@ -43,6 +59,7 @@ export async function GET(request: NextRequest) {
 
     try {
       const filter = filterValidator.parse(params.get("filter"));
+      const type = typeValidator.parse(params.get("type"));
       const limit = limitValidator.parse(params.get("limit"));
       const offset = offsetValidator.parse(params.get("offset"));
       const proposalsResult = await fetchProposals({
@@ -51,6 +68,7 @@ export async function GET(request: NextRequest) {
           offset,
         },
         filter,
+        type,
       });
       return NextResponse.json(proposalsResult);
     } catch (e: any) {
