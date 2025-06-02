@@ -411,7 +411,7 @@ view OptimismVotes {
   start_block      String?
   description      String?
   proposal_data    Json
-  proposal_type    ProposalType
+  proposal_type    String
   contract         String?      @db.VarChar(42)
   chain_id         Int?
 
@@ -462,7 +462,7 @@ view OptimismProposals {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType
+  proposal_type              String
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?      @db.VarChar(66)
@@ -635,7 +635,7 @@ view ensProposals {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType
+  proposal_type              String
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?      @db.VarChar(66)
@@ -680,7 +680,7 @@ view ensVotes {
   start_block      String?
   description      String?
   proposal_data    Json
-  proposal_type    ProposalType
+  proposal_type    String
   contract         String?
   chain_id         Int?
 
@@ -861,7 +861,7 @@ view etherfiProposals {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType
+  proposal_type              String
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?
@@ -900,7 +900,7 @@ view etherfiVotes {
   start_block      String?
   description      String?
   proposal_data    Json
-  proposal_type    ProposalType
+  proposal_type    String
   contract         String?
   chain_id         Int?
 
@@ -1059,7 +1059,7 @@ view uniswapProposals {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType
+  proposal_type              String
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?      @db.VarChar(66)
@@ -1098,7 +1098,7 @@ view uniswapVotes {
   start_block      String?
   description      String?
   proposal_data    Json
-  proposal_type    ProposalType
+  proposal_type    String
   contract         String?      @db.VarChar(42)
   chain_id         Int?
 
@@ -1475,7 +1475,7 @@ view proposals_wrapper {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType?
+  proposal_type              String?
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?       @db.VarChar(66)
@@ -1531,7 +1531,7 @@ view ens_proposals_wrapper {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType?
+  proposal_type              String?
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?       @db.VarChar
@@ -2006,7 +2006,7 @@ view cyberProposals {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType
+  proposal_type              String
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?      @db.VarChar(66)
@@ -2099,7 +2099,7 @@ view cyberVotes {
   start_block      String?
   description      String?
   proposal_data    Json
-  proposal_type    ProposalType
+  proposal_type    String
   contract         String?       @db.VarChar(42)
   chain_id         Int?
 
@@ -2343,7 +2343,7 @@ view scrollProposals {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType
+  proposal_type              String
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?      @db.VarChar(66)
@@ -2436,7 +2436,7 @@ view scrollVotes {
   start_block      String?
   description      String?
   proposal_data    Json
-  proposal_type    ProposalType
+  proposal_type    String
   contract         String?       @db.VarChar(42)
   chain_id         Int?
 
@@ -2668,7 +2668,7 @@ view deriveProposals {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType
+  proposal_type              String
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?      @db.VarChar(66)
@@ -2762,7 +2762,7 @@ view deriveVotes {
   start_block      String?
   description      String?
   proposal_data    Json
-  proposal_type    ProposalType
+  proposal_type    String
   contract         String?       @db.VarChar(42)
   chain_id         Int?
 
@@ -2995,7 +2995,7 @@ view pguildProposals {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType
+  proposal_type              String
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?      @db.VarChar(66)
@@ -3088,7 +3088,7 @@ view pguildVotes {
   start_block      String?
   description      String?
   proposal_data    Json
-  proposal_type    ProposalType
+  proposal_type    String
   contract         String?       @db.VarChar(42)
   chain_id         Int?
 
@@ -3320,7 +3320,7 @@ view boostProposals {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType
+  proposal_type              String
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?      @db.VarChar(66)
@@ -3413,7 +3413,7 @@ view boostVotes {
   start_block      String?
   description      String?
   proposal_data    Json
-  proposal_type    ProposalType
+  proposal_type    String
   contract         String?       @db.VarChar(42)
   chain_id         Int?
 
@@ -3643,7 +3643,7 @@ view xaiProposals {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType
+  proposal_type              String
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?      @db.VarChar(66)
@@ -3737,7 +3737,7 @@ view xaiVotes {
   start_block      String?
   description      String?
   proposal_data    Json
-  proposal_type    ProposalType
+  proposal_type    String
   contract         String?       @db.VarChar(42)
   chain_id         Int?
 
@@ -3885,7 +3885,7 @@ view b3Proposals {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType
+  proposal_type              String
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?      @db.VarChar(66)
@@ -3942,7 +3942,7 @@ view b3Votes {
   start_block      String?
   description      String?
   proposal_data    Json
-  proposal_type    ProposalType
+  proposal_type    String
   contract         String?       @db.VarChar(42)
   chain_id         Int?
 
@@ -4158,7 +4158,7 @@ view demoProposals {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType
+  proposal_type              String
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?      @db.VarChar(66)
@@ -4245,7 +4245,7 @@ view demoVotes {
   start_block      String?
   description      String?
   proposal_data    Json
-  proposal_type    ProposalType
+  proposal_type    String
   contract         String?      @db.VarChar(42)
   chain_id         Int?
   @@map("votes")
@@ -4458,7 +4458,7 @@ view lineaProposals {
   executed_block             BigInt?
   proposal_data              Json?
   proposal_data_raw          String?
-  proposal_type              ProposalType
+  proposal_type              String
   proposal_type_data         Json?
   proposal_results           Json?
   created_transaction_hash   String?      @db.VarChar(66)
@@ -4545,7 +4545,7 @@ view lineaVotes {
   start_timestamp  String?
   description      String?
   proposal_data    Json
-  proposal_type    ProposalType
+  proposal_type    String
   contract         String?      @db.VarChar(42)
   chain_id         Int?
   @@map("votes")
@@ -4644,6 +4644,7 @@ enum ProposalType {
   APPROVAL
   OPTIMISTIC
   SNAPSHOT
+  OFFCHAIN
 
   @@map("proposal_type")
   @@schema("config")
@@ -4677,6 +4678,8 @@ model OffchainProposals {
   choices                    String[]
   proposal_results           Json?
   proposal_type_id           String?
+  proposal_type              String?
+  tiers                      Int[]
   start_block                String?
   end_block                  String?
   created_block              BigInt?

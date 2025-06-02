@@ -1,7 +1,6 @@
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { TENANT_NAMESPACES } from "./constants";
 import { TenantNamespace } from "./types";
-import { $Enums, ProposalType } from "@prisma/client";
 
 export function findDelagatee({
   namespace,
@@ -157,7 +156,7 @@ export function findSnapshotProposalsQueryFromDb({
     where: {
       contract,
       proposal_type: {
-        equals: ProposalType.SNAPSHOT,
+        equals: "SNAPSHOT",
       },
     },
   };
@@ -200,13 +199,21 @@ export function findProposalsQueryFromDB({
   take,
   filter,
   contract,
+  type,
 }: {
   namespace: TenantNamespace;
   skip: number;
   take: number;
   filter: string;
   contract: string;
+  type?: string;
 }) {
+  const allOffchainProposalTypes = [
+    "OFFCHAIN_STANDARD",
+    "OFFCHAIN_APPROVAL",
+    "OFFCHAIN_OPTIMISTIC",
+    "OFFCHAIN_OPTIMISTIC_TIERED",
+  ];
   const condition = {
     take,
     skip,
@@ -216,6 +223,8 @@ export function findProposalsQueryFromDB({
     where: {
       contract,
       cancelled_block: filter === "relevant" ? null : undefined,
+      proposal_type:
+        type === "OFFCHAIN" ? { in: allOffchainProposalTypes } : type,
     },
     select: {
       // Required by ProposalPayload type

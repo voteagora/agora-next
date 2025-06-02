@@ -15,10 +15,7 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
-import {
-  ProposalStage as PrismaProposalStage,
-  ProposalType,
-} from "@prisma/client";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import { Proposal, ProposalPayload } from "./proposal";
 import { doInSpan } from "@/app/lib/logging";
 import {
@@ -54,9 +51,11 @@ const fetchSnapshotProposalsFromDB = cache(getSnapshotProposalsFromDB);
 async function getProposals({
   filter,
   pagination,
+  type,
 }: {
   filter: string;
   pagination: PaginationParams;
+  type?: string;
 }): Promise<PaginatedResult<Proposal[]>> {
   return withMetrics(
     "getProposals",
@@ -128,6 +127,7 @@ async function getProposals({
                     skip,
                     take,
                     filter,
+                    type,
                     contract: contracts.governor.address,
                   });
 
@@ -211,14 +211,18 @@ async function getProposal(proposalId: string) {
 
     const isPending =
       (isTimeStampBasedTenant
-        ? !isTimestampBasedProposal(proposal) ||
-          Number(getStartTimestamp(proposal)) > latestBlock.timestamp
-        : Number(getStartBlock(proposal)) > latestBlock.number) || !latestBlock;
+        ? !isTimestampBasedProposal(proposal as ProposalPayload) ||
+          Number(getStartTimestamp(proposal as ProposalPayload)) >
+            latestBlock.timestamp
+        : Number(getStartBlock(proposal as ProposalPayload)) >
+          latestBlock.number) || !latestBlock;
 
-    const quorum = isPending ? null : await fetchQuorumForProposal(proposal);
+    const quorum = isPending
+      ? null
+      : await fetchQuorumForProposal(proposal as ProposalPayload);
 
     return parseProposal(
-      proposal,
+      proposal as ProposalPayload,
       latestBlock,
       quorum ?? null,
       BigInt(votableSupply)

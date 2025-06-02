@@ -3,13 +3,10 @@ import {
   ProposalStatus,
   ParsedProposalResults,
 } from "@/lib/proposalUtils";
-import {
-  OptimismProposals,
-  ProposalType,
-  lineaProposals,
-} from "@prisma/client";
+import { OptimismProposals, lineaProposals } from "@prisma/client";
 import { BigNumberish } from "ethers";
 import { Decimal } from "@prisma/client/runtime";
+import { ProposalType } from "@/lib/types";
 
 export type ProposalPayloadFromDAONode = {
   id: string;

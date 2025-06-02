@@ -612,3 +612,13 @@ function ErrorState({
     </TooltipProvider>
   );
 }
+
+export const OffchainCastVoteInput = () => {
+  return (
+    <Button className="w-full" asChild>
+      <a href="https://atlas.optimism.io" target="_blank">
+        Vote in Atlas
+      </a>
+    </Button>
+  );
+};

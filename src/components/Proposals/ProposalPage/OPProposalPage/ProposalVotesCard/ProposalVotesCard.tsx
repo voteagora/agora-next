@@ -3,7 +3,9 @@
 import { useState } from "react";
 import ProposalVotesSummary from "../ProposalVotesSummary/ProposalVotesSummary";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
-import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
+import CastVoteInput, {
+  OffchainCastVoteInput,
+} from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalVotesFilter from "./ProposalVotesFilter";
@@ -12,6 +14,7 @@ import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalN
 const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
   const [isClicked, setIsClicked] = useState(false);
   const [showVoters, setShowVoters] = useState(true);
+  const isOffchain = proposal.proposalType?.startsWith("OFFCHAIN");
 
   const handleClick = () => {
     setIsClicked(!isClicked);
@@ -52,7 +55,11 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
           <ProposalNonVoterList proposal={proposal} />
         )}
         {/* Show the input for the user to vote on a proposal if allowed */}
-        <CastVoteInput proposal={proposal} />
+        {isOffchain ? (
+          <OffchainCastVoteInput />
+        ) : (
+          <CastVoteInput proposal={proposal} />
+        )}
       </div>
     </div>
   );

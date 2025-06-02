@@ -237,6 +237,8 @@ export type PLMConfig = {
 export type BaseProposal = ProposalDraft & {
   checklist_items: ProposalChecklist[];
   proposal_scope?: ProposalScope;
+  tiers_enabled?: boolean;
+  tiers?: number[];
 };
 
 export type BasicProposal = BaseProposal & {
@@ -311,6 +313,8 @@ const parseTransaction = (t: ProposalDraftTransaction) => {
 export const parseProposalToForm = (proposal: DraftProposal) => {
   const baseFields = {
     proposal_scope: proposal.proposal_scope,
+    tiers_enabled: proposal.tiers_enabled,
+    tiers: proposal.tiers,
   };
 
   switch (proposal.voting_module_type) {

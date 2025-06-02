@@ -3,9 +3,8 @@ import {
   ProposalPayloadFromDB,
 } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
+import { ProposalType } from "@/lib/types";
 import { cache } from "react";
-import { PaginatedResult } from "../pagination";
-import { ProposalType } from "@prisma/client";
 
 const { contracts, namespace } = Tenant.current();
 

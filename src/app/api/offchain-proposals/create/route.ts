@@ -3,7 +3,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types.d";
 import { getPublicClient } from "@/lib/viem";
 import { generateProposalId } from "@/lib/seatbelt/simulate";
 
@@ -15,6 +15,8 @@ interface OffchainProposalRequestBody {
     proposal_type_id: number;
     start_block: string;
     end_block: string;
+    proposal_type: ProposalType;
+    tiers: number[];
   };
   id: string;
   transactionHash: string;
@@ -64,6 +66,8 @@ export async function POST(request: NextRequest) {
     proposal_type_id,
     start_block,
     end_block,
+    proposal_type,
+    tiers,
   } = proposalData;
 
   try {
@@ -95,6 +99,8 @@ export async function POST(request: NextRequest) {
         description: description,
         choices: choices,
         proposal_type_id: proposal_type_id.toString(),
+        proposal_type: proposal_type,
+        tiers: tiers,
         start_block: start_block.toString(),
         end_block: end_block.toString(),
         created_transaction_hash: transactionHash,
