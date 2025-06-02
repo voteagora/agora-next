@@ -10,6 +10,7 @@ import ApprovalOptionsRow from "./ApprovalOptionsRow";
 import StandardForm from "./StandardForm";
 import SubmitButton from "./SubmitButton";
 import JointHouseSettings from "./JointHouseSettings";
+import TiersSettings from "./TiersSettings";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalScope } from "@/app/proposals/draft/types";
 
@@ -25,6 +26,8 @@ type FormValues = {
   topChoices: number;
   options: Option[];
   proposal_scope?: ProposalScope;
+  tiers_enabled?: boolean;
+  tiers?: number[];
 };
 
 type Option = {
@@ -64,6 +67,8 @@ export default function CreateProposalForm({
     topChoices: 1,
     options: [{ title: "", transactions: [] }],
     proposal_scope: ProposalScope.ONCHAIN_ONLY,
+    tiers_enabled: false,
+    tiers: [],
   };
   const form = useForm<FormValues>(() => initialFormValues);
   const formTarget = useRef<HTMLFormElement>(null);
@@ -90,6 +95,7 @@ export default function CreateProposalForm({
               form={form}
               proposalSettingsList={proposalSettingsList}
             />
+            <TiersSettings form={form} />
             <TitleDescriptionRow form={form} />
           </div>
           {form.state.proposalType === "Approval" && (

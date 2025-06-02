@@ -141,6 +141,8 @@ const BaseProposalSchema = z.object({
   simulation_state: z.string().optional(), // unconfirmed, valid, invalid
   simulation_id: z.string().optional(),
   proposal_scope: z.nativeEnum(ProposalScope).optional(),
+  tiers_enabled: z.boolean().optional(),
+  tiers: z.array(z.number()).optional(),
 });
 
 export const BasicProposalSchema = BaseProposalSchema.extend({

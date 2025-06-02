@@ -151,10 +151,13 @@ export default async function Page({
   let RenderComponent;
   switch (proposal.proposalType) {
     case "STANDARD":
+    case "OFFCHAIN_STANDARD":
       RenderComponent = StandardProposalPage;
       break;
 
     case "OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED":
       RenderComponent = OPProposalOptimisticPage;
       break;
     case "APPROVAL":
