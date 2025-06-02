@@ -21,13 +21,18 @@ interface Props {
   }) => Promise<PaginatedResult<DelegateChunk[]>>;
 }
 
+const batchSize = 50;
+
 export default function DelegateCardList({
   initialDelegates,
   fetchDelegates,
 }: Props) {
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
-  const [delegates, setDelegates] = useState(initialDelegates.data);
+  const [delegates, setDelegates] = useState(
+    initialDelegates.data.slice(0, batchSize)
+  );
+  const [dataFromServer, setDataFromServer] = useState<DelegateChunk[]>(initialDelegates.data);
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
   const { ui } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
@@ -36,25 +41,44 @@ export default function DelegateCardList({
   const showParticipation = ui.toggle("show-participation")?.enabled || false;
 
   useEffect(() => {
-    setIsDelegatesFiltering(false);
-    setDelegates(initialDelegates.data);
+    setDelegates(initialDelegates.data.slice(0, batchSize));
     setMeta(initialDelegates.meta);
+    setDataFromServer(initialDelegates.data);
+    setIsDelegatesFiltering(false);
   }, [initialDelegates, setIsDelegatesFiltering]);
 
   const loadMore = async () => {
-    if (!fetching.current && meta.has_next) {
+    if (!fetching.current && meta.has_next && !isDelegatesFiltering) {
       try {
         fetching.current = true;
 
-        console.log("😍 showParticipation - B", showParticipation);
+        // Check if we have more initial data to show
+        const remainingInitialData = dataFromServer.slice(
+          delegates.length
+        );
 
-        const data = await fetchDelegates({
-          pagination: { offset: meta.next_offset, limit: meta.total_returned },
-          seed: initialDelegates.seed || Math.random(),
-          showParticipation,
-        });
-        setDelegates(delegates.concat(data.data));
-        setMeta(data.meta);
+        if (remainingInitialData.length > 0) {
+          const nextBatch = remainingInitialData.slice(0, batchSize);
+          setDelegates((prev) => [...prev, ...nextBatch]);
+          setMeta((prev) => ({
+            ...prev,
+            has_next: remainingInitialData.length > batchSize,
+            next_offset: meta.next_offset + nextBatch.length,
+          }));
+        } else {
+          // No more initial data, fetch from API
+          const data = await fetchDelegates({
+            pagination: {
+              offset: meta.next_offset,
+              limit: meta.total_returned,
+            },
+            seed: initialDelegates.seed || Math.random(),
+            showParticipation,
+          });
+          setDataFromServer((prev) => [...prev, ...data.data]);
+          setDelegates((prev) => [...prev, ...data.data.slice(0, batchSize)]);
+          setMeta(data.meta);
+        }
       } catch (error) {
         console.error("Error loading more delegates:", error);
       } finally {
@@ -98,7 +122,7 @@ export default function DelegateCardList({
 
           return (
             <DelegateCard
-              key={idx}
+              key={delegate.address + idx}
               delegate={delegate}
               truncatedStatement={truncatedStatement}
               isDelegatesFiltering={isDelegatesFiltering}
