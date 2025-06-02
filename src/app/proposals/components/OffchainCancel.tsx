@@ -33,6 +33,12 @@ export const OffchainCancel = ({ proposal }: Props) => {
     const signer = new JsonRpcSigner(provider, address);
 
     try {
+      const apiKey = process.env.NEXT_PUBLIC_AGORA_API_KEY;
+
+      if (!apiKey) {
+        throw new Error("AGORA_API_KEY is not set");
+      }
+
       const { transactionHash } = await cancelProposalAttestation({
         id: proposal.id,
         signer: signer,
@@ -43,6 +49,7 @@ export const OffchainCancel = ({ proposal }: Props) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
           proposalId: proposal.id,
