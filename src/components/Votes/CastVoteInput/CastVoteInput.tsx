@@ -624,10 +624,12 @@ function ErrorState({
 
 export const OffchainCastVoteInput = () => {
   return (
-    <Button className="w-full" asChild>
-      <a href="https://atlas.optimism.io" target="_blank">
-        Vote in Atlas
-      </a>
-    </Button>
+    <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+      <Button className="w-full" asChild>
+        <a href="https://atlas.optimism.io" target="_blank">
+          Vote in Atlas
+        </a>
+      </Button>
+    </div>
   );
 };
