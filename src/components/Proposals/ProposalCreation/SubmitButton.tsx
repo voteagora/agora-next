@@ -178,22 +178,24 @@ export default function SubmitButton({
 
       let onchainProposalId: string | null = null;
 
-      const targets = form.state.options[0].transactions.map((t) => t.target);
-      const values = form.state.options[0].transactions.map((t) =>
-        BigInt(t.value.toString() || "0")
-      );
-      const calldatas = form.state.options[0].transactions.map(
-        (t) => t.calldata
-      );
       const proposalType = form.state.proposalType.toLowerCase() as
         | "basic"
         | "approval"
         | "optimistic";
-      const unformattedProposalData = getUnformattedProposalData(form);
+      const targets =
+        proposalType === "basic" ? (inputData[0] as string[]) : null;
+      const values =
+        proposalType === "basic" ? (inputData[1] as bigint[]) : null;
+      const calldatas =
+        proposalType === "basic" ? (inputData[2] as string[]) : null;
+      const description =
+        proposalType === "basic"
+          ? (inputData[3] as string)
+          : (inputData[2] as string);
       const moduleAddress =
-        getProposalTypeAddress(
-          form.state.proposalType.toLowerCase() as ProposalType
-        ) || undefined;
+        proposalType !== "basic" ? (inputData[0] as string) : undefined;
+      const unformattedProposalData =
+        proposalType !== "basic" ? (inputData[1] as string) : undefined;
       const offchainOnly =
         form.state.proposal_scope === ProposalScope.OFFCHAIN_ONLY;
 
@@ -203,7 +205,7 @@ export default function SubmitButton({
             targets,
             values,
             calldatas,
-            description: rawProposalDataForBackend.description,
+            description,
             proposalType,
             unformattedProposalData,
             moduleAddress,
