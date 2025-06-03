@@ -20,13 +20,7 @@ interface OffchainProposalRequestBody {
   };
   id: string;
   transactionHash: string;
-  targets?: string[];
-  values?: bigint[];
-  calldatas?: string[];
-  proposalType: "basic" | "approval" | "optimistic";
-  unformattedProposalData?: string;
-  moduleAddress?: string;
-  offchainOnly?: boolean;
+  onchainProposalId: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -47,18 +41,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const {
-    proposalData,
-    targets,
-    values,
-    calldatas,
-    id,
-    transactionHash,
-    proposalType,
-    unformattedProposalData,
-    moduleAddress,
-    offchainOnly,
-  } = requestBody;
+  const { proposalData, onchainProposalId, id, transactionHash } = requestBody;
   const {
     proposer,
     description,
@@ -72,22 +55,6 @@ export async function POST(request: NextRequest) {
 
   try {
     const latestBlock = await getPublicClient().getBlockNumber();
-
-    let onchainProposalId: string | null = null;
-
-    if (targets && values && calldatas && !offchainOnly) {
-      onchainProposalId = (
-        await generateProposalId({
-          targets,
-          values,
-          calldatas,
-          description,
-          proposalType,
-          unformattedProposalData,
-          moduleAddress,
-        })
-      ).toString();
-    }
 
     const dbProposal = await prismaWeb2Client.offchainProposals.create({
       data: {
@@ -103,7 +70,7 @@ export async function POST(request: NextRequest) {
         tiers: tiers,
         start_block: start_block.toString(),
         end_block: end_block.toString(),
-        created_transaction_hash: transactionHash,
+        created_attestation_hash: transactionHash,
         created_block: latestBlock,
       },
     });

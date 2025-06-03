@@ -14,8 +14,8 @@ const { slug } = Tenant.current();
 
 const CREATE_PROPOSAL_SCHEMA_ID =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? "0xb7d3c3baaf4b76cd4b4a14e87fc9660b3ad07b7b962a589dcd073aae407e759e"
-    : "0xb7d3c3baaf4b76cd4b4a14e87fc9660b3ad07b7b962a589dcd073aae407e759e";
+    ? "0x60690c8647ba265b168257134a577e1faa19708dce6b9332e96844a190992b90"
+    : "0x60690c8647ba265b168257134a577e1faa19708dce6b9332e96844a190992b90";
 
 const CANCEL_PROPOSAL_SCHEMA_ID =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
@@ -23,7 +23,7 @@ const CANCEL_PROPOSAL_SCHEMA_ID =
     : "0x93dbaf80a47c49a96e9ad6e038a064088d322f9b42d4e4bd8e78efb947b448ad";
 
 const schemaEncoder = new SchemaEncoder(
-  "address contract,string id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block, string proposal_type, uint256[] tiers"
+  "address contract,string id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block, string proposal_type, uint256[] tiers, string onchain_proposalid"
 );
 
 const schemaEncoderCancel = new SchemaEncoder("string id");
@@ -44,6 +44,7 @@ export async function createProposalAttestation({
   signer,
   proposal_type,
   tiers,
+  onchain_proposalid,
 }: {
   contract: string;
   proposer: string;
@@ -55,6 +56,7 @@ export async function createProposalAttestation({
   proposal_type: string;
   tiers: number[];
   signer: JsonRpcSigner;
+  onchain_proposalid?: string | null;
 }) {
   const id = keccak256(
     defaultAbiCoder.encode(
@@ -74,6 +76,11 @@ export async function createProposalAttestation({
     { name: "end_block", value: BigInt(end_block), type: "uint256" },
     { name: "proposal_type", value: proposal_type, type: "string" },
     { name: "tiers", value: tiers, type: "uint256[]" },
+    {
+      name: "onchain_proposalid",
+      value: onchain_proposalid || "",
+      type: "string",
+    },
   ]);
 
   const recipient = "0x0000000000000000000000000000000000000000";

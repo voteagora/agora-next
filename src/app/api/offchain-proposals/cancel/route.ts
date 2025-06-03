@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       },
       data: {
         cancelled_block: latestBlock,
-        cancelled_transaction_hash: transactionHash,
+        cancelled_attestation_hash: transactionHash,
       },
     });
 
