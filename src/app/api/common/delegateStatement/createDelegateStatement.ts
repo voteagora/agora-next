@@ -6,6 +6,7 @@ import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { Prisma } from "@prisma/client";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
+import { createHash } from "crypto";
 
 export async function createDelegateStatement({
   address,
@@ -40,9 +41,14 @@ export async function createDelegateStatement({
     delegateStatement: sanitizeContent(delegateStatement.delegateStatement),
   };
 
+  const stopGapMessageHash = createHash("sha256")
+    .update(sanitizedStatement.delegateStatement)
+    .digest("hex");
+
   const data = {
     address: address.toLowerCase(),
     dao_slug: slug,
+    message_hash: stopGapMessageHash,
     signature,
     payload: sanitizedStatement as Prisma.InputJsonValue,
     twitter,
@@ -58,9 +64,10 @@ export async function createDelegateStatement({
 
   return prismaWeb2Client.delegateStatements.upsert({
     where: {
-      address_dao_slug: {
+      address_dao_slug_message_hash: {
         address: address.toLowerCase(),
         dao_slug: slug,
+        message_hash: stopGapMessageHash,
       },
     },
     update: data,

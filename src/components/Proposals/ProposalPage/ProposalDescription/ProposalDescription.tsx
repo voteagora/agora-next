@@ -57,7 +57,7 @@ export default function ProposalDescription({
 
   return (
     <div
-      className={`flex flex-col gap-4 sm:max-w-[48rem] w-full max-w-[calc(100vw-2rem)]`}
+      className={`flex flex-col gap-4 sm:max-w-[48rem] w-full md:min-w-[20rem] lg:min-w-[32rem] xl:min-w-[48rem] max-w-[calc(100vw-2rem)]`}
     >
       <ProposalTitle title={shortTitle} proposal={proposal} />
       <ProposalChart proposal={proposal} />

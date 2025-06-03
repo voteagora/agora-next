@@ -3,14 +3,16 @@ import {
   ProposalPayloadFromDB,
 } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
+import { ProposalType } from "@/lib/types";
+import { unstable_cache } from "next/cache";
 import { cache } from "react";
-import { PaginatedResult } from "../pagination";
-import { ProposalType } from "@prisma/client";
 
-const { contracts, namespace } = Tenant.current();
+const { namespace, ui } = Tenant.current();
 
+// DO NOT ENABLE DAO-NODE PROPOSALS UNTIL TODO BELOW IS HANDLED
 export function adaptDAONodeResponse(
-  apiResponse: ProposalPayloadFromDAONode
+  apiResponse: ProposalPayloadFromDAONode,
+  proposalTypes: any
 ): ProposalPayloadFromDB {
   const votingModuleName = apiResponse.voting_module_name;
 
@@ -64,6 +66,11 @@ export function adaptDAONodeResponse(
     throw new Error(`Unknown voting module name: ${votingModuleName}`);
   }
 
+  const proposalType = proposalTypes[String(apiResponse.proposal_type)];
+  const parsedProposalType = Object.assign(proposalType, {
+    proposal_type_id: String(apiResponse.proposal_type),
+  });
+
   return {
     proposal_id: apiResponse.id,
     proposer: apiResponse.proposer.toLowerCase(),
@@ -82,7 +89,9 @@ export function adaptDAONodeResponse(
       : null,
     proposal_data: proposalData,
     proposal_type: apiResponse.voting_module_name.toUpperCase() as ProposalType,
-    proposal_type_data: null,
+    // TODO: Add proposal type data
+    // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL THIS IS HANDLED
+    proposal_type_data: parsedProposalType,
     proposal_results: proposalResults,
 
     proposal_data_raw: apiResponse.proposal_data,
@@ -104,18 +113,26 @@ export const getDaoNodeURLForNamespace = (namespace: string) => {
   return parsedUrl;
 };
 
-export const getProposalTypesFromDaoNode = async () => {
-  const url = getDaoNodeURLForNamespace(namespace);
-  const supportScopes = contracts.supportScopes;
-  if (!url || !supportScopes) {
-    return null;
+export const getProposalTypesFromDaoNode = unstable_cache(
+  async () => {
+    const url = getDaoNodeURLForNamespace(namespace);
+    const useDaoNodeForProposalTypes = ui.toggle(
+      "use-daonode-for-proposal-types"
+    )?.enabled;
+    if (!url || !useDaoNodeForProposalTypes) {
+      return null;
+    }
+
+    const response = await fetch(`${url}v1/proposal_types`);
+    const data = await response.json();
+
+    return data;
+  },
+  ["proposal-types"],
+  {
+    revalidate: 60, // 1 minute
   }
-
-  const response = await fetch(`${url}v1/proposal_types`);
-  const data = await response.json();
-
-  return data;
-};
+);
 
 export const getAllProposalsFromDaoNode = async () => {
   const url = getDaoNodeURLForNamespace(namespace);

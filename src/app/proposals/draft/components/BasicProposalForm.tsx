@@ -19,7 +19,9 @@ import { StructuredReport } from "@/components/Simulation/StructuredReport";
 
 type FormType = z.output<typeof BasicProposalSchema>;
 
-export const TENDERLY_VALID_CHAINS = [1, 10, 11155111, 8453, 42161, 534352];
+export const TENDERLY_VALID_CHAINS = [
+  1, 11155111, 10, 11155420, 42161, 421614, 8453, 534352,
+];
 
 // just the parts of the transaction that actually matter on-chain
 const stringifyTransactionDetails = (transaction: any) => {

@@ -240,3 +240,13 @@ export interface FormattedProposalType {
   isClientSide?: boolean;
   scopes?: ScopeData[];
 }
+
+export type ProposalType =
+  | "STANDARD"
+  | "APPROVAL"
+  | "OPTIMISTIC"
+  | "SNAPSHOT"
+  | "OFFCHAIN_STANDARD"
+  | "OFFCHAIN_APPROVAL"
+  | "OFFCHAIN_OPTIMISTIC"
+  | "OFFCHAIN_OPTIMISTIC_TIERED";

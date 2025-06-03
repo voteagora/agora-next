@@ -15,10 +15,7 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
-import {
-  ProposalStage as PrismaProposalStage,
-  ProposalType,
-} from "@prisma/client";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import { Proposal, ProposalPayload } from "./proposal";
 import { doInSpan } from "@/app/lib/logging";
 import {
@@ -38,6 +35,8 @@ import {
   getProposalTypesFromDaoNode,
 } from "@/app/lib/dao-node/client";
 
+// Is this working? Not sure, but i don't think so.
+// TODO: Check before enabling DAO-NODE PROPOSALS
 function getSnapshotProposalsFromDB() {
   const { namespace, contracts } = Tenant.current();
 
@@ -76,7 +75,10 @@ async function getProposals({
               proposalsResult = await paginateResult(
                 async (skip: number, take: number) => {
                   try {
-                    let data = await getCachedAllProposalsFromDaoNode();
+                    let [data, typesFromApi] = await Promise.all([
+                      getCachedAllProposalsFromDaoNode(),
+                      getProposalTypesFromDaoNode(),
+                    ]);
 
                     if (filter == "relevant") {
                       data = data.filter((proposal) => {
@@ -87,7 +89,12 @@ async function getProposals({
                     // We could do this in the cache,
                     // but it's tech-debt I don't want the client
                     // to absorbe.
-                    data = data.map(adaptDAONodeResponse);
+                    data = data.map((proposal) =>
+                      adaptDAONodeResponse(
+                        proposal,
+                        typesFromApi.proposal_types
+                      )
+                    );
 
                     if (useSnapshot) {
                       const snapshotData = await fetchSnapshotProposalsFromDB();
@@ -209,14 +216,18 @@ async function getProposal(proposalId: string) {
 
     const isPending =
       (isTimeStampBasedTenant
-        ? !isTimestampBasedProposal(proposal) ||
-          Number(getStartTimestamp(proposal)) > latestBlock.timestamp
-        : Number(getStartBlock(proposal)) > latestBlock.number) || !latestBlock;
+        ? !isTimestampBasedProposal(proposal as ProposalPayload) ||
+          Number(getStartTimestamp(proposal as ProposalPayload)) >
+            latestBlock.timestamp
+        : Number(getStartBlock(proposal as ProposalPayload)) >
+          latestBlock.number) || !latestBlock;
 
-    const quorum = isPending ? null : await fetchQuorumForProposal(proposal);
+    const quorum = isPending
+      ? null
+      : await fetchQuorumForProposal(proposal as ProposalPayload);
 
     return parseProposal(
-      proposal,
+      proposal as ProposalPayload,
       latestBlock,
       quorum ?? null,
       BigInt(votableSupply)

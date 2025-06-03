@@ -184,5 +184,9 @@ If you need help creating transactions / calldata, please see this [video](https
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
       },
     },
+    {
+      name: "use-daonode-for-proposal-types",
+      enabled: false,
+    },
   ],
 });
