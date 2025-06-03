@@ -473,6 +473,11 @@ async function getAllDelegatorsInChainsForAddress({
 }) {
   return withMetrics("getAllDelegatorsInChainsForAddress", async () => {
     const { namespace, contracts } = Tenant.current();
+
+    if (!contracts.alligator) {
+      return [];
+    }
+
     const allAddresess = await prismaWeb2Client.$queryRawUnsafe<
       { addresses: string[] }[]
     >(
