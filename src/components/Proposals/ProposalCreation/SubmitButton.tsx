@@ -25,6 +25,7 @@ import toast from "react-hot-toast";
 import { createProposalAttestation } from "@/lib/eas";
 import { getPublicClient } from "@/lib/viem";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
+import { generateProposalId } from "@/lib/seatbelt/simulate";
 
 const { contracts, ui } = Tenant.current();
 const abiCoder = new AbiCoder();
@@ -175,6 +176,41 @@ export default function SubmitButton({
         tiers: form.state.tiers,
       };
 
+      let onchainProposalId: string | null = null;
+
+      const targets = form.state.options[0].transactions.map((t) => t.target);
+      const values = form.state.options[0].transactions.map((t) =>
+        BigInt(t.value.toString() || "0")
+      );
+      const calldatas = form.state.options[0].transactions.map(
+        (t) => t.calldata
+      );
+      const proposalType = form.state.proposalType.toLowerCase() as
+        | "basic"
+        | "approval"
+        | "optimistic";
+      const unformattedProposalData = getUnformattedProposalData(form);
+      const moduleAddress =
+        getProposalTypeAddress(
+          form.state.proposalType.toLowerCase() as ProposalType
+        ) || undefined;
+      const offchainOnly =
+        form.state.proposal_scope === ProposalScope.OFFCHAIN_ONLY;
+
+      if (targets && values && calldatas && !offchainOnly) {
+        onchainProposalId = (
+          await generateProposalId({
+            targets,
+            values,
+            calldatas,
+            description: rawProposalDataForBackend.description,
+            proposalType,
+            unformattedProposalData,
+            moduleAddress,
+          })
+        ).toString();
+      }
+
       const { id, transactionHash } = await createProposalAttestation({
         contract: governorContract.address as `0x${string}`,
         proposer: rawProposalDataForBackend.proposer,
@@ -186,9 +222,8 @@ export default function SubmitButton({
         proposal_type: parsedProposalType,
         tiers: form.state.tiers || [],
         signer: signer,
+        onchain_proposalid: onchainProposalId,
       });
-
-      const unformattedProposalData = getUnformattedProposalData(form);
 
       const apiKey = process.env.NEXT_PUBLIC_AGORA_API_KEY;
 
@@ -215,18 +250,7 @@ export default function SubmitButton({
           },
           id,
           transactionHash,
-          proposalType: form.state.proposalType.toLowerCase(),
-          offchainOnly:
-            form.state.proposal_scope === ProposalScope.OFFCHAIN_ONLY,
-          moduleAddress: getProposalTypeAddress(
-            form.state.proposalType.toLowerCase() as ProposalType
-          ),
-          unformattedProposalData,
-          targets: form.state.options[0].transactions.map((t) => t.target),
-          values: form.state.options[0].transactions.map(
-            (t) => t.value.toString() || "0"
-          ),
-          calldatas: form.state.options[0].transactions.map((t) => t.calldata),
+          onchainProposalId,
         }),
       });
 

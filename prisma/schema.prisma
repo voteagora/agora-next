@@ -4683,13 +4683,13 @@ model OffchainProposals {
   start_block                String?
   end_block                  String?
   created_block              BigInt?
-  created_transaction_hash   String?
+  created_attestation_hash   String?
   queued_block               BigInt?
-  queued_transaction_hash    String?
+  queued_attestation_hash    String?
   cancelled_block            BigInt?
-  cancelled_transaction_hash String?
+  cancelled_attestation_hash String?
   executed_block             BigInt?
-  executed_transaction_hash  String?
+  executed_attestation_hash  String?
 
   @@index([dao_slug], name: "ix_offchain_proposals_dao_slug")
   @@schema("alltenant")
