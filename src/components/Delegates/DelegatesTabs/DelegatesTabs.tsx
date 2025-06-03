@@ -8,7 +8,6 @@ import { useQueryState } from "nuqs";
 import { cn } from "@/lib/utils";
 
 import DelegatesSortFilter from "@/components/Delegates/DelegatesFilter/DelegatesSortFilter";
-import CitizensSortFilter from "@/components/Delegates/DelegatesFilter/CitizensSortFilter";
 import { DelegatesFilter } from "@/components/Delegates/DelegatesFilter/DelegatesFilter";
 
 import { DelegatesFilterChips } from "@/components/Delegates/DelegatesTabs/DelegatesFilterChips";
