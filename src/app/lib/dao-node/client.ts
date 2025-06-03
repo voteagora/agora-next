@@ -7,6 +7,7 @@ import { ProposalType } from "@/lib/types";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import { DelegateStats } from "@/lib/types";
 
 const { namespace, ui } = Tenant.current();
 
@@ -389,6 +390,36 @@ export const getDelegatesFromDaoNode = async (options?: {
     }
   } catch (error) {
     console.error("Error fetching delegates from DAO node:", error);
+    return null;
+  }
+};
+
+/**
+ * Fetches participation statistics for a delegate address from the DAO node
+ * @param address The delegate address to fetch stats for
+ * @returns Participation stats or null if fetching fails
+ */
+export const getDelegateDataFromDaoNode = async (
+  address: string
+): Promise<DelegateStats | null> => {
+  const url = getDaoNodeURLForNamespace(namespace);
+  if (!url) {
+    return null;
+  }
+  try {
+    // Fetch delegate data for participation rate
+    const delegateRes = await fetch(`${url}v1/delegate/${address}`);
+    // Check if the response was successful
+    if (!delegateRes.ok) {
+      console.error(
+        `Failed to fetch delegate data: ${delegateRes.status} ${delegateRes.statusText}`
+      );
+      return null;
+    }
+
+    return (await delegateRes.json()) as DelegateStats;
+  } catch (error) {
+    console.error("Error in getDelegateDataFromDaoNode:", error);
     return null;
   }
 };
