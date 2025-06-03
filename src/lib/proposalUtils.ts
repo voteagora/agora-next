@@ -1061,6 +1061,10 @@ export async function getProposalStatus(
   }
 }
 
+const ensureHexPrefix = (hex: string): `0x${string}` => {
+  return hex.startsWith("0x") ? (hex as `0x${string}`) : `0x${hex}`;
+};
+
 export const proposalToCallArgs = (proposal: Proposal) => {
   const dynamicProposalType: keyof ParsedProposalData =
     proposal.proposalType as keyof ParsedProposalData;
@@ -1070,7 +1074,9 @@ export const proposalToCallArgs = (proposal: Proposal) => {
   return [
     "options" in proposalData ? proposalData.options[0].targets : "",
     "options" in proposalData ? proposalData.options[0].values : "",
-    "options" in proposalData ? proposalData.options[0].calldatas : "",
+    "options" in proposalData
+      ? proposalData.options[0].calldatas.map(ensureHexPrefix)
+      : "",
     keccak256(toUtf8Bytes(proposal.description!)),
   ];
 };
