@@ -28,9 +28,9 @@ export default async function Page() {
     <div className="mt-12">
       <NewStakeFlow
         delegates={delegates}
-        fetchDelegates={async (pagination, seed) => {
+        fetchDelegates={async (args) => {
           "use server";
-          return apiFetchDelegates({ pagination, seed, sort });
+          return apiFetchDelegates({ ...args, sort });
         }}
         refreshPath={async (path) => {
           "use server";

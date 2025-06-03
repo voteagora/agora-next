@@ -6,6 +6,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { ProposalType } from "@/lib/types";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
+import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
 
 const { namespace, ui } = Tenant.current();
 
@@ -101,6 +102,29 @@ export function adaptDAONodeResponse(
     queued_transaction_hash: null,
     executed_transaction_hash: null,
   };
+}
+
+interface MappedDelegate {
+  address: string;
+  votingPower: {
+    total: string;
+    direct: string;
+    advanced: string;
+  };
+  statement: {
+    address: string;
+    payload: {
+      delegateStatement: string;
+      topIssues: { type: string; value: string }[];
+      topStakeholders: { type: string }[];
+    };
+    endorsed: boolean;
+  } | null;
+  numOfDelegators: string;
+  vpChange7d: string;
+  participation: number;
+  mostRecentDelegationBlock: number;
+  lastVoteBlock: number;
 }
 
 export const getDaoNodeURLForNamespace = (namespace: string) => {
@@ -250,3 +274,121 @@ export const getCachedAllProposalsFromDaoNode = cache(
     proposal_type: 'STANDARD'
   }
   */
+
+export const getDelegatesFromDaoNode = async (options?: {
+  sortBy?: string;
+  reverse?: boolean;
+  limit?: number;
+  offset?: number;
+  filters?: {
+    delegator?: `0x${string}`;
+  };
+  performInternalPagination?: boolean;
+  withParticipation?: boolean;
+}) => {
+  const url = getDaoNodeURLForNamespace(namespace);
+  if (!url) {
+    return null;
+  }
+
+  try {
+    const sortBy = options?.sortBy || "VP";
+    const reverse = options?.reverse ?? true;
+    const filters = options?.filters;
+
+    // TODO: Properly cache this... SMH
+    // entire point of DAO node is to serve up full state
+    // not give tiny little pages.
+    // We're setting this at 1000, and gambling that
+    // nothing above 1000 will be needed in any given
+    // page passed onto the client.
+
+    // if this functions, we can either have DAO-node return a full count
+    // and use that intelligence to properly detect when 1000 is insufficient
+    // or we can have DAO-node return a "hasMore" boolean or something.
+
+    const queryParams = new URLSearchParams({
+      sort_by: sortBy,
+      reverse: reverse.toString(),
+      include:
+        "VP,DC," + (options?.withParticipation ? "PR," : "") + "LVB,MRD,VPC",
+      page_size: "1000",
+      offset: "0",
+    });
+
+    if (filters?.delegator) {
+      queryParams.append("delegator", filters.delegator);
+    }
+
+    const response = await fetch(`${url}v1/delegates?${queryParams}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch delegates: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data && data.delegates && data.delegates.length > 0) {
+      const allRawDelegatesFromApi = data.delegates;
+      const totalBeforeInternalPagination = allRawDelegatesFromApi.length;
+
+      let delegatesToFetchStatementsFor = [...allRawDelegatesFromApi];
+
+      delegatesToFetchStatementsFor = allRawDelegatesFromApi.slice(0, 1000);
+
+      let mappedDelegates: MappedDelegate[] = [];
+
+      if (delegatesToFetchStatementsFor.length > 0) {
+        const delegateAddresses = delegatesToFetchStatementsFor.map(
+          (delegate: { addr: string }) => delegate.addr.toLowerCase()
+        );
+
+        const statements = await fetchDelegateStatements({
+          addresses: delegateAddresses,
+        });
+
+        const statementMap: Map<string, any> = new Map();
+        statements.forEach((statement) => {
+          if (statement) {
+            statementMap.set(statement.address.toLowerCase(), statement);
+          }
+        });
+
+        mappedDelegates = delegatesToFetchStatementsFor.map(
+          (delegateFromDaoNode: {
+            addr: string;
+            VP?: string;
+            DC?: number;
+            PR?: number;
+            VPC?: string;
+            MRD?: number;
+            LVB?: number;
+          }) => {
+            const lowerCaseAddress = delegateFromDaoNode.addr.toLowerCase();
+            return {
+              address: lowerCaseAddress,
+              votingPower: {
+                total: delegateFromDaoNode.VP || "0",
+                direct: delegateFromDaoNode.VP || "0",
+                advanced: "0",
+              },
+              statement: statementMap.get(lowerCaseAddress) || null,
+              numOfDelegators: delegateFromDaoNode.DC?.toString() || "0",
+              vpChange7d: delegateFromDaoNode.VPC || "0",
+              participation: delegateFromDaoNode.PR || 0,
+              mostRecentDelegationBlock: delegateFromDaoNode.MRD || 0,
+              lastVoteBlock: delegateFromDaoNode.LVB || 0,
+            };
+          }
+        );
+      }
+
+      return {
+        delegates: mappedDelegates,
+        totalBeforeInternalPagination: totalBeforeInternalPagination,
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching delegates from DAO node:", error);
+    return null;
+  }
+};

@@ -54,4 +54,9 @@ export type DelegatesSort =
   | "most_delegators"
   | "weighted_random"
   | "voting_power"
-  | "least_voting_power";
+  | "least_voting_power"
+  | "most_recent_delegation"
+  | "oldest_delegation"
+  | "latest_voting_block"
+  | "vp_change_7d"
+  | "vp_change_7d_desc";
