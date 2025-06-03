@@ -327,5 +327,9 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
       name: "use-daonode-for-proposal-types",
       enabled: false,
     },
+    {
+      name: "show-participation",
+      enabled: true,
+    },
   ],
 });
