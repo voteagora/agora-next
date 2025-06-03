@@ -69,20 +69,16 @@ const Issue = ({ title, icon, value }: IssueProps) => {
           </div>
         </div>
 
-
-          {value.trim() !== "" ? (
-              <div className="flex flex-col">
-                <div className="text-xs font-medium text-secondary">{title}</div>
-                <div className="text-primary">{value}</div>
-              </div>
-            ) : (
-              <div className="flex flex-col self-center">
-                <div className="text-large font-medium text-secondary">
-                  {title}
-                </div>
-              </div>
-            )
-          }
+        {value.trim() !== "" ? (
+          <div className="flex flex-col">
+            <div className="text-xs font-medium text-secondary">{title}</div>
+            <div className="text-primary">{value}</div>
+          </div>
+        ) : (
+          <div className="flex flex-col self-center">
+            <div className="text-large font-medium text-secondary">{title}</div>
+          </div>
+        )}
       </div>
     </div>
   );
