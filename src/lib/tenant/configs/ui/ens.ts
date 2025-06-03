@@ -296,5 +296,9 @@ For a full walkthrough of the proposal process, check out the [ENS DAO docs](htt
       name: "use-daonode-for-proposal-types",
       enabled: false,
     },
+    {
+      name: "show-participation",
+      enabled: true,
+    },
   ],
 });

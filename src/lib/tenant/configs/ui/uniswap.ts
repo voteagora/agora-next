@@ -357,5 +357,9 @@ export const uniswapTenantUIConfig = new TenantUI({
       name: "use-daonode-for-proposal-types",
       enabled: false,
     },
+    {
+      name: "show-participation",
+      enabled: true,
+    },
   ],
 });
