@@ -5,7 +5,7 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
 import { PaginatedResult } from "../pagination";
-import { ProposalType } from "@prisma/client";
+import { ProposalType } from "@/lib/types";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { DelegateStats } from "@/lib/types";
 
