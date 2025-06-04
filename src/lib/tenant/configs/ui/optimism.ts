@@ -279,12 +279,12 @@ export const optimismTenantUIConfig = new TenantUI({
           {
             type: "approval",
             prodAddress: "0x8060B18290F48fc0bF2149EEb2F3c280bDe7674f",
-            testnetAddress: "0xdd0229D72a414DC821DEc66f3Cc4eF6dB2C7b7df",
+            testnetAddress: "0x4E2e3509F4C77Df377FeE48e3969BB7000B9FAF1",
           },
           {
             type: "optimistic",
             prodAddress: "0x8980C97f0e8a3A69831139e51003E65238F1F343",
-            testnetAddress: "0x4ab438e093647fC5eC7B773D1A5f6d3C2C7F0593",
+            testnetAddress: "0xd88b3D2DFf4ACF38CBD6C425F40Cd1A687E1ee4B",
           },
         ],
         copy: {
