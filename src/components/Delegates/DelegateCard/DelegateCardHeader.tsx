@@ -1,7 +1,7 @@
 "use client";
 
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { useVoterStats } from "@/hooks/useVoterStats";
+import { useVoterStats, useDelegateStats } from "@/hooks/useVoterStats";
 import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
