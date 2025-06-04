@@ -15,7 +15,11 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
       address: delegate.address,
     });
 
-  if (!voterStats || !delegateResponse || delegateStatsError) {
+  const { ui } = Tenant.current();
+
+  const showParticipation = ui.toggle("show-participation")?.enabled || false;
+
+  if (!voterStats || !delegateResponse || delegateStatsError || !showParticipation) {
     return null;
   }
 
