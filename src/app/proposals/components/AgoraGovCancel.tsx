@@ -5,11 +5,16 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { Button } from "@/components/ui/button";
-import { proposalToCallArgs } from "@/lib/proposalUtils";
+import { keccak256 } from "viem";
+import { toUtf8Bytes } from "ethers";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
+
+import { Button } from "@/components/ui/button";
+import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
+import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
+import { ProposalType } from "@/app/proposals/draft/types";
 
 interface Props {
   proposal: Proposal;
@@ -28,6 +33,43 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
     useWaitForTransactionReceipt({
       hash: data,
     });
+
+  const isStandardType = proposal.proposalType === "STANDARD";
+
+  const callArgs = () => {
+    if (isStandardType) {
+      return proposalToCallArgs(proposal);
+    } else {
+      const approvalModuleAddress = getProposalTypeAddress(
+        ProposalType.APPROVAL
+      );
+      const optimisticModuleAddress = getProposalTypeAddress(
+        ProposalType.OPTIMISTIC
+      );
+
+      const moduleAddress =
+        proposal.proposalType === "APPROVAL"
+          ? approvalModuleAddress
+          : optimisticModuleAddress;
+
+      // When using cancelWithModule, the proposal data needs to be a hex string otherwise the bytecode
+      // won't match the proposal and the transaction will fail.
+      const proposalData = proposal.unformattedProposalData?.startsWith("0x")
+        ? proposal.unformattedProposalData
+        : `0x${proposal.unformattedProposalData}`;
+
+      if (!moduleAddress) {
+        throw new Error(
+          `Module address not found for tenant ${Tenant.current().namespace}`
+        );
+      }
+      return [
+        moduleAddress,
+        proposalData,
+        keccak256(toUtf8Bytes(proposal.description!)),
+      ];
+    }
+  };
 
   useEffect(() => {
     if (isSuccess) {
@@ -59,8 +101,8 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
             write({
               address: contracts.governor.address as `0x${string}`,
               abi: contracts.governor.abi,
-              functionName: "cancel",
-              args: proposalToCallArgs(proposal),
+              functionName: isStandardType ? "cancel" : "cancelWithModule",
+              args: callArgs(),
             })
           }
           variant="outline"
