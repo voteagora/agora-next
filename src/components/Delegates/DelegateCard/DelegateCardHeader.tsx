@@ -23,9 +23,6 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
   const numRecentVotes = delegateStats.participation[0];
   const numRecentProposals = delegateStats.participation[1];
 
-  console.log("Delegate stats: ", delegateStats);
-  console.log("Voter stats: ", voterStats);
-
   const eligible = numRecentProposals >= 10;
 
   if (!eligible) {
@@ -37,8 +34,6 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
     numRecentProposals; // Denominator
 
   const participationString = Math.floor(participationRate * 100);
-
-  console.log("Participation rate: ", participationRate);
 
   if (participationRate > 0.5) {
     return (
