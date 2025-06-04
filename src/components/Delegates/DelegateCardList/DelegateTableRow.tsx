@@ -12,7 +12,6 @@ export default function DelegateTableRow({
   delegate,
   isAdvancedUser,
   delegators,
-  showParticipation,
 }: {
   delegate: DelegateChunk & {
     numOfDelegators: bigint;
@@ -21,7 +20,6 @@ export default function DelegateTableRow({
   };
   isAdvancedUser: boolean;
   delegators: string[] | null;
-  showParticipation: boolean;
 }) {
   const router = useRouter();
 
@@ -37,18 +35,16 @@ export default function DelegateTableRow({
       }}
     >
       <TableCell>
-        <div className="w-64">
-          <DelegateProfileImage
-            truncateText
-            endorsed={delegate.statement?.endorsed}
-            address={delegate.address}
-            votingPower={delegate.votingPower.total}
-            citizen={delegate.citizen}
-          />
-        </div>
+        <DelegateProfileImage
+          endorsed={delegate.statement?.endorsed}
+          address={delegate.address}
+          votingPower={delegate.votingPower.total}
+          citizen={delegate.citizen}
+        />
       </TableCell>
       <TableCell>{formatNumber(delegate.votingPower.total)}</TableCell>
-      <TableCell>
+      {/* Used for debugging purposes */}
+      {/* <TableCell>
         {delegate.vpChange7d ? (
           <span
             className={
@@ -63,10 +59,8 @@ export default function DelegateTableRow({
         ) : (
           "0"
         )}
-      </TableCell>
-      {showParticipation && (
-        <TableCell>{`${Math.round(delegate.participation)}%`}</TableCell>
-      )}
+      </TableCell> */}
+      <TableCell>{`${Math.round(delegate.participation)}%`}</TableCell>
       {/* @ts-ignore */}
       <TableCell>
         {delegate.numOfDelegators?.toString() || 0} addresses

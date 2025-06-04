@@ -58,5 +58,4 @@ export type DelegatesSort =
   | "most_recent_delegation"
   | "oldest_delegation"
   | "latest_voting_block"
-  | "vp_change_7d"
-  | "vp_change_7d_desc";
+  | "vp_change_7d";
