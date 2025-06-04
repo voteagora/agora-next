@@ -20,6 +20,7 @@ import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
 import ENSName from "@/components/shared/ENSName";
 import { CollapsibleText } from "@/components/shared/CollapsibleText";
 import { SCWProfileImage } from "./SCWProfileImage";
+import { cn } from "@/lib/utils";
 
 interface Props {
   address: string;
@@ -28,6 +29,7 @@ interface Props {
   endorsed: boolean;
   votingPower: string;
   scwAddress?: string;
+  truncateText?: boolean;
 }
 
 export function DelegateProfileImage({
@@ -36,6 +38,7 @@ export function DelegateProfileImage({
   copyable = false,
   endorsed,
   votingPower,
+  truncateText = false,
 }: Props) {
   const { ui } = Tenant.current();
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
@@ -96,15 +99,17 @@ export function DelegateProfileImage({
 
       <div className="flex flex-col">
         <div className="text-primary flex flex-row gap-1 font-semibold hover:opacity-90">
-          {copyable ? (
-            <CopyableHumanAddress address={address} />
-          ) : (
-            <ENSName address={address} />
-          )}
+          <div className={cn(truncateText && "truncate")}>
+            {copyable ? (
+              <CopyableHumanAddress address={address} />
+            ) : (
+              <ENSName address={address} />
+            )}
+          </div>
           {endorsed && hasEndorsedFilter && endorsedToggle && (
             <TooltipProvider delayDuration={0}>
               <Tooltip>
-                <TooltipTrigger>
+                <TooltipTrigger className="shrink-0">
                   <Image
                     src={icons.endorsed}
                     alt={(endorsedToggle.config as UIEndorsedConfig).tooltip}
@@ -136,7 +141,7 @@ export function DelegateProfileImageWithMetadata({
   followersCount,
   followingCount,
   scwAddress,
-}: Props & {
+}: Omit<Props, "truncateText"> & {
   description?: string;
   location?: string;
   followersCount?: string;

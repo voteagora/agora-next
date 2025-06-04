@@ -18,10 +18,11 @@ const PAGE_TITLE = ["Edit Delegate", "Confirm your transaction"];
 interface EditDelegateFlowProps {
   delegates: PaginatedResult<DelegateChunk[]>;
   deposit: StakedDeposit;
-  fetchDelegates: (
-    pagination: PaginationParams,
-    seed: number
-  ) => Promise<PaginatedResult<DelegateChunk[]>>;
+  fetchDelegates: (args: {
+    pagination?: PaginationParams;
+    seed?: number;
+    showParticipation?: boolean;
+  }) => Promise<PaginatedResult<DelegateChunk[]>>;
   refreshPath: (path: string) => void;
 }
 

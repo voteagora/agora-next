@@ -117,6 +117,7 @@ async function getCitizens({
       votingParticipation: 0,
       citizen: citizen.citizen,
       statement: citizen.statement,
+      participation: 0,
     })),
     seed,
   };
