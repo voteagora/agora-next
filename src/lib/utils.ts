@@ -27,6 +27,7 @@ import {
   polygon,
   scroll,
   sepolia,
+  worldchain,
 } from "viem/chains";
 
 const { token } = Tenant.current();
@@ -507,6 +508,13 @@ export const getTransportForChain = (chainId: number) => {
           `https://linea-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
 
+    // world
+    case 480:
+      return http(
+        FORK_NODE_URL ||
+          `https://worldchain-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
+
     // for each new dao with a new chainId add them here
     default:
       return null;
@@ -572,6 +580,7 @@ const apiNetworkName: Record<number, string> = {
   [goerli.id]: "goerli",
   [sepolia.id]: "sepolia",
   [scroll.id]: "scroll",
+  [worldchain.id]: "worldchain",
 };
 
 export const resolveSafeTx = async (

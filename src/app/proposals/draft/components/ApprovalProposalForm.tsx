@@ -26,7 +26,10 @@ import { encodeAbiParameters, parseEther } from "viem";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { checkNewApprovalProposal } from "@/lib/seatbelt/checkProposal";
 import { StructuredReport } from "@/components/Simulation/StructuredReport";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 type FormType = z.output<typeof ApprovalProposalSchema>;
+
+const { namespace, contracts } = Tenant.current();
 
 const OptionItem = ({
   optionIndex,
@@ -54,84 +57,84 @@ const OptionItem = ({
         name={`approvalProposal.options.${optionIndex}.title`}
         control={control}
       />
-      <div className="mt-6 space-y-12">
-        {transactions.map((field, transactionIndex) => {
-          return (
-            <>
-              {field.type === TransactionType.TRANSFER ? (
-                <TransactionFormItem
-                  remove={removeTransaction}
-                  optionIndex={optionIndex}
-                  transactionIndex={transactionIndex}
-                  key={`transfer-${transactionIndex}`}
-                >
-                  <TransferTransactionForm
-                    index={transactionIndex}
-                    name={`approvalProposal.options.${optionIndex}.transactions`}
-                  />
-                </TransactionFormItem>
-              ) : (
-                <TransactionFormItem
-                  remove={removeTransaction}
-                  optionIndex={optionIndex}
-                  transactionIndex={transactionIndex}
-                  key={`custom-${transactionIndex}`}
-                >
-                  <CustomTransactionForm
-                    index={transactionIndex}
-                    name={`approvalProposal.options.${optionIndex}.transactions`}
-                  />
-                </TransactionFormItem>
-              )}
-            </>
-          );
-        })}
-      </div>
-      {!isOffchain && (
-        <div className="flex flex-row space-x-2 w-full mt-6">
-          <UpdatedButton
-            isSubmit={false}
-            type="secondary"
-            className="flex-grow"
-            onClick={() => {
-              appendTransaction({
-                type: TransactionType.TRANSFER,
-                target: "" as EthereumAddress,
-                value: "",
-                calldata: "",
-                description: "",
-                simulation_state: "UNCONFIRMED",
-                simulation_id: "",
-              });
-            }}
-          >
-            Add a transfer transaction
-          </UpdatedButton>
-          <UpdatedButton
-            isSubmit={false}
-            type="secondary"
-            className="flex-grow"
-            onClick={() => {
-              appendTransaction({
-                type: TransactionType.CUSTOM,
-                target: "" as EthereumAddress,
-                value: "",
-                calldata: "",
-                description: "",
-                simulation_state: "UNCONFIRMED",
-                simulation_id: "",
-              });
-            }}
-          >
-            Add a custom transaction
-          </UpdatedButton>
-        </div>
+      {namespace !== TENANT_NAMESPACES.WORLD && !isOffchain && (
+        <>
+          <div className="mt-6 space-y-12">
+            {transactions.map((field, transactionIndex) => {
+              return (
+                <>
+                  {field.type === TransactionType.TRANSFER ? (
+                    <TransactionFormItem
+                      remove={removeTransaction}
+                      optionIndex={optionIndex}
+                      transactionIndex={transactionIndex}
+                      key={`transfer-${transactionIndex}`}
+                    >
+                      <TransferTransactionForm
+                        index={transactionIndex}
+                        name={`approvalProposal.options.${optionIndex}.transactions`}
+                      />
+                    </TransactionFormItem>
+                  ) : (
+                    <TransactionFormItem
+                      remove={removeTransaction}
+                      optionIndex={optionIndex}
+                      transactionIndex={transactionIndex}
+                      key={`custom-${transactionIndex}`}
+                    >
+                      <CustomTransactionForm
+                        index={transactionIndex}
+                        name={`approvalProposal.options.${optionIndex}.transactions`}
+                      />
+                    </TransactionFormItem>
+                  )}
+                </>
+              );
+            })}
+          </div>
+          <div className="flex flex-row space-x-2 w-full mt-6">
+            <UpdatedButton
+              isSubmit={false}
+              type="secondary"
+              className="flex-grow"
+              onClick={() => {
+                appendTransaction({
+                  type: TransactionType.TRANSFER,
+                  target: "" as EthereumAddress,
+                  value: "",
+                  calldata: "",
+                  description: "",
+                  simulation_state: "UNCONFIRMED",
+                  simulation_id: "",
+                });
+              }}
+            >
+              Add a transfer transaction
+            </UpdatedButton>
+            <UpdatedButton
+              isSubmit={false}
+              type="secondary"
+              className="flex-grow"
+              onClick={() => {
+                appendTransaction({
+                  type: TransactionType.CUSTOM,
+                  target: "" as EthereumAddress,
+                  value: "",
+                  calldata: "",
+                  description: "",
+                  simulation_state: "UNCONFIRMED",
+                  simulation_id: "",
+                });
+              }}
+            >
+              Add a custom transaction
+            </UpdatedButton>
+          </div>
+        </>
       )}
     </div>
   );
 };
-
-const { contracts } = Tenant.current();
 
 const TransactionFormItem = ({
   optionIndex,
@@ -418,6 +421,15 @@ const ApprovalProposalForm = () => {
           tooltip=" Determines up to how many options each voter may select."
           control={control}
         />
+        {namespace === TENANT_NAMESPACES.WORLD && (
+          <NumberInput
+            required={true}
+            label="Min participation"
+            name="approvalProposal.minParticipation"
+            control={control}
+            tooltip="Minimum number of participants required for the proposal to be valid."
+          />
+        )}
         {/* info="Threshold means all options with more than a set amount of votes win. Top choices means only a set number of the most popular options win." */}
         <SwitchInput
           control={control}

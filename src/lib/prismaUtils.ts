@@ -19,6 +19,8 @@ export function findDelagatee({
   };
 
   switch (namespace) {
+    case TENANT_NAMESPACES.WORLD:
+      return null;
     case TENANT_NAMESPACES.OPTIMISM:
       return prismaWeb3Client.optimismDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.ENS:
@@ -68,6 +70,8 @@ export function findAdvancedDelegatee({
   };
 
   switch (namespace) {
+    case TENANT_NAMESPACES.WORLD:
+      return [];
     case TENANT_NAMESPACES.OPTIMISM:
       return prismaWeb3Client.optimismAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.ENS:
@@ -114,6 +118,8 @@ export function findVotableSupply({
   };
 
   switch (namespace) {
+    case TENANT_NAMESPACES.WORLD:
+      return null;
     case TENANT_NAMESPACES.OPTIMISM:
       return prismaWeb3Client.optimismVotableSupply.findFirst(condition);
     case TENANT_NAMESPACES.ENS:
@@ -160,6 +166,8 @@ export function findSnapshotProposalsQueryFromDb({
   };
 
   switch (namespace) {
+    case TENANT_NAMESPACES.WORLD:
+      return [];
     case TENANT_NAMESPACES.OPTIMISM:
       return prismaWeb3Client.optimismProposals.findMany(condition);
     case TENANT_NAMESPACES.ENS:
@@ -266,6 +274,8 @@ export function findProposalsQueryFromDB({
   };
 
   switch (namespace) {
+    case TENANT_NAMESPACES.WORLD:
+      return null;
     case TENANT_NAMESPACES.OPTIMISM:
       return prismaWeb3Client.optimismProposals.findMany(condition);
     case TENANT_NAMESPACES.ENS:
@@ -311,6 +321,8 @@ export function findProposal({
   };
 
   switch (namespace) {
+    case TENANT_NAMESPACES.WORLD:
+      return null;
     case TENANT_NAMESPACES.OPTIMISM:
       return prismaWeb3Client.optimismProposals.findFirst(condition);
     case TENANT_NAMESPACES.ENS:
@@ -518,6 +530,8 @@ export function findProposalType({
   };
 
   switch (namespace) {
+    case TENANT_NAMESPACES.WORLD:
+      return [];
     case TENANT_NAMESPACES.OPTIMISM:
       return prismaWeb3Client.optimismProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.ENS:
@@ -563,6 +577,8 @@ export function findVotes({
   };
 
   switch (namespace) {
+    case TENANT_NAMESPACES.WORLD:
+      return [];
     case TENANT_NAMESPACES.OPTIMISM:
       return prismaWeb3Client.optimismVotes.findMany(condition);
     case TENANT_NAMESPACES.ENS:
@@ -611,6 +627,8 @@ export function findVotingPower({
   };
 
   switch (namespace) {
+    case TENANT_NAMESPACES.WORLD:
+      return null;
     case TENANT_NAMESPACES.OPTIMISM:
       return prismaWeb3Client.optimismVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.ENS:
@@ -659,6 +677,8 @@ export function findAdvancedVotingPower({
   };
 
   switch (namespace) {
+    case TENANT_NAMESPACES.WORLD:
+      return null;
     case TENANT_NAMESPACES.OPTIMISM:
       return prismaWeb3Client.optimismAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.ENS:
@@ -704,6 +724,8 @@ export async function findStakedDeposit({
   };
 
   switch (namespace) {
+    case TENANT_NAMESPACES.WORLD:
+      return null;
     case TENANT_NAMESPACES.OPTIMISM:
       return prismaWeb3Client.optimismStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.ENS:
@@ -761,6 +783,8 @@ export function findStakedDeposits({
   };
 
   switch (namespace) {
+    case TENANT_NAMESPACES.WORLD:
+      return [];
     case TENANT_NAMESPACES.OPTIMISM:
       return prismaWeb3Client.optimismStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.ENS:
@@ -807,6 +831,8 @@ export function getProposalsCount({
   };
 
   switch (namespace) {
+    case TENANT_NAMESPACES.WORLD:
+      return 0;
     case TENANT_NAMESPACES.OPTIMISM:
       return prismaWeb3Client.optimismProposals.count(condition);
     case TENANT_NAMESPACES.ENS:

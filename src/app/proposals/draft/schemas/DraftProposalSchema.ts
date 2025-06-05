@@ -78,6 +78,7 @@ const approvalProposal = z
     criteria: z.nativeEnum(ApprovalProposalType),
     budget: z.string().optional(),
     maxOptions: z.string().optional(),
+    minParticipation: z.string().optional(),
     threshold: z.string().optional(),
     topChoices: z
       .string()
