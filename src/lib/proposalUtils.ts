@@ -230,13 +230,14 @@ export async function parseProposal(
   proposal: ProposalPayload,
   latestBlock: Block | null,
   quorum: bigint | null,
-  votableSupply: bigint
+  votableSupply: bigint,
+  offlineProposalData?: any
 ): Promise<Proposal> {
   const { contracts, ui } = Tenant.current();
   const isTimeStampBasedTenant = ui.toggle(
     "use-timestamp-for-proposals"
   )?.enabled;
-
+  console.log(proposal);
   // Use the safe accessor functions
   let startBlock: bigint | string | null = getStartBlock(proposal) || null;
   let endBlock: bigint | string | null = getEndBlock(proposal) || null;
@@ -271,6 +272,10 @@ export async function parseProposal(
     JSON.stringify(proposal.proposal_results || {}),
     proposalData,
     String(startBlock)
+  );
+
+  const parseOffchainResults = parseOffChainProposalResults(
+    JSON.stringify(offlineProposalData || {})
   );
 
   const calculateStartTime = (): Date | null => {
@@ -344,7 +349,9 @@ export async function parseProposal(
     proposalData: proposalData.kind,
     unformattedProposalData: proposal.proposal_data_raw,
     proposalResults: proposalResuts.kind,
-    proposalType: proposal.proposal_type as ProposalType,
+    proposalType: offlineProposalData
+      ? "HYBRID_STANDARD"
+      : (proposal.proposal_type as ProposalType),
     status: latestBlock
       ? await getProposalStatus(
           proposal,
@@ -357,6 +364,7 @@ export async function parseProposal(
     createdTransactionHash: proposal.created_transaction_hash,
     cancelledTransactionHash: proposal.cancelled_transaction_hash,
     executedTransactionHash: proposal.executed_transaction_hash,
+    offchainResults: parseOffchainResults,
   };
 }
 
@@ -476,6 +484,13 @@ export type ParsedProposalData = {
       options: [];
       onchainProposalId?: string;
       choices: string[];
+    };
+  };
+  HYBRID_STANDARD: {
+    key: "HYBRID_STANDARD";
+    kind: {
+      options: [];
+      onchainProposalId?: string;
     };
   };
 };
@@ -766,7 +781,57 @@ export type ParsedProposalResults = {
       }[];
     };
   };
+  HYBRID_STANDARD: {
+    key: "HYBRID_STANDARD";
+    kind: {
+      CHAIN: {
+        for: bigint;
+        abstain: bigint;
+        against: bigint;
+      };
+      PROJECT: {
+        for: bigint;
+        abstain: bigint;
+        against: bigint;
+      };
+      USER: {
+        for: bigint;
+        abstain: bigint;
+        against: bigint;
+      };
+      DELEGATES?: {
+        for: bigint;
+        abstain: bigint;
+        against: bigint;
+      };
+    };
+  };
 };
+
+//   key: "HYBRID_STANDARD";
+//   kind: {
+//     CHAIN: {
+//       for: bigint;
+//       abstain: bigint;
+//       against: bigint;
+//     };
+//     PROJECT: {
+//       for: bigint;
+//       abstain: bigint;
+//       against: bigint;
+//     };
+//     USER: {
+//       for: bigint;
+//       abstain: bigint;
+//       against: bigint;
+//     };
+//     DELEGATES: {
+//       for: bigint;
+//       abstain: bigint;
+//       against: bigint;
+//     };
+//   };
+// };
 
 type ProposalResults = {
   standard: [string, string, string];
@@ -781,7 +846,8 @@ export function parseProposalResults(
   proposalData: ParsedProposalData[ProposalType],
   startBlock: string
 ): ParsedProposalResults[ProposalType] {
-  switch (proposalData.key) {
+  const type = proposalData.key;
+  switch (type) {
     case "SNAPSHOT": {
       return {
         key: "SNAPSHOT",
@@ -880,6 +946,53 @@ export function parseProposalResults(
         },
       };
     }
+    case "HYBRID_STANDARD": {
+      return parseOffChainProposalResults(proposalResults);
+    }
+  }
+}
+
+export function parseOffChainProposalResults(
+  // proposalResults is expected to be a stringified JSON of the offchain_tally object
+  proposalResults: string
+): any {
+  try {
+    const tallyData = JSON.parse(proposalResults);
+
+    const processTallySource = (
+      sourceData: { [key: string]: number } | undefined
+    ) => {
+      return {
+        for: BigInt(sourceData?.["1"] ?? 0),
+        against: BigInt(sourceData?.["0"] ?? 0),
+        abstain: BigInt(sourceData?.["2"] ?? 0),
+      };
+    };
+
+    return {
+      key: "HYBRID_STANDARD",
+      kind: {
+        PROJECT: processTallySource(tallyData?.PROJECT),
+        USER: processTallySource(tallyData?.USER),
+        CHAIN: processTallySource(tallyData?.CHAIN),
+      },
+    };
+  } catch (error) {
+    console.error("Error parsing offchain proposal results:", error);
+    // Return a default structure in case of parsing errors or missing data
+    const defaultSourceTally = {
+      for: 0n,
+      against: 0n,
+      abstain: 0n,
+    };
+    return {
+      key: "HYBRID_STANDARD",
+      kind: {
+        PROJECT: defaultSourceTally,
+        USER: defaultSourceTally,
+        CHAIN: defaultSourceTally,
+      },
+    };
   }
 }
 

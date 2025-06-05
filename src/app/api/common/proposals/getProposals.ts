@@ -10,6 +10,7 @@ import {
   isTimestampBasedProposal,
   getStartTimestamp,
   getStartBlock,
+  ParsedProposalResults,
 } from "@/lib/proposalUtils";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
@@ -198,8 +199,20 @@ async function getProposal(proposalId: string) {
       })
     );
 
-    const [proposal, votableSupply] = await Promise.all([
+    const getOfflineProposal = doInSpan(
+      { name: "getOfflineProposal" },
+      async () =>
+        findProposal({
+          namespace,
+          proposalId:
+            "0xcab2f59b6dbbf9c2adce5dedf53704d20b1597eed8a038f18a71fc86d99c9336",
+          contract: contracts.governor.address,
+        })
+    );
+
+    const [proposal, offlineProposal, votableSupply] = await Promise.all([
       getProposalExecution,
+      getOfflineProposal,
       fetchVotableSupply(),
     ]);
 
@@ -208,6 +221,9 @@ async function getProposal(proposalId: string) {
     }
 
     const latestBlock = await latestBlockPromise;
+
+    console.log(offlineProposal, "offlineProposal");
+    console.log(proposal, "proposal");
 
     const isPending =
       (isTimeStampBasedTenant
@@ -225,7 +241,8 @@ async function getProposal(proposalId: string) {
       proposal as ProposalPayload,
       latestBlock,
       quorum ?? null,
-      BigInt(votableSupply)
+      BigInt(votableSupply),
+      (offlineProposal?.proposal_data as any)?.offchain_tally
     );
   });
 }

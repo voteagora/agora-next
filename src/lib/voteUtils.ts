@@ -116,6 +116,10 @@ export type ParsedParams = {
     key: "OFFCHAIN_APPROVAL";
     kind: string[];
   };
+  HYBRID_STANDARD: {
+    key: "HYBRID_STANDARD";
+    kind: string[];
+  };
 };
 
 export function parseParams(
