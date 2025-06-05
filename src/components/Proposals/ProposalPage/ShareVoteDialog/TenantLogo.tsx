@@ -490,6 +490,7 @@ export const ogLogoForShareVote = (namespace: TenantNamespace) => {
         />
       );
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.WORLD:
       return (
         <svg
           width="52"

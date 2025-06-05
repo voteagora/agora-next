@@ -6,6 +6,7 @@ import {
   TIMELOCK_TYPE,
   TENANT_NAMESPACES,
   ZERO_ADDRESS,
+  GOVERNOR_TYPE,
 } from "@/lib/constants";
 import { disapprovalThreshold } from "@/lib/constants";
 import { getProposalTypeAddress } from "./stages";
@@ -44,6 +45,12 @@ type BasicInputData = [
   number,
 ];
 type OZBasicInputData = [`0x${string}`[], number[], `0x${string}`[], string];
+type Agora20BasicInputData = [
+  `0x${string}`[],
+  number[],
+  `0x${string}`[],
+  string,
+];
 type UniBasicInputData = [
   `0x${string}`[],
   number[],
@@ -53,6 +60,12 @@ type UniBasicInputData = [
 ];
 
 type ApprovalInputData = [string, string, string, Number];
+type WorldApprovalInputData = [
+  `0x${string}`[],
+  number[],
+  `0x${string}`[],
+  string,
+];
 type InputData =
   | OZBasicInputData
   | BasicInputData
@@ -70,6 +83,7 @@ export function getInputData(proposal: DraftProposal): {
   inputData: InputData;
 } {
   const { namespace, contracts } = Tenant.current();
+  const governorType = contracts.governorType;
   const description =
     "# " +
     proposal.title +
@@ -132,6 +146,17 @@ export function getInputData(proposal: DraftProposal): {
         inputData = inputData.slice(0, 4) as OZBasicInputData;
       }
 
+      // Agora 2.0 governor proposal type is defined in the description
+      if (governorType === GOVERNOR_TYPE.AGORA_20) {
+        const parsedDescription = description + "#proposalTypeId=" + 3;
+        inputData = [
+          targets,
+          values,
+          calldatas,
+          parsedDescription,
+        ] as Agora20BasicInputData;
+      }
+
       if (namespace === TENANT_NAMESPACES.UNISWAP) {
         inputData = [
           targets,
@@ -147,6 +172,72 @@ export function getInputData(proposal: DraftProposal): {
     // inputs for approval type
     // ((uint256 budgetTokensSpent,address[] targets,uint256[] values,bytes[] calldatas,string description)[] proposalOptions,(uint8 maxApprovals,uint8 criteria,address budgetToken,uint128 criteriaValue,uint128 budgetAmount) proposalSettings)
     case ProposalType.APPROVAL: {
+      if (namespace === TENANT_NAMESPACES.WORLD) {
+        // World-specific approval proposal handling
+        let options = [] as {
+          description: string;
+        }[];
+
+        proposal.approval_options.forEach((option) => {
+          options.push({
+            description: option.title,
+          });
+        });
+
+        const budget = proposal.budget as number;
+
+        const settings = {
+          minParticipation: BigInt(proposal.min_participation || 1),
+          maxApprovals: proposal.max_options,
+          criteria: proposal.criteria === "Threshold" ? 0 : 1,
+          criteriaValue:
+            proposal.criteria === "Threshold"
+              ? parseEther(proposal.threshold.toString())
+              : BigInt(proposal.top_choices),
+          budgetAmount: parseEther(budget.toString()),
+          isSignalVote: true,
+        };
+
+        const calldata = encodeAbiParameters(
+          [
+            {
+              name: "proposalOptions",
+              type: "tuple[]",
+              components: [{ name: "description", type: "string" }],
+            },
+            {
+              name: "proposalSettings",
+              type: "tuple",
+              components: [
+                { name: "minParticipation", type: "uint256" },
+                { name: "maxApprovals", type: "uint8" },
+                { name: "criteria", type: "uint8" },
+                { name: "criteriaValue", type: "uint128" },
+                { name: "budgetAmount", type: "uint128" },
+                { name: "isSignalVote", type: "bool" },
+              ],
+            },
+          ],
+          [options, settings]
+        );
+
+        const parsedDescription =
+          description + "#proposalTypeId=" + 3 + "#proposalData=" + calldata;
+
+        const timelockAddress = contracts.timelock?.address;
+
+        const approvalInputData: WorldApprovalInputData = [
+          [timelockAddress as `0x${string}`], // targets
+          [0], // values
+          ["0xf27a0c92" as `0x${string}`], // calldatas
+          // The 3 items above will be ignored by the governor, but are still needed to be included in the input data
+          parsedDescription,
+        ];
+
+        return { inputData: approvalInputData };
+      }
+
+      // Original approval proposal handling for other tenants
       let options = [] as {
         budgetTokensSpent: bigint;
         targets: `0x${string}`[];
@@ -282,12 +373,27 @@ export function getInputData(proposal: DraftProposal): {
         );
       }
 
-      const optimisticInputData: ApprovalInputData = [
+      let optimisticInputData: ApprovalInputData | WorldApprovalInputData = [
         optimisticModuleAddress,
         calldata,
         description,
         parseInt(proposal.proposal_type || "0"),
       ];
+
+      if (namespace === TENANT_NAMESPACES.WORLD) {
+        const parsedDescription =
+          description + "#proposalTypeId=" + 3 + "#proposalData=" + calldata;
+
+        const timelockAddress = contracts.timelock?.address;
+
+        optimisticInputData = [
+          [timelockAddress as `0x${string}`], // targets
+          [0], // values
+          ["0xf27a0c92" as `0x${string}`], // calldatas
+          // The 3 items above will be ignored by the governor, but are still needed to be included in the input data
+          parsedDescription,
+        ];
+      }
 
       return { inputData: optimisticInputData };
     }

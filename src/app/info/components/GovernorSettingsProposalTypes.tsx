@@ -40,6 +40,7 @@ const GovernorSettingsProposalTypes = ({
     namespace !== TENANT_NAMESPACES.PGUILD &&
     namespace !== TENANT_NAMESPACES.DERIVE &&
     namespace !== TENANT_NAMESPACES.DEMO &&
+    namespace !== TENANT_NAMESPACES.WORLD &&
     namespace !== TENANT_NAMESPACES.B3 &&
     namespace !== TENANT_NAMESPACES.XAI &&
     namespace !== TENANT_NAMESPACES.SCROLL;

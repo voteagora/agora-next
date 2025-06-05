@@ -29,6 +29,7 @@ export function getSecondsPerBlock(chainId: number | undefined): number {
     case 957: // Derive Testnet
     case 7560: // Cyber Mainnet
     case 111557560: // Cyber Testnet
+    case 480: // World
       return 2;
 
     case 534352: // Scroll

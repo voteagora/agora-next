@@ -77,6 +77,7 @@ const approvalProposal = z
     criteria: z.nativeEnum(ApprovalProposalType),
     budget: z.string().min(1, { message: "Budget cannot be empty" }),
     maxOptions: z.string().optional(),
+    minParticipation: z.string().optional(),
     threshold: z.string().optional(),
     topChoices: z
       .string()

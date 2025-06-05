@@ -423,3 +423,12 @@ export const getDelegateDataFromDaoNode = async (
     return null;
   }
 };
+
+export const getVotesForDelegateFromDaoNode = async (address: string) => {
+  const url = getDaoNodeURLForNamespace(namespace);
+
+  const response = await fetch(`${url}v1/delegate/${address}/voting_history`);
+  const data = await response.json();
+
+  return data;
+};
