@@ -10,6 +10,7 @@ import {
   isTimestampBasedProposal,
   getStartTimestamp,
   getStartBlock,
+  ParsedProposalResults,
 } from "@/lib/proposalUtils";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
@@ -19,6 +20,7 @@ import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import { Proposal, ProposalPayload } from "./proposal";
 import { doInSpan } from "@/app/lib/logging";
 import {
+  findOffchainProposal,
   findProposal,
   findProposalType,
   findProposalsQueryFromDB,
@@ -206,10 +208,34 @@ async function getProposal(proposalId: string) {
       })
     );
 
-    const [proposal, votableSupply] = await Promise.all([
+    const getOfflineProposal = doInSpan(
+      { name: "getOfflineProposal" },
+      async () =>
+        findOffchainProposal({
+          namespace,
+          onchainProposalId: proposalId,
+        })
+    );
+
+    // Hard coded for testing other types
+    // const getOfflineProposal = doInSpan(
+    //   { name: "getOfflineProposal" },
+    //   async () =>
+    //     findProposal({
+    //       namespace,
+    //       proposalId:
+    //         "95647532391336425113284705305810426138679226160678387259848355019474222496950",
+    //       contract: contracts.governor.address,
+    //     })
+    // );
+
+    const [proposal, offlineProposal, votableSupply] = await Promise.all([
       getProposalExecution,
+      getOfflineProposal,
       fetchVotableSupply(),
     ]);
+    console.log("proposal", proposal);
+    console.log("offlineProposal", offlineProposal);
 
     if (!proposal) {
       return notFound();
@@ -233,7 +259,8 @@ async function getProposal(proposalId: string) {
       proposal as ProposalPayload,
       latestBlock,
       quorum ?? null,
-      BigInt(votableSupply)
+      BigInt(votableSupply),
+      offlineProposal as ProposalPayload
     );
   });
 }

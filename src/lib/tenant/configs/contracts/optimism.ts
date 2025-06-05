@@ -80,7 +80,7 @@ export const optimismTenantContractConfig = ({
       chain,
       contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
-      v6UpgradeBlock: isProd ? 114995000 : 114615036,
+      v6UpgradeBlock: isProd ? 114995000 : 100, // TODO: get the right block number
       provider,
     }),
 
