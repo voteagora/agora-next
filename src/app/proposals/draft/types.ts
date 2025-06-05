@@ -253,6 +253,7 @@ export type ApprovalProposal = BaseProposal & {
   threshold: number;
   top_choices: number;
   approval_options: ApprovalProposalOption[];
+  min_participation: number;
 };
 
 type ApprovalProposalOption = {

@@ -10,6 +10,7 @@ import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/spon
 import { ApprovalProposal } from "@/app/proposals/draft/types";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { GOVERNOR_TYPE } from "@/lib/constants";
 
 const ApprovalProposalAction = ({
   draftProposal,
@@ -28,7 +29,10 @@ const ApprovalProposalAction = ({
   } = useSimulateContract({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
-    functionName: "proposeWithModule",
+    functionName:
+      contracts.governorType === GOVERNOR_TYPE.AGORA_20
+        ? "propose"
+        : "proposeWithModule",
     args: inputData as any,
     query: {
       enabled: !proposalCreated,

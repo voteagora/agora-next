@@ -7,7 +7,10 @@ export const revalidate = 0;
 export async function generateMetadata({}) {
   const { ui } = Tenant.current();
   const page = ui.page("delegates");
-  const { title, description } = page!.meta;
+  const { title, description } = page?.meta ?? {
+    title: "Delegates",
+    description: "Delegates",
+  };
 
   const preview = `/api/images/og/delegates?title=${encodeURIComponent(
     title
@@ -34,5 +37,12 @@ export async function generateMetadata({}) {
 }
 
 export default async function Page() {
+  const { ui } = Tenant.current();
+  if (!ui.toggle("delegates/edit")?.enabled) {
+    return (
+      <div className="text-primary">Route not supported for namespace</div>
+    );
+  }
+
   return <CurrentDelegateStatement />;
 }

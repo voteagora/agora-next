@@ -13,6 +13,7 @@ import { xaiTenantUIConfig } from "@/lib/tenant/configs/ui/xai";
 import { b3TenantUIConfig } from "@/lib/tenant/configs/ui/b3";
 import { demoTenantUIConfig } from "@/lib/tenant/configs/ui/demo";
 import { lineaTenantUIConfig } from "@/lib/tenant/configs/ui/linea";
+import { worldTenantUIConfig } from "./configs/ui/world";
 
 export default class TenantUIFactory {
   public static create(namespace: TenantNamespace): any {
@@ -55,6 +56,10 @@ export default class TenantUIFactory {
 
       case TENANT_NAMESPACES.LINEA:
         return lineaTenantUIConfig;
+
+      case TENANT_NAMESPACES.WORLD:
+        return worldTenantUIConfig;
+
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

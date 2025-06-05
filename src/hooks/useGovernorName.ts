@@ -13,7 +13,7 @@ export const useGovernorName = ({ enabled }: Props) => {
   const { data, isFetching, isFetched } = useQuery({
     queryKey: [GOVERNOR_NAME_QK, contracts.governor.address],
     queryFn: async () => {
-      return await contracts.governor.contract.name();
+      return await contracts.governor.contract.name?.();
     },
     enabled: enabled,
   });

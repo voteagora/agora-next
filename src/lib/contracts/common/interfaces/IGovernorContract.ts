@@ -8,7 +8,7 @@ export interface IGovernorContract extends BaseContract {
   // -------
   // AGORA, BRAVO
 
-  name: TypedContractMethod<[], [string], "view">;
+  name?: TypedContractMethod<[], [string], "view">;
 
   admin?: TypedContractMethod<[], [string], "view">;
 

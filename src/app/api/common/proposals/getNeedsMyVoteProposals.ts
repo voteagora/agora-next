@@ -7,6 +7,8 @@ import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
+import { fetchProposals } from "./getProposals";
+import { getVotesForDelegateFromDaoNode } from "@/app/lib/dao-node/client";
 
 async function getNeedsMyVoteProposals(address: string) {
   return withMetrics("getNeedsMyVoteProposals", async () => {
@@ -21,6 +23,10 @@ async function getNeedsMyVoteProposals(address: string) {
       ? contracts.providerForTime?.getBlock("latest")
       : contracts.token.provider.getBlock("latest");
 
+    const useDaoNode =
+      ui.toggle("use-daonode-for-get-needs-my-vote-proposals")?.enabled ??
+      false;
+
     const [latestBlock, votableSupply] = await Promise.all([
       latestBlockPromise,
       fetchVotableSupply(),
@@ -28,6 +34,29 @@ async function getNeedsMyVoteProposals(address: string) {
 
     if (!latestBlock) {
       throw new Error("Could not get latest block");
+    }
+
+    if (useDaoNode) {
+      const [proposals, votes] = await Promise.all([
+        await fetchProposals({
+          filter: "relevant",
+          pagination: {
+            limit: 10,
+            offset: 0,
+          },
+        }),
+        getVotesForDelegateFromDaoNode(address),
+      ]);
+
+      const proposalsWithoutVotes = proposals.data.filter((proposal) => {
+        const vote = votes.find(
+          (vote: any) => vote.proposal_id === proposal.id
+        );
+        return !vote;
+      });
+      return {
+        proposals: proposalsWithoutVotes,
+      };
     }
 
     const prodDataOnly =

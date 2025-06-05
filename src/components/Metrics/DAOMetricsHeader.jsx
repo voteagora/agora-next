@@ -30,6 +30,7 @@ export default function DAOMetricsHeader() {
   const faqLink = ui.link("faq");
   const discordLink = ui.link("discord");
   const agoraLink = ui.link("agora");
+  const showSupplyStats = ui.toggle("show-supply-stats")?.enabled ?? true;
 
   const links = [
     governanceForumLink,
@@ -146,28 +147,13 @@ export default function DAOMetricsHeader() {
                   )}
                 </div>
               )}
-              <div className="flex px-6 gap-6 h-14 border-l border-line text-tertiary">
-                <HoverCard openDelay={100} closeDelay={100}>
-                  <HoverCardTrigger className="flex">
-                    <span className="cursor-default content-center">
-                      {isLoading ? "-" : formattedMetrics.totalSupply}{" "}
-                      {token.symbol} total supply
-                    </span>
-                  </HoverCardTrigger>
-                  <HoverCardContent
-                    className="w-full shadow"
-                    side="bottom"
-                    sideOffset={3}
-                  >
-                    <span>Total amount of {token.symbol} in existence</span>
-                  </HoverCardContent>
-                </HoverCard>
-                {contracts.token.isERC20() && (
+              {showSupplyStats && (
+                <div className="flex px-6 gap-6 h-14 border-l border-line text-tertiary">
                   <HoverCard openDelay={100} closeDelay={100}>
                     <HoverCardTrigger className="flex">
                       <span className="cursor-default content-center">
-                        {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
-                        {token.symbol} votable supply
+                        {isLoading ? "-" : formattedMetrics.totalSupply}{" "}
+                        {token.symbol} total supply
                       </span>
                     </HoverCardTrigger>
                     <HoverCardContent
@@ -175,11 +161,30 @@ export default function DAOMetricsHeader() {
                       side="bottom"
                       sideOffset={3}
                     >
-                      <span>{token.symbol} currently delegated to a voter</span>
+                      <span>Total amount of {token.symbol} in existence</span>
                     </HoverCardContent>
                   </HoverCard>
-                )}
-              </div>
+                  {contracts.token.isERC20() && (
+                    <HoverCard openDelay={100} closeDelay={100}>
+                      <HoverCardTrigger className="flex">
+                        <span className="cursor-default content-center">
+                          {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
+                          {token.symbol} votable supply
+                        </span>
+                      </HoverCardTrigger>
+                      <HoverCardContent
+                        className="w-full shadow"
+                        side="bottom"
+                        sideOffset={3}
+                      >
+                        <span>
+                          {token.symbol} currently delegated to a voter
+                        </span>
+                      </HoverCardContent>
+                    </HoverCard>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>,

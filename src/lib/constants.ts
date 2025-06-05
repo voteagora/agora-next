@@ -45,6 +45,7 @@ export const TENANT_NAMESPACES = {
   B3: "b3",
   DEMO: "demo",
   LINEA: "linea",
+  WORLD: "world",
 } as const;
 
 export const proposalsFilterOptions = {
@@ -132,6 +133,7 @@ export const disapprovalThreshold = 12;
 
 export enum GOVERNOR_TYPE {
   AGORA = "AGORA",
+  AGORA_20 = "AGORA_20",
   ALLIGATOR = "ALLIGATOR",
   BRAVO = "BRAVO",
   ENS = "ENS",
