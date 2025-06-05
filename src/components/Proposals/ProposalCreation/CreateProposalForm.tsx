@@ -9,6 +9,10 @@ import ApprovalCriteriaRow from "./ApprovalCriteriaRow";
 import ApprovalOptionsRow from "./ApprovalOptionsRow";
 import StandardForm from "./StandardForm";
 import SubmitButton from "./SubmitButton";
+import JointHouseSettings from "./JointHouseSettings";
+import TiersSettings from "./TiersSettings";
+import Tenant from "@/lib/tenant/tenant";
+import { ProposalScope } from "@/app/proposals/draft/types";
 
 type FormValues = {
   proposalType: "Basic" | "Approval" | "Optimistic";
@@ -21,6 +25,9 @@ type FormValues = {
   threshold: number;
   topChoices: number;
   options: Option[];
+  proposal_scope?: ProposalScope;
+  tiers_enabled?: boolean;
+  tiers?: number[];
 };
 
 type Option = {
@@ -39,6 +46,10 @@ export type Transaction = {
 
 export type Form = UseForm<FormValues>;
 
+const { ui } = Tenant.current();
+
+const offchainProposals = ui.toggle("proposals/offchain")?.enabled;
+
 export default function CreateProposalForm({
   proposalSettingsList,
 }: {
@@ -55,6 +66,9 @@ export default function CreateProposalForm({
     threshold: 0,
     topChoices: 1,
     options: [{ title: "", transactions: [] }],
+    proposal_scope: ProposalScope.ONCHAIN_ONLY,
+    tiers_enabled: false,
+    tiers: [],
   };
   const form = useForm<FormValues>(() => initialFormValues);
   const formTarget = useRef<HTMLFormElement>(null);
@@ -72,10 +86,16 @@ export default function CreateProposalForm({
               describe its intent to voters. Remember to proofread as proposals
               cannot be edited once published.
             </p>
+            {offchainProposals ? (
+              <div className="pt-8">
+                <JointHouseSettings form={form} />
+              </div>
+            ) : null}
             <ProposalTypeRow
               form={form}
               proposalSettingsList={proposalSettingsList}
             />
+            <TiersSettings form={form} />
             <TitleDescriptionRow form={form} />
           </div>
           {form.state.proposalType === "Approval" && (
@@ -90,7 +110,10 @@ export default function CreateProposalForm({
           )}
           {form.state.proposalType === "Basic" && (
             <div className="p-8 border-b border-line">
-              <StandardForm form={form} />
+              <StandardForm
+                form={form}
+                proposal_scope={form.state.proposal_scope}
+              />
             </div>
           )}
           <HStack
