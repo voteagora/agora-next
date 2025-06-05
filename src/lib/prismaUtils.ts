@@ -336,6 +336,58 @@ export function findProposal({
   }
 }
 
+/**
+ * Find an offchain proposal that matches an onchain proposal ID
+ * This is used to merge offchain proposal data with onchain proposals
+ */
+export function findOffchainProposal({
+  namespace,
+  onchainProposalId,
+}: {
+  namespace: TenantNamespace;
+  onchainProposalId: string;
+}) {
+  const condition = {
+    where: {
+      proposal_data: {
+        path: ["onchain_proposalid"], // Specifies the JSON path to the key
+        equals: onchainProposalId, // Checks if the value at that path equals onchainProposalId
+      },
+    },
+  };
+
+  switch (namespace) {
+    case TENANT_NAMESPACES.OPTIMISM:
+      return prismaWeb3Client.optimismProposals.findFirst(condition);
+    case TENANT_NAMESPACES.ENS:
+      return prismaWeb3Client.ensProposals.findFirst(condition);
+    case TENANT_NAMESPACES.ETHERFI:
+      return prismaWeb3Client.etherfiProposals.findFirst(condition);
+    case TENANT_NAMESPACES.UNISWAP:
+      return prismaWeb3Client.uniswapProposals.findFirst(condition);
+    case TENANT_NAMESPACES.CYBER:
+      return prismaWeb3Client.cyberProposals.findFirst(condition);
+    case TENANT_NAMESPACES.SCROLL:
+      return prismaWeb3Client.scrollProposals.findFirst(condition);
+    case TENANT_NAMESPACES.DERIVE:
+      return prismaWeb3Client.deriveProposals.findFirst(condition);
+    case TENANT_NAMESPACES.PGUILD:
+      return prismaWeb3Client.pguildProposals.findFirst(condition);
+    case TENANT_NAMESPACES.BOOST:
+      return prismaWeb3Client.boostProposals.findFirst(condition);
+    case TENANT_NAMESPACES.XAI:
+      return prismaWeb3Client.xaiProposals.findFirst(condition);
+    case TENANT_NAMESPACES.B3:
+      return prismaWeb3Client.b3Proposals.findFirst(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prismaWeb3Client.demoProposals.findFirst(condition);
+    case TENANT_NAMESPACES.LINEA:
+      return prismaWeb3Client.lineaProposals.findFirst(condition);
+    default:
+      return null;
+  }
+}
+
 export function findProposalType({
   namespace,
   contract,

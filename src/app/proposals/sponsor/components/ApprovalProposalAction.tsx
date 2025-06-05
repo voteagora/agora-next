@@ -35,6 +35,7 @@ const ApprovalProposalAction = ({
     },
   });
 
+  console.log(error);
   const { writeContractAsync: writeAsync, isPending: isWriteLoading } =
     useWriteContract();
 
