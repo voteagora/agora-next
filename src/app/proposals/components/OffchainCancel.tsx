@@ -40,7 +40,7 @@ export const OffchainCancel = ({ proposal }: Props) => {
       }
 
       const { transactionHash } = await cancelProposalAttestation({
-        id: proposal.id,
+        id: BigInt(proposal.id),
         signer: signer,
         canceller: address,
       });
@@ -52,7 +52,7 @@ export const OffchainCancel = ({ proposal }: Props) => {
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          proposalId: proposal.id,
+          proposalId: BigInt(proposal.id),
           transactionHash: transactionHash,
         }),
       });

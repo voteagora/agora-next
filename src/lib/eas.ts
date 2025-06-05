@@ -14,19 +14,19 @@ const { slug } = Tenant.current();
 
 const CREATE_PROPOSAL_SCHEMA_ID =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? "0x60690c8647ba265b168257134a577e1faa19708dce6b9332e96844a190992b90"
-    : "0x60690c8647ba265b168257134a577e1faa19708dce6b9332e96844a190992b90";
+    ? "0xc2d307e00cc97b07606361c49971814ed50e20b080a0fb7a3c9c94c224463539"
+    : "0xc2d307e00cc97b07606361c49971814ed50e20b080a0fb7a3c9c94c224463539";
 
 const CANCEL_PROPOSAL_SCHEMA_ID =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? "0x93dbaf80a47c49a96e9ad6e038a064088d322f9b42d4e4bd8e78efb947b448ad"
-    : "0x93dbaf80a47c49a96e9ad6e038a064088d322f9b42d4e4bd8e78efb947b448ad";
+    ? "0x59bc3744c9c3d0dd7871882f71dbf9f9709bf6bb469d45f36537f9de6288a736"
+    : "0x59bc3744c9c3d0dd7871882f71dbf9f9709bf6bb469d45f36537f9de6288a736";
 
 const schemaEncoder = new SchemaEncoder(
-  "address contract,string id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block, string proposal_type, uint256[] tiers, string onchain_proposalid"
+  "address contract,uint256 id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block, string proposal_type, uint256[] tiers, uint256 onchain_proposalid"
 );
 
-const schemaEncoderCancel = new SchemaEncoder("string id");
+const schemaEncoderCancel = new SchemaEncoder("uint256 id");
 
 const eas =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
@@ -56,18 +56,20 @@ export async function createProposalAttestation({
   proposal_type: string;
   tiers: number[];
   signer: JsonRpcSigner;
-  onchain_proposalid?: string | null;
+  onchain_proposalid?: bigint | null;
 }) {
-  const id = keccak256(
-    defaultAbiCoder.encode(
-      ["bytes32", "bytes32"],
-      [keccak256(toUtf8Bytes(slug)), keccak256(toUtf8Bytes(description))]
-    ) as `0x${string}`
+  const id = BigInt(
+    keccak256(
+      defaultAbiCoder.encode(
+        ["bytes32", "bytes32"],
+        [keccak256(toUtf8Bytes(slug)), keccak256(toUtf8Bytes(description))]
+      ) as `0x${string}`
+    )
   );
 
   const encodedData = schemaEncoder.encodeData([
     { name: "contract", value: contract, type: "address" },
-    { name: "id", value: id, type: "string" },
+    { name: "id", value: id, type: "uint256" },
     { name: "proposer", value: proposer, type: "address" },
     { name: "description", value: description, type: "string" },
     { name: "choices", value: choices, type: "string[]" },
@@ -78,8 +80,8 @@ export async function createProposalAttestation({
     { name: "tiers", value: tiers, type: "uint256[]" },
     {
       name: "onchain_proposalid",
-      value: onchain_proposalid || "",
-      type: "string",
+      value: onchain_proposalid || 0n,
+      type: "uint256",
     },
   ]);
 
@@ -150,12 +152,12 @@ export async function cancelProposalAttestation({
   signer,
   canceller,
 }: {
-  id: string;
+  id: bigint;
   signer: JsonRpcSigner;
   canceller: string;
 }) {
   const encodedData = schemaEncoderCancel.encodeData([
-    { name: "id", value: id, type: "string" },
+    { name: "id", value: id, type: "uint256" },
   ]);
 
   const recipient = "0x0000000000000000000000000000000000000000";
