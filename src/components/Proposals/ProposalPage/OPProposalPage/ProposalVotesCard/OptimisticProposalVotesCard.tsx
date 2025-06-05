@@ -28,6 +28,7 @@ const OptimisticProposalVotesCard = ({
   againstLengthString,
   status,
 }: Props) => {
+  console.log("proposal", proposal);
   const { token } = Tenant.current();
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [showVoters, setShowVoters] = useState(true);

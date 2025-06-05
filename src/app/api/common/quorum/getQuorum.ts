@@ -2,7 +2,6 @@ import { cache } from "react";
 import { ProposalPayload } from "../proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import { findVotableSupply } from "@/lib/prismaUtils";
 import { fetchVotableSupplyUnstableCache } from "../votableSupply/getVotableSupply";
 
 async function getQuorumForProposal(proposal: ProposalPayload) {

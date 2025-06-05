@@ -43,14 +43,14 @@ export function parseSupport(
 
   const { namespace, contracts } = Tenant.current();
 
-  if (
-    namespace === TENANT_NAMESPACES.OPTIMISM &&
-    start_block &&
-    contracts.governor.v6UpgradeBlock &&
-    Number(start_block) < contracts.governor.v6UpgradeBlock
-  ) {
-    return parseSupportOldModule(support, proposalType);
-  }
+  // if (
+  //   namespace === TENANT_NAMESPACES.OPTIMISM &&
+  //   start_block &&
+  //   contracts.governor.v6UpgradeBlock &&
+  //   Number(start_block) < contracts.governor.v6UpgradeBlock
+  // ) {
+  //   return parseSupportOldModule(support, proposalType);
+  // }
 
   switch (Number(support)) {
     case 0:
@@ -114,6 +114,22 @@ export type ParsedParams = {
   };
   OFFCHAIN_APPROVAL: {
     key: "OFFCHAIN_APPROVAL";
+    kind: string[];
+  };
+  HYBRID_STANDARD: {
+    key: "HYBRID_STANDARD";
+    kind: string[];
+  };
+  HYBRID_APPROVAL: {
+    key: "HYBRID_APPROVAL";
+    kind: string[];
+  };
+  HYBRID_OPTIMISTIC: {
+    key: "HYBRID_OPTIMISTIC";
+    kind: string[];
+  };
+  HYBRID_OPTIMISTIC_TIERED: {
+    key: "HYBRID_OPTIMISTIC_TIERED";
     kind: string[];
   };
 };
@@ -387,7 +403,10 @@ export function calculateVoteMetadata({
   }[] = [];
   let totalOptions = 0;
 
-  if (proposal.proposalType === "APPROVAL") {
+  if (
+    proposal.proposalType === "APPROVAL" ||
+    proposal.proposalType === "HYBRID_APPROVAL"
+  ) {
     const proposalData =
       proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
 
