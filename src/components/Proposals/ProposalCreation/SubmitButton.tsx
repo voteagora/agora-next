@@ -176,7 +176,7 @@ export default function SubmitButton({
         tiers: form.state.tiers,
       };
 
-      let onchainProposalId: string | null = null;
+      let onchainProposalId: bigint | null = null;
 
       const proposalType = form.state.proposalType.toLowerCase() as
         | "basic"
@@ -200,17 +200,15 @@ export default function SubmitButton({
         form.state.proposal_scope === ProposalScope.OFFCHAIN_ONLY;
 
       if (targets && values && calldatas && !offchainOnly) {
-        onchainProposalId = (
-          await generateProposalId({
-            targets,
-            values,
-            calldatas,
-            description,
-            proposalType,
-            unformattedProposalData,
-            moduleAddress,
-          })
-        ).toString();
+        onchainProposalId = await generateProposalId({
+          targets,
+          values,
+          calldatas,
+          description,
+          proposalType,
+          unformattedProposalData,
+          moduleAddress,
+        });
       }
 
       const { id, transactionHash } = await createProposalAttestation({

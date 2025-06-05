@@ -18,9 +18,9 @@ interface OffchainProposalRequestBody {
     proposal_type: ProposalType;
     tiers: number[];
   };
-  id: string;
+  id: bigint;
   transactionHash: string;
-  onchainProposalId: string;
+  onchainProposalId: bigint;
 }
 
 export async function POST(request: NextRequest) {
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       data: {
         id,
         contract: governor,
-        onchain_proposalid: onchainProposalId?.toString() ?? null,
+        onchain_proposalid: onchainProposalId ?? null,
         dao_slug: slug,
         proposer: proposer,
         description: description,
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     trackEvent({
       event_name: ANALYTICS_EVENT_NAMES.CREATE_OFFCHAIN_PROPOSAL,
       event_data: {
-        proposal_id: id,
+        proposal_id: id.toString(),
       },
     });
 

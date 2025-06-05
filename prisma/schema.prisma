@@ -4670,8 +4670,8 @@ enum ProposalStage {
 
 model OffchainProposals {
   contract                   String?
-  id                         String @unique
-  onchain_proposalid         String?
+  id                         BigInt @unique
+  onchain_proposalid         BigInt?
   dao_slug                   DaoSlug
   proposer                   String
   description                String

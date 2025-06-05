@@ -7,7 +7,7 @@ import { getPublicClient } from "@/lib/viem";
 import Tenant from "@/lib/tenant/tenant";
 
 interface OffchainCancelRequestBody {
-  proposalId: string;
+  proposalId: bigint;
   transactionHash: string;
 }
 
