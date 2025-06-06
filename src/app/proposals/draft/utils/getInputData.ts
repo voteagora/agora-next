@@ -1,6 +1,14 @@
-import { ethers } from "ethers";
+import { AbiCoder, ethers, toUtf8Bytes } from "ethers";
 import { DraftProposal, ProposalType } from "../types";
-import { decodeFunctionData, encodeAbiParameters, parseEther } from "viem";
+import {
+  decodeFunctionData,
+  encodeAbiParameters,
+  parseEther,
+  hexToBytes,
+  bytesToString,
+  concat,
+  hexToString,
+} from "viem";
 import Tenant from "@/lib/tenant/tenant";
 import {
   TIMELOCK_TYPE,
@@ -184,19 +192,17 @@ export function getInputData(proposal: DraftProposal): {
           });
         });
 
-        const budget = proposal.budget as number;
-
-        const settings = {
-          minParticipation: BigInt(proposal.min_participation || 1),
-          maxApprovals: proposal.max_options,
-          criteria: proposal.criteria === "Threshold" ? 0 : 1,
-          criteriaValue:
-            proposal.criteria === "Threshold"
-              ? parseEther(proposal.threshold.toString())
-              : BigInt(proposal.top_choices),
-          budgetAmount: parseEther(budget.toString()),
-          isSignalVote: true,
-        };
+        // const settings = {
+        //   minParticipation: BigInt(proposal.min_participation || 1),
+        //   maxApprovals: proposal.max_options,
+        //   criteria: proposal.criteria === "Threshold" ? 0 : 1,
+        //   criteriaValue:
+        //     proposal.criteria === "Threshold"
+        //       ? parseEther(proposal.threshold.toString())
+        //       : BigInt(proposal.top_choices),
+        //   budgetAmount: BigInt(0),
+        //   isSignalVote: true,
+        // };
 
         const calldata = encodeAbiParameters(
           [
@@ -218,20 +224,68 @@ export function getInputData(proposal: DraftProposal): {
               ],
             },
           ],
-          [options, settings]
+          [
+            [{ description: "option 1" }, { description: "option 2" }],
+            {
+              minParticipation: 3 as any,
+              maxApprovals: 2,
+              criteria: 1,
+              criteriaValue: 1 as any,
+              budgetAmount: 0 as any,
+              isSignalVote: true,
+            },
+          ]
         );
 
-        const parsedDescription =
-          description + "#proposalTypeId=" + 3 + "#proposalData=" + calldata;
+        console.log(calldata, "calldata");
 
-        const timelockAddress = contracts.timelock?.address;
+        // const calldata =
+        //   "0x5b544553545d202d20706564726f20323032352d30362d3034205b544553545d202d20706564726f20323032352d30362d30342370726f706f73616c5479706549643d322370726f706f73616c446174613d00000000000000000000000000000000000000000000000000000000000000e000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000de0b6b3a764000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000086f7074696f6e2031000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000086f7074696f6e2032000000000000000000000000000000000000000000000000";
+
+        // const parsedCalldata = hexToString(calldata);
+
+        // console.log(parsedCalldata);
+
+        const parsedDescription = "h#proposalTypeId=2#proposalData=";
+
+        // const data = hexToBytes(calldata);
+
+        // const parsedData = new Uint8Array([...parsedDescription, ...data]);
+
+        // const parsedDataToUTF8 = bytesToString(parsedData);
+
+        // console.log(parsedDataToUTF8, "parsedDataToUTF8");
+
+        const abiCoder = new AbiCoder();
+
+        const encodedDescription = abiCoder.encode(
+          ["string"],
+          [parsedDescription]
+        );
+
+        console.log(encodedDescription, "encodedDescription");
+
+        // const concatenated = hexToString(
+        //   concat([
+        //     encodedDescription as `0x${string}`,
+        //     calldata as `0x${string}`,
+        //   ])
+        // );
+
+        const concatenated = hexToString(
+          "0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000220682370726f706f73616c5479706549643d322370726f706f73616c446174613d00000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000086f7074696f6e2031000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000086f7074696f6e2032000000000000000000000000000000000000000000000000"
+        );
+
+        // const timelockAddress = contracts.timelock?.address;
 
         const approvalInputData: WorldApprovalInputData = [
-          [timelockAddress as `0x${string}`], // targets
+          ["0xbD7e5e656A1B5b6f0FacB7a6a911CcF36e570201" as `0x${string}`], // targets
           [0], // values
-          ["0xf27a0c92" as `0x${string}`], // calldatas
+          [
+            "0xa9059cbb000000000000000000000000648bfc4db7e43e799a84d0f607af0b4298f932db0000000000000000000000000000000000000000000000000000000000000064" as `0x${string}`,
+          ], // calldatas
           // The 3 items above will be ignored by the governor, but are still needed to be included in the input data
-          parsedDescription,
+          concatenated,
         ];
 
         return { inputData: approvalInputData };
