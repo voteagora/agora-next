@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UpdatedButton } from "@/components/Button";
+import { DSButton } from "@/components/design-system/Button";
 import createProposalDraft from "./actions/createProposalDraft";
 import classNames from "classnames";
 import Tenant from "@/lib/tenant/tenant";
@@ -9,6 +9,7 @@ import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { PLMConfig } from "@/app/proposals/draft/types";
+
 const CreateProposalDraftButton = ({
   address,
   className,
@@ -54,10 +55,11 @@ const CreateProposalDraftButton = ({
   }
 
   return (
-    <UpdatedButton
-      variant="rounded"
-      type="primary"
-      isLoading={isPending}
+    <DSButton
+      variant="primary"
+      size="small"
+      fullWidth
+      loading={isPending}
       className={classNames(className)}
       onClick={async () => {
         setIsPending(true);
@@ -66,7 +68,7 @@ const CreateProposalDraftButton = ({
       }}
     >
       Create proposal
-    </UpdatedButton>
+    </DSButton>
   );
 };
 

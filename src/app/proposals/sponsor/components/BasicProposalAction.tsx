@@ -5,7 +5,7 @@ import { useSimulateContract, useWriteContract } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
 import { BasicProposal } from "../../../proposals/draft/types";
-import { UpdatedButton } from "@/components/Button";
+import { DSButton } from "@/components/design-system/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
 import { trackEvent } from "@/lib/analytics";
@@ -56,10 +56,12 @@ const BasicProposalAction = ({
 
   return (
     <>
-      <UpdatedButton
-        isLoading={isWriteLoading || isSimulating}
-        fullWidth={true}
-        type={onPrepareError && !proposalCreated ? "disabled" : "primary"}
+      <DSButton
+        variant="primary"
+        size="small"
+        fullWidth
+        loading={isWriteLoading || isSimulating}
+        disabled={onPrepareError && !proposalCreated}
         onClick={async () => {
           try {
             const data = await writeAsync(config!.request);
@@ -97,7 +99,7 @@ const BasicProposalAction = ({
         }}
       >
         Submit proposal
-      </UpdatedButton>
+      </DSButton>
 
       {onPrepareError && !proposalCreated && (
         <div className="p-4 border border-negative bg-negative/10 rounded mt-4 text-sm text-negative break-words hyphens-auto">

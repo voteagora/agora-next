@@ -25,6 +25,7 @@ import { encodeAbiParameters, parseEther } from "viem";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { checkNewApprovalProposal } from "@/lib/seatbelt/checkProposal";
 import { StructuredReport } from "@/components/Simulation/StructuredReport";
+import { DSButton } from "@/components/design-system/Button";
 type FormType = z.output<typeof ApprovalProposalSchema>;
 
 const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
@@ -466,10 +467,10 @@ const ApprovalProposalForm = () => {
           })}
         </div>
         <div className="flex flex-row space-x-2 w-full mt-6">
-          <UpdatedButton
-            isSubmit={false}
-            type="secondary"
-            className="flex-grow"
+          <DSButton
+            variant="secondary"
+            size="small"
+            fullWidth
             onClick={() => {
               appendOption({
                 title: "",
@@ -478,7 +479,7 @@ const ApprovalProposalForm = () => {
             }}
           >
             Add option
-          </UpdatedButton>
+          </DSButton>
         </div>
       </div>
       {options?.length > 0 &&

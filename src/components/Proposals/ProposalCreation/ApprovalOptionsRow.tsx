@@ -5,6 +5,7 @@ import { XCircleIcon } from "@heroicons/react/20/solid";
 import { VStack } from "@/components/Layout/Stack";
 import InputBox from "@/components/shared/InputBox";
 import AddTransactionsDetails from "./AddTransactionsDetails";
+import { DSButton } from "@/components/design-system/Button";
 
 export default function ApprovalOptionsRow({ form }: { form: Form }) {
   function addOption() {
@@ -71,15 +72,15 @@ export default function ApprovalOptionsRow({ form }: { form: Form }) {
           </VStack>
         </VStack>
       ))}
-      <div
+      <DSButton
+        variant="secondary"
+        size="large"
+        fullWidth
         onClick={addOption}
-        className="flex items-center w-full gap-2 p-4 border border-line cursor-pointer font-semibold shadow-newDefault"
+        className="mt-2"
       >
-        <div className="h-8 w-8 flex items-center justify-center rounded-full shadow-newDefault bg-neutral border border-line">
-          +
-        </div>
-        <div>Add option</div>
-      </div>
+        Add option
+      </DSButton>
     </>
   );
 }
