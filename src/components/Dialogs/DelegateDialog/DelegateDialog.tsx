@@ -27,6 +27,7 @@ import { formatEther } from "viem";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { DSButton } from "@/components/design-system/Button";
 
 export function DelegateDialog({
   delegate,
@@ -172,9 +173,15 @@ export function DelegateDialog({
 
     if (isError || didFailDelegation) {
       return (
-        <Button disabled={false} onClick={executeDelegate}>
-          Delegation failed - try again
-        </Button>
+        <DSButton
+          variant="primary"
+          size="small"
+          fullWidth
+          disabled={false}
+          onClick={executeDelegate}
+        >
+          Delegation Failed - Try Again
+        </DSButton>
       );
     }
 
@@ -195,7 +202,16 @@ export function DelegateDialog({
       );
     }
 
-    return <ShadcnButton onClick={executeDelegate}>Delegate</ShadcnButton>;
+    return (
+      <DSButton
+        variant="primary"
+        size="small"
+        fullWidth
+        onClick={executeDelegate}
+      >
+        Delegate
+      </DSButton>
+    );
   };
 
   useEffect(() => {

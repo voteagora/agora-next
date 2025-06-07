@@ -17,8 +17,8 @@ export function UndelegateButton({
 
   return (
     <DSButton
-      variant="secondary"
-      size="large"
+      variant="primary"
+      size="small"
       fullWidth={full}
       onClick={(e: any) => {
         e.preventDefault();

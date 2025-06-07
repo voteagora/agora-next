@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormCard from "../form/FormCard";
 import TextInput from "../form/TextInput";
-import { UpdatedButton } from "@/components/Button";
+import { DSButton } from "@/components/design-system/Button";
 import { schema as tempCheckSchema } from "../../schemas/tempCheckSchema";
 import { onSubmitAction as tempCheckAction } from "../../actions/createTempCheck";
 import { useAccount } from "wagmi";
@@ -97,25 +97,26 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
                   label="Link"
                   name="temp_check_link"
                   control={control}
-                  //   TODO: still ENS branded -- make generalizable
                   placeholder="https://discuss.ens.domains/"
                 />
               </div>
               <div className="space-x-2 self-start mt-[22px] flex items-center">
-                <UpdatedButton
-                  type="secondary"
-                  isLoading={isSkipPending}
+                <DSButton
+                  variant="secondary"
+                  size="small"
+                  loading={isSkipPending}
                   onClick={handleSubmit(onSubmitSkip)}
                 >
                   Skip
-                </UpdatedButton>
-                <UpdatedButton
-                  type="primary"
-                  isLoading={isSubmitPending}
+                </DSButton>
+                <DSButton
+                  variant="primary"
+                  size="small"
+                  loading={isSubmitPending}
                   onClick={handleSubmit(onSubmit)}
                 >
                   Continue
-                </UpdatedButton>
+                </DSButton>
               </div>
             </div>
           </FormCard.Section>

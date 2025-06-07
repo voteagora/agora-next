@@ -23,7 +23,7 @@ const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
         });
       }}
     >
-      Delete Proposal
+      <span className="mt-[2px] inline-block">Delete Proposal</span>
     </DSButton>
   );
 };

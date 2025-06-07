@@ -10,7 +10,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Environment Variables
 
-* *NEXT_PUBLIC_FORK_NODE_URL* - The URL of an optional node, most likely a fork, for testing purposes.  Leave blank to use alchemy.
+- _NEXT_PUBLIC_FORK_NODE_URL_ - The URL of an optional node, most likely a fork, for testing purposes. Leave blank to use alchemy.
 
 ## About this repo
 

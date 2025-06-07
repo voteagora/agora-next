@@ -17,6 +17,7 @@ import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeh
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { useDelegate } from "@/hooks/useDelegate";
 import { useDelegateStatementStore } from "@/stores/delegateStatement";
+import { DSButton } from "@/components/design-system/Button";
 
 export default function DelegateStatementForm({
   form,
@@ -154,14 +155,17 @@ export default function DelegateStatementForm({
                   time.
                 </span>
 
-                <Button
-                  variant="elevatedOutline"
-                  className="py-3 px-4 text-primary"
+                <DSButton
+                  variant="secondary"
+                  size="small"
                   disabled={!canSubmit}
                   type="submit"
+                  primaryTextColor={
+                    Tenant.current().namespace === "xai" ? "white" : undefined
+                  }
                 >
                   Submit delegate profile
-                </Button>
+                </DSButton>
                 {form.formState.isSubmitted && !agreeCodeConduct && (
                   <span className="text-red-700 text-sm">
                     You must agree with the code of conduct to continue

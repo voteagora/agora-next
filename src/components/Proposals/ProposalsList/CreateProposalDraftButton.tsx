@@ -9,6 +9,7 @@ import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { PLMConfig } from "@/app/proposals/draft/types";
+
 const CreateProposalDraftButton = ({
   address,
   className,

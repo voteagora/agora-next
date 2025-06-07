@@ -10,6 +10,7 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { DraftProposal } from "../../types";
+import { DSButton } from "@/components/design-system/Button";
 
 /**
  * TODO:
@@ -114,42 +115,42 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
       <FormCard.Section>
         {!!github_pr_checklist_item ? (
           <div className="space-x-2 self-start flex items-center">
-            <UpdatedButton
+            <DSButton
               fullWidth={true}
-              type="primary"
+              variant="primary"
+              size="small"
               onClick={() => {
                 router.push(`/proposals/draft/${draftProposal.id}?stage=3`);
               }}
             >
               Continue
-            </UpdatedButton>
+            </DSButton>
           </div>
         ) : (
           <div className="space-x-2 self-start flex flex-row items-center">
-            <UpdatedButton
-              isSubmit={false}
-              type="secondary"
-              isLoading={isSkipPending}
+            <DSButton
+              variant="secondary"
+              size="small"
+              loading={isSkipPending}
               onClick={() => {
-                // If we have already created a PR we don't even need to handleCLick, we can just redirect
                 handleSkip();
               }}
               className="shrink"
             >
               Skip
-            </UpdatedButton>
-            <UpdatedButton
-              isSubmit={false}
-              type="primary"
+            </DSButton>
+            <DSButton
+              variant="primary"
+              size="small"
               fullWidth={true}
-              isLoading={isCreatePRPending}
+              loading={isCreatePRPending}
               onClick={() => {
                 handleCreatePR();
               }}
               className="grow"
             >
               Update docs for me
-            </UpdatedButton>
+            </DSButton>
           </div>
         )}
       </FormCard.Section>

@@ -9,6 +9,7 @@ import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import { ProposalType } from "@/app/proposals/draft/types";
 import { keccak256 } from "viem";
 import { toUtf8Bytes } from "ethers";
+import { DSButton } from "@/components/design-system/Button";
 
 interface Props {
   proposal: Proposal;
@@ -70,7 +71,11 @@ export const AgoraOptimismGovQueue = ({ proposal }: Props) => {
   return (
     <>
       {!isFetched && (
-        <Button
+        <DSButton
+          variant="primary"
+          primaryTextColor="black"
+          size="small"
+          fullWidth={false}
           loading={isLoading}
           onClick={() =>
             write({
@@ -82,7 +87,7 @@ export const AgoraOptimismGovQueue = ({ proposal }: Props) => {
           }
         >
           Queue
-        </Button>
+        </DSButton>
       )}
     </>
   );

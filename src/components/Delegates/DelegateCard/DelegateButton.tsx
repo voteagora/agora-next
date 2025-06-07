@@ -14,7 +14,7 @@ export function DelegateButton({
 
   return (
     <DSButton
-      variant="primary"
+      variant="secondary"
       size="small"
       fullWidth={full}
       onClick={(e: any) => {
