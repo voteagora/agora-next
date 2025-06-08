@@ -317,15 +317,15 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
     },
     {
       name: "use-daonode-for-proposals",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "use-daonode-for-votable-supply",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "use-daonode-for-proposal-types",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "show-participation",
