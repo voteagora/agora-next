@@ -426,7 +426,7 @@ export const getDelegateDataFromDaoNode = async (
     console.error("Error in getDelegateDataFromDaoNode:", error);
     return null;
   }
-
+};
 
 export const getDelegateFromDaoNode = async (address: string) => {
   const { namespace, ui } = Tenant.current();
