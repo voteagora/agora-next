@@ -31,6 +31,7 @@ import { unstable_cache } from "next/cache";
 import { getPublicClient } from "@/lib/viem";
 import {
   adaptDAONodeResponse,
+  getProposalFromDaoNode,
   getCachedAllProposalsFromDaoNode,
   getProposalTypesFromDaoNode,
 } from "@/app/lib/dao-node/client";
@@ -186,6 +187,8 @@ async function getProposal(proposalId: string) {
   return withMetrics("getProposal", async () => {
     const { namespace, contracts, ui } = Tenant.current();
 
+    const useDaoNode = ui.toggle("use-daonode-for-proposals")?.enabled ?? false;
+
     const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
       ?.enabled
       ? contracts.providerForTime?.getBlock("latest")
@@ -195,13 +198,23 @@ async function getProposal(proposalId: string) {
       "use-timestamp-for-proposals"
     )?.enabled;
 
-    const getProposalExecution = doInSpan({ name: "getProposal" }, async () =>
-      findProposal({
-        namespace,
-        proposalId,
-        contract: contracts.governor.address,
-      })
-    );
+    let getProposalExecution;
+    if (useDaoNode) {
+      getProposalExecution = doInSpan({ name: "getProposal" }, async () => {
+        const propTypes = await getProposalTypesFromDaoNode();
+        const prop = await getProposalFromDaoNode(proposalId);
+        const proposal = adaptDAONodeResponse(prop.proposal, propTypes.proposal_types);
+        return proposal;
+      });
+    } else {
+      getProposalExecution = doInSpan({ name: "getProposal" }, async () =>
+        findProposal({
+          namespace,
+          proposalId,
+          contract: contracts.governor.address,
+        })
+      );
+    }
 
     const [proposal, votableSupply] = await Promise.all([
       getProposalExecution,

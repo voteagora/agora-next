@@ -9,10 +9,10 @@ import { cache } from "react";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { DelegateStats } from "@/lib/types";
 
-
 const { namespace, ui } = Tenant.current();
-import { DaoNodeVote } from "@/app/api/common/votes/vote";
-
+import { DaoNodeDelegateVote, DaoNodeVote } from "@/app/api/common/votes/vote";
+import { options } from "yargs";
+import { PaginationParams } from "../pagination";
 
 // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL TODO BELOW IS HANDLED
 export function adaptDAONodeResponse(
@@ -71,10 +71,23 @@ export function adaptDAONodeResponse(
     throw new Error(`Unknown voting module name: ${votingModuleName}`);
   }
 
-  const proposalType = proposalTypes[String(apiResponse.proposal_type)];
-  const parsedProposalType = Object.assign(proposalType, {
-    proposal_type_id: String(apiResponse.proposal_type),
-  });
+  // Proposal Type is undefined for some proposals
+  const proposalType =
+    apiResponse.proposal_type !== undefined
+      ? proposalTypes[String(apiResponse.proposal_type)]
+      : undefined;
+  const parsedProposalType =
+    proposalType !== undefined
+      ? Object.assign(proposalType, {
+          proposal_type_id: String(apiResponse.proposal_type),
+        })
+      : undefined;
+
+  if (!parsedProposalType) {
+    console.warn(
+      `Proposal type not found for proposal ${apiResponse.id} (${apiResponse.proposal_type})`
+    );
+  }
 
   return {
     proposal_id: apiResponse.id,
@@ -212,11 +225,11 @@ export const getVotableSupplyFromDaoNode = async () => {
   try {
     const startTime = Date.now();
 
-    const response = await fetch(`${url}v1/voting_power`);
-
     const startTimeS = new Date(startTime).toLocaleString();
 
     console.log(`${startTimeS} -> getVotableSupplyFromDaoNode`);
+
+    const response = await fetch(`${url}v1/voting_power`);
 
     if (!response.ok) {
       throw new Error(`API responded with status: ${response.status} (${url})`);
@@ -278,7 +291,6 @@ export const getCachedAllProposalsFromDaoNode = cache(
     proposal_type: 'STANDARD'
   }
   */
-
 
 export const getDelegatesFromDaoNode = async (options?: {
   sortBy?: string;
@@ -452,10 +464,22 @@ export const getDelegateFromDaoNode = async (address: string) => {
 export const getProposalFromDaoNode = unstable_cache(
   async (proposalId: string) => {
     const url = getDaoNodeURLForNamespace(namespace);
-    const response = await fetch(`${url}v1/proposal/${proposalId}`);
+
+    const startTime = Date.now();
+    const startTimeS = new Date(startTime).toLocaleString();
+    console.log(`${startTimeS} -> getProposalFromDaoNode`);
+    
+    const qry = `${url}v1/proposal/${proposalId}`;
+    console.log(qry);
+
+    const response = await fetch(qry);
     const data: {
       proposal: ProposalPayloadFromDAONode;
     } = await response.json();
+
+    const endTime = Date.now();
+    const endTimeS = new Date(endTime).toLocaleString();
+    console.log(`${endTimeS} <- getProposalFromDaoNode took ${endTime - startTime}ms`);
     return data;
   },
   ["proposalFromDaoNode"],
@@ -468,6 +492,24 @@ export const getProposalFromDaoNode = unstable_cache(
 export const getVotingHistoryFromDaoNode = async (address: string) => {
   const url = getDaoNodeURLForNamespace(namespace);
   const response = await fetch(`${url}v1/delegate/${address}/voting_history`);
-  const data: { voting_history: DaoNodeVote[] } = await response.json();
+  const data: { voting_history: DaoNodeDelegateVote[] } = await response.json();
   return data;
 };
+
+
+
+    
+export const getVoteRecordFromDaoNode = async (proposalId: string, sortBy: string, pagination: PaginationParams, reverse: true | false) => {
+  const url = getDaoNodeURLForNamespace(namespace);
+
+  const queryParams = new URLSearchParams({
+    sort_by: sortBy,
+    page_size: pagination.limit.toString(),
+    offset: pagination.offset.toString(),
+    reverse: reverse ? "true" : "false", // For VP, you likely want "true", to sort by descending.  For Block Number, you likely want false, for ascending.
+  });
+
+  const response = await fetch(`${url}v1/vote_record/${proposalId}?${queryParams}`);
+  const data: { vote_record: DaoNodeVote[], has_next: boolean } = await response.json();
+  return data;
+}

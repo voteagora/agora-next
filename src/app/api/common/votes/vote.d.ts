@@ -51,14 +51,26 @@ export type SnapshotVote = {
   choiceLabels: Record<string, any>;
 };
 
-export type DaoNodeVote = {
-  block_number: number;
-  transaction_index: number;
+export type DaoNodeDelegateVote = {
+  bn: string; // block number
+  tid: number; // transaction index
   voter: string;
   proposal_id: string;
   support: number;
   weight: number;
-  reason: string;
+  reason?: string;
+  params?: number[];
+};
+
+export type DaoNodeVoteRecord = {
+  bn: string; // block number
+  tid: number; // transaction index
+  lid: number; // event log index
+  voter: string;
+  support: number;
+  weight?: number; // Depending on the ABI, "weight" or "votes" will be present
+  votes?: number;
+  reason?: string;
   params?: number[];
 };
 
