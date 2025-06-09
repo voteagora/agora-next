@@ -428,14 +428,17 @@ async function getVotesForProposal({
         : contracts.token.provider.getBlock("latest");
 
       if (useDaoNode) {
+
+        console.log("😀 Using dao node for votes")
         try {
           
           const sortBy = "VP"
           const reverse = true
-          let [proposalResponse, typesFromApi, voteRecordPage] = await Promise.all([
+          let [proposalResponse, typesFromApi, voteRecordPage, latestBlock] = await Promise.all([
             getProposalFromDaoNode(proposalId),
             getProposalTypesFromDaoNode(),
             getVoteRecordFromDaoNode(proposalId, sortBy, pagination, reverse),
+            latestBlockPromise
           ]);
 
           const proposal = proposalResponse.proposal;
@@ -453,7 +456,6 @@ async function getVotesForProposal({
             JSON.stringify(parsedProposal.proposal_data || {}),
             parsedProposal.proposal_type
           );
-          const latestBlock = await latestBlockPromise;
           const votes = voteRecordPage.vote_record
             ?.map((vote) => {
               return {
@@ -482,9 +484,10 @@ async function getVotesForProposal({
                 transaction_index: vote.tid,
               };
             });
+
           return {
             meta: {
-              has_next: voteRecordPage.has_next,
+              has_next: voteRecordPage.has_more,
               total_returned: votes.length,
               next_offset: pagination.offset + pagination.limit,
             },
@@ -699,7 +702,7 @@ async function getUserVotesForProposal({
           });
         return votes;
       } catch (error) {
-        // skip error
+        throw error;
       }
     }
 
