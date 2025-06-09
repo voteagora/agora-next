@@ -248,9 +248,9 @@ export default function SubmitButton({
             proposal_type: rawProposalDataForBackend.proposal_type,
             tiers: rawProposalDataForBackend.tiers,
           },
-          id,
+          id: id.toString(),
           transactionHash,
-          onchainProposalId,
+          onchainProposalId: onchainProposalId?.toString(),
         }),
       });
 

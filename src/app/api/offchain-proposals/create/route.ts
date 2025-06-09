@@ -18,9 +18,9 @@ interface OffchainProposalRequestBody {
     proposal_type: ProposalType;
     tiers: number[];
   };
-  id: bigint;
+  id: string;
   transactionHash: string;
-  onchainProposalId: bigint;
+  onchainProposalId: string | null;
 }
 
 export async function POST(request: NextRequest) {
@@ -58,9 +58,9 @@ export async function POST(request: NextRequest) {
 
     const dbProposal = await prismaWeb2Client.offchainProposals.create({
       data: {
-        id,
+        id: id,
         contract: governor,
-        onchain_proposalid: onchainProposalId ?? null,
+        onchain_proposalid: onchainProposalId || null,
         dao_slug: slug,
         proposer: proposer,
         description: description,
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     trackEvent({
       event_name: ANALYTICS_EVENT_NAMES.CREATE_OFFCHAIN_PROPOSAL,
       event_data: {
-        proposal_id: id.toString(),
+        proposal_id: id,
       },
     });
 
