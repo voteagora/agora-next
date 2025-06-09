@@ -23,6 +23,7 @@ import { getProxyAddress } from "@/lib/alligatorUtils";
 import { calculateBigIntRatio } from "../utils/bigIntRatio";
 import { withMetrics } from "@/lib/metricWrapper";
 import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
+import { getDelegateFromDaoNode } from "@/app/lib/dao-node/client";
 
 // Create a cached version of getDelegatesFromDaoNode
 const cachedGetDelegatesFromDaoNode = unstable_cache(

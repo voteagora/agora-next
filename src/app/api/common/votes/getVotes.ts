@@ -36,9 +36,12 @@ import {
   adaptDAONodeResponse,
   getCachedAllProposalsFromDaoNode,
   getProposalFromDaoNode,
+  getProposalTypesFromDaoNode,
+  getVoteRecordFromDaoNode,
   getVotingHistoryFromDaoNode,
 } from "@/app/lib/dao-node/client";
 import { getHumanBlockTime } from "@/lib/blockTimes";
+import { ProposalPayloadFromDAONode } from "../proposals/proposal";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -72,8 +75,15 @@ async function getVotesForDelegateForAddress({
         const votingHistory = (await getVotingHistoryFromDaoNode(address))
           .voting_history;
         if (votingHistory.length) {
-          const proposals = await getCachedAllProposalsFromDaoNode();
-          const parsedProposals = proposals.map(adaptDAONodeResponse);
+          let [proposals, typesFromApi] = await Promise.all([
+            getCachedAllProposalsFromDaoNode(),
+            getProposalTypesFromDaoNode(),
+          ]);
+
+          const parsedProposals = proposals.map(
+            (proposal: ProposalPayloadFromDAONode) =>
+              adaptDAONodeResponse(proposal, typesFromApi.proposal_types)
+          );
           const parsedVotes = await Promise.all(
             votingHistory.map(async (vote) => {
               const proposal = parsedProposals.find(
@@ -529,56 +539,68 @@ async function getVotesForProposal({
 
       if (useDaoNode) {
         try {
-          const proposal = (await getProposalFromDaoNode(proposalId)).proposal;
+          const sortBy = "VP";
+          const reverse = true;
+          let [proposalResponse, typesFromApi, voteRecordPage] =
+            await Promise.all([
+              getProposalFromDaoNode(proposalId),
+              getProposalTypesFromDaoNode(),
+              getVoteRecordFromDaoNode(proposalId, sortBy, pagination, reverse),
+            ]);
+
+          const proposal = proposalResponse.proposal;
+
           if (!proposal) {
             // Will be caught and ignored below and move on to DB fallback
             throw new Error("Proposal not found");
           }
-          const parsedProposal = adaptDAONodeResponse(proposal);
+          const parsedProposal = adaptDAONodeResponse(
+            proposal,
+            typesFromApi.proposal_types
+          );
+
           const proposalData = parseProposalData(
             JSON.stringify(parsedProposal.proposal_data || {}),
             parsedProposal.proposal_type
           );
           const latestBlock = await latestBlockPromise;
-          const votes = proposal.voting_record
-            ?.map((vote) => {
-              return {
-                transactionHash: null,
-                address: vote.voter,
-                proposalId,
-                support: parseSupport(
-                  String(vote.support),
-                  parsedProposal.proposal_type,
-                  String(proposal.start_block)
-                ),
-                weight: vote.weight.toLocaleString("fullwide", {
-                  useGrouping: false,
-                }),
-                reason: vote.reason,
-                params: vote.params
-                  ? parseParams(JSON.stringify(vote.params), proposalData)
-                  : [],
-                proposalValue: getProposalTotalValue(proposalData) ?? BigInt(0),
-                proposalTitle: getTitleFromProposalDescription(
-                  proposal.description
-                ),
-                proposalType: parsedProposal.proposal_type,
-                timestamp: getHumanBlockTime(vote.block_number, latestBlock),
-                blockNumber: BigInt(vote.block_number),
-                transaction_index: vote.transaction_index,
-              };
-            })
-            .sort((a, b) => Number(b.weight) - Number(a.weight));
+          const votes = voteRecordPage.vote_record?.map((vote) => {
+            return {
+              transactionHash: null,
+              address: vote.voter,
+              proposalId,
+              support: parseSupport(
+                String(vote.support),
+                parsedProposal.proposal_type,
+                String(proposal.start_block)
+              ),
+              weight: vote.weight.toLocaleString("fullwide", {
+                useGrouping: false,
+              }),
+              reason: vote.reason,
+              params: vote.params
+                ? parseParams(JSON.stringify(vote.params), proposalData)
+                : [],
+              proposalValue: getProposalTotalValue(proposalData) ?? BigInt(0),
+              proposalTitle: getTitleFromProposalDescription(
+                proposal.description
+              ),
+              proposalType: parsedProposal.proposal_type,
+              timestamp: getHumanBlockTime(vote.block_number, latestBlock),
+              blockNumber: BigInt(vote.bn),
+              transaction_index: vote.tid,
+            };
+          });
           return {
             meta: {
-              has_next: false,
+              has_next: voteRecordPage.has_next,
               total_returned: votes.length,
-              next_offset: 0,
+              next_offset: pagination.offset + pagination.limit,
             },
             data: votes,
           };
         } catch (error) {
-          // skip error
+          throw error;
         }
       }
 
@@ -777,12 +799,19 @@ async function getUserVotesForProposal({
 
     if (useDaoNode) {
       try {
-        const proposal = (await getProposalFromDaoNode(proposalId)).proposal;
+        let [proposalResponse, typesFromApi] = await Promise.all([
+          getProposalFromDaoNode(proposalId),
+          getProposalTypesFromDaoNode(),
+        ]);
+        const proposal = proposalResponse.proposal;
         if (!proposal) {
           // Will be caught and ignored below and move on to DB fallback
           throw new Error("Proposal not found");
         }
-        const parsedProposal = adaptDAONodeResponse(proposal);
+        const parsedProposal = adaptDAONodeResponse(
+          proposal,
+          typesFromApi.proposal_types
+        );
         const proposalData = parseProposalData(
           JSON.stringify(parsedProposal.proposal_data || {}),
           parsedProposal.proposal_type
