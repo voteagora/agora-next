@@ -19,7 +19,12 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
 
   const showParticipation = ui.toggle("show-participation")?.enabled || false;
 
-  if (!voterStats || !delegateResponse || delegateStatsError || !showParticipation) {
+  if (
+    !voterStats ||
+    !delegateResponse ||
+    delegateStatsError ||
+    !showParticipation
+  ) {
     return null;
   }
 
