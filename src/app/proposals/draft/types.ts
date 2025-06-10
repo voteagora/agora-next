@@ -313,7 +313,7 @@ const parseTransaction = (t: ProposalDraftTransaction) => {
 export const parseProposalToForm = (proposal: DraftProposal) => {
   const baseFields = {
     proposal_scope: proposal.proposal_scope,
-    tiers_enabled: proposal.tiers_enabled,
+    tiers_enabled: proposal.tiers_enabled || proposal.tiers?.length > 0,
     tiers: proposal.tiers,
   };
 
