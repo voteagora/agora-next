@@ -1,9 +1,11 @@
 "use client";
 
-import { Form } from "./CreateProposalForm";
 import { VStack } from "@/components/Layout/Stack";
 import { Switch } from "@/components/shared/Switch";
 import { ProposalScope } from "@/app/proposals/draft/types";
+import { UseFormReturn } from "react-hook-form";
+import { DraftProposalSchema } from "@/app/proposals/draft/schemas/DraftProposalSchema";
+import { z } from "zod";
 
 const proposalScopeOptions = {
   [ProposalScope.ONCHAIN_ONLY]: "On-Chain Only",
@@ -11,8 +13,12 @@ const proposalScopeOptions = {
   [ProposalScope.HYBRID]: "Hybrid (On-Chain & Off-Chain)",
 };
 
-function JointHouseSettings({ form }: { form: Form }) {
-  const { proposal_scope } = form.state;
+function JointHouseSettings({
+  form,
+}: {
+  form: UseFormReturn<z.output<typeof DraftProposalSchema>>;
+}) {
+  const proposal_scope = form.watch("proposal_scope");
 
   const handleScopeChange = (selectedOption: string) => {
     const scope = Object.keys(proposalScopeOptions).find(
@@ -20,8 +26,8 @@ function JointHouseSettings({ form }: { form: Form }) {
     ) as ProposalScope | undefined;
 
     if (scope) {
-      if (form.onChange.proposal_scope) {
-        form.onChange.proposal_scope(scope);
+      if (form.setValue) {
+        form.setValue("proposal_scope", scope);
       }
     }
   };

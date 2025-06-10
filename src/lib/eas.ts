@@ -14,19 +14,12 @@ const { slug } = Tenant.current();
 
 const CREATE_PROPOSAL_SCHEMA_ID =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? "0xc2d307e00cc97b07606361c49971814ed50e20b080a0fb7a3c9c94c224463539"
-    : "0xc2d307e00cc97b07606361c49971814ed50e20b080a0fb7a3c9c94c224463539";
-
-const CANCEL_PROPOSAL_SCHEMA_ID =
-  process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? "0x59bc3744c9c3d0dd7871882f71dbf9f9709bf6bb469d45f36537f9de6288a736"
-    : "0x59bc3744c9c3d0dd7871882f71dbf9f9709bf6bb469d45f36537f9de6288a736";
+    ? "0x875845d42b7cb72da8d97c3442182b9a0ee302d4a8d661ee8b83f13bf1f8f38b"
+    : "0x875845d42b7cb72da8d97c3442182b9a0ee302d4a8d661ee8b83f13bf1f8f38b";
 
 const schemaEncoder = new SchemaEncoder(
   "address contract,uint256 id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block, string proposal_type, uint256[] tiers, uint256 onchain_proposalid"
 );
-
-const schemaEncoderCancel = new SchemaEncoder("uint256 id");
 
 const eas =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"

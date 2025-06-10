@@ -11,6 +11,7 @@ import {
   ApprovalProposalType,
   TransactionType,
   EthereumAddress,
+  ProposalScope,
 } from "@/app/proposals/draft/types";
 import TransferTransactionForm from "./TransferTransactionForm";
 import CustomTransactionForm from "./CustomTransactionForm";
@@ -27,7 +28,13 @@ import { checkNewApprovalProposal } from "@/lib/seatbelt/checkProposal";
 import { StructuredReport } from "@/components/Simulation/StructuredReport";
 type FormType = z.output<typeof ApprovalProposalSchema>;
 
-const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
+const OptionItem = ({
+  optionIndex,
+  isOffchain,
+}: {
+  optionIndex: number;
+  isOffchain: boolean;
+}) => {
   const { control } = useFormContext<FormType>();
 
   const {
@@ -80,44 +87,46 @@ const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
           );
         })}
       </div>
-      <div className="flex flex-row space-x-2 w-full mt-6">
-        <UpdatedButton
-          isSubmit={false}
-          type="secondary"
-          className="flex-grow"
-          onClick={() => {
-            appendTransaction({
-              type: TransactionType.TRANSFER,
-              target: "" as EthereumAddress,
-              value: "",
-              calldata: "",
-              description: "",
-              simulation_state: "UNCONFIRMED",
-              simulation_id: "",
-            });
-          }}
-        >
-          Add a transfer transaction
-        </UpdatedButton>
-        <UpdatedButton
-          isSubmit={false}
-          type="secondary"
-          className="flex-grow"
-          onClick={() => {
-            appendTransaction({
-              type: TransactionType.CUSTOM,
-              target: "" as EthereumAddress,
-              value: "",
-              calldata: "",
-              description: "",
-              simulation_state: "UNCONFIRMED",
-              simulation_id: "",
-            });
-          }}
-        >
-          Add a custom transaction
-        </UpdatedButton>
-      </div>
+      {!isOffchain && (
+        <div className="flex flex-row space-x-2 w-full mt-6">
+          <UpdatedButton
+            isSubmit={false}
+            type="secondary"
+            className="flex-grow"
+            onClick={() => {
+              appendTransaction({
+                type: TransactionType.TRANSFER,
+                target: "" as EthereumAddress,
+                value: "",
+                calldata: "",
+                description: "",
+                simulation_state: "UNCONFIRMED",
+                simulation_id: "",
+              });
+            }}
+          >
+            Add a transfer transaction
+          </UpdatedButton>
+          <UpdatedButton
+            isSubmit={false}
+            type="secondary"
+            className="flex-grow"
+            onClick={() => {
+              appendTransaction({
+                type: TransactionType.CUSTOM,
+                target: "" as EthereumAddress,
+                value: "",
+                calldata: "",
+                description: "",
+                simulation_state: "UNCONFIRMED",
+                simulation_id: "",
+              });
+            }}
+          >
+            Add a custom transaction
+          </UpdatedButton>
+        </div>
+      )}
     </div>
   );
 };
@@ -171,6 +180,7 @@ const ApprovalProposalForm = () => {
   const criteria = watch("approvalProposal.criteria");
   const topChoices = watch("approvalProposal.topChoices");
   const optionsWatched = watch("approvalProposal.options");
+  const proposal_scope = watch("proposal_scope");
   const [simulationReports, setSimulationReports] = useState<
     StructuredSimulationReport[]
   >([]);
@@ -435,10 +445,17 @@ const ApprovalProposalForm = () => {
       </div>
       <div>
         <h3 className="text-secondary font-semibold">Proposed transactions</h3>
-        <p className="mt-2 text-secondary">
-          Proposed transactions will execute if your proposal passes. If you
-          skip this step no transactions will be added.
-        </p>
+        {proposal_scope !== ProposalScope.OFFCHAIN_ONLY ? (
+          <p className="mt-2 text-secondary">
+            Proposed transactions will execute if your proposal passes. If you
+            skip this step no transactions will be added.
+          </p>
+        ) : (
+          <p className="mt-2 text-secondary">
+            Options for an off-chain only proposal define choices for voters and
+            will not execute on-chain transactions.
+          </p>
+        )}
         <div className="mt-6 space-y-12">
           {options.map((field, index) => {
             return (
@@ -459,7 +476,10 @@ const ApprovalProposalForm = () => {
                       <XCircleIcon className="w-5 h-5 text-red-500 cursor-pointer" />
                     </span>
                   </div>
-                  <OptionItem optionIndex={index} />
+                  <OptionItem
+                    optionIndex={index}
+                    isOffchain={proposal_scope === ProposalScope.OFFCHAIN_ONLY}
+                  />
                 </div>
               </div>
             );
@@ -482,6 +502,7 @@ const ApprovalProposalForm = () => {
         </div>
       </div>
       {options?.length > 0 &&
+        proposal_scope !== ProposalScope.OFFCHAIN_ONLY &&
         TENDERLY_VALID_CHAINS.includes(
           Tenant.current().contracts.governor.chain.id
         ) && (

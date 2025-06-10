@@ -1,53 +1,62 @@
 "use client";
 
-import { Form } from "./CreateProposalForm";
-import { ProposalScope } from "@/app/proposals/draft/types";
+import { ProposalScope, ProposalType } from "@/app/proposals/draft/types";
 import { Button } from "@/components/ui/button";
 import { Plus, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
+import { DraftProposalSchema } from "@/app/proposals/draft/schemas/DraftProposalSchema";
 
-function TiersSettings({ form }: { form: Form }) {
-  const { proposal_scope, proposalType, tiers_enabled, tiers } = form.state;
+function TiersSettings({
+  form,
+}: {
+  form: UseFormReturn<z.output<typeof DraftProposalSchema>>;
+}) {
+  const proposal_scope = form.watch("proposal_scope");
+  const proposalType = form.watch("type");
+  const tiers_enabled = form.watch("tiers_enabled");
+  const tiers = form.watch("tiers");
 
   const handleTiersEnabledChange = (enabled: boolean) => {
-    if (form.onChange.tiers_enabled) {
-      form.onChange.tiers_enabled(enabled);
-      if (!enabled && form.onChange.tiers) {
-        form.onChange.tiers([]);
+    if (form.setValue) {
+      form.setValue("tiers_enabled", enabled);
+      if (!enabled && form.setValue) {
+        form.setValue("tiers", []);
       }
     }
   };
 
   const handleTierChange = (index: number, value: string) => {
-    if (form.onChange.tiers) {
+    if (form.setValue) {
       const newTiers = [...(tiers || [])];
       const percentage = parseFloat(value);
       if (!isNaN(percentage) && percentage >= 0 && percentage <= 100) {
         const internalValue = Math.round(percentage * 100);
         newTiers[index] = internalValue;
-        form.onChange.tiers(newTiers);
+        form.setValue("tiers", newTiers);
       }
     }
   };
 
   const addTier = () => {
-    if (form.onChange.tiers) {
+    if (form.setValue) {
       const newTiers = [...(tiers || []), 0];
-      form.onChange.tiers(newTiers);
+      form.setValue("tiers", newTiers);
     }
   };
 
   const removeTier = (index: number) => {
-    if (form.onChange.tiers) {
+    if (form.setValue) {
       const newTiers = [...(tiers || [])];
       newTiers.splice(index, 1);
-      form.onChange.tiers(newTiers);
+      form.setValue("tiers", newTiers);
     }
   };
 
   const showTiers =
-    proposalType === "Optimistic" &&
+    proposalType === ProposalType.OPTIMISTIC &&
     proposal_scope !== ProposalScope.ONCHAIN_ONLY;
 
   if (!showTiers) return null;
