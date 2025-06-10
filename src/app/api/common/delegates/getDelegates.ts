@@ -26,7 +26,15 @@ import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
 
 // Create a cached version of getDelegatesFromDaoNode
 const cachedGetDelegatesFromDaoNode = unstable_cache(
-  getDelegatesFromDaoNode,
+  async (args) => {
+    try {
+      const result = await getDelegatesFromDaoNode(args);
+      return result || { delegates: [], totalBeforeInternalPagination: 0 };
+    } catch (error) {
+      console.error("Error fetching delegates from DAO node:", error);
+      return { delegates: [], totalBeforeInternalPagination: 0 };
+    }
+  },
   ["delegates-dao-node-filters"],
   {
     revalidate: 30, // Cache for 30 seconds
