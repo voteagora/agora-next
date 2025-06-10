@@ -357,6 +357,7 @@ export async function parseProposal(
       ? await getProposalStatus(
           proposal,
           proposalResuts,
+          proposalData,
           latestBlock,
           quorum,
           votableSupply
@@ -462,6 +463,8 @@ export type ParsedProposalData = {
       options: [];
       tiers: number[];
       onchainProposalId?: string;
+      created_attestation_hash?: string;
+      cancelled_attestation_hash?: string;
     };
   };
   OFFCHAIN_OPTIMISTIC: {
@@ -469,6 +472,8 @@ export type ParsedProposalData = {
     kind: {
       options: [];
       onchainProposalId?: string;
+      created_attestation_hash?: string;
+      cancelled_attestation_hash?: string;
     };
   };
   OFFCHAIN_STANDARD: {
@@ -476,6 +481,8 @@ export type ParsedProposalData = {
     kind: {
       options: [];
       onchainProposalId?: string;
+      created_attestation_hash?: string;
+      cancelled_attestation_hash?: string;
     };
   };
   OFFCHAIN_APPROVAL: {
@@ -484,6 +491,8 @@ export type ParsedProposalData = {
       options: [];
       onchainProposalId?: string;
       choices: string[];
+      created_attestation_hash?: string;
+      cancelled_attestation_hash?: string;
     };
   };
 };
@@ -644,7 +653,10 @@ export function parseProposalData(
         kind: {
           options: [],
           tiers: parsedProposalData.tiers,
-          onchainProposalId: proposalData,
+          onchainProposalId: parsedProposalData.onchain_proposalid,
+          created_attestation_hash: parsedProposalData.created_attestation_hash,
+          cancelled_attestation_hash:
+            parsedProposalData.cancelled_attestation_hash,
         },
       };
     }
@@ -654,7 +666,10 @@ export function parseProposalData(
         key: "OFFCHAIN_OPTIMISTIC",
         kind: {
           options: [],
-          onchainProposalId: parsedProposalData.onchainProposalId,
+          onchainProposalId: parsedProposalData.onchain_proposalid,
+          created_attestation_hash: parsedProposalData.created_attestation_hash,
+          cancelled_attestation_hash:
+            parsedProposalData.cancelled_attestation_hash,
         },
       };
     }
@@ -664,7 +679,10 @@ export function parseProposalData(
         key: "OFFCHAIN_STANDARD",
         kind: {
           options: [],
-          onchainProposalId: parsedProposalData.onchainProposalId,
+          onchainProposalId: parsedProposalData.onchain_proposalid,
+          created_attestation_hash: parsedProposalData.created_attestation_hash,
+          cancelled_attestation_hash:
+            parsedProposalData.cancelled_attestation_hash,
         },
       };
     }
@@ -673,9 +691,12 @@ export function parseProposalData(
       return {
         key: "OFFCHAIN_APPROVAL",
         kind: {
-          onchainProposalId: parsedProposalData.onchainProposalId,
+          onchainProposalId: parsedProposalData.onchain_proposalid,
           choices: parsedProposalData.choices,
           options: [],
+          created_attestation_hash: parsedProposalData.created_attestation_hash,
+          cancelled_attestation_hash:
+            parsedProposalData.cancelled_attestation_hash,
         },
       };
     }
@@ -910,6 +931,7 @@ export type ProposalStatus =
 export async function getProposalStatus(
   proposal: ProposalPayload,
   proposalResults: ParsedProposalResults[ProposalType],
+  proposalData: ParsedProposalData[ProposalType],
   latestBlock: Block | null,
   quorum: bigint | null,
   votableSupply: bigint
@@ -1003,7 +1025,11 @@ export async function getProposalStatus(
   if (proposalResults.key === "SNAPSHOT") {
     return proposalResults.kind.status.toUpperCase() as ProposalStatus;
   }
-  if (proposal.cancelled_block) {
+  if (
+    proposal.cancelled_block ||
+    (proposalData.kind as ParsedProposalData["OFFCHAIN_STANDARD"]["kind"])
+      .cancelled_attestation_hash
+  ) {
     return "CANCELLED";
   }
   if (proposal.executed_block) {

@@ -1,13 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { getPublicClient } from "@/lib/viem";
 import Tenant from "@/lib/tenant/tenant";
 
 interface OffchainCancelRequestBody {
-  proposalId: bigint;
+  proposalId: string;
   transactionHash: string;
 }
 
@@ -30,8 +28,8 @@ export async function POST(request: NextRequest) {
 
   const { proposalId, transactionHash } = requestBody;
 
-  if (!proposalId || !transactionHash) {
-    return new Response("Missing proposalId or transactionHash", {
+  if (!proposalId) {
+    return new Response("Missing proposalId", {
       status: 400,
     });
   }

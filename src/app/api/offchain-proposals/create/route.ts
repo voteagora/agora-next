@@ -58,9 +58,9 @@ export async function POST(request: NextRequest) {
 
     const dbProposal = await prismaWeb2Client.offchainProposals.create({
       data: {
-        id: id,
+        id,
         contract: governor,
-        onchain_proposalid: onchainProposalId || null,
+        onchain_proposalid: onchainProposalId ?? null,
         dao_slug: slug,
         proposer: proposer,
         description: description,
