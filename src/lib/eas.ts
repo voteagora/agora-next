@@ -87,7 +87,7 @@ export async function createProposalAttestation({
 
   const recipient = "0x0000000000000000000000000000000000000000";
   const expirationTime = NO_EXPIRATION;
-  const revocable = false;
+  const revocable = true;
 
   const signature = await signDelegatedAttestation({
     schema: CREATE_PROPOSAL_SCHEMA_ID,
@@ -148,77 +148,29 @@ export async function createProposalAttestation({
 }
 
 export async function cancelProposalAttestation({
-  id,
+  attestationUID,
   signer,
   canceller,
 }: {
-  id: bigint;
+  attestationUID: string;
   signer: JsonRpcSigner;
   canceller: string;
 }) {
-  const encodedData = schemaEncoderCancel.encodeData([
-    { name: "id", value: id, type: "uint256" },
-  ]);
+  eas.connect(signer as any);
 
-  const recipient = "0x0000000000000000000000000000000000000000";
-  const expirationTime = NO_EXPIRATION;
-  const revocable = false;
-
-  const signature = await signDelegatedAttestation({
-    schema: CANCEL_PROPOSAL_SCHEMA_ID,
-    recipient,
-    expirationTime,
-    revocable,
-    refUID: ZERO_BYTES32,
-    encodedData,
-    deadline: expirationTime,
-    value: 0n,
-    signer,
+  const transaction = await eas.revoke({
+    schema: CREATE_PROPOSAL_SCHEMA_ID,
+    data: {
+      uid: attestationUID,
+      value: 0n,
+    },
   });
 
-  if (!signature) {
-    console.error("Failed to get signature");
-    throw new Error("Signature is required");
-  }
-  if (
-    typeof signature === "object" &&
-    "v" in signature &&
-    "r" in signature &&
-    "s" in signature
-  ) {
-    const { v, r, s } = signature;
-    if (
-      typeof v !== "number" ||
-      typeof r !== "string" ||
-      typeof s !== "string"
-    ) {
-      throw new Error("Invalid signature format");
-    }
-  } else {
-    throw new Error("Invalid signature format");
-  }
-
-  const receipt = await attestByDelegationServer({
-    recipient,
-    expirationTime,
-    revocable,
-    encodedData,
-    signature,
-    attester: canceller,
-    schema: CANCEL_PROPOSAL_SCHEMA_ID,
-  });
-
-  if (!receipt) {
-    console.error(
-      "Transaction failed or was not mined. Full response:",
-      receipt
-    );
-    throw new Error("Transaction failed or was not mined.");
-  }
+  const receipt = await transaction.wait();
 
   return {
     transactionHash: receipt,
-    id,
+    attestationUID,
   };
 }
 

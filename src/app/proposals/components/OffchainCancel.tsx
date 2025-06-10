@@ -6,6 +6,7 @@ import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
 import { cancelProposalAttestation } from "@/lib/eas";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
 import { useState } from "react";
+import { ParsedProposalData } from "@/lib/proposalUtils";
 
 interface Props {
   proposal: Proposal;
@@ -35,12 +36,16 @@ export const OffchainCancel = ({ proposal }: Props) => {
     try {
       const apiKey = process.env.NEXT_PUBLIC_AGORA_API_KEY;
 
-      if (!apiKey) {
+      const attestationUID = (
+        proposal.proposalData as ParsedProposalData["OFFCHAIN_STANDARD"]["kind"]
+      ).cancelled_attestation_hash;
+
+      if (!apiKey || !attestationUID) {
         throw new Error("AGORA_API_KEY is not set");
       }
 
       const { transactionHash } = await cancelProposalAttestation({
-        id: BigInt(proposal.id),
+        attestationUID,
         signer: signer,
         canceller: address,
       });
@@ -52,8 +57,8 @@ export const OffchainCancel = ({ proposal }: Props) => {
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          proposalId: BigInt(proposal.id),
-          transactionHash: transactionHash,
+          proposalId: proposal.id,
+          transactionHash: attestationUID,
         }),
       });
 
