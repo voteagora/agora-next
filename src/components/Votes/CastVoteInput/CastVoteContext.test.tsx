@@ -83,6 +83,9 @@ vi.mock("@/lib/tenant/tenant", () => {
           id: 1,
         },
       },
+      governor: {
+        provider: {},
+      },
     };
     ui = {
       toggle: vi.fn((feature) => {
