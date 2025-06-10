@@ -944,7 +944,7 @@ view etherfiAuthorityChainsSnaps {
   balance              Decimal  @db.Decimal
   allowance            Decimal  @db.Decimal
   contract             String?  @db.VarChar
-  balance_block_number BigInt?
+  balance_block_number BigInt
   balance_ordinal      Decimal? @db.Decimal
 
   @@map("authority_chains_snaps")
@@ -1142,7 +1142,7 @@ view uniswapAuthorityChainsSnaps {
   balance              Decimal  @db.Decimal
   allowance            Decimal  @db.Decimal
   contract             String?  @db.VarChar
-  balance_block_number BigInt?
+  balance_block_number BigInt
   balance_ordinal      Decimal? @db.Decimal
 
   @@map("authority_chains_snaps")
@@ -4644,7 +4644,6 @@ enum ProposalType {
   APPROVAL
   OPTIMISTIC
   SNAPSHOT
-  OFFCHAIN_STANDARD
 
   @@map("proposal_type")
   @@schema("config")
