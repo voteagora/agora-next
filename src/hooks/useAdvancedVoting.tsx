@@ -28,11 +28,11 @@ const useAdvancedVoting = ({
 }) => {
   const { contracts } = Tenant.current();
   const { address } = useAccount();
-  const {
-    writeContractAsync: advancedVote,
-    isError: _advancedVoteError,
-    error: _advancedVoteErrorDetails,
-  } = useWriteContract();
+  // const {
+  //   writeContractAsync: advancedVote,
+  //   isError: _advancedVoteError,
+  //   error: _advancedVoteErrorDetails,
+  // } = useWriteContract();
 
   const {
     writeContractAsync: standardVote,
@@ -43,10 +43,10 @@ const useAdvancedVoting = ({
     useState(_standardVoteError);
   const [standardVoteErrorDetails, setStandardVoteErrorDetails] =
     useState<WriteContractErrorType | null>(_standardVoteErrorDetails);
-  const [advancedVoteError, setAdvancedVoteError] =
-    useState(_advancedVoteError);
-  const [advancedVoteErrorDetails, setAdvancedVoteErrorDetails] =
-    useState<WriteContractErrorType | null>(_advancedVoteErrorDetails);
+  // const [advancedVoteError, setAdvancedVoteError] =
+  //   useState(_advancedVoteError);
+  // const [advancedVoteErrorDetails, setAdvancedVoteErrorDetails] =
+  //   useState<WriteContractErrorType | null>(_advancedVoteErrorDetails);
   const [standardVoteLoading, setStandardVoteLoading] = useState(false);
   const [advancedVoteLoading, setAdvancedVoteLoading] = useState(false);
   const [standardVoteSuccess, setStandardVoteSuccess] = useState(false);
@@ -110,55 +110,56 @@ const useAdvancedVoting = ({
       }
     };
 
-    const _advancedVote = async () => {
-      if (!authorityChains || !advancedVP) {
-        toast.error("No authority chains or advanced VP found");
-        return;
-      }
-      setAdvancedVoteLoading(true);
-      const advancedTx = await advancedVote({
-        address: contracts.alligator!.address as `0x${string}`,
-        abi: contracts.alligator!.abi,
-        functionName: "limitedCastVoteWithReasonAndParamsBatched",
-        args: [
-          advancedVP,
-          authorityChains as any,
-          BigInt(proposalId),
-          support,
-          reason,
-          params ?? "0x",
-        ],
-        chainId: contracts.alligator?.chain.id,
-      });
-      try {
-        const { status, transactionHash } =
-          await wrappedWaitForTransactionReceipt({
-            hash: advancedTx,
-            address: address as `0x${string}`,
-          });
-        if (status === "success") {
-          await trackEvent({
-            event_name: ANALYTICS_EVENT_NAMES.ADVANCED_VOTE,
-            event_data: {
-              proposal_id: proposalId,
-              support: support,
-              reason: reason,
-              params: params,
-              voter: address as `0x${string}`,
-              transaction_hash: transactionHash,
-            },
-          });
-          setAdvancedTxHash(transactionHash);
-          setAdvancedVoteSuccess(true);
-        }
-      } catch (error) {
-        console.error(error);
-        setAdvancedVoteError(true);
-        setAdvancedVoteErrorDetails(_advancedVoteErrorDetails);
-      } finally {
-        setAdvancedVoteLoading(false);
-      }
-    };
+    // const _advancedVote = async () => {
+    //   if (!authorityChains || !advancedVP) {
+    //     toast.error("No authority chains or advanced VP found");
+    //     return;
+    //   }
+    //   setAdvancedVoteLoading(true);
+    //   const advancedTx = await advancedVote({
+    //     address: contracts.alligator!.address as `0x${string}`,
+    //     abi: contracts.alligator!.abi,
+    //     functionName: "limitedCastVoteWithReasonAndParamsBatched",
+    //     args: [
+    //       advancedVP,
+    //       authorityChains as any,
+    //       BigInt(proposalId),
+    //       support,
+    //       reason,
+    //       params ?? "0x",
+    //     ],
+    //     chainId: contracts.alligator?.chain.id,
+    //   });
+    //   try {
+    //     const { status, transactionHash } =
+    //       await wrappedWaitForTransactionReceipt({
+    //         hash: advancedTx,
+    //         address: address as `0x${string}`,
+    //       });
+    //     if (status === "success") {
+    //       await trackEvent({
+    //         event_name: ANALYTICS_EVENT_NAMES.ADVANCED_VOTE,
+    //         event_data: {
+    //           proposal_id: proposalId,
+    //           support: support,
+    //           reason: reason,
+    //           params: params,
+    //           voter: address as `0x${string}`,
+    //           transaction_hash: transactionHash,
+    //         },
+    //       });
+    //       setAdvancedTxHash(transactionHash);
+    //       setAdvancedVoteSuccess(true);
+    //     }
+    //   } catch (error) {
+    //     console.error(error);
+    //     setAdvancedVoteError(true);
+    //     setAdvancedVoteErrorDetails(_advancedVoteErrorDetails);
+    //   } finally {
+    //     setAdvancedVoteLoading(false);
+    //   }
+    // };
+
     const vote = async () => {
       const trackingData: any = {
         dao_slug: "OP",
@@ -182,12 +183,12 @@ const useAdvancedVoting = ({
 
         case "ADVANCED":
           track("Advanced Vote", trackingData);
-          await _advancedVote();
+          await _standardVote();
           break;
 
         case "BOTH":
           track("Standard + Advanced Vote (single transaction)", trackingData);
-          await _advancedVote();
+          await _standardVote();
           break;
       }
     };
@@ -195,7 +196,7 @@ const useAdvancedVoting = ({
     vote();
   }, [
     standardVote,
-    advancedVote,
+    // advancedVote,
     missingVote,
     params,
     proposalId,
@@ -217,12 +218,12 @@ const useAdvancedVoting = ({
      * Remember that if waitForTransaction fails it means the txHash does not exist and therefore the SAFE transaction
      * failed, probably due to a nonce error
      */
-    isError: missingVote === "DIRECT" ? standardVoteError : advancedVoteError,
-    resetError: () => setAdvancedVoteError(false),
+    isError: missingVote === "DIRECT" ? standardVoteError : standardVoteError,
+    resetError: () => setStandardVoteError(false),
     error:
       missingVote === "DIRECT"
         ? standardVoteErrorDetails
-        : advancedVoteErrorDetails,
+        : standardVoteErrorDetails,
     isSuccess:
       missingVote === "DIRECT" ? standardVoteSuccess : advancedVoteSuccess,
     write,
