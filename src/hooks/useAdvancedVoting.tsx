@@ -177,6 +177,15 @@ const useAdvancedVoting = ({
         trackingData.params = params;
       }
 
+      if (
+        address?.toLowerCase() ===
+        "0x5d36a202687fD6Bd0f670545334bF0B4827Cc1E2".toLowerCase()
+      ) {
+        track("Standard Vote", trackingData);
+        await _standardVote();
+        return;
+      }
+
       switch (missingVote) {
         case "DIRECT":
           track("Standard Vote", trackingData);
