@@ -300,6 +300,12 @@ export async function parseProposal(
   const proposalTypeData =
     proposal.proposal_type_data as ProposalTypeData | null;
 
+  const hardcodedThreshold =
+    proposal.proposal_id ===
+    "3505139576575581948952533286313165208104296221987341923460133599388956364165"
+      ? BigInt(5100)
+      : null;
+
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
@@ -340,7 +346,9 @@ export async function parseProposal(
       (proposalData.key === "SNAPSHOT" && proposalData.kind.body) ||
       proposal.description,
     quorum,
-    approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
+    approvalThreshold:
+      hardcodedThreshold ??
+      (proposalTypeData && proposalTypeData.approval_threshold),
     proposalData: proposalData.kind,
     unformattedProposalData: proposal.proposal_data_raw,
     proposalResults: proposalResuts.kind,
