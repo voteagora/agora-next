@@ -111,13 +111,13 @@ const OffchainProposalAction = ({
         | "approval"
         | "optimistic";
       const targets =
-        proposalType === "basic" ? (inputData?.[0] as string[]) : null;
+        proposalType === "basic" ? (inputData?.[0] as string[]) : [];
       const values =
         proposalType === "basic"
           ? (inputData?.[1] as number[]).map(BigInt)
-          : null;
+          : [];
       const calldatas =
-        proposalType === "basic" ? (inputData?.[2] as string[]) : null;
+        proposalType === "basic" ? (inputData?.[2] as string[]) : [];
       const description =
         proposalType === "basic"
           ? (inputData?.[3] as string)
@@ -129,7 +129,7 @@ const OffchainProposalAction = ({
       const offchainOnly =
         draftProposal.proposal_scope === ProposalScope.OFFCHAIN_ONLY;
 
-      if (targets && values && calldatas && !offchainOnly) {
+      if (!offchainOnly) {
         onchainProposalId = await generateProposalId({
           targets,
           values,
