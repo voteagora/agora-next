@@ -3,8 +3,14 @@ import { disapprovalThreshold } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 
 function formatNumber(amount, decimals = 0, maximumSignificantDigits = 4) {
-  const standardUnitAmount = Number(formatUnits(amount, decimals));
-  return standardUnitAmount;
+  if (amount == null) return 0;
+  try {
+    const standardUnitAmount = Number(formatUnits(amount, decimals));
+    return standardUnitAmount;
+  } catch (error) {
+    console.error("Error formatting number:", error);
+    return 0;
+  }
 }
 
 export default function OPOptimisticProposalStatus({

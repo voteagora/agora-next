@@ -11,6 +11,7 @@ import {
   ApprovalProposalType,
   TransactionType,
   EthereumAddress,
+  ProposalScope,
 } from "@/app/proposals/draft/types";
 import TransferTransactionForm from "./TransferTransactionForm";
 import CustomTransactionForm from "./CustomTransactionForm";
@@ -27,7 +28,13 @@ import { checkNewApprovalProposal } from "@/lib/seatbelt/checkProposal";
 import { StructuredReport } from "@/components/Simulation/StructuredReport";
 type FormType = z.output<typeof ApprovalProposalSchema>;
 
-const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
+const OptionItem = ({
+  optionIndex,
+  isOffchain,
+}: {
+  optionIndex: number;
+  isOffchain: boolean;
+}) => {
   const { control } = useFormContext<FormType>();
 
   const {
@@ -80,44 +87,46 @@ const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
           );
         })}
       </div>
-      <div className="flex flex-row space-x-2 w-full mt-6">
-        <UpdatedButton
-          isSubmit={false}
-          type="secondary"
-          className="flex-grow"
-          onClick={() => {
-            appendTransaction({
-              type: TransactionType.TRANSFER,
-              target: "" as EthereumAddress,
-              value: "",
-              calldata: "",
-              description: "",
-              simulation_state: "UNCONFIRMED",
-              simulation_id: "",
-            });
-          }}
-        >
-          Add a transfer transaction
-        </UpdatedButton>
-        <UpdatedButton
-          isSubmit={false}
-          type="secondary"
-          className="flex-grow"
-          onClick={() => {
-            appendTransaction({
-              type: TransactionType.CUSTOM,
-              target: "" as EthereumAddress,
-              value: "",
-              calldata: "",
-              description: "",
-              simulation_state: "UNCONFIRMED",
-              simulation_id: "",
-            });
-          }}
-        >
-          Add a custom transaction
-        </UpdatedButton>
-      </div>
+      {!isOffchain && (
+        <div className="flex flex-row space-x-2 w-full mt-6">
+          <UpdatedButton
+            isSubmit={false}
+            type="secondary"
+            className="flex-grow"
+            onClick={() => {
+              appendTransaction({
+                type: TransactionType.TRANSFER,
+                target: "" as EthereumAddress,
+                value: "",
+                calldata: "",
+                description: "",
+                simulation_state: "UNCONFIRMED",
+                simulation_id: "",
+              });
+            }}
+          >
+            Add a transfer transaction
+          </UpdatedButton>
+          <UpdatedButton
+            isSubmit={false}
+            type="secondary"
+            className="flex-grow"
+            onClick={() => {
+              appendTransaction({
+                type: TransactionType.CUSTOM,
+                target: "" as EthereumAddress,
+                value: "",
+                calldata: "",
+                description: "",
+                simulation_state: "UNCONFIRMED",
+                simulation_id: "",
+              });
+            }}
+          >
+            Add a custom transaction
+          </UpdatedButton>
+        </div>
+      )}
     </div>
   );
 };
@@ -171,6 +180,7 @@ const ApprovalProposalForm = () => {
   const criteria = watch("approvalProposal.criteria");
   const topChoices = watch("approvalProposal.topChoices");
   const optionsWatched = watch("approvalProposal.options");
+  const proposal_scope = watch("proposal_scope");
   const [simulationReports, setSimulationReports] = useState<
     StructuredSimulationReport[]
   >([]);
@@ -392,13 +402,15 @@ const ApprovalProposalForm = () => {
         </p>
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <NumberInput
-          required={true}
-          label="Budget"
-          name="approvalProposal.budget"
-          control={control}
-          tooltip="This is the maximum number of tokens that can be transferred from all the options in this proposal."
-        />
+        {proposal_scope !== ProposalScope.OFFCHAIN_ONLY && (
+          <NumberInput
+            required={false}
+            label="Budget"
+            name="approvalProposal.budget"
+            control={control}
+            tooltip="This is the maximum number of tokens that can be transferred from all the options in this proposal."
+          />
+        )}
         <NumberInput
           required={true}
           label="Max options"
@@ -423,22 +435,69 @@ const ApprovalProposalForm = () => {
             control={control}
           />
         )}
-        {criteria === ApprovalProposalType.THRESHOLD && (
-          <NumberInput
-            required={true}
-            label="Threshold"
-            name="approvalProposal.threshold"
-            tooltip="This is the minimum number of votes an option must have to be considered a winner"
-            control={control}
-          />
-        )}
+        {criteria === ApprovalProposalType.THRESHOLD &&
+          (proposal_scope === ProposalScope.ONCHAIN_ONLY ? (
+            <NumberInput
+              required={true}
+              label="Threshold"
+              name="approvalProposal.threshold"
+              tooltip="This is the minimum number of votes an option must have to be considered a winner"
+              control={control}
+            />
+          ) : (
+            <NumberInput
+              required={true}
+              label="Threshold"
+              name="approvalProposal.threshold"
+              tooltip="This is the percentage an option must have to be considered a winner"
+              control={control}
+              customInput={
+                <div className="flex-1 relative">
+                  <input
+                    value={
+                      Number(watch("approvalProposal.threshold") || 0) / 100
+                    }
+                    placeholder="0"
+                    onChange={(e) => {
+                      const percentage = parseFloat(e.target.value);
+                      if (
+                        !isNaN(percentage) &&
+                        percentage >= 0 &&
+                        percentage <= 100
+                      ) {
+                        const internalValue = Math.round(percentage * 100);
+                        setValue(
+                          "approvalProposal.threshold",
+                          internalValue.toString()
+                        );
+                      }
+                    }}
+                    className={`border bg-wash border-line placeholder:text-tertiary p-2 rounded-lg w-full text-primary pr-8 text-right`}
+                    type="number"
+                    min={0}
+                    max={100}
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary pointer-events-none">
+                    %
+                  </span>
+                </div>
+              }
+            />
+          ))}
       </div>
       <div>
         <h3 className="text-secondary font-semibold">Proposed transactions</h3>
-        <p className="mt-2 text-secondary">
-          Proposed transactions will execute if your proposal passes. If you
-          skip this step no transactions will be added.
-        </p>
+        {proposal_scope !== ProposalScope.OFFCHAIN_ONLY ? (
+          <p className="mt-2 text-secondary">
+            Proposed transactions will execute if your proposal passes. If you
+            skip this step no transactions will be added.
+          </p>
+        ) : (
+          <p className="mt-2 text-secondary">
+            Options for an off-chain only proposal define choices for voters and
+            will not execute on-chain transactions.
+          </p>
+        )}
         <div className="mt-6 space-y-12">
           {options.map((field, index) => {
             return (
@@ -459,7 +518,10 @@ const ApprovalProposalForm = () => {
                       <XCircleIcon className="w-5 h-5 text-red-500 cursor-pointer" />
                     </span>
                   </div>
-                  <OptionItem optionIndex={index} />
+                  <OptionItem
+                    optionIndex={index}
+                    isOffchain={proposal_scope === ProposalScope.OFFCHAIN_ONLY}
+                  />
                 </div>
               </div>
             );
@@ -482,6 +544,7 @@ const ApprovalProposalForm = () => {
         </div>
       </div>
       {options?.length > 0 &&
+        proposal_scope !== ProposalScope.OFFCHAIN_ONLY &&
         TENDERLY_VALID_CHAINS.includes(
           Tenant.current().contracts.governor.chain.id
         ) && (

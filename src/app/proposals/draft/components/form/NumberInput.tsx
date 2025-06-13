@@ -21,6 +21,7 @@ type NumberInputProps = {
   placeholder?: string;
   tooltip?: string;
   required?: boolean;
+  customInput?: React.ReactNode;
 };
 
 function NumberInput<
@@ -34,6 +35,7 @@ function NumberInput<
   tooltip,
   placeholder,
   description,
+  customInput,
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> & NumberInputProps) {
   return (
     <FormField
@@ -41,9 +43,9 @@ function NumberInput<
       name={name}
       render={({ field }) => (
         <FormItem>
-          <TooltipProvider>
+          <TooltipProvider delayDuration={300}>
             <Tooltip>
-              <TooltipTrigger className="flex flex-row space-x-1">
+              <TooltipTrigger type="button" className="flex flex-row space-x-1">
                 <FormLabel
                   className="text-xs font-semibold secondary"
                   isRequired={required}
@@ -62,16 +64,20 @@ function NumberInput<
             </Tooltip>
           </TooltipProvider>
           <FormControl>
-            <div className="relative">
-              <input
-                type="number"
-                className={`border bg-wash border-line placeholder:text-tertiary p-2 rounded-lg w-full text-primary`}
-                {...field}
-                placeholder={placeholder}
-                onWheel={(e) => e.currentTarget.blur()}
-                min={0}
-              />
-            </div>
+            {customInput ? (
+              customInput
+            ) : (
+              <div className="relative">
+                <input
+                  type="number"
+                  className={`border bg-wash border-line placeholder:text-tertiary p-2 rounded-lg w-full text-primary`}
+                  {...field}
+                  placeholder={placeholder}
+                  onWheel={(e) => e.currentTarget.blur()}
+                  min={0}
+                />
+              </div>
+            )}
           </FormControl>
           {description && <FormDescription>{description}</FormDescription>}
           <FormMessage />
