@@ -2,7 +2,7 @@
 import { z } from "zod";
 import Tenant from "@/lib/tenant/tenant";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { TransactionType, EthereumAddress } from "../types";
+import { TransactionType, EthereumAddress, ProposalScope } from "../types";
 import { BasicProposalSchema } from "../schemas/DraftProposalSchema";
 import { UpdatedButton } from "@/components/Button";
 import {
@@ -204,13 +204,22 @@ const BasicProposalForm = () => {
   const isSimulationButtonEnabled =
     allTransactionFieldsValid && (formDirty || !allFieldsValid);
 
+  const proposal_scope = watch("proposal_scope");
+
   return (
     <div>
       <h3 className="text-primary font-semibold">Proposed transactions</h3>
-      <p className="mt-2 text-tertiary">
-        Proposed transactions will execute after a proposal passes and then gets
-        executed.
-      </p>
+      {proposal_scope !== ProposalScope.OFFCHAIN_ONLY ? (
+        <p className="mt-2 text-tertiary">
+          Proposed transactions will execute after a proposal passes and then
+          gets executed.
+        </p>
+      ) : (
+        <p className="mt-2 text-tertiary">
+          This is an off-chain only proposal and will not execute on-chain
+          transactions.
+        </p>
+      )}
 
       <div className="mt-6 space-y-12">
         {fields.map((field, index) => {
@@ -238,6 +247,7 @@ const BasicProposalForm = () => {
         })}
       </div>
       {fields.length > 0 &&
+        proposal_scope !== ProposalScope.OFFCHAIN_ONLY &&
         TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) && (
           <div className="mt-6">
             <UpdatedButton
@@ -255,44 +265,46 @@ const BasicProposalForm = () => {
             </UpdatedButton>
           </div>
         )}
-      <div className="flex flex-row space-x-2 w-full mt-6">
-        <UpdatedButton
-          isSubmit={false}
-          type="secondary"
-          className="flex-grow"
-          onClick={() => {
-            append({
-              type: TransactionType.TRANSFER,
-              target: "" as EthereumAddress,
-              value: "",
-              calldata: "",
-              description: "",
-              simulation_state: "UNCONFIRMED",
-              simulation_id: "",
-            });
-          }}
-        >
-          Transfer from the treasury
-        </UpdatedButton>
-        <UpdatedButton
-          isSubmit={false}
-          type="secondary"
-          className="flex-grow"
-          onClick={() => {
-            append({
-              type: TransactionType.CUSTOM,
-              target: "" as EthereumAddress,
-              value: "",
-              calldata: "",
-              description: "",
-              simulation_state: "UNCONFIRMED",
-              simulation_id: "",
-            });
-          }}
-        >
-          Create a custom transaction
-        </UpdatedButton>
-      </div>
+      {proposal_scope !== ProposalScope.OFFCHAIN_ONLY && (
+        <div className="flex flex-row space-x-2 w-full mt-6">
+          <UpdatedButton
+            isSubmit={false}
+            type="secondary"
+            className="flex-grow"
+            onClick={() => {
+              append({
+                type: TransactionType.TRANSFER,
+                target: "" as EthereumAddress,
+                value: "",
+                calldata: "",
+                description: "",
+                simulation_state: "UNCONFIRMED",
+                simulation_id: "",
+              });
+            }}
+          >
+            Transfer from the treasury
+          </UpdatedButton>
+          <UpdatedButton
+            isSubmit={false}
+            type="secondary"
+            className="flex-grow"
+            onClick={() => {
+              append({
+                type: TransactionType.CUSTOM,
+                target: "" as EthereumAddress,
+                value: "",
+                calldata: "",
+                description: "",
+                simulation_state: "UNCONFIRMED",
+                simulation_id: "",
+              });
+            }}
+          >
+            Create a custom transaction
+          </UpdatedButton>
+        </div>
+      )}
       <div className="mt-6">
         {simulationReport && <StructuredReport report={simulationReport} />}
       </div>

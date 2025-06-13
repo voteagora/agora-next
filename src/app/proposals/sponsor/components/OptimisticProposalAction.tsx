@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
-import { OptimisticProposal } from "../../../proposals/draft/types";
+import {
+  OptimisticProposal,
+  ProposalScope,
+} from "../../../proposals/draft/types";
 import { useSimulateContract, useWriteContract } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
@@ -73,6 +76,8 @@ const OptimisticProposalAction = ({
               params: {
                 redirectUrl: "/",
                 txHash: data,
+                isHybrid: draftProposal.proposal_scope === ProposalScope.HYBRID,
+                draftProposal,
               },
             });
           } catch (error) {}
