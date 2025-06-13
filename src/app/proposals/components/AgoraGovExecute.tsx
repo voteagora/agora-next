@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
+import { keccak256 } from "viem";
+import { toUtf8Bytes } from "ethers";
 
 import {
   Tooltip,
@@ -17,6 +19,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
+import { ProposalType } from "@/app/proposals/draft/types";
 
 interface Props {
   proposal: Proposal;
@@ -49,6 +53,27 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
   const { isLoading, isSuccess, isError, isFetched, error } =
     useWaitForTransactionReceipt({ hash: data });
 
+  const isStandardType = proposal.proposalType === "STANDARD";
+
+  const callArgs = () => {
+    if (isStandardType) {
+      return proposalToCallArgs(proposal);
+    } else {
+      const moduleAddress = getProposalTypeAddress(ProposalType.APPROVAL);
+
+      if (!moduleAddress) {
+        throw new Error(
+          `Module address not found for tenant ${Tenant.current().namespace}`
+        );
+      }
+      return [
+        moduleAddress,
+        proposal.unformattedProposalData,
+        keccak256(toUtf8Bytes(proposal.description!)),
+      ];
+    }
+  };
+
   useEffect(() => {
     if (isSuccess) {
       toast.success(
@@ -65,6 +90,11 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
       });
     }
   }, [isSuccess, isError, error]);
+
+  // Note: Optimistic proposals are not executed
+  if (proposal.proposalType === "OPTIMISTIC") {
+    return null;
+  }
 
   return (
     <div>
@@ -90,8 +120,10 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
                     write({
                       address: contracts.governor.address as `0x${string}`,
                       abi: contracts.governor.abi,
-                      functionName: "execute",
-                      args: proposalToCallArgs(proposal),
+                      functionName: isStandardType
+                        ? "execute"
+                        : "executeWithModule",
+                      args: callArgs(),
                     })
                   }
                   loading={isLoading}
