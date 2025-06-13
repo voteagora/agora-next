@@ -16,7 +16,6 @@ import { invalidatePath } from "../../../actions/revalidatePath";
 import {
   ProposalType,
   SocialProposalType,
-  ProposalTypeMetadata,
   parseProposalToForm,
   DraftProposal,
   ProposalScope,
@@ -38,6 +37,35 @@ import { FormattedProposalType } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSettings";
 import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
+
+export const ProposalTypeMetadata = {
+  [ProposalType.SOCIAL]: {
+    title: "Social Proposal",
+    description: "A proposal that resolves via a snapshot vote.",
+  },
+  [ProposalType.BASIC]: {
+    title: "Basic Proposal",
+    description:
+      Tenant.current().namespace === "optimism"
+        ? "Voters are asked to vote for, against, or abstain. The proposal passes if the for votes exceed quorum AND if the for votes exceed the approval threshold."
+        : "Voters are asked to vote for, against, or abstain. The proposal passes if the abstain and for votes exceeed quorum AND if the for votes exceed the approval threshold.",
+  },
+  [ProposalType.APPROVAL]: {
+    title: "Approval Proposal",
+    description:
+      "Voters are asked to choose among multiple options. If the proposal passes quorum, options will be approved according to the approval criteria.",
+  },
+  [ProposalType.OPTIMISTIC]: {
+    title: "Optimistic Proposal",
+    description:
+      "Voters are asked to vote for, against, or abstain. The proposal automatically passes unless 12% vote against. No transactions can be proposed for optimistic proposals, it can only be used for social signaling.",
+  },
+} as {
+  [key in ProposalType]: {
+    title: string;
+    description: string;
+  };
+};
 
 const DEFAULT_FORM = {
   type: ProposalType.BASIC,
@@ -204,11 +232,7 @@ const DraftFormClient = ({
         <FormCard>
           <FormCard.Section>
             <div className="flex flex-col space-y-6">
-              {offchainProposals ? (
-                <div className="pt-8">
-                  <JointHouseSettings form={methods} />
-                </div>
-              ) : null}
+              {offchainProposals ? <JointHouseSettings form={methods} /> : null}
               {validProposalTypes.length > 0 && (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <SwitchInput
@@ -224,29 +248,22 @@ const DraftFormClient = ({
                   </p>
                 </div>
               )}
-              {validProposalTypes.length > 1 ? (
-                <div className="relative">
-                  <SelectInput
-                    control={control}
-                    label="Proposal type"
-                    required={true}
-                    options={validProposalTypes.map((typeConfig) => {
-                      return {
-                        label: typeConfig.name,
-                        value: typeConfig.proposal_type_id,
-                      };
-                    })}
-                    name="proposalConfigType"
-                    emptyCopy="Default"
-                  />
-                </div>
-              ) : (
-                <input
-                  type="hidden"
+              <div className="relative">
+                <SelectInput
+                  control={control}
+                  label="Proposal type"
+                  required={true}
+                  options={validProposalTypes.map((typeConfig) => {
+                    return {
+                      label: `${typeConfig.name} (${typeConfig.quorum / 100}% Quorum, ${typeConfig.approval_threshold / 100}% Approval)`,
+                      value: typeConfig.proposal_type_id,
+                    };
+                  })}
                   name="proposalConfigType"
-                  value={validProposalTypes[0]?.proposal_type_id || null}
+                  emptyCopy="Default"
                 />
-              )}
+              </div>
+
               {(selectedProposalType?.scopes?.length || 0) > 0 && (
                 <div className="flex flex-col gap-2">
                   <span className="text-sm font-medium">Scopes</span>

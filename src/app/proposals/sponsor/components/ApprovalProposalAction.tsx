@@ -67,6 +67,8 @@ const ApprovalProposalAction = ({
             await sponsorDraftProposal({
               draftProposalId: draftProposal.id,
               onchain_transaction_hash: data,
+              is_offchain_submission: false,
+              proposal_scope: draftProposal.proposal_scope,
             });
 
             openDialog({

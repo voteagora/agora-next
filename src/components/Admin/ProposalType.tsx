@@ -375,7 +375,7 @@ export default function ProposalType({
         <div>
           <div className="flex justify-between items-center">
             <p className="text-sm font-semibold text-secondary">
-              Proposal type {index + 1}
+              Proposal type {index + 1} (id={proposalType.proposal_type_id})
             </p>
             <Button
               size="icon"

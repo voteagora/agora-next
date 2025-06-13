@@ -35,10 +35,10 @@ function JointHouseSettings({
   return (
     <VStack>
       <div className="mb-1">
-        <h3 className="text-lg font-semibold mb-2 text-primary">
+        <h3 className="text-sm font-semibold mb-2 text-primary">
           Proposal Scope
         </h3>
-        <p className="text-sm text-secondary">
+        <p className="text-xs text-secondary">
           Select the voting mechanism for this proposal.
         </p>
       </div>
@@ -60,9 +60,9 @@ function JointHouseSettings({
           <p>
             <strong>Note:</strong>
             {proposal_scope === ProposalScope.OFFCHAIN_ONLY &&
-              " This proposal will be voted on by the Citizen House using off-chain mechanisms."}
+              " This proposal will be voted on by the Citizen House using off-chain mechanisms. Weights: 1/3 (Chains) / 1/3 (Apps) / 1/3 (Users)"}
             {proposal_scope === ProposalScope.HYBRID &&
-              " This proposal will include both on-chain Token House voting and parallel EAS-based Citizen House voting."}
+              " This proposal will include both on-chain Token House voting and parallel EAS-based Citizen House voting. Weights: 1/2 (Token House) / 1/6 (Chains) / 1/6 (Apps) / 1/6 (Users)"}
           </p>
         </div>
       )}

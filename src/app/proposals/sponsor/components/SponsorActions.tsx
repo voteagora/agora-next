@@ -16,7 +16,10 @@ const SponsorActions = ({
 }) => {
   const renderAction = (proposal: DraftProposal) => {
     const proposal_scope = proposal.proposal_scope;
-    if (proposal_scope === ProposalScope.OFFCHAIN_ONLY) {
+    if (
+      proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
+      !!draftProposal.onchain_transaction_hash
+    ) {
       return <OffchainProposalAction draftProposal={proposal} />;
     }
     switch (proposal.voting_module_type) {
