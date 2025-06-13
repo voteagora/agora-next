@@ -38,7 +38,7 @@ export const OffchainCancel = ({ proposal }: Props) => {
 
       const attestationUID = (
         proposal.proposalData as ParsedProposalData["OFFCHAIN_STANDARD"]["kind"]
-      ).cancelled_attestation_hash;
+      ).created_attestation_hash;
 
       if (!apiKey || !attestationUID) {
         throw new Error("AGORA_API_KEY is not set");
