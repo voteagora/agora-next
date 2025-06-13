@@ -507,20 +507,6 @@ export const getTransportForChain = (chainId: number) => {
   }
 };
 
-export const getVotingModuleTypeForProposalType = (proposalType: {
-  quorum: number;
-  approval_threshold: number;
-  name: string;
-}) => {
-  if (proposalType.name.toLowerCase().includes("approval")) {
-    return ProposalType.APPROVAL;
-  } else if (proposalType.name.toLowerCase().includes("optimistic")) {
-    return ProposalType.OPTIMISTIC;
-  } else {
-    return ProposalType.BASIC;
-  }
-};
-
 export const mapArbitrumBlockToMainnetBlock = unstable_cache(
   async (blockNumber: bigint) => {
     const { contracts } = Tenant.current();

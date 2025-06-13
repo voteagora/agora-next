@@ -28,7 +28,6 @@ import {
 } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import { getVotingModuleTypeForProposalType } from "@/lib/utils";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import { useTotalSupply } from "@/hooks/useTotalSupply";
 import { formatUnits } from "viem";
@@ -39,6 +38,14 @@ import BlockScanUrls from "../shared/BlockScanUrl";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { ScopeData, FormattedProposalType } from "@/lib/types";
 import { ScopeDetails } from "./ScopeDetails";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { ProposalType as ProposalTypeEnum } from "@/app/proposals/draft/types";
 
 type Props = {
   proposalType: FormattedProposalType;
@@ -54,6 +61,7 @@ const proposalTypeSchema = z.object({
   description: z.string(),
   approval_threshold: z.coerce.number().lte(100),
   quorum: z.coerce.number().lte(100),
+  voting_module_type: z.nativeEnum(ProposalTypeEnum),
 });
 
 export default function ProposalType({
@@ -198,12 +206,7 @@ export default function ProposalType({
   // --- Handlers ---
 
   function onSubmit(values: z.infer<typeof proposalTypeSchema>) {
-    const name = values.name;
-    const votingModuleType = getVotingModuleTypeForProposalType({
-      quorum,
-      approval_threshold,
-      name,
-    });
+    const votingModuleType = values.voting_module_type;
 
     const proposalTypeAddress = getProposalTypeAddress(votingModuleType);
 
@@ -369,6 +372,24 @@ export default function ProposalType({
     [availableScopes, assignedScopes]
   );
 
+  const hasOptimisticProposalType = useMemo(() => {
+    try {
+      const address = getProposalTypeAddress(ProposalTypeEnum.OPTIMISTIC);
+      return address !== null;
+    } catch (e) {
+      return false;
+    }
+  }, []);
+
+  const hasApprovalProposalType = useMemo(() => {
+    try {
+      const address = getProposalTypeAddress(ProposalTypeEnum.APPROVAL);
+      return address !== null;
+    } catch (e) {
+      return false;
+    }
+  }, []);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 my-4">
@@ -403,6 +424,43 @@ export default function ProposalType({
                 <FormLabel>Name</FormLabel>
                 <FormControl>
                   <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="voting_module_type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Voting module type</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormItem>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a voting module type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={ProposalTypeEnum.BASIC}>
+                          Standard
+                        </SelectItem>
+                        {hasApprovalProposalType && (
+                          <SelectItem value={ProposalTypeEnum.APPROVAL}>
+                            Approval
+                          </SelectItem>
+                        )}
+                        {hasOptimisticProposalType && (
+                          <SelectItem value={ProposalTypeEnum.OPTIMISTIC}>
+                            Optimistic
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </FormItem>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>

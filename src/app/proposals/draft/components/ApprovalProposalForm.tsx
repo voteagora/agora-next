@@ -404,7 +404,7 @@ const ApprovalProposalForm = () => {
       <div className="grid grid-cols-2 gap-4">
         {proposal_scope !== ProposalScope.OFFCHAIN_ONLY && (
           <NumberInput
-            required={true}
+            required={false}
             label="Budget"
             name="approvalProposal.budget"
             control={control}
@@ -472,7 +472,7 @@ const ApprovalProposalForm = () => {
                         );
                       }
                     }}
-                    className="w-full py-2 px-4 pr-8 rounded-md text-base border-line bg-neutral text-right"
+                    className={`border bg-wash border-line placeholder:text-tertiary p-2 rounded-lg w-full text-primary pr-8 text-right`}
                     type="number"
                     min={0}
                     max={100}
