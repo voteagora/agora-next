@@ -4682,6 +4682,9 @@ model OffchainProposals {
   proposal_type_id           String?
   proposal_type              String?
   tiers                      Int[]
+  max_options                Int?
+  criteria                   Int?
+  criteria_value             Int?
   start_block                String?
   end_block                  String?
   created_block              BigInt?

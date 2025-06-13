@@ -101,6 +101,17 @@ const OffchainProposalAction = ({
         end_block: endBlock,
         proposal_type: parsedProposalType,
         tiers: tiersEnabled ? draftProposal.tiers : [],
+        maxApprovals: draftProposal.max_options ?? 0,
+        criteria: draftProposal.criteria
+          ? draftProposal.criteria === "Threshold"
+            ? 0
+            : 1
+          : 99,
+        criteriaValue: draftProposal.criteria
+          ? draftProposal.criteria === "Threshold"
+            ? (draftProposal.threshold ?? 0)
+            : (draftProposal.top_choices ?? 0)
+          : 0,
       };
 
       let onchainProposalId: bigint | null = null;
@@ -152,6 +163,9 @@ const OffchainProposalAction = ({
         tiers: rawProposalDataForBackend.tiers,
         signer: signer,
         onchain_proposalid: onchainProposalId,
+        maxApprovals: rawProposalDataForBackend.maxApprovals,
+        criteria: rawProposalDataForBackend.criteria,
+        criteriaValue: rawProposalDataForBackend.criteriaValue,
       });
 
       const apiKey = process.env.NEXT_PUBLIC_AGORA_API_KEY;
@@ -176,6 +190,9 @@ const OffchainProposalAction = ({
             end_block: rawProposalDataForBackend.end_block.toString(),
             proposal_type: rawProposalDataForBackend.proposal_type,
             tiers: rawProposalDataForBackend.tiers,
+            maxApprovals: rawProposalDataForBackend.maxApprovals,
+            criteria: rawProposalDataForBackend.criteria,
+            criteriaValue: rawProposalDataForBackend.criteriaValue,
           },
           id: id.toString(),
           transactionHash,
