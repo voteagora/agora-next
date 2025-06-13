@@ -20,23 +20,22 @@ import { generateProposalId } from "@/lib/seatbelt/simulate";
 import { createProposalAttestation } from "@/lib/eas";
 import toast from "react-hot-toast";
 
+const { contracts } = Tenant.current();
+const governorContract = contracts.governor;
+
 const OffchainProposalAction = ({
   draftProposal,
 }: {
   draftProposal: DraftProposal;
 }) => {
   const openDialog = useOpenDialog();
-  const { contracts } = Tenant.current();
   const { inputData } = getInputData(draftProposal);
   const [offchainSubmitError, setOffchainSubmitError] = useState<string | null>(
     null
   );
   const [isOffchainSubmitting, setIsOffchainSubmitting] = useState(false);
-  const proposal_scope = draftProposal.proposal_scope;
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient();
-
-  const governorContract = contracts.governor;
 
   const { data: votingDelay } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
@@ -200,6 +199,8 @@ const OffchainProposalAction = ({
         await sponsorDraftProposal({
           draftProposalId: draftProposal.id,
           onchain_transaction_hash: transactionHash,
+          is_offchain_submission: true,
+          proposal_scope: draftProposal.proposal_scope,
         });
         trackEvent({
           event_name: ANALYTICS_EVENT_NAMES.CREATE_OFFCHAIN_PROPOSAL,

@@ -171,33 +171,6 @@ export enum ProposalType {
   OPTIMISTIC = "optimistic",
 }
 
-export const ProposalTypeMetadata = {
-  [ProposalType.SOCIAL]: {
-    title: "Social Proposal",
-    description: "A proposal that resolves via a snapshot vote.",
-  },
-  [ProposalType.BASIC]: {
-    title: "Basic Proposal",
-    description:
-      "Voters are asked to vote for, against, or abstain. The proposal passes if the abstain and for votes exceeed quorum AND if the for votes exceed the approval threshold.",
-  },
-  [ProposalType.APPROVAL]: {
-    title: "Approval Proposal",
-    description:
-      "Voters are asked to choose among multiple options. If the proposal passes quorum, options will be approved according to the approval criteria.",
-  },
-  [ProposalType.OPTIMISTIC]: {
-    title: "Optimistic Proposal",
-    description:
-      "Voters are asked to vote for, against, or abstain. The proposal automatically passes unless 12% vote against. No transactions can be proposed for optimistic proposals, it can only be used for social signaling.",
-  },
-} as {
-  [key in ProposalType]: {
-    title: string;
-    description: string;
-  };
-};
-
 export enum TransactionType {
   TRANSFER = "transfer",
   CUSTOM = "custom",

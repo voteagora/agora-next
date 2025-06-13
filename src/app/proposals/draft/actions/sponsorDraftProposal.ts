@@ -7,6 +7,7 @@ import {
   getStageByIndex,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
+import { ProposalScope } from "../types";
 
 export type FormState = {
   ok: boolean;
@@ -27,10 +28,29 @@ export async function onSubmitAction(
     };
   }
 
+  const isHybrid = parsed.data.proposal_scope === ProposalScope.HYBRID;
+  const isOffchainSubmission = parsed.data.is_offchain_submission;
+
   const currentIndex = getStageIndexForTenant("AWAITING_SUBMISSION") as number;
 
   try {
-    const nextStage = getStageByIndex(currentIndex + 1);
+    const nextStage =
+      isHybrid && !isOffchainSubmission
+        ? getStageByIndex(currentIndex)
+        : getStageByIndex(currentIndex + 1);
+    let concatenedTransactionHash = null;
+    if (isHybrid && isOffchainSubmission) {
+      const alreadyExistingTransactionHash =
+        await prismaWeb2Client.proposalDraft.findUnique({
+          select: {
+            onchain_transaction_hash: true,
+          },
+          where: {
+            id: data.draftProposalId,
+          },
+        });
+      concatenedTransactionHash = `${alreadyExistingTransactionHash?.onchain_transaction_hash},${parsed.data.onchain_transaction_hash}`;
+    }
     const updateDraft = prismaWeb2Client.proposalDraft.update({
       where: {
         id: data.draftProposalId,
@@ -41,7 +61,8 @@ export async function onSubmitAction(
           snapshot_link: parsed.data.snapshot_link,
         }),
         ...(parsed.data.onchain_transaction_hash && {
-          onchain_transaction_hash: parsed.data.onchain_transaction_hash,
+          onchain_transaction_hash:
+            concatenedTransactionHash ?? parsed.data.onchain_transaction_hash,
         }),
       },
     });
