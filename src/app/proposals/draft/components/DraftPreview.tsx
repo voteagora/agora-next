@@ -12,6 +12,7 @@ import {
   DraftProposal,
   PLMConfig,
   ProposalGatingType,
+  ProposalScope,
 } from "@/app/proposals/draft/types";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalType } from "@/app/proposals/draft/types";
@@ -212,15 +213,16 @@ const DraftPreview = ({
         </h2>
         {renderProposalDescription(proposalDraft)}
         <div className="mt-6">
-          {proposalDraft.voting_module_type === ProposalType.BASIC && (
-            <ProposalTransactionDisplay
-              descriptions={description as string[]}
-              targets={targets as `0x${string}`[]}
-              calldatas={calldatas as `0x${string}`[]}
-              values={(values as number[]).map((v) => v.toString())}
-              network={tenant.contracts.governor.chain.name}
-            />
-          )}
+          {proposalDraft.voting_module_type === ProposalType.BASIC &&
+            proposalDraft.proposal_scope !== ProposalScope.OFFCHAIN_ONLY && (
+              <ProposalTransactionDisplay
+                descriptions={description as string[]}
+                targets={targets as `0x${string}`[]}
+                calldatas={calldatas as `0x${string}`[]}
+                values={(values as number[]).map((v) => v.toString())}
+                network={tenant.contracts.governor.chain.name}
+              />
+            )}
         </div>
         {proposalDraft.voting_module_type === "social" && (
           <div>

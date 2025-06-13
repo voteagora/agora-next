@@ -19,6 +19,7 @@ import {
   ProposalTypeMetadata,
   parseProposalToForm,
   DraftProposal,
+  ProposalScope,
 } from "../../../types";
 import BasicProposalForm from "../../BasicProposalForm";
 import SocialProposalForm from "../../SocialProposalForm";
@@ -34,6 +35,9 @@ import {
 import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
 import { ScopeDetails } from "@/components/Admin/ScopeDetails";
 import { FormattedProposalType } from "@/lib/types";
+import Tenant from "@/lib/tenant/tenant";
+import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSettings";
+import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
 
 const DEFAULT_FORM = {
   type: ProposalType.BASIC,
@@ -46,6 +50,7 @@ const DEFAULT_FORM = {
     end_date: undefined,
     options: [],
   },
+  proposal_scope: ProposalScope.ONCHAIN_ONLY,
 };
 
 const getValidProposalTypesForVotingType = (
@@ -106,6 +111,10 @@ const getValidProposalTypesForVotingType = (
       return proposalTypes;
   }
 };
+
+const { ui } = Tenant.current();
+
+const offchainProposals = ui.toggle("proposals/offchain")?.enabled;
 
 const DraftFormClient = ({
   draftProposal,
@@ -195,6 +204,11 @@ const DraftFormClient = ({
         <FormCard>
           <FormCard.Section>
             <div className="flex flex-col space-y-6">
+              {offchainProposals ? (
+                <div className="pt-8">
+                  <JointHouseSettings form={methods} />
+                </div>
+              ) : null}
               {validProposalTypes.length > 0 && (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <SwitchInput
@@ -239,14 +253,14 @@ const DraftFormClient = ({
                   {selectedProposalType?.scopes?.map((scope) => (
                     <div
                       key={scope.scope_key}
-                      className="flex flex-col gap-4 text-sm p-2 rounded-md border border-line rounded-lg p-4 w-full"
+                      className="flex flex-col gap-4 text-sm border border-line rounded-lg p-4 w-full"
                     >
                       <ScopeDetails scope={scope} />
                     </div>
                   ))}
                 </div>
               )}
-
+              <TiersSettings form={methods} />
               <TextInput
                 label="Title"
                 name="title"

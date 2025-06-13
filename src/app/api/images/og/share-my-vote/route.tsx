@@ -5,7 +5,7 @@ import { BRAND_NAME_MAPPINGS } from "@/lib/tenant/tenant";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import TenantUIFactory from "@/lib/tenant/tenantUIFactory";
-import { TenantNamespace } from "@/lib/types";
+import { ProposalType, TenantNamespace } from "@/lib/types";
 import { formatNumber } from "@/lib/utils";
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
@@ -272,7 +272,7 @@ function generateVoteBars(
   forPercentage: number,
   againstPercentage: number,
   namespace: TenantNamespace,
-  proposalType: "STANDARD" | "OPTIMISTIC" | "APPROVAL" | "SNAPSHOT",
+  proposalType: ProposalType,
   supportType: "FOR" | "AGAINST" | "ABSTAIN"
 ) {
   const tenantUI: TenantUI = TenantUIFactory.create(
@@ -314,7 +314,9 @@ function generateVoteBars(
     }
   } else {
     const forBars =
-      proposalType === "OPTIMISTIC"
+      proposalType === "OPTIMISTIC" ||
+      proposalType === "OFFCHAIN_OPTIMISTIC" ||
+      proposalType === "OFFCHAIN_OPTIMISTIC_TIERED"
         ? 0
         : Math.round((totalBars * forPercentage) / 100);
     const againstBars = Math.round((totalBars * againstPercentage) / 100);
@@ -385,7 +387,7 @@ const SuccessMessageCard = ({
   endsIn: string | null;
   voteDate: string | null;
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
-  proposalType: "STANDARD" | "OPTIMISTIC" | "APPROVAL" | "SNAPSHOT";
+  proposalType: ProposalType;
   options: {
     description: string;
     votes: bigint;
@@ -662,11 +664,7 @@ export async function GET(req: NextRequest) {
   const voteDate = searchParams.get("voteDate");
   const options = JSON.parse(searchParams.get("options") || "[]");
   const totalOptions = Number(searchParams.get("totalOptions"));
-  const proposalType = searchParams.get("proposalType") as
-    | "STANDARD"
-    | "OPTIMISTIC"
-    | "APPROVAL"
-    | "SNAPSHOT";
+  const proposalType = searchParams.get("proposalType") as ProposalType;
   const supportType = searchParams.get("supportType") as
     | "FOR"
     | "AGAINST"
