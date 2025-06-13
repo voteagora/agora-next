@@ -14,11 +14,11 @@ const { slug } = Tenant.current();
 
 const CREATE_PROPOSAL_SCHEMA_ID =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? "0x875845d42b7cb72da8d97c3442182b9a0ee302d4a8d661ee8b83f13bf1f8f38b"
-    : "0x875845d42b7cb72da8d97c3442182b9a0ee302d4a8d661ee8b83f13bf1f8f38b";
+    ? "0x9cad4e2f288915744fce975c670629d6e6d4344b17435c9d714b43a129c6535b"
+    : "0x9cad4e2f288915744fce975c670629d6e6d4344b17435c9d714b43a129c6535b";
 
 const schemaEncoder = new SchemaEncoder(
-  "address contract,uint256 id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block, string proposal_type, uint256[] tiers, uint256 onchain_proposalid"
+  "address contract,uint256 id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block, string proposal_type, uint256[] tiers, uint256 onchain_proposalid, uint8 max_approvals, uint8 criteria, uint128 criteria_value"
 );
 
 const eas =
@@ -38,6 +38,9 @@ export async function createProposalAttestation({
   proposal_type,
   tiers,
   onchain_proposalid,
+  maxApprovals,
+  criteria,
+  criteriaValue,
 }: {
   contract: string;
   proposer: string;
@@ -50,6 +53,9 @@ export async function createProposalAttestation({
   tiers: number[];
   signer: JsonRpcSigner;
   onchain_proposalid?: bigint | null;
+  maxApprovals: number;
+  criteria: number;
+  criteriaValue: number;
 }) {
   const id = BigInt(
     keccak256(
@@ -76,6 +82,9 @@ export async function createProposalAttestation({
       value: onchain_proposalid || 0n,
       type: "uint256",
     },
+    { name: "max_approvals", value: maxApprovals, type: "uint8" },
+    { name: "criteria", value: criteria, type: "uint8" },
+    { name: "criteria_value", value: criteriaValue, type: "uint128" },
   ]);
 
   const recipient = "0x0000000000000000000000000000000000000000";

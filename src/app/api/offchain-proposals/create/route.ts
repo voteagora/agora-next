@@ -17,6 +17,9 @@ interface OffchainProposalRequestBody {
     end_block: string;
     proposal_type: ProposalType;
     tiers: number[];
+    maxApprovals: number;
+    criteria: number;
+    criteriaValue: number;
   };
   id: string;
   transactionHash: string;
@@ -51,6 +54,9 @@ export async function POST(request: NextRequest) {
     end_block,
     proposal_type,
     tiers,
+    maxApprovals,
+    criteria,
+    criteriaValue,
   } = proposalData;
 
   try {
@@ -72,6 +78,9 @@ export async function POST(request: NextRequest) {
         end_block: end_block.toString(),
         created_attestation_hash: transactionHash,
         created_block: latestBlock,
+        max_options: maxApprovals,
+        criteria: criteria,
+        criteria_value: criteriaValue,
       },
     });
 

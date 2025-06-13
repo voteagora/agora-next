@@ -402,13 +402,15 @@ const ApprovalProposalForm = () => {
         </p>
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <NumberInput
-          required={true}
-          label="Budget"
-          name="approvalProposal.budget"
-          control={control}
-          tooltip="This is the maximum number of tokens that can be transferred from all the options in this proposal."
-        />
+        {proposal_scope !== ProposalScope.OFFCHAIN_ONLY && (
+          <NumberInput
+            required={true}
+            label="Budget"
+            name="approvalProposal.budget"
+            control={control}
+            tooltip="This is the maximum number of tokens that can be transferred from all the options in this proposal."
+          />
+        )}
         <NumberInput
           required={true}
           label="Max options"
@@ -433,15 +435,55 @@ const ApprovalProposalForm = () => {
             control={control}
           />
         )}
-        {criteria === ApprovalProposalType.THRESHOLD && (
-          <NumberInput
-            required={true}
-            label="Threshold"
-            name="approvalProposal.threshold"
-            tooltip="This is the minimum number of votes an option must have to be considered a winner"
-            control={control}
-          />
-        )}
+        {criteria === ApprovalProposalType.THRESHOLD &&
+          (proposal_scope === ProposalScope.ONCHAIN_ONLY ? (
+            <NumberInput
+              required={true}
+              label="Threshold"
+              name="approvalProposal.threshold"
+              tooltip="This is the minimum number of votes an option must have to be considered a winner"
+              control={control}
+            />
+          ) : (
+            <NumberInput
+              required={true}
+              label="Threshold"
+              name="approvalProposal.threshold"
+              tooltip="This is the percentage an option must have to be considered a winner"
+              control={control}
+              customInput={
+                <div className="flex-1 relative">
+                  <input
+                    value={
+                      Number(watch("approvalProposal.threshold") || 0) / 100
+                    }
+                    placeholder="0"
+                    onChange={(e) => {
+                      const percentage = parseFloat(e.target.value);
+                      if (
+                        !isNaN(percentage) &&
+                        percentage >= 0 &&
+                        percentage <= 100
+                      ) {
+                        const internalValue = Math.round(percentage * 100);
+                        setValue(
+                          "approvalProposal.threshold",
+                          internalValue.toString()
+                        );
+                      }
+                    }}
+                    className="w-full py-2 px-4 pr-8 rounded-md text-base border-line bg-neutral text-right"
+                    type="number"
+                    min={0}
+                    max={100}
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary pointer-events-none">
+                    %
+                  </span>
+                </div>
+              }
+            />
+          ))}
       </div>
       <div>
         <h3 className="text-secondary font-semibold">Proposed transactions</h3>
