@@ -76,7 +76,16 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
             proposal.proposalType === "APPROVAL" ||
             proposal.proposalType === "STANDARD"
           ) {
-            return "This proposal is now passed and can be queued for execution.";
+            return (
+              <span>
+                <span className="block sm:inline">
+                  This proposal is now passed and
+                </span>{" "}
+                <span className="block sm:inline">
+                  can be queued for execution.
+                </span>
+              </span>
+            );
           } else if (proposal.proposalType === "OPTIMISTIC") {
             // No banner for Optimistic proposals.
             return null;
@@ -84,7 +93,16 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
           return "This proposal can still be cancelled by the admin.";
         }
         // If succeeded but not Optimism, then proceed to queue
-        return "This proposal is now passed and can be queued for execution.";
+        return (
+          <span>
+            <span className="block sm:inline">
+              This proposal is now passed and
+            </span>{" "}
+            <span className="block sm:inline">
+              can be queued for execution.
+            </span>
+          </span>
+        );
 
       case PROPOSAL_STATUS.QUEUED:
         return "This proposal can be executed after the timelock passes, or cancelled by the admin.";

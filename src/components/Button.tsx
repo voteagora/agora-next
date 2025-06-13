@@ -1,3 +1,5 @@
+// outdated button, use DSButton instead
+
 import Link from "next/link";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { cn } from "@/lib/utils";
@@ -26,8 +28,7 @@ export function Button({ href = "", className = "", ...props }) {
   );
 }
 
-// Button with styles that follow mocks in figma
-// plan is to replace all buttons with this one
+// outdated button, use DSButton instead
 export function UpdatedButton({
   type = "primary",
   variant = "",

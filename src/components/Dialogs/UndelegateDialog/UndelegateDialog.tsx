@@ -24,6 +24,7 @@ import { formatEther, zeroAddress } from "viem";
 import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
+import { DSButton } from "@/components/design-system/Button";
 
 interface UndelegateActionButtonsProps {
   isDisabledInTenant: boolean;
@@ -74,16 +75,30 @@ const UndelegateActionButtons = ({
 
   if (isProcessingDelegation || isProcessingSponsoredUnelegation) {
     return (
-      <Button disabled={true}>Submitting your undelegation request...</Button>
+      <DSButton
+        variant="primary"
+        primaryTextColor="black"
+        fullWidth
+        size="small"
+        disabled
+      >
+        Submitting your undelegation request...
+      </DSButton>
     );
   }
 
   if (didProcessDelegation || didProcessSponsoredUnelegation) {
     return (
       <div>
-        <Button className="w-full" disabled={false}>
+        <DSButton
+          variant="primary"
+          primaryTextColor="black"
+          fullWidth
+          size="small"
+          disabled
+        >
           Undelegation completed!
-        </Button>
+        </DSButton>
         <BlockScanUrls
           hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
         />
@@ -93,9 +108,15 @@ const UndelegateActionButtons = ({
 
   if (sameDelegatee) {
     return (
-      <ShadcnButton onClick={executeDelegate}>
+      <DSButton
+        variant="primary"
+        primaryTextColor="black"
+        fullWidth
+        size="small"
+        onClick={executeDelegate}
+      >
         Remove your own delegation
-      </ShadcnButton>
+      </DSButton>
     );
   }
 

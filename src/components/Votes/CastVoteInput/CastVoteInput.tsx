@@ -39,6 +39,8 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import shareIcon from "@/icons/share.svg";
 import { format } from "date-fns";
 import { useVotableSupply } from "@/hooks/useVotableSupply";
+import { DaoSlug } from "@prisma/client";
+import { DSButton } from "@/components/design-system/Button";
 
 type Props = {
   proposal: Proposal;
@@ -51,6 +53,7 @@ export default function CastVoteInput({
 }: Props) {
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
+  const { slug: tenant } = Tenant.current();
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
   const { data, isSuccess, isPending } = useFetchAllForVoting({
@@ -67,9 +70,21 @@ export default function CastVoteInput({
   if (!isConnected) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
-        <Button className="w-full" onClick={() => setOpen(true)}>
+        <DSButton
+          variant="primary"
+          primaryTextColor={
+            tenant === "SCROLL"
+              ? "black"
+              : tenant === "XAI"
+                ? "white"
+                : undefined
+          }
+          size="small"
+          fullWidth
+          onClick={() => setOpen(true)}
+        >
           Connect wallet to vote
-        </Button>
+        </DSButton>
       </div>
     );
   }
@@ -442,7 +457,7 @@ export function SuccessMessage({
         className
       )}
     >
-      <Button
+      <DSButton
         onClick={() => {
           openDialog({
             className: "sm:w-[32rem]",
@@ -468,18 +483,20 @@ export function SuccessMessage({
             },
           });
         }}
-        variant="outline"
-        className="w-full text-secondary font-semibold text-xs gap-2 rounded-[0.5rem] h-8"
+        variant="secondary"
+        size="small"
+        fullWidth
+        className="text-secondary font-semibold text-xs gap-2 rounded-[0.5rem] h-8 justify-center"
       >
-        <Image src={shareIcon.src} alt="Share icon" height={18} width={18} />
-        <span>
+        <span className="flex items-center gap-2">
+          <Image src={shareIcon.src} alt="Share icon" height={18} width={18} />
           Share you voted{" "}
           <span className={supportColor}>
             {support?.toUpperCase() + (support === "ABSTAIN" ? " in" : "")}
           </span>{" "}
           this proposal
         </span>
-      </Button>
+      </DSButton>
       <BlockScanUrls
         className="pt-2 text-tertiary font-medium mx-auto"
         hash1={
@@ -518,7 +535,6 @@ function VoteButtons({
 
 function VoteButton({ action }: { action: SupportTextProps["supportType"] }) {
   const actionString = action.toLowerCase();
-
   const { support, setSupport } = useCastVoteContext();
 
   const selectedStyle =
@@ -534,6 +550,8 @@ function VoteButton({ action }: { action: SupportTextProps["supportType"] }) {
     <button
       className={`${actionString === "for" ? "text-positive" : actionString === "against" ? "text-negative" : "text-secondary"} ${selectedStyle} rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
       onClick={() => setSupport(support === action ? null : action)}
+      aria-pressed={support === action}
+      type="button"
     >
       {action.toLowerCase()}
     </button>
@@ -542,25 +560,31 @@ function VoteButton({ action }: { action: SupportTextProps["supportType"] }) {
 
 function DisabledVoteButton({ reason }: { reason: string }) {
   return (
-    <Button className="w-full" disabled={true}>
+    <DSButton variant="primary" size="small" fullWidth disabled type="button">
       {reason}
-    </Button>
+    </DSButton>
   );
 }
 
 function NoStatementView() {
+  const { slug: tenant } = Tenant.current();
   return (
     <div className="flex flex-col gap-3">
       <div className="py-2 px-4 bg-line text-xs text-secondary rounded-lg flex items-center gap-2">
         <Image src={icons.info} alt="Info" width={24} height={24} />
         Voting requires a delegate statement. Set yours one now to participate.
       </div>
-      <Button
-        className="w-full"
+      <DSButton
+        variant="primary"
+        primaryTextColor={
+          tenant === "SCROLL" ? "black" : tenant === "XAI" ? "white" : undefined
+        }
+        size="small"
+        fullWidth
         onClick={() => (window.location.href = "/delegates/create")}
       >
         Set up statement
-      </Button>
+      </DSButton>
     </div>
   );
 }

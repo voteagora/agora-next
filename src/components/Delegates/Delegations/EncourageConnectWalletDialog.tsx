@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ConnectKitButton } from "connectkit";
 import { useEffect } from "react";
 import { useAccount } from "wagmi";
+import { DSButton } from "@/components/design-system/Button";
 
 export const EncourageConnectWalletDialog = ({
   closeDialog,
@@ -27,15 +28,18 @@ export const EncourageConnectWalletDialog = ({
       </div>
       <ConnectKitButton.Custom>
         {({ show }) => (
-          <Button
-            className="w-full px-[20px] py-3 font-medium text-[16px] leading-[24px]"
+          <DSButton
+            variant="primary"
+            primaryTextColor="black"
+            fullWidth
+            size="large"
             onClick={() => {
               show?.();
               closeDialog();
             }}
           >
-            Connect wallet
-          </Button>
+            Connect Wallet
+          </DSButton>
         )}
       </ConnectKitButton.Custom>
     </div>
