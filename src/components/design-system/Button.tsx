@@ -65,7 +65,7 @@ export const DSButton: React.FC<DSButtonProps> = ({
                 ],
         ],
         variant === "secondary" && [
-          "bg-neutral text-primary rounded-[1000px] border border-line font-medium shadow-newDefault cursor-pointer px-5 py-3 transition-all",
+          "bg-neutral text-primary rounded-[1000px] border border-line font-medium cursor-pointer px-5 py-3 transition-all",
           "hover:shadow-newHover active:shadow-none active:bg-line disabled:bg-line disabled:text-secondary",
         ],
         variant === "text" &&

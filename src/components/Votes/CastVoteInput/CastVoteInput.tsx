@@ -457,7 +457,7 @@ export function SuccessMessage({
         className
       )}
     >
-      <Button
+      <DSButton
         onClick={() => {
           openDialog({
             className: "sm:w-[32rem]",
@@ -483,18 +483,20 @@ export function SuccessMessage({
             },
           });
         }}
-        variant="outline"
-        className="w-full text-secondary font-semibold text-xs gap-2 rounded-[0.5rem] h-8"
+        variant="secondary"
+        size="small"
+        fullWidth
+        className="text-secondary font-semibold text-xs gap-2 rounded-[0.5rem] h-8 justify-center"
       >
-        <Image src={shareIcon.src} alt="Share icon" height={18} width={18} />
-        <span>
+        <span className="flex items-center gap-2">
+          <Image src={shareIcon.src} alt="Share icon" height={18} width={18} />
           Share you voted{" "}
           <span className={supportColor}>
             {support?.toUpperCase() + (support === "ABSTAIN" ? " in" : "")}
           </span>{" "}
           this proposal
         </span>
-      </Button>
+      </DSButton>
       <BlockScanUrls
         className="pt-2 text-tertiary font-medium mx-auto"
         hash1={
