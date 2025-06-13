@@ -107,9 +107,9 @@ const PendingActivityHeader = () => {
   return (
     <CardHeader
       title={"Gathering Data"}
-      cornerTitle={"🆕 -%"}
+      cornerTitle={"⏰"}
       subtitle={
-        "This delegate hasn’t been eligible to vote on any recent proposals yet. Check back soon!"
+        "This delegate has not had voting power for a sufficient number of recent proposals. Check back later!"
       }
     />
   );
