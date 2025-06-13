@@ -60,7 +60,10 @@ export default function ProposalDescription({
       className={`flex flex-col gap-4 sm:max-w-[48rem] w-full md:min-w-[20rem] lg:min-w-[32rem] xl:min-w-[48rem] max-w-[calc(100vw-2rem)]`}
     >
       <ProposalTitle title={shortTitle} proposal={proposal} />
-      <ProposalChart proposal={proposal} />
+      {!proposal.proposalType?.includes("OFFCHAIN") &&
+        !proposal.proposalType?.includes("HYBRID") && (
+          <ProposalChart proposal={proposal} />
+        )}
 
       <div className="flex flex-col gap-2">
         {/* Right now I'm only sure this better decoded component works for standard proposals */}

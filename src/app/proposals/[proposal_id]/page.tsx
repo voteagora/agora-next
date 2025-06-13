@@ -154,23 +154,25 @@ export default async function Page({
   let RenderComponent;
   switch (proposal.proposalType) {
     case "STANDARD":
-    case "OFFCHAIN_STANDARD":
       RenderComponent = StandardProposalPage;
       break;
 
+    case "OFFCHAIN_STANDARD":
     case "HYBRID_STANDARD":
       RenderComponent = HybridStandardProposalPage;
       break;
 
     case "OPTIMISTIC":
-    case "OFFCHAIN_OPTIMISTIC":
-    case "OFFCHAIN_OPTIMISTIC_TIERED":
       RenderComponent = OPProposalOptimisticPage;
       break;
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED":
     case "HYBRID_OPTIMISTIC_TIERED":
       RenderComponent = HybridOptimisticProposalPage;
       break;
     case "APPROVAL":
+      RenderComponent = OPProposalApprovalPage;
+      break;
     case "HYBRID_APPROVAL":
       RenderComponent = HybridApprovalProposalPage;
       break;

@@ -264,7 +264,7 @@ export async function parseProposal(
   let createdBlock: bigint | string | null = proposal.created_block;
   let offChainProposalData = offchainProposal?.proposal_data;
   let proposalType = proposal.proposal_type as ProposalType;
-  console.log("offChainProposalData", offChainProposalData);
+
   if (offChainProposalData) {
     proposalType = mapOffchainProposalType(
       offchainProposal?.proposal_type as ProposalType
@@ -294,13 +294,21 @@ export async function parseProposal(
     proposalType
   );
 
-  const proposalResuts = parseProposalResults(
-    JSON.stringify(proposal.proposal_results || {}),
-    proposalData,
-    String(startBlock),
-    JSON.stringify(offchainProposal?.proposal_data?.offchain_tally || {})
-  );
-  console.log("proposalResuts", proposalResuts);
+  let proposalResults;
+  if (proposal.proposal_type.includes("OFFCHAIN") && !offChainProposalData) {
+    proposalResults = parseOffChainProposalResults(
+      JSON.stringify(proposal.proposal_results || {}),
+      proposalType
+    );
+  } else {
+    proposalResults = parseProposalResults(
+      JSON.stringify(proposal.proposal_results || {}),
+      proposalData,
+      String(startBlock),
+      JSON.stringify(offchainProposal?.proposal_data?.offchain_tally || {})
+    );
+  }
+
   const calculateStartTime = (): Date | null => {
     if (proposalData.key === "SNAPSHOT") {
       return new Date(proposalData.kind.start_ts * 1000);
@@ -371,12 +379,12 @@ export async function parseProposal(
     approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
     proposalData: proposalData.kind,
     unformattedProposalData: proposal.proposal_data_raw,
-    proposalResults: proposalResuts.kind,
+    proposalResults: proposalResults.kind,
     proposalType,
     status: latestBlock
       ? await getProposalStatus(
           proposal,
-          proposalResuts,
+          proposalResults,
           proposalData,
           latestBlock,
           quorum,
@@ -837,8 +845,19 @@ export type ParsedProposalResults = {
   OFFCHAIN_OPTIMISTIC_TIERED: {
     key: "OFFCHAIN_OPTIMISTIC_TIERED";
     kind: {
+      CHAIN: {
+        for: bigint;
+        against: bigint;
+      };
+      PROJECT: {
+        for: bigint;
+        against: bigint;
+      };
+      USER: {
+        for: bigint;
+        against: bigint;
+      };
       for: bigint;
-      abstain: bigint;
       against: bigint;
     };
   };
@@ -921,22 +940,18 @@ export type ParsedProposalResults = {
     kind: {
       CHAIN: {
         for: bigint;
-        abstain: bigint;
         against: bigint;
       };
       PROJECT: {
         for: bigint;
-        abstain: bigint;
         against: bigint;
       };
       USER: {
         for: bigint;
-        abstain: bigint;
         against: bigint;
       };
       DELEGATES?: {
         for: bigint;
-        abstain: bigint;
         against: bigint;
       };
     };
@@ -993,7 +1008,6 @@ export function parseProposalResults(
     }
     case "STANDARD":
     case "OPTIMISTIC":
-    case "OFFCHAIN_OPTIMISTIC_TIERED":
     case "OFFCHAIN_OPTIMISTIC":
     case "OFFCHAIN_STANDARD": {
       const parsedProposalResults = JSON.parse(proposalResults).standard;
@@ -1129,6 +1143,12 @@ export function parseProposalResults(
         },
       };
     }
+    case "OFFCHAIN_OPTIMISTIC_TIERED": {
+      return parseOffChainProposalResults(
+        proposalResults || "{}",
+        "OFFCHAIN_OPTIMISTIC_TIERED"
+      );
+    }
     case "HYBRID_OPTIMISTIC_TIERED": {
       // Parse onchain data (DELEGATES) from proposalResults
       const parsedProposalResults = JSON.parse(proposalResults).standard;
@@ -1229,11 +1249,13 @@ export function parseProposalResults(
 export function parseOffChainProposalResults(
   // proposalResults is expected to be a stringified JSON of the offchain_tally object
   proposalResults: string,
-  proposalType: ProposalType = "HYBRID_STANDARD"
+  proposalType: ProposalType
 ): any {
   switch (proposalType) {
+    case "OFFCHAIN_STANDARD":
     case "HYBRID_STANDARD":
       const tallyData = JSON.parse(proposalResults);
+      console.log("tallyData", tallyData);
       const processTallySource = (
         sourceData: { [key: string]: number } | undefined
       ) => {
@@ -1244,7 +1266,7 @@ export function parseOffChainProposalResults(
         };
       };
 
-      return {
+      const result = {
         key: proposalType,
         kind: {
           PROJECT: processTallySource(tallyData?.PROJECT),
@@ -1252,6 +1274,34 @@ export function parseOffChainProposalResults(
           CHAIN: processTallySource(tallyData?.CHAIN),
         },
       };
+
+      if (proposalType === "OFFCHAIN_STANDARD") {
+        const allForVotes =
+          result.kind.PROJECT.for +
+          result.kind.USER.for +
+          result.kind.CHAIN.for;
+        const allAgainstVotes =
+          result.kind.PROJECT.against +
+          result.kind.USER.against +
+          result.kind.CHAIN.against;
+        const allAbstainVotes =
+          result.kind.PROJECT.abstain +
+          result.kind.USER.abstain +
+          result.kind.CHAIN.abstain;
+        return {
+          ...result,
+          kind: {
+            ...result.kind,
+            for: allForVotes,
+            against: allAgainstVotes,
+            abstain: allAbstainVotes,
+          },
+        };
+      } else {
+        return result;
+      }
+
+    case "OFFCHAIN_APPROVAL":
     case "HYBRID_APPROVAL": {
       const tallyData = JSON.parse(proposalResults);
 
@@ -1277,7 +1327,7 @@ export function parseOffChainProposalResults(
         );
       };
 
-      return {
+      const result = {
         key: proposalType,
         kind: {
           PROJECT: processApprovalTallySource(tallyData?.PROJECT),
@@ -1285,7 +1335,29 @@ export function parseOffChainProposalResults(
           CHAIN: processApprovalTallySource(tallyData?.CHAIN),
         },
       };
+      if (proposalType === "OFFCHAIN_APPROVAL") {
+        const allForVotes =
+          result.kind.PROJECT.for +
+          result.kind.USER.for +
+          result.kind.CHAIN.for;
+        const allAgainstVotes =
+          result.kind.PROJECT.against +
+          result.kind.USER.against +
+          result.kind.CHAIN.against;
+
+        return {
+          ...result,
+          kind: {
+            ...result.kind,
+            for: allForVotes,
+            against: allAgainstVotes,
+          },
+        };
+      }
+      return result;
     }
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED":
     case "HYBRID_OPTIMISTIC_TIERED": {
       const tallyData = JSON.parse(proposalResults);
       const processTallySource = (
@@ -1298,7 +1370,7 @@ export function parseOffChainProposalResults(
         };
       };
 
-      return {
+      const result = {
         key: proposalType,
         kind: {
           PROJECT: processTallySource(tallyData?.PROJECT),
@@ -1306,6 +1378,29 @@ export function parseOffChainProposalResults(
           CHAIN: processTallySource(tallyData?.CHAIN),
         },
       };
+      if (
+        proposalType === "OFFCHAIN_OPTIMISTIC_TIERED" ||
+        proposalType === "OFFCHAIN_OPTIMISTIC"
+      ) {
+        const allForVotes =
+          result.kind.PROJECT.for +
+          result.kind.USER.for +
+          result.kind.CHAIN.for;
+        const allAgainstVotes =
+          result.kind.PROJECT.against +
+          result.kind.USER.against +
+          result.kind.CHAIN.against;
+
+        return {
+          ...result,
+          kind: {
+            ...result.kind,
+            for: allForVotes,
+            against: allAgainstVotes,
+          },
+        };
+      }
+      return result;
     }
     default:
       // Return a default structure for unsupported proposal types
@@ -1583,8 +1678,7 @@ export async function getProposalStatus(
       return "DEFEATED";
     }
     case "OPTIMISTIC":
-    case "OFFCHAIN_OPTIMISTIC":
-    case "OFFCHAIN_OPTIMISTIC_TIERED": {
+    case "OFFCHAIN_OPTIMISTIC": {
       const {
         for: forVotes,
         against: againstVotes,

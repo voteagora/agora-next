@@ -217,25 +217,11 @@ async function getProposal(proposalId: string) {
         })
     );
 
-    // Hard coded for testing other types
-    // const getOfflineProposal = doInSpan(
-    //   { name: "getOfflineProposal" },
-    //   async () =>
-    //     findProposal({
-    //       namespace,
-    //       proposalId:
-    //         "95647532391336425113284705305810426138679226160678387259848355019474222496950",
-    //       contract: contracts.governor.address,
-    //     })
-    // );
-
     const [proposal, offlineProposal, votableSupply] = await Promise.all([
       getProposalExecution,
       getOfflineProposal,
       fetchVotableSupply(),
     ]);
-    console.log("proposal", proposal);
-    console.log("offlineProposal", offlineProposal);
 
     if (!proposal) {
       return notFound();
