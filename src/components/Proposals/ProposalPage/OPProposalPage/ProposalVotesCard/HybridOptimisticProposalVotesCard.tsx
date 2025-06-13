@@ -26,15 +26,7 @@ const HybridOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
   const proposalResults =
     proposal.proposalResults as ParsedProposalResults["HYBRID_OPTIMISTIC_TIERED"]["kind"];
 
-  const voteGroups = [
-    {
-      name: "Delegates",
-      againstVotes: proposalResults?.DELEGATES?.against
-        ? formatNumber(proposalResults.DELEGATES.against, token.decimals)
-        : 0,
-      weight: "5%",
-      veto: "—",
-    },
+  let voteGroups = [
     {
       name: "Chains",
       againstVotes: proposalResults?.CHAIN?.against
@@ -59,10 +51,21 @@ const HybridOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
       weight: "5%",
       veto: "—",
     },
-  ].map((group) => ({
-    ...group,
-    againstVotes: group.againstVotes.toLocaleString(),
-  }));
+  ];
+
+  if (proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED") {
+    voteGroups = [
+      {
+        name: "Delegates",
+        againstVotes: proposalResults?.DELEGATES?.against
+          ? formatNumber(proposalResults.DELEGATES.against, token.decimals)
+          : 0,
+        weight: "5%",
+        veto: "—",
+      },
+      ...voteGroups,
+    ];
+  }
 
   return (
     <VotesGroupTable
@@ -90,18 +93,13 @@ const HybridOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
 };
 
 const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
-  const [isClicked, setIsClicked] = useState<boolean>(false);
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState("results");
-
-  const handleClick = () => {
-    setIsClicked(!isClicked);
-  };
 
   return (
     <>
       <div
-        className={`fixed flex-col justify-between gap-4 md:sticky top-[auto] md:top-20 md:max-h-[calc(100vh-220px)] max-h-[calc(100%-160px)] items-stretch flex-shrink w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] md:w-[20rem] lg:w-[24rem] bg-neutral border border-line rounded-xl mb-2 transition-all ${isClicked ? "bottom-[20px]" : "bottom-[calc(-100%+350px)] h-[calc(100%-160px)] md:h-auto"} overflow-hidden`}
+        className={`fixed flex-col justify-between gap-4 md:sticky top-[auto] md:top-20 md:max-h-[calc(100vh-220px)] max-h-[calc(100%-160px)] items-stretch flex-shrink w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] md:w-[20rem] lg:w-[24rem] bg-neutral border border-line rounded-xl mb-2 transition-all bottom-[20px] h-[calc(100%-160px)] md:h-auto overflow-hidden`}
         style={{
           transition: "bottom 600ms cubic-bezier(0, 0.975, 0.015, 0.995)",
         }}

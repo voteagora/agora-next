@@ -16,53 +16,55 @@ const { token } = Tenant.current();
 const HybridStandardVotesGroup = ({ proposal }: { proposal: Proposal }) => {
   const proposalResults =
     proposal.proposalResults as ParsedProposalResults["HYBRID_STANDARD"]["kind"];
-
-  const voteGroups = [
-    {
-      name: "Delegates",
-      forVotes: proposalResults?.DELEGATES?.for
-        ? formatNumber(proposalResults.DELEGATES.for, token.decimals)
-        : 0,
-      againstVotes: proposalResults?.DELEGATES?.against
-        ? formatNumber(proposalResults.DELEGATES.against, token.decimals)
-        : 0,
-      weight: "50.00%",
-    },
+  // Calculate weight based on proposal type
+  const categoryWeight =
+    proposal.proposalType === "HYBRID_STANDARD" ? "16.67%" : "33.33%";
+  console.log("proposalResults", formatNumber("1", token.decimals));
+  let voteGroups = [
     {
       name: "Chains",
-      forVotes: proposalResults?.CHAIN?.for
-        ? formatNumber(proposalResults.CHAIN.for, token.decimals)
-        : 0,
-      againstVotes: proposalResults?.CHAIN?.against
-        ? formatNumber(proposalResults.CHAIN.against, token.decimals)
-        : 0,
-      weight: "16.67%",
+      forVotes: proposalResults.CHAIN.for || "0",
+      againstVotes: proposalResults.CHAIN.against || "0",
+      abstainVotes: proposalResults.CHAIN.abstain || "0",
+      weight: categoryWeight,
     },
     {
       name: "Apps", // Corresponds to PROJECT in offchainResults
-      forVotes: proposalResults?.PROJECT?.for
-        ? formatNumber(proposalResults.PROJECT.for, token.decimals)
-        : 0,
-      againstVotes: proposalResults?.PROJECT?.against
-        ? formatNumber(proposalResults.PROJECT.against, token.decimals)
-        : 0,
-      weight: "16.67%",
+      forVotes: proposalResults.PROJECT.for || "0",
+      againstVotes: proposalResults.PROJECT.against || "0",
+      abstainVotes: proposalResults.PROJECT.abstain || "0",
+      weight: categoryWeight,
     },
     {
       name: "Users",
-      forVotes: proposalResults?.USER?.for
-        ? formatNumber(proposalResults.USER.for, token.decimals)
-        : 0,
-      againstVotes: proposalResults?.USER?.against
-        ? formatNumber(proposalResults.USER.against, token.decimals)
-        : 0,
-      weight: "16.67%",
+      forVotes: proposalResults.USER.for || "0",
+      againstVotes: proposalResults.USER.against || "0",
+      abstainVotes: proposalResults.USER.abstain || "0",
+      weight: categoryWeight,
     },
-  ].map((group) => ({
-    ...group,
-    forVotes: group.forVotes.toLocaleString(),
-    againstVotes: group.againstVotes.toLocaleString(),
-  }));
+  ];
+
+  if (proposal.proposalType === "HYBRID_STANDARD") {
+    voteGroups = [
+      {
+        name: "Delegates",
+        forVotes: formatNumber(
+          (proposalResults?.DELEGATES?.for || "0").toString(),
+          token.decimals
+        ),
+        againstVotes: formatNumber(
+          (proposalResults?.DELEGATES?.against || "0").toString(),
+          token.decimals
+        ),
+        abstainVotes: formatNumber(
+          (proposalResults?.DELEGATES?.abstain || "0").toString(),
+          token.decimals
+        ),
+        weight: "50.00%",
+      },
+      ...voteGroups,
+    ];
+  }
 
   return (
     <VotesGroupTable
@@ -73,6 +75,12 @@ const HybridStandardVotesGroup = ({ proposal }: { proposal: Proposal }) => {
           header: "For",
           width: "w-[60px]",
           textColorClass: "text-positive",
+        },
+        {
+          key: "abstainVotes",
+          header: "Abstain",
+          width: "w-[60px]",
+          textColorClass: "text-secondary",
         },
         {
           key: "againstVotes",
@@ -185,12 +193,6 @@ const HybridStandardProposalVotesSummary = ({
       const calculatedQuorumPercentage = (totalVotes / quorumValue) * 100;
 
       const calculatedQuorumMet = calculatedTotalForVotes >= quorumValue;
-      console.log(
-        "calculatedQuorumPercentage",
-        calculatedQuorumMet,
-        calculatedTotalForVotes,
-        quorumValue
-      );
 
       return {
         quorumPercentage: calculatedQuorumPercentage,

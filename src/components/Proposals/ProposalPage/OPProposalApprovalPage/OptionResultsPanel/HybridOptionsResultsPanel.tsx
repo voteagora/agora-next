@@ -25,10 +25,6 @@ export default function HybridOptionsResultsPanel({
   optionsToShow?: number;
   showAllOptions?: boolean;
 }) {
-  console.log("proposal", proposal);
-  // Note: Defaulting to optimism token for now since the contract-scoped token
-  // was exactly the same as the optimism token.
-
   const proposalData =
     proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"];
 
@@ -109,7 +105,7 @@ export default function HybridOptionsResultsPanel({
   return (
     <div
       className={cn(
-        "flex flex-col max-h-[calc(100vh-482px)] overflow-y-scroll flex-shrink p-4 min-h-[36px] mb-[192px]",
+        "flex flex-col max-h-[calc(100vh-482px)] overflow-y-auto flex-shrink p-4 min-h-[36px] mb-[192px]",
         className
       )}
     >
@@ -208,7 +204,11 @@ function SingleOption({
 
   // Calculate vote data for each category
   const { token } = Tenant.current();
-  const getVoteData = (category: string, displayName: string) => {
+  const getVoteData = (
+    category: string,
+    displayName: string,
+    weight: string
+  ) => {
     const votes = proposalResults[category as keyof typeof proposalResults]?.[
       option.option
     ]
@@ -225,15 +225,15 @@ function SingleOption({
         votes && votesFromAllCategories > 0n
           ? (votes * 100n) / votesFromAllCategories
           : 0n,
-      weight: "33.33%",
+      weight,
     };
   };
 
   const voteGroups = [
-    getVoteData("DELEGATES", "Delegates"),
-    getVoteData("CHAIN", "Chains"),
-    getVoteData("PROJECT", "Apps"),
-    getVoteData("USER", "Users"),
+    getVoteData("DELEGATES", "Delegates", "50.00%"),
+    getVoteData("CHAIN", "Chains", "16.67%"),
+    getVoteData("PROJECT", "Apps", "16.67%"),
+    getVoteData("USER", "Users", "16.67%"),
   ];
 
   return (
