@@ -34,6 +34,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { DSButton } from "@/components/design-system/Button";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -266,25 +267,37 @@ export function AdvancedDelegateDialog({
 
                 {address ? (
                   isError ? (
-                    <Button
-                      disabled={false}
+                    <DSButton
+                      variant="primary"
+                      size="small"
+                      fullWidth
                       className="mt-3"
+                      disabled={false}
                       onClick={() => writeWithTracking()}
                     >
                       Delegation failed
-                    </Button>
+                    </DSButton>
                   ) : isLoading ? (
-                    <Button disabled={false} className="mt-3">
-                      Submitting your delegation...
-                    </Button>
-                  ) : (
-                    <Button
-                      disabled={false}
+                    <DSButton
+                      variant="primary"
+                      size="small"
+                      fullWidth
                       className="mt-3"
+                      disabled
+                    >
+                      Submitting your delegation...
+                    </DSButton>
+                  ) : (
+                    <DSButton
+                      variant="primary"
+                      size="small"
+                      fullWidth
+                      className="mt-3"
+                      disabled={false}
                       onClick={() => writeWithTracking()}
                     >
                       Delegate your votes
-                    </Button>
+                    </DSButton>
                   )
                 ) : (
                   <Button className="mt-3" onClick={() => setOpen(true)}>
@@ -361,7 +374,7 @@ function InfoDialog({
         </div>
         {directDelegatedFromOthers > 0n && (
           <p className="w-full p-3 text-xs font-medium leading-4 border-t text-primary/30 border-line">
-            You’ve been delegated an additional{" "}
+            You've been delegated an additional{" "}
             <TokenAmountDecorated amount={directDelegatedFromOthers} /> without
             the right to redelegate. You can only vote with this portion of
             votes and cannot pass them to others.

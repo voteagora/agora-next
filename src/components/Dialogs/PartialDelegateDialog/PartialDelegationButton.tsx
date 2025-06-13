@@ -91,7 +91,7 @@ export const PartialDelegationButton = ({
       <DSButton
         variant="primary"
         primaryTextColor="black"
-        size="large"
+        size="small"
         fullWidth
         onClick={() => write(simulateData!.request)}
         disabled={isLoading || disabled || !simulateData?.request}

@@ -1,4 +1,3 @@
-import { ProposalType } from "@prisma/client";
 import { getHumanBlockTime } from "./blockTimes";
 import {
   Proposal,
@@ -11,6 +10,7 @@ import Tenant from "./tenant/tenant";
 import { Block, toUtf8Bytes } from "ethers";
 import { mapArbitrumBlockToMainnetBlock } from "./utils";
 import { TENANT_NAMESPACES } from "./constants";
+import { ProposalType } from "./types";
 
 // Type guards
 export function isTimestampBasedProposal(
@@ -448,6 +448,22 @@ export type ParsedProposalData = {
     key: "OPTIMISTIC";
     kind: { options: [] };
   };
+  OFFCHAIN_STANDARD: {
+    key: "OFFCHAIN_STANDARD";
+    kind: { options: [] };
+  };
+  OFFCHAIN_APPROVAL: {
+    key: "OFFCHAIN_APPROVAL";
+    kind: { options: [] };
+  };
+  OFFCHAIN_OPTIMISTIC: {
+    key: "OFFCHAIN_OPTIMISTIC";
+    kind: { options: [] };
+  };
+  OFFCHAIN_OPTIMISTIC_TIERED: {
+    key: "OFFCHAIN_OPTIMISTIC_TIERED";
+    kind: { options: [] };
+  };
 };
 
 export function parseIfNecessary(obj: string | object) {
@@ -599,6 +615,15 @@ export function parseProposalData(
         },
       };
     }
+    case "OFFCHAIN_STANDARD":
+    case "OFFCHAIN_APPROVAL":
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED": {
+      return {
+        key: proposalType,
+        kind: { options: [] },
+      };
+    }
     default: {
       throw new Error(`unknown type ${proposalType}`);
     }
@@ -657,6 +682,22 @@ export type ParsedProposalResults = {
       criteria: "THRESHOLD" | "TOP_CHOICES";
       criteriaValue: bigint;
     };
+  };
+  OFFCHAIN_STANDARD: {
+    key: "OFFCHAIN_STANDARD";
+    kind: null;
+  };
+  OFFCHAIN_APPROVAL: {
+    key: "OFFCHAIN_APPROVAL";
+    kind: null;
+  };
+  OFFCHAIN_OPTIMISTIC: {
+    key: "OFFCHAIN_OPTIMISTIC";
+    kind: null;
+  };
+  OFFCHAIN_OPTIMISTIC_TIERED: {
+    key: "OFFCHAIN_OPTIMISTIC_TIERED";
+    kind: null;
   };
 };
 
@@ -755,6 +796,15 @@ export function parseProposalResults(
         },
       };
     }
+    case "OFFCHAIN_STANDARD":
+    case "OFFCHAIN_APPROVAL":
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED": {
+      return {
+        key: proposalData.key,
+        kind: null,
+      };
+    }
   }
 }
 
@@ -787,7 +837,8 @@ export async function getProposalStatus(
   const checkHasNoCalldata = (): boolean => {
     if (
       proposal.proposal_type === "SNAPSHOT" ||
-      proposal.proposal_type === "OPTIMISTIC"
+      proposal.proposal_type === "OPTIMISTIC" ||
+      proposal.proposal_type.startsWith("OFFCHAIN_")
     ) {
       return true;
     }
@@ -1001,8 +1052,18 @@ export async function getProposalStatus(
         return "SUCCEEDED";
       }
     }
+    case "OFFCHAIN_STANDARD":
+    case "OFFCHAIN_APPROVAL":
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED": {
+      return "PENDING";
+    }
   }
 }
+
+const ensureHexPrefix = (hex: string): `0x${string}` => {
+  return hex.startsWith("0x") ? (hex as `0x${string}`) : `0x${hex}`;
+};
 
 export const proposalToCallArgs = (proposal: Proposal) => {
   const dynamicProposalType: keyof ParsedProposalData =
@@ -1013,7 +1074,9 @@ export const proposalToCallArgs = (proposal: Proposal) => {
   return [
     "options" in proposalData ? proposalData.options[0].targets : "",
     "options" in proposalData ? proposalData.options[0].values : "",
-    "options" in proposalData ? proposalData.options[0].calldatas : "",
+    "options" in proposalData
+      ? proposalData.options[0].calldatas.map(ensureHexPrefix)
+      : "",
     keccak256(toUtf8Bytes(proposal.description!)),
   ];
 };

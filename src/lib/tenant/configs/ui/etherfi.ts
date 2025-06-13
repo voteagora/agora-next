@@ -157,5 +157,13 @@ export const etherfiTenantUIConfig = new TenantUI({
       name: "use-daonode-for-votable-supply",
       enabled: false,
     },
+    {
+      name: "use-daonode-for-proposal-types",
+      enabled: false,
+    },
+    {
+      name: "show-participation",
+      enabled: false,
+    },
   ],
 });

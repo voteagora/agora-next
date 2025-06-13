@@ -186,15 +186,19 @@ export function DelegateDialog({
     }
 
     if (isProcessingDelegation || isProcessingSponsoredDelegation) {
-      return <Button disabled={true}>Submitting your delegation...</Button>;
+      return (
+        <DSButton variant="primary" size="small" fullWidth disabled>
+          Submitting your delegation...
+        </DSButton>
+      );
     }
 
     if (didProcessDelegation || didProcessSponsoredDelegation) {
       return (
         <div>
-          <Button className="w-full" disabled={false}>
+          <DSButton variant="primary" size="small" fullWidth disabled>
             Delegation completed!
-          </Button>
+          </DSButton>
           <BlockScanUrls
             hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
           />

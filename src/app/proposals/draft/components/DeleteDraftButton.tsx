@@ -12,6 +12,7 @@ const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
     <DSButton
       variant="text"
       size="small"
+      className="flex items-end"
       iconBefore={<TrashIcon className="h-5 w-5" />}
       onClick={(e: any) => {
         e.preventDefault();
@@ -23,7 +24,9 @@ const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
         });
       }}
     >
-      <span className="mt-[2px] inline-block">Delete Proposal</span>
+      <span className="mt-[6px] inline-block align-bottom">
+        Delete Proposal
+      </span>
     </DSButton>
   );
 };

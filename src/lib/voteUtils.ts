@@ -1,4 +1,3 @@
-import { ProposalType } from "@prisma/client";
 import {
   getProposalTotalValue,
   getTitleFromProposalDescription,
@@ -22,6 +21,7 @@ import { formatUnits, parseUnits } from "viem";
 import { format } from "date-fns";
 import { tokenForContractAddress } from "./tokenUtils";
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import { ProposalType } from "./types";
 
 /**
  * Vote primitives
@@ -98,6 +98,22 @@ export type ParsedParams = {
   };
   SNAPSHOT: {
     key: "SNAPSHOT";
+    kind: null;
+  };
+  OFFCHAIN_STANDARD: {
+    key: "OFFCHAIN_STANDARD";
+    kind: null;
+  };
+  OFFCHAIN_APPROVAL: {
+    key: "OFFCHAIN_APPROVAL";
+    kind: null;
+  };
+  OFFCHAIN_OPTIMISTIC: {
+    key: "OFFCHAIN_OPTIMISTIC";
+    kind: null;
+  };
+  OFFCHAIN_OPTIMISTIC_TIERED: {
+    key: "OFFCHAIN_OPTIMISTIC_TIERED";
     kind: null;
   };
 };

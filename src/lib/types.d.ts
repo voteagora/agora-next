@@ -240,3 +240,25 @@ export interface FormattedProposalType {
   isClientSide?: boolean;
   scopes?: ScopeData[];
 }
+
+export interface DelegateResponse {
+  delegate: DelegateStats;
+}
+
+export interface DelegateStats {
+  addr: string;
+  from_cnt: number;
+  from_list: object[];
+  voting_power: string;
+  participation: [number, number];
+}
+
+export type ProposalType =
+  | "STANDARD"
+  | "APPROVAL"
+  | "OPTIMISTIC"
+  | "SNAPSHOT"
+  | "OFFCHAIN_STANDARD"
+  | "OFFCHAIN_APPROVAL"
+  | "OFFCHAIN_OPTIMISTIC"
+  | "OFFCHAIN_OPTIMISTIC_TIERED";

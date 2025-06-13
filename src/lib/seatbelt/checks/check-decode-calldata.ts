@@ -89,6 +89,7 @@ function findMatchingCall(
   calldata: string,
   calls: any[]
 ): FluffyCall | null {
+  if (!calls || !calls.length) return null;
   const callMatches = (f: string, c: string) =>
     getAddress(f) === getAddress(from) && c === calldata;
   for (const call of calls) {

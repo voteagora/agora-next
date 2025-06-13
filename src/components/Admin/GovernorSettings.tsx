@@ -123,57 +123,39 @@ export default function GovernorSettings() {
     error: delayTXerror,
   } = useWaitForTransactionReceipt({
     hash: resultSetVotingDelay,
-    confirmations: 1,
   });
   const isDisabledSetVotingDelay =
     isLoadingSetVotingDelay || isLoadingSetVotingDelayTransaction;
 
   const isAdmin = address === adminAddress;
 
-  // For working with updating the values
   useEffect(() => {
-    const triggerToast = ({
-      success,
-      hash,
-    }: {
-      success: boolean;
-      hash?: string;
-    }) => {
-      success
-        ? toast.success(
-            <div className="flex flex-col items-center gap-2 p-1">
-              <span className="text-sm font-semibold">
-                Updated Successfully!
-              </span>
-              {hash ? <BlockScanUrls hash1={hash} /> : null}
-            </div>
-          )
-        : toast.error("Transaction failed.");
-    };
-
-    if (delayTXStatus === "success") {
-      triggerToast({ success: true, hash: resultSetVotingDelay });
-    } else if (periodTXStatus === "success") {
-      triggerToast({ success: true, hash: resultSetVotingPeriod });
-    } else if (delayTXStatus === "error" || periodTXStatus === "error") {
-      triggerToast({ success: false });
-    }
-
-    // Debugging for undefined errors
-    if (delayTXerror) {
-      console.error("Transaction error - delay:", delayTXerror);
-    }
-    if (periodTXError) {
+    if (periodTXStatus === "success" && resultSetVotingPeriod) {
+      toast.success(
+        <div className="flex flex-col items-center gap-2 p-1">
+          <span className="text-sm font-semibold">Updated Successfully!</span>
+          <BlockScanUrls hash1={resultSetVotingPeriod} />
+        </div>
+      );
+    } else if (periodTXStatus === "error") {
+      toast.error("Transaction failed.");
       console.error("Transaction error - period:", periodTXError);
     }
-  }, [
-    delayTXStatus,
-    delayTXerror,
-    periodTXStatus,
-    periodTXError,
-    resultSetVotingDelay,
-    resultSetVotingPeriod,
-  ]);
+  }, [periodTXStatus, resultSetVotingPeriod, periodTXError]);
+
+  useEffect(() => {
+    if (delayTXStatus === "success" && resultSetVotingDelay) {
+      toast.success(
+        <div className="flex flex-col items-center gap-2 p-1">
+          <span className="text-sm font-semibold">Updated Successfully!</span>
+          <BlockScanUrls hash1={resultSetVotingDelay} />
+        </div>
+      );
+    } else if (delayTXStatus === "error") {
+      toast.error("Transaction failed.");
+      console.error("Transaction error - delay:", delayTXerror);
+    }
+  }, [delayTXStatus, resultSetVotingDelay, delayTXerror]);
 
   return (
     <div className="gl_box bg-neutral">

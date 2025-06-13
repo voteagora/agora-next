@@ -158,6 +158,7 @@ export function UndelegateDialog({
       votingPower: { total: "0", direct: "0", advanced: "0" },
       statement: null,
       citizen: false,
+      participation: 0,
     },
   });
 

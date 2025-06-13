@@ -261,7 +261,7 @@ const BasicProposalForm = () => {
         <DSButton
           variant="secondary"
           size="small"
-          className="flex-grow"
+          className="flex-grow h-16 sm:h-10"
           onClick={() => {
             append({
               type: TransactionType.TRANSFER,
@@ -279,7 +279,7 @@ const BasicProposalForm = () => {
         <DSButton
           variant="secondary"
           size="small"
-          className="flex-grow"
+          className="flex-grow h-16 sm:h-10"
           onClick={() => {
             append({
               type: TransactionType.CUSTOM,
@@ -292,7 +292,7 @@ const BasicProposalForm = () => {
             });
           }}
         >
-          Create a custom transaction
+          <span className="whitespace-nowrap">Create a custom</span> transaction
         </DSButton>
       </div>
       <div className="mt-6">

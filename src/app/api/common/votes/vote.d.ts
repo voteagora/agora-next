@@ -1,6 +1,6 @@
 import { OptimismVotes, LineaVotes } from "@prisma/client";
 import { ParsedParams } from "@/lib/voteUtils";
-import { ProposalType } from "@prisma/client";
+import { ProposalType } from "@/lib/types";
 
 export type VotesSortOrder = "asc" | "desc";
 export type VotesSort = "weight" | "block_number";
@@ -54,4 +54,9 @@ export type DelegatesSort =
   | "most_delegators"
   | "weighted_random"
   | "voting_power"
-  | "least_voting_power";
+  | "least_voting_power"
+  | "most_recent_delegation"
+  | "oldest_delegation"
+  | "latest_voting_block"
+  | "vp_change_7d"
+  | "vp_change_7d_desc";

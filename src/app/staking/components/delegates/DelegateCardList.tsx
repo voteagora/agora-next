@@ -12,10 +12,11 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 interface Props {
   address: string;
   initialDelegates: PaginatedResult<DelegateChunk[]>;
-  fetchDelegates: (
-    pagination: PaginationParams,
-    seed: number
-  ) => Promise<PaginatedResult<DelegateChunk[]>>;
+  fetchDelegates: (args: {
+    pagination?: PaginationParams;
+    seed?: number;
+    showParticipation?: boolean;
+  }) => Promise<PaginatedResult<DelegateChunk[]>>;
   onSelect: (address: string) => void;
 }
 
@@ -28,7 +29,9 @@ export default function DelegateCardList({
   const fetching = useRef(false);
   const [meta, setMeta] = useState(initialDelegates.meta);
   const [delegates, setDelegates] = useState(initialDelegates.data);
-  const { namespace } = Tenant.current();
+  const { namespace, ui } = Tenant.current();
+
+  const showParticipation = ui.toggle("show-participation")?.enabled || false;
 
   useEffect(() => {
     setDelegates(initialDelegates.data);
@@ -38,10 +41,17 @@ export default function DelegateCardList({
   const loadMore = async () => {
     if (!fetching.current && meta.has_next) {
       fetching.current = true;
-      const data = await fetchDelegates(
-        { offset: meta.next_offset, limit: meta.total_returned },
-        initialDelegates.seed || Math.random()
-      );
+      console.log("🥵 showParticipation - C", showParticipation);
+
+      const data = await fetchDelegates({
+        pagination: {
+          limit: meta.total_returned,
+          offset: meta.next_offset,
+        },
+        seed: initialDelegates.seed || Math.random(),
+        showParticipation,
+      });
+
       setDelegates(delegates.concat(data.data));
       setMeta(data.meta);
       fetching.current = false;

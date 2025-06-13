@@ -169,7 +169,7 @@ const DraftPreview = ({
           className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
         >
           <p className="flex-grow text-primary">Manager address</p>
-          <span className="text-secondary font-mono text-xs">
+          <span className="text-secondary font-mono text-xs break-all max-w-full">
             {manager?.toString()}
           </span>
         </div>

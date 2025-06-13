@@ -3,14 +3,18 @@ import {
   ProposalPayloadFromDB,
 } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
+import { ProposalType } from "@/lib/types";
+import { unstable_cache } from "next/cache";
 import { cache } from "react";
-import { PaginatedResult } from "../pagination";
-import { ProposalType } from "@prisma/client";
+import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import { DelegateStats } from "@/lib/types";
 
-const { contracts, namespace } = Tenant.current();
+const { namespace, ui } = Tenant.current();
 
+// DO NOT ENABLE DAO-NODE PROPOSALS UNTIL TODO BELOW IS HANDLED
 export function adaptDAONodeResponse(
-  apiResponse: ProposalPayloadFromDAONode
+  apiResponse: ProposalPayloadFromDAONode,
+  proposalTypes: any
 ): ProposalPayloadFromDB {
   const votingModuleName = apiResponse.voting_module_name;
 
@@ -64,6 +68,11 @@ export function adaptDAONodeResponse(
     throw new Error(`Unknown voting module name: ${votingModuleName}`);
   }
 
+  const proposalType = proposalTypes[String(apiResponse.proposal_type)];
+  const parsedProposalType = Object.assign(proposalType, {
+    proposal_type_id: String(apiResponse.proposal_type),
+  });
+
   return {
     proposal_id: apiResponse.id,
     proposer: apiResponse.proposer.toLowerCase(),
@@ -82,7 +91,9 @@ export function adaptDAONodeResponse(
       : null,
     proposal_data: proposalData,
     proposal_type: apiResponse.voting_module_name.toUpperCase() as ProposalType,
-    proposal_type_data: null,
+    // TODO: Add proposal type data
+    // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL THIS IS HANDLED
+    proposal_type_data: parsedProposalType,
     proposal_results: proposalResults,
 
     proposal_data_raw: apiResponse.proposal_data,
@@ -92,6 +103,29 @@ export function adaptDAONodeResponse(
     queued_transaction_hash: null,
     executed_transaction_hash: null,
   };
+}
+
+interface MappedDelegate {
+  address: string;
+  votingPower: {
+    total: string;
+    direct: string;
+    advanced: string;
+  };
+  statement: {
+    address: string;
+    payload: {
+      delegateStatement: string;
+      topIssues: { type: string; value: string }[];
+      topStakeholders: { type: string }[];
+    };
+    endorsed: boolean;
+  } | null;
+  numOfDelegators: string;
+  vpChange7d: string;
+  participation: number;
+  mostRecentDelegationBlock: number;
+  lastVoteBlock: number;
 }
 
 export const getDaoNodeURLForNamespace = (namespace: string) => {
@@ -104,18 +138,26 @@ export const getDaoNodeURLForNamespace = (namespace: string) => {
   return parsedUrl;
 };
 
-export const getProposalTypesFromDaoNode = async () => {
-  const url = getDaoNodeURLForNamespace(namespace);
-  const supportScopes = contracts.supportScopes;
-  if (!url || !supportScopes) {
-    return null;
+export const getProposalTypesFromDaoNode = unstable_cache(
+  async () => {
+    const url = getDaoNodeURLForNamespace(namespace);
+    const useDaoNodeForProposalTypes = ui.toggle(
+      "use-daonode-for-proposal-types"
+    )?.enabled;
+    if (!url || !useDaoNodeForProposalTypes) {
+      return null;
+    }
+
+    const response = await fetch(`${url}v1/proposal_types`);
+    const data = await response.json();
+
+    return data;
+  },
+  ["proposal-types"],
+  {
+    revalidate: 60, // 1 minute
   }
-
-  const response = await fetch(`${url}v1/proposal_types`);
-  const data = await response.json();
-
-  return data;
-};
+);
 
 export const getAllProposalsFromDaoNode = async () => {
   const url = getDaoNodeURLForNamespace(namespace);
@@ -233,3 +275,151 @@ export const getCachedAllProposalsFromDaoNode = cache(
     proposal_type: 'STANDARD'
   }
   */
+
+export const getDelegatesFromDaoNode = async (options?: {
+  sortBy?: string;
+  reverse?: boolean;
+  limit?: number;
+  offset?: number;
+  filters?: {
+    delegator?: `0x${string}`;
+  };
+  performInternalPagination?: boolean;
+  withParticipation?: boolean;
+}) => {
+  const url = getDaoNodeURLForNamespace(namespace);
+  if (!url) {
+    return null;
+  }
+
+  try {
+    const sortBy = options?.sortBy || "VP";
+    const reverse = options?.reverse ?? true;
+    const filters = options?.filters;
+
+    // TODO: Properly cache this... SMH
+    // entire point of DAO node is to serve up full state
+    // not give tiny little pages.
+    // We're setting this at 1000, and gambling that
+    // nothing above 1000 will be needed in any given
+    // page passed onto the client.
+
+    // if this functions, we can either have DAO-node return a full count
+    // and use that intelligence to properly detect when 1000 is insufficient
+    // or we can have DAO-node return a "hasMore" boolean or something.
+
+    const queryParams = new URLSearchParams({
+      sort_by: sortBy,
+      reverse: reverse.toString(),
+      include:
+        "VP,DC," + (options?.withParticipation ? "PR," : "") + "LVB,MRD,VPC",
+      page_size: "1000",
+      offset: "0",
+    });
+
+    if (filters?.delegator) {
+      queryParams.append("delegator", filters.delegator);
+    }
+
+    const response = await fetch(`${url}v1/delegates?${queryParams}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch delegates: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data && data.delegates && data.delegates.length > 0) {
+      const allRawDelegatesFromApi = data.delegates;
+      const totalBeforeInternalPagination = allRawDelegatesFromApi.length;
+
+      let delegatesToFetchStatementsFor = [...allRawDelegatesFromApi];
+
+      delegatesToFetchStatementsFor = allRawDelegatesFromApi.slice(0, 1000);
+
+      let mappedDelegates: MappedDelegate[] = [];
+
+      if (delegatesToFetchStatementsFor.length > 0) {
+        const delegateAddresses = delegatesToFetchStatementsFor.map(
+          (delegate: { addr: string }) => delegate.addr.toLowerCase()
+        );
+
+        const statements = await fetchDelegateStatements({
+          addresses: delegateAddresses,
+        });
+
+        const statementMap: Map<string, any> = new Map();
+        statements.forEach((statement) => {
+          if (statement) {
+            statementMap.set(statement.address.toLowerCase(), statement);
+          }
+        });
+
+        mappedDelegates = delegatesToFetchStatementsFor.map(
+          (delegateFromDaoNode: {
+            addr: string;
+            VP?: string;
+            DC?: number;
+            PR?: number;
+            VPC?: string;
+            MRD?: number;
+            LVB?: number;
+          }) => {
+            const lowerCaseAddress = delegateFromDaoNode.addr.toLowerCase();
+            return {
+              address: lowerCaseAddress,
+              votingPower: {
+                total: delegateFromDaoNode.VP || "0",
+                direct: delegateFromDaoNode.VP || "0",
+                advanced: "0",
+              },
+              statement: statementMap.get(lowerCaseAddress) || null,
+              numOfDelegators: delegateFromDaoNode.DC?.toString() || "0",
+              vpChange7d: delegateFromDaoNode.VPC || "0",
+              participation: delegateFromDaoNode.PR || 0,
+              mostRecentDelegationBlock: delegateFromDaoNode.MRD || 0,
+              lastVoteBlock: delegateFromDaoNode.LVB || 0,
+            };
+          }
+        );
+      }
+
+      return {
+        delegates: mappedDelegates,
+        totalBeforeInternalPagination: totalBeforeInternalPagination,
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching delegates from DAO node:", error);
+    return null;
+  }
+};
+
+/**
+ * Fetches participation statistics for a delegate address from the DAO node
+ * @param address The delegate address to fetch stats for
+ * @returns Participation stats or null if fetching fails
+ */
+export const getDelegateDataFromDaoNode = async (
+  address: string
+): Promise<DelegateStats | null> => {
+  const url = getDaoNodeURLForNamespace(namespace);
+  if (!url) {
+    return null;
+  }
+  try {
+    // Fetch delegate data for participation rate
+    const delegateRes = await fetch(`${url}v1/delegate/${address}`);
+    // Check if the response was successful
+    if (!delegateRes.ok) {
+      console.error(
+        `Failed to fetch delegate data: ${delegateRes.status} ${delegateRes.statusText}`
+      );
+      return null;
+    }
+
+    return (await delegateRes.json()) as DelegateStats;
+  } catch (error) {
+    console.error("Error in getDelegateDataFromDaoNode:", error);
+    return null;
+  }
+};
