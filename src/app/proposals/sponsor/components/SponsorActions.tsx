@@ -4,10 +4,15 @@ import ApprovalProposalAction from "./ApprovalProposalAction";
 import OptimisticProposalAction from "./OptimisticProposalAction";
 import {
   DraftProposal,
-  ProposalScope,
   ProposalType,
+  ProposalScope,
 } from "../../../proposals/draft/types";
+import Tenant from "@/lib/tenant/tenant";
+import { GOVERNOR_TYPE } from "@/lib/constants";
 import OffchainProposalAction from "./OffchainProposalAction";
+import AG20ProposalAction from "./AG20ProposalAction";
+
+const { contracts } = Tenant.current();
 
 const SponsorActions = ({
   draftProposal,
@@ -21,6 +26,9 @@ const SponsorActions = ({
       !!draftProposal.onchain_transaction_hash
     ) {
       return <OffchainProposalAction draftProposal={proposal} />;
+    }
+    if (contracts.governorType === GOVERNOR_TYPE.AGORA_20) {
+      return <AG20ProposalAction draftProposal={proposal} />;
     }
     switch (proposal.voting_module_type) {
       case ProposalType.BASIC:

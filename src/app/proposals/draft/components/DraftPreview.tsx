@@ -114,10 +114,15 @@ const DraftPreview = ({
           proposal.proposal_scope === ProposalScope.ONCHAIN_ONLY;
         return (
           <p className="text-secondary mt-2">
-            This is an <PreText text="approval" /> proposal. The maximum number
-            of tokens that can be transferred from all the options in this
-            proposal is <PreText text={proposal.budget.toString()} />. The
-            number of options each voter may select is{" "}
+            This is an <PreText text="approval" /> proposal.{" "}
+            {proposal.budget && (
+              <>
+                The maximum number of tokens that can be transferred from all
+                the options in this proposal is{" "}
+                <PreText text={proposal.budget.toString()} />.
+              </>
+            )}
+            The number of options each voter may select is{" "}
             <PreText text={proposal.max_options.toString()} />.{" "}
             {proposal.criteria === "Threshold" && (
               <>

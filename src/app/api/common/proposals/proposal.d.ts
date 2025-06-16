@@ -22,8 +22,10 @@ export type ProposalPayloadFromDAONode = {
   values: number[];
   signatures: string[];
   calldatas: string[];
-  start_block: number;
-  end_block: number;
+  start_block?: number;
+  end_block?: number;
+  vote_start?: number;
+  vote_end?: number;
 
   queue_event?: {
     block_number: number;
@@ -67,6 +69,7 @@ export type ProposalPayloadFromDAONode = {
   // So, DAO Node might be forced to re-cast large integers as strings, where they exist.
   // We'll make this decision later, after tests are up and running. -- Jeff M, 2025-04-29
   decoded_proposal_data?: Object;
+  created_transaction_hash: string | null;
 };
 
 export type ProposalPayloadFromDB = {

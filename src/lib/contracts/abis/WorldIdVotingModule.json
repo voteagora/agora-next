@@ -3,134 +3,511 @@
     "type": "constructor",
     "inputs": [
       {
-        "name": "minDelay",
-        "type": "uint256",
-        "internalType": "uint256"
+        "name": "_governor",
+        "type": "address",
+        "internalType": "address payable"
       },
       {
-        "name": "proposers",
-        "type": "address[]",
-        "internalType": "address[]"
-      },
-      {
-        "name": "executors",
-        "type": "address[]",
-        "internalType": "address[]"
-      },
-      {
-        "name": "admin",
+        "name": "_router",
         "type": "address",
         "internalType": "address"
+      },
+      {
+        "name": "_worldId",
+        "type": "address",
+        "internalType": "contract IWorldID"
       }
     ],
     "stateMutability": "nonpayable"
   },
   {
-    "type": "receive",
-    "stateMutability": "payable"
-  },
-  {
     "type": "function",
-    "name": "CANCELLER_ROLE",
+    "name": "COUNTING_MODE",
     "inputs": [],
     "outputs": [
       {
         "name": "",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "type": "string",
+        "internalType": "string"
       }
     ],
-    "stateMutability": "view"
+    "stateMutability": "pure"
   },
   {
     "type": "function",
-    "name": "DEFAULT_ADMIN_ROLE",
+    "name": "PROPOSAL_DATA_ENCODING",
     "inputs": [],
     "outputs": [
       {
         "name": "",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "type": "string",
+        "internalType": "string"
       }
     ],
-    "stateMutability": "view"
+    "stateMutability": "pure"
   },
   {
     "type": "function",
-    "name": "EXECUTOR_ROLE",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "PROPOSER_ROLE",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "cancel",
+    "name": "afterCancel",
     "inputs": [
       {
-        "name": "id",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "execute",
-    "inputs": [
-      {
-        "name": "target",
+        "name": "",
         "type": "address",
         "internalType": "address"
       },
       {
-        "name": "value",
+        "name": "",
         "type": "uint256",
         "internalType": "uint256"
       },
       {
-        "name": "payload",
+        "name": "",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "afterExecute",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "afterInitialize",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "afterPropose",
+    "inputs": [
+      {
+        "name": "sender",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "proposalId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "afterQueue",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "afterQuorumCalculation",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "afterVote",
+    "inputs": [
+      {
+        "name": "sender",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "weight",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "proposalId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "account",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "support",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "reason",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "params",
         "type": "bytes",
         "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "afterVoteSucceeded",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
       },
       {
-        "name": "predecessor",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
       },
       {
-        "name": "salt",
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "beforeCancel",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "",
         "type": "bytes32",
         "internalType": "bytes32"
       }
     ],
-    "outputs": [],
-    "stateMutability": "payable"
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "executeBatch",
+    "name": "beforeExecute",
     "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      },
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "beforeInitialize",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "beforePropose",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "beforeQueue",
+    "inputs": [
+      {
+        "name": "sender",
+        "type": "address",
+        "internalType": "address"
+      },
       {
         "name": "targets",
         "type": "address[]",
@@ -142,29 +519,66 @@
         "internalType": "uint256[]"
       },
       {
-        "name": "payloads",
+        "name": "calldatas",
         "type": "bytes[]",
         "internalType": "bytes[]"
       },
       {
-        "name": "predecessor",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "salt",
+        "name": "descriptionHash",
         "type": "bytes32",
         "internalType": "bytes32"
       }
     ],
-    "outputs": [],
-    "stateMutability": "payable"
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      },
+      {
+        "name": "",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "getMinDelay",
-    "inputs": [],
+    "name": "beforeQuorumCalculation",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
     "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      },
       {
         "name": "",
         "type": "uint256",
@@ -175,95 +589,84 @@
   },
   {
     "type": "function",
-    "name": "getOperationState",
+    "name": "beforeVote",
     "inputs": [
       {
-        "name": "id",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "outputs": [
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
       {
         "name": "",
         "type": "uint8",
-        "internalType": "enum TimelockController.OperationState"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getRoleAdmin",
-    "inputs": [
+        "internalType": "uint8"
+      },
       {
-        "name": "role",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "",
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
     "outputs": [
       {
         "name": "",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getTimestamp",
-    "inputs": [
+        "type": "bytes4",
+        "internalType": "bytes4"
+      },
       {
-        "name": "id",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "outputs": [
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      },
       {
         "name": "",
         "type": "uint256",
         "internalType": "uint256"
       }
     ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "grantRole",
-    "inputs": [
-      {
-        "name": "role",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "hasRole",
+    "name": "beforeVoteSucceeded",
     "inputs": [
       {
-        "name": "role",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "account",
+        "name": "sender",
         "type": "address",
         "internalType": "address"
+      },
+      {
+        "name": "proposalId",
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
     "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      },
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      },
       {
         "name": "",
         "type": "bool",
@@ -274,46 +677,7 @@
   },
   {
     "type": "function",
-    "name": "hashOperation",
-    "inputs": [
-      {
-        "name": "target",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "value",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "data",
-        "type": "bytes",
-        "internalType": "bytes"
-      },
-      {
-        "name": "predecessor",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "salt",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "stateMutability": "pure"
-  },
-  {
-    "type": "function",
-    "name": "hashOperationBatch",
+    "name": "generateProposeCalldata",
     "inputs": [
       {
         "name": "targets",
@@ -326,643 +690,292 @@
         "internalType": "uint256[]"
       },
       {
-        "name": "payloads",
+        "name": "calldatas",
         "type": "bytes[]",
         "internalType": "bytes[]"
       },
       {
-        "name": "predecessor",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "name": "description",
+        "type": "string",
+        "internalType": "string"
       },
       {
-        "name": "salt",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "name": "proposalData",
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
     "outputs": [
       {
         "name": "",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
     "stateMutability": "pure"
   },
   {
     "type": "function",
-    "name": "isOperation",
-    "inputs": [
-      {
-        "name": "id",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
+    "name": "getHookPermissions",
+    "inputs": [],
     "outputs": [
       {
         "name": "",
-        "type": "bool",
-        "internalType": "bool"
+        "type": "tuple",
+        "internalType": "struct Hooks.Permissions",
+        "components": [
+          {
+            "name": "beforeInitialize",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "afterInitialize",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "beforeVoteSucceeded",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "afterVoteSucceeded",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "beforeQuorumCalculation",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "afterQuorumCalculation",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "beforeVote",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "afterVote",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "beforePropose",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "afterPropose",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "beforeCancel",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "afterCancel",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "beforeQueue",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "afterQueue",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "beforeExecute",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "afterExecute",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "governor",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract AgoraGovernor"
       }
     ],
     "stateMutability": "view"
   },
   {
     "type": "function",
-    "name": "isOperationDone",
+    "name": "proposals",
     "inputs": [
       {
-        "name": "id",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "name": "proposalId",
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
     "outputs": [
       {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
+        "name": "governor",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "settings",
+        "type": "tuple",
+        "internalType": "struct ProposalSettings",
+        "components": [
+          {
+            "name": "minParticipation",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "maxApprovals",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "criteria",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "criteriaValue",
+            "type": "uint128",
+            "internalType": "uint128"
+          },
+          {
+            "name": "isSignalVote",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      },
+      {
+        "name": "forVotes",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "againstVotes",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "externalNullifierHash",
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
     "stateMutability": "view"
   },
   {
     "type": "function",
-    "name": "isOperationPending",
-    "inputs": [
-      {
-        "name": "id",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
+    "name": "version",
+    "inputs": [],
     "outputs": [
       {
         "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "isOperationReady",
-    "inputs": [
-      {
-        "name": "id",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "onERC1155BatchReceived",
-    "inputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "",
-        "type": "uint256[]",
-        "internalType": "uint256[]"
-      },
-      {
-        "name": "",
-        "type": "uint256[]",
-        "internalType": "uint256[]"
-      },
-      {
-        "name": "",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes4",
-        "internalType": "bytes4"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "onERC1155Received",
-    "inputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes4",
-        "internalType": "bytes4"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "onERC721Received",
-    "inputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes4",
-        "internalType": "bytes4"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "renounceRole",
-    "inputs": [
-      {
-        "name": "role",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "callerConfirmation",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "revokeRole",
-    "inputs": [
-      {
-        "name": "role",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "schedule",
-    "inputs": [
-      {
-        "name": "target",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "value",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "data",
-        "type": "bytes",
-        "internalType": "bytes"
-      },
-      {
-        "name": "predecessor",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "salt",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "delay",
         "type": "uint256",
         "internalType": "uint256"
       }
     ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "scheduleBatch",
-    "inputs": [
-      {
-        "name": "targets",
-        "type": "address[]",
-        "internalType": "address[]"
-      },
-      {
-        "name": "values",
-        "type": "uint256[]",
-        "internalType": "uint256[]"
-      },
-      {
-        "name": "payloads",
-        "type": "bytes[]",
-        "internalType": "bytes[]"
-      },
-      {
-        "name": "predecessor",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "salt",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "delay",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "supportsInterface",
-    "inputs": [
-      {
-        "name": "interfaceId",
-        "type": "bytes4",
-        "internalType": "bytes4"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "updateDelay",
-    "inputs": [
-      {
-        "name": "newDelay",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    "stateMutability": "pure"
   },
   {
     "type": "event",
-    "name": "CallExecuted",
+    "name": "ProposalCreated",
     "inputs": [
       {
-        "name": "id",
-        "type": "bytes32",
-        "indexed": true,
-        "internalType": "bytes32"
-      },
-      {
-        "name": "index",
+        "name": "proposalID",
         "type": "uint256",
         "indexed": true,
         "internalType": "uint256"
       },
       {
-        "name": "target",
-        "type": "address",
+        "name": "options",
+        "type": "tuple[]",
         "indexed": false,
-        "internalType": "address"
+        "internalType": "struct ProposalOption[]",
+        "components": [
+          {
+            "name": "description",
+            "type": "string",
+            "internalType": "string"
+          }
+        ]
       },
       {
-        "name": "value",
-        "type": "uint256",
+        "name": "settings",
+        "type": "tuple",
         "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "data",
-        "type": "bytes",
-        "indexed": false,
-        "internalType": "bytes"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "CallSalt",
-    "inputs": [
-      {
-        "name": "id",
-        "type": "bytes32",
-        "indexed": true,
-        "internalType": "bytes32"
-      },
-      {
-        "name": "salt",
-        "type": "bytes32",
-        "indexed": false,
-        "internalType": "bytes32"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "CallScheduled",
-    "inputs": [
-      {
-        "name": "id",
-        "type": "bytes32",
-        "indexed": true,
-        "internalType": "bytes32"
-      },
-      {
-        "name": "index",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      },
-      {
-        "name": "target",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      },
-      {
-        "name": "value",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "data",
-        "type": "bytes",
-        "indexed": false,
-        "internalType": "bytes"
-      },
-      {
-        "name": "predecessor",
-        "type": "bytes32",
-        "indexed": false,
-        "internalType": "bytes32"
-      },
-      {
-        "name": "delay",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "Cancelled",
-    "inputs": [
-      {
-        "name": "id",
-        "type": "bytes32",
-        "indexed": true,
-        "internalType": "bytes32"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "MinDelayChange",
-    "inputs": [
-      {
-        "name": "oldDuration",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "newDuration",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "RoleAdminChanged",
-    "inputs": [
-      {
-        "name": "role",
-        "type": "bytes32",
-        "indexed": true,
-        "internalType": "bytes32"
-      },
-      {
-        "name": "previousAdminRole",
-        "type": "bytes32",
-        "indexed": true,
-        "internalType": "bytes32"
-      },
-      {
-        "name": "newAdminRole",
-        "type": "bytes32",
-        "indexed": true,
-        "internalType": "bytes32"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "RoleGranted",
-    "inputs": [
-      {
-        "name": "role",
-        "type": "bytes32",
-        "indexed": true,
-        "internalType": "bytes32"
-      },
-      {
-        "name": "account",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "sender",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "RoleRevoked",
-    "inputs": [
-      {
-        "name": "role",
-        "type": "bytes32",
-        "indexed": true,
-        "internalType": "bytes32"
-      },
-      {
-        "name": "account",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "sender",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        "internalType": "struct ProposalSettings",
+        "components": [
+          {
+            "name": "minParticipation",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "maxApprovals",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "criteria",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "criteriaValue",
+            "type": "uint128",
+            "internalType": "uint128"
+          },
+          {
+            "name": "isSignalVote",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
       }
     ],
     "anonymous": false
   },
   {
     "type": "error",
-    "name": "AccessControlBadConfirmation",
+    "name": "AlreadyVoted",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "AccessControlUnauthorizedAccount",
-    "inputs": [
-      {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "neededRole",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "FailedCall",
+    "name": "ExistingProposal",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "TimelockInsufficientDelay",
+    "name": "HookAddressNotValid",
     "inputs": [
       {
-        "name": "delay",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "minDelay",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "TimelockInvalidOperationLength",
-    "inputs": [
-      {
-        "name": "targets",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "payloads",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "values",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "TimelockUnauthorizedCaller",
-    "inputs": [
-      {
-        "name": "caller",
+        "name": "hooks",
         "type": "address",
         "internalType": "address"
       }
@@ -970,29 +983,73 @@
   },
   {
     "type": "error",
-    "name": "TimelockUnexecutedPredecessor",
+    "name": "HookNotImplemented",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidGovernor",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidNullifier",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidParams",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidParticipationThreshold",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "MaxApprovalsExceeded",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "MaxChoicesExceeded",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotGovernor",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotRouter",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "OptionsNotStrictlyAscending",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "SafeCastOverflowedUintDowncast",
     "inputs": [
       {
-        "name": "predecessorId",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "name": "bits",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "value",
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ]
   },
   {
     "type": "error",
-    "name": "TimelockUnexpectedOperationState",
-    "inputs": [
-      {
-        "name": "operationId",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "expectedStates",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ]
+    "name": "SignalVoteOnly",
+    "inputs": []
   }
 ]

@@ -10,6 +10,10 @@ export default function ApprovedTransactions({
   proposalData,
   proposalType,
   executedTransactionHash,
+}: {
+  proposalData: any;
+  proposalType: string | null;
+  executedTransactionHash: string | null;
 }) {
   const [displayedOptions, setDisplayedOptions] = useState(1);
   const toggleElements = () => {

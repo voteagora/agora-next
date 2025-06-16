@@ -218,6 +218,8 @@ export type BaseProposal = ProposalDraft & {
   tiers_enabled?: boolean;
   tiers?: number[];
   calculationOptions?: number;
+  min_participation?: number;
+  is_signal_vote?: boolean;
 };
 
 export type BasicProposal = BaseProposal & {
@@ -241,7 +243,6 @@ export type ApprovalProposal = BaseProposal & {
   threshold: number;
   top_choices: number;
   approval_options: ApprovalProposalOption[];
-  min_participation: number;
 };
 
 type ApprovalProposalOption = {

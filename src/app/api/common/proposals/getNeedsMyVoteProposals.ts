@@ -10,6 +10,7 @@ import { withMetrics } from "@/lib/metricWrapper";
 import { fetchOffchainProposalsMap } from "./fetchOffchainProposalsMap";
 import { fetchProposals } from "./getProposals";
 import { getVotesForDelegateFromDaoNode } from "@/app/lib/dao-node/client";
+import { PROPOSAL_STATUS } from "@/lib/constants";
 
 async function getNeedsMyVoteProposals(address: string) {
   return withMetrics("getNeedsMyVoteProposals", async () => {
@@ -53,7 +54,7 @@ async function getNeedsMyVoteProposals(address: string) {
         const vote = votes.find(
           (vote: any) => vote.proposal_id === proposal.id
         );
-        return !vote;
+        return !vote && proposal.status === PROPOSAL_STATUS.ACTIVE;
       });
       return {
         proposals: proposalsWithoutVotes,

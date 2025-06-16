@@ -153,11 +153,6 @@ export const worldTenantUIConfig = new TenantUI({
             prodAddress: "0x0000000000000000000000000000000000000000",
             testnetAddress: "0x0000000000000000000000000000000000000000",
           },
-          {
-            type: ProposalType?.OPTIMISTIC,
-            prodAddress: "0x0000000000000000000000000000000000000000",
-            testnetAddress: "0x0000000000000000000000000000000000000000",
-          },
         ],
         copy: {
           helperText: `
