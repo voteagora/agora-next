@@ -150,7 +150,6 @@ export default async function Page({
   params: { proposal_id: string };
 }) {
   const proposal = await fetchProposal(proposal_id);
-  console.log("proposal", proposal);
   let RenderComponent;
   switch (proposal.proposalType) {
     case "STANDARD":
