@@ -218,7 +218,7 @@ export default function ProposalType({
       BigInt(index),
       Math.round(formValues.quorum * 100),
       Math.round(formValues.approval_threshold * 100),
-      formValues.name,
+      `${formValues.name} - ${votingModuleType}`,
       formValues.description || "",
       proposalTypeAddress,
     ];
