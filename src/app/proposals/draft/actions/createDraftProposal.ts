@@ -65,7 +65,7 @@ const formDataByType = (
         threshold: data.approvalProposal.threshold
           ? parseInt(data.approvalProposal.threshold)
           : null,
-        budget: parseInt(data.approvalProposal.budget),
+        budget: parseInt(data.approvalProposal.budget ?? "0"),
         max_options: data.approvalProposal.maxOptions
           ? parseInt(data.approvalProposal.maxOptions)
           : null,
