@@ -422,15 +422,6 @@ const ApprovalProposalForm = () => {
           tooltip=" Determines up to how many options each voter may select."
           control={control}
         />
-        {namespace === TENANT_NAMESPACES.WORLD && (
-          <NumberInput
-            required={true}
-            label="Min participation"
-            name="approvalProposal.minParticipation"
-            control={control}
-            tooltip="Minimum number of participants required for the proposal to be valid."
-          />
-        )}
         {/* info="Threshold means all options with more than a set amount of votes win. Top choices means only a set number of the most popular options win." */}
         <SwitchInput
           control={control}

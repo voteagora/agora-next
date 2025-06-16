@@ -145,6 +145,8 @@ const BaseProposalSchema = z.object({
   tiers_enabled: z.boolean().optional(),
   tiers: z.array(z.number()).optional(),
   calculationOptions: z.number().optional(),
+  minParticipation: z.string().optional(),
+  isSignalVote: z.boolean().optional(),
 });
 
 export const BasicProposalSchema = BaseProposalSchema.extend({

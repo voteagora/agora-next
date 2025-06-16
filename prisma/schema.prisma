@@ -1199,6 +1199,10 @@ model ProposalDraft {
   proposal_social_type     String?                    @db.VarChar(50)
   title                    String                     @db.VarChar(255)
   abstract                 String
+  min_participation        Int?
+  is_signal_vote           Boolean?
+  proposal_scope           String?
+  tiers                    Int[]
   audit_url                String?
   dao_slug                 DaoSlug
   author_address           String

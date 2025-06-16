@@ -134,6 +134,10 @@ export async function onSubmitAction(
       proposal_scope: parsed.data.proposal_scope,
       calculation_options: parsed.data.calculationOptions,
       tiers: parsed.data.tiers,
+      min_participation: parsed.data.minParticipation
+        ? parseInt(parsed.data.minParticipation)
+        : null,
+      is_signal_vote: Boolean(parsed.data.isSignalVote),
     };
 
     const updateDraft = prismaWeb2Client.proposalDraft.update({
