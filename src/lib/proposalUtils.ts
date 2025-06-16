@@ -9,8 +9,10 @@ import { Abi, decodeFunctionData, keccak256 } from "viem";
 import Tenant from "./tenant/tenant";
 import { Block, toUtf8Bytes } from "ethers";
 import { mapArbitrumBlockToMainnetBlock } from "./utils";
-import { TENANT_NAMESPACES } from "./constants";
+import { GOVERNOR_TYPE, TENANT_NAMESPACES } from "./constants";
 import { ProposalType } from "./types";
+
+const { contracts, ui, namespace } = Tenant.current();
 
 // Type guards
 export function isTimestampBasedProposal(
@@ -232,7 +234,6 @@ export async function parseProposal(
   quorum: bigint | null,
   votableSupply: bigint
 ): Promise<Proposal> {
-  const { contracts, ui } = Tenant.current();
   const isTimeStampBasedTenant = ui.toggle(
     "use-timestamp-for-proposals"
   )?.enabled;
@@ -449,6 +450,8 @@ export type ParsedProposalData = {
         budgetToken: string;
         criteriaValue: bigint;
         budgetAmount: bigint;
+        isSignalVote?: boolean;
+        minParticipation?: bigint;
       };
     };
   };
@@ -563,65 +566,119 @@ export function parseProposalData(
       };
     }
     case "APPROVAL": {
-      const parsedProposalData = JSON.parse(proposalData);
-      const [maxApprovals, criteria, budgetToken, criteriaValue, budgetAmount] =
-        parsedProposalData[1] as [string, string, string, string, string];
-      return {
-        key: "APPROVAL",
-        kind: {
-          options: parsedProposalData[0].map(
-            (option: Array<string | string[]>) => {
-              const [
-                budgetTokensSpent,
-                targets,
-                values,
-                calldatas,
-                description,
-              ] = (() => {
-                if (option.length === 4) {
-                  return [
-                    null,
-                    option[0],
-                    option[1],
-                    option[2],
-                    option[3],
-                  ] as const;
-                } else if (option.length === 5) {
-                  return [
-                    option[0],
-                    option[1],
-                    option[2],
-                    option[3],
-                    option[4],
-                  ] as const;
-                } else {
-                  throw new Error("unknown option length");
-                }
-              })();
+      if (contracts.governorType === GOVERNOR_TYPE.AGORA_20) {
+        const parsedProposalData = JSON.parse(proposalData);
+        const parsedProposalDataOptions = JSON.parse(parsedProposalData[0]);
+        const parsedProposalDataSettings = JSON.parse(parsedProposalData[1]);
+        const [
+          minParticipation,
+          maxApprovals,
+          criteria,
+          criteriaValue,
+          isSignalVote,
+        ] = parsedProposalDataSettings as [
+          string,
+          string,
+          string,
+          string,
+          string,
+        ];
 
-              const functionArgsName = decodeCalldata(
-                calldatas as `0x${string}`[]
-              );
+        return {
+          key: "APPROVAL",
+          kind: {
+            options: parsedProposalDataOptions.map(
+              (option: Array<string | string[]>) => {
+                const [description] = (() => {
+                  if (option.length === 1) {
+                    return [option[0]];
+                  } else {
+                    throw new Error("unknown option length");
+                  }
+                })();
 
-              return {
-                targets,
-                values,
-                calldatas,
-                description,
-                functionArgsName,
-                budgetTokensSpent,
-              };
-            }
-          ),
-          proposalSettings: {
-            maxApprovals: Number(maxApprovals),
-            criteria: toApprovalVotingCriteria(Number(criteria)),
-            budgetToken,
-            criteriaValue: BigInt(criteriaValue),
-            budgetAmount: BigInt(budgetAmount),
+                return {
+                  description,
+                };
+              }
+            ),
+            proposalSettings: {
+              maxApprovals: Number(maxApprovals),
+              criteria: toApprovalVotingCriteria(Number(criteria)),
+              budgetToken: "0",
+              criteriaValue: BigInt(criteriaValue),
+              budgetAmount: BigInt(0),
+              isSignalVote: isSignalVote === "true",
+              minParticipation: BigInt(minParticipation),
+            },
           },
-        },
-      };
+        };
+      } else {
+        const parsedProposalData = JSON.parse(proposalData);
+        const [
+          maxApprovals,
+          criteria,
+          budgetToken,
+          criteriaValue,
+          budgetAmount,
+        ] = parsedProposalData[1] as [string, string, string, string, string];
+        return {
+          key: "APPROVAL",
+          kind: {
+            options: parsedProposalData[0].map(
+              (option: Array<string | string[]>) => {
+                const [
+                  budgetTokensSpent,
+                  targets,
+                  values,
+                  calldatas,
+                  description,
+                ] = (() => {
+                  if (option.length === 4) {
+                    return [
+                      null,
+                      option[0],
+                      option[1],
+                      option[2],
+                      option[3],
+                    ] as const;
+                  } else if (option.length === 5) {
+                    return [
+                      option[0],
+                      option[1],
+                      option[2],
+                      option[3],
+                      option[4],
+                    ] as const;
+                  } else {
+                    throw new Error("unknown option length");
+                  }
+                })();
+
+                const functionArgsName = decodeCalldata(
+                  calldatas as `0x${string}`[]
+                );
+
+                return {
+                  targets,
+                  values,
+                  calldatas,
+                  description,
+                  functionArgsName,
+                  budgetTokensSpent,
+                };
+              }
+            ),
+            proposalSettings: {
+              maxApprovals: Number(maxApprovals),
+              criteria: toApprovalVotingCriteria(Number(criteria)),
+              budgetToken,
+              criteriaValue: BigInt(criteriaValue),
+              budgetAmount: BigInt(budgetAmount),
+            },
+          },
+        };
+      }
     }
     case "OFFCHAIN_STANDARD":
     case "OFFCHAIN_APPROVAL":
@@ -761,8 +818,6 @@ export function parseProposalResults(
         proposalResults
       ) as ProposalResults;
 
-      const { namespace, contracts } = Tenant.current();
-
       const standardResults = (() => {
         if (
           namespace === TENANT_NAMESPACES.OPTIMISM &&
@@ -840,7 +895,6 @@ export async function getProposalStatus(
   votableSupply: bigint
 ): Promise<ProposalStatus> {
   const TEN_DAYS_IN_SECONDS = 10 * 24 * 60 * 60;
-  const { contracts, ui } = Tenant.current();
 
   const checkHasNoCalldata = (): boolean => {
     if (
@@ -1105,8 +1159,6 @@ export function getProposalCurrentQuorum(
     | ParsedProposalResults["STANDARD"]["kind"]
     | ParsedProposalResults["OPTIMISTIC"]["kind"]
 ) {
-  const { namespace } = Tenant.current();
-
   switch (namespace) {
     case TENANT_NAMESPACES.UNISWAP:
       return BigInt(proposalResults.for);
@@ -1123,7 +1175,6 @@ export function getProposalCurrentQuorum(
 }
 
 export function isProposalCreatedBeforeUpgradeCheck(proposal: Proposal) {
-  const { namespace } = Tenant.current();
   return (
     namespace === TENANT_NAMESPACES.OPTIMISM &&
     proposal.createdTime &&

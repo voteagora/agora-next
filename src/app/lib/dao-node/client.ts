@@ -78,8 +78,10 @@ export function adaptDAONodeResponse(
     proposer: apiResponse.proposer.toLowerCase(),
     description: apiResponse.description,
     created_block: BigInt(apiResponse.block_number),
-    start_block: apiResponse.start_block.toString(),
-    end_block: apiResponse.end_block.toString(),
+    start_block:
+      (apiResponse.start_block ?? apiResponse.vote_start)?.toString() ?? "0",
+    end_block:
+      (apiResponse.end_block ?? apiResponse.vote_end)?.toString() ?? "0",
     cancelled_block: apiResponse.cancel_event
       ? BigInt(apiResponse.cancel_event.block_number)
       : null,
@@ -98,7 +100,7 @@ export function adaptDAONodeResponse(
 
     proposal_data_raw: apiResponse.proposal_data,
 
-    created_transaction_hash: null,
+    created_transaction_hash: apiResponse.created_transaction_hash,
     cancelled_transaction_hash: null,
     queued_transaction_hash: null,
     executed_transaction_hash: null,
@@ -430,5 +432,5 @@ export const getVotesForDelegateFromDaoNode = async (address: string) => {
   const response = await fetch(`${url}v1/delegate/${address}/voting_history`);
   const data = await response.json();
 
-  return data;
+  return data?.voting_history ?? [];
 };

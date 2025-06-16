@@ -46,6 +46,7 @@ const DEFAULT_FORM = {
     end_date: undefined,
     options: [],
   },
+  budget: 0,
 };
 
 const getValidProposalTypesForVotingType = (

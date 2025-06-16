@@ -230,6 +230,8 @@ export type PLMConfig = {
 
 export type BaseProposal = ProposalDraft & {
   checklist_items: ProposalChecklist[];
+  min_participation?: number;
+  is_signal_vote?: boolean;
 };
 
 export type BasicProposal = BaseProposal & {
@@ -253,7 +255,6 @@ export type ApprovalProposal = BaseProposal & {
   threshold: number;
   top_choices: number;
   approval_options: ApprovalProposalOption[];
-  min_participation: number;
 };
 
 type ApprovalProposalOption = {

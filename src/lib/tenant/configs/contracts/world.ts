@@ -3,6 +3,7 @@ import {
   AgoraTimelock_20__factory,
   ERC20__factory,
   ProposalTypesConfigurator_20__factory,
+  WorldIdVotingModule__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
@@ -30,6 +31,8 @@ export const worldTenantConfig = ({ alchemyId }: Props): TenantContracts => {
   const TYPES = "0xD2bA4C53732054521910b45B376ed6cEDE7E3fFf";
 
   const TIMELOCK = "0x10374c5d846179ba9ac03b468497b58e13c5f74e";
+
+  const VOTING_MODULE = "0xa829a64365dedf413012f9cac9b752cb07142148";
 
   const provider = new JsonRpcProvider(
     `https://worldchain-mainnet.g.alchemy.com/v2/${alchemyId}`
@@ -59,6 +62,14 @@ export const worldTenantConfig = ({ alchemyId }: Props): TenantContracts => {
       address: TIMELOCK,
       chain,
       contract: AgoraTimelock_20__factory.connect(TIMELOCK, provider),
+      provider,
+    }),
+
+    votingModule: new TenantContract<BaseContract>({
+      abi: WorldIdVotingModule__factory.abi,
+      address: VOTING_MODULE,
+      chain,
+      contract: WorldIdVotingModule__factory.connect(VOTING_MODULE, provider),
       provider,
     }),
 

@@ -16,7 +16,7 @@ export async function POST(request: Request) {
           /* Simulation Configuration */
           save: true, // if true simulation is saved and shows up in the dashboard
           save_if_fails: true, // if true, reverting simulations show up in the dashboard
-          simulation_type: "quick", // full or quick (full is default)
+          simulation_type: "full", // full or quick (full is default)
           network_id: body?.networkId || "1", // network to simulate on
           /* Standard EVM Transaction object */
           from: body?.from || "", // timelock address

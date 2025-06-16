@@ -60,10 +60,11 @@ type UniBasicInputData = [
 ];
 
 type ApprovalInputData = [string, string, string, Number];
-type WorldApprovalInputData = [
+type AG20InputData = [
   `0x${string}`[],
   number[],
   `0x${string}`[],
+  string,
   string,
 ];
 type InputData =
@@ -71,6 +72,7 @@ type InputData =
   | BasicInputData
   | ApprovalInputData
   | UniBasicInputData
+  | AG20InputData
   | null;
 
 const isTransfer = (calldata: string) => {
@@ -93,6 +95,65 @@ export function getInputData(proposal: DraftProposal): {
       "[Temp Check Discourse link](" + proposal.temp_check_link + ")\n\n"
     }` +
     proposal.abstract;
+
+  if (governorType === GOVERNOR_TYPE.AGORA_20) {
+    let options = [] as {
+      description: string;
+    }[];
+    let maxApprovals = 0;
+    let criteria = proposal.voting_module_type === ProposalType.BASIC ? 2 : 0;
+    let criteriaValue = BigInt(0);
+    const minParticipation = BigInt(3); // 3 is the minimum participation
+    const isSignalVote = true;
+
+    if (proposal.voting_module_type === ProposalType.APPROVAL) {
+      proposal.approval_options.forEach((option) => {
+        options.push({
+          description: option.title,
+        });
+      });
+      maxApprovals = proposal.max_options;
+      criteria = proposal.criteria === "Threshold" ? 0 : 1;
+      criteriaValue =
+        proposal.criteria === "Threshold"
+          ? parseEther(proposal.threshold.toString())
+          : BigInt(proposal.top_choices);
+    }
+
+    const settings = {
+      minParticipation,
+      maxApprovals,
+      criteria,
+      criteriaValue,
+      isSignalVote,
+    };
+
+    const abiCoder = ethers.AbiCoder.defaultAbiCoder();
+
+    const proposalData = abiCoder.encode(
+      [
+        "tuple(string description)[]",
+        "tuple(uint256 minParticipation, uint256 maxApprovals, uint8 criteria, uint256 criteriaValue, bool isSignalVote)",
+      ],
+      [options, settings]
+    );
+
+    const parsedDescription =
+      description + `#proposalTypeId=${proposal.proposal_type}#proposalData=`;
+
+    const timelockAddress = contracts.timelock?.address;
+
+    const inputData: AG20InputData = [
+      [timelockAddress as `0x${string}`], // targets
+      [0], // values
+      ["0xf27a0c92" as `0x${string}`], // calldatas
+      // The 3 items above will be ignored by the governor, but are still needed to be included in the input data
+      parsedDescription,
+      proposalData,
+    ];
+
+    return { inputData };
+  }
 
   // Inputs for basic type
   // [targets, values, calldatas, description]
@@ -172,71 +233,6 @@ export function getInputData(proposal: DraftProposal): {
     // inputs for approval type
     // ((uint256 budgetTokensSpent,address[] targets,uint256[] values,bytes[] calldatas,string description)[] proposalOptions,(uint8 maxApprovals,uint8 criteria,address budgetToken,uint128 criteriaValue,uint128 budgetAmount) proposalSettings)
     case ProposalType.APPROVAL: {
-      if (namespace === TENANT_NAMESPACES.WORLD) {
-        // World-specific approval proposal handling
-        let options = [] as {
-          description: string;
-        }[];
-
-        proposal.approval_options.forEach((option) => {
-          options.push({
-            description: option.title,
-          });
-        });
-
-        const budget = proposal.budget as number;
-
-        const settings = {
-          minParticipation: BigInt(proposal.min_participation || 1),
-          maxApprovals: proposal.max_options,
-          criteria: proposal.criteria === "Threshold" ? 0 : 1,
-          criteriaValue:
-            proposal.criteria === "Threshold"
-              ? parseEther(proposal.threshold.toString())
-              : BigInt(proposal.top_choices),
-          budgetAmount: parseEther(budget.toString()),
-          isSignalVote: true,
-        };
-
-        const calldata = encodeAbiParameters(
-          [
-            {
-              name: "proposalOptions",
-              type: "tuple[]",
-              components: [{ name: "description", type: "string" }],
-            },
-            {
-              name: "proposalSettings",
-              type: "tuple",
-              components: [
-                { name: "minParticipation", type: "uint256" },
-                { name: "maxApprovals", type: "uint8" },
-                { name: "criteria", type: "uint8" },
-                { name: "criteriaValue", type: "uint128" },
-                { name: "budgetAmount", type: "uint128" },
-                { name: "isSignalVote", type: "bool" },
-              ],
-            },
-          ],
-          [options, settings]
-        );
-
-        const parsedDescription =
-          description + "#proposalTypeId=" + 3 + "#proposalData=" + calldata;
-
-        const timelockAddress = contracts.timelock?.address;
-
-        const approvalInputData: WorldApprovalInputData = [
-          [timelockAddress as `0x${string}`], // targets
-          [0], // values
-          ["0xf27a0c92" as `0x${string}`], // calldatas
-          // The 3 items above will be ignored by the governor, but are still needed to be included in the input data
-          parsedDescription,
-        ];
-
-        return { inputData: approvalInputData };
-      }
-
       // Original approval proposal handling for other tenants
       let options = [] as {
         budgetTokensSpent: bigint;
@@ -373,27 +369,12 @@ export function getInputData(proposal: DraftProposal): {
         );
       }
 
-      let optimisticInputData: ApprovalInputData | WorldApprovalInputData = [
+      let optimisticInputData: ApprovalInputData = [
         optimisticModuleAddress,
         calldata,
         description,
         parseInt(proposal.proposal_type || "0"),
       ];
-
-      if (namespace === TENANT_NAMESPACES.WORLD) {
-        const parsedDescription =
-          description + "#proposalTypeId=" + 3 + "#proposalData=" + calldata;
-
-        const timelockAddress = contracts.timelock?.address;
-
-        optimisticInputData = [
-          [timelockAddress as `0x${string}`], // targets
-          [0], // values
-          ["0xf27a0c92" as `0x${string}`], // calldatas
-          // The 3 items above will be ignored by the governor, but are still needed to be included in the input data
-          parsedDescription,
-        ];
-      }
 
       return { inputData: optimisticInputData };
     }

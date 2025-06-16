@@ -111,10 +111,15 @@ const DraftPreview = ({
       case ProposalType.APPROVAL:
         return (
           <p className="text-secondary mt-2">
-            This is an <PreText text="approval" /> proposal. The maximum number
-            of tokens that can be transferred from all the options in this
-            proposal is <PreText text={proposal.budget.toString()} />. The
-            number of options each voter may select is{" "}
+            This is an <PreText text="approval" /> proposal.{" "}
+            {proposal.budget && (
+              <>
+                The maximum number of tokens that can be transferred from all
+                the options in this proposal is{" "}
+                <PreText text={proposal.budget.toString()} />.
+              </>
+            )}
+            The number of options each voter may select is{" "}
             <PreText text={proposal.max_options.toString()} />.{" "}
             {proposal.criteria === "Threshold" &&
               `All options with more than ${proposal.threshold} votes will be considered approved.`}

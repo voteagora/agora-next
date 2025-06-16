@@ -40,6 +40,7 @@ export type TenantNamespace =
 
 export type TenantContracts = {
   governor: TenantContract<IGovernorContract>;
+  votingModule?: TenantContract<BaseContract>;
   proposalTypesConfigurator?: TenantContract<BaseContract>;
   token: TenantContract<ITokenContract | IMembershipContract> & {
     isERC20: () => this is TenantContract<ITokenContract>;

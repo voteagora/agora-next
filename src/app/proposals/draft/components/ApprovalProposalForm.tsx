@@ -25,7 +25,7 @@ import { encodeAbiParameters, parseEther } from "viem";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { checkNewApprovalProposal } from "@/lib/seatbelt/checkProposal";
 import { StructuredReport } from "@/components/Simulation/StructuredReport";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import { GOVERNOR_TYPE, TENANT_NAMESPACES } from "@/lib/constants";
 type FormType = z.output<typeof ApprovalProposalSchema>;
 
 const { namespace, contracts } = Tenant.current();
@@ -397,13 +397,15 @@ const ApprovalProposalForm = () => {
         </p>
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <NumberInput
-          required={true}
-          label="Budget"
-          name="approvalProposal.budget"
-          control={control}
-          tooltip="This is the maximum number of tokens that can be transferred from all the options in this proposal."
-        />
+        {contracts.governorType !== GOVERNOR_TYPE.AGORA_20 && (
+          <NumberInput
+            required={false}
+            label="Budget"
+            name="approvalProposal.budget"
+            control={control}
+            tooltip="This is the maximum number of tokens that can be transferred from all the options in this proposal."
+          />
+        )}
         <NumberInput
           required={true}
           label="Max options"
@@ -496,9 +498,7 @@ const ApprovalProposalForm = () => {
         </div>
       </div>
       {options?.length > 0 &&
-        TENDERLY_VALID_CHAINS.includes(
-          Tenant.current().contracts.governor.chain.id
-        ) && (
+        TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) && (
           <div className="mt-6">
             <UpdatedButton
               isLoading={simulationPending}

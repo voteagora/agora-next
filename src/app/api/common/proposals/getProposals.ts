@@ -34,6 +34,7 @@ import {
   getCachedAllProposalsFromDaoNode,
   getProposalTypesFromDaoNode,
 } from "@/app/lib/dao-node/client";
+import { blockNumberAndTransactionIndexToHash } from "@/lib/serverUtils";
 
 // Is this working? Not sure, but i don't think so.
 // TODO: Check before enabling DAO-NODE PROPOSALS
@@ -89,7 +90,10 @@ async function getProposals({
                     // We could do this in the cache,
                     // but it's tech-debt I don't want the client
                     // to absorbe.
-                    data = data.map((proposal) =>
+                    const filteredData = data.filter(
+                      (proposal) => !!proposal.voting_module_name
+                    );
+                    data = filteredData.map((proposal) =>
                       adaptDAONodeResponse(
                         proposal,
                         typesFromApi.proposal_types
@@ -191,17 +195,44 @@ async function getProposal(proposalId: string) {
       ? contracts.providerForTime?.getBlock("latest")
       : contracts.token.provider.getBlock("latest");
 
+    const useDaoNode = ui.toggle("use-daonode-for-proposals")?.enabled ?? false;
+
+    let getProposalExecution;
+
     const isTimeStampBasedTenant = ui.toggle(
       "use-timestamp-for-proposals"
     )?.enabled;
 
-    const getProposalExecution = doInSpan({ name: "getProposal" }, async () =>
-      findProposal({
-        namespace,
-        proposalId,
-        contract: contracts.governor.address,
-      })
-    );
+    if (useDaoNode) {
+      getProposalExecution = doInSpan({ name: "getProposal" }, async () => {
+        const [proposals, typesFromApi] = await Promise.all([
+          getCachedAllProposalsFromDaoNode(),
+          getProposalTypesFromDaoNode(),
+        ]);
+
+        const proposal = proposals.find((p) => p.id === proposalId);
+        if (!proposal) {
+          return notFound();
+        }
+        const createdTransactionHash =
+          await blockNumberAndTransactionIndexToHash(
+            proposal.block_number,
+            proposal.transaction_index
+          );
+        return adaptDAONodeResponse(
+          { ...proposal, created_transaction_hash: createdTransactionHash },
+          typesFromApi.proposal_types
+        );
+      });
+    } else {
+      getProposalExecution = doInSpan({ name: "getProposal" }, async () =>
+        findProposal({
+          namespace,
+          proposalId,
+          contract: contracts.governor.address,
+        })
+      );
+    }
 
     const [proposal, votableSupply] = await Promise.all([
       getProposalExecution,
@@ -250,16 +281,18 @@ async function getProposalTypes() {
     const typesFromApi = await getProposalTypesFromDaoNode();
 
     if (typesFromApi) {
-      const parsedTypes = Object.entries(typesFromApi.proposal_types)?.map(
-        ([proposalTypeId, type]: any) => ({
+      const parsedTypes = Object.entries(typesFromApi.proposal_types)
+        ?.filter(([proposalTypeId, type]: any) => {
+          return !!type.name;
+        })
+        ?.map(([proposalTypeId, type]: any) => ({
           ...type,
           proposal_type_id: String(proposalTypeId),
           quorum: Number(type.quorum),
           approval_threshold: Number(type.approval_threshold),
           isClientSide: false,
           module: type.module,
-        })
-      );
+        }));
       types = parsedTypes;
     } else {
       types = await findProposalType({
