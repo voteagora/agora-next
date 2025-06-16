@@ -1,17 +1,22 @@
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { ParsedProposalData } from "@/lib/proposalUtils";
+import {
+  ParsedProposalData,
+  calculateHybridApprovalOptionVotes,
+  calculateHybridApprovalWeightedPercentage,
+  calculateHybridApprovalMetrics,
+} from "@/lib/proposalUtils";
 import { parseUnits } from "viem";
 import { formatNumber } from "@/lib/utils";
 import { tokenForContractAddress } from "@/lib/tokenUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { cn } from "@/lib/utils";
-import { fontMapper } from "@/styles/fonts";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { useState } from "react";
 import { ExpandCollapseIcon } from "@/icons/ExpandCollapseIcon";
 import VotesGroupTable from "@/components/common/VotesGroupTable";
 import { getScaledBarPercentage } from "./OptionResultsPanel";
+import { HYBRID_VOTE_WEIGHTS } from "@/lib/constants";
 
 const { contracts, ui } = Tenant.current();
 export default function HybridOptionsResultsPanel({
@@ -43,52 +48,62 @@ export default function HybridOptionsResultsPanel({
     criteria: "THRESHOLD" | "TOP_CHOICES";
     criteriaValue: bigint;
   };
-  console.log("proposalResults", proposalResults);
 
   const proposalSettings = proposalData.proposalSettings;
   const options = proposalResults.options;
 
-  // Helper function to calculate votes for an option
+  // Use shared utility to calculate all hybrid approval metrics
+  const hybridMetrics = calculateHybridApprovalMetrics(
+    proposalResults,
+    Number(proposal.quorum),
+    Number(criteriaValue)
+  );
+
+  // Use shared utility function to calculate votes for an option
   const calculateOptionVotes = (optionName: string) => {
-    let optionVotes = 0n;
-    if (proposalResults.DELEGATES?.[optionName]) {
-      optionVotes += BigInt(proposalResults.DELEGATES[optionName]);
-    }
-    if (proposalResults.CHAIN[optionName]) {
-      optionVotes += BigInt(proposalResults.CHAIN[optionName]);
-    }
-    if (proposalResults.PROJECT[optionName]) {
-      optionVotes += BigInt(proposalResults.PROJECT[optionName]);
-    }
-    if (proposalResults.USER[optionName]) {
-      optionVotes += BigInt(proposalResults.USER[optionName]);
-    }
-    return optionVotes;
+    return calculateHybridApprovalOptionVotes(optionName, proposalResults);
   };
 
-  // Calculate total voting power across all options and categories
-  let totalVotingPower = 0n;
+  // Calculate weighted percentage for an option
+  const calculateOptionWeightedPercentage = (optionName: string) => {
+    return calculateHybridApprovalWeightedPercentage(
+      optionName,
+      proposalResults,
+      Number(proposal.quorum)
+    );
+  };
+
+  // Calculate total weighted participation across all options (for display purposes)
+  let totalWeightedParticipation = 0;
   for (const option of options) {
-    totalVotingPower += calculateOptionVotes(option.option);
+    totalWeightedParticipation += calculateOptionWeightedPercentage(
+      option.option
+    );
   }
 
+  // Calculate threshold position based on weighted percentages
   const thresholdPosition = (() => {
     if (proposalSettings.criteria === "THRESHOLD") {
-      const threshold = BigInt(criteriaValue);
-      if (totalVotingPower < (threshold * BigInt(15)) / BigInt(10)) {
+      const thresholdPercentage = Number(criteriaValue) / 100; // Convert to percentage (e.g., 10 -> 0.1)
+      const totalWeightedParticipation =
+        hybridMetrics.totalWeightedParticipation;
+
+      if (totalWeightedParticipation < thresholdPercentage * 1.5) {
         return 66;
       } else {
-        // calculate threshold position, min 5% max 66%
-        return totalVotingPower > 0n
-          ? Math.max(Number((threshold * BigInt(100)) / totalVotingPower), 5)
+        // Calculate threshold position based on weighted participation, min 5% max 66%
+        return totalWeightedParticipation > 0
+          ? Math.max(
+              (thresholdPercentage / totalWeightedParticipation) * 100,
+              5
+            )
           : 5;
       }
     }
     return 0;
   })();
 
-  //   let availableBudget = BigInt(proposalSettings.budgetAmount);
-  let availableBudget = BigInt(100000000);
+  let availableBudget = BigInt(proposalSettings.budgetAmount);
   let isExceeded = false;
 
   const mutableOptions = [...options];
@@ -97,8 +112,23 @@ export default function HybridOptionsResultsPanel({
       return { ...option, ...proposalData.options[i] };
     })
     .sort((a, b) => {
-      const aVotes = calculateOptionVotes(a.option);
-      const bVotes = calculateOptionVotes(b.option);
+      // Sort by weighted percentage first, then by raw votes as tiebreaker
+      const aWeightedPercentage = calculateOptionWeightedPercentage(a.option);
+      const bWeightedPercentage = calculateOptionWeightedPercentage(b.option);
+
+      if (aWeightedPercentage !== bWeightedPercentage) {
+        return bWeightedPercentage > aWeightedPercentage ? 1 : -1;
+      }
+
+      // Tiebreaker: use raw votes
+      const aVotes = calculateHybridApprovalOptionVotes(
+        a.option,
+        proposalResults
+      );
+      const bVotes = calculateHybridApprovalOptionVotes(
+        b.option,
+        proposalResults
+      );
       return bVotes > aVotes ? 1 : bVotes < aVotes ? -1 : 0;
     });
 
@@ -114,7 +144,13 @@ export default function HybridOptionsResultsPanel({
         .map((option, index) => {
           let isApproved = false;
 
-          const votesFromAllCategories = calculateOptionVotes(option.option);
+          const votesFromAllCategories = calculateHybridApprovalOptionVotes(
+            option.option,
+            proposalResults
+          );
+          const weightedPercentage = calculateOptionWeightedPercentage(
+            option.option
+          );
 
           const optionBudget =
             (proposal?.createdTime as Date) >
@@ -124,13 +160,15 @@ export default function HybridOptionsResultsPanel({
                   option?.budgetTokensSpent?.toString() || "0",
                   contractTokenDecimals
                 );
+
           if (proposalSettings.criteria === "TOP_CHOICES") {
             isApproved = index < Number(criteriaValue);
           } else if (proposalSettings.criteria === "THRESHOLD") {
-            const threshold = BigInt(criteriaValue);
+            // Use weighted percentage for threshold checking
+            const thresholdPercentage = Number(criteriaValue) / 100; // Convert to percentage (e.g., 10 -> 0.1)
             isApproved =
               !isExceeded &&
-              votesFromAllCategories >= threshold &&
+              weightedPercentage >= thresholdPercentage &&
               availableBudget >= optionBudget;
             if (isApproved) {
               availableBudget = availableBudget - optionBudget;
@@ -144,12 +182,13 @@ export default function HybridOptionsResultsPanel({
               key={index}
               description={option.option}
               votesFromAllCategories={votesFromAllCategories}
-              totalVotingPower={totalVotingPower}
+              totalWeightedParticipation={totalWeightedParticipation}
               proposalSettings={proposalSettings}
               thresholdPosition={thresholdPosition}
               isApproved={isApproved}
               option={option}
               proposalResults={proposalResults}
+              weightedPercentage={weightedPercentage}
             />
           );
         })}
@@ -165,39 +204,51 @@ export default function HybridOptionsResultsPanel({
 function SingleOption({
   description,
   votesFromAllCategories,
-  totalVotingPower,
+  totalWeightedParticipation,
   proposalSettings,
   thresholdPosition,
   isApproved,
   option,
   proposalResults,
+  weightedPercentage,
 }: {
   description: string;
   votesFromAllCategories: bigint;
-  totalVotingPower: bigint;
+  totalWeightedParticipation: number;
   proposalSettings: any;
   thresholdPosition: number;
   isApproved: boolean;
   option: any;
   proposalResults: any;
+  weightedPercentage: number;
 }) {
   const criteriaValue = BigInt(100);
 
   const [isOpen, setIsOpen] = useState(false);
   let barPercentage = BigInt(0);
-  const percentage =
-    totalVotingPower === 0n
+
+  // Use weighted percentage for all display calculations
+  const weightedParticipationPercentage =
+    totalWeightedParticipation === 0
       ? BigInt(0)
-      : (votesFromAllCategories * BigInt(10000)) / totalVotingPower; // mul by 10_000 to get 2 decimal places, divide by 100 later to use percentage
+      : BigInt(
+          Math.round((weightedPercentage / totalWeightedParticipation) * 10000)
+        ); // Convert to 0-10000 scale for consistency
+
+  // Convert weighted percentage to display format (0-100 scale)
+  const weightedDisplayPercentage = BigInt(
+    Math.round(weightedPercentage * 10000)
+  );
 
   if (proposalSettings.criteria === "TOP_CHOICES") {
-    barPercentage = percentage;
+    barPercentage = weightedParticipationPercentage; // Use weighted percentage for top choices
   } else if (proposalSettings.criteria === "THRESHOLD") {
+    // For threshold, use weighted percentage in bar calculation
     const threshold = BigInt(criteriaValue);
     barPercentage = getScaledBarPercentage({
       threshold,
-      totalVotingPower,
-      votesAmountBN: votesFromAllCategories,
+      totalVotingPower: BigInt(Math.round(totalWeightedParticipation * 10000)), // Use total weighted participation
+      votesAmountBN: weightedDisplayPercentage,
       thresholdPosition,
     });
   }
@@ -207,7 +258,7 @@ function SingleOption({
   const getVoteData = (
     category: string,
     displayName: string,
-    weight: string
+    weight: number
   ) => {
     const votes = proposalResults[category as keyof typeof proposalResults]?.[
       option.option
@@ -225,15 +276,15 @@ function SingleOption({
         votes && votesFromAllCategories > 0n
           ? (votes * 100n) / votesFromAllCategories
           : 0n,
-      weight,
+      weight: weight.toFixed(3),
     };
   };
 
   const voteGroups = [
-    getVoteData("DELEGATES", "Delegates", "50.00%"),
-    getVoteData("CHAIN", "Chains", "16.67%"),
-    getVoteData("PROJECT", "Apps", "16.67%"),
-    getVoteData("USER", "Users", "16.67%"),
+    getVoteData("DELEGATES", "Delegates", HYBRID_VOTE_WEIGHTS.delegates),
+    getVoteData("CHAIN", "Chains", HYBRID_VOTE_WEIGHTS.chains),
+    getVoteData("PROJECT", "Apps", HYBRID_VOTE_WEIGHTS.apps),
+    getVoteData("USER", "Users", HYBRID_VOTE_WEIGHTS.users),
   ];
 
   return (
@@ -251,20 +302,12 @@ function SingleOption({
             <div className="text-primary flex items-center gap-1">
               <TokenAmountDecorated
                 amount={votesFromAllCategories}
-                className={
-                  fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
-                }
                 hideCurrency
               />
-              <span
-                className={cn(
-                  "ml-1 text-tertiary",
-                  fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
-                )}
-              >
-                {percentage === 0n
+              <span className="ml-1 text-tertiary">
+                {weightedPercentage === 0
                   ? "0%"
-                  : (Number(percentage) / 100).toFixed(2) + "%"}
+                  : (weightedPercentage * 100).toFixed(2) + "%"}
               </span>
               <button className="w-4 h-4 flex items-center justify-center">
                 <ExpandCollapseIcon className="stroke-primary" />
@@ -291,6 +334,7 @@ function SingleOption({
               key: "votes",
               header: "For",
               width: "w-[60px]",
+              textColorClass: "text-positive",
             },
             {
               key: "percentage",

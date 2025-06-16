@@ -129,6 +129,7 @@ export type Proposal = {
   markdowntitle: string;
   description: string | null;
   quorum: bigint | null;
+  votableSupply?: bigint | null; // Added votableSupply property to match Python implementation
   approvalThreshold: bigint | null;
   proposalData: ParsedProposalData[ProposalType]["kind"];
   unformattedProposalData: `0x${string}` | null | any;

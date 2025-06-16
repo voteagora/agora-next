@@ -3,9 +3,10 @@ import Tenant from "@/lib/tenant/tenant";
 import { useMemo } from "react";
 
 interface VoteBarProps {
-  forVotes: number;
+  forVotes?: number;
   againstVotes: number;
   quorumPercentage?: number;
+  showVotesPercentage?: boolean;
 }
 
 type VoteSegment = {
@@ -18,6 +19,7 @@ export const VotesBar = ({
   forVotes,
   againstVotes,
   quorumPercentage,
+  showVotesPercentage,
 }: VoteBarProps) => {
   const { ui } = Tenant.current();
   const { positive, negative, line } = ui.customization || {};
@@ -31,30 +33,21 @@ export const VotesBar = ({
     [negative]
   );
 
-  const { totalVotes, forPercentage, againstPercentage } = useMemo(() => {
-    const total = forVotes + againstVotes;
-    return {
-      totalVotes: total,
-      forPercentage: total > 0 ? (forVotes / total) * 100 : 0,
-      againstPercentage: total > 0 ? (againstVotes / total) * 100 : 0,
-    };
-  }, [forVotes, againstVotes]);
-
   const segments = useMemo<VoteSegment[]>(
     () =>
       [
         {
           type: "for" as const,
-          percentage: forPercentage,
+          percentage: forVotes || 0,
           color: forColor,
         },
         {
           type: "against" as const,
-          percentage: againstPercentage,
+          percentage: againstVotes,
           color: againstColor,
         },
       ].filter((segment) => segment.percentage > 0),
-    [forPercentage, againstPercentage, forColor, againstColor]
+    [forVotes, forColor, againstVotes, againstColor]
   );
 
   return (
@@ -64,6 +57,9 @@ export const VotesBar = ({
         {/* Adjusted margin for single bar context */}
         <div className="flex items-center justify-between mb-2">
           <div className="text-sm font-medium">Total Votes</div>
+          {showVotesPercentage && (
+            <div className="text-sm font-medium">{againstVotes}%</div>
+          )}
         </div>
         {/* Single Vote bar */}
         <div className="relative h-3 rounded-sm overflow-hidden bg-line">

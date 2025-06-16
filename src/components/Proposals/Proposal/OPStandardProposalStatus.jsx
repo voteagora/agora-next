@@ -7,7 +7,7 @@ function formatNumber(amount, decimals) {
     const standardUnitAmount = Number(formatUnits(amount, decimals));
     return standardUnitAmount;
   } catch (error) {
-    console.error('Error formatting number:', error);
+    console.error("Error formatting number:", error);
     return 0;
   }
 }

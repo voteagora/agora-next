@@ -1,7 +1,11 @@
 "use client";
-import { Proposal } from "@/app/api/common/proposals/proposal.d";
 import { useMemo } from "react";
-import { ParsedProposalResults } from "@/lib/proposalUtils";
+import { Proposal } from "@/app/api/common/proposals/proposal.d";
+import { HYBRID_VOTE_WEIGHTS } from "@/lib/constants";
+import {
+  ParsedProposalResults,
+  calculateHybridStandardProposalMetrics,
+} from "@/lib/proposalUtils";
 import { ExclamationCircleIcon } from "@/icons/ExclamationCircleIcon";
 import Image from "next/image";
 import checkIcon from "@/icons/check.svg";
@@ -18,29 +22,31 @@ const HybridStandardVotesGroup = ({ proposal }: { proposal: Proposal }) => {
     proposal.proposalResults as ParsedProposalResults["HYBRID_STANDARD"]["kind"];
   // Calculate weight based on proposal type
   const categoryWeight =
-    proposal.proposalType === "HYBRID_STANDARD" ? "16.67%" : "33.33%";
-  console.log("proposalResults", formatNumber("1", token.decimals));
+    proposal.proposalType === "HYBRID_STANDARD"
+      ? Number(HYBRID_VOTE_WEIGHTS.chains)
+      : 100 / 3;
+
   let voteGroups = [
     {
       name: "Chains",
       forVotes: proposalResults.CHAIN.for || "0",
       againstVotes: proposalResults.CHAIN.against || "0",
       abstainVotes: proposalResults.CHAIN.abstain || "0",
-      weight: categoryWeight,
+      weight: categoryWeight.toFixed(3),
     },
     {
       name: "Apps", // Corresponds to PROJECT in offchainResults
       forVotes: proposalResults.PROJECT.for || "0",
       againstVotes: proposalResults.PROJECT.against || "0",
       abstainVotes: proposalResults.PROJECT.abstain || "0",
-      weight: categoryWeight,
+      weight: categoryWeight.toFixed(3),
     },
     {
       name: "Users",
       forVotes: proposalResults.USER.for || "0",
       againstVotes: proposalResults.USER.against || "0",
       abstainVotes: proposalResults.USER.abstain || "0",
-      weight: categoryWeight,
+      weight: categoryWeight.toFixed(3),
     },
   ];
 
@@ -60,7 +66,7 @@ const HybridStandardVotesGroup = ({ proposal }: { proposal: Proposal }) => {
           (proposalResults?.DELEGATES?.abstain || "0").toString(),
           token.decimals
         ),
-        weight: "50.00%",
+        weight: HYBRID_VOTE_WEIGHTS.delegates.toFixed(3),
       },
       ...voteGroups,
     ];
@@ -147,68 +153,23 @@ const HybridStandardProposalVotesSummary = ({
 }: {
   proposal: Proposal;
 }) => {
-  // Use memoization for vote calculations to prevent unnecessary re-renders
-  const { quorumPercentage, quorumMet, totalForVotes, totalAgainstVotes } =
-    useMemo(() => {
-      // Get on-chain delegate results
-      const delegateResults =
-        proposal.proposalResults as ParsedProposalResults["HYBRID_STANDARD"]["kind"];
-      const delegateFor = delegateResults?.DELEGATES?.for
-        ? Number(delegateResults.DELEGATES.for)
-        : 0;
-      const delegateAgainst = delegateResults?.DELEGATES?.against
-        ? Number(delegateResults.DELEGATES.against)
-        : 0;
-
-      // Get off-chain results
-      const chainFor = delegateResults?.CHAIN?.for
-        ? Number(delegateResults.CHAIN.for)
-        : 0;
-      const chainAgainst = delegateResults?.CHAIN?.against
-        ? Number(delegateResults.CHAIN.against)
-        : 0;
-
-      const projectFor = delegateResults?.PROJECT?.for
-        ? Number(delegateResults.PROJECT.for)
-        : 0;
-      const projectAgainst = delegateResults?.PROJECT?.against
-        ? Number(delegateResults.PROJECT.against)
-        : 0;
-
-      const userFor = delegateResults?.USER?.for
-        ? Number(delegateResults.USER.for)
-        : 0;
-      const userAgainst = delegateResults?.USER?.against
-        ? Number(delegateResults.USER.against)
-        : 0;
-
-      const calculatedTotalForVotes =
-        delegateFor + chainFor + projectFor + userFor;
-      const calculatedTotalAgainstVotes =
-        delegateAgainst + chainAgainst + projectAgainst + userAgainst;
-
-      const totalVotes = calculatedTotalForVotes + calculatedTotalAgainstVotes;
-
-      const quorumValue = proposal.quorum ? Number(proposal.quorum) : 0;
-      const calculatedQuorumPercentage = (totalVotes / quorumValue) * 100;
-
-      const calculatedQuorumMet = calculatedTotalForVotes >= quorumValue;
-
-      return {
-        quorumPercentage: calculatedQuorumPercentage,
-        quorumMet: calculatedQuorumMet,
-        totalForVotes: calculatedTotalForVotes,
-        totalAgainstVotes: calculatedTotalAgainstVotes,
-      };
-    }, [proposal]);
+  const {
+    quorumPercentage,
+    quorumMet,
+    totalForVotesPercentage,
+    totalAgainstVotesPercentage,
+  } = useMemo(
+    () => calculateHybridStandardProposalMetrics(proposal),
+    [proposal]
+  );
 
   return (
     <div className="p-4">
       <div className="border border-line rounded-lg">
         <VotesBar
-          forVotes={totalForVotes}
-          againstVotes={totalAgainstVotes}
-          quorumPercentage={quorumPercentage} // Pass the overall quorum percentage
+          forVotes={totalForVotesPercentage}
+          againstVotes={totalAgainstVotesPercentage}
+          quorumPercentage={30}
         />
         <HybridStandardVotesGroup proposal={proposal} />
         <QuorumStatus
