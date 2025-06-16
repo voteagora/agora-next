@@ -713,8 +713,10 @@ export function parseProposalData(
     case "HYBRID_APPROVAL": {
       if (contracts.governorType === GOVERNOR_TYPE.AGORA_20) {
         const parsedProposalData = JSON.parse(proposalData);
-        const parsedProposalDataOptions = JSON.parse(parsedProposalData[0]);
-        const parsedProposalDataSettings = JSON.parse(parsedProposalData[1]);
+        const parsedProposalDataOptions = parsedProposalData[0].map(
+          (option: string) => [option.replace(/^\[|\]$/g, "")]
+        );
+        const parsedProposalDataSettings = parsedProposalData[1];
         const [
           minParticipation,
           maxApprovals,
@@ -722,11 +724,11 @@ export function parseProposalData(
           criteriaValue,
           isSignalVote,
         ] = parsedProposalDataSettings as [
-          string,
-          string,
-          string,
-          string,
-          string,
+          number,
+          number,
+          number,
+          number,
+          boolean,
         ];
 
         return {
@@ -753,7 +755,7 @@ export function parseProposalData(
               budgetToken: "0",
               criteriaValue: BigInt(criteriaValue),
               budgetAmount: BigInt(0),
-              isSignalVote: isSignalVote === "true",
+              isSignalVote,
               minParticipation: BigInt(minParticipation),
             },
           },
