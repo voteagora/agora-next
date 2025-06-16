@@ -311,12 +311,16 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         title: proposal.title,
         abstract: proposal.abstract,
         transactions: proposal.transactions.map((t) => parseTransaction(t)),
+        minParticipation: proposal.min_participation?.toString(),
+        isSignalVote: proposal.is_signal_vote,
       };
     case ProposalType.SOCIAL:
       return {
         type: ProposalType.SOCIAL,
         title: proposal.title,
         abstract: proposal.abstract,
+        minParticipation: proposal.min_participation?.toString(),
+        isSignalVote: proposal.is_signal_vote,
         socialProposal: {
           type: proposal.proposal_social_type,
           start_date: proposal.start_date_social,
@@ -329,6 +333,8 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         type: ProposalType.APPROVAL,
         title: proposal.title,
         abstract: proposal.abstract,
+        minParticipation: proposal.min_participation?.toString(),
+        isSignalVote: proposal.is_signal_vote,
         approvalProposal: {
           criteria: proposal.criteria,
           budget: proposal.budget?.toString(),
@@ -348,6 +354,8 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         type: ProposalType.OPTIMISTIC,
         title: proposal.title,
         abstract: proposal.abstract,
+        minParticipation: proposal.min_participation?.toString(),
+        isSignalVote: proposal.is_signal_vote,
       };
   }
 };
