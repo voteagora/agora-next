@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import AddressInput from "./form/AddressInput";
 import { useBlockNumber } from "wagmi";
-import { UpdatedButton } from "@/components/Button";
+import { DSButton } from "@/components/design-system/Button";
 import { onSubmitAction as requestSponsorshipAction } from "../actions/requestSponsorship";
 import AvatarAddress from "./AvatarAdress";
 import { invalidatePath } from "../actions/revalidatePath";
@@ -100,11 +100,12 @@ const RequestSponsorshipForm = ({
           </div>
         </div>
       </div>
-      <UpdatedButton
-        fullWidth={true}
-        isSubmit={false}
-        isLoading={isPending}
-        type={canAddressSponsor ? "primary" : "disabled"}
+      <DSButton
+        fullWidth
+        size="small"
+        variant="primary"
+        disabled={!canAddressSponsor || isPending}
+        loading={isPending}
         className="mt-6"
         onClick={async () => {
           if (canAddressSponsor) {
@@ -121,7 +122,7 @@ const RequestSponsorshipForm = ({
         }}
       >
         Request sponsorship
-      </UpdatedButton>
+      </DSButton>
     </>
   );
 };

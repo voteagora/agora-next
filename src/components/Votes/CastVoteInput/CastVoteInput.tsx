@@ -373,9 +373,16 @@ const SubmitButton = ({
   disabled: boolean;
 }) => {
   return (
-    <Button onClick={onClick} className="w-full" disabled={disabled}>
+    <DSButton
+      onClick={onClick}
+      className="w-full"
+      disabled={disabled}
+      variant="primary"
+      size="small"
+      fullWidth
+    >
       {children}
-    </Button>
+    </DSButton>
   );
 };
 
@@ -389,9 +396,16 @@ function LoadingVote() {
         It might take up to a minute for the changes to be reflected.
       </div>
       <div>
-        <Button className="w-full" disabled={true}>
+        <DSButton
+          className="w-full"
+          disabled
+          variant="primary"
+          size="small"
+          fullWidth
+          loading
+        >
           Writing your vote to the chain...
-        </Button>
+        </DSButton>
       </div>
     </div>
   );
@@ -616,13 +630,14 @@ function ErrorState({
               {message}
             </div>
             <div className="flex flex-row gap-2">
-              <Button
-                className="w-full"
-                variant="elevatedOutline"
+              <DSButton
+                variant="secondary"
+                size="small"
+                fullWidth
                 onClick={button1.action}
               >
                 {button1.message}
-              </Button>
+              </DSButton>
               <Button className="w-full" onClick={button2.action}>
                 {button2.message}
               </Button>

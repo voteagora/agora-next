@@ -4,7 +4,6 @@ import Tenant from "@/lib/tenant/tenant";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { TransactionType, EthereumAddress } from "../types";
 import { BasicProposalSchema } from "../schemas/DraftProposalSchema";
-import { UpdatedButton } from "@/components/Button";
 import {
   useFormContext,
   useFieldArray,

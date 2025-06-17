@@ -1,4 +1,4 @@
-import { UpdatedButton } from "@/components/Button";
+import { DSButton } from "@/components/design-system/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { fetchCurrentDelegatees } from "@/app/delegates/actions";
@@ -17,9 +17,10 @@ export const PartialDelegateButton = ({
   const openDialog = useOpenDialog();
 
   return (
-    <UpdatedButton
-      type={isConnectedAccountDelegate ? "primary" : "secondary"}
-      variant="rounded"
+    <DSButton
+      variant={isConnectedAccountDelegate ? "primary" : "secondary"}
+      size="small"
+      fullWidth={full}
       onClick={(e: any) => {
         e.preventDefault();
         openDialog({
@@ -33,6 +34,6 @@ export const PartialDelegateButton = ({
       className={full ? "w-full" : undefined}
     >
       {isConnectedAccountDelegate ? "Undelegate" : "Delegate"}
-    </UpdatedButton>
+    </DSButton>
   );
 };
