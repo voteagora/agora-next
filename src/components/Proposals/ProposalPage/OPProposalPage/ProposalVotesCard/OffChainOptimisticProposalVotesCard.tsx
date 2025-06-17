@@ -8,17 +8,11 @@ import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalN
 import ProposalVotesFilter from "./ProposalVotesFilter";
 import VotesGroupTable from "@/components/common/VotesGroupTable";
 import {
-  ParsedProposalData,
   ParsedProposalResults,
   calculateHybridOptimisticProposalMetrics,
 } from "@/lib/proposalUtils";
 import { ProposalVotesTab } from "@/components/common/ProposalVotesTab";
 import { VoteOnAtlas } from "@/components/common/VoteOnAtlas";
-import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
-import { formatNumber } from "@/lib/utils";
-import { HYBRID_VOTE_WEIGHTS } from "@/lib/constants";
-import Tenant from "@/lib/tenant/tenant";
-import { CloseIcon } from "@/icons/closeIcon";
 import { InfoIcon } from "@/icons/InfoIcon";
 import {
   Tooltip,
@@ -26,15 +20,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Image from "next/image";
-import checkIcon from "@/icons/check.svg";
 import { VotesBar } from "@/components/common/VotesBar";
 
 interface Props {
   proposal: Proposal;
 }
-
-const { token } = Tenant.current();
 
 const OffChainOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
   const proposalResults =
@@ -103,10 +93,7 @@ const OffChainOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
 const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState("results");
-  const proposalData =
-    proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"];
-
-  const { totalAgainstVotes, groupTallies } = useMemo(
+  const { totalAgainstVotes } = useMemo(
     () => calculateHybridOptimisticProposalMetrics(proposal),
     [proposal]
   );
