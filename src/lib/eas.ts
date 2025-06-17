@@ -14,11 +14,11 @@ const { slug } = Tenant.current();
 
 const CREATE_PROPOSAL_SCHEMA_ID =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? "0x9cad4e2f288915744fce975c670629d6e6d4344b17435c9d714b43a129c6535b"
-    : "0x9cad4e2f288915744fce975c670629d6e6d4344b17435c9d714b43a129c6535b";
+    ? "0x590765de6f34bbae3e51aa89e571f567fa6d63cf3f8225592d58133860a0ccda"
+    : "0x590765de6f34bbae3e51aa89e571f567fa6d63cf3f8225592d58133860a0ccda";
 
 const schemaEncoder = new SchemaEncoder(
-  "address contract,uint256 id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block, string proposal_type, uint256[] tiers, uint256 onchain_proposalid, uint8 max_approvals, uint8 criteria, uint128 criteria_value"
+  "address contract,uint256 id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block, string proposal_type, uint256[] tiers, uint256 onchain_proposalid, uint8 max_approvals, uint8 criteria, uint128 criteria_value, uint8 calculationOptions"
 );
 
 const eas =
@@ -41,6 +41,7 @@ export async function createProposalAttestation({
   maxApprovals,
   criteria,
   criteriaValue,
+  calculationOptions,
 }: {
   contract: string;
   proposer: string;
@@ -56,6 +57,7 @@ export async function createProposalAttestation({
   maxApprovals: number;
   criteria: number;
   criteriaValue: number;
+  calculationOptions: number;
 }) {
   const id = BigInt(
     keccak256(
@@ -85,6 +87,7 @@ export async function createProposalAttestation({
     { name: "max_approvals", value: maxApprovals, type: "uint8" },
     { name: "criteria", value: criteria, type: "uint8" },
     { name: "criteria_value", value: criteriaValue, type: "uint128" },
+    { name: "calculationOptions", value: calculationOptions, type: "uint8" },
   ]);
 
   const recipient = "0x0000000000000000000000000000000000000000";

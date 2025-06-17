@@ -20,6 +20,7 @@ interface OffchainProposalRequestBody {
     maxApprovals: number;
     criteria: number;
     criteriaValue: number;
+    calculationOptions: number;
   };
   id: string;
   transactionHash: string;
@@ -57,6 +58,7 @@ export async function POST(request: NextRequest) {
     maxApprovals,
     criteria,
     criteriaValue,
+    calculationOptions,
   } = proposalData;
 
   try {
@@ -81,6 +83,7 @@ export async function POST(request: NextRequest) {
         max_options: maxApprovals,
         criteria: criteria,
         criteria_value: criteriaValue,
+        calculation_options: calculationOptions,
       },
     });
 
