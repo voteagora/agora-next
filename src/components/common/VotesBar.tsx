@@ -5,12 +5,13 @@ import { useMemo } from "react";
 interface VoteBarProps {
   forVotes?: number;
   againstVotes: number;
+  abstainVotes?: number;
   quorumPercentage?: number;
   showVotesPercentage?: boolean;
 }
 
 type VoteSegment = {
-  type: "for" | "against";
+  type: "for" | "against" | "abstain";
   percentage: number;
   color: string;
 };
@@ -18,11 +19,12 @@ type VoteSegment = {
 export const VotesBar = ({
   forVotes,
   againstVotes,
+  abstainVotes,
   quorumPercentage,
   showVotesPercentage,
 }: VoteBarProps) => {
   const { ui } = Tenant.current();
-  const { positive, negative, line } = ui.customization || {};
+  const { positive, negative, secondary } = ui.customization || {};
 
   const forColor = useMemo(
     () => (positive ? rgbStringToHex(positive) : "#4DE897"),
@@ -31,6 +33,10 @@ export const VotesBar = ({
   const againstColor = useMemo(
     () => (negative ? rgbStringToHex(negative) : "#FF5C57"),
     [negative]
+  );
+  const abstainColor = useMemo(
+    () => (secondary ? rgbStringToHex(secondary) : "#FFC107"),
+    [secondary]
   );
 
   const segments = useMemo<VoteSegment[]>(
@@ -46,8 +52,13 @@ export const VotesBar = ({
           percentage: againstVotes,
           color: againstColor,
         },
+        {
+          type: "abstain" as const,
+          percentage: abstainVotes || 0,
+          color: abstainColor,
+        },
       ].filter((segment) => segment.percentage > 0),
-    [forVotes, forColor, againstVotes, againstColor]
+    [forVotes, forColor, againstVotes, againstColor, abstainVotes, abstainColor]
   );
 
   return (

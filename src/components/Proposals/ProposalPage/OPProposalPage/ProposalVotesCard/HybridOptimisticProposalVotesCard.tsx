@@ -45,7 +45,7 @@ const HybridOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
   );
   const categoryWeight =
     proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
-      ? HYBRID_VOTE_WEIGHTS.chains
+      ? (HYBRID_VOTE_WEIGHTS.chains * 100).toFixed(3)
       : "33.33%";
 
   let voteGroups = [
@@ -81,7 +81,7 @@ const HybridOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
           (proposalResults?.DELEGATES?.against || "0").toString(),
           token.decimals
         ),
-        weight: HYBRID_VOTE_WEIGHTS.delegates,
+        weight: (HYBRID_VOTE_WEIGHTS.delegates * 100).toFixed(2),
         veto:
           groupTallies.find((g) => g.name === "delegates")?.exceedsThreshold ||
           false,

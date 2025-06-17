@@ -276,7 +276,7 @@ function SingleOption({
         votes && votesFromAllCategories > 0n
           ? (votes * 100n) / votesFromAllCategories
           : 0n,
-      weight: weight.toFixed(3),
+      weight: (weight * 100).toFixed(2),
     };
   };
 

@@ -4,6 +4,7 @@ import { Proposal } from "@/app/api/common/proposals/proposal.d";
 import { HYBRID_VOTE_WEIGHTS } from "@/lib/constants";
 import {
   ParsedProposalResults,
+  ParsedProposalData,
   calculateHybridStandardProposalMetrics,
 } from "@/lib/proposalUtils";
 import { ExclamationCircleIcon } from "@/icons/ExclamationCircleIcon";
@@ -32,21 +33,21 @@ const HybridStandardVotesGroup = ({ proposal }: { proposal: Proposal }) => {
       forVotes: proposalResults.CHAIN.for || "0",
       againstVotes: proposalResults.CHAIN.against || "0",
       abstainVotes: proposalResults.CHAIN.abstain || "0",
-      weight: categoryWeight.toFixed(3),
+      weight: (categoryWeight * 100).toFixed(2),
     },
     {
       name: "Apps", // Corresponds to PROJECT in offchainResults
       forVotes: proposalResults.PROJECT.for || "0",
       againstVotes: proposalResults.PROJECT.against || "0",
       abstainVotes: proposalResults.PROJECT.abstain || "0",
-      weight: categoryWeight.toFixed(3),
+      weight: (categoryWeight * 100).toFixed(2),
     },
     {
       name: "Users",
       forVotes: proposalResults.USER.for || "0",
       againstVotes: proposalResults.USER.against || "0",
       abstainVotes: proposalResults.USER.abstain || "0",
-      weight: categoryWeight.toFixed(3),
+      weight: (categoryWeight * 100).toFixed(2),
     },
   ];
 
@@ -66,7 +67,7 @@ const HybridStandardVotesGroup = ({ proposal }: { proposal: Proposal }) => {
           (proposalResults?.DELEGATES?.abstain || "0").toString(),
           token.decimals
         ),
-        weight: HYBRID_VOTE_WEIGHTS.delegates.toFixed(3),
+        weight: (HYBRID_VOTE_WEIGHTS.delegates * 100).toFixed(2),
       },
       ...voteGroups,
     ];
@@ -105,7 +106,7 @@ const HybridStandardVotesGroup = ({ proposal }: { proposal: Proposal }) => {
 };
 
 const QuorumStatus = ({
-  quorumPercentage = 55,
+  quorumPercentage = 30,
   quorumMet = true,
 }: {
   quorumPercentage?: number;
@@ -158,17 +159,18 @@ const HybridStandardProposalVotesSummary = ({
     quorumMet,
     totalForVotesPercentage,
     totalAgainstVotesPercentage,
+    totalAbstainVotesPercentage,
   } = useMemo(
     () => calculateHybridStandardProposalMetrics(proposal),
     [proposal]
   );
-
   return (
     <div className="p-4">
       <div className="border border-line rounded-lg">
         <VotesBar
           forVotes={totalForVotesPercentage}
           againstVotes={totalAgainstVotesPercentage}
+          abstainVotes={totalAbstainVotesPercentage}
           quorumPercentage={30}
         />
         <HybridStandardVotesGroup proposal={proposal} />
