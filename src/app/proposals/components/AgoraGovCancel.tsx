@@ -37,28 +37,10 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
   const canCancel =
     adminAddress?.toString().toLowerCase() === address?.toLowerCase();
 
-  const { writeContract: write, data } = useWriteContract();
-  const { isLoading, isSuccess, isError, isFetched, error } =
-    useWaitForTransactionReceipt({
-      hash: data,
-    });
-
-  useEffect(() => {
-    if (isSuccess) {
-      toast.success(
-        "Proposal Cancelled. It might take a minute to see the updated status.",
-        { duration: 5000 }
-      );
-    }
-    if (isError) {
-      const errorMessage =
-        "shortMessage" in error ? error.shortMessage : error.message;
-
-      toast.error(`Error cancelling proposal ${errorMessage}`, {
-        duration: 5000,
-      });
-    }
-  }, [isSuccess, isError, error]);
+  const { writeContractAsync: write, data } = useWriteContract();
+  const { isFetched } = useWaitForTransactionReceipt({
+    hash: data,
+  });
 
   if (!canCancel) {
     return null;
@@ -99,7 +81,7 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
                       return input.value;
                     }
                   );
-                write({
+                await write({
                   address: contracts.governor.address as `0x${string}`,
                   abi: contracts.governor.abi,
                   functionName: "cancel",
@@ -114,7 +96,7 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
                 setCancelling(false);
                 setCancelled(true);
               } else {
-                write({
+                await write({
                   address: contracts.governor.address as `0x${string}`,
                   abi: contracts.governor.abi,
                   functionName: "cancel",
