@@ -112,6 +112,7 @@ const OffchainProposalAction = ({
             ? (draftProposal.threshold ?? 0)
             : (draftProposal.top_choices ?? 0)
           : 0,
+        calculationOptions: draftProposal.calculationOptions,
       };
 
       let onchainProposalId: bigint | null = null;
@@ -166,6 +167,7 @@ const OffchainProposalAction = ({
         maxApprovals: rawProposalDataForBackend.maxApprovals,
         criteria: rawProposalDataForBackend.criteria,
         criteriaValue: rawProposalDataForBackend.criteriaValue,
+        calculationOptions: rawProposalDataForBackend.calculationOptions ?? 0,
       });
 
       const apiKey = process.env.NEXT_PUBLIC_AGORA_API_KEY;
@@ -193,6 +195,8 @@ const OffchainProposalAction = ({
             maxApprovals: rawProposalDataForBackend.maxApprovals,
             criteria: rawProposalDataForBackend.criteria,
             criteriaValue: rawProposalDataForBackend.criteriaValue,
+            calculationOptions:
+              rawProposalDataForBackend.calculationOptions ?? 0,
           },
           id: id.toString(),
           transactionHash,

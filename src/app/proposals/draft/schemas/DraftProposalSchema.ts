@@ -143,6 +143,7 @@ const BaseProposalSchema = z.object({
   proposal_scope: z.nativeEnum(ProposalScope).optional(),
   tiers_enabled: z.boolean().optional(),
   tiers: z.array(z.number()).optional(),
+  calculationOptions: z.number().optional(),
 });
 
 export const BasicProposalSchema = BaseProposalSchema.extend({

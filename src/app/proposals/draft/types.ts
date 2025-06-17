@@ -162,6 +162,11 @@ export enum ProposalScope {
   HYBRID = "hybrid",
 }
 
+export enum CalculationOptions {
+  INCLUDE_ABSTAIN = "Include Abstain",
+  EXCLUDE_ABSTAIN = "Exclude Abstain",
+}
+
 export enum ProposalType {
   // might make sense to move snapshot to something else since snapshot isn't really a "proposal"
   // It doesn't go through the governor
@@ -212,6 +217,7 @@ export type BaseProposal = ProposalDraft & {
   proposal_scope?: ProposalScope;
   tiers_enabled?: boolean;
   tiers?: number[];
+  calculationOptions?: number;
 };
 
 export type BasicProposal = BaseProposal & {

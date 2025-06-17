@@ -1205,6 +1205,7 @@ model ProposalDraft {
   sponsor_address          String
   stage                    ProposalStage
   proposal_scope           String?
+  calculation_options      Int?
   tiers                    Int[]
   start_date_social        DateTime?                  @db.Timestamp(6)
   end_date_social          DateTime?                  @db.Timestamp(6)
@@ -4685,6 +4686,7 @@ model OffchainProposals {
   max_options                Int?
   criteria                   Int?
   criteria_value             Int?
+  calculation_options        Int?
   start_block                String?
   end_block                  String?
   created_block              BigInt?

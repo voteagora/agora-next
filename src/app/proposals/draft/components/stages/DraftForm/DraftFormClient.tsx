@@ -80,6 +80,7 @@ const DEFAULT_FORM = {
   },
   proposal_scope: ProposalScope.ONCHAIN_ONLY,
   budget: 0,
+  calculationOptions: 0,
 };
 
 const getValidProposalTypesForVotingType = (

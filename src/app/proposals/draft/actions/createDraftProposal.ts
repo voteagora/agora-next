@@ -132,6 +132,7 @@ export async function onSubmitAction(
       voting_module_type: parsed.data.type,
       proposal_type: parsed.data.proposalConfigType,
       proposal_scope: parsed.data.proposal_scope,
+      calculation_options: parsed.data.calculationOptions,
       tiers: parsed.data.tiers,
     };
 

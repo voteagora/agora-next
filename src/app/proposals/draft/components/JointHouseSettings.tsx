@@ -1,8 +1,7 @@
 "use client";
 
-import { VStack } from "@/components/Layout/Stack";
 import { Switch } from "@/components/shared/Switch";
-import { ProposalScope } from "@/app/proposals/draft/types";
+import { CalculationOptions, ProposalScope } from "@/app/proposals/draft/types";
 import { UseFormReturn } from "react-hook-form";
 import { DraftProposalSchema } from "@/app/proposals/draft/schemas/DraftProposalSchema";
 import { z } from "zod";
@@ -19,6 +18,7 @@ function JointHouseSettings({
   form: UseFormReturn<z.output<typeof DraftProposalSchema>>;
 }) {
   const proposal_scope = form.watch("proposal_scope");
+  const calculationOptions = form.watch("calculationOptions");
 
   const handleScopeChange = (selectedOption: string) => {
     const scope = Object.keys(proposalScopeOptions).find(
@@ -32,8 +32,23 @@ function JointHouseSettings({
     }
   };
 
+  const handleCalculationOptionsChange = (selectedOption: string) => {
+    const calculationOptions = Object.values(CalculationOptions).find(
+      (key) => key === selectedOption
+    ) as CalculationOptions | undefined;
+
+    const calculationOptionsNumber =
+      calculationOptions === CalculationOptions.INCLUDE_ABSTAIN ? 0 : 1;
+
+    if (calculationOptions) {
+      if (form.setValue) {
+        form.setValue("calculationOptions", calculationOptionsNumber);
+      }
+    }
+  };
+
   return (
-    <VStack>
+    <div className="flex flex-col">
       <div className="mb-1">
         <h3 className="text-sm font-semibold mb-2 text-primary">
           Proposal Scope
@@ -66,7 +81,32 @@ function JointHouseSettings({
           </p>
         </div>
       )}
-    </VStack>
+
+      {proposal_scope !== ProposalScope.ONCHAIN_ONLY && (
+        <>
+          <div className="flex flex-col space-y-2 mt-6">
+            <h3 className="text-sm font-semibold mb-2 text-primary">
+              Calculation Options
+            </h3>
+            <p className="text-xs text-secondary">
+              Select the calculation options for this proposal.
+            </p>
+          </div>
+
+          <Switch
+            options={Object.values(CalculationOptions)}
+            selection={
+              calculationOptions
+                ? calculationOptions === 1
+                  ? CalculationOptions.EXCLUDE_ABSTAIN
+                  : CalculationOptions.INCLUDE_ABSTAIN
+                : CalculationOptions.INCLUDE_ABSTAIN
+            }
+            onSelectionChanged={handleCalculationOptionsChange}
+          />
+        </>
+      )}
+    </div>
   );
 }
 
