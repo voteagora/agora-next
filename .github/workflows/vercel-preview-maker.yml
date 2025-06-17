@@ -15,8 +15,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11" # or whichever version you prefer
-
+          python-version: '3.11'  # or whichever version you prefer
+        
       - name: Install Python dependencies
         run: pip install requests
 
@@ -27,4 +27,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          GITHUB_EVENT_PATH: ${{ github.event_path }} # the path to the event payload (JSON)
+          GITHUB_EVENT_PATH: ${{ github.event_path }}  # the path to the event payload (JSON)

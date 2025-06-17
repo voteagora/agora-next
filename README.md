@@ -10,7 +10,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Environment Variables
 
-- _NEXT_PUBLIC_FORK_NODE_URL_ - The URL of an optional node, most likely a fork, for testing purposes. Leave blank to use alchemy.
+* *NEXT_PUBLIC_FORK_NODE_URL* - The URL of an optional node, most likely a fork, for testing purposes.  Leave blank to use alchemy.
 
 ## About this repo
 
@@ -204,8 +204,8 @@ npm run generate-apikey -- --email user@example.com --address 0x123345 --chain-i
 If for any reason you need an API key for a new chain, you'll need to run something like this against prod:
 
 ```
-INSERT INTO agora."chain" (id,  name,      created_at,  updated_at) VALUES
+INSERT INTO agora."chain" (id,  name,      created_at,  updated_at) VALUES 
                           ('10','Optimism','2025-06-09','2025-06-09');
 ```
 
-...where id is the chain id.
+...where id is the chain id.  
