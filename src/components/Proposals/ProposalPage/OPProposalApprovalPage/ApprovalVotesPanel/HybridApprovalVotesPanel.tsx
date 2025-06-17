@@ -20,7 +20,6 @@ type Props = {
 export default function HybridApprovalVotesPanel({ proposal }: Props) {
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState("results");
-  console.log("proposal", proposal);
   const hybridApprovalData =
     proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"];
 

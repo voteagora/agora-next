@@ -25,7 +25,7 @@ import { icons } from "@/icons/icons";
 import Image from "next/image";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
-import { formatEther, formatUnits } from "viem";
+import { formatEther } from "viem";
 import {
   Tooltip,
   TooltipContent,
@@ -171,11 +171,11 @@ function CastVoteInputContent({
   return (
     <div className="flex flex-col flex-shrink rounded-b-lg">
       <div
-        className={`flex flex-col bg-neutral border-b border-line rounded-b-lg flex-shrink ${isGasRelayLive && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
+        className={`flex flex-col flex-shrink ${isGasRelayLive && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
       >
-        <div className="flex flex-col items-stretch justify-between pb-3 pt-1">
+        <div className="flex flex-col items-stretch justify-between">
           {!isError && !showSuccessMessage && (
-            <div className="bg-neutral border-t border-line px-3 ">
+            <div className="border-t border-line px-3 pb-3 pt-1">
               {!isLoading && (
                 <div className="flex flex-col gap-2">
                   {proposal.status === "ACTIVE" && (
@@ -184,7 +184,7 @@ function CastVoteInputContent({
                       value={reason || undefined}
                       onChange={(e) => setReason(e.target.value)}
                       rows={reason ? undefined : 1}
-                      className="text-sm text-primary bg-neutral resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
+                      className="text-sm text-primary resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
                     />
                   )}
                   <div className={cn(proposal.status !== "ACTIVE" && "mt-3")}>
@@ -239,11 +239,13 @@ function CastVoteInputContent({
         <VotingBanner />
       )}
       {showSuccessMessage && (
-        <SuccessMessage
-          proposal={proposal}
-          votes={votes}
-          votingPower={vpToDisplay}
-        />
+        <div className="border-t border-line">
+          <SuccessMessage
+            proposal={proposal}
+            votes={votes}
+            votingPower={vpToDisplay}
+          />
+        </div>
       )}
     </div>
   );
