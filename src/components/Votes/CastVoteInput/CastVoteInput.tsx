@@ -37,7 +37,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import shareIcon from "@/icons/share.svg";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { useVotableSupply } from "@/hooks/useVotableSupply";
 
 type Props = {
@@ -175,7 +175,7 @@ function CastVoteInputContent({
       >
         <div className="flex flex-col items-stretch justify-between">
           {!isError && !showSuccessMessage && (
-            <div className="border-t border-line px-3 pb-3 pt-1">
+            <div className="border-t border-line px-4 pb-3 pt-1">
               {!isLoading && (
                 <div className="flex flex-col gap-2">
                   {proposal.status === "ACTIVE" && (
@@ -440,7 +440,7 @@ export function SuccessMessage({
   return (
     <div
       className={cn(
-        "flex flex-col w-full text-sm text-secondary font-medium py-2 px-4 bg-transparent rounded-b-lg",
+        "flex flex-col w-full text-sm text-secondary font-medium p-4 pb-2 bg-transparent rounded-b-lg",
         className
       )}
     >
@@ -471,19 +471,17 @@ export function SuccessMessage({
           });
         }}
         variant="outline"
-        className="w-full text-secondary font-semibold text-xs gap-2 rounded-[0.5rem] h-8"
+        className="w-full text-secondary font-semibold text-xs gap-2 rounded-full border-primary h-8"
       >
         <Image src={shareIcon.src} alt="Share icon" height={18} width={18} />
-        <span>
-          Share you voted{" "}
-          <span className={supportColor}>
-            {support?.toUpperCase() + (support === "ABSTAIN" ? " in" : "")}
-          </span>{" "}
-          this proposal
-        </span>
+        <span>Share your vote</span>
       </Button>
+      <p className="text-[14px] font-bold text-secondary text-center mt-2">
+        You voted for this proposal {formatDistanceToNow(new Date(timestamp))}{" "}
+        ago
+      </p>
       <BlockScanUrls
-        className="pt-2 text-tertiary font-medium mx-auto"
+        className="text-xs font-medium text-tertiary mx-auto pt-1"
         hash1={
           data?.sponsoredVoteTxHash || data?.standardTxHash || transactionHash
         }

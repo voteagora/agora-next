@@ -139,4 +139,5 @@ export type Proposal = {
   createdTransactionHash: string | null;
   cancelledTransactionHash: string | null;
   executedTransactionHash: string | null;
+  offchainProposalId?: string;
 };

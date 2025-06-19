@@ -25,7 +25,7 @@ const HybridStandardVotesGroup = ({ proposal }: { proposal: Proposal }) => {
   const categoryWeight =
     proposal.proposalType === "HYBRID_STANDARD"
       ? Number(HYBRID_VOTE_WEIGHTS.chains)
-      : 100 / 3;
+      : 1 / 3;
 
   let voteGroups = [
     {
@@ -165,22 +165,26 @@ const HybridStandardProposalVotesSummary = ({
     [proposal]
   );
   return (
-    <div className="p-4">
-      <div className="border border-line rounded-lg">
-        <VotesBar
-          forVotes={totalForVotesPercentage}
-          againstVotes={totalAgainstVotesPercentage}
-          abstainVotes={totalAbstainVotesPercentage}
-          quorumPercentage={30}
-        />
-        <HybridStandardVotesGroup proposal={proposal} />
-        <QuorumStatus
-          quorumPercentage={quorumPercentage}
-          quorumMet={quorumMet}
-        />
+    <>
+      <div className="p-4">
+        <div className="border border-line rounded-lg">
+          <VotesBar
+            forVotes={totalForVotesPercentage}
+            againstVotes={totalAgainstVotesPercentage}
+            abstainVotes={totalAbstainVotesPercentage}
+            quorumPercentage={30}
+          />
+          <HybridStandardVotesGroup proposal={proposal} />
+          <QuorumStatus
+            quorumPercentage={quorumPercentage}
+            quorumMet={quorumMet}
+          />
+        </div>
+      </div>
+      <div className="">
         <CastVoteInput proposal={proposal} />
       </div>
-    </div>
+    </>
   );
 };
 

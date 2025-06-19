@@ -20,6 +20,7 @@ import React from "react";
 import HybridStandardProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/HybridStandardProposalPage";
 import HybridApprovalProposalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/HybridApprovalProposalPage";
 import HybridOptimisticProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/HybridOptimisticProposalPage";
+import { redirect } from "next/navigation";
 
 export const maxDuration = 60;
 
@@ -150,6 +151,12 @@ export default async function Page({
   params: { proposal_id: string };
 }) {
   const proposal = await fetchProposal(proposal_id);
+  const proposalData =
+    proposal.proposalData as ParsedProposalData["OFFCHAIN_STANDARD"]["kind"];
+  if (proposalData.onchainProposalId) {
+    redirect(`/proposals/${proposalData.onchainProposalId}`);
+  }
+
   let RenderComponent;
   switch (proposal.proposalType) {
     case "STANDARD":

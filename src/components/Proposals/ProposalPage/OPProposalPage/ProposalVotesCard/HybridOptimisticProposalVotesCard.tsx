@@ -45,8 +45,8 @@ const HybridOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
   );
   const categoryWeight =
     proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
-      ? (HYBRID_VOTE_WEIGHTS.chains * 100).toFixed(3)
-      : "33.33%";
+      ? (HYBRID_VOTE_WEIGHTS.chains * 100).toFixed(2)
+      : "33.33";
 
   let voteGroups = [
     {
@@ -283,7 +283,7 @@ const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
               )}
             </>
           )}
-          <VoteOnAtlas />
+          <VoteOnAtlas offchainProposalId={proposal.offchainProposalId} />
         </div>
       </div>
     </>
