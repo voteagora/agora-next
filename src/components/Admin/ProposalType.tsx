@@ -214,11 +214,18 @@ export default function ProposalType({
       throw new Error("Proposal type address not found");
     }
 
+    const quorum =
+      votingModuleType === ProposalTypeEnum.OPTIMISTIC ? 0 : formValues.quorum;
+    const approvalThreshold =
+      votingModuleType === ProposalTypeEnum.OPTIMISTIC
+        ? 0
+        : formValues.approval_threshold;
+
     const setProposalTypeArgs = [
       BigInt(index),
-      Math.round(formValues.quorum * 100),
-      Math.round(formValues.approval_threshold * 100),
-      `${formValues.name} - ${votingModuleType}`,
+      Math.round(quorum * 100),
+      Math.round(approvalThreshold * 100),
+      `${formValues.name}${formValues.name.toLowerCase().includes(votingModuleType) ? "" : ` - [${votingModuleType}]`}`,
       formValues.description || "",
       proposalTypeAddress,
     ];
@@ -467,95 +474,104 @@ export default function ProposalType({
             )}
           />
         </div>
-        <div className="space-y-4 sm:space-y-0 sm:flex sm:gap-4">
-          <FormField
-            control={form.control}
-            name="quorum"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>Quorum</FormLabel>
-                <FormControl>
-                  <div className="relative flex items-center">
-                    <Input
-                      {...field}
-                      min={0}
-                      max={100}
-                      step={0.01}
-                      type="number"
-                      disabled={isDisabled}
-                      onChange={(e) => {
-                        form.setValue(
-                          "quorum",
-                          Number(e.target.value) > 100
-                            ? 100
-                            : Number(e.target.value) < 0
-                              ? 0
-                              : Number(e.target.value)
-                        );
-                      }}
-                    />
-                    <div className="absolute right-[12px] text-sm text-muted-foreground flex gap-2 text-center items-center">
-                      <p>
-                        % of{" "}
-                        {namespace === TENANT_NAMESPACES.SCROLL
-                          ? "total"
-                          : "votable"}{" "}
-                        supply
-                      </p>
-                      <div className="mx-auto w-[1px] bg-muted-foreground/40 h-4" />
-                      <p className="text-[0.8rem] col-span-3">
-                        {formatNumber(
-                          Math.floor(
-                            (formattedSupply * formValues.quorum) / 100
-                          ).toString(),
-                          0,
-                          1
-                        )}{" "}
-                        {token.symbol}
-                      </p>
+        {formValues.voting_module_type === ProposalTypeEnum.OPTIMISTIC ? (
+          <div>
+            <p>
+              Optimistic proposals do not require a quorum or approval
+              threshold. The value is always 0.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4 sm:space-y-0 sm:flex sm:gap-4">
+            <FormField
+              control={form.control}
+              name="quorum"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Quorum</FormLabel>
+                  <FormControl>
+                    <div className="relative flex items-center">
+                      <Input
+                        {...field}
+                        min={0}
+                        max={100}
+                        step={0.01}
+                        type="number"
+                        disabled={isDisabled}
+                        onChange={(e) => {
+                          form.setValue(
+                            "quorum",
+                            Number(e.target.value) > 100
+                              ? 100
+                              : Number(e.target.value) < 0
+                                ? 0
+                                : Number(e.target.value)
+                          );
+                        }}
+                      />
+                      <div className="absolute right-[12px] text-sm text-muted-foreground flex gap-2 text-center items-center">
+                        <p>
+                          % of{" "}
+                          {namespace === TENANT_NAMESPACES.SCROLL
+                            ? "total"
+                            : "votable"}{" "}
+                          supply
+                        </p>
+                        <div className="mx-auto w-[1px] bg-muted-foreground/40 h-4" />
+                        <p className="text-[0.8rem] col-span-3">
+                          {formatNumber(
+                            Math.floor(
+                              (formattedSupply * formValues.quorum) / 100
+                            ).toString(),
+                            0,
+                            1
+                          )}{" "}
+                          {token.symbol}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="approval_threshold"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>Approval threshold</FormLabel>
-                <FormControl>
-                  <div className="relative flex items-center">
-                    <Input
-                      {...field}
-                      min={0}
-                      max={100}
-                      step={0.01}
-                      type="number"
-                      disabled={isDisabled}
-                      onChange={(e) => {
-                        form.setValue(
-                          "approval_threshold",
-                          Number(e.target.value) > 100
-                            ? 100
-                            : Number(e.target.value) < 0
-                              ? 0
-                              : Number(e.target.value)
-                        );
-                      }}
-                    />
-                    <div className="absolute right-[12px] text-sm text-muted-foreground">
-                      <p>% of votes for each proposal</p>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="approval_threshold"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Approval threshold</FormLabel>
+                  <FormControl>
+                    <div className="relative flex items-center">
+                      <Input
+                        {...field}
+                        min={0}
+                        max={100}
+                        step={0.01}
+                        type="number"
+                        disabled={isDisabled}
+                        onChange={(e) => {
+                          form.setValue(
+                            "approval_threshold",
+                            Number(e.target.value) > 100
+                              ? 100
+                              : Number(e.target.value) < 0
+                                ? 0
+                                : Number(e.target.value)
+                          );
+                        }}
+                      />
+                      <div className="absolute right-[12px] text-sm text-muted-foreground">
+                        <p>% of votes for each proposal</p>
+                      </div>
                     </div>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
 
         {/* Scopes Section */}
         {contracts.supportScopes && (

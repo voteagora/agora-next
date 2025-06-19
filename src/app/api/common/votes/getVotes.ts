@@ -251,6 +251,8 @@ async function getVotersWhoHaveNotVotedForProposal({
       eventsViewName = "vote_cast_with_params_events";
     }
 
+    const includeCitizens = namespace === TENANT_NAMESPACES.OPTIMISM;
+
     const queryFunction = (skip: number, take: number) => {
       const notVotedQuery = `
               with has_voted as (
@@ -259,9 +261,18 @@ async function getVotersWhoHaveNotVotedForProposal({
                   SELECT voter FROM ${namespace}.${eventsViewName} WHERE proposal_id = $1 and contract = $3
                   UNION ALL
                   SELECT voter FROM "snapshot".votes WHERE proposal_id = $1 and dao_slug = '${slug}'
+                  UNION ALL
+                  SELECT LOWER("voterAddress") as voter FROM atlas."OffChainVote" WHERE "proposalId" = $1
                 ),
                 relevant_delegates as (
-                  SELECT * FROM ${namespace}.delegates where contract = $2
+                  SELECT delegate, voting_power FROM ${namespace}.delegates where contract = $2
+                  ${
+                    includeCitizens
+                      ? `
+                    UNION
+                    SELECT LOWER("address") as delegate, 0 as voting_power FROM atlas."Citizen"`
+                      : ""
+                  }
                 ),
                 delegates_who_havent_votes as (
                   SELECT * FROM relevant_delegates d left join has_voted v on d.delegate = v.voter where v.voter is null
@@ -406,6 +417,18 @@ async function getVotesForProposal({
                 block_number
               FROM ${namespace}.${eventsViewName}
               WHERE proposal_id = $1 AND contract = $2
+               UNION ALL
+              SELECT
+                 "transactionHash" as transaction_hash,
+                 "proposalId" as proposal_id,
+                 "voterAddress" as voter,
+                 1::text as support,
+                 1 as weight,
+                 NULL as reason,
+                 NULL as params,
+                 NULL as block_number
+               FROM atlas."OffChainVote"
+               WHERE "proposalId" = $1
             ) t
             GROUP BY 2,3,4,8
             ) av
@@ -413,7 +436,7 @@ async function getVotesForProposal({
               SELECT
                 proposals.description,
                 proposals.proposal_data,
-                proposals.proposal_type::config.proposal_type AS proposal_type
+                proposals.proposal_type AS proposal_type
               FROM ${namespace}.proposals_v2 proposals
               WHERE proposals.proposal_id = $1 AND proposals.contract = $2) p ON TRUE
           ) q
