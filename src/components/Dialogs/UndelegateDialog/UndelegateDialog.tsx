@@ -5,8 +5,6 @@ import {
   useWriteContract,
 } from "wagmi";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
-import { Button } from "@/components/Button";
-import { Button as ShadcnButton } from "@/components/ui/button";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -24,6 +22,7 @@ import { formatEther, zeroAddress } from "viem";
 import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
+import { DSButton } from "@/components/design-system/Button";
 
 interface UndelegateActionButtonsProps {
   isDisabledInTenant: boolean;
@@ -58,32 +57,51 @@ const UndelegateActionButtons = ({
 }: UndelegateActionButtonsProps) => {
   if (isDisabledInTenant) {
     return (
-      <Button disabled={true}>
+      <DSButton variant="primary" size="small" fullWidth disabled>
         {tokenSymbol} delegation is disabled at this time
-      </Button>
+      </DSButton>
     );
   }
 
   if (isError || didFailDelegation) {
     return (
-      <Button disabled={false} onClick={executeDelegate}>
+      <DSButton
+        variant="primary"
+        size="small"
+        fullWidth
+        onClick={executeDelegate}
+      >
         Undelegation failed - try again
-      </Button>
+      </DSButton>
     );
   }
 
   if (isProcessingDelegation || isProcessingSponsoredUnelegation) {
     return (
-      <Button disabled={true}>Submitting your undelegation request...</Button>
+      <DSButton
+        variant="primary"
+        primaryTextColor="black"
+        fullWidth
+        size="small"
+        disabled
+      >
+        Submitting your undelegation request...
+      </DSButton>
     );
   }
 
   if (didProcessDelegation || didProcessSponsoredUnelegation) {
     return (
       <div>
-        <Button className="w-full" disabled={false}>
+        <DSButton
+          variant="primary"
+          primaryTextColor="black"
+          fullWidth
+          size="small"
+          disabled
+        >
           Undelegation completed!
-        </Button>
+        </DSButton>
         <BlockScanUrls
           hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
         />
@@ -93,13 +111,28 @@ const UndelegateActionButtons = ({
 
   if (sameDelegatee) {
     return (
-      <ShadcnButton onClick={executeDelegate}>
+      <DSButton
+        variant="primary"
+        primaryTextColor="black"
+        fullWidth
+        size="small"
+        onClick={executeDelegate}
+      >
         Remove your own delegation
-      </ShadcnButton>
+      </DSButton>
     );
   }
 
-  return <ShadcnButton onClick={executeDelegate}>Undelegate</ShadcnButton>;
+  return (
+    <DSButton
+      variant="primary"
+      size="small"
+      fullWidth
+      onClick={executeDelegate}
+    >
+      Undelegate
+    </DSButton>
+  );
 };
 
 export function UndelegateDialog({

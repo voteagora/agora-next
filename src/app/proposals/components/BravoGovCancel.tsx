@@ -5,7 +5,7 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { Button } from "@/components/ui/button";
+import { DSButton } from "@/components/design-system/Button";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
@@ -55,7 +55,7 @@ export const BravoGovCancel = ({ proposal }: Props) => {
   return (
     <>
       {!isFetched && (
-        <Button
+        <DSButton
           onClick={() =>
             write({
               address: contracts.governor.address as `0x${string}`,
@@ -64,11 +64,12 @@ export const BravoGovCancel = ({ proposal }: Props) => {
               args: [proposal.id],
             })
           }
-          variant="outline"
+          variant="secondary"
+          size="small"
           loading={isLoading}
         >
           Cancel
-        </Button>
+        </DSButton>
       )}
     </>
   );

@@ -21,6 +21,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
 import { SuccessMessage } from "../CastVoteInput/CastVoteInput";
+import { DSButton } from "@/components/design-system/Button";
 
 type Props = {
   proposal: Proposal;
@@ -185,11 +186,15 @@ function CastButton({ onClick }: { onClick: () => void }) {
 
 function DisabledVoteButton({ reason }: { reason: string }) {
   return (
-    <button
+    <DSButton
+      variant="primary"
+      primaryTextColor="black"
+      size="small"
+      fullWidth
       disabled
-      className="bg-neutral rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1"
+      type="button"
     >
       {reason}
-    </button>
+    </DSButton>
   );
 }

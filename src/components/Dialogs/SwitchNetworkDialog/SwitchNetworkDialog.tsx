@@ -1,5 +1,5 @@
 import { useAccount, useSwitchChain } from "wagmi";
-import { Button } from "@/components/ui/button";
+import { DSButton } from "@/components/design-system/Button";
 import { useEffect } from "react";
 import { Chain } from "viem/chains";
 import Image from "next/image";
@@ -29,8 +29,10 @@ export function SwitchNetwork({
       <p className="text-secondary">
         Wrong network detected, switch to {chain.name} to continue.
       </p>
-      <Button
-        variant="outline"
+      <DSButton
+        variant="primary"
+        size="small"
+        fullWidth
         className="font-bold"
         onClick={() => {
           switchChain?.({ chainId: chain.id });
@@ -38,7 +40,7 @@ export function SwitchNetwork({
         }}
       >
         Switch to {chain.name}
-      </Button>
+      </DSButton>
     </div>
   );
 }

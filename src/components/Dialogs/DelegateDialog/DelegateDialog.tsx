@@ -27,6 +27,7 @@ import { formatEther } from "viem";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { DSButton } from "@/components/design-system/Button";
 
 export function DelegateDialog({
   delegate,
@@ -172,22 +173,32 @@ export function DelegateDialog({
 
     if (isError || didFailDelegation) {
       return (
-        <Button disabled={false} onClick={executeDelegate}>
-          Delegation failed - try again
-        </Button>
+        <DSButton
+          variant="primary"
+          size="small"
+          fullWidth
+          disabled={false}
+          onClick={executeDelegate}
+        >
+          Delegation Failed - Try Again
+        </DSButton>
       );
     }
 
     if (isProcessingDelegation || isProcessingSponsoredDelegation) {
-      return <Button disabled={true}>Submitting your delegation...</Button>;
+      return (
+        <DSButton variant="primary" size="small" fullWidth disabled>
+          Submitting your delegation...
+        </DSButton>
+      );
     }
 
     if (didProcessDelegation || didProcessSponsoredDelegation) {
       return (
         <div>
-          <Button className="w-full" disabled={false}>
+          <DSButton variant="primary" size="small" fullWidth disabled>
             Delegation completed!
-          </Button>
+          </DSButton>
           <BlockScanUrls
             hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
           />
@@ -195,7 +206,16 @@ export function DelegateDialog({
       );
     }
 
-    return <ShadcnButton onClick={executeDelegate}>Delegate</ShadcnButton>;
+    return (
+      <DSButton
+        variant="primary"
+        size="small"
+        fullWidth
+        onClick={executeDelegate}
+      >
+        Delegate
+      </DSButton>
+    );
   };
 
   useEffect(() => {

@@ -5,7 +5,7 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { Button } from "@/components/ui/button";
+import { DSButton } from "@/components/design-system/Button";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -78,15 +78,15 @@ export const BravoGovExecute = ({ proposal }: Props) => {
           {!canExecute && executeTime ? (
             <>
               <TooltipTrigger>
-                <Button disabled={true} variant="outline">
+                <DSButton disabled={true} variant="primary" size="small">
                   Execute
-                </Button>
+                </DSButton>
               </TooltipTrigger>
             </>
           ) : (
             <>
               {!isFetched && (
-                <Button
+                <DSButton
                   onClick={() =>
                     writeContract({
                       address: contracts.governor.address as `0x${string}`,
@@ -96,9 +96,11 @@ export const BravoGovExecute = ({ proposal }: Props) => {
                     })
                   }
                   loading={isLoading}
+                  variant="primary"
+                  size="small"
                 >
                   Execute
-                </Button>
+                </DSButton>
               )}
             </>
           )}

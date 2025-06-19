@@ -19,6 +19,7 @@ import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import { ProposalType } from "@/app/proposals/draft/types";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { DSButton } from "@/components/design-system/Button";
 
 const { contracts, ui } = Tenant.current();
 
@@ -132,12 +133,14 @@ export default function SubmitButton({
           )}
         </div>
       )}
-      <Button
+      <DSButton
         type="submit"
-        variant={"outline"}
+        variant="primary"
+        size="small"
+        fullWidth
         disabled={isLoading || onPrepareError || !!inputDataError}
         className={cx([
-          "w-[40%]",
+          "w-full",
           onPrepareError && "cursor-not-allowed bg-line",
         ])}
         onClick={(e) => {
@@ -154,7 +157,7 @@ export default function SubmitButton({
       >
         {/* hack to suppress Suspense boundary error */}
         {isClient && isConnected ? "Submit proposal" : "Connect wallet"}
-      </Button>
+      </DSButton>
     </>
   );
 }

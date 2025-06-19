@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import { DSButton } from "@/components/design-system/Button";
 import {
   Form,
   FormControl,
@@ -603,15 +604,17 @@ export default function ProposalType({
           </>
         )}
 
-        <Button
+        <DSButton
           type="submit"
           className="w-full"
-          variant="outline"
+          variant="primary"
+          size="small"
+          fullWidth
           loading={isLoading}
           disabled={isDisabled || isErrorSetProposalType}
         >
           Set proposal type
-        </Button>
+        </DSButton>
       </form>
     </Form>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { UpdatedButton } from "@/components/Button";
+import { DSButton } from "@/components/design-system/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { onSubmitAction as deleteAction } from "../actions/deleteDraftProposal";
 import { TrashIcon } from "@heroicons/react/20/solid";
@@ -9,8 +9,11 @@ import { TrashIcon } from "@heroicons/react/20/solid";
 const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
   const openDialog = useOpenDialog();
   return (
-    <button
-      className="flex flex-row items-center space-x-2 text-secondary"
+    <DSButton
+      variant="text"
+      size="small"
+      className="flex items-end"
+      iconBefore={<TrashIcon className="h-5 w-5" />}
       onClick={(e: any) => {
         e.preventDefault();
         openDialog({
@@ -21,9 +24,10 @@ const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
         });
       }}
     >
-      <TrashIcon className="h-5 w-5" />
-      <span className="block">Delete Proposal</span>
-    </button>
+      <span className="mt-[6px] inline-block align-bottom">
+        Delete Proposal
+      </span>
+    </DSButton>
   );
 };
 
@@ -44,19 +48,21 @@ export const DeleteDraftProposalDialog = ({
         Are you sure you want to delete this proposal?
       </p>
       <div className="mt-6 flex items-center justify-between space-x-2">
-        <UpdatedButton
-          type="secondary"
+        <DSButton
+          variant="secondary"
+          size="small"
           fullWidth
           onClick={() => {
             closeDialog();
           }}
         >
           No
-        </UpdatedButton>
-        <UpdatedButton
-          type="primary"
+        </DSButton>
+        <DSButton
+          variant="primary"
+          size="small"
           fullWidth
-          isLoading={isPending}
+          loading={isPending}
           onClick={async () => {
             setIsPending(true);
             await deleteAction(proposalId);
@@ -64,7 +70,7 @@ export const DeleteDraftProposalDialog = ({
           }}
         >
           Yes
-        </UpdatedButton>
+        </DSButton>
       </div>
     </div>
   );
