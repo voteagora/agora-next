@@ -8,11 +8,15 @@ export default function BlockScanUrls({
   className,
   isEas,
 }: {
-  hash1: string | undefined;
-  hash2?: string | undefined;
+  hash1: string | undefined | null;
+  hash2?: string | undefined | null;
   className?: string | undefined;
   isEas?: boolean;
 }) {
+  if (!hash1 && !hash2) {
+    return null;
+  }
+
   return (
     <div className={cn("pt-4 text-xs text-secondary", className)}>
       {hash2 && hash1 ? (

@@ -163,8 +163,16 @@ async function getProposals({
           fetchVotableSupply(),
         ]);
 
+        // This will filter the offchain record of an hybrid proposal.
+        const filteredProposals =
+          filter === "relevant"
+            ? proposals.data.filter((proposal: ProposalPayload) => {
+                return !(proposal.proposal_data as any)?.onchain_proposalid;
+              })
+            : proposals.data;
+
         const resolvedProposals = await Promise.all(
-          proposals.data.map(async (proposal: ProposalPayload) => {
+          filteredProposals.map(async (proposal: ProposalPayload) => {
             const quorum = await fetchQuorumForProposal(proposal);
             return parseProposal(
               proposal,
