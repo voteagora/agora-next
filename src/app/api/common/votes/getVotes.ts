@@ -270,7 +270,10 @@ async function getVotersWhoHaveNotVotedForProposal({
                     includeCitizens
                       ? `
                     UNION
-                    SELECT LOWER("address") as delegate, 0 as voting_power FROM atlas."Citizen"`
+                    SELECT LOWER(c."address") as delegate, 0 as voting_power 
+                    FROM atlas."Citizen" c
+                    LEFT JOIN ${namespace}.delegates d ON LOWER(c."address") = LOWER(d.delegate) AND d.contract = $2
+                    WHERE d.delegate IS NULL`
                       : ""
                   }
                 ),
