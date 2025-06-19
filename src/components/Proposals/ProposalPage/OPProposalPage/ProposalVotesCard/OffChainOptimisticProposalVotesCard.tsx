@@ -178,7 +178,7 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
             </>
           )}
         </div>
-        <VoteOnAtlas />
+        <VoteOnAtlas offchainProposalId={proposal.offchainProposalId} />
       </div>
     </>
   );

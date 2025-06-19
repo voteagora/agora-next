@@ -411,6 +411,7 @@ export async function parseProposal(
     createdTransactionHash: proposal.created_transaction_hash,
     cancelledTransactionHash: proposal.cancelled_transaction_hash,
     executedTransactionHash: proposal.executed_transaction_hash,
+    offchainProposalId: offchainProposal?.proposal_id,
   };
 }
 
@@ -1422,6 +1423,125 @@ export function calculateHybridStandardProposalMetrics(proposal: Proposal) {
   };
 }
 
+export function calculateHybridApprovalProposalMetrics(proposal: Proposal) {
+  const proposalResults =
+    proposal.proposalResults as ParsedProposalResults["HYBRID_APPROVAL"]["kind"];
+  const proposalData =
+    proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"];
+
+  // For delegates, we need to calculate the total eligible voters
+  // proposal.quorum is 30% of votable supply, so we need to multiply by (100/30)
+  const eligibleVoters = {
+    delegates: Number(proposal.quorum) * (100 / 30),
+    apps: OFFCHAIN_THRESHOLDS.PROJECT,
+    users: OFFCHAIN_THRESHOLDS.USER,
+    chains: OFFCHAIN_THRESHOLDS.CHAIN,
+  };
+
+  // Setup weights and participating groups based on proposal type
+  let tallyWeights, eligibleCounts;
+  if (proposal.proposalType === "HYBRID_APPROVAL") {
+    // All 4 groups participate with hybrid weights
+    tallyWeights = [
+      HYBRID_VOTE_WEIGHTS.delegates,
+      HYBRID_VOTE_WEIGHTS.apps,
+      HYBRID_VOTE_WEIGHTS.users,
+      HYBRID_VOTE_WEIGHTS.chains,
+    ];
+    eligibleCounts = [
+      eligibleVoters.delegates,
+      eligibleVoters.apps,
+      eligibleVoters.users,
+      eligibleVoters.chains,
+    ];
+  } else {
+    // Only 3 groups participate with equal weights
+    tallyWeights = [1 / 3, 1 / 3, 1 / 3];
+    eligibleCounts = [
+      eligibleVoters.apps,
+      eligibleVoters.users,
+      eligibleVoters.chains,
+    ];
+  }
+
+  // Get all option names across all categories
+  const optionNames = new Set<string>();
+  if (proposalResults.PROJECT)
+    Object.keys(proposalResults.PROJECT).forEach((key) => optionNames.add(key));
+  if (proposalResults.USER)
+    Object.keys(proposalResults.USER).forEach((key) => optionNames.add(key));
+  if (proposalResults.CHAIN)
+    Object.keys(proposalResults.CHAIN).forEach((key) => optionNames.add(key));
+  if (proposalResults.DELEGATES)
+    Object.keys(proposalResults.DELEGATES).forEach((key) =>
+      optionNames.add(key)
+    );
+
+  // Calculate weighted participation for each option
+  const optionResults = [];
+  for (const optionName of optionNames) {
+    const categories =
+      proposal.proposalType === "HYBRID_APPROVAL"
+        ? [
+            proposalResults.DELEGATES,
+            proposalResults.PROJECT,
+            proposalResults.USER,
+            proposalResults.CHAIN,
+          ]
+        : [
+            proposalResults.PROJECT,
+            proposalResults.USER,
+            proposalResults.CHAIN,
+          ];
+
+    // Calculate weighted votes as percentage of potential participation
+    const calculatedWeightedVotes = categories.reduce(
+      (sum, category, index) => {
+        const votes = category?.[optionName] ? Number(category[optionName]) : 0;
+        const votesPercentage =
+          votes > 0 ? (votes / eligibleCounts[index]) * 100 : 0;
+        return sum + votesPercentage * tallyWeights[index];
+      },
+      0
+    );
+
+    optionResults.push({
+      optionName,
+      weightedPercentage: Number(calculatedWeightedVotes.toFixed(2)),
+      rawVotes: categories.reduce((sum, category) => {
+        const votes = category?.[optionName] ? Number(category[optionName]) : 0;
+        return sum + votes;
+      }, 0),
+    });
+  }
+
+  // Calculate total weighted participation (sum of all option votes)
+  const totalWeightedParticipation = optionResults.reduce(
+    (sum, option) => sum + option.weightedPercentage,
+    0
+  );
+
+  // Check if quorum is met (30% threshold)
+  const quorumThreshold = 30;
+  const quorumMet = totalWeightedParticipation >= quorumThreshold;
+
+  // Check if threshold is met for THRESHOLD criteria
+  const criteriaValue = proposalData?.proposalSettings?.criteriaValue;
+  const thresholdMet =
+    proposalResults.criteria === "THRESHOLD" && criteriaValue
+      ? optionResults.some(
+          (option) => option.weightedPercentage >= Number(criteriaValue)
+        )
+      : false;
+
+  return {
+    totalWeightedParticipation: Number(totalWeightedParticipation.toFixed(2)),
+    quorumMet,
+    thresholdMet,
+    optionResults,
+  };
+}
+
 export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
   const proposalResults =
     proposal.proposalResults as ParsedProposalResults["HYBRID_OPTIMISTIC_TIERED"]["kind"];
@@ -1437,13 +1557,29 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
 
   // Get thresholds from tiers array: [2GroupThreshold, 3GroupThreshold, 4GroupThreshold]
   const proposalData =
-    proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"];
-  const tiers = proposalData?.tiers || [55, 45, 35];
+    proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
+      ? (proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"])
+      : (proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC"]["kind"]);
+
+  const tiers = (proposalData as any)?.tiers || [55, 45, 35];
   const thresholds = {
     twoGroups: tiers[0] || 55,
     threeGroups: tiers[1] || 45,
     fourGroups: tiers[2] || 35,
   };
+
+  // Setup weights based on proposal type
+  let tallyWeights;
+  if (proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED") {
+    tallyWeights = [
+      HYBRID_VOTE_WEIGHTS.delegates,
+      HYBRID_VOTE_WEIGHTS.apps,
+      HYBRID_VOTE_WEIGHTS.users,
+      HYBRID_VOTE_WEIGHTS.chains,
+    ];
+  } else {
+    tallyWeights = [1 / 3, 1 / 3, 1 / 3];
+  }
 
   const calculateVetoTally = (category: any, eligibleCount: number) => {
     const againstVotes = category?.against ? Number(category.against) : 0;
@@ -1517,27 +1653,18 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
       ).length >= 2;
   }
 
-  // Calculate weighted total for display (normalized to a base value for representation)
-  const baseValue = 100;
-  const weights =
-    proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
-      ? [
-          HYBRID_VOTE_WEIGHTS.delegates,
-          HYBRID_VOTE_WEIGHTS.apps,
-          HYBRID_VOTE_WEIGHTS.users,
-          HYBRID_VOTE_WEIGHTS.chains,
-        ]
-      : [1 / 3, 1 / 3, 1 / 3];
-
+  // Calculate weighted total against votes as percentage of potential participation
   const calculatedTotalAgainstVotes = groupTallies.reduce(
-    (sum, tally, index) =>
-      sum + (tally.vetoPercentage / 100) * (weights[index] || 0) * baseValue,
+    (sum, tally, index) => {
+      const againstPercentage = tally.vetoPercentage;
+      return sum + againstPercentage * tallyWeights[index];
+    },
     0
   );
 
   return {
     vetoThresholdMet: vetoTriggered,
-    totalAgainstVotes: Math.round(calculatedTotalAgainstVotes),
+    totalAgainstVotes: Number(calculatedTotalAgainstVotes.toFixed(2)),
     groupTallies: groupsExceedingThresholds,
     thresholds,
   };
