@@ -165,7 +165,7 @@ async function getProposals({
 
         // This will filter the offchain record of an hybrid proposal.
         const filteredProposals =
-          filter === "relevant"
+          filter === "relevant" && !(type === "OFFCHAIN")
             ? proposals.data.filter((proposal: ProposalPayload) => {
                 return !(proposal.proposal_data as any)?.onchain_proposalid;
               })
