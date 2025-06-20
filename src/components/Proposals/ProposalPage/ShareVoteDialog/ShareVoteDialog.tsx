@@ -48,10 +48,9 @@ function generateVoteBars(
       );
     }
   } else {
-    const forBars =
-      proposalType === "OPTIMISTIC"
-        ? 0
-        : Math.round((totalBars * forPercentage) / 100);
+    const forBars = proposalType.includes("OPTIMISTIC")
+      ? 0
+      : Math.round((totalBars * forPercentage) / 100);
     const againstBars = Math.round((totalBars * againstPercentage) / 100);
     const abstainBars = totalBars - forBars - againstBars;
 
