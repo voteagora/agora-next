@@ -31,7 +31,7 @@ export const VotesGroupTable: React.FC<VotesGroupTableProps> = ({
       {/* Header */}
       <div className="inline-flex justify-between items-center font-semibold uppercase leading-none text-tertiary text-[9px]">
         <div className="text-[9px]">Group</div>
-        <div className="flex justify-between items-center">
+        <div className="contents lg:flex justify-between items-center">
           {columns.map((column) => (
             <div
               key={column.key}
@@ -49,12 +49,14 @@ export const VotesGroupTable: React.FC<VotesGroupTableProps> = ({
           key={index}
           className="self-stretch inline-flex justify-between items-center font-semibold"
         >
-          <div className="text-primary text-xs leading-none">{group.name}</div>
-          <div className="flex justify-between items-center">
+          <div className="text-primary text-xs leading-none min-w-[60px]">
+            {group.name}
+          </div>
+          <div className="contents lg:flex justify-between items-center">
             {columns.map((column) => (
               <div
                 key={column.key}
-                className={`flex justify-end items-center ${column.width || "w-[60px]"}`}
+                className={`flex justify-center lg:justify-end items-center ${column.width || "w-[60px]"}`}
               >
                 <div
                   className={`text-xs leading-tight ${column.textColorClass || "text-primary"}`}
