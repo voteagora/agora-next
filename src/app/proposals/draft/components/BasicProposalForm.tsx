@@ -212,7 +212,7 @@ const BasicProposalForm = () => {
       <div>
         <h3 className="text-primary font-semibold">Signal vote</h3>
         <p className="mt-2 text-tertiary">
-          This is a signal vote that doesn't execute any transactions.
+          This is a signal vote that doesn&apos;t execute any transactions.
         </p>
       </div>
     );
