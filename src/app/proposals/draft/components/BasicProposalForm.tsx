@@ -75,6 +75,8 @@ const BasicProposalForm = () => {
   const { control, setValue, getValues, formState, trigger, watch } =
     useFormContext<FormType>();
 
+  const isSignalVote = watch("isSignalVote");
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: "transactions",
@@ -203,6 +205,17 @@ const BasicProposalForm = () => {
 
   const isSimulationButtonEnabled =
     allTransactionFieldsValid && (formDirty || !allFieldsValid);
+
+  if (isSignalVote) {
+    return (
+      <div>
+        <h3 className="text-primary font-semibold">Signal vote</h3>
+        <p className="mt-2 text-tertiary">
+          This is a signal vote that doesn't execute any transactions.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
