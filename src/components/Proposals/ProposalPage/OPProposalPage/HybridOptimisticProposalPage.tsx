@@ -1,0 +1,27 @@
+import ProposalDescription from "../ProposalDescription/ProposalDescription";
+import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
+import HybridOptimisticProposalVotesCard from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/HybridOptimisticProposalVotesCard";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import OffChainOptimisticProposalVotesCard from "./ProposalVotesCard/OffChainOptimisticProposalVotesCard";
+
+export default async function HybridOptimisticProposalPage({
+  proposal,
+}: {
+  proposal: Proposal;
+}) {
+  return (
+    <div className="flex flex-col">
+      <ProposalStateAdmin proposal={proposal} />
+      <div className="flex gap-16 justify-between items-start max-w-[76rem] flex-col md:flex-row md:items-start md:justify-between">
+        <ProposalDescription proposal={proposal} />
+        <div>
+          {proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED" ? (
+            <HybridOptimisticProposalVotesCard proposal={proposal} />
+          ) : (
+            <OffChainOptimisticProposalVotesCard proposal={proposal} />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

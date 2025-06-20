@@ -6,17 +6,23 @@ export default function BlockScanUrls({
   hash1,
   hash2,
   className,
+  isEas,
 }: {
-  hash1: string | undefined;
-  hash2?: string | undefined;
+  hash1: string | undefined | null;
+  hash2?: string | undefined | null;
   className?: string | undefined;
+  isEas?: boolean;
 }) {
+  if (!hash1 && !hash2) {
+    return null;
+  }
+
   return (
     <div className={cn("pt-4 text-xs text-secondary", className)}>
       {hash2 && hash1 ? (
         <div className="flex items-center">
           <a
-            href={getBlockScanUrl(hash1)}
+            href={getBlockScanUrl(hash1, isEas)}
             target="_blank"
             rel="noreferrer noopener"
             className="flex items-center justify-center hover:underline"
@@ -25,7 +31,7 @@ export default function BlockScanUrls({
             <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-2" />
           </a>
           <a
-            href={getBlockScanUrl(hash2)}
+            href={getBlockScanUrl(hash2, isEas)}
             target="_blank"
             rel="noreferrer noopener"
             className="flex items-center justify-center hover:underline"
@@ -36,7 +42,7 @@ export default function BlockScanUrls({
         </div>
       ) : (
         <a
-          href={getBlockScanUrl(hash1 || hash2 || "")}
+          href={getBlockScanUrl(hash1 || hash2 || "", isEas)}
           target="_blank"
           rel="noreferrer noopener"
           className="flex flex-row items-center w-full hover:underline"

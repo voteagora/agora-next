@@ -129,6 +129,7 @@ export type Proposal = {
   markdowntitle: string;
   description: string | null;
   quorum: bigint | null;
+  votableSupply?: bigint | null; // Added votableSupply property to match Python implementation
   approvalThreshold: bigint | null;
   proposalData: ParsedProposalData[ProposalType]["kind"];
   unformattedProposalData: `0x${string}` | null | any;
@@ -138,4 +139,5 @@ export type Proposal = {
   createdTransactionHash: string | null;
   cancelledTransactionHash: string | null;
   executedTransactionHash: string | null;
+  offchainProposalId?: string;
 };

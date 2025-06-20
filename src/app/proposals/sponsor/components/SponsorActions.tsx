@@ -2,7 +2,12 @@ import BasicProposalAction from "./BasicProposalAction";
 import SocialProposalAction from "./SocialProposalAction";
 import ApprovalProposalAction from "./ApprovalProposalAction";
 import OptimisticProposalAction from "./OptimisticProposalAction";
-import { DraftProposal, ProposalType } from "../../../proposals/draft/types";
+import {
+  DraftProposal,
+  ProposalScope,
+  ProposalType,
+} from "../../../proposals/draft/types";
+import OffchainProposalAction from "./OffchainProposalAction";
 
 const SponsorActions = ({
   draftProposal,
@@ -10,6 +15,13 @@ const SponsorActions = ({
   draftProposal: DraftProposal;
 }) => {
   const renderAction = (proposal: DraftProposal) => {
+    const proposal_scope = proposal.proposal_scope;
+    if (
+      proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
+      !!draftProposal.onchain_transaction_hash
+    ) {
+      return <OffchainProposalAction draftProposal={proposal} />;
+    }
     switch (proposal.voting_module_type) {
       case ProposalType.BASIC:
         return <BasicProposalAction draftProposal={proposal} />;

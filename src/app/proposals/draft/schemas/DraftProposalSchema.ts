@@ -6,6 +6,7 @@ import {
   SocialProposalType,
   ApprovalProposalType,
   EthereumAddress,
+  ProposalScope,
 } from "../types";
 
 const ethereumAddressSchema = z
@@ -75,7 +76,7 @@ const socialProposal = z
 const approvalProposal = z
   .object({
     criteria: z.nativeEnum(ApprovalProposalType),
-    budget: z.string().min(1, { message: "Budget cannot be empty" }),
+    budget: z.string().optional(),
     maxOptions: z.string().optional(),
     threshold: z.string().optional(),
     topChoices: z
@@ -139,6 +140,10 @@ const BaseProposalSchema = z.object({
   abstract: z.string().min(1, { message: "Description cannot be empty" }),
   simulation_state: z.string().optional(), // unconfirmed, valid, invalid
   simulation_id: z.string().optional(),
+  proposal_scope: z.nativeEnum(ProposalScope).optional(),
+  tiers_enabled: z.boolean().optional(),
+  tiers: z.array(z.number()).optional(),
+  calculationOptions: z.number().optional(),
 });
 
 export const BasicProposalSchema = BaseProposalSchema.extend({

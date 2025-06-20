@@ -43,9 +43,9 @@ type CastVoteContextType = {
   fallbackToStandardVote: boolean;
   setFallbackToStandardVote: Dispatch<SetStateAction<boolean>>;
   data: Partial<{
-    standardTxHash: string;
-    advancedTxHash: string;
-    sponsoredVoteTxHash: string;
+    standardTxHash: string | null;
+    advancedTxHash: string | null;
+    sponsoredVoteTxHash: string | null;
   }>;
 };
 
@@ -158,21 +158,21 @@ const CastVoteContextProvider = ({
     weight: votingPower?.directVP || votingPower?.advancedVP || "0",
   };
 
-  const { againstPercentage, forPercentage, endsIn } =
-    calculateVoteMetadataMinified({
-      proposal,
-      votableSupply: votableSupply,
-      newVote,
-    });
+  // const { againstPercentage, forPercentage, endsIn } =
+  //   calculateVoteMetadataMinified({
+  //     proposal,
+  //     votableSupply: votableSupply,
+  //     newVote,
+  //   });
 
   const openShareVoteDialog = useEffectEvent(() => {
     openDialog({
       className: "sm:w-[32rem]",
       type: "SHARE_VOTE",
       params: {
-        againstPercentage: againstPercentage,
-        forPercentage: forPercentage,
-        endsIn: endsIn,
+        againstPercentage: 0,
+        forPercentage: 0,
+        endsIn: "",
         blockNumber: null,
         voteDate: null,
         supportType: support || "ABSTAIN",

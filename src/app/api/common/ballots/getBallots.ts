@@ -155,7 +155,7 @@ async function getR5Ballot({
     return {
       address: ballot.address,
       round_id: ballot.round,
-      status: "PROJECT RANKING",
+      status: "APP RANKING",
       budget: ballot.budget,
       project_allocations: parseProjectAllocations(ballot.project_allocations),
       category_allocations: ballot.category_allocations,

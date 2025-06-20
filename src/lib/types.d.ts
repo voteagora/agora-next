@@ -121,6 +121,7 @@ export enum ANALYTICS_EVENT_NAMES {
   WALLET_CONNECTED = "wallet_connected",
   DELEGATE_PAGE_VIEW_WITH_WALLET = "delegate_page_view_with_wallet",
   CITIZENS_PAGE_VIEW_WITH_WALLET = "citizens_page_view_with_wallet",
+  CREATE_OFFCHAIN_PROPOSAL = "CREATE_OFFCHAIN_PROPOSAL",
 }
 
 export type AnalyticsEvent =
@@ -217,6 +218,12 @@ export type AnalyticsEvent =
       event_data: {
         address: `0x${string}`;
       };
+    }
+  | {
+      event_name: ANALYTICS_EVENT_NAMES.CREATE_OFFCHAIN_PROPOSAL;
+      event_data: {
+        proposal_id: string;
+      };
     };
 
 export type ScopeData = {
@@ -258,7 +265,11 @@ export type ProposalType =
   | "APPROVAL"
   | "OPTIMISTIC"
   | "SNAPSHOT"
+  | "OFFCHAIN_OPTIMISTIC_TIERED"
+  | "OFFCHAIN_OPTIMISTIC"
   | "OFFCHAIN_STANDARD"
   | "OFFCHAIN_APPROVAL"
-  | "OFFCHAIN_OPTIMISTIC"
-  | "OFFCHAIN_OPTIMISTIC_TIERED";
+  | "HYBRID_STANDARD"
+  | "HYBRID_APPROVAL"
+  | "HYBRID_OPTIMISTIC"
+  | "HYBRID_OPTIMISTIC_TIERED";

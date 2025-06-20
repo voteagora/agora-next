@@ -37,7 +37,9 @@ const SUPPORT_TO_ICON: Record<Support, React.ReactNode> = {
 export function ProposalSingleVote({ vote }: { vote: Vote }) {
   const { address: connectedAddress } = useAccount();
   const [hovered, setHovered] = useState(false);
-  const [hash1, hash2] = vote.transactionHash.split("|");
+  const [hash1, hash2] = vote.transactionHash?.split("|") || [];
+
+  const isOffchainVote = vote.proposalType.startsWith("OFFCHAIN");
 
   const { data } = useEnsName({
     chainId: 1,
@@ -117,6 +119,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                         <TokenAmountDecorated
                           amount={vote.weight}
                           hideCurrency
+                          decimals={isOffchainVote ? 0 : undefined}
                           specialFormatting
                           className={
                             fontMapper[ui?.customization?.tokenAmountFont || ""]
@@ -127,7 +130,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="p-4">
-                      {`${formatNumber(vote.weight, token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
+                      {`${formatNumber(vote.weight, isOffchainVote ? 0 : token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

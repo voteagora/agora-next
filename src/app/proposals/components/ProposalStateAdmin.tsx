@@ -17,6 +17,7 @@ import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
 import { AgoraOptimismGovCancel } from "@/app/proposals/components/AgoraOptimismGovCancel";
 import { AgoraOptimismGovQueue } from "@/app/proposals/components/AgoraOptimismGovQueue";
 import { AgoraOptimismGovExecute } from "@/app/proposals/components/AgoraOptimismGovExecute";
+import { OffchainCancel } from "@/app/proposals/components/OffchainCancel";
 
 interface Props {
   proposal: Proposal;
@@ -77,11 +78,17 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
             proposal.proposalType === "STANDARD"
           ) {
             return "This proposal is now passed and can be queued for execution.";
-          } else if (proposal.proposalType === "OPTIMISTIC") {
+          } else if (
+            proposal.proposalType === "OPTIMISTIC" ||
+            proposal.proposalType?.startsWith("OFFCHAIN")
+          ) {
             // No banner for Optimistic proposals.
             return null;
           }
           return "This proposal can still be cancelled by the admin.";
+        }
+        if (proposal.proposalType?.startsWith("OFFCHAIN")) {
+          return null;
         }
         // If succeeded but not Optimism, then proceed to queue
         return "This proposal is now passed and can be queued for execution.";
@@ -151,8 +158,14 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.B3:
       return (
         <div className="flex flex-row gap-2">
-          <AgoraGovCancel proposal={proposal} />
-          <AgoraGovQueue proposal={proposal} />
+          {proposal.proposalType?.startsWith("OFFCHAIN") ? (
+            <OffchainCancel proposal={proposal} />
+          ) : (
+            <>
+              <AgoraGovCancel proposal={proposal} />
+              <AgoraGovQueue proposal={proposal} />
+            </>
+          )}
         </div>
       );
 
@@ -173,14 +186,24 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
       ) {
         return (
           <div className="flex flex-row gap-2">
-            <AgoraOptimismGovCancel proposal={proposal} />
-            <AgoraOptimismGovQueue proposal={proposal} />
+            {proposal.proposalType?.startsWith("OFFCHAIN") ? (
+              <OffchainCancel proposal={proposal} />
+            ) : (
+              <>
+                <AgoraOptimismGovCancel proposal={proposal} />
+                <AgoraOptimismGovQueue proposal={proposal} />
+              </>
+            )}
           </div>
         );
       } else if (proposal.proposalType === "OPTIMISTIC") {
         return null;
       } else {
-        return <AgoraOptimismGovCancel proposal={proposal} />;
+        return proposal.proposalType?.startsWith("OFFCHAIN") ? (
+          <OffchainCancel proposal={proposal} />
+        ) : (
+          <AgoraOptimismGovCancel proposal={proposal} />
+        );
       }
 
     case TENANT_NAMESPACES.UNISWAP:
@@ -205,8 +228,14 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.B3:
       return (
         <div className="flex flex-row gap-2">
-          <AgoraGovCancel proposal={proposal} />
-          <AgoraGovExecute proposal={proposal} />
+          {proposal.proposalType?.startsWith("OFFCHAIN") ? (
+            <OffchainCancel proposal={proposal} />
+          ) : (
+            <>
+              <AgoraGovCancel proposal={proposal} />
+              <AgoraGovExecute proposal={proposal} />
+            </>
+          )}
         </div>
       );
 
@@ -223,8 +252,14 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
 
       return (
         <div className="flex flex-row gap-2">
-          <AgoraOptimismGovCancel proposal={proposal} />
-          <AgoraOptimismGovExecute proposal={proposal} />
+          {proposal.proposalType?.startsWith("OFFCHAIN") ? (
+            <OffchainCancel proposal={proposal} />
+          ) : (
+            <>
+              <AgoraOptimismGovCancel proposal={proposal} />
+              <AgoraOptimismGovExecute proposal={proposal} />
+            </>
+          )}
         </div>
       );
 
@@ -248,10 +283,18 @@ const activeStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.LINEA:
     case TENANT_NAMESPACES.B3:
-      return <AgoraGovCancel proposal={proposal} />;
+      return proposal.proposalType?.startsWith("OFFCHAIN") ? (
+        <OffchainCancel proposal={proposal} />
+      ) : (
+        <AgoraGovCancel proposal={proposal} />
+      );
 
     case TENANT_NAMESPACES.OPTIMISM:
-      return <AgoraOptimismGovCancel proposal={proposal} />;
+      return proposal.proposalType?.startsWith("OFFCHAIN") ? (
+        <OffchainCancel proposal={proposal} />
+      ) : (
+        <AgoraOptimismGovCancel proposal={proposal} />
+      );
 
     case TENANT_NAMESPACES.ENS:
       // Cancelling proposals is not supported for ENS

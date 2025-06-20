@@ -47,6 +47,7 @@ async function getNeedsMyVoteProposals(address: string) {
                  AND CAST(end_block AS INTEGER) > $1`
           }
             AND cancelled_block IS NULL
+            AND proposal_type NOT LIKE '%OFFCHAIN%'
             ${prodDataOnly}
         ) AS p
         LEFT JOIN ${
