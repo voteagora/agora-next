@@ -290,7 +290,7 @@ export function parseOffChainProposalResults(
       const result = {
         key: proposalType,
         kind: {
-          PROJECT: processTallySource(tallyData?.PROJECT),
+          APP: processTallySource(tallyData?.APP),
           USER: processTallySource(tallyData?.USER),
           CHAIN: processTallySource(tallyData?.CHAIN),
         },
@@ -298,15 +298,15 @@ export function parseOffChainProposalResults(
 
       if (proposalType === "OFFCHAIN_STANDARD") {
         const allForVotes =
-          result.kind.PROJECT.for +
+          result.kind.APP.for +
           result.kind.USER.for +
           result.kind.CHAIN.for;
         const allAgainstVotes =
-          result.kind.PROJECT.against +
+          result.kind.APP.against +
           result.kind.USER.against +
           result.kind.CHAIN.against;
         const allAbstainVotes =
-          result.kind.PROJECT.abstain +
+          result.kind.APP.abstain +
           result.kind.USER.abstain +
           result.kind.CHAIN.abstain;
         return {
@@ -351,7 +351,7 @@ export function parseOffChainProposalResults(
       const result = {
         key: proposalType,
         kind: {
-          PROJECT: processApprovalTallySource(tallyData?.PROJECT),
+          APP: processApprovalTallySource(tallyData?.APP),
           USER: processApprovalTallySource(tallyData?.USER),
           CHAIN: processApprovalTallySource(tallyData?.CHAIN),
         },
@@ -394,7 +394,7 @@ export function parseOffChainProposalResults(
       const result = {
         key: proposalType,
         kind: {
-          PROJECT: processTallySource(tallyData?.PROJECT),
+          APP: processTallySource(tallyData?.APP),
           USER: processTallySource(tallyData?.USER),
           CHAIN: processTallySource(tallyData?.CHAIN),
         },
@@ -404,11 +404,11 @@ export function parseOffChainProposalResults(
         proposalType === "OFFCHAIN_OPTIMISTIC"
       ) {
         const allForVotes =
-          result.kind.PROJECT.for +
+          result.kind.APP.for +
           result.kind.USER.for +
           result.kind.CHAIN.for;
         const allAgainstVotes =
-          result.kind.PROJECT.against +
+          result.kind.APP.against +
           result.kind.USER.against +
           result.kind.CHAIN.against;
 
