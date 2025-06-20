@@ -65,7 +65,7 @@ const formDataByType = (
         threshold: data.approvalProposal.threshold
           ? parseInt(data.approvalProposal.threshold)
           : null,
-        budget: parseInt(data.approvalProposal.budget),
+        budget: parseInt(data.approvalProposal.budget ?? "0"),
         max_options: data.approvalProposal.maxOptions
           ? parseInt(data.approvalProposal.maxOptions)
           : null,
@@ -131,6 +131,10 @@ export async function onSubmitAction(
       abstract: parsed.data.abstract,
       voting_module_type: parsed.data.type,
       proposal_type: parsed.data.proposalConfigType,
+      min_participation: parsed.data.minParticipation
+        ? parseInt(parsed.data.minParticipation)
+        : null,
+      is_signal_vote: Boolean(parsed.data.isSignalVote),
     };
 
     const updateDraft = prismaWeb2Client.proposalDraft.update({

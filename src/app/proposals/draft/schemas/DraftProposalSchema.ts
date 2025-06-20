@@ -75,8 +75,9 @@ const socialProposal = z
 const approvalProposal = z
   .object({
     criteria: z.nativeEnum(ApprovalProposalType),
-    budget: z.string().min(1, { message: "Budget cannot be empty" }),
+    budget: z.string().optional(),
     maxOptions: z.string().optional(),
+    minParticipation: z.string().optional(),
     threshold: z.string().optional(),
     topChoices: z
       .string()
@@ -139,6 +140,8 @@ const BaseProposalSchema = z.object({
   abstract: z.string().min(1, { message: "Description cannot be empty" }),
   simulation_state: z.string().optional(), // unconfirmed, valid, invalid
   simulation_id: z.string().optional(),
+  minParticipation: z.string().optional(),
+  isSignalVote: z.boolean().optional(),
 });
 
 export const BasicProposalSchema = BaseProposalSchema.extend({

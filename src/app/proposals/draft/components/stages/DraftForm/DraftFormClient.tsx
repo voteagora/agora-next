@@ -25,6 +25,7 @@ import SocialProposalForm from "../../SocialProposalForm";
 import ApprovalProposalForm from "../../ApprovalProposalForm";
 import OptimisticProposalForm from "../../OptimisticProposalForm";
 import SwitchInput from "../../form/SwitchInput";
+import CheckboxInput from "../../form/CheckboxInput";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import {
@@ -34,6 +35,11 @@ import {
 import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
 import { ScopeDetails } from "@/components/Admin/ScopeDetails";
 import { FormattedProposalType } from "@/lib/types";
+import NumberInput from "../../form/NumberInput";
+import { GOVERNOR_TYPE } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
+
+const { contracts } = Tenant.current();
 
 const DEFAULT_FORM = {
   type: ProposalType.BASIC,
@@ -46,6 +52,8 @@ const DEFAULT_FORM = {
     end_date: undefined,
     options: [],
   },
+  budget: 0,
+  isSignalVote: true,
 };
 
 const getValidProposalTypesForVotingType = (
@@ -259,6 +267,23 @@ const DraftFormClient = ({
                 required={true}
                 name="abstract"
               />
+              {contracts.governorType === GOVERNOR_TYPE.AGORA_20 && (
+                <>
+                  <NumberInput
+                    required={false}
+                    label="Min participation"
+                    name="minParticipation"
+                    control={methods.control}
+                    tooltip="Minimum number of participants required for the proposal to be valid."
+                  />
+                  <CheckboxInput
+                    control={methods.control}
+                    label="Signal vote"
+                    name="isSignalVote"
+                    tooltip="Whether this proposal is a signal vote that doesn't execute any transactions."
+                  />
+                </>
+              )}
             </div>
           </FormCard.Section>
           <FormCard.Section>

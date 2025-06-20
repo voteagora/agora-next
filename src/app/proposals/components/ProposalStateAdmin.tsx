@@ -37,6 +37,7 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
     (namespace === TENANT_NAMESPACES.CYBER ||
       namespace === TENANT_NAMESPACES.XAI ||
       namespace === TENANT_NAMESPACES.DEMO ||
+      namespace === TENANT_NAMESPACES.WORLD ||
       namespace === TENANT_NAMESPACES.SCROLL ||
       namespace === TENANT_NAMESPACES.OPTIMISM ||
       namespace === TENANT_NAMESPACES.DERIVE ||
@@ -146,6 +147,7 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.WORLD:
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.LINEA:
     case TENANT_NAMESPACES.B3:
@@ -200,6 +202,7 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.WORLD:
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.LINEA:
     case TENANT_NAMESPACES.B3:
@@ -245,6 +248,7 @@ const activeStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.WORLD:
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.LINEA:
     case TENANT_NAMESPACES.B3:

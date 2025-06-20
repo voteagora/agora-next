@@ -118,6 +118,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
       );
 
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.WORLD:
       return (
         <svg
           width="80"
@@ -1073,6 +1074,7 @@ export const ogLogoForShareVote = (namespace: TenantNamespace) => {
         </svg>
       );
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.WORLD:
       return (
         <div tw="flex w-[80px] h-[80px]">
           <svg

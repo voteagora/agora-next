@@ -7,10 +7,15 @@ import Hero from "@/components/Hero/Hero";
 
 export const dynamic = "force-dynamic"; //nuqs does not consider params changes for filters otherwise
 
-export async function generateMetadata({}, parent) {
+export async function generateMetadata({}, parent: any) {
   const { ui } = Tenant.current();
-  const page = ui.page("delegates");
-  const { title, description, imageTitle, imageDescription } = page.meta;
+  const page = ui.toggle("delegates")?.enabled ? ui.page("delegates") : null;
+  const { title, description, imageTitle, imageDescription } = page?.meta ?? {
+    title: "Delegates",
+    description: "Delegates",
+    imageTitle: "Delegates",
+    imageDescription: "Delegates",
+  };
 
   const preview = `/api/images/og/delegates?title=${encodeURIComponent(
     imageTitle
@@ -36,7 +41,13 @@ export async function generateMetadata({}, parent) {
   };
 }
 
-export default async function Page({ searchParams }) {
+export default async function Page({ searchParams }: { searchParams: any }) {
+  const { ui } = Tenant.current();
+  if (!ui.toggle("delegates")?.enabled) {
+    return (
+      <div className="text-primary">Route not supported for namespace</div>
+    );
+  }
   return (
     <section>
       <Hero page="delegates" />
