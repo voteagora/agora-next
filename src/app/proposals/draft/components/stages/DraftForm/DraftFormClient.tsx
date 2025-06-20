@@ -37,8 +37,11 @@ import { FormattedProposalType } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSettings";
 import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
-export const ProposalTypeMetadata = {
+const { ui, namespace } = Tenant.current();
+
+const ProposalTypeMetadata = {
   [ProposalType.SOCIAL]: {
     title: "Social Proposal",
     description: "A proposal that resolves via a snapshot vote.",
@@ -46,7 +49,7 @@ export const ProposalTypeMetadata = {
   [ProposalType.BASIC]: {
     title: "Basic Proposal",
     description:
-      Tenant.current().namespace === "optimism"
+      namespace === "optimism"
         ? "Voters are asked to vote for, against, or abstain. The proposal passes if the for votes exceed quorum AND if the for votes exceed the approval threshold."
         : "Voters are asked to vote for, against, or abstain. The proposal passes if the abstain and for votes exceeed quorum AND if the for votes exceed the approval threshold.",
   },
@@ -65,6 +68,23 @@ export const ProposalTypeMetadata = {
     title: string;
     description: string;
   };
+};
+
+const getProposalMetadataDescription = (
+  proposalType: ProposalType,
+  includeAbstain = true
+) => {
+  if (
+    proposalType === ProposalType.BASIC &&
+    namespace === TENANT_NAMESPACES.OPTIMISM
+  ) {
+    if (!includeAbstain) {
+      return "Voters are asked to vote for, against, or abstain. The proposal passes if the for votes exceed quorum AND if the for votes, relative to the total votes, exceed the approval threshold. ⚠️ This option is currently not supported by the governor contract. This warning can be ignored (and will be removed) after the governor contract is upgraded. ⚠️";
+    } else {
+      return "Voters are asked to vote for, against, or abstain. The proposal passes if the for and abstain votes exceed quorum AND if the for votes, relative to the total votes, exceed the approval threshold. This option is currently supported by the governor contract.";
+    }
+  }
+  return ProposalTypeMetadata[proposalType].description;
 };
 
 const DEFAULT_FORM = {
@@ -142,8 +162,6 @@ const getValidProposalTypesForVotingType = (
   }
 };
 
-const { ui } = Tenant.current();
-
 const offchainProposals = ui.toggle("proposals/offchain")?.enabled;
 
 const DraftFormClient = ({
@@ -170,6 +188,7 @@ const DraftFormClient = ({
 
   const votingModuleType = watch("type");
   const proposalTypeId = watch("proposalConfigType");
+  const calculationOptions = watch("calculationOptions");
   const enabledProposalTypesFromConfigAndAPI = useMemo(
     () => getProposalTypeMetaDataForTenant(proposalTypes),
     [proposalTypes]
@@ -246,7 +265,10 @@ const DraftFormClient = ({
                   />
 
                   <p className="text-sm self-center text-agora-stone-700 mt-6">
-                    {ProposalTypeMetadata[votingModuleType].description}
+                    {getProposalMetadataDescription(
+                      votingModuleType,
+                      calculationOptions === 0
+                    )}
                   </p>
                 </div>
               )}
