@@ -342,7 +342,10 @@ export function calculateVoteMetadata({
     const metrics = calculateHybridApprovalProposalMetrics(proposal);
     boundedForPercentage = metrics.totalWeightedParticipation;
     boundedAgainstPercentage = 0; // Approval proposals don't typically show against percentage
-  } else if (proposal.proposalType === "HYBRID_OPTIMISTIC" || proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED") {
+  } else if (
+    proposal.proposalType === "HYBRID_OPTIMISTIC" ||
+    proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
+  ) {
     const metrics = calculateHybridOptimisticProposalMetrics(proposal);
     boundedForPercentage = 0; // Optimistic proposals don't show for percentage
     boundedAgainstPercentage = metrics.totalAgainstVotes;
@@ -408,10 +411,7 @@ export function calculateVoteMetadata({
 
     // Ensure percentages are within bounds
     boundedForPercentage = Math.min(Math.max(forPercentage, 0), 100);
-    boundedAgainstPercentage = Math.min(
-      Math.max(againstPercentage, 0),
-      100
-    );
+    boundedAgainstPercentage = Math.min(Math.max(againstPercentage, 0), 100);
   }
 
   let parsedOptions: {
@@ -447,16 +447,23 @@ export function calculateVoteMetadata({
     if (proposal.proposalType === "HYBRID_APPROVAL") {
       // Use weighted calculations for hybrid approval
       const metrics = calculateHybridApprovalProposalMetrics(proposal);
-      totalVotingPower = BigInt(Math.round(metrics.totalWeightedParticipation * 10000)); // Convert to scaled format
-      
+      totalVotingPower = BigInt(
+        Math.round(metrics.totalWeightedParticipation * 10000)
+      ); // Convert to scaled format
+
       thresholdPosition = (() => {
         if (proposalSettings.criteria === "THRESHOLD") {
-          const thresholdPercentage = Number(proposalSettings.criteriaValue) / 100;
+          const thresholdPercentage =
+            Number(proposalSettings.criteriaValue) / 100;
           if (metrics.totalWeightedParticipation < thresholdPercentage * 1.5) {
             return 66;
           } else {
             return metrics.totalWeightedParticipation > 0
-              ? Math.max((thresholdPercentage / metrics.totalWeightedParticipation) * 100, 5)
+              ? Math.max(
+                  (thresholdPercentage / metrics.totalWeightedParticipation) *
+                    100,
+                  5
+                )
               : 5;
           }
         }
@@ -481,7 +488,10 @@ export function calculateVoteMetadata({
           } else {
             // calculate threshold position, min 5% max 66%
             return totalVotingPower
-              ? Math.max(Number((threshold * BigInt(100)) / totalVotingPower), 5)
+              ? Math.max(
+                  Number((threshold * BigInt(100)) / totalVotingPower),
+                  5
+                )
               : 5;
           }
         }
@@ -502,9 +512,10 @@ export function calculateVoteMetadata({
         .map((option, i) => ({
           ...option,
           ...proposalData.options[i],
-          weightedPercentage: metrics.optionResults.find(
-            (result) => result.optionName === option.option
-          )?.weightedPercentage || 0,
+          weightedPercentage:
+            metrics.optionResults.find(
+              (result) => result.optionName === option.option
+            )?.weightedPercentage || 0,
         }))
         .sort((a, b) => b.weightedPercentage - a.weightedPercentage);
     } else {
@@ -579,7 +590,7 @@ export function calculateVoteMetadata({
               votesAmountBN >= threshold &&
               availableBudget >= optionBudget;
           }
-          
+
           if (isApproved) {
             availableBudget = availableBudget - optionBudget;
           } else {
