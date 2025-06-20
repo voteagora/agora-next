@@ -41,7 +41,7 @@ export default function HybridOptionsResultsPanel({
   const criteriaValue = BigInt(100000);
   const proposalResults = proposal.proposalResults as unknown as {
     options: { option: string; votes: bigint }[];
-    PROJECT: Record<string, bigint>;
+    APP: Record<string, bigint>;
     USER: Record<string, bigint>;
     CHAIN: Record<string, bigint>;
     DELEGATES?: Record<string, bigint>;
@@ -283,7 +283,7 @@ function SingleOption({
   const voteGroups = [
     getVoteData("DELEGATES", "Delegates", HYBRID_VOTE_WEIGHTS.delegates),
     getVoteData("CHAIN", "Chains", HYBRID_VOTE_WEIGHTS.chains),
-    getVoteData("PROJECT", "Apps", HYBRID_VOTE_WEIGHTS.apps),
+    getVoteData("APP", "Apps", HYBRID_VOTE_WEIGHTS.apps),
     getVoteData("USER", "Users", HYBRID_VOTE_WEIGHTS.users),
   ];
 
