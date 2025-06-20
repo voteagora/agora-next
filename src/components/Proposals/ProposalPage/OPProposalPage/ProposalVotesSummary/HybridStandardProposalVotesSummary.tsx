@@ -36,10 +36,10 @@ const HybridStandardVotesGroup = ({ proposal }: { proposal: Proposal }) => {
       weight: (categoryWeight * 100).toFixed(2),
     },
     {
-      name: "Apps", // Corresponds to PROJECT in offchainResults
-      forVotes: proposalResults.PROJECT.for || "0",
-      againstVotes: proposalResults.PROJECT.against || "0",
-      abstainVotes: proposalResults.PROJECT.abstain || "0",
+      name: "Apps", // Corresponds to APP in offchainResults
+      forVotes: proposalResults.APP.for || "0",
+      againstVotes: proposalResults.APP.against || "0",
+      abstainVotes: proposalResults.APP.abstain || "0",
       weight: (categoryWeight * 100).toFixed(2),
     },
     {

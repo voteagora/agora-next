@@ -49,7 +49,7 @@ const OffChainOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
     },
     {
       name: "Apps",
-      againstVotes: proposalResults?.PROJECT?.against || "0",
+      againstVotes: proposalResults?.APP?.against || "0",
       votePercentage:
         groupTallies
           .find((g) => g.name === "apps")

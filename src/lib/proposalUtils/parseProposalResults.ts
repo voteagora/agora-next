@@ -358,11 +358,11 @@ export function parseOffChainProposalResults(
       };
       if (proposalType === "OFFCHAIN_APPROVAL") {
         const allForVotes =
-          result.kind.PROJECT.for +
+          result.kind.APP.for +
           result.kind.USER.for +
           result.kind.CHAIN.for;
         const allAgainstVotes =
-          result.kind.PROJECT.against +
+          result.kind.APP.against +
           result.kind.USER.against +
           result.kind.CHAIN.against;
 
