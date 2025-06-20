@@ -1,5 +1,5 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
-import demoHero from "@/assets/tenant/demo_hero.png";
+import WorldHero from "@/assets/tenant/world_hero.svg";
 import WorldLogo from "@/assets/tenant/world_logo.svg";
 import demoDelegate from "@/assets/tenant/demo_delegate.svg";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
@@ -32,7 +32,7 @@ export const worldTenantUIConfig = new TenantUI({
     primary: "51 49 46",
     secondary: "132 131 130",
     tertiary: "173 172 172",
-    neutral: "236 236 236",
+    neutral: "248 248 247",
     wash: "252 251 247",
     line: "214 214 213",
     positive: "0 171 72",
@@ -57,9 +57,9 @@ export const worldTenantUIConfig = new TenantUI({
     {
       route: "/",
       title: "Welcome to World governance",
-      hero: demoHero,
+      hero: WorldHero,
       description:
-        "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
+        "World Foundation serves as the steward of World, supporting and growing the network's self-sufficiency. Aiming for a inclusive, fair and just governance.",
       meta: {
         title: "Welcome to World governance",
         description: "Home of token governance",
@@ -71,8 +71,8 @@ export const worldTenantUIConfig = new TenantUI({
       route: "proposals",
       title: "Welcome to World governance",
       description:
-        "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
-      hero: demoHero,
+        "World Foundation serves as the steward of World, supporting and growing the network's self-sufficiency. Aiming for a inclusive, fair and just governance.",
+      hero: WorldHero,
       meta: {
         title: "Voter on World",
         description: "Delegate your voting power to a trusted representative",
