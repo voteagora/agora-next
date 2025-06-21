@@ -7,9 +7,9 @@ import {
 } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData, keccak256 } from "viem";
 import Tenant from "./tenant/tenant";
-import { Block, toUtf8Bytes } from "ethers";
+import { Block, toUtf8Bytes, formatUnits } from "ethers";
 import { mapArbitrumBlockToMainnetBlock } from "./utils";
-import { TENANT_NAMESPACES } from "./constants";
+import { TENANT_NAMESPACES, disapprovalThreshold } from "./constants";
 import { ProposalType } from "./types";
 
 // Type guards
@@ -1129,4 +1129,47 @@ export function isProposalCreatedBeforeUpgradeCheck(proposal: Proposal) {
     proposal.createdTime &&
     new Date(proposal.createdTime) < new Date("2024-01-08")
   );
+}
+
+/**
+ * Calculates metrics for an optimistic proposal
+ * @param proposal - The proposal to analyze
+ * @param votableSupply - The total votable supply
+ * @returns An object with the calculated metrics:
+ *  - againstRelativeAmount: Percentage of votes against
+ *  - againstLength: Total number of votes against
+ *  - formattedVotableSupply: Formatted votable supply
+ *  - status: Proposal status ('approved' or 'defeated')
+ */
+export function calculateOptimisticProposalMetrics(
+  proposal: Proposal,
+  votableSupply: string
+) {
+  const tokenDecimals = Tenant.current().token.decimals;
+
+  const formattedVotableSupply = Number(
+    BigInt(votableSupply || "0") / BigInt(10 ** tokenDecimals)
+  );
+
+  const proposalResults = proposal.proposalResults as {
+    against?: string;
+  } | null;
+  const againstAmount = proposalResults?.against || "0";
+
+  const againstLength = Number(formatUnits(againstAmount, tokenDecimals));
+
+  const againstRelativeAmount =
+    formattedVotableSupply > 0
+      ? Number(((againstLength / formattedVotableSupply) * 100).toFixed(2))
+      : 0;
+
+  const status =
+    againstRelativeAmount <= disapprovalThreshold ? "approved" : "defeated";
+
+  return {
+    againstRelativeAmount,
+    againstLength,
+    formattedVotableSupply,
+    status,
+  };
 }
