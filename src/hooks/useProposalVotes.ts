@@ -12,6 +12,7 @@ interface Props {
   limit?: number;
   offset?: number;
   proposalId: string;
+  offchainProposalId?: string;
 }
 
 const QK = "votes";
@@ -21,15 +22,21 @@ export const useProposalVotes = ({
   limit,
   offset,
   proposalId,
+  offchainProposalId,
 }: Props) => {
   const { data, isFetching, isFetched } = useQuery({
     enabled: enabled,
     queryKey: [QK, proposalId, offset],
     queryFn: async () => {
-      return (await fetchProposalVotes(proposalId, {
-        limit: limit || 20,
-        offset: offset || 0,
-      })) as PaginatedResult<Vote[]>;
+      return (await fetchProposalVotes(
+        proposalId,
+        {
+          limit: limit || 20,
+          offset: offset || 0,
+        },
+        undefined,
+        offchainProposalId
+      )) as PaginatedResult<Vote[]>;
     },
     staleTime: 60000, // 1 minute cache
   });

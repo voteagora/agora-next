@@ -236,9 +236,11 @@ async function getSnapshotVotesForDelegateForAddress({
 async function getVotersWhoHaveNotVotedForProposal({
   proposalId,
   pagination = { offset: 0, limit: 20 },
+  offchainProposalId,
 }: {
   proposalId: string;
   pagination?: PaginationParams;
+  offchainProposalId?: string;
 }) {
   return withMetrics("getVotersWhoHaveNotVotedForProposal", async () => {
     const { namespace, contracts, slug } = Tenant.current();
@@ -261,16 +263,21 @@ async function getVotersWhoHaveNotVotedForProposal({
                   SELECT voter FROM ${namespace}.${eventsViewName} WHERE proposal_id = $1 and contract = $3
                   UNION ALL
                   SELECT voter FROM "snapshot".votes WHERE proposal_id = $1 and dao_slug = '${slug}'
+                  ${
+                    includeCitizens
+                      ? `
                   UNION ALL
-                  SELECT LOWER("voterAddress") as voter FROM atlas."OffChainVote" WHERE "proposalId" = $1
+                  SELECT LOWER("voterAddress") as voter FROM atlas."OffChainVote" WHERE "proposalId" = ${offchainProposalId ? "$6" : "$1"}`
+                      : ""
+                  }
                 ),
                 relevant_delegates as (
-                  SELECT delegate, voting_power FROM ${namespace}.delegates where contract = $2
+                  SELECT delegate, voting_power, NULL::text as citizen_type FROM ${namespace}.delegates where contract = $2
                   ${
                     includeCitizens
                       ? `
                     UNION
-                    SELECT LOWER(c."address") as delegate, 0 as voting_power 
+                    SELECT LOWER(c."address") as delegate, 0 as voting_power, c."type"::text as citizen_type
                     FROM atlas."Citizen" c
                     LEFT JOIN ${namespace}.delegates d ON LOWER(c."address") = LOWER(d.delegate) AND d.contract = $2
                     WHERE d.delegate IS NULL`
@@ -296,7 +303,8 @@ async function getVotersWhoHaveNotVotedForProposal({
         contracts.token.address.toLowerCase(),
         contracts.governor.address.toLowerCase(),
         skip,
-        take
+        take,
+        offchainProposalId
       );
     };
 
@@ -353,10 +361,12 @@ async function getVotesForProposal({
   proposalId,
   pagination = { offset: 0, limit: 20 },
   sort = "weight",
+  offchainProposalId,
 }: {
   proposalId: string;
   pagination?: PaginationParams;
   sort?: VotesSort;
+  offchainProposalId?: string;
 }): Promise<PaginatedResult<Vote[]>> {
   return withMetrics(
     "getVotesForProposal",
@@ -371,6 +381,8 @@ async function getVotesForProposal({
         eventsViewName = "vote_cast_with_params_events";
       }
 
+      const includeCitizens = namespace === TENANT_NAMESPACES.OPTIMISM;
+
       const queryFunction = (skip: number, take: number) => {
         const query = `
           SELECT
@@ -382,6 +394,7 @@ async function getVotesForProposal({
             reason,
             block_number,
             params,
+            citizen_type,
             description,
             proposal_data,
             proposal_type
@@ -395,7 +408,8 @@ async function getVotesForProposal({
               SUM(weight) as weight,
               STRING_AGG(distinct reason, '\n --------- \n') as reason,
               MAX(block_number) as block_number,
-              params
+              params,
+              citizen_type
             FROM (
               SELECT
                 transaction_hash,
@@ -405,7 +419,8 @@ async function getVotesForProposal({
                 weight::numeric,
                 reason,
                 params,
-                block_number
+                block_number,
+                NULL::text as citizen_type
               FROM ${namespace}.vote_cast_events
               WHERE proposal_id = $1 AND contract = $2
               UNION ALL
@@ -417,23 +432,31 @@ async function getVotesForProposal({
                 weight::numeric,
                 reason,
                 params,
-                block_number
+                block_number,
+                NULL::text as citizen_type
               FROM ${namespace}.${eventsViewName}
               WHERE proposal_id = $1 AND contract = $2
+              ${
+                includeCitizens
+                  ? `
                UNION ALL
               SELECT
                  "transactionHash" as transaction_hash,
                  "proposalId" as proposal_id,
                  "voterAddress" as voter,
-                 1::text as support,
+                 "vote"->>0 as support,
                  1 as weight,
                  NULL as reason,
                  NULL as params,
-                 NULL as block_number
+                 NULL as block_number,
+                 "citizenCategory"::text as citizen_type
                FROM atlas."OffChainVote"
-               WHERE "proposalId" = $1
+               WHERE "proposalId" = ${offchainProposalId ? "$5" : "$1"}
+              `
+                  : ""
+              }
             ) t
-            GROUP BY 2,3,4,8
+            GROUP BY 2,3,4,8,9
             ) av
             LEFT JOIN LATERAL (
               SELECT
@@ -443,7 +466,7 @@ async function getVotesForProposal({
               FROM ${namespace}.proposals_v2 proposals
               WHERE proposals.proposal_id = $1 AND proposals.contract = $2) p ON TRUE
           ) q
-          ORDER BY ${sort} DESC
+          ORDER BY citizen_type IS NOT NULL DESC, ${sort} DESC
           OFFSET $3
           LIMIT $4;`;
 
@@ -452,7 +475,8 @@ async function getVotesForProposal({
           proposalId,
           contracts.governor.address.toLowerCase(),
           skip,
-          take
+          take,
+          offchainProposalId
         );
       };
 
