@@ -302,12 +302,13 @@ export async function getProposalStatus(
     case "HYBRID_APPROVAL": {
       const kind = proposalResults.kind;
 
-      // Use shared utility function for calculating hybrid approval metrics
-      const metrics = calculateHybridApprovalMetrics(
-        kind,
-        Number(quorum!),
-        Number(kind.criteriaValue)
-      );
+      const proposalForMetrics = {
+        proposalResults: kind,
+        quorum: quorum!,
+        approvalThreshold: 0,
+      };
+
+      const metrics = calculateHybridApprovalMetrics(proposalForMetrics, false);
 
       // Check if weighted quorum is met
       if (!metrics.quorumMet) {

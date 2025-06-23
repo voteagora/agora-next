@@ -5,7 +5,7 @@ import {
   TimestampBasedProposal,
   ProposalPayload,
 } from "@/app/api/common/proposals/proposal";
-import { Abi, decodeFunctionData, keccak256 } from "viem";
+import { Abi, decodeFunctionData, keccak256, parseUnits } from "viem";
 import Tenant from "./tenant/tenant";
 import { Block, toUtf8Bytes, formatUnits } from "ethers";
 import { mapArbitrumBlockToMainnetBlock } from "./utils";
@@ -21,6 +21,7 @@ import {
   parseProposalResults,
 } from "./proposalUtils/parseProposalResults";
 import { getProposalStatus } from "./proposalUtils/proposalStatus";
+import { tokenForContractAddress } from "./tokenUtils";
 
 // Type guards
 export function isTimestampBasedProposal(
@@ -1183,6 +1184,7 @@ export function calculateHybridApprovalWeightedPercentage(
 
   weightedOptionPercentage +=
     (delegatesVotes / eligibleVoters.delegates) * weights.delegates;
+
   weightedOptionPercentage += (appsVotes / eligibleVoters.apps) * weights.apps;
   weightedOptionPercentage +=
     (usersVotes / eligibleVoters.users) * weights.users;
@@ -1193,11 +1195,27 @@ export function calculateHybridApprovalWeightedPercentage(
 }
 
 export function calculateHybridApprovalMetrics(
-  proposalResults: any,
-  quorum: number,
-  criteriaValue: string | number
+  proposal: any,
+  includeOptionApprovalData = false
 ) {
-  const quorumThreshold = 0.3;
+  const quorumThreshold = 0.3; // 30% quorum
+
+  // Extract data from proposal object
+  const proposalResults = proposal.proposalResults;
+  const proposalData = proposal.proposalData;
+  const quorum = Number(proposal.quorum);
+
+  // Get criteria value from proposal results (module-level criteria)
+  const criteriaValue =
+    proposalResults?.criteriaValue ||
+    proposalData?.proposalSettings?.criteriaValue ||
+    0;
+
+  // Get governor-level approval threshold if available
+  const governorApprovalThreshold =
+    typeof proposal.approvalThreshold === "bigint"
+      ? Number(proposal.approvalThreshold)
+      : proposal.approvalThreshold || 0;
 
   // Get all option names across all categories
   const optionNames = new Set<string>();
@@ -1214,7 +1232,27 @@ export function calculateHybridApprovalMetrics(
 
   let totalWeightedParticipation = 0;
   let thresholdMet = false;
-  const optionResults = [];
+  const optionResults: Array<{
+    optionName: string;
+    weightedPercentage: number;
+    meetsThreshold: boolean;
+    rawVotes: bigint;
+  }> = [];
+
+  // Sort options to get index for TOP_CHOICES criteria
+  const sortedOptions = Array.from(optionNames).sort((a, b) => {
+    const aWeighted = calculateHybridApprovalWeightedPercentage(
+      a,
+      proposalResults,
+      quorum
+    );
+    const bWeighted = calculateHybridApprovalWeightedPercentage(
+      b,
+      proposalResults,
+      quorum
+    );
+    return bWeighted - aWeighted;
+  });
 
   // Calculate weighted participation and check threshold for each option
   for (const optionName of optionNames) {
@@ -1226,20 +1264,109 @@ export function calculateHybridApprovalMetrics(
 
     totalWeightedParticipation += weightedPercentage;
 
-    const meetsThreshold =
-      proposalResults.criteria === "THRESHOLD" &&
-      weightedPercentage >= Number(criteriaValue) / 100;
+    // Check module-level criteria
+    let meetsModuleCriteria = false;
+    if (proposalResults.criteria === "THRESHOLD") {
+      // Module criteria is in basis points (10000 = 100%)
+      const thresholdPercentage = Number(criteriaValue) / 10000;
+      meetsModuleCriteria = weightedPercentage >= thresholdPercentage;
+    } else if (proposalResults.criteria === "TOP_CHOICES") {
+      const optionIndex = sortedOptions.indexOf(optionName);
+      meetsModuleCriteria = optionIndex < Number(criteriaValue);
+    }
 
-    if (meetsThreshold) {
+    if (meetsModuleCriteria) {
       thresholdMet = true;
     }
 
     optionResults.push({
       optionName,
       weightedPercentage,
-      meetsThreshold,
+      meetsThreshold: meetsModuleCriteria,
       rawVotes: calculateHybridApprovalOptionVotes(optionName, proposalResults),
     });
+  }
+
+  // Calculate governor-level approval threshold check
+  const proposalForVotes = BigInt(proposalResults?.for || 0);
+  const proposalAgainstVotes = BigInt(proposalResults?.against || 0);
+  const proposalTotalVotes = proposalForVotes + proposalAgainstVotes;
+
+  // TODO: this is not correct since, the total votes will have to be weighted instead of raw votes
+  const passesGovernorThreshold =
+    !governorApprovalThreshold ||
+    governorApprovalThreshold === 0 ||
+    (proposalTotalVotes > 0n &&
+      (proposalForVotes * 10000n) / proposalTotalVotes >=
+        BigInt(governorApprovalThreshold));
+
+  // If option approval data requested, calculate full approval data
+  let optionsWithApproval = null;
+  let remainingBudget = null;
+
+  if (
+    includeOptionApprovalData &&
+    proposalData?.proposalSettings &&
+    proposalResults?.options
+  ) {
+    const proposalSettings = proposalData.proposalSettings;
+    const options = proposalResults.options;
+
+    const { contracts } = Tenant.current();
+    const { decimals: contractTokenDecimals } = tokenForContractAddress(
+      proposalSettings.budgetToken
+    );
+
+    // Prepare enriched options with proposal data
+    const enrichedOptions = options.map((option: any, i: number) => {
+      return { ...option, ...proposalData.options[i] };
+    });
+
+    let availableBudget = BigInt(proposalSettings.budgetAmount);
+    let isExceeded = false;
+
+    optionsWithApproval = enrichedOptions.map((option: any) => {
+      const optionBudget = calculateOptionBudget(
+        option,
+        proposal.createdTime as Date,
+        contracts.governor.optionBudgetChangeDate || null,
+        contractTokenDecimals
+      );
+
+      // Find metrics for this option
+      const optionMetrics = optionResults.find(
+        (result) => result.optionName === option.option
+      );
+
+      // Determine if option is approved
+      const isApproved = !!(
+        passesGovernorThreshold &&
+        optionMetrics?.meetsThreshold &&
+        availableBudget >= optionBudget
+      );
+
+      if (isApproved) {
+        availableBudget = availableBudget - optionBudget;
+      } else if (
+        optionMetrics?.meetsThreshold &&
+        availableBudget < optionBudget
+      ) {
+        isExceeded = true;
+      }
+
+      return {
+        ...option,
+        optionBudget,
+        passesModuleCriteria: optionMetrics?.meetsThreshold || false,
+        isApproved,
+        weightedPercentage: optionMetrics?.weightedPercentage || 0,
+        rawVotes: optionMetrics?.rawVotes || 0n,
+        budgetExceeded:
+          isExceeded && optionMetrics?.meetsThreshold && !isApproved,
+      };
+    });
+
+    remainingBudget = availableBudget;
   }
 
   return {
@@ -1247,7 +1374,28 @@ export function calculateHybridApprovalMetrics(
     thresholdMet,
     optionResults,
     quorumMet: totalWeightedParticipation >= quorumThreshold,
+    passesGovernorThreshold,
+    proposalForVotes,
+    proposalAgainstVotes,
+    proposalTotalVotes,
+    optionsWithApproval,
+    remainingBudget,
   };
+}
+
+// Helper function to calculate option budget based on proposal creation time
+export function calculateOptionBudget(
+  option: any,
+  proposalCreatedTime: Date,
+  optionBudgetChangeDate: Date | null,
+  contractTokenDecimals: number
+): bigint {
+  return proposalCreatedTime > (optionBudgetChangeDate || new Date(0))
+    ? BigInt(option?.budgetTokensSpent || 0)
+    : parseUnits(
+        option?.budgetTokensSpent?.toString() || "0",
+        contractTokenDecimals
+      );
 }
 
 // Shared helper function for calculating hybrid standard metrics
