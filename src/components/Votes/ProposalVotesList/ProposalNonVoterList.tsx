@@ -16,14 +16,20 @@ const LIMIT = 20;
 type Props = {
   proposal: Proposal;
   isApprovalProposal?: boolean;
+  offchainProposalId?: string;
 };
 
-const ProposalNonVoterList = ({ proposal, isApprovalProposal }: Props) => {
+const ProposalNonVoterList = ({
+  proposal,
+  isApprovalProposal,
+  offchainProposalId,
+}: Props) => {
   const { data: fetchedNonVotes, isFetched } = useProposalNonVotes({
     enabled: true,
     limit: LIMIT,
     offset: 0,
     proposalId: proposal.id,
+    offchainProposalId,
   });
 
   const fetching = useRef(false);
@@ -41,10 +47,14 @@ const ProposalNonVoterList = ({ proposal, isApprovalProposal }: Props) => {
   const loadMore = useCallback(async () => {
     if (!fetching.current && meta?.has_next) {
       fetching.current = true;
-      const data = await fetchVotersWhoHaveNotVotedForProposal(proposal.id, {
-        limit: LIMIT,
-        offset: meta.next_offset,
-      });
+      const data = await fetchVotersWhoHaveNotVotedForProposal(
+        proposal.id,
+        {
+          limit: LIMIT,
+          offset: meta.next_offset,
+        },
+        offchainProposalId
+      );
       setPages((prev) => [...prev, { ...data, votes: data.data }]);
       setMeta(data.meta);
       fetching.current = false;

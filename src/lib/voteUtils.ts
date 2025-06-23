@@ -217,6 +217,7 @@ export async function parseVote(
     proposalType: vote.proposal_type,
     blockNumber: vote.block_number,
     timestamp: latestBlock ? getHumanBlockTime(blockNumber, latestBlock) : null,
+    citizenType: vote.citizen_type || null,
   };
 }
 

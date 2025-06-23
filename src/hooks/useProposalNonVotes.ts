@@ -7,6 +7,7 @@ interface Props {
   limit?: number;
   offset?: number;
   proposalId: string;
+  offchainProposalId?: string;
 }
 
 const QK = "nonvotes";
@@ -16,15 +17,20 @@ export const useProposalNonVotes = ({
   limit,
   offset,
   proposalId,
+  offchainProposalId,
 }: Props) => {
   const { data, isFetching, isFetched } = useQuery({
     enabled: enabled,
     queryKey: [QK, proposalId, offset],
     queryFn: async () => {
-      return (await fetchVotersWhoHaveNotVotedForProposal(proposalId, {
-        offset: offset || 0,
-        limit: limit || 20,
-      })) as PaginatedResult<any[]>;
+      return (await fetchVotersWhoHaveNotVotedForProposal(
+        proposalId,
+        {
+          offset: offset || 0,
+          limit: limit || 20,
+        },
+        offchainProposalId
+      )) as PaginatedResult<any[]>;
     },
     staleTime: 30000, // 30 second cache
   });
