@@ -103,8 +103,8 @@ const OptimisticProposalVotesCard = ({
         {/* Show the input for the user to vote on a proposal if allowed */}
         <CastVoteInput proposal={proposal} isOptimistic />
         <p className="mx-4 text-xs text-secondary">
-          If you agree with this proposal, you don’t need to vote. Only vote
-          against if you oppose this proposal.
+          If you agree with this proposal, you don&apos;t need to vote. Only
+          vote against if you oppose this proposal.
         </p>
       </VStack>
     </div>

@@ -39,10 +39,10 @@ export default async function CopelandProposalPage({
   const proposalState = proposal.status;
   return (
     <div className="flex gap-16 justify-between items-start max-w-[76rem] flex-col sm:flex-row sm:items-start sm:justify-between">
-      <div className="flex-1">
+      <div className="flex-1 proposal-description pb-6 md:pb-0">
         <ProposalDescription proposal={proposal} />
       </div>
-      <div className="sticky flex-none top-20 max-w-[24rem] bg-neutral border-line border rounded-xl shadow-newDefault mb-8 items-stretch sm:items-start justify-end sm:justify-between w-full max-h-none h-auto">
+      <div className="w-full md:max-w-[24rem] sticky flex-none top-20 bg-neutral border-line border rounded-xl shadow-newDefault mb-8 items-stretch sm:items-start justify-end sm:justify-between max-h-none h-auto">
         <CopelandVotesPanel
           proposal={proposal}
           fetchVotesForProposal={fetchProposalVotes}
@@ -54,6 +54,8 @@ export default async function CopelandProposalPage({
           </div>
         )}
       </div>
+      {/* Mobile-only spacer to prevent overlap with modal/circle */}
+      <div className="block md:hidden" style={{ height: 65 }} />
     </div>
   );
 }
