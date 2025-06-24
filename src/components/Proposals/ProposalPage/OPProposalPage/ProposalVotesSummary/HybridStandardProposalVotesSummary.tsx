@@ -181,9 +181,11 @@ const HybridStandardProposalVotesSummary = ({
           />
         </div>
       </div>
-      <div className="">
-        <CastVoteInput proposal={proposal} />
-      </div>
+      {proposal.proposalType === "HYBRID_STANDARD" && (
+        <div className="">
+          <CastVoteInput proposal={proposal} />
+        </div>
+      )}
     </>
   );
 };

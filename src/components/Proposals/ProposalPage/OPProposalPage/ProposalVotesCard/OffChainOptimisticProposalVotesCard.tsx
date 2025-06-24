@@ -8,6 +8,7 @@ import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalN
 import ProposalVotesFilter from "./ProposalVotesFilter";
 import VotesGroupTable from "@/components/common/VotesGroupTable";
 import {
+  ParsedProposalData,
   ParsedProposalResults,
   calculateHybridOptimisticProposalMetrics,
 } from "@/lib/proposalUtils";
@@ -96,11 +97,13 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState("results");
   const [isClicked, setIsClicked] = useState<boolean>(false);
+
   const { totalAgainstVotes } = useMemo(
     () => calculateHybridOptimisticProposalMetrics(proposal),
     [proposal]
   );
-
+  const proposalData =
+    proposal.proposalData as ParsedProposalData["OFFCHAIN_OPTIMISTIC_TIERED"]["kind"];
   const handleClick = () => {
     setIsClicked(!isClicked);
   };
@@ -118,7 +121,9 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
             </TooltipTrigger>
             <TooltipContent className="max-w-[300px] p-4 text-xs text-tertiary">
               <p className="text-primary font-bold mb-2">Threshold</p>
-              <p className="line-height-[32px]">4 groups 66%</p>
+              <p className="line-height-[32px]">
+                3 groups {proposalData?.tiers?.[0] / 100 || 65}%
+              </p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -164,7 +169,7 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
                     <VotesBar
                       forVotes={0}
                       againstVotes={totalAgainstVotes}
-                      quorumPercentage={66}
+                      quorumPercentage={proposalData?.tiers?.[0] / 100 || 65}
                       showVotesPercentage
                     />
                   </div>

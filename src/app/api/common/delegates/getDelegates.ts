@@ -109,14 +109,6 @@ async function getDelegates({
         filters?.hasStatement;
       const isWeightedRandomSort = sort === "weighted_random" && seed;
 
-      console.log({
-        filters,
-        isAllowListEnabled,
-        isWeightedRandomSort,
-        sort,
-        seed,
-      });
-
       const args = {
         sortBy: daoNodeSortBy,
         reverse: reverse,
