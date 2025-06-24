@@ -298,9 +298,7 @@ export function parseOffChainProposalResults(
 
       if (proposalType === "OFFCHAIN_STANDARD") {
         const allForVotes =
-          result.kind.APP.for +
-          result.kind.USER.for +
-          result.kind.CHAIN.for;
+          result.kind.APP.for + result.kind.USER.for + result.kind.CHAIN.for;
         const allAgainstVotes =
           result.kind.APP.against +
           result.kind.USER.against +
@@ -358,9 +356,7 @@ export function parseOffChainProposalResults(
       };
       if (proposalType === "OFFCHAIN_APPROVAL") {
         const allForVotes =
-          result.kind.APP.for +
-          result.kind.USER.for +
-          result.kind.CHAIN.for;
+          result.kind.APP.for + result.kind.USER.for + result.kind.CHAIN.for;
         const allAgainstVotes =
           result.kind.APP.against +
           result.kind.USER.against +
@@ -404,9 +400,7 @@ export function parseOffChainProposalResults(
         proposalType === "OFFCHAIN_OPTIMISTIC"
       ) {
         const allForVotes =
-          result.kind.APP.for +
-          result.kind.USER.for +
-          result.kind.CHAIN.for;
+          result.kind.APP.for + result.kind.USER.for + result.kind.CHAIN.for;
         const allAgainstVotes =
           result.kind.APP.against +
           result.kind.USER.against +

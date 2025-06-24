@@ -9,15 +9,12 @@ import { Abi, decodeFunctionData, keccak256, parseUnits } from "viem";
 import Tenant from "./tenant/tenant";
 import { Block, toUtf8Bytes, formatUnits } from "ethers";
 import { mapArbitrumBlockToMainnetBlock } from "./utils";
-<<<<<<< HEAD
 import {
   TENANT_NAMESPACES,
   OFFCHAIN_THRESHOLDS,
   HYBRID_VOTE_WEIGHTS,
+  disapprovalThreshold,
 } from "./constants";
-=======
-import { TENANT_NAMESPACES, disapprovalThreshold } from "./constants";
->>>>>>> main
 import { ProposalType } from "./types";
 import {
   parseOffChainProposalResults,
@@ -1091,7 +1088,6 @@ export function isProposalCreatedBeforeUpgradeCheck(proposal: Proposal) {
   );
 }
 
-<<<<<<< HEAD
 // Shared helper functions for hybrid approval calculations
 export function calculateHybridApprovalOptionVotes(
   optionName: string,
@@ -1782,7 +1778,9 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
     totalAgainstVotes: Number(calculatedTotalAgainstVotes.toFixed(2)),
     groupTallies: groupsExceedingThresholds,
     thresholds,
-=======
+  };
+}
+
 /**
  * Calculates metrics for an optimistic proposal
  * @param proposal - The proposal to analyze
@@ -1823,6 +1821,5 @@ export function calculateOptimisticProposalMetrics(
     againstLength,
     formattedVotableSupply,
     status,
->>>>>>> main
   };
 }
