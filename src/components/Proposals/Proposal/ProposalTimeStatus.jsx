@@ -34,9 +34,7 @@ export default function ProposalTimeStatus({
 
   const _proposalExecutedTime =
     proposalExecutedTime &&
-    new Intl.DateTimeFormat("en-US", finishOptions).format(
-      proposalExecutedTime
-    );
+    format(proposalExecutedTime, "h:mm aaa MMM dd, yyyy");
 
   switch (proposalStatus) {
     case "PENDING":

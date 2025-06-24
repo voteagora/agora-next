@@ -206,29 +206,31 @@ function CastVoteInputContent({
               )}
             </div>
           )}
-          {isError && (!isGasRelayLive || fallbackToStandardVote) && (
+          {isError && (
             <ErrorState
               message="Error submitting vote"
               error={error}
-              button1={{ message: "Cancel", action: reset }}
+              button1={
+                isGasRelayLive && !fallbackToStandardVote
+                  ? {
+                      message: "Try regular vote",
+                      action: () => {
+                        resetError();
+                        setFallbackToStandardVote(true);
+                      },
+                    }
+                  : {
+                      message: "Cancel",
+                      action: reset,
+                    }
+              }
               button2={{
                 message: "Try again",
-                action: write,
-              }}
-            />
-          )}
-          {isError && isGasRelayLive && !fallbackToStandardVote && (
-            <ErrorState
-              message="Error submitting vote"
-              error={error}
-              button1={{
-                message: "Try regular vote",
                 action: () => {
                   resetError();
-                  setFallbackToStandardVote(true);
+                  setTimeout(() => write(), 50);
                 },
               }}
-              button2={{ message: "Try again", action: write }}
             />
           )}
         </div>
@@ -377,7 +379,7 @@ function LoadingVote() {
       </div>
       <div>
         <Button className="w-full" disabled={true}>
-          Writing your vote to the chain...
+          Approve transaction in your wallet to vote
         </Button>
       </div>
     </div>
@@ -579,7 +581,7 @@ function ErrorState({
   return (
     <TooltipProvider delayDuration={300}>
       <Tooltip>
-        <TooltipTrigger>
+        <TooltipTrigger asChild>
           <div className="flex flex-col gap-3 p-3 border-t border-line">
             <div className="py-2 px-4 bg-red-300 text-xs text-red-700 font-medium rounded-lg flex items-center gap-2">
               <Image
@@ -606,7 +608,14 @@ function ErrorState({
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          <div>{JSON.stringify(error || {}, null, 2)}</div>
+          <div>
+            {JSON.stringify(
+              error || {},
+              (key, value) =>
+                typeof value === "bigint" ? value.toString() + "n" : value,
+              2
+            )}
+          </div>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

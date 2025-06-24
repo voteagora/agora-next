@@ -26,7 +26,16 @@ import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
 
 // Create a cached version of getDelegatesFromDaoNode
 const cachedGetDelegatesFromDaoNode = unstable_cache(
-  getDelegatesFromDaoNode,
+  (args: {
+    sortBy?: string;
+    reverse?: boolean;
+    limit?: number;
+    offset?: number;
+    filters?: {
+      delegator?: `0x${string}`;
+    };
+    withParticipation?: boolean;
+  }) => getDelegatesFromDaoNode(args),
   ["delegates-dao-node-filters"],
   {
     revalidate: 30, // Cache for 30 seconds
@@ -109,15 +118,22 @@ async function getDelegates({
         filters?.hasStatement;
       const isWeightedRandomSort = sort === "weighted_random" && seed;
 
-      const args = {
+      console.log({
+        filters,
+        isAllowListEnabled,
+        isWeightedRandomSort,
+        sort,
+        seed,
+      });
+
+      const daoNodeResult = await cachedGetDelegatesFromDaoNode({
         sortBy: daoNodeSortBy,
         reverse: reverse,
         filters,
         limit: undefined,
         offset: undefined,
         withParticipation: showParticipation,
-      };
-      const daoNodeResult = await cachedGetDelegatesFromDaoNode(args);
+      });
 
       // If we have valid data from the DAO node, use it instead of database query
       if (

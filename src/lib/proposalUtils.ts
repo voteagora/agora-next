@@ -7,13 +7,17 @@ import {
 } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData, keccak256, parseUnits } from "viem";
 import Tenant from "./tenant/tenant";
-import { Block, toUtf8Bytes } from "ethers";
+import { Block, toUtf8Bytes, formatUnits } from "ethers";
 import { mapArbitrumBlockToMainnetBlock } from "./utils";
+<<<<<<< HEAD
 import {
   TENANT_NAMESPACES,
   OFFCHAIN_THRESHOLDS,
   HYBRID_VOTE_WEIGHTS,
 } from "./constants";
+=======
+import { TENANT_NAMESPACES, disapprovalThreshold } from "./constants";
+>>>>>>> main
 import { ProposalType } from "./types";
 import {
   parseOffChainProposalResults,
@@ -345,6 +349,12 @@ export async function parseProposal(
   const proposalTypeData =
     proposal.proposal_type_data as ProposalTypeData | null;
 
+  const hardcodedThreshold =
+    proposal.proposal_id ===
+    "3505139576575581948952533286313165208104296221987341923460133599388956364165"
+      ? BigInt(5100)
+      : null;
+
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
@@ -385,7 +395,9 @@ export async function parseProposal(
       (proposalData.key === "SNAPSHOT" && proposalData.kind.body) ||
       proposal.description,
     quorum,
-    approvalThreshold: proposalTypeData && proposalTypeData.approval_threshold,
+    approvalThreshold:
+      hardcodedThreshold ??
+      (proposalTypeData && proposalTypeData.approval_threshold),
     proposalData: proposalData.kind,
     unformattedProposalData: proposal.proposal_data_raw,
     proposalResults: proposalResults.kind,
@@ -1079,6 +1091,7 @@ export function isProposalCreatedBeforeUpgradeCheck(proposal: Proposal) {
   );
 }
 
+<<<<<<< HEAD
 // Shared helper functions for hybrid approval calculations
 export function calculateHybridApprovalOptionVotes(
   optionName: string,
@@ -1769,5 +1782,47 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
     totalAgainstVotes: Number(calculatedTotalAgainstVotes.toFixed(2)),
     groupTallies: groupsExceedingThresholds,
     thresholds,
+=======
+/**
+ * Calculates metrics for an optimistic proposal
+ * @param proposal - The proposal to analyze
+ * @param votableSupply - The total votable supply
+ * @returns An object with the calculated metrics:
+ *  - againstRelativeAmount: Percentage of votes against
+ *  - againstLength: Total number of votes against
+ *  - formattedVotableSupply: Formatted votable supply
+ *  - status: Proposal status ('approved' or 'defeated')
+ */
+export function calculateOptimisticProposalMetrics(
+  proposal: Proposal,
+  votableSupply: string
+) {
+  const tokenDecimals = Tenant.current().token.decimals;
+
+  const formattedVotableSupply = Number(
+    BigInt(votableSupply || "0") / BigInt(10 ** tokenDecimals)
+  );
+
+  const proposalResults = proposal.proposalResults as {
+    against?: string;
+  } | null;
+  const againstAmount = proposalResults?.against || "0";
+
+  const againstLength = Number(formatUnits(againstAmount, tokenDecimals));
+
+  const againstRelativeAmount =
+    formattedVotableSupply > 0
+      ? Number(((againstLength / formattedVotableSupply) * 100).toFixed(2))
+      : 0;
+
+  const status =
+    againstRelativeAmount <= disapprovalThreshold ? "approved" : "defeated";
+
+  return {
+    againstRelativeAmount,
+    againstLength,
+    formattedVotableSupply,
+    status,
+>>>>>>> main
   };
 }

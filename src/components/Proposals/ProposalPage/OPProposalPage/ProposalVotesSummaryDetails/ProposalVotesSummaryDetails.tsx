@@ -19,7 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, X } from "lucide-react";
 
 export const QuorumTooltip = () => {
   return (
@@ -78,6 +78,8 @@ export default function ProposalVotesSummaryDetails({
   let totalVotes =
     BigInt(results.for) + BigInt(results.abstain) + BigInt(results.against);
 
+  let thresholdVotes = BigInt(results.for) + BigInt(results.against);
+
   /**
    * This is a temporary fix for ENS.
    * https://voteagora.atlassian.net/browse/ENG-903
@@ -97,8 +99,8 @@ export default function ProposalVotesSummaryDetails({
   }
 
   const voteThresholdPercent =
-    Number(totalVotes) > 0
-      ? (Number(results.for) / Number(totalVotes)) * 100
+    Number(thresholdVotes) > 0
+      ? (Number(results.for) / Number(thresholdVotes)) * 100
       : 0;
   const apprThresholdPercent = Number(proposal.approvalThreshold) / 100;
 
@@ -170,7 +172,11 @@ export default function ProposalVotesSummaryDetails({
               Threshold
             </div>
             <div className="flex flex-row gap-1 ">
-              {hasMetThreshold && <Image src={checkIcon} alt="check icon" />}
+              {hasMetThreshold ? (
+                <Image src={checkIcon} alt="check icon" />
+              ) : (
+                <X className="h-4 w-4 text-negative" />
+              )}
               <p className=" text-xs font-semibold text-secondary">
                 {voteThresholdPercent.toFixed(2)}% /{" "}
                 {`${apprThresholdPercent}%`} Required

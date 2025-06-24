@@ -1,35 +1,15 @@
-import { formatUnits } from "ethers";
 import { disapprovalThreshold } from "@/lib/constants";
-import Tenant from "@/lib/tenant/tenant";
-
-function formatNumber(amount, decimals = 0, maximumSignificantDigits = 4) {
-  if (amount == null) return 0;
-  try {
-    const standardUnitAmount = Number(formatUnits(amount, decimals));
-    return standardUnitAmount;
-  } catch (error) {
-    console.error("Error formatting number:", error);
-    return 0;
-  }
-}
+import { calculateOptimisticProposalMetrics } from "@/lib/proposalUtils";
 
 export default function OPOptimisticProposalStatus({
   proposal,
   votableSupply,
 }) {
-  const tokenDecimals = Tenant.current().token.decimals;
-  const formattedVotableSupply = Number(
-    BigInt(votableSupply) / BigInt(10 ** tokenDecimals)
+  const { againstRelativeAmount, status } = calculateOptimisticProposalMetrics(
+    proposal,
+    votableSupply
   );
-  const againstLength = formatNumber(
-    proposal.proposalResults.against,
-    tokenDecimals,
-    0
-  );
-  const againstRelativeAmount =
-    (Math.floor(againstLength / formattedVotableSupply) * 100) / 100;
-  const status =
-    againstRelativeAmount <= disapprovalThreshold ? "approved" : "defeated";
+
   return (
     <div className="flex flex-col text-right text-primary">
       <div>
