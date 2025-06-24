@@ -94,7 +94,7 @@ export const VotesBar = ({
             <div
               className="absolute top-0 bottom-0 w-0.5 bg-black"
               style={{ left: `${Math.min(quorumPercentage, 100)}%` }} // Cap at 100%
-              aria-label={`Quorum threshold: ${quorumPercentage.toFixed(2)}%`}
+              aria-label={`Quorum threshold: ${quorumPercentage}%`}
             />
           )}
         </div>

@@ -46,14 +46,14 @@ export function parseSupport(
 
   const { namespace, contracts } = Tenant.current();
 
-  // if (
-  //   namespace === TENANT_NAMESPACES.OPTIMISM &&
-  //   start_block &&
-  //   contracts.governor.v6UpgradeBlock &&
-  //   Number(start_block) < contracts.governor.v6UpgradeBlock
-  // ) {
-  //   return parseSupportOldModule(support, proposalType);
-  // }
+  if (
+    namespace === TENANT_NAMESPACES.OPTIMISM &&
+    start_block &&
+    contracts.governor.v6UpgradeBlock &&
+    Number(start_block) < contracts.governor.v6UpgradeBlock
+  ) {
+    return parseSupportOldModule(support, proposalType);
+  }
 
   switch (Number(support)) {
     case 0:

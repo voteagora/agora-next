@@ -1443,10 +1443,7 @@ export function calculateHybridStandardTallies(
     proposalResults?.DELEGATES,
     eligibleVoters.delegates
   );
-  const appsTally = calculateTally(
-    proposalResults?.APP,
-    eligibleVoters.apps
-  );
+  const appsTally = calculateTally(proposalResults?.APP, eligibleVoters.apps);
   const usersTally = calculateTally(
     proposalResults?.USER,
     eligibleVoters.users
@@ -1636,11 +1633,7 @@ export function calculateHybridApprovalProposalMetrics(proposal: Proposal) {
             proposalResults.USER,
             proposalResults.CHAIN,
           ]
-        : [
-            proposalResults.APP,
-            proposalResults.USER,
-            proposalResults.CHAIN,
-          ];
+        : [proposalResults.APP, proposalResults.USER, proposalResults.CHAIN];
 
     // Calculate weighted votes as percentage of potential participation
     const calculatedWeightedVotes = categories.reduce(
@@ -1709,11 +1702,16 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
       ? (proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"])
       : (proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC"]["kind"]);
 
-  const tiers = (proposalData as any)?.tiers || [55, 45, 35];
+  // For non-hybrid optimistic tiered proposals, we use 65% threshold for all groups (apps, users, chains)
+  const tiers =
+    (proposalData as any)?.tiers ||
+    (proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
+      ? [55, 45, 35]
+      : [65, 65, 65]);
   const thresholds = {
-    twoGroups: tiers[0] || 55,
-    threeGroups: tiers[1] || 45,
-    fourGroups: tiers[2] || 35,
+    twoGroups: tiers[0] / 100 || 55,
+    threeGroups: tiers[1] / 100 || 45,
+    fourGroups: tiers[2] / 100 || 35,
   };
 
   // Setup weights based on proposal type
@@ -1772,34 +1770,41 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
     ];
   }
 
-  // Count groups that exceed their respective thresholds
-  const groupsExceedingThresholds = groupTallies.map((group) => ({
-    ...group,
-    exceedsThreshold: group.vetoPercentage >= thresholds.fourGroups,
-  }));
-
-  const numGroupsVetoing = groupsExceedingThresholds.filter(
-    (g) => g.exceedsThreshold
-  ).length;
-
   // Determine if veto is triggered based on tiered logic
   let vetoTriggered = false;
-  if (numGroupsVetoing >= 4) {
-    vetoTriggered =
-      groupsExceedingThresholds.filter(
-        (g) => g.vetoPercentage >= thresholds.fourGroups
-      ).length >= 4;
-  } else if (numGroupsVetoing >= 3) {
-    vetoTriggered =
-      groupsExceedingThresholds.filter(
-        (g) => g.vetoPercentage >= thresholds.threeGroups
-      ).length >= 3;
-  } else if (numGroupsVetoing >= 2) {
-    vetoTriggered =
-      groupsExceedingThresholds.filter(
-        (g) => g.vetoPercentage >= thresholds.twoGroups
-      ).length >= 2;
+
+  const groupsExceedingFourThreshold = groupTallies.filter(
+    (g) => g.vetoPercentage >= thresholds.fourGroups
+  );
+  if (groupsExceedingFourThreshold.length >= 4) {
+    vetoTriggered = true;
+  } else if (
+    groupTallies.filter((g) => g.vetoPercentage >= thresholds.threeGroups)
+      .length >= 3
+  ) {
+    vetoTriggered = true;
+  } else if (
+    groupTallies.filter((g) => g.vetoPercentage >= thresholds.twoGroups)
+      .length >= 2
+  ) {
+    vetoTriggered = true;
   }
+
+  const groupsExceedingThresholds = groupTallies.map((group) => {
+    let exceedsThreshold = false;
+    if (groupTallies.length >= 4) {
+      exceedsThreshold = group.vetoPercentage >= thresholds.fourGroups;
+    } else if (groupTallies.length >= 3) {
+      exceedsThreshold = group.vetoPercentage >= thresholds.threeGroups;
+    } else if (groupTallies.length >= 2) {
+      exceedsThreshold = group.vetoPercentage >= thresholds.twoGroups;
+    }
+
+    return {
+      ...group,
+      exceedsThreshold,
+    };
+  });
 
   // Calculate weighted total against votes as percentage of potential participation
   const calculatedTotalAgainstVotes = groupTallies.reduce(

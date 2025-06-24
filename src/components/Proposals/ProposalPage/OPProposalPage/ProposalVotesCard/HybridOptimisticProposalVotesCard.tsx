@@ -131,11 +131,10 @@ const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
   const proposalData =
     proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"];
 
-  const { vetoThresholdMet, totalAgainstVotes, groupTallies, thresholds } =
-    useMemo(
-      () => calculateHybridOptimisticProposalMetrics(proposal),
-      [proposal]
-    );
+  const { vetoThresholdMet, groupTallies } = useMemo(
+    () => calculateHybridOptimisticProposalMetrics(proposal),
+    [proposal]
+  );
 
   const vetoingGroupsCount = useMemo(
     () => groupTallies.filter((g) => g.exceedsThreshold).length,
@@ -239,10 +238,10 @@ const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
                                   />
                                   <div className="text-right text-black text-xs font-semibold leading-none">
                                     {vetoingGroupsCount === 2
-                                      ? proposalData?.tiers?.[0] || 55
+                                      ? proposalData?.tiers?.[0] / 100 || 55
                                       : vetoingGroupsCount === 3
-                                        ? proposalData?.tiers?.[1] || 45
-                                        : proposalData?.tiers?.[2] || 35}
+                                        ? proposalData?.tiers?.[1] / 100 || 45
+                                        : proposalData?.tiers?.[2] / 100 || 35}
                                     %
                                   </div>
                                 </div>
@@ -256,7 +255,7 @@ const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
                               <div className="flex justify-end items-center">
                                 <div className="flex items-center gap-1">
                                   <div className="text-right text-black text-xs font-semibold leading-none">
-                                    {proposalData?.tiers?.[2] || 35}%
+                                    {proposalData?.tiers?.[2] / 100 || 35}%
                                   </div>
                                 </div>
                               </div>

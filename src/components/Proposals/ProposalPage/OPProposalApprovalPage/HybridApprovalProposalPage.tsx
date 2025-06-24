@@ -1,36 +1,7 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import HybridApprovalVotesPanel from "./ApprovalVotesPanel/HybridApprovalVotesPanel";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import {
-  fetchUserVotesForProposal as apiFetchUserVotesForProposal,
-  fetchVotesForProposal,
-} from "@/app/api/common/votes/getVotes";
-import { PaginationParams } from "@/app/lib/pagination";
 import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
-
-// async function fetchProposalVotes(
-//   proposalId: string,
-//   pagination?: PaginationParams
-// ) {
-//   "use server";
-
-//   return fetchVotesForProposal({
-//     proposalId,
-//     pagination,
-//   });
-// }
-
-// async function fetchUserVotesForProposal(
-//   proposalId: string,
-//   address: string | `0x${string}`
-// ) {
-//   "use server";
-
-//   return await apiFetchUserVotesForProposal({
-//     proposalId,
-//     address,
-//   });
-// }
 
 export default async function HybridApprovalProposalPage({
   proposal,
