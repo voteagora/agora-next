@@ -26,9 +26,11 @@ export default async function OPProposalPage({ proposal }) {
   return (
     <div className="flex flex-col">
       <ProposalStateAdmin proposal={proposal} />
-      <div className="flex gap-16 justify-between items-start max-w-[76rem] flex-col md:flex-row md:items-start md:justify-between">
-        <ProposalDescription proposal={proposal} />
-        <div>
+      <div className="flex gap-0 md:gap-16 justify-between items-start max-w-[76rem] flex-col md:flex-row md:items-start md:justify-between">
+        <div className="w-full proposal-description pb-6 md:pb-0">
+          <ProposalDescription proposal={proposal} />
+        </div>
+        <div className="w-full md:max-w-[24rem]">
           <OptimisticProposalVotesCard
             proposal={proposal}
             againstRelativeAmount={againstRelativeAmount}
@@ -38,6 +40,8 @@ export default async function OPProposalPage({ proposal }) {
           />
         </div>
       </div>
+      {/* Mobile-only spacer to prevent overlap with modal */}
+      <div className="block md:hidden" style={{ height: 65 }} />
     </div>
   );
 }
