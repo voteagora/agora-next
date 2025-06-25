@@ -4,7 +4,6 @@ import { Proposal } from "@/app/api/common/proposals/proposal.d";
 import { HYBRID_VOTE_WEIGHTS } from "@/lib/constants";
 import {
   ParsedProposalResults,
-  ParsedProposalData,
   calculateHybridStandardProposalMetrics,
 } from "@/lib/proposalUtils";
 import { ExclamationCircleIcon } from "@/icons/ExclamationCircleIcon";
@@ -13,8 +12,16 @@ import checkIcon from "@/icons/check.svg";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import VotesGroupTable from "@/components/common/VotesGroupTable";
 import { VotesBar } from "@/components/common/VotesBar";
-import { cn, formatNumber } from "@/lib/utils";
+import { formatNumber } from "@/lib/tokenUtils";
 import Tenant from "@/lib/tenant/tenant";
+import { cn } from "@/lib/utils";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const { token } = Tenant.current();
 
@@ -117,8 +124,22 @@ const QuorumStatus = ({
       <div className="flex">
         <div className="h-8 inline-flex w-full justify-between">
           <div className="flex justify-start items-center gap-0.5">
-            <div className="text-black text-xs font-bold">Quorum</div>
-            <ExclamationCircleIcon className="w-3 h-3 stroke-tertiary" />
+            <TooltipProvider delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="inline-flex items-center gap-0.5">
+                    <div className="text-black text-xs font-bold">Quorum</div>
+                    <ExclamationCircleIcon className="w-3 h-3 stroke-tertiary" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-[300px] p-4 text-xs text-tertiary">
+                  <p className="text-primary font-bold mb-2">Quorum</p>
+                  <p className="line-height-[32px]">
+                    Quorum for this proposal is at 30%
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <div className="flex justify-start items-center gap-1">
             <div
