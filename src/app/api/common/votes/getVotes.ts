@@ -297,14 +297,21 @@ async function getVotersWhoHaveNotVotedForProposal({
                 ORDER BY del.voting_power DESC
                 OFFSET $4 LIMIT $5;`;
 
-      return prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
-        notVotedQuery,
+      const params = [
         proposalId,
         contracts.token.address.toLowerCase(),
         contracts.governor.address.toLowerCase(),
         skip,
         take,
-        offchainProposalId
+      ];
+      
+      if (includeCitizens && offchainProposalId) {
+        params.push(offchainProposalId);
+      }
+
+      return prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
+        notVotedQuery,
+        ...params
       );
     };
 
@@ -384,6 +391,26 @@ async function getVotesForProposal({
       const includeCitizens = namespace === TENANT_NAMESPACES.OPTIMISM;
 
       const queryFunction = (skip: number, take: number) => {
+        let citizenQuery = "";
+
+        if (includeCitizens) {
+          citizenQuery = `
+            UNION ALL
+            SELECT
+              "transactionHash" as transaction_hash,
+              "proposalId" as proposal_id,
+              "voterAddress" as voter,
+              ("vote"->>'0') as support,
+              1::numeric as weight,
+              NULL as reason,
+              NULL as params,
+              NULL as block_number,
+              "citizenCategory"::text as citizen_type
+            FROM atlas."OffChainVote"
+            WHERE "proposalId" = ${offchainProposalId ? "$5" : "$1"}
+          `;
+        }
+
         const query = `
           SELECT
             transaction_hash,
@@ -436,25 +463,7 @@ async function getVotesForProposal({
                 NULL::text as citizen_type
               FROM ${namespace}.${eventsViewName}
               WHERE proposal_id = $1 AND contract = $2
-              ${
-                includeCitizens
-                  ? `
-               UNION ALL
-              SELECT
-                 "transactionHash" as transaction_hash,
-                 "proposalId" as proposal_id,
-                 "voterAddress" as voter,
-                 "vote"->>0 as support,
-                 1 as weight,
-                 NULL as reason,
-                 NULL as params,
-                 NULL as block_number,
-                 "citizenCategory"::text as citizen_type
-               FROM atlas."OffChainVote"
-               WHERE "proposalId" = ${offchainProposalId ? "$5" : "$1"}
-              `
-                  : ""
-              }
+              ${includeCitizens ? citizenQuery : ""}
             ) t
             GROUP BY 2,3,4,8,9
             ) av
@@ -470,13 +479,20 @@ async function getVotesForProposal({
           OFFSET $3
           LIMIT $4;`;
 
-        return prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
-          query,
+        const params = [
           proposalId,
           contracts.governor.address.toLowerCase(),
           skip,
           take,
-          offchainProposalId
+        ];
+        
+        if (includeCitizens && offchainProposalId) {
+          params.push(offchainProposalId);
+        }
+
+        return prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
+          query,
+          ...params
         );
       };
 
