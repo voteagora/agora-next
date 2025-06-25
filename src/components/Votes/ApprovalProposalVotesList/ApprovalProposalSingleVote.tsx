@@ -34,7 +34,7 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
     transactionHash,
   } = vote;
   const [hovered, setHovered] = useState(false);
-  const [hash1, hash2] = transactionHash.split("|");
+  const [hash1, hash2] = transactionHash?.split("|") || [];
 
   const { data } = useEnsName({
     chainId: 1,

@@ -25,7 +25,7 @@ import { icons } from "@/icons/icons";
 import Image from "next/image";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
-import { formatEther, formatUnits } from "viem";
+import { formatEther } from "viem";
 import {
   Tooltip,
   TooltipContent,
@@ -37,7 +37,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import shareIcon from "@/icons/share.svg";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { useVotableSupply } from "@/hooks/useVotableSupply";
 
 type Props = {
@@ -171,11 +171,11 @@ function CastVoteInputContent({
   return (
     <div className="flex flex-col flex-shrink rounded-b-lg">
       <div
-        className={`flex flex-col bg-neutral border-b border-line rounded-b-lg flex-shrink ${isGasRelayLive && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
+        className={`flex flex-col flex-shrink ${isGasRelayLive && !showSuccessMessage && "shadow-[0_2px_6px_-1px_rgba(0,0,0,0.05)]"}`}
       >
-        <div className="flex flex-col items-stretch justify-between pb-3 pt-1">
+        <div className="flex flex-col items-stretch justify-between">
           {!isError && !showSuccessMessage && (
-            <div className="bg-neutral border-t border-line px-3 ">
+            <div className="border-t border-line px-4 pb-3 pt-1">
               {!isLoading && (
                 <div className="flex flex-col gap-2">
                   {proposal.status === "ACTIVE" && (
@@ -184,7 +184,7 @@ function CastVoteInputContent({
                       value={reason || undefined}
                       onChange={(e) => setReason(e.target.value)}
                       rows={reason ? undefined : 1}
-                      className="text-sm text-primary bg-neutral resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
+                      className="text-sm text-primary resize-none rounded-lg border border-line rounded-b-lg focus:outline-none focus:inset-0 focus:shadow-none focus:outline-offset-0 mt-3"
                     />
                   )}
                   <div className={cn(proposal.status !== "ACTIVE" && "mt-3")}>
@@ -239,11 +239,13 @@ function CastVoteInputContent({
         <VotingBanner />
       )}
       {showSuccessMessage && (
-        <SuccessMessage
-          proposal={proposal}
-          votes={votes}
-          votingPower={vpToDisplay}
-        />
+        <div className="border-t border-line">
+          <SuccessMessage
+            proposal={proposal}
+            votes={votes}
+            votingPower={vpToDisplay}
+          />
+        </div>
       )}
     </div>
   );
@@ -440,7 +442,7 @@ export function SuccessMessage({
   return (
     <div
       className={cn(
-        "flex flex-col w-full text-sm text-secondary font-medium py-2 px-4 bg-transparent rounded-b-lg",
+        "flex flex-col w-full text-sm text-secondary font-medium p-4 pb-2 bg-transparent rounded-b-lg",
         className
       )}
     >
@@ -471,19 +473,17 @@ export function SuccessMessage({
           });
         }}
         variant="outline"
-        className="w-full text-secondary font-semibold text-xs gap-2 rounded-[0.5rem] h-8"
+        className="w-full text-secondary font-semibold text-xs gap-2 rounded-full border-primary h-8"
       >
         <Image src={shareIcon.src} alt="Share icon" height={18} width={18} />
-        <span>
-          Share you voted{" "}
-          <span className={supportColor}>
-            {support?.toUpperCase() + (support === "ABSTAIN" ? " in" : "")}
-          </span>{" "}
-          this proposal
-        </span>
+        <span>Share your vote</span>
       </Button>
+      <p className="text-[14px] font-bold text-secondary text-center mt-2">
+        You voted for this proposal {formatDistanceToNow(new Date(timestamp))}{" "}
+        ago
+      </p>
       <BlockScanUrls
-        className="pt-2 text-tertiary font-medium mx-auto"
+        className="text-xs font-medium text-tertiary mx-auto pt-1"
         hash1={
           data?.sponsoredVoteTxHash || data?.standardTxHash || transactionHash
         }
@@ -621,3 +621,15 @@ function ErrorState({
     </TooltipProvider>
   );
 }
+
+export const OffchainCastVoteInput = () => {
+  return (
+    <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+      <Button className="w-full" asChild>
+        <a href="https://atlas.optimism.io" target="_blank">
+          Vote in Atlas
+        </a>
+      </Button>
+    </div>
+  );
+};

@@ -1,7 +1,7 @@
 import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
-import { type ProposalStatus } from "@/lib/proposalUtils";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { cn, getBlockScanUrl } from "@/lib/utils";
+import { ProposalStatus } from "@/lib/proposalUtils/proposalStatus";
 
 export default function ProposalStatusDetail({
   proposalStatus,

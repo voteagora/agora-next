@@ -8,7 +8,7 @@ export type VotesSort = "weight" | "block_number";
 export type VotePayload = OptimismVotes | LineaVotes;
 
 export type Vote = {
-  transactionHash: string;
+  transactionHash: string | null;
   address: string;
   proposalId: string;
   support: Support;
@@ -20,6 +20,7 @@ export type Vote = {
   proposalType: ProposalType;
   timestamp: Date | null;
   blockNumber?: bigint;
+  citizenType: string | null;
 };
 
 export type SnapshotVotePayload = {

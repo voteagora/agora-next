@@ -42,7 +42,7 @@ const tabsTriggerVariants = cva(
         gray: "rounded-full py-1 px-3 text-secondary font-medium hover:bg-wash hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-wash data-[state=active]:hover:bg-wash",
         bool: "text-primary p-3 flex-1 text-center hover:bg-neutral data-[state=active]:bg-neutral data-[state=active]:rounded-md data-[state=active]:shadow-newDefault",
         underlined:
-          "pb-2 text-neutral-500 text-base font-medium flex gap-2.5 data-[state=active]:text-neutral-900 data-[state=active]:border-b-2 data-[state=active]:border-neutral-900 data-[state=active]:pb-[6px]",
+          "pb-2 text-neutral-500 text-base font-medium flex gap-2.5 data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:pb-[6px]",
       },
     },
     defaultVariants: {

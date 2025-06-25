@@ -5,7 +5,6 @@ import { useState } from "react";
 import { formatEther } from "viem";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { getBlockScanUrl } from "@/lib/utils";
-import Tenant from "@/lib/tenant/tenant";
 
 export default function ApprovedTransactions({
   proposalData,
@@ -23,12 +22,11 @@ export default function ApprovedTransactions({
     return null;
   }
 
-  const { namespace } = Tenant.current();
-
   const isNoProposedTransactions =
-    proposalType === "STANDARD" &&
-    proposalData.options[0].calldatas[0] === "0x";
-
+    (proposalType === "STANDARD" &&
+      proposalData.options[0].calldatas[0] === "0x") ||
+    (proposalType === "HYBRID_STANDARD" &&
+      proposalData.options[0].calldatas[0] === "0x");
   return (
     <div className="flex flex-col gap-1 border border-line rounded-lg bg-wash py-4">
       <div className="flex items-center justify-between px-4 mb-2">
@@ -51,11 +49,12 @@ export default function ApprovedTransactions({
           {proposalData.options.slice(0, displayedOptions).map((option, i) => {
             return (
               <div key={i}>
-                {proposalType === "APPROVAL" && (
-                  <p className="font-mono text-xs font-medium leading-4 text-tertiary">
-                    {"//"} {option.description}
-                  </p>
-                )}
+                {proposalType === "APPROVAL" ||
+                  (proposalType === "HYBRID_APPROVAL" && (
+                    <p className="font-mono text-xs font-medium leading-4 text-tertiary">
+                      {"//"} {option.description}
+                    </p>
+                  ))}
                 {option.values.length > 0 &&
                   option.targets.map((t, i) => {
                     const valueETH =

@@ -14,16 +14,21 @@ import { useProposalVotes } from "@/hooks/useProposalVotes";
 
 interface Props {
   proposalId: string;
+  offchainProposalId?: string;
 }
 
 const LIMIT = 10;
 
-export default function ProposalVotesList({ proposalId }: Props) {
+export default function ProposalVotesList({
+  proposalId,
+  offchainProposalId,
+}: Props) {
   const { data: fetchedVotes, isFetched } = useProposalVotes({
     enabled: true,
     limit: LIMIT,
     offset: 0,
     proposalId: proposalId,
+    offchainProposalId,
   });
 
   const { address: connectedAddress } = useAccount();
@@ -75,10 +80,15 @@ export default function ProposalVotesList({ proposalId }: Props) {
   const loadMore = useCallback(async () => {
     if (!fetching.current && voteState.meta?.has_next) {
       fetching.current = true;
-      const data = await fetchProposalVotes(proposalId, {
-        limit: LIMIT,
-        offset: voteState.meta.next_offset,
-      });
+      const data = await fetchProposalVotes(
+        proposalId,
+        {
+          limit: LIMIT,
+          offset: voteState.meta.next_offset,
+        },
+        undefined,
+        offchainProposalId
+      );
       setVoteState((prev) => ({
         pages: [...prev.pages, { ...data, votes: data.data }],
         meta: data.meta,
