@@ -253,7 +253,8 @@ async function getVotersWhoHaveNotVotedForProposal({
       eventsViewName = "vote_cast_with_params_events";
     }
 
-    const includeCitizens = namespace === TENANT_NAMESPACES.OPTIMISM;
+    // const includeCitizens = namespace === TENANT_NAMESPACES.OPTIMISM;
+    const includeCitizens = false;
 
     const queryFunction = (skip: number, take: number) => {
       const notVotedQuery = `
@@ -388,7 +389,8 @@ async function getVotesForProposal({
         eventsViewName = "vote_cast_with_params_events";
       }
 
-      const includeCitizens = namespace === TENANT_NAMESPACES.OPTIMISM;
+      // const includeCitizens = namespace === TENANT_NAMESPACES.OPTIMISM;
+      const includeCitizens = false;
       const queryFunction = (skip: number, take: number) => {
         let citizenQuery = "";
 
