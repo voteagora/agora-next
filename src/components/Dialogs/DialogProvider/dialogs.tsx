@@ -2,7 +2,6 @@ import { DialogDefinitions } from "./types";
 import { DelegateDialog } from "../DelegateDialog/DelegateDialog";
 import { UndelegateDialog } from "../UndelegateDialog/UndelegateDialog";
 import { SwitchNetwork } from "../SwitchNetworkDialog/SwitchNetworkDialog";
-import { CastProposalDialog } from "@/components/Proposals/ProposalCreation/CastProposalDialog";
 import {
   CastVoteDialog,
   SupportTextProps,
@@ -37,11 +36,12 @@ import { EncourageConnectWalletDialog } from "@/components/Delegates/Delegations
 import { CreateScopeDialog } from "@/components/Admin/CreateScopeDialog";
 import { ScopeData } from "@/lib/types";
 import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActionDialog";
+import SponsorOffchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOffchainProposalDialog";
+import { DraftProposal } from "@/app/proposals/draft/types";
 
 export type DialogType =
   | AdvancedDelegateDialogType
   | ApprovalCastVoteDialogType
-  | CastProposalDialogType
   | CastVoteDialogType
   | CreateDraftProposalDialog
   | DelegateDialogType
@@ -60,7 +60,8 @@ export type DialogType =
   | SimulationReportDialogType
   | EncourageConnectWalletDialogType
   | CreateScopeDialogType
-  | AccountActionDialogType;
+  | AccountActionDialogType
+  | SponsorOffchainDraftProposalDialog;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -112,6 +113,7 @@ export type CastProposalDialogType = {
     isError: boolean;
     isSuccess: boolean;
     txHash?: string;
+    isEas?: boolean;
   };
 };
 
@@ -239,6 +241,16 @@ export type SponsorSnapshotDraftProposalDialog = {
 
 export type SponsorOnchainDraftProposalDialog = {
   type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL";
+  params: {
+    redirectUrl: string;
+    txHash: `0x${string}`;
+    isHybrid: boolean;
+    draftProposal: DraftProposal;
+  };
+};
+
+export type SponsorOffchainDraftProposalDialog = {
+  type: "SPONSOR_OFFCHAIN_DRAFT_PROPOSAL";
   params: { redirectUrl: string; txHash: `0x${string}` };
 };
 
@@ -327,17 +339,6 @@ export const dialogs: DialogDefinitions<DialogType> = {
         fetchAllForAdvancedDelegation={fetchAllForAdvancedDelegation}
         completeDelegation={closeDialog}
         isDelegationEncouragement={isDelegationEncouragement}
-      />
-    );
-  },
-  CAST_PROPOSAL: ({ isError, isLoading, isSuccess, txHash }, closeDialog) => {
-    return (
-      <CastProposalDialog
-        isError={isError}
-        isLoading={isLoading}
-        isSuccess={isSuccess}
-        txHash={txHash}
-        closeDialog={closeDialog}
       />
     );
   },
@@ -460,8 +461,20 @@ export const dialogs: DialogDefinitions<DialogType> = {
   UPDATE_DRAFT_PROPOSAL: ({ redirectUrl }, closeDialog) => (
     <UpdateDraftProposalDialog redirectUrl={redirectUrl} />
   ),
-  SPONSOR_ONCHAIN_DRAFT_PROPOSAL: ({ redirectUrl, txHash }, closeDialog) => (
+  SPONSOR_ONCHAIN_DRAFT_PROPOSAL: (
+    { redirectUrl, txHash, isHybrid, draftProposal },
+    closeDialog
+  ) => (
     <SponsorOnchainProposalDialog
+      redirectUrl={redirectUrl}
+      txHash={txHash}
+      closeDialog={closeDialog}
+      isHybrid={isHybrid}
+      draftProposal={draftProposal}
+    />
+  ),
+  SPONSOR_OFFCHAIN_DRAFT_PROPOSAL: ({ redirectUrl, txHash }, closeDialog) => (
+    <SponsorOffchainProposalDialog
       redirectUrl={redirectUrl}
       txHash={txHash}
       closeDialog={closeDialog}

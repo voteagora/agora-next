@@ -8,15 +8,21 @@ import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
 import { UpdatedButton } from "@/components/Button";
 import { getBlockScanUrl, wrappedWaitForTransactionReceipt } from "@/lib/utils";
+import OffchainProposalAction from "@/app/proposals/sponsor/components/OffchainProposalAction";
+import { DraftProposal } from "../../types";
 
 const SponsorOnchainProposalDialog = ({
   redirectUrl,
   txHash,
   closeDialog,
+  isHybrid,
+  draftProposal,
 }: {
   redirectUrl: string;
   txHash: `0x${string}`;
   closeDialog: () => void;
+  isHybrid: boolean;
+  draftProposal: DraftProposal;
 }) => {
   const tenant = Tenant.current();
   const { address } = useAccount();
@@ -57,6 +63,16 @@ const SponsorOnchainProposalDialog = ({
             <div className="mb-2 text-2xl font-black text-primary">
               {isLoading ? "Creating your proposal ..." : "Proposal complete!"}
             </div>
+            {isHybrid && (
+              <div className="mb-5 text-base text-secondary">
+                <b>
+                  Don&apos;t leave this page until you have signed the
+                  attestation.
+                </b>
+                After the onchain transaction is confirmed, you will need to
+                sign an attestation to create the offchain proposal.{" "}
+              </div>
+            )}
             {isLoading && (
               <div className="mb-5 text-base text-secondary">
                 It might take up to a minute for the changes to be reflected.
@@ -68,22 +84,24 @@ const SponsorOnchainProposalDialog = ({
                 appear on Agora.
               </div>
             )}
-            <div>
-              <UpdatedButton
-                fullWidth={true}
-                type="primary"
-                isLoading={isLoading}
-                onClick={async () => {
-                  // TODO: redirect to the proposal page once we have indexing available
-                  router.push(redirectUrl);
-                  closeDialog();
-                }}
-              >
-                {isLoading
-                  ? "Saving your proposal onchain..."
-                  : "View Proposals"}
-              </UpdatedButton>
-            </div>
+            {!isHybrid && (
+              <div>
+                <UpdatedButton
+                  fullWidth={true}
+                  type="primary"
+                  isLoading={isLoading}
+                  onClick={async () => {
+                    // TODO: redirect to the proposal page once we have indexing available
+                    router.push(redirectUrl);
+                    closeDialog();
+                  }}
+                >
+                  {isLoading
+                    ? "Saving your proposal onchain..."
+                    : "View Proposals"}
+                </UpdatedButton>
+              </div>
+            )}
             {!isLoading && (
               <div className="flex flex-row justify-between items-center mt-4">
                 <span className="text-secondary">
@@ -99,6 +117,11 @@ const SponsorOnchainProposalDialog = ({
                     />
                   </Link>
                 </div>
+              </div>
+            )}
+            {isHybrid && (
+              <div className="mt-4">
+                <OffchainProposalAction draftProposal={draftProposal} />
               </div>
             )}
           </VStack>

@@ -208,10 +208,6 @@ export const optimismTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "proposals/create",
-      enabled: true,
-    },
-    {
       name: "delegates",
       enabled: true,
     },
@@ -337,6 +333,10 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
     },
     {
       name: "dao-node/proposal-votes",
+      enabled: true,
+    },
+    {
+      name: "proposals/offchain",
       enabled: true,
     },
   ],

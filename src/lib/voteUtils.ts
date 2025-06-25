@@ -3,6 +3,9 @@ import {
   getTitleFromProposalDescription,
   ParsedProposalData,
   ParsedProposalResults,
+  calculateHybridStandardProposalMetrics,
+  calculateHybridApprovalProposalMetrics,
+  calculateHybridOptimisticProposalMetrics,
 } from "./proposalUtils";
 import { getHumanBlockTime } from "./blockTimes";
 import {
@@ -100,21 +103,37 @@ export type ParsedParams = {
     key: "SNAPSHOT";
     kind: null;
   };
-  OFFCHAIN_STANDARD: {
-    key: "OFFCHAIN_STANDARD";
-    kind: null;
-  };
-  OFFCHAIN_APPROVAL: {
-    key: "OFFCHAIN_APPROVAL";
+  OFFCHAIN_OPTIMISTIC_TIERED: {
+    key: "OFFCHAIN_OPTIMISTIC_TIERED";
     kind: null;
   };
   OFFCHAIN_OPTIMISTIC: {
     key: "OFFCHAIN_OPTIMISTIC";
     kind: null;
   };
-  OFFCHAIN_OPTIMISTIC_TIERED: {
-    key: "OFFCHAIN_OPTIMISTIC_TIERED";
+  OFFCHAIN_STANDARD: {
+    key: "OFFCHAIN_STANDARD";
     kind: null;
+  };
+  OFFCHAIN_APPROVAL: {
+    key: "OFFCHAIN_APPROVAL";
+    kind: string[];
+  };
+  HYBRID_STANDARD: {
+    key: "HYBRID_STANDARD";
+    kind: string[];
+  };
+  HYBRID_APPROVAL: {
+    key: "HYBRID_APPROVAL";
+    kind: string[];
+  };
+  HYBRID_OPTIMISTIC: {
+    key: "HYBRID_OPTIMISTIC";
+    kind: string[];
+  };
+  HYBRID_OPTIMISTIC_TIERED: {
+    key: "HYBRID_OPTIMISTIC_TIERED";
+    kind: string[];
   };
 };
 
@@ -200,6 +219,7 @@ export async function parseVote(
     proposalType: vote.proposal_type,
     blockNumber: vote.block_number,
     timestamp: latestBlock ? getHumanBlockTime(blockNumber, latestBlock) : null,
+    citizenType: vote.citizen_type || null,
   };
 }
 
@@ -313,70 +333,89 @@ export function calculateVoteMetadata({
     ? `ENDS ~${format(new Date(proposal.endTime), "MMM d")}`
     : "";
 
-  const results =
-    proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
+  // Handle hybrid proposals with weighted calculations
+  let boundedForPercentage = 0;
+  let boundedAgainstPercentage = 0;
 
-  const adjustedResults = {
-    for: BigInt(results.for),
-    against: BigInt(results.against),
-    abstain: BigInt(results.abstain),
-  };
+  if (proposal.proposalType === "HYBRID_STANDARD") {
+    const metrics = calculateHybridStandardProposalMetrics(proposal);
+    boundedForPercentage = metrics.totalForVotesPercentage;
+    boundedAgainstPercentage = metrics.totalAgainstVotesPercentage;
+  } else if (proposal.proposalType === "HYBRID_APPROVAL") {
+    const metrics = calculateHybridApprovalProposalMetrics(proposal);
+    boundedForPercentage = metrics.totalWeightedParticipation;
+    boundedAgainstPercentage = 0; // Approval proposals don't typically show against percentage
+  } else if (
+    proposal.proposalType === "HYBRID_OPTIMISTIC" ||
+    proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
+  ) {
+    const metrics = calculateHybridOptimisticProposalMetrics(proposal);
+    boundedForPercentage = 0; // Optimistic proposals don't show for percentage
+    boundedAgainstPercentage = metrics.totalAgainstVotes;
+  } else {
+    // Standard calculation for non-hybrid proposals
+    const results =
+      proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
-  if (newVote) {
-    const newVoteWeight = BigInt(newVote.weight);
-    if (newVote.support === "FOR") adjustedResults.for += newVoteWeight;
-    else if (newVote.support === "AGAINST")
-      adjustedResults.against += newVoteWeight;
-    else if (newVote.support === "ABSTAIN")
-      adjustedResults.abstain += newVoteWeight;
+    const adjustedResults = {
+      for: BigInt(results.for),
+      against: BigInt(results.against),
+      abstain: BigInt(results.abstain),
+    };
+
+    if (newVote) {
+      const newVoteWeight = BigInt(newVote.weight);
+      if (newVote.support === "FOR") adjustedResults.for += newVoteWeight;
+      else if (newVote.support === "AGAINST")
+        adjustedResults.against += newVoteWeight;
+      else if (newVote.support === "ABSTAIN")
+        adjustedResults.abstain += newVoteWeight;
+    }
+
+    const totalVotes =
+      adjustedResults.for + adjustedResults.against + adjustedResults.abstain;
+
+    const calculatePercentage = (value: bigint, total: bigint): number => {
+      if (total === BigInt(0)) return 0;
+      try {
+        const percentage = (Number(value) / Number(total)) * 100;
+        return isFinite(percentage) ? percentage : 0;
+      } catch {
+        return 0;
+      }
+    };
+
+    const calculateOptimisticAgainstPercentage = (): number => {
+      try {
+        const againstAmount = Number(
+          formatUnits(adjustedResults.against, token.decimals)
+        );
+        const thresholdAmount =
+          (disapprovalThreshold * Number(formattedVotableSupply)) / 100;
+
+        if (thresholdAmount === 0) return 0;
+
+        const percentage = (againstAmount / thresholdAmount) * 100;
+        return isFinite(percentage) ? percentage : 0;
+      } catch {
+        return 0;
+      }
+    };
+
+    const forPercentage =
+      proposal.proposalType === "OPTIMISTIC"
+        ? 0
+        : calculatePercentage(adjustedResults.for, totalVotes);
+
+    const againstPercentage =
+      proposal.proposalType === "OPTIMISTIC"
+        ? calculateOptimisticAgainstPercentage()
+        : calculatePercentage(adjustedResults.against, totalVotes);
+
+    // Ensure percentages are within bounds
+    boundedForPercentage = Math.min(Math.max(forPercentage, 0), 100);
+    boundedAgainstPercentage = Math.min(Math.max(againstPercentage, 0), 100);
   }
-
-  const totalVotes =
-    adjustedResults.for + adjustedResults.against + adjustedResults.abstain;
-
-  const calculatePercentage = (value: bigint, total: bigint): number => {
-    if (total === BigInt(0)) return 0;
-    try {
-      const percentage = (Number(value) / Number(total)) * 100;
-      return isFinite(percentage) ? percentage : 0;
-    } catch {
-      return 0;
-    }
-  };
-
-  const calculateOptimisticAgainstPercentage = (): number => {
-    try {
-      const againstAmount = Number(
-        formatUnits(adjustedResults.against, token.decimals)
-      );
-      const thresholdAmount =
-        (disapprovalThreshold * Number(formattedVotableSupply)) / 100;
-
-      if (thresholdAmount === 0) return 0;
-
-      const percentage = (againstAmount / thresholdAmount) * 100;
-      return isFinite(percentage) ? percentage : 0;
-    } catch {
-      return 0;
-    }
-  };
-
-  const forPercentage =
-    proposal.proposalType === "OPTIMISTIC"
-      ? 0
-      : calculatePercentage(adjustedResults.for, totalVotes);
-
-  const againstPercentage =
-    proposal.proposalType === "OPTIMISTIC"
-      ? calculateOptimisticAgainstPercentage()
-      : calculatePercentage(adjustedResults.against, totalVotes);
-
-  // Ensure percentages are within bounds
-  const boundedForPercentage = Math.min(Math.max(forPercentage, 0), 100);
-  const boundedAgainstPercentage = Math.min(
-    Math.max(againstPercentage, 0),
-    100
-  );
 
   let parsedOptions: {
     description: string;
@@ -389,7 +428,10 @@ export function calculateVoteMetadata({
   }[] = [];
   let totalOptions = 0;
 
-  if (proposal.proposalType === "APPROVAL") {
+  if (
+    proposal.proposalType === "APPROVAL" ||
+    proposal.proposalType === "HYBRID_APPROVAL"
+  ) {
     const proposalData =
       proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
 
@@ -402,55 +444,106 @@ export function calculateVoteMetadata({
     const proposalSettings = proposalData.proposalSettings;
     const options = proposalResults.options;
 
-    let totalVotingPower =
-      BigInt(proposalResults.for) +
-      BigInt(proposalResults.abstain) +
-      BigInt(proposalResults.against);
+    let totalVotingPower;
+    let thresholdPosition;
 
-    if (newVote) {
-      totalVotingPower += BigInt(newVote.weight);
-    }
+    if (proposal.proposalType === "HYBRID_APPROVAL") {
+      // Use weighted calculations for hybrid approval
+      const metrics = calculateHybridApprovalProposalMetrics(proposal);
+      totalVotingPower = BigInt(
+        Math.round(metrics.totalWeightedParticipation * 10000)
+      ); // Convert to scaled format
 
-    // Same calculation as in OptionResultsPanel.tsx
-    const thresholdPosition = (() => {
-      if (proposalSettings.criteria === "THRESHOLD") {
-        const threshold = BigInt(proposalSettings.criteriaValue);
-        if (totalVotingPower < (threshold * BigInt(15)) / BigInt(10)) {
-          return 66;
-        } else {
-          // calculate threshold position, min 5% max 66%
-          return totalVotingPower
-            ? Math.max(Number((threshold * BigInt(100)) / totalVotingPower), 5)
-            : 5;
+      thresholdPosition = (() => {
+        if (proposalSettings.criteria === "THRESHOLD") {
+          const thresholdPercentage =
+            Number(proposalSettings.criteriaValue) / 100;
+          if (metrics.totalWeightedParticipation < thresholdPercentage * 1.5) {
+            return 66;
+          } else {
+            return metrics.totalWeightedParticipation > 0
+              ? Math.max(
+                  (thresholdPercentage / metrics.totalWeightedParticipation) *
+                    100,
+                  5
+                )
+              : 5;
+          }
         }
+        return 0;
+      })();
+    } else {
+      // Standard approval calculation
+      totalVotingPower =
+        BigInt(proposalResults.for) +
+        BigInt(proposalResults.abstain) +
+        BigInt(proposalResults.against);
+
+      if (newVote) {
+        totalVotingPower += BigInt(newVote.weight);
       }
-      return 0;
-    })();
+
+      thresholdPosition = (() => {
+        if (proposalSettings.criteria === "THRESHOLD") {
+          const threshold = BigInt(proposalSettings.criteriaValue);
+          if (totalVotingPower < (threshold * BigInt(15)) / BigInt(10)) {
+            return 66;
+          } else {
+            // calculate threshold position, min 5% max 66%
+            return totalVotingPower
+              ? Math.max(
+                  Number((threshold * BigInt(100)) / totalVotingPower),
+                  5
+                )
+              : 5;
+          }
+        }
+        return 0;
+      })();
+    }
 
     let availableBudget = BigInt(proposalSettings.budgetAmount);
     let isExceeded = false;
 
     const mutableOptions = [...options];
-    const sortedOptions = mutableOptions
-      .map((option, i) => {
-        const votes = BigInt(option.votes || 0);
-        const newVoteForOption = newVote?.params?.includes(option.option)
-          ? BigInt(newVote.weight)
-          : BigInt(0);
+    let sortedOptions;
 
-        return {
+    if (proposal.proposalType === "HYBRID_APPROVAL") {
+      // For hybrid approval, use weighted percentage for sorting
+      const metrics = calculateHybridApprovalProposalMetrics(proposal);
+      sortedOptions = mutableOptions
+        .map((option, i) => ({
           ...option,
           ...proposalData.options[i],
-          votes: (votes + newVoteForOption).toString(),
-        };
-      })
-      .sort((a, b) =>
-        BigInt(b.votes || 0) > BigInt(a.votes || 0)
-          ? 1
-          : BigInt(b.votes || 0) < BigInt(a.votes || 0)
-            ? -1
-            : 0
-      );
+          weightedPercentage:
+            metrics.optionResults.find(
+              (result) => result.optionName === option.option
+            )?.weightedPercentage || 0,
+        }))
+        .sort((a, b) => b.weightedPercentage - a.weightedPercentage);
+    } else {
+      // Standard sorting by raw votes
+      sortedOptions = mutableOptions
+        .map((option, i) => {
+          const votes = BigInt(option.votes || 0);
+          const newVoteForOption = newVote?.params?.includes(option.option)
+            ? BigInt(newVote.weight)
+            : BigInt(0);
+
+          return {
+            ...option,
+            ...proposalData.options[i],
+            votes: (votes + newVoteForOption).toString(),
+          };
+        })
+        .sort((a, b) =>
+          BigInt(b.votes || 0) > BigInt(a.votes || 0)
+            ? 1
+            : BigInt(b.votes || 0) < BigInt(a.votes || 0)
+              ? -1
+              : 0
+        );
+    }
 
     totalOptions = sortedOptions.length;
 
@@ -458,7 +551,19 @@ export function calculateVoteMetadata({
       .slice(0, totalOptions > 7 ? 7 : totalOptions)
       .forEach((option, index) => {
         let isApproved = false;
-        const votesAmountBN = BigInt(option?.votes || 0);
+        let votesAmountBN;
+        let votes;
+
+        if (proposal.proposalType === "HYBRID_APPROVAL") {
+          // For hybrid approval, use weighted percentage
+          const weightedPercentage = (option as any).weightedPercentage || 0;
+          votesAmountBN = BigInt(Math.round(weightedPercentage * 10000)); // Convert to scaled format
+          votes = String(Math.round(weightedPercentage * 100)); // Convert to percentage format
+        } else {
+          // Standard calculation
+          votesAmountBN = BigInt(option?.votes || 0);
+          votes = String(option.votes);
+        }
 
         const optionBudget =
           (proposal?.createdTime as Date) >
@@ -472,11 +577,23 @@ export function calculateVoteMetadata({
         if (proposalSettings.criteria === "TOP_CHOICES") {
           isApproved = index < Number(proposalSettings.criteriaValue);
         } else if (proposalSettings.criteria === "THRESHOLD") {
-          const threshold = BigInt(proposalSettings.criteriaValue);
-          isApproved =
-            !isExceeded &&
-            votesAmountBN >= threshold &&
-            availableBudget >= optionBudget;
+          if (proposal.proposalType === "HYBRID_APPROVAL") {
+            // For hybrid approval, compare weighted percentage to threshold
+            const thresholdPercentage = Number(proposalSettings.criteriaValue);
+            const weightedPercentage = (option as any).weightedPercentage || 0;
+            isApproved =
+              !isExceeded &&
+              weightedPercentage >= thresholdPercentage &&
+              availableBudget >= optionBudget;
+          } else {
+            // Standard threshold comparison
+            const threshold = BigInt(proposalSettings.criteriaValue);
+            isApproved =
+              !isExceeded &&
+              votesAmountBN >= threshold &&
+              availableBudget >= optionBudget;
+          }
+
           if (isApproved) {
             availableBudget = availableBudget - optionBudget;
           } else {
@@ -486,7 +603,7 @@ export function calculateVoteMetadata({
 
         parsedOptions.push({
           description: option.option,
-          votes: String(option.votes),
+          votes,
           votesAmountBN: String(votesAmountBN),
           totalVotingPower: String(totalVotingPower),
           proposalSettings,

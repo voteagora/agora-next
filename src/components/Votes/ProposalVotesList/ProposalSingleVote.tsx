@@ -39,7 +39,7 @@ const SUPPORT_TO_ICON: Record<Support, React.ReactNode> = {
 export function ProposalSingleVote({ vote }: { vote: Vote }) {
   const { address: connectedAddress } = useAccount();
   const [hovered, setHovered] = useState(false);
-  const [hash1, hash2] = vote.transactionHash?.split("|") ?? [];
+  const [hash1, hash2] = vote.transactionHash?.split("|") || [];
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -50,6 +50,8 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
     transactionIndex: vote.transaction_index,
     enabled: inView && !!vote.blockNumber && !!vote.transaction_index,
   });
+
+  const isOffchainVote = !!vote.citizenType;
 
   const { data } = useEnsName({
     chainId: 1,
@@ -83,16 +85,24 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
               className="font-semibold text-secondary"
             >
               <HStack gap={1} alignItems="items-center">
-                <ENSAvatar ensName={data} className="w-5 h-5" />
-                <div className="text-primary hover:underline">
-                  <Link href={`/delegates/${vote.address}`}>
-                    <ENSName address={vote.address} />
-                  </Link>
+                <ENSAvatar ensName={data} className="w-8 h-8" />
+                <div className="flex flex-col">
+                  <div className="text-primary font-bold hover:underline">
+                    <Link href={`/delegates/${vote.address}`}>
+                      <ENSName address={vote.address} />
+                    </Link>
+                  </div>
+                  {vote.citizenType && (
+                    <div className="text-[9px] font-bold text-tertiary">
+                      {vote.citizenType?.charAt(0).toUpperCase() +
+                        vote.citizenType?.slice(1).toLowerCase()}
+                    </div>
+                  )}
                 </div>
                 {vote.address === connectedAddress?.toLowerCase() && (
                   <p className="text-primary">(you)</p>
                 )}
-                {hovered && (
+                {hovered && (!!hash1 || !!hash2) && (
                   <>
                     {hash1 || hash ? (
                       <a
@@ -131,6 +141,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                         <TokenAmountDecorated
                           amount={vote.weight}
                           hideCurrency
+                          decimals={isOffchainVote ? 0 : undefined}
                           specialFormatting
                           className={
                             fontMapper[ui?.customization?.tokenAmountFont || ""]
@@ -141,7 +152,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="p-4">
-                      {`${formatNumber(vote.weight, token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
+                      {`${formatNumber(vote.weight, isOffchainVote ? 0 : token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

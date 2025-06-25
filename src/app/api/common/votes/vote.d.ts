@@ -21,6 +21,7 @@ export type Vote = {
   timestamp: Date | null;
   blockNumber?: bigint;
   transaction_index?: number;
+  citizenType: string | null;
 };
 
 export type SnapshotVotePayload = {

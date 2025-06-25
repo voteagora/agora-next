@@ -10,6 +10,7 @@ import {
   isTimestampBasedProposal,
   getStartTimestamp,
   getStartBlock,
+  ParsedProposalResults,
 } from "@/lib/proposalUtils";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
@@ -19,6 +20,7 @@ import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import { Proposal, ProposalPayload } from "./proposal";
 import { doInSpan } from "@/app/lib/logging";
 import {
+  findOffchainProposal,
   findProposal,
   findProposalType,
   findProposalsQueryFromDB,
@@ -52,9 +54,11 @@ const fetchSnapshotProposalsFromDB = cache(getSnapshotProposalsFromDB);
 async function getProposals({
   filter,
   pagination,
+  type,
 }: {
   filter: string;
   pagination: PaginationParams;
+  type?: string;
 }): Promise<PaginatedResult<Proposal[]>> {
   return withMetrics(
     "getProposals",
@@ -134,6 +138,7 @@ async function getProposals({
                     skip,
                     take,
                     filter,
+                    type,
                     contract: contracts.governor.address,
                   });
 
@@ -159,8 +164,16 @@ async function getProposals({
           fetchVotableSupply(),
         ]);
 
+        // This will filter the offchain record of an hybrid proposal.
+        const filteredProposals =
+          filter === "relevant" && !(type === "OFFCHAIN")
+            ? proposals.data.filter((proposal: ProposalPayload) => {
+                return !(proposal.proposal_data as any)?.onchain_proposalid;
+              })
+            : proposals.data;
+
         const resolvedProposals = await Promise.all(
-          proposals.data.map(async (proposal: ProposalPayload) => {
+          filteredProposals.map(async (proposal: ProposalPayload) => {
             const quorum = await fetchQuorumForProposal(proposal);
             return parseProposal(
               proposal,
@@ -216,8 +229,18 @@ async function getProposal(proposalId: string) {
       );
     }
 
-    const [proposal, votableSupply] = await Promise.all([
+    const getOfflineProposal = doInSpan(
+      { name: "getOfflineProposal" },
+      async () =>
+        findOffchainProposal({
+          namespace,
+          onchainProposalId: proposalId,
+        })
+    );
+
+    const [proposal, offlineProposal, votableSupply] = await Promise.all([
       getProposalExecution,
+      getOfflineProposal,
       fetchVotableSupply(),
     ]);
 
@@ -243,7 +266,8 @@ async function getProposal(proposalId: string) {
       proposal as ProposalPayload,
       latestBlock,
       quorum ?? null,
-      BigInt(votableSupply)
+      BigInt(votableSupply),
+      offlineProposal as ProposalPayload
     );
   });
 }

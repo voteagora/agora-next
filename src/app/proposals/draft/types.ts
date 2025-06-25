@@ -156,6 +156,17 @@ export enum ApprovalProposalType {
   TOP_CHOICES = "Top choices",
 }
 
+export enum ProposalScope {
+  ONCHAIN_ONLY = "onchain_only",
+  OFFCHAIN_ONLY = "offchain_only",
+  HYBRID = "hybrid",
+}
+
+export enum CalculationOptions {
+  INCLUDE_ABSTAIN = "Include Abstain",
+  EXCLUDE_ABSTAIN = "Exclude Abstain",
+}
+
 export enum ProposalType {
   // might make sense to move snapshot to something else since snapshot isn't really a "proposal"
   // It doesn't go through the governor
@@ -164,33 +175,6 @@ export enum ProposalType {
   APPROVAL = "approval",
   OPTIMISTIC = "optimistic",
 }
-
-export const ProposalTypeMetadata = {
-  [ProposalType.SOCIAL]: {
-    title: "Social Proposal",
-    description: "A proposal that resolves via a snapshot vote.",
-  },
-  [ProposalType.BASIC]: {
-    title: "Basic Proposal",
-    description:
-      "Voters are asked to vote for, against, or abstain. The proposal passes if the abstain and for votes exceeed quorum AND if the for votes exceed the approval threshold.",
-  },
-  [ProposalType.APPROVAL]: {
-    title: "Approval Proposal",
-    description:
-      "Voters are asked to choose among multiple options. If the proposal passes quorum, options will be approved according to the approval criteria.",
-  },
-  [ProposalType.OPTIMISTIC]: {
-    title: "Optimistic Proposal",
-    description:
-      "Voters are asked to vote for, against, or abstain. The proposal automatically passes unless 12% vote against. No transactions can be proposed for optimistic proposals, it can only be used for social signaling.",
-  },
-} as {
-  [key in ProposalType]: {
-    title: string;
-    description: string;
-  };
-};
 
 export enum TransactionType {
   TRANSFER = "transfer",
@@ -230,6 +214,10 @@ export type PLMConfig = {
 
 export type BaseProposal = ProposalDraft & {
   checklist_items: ProposalChecklist[];
+  proposal_scope?: ProposalScope;
+  tiers_enabled?: boolean;
+  tiers?: number[];
+  calculationOptions?: number;
 };
 
 export type BasicProposal = BaseProposal & {
@@ -302,6 +290,12 @@ const parseTransaction = (t: ProposalDraftTransaction) => {
 };
 // Used to translate a draftProposal database record into its form representation
 export const parseProposalToForm = (proposal: DraftProposal) => {
+  const baseFields = {
+    proposal_scope: proposal.proposal_scope,
+    tiers_enabled: proposal.tiers_enabled || proposal.tiers?.length > 0,
+    tiers: proposal.tiers,
+  };
+
   switch (proposal.voting_module_type) {
     case ProposalType.BASIC:
       return {
@@ -309,6 +303,7 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         title: proposal.title,
         abstract: proposal.abstract,
         transactions: proposal.transactions.map((t) => parseTransaction(t)),
+        ...baseFields,
       };
     case ProposalType.SOCIAL:
       return {
@@ -321,6 +316,7 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
           end_date: proposal.end_date_social,
           options: proposal.social_options,
         },
+        ...baseFields,
       };
     case ProposalType.APPROVAL:
       return {
@@ -340,12 +336,14 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
             };
           }),
         },
+        ...baseFields,
       };
     case ProposalType.OPTIMISTIC:
       return {
         type: ProposalType.OPTIMISTIC,
         title: proposal.title,
         abstract: proposal.abstract,
+        ...baseFields,
       };
   }
 };

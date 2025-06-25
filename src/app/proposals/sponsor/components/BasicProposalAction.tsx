@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSimulateContract, useWriteContract } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
-import { BasicProposal } from "../../../proposals/draft/types";
+import { BasicProposal, ProposalScope } from "../../../proposals/draft/types";
 import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
@@ -21,6 +21,7 @@ const BasicProposalAction = ({
   const { contracts } = Tenant.current();
   const { inputData } = getInputData(draftProposal);
   const [proposalCreated, setProposalCreated] = useState(false);
+  const proposal_scope = draftProposal.proposal_scope;
 
   /**
    * Notes on proposal methods per governor:
@@ -83,12 +84,16 @@ const BasicProposalAction = ({
             await sponsorDraftProposal({
               draftProposalId: draftProposal.id,
               onchain_transaction_hash: data,
+              is_offchain_submission: false,
+              proposal_scope: draftProposal.proposal_scope,
             });
             openDialog({
               type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL",
               params: {
                 redirectUrl: "/",
                 txHash: data,
+                isHybrid: proposal_scope === ProposalScope.HYBRID,
+                draftProposal,
               },
             });
           } catch (error) {

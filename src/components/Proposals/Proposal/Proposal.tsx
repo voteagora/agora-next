@@ -1,7 +1,9 @@
 import Link from "next/link";
 import ProposalStatus from "../ProposalStatus/ProposalStatus";
 import OPStandardProposalStatus from "./OPStandardProposalStatus";
-import OPApprovalProposalStatus from "./OPApprovalProposalStatus";
+import OPApprovalProposalStatus, {
+  OffchainApprovalProposalStatus,
+} from "./OPApprovalProposalStatus";
 import ProposalTimeStatus from "./ProposalTimeStatus";
 import { cn, getProposalTypeText } from "@/lib/utils";
 import OPOptimisticProposalStatus from "./OPOptimisticProposalStatus";
@@ -100,11 +102,14 @@ export default function Proposal({
             {proposal.proposalType === "SNAPSHOT" && (
               <SnapshotProposalStatus proposal={proposal} />
             )}
-            {proposal.proposalType === "STANDARD" &&
+            {(proposal.proposalType === "STANDARD" ||
+              proposal.proposalType === "OFFCHAIN_STANDARD") &&
               proposal.proposalResults && (
                 <OPStandardProposalStatus proposal={proposal} />
               )}
-            {proposal.proposalType === "OPTIMISTIC" &&
+            {(proposal.proposalType === "OPTIMISTIC" ||
+              proposal.proposalType === "OFFCHAIN_OPTIMISTIC" ||
+              proposal.proposalType === "OFFCHAIN_OPTIMISTIC_TIERED") &&
               proposal.proposalResults && (
                 <OPOptimisticProposalStatus
                   proposal={proposal}
@@ -114,6 +119,10 @@ export default function Proposal({
             {proposal.proposalType === "APPROVAL" && proposal.proposalData && (
               <OPApprovalProposalStatus proposal={proposal} />
             )}
+            {proposal.proposalType === "OFFCHAIN_APPROVAL" &&
+              proposal.proposalData && (
+                <OffchainApprovalProposalStatus proposal={proposal} />
+              )}
           </div>
         </div>
       </div>
