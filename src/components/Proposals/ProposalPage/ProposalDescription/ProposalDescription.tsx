@@ -60,6 +60,24 @@ export default function ProposalDescription({
       className={`flex flex-col gap-4 sm:max-w-[48rem] w-full md:min-w-[20rem] lg:min-w-[32rem] xl:min-w-[48rem] max-w-[calc(100vw-2rem)]`}
     >
       <ProposalTitle title={shortTitle} proposal={proposal} />
+      {(proposal.proposalType?.includes("OFFCHAIN") ||
+        proposal.proposalType?.includes("HYBRID")) && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p>
+            <strong>New:</strong> This proposal implements the Joint House
+            Voting. Learn more about how the two houses work together here:{" "}
+            <a
+              href="https://github.com/ethereum-optimism/OPerating-manual/blob/main/manual.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              Operating Manual
+            </a>
+            .
+          </p>
+        </div>
+      )}
       {!proposal.proposalType?.includes("OFFCHAIN") &&
         !proposal.proposalType?.includes("HYBRID") && (
           <ProposalChart proposal={proposal} />
