@@ -304,7 +304,7 @@ async function getVotersWhoHaveNotVotedForProposal({
         skip,
         take,
       ];
-      
+
       if (includeCitizens && offchainProposalId) {
         params.push(offchainProposalId);
       }
@@ -389,7 +389,6 @@ async function getVotesForProposal({
       }
 
       const includeCitizens = namespace === TENANT_NAMESPACES.OPTIMISM;
-
       const queryFunction = (skip: number, take: number) => {
         let citizenQuery = "";
 
@@ -485,7 +484,7 @@ async function getVotesForProposal({
           skip,
           take,
         ];
-        
+
         if (includeCitizens && offchainProposalId) {
           params.push(offchainProposalId);
         }
