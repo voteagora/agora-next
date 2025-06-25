@@ -26,7 +26,6 @@ export default function HybridOptionsResultsPanel({
   const proposalData =
     proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"];
 
-
   const proposalResults = proposal.proposalResults as unknown as {
     options: { option: string; votes: bigint }[];
     APP: Record<string, bigint>;
@@ -45,7 +44,7 @@ export default function HybridOptionsResultsPanel({
     proposal,
     true // Include option approval data
   );
-  
+
   // Extract data for threshold calculations
   const proposalSettings = proposalData.proposalSettings;
   const moduleCriteriaValue = BigInt(
