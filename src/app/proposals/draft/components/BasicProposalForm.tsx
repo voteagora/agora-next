@@ -15,7 +15,7 @@ import toast from "react-hot-toast";
 import { checkNewProposal } from "@/lib/seatbelt/checkProposal";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { StructuredReport } from "@/components/Simulation/StructuredReport";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 
 type FormType = z.output<typeof BasicProposalSchema>;
 
@@ -240,7 +240,7 @@ const BasicProposalForm = () => {
       {fields.length > 0 &&
         TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) && (
           <div className="mt-6">
-            <UpdatedButton
+            <Button
               variant={isSimulationButtonEnabled ? "secondary" : "secondary"}
               fullWidth={true}
               loading={simulationPending}
@@ -252,11 +252,11 @@ const BasicProposalForm = () => {
               }}
             >
               Simulate transactions
-            </UpdatedButton>
+            </Button>
           </div>
         )}
       <div className="flex flex-row space-x-2 w-full mt-6">
-        <UpdatedButton
+        <Button
           variant="secondary"
           className="flex-grow h-16 sm:h-10"
           onClick={() => {
@@ -272,8 +272,8 @@ const BasicProposalForm = () => {
           }}
         >
           Transfer from the treasury
-        </UpdatedButton>
-        <UpdatedButton
+        </Button>
+        <Button
           variant="secondary"
           className="flex-grow h-16 sm:h-10"
           onClick={() => {
@@ -289,7 +289,7 @@ const BasicProposalForm = () => {
           }}
         >
           <span className="whitespace-nowrap">Create a custom</span> transaction
-        </UpdatedButton>
+        </Button>
       </div>
       <div className="mt-6">
         {simulationReport && <StructuredReport report={simulationReport} />}

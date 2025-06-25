@@ -40,7 +40,7 @@ import shareIcon from "@/icons/share.svg";
 import { format } from "date-fns";
 import { useVotableSupply } from "@/hooks/useVotableSupply";
 import { DaoSlug } from "@prisma/client";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 
 type Props = {
   proposal: Proposal;
@@ -70,7 +70,7 @@ export default function CastVoteInput({
   if (!isConnected) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
-        <UpdatedButton
+        <Button
           primaryTextColor={
             tenant === "SCROLL"
               ? "black"
@@ -82,7 +82,7 @@ export default function CastVoteInput({
           onClick={() => setOpen(true)}
         >
           Connect wallet to vote
-        </UpdatedButton>
+        </Button>
       </div>
     );
   }
@@ -348,7 +348,7 @@ function VoteSubmitButton({
 
   return (
     <div className="pt-3">
-      <UpdatedButton onClick={write} disabled={!supportType} fullWidth className="w-full">
+      <Button onClick={write} disabled={!supportType} fullWidth className="w-full">
         Submit vote
         {vpToDisplay ? (
           <>
@@ -356,7 +356,7 @@ function VoteSubmitButton({
             with{"\u00A0"} <TokenAmountDisplay amount={vpToDisplay} />
           </>
         ) : null}
-      </UpdatedButton>
+      </Button>
     </div>
   );
 }
@@ -371,9 +371,9 @@ function LoadingVote() {
         It might take up to a minute for the changes to be reflected.
       </div>
       <div>
-        <UpdatedButton className="w-full" disabled fullWidth loading>
+        <Button className="w-full" disabled fullWidth loading>
           Writing your vote to the chain...
-        </UpdatedButton>
+        </Button>
       </div>
     </div>
   );
@@ -439,7 +439,7 @@ export function SuccessMessage({
         className
       )}
     >
-      <UpdatedButton
+      <Button
         onClick={() => {
           openDialog({
             className: "sm:w-[32rem]",
@@ -477,7 +477,7 @@ export function SuccessMessage({
           </span>{" "}
           this proposal
         </span>
-      </UpdatedButton>
+      </Button>
       <BlockScanUrls
         className="pt-2 text-tertiary font-medium mx-auto"
         hash1={
@@ -541,9 +541,9 @@ function VoteButton({ action }: { action: SupportTextProps["supportType"] }) {
 
 function DisabledVoteButton({ reason }: { reason: string }) {
   return (
-    <UpdatedButton fullWidth disabled type="button">
+    <Button fullWidth disabled type="button">
       {reason}
-    </UpdatedButton>
+    </Button>
   );
 }
 
@@ -555,7 +555,7 @@ function NoStatementView() {
         <Image src={icons.info} alt="Info" width={24} height={24} />
         Voting requires a delegate statement. Set yours one now to participate.
       </div>
-      <UpdatedButton
+      <Button
         primaryTextColor={
           tenant === "SCROLL" ? "black" : tenant === "XAI" ? "white" : undefined
         }
@@ -563,7 +563,7 @@ function NoStatementView() {
         onClick={() => (window.location.href = "/delegates/create")}
       >
         Set up statement
-      </UpdatedButton>
+      </Button>
     </div>
   );
 }
@@ -595,13 +595,13 @@ function ErrorState({
               {message}
             </div>
             <div className="flex flex-row gap-2">
-              <UpdatedButton
+              <Button
                 variant="secondary"
                 fullWidth
                 onClick={button1.action}
               >
                 {button1.message}
-              </UpdatedButton>
+              </Button>
               <Button className="w-full" onClick={button2.action}>
                 {button2.message}
               </Button>

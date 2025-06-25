@@ -34,7 +34,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -267,27 +267,27 @@ export function AdvancedDelegateDialog({
 
                 {address ? (
                   isError ? (
-                    <UpdatedButton
+                    <Button
                       fullWidth
                       className="mt-3"
                       disabled={false}
                       onClick={() => writeWithTracking()}
                     >
                       Delegation failed
-                    </UpdatedButton>
+                    </Button>
                   ) : isLoading ? (
-                    <UpdatedButton fullWidth className="mt-3" disabled>
+                    <Button fullWidth className="mt-3" disabled>
                       Submitting your delegation...
-                    </UpdatedButton>
+                    </Button>
                   ) : (
-                    <UpdatedButton
+                    <Button
                       fullWidth
                       className="mt-3"
                       disabled={false}
                       onClick={() => writeWithTracking()}
                     >
                       Delegate your votes
-                    </UpdatedButton>
+                    </Button>
                   )
                 ) : (
                   <Button className="mt-3" onClick={() => setOpen(true)}>

@@ -34,7 +34,7 @@ import {
 import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
 import { ScopeDetails } from "@/components/Admin/ScopeDetails";
 import { FormattedProposalType } from "@/lib/types";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 
 const DEFAULT_FORM = {
   type: ProposalType.BASIC,
@@ -282,14 +282,14 @@ const DraftFormClient = ({
           <FormCard.Section>
             <div className="flex flex-row justify-between space-x-4">
               <div className="w-full">
-                <UpdatedButton
+                <Button
                   fullWidth
                   type="submit"
                   loading={isPending}
                   className="flex items-center justify-center"
                 >
                   {draftProposal.title ? "Update draft" : "Create draft"}
-                </UpdatedButton>
+                </Button>
               </div>
             </div>
           </FormCard.Section>

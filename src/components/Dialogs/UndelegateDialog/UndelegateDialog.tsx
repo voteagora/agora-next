@@ -22,7 +22,7 @@ import { formatEther, zeroAddress } from "viem";
 import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 
 interface UndelegateActionButtonsProps {
   isDisabledInTenant: boolean;
@@ -57,34 +57,34 @@ const UndelegateActionButtons = ({
 }: UndelegateActionButtonsProps) => {
   if (isDisabledInTenant) {
     return (
-      <UpdatedButton fullWidth disabled>
+      <Button fullWidth disabled>
         {tokenSymbol} delegation is disabled at this time
-      </UpdatedButton>
+      </Button>
     );
   }
 
   if (isError || didFailDelegation) {
     return (
-      <UpdatedButton fullWidth onClick={executeDelegate}>
+      <Button fullWidth onClick={executeDelegate}>
         Undelegation failed - try again
-      </UpdatedButton>
+      </Button>
     );
   }
 
   if (isProcessingDelegation || isProcessingSponsoredUnelegation) {
     return (
-      <UpdatedButton primaryTextColor="black" fullWidth disabled>
+      <Button primaryTextColor="black" fullWidth disabled>
         Submitting your undelegation request...
-      </UpdatedButton>
+      </Button>
     );
   }
 
   if (didProcessDelegation || didProcessSponsoredUnelegation) {
     return (
       <div>
-        <UpdatedButton primaryTextColor="black" fullWidth disabled>
+        <Button primaryTextColor="black" fullWidth disabled>
           Undelegation completed!
-        </UpdatedButton>
+        </Button>
         <BlockScanUrls
           hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
         />
@@ -94,16 +94,16 @@ const UndelegateActionButtons = ({
 
   if (sameDelegatee) {
     return (
-      <UpdatedButton fullWidth onClick={executeDelegate}>
+      <Button fullWidth onClick={executeDelegate}>
         Remove your own delegation
-      </UpdatedButton>
+      </Button>
     );
   }
 
   return (
-    <UpdatedButton fullWidth onClick={executeDelegate}>
+    <Button fullWidth onClick={executeDelegate}>
       Undelegate
-    </UpdatedButton>
+    </Button>
   );
 };
 

@@ -19,7 +19,7 @@ import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import { ProposalType } from "@/app/proposals/draft/types";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 
 const { contracts, ui } = Tenant.current();
 
@@ -133,7 +133,7 @@ export default function SubmitButton({
           )}
         </div>
       )}
-      <UpdatedButton
+      <Button
         type="submit"
         fullWidth
         disabled={isLoading || onPrepareError || !!inputDataError}
@@ -155,7 +155,7 @@ export default function SubmitButton({
       >
         {/* hack to suppress Suspense boundary error */}
         {isClient && isConnected ? "Submit proposal" : "Connect wallet"}
-      </UpdatedButton>
+      </Button>
     </>
   );
 }

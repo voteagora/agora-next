@@ -27,12 +27,12 @@ export function Button({ href = "", className = "", ...props }) {
   );
 }
 
-// UpdatedButton - use this for any button implementation
+// Button - use this for any button implementation
 type ButtonVariant = "primary" | "secondary" | "text";
 type ButtonSize = "large" | "small";
 type PrimaryTextColor = "wash" | "primary" | "black" | "white";
 
-export interface UpdatedButtonProps
+export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -43,7 +43,7 @@ export interface UpdatedButtonProps
   primaryTextColor?: PrimaryTextColor;
 }
 
-export const UpdatedButton: React.FC<UpdatedButtonProps> = ({
+export const Button: React.FC<ButtonProps> = ({
   variant = "primary",
   size = "small",
   iconBefore,
@@ -104,7 +104,7 @@ export const UpdatedButton: React.FC<UpdatedButtonProps> = ({
   );
 };
 
-// OldButton - use UpdatedButton instead
+// OldButton - use Button instead
 export function OldButton({
   type = "primary",
   variant = "",

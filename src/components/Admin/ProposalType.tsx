@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 import {
   Form,
   FormControl,
@@ -604,7 +604,7 @@ export default function ProposalType({
           </>
         )}
 
-        <UpdatedButton
+        <Button
           type="submit"
           className="w-full"
           fullWidth
@@ -612,7 +612,7 @@ export default function ProposalType({
           disabled={isDisabled || isErrorSetProposalType}
         >
           Set proposal type
-        </UpdatedButton>
+        </Button>
       </form>
     </Form>
   );

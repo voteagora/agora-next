@@ -5,7 +5,7 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -78,13 +78,13 @@ export const BravoGovExecute = ({ proposal }: Props) => {
           {!canExecute && executeTime ? (
             <>
               <TooltipTrigger>
-                <UpdatedButton disabled={true}>Execute</UpdatedButton>
+                <Button disabled={true}>Execute</Button>
               </TooltipTrigger>
             </>
           ) : (
             <>
               {!isFetched && (
-                <UpdatedButton
+                <Button
                   onClick={() =>
                     writeContract({
                       address: contracts.governor.address as `0x${string}`,
@@ -96,7 +96,7 @@ export const BravoGovExecute = ({ proposal }: Props) => {
                   loading={isLoading}
                 >
                   Execute
-                </UpdatedButton>
+                </Button>
               )}
             </>
           )}

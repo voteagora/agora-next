@@ -1,7 +1,7 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 
@@ -36,7 +36,7 @@ export const BravoGovQueue = ({ proposal }: Props) => {
   return (
     <>
       {!isFetched && (
-        <UpdatedButton
+        <Button
           primaryTextColor="black"
           fullWidth={false}
           loading={isLoading}
@@ -50,7 +50,7 @@ export const BravoGovQueue = ({ proposal }: Props) => {
           }
         >
           Queue
-        </UpdatedButton>
+        </Button>
       )}
     </>
   );

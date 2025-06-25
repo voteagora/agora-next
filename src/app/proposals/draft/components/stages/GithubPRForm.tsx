@@ -10,7 +10,7 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { DraftProposal } from "../../types";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 
 /**
  * TODO:
@@ -115,18 +115,18 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
       <FormCard.Section>
         {!!github_pr_checklist_item ? (
           <div className="space-x-2 self-start flex items-center">
-            <UpdatedButton
+            <Button
               fullWidth={true}
               onClick={() => {
                 router.push(`/proposals/draft/${draftProposal.id}?stage=3`);
               }}
             >
               Continue
-            </UpdatedButton>
+            </Button>
           </div>
         ) : (
           <div className="space-x-2 self-start flex flex-row items-center">
-            <UpdatedButton
+            <Button
               variant="secondary"
               loading={isSkipPending}
               onClick={() => {
@@ -135,8 +135,8 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
               className="shrink"
             >
               Skip
-            </UpdatedButton>
-            <UpdatedButton
+            </Button>
+            <Button
               fullWidth={true}
               loading={isCreatePRPending}
               onClick={() => {
@@ -145,7 +145,7 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
               className="grow"
             >
               Update docs for me
-            </UpdatedButton>
+            </Button>
           </div>
         )}
       </FormCard.Section>

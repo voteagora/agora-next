@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ConnectKitButton } from "connectkit";
 import { useEffect } from "react";
 import { useAccount } from "wagmi";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 
 export const EncourageConnectWalletDialog = ({
   closeDialog,
@@ -28,7 +28,7 @@ export const EncourageConnectWalletDialog = ({
       </div>
       <ConnectKitButton.Custom>
         {({ show }) => (
-          <UpdatedButton
+          <Button
             primaryTextColor="black"
             fullWidth
             size="large"
@@ -38,7 +38,7 @@ export const EncourageConnectWalletDialog = ({
             }}
           >
             Connect Wallet
-          </UpdatedButton>
+          </Button>
         )}
       </ConnectKitButton.Custom>
     </div>

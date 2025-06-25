@@ -1,7 +1,7 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
@@ -40,7 +40,7 @@ export const OZGovQueue = ({ proposal }: Props) => {
   return (
     <>
       {!isFetched && (
-        <UpdatedButton
+        <Button
           primaryTextColor="black"
           size="large"
           fullWidth={false}
@@ -55,7 +55,7 @@ export const OZGovQueue = ({ proposal }: Props) => {
           }
         >
           Queue
-        </UpdatedButton>
+        </Button>
       )}
     </>
   );

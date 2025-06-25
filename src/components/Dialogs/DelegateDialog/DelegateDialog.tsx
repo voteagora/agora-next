@@ -27,7 +27,7 @@ import { formatEther } from "viem";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 
 export function DelegateDialog({
   delegate,
@@ -173,26 +173,26 @@ export function DelegateDialog({
 
     if (isError || didFailDelegation) {
       return (
-        <UpdatedButton fullWidth disabled={false} onClick={executeDelegate}>
+        <Button fullWidth disabled={false} onClick={executeDelegate}>
           Delegation Failed - Try Again
-        </UpdatedButton>
+        </Button>
       );
     }
 
     if (isProcessingDelegation || isProcessingSponsoredDelegation) {
       return (
-        <UpdatedButton fullWidth disabled>
+        <Button fullWidth disabled>
           Submitting your delegation...
-        </UpdatedButton>
+        </Button>
       );
     }
 
     if (didProcessDelegation || didProcessSponsoredDelegation) {
       return (
         <div>
-          <UpdatedButton fullWidth disabled>
+          <Button fullWidth disabled>
             Delegation completed!
-          </UpdatedButton>
+          </Button>
           <BlockScanUrls
             hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
           />
@@ -201,9 +201,9 @@ export function DelegateDialog({
     }
 
     return (
-      <UpdatedButton fullWidth disabled={false} onClick={executeDelegate}>
+      <Button fullWidth disabled={false} onClick={executeDelegate}>
         Delegate
-      </UpdatedButton>
+      </Button>
     );
   };
 

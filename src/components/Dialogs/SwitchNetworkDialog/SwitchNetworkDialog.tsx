@@ -1,5 +1,5 @@
 import { useAccount, useSwitchChain } from "wagmi";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 import { useEffect } from "react";
 import { Chain } from "viem/chains";
 import Image from "next/image";
@@ -29,7 +29,7 @@ export function SwitchNetwork({
       <p className="text-secondary">
         Wrong network detected, switch to {chain.name} to continue.
       </p>
-      <UpdatedButton
+      <Button
         fullWidth
         className="font-bold"
         onClick={() => {
@@ -38,7 +38,7 @@ export function SwitchNetwork({
         }}
       >
         Switch to {chain.name}
-      </UpdatedButton>
+      </Button>
     </div>
   );
 }

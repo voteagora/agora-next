@@ -17,7 +17,7 @@ import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeh
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { useDelegate } from "@/hooks/useDelegate";
 import { useDelegateStatementStore } from "@/stores/delegateStatement";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 
 export default function DelegateStatementForm({
   form,
@@ -155,7 +155,7 @@ export default function DelegateStatementForm({
                   time.
                 </span>
 
-                <UpdatedButton
+                <Button
                   variant="secondary"
                   disabled={!canSubmit}
                   type="submit"
@@ -164,7 +164,7 @@ export default function DelegateStatementForm({
                   }
                 >
                   Submit delegate profile
-                </UpdatedButton>
+                </Button>
                 {form.formState.isSubmitted && !agreeCodeConduct && (
                   <span className="text-red-700 text-sm">
                     You must agree with the code of conduct to continue

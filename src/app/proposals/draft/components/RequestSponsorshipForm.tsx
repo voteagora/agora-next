@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import AddressInput from "./form/AddressInput";
 import { useBlockNumber } from "wagmi";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 import { onSubmitAction as requestSponsorshipAction } from "../actions/requestSponsorship";
 import AvatarAddress from "./AvatarAdress";
 import { invalidatePath } from "../actions/revalidatePath";
@@ -100,7 +100,7 @@ const RequestSponsorshipForm = ({
           </div>
         </div>
       </div>
-      <UpdatedButton
+      <Button
         fullWidth
         disabled={!canAddressSponsor || isPending}
         loading={isPending}
@@ -120,7 +120,7 @@ const RequestSponsorshipForm = ({
         }}
       >
         Request sponsorship
-      </UpdatedButton>
+      </Button>
     </>
   );
 };

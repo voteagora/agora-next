@@ -25,7 +25,7 @@ import { encodeAbiParameters, parseEther } from "viem";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { checkNewApprovalProposal } from "@/lib/seatbelt/checkProposal";
 import { StructuredReport } from "@/components/Simulation/StructuredReport";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 type FormType = z.output<typeof ApprovalProposalSchema>;
 
 const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
@@ -467,7 +467,7 @@ const ApprovalProposalForm = () => {
           })}
         </div>
         <div className="flex flex-row space-x-2 w-full mt-6">
-          <UpdatedButton
+          <Button
             variant="secondary"
             fullWidth
             onClick={() => {
@@ -478,7 +478,7 @@ const ApprovalProposalForm = () => {
             }}
           >
             Add option
-          </UpdatedButton>
+          </Button>
         </div>
       </div>
       {options?.length > 0 &&

@@ -5,7 +5,7 @@ import { useDelegate } from "@/hooks/useDelegate";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useAccount } from "wagmi";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 import EnvelopeBottom from "./DialogImage/EnvelopeBottom";
 import EnvelopePaper from "./DialogImage/EnvelopePaper";
 import EnvelopeTop from "./DialogImage/EnvelopeTop";
@@ -90,7 +90,7 @@ const SubscribeDialog = ({
         </div>
       )}
       <div className="flex flex-col items-center gap-1 mt-4">
-        <UpdatedButton
+        <Button
           variant="secondary"
           fullWidth
           className="mb-2"
@@ -128,8 +128,8 @@ const SubscribeDialog = ({
           }}
         >
           No thanks
-        </UpdatedButton>
-        <UpdatedButton
+        </Button>
+        <Button
           fullWidth
           disabled={!(existingEmail || email)}
           onMouseOver={() => {
@@ -159,7 +159,7 @@ const SubscribeDialog = ({
           }}
         >
           Notify me
-        </UpdatedButton>
+        </Button>
       </div>
     </div>
   );

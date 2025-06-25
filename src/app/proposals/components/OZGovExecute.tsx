@@ -6,7 +6,7 @@ import {
   useWriteContract,
   useWaitForTransactionReceipt,
 } from "wagmi";
-import { UpdatedButton } from "@/components/Button";
+import { Button } from "@/components/Button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -94,13 +94,13 @@ export const OZGovExecute = ({ proposal }: Props) => {
           {!canExecute ? (
             <>
               <TooltipTrigger>
-                <UpdatedButton disabled={true}>Execute</UpdatedButton>
+                <Button disabled={true}>Execute</Button>
               </TooltipTrigger>
             </>
           ) : (
             <>
               {!isFetched && (
-                <UpdatedButton
+                <Button
                   onClick={() =>
                     write({
                       address: contracts.governor!.address as `0x${string}`,
@@ -112,7 +112,7 @@ export const OZGovExecute = ({ proposal }: Props) => {
                   loading={isLoading}
                 >
                   Execute
-                </UpdatedButton>
+                </Button>
               )}
             </>
           )}
