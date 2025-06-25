@@ -5,7 +5,7 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
@@ -102,15 +102,13 @@ export const AgoraOptimismGovExecute = ({ proposal }: Props) => {
           {!canExecute ? (
             <>
               <TooltipTrigger>
-                <DSButton disabled={true} variant="primary" size="small">
-                  Execute
-                </DSButton>
+                <UpdatedButton disabled={true}>Execute</UpdatedButton>
               </TooltipTrigger>
             </>
           ) : (
             <>
               {!isFetched && (
-                <DSButton
+                <UpdatedButton
                   onClick={() =>
                     write({
                       address: contracts.governor.address as `0x${string}`,
@@ -122,11 +120,9 @@ export const AgoraOptimismGovExecute = ({ proposal }: Props) => {
                     })
                   }
                   loading={isLoading}
-                  variant="primary"
-                  size="small"
                 >
                   Execute
-                </DSButton>
+                </UpdatedButton>
               )}
             </>
           )}

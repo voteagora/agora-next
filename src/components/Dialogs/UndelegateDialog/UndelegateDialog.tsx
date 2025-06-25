@@ -22,7 +22,7 @@ import { formatEther, zeroAddress } from "viem";
 import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 
 interface UndelegateActionButtonsProps {
   isDisabledInTenant: boolean;
@@ -57,51 +57,34 @@ const UndelegateActionButtons = ({
 }: UndelegateActionButtonsProps) => {
   if (isDisabledInTenant) {
     return (
-      <DSButton variant="primary" size="small" fullWidth disabled>
+      <UpdatedButton fullWidth disabled>
         {tokenSymbol} delegation is disabled at this time
-      </DSButton>
+      </UpdatedButton>
     );
   }
 
   if (isError || didFailDelegation) {
     return (
-      <DSButton
-        variant="primary"
-        size="small"
-        fullWidth
-        onClick={executeDelegate}
-      >
+      <UpdatedButton fullWidth onClick={executeDelegate}>
         Undelegation failed - try again
-      </DSButton>
+      </UpdatedButton>
     );
   }
 
   if (isProcessingDelegation || isProcessingSponsoredUnelegation) {
     return (
-      <DSButton
-        variant="primary"
-        primaryTextColor="black"
-        fullWidth
-        size="small"
-        disabled
-      >
+      <UpdatedButton primaryTextColor="black" fullWidth disabled>
         Submitting your undelegation request...
-      </DSButton>
+      </UpdatedButton>
     );
   }
 
   if (didProcessDelegation || didProcessSponsoredUnelegation) {
     return (
       <div>
-        <DSButton
-          variant="primary"
-          primaryTextColor="black"
-          fullWidth
-          size="small"
-          disabled
-        >
+        <UpdatedButton primaryTextColor="black" fullWidth disabled>
           Undelegation completed!
-        </DSButton>
+        </UpdatedButton>
         <BlockScanUrls
           hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
         />
@@ -111,27 +94,16 @@ const UndelegateActionButtons = ({
 
   if (sameDelegatee) {
     return (
-      <DSButton
-        variant="primary"
-        primaryTextColor="black"
-        fullWidth
-        size="small"
-        onClick={executeDelegate}
-      >
+      <UpdatedButton fullWidth onClick={executeDelegate}>
         Remove your own delegation
-      </DSButton>
+      </UpdatedButton>
     );
   }
 
   return (
-    <DSButton
-      variant="primary"
-      size="small"
-      fullWidth
-      onClick={executeDelegate}
-    >
+    <UpdatedButton fullWidth onClick={executeDelegate}>
       Undelegate
-    </DSButton>
+    </UpdatedButton>
   );
 };
 

@@ -14,7 +14,7 @@ import {
 } from "@/app/proposals/draft/types";
 import TransferTransactionForm from "./TransferTransactionForm";
 import CustomTransactionForm from "./CustomTransactionForm";
-import { UpdatedButton } from "@/components/Button";
+import { OldButton } from "@/components/Button";
 import TextInput from "./form/TextInput";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 import { useEffect, useState, useCallback } from "react";
@@ -25,7 +25,7 @@ import { encodeAbiParameters, parseEther } from "viem";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { checkNewApprovalProposal } from "@/lib/seatbelt/checkProposal";
 import { StructuredReport } from "@/components/Simulation/StructuredReport";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 type FormType = z.output<typeof ApprovalProposalSchema>;
 
 const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
@@ -82,7 +82,7 @@ const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
         })}
       </div>
       <div className="flex flex-row space-x-2 w-full mt-6">
-        <UpdatedButton
+        <OldButton
           isSubmit={false}
           type="secondary"
           className="flex-grow"
@@ -99,8 +99,8 @@ const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
           }}
         >
           Add a transfer transaction
-        </UpdatedButton>
-        <UpdatedButton
+        </OldButton>
+        <OldButton
           isSubmit={false}
           type="secondary"
           className="flex-grow"
@@ -117,7 +117,7 @@ const OptionItem = ({ optionIndex }: { optionIndex: number }) => {
           }}
         >
           Add a custom transaction
-        </UpdatedButton>
+        </OldButton>
       </div>
     </div>
   );
@@ -467,9 +467,8 @@ const ApprovalProposalForm = () => {
           })}
         </div>
         <div className="flex flex-row space-x-2 w-full mt-6">
-          <DSButton
+          <UpdatedButton
             variant="secondary"
-            size="small"
             fullWidth
             onClick={() => {
               appendOption({
@@ -479,7 +478,7 @@ const ApprovalProposalForm = () => {
             }}
           >
             Add option
-          </DSButton>
+          </UpdatedButton>
         </div>
       </div>
       {options?.length > 0 &&
@@ -487,7 +486,7 @@ const ApprovalProposalForm = () => {
           Tenant.current().contracts.governor.chain.id
         ) && (
           <div className="mt-6">
-            <UpdatedButton
+            <OldButton
               isLoading={simulationPending}
               isSubmit={false}
               type="secondary"
@@ -495,7 +494,7 @@ const ApprovalProposalForm = () => {
               onClick={simulateAllPossibleCombinations}
             >
               Simulate all possible winning combinations
-            </UpdatedButton>
+            </OldButton>
             <p className="mt-2 text-sm text-tertiary">
               This will simulate all possible combinations of winning options
               based on your selected criteria.

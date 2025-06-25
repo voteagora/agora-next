@@ -14,7 +14,7 @@ import { ProposalType } from "@/app/proposals/draft/types";
 import { keccak256 } from "viem";
 import { toUtf8Bytes } from "ethers";
 import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 
 interface Props {
   proposal: Proposal;
@@ -96,7 +96,7 @@ export const AgoraOptimismGovCancel = ({ proposal }: Props) => {
   return (
     <>
       {!isFetched && (
-        <DSButton
+        <UpdatedButton
           onClick={() =>
             write({
               address: contracts.governor.address as `0x${string}`,
@@ -106,11 +106,10 @@ export const AgoraOptimismGovCancel = ({ proposal }: Props) => {
             })
           }
           variant="secondary"
-          size="small"
           loading={isLoading}
         >
           Cancel
-        </DSButton>
+        </UpdatedButton>
       )}
     </>
   );

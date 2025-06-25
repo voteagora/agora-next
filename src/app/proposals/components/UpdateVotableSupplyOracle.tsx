@@ -16,7 +16,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { formatNumber } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { UpdatedButton } from "@/components/Button";
+import { OldButton } from "@/components/Button";
 import { IVotableSupplyOracleContract } from "@/lib/contracts/common/interfaces/IVotableSupplyOracleContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 
@@ -120,13 +120,13 @@ export const UpdateVotableSupplyOracle = ({
             <div>Current votable supply: {formattedPresentVotableSupply}</div>
             <div>Current value in oracle: {formattedOracleSupply}</div>
           </div>
-          <UpdatedButton
+          <OldButton
             onClick={handleUpdateSupply}
             disabled={isPending}
             className="ml-auto"
           >
             {isPending ? "Updating..." : "Update Votable Supply"}
-          </UpdatedButton>
+          </OldButton>
         </div>
       </CardContent>
     </Card>

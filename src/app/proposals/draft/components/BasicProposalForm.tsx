@@ -15,7 +15,7 @@ import toast from "react-hot-toast";
 import { checkNewProposal } from "@/lib/seatbelt/checkProposal";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { StructuredReport } from "@/components/Simulation/StructuredReport";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 
 type FormType = z.output<typeof BasicProposalSchema>;
 
@@ -240,9 +240,8 @@ const BasicProposalForm = () => {
       {fields.length > 0 &&
         TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) && (
           <div className="mt-6">
-            <DSButton
+            <UpdatedButton
               variant={isSimulationButtonEnabled ? "secondary" : "secondary"}
-              size="small"
               fullWidth={true}
               loading={simulationPending}
               disabled={!isSimulationButtonEnabled}
@@ -253,13 +252,12 @@ const BasicProposalForm = () => {
               }}
             >
               Simulate transactions
-            </DSButton>
+            </UpdatedButton>
           </div>
         )}
       <div className="flex flex-row space-x-2 w-full mt-6">
-        <DSButton
+        <UpdatedButton
           variant="secondary"
-          size="small"
           className="flex-grow h-16 sm:h-10"
           onClick={() => {
             append({
@@ -274,10 +272,9 @@ const BasicProposalForm = () => {
           }}
         >
           Transfer from the treasury
-        </DSButton>
-        <DSButton
+        </UpdatedButton>
+        <UpdatedButton
           variant="secondary"
-          size="small"
           className="flex-grow h-16 sm:h-10"
           onClick={() => {
             append({
@@ -292,7 +289,7 @@ const BasicProposalForm = () => {
           }}
         >
           <span className="whitespace-nowrap">Create a custom</span> transaction
-        </DSButton>
+        </UpdatedButton>
       </div>
       <div className="mt-6">
         {simulationReport && <StructuredReport report={simulationReport} />}

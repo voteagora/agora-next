@@ -6,7 +6,7 @@ import {
 } from "@/app/delegates/actions";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 import { DELEGATION_MODEL } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -60,8 +60,7 @@ export const DelegateToSelf = ({
   };
 
   return (
-    <DSButton
-      variant="primary"
+    <UpdatedButton
       primaryTextColor="black"
       className={className}
       onClick={(e: any) => {
@@ -70,6 +69,6 @@ export const DelegateToSelf = ({
       }}
     >
       <div className="justify-center text-base font-medium">{label}</div>
-    </DSButton>
+    </UpdatedButton>
   );
 };

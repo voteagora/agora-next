@@ -3,14 +3,14 @@
 import { useAccount } from "wagmi";
 import { useState } from "react";
 import FormCard from "../form/FormCard";
-import { UpdatedButton } from "@/components/Button";
+import { OldButton } from "@/components/Button";
 import { createGithubProposal } from "@/app/proposals/draft/utils/github";
 import { onSubmitAction as createGithubChecklistItem } from "../../actions/createGithubChecklistItem";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { DraftProposal } from "../../types";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 
 /**
  * TODO:
@@ -115,22 +115,19 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
       <FormCard.Section>
         {!!github_pr_checklist_item ? (
           <div className="space-x-2 self-start flex items-center">
-            <DSButton
+            <UpdatedButton
               fullWidth={true}
-              variant="primary"
-              size="small"
               onClick={() => {
                 router.push(`/proposals/draft/${draftProposal.id}?stage=3`);
               }}
             >
               Continue
-            </DSButton>
+            </UpdatedButton>
           </div>
         ) : (
           <div className="space-x-2 self-start flex flex-row items-center">
-            <DSButton
+            <UpdatedButton
               variant="secondary"
-              size="small"
               loading={isSkipPending}
               onClick={() => {
                 handleSkip();
@@ -138,10 +135,8 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
               className="shrink"
             >
               Skip
-            </DSButton>
-            <DSButton
-              variant="primary"
-              size="small"
+            </UpdatedButton>
+            <UpdatedButton
               fullWidth={true}
               loading={isCreatePRPending}
               onClick={() => {
@@ -150,7 +145,7 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
               className="grow"
             >
               Update docs for me
-            </DSButton>
+            </UpdatedButton>
           </div>
         )}
       </FormCard.Section>

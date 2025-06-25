@@ -5,7 +5,7 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
@@ -53,7 +53,7 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
   return (
     <>
       {!isFetched && (
-        <DSButton
+        <UpdatedButton
           className="bg-neutral hover:bg-neutral border-line"
           onClick={() =>
             write({
@@ -64,11 +64,10 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
             })
           }
           variant="secondary"
-          size="small"
           loading={isLoading}
         >
           Cancel
-        </DSButton>
+        </UpdatedButton>
       )}
     </>
   );

@@ -3,7 +3,7 @@ import { z } from "zod";
 import TextInput from "./form/TextInput";
 import { SocialProposalType } from "./../types";
 import { SocialProposalSchema } from "./../schemas/DraftProposalSchema";
-import { UpdatedButton } from "@/components/Button";
+import { OldButton } from "@/components/Button";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import RadioGroupInput from "./form/RadioGroupInput";
 import DateInput from "./form/DateInput";
@@ -97,7 +97,7 @@ const SocialProposalForm = () => {
             </div>
             {localProposalType === SocialProposalType.APPROVAL &&
               fields.length > 1 && (
-                <UpdatedButton
+                <OldButton
                   className="self-end"
                   type="secondary"
                   onClick={() => {
@@ -107,13 +107,13 @@ const SocialProposalForm = () => {
                   }}
                 >
                   Remove option
-                </UpdatedButton>
+                </OldButton>
               )}
           </div>
         ))}
       </div>
       {localProposalType === SocialProposalType.APPROVAL && (
-        <UpdatedButton
+        <OldButton
           type="secondary"
           fullWidth
           isSubmit={false}
@@ -122,7 +122,7 @@ const SocialProposalForm = () => {
           }}
         >
           Add option
-        </UpdatedButton>
+        </OldButton>
       )}
     </div>
   );

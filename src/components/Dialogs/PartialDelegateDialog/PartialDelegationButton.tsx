@@ -5,7 +5,7 @@ import {
   useWriteContract,
 } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import { useEffect } from "react";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
@@ -68,16 +68,14 @@ export const PartialDelegationButton = ({
   if (isSimulateError) {
     return (
       <div>
-        <DSButton
-          variant="primary"
-          size="small"
+        <UpdatedButton
           fullWidth
           onClick={() => {}}
           disabled={true}
           loading={false}
         >
           Error simulating transaction
-        </DSButton>
+        </UpdatedButton>
 
         <div className="mt-4 text-xs text-primary bg-negative/40 border border-negative/80 p-2 rounded-md break-words">
           {error.toString()}
@@ -88,17 +86,15 @@ export const PartialDelegationButton = ({
 
   return (
     <div>
-      <DSButton
-        variant="primary"
+      <UpdatedButton
         primaryTextColor="black"
-        size="small"
         fullWidth
         onClick={() => write(simulateData!.request)}
         disabled={isLoading || disabled || !simulateData?.request}
         loading={isLoading}
       >
         Delegate Voting Power
-      </DSButton>
+      </UpdatedButton>
 
       {data && <BlockScanUrls hash1={data} />}
     </div>

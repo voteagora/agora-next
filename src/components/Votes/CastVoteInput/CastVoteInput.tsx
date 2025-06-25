@@ -40,7 +40,7 @@ import shareIcon from "@/icons/share.svg";
 import { format } from "date-fns";
 import { useVotableSupply } from "@/hooks/useVotableSupply";
 import { DaoSlug } from "@prisma/client";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 
 type Props = {
   proposal: Proposal;
@@ -70,8 +70,7 @@ export default function CastVoteInput({
   if (!isConnected) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
-        <DSButton
-          variant="primary"
+        <UpdatedButton
           primaryTextColor={
             tenant === "SCROLL"
               ? "black"
@@ -79,12 +78,11 @@ export default function CastVoteInput({
                 ? "white"
                 : undefined
           }
-          size="small"
           fullWidth
           onClick={() => setOpen(true)}
         >
           Connect wallet to vote
-        </DSButton>
+        </UpdatedButton>
       </div>
     );
   }
@@ -350,7 +348,7 @@ function VoteSubmitButton({
 
   return (
     <div className="pt-3">
-      <SubmitButton onClick={write} disabled={!supportType}>
+      <UpdatedButton onClick={write} disabled={!supportType}>
         Submit vote
         {vpToDisplay ? (
           <>
@@ -358,33 +356,10 @@ function VoteSubmitButton({
             with{"\u00A0"} <TokenAmountDisplay amount={vpToDisplay} />
           </>
         ) : null}
-      </SubmitButton>
+      </UpdatedButton>
     </div>
   );
 }
-
-const SubmitButton = ({
-  children,
-  onClick,
-  disabled,
-}: {
-  children: ReactNode;
-  onClick?: () => void;
-  disabled: boolean;
-}) => {
-  return (
-    <DSButton
-      onClick={onClick}
-      className="w-full"
-      disabled={disabled}
-      variant="primary"
-      size="small"
-      fullWidth
-    >
-      {children}
-    </DSButton>
-  );
-};
 
 function LoadingVote() {
   return (
@@ -396,16 +371,9 @@ function LoadingVote() {
         It might take up to a minute for the changes to be reflected.
       </div>
       <div>
-        <DSButton
-          className="w-full"
-          disabled
-          variant="primary"
-          size="small"
-          fullWidth
-          loading
-        >
+        <UpdatedButton className="w-full" disabled fullWidth loading>
           Writing your vote to the chain...
-        </DSButton>
+        </UpdatedButton>
       </div>
     </div>
   );
@@ -471,7 +439,7 @@ export function SuccessMessage({
         className
       )}
     >
-      <DSButton
+      <UpdatedButton
         onClick={() => {
           openDialog({
             className: "sm:w-[32rem]",
@@ -498,7 +466,6 @@ export function SuccessMessage({
           });
         }}
         variant="secondary"
-        size="small"
         fullWidth
         className="text-secondary font-semibold text-xs gap-2 rounded-[0.5rem] h-8 justify-center"
       >
@@ -510,7 +477,7 @@ export function SuccessMessage({
           </span>{" "}
           this proposal
         </span>
-      </DSButton>
+      </UpdatedButton>
       <BlockScanUrls
         className="pt-2 text-tertiary font-medium mx-auto"
         hash1={
@@ -574,9 +541,9 @@ function VoteButton({ action }: { action: SupportTextProps["supportType"] }) {
 
 function DisabledVoteButton({ reason }: { reason: string }) {
   return (
-    <DSButton variant="primary" size="small" fullWidth disabled type="button">
+    <UpdatedButton fullWidth disabled type="button">
       {reason}
-    </DSButton>
+    </UpdatedButton>
   );
 }
 
@@ -588,17 +555,15 @@ function NoStatementView() {
         <Image src={icons.info} alt="Info" width={24} height={24} />
         Voting requires a delegate statement. Set yours one now to participate.
       </div>
-      <DSButton
-        variant="primary"
+      <UpdatedButton
         primaryTextColor={
           tenant === "SCROLL" ? "black" : tenant === "XAI" ? "white" : undefined
         }
-        size="small"
         fullWidth
         onClick={() => (window.location.href = "/delegates/create")}
       >
         Set up statement
-      </DSButton>
+      </UpdatedButton>
     </div>
   );
 }
@@ -630,14 +595,13 @@ function ErrorState({
               {message}
             </div>
             <div className="flex flex-row gap-2">
-              <DSButton
+              <UpdatedButton
                 variant="secondary"
-                size="small"
                 fullWidth
                 onClick={button1.action}
               >
                 {button1.message}
-              </DSButton>
+              </UpdatedButton>
               <Button className="w-full" onClick={button2.action}>
                 {button2.message}
               </Button>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
 import { useSimulateContract, useWriteContract } from "wagmi";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
 import { ApprovalProposal } from "@/app/proposals/draft/types";
@@ -40,11 +40,9 @@ const ApprovalProposalAction = ({
 
   return (
     <>
-      <DSButton
+      <UpdatedButton
         loading={isWriteLoading}
         fullWidth
-        variant="primary"
-        size="small"
         disabled={onPrepareError}
         onClick={async () => {
           try {
@@ -81,7 +79,7 @@ const ApprovalProposalAction = ({
         }}
       >
         Submit proposal
-      </DSButton>
+      </UpdatedButton>
       {onPrepareError && (
         <div className="p-4 border border-line bg-wash rounded mt-4 text-sm text-tertiary break-words hyphens-auto">
           {error?.message}

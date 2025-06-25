@@ -1,7 +1,7 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
@@ -40,10 +40,8 @@ export const AgoraGovQueue = ({ proposal }: Props) => {
   return (
     <>
       {!isFetched && (
-        <DSButton
-          variant="primary"
+        <UpdatedButton
           primaryTextColor="black"
-          size="small"
           fullWidth={false}
           loading={isLoading}
           onClick={() =>
@@ -56,7 +54,7 @@ export const AgoraGovQueue = ({ proposal }: Props) => {
           }
         >
           Queue
-        </DSButton>
+        </UpdatedButton>
       )}
     </>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 import { Fragment } from "react";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
@@ -92,14 +92,13 @@ interface AccountActionButtonProps {
 function AccountActionButton(props: AccountActionButtonProps) {
   return (
     <div className="flex ml-10">
-      <DSButton
+      <UpdatedButton
         title={props.title}
         onClick={props.onClick}
         variant="secondary"
-        size="small"
       >
         {props.title}
-      </DSButton>
+      </UpdatedButton>
     </div>
   );
 }

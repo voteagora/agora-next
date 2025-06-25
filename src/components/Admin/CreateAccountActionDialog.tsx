@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 import { Fragment, useState } from "react";
 import toast from "react-hot-toast";
 import Tenant from "@/lib/tenant/tenant";
@@ -111,15 +111,13 @@ export function CreateAccountActionDialog({
                   Please supply an address
                 </p>
               )}
-              <DSButton
+              <UpdatedButton
                 disabled={!addressSupplied}
                 type="submit"
-                variant="primary"
-                size="small"
                 fullWidth
               >
                 Transfer
-              </DSButton>
+              </UpdatedButton>
             </div>
           ) : (
             <Acknowledgement

@@ -34,7 +34,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -267,37 +267,27 @@ export function AdvancedDelegateDialog({
 
                 {address ? (
                   isError ? (
-                    <DSButton
-                      variant="primary"
-                      size="small"
+                    <UpdatedButton
                       fullWidth
                       className="mt-3"
                       disabled={false}
                       onClick={() => writeWithTracking()}
                     >
                       Delegation failed
-                    </DSButton>
+                    </UpdatedButton>
                   ) : isLoading ? (
-                    <DSButton
-                      variant="primary"
-                      size="small"
-                      fullWidth
-                      className="mt-3"
-                      disabled
-                    >
+                    <UpdatedButton fullWidth className="mt-3" disabled>
                       Submitting your delegation...
-                    </DSButton>
+                    </UpdatedButton>
                   ) : (
-                    <DSButton
-                      variant="primary"
-                      size="small"
+                    <UpdatedButton
                       fullWidth
                       className="mt-3"
                       disabled={false}
                       onClick={() => writeWithTracking()}
                     >
                       Delegate your votes
-                    </DSButton>
+                    </UpdatedButton>
                   )
                 ) : (
                   <Button className="mt-3" onClick={() => setOpen(true)}>

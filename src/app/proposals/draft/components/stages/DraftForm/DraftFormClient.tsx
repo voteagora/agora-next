@@ -9,7 +9,7 @@ import FormCard from "../../form/FormCard";
 import TextInput from "../../form/TextInput";
 import SelectInput from "../../form/SelectInput";
 import MarkdownTextareaInput from "../../form/MarkdownTextareaInput";
-import { UpdatedButton } from "@/components/Button";
+import { OldButton } from "@/components/Button";
 import { DraftProposalSchema } from "../../../schemas/DraftProposalSchema";
 import { onSubmitAction as draftProposalAction } from "../../../actions/createDraftProposal";
 import { invalidatePath } from "../../../actions/revalidatePath";
@@ -34,7 +34,7 @@ import {
 import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
 import { ScopeDetails } from "@/components/Admin/ScopeDetails";
 import { FormattedProposalType } from "@/lib/types";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 
 const DEFAULT_FORM = {
   type: ProposalType.BASIC,
@@ -281,16 +281,16 @@ const DraftFormClient = ({
           </FormCard.Section>
           <FormCard.Section>
             <div className="flex flex-row justify-between space-x-4">
-              <DSButton
-                fullWidth={true}
-                variant="primary"
-                size="small"
-                type="submit"
-                loading={isPending}
-                className="w-[200px] flex items-center justify-center"
-              >
-                {draftProposal.title ? "Update draft" : "Create draft"}
-              </DSButton>
+              <div className="w-full">
+                <UpdatedButton
+                  fullWidth
+                  type="submit"
+                  loading={isPending}
+                  className="flex items-center justify-center"
+                >
+                  {draftProposal.title ? "Update draft" : "Create draft"}
+                </UpdatedButton>
+              </div>
             </div>
           </FormCard.Section>
         </FormCard>

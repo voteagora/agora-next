@@ -1,4 +1,4 @@
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import {
@@ -16,9 +16,7 @@ export function UndelegateButton({
   const openDialog = useOpenDialog();
 
   return (
-    <DSButton
-      variant="primary"
-      size="small"
+    <UpdatedButton
       fullWidth={full}
       onClick={(e: any) => {
         e.preventDefault();
@@ -33,6 +31,6 @@ export function UndelegateButton({
       }}
     >
       Undelegate
-    </DSButton>
+    </UpdatedButton>
   );
 }

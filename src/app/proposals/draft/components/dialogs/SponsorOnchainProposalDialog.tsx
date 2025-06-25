@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
-import { UpdatedButton } from "@/components/Button";
+import { OldButton } from "@/components/Button";
 import { getBlockScanUrl, wrappedWaitForTransactionReceipt } from "@/lib/utils";
 
 const SponsorOnchainProposalDialog = ({
@@ -69,7 +69,7 @@ const SponsorOnchainProposalDialog = ({
               </div>
             )}
             <div>
-              <UpdatedButton
+              <OldButton
                 fullWidth={true}
                 type="primary"
                 isLoading={isLoading}
@@ -82,7 +82,7 @@ const SponsorOnchainProposalDialog = ({
                 {isLoading
                   ? "Saving your proposal onchain..."
                   : "View Proposals"}
-              </UpdatedButton>
+              </OldButton>
             </div>
             {!isLoading && (
               <div className="flex flex-row justify-between items-center mt-4">

@@ -1,4 +1,4 @@
-import { UpdatedButton } from "@/components/Button";
+import { OldButton } from "@/components/Button";
 import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
 
@@ -23,7 +23,7 @@ const CreateDraftProposalDialog = ({
         </div>
       </div>
       <div className="mt-6 flex items-center justify-end space-x-2">
-        <UpdatedButton
+        <OldButton
           fullWidth={true}
           type="primary"
           onClick={async () => {
@@ -31,7 +31,7 @@ const CreateDraftProposalDialog = ({
           }}
         >
           Continue
-        </UpdatedButton>
+        </OldButton>
       </div>
     </div>
   );

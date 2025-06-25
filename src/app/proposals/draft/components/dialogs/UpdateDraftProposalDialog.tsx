@@ -1,5 +1,5 @@
 "use client";
-import { UpdatedButton } from "@/components/Button";
+import { OldButton } from "@/components/Button";
 
 const UpdateDraftProposalDialog = ({
   redirectUrl,
@@ -15,15 +15,14 @@ const UpdateDraftProposalDialog = ({
         please remember to post an update there as well.
       </p>
       <div className="mt-6 flex items-center justify-end space-x-2">
-        <UpdatedButton
+        <OldButton
           fullWidth={true}
-          type="primary"
           onClick={async () => {
             window.location.href = redirectUrl;
           }}
         >
           Continue
-        </UpdatedButton>
+        </OldButton>
       </div>
     </div>
   );

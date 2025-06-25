@@ -20,7 +20,7 @@ vi.mock("@tanstack/react-query");
 vi.mock("@/hooks/useGetVotableSupply");
 
 vi.mock("@/components/Button", () => ({
-  UpdatedButton: vi.fn(({ children, ...props }) => (
+  OldButton: vi.fn(({ children, ...props }) => (
     <button data-testid="update-supply-button" {...props}>
       {children}
     </button>

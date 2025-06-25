@@ -1,5 +1,5 @@
 "use client";
-import { UpdatedButton } from "@/components/Button";
+import { OldButton } from "@/components/Button";
 import { icons } from "@/assets/icons/icons";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -28,7 +28,7 @@ const AddGithubPRDialog = ({
         </div>
       </div>
       <div className="mt-6 flex items-center justify-end space-x-2">
-        <UpdatedButton
+        <OldButton
           fullWidth={true}
           type="primary"
           onClick={async () => {
@@ -37,7 +37,7 @@ const AddGithubPRDialog = ({
           }}
         >
           Continue
-        </UpdatedButton>
+        </OldButton>
       </div>
     </div>
   );

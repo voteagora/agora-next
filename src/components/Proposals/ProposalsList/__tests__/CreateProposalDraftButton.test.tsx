@@ -7,7 +7,7 @@ import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { UseQueryResult } from "@tanstack/react-query";
 
 vi.mock("@/components/Button", () => ({
-  UpdatedButton: ({ children, ...props }: { children: React.ReactNode }) => (
+  OldButton: ({ children, ...props }: { children: React.ReactNode }) => (
     <button {...props}>{children}</button>
   ),
 }));

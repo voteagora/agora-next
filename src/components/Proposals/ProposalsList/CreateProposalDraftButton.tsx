@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 import createProposalDraft from "./actions/createProposalDraft";
 import classNames from "classnames";
 import Tenant from "@/lib/tenant/tenant";
@@ -55,9 +55,7 @@ const CreateProposalDraftButton = ({
   }
 
   return (
-    <DSButton
-      variant="primary"
-      size="small"
+    <UpdatedButton
       fullWidth
       loading={isPending}
       className={classNames(className)}
@@ -68,7 +66,7 @@ const CreateProposalDraftButton = ({
       }}
     >
       Create proposal
-    </DSButton>
+    </UpdatedButton>
   );
 };
 

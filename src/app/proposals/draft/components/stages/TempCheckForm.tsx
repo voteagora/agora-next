@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormCard from "../form/FormCard";
 import TextInput from "../form/TextInput";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 import { schema as tempCheckSchema } from "../../schemas/tempCheckSchema";
 import { onSubmitAction as tempCheckAction } from "../../actions/createTempCheck";
 import { useAccount } from "wagmi";
@@ -101,22 +101,20 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
                 />
               </div>
               <div className="space-x-2 self-start mt-[22px] flex items-center">
-                <DSButton
+                <UpdatedButton
                   variant="secondary"
-                  size="small"
                   loading={isSkipPending}
                   onClick={handleSubmit(onSubmitSkip)}
                 >
                   Skip
-                </DSButton>
-                <DSButton
-                  variant="primary"
-                  size="small"
+                </UpdatedButton>
+                <UpdatedButton
+                  fullWidth={true}
                   loading={isSubmitPending}
                   onClick={handleSubmit(onSubmit)}
                 >
                   Continue
-                </DSButton>
+                </UpdatedButton>
               </div>
             </div>
           </FormCard.Section>

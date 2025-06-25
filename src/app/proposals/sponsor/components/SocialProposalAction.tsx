@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 import Tenant from "@/lib/tenant/tenant";
 import { createSnapshot } from "../../draft/utils/createSnapshot";
 import { PLMConfig, SocialProposal } from "../../../proposals/draft/types";
@@ -22,11 +22,9 @@ const SocialProposalAction = ({
   const { address } = useAccount();
 
   return (
-    <DSButton
+    <UpdatedButton
       loading={isSnapshotPending}
       fullWidth
-      variant="primary"
-      size="small"
       onClick={async () => {
         try {
           setIsSnapshotPending(true);
@@ -56,7 +54,7 @@ const SocialProposalAction = ({
       }}
     >
       Submit proposal
-    </DSButton>
+    </UpdatedButton>
   );
 };
 

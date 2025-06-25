@@ -10,7 +10,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { DELEGATION_MODEL } from "@/lib/constants";
 import { useGetDelegatees } from "@/hooks/useGetDelegatee";
 import { PartialDelegateButton } from "./PartialDelegateButton";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 
 export function DelegationSelector({
   delegate,
@@ -70,9 +70,8 @@ export function DelegationSelector({
       ) : (
         <ConnectKitButton.Custom>
           {({ show }) => (
-            <DSButton
+            <UpdatedButton
               variant="secondary"
-              size="small"
               onClick={(e: SyntheticEvent) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -80,7 +79,7 @@ export function DelegationSelector({
               }}
             >
               {isConnectedAccountDelegate ? "Undelegate" : "Delegate"}
-            </DSButton>
+            </UpdatedButton>
           )}
         </ConnectKitButton.Custom>
       )}

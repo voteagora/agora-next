@@ -1,9 +1,8 @@
-// outdated button, use DSButton instead
-
 import Link from "next/link";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { cn } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
+import React from "react";
 
 const { ui } = Tenant.current();
 
@@ -28,8 +27,85 @@ export function Button({ href = "", className = "", ...props }) {
   );
 }
 
-// outdated button, use DSButton instead
-export function UpdatedButton({
+// UpdatedButton - use this for any button implementation
+type ButtonVariant = "primary" | "secondary" | "text";
+type ButtonSize = "large" | "small";
+type PrimaryTextColor = "wash" | "primary" | "black" | "white";
+
+export interface UpdatedButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  iconBefore?: React.ReactNode;
+  iconAfter?: React.ReactNode;
+  loading?: boolean;
+  fullWidth?: boolean;
+  primaryTextColor?: PrimaryTextColor;
+}
+
+export const UpdatedButton: React.FC<UpdatedButtonProps> = ({
+  variant = "primary",
+  size = "small",
+  iconBefore,
+  iconAfter,
+  loading = false,
+  disabled,
+  fullWidth = false,
+  primaryTextColor = "wash",
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <button
+      className={cn(
+        variant === "primary" && primaryTextColor === "wash"
+          ? "font-medium"
+          : "font-medium",
+        "text-base transition-all rounded-[1000px] px-5 flex items-center justify-center gap-2 select-none",
+        size === "large" ? "h-12 min-h-[48px]" : "h-10 min-h-[40px]",
+        fullWidth && "w-full",
+        variant === "primary" && [
+          primaryTextColor === "black"
+            ? "bg-black text-white"
+            : primaryTextColor === "white"
+              ? "bg-white text-black"
+              : [
+                  "bg-brandPrimary",
+                  primaryTextColor === "wash" ? "text-wash" : "text-primary",
+                ],
+        ],
+        variant === "secondary" && [
+          "bg-neutral text-primary rounded-[1000px] border border-line font-medium cursor-pointer px-5 py-3 transition-all",
+          "hover:shadow-newHover active:shadow-none active:bg-line disabled:bg-line disabled:text-secondary",
+        ],
+        variant === "text" &&
+          "bg-transparent text-primary border-none shadow-none px-0",
+        !disabled &&
+          !loading && [
+            variant !== "text"
+              ? "hover:shadow-[0px_2px_6px_rgba(0,0,0,0.08),0px_4px_12px_rgba(0,0,0,0.08)]"
+              : "hover:underline focus:underline underline-offset-4",
+            "focus:brightness-90",
+          ],
+        disabled &&
+          "bg-tertiary opacity-50 pointer-events-none text-wash border-none",
+        className
+      )}
+      disabled={disabled || loading}
+      {...props}
+    >
+      {iconBefore && (
+        <span className="flex-shrink-0 w-4 h-4">{iconBefore}</span>
+      )}
+      {loading ? <span>Loading...</span> : <span>{children}</span>}
+      {iconAfter && <span className="flex-shrink-0 w-4 h-4">{iconAfter}</span>}
+    </button>
+  );
+};
+
+// OldButton - use UpdatedButton instead
+export function OldButton({
   type = "primary",
   variant = "",
   href = "",

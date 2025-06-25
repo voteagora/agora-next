@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DSButton } from "@/components/design-system/Button";
+import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { onSubmitAction as deleteAction } from "../actions/deleteDraftProposal";
 import { TrashIcon } from "@heroicons/react/20/solid";
@@ -9,10 +9,9 @@ import { TrashIcon } from "@heroicons/react/20/solid";
 const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
   const openDialog = useOpenDialog();
   return (
-    <DSButton
+    <UpdatedButton
       variant="text"
-      size="small"
-      className="flex items-end"
+      className="flex items-center"
       iconBefore={<TrashIcon className="h-5 w-5" />}
       onClick={(e: any) => {
         e.preventDefault();
@@ -27,7 +26,7 @@ const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
       <span className="mt-[6px] inline-block align-bottom">
         Delete Proposal
       </span>
-    </DSButton>
+    </UpdatedButton>
   );
 };
 
@@ -48,19 +47,16 @@ export const DeleteDraftProposalDialog = ({
         Are you sure you want to delete this proposal?
       </p>
       <div className="mt-6 flex items-center justify-between space-x-2">
-        <DSButton
+        <UpdatedButton
           variant="secondary"
-          size="small"
           fullWidth
           onClick={() => {
             closeDialog();
           }}
         >
           No
-        </DSButton>
-        <DSButton
-          variant="primary"
-          size="small"
+        </UpdatedButton>
+        <UpdatedButton
           fullWidth
           loading={isPending}
           onClick={async () => {
@@ -70,7 +66,7 @@ export const DeleteDraftProposalDialog = ({
           }}
         >
           Yes
-        </DSButton>
+        </UpdatedButton>
       </div>
     </div>
   );
