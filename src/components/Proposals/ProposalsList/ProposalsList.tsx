@@ -44,6 +44,7 @@ export default function ProposalsList({
   if (slug === DaoSlug.OP) {
     const proposalCreators = [
       "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8", // Op Gov Manager for Prod
+      "0xE4553b743E74dA3424Ac51f8C1E586fd43aE226F",
       "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB", // Dev Wallet for testing on op-sepolia
     ];
 
