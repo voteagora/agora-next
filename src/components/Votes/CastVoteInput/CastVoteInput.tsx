@@ -348,7 +348,7 @@ function VoteSubmitButton({
 
   return (
     <div className="pt-3">
-      <UpdatedButton onClick={write} disabled={!supportType}>
+      <UpdatedButton onClick={write} disabled={!supportType} fullWidth className="w-full">
         Submit vote
         {vpToDisplay ? (
           <>
