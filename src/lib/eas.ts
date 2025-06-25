@@ -62,8 +62,12 @@ export async function createProposalAttestation({
   const id = BigInt(
     keccak256(
       defaultAbiCoder.encode(
-        ["bytes32", "bytes32"],
-        [keccak256(toUtf8Bytes(slug)), keccak256(toUtf8Bytes(description))]
+        ["bytes32", "bytes32", "bytes32"],
+        [
+          keccak256(toUtf8Bytes(slug)),
+          keccak256(toUtf8Bytes(description)),
+          keccak256(toUtf8Bytes(Date.now().toString())),
+        ]
       ) as `0x${string}`
     )
   );
