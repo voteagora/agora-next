@@ -399,7 +399,7 @@ async function getVotesForProposal({
               "transactionHash" as transaction_hash,
               "proposalId" as proposal_id,
               "voterAddress" as voter,
-              ("vote"->>'0') as support,
+              ("vote"::json->>0) as support,
               1::numeric as weight,
               NULL as reason,
               NULL as params,

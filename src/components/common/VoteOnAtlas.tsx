@@ -17,7 +17,7 @@ export const VoteOnAtlas = ({
           Are you a citizen?{" "}
         </span>
         <Link
-          href={`${ATLAS_URL}/proposals/${offchainProposalId}`}
+          href={`${ATLAS_URL}proposals/${offchainProposalId}`}
           target="_blank"
           className="text-secondary text-xs font-bold underline leading-[18px]"
         >

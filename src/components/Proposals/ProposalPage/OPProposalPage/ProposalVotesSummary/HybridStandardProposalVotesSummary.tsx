@@ -63,16 +63,13 @@ const HybridStandardVotesGroup = ({ proposal }: { proposal: Proposal }) => {
       {
         name: "Delegates",
         forVotes: formatNumber(
-          (proposalResults?.DELEGATES?.for || "0").toString(),
-          token.decimals
+          (proposalResults?.DELEGATES?.for || "0").toString()
         ),
         againstVotes: formatNumber(
-          (proposalResults?.DELEGATES?.against || "0").toString(),
-          token.decimals
+          (proposalResults?.DELEGATES?.against || "0").toString()
         ),
         abstainVotes: formatNumber(
-          (proposalResults?.DELEGATES?.abstain || "0").toString(),
-          token.decimals
+          (proposalResults?.DELEGATES?.abstain || "0").toString()
         ),
         weight: (HYBRID_VOTE_WEIGHTS.delegates * 100).toFixed(2),
       },
