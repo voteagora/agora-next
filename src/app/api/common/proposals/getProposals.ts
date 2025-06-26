@@ -21,6 +21,7 @@ import { Proposal, ProposalPayload } from "./proposal";
 import { doInSpan } from "@/app/lib/logging";
 import {
   findOffchainProposal,
+  findOffchainProposalsByOnchainIds,
   findProposal,
   findProposalType,
   findProposalsQueryFromDB,
@@ -164,29 +165,67 @@ async function getProposals({
           fetchVotableSupply(),
         ]);
 
-        // This will filter the offchain record of an hybrid proposal.
-        const filteredProposals =
-          filter === "relevant" && !(type === "OFFCHAIN")
-            ? proposals.data.filter((proposal: ProposalPayload) => {
-                return !(proposal.proposal_data as any)?.onchain_proposalid;
-              })
-            : proposals.data;
+        // Collect IDs of all non-offchain proposals (onchain and hybrid)
+        const nonOffchainProposalIds = proposals.data
+          .filter(
+            (proposal: ProposalPayload) =>
+              proposal.proposal_type &&
+              !proposal.proposal_type.startsWith("OFFCHAIN")
+          )
+          .map((proposal: ProposalPayload) => proposal.proposal_id);
 
+        // Fetch offline proposals that match our non-offchain proposal IDs
+        const offlineProposalsMap = new Map<string, ProposalPayload>();
+        if (nonOffchainProposalIds.length > 0) {
+          const offlineProposals = await findOffchainProposalsByOnchainIds({
+            namespace,
+            onchainProposalIds: nonOffchainProposalIds,
+          });
+
+          // Create a map of offline proposals by their onchain_proposalid
+          (offlineProposals as ProposalPayload[]).forEach((offlineProposal) => {
+            const onchainId = (offlineProposal.proposal_data as any)
+              ?.onchain_proposalid;
+            if (onchainId) {
+              offlineProposalsMap.set(onchainId, offlineProposal);
+            }
+          });
+        }
+
+        // Process proposals with their offline counterparts
         const resolvedProposals = await Promise.all(
-          filteredProposals.map(async (proposal: ProposalPayload) => {
+          proposals.data.map(async (proposal: ProposalPayload) => {
+            // Skip offline records of hybrid proposals when filter is relevant
+            if (
+              filter === "relevant" &&
+              type !== "OFFCHAIN" &&
+              (proposal.proposal_data as any)?.onchain_proposalid
+            ) {
+              return null;
+            }
+
             const quorum = await fetchQuorumForProposal(proposal);
+
+            // Get offline proposal from map
+            const offlineProposal =
+              offlineProposalsMap.get(proposal.proposal_id) || null;
+
             return parseProposal(
               proposal,
               latestBlock,
               quorum ?? null,
-              BigInt(votableSupply)
+              BigInt(votableSupply),
+              offlineProposal as ProposalPayload
             );
           })
         );
 
+        // Filter out null values from skipped proposals
+        const filteredProposals = resolvedProposals.filter((p) => p !== null);
+
         return {
           meta: proposals.meta,
-          data: resolvedProposals,
+          data: filteredProposals,
         };
       } catch (error) {
         throw error;
