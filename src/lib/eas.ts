@@ -8,7 +8,6 @@ import { JsonRpcSigner, toUtf8Bytes } from "ethers";
 import Tenant from "./tenant/tenant";
 import { keccak256 } from "viem";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { attestByDelegationServer } from "./eas-server";
 
 const { slug } = Tenant.current();
 
@@ -59,6 +58,7 @@ export async function createProposalAttestation({
   criteriaValue: number;
   calculationOptions: number;
 }) {
+  eas.connect(signer as any);
   const id = BigInt(
     keccak256(
       defaultAbiCoder.encode(
@@ -98,49 +98,19 @@ export async function createProposalAttestation({
   const expirationTime = NO_EXPIRATION;
   const revocable = true;
 
-  const signature = await signDelegatedAttestation({
+  const txResponse = await eas.attest({
     schema: CREATE_PROPOSAL_SCHEMA_ID,
-    recipient,
-    expirationTime,
-    revocable,
-    refUID: ZERO_BYTES32,
-    encodedData,
-    deadline: expirationTime,
-    value: 0n,
-    signer,
+    data: {
+      recipient,
+      expirationTime,
+      revocable,
+      refUID: ZERO_BYTES32,
+      data: encodedData,
+      value: 0n,
+    },
   });
 
-  if (!signature) {
-    console.error("Failed to get signature");
-    throw new Error("Signature is required");
-  }
-  if (
-    typeof signature === "object" &&
-    "v" in signature &&
-    "r" in signature &&
-    "s" in signature
-  ) {
-    const { v, r, s } = signature;
-    if (
-      typeof v !== "number" ||
-      typeof r !== "string" ||
-      typeof s !== "string"
-    ) {
-      throw new Error("Invalid signature format");
-    }
-  } else {
-    throw new Error("Invalid signature format");
-  }
-
-  const receipt = await attestByDelegationServer({
-    recipient,
-    expirationTime,
-    revocable,
-    encodedData,
-    signature,
-    attester: proposer,
-    schema: CREATE_PROPOSAL_SCHEMA_ID,
-  });
+  const receipt = await txResponse.wait(1);
 
   if (!receipt) {
     console.error(
