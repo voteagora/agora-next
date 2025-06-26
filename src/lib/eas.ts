@@ -58,6 +58,7 @@ export async function createProposalAttestation({
   criteriaValue: number;
   calculationOptions: number;
 }) {
+  eas.connect(signer as any);
   const id = BigInt(
     keccak256(
       defaultAbiCoder.encode(
