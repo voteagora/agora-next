@@ -15,7 +15,7 @@ import {
 import { ProposalVotesTab } from "@/components/common/ProposalVotesTab";
 import { VoteOnAtlas } from "@/components/common/VoteOnAtlas";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber } from "@/lib/tokenUtils";
 import { HYBRID_VOTE_WEIGHTS } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import { CloseIcon } from "@/icons/closeIcon";
@@ -80,8 +80,7 @@ const HybridOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
       {
         name: "Delegates",
         againstVotes: formatNumber(
-          (proposalResults?.DELEGATES?.against || "0").toString(),
-          token.decimals
+          (proposalResults?.DELEGATES?.against || "0").toString()
         ),
         weight: (HYBRID_VOTE_WEIGHTS.delegates * 100).toFixed(2),
         veto:
@@ -297,7 +296,9 @@ const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
               )}
             </>
           )}
-          <VoteOnAtlas offchainProposalId={proposal.offchainProposalId} />
+          <VoteOnAtlas
+            offchainProposalId={proposal.offchainProposalId || proposal.id}
+          />
         </div>
       </div>
     </>

@@ -92,7 +92,9 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
             </>
           )}
         </div>
-        <VoteOnAtlas offchainProposalId={proposal.offchainProposalId} />
+        <VoteOnAtlas
+          offchainProposalId={proposal.offchainProposalId || proposal.id}
+        />
       </div>
     </>
   );
