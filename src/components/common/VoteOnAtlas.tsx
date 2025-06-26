@@ -11,7 +11,7 @@ export const VoteOnAtlas = ({
   offchainProposalId?: string;
 }) => {
   return (
-    <div className="rounded-lg border border-line p-1">
+    <div className="rounded-lg border border-line p-1 bg-neutral">
       <div className="text-center justify-center">
         <span className="text-secondary text-xs font-bold leading-[18px]">
           Are you a citizen?{" "}
