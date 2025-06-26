@@ -21,6 +21,11 @@ export type Vote = {
   timestamp: Date | null;
   blockNumber?: bigint;
   citizenType: string | null;
+  voterMetadata: Record<{
+    name: string;
+    image: string;
+    type: string;
+  }> | null;
 };
 
 export type SnapshotVotePayload = {

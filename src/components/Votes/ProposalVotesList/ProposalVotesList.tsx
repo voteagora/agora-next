@@ -114,13 +114,13 @@ export default function ProposalVotesList({
         >
           <ul className="flex flex-col">
             {userVotes.map((vote) => (
-              <li key={vote.transactionHash}>
+              <li key={vote.transactionHash || vote.address + vote.citizenType}>
                 <ProposalSingleVote vote={vote} />
               </li>
             ))}
             {proposalVotes.map((vote) => (
               <li
-                key={vote.transactionHash}
+                key={vote.transactionHash || vote.address + vote.citizenType}
                 className={`${
                   connectedAddress?.toLowerCase() === vote.address && "hidden"
                 }`}

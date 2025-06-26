@@ -218,6 +218,7 @@ export async function parseVote(
     blockNumber: vote.block_number,
     timestamp: latestBlock ? getHumanBlockTime(blockNumber, latestBlock) : null,
     citizenType: vote.citizen_type || null,
+    voterMetadata: vote.voter_metadata || {},
   };
 }
 
