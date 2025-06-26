@@ -168,11 +168,11 @@ export const MY_DELEGATES_FILTER_PARAM = "delegatorFilter";
 export const ISSUES_FILTER_PARAM = "issueFilter";
 export const STAKEHOLDERS_FILTER_PARAM = "stakeholderFilter";
 
-export const OFFCHAIN_THRESHOLDS = { APP: 100, USER: 1000, CHAIN: 15 };
+export const OFFCHAIN_THRESHOLDS = { APP: 2, USER: 4, CHAIN: 1 };
 
 export const HYBRID_VOTE_WEIGHTS = {
-  delegates: 0.5,
-  apps: 1 / 6,
-  users: 1 / 6,
-  chains: 1 / 6,
+  delegates: 1/10,
+  apps: 3 / 10,
+  users: 3 / 10,
+  chains: 3 / 10,
 } as const;
