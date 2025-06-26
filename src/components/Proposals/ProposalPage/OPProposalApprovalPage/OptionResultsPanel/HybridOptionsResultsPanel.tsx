@@ -3,7 +3,7 @@ import {
   ParsedProposalData,
   calculateHybridApprovalMetrics,
 } from "@/lib/proposalUtils";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber } from "@/lib/tokenUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { cn } from "@/lib/utils";
 import * as Collapsible from "@radix-ui/react-collapsible";
@@ -139,8 +139,7 @@ function SingleOption({
       : 0n;
     return {
       name: displayName,
-      votes:
-        category === "DELEGATES" ? formatNumber(votes, token.decimals) : votes,
+      votes: category === "DELEGATES" ? formatNumber(votes) : votes,
       percentage: weightedDisplayPercentage,
       weight: (weight * 100).toFixed(2),
     };

@@ -82,7 +82,9 @@ const HybridStandardProposalVotesCard = ({
             </>
           )}
         </div>
-        <VoteOnAtlas offchainProposalId={proposal.offchainProposalId} />
+        <VoteOnAtlas
+          offchainProposalId={proposal.offchainProposalId || proposal.id}
+        />
       </div>
     </>
   );
