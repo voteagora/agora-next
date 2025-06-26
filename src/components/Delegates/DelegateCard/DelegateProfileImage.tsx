@@ -24,7 +24,6 @@ import { cn } from "@/lib/utils";
 
 interface Props {
   address: string;
-  citizen?: boolean;
   copyable?: boolean;
   endorsed: boolean;
   votingPower: string;
@@ -34,7 +33,6 @@ interface Props {
 
 export function DelegateProfileImage({
   address,
-  citizen,
   copyable = false,
   endorsed,
   votingPower,
@@ -87,13 +85,6 @@ export function DelegateProfileImage({
   return (
     <div className="flex flex-row gap-4 items-center">
       <div className="relative aspect-square">
-        {citizen && (
-          <Image
-            className="absolute bottom-[-5px] right-[-7px] z-10"
-            src={icons.badge}
-            alt="citizen badge"
-          />
-        )}
         <ENSAvatar className="rounded-full w-[44px] h-[44px]" ensName={data} />
       </div>
 
@@ -133,7 +124,6 @@ export function DelegateProfileImage({
 
 export function DelegateProfileImageWithMetadata({
   address,
-  citizen,
   endorsed,
   votingPower,
   description,
@@ -195,13 +185,6 @@ export function DelegateProfileImageWithMetadata({
     <div className="flex flex-col gap-2">
       <div className="flex flex-row gap-4 items-center">
         <div className="relative aspect-square">
-          {citizen && (
-            <Image
-              className="absolute bottom-[-5px] right-[-7px] z-10"
-              src={icons.badge}
-              alt="citizen badge"
-            />
-          )}
           <ENSAvatar
             className="rounded-full w-[48px] h-[48px]"
             ensName={data}
