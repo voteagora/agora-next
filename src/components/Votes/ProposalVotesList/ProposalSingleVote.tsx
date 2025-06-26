@@ -85,11 +85,27 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
               className="font-semibold text-secondary"
             >
               <HStack gap={1} alignItems="items-center">
-                <ENSAvatar ensName={data} className="w-8 h-8" />
+                {vote.voterMetadata?.image ? (
+                  <div
+                    className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
+                  >
+                    <img
+                      src={vote.voterMetadata.image}
+                      alt="avatar"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <ENSAvatar ensName={data} className="w-8 h-8" />
+                )}
                 <div className="flex flex-col">
                   <div className="text-primary font-bold hover:underline">
                     <Link href={`/delegates/${vote.address}`}>
-                      <ENSName address={vote.address} />
+                      {vote.voterMetadata?.name ? (
+                        vote.voterMetadata.name
+                      ) : (
+                        <ENSName address={vote.address} />
+                      )}
                     </Link>
                   </div>
                   {vote.citizenType && (
