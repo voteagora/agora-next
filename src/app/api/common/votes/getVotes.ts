@@ -272,22 +272,37 @@ async function getVotersWhoHaveNotVotedForProposal({
                   }
                 ),
                 relevant_delegates as (
-                  SELECT delegate, voting_power, NULL::text as citizen_type FROM ${namespace}.delegates where contract = $2
+                  SELECT delegate, voting_power, NULL::text as citizen_type, NULL::text as voter_metadata_text FROM ${namespace}.delegates where contract = $2
                   ${
                     includeCitizens
                       ? `
                     UNION
-                    SELECT LOWER(c."address") as delegate, 0 as voting_power, c."type"::text as citizen_type
+                    SELECT 
+                      LOWER(c."address") as delegate, 
+                      0 as voting_power, 
+                      c."type"::text as citizen_type,
+                      CASE 
+                        WHEN c."organizationId" IS NOT NULL THEN 
+                          JSON_BUILD_OBJECT('name', o."name", 'image', o."avatarUrl", 'type', 'organization')::text
+                        WHEN c."projectId" IS NOT NULL THEN 
+                          JSON_BUILD_OBJECT('name', p."name", 'image', p."thumbnailUrl", 'type', 'project')::text
+                        WHEN c."userId" IS NOT NULL THEN 
+                          JSON_BUILD_OBJECT('name', u."name", 'image', u."imageUrl", 'type', 'user')::text
+                        ELSE NULL
+                      END as voter_metadata_text
                     FROM atlas."Citizen" c
+                    LEFT JOIN atlas."Project" p ON p.id = c."projectId"
+                    LEFT JOIN atlas."Organization" o ON o.id = c."organizationId"
+                    LEFT JOIN atlas."User" u ON u.id = c."userId"
                     LEFT JOIN ${namespace}.delegates d ON LOWER(c."address") = LOWER(d.delegate) AND d.contract = $2
                     WHERE d.delegate IS NULL`
                       : ""
                   }
                 ),
                 delegates_who_havent_votes as (
-                  SELECT * FROM relevant_delegates d left join has_voted v on d.delegate = v.voter where v.voter is null
+                  SELECT d.delegate, d.voting_power, d.citizen_type, d.voter_metadata_text FROM relevant_delegates d left join has_voted v on d.delegate = v.voter where v.voter is null
                 )
-                select del.*,
+                select del.delegate, del.voting_power, del.citizen_type, del.voter_metadata_text::json as "voterMetadata",
                       ds.twitter,
                     ds.discord,
                     ds.warpcast
@@ -396,17 +411,30 @@ async function getVotesForProposal({
           citizenQuery = `
             UNION ALL
             SELECT
-              "transactionHash" as transaction_hash,
-              "proposalId" as proposal_id,
-              "voterAddress" as voter,
-              ("vote"::json->>0) as support,
+              ocv."transactionHash" as transaction_hash,
+              ocv."proposalId" as proposal_id,
+              ocv."voterAddress" as voter,
+              (ocv."vote"::json->>0) as support,
               1::numeric as weight,
               NULL as reason,
               NULL as params,
               NULL as block_number,
-              "citizenCategory"::text as citizen_type
-            FROM atlas."OffChainVote"
-            WHERE "proposalId" = ${offchainProposalId ? "$5" : "$1"}
+              ocv."citizenCategory"::text as citizen_type,
+              CASE 
+                WHEN c."organizationId" IS NOT NULL THEN 
+                  JSON_BUILD_OBJECT('name', o."name", 'image', o."avatarUrl", 'type', 'chain')
+                WHEN c."projectId" IS NOT NULL THEN 
+                  JSON_BUILD_OBJECT('name', p."name", 'image', p."thumbnailUrl", 'type', 'app')
+                WHEN c."userId" IS NOT NULL THEN 
+                  JSON_BUILD_OBJECT('name', u."name", 'image', u."imageUrl", 'type', 'user')
+                ELSE NULL
+              END as voter_metadata
+            FROM atlas."OffChainVote" ocv
+            LEFT JOIN atlas."Citizen" c ON ocv."citizenId" = c.id
+            LEFT JOIN atlas."Project" p ON p.id = c."projectId"
+            LEFT JOIN atlas."Organization" o ON o.id = c."organizationId"
+            LEFT JOIN atlas."User" u ON u.id = c."userId"
+            WHERE ocv."proposalId" = ${offchainProposalId ? "$5" : "$1"}
           `;
         }
 
@@ -421,6 +449,7 @@ async function getVotesForProposal({
             block_number,
             params,
             citizen_type,
+            voter_metadata,
             description,
             proposal_data,
             proposal_type
@@ -435,7 +464,8 @@ async function getVotesForProposal({
               STRING_AGG(distinct reason, '\n --------- \n') as reason,
               MAX(block_number) as block_number,
               params,
-              citizen_type
+              citizen_type,
+              MAX(voter_metadata::text)::json as voter_metadata
             FROM (
               SELECT
                 transaction_hash,
@@ -446,7 +476,8 @@ async function getVotesForProposal({
                 reason,
                 params,
                 block_number,
-                NULL::text as citizen_type
+                NULL::text as citizen_type,
+                NULL::json as voter_metadata
               FROM ${namespace}.vote_cast_events
               WHERE proposal_id = $1 AND contract = $2
               UNION ALL
@@ -459,7 +490,8 @@ async function getVotesForProposal({
                 reason,
                 params,
                 block_number,
-                NULL::text as citizen_type
+                NULL::text as citizen_type,
+                NULL::json as voter_metadata
               FROM ${namespace}.${eventsViewName}
               WHERE proposal_id = $1 AND contract = $2
               ${includeCitizens ? citizenQuery : ""}
