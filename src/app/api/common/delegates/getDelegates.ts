@@ -627,7 +627,7 @@ async function getDelegates({
             direct: delegate.direct_vp?.toFixed(0) || "0",
             advanced: delegate.advanced_vp?.toFixed(0) || "0",
           },
-          citizen: delegate.citizen,
+          citizen: false,
           statement: delegate.statement,
           numOfDelegators: BigInt(delegate.num_of_delegators || "0"),
           participation: 0,
@@ -812,7 +812,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     // Build out delegate JSON response
     return {
       address: address,
-      citizen: delegate?.citizen || false,
+      citizen: false,
       votingPower: {
         total: totalVotingPower.toString(),
         direct: delegate?.voting_power?.toString() || "0",

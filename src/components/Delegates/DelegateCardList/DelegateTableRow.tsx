@@ -43,7 +43,6 @@ export default function DelegateTableRow({
             endorsed={delegate.statement?.endorsed}
             address={delegate.address}
             votingPower={delegate.votingPower.total}
-            citizen={delegate.citizen}
           />
         </div>
       </TableCell>

@@ -96,16 +96,6 @@ export const delegatesFilterOptions = {
   },
 };
 
-export const citizensFilterOptions = {
-  mostVotingPower: {
-    value: "Most voting power",
-    sort: "most_voting_power",
-  },
-  shuffle: {
-    sort: "shuffle",
-    value: "Shuffle",
-  },
-};
 export const delegatesVotesSortOptions = {
   newest: {
     sortOrder: "desc",
