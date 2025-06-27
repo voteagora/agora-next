@@ -23,9 +23,10 @@ import {
 
 interface Props {
   proposal: Proposal;
+  useOptimismStyling?: boolean;
 }
 
-export const AgoraGovExecute = ({ proposal }: Props) => {
+export const AgoraGovExecute = ({ proposal, useOptimismStyling = false }: Props) => {
   const { contracts, ui } = Tenant.current();
 
   const { data: delayInSeconds } = useReadContract({
@@ -82,7 +83,7 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
             <>
               <TooltipTrigger>
                 <Button
-                  className={cn(ui.theme === "dark" && "text-neutral")}
+                  className={useOptimismStyling ? undefined : cn(ui.theme === "dark" && "text-neutral")}
                   disabled={true}
                   variant="outline"
                 >
@@ -106,7 +107,7 @@ export const AgoraGovExecute = ({ proposal }: Props) => {
                     })
                   }
                   loading={isLoading}
-                  className={cn(ui.theme === "dark" && "text-neutral")}
+                  className={useOptimismStyling ? undefined : cn(ui.theme === "dark" && "text-neutral")}
                 >
                   Execute
                 </Button>

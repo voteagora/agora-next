@@ -14,9 +14,6 @@ import { OZGovExecute } from "@/app/proposals/components/OZGovExecute";
 import { BravoGovExecute } from "@/app/proposals/components/BravoGovExecute";
 import { BravoGovQueue } from "@/app/proposals/components/BravoGovQueue";
 import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
-import { AgoraOptimismGovCancel } from "@/app/proposals/components/AgoraOptimismGovCancel";
-import { AgoraOptimismGovQueue } from "@/app/proposals/components/AgoraOptimismGovQueue";
-import { AgoraOptimismGovExecute } from "@/app/proposals/components/AgoraOptimismGovExecute";
 import { OffchainCancel } from "@/app/proposals/components/OffchainCancel";
 
 interface Props {
@@ -190,8 +187,8 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
               <OffchainCancel proposal={proposal} />
             ) : (
               <>
-                <AgoraOptimismGovCancel proposal={proposal} />
-                <AgoraOptimismGovQueue proposal={proposal} />
+                <AgoraGovCancel proposal={proposal} useOptimismStyling={true} />
+                <AgoraGovQueue proposal={proposal} />
               </>
             )}
           </div>
@@ -202,7 +199,7 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
         return proposal.proposalType?.startsWith("OFFCHAIN") ? (
           <OffchainCancel proposal={proposal} />
         ) : (
-          <AgoraOptimismGovCancel proposal={proposal} />
+          <AgoraGovCancel proposal={proposal} useOptimismStyling={true} />
         );
       }
 
@@ -256,8 +253,8 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
             <OffchainCancel proposal={proposal} />
           ) : (
             <>
-              <AgoraOptimismGovCancel proposal={proposal} />
-              <AgoraOptimismGovExecute proposal={proposal} />
+              <AgoraGovCancel proposal={proposal} useOptimismStyling={true} />
+              <AgoraGovExecute proposal={proposal} useOptimismStyling={true} />
             </>
           )}
         </div>
@@ -283,17 +280,11 @@ const activeStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.LINEA:
     case TENANT_NAMESPACES.B3:
-      return proposal.proposalType?.startsWith("OFFCHAIN") ? (
-        <OffchainCancel proposal={proposal} />
-      ) : (
-        <AgoraGovCancel proposal={proposal} />
-      );
-
     case TENANT_NAMESPACES.OPTIMISM:
       return proposal.proposalType?.startsWith("OFFCHAIN") ? (
         <OffchainCancel proposal={proposal} />
       ) : (
-        <AgoraOptimismGovCancel proposal={proposal} />
+        <AgoraGovCancel proposal={proposal} />
       );
 
     case TENANT_NAMESPACES.ENS:
