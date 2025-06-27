@@ -406,7 +406,9 @@ export async function parseProposal(
           proposalData,
           latestBlock,
           quorum,
-          votableSupply
+          votableSupply,
+          hardcodedThreshold ??
+            (proposalTypeData && proposalTypeData.approval_threshold)
         )
       : null,
     createdTransactionHash: proposal.created_transaction_hash,
@@ -1402,6 +1404,7 @@ export function calculateOptionBudget(
 export function calculateHybridStandardTallies(
   proposalResults: any,
   delegateQuorum: number,
+  approvalThreshold: number,
   isHybridStandard: boolean,
   calculationOptions?: 0 | 1
 ) {
@@ -1413,7 +1416,7 @@ export function calculateHybridStandardTallies(
   };
 
   const quorumThreshold = 0.3;
-  const approvalThreshold = 0.51;
+  const approvalThresholdNumber = approvalThreshold / 100 || 0.51; // Default to 51% approval threshold
 
   const calculateTally = (category: any, eligibleCount: number) => {
     const forVotes = category?.for ? Number(category.for) : 0;
@@ -1435,7 +1438,9 @@ export function calculateHybridStandardTallies(
       approval: quorumVotes > 0 ? forVotes / totalVotes : 0,
       passingQuorum: quorumVotes / eligibleCount >= quorumThreshold,
       passingApproval:
-        quorumVotes > 0 ? forVotes / totalVotes >= approvalThreshold : false,
+        quorumVotes > 0
+          ? forVotes / totalVotes >= approvalThresholdNumber
+          : false,
     };
   };
 
@@ -1512,11 +1517,11 @@ export function calculateHybridStandardProposalMetrics(proposal: Proposal) {
   const calculationOptions = (
     proposal.proposalData as ParsedProposalData["HYBRID_STANDARD"]["kind"]
   ).calculationOptions;
-
   // Use shared helper function
   const talliesData = calculateHybridStandardTallies(
     proposalResults,
     Number(proposal.quorum),
+    Number(proposal.approvalThreshold),
     proposal.proposalType === "HYBRID_STANDARD",
     calculationOptions
   );

@@ -1,5 +1,6 @@
 import { rgbStringToHex } from "@/app/lib/utils/color";
 import Tenant from "@/lib/tenant/tenant";
+import { cn } from "@/lib/utils";
 import { useMemo } from "react";
 
 interface VoteBarProps {
@@ -8,6 +9,7 @@ interface VoteBarProps {
   abstainVotes?: number;
   quorumPercentage?: number;
   showVotesPercentage?: boolean;
+  compact?: boolean;
 }
 
 type VoteSegment = {
@@ -22,6 +24,7 @@ export const VotesBar = ({
   abstainVotes,
   quorumPercentage,
   showVotesPercentage,
+  compact = false,
 }: VoteBarProps) => {
   const { ui } = Tenant.current();
   const { positive, negative, secondary } = ui.customization || {};
@@ -62,12 +65,14 @@ export const VotesBar = ({
   );
 
   return (
-    <div className="p-4 border-b border-line">
+    <div
+      className={cn("p-4 border-b border-line", compact && "p-0 border-none")}
+    >
       <div className="mb-4">
         {" "}
         {/* Adjusted margin for single bar context */}
         <div className="flex items-center justify-between mb-2">
-          <div className="text-sm font-medium">Total Votes</div>
+          {!compact && <div className="text-sm font-medium">Total Votes</div>}
           {showVotesPercentage && (
             <div className="text-sm font-medium">{againstVotes}%</div>
           )}
