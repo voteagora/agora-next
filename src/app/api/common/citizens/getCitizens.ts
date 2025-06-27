@@ -115,7 +115,6 @@ async function getCitizens({
         advanced: citizen.advanced_vp?.toFixed(0) || "0",
       },
       votingParticipation: 0,
-      citizen: citizen.citizen,
       statement: citizen.statement,
       participation: 0,
     })),
