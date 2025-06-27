@@ -10,7 +10,6 @@ import {
   isTimestampBasedProposal,
   getStartTimestamp,
   getStartBlock,
-  ParsedProposalResults,
 } from "@/lib/proposalUtils";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
@@ -21,13 +20,13 @@ import { Proposal, ProposalPayload } from "./proposal";
 import { doInSpan } from "@/app/lib/logging";
 import {
   findOffchainProposal,
-  findOffchainProposalsByOnchainIds,
   findProposal,
   findProposalType,
   findProposalsQueryFromDB,
   findSnapshotProposalsQueryFromDb,
   getProposalsCount,
 } from "@/lib/prismaUtils";
+import { fetchOffchainProposalsMap } from "./fetchOffchainProposalsMap";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
@@ -174,22 +173,10 @@ async function getProposals({
           .map((proposal: ProposalPayload) => proposal.proposal_id);
 
         // Fetch offline proposals that match our non-offchain proposal IDs
-        const offlineProposalsMap = new Map<string, ProposalPayload>();
-        if (nonOffchainProposalIds.length > 0) {
-          const offlineProposals = await findOffchainProposalsByOnchainIds({
-            namespace,
-            onchainProposalIds: nonOffchainProposalIds,
-          });
-
-          // Create a map of offline proposals by their onchain_proposalid
-          (offlineProposals as ProposalPayload[]).forEach((offlineProposal) => {
-            const onchainId = (offlineProposal.proposal_data as any)
-              ?.onchain_proposalid;
-            if (onchainId) {
-              offlineProposalsMap.set(onchainId, offlineProposal);
-            }
-          });
-        }
+        const offlineProposalsMap = await fetchOffchainProposalsMap({
+          namespace,
+          proposalIds: nonOffchainProposalIds,
+        });
 
         // Process proposals with their offline counterparts
         const resolvedProposals = await Promise.all(

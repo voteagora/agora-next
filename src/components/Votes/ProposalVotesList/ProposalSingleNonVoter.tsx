@@ -66,7 +66,7 @@ export function ProposalSingleNonVoter({
               <img
                 src={voter.voterMetadata.image}
                 alt="avatar"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover"
               />
             </div>
           ) : (
