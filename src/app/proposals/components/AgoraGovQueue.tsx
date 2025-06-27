@@ -11,9 +11,11 @@ import {
 
 interface Props {
   proposal: Proposal;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
-export const AgoraGovQueue = ({ proposal }: Props) => {
+export const AgoraGovQueue = ({ proposal, className, style }: Props) => {
   const { contracts } = Tenant.current();
 
   const { data, writeContract: write } = useWriteContract();
@@ -50,6 +52,8 @@ export const AgoraGovQueue = ({ proposal }: Props) => {
     <>
       {!isFetched && (
         <Button
+          className={className}
+          style={style}
           loading={isLoading}
           onClick={() =>
             write({
