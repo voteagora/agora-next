@@ -42,7 +42,6 @@ const DelegateCard = ({
                 endorsed={delegate.statement?.endorsed}
                 address={delegate.address}
                 votingPower={delegate.votingPower.total}
-                citizen={delegate.citizen}
               />
             </div>
             <div className="px-4 flex flex-row gap-4">

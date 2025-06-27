@@ -111,7 +111,6 @@ export default function CitizenCardList({
                       endorsed={false}
                       address={delegate.address}
                       votingPower={delegate.votingPower.total}
-                      citizen={delegate.citizen}
                     />
                     <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2">
                       {truncatedStatement}
