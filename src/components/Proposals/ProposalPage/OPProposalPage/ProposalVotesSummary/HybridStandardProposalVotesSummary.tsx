@@ -1,5 +1,5 @@
 "use client";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Proposal } from "@/app/api/common/proposals/proposal.d";
 import { HYBRID_VOTE_WEIGHTS } from "@/lib/constants";
 import {
@@ -15,13 +15,19 @@ import { VotesBar } from "@/components/common/VotesBar";
 import { formatNumber } from "@/lib/tokenUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { cn } from "@/lib/utils";
-
+import { format } from "date-fns";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { HybridStandardVotesSummaryTooltip } from "./HybridStandardVotesSummaryTooltip";
 
 const { token } = Tenant.current();
 
@@ -172,6 +178,7 @@ const HybridStandardProposalVotesSummary = ({
 }: {
   proposal: Proposal;
 }) => {
+  const [showDetails, setShowDetails] = useState(false);
   const {
     quorumPercentage,
     quorumMet,
@@ -182,16 +189,50 @@ const HybridStandardProposalVotesSummary = ({
     () => calculateHybridStandardProposalMetrics(proposal),
     [proposal]
   );
+
+  const formatTime = (date: Date | null) => {
+    return date ? format(new Date(date), "h:mma MMMM dd yyyy") : "";
+  };
+
   return (
     <>
       <div className="p-4">
         <div className="border border-line rounded-lg">
-          <VotesBar
-            forVotes={totalForVotesPercentage}
-            againstVotes={totalAgainstVotesPercentage}
-            abstainVotes={totalAbstainVotesPercentage}
-            quorumPercentage={30}
-          />
+          <HoverCard
+            open={showDetails}
+            onOpenChange={setShowDetails}
+            openDelay={0}
+            closeDelay={0}
+          >
+            <HoverCardTrigger asChild>
+              <div className="cursor-pointer relative">
+                <VotesBar
+                  forVotes={totalForVotesPercentage}
+                  againstVotes={totalAgainstVotesPercentage}
+                  abstainVotes={totalAbstainVotesPercentage}
+                  quorumPercentage={30}
+                />
+              </div>
+            </HoverCardTrigger>
+
+            <HoverCardContent
+              className="w-full w-[125%] p-0"
+              side="bottom"
+              align="start"
+              sideOffset={-90}
+              alignOffset={0}
+            >
+              <HybridStandardVotesSummaryTooltip
+                proposal={proposal}
+                totalForVotesPercentage={totalForVotesPercentage}
+                totalAgainstVotesPercentage={totalAgainstVotesPercentage}
+                totalAbstainVotesPercentage={totalAbstainVotesPercentage}
+                quorumPercentage={quorumPercentage}
+                quorumMet={quorumMet}
+                formatTime={formatTime}
+              />
+            </HoverCardContent>
+          </HoverCard>
           <HybridStandardVotesGroup proposal={proposal} />
           <QuorumStatus
             quorumPercentage={quorumPercentage}

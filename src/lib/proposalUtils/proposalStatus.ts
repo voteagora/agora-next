@@ -38,7 +38,8 @@ export async function getProposalStatus(
   proposalData: ParsedProposalData[ProposalType],
   latestBlock: Block | null,
   quorum: bigint | null,
-  votableSupply: bigint
+  votableSupply: bigint,
+  approvalThreshold: bigint | null
 ): Promise<ProposalStatus> {
   const TEN_DAYS_IN_SECONDS = 10 * 24 * 60 * 60;
   const { contracts, ui } = Tenant.current();
@@ -244,7 +245,8 @@ export async function getProposalStatus(
       const tallies = calculateHybridStandardTallies(
         proposalResults.kind,
         Number(quorum!),
-        true, // isHybridStandard
+        Number(approvalThreshold),
+        true, // isHybridStandard,
         (proposalData as ParsedProposalData["HYBRID_STANDARD"]).kind
           .calculationOptions
       );
