@@ -7,6 +7,7 @@ import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
+import { fetchOffchainProposalsMap } from "./fetchOffchainProposalsMap";
 
 async function getNeedsMyVoteProposals(address: string) {
   return withMetrics("getNeedsMyVoteProposals", async () => {
@@ -61,14 +62,31 @@ async function getNeedsMyVoteProposals(address: string) {
       contracts.governor.address
     );
 
+    // Collect IDs of all non-offchain proposals (onchain and hybrid)
+    const nonOffchainProposalIds = proposals.map(
+      (proposal: ProposalPayload) => proposal.proposal_id
+    );
+
+    // Fetch offline proposals that match our non-offchain proposal IDs
+    const offlineProposalsMap = await fetchOffchainProposalsMap({
+      namespace,
+      proposalIds: nonOffchainProposalIds,
+    });
+
     const resolvedProposals = Promise.all(
       proposals.map(async (proposal) => {
         const quorum = await fetchQuorumForProposal(proposal);
+
+        // Get offline proposal from map
+        const offlineProposal =
+          offlineProposalsMap.get(proposal.proposal_id) || null;
+
         return parseProposal(
           proposal,
           latestBlock,
           quorum ?? null,
-          BigInt(votableSupply)
+          BigInt(votableSupply),
+          offlineProposal as ProposalPayload
         );
       })
     );
