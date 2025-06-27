@@ -26,7 +26,6 @@ export const delegatesSearchParams = {
     parseAsArrayOf(parseAsString).withDefault(emptyArray),
   tab: parseAsString.withDefault("delegates"),
   orderBy: parseAsString.withDefault("weighted_random"),
-  citizensOrderBy: parseAsString.withDefault("shuffle"),
 };
 
 // Create the loader function for server components
