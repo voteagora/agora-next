@@ -34,3 +34,19 @@ Always run these commands before committing:
 1. `yarn prettier-src` - Format code
 2. `yarn lint` - Check for linting errors
 3. `yarn typecheck` - Check for TypeScript errors
+
+## Product overview
+
+This project is an Agora application built using Next.js, TypeScript, and React. It is a decentralized platform for creating and managing proposals, with features such as voting, proposal creation, and proposal execution.
+
+## Proposal specs and gotchas
+
+- import @specs/proposals.md
+
+## Delegation specs and gotchas
+
+- import @specs/delegations.md
+
+## Voting specs and gotchas
+
+- import @specs/voting.md

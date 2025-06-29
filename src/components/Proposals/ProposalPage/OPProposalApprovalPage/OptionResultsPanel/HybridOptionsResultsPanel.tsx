@@ -71,6 +71,8 @@ export default function HybridOptionsResultsPanel({
     return b.rawVotes > a.rawVotes ? 1 : b.rawVotes < a.rawVotes ? -1 : 0;
   });
 
+  console.log(sortedOptions);
+
   return (
     <div
       className={cn(
@@ -140,7 +142,7 @@ function SingleOption({
     return {
       name: displayName,
       votes: category === "DELEGATES" ? formatNumber(votes) : votes,
-      percentage: weightedDisplayPercentage,
+      percentage: option.weightedPercentage,
       weight: (weight * 100).toFixed(2),
     };
   };

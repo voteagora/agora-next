@@ -1170,28 +1170,12 @@ export function calculateHybridApprovalWeightedPercentage(
   const weights = HYBRID_VOTE_WEIGHTS;
   let weightedOptionPercentage = 0;
 
-  // Calculate contribution from each group
   const delegatesVotes = proposalResults.DELEGATES?.[optionName]
     ? Number(proposalResults.DELEGATES[optionName])
     : 0;
-  const appsVotes = proposalResults.APP?.[optionName]
-    ? Number(proposalResults.APP[optionName])
-    : 0;
-  const usersVotes = proposalResults.USER?.[optionName]
-    ? Number(proposalResults.USER[optionName])
-    : 0;
-  const chainsVotes = proposalResults.CHAIN?.[optionName]
-    ? Number(proposalResults.CHAIN[optionName])
-    : 0;
-
+  console.log(optionName, proposalResults);
   weightedOptionPercentage +=
     (delegatesVotes / eligibleVoters.delegates) * weights.delegates;
-
-  weightedOptionPercentage += (appsVotes / eligibleVoters.apps) * weights.apps;
-  weightedOptionPercentage +=
-    (usersVotes / eligibleVoters.users) * weights.users;
-  weightedOptionPercentage +=
-    (chainsVotes / eligibleVoters.chains) * weights.chains;
 
   return weightedOptionPercentage;
 }

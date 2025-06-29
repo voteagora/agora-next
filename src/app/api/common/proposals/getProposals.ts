@@ -36,6 +36,14 @@ import {
   getCachedAllProposalsFromDaoNode,
   getProposalTypesFromDaoNode,
 } from "@/app/lib/dao-node/client";
+// NEW: Import our domain architecture
+import { ProposalAdapter } from "@/domain/proposals/adapters/ProposalAdapter";
+import { ProposalStrategyInitializer } from "@/domain/proposals/services/ProposalStrategyInitializer";
+import {
+  getProposalSystemConfig,
+  ProposalSystemLogger,
+  ProposalSystemMetrics,
+} from "@/lib/config/proposalSystemConfig";
 
 // Is this working? Not sure, but i don't think so.
 // TODO: Check before enabling DAO-NODE PROPOSALS
@@ -64,6 +72,21 @@ async function getProposals({
     async () => {
       try {
         const { namespace, contracts, ui } = Tenant.current();
+
+        // NEW: Get proposal system configuration
+        const config = getProposalSystemConfig();
+        ProposalSystemLogger.setLevel(config.logLevel);
+
+        ProposalSystemLogger.debug("Request processing started", {
+          tenant: namespace,
+          filter,
+          type,
+          config: {
+            useNewSystem: config.useNewSystem,
+            newSystemPercentage: config.newSystemPercentage,
+            isEnabled: config.isEnabled,
+          },
+        });
 
         const getProposalsExecution = doInSpan(
           { name: "getProposals" },
@@ -196,6 +219,62 @@ async function getProposals({
             const offlineProposal =
               offlineProposalsMap.get(proposal.proposal_id) || null;
 
+            // NEW: Use domain architecture if enabled
+            if (config.isEnabled) {
+              try {
+                // Initialize domain system (cached after first call)
+                ProposalStrategyInitializer.initialize();
+
+                // Create domain proposal using our new architecture
+                const domainProposal = ProposalAdapter.toDomainModel(
+                  proposal,
+                  BigInt(votableSupply),
+                  {
+                    tenant: namespace,
+                    calculationOptions: (proposal as any).calculation_options,
+                    delegateQuorum: quorum ? BigInt(quorum) : undefined,
+                    v6UpgradeBlock: (proposal as any).v6_upgrade_block,
+                    disapprovalThreshold: (proposal as any)
+                      .disapproval_threshold,
+                    budgetChangeDate: (proposal as any).budget_change_date
+                      ? BigInt((proposal as any).budget_change_date)
+                      : undefined,
+                  },
+                  offlineProposal || undefined
+                );
+
+                // Log successful usage
+                ProposalSystemMetrics.incrementNewSystemUsage();
+                ProposalSystemLogger.logNewSystemUsage({
+                  tenant: namespace,
+                  proposalId: proposal.proposal_id,
+                  proposalType: proposal.proposal_type || "unknown",
+                  isHybrid: !!offlineProposal,
+                  timestamp: Date.now(),
+                });
+
+                // Convert back to API response format
+                const apiProposal =
+                  ProposalAdapter.toApiResponse(domainProposal);
+                console.log("API Proposal:", apiProposal);
+                return apiProposal;
+              } catch (error) {
+                // Log fallback and track metrics
+                ProposalSystemMetrics.incrementFallbackCount();
+                ProposalSystemMetrics.incrementErrors();
+                ProposalSystemLogger.logFallbackToOldSystem({
+                  tenant: namespace,
+                  proposalId: proposal.proposal_id,
+                  error: error instanceof Error ? error.message : String(error),
+                  timestamp: Date.now(),
+                });
+
+                // Fall back to old system on any error
+              }
+            }
+
+            // OLD: Use existing parseProposal logic (fallback or when new system disabled)
+            ProposalSystemMetrics.incrementOldSystemUsage();
             return parseProposal(
               proposal,
               latestBlock,
@@ -208,6 +287,25 @@ async function getProposals({
 
         // Filter out null values from skipped proposals
         const filteredProposals = resolvedProposals.filter((p) => p !== null);
+
+        // NEW: System comparison logging and metrics
+        if (config.enableSystemComparison && config.useNewSystem) {
+          ProposalSystemLogger.logSystemComparison({
+            tenant: namespace,
+            totalProposals: filteredProposals.length,
+            newSystemPercentage: config.newSystemPercentage,
+            filter,
+            type,
+            timestamp: Date.now(),
+          });
+        }
+
+        // Log final metrics summary
+        ProposalSystemLogger.debug("Request processing completed", {
+          tenant: namespace,
+          totalProposals: filteredProposals.length,
+          metrics: ProposalSystemMetrics.getMetricsSummary(),
+        });
 
         return {
           meta: proposals.meta,
