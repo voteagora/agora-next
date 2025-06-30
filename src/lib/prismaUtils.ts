@@ -221,8 +221,12 @@ export function findProposalsQueryFromDB({
     where: {
       contract,
       cancelled_block: filter === "relevant" ? null : undefined,
-      proposal_type:
-        type === "OFFCHAIN" ? { in: allOffchainProposalTypes } : type,
+      ...(type
+        ? {
+            proposal_type:
+              type === "OFFCHAIN" ? { in: allOffchainProposalTypes } : type,
+          }
+        : {}),
     },
     select: {
       // Required by ProposalPayload type
