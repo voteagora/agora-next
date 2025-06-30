@@ -14,25 +14,25 @@ export async function fetchOffchainProposalsMap({
   namespace: TenantNamespace;
   proposalIds: string[];
 }): Promise<Map<string, ProposalPayload>> {
-  const offlineProposalsMap = new Map<string, ProposalPayload>();
+  const offchainProposalsMap = new Map<string, ProposalPayload>();
 
   if (proposalIds.length === 0) {
-    return offlineProposalsMap;
+    return offchainProposalsMap;
   }
 
-  const offlineProposals = await findOffchainProposalsByOnchainIds({
+  const offchainProposals = await findOffchainProposalsByOnchainIds({
     namespace,
     onchainProposalIds: proposalIds,
   });
 
-  // Create a map of offline proposals by their onchain_proposalid
-  (offlineProposals as ProposalPayload[]).forEach((offlineProposal) => {
-    const onchainId = (offlineProposal.proposal_data as any)
+  // Create a map of offchain proposals by their onchain_proposalid
+  (offchainProposals as ProposalPayload[]).forEach((offchainProposal) => {
+    const onchainId = (offchainProposal.proposal_data as any)
       ?.onchain_proposalid;
     if (onchainId) {
-      offlineProposalsMap.set(onchainId, offlineProposal);
+      offchainProposalsMap.set(onchainId, offchainProposal);
     }
   });
 
-  return offlineProposalsMap;
+  return offchainProposalsMap;
 }
