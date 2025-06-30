@@ -67,8 +67,8 @@ async function getNeedsMyVoteProposals(address: string) {
       (proposal: ProposalPayload) => proposal.proposal_id
     );
 
-    // Fetch offline proposals that match our non-offchain proposal IDs
-    const offlineProposalsMap = await fetchOffchainProposalsMap({
+    // Fetch offchain proposals that match our non-offchain proposal IDs
+    const offchainProposalsMap = await fetchOffchainProposalsMap({
       namespace,
       proposalIds: nonOffchainProposalIds,
     });
@@ -77,16 +77,16 @@ async function getNeedsMyVoteProposals(address: string) {
       proposals.map(async (proposal) => {
         const quorum = await fetchQuorumForProposal(proposal);
 
-        // Get offline proposal from map
-        const offlineProposal =
-          offlineProposalsMap.get(proposal.proposal_id) || null;
+        // Get offchain proposal from map
+        const offchainProposal =
+          offchainProposalsMap.get(proposal.proposal_id) || null;
 
         return parseProposal(
           proposal,
           latestBlock,
           quorum ?? null,
           BigInt(votableSupply),
-          offlineProposal as ProposalPayload
+          offchainProposal as ProposalPayload
         );
       })
     );

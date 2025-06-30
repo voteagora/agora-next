@@ -15,7 +15,7 @@ export function parseProposalResults(
   proposalResults: string,
   proposalData: ParsedProposalData[ProposalType],
   startBlock: string,
-  offlineProposalData?: string
+  offchainProposalData?: string
 ): ParsedProposalResults[ProposalType] {
   const type = proposalData.key;
   switch (type) {
@@ -125,9 +125,9 @@ export function parseProposalResults(
         abstain: BigInt(parsedProposalResults?.[2] ?? 0),
       };
 
-      // Parse offchain data from offlineProposalData
+      // Parse offchain data from offchainProposalData
       const offchainResults = parseOffChainProposalResults(
-        offlineProposalData || "{}",
+        offchainProposalData || "{}",
         "HYBRID_STANDARD"
       );
 
@@ -150,9 +150,9 @@ export function parseProposalResults(
         abstain: BigInt(parsedProposalResults?.[2] ?? 0),
       };
 
-      // Parse offchain data from offlineProposalData
+      // Parse offchain data from offchainProposalData
       const offchainResults = parseOffChainProposalResults(
-        offlineProposalData || "{}",
+        offchainProposalData || "{}",
         "HYBRID_OPTIMISTIC"
       );
 
@@ -180,9 +180,9 @@ export function parseProposalResults(
         abstain: BigInt(parsedProposalResults?.[2] ?? 0),
       };
 
-      // Parse offchain data from offlineProposalData
+      // Parse offchain data from offchainProposalData
       const offchainResults = parseOffChainProposalResults(
-        offlineProposalData || "{}",
+        offchainProposalData || "{}",
         "HYBRID_OPTIMISTIC_TIERED"
       );
 
@@ -225,9 +225,9 @@ export function parseProposalResults(
         };
       })();
 
-      // Parse offchain data from offlineProposalData
+      // Parse offchain data from offchainProposalData
       const offchainResults = parseOffChainProposalResults(
-        offlineProposalData || "{}",
+        offchainProposalData || "{}",
         "HYBRID_APPROVAL"
       );
 
