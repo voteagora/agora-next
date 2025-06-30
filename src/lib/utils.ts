@@ -68,6 +68,12 @@ export const getProposalTypeText = (
       return "Standard Proposal (Offchain)";
     case "OFFCHAIN_APPROVAL":
       return "Approval Vote Proposal (Offchain)";
+    case "HYBRID_STANDARD":
+      return "Joint House Standard Proposal";
+    case "HYBRID_APPROVAL":
+      return "Joint House Approval Proposal";
+    case "HYBRID_OPTIMISTIC_TIERED":
+      return "Joint House Optimistic Proposal";
     default:
       return "Proposal";
   }
