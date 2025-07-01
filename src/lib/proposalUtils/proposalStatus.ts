@@ -1,6 +1,6 @@
 import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import {
-  calculateHybridApprovalMetrics,
+  calculateHybridApprovalProposalMetrics,
   calculateHybridOptimisticProposalMetrics,
   calculateHybridStandardTallies,
   getEndBlock,
@@ -323,7 +323,8 @@ export async function getProposalStatus(
         approvalThreshold: 0,
       };
 
-      const metrics = calculateHybridApprovalMetrics(proposalForMetrics, false);
+      const metrics =
+        calculateHybridApprovalProposalMetrics(proposalForMetrics);
 
       // Check if weighted quorum is met
       if (!metrics.quorumMet) {
