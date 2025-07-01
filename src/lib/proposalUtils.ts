@@ -14,6 +14,7 @@ import {
   OFFCHAIN_THRESHOLDS,
   HYBRID_VOTE_WEIGHTS,
   disapprovalThreshold,
+  HYBRID_PROPOSAL_QUORUM,
 } from "./constants";
 import { ProposalType } from "./types";
 import {
@@ -1159,18 +1160,31 @@ export function calculateHybridApprovalOptionVotes(
   return optionVotes;
 }
 
-export function calculateHybridApprovalWeightedPercentage(
-  optionName: string,
-  proposalResults: any,
-  quorum: number
-) {
-  const eligibleVoters = {
+// Helper function to calculate individual group percentage contribution
+export function calculateGroupPercentageContribution(
+  votes: number,
+  eligibleVoters: number,
+  weight: number
+): number {
+  return (votes / eligibleVoters) * weight * 100;
+}
+
+// Helper function to get eligible voters for hybrid proposals
+export function getHybridEligibleVoters(quorum: number) {
+  return {
     delegates: Number(quorum) * (100 / 30), // Convert 30% quorum to total eligible
     apps: OFFCHAIN_THRESHOLDS.APP,
     users: OFFCHAIN_THRESHOLDS.USER,
     chains: OFFCHAIN_THRESHOLDS.CHAIN,
   };
+}
 
+export function calculateHybridApprovalWeightedPercentage(
+  optionName: string,
+  proposalResults: any,
+  quorum: number
+) {
+  const eligibleVoters = getHybridEligibleVoters(quorum);
   const weights = HYBRID_VOTE_WEIGHTS;
   let weightedOptionPercentage = 0;
 
@@ -1189,22 +1203,20 @@ export function calculateHybridApprovalWeightedPercentage(
     : 0;
 
   weightedOptionPercentage +=
-    (delegatesVotes / eligibleVoters.delegates) * weights.delegates;
+    (delegatesVotes / eligibleVoters.delegates) * weights.delegates * 100;
 
-  weightedOptionPercentage += (appsVotes / eligibleVoters.apps) * weights.apps;
   weightedOptionPercentage +=
-    (usersVotes / eligibleVoters.users) * weights.users;
+    (appsVotes / eligibleVoters.apps) * weights.apps * 100;
   weightedOptionPercentage +=
-    (chainsVotes / eligibleVoters.chains) * weights.chains;
+    (usersVotes / eligibleVoters.users) * weights.users * 100;
+  weightedOptionPercentage +=
+    (chainsVotes / eligibleVoters.chains) * weights.chains * 100;
 
   return weightedOptionPercentage;
 }
 
-export function calculateHybridApprovalMetrics(
-  proposal: any,
-  includeOptionApprovalData = false
-) {
-  const quorumThreshold = 0.3; // 30% quorum
+export function calculateHybridApprovalProposalMetrics(proposal: any) {
+  const quorumThreshold = HYBRID_PROPOSAL_QUORUM; // 30% quorum
 
   // Extract data from proposal object
   const proposalResults = proposal.proposalResults;
@@ -1306,15 +1318,11 @@ export function calculateHybridApprovalMetrics(
       (proposalForVotes * 10000n) / proposalTotalVotes >=
         BigInt(governorApprovalThreshold));
 
-  // If option approval data requested, calculate full approval data
+  // Calculate full approval data
   let optionsWithApproval = null;
   let remainingBudget = null;
 
-  if (
-    includeOptionApprovalData &&
-    proposalData?.proposalSettings &&
-    proposalResults?.options
-  ) {
+  if (proposalData?.proposalSettings && proposalResults?.options) {
     const proposalSettings = proposalData.proposalSettings;
     const options = proposalResults.options;
 
@@ -1412,14 +1420,9 @@ export function calculateHybridStandardTallies(
   isHybridStandard: boolean,
   calculationOptions?: 0 | 1
 ) {
-  const eligibleVoters = {
-    delegates: Number(delegateQuorum) * (100 / 30), // Convert 30% quorum to total eligible
-    apps: OFFCHAIN_THRESHOLDS.APP,
-    users: OFFCHAIN_THRESHOLDS.USER,
-    chains: OFFCHAIN_THRESHOLDS.CHAIN,
-  };
+  const eligibleVoters = getHybridEligibleVoters(Number(delegateQuorum));
 
-  const quorumThreshold = 0.3;
+  const quorumThreshold = HYBRID_PROPOSAL_QUORUM;
   const approvalThresholdNumber = approvalThreshold / 100 || 0.51; // Default to 51% approval threshold
 
   const calculateTally = (category: any, eligibleCount: number) => {
@@ -1579,133 +1582,13 @@ export function calculateHybridStandardProposalMetrics(proposal: Proposal) {
   };
 }
 
-export function calculateHybridApprovalProposalMetrics(proposal: Proposal) {
-  const proposalResults =
-    proposal.proposalResults as ParsedProposalResults["HYBRID_APPROVAL"]["kind"];
-  const proposalData =
-    proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"];
-
-  // For delegates, we need to calculate the total eligible voters
-  // proposal.quorum is 30% of votable supply, so we need to multiply by (100/30)
-  const eligibleVoters = {
-    delegates: Number(proposal.quorum) * (100 / 30),
-    apps: OFFCHAIN_THRESHOLDS.APP,
-    users: OFFCHAIN_THRESHOLDS.USER,
-    chains: OFFCHAIN_THRESHOLDS.CHAIN,
-  };
-
-  // Setup weights and participating groups based on proposal type
-  let tallyWeights, eligibleCounts;
-  if (proposal.proposalType === "HYBRID_APPROVAL") {
-    // All 4 groups participate with hybrid weights
-    tallyWeights = [
-      HYBRID_VOTE_WEIGHTS.delegates,
-      HYBRID_VOTE_WEIGHTS.apps,
-      HYBRID_VOTE_WEIGHTS.users,
-      HYBRID_VOTE_WEIGHTS.chains,
-    ];
-    eligibleCounts = [
-      eligibleVoters.delegates,
-      eligibleVoters.apps,
-      eligibleVoters.users,
-      eligibleVoters.chains,
-    ];
-  } else {
-    // Only 3 groups participate with equal weights
-    tallyWeights = [1 / 3, 1 / 3, 1 / 3];
-    eligibleCounts = [
-      eligibleVoters.apps,
-      eligibleVoters.users,
-      eligibleVoters.chains,
-    ];
-  }
-
-  // Get all option names across all categories
-  const optionNames = new Set<string>();
-  if (proposalResults.APP)
-    Object.keys(proposalResults.APP).forEach((key) => optionNames.add(key));
-  if (proposalResults.USER)
-    Object.keys(proposalResults.USER).forEach((key) => optionNames.add(key));
-  if (proposalResults.CHAIN)
-    Object.keys(proposalResults.CHAIN).forEach((key) => optionNames.add(key));
-  if (proposalResults.DELEGATES)
-    Object.keys(proposalResults.DELEGATES).forEach((key) =>
-      optionNames.add(key)
-    );
-
-  // Calculate weighted participation for each option
-  const optionResults = [];
-  for (const optionName of optionNames) {
-    const categories =
-      proposal.proposalType === "HYBRID_APPROVAL"
-        ? [
-            proposalResults.DELEGATES,
-            proposalResults.APP,
-            proposalResults.USER,
-            proposalResults.CHAIN,
-          ]
-        : [proposalResults.APP, proposalResults.USER, proposalResults.CHAIN];
-
-    // Calculate weighted votes as percentage of potential participation
-    const calculatedWeightedVotes = categories.reduce(
-      (sum, category, index) => {
-        const votes = category?.[optionName] ? Number(category[optionName]) : 0;
-        const votesPercentage =
-          votes > 0 ? (votes / eligibleCounts[index]) * 100 : 0;
-        return sum + votesPercentage * tallyWeights[index];
-      },
-      0
-    );
-
-    optionResults.push({
-      optionName,
-      weightedPercentage: Number(calculatedWeightedVotes.toFixed(2)),
-      rawVotes: categories.reduce((sum, category) => {
-        const votes = category?.[optionName] ? Number(category[optionName]) : 0;
-        return sum + votes;
-      }, 0),
-    });
-  }
-
-  // Calculate total weighted participation (sum of all option votes)
-  const totalWeightedParticipation = optionResults.reduce(
-    (sum, option) => sum + option.weightedPercentage,
-    0
-  );
-
-  // Check if quorum is met (30% threshold)
-  const quorumThreshold = 30;
-  const quorumMet = totalWeightedParticipation >= quorumThreshold;
-
-  // Check if threshold is met for THRESHOLD criteria
-  const criteriaValue = proposalData?.proposalSettings?.criteriaValue;
-  const thresholdMet =
-    proposalResults.criteria === "THRESHOLD" && criteriaValue
-      ? optionResults.some(
-          (option) => option.weightedPercentage >= Number(criteriaValue)
-        )
-      : false;
-
-  return {
-    totalWeightedParticipation: Number(totalWeightedParticipation.toFixed(2)),
-    quorumMet,
-    thresholdMet,
-    optionResults,
-  };
-}
-
 export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
   const proposalResults =
     proposal.proposalResults as ParsedProposalResults["HYBRID_OPTIMISTIC_TIERED"]["kind"];
 
   // For delegates, we need to calculate the total eligible voters
   // proposal.quorum is 30% of votable supply, so we need to multiply by (100/30)
-  const eligibleVoters = {
-    delegates: Number(proposal.quorum) * (100 / 30),
-    apps: OFFCHAIN_THRESHOLDS.APP,
-    users: OFFCHAIN_THRESHOLDS.USER,
-    chains: OFFCHAIN_THRESHOLDS.CHAIN,
-  };
+  const eligibleVoters = getHybridEligibleVoters(Number(proposal.quorum));
 
   // Get thresholds from tiers array: [2GroupThreshold, 3GroupThreshold, 4GroupThreshold]
   const proposalData =

@@ -176,3 +176,5 @@ export const HYBRID_VOTE_WEIGHTS = {
   users: 1 / 6,
   chains: 1 / 6,
 } as const;
+
+export const HYBRID_PROPOSAL_QUORUM = 0.3;
