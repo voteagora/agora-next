@@ -93,6 +93,8 @@ describe("calculateVoteMetadata", () => {
     proposalType: "STANDARD",
     timestamp: new Date("2024-03-02"),
     blockNumber: BigInt(123),
+    citizenType: null,
+    voterMetadata: {},
   };
 
   describe("Standard Proposal", () => {

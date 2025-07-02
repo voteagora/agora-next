@@ -1,7 +1,8 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import {
   ParsedProposalData,
-  calculateHybridApprovalMetrics,
+  calculateHybridApprovalProposalMetrics,
+  getHybridEligibleVoters,
 } from "@/lib/proposalUtils";
 import { formatNumber } from "@/lib/tokenUtils";
 import Tenant from "@/lib/tenant/tenant";
@@ -40,10 +41,7 @@ export default function HybridOptionsResultsPanel({
   };
 
   // Use consolidated function to calculate all metrics and approval data
-  const hybridMetrics = calculateHybridApprovalMetrics(
-    proposal,
-    true // Include option approval data
-  );
+  const hybridMetrics = calculateHybridApprovalProposalMetrics(proposal);
 
   // Extract data for threshold calculations
   const proposalSettings = proposalData.proposalSettings;
@@ -90,6 +88,7 @@ export default function HybridOptionsResultsPanel({
               option={option}
               proposalResults={proposalResults}
               weightedPercentage={option.weightedPercentage}
+              proposal={proposal}
             />
           );
         })}
@@ -109,6 +108,7 @@ function SingleOption({
   option,
   proposalResults,
   weightedPercentage,
+  proposal,
 }: {
   description: string;
   thresholdPosition: number;
@@ -116,17 +116,20 @@ function SingleOption({
   option: any;
   proposalResults: any;
   weightedPercentage: number;
+  proposal: Proposal;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const weightedDisplayPercentage = weightedPercentage * 100;
+  const weightedDisplayPercentage = weightedPercentage;
 
   // Calculate vote data for each category
-  const { token } = Tenant.current();
+  const eligibleVoters = getHybridEligibleVoters(Number(proposal.quorum));
+
   const getVoteData = (
     category: string,
     displayName: string,
-    weight: number
+    weight: number,
+    eligibleCount: number
   ) => {
     const votes = proposalResults[category as keyof typeof proposalResults]?.[
       option.option
@@ -137,19 +140,39 @@ function SingleOption({
           ]
         )
       : 0n;
+
+    // Calculate the percentage of this group that voted for this option
+    const groupPercentage =
+      eligibleCount > 0 ? (Number(votes) / eligibleCount) * 100 : 0;
+
     return {
       name: displayName,
       votes: category === "DELEGATES" ? formatNumber(votes) : votes,
-      percentage: weightedDisplayPercentage,
+      percentage: groupPercentage.toFixed(2),
       weight: (weight * 100).toFixed(2),
     };
   };
 
   const voteGroups = [
-    getVoteData("DELEGATES", "Delegates", HYBRID_VOTE_WEIGHTS.delegates),
-    getVoteData("CHAIN", "Chains", HYBRID_VOTE_WEIGHTS.chains),
-    getVoteData("APP", "Apps", HYBRID_VOTE_WEIGHTS.apps),
-    getVoteData("USER", "Users", HYBRID_VOTE_WEIGHTS.users),
+    getVoteData(
+      "DELEGATES",
+      "Delegates",
+      HYBRID_VOTE_WEIGHTS.delegates,
+      eligibleVoters.delegates
+    ),
+    getVoteData(
+      "CHAIN",
+      "Chains",
+      HYBRID_VOTE_WEIGHTS.chains,
+      eligibleVoters.chains
+    ),
+    getVoteData("APP", "Apps", HYBRID_VOTE_WEIGHTS.apps, eligibleVoters.apps),
+    getVoteData(
+      "USER",
+      "Users",
+      HYBRID_VOTE_WEIGHTS.users,
+      eligibleVoters.users
+    ),
   ];
 
   return (
@@ -168,7 +191,7 @@ function SingleOption({
               <span className="ml-1 text-tertiary">
                 {weightedPercentage === 0
                   ? "0%"
-                  : (weightedPercentage * 100).toFixed(2) + "%"}
+                  : weightedPercentage.toFixed(2) + "%"}
               </span>
               <button className="w-4 h-4 flex items-center justify-center">
                 <ExpandCollapseIcon className="stroke-primary" />
