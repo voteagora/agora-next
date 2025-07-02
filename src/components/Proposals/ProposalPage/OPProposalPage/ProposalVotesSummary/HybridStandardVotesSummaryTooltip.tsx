@@ -13,6 +13,7 @@ interface VotesSummaryTooltipProps {
   quorumPercentage: number;
   quorumMet: boolean;
   formatTime: (date: Date | null) => string;
+  finalApproval: number;
 }
 
 export const HybridStandardVotesSummaryTooltip = ({
@@ -23,6 +24,7 @@ export const HybridStandardVotesSummaryTooltip = ({
   quorumPercentage,
   quorumMet,
   formatTime,
+  finalApproval,
 }: VotesSummaryTooltipProps) => {
   return (
     <div className="flex flex-col font-semibold text-xs">
@@ -67,7 +69,7 @@ export const HybridStandardVotesSummaryTooltip = ({
           <div className="flex justify-between">
             <span className="text-secondary">Threshold</span>
             <div className="flex items-center gap-1">
-              {totalForVotesPercentage >=
+              {finalApproval * 100 >=
               Number(proposal.approvalThreshold) / 100 ? (
                 <Image
                   width="12"
@@ -80,17 +82,16 @@ export const HybridStandardVotesSummaryTooltip = ({
               )}
               <span
                 className={
-                  totalForVotesPercentage >=
+                  finalApproval * 100 >=
                   Number(proposal.approvalThreshold) / 100
                     ? "text-positive"
                     : "text-negative"
                 }
               >
-                {totalForVotesPercentage >=
-                Number(proposal.approvalThreshold) / 100
+                {finalApproval * 100 >= Number(proposal.approvalThreshold) / 100
                   ? "Met"
                   : "Not Met"}{" "}
-                - {(Number(proposal.approvalThreshold) / 100).toFixed(0)}%
+                - {Number(finalApproval * 100).toFixed(2)}%
               </span>
             </div>
           </div>

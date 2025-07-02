@@ -181,10 +181,12 @@ const HybridStandardProposalVotesSummary = ({
   const [showDetails, setShowDetails] = useState(false);
   const {
     quorumPercentage,
-    quorumMet,
+    finalQuorumMet,
     totalForVotesPercentage,
     totalAgainstVotesPercentage,
     totalAbstainVotesPercentage,
+    quorumMet,
+    finalApproval,
   } = useMemo(
     () => calculateHybridStandardProposalMetrics(proposal),
     [proposal]
@@ -228,8 +230,9 @@ const HybridStandardProposalVotesSummary = ({
                 totalAgainstVotesPercentage={totalAgainstVotesPercentage}
                 totalAbstainVotesPercentage={totalAbstainVotesPercentage}
                 quorumPercentage={quorumPercentage}
-                quorumMet={quorumMet}
+                quorumMet={finalQuorumMet}
                 formatTime={formatTime}
+                finalApproval={finalApproval}
               />
             </HoverCardContent>
           </HoverCard>
