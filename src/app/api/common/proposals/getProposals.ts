@@ -22,6 +22,7 @@ import {
   findOffchainProposal,
   findProposal,
   findProposalType,
+  findProposalsByIds,
   findProposalsQueryFromDB,
   findSnapshotProposalsQueryFromDb,
   getProposalsCount,
@@ -172,16 +173,10 @@ async function getProposals({
           )
           .map((proposal: ProposalPayload) => proposal.proposal_id);
 
-        // Fetch offline proposals that match our non-offchain proposal IDs
-        const offlineProposalsMap = await fetchOffchainProposalsMap({
-          namespace,
-          proposalIds: nonOffchainProposalIds,
-        });
-
-        // Process proposals with their offline counterparts
+        // Process proposals with their offchain counterparts
         const resolvedProposals = await Promise.all(
           proposals.data.map(async (proposal: ProposalPayload) => {
-            // Skip offline records of hybrid proposals when filter is relevant
+            // Skip offchain records of hybrid proposals when filter is relevant
             if (
               filter === "relevant" &&
               type !== "OFFCHAIN" &&
@@ -192,16 +187,51 @@ async function getProposals({
 
             const quorum = await fetchQuorumForProposal(proposal);
 
-            // Get offline proposal from map
-            const offlineProposal =
-              offlineProposalsMap.get(proposal.proposal_id) || null;
+            let offchainProposal = null;
+
+            if (ui.toggle("proposals/offchain")?.enabled) {
+              if (type === "OFFCHAIN") {
+                const onchainIds = proposals.data.map(
+                  (proposal: ProposalPayload) =>
+                    (proposal.proposal_data as any)?.onchain_proposalid
+                );
+
+                const onchainProposals = await findProposalsByIds({
+                  namespace,
+                  proposalIds: onchainIds,
+                });
+
+                const onchainProposal = onchainProposals.find(
+                  (p) =>
+                    p.proposal_id === proposal.proposal_data?.onchain_proposalid
+                );
+
+                return parseProposal(
+                  onchainProposal as ProposalPayload,
+                  latestBlock,
+                  quorum ?? null,
+                  BigInt(votableSupply),
+                  proposal as ProposalPayload
+                );
+              } else {
+                // Fetch offchain proposals that match our non-offchain proposal IDs
+                const offchainProposalsMap = await fetchOffchainProposalsMap({
+                  namespace,
+                  proposalIds: nonOffchainProposalIds,
+                });
+
+                // Get offchain proposal from map
+                offchainProposal =
+                  offchainProposalsMap.get(proposal.proposal_id) || null;
+              }
+            }
 
             return parseProposal(
               proposal,
               latestBlock,
               quorum ?? null,
               BigInt(votableSupply),
-              offlineProposal as ProposalPayload
+              offchainProposal as ProposalPayload
             );
           })
         );
@@ -242,8 +272,8 @@ async function getProposal(proposalId: string) {
       })
     );
 
-    const getOfflineProposal = doInSpan(
-      { name: "getOfflineProposal" },
+    const getOffchainProposal = doInSpan(
+      { name: "getOffchainProposal" },
       async () =>
         findOffchainProposal({
           namespace,
@@ -251,9 +281,9 @@ async function getProposal(proposalId: string) {
         })
     );
 
-    const [proposal, offlineProposal, votableSupply] = await Promise.all([
+    const [proposal, offchainProposal, votableSupply] = await Promise.all([
       getProposalExecution,
-      getOfflineProposal,
+      getOffchainProposal,
       fetchVotableSupply(),
     ]);
 
@@ -280,7 +310,7 @@ async function getProposal(proposalId: string) {
       latestBlock,
       quorum ?? null,
       BigInt(votableSupply),
-      offlineProposal as ProposalPayload
+      offchainProposal as ProposalPayload
     );
   });
 }

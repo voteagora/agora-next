@@ -30,8 +30,7 @@ export function parseProposalResults(
     }
     case "STANDARD":
     case "OPTIMISTIC":
-    case "OFFCHAIN_OPTIMISTIC":
-    case "OFFCHAIN_STANDARD": {
+    case "OFFCHAIN_OPTIMISTIC": {
       const parsedProposalResults = JSON.parse(proposalResults).standard;
 
       return {
@@ -116,7 +115,8 @@ export function parseProposalResults(
         },
       };
     }
-    case "HYBRID_STANDARD": {
+    case "HYBRID_STANDARD":
+    case "OFFCHAIN_STANDARD": {
       // Parse onchain data (DELEGATES) from proposalResults
       const parsedProposalResults = JSON.parse(proposalResults).standard;
       const delegatesResults = {
