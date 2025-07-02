@@ -470,7 +470,6 @@ async function getDelegates({
                 CASE
                   WHEN EXISTS (
                     SELECT 1
-                    FROM agora.citizens
                     WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
                   ) THEN TRUE
                   ELSE FALSE
@@ -520,7 +519,6 @@ async function getDelegates({
                 CASE
                   WHEN EXISTS (
                     SELECT 1
-                    FROM agora.citizens
                     WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
                   ) THEN TRUE
                   ELSE FALSE
@@ -567,7 +565,6 @@ async function getDelegates({
                 CASE
                   WHEN EXISTS (
                     SELECT 1
-                    FROM agora.citizens
                     WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
                   ) THEN TRUE
                   ELSE FALSE
@@ -627,7 +624,6 @@ async function getDelegates({
             direct: delegate.direct_vp?.toFixed(0) || "0",
             advanced: delegate.advanced_vp?.toFixed(0) || "0",
           },
-          citizen: delegate.citizen,
           statement: delegate.statement,
           numOfDelegators: BigInt(delegate.num_of_delegators || "0"),
           participation: 0,
@@ -686,7 +682,6 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
         LEFT JOIN
             (SELECT
               CASE
-              WHEN EXISTS (SELECT 1 FROM agora.citizens ac WHERE LOWER(ac.address) = LOWER($1) AND ac.dao_slug = $3::config.dao_slug) THEN TRUE
               ELSE FALSE
               END as citizen
             ) citizen ON TRUE
@@ -812,7 +807,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     // Build out delegate JSON response
     return {
       address: address,
-      citizen: delegate?.citizen || false,
+      citizen: false,
       votingPower: {
         total: totalVotingPower.toString(),
         direct: delegate?.voting_power?.toString() || "0",

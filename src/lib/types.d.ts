@@ -120,7 +120,6 @@ export enum ANALYTICS_EVENT_NAMES {
   DELEGATION_ENCOURAGEMENT_DOT = "delegation_encouragement_dot",
   WALLET_CONNECTED = "wallet_connected",
   DELEGATE_PAGE_VIEW_WITH_WALLET = "delegate_page_view_with_wallet",
-  CITIZENS_PAGE_VIEW_WITH_WALLET = "citizens_page_view_with_wallet",
   CREATE_OFFCHAIN_PROPOSAL = "CREATE_OFFCHAIN_PROPOSAL",
 }
 
@@ -209,12 +208,6 @@ export type AnalyticsEvent =
     }
   | {
       event_name: ANALYTICS_EVENT_NAMES.DELEGATE_PAGE_VIEW_WITH_WALLET;
-      event_data: {
-        address: `0x${string}`;
-      };
-    }
-  | {
-      event_name: ANALYTICS_EVENT_NAMES.CITIZENS_PAGE_VIEW_WITH_WALLET;
       event_data: {
         address: `0x${string}`;
       };
