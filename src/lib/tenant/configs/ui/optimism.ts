@@ -239,6 +239,7 @@ export const optimismTenantUIConfig = new TenantUI({
       name: "proposal-lifecycle",
       enabled: true,
       config: {
+        offchainProposalCreator: "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB",
         stages: [
           {
             stage: PrismaProposalStage.DRAFTING,

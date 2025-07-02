@@ -3,10 +3,10 @@
 import { useAccount } from "wagmi";
 
 const OnlyOwner = ({
-  ownerAddress,
+  ownerAddresses,
   children,
 }: {
-  ownerAddress: `0x${string}`;
+  ownerAddresses: string[];
   children: React.ReactNode;
 }) => {
   const { address, isConnecting, isReconnecting } = useAccount();
@@ -26,7 +26,7 @@ const OnlyOwner = ({
   //     );
   //   }
 
-  if (ownerAddress !== address) {
+  if (!ownerAddresses.includes(address as string)) {
     return (
       <div className="text-primary">
         You are not the owner of this proposal.

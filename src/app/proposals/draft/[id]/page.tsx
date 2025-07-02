@@ -27,6 +27,7 @@ export default async function DraftProposalPage({
 }) {
   const { ui } = Tenant.current();
   const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
+  const config = proposalLifecycleToggle?.config as PLMConfig;
   const tenantSupportsProposalLifecycle = proposalLifecycleToggle?.enabled;
 
   if (!tenantSupportsProposalLifecycle) {
@@ -48,8 +49,13 @@ export default async function DraftProposalPage({
   const stageObject = DRAFT_STAGES_FOR_TENANT[stageIndex];
   const stageMetadata = getStageMetadata(stageObject.stage);
 
+  const ownerAddresses = [
+    draftProposal.author_address,
+    config.offchainProposalCreator,
+  ].filter(Boolean) as string[];
+
   return (
-    <OnlyOwner ownerAddress={draftProposal.author_address as `0x${string}`}>
+    <OnlyOwner ownerAddresses={ownerAddresses}>
       <main className="max-w-screen-xl mx-auto mt-10">
         <div className="flex flex-row items-center justify-between">
           <div className="flex flex-row items-center space-x-6">
