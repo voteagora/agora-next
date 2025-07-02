@@ -1498,7 +1498,7 @@ export function calculateHybridStandardTallies(
   );
 
   const finalQuorumMet = finalQuorum >= quorumThreshold;
-  const finalApprovalMet = finalApproval >= approvalThreshold;
+  const finalApprovalMet = finalApproval * 100 >= approvalThresholdNumber;
   return {
     tallies,
     tallyWeights,
@@ -1563,7 +1563,9 @@ export function calculateHybridStandardProposalMetrics(proposal: Proposal) {
 
   return {
     quorumPercentage: talliesData.finalQuorum * 100,
+    finalQuorumMet: talliesData.finalQuorumMet,
     quorumMet: talliesData.quorumMet,
+    finalApproval: talliesData.finalApproval,
     totalForVotesPercentage: Number(calculatedTotalForVotes.toFixed(2)),
     totalAgainstVotesPercentage: Number(calculatedTotalAgainstVotes.toFixed(2)),
     totalAbstainVotesPercentage:
