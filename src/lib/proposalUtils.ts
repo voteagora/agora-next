@@ -1074,7 +1074,11 @@ export function getProposalCurrentQuorum(
       if (calculationOptions === 1) {
         return BigInt(proposalResults.for);
       } else {
-        return BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
+        return (
+          BigInt(proposalResults.for) +
+          BigInt(proposalResults.abstain) +
+          BigInt(proposalResults.against)
+        );
       }
     default:
       return BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
