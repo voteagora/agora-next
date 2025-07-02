@@ -225,13 +225,26 @@ export async function getProposalStatus(
       const calculationOptions = (
         proposalData as ParsedProposalData["STANDARD" | "HYBRID_STANDARD"]
       ).kind.calculationOptions;
+      let thresholdVotes = BigInt(forVotes) + BigInt(againstVotes);
+      const voteThresholdPercent =
+        Number(thresholdVotes) > 0
+          ? (Number(forVotes) / Number(thresholdVotes)) * 100
+          : 0;
+      const apprThresholdPercent = Number(approvalThreshold) / 100;
+      const hasMetThreshold = Boolean(
+        voteThresholdPercent >= apprThresholdPercent
+      );
 
       const quorumForGovernor = getProposalCurrentQuorum(
         proposalResults.kind,
         calculationOptions
       );
 
-      if ((quorum && quorumForGovernor < quorum) || forVotes < againstVotes) {
+      if (
+        (quorum && quorumForGovernor < quorum) ||
+        forVotes < againstVotes ||
+        !hasMetThreshold
+      ) {
         return "DEFEATED";
       }
 
