@@ -50,7 +50,10 @@ function CheckboxInput<
             <div className="flex flex-col">
               <TooltipProvider>
                 <Tooltip>
-                  <TooltipTrigger className="flex flex-row space-x-1">
+                  <TooltipTrigger
+                    type="button"
+                    className="flex flex-row space-x-1"
+                  >
                     <FormLabel
                       className="text-xs font-semibold text-secondary cursor-pointer"
                       isRequired={required}

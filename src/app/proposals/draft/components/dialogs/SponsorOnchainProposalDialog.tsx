@@ -10,6 +10,8 @@ import { UpdatedButton } from "@/components/Button";
 import { getBlockScanUrl, wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import OffchainProposalAction from "@/app/proposals/sponsor/components/OffchainProposalAction";
 import { DraftProposal } from "../../types";
+import { createWorldIdAction } from "../../actions/createWorldIdAction";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const SponsorOnchainProposalDialog = ({
   redirectUrl,
@@ -24,7 +26,7 @@ const SponsorOnchainProposalDialog = ({
   isHybrid: boolean;
   draftProposal: DraftProposal;
 }) => {
-  const tenant = Tenant.current();
+  const { ui, namespace } = Tenant.current();
   const { address } = useAccount();
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -38,6 +40,17 @@ const SponsorOnchainProposalDialog = ({
           hash: txHash,
           address: address as `0x${string}`,
         });
+        if (namespace === TENANT_NAMESPACES.WORLD) {
+          try {
+            const result = await createWorldIdAction(txHash);
+            console.log(
+              "World ID action created successfully for proposal",
+              result.proposalId
+            );
+          } catch (error) {
+            console.error("Failed to create World ID action:", error);
+          }
+        }
       } catch (error) {
         console.error("Error waiting for transaction:", error);
       } finally {
@@ -54,9 +67,7 @@ const SponsorOnchainProposalDialog = ({
         <VStack>
           <VStack className="w-full">
             <Image
-              src={
-                isLoading ? tenant.ui.assets.pending : tenant.ui.assets.success
-              }
+              src={isLoading ? ui.assets.pending : ui.assets.success}
               className="w-full mb-3"
               alt={isLoading ? "Pending" : "Success"}
             />
