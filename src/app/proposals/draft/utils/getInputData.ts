@@ -126,6 +126,7 @@ export function getInputData(proposal: DraftProposal): {
       criteria,
       criteriaValue,
       isSignalVote,
+      actionId: proposal.title,
     };
 
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
@@ -133,7 +134,7 @@ export function getInputData(proposal: DraftProposal): {
     const proposalData = abiCoder.encode(
       [
         "tuple(string description)[]",
-        "tuple(uint256 minParticipation, uint256 maxApprovals, uint8 criteria, uint256 criteriaValue, bool isSignalVote)",
+        "tuple(uint256 minParticipation, uint256 maxApprovals, uint8 criteria, uint256 criteriaValue, bool isSignalVote, string actionId)",
       ],
       [options, settings]
     );

@@ -10,6 +10,8 @@ import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/spon
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { DraftProposal } from "../../draft/types";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import { createWorldIdAction } from "../../draft/actions/createWorldIdAction";
 
 const ApprovalProposalAction = ({
   draftProposal,
@@ -17,7 +19,7 @@ const ApprovalProposalAction = ({
   draftProposal: DraftProposal;
 }) => {
   const openDialog = useOpenDialog();
-  const { contracts } = Tenant.current();
+  const { contracts, namespace } = Tenant.current();
   const { inputData } = getInputData(draftProposal);
   const [proposalCreated, setProposalCreated] = useState(false);
 
@@ -55,6 +57,18 @@ const ApprovalProposalAction = ({
               to: contracts.governor.address as `0x${string}`,
               data: calldata as `0x${string}`,
             });
+
+            if (namespace === TENANT_NAMESPACES.WORLD) {
+              try {
+                const result = await createWorldIdAction(draftProposal.title);
+                console.log(
+                  "World ID action created successfully for proposal",
+                  result.worldIdAction
+                );
+              } catch (error) {
+                console.error("Failed to create World ID action:", error);
+              }
+            }
 
             setProposalCreated(true);
 
