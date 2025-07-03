@@ -159,17 +159,17 @@ function shouldSkipProposal(
   );
 }
 
-// Helper function to determine base and offline proposals for hybrid proposals
+// Helper function to determine base and offchain proposals for hybrid proposals
 function resolveHybridProposal(
   proposal: ProposalPayload,
   onchainProposalsMap: Map<string, ProposalPayload>,
-  offlineProposalsMap: Map<string, ProposalPayload | null>
+  offchainProposalsMap: Map<string, ProposalPayload | null>
 ): {
   baseProposal: ProposalPayload;
-  offlineProposal: ProposalPayload | null;
+  offchainProposal: ProposalPayload | null;
 } {
   let baseProposal = proposal;
-  let offlineProposal = offlineProposalsMap.get(proposal.proposal_id) || null;
+  let offchainProposal = offchainProposalsMap.get(proposal.proposal_id) || null;
 
   if (
     proposal.proposal_type?.startsWith("OFFCHAIN") &&
@@ -179,11 +179,11 @@ function resolveHybridProposal(
     const onchainProposal = onchainProposalsMap.get(onchainId);
     if (onchainProposal) {
       baseProposal = onchainProposal;
-      offlineProposal = proposal;
+      offchainProposal = proposal;
     }
   }
 
-  return { baseProposal, offlineProposal };
+  return { baseProposal, offchainProposal };
 }
 
 // Main function to fetch initial proposals
@@ -235,7 +235,7 @@ function getLatestBlockPromise(ui: any, contracts: any): Promise<Block> {
 async function processAndParseProposals(
   proposals: ProposalPayload[],
   onchainProposalsMap: Map<string, ProposalPayload>,
-  offlineProposalsMap: Map<string, ProposalPayload | null>,
+  offchainProposalsMap: Map<string, ProposalPayload | null>,
   latestBlock: Block,
   votableSupply: string,
   filter: string,
@@ -247,10 +247,10 @@ async function processAndParseProposals(
         return null;
       }
 
-      const { baseProposal, offlineProposal } = resolveHybridProposal(
+      const { baseProposal, offchainProposal } = resolveHybridProposal(
         proposal,
         onchainProposalsMap,
-        offlineProposalsMap
+        offchainProposalsMap
       );
 
       const quorum = await fetchQuorumForProposal(baseProposal);
@@ -260,7 +260,7 @@ async function processAndParseProposals(
         latestBlock,
         quorum ?? null,
         BigInt(votableSupply),
-        offlineProposal as ProposalPayload
+        offchainProposal as ProposalPayload
       );
     })
   );
@@ -319,7 +319,7 @@ export async function getProposals({
         );
         const onchainProposalIds = getOnchainProposalIds(proposals.data);
 
-        const [onchainProposalsMap, offlineProposalsMap] = await Promise.all([
+        const [onchainProposalsMap, offchainProposalsMap] = await Promise.all([
           // Fetch onchain proposals referenced by offchain proposals (for hybrid proposals)
           // This will get any data of onchain proposals that are in from offchain proposals
           fetchOnchainProposalsByIds(
@@ -339,13 +339,13 @@ export async function getProposals({
         const parsedProposals = await processAndParseProposals(
           proposals.data,
           onchainProposalsMap,
-          offlineProposalsMap,
+          offchainProposalsMap,
           latestBlock,
           votableSupply,
           filter,
           type
         );
-        console.log("parsedProposals", parsedProposals);
+
         return {
           meta: proposals.meta,
           data: parsedProposals,
@@ -380,8 +380,8 @@ async function getProposal(proposalId: string) {
       })
     );
 
-    const getOfflineProposal = doInSpan(
-      { name: "getOfflineProposal" },
+    const getOffchainProposal = doInSpan(
+      { name: "getOffchainProposal" },
       async () =>
         findOffchainProposal({
           namespace,
@@ -389,9 +389,9 @@ async function getProposal(proposalId: string) {
         })
     );
 
-    const [proposal, offlineProposal, votableSupply] = await Promise.all([
+    const [proposal, offchainProposal, votableSupply] = await Promise.all([
       getProposalExecution,
-      getOfflineProposal,
+      getOffchainProposal,
       fetchVotableSupply(),
     ]);
 
@@ -418,7 +418,7 @@ async function getProposal(proposalId: string) {
       latestBlock,
       quorum ?? null,
       BigInt(votableSupply),
-      offlineProposal as ProposalPayload
+      offchainProposal as ProposalPayload
     );
   });
 }
