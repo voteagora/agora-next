@@ -27,6 +27,7 @@ const typeValidator = createOptionalStringValidator(
     "OFFCHAIN_STANDARD",
     "OFFCHAIN_APPROVAL",
     "OFFCHAIN",
+    "EXCLUDE_ONCHAIN",
   ],
   ""
 );

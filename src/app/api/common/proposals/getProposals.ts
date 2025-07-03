@@ -21,6 +21,7 @@ import { doInSpan } from "@/app/lib/logging";
 import {
   findOffchainProposal,
   findProposal,
+  findProposalsByIds,
   findProposalType,
   findProposalsQueryFromDB,
   findSnapshotProposalsQueryFromDb,
@@ -28,6 +29,7 @@ import {
 } from "@/lib/prismaUtils";
 import { fetchOffchainProposalsMap } from "./fetchOffchainProposalsMap";
 import { Block } from "ethers";
+
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
 import { getPublicClient } from "@/lib/viem";
@@ -36,6 +38,235 @@ import {
   getCachedAllProposalsFromDaoNode,
   getProposalTypesFromDaoNode,
 } from "@/app/lib/dao-node/client";
+
+// Helper function to fetch proposals from DAO Node
+async function fetchProposalsFromDaoNode(
+  skip: number,
+  take: number,
+  filter: string,
+  useSnapshot: boolean,
+  namespace: any,
+  contracts: any
+): Promise<ProposalPayload[]> {
+  try {
+    const [data, typesFromApi] = await Promise.all([
+      getCachedAllProposalsFromDaoNode(),
+      getProposalTypesFromDaoNode(),
+    ]);
+
+    let proposals = data;
+
+    // Apply relevant filter
+    if (filter === "relevant") {
+      proposals = proposals.filter((proposal) => !proposal.cancel_event);
+    }
+
+    // Adapt DAO Node response format
+    proposals = proposals.map((proposal) =>
+      adaptDAONodeResponse(proposal, typesFromApi.proposal_types)
+    );
+
+    // Include snapshot proposals if enabled
+    if (useSnapshot) {
+      const snapshotData = await fetchSnapshotProposalsFromDB();
+      proposals = [...proposals, ...snapshotData];
+
+      // Sort by start block descending
+      proposals.sort((a, b) => b.start_block - a.start_block);
+    }
+
+    return proposals.slice(skip, skip + take) as unknown as ProposalPayload[];
+  } catch (error) {
+    console.warn("REST API failed, falling back to DB:", error);
+    return (await findProposalsQueryFromDB({
+      namespace,
+      skip,
+      take,
+      filter,
+      contract: contracts.governor.address,
+    })) as ProposalPayload[];
+  }
+}
+
+// Helper function to extract onchain IDs from offchain proposals
+function extractOnchainIdsFromOffchainProposals(
+  proposals: ProposalPayload[]
+): string[] {
+  return proposals
+    .filter(
+      (proposal) =>
+        proposal.proposal_type?.startsWith("OFFCHAIN") &&
+        (proposal.proposal_data as any)?.onchain_proposalid
+    )
+    .map((proposal) => (proposal.proposal_data as any).onchain_proposalid);
+}
+
+// Helper function to fetch onchain proposals by IDs
+async function fetchOnchainProposalsByIds(
+  proposalIds: string[],
+  namespace: any,
+  contracts: any
+): Promise<Map<string, ProposalPayload>> {
+  const onchainProposalsMap = new Map<string, ProposalPayload>();
+
+  if (proposalIds.length === 0) {
+    return onchainProposalsMap;
+  }
+
+  try {
+    const onchainProposals = await findProposalsByIds({
+      namespace,
+      proposalIds,
+      contract: contracts.governor.address,
+    });
+
+    onchainProposals.forEach((proposal) => {
+      if (proposal) {
+        onchainProposalsMap.set(
+          proposal.proposal_id,
+          proposal as ProposalPayload
+        );
+      }
+    });
+  } catch (error) {
+    console.error(`Failed to fetch onchain proposals:`, error);
+  }
+
+  return onchainProposalsMap;
+}
+
+// Helper function to get non-offchain proposal IDs
+function getOnchainProposalIds(proposals: ProposalPayload[]): string[] {
+  return proposals
+    .filter(
+      (proposal) =>
+        proposal.proposal_type && !proposal.proposal_type.startsWith("OFFCHAIN")
+    )
+    .map((proposal) => proposal.proposal_id);
+}
+
+// Helper function to determine if a proposal should be skipped
+function shouldSkipProposal(
+  proposal: ProposalPayload,
+  filter: string,
+  type?: string
+): boolean {
+  return (
+    filter === "relevant" &&
+    type !== "OFFCHAIN" &&
+    type !== "EXCLUDE_ONCHAIN" &&
+    !!(proposal.proposal_data as any)?.onchain_proposalid
+  );
+}
+
+// Helper function to determine base and offline proposals for hybrid proposals
+function resolveHybridProposal(
+  proposal: ProposalPayload,
+  onchainProposalsMap: Map<string, ProposalPayload>,
+  offlineProposalsMap: Map<string, ProposalPayload | null>
+): {
+  baseProposal: ProposalPayload;
+  offlineProposal: ProposalPayload | null;
+} {
+  let baseProposal = proposal;
+  let offlineProposal = offlineProposalsMap.get(proposal.proposal_id) || null;
+
+  if (
+    proposal.proposal_type?.startsWith("OFFCHAIN") &&
+    (proposal.proposal_data as any)?.onchain_proposalid
+  ) {
+    const onchainId = (proposal.proposal_data as any).onchain_proposalid;
+    const onchainProposal = onchainProposalsMap.get(onchainId);
+    if (onchainProposal) {
+      baseProposal = onchainProposal;
+      offlineProposal = proposal;
+    }
+  }
+
+  return { baseProposal, offlineProposal };
+}
+
+// Main function to fetch initial proposals
+async function fetchInitialProposals(
+  pagination: PaginationParams,
+  filter: string,
+  type: string | undefined,
+  useDaoNode: boolean,
+  useSnapshot: boolean,
+  namespace: any,
+  contracts: any
+): Promise<PaginatedResult<ProposalPayload[]>> {
+  return doInSpan({ name: "getProposals" }, async () => {
+    const proposalsResult = await paginateResult(
+      async (skip: number, take: number) => {
+        if (useDaoNode) {
+          return await fetchProposalsFromDaoNode(
+            skip,
+            take,
+            filter,
+            useSnapshot,
+            namespace,
+            contracts
+          );
+        }
+        return (await findProposalsQueryFromDB({
+          namespace,
+          skip,
+          take,
+          filter,
+          type,
+          contract: contracts.governor.address,
+        })) as ProposalPayload[];
+      },
+      pagination
+    );
+    return proposalsResult as PaginatedResult<ProposalPayload[]>;
+  });
+}
+
+// Function to get latest block
+function getLatestBlockPromise(ui: any, contracts: any): Promise<Block> {
+  return ui.toggle("use-l1-block-number")?.enabled
+    ? contracts.providerForTime?.getBlock("latest")
+    : contracts.token.provider.getBlock("latest");
+}
+
+// Function to process and parse proposals
+async function processAndParseProposals(
+  proposals: ProposalPayload[],
+  onchainProposalsMap: Map<string, ProposalPayload>,
+  offlineProposalsMap: Map<string, ProposalPayload | null>,
+  latestBlock: Block,
+  votableSupply: string,
+  filter: string,
+  type?: string
+): Promise<Proposal[]> {
+  const resolvedProposals = await Promise.all(
+    proposals.map(async (proposal) => {
+      if (shouldSkipProposal(proposal, filter, type)) {
+        return null;
+      }
+
+      const { baseProposal, offlineProposal } = resolveHybridProposal(
+        proposal,
+        onchainProposalsMap,
+        offlineProposalsMap
+      );
+
+      const quorum = await fetchQuorumForProposal(baseProposal);
+
+      return parseProposal(
+        baseProposal,
+        latestBlock,
+        quorum ?? null,
+        BigInt(votableSupply),
+        offlineProposal as ProposalPayload
+      );
+    })
+  );
+
+  return resolvedProposals.filter((p) => p !== null) as Proposal[];
+}
 
 // Is this working? Not sure, but i don't think so.
 // TODO: Check before enabling DAO-NODE PROPOSALS
@@ -50,7 +281,7 @@ function getSnapshotProposalsFromDB() {
 
 const fetchSnapshotProposalsFromDB = cache(getSnapshotProposalsFromDB);
 
-async function getProposals({
+export async function getProposals({
   filter,
   pagination,
   type,
@@ -64,156 +295,63 @@ async function getProposals({
     async () => {
       try {
         const { namespace, contracts, ui } = Tenant.current();
+        const useDaoNode =
+          ui.toggle("use-daonode-for-proposals")?.enabled ?? false;
+        const useSnapshot = ui.toggle("snapshotVotes")?.enabled ?? false;
 
-        const getProposalsExecution = doInSpan(
-          { name: "getProposals" },
-          async () => {
-            const useDaoNode =
-              ui.toggle("use-daonode-for-proposals")?.enabled ?? false;
-
-            const useSnapshot = ui.toggle("snapshotVotes")?.enabled ?? false;
-
-            let proposalsResult;
-
-            if (useDaoNode) {
-              proposalsResult = await paginateResult(
-                async (skip: number, take: number) => {
-                  try {
-                    let [data, typesFromApi] = await Promise.all([
-                      getCachedAllProposalsFromDaoNode(),
-                      getProposalTypesFromDaoNode(),
-                    ]);
-
-                    if (filter == "relevant") {
-                      data = data.filter((proposal) => {
-                        return !proposal.cancel_event;
-                      });
-                    }
-
-                    // We could do this in the cache,
-                    // but it's tech-debt I don't want the client
-                    // to absorbe.
-                    data = data.map((proposal) =>
-                      adaptDAONodeResponse(
-                        proposal,
-                        typesFromApi.proposal_types
-                      )
-                    );
-
-                    if (useSnapshot) {
-                      const snapshotData = await fetchSnapshotProposalsFromDB();
-                      data = [...data, ...snapshotData];
-
-                      // TODO - Feeling like more and more, the client should handle the sort.
-                      data.sort((a, b) => {
-                        return b.start_block - a.start_block;
-                      });
-                    }
-
-                    data = data.slice(skip, skip + take);
-
-                    return data as unknown as ProposalPayload[];
-                  } catch (error) {
-                    console.warn("REST API failed, falling back to DB:", error);
-                  }
-
-                  const result = await findProposalsQueryFromDB({
-                    namespace,
-                    skip,
-                    take,
-                    filter,
-                    contract: contracts.governor.address,
-                  });
-
-                  return result as ProposalPayload[];
-                },
-                pagination
-              );
-            } else {
-              proposalsResult = await paginateResult(
-                async (skip: number, take: number) => {
-                  const result = await findProposalsQueryFromDB({
-                    namespace,
-                    skip,
-                    take,
-                    filter,
-                    type,
-                    contract: contracts.governor.address,
-                  });
-
-                  return result as ProposalPayload[];
-                },
-                pagination
-              );
-            }
-
-            return proposalsResult as PaginatedResult<ProposalPayload[]>;
-          }
-        );
-
-        const latestBlockPromise: Promise<Block> = ui.toggle(
-          "use-l1-block-number"
-        )?.enabled
-          ? contracts.providerForTime?.getBlock("latest")
-          : contracts.token.provider.getBlock("latest");
-
+        // Fetch initial proposals and supporting data in parallel
         const [proposals, latestBlock, votableSupply] = await Promise.all([
-          getProposalsExecution,
-          latestBlockPromise,
+          fetchInitialProposals(
+            pagination,
+            filter,
+            type,
+            useDaoNode,
+            useSnapshot,
+            namespace,
+            contracts
+          ),
+          getLatestBlockPromise(ui, contracts),
           fetchVotableSupply(),
         ]);
 
-        // Collect IDs of all non-offchain proposals (onchain and hybrid)
-        const nonOffchainProposalIds = proposals.data
-          .filter(
-            (proposal: ProposalPayload) =>
-              proposal.proposal_type &&
-              !proposal.proposal_type.startsWith("OFFCHAIN")
-          )
-          .map((proposal: ProposalPayload) => proposal.proposal_id);
-
-        // Fetch offline proposals that match our non-offchain proposal IDs
-        const offlineProposalsMap = await fetchOffchainProposalsMap({
-          namespace,
-          proposalIds: nonOffchainProposalIds,
-        });
-
-        // Process proposals with their offline counterparts
-        const resolvedProposals = await Promise.all(
-          proposals.data.map(async (proposal: ProposalPayload) => {
-            // Skip offline records of hybrid proposals when filter is relevant
-            if (
-              filter === "relevant" &&
-              type !== "OFFCHAIN" &&
-              (proposal.proposal_data as any)?.onchain_proposalid
-            ) {
-              return null;
-            }
-
-            const quorum = await fetchQuorumForProposal(proposal);
-
-            // Get offline proposal from map
-            const offlineProposal =
-              offlineProposalsMap.get(proposal.proposal_id) || null;
-
-            return parseProposal(
-              proposal,
-              latestBlock,
-              quorum ?? null,
-              BigInt(votableSupply),
-              offlineProposal as ProposalPayload
-            );
-          })
+        const referencedOnchainIds = extractOnchainIdsFromOffchainProposals(
+          proposals.data
         );
+        const onchainProposalIds = getOnchainProposalIds(proposals.data);
 
-        // Filter out null values from skipped proposals
-        const filteredProposals = resolvedProposals.filter((p) => p !== null);
+        const [onchainProposalsMap, offlineProposalsMap] = await Promise.all([
+          // Fetch onchain proposals referenced by offchain proposals (for hybrid proposals)
+          // This will get any data of onchain proposals that are in from offchain proposals
+          fetchOnchainProposalsByIds(
+            referencedOnchainIds,
+            namespace,
+            contracts
+          ),
+          // Fetch offchain proposals that correspond to onchain proposals
+          // This will get any data of offchain proposals that are in from onchain proposals, we dont have
+          // offchainIds here but we will checking with query to get them
+          fetchOffchainProposalsMap({
+            namespace,
+            proposalIds: onchainProposalIds,
+          }),
+        ]);
 
+        const parsedProposals = await processAndParseProposals(
+          proposals.data,
+          onchainProposalsMap,
+          offlineProposalsMap,
+          latestBlock,
+          votableSupply,
+          filter,
+          type
+        );
+        console.log("parsedProposals", parsedProposals);
         return {
           meta: proposals.meta,
-          data: filteredProposals,
+          data: parsedProposals,
         };
       } catch (error) {
+        console.error("Error fetching proposals:", error);
         throw error;
       }
     },
