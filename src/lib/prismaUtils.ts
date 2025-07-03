@@ -224,7 +224,9 @@ export function findProposalsQueryFromDB({
       ...(type
         ? {
             proposal_type:
-              type === "OFFCHAIN" ? { in: allOffchainProposalTypes } : type,
+              type === "OFFCHAIN" || type === "EXCLUDE_ONCHAIN"
+                ? { in: allOffchainProposalTypes }
+                : type,
           }
         : {}),
     },
@@ -335,6 +337,58 @@ export function findProposal({
       return prismaWeb3Client.demoProposals.findFirst(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findFirst(condition);
+    default:
+      throw new Error(`Unknown namespace: ${namespace}`);
+  }
+}
+
+export function findProposalsByIds({
+  namespace,
+  proposalIds,
+  contract,
+}: {
+  namespace: TenantNamespace;
+  proposalIds: string[];
+  contract: string;
+}) {
+  if (proposalIds.length === 0) {
+    return Promise.resolve([]);
+  }
+
+  const condition = {
+    where: {
+      proposal_id: { in: proposalIds },
+      contract,
+    },
+  };
+
+  switch (namespace) {
+    case TENANT_NAMESPACES.OPTIMISM:
+      return prismaWeb3Client.optimismProposals.findMany(condition);
+    case TENANT_NAMESPACES.ENS:
+      return prismaWeb3Client.ensProposals.findMany(condition);
+    case TENANT_NAMESPACES.ETHERFI:
+      return prismaWeb3Client.etherfiProposals.findMany(condition);
+    case TENANT_NAMESPACES.UNISWAP:
+      return prismaWeb3Client.uniswapProposals.findMany(condition);
+    case TENANT_NAMESPACES.CYBER:
+      return prismaWeb3Client.cyberProposals.findMany(condition);
+    case TENANT_NAMESPACES.SCROLL:
+      return prismaWeb3Client.scrollProposals.findMany(condition);
+    case TENANT_NAMESPACES.DERIVE:
+      return prismaWeb3Client.deriveProposals.findMany(condition);
+    case TENANT_NAMESPACES.PGUILD:
+      return prismaWeb3Client.pguildProposals.findMany(condition);
+    case TENANT_NAMESPACES.BOOST:
+      return prismaWeb3Client.boostProposals.findMany(condition);
+    case TENANT_NAMESPACES.XAI:
+      return prismaWeb3Client.xaiProposals.findMany(condition);
+    case TENANT_NAMESPACES.B3:
+      return prismaWeb3Client.b3Proposals.findMany(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prismaWeb3Client.demoProposals.findMany(condition);
+    case TENANT_NAMESPACES.LINEA:
+      return prismaWeb3Client.lineaProposals.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }

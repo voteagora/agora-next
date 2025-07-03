@@ -1,4 +1,4 @@
-import { calculateVoteMetadata } from "../voteUtils";
+import { calculateVoteMetadata, Support } from "../voteUtils";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import { expect, describe, it, vi } from "vitest";
@@ -84,7 +84,7 @@ describe("calculateVoteMetadata", () => {
     transactionHash: "0xabc",
     address: "0x456",
     proposalId: "1",
-    support: "FOR",
+    support: "FOR" as Support,
     weight: "100",
     reason: "",
     params: [],
@@ -93,6 +93,8 @@ describe("calculateVoteMetadata", () => {
     proposalType: "STANDARD",
     timestamp: new Date("2024-03-02"),
     blockNumber: BigInt(123),
+    citizenType: null,
+    voterMetadata: null,
   };
 
   describe("Standard Proposal", () => {
