@@ -49,12 +49,12 @@ export default function ApprovedTransactions({
           {proposalData.options.slice(0, displayedOptions).map((option, i) => {
             return (
               <div key={i}>
-                {proposalType === "APPROVAL" ||
-                  (proposalType === "HYBRID_APPROVAL" && (
-                    <p className="font-mono text-xs font-medium leading-4 text-tertiary">
-                      {"//"} {option.description}
-                    </p>
-                  ))}
+                {(proposalType === "APPROVAL" ||
+                  proposalType === "HYBRID_APPROVAL") && (
+                  <p className="font-mono text-xs font-medium leading-4 text-tertiary">
+                    {"//"} {option.description}
+                  </p>
+                )}
                 {option.values.length > 0 &&
                   option.targets.map((t, i) => {
                     const valueETH =
