@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
         address_dao_slug_message_hash: {
           address: address.toLowerCase(),
           dao_slug: slug,
-          message_hash: "Not Hashed",
+          message_hash: "",
         },
       },
       create: {
