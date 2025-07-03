@@ -10,8 +10,6 @@ import { UpdatedButton } from "@/components/Button";
 import { getBlockScanUrl, wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import OffchainProposalAction from "@/app/proposals/sponsor/components/OffchainProposalAction";
 import { DraftProposal } from "../../types";
-import { createWorldIdAction } from "../../actions/createWorldIdAction";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const SponsorOnchainProposalDialog = ({
   redirectUrl,
@@ -40,17 +38,6 @@ const SponsorOnchainProposalDialog = ({
           hash: txHash,
           address: address as `0x${string}`,
         });
-        if (namespace === TENANT_NAMESPACES.WORLD) {
-          try {
-            const result = await createWorldIdAction(txHash);
-            console.log(
-              "World ID action created successfully for proposal",
-              result.worldIdAction
-            );
-          } catch (error) {
-            console.error("Failed to create World ID action:", error);
-          }
-        }
       } catch (error) {
         console.error("Error waiting for transaction:", error);
       } finally {

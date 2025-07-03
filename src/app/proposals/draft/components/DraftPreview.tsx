@@ -115,7 +115,7 @@ const DraftPreview = ({
         return (
           <p className="text-secondary mt-2">
             This is an <PreText text="approval" /> proposal.{" "}
-            {proposal.budget && (
+            {!!proposal.budget && (
               <>
                 The maximum number of tokens that can be transferred from all
                 the options in this proposal is{" "}
