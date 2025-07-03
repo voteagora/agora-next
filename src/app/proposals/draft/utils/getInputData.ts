@@ -6,6 +6,7 @@ import {
   TIMELOCK_TYPE,
   TENANT_NAMESPACES,
   ZERO_ADDRESS,
+  GOVERNOR_TYPE,
 } from "@/lib/constants";
 import { disapprovalThreshold } from "@/lib/constants";
 import { getProposalTypeAddress } from "./stages";
@@ -44,6 +45,12 @@ type BasicInputData = [
   number,
 ];
 type OZBasicInputData = [`0x${string}`[], number[], `0x${string}`[], string];
+type Agora20BasicInputData = [
+  `0x${string}`[],
+  number[],
+  `0x${string}`[],
+  string,
+];
 type UniBasicInputData = [
   `0x${string}`[],
   number[],
@@ -53,11 +60,19 @@ type UniBasicInputData = [
 ];
 
 type ApprovalInputData = [string, string, string, Number];
+type AG20InputData = [
+  `0x${string}`[],
+  number[],
+  `0x${string}`[],
+  string,
+  string,
+];
 type InputData =
   | OZBasicInputData
   | BasicInputData
   | ApprovalInputData
   | UniBasicInputData
+  | AG20InputData
   | null;
 
 const isTransfer = (calldata: string) => {
@@ -70,6 +85,7 @@ export function getInputData(proposal: DraftProposal): {
   inputData: InputData;
 } {
   const { namespace, contracts } = Tenant.current();
+  const governorType = contracts.governorType;
   const description =
     "# " +
     proposal.title +
@@ -79,6 +95,66 @@ export function getInputData(proposal: DraftProposal): {
       "[Temp Check Discourse link](" + proposal.temp_check_link + ")\n\n"
     }` +
     proposal.abstract;
+
+  if (governorType === GOVERNOR_TYPE.AGORA_20) {
+    let options = [] as {
+      description: string;
+    }[];
+    let maxApprovals = 0;
+    let criteria = proposal.voting_module_type === ProposalType.BASIC ? 2 : 0;
+    let criteriaValue = BigInt(0);
+    const minParticipation = BigInt(proposal.min_participation || 3); // 3 is the minimum participation
+    const isSignalVote = proposal.is_signal_vote ?? true;
+
+    if (proposal.voting_module_type === ProposalType.APPROVAL) {
+      proposal.approval_options.forEach((option) => {
+        options.push({
+          description: option.title,
+        });
+      });
+      maxApprovals = proposal.max_options;
+      criteria = proposal.criteria === "Threshold" ? 0 : 1;
+      criteriaValue =
+        proposal.criteria === "Threshold"
+          ? parseEther(proposal.threshold.toString())
+          : BigInt(proposal.top_choices);
+    }
+
+    const settings = {
+      minParticipation,
+      maxApprovals,
+      criteria,
+      criteriaValue,
+      isSignalVote,
+      actionId: proposal.title,
+    };
+
+    const abiCoder = ethers.AbiCoder.defaultAbiCoder();
+
+    const proposalData = abiCoder.encode(
+      [
+        "tuple(string description)[]",
+        "tuple(uint256 minParticipation, uint256 maxApprovals, uint8 criteria, uint256 criteriaValue, bool isSignalVote, string actionId)",
+      ],
+      [options, settings]
+    );
+
+    const parsedDescription =
+      description + `#proposalTypeId=${proposal.proposal_type}#proposalData=`;
+
+    const timelockAddress = contracts.timelock?.address;
+
+    const inputData: AG20InputData = [
+      [timelockAddress as `0x${string}`], // targets
+      [0], // values
+      ["0xf27a0c92" as `0x${string}`], // calldatas
+      // The 3 items above will be ignored by the governor, but are still needed to be included in the input data
+      parsedDescription,
+      proposalData,
+    ];
+
+    return { inputData };
+  }
 
   // Inputs for basic type
   // [targets, values, calldatas, description]
@@ -132,6 +208,17 @@ export function getInputData(proposal: DraftProposal): {
         inputData = inputData.slice(0, 4) as OZBasicInputData;
       }
 
+      // Agora 2.0 governor proposal type is defined in the description
+      if (governorType === GOVERNOR_TYPE.AGORA_20) {
+        const parsedDescription = description + "#proposalTypeId=" + 3;
+        inputData = [
+          targets,
+          values,
+          calldatas,
+          parsedDescription,
+        ] as Agora20BasicInputData;
+      }
+
       if (namespace === TENANT_NAMESPACES.UNISWAP) {
         inputData = [
           targets,
@@ -147,6 +234,7 @@ export function getInputData(proposal: DraftProposal): {
     // inputs for approval type
     // ((uint256 budgetTokensSpent,address[] targets,uint256[] values,bytes[] calldatas,string description)[] proposalOptions,(uint8 maxApprovals,uint8 criteria,address budgetToken,uint128 criteriaValue,uint128 budgetAmount) proposalSettings)
     case ProposalType.APPROVAL: {
+      // Original approval proposal handling for other tenants
       let options = [] as {
         budgetTokensSpent: bigint;
         targets: `0x${string}`[];
@@ -282,7 +370,7 @@ export function getInputData(proposal: DraftProposal): {
         );
       }
 
-      const optimisticInputData: ApprovalInputData = [
+      let optimisticInputData: ApprovalInputData = [
         optimisticModuleAddress,
         calldata,
         description,

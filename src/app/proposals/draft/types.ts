@@ -218,6 +218,8 @@ export type BaseProposal = ProposalDraft & {
   tiers_enabled?: boolean;
   tiers?: number[];
   calculationOptions?: number;
+  min_participation?: number;
+  is_signal_vote?: boolean;
 };
 
 export type BasicProposal = BaseProposal & {
@@ -294,6 +296,8 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
     proposal_scope: proposal.proposal_scope,
     tiers_enabled: proposal.tiers_enabled || proposal.tiers?.length > 0,
     tiers: proposal.tiers,
+    minParticipation: proposal.min_participation?.toString(),
+    sSignalVote: proposal.is_signal_vote,
   };
 
   switch (proposal.voting_module_type) {

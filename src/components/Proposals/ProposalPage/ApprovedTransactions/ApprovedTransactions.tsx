@@ -10,6 +10,10 @@ export default function ApprovedTransactions({
   proposalData,
   proposalType,
   executedTransactionHash,
+}: {
+  proposalData: any;
+  proposalType: string | null;
+  executedTransactionHash: string | null;
 }) {
   const [displayedOptions, setDisplayedOptions] = useState(1);
   const toggleElements = () => {
@@ -46,35 +50,41 @@ export default function ApprovedTransactions({
       </div>
       {!isNoProposedTransactions && (
         <div className="flex flex-col px-4">
-          {proposalData.options.slice(0, displayedOptions).map((option, i) => {
-            return (
-              <div key={i}>
-                {proposalType === "APPROVAL" ||
-                  (proposalType === "HYBRID_APPROVAL" && (
-                    <p className="font-mono text-xs font-medium leading-4 text-tertiary">
-                      {"//"} {option.description}
-                    </p>
-                  ))}
-                {option.values.length > 0 &&
-                  option.targets.map((t, i) => {
-                    const valueETH =
-                      option.values[i] > 0
-                        ? `{ value: ${formatEther(option.values[i])} ETH }`
-                        : undefined;
-                    return (
-                      <div key={i}>
-                        <CodeChange
-                          target={option.targets[i]}
-                          valueETH={valueETH}
-                          functionName={option.functionArgsName[i].functionName}
-                          functionArgs={option.functionArgsName[i].functionArgs}
-                        />
-                      </div>
-                    );
-                  })}
-              </div>
-            );
-          })}
+          {proposalData.options
+            .slice(0, displayedOptions)
+            .map((option: any, i: number) => {
+              return (
+                <div key={i}>
+                  {proposalType === "APPROVAL" ||
+                    (proposalType === "HYBRID_APPROVAL" && (
+                      <p className="font-mono text-xs font-medium leading-4 text-tertiary">
+                        {"//"} {option.description}
+                      </p>
+                    ))}
+                  {option.values.length > 0 &&
+                    option.targets.map((t: any, i: number) => {
+                      const valueETH =
+                        option.values[i] > 0
+                          ? `{ value: ${formatEther(option.values[i])} ETH }`
+                          : undefined;
+                      return (
+                        <div key={i}>
+                          <CodeChange
+                            target={option.targets[i]}
+                            valueETH={valueETH}
+                            functionName={
+                              option.functionArgsName[i].functionName
+                            }
+                            functionArgs={
+                              option.functionArgsName[i].functionArgs
+                            }
+                          />
+                        </div>
+                      );
+                    })}
+                </div>
+              );
+            })}
         </div>
       )}
       {proposalData.options.length > 1 && (

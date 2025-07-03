@@ -27,7 +27,7 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import { GOVERNOR_TYPE, TENANT_NAMESPACES } from "@/lib/constants";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import { useTotalSupply } from "@/hooks/useTotalSupply";
 import { formatUnits } from "viem";
@@ -208,7 +208,10 @@ export default function ProposalType({
   function onSubmit(values: z.infer<typeof proposalTypeSchema>) {
     const votingModuleType = values.voting_module_type;
 
-    const proposalTypeAddress = getProposalTypeAddress(votingModuleType);
+    const proposalTypeAddress =
+      contracts.governorType === GOVERNOR_TYPE.AGORA_20
+        ? contracts.votingModule?.address
+        : getProposalTypeAddress(votingModuleType);
 
     if (!proposalTypeAddress) {
       throw new Error("Proposal type address not found");

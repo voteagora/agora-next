@@ -24,7 +24,7 @@ const SponsorOnchainProposalDialog = ({
   isHybrid: boolean;
   draftProposal: DraftProposal;
 }) => {
-  const tenant = Tenant.current();
+  const { ui, namespace } = Tenant.current();
   const { address } = useAccount();
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -54,9 +54,7 @@ const SponsorOnchainProposalDialog = ({
         <VStack>
           <VStack className="w-full">
             <Image
-              src={
-                isLoading ? tenant.ui.assets.pending : tenant.ui.assets.success
-              }
+              src={isLoading ? ui.assets.pending : ui.assets.success}
               className="w-full mb-3"
               alt={isLoading ? "Pending" : "Success"}
             />

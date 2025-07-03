@@ -26,7 +26,10 @@ import { encodeAbiParameters, parseEther } from "viem";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { checkNewApprovalProposal } from "@/lib/seatbelt/checkProposal";
 import { StructuredReport } from "@/components/Simulation/StructuredReport";
+import { GOVERNOR_TYPE, TENANT_NAMESPACES } from "@/lib/constants";
 type FormType = z.output<typeof ApprovalProposalSchema>;
+
+const { namespace, contracts } = Tenant.current();
 
 const OptionItem = ({
   optionIndex,
@@ -54,84 +57,84 @@ const OptionItem = ({
         name={`approvalProposal.options.${optionIndex}.title`}
         control={control}
       />
-      <div className="mt-6 space-y-12">
-        {transactions.map((field, transactionIndex) => {
-          return (
-            <>
-              {field.type === TransactionType.TRANSFER ? (
-                <TransactionFormItem
-                  remove={removeTransaction}
-                  optionIndex={optionIndex}
-                  transactionIndex={transactionIndex}
-                  key={`transfer-${transactionIndex}`}
-                >
-                  <TransferTransactionForm
-                    index={transactionIndex}
-                    name={`approvalProposal.options.${optionIndex}.transactions`}
-                  />
-                </TransactionFormItem>
-              ) : (
-                <TransactionFormItem
-                  remove={removeTransaction}
-                  optionIndex={optionIndex}
-                  transactionIndex={transactionIndex}
-                  key={`custom-${transactionIndex}`}
-                >
-                  <CustomTransactionForm
-                    index={transactionIndex}
-                    name={`approvalProposal.options.${optionIndex}.transactions`}
-                  />
-                </TransactionFormItem>
-              )}
-            </>
-          );
-        })}
-      </div>
-      {!isOffchain && (
-        <div className="flex flex-row space-x-2 w-full mt-6">
-          <UpdatedButton
-            isSubmit={false}
-            type="secondary"
-            className="flex-grow"
-            onClick={() => {
-              appendTransaction({
-                type: TransactionType.TRANSFER,
-                target: "" as EthereumAddress,
-                value: "",
-                calldata: "",
-                description: "",
-                simulation_state: "UNCONFIRMED",
-                simulation_id: "",
-              });
-            }}
-          >
-            Add a transfer transaction
-          </UpdatedButton>
-          <UpdatedButton
-            isSubmit={false}
-            type="secondary"
-            className="flex-grow"
-            onClick={() => {
-              appendTransaction({
-                type: TransactionType.CUSTOM,
-                target: "" as EthereumAddress,
-                value: "",
-                calldata: "",
-                description: "",
-                simulation_state: "UNCONFIRMED",
-                simulation_id: "",
-              });
-            }}
-          >
-            Add a custom transaction
-          </UpdatedButton>
-        </div>
+      {namespace !== TENANT_NAMESPACES.WORLD && !isOffchain && (
+        <>
+          <div className="mt-6 space-y-12">
+            {transactions.map((field, transactionIndex) => {
+              return (
+                <>
+                  {field.type === TransactionType.TRANSFER ? (
+                    <TransactionFormItem
+                      remove={removeTransaction}
+                      optionIndex={optionIndex}
+                      transactionIndex={transactionIndex}
+                      key={`transfer-${transactionIndex}`}
+                    >
+                      <TransferTransactionForm
+                        index={transactionIndex}
+                        name={`approvalProposal.options.${optionIndex}.transactions`}
+                      />
+                    </TransactionFormItem>
+                  ) : (
+                    <TransactionFormItem
+                      remove={removeTransaction}
+                      optionIndex={optionIndex}
+                      transactionIndex={transactionIndex}
+                      key={`custom-${transactionIndex}`}
+                    >
+                      <CustomTransactionForm
+                        index={transactionIndex}
+                        name={`approvalProposal.options.${optionIndex}.transactions`}
+                      />
+                    </TransactionFormItem>
+                  )}
+                </>
+              );
+            })}
+          </div>
+          <div className="flex flex-row space-x-2 w-full mt-6">
+            <UpdatedButton
+              isSubmit={false}
+              type="secondary"
+              className="flex-grow"
+              onClick={() => {
+                appendTransaction({
+                  type: TransactionType.TRANSFER,
+                  target: "" as EthereumAddress,
+                  value: "",
+                  calldata: "",
+                  description: "",
+                  simulation_state: "UNCONFIRMED",
+                  simulation_id: "",
+                });
+              }}
+            >
+              Add a transfer transaction
+            </UpdatedButton>
+            <UpdatedButton
+              isSubmit={false}
+              type="secondary"
+              className="flex-grow"
+              onClick={() => {
+                appendTransaction({
+                  type: TransactionType.CUSTOM,
+                  target: "" as EthereumAddress,
+                  value: "",
+                  calldata: "",
+                  description: "",
+                  simulation_state: "UNCONFIRMED",
+                  simulation_id: "",
+                });
+              }}
+            >
+              Add a custom transaction
+            </UpdatedButton>
+          </div>
+        </>
       )}
     </div>
   );
 };
-
-const { contracts } = Tenant.current();
 
 const TransactionFormItem = ({
   optionIndex,
@@ -402,15 +405,16 @@ const ApprovalProposalForm = () => {
         </p>
       </div>
       <div className="grid grid-cols-2 gap-4">
-        {proposal_scope !== ProposalScope.OFFCHAIN_ONLY && (
-          <NumberInput
-            required={false}
-            label="Budget"
-            name="approvalProposal.budget"
-            control={control}
-            tooltip="This is the maximum number of tokens that can be transferred from all the options in this proposal."
-          />
-        )}
+        {proposal_scope !== ProposalScope.OFFCHAIN_ONLY &&
+          contracts.governorType !== GOVERNOR_TYPE.AGORA_20 && (
+            <NumberInput
+              required={false}
+              label="Budget"
+              name="approvalProposal.budget"
+              control={control}
+              tooltip="This is the maximum number of tokens that can be transferred from all the options in this proposal."
+            />
+          )}
         <NumberInput
           required={true}
           label="Max options"
@@ -545,9 +549,7 @@ const ApprovalProposalForm = () => {
       </div>
       {options?.length > 0 &&
         proposal_scope !== ProposalScope.OFFCHAIN_ONLY &&
-        TENDERLY_VALID_CHAINS.includes(
-          Tenant.current().contracts.governor.chain.id
-        ) && (
+        TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) && (
           <div className="mt-6">
             <UpdatedButton
               isLoading={simulationPending}

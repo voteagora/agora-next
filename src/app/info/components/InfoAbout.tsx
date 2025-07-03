@@ -70,9 +70,7 @@ const InfoAbout = () => {
           </div>
           <div className="sm:w-1/2">
             <h3 className="text-lg font-bold text-primary">
-              {namespace === TENANT_NAMESPACES.DEMO
-                ? "About Canopy"
-                : "About " + brandName}
+              {`About ${brandName}`}
             </h3>
             <p className="text-secondary mt-3">{page.description}</p>
             {/* So the image doesn't look smooshed for scroll :eye-roll: */}

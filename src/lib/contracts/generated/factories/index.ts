@@ -3,7 +3,9 @@
 /* eslint-disable */
 export { AgoraGovernor__factory } from "./AgoraGovernor__factory";
 export { AgoraGovernor_11__factory } from "./AgoraGovernor_11__factory";
+export { AgoraGovernor_20__factory } from "./AgoraGovernor_20__factory";
 export { AgoraTimelock__factory } from "./AgoraTimelock__factory";
+export { AgoraTimelock_20__factory } from "./AgoraTimelock_20__factory";
 export { AgoraToken__factory } from "./AgoraToken__factory";
 export { AlligatorOPV5__factory } from "./AlligatorOPV5__factory";
 export { ApprovalVotingModule__factory } from "./ApprovalVotingModule__factory";
@@ -16,8 +18,10 @@ export { NounsGovernor__factory } from "./NounsGovernor__factory";
 export { OptimismGovernor__factory } from "./OptimismGovernor__factory";
 export { ProposalTypesConfigurator__factory } from "./ProposalTypesConfigurator__factory";
 export { ProposalTypesConfiguratorScopes__factory } from "./ProposalTypesConfiguratorScopes__factory";
+export { ProposalTypesConfigurator_20__factory } from "./ProposalTypesConfigurator_20__factory";
 export { UniswapGovernor__factory } from "./UniswapGovernor__factory";
 export { UniswapStaker__factory } from "./UniswapStaker__factory";
 export { UniswapTimelock__factory } from "./UniswapTimelock__factory";
 export { UniswapToken__factory } from "./UniswapToken__factory";
 export { VotableSupplyOracle__factory } from "./VotableSupplyOracle__factory";
+export { WorldIdVotingModule__factory } from "./WorldIdVotingModule__factory";
