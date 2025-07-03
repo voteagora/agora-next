@@ -45,7 +45,7 @@ const SponsorOnchainProposalDialog = ({
             const result = await createWorldIdAction(txHash);
             console.log(
               "World ID action created successfully for proposal",
-              result.proposalId
+              result.worldIdAction
             );
           } catch (error) {
             console.error("Failed to create World ID action:", error);

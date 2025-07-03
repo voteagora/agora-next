@@ -91,6 +91,8 @@ const ApprovalProposalAction = ({
               params: {
                 redirectUrl: "/",
                 txHash: data,
+                isHybrid: false,
+                draftProposal: draftProposal,
               },
             });
           } catch (error) {
