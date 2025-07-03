@@ -1208,9 +1208,7 @@ model ProposalDraft {
   author_address           String
   sponsor_address          String
   stage                    ProposalStage
-  proposal_scope           String?
   calculation_options      Int?
-  tiers                    Int[]
   start_date_social        DateTime?                  @db.Timestamp(6)
   end_date_social          DateTime?                  @db.Timestamp(6)
   created_at               DateTime                   @default(now()) @db.Timestamptz(6)
