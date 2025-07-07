@@ -67,26 +67,29 @@ export default function DAOMetricsHeader() {
   return (
     <>
       {createPortal(
-        <div className="sticky z-50 bottom-0 hidden sm:flex left-0 justify-center border-t border-line">
+        <div className="sticky bg-white z-50 bottom-0 hidden sm:flex left-0 rounded-t-xl justify-center border-t border-x border-line mx-auto max-w-[1280px] px-3 sm:px-8 h-12 shadow-sm">
           <div
             className={cn(
               "flex flex-row w-full bg-wash border-wash justify-between",
               "text-xs text-secondary font-inter font-medium"
             )}
           >
-            <div className="flex items-center px-8 gap-8 justify-start h-14">
+            <div className="flex items-center justify-start">
               <div className="flex gap-8">
                 <div className="flex items-center gap-2">
-                  <AgoraIconWithText className="fill-primary h-[21px] w-[82px]" />
-                  <span className="text-sm text-primary font-medium hidden lg:inline">
-                    Onchain Governance
-                  </span>
+                  <a
+                    href="https://agora.xyz"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    <AgoraIconWithText className="fill-secondary h-5 transition-colors duration-200 hover:fill-primary" />
+                  </a>
                 </div>
               </div>
             </div>
             <div className="flex items-center">
               {links.length > 0 && (
-                <div className="flex justify-end items-center text-tertiary px-6 gap-6 h-14 border-l border-line">
+                <div className="flex justify-end items-center text-tertiary px-6 gap-6 border-l border-line">
                   {discordLink && (
                     <a
                       href={discordLink.url}
@@ -146,7 +149,7 @@ export default function DAOMetricsHeader() {
                   )}
                 </div>
               )}
-              <div className="flex px-6 gap-6 h-14 border-l border-line text-tertiary">
+              <div className="flex px-6 gap-6 border-l border-line text-tertiary">
                 <HoverCard openDelay={100} closeDelay={100}>
                   <HoverCardTrigger className="flex">
                     <span className="cursor-default content-center">
