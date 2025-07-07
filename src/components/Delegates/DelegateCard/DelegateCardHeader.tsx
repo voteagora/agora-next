@@ -78,8 +78,8 @@ const ActiveHeader = ({
 }) => {
   return (
     <CardHeader
-      title="Active delegate"
-      cornerTitle={`🎉 ${percentParticipation}%`}
+      title="Active delegate 🎉"
+      cornerTitle={`${percentParticipation}%`}
       subtitle={`Voted in ${outOfTen}/${totalProposals} of the most recent proposals`}
     />
   );
@@ -96,8 +96,8 @@ const InactiveHeader = ({
 }) => {
   return (
     <CardHeader
-      title="Inactive delegate"
-      cornerTitle={`💤 ${percentParticipation}%`}
+      title="Inactive delegate 💤"
+      cornerTitle={`${percentParticipation}%`}
       subtitle={`Voted in ${outOfTen}/${totalProposals} of the most recent proposals`}
     />
   );
@@ -125,13 +125,13 @@ const CardHeader = ({
   subtitle: string;
 }) => {
   return (
-    <div className="px-4 pt-4 pb-8 border border-line bg-tertiary/5 rounded-lg mb-[-16px]">
+    <div className="p-7 border border-line bg-tertiary/5 rounded-xl mb-[-16px]">
       <div className="flex flex-col gap-0.5">
         <div className="flex flex-row justify-between">
-          <h3 className="text-primary font-bold">{title}</h3>
-          <span className="text-primary font-bold">{cornerTitle}</span>
+          <h3 className="text-primary font-medium">{title}</h3>
+          <span className="text-primary font-medium">{cornerTitle}</span>
         </div>
-        <p className="text-xs text-tertiary">{subtitle}</p>
+        <p className="text-xs font-medium text-tertiary">{subtitle}</p>
       </div>
     </div>
   );
