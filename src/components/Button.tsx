@@ -61,7 +61,7 @@ export function UpdatedButton({
             type === "link" && "",
             variant === "rounded" && "rounded-full",
             fullWidth && "w-full",
-            "font-semibold py-2 px-4 border border-line cursor-pointer"
+            "font-medium py-2 px-4 border border-line cursor-pointer shadow-newDefault"
           )}
         >
           <Link href={href} {...props}>
@@ -72,11 +72,11 @@ export function UpdatedButton({
         <button
           className={cn(
             className,
-            "font-semibold py-2 px-4 border border-line cursor-pointer",
+            "font-medium py-2 px-4 border border-line cursor-pointer shadow-newDefault",
             type === "primary" &&
               "bg-brandPrimary hover:bg-brandPrimary/90 text-neutral transition-shadow",
             type === "secondary" &&
-              "bg-neutral text-primary hover:shadow-newDefault",
+              "bg-neutral text-primary hover:shadow-newHover",
             type === "link" && "",
             type === "destructive" &&
               "bg-white text-red-500 hover:text-red-700",
@@ -95,7 +95,7 @@ export function UpdatedButton({
                 type === "secondary" && !themeIsDark && "text-black",
                 type === "destructive" && !themeIsDark && "text-red-500",
                 type === "link" && "",
-                "font-semibold flex flex-row space-x-2 items-center justify-center"
+                "font-medium flex flex-row space-x-2 items-center justify-center"
               )}
             >
               <LoadingSpinner
@@ -104,7 +104,7 @@ export function UpdatedButton({
                   type === "secondary" && !themeIsDark && "text-black",
                   type === "destructive" && !themeIsDark && "text-red-500",
                   type === "link" && "",
-                  "font-semibold"
+                  "font-medium"
                 )}
               />
               <p>loading...</p>
