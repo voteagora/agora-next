@@ -32,7 +32,7 @@ export const worldTenantConfig = ({ alchemyId }: Props): TenantContracts => {
 
   const TIMELOCK = "0x10374c5d846179ba9ac03b468497b58e13c5f74e";
 
-  const VOTING_MODULE = "0x9Ade288C74eA1e31c730B52dbC7453a6d3802148";
+  const VOTING_MODULE = "0xbF6187867c1EF9B17D0c9Ab2122Fa52BEDfa2148";
 
   const provider = new JsonRpcProvider(
     `https://worldchain-mainnet.g.alchemy.com/v2/${alchemyId}`
