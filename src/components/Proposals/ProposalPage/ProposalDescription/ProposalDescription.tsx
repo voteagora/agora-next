@@ -9,13 +9,14 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import Tenant from "@/lib/tenant/tenant";
 
-const { contracts } = Tenant.current();
+const { contracts, ui } = Tenant.current();
 
 export default function ProposalDescription({
   proposal,
 }: {
   proposal: Proposal;
 }) {
+  const displayChart = ui.toggle("show-chart")?.enabled ?? true;
   const proposalsWithBadDescription = [
     "94365805422398770067924881378455503928423439630602149628781926844759467250082",
     "64930538748268257621925093712454552173772860987977453334165023026835711650357",
@@ -78,7 +79,8 @@ export default function ProposalDescription({
           </p>
         </div>
       )}
-      {!proposal.proposalType?.includes("OFFCHAIN") &&
+      {displayChart &&
+        !proposal.proposalType?.includes("OFFCHAIN") &&
         !proposal.proposalType?.includes("HYBRID") && (
           <ProposalChart proposal={proposal} />
         )}

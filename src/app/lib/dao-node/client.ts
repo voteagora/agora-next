@@ -15,7 +15,7 @@ const { namespace, ui } = Tenant.current();
 export function adaptDAONodeResponse(
   apiResponse: ProposalPayloadFromDAONode,
   proposalTypes: any
-): ProposalPayloadFromDB {
+): ProposalPayloadFromDB | null {
   const votingModuleName = apiResponse.voting_module_name;
 
   let proposalResults;
@@ -65,7 +65,7 @@ export function adaptDAONodeResponse(
       approval: null,
     };
   } else {
-    throw new Error(`Unknown voting module name: ${votingModuleName}`);
+    return null;
   }
 
   const proposalType = proposalTypes[String(apiResponse.proposal_type)];
@@ -73,10 +73,13 @@ export function adaptDAONodeResponse(
     proposal_type_id: String(apiResponse.proposal_type),
   });
 
+  const parsedDescription =
+    apiResponse.description.split("#proposalTypeId=")[0];
+
   return {
     proposal_id: apiResponse.id,
     proposer: apiResponse.proposer.toLowerCase(),
-    description: apiResponse.description,
+    description: parsedDescription,
     created_block: BigInt(apiResponse.block_number),
     start_block:
       (apiResponse.start_block ?? apiResponse.vote_start)?.toString() ?? "0",

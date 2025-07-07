@@ -22,7 +22,11 @@ export default function ApprovedTransactions({
       : setDisplayedOptions(1);
   };
 
-  if (proposalData.options.length === 0) {
+  const optionsHaveTargets = proposalData.options.some(
+    (option: any) => option.targets?.length > 0
+  );
+
+  if (proposalData.options.length === 0 || !optionsHaveTargets) {
     return null;
   }
 
@@ -61,7 +65,7 @@ export default function ApprovedTransactions({
                         {"//"} {option.description}
                       </p>
                     ))}
-                  {option.values.length > 0 &&
+                  {option.values?.length > 0 &&
                     option.targets.map((t: any, i: number) => {
                       const valueETH =
                         option.values[i] > 0

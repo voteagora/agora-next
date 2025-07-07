@@ -1,7 +1,9 @@
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import { ParsedProposalResults } from "@/lib/proposalUtils";
 import { TokenAmountDisplay } from "@/lib/utils";
 import { formatUnits } from "ethers";
 
-function formatNumber(amount, decimals) {
+function formatNumber(amount: string | bigint, decimals?: number) {
   if (amount == null) return 0;
   try {
     const standardUnitAmount = Number(formatUnits(amount, decimals));
@@ -12,27 +14,47 @@ function formatNumber(amount, decimals) {
   }
 }
 
-export default function OPStandardProposalStatus({ proposal }) {
-  const forLength = formatNumber(proposal.proposalResults.for);
-  const againstLength = formatNumber(proposal.proposalResults.against);
-  const abstainLength = formatNumber(proposal.proposalResults.abstain);
+export default function OPStandardProposalStatus({
+  proposal,
+}: {
+  proposal: Proposal;
+}) {
+  const forLength = formatNumber(
+    (proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"]).for
+  );
+  const againstLength = formatNumber(
+    (proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"])
+      .against
+  );
+  const abstainLength = formatNumber(
+    (proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"])
+      .abstain
+  );
   const totalLength = forLength + againstLength + abstainLength;
   return (
     <div className="flex flex-col items-end gap-1 justify-center">
       <div className="flex flex-row space-between text-primary gap-1">
         <div>
-          {TokenAmountDisplay({
-            amount: proposal.proposalResults.for,
-            currency: "",
-          })}{" "}
+          <TokenAmountDisplay
+            amount={
+              (
+                proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"]
+              ).for
+            }
+            currency=""
+          />
           For
         </div>
         <div>–</div>
         <div>
-          {TokenAmountDisplay({
-            amount: proposal.proposalResults.against,
-            currency: "",
-          })}{" "}
+          <TokenAmountDisplay
+            amount={
+              (
+                proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"]
+              ).against
+            }
+            currency=""
+          />
           Against
         </div>
       </div>

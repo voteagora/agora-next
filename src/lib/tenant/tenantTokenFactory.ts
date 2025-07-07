@@ -126,7 +126,7 @@ export default class TenantTokenFactory {
         return {
           name: "Ethereum",
           symbol: "ETH",
-          decimals: 18,
+          decimals: 0,
           address: "0x0000000000000000000000000000000000000000",
         };
       default:

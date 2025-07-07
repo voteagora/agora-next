@@ -16,6 +16,7 @@ import {
 import ProposalVotesSummaryDetails, {
   QuorumTooltip,
 } from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesSummaryDetails/ProposalVotesSummaryDetails";
+import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
   proposal: Proposal;
@@ -29,6 +30,10 @@ export default function ProposalVotesSummary({ proposal }: Props) {
 
   const isProposalCreatedBeforeUpgrade =
     isProposalCreatedBeforeUpgradeCheck(proposal);
+
+  const { ui } = Tenant.current();
+  const showQuorumAndThreshold =
+    ui.toggle("show-quorum-and-threshold")?.enabled ?? true;
 
   return (
     <HoverCard
@@ -61,37 +66,41 @@ export default function ProposalVotesSummary({ proposal }: Props) {
 
             <ProposalVotesBar proposal={proposal} />
 
-            <div className="flex flex-col font-medium">
-              <div className="flex flex-row text-secondary pb-2 justify-between">
-                <>
-                  {proposal.quorum && (
-                    <div>
-                      Quorum{" "}
-                      <TokenAmountDecorated
-                        amount={proposal.quorum}
-                        hideCurrency
-                        specialFormatting
-                      />
-                      {isProposalCreatedBeforeUpgrade && (
-                        <span className="inline-flex items-center">
-                          0
-                          <QuorumTooltip />
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </>
-                <>
-                  {proposal.approvalThreshold && (
-                    <div>
-                      <p>{`Threshold ${
-                        Number(proposal.approvalThreshold) / 100
-                      }%`}</p>
-                    </div>
-                  )}
-                </>
+            {showQuorumAndThreshold ? (
+              <div className="flex flex-col font-medium">
+                <div className="flex flex-row text-secondary pb-2 justify-between">
+                  <>
+                    {proposal.quorum && (
+                      <div>
+                        Quorum{" "}
+                        <TokenAmountDecorated
+                          amount={proposal.quorum}
+                          hideCurrency
+                          specialFormatting
+                        />
+                        {isProposalCreatedBeforeUpgrade && (
+                          <span className="inline-flex items-center">
+                            0
+                            <QuorumTooltip />
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </>
+                  <>
+                    {proposal.approvalThreshold && (
+                      <div>
+                        <p>{`Threshold ${
+                          Number(proposal.approvalThreshold) / 100
+                        }%`}</p>
+                      </div>
+                    )}
+                  </>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="mb-2" />
+            )}
           </HoverCardTrigger>
 
           <div className="px-4 font-medium">

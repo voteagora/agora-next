@@ -61,7 +61,7 @@ const proposalTypeSchema = z.object({
   description: z.string(),
   approval_threshold: z.coerce.number().lte(100),
   quorum: z.coerce.number().lte(100),
-  voting_module_type: z.nativeEnum(ProposalTypeEnum),
+  voting_module_type: z.nativeEnum(ProposalTypeEnum).optional(),
 });
 
 export default function ProposalType({
@@ -211,7 +211,7 @@ export default function ProposalType({
     const proposalTypeAddress =
       contracts.governorType === GOVERNOR_TYPE.AGORA_20
         ? contracts.votingModule?.address
-        : getProposalTypeAddress(votingModuleType);
+        : getProposalTypeAddress(votingModuleType ?? ProposalTypeEnum.BASIC);
 
     if (!proposalTypeAddress) {
       throw new Error("Proposal type address not found");
@@ -228,7 +228,7 @@ export default function ProposalType({
       BigInt(index),
       Math.round(quorum * 100),
       Math.round(approvalThreshold * 100),
-      `${formValues.name}${formValues.name.toLowerCase().includes(votingModuleType) ? "" : ` - [${votingModuleType}]`}`,
+      `${formValues.name}${formValues.name.toLowerCase().includes(votingModuleType ?? ProposalTypeEnum.BASIC) ? "" : ` - [${votingModuleType ?? ProposalTypeEnum.BASIC}]`}`,
       formValues.description || "",
       proposalTypeAddress,
     ];
@@ -439,43 +439,45 @@ export default function ProposalType({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="voting_module_type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Voting module type</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormItem>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a voting module type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={ProposalTypeEnum.BASIC}>
-                          Standard
-                        </SelectItem>
-                        {hasApprovalProposalType && (
-                          <SelectItem value={ProposalTypeEnum.APPROVAL}>
-                            Approval
+          {contracts.governorType !== GOVERNOR_TYPE.AGORA_20 && (
+            <FormField
+              control={form.control}
+              name="voting_module_type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Voting module type</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormItem>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a voting module type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value={ProposalTypeEnum.BASIC}>
+                            Standard
                           </SelectItem>
-                        )}
-                        {hasOptimisticProposalType && (
-                          <SelectItem value={ProposalTypeEnum.OPTIMISTIC}>
-                            Optimistic
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </FormItem>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                          {hasApprovalProposalType && (
+                            <SelectItem value={ProposalTypeEnum.APPROVAL}>
+                              Approval
+                            </SelectItem>
+                          )}
+                          {hasOptimisticProposalType && (
+                            <SelectItem value={ProposalTypeEnum.OPTIMISTIC}>
+                              Optimistic
+                            </SelectItem>
+                          )}
+                        </SelectContent>
+                      </FormItem>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
         </div>
         {formValues.voting_module_type === ProposalTypeEnum.OPTIMISTIC ? (
           <div>

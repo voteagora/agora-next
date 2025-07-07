@@ -197,5 +197,17 @@ If you meet the proposal threshold or are the manager of the governor, then you 
       name: "show-supply-stats",
       enabled: false,
     },
+    {
+      name: "show-chart",
+      enabled: false,
+    },
+    {
+      name: "show-quorum-and-threshold",
+      enabled: false,
+    },
+    {
+      name: "show-min-participation",
+      enabled: true,
+    },
   ],
 });

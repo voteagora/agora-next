@@ -63,9 +63,11 @@ async function fetchProposalsFromDaoNode(
     }
 
     // Adapt DAO Node response format
-    proposals = proposals.map((proposal) =>
-      adaptDAONodeResponse(proposal, typesFromApi.proposal_types)
-    );
+    proposals = proposals
+      .map((proposal) =>
+        adaptDAONodeResponse(proposal, typesFromApi.proposal_types)
+      )
+      .filter(Boolean);
 
     // Include snapshot proposals if enabled
     if (useSnapshot) {

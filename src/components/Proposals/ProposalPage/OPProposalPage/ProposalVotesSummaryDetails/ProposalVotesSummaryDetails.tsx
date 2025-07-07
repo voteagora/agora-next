@@ -46,15 +46,22 @@ export const QuorumTooltip = () => {
 function AmountAndPercent({
   amount,
   total,
+  decimals,
 }: {
   amount: bigint;
   total: bigint;
+  decimals?: number;
 }) {
   const percent =
     total > 0 ? ((Number(amount) / Number(total)) * 100).toFixed(2) : undefined;
   return (
     <span>
-      <TokenAmountDecorated amount={amount} hideCurrency specialFormatting />
+      <TokenAmountDecorated
+        amount={amount}
+        hideCurrency
+        specialFormatting
+        decimals={decimals}
+      />
       {percent && `(${percent}%)`}
     </span>
   );
@@ -65,7 +72,9 @@ export default function ProposalVotesSummaryDetails({
 }: {
   proposal: Proposal;
 }) {
-  const { token, namespace } = Tenant.current();
+  const { token, namespace, ui } = Tenant.current();
+  const showQuorumAndThreshold =
+    ui.toggle("show-quorum-and-threshold")?.enabled ?? true;
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
@@ -131,61 +140,63 @@ export default function ProposalVotesSummaryDetails({
           <AmountAndPercent amount={results.against} total={totalVotes} />
         </div>
       </div>
-
-      <div className="flex flex-col gap-2 w-[calc(100%+32px)] mt-4 bg-wash border-t border-b border-line -ml-4 p-4">
-        <div className="flex justify-between">
-          <div className="flex items-center gap-1 text-secondary font-semibold text-xs">
-            Quorum
-            {isProposalCreatedBeforeUpgrade && <QuorumTooltip />}
+      {showQuorumAndThreshold ? (
+        <div className="flex flex-col gap-2 w-[calc(100%+32px)] mt-4 bg-wash border-t border-b border-line -ml-4 p-4">
+          <div className="flex justify-between">
+            <div className="flex items-center gap-1 text-secondary font-semibold text-xs">
+              Quorum
+              {isProposalCreatedBeforeUpgrade && <QuorumTooltip />}
+            </div>
+            {proposal.quorum && (
+              <div className="flex items-center gap-1 ">
+                {hasMetQuorum && (
+                  <Image
+                    width="12"
+                    height="12"
+                    src={checkIcon}
+                    alt="check icon"
+                  />
+                )}
+                <p className="text-xs font-semibold text-secondary">
+                  <TokenAmountDecorated
+                    amount={quorumVotes}
+                    decimals={token.decimals}
+                    hideCurrency
+                    specialFormatting
+                  />{" "}
+                  /{" "}
+                  <TokenAmountDecorated
+                    amount={proposal.quorum}
+                    decimals={token.decimals}
+                    hideCurrency
+                    specialFormatting
+                  />
+                  {isProposalCreatedBeforeUpgrade && "0"} Required
+                </p>
+              </div>
+            )}
           </div>
-          {proposal.quorum && (
-            <div className="flex items-center gap-1 ">
-              {hasMetQuorum && (
-                <Image
-                  width="12"
-                  height="12"
-                  src={checkIcon}
-                  alt="check icon"
-                />
-              )}
-              <p className="text-xs font-semibold text-secondary">
-                <TokenAmountDecorated
-                  amount={quorumVotes}
-                  decimals={token.decimals}
-                  hideCurrency
-                  specialFormatting
-                />{" "}
-                /{" "}
-                <TokenAmountDecorated
-                  amount={proposal.quorum}
-                  decimals={token.decimals}
-                  hideCurrency
-                  specialFormatting
-                />
-                {isProposalCreatedBeforeUpgrade && "0"} Required
-              </p>
+          {proposal.approvalThreshold && (
+            <div className="flex justify-between">
+              <div className="flex flex-row gap-1 text-secondary font-semibold text-xs">
+                Threshold
+              </div>
+              <div className="flex flex-row gap-1 ">
+                {hasMetThreshold ? (
+                  <Image src={checkIcon} alt="check icon" />
+                ) : (
+                  <X className="h-4 w-4 text-negative" />
+                )}
+                <p className=" text-xs font-semibold text-secondary">
+                  {voteThresholdPercent.toFixed(2)}% /{" "}
+                  {`${apprThresholdPercent}%`} Required
+                </p>
+              </div>
             </div>
           )}
         </div>
-        {proposal.approvalThreshold && (
-          <div className="flex justify-between">
-            <div className="flex flex-row gap-1 text-secondary font-semibold text-xs">
-              Threshold
-            </div>
-            <div className="flex flex-row gap-1 ">
-              {hasMetThreshold ? (
-                <Image src={checkIcon} alt="check icon" />
-              ) : (
-                <X className="h-4 w-4 text-negative" />
-              )}
-              <p className=" text-xs font-semibold text-secondary">
-                {voteThresholdPercent.toFixed(2)}% /{" "}
-                {`${apprThresholdPercent}%`} Required
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
+      ) : null}
+
       <ol className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-wash -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg">
         <StepperRow
           label="Proposal created"
