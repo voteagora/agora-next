@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import Image from "next/image";
-import { icons } from "@/icons/icons";
+import logo from "@/assets/agora_logo.svg";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
-const useDelayedLoader = (delayMs = 1500) => {
+const useDelayedLoader = (delayMs = 200) => {
   const [shouldShow, setShouldShow] = useState(false);
 
   useEffect(() => {
@@ -25,18 +25,15 @@ export default function AgoraLoader() {
 
   if (!shouldShow) return null;
 
-  let loaderForTenant = icons.agoraLoaderDark;
-  const { namespace } = Tenant.current();
-  if (
-    namespace === TENANT_NAMESPACES.XAI ||
-    namespace === TENANT_NAMESPACES.DERIVE
-  ) {
-    loaderForTenant = icons.agoraLoaderLight;
-  }
-
   return (
     <div className="flex flex-col justify-center items-center h-[calc(100vh-268px)]">
-      <Image src={loaderForTenant} alt="loading" width={120} height={120} />
+      <Image
+        src={logo}
+        alt="loading"
+        width={24}
+        height={24}
+        className="animate-pulse"
+      />
     </div>
   );
 }
@@ -46,18 +43,15 @@ export function AgoraLoaderSmall() {
 
   if (!shouldShow) return null;
 
-  let loaderForTenant = icons.agoraLoaderDark;
-  const { namespace } = Tenant.current();
-  if (
-    namespace === TENANT_NAMESPACES.XAI ||
-    namespace === TENANT_NAMESPACES.DERIVE
-  ) {
-    loaderForTenant = icons.agoraLoaderLight;
-  }
-
   return (
     <div className="flex flex-col justify-center items-center w-full h-full">
-      <Image src={loaderForTenant} alt="loading" width={48} height={48} />
+      <Image
+        src={logo}
+        alt="loading"
+        width={48}
+        height={48}
+        className="animate-pulse"
+      />
     </div>
   );
 }
