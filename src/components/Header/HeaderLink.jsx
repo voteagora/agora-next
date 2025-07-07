@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const HeaderLink = ({ className, children, href, target, isActive }) => {
   const activeClass = isActive
-    ? "bg-white text-inherit text-primary border border-line"
+    ? "bg-white text-inherit text-primary border border-line shadow-newDefault"
     : "text-tertiary";
 
   return (
