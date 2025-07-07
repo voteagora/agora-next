@@ -37,24 +37,16 @@ const DelegateCard = ({
       <Link href={`/delegates/${delegate.address}`}>
         <div className="flex flex-col gap-4 h-full rounded-xl bg-wash border border-line shadow-newDefault">
           <div className="flex flex-col gap-4 justify-center pt-4">
-            <div className="border-b border-line px-4 pb-4">
+            <div className="px-4">
               <DelegateProfileImage
                 endorsed={delegate.statement?.endorsed}
                 address={delegate.address}
                 votingPower={delegate.votingPower.total}
+                participation={delegate.participation}
                 citizen={delegate.citizen}
+                showParticipation={true}
+                showVotingPower={true}
               />
-            </div>
-            <div className="px-4 flex flex-row gap-4">
-              <span className="text-primary font-bold">
-                {formatNumber(delegate.votingPower.total)} {token.symbol}
-              </span>
-              {showParticipation && (
-                <span className="text-primary font-bold">
-                  {Math.round(delegate.participation)}% Participation
-                </span>
-              )}
-              <span className="text-primary font-bold"></span>
             </div>
             <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2 px-4">
               {sanitizedTruncatedStatement}
