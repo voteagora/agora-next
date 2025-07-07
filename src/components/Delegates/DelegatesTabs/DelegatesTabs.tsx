@@ -46,7 +46,7 @@ export default function DelegatesTabs({ children }: { children: ReactNode }) {
     >
       <div className="flex flex-row justify-between items-baseline gap-2 mt-3 md:mt-0">
         <TabsList>
-          <TabsTrigger className="" value="delegates">
+          <TabsTrigger className="text-2xl font-extrabold" value="delegates">
             Delegates
           </TabsTrigger>
         </TabsList>

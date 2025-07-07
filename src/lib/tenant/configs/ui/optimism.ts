@@ -28,7 +28,7 @@ export const optimismTenantUIConfig = new TenantUI({
     primary: "0 0 0",
     secondary: "64 64 64",
     tertiary: "115 115 115",
-    neutral: "250 250 250",
+    neutral: "255 255 255",
     wash: "255 255 255",
     line: "229 229 229",
     positive: "97 209 97",
