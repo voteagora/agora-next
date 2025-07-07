@@ -11,15 +11,15 @@ export default function LogoLink() {
         <Image
           src={ui.logo}
           alt="logo"
-          width="46"
-          height="46"
+          width="48"
+          height="48"
           className="h-[46px] w-auto"
         />
         {!isProd && (
           <>
             <div className="h-3 w-[2px] bg-line rounded-full hidden sm:block"></div>
-            <span className="hidden sm:block font-semibold text-primary bg-tertiary/10 px-1.5 py-0.5 rounded-lg text-xs border border-line">
-              Test contracts mode
+            <span className="hidden sm:block font-semibold text-primary bg-tertiary/10 px-1.5 py-0.5 rounded-lg text-xs border border-line whitespace-nowrap">
+              Test Contracts
             </span>
           </>
         )}

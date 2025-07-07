@@ -29,6 +29,9 @@ interface Props {
   votingPower: string;
   scwAddress?: string;
   truncateText?: boolean;
+  showVotingPower?: boolean;
+  participation?: number;
+  showParticipation?: boolean;
 }
 
 export function DelegateProfileImage({
@@ -37,6 +40,9 @@ export function DelegateProfileImage({
   endorsed,
   votingPower,
   truncateText = false,
+  showVotingPower = false,
+  participation,
+  showParticipation = false,
 }: Props) {
   const { ui } = Tenant.current();
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
@@ -89,7 +95,7 @@ export function DelegateProfileImage({
       </div>
 
       <div className="flex flex-col">
-        <div className="text-primary flex flex-row gap-1 font-semibold hover:opacity-90">
+        <div className="text-primary flex flex-row gap-1 font-medium">
           <div className={cn(truncateText && "truncate")}>
             {copyable ? (
               <CopyableHumanAddress address={address} />
@@ -117,6 +123,23 @@ export function DelegateProfileImage({
             </TooltipProvider>
           )}
         </div>
+        {(showVotingPower || showParticipation) && (
+          <div className="flex flex-row gap-2 text-xs text-secondary font-medium items-center">
+            {showVotingPower && (
+              <span>
+                {formattedNumber} {Tenant.current().token.symbol}
+              </span>
+            )}
+            {showVotingPower &&
+              showParticipation &&
+              participation !== undefined && (
+                <div className="h-3 border-r border-tertiary"></div>
+              )}
+            {showParticipation && participation !== undefined && (
+              <span>{Math.round(participation)}% Participation</span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -131,6 +154,9 @@ export function DelegateProfileImageWithMetadata({
   followersCount,
   followingCount,
   scwAddress,
+  showVotingPower = false,
+  participation,
+  showParticipation = false,
 }: Omit<Props, "truncateText"> & {
   description?: string;
   location?: string;
@@ -234,6 +260,18 @@ export function DelegateProfileImageWithMetadata({
             <div className="text-xs text-primary font-medium">
               <span className="font-bold">{followingCount}</span> following ·{" "}
               <span className="font-bold">{followersCount}</span> followers
+            </div>
+          )}
+          {(showVotingPower || showParticipation) && (
+            <div className="flex flex-row gap-3 text-xs text-secondary">
+              {showVotingPower && (
+                <span>
+                  {formattedNumber} {Tenant.current().token.symbol}
+                </span>
+              )}
+              {showParticipation && participation !== undefined && (
+                <span>{Math.round(participation)}% Participation</span>
+              )}
             </div>
           )}
         </div>

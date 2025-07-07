@@ -467,13 +467,6 @@ async function getDelegates({
             const QRY1 = `
               ${delegateUniverseCTE}
               SELECT *,
-                CASE
-                  WHEN EXISTS (
-                    SELECT 1
-                    WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
-                  ) THEN TRUE
-                  ELSE FALSE
-                END AS citizen,
                 (SELECT row_to_json(sub)
                   FROM (
                     SELECT
@@ -516,13 +509,6 @@ async function getDelegates({
 
             const QRY2 = ` ${delegateUniverseCTE}
               SELECT *,
-                CASE
-                  WHEN EXISTS (
-                    SELECT 1
-                    WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
-                  ) THEN TRUE
-                  ELSE FALSE
-                END AS citizen,
                 (SELECT row_to_json(sub)
                   FROM (
                     SELECT
@@ -562,13 +548,6 @@ async function getDelegates({
             const QRY3 = `
               ${delegateUniverseCTE}
               SELECT *,
-                CASE
-                  WHEN EXISTS (
-                    SELECT 1
-                    WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
-                  ) THEN TRUE
-                  ELSE FALSE
-                END AS citizen,
                 (SELECT row_to_json(sub)
                   FROM (
                     SELECT
@@ -679,12 +658,6 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
              WHERE p.contract = $4
              AND p.cancelled_block IS NULL
             ) total_proposals ON TRUE
-        LEFT JOIN
-            (SELECT
-              CASE
-              ELSE FALSE
-              END as citizen
-            ) citizen ON TRUE
         LEFT JOIN
             (SELECT row_to_json(sub) as statement
             FROM (
