@@ -25,7 +25,6 @@ export const AgoraGovQueue = ({ proposal, className, style }: Props) => {
       hash: data,
     });
 
-
   useEffect(() => {
     if (isSuccess) {
       toast.success(

@@ -20,7 +20,10 @@ interface Props {
   useOptimismStyling?: boolean;
 }
 
-export const AgoraGovCancel = ({ proposal, useOptimismStyling = false }: Props) => {
+export const AgoraGovCancel = ({
+  proposal,
+  useOptimismStyling = false,
+}: Props) => {
   const { contracts } = Tenant.current();
   const { address } = useAccount();
 
@@ -33,7 +36,6 @@ export const AgoraGovCancel = ({ proposal, useOptimismStyling = false }: Props) 
     useWaitForTransactionReceipt({
       hash: data,
     });
-
 
   useEffect(() => {
     if (isSuccess) {
@@ -60,7 +62,11 @@ export const AgoraGovCancel = ({ proposal, useOptimismStyling = false }: Props) 
     <>
       {!isFetched && (
         <Button
-          className={useOptimismStyling ? undefined : "bg-neutral hover:bg-neutral border-line"}
+          className={
+            useOptimismStyling
+              ? undefined
+              : "bg-neutral hover:bg-neutral border-line"
+          }
           onClick={() =>
             write({
               address: contracts.governor.address as `0x${string}`,
