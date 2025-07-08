@@ -74,8 +74,11 @@ function DelegationsContainer({
 
   if (delegatees.length === 0 && delegators.length === 0) {
     return (
-      <div className="p-8 text-center text-secondary align-middle bg-wash rounded-xl">
-        No delegations found.
+      <div className="flex flex-col gap-2">
+        <h2 className="text-2xl font-bold text-primary">Delegations</h2>
+        <div className="p-8 text-center text-secondary align-middle bg-wash rounded-xl border border-line shadow-newDefault">
+          No delegations found.
+        </div>
       </div>
     );
   }

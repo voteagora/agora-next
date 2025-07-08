@@ -47,8 +47,11 @@ export default function DelegateStatementContainer({ delegate }: Props) {
         </div>
       )}
       {!delegateStatement && (
-        <div className="p-8 text-center text-secondary align-middle bg-wash rounded-xl">
-          <p className="break-words">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-2xl font-bold text-primary">
+            Delegate Statement
+          </h2>
+          <p className="break-words p-8 text-center text-secondary align-middle bg-wash rounded-xl shadow-newDefault border border-line">
             No delegate statement for {delegate.address}
           </p>
           {isConnected && address === delegate.address && (
