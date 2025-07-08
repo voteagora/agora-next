@@ -26,7 +26,13 @@ const toRGBA = (hex: string, alpha: number) => {
     .join(",")}, ${alpha})`;
 };
 
-export default function Markdown({ content }: { content: string }) {
+export default function Markdown({
+  content,
+  className,
+}: {
+  content: string;
+  className?: string;
+}) {
   const { ui } = Tenant.current();
   const primary = ui?.customization?.primary ?? defaults.primary;
   const secondary = ui?.customization?.secondary ?? defaults.secondary;
@@ -51,7 +57,9 @@ export default function Markdown({ content }: { content: string }) {
             fontFamily: defaults.font,
           } as React.CSSProperties
         }
-        className={`
+        className={
+          (cn(
+            `
           h-full
           py-3
           max-w-full
@@ -68,7 +76,10 @@ export default function Markdown({ content }: { content: string }) {
           prose-h4:text-secondary
           prose-h5:text-secondary
           prose-h6:text-secondary
-          `}
+          `
+          ),
+          className)
+        }
         wrapperElement={{
           "data-color-mode": "light",
         }}
