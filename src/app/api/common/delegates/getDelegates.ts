@@ -640,7 +640,6 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
           advanced_vp,
           num_of_delegators,
           proposals_proposed,
-          citizen.citizen,
           statement.statement,
           COALESCE(total_proposals.count, 0) as total_proposals
         FROM
