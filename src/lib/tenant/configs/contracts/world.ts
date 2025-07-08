@@ -23,16 +23,27 @@ interface Props {
   isProd: boolean;
   alchemyId: string;
 }
-export const worldTenantConfig = ({ alchemyId }: Props): TenantContracts => {
+export const worldTenantConfig = ({
+  alchemyId,
+  isProd,
+}: Props): TenantContracts => {
   const TOKEN = ZERO_ADDRESS;
 
-  const GOVERNOR = "0x2809b50B42F0F6a7183239416cfB19f27EA8A412";
+  const GOVERNOR = isProd
+    ? "0xB39948c99604c3Cb9dE77A07CD72B356a348D4BE"
+    : "0x2809b50B42F0F6a7183239416cfB19f27EA8A412";
 
-  const TYPES = "0xD2bA4C53732054521910b45B376ed6cEDE7E3fFf";
+  const TYPES = isProd
+    ? "0x41245523d86D91619BF3a3510376eDc2bD7a3fFf"
+    : "0xD2bA4C53732054521910b45B376ed6cEDE7E3fFf";
 
-  const TIMELOCK = "0x10374c5d846179ba9ac03b468497b58e13c5f74e";
+  const TIMELOCK = isProd
+    ? "0x16822347950AEeEE4cA0B8402afaD48Bc000e3cd"
+    : "0x10374c5d846179ba9ac03b468497b58e13c5f74e";
 
-  const VOTING_MODULE = "0xbF6187867c1EF9B17D0c9Ab2122Fa52BEDfa2148";
+  const VOTING_MODULE = isProd
+    ? "0xcA694F136e3e472E62c98E67ADeAeeee12b72148"
+    : "0xbF6187867c1EF9B17D0c9Ab2122Fa52BEDfa2148";
 
   const provider = new JsonRpcProvider(
     `https://worldchain-mainnet.g.alchemy.com/v2/${alchemyId}`
