@@ -12,6 +12,7 @@ import { useState } from "react";
 import { ExpandCollapseIcon } from "@/icons/ExpandCollapseIcon";
 import VotesGroupTable from "@/components/common/VotesGroupTable";
 import { HYBRID_VOTE_WEIGHTS } from "@/lib/constants";
+import Markdown from "@/components/shared/Markdown/Markdown";
 
 export default function HybridOptionsResultsPanel({
   proposal,
@@ -185,7 +186,7 @@ function SingleOption({
         <div className="flex flex-col gap-1 p-3 cursor-pointer hover:bg-wash">
           <div className="flex justify-between font-semibold text-sm mb-1">
             <div className="whitespace-normal max-w-[12rem] text-primary text-xs font-bold flex items-center gap-2">
-              {description}
+              <Markdown content={description} className="py-0" />
             </div>
             <div className="text-primary flex items-center gap-1">
               <span className="ml-1 text-tertiary">
