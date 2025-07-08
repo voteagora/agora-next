@@ -1,5 +1,5 @@
 "use client";
-
+import rehypeExternalLinks from "rehype-external-links";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import styles from "./markdown.module.scss";
 import Tenant from "@/lib/tenant/tenant";
@@ -83,6 +83,7 @@ export default function Markdown({
         wrapperElement={{
           "data-color-mode": "light",
         }}
+        rehypePlugins={[() => rehypeExternalLinks({ target: "_blank" })]}
         components={{
           h2: ({ node, ...props }) => (
             <h1 className="text-primary" {...props} />
