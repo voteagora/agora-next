@@ -108,10 +108,15 @@ const DEFAULT_FORM = {
 
 const getValidProposalTypesForVotingType = (
   proposalTypes: any[],
-  proposalType: ProposalType
+  proposalType: ProposalType,
+  governorType?: GOVERNOR_TYPE
 ) => {
   let optimisticModuleAddress: string | null = null;
   let approvalModuleAddress: string | null = null;
+
+  if (governorType === GOVERNOR_TYPE.AGORA_20) {
+    return proposalTypes;
+  }
 
   try {
     optimisticModuleAddress =
@@ -193,7 +198,8 @@ const DraftFormClient = ({
   const proposalTypeId = watch("proposalConfigType");
   const calculationOptions = watch("calculationOptions");
   const enabledProposalTypesFromConfigAndAPI = useMemo(
-    () => getProposalTypeMetaDataForTenant(proposalTypes),
+    () =>
+      getProposalTypeMetaDataForTenant(proposalTypes, contracts.governorType),
     [proposalTypes]
   );
   const stageIndex = getStageIndexForTenant("DRAFTING") as number;
@@ -201,7 +207,8 @@ const DraftFormClient = ({
   useEffect(() => {
     const newValidProposalTypes = getValidProposalTypesForVotingType(
       proposalTypes,
-      votingModuleType
+      votingModuleType,
+      contracts.governorType
     );
 
     setValidProposalTypes(newValidProposalTypes);

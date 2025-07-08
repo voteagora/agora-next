@@ -1,14 +1,22 @@
 import Tenant from "@/lib/tenant/tenant";
 import { PLMConfig, ProposalType } from "../types";
 import { getProposalTypeAddress } from "./stages";
+import { GOVERNOR_TYPE } from "@/lib/constants";
 
-export const getProposalTypeMetaDataForTenant = (proposalTypes: any[]) => {
+export const getProposalTypeMetaDataForTenant = (
+  proposalTypes: any[],
+  governorType?: GOVERNOR_TYPE
+) => {
   const { ui } = Tenant.current();
   const plmToggle = ui.toggle("proposal-lifecycle");
 
   const enabledProposalTypesFromConfig = (
     (plmToggle?.config as PLMConfig)?.proposalTypes || []
   ).map((pt: any) => pt.type);
+
+  if (governorType === GOVERNOR_TYPE.AGORA_20) {
+    return enabledProposalTypesFromConfig;
+  }
 
   const proposalTypeMap = new Map<string, boolean>();
 
