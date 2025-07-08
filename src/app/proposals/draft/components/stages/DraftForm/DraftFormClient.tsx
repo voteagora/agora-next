@@ -282,7 +282,7 @@ const DraftFormClient = ({
                   required={true}
                   options={validProposalTypes.map((typeConfig) => {
                     return {
-                      label: `${typeConfig.name} (${typeConfig.quorum / 100}% Quorum, ${typeConfig.approval_threshold / 100}% Approval)`,
+                      label: `${typeConfig.name} ${contracts.governorType !== GOVERNOR_TYPE.AGORA_20 ? `(${typeConfig.quorum / 100}% Quorum, ${typeConfig.approval_threshold / 100}% Approval)` : ""}`,
                       value: typeConfig.proposal_type_id,
                     };
                   })}
