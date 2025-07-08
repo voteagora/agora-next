@@ -43,7 +43,6 @@ const DelegateCard = ({
                 address={delegate.address}
                 votingPower={delegate.votingPower.total}
                 participation={delegate.participation}
-                citizen={delegate.citizen}
                 showParticipation={true}
                 showVotingPower={true}
               />
