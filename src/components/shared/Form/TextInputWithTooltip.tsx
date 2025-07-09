@@ -1,6 +1,7 @@
 "use client";
 
 import React, { MutableRefObject, useState } from "react";
+import { sanitizeContent } from "@/lib/sanitizationUtils";
 
 type Props = {
   className?: string;
@@ -42,7 +43,7 @@ export function TextInputWithTooltip({
       />
       {isTooltipVisible && (
         <div className="absolute bg-black bg-opacity-75 text-neutral rounded-[4px] py-1 px-2 text-xs bottom-[100%] left-0 mb-1 z-50">
-          {tooltipMessage}
+          {tooltipMessage ? sanitizeContent(tooltipMessage) : null}
         </div>
       )}
     </div>
@@ -73,8 +74,8 @@ export function TextInputTooltip({
       className={className}
       type="text"
       ref={inputRef}
-      placeholder={placeholder}
-      defaultValue={defaultValue}
+      placeholder={placeholder ? sanitizeContent(placeholder) : undefined}
+      defaultValue={defaultValue ? sanitizeContent(defaultValue) : undefined}
       onChange={(event) => onChange(event.target.value)}
       onClick={onClick}
       onBlur={onBlur}
