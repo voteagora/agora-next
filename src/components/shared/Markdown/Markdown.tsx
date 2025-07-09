@@ -29,9 +29,11 @@ const toRGBA = (hex: string, alpha: number) => {
 export default function Markdown({
   content,
   className,
+  wrapperClassName,
 }: {
   content: string;
   className?: string;
+  wrapperClassName?: string;
 }) {
   const { ui } = Tenant.current();
   const primary = ui?.customization?.primary ?? defaults.primary;
@@ -41,7 +43,11 @@ export default function Markdown({
   const positive = ui?.customization?.positive ?? defaults.positive;
   return (
     <div
-      className={cn(styles.proposal_description_md, "max-w-full text-primary")}
+      className={cn(
+        styles.proposal_description_md,
+        "max-w-full text-primary",
+        wrapperClassName
+      )}
     >
       <MarkdownPreview
         source={content}

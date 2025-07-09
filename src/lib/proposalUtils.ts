@@ -1216,7 +1216,7 @@ export function calculateHybridApprovalWeightedPercentage(
 }
 
 export function calculateHybridApprovalProposalMetrics(proposal: any) {
-  const quorumThreshold = HYBRID_PROPOSAL_QUORUM; // 30% quorum
+  const quorumThreshold = HYBRID_PROPOSAL_QUORUM * 100; // 30% quorum
 
   // Extract data from proposal object
   const proposalResults = proposal.proposalResults;
@@ -1228,12 +1228,6 @@ export function calculateHybridApprovalProposalMetrics(proposal: any) {
     proposalResults?.criteriaValue ||
     proposalData?.proposalSettings?.criteriaValue ||
     0;
-
-  // Get governor-level approval threshold if available
-  const governorApprovalThreshold =
-    typeof proposal.approvalThreshold === "bigint"
-      ? Number(proposal.approvalThreshold)
-      : proposal.approvalThreshold || 0;
 
   // Get all option names across all categories
   const optionNames = new Set<string>();
@@ -1305,18 +1299,10 @@ export function calculateHybridApprovalProposalMetrics(proposal: any) {
     });
   }
 
-  // Calculate governor-level approval threshold check
+  // Calculate governor-level approval threshold check using weighted percentages
   const proposalForVotes = BigInt(proposalResults?.for || 0);
   const proposalAgainstVotes = BigInt(proposalResults?.against || 0);
   const proposalTotalVotes = proposalForVotes + proposalAgainstVotes;
-
-  // TODO: this is not correct since, the total votes will have to be weighted instead of raw votes
-  const passesGovernorThreshold =
-    !governorApprovalThreshold ||
-    governorApprovalThreshold === 0 ||
-    (proposalTotalVotes > 0n &&
-      (proposalForVotes * 10000n) / proposalTotalVotes >=
-        BigInt(governorApprovalThreshold));
 
   // Calculate full approval data
   let optionsWithApproval = null;
@@ -1354,9 +1340,7 @@ export function calculateHybridApprovalProposalMetrics(proposal: any) {
 
       // Determine if option is approved
       const isApproved = !!(
-        passesGovernorThreshold &&
-        optionMetrics?.meetsThreshold &&
-        availableBudget >= optionBudget
+        optionMetrics?.meetsThreshold && availableBudget >= optionBudget
       );
 
       if (isApproved) {
@@ -1388,7 +1372,6 @@ export function calculateHybridApprovalProposalMetrics(proposal: any) {
     thresholdMet,
     optionResults,
     quorumMet: totalWeightedParticipation >= quorumThreshold,
-    passesGovernorThreshold,
     proposalForVotes,
     proposalAgainstVotes,
     proposalTotalVotes,
