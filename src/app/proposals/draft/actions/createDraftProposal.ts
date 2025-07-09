@@ -28,17 +28,28 @@ const formDataByType = (
         transactions: {
           // deletes old transactions so we aren't stacking on top of old transactions
           deleteMany: {},
-          create: data.transactions.map((transaction: { target: string; value: string; calldata: string; signature?: string; description: string }, idx: number) => {
-            const asTransaction = {
-              order: idx,
-              target: transaction.target as string,
-              value: transaction.value,
-              calldata: transaction.calldata,
-              signature: transaction.signature,
-              description: sanitizeContent(transaction.description),
-            } as ProposalDraftTransaction;
-            return asTransaction;
-          }),
+          create: data.transactions.map(
+            (
+              transaction: {
+                target: string;
+                value: string;
+                calldata: string;
+                signature?: string;
+                description: string;
+              },
+              idx: number
+            ) => {
+              const asTransaction = {
+                order: idx,
+                target: transaction.target as string,
+                value: transaction.value,
+                calldata: transaction.calldata,
+                signature: transaction.signature,
+                description: sanitizeContent(transaction.description),
+              } as ProposalDraftTransaction;
+              return asTransaction;
+            }
+          ),
         },
       };
 
@@ -54,9 +65,11 @@ const formDataByType = (
         social_options: {
           // deletes all existing options so we aren't stacking on top of old options
           deleteMany: {},
-          create: data.socialProposal?.options.map((option: { text: string }) => ({
-            text: sanitizeContent(option.text),
-          })),
+          create: data.socialProposal?.options.map(
+            (option: { text: string }) => ({
+              text: sanitizeContent(option.text),
+            })
+          ),
         },
       };
 
@@ -77,19 +90,41 @@ const formDataByType = (
           // deletes all existing options so we aren't stacking on top of old options
           // TODO: do we need to make sure deletes cascade and remove transactions?
           deleteMany: {},
-          create: data.approvalProposal.options.map((option: { title: string; transactions: { target: string; value: string; calldata: string; signature?: string; description: string }[] }) => ({
-            title: sanitizeContent(option.title),
-            transactions: {
-              create: option.transactions.map((transaction: { target: string; value: string; calldata: string; signature?: string; description: string }, idx: number) => ({
-                order: idx,
-                target: transaction.target as string,
-                value: transaction.value,
-                calldata: transaction.calldata,
-                description: sanitizeContent(transaction.description),
-                proposal: { connect: { id } },
-              })),
-            },
-          })),
+          create: data.approvalProposal.options.map(
+            (option: {
+              title: string;
+              transactions: {
+                target: string;
+                value: string;
+                calldata: string;
+                signature?: string;
+                description: string;
+              }[];
+            }) => ({
+              title: sanitizeContent(option.title),
+              transactions: {
+                create: option.transactions.map(
+                  (
+                    transaction: {
+                      target: string;
+                      value: string;
+                      calldata: string;
+                      signature?: string;
+                      description: string;
+                    },
+                    idx: number
+                  ) => ({
+                    order: idx,
+                    target: transaction.target as string,
+                    value: transaction.value,
+                    calldata: transaction.calldata,
+                    description: sanitizeContent(transaction.description),
+                    proposal: { connect: { id } },
+                  })
+                ),
+              },
+            })
+          ),
         },
       };
 
