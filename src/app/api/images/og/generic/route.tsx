@@ -1,24 +1,7 @@
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
 import { LogoPill } from "@/app/api/images/og/assets/shared";
-
-// Simple server-safe sanitization for OG params
-function sanitizeOgParam(value: string | null): string {
-  if (!value) return "";
-  // Remove HTML tags and encode special characters
-  return value
-    .replace(/<[^>]*>/g, "") // Remove HTML tags
-    .replace(/[<>"'&]/g, (char) => { // Encode special characters
-      switch (char) {
-        case '<': return '&lt;';
-        case '>': return '&gt;';
-        case '"': return '&quot;';
-        case "'": return '&#39;';
-        case '&': return '&amp;';
-        default: return char;
-      }
-    });
-}
+import { sanitizeOgParam } from "@/lib/sanitizationUtilsEdge";
 
 export const runtime = "edge";
 
