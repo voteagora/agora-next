@@ -132,23 +132,22 @@ function SingleOption({
     weight: number,
     eligibleCount: number
   ) => {
-    const votes = proposalResults[category as keyof typeof proposalResults]?.[
-      option.option
-    ]
-      ? BigInt(
-          proposalResults[category as keyof typeof proposalResults][
-            option.option
-          ]
-        )
-      : 0n;
+    const rawVotes =
+      proposalResults[category as keyof typeof proposalResults]?.[
+        option.option
+      ] ?? 0;
+    const votes =
+      category === "DELEGATES" ? BigInt(rawVotes) : Number(rawVotes);
 
     // Calculate the percentage of this group that voted for this option
+    const voteValue =
+      category === "DELEGATES" ? Number(votes) : (votes as number);
     const groupPercentage =
-      eligibleCount > 0 ? (Number(votes) / eligibleCount) * 100 : 0;
+      eligibleCount > 0 ? (voteValue / eligibleCount) * 100 : 0;
 
     return {
       name: displayName,
-      votes: category === "DELEGATES" ? formatNumber(votes) : votes,
+      votes: category === "DELEGATES" ? formatNumber(votes as bigint) : votes,
       percentage: groupPercentage.toFixed(2),
       weight: (weight * 100).toFixed(2),
     };
