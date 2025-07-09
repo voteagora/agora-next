@@ -1,7 +1,24 @@
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
 import { LogoPill } from "@/app/api/images/og/assets/shared";
-import { sanitizeContent } from "@/lib/sanitizationUtils";
+
+// Simple server-safe sanitization for OG params
+function sanitizeOgParam(value: string | null): string {
+  if (!value) return "";
+  // Remove HTML tags and encode special characters
+  return value
+    .replace(/<[^>]*>/g, "") // Remove HTML tags
+    .replace(/[<>"'&]/g, (char) => { // Encode special characters
+      switch (char) {
+        case '<': return '&lt;';
+        case '>': return '&gt;';
+        case '"': return '&quot;';
+        case "'": return '&#39;';
+        case '&': return '&amp;';
+        default: return char;
+      }
+    });
+}
 
 export const runtime = "edge";
 
@@ -13,8 +30,8 @@ export async function GET(req: NextRequest) {
     searchParams.get("description") || "Home of token governance";
 
   // Sanitize the URL parameters to prevent XSS
-  const title = sanitizeContent(unsafeTitle);
-  const description = sanitizeContent(unsafeDescription);
+  const title = sanitizeOgParam(unsafeTitle);
+  const description = sanitizeOgParam(unsafeDescription);
 
   const interBoldFont = await fetch(
     new URL("../assets/Inter-Black.ttf", import.meta.url)
