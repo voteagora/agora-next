@@ -30,7 +30,6 @@ export function parseProposalResults(
     }
     case "STANDARD":
     case "OPTIMISTIC":
-    case "OFFCHAIN_OPTIMISTIC":
     case "OFFCHAIN_STANDARD": {
       const parsedProposalResults = JSON.parse(proposalResults).standard;
 
@@ -165,6 +164,7 @@ export function parseProposalResults(
         },
       };
     }
+    case "OFFCHAIN_OPTIMISTIC":
     case "OFFCHAIN_OPTIMISTIC_TIERED": {
       return parseOffChainProposalResults(
         proposalResults || "{}",
