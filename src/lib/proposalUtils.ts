@@ -480,6 +480,7 @@ export type ParsedProposalData = {
         }[];
       }[];
       calculationOptions?: 0 | 1;
+      minParticipation?: bigint;
     };
   };
   HYBRID_STANDARD: {
@@ -496,6 +497,7 @@ export type ParsedProposalData = {
         }[];
       }[];
       calculationOptions?: 0 | 1;
+      minParticipation?: bigint;
     };
   };
   APPROVAL: {
@@ -668,6 +670,12 @@ export function parseProposalData(
         );
         const functionArgsName = decodeCalldata(calldatas);
 
+        const minParticipation =
+          contracts.governorType === GOVERNOR_TYPE.AGORA_20 &&
+          parsedProposalData.minParticipation
+            ? BigInt(parsedProposalData.minParticipation)
+            : undefined;
+
         return {
           key: proposalType,
           kind: {
@@ -681,6 +689,7 @@ export function parseProposalData(
               },
             ],
             calculationOptions,
+            minParticipation,
           },
         };
       } catch (error) {
@@ -1139,7 +1148,11 @@ export function getProposalCurrentQuorum(
         );
       }
     default:
-      return BigInt(proposalResults.for) + BigInt(proposalResults.abstain);
+      return (
+        BigInt(proposalResults.for) +
+        BigInt(proposalResults.abstain) +
+        BigInt(proposalResults.against)
+      );
   }
 }
 

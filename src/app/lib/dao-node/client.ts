@@ -8,8 +8,9 @@ import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { DelegateStats } from "@/lib/types";
+import { GOVERNOR_TYPE } from "@/lib/constants";
 
-const { namespace, ui } = Tenant.current();
+const { namespace, ui, contracts } = Tenant.current();
 
 // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL TODO BELOW IS HANDLED
 export function adaptDAONodeResponse(
@@ -22,11 +23,16 @@ export function adaptDAONodeResponse(
   let proposalData;
 
   if (votingModuleName == "standard") {
+    const minParticipation =
+      contracts.governorType === GOVERNOR_TYPE.AGORA_20
+        ? (apiResponse.decoded_proposal_data as any)?.[1]?.[0]
+        : null;
     proposalData = {
       values: apiResponse.values,
       targets: apiResponse.targets,
       signatures: apiResponse.signatures,
       calldatas: apiResponse.calldatas.map((c) => "0x" + c),
+      minParticipation: minParticipation,
     };
 
     proposalResults = {

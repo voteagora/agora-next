@@ -235,6 +235,12 @@ export async function getProposalStatus(
         voteThresholdPercent >= apprThresholdPercent
       );
 
+      const minParticipation = (proposalData as ParsedProposalData["STANDARD"])
+        .kind.minParticipation;
+      const hasMetMinParticipation = minParticipation
+        ? BigInt(forVotes) + BigInt(againstVotes) + BigInt(abstainVotes) >=
+          minParticipation
+        : true;
       const quorumForGovernor = getProposalCurrentQuorum(
         proposalResults.kind,
         calculationOptions
@@ -243,7 +249,8 @@ export async function getProposalStatus(
       if (
         (quorum && quorumForGovernor < quorum) ||
         forVotes < againstVotes ||
-        !hasMetThreshold
+        !hasMetThreshold ||
+        !hasMetMinParticipation
       ) {
         return "DEFEATED";
       }
@@ -286,8 +293,13 @@ export async function getProposalStatus(
     case "APPROVAL": {
       const { for: forVotes, abstain: abstainVotes } = proposalResults.kind;
       const proposalQuorumVotes = forVotes + abstainVotes;
+      const minParticipation = (proposalData as ParsedProposalData["APPROVAL"])
+        .kind.proposalSettings.minParticipation;
+      const hasMetMinParticipation = minParticipation
+        ? BigInt(forVotes) + BigInt(abstainVotes) >= minParticipation
+        : true;
 
-      if (quorum && proposalQuorumVotes < quorum) {
+      if ((quorum && proposalQuorumVotes < quorum) || !hasMetMinParticipation) {
         return "DEFEATED";
       }
 
