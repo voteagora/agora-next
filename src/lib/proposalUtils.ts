@@ -310,6 +310,12 @@ export async function parseProposal(
 
   let proposalResults;
 
+  const createdTime = getProposalCreatedTime({
+    proposalData,
+    latestBlock,
+    createdBlock,
+  });
+
   if (proposal.proposal_type.includes("OFFCHAIN") && !offChainProposalData) {
     proposalResults = parseOffChainProposalResults(
       JSON.stringify(proposal.proposal_data?.offchain_tally || {}),
@@ -320,7 +326,9 @@ export async function parseProposal(
       JSON.stringify(proposal.proposal_results || {}),
       proposalData,
       String(startBlock),
-      JSON.stringify(offchainProposal?.proposal_data?.offchain_tally || {})
+      JSON.stringify(offchainProposal?.proposal_data?.offchain_tally || {}),
+      Number(quorum),
+      createdTime
     );
   }
   const calculateStartTime = (): Date | null => {
@@ -360,12 +368,7 @@ export async function parseProposal(
     id: proposal.proposal_id,
     proposer: proposal.proposer,
     snapshotBlockNumber: Number(proposal.created_block),
-    createdTime:
-      proposalData.key === "SNAPSHOT"
-        ? new Date(proposalData.kind.created_ts * 1000)
-        : latestBlock
-          ? getHumanBlockTime(createdBlock ?? 0, latestBlock)
-          : null,
+    createdTime,
     startTime: calculateStartTime(),
     startBlock: proposalData.key === "SNAPSHOT" ? null : startBlock,
     endTime: calculateEndTime(),
@@ -928,9 +931,10 @@ export type ParsedProposalResults = {
       for: bigint;
       abstain: bigint;
       against: bigint;
-      choices: {
-        choice: string;
-        votes: bigint;
+      options: {
+        option: string;
+        weightedPercentage: number;
+        isApproved?: boolean;
       }[];
     };
   };
@@ -967,7 +971,8 @@ export type ParsedProposalResults = {
     kind: {
       options: {
         option: string;
-        votes: bigint;
+        weightedPercentage: number;
+        isApproved?: boolean;
       }[];
       APP: Record<string, bigint>;
       USER: Record<string, bigint>;
@@ -1219,13 +1224,18 @@ export function calculateHybridApprovalWeightedPercentage(
   return weightedOptionPercentage;
 }
 
-export function calculateHybridApprovalProposalMetrics(proposal: any) {
+export function calculateHybridApprovalProposalMetrics({
+  proposalResults,
+  proposalData,
+  quorum,
+  createdTime,
+}: {
+  proposalResults: ParsedProposalResults["HYBRID_APPROVAL"]["kind"];
+  proposalData: ParsedProposalData["HYBRID_APPROVAL"]["kind"];
+  quorum: number;
+  createdTime: Date | null;
+}) {
   const quorumThreshold = HYBRID_PROPOSAL_QUORUM * 100; // 30% quorum
-
-  // Extract data from proposal object
-  const proposalResults = proposal.proposalResults;
-  const proposalData = proposal.proposalData;
-  const quorum = Number(proposal.quorum);
 
   // Get criteria value from proposal results (module-level criteria)
   const criteriaValue =
@@ -1332,9 +1342,8 @@ export function calculateHybridApprovalProposalMetrics(proposal: any) {
     optionsWithApproval = enrichedOptions.map((option: any) => {
       const optionBudget = calculateOptionBudget(
         option,
-        proposal.createdTime as Date,
-        contracts.governor.optionBudgetChangeDate || null,
-        contractTokenDecimals
+        contractTokenDecimals,
+        createdTime
       );
 
       // Find metrics for this option
@@ -1363,8 +1372,6 @@ export function calculateHybridApprovalProposalMetrics(proposal: any) {
         isApproved,
         weightedPercentage: optionMetrics?.weightedPercentage || 0,
         rawVotes: optionMetrics?.rawVotes || 0n,
-        budgetExceeded:
-          isExceeded && optionMetrics?.meetsThreshold && !isApproved,
       };
     });
 
@@ -1387,11 +1394,12 @@ export function calculateHybridApprovalProposalMetrics(proposal: any) {
 // Helper function to calculate option budget based on proposal creation time
 export function calculateOptionBudget(
   option: any,
-  proposalCreatedTime: Date,
-  optionBudgetChangeDate: Date | null,
-  contractTokenDecimals: number
+  contractTokenDecimals: number,
+  proposalCreatedTime: Date | null
 ): bigint {
-  return proposalCreatedTime > (optionBudgetChangeDate || new Date(0))
+  const { contracts } = Tenant.current();
+  return (proposalCreatedTime as Date) >
+    (contracts.governor.optionBudgetChangeDate || new Date(0))
     ? BigInt(option?.budgetTokensSpent || 0)
     : parseUnits(
         option?.budgetTokensSpent?.toString() || "0",
@@ -1702,3 +1710,19 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
     thresholds,
   };
 }
+
+export const getProposalCreatedTime = ({
+  proposalData,
+  latestBlock,
+  createdBlock,
+}: {
+  proposalData: ParsedProposalData[ProposalType];
+  latestBlock: Block | null;
+  createdBlock: bigint | string | null;
+}) => {
+  return proposalData.key === "SNAPSHOT"
+    ? new Date(proposalData.kind.created_ts * 1000)
+    : latestBlock
+      ? getHumanBlockTime(createdBlock ?? 0, latestBlock)
+      : null;
+};

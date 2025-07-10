@@ -156,7 +156,7 @@ export default async function Page({
   if (proposalData.onchainProposalId) {
     redirect(`/proposals/${proposalData.onchainProposalId}`);
   }
-
+  console.log("proposalData", proposal.proposalResults);
   let RenderComponent;
   switch (proposal.proposalType) {
     case "STANDARD":
