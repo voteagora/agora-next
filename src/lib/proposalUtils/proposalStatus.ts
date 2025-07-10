@@ -5,6 +5,7 @@ import {
   calculateHybridStandardTallies,
   getEndBlock,
   getEndTimestamp,
+  getProposalCreatedTime,
   getProposalCurrentQuorum,
   getStartBlock,
   getStartTimestamp,
@@ -322,8 +323,17 @@ export async function getProposalStatus(
         approvalThreshold: 0,
       };
 
-      const metrics =
-        calculateHybridApprovalProposalMetrics(proposalForMetrics);
+      const metrics = calculateHybridApprovalProposalMetrics({
+        proposalResults: kind,
+        proposalData:
+          proposalData.kind as ParsedProposalData["HYBRID_APPROVAL"]["kind"],
+        quorum: Number(quorum!),
+        createdTime: getProposalCreatedTime({
+          proposalData,
+          latestBlock,
+          createdBlock: proposal.created_block,
+        }),
+      });
 
       // Check if weighted quorum is met
       if (!metrics.quorumMet) {

@@ -26,7 +26,7 @@ export const HybridOptimisticProposalStatus = ({
 
   const statusTxt = proposal.status === "DEFEATED" ? "defeated" : "approved";
   const proposalStatus = proposal.status;
-  console.log(proposalStatus);
+
   if (proposalStatus === "DEFEATED") {
     // Determine which tier threshold was exceeded
     const { groupTallies, thresholds } = metrics;

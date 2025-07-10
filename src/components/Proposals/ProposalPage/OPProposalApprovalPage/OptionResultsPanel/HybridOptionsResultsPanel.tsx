@@ -1,6 +1,7 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import {
   ParsedProposalData,
+  ParsedProposalResults,
   calculateHybridApprovalProposalMetrics,
   getHybridEligibleVoters,
 } from "@/lib/proposalUtils";
@@ -27,22 +28,16 @@ export default function HybridOptionsResultsPanel({
 }) {
   const proposalData =
     proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"];
-
-  const proposalResults = proposal.proposalResults as unknown as {
-    options: { option: string; votes: bigint }[];
-    APP: Record<string, bigint>;
-    USER: Record<string, bigint>;
-    CHAIN: Record<string, bigint>;
-    DELEGATES?: Record<string, bigint>;
-    criteria: "THRESHOLD" | "TOP_CHOICES";
-    criteriaValue: bigint;
-    for?: bigint;
-    against?: bigint;
-    abstain?: bigint;
-  };
+  const proposalResults =
+    proposal.proposalResults as ParsedProposalResults["HYBRID_APPROVAL"]["kind"];
 
   // Use consolidated function to calculate all metrics and approval data
-  const hybridMetrics = calculateHybridApprovalProposalMetrics(proposal);
+  const hybridMetrics = calculateHybridApprovalProposalMetrics({
+    proposalResults,
+    proposalData,
+    quorum: Number(proposal.quorum),
+    createdTime: proposal.createdTime,
+  });
 
   // Extract data for threshold calculations
   const proposalSettings = proposalData.proposalSettings;

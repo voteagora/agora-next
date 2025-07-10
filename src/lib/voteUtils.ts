@@ -341,7 +341,14 @@ export function calculateVoteMetadata({
     boundedForPercentage = metrics.totalForVotesPercentage;
     boundedAgainstPercentage = metrics.totalAgainstVotesPercentage;
   } else if (proposal.proposalType === "HYBRID_APPROVAL") {
-    const metrics = calculateHybridApprovalProposalMetrics(proposal);
+    const metrics = calculateHybridApprovalProposalMetrics({
+      proposalResults:
+        proposal.proposalResults as ParsedProposalResults["HYBRID_APPROVAL"]["kind"],
+      proposalData:
+        proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"],
+      quorum: Number(proposal.quorum),
+      createdTime: proposal.createdTime,
+    });
     boundedForPercentage = metrics.totalWeightedParticipation;
     boundedAgainstPercentage = 0; // Approval proposals don't typically show against percentage
   } else if (
@@ -448,7 +455,14 @@ export function calculateVoteMetadata({
 
     if (proposal.proposalType === "HYBRID_APPROVAL") {
       // Use weighted calculations for hybrid approval
-      const metrics = calculateHybridApprovalProposalMetrics(proposal);
+      const metrics = calculateHybridApprovalProposalMetrics({
+        proposalResults:
+          proposal.proposalResults as ParsedProposalResults["HYBRID_APPROVAL"]["kind"],
+        proposalData:
+          proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"],
+        quorum: Number(proposal.quorum),
+        createdTime: proposal.createdTime,
+      });
       totalVotingPower = BigInt(
         Math.round(metrics.totalWeightedParticipation * 10000)
       ); // Convert to scaled format
@@ -509,7 +523,14 @@ export function calculateVoteMetadata({
 
     if (proposal.proposalType === "HYBRID_APPROVAL") {
       // For hybrid approval, use weighted percentage for sorting
-      const metrics = calculateHybridApprovalProposalMetrics(proposal);
+      const metrics = calculateHybridApprovalProposalMetrics({
+        proposalResults:
+          proposal.proposalResults as ParsedProposalResults["HYBRID_APPROVAL"]["kind"],
+        proposalData:
+          proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"],
+        quorum: Number(proposal.quorum),
+        createdTime: proposal.createdTime,
+      });
       sortedOptions = mutableOptions
         .map((option, i) => ({
           ...option,
