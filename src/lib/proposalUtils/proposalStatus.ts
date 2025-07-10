@@ -270,8 +270,7 @@ export async function getProposalStatus(
 
       return "DEFEATED";
     }
-    case "OPTIMISTIC":
-    case "OFFCHAIN_OPTIMISTIC": {
+    case "OPTIMISTIC": {
       const {
         for: forVotes,
         against: againstVotes,
@@ -337,6 +336,7 @@ export async function getProposalStatus(
         return "SUCCEEDED";
       }
     }
+    case "OFFCHAIN_OPTIMISTIC":
     case "OFFCHAIN_OPTIMISTIC_TIERED":
     case "HYBRID_OPTIMISTIC_TIERED": {
       // Create a temporary proposal object for the metrics calculation
