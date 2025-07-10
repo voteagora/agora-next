@@ -16,6 +16,7 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { Vote } from "@/app/api/common/votes/vote";
 import { cn } from "@/lib/utils";
 import Markdown from "@/components/shared/Markdown/Markdown";
+import Tenant from "@/lib/tenant/tenant";
 
 const abiCoder = new AbiCoder();
 
@@ -312,15 +313,17 @@ export function ApprovalCastVoteDialog({
                   abstain={abstain}
                 />
               ))}
-              <CheckCard
-                key={proposalData.options.length}
-                title={"Abstain: vote for no options"}
-                description={""}
-                checked={!!abstain}
-                checkedOptions={selectedOptions.length}
-                onClick={() => handleOnChange(abstainOptionId)}
-                abstain={abstain}
-              />
+              {Tenant.current().namespace !== "optimism" && (
+                <CheckCard
+                  key={proposalData.options.length}
+                  title={"Abstain: vote for no options"}
+                  description={""}
+                  checked={!!abstain}
+                  checkedOptions={selectedOptions.length}
+                  onClick={() => handleOnChange(abstainOptionId)}
+                  abstain={abstain}
+                />
+              )}
             </div>
             <CastVoteWithReason
               //   onVoteClick={write}
