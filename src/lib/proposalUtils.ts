@@ -15,6 +15,8 @@ import {
   HYBRID_VOTE_WEIGHTS,
   disapprovalThreshold,
   HYBRID_PROPOSAL_QUORUM,
+  HYBRID_OPTIMISTIC_TIERED_THRESHOLD,
+  OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD,
 } from "./constants";
 import { ProposalType } from "./types";
 import {
@@ -579,6 +581,7 @@ export type ParsedProposalData = {
       onchainProposalId?: string;
       created_attestation_hash?: string;
       cancelled_attestation_hash?: string;
+      tiers?: number[];
     };
   };
   OFFCHAIN_STANDARD: {
@@ -1576,20 +1579,19 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
 
   // Get thresholds from tiers array: [2GroupThreshold, 3GroupThreshold, 4GroupThreshold]
   const proposalData =
-    proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
-      ? (proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"])
-      : (proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC"]["kind"]);
+    proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"];
 
   // For non-hybrid optimistic tiered proposals, we use 65% threshold for all groups (apps, users, chains)
   const tiers =
-    (proposalData as any)?.tiers ||
+    proposalData?.tiers ||
     (proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
-      ? [55, 45, 35]
-      : [65, 65, 65]);
+      ? HYBRID_OPTIMISTIC_TIERED_THRESHOLD
+      : OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD);
+
   const thresholds = {
-    twoGroups: tiers[0] / 100 || 55,
-    threeGroups: tiers[1] / 100 || 45,
-    fourGroups: tiers[2] / 100 || 35,
+    twoGroups: tiers[0],
+    threeGroups: tiers[1],
+    fourGroups: tiers[2],
   };
 
   // Setup weights based on proposal type
