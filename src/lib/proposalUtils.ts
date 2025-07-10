@@ -307,9 +307,10 @@ export async function parseProposal(
   );
 
   let proposalResults;
+
   if (proposal.proposal_type.includes("OFFCHAIN") && !offChainProposalData) {
     proposalResults = parseOffChainProposalResults(
-      JSON.stringify(proposal.proposal_results || {}),
+      JSON.stringify(proposal.proposal_data?.offchain_tally || {}),
       proposalType
     );
   } else {
