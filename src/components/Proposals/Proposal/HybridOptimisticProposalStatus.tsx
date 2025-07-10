@@ -1,11 +1,7 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import {
-  HYBRID_OPTIMISTIC_TIERED_THRESHOLD,
-  OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD,
-} from "@/lib/constants";
-import {
   calculateHybridOptimisticProposalMetrics,
-  ParsedProposalData,
+  getProposalTiers,
 } from "@/lib/proposalUtils";
 
 export const HybridOptimisticProposalStatus = ({
@@ -15,14 +11,8 @@ export const HybridOptimisticProposalStatus = ({
 }) => {
   const metrics = calculateHybridOptimisticProposalMetrics(proposal);
 
-  const proposalData =
-    proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"];
   let proposalInfoTxt = "";
-  const tiers =
-    proposalData?.tiers ||
-    (proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
-      ? HYBRID_OPTIMISTIC_TIERED_THRESHOLD
-      : OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD);
+  const tiers = getProposalTiers(proposal);
 
   const statusTxt = proposal.status === "DEFEATED" ? "defeated" : "approved";
   const proposalStatus = proposal.status;
@@ -52,8 +42,7 @@ export const HybridOptimisticProposalStatus = ({
 
     proposalInfoTxt = thresholdText;
   } else {
-    proposalInfoTxt = `${metrics.totalAgainstVotes}% / ${tiers[0]}% against
-            needed to defeat`;
+    proposalInfoTxt = `${metrics.totalAgainstVotes}% / ${tiers[0]}% against needed to defeat`;
   }
   return (
     <div className="flex flex-col text-right text-primary">

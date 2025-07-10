@@ -17,6 +17,7 @@ import {
   HYBRID_PROPOSAL_QUORUM,
   HYBRID_OPTIMISTIC_TIERED_THRESHOLD,
   OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD,
+  OFFCHAIN_OPTIMISTIC_THRESHOLD,
 } from "./constants";
 import { ProposalType } from "./types";
 import {
@@ -1577,6 +1578,24 @@ export function calculateHybridStandardProposalMetrics(proposal: Proposal) {
   };
 }
 
+export const getProposalTiers = (proposal: Proposal) => {
+  const proposalData = proposal.proposalData as
+    | ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"]
+    | ParsedProposalData["OFFCHAIN_OPTIMISTIC_TIERED"]["kind"]
+    | ParsedProposalData["OFFCHAIN_OPTIMISTIC"]["kind"];
+
+  if (proposalData.tiers) {
+    return proposalData.tiers;
+  }
+  if (proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED") {
+    return HYBRID_OPTIMISTIC_TIERED_THRESHOLD;
+  }
+  if (proposal.proposalType === "OFFCHAIN_OPTIMISTIC_TIERED") {
+    return OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD;
+  }
+  return OFFCHAIN_OPTIMISTIC_THRESHOLD;
+};
+
 export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
   const proposalResults =
     proposal.proposalResults as ParsedProposalResults["HYBRID_OPTIMISTIC_TIERED"]["kind"];
@@ -1590,11 +1609,7 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
     proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"];
 
   // For non-hybrid optimistic tiered proposals, we use 65% threshold for all groups (apps, users, chains)
-  const tiers =
-    proposalData?.tiers ||
-    (proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
-      ? HYBRID_OPTIMISTIC_TIERED_THRESHOLD
-      : OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD);
+  const tiers = getProposalTiers(proposal);
 
   const thresholds = {
     twoGroups: tiers[0],
@@ -1660,22 +1675,34 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
 
   // Determine if veto is triggered based on tiered logic
   let vetoTriggered = false;
-
-  const groupsExceedingFourThreshold = groupTallies.filter(
-    (g) => g.vetoPercentage >= thresholds.fourGroups
-  );
-  if (groupsExceedingFourThreshold.length >= 4) {
-    vetoTriggered = true;
-  } else if (
-    groupTallies.filter((g) => g.vetoPercentage >= thresholds.threeGroups)
-      .length >= 3
-  ) {
-    vetoTriggered = true;
-  } else if (
-    groupTallies.filter((g) => g.vetoPercentage >= thresholds.twoGroups)
-      .length >= 2
-  ) {
-    vetoTriggered = true;
+  if (proposal.proposalType === "OFFCHAIN_OPTIMISTIC_TIERED") {
+    const totalWeightedVetoPercentage = groupTallies.reduce(
+      (sum, tally, index) => {
+        const vetoPercentage = tally.vetoPercentage;
+        return sum + vetoPercentage * tallyWeights[index];
+      },
+      0
+    );
+    if (totalWeightedVetoPercentage >= tiers[0]) {
+      vetoTriggered = true;
+    }
+  } else {
+    const groupsExceedingFourThreshold = groupTallies.filter(
+      (g) => g.vetoPercentage >= thresholds.fourGroups
+    );
+    if (groupsExceedingFourThreshold.length >= 4) {
+      vetoTriggered = true;
+    } else if (
+      groupTallies.filter((g) => g.vetoPercentage >= thresholds.threeGroups)
+        .length >= 3
+    ) {
+      vetoTriggered = true;
+    } else if (
+      groupTallies.filter((g) => g.vetoPercentage >= thresholds.twoGroups)
+        .length >= 2
+    ) {
+      vetoTriggered = true;
+    }
   }
 
   const groupsExceedingThresholds = groupTallies.map((group) => {

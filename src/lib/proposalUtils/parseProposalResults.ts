@@ -216,7 +216,7 @@ export function parseProposalResults(
     case "OFFCHAIN_OPTIMISTIC_TIERED": {
       return parseOffChainProposalResults(
         proposalResults || "{}",
-        "OFFCHAIN_OPTIMISTIC_TIERED"
+        proposalData.key
       );
     }
     case "HYBRID_OPTIMISTIC_TIERED": {
