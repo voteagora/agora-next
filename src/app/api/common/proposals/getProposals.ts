@@ -399,26 +399,53 @@ async function getProposal(proposalId: string) {
       return notFound();
     }
 
+    // Resolve hybrid proposal logic - check if this is an offchain proposal that references an onchain proposal
+    let baseProposal = proposal as ProposalPayload;
+    let resolvedOffchainProposal = offchainProposal as
+      | ProposalPayload
+      | undefined;
+
+    // If this is an offchain proposal with an onchain_proposalid, we need to fetch the onchain proposal as the base
+    if (
+      proposal.proposal_type?.startsWith("OFFCHAIN") &&
+      (proposal.proposal_data as any)?.onchain_proposalid
+    ) {
+      const onchainId = (proposal.proposal_data as any).onchain_proposalid;
+      const onchainProposal = await doInSpan(
+        { name: "getOnchainProposal" },
+        async () =>
+          findProposal({
+            namespace,
+            proposalId: onchainId,
+            contract: contracts.governor.address,
+          })
+      );
+
+      if (onchainProposal) {
+        baseProposal = onchainProposal as ProposalPayload;
+        resolvedOffchainProposal = proposal as ProposalPayload;
+      }
+    }
+
     const latestBlock = await latestBlockPromise;
 
     const isPending =
       (isTimeStampBasedTenant
-        ? !isTimestampBasedProposal(proposal as ProposalPayload) ||
-          Number(getStartTimestamp(proposal as ProposalPayload)) >
-            latestBlock.timestamp
-        : Number(getStartBlock(proposal as ProposalPayload)) >
-          latestBlock.number) || !latestBlock;
+        ? !isTimestampBasedProposal(baseProposal) ||
+          Number(getStartTimestamp(baseProposal)) > latestBlock.timestamp
+        : Number(getStartBlock(baseProposal)) > latestBlock.number) ||
+      !latestBlock;
 
     const quorum = isPending
       ? null
-      : await fetchQuorumForProposal(proposal as ProposalPayload);
+      : await fetchQuorumForProposal(baseProposal);
 
     return parseProposal(
-      proposal as ProposalPayload,
+      baseProposal,
       latestBlock,
       quorum ?? null,
       BigInt(votableSupply),
-      offchainProposal as ProposalPayload
+      resolvedOffchainProposal
     );
   });
 }
