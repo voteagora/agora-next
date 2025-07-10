@@ -282,21 +282,25 @@ const DraftFormClient = ({
                   </p>
                 </div>
               )}
-              <div className="relative">
-                <SelectInput
-                  control={control}
-                  label="Proposal type"
-                  required={true}
-                  options={validProposalTypes.map((typeConfig) => {
-                    return {
-                      label: `${typeConfig.name} ${contracts.governorType !== GOVERNOR_TYPE.AGORA_20 ? `(${typeConfig.quorum / 100}% Quorum, ${typeConfig.approval_threshold / 100}% Approval)` : ""}`,
-                      value: typeConfig.proposal_type_id,
-                    };
-                  })}
-                  name="proposalConfigType"
-                  emptyCopy="Default"
-                />
-              </div>
+              {contracts.governorType !== GOVERNOR_TYPE.AGORA_20 ||
+              (contracts.governorType === GOVERNOR_TYPE.AGORA_20 &&
+                validProposalTypes.length > 1) ? (
+                <div className="relative">
+                  <SelectInput
+                    control={control}
+                    label="Proposal type"
+                    required={true}
+                    options={validProposalTypes.map((typeConfig) => {
+                      return {
+                        label: `${typeConfig.name} ${contracts.governorType !== GOVERNOR_TYPE.AGORA_20 ? `(${typeConfig.quorum / 100}% Quorum, ${typeConfig.approval_threshold / 100}% Approval)` : ""}`,
+                        value: typeConfig.proposal_type_id,
+                      };
+                    })}
+                    name="proposalConfigType"
+                    emptyCopy="Default"
+                  />
+                </div>
+              ) : null}
 
               {(selectedProposalType?.scopes?.length || 0) > 0 && (
                 <div className="flex flex-col gap-2">
@@ -333,12 +337,14 @@ const DraftFormClient = ({
                     control={methods.control}
                     tooltip="Minimum number of participants required for the proposal to be valid."
                   />
-                  <CheckboxInput
-                    control={methods.control}
-                    label="Signal vote"
-                    name="isSignalVote"
-                    tooltip="Whether this proposal is a signal vote that doesn't execute any transactions."
-                  />
+                  {votingModuleType !== ProposalType.APPROVAL && (
+                    <CheckboxInput
+                      control={methods.control}
+                      label="Signal vote"
+                      name="isSignalVote"
+                      tooltip="Whether this proposal is a signal vote that doesn't execute any transactions."
+                    />
+                  )}
                 </>
               )}
             </div>

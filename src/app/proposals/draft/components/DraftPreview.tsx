@@ -18,6 +18,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { ProposalType } from "@/app/proposals/draft/types";
 import toast from "react-hot-toast";
 import { useGetVotes } from "@/hooks/useGetVotes";
+import { useNFTBalance } from "@/hooks/useNFTBalance";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { useEffect, useState } from "react";
 import { getInputData } from "../utils/getInputData";
@@ -62,6 +63,15 @@ const DraftPreview = ({
     enabled: !!address && !!blockNumber,
   });
 
+  const { data: nftBalance } = useNFTBalance({
+    address: address as `0x${string}`,
+    contractAddress: tenant.contracts.permissionToken?.address as `0x${string}`,
+    chainId: tenant.contracts.permissionToken?.chain?.id as number,
+    enabled:
+      gatingType === ProposalGatingType.PERMISSION_TOKEN &&
+      tenant.contracts.permissionToken !== undefined,
+  });
+
   const [lastValidVotes, setLastValidVotes] = useState<bigint | undefined>(
     undefined
   );
@@ -94,6 +104,8 @@ const DraftPreview = ({
             ? effectiveVotes >= threshold
             : false)
         );
+      case ProposalGatingType.PERMISSION_TOKEN:
+        return nftBalance !== undefined && nftBalance > 0n;
       default:
         return false;
     }
@@ -219,6 +231,20 @@ const DraftPreview = ({
                 )
               : "0"}{" "}
             tokens
+          </span>
+        </div>
+      );
+    }
+
+    if (gatingType === ProposalGatingType.PERMISSION_TOKEN) {
+      requirements.push(
+        <div
+          key="nft"
+          className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
+        >
+          <p className="flex-grow text-primary">NFT ownership</p>
+          <span className="text-secondary font-mono text-xs">
+            {`> 0 NFTs from ${tenant.contracts.permissionToken?.address}`}
           </span>
         </div>
       );

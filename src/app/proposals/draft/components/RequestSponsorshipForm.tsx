@@ -12,6 +12,7 @@ import { invalidatePath } from "../actions/revalidatePath";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
+import { useNFTBalance } from "@/hooks/useNFTBalance";
 import {
   DraftProposal,
   PLMConfig,
@@ -47,6 +48,15 @@ const RequestSponsorshipForm = ({
     enabled: true,
   });
 
+  const { data: nftBalance } = useNFTBalance({
+    address: address as `0x${string}`,
+    contractAddress: tenant.contracts.permissionToken?.address as `0x${string}`,
+    chainId: tenant.contracts.permissionToken?.chain?.id as number,
+    enabled:
+      gatingType === ProposalGatingType.PERMISSION_TOKEN &&
+      tenant.contracts.permissionToken !== undefined,
+  });
+
   const canSponsor = () => {
     if (votingModuleType === ProposalType.SOCIAL) {
       const requiredTokensForSnapshot = (plmToggle?.config as PLMConfig)
@@ -71,6 +81,8 @@ const RequestSponsorshipForm = ({
             ? accountVotesData >= threshold
             : false)
         );
+      case ProposalGatingType.PERMISSION_TOKEN:
+        return nftBalance !== undefined && nftBalance > 0n;
       default:
         return false;
     }

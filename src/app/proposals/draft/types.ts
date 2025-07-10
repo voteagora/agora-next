@@ -185,6 +185,7 @@ export enum ProposalGatingType {
   MANAGER = "manager",
   TOKEN_THRESHOLD = "token threshold",
   GOVERNOR_V1 = "governor v1",
+  PERMISSION_TOKEN = "permission token",
 }
 
 export type PLMConfig = {

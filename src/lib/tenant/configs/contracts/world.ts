@@ -45,6 +45,10 @@ export const worldTenantConfig = ({
     ? "0x6253380b35540ba93F399cF40b1B52B550312148"
     : "0xbF6187867c1EF9B17D0c9Ab2122Fa52BEDfa2148";
 
+  const PERMISSION_TOKEN = isProd
+    ? "0x7EA914f3cfFC4E676f968326A4bb3e82F1CEB80f"
+    : "0xbD7e5e656A1B5b6f0FacB7a6a911CcF36e570201";
+
   const provider = new JsonRpcProvider(
     `https://worldchain-mainnet.g.alchemy.com/v2/${alchemyId}`
   );
@@ -56,6 +60,15 @@ export const worldTenantConfig = ({
       address: TOKEN as `0x${string}`,
       chain,
       contract: ERC20__factory.connect(TOKEN, provider),
+      provider,
+      type: "erc20",
+    }),
+
+    permissionToken: createTokenContract({
+      abi: ERC20__factory.abi,
+      address: PERMISSION_TOKEN as `0x${string}`,
+      chain,
+      contract: ERC20__factory.connect(PERMISSION_TOKEN, provider),
       provider,
       type: "erc20",
     }),

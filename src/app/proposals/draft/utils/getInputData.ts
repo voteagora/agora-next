@@ -104,7 +104,10 @@ export function getInputData(proposal: DraftProposal): {
     let criteria = proposal.voting_module_type === ProposalType.BASIC ? 2 : 0;
     let criteriaValue = BigInt(0);
     const minParticipation = BigInt(proposal.min_participation || 3); // 3 is the minimum participation
-    const isSignalVote = proposal.is_signal_vote ?? true;
+    const isSignalVote =
+      proposal.voting_module_type === ProposalType.APPROVAL
+        ? true
+        : (proposal.is_signal_vote ?? true);
 
     if (proposal.voting_module_type === ProposalType.APPROVAL) {
       proposal.approval_options.forEach((option) => {

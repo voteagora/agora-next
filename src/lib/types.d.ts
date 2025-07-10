@@ -46,6 +46,7 @@ export type TenantContracts = {
     isERC20: () => this is TenantContract<ITokenContract>;
     isERC721: () => this is TenantContract<IMembershipContract>;
   };
+  permissionToken?: TenantContract<BaseContract>;
 
   votableSupplyOracle?: TenantContract<IVotableSupplyOracleContract>;
   staker?: TenantContract<IStaker>;

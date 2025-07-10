@@ -11,6 +11,7 @@ import { useManager } from "@/hooks/useManager";
 import { DraftProposal, PLMConfig, ProposalGatingType } from "../../types";
 import Tenant from "@/lib/tenant/tenant";
 import { useGetVotes } from "@/hooks/useGetVotes";
+import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { UpdateVotableSupplyOracle } from "@/app/proposals/components/UpdateVotableSupplyOracle";
 
 const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
@@ -41,6 +42,15 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
     enabled: !!address,
   });
 
+  const { data: nftBalance } = useNFTBalance({
+    address: address as `0x${string}`,
+    contractAddress: tenant.contracts.permissionToken?.address as `0x${string}`,
+    chainId: tenant.contracts.permissionToken?.chain?.id as number,
+    enabled:
+      gatingType === ProposalGatingType.PERMISSION_TOKEN &&
+      tenant.contracts.permissionToken !== undefined,
+  });
+
   // Update lastValidVotes when accountVotes changes and is defined
   useEffect(() => {
     if (accountVotes !== undefined) {
@@ -67,10 +77,12 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
             ? stableAccountVotes >= threshold
             : false)
         );
+      case ProposalGatingType.PERMISSION_TOKEN:
+        return nftBalance !== undefined && nftBalance > 0n;
       default:
         return false;
     }
-  }, [gatingType, manager, address, stableAccountVotes, threshold]);
+  }, [gatingType, manager, address, stableAccountVotes, threshold, nftBalance]);
   return (
     <div className="mt-6">
       {tenant.contracts.votableSupplyOracle?.address && (
