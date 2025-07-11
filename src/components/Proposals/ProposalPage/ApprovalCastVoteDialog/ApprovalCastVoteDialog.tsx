@@ -17,6 +17,7 @@ import { Vote } from "@/app/api/common/votes/vote";
 import { cn } from "@/lib/utils";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const abiCoder = new AbiCoder();
 
@@ -313,7 +314,7 @@ export function ApprovalCastVoteDialog({
                   abstain={abstain}
                 />
               ))}
-              {Tenant.current().namespace !== "optimism" && (
+              {Tenant.current().namespace !== TENANT_NAMESPACES.OPTIMISM && (
                 <CheckCard
                   key={proposalData.options.length}
                   title={"Abstain: vote for no options"}
