@@ -1,15 +1,20 @@
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
 import { LogoPill } from "@/app/api/images/og/assets/shared";
+import { sanitizeOgParam } from "@/lib/sanitizationUtilsEdge";
 
 export const runtime = "edge";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
-  const title = searchParams.get("title") || "Agora Proposal";
-  const description =
+  const unsafeTitle = searchParams.get("title") || "Agora Proposal";
+  const unsafeDescription =
     searchParams.get("description") || "Home of token governance";
+
+  // Sanitize the URL parameters to prevent XSS
+  const title = sanitizeOgParam(unsafeTitle);
+  const description = sanitizeOgParam(unsafeDescription);
 
   const interBoldFont = await fetch(
     new URL("../assets/Inter-Black.ttf", import.meta.url)

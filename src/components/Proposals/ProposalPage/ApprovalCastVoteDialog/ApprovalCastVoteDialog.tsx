@@ -15,6 +15,9 @@ import { truncateAddress } from "@/app/lib/utils/text";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Vote } from "@/app/api/common/votes/vote";
 import { cn } from "@/lib/utils";
+import Markdown from "@/components/shared/Markdown/Markdown";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const abiCoder = new AbiCoder();
 
@@ -70,7 +73,7 @@ export function ReviewApprovalVoteDialog({
                 key={`option-${index}`}
               >
                 <p className="font-medium max-w-[calc(100%-24px)]">
-                  {option.description}
+                  <Markdown content={option.description} />
                 </p>
                 <div
                   className={
@@ -311,15 +314,17 @@ export function ApprovalCastVoteDialog({
                   abstain={abstain}
                 />
               ))}
-              <CheckCard
-                key={proposalData.options.length}
-                title={"Abstain: vote for no options"}
-                description={""}
-                checked={!!abstain}
-                checkedOptions={selectedOptions.length}
-                onClick={() => handleOnChange(abstainOptionId)}
-                abstain={abstain}
-              />
+              {Tenant.current().namespace !== TENANT_NAMESPACES.OPTIMISM && (
+                <CheckCard
+                  key={proposalData.options.length}
+                  title={"Abstain: vote for no options"}
+                  description={""}
+                  checked={!!abstain}
+                  checkedOptions={selectedOptions.length}
+                  onClick={() => handleOnChange(abstainOptionId)}
+                  abstain={abstain}
+                />
+              )}
             </div>
             <CastVoteWithReason
               //   onVoteClick={write}
@@ -424,8 +429,11 @@ function CheckCard({
           "transition-all max-w-[calc(100%-24px)]",
           checked ? "text-primary font-medium" : "text-secondary font-normal"
         )}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
       >
-        {title}
+        <Markdown content={title} />
       </p>
       <div className="text-xs font-medium text-secondary">{description}</div>
 

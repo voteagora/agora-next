@@ -95,6 +95,7 @@
     "react-markdown": "^8.0.7",
     "react-responsive": "^9.0.2",
     "recharts": "^2.12.7",
+    "rehype-external-links": "^3.0.0",
     "remark": "^15.0.1",
     "remark-toc": "^9.0.0",
     "siwe": "^2.3.2",
