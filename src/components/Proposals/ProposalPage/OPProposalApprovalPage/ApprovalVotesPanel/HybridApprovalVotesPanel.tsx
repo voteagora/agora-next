@@ -85,9 +85,15 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
                 />
               </div>
               {showVoters ? (
-                <ProposalVotesList proposalId={proposal.id} />
+                <ProposalVotesList
+                  proposalId={proposal.id}
+                  offchainProposalId={proposal.offchainProposalId}
+                />
               ) : (
-                <ProposalNonVoterList proposal={proposal} />
+                <ProposalNonVoterList
+                  proposal={proposal}
+                  offchainProposalId={proposal.offchainProposalId}
+                />
               )}
             </>
           )}

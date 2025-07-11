@@ -11,6 +11,7 @@ import {
   ParsedProposalData,
   ParsedProposalResults,
   calculateHybridOptimisticProposalMetrics,
+  getProposalTiers,
 } from "@/lib/proposalUtils";
 import { ProposalVotesTab } from "@/components/common/ProposalVotesTab";
 import { VoteOnAtlas } from "@/components/common/VoteOnAtlas";
@@ -102,8 +103,8 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
     () => calculateHybridOptimisticProposalMetrics(proposal),
     [proposal]
   );
-  const proposalData =
-    proposal.proposalData as ParsedProposalData["OFFCHAIN_OPTIMISTIC_TIERED"]["kind"];
+
+  const proposalQuorum = getProposalTiers(proposal);
   const handleClick = () => {
     setIsClicked(!isClicked);
   };
@@ -122,7 +123,7 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
             <TooltipContent className="max-w-[300px] p-4 text-xs text-tertiary">
               <p className="text-primary font-bold mb-2">Threshold</p>
               <p className="line-height-[32px]">
-                3 groups {proposalData?.tiers?.[0] / 100 || 65}%
+                3 groups {proposalQuorum[0] || 20}%
               </p>
             </TooltipContent>
           </Tooltip>
@@ -169,7 +170,7 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
                     <VotesBar
                       forVotes={0}
                       againstVotes={totalAgainstVotes}
-                      quorumPercentage={proposalData?.tiers?.[0] / 100 || 65}
+                      quorumPercentage={proposalQuorum[0] || 65}
                       showVotesPercentage
                     />
                   </div>

@@ -166,3 +166,9 @@ export const HYBRID_VOTE_WEIGHTS = {
   users: 1 / 6,
   chains: 1 / 6,
 } as const;
+
+export const HYBRID_PROPOSAL_QUORUM = 0.3;
+
+export const HYBRID_OPTIMISTIC_TIERED_THRESHOLD = [55, 45, 35];
+export const OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD = [65, 65, 65];
+export const OFFCHAIN_OPTIMISTIC_THRESHOLD = [20, 20, 20];

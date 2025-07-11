@@ -1,10 +1,11 @@
 import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import {
-  calculateHybridApprovalMetrics,
+  calculateHybridApprovalProposalMetrics,
   calculateHybridOptimisticProposalMetrics,
   calculateHybridStandardTallies,
   getEndBlock,
   getEndTimestamp,
+  getProposalCreatedTime,
   getProposalCurrentQuorum,
   getStartBlock,
   getStartTimestamp,
@@ -270,8 +271,7 @@ export async function getProposalStatus(
 
       return "DEFEATED";
     }
-    case "OPTIMISTIC":
-    case "OFFCHAIN_OPTIMISTIC": {
+    case "OPTIMISTIC": {
       const {
         for: forVotes,
         against: againstVotes,
@@ -323,7 +323,17 @@ export async function getProposalStatus(
         approvalThreshold: 0,
       };
 
-      const metrics = calculateHybridApprovalMetrics(proposalForMetrics, false);
+      const metrics = calculateHybridApprovalProposalMetrics({
+        proposalResults: kind,
+        proposalData:
+          proposalData.kind as ParsedProposalData["HYBRID_APPROVAL"]["kind"],
+        quorum: Number(quorum!),
+        createdTime: getProposalCreatedTime({
+          proposalData,
+          latestBlock,
+          createdBlock: proposal.created_block,
+        }),
+      });
 
       // Check if weighted quorum is met
       if (!metrics.quorumMet) {
@@ -336,6 +346,7 @@ export async function getProposalStatus(
         return "SUCCEEDED";
       }
     }
+    case "OFFCHAIN_OPTIMISTIC":
     case "OFFCHAIN_OPTIMISTIC_TIERED":
     case "HYBRID_OPTIMISTIC_TIERED": {
       // Create a temporary proposal object for the metrics calculation

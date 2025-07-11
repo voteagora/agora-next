@@ -1,5 +1,5 @@
 "use client";
-
+import rehypeExternalLinks from "rehype-external-links";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import styles from "./markdown.module.scss";
 import Tenant from "@/lib/tenant/tenant";
@@ -26,7 +26,15 @@ const toRGBA = (hex: string, alpha: number) => {
     .join(",")}, ${alpha})`;
 };
 
-export default function Markdown({ content }: { content: string }) {
+export default function Markdown({
+  content,
+  className,
+  wrapperClassName,
+}: {
+  content: string;
+  className?: string;
+  wrapperClassName?: string;
+}) {
   const { ui } = Tenant.current();
   const primary = ui?.customization?.primary ?? defaults.primary;
   const secondary = ui?.customization?.secondary ?? defaults.secondary;
@@ -35,7 +43,11 @@ export default function Markdown({ content }: { content: string }) {
   const positive = ui?.customization?.positive ?? defaults.positive;
   return (
     <div
-      className={cn(styles.proposal_description_md, "max-w-full text-primary")}
+      className={cn(
+        styles.proposal_description_md,
+        "max-w-full text-primary",
+        wrapperClassName
+      )}
     >
       <MarkdownPreview
         source={content}
@@ -51,7 +63,9 @@ export default function Markdown({ content }: { content: string }) {
             fontFamily: defaults.font,
           } as React.CSSProperties
         }
-        className={`
+        className={
+          (cn(
+            `
           h-full
           py-3
           max-w-full
@@ -68,10 +82,14 @@ export default function Markdown({ content }: { content: string }) {
           prose-h4:text-secondary
           prose-h5:text-secondary
           prose-h6:text-secondary
-          `}
+          `
+          ),
+          className)
+        }
         wrapperElement={{
           "data-color-mode": "light",
         }}
+        rehypePlugins={[() => rehypeExternalLinks({ target: "_blank" })]}
         components={{
           h2: ({ node, ...props }) => (
             <h1 className="text-primary" {...props} />

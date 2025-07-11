@@ -1,7 +1,9 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import {
   ParsedProposalData,
-  calculateHybridApprovalMetrics,
+  ParsedProposalResults,
+  calculateHybridApprovalProposalMetrics,
+  getHybridEligibleVoters,
 } from "@/lib/proposalUtils";
 import { formatNumber } from "@/lib/tokenUtils";
 import Tenant from "@/lib/tenant/tenant";
@@ -11,6 +13,7 @@ import { useState } from "react";
 import { ExpandCollapseIcon } from "@/icons/ExpandCollapseIcon";
 import VotesGroupTable from "@/components/common/VotesGroupTable";
 import { HYBRID_VOTE_WEIGHTS } from "@/lib/constants";
+import Markdown from "@/components/shared/Markdown/Markdown";
 
 export default function HybridOptionsResultsPanel({
   proposal,
@@ -25,25 +28,16 @@ export default function HybridOptionsResultsPanel({
 }) {
   const proposalData =
     proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"];
-
-  const proposalResults = proposal.proposalResults as unknown as {
-    options: { option: string; votes: bigint }[];
-    APP: Record<string, bigint>;
-    USER: Record<string, bigint>;
-    CHAIN: Record<string, bigint>;
-    DELEGATES?: Record<string, bigint>;
-    criteria: "THRESHOLD" | "TOP_CHOICES";
-    criteriaValue: bigint;
-    for?: bigint;
-    against?: bigint;
-    abstain?: bigint;
-  };
+  const proposalResults =
+    proposal.proposalResults as ParsedProposalResults["HYBRID_APPROVAL"]["kind"];
 
   // Use consolidated function to calculate all metrics and approval data
-  const hybridMetrics = calculateHybridApprovalMetrics(
-    proposal,
-    true // Include option approval data
-  );
+  const hybridMetrics = calculateHybridApprovalProposalMetrics({
+    proposalResults,
+    proposalData,
+    quorum: Number(proposal.quorum),
+    createdTime: proposal.createdTime,
+  });
 
   // Extract data for threshold calculations
   const proposalSettings = proposalData.proposalSettings;
@@ -90,6 +84,7 @@ export default function HybridOptionsResultsPanel({
               option={option}
               proposalResults={proposalResults}
               weightedPercentage={option.weightedPercentage}
+              proposal={proposal}
             />
           );
         })}
@@ -109,6 +104,7 @@ function SingleOption({
   option,
   proposalResults,
   weightedPercentage,
+  proposal,
 }: {
   description: string;
   thresholdPosition: number;
@@ -116,40 +112,62 @@ function SingleOption({
   option: any;
   proposalResults: any;
   weightedPercentage: number;
+  proposal: Proposal;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const weightedDisplayPercentage = weightedPercentage * 100;
+  const weightedDisplayPercentage = weightedPercentage;
 
   // Calculate vote data for each category
-  const { token } = Tenant.current();
+  const eligibleVoters = getHybridEligibleVoters(Number(proposal.quorum));
+
   const getVoteData = (
     category: string,
     displayName: string,
-    weight: number
+    weight: number,
+    eligibleCount: number
   ) => {
-    const votes = proposalResults[category as keyof typeof proposalResults]?.[
-      option.option
-    ]
-      ? BigInt(
-          proposalResults[category as keyof typeof proposalResults][
-            option.option
-          ]
-        )
-      : 0n;
+    const rawVotes =
+      proposalResults[category as keyof typeof proposalResults]?.[
+        option.option
+      ] ?? 0;
+    const votes =
+      category === "DELEGATES" ? BigInt(rawVotes) : Number(rawVotes);
+
+    // Calculate the percentage of this group that voted for this option
+    const voteValue =
+      category === "DELEGATES" ? Number(votes) : (votes as number);
+    const groupPercentage =
+      eligibleCount > 0 ? (voteValue / eligibleCount) * 100 : 0;
+
     return {
       name: displayName,
-      votes: category === "DELEGATES" ? formatNumber(votes) : votes,
-      percentage: weightedDisplayPercentage,
+      votes: category === "DELEGATES" ? formatNumber(votes as bigint) : votes,
+      percentage: groupPercentage.toFixed(2),
       weight: (weight * 100).toFixed(2),
     };
   };
 
   const voteGroups = [
-    getVoteData("DELEGATES", "Delegates", HYBRID_VOTE_WEIGHTS.delegates),
-    getVoteData("CHAIN", "Chains", HYBRID_VOTE_WEIGHTS.chains),
-    getVoteData("APP", "Apps", HYBRID_VOTE_WEIGHTS.apps),
-    getVoteData("USER", "Users", HYBRID_VOTE_WEIGHTS.users),
+    getVoteData(
+      "DELEGATES",
+      "Delegates",
+      HYBRID_VOTE_WEIGHTS.delegates,
+      eligibleVoters.delegates
+    ),
+    getVoteData(
+      "CHAIN",
+      "Chains",
+      HYBRID_VOTE_WEIGHTS.chains,
+      eligibleVoters.chains
+    ),
+    getVoteData("APP", "Apps", HYBRID_VOTE_WEIGHTS.apps, eligibleVoters.apps),
+    getVoteData(
+      "USER",
+      "Users",
+      HYBRID_VOTE_WEIGHTS.users,
+      eligibleVoters.users
+    ),
   ];
 
   return (
@@ -162,13 +180,13 @@ function SingleOption({
         <div className="flex flex-col gap-1 p-3 cursor-pointer hover:bg-wash">
           <div className="flex justify-between font-semibold text-sm mb-1">
             <div className="whitespace-normal max-w-[12rem] text-primary text-xs font-bold flex items-center gap-2">
-              {description}
+              <Markdown content={description} className="py-0" />
             </div>
             <div className="text-primary flex items-center gap-1">
               <span className="ml-1 text-tertiary">
                 {weightedPercentage === 0
                   ? "0%"
-                  : (weightedPercentage * 100).toFixed(2) + "%"}
+                  : weightedPercentage.toFixed(2) + "%"}
               </span>
               <button className="w-4 h-4 flex items-center justify-center">
                 <ExpandCollapseIcon className="stroke-primary" />
