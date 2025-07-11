@@ -2,25 +2,29 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useAccount, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
 import { cancelProposalAttestation } from "@/lib/eas";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
 import { useState } from "react";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import { cancelOffchainProposal } from "@/app/api/offchain-proposals/actions";
+import { PLMConfig } from "../draft/types";
+import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
   proposal: Proposal;
 }
 
+const { ui } = Tenant.current();
+
 export const OffchainCancel = ({ proposal }: Props) => {
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient();
   const [isLoading, setIsLoading] = useState(false);
+  const plmConfig = ui.toggle("proposal-lifecycle")?.config as PLMConfig;
+  const offchainProposalCreator = plmConfig.offchainProposalCreator;
 
-  const { data: adminAddress } = useGovernorAdmin({ enabled: true });
   const canCancel =
-    adminAddress?.toString().toLowerCase() === address?.toLowerCase();
+    offchainProposalCreator?.toLowerCase() === address?.toLowerCase();
 
   const handleCancel = async () => {
     if (!proposal.id || !walletClient || !address || !chain) {
