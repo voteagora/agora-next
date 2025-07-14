@@ -365,6 +365,10 @@ export async function parseProposal(
       ? BigInt(5100)
       : null;
 
+  const offchainProposalId = proposalType.startsWith("OFFCHAIN")
+    ? proposal.proposal_id
+    : offchainProposal?.proposal_id;
+
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
@@ -422,7 +426,7 @@ export async function parseProposal(
     createdTransactionHash: proposal.created_transaction_hash,
     cancelledTransactionHash: proposal.cancelled_transaction_hash,
     executedTransactionHash: proposal.executed_transaction_hash,
-    offchainProposalId: offchainProposal?.proposal_id,
+    offchainProposalId,
   };
 }
 

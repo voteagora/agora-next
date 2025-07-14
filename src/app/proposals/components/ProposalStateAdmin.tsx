@@ -18,6 +18,7 @@ import { AgoraOptimismGovCancel } from "@/app/proposals/components/AgoraOptimism
 import { AgoraOptimismGovQueue } from "@/app/proposals/components/AgoraOptimismGovQueue";
 import { AgoraOptimismGovExecute } from "@/app/proposals/components/AgoraOptimismGovExecute";
 import { OffchainCancel } from "@/app/proposals/components/OffchainCancel";
+import { PLMConfig } from "../draft/types";
 
 interface Props {
   proposal: Proposal;
@@ -27,6 +28,9 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
   const { ui } = Tenant.current();
   const { isConnected, address } = useAccount();
   const { namespace } = Tenant.current();
+
+  const plmConfig = ui.toggle("proposal-lifecycle")?.config as PLMConfig;
+  const offchainProposalCreator = plmConfig?.offchainProposalCreator;
 
   const hasProposalLifecycle = Boolean(ui.toggle("proposal-execute")?.enabled);
 
@@ -48,7 +52,9 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
   const { data: adminAddress } = useGovernorAdmin({ enabled: isCancellable });
 
   const canCancel =
-    adminAddress?.toString().toLowerCase() === address?.toLowerCase();
+    adminAddress?.toString().toLowerCase() === address?.toLowerCase() ||
+    (proposal.proposalType?.startsWith("OFFCHAIN") &&
+      offchainProposalCreator?.toLowerCase() === address?.toLowerCase());
 
   const actionableStates: string[] = [
     PROPOSAL_STATUS.ACTIVE,
@@ -70,6 +76,9 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
     switch (proposal.status) {
       case PROPOSAL_STATUS.ACTIVE:
       case PROPOSAL_STATUS.PENDING:
+        if (proposal.proposalType?.startsWith("OFFCHAIN")) {
+          return "This proposal can still be cancelled by the creator.";
+        }
         return "This proposal can still be cancelled by the admin.";
       case PROPOSAL_STATUS.SUCCEEDED:
         if (namespace === TENANT_NAMESPACES.OPTIMISM) {
@@ -84,6 +93,9 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
           ) {
             // No banner for Optimistic proposals.
             return null;
+          }
+          if (proposal.proposalType?.startsWith("OFFCHAIN")) {
+            return "This proposal can still be cancelled by the creator.";
           }
           return "This proposal can still be cancelled by the admin.";
         }
