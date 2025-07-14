@@ -674,6 +674,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
                 notification_preferences
               FROM agora.delegate_statements s
               WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug
+              ORDER BY s.updated_at_ts DESC
               LIMIT 1
             ) sub
           ) AS statement ON TRUE;
