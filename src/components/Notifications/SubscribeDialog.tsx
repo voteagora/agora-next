@@ -99,6 +99,16 @@ const SubscribeDialog = ({
               "prompted"
             );
             try {
+              closeDialog();
+              toast.success(
+                <span>
+                  No problem! We won&apos;t bug you again. You can change your
+                  preferences in{" "}
+                  <Link className="underline" href={`/delegates/${address}`}>
+                    your profile
+                  </Link>
+                </span>
+              );
               await updateNotificationPreferencesForAddress(
                 address,
                 existingEmail || email,
@@ -109,20 +119,8 @@ const SubscribeDialog = ({
               );
               // refresh delegate data
               await refetch();
-              closeDialog();
             } catch (error) {
-              toast.error("Error updating notification preferences.");
               console.error(error);
-            } finally {
-              toast.success(
-                <span>
-                  No problem! We won&apos;t bug you again. You can change your
-                  preferences in{" "}
-                  <Link className="underline" href={`/delegates/${address}`}>
-                    your profile
-                  </Link>
-                </span>
-              );
             }
           }}
         >
