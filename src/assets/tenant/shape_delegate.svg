@@ -1,0 +1,6 @@
+<svg width="200" height="100" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="100" fill="#e3f2fd"/>
+  <text x="100" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#1976d2">
+    Shape Delegate
+  </text>
+</svg> 
