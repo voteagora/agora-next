@@ -724,37 +724,18 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     } else {
       throw new Error("Token contract is neither ERC20 nor ERC721?");
     }
-    var numOfDelegationsQuery;
 
-    const partialDelegationContract = contracts.alligator
-      ? contracts.alligator.address
-      : contracts.token.address;
+    let numOfDelegationsQuery;
 
-    if (contracts.alligator) {
-      numOfDelegationsQuery = prismaWeb3Client.$queryRawUnsafe<
-        { num_of_delegators: BigInt }[]
-      >(
-        `
-          SELECT
-            SUM(num_of_delegators) as num_of_delegators
-          FROM (
-            ${numOfAdvancedDelegationsQuery}
-            UNION ALL
-            ${numOfDirectDelegationsQuery}
-          ) t;
-          `,
-        address,
-        partialDelegationContract
-      );
-    } else if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
-      numOfDelegationsQuery = prismaWeb3Client.$queryRawUnsafe<
-        { num_of_delegators: BigInt }[]
-      >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);
+    if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
+      numOfDelegationsQuery = numOfAdvancedDelegationsQuery;
     } else {
-      numOfDelegationsQuery = prismaWeb3Client.$queryRawUnsafe<
-        { num_of_delegators: BigInt }[]
-      >(numOfDirectDelegationsQuery, address, partialDelegationContract);
+      numOfDelegationsQuery = numOfDirectDelegationsQuery;
     }
+
+    const numOfDelegationsResult = prismaWeb3Client.$queryRawUnsafe<
+      { num_of_delegators: BigInt }[]
+    >(numOfDirectDelegationsQuery, address, contracts.token.address);
 
     const totalVotingPower =
       BigInt(delegate?.voting_power || 0) +
@@ -767,8 +748,9 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     const usedNumOfDelegators =
       cachedNumOfDelegators < 1000n
         ? BigInt(
-            (await numOfDelegationsQuery)?.[0]?.num_of_delegators?.toString() ||
-              "0"
+            (
+              await numOfDelegationsResult
+            )?.[0]?.num_of_delegators?.toString() || "0"
           )
         : cachedNumOfDelegators;
 
