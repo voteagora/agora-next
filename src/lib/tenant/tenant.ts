@@ -16,6 +16,7 @@ export const BRAND_NAME_MAPPINGS: Record<string, string> = {
   pguild: "PGuild",
   boost: "Boost",
   demo: "Canopy",
+  shape: "Shape",
 };
 
 export default class Tenant {
