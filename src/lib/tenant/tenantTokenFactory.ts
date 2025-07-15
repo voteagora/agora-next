@@ -129,6 +129,15 @@ export default class TenantTokenFactory {
           decimals: 0,
           address: "0x0000000000000000000000000000000000000000",
         };
+      case TENANT_NAMESPACES.SHAPE:
+        return {
+          name: "Shape",
+          symbol: "SHAPE",
+          decimals: 18,
+          address: isProd
+            ? "0xD6e705292f293Df65c9FB9C28f67C3794fC66D5F"
+            : "0x27b0031c64f4231f0aff28e668553d73f48125f3",
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

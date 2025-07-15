@@ -33,6 +33,8 @@ export default class TenantSlugFactory {
         return "LINEA";
       case TENANT_NAMESPACES.WORLD:
         return "WORLD" as any;
+      case TENANT_NAMESPACES.SHAPE:
+        return "SHAPE" as any;
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

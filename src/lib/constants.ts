@@ -46,6 +46,7 @@ export const TENANT_NAMESPACES = {
   DEMO: "demo",
   LINEA: "linea",
   WORLD: "world",
+  SHAPE: "shape",
 } as const;
 
 export const proposalsFilterOptions = {

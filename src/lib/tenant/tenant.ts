@@ -17,6 +17,7 @@ export const BRAND_NAME_MAPPINGS: Record<string, string> = {
   boost: "Boost",
   demo: "Canopy",
   world: "World",
+  shape: "Shape",
 };
 
 export default class Tenant {
