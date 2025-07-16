@@ -2,7 +2,7 @@
 
 import { AbiCoder } from "ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { LoadingVote, NoStatementView } from "../CastVoteDialog/CastVoteDialog";
+import { LoadingVote } from "../CastVoteDialog/CastVoteDialog";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { CheckIcon } from "lucide-react";
 import { ParsedProposalData } from "@/lib/proposalUtils";
@@ -10,12 +10,15 @@ import useAdvancedVoting from "@/hooks/useAdvancedVoting";
 import { Button } from "@/components/ui/button";
 import { ApprovalCastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
 import { calculateVoteMetadata, getVpToDisplay } from "@/lib/voteUtils";
-import { useEnsName, useAccount } from "wagmi";
+import { useEnsName } from "wagmi";
 import { truncateAddress } from "@/app/lib/utils/text";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Vote } from "@/app/api/common/votes/vote";
 import { cn } from "@/lib/utils";
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
+import Markdown from "@/components/shared/Markdown/Markdown";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const abiCoder = new AbiCoder();
 
@@ -34,10 +37,10 @@ export function ReviewApprovalVoteDialog({
   votingPower: string | null;
   onClose: () => void;
 }) {
-  const { address } = useAccount();
+  const { selectedWalletAddress } = useSelectedWallet();
   const { data } = useEnsName({
     chainId: 1,
-    address: address as `0x${string}`,
+    address: selectedWalletAddress as `0x${string}`,
   });
 
   const submitVote = () => {
@@ -51,7 +54,7 @@ export function ReviewApprovalVoteDialog({
         <div className="flex flex-row justify-between">
           <div className="flex flex-col">
             <span className="text-xs">
-              {data || truncateAddress(address as string)}
+              {data || truncateAddress(selectedWalletAddress as string)}
             </span>
             <p className="text-xl font-extrabold">
               Casting vote for {selectedOptions.length} option
@@ -76,7 +79,7 @@ export function ReviewApprovalVoteDialog({
                 key={`option-${index}`}
               >
                 <p className="font-medium max-w-[calc(100%-24px)]">
-                  {option.description}
+                  <Markdown content={option.description} />
                 </p>
                 <div
                   className={
@@ -131,7 +134,6 @@ export function ApprovalCastVoteDialog({
   const maxChecked = proposalData.proposalSettings.maxApprovals;
   const abstainOptionId = proposalData.options.length; // Abstain option is always last
   const openDialog = useOpenDialog();
-  const { address } = useAccount();
 
   const handleOnChange = (optionId: number) => {
     if (optionId === abstainOptionId) {
@@ -311,15 +313,17 @@ export function ApprovalCastVoteDialog({
                   abstain={abstain}
                 />
               ))}
-              <CheckCard
-                key={proposalData.options.length}
-                title={"Abstain: vote for no options"}
-                description={""}
-                checked={!!abstain}
-                checkedOptions={selectedOptions.length}
-                onClick={() => handleOnChange(abstainOptionId)}
-                abstain={abstain}
-              />
+              {Tenant.current().namespace !== TENANT_NAMESPACES.OPTIMISM && (
+                <CheckCard
+                  key={proposalData.options.length}
+                  title={"Abstain: vote for no options"}
+                  description={""}
+                  checked={!!abstain}
+                  checkedOptions={selectedOptions.length}
+                  onClick={() => handleOnChange(abstainOptionId)}
+                  abstain={abstain}
+                />
+              )}
             </div>
             <CastVoteWithReason
               //   onVoteClick={write}
@@ -424,8 +428,11 @@ function CheckCard({
           "transition-all max-w-[calc(100%-24px)]",
           checked ? "text-primary font-medium" : "text-secondary font-normal"
         )}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
       >
-        {title}
+        <Markdown content={title} />
       </p>
       <div className="text-xs font-medium text-secondary">{description}</div>
 

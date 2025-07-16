@@ -236,9 +236,11 @@ async function getSnapshotVotesForDelegateForAddress({
 async function getVotersWhoHaveNotVotedForProposal({
   proposalId,
   pagination = { offset: 0, limit: 20 },
+  offchainProposalId,
 }: {
   proposalId: string;
   pagination?: PaginationParams;
+  offchainProposalId?: string;
 }) {
   return withMetrics("getVotersWhoHaveNotVotedForProposal", async () => {
     const { namespace, contracts, slug } = Tenant.current();
@@ -251,6 +253,8 @@ async function getVotersWhoHaveNotVotedForProposal({
       eventsViewName = "vote_cast_with_params_events";
     }
 
+    const includeCitizens = namespace === TENANT_NAMESPACES.OPTIMISM;
+
     const queryFunction = (skip: number, take: number) => {
       const notVotedQuery = `
               with has_voted as (
@@ -259,14 +263,46 @@ async function getVotersWhoHaveNotVotedForProposal({
                   SELECT voter FROM ${namespace}.${eventsViewName} WHERE proposal_id = $1 and contract = $3
                   UNION ALL
                   SELECT voter FROM "snapshot".votes WHERE proposal_id = $1 and dao_slug = '${slug}'
+                  ${
+                    includeCitizens
+                      ? `
+                  UNION ALL
+                  SELECT LOWER("voterAddress") as voter FROM atlas."OffChainVote" WHERE "proposalId" = ${offchainProposalId ? "$6" : "$1"}`
+                      : ""
+                  }
                 ),
                 relevant_delegates as (
-                  SELECT * FROM ${namespace}.delegates where contract = $2
+                  SELECT delegate, voting_power, NULL::text as citizen_type, NULL::text as voter_metadata_text FROM ${namespace}.delegates where contract = $2
+                  ${
+                    includeCitizens
+                      ? `
+                    UNION
+                    SELECT 
+                      LOWER(c."address") as delegate, 
+                      0 as voting_power, 
+                      c."type"::text as citizen_type,
+                      CASE 
+                        WHEN c."organizationId" IS NOT NULL THEN 
+                          JSON_BUILD_OBJECT('name', o."name", 'image', o."avatarUrl", 'type', 'organization')::text
+                        WHEN c."projectId" IS NOT NULL THEN 
+                          JSON_BUILD_OBJECT('name', p."name", 'image', p."thumbnailUrl", 'type', 'project')::text
+                        WHEN c."userId" IS NOT NULL THEN 
+                          JSON_BUILD_OBJECT('name', u."name", 'image', u."imageUrl", 'type', 'user')::text
+                        ELSE NULL
+                      END as voter_metadata_text
+                    FROM atlas."Citizen" c
+                    LEFT JOIN atlas."Project" p ON p.id = c."projectId"
+                    LEFT JOIN atlas."Organization" o ON o.id = c."organizationId"
+                    LEFT JOIN atlas."User" u ON u.id = c."userId"
+                    LEFT JOIN ${namespace}.delegates d ON LOWER(c."address") = LOWER(d.delegate) AND d.contract = $2
+                    WHERE d.delegate IS NULL`
+                      : ""
+                  }
                 ),
                 delegates_who_havent_votes as (
-                  SELECT * FROM relevant_delegates d left join has_voted v on d.delegate = v.voter where v.voter is null
+                  SELECT d.delegate, d.voting_power, d.citizen_type, d.voter_metadata_text FROM relevant_delegates d left join has_voted v on d.delegate = v.voter where v.voter is null
                 )
-                select del.*,
+                select del.delegate, del.voting_power, del.citizen_type, del.voter_metadata_text::json as "voterMetadata",
                       ds.twitter,
                     ds.discord,
                     ds.warpcast
@@ -276,13 +312,21 @@ async function getVotersWhoHaveNotVotedForProposal({
                 ORDER BY del.voting_power DESC
                 OFFSET $4 LIMIT $5;`;
 
-      return prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
-        notVotedQuery,
+      const params = [
         proposalId,
         contracts.token.address.toLowerCase(),
         contracts.governor.address.toLowerCase(),
         skip,
-        take
+        take,
+      ];
+
+      if (includeCitizens && offchainProposalId) {
+        params.push(offchainProposalId);
+      }
+
+      return prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
+        notVotedQuery,
+        ...params
       );
     };
 
@@ -339,10 +383,12 @@ async function getVotesForProposal({
   proposalId,
   pagination = { offset: 0, limit: 20 },
   sort = "weight",
+  offchainProposalId,
 }: {
   proposalId: string;
   pagination?: PaginationParams;
   sort?: VotesSort;
+  offchainProposalId?: string;
 }): Promise<PaginatedResult<Vote[]>> {
   return withMetrics(
     "getVotesForProposal",
@@ -357,7 +403,41 @@ async function getVotesForProposal({
         eventsViewName = "vote_cast_with_params_events";
       }
 
+      const includeCitizens = namespace === TENANT_NAMESPACES.OPTIMISM;
       const queryFunction = (skip: number, take: number) => {
+        let citizenQuery = "";
+
+        if (includeCitizens) {
+          citizenQuery = `
+            UNION ALL
+            SELECT
+              ocv."transactionHash" as transaction_hash,
+              ocv."proposalId" as proposal_id,
+              ocv."voterAddress" as voter,
+              (ocv."vote"::json->>0) as support,
+              1::numeric as weight,
+              NULL as reason,
+              NULL as params,
+              NULL as block_number,
+              ocv."citizenCategory"::text as citizen_type,
+              CASE 
+                WHEN c."organizationId" IS NOT NULL THEN 
+                  JSON_BUILD_OBJECT('name', o."name", 'image', o."avatarUrl", 'type', 'chain')
+                WHEN c."projectId" IS NOT NULL THEN 
+                  JSON_BUILD_OBJECT('name', p."name", 'image', p."thumbnailUrl", 'type', 'app')
+                WHEN c."userId" IS NOT NULL THEN 
+                  JSON_BUILD_OBJECT('name', u."name", 'image', u."imageUrl", 'type', 'user')
+                ELSE NULL
+              END as voter_metadata
+            FROM atlas."OffChainVote" ocv
+            LEFT JOIN atlas."Citizen" c ON ocv."citizenId" = c.id
+            LEFT JOIN atlas."Project" p ON p.id = c."projectId"
+            LEFT JOIN atlas."Organization" o ON o.id = c."organizationId"
+            LEFT JOIN atlas."User" u ON u.id = c."userId"
+            WHERE ocv."proposalId" = ${offchainProposalId ? "$5" : "$1"}
+          `;
+        }
+
         const query = `
           SELECT
             transaction_hash,
@@ -368,6 +448,8 @@ async function getVotesForProposal({
             reason,
             block_number,
             params,
+            citizen_type,
+            voter_metadata,
             description,
             proposal_data,
             proposal_type
@@ -381,7 +463,9 @@ async function getVotesForProposal({
               SUM(weight) as weight,
               STRING_AGG(distinct reason, '\n --------- \n') as reason,
               MAX(block_number) as block_number,
-              params
+              params,
+              citizen_type,
+              MAX(voter_metadata::text)::json as voter_metadata
             FROM (
               SELECT
                 transaction_hash,
@@ -391,7 +475,9 @@ async function getVotesForProposal({
                 weight::numeric,
                 reason,
                 params,
-                block_number
+                block_number,
+                NULL::text as citizen_type,
+                NULL::json as voter_metadata
               FROM ${namespace}.vote_cast_events
               WHERE proposal_id = $1 AND contract = $2
               UNION ALL
@@ -403,30 +489,41 @@ async function getVotesForProposal({
                 weight::numeric,
                 reason,
                 params,
-                block_number
+                block_number,
+                NULL::text as citizen_type,
+                NULL::json as voter_metadata
               FROM ${namespace}.${eventsViewName}
               WHERE proposal_id = $1 AND contract = $2
+              ${includeCitizens ? citizenQuery : ""}
             ) t
-            GROUP BY 2,3,4,8
+            GROUP BY 2,3,4,8,9
             ) av
             LEFT JOIN LATERAL (
               SELECT
                 proposals.description,
                 proposals.proposal_data,
-                proposals.proposal_type::config.proposal_type AS proposal_type
+                proposals.proposal_type AS proposal_type
               FROM ${namespace}.proposals_v2 proposals
               WHERE proposals.proposal_id = $1 AND proposals.contract = $2) p ON TRUE
           ) q
-          ORDER BY ${sort} DESC
+          ORDER BY citizen_type IS NOT NULL DESC, ${sort} DESC
           OFFSET $3
           LIMIT $4;`;
 
-        return prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
-          query,
+        const params = [
           proposalId,
           contracts.governor.address.toLowerCase(),
           skip,
-          take
+          take,
+        ];
+
+        if (includeCitizens && offchainProposalId) {
+          params.push(offchainProposalId);
+        }
+
+        return prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
+          query,
+          ...params
         );
       };
 

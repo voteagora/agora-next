@@ -2,8 +2,14 @@ import { TokenAmountDisplay } from "@/lib/utils";
 import { formatUnits } from "ethers";
 
 function formatNumber(amount, decimals) {
-  const standardUnitAmount = Number(formatUnits(amount, decimals));
-  return standardUnitAmount;
+  if (amount == null) return 0;
+  try {
+    const standardUnitAmount = Number(formatUnits(amount, decimals));
+    return standardUnitAmount;
+  } catch (error) {
+    console.error("Error formatting number:", error);
+    return 0;
+  }
 }
 
 export default function OPStandardProposalStatus({ proposal }) {

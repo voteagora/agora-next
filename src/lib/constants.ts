@@ -74,18 +74,28 @@ export const delegatesFilterOptions = {
     sort: "most_delegators",
     value: "Most delegators",
   },
+  mostRecentDelegation: {
+    sort: "most_recent_delegation",
+    value: "Most recently delegated",
+  },
+  oldestDelegation: {
+    sort: "oldest_delegation",
+    value: "Oldest delegation",
+  },
+  latestVotingBlock: {
+    sort: "latest_voting_block",
+    value: "Latest voting block",
+  },
+  vpChange7d: {
+    sort: "vp_change_7d",
+    value: "7d VP Change Increase",
+  },
+  vpChange7dDesc: {
+    sort: "vp_change_7d_desc",
+    value: "7d VP Change Decrease",
+  },
 };
 
-export const citizensFilterOptions = {
-  mostVotingPower: {
-    value: "Most voting power",
-    sort: "most_voting_power",
-  },
-  shuffle: {
-    sort: "shuffle",
-    value: "Shuffle",
-  },
-};
 export const delegatesVotesSortOptions = {
   newest: {
     sortOrder: "desc",
@@ -147,3 +157,18 @@ export const HAS_STATEMENT_FILTER_PARAM = "hasStatement";
 export const MY_DELEGATES_FILTER_PARAM = "delegatorFilter";
 export const ISSUES_FILTER_PARAM = "issueFilter";
 export const STAKEHOLDERS_FILTER_PARAM = "stakeholderFilter";
+
+export const OFFCHAIN_THRESHOLDS = { APP: 100, USER: 1000, CHAIN: 15 };
+
+export const HYBRID_VOTE_WEIGHTS = {
+  delegates: 0.5,
+  apps: 1 / 6,
+  users: 1 / 6,
+  chains: 1 / 6,
+} as const;
+
+export const HYBRID_PROPOSAL_QUORUM = 0.3;
+
+export const HYBRID_OPTIMISTIC_TIERED_THRESHOLD = [55, 45, 35];
+export const OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD = [65, 65, 65];
+export const OFFCHAIN_OPTIMISTIC_THRESHOLD = [20, 20, 20];

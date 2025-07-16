@@ -3,13 +3,10 @@ import {
   ProposalStatus,
   ParsedProposalResults,
 } from "@/lib/proposalUtils";
-import {
-  OptimismProposals,
-  ProposalType,
-  lineaProposals,
-} from "@prisma/client";
+import { OptimismProposals, lineaProposals } from "@prisma/client";
 import { BigNumberish } from "ethers";
 import { Decimal } from "@prisma/client/runtime";
+import { ProposalType } from "@/lib/types";
 
 export type ProposalPayloadFromDAONode = {
   id: string;
@@ -51,6 +48,7 @@ export type ProposalPayloadFromDAONode = {
   };
 
   totals: Record<string, string>;
+  proposal_type: number;
   voting_module_name: string;
 
   // this is a string representing bytes, without 0x prefix.
@@ -131,6 +129,7 @@ export type Proposal = {
   markdowntitle: string;
   description: string | null;
   quorum: bigint | null;
+  votableSupply?: bigint | null; // Added votableSupply property to match Python implementation
   approvalThreshold: bigint | null;
   proposalData: ParsedProposalData[ProposalType]["kind"];
   unformattedProposalData: `0x${string}` | null | any;
@@ -140,4 +139,5 @@ export type Proposal = {
   createdTransactionHash: string | null;
   cancelledTransactionHash: string | null;
   executedTransactionHash: string | null;
+  offchainProposalId?: string;
 };

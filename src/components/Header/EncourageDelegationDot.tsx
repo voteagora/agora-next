@@ -3,33 +3,22 @@ import { useEffect, useMemo } from "react";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { useAccount } from "wagmi";
+import { ZERO_ADDRESS } from "@/lib/constants";
 
 const EncourageDelegationDot = ({ className }: { className?: string }) => {
   const { tokenBalance, delegate, delegatees } = useProfileData();
   const { address } = useAccount();
   const filteredDelegations = useMemo(() => {
-    return delegatees?.filter(
-      (delegation) =>
-        delegation.to !== "0x0000000000000000000000000000000000000000"
-    );
+    return delegatees?.filter((delegation) => delegation.to !== ZERO_ADDRESS);
   }, [delegatees]);
 
   const hasDelegated =
     Array.isArray(filteredDelegations) && filteredDelegations.length > 0;
-  const canEncourageDelegationBecauseOfVP =
-    tokenBalance !== undefined &&
-    tokenBalance !== BigInt(0) &&
-    delegate?.votingPower?.total === "0";
-
-  const canEncourageDelegationBecauseOfNoDelegation =
+  const shouldShowDot =
     tokenBalance !== undefined &&
     tokenBalance !== BigInt(0) &&
     filteredDelegations !== undefined &&
     !hasDelegated;
-
-  const shouldShowDot =
-    canEncourageDelegationBecauseOfVP ||
-    canEncourageDelegationBecauseOfNoDelegation;
 
   useEffect(() => {
     if (shouldShowDot && address) {

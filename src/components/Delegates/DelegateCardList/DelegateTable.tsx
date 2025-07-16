@@ -21,46 +21,70 @@ import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
-  fetchDelegates: (
-    pagination: PaginationParams,
-    seed?: number
-  ) => Promise<PaginatedResult<DelegateChunk[]>>;
+  fetchDelegates: (args: {
+    pagination?: PaginationParams;
+    seed?: number;
+    showParticipation?: boolean;
+  }) => Promise<PaginatedResult<DelegateChunk[]>>;
 }
+
+const batchSize = 50;
 
 export default function DelegateTable({
   initialDelegates,
   fetchDelegates,
 }: Props) {
   const [meta, setMeta] = useState(initialDelegates.meta);
-  const [delegates, setDelegates] = useState(initialDelegates.data);
-
+  const [delegates, setDelegates] = useState(
+    initialDelegates.data.slice(0, batchSize)
+  );
+  const [dataFromServer, setDataFromServer] = useState<DelegateChunk[]>(
+    initialDelegates.data
+  );
   const fetching = useRef(false);
 
   const { ui } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
+  const showParticipation = ui.toggle("show-participation")?.enabled || false;
   const { isAdvancedUser } = useIsAdvancedUser();
   const { advancedDelegators } = useConnectedDelegate();
 
-  const { setIsDelegatesFiltering } = useAgoraContext();
+  const { setIsDelegatesFiltering, isDelegatesFiltering } = useAgoraContext();
 
   useEffect(() => {
-    setIsDelegatesFiltering(false);
-    setDelegates(initialDelegates.data);
+    setDelegates(initialDelegates.data.slice(0, batchSize));
     setMeta(initialDelegates.meta);
+    setDataFromServer(initialDelegates.data);
+    setIsDelegatesFiltering(false);
   }, [initialDelegates, setIsDelegatesFiltering]);
 
   const loadMore = async () => {
-    if (!fetching.current && meta.has_next) {
+    if (!fetching.current && meta.has_next && !isDelegatesFiltering) {
       try {
         fetching.current = true;
-        const data = await fetchDelegates(
-          { offset: meta.next_offset, limit: meta.total_returned },
-          initialDelegates.seed || Math.random()
-        );
-        setDelegates(delegates.concat(data.data));
-        setMeta(data.meta);
+
+        // Check if we have more initial data to show
+        const remainingInitialData = dataFromServer.slice(delegates.length);
+
+        if (remainingInitialData.length > 0) {
+          const nextBatch = remainingInitialData.slice(0, batchSize);
+          setDelegates((prev) => [...prev, ...nextBatch]);
+        } else {
+          // No more initial data, fetch from API
+          const data = await fetchDelegates({
+            pagination: {
+              offset: meta.next_offset,
+              limit: meta.total_returned,
+            },
+            seed: initialDelegates.seed || Math.random(),
+            showParticipation,
+          });
+          setDelegates((prev) => [...prev, ...data.data.slice(0, batchSize)]);
+          setDataFromServer((prev) => [...prev, ...data.data]);
+          setMeta(data.meta);
+        }
       } catch (error) {
         console.error("Error loading more delegates:", error);
       } finally {
@@ -81,11 +105,14 @@ export default function DelegateTable({
               <TableHead className="h-10 text-secondary">
                 Voting power
               </TableHead>
+              <TableHead className="h-10 text-secondary">7d Change</TableHead>
+              {showParticipation && (
+                <TableHead className="h-10 text-secondary">
+                  Participation
+                </TableHead>
+              )}
               <TableHead className="h-10 text-secondary">
-                Participation
-              </TableHead>
-              <TableHead className="h-10 text-secondary">
-                Delegated from
+                # of Delegators
               </TableHead>
               <TableHead className="h-10 text-secondary">Info</TableHead>
               <TableHead className="h-10 text-secondary"></TableHead>
@@ -108,7 +135,6 @@ export default function DelegateTable({
             // References styles of TableBody
             className="[&_tr:last-child]:border-0"
             element="tbody"
-            useWindow={false}
           >
             {delegates.length === 0 ? (
               <td
@@ -118,14 +144,18 @@ export default function DelegateTable({
                 None found
               </td>
             ) : (
-              delegates.map((delegate) => (
+              delegates.map((delegate, index) => (
                 <DelegateTableRow
-                  key={delegate.address}
+                  key={delegate.address + index}
                   delegate={
-                    delegate as DelegateChunk & { numOfDelegators: bigint }
+                    delegate as DelegateChunk & {
+                      numOfDelegators: bigint;
+                      participation: number;
+                    }
                   }
                   isAdvancedUser={isAdvancedUser}
                   delegators={advancedDelegators}
+                  showParticipation={showParticipation}
                 />
               ))
             )}

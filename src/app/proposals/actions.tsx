@@ -21,18 +21,26 @@ export async function fetchProposalsCount() {
 
 export const fetchVotersWhoHaveNotVotedForProposal = (
   proposalId: string,
-  pagination?: PaginationParams
-) => apiFetchVotersWhoHaveNotVotedForProposal({ proposalId, pagination });
+  pagination?: PaginationParams,
+  offchainProposalId?: string
+) =>
+  apiFetchVotersWhoHaveNotVotedForProposal({
+    proposalId,
+    pagination,
+    offchainProposalId,
+  });
 
 export const fetchProposalVotes = (
   proposalId: string,
   pagination?: PaginationParams,
-  sort?: VotesSort
+  sort?: VotesSort,
+  offchainProposalId?: string
 ) =>
   apiFetchVotesForProposal({
     proposalId,
     pagination,
     sort,
+    offchainProposalId,
   });
 
 export const fetchSnapshotProposalVotes = (

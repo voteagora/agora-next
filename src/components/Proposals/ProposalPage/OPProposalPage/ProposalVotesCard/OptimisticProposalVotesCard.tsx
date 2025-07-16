@@ -5,7 +5,9 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
-import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
+import CastVoteInput, {
+  OffchainCastVoteInput,
+} from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import ProposalVotesFilter from "./ProposalVotesFilter";
@@ -29,6 +31,7 @@ const OptimisticProposalVotesCard = ({
   const { token } = Tenant.current();
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [showVoters, setShowVoters] = useState(true);
+  const isOffchain = proposal.proposalType?.startsWith("OFFCHAIN");
 
   const handleClick = () => {
     setIsClicked(!isClicked);
@@ -101,10 +104,14 @@ const OptimisticProposalVotesCard = ({
           <ProposalNonVoterList proposal={proposal} />
         )}
         {/* Show the input for the user to vote on a proposal if allowed */}
-        <CastVoteInput proposal={proposal} isOptimistic />
+        {isOffchain ? (
+          <OffchainCastVoteInput />
+        ) : (
+          <CastVoteInput proposal={proposal} isOptimistic />
+        )}
         <p className="mx-4 text-xs text-secondary">
-          If you agree with this proposal, you don’t need to vote. Only vote
-          against if you oppose this proposal.
+          If you agree with this proposal, you don&apos;t need to vote. Only
+          vote against if you oppose this proposal.
         </p>
       </VStack>
     </div>

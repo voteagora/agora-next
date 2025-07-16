@@ -247,3 +247,18 @@ input[type="number"] {
   src: url("/fonts/TransSansPremium/TransSansPremium_Bold.otf")
     format("opentype");
 }
+
+@media (max-width: 767px) {
+  .proposal-description {
+    padding-bottom: 90px !important;
+  }
+}
+
+.vote-reason {
+  div {
+    display: inline;
+  }
+  p {
+    display: inline;
+  }
+}

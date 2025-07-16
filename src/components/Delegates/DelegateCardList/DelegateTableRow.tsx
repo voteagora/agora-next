@@ -4,7 +4,6 @@ import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { formatNumber } from "@/lib/tokenUtils";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { useVoterStats } from "@/hooks/useVoterStats";
 import { useRouter } from "next/navigation";
 import { DelegationSelector } from "../DelegateCard/DelegationSelector";
 import { DelegateSocialLinks } from "../DelegateCard/DelegateSocialLinks";
@@ -13,27 +12,22 @@ export default function DelegateTableRow({
   delegate,
   isAdvancedUser,
   delegators,
+  showParticipation,
 }: {
-  delegate: DelegateChunk & { numOfDelegators: bigint };
+  delegate: DelegateChunk & {
+    numOfDelegators: bigint;
+    vpChange7d?: string;
+    participation: number;
+  };
   isAdvancedUser: boolean;
   delegators: string[] | null;
+  showParticipation: boolean;
 }) {
   const router = useRouter();
-  const { data: voterStats, isPending: isVoterStatsPending } = useVoterStats({
-    address: delegate.address as `0x${string}`,
-  });
+
   const twitter = delegate?.statement?.twitter;
   const discord = delegate?.statement?.discord;
   const warpcast = delegate?.statement?.warpcast;
-
-  const numProposals = voterStats?.total_proposals || 0;
-  const participation = Math.round(
-    Math.round(
-      ((voterStats?.last_10_props || 0) / Math.min(10, numProposals)) *
-        100 *
-        100
-    ) / 100
-  );
 
   return (
     <TableRow
@@ -43,17 +37,35 @@ export default function DelegateTableRow({
       }}
     >
       <TableCell>
-        <DelegateProfileImage
-          endorsed={delegate.statement?.endorsed}
-          address={delegate.address}
-          votingPower={delegate.votingPower.total}
-          citizen={delegate.citizen}
-        />
+        <div className="w-64">
+          <DelegateProfileImage
+            truncateText
+            endorsed={delegate.statement?.endorsed}
+            address={delegate.address}
+            votingPower={delegate.votingPower.total}
+          />
+        </div>
       </TableCell>
       <TableCell>{formatNumber(delegate.votingPower.total)}</TableCell>
       <TableCell>
-        {!isVoterStatsPending && numProposals > 0 && `${participation}%`}
+        {delegate.vpChange7d ? (
+          <span
+            className={
+              Number(delegate.vpChange7d) >= 0
+                ? "text-green-500"
+                : "text-red-500"
+            }
+          >
+            {Number(delegate.vpChange7d) >= 0 ? "+" : ""}
+            {formatNumber(delegate.vpChange7d)}
+          </span>
+        ) : (
+          "0"
+        )}
       </TableCell>
+      {showParticipation && (
+        <TableCell>{`${Math.round(delegate.participation)}%`}</TableCell>
+      )}
       {/* @ts-ignore */}
       <TableCell>
         {delegate.numOfDelegators?.toString() || 0} addresses

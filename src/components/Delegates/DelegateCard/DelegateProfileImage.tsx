@@ -20,22 +20,29 @@ import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
 import ENSName from "@/components/shared/ENSName";
 import { CollapsibleText } from "@/components/shared/CollapsibleText";
 import { SCWProfileImage } from "./SCWProfileImage";
+import { cn } from "@/lib/utils";
 
 interface Props {
   address: string;
-  citizen?: boolean;
   copyable?: boolean;
   endorsed: boolean;
   votingPower: string;
   scwAddress?: string;
+  truncateText?: boolean;
+  showVotingPower?: boolean;
+  participation?: number;
+  showParticipation?: boolean;
 }
 
 export function DelegateProfileImage({
   address,
-  citizen,
   copyable = false,
   endorsed,
   votingPower,
+  truncateText = false,
+  showVotingPower = false,
+  participation,
+  showParticipation = false,
 }: Props) {
   const { ui } = Tenant.current();
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
@@ -84,27 +91,22 @@ export function DelegateProfileImage({
   return (
     <div className="flex flex-row gap-4 items-center">
       <div className="relative aspect-square">
-        {citizen && (
-          <Image
-            className="absolute bottom-[-5px] right-[-7px] z-10"
-            src={icons.badge}
-            alt="citizen badge"
-          />
-        )}
         <ENSAvatar className="rounded-full w-[44px] h-[44px]" ensName={data} />
       </div>
 
       <div className="flex flex-col">
-        <div className="text-primary flex flex-row gap-1 font-semibold hover:opacity-90">
-          {copyable ? (
-            <CopyableHumanAddress address={address} />
-          ) : (
-            <ENSName address={address} />
-          )}
+        <div className="text-primary flex flex-row gap-1 font-medium">
+          <div className={cn(truncateText && "truncate")}>
+            {copyable ? (
+              <CopyableHumanAddress address={address} />
+            ) : (
+              <ENSName address={address} />
+            )}
+          </div>
           {endorsed && hasEndorsedFilter && endorsedToggle && (
             <TooltipProvider delayDuration={0}>
               <Tooltip>
-                <TooltipTrigger>
+                <TooltipTrigger className="shrink-0">
                   <Image
                     src={icons.endorsed}
                     alt={(endorsedToggle.config as UIEndorsedConfig).tooltip}
@@ -121,6 +123,23 @@ export function DelegateProfileImage({
             </TooltipProvider>
           )}
         </div>
+        {(showVotingPower || showParticipation) && (
+          <div className="flex flex-row gap-2 text-xs text-secondary font-medium items-center">
+            {showVotingPower && (
+              <span>
+                {formattedNumber} {Tenant.current().token.symbol}
+              </span>
+            )}
+            {showVotingPower &&
+              showParticipation &&
+              participation !== undefined && (
+                <div className="h-3 border-r border-tertiary"></div>
+              )}
+            {showParticipation && participation !== undefined && (
+              <span>{Math.round(participation)}% Participation</span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -128,7 +147,6 @@ export function DelegateProfileImage({
 
 export function DelegateProfileImageWithMetadata({
   address,
-  citizen,
   endorsed,
   votingPower,
   description,
@@ -136,7 +154,10 @@ export function DelegateProfileImageWithMetadata({
   followersCount,
   followingCount,
   scwAddress,
-}: Props & {
+  showVotingPower = false,
+  participation,
+  showParticipation = false,
+}: Omit<Props, "truncateText"> & {
   description?: string;
   location?: string;
   followersCount?: string;
@@ -190,13 +211,6 @@ export function DelegateProfileImageWithMetadata({
     <div className="flex flex-col gap-2">
       <div className="flex flex-row gap-4 items-center">
         <div className="relative aspect-square">
-          {citizen && (
-            <Image
-              className="absolute bottom-[-5px] right-[-7px] z-10"
-              src={icons.badge}
-              alt="citizen badge"
-            />
-          )}
           <ENSAvatar
             className="rounded-full w-[48px] h-[48px]"
             ensName={data}
@@ -246,6 +260,18 @@ export function DelegateProfileImageWithMetadata({
             <div className="text-xs text-primary font-medium">
               <span className="font-bold">{followingCount}</span> following ·{" "}
               <span className="font-bold">{followersCount}</span> followers
+            </div>
+          )}
+          {(showVotingPower || showParticipation) && (
+            <div className="flex flex-row gap-3 text-xs text-secondary">
+              {showVotingPower && (
+                <span>
+                  {formattedNumber} {Tenant.current().token.symbol}
+                </span>
+              )}
+              {showParticipation && participation !== undefined && (
+                <span>{Math.round(participation)}% Participation</span>
+              )}
             </div>
           )}
         </div>

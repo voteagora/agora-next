@@ -1,7 +1,9 @@
 import Link from "next/link";
 import ProposalStatus from "../ProposalStatus/ProposalStatus";
 import OPStandardProposalStatus from "./OPStandardProposalStatus";
-import OPApprovalProposalStatus from "./OPApprovalProposalStatus";
+import OPApprovalProposalStatus, {
+  OffchainApprovalProposalStatus,
+} from "./OPApprovalProposalStatus";
 import ProposalTimeStatus from "./ProposalTimeStatus";
 import { cn, getProposalTypeText } from "@/lib/utils";
 import OPOptimisticProposalStatus from "./OPOptimisticProposalStatus";
@@ -12,6 +14,8 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { type Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import ENSName from "@/components/shared/ENSName";
+import HybridStandardProposalStatus from "./HybridStandardProposalStatus";
+import { HybridOptimisticProposalStatus } from "./HybridOptimisticProposalStatus";
 
 export default function Proposal({
   proposal,
@@ -111,8 +115,23 @@ export default function Proposal({
                   votableSupply={votableSupply}
                 />
               )}
-            {proposal.proposalType === "APPROVAL" && proposal.proposalData && (
-              <OPApprovalProposalStatus proposal={proposal} />
+            {(proposal.proposalType === "APPROVAL" ||
+              proposal.proposalType === "HYBRID_APPROVAL") &&
+              proposal.proposalData && (
+                <OPApprovalProposalStatus proposal={proposal} />
+              )}
+            {proposal.proposalType === "OFFCHAIN_APPROVAL" &&
+              proposal.proposalData && (
+                <OffchainApprovalProposalStatus proposal={proposal} />
+              )}
+            {(proposal.proposalType === "HYBRID_STANDARD" ||
+              proposal.proposalType === "OFFCHAIN_STANDARD") &&
+              proposal.proposalData && (
+                <HybridStandardProposalStatus proposal={proposal} />
+              )}
+            {(proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED" ||
+              proposal.proposalType === "OFFCHAIN_OPTIMISTIC") && (
+              <HybridOptimisticProposalStatus proposal={proposal} />
             )}
           </div>
         </div>

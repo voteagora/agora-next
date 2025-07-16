@@ -12,6 +12,7 @@ import {
   DraftProposal,
   PLMConfig,
   ProposalGatingType,
+  ProposalScope,
 } from "@/app/proposals/draft/types";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalType } from "@/app/proposals/draft/types";
@@ -109,6 +110,8 @@ const DraftPreview = ({
           </p>
         );
       case ProposalType.APPROVAL:
+        const isOnchainOnly =
+          proposal.proposal_scope === ProposalScope.ONCHAIN_ONLY;
         return (
           <p className="text-secondary mt-2">
             This is an <PreText text="approval" /> proposal. The maximum number
@@ -116,10 +119,25 @@ const DraftPreview = ({
             proposal is <PreText text={proposal.budget.toString()} />. The
             number of options each voter may select is{" "}
             <PreText text={proposal.max_options.toString()} />.{" "}
-            {proposal.criteria === "Threshold" &&
-              `All options with more than ${proposal.threshold} votes will be considered approved.`}
-            {proposal.criteria === "Top choices" &&
-              `The top ${proposal.top_choices} choices will be considered approved.`}
+            {proposal.criteria === "Threshold" && (
+              <>
+                All options with more than{" "}
+                <PreText
+                  text={
+                    isOnchainOnly
+                      ? proposal.threshold.toString()
+                      : `${(proposal.threshold / 100).toString()}%`
+                  }
+                />{" "}
+                {isOnchainOnly ? "votes" : ""} will be considered approved
+              </>
+            )}
+            {proposal.criteria === "Top choices" && (
+              <>
+                The top <PreText text={proposal.top_choices.toString()} />{" "}
+                choices will be considered approved
+              </>
+            )}
           </p>
         );
 
@@ -212,15 +230,16 @@ const DraftPreview = ({
         </h2>
         {renderProposalDescription(proposalDraft)}
         <div className="mt-6">
-          {proposalDraft.voting_module_type === ProposalType.BASIC && (
-            <ProposalTransactionDisplay
-              descriptions={description as string[]}
-              targets={targets as `0x${string}`[]}
-              calldatas={calldatas as `0x${string}`[]}
-              values={(values as number[]).map((v) => v.toString())}
-              network={tenant.contracts.governor.chain.name}
-            />
-          )}
+          {proposalDraft.voting_module_type === ProposalType.BASIC &&
+            proposalDraft.proposal_scope !== ProposalScope.OFFCHAIN_ONLY && (
+              <ProposalTransactionDisplay
+                descriptions={description as string[]}
+                targets={targets as `0x${string}`[]}
+                calldatas={calldatas as `0x${string}`[]}
+                values={(values as number[]).map((v) => v.toString())}
+                network={tenant.contracts.governor.chain.name}
+              />
+            )}
         </div>
         {proposalDraft.voting_module_type === "social" && (
           <div>

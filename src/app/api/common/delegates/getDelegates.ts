@@ -5,6 +5,7 @@ import {
 } from "@/app/lib/pagination";
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { isAddress } from "viem";
 import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import {
@@ -22,6 +23,26 @@ import { getProxyAddress } from "@/lib/alligatorUtils";
 import { calculateBigIntRatio } from "../utils/bigIntRatio";
 import { withMetrics } from "@/lib/metricWrapper";
 import { stageStatus } from "@/app/lib/sharedEnums";
+import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
+
+// Create a cached version of getDelegatesFromDaoNode
+const cachedGetDelegatesFromDaoNode = unstable_cache(
+  (args: {
+    sortBy?: string;
+    reverse?: boolean;
+    limit?: number;
+    offset?: number;
+    filters?: {
+      delegator?: `0x${string}`;
+    };
+    withParticipation?: boolean;
+  }) => getDelegatesFromDaoNode(args),
+  ["delegates-dao-node-filters"],
+  {
+    revalidate: 30, // Cache for 30 seconds
+    tags: ["delegates-dao-node-filters"],
+  }
+);
 
 /*
  * Fetches a list of delegates
@@ -32,12 +53,13 @@ import { stageStatus } from "@/app/lib/sharedEnums";
  */
 async function getDelegates({
   pagination = {
-    limit: 20,
+    limit: 500,
     offset: 0,
   },
   sort,
   seed,
   filters,
+  showParticipation,
 }: {
   pagination?: PaginationParams;
   sort: string;
@@ -49,12 +71,226 @@ async function getDelegates({
     endorsed?: boolean;
     hasStatement?: boolean;
   };
+  showParticipation?: boolean;
 }): Promise<PaginatedResult<DelegateChunk[]>> {
   return withMetrics(
     "getDelegates",
     async () => {
+      let daoNodeSortBy: string = "VP"; // Default to voting power
+      let reverse = true;
+
       const { namespace, ui, slug, contracts } = Tenant.current();
       const allowList = ui.delegates?.allowed || [];
+      const isAllowListEnabled = allowList.length > 0;
+
+      // VP = vote power (default)
+      // MRD = most recently delegated
+      // OLD = oldest delegation
+      // DC = delegator count
+      // LVB = latest voting block
+      if (sort === "most_delegators") {
+        daoNodeSortBy = "DC"; // delegator count
+      } else if (sort === "weighted_random" && seed) {
+        // For weighted_random, we'll still sort client-side
+        daoNodeSortBy = "VP"; // default
+      } else if (sort === "least_voting_power") {
+        daoNodeSortBy = "VP";
+        reverse = false;
+      } else if (sort === "most_recent_delegation") {
+        daoNodeSortBy = "MRD";
+      } else if (sort === "oldest_delegation") {
+        daoNodeSortBy = "OLD";
+      } else if (sort === "latest_voting_block") {
+        daoNodeSortBy = "LVB";
+      } else if (sort === "vp_change_7d") {
+        daoNodeSortBy = "VPC";
+      } else if (sort === "vp_change_7d_desc") {
+        daoNodeSortBy = "VPC";
+        reverse = false;
+      } else {
+        daoNodeSortBy = "VP";
+      }
+
+      // Determine if filters or weighted_random sort are active
+      const hasFilters =
+        filters?.issues ||
+        filters?.stakeholders ||
+        filters?.endorsed ||
+        filters?.hasStatement;
+      const isWeightedRandomSort = sort === "weighted_random" && seed;
+
+      console.log({
+        filters,
+        isAllowListEnabled,
+        isWeightedRandomSort,
+        sort,
+        seed,
+      });
+
+      const daoNodeResult = await cachedGetDelegatesFromDaoNode({
+        sortBy: daoNodeSortBy,
+        reverse: reverse,
+        filters,
+        limit: undefined,
+        offset: undefined,
+        withParticipation: showParticipation,
+      });
+
+      // If we have valid data from the DAO node, use it instead of database query
+      if (
+        daoNodeResult &&
+        daoNodeResult.delegates &&
+        (daoNodeResult.delegates.length > 0 ||
+          (daoNodeResult.delegates.length === 0 && !!filters?.delegator))
+      ) {
+        let processedDelegates = [...daoNodeResult.delegates];
+        let currentTotalCount = daoNodeResult.totalBeforeInternalPagination;
+
+        // Apply filters if they were not handled by delegator filter in DAO node and internal pagination was skipped
+        if (hasFilters || isAllowListEnabled) {
+          processedDelegates = processedDelegates.filter((delegate) => {
+            const endorsed = delegate.statement?.endorsed || false;
+            if (filters?.endorsed && !endorsed) {
+              return false;
+            }
+
+            const statementPayload = delegate.statement?.payload;
+
+            if (filters?.hasStatement) {
+              const delegateStatementText = statementPayload?.delegateStatement;
+              if (
+                !delegateStatementText ||
+                typeof delegateStatementText !== "string" ||
+                delegateStatementText.length < 10
+              ) {
+                return false;
+              }
+            }
+
+            if (filters?.issues) {
+              const topIssuesArray = filters.issues
+                .split(",")
+                .map((issue) => issue.trim());
+              const delegateIssues = statementPayload?.topIssues;
+              if (
+                !delegateIssues ||
+                !Array.isArray(delegateIssues) ||
+                delegateIssues.length === 0
+              )
+                return false;
+              const hasMatchingIssue = delegateIssues.some(
+                (issue) =>
+                  topIssuesArray.includes(issue.type) &&
+                  issue.value &&
+                  issue.value !== ""
+              );
+              if (!hasMatchingIssue) return false;
+            }
+
+            if (filters?.stakeholders) {
+              const delegateStakeholders = statementPayload?.topStakeholders;
+              if (
+                !delegateStakeholders ||
+                !Array.isArray(delegateStakeholders) ||
+                delegateStakeholders.length === 0
+              )
+                return false;
+              const hasMatchingStakeholder = delegateStakeholders.some(
+                (sh) => sh.type === filters?.stakeholders
+              );
+              if (!hasMatchingStakeholder) return false;
+            }
+
+            if (allowList.length > 0) {
+              return allowList.includes(delegate.address as `0x${string}`);
+            }
+
+            return true;
+          });
+          currentTotalCount = processedDelegates.length;
+        }
+
+        if (isWeightedRandomSort) {
+          processedDelegates.sort(() => Math.random() - 0.5);
+        }
+
+        let finalPaginatedDelegates = processedDelegates;
+
+        finalPaginatedDelegates = processedDelegates.slice(
+          pagination.offset,
+          pagination.offset + pagination.limit
+        );
+
+        let transformedDelegates = finalPaginatedDelegates.map((delegate) => {
+          // Check if delegate has the expected properties
+          if (!delegate || typeof delegate !== "object") {
+            console.error(
+              "Invalid delegate object from DAO node processing:",
+              delegate
+            );
+            return {
+              address: "unknown",
+              votingPower: {
+                total: "0",
+                direct: "0",
+                advanced: "0",
+              },
+              citizen: false, // Citizen status is not available from the DAO node source
+              statement: null,
+              numOfDelegators: BigInt(0),
+              participation: 0,
+            };
+          }
+
+          const address = delegate.address;
+
+          const votingPower = delegate.votingPower || {
+            total: "0",
+            direct: "0",
+            advanced: "0",
+          };
+
+          return {
+            address:
+              typeof address === "string"
+                ? address.toLowerCase()
+                : String(address).toLowerCase(),
+            votingPower: {
+              total: votingPower.total || "0",
+              direct: votingPower.direct || "0",
+              advanced: votingPower.advanced || "0",
+            },
+            citizen: false,
+            statement: delegate.statement || null,
+            numOfDelegators: BigInt(String(delegate.numOfDelegators || 0)),
+            mostRecentDelegationBlock: BigInt(
+              String(delegate.mostRecentDelegationBlock || 0)
+            ),
+            lastVoteBlock: BigInt(String(delegate.lastVoteBlock || 0)),
+            vpChange7d: BigInt(String(delegate.vpChange7d || 0)),
+            participation: delegate.participation
+              ? delegate.participation * 100.0
+              : 0,
+          };
+        });
+
+        const hasNext =
+          pagination.offset + finalPaginatedDelegates.length <
+          currentTotalCount;
+
+        return {
+          meta: {
+            has_next: hasNext,
+            next_offset: pagination.offset + pagination.limit,
+            total_returned: finalPaginatedDelegates.length,
+            total_count: currentTotalCount,
+          },
+          data: transformedDelegates,
+          seed,
+        };
+      }
+
+      // If no DAO node data, continue with the original database query
 
       // The top issues filter supports multiple selection - a comma separated list of issues
       const topIssuesParam = filters?.issues || "";
@@ -235,14 +471,6 @@ async function getDelegates({
             const QRY1 = `
               ${delegateUniverseCTE}
               SELECT *,
-                CASE
-                  WHEN EXISTS (
-                    SELECT 1
-                    FROM agora.citizens
-                    WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
-                  ) THEN TRUE
-                  ELSE FALSE
-                END AS citizen,
                 (SELECT row_to_json(sub)
                   FROM (
                     SELECT
@@ -286,14 +514,6 @@ async function getDelegates({
 
             const QRY2 = ` ${delegateUniverseCTE}
               SELECT *,
-                CASE
-                  WHEN EXISTS (
-                    SELECT 1
-                    FROM agora.citizens
-                    WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
-                  ) THEN TRUE
-                  ELSE FALSE
-                END AS citizen,
                 (SELECT row_to_json(sub)
                   FROM (
                     SELECT
@@ -334,14 +554,6 @@ async function getDelegates({
             const QRY3 = `
               ${delegateUniverseCTE}
               SELECT *,
-                CASE
-                  WHEN EXISTS (
-                    SELECT 1
-                    FROM agora.citizens
-                    WHERE LOWER(address) = d.delegate AND dao_slug='${slug}'::config.dao_slug
-                  ) THEN TRUE
-                  ELSE FALSE
-                END AS citizen,
                 (SELECT row_to_json(sub)
                   FROM (
                     SELECT
@@ -398,9 +610,9 @@ async function getDelegates({
             direct: delegate.direct_vp?.toFixed(0) || "0",
             advanced: delegate.advanced_vp?.toFixed(0) || "0",
           },
-          citizen: delegate.citizen,
           statement: delegate.statement,
           numOfDelegators: BigInt(delegate.num_of_delegators || "0"),
+          participation: 0,
         })),
         seed,
       };
@@ -434,7 +646,6 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
           advanced_vp,
           num_of_delegators,
           proposals_proposed,
-          citizen.citizen,
           statement.statement,
           COALESCE(total_proposals.count, 0) as total_proposals
         FROM
@@ -453,13 +664,6 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
              WHERE p.contract = $4
              AND p.cancelled_block IS NULL
             ) total_proposals ON TRUE
-        LEFT JOIN
-            (SELECT
-              CASE
-              WHEN EXISTS (SELECT 1 FROM agora.citizens ac WHERE LOWER(ac.address) = LOWER($1) AND ac.dao_slug = $3::config.dao_slug) THEN TRUE
-              ELSE FALSE
-              END as citizen
-            ) citizen ON TRUE
         LEFT JOIN
             (SELECT row_to_json(sub) as statement
             FROM (
@@ -584,7 +788,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     // Build out delegate JSON response
     return {
       address: address,
-      citizen: delegate?.citizen || false,
+      citizen: false,
       votingPower: {
         total: totalVotingPower.toString(),
         direct: delegate?.voting_power?.toString() || "0",
@@ -609,6 +813,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       totalProposals: delegate?.total_proposals || 0,
       statement: delegate?.statement || null,
       relativeVotingPowerToVotableSupply,
+      vpChange7d: 0n,
+      participation: 0,
     };
   });
 }
@@ -693,9 +899,11 @@ export const fetchDelegates = cache(
       endorsed?: boolean;
       hasStatement?: boolean;
     };
+    showParticipation?: boolean;
   }) => {
     "use server";
-    return getDelegates(args);
+    const options = args;
+    return getDelegates(options);
   }
 );
 

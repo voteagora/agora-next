@@ -120,7 +120,7 @@ export enum ANALYTICS_EVENT_NAMES {
   DELEGATION_ENCOURAGEMENT_DOT = "delegation_encouragement_dot",
   WALLET_CONNECTED = "wallet_connected",
   DELEGATE_PAGE_VIEW_WITH_WALLET = "delegate_page_view_with_wallet",
-  CITIZENS_PAGE_VIEW_WITH_WALLET = "citizens_page_view_with_wallet",
+  CREATE_OFFCHAIN_PROPOSAL = "CREATE_OFFCHAIN_PROPOSAL",
 }
 
 export type AnalyticsEvent =
@@ -213,9 +213,9 @@ export type AnalyticsEvent =
       };
     }
   | {
-      event_name: ANALYTICS_EVENT_NAMES.CITIZENS_PAGE_VIEW_WITH_WALLET;
+      event_name: ANALYTICS_EVENT_NAMES.CREATE_OFFCHAIN_PROPOSAL;
       event_data: {
-        address: `0x${string}`;
+        proposal_id: string;
       };
     };
 
@@ -240,3 +240,29 @@ export interface FormattedProposalType {
   isClientSide?: boolean;
   scopes?: ScopeData[];
 }
+
+export interface DelegateResponse {
+  delegate: DelegateStats;
+}
+
+export interface DelegateStats {
+  addr: string;
+  from_cnt: number;
+  from_list: object[];
+  voting_power: string;
+  participation: [number, number];
+}
+
+export type ProposalType =
+  | "STANDARD"
+  | "APPROVAL"
+  | "OPTIMISTIC"
+  | "SNAPSHOT"
+  | "OFFCHAIN_OPTIMISTIC_TIERED"
+  | "OFFCHAIN_OPTIMISTIC"
+  | "OFFCHAIN_STANDARD"
+  | "OFFCHAIN_APPROVAL"
+  | "HYBRID_STANDARD"
+  | "HYBRID_APPROVAL"
+  | "HYBRID_OPTIMISTIC"
+  | "HYBRID_OPTIMISTIC_TIERED";

@@ -7,7 +7,7 @@ import { useSimulateContract } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
-import { ApprovalProposal } from "@/app/proposals/draft/types";
+import { ApprovalProposal, ProposalScope } from "@/app/proposals/draft/types";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { useSelectedWallet } from "@/contexts/SelectedWalletContext";
@@ -43,6 +43,7 @@ const ApprovalProposalAction = ({
     account: selectedWalletAddress,
   });
 
+  console.log(error);
   const { writeContractAsync: writeAsync, isPending: isWriteLoading } =
     useWrappedWriteContract();
 
@@ -69,6 +70,8 @@ const ApprovalProposalAction = ({
         await sponsorDraftProposal({
           draftProposalId: draftProposal.id,
           onchain_transaction_hash: data,
+          is_offchain_submission: false,
+          proposal_scope: draftProposal.proposal_scope,
         });
 
         openDialog({
@@ -76,6 +79,8 @@ const ApprovalProposalAction = ({
           params: {
             redirectUrl: "/",
             txHash: data,
+            isHybrid: draftProposal.proposal_scope === ProposalScope.HYBRID,
+            draftProposal,
           },
         });
       }

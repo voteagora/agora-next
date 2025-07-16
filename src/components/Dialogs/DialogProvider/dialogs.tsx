@@ -2,7 +2,6 @@ import { DialogDefinitions } from "./types";
 import { DelegateDialog } from "../DelegateDialog/DelegateDialog";
 import { UndelegateDialog } from "../UndelegateDialog/UndelegateDialog";
 import { SwitchNetwork } from "../SwitchNetworkDialog/SwitchNetworkDialog";
-import { CastProposalDialog } from "@/components/Proposals/ProposalCreation/CastProposalDialog";
 import {
   CastVoteDialog,
   SupportTextProps,
@@ -25,7 +24,7 @@ import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/
 import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOnchainProposalDialog";
 import SponsorSnapshotProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorSnapshotProposalDialog";
 import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithubPRDialog";
-import { ANALYTICS_EVENT_NAMES, StakedDeposit } from "@/lib/types";
+import { ProposalType, StakedDeposit } from "@/lib/types";
 import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
 import SubscribeDialog from "@/components/Notifications/SubscribeDialog";
@@ -40,11 +39,12 @@ import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActio
 import { SafeWalletConfirmationDialog } from "../SafeWalletConfirmation";
 import { SafeSignConfirmationDialog } from "../SafeSignConfirmation";
 import { SafeDeleteStatementDialog } from "../SafeDeleteStatement";
+import SponsorOffchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOffchainProposalDialog";
+import { DraftProposal } from "@/app/proposals/draft/types";
 
 export type DialogType =
   | AdvancedDelegateDialogType
   | ApprovalCastVoteDialogType
-  | CastProposalDialogType
   | CastVoteDialogType
   | CreateDraftProposalDialog
   | DelegateDialogType
@@ -66,8 +66,8 @@ export type DialogType =
   | AccountActionDialogType
   | SafeWalletConfirmationDialogType
   | SafeSignConfirmationDialogType
-  | SafeDeleteStatementDialogType;
-
+  | SafeDeleteStatementDialogType
+  | SponsorOffchainDraftProposalDialog;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -119,6 +119,7 @@ export type CastProposalDialogType = {
     isError: boolean;
     isSuccess: boolean;
     txHash?: string;
+    isEas?: boolean;
   };
 };
 
@@ -187,7 +188,7 @@ export type ShareVoteDialogType = {
     voteReason: string;
     proposalId: string;
     proposalTitle: string;
-    proposalType: "OPTIMISTIC" | "STANDARD" | "APPROVAL" | "SNAPSHOT";
+    proposalType: ProposalType;
     proposal: Proposal;
     newVote: {
       support: string;
@@ -246,6 +247,16 @@ export type SponsorSnapshotDraftProposalDialog = {
 
 export type SponsorOnchainDraftProposalDialog = {
   type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL";
+  params: {
+    redirectUrl: string;
+    txHash: `0x${string}`;
+    isHybrid: boolean;
+    draftProposal: DraftProposal;
+  };
+};
+
+export type SponsorOffchainDraftProposalDialog = {
+  type: "SPONSOR_OFFCHAIN_DRAFT_PROPOSAL";
   params: { redirectUrl: string; txHash: `0x${string}` };
 };
 
@@ -360,17 +371,6 @@ export const dialogs: DialogDefinitions<DialogType> = {
         fetchAllForAdvancedDelegation={fetchAllForAdvancedDelegation}
         completeDelegation={closeDialog}
         isDelegationEncouragement={isDelegationEncouragement}
-      />
-    );
-  },
-  CAST_PROPOSAL: ({ isError, isLoading, isSuccess, txHash }, closeDialog) => {
-    return (
-      <CastProposalDialog
-        isError={isError}
-        isLoading={isLoading}
-        isSuccess={isSuccess}
-        txHash={txHash}
-        closeDialog={closeDialog}
       />
     );
   },
@@ -493,8 +493,20 @@ export const dialogs: DialogDefinitions<DialogType> = {
   UPDATE_DRAFT_PROPOSAL: ({ redirectUrl }, closeDialog) => (
     <UpdateDraftProposalDialog redirectUrl={redirectUrl} />
   ),
-  SPONSOR_ONCHAIN_DRAFT_PROPOSAL: ({ redirectUrl, txHash }, closeDialog) => (
+  SPONSOR_ONCHAIN_DRAFT_PROPOSAL: (
+    { redirectUrl, txHash, isHybrid, draftProposal },
+    closeDialog
+  ) => (
     <SponsorOnchainProposalDialog
+      redirectUrl={redirectUrl}
+      txHash={txHash}
+      closeDialog={closeDialog}
+      isHybrid={isHybrid}
+      draftProposal={draftProposal}
+    />
+  ),
+  SPONSOR_OFFCHAIN_DRAFT_PROPOSAL: ({ redirectUrl, txHash }, closeDialog) => (
+    <SponsorOffchainProposalDialog
       redirectUrl={redirectUrl}
       txHash={txHash}
       closeDialog={closeDialog}

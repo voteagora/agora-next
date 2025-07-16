@@ -10,6 +10,7 @@ import {
 } from "@/lib/proposalUtils";
 import { format } from "date-fns";
 import Link from "next/link";
+import { StepperRow } from "@/components/common/StepperRow";
 
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -19,7 +20,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, X } from "lucide-react";
 
 export const QuorumTooltip = () => {
   return (
@@ -78,6 +79,8 @@ export default function ProposalVotesSummaryDetails({
   let totalVotes =
     BigInt(results.for) + BigInt(results.abstain) + BigInt(results.against);
 
+  let thresholdVotes = BigInt(results.for) + BigInt(results.against);
+
   /**
    * This is a temporary fix for ENS.
    * https://voteagora.atlassian.net/browse/ENG-903
@@ -97,8 +100,8 @@ export default function ProposalVotesSummaryDetails({
   }
 
   const voteThresholdPercent =
-    Number(totalVotes) > 0
-      ? (Number(results.for) / Number(totalVotes)) * 100
+    Number(thresholdVotes) > 0
+      ? (Number(results.for) / Number(thresholdVotes)) * 100
       : 0;
   const apprThresholdPercent = Number(proposal.approvalThreshold) / 100;
 
@@ -170,7 +173,11 @@ export default function ProposalVotesSummaryDetails({
               Threshold
             </div>
             <div className="flex flex-row gap-1 ">
-              {hasMetThreshold && <Image src={checkIcon} alt="check icon" />}
+              {hasMetThreshold ? (
+                <Image src={checkIcon} alt="check icon" />
+              ) : (
+                <X className="h-4 w-4 text-negative" />
+              )}
               <p className=" text-xs font-semibold text-secondary">
                 {voteThresholdPercent.toFixed(2)}% /{" "}
                 {`${apprThresholdPercent}%`} Required
@@ -205,42 +212,3 @@ export default function ProposalVotesSummaryDetails({
     </div>
   );
 }
-
-const StepperRow = ({
-  label,
-  value,
-  isActive,
-  isCompleted,
-  isLastStep,
-  href,
-}: {
-  label: string;
-  value: string;
-  isActive?: boolean;
-  isCompleted?: boolean;
-  isLastStep?: boolean;
-  href?: string;
-}) => {
-  return (
-    <li
-      className={`relative flex-1  ${!isLastStep && "after:content-[''] after:w-[1.5px] after:h-[35px]  after:bg-line after:inline-block after:absolute after:top-3 after:left-0.5"} `}
-    >
-      <Link href={href ?? "#"} className="flex items-center gap-x-3">
-        <div
-          className={`w-1.5 h-1.5 rounded-full ${isCompleted ? "bg-black" : isActive ? "bg-blue-600" : "bg-primary/30"}`}
-        />
-
-        <div className="w-full flex items-center justify-between text-xs font-semibold">
-          <div
-            className={`${isCompleted ? "text-primary" : isActive ? "text-blue-600" : "text-secondary"} flex items-center gap-x-1`}
-          >
-            {label}
-            {href && <Image src={linkIcon} alt="redirect" />}
-          </div>
-
-          <p className="text-xs font-medium text-secondary">{value}</p>
-        </div>
-      </Link>
-    </li>
-  );
-};

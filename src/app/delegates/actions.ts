@@ -26,6 +26,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
 import { fetchDelegateStatements as apiFetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
+import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
 
 export const fetchDelegate = async (address: string) => {
   try {
@@ -231,3 +232,7 @@ export async function updateNotificationPreferencesForAddress(
     options
   );
 }
+
+export const fetchDelegateStats = async (address: string) => {
+  return getDelegateDataFromDaoNode(address);
+};

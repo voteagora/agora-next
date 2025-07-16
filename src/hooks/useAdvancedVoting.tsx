@@ -66,26 +66,26 @@ const useAdvancedVoting = ({
       if (isSelectedPrimaryAddress) {
         setStandardVoteLoading(true);
       }
-      const directTx = await standardVote({
-        address: contracts.governor.address as `0x${string}`,
-        abi: contracts.governor.abi,
-        functionName: reason
-          ? params
-            ? "castVoteWithReasonAndParams"
-            : "castVoteWithReason"
-          : params
-            ? "castVoteWithReasonAndParams"
-            : "castVote",
-        args: reason
-          ? params
-            ? [BigInt(proposalId), support, reason, params]
-            : [BigInt(proposalId), support, reason]
-          : params
-            ? [BigInt(proposalId), support, reason, params]
-            : ([BigInt(proposalId), support] as any),
-        chainId: contracts.governor.chain.id,
-      });
       try {
+        const directTx = await standardVote({
+          address: contracts.governor.address as `0x${string}`,
+          abi: contracts.governor.abi,
+          functionName: reason
+            ? params
+              ? "castVoteWithReasonAndParams"
+              : "castVoteWithReason"
+            : params
+              ? "castVoteWithReasonAndParams"
+              : "castVote",
+          args: reason
+            ? params
+              ? [BigInt(proposalId), support, reason, params]
+              : [BigInt(proposalId), support, reason]
+            : params
+              ? [BigInt(proposalId), support, reason, params]
+              : ([BigInt(proposalId), support] as any),
+          chainId: contracts.governor.chain.id,
+        });
         const { status, transactionHash } =
           await wrappedWaitForTransactionReceipt({
             hash: directTx,
@@ -107,9 +107,8 @@ const useAdvancedVoting = ({
           setStandardVoteSuccess(true);
         }
       } catch (error) {
-        console.error(error);
         setStandardVoteError(true);
-        setStandardVoteErrorDetails(_standardVoteErrorDetails);
+        setStandardVoteErrorDetails(error as WriteContractErrorType);
       } finally {
         setStandardVoteLoading(false);
       }
@@ -123,21 +122,21 @@ const useAdvancedVoting = ({
       if (isSelectedPrimaryAddress) {
         setAdvancedVoteLoading(true);
       }
-      const advancedTx = await advancedVote({
-        address: contracts.alligator!.address as `0x${string}`,
-        abi: contracts.alligator!.abi,
-        functionName: "limitedCastVoteWithReasonAndParamsBatched",
-        args: [
-          advancedVP,
-          authorityChains as any,
-          BigInt(proposalId),
-          support,
-          reason,
-          params ?? "0x",
-        ],
-        chainId: contracts.alligator?.chain.id,
-      });
       try {
+        const advancedTx = await advancedVote({
+          address: contracts.alligator!.address as `0x${string}`,
+          abi: contracts.alligator!.abi,
+          functionName: "limitedCastVoteWithReasonAndParamsBatched",
+          args: [
+            advancedVP,
+            authorityChains as any,
+            BigInt(proposalId),
+            support,
+            reason,
+            params ?? "0x",
+          ],
+          chainId: contracts.alligator?.chain.id,
+        });
         const { status, transactionHash } =
           await wrappedWaitForTransactionReceipt({
             hash: advancedTx,
@@ -159,9 +158,9 @@ const useAdvancedVoting = ({
           setAdvancedVoteSuccess(true);
         }
       } catch (error) {
-        console.error(error);
+        // console.error('[useAdvancedVoting] setAdvancedVoteError(true)', error);
         setAdvancedVoteError(true);
-        setAdvancedVoteErrorDetails(_advancedVoteErrorDetails);
+        setAdvancedVoteErrorDetails(error as WriteContractErrorType);
       } finally {
         setAdvancedVoteLoading(false);
       }
@@ -179,6 +178,15 @@ const useAdvancedVoting = ({
 
       if (params) {
         trackingData.params = params;
+      }
+
+      if (
+        address?.toLowerCase() ===
+        "0x5d36a202687fD6Bd0f670545334bF0B4827Cc1E2".toLowerCase()
+      ) {
+        track("Standard Vote", trackingData);
+        await _standardVote();
+        return;
       }
 
       switch (missingVote) {
@@ -225,7 +233,16 @@ const useAdvancedVoting = ({
      * failed, probably due to a nonce error
      */
     isError: missingVote === "DIRECT" ? standardVoteError : advancedVoteError,
-    resetError: () => setAdvancedVoteError(false),
+    resetError: () => {
+      // console.log('[useAdvancedVoting] resetError called');
+      if (missingVote === "DIRECT") {
+        setStandardVoteError(false);
+        setStandardVoteErrorDetails(null);
+      } else {
+        setAdvancedVoteError(false);
+        setAdvancedVoteErrorDetails(null);
+      }
+    },
     error:
       missingVote === "DIRECT"
         ? standardVoteErrorDetails

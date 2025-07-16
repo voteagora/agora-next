@@ -35,8 +35,8 @@ export const uniswapTenantUIConfig = new TenantUI({
     primary: "0 0 0",
     secondary: "64 64 64",
     tertiary: "115 115 115",
-    neutral: "255 255 255",
-    wash: "250 250 250",
+    neutral: "250 250 250",
+    wash: "255 255 255",
     line: "229 229 229",
     positive: "97 209 97",
     negative: "226 54 54",
@@ -352,6 +352,14 @@ export const uniswapTenantUIConfig = new TenantUI({
     {
       name: "use-daonode-for-votable-supply",
       enabled: false,
+    },
+    {
+      name: "use-daonode-for-proposal-types",
+      enabled: false,
+    },
+    {
+      name: "show-participation",
+      enabled: true,
     },
   ],
 });

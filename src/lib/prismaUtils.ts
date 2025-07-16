@@ -1,7 +1,6 @@
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { TENANT_NAMESPACES } from "./constants";
 import { TenantNamespace } from "./types";
-import { $Enums, ProposalType } from "@prisma/client";
 
 export function findDelagatee({
   namespace,
@@ -156,9 +155,7 @@ export function findSnapshotProposalsQueryFromDb({
   const condition = {
     where: {
       contract,
-      proposal_type: {
-        equals: ProposalType.SNAPSHOT,
-      },
+      proposal_type: "SNAPSHOT",
     },
   };
 
@@ -200,13 +197,21 @@ export function findProposalsQueryFromDB({
   take,
   filter,
   contract,
+  type,
 }: {
   namespace: TenantNamespace;
   skip: number;
   take: number;
   filter: string;
   contract: string;
+  type?: string;
 }) {
+  const allOffchainProposalTypes = [
+    "OFFCHAIN_STANDARD",
+    "OFFCHAIN_APPROVAL",
+    "OFFCHAIN_OPTIMISTIC",
+    "OFFCHAIN_OPTIMISTIC_TIERED",
+  ];
   const condition = {
     take,
     skip,
@@ -216,6 +221,14 @@ export function findProposalsQueryFromDB({
     where: {
       contract,
       cancelled_block: filter === "relevant" ? null : undefined,
+      ...(type
+        ? {
+            proposal_type:
+              type === "OFFCHAIN" || type === "EXCLUDE_ONCHAIN"
+                ? { in: allOffchainProposalTypes }
+                : type,
+          }
+        : {}),
     },
     select: {
       // Required by ProposalPayload type
@@ -234,7 +247,7 @@ export function findProposalsQueryFromDB({
       // proposal_data_raw: true,
       proposal_results: true,
       proposal_type: true,
-      // proposal_type_data: true,
+      proposal_type_data: true,
       // created_transaction_hash: true,
       // cancelled_transaction_hash: true,
       // executed_transaction_hash: true,
@@ -326,6 +339,165 @@ export function findProposal({
       return prismaWeb3Client.lineaProposals.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
+  }
+}
+
+export function findProposalsByIds({
+  namespace,
+  proposalIds,
+  contract,
+}: {
+  namespace: TenantNamespace;
+  proposalIds: string[];
+  contract: string;
+}) {
+  if (proposalIds.length === 0) {
+    return Promise.resolve([]);
+  }
+
+  const condition = {
+    where: {
+      proposal_id: { in: proposalIds },
+      contract,
+    },
+  };
+
+  switch (namespace) {
+    case TENANT_NAMESPACES.OPTIMISM:
+      return prismaWeb3Client.optimismProposals.findMany(condition);
+    case TENANT_NAMESPACES.ENS:
+      return prismaWeb3Client.ensProposals.findMany(condition);
+    case TENANT_NAMESPACES.ETHERFI:
+      return prismaWeb3Client.etherfiProposals.findMany(condition);
+    case TENANT_NAMESPACES.UNISWAP:
+      return prismaWeb3Client.uniswapProposals.findMany(condition);
+    case TENANT_NAMESPACES.CYBER:
+      return prismaWeb3Client.cyberProposals.findMany(condition);
+    case TENANT_NAMESPACES.SCROLL:
+      return prismaWeb3Client.scrollProposals.findMany(condition);
+    case TENANT_NAMESPACES.DERIVE:
+      return prismaWeb3Client.deriveProposals.findMany(condition);
+    case TENANT_NAMESPACES.PGUILD:
+      return prismaWeb3Client.pguildProposals.findMany(condition);
+    case TENANT_NAMESPACES.BOOST:
+      return prismaWeb3Client.boostProposals.findMany(condition);
+    case TENANT_NAMESPACES.XAI:
+      return prismaWeb3Client.xaiProposals.findMany(condition);
+    case TENANT_NAMESPACES.B3:
+      return prismaWeb3Client.b3Proposals.findMany(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prismaWeb3Client.demoProposals.findMany(condition);
+    case TENANT_NAMESPACES.LINEA:
+      return prismaWeb3Client.lineaProposals.findMany(condition);
+    default:
+      throw new Error(`Unknown namespace: ${namespace}`);
+  }
+}
+
+/**
+ * Find an offchain proposal that matches an onchain proposal ID
+ * This is used to merge offchain proposal data with onchain proposals
+ */
+export function findOffchainProposal({
+  namespace,
+  onchainProposalId,
+}: {
+  namespace: TenantNamespace;
+  onchainProposalId: string;
+}) {
+  const condition = {
+    where: {
+      proposal_data: {
+        path: ["onchain_proposalid"], // Specifies the JSON path to the key
+        equals: onchainProposalId, // Checks if the value at that path equals onchainProposalId
+      },
+    },
+  };
+
+  switch (namespace) {
+    case TENANT_NAMESPACES.OPTIMISM:
+      return prismaWeb3Client.optimismProposals.findFirst(condition);
+    case TENANT_NAMESPACES.ENS:
+      return prismaWeb3Client.ensProposals.findFirst(condition);
+    case TENANT_NAMESPACES.ETHERFI:
+      return prismaWeb3Client.etherfiProposals.findFirst(condition);
+    case TENANT_NAMESPACES.UNISWAP:
+      return prismaWeb3Client.uniswapProposals.findFirst(condition);
+    case TENANT_NAMESPACES.CYBER:
+      return prismaWeb3Client.cyberProposals.findFirst(condition);
+    case TENANT_NAMESPACES.SCROLL:
+      return prismaWeb3Client.scrollProposals.findFirst(condition);
+    case TENANT_NAMESPACES.DERIVE:
+      return prismaWeb3Client.deriveProposals.findFirst(condition);
+    case TENANT_NAMESPACES.PGUILD:
+      return prismaWeb3Client.pguildProposals.findFirst(condition);
+    case TENANT_NAMESPACES.BOOST:
+      return prismaWeb3Client.boostProposals.findFirst(condition);
+    case TENANT_NAMESPACES.XAI:
+      return prismaWeb3Client.xaiProposals.findFirst(condition);
+    case TENANT_NAMESPACES.B3:
+      return prismaWeb3Client.b3Proposals.findFirst(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prismaWeb3Client.demoProposals.findFirst(condition);
+    case TENANT_NAMESPACES.LINEA:
+      return prismaWeb3Client.lineaProposals.findFirst(condition);
+    default:
+      return null;
+  }
+}
+
+/**
+ * Find multiple offchain proposals that match a list of onchain proposal IDs
+ * This is used to batch fetch offchain proposals for efficiency
+ */
+export function findOffchainProposalsByOnchainIds({
+  namespace,
+  onchainProposalIds,
+}: {
+  namespace: TenantNamespace;
+  onchainProposalIds: string[];
+}) {
+  // Create OR conditions for each proposal ID
+  const condition = {
+    where: {
+      OR: onchainProposalIds.map((id) => ({
+        proposal_data: {
+          path: ["onchain_proposalid"],
+          equals: id,
+        },
+      })),
+    },
+  };
+
+  switch (namespace) {
+    case TENANT_NAMESPACES.OPTIMISM:
+      return prismaWeb3Client.optimismProposals.findMany(condition);
+    case TENANT_NAMESPACES.ENS:
+      return prismaWeb3Client.ensProposals.findMany(condition);
+    case TENANT_NAMESPACES.ETHERFI:
+      return prismaWeb3Client.etherfiProposals.findMany(condition);
+    case TENANT_NAMESPACES.UNISWAP:
+      return prismaWeb3Client.uniswapProposals.findMany(condition);
+    case TENANT_NAMESPACES.CYBER:
+      return prismaWeb3Client.cyberProposals.findMany(condition);
+    case TENANT_NAMESPACES.SCROLL:
+      return prismaWeb3Client.scrollProposals.findMany(condition);
+    case TENANT_NAMESPACES.DERIVE:
+      return prismaWeb3Client.deriveProposals.findMany(condition);
+    case TENANT_NAMESPACES.PGUILD:
+      return prismaWeb3Client.pguildProposals.findMany(condition);
+    case TENANT_NAMESPACES.BOOST:
+      return prismaWeb3Client.boostProposals.findMany(condition);
+    case TENANT_NAMESPACES.XAI:
+      return prismaWeb3Client.xaiProposals.findMany(condition);
+    case TENANT_NAMESPACES.B3:
+      return prismaWeb3Client.b3Proposals.findMany(condition);
+    case TENANT_NAMESPACES.DEMO:
+      return prismaWeb3Client.demoProposals.findMany(condition);
+    case TENANT_NAMESPACES.LINEA:
+      return prismaWeb3Client.lineaProposals.findMany(condition);
+    default:
+      return [];
   }
 }
 

@@ -61,6 +61,19 @@ export const getProposalTypeText = (
       if (proposalData?.type === "copeland") {
         return "Ranked Choice Proposal";
       }
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED":
+      return "Optimistic Proposal (Offchain)";
+    case "OFFCHAIN_STANDARD":
+      return "Standard Proposal (Offchain)";
+    case "OFFCHAIN_APPROVAL":
+      return "Approval Vote Proposal (Offchain)";
+    case "HYBRID_STANDARD":
+      return "Joint House Standard Proposal";
+    case "HYBRID_APPROVAL":
+      return "Joint House Approval Proposal";
+    case "HYBRID_OPTIMISTIC_TIERED":
+      return "Joint House Optimistic Proposal";
     default:
       return "Proposal";
   }
@@ -366,7 +379,18 @@ export function getBlockScanAddress(address: string) {
   return `${url}/address/${address}`;
 }
 
-export function getBlockScanUrl(hash: string | `0x${string}`) {
+export function getBlockScanUrl(hash: string | `0x${string}`, isEas?: boolean) {
+  const chainId = Tenant.current().contracts.token.chain.id;
+  if (isEas) {
+    switch (chainId) {
+      case 10:
+        return `https://optimism.easscan.org/attestation/view/${hash}`;
+      case 11155420:
+        return `https://optimism-sepolia.easscan.org/attestation/view/${hash}`;
+      default:
+        return `https://optimism.easscan.org/attestation/view/${hash}`;
+    }
+  }
   const { contracts } = Tenant.current();
   const url = contracts.token.chain.blockExplorers?.default.url;
   return `${url}/tx/${hash}`;
@@ -486,20 +510,6 @@ export const getTransportForChain = (chainId: number) => {
     // for each new dao with a new chainId add them here
     default:
       return null;
-  }
-};
-
-export const getVotingModuleTypeForProposalType = (proposalType: {
-  quorum: number;
-  approval_threshold: number;
-  name: string;
-}) => {
-  if (proposalType.name.toLowerCase().includes("approval")) {
-    return ProposalType.APPROVAL;
-  } else if (proposalType.name.toLowerCase().includes("optimistic")) {
-    return ProposalType.OPTIMISTIC;
-  } else {
-    return ProposalType.BASIC;
   }
 };
 

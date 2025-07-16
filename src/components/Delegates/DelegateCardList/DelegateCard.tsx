@@ -6,7 +6,6 @@ import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { DelegateActions } from "../DelegateCard/DelegateActions";
 import Tenant from "@/lib/tenant/tenant";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
-import { useVoterStats } from "@/hooks/useVoterStats";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
 
 const DelegateCard = ({
@@ -20,18 +19,12 @@ const DelegateCard = ({
   isAdvancedUser: boolean;
   truncatedStatement: string;
 }) => {
-  const { token } = Tenant.current();
+  const { token, ui } = Tenant.current();
   const { advancedDelegators } = useConnectedDelegate();
-
-  const { data: votingStats, isFetching: isVotingStatsPending } = useVoterStats(
-    {
-      address: delegate.address as `0x${string}`,
-    }
-  );
 
   const sanitizedTruncatedStatement = sanitizeContent(truncatedStatement);
 
-  const numProposals = votingStats?.total_proposals || 0;
+  const showParticipation = ui.toggle("show-participation")?.enabled || false;
 
   return (
     <div
@@ -47,31 +40,15 @@ const DelegateCard = ({
       >
         <div className="flex flex-col gap-4 h-full rounded-xl bg-wash border border-line shadow-newDefault">
           <div className="flex flex-col gap-4 justify-center pt-4">
-            <div className="border-b border-line px-4 pb-4">
+            <div className="px-4">
               <DelegateProfileImage
                 endorsed={delegate.statement?.endorsed}
                 address={delegate.address}
                 votingPower={delegate.votingPower.total}
-                citizen={delegate.citizen}
+                participation={delegate.participation}
+                showParticipation={true}
+                showVotingPower={true}
               />
-            </div>
-            <div className="px-4 flex flex-row gap-4">
-              <span className="text-primary font-bold">
-                {formatNumber(delegate.votingPower.total)} {token.symbol}
-              </span>
-              {numProposals > 0 && !isVotingStatsPending && (
-                <span className="text-primary font-bold">
-                  {Math.round(
-                    Math.round(
-                      ((votingStats?.last_10_props || 0) /
-                        Math.min(10, numProposals)) *
-                        100 *
-                        100
-                    ) / 100
-                  )}
-                  % Participation
-                </span>
-              )}
             </div>
             <p className="text-base leading-normal min-h-[48px] break-words text-secondary overflow-hidden line-clamp-2 px-4">
               {sanitizedTruncatedStatement}

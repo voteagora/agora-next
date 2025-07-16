@@ -20,8 +20,7 @@ export function DesktopConnectButton() {
             onClick={!isConnected ? () => show?.() : undefined}
             data-testid="connect-button"
             className={cn(
-              "border-none lg:border border-solid text-primary lg:bg-neutral p-0 lg:px-4 lg:py-2 rounded-full cursor-pointer hidden md:flex items-center transition-all hover:lg:shadow-newDefault h-[48px] relative",
-              isConnected ? "border-line" : "border-primary"
+              "lg:border text-primary font-medium lg:bg-neutral p-0 lg:px-4 lg:py-2 rounded-full cursor-pointer hidden md:flex items-center transition-all hover:lg:shadow-newDefault h-[48px] relative border-line"
             )}
           >
             {isConnected ? (

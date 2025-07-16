@@ -175,7 +175,7 @@ export function getInputData(proposal: DraftProposal): {
 
             formattedOption.budgetTokensSpent += amount;
             formattedOption.targets.push(t.target as `0x${string}`);
-            formattedOption.values.push(BigInt(0));
+            formattedOption.values.push(BigInt(proposal.top_choices));
             formattedOption.calldatas.push(t.calldata as `0x${string}`);
           } else {
             formattedOption.targets.push(

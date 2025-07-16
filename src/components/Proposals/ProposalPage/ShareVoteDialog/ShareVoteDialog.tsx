@@ -16,12 +16,12 @@ import { useLatestBlock } from "@/hooks/useLatestBlock";
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types.d";
 
 function generateVoteBars(
   forPercentage: number,
   againstPercentage: number,
-  proposalType: "OPTIMISTIC" | "STANDARD" | "APPROVAL" | "SNAPSHOT",
+  proposalType: ProposalType,
   supportType: "FOR" | "AGAINST" | "ABSTAIN"
 ) {
   const totalBars = 56;
@@ -48,10 +48,9 @@ function generateVoteBars(
       );
     }
   } else {
-    const forBars =
-      proposalType === "OPTIMISTIC"
-        ? 0
-        : Math.round((totalBars * forPercentage) / 100);
+    const forBars = proposalType.includes("OPTIMISTIC")
+      ? 0
+      : Math.round((totalBars * forPercentage) / 100);
     const againstBars = Math.round((totalBars * againstPercentage) / 100);
     const abstainBars = totalBars - forBars - againstBars;
 
@@ -98,7 +97,7 @@ const SuccessMessageCard = ({
   endsIn: string | null;
   voteDate: string | null;
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
-  proposalType: "OPTIMISTIC" | "STANDARD" | "APPROVAL" | "SNAPSHOT";
+  proposalType: ProposalType;
   proposal: Proposal;
 }) => {
   const { namespace, brandName } = Tenant.current();
@@ -230,7 +229,7 @@ export function ShareDialog({
   voteReason: string;
   proposalId: string;
   proposalTitle: string;
-  proposalType: "STANDARD" | "OPTIMISTIC" | "APPROVAL" | "SNAPSHOT";
+  proposalType: ProposalType;
   proposal: Proposal;
   totalOptions: number;
   newVote: {

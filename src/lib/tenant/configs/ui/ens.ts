@@ -29,8 +29,8 @@ export const ensTenantUIConfig = new TenantUI({
     primary: "1 26 37",
     secondary: "9 60 82",
     tertiary: "74 92 99",
-    neutral: "255 255 255",
-    wash: "246 246 246",
+    neutral: "246 246 246",
+    wash: "255 255 255",
     line: "229 229 229",
     positive: "0 153 43",
     negative: "226 54 54",
@@ -291,6 +291,14 @@ For a full walkthrough of the proposal process, check out the [ENS DAO docs](htt
     {
       name: "use-daonode-for-votable-supply",
       enabled: false,
+    },
+    {
+      name: "use-daonode-for-proposal-types",
+      enabled: false,
+    },
+    {
+      name: "show-participation",
+      enabled: true,
     },
   ],
 });

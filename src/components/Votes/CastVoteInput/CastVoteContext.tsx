@@ -43,9 +43,9 @@ type CastVoteContextType = {
   fallbackToStandardVote: boolean;
   setFallbackToStandardVote: Dispatch<SetStateAction<boolean>>;
   data: Partial<{
-    standardTxHash: string;
-    advancedTxHash: string;
-    sponsoredVoteTxHash: string;
+    standardTxHash: string | null;
+    advancedTxHash: string | null;
+    sponsoredVoteTxHash: string | null;
   }>;
 };
 
@@ -172,9 +172,9 @@ const CastVoteContextProvider = ({
       className: "sm:w-[32rem]",
       type: "SHARE_VOTE",
       params: {
-        againstPercentage: againstPercentage,
-        forPercentage: forPercentage,
-        endsIn: endsIn,
+        againstPercentage,
+        forPercentage,
+        endsIn,
         blockNumber: null,
         voteDate: null,
         supportType: support || "ABSTAIN",

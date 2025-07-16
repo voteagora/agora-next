@@ -8,7 +8,6 @@ import { useQueryState } from "nuqs";
 import { cn } from "@/lib/utils";
 
 import DelegatesSortFilter from "@/components/Delegates/DelegatesFilter/DelegatesSortFilter";
-import CitizensSortFilter from "@/components/Delegates/DelegatesFilter/CitizensSortFilter";
 import { DelegatesFilter } from "@/components/Delegates/DelegatesFilter/DelegatesFilter";
 
 import { DelegatesFilterChips } from "@/components/Delegates/DelegatesTabs/DelegatesFilterChips";
@@ -31,8 +30,6 @@ export default function DelegatesTabs({ children }: { children: ReactNode }) {
 
   const { ui } = Tenant.current();
 
-  const hasCitizens = ui.toggle("citizens")?.enabled;
-
   const handleTabChange = (value: string) => {
     setTab(value);
   };
@@ -49,14 +46,9 @@ export default function DelegatesTabs({ children }: { children: ReactNode }) {
     >
       <div className="flex flex-row justify-between items-baseline gap-2 mt-3 md:mt-0">
         <TabsList>
-          <TabsTrigger className="" value="delegates">
+          <TabsTrigger className="text-2xl font-extrabold" value="delegates">
             Delegates
           </TabsTrigger>
-          {hasCitizens && (
-            <TabsTrigger className="" value="citizens">
-              Citizens
-            </TabsTrigger>
-          )}
         </TabsList>
         <div className="flex flex-row self-end md:justify-between gap-2 w-fit">
           <DelegatesSearch className="hidden md:block" />
@@ -71,53 +63,45 @@ export default function DelegatesTabs({ children }: { children: ReactNode }) {
               <MagnifyingGlassIcon className="text-primary w-4 h-4" />
             </button>
           </div>
-          {tab === "citizens" ? (
-            <CitizensSortFilter />
-          ) : (
-            <>
-              <div className="items-center gap-2 hidden md:flex">
-                <DelegatesSortFilter />
-                <DelegatesFilter />
-              </div>
-              <div className="block md:hidden">
-                <MobileDelegatesFilter />
-              </div>
-            </>
-          )}
-          {tab !== "citizens" && (
-            <div className="flex items-center gap-2 bg-wash rounded-sm md:rounded-lg border border-line px-3 py-3 shrink-0">
-              <button
-                onClick={() => {
-                  setLayout("grid");
-                }}
-                className={layout === "grid" ? "hidden md:block" : ""}
-                disabled={layout === "grid"}
-              >
-                <GridLayoutIcon
-                  className={
-                    layout === "grid"
-                      ? "h-4 w-4 fill-primary"
-                      : "h-4 w-4 md:fill-secondary/30 fill-primary"
-                  }
-                />
-              </button>
-              <button
-                onClick={() => {
-                  setLayout("list");
-                }}
-                className={layout === "list" ? "hidden md:block" : ""}
-                disabled={layout === "list"}
-              >
-                <ListViewIcon
-                  className={
-                    layout === "list"
-                      ? "h-4 w-4 fill-primary"
-                      : "h-4 w-4 md:fill-secondary/30 fill-primary"
-                  }
-                />
-              </button>
-            </div>
-          )}
+          <div className="items-center gap-2 hidden md:flex">
+            <DelegatesSortFilter />
+            <DelegatesFilter />
+          </div>
+          <div className="block md:hidden">
+            <MobileDelegatesFilter />
+          </div>
+          <div className="flex items-center gap-2 bg-wash rounded-sm md:rounded-lg border border-line px-3 py-3 shrink-0">
+            <button
+              onClick={() => {
+                setLayout("grid");
+              }}
+              className={layout === "grid" ? "hidden md:block" : ""}
+              disabled={layout === "grid"}
+            >
+              <GridLayoutIcon
+                className={
+                  layout === "grid"
+                    ? "h-4 w-4 fill-primary"
+                    : "h-4 w-4 md:fill-secondary/30 fill-primary"
+                }
+              />
+            </button>
+            <button
+              onClick={() => {
+                setLayout("list");
+              }}
+              className={layout === "list" ? "hidden md:block" : ""}
+              disabled={layout === "list"}
+            >
+              <ListViewIcon
+                className={
+                  layout === "list"
+                    ? "h-4 w-4 fill-primary"
+                    : "h-4 w-4 md:fill-secondary/30 fill-primary"
+                }
+              />
+            </button>
+          </div>
         </div>
       </div>
       <div>

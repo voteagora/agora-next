@@ -29,7 +29,7 @@ export const optimismTenantUIConfig = new TenantUI({
     secondary: "64 64 64",
     tertiary: "115 115 115",
     neutral: "255 255 255",
-    wash: "250 250 250",
+    wash: "255 255 255",
     line: "229 229 229",
     positive: "97 209 97",
     negative: "226 54 54",
@@ -208,10 +208,6 @@ export const optimismTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "proposals/create",
-      enabled: true,
-    },
-    {
       name: "delegates",
       enabled: true,
     },
@@ -222,10 +218,6 @@ export const optimismTenantUIConfig = new TenantUI({
     {
       name: "retropgf",
       enabled: false,
-    },
-    {
-      name: "citizens",
-      enabled: true,
     },
     {
       name: "delegates/edit",
@@ -247,6 +239,7 @@ export const optimismTenantUIConfig = new TenantUI({
       name: "proposal-lifecycle",
       enabled: true,
       config: {
+        offchainProposalCreator: "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB",
         stages: [
           {
             stage: PrismaProposalStage.DRAFTING,
@@ -283,12 +276,12 @@ export const optimismTenantUIConfig = new TenantUI({
           {
             type: "approval",
             prodAddress: "0x8060B18290F48fc0bF2149EEb2F3c280bDe7674f",
-            testnetAddress: "0xdd0229D72a414DC821DEc66f3Cc4eF6dB2C7b7df",
+            testnetAddress: "0x4E2e3509F4C77Df377FeE48e3969BB7000B9FAF1",
           },
           {
             type: "optimistic",
             prodAddress: "0x8980C97f0e8a3A69831139e51003E65238F1F343",
-            testnetAddress: "0x4ab438e093647fC5eC7B773D1A5f6d3C2C7F0593",
+            testnetAddress: "0xd88b3D2DFf4ACF38CBD6C425F40Cd1A687E1ee4B",
           },
         ],
         copy: {
@@ -326,6 +319,18 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
     {
       name: "use-daonode-for-votable-supply",
       enabled: false,
+    },
+    {
+      name: "use-daonode-for-proposal-types",
+      enabled: false,
+    },
+    {
+      name: "show-participation",
+      enabled: true,
+    },
+    {
+      name: "proposals/offchain",
+      enabled: true,
     },
   ],
 });

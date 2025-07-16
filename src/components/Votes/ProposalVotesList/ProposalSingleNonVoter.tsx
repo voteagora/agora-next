@@ -26,6 +26,12 @@ export function ProposalSingleNonVoter({
     twitter: string | null;
     discord: string | null;
     warpcast: string | null;
+    citizen_type: string | null;
+    voterMetadata: {
+      name: string;
+      image: string;
+      type: string;
+    } | null;
   };
 }) {
   const { namespace, ui } = Tenant.current();
@@ -53,11 +59,35 @@ export function ProposalSingleNonVoter({
         className="font-semibold text-secondary"
       >
         <HStack gap={1} alignItems="items-center">
-          <ENSAvatar ensName={data} className="w-5 h-5" />
-          <div className="text-primary hover:underline">
-            <Link href={`/delegates/${voter.delegate}`}>
-              <ENSName address={voter.delegate} />
-            </Link>
+          {voter.voterMetadata?.image ? (
+            <div
+              className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
+            >
+              <img
+                src={voter.voterMetadata.image}
+                alt="avatar"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <ENSAvatar ensName={data} className="w-8 h-8" />
+          )}
+          <div className="flex flex-col">
+            <div className="text-primary font-bold hover:underline">
+              <Link href={`/delegates/${voter.delegate}`}>
+                {voter.voterMetadata?.name ? (
+                  voter.voterMetadata.name
+                ) : (
+                  <ENSName address={voter.delegate} />
+                )}
+              </Link>
+            </div>
+            {voter.citizen_type && (
+              <div className="text-[9px] font-bold text-tertiary">
+                {voter.citizen_type?.charAt(0).toUpperCase() +
+                  voter.citizen_type?.slice(1).toLowerCase()}
+              </div>
+            )}
           </div>
           {voter.delegate === connectedAddress?.toLowerCase() && (
             <p className="text-primary">(you)</p>

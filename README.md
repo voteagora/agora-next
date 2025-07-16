@@ -200,3 +200,12 @@ Agora Staff can generate API keys using:
 ```
 npm run generate-apikey -- --email user@example.com --address 0x123345 --chain-id 1 --description "API access for..."
 ```
+
+If for any reason you need an API key for a new chain, you'll need to run something like this against prod:
+
+```
+INSERT INTO agora."chain" (id,  name,      created_at,  updated_at) VALUES 
+                          ('10','Optimism','2025-06-09','2025-06-09');
+```
+
+...where id is the chain id.  

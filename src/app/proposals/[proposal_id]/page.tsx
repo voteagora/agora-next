@@ -17,6 +17,10 @@ import Tenant from "@/lib/tenant/tenant";
 import { calculateVoteMetadata } from "@/lib/voteUtils";
 import { format } from "date-fns";
 import React from "react";
+import HybridStandardProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/HybridStandardProposalPage";
+import HybridApprovalProposalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/HybridApprovalProposalPage";
+import HybridOptimisticProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/HybridOptimisticProposalPage";
+import { redirect } from "next/navigation";
 
 export const maxDuration = 60;
 
@@ -147,6 +151,11 @@ export default async function Page({
   params: { proposal_id: string };
 }) {
   const proposal = await fetchProposal(proposal_id);
+  const proposalData =
+    proposal.proposalData as ParsedProposalData["OFFCHAIN_STANDARD"]["kind"];
+  if (proposalData.onchainProposalId) {
+    redirect(`/proposals/${proposalData.onchainProposalId}`);
+  }
 
   let RenderComponent;
   switch (proposal.proposalType) {
@@ -154,11 +163,24 @@ export default async function Page({
       RenderComponent = StandardProposalPage;
       break;
 
+    case "OFFCHAIN_STANDARD":
+    case "HYBRID_STANDARD":
+      RenderComponent = HybridStandardProposalPage;
+      break;
+
     case "OPTIMISTIC":
       RenderComponent = OPProposalOptimisticPage;
       break;
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED":
+    case "HYBRID_OPTIMISTIC_TIERED":
+      RenderComponent = HybridOptimisticProposalPage;
+      break;
     case "APPROVAL":
       RenderComponent = OPProposalApprovalPage;
+      break;
+    case "HYBRID_APPROVAL":
+      RenderComponent = HybridApprovalProposalPage;
       break;
     case "SNAPSHOT":
       if (

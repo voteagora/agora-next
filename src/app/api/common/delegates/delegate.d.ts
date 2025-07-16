@@ -3,7 +3,6 @@ import { Prisma } from "@prisma/client";
 
 export type Delegate = {
   address: string;
-  citizen: boolean;
   votingPower: {
     total: string;
     direct: string;
@@ -22,11 +21,13 @@ export type Delegate = {
   numOfDelegators: bigint;
   statement: DelegateStatementType | null;
   relativeVotingPowerToVotableSupply: string;
+  vpChange7d: bigint;
+  participation: number;
 };
 
 export type DelegateChunk = Pick<
   Delegate,
-  "address" | "votingPower" | "statement" | "citizen"
+  "address" | "votingPower" | "statement" | "participation"
 >;
 
 export type DelegatePayload = Delegate & {
@@ -40,7 +41,6 @@ export type DelegatesGetPayload = {
   direct_vp: Prisma.Decimal;
   advanced_vp: Prisma.Decimal;
   voting_power: Prisma.Decimal;
-  citizen: boolean;
   statement: DelegateStatementType;
 };
 
@@ -81,5 +81,4 @@ export type DelegateStats = {
   proposals_proposed: OptimismDelegates["proposals_proposed"];
   total_proposals: number;
   statement: DelegateStatement;
-  citizen: boolean;
 };

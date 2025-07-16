@@ -47,16 +47,17 @@ const useStandardVoting = ({
       if (isSelectedPrimaryAddress) {
         setStandardVoteLoading(true);
       }
-      const directTx = await standardVote({
-        address: contracts.governor.address as `0x${string}`,
-        abi: contracts.governor.abi,
-        functionName: !!reason ? "castVoteWithReason" : "castVote",
-        args: !!reason
-          ? [BigInt(proposalId), support, reason]
-          : [BigInt(proposalId), support],
-        chainId: contracts.governor.chain.id,
-      });
       try {
+        const directTx = await standardVote({
+          address: contracts.governor.address as `0x${string}`,
+          abi: contracts.governor.abi,
+          functionName: !!reason ? "castVoteWithReason" : "castVote",
+          args: !!reason
+            ? [BigInt(proposalId), support, reason]
+            : [BigInt(proposalId), support],
+          chainId: contracts.governor.chain.id,
+        });
+
         const { status, transactionHash } =
           await wrappedWaitForTransactionReceipt({
             hash: directTx,
@@ -101,7 +102,10 @@ const useStandardVoting = ({
   return {
     isLoading: standardVoteLoading,
     isError: standardVoteError || _standardVoteError,
-    resetError: () => setStandardVoteError(false),
+    resetError: () => {
+      setStandardVoteError(false);
+      setStandardVoteErrorDetails(null);
+    },
     isSuccess: standardVoteSuccess,
     write,
     error: standardVoteErrorDetails,
