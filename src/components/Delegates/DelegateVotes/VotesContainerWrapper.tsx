@@ -7,13 +7,13 @@ import SnapshotVotes from "./SnapshotVotes";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 
 interface Props {
-  delegate: Delegate;
+  address: string;
 }
 
-const VotesContainerWrapper = async ({ delegate }: Props) => {
+const VotesContainerWrapper = async ({ address }: Props) => {
   const [delegateVotes, snapshotVotes] = await Promise.all([
-    fetchVotesForDelegate(delegate.address),
-    fetchSnapshotVotesForDelegate({ addressOrENSName: delegate.address }),
+    fetchVotesForDelegate(address),
+    fetchSnapshotVotesForDelegate({ addressOrENSName: address }),
   ]);
 
   return (
@@ -26,7 +26,7 @@ const VotesContainerWrapper = async ({ delegate }: Props) => {
                 initialVotes={delegateVotes}
                 fetchDelegateVotes={async (pagination: PaginationParams) => {
                   "use server";
-                  return fetchVotesForDelegate(delegate.address, pagination);
+                  return fetchVotesForDelegate(address, pagination);
                 }}
               />
             </div>
@@ -45,7 +45,7 @@ const VotesContainerWrapper = async ({ delegate }: Props) => {
               fetchSnapshotVotes={async (pagination: PaginationParams) => {
                 "use server";
                 return await fetchSnapshotVotesForDelegate({
-                  addressOrENSName: delegate.address,
+                  addressOrENSName: address,
                   pagination,
                 });
               }}

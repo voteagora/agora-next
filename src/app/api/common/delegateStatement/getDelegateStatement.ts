@@ -45,8 +45,10 @@ async function getDelegateStatementForAddress({
  */
 export async function getDelegateStatementsForAddresses({
   addresses,
+  stage,
 }: {
   addresses: string[];
+  stage?: stageStatus;
 }) {
   const { slug } = Tenant.current();
 
@@ -62,6 +64,10 @@ export async function getDelegateStatementsForAddresses({
           where: {
             address: { in: lowercasedAddresses },
             dao_slug: slug,
+            stage: stage || stageStatus.PUBLISHED,
+          },
+          orderBy: {
+            updated_at_ts: "desc",
           },
         })
         .catch((error) => {

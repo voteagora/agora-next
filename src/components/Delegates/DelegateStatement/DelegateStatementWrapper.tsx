@@ -2,13 +2,16 @@ import { DraftStatementDetails } from "./DelegateDraftStatement";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { DelegateStatementsSelector } from "./DelegateStatementsSelector";
 import { DelegateStatement } from "@/app/api/common/delegates/delegate";
+import { stageStatus } from "@/app/lib/sharedEnums";
 
 interface Props {
   address: string;
 }
 
 const DelegateStatementWrapper = async ({ address }: Props) => {
-  const delegateStatements = await fetchDelegateStatements(address);
+  const delegateStatements = await fetchDelegateStatements({
+    addresses: [address],
+  });
   const delegate = delegateStatements?.[0];
 
   return (

@@ -78,7 +78,10 @@ export const fetchDelegateDraftStatement = async (address: string) => {
   try {
     const cachedFetchDelegateDraft = unstable_cache(
       async () => {
-        return apiFetchDelegateStatements(address, stageStatus.DRAFT);
+        return apiFetchDelegateStatements({
+          addresses: [address],
+          stage: stageStatus.DRAFT,
+        });
       },
       [`delegateStatement-${address.toLowerCase()}-${stageStatus.DRAFT}`],
       {

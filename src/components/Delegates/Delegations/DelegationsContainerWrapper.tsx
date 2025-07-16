@@ -7,18 +7,13 @@ import {
 import { Delegate } from "@/app/api/common/delegates/delegate";
 
 interface Props {
-  delegate: Delegate;
+  address: string;
 }
 
-const DelegationsContainerWrapper = async ({ delegate }: Props) => {
-  // Use scw address for the 'delegated to' if exists
-  const hasSCWAddress = Boolean(delegate.statement?.scw_address);
-
+const DelegationsContainerWrapper = async ({ address }: Props) => {
   const [delegatees, delegators] = await Promise.all([
-    fetchCurrentDelegatees(
-      hasSCWAddress ? delegate.statement?.scw_address : delegate.address
-    ),
-    fetchCurrentDelegators(delegate.address),
+    fetchCurrentDelegatees(address),
+    fetchCurrentDelegators(address),
   ]);
   return (
     <DelegationsContainer
@@ -26,7 +21,7 @@ const DelegationsContainerWrapper = async ({ delegate }: Props) => {
       initialDelegators={delegators}
       fetchDelegators={async (pagination: PaginationParams) => {
         "use server";
-        return fetchCurrentDelegators(delegate.address, pagination);
+        return fetchCurrentDelegators(address, pagination);
       }}
     />
   );

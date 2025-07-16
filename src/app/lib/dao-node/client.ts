@@ -8,6 +8,7 @@ import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
 import { DelegateStats } from "@/lib/types";
+import { stageStatus } from "../sharedEnums";
 
 const { namespace, ui } = Tenant.current();
 
@@ -345,6 +346,7 @@ export const getDelegatesFromDaoNode = async (options?: {
 
         const statements = await fetchDelegateStatements({
           addresses: delegateAddresses,
+          stage: stageStatus.PUBLISHED,
         });
 
         const statementMap: Map<string, any> = new Map();

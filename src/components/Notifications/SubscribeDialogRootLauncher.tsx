@@ -1,6 +1,6 @@
 "use client";
 
-import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { useOpenDialogOptional } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useDelegate } from "@/hooks/useDelegate";
 import Tenant from "@/lib/tenant/tenant";
 import { useEffect, useState } from "react";
@@ -10,7 +10,7 @@ const SubscribeDialogLauncher = () => {
   const { address } = useAccount();
 
   const { ui } = Tenant.current();
-  const openDialog = useOpenDialog();
+  const openDialog = useOpenDialogOptional();
   const { data: delegate } = useDelegate({ address: address });
   const [hasShownRootDialog, setHasShownRootDialog] = useState<boolean>(false);
 
@@ -23,8 +23,10 @@ const SubscribeDialogLauncher = () => {
   // 1. make sure tenant supports this feature
   // 2. make sure we haven't already shown the root dialog
   // 3. make sure delegate is marked as "prompt" (should prompt)
+  // 4. make sure openDialog is available (DialogProvider is mounted)
   useEffect(() => {
     if (
+      openDialog &&
       ui.toggle("email-subscriptions")?.enabled &&
       !hasShownRootDialog &&
       (delegate?.statement?.notification_preferences
@@ -39,7 +41,7 @@ const SubscribeDialogLauncher = () => {
         },
       });
     }
-  }, [delegate, hasShownRootDialog]);
+  }, [delegate, hasShownRootDialog, openDialog]);
 
   return null;
 };
