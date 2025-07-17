@@ -6,6 +6,7 @@ import { tokenForContractAddress } from "@/lib/tokenUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { cn } from "@/lib/utils";
 import { fontMapper } from "@/styles/fonts";
+import Markdown from "@/components/shared/Markdown/Markdown";
 
 const { contracts, ui } = Tenant.current();
 
@@ -169,7 +170,7 @@ function SingleOption({
       {" "}
       <div className="flex justify-between font-semibold text-sm mb-1">
         <div className="whitespace-normal max-w-[12rem] text-primary">
-          {description}
+          <Markdown content={description} />
         </div>
         <div className="text-primary flex items-center gap-1">
           <TokenAmountDecorated
