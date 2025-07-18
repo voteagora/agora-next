@@ -411,30 +411,18 @@ async function getVotesForProposal({
           citizenQuery = `
             UNION ALL
             SELECT
-              ocv."transactionHash" as transaction_hash,
-              ocv."proposalId" as proposal_id,
-              ocv."voterAddress" as voter,
-              (ocv."vote"::json->>0) as support,
-              1::numeric as weight,
-              NULL as reason,
-              NULL as params,
-              NULL as block_number,
-              ocv."citizenCategory"::text as citizen_type,
-              CASE 
-                WHEN c."organizationId" IS NOT NULL THEN 
-                  JSON_BUILD_OBJECT('name', o."name", 'image', o."avatarUrl", 'type', 'chain')
-                WHEN c."projectId" IS NOT NULL THEN 
-                  JSON_BUILD_OBJECT('name', p."name", 'image', p."thumbnailUrl", 'type', 'app')
-                WHEN c."userId" IS NOT NULL THEN 
-                  JSON_BUILD_OBJECT('name', u."name", 'image', u."imageUrl", 'type', 'user')
-                ELSE NULL
-              END as voter_metadata
-            FROM atlas."OffChainVote" ocv
-            LEFT JOIN atlas."Citizen" c ON ocv."citizenId" = c.id
-            LEFT JOIN atlas."Project" p ON p.id = c."projectId"
-            LEFT JOIN atlas."Organization" o ON o.id = c."organizationId"
-            LEFT JOIN atlas."User" u ON u.id = c."userId"
-            WHERE ocv."proposalId" = ${offchainProposalId ? "$5" : "$1"}
+              transaction_hash,
+              proposal_id,
+              voter,
+              support::text,
+              weight,
+              reason,
+              params,
+              block_number,
+              citizen_type::text,
+              voter_metadata::json
+            FROM atlas."VotesWithMeta" ocv
+            WHERE ocv.proposal_id = ${offchainProposalId ? "$5" : "$1"}
           `;
         }
 
