@@ -267,7 +267,7 @@ async function getVotersWhoHaveNotVotedForProposal({
                     includeCitizens
                       ? `
                   UNION ALL
-                  SELECT LOWER("voterAddress") as voter FROM atlas."OffChainVote" WHERE "proposalId" = ${offchainProposalId ? "$6" : "$1"}`
+                  SELECT LOWER("voter") as voter FROM atlas."votes_with_meta_mat" WHERE "proposal_id" = ${offchainProposalId ? "$6" : "$1"}`
                       : ""
                   }
                 ),
@@ -276,7 +276,7 @@ async function getVotersWhoHaveNotVotedForProposal({
                   ${
                     includeCitizens
                       ? `
-                    UNION
+                    UNION ALL
                     SELECT 
                       LOWER(c."address") as delegate, 
                       0 as voting_power, 
