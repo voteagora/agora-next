@@ -421,7 +421,7 @@ async function getVotesForProposal({
               block_number,
               citizen_type::text,
               voter_metadata::json
-            FROM atlas."VotesWithMeta" ocv
+            FROM atlas."votes_with_meta_mat" ocv
             WHERE ocv.proposal_id = ${offchainProposalId ? "$5" : "$1"}
           `;
         }
