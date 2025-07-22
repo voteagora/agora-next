@@ -11,6 +11,8 @@ import {
 } from "@/app/proposals/actions";
 import { PaginatedResult } from "@/app/lib/pagination";
 import { useProposalVotes } from "@/hooks/useProposalVotes";
+import { cn } from "@/lib/utils";
+import ProposalVoterListFilter, { VoterTypes } from "./ProsalVoterListFilter";
 
 interface Props {
   proposalId: string;
@@ -33,6 +35,9 @@ export default function ProposalVotesList({
 
   const { address: connectedAddress } = useAccount();
   const fetching = useRef(false);
+  const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>(
+    VoterTypes[0]
+  );
 
   const [voteState, setVoteState] = useState<{
     pages: PaginatedResult<Vote[]>[];
@@ -97,42 +102,63 @@ export default function ProposalVotesList({
     }
   }, [proposalId, voteState.meta]);
 
+  const selectVoterType = (type: VoterTypes) => {
+    setSelectedVoterType(type);
+  };
+
   return (
-    <div className="px-4 pb-4 overflow-y-auto max-h-[calc(100vh-437px)] min-h-[36px]">
-      {isFetched && fetchedVotes ? (
-        <InfiniteScroll
-          hasMore={voteState.meta?.has_next}
-          pageStart={0}
-          loadMore={loadMore}
-          useWindow={false}
-          loader={
-            <div className="flex text-xs font-medium text-secondary" key={0}>
-              Loading more votes...
-            </div>
-          }
-          element="main"
-        >
-          <ul className="flex flex-col">
-            {userVotes.map((vote) => (
-              <li key={vote.transactionHash || vote.address + vote.citizenType}>
-                <ProposalSingleVote vote={vote} />
-              </li>
-            ))}
-            {proposalVotes.map((vote) => (
-              <li
-                key={vote.transactionHash || vote.address + vote.citizenType}
-                className={`${
-                  connectedAddress?.toLowerCase() === vote.address && "hidden"
-                }`}
-              >
-                <ProposalSingleVote vote={vote} />
-              </li>
-            ))}
-          </ul>
-        </InfiniteScroll>
-      ) : (
-        <div className="text-secondary text-xs">Loading...</div>
+    <>
+      {offchainProposalId && (
+        <ProposalVoterListFilter
+          selectedVoterType={selectedVoterType}
+          onVoterTypeChange={selectVoterType}
+        />
       )}
-    </div>
+      <div
+        className={cn(
+          "px-4 pb-4 overflow-y-auto min-h-[36px]",
+          offchainProposalId
+            ? "max-h-[calc(100vh-487px)]"
+            : "max-h-[calc(100vh-437px)]"
+        )}
+      >
+        {isFetched && fetchedVotes ? (
+          <InfiniteScroll
+            hasMore={voteState.meta?.has_next}
+            pageStart={0}
+            loadMore={loadMore}
+            useWindow={false}
+            loader={
+              <div className="flex text-xs font-medium text-secondary" key={0}>
+                Loading more votes...
+              </div>
+            }
+            element="main"
+          >
+            <ul className="flex flex-col">
+              {userVotes.map((vote) => (
+                <li
+                  key={vote.transactionHash || vote.address + vote.citizenType}
+                >
+                  <ProposalSingleVote vote={vote} />
+                </li>
+              ))}
+              {proposalVotes.map((vote) => (
+                <li
+                  key={vote.transactionHash || vote.address + vote.citizenType}
+                  className={`${
+                    connectedAddress?.toLowerCase() === vote.address && "hidden"
+                  }`}
+                >
+                  <ProposalSingleVote vote={vote} />
+                </li>
+              ))}
+            </ul>
+          </InfiniteScroll>
+        ) : (
+          <div className="text-secondary text-xs">Loading...</div>
+        )}
+      </div>
+    </>
   );
 }

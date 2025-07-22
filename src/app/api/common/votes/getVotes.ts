@@ -22,6 +22,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
+import { VoterTypes } from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -237,10 +238,12 @@ async function getVotersWhoHaveNotVotedForProposal({
   proposalId,
   pagination = { offset: 0, limit: 20 },
   offchainProposalId,
+  type,
 }: {
   proposalId: string;
   pagination?: PaginationParams;
   offchainProposalId?: string;
+  type?: VoterTypes["type"];
 }) {
   return withMetrics("getVotersWhoHaveNotVotedForProposal", async () => {
     const { namespace, contracts, slug } = Tenant.current();

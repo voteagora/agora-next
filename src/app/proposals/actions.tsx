@@ -10,6 +10,7 @@ import { getProposalsCount } from "@/lib/prismaUtils";
 import { PaginationParams } from "../lib/pagination";
 import { VotesSort } from "../api/common/votes/vote";
 import Tenant from "@/lib/tenant/tenant";
+import { VoterTypes } from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
 
 export async function fetchProposalsCount() {
   const { namespace, contracts } = Tenant.current();
@@ -22,12 +23,14 @@ export async function fetchProposalsCount() {
 export const fetchVotersWhoHaveNotVotedForProposal = (
   proposalId: string,
   pagination?: PaginationParams,
-  offchainProposalId?: string
+  offchainProposalId?: string,
+  type?: VoterTypes["type"]
 ) =>
   apiFetchVotersWhoHaveNotVotedForProposal({
     proposalId,
     pagination,
     offchainProposalId,
+    type,
   });
 
 export const fetchProposalVotes = (
