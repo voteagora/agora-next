@@ -280,20 +280,9 @@ async function getVotersWhoHaveNotVotedForProposal({
                     SELECT 
                       LOWER(c."address") as delegate, 
                       0 as voting_power, 
-                      c."type"::text as citizen_type,
-                      CASE 
-                        WHEN c."organizationId" IS NOT NULL THEN 
-                          JSON_BUILD_OBJECT('name', o."name", 'image', o."avatarUrl", 'type', 'organization')::text
-                        WHEN c."projectId" IS NOT NULL THEN 
-                          JSON_BUILD_OBJECT('name', p."name", 'image', p."thumbnailUrl", 'type', 'project')::text
-                        WHEN c."userId" IS NOT NULL THEN 
-                          JSON_BUILD_OBJECT('name', u."name", 'image', u."imageUrl", 'type', 'user')::text
-                        ELSE NULL
-                      END as voter_metadata_text
-                    FROM atlas."Citizen" c
-                    LEFT JOIN atlas."Project" p ON p.id = c."projectId"
-                    LEFT JOIN atlas."Organization" o ON o.id = c."organizationId"
-                    LEFT JOIN atlas."User" u ON u.id = c."userId"
+                      citizen_type,
+                      voter_metadata_text
+                    FROM atlas.citizens_mat c
                     LEFT JOIN ${namespace}.delegates d ON LOWER(c."address") = LOWER(d.delegate) AND d.contract = $2
                     WHERE d.delegate IS NULL`
                       : ""
