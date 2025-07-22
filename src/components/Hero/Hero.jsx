@@ -5,6 +5,13 @@ export default function Hero({ page }) {
   const { namespace, ui } = Tenant.current();
   const { title, description, hero } = ui.page(page);
 
+  // For Protocol Guild proposals/delegates, render nothing (no whitespace)
+  if (
+    namespace === "pguild" &&
+    (page === "proposals" || page === "delegates")
+  ) {
+    return <div style={{ height: 24 }} />;
+  }
   return (
     <div className="flex-col hidden sm:flex sm:flex-row justify-between mt-12 mb-0 sm:my-12 max-w-full">
       <div className="flex flex-col max-w-[36rem] mt-0 mb-8 sm:mb-0">

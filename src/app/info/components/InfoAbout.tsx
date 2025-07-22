@@ -49,6 +49,50 @@ const InfoAbout = () => {
   const { namespace, ui, brandName } = Tenant.current();
   const page = ui.page("info/about");
 
+  // override for Protocol Guild
+  const pguildTabs = [
+    {
+      icon: (
+        <CoinsIcon
+          className="w-[24px] h-[24px]"
+          stroke={rgbStringToHex(ui.customization?.brandPrimary)}
+        />
+      ),
+      title: "Voting power",
+      description:
+        "All Protocol Guild members are given one voting share, which they must delegate to themselves or other members.",
+    },
+    {
+      icon: (
+        <NotificationIcon
+          className="w-[24px] h-[24px]"
+          stroke={rgbStringToHex(ui.customization?.brandPrimary)}
+        />
+      ),
+      title: "Proposal cadence",
+      description: (
+        <>
+          Membership updates are batched onchain on a quarterly basis to
+          minimize governance overhead.
+        </>
+      ),
+    },
+    {
+      icon: (
+        <CheckCircleBrokenIcon
+          className="w-[24px] h-[24px]"
+          stroke={rgbStringToHex(ui.customization?.brandPrimary)}
+        />
+      ),
+      title: "Proposal thresholds",
+      description:
+        "Membership updates require a quorum of 33% and an approval threshold of 51% to pass.",
+    },
+  ];
+
+  // Use pguildTabs only for Protocol Guild, otherwise use the original tabs
+  const activeTabs = namespace === TENANT_NAMESPACES.PGUILD ? pguildTabs : tabs;
+
   if (!page) {
     return <div>Page metadata not defined</div>;
   }
@@ -56,7 +100,9 @@ const InfoAbout = () => {
   return (
     <>
       <h3 className="text-2xl font-black text-primary mt-12">
-        Getting started
+        {namespace === TENANT_NAMESPACES.PGUILD
+          ? "How it works"
+          : "Getting started"}
       </h3>
       <div className="mt-4 rounded-xl border border-line bg-neutral shadow-sm">
         <div className="p-6 flex flex-row flex-wrap sm:flex-nowrap gap-6">
@@ -72,9 +118,48 @@ const InfoAbout = () => {
             <h3 className="text-lg font-bold text-primary">
               {namespace === TENANT_NAMESPACES.DEMO
                 ? "About Canopy"
-                : "About " + brandName}
+                : namespace === TENANT_NAMESPACES.PGUILD
+                  ? "About Protocol Guild"
+                  : "About " + brandName}
             </h3>
-            <p className="text-secondary mt-3">{page.description}</p>
+            <p className="text-secondary mt-3">
+              {namespace === TENANT_NAMESPACES.PGUILD ? (
+                <>
+                  Protocol Guild’s Agora DAO includes{" "}
+                  <a
+                    href="https://protocol-guild.readthedocs.io/en/latest/02-membership.html#active-members"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    all Guild members
+                  </a>
+                  , with one person one vote, including vote delegation. The DAO
+                  is used to ratify changes to the membership on a quarterly
+                  basis. It does not keep track of{" "}
+                  <a
+                    href="https://protocol-guild.readthedocs.io/en/latest/02-membership.html#split-share"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    member weights
+                  </a>
+                  , nor does it hold any{" "}
+                  <a
+                    href="https://protocol-guild.readthedocs.io/en/latest/03-onchain-architecture.html#vesting-contract"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    funds
+                  </a>
+                  .
+                </>
+              ) : (
+                page.description
+              )}
+            </p>
             {/* So the image doesn't look smooshed for scroll :eye-roll: */}
             {namespace === TENANT_NAMESPACES.SCROLL && (
               <div className="sm:h-[105px] block"></div>
@@ -110,7 +195,7 @@ const InfoAbout = () => {
         )}
         <div className="p-6  rounded-b-xl bg-neutral border-t border-line">
           <div className="flex flex-row gap-6 flex-wrap sm:flex-nowrap mb-4">
-            {tabs.map((item, index) => (
+            {activeTabs.map((item, index) => (
               <div
                 key={index}
                 className="flex flex-row gap-3 justify-center items-center mt-3"
@@ -121,7 +206,9 @@ const InfoAbout = () => {
                 <div>
                   <h3 className="font-semibold text-primary">{item.title}</h3>
                   <p className="font-normal text-secondary">
-                    {item.description}
+                    {typeof item.description === "string"
+                      ? item.description
+                      : item.description}
                   </p>
                 </div>
               </div>
