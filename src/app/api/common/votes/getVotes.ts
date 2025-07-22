@@ -282,9 +282,7 @@ async function getVotersWhoHaveNotVotedForProposal({
                       0 as voting_power, 
                       citizen_type,
                       voter_metadata_text
-                    FROM atlas.citizens_mat c
-                    LEFT JOIN ${namespace}.delegates d ON c."address" = LOWER(d.delegate) AND d.contract = $2
-                    WHERE d.delegate IS NULL`
+                    FROM atlas.citizens_mat c`
                       : ""
                   }
                 ),
