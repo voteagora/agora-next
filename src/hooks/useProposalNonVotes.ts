@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { PaginatedResult } from "@/app/lib/pagination";
 import { fetchVotersWhoHaveNotVotedForProposal } from "@/app/proposals/actions";
-import { VoterTypes } from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
+import { VoterTypes } from "@/app/api/common/votes/vote";
 
 interface Props {
   enabled: boolean;

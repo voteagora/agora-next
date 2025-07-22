@@ -9,30 +9,8 @@ import {
 import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu";
 import { FilterIcon } from "@/icons/filter";
 import { cn } from "@/lib/utils";
-
-export type VoterTypes = {
-  type: string;
-  value: string;
-};
-
-export const VoterTypes = [
-  {
-    type: "citizenHouseApps",
-    value: "Citizen House: Apps",
-  },
-  {
-    type: "citizenHouseChains",
-    value: "Citizen House: Chains",
-  },
-  {
-    type: "citizenHouseUsers",
-    value: "Citizen House: Users",
-  },
-  {
-    type: "TH",
-    value: "Token House",
-  },
-];
+import { VOTER_TYPES } from "@/lib/constants";
+import { VoterTypes } from "@/app/api/common/votes/vote";
 
 interface ProposalVoterListFilterProps {
   selectedVoterType: VoterTypes;
@@ -59,13 +37,13 @@ export default function ProposalVoterListFilter({
           <DropdownMenuRadioGroup
             value={selectedVoterType.type}
             onValueChange={(value: string) => {
-              const selectedType = VoterTypes.find(
+              const selectedType = VOTER_TYPES.find(
                 (type) => type.type === value
               );
               if (selectedType) onVoterTypeChange(selectedType);
             }}
           >
-            {VoterTypes.map((type) => (
+            {VOTER_TYPES.map((type) => (
               <DropdownMenuRadioItem
                 key={type.value}
                 value={type.type}

@@ -7,11 +7,11 @@ import InfiniteScroll from "react-infinite-scroller";
 import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useProposalNonVotes } from "@/hooks/useProposalNonVotes";
-import { Vote } from "@/app/api/common/votes/vote";
+import { Vote, VoterTypes } from "@/app/api/common/votes/vote";
 import { cn } from "@/lib/utils";
 import { ParsedProposalData } from "@/lib/proposalUtils";
-
-import ProposalVoterListFilter, { VoterTypes } from "./ProsalVoterListFilter";
+import { VOTER_TYPES } from "@/lib/constants";
+import ProposalVoterListFilter from "./ProsalVoterListFilter";
 const LIMIT = 20;
 
 type Props = {
@@ -26,7 +26,7 @@ const ProposalNonVoterList = ({
   offchainProposalId,
 }: Props) => {
   const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>(
-    VoterTypes[0]
+    VOTER_TYPES[0]
   );
 
   const { data: fetchedNonVotes, isFetched } = useProposalNonVotes({

@@ -3,7 +3,7 @@
 import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
 import { ProposalSingleVote } from "./ProposalSingleVote";
-import { Vote } from "@/app/api/common/votes/vote";
+import { Vote, VoterTypes } from "@/app/api/common/votes/vote";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   fetchProposalVotes,
@@ -12,7 +12,8 @@ import {
 import { PaginatedResult } from "@/app/lib/pagination";
 import { useProposalVotes } from "@/hooks/useProposalVotes";
 import { cn } from "@/lib/utils";
-import ProposalVoterListFilter, { VoterTypes } from "./ProsalVoterListFilter";
+import ProposalVoterListFilter from "./ProsalVoterListFilter";
+import { VOTER_TYPES } from "@/lib/constants";
 
 interface Props {
   proposalId: string;
@@ -36,7 +37,7 @@ export default function ProposalVotesList({
   const { address: connectedAddress } = useAccount();
   const fetching = useRef(false);
   const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>(
-    VoterTypes[0]
+    VOTER_TYPES[0]
   );
 
   const [voteState, setVoteState] = useState<{

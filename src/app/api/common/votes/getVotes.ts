@@ -11,6 +11,7 @@ import {
   SnapshotVotePayload,
   Vote,
   VotePayload,
+  VoterTypes,
   VotesSort,
 } from "./vote";
 import { prismaWeb3Client } from "@/app/lib/prisma";
@@ -22,7 +23,6 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
-import { VoterTypes } from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -238,7 +238,7 @@ async function getVotersWhoHaveNotVotedForProposal({
   proposalId,
   pagination = { offset: 0, limit: 20 },
   offchainProposalId,
-  type,
+  type = "TH",
 }: {
   proposalId: string;
   pagination?: PaginationParams;

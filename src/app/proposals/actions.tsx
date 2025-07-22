@@ -8,9 +8,8 @@ import {
 } from "@/app/api/common/votes/getVotes";
 import { getProposalsCount } from "@/lib/prismaUtils";
 import { PaginationParams } from "../lib/pagination";
-import { VotesSort } from "../api/common/votes/vote";
+import { VoterTypes, VotesSort } from "../api/common/votes/vote";
 import Tenant from "@/lib/tenant/tenant";
-import { VoterTypes } from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
 
 export async function fetchProposalsCount() {
   const { namespace, contracts } = Tenant.current();
