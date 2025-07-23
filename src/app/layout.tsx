@@ -4,8 +4,9 @@ import Header from "@/components/Header/Header";
 import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import Tenant from "@/lib/tenant/tenant";
-import { fontMapper, inter } from "@/styles/fonts";
+import { fontMapper, inter, fontShape } from "@/styles/fonts";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import ShapeCanvas from "@/components/Background/ShapeCanvas";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 declare global {
@@ -69,6 +70,9 @@ export default async function RootLayout({
     fontMapper[ui?.customization?.font || ""]?.style.fontFamily ||
     inter.style.fontFamily;
 
+  const { namespace } = Tenant.current();
+  const showShapeCanvas = namespace === "shape";
+
   const favicons = {
     appleTouchIcon:
       ui?.favicon?.["apple-touch-icon"] || defaultFavicons["apple-touch-icon"],
@@ -94,7 +98,11 @@ export default async function RootLayout({
   } as React.CSSProperties;
 
   return (
-    <html lang="en" style={style}>
+    <html
+      lang="en"
+      style={style}
+      className={`${inter.variable} ${fontShape.variable}`}
+    >
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
@@ -131,6 +139,7 @@ export default async function RootLayout({
 
       <NuqsAdapter>
         <ClientLayout>
+          {showShapeCanvas && <ShapeCanvas />}
           <Header />
           <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
             {children}
