@@ -38,7 +38,8 @@ const DraftPreview = ({
 }) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-  const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
+  const config = plmToggle?.config as PLMConfig;
+  const gatingType = config?.gatingType;
   const votingModuleType = proposalDraft.voting_module_type;
   const { inputData } = getInputData(proposalDraft);
   const targets = inputData?.[0];
@@ -80,6 +81,16 @@ const DraftPreview = ({
     accountVotes !== undefined ? accountVotes : lastValidVotes;
 
   const canSponsor = () => {
+    if (
+      proposalDraft.proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
+      (proposalDraft.proposal_scope === ProposalScope.HYBRID &&
+        !!proposalDraft.onchain_transaction_hash)
+    ) {
+      return (
+        !!config.offchainProposalCreator &&
+        config.offchainProposalCreator.includes(address || "")
+      );
+    }
     switch (gatingType) {
       case ProposalGatingType.MANAGER:
         return manager === address;
@@ -170,8 +181,31 @@ const DraftPreview = ({
           <p className="flex-grow text-primary">Voting power</p>
           <span className="text-secondary font-mono text-xs">
             {"> "}
-            {(plmToggle?.config as PLMConfig)?.snapshotConfig?.requiredTokens}
+            {config?.snapshotConfig?.requiredTokens}
             {" tokens"}
+          </span>
+        </div>
+      );
+    }
+    if (
+      (proposalDraft.proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
+        (proposalDraft.proposal_scope === ProposalScope.HYBRID &&
+          !!proposalDraft.onchain_transaction_hash)) &&
+      config?.offchainProposalCreator
+    ) {
+      return (
+        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+          <p className="flex-grow text-primary">Offchain proposal creator</p>
+          <span className="text-secondary font-mono text-xs">
+            <div className="flex flex-col">
+              {config.offchainProposalCreator?.map((creator) => (
+                <div key={creator}>
+                  <span className="text-secondary font-mono text-xs">
+                    {creator}
+                  </span>
+                </div>
+              ))}
+            </div>
           </span>
         </div>
       );

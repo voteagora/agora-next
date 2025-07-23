@@ -65,14 +65,15 @@ const SponsorOnchainProposalDialog = ({
             <div className="mb-2 text-2xl font-black text-primary">
               {isLoading ? "Creating your proposal ..." : "Proposal complete!"}
             </div>
-            {isHybrid &&
-              config.offchainProposalCreator &&
-              config.offchainProposalCreator !== address && (
+            {!!isHybrid &&
+              !!config.offchainProposalCreator &&
+              !!address &&
+              !config.offchainProposalCreator.includes(address) && (
                 <div className="mb-5 text-base text-secondary">
                   Switch to the offchain proposal creator wallet to create an
                   offchain proposal:
                   <div className="text-primary">
-                    {config.offchainProposalCreator}
+                    {config.offchainProposalCreator.join(", ")}
                   </div>
                 </div>
               )}
@@ -122,9 +123,10 @@ const SponsorOnchainProposalDialog = ({
                 </div>
               </div>
             )}
-            {isHybrid &&
-              config.offchainProposalCreator &&
-              config.offchainProposalCreator === address && (
+            {!!isHybrid &&
+              !!config.offchainProposalCreator &&
+              !!address &&
+              config.offchainProposalCreator.includes(address) && (
                 <div className="mt-4">
                   <OffchainProposalAction draftProposal={draftProposal} />
                 </div>

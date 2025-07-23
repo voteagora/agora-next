@@ -54,7 +54,10 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
   const canCancel =
     adminAddress?.toString().toLowerCase() === address?.toLowerCase() ||
     (proposal.proposalType?.startsWith("OFFCHAIN") &&
-      offchainProposalCreator?.toLowerCase() === address?.toLowerCase());
+      address &&
+      offchainProposalCreator?.some(
+        (creator) => creator.toLowerCase() === address?.toLowerCase()
+      ));
 
   const actionableStates: string[] = [
     PROPOSAL_STATUS.ACTIVE,
