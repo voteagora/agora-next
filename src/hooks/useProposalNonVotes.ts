@@ -24,7 +24,7 @@ export const useProposalNonVotes = ({
 }: Props) => {
   const { data, isFetching, isFetched } = useQuery({
     enabled: enabled,
-    queryKey: [QK, proposalId, offset],
+    queryKey: [QK, proposalId, offset, type, offchainProposalId],
     queryFn: async () => {
       return (await fetchVotersWhoHaveNotVotedForProposal(
         proposalId,

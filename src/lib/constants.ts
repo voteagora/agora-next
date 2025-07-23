@@ -175,15 +175,15 @@ export const OFFCHAIN_OPTIMISTIC_THRESHOLD = [20, 20, 20];
 
 export const VOTER_TYPES: VoterTypes[] = [
   {
-    type: "citizenHouseApps",
+    type: "APP",
     value: "Citizen House: Apps",
   },
   {
-    type: "citizenHouseChains",
+    type: "CHAIN",
     value: "Citizen House: Chains",
   },
   {
-    type: "citizenHouseUsers",
+    type: "USER",
     value: "Citizen House: Users",
   },
   {

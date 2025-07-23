@@ -26,7 +26,10 @@ const ProposalNonVoterList = ({
   offchainProposalId,
 }: Props) => {
   const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>(
-    VOTER_TYPES[0]
+    proposal.proposalType?.includes("HYBRID") ||
+      proposal.proposalType?.includes("OFFCHAIN")
+      ? VOTER_TYPES[0]
+      : VOTER_TYPES[VOTER_TYPES.length - 1]
   );
 
   const { data: fetchedNonVotes, isFetched } = useProposalNonVotes({
@@ -83,41 +86,60 @@ const ProposalNonVoterList = ({
           onVoterTypeChange={(type) => setSelectedVoterType(type)}
         />
       )}
-      <div
-        className={cn(
-          "px-4 pb-4 overflow-y-auto min-h-[36px]",
-          isThresholdCriteria || proposal.proposalType === "SNAPSHOT"
-            ? "max-h-[calc(100vh-560px)]"
-            : isApprovalProposal
-              ? "max-h-[calc(100vh-527px)]"
-              : "max-h-[calc(100vh-437px)]"
-        )}
-      >
-        {isFetched && fetchedNonVotes ? (
-          <InfiniteScroll
-            hasMore={meta?.has_next}
-            pageStart={0}
-            loadMore={loadMore}
-            useWindow={false}
-            loader={
-              <div className="flex text-xs font-medium text-secondary" key={0}>
-                Loading more voters...
-              </div>
-            }
-            element="main"
+
+      {(() => {
+        let baseHeight = 437;
+        if (isThresholdCriteria || proposal.proposalType === "SNAPSHOT") {
+          baseHeight = 560;
+        } else if (isApprovalProposal) {
+          baseHeight = 527;
+        }
+
+        // Only add 50px for offchainProposalId to account for filter
+        if (offchainProposalId) {
+          baseHeight += 50;
+        }
+        const maxHeightClass = `max-h-[calc(100vh-${baseHeight}px)]`;
+        return (
+          <div
+            className={cn(
+              "px-4 pb-4 overflow-y-auto min-h-[36px]",
+              maxHeightClass
+            )}
           >
-            <ul className="flex flex-col gap-2">
-              {voters.map((voter) => (
-                <li key={voter.delegate} className="">
-                  <ProposalSingleNonVoter voter={voter} proposal={proposal} />
-                </li>
-              ))}
-            </ul>
-          </InfiniteScroll>
-        ) : (
-          <div className="text-secondary text-xs">Loading...</div>
-        )}
-      </div>
+            {isFetched && fetchedNonVotes ? (
+              <InfiniteScroll
+                hasMore={meta?.has_next}
+                pageStart={0}
+                loadMore={loadMore}
+                useWindow={false}
+                loader={
+                  <div
+                    className="flex text-xs font-medium text-secondary"
+                    key={0}
+                  >
+                    Loading more voters...
+                  </div>
+                }
+                element="main"
+              >
+                <ul className="flex flex-col gap-2">
+                  {voters.map((voter) => (
+                    <li key={voter.delegate} className="">
+                      <ProposalSingleNonVoter
+                        voter={voter}
+                        proposal={proposal}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </InfiniteScroll>
+            ) : (
+              <div className="text-secondary text-xs">Loading...</div>
+            )}
+          </div>
+        );
+      })()}
     </>
   );
 };
