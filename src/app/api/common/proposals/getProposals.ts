@@ -378,10 +378,34 @@ async function getProposal(proposalId: string) {
     let getProposalExecution;
     if (useDaoNode) {
       getProposalExecution = doInSpan({ name: "getProposal" }, async () => {
-        const propTypes = await getProposalTypesFromDaoNode();
-        const prop = await getProposalFromDaoNode(proposalId);
-        const proposal = adaptDAONodeResponse(prop.proposal, propTypes.proposal_types);
-        return proposal;
+        try {
+          console.log(
+            `Attempting to fetch proposal ${proposalId} from DAO-Node...`
+          );
+          const propTypes = await getProposalTypesFromDaoNode();
+          const prop = await getProposalFromDaoNode(proposalId);
+          const proposal = adaptDAONodeResponse(
+            prop.proposal,
+            propTypes.proposal_types
+          );
+          console.log(
+            `✅ Successfully fetched proposal ${proposalId} from DAO-Node`
+          );
+          return proposal;
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+          console.warn(
+            `⚠️ DAO-Node failed for proposal ${proposalId}, falling back to database:`,
+            errorMessage
+          );
+          // Fallback to database
+          return findProposal({
+            namespace,
+            proposalId,
+            contract: contracts.governor.address,
+          });
+        }
       });
     } else {
       getProposalExecution = doInSpan({ name: "getProposal" }, async () =>
