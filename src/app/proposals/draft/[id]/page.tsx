@@ -51,7 +51,7 @@ export default async function DraftProposalPage({
 
   const ownerAddresses = [
     draftProposal.author_address,
-    config.offchainProposalCreator,
+    ...(config.offchainProposalCreator || []),
   ].filter(Boolean) as string[];
 
   return (
