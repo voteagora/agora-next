@@ -94,7 +94,7 @@ export const shapeTenantConfig = ({
     treasury: TREASURY,
 
     delegationModel: DELEGATION_MODEL.FULL,
-    governorType: GOVERNOR_TYPE.AGORA,
+    governorType: GOVERNOR_TYPE.AGORA_20,
     timelockType:
       TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
     supportScopes: true,

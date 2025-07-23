@@ -97,6 +97,16 @@ export const delegatesFilterOptions = {
   },
 };
 
+export const citizensFilterOptions = {
+  mostVotingPower: {
+    value: "Most voting power",
+    sort: "most_voting_power",
+  },
+  shuffle: {
+    sort: "shuffle",
+    value: "Shuffle",
+  },
+};
 export const delegatesVotesSortOptions = {
   newest: {
     sortOrder: "desc",
@@ -143,6 +153,7 @@ export const disapprovalThreshold = 12;
 
 export enum GOVERNOR_TYPE {
   AGORA = "AGORA",
+  AGORA_20 = "AGORA_20",
   ALLIGATOR = "ALLIGATOR",
   BRAVO = "BRAVO",
   ENS = "ENS",
