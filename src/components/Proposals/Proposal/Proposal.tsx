@@ -130,7 +130,8 @@ export default function Proposal({
                 <HybridStandardProposalStatus proposal={proposal} />
               )}
             {(proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED" ||
-              proposal.proposalType === "OFFCHAIN_OPTIMISTIC") && (
+              proposal.proposalType === "OFFCHAIN_OPTIMISTIC" ||
+              proposal.proposalType === "OFFCHAIN_OPTIMISTIC_TIERED") && (
               <HybridOptimisticProposalStatus proposal={proposal} />
             )}
           </div>
