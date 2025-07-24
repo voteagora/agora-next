@@ -140,15 +140,13 @@ export const ProfileDropDownContent = ({
           }
           detail={
             <div className="flex flex-col gap-4">
-              {filteredDelegations
-                ?.slice(0, 3)
-                .map((delegate) => (
-                  <DelegatePanelRow
-                    key={delegate.transaction_hash}
-                    delegate={delegate}
-                    onClick={handleCloseDrawer}
-                  />
-                ))}
+              {filteredDelegations?.slice(0, 3).map((delegate) => (
+                <DelegatePanelRow
+                  key={delegate.transaction_hash}
+                  delegate={delegate}
+                  onClick={handleCloseDrawer}
+                />
+              ))}
               {filteredDelegations?.length > 3 && (
                 <Link
                   href={`/delegates/${address}?tab=delegations&subtab=delegatedTo`}
