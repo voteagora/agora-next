@@ -210,8 +210,10 @@ export type PLMConfig = {
   gatingType: ProposalGatingType;
   // Whether to show the create proposal button conditionally with a check
   protocolLevelCreateProposalButtonCheck?: boolean;
-  // The address that can create offchain proposals
-  offchainProposalCreator?: string;
+  // The addresses that can create offchain proposals
+  offchainProposalCreator?: string[];
+  // Temporary: allow public draft sharing via ?share=AuthorAddress
+  allowDraftSharing?: boolean;
 };
 
 export type BaseProposal = ProposalDraft & {

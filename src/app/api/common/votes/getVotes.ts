@@ -11,6 +11,7 @@ import {
   SnapshotVotePayload,
   Vote,
   VotePayload,
+  VoterTypes,
   VotesSort,
 } from "./vote";
 import { prismaWeb3Client } from "@/app/lib/prisma";
@@ -233,84 +234,142 @@ async function getSnapshotVotesForDelegateForAddress({
   });
 }
 
+/**
+ * Build the has_voted CTE query based on voter type and namespace
+ */
+function buildHasVotedQuery(
+  namespace: string,
+  eventsViewName: string,
+  slug: string,
+  type: VoterTypes["type"],
+  offchainProposalId?: string
+): string {
+  const isTokenHouse = type === "TH";
+
+  if (isTokenHouse) {
+    // Token House: Check onchain votes and snapshot votes
+    return `
+      SELECT voter FROM ${namespace}.vote_cast_events WHERE proposal_id = $1 and contract = $3
+      UNION ALL
+      SELECT voter FROM ${namespace}.${eventsViewName} WHERE proposal_id = $1 and contract = $3
+      UNION ALL
+      SELECT voter FROM "snapshot".votes WHERE proposal_id = $1 and dao_slug = '${slug}'`;
+  }
+
+  return `SELECT LOWER("voter") as voter FROM atlas."votes_with_meta_mat" WHERE "proposal_id" = ${offchainProposalId ? "$6" : "$1"}`;
+}
+
+/**
+ * Get the citizen type filter based on the voter type
+ */
+function getCitizenTypeFilter(type: VoterTypes["type"]): string {
+  switch (type) {
+    case "APP":
+      return "citizen_type = 'app'";
+    case "CHAIN":
+      return "citizen_type = 'chain'";
+    case "USER":
+      return "citizen_type = 'user'";
+    default:
+      return "citizen_type IN ('app', 'chain', 'user')";
+  }
+}
+
+/**
+ * Build the relevant_delegates CTE query based on voter type
+ */
+function buildRelevantDelegatesQuery(
+  namespace: string,
+  type: VoterTypes["type"]
+): string {
+  const isTokenHouse = type === "TH";
+
+  if (isTokenHouse) {
+    return `SELECT delegate, voting_power, NULL::text as citizen_type, NULL::text as voter_metadata_text FROM ${namespace}.delegates where contract = $2`;
+  }
+
+  const citizenTypeFilter = getCitizenTypeFilter(type);
+  return `
+      SELECT 
+        c."address" as delegate, 
+        1 as voting_power, 
+        citizen_type,
+        voter_metadata_text
+      FROM atlas.citizens_mat c
+      WHERE ${citizenTypeFilter}`;
+}
+
 async function getVotersWhoHaveNotVotedForProposal({
   proposalId,
   pagination = { offset: 0, limit: 20 },
   offchainProposalId,
+  type = "TH",
 }: {
   proposalId: string;
   pagination?: PaginationParams;
   offchainProposalId?: string;
+  type?: VoterTypes["type"];
 }) {
   return withMetrics("getVotersWhoHaveNotVotedForProposal", async () => {
     const { namespace, contracts, slug } = Tenant.current();
 
-    let eventsViewName;
-
-    if (namespace == TENANT_NAMESPACES.OPTIMISM) {
-      eventsViewName = "vote_cast_with_params_events_v2";
-    } else {
-      eventsViewName = "vote_cast_with_params_events";
-    }
-
-    const includeCitizens = namespace === TENANT_NAMESPACES.OPTIMISM;
+    const eventsViewName =
+      namespace === TENANT_NAMESPACES.OPTIMISM
+        ? "vote_cast_with_params_events_v2"
+        : "vote_cast_with_params_events";
 
     const queryFunction = (skip: number, take: number) => {
+      const hasVotedQuery = buildHasVotedQuery(
+        namespace,
+        eventsViewName,
+        slug,
+        type,
+        offchainProposalId
+      );
+      const relevantDelegatesQuery = buildRelevantDelegatesQuery(
+        namespace,
+        type
+      );
+
       const notVotedQuery = `
-              with has_voted as (
-                  SELECT voter FROM ${namespace}.vote_cast_events WHERE proposal_id = $1 and contract = $3
-                  UNION ALL
-                  SELECT voter FROM ${namespace}.${eventsViewName} WHERE proposal_id = $1 and contract = $3
-                  UNION ALL
-                  SELECT voter FROM "snapshot".votes WHERE proposal_id = $1 and dao_slug = '${slug}'
-                  ${
-                    includeCitizens
-                      ? `
-                  UNION ALL
-                  SELECT LOWER("voterAddress") as voter FROM atlas."OffChainVote" WHERE "proposalId" = ${offchainProposalId ? "$6" : "$1"}`
-                      : ""
-                  }
-                ),
-                relevant_delegates as (
-                  SELECT delegate, voting_power, NULL::text as citizen_type, NULL::text as voter_metadata_text FROM ${namespace}.delegates where contract = $2
-                  ${
-                    includeCitizens
-                      ? `
-                    UNION
-                    SELECT 
-                      LOWER(c."address") as delegate, 
-                      0 as voting_power, 
-                      c."type"::text as citizen_type,
-                      CASE 
-                        WHEN c."organizationId" IS NOT NULL THEN 
-                          JSON_BUILD_OBJECT('name', o."name", 'image', o."avatarUrl", 'type', 'organization')::text
-                        WHEN c."projectId" IS NOT NULL THEN 
-                          JSON_BUILD_OBJECT('name', p."name", 'image', p."thumbnailUrl", 'type', 'project')::text
-                        WHEN c."userId" IS NOT NULL THEN 
-                          JSON_BUILD_OBJECT('name', u."name", 'image', u."imageUrl", 'type', 'user')::text
-                        ELSE NULL
-                      END as voter_metadata_text
-                    FROM atlas."Citizen" c
-                    LEFT JOIN atlas."Project" p ON p.id = c."projectId"
-                    LEFT JOIN atlas."Organization" o ON o.id = c."organizationId"
-                    LEFT JOIN atlas."User" u ON u.id = c."userId"
-                    LEFT JOIN ${namespace}.delegates d ON LOWER(c."address") = LOWER(d.delegate) AND d.contract = $2
-                    WHERE d.delegate IS NULL`
-                      : ""
-                  }
-                ),
-                delegates_who_havent_votes as (
-                  SELECT d.delegate, d.voting_power, d.citizen_type, d.voter_metadata_text FROM relevant_delegates d left join has_voted v on d.delegate = v.voter where v.voter is null
-                )
-                select del.delegate, del.voting_power, del.citizen_type, del.voter_metadata_text::json as "voterMetadata",
-                      ds.twitter,
-                    ds.discord,
-                    ds.warpcast
-                from delegates_who_havent_votes del LEFT JOIN agora.delegate_statements ds on 
-                  del.delegate = ds.address
-                  AND ds.dao_slug = 'OP'
-                ORDER BY del.voting_power DESC
-                OFFSET $4 LIMIT $5;`;
+        WITH has_voted AS (
+          ${hasVotedQuery}
+        ),
+        relevant_delegates AS (
+          ${relevantDelegatesQuery}
+        ),
+        delegates_who_havent_votes AS (
+          SELECT d.delegate, d.voting_power, d.citizen_type, d.voter_metadata_text 
+          FROM relevant_delegates d 
+          LEFT JOIN has_voted v ON d.delegate = v.voter 
+          WHERE v.voter IS NULL
+        ),
+        unique_delegates AS (
+          SELECT DISTINCT ON (del.delegate)
+            del.delegate, 
+            del.voting_power, 
+            del.citizen_type, 
+            del.voter_metadata_text,
+            ds.twitter,
+            ds.discord,
+            ds.warpcast
+          FROM delegates_who_havent_votes del 
+          LEFT JOIN agora.delegate_statements ds ON 
+            del.delegate = ds.address
+            AND ds.dao_slug = 'OP'
+          ORDER BY del.delegate, del.voting_power DESC
+        )
+        SELECT 
+          delegate, 
+          voting_power, 
+          citizen_type, 
+          voter_metadata_text::json as "voterMetadata",
+          twitter,
+          discord,
+          warpcast
+        FROM unique_delegates
+        ORDER BY voting_power DESC
+        OFFSET $4 LIMIT $5`;
 
       const params = [
         proposalId,
@@ -320,7 +379,10 @@ async function getVotersWhoHaveNotVotedForProposal({
         take,
       ];
 
-      if (includeCitizens && offchainProposalId) {
+      // Add offchain proposal ID parameter if needed for citizen votes
+      const shouldIncludeCitizenVotes =
+        namespace === TENANT_NAMESPACES.OPTIMISM && type !== "TH";
+      if (shouldIncludeCitizenVotes && offchainProposalId) {
         params.push(offchainProposalId);
       }
 
@@ -421,7 +483,7 @@ async function getVotesForProposal({
               block_number,
               citizen_type::text,
               voter_metadata::json
-            FROM atlas."VotesWithMeta" ocv
+            FROM atlas."votes_with_meta_mat" ocv
             WHERE ocv.proposal_id = ${offchainProposalId ? "$5" : "$1"}
           `;
         }

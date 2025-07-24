@@ -13,7 +13,6 @@ import {
   TENANT_NAMESPACES,
   OFFCHAIN_THRESHOLDS,
   HYBRID_VOTE_WEIGHTS,
-  disapprovalThreshold,
   HYBRID_PROPOSAL_QUORUM,
   HYBRID_OPTIMISTIC_TIERED_THRESHOLD,
   OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD,
@@ -556,7 +555,10 @@ export type ParsedProposalData = {
   };
   OPTIMISTIC: {
     key: "OPTIMISTIC";
-    kind: { options: [] };
+    kind: {
+      options: [];
+      disapprovalThreshold: number;
+    };
   };
   HYBRID_OPTIMISTIC: {
     key: "HYBRID_OPTIMISTIC";
@@ -700,10 +702,13 @@ export function parseProposalData(
       }
     }
     case "OPTIMISTIC": {
+      const parsedProposalData = JSON.parse(proposalData);
+      const disapprovalThreshold =
+        Number(parsedProposalData?.[0]?.[0] || 2000) / 100;
       return {
         key: proposalType,
-        kind: { options: [] },
-      };
+        kind: { options: [], disapprovalThreshold },
+      } as ParsedProposalData["OPTIMISTIC"];
     }
     case "HYBRID_OPTIMISTIC_TIERED": {
       const parsedProposalData = JSON.parse(proposalData);
@@ -711,7 +716,9 @@ export function parseProposalData(
         key: proposalType,
         kind: {
           options: [],
-          tiers: parsedProposalData.tiers,
+          tiers: parsedProposalData.tiers
+            .map((tier: number) => tier / 100)
+            .sort((a: number, b: number) => b - a),
           created_attestation_hash: parsedProposalData.created_attestation_hash,
           cancelled_attestation_hash:
             parsedProposalData.cancelled_attestation_hash,
@@ -787,7 +794,9 @@ export function parseProposalData(
         key: proposalType,
         kind: {
           options: [],
-          tiers: parsedProposalData.tiers,
+          tiers: parsedProposalData.tiers
+            .map((tier: number) => tier / 100)
+            .sort((a: number, b: number) => b - a),
           onchainProposalId: parsedProposalData.onchain_proposalid,
           created_attestation_hash: parsedProposalData.created_attestation_hash,
           cancelled_attestation_hash:
@@ -1140,6 +1149,10 @@ export function calculateOptimisticProposalMetrics(
     formattedVotableSupply > 0
       ? Number(((againstLength / formattedVotableSupply) * 100).toFixed(2))
       : 0;
+
+  const proposalData =
+    proposal.proposalData as ParsedProposalData["OPTIMISTIC"]["kind"];
+  const disapprovalThreshold = proposalData.disapprovalThreshold;
 
   const status =
     againstRelativeAmount <= disapprovalThreshold ? "approved" : "defeated";

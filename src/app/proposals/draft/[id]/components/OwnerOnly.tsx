@@ -1,6 +1,9 @@
 "use client";
 
 import { useAccount } from "wagmi";
+import { useSearchParams } from "next/navigation";
+import Tenant from "@/lib/tenant/tenant";
+import { PLMConfig } from "@/app/proposals/draft/types";
 
 const OnlyOwner = ({
   ownerAddresses,
@@ -10,6 +13,11 @@ const OnlyOwner = ({
   children: React.ReactNode;
 }) => {
   const { address, isConnecting, isReconnecting } = useAccount();
+  const searchParams = useSearchParams();
+  const shareParam = searchParams?.get("share");
+  const { ui } = Tenant.current();
+  const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
+  const config = proposalLifecycleToggle?.config as PLMConfig;
 
   // causing jitter when loading... need to figure out a better long term solution
   //   if (isConnecting || isReconnecting) {
@@ -25,6 +33,17 @@ const OnlyOwner = ({
   //       </main>
   //     );
   //   }
+
+  // Check if sharing via author address - configurable per tenant
+  if (
+    config?.allowDraftSharing &&
+    shareParam &&
+    ownerAddresses.some(
+      (owner) => owner.toLowerCase() === shareParam.toLowerCase()
+    )
+  ) {
+    return <>{children}</>;
+  }
 
   if (!ownerAddresses.includes(address as string)) {
     return (

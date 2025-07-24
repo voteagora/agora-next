@@ -50,7 +50,7 @@ export function ProposalSingleNonVoter({
 
   return (
     <VStack
-      key={voter.delegate}
+      key={voter.delegate + (voter.citizen_type || "")}
       gap={2}
       className="text-xs text-tertiary px-0 py-1"
     >
@@ -147,7 +147,11 @@ export function ProposalSingleNonVoter({
         </HStack>
         <HStack className="text-primary" alignItems="items-center">
           <TokenAmountDecorated
-            amount={pastVotes || voter.direct_vp}
+            amount={
+              voter.citizen_type
+                ? voter.direct_vp
+                : pastVotes || voter.direct_vp
+            }
             hideCurrency
             specialFormatting
             className={

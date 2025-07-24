@@ -16,6 +16,7 @@ import {
   DraftProposal,
   PLMConfig,
   ProposalGatingType,
+  ProposalScope,
   ProposalType,
 } from "../types";
 import Tenant from "@/lib/tenant/tenant";
@@ -55,6 +56,17 @@ const RequestSponsorshipForm = ({
         accountVotesData !== undefined &&
         requiredTokensForSnapshot !== undefined &&
         accountVotesData >= requiredTokensForSnapshot
+      );
+    }
+    if (
+      draftProposal.proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
+      (draftProposal.proposal_scope === ProposalScope.HYBRID &&
+        !!draftProposal.onchain_transaction_hash)
+    ) {
+      const config = plmToggle?.config as PLMConfig;
+      return (
+        !!config.offchainProposalCreator &&
+        config.offchainProposalCreator.includes(address || "")
       );
     }
     switch (gatingType) {

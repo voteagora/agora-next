@@ -62,7 +62,7 @@ const OffchainProposalAction = ({
       return;
     }
 
-    if (address !== config.offchainProposalCreator) {
+    if (!address || !config.offchainProposalCreator?.includes(address)) {
       setOffchainSubmitError(
         "You are not authorized to submit offchain proposals."
       );

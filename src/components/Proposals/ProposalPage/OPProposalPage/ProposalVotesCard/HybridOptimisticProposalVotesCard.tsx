@@ -292,7 +292,10 @@ const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
               {showVoters ? (
                 <ProposalVotesList proposalId={proposal.id} />
               ) : (
-                <ProposalNonVoterList proposal={proposal} />
+                <ProposalNonVoterList
+                  proposal={proposal}
+                  offchainProposalId={proposal.offchainProposalId}
+                />
               )}
             </>
           )}

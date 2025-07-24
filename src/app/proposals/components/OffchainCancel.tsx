@@ -24,7 +24,10 @@ export const OffchainCancel = ({ proposal }: Props) => {
   const offchainProposalCreator = plmConfig.offchainProposalCreator;
 
   const canCancel =
-    offchainProposalCreator?.toLowerCase() === address?.toLowerCase();
+    address &&
+    offchainProposalCreator?.some(
+      (creator) => creator.toLowerCase() === address?.toLowerCase()
+    );
 
   const handleCancel = async () => {
     if (!proposal.id || !walletClient || !address || !chain) {

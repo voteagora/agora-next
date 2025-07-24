@@ -1,4 +1,4 @@
-import { TenantNamespace } from "./types";
+import { VoterTypes } from "@/app/api/common/votes/vote";
 
 export const INDEXER_DELAY = 3000;
 
@@ -138,7 +138,7 @@ export const retroPGFSort = {
   mostInBallots: "Most in ballots",
 };
 
-export const disapprovalThreshold = 12;
+export const disapprovalThreshold = 20;
 
 export enum GOVERNOR_TYPE {
   AGORA = "AGORA",
@@ -172,3 +172,22 @@ export const HYBRID_PROPOSAL_QUORUM = 0.3;
 export const HYBRID_OPTIMISTIC_TIERED_THRESHOLD = [55, 45, 35];
 export const OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD = [65, 65, 65];
 export const OFFCHAIN_OPTIMISTIC_THRESHOLD = [20, 20, 20];
+
+export const VOTER_TYPES: VoterTypes[] = [
+  {
+    type: "APP",
+    value: "Citizen House: Apps",
+  },
+  {
+    type: "CHAIN",
+    value: "Citizen House: Chains",
+  },
+  {
+    type: "USER",
+    value: "Citizen House: Users",
+  },
+  {
+    type: "TH", // used as default in voter/hasnt voted list apis
+    value: "Token House",
+  },
+];

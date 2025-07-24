@@ -66,7 +66,10 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
         proposalDraft.proposal_scope === ProposalScope.OFFCHAIN_ONLY)
     ) {
       return (
-        (plmToggle?.config as PLMConfig)?.offchainProposalCreator === address
+        address &&
+        (plmToggle?.config as PLMConfig)?.offchainProposalCreator?.includes(
+          address
+        )
       );
     }
     switch (gatingType) {
