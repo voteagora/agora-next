@@ -703,8 +703,8 @@ export function parseProposalData(
     }
     case "OPTIMISTIC": {
       const parsedProposalData = JSON.parse(proposalData);
-      const disapprovalThreshold = ((parsedProposalData[0] || 2000) /
-        100) as number;
+      const disapprovalThreshold =
+        Number(parsedProposalData?.[0]?.[0] || 2000) / 100;
       return {
         key: proposalType,
         kind: { options: [], disapprovalThreshold },
