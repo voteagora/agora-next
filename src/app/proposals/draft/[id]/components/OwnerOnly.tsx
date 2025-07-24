@@ -3,7 +3,7 @@
 import { useAccount } from "wagmi";
 import { useSearchParams } from "next/navigation";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import { PLMConfig } from "@/app/proposals/draft/types";
 
 const OnlyOwner = ({
   ownerAddresses,
@@ -15,7 +15,9 @@ const OnlyOwner = ({
   const { address, isConnecting, isReconnecting } = useAccount();
   const searchParams = useSearchParams();
   const shareParam = searchParams?.get("share");
-  const { namespace } = Tenant.current();
+  const { ui } = Tenant.current();
+  const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
+  const config = proposalLifecycleToggle?.config as PLMConfig;
 
   // causing jitter when loading... need to figure out a better long term solution
   //   if (isConnecting || isReconnecting) {
@@ -32,9 +34,9 @@ const OnlyOwner = ({
   //     );
   //   }
 
-  // Check if sharing via author address - only for Optimism tenant
+  // Check if sharing via author address - configurable per tenant
   if (
-    namespace === TENANT_NAMESPACES.OPTIMISM &&
+    config?.allowDraftSharing &&
     shareParam &&
     ownerAddresses.some(
       (owner) => owner.toLowerCase() === shareParam.toLowerCase()

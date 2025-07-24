@@ -212,6 +212,8 @@ export type PLMConfig = {
   protocolLevelCreateProposalButtonCheck?: boolean;
   // The addresses that can create offchain proposals
   offchainProposalCreator?: string[];
+  // Temporary: allow public draft sharing via ?share=AuthorAddress
+  allowDraftSharing?: boolean;
 };
 
 export type BaseProposal = ProposalDraft & {
