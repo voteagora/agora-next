@@ -180,7 +180,7 @@ const DraftPreview = ({
         <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
           <p className="flex-grow text-primary">Voting power</p>
           <span className="text-secondary font-mono text-xs">
-            {"> "}
+            {">= "}
             {config?.snapshotConfig?.requiredTokens}
             {" tokens"}
           </span>
@@ -239,7 +239,7 @@ const DraftPreview = ({
         >
           <p className="flex-grow text-primary">Voting power</p>
           <span className="text-secondary font-mono text-xs">
-            {"> "}
+            {">= "}
             {threshold
               ? Math.round(
                   parseFloat(
