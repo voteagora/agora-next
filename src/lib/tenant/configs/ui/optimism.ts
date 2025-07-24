@@ -239,6 +239,8 @@ export const optimismTenantUIConfig = new TenantUI({
       name: "proposal-lifecycle",
       enabled: true,
       config: {
+        // Temporary: allow public draft sharing via ?share=AuthorAddress
+        allowDraftSharing: true,
         offchainProposalCreator: [
           "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB",
           "0xa7f8Ad892F3E6f25BB042c8AD7a220e74aCebAd8",
