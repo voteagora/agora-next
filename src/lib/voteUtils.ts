@@ -16,7 +16,7 @@ import {
 } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import Tenant from "@/lib/tenant/tenant";
-import { disapprovalThreshold, TENANT_NAMESPACES } from "@/lib/constants";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
 import { AbiCoder } from "ethers";
 import { mapArbitrumBlockToMainnetBlock } from "./utils";
@@ -396,6 +396,9 @@ export function calculateVoteMetadata({
         const againstAmount = Number(
           formatUnits(adjustedResults.against, token.decimals)
         );
+        const proposalData =
+          proposal.proposalData as ParsedProposalData["OPTIMISTIC"]["kind"];
+        const disapprovalThreshold = proposalData.disapprovalThreshold;
         const thresholdAmount =
           (disapprovalThreshold * Number(formattedVotableSupply)) / 100;
 
@@ -705,6 +708,9 @@ export function calculateVoteMetadataMinified({
       const againstAmount = Number(
         formatUnits(adjustedResults.against, token.decimals)
       );
+      const proposalData =
+        proposal.proposalData as ParsedProposalData["OPTIMISTIC"]["kind"];
+      const disapprovalThreshold = proposalData.disapprovalThreshold;
       const thresholdAmount =
         (disapprovalThreshold * Number(formattedVotableSupply)) / 100;
 

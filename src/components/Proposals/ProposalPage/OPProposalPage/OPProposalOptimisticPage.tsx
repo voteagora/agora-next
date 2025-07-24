@@ -1,13 +1,20 @@
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
-import { disapprovalThreshold } from "@/lib/constants";
 import { formatNumber } from "@/lib/utils";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
 import OptimisticProposalVotesCard from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/OptimisticProposalVotesCard";
-import { calculateOptimisticProposalMetrics } from "@/lib/proposalUtils";
+import {
+  calculateOptimisticProposalMetrics,
+  ParsedProposalData,
+} from "@/lib/proposalUtils";
 import Tenant from "@/lib/tenant/tenant";
+import { Proposal } from "@/app/api/common/proposals/proposal";
 
-export default async function OPProposalPage({ proposal }) {
+export default async function OPProposalPage({
+  proposal,
+}: {
+  proposal: Proposal;
+}) {
   const votableSupply = await fetchVotableSupply();
   const tokenDecimals = Tenant.current().token.decimals;
 
@@ -17,11 +24,15 @@ export default async function OPProposalPage({ proposal }) {
   );
 
   const againstLengthString = formatNumber(
-    proposal.proposalResults?.against || "0",
+    (proposal.proposalResults as any)?.against || "0",
     tokenDecimals,
     0,
     true
   );
+
+  const proposalData =
+    proposal.proposalData as ParsedProposalData["OPTIMISTIC"]["kind"];
+  const disapprovalThreshold = proposalData.disapprovalThreshold;
 
   return (
     <div className="flex flex-col">
@@ -33,7 +44,7 @@ export default async function OPProposalPage({ proposal }) {
         <div className="w-full md:max-w-[24rem]">
           <OptimisticProposalVotesCard
             proposal={proposal}
-            againstRelativeAmount={againstRelativeAmount}
+            againstRelativeAmount={againstRelativeAmount.toString()}
             againstLengthString={againstLengthString}
             disapprovalThreshold={disapprovalThreshold}
             status={status}
