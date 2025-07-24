@@ -90,10 +90,7 @@ export default function ApprovalVotesPanel({
                 isThresholdCriteria={isThresholdCriteria}
               />
             ) : (
-              <ProposalNonVoterList
-                proposal={proposal}
-                isApprovalProposal={true}
-              />
+              <ProposalNonVoterList proposal={proposal} />
             )}
           </>
         )}

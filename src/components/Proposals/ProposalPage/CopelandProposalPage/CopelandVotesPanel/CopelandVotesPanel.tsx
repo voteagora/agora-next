@@ -151,10 +151,7 @@ export default function CopelandVotesPanel({
                 proposalId={proposal.id}
               />
             ) : (
-              <ProposalNonVoterList
-                proposal={proposal}
-                isApprovalProposal={true}
-              />
+              <ProposalNonVoterList proposal={proposal} />
             )}
           </>
         )}
