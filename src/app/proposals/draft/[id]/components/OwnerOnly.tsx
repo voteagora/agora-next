@@ -1,6 +1,9 @@
 "use client";
 
 import { useAccount } from "wagmi";
+import { useSearchParams } from "next/navigation";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const OnlyOwner = ({
   ownerAddresses,
@@ -10,6 +13,9 @@ const OnlyOwner = ({
   children: React.ReactNode;
 }) => {
   const { address, isConnecting, isReconnecting } = useAccount();
+  const searchParams = useSearchParams();
+  const shareParam = searchParams?.get("share");
+  const { namespace } = Tenant.current();
 
   // causing jitter when loading... need to figure out a better long term solution
   //   if (isConnecting || isReconnecting) {
@@ -25,6 +31,17 @@ const OnlyOwner = ({
   //       </main>
   //     );
   //   }
+
+  // Check if sharing via author address - only for Optimism tenant
+  if (
+    namespace === TENANT_NAMESPACES.OPTIMISM &&
+    shareParam &&
+    ownerAddresses.some(
+      (owner) => owner.toLowerCase() === shareParam.toLowerCase()
+    )
+  ) {
+    return <>{children}</>;
+  }
 
   if (!ownerAddresses.includes(address as string)) {
     return (
