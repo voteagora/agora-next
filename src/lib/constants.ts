@@ -138,7 +138,7 @@ export const retroPGFSort = {
   mostInBallots: "Most in ballots",
 };
 
-export const disapprovalThreshold = 12;
+export const disapprovalThreshold = 20;
 
 export enum GOVERNOR_TYPE {
   AGORA = "AGORA",
