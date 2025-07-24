@@ -3,7 +3,7 @@
 import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
 import { ProposalSingleVote } from "./ProposalSingleVote";
-import { Vote } from "@/app/api/common/votes/vote";
+import { Vote, VoterTypes } from "@/app/api/common/votes/vote";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   fetchProposalVotes,
@@ -98,7 +98,7 @@ export default function ProposalVotesList({
   }, [proposalId, voteState.meta]);
 
   return (
-    <div className="px-4 pb-4 overflow-y-auto max-h-[calc(100vh-437px)] min-h-[36px]">
+    <div className="px-4 pb-4 overflow-y-auto min-h-[36px] max-h-[calc(100vh-437px)]">
       {isFetched && fetchedVotes ? (
         <InfiniteScroll
           hasMore={voteState.meta?.has_next}
