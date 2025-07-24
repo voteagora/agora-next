@@ -128,8 +128,8 @@ export default class TenantTokenFactory {
           symbol: "SHAPE",
           decimals: 18,
           address: isProd
-            ? "0xD6e705292f293Df65c9FB9C28f67C3794fC66D5F"
-            : "0x27b0031c64f4231f0aff28e668553d73f48125f3",
+            ? "0x10374c5D846179BA9aC03b468497B58E13C5f74e"
+            : "0x10374c5D846179BA9aC03b468497B58E13C5f74e",
         };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
