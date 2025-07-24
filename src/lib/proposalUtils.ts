@@ -711,7 +711,9 @@ export function parseProposalData(
         key: proposalType,
         kind: {
           options: [],
-          tiers: parsedProposalData.tiers,
+          tiers: parsedProposalData.tiers
+            .map((tier: number) => tier / 100)
+            .sort((a: number, b: number) => b - a),
           created_attestation_hash: parsedProposalData.created_attestation_hash,
           cancelled_attestation_hash:
             parsedProposalData.cancelled_attestation_hash,
@@ -787,7 +789,9 @@ export function parseProposalData(
         key: proposalType,
         kind: {
           options: [],
-          tiers: parsedProposalData.tiers,
+          tiers: parsedProposalData.tiers
+            .map((tier: number) => tier / 100)
+            .sort((a: number, b: number) => b - a),
           onchainProposalId: parsedProposalData.onchain_proposalid,
           created_attestation_hash: parsedProposalData.created_attestation_hash,
           cancelled_attestation_hash:
