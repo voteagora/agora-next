@@ -10,10 +10,8 @@ import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getD
 import { DelegateStats } from "@/lib/types";
 
 const { namespace, ui } = Tenant.current();
-import {
-  DaoNodeDelegateVote,
-  DaoNodeVoteRecord,
-} from "@/app/api/common/votes/vote";
+
+import { DaoNodeDelegateVote, DaoNodeVoteRecord } from "@/app/api/common/votes/vote";
 import { PaginationParams } from "../pagination";
 
 // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL TODO BELOW IS HANDLED
