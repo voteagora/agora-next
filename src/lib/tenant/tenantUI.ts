@@ -2,6 +2,7 @@ import { StaticImageData } from "next/image";
 import { icons } from "@/icons/icons";
 import { PLMConfig } from "@/app/proposals/draft/types";
 import { TenantToken } from "../types";
+import React, { ReactNode } from "react";
 
 type UIToggle = {
   name: string;
@@ -51,12 +52,18 @@ export type UILink = {
 };
 
 type UIPage = {
-  description: string;
+  description: string | React.ReactNode;
   hero?: StaticImageData | string;
   href?: string;
   links?: UILink[];
   route: string;
   title: string;
+  sectionTitle?: string;
+  tabs?: Array<{
+    icon: React.ReactNode;
+    title: string;
+    description: string | React.ReactNode;
+  }>;
   meta: {
     title: string;
     description: string;

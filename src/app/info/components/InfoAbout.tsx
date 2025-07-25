@@ -53,11 +53,12 @@ const InfoAbout = () => {
     return <div>Page metadata not defined</div>;
   }
 
+  const activeTabs = page.tabs || tabs;
+  const sectionTitle = page.sectionTitle || "Getting started";
+
   return (
     <>
-      <h3 className="text-2xl font-black text-primary mt-12">
-        Getting started
-      </h3>
+      <h3 className="text-2xl font-black text-primary mt-12">{sectionTitle}</h3>
       <div className="mt-4 rounded-xl border border-line bg-neutral shadow-sm">
         <div className="p-6 flex flex-row flex-wrap sm:flex-nowrap gap-6">
           <div className="w-full h-[200px] sm:h-auto sm:w-1/2 relative">
@@ -70,9 +71,7 @@ const InfoAbout = () => {
           </div>
           <div className="sm:w-1/2">
             <h3 className="text-lg font-bold text-primary">
-              {namespace === TENANT_NAMESPACES.DEMO
-                ? "About Canopy"
-                : "About " + brandName}
+              {"About " + brandName}
             </h3>
             <p className="text-secondary mt-3">{page.description}</p>
             {/* So the image doesn't look smooshed for scroll :eye-roll: */}
@@ -110,7 +109,7 @@ const InfoAbout = () => {
         )}
         <div className="p-6  rounded-b-xl bg-neutral border-t border-line">
           <div className="flex flex-row gap-6 flex-wrap sm:flex-nowrap mb-4">
-            {tabs.map((item, index) => (
+            {activeTabs.map((item, index) => (
               <div
                 key={index}
                 className="flex flex-row gap-3 justify-center items-center mt-3"
