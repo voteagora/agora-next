@@ -191,7 +191,7 @@ export async function parseVote(
     proposalId: vote.proposal_id,
     support: parseSupport(vote.support, vote.proposal_type, vote.start_block),
     weight: vote.weight.toFixed(0),
-    reason: vote.reason,
+    reason: vote.reason ?? null,
     params: proposalData ? parseParams(vote.params, proposalData) : null,
     proposalValue: proposalData
       ? getProposalTotalValue(proposalData) || BigInt(0)
