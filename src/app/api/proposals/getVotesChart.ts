@@ -21,7 +21,7 @@ export async function getVotesChart({
         return {
           voter: vote.voter,
           support: String(vote.support),
-          weight: vote.weight.toLocaleString("fullwide", {
+          weight: (vote.weight ?? "0").toLocaleString("fullwide", {
             useGrouping: false,
           }),
           block_number: String(vote.bn),

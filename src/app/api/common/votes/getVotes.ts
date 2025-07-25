@@ -578,7 +578,7 @@ async function getVotesForProposal({
                   parsedProposal.proposal_type,
                   String(proposal.start_block)
                 ),
-                weight: vote.weight.toLocaleString("fullwide", {
+                weight: (vote.weight ?? "0").toLocaleString("fullwide", {
                   useGrouping: false,
                 }),
                 reason: vote.reason,
