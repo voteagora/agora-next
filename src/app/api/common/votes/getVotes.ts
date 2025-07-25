@@ -506,6 +506,7 @@ async function getVotesForProposal({
             ?.map((vote) => {
               return {
                 transactionHash: null,
+                transactionOrdinal: (BigInt(vote.bn) * BigInt(10000)) + BigInt(vote.tid * 100) + BigInt(vote.lid),
                 address: vote.voter,
                 proposalId,
                 support: parseSupport(
