@@ -10,10 +10,14 @@ import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getD
 import { DelegateStats } from "@/lib/types";
 
 const { namespace, ui } = Tenant.current();
+<<<<<<< HEAD
 import {
   DaoNodeDelegateVote,
   DaoNodeVoteRecord,
 } from "@/app/api/common/votes/vote";
+=======
+import { DaoNodeDelegateVote, DaoNodeVoteRecord } from "@/app/api/common/votes/vote";
+>>>>>>> c5505753 (Switcht to DaoNodeVoteRecord)
 import { PaginationParams } from "../pagination";
 
 // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL TODO BELOW IS HANDLED
@@ -527,11 +531,17 @@ export const getVoteRecordFromDaoNode = async (
     reverse: reverse ? "true" : "false", // For VP, you likely want "true", to sort by descending.  For Block Number, you likely want false, for ascending.
   });
 
-  const response = await fetch(
-    `${url}v1/vote_record/${proposalId}?${queryParams}`
-  );
-  const data: { vote_record: DaoNodeVoteRecord[]; has_more: boolean } =
-    await response.json();
+
+  if (pagination) {
+    queryParams.append("page_size", pagination.limit.toString());
+    queryParams.append("offset", pagination.offset.toString());
+  } else {
+    queryParams.append("full", "true");
+  }
+
+
+  const response = await fetch(`${url}v1/vote_record/${proposalId}?${queryParams}`);
+  const data: { vote_record: DaoNodeVoteRecord[], has_more: boolean } = await response.json();
   return data;
 };
 
