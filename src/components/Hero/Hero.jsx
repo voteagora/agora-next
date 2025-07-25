@@ -1,5 +1,6 @@
 import Tenant from "@/lib/tenant/tenant";
 import Image from "next/image";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default function Hero({ page }) {
   const { namespace, ui } = Tenant.current();
@@ -7,7 +8,7 @@ export default function Hero({ page }) {
 
   // For Protocol Guild proposals/delegates, render nothing (no whitespace)
   if (
-    namespace === "pguild" &&
+    namespace === TENANT_NAMESPACES.PGUILD &&
     (page === "proposals" || page === "delegates")
   ) {
     return <div style={{ height: 24 }} />;
