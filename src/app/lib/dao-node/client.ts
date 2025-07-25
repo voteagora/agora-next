@@ -501,23 +501,40 @@ export const getVotingHistoryFromDaoNode = async (address: string) => {
 };
 
 export const getVoteRecordFromDaoNode = async (
-  proposalId: string,
-  sortBy: string,
-  pagination: PaginationParams,
+  proposalId: string, 
+  sortBy: string, 
+  pagination: PaginationParams | undefined, 
   reverse: true | false
 ) => {
   const url = getDaoNodeURLForNamespace(namespace);
 
   const queryParams = new URLSearchParams({
     sort_by: sortBy,
-    page_size: pagination.limit.toString(),
-    offset: pagination.offset.toString(),
     reverse: reverse ? "true" : "false", // For VP, you likely want "true", to sort by descending.  For Block Number, you likely want false, for ascending.
   });
 
-  const response = await fetch(
-    `${url}v1/vote_record/${proposalId}?${queryParams}`);
-  const data: { vote_record: DaoNodeVoteRecord[], has_more: boolean } = 
-    await response.json();
+  if (pagination) {
+    queryParams.append("page_size", pagination.limit.toString());
+    queryParams.append("offset", pagination.offset.toString());
+  } else {
+    queryParams.append("full", "true");
+  }
+
+
+  const response = await fetch(`${url}v1/vote_record/${proposalId}?${queryParams}`);
+  const data: { vote_record: DaoNodeVoteRecord[], has_more: boolean } = await response.json();
   return data;
-};
+}
+
+export const getUserVoteRecordFromDaoNode = async (proposalId: string, address: string) => {
+  const url = getDaoNodeURLForNamespace(namespace);
+
+  const queryParams = new URLSearchParams({
+    proposal_id: proposalId,
+    addr: address,
+  });
+
+  const response = await fetch(`${url}v1/vote?${queryParams}`);
+  const data: { vote: DaoNodeVoteRecord } = await response.json();
+  return data;
+}
