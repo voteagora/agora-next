@@ -39,7 +39,7 @@ export const shapeTenantUIConfig = new TenantUI({
     line: "223 223 223",
     positive: "66 122 43",
     negative: "182 13 13",
-    brandPrimary: "144 193 41",
+    brandPrimary: "0 0 0",
     brandSecondary: "242 242 242",
     font: "font-shape",
     letterSpacing: "0",

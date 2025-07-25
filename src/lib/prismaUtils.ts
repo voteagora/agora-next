@@ -46,7 +46,7 @@ export function findDelagatee({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.SHAPE:
-      return prismaWeb3Client.pguildDelegatees.findFirst(condition);
+      return prismaWeb3Client.shapeDelegatees.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -97,7 +97,7 @@ export function findAdvancedDelegatee({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.SHAPE:
-      return prismaWeb3Client.pguildAdvancedDelegatees.findMany(condition);
+      return prismaWeb3Client.shapeAdvancedDelegatees.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -145,7 +145,7 @@ export function findVotableSupply({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaVotableSupply.findFirst({});
     case TENANT_NAMESPACES.SHAPE:
-      return prismaWeb3Client.pguildVotableSupply.findFirst({});
+      return prismaWeb3Client.shapeVotableSupply.findFirst({});
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -193,7 +193,7 @@ export function findSnapshotProposalsQueryFromDb({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findMany(condition);
     case TENANT_NAMESPACES.SHAPE:
-      return prismaWeb3Client.pguildProposals.findMany(condition);
+      return prismaWeb3Client.shapeProposals.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -301,7 +301,7 @@ export function findProposalsQueryFromDB({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findMany(condition);
     case TENANT_NAMESPACES.SHAPE:
-      return prismaWeb3Client.pguildProposals.findMany(condition);
+      return prismaWeb3Client.shapeProposals.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -348,7 +348,7 @@ export function findProposal({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findFirst(condition);
     case TENANT_NAMESPACES.SHAPE:
-      return prismaWeb3Client.pguildProposals.findFirst(condition);
+      return prismaWeb3Client.shapeProposals.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -557,7 +557,7 @@ export function findProposalType({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.SHAPE:
-      return prismaWeb3Client.pguildProposalTypes.findMany(condition);
+      return prismaWeb3Client.shapeProposalTypes.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -604,7 +604,7 @@ export function findVotes({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaVotes.findMany(condition);
     case TENANT_NAMESPACES.SHAPE:
-      return prismaWeb3Client.pguildVotes.findMany(condition);
+      return prismaWeb3Client.shapeVotes.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -654,7 +654,7 @@ export function findVotingPower({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.SHAPE:
-      return prismaWeb3Client.pguildVotingPower.findFirst(condition);
+      return prismaWeb3Client.shapeVotingPower.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -704,7 +704,7 @@ export function findAdvancedVotingPower({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.SHAPE:
-      return prismaWeb3Client.pguildAdvancedVotingPower.findFirst(condition);
+      return prismaWeb3Client.shapeAdvancedVotingPower.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -751,7 +751,7 @@ export async function findStakedDeposit({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.SHAPE:
-      return prismaWeb3Client.pguildStakedDeposits.findFirst(condition);
+      return prismaWeb3Client.shapeStakedDeposits.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -810,7 +810,7 @@ export function findStakedDeposits({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.SHAPE:
-      return prismaWeb3Client.pguildStakedDeposits.findMany(condition);
+      return prismaWeb3Client.shapeStakedDeposits.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -858,7 +858,7 @@ export function getProposalsCount({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.count(condition);
     case TENANT_NAMESPACES.SHAPE:
-      return prismaWeb3Client.pguildProposals.count(condition);
+      return prismaWeb3Client.shapeProposals.count(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
