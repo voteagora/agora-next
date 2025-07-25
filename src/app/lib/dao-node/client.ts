@@ -10,8 +10,7 @@ import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getD
 import { DelegateStats } from "@/lib/types";
 
 const { namespace, ui } = Tenant.current();
-import { DaoNodeDelegateVote, DaoNodeVote } from "@/app/api/common/votes/vote";
-import { options } from "yargs";
+import { DaoNodeDelegateVote, DaoNodeVoteRecord } from "@/app/api/common/votes/vote";
 import { PaginationParams } from "../pagination";
 
 // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL TODO BELOW IS HANDLED
@@ -516,7 +515,7 @@ export const getVoteRecordFromDaoNode = async (proposalId: string, sortBy: strin
 
 
   const response = await fetch(`${url}v1/vote_record/${proposalId}?${queryParams}`);
-  const data: { vote_record: DaoNodeVote[], has_more: boolean } = await response.json();
+  const data: { vote_record: DaoNodeVoteRecord[], has_more: boolean } = await response.json();
   return data;
 }
 
@@ -529,6 +528,6 @@ export const getUserVoteRecordFromDaoNode = async (proposalId: string, address: 
   });
 
   const response = await fetch(`${url}v1/vote?${queryParams}`);
-  const data: { vote: DaoNodeVote } = await response.json();
+  const data: { vote: DaoNodeVoteRecord } = await response.json();
   return data;
 }
