@@ -517,7 +517,7 @@ async function getVotesForProposal({
                 weight: (vote.weight ?? "0").toLocaleString("fullwide", {
                   useGrouping: false,
                 }),
-                reason: vote.reason,
+                reason: vote.reason ?? null,
                 params: vote.params
                   ? parseParams(JSON.stringify(vote.params), proposalData)
                   : [],
