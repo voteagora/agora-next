@@ -526,7 +526,7 @@ async function getVotesForProposal({
                   proposal.description
                 ),
                 proposalType: parsedProposal.proposal_type,
-                timestamp: getHumanBlockTime(vote.block_number, latestBlock),
+                timestamp: getHumanBlockTime(vote.bn, latestBlock),
                 blockNumber: BigInt(vote.bn),
                 transaction_index: vote.tid,
               };
@@ -772,7 +772,7 @@ async function getUserVotesForProposal({
               weight: vote.weight.toLocaleString("fullwide", {
                 useGrouping: false,
               }),
-              reason: vote.reason,
+              reason: vote.reason ?? null,
               params: vote.params
                 ? parseParams(JSON.stringify(vote.params), proposalData)
                 : [],
