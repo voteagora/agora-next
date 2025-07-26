@@ -515,7 +515,7 @@ export const getVotingHistoryFromDaoNode = async (address: string) => {
 export const getVoteRecordFromDaoNode = async (
   proposalId: string,
   sortBy: string,
-  pagination: PaginationParams,
+  pagination: PaginationParams | undefined,
   reverse: true | false
 ) => {
   const url = getDaoNodeURLForNamespace(namespace);
