@@ -477,15 +477,15 @@ async function getVotesForProposal({
 
         console.log("😀 Using dao node for votes")
         try {
-          
-          const sortBy = "VP"
-          const reverse = true
-          let [proposalResponse, typesFromApi, voteRecordPage, latestBlock] = await Promise.all([
-            getProposalFromDaoNode(proposalId),
-            getProposalTypesFromDaoNode(),
-            getVoteRecordFromDaoNode(proposalId, sortBy, pagination, reverse),
-            latestBlockPromise
-          ]);
+          const sortBy = "VP";
+          const reverse = true;
+          let [proposalResponse, typesFromApi, voteRecordPage, latestBlock] =
+            await Promise.all([
+              getProposalFromDaoNode(proposalId),
+              getProposalTypesFromDaoNode(),
+              getVoteRecordFromDaoNode(proposalId, sortBy, pagination, reverse),
+              latestBlockPromise,
+            ]);
 
           const proposal = proposalResponse.proposal;
 
@@ -502,34 +502,39 @@ async function getVotesForProposal({
             JSON.stringify(parsedProposal.proposal_data || {}),
             parsedProposal.proposal_type
           );
-          const votes = voteRecordPage.vote_record
-            ?.map((vote) => {
-              return {
-                transactionHash: null,
-                address: vote.voter,
-                proposalId,
-                support: parseSupport(
-                  String(vote.support),
-                  parsedProposal.proposal_type,
-                  String(proposal.start_block)
-                ),
-                weight: vote.weight.toLocaleString("fullwide", {
-                  useGrouping: false,
-                }),
-                reason: vote.reason,
-                params: vote.params
-                  ? parseParams(JSON.stringify(vote.params), proposalData)
-                  : [],
-                proposalValue: getProposalTotalValue(proposalData) ?? BigInt(0),
-                proposalTitle: getTitleFromProposalDescription(
-                  proposal.description
-                ),
-                proposalType: parsedProposal.proposal_type,
-                timestamp: getHumanBlockTime(vote.block_number, latestBlock),
-                blockNumber: BigInt(vote.bn),
-                transaction_index: vote.tid,
-              };
-            });
+          const votes = voteRecordPage.vote_record?.map((vote) => {
+            return {
+              transactionHash: null,
+              transactionOrdinal:
+                BigInt(vote.bn) * BigInt(10000) +
+                BigInt(vote.tid * 100) +
+                BigInt(vote.lid),
+              address: vote.voter,
+              proposalId,
+              support: parseSupport(
+                String(vote.support),
+                parsedProposal.proposal_type,
+                String(proposal.start_block)
+              ),
+              weight: (vote.weight ?? "0").toLocaleString("fullwide", {
+                useGrouping: false,
+              }),
+              reason: vote.reason ?? null,
+              params: vote.params
+                ? parseParams(JSON.stringify(vote.params), proposalData)
+                : [],
+              proposalValue: getProposalTotalValue(proposalData) ?? BigInt(0),
+              proposalTitle: getTitleFromProposalDescription(
+                proposal.description
+              ),
+              proposalType: parsedProposal.proposal_type,
+              timestamp: getHumanBlockTime(vote.bn, latestBlock),
+              blockNumber: BigInt(vote.bn),
+              transaction_index: vote.tid,
+              citizenType: null,
+              voterMetadata: {}
+            };
+          });
 
           return {
             meta: {
@@ -771,7 +776,7 @@ async function getUserVotesForProposal({
               weight: vote.weight.toLocaleString("fullwide", {
                 useGrouping: false,
               }),
-              reason: vote.reason,
+              reason: vote.reason ?? null,
               params: vote.params
                 ? parseParams(JSON.stringify(vote.params), proposalData)
                 : [],
@@ -783,6 +788,8 @@ async function getUserVotesForProposal({
               timestamp: getHumanBlockTime(vote.block_number, latestBlock),
               blockNumber: BigInt(vote.block_number),
               transaction_index: vote.transaction_index,
+              citizenType: null,
+              voterMetadata: {}
             };
           });
         return votes;
