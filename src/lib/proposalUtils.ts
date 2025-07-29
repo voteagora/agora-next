@@ -1260,21 +1260,24 @@ export function calculateHybridApprovalUniqueParticipationPercentage(
     ["chains"]: proposalResults.totals.vote_counts.CHAIN,
   };
   let uniqueParticipationPercentage = 0;
+
   uniqueParticipationPercentage +=
-    (Number(totalUniqueVoters.delegates) / eligibleVoters.delegates) *
+    (Number(totalUniqueVoters.delegates || 0) / eligibleVoters.delegates) *
     100 *
     weights.delegates;
 
   uniqueParticipationPercentage +=
-    (Number(totalUniqueVoters.apps) / eligibleVoters.apps) * 100 * weights.apps;
+    (Number(totalUniqueVoters.apps || 0) / eligibleVoters.apps) *
+    100 *
+    weights.apps;
 
   uniqueParticipationPercentage +=
-    (Number(totalUniqueVoters.users) / eligibleVoters.users) *
+    (Number(totalUniqueVoters.users || 0) / eligibleVoters.users) *
     100 *
     weights.users;
 
   uniqueParticipationPercentage +=
-    (Number(totalUniqueVoters.chains) / eligibleVoters.chains) *
+    (Number(totalUniqueVoters.chains || 0) / eligibleVoters.chains) *
     100 *
     weights.chains;
 
