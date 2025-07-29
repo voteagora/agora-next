@@ -4,6 +4,7 @@ import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import { ExpandCollapseIcon } from "@/icons/ExpandCollapseIcon";
 import { HStack } from "@/components/Layout/Stack";
+import { HYBRID_PROPOSAL_QUORUM } from "@/lib/constants";
 
 export const HybridApprovalCriteria = ({
   proposalSettings,
@@ -23,7 +24,7 @@ export const HybridApprovalCriteria = ({
           justifyContent="justify-between"
           className="text-xs font-semibold text-secondary pt-4"
         >
-          <div>Quorum 30%</div>
+          <div>Quorum {HYBRID_PROPOSAL_QUORUM * 100}%</div>
           <div>Current {currentQorum?.toFixed(2)}%</div>
         </HStack>
       </div>
