@@ -82,6 +82,18 @@ export const townsTenantUIConfig = new TenantUI({
       },
     },
     {
+      route: "delegates",
+      title: "Towns Protocol Delegates",
+      description:
+        "Towns Protocol is currently setting up its governance infrastructure. Delegate functionality will be available soon.",
+      meta: {
+        title: "Towns Protocol Delegates",
+        description: "Delegate your voting power in Towns Protocol",
+        imageTitle: "Towns Protocol Delegates",
+        imageDescription: "Delegate your voting power in Towns Protocol",
+      },
+    },
+    {
       route: "info/about",
       title: "About Towns",
       hero: townsInfoHero,
