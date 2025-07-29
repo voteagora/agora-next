@@ -37,19 +37,6 @@ export const townsTenantUIConfig = new TenantUI({
 
   pages: [
     {
-      route: "proposals",
-      title: "Towns Protocol Governance",
-      description:
-        "Towns is experimenting with minimal, onchain governance. This page is the canonical home for Towns governance info.",
-      hero: etherfiHero,
-      meta: {
-        title: "Towns Protocol Agora",
-        description: "Home of Towns Protocol governance",
-        imageTitle: "Towns Protocol Agora",
-        imageDescription: "Home of Towns Protocol governance",
-      },
-    },
-    {
       route: "info",
       title: "Towns Protocol Governance",
       description:
@@ -61,45 +48,6 @@ export const townsTenantUIConfig = new TenantUI({
         description: "Home of Towns Protocol governance",
         imageTitle: "Towns Protocol Agora",
         imageDescription: "Home of Towns Protocol governance",
-      },
-    },
-    {
-      route: "delegates",
-      title: "Towns Protocol Delegates",
-      description:
-        "Towns is experimenting with minimal, onchain governance. This page is the canonical home for Towns governance info.",
-      hero: etherfiHero,
-      meta: {
-        title: "Towns Protocol Delegates",
-        description: "Home of Towns Protocol delegates",
-        imageTitle: "Towns Protocol Delegates",
-        imageDescription: "Home of Towns Protocol delegates",
-      },
-    },
-    {
-      route: "info/about",
-      title: "Towns Protocol About",
-      description:
-        "Towns is experimenting with minimal, onchain governance. This page is the canonical home for Towns governance info.",
-      hero: etherfiHero,
-      meta: {
-        title: "Towns Protocol About",
-        description: "About Towns Protocol governance",
-        imageTitle: "Towns Protocol About",
-        imageDescription: "About Towns Protocol governance",
-      },
-    },
-    {
-      route: "/",
-      title: "Towns Protocol",
-      description:
-        "Towns is experimenting with minimal, onchain governance. This page is the canonical home for Towns governance info.",
-      hero: etherfiHero,
-      meta: {
-        title: "Towns Protocol",
-        description: "Home of Towns Protocol",
-        imageTitle: "Towns Protocol",
-        imageDescription: "Home of Towns Protocol",
       },
     },
   ],
@@ -119,7 +67,7 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       name: "delegates",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "delegates/edit",

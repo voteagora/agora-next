@@ -3,6 +3,7 @@
 import { fetchChangelogForDAO } from "@/app/api/common/changelogs/getChangelogs";
 import ChangelogList from "@/components/Changelog/ChangelogList";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export async function generateMetadata() {
   const { brandName } = Tenant.current();
@@ -15,7 +16,18 @@ export async function generateMetadata() {
 export const revalidate = 300;
 
 export default async function Page() {
-  const { slug } = Tenant.current();
+  const { slug, namespace } = Tenant.current();
+
+  // For towns tenant, use simplified version without database queries
+  if (namespace === TENANT_NAMESPACES.TOWNS) {
+    return (
+      <div className="px-6 py-16 lg:px-8">
+        <div className="mx-auto max-w-3xl"></div>
+      </div>
+    );
+  }
+
+  // For all other tenants, use the full changelog implementation
   const initChangelog = await fetchChangelogForDAO({
     daoSlug: slug,
     pagination: {
