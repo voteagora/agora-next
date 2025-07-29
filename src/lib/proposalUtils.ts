@@ -1242,6 +1242,45 @@ export function calculateHybridApprovalWeightedPercentage(
   return weightedOptionPercentage;
 }
 
+export function calculateHybridApprovalUniqueParticipationPercentage(
+  proposalResults: any,
+  quorum: number
+) {
+  const weights = HYBRID_VOTE_WEIGHTS;
+
+  const eligibleVoters = getHybridEligibleVoters(quorum);
+  const proposalForVotes = BigInt(proposalResults?.for || 0);
+  const proposalAgainstVotes = BigInt(proposalResults?.against || 0);
+  const proposalTotalVotes = proposalForVotes + proposalAgainstVotes;
+
+  const totalUniqueVoters = {
+    ["delegates"]: proposalTotalVotes,
+    ["apps"]: proposalResults.totals.vote_counts.APP,
+    ["users"]: proposalResults.totals.vote_counts.USER,
+    ["chains"]: proposalResults.totals.vote_counts.CHAIN,
+  };
+  let uniqueParticipationPercentage = 0;
+  uniqueParticipationPercentage +=
+    (Number(totalUniqueVoters.delegates) / eligibleVoters.delegates) *
+    100 *
+    weights.delegates;
+
+  uniqueParticipationPercentage +=
+    (Number(totalUniqueVoters.apps) / eligibleVoters.apps) * 100 * weights.apps;
+
+  uniqueParticipationPercentage +=
+    (Number(totalUniqueVoters.users) / eligibleVoters.users) *
+    100 *
+    weights.users;
+
+  uniqueParticipationPercentage +=
+    (Number(totalUniqueVoters.chains) / eligibleVoters.chains) *
+    100 *
+    weights.chains;
+
+  return uniqueParticipationPercentage;
+}
+
 export function calculateHybridApprovalProposalMetrics({
   proposalResults,
   proposalData,
@@ -1274,7 +1313,12 @@ export function calculateHybridApprovalProposalMetrics({
       optionNames.add(key)
     );
 
-  let totalWeightedParticipation = 0;
+  let totalWeightedParticipation =
+    calculateHybridApprovalUniqueParticipationPercentage(
+      proposalResults,
+      quorum
+    );
+
   let thresholdMet = false;
   const optionResults: Array<{
     optionName: string;
@@ -1305,8 +1349,6 @@ export function calculateHybridApprovalProposalMetrics({
       proposalResults,
       quorum
     );
-
-    totalWeightedParticipation += weightedPercentage;
 
     // Check module-level criteria
     let meetsModuleCriteria = false;
