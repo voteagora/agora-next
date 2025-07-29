@@ -43,6 +43,31 @@ export const townsTenantUIConfig = new TenantUI({
 
   pages: [
     {
+      route: "/",
+      title: "Towns Protocol Governance",
+      description:
+        "Towns is experimenting with minimal, onchain governance. This page is the canonical home for Towns governance info.",
+      hero: townsHero,
+      meta: {
+        title: "Towns Protocol Agora",
+        description: "Home of Towns Protocol governance",
+        imageTitle: "Towns Protocol Agora",
+        imageDescription: "Home of Towns Protocol governance",
+      },
+    },
+    {
+      route: "proposals",
+      title: "Towns Protocol Proposals",
+      description:
+        "Towns Protocol is currently setting up its governance infrastructure. Proposal functionality will be available soon.",
+      meta: {
+        title: "Towns Protocol Proposals",
+        description: "View and vote on Towns Protocol proposals",
+        imageTitle: "Towns Protocol Proposals",
+        imageDescription: "View and vote on Towns Protocol proposals",
+      },
+    },
+    {
       route: "info",
       title: "Towns Protocol Governance",
       description:
