@@ -1,17 +1,23 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
-import etherfiLogo from "@/assets/tenant/etherfi_logo.svg";
-import etherfiHero from "@/assets/tenant/etherfi_hero.svg";
+import townsLogo from "@/assets/tenant/towns_logo.svg";
+import townsHero from "@/assets/tenant/towns_hero.svg";
+import townsSuccess from "@/assets/tenant/towns_success.svg";
+import townsPending from "@/assets/tenant/towns_pending.svg";
+import townsInfoHero from "@/assets/tenant/towns_info_hero.svg";
+import townsInfoCard1 from "@/assets/tenant/towns_info_1.svg";
+import townsInfoCard2 from "@/assets/tenant/towns_info_2.svg";
+import townsInfoCard3 from "@/assets/tenant/towns_info_3.svg";
+import townsInfoCard4 from "@/assets/tenant/towns_info_4.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 
-// TODO: update to towns assets
 export const townsTenantUIConfig = new TenantUI({
   title: "Towns Protocol",
-  logo: etherfiLogo,
+  logo: townsLogo,
   tokens: [],
 
   assets: {
-    success: etherfiHero,
-    pending: etherfiHero,
+    success: townsSuccess,
+    pending: townsPending,
     delegate: delegateAvatar,
   },
 
@@ -41,13 +47,53 @@ export const townsTenantUIConfig = new TenantUI({
       title: "Towns Protocol Governance",
       description:
         "Towns is experimenting with minimal, onchain governance. This page is the canonical home for Towns governance info.",
-      hero: etherfiHero,
-      links: [],
+      hero: townsHero,
+      links: [
+        {
+          name: "Documentation",
+          title: "Documentation",
+          url: "https://docs.towns.com",
+          image: townsInfoCard1,
+        },
+        {
+          name: "Community",
+          title: "Community",
+          url: "https://discord.gg/towns",
+          image: townsInfoCard2,
+        },
+        {
+          name: "Governance",
+          title: "Governance",
+          url: "https://gov.towns.com",
+          image: townsInfoCard3,
+        },
+        {
+          name: "Updates",
+          title: "Updates",
+          url: "https://twitter.com/towns",
+          image: townsInfoCard4,
+        },
+      ],
       meta: {
         title: "Towns Protocol Agora",
         description: "Home of Towns Protocol governance",
         imageTitle: "Towns Protocol Agora",
         imageDescription: "Home of Towns Protocol governance",
+      },
+    },
+    {
+      route: "info/about",
+      title: "About Towns",
+      hero: townsInfoHero,
+      description:
+        "Towns Protocol is a decentralized platform for creating and governing digital communities. Built on blockchain technology, Towns enables transparent, community-driven decision making through innovative governance mechanisms. The protocol empowers communities to self-organize, manage resources, and make collective decisions in a trustless environment.",
+      meta: {
+        title: "About Towns Protocol",
+        description:
+          "Learn about Towns Protocol and decentralized community governance",
+        imageTitle: "About Towns Protocol",
+        imageDescription:
+          "Learn about Towns Protocol and decentralized community governance",
       },
     },
   ],
