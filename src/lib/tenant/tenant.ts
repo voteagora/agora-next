@@ -13,7 +13,7 @@ import { type DaoSlug } from "@prisma/client";
 export const BRAND_NAME_MAPPINGS: Record<string, string> = {
   ens: "ENS",
   etherfi: "EtherFi",
-  pguild: "PGuild",
+  pguild: "Protocol Guild",
   boost: "Boost",
   demo: "Canopy",
 };

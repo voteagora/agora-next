@@ -1,11 +1,20 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import pguildLogo from "@/assets/tenant/pguild_logo.svg";
 import pguildHero from "@/assets/tenant/pguild_hero.svg";
+import pguildInfo1 from "@/assets/tenant/pguild_info_1.svg";
+import pguildInfo2 from "@/assets/tenant/pguild_info_2.svg";
+import pguildInfo3 from "@/assets/tenant/pguild_info_3.svg";
+import pguildInfo4 from "@/assets/tenant/pguild_info_4.svg";
+import pguildSuccess from "@/assets/tenant/pguild_success.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import React from "react";
+import { CoinsIcon } from "@/icons/CoinsIcon";
+import { NotificationIcon } from "@/icons/NotificationIcon";
+import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
 
 export const protocolGuildTenantUIConfig = new TenantUI({
   title: "Protocol Guild",
@@ -13,8 +22,7 @@ export const protocolGuildTenantUIConfig = new TenantUI({
   tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.PGUILD)],
 
   assets: {
-    // TODO: Replace success and pending images
-    success: pguildHero,
+    success: pguildSuccess,
     pending: pguildHero,
     delegate: delegateAvatar,
   },
@@ -50,7 +58,7 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       title: "Protocol Guild Governance",
       hero: pguildHero,
       description:
-        "Protocol Guild members are Ethereum L1 R&D maintainers. This is the home of their governance.",
+        "Protocol Guild is the leading independent organization dedicated to sustainable funding for Ethereum’s core protocol development. Our mission is to secure Ethereum’s future by funding core contributors.",
       meta: {
         title: "Protocol Guild Agora",
         description: "Home of Ethereum L1 R&D governance",
@@ -62,7 +70,7 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       route: "proposals",
       title: "Protocol Guild Governance",
       description:
-        "Protocol Guild members are Ethereum L1 R&D maintainers. This is the home of their governance.",
+        "Protocol Guild is the leading independent organization dedicated to sustainable funding for Ethereum’s core protocol development. Our mission is to secure Ethereum’s future by funding core contributors.",
       meta: {
         title: "Protocol Guild Agora",
         description: "Home of Ethereum L1 R&D governance",
@@ -74,7 +82,7 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       route: "delegates",
       title: "Protocol Guild Governance",
       description:
-        "Protocol Guild members are Ethereum L1 R&D maintainers. This is the home of their governance.",
+        "Protocol Guild is the leading independent organization dedicated to sustainable funding for Ethereum’s core protocol development. Our mission is to secure Ethereum’s future by funding core contributors.",
       meta: {
         title: "Voter on Agora",
         description: "Delegate your voting power to a trusted representative",
@@ -87,7 +95,7 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       route: "info",
       title: "Protocol Guild Governance",
       description:
-        "Protocol Guild members are Ethereum L1 R&D maintainers. This is the home of their governance.",
+        "Protocol Guild is the leading independent organization dedicated to sustainable funding for Ethereum’s core protocol development. Our mission is to secure Ethereum’s future by funding core contributors.",
       hero: pguildHero,
       meta: {
         title: "Info of Agora",
@@ -97,28 +105,28 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       },
       links: [
         {
+          name: "Website",
+          title: "Website",
+          url: "https://www.protocolguild.org/",
+          image: pguildInfo1,
+        },
+        {
           name: "Documentation",
           title: "Documentation",
-          url: "https://protocol-guild.readthedocs.io",
-          image: pguildLogo,
+          url: "https://protocol-guild.readthedocs.io/",
+          image: pguildInfo2,
         },
         {
-          name: "Membership",
-          title: "Membership",
-          url: "https://protocol-guild.readthedocs.io/en/latest/02-membership.html#active-members",
-          image: pguildLogo,
-        },
-        {
-          name: "Guild Pledge",
-          title: "Guild Pledge",
-          url: "https://tim.mirror.xyz/srVdVopOFhD_ZoRDR50x8n5wmW3aRJIrNEAkpyQ4_ng",
-          image: pguildLogo,
+          name: "Dune",
+          title: "Dune",
+          url: "https://dune.com/protocolguild/protocol-guild",
+          image: pguildInfo3,
         },
         {
           name: "Other links",
           title: "Other links",
           url: "https://linktr.ee/protocolguild",
-          image: pguildLogo,
+          image: pguildInfo4,
         },
       ],
     },
@@ -126,8 +134,72 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       route: "info/about",
       title: "About Protocol Guild",
       hero: pguildHero,
-      description:
-        "The Protocol Guild is a collective funding mechanism for +180 Ethereum L1 R&D maintainers 🌿. Supported by donors who have taken the Protocol Guild Pledge, the Protocol Guild's mission is to make contributing to Ethereum L1 R&D economically rational on a risk-adjusted basis, while avoiding capture.",
+      description: (
+        <>
+          Protocol Guild’s Agora DAO includes{" "}
+          <a
+            href="https://protocol-guild.readthedocs.io/en/latest/01-membership.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline text-primary"
+          >
+            all Guild members
+          </a>
+          , with one person one vote, including vote delegation. The DAO is used
+          to ratify changes to the membership on a quarterly basis. It does not
+          keep track of{" "}
+          <a
+            href="https://protocol-guild.readthedocs.io/en/latest/01-membership.html#split-share"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline text-primary"
+          >
+            member weights
+          </a>
+          , nor does it hold any{" "}
+          <a
+            href="https://protocol-guild.readthedocs.io/en/latest/02-onchain-architecture.html#vesting-contract"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline text-primary"
+          >
+            funds
+          </a>
+          .
+        </>
+      ),
+      sectionTitle: "How it works",
+      tabs: [
+        {
+          icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#000" />,
+          title: "Voting power",
+          description:
+            "All Protocol Guild members are given one voting share, which they must delegate to themselves or other members.",
+        },
+        {
+          icon: (
+            <NotificationIcon className="w-[24px] h-[24px]" stroke="#000" />
+          ),
+          title: "Proposal cadence",
+          description: (
+            <>
+              Membership updates are batched onchain on a quarterly basis to
+              minimize governance overhead.
+            </>
+          ),
+        },
+        {
+          icon: (
+            <CheckCircleBrokenIcon
+              className="w-[24px] h-[24px]"
+              stroke="#000"
+            />
+          ),
+          title: "Proposal thresholds",
+          description:
+            "Membership updates require a quorum of 33% and an approval threshold of 51% to pass.",
+        },
+      ],
       meta: {
         title: "About Protocol Guild",
         description:
