@@ -1,9 +1,8 @@
 import { TenantContracts } from "@/lib/types";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { BaseContract } from "ethers";
-import { mainnet } from "viem/chains";
-import { JsonRpcProvider } from "ethers";
+import { BaseContract, AlchemyProvider, JsonRpcProvider } from "ethers";
+import { mainnet, sepolia } from "viem/chains";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ERC20__factory } from "@/lib/contracts/generated";
 
@@ -16,33 +15,32 @@ export const townsTenantConfig = ({
   isProd,
   alchemyId,
 }: Props): TenantContracts => {
+  const TOKEN = isProd
+    ? "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72"
+    : "0xca83e6932cf4F03cDd6238be0fFcF2fe97854f67";
+
   // dummy addresses; for now: towns is info-only
-  const DUMMY_TOKEN = "0x0000000000000000000000000000000000000001";
   const DUMMY_GOVERNOR = "0x0000000000000000000000000000000000000002";
   const DUMMY_TIMELOCK = "0x0000000000000000000000000000000000000003";
   const DUMMY_TYPES = "0x0000000000000000000000000000000000000004";
 
-  // mock provider that doesn't make network requests; for now: towns is info-only
-  const mockProvider = {
-    getNetwork: () => Promise.resolve({ chainId: 1, name: "mainnet" }),
-    getCode: () => Promise.resolve("0x"),
-    getBalance: () => Promise.resolve({ value: 0n }),
-    getBlock: () =>
-      Promise.resolve({ number: 19000000, timestamp: 1700000000 }),
-    // prevent network detection attempts
-    _detectNetwork: () => Promise.resolve({ chainId: 1, name: "mainnet" }),
-    ready: Promise.resolve({ chainId: 1, name: "mainnet" }),
-  } as any;
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
 
-  const chain = mainnet;
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : isProd
+      ? new AlchemyProvider("mainnet", alchemyId)
+      : new AlchemyProvider("sepolia", alchemyId);
+
+  const chain = isProd ? mainnet : sepolia;
 
   return {
     token: createTokenContract({
       abi: ERC20__factory.abi,
-      address: DUMMY_TOKEN as `0x${string}`,
+      address: TOKEN as `0x${string}`,
       chain,
-      contract: ERC20__factory.connect(DUMMY_TOKEN, mockProvider),
-      provider: mockProvider,
+      contract: ERC20__factory.connect(TOKEN, provider),
+      provider,
       type: "erc20",
     }),
 
@@ -51,7 +49,7 @@ export const townsTenantConfig = ({
       address: DUMMY_GOVERNOR,
       chain,
       contract: {} as IGovernorContract,
-      provider: mockProvider,
+      provider,
     }),
 
     timelock: new TenantContract<BaseContract>({
@@ -59,7 +57,7 @@ export const townsTenantConfig = ({
       address: DUMMY_TIMELOCK,
       chain,
       contract: {} as BaseContract,
-      provider: mockProvider,
+      provider,
     }),
 
     proposalTypesConfigurator: new TenantContract<BaseContract>({
@@ -67,7 +65,7 @@ export const townsTenantConfig = ({
       address: DUMMY_TYPES,
       chain,
       contract: {} as BaseContract,
-      provider: mockProvider,
+      provider,
     }),
 
     treasury: [],
