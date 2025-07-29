@@ -265,6 +265,7 @@ export async function parseProposal(
   votableSupply: bigint,
   offchainProposal?: ProposalPayload
 ): Promise<Proposal> {
+  console.log("parseProposal", { proposal });
   const { contracts, ui } = Tenant.current();
   const isTimeStampBasedTenant = ui.toggle(
     "use-timestamp-for-proposals"
@@ -320,7 +321,10 @@ export async function parseProposal(
   if (proposal.proposal_type.includes("OFFCHAIN") && !offChainProposalData) {
     proposalResults = parseOffChainProposalResults(
       JSON.stringify(proposal.proposal_data?.offchain_tally || {}),
-      proposalType
+      proposalType,
+      proposalData,
+      Number(quorum),
+      createdTime
     );
   } else {
     proposalResults = parseProposalResults(
@@ -605,11 +609,28 @@ export type ParsedProposalData = {
   OFFCHAIN_APPROVAL: {
     key: "OFFCHAIN_APPROVAL";
     kind: {
-      options: [];
+      options: {
+        targets: string[];
+        values: string[];
+        calldatas: string[];
+        description: string;
+        functionArgsName: {
+          functionName: string;
+          functionArgs: string[];
+        }[];
+        budgetTokensSpent: bigint | null;
+      }[];
       onchainProposalId?: string;
       choices: string[];
       created_attestation_hash?: string;
       cancelled_attestation_hash?: string;
+      proposalSettings: {
+        maxApprovals: number;
+        criteria: "THRESHOLD" | "TOP_CHOICES";
+        budgetToken: string;
+        criteriaValue: bigint;
+        budgetAmount: bigint;
+      };
     };
   };
 };
@@ -737,6 +758,7 @@ export function parseProposalData(
                 calldatas,
                 description,
               ] = (() => {
+                // ???
                 if (option.length === 4) {
                   return [
                     null,
@@ -828,12 +850,65 @@ export function parseProposalData(
     }
     case "OFFCHAIN_APPROVAL": {
       const parsedProposalData = JSON.parse(proposalData);
+      const [maxApprovals, criteria, budgetToken, criteriaValue, budgetAmount] =
+        parsedProposalData[1] as [string, string, string, string, string];
       return {
         key: proposalType,
         kind: {
           onchainProposalId: parsedProposalData.onchain_proposalid,
           choices: parsedProposalData.choices,
-          options: [],
+          options: parsedProposalData[0].map(
+            (option: Array<string | string[]>) => {
+              const [
+                budgetTokensSpent,
+                targets,
+                values,
+                calldatas,
+                description,
+              ] = (() => {
+                // ???
+                if (option.length === 4) {
+                  return [
+                    null,
+                    option[0],
+                    option[1],
+                    option[2],
+                    option[3],
+                  ] as const;
+                } else if (option.length === 5) {
+                  return [
+                    option[0],
+                    option[1],
+                    option[2],
+                    option[3],
+                    option[4],
+                  ] as const;
+                } else {
+                  throw new Error("unknown option length");
+                }
+              })();
+
+              const functionArgsName = decodeCalldata(
+                calldatas as `0x${string}`[]
+              );
+
+              return {
+                targets,
+                values,
+                calldatas,
+                description,
+                functionArgsName,
+                budgetTokensSpent,
+              };
+            }
+          ),
+          proposalSettings: {
+            maxApprovals: Number(maxApprovals),
+            criteria: toApprovalVotingCriteria(Number(criteria)),
+            budgetToken,
+            criteriaValue: BigInt(criteriaValue),
+            budgetAmount: BigInt(budgetAmount),
+          },
           created_attestation_hash: parsedProposalData.created_attestation_hash,
           cancelled_attestation_hash:
             parsedProposalData.cancelled_attestation_hash,
@@ -945,6 +1020,11 @@ export type ParsedProposalResults = {
         weightedPercentage: number;
         isApproved?: boolean;
       }[];
+      APP: Record<string, bigint>;
+      USER: Record<string, bigint>;
+      CHAIN: Record<string, bigint>;
+      criteria: "THRESHOLD" | "TOP_CHOICES";
+      criteriaValue: bigint;
     };
   };
   HYBRID_STANDARD: {
@@ -1231,6 +1311,175 @@ export function calculateHybridApprovalWeightedPercentage(
     (chainsVotes / eligibleVoters.chains) * weights.chains * 100;
 
   return weightedOptionPercentage;
+}
+
+export function calculateOffchainApprovalProposalMetrics({
+  proposalResults,
+  proposalData,
+  quorum,
+  createdTime,
+}: {
+  proposalResults: ParsedProposalResults["OFFCHAIN_APPROVAL"]["kind"];
+  proposalData: ParsedProposalData["OFFCHAIN_APPROVAL"]["kind"];
+  quorum: number;
+  createdTime: Date | null;
+}) {
+  console.log("calculateOffchainApprovalProposalMetrics", {
+    proposalResults,
+    proposalData,
+    quorum,
+    createdTime,
+  });
+
+  const quorumThreshold = 0.3 * 100; // 30% quorum
+
+  // Get criteria value from proposal results (module-level criteria)
+  const criteriaValue =
+    proposalResults?.criteriaValue ||
+    proposalData?.proposalSettings?.criteriaValue ||
+    0;
+
+  // Get all option names across all categories
+  const optionNames = new Set<string>();
+  if (proposalResults.APP)
+    Object.keys(proposalResults.APP).forEach((key) => optionNames.add(key));
+  if (proposalResults.USER)
+    Object.keys(proposalResults.USER).forEach((key) => optionNames.add(key));
+  if (proposalResults.CHAIN)
+    Object.keys(proposalResults.CHAIN).forEach((key) => optionNames.add(key));
+
+  let totalWeightedParticipation = 0;
+  let thresholdMet = false;
+  const optionResults: Array<{
+    optionName: string;
+    weightedPercentage: number;
+    meetsThreshold: boolean;
+    rawVotes: bigint;
+  }> = [];
+
+  // Sort options to get index for TOP_CHOICES criteria
+  const sortedOptions = Array.from(optionNames).sort((a, b) => {
+    const aWeighted = calculateHybridApprovalWeightedPercentage(
+      a,
+      proposalResults,
+      quorum
+    );
+    const bWeighted = calculateHybridApprovalWeightedPercentage(
+      b,
+      proposalResults,
+      quorum
+    );
+    return bWeighted - aWeighted;
+  });
+
+  // Calculate weighted participation and check threshold for each option
+  for (const optionName of optionNames) {
+    const weightedPercentage = calculateHybridApprovalWeightedPercentage(
+      optionName,
+      proposalResults,
+      quorum
+    );
+
+    totalWeightedParticipation += weightedPercentage;
+
+    // Check module-level criteria
+    let meetsModuleCriteria = false;
+    if (proposalResults.criteria === "THRESHOLD") {
+      // Module criteria is in basis points (10000 = 100%)
+      const thresholdPercentage = Number(criteriaValue) / 10000;
+      meetsModuleCriteria = weightedPercentage >= thresholdPercentage;
+    } else if (proposalResults.criteria === "TOP_CHOICES") {
+      const optionIndex = sortedOptions.indexOf(optionName);
+      meetsModuleCriteria = optionIndex < Number(criteriaValue);
+    }
+
+    if (meetsModuleCriteria) {
+      thresholdMet = true;
+    }
+
+    optionResults.push({
+      optionName,
+      weightedPercentage,
+      meetsThreshold: meetsModuleCriteria,
+      rawVotes: calculateHybridApprovalOptionVotes(optionName, proposalResults),
+    });
+  }
+
+  // Calculate governor-level approval threshold check using weighted percentages
+  const proposalForVotes = BigInt(proposalResults?.for || 0);
+  const proposalAgainstVotes = BigInt(proposalResults?.against || 0);
+  const proposalTotalVotes = proposalForVotes + proposalAgainstVotes;
+
+  // Calculate full approval data
+  let optionsWithApproval = null;
+  let remainingBudget = null;
+
+  if (proposalData?.proposalSettings && proposalResults?.options) {
+    const proposalSettings = proposalData.proposalSettings;
+    const options = proposalResults.options;
+
+    const { contracts } = Tenant.current();
+    const { decimals: contractTokenDecimals } = tokenForContractAddress(
+      proposalSettings.budgetToken
+    );
+
+    // Prepare enriched options with proposal data
+    const enrichedOptions = options.map((option: any, i: number) => {
+      return { ...option, ...proposalData.options[i] };
+    });
+
+    let availableBudget = BigInt(proposalSettings.budgetAmount);
+    let isExceeded = false;
+
+    optionsWithApproval = enrichedOptions.map((option: any) => {
+      const optionBudget = calculateOptionBudget(
+        option,
+        contractTokenDecimals,
+        createdTime
+      );
+
+      // Find metrics for this option
+      const optionMetrics = optionResults.find(
+        (result) => result.optionName === option.option
+      );
+
+      // Determine if option is approved
+      const isApproved = !!(
+        optionMetrics?.meetsThreshold && availableBudget >= optionBudget
+      );
+
+      if (isApproved) {
+        availableBudget = availableBudget - optionBudget;
+      } else if (
+        optionMetrics?.meetsThreshold &&
+        availableBudget < optionBudget
+      ) {
+        isExceeded = true;
+      }
+
+      return {
+        ...option,
+        optionBudget,
+        passesModuleCriteria: optionMetrics?.meetsThreshold || false,
+        isApproved,
+        weightedPercentage: optionMetrics?.weightedPercentage || 0,
+        rawVotes: optionMetrics?.rawVotes || 0n,
+      };
+    });
+    remainingBudget = availableBudget;
+  }
+
+  return {
+    totalWeightedParticipation,
+    thresholdMet,
+    optionResults,
+    quorumMet: totalWeightedParticipation >= quorumThreshold,
+    proposalForVotes,
+    proposalAgainstVotes,
+    proposalTotalVotes,
+    optionsWithApproval,
+    remainingBudget,
+  };
 }
 
 export function calculateHybridApprovalProposalMetrics({

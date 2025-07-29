@@ -3,6 +3,7 @@ import {
   ParsedProposalData,
   ParsedProposalResults,
   getProposalCreatedTime,
+  calculateOffchainApprovalProposalMetrics,
 } from "../proposalUtils";
 import { ProposalType } from "../types";
 import Tenant from "../tenant/tenant";
@@ -24,6 +25,15 @@ export function parseProposalResults(
   quorum?: number,
   createdTime?: Date | null
 ): ParsedProposalResults[ProposalType] {
+  console.log("[parseProposalResults input]", {
+    proposalResults,
+    proposalData,
+    startBlock,
+    offchainProposalData,
+    quorum,
+    createdTime,
+  });
+
   const type = proposalData.key;
   switch (type) {
     case "SNAPSHOT": {
@@ -38,7 +48,15 @@ export function parseProposalResults(
     case "STANDARD":
     case "OPTIMISTIC":
     case "OFFCHAIN_STANDARD": {
-      const parsedProposalResults = JSON.parse(proposalResults).standard;
+      // Before destructuring, ensure it's an array
+      const parsedStandard = JSON.parse(proposalResults).standard;
+      if (!Array.isArray(parsedStandard)) {
+        throw new Error(
+          'Expected "standard" field to be an array in proposal results. Got: ' +
+            JSON.stringify(parsedStandard)
+        );
+      }
+      const parsedProposalResults = parsedStandard;
 
       return {
         key: proposalData.key,
@@ -75,6 +93,15 @@ export function parseProposalResults(
           abstain: BigInt(parsedProposalResults.standard?.[2] ?? 0),
         };
       })();
+
+      // Before mapping:
+      const approvalArr = JSON.parse(proposalResults).approval;
+      if (!Array.isArray(approvalArr)) {
+        throw new Error(
+          'Expected "approval" field to be an array in proposal results. Got: ' +
+            JSON.stringify(approvalArr)
+        );
+      }
 
       return {
         key: "APPROVAL",
@@ -120,6 +147,9 @@ export function parseProposalResults(
             weightedPercentage: 0,
             isApproved: false,
           })),
+          ...offchainResults.kind,
+          criteria: "THRESHOLD" as const,
+          criteriaValue: 0n,
         },
       };
 
@@ -347,7 +377,10 @@ export function parseProposalResults(
 export function parseOffChainProposalResults(
   // proposalResults is expected to be a stringified JSON of the offchain_tally object
   proposalResults: string,
-  proposalType: ProposalType
+  proposalType: ProposalType,
+  proposalData?: ParsedProposalData[ProposalType],
+  quorum?: number,
+  createdTime?: Date | null
 ): any {
   switch (proposalType) {
     case "OFFCHAIN_STANDARD":
@@ -430,7 +463,7 @@ export function parseOffChainProposalResults(
           CHAIN: processApprovalTallySource(tallyData?.CHAIN),
         },
       };
-      if (proposalType === "OFFCHAIN_APPROVAL") {
+      if (proposalData && proposalData.key === "OFFCHAIN_APPROVAL") {
         const allForVotes =
           result.kind.APP.for + result.kind.USER.for + result.kind.CHAIN.for;
         const allAgainstVotes =
@@ -438,14 +471,58 @@ export function parseOffChainProposalResults(
           result.kind.USER.against +
           result.kind.CHAIN.against;
 
-        return {
+        const baseResults = {
           ...result,
           kind: {
             ...result.kind,
             for: allForVotes,
+            abstain: 0n,
             against: allAgainstVotes,
+            options: proposalData?.kind.options.map((option) => ({
+              option: option.description,
+              weightedPercentage: 0,
+              isApproved: false,
+            })),
+            criteria: "THRESHOLD" as const,
+            criteriaValue: 0n,
           },
         };
+
+        if (quorum && createdTime) {
+          try {
+            const metrics = calculateOffchainApprovalProposalMetrics({
+              proposalResults: baseResults.kind,
+              proposalData: proposalData.kind,
+              quorum,
+              createdTime,
+            });
+
+            baseResults.kind.options = baseResults.kind.options.map(
+              (option: {
+                option: string;
+                weightedPercentage: number;
+                isApproved: boolean;
+              }) => {
+                const optionMetrics = metrics.optionResults.find(
+                  (result) => result.optionName === option.option
+                );
+                return {
+                  option: option.option,
+                  weightedPercentage: optionMetrics?.weightedPercentage || 0,
+                  isApproved: optionMetrics?.meetsThreshold || false,
+                };
+              }
+            );
+
+            return baseResults;
+          } catch (error) {
+            // If calculation fails, keep default values
+            console.warn(
+              "Failed to calculate OFFCHAIN_APPROVAL metrics:",
+              error
+            );
+          }
+        }
       }
       return result;
     }
