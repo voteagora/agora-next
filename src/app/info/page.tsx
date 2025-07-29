@@ -57,6 +57,7 @@ export default async function Page() {
 
   const hasGovernanceCharts =
     ui.toggle("info/governance-charts")?.enabled === true;
+  const hasDunaAdministration = ui.toggle("duna")?.enabled === true;
 
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
     const treasuryData = await apiFetchTreasuryBalanceTS(
@@ -68,7 +69,7 @@ export default async function Page() {
         <InfoHero />
         <InfoAbout />
         <GovernorSettings />
-        <DunaAdministration />
+        {hasDunaAdministration && <DunaAdministration />}
         {treasuryData.result.length > 0 && (
           <ChartTreasury
             initialData={treasuryData.result}

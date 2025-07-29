@@ -1,35 +1,39 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronUpDownIcon, PlusIcon } from "@heroicons/react/20/solid";
+import { PlusIcon } from "@heroicons/react/20/solid";
 import QuarterlyReportCard from "./QuarterlyReportCard";
 import ReportModal from "./ReportModal";
 import CreatePostModal from "./CreatePostModal";
-import { useDunaAPI } from "@/hooks/useDunaAPI";
+import { useForum } from "@/hooks/useForum";
+import toast from "react-hot-toast";
 
-const QuarterlyReportsSection = () => {
-  const [reports, setReports] = useState<any[]>([]);
+const DUNA_CATEGORY_ID = 1;
+
+interface Report {
+  id: number;
+  title: string;
+  author: string;
+  content: string;
+  createdAt: string;
+  comments: any[];
+  attachments: any[];
+}
+
+interface QuarterlyReportsSectionProps {
+  initialReports: Report[];
+}
+
+const QuarterlyReportsSection = ({
+  initialReports,
+}: QuarterlyReportsSectionProps) => {
+  const [reports, setReports] = useState<Report[]>(initialReports || []);
   const [selectedReport, setSelectedReport] = useState<any>(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  
-  const { fetchReports, createReport, loading, error } = useDunaAPI();
 
-  useEffect(() => {
-    loadReports();
-  }, []);
-
-  useEffect(() => {
-    console.log("Component state:", { loading, error, reportsLength: reports.length });
-  }, [loading, error, reports.length]);
-
-  const loadReports = async () => {
-    console.log("Loading reports...");
-    const reportsData = await fetchReports();
-    console.log("Reports loaded:", reportsData);
-    setReports(reportsData);
-  };
+  const { createTopic, loading } = useForum();
 
   const handleReportClick = (report: any) => {
     setSelectedReport(report);
@@ -40,15 +44,31 @@ const QuarterlyReportsSection = () => {
     setIsCreateModalOpen(true);
   };
 
-  const handleCreateReport = async (data: { title: string; content: string; attachment?: File }) => {
-    const newReport = await createReport({
-      title: data.title,
-      content: data.content,
-    });
+  const handleCreateReport = async (data: {
+    title: string;
+    content: string;
+    attachment?: File;
+  }) => {
+    try {
+      const newReport = await createTopic({
+        title: data.title,
+        content: data.content,
+        categoryId: DUNA_CATEGORY_ID,
+        attachment: data.attachment,
+      });
 
-    if (newReport) {
-      setReports(prev => [newReport, ...prev]);
-      setIsCreateModalOpen(false);
+      if (newReport) {
+        setReports((prev) => [newReport, ...prev]);
+        setIsCreateModalOpen(false);
+        toast.success("Topic created successfully!");
+      } else {
+        throw new Error("Failed to create topic");
+      }
+    } catch (error) {
+      console.error("Error creating topic:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create topic";
+      toast.error(errorMessage);
     }
   };
 
@@ -56,7 +76,7 @@ const QuarterlyReportsSection = () => {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h4 className="text-lg font-bold text-primary">Quarterly Reports</h4>
-        <Button 
+        <Button
           onClick={handleCreatePost}
           className="bg-black text-white border border-black hover:bg-gray-800"
         >
@@ -64,26 +84,22 @@ const QuarterlyReportsSection = () => {
           Create new post
         </Button>
       </div>
-      
+
       {loading && (
         <div className="text-center py-4">
-          <div className="text-secondary">Loading reports...</div>
+          <div className="text-secondary">Creating report...</div>
         </div>
       )}
-      
-      {error && (
-        <div className="text-center py-4">
-          <div className="text-red-500">{error}</div>
-        </div>
-      )}
-      
-      {!loading && !error && reports.length === 0 && (
+
+      {reports.length === 0 && (
         <div className="text-center py-8">
-          <div className="text-secondary">No reports found. Create the first one!</div>
+          <div className="text-secondary">
+            No reports found. Create the first one!
+          </div>
         </div>
       )}
-      
-      {!loading && !error && reports.length > 0 && (
+
+      {reports.length > 0 && (
         <div className="space-y-3">
           {reports.map((report) => (
             <QuarterlyReportCard
@@ -110,4 +126,4 @@ const QuarterlyReportsSection = () => {
   );
 };
 
-export default QuarterlyReportsSection; 
+export default QuarterlyReportsSection;

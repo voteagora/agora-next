@@ -4735,14 +4735,13 @@ enum AttachableType {
 }
 
 model ForumCategory {
-  id          Int                 @id @default(autoincrement())
+  id          Int               @id @default(autoincrement())
   dao_slug    DaoSlug
   name        String
   description String?
-  createdAt   DateTime            @default(now()) @map("created_at")
-  updatedAt   DateTime            @updatedAt @map("updated_at")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
   topics      ForumTopic[]
-  attachments ForumAttachment[]
 
   @@unique([dao_slug, name])
   @@index([dao_slug])
@@ -4765,7 +4764,6 @@ model ForumTopic {
   posts          ForumPost[]
   votes          ForumVote[]
   reactions      ForumReaction[]
-  attachments    ForumAttachment[]
 
   @@index([dao_slug])
   @@index([dao_slug, categoryId])
@@ -4774,21 +4772,20 @@ model ForumTopic {
 }
 
 model ForumPost {
-  id             Int             @id @default(autoincrement())
+  id             Int               @id @default(autoincrement())
   dao_slug       DaoSlug
-  topicId        Int             @map("topic_id")
-  topic          ForumTopic      @relation(fields: [topicId], references: [id])
+  topicId        Int               @map("topic_id")
+  topic          ForumTopic        @relation(fields: [topicId], references: [id])
   address        String
-  parentPostId   Int?            @map("parent_post_id")
-  parentPost     ForumPost?      @relation("PostToPost", fields: [parentPostId], references: [id])
-  replies        ForumPost[]     @relation("PostToPost")
+  parentPostId   Int?              @map("parent_post_id")
+  parentPost     ForumPost?        @relation("PostToPost", fields: [parentPostId], references: [id])
+  replies        ForumPost[]       @relation("PostToPost")
   content        String
-  upvotesCount   Int             @default(0) @map("upvotes_count")
-  reactionsCount Int             @default(0) @map("reactions_count")
-  createdAt      DateTime        @default(now()) @map("created_at")
+  upvotesCount   Int               @default(0) @map("upvotes_count")
+  reactionsCount Int               @default(0) @map("reactions_count")
+  createdAt      DateTime          @default(now()) @map("created_at")
   votes          ForumVote[]
   reactions      ForumReaction[]
-  attachments    ForumAttachment[]
 
   @@index([dao_slug])
   @@index([dao_slug, topicId])
@@ -4803,7 +4800,7 @@ model ForumVote {
   address    String
   targetType AttachableType @map("target_type")
   targetId   Int            @map("target_id")
-  vote       Int            // 1 or -1
+  vote       Int // 1 or -1
   createdAt  DateTime       @default(now()) @map("created_at")
   topic      ForumTopic?    @relation(fields: [topicId], references: [id])
   topicId    Int?
@@ -4845,12 +4842,6 @@ model ForumAttachment {
   targetType  AttachableType @map("target_type")
   targetId    Int            @map("target_id")
   createdAt   DateTime       @default(now()) @map("created_at")
-  category    ForumCategory? @relation(fields: [categoryId], references: [id])
-  categoryId  Int?
-  topic       ForumTopic?    @relation(fields: [topicId], references: [id])
-  topicId     Int?
-  post        ForumPost?     @relation(fields: [postId], references: [id])
-  postId      Int?
 
   @@index([dao_slug, targetType, targetId])
   @@map("forum_attachments")

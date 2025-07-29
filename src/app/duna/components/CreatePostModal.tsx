@@ -1,26 +1,50 @@
 "use client";
 
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useAccount } from "wagmi";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { XMarkIcon, PaperClipIcon } from "@heroicons/react/20/solid";
+import { PaperClipIcon } from "@heroicons/react/20/solid";
+import toast from "react-hot-toast";
 
 interface CreatePostModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: { title: string; content: string; attachment?: File }) => Promise<void>;
+  onSubmit: (data: {
+    title: string;
+    content: string;
+    attachment?: File;
+  }) => Promise<void>;
 }
 
-const CreatePostModal = ({ isOpen, onClose, onSubmit }: CreatePostModalProps) => {
+const CreatePostModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+}: CreatePostModalProps) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [attachment, setAttachment] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { isConnected } = useAccount();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim()) return;
-    
+    if (!title.trim() || !content.trim()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (!isConnected) {
+      toast.error("Please connect your wallet first");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await onSubmit({
@@ -28,11 +52,11 @@ const CreatePostModal = ({ isOpen, onClose, onSubmit }: CreatePostModalProps) =>
         content: content.trim(),
         attachment: attachment || undefined,
       });
-      
       // Reset form
       setTitle("");
       setContent("");
       setAttachment(null);
+      onClose();
     } catch (error) {
       console.error("Error creating post:", error);
     } finally {
@@ -64,10 +88,13 @@ const CreatePostModal = ({ isOpen, onClose, onSubmit }: CreatePostModalProps) =>
             Create New Post
           </DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-primary mb-2">
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-primary mb-2"
+            >
               Title
             </label>
             <input
@@ -81,9 +108,12 @@ const CreatePostModal = ({ isOpen, onClose, onSubmit }: CreatePostModalProps) =>
               disabled={isSubmitting}
             />
           </div>
-          
+
           <div>
-            <label htmlFor="content" className="block text-sm font-medium text-primary mb-2">
+            <label
+              htmlFor="content"
+              className="block text-sm font-medium text-primary mb-2"
+            >
               Content
             </label>
             <textarea
@@ -97,9 +127,12 @@ const CreatePostModal = ({ isOpen, onClose, onSubmit }: CreatePostModalProps) =>
               disabled={isSubmitting}
             />
           </div>
-          
+
           <div>
-            <label htmlFor="attachment" className="block text-sm font-medium text-primary mb-2">
+            <label
+              htmlFor="attachment"
+              className="block text-sm font-medium text-primary mb-2"
+            >
               Attachment (Optional)
             </label>
             <div className="flex items-center gap-2">
@@ -125,7 +158,7 @@ const CreatePostModal = ({ isOpen, onClose, onSubmit }: CreatePostModalProps) =>
               )}
             </div>
           </div>
-          
+
           <div className="flex justify-end gap-3 pt-4">
             <Button
               type="button"
@@ -149,4 +182,4 @@ const CreatePostModal = ({ isOpen, onClose, onSubmit }: CreatePostModalProps) =>
   );
 };
 
-export default CreatePostModal; 
+export default CreatePostModal;

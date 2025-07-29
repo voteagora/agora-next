@@ -1,12 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { XMarkIcon, PaperClipIcon } from "@heroicons/react/20/solid";
+import { PaperClipIcon } from "@heroicons/react/20/solid";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
-import { useDunaAPI } from "@/hooks/useDunaAPI";
+import { useForum } from "@/hooks/useForum";
+import { format } from "date-fns";
 
 interface Comment {
   id: number;
@@ -22,10 +28,13 @@ interface Report {
   author: string;
   content: string;
   createdAt: string;
-  attachment?: {
-    name: string;
+  attachments: {
+    id: number;
+    fileName: string;
     url: string;
-  };
+    contentType: string;
+    fileSize: number;
+  }[];
   comments: Comment[];
 }
 
@@ -39,8 +48,8 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const { createComment, loading, error } = useDunaAPI();
+
+  const { createPost, loading, error } = useForum();
 
   useEffect(() => {
     if (report) {
@@ -51,15 +60,15 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim() || !report) return;
-    
+
     setIsSubmitting(true);
     try {
-      const newCommentData = await createComment(report.id, {
+      const newCommentData = await createPost(report.id, {
         content: newComment.trim(),
       });
-      
+
       if (newCommentData) {
-        setComments(prev => [...prev, newCommentData]);
+        setComments((prev) => [...prev, newCommentData]);
         setNewComment("");
       }
     } catch (error) {
@@ -70,23 +79,29 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
   };
 
   // Function to render comments with proper threading
-  const renderComments = (comments: Comment[], parentId: number | null = null, depth: number = 0) => {
-    const filteredComments = comments.filter(comment => (comment.parentId || null) === parentId);
+  const renderComments = (
+    comments: Comment[],
+    parentId: number | null = null,
+    depth: number = 0
+  ) => {
+    const filteredComments = comments.filter(
+      (comment) => (comment.parentId || null) === parentId
+    );
 
     return filteredComments.map((comment) => (
-      <div key={comment.id} className={`${depth > 0 ? 'ml-8 mt-4' : 'mt-4'}`}>
+      <div key={comment.id} className={`${depth > 0 ? "ml-8 mt-4" : "mt-4"}`}>
         <div className="flex gap-3">
           <div className="flex-shrink-0">
             <ENSAvatar ensName={comment.author} className="w-8 h-8" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <span className="font-medium text-primary">{comment.author}</span>
-              <span className="text-sm text-secondary">posted {comment.createdAt}</span>
+              <ENSName address={comment.author} />
+              <span className="text-sm text-secondary">
+                posted {format(new Date(comment.createdAt), "yyyy-MM-dd")}
+              </span>
             </div>
-            <div className="text-secondary">
-              {comment.content}
-            </div>
+            <div className="text-secondary">{comment.content}</div>
           </div>
         </div>
         {renderComments(comments, comment.id, depth + 1)}
@@ -107,19 +122,13 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
             <DialogTitle className="text-2xl font-black text-primary pr-8">
               {report.title}
             </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0 hover:bg-neutral"
-            >
-              <XMarkIcon className="h-4 w-4" />
-            </Button>
           </div>
           <div className="flex items-center gap-2 mt-2">
             <ENSAvatar ensName={report.author} className="w-8 h-8" />
-            <span className="font-medium text-primary">{report.author}</span>
-            <span className="text-sm text-secondary">posted {report.createdAt}</span>
+            <ENSName address={report.author} />
+            <span className="text-sm text-secondary">
+              posted {format(new Date(report.createdAt), "yyyy-MM-dd")}
+            </span>
           </div>
         </DialogHeader>
 
@@ -128,15 +137,27 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
           <div className="text-secondary leading-relaxed whitespace-pre-wrap">
             {report.content}
           </div>
-          
-          {/* Attachment */}
-          {report.attachment && (
+
+          {/* Attachments */}
+          {report.attachments && report.attachments.length > 0 && (
             <div className="border-t border-line pt-4">
-              <div className="text-sm font-semibold text-primary mb-2">Attachment</div>
-              <Button variant="outline" className="w-full justify-start">
-                <PaperClipIcon className="w-4 h-4 mr-2" />
-                {report.attachment.name}
-              </Button>
+              <div className="text-sm font-semibold text-primary mb-2">
+                Attachment{report.attachments.length > 1 ? "s" : ""} (
+                {report.attachments.length})
+              </div>
+              <div className="space-y-2">
+                {report.attachments.map((attachment) => (
+                  <Button
+                    key={attachment.id}
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => window.open(attachment.url, "_blank")}
+                  >
+                    <PaperClipIcon className="w-4 h-4 mr-2" />
+                    {attachment.fileName || `Attachment ${attachment.id}`}
+                  </Button>
+                ))}
+              </div>
             </div>
           )}
 
@@ -145,10 +166,8 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
             <h4 className="text-lg font-bold text-primary mb-4">
               Comments ({comments.length})
             </h4>
-            
-            <div className="space-y-4">
-              {renderComments(comments)}
-            </div>
+
+            <div className="space-y-4">{renderComments(comments)}</div>
 
             {/* Comment Input */}
             <div className="mt-6 pt-4 border-t border-line">
@@ -162,7 +181,7 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
                   disabled={isSubmitting}
                 />
                 <div className="flex justify-end mt-2">
-                  <Button 
+                  <Button
                     type="submit"
                     disabled={isSubmitting || !newComment.trim()}
                     className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
@@ -179,4 +198,4 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
   );
 };
 
-export default ReportModal; 
+export default ReportModal;
