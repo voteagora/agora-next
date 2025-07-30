@@ -194,5 +194,31 @@ If you need help creating transactions / calldata, please see este [video](https
         gatingType: ProposalGatingType.MANAGER,
       },
     },
+    // DAO-Node Integration - Phase 1
+    // Shape is the first tenant with Governor v2.0 (AGORA_20) to use DAO-Node
+    {
+      name: "use-daonode-for-proposals",
+      enabled: true,
+    },
+    {
+      name: "dao-node/proposal-votes",
+      enabled: true,
+    },
+    {
+      name: "dao-node/delegate/addr",
+      enabled: true,
+    },
+    {
+      name: "use-daonode-for-votable-supply",
+      enabled: true,
+    },
+    {
+      name: "use-daonode-for-proposal-types",
+      enabled: true,
+    },
+    {
+      name: "dao-node/votes-chart",
+      enabled: true,
+    },
   ],
 });
