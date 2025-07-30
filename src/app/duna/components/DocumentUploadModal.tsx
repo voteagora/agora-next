@@ -216,7 +216,7 @@ export default function DocumentUploadModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleModalClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Upload Document</DialogTitle>
         </DialogHeader>
@@ -233,7 +233,7 @@ export default function DocumentUploadModal({
           {!selectedFile && (
             <div
               className={`
-                border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
+                border-2 border-dashed rounded-lg p-4 sm:p-8 text-center cursor-pointer transition-colors
                 ${
                   isDragOver
                     ? "border-gray-400 bg-gray-50 dark:bg-gray-900/20"
@@ -246,14 +246,14 @@ export default function DocumentUploadModal({
               onDrop={handleDrop}
               onClick={triggerFileInput}
             >
-              <DocumentIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <DocumentIcon className="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-400 mb-2 sm:mb-4" />
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 <span className="font-medium text-gray-500 dark:text-gray-400">
                   Click to upload
                 </span>{" "}
                 or drag and drop
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 sm:mt-2">
                 PDF, Word, Excel, PowerPoint, images, and text files up to 20MB
               </p>
             </div>
@@ -261,14 +261,14 @@ export default function DocumentUploadModal({
 
           {selectedFile && (
             <div
-              className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800"
+              className="border rounded-lg p-3 sm:p-4 bg-gray-50 dark:bg-gray-800"
               style={{ borderColor: "#E5E5E5" }}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3 flex-1 min-w-0">
-                  <DocumentIcon className="h-8 w-8 text-gray-400 flex-shrink-0" />
+                <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                  <DocumentIcon className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400 flex-shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                    <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                       {selectedFile.name}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 break-words">
@@ -283,7 +283,7 @@ export default function DocumentUploadModal({
                     className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 flex-shrink-0"
                     title="Remove file"
                   >
-                    <XMarkIcon className="h-5 w-5" />
+                    <XMarkIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                   </button>
                 )}
               </div>
@@ -320,11 +320,11 @@ export default function DocumentUploadModal({
           )}
         </div>
 
-        <div className="flex justify-end space-x-3 pt-4 w-full">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 w-full">
           <Button
             onClick={handleModalClose}
             disabled={isUploading}
-            className="bg-neutral text-primary border hover:bg-wash"
+            className="bg-neutral text-primary border hover:bg-wash w-full sm:w-auto order-2 sm:order-1"
             style={{ borderColor: "#E5E5E5" }}
           >
             Cancel
@@ -332,7 +332,7 @@ export default function DocumentUploadModal({
           <Button
             onClick={handleFileUpload}
             disabled={!selectedFile || isUploading}
-            className="text-white border border-black hover:bg-gray-800 text-sm"
+            className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto order-1 sm:order-2"
             style={{
               display: "flex",
               height: "36px",

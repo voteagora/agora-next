@@ -55,11 +55,11 @@ const DocumentsSection = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <h4 className="text-lg font-bold text-primary">Documents</h4>
         <Button
           onClick={() => setIsUploadModalOpen(true)}
-          className="text-white border border-black hover:bg-gray-800 text-sm"
+          className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto"
           style={{
             display: "flex",
             height: "36px",
@@ -99,7 +99,7 @@ const DocumentsSection = () => {
       )}
 
       {!loading && !error && documents.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {documents.map((document, index) => (
             <div
               key={document.id || index}
@@ -109,7 +109,7 @@ const DocumentsSection = () => {
             >
               <DocumentIcon className="w-4 h-4 text-gray-900 flex-shrink-0" />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
+                <p className="text-sm font-medium text-gray-900 truncate">
                   {document.name}
                 </p>
               </div>

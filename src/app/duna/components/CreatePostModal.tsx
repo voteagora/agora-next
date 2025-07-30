@@ -82,7 +82,7 @@ const CreatePostModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-primary">
             Create New Post
@@ -149,7 +149,7 @@ const CreatePostModal = ({
               <Button
                 type="button"
                 onClick={() => document.getElementById("attachment")?.click()}
-                className="bg-neutral text-primary border border-line hover:bg-wash"
+                className="bg-neutral text-primary border border-line hover:bg-wash w-full sm:w-auto"
                 disabled={isSubmitting}
               >
                 <PaperClipIcon className="w-4 h-4 mr-2" />

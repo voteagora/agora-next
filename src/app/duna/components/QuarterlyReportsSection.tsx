@@ -101,11 +101,11 @@ const QuarterlyReportsSection = ({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <h4 className="text-lg font-bold text-primary">Quarterly Reports</h4>
         <Button
           onClick={handleCreatePost}
-          className="text-white border border-black hover:bg-gray-800 text-sm"
+          className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto"
           style={{
             display: "flex",
             height: "36px",

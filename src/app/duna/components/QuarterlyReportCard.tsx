@@ -52,13 +52,13 @@ const QuarterlyReportCard = ({
       style={!isLast ? { borderBottomColor: "#E5E5E5" } : {}}
       onClick={onClick}
     >
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-3 gap-2">
         <div className="flex-1">
           <h5 className="font-bold text-primary text-base mb-1">
             {report.title}
           </h5>
         </div>
-        <div className="flex items-center gap-2 text-sm text-secondary ml-4">
+        <div className="flex items-center gap-2 text-sm text-secondary sm:ml-4">
           <ENSAvatar ensName={report.author} className="w-6 h-6" />
           <ENSName address={report.author} />
         </div>
