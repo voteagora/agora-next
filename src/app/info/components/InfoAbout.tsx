@@ -74,9 +74,15 @@ const InfoAbout = () => {
   return (
     <>
       <h3 className="text-2xl font-black text-primary mt-12">{sectionTitle}</h3>
-      <div className="mt-4 rounded-xl border border-line bg-neutral shadow-sm">
-        <div className="p-6 flex flex-row flex-wrap sm:flex-nowrap gap-6">
-          <div className="w-full h-[200px] sm:h-auto sm:w-1/2 relative">
+      <div
+        className={`mt-4 rounded-xl border border-line shadow-sm ${ui.customization?.customInfoSectionBackground ? `bg-[${ui.customization.customInfoSectionBackground}]` : "bg-neutral"}`}
+      >
+        <div
+          className={`p-6 flex flex-row flex-wrap sm:flex-nowrap ${ui.customization?.customInfoLayout ? ui.customization.customInfoLayout : "gap-6"}`}
+        >
+          <div
+            className={`w-full sm:w-1/2 relative ${ui.customization?.customHeroImageSize ? ui.customization.customHeroImageSize : "h-[200px] sm:h-auto"}`}
+          >
             <Image
               src={page.hero!}
               alt={page.title}
@@ -84,11 +90,20 @@ const InfoAbout = () => {
               className="rounded-lg object-cover object-center"
             />
           </div>
-          <div className="sm:w-1/2">
-            <h3 className="text-lg font-bold text-primary">
-              {"About " + brandName}
-            </h3>
-            <p className="text-secondary mt-3">{page.description}</p>
+          <div
+            className={`${ui.customization?.customInfoLayout ? "sm:w-auto sm:ml-2" : "sm:w-1/2"}`}
+          >
+            <div
+              className={`${ui.customization?.customTextContainer ? ui.customization.customTextContainer : ""}`}
+            >
+              <h3 className="text-lg font-bold text-primary">
+                {ui.customization?.customAboutSubtitle ||
+                  (namespace === TENANT_NAMESPACES.DEMO
+                    ? "About Canopy"
+                    : "About " + brandName)}
+              </h3>
+              <p className="text-secondary mt-3">{page.description}</p>
+            </div>
             {/* So the image doesn't look smooshed for scroll :eye-roll: */}
             {namespace === TENANT_NAMESPACES.SCROLL && (
               <div className="sm:h-[105px] block"></div>
