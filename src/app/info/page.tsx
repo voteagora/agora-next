@@ -7,6 +7,7 @@ import { InfoHero } from "@/app/info/components/InfoHero";
 import { ChartTreasury } from "@/app/info/components/ChartTreasury";
 import GovernorSettings from "@/app/info/components/GovernorSettings";
 import GovernanceCharts from "@/app/info/components/GovernanceCharts";
+import DunaAdministration from "@/app/duna/components/DunaAdministration";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/getTreasuryBalanceTS";
@@ -14,6 +15,8 @@ import { apiFetchDelegateWeights } from "@/app/api/analytics/top/delegates/getTo
 import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/getProposalVoteCounts";
 import { apiFetchMetricTS } from "@/app/api/analytics/metric/[metric_id]/[frequency]/getMetricsTS";
 import Hero from "@/components/Hero/Hero";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
@@ -56,6 +59,7 @@ export default async function Page() {
 
   const hasGovernanceCharts =
     ui.toggle("info/governance-charts")?.enabled === true;
+  const hasDunaAdministration = ui.toggle("duna")?.enabled === true;
 
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
     const treasuryData = await apiFetchTreasuryBalanceTS(
@@ -67,6 +71,7 @@ export default async function Page() {
         <InfoHero />
         <InfoAbout />
         <GovernorSettings />
+        {hasDunaAdministration && <DunaAdministration />}
         {treasuryData.result.length > 0 && (
           <ChartTreasury
             initialData={treasuryData.result}

@@ -11,22 +11,22 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: "/(.*)",
         headers: [
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
+            key: "X-Content-Type-Options",
+            value: "nosniff",
           },
           {
-            key: 'X-Frame-Options',
-            value: 'DENY'
+            key: "X-Frame-Options",
+            value: "DENY",
           },
           {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block'
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
           },
-        ]
-      }
+        ],
+      },
     ];
   },
   images: {
@@ -59,8 +59,11 @@ const nextConfig = {
     instrumentationHook: true,
     // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297
     serverComponentsExternalPackages: ["@opentelemetry/sdk-node"],
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
   },
-  output: 'standalone', // Optional, good for Docker
+  output: "standalone", // Optional, good for Docker
 };
 
 module.exports = nextConfig;

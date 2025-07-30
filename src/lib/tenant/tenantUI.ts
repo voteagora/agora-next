@@ -140,6 +140,7 @@ type TenantUIParams = {
   tacticalStrings?: {
     myBalance?: string;
   };
+  dunaDisclaimers?: string;
 };
 
 export class TenantUI {
@@ -186,11 +187,13 @@ export class TenantUI {
   private _tacticalStrings?: {
     myBalance?: string;
   };
+  private _dunaDisclaimers?: string;
 
   constructor({
     assets,
     customization,
     delegates,
+    dunaDisclaimers,
     favicon,
     googleAnalytics,
     governanceIssues,
@@ -210,6 +213,7 @@ export class TenantUI {
     this._assets = assets;
     this._customization = customization;
     this._delegates = delegates;
+    this._dunaDisclaimers = dunaDisclaimers;
     this._favicon = favicon;
     this._googleAnalytics = googleAnalytics;
     this._governanceIssues = governanceIssues;
@@ -342,5 +346,9 @@ export class TenantUI {
       }
     | undefined {
     return this._tacticalStrings;
+  }
+
+  public get dunaDisclaimers(): string | undefined {
+    return this._dunaDisclaimers;
   }
 }
