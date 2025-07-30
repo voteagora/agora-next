@@ -6,7 +6,10 @@ import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/Ap
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
-import { ParsedProposalData } from "@/lib/proposalUtils";
+import {
+  calculateHybridApprovalUniqueParticipationPercentage,
+  ParsedProposalData,
+} from "@/lib/proposalUtils";
 import { ProposalVotesTab } from "@/components/common/ProposalVotesTab";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
@@ -29,6 +32,11 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
   const handleClick = () => {
     setIsClicked(!isClicked);
   };
+
+  const currentQorum = calculateHybridApprovalUniqueParticipationPercentage(
+    proposal.proposalResults,
+    Number(proposal.quorum)
+  );
 
   return (
     <>
@@ -64,9 +72,10 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
               </div>
               <HybridOptionsResultsPanel proposal={proposal} />
               <div className="static md:sticky bottom-0 w-full right-0 border-t">
-                <div className="p-4 bg-neutral">
+                <div className=" bg-neutral">
                   <HybridApprovalCriteria
                     proposalSettings={hybridApprovalData?.proposalSettings}
+                    currentQorum={currentQorum}
                   />
                 </div>
                 <div className="p-4 border-t pt-1">

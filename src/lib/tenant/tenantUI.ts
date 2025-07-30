@@ -2,6 +2,7 @@ import { StaticImageData } from "next/image";
 import { icons } from "@/icons/icons";
 import { PLMConfig } from "@/app/proposals/draft/types";
 import { TenantToken } from "../types";
+import React, { ReactNode } from "react";
 
 type UIToggle = {
   name: string;
@@ -51,12 +52,18 @@ export type UILink = {
 };
 
 type UIPage = {
-  description: string;
+  description: string | React.ReactNode;
   hero?: StaticImageData | string;
   href?: string;
   links?: UILink[];
   route: string;
   title: string;
+  sectionTitle?: string;
+  tabs?: Array<{
+    icon: React.ReactNode;
+    title: string;
+    description: string | React.ReactNode;
+  }>;
   meta: {
     title: string;
     description: string;
@@ -147,6 +154,7 @@ type TenantUIParams = {
   tacticalStrings?: {
     myBalance?: string;
   };
+  dunaDisclaimers?: string;
 };
 
 export class TenantUI {
@@ -207,11 +215,13 @@ export class TenantUI {
   private _tacticalStrings?: {
     myBalance?: string;
   };
+  private _dunaDisclaimers?: string;
 
   constructor({
     assets,
     customization,
     delegates,
+    dunaDisclaimers,
     favicon,
     googleAnalytics,
     governanceIssues,
@@ -232,6 +242,7 @@ export class TenantUI {
     this._assets = assets;
     this._customization = customization;
     this._delegates = delegates;
+    this._dunaDisclaimers = dunaDisclaimers;
     this._favicon = favicon;
     this._googleAnalytics = googleAnalytics;
     this._governanceIssues = governanceIssues;
@@ -382,5 +393,9 @@ export class TenantUI {
       }
     | undefined {
     return this._tacticalStrings;
+  }
+
+  public get dunaDisclaimers(): string | undefined {
+    return this._dunaDisclaimers;
   }
 }
