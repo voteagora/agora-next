@@ -3,44 +3,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import QuarterlyReportsSection from "./QuarterlyReportsSection";
 import DocumentsSection from "./DocumentsSection";
 import { getForumTopics } from "@/lib/actions/forum";
+import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 
 const DUNA_CATEGORY_ID = 1;
 
-interface Report {
-  id: number;
-  title: string;
-  author: string;
-  content: string;
-  createdAt: string;
-  comments: any[];
-  attachments: any[];
-}
-
-function transformForumTopics(data: any[]): Report[] {
-  return data.map((topic: any) => {
-    const topicAttachments = topic.attachments || [];
-    const postAttachments =
-      topic.posts?.flatMap((post: any) => post.attachments || []) || [];
-    const allAttachments = [...topicAttachments, ...postAttachments];
-
-    return {
-      id: topic.id,
-      title: topic.title,
-      author: topic.address,
-      content: topic.posts?.[0]?.content || "",
-      createdAt: topic.createdAt,
-      comments: topic.posts?.slice(1) || [],
-      attachments: allAttachments,
-    };
-  });
-}
-
 const DunaAdministration = async () => {
-  let dunaReports: Report[] = [];
+  let dunaReports: ForumTopic[] = [];
   try {
     const topicsResult = await getForumTopics(DUNA_CATEGORY_ID);
     if (topicsResult.success) {
-      dunaReports = transformForumTopics(topicsResult.data);
+      dunaReports = transformForumTopics(topicsResult.data, {
+        mergePostAttachments: true,
+      });
     }
   } catch (error) {
     console.error("Error fetching forum topics:", error);

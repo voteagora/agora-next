@@ -60,7 +60,7 @@ const nextConfig = {
     // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297
     serverComponentsExternalPackages: ["@opentelemetry/sdk-node"],
     serverActions: {
-      bodySizeLimit: "20mb",
+      bodySizeLimit: "10mb",
     },
   },
   output: "standalone", // Optional, good for Docker

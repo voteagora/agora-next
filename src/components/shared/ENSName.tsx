@@ -11,36 +11,24 @@ interface ENSNameProps {
 
 // This component will display the ENS name for a given address
 export default function ENSName({ address, truncate = true }: ENSNameProps) {
-  console.log("ENSName received address:", address);
-
   const [ensName, setEnsName] = useState(
-    address && address.trim()
-      ? truncate
-        ? truncateAddress(address)
-        : address
-      : "Unknown"
+    truncate ? truncateAddress(address || "") : address || ""
   );
 
   const { data } = useEnsName({
     chainId: 1,
-    address:
-      address && address.startsWith("0x")
-        ? (address as `0x${string}`)
-        : undefined,
+    address: address as `0x${string}`,
   });
 
   useEffect(() => {
     if (data) {
       setEnsName(data); // Set ENS name if available
-    } else if (address && address.trim()) {
-      setEnsName(truncate ? truncateAddress(address) : address); // Fallback
     } else {
-      setEnsName("Unknown");
+      setEnsName(truncate ? truncateAddress(address) : address); // Fallback
     }
   }, [data, address, truncate]);
 
   return truncate
-    ? ensName ||
-        (address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "Unknown")
-    : ensName || address || "Unknown";
+    ? ensName || `${address.slice(0, 6)}...${address.slice(-4)}`
+    : ensName || address;
 }

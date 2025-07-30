@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowDownTrayIcon } from "@heroicons/react/20/solid";
 import { useForum } from "@/hooks/useForum";
-import { format } from "date-fns";
+import { useAccount } from "wagmi";
 
 // Custom document icon with folded corner (outline)
 const DocumentIcon = ({ className }: { className?: string }) => (
@@ -26,6 +25,7 @@ const DocumentsSection = () => {
   const [documents, setDocuments] = useState<any[]>([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const { fetchDocuments, loading, error } = useForum();
+  const { address } = useAccount();
 
   useEffect(() => {
     loadDocuments();
@@ -57,25 +57,27 @@ const DocumentsSection = () => {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <h4 className="text-lg font-bold text-primary">Documents</h4>
-        <Button
-          onClick={() => setIsUploadModalOpen(true)}
-          className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto"
-          style={{
-            display: "flex",
-            height: "36px",
-            padding: "12px 20px",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "8px",
-            flexShrink: 0,
-            borderRadius: "8px",
-            background: "#171717",
-            boxShadow:
-              "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-          }}
-        >
-          Upload new document
-        </Button>
+        {!!address && (
+          <Button
+            onClick={() => setIsUploadModalOpen(true)}
+            className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto"
+            style={{
+              display: "flex",
+              height: "36px",
+              padding: "12px 20px",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "8px",
+              flexShrink: 0,
+              borderRadius: "8px",
+              background: "#171717",
+              boxShadow:
+                "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+            }}
+          >
+            Upload new document
+          </Button>
+        )}
       </div>
 
       {loading && (

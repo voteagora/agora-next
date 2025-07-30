@@ -7,7 +7,9 @@ import QuarterlyReportCard from "./QuarterlyReportCard";
 import ReportModal from "./ReportModal";
 import CreatePostModal from "./CreatePostModal";
 import { useForum } from "@/hooks/useForum";
+import { ForumTopic } from "@/lib/forumUtils";
 import toast from "react-hot-toast";
+import { useAccount } from "wagmi";
 
 // Custom up-down chevron icon (outline)
 const UpDownChevronIcon = ({ className }: { className?: string }) => (
@@ -25,32 +27,23 @@ const UpDownChevronIcon = ({ className }: { className?: string }) => (
 
 const DUNA_CATEGORY_ID = 1;
 
-interface Report {
-  id: number;
-  title: string;
-  author: string;
-  content: string;
-  createdAt: string;
-  comments: any[];
-  attachments: any[];
-}
-
 interface QuarterlyReportsSectionProps {
-  initialReports: Report[];
+  initialReports: ForumTopic[];
 }
 
 const QuarterlyReportsSection = ({
   initialReports,
 }: QuarterlyReportsSectionProps) => {
-  const [reports, setReports] = useState<Report[]>(initialReports || []);
-  const [selectedReport, setSelectedReport] = useState<any>(null);
+  const [reports, setReports] = useState<ForumTopic[]>(initialReports || []);
+  const [selectedReport, setSelectedReport] = useState<ForumTopic | null>(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [showAllReports, setShowAllReports] = useState(false);
+  const { address } = useAccount();
 
   const { createTopic, loading } = useForum();
 
-  const handleReportClick = (report: any) => {
+  const handleReportClick = (report: ForumTopic) => {
     setSelectedReport(report);
     setIsReportModalOpen(true);
   };
@@ -76,13 +69,10 @@ const QuarterlyReportsSection = ({
         setReports((prev) => [newReport, ...prev]);
         setIsCreateModalOpen(false);
         toast.success("Topic created successfully!");
-      } else {
-        throw new Error("Failed to create topic");
       }
     } catch (error) {
       console.error("Error creating topic:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to create topic";
+      const errorMessage = "Failed to create topic";
       toast.error(errorMessage);
     }
   };
@@ -103,25 +93,27 @@ const QuarterlyReportsSection = ({
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <h4 className="text-lg font-bold text-primary">Quarterly Reports</h4>
-        <Button
-          onClick={handleCreatePost}
-          className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto"
-          style={{
-            display: "flex",
-            height: "36px",
-            padding: "12px 20px",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "8px",
-            flexShrink: 0,
-            borderRadius: "8px",
-            background: "#171717",
-            boxShadow:
-              "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-          }}
-        >
-          Create new post
-        </Button>
+        {!!address && (
+          <Button
+            onClick={handleCreatePost}
+            className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto"
+            style={{
+              display: "flex",
+              height: "36px",
+              padding: "12px 20px",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "8px",
+              flexShrink: 0,
+              borderRadius: "8px",
+              background: "#171717",
+              boxShadow:
+                "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+            }}
+          >
+            Create new post
+          </Button>
+        )}
       </div>
 
       {loading && (

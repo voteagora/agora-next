@@ -267,6 +267,36 @@ export async function createForumTopic(
   }
 }
 
+export async function deleteForumTopic(topicId: number) {
+  try {
+    const { slug } = Tenant.current();
+
+    await prisma.forumPost.deleteMany({
+      where: {
+        topicId: topicId,
+        dao_slug: slug,
+      },
+    });
+
+    await prisma.forumTopic.delete({
+      where: {
+        id: topicId,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting forum topic:", error);
+    return {
+      success: false,
+      error: "Failed to delete topic",
+      details: error instanceof Error ? error.message : "Unknown error",
+    };
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 export async function createForumPost(
   topicId: number,
   data: z.infer<typeof createPostSchema>

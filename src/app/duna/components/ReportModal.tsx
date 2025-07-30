@@ -12,46 +12,24 @@ import { PaperClipIcon } from "@heroicons/react/20/solid";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
 import { useForum } from "@/hooks/useForum";
+import { ForumTopic, ForumPost } from "@/lib/forumUtils";
 import { format } from "date-fns";
 import { useAccount } from "wagmi";
 import { ConnectKitButton } from "connectkit";
-
-interface Comment {
-  id: number;
-  author: string;
-  content: string;
-  createdAt: string;
-  parentId?: number;
-}
-
-interface Report {
-  id: number;
-  title: string;
-  author: string;
-  content: string;
-  createdAt: string;
-  attachments: {
-    id: number;
-    fileName: string;
-    url: string;
-    contentType: string;
-    fileSize: number;
-  }[];
-  comments: Comment[];
-}
+import CommentList from "./CommentList";
 
 interface ReportModalProps {
-  report: Report | null;
+  report: ForumTopic | null;
   isOpen: boolean;
   onClose: () => void;
 }
 
 const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
   const [newComment, setNewComment] = useState("");
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<ForumPost[]>(report?.comments || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { createPost, loading, error } = useForum();
+  const { createPost } = useForum();
   const { address, isConnected } = useAccount();
 
   useEffect(() => {
@@ -62,37 +40,24 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted, comment:", newComment);
-    console.log("Report:", report);
 
     if (!newComment.trim() || !report) {
-      console.log("Early return - no comment or report");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      console.log("Creating post for report ID:", report.id);
-      console.log("Current wallet address:", address);
       const newCommentData = await createPost(report.id, {
         content: newComment.trim(),
       });
 
-      console.log("New comment data:", newCommentData);
-      console.log("New comment author:", newCommentData?.author);
-      console.log("New comment author type:", typeof newCommentData?.author);
       if (newCommentData) {
-        // Ensure the comment has the correct author
         const commentWithAuthor = {
           ...newCommentData,
           author: newCommentData.author || address || "",
         };
-        console.log("Comment with author:", commentWithAuthor);
-        console.log("Using author:", commentWithAuthor.author);
         setComments((prev) => [...prev, commentWithAuthor]);
         setNewComment("");
-      } else {
-        console.log("No newCommentData returned");
       }
     } catch (error) {
       console.error("Error creating comment:", error);
@@ -101,53 +66,9 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
     }
   };
 
-  // Function to render comments with proper threading
-  const renderComments = (
-    comments: Comment[],
-    parentId: number | null = null,
-    depth: number = 0
-  ) => {
-    const filteredComments = comments.filter(
-      (comment) => (comment.parentId || null) === parentId
-    );
-
-    return filteredComments.map((comment) => (
-      <div
-        key={comment.id}
-        className={`${depth > 0 ? "ml-4 sm:ml-8 mt-3 sm:mt-4" : "mt-3 sm:mt-4"}`}
-      >
-        <div className="flex gap-2 sm:gap-3">
-          <div className="flex-shrink-0">
-            <ENSAvatar
-              ensName={comment.author}
-              className="w-6 h-6 sm:w-8 sm:h-8"
-            />
-          </div>
-          <div className="flex-1">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-              <ENSName address={comment.author || ""} />
-              <span className="text-xs sm:text-sm text-secondary">
-                posted {format(new Date(comment.createdAt), "yyyy-MM-dd")}
-              </span>
-            </div>
-            <div className="text-secondary text-xs sm:text-sm">
-              {comment.content}
-            </div>
-          </div>
-        </div>
-        {renderComments(comments, comment.id, depth + 1)}
-      </div>
-    ));
-  };
-
-  // Don't render if no report is provided
   if (!report) {
     return null;
   }
-
-  // Debug logging
-  console.log("Report author:", report.author);
-  console.log("Comments:", comments);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -159,7 +80,8 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
                 {report.title}
               </DialogTitle>
               <div className="text-xs sm:text-sm text-secondary">
-                Created {format(new Date(report.createdAt), "MMM d, yyyy")} •{" "}
+                Created{" "}
+                {format(new Date(report.createdAt), "MMM d, yyyy hh:mm")}{" "}
                 {comments.length} comments {report.attachments?.length || 0}{" "}
                 attachment{(report.attachments?.length || 0) !== 1 ? "s" : ""}
               </div>
@@ -180,7 +102,8 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
                 <ENSName address={report.author || ""} />
                 <span className="text-xs sm:text-sm text-secondary">
-                  posted {format(new Date(report.createdAt), "MMM d, yyyy")}
+                  posted{" "}
+                  {format(new Date(report.createdAt), "MMM d, yyyy hh:mm")}
                 </span>
               </div>
 
@@ -226,17 +149,12 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
               Comments ({comments.length})
             </h4>
 
-            <div className="space-y-3 sm:space-y-4">
-              {renderComments(comments)}
-            </div>
+            <CommentList comments={comments} />
 
             {/* Comment Input */}
             <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-line">
               {!isConnected ? (
-                <div className="text-center py-3 sm:py-4">
-                  <p className="text-xs sm:text-sm text-secondary mb-2 sm:mb-3">
-                    Connect your wallet to comment
-                  </p>
+                <div className="text-center py-3 sm:py-4 flex items-center justify-center">
                   <ConnectKitButton.Custom>
                     {({ show }) => (
                       <Button
@@ -256,7 +174,7 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
                             "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
                         }}
                       >
-                        Connect Wallet
+                        Connect your wallet to comment
                       </Button>
                     )}
                   </ConnectKitButton.Custom>

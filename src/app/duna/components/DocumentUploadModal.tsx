@@ -42,7 +42,7 @@ export default function DocumentUploadModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validateFile = (file: File): { valid: boolean; error?: string } => {
-    const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
     const ALLOWED_FILE_TYPES = [
       "application/pdf",
       "application/msword",
@@ -63,7 +63,7 @@ export default function DocumentUploadModal({
     if (file.size > MAX_FILE_SIZE) {
       return {
         valid: false,
-        error: `File size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds maximum limit of 20MB`,
+        error: `File size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds maximum limit of 10MB`,
       };
     }
 
@@ -254,7 +254,7 @@ export default function DocumentUploadModal({
                 or drag and drop
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 sm:mt-2">
-                PDF, Word, Excel, PowerPoint, images, and text files up to 20MB
+                PDF, Word, Excel, PowerPoint, images, and text files up to 10MB
               </p>
             </div>
           )}
@@ -268,7 +268,7 @@ export default function DocumentUploadModal({
                 <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
                   <DocumentIcon className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400 flex-shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                    <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate max-w-[200px]">
                       {selectedFile.name}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 break-words">

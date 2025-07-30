@@ -5,30 +5,14 @@ import {
   getForumTopic,
   createForumTopic,
   createForumPost,
+  deleteForumTopic,
   getForumDocuments,
   uploadDocumentFromBase64,
 } from "@/lib/actions/forum";
 import { uploadAttachment } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData, AttachmentData } from "@/lib/fileUtils";
+import { transformForumTopics, ForumTopic, ForumPost } from "@/lib/forumUtils";
 import toast from "react-hot-toast";
-
-interface ForumTopic {
-  id: number;
-  title: string;
-  author: string;
-  content: string;
-  createdAt: string;
-  comments: ForumPost[];
-  attachments: any[];
-}
-
-interface ForumPost {
-  id: number;
-  author: string;
-  content: string;
-  createdAt: string;
-  parentId?: number;
-}
 
 interface ForumDocument {
   id: number;
@@ -70,15 +54,7 @@ export const useForum = () => {
           throw new Error(result.error);
         }
 
-        const transformedTopics = result.data.map((topic: any) => ({
-          id: topic.id,
-          title: topic.title,
-          author: topic.address,
-          content: topic.posts?.[0]?.content || "",
-          createdAt: topic.createdAt,
-          comments: topic.posts?.slice(1) || [],
-          attachments: topic.attachments || [],
-        }));
+        const transformedTopics = transformForumTopics(result.data);
 
         return transformedTopics;
       } catch (err) {
@@ -136,6 +112,11 @@ export const useForum = () => {
         throw new Error("Please connect your wallet first");
       }
 
+      if (data.attachment && data.attachment.size > 10 * 1024 * 1024) {
+        toast.error("File size must be less than 10MB");
+        return null;
+      }
+
       setLoading(true);
       setError(null);
 
@@ -173,35 +154,29 @@ export const useForum = () => {
             );
 
             if (
-              attachmentResult &&
-              attachmentResult.success &&
-              attachmentResult.attachment
+              !attachmentResult ||
+              !attachmentResult.success ||
+              !attachmentResult.attachment
             ) {
-              attachments = [
-                {
-                  id: attachmentResult.attachment.id,
-                  fileName: attachmentResult.attachment.fileName,
-                  contentType: attachmentResult.attachment.contentType,
-                  fileSize: attachmentResult.attachment.fileSize,
-                  ipfsCid: attachmentResult.attachment.ipfsCid,
-                  url: attachmentResult.attachment.ipfsUrl,
-                  createdAt: attachmentResult.attachment.createdAt,
-                },
-              ];
-            } else {
-              console.error(
-                "Failed to upload attachment:",
-                attachmentResult?.error || "No result returned"
-              );
-              toast.error(
-                `Topic created but attachment failed: ${attachmentResult?.error || "Upload function returned no result"}`
+              throw new Error(
+                attachmentResult?.error || "Failed to upload attachment"
               );
             }
+
+            attachments = [
+              {
+                id: attachmentResult.attachment.id,
+                fileName: attachmentResult.attachment.fileName,
+                contentType: attachmentResult.attachment.contentType,
+                fileSize: attachmentResult.attachment.fileSize,
+                ipfsCid: attachmentResult.attachment.ipfsCid,
+                url: attachmentResult.attachment.ipfsUrl,
+                createdAt: attachmentResult.attachment.createdAt,
+              },
+            ];
           } catch (attachmentError) {
-            console.error("Attachment upload threw an error:", attachmentError);
-            toast.error(
-              `Topic created but attachment failed: ${attachmentError instanceof Error ? attachmentError.message : "Unknown error"}`
-            );
+            await deleteForumTopic(result.topic.id);
+            throw attachmentError;
           }
         }
 

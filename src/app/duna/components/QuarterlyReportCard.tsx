@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   ChatBubbleLeftIcon,
   ClockIcon,
@@ -9,20 +8,11 @@ import {
 } from "@heroicons/react/20/solid";
 import ENSName from "@/components/shared/ENSName";
 import ENSAvatar from "@/components/shared/ENSAvatar";
-import { format } from "date-fns";
-
-interface Report {
-  id: number;
-  title: string;
-  author: string;
-  content: string;
-  createdAt: string;
-  comments: any[];
-  attachments: any[];
-}
+import { ForumTopic } from "@/lib/forumUtils";
+import { formatDistanceToNow } from "date-fns";
 
 interface QuarterlyReportCardProps {
-  report: Report;
+  report: ForumTopic;
   onClick: () => void;
   isLast?: boolean;
 }
@@ -38,11 +28,11 @@ const QuarterlyReportCard = ({
   const commentsCount = report.comments ? report.comments.length : 0;
   const lastCommentDate =
     report.comments && report.comments.length > 0
-      ? format(
+      ? formatDistanceToNow(
           new Date(report.comments[report.comments.length - 1].createdAt),
-          "yyyy-MM-dd"
+          { addSuffix: true }
         )
-      : format(new Date(report.createdAt), "yyyy-MM-dd");
+      : formatDistanceToNow(new Date(report.createdAt), { addSuffix: true });
 
   return (
     <div
