@@ -66,7 +66,7 @@ export default async function Page() {
       <div className="flex flex-col">
         <InfoHero />
         <InfoAbout />
-        <GovernorSettings />
+        {namespace !== TENANT_NAMESPACES.TOWNS && <GovernorSettings />}
         {treasuryData.result.length > 0 && (
           <ChartTreasury
             initialData={treasuryData.result}
