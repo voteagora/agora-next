@@ -16,6 +16,8 @@ import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/getProposal
 import { apiFetchMetricTS } from "@/app/api/analytics/metric/[metric_id]/[frequency]/getMetricsTS";
 import Hero from "@/components/Hero/Hero";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
   const page = tenant.ui.page("info") || tenant.ui.page("/");
