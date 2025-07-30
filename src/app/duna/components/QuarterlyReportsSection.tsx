@@ -9,6 +9,20 @@ import CreatePostModal from "./CreatePostModal";
 import { useForum } from "@/hooks/useForum";
 import toast from "react-hot-toast";
 
+// Custom up-down chevron icon (outline)
+const UpDownChevronIcon = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+  >
+    <path d="M7 9l5-5 5 5" />
+    <path d="M7 15l5 5 5-5" />
+  </svg>
+);
+
 const DUNA_CATEGORY_ID = 1;
 
 interface Report {
@@ -32,6 +46,7 @@ const QuarterlyReportsSection = ({
   const [selectedReport, setSelectedReport] = useState<any>(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [showAllReports, setShowAllReports] = useState(false);
 
   const { createTopic, loading } = useForum();
 
@@ -72,15 +87,39 @@ const QuarterlyReportsSection = ({
     }
   };
 
+  // Show only 2 latest reports initially
+  const initialReportsCount = 2;
+  const hasMoreReports = reports.length > initialReportsCount;
+
+  const displayedReports = showAllReports
+    ? reports
+    : reports.slice(0, initialReportsCount); // Show latest 2
+
+  const handleToggleReports = () => {
+    setShowAllReports(!showAllReports);
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h4 className="text-lg font-bold text-primary">Quarterly Reports</h4>
         <Button
           onClick={handleCreatePost}
-          className="bg-black text-white border border-black hover:bg-gray-800"
+          className="text-white border border-black hover:bg-gray-800 text-sm"
+          style={{
+            display: "flex",
+            height: "36px",
+            padding: "12px 20px",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "8px",
+            flexShrink: 0,
+            borderRadius: "8px",
+            background: "#171717",
+            boxShadow:
+              "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+          }}
         >
-          <PlusIcon className="w-4 h-4 mr-2" />
           Create new post
         </Button>
       </div>
@@ -100,14 +139,39 @@ const QuarterlyReportsSection = ({
       )}
 
       {reports.length > 0 && (
-        <div className="space-y-3">
-          {reports.map((report) => (
+        <div
+          className="border rounded-lg bg-white"
+          style={{ borderColor: "#E5E5E5" }}
+        >
+          {displayedReports.map((report, index) => (
             <QuarterlyReportCard
               key={report.id}
               report={report}
               onClick={() => handleReportClick(report)}
+              isLast={index === displayedReports.length - 1}
             />
           ))}
+
+          {/* Toggle button in the middle */}
+          {hasMoreReports && (
+            <div
+              className="flex justify-between items-center py-3 border-t px-4"
+              style={{ borderTopColor: "#E5E5E5" }}
+            >
+              <button
+                onClick={handleToggleReports}
+                className="text-xs font-medium text-secondary hover:text-primary transition-colors"
+              >
+                {showAllReports ? "SHOW LESS" : "VIEW OLDER POSTS"}
+              </button>
+              <button
+                onClick={handleToggleReports}
+                className="text-secondary hover:text-primary transition-colors"
+              >
+                <UpDownChevronIcon className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       )}
 

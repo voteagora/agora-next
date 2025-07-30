@@ -236,18 +236,19 @@ export default function DocumentUploadModal({
                 border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
                 ${
                   isDragOver
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                    ? "border-gray-400 bg-gray-50 dark:bg-gray-900/20"
                     : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
                 }
               `}
+              style={{ borderColor: "#E5E5E5" }}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={triggerFileInput}
             >
               <DocumentIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                <span className="font-medium text-blue-600 dark:text-blue-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                <span className="font-medium text-gray-500 dark:text-gray-400">
                   Click to upload
                 </span>{" "}
                 or drag and drop
@@ -259,15 +260,18 @@ export default function DocumentUploadModal({
           )}
 
           {selectedFile && (
-            <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+            <div
+              className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800"
+              style={{ borderColor: "#E5E5E5" }}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3 flex-1 min-w-0">
                   <DocumentIcon className="h-8 w-8 text-gray-400 flex-shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                       {selectedFile.name}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 break-words">
                       {formatFileSize(selectedFile.size)} • {selectedFile.type}
                     </p>
                   </div>
@@ -276,7 +280,7 @@ export default function DocumentUploadModal({
                 {!isUploading && (
                   <button
                     onClick={handleClearFile}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 flex-shrink-0"
                     title="Remove file"
                   >
                     <XMarkIcon className="h-5 w-5" />
@@ -316,18 +320,32 @@ export default function DocumentUploadModal({
           )}
         </div>
 
-        <div className="flex justify-end space-x-3 pt-4">
+        <div className="flex justify-end space-x-3 pt-4 w-full">
           <Button
-            variant="outline"
             onClick={handleModalClose}
             disabled={isUploading}
+            className="bg-neutral text-primary border hover:bg-wash"
+            style={{ borderColor: "#E5E5E5" }}
           >
             Cancel
           </Button>
           <Button
             onClick={handleFileUpload}
             disabled={!selectedFile || isUploading}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="text-white border border-black hover:bg-gray-800 text-sm"
+            style={{
+              display: "flex",
+              height: "36px",
+              padding: "12px 20px",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "8px",
+              flexShrink: 0,
+              borderRadius: "8px",
+              background: "#171717",
+              boxShadow:
+                "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+            }}
           >
             {isUploading ? "Uploading..." : "Upload Document"}
           </Button>

@@ -2,9 +2,24 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { DocumentIcon, ArrowDownTrayIcon } from "@heroicons/react/20/solid";
+import { ArrowDownTrayIcon } from "@heroicons/react/20/solid";
 import { useForum } from "@/hooks/useForum";
 import { format } from "date-fns";
+
+// Custom document icon with folded corner (outline)
+const DocumentIcon = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+  >
+    <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" />
+    <path d="M14 2V8H20" />
+  </svg>
+);
+
 import DocumentUploadModal from "./DocumentUploadModal";
 
 const DocumentsSection = () => {
@@ -32,13 +47,32 @@ const DocumentsSection = () => {
     setIsUploadModalOpen(false);
   };
 
+  const handleDocumentClick = (document: any) => {
+    if (document.url && document.url !== "#") {
+      window.open(document.url, "_blank");
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h4 className="text-lg font-bold text-primary">Documents</h4>
         <Button
           onClick={() => setIsUploadModalOpen(true)}
-          className="bg-black text-white border border-black hover:bg-gray-800"
+          className="text-white border border-black hover:bg-gray-800 text-sm"
+          style={{
+            display: "flex",
+            height: "36px",
+            padding: "12px 20px",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "8px",
+            flexShrink: 0,
+            borderRadius: "8px",
+            background: "#171717",
+            boxShadow:
+              "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+          }}
         >
           Upload new document
         </Button>
@@ -65,39 +99,19 @@ const DocumentsSection = () => {
       )}
 
       {!loading && !error && documents.length > 0 && (
-        <div className="space-y-3">
+        <div className="flex flex-wrap gap-2">
           {documents.map((document, index) => (
             <div
               key={document.id || index}
-              className="flex items-center justify-between p-4 rounded-lg border border-line bg-neutral/50 hover:bg-neutral transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded border bg-white hover:bg-gray-50 transition-colors cursor-pointer"
+              style={{ borderColor: "#E5E5E5" }}
+              onClick={() => handleDocumentClick(document)}
             >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <DocumentIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-primary truncate">
-                    {document.name}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs text-secondary">
-                    <span>
-                      {format(new Date(document.createdAt), "MMM d, yyyy")}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {document.url && document.url !== "#" && (
-                  <>
-                    <a
-                      href={document.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                    >
-                      View
-                    </a>
-                  </>
-                )}
+              <DocumentIcon className="w-4 h-4 text-gray-900 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
+                  {document.name}
+                </p>
               </div>
             </div>
           ))}

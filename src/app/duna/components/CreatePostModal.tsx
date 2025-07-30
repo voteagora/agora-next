@@ -102,7 +102,8 @@ const CreatePostModal = ({
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-line rounded-md bg-white text-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-md bg-white text-primary focus:outline-none focus:ring-1 focus:ring-gray-200"
+              style={{ borderColor: "#E5E5E5" }}
               placeholder="Enter post title..."
               required
               disabled={isSubmitting}
@@ -121,7 +122,8 @@ const CreatePostModal = ({
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={8}
-              className="w-full px-3 py-2 border border-line rounded-md bg-white text-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-md bg-white text-primary focus:outline-none focus:ring-1 focus:ring-gray-200"
+              style={{ borderColor: "#E5E5E5" }}
               placeholder="Enter post content..."
               required
               disabled={isSubmitting}
@@ -170,7 +172,20 @@ const CreatePostModal = ({
             </Button>
             <Button
               type="submit"
-              className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              className="text-white border border-black hover:bg-gray-800 text-sm"
+              style={{
+                display: "flex",
+                height: "36px",
+                padding: "12px 20px",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "8px",
+                flexShrink: 0,
+                borderRadius: "8px",
+                background: "#171717",
+                boxShadow:
+                  "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+              }}
               disabled={isSubmitting || !title.trim() || !content.trim()}
             >
               {isSubmitting ? "Creating..." : "Create Post"}
