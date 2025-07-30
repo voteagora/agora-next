@@ -428,6 +428,7 @@ export function parseOffChainProposalResults(
           APP: processApprovalTallySource(tallyData?.APP),
           USER: processApprovalTallySource(tallyData?.USER),
           CHAIN: processApprovalTallySource(tallyData?.CHAIN),
+          totals: tallyData?.totals,
         },
       };
       if (proposalType === "OFFCHAIN_APPROVAL") {
@@ -447,6 +448,7 @@ export function parseOffChainProposalResults(
           },
         };
       }
+
       return result;
     }
     case "OFFCHAIN_OPTIMISTIC":
