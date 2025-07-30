@@ -515,6 +515,20 @@ export const getTransportForChain = (chainId: number) => {
           `https://worldchain-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
 
+    // shape sepolia
+    case 11011:
+      return http(
+        FORK_NODE_URL ||
+          `https://shape-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
+
+    // shape mainnet
+    case 360:
+      return http(
+        FORK_NODE_URL ||
+          `https://shape-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
+
     // for each new dao with a new chainId add them here
     default:
       return null;

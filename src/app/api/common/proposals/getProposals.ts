@@ -597,10 +597,11 @@ async function getProposalTypes() {
 
 async function getDraftProposals(address: `0x${string}`) {
   return withMetrics("getDraftProposals", async () => {
-    const { contracts } = Tenant.current();
+    const { contracts, slug } = Tenant.current();
     return await prismaWeb2Client.proposalDraft.findMany({
       where: {
         author_address: address,
+        dao_slug: slug, // FIX: Filter by tenant to show only drafts for current DAO
         chain_id: contracts.governor.chain.id,
         contract: contracts.governor.address.toLowerCase(),
         stage: {
@@ -621,10 +622,11 @@ async function getDraftProposals(address: `0x${string}`) {
 
 async function getDraftProposalForSponsor(address: `0x${string}`) {
   return withMetrics("getDraftProposalForSponsor", async () => {
-    const { contracts } = Tenant.current();
+    const { contracts, slug } = Tenant.current();
     return await prismaWeb2Client.proposalDraft.findMany({
       where: {
         sponsor_address: address,
+        dao_slug: slug, // FIX: Filter by tenant to show only drafts for current DAO
         chain_id: contracts.governor.chain.id,
         contract: contracts.governor.address.toLowerCase(),
         stage: {
