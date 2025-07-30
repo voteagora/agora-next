@@ -1,0 +1,49 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Towns Protocol Success -->
+  <defs>
+    <linearGradient id="successGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:0.2" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="90" fill="url(#successGradient)" stroke="#10B981" stroke-width="2"/>
+  
+  <!-- Success Buildings -->
+  <rect x="60" y="120" width="20" height="40" fill="#10B981" rx="2" opacity="0.8"/>
+  <rect x="85" y="110" width="20" height="50" fill="#059669" rx="2"/>
+  <rect x="110" y="115" width="20" height="45" fill="#10B981" rx="2" opacity="0.9"/>
+  <rect x="135" y="125" width="20" height="35" fill="#047857" rx="2" opacity="0.8"/>
+  
+  <!-- Windows -->
+  <rect x="65" y="130" width="4" height="4" fill="#F3F4F6" opacity="0.8"/>
+  <rect x="71" y="130" width="4" height="4" fill="#F3F4F6" opacity="0.6"/>
+  <rect x="65" y="140" width="4" height="4" fill="#F3F4F6" opacity="0.7"/>
+  <rect x="71" y="140" width="4" height="4" fill="#F3F4F6" opacity="0.8"/>
+  
+  <rect x="90" y="120" width="4" height="4" fill="#F3F4F6" opacity="0.9"/>
+  <rect x="96" y="120" width="4" height="4" fill="#F3F4F6" opacity="0.7"/>
+  <rect x="90" y="130" width="4" height="4" fill="#F3F4F6" opacity="0.8"/>
+  <rect x="96" y="130" width="4" height="4" fill="#F3F4F6" opacity="0.9"/>
+  
+  <rect x="115" y="125" width="4" height="4" fill="#F3F4F6" opacity="0.8"/>
+  <rect x="121" y="125" width="4" height="4" fill="#F3F4F6" opacity="0.6"/>
+  <rect x="115" y="135" width="4" height="4" fill="#F3F4F6" opacity="0.7"/>
+  <rect x="121" y="135" width="4" height="4" fill="#F3F4F6" opacity="0.9"/>
+  
+  <rect x="140" y="135" width="4" height="4" fill="#F3F4F6" opacity="0.8"/>
+  <rect x="146" y="135" width="4" height="4" fill="#F3F4F6" opacity="0.6"/>
+  <rect x="140" y="145" width="4" height="4" fill="#F3F4F6" opacity="0.7"/>
+  <rect x="146" y="145" width="4" height="4" fill="#F3F4F6" opacity="0.8"/>
+  
+  <!-- Large Success Checkmark -->
+  <circle cx="100" cy="80" r="25" fill="#10B981" stroke="#059669" stroke-width="2"/>
+  <path d="M88 80 L96 88 L112 72" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Ground -->
+  <rect x="50" y="160" width="100" height="2" fill="#6B7280" opacity="0.3"/>
+  
+  <!-- Success Text -->
+  <text x="100" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="600" fill="#059669">Success!</text>
+</svg> 
