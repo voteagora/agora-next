@@ -9,8 +9,8 @@ export const truncateString = (str: string, maxLength: number) => {
 };
 
 export const truncateAddress = (address: string) => {
-  return (
-    address &&
-    `${address.substring(0, 4)}...${address.substring(address?.length - 4)}`
-  );
+  if (!address || address.length < 8) {
+    return address || "";
+  }
+  return `${address.substring(0, 4)}...${address.substring(address.length - 4)}`;
 };

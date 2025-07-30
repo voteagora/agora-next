@@ -57,7 +57,7 @@ const DunaAdministration = async () => {
       <Card className="border border-line bg-white shadow-sm">
         <CardContent className="p-6">
           <QuarterlyReportsSection initialReports={dunaReports} />
-          <div className="border-t border-line mt-8 pt-8">
+          <div className="mt-4 pt-4">
             <DocumentsSection />
           </div>
         </CardContent>
