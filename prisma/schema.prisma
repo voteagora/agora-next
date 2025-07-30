@@ -4608,6 +4608,7 @@ enum DaoSlug {
   DEMO
   LINEA
   WORLD
+  SHAPE
   @@map("dao_slug")
   @@schema("config")
 }
