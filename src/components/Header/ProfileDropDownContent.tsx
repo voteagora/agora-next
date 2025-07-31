@@ -64,7 +64,7 @@ const RenderDelegateToSelf = ({ delegate }: { delegate: DelegateChunk }) => {
   return (
     <div className="p-4 rounded-lg border border-line gap-2 bg-neutral">
       <div className="flex flex-col text-neutral-900 leading-normal">
-        <div className="flex inline-flex gap-2">
+        <div className="inline-flex gap-2">
           <ExclamationCircleIcon className="w-6 h-6 stroke-negative" />
           <div className="flex-1 inline-flex flex-col justify-start items-start gap-4">
             <div className="flex flex-col justify-start items-start gap-1">
@@ -140,13 +140,15 @@ export const ProfileDropDownContent = ({
           }
           detail={
             <div className="flex flex-col gap-4">
-              {filteredDelegations?.slice(0, 3).map((delegate) => (
-                <DelegatePanelRow
-                  key={delegate.transaction_hash}
-                  delegate={delegate}
-                  onClick={handleCloseDrawer}
-                />
-              ))}
+              {filteredDelegations
+                ?.slice(0, 3)
+                .map((delegate) => (
+                  <DelegatePanelRow
+                    key={delegate.transaction_hash}
+                    delegate={delegate}
+                    onClick={handleCloseDrawer}
+                  />
+                ))}
               {filteredDelegations?.length > 3 && (
                 <Link
                   href={`/delegates/${address}?tab=delegations&subtab=delegatedTo`}
