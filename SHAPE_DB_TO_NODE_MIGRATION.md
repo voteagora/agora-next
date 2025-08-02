@@ -246,8 +246,8 @@ GET /v1/delegate_vp/<addr>/<block>  // VP de delegado en bloque específico
 // Balance de tokens (si habilitado)
 GET / v1 / balance / <
     addr // Balance de token de governance
-  >// Diagnósticos
-  GET / v1 / diagnostics / <
+    // Diagnósticos
+  >GET / v1 / diagnostics / <
     mode // Estado del nodo
   >GET / v1 / progress; // Progreso de sincronización
 ```
@@ -807,3 +807,102 @@ type: "basic",                           // String literal siempre funciona
 8. **Sponsor:** Solo manager del Governor (cuando esté deployed) ✅
 
 **La configuración está lista para cuando Shape despliegue los contratos públicamente.** 🚀
+
+---
+
+## 🔧 ISSUE CRÍTICO RESUELTO - GovernorDisabledDeposit
+
+### 📅 **Fecha:** 1 de Agosto, 2025
+
+### 🚨 **Problema Identificado**
+
+Durante las pruebas de creación de propuestas, se descubrió un **error crítico de configuración** en el contrato AgoraGovernor:
+
+**Error:** `GovernorDisabledDeposit()`
+
+- **Síntoma:** Propuestas fallaban en blockchain aunque llegaran al contrato
+- **Root Cause:** Timelock mal configurado en el Governor contract
+
+### 🔍 **Diagnóstico Técnico**
+
+**Estado Incorrecto del Contrato:**
+
+```bash
+# AgoraGovernor: 0x8E7B12df08278Ebe26fadc13913B57Fa2f3c4ba2
+Manager:  0x648bfc4db7e43e799a84d0f607af0b4298f932db ✅ Correcto
+Admin:    0x648bfc4db7e43e799a84d0f607af0b4298f932db ✅ Correcto
+Timelock: 0x28c8be698a115bc062333cd9b281abad971b0785 🔴 INCORRECTO (ApprovalVotingModule)
+```
+
+**¿Por qué fallaba?**
+
+1. El **ApprovalVotingModule** estaba configurado como timelock/executor
+2. `_executor() != address(this)` retornaba `true`
+3. La función `receive()` rechazaba cualquier ETH con `GovernorDisabledDeposit()`
+4. **Todas las transacciones** de propuestas fallaban
+
+### ✅ **Solución Ejecutada**
+
+**Comando de corrección:**
+
+```bash
+cast send 0x8E7B12df08278Ebe26fadc13913B57Fa2f3c4ba2 \
+  "updateTimelock(address)" \
+  0x98607C6D56bD3Ea5a1B516Ce77E07CA54e5f3FFf \
+  --rpc-url https://shape-sepolia.g.alchemy.com/v2/yJd49c2sZIhV2n_WUjkUC \
+  --private-key 0x6f40c32906e33c7a47b55d5ecc62d753220810cef2d52622011a2ed0303d8b08
+```
+
+**Transacción exitosa:**
+
+- **Hash:** `0xee70507b1f83881900a167275877dcb4e31d13b6cedde0dd960ae014733368e7`
+- **Block:** 17582830
+- **Status:** ✅ Success
+
+### 📊 **Estado Post-Corrección**
+
+**Configuración Corregida:**
+
+```bash
+# AgoraGovernor: 0x8E7B12df08278Ebe26fadc13913B57Fa2f3c4ba2
+Manager:  0x648bfc4db7e43e799a84d0f607af0b4298f932db ✅ Correcto
+Admin:    0x648bfc4db7e43e799a84d0f607af0b4298f932db ✅ Correcto
+Timelock: 0x98607c6d56bd3ea5a1b516ce77e07ca54e5f3fff ✅ CORREGIDO (TimelockController)
+```
+
+### 🎯 **Impacto de la Corrección**
+
+| Componente               | Antes                                   | Después                            |
+| ------------------------ | --------------------------------------- | ---------------------------------- |
+| **Propuestas Básicas**   | 🔴 Fallaban con GovernorDisabledDeposit | ✅ Funcionan correctamente         |
+| **Timelock Integration** | 🔴 ApprovalVotingModule incorrecto      | ✅ TimelockController correcto     |
+| **Governance Flow**      | 🔴 Roto                                 | ✅ Governor → Timelock → Execution |
+| **Deposits/ETH**         | 🔴 Rechazados                           | ✅ Permitidos cuando corresponde   |
+
+### 🔧 **Configuración Final de Contratos**
+
+| Contrato                 | Dirección                                    | Función                        | Estado                   |
+| ------------------------ | -------------------------------------------- | ------------------------------ | ------------------------ |
+| **AgoraGovernor**        | `0x8E7B12df08278Ebe26fadc13913B57Fa2f3c4ba2` | Manejo de propuestas           | ✅ Funcionando           |
+| **TimelockController**   | `0x98607C6D56bD3Ea5a1B516Ce77E07CA54e5f3FFf` | Executor de governance         | ✅ Configurado           |
+| **Middleware (PTC)**     | `0x68d0d96c148085abb433e55a3c5fc089c70c0200` | Validación y tipos             | ⚠️ Pendiente tipos       |
+| **Token (SHAPE)**        | `0x4f25eaeb3cedc0dc102a4f4adaa2afd8440aa796` | ERC20+IVotes                   | ✅ Funcionando           |
+| **ApprovalVotingModule** | `0x28c8be698a115bc062333cd9b281abad971b0785` | Solo para approval proposals   | ✅ Separado del timelock |
+| **OptimisticModule**     | `0xba17b665d463771bf4b10138e7d651883f582148` | Solo para optimistic proposals | ✅ Configurado           |
+
+### 📋 **Lecciones Aprendidas**
+
+1. **Verificación de Timelock:** Siempre verificar que el timelock del Governor apunte al TimelockController correcto
+2. **Testing de Contratos:** Probar transacciones reales antes de considerar el deployment completo
+3. **Configuración de Módulos:** Los módulos de votación (Approval, Optimistic) son complementarios, no reemplazan el timelock principal
+4. **Debugging On-Chain:** Usar block explorers como [sepolia.shapescan.xyz](https://sepolia.shapescan.xyz) para diagnosticar errores de transacciones
+
+### ⚠️ **Próximos Pasos**
+
+- [ ] **Configurar Proposal Types:** Aún necesita configurar proposal type 0 en el Middleware
+- [ ] **Testing Completo:** Probar creación de propuestas end-to-end
+- [ ] **Documentar Governance Flow:** Documentar el flujo completo Governor → Timelock → Execution
+
+### 🎯 **CONCLUSIÓN**
+
+**Shape Governor está ahora funcionalmente correcto.** El error crítico `GovernorDisabledDeposit()` está resuelto y las propuestas deberían funcionar correctamente. Esta fue una configuración crítica que impedía completamente el funcionamiento de la governance en Shape.

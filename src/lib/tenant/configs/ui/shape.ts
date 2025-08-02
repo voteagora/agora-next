@@ -178,8 +178,8 @@ export const shapeTenantUIConfig = new TenantUI({
           },
           {
             type: "optimistic",
-            prodAddress: "0x2e360A2bb39B47749D5F34cf0E1A285C76c088c3",
-            testnetAddress: "0x4414D030cFfEC5Edc011a27c653Ce21704b12d85",
+            prodAddress: "0xba17b665d463771bf4b10138e7d651883f582148", // OptimisticModule
+            testnetAddress: "0xba17b665d463771bf4b10138e7d651883f582148", // Same for testnet
           },
         ],
         copy: {

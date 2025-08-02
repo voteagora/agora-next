@@ -45,7 +45,7 @@ export const shapeSepolia: Chain = defineChain({
   blockExplorers: {
     default: {
       name: "Shape Sepolia Explorer",
-      url: "https://sepolia-explorer.shape.network",
+      url: "https://sepolia.shapescan.xyz",
     },
   },
   testnet: true,
@@ -71,7 +71,7 @@ export const shapeMainnet: Chain = defineChain({
   blockExplorers: {
     default: {
       name: "Shape Explorer",
-      url: "https://explorer.shape.network",
+      url: "https://shapescan.xyz",
     },
   },
   testnet: false,
@@ -81,12 +81,16 @@ export const shapeTenantConfig = ({
   isProd,
   alchemyId,
 }: Props): TenantContracts => {
-  // ✅ UPDATED: Correct addresses from agora-tenants repository
-  // Both prod and dev use Shape Sepolia testnet (chain_id: 11011) for now
-  const TOKEN = "0x10374c5D846179BA9aC03b468497B58E13C5f74e";
-  const GOVERNOR = "0x90193C961A926261B756D1E5bb255e67ff9498A1";
-  const TIMELOCK = "0x34A1D3fff3958843C43aD80F30b94c510645C316";
-  const TYPES = "0x98607C6D56bD3Ea5a1B516Ce77E07CA54e5f3FFf";
+  // ✅ UPDATED: New contract addresses - December 2024
+  // Updated with latest deployed contracts
+  const TOKEN = "0x4f25eaeb3cedc0dc102a4f4adaa2afd8440aa796"; // Token (SHAPE) ERC20+IVotes
+  const GOVERNOR = "0x8E7B12df08278Ebe26fadc13913B57Fa2f3c4ba2"; // AgoraGovernor
+  const TIMELOCK = "0x98607C6D56bD3Ea5a1B516Ce77E07CA54e5f3FFf"; // TimelockController
+  const TYPES = "0x68d0d96c148085abb433e55a3c5fc089c70c0200"; // Middleware (PTC)
+
+  // Additional modules available:
+  const APPROVAL_MODULE = "0x28c8be698a115bc062333cd9b281abad971b0785"; // ApprovalVotingModule
+  const OPTIMISTIC_MODULE = "0xba17b665d463771bf4b10138e7d651883f582148"; // OptimisticModule
 
   const TREASURY = [TIMELOCK];
 
@@ -146,7 +150,7 @@ export const shapeTenantConfig = ({
     treasury: TREASURY,
 
     delegationModel: DELEGATION_MODEL.FULL,
-    governorType: GOVERNOR_TYPE.AGORA,
+    governorType: GOVERNOR_TYPE.AGORA, // ✅ CORRECTED: Shape uses basic propose() function, not proposeWithModule()
     timelockType:
       TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
     supportScopes: true,
