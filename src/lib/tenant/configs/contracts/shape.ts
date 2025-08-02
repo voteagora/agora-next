@@ -85,12 +85,12 @@ export const shapeTenantConfig = ({
   // Updated with latest deployed contracts
   const TOKEN = "0x4f25eaeb3cedc0dc102a4f4adaa2afd8440aa796"; // Token (SHAPE) ERC20+IVotes
   const GOVERNOR = "0x8E7B12df08278Ebe26fadc13913B57Fa2f3c4ba2"; // AgoraGovernor
-  const TIMELOCK = "0x98607C6D56bD3Ea5a1B516Ce77E07CA54e5f3FFf"; // TimelockController
-  const TYPES = "0x68d0d96c148085abb433e55a3c5fc089c70c0200"; // Middleware (PTC)
+  const TIMELOCK = "0x28c8be698a115bc062333cd9b281abad971b0785"; // TimelockController - DIRECCIÓN CORRECTA del broadcast
+  const TYPES = "0x98607c6d56bd3ea5a1b516ce77e07ca54e5f3fff"; // Middleware (PTC) - DIRECCIÓN CORRECTA del broadcast
 
   // Additional modules available:
-  const APPROVAL_MODULE = "0x28c8be698a115bc062333cd9b281abad971b0785"; // ApprovalVotingModule
-  const OPTIMISTIC_MODULE = "0xba17b665d463771bf4b10138e7d651883f582148"; // OptimisticModule
+  const APPROVAL_MODULE = "0xba17b665d463771bf4b10138e7d651883f582148"; // ApprovalVotingModule - DIRECCIÓN CORRECTA del broadcast
+  const OPTIMISTIC_MODULE = "0xaa5f39acb9ac2517e7e9753d20b185cd674a2048"; // OptimisticModule - DIRECCIÓN CORRECTA del broadcast
 
   const TREASURY = [TIMELOCK];
 

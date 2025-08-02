@@ -211,6 +211,22 @@ export function getInputData(proposal: DraftProposal): {
         inputData = inputData.slice(0, 4) as OZBasicInputData;
       }
 
+      // Shape uses AGORA governor with Middleware - needs #proposalTypeId in description but 4 parameters
+      if (
+        governorType === GOVERNOR_TYPE.AGORA &&
+        namespace === TENANT_NAMESPACES.SHAPE
+      ) {
+        const parsedDescription = description + "#proposalTypeId=0";
+        inputData = [
+          targets,
+          values,
+          calldatas,
+          parsedDescription,
+        ] as OZBasicInputData;
+      } else if (governorType === GOVERNOR_TYPE.AGORA) {
+        inputData = inputData.slice(0, 4) as OZBasicInputData;
+      }
+
       // Agora 2.0 governor proposal type is defined in the description
       if (governorType === GOVERNOR_TYPE.AGORA_20) {
         const parsedDescription = description + "#proposalTypeId=" + 3;
