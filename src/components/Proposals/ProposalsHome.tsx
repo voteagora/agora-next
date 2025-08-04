@@ -21,7 +21,17 @@ async function fetchProposals(
   pagination = { limit: 10, offset: 0 }
 ) {
   "use server";
-  return apiFetchProposals({ filter, pagination });
+  console.log(
+    "🚀 DEBUG: ProposalsHome.fetchProposals called with filter:",
+    filter
+  );
+  const result = await apiFetchProposals({ filter, pagination });
+  console.log(
+    "🚀 DEBUG: ProposalsHome.fetchProposals result:",
+    result?.data?.length,
+    "proposals"
+  );
+  return result;
 }
 
 async function fetchNeedsMyVoteProposals(address: string) {

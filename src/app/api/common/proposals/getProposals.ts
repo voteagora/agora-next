@@ -50,10 +50,19 @@ async function fetchProposalsFromDaoNode(
   contracts: any
 ): Promise<ProposalPayload[]> {
   try {
+    console.log(
+      "🔍 DEBUG: fetchProposalsFromDaoNode called for namespace:",
+      namespace
+    );
     const [data, typesFromApi] = await Promise.all([
       getCachedAllProposalsFromDaoNode(),
       getProposalTypesFromDaoNode(),
     ]);
+    console.log("🔍 DEBUG: DAO-Node data received:", data?.length, "proposals");
+    console.log(
+      "🔍 DEBUG: Proposal types:",
+      typesFromApi?.proposal_types ? "✅" : "❌"
+    );
 
     let proposals = data;
 
@@ -69,6 +78,12 @@ async function fetchProposalsFromDaoNode(
       )
       .filter(Boolean);
 
+    console.log(
+      "🔍 DEBUG: After adaptation and filtering:",
+      proposals?.length,
+      "proposals"
+    );
+
     // Include snapshot proposals if enabled
     if (useSnapshot) {
       const snapshotData = await fetchSnapshotProposalsFromDB();
@@ -78,9 +93,18 @@ async function fetchProposalsFromDaoNode(
       proposals.sort((a, b) => b.start_block - a.start_block);
     }
 
-    return proposals.slice(skip, skip + take) as unknown as ProposalPayload[];
+    const result = proposals.slice(
+      skip,
+      skip + take
+    ) as unknown as ProposalPayload[];
+    console.log(
+      "🔍 DEBUG: Final result:",
+      result?.length,
+      "proposals returned"
+    );
+    return result;
   } catch (error) {
-    console.warn("REST API failed, falling back to DB:", error);
+    console.error("❌ DAO-Node failed, falling back to DB:", error);
     return (await findProposalsQueryFromDB({
       namespace,
       skip,
@@ -301,6 +325,10 @@ export async function getProposals({
         const useDaoNode =
           ui.toggle("use-daonode-for-proposals")?.enabled ?? false;
         const useSnapshot = ui.toggle("snapshotVotes")?.enabled ?? false;
+
+        console.log("🔍 DEBUG: getProposals for namespace:", namespace);
+        console.log("🔍 DEBUG: useDaoNode flag:", useDaoNode);
+        console.log("🔍 DEBUG: useSnapshot flag:", useSnapshot);
 
         // Fetch initial proposals and supporting data in parallel
         const [proposals, latestBlock, votableSupply] = await Promise.all([
@@ -658,7 +686,8 @@ async function getTotalProposalsCount(): Promise<number> {
 export const fetchProposalsCount = cache(getTotalProposalsCount);
 export const fetchDraftProposalForSponsor = cache(getDraftProposalForSponsor);
 export const fetchDraftProposals = cache(getDraftProposals);
-export const fetchProposals = cache(getProposals);
+// TEMPORAL: Desactivar cache para debugging
+export const fetchProposals = getProposals; // cache(getProposals);
 export const fetchProposal = cache(getProposal);
 export const fetchProposalTypes = cache(getProposalTypes);
 export const fetchProposalUnstableCache = unstable_cache(getProposal, [], {

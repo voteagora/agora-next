@@ -3679,6 +3679,7 @@ view xaiVotableSupply {
   @@map("votable_supply_v2")
 }
 
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view xai_vote_cast_events {
   transaction_hash String?  @db.VarChar(66)
