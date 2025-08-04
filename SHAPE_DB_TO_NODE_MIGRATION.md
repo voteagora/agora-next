@@ -246,8 +246,8 @@ GET /v1/delegate_vp/<addr>/<block>  // VP de delegado en bloque específico
 // Balance de tokens (si habilitado)
 GET / v1 / balance / <
     addr // Balance de token de governance
-  >// Diagnósticos
-  GET / v1 / diagnostics / <
+    // Diagnósticos
+  >GET / v1 / diagnostics / <
     mode // Estado del nodo
   >GET / v1 / progress; // Progreso de sincronización
 ```
