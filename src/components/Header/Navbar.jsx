@@ -12,6 +12,8 @@ export default function Navbar() {
 
   const hasProposals = ui.toggle("proposals") && ui.toggle("proposals").enabled;
   const hasProposalsHref = Boolean(ui.page("proposals")?.href);
+  const hasComingSoon =
+    ui.toggle("coming-soon") && ui.toggle("coming-soon").enabled;
 
   const { address } = useAccount();
   const { isConnected } = useAgoraContext();
@@ -27,6 +29,15 @@ export default function Navbar() {
           isActive={pathname.includes("proposals") || pathname === "/"}
         >
           Proposals
+        </HeaderLink>
+      )}
+
+      {hasComingSoon && (
+        <HeaderLink
+          href="/coming-soon"
+          isActive={pathname.includes("coming-soon")}
+        >
+          Governance
         </HeaderLink>
       )}
 

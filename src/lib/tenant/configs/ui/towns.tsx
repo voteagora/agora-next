@@ -188,6 +188,19 @@ export const townsTenantUIConfig = new TenantUI({
           "Learn about Towns Protocol and decentralized community governance",
       },
     },
+    {
+      route: "coming-soon",
+      title: "Towns governance is\ncoming soon",
+      description:
+        "Towns voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+      hero: townsHero,
+      meta: {
+        title: "Towns Protocol Governance",
+        description: "Towns Protocol governance coming soon",
+        imageTitle: "Towns Protocol Governance",
+        imageDescription: "Towns Protocol governance coming soon",
+      },
+    },
   ],
 
   toggles: [
@@ -239,5 +252,46 @@ export const townsTenantUIConfig = new TenantUI({
       name: "duna",
       enabled: true,
     },
+    {
+      name: "coming-soon",
+      enabled: true,
+    },
   ],
 });
+
+// Custom content component for towns coming-soon page
+export function TownsComingSoonContent() {
+  return (
+    <div className="grid md:grid-cols-2 gap-8">
+      <div className="bg-wash border border-line rounded-lg p-6">
+        <h3 className="text-xl font-semibold text-primary mb-4">
+          🏗️ Governance Infrastructure
+        </h3>
+        <p className="text-secondary mb-4">
+          Towns Protocol is currently setting up its governance infrastructure.
+          Proposal functionality will be available soon as the protocol evolves.
+        </p>
+        <ul className="text-secondary space-y-2">
+          <li>• Minimal onchain governance design</li>
+          <li>• Community-driven decision making</li>
+          <li>• Transparent proposal process</li>
+        </ul>
+      </div>
+
+      <div className="bg-wash border border-line rounded-lg p-6">
+        <h3 className="text-xl font-semibold text-primary mb-4">
+          📋 What&apos;s Coming
+        </h3>
+        <p className="text-secondary mb-4">
+          The Towns governance system will include:
+        </p>
+        <ul className="text-secondary space-y-2">
+          <li>• Proposal creation and submission</li>
+          <li>• Community voting mechanisms</li>
+          <li>• Delegation system</li>
+          <li>• Execution and implementation</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
