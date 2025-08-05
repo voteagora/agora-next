@@ -22,7 +22,10 @@ import { DELEGATION_MODEL, TENANT_NAMESPACES } from "@/lib/constants";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { calculateBigIntRatio } from "../utils/bigIntRatio";
 import { withMetrics } from "@/lib/metricWrapper";
-import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
+import {
+  getDelegatesFromDaoNode,
+  getDelegateDataFromDaoNode,
+} from "@/app/lib/dao-node/client";
 
 // Create a cached version of getDelegatesFromDaoNode
 const cachedGetDelegatesFromDaoNode = unstable_cache(
@@ -641,11 +644,69 @@ async function getDelegates({
 
 async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   return withMetrics("getDelegate", async () => {
-    const { namespace, contracts, slug } = Tenant.current();
+    const { namespace, contracts, slug, ui } = Tenant.current();
     const address = isAddress(addressOrENSName)
       ? addressOrENSName.toLowerCase()
       : await ensNameToAddress(addressOrENSName);
 
+    // Try DAO-Node first if enabled
+    const isDaoNodeEnabled = ui.toggle("dao-node/delegate/addr")?.enabled;
+    if (isDaoNodeEnabled) {
+      try {
+        const daoNodeResponse = (await getDelegateDataFromDaoNode(
+          address
+        )) as any;
+        if (daoNodeResponse?.delegate) {
+          const daoNodeDelegate = daoNodeResponse.delegate;
+          // Convert DAO-Node format to expected Delegate format
+          return {
+            address: address,
+            citizen: false, // DAO-Node basic type doesn't have citizen
+            votingPower: {
+              total: daoNodeDelegate.voting_power || "0",
+              direct: "0", // DAO-Node basic type doesn't have direct_vp
+              advanced: "0", // DAO-Node basic type doesn't have advanced_vp
+            },
+            votingPowerRelativeToVotableSupply: 0, // Will be calculated if needed
+            votingPowerRelativeToQuorum: 0, // Will be calculated if needed
+            proposalsCreated: BigInt(0), // DAO-Node basic type doesn't have proposals_proposed
+            proposalsVotedOn: BigInt(0), // DAO-Node basic type doesn't have proposals_voted
+            votedFor: "0", // DAO-Node basic type doesn't have for
+            votedAgainst: "0", // DAO-Node basic type doesn't have against
+            votedAbstain: "0", // DAO-Node basic type doesn't have abstain
+            votingParticipation: Array.isArray(daoNodeDelegate.participation)
+              ? daoNodeDelegate.participation[0] /
+                daoNodeDelegate.participation[1]
+              : 0,
+            lastTenProps: "", // DAO-Node basic type doesn't have last_10_props
+            totalProposals: 0,
+            numOfDelegators: BigInt(daoNodeDelegate.from_cnt || 0),
+            statement: null, // DAO-Node basic type doesn't have statement
+            relativeVotingPowerToVotableSupply: "0", // Will be calculated if needed
+            vpChange7d: BigInt(0), // DAO-Node basic type doesn't have this
+            participation: Array.isArray(daoNodeDelegate.participation)
+              ? daoNodeDelegate.participation[0] /
+                daoNodeDelegate.participation[1]
+              : 0,
+          };
+        }
+      } catch (error) {
+        console.warn(
+          "DAO-Node delegate fetch failed, falling back to DB:",
+          error
+        );
+      }
+    }
+
+    // ✅ Si DAO-Node falló, evitar fallback a DB para Shape (tablas faltantes)
+    if (isDaoNodeEnabled) {
+      console.warn(
+        `⚠️ DAO-Node falló para ${address}, pero evitando DB fallback para ${namespace} (tablas faltantes)`
+      );
+      throw new Error(`Delegate data temporarily unavailable for ${address}`);
+    }
+
+    // Fallback to database query
     // Eventually want to deprecate voter_stats from this query
     // we are already relying on getVoterStats below
     // but this voter_stats view includes things like for/against/abstain

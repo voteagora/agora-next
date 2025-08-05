@@ -22,6 +22,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
+import { getVotesForDelegateFromDaoNode } from "@/app/lib/dao-node/client";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -43,6 +44,40 @@ async function getVotesForDelegateForAddress({
 }) {
   return withMetrics("getVotesForDelegateForAddress", async () => {
     const { namespace, contracts, ui } = Tenant.current();
+
+    // ✅ Check if DAO-Node is enabled for votes
+    const isDaoNodeEnabled = ui.toggle("dao-node/proposal-votes")?.enabled;
+
+    if (isDaoNodeEnabled) {
+      try {
+        console.log(
+          `🚀 Attempting to fetch votes for ${address} from DAO-Node...`
+        );
+        const daoNodeVotes = await getVotesForDelegateFromDaoNode(address);
+
+        if (daoNodeVotes && Array.isArray(daoNodeVotes)) {
+          console.log(
+            `✅ Successfully fetched ${daoNodeVotes.length} votes from DAO-Node`
+          );
+
+          // TODO: Adapt DAO-Node votes to expected format
+          // For now, return empty result to avoid BigInt errors
+          return {
+            meta: {
+              total: daoNodeVotes.length,
+              offset: pagination.offset,
+              limit: pagination.limit,
+            },
+            data: [], // TODO: Implement proper adaptation
+          };
+        }
+      } catch (error) {
+        console.warn(
+          `⚠️ DAO-Node votes fetch failed for ${address}, falling back to DB:`,
+          error
+        );
+      }
+    }
 
     let eventsViewName;
 

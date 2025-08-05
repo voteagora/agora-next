@@ -222,5 +222,9 @@ If you need help creating transactions / calldata, please see este [video](https
       name: "dao-node/votes-chart",
       enabled: true,
     },
+    {
+      name: "optional-delegate-statement",
+      enabled: true,
+    },
   ],
 });

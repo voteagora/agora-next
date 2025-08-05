@@ -134,8 +134,7 @@ export default class TenantTokenFactory {
           name: "Shape",
           symbol: "SHAPE",
           decimals: 18,
-          // ✅ UPDATED: New token address - December 2024
-          address: "0x4f25eaeb3cedc0dc102a4f4adaa2afd8440aa796",
+          address: "0x10374c5D846179BA9aC03b468497B58E13C5f74e",
         };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);

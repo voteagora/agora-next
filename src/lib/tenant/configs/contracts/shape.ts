@@ -24,7 +24,6 @@ interface Props {
   alchemyId: string;
 }
 
-// ✅ Shape chain definitions
 export const shapeSepolia: Chain = defineChain({
   id: 11011,
   name: "Shape Sepolia",
@@ -81,22 +80,18 @@ export const shapeTenantConfig = ({
   isProd,
   alchemyId,
 }: Props): TenantContracts => {
-  // ✅ UPDATED: New contract addresses - December 2024
-  // Updated with latest deployed contracts
-  const TOKEN = "0x4f25eaeb3cedc0dc102a4f4adaa2afd8440aa796"; // Token (SHAPE) ERC20+IVotes
-  const GOVERNOR = "0x8E7B12df08278Ebe26fadc13913B57Fa2f3c4ba2"; // AgoraGovernor
-  const TIMELOCK = "0x28c8be698a115bc062333cd9b281abad971b0785"; // TimelockController - DIRECCIÓN CORRECTA del broadcast
-  const TYPES = "0x98607c6d56bd3ea5a1b516ce77e07ca54e5f3fff"; // Middleware (PTC) - DIRECCIÓN CORRECTA del broadcast
+  const TOKEN = "0x10374c5D846179BA9aC03b468497B58E13C5f74e";
+  const GOVERNOR = "0x8E7B12df08278Ebe26fadc13913B57Fa2f3c4ba2";
+  const TIMELOCK = "0x28c8be698a115bc062333cd9b281abad971b0785";
+  const TYPES = "0x98607c6d56bd3ea5a1b516ce77e07ca54e5f3fff";
 
-  // Additional modules available:
-  const APPROVAL_MODULE = "0xba17b665d463771bf4b10138e7d651883f582148"; // ApprovalVotingModule - DIRECCIÓN CORRECTA del broadcast
-  const OPTIMISTIC_MODULE = "0xaa5f39acb9ac2517e7e9753d20b185cd674a2048"; // OptimisticModule - DIRECCIÓN CORRECTA del broadcast
+  const APPROVAL_MODULE = "0xba17b665d463771bf4b10138e7d651883f582148";
+  const OPTIMISTIC_MODULE = "0xaa5f39acb9ac2517e7e9753d20b185cd674a2048";
 
   const TREASURY = [TIMELOCK];
 
   const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
 
-  // ✅ UPDATED: Use correct RPC for prod/dev
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
     : isProd
@@ -107,7 +102,6 @@ export const shapeTenantConfig = ({
           `https://shape-sepolia.g.alchemy.com/v2/${alchemyId}`
         );
 
-  // ✅ UPDATED: Use correct chain for prod/dev
   const chain = isProd ? shapeMainnet : shapeSepolia;
 
   return {
@@ -150,7 +144,7 @@ export const shapeTenantConfig = ({
     treasury: TREASURY,
 
     delegationModel: DELEGATION_MODEL.FULL,
-    governorType: GOVERNOR_TYPE.AGORA, // ✅ CORRECTED: Shape uses basic propose() function, not proposeWithModule()
+    governorType: GOVERNOR_TYPE.AGORA_20,
     timelockType:
       TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
     supportScopes: true,
