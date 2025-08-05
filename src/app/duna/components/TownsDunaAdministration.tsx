@@ -73,11 +73,11 @@ const TownsDunaAdministration = async () => {
       <Card className="border border-line shadow-sm bg-[#1E1A2F] mt-6">
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
-            <h4 className="text-lg font-bold text-primary">
+            <h4 className="text-lg font-bold text-primary opacity-75">
               Community Dialogue
             </h4>
           </div>
-          <div className="text-secondary text-sm">
+          <div className="text-secondary text-sm opacity-75">
             Coming Soon: this section will be available on August 15, 2025.
           </div>
         </CardContent>
