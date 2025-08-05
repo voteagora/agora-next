@@ -448,17 +448,20 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
           </defs>
         </svg>
       );
-
     case TENANT_NAMESPACES.TOWNS:
       return (
         <div tw="flex w-[30px] h-[30px]">
           <svg
-            xmlns="http://www.w3.org/2000/svg"
             width="30"
             height="30"
             viewBox="0 0 201 205"
             fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           >
+            {/* Add background rectangle */}
+            <rect width="201" height="205" fill="#1E1A2F" />
+
+            {/* White icon path */}
             <path
               fillRule="evenodd"
               clipRule="evenodd"
@@ -1147,12 +1150,16 @@ export const ogLogoForShareVote = (namespace: TenantNamespace) => {
       return (
         <div tw="flex w-[30px] h-[30px]">
           <svg
-            xmlns="http://www.w3.org/2000/svg"
             width="30"
             height="30"
             viewBox="0 0 201 205"
             fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           >
+            {/* Add background rectangle */}
+            <rect width="201" height="205" fill="#1E1A2F" />
+
+            {/* White icon path */}
             <path
               fillRule="evenodd"
               clipRule="evenodd"
