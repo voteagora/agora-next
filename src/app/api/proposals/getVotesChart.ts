@@ -2,7 +2,10 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { SnapshotVotePayload, VotePayload } from "@/app/api/common/votes/vote";
 import { prismaWeb3Client } from "@/app/lib/prisma";
-import { getProposalFromDaoNode } from "@/app/lib/dao-node/client";
+import {
+  getProposalFromDaoNode,
+  getVoteRecordFromDaoNode,
+} from "@/app/lib/dao-node/client";
 
 export async function getVotesChart({
   proposalId,
@@ -13,24 +16,28 @@ export async function getVotesChart({
   const useDaoNode = ui.toggle("dao-node/votes-chart")?.enabled ?? false;
   if (useDaoNode) {
     try {
-      const proposal = (await getProposalFromDaoNode(proposalId)).proposal;
-      if (!proposal) {
-        // Will be caught and ignored below and move on to DB fallback
-        throw new Error("Proposal not found");
-      }
-      const votes = proposal.voting_record?.map((vote) => {
+      const pagination = undefined;
+      const reverse = false;
+      const sortBy = "BN";
+      const voteRecordPage = (
+        await getVoteRecordFromDaoNode(proposalId, sortBy, pagination, reverse)
+      ).vote_record;
+      const votes = voteRecordPage.map((vote) => {
         return {
           voter: vote.voter,
           support: String(vote.support),
-          weight: vote.weight.toLocaleString("fullwide", {
-            useGrouping: false,
-          }),
-          block_number: String(vote.block_number),
+          weight: ((vote.weight || 0) + (vote.votes || 0)).toLocaleString(
+            "fullwide",
+            {
+              useGrouping: false,
+            }
+          ),
+          block_number: String(vote.bn),
         };
       });
       return votes;
     } catch (error) {
-      // skip error
+      throw error;
     }
   }
 
