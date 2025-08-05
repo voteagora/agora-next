@@ -571,7 +571,7 @@ async function getVotesForProposal({
             ?.map((vote) => {
               return {
                 transactionHash: null,
-                // transactionOrdinal: (BigInt(vote.bn) * BigInt(10000)) + BigInt(vote.tid * 100) + BigInt(vote.lid),
+                transactionOrdinal: (BigInt(vote.bn) * BigInt(10000)) + BigInt(vote.tid * 100) + BigInt(vote.lid),
                 address: vote.voter,
                 proposalId,
                 support: parseSupport(
@@ -579,7 +579,7 @@ async function getVotesForProposal({
                   parsedProposal.proposal_type,
                   String(proposal.start_block)
                 ),
-                weight: (vote.weight ?? "0").toLocaleString("fullwide", {
+                weight: ((vote.weight || 0) + (vote.votes || 0)).toLocaleString("fullwide", {
                   useGrouping: false,
                 }),
                 reason: vote.reason ?? null,
