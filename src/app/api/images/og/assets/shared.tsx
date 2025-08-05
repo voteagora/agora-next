@@ -440,6 +440,26 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         </div>
       );
 
+    case TENANT_NAMESPACES.TOWNS:
+      return (
+        <div tw="flex w-[30px] h-[30px]">
+          <svg
+            width="30"
+            height="30"
+            viewBox="0 0 80 80"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="40" cy="40" r="40" fill="#1E1A2F" />
+            <g transform="translate(20, 20) scale(1.5)">
+              <path
+                d="M26.6667 0H13.3333C5.97333 0 0 5.97333 0 13.3333V26.6667C0 34.0267 5.97333 40 13.3333 40H26.6667C34.0267 40 40 34.0267 40 26.6667V13.3333C40 5.97333 34.0267 0 26.6667 0ZM20 30C15.6 30 12 26.4 12 22C12 17.6 15.6 14 20 14C24.4 14 28 17.6 28 22C28 26.4 24.4 30 20 30ZM20 18C17.8 18 16 19.8 16 22C16 24.2 17.8 26 20 26C22.2 26 24 24.2 24 22C24 19.8 22.2 18 20 18Z"
+                fill="#FFFFFF"
+              />
+            </g>
+          </svg>
+        </div>
+      );
+
     case TENANT_NAMESPACES.OPTIMISM:
     default:
       return (
