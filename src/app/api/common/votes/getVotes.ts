@@ -37,6 +37,7 @@ import {
   getCachedAllProposalsFromDaoNode,
   getProposalFromDaoNode,
   getProposalTypesFromDaoNode,
+  getUserVoteRecordFromDaoNode,
   getVoteRecordFromDaoNode,
   getVotingHistoryFromDaoNode,
 } from "@/app/lib/dao-node/client";
@@ -804,10 +805,12 @@ async function getUserVotesForProposal({
 
     if (useDaoNode) {
       try {
-        let [proposalResponse, typesFromApi] = await Promise.all([
+        let [userVote, proposalResponse, typesFromApi] = await Promise.all([
+          getUserVoteRecordFromDaoNode(proposalId, address),
           getProposalFromDaoNode(proposalId),
           getProposalTypesFromDaoNode(),
         ]);
+
         const proposal = proposalResponse.proposal;
         if (!proposal) {
           // Will be caught and ignored below and move on to DB fallback
@@ -821,9 +824,8 @@ async function getUserVotesForProposal({
           JSON.stringify(parsedProposal.proposal_data || {}),
           parsedProposal.proposal_type
         );
-        const votes = proposal.voting_record
-          ?.filter((vote) => vote.voter === address.toLowerCase())
-          .map((vote) => {
+
+        const votes = userVote.vote?.map((vote) => {
             return {
               transactionHash: null,
               address: vote.voter,
@@ -833,9 +835,7 @@ async function getUserVotesForProposal({
                 parsedProposal.proposal_type,
                 String(proposal.start_block)
               ),
-              weight: vote.weight.toLocaleString("fullwide", {
-                useGrouping: false,
-              }),
+              weight: ((vote.weight || 0) + (vote.votes || 0)).toLocaleString("fullwide", { useGrouping: false}),
               reason: vote.reason ?? null,
               params: vote.params
                 ? parseParams(JSON.stringify(vote.params), proposalData)
@@ -845,11 +845,12 @@ async function getUserVotesForProposal({
                 proposal.description
               ),
               proposalType: parsedProposal.proposal_type,
-              timestamp: getHumanBlockTime(vote.block_number, latestBlock),
-              blockNumber: BigInt(vote.block_number),
-              transaction_index: vote.transaction_index,
+              timestamp: getHumanBlockTime(vote.bn, latestBlock),
+              blockNumber: BigInt(vote.bn),
+              transaction_index: vote.tid,
             };
           });
+
         return votes;
       } catch (error) {
         throw error;

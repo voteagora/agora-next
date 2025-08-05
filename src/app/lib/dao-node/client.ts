@@ -529,10 +529,10 @@ export const getUserVoteRecordFromDaoNode = async (proposalId: string, address: 
 
   const queryParams = new URLSearchParams({
     proposal_id: proposalId,
-    addr: address,
+    voter: address.toLowerCase(),
   });
 
   const response = await fetch(`${url}v1/vote?${queryParams}`);
-  const data: { vote: DaoNodeVoteRecord } = await response.json();
+  const data: { vote: DaoNodeVoteRecord[] } = await response.json();
   return data;
 }
