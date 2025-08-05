@@ -203,7 +203,10 @@ async function getProposal(proposalId: string) {
       getProposalExecution = doInSpan({ name: "getProposal" }, async () => {
         const propTypes = await getProposalTypesFromDaoNode();
         const prop = await getProposalFromDaoNode(proposalId);
-        const proposal = adaptDAONodeResponse(prop.proposal, propTypes.proposal_types);
+        const proposal = adaptDAONodeResponse(
+          prop.proposal,
+          propTypes.proposal_types
+        );
         return proposal;
       });
     } else {

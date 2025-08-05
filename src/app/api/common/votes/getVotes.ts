@@ -429,18 +429,17 @@ async function getVotesForProposal({
         : contracts.token.provider.getBlock("latest");
 
       if (useDaoNode) {
-
-        console.log("😀 Using dao node for votes")
+        console.log("😀 Using dao node for votes");
         try {
-          
-          const sortBy = "VP"
-          const reverse = true
-          let [proposalResponse, typesFromApi, voteRecordPage, latestBlock] = await Promise.all([
-            getProposalFromDaoNode(proposalId),
-            getProposalTypesFromDaoNode(),
-            getVoteRecordFromDaoNode(proposalId, sortBy, pagination, reverse),
-            latestBlockPromise
-          ]);
+          const sortBy = "VP";
+          const reverse = true;
+          let [proposalResponse, typesFromApi, voteRecordPage, latestBlock] =
+            await Promise.all([
+              getProposalFromDaoNode(proposalId),
+              getProposalTypesFromDaoNode(),
+              getVoteRecordFromDaoNode(proposalId, sortBy, pagination, reverse),
+              latestBlockPromise,
+            ]);
 
           const proposal = proposalResponse.proposal;
 
@@ -471,9 +470,12 @@ async function getVotesForProposal({
                 parsedProposal.proposal_type,
                 String(proposal.start_block)
               ),
-              weight: ((vote.weight || 0) + (vote.votes || 0)).toLocaleString("fullwide", {
-                useGrouping: false,
-              }),
+              weight: ((vote.weight || 0) + (vote.votes || 0)).toLocaleString(
+                "fullwide",
+                {
+                  useGrouping: false,
+                }
+              ),
               reason: vote.reason ?? null,
               params: vote.params
                 ? parseParams(JSON.stringify(vote.params), proposalData)
@@ -679,30 +681,33 @@ async function getUserVotesForProposal({
         );
 
         const votes = userVote.vote?.map((vote) => {
-            return {
-              transactionHash: null,
-              address: vote.voter,
-              proposalId,
-              support: parseSupport(
-                String(vote.support),
-                parsedProposal.proposal_type,
-                String(proposal.start_block)
-              ),
-              weight: ((vote.weight || 0) + (vote.votes || 0)).toLocaleString("fullwide", { useGrouping: false}),
-              reason: vote.reason ?? null,
-              params: vote.params
-                ? parseParams(JSON.stringify(vote.params), proposalData)
-                : [],
-              proposalValue: getProposalTotalValue(proposalData) ?? BigInt(0),
-              proposalTitle: getTitleFromProposalDescription(
-                proposal.description
-              ),
-              proposalType: parsedProposal.proposal_type,
-              timestamp: getHumanBlockTime(vote.bn, latestBlock),
-              blockNumber: BigInt(vote.bn),
-              transaction_index: vote.tid,
-            };
-          });
+          return {
+            transactionHash: null,
+            address: vote.voter,
+            proposalId,
+            support: parseSupport(
+              String(vote.support),
+              parsedProposal.proposal_type,
+              String(proposal.start_block)
+            ),
+            weight: ((vote.weight || 0) + (vote.votes || 0)).toLocaleString(
+              "fullwide",
+              { useGrouping: false }
+            ),
+            reason: vote.reason ?? null,
+            params: vote.params
+              ? parseParams(JSON.stringify(vote.params), proposalData)
+              : [],
+            proposalValue: getProposalTotalValue(proposalData) ?? BigInt(0),
+            proposalTitle: getTitleFromProposalDescription(
+              proposal.description
+            ),
+            proposalType: parsedProposal.proposal_type,
+            timestamp: getHumanBlockTime(vote.bn, latestBlock),
+            blockNumber: BigInt(vote.bn),
+            transaction_index: vote.tid,
+          };
+        });
 
         return votes;
       } catch (error) {
