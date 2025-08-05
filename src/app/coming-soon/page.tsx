@@ -51,7 +51,17 @@ export default async function ComingSoonPage() {
             <img
               src={townsStaticProposals.src}
               alt="Towns Proposals"
-              className="w-full h-auto blur-sm opacity-60"
+              className="w-full h-auto blur-sm opacity-60 block"
+            />
+            <img
+              src={townsStaticProposals.src}
+              alt="Towns Proposals"
+              className="w-full h-auto blur-sm opacity-60 block -mt-1 sm:hidden"
+            />
+            <img
+              src={townsStaticProposals.src}
+              alt="Towns Proposals"
+              className="w-full h-auto blur-sm opacity-60 block -mt-1 sm:hidden"
             />
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="text-primary text-center text-base leading-6">
