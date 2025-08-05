@@ -81,18 +81,20 @@ const InfoAbout = () => {
         <div
           className={`p-6 flex flex-row flex-wrap sm:flex-nowrap ${ui.customization?.customInfoLayout ? ui.customization.customInfoLayout : "gap-6"}`}
         >
+          {namespace !== TENANT_NAMESPACES.TOWNS && (
+            <div
+              className={`w-full sm:w-1/2 relative ${ui.customization?.customHeroImageSize ? ui.customization.customHeroImageSize : "h-[200px] sm:h-auto"}`}
+            >
+              <Image
+                src={page.hero!}
+                alt={page.title}
+                fill
+                className="rounded-lg object-cover object-center"
+              />
+            </div>
+          )}
           <div
-            className={`w-full sm:w-1/2 relative ${ui.customization?.customHeroImageSize ? ui.customization.customHeroImageSize : "h-[200px] sm:h-auto"}`}
-          >
-            <Image
-              src={page.hero!}
-              alt={page.title}
-              fill
-              className="rounded-lg object-cover object-center"
-            />
-          </div>
-          <div
-            className={`${ui.customization?.customInfoLayout ? "sm:w-auto sm:ml-2" : "sm:w-1/2"}`}
+            className={`${ui.customization?.customInfoLayout ? "sm:w-auto sm:ml-2" : namespace === TENANT_NAMESPACES.TOWNS ? "w-full" : "sm:w-1/2"}`}
           >
             <div
               className={`${ui.customization?.customTextContainer ? ui.customization.customTextContainer : ""}`}
@@ -103,7 +105,11 @@ const InfoAbout = () => {
                     ? "About Canopy"
                     : "About " + brandName)}
               </h3>
-              <p className="text-secondary mt-3">{page.description}</p>
+              <p
+                className={`text-secondary mt-3 ${namespace === TENANT_NAMESPACES.TOWNS ? "whitespace-pre-line" : ""}`}
+              >
+                {page.description}
+              </p>
             </div>
             {/* So the image doesn't look smooshed for scroll :eye-roll: */}
             {namespace === TENANT_NAMESPACES.SCROLL && (
