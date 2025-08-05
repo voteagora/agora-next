@@ -8,13 +8,20 @@ import Tenant from "@/lib/tenant/tenant";
 const DUNA_DOCUMENTS = [
   {
     id: 1,
+    name: "Towns Lodge - Purpose",
+    url: "/documents/towns/Towns Lodge - Purpose.pdf",
+    createdAt: "2025-01-01T00:00:00Z",
+    uploadedBy: "Towns Governance Team",
+  },
+  {
+    id: 2,
     name: "Towns Lodge - Association Agreement",
     url: "/documents/towns/Towns Lodge - Association Agreement.pdf",
     createdAt: "2025-01-01T00:00:00Z",
     uploadedBy: "Towns Governance Team",
   },
   {
-    id: 2,
+    id: 3,
     name: "Towns Lodge - Redacted EIN",
     url: "/documents/towns/Towns Lodge - Redacted EIN.pdf",
     createdAt: "2025-01-01T00:00:00Z",
