@@ -176,7 +176,7 @@ export const townsTenantUIConfig = new TenantUI({
               stroke="#87819F"
             />
           ),
-          title: "January 1, 2025",
+          title: "January 1, 2026",
           description:
             "Token governance is live, with a temperature check and tax reporting intake (via Cowrie – Administrator Services tooling) completed before a proposal is brought to a final vote.",
         },
