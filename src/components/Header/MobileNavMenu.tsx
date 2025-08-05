@@ -52,6 +52,10 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   const infoToggle = ui.toggle("info");
   const hasInfo = infoToggle !== undefined && infoToggle.enabled;
 
+  const comingSoonToggle = ui.toggle("coming-soon");
+  const hasComingSoon =
+    comingSoonToggle !== undefined && comingSoonToggle.enabled;
+
   // Format metrics
   const formattedMetrics = {
     votableSupply: formatNumber(votableSupply),
@@ -108,6 +112,16 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
             href: "/info",
             target: "_self",
             isActive: pathname.includes("info"),
+          },
+        ]
+      : []),
+    ...(hasComingSoon
+      ? [
+          {
+            name: "Governance",
+            href: "/coming-soon",
+            target: "_self",
+            isActive: pathname.includes("coming-soon"),
           },
         ]
       : []),

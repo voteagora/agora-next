@@ -31,12 +31,36 @@ export const InfoHero = () => {
           <div className="text-base text-secondary mt-4">
             <div className="whitespace-pre-line">{page!.description}</div>
             <div className="mt-4">
-              View Towns Lodge DUNA Member{" "}
               <a
                 href="#duna-administration"
-                className="text-secondary underline hover:text-primary transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 bg-[#3A3454] text-white rounded-[40px] hover:bg-[#3A3454]/90 transition-colors cursor-pointer text-sm sm:text-base"
               >
-                Disclosure
+                <svg
+                  width="14"
+                  height="14"
+                  className="sm:w-4 sm:h-4 flex-shrink-0"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="8"
+                    cy="8"
+                    r="7"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M8 4V6M8 8V12"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <span className="whitespace-normal">
+                  View Towns Lodge DUNA Member{" "}
+                  <span className="underline">Disclosure</span>
+                </span>
               </a>
             </div>
           </div>
