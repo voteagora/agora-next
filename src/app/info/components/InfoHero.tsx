@@ -27,18 +27,33 @@ export const InfoHero = () => {
         >
           {page!.title}
         </h1>
-        <p className="text-base text-secondary mt-4">
-          {page!.description}
-          {namespace === TENANT_NAMESPACES.SCROLL && (
-            <div className="flex flex-row gap-2 mt-4">
-              <Link href={"https://claim.scroll.io/faq"}>
-                <Button className="bg-wash text-primary border border-line hover:bg-wash/90 hover:text-secondary cursor-pointer block">
-                  FAQ
-                </Button>
-              </Link>
+        {namespace === TENANT_NAMESPACES.TOWNS ? (
+          <div className="text-base text-secondary mt-4">
+            <div className="whitespace-pre-line">{page!.description}</div>
+            <div className="mt-4">
+              View Towns Lodge DUNA Member{" "}
+              <a
+                href="#duna-administration"
+                className="text-secondary underline hover:text-primary transition-colors cursor-pointer"
+              >
+                Disclosure
+              </a>
             </div>
-          )}
-        </p>
+          </div>
+        ) : (
+          <p className="text-base text-secondary mt-4">
+            {page!.description}
+            {namespace === TENANT_NAMESPACES.SCROLL && (
+              <div className="flex flex-row gap-2 mt-4">
+                <Link href={"https://claim.scroll.io/faq"}>
+                  <Button className="bg-wash text-primary border border-line hover:bg-wash/90 hover:text-secondary cursor-pointer block">
+                    FAQ
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 sm:flex sm:flex-row md:w-fit md:flex-auto md:mx-auto self-start justify-between sm:justify-end w-full gap-4 sm:mt-4 lg:mt-0">
@@ -70,32 +85,36 @@ const Card = ({
   image: StaticImageData | string;
   ui: any;
 }) => {
+  const isDisabled = link === "" && ui.dunaDisclaimers;
+
   return (
-    <Link
-      target="_blank"
-      href={link}
-      className={`flex flex-col grow-0 p-1.5 border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)] hover:rotate-0 transition-all hover:z-10 hover:scale-110 ${ui.customization?.customInfoSectionBackground ? "bg-[#130C2F]" : "bg-neutral"} ${className}`}
-    >
-      <div
-        className={`relative w-full aspect-square ${ui.customization?.customCardSize || "sm:h-[130px] sm:w-[130px] lg:h-[150px] lg:w-[150px]"}`}
+    <div className="relative">
+      <Link
+        target="_blank"
+        href={link}
+        className={`flex flex-col grow-0 p-1.5 border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)] hover:rotate-0 transition-all hover:z-10 hover:scale-110 ${ui.customization?.customInfoSectionBackground ? "bg-[#130C2F]" : "bg-neutral"} ${className} ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
       >
-        <Image
-          src={image}
-          className="w-full rounded scale"
-          fill={true}
-          alt=""
-        />
-      </div>
-      <div className="w-full flex flex-row justify-between gap-1 items-center text-xs font-medium text-secondary mt-1.5">
-        <span>{linkText}</span>
-        <Image
-          src={icons.northEast}
-          width={12}
-          height={12}
-          alt="arrow pointing right"
-          className={`self-start mt-1 ${ui.customization?.customInfoSectionBackground ? "brightness-0 invert" : ""}`}
-        />
-      </div>
-    </Link>
+        <div
+          className={`relative w-full aspect-square ${ui.customization?.customCardSize || "sm:h-[130px] sm:w-[130px] lg:h-[150px] lg:w-[150px]"}`}
+        >
+          <Image
+            src={image}
+            className="w-full rounded scale"
+            fill={true}
+            alt=""
+          />
+        </div>
+        <div className="w-full flex flex-row justify-between gap-1 items-center text-xs font-medium text-secondary mt-1.5">
+          <span>{linkText}</span>
+          <Image
+            src={icons.northEast}
+            width={12}
+            height={12}
+            alt="arrow pointing right"
+            className={`self-start mt-1 ${ui.customization?.customInfoSectionBackground ? "brightness-0 invert" : ""} ${isDisabled ? "opacity-50" : ""}`}
+          />
+        </div>
+      </Link>
+    </div>
   );
 };
