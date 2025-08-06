@@ -4,8 +4,7 @@ import QuarterlyReportsSection from "./QuarterlyReportsSection";
 import DocumentsSection from "./DocumentsSection";
 import { getForumTopics } from "@/lib/actions/forum";
 import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
-
-const DUNA_CATEGORY_ID = 1;
+import { DUNA_CATEGORY_ID } from "@/lib/constants";
 
 const DunaAdministration = async () => {
   let dunaReports: ForumTopic[] = [];

@@ -363,7 +363,10 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "duna",
-      enabled: false,
+      enabled: true,
+      config: {
+        adminAddresses: ["0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB"],
+      },
     },
   ],
 

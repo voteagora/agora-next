@@ -38,6 +38,9 @@ import { ScopeData } from "@/lib/types";
 import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActionDialog";
 import SponsorOffchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOffchainProposalDialog";
 import { DraftProposal } from "@/app/proposals/draft/types";
+import { ConfirmDialog } from "../ConfirmDialog/ConfirmDialog";
+import { ForumPost, ForumTopic } from "@/lib/forumUtils";
+import ReportModal from "@/app/duna/components/ReportModal";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -61,7 +64,9 @@ export type DialogType =
   | EncourageConnectWalletDialogType
   | CreateScopeDialogType
   | AccountActionDialogType
-  | SponsorOffchainDraftProposalDialog;
+  | SponsorOffchainDraftProposalDialog
+  | ConfirmDialogType
+  | ReportModalDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -291,6 +296,27 @@ export type AccountActionDialogType = {
   params: {};
 };
 
+export type ConfirmDialogType = {
+  type: "CONFIRM";
+  params: {
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  };
+};
+
+export type ReportModalDialogType = {
+  type: "REPORT_MODAL";
+  className?: string;
+  params: {
+    report: ForumTopic | null;
+    onDelete?: () => void;
+    onArchive?: () => void;
+    onCommentAdded?: (newComment: ForumPost) => void;
+    onCommentDeleted?: (commentId: number) => void;
+  };
+};
+
 export const dialogs: DialogDefinitions<DialogType> = {
   DELEGATE: (
     { delegate, fetchDirectDelegatee, isDelegationEncouragement },
@@ -517,6 +543,31 @@ export const dialogs: DialogDefinitions<DialogType> = {
   },
   ACCOUNT_ACTION: ({}, closeDialog) => {
     return <CreateAccountActionDialog closeDialog={closeDialog} />;
+  },
+  CONFIRM: ({ title, message, onConfirm }, closeDialog) => {
+    return (
+      <ConfirmDialog
+        title={title}
+        message={message}
+        onConfirm={onConfirm}
+        closeDialog={closeDialog}
+      />
+    );
+  },
+  REPORT_MODAL: (
+    { report, onDelete, onArchive, onCommentAdded, onCommentDeleted },
+    closeDialog
+  ) => {
+    return (
+      <ReportModal
+        report={report}
+        onDelete={onDelete}
+        onArchive={onArchive}
+        onCommentAdded={onCommentAdded}
+        onCommentDeleted={onCommentDeleted}
+        closeDialog={closeDialog}
+      />
+    );
   },
   // FAQ: () => {
   //   return <FaqDialog />;

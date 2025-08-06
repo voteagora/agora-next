@@ -2,30 +2,28 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { useForum } from "@/hooks/useForum";
+import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
-
-// Custom document icon with folded corner (outline)
-const DocumentIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-  >
-    <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" />
-    <path d="M14 2V8H20" />
-  </svg>
-);
-
+import { TrashIcon, ArchiveBoxIcon } from "@heroicons/react/20/solid";
 import DocumentUploadModal from "./DocumentUploadModal";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
+import { DUNA_CATEGORY_ID } from "@/lib/constants";
+import { FileIcon } from "lucide-react";
 
 const DocumentsSection = () => {
   const [documents, setDocuments] = useState<any[]>([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const { fetchDocuments, loading, error } = useForum();
+  const {
+    fetchDocuments,
+    deleteAttachment,
+    archiveAttachment,
+    loading,
+    error,
+  } = useForum();
   const { address } = useAccount();
+  const openDialog = useOpenDialog();
+  const { isAdmin } = useForumAdmin(DUNA_CATEGORY_ID);
 
   useEffect(() => {
     loadDocuments();
@@ -51,6 +49,50 @@ const DocumentsSection = () => {
     if (document.url && document.url !== "#") {
       window.open(document.url, "_blank");
     }
+  };
+
+  const handleDeleteAttachment = async (
+    attachmentId: number,
+    e: React.MouseEvent
+  ) => {
+    e.stopPropagation();
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Delete Attachment",
+        message: "Are you sure you want to delete this attachment?",
+        onConfirm: async () => {
+          const success = await deleteAttachment(attachmentId);
+          if (success) {
+            setDocuments((prev) =>
+              prev.filter((doc) => doc.id !== attachmentId)
+            );
+          }
+        },
+      },
+    });
+  };
+
+  const handleArchiveAttachment = async (
+    attachmentId: number,
+    e: React.MouseEvent
+  ) => {
+    e.stopPropagation();
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Archive Attachment",
+        message: "Are you sure you want to archive this attachment?",
+        onConfirm: async () => {
+          const success = await archiveAttachment(attachmentId);
+          if (success) {
+            setDocuments((prev) =>
+              prev.filter((doc) => doc.id !== attachmentId)
+            );
+          }
+        },
+      },
+    });
   };
 
   return (
@@ -102,21 +144,56 @@ const DocumentsSection = () => {
 
       {!loading && !error && documents.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-          {documents.map((document, index) => (
-            <div
-              key={document.id || index}
-              className="flex items-center gap-2 px-3 py-2 rounded border bg-white hover:bg-gray-50 transition-colors cursor-pointer"
-              style={{ borderColor: "#E5E5E5" }}
-              onClick={() => handleDocumentClick(document)}
-            >
-              <DocumentIcon className="w-4 h-4 text-gray-900 flex-shrink-0" />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {document.name}
-                </p>
+          {documents.map((document, index) => {
+            const canArchive = canArchiveContent(
+              address || "",
+              document.uploadedBy || "",
+              isAdmin
+            );
+            const canDelete = canDeleteContent(
+              address || "",
+              document.uploadedBy || "",
+              isAdmin
+            );
+
+            return (
+              <div
+                key={document.id || index}
+                className="flex items-center gap-2 px-3 py-2 rounded border bg-white hover:bg-gray-50 transition-colors cursor-pointer"
+                style={{ borderColor: "#E5E5E5" }}
+                onClick={() => handleDocumentClick(document)}
+              >
+                <FileIcon className="w-4 h-4 text-gray-900 flex-shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {document.name}
+                  </p>
+                </div>
+                {(canArchive || canDelete) && (
+                  <>
+                    {canArchive && (
+                      <button
+                        onClick={(e) => handleArchiveAttachment(document.id, e)}
+                        className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+                        title="Archive attachment"
+                      >
+                        <ArchiveBoxIcon className="w-4 h-4" />
+                      </button>
+                    )}
+                    {canDelete && (
+                      <button
+                        onClick={(e) => handleDeleteAttachment(document.id, e)}
+                        className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                        title="Delete attachment"
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
+                    )}
+                  </>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

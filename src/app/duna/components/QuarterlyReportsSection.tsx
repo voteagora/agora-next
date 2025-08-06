@@ -2,14 +2,14 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "@heroicons/react/20/solid";
 import QuarterlyReportCard from "./QuarterlyReportCard";
-import ReportModal from "./ReportModal";
 import CreatePostModal from "./CreatePostModal";
 import { useForum } from "@/hooks/useForum";
-import { ForumTopic } from "@/lib/forumUtils";
+import { ForumTopic, ForumPost } from "@/lib/forumUtils";
 import toast from "react-hot-toast";
 import { useAccount } from "wagmi";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { DUNA_CATEGORY_ID } from "@/lib/constants";
 
 // Custom up-down chevron icon (outline)
 const UpDownChevronIcon = ({ className }: { className?: string }) => (
@@ -25,8 +25,6 @@ const UpDownChevronIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const DUNA_CATEGORY_ID = 1;
-
 interface QuarterlyReportsSectionProps {
   initialReports: ForumTopic[];
 }
@@ -35,17 +33,27 @@ const QuarterlyReportsSection = ({
   initialReports,
 }: QuarterlyReportsSectionProps) => {
   const [reports, setReports] = useState<ForumTopic[]>(initialReports || []);
-  const [selectedReport, setSelectedReport] = useState<ForumTopic | null>(null);
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [showAllReports, setShowAllReports] = useState(false);
   const { address } = useAccount();
 
   const { createTopic, loading } = useForum();
+  const openDialog = useOpenDialog();
 
   const handleReportClick = (report: ForumTopic) => {
-    setSelectedReport(report);
-    setIsReportModalOpen(true);
+    openDialog({
+      type: "REPORT_MODAL",
+      className: "w-[48rem] sm:w-[48rem] p-0",
+      params: {
+        report,
+        onDelete: () => handleDeleteReport(report),
+        onArchive: () => handleArchiveReport(report),
+        onCommentAdded: (newComment: ForumPost) =>
+          handleCommentAdded(report.id, newComment),
+        onCommentDeleted: (commentId: number) =>
+          handleCommentDeleted(report.id, commentId),
+      },
+    });
   };
 
   const handleCreatePost = () => {
@@ -77,13 +85,53 @@ const QuarterlyReportsSection = ({
     }
   };
 
+  const handleDeleteReport = (reportToDelete?: ForumTopic) => {
+    setReports((prev) =>
+      prev.filter((report) => report.id !== reportToDelete?.id)
+    );
+  };
+
+  const handleArchiveReport = (reportToArchive?: ForumTopic) => {
+    setReports((prev) =>
+      prev.filter((report) => report.id !== reportToArchive?.id)
+    );
+  };
+
+  const handleCommentAdded = (reportId: number, newComment: ForumPost) => {
+    setReports((prev) =>
+      prev.map((report) =>
+        report.id === reportId
+          ? {
+              ...report,
+              comments: [...(report.comments || []), newComment],
+            }
+          : report
+      )
+    );
+  };
+
+  const handleCommentDeleted = (reportId: number, commentId: number) => {
+    setReports((prev) =>
+      prev.map((report) =>
+        report.id === reportId
+          ? {
+              ...report,
+              comments: (report.comments || []).filter(
+                (comment) => comment.id !== commentId
+              ),
+            }
+          : report
+      )
+    );
+  };
+
   // Show only 2 latest reports initially
   const initialReportsCount = 2;
   const hasMoreReports = reports.length > initialReportsCount;
 
   const displayedReports = showAllReports
     ? reports
-    : reports.slice(0, initialReportsCount); // Show latest 2
+    : reports.slice(0, initialReportsCount);
 
   const handleToggleReports = () => {
     setShowAllReports(!showAllReports);
@@ -141,6 +189,8 @@ const QuarterlyReportsSection = ({
               report={report}
               onClick={() => handleReportClick(report)}
               isLast={index === displayedReports.length - 1}
+              onDelete={() => handleDeleteReport(report)}
+              onArchive={() => handleArchiveReport(report)}
             />
           ))}
 
@@ -166,12 +216,6 @@ const QuarterlyReportsSection = ({
           )}
         </div>
       )}
-
-      <ReportModal
-        report={selectedReport}
-        isOpen={isReportModalOpen}
-        onClose={() => setIsReportModalOpen(false)}
-      />
 
       <CreatePostModal
         isOpen={isCreateModalOpen}
