@@ -2,15 +2,20 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
+import {
+  getProposalCallArgs,
+  getProposalFunctionName,
+} from "@/app/proposals/utils/moduleProposalUtils";
 
 interface Props {
   proposal: Proposal;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
-export const AgoraGovQueue = ({ proposal }: Props) => {
+export const AgoraGovQueue = ({ proposal, className, style }: Props) => {
   const { contracts } = Tenant.current();
 
   const { data, writeContract: write } = useWriteContract();
@@ -37,17 +42,27 @@ export const AgoraGovQueue = ({ proposal }: Props) => {
     }
   }, [isSuccess, isError, error]);
 
+  // Note: Optimistic proposals are not queued
+  if (proposal.proposalType === "OPTIMISTIC") {
+    return null;
+  }
+
   return (
     <>
       {!isFetched && (
         <Button
+          className={className}
+          style={style}
           loading={isLoading}
           onClick={() =>
             write({
               address: contracts.governor.address as `0x${string}`,
               abi: contracts.governor.abi,
-              functionName: "queue",
-              args: proposalToCallArgs(proposal),
+              functionName: getProposalFunctionName(
+                proposal.proposalType!,
+                "queue"
+              ),
+              args: getProposalCallArgs(proposal),
             })
           }
         >
