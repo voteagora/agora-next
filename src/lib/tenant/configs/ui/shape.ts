@@ -4,7 +4,7 @@ import shapeHero from "@/assets/tenant/shape_hero.svg";
 import shapeSuccess from "@/assets/tenant/shape_success.svg";
 import shapePending from "@/assets/tenant/shape_pending.svg";
 import shapeDelegate from "@/assets/tenant/shape_delegate.svg";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -172,14 +172,14 @@ export const shapeTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [
           {
-            type: ProposalType?.BASIC,
+            type: "basic", // Keep as string - ProposalType.BASIC would need optional chaining but strings work fine here
             prodAddress: null,
             testnetAddress: null,
           },
           {
             type: "optimistic",
-            prodAddress: "0x2e360A2bb39B47749D5F34cf0E1A285C76c088c3",
-            testnetAddress: "0x4414D030cFfEC5Edc011a27c653Ce21704b12d85",
+            prodAddress: "0xaa5f39acb9ac2517e7e9753d20b185cd674a2048", // OptimisticModule - DIRECCIÓN CORRECTA
+            testnetAddress: "0xaa5f39acb9ac2517e7e9753d20b185cd674a2048", // Same for testnet
           },
         ],
         copy: {
@@ -191,8 +191,40 @@ export const shapeTenantUIConfig = new TenantUI({
 If you need help creating transactions / calldata, please see este [video](https://www.loom.com/share/33b000ef682c4129995c8fa4bc35db57).
 `.trim(),
         },
-        gatingType: ProposalGatingType.MANAGER,
+        gatingType: ProposalGatingType?.MANAGER, // Using optional chaining like other tenants to handle import timing
       },
+    },
+    // DAO-Node Integration - Phase 1 - RE-ENABLED ✅
+    // Shape is the first tenant with Governor v2.0 (AGORA_20) to use DAO-Node
+    // CONFIRMED: shape.dev.agoradata.xyz returns {"proposals":[]} correctly
+    // Issue was browser cache showing OP proposals from previous sessions
+    {
+      name: "use-daonode-for-proposals",
+      enabled: true,
+    },
+    {
+      name: "dao-node/proposal-votes",
+      enabled: true,
+    },
+    {
+      name: "dao-node/delegate/addr",
+      enabled: true,
+    },
+    {
+      name: "use-daonode-for-votable-supply",
+      enabled: true,
+    },
+    {
+      name: "use-daonode-for-proposal-types",
+      enabled: true,
+    },
+    {
+      name: "dao-node/votes-chart",
+      enabled: true,
+    },
+    {
+      name: "optional-delegate-statement",
+      enabled: true,
     },
   ],
 });

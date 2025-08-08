@@ -657,6 +657,14 @@ const SuccessMessageCard = ({
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const namespace = searchParams.get("namespace") as TenantNamespace;
+
+  // Early return if namespace is not provided (e.g., during build time)
+  if (!namespace || !(namespace.toUpperCase() in TENANT_NAMESPACES)) {
+    return new Response("Missing or invalid namespace parameter", {
+      status: 400,
+    });
+  }
+
   const forPercentage = Number(searchParams.get("forPercentage"));
   const againstPercentage = Number(searchParams.get("againstPercentage"));
   const blockNumber = searchParams.get("blockNumber");
