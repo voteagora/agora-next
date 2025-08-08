@@ -17,7 +17,8 @@ export function adaptDAONodeResponse(
   apiResponse: ProposalPayloadFromDAONode,
   proposalTypes: any
 ): ProposalPayloadFromDB | null {
-  const votingModuleName = apiResponse.voting_module_name;
+  // ✅ FIX: For basic proposals without voting_module_name, assume "standard"
+  const votingModuleName = apiResponse.voting_module_name || "standard";
 
   let proposalResults;
   let proposalData;
@@ -74,10 +75,23 @@ export function adaptDAONodeResponse(
     return null;
   }
 
-  const proposalType = proposalTypes[String(apiResponse.proposal_type)];
-  const parsedProposalType = Object.assign(proposalType, {
-    proposal_type_id: String(apiResponse.proposal_type),
-  });
+  // Proposal Type is undefined for some proposals
+  const proposalType =
+    apiResponse.proposal_type !== undefined
+      ? proposalTypes[String(apiResponse.proposal_type)]
+      : undefined;
+  const parsedProposalType =
+    proposalType !== undefined
+      ? Object.assign(proposalType, {
+          proposal_type_id: String(apiResponse.proposal_type),
+        })
+      : undefined;
+
+  if (!parsedProposalType) {
+    console.warn(
+      `Proposal type not found for proposal ${apiResponse.id} (${apiResponse.proposal_type})`
+    );
+  }
 
   const parsedDescription =
     apiResponse.description.split("#proposalTypeId=")[0];
@@ -101,7 +115,9 @@ export function adaptDAONodeResponse(
       ? BigInt(apiResponse.queue_event.block_number)
       : null,
     proposal_data: proposalData,
-    proposal_type: apiResponse.voting_module_name.toUpperCase() as ProposalType,
+    proposal_type: (
+      votingModuleName || "standard"
+    ).toUpperCase() as ProposalType,
     // TODO: Add proposal type data
     // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL THIS IS HANDLED
     proposal_type_data: parsedProposalType,
@@ -442,4 +458,29 @@ export const getVotesForDelegateFromDaoNode = async (address: string) => {
   const data = await response.json();
 
   return data?.voting_history ?? [];
+};
+
+export const getVotesForProposalFromDaoNode = async (proposalId: string) => {
+  const url = getDaoNodeURLForNamespace(namespace);
+  if (!url) return [];
+
+  try {
+    const res = await fetch(`${url}v1/proposal/${proposalId}/votes`);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch votes for proposal ${proposalId}: ${res.status}`);
+    }
+    const data = await res.json();
+
+    // Normalize a couple of likely response shapes
+    const votes = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.votes)
+      ? data.votes
+      : [];
+
+    return votes;
+  } catch (err) {
+    console.warn("getVotesForProposalFromDaoNode error", err);
+    return [];
+  }
 };

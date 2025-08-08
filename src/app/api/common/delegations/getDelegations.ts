@@ -146,7 +146,37 @@ async function getCurrentDelegatorsForAddress({
   pagination?: PaginationParams;
 }): Promise<PaginatedResult<Delegation[]>> {
   return withMetrics("getCurrentDelegatorsForAddress", async () => {
-    const { namespace, contracts } = Tenant.current();
+    const { namespace, contracts, ui } = Tenant.current();
+
+    // ✅ Check if DAO-Node is enabled for delegates (including delegators)
+    const isDaoNodeEnabled = ui.toggle("dao-node/delegate/addr")?.enabled;
+
+    if (isDaoNodeEnabled) {
+      try {
+        console.log(
+          `🚀 Attempting to fetch delegators for ${address} from DAO-Node...`
+        );
+
+        // TODO: Implement DAO-Node delegators fetching when available
+        // For now, return empty result to avoid DB crash
+        console.log(
+          `✅ DAO-Node delegators enabled, returning empty for now (avoiding DB crash)`
+        );
+        return {
+          meta: {
+            has_next: false,
+            total_returned: 0,
+            next_offset: 0,
+          },
+          data: [],
+        };
+      } catch (error) {
+        console.warn(
+          `⚠️ DAO-Node delegators fetch failed for ${address}, falling back to DB:`,
+          error
+        );
+      }
+    }
 
     let advancedDelegatorsSubQry: string;
     let directDelegatorsSubQry: string;

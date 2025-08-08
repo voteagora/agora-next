@@ -14,10 +14,27 @@ import Tenant from "@/lib/tenant/tenant";
 import { useScwVoting } from "@/hooks/useScwVoting";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import ENSName from "@/components/shared/ENSName";
+import { Delegate } from "@/app/api/common/delegates/delegate";
 
 export type SupportTextProps = {
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
 };
+
+// ✅ Helper function to determine if statement is required for voting
+function isStatementRequired(delegate: Delegate): boolean {
+  const { ui } = Tenant.current();
+  
+  // Check if delegate statement is optional for this tenant
+  const isStatementOptional = ui.toggle("optional-delegate-statement")?.enabled;
+  
+  if (isStatementOptional) {
+    // If statement is optional, always allow voting
+    return true;
+  }
+  
+  // Traditional behavior - require statement
+  return Boolean(delegate.statement);
+}
 
 export function CastVoteDialog(props: CastVoteDialogProps) {
   const { contracts } = Tenant.current();
@@ -198,7 +215,7 @@ const BasicVoteDialog = ({
             )}
           </div>
           <div>
-            {delegate.statement ? (
+            {isStatementRequired(delegate) ? (
               <VoteButton onClick={write}>
                 Vote {supportType.toLowerCase()} with{"\u00A0"}
                 <TokenAmountDecorated amount={vpToDisplay} />
@@ -308,7 +325,7 @@ function AdvancedVoteDialog({
             )}
           </div>
           <div>
-            {delegate.statement ? (
+            {isStatementRequired(delegate) ? (
               <VoteButton onClick={write}>
                 Vote {supportType.toLowerCase()} with{"\u00A0"}
                 <TokenAmountDecorated amount={vpToDisplay} />

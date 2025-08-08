@@ -30,6 +30,8 @@ export function getSecondsPerBlock(chainId: number | undefined): number {
     case 7560: // Cyber Mainnet
     case 111557560: // Cyber Testnet
     case 480: // World
+    case 360: // Shape Mainnet
+    case 11011: // Shape Sepolia
       return 2;
 
     case 534352: // Scroll

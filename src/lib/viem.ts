@@ -21,6 +21,10 @@ import {
   deriveMainnet,
   deriveTestnet,
 } from "@/lib/tenant/configs/contracts/derive";
+import {
+  shapeSepolia,
+  shapeMainnet,
+} from "@/lib/tenant/configs/contracts/shape";
 import Tenant from "@/lib/tenant/tenant";
 
 export const getWalletClient = (chainId: number) => {
@@ -83,6 +87,18 @@ export const getWalletClient = (chainId: number) => {
     case lineaSepolia.id:
       return createWalletClient({
         chain: lineaSepolia,
+        transport,
+      });
+
+    case shapeSepolia.id:
+      return createWalletClient({
+        chain: shapeSepolia,
+        transport,
+      });
+
+    case shapeMainnet.id:
+      return createWalletClient({
+        chain: shapeMainnet,
         transport,
       });
 

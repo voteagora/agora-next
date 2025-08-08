@@ -25,9 +25,7 @@ async function getNeedsMyVoteProposals(address: string) {
       ? contracts.providerForTime?.getBlock("latest")
       : contracts.token.provider.getBlock("latest");
 
-    const useDaoNode =
-      ui.toggle("use-daonode-for-get-needs-my-vote-proposals")?.enabled ??
-      false;
+    const useDaoNode = ui.toggle("use-daonode-for-proposals")?.enabled ?? false;
 
     const [latestBlock, votableSupply] = await Promise.all([
       latestBlockPromise,
