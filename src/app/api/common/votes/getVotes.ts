@@ -64,9 +64,9 @@ async function getVotesForDelegateForAddress({
           // For now, return empty result to avoid BigInt errors
           return {
             meta: {
-              total: daoNodeVotes.length,
-              offset: pagination.offset,
-              limit: pagination.limit,
+              has_next: false,
+              total_returned: 0,
+              next_offset: 0,
             },
             data: [], // TODO: Implement proper adaptation
           };

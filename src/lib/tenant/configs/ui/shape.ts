@@ -178,7 +178,7 @@ export const shapeTenantUIConfig = new TenantUI({
           },
           {
             type: "optimistic",
-            prodAddress: "0xaa5f39acb9ac2517e7e9753d20b185cd674a2048", // OptimisticModule - DIRECCIÓN CORRECTA
+            prodAddress: "0xaa5f39acb9ac2517e7e9753d20b185cd674a2048", // OptimisticModule - CORRECT ADDRESS
             testnetAddress: "0xaa5f39acb9ac2517e7e9753d20b185cd674a2048", // Same for testnet
           },
         ],
@@ -188,7 +188,7 @@ export const shapeTenantUIConfig = new TenantUI({
 1. Select the correct proposal type that matches the correct transfer size.
 2. Add a title, description
 3. Add transactions.
-If you need help creating transactions / calldata, please see este [video](https://www.loom.com/share/33b000ef682c4129995c8fa4bc35db57).
+            If you need help creating transactions / calldata, please see this [video](https://www.loom.com/share/33b000ef682c4129995c8fa4bc35db57).
 `.trim(),
         },
         gatingType: ProposalGatingType?.MANAGER, // Using optional chaining like other tenants to handle import timing

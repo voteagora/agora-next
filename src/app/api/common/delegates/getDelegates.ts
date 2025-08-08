@@ -698,10 +698,10 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       }
     }
 
-    // ✅ Si DAO-Node falló, evitar fallback a DB para Shape (tablas faltantes)
+    // ✅ If DAO-Node fails, avoid DB fallback for Shape (missing tables)
     if (isDaoNodeEnabled) {
       console.warn(
-        `⚠️ DAO-Node falló para ${address}, pero evitando DB fallback para ${namespace} (tablas faltantes)`
+        `⚠️ DAO-Node failed for ${address}, but avoiding DB fallback for ${namespace} (missing tables)`
       );
       throw new Error(`Delegate data temporarily unavailable for ${address}`);
     }

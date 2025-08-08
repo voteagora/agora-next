@@ -17,7 +17,7 @@ export function adaptDAONodeResponse(
   apiResponse: ProposalPayloadFromDAONode,
   proposalTypes: any
 ): ProposalPayloadFromDB | null {
-  // ✅ FIX: Para propuestas básicas sin voting_module_name, asumir "standard"
+  // ✅ FIX: For basic proposals without voting_module_name, assume "standard"
   const votingModuleName = apiResponse.voting_module_name || "standard";
 
   let proposalResults;
@@ -458,4 +458,29 @@ export const getVotesForDelegateFromDaoNode = async (address: string) => {
   const data = await response.json();
 
   return data?.voting_history ?? [];
+};
+
+export const getVotesForProposalFromDaoNode = async (proposalId: string) => {
+  const url = getDaoNodeURLForNamespace(namespace);
+  if (!url) return [];
+
+  try {
+    const res = await fetch(`${url}v1/proposal/${proposalId}/votes`);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch votes for proposal ${proposalId}: ${res.status}`);
+    }
+    const data = await res.json();
+
+    // Normalize a couple of likely response shapes
+    const votes = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.votes)
+      ? data.votes
+      : [];
+
+    return votes;
+  } catch (err) {
+    console.warn("getVotesForProposalFromDaoNode error", err);
+    return [];
+  }
 };

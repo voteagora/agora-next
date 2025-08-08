@@ -164,9 +164,9 @@ async function getCurrentDelegatorsForAddress({
         );
         return {
           meta: {
-            total: 0,
-            offset: pagination.offset,
-            limit: pagination.limit,
+            has_next: false,
+            total_returned: 0,
+            next_offset: 0,
           },
           data: [],
         };
