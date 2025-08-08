@@ -106,7 +106,11 @@ const SponsorOnchainProposalDialog = ({
                   View transaction on block explorer
                 </span>
                 <div className="flex flex-row items-center space-x-2">
-                  <Link href={`${getBlockScanUrl(txHash)}`}>
+                  <Link
+                    href={`${getBlockScanUrl(txHash)}`}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
                     <Image
                       src={icons.link}
                       height="16"
