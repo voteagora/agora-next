@@ -40,7 +40,11 @@ export default function DelegatesSortFilter() {
                 delegatesFilterOptions[
                   key as keyof typeof delegatesFilterOptions
                 ].sort;
-              if (!show7dChange && (sortValue === "vp_change_7d" || sortValue === "vp_change_7d_desc")) {
+              if (
+                !show7dChange &&
+                (sortValue === "vp_change_7d" ||
+                  sortValue === "vp_change_7d_desc")
+              ) {
                 return false;
               }
               return true;

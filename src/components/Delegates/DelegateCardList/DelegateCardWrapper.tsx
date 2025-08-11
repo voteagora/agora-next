@@ -39,9 +39,11 @@ const DelegateCardWrapper = async ({
   const { ui } = Tenant.current();
   const show7dChange = ui.toggle("show-7d-change")?.enabled ?? true;
   const rawSort = parsedParams.orderBy;
-  const sort = !show7dChange && (rawSort === "vp_change_7d" || rawSort === "vp_change_7d_desc")
-    ? "weighted_random"
-    : rawSort;
+  const sort =
+    !show7dChange &&
+    (rawSort === "vp_change_7d" || rawSort === "vp_change_7d_desc")
+      ? "weighted_random"
+      : rawSort;
 
   // Use the utility function to build filters from parsed params
   const filters = buildDelegateFilters(parsedParams);

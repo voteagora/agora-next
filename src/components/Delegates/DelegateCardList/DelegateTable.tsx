@@ -142,7 +142,9 @@ export default function DelegateTable({
             {delegates.length === 0 ? (
               <td
                 className="w-full p-4 bg-neutral text-center text-secondary text-sm"
-                colSpan={5 + (show7dChange ? 1 : 0) + (showParticipation ? 1 : 0)}
+                colSpan={
+                  5 + (show7dChange ? 1 : 0) + (showParticipation ? 1 : 0)
+                }
               >
                 None found
               </td>

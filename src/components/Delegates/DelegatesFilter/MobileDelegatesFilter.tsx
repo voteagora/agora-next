@@ -164,7 +164,11 @@ export const MobileDelegatesFilter = () => {
                   delegatesFilterOptions[
                     key as keyof typeof delegatesFilterOptions
                   ];
-                if (!show7dChange && (option.sort === "vp_change_7d" || option.sort === "vp_change_7d_desc")) {
+                if (
+                  !show7dChange &&
+                  (option.sort === "vp_change_7d" ||
+                    option.sort === "vp_change_7d_desc")
+                ) {
                   return false;
                 }
                 return true;
