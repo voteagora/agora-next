@@ -27,6 +27,13 @@ const DUNA_DOCUMENTS = [
     createdAt: "2025-01-01T00:00:00Z",
     uploadedBy: "Towns Governance Team",
   },
+  {
+    id: 4,
+    name: "Towns Lodge - Existing Authorizations of Authority",
+    url: "/documents/towns/Towns Lodge - Existing Authorizations of Authority.pdf",
+    createdAt: "2025-01-01T00:00:00Z",
+    uploadedBy: "Towns Governance Team",
+  },
 ];
 
 const TownsDunaAdministration = () => {
