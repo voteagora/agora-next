@@ -25,6 +25,7 @@ const DelegateCard = ({
   const sanitizedTruncatedStatement = sanitizeContent(truncatedStatement);
 
   const showParticipation = ui.toggle("show-participation")?.enabled || false;
+  const show7dChange = ui.toggle("show-7d-change")?.enabled ?? true;
 
   return (
     <div

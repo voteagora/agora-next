@@ -297,6 +297,10 @@ If you need help creating transactions / calldata, please see this [video](https
       },
     },
     {
+      name: "show-7d-change",
+      enabled: false,
+    },
+    {
       name: "use-daonode-for-proposal-types",
       enabled: false,
     },

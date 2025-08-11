@@ -48,6 +48,7 @@ export default function DelegateTable({
     "delegation-encouragement"
   )?.enabled;
   const showParticipation = ui.toggle("show-participation")?.enabled || false;
+  const show7dChange = ui.toggle("show-7d-change")?.enabled ?? true;
   const { isAdvancedUser } = useIsAdvancedUser();
   const { advancedDelegators } = useConnectedDelegate();
 
@@ -105,7 +106,9 @@ export default function DelegateTable({
               <TableHead className="h-10 text-secondary">
                 Voting power
               </TableHead>
-              <TableHead className="h-10 text-secondary">7d Change</TableHead>
+              {show7dChange && (
+                <TableHead className="h-10 text-secondary">7d Change</TableHead>
+              )}
               {showParticipation && (
                 <TableHead className="h-10 text-secondary">
                   Participation
@@ -139,7 +142,7 @@ export default function DelegateTable({
             {delegates.length === 0 ? (
               <td
                 className="w-full p-4 bg-neutral text-center text-secondary text-sm"
-                colSpan={6}
+                colSpan={5 + (show7dChange ? 1 : 0) + (showParticipation ? 1 : 0)}
               >
                 None found
               </td>
@@ -156,6 +159,7 @@ export default function DelegateTable({
                   isAdvancedUser={isAdvancedUser}
                   delegators={advancedDelegators}
                   showParticipation={showParticipation}
+                  show7dChange={show7dChange}
                 />
               ))
             )}

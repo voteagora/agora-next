@@ -35,8 +35,13 @@ const DelegateCardWrapper = async ({
 }) => {
   const parsedParams = loadDelegatesSearchParams(searchParams);
 
-  // Get sort values directly from parsed params
-  const sort = parsedParams.orderBy;
+  // Get sort values directly from parsed params and sanitize based on UI flags
+  const { ui } = Tenant.current();
+  const show7dChange = ui.toggle("show-7d-change")?.enabled ?? true;
+  const rawSort = parsedParams.orderBy;
+  const sort = !show7dChange && (rawSort === "vp_change_7d" || rawSort === "vp_change_7d_desc")
+    ? "weighted_random"
+    : rawSort;
 
   // Use the utility function to build filters from parsed params
   const filters = buildDelegateFilters(parsedParams);
@@ -44,7 +49,6 @@ const DelegateCardWrapper = async ({
   const tab = parsedParams.tab;
   const seed = Math.random();
 
-  const { ui } = Tenant.current();
   const showParticipation = ui.toggle("show-participation")?.enabled || false;
 
   const delegates = await fetchDelegatesWithParams(
