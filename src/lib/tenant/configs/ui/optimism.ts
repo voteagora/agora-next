@@ -42,6 +42,7 @@ export const optimismTenantUIConfig = new TenantUI({
     allowed: [],
     advanced: [],
     retired: [
+      "0x3eee61b92c36e97be6319bf9096a1ac3c04a1466", // ACC
       "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee", // lindajxie.eth
     ],
   },
