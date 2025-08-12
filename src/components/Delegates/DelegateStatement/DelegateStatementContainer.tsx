@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 import DelegateStatement from "./DelegateStatement";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import { useDelegateStatementStore } from "@/stores/delegateStatement";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface Props {
   delegate: Delegate;
@@ -25,6 +25,26 @@ export default function DelegateStatementContainer({ delegate }: Props) {
     delegate?.statement?.payload as { delegateStatement: string }
   )?.delegateStatement;
 
+  const successBannerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!showSuccessMessage) return;
+    const banner = successBannerRef.current;
+    if (!banner) return;
+    const isMobileViewport =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(max-width: 768px)").matches;
+    if (!isMobileViewport) return;
+
+    const bannerTop = banner.getBoundingClientRect().top + window.scrollY;
+    const offset = 80;
+    window.scrollTo({
+      top: Math.max(0, bannerTop - offset),
+      behavior: "smooth",
+    });
+  }, [showSuccessMessage]);
+
   useEffect(() => {
     const handleBeforeUnload = () => {
       setSaveSuccess(false);
@@ -41,6 +61,7 @@ export default function DelegateStatementContainer({ delegate }: Props) {
         <div
           className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4"
           role="alert"
+          ref={successBannerRef}
         >
           <p className="font-bold">Statement Saved</p>
           <p>Nice! Thank you for telling the community what you believe in.</p>
