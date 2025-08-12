@@ -76,6 +76,11 @@ function setCorsHeaders(request: NextRequest, response: Response) {
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
+  // Special handling for towns tenant - redirect root to /info
+  if (process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME === "towns" && path === "/") {
+    return NextResponse.redirect(new URL("/info", request.url));
+  }
+
   if (path === "/" && ROOT_PATH !== "/") {
     return NextResponse.redirect(new URL(ROOT_PATH, request.url));
   }

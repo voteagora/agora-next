@@ -4625,7 +4625,7 @@ enum DaoSlug {
   B3
   DEMO
   LINEA
-
+  TOWNS
   @@map("dao_slug")
   @@schema("config")
 }

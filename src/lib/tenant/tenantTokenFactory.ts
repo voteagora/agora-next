@@ -122,6 +122,13 @@ export default class TenantTokenFactory {
           decimals: 18,
           address: "0x03A61C68BF297aDffF451426ea8C491bb8F87c65",
         };
+      case TENANT_NAMESPACES.TOWNS:
+        return {
+          name: "Towns Protocol",
+          symbol: "TOWNS",
+          decimals: 18,
+          address: "0x0000000000000000000000000000000000000000",
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

@@ -8,6 +8,7 @@ import { ChartTreasury } from "@/app/info/components/ChartTreasury";
 import GovernorSettings from "@/app/info/components/GovernorSettings";
 import GovernanceCharts from "@/app/info/components/GovernanceCharts";
 import DunaAdministration from "@/app/duna/components/DunaAdministration";
+import TownsDunaAdministration from "@/app/duna/components/TownsDunaAdministration";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/getTreasuryBalanceTS";
@@ -70,8 +71,12 @@ export default async function Page() {
       <div className="flex flex-col">
         <InfoHero />
         <InfoAbout />
-        <GovernorSettings />
-        {hasDunaAdministration && <DunaAdministration />}
+        {namespace !== TENANT_NAMESPACES.TOWNS && <GovernorSettings />}
+        {hasDunaAdministration && namespace === TENANT_NAMESPACES.TOWNS ? (
+          <TownsDunaAdministration />
+        ) : (
+          hasDunaAdministration && <DunaAdministration />
+        )}
         {treasuryData.result.length > 0 && (
           <ChartTreasury
             initialData={treasuryData.result}

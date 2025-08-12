@@ -12,13 +12,15 @@ export default function Navbar() {
 
   const hasProposals = ui.toggle("proposals") && ui.toggle("proposals").enabled;
   const hasProposalsHref = Boolean(ui.page("proposals")?.href);
+  const hasComingSoon =
+    ui.toggle("coming-soon") && ui.toggle("coming-soon").enabled;
 
   const { address } = useAccount();
   const { isConnected } = useAgoraContext();
 
   return (
     <div
-      className={`flex flex-row bg-neutral rounded-full border border-line p-1 font-medium`}
+      className={`flex flex-row rounded-full border border-line p-1 font-medium ${ui.customization?.customInfoTabBackground ? `bg-[${ui.customization.customInfoTabBackground}]` : "bg-neutral"}`}
     >
       {hasProposals && (
         <HeaderLink
@@ -27,6 +29,15 @@ export default function Navbar() {
           isActive={pathname.includes("proposals") || pathname === "/"}
         >
           Proposals
+        </HeaderLink>
+      )}
+
+      {hasComingSoon && (
+        <HeaderLink
+          href="/coming-soon"
+          isActive={pathname.includes("coming-soon")}
+        >
+          Governance
         </HeaderLink>
       )}
 
