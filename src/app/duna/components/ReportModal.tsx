@@ -38,7 +38,7 @@ const ReportModal = ({
   closeDialog,
 }: ReportModalProps) => {
   const [newComment, setNewComment] = useState("");
-  const [comments, setComments] = useState<ForumPost[]>(report?.comments || []);
+  const [comments, setComments] = useState<ForumPost[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [replyingToId, setReplyingToId] = useState<number | null>(null);
   const [replyContent, setReplyContent] = useState("");
@@ -47,12 +47,6 @@ const ReportModal = ({
   const { address, isConnected } = useAccount();
   const openDialog = useOpenDialog();
   const { isAdmin } = useForumAdmin(DUNA_CATEGORY_ID);
-
-  useEffect(() => {
-    if (report) {
-      setComments(report.comments || []);
-    }
-  }, [report]);
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,11 +144,6 @@ const ReportModal = ({
       });
 
       if (newReplyData) {
-        const replyWithAuthor = {
-          ...newReplyData,
-          author: newReplyData.author || address || "",
-        };
-        setComments((prev) => [...prev, replyWithAuthor]);
         setReplyContent("");
         setReplyingToId(null);
       }

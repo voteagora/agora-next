@@ -17,6 +17,7 @@ interface CommentItemProps {
   depth: number;
   onDelete?: (commentId: number) => void;
   isAdmin: boolean;
+  comments: ForumPost[]; // Need this to count replies
   onReply: (commentId: number) => void;
   isReplying: boolean;
   replyingToId: number | null;
@@ -31,6 +32,7 @@ const CommentItem = ({
   depth,
   onDelete,
   isAdmin,
+  comments,
   onReply,
   isReplying,
   replyingToId,
@@ -39,10 +41,17 @@ const CommentItem = ({
   onSubmitReply,
   onCancelReply,
 }: CommentItemProps) => {
-  const isThisCommentBeingRepliedTo = replyingToId === comment.id;
+  const [showReplies, setShowReplies] = useState(false);
   const { address } = useAccount();
   const { deletePost } = useForum();
   const openDialog = useOpenDialog();
+
+  // Get replies for this comment
+  const replies = comments.filter(
+    (reply: ForumPost) => reply.parentId === comment.id
+  );
+  const hasReplies = replies.length > 0;
+  const isThisCommentBeingRepliedTo = replyingToId === comment.id;
 
   const canDelete = canDeleteContent(
     address || "",
@@ -97,7 +106,9 @@ const CommentItem = ({
           <div className="text-secondary text-xs sm:text-sm mb-2">
             <DunaContentRenderer content={comment.content} />
           </div>
-          <div className="flex items-center gap-2">
+
+          {/* Reply preview and actions */}
+          <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="sm"
@@ -108,9 +119,50 @@ const CommentItem = ({
               <Reply className="w-3 h-3 mr-1" />
               Reply
             </Button>
+
+            {/* Reply count */}
+            {hasReplies && (
+              <button
+                onClick={() => setShowReplies(!showReplies)}
+                className="text-xs text-secondary hover:text-primary transition-colors cursor-pointer"
+              >
+                {replies.length} {replies.length === 1 ? "reply" : "replies"}
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Expandable replies section */}
+      {hasReplies && showReplies && (
+        <div className="mt-3 ml-8 sm:ml-12 space-y-3">
+          {replies.map((reply) => (
+            <div key={reply.id} className="border-l-2 border-gray-200 pl-3">
+              <CommentItem
+                comment={reply}
+                depth={depth + 1}
+                comments={comments}
+                onReply={onReply}
+                isReplying={isReplying}
+                replyingToId={replyingToId}
+                replyContent={replyContent}
+                onReplyContentChange={onReplyContentChange}
+                onSubmitReply={onSubmitReply}
+                onCancelReply={onCancelReply}
+                isAdmin={isAdmin}
+              />
+            </div>
+          ))}
+
+          {/* Collapse button */}
+          <button
+            onClick={() => setShowReplies(false)}
+            className="text-xs text-secondary hover:text-primary transition-colors cursor-pointer"
+          >
+            Hide replies
+          </button>
+        </div>
+      )}
 
       {/* Reply form appears right below this comment */}
       {isThisCommentBeingRepliedTo && (
@@ -195,6 +247,7 @@ const CommentThread = ({
             depth={depth}
             onDelete={onDelete}
             isAdmin={isAdmin}
+            comments={comments}
             onReply={onReply}
             isReplying={isReplying}
             replyingToId={replyingToId}
