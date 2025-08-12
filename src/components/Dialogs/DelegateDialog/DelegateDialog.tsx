@@ -141,14 +141,20 @@ export function DelegateDialog({
   }, [didProcessDelegation]);
 
   async function executeDelegate() {
+    console.log("executeDelegate");
     if (isGasRelayLive) {
+      console.log("gas relay is live, calling sponsored delegate");
       await call();
     } else {
+      console.log("gas relay is not live", {
+        contractChainId: contracts.token.chain.id,
+      });
       write({
         address: contracts.token.address as any,
         abi: contracts.token.abi,
         functionName: "delegate",
         args: [delegate.address as any],
+        chainId: contracts.token.chain.id,
       });
     }
   }

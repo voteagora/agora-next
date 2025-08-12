@@ -25,6 +25,7 @@ export async function delegateBySignatureApi({
   });
 
   const { governor } = Tenant.current().contracts;
+  console.log("delegateBySignatureApi", { governor });
   const transport = getTransportForChain(governor.chain.id)!;
 
   const walletClient = createWalletClient({

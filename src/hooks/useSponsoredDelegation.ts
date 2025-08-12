@@ -43,6 +43,12 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
   });
 
   const call = async () => {
+    console.log("useSponsoredDelegation call()", {
+      address,
+      delegate,
+      nonce,
+      name,
+    });
     // Nonce for new delegations is 0n which does not pass !nonce condition
     // check for explicit undefined
     if (nonce === undefined || !name) {
@@ -57,6 +63,10 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
       : await contracts.token.provider.getBlock("latest");
     const expiry = (latestBlock?.timestamp || 0) + 1000;
 
+    console.log("useSponsoredDelegation", {
+      contracts,
+      chainId: contracts.token.chain.id,
+    });
     const signature = await signTypedDataAsync({
       domain: {
         ...gasRelayConfig.signature,
