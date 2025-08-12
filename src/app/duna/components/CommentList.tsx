@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
 import { ForumPost } from "@/lib/forumUtils";
@@ -8,12 +8,22 @@ import { useForum } from "@/hooks/useForum";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { canDeleteContent } from "@/lib/forumAdminUtils";
+import { DunaContentRenderer, DunaEditor } from "@/components/duna-editor";
+import { Button } from "@/components/ui/button";
+import { Reply } from "lucide-react";
 
 interface CommentItemProps {
   comment: ForumPost;
   depth: number;
   onDelete?: (commentId: number) => void;
   isAdmin: boolean;
+  onReply: (commentId: number) => void;
+  isReplying: boolean;
+  replyingToId: number | null;
+  replyContent: string;
+  onReplyContentChange: (content: string) => void;
+  onSubmitReply: (e?: React.FormEvent) => void;
+  onCancelReply: () => void;
 }
 
 const CommentItem = ({
@@ -21,7 +31,15 @@ const CommentItem = ({
   depth,
   onDelete,
   isAdmin,
+  onReply,
+  isReplying,
+  replyingToId,
+  replyContent,
+  onReplyContentChange,
+  onSubmitReply,
+  onCancelReply,
 }: CommentItemProps) => {
+  const isThisCommentBeingRepliedTo = replyingToId === comment.id;
   const { address } = useAccount();
   const { deletePost } = useForum();
   const openDialog = useOpenDialog();
@@ -76,11 +94,61 @@ const CommentItem = ({
               </button>
             )}
           </div>
-          <div className="text-secondary text-xs sm:text-sm">
-            {comment.content}
+          <div className="text-secondary text-xs sm:text-sm mb-2">
+            <DunaContentRenderer content={comment.content} />
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onReply(comment.id)}
+              className="text-xs text-secondary hover:text-primary p-1 h-6"
+              disabled={isReplying}
+            >
+              <Reply className="w-3 h-3 mr-1" />
+              Reply
+            </Button>
           </div>
         </div>
       </div>
+
+      {/* Reply form appears right below this comment */}
+      {isThisCommentBeingRepliedTo && (
+        <div className="mt-3 ml-8 sm:ml-12 p-3 bg-gray-50 rounded-lg border border-line">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs text-secondary">
+              Replying to this comment
+            </span>
+          </div>
+          <DunaEditor
+            variant="comment"
+            placeholder="Write your reply…"
+            value={replyContent}
+            onChange={(html) => onReplyContentChange(html)}
+            disabled={false}
+          />
+          <div className="flex justify-end gap-2 mt-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onCancelReply}
+              className="text-xs"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={onSubmitReply}
+              disabled={!replyContent.trim()}
+              className="text-xs bg-black text-white hover:bg-black/90"
+            >
+              Reply
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -91,6 +159,13 @@ interface CommentThreadProps {
   depth: number;
   onDelete?: (commentId: number) => void;
   isAdmin: boolean;
+  onReply: (commentId: number) => void;
+  isReplying: boolean;
+  replyingToId: number | null;
+  replyContent: string;
+  onReplyContentChange: (content: string) => void;
+  onSubmitReply: (e?: React.FormEvent) => void;
+  onCancelReply: () => void;
 }
 
 const CommentThread = ({
@@ -99,6 +174,13 @@ const CommentThread = ({
   depth,
   onDelete,
   isAdmin,
+  onReply,
+  isReplying,
+  replyingToId,
+  replyContent,
+  onReplyContentChange,
+  onSubmitReply,
+  onCancelReply,
 }: CommentThreadProps) => {
   const filteredComments = comments.filter(
     (comment) => (comment.parentId || null) === parentId
@@ -113,6 +195,13 @@ const CommentThread = ({
             depth={depth}
             onDelete={onDelete}
             isAdmin={isAdmin}
+            onReply={onReply}
+            isReplying={isReplying}
+            replyingToId={replyingToId}
+            replyContent={replyContent}
+            onReplyContentChange={onReplyContentChange}
+            onSubmitReply={onSubmitReply}
+            onCancelReply={onCancelReply}
           />
           <CommentThread
             comments={comments}
@@ -120,6 +209,13 @@ const CommentThread = ({
             depth={depth + 1}
             onDelete={onDelete}
             isAdmin={isAdmin}
+            onReply={onReply}
+            isReplying={isReplying}
+            replyingToId={replyingToId}
+            replyContent={replyContent}
+            onReplyContentChange={onReplyContentChange}
+            onSubmitReply={onSubmitReply}
+            onCancelReply={onCancelReply}
           />
         </div>
       ))}
@@ -131,9 +227,27 @@ interface CommentListProps {
   comments: ForumPost[];
   onDelete?: (commentId: number) => void;
   isAdmin: boolean;
+  onReply: (commentId: number) => void;
+  isReplying: boolean;
+  replyingToId: number | null;
+  replyContent: string;
+  onReplyContentChange: (content: string) => void;
+  onSubmitReply: (e?: React.FormEvent) => void;
+  onCancelReply: () => void;
 }
 
-const CommentList = ({ comments, onDelete, isAdmin }: CommentListProps) => {
+const CommentList = ({
+  comments,
+  onReply,
+  isReplying,
+  replyingToId,
+  replyContent,
+  onReplyContentChange,
+  onSubmitReply,
+  onCancelReply,
+  onDelete,
+  isAdmin,
+}: CommentListProps) => {
   return (
     <div className="space-y-3 sm:space-y-4">
       <CommentThread
@@ -142,6 +256,13 @@ const CommentList = ({ comments, onDelete, isAdmin }: CommentListProps) => {
         depth={0}
         onDelete={onDelete}
         isAdmin={isAdmin}
+        onReply={onReply}
+        isReplying={isReplying}
+        replyingToId={replyingToId}
+        replyContent={replyContent}
+        onReplyContentChange={onReplyContentChange}
+        onSubmitReply={onSubmitReply}
+        onCancelReply={onCancelReply}
       />
     </div>
   );

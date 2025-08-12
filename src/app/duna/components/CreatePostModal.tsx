@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { ConnectKitButton } from "connectkit";
+import { DunaEditor } from "@/components/duna-editor";
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -36,7 +37,9 @@ const CreatePostModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim()) {
+    // Strip HTML tags for validation
+    const plainTextContent = content.replace(/<[^>]*>/g, "").trim();
+    if (!title.trim() || !plainTextContent) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -140,15 +143,11 @@ const CreatePostModal = ({
               >
                 Content
               </label>
-              <textarea
-                id="content"
+              <DunaEditor
+                variant="post"
+                placeholder="Write your DUNA post…"
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows={8}
-                className="w-full px-3 py-2 border rounded-md bg-white text-primary focus:outline-none focus:ring-1 focus:ring-gray-200"
-                style={{ borderColor: "#E5E5E5" }}
-                placeholder="Enter post content..."
-                required
+                onChange={(html) => setContent(html)}
                 disabled={isSubmitting}
               />
             </div>
@@ -211,7 +210,11 @@ const CreatePostModal = ({
                   boxShadow:
                     "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
                 }}
-                disabled={isSubmitting || !title.trim() || !content.trim()}
+                disabled={
+                  isSubmitting ||
+                  !title.trim() ||
+                  !content.replace(/<[^>]*>/g, "").trim()
+                }
               >
                 {isSubmitting ? "Creating..." : "Create Post"}
               </Button>

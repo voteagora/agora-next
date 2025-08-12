@@ -17,6 +17,7 @@ import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 import { DUNA_CATEGORY_ID } from "@/lib/constants";
+import { DunaContentRenderer } from "@/components/duna-editor";
 
 interface QuarterlyReportCardProps {
   report: ForumTopic;
@@ -137,9 +138,9 @@ const QuarterlyReportCard = ({
       </div>
 
       <div className="mb-4">
-        <p className="text-sm text-secondary leading-relaxed line-clamp-2">
-          {content}
-        </p>
+        <div className="text-sm text-secondary leading-relaxed line-clamp-2">
+          <DunaContentRenderer content={content} />
+        </div>
       </div>
 
       <div className="flex items-center justify-between text-xs text-tertiary">
