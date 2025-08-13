@@ -137,6 +137,7 @@ export async function getForumTopics(categoryId?: number) {
         address: post.address,
         createdAt: post.createdAt.toISOString(),
         attachments: postAttachmentsMap.get(post.id) || [],
+        parentPostId: post.parentPostId,
       })),
     }));
 

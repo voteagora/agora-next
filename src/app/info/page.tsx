@@ -8,6 +8,7 @@ import { ChartTreasury } from "@/app/info/components/ChartTreasury";
 import GovernorSettings from "@/app/info/components/GovernorSettings";
 import GovernanceCharts from "@/app/info/components/GovernanceCharts";
 import DunaAdministration from "@/app/duna/components/DunaAdministration";
+import DunaDisclosures from "@/app/duna/components/DunaDisclosures";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/getTreasuryBalanceTS";
@@ -97,6 +98,7 @@ export default async function Page() {
             }}
           />
         )}
+        {hasDunaAdministration && <DunaDisclosures />}
       </div>
     );
   } else {

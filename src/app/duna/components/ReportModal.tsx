@@ -8,6 +8,7 @@ import {
   ArchiveBoxIcon,
 } from "@heroicons/react/20/solid";
 import ENSAvatar from "@/components/shared/ENSAvatar";
+import { DunaEditor, DunaContentRenderer } from "@/components/duna-editor";
 import ENSName from "@/components/shared/ENSName";
 import { ForumTopic, ForumPost } from "@/lib/forumUtils";
 import { format } from "date-fns";
@@ -39,17 +40,13 @@ const ReportModal = ({
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<ForumPost[]>(report?.comments || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [replyingToId, setReplyingToId] = useState<number | null>(null);
+  const [replyContent, setReplyContent] = useState("");
 
   const { createPost, deleteTopic, archiveTopic } = useForum();
   const { address, isConnected } = useAccount();
   const openDialog = useOpenDialog();
   const { isAdmin } = useForumAdmin(DUNA_CATEGORY_ID);
-
-  useEffect(() => {
-    if (report) {
-      setComments(report.comments || []);
-    }
-  }, [report]);
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,6 +122,50 @@ const ReportModal = ({
     });
   };
 
+  const handleReply = (commentId: number) => {
+    setReplyingToId(commentId);
+    setReplyContent("");
+  };
+
+  const handleSubmitReply = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+
+    if (!replyContent.trim() || !report || !replyingToId) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const newReplyData = await createPost(report.id, {
+        content: replyContent.trim(),
+        parentId: replyingToId,
+      });
+
+      if (newReplyData) {
+        const replyWithAuthor = {
+          ...newReplyData,
+          author: newReplyData.author || address || "",
+          parentId: newReplyData.parentId || replyingToId,
+        };
+        setComments((prev) => [...prev, replyWithAuthor]);
+        onCommentAdded?.(replyWithAuthor);
+        setReplyContent("");
+        setReplyingToId(null);
+      }
+    } catch (error) {
+      console.error("Error creating reply:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancelReply = () => {
+    setReplyingToId(null);
+    setReplyContent("");
+  };
+
   if (!report) {
     return null;
   }
@@ -148,10 +189,16 @@ const ReportModal = ({
             <h2 className="text-xl sm:text-2xl font-black text-primary mb-2">
               {report.title}
             </h2>
-            <div className="text-xs sm:text-sm text-secondary">
-              Created {format(new Date(report.createdAt), "MMM d, yyyy hh:mm")}{" "}
-              {comments.length} comments {report.attachments?.length || 0}{" "}
-              attachment{(report.attachments?.length || 0) !== 1 ? "s" : ""}
+            <div className="text-xs sm:text-sm text-secondary flex gap-2 divide-x">
+              <span>
+                Created{" "}
+                {format(new Date(report.createdAt), "MMM d, yyyy hh:mm")}
+              </span>
+              <span className="pl-2">{comments.length} comments</span>
+              <span className="pl-2">
+                {report.attachments?.length || 0} attachment
+                {(report.attachments?.length || 0) !== 1 ? "s" : ""}
+              </span>
             </div>
           </div>
           {(canArchive || canDelete) && (
@@ -177,76 +224,114 @@ const ReportModal = ({
             </div>
           )}
         </div>
-      </div>
 
-      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-x-hidden">
-        <div className="flex gap-3 sm:gap-4">
-          <div className="flex-shrink-0">
-            <ENSAvatar
-              ensName={report.author}
-              className="w-8 h-8 sm:w-10 sm:h-10"
-            />
-          </div>
-          <div className="flex-1">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
-              <ENSName address={report.author || ""} />
-              <span className="text-xs sm:text-sm text-secondary">
-                posted {format(new Date(report.createdAt), "MMM d, yyyy hh:mm")}
-              </span>
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-x-hidden">
+          {/* Author and Content Section */}
+          <div className="flex gap-3 sm:gap-4">
+            <div className="flex-shrink-0">
+              <ENSAvatar
+                ensName={report.author}
+                className="w-8 h-8 sm:w-10 sm:h-10"
+              />
             </div>
+            <div className="flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
+                <ENSName address={report.author || ""} />
+                <span className="text-xs sm:text-sm text-secondary">
+                  posted{" "}
+                  {format(new Date(report.createdAt), "MMM d, yyyy hh:mm")}
+                </span>
+              </div>
 
-            <div className="text-secondary leading-relaxed space-y-3 sm:space-y-4">
-              {report.content.split("\n\n").map((paragraph, index) => (
-                <p
-                  key={index}
-                  className="text-xs sm:text-sm break-words whitespace-pre-wrap leading-relaxed"
-                >
-                  {paragraph}
-                </p>
-              ))}
+              {/* Report Content */}
+              <div className="text-secondary leading-relaxed">
+                <DunaContentRenderer content={report.content} />
+              </div>
             </div>
           </div>
-        </div>
 
-        {report.attachments && report.attachments.length > 0 && (
+          {/* Attachments */}
+          {report.attachments && report.attachments.length > 0 && (
+            <div className="border-t border-line pt-3 sm:pt-4">
+              <div className="text-xs sm:text-sm font-semibold text-primary mb-2 sm:mb-3">
+                Attachment
+              </div>
+              <div className="space-y-2">
+                {report.attachments.map((attachment) => (
+                  <Button
+                    key={attachment.id}
+                    variant="outline"
+                    className="w-full justify-start bg-gray-50 border-gray-200 hover:bg-gray-100 text-xs sm:text-sm"
+                    onClick={() => window.open(attachment.url, "_blank")}
+                  >
+                    <PaperClipIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                    {attachment.fileName || `Attachment ${attachment.id}`}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Comments Section */}
           <div className="border-t border-line pt-3 sm:pt-4">
-            <div className="text-xs sm:text-sm font-semibold text-primary mb-2 sm:mb-3">
-              Attachment
-            </div>
-            <div className="space-y-2">
-              {report.attachments.map((attachment) => (
-                <Button
-                  key={attachment.id}
-                  variant="outline"
-                  className="w-full justify-start bg-gray-50 border-gray-200 hover:bg-gray-100 text-xs sm:text-sm"
-                  onClick={() => window.open(attachment.url, "_blank")}
-                >
-                  <PaperClipIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                  {attachment.fileName || `Attachment ${attachment.id}`}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
+            <h4 className="text-base sm:text-lg font-bold text-primary mb-3 sm:mb-4">
+              Comments ({comments.length})
+            </h4>
 
-        <div className="border-t border-line pt-3 sm:pt-4">
-          <h4 className="text-base sm:text-lg font-bold text-primary mb-3 sm:mb-4">
-            Comments ({comments.length})
-          </h4>
+            <CommentList
+              comments={comments}
+              onReply={handleReply}
+              isReplying={replyingToId !== null}
+              replyingToId={replyingToId}
+              replyContent={replyContent}
+              onReplyContentChange={setReplyContent}
+              onSubmitReply={handleSubmitReply}
+              onCancelReply={handleCancelReply}
+              onDelete={handleDeleteComment}
+              isAdmin={isAdmin}
+            />
 
-          <CommentList
-            comments={comments}
-            onDelete={handleDeleteComment}
-            isAdmin={isAdmin}
-          />
-
-          <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-line">
-            {!isConnected ? (
-              <div className="text-center py-3 sm:py-4 flex items-center justify-center">
-                <ConnectKitButton.Custom>
-                  {({ show }) => (
+            {/* Comment Input */}
+            <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-line">
+              {!isConnected ? (
+                <div className="text-center py-3 sm:py-4 flex items-center justify-center">
+                  <ConnectKitButton.Custom>
+                    {({ show }) => (
+                      <Button
+                        onClick={() => show?.()}
+                        className="text-white border border-black hover:bg-gray-800 text-xs sm:text-sm w-full sm:w-auto"
+                        style={{
+                          display: "flex",
+                          height: "36px",
+                          padding: "12px 20px",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          gap: "8px",
+                          flexShrink: 0,
+                          borderRadius: "8px",
+                          background: "#171717",
+                          boxShadow:
+                            "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+                        }}
+                      >
+                        Connect your wallet to comment
+                      </Button>
+                    )}
+                  </ConnectKitButton.Custom>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmitComment}>
+                  <DunaEditor
+                    variant="comment"
+                    placeholder="Write a comment…"
+                    value={newComment}
+                    onChange={(html) => setNewComment(html)}
+                    disabled={isSubmitting}
+                  />
+                  <div className="flex justify-end mt-2">
                     <Button
-                      onClick={() => show?.()}
+                      type="submit"
+                      disabled={isSubmitting || !newComment.trim()}
                       className="text-white border border-black hover:bg-gray-800 text-xs sm:text-sm w-full sm:w-auto"
                       style={{
                         display: "flex",
@@ -262,46 +347,12 @@ const ReportModal = ({
                           "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
                       }}
                     >
-                      Connect your wallet to comment
+                      {isSubmitting ? "Posting..." : "Post"}
                     </Button>
-                  )}
-                </ConnectKitButton.Custom>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmitComment}>
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  className="w-full p-2 sm:p-3 border rounded-md bg-white text-primary focus:outline-none focus:ring-1 focus:ring-gray-200 resize-none font-normal text-xs sm:text-sm"
-                  style={{ borderColor: "#E5E5E5" }}
-                  rows={3}
-                  placeholder="Write a comment..."
-                  disabled={isSubmitting}
-                />
-                <div className="flex justify-end mt-2">
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting || !newComment.trim()}
-                    className="text-white border border-black hover:bg-gray-800 text-xs sm:text-sm w-full sm:w-auto"
-                    style={{
-                      display: "flex",
-                      height: "36px",
-                      padding: "12px 20px",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      gap: "8px",
-                      flexShrink: 0,
-                      borderRadius: "8px",
-                      background: "#171717",
-                      boxShadow:
-                        "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-                    }}
-                  >
-                    {isSubmitting ? "Posting..." : "Post"}
-                  </Button>
-                </div>
-              </form>
-            )}
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       </div>
