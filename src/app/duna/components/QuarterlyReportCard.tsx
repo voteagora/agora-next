@@ -53,14 +53,7 @@ const QuarterlyReportCard = ({
   const content = report.content;
 
   const commentsCount = report.comments ? report.comments.length : 0;
-  const lastCommentDate =
-    report.comments && report.comments.length > 0
-      ? formatDistanceToNow(
-          new Date(report.comments[report.comments.length - 1].createdAt),
-          { addSuffix: true }
-        )
-      : formatDistanceToNow(new Date(report.createdAt), { addSuffix: true });
-
+  const createdAt = new Date(report.createdAt);
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     openDialog({
@@ -151,7 +144,7 @@ const QuarterlyReportCard = ({
           </div>
           <div className="flex items-center gap-1">
             <ClockIcon className="w-4 h-4" />
-            <span>{lastCommentDate}</span>
+            <span>{formatDistanceToNow(createdAt, { addSuffix: true })}</span>
           </div>
           <div className="flex items-center gap-1">
             <PaperClipIcon className="w-4 h-4" />
