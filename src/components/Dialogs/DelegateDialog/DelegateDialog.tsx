@@ -148,14 +148,9 @@ export function DelegateDialog({
   }, [didProcessDelegation]);
 
   async function executeDelegate() {
-    console.log("executeDelegate");
     if (isGasRelayLive) {
-      console.log("gas relay is live, calling sponsored delegate");
       await call();
     } else {
-      console.log("gas relay is not live", {
-        contractChainId: contracts.token.chain.id,
-      });
       try {
         // Bypass wagmi to avoid CAIP-2 chain id leakage from Safe provider
         const publicClient = getPublicClient(contracts.token.chain);
