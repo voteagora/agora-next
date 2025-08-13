@@ -78,7 +78,7 @@ const TownsDunaAdministration = async () => {
             </h4>
           </div>
           <div className="text-secondary text-sm opacity-75">
-            Coming Soon: this section will be available on August 15, 2025.
+            Coming Soon: this section will be available on August 20, 2025.
           </div>
         </CardContent>
       </Card>
