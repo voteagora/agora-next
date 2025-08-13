@@ -61,11 +61,6 @@ const combinedTransport = custom({
       id: numericId,
     } satisfies Chain;
 
-    console.log({
-      combinedTransportNormalizedChain: normalizedChain,
-      methodCalled: method,
-    });
-
     if (bundlerRpcMethods.has(method)) {
       return bundlerTransport({ chain: normalizedChain }).request({
         method,

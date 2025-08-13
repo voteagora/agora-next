@@ -12,18 +12,6 @@ export default async function verifyMessage({
   message: string;
 }) {
   const publicClient = getPublicClient();
-
-  console.log("Verifying message", {
-    address,
-    message,
-    signature,
-    publicClient: await publicClient.verifyMessage({
-      address,
-      message,
-      signature,
-    }),
-  });
-
   return await publicClient.verifyMessage({
     address,
     message,

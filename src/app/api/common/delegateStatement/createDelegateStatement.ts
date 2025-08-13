@@ -25,8 +25,6 @@ export async function createDelegateStatement({
     delegateStatement;
   const { slug } = Tenant.current();
 
-  console.log({ slug, delegateStatement });
-
   const valid = await verifyMessage({
     address,
     message,

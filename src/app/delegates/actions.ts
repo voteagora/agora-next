@@ -108,13 +108,6 @@ export async function submitDelegateStatement({
   message: string;
   scwAddress?: string;
 }) {
-  console.log("submitDelegateStatement", {
-    address,
-    delegateStatement,
-    signature,
-    message,
-    scwAddress,
-  });
   const response = await createDelegateStatement({
     address,
     delegateStatement,

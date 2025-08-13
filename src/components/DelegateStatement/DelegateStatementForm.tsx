@@ -101,8 +101,6 @@ export default function DelegateStatementForm({
         message: serializedBody,
       });
 
-      console.log("signature", { signature });
-
       if (!signature) {
         setSubmissionError("Signature failed, please try again");
         return;
