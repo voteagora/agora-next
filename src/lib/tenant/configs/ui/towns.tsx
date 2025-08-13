@@ -157,7 +157,7 @@ export const townsTenantUIConfig = new TenantUI({
       tabs: [
         {
           icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#87819F" />,
-          title: "August 15, 2025",
+          title: "August 20, 2025",
           description:
             "Messaging functionality opens for the DUNA Administration Section after time has elapsed for members to claim their $TOWNS.",
         },
