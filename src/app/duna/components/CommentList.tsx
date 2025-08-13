@@ -234,9 +234,12 @@ const CommentThread = ({
   onSubmitReply,
   onCancelReply,
 }: CommentThreadProps) => {
-  const filteredComments = comments.filter(
-    (comment) => (comment.parentId || null) === parentId
-  );
+  const filteredComments = comments.filter((comment) => {
+    if (parentId === null) {
+      return !comment.parentId;
+    }
+    return comment.parentId === parentId;
+  });
 
   return (
     <>
@@ -248,20 +251,6 @@ const CommentThread = ({
             onDelete={onDelete}
             isAdmin={isAdmin}
             comments={comments}
-            onReply={onReply}
-            isReplying={isReplying}
-            replyingToId={replyingToId}
-            replyContent={replyContent}
-            onReplyContentChange={onReplyContentChange}
-            onSubmitReply={onSubmitReply}
-            onCancelReply={onCancelReply}
-          />
-          <CommentThread
-            comments={comments}
-            parentId={comment.id}
-            depth={depth + 1}
-            onDelete={onDelete}
-            isAdmin={isAdmin}
             onReply={onReply}
             isReplying={isReplying}
             replyingToId={replyingToId}
