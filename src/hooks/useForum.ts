@@ -6,13 +6,31 @@ import {
   createForumTopic,
   createForumPost,
   deleteForumTopic,
-  getForumDocuments,
+  deleteForumPost,
+  deleteForumAttachment,
+  getForumAttachments,
   uploadDocumentFromBase64,
+  archiveForumTopic,
+  archiveForumAttachment,
+  getForumCategories,
+  getArchivedForumTopics,
+  getArchivedForumAttachments,
+  getArchivedForumCategories,
+  unarchiveForumTopic,
+  unarchiveForumAttachment,
+  unarchiveForumCategory,
 } from "@/lib/actions/forum";
 import { uploadAttachment } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData, AttachmentData } from "@/lib/fileUtils";
-import { transformForumTopics, ForumTopic, ForumPost } from "@/lib/forumUtils";
+import {
+  transformForumTopics,
+  ForumTopic,
+  ForumPost,
+  ForumCategory,
+} from "@/lib/forumUtils";
 import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
+import { checkForumPermissions } from "@/lib/forumAdminUtils";
 
 interface ForumDocument {
   id: number;
@@ -118,6 +136,7 @@ export const useForum = () => {
       }
 
       setLoading(true);
+      const toastId = toast.loading("Creating topic...");
       setError(null);
 
       try {
@@ -196,6 +215,7 @@ export const useForum = () => {
         throw err;
       } finally {
         setLoading(false);
+        toast.dismiss(toastId);
       }
     },
     [isConnected, address, signMessageAsync]
@@ -211,6 +231,7 @@ export const useForum = () => {
       }
 
       setLoading(true);
+      const toastId = toast.loading("Creating post...");
       setError(null);
 
       try {
@@ -275,6 +296,7 @@ export const useForum = () => {
         throw err;
       } finally {
         setLoading(false);
+        toast.dismiss(toastId);
       }
     },
     [isConnected, address, signMessageAsync]
@@ -285,7 +307,7 @@ export const useForum = () => {
     setError(null);
 
     try {
-      const result = await getForumDocuments();
+      const result = await getForumAttachments();
 
       if (!result.success) {
         throw new Error(result.error);
@@ -305,10 +327,14 @@ export const useForum = () => {
   const uploadDocument = useCallback(
     async (attachmentData: AttachmentData): Promise<ForumDocument | null> => {
       setLoading(true);
+      const toastId = toast.loading("Uploading document...");
       setError(null);
 
       try {
-        const result = await uploadDocumentFromBase64(attachmentData);
+        const result = await uploadDocumentFromBase64(
+          attachmentData,
+          address || ""
+        );
 
         if (!result.success) {
           throw new Error(result.error || "Failed to save document");
@@ -334,9 +360,359 @@ export const useForum = () => {
         return null;
       } finally {
         setLoading(false);
+        toast.dismiss(toastId);
       }
     },
     []
+  );
+
+  const deleteTopic = useCallback(async (topicId: number): Promise<boolean> => {
+    setLoading(true);
+    const toastId = toast.loading("Deleting topic...");
+    setError(null);
+
+    try {
+      const result = await deleteForumTopic(topicId);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      toast.success("Topic deleted successfully!");
+      return true;
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to delete topic";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      return false;
+    } finally {
+      setLoading(false);
+      toast.dismiss(toastId);
+    }
+  }, []);
+
+  const deletePost = useCallback(async (postId: number): Promise<boolean> => {
+    setLoading(true);
+    const toastId = toast.loading("Deleting post...");
+    setError(null);
+
+    try {
+      const result = await deleteForumPost(postId);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      toast.success("Post deleted successfully!");
+      return true;
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to delete post";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      return false;
+    } finally {
+      setLoading(false);
+      toast.dismiss(toastId);
+    }
+  }, []);
+
+  const deleteAttachment = useCallback(
+    async (attachmentId: number): Promise<boolean> => {
+      setLoading(true);
+      const toastId = toast.loading("Deleting attachment...");
+      setError(null);
+
+      try {
+        const result = await deleteForumAttachment(attachmentId);
+
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        toast.success("Attachment deleted successfully!");
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to delete document";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        return false;
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastId);
+      }
+    },
+    []
+  );
+
+  const archiveTopic = useCallback(
+    async (topicId: number): Promise<boolean> => {
+      setLoading(true);
+      const toastId = toast.loading("Archiving topic...");
+      setError(null);
+
+      try {
+        const result = await archiveForumTopic(topicId);
+
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        toast.success("Topic archived successfully!");
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to archive topic";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        return false;
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastId);
+      }
+    },
+    []
+  );
+
+  const archiveAttachment = useCallback(
+    async (attachmentId: number): Promise<boolean> => {
+      setLoading(true);
+      const toastId = toast.loading("Archiving attachment...");
+      setError(null);
+
+      try {
+        const result = await archiveForumAttachment(attachmentId);
+
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        toast.success("Attachment archived successfully!");
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to archive attachment";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        return false;
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastId);
+      }
+    },
+    []
+  );
+
+  const fetchCategories = useCallback(async (): Promise<ForumCategory[]> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await getForumCategories();
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      return result.data.map((category) => ({
+        id: category.id,
+        name: category.name,
+        description: category.description || undefined,
+        archived: category.archived,
+        adminOnlyTopics: category.adminOnlyTopics,
+        createdAt: category.createdAt.toISOString(),
+        updatedAt: category.updatedAt.toISOString(),
+      }));
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch categories"
+      );
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchArchivedTopics = useCallback(
+    async (categoryId?: number): Promise<ForumTopic[]> => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const result = await getArchivedForumTopics(categoryId);
+
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        const transformedTopics = transformForumTopics(result.data);
+
+        return transformedTopics;
+      } catch (err) {
+        console.error("Error fetching archived topics:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to fetch archived topics"
+        );
+        return [];
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  const fetchArchivedDocuments = useCallback(async (): Promise<
+    ForumDocument[]
+  > => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await getArchivedForumAttachments();
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      return result.data;
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to fetch archived documents"
+      );
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchArchivedCategories = useCallback(async (): Promise<
+    ForumCategory[]
+  > => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await getArchivedForumCategories();
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      return result.data.map((category) => ({
+        id: category.id,
+        name: category.name,
+        description: category.description || undefined,
+        archived: category.archived,
+        adminOnlyTopics: category.adminOnlyTopics,
+        createdAt: category.createdAt.toISOString(),
+        updatedAt: category.updatedAt.toISOString(),
+      }));
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to fetch archived categories"
+      );
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const unarchiveTopic = useCallback(
+    async (topicId: number): Promise<boolean> => {
+      setLoading(true);
+      const toastId = toast.loading("Unarchiving topic...");
+      setError(null);
+
+      try {
+        const result = await unarchiveForumTopic(topicId);
+
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        toast.success("Topic unarchived successfully!");
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to unarchive topic";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        return false;
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastId);
+      }
+    },
+    []
+  );
+
+  const unarchiveAttachment = useCallback(
+    async (attachmentId: number): Promise<boolean> => {
+      setLoading(true);
+      const toastId = toast.loading("Unarchiving attachment...");
+      setError(null);
+
+      try {
+        const result = await unarchiveForumAttachment(attachmentId);
+
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        toast.success("Attachment unarchived successfully!");
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to unarchive attachment";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        return false;
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastId);
+      }
+    },
+    []
+  );
+
+  const unarchiveCategory = useCallback(
+    async (categoryId: number): Promise<boolean> => {
+      if (!address) {
+        toast.error("Please connect your wallet first");
+        return false;
+      }
+
+      setLoading(true);
+      const toastId = toast.loading("Unarchiving category...");
+      setError(null);
+
+      try {
+        const result = await unarchiveForumCategory(categoryId, address);
+
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        toast.success("Category unarchived successfully!");
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to unarchive category";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        return false;
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastId);
+      }
+    },
+    [address]
   );
 
   return {
@@ -347,7 +723,33 @@ export const useForum = () => {
     fetchTopic,
     createTopic,
     createPost,
+    deleteTopic,
+    deletePost,
+    deleteAttachment,
     fetchDocuments,
     uploadDocument,
+    archiveTopic,
+    archiveAttachment,
+    fetchCategories,
+    fetchArchivedTopics,
+    fetchArchivedDocuments,
+    fetchArchivedCategories,
+    unarchiveTopic,
+    unarchiveAttachment,
+    unarchiveCategory,
+  };
+};
+
+export const useForumAdmin = (categoryId: number) => {
+  const { address } = useAccount();
+
+  const { data } = useQuery({
+    queryKey: ["forum-admin", categoryId, address],
+    queryFn: () => checkForumPermissions(address || "", categoryId),
+  });
+
+  return {
+    isAdmin: !!data?.isAdmin,
+    canCreateTopics: !!data?.canCreateTopics,
   };
 };
