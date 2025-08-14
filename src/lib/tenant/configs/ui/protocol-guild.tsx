@@ -276,7 +276,7 @@ export const protocolGuildTenantUIConfig = new TenantUI({
             type: ProposalType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
-          }
+          },
         ],
         copy: {
           helperText: `
