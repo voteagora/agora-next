@@ -165,7 +165,7 @@ export default function DAOMetricsHeader() {
                     <span>Total amount of {token.symbol} in existence</span>
                   </HoverCardContent>
                 </HoverCard>
-                {contracts.token.isERC20() && (
+                {contracts.token.isERC20() | contracts.token.isERC721() && (
                   <HoverCard openDelay={100} closeDelay={100}>
                     <HoverCardTrigger className="flex">
                       <span className="cursor-default content-center">
