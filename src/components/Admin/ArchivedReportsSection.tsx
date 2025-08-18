@@ -1,14 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForum } from "@/hooks/useForum";
+import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { ForumTopic } from "@/lib/forumUtils";
-import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { ArrowUpIcon, EyeIcon } from "@heroicons/react/20/solid";
 import { toast } from "react-hot-toast";
-import Tenant from "@/lib/tenant/tenant";
-import { UIForumConfig } from "@/lib/tenant/tenantUI";
+import { DUNA_CATEGORY_ID } from "@/lib/constants";
 
 interface ArchivedReportCardProps {
   report: ForumTopic;
@@ -21,21 +19,15 @@ const ArchivedReportCard = ({
   onUnarchive,
   isLast,
 }: ArchivedReportCardProps) => {
-  const { address } = useAccount();
   const { unarchiveTopic } = useForum();
   const openDialog = useOpenDialog();
-
-  const tenant = Tenant.current();
-  const forumToggle = tenant.ui.toggle("duna");
-  const forumConfig = forumToggle?.config as UIForumConfig | undefined;
-  const forumAdmins = forumConfig?.adminAddresses || [];
-  const isAdmin = forumAdmins.includes(address as `0x${string}`);
+  const { isAdmin, canManageTopics } = useForumAdmin(DUNA_CATEGORY_ID);
 
   const handleUnarchive = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (!isAdmin) {
-      toast.error("Only forum admins can unarchive reports.");
+    if (!isAdmin && !canManageTopics) {
+      toast.error("You don't have permission to unarchive reports.");
       return;
     }
 
@@ -91,14 +83,16 @@ const ArchivedReportCard = ({
           <button
             onClick={handleUnarchive}
             className={`p-1 transition-colors ${
-              isAdmin
+              isAdmin || canManageTopics
                 ? "text-blue-500 hover:text-blue-700"
                 : "text-gray-400 cursor-not-allowed"
             }`}
             title={
-              isAdmin ? "Unarchive report" : "Only forum admins can unarchive"
+              isAdmin || canManageTopics
+                ? "Unarchive report"
+                : "You don't have permission to unarchive"
             }
-            disabled={!isAdmin}
+            disabled={!isAdmin && !canManageTopics}
           >
             <ArrowUpIcon className="w-4 h-4" />
           </button>

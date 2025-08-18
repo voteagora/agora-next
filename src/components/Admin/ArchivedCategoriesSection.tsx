@@ -1,14 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForum } from "@/hooks/useForum";
+import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
 import { ArrowUpIcon } from "@heroicons/react/20/solid";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { ForumCategory } from "@/lib/forumUtils";
 import { toast } from "react-hot-toast";
-import Tenant from "@/lib/tenant/tenant";
-import { UIForumConfig } from "@/lib/tenant/tenantUI";
 
 interface ArchivedCategoryCardProps {
   category: ForumCategory;
@@ -24,12 +22,7 @@ const ArchivedCategoryCard = ({
   const { address } = useAccount();
   const { unarchiveCategory } = useForum();
   const openDialog = useOpenDialog();
-
-  const tenant = Tenant.current();
-  const forumToggle = tenant.ui.toggle("duna");
-  const forumConfig = forumToggle?.config as UIForumConfig | undefined;
-  const forumAdmins = forumConfig?.adminAddresses || [];
-  const isAdmin = forumAdmins.includes(address as `0x${string}`);
+  const { isAdmin } = useForumAdmin();
 
   const handleUnarchive = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -96,9 +89,6 @@ const ArchivedCategoryCard = ({
 
       <div className="flex items-center justify-between text-xs text-tertiary">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1">
-            <span>Admins: {forumAdmins.length}</span>
-          </div>
           <div className="flex items-center gap-1">
             <span>
               {category.adminOnlyTopics ? "Admin-only topics" : "Public topics"}

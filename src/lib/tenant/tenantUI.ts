@@ -7,7 +7,7 @@ import React, { ReactNode } from "react";
 type UIToggle = {
   name: string;
   enabled: boolean;
-  config?: UIConfig | UIEndorsedConfig | UIGasRelayConfig | UIForumConfig;
+  config?: UIConfig | UIEndorsedConfig | UIGasRelayConfig;
 };
 
 export type UIEndorsedConfig = {
@@ -24,10 +24,6 @@ export type UIGasRelayConfig = {
   minBalance: string;
   sponsorAddress: `0x${string}`;
   minVPToUseGasRelay: string;
-};
-
-export type UIForumConfig = {
-  adminAddresses: `0x${string}`[];
 };
 
 // UI config exists to give tenant specifc config options to a UI toggle

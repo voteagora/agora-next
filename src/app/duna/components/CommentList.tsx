@@ -4,19 +4,19 @@ import ENSName from "@/components/shared/ENSName";
 import { ForumPost } from "@/lib/forumUtils";
 import { format } from "date-fns";
 import { useAccount } from "wagmi";
-import { useForum } from "@/hooks/useForum";
+import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { canDeleteContent } from "@/lib/forumAdminUtils";
 import { DunaContentRenderer, DunaEditor } from "@/components/duna-editor";
 import { Button } from "@/components/ui/button";
 import { Reply } from "lucide-react";
+import { DUNA_CATEGORY_ID } from "@/lib/constants";
 
 interface CommentItemProps {
   comment: ForumPost;
   depth: number;
   onDelete?: (commentId: number) => void;
-  isAdmin: boolean;
   comments: ForumPost[]; // Need this to count replies
   onReply: (commentId: number) => void;
   isReplying: boolean;
@@ -31,7 +31,6 @@ const CommentItem = ({
   comment,
   depth,
   onDelete,
-  isAdmin,
   comments,
   onReply,
   isReplying,
@@ -45,6 +44,7 @@ const CommentItem = ({
   const { address } = useAccount();
   const { deletePost } = useForum();
   const openDialog = useOpenDialog();
+  const { isAdmin, canManageTopics } = useForumAdmin(DUNA_CATEGORY_ID);
 
   // Get replies for this comment
   const replies = comments.filter(
@@ -56,7 +56,7 @@ const CommentItem = ({
   const canDelete = canDeleteContent(
     address || "",
     comment.author || "",
-    isAdmin
+    isAdmin || canManageTopics
   );
 
   const handleDelete = async (e: React.MouseEvent) => {
@@ -149,7 +149,6 @@ const CommentItem = ({
                 onReplyContentChange={onReplyContentChange}
                 onSubmitReply={onSubmitReply}
                 onCancelReply={onCancelReply}
-                isAdmin={isAdmin}
               />
             </div>
           ))}
@@ -210,7 +209,6 @@ interface CommentThreadProps {
   parentId: number | null;
   depth: number;
   onDelete?: (commentId: number) => void;
-  isAdmin: boolean;
   onReply: (commentId: number) => void;
   isReplying: boolean;
   replyingToId: number | null;
@@ -225,7 +223,6 @@ const CommentThread = ({
   parentId,
   depth,
   onDelete,
-  isAdmin,
   onReply,
   isReplying,
   replyingToId,
@@ -249,7 +246,6 @@ const CommentThread = ({
             comment={comment}
             depth={depth}
             onDelete={onDelete}
-            isAdmin={isAdmin}
             comments={comments}
             onReply={onReply}
             isReplying={isReplying}
@@ -268,7 +264,6 @@ const CommentThread = ({
 interface CommentListProps {
   comments: ForumPost[];
   onDelete?: (commentId: number) => void;
-  isAdmin: boolean;
   onReply: (commentId: number) => void;
   isReplying: boolean;
   replyingToId: number | null;
@@ -288,7 +283,6 @@ const CommentList = ({
   onSubmitReply,
   onCancelReply,
   onDelete,
-  isAdmin,
 }: CommentListProps) => {
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -297,7 +291,6 @@ const CommentList = ({
         parentId={null}
         depth={0}
         onDelete={onDelete}
-        isAdmin={isAdmin}
         onReply={onReply}
         isReplying={isReplying}
         replyingToId={replyingToId}

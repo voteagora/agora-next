@@ -19,6 +19,7 @@ import {
   unarchiveForumTopic,
   unarchiveForumAttachment,
   unarchiveForumCategory,
+  checkForumPermissions,
 } from "@/lib/actions/forum";
 import { uploadAttachment } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData, AttachmentData } from "@/lib/fileUtils";
@@ -30,7 +31,6 @@ import {
 } from "@/lib/forumUtils";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
-import { checkForumPermissions } from "@/lib/forumAdminUtils";
 
 interface ForumDocument {
   id: number;
@@ -194,7 +194,17 @@ export const useForum = () => {
               },
             ];
           } catch (attachmentError) {
-            await deleteForumTopic(result.topic.id);
+            try {
+              await deleteForumTopic({
+                topicId: result.topic.id,
+                _internal: true,
+              });
+            } catch (cleanupError) {
+              console.error(
+                "Failed to clean up topic after attachment error:",
+                cleanupError
+              );
+            }
             throw attachmentError;
           }
         }
@@ -326,14 +336,23 @@ export const useForum = () => {
 
   const uploadDocument = useCallback(
     async (attachmentData: AttachmentData): Promise<ForumDocument | null> => {
+      if (!isConnected || !address) {
+        throw new Error("Please connect your wallet first");
+      }
+
       setLoading(true);
       const toastId = toast.loading("Uploading document...");
       setError(null);
 
       try {
+        const message = `Upload forum document: ${attachmentData.fileName}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+
         const result = await uploadDocumentFromBase64(
           attachmentData,
-          address || ""
+          address,
+          signature,
+          message
         );
 
         if (!result.success) {
@@ -363,69 +382,111 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    []
+    [isConnected, address, signMessageAsync]
   );
 
-  const deleteTopic = useCallback(async (topicId: number): Promise<boolean> => {
-    setLoading(true);
-    const toastId = toast.loading("Deleting topic...");
-    setError(null);
-
-    try {
-      const result = await deleteForumTopic(topicId);
-
-      if (!result.success) {
-        throw new Error(result.error);
+  const deleteTopic = useCallback(
+    async (topicId: number): Promise<boolean> => {
+      if (!isConnected || !address) {
+        throw new Error("Please connect your wallet first");
       }
 
-      toast.success("Topic deleted successfully!");
-      return true;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to delete topic";
-      setError(errorMessage);
-      toast.error(errorMessage);
-      return false;
-    } finally {
-      setLoading(false);
-      toast.dismiss(toastId);
-    }
-  }, []);
+      setLoading(true);
+      const toastId = toast.loading("Deleting topic...");
+      setError(null);
 
-  const deletePost = useCallback(async (postId: number): Promise<boolean> => {
-    setLoading(true);
-    const toastId = toast.loading("Deleting post...");
-    setError(null);
+      try {
+        const message = `Delete forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
 
-    try {
-      const result = await deleteForumPost(postId);
+        const result = await deleteForumTopic({
+          topicId,
+          address,
+          signature,
+          message,
+        });
 
-      if (!result.success) {
-        throw new Error(result.error);
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        toast.success("Topic deleted successfully!");
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to delete topic";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        return false;
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastId);
+      }
+    },
+    [isConnected, address, signMessageAsync]
+  );
+
+  const deletePost = useCallback(
+    async (postId: number): Promise<boolean> => {
+      if (!isConnected || !address) {
+        throw new Error("Please connect your wallet first");
       }
 
-      toast.success("Post deleted successfully!");
-      return true;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to delete post";
-      setError(errorMessage);
-      toast.error(errorMessage);
-      return false;
-    } finally {
-      setLoading(false);
-      toast.dismiss(toastId);
-    }
-  }, []);
+      setLoading(true);
+      const toastId = toast.loading("Deleting post...");
+      setError(null);
+
+      try {
+        const message = `Delete forum post: ${postId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+
+        const result = await deleteForumPost({
+          postId,
+          address,
+          signature,
+          message,
+        });
+
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        toast.success("Post deleted successfully!");
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to delete post";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        return false;
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastId);
+      }
+    },
+    [isConnected, address, signMessageAsync]
+  );
 
   const deleteAttachment = useCallback(
     async (attachmentId: number): Promise<boolean> => {
+      if (!isConnected || !address) {
+        throw new Error("Please connect your wallet first");
+      }
+
       setLoading(true);
       const toastId = toast.loading("Deleting attachment...");
       setError(null);
 
       try {
-        const result = await deleteForumAttachment(attachmentId);
+        const message = `Delete forum attachment: ${attachmentId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+
+        const result = await deleteForumAttachment({
+          attachmentId,
+          address,
+          signature,
+          message,
+        });
 
         if (!result.success) {
           throw new Error(result.error);
@@ -444,17 +505,29 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    []
+    [isConnected, address, signMessageAsync]
   );
 
   const archiveTopic = useCallback(
     async (topicId: number): Promise<boolean> => {
+      if (!isConnected || !address) {
+        throw new Error("Please connect your wallet first");
+      }
+
       setLoading(true);
       const toastId = toast.loading("Archiving topic...");
       setError(null);
 
       try {
-        const result = await archiveForumTopic(topicId);
+        const message = `Archive forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+
+        const result = await archiveForumTopic({
+          topicId,
+          address,
+          signature,
+          message,
+        });
 
         if (!result.success) {
           throw new Error(result.error);
@@ -473,17 +546,29 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    []
+    [isConnected, address, signMessageAsync]
   );
 
   const archiveAttachment = useCallback(
     async (attachmentId: number): Promise<boolean> => {
+      if (!isConnected || !address) {
+        throw new Error("Please connect your wallet first");
+      }
+
       setLoading(true);
       const toastId = toast.loading("Archiving attachment...");
       setError(null);
 
       try {
-        const result = await archiveForumAttachment(attachmentId);
+        const message = `Archive forum attachment: ${attachmentId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+
+        const result = await archiveForumAttachment({
+          attachmentId,
+          address,
+          signature,
+          message,
+        });
 
         if (!result.success) {
           throw new Error(result.error);
@@ -502,7 +587,7 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    []
+    [isConnected, address, signMessageAsync]
   );
 
   const fetchCategories = useCallback(async (): Promise<ForumCategory[]> => {
@@ -625,12 +710,24 @@ export const useForum = () => {
 
   const unarchiveTopic = useCallback(
     async (topicId: number): Promise<boolean> => {
+      if (!isConnected || !address) {
+        throw new Error("Please connect your wallet first");
+      }
+
       setLoading(true);
       const toastId = toast.loading("Unarchiving topic...");
       setError(null);
 
       try {
-        const result = await unarchiveForumTopic(topicId);
+        const message = `Unarchive forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+
+        const result = await unarchiveForumTopic({
+          topicId,
+          address,
+          signature,
+          message,
+        });
 
         if (!result.success) {
           throw new Error(result.error);
@@ -649,17 +746,29 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    []
+    [isConnected, address, signMessageAsync]
   );
 
   const unarchiveAttachment = useCallback(
     async (attachmentId: number): Promise<boolean> => {
+      if (!isConnected || !address) {
+        throw new Error("Please connect your wallet first");
+      }
+
       setLoading(true);
       const toastId = toast.loading("Unarchiving attachment...");
       setError(null);
 
       try {
-        const result = await unarchiveForumAttachment(attachmentId);
+        const message = `Unarchive forum attachment: ${attachmentId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+
+        const result = await unarchiveForumAttachment({
+          attachmentId,
+          address,
+          signature,
+          message,
+        });
 
         if (!result.success) {
           throw new Error(result.error);
@@ -678,12 +787,12 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    []
+    [isConnected, address, signMessageAsync]
   );
 
   const unarchiveCategory = useCallback(
     async (categoryId: number): Promise<boolean> => {
-      if (!address) {
+      if (!isConnected || !address) {
         toast.error("Please connect your wallet first");
         return false;
       }
@@ -693,7 +802,15 @@ export const useForum = () => {
       setError(null);
 
       try {
-        const result = await unarchiveForumCategory(categoryId, address);
+        const message = `Unarchive forum category: ${categoryId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+
+        const result = await unarchiveForumCategory({
+          categoryId,
+          adminAddress: address,
+          signature,
+          message,
+        });
 
         if (!result.success) {
           throw new Error(result.error);
@@ -712,7 +829,7 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [address]
+    [isConnected, address, signMessageAsync]
   );
 
   return {
@@ -740,10 +857,10 @@ export const useForum = () => {
   };
 };
 
-export const useForumAdmin = (categoryId: number) => {
+export const useForumAdmin = (categoryId?: number) => {
   const { address } = useAccount();
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["forum-admin", categoryId, address],
     queryFn: () => checkForumPermissions(address || "", categoryId),
   });
@@ -751,5 +868,9 @@ export const useForumAdmin = (categoryId: number) => {
   return {
     isAdmin: !!data?.isAdmin,
     canCreateTopics: !!data?.canCreateTopics,
+    canManageTopics: !!data?.canManageTopics,
+    canCreateAttachments: !!data?.canCreateAttachments,
+    canManageAttachments: !!data?.canManageAttachments,
+    isLoading,
   };
 };

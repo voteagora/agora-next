@@ -46,7 +46,7 @@ const ReportModal = ({
   const { createPost, deleteTopic, archiveTopic } = useForum();
   const { address, isConnected } = useAccount();
   const openDialog = useOpenDialog();
-  const { isAdmin } = useForumAdmin(DUNA_CATEGORY_ID);
+  const { isAdmin, canManageTopics } = useForumAdmin(DUNA_CATEGORY_ID);
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,12 +173,12 @@ const ReportModal = ({
   const canArchive = canArchiveContent(
     address || "",
     report.author || "",
-    isAdmin
+    isAdmin || canManageTopics
   );
   const canDelete = canDeleteContent(
     address || "",
     report.author || "",
-    isAdmin
+    isAdmin || canManageTopics
   );
 
   return (
@@ -288,7 +288,6 @@ const ReportModal = ({
               onSubmitReply={handleSubmitReply}
               onCancelReply={handleCancelReply}
               onDelete={handleDeleteComment}
-              isAdmin={isAdmin}
             />
 
             {/* Comment Input */}
