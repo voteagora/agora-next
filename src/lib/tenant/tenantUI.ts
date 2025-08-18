@@ -143,6 +143,10 @@ type TenantUIParams = {
     customCardSize?: string;
     customIconColor?: string;
     customHeaderBackground?: string;
+    customFooterHideChangelog?: boolean;
+    customFooterHideVotableSupply?: boolean;
+    customFooterHideTotalSupply?: boolean;
+    customFooterBackground?: string;
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -199,6 +203,10 @@ export class TenantUI {
     customTitleSize?: string;
     customCardSize?: string;
     customIconColor?: string;
+    customFooterHideChangelog?: boolean;
+    customFooterHideVotableSupply?: boolean;
+    customFooterHideTotalSupply?: boolean;
+    customFooterBackground?: string;
   };
   private _theme: "light" | "dark";
   private _favicon?: {
@@ -333,6 +341,10 @@ export class TenantUI {
         customTitleSize?: string;
         customCardSize?: string;
         customIconColor?: string;
+        customFooterHideChangelog?: boolean;
+        customFooterHideVotableSupply?: boolean;
+        customFooterHideTotalSupply?: boolean;
+        customFooterBackground?: string;
       }
     | undefined {
     return this._customization;
