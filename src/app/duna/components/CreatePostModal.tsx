@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import { ConnectKitButton } from "connectkit";
 import { DunaEditor } from "@/components/duna-editor";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -38,7 +39,7 @@ const CreatePostModal = ({
 
   // Check if current tenant is Towns
   const { namespace } = Tenant.current();
-  const isTowns = namespace === "towns";
+  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +89,7 @@ const CreatePostModal = ({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
         className={`max-w-2xl w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto ${
-          isTowns ? "bg-[#1E1A2F] border-[#43_36_73]" : ""
+          isTowns ? "bg-[#1E1A2F] border-[#2B2449]" : ""
         }`}
       >
         <DialogHeader>
@@ -107,20 +108,28 @@ const CreatePostModal = ({
               {({ show }) => (
                 <Button
                   onClick={() => show?.()}
-                  className="text-white border border-black hover:bg-gray-800 text-sm"
-                  style={{
-                    display: "flex",
-                    height: "36px",
-                    padding: "12px 20px",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: "8px",
-                    flexShrink: 0,
-                    borderRadius: "8px",
-                    background: "#171717",
-                    boxShadow:
-                      "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-                  }}
+                  className={`${
+                    isTowns
+                      ? "bg-[#5A4B7A] text-white border-[#5A4B7A] hover:bg-[#6B5C8B]"
+                      : "text-white border border-black hover:bg-gray-800"
+                  } text-sm`}
+                  style={
+                    !isTowns
+                      ? {
+                          display: "flex",
+                          height: "36px",
+                          padding: "12px 20px",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          gap: "8px",
+                          flexShrink: 0,
+                          borderRadius: "8px",
+                          background: "#171717",
+                          boxShadow:
+                            "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+                        }
+                      : undefined
+                  }
                 >
                   Connect your wallet to create a post
                 </Button>
@@ -143,10 +152,10 @@ const CreatePostModal = ({
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-gray-200 ${
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 ${
                   isTowns
-                    ? "bg-[#2A2338] text-white border-[#43_36_73] placeholder-[#87819F]"
-                    : "bg-white text-primary border-[#E5E5E5]"
+                    ? "bg-[#2A2338] text-white border-[#2B2449] placeholder-[#87819F] focus:ring-[#5A4B7A] focus:border-[#5A4B7A]"
+                    : "bg-white text-primary border-[#E5E5E5] focus:ring-gray-200"
                 }`}
                 placeholder="Enter post title..."
                 required
@@ -195,7 +204,7 @@ const CreatePostModal = ({
                   onClick={() => document.getElementById("attachment")?.click()}
                   className={`w-full sm:w-auto ${
                     isTowns
-                      ? "bg-[#43_36_73] text-white border-[#43_36_73] hover:bg-[#5A4B7A]"
+                      ? "bg-[#2B2449] text-white border-[#2B2449] hover:bg-[#5A4B7A]"
                       : "bg-neutral text-primary border border-line hover:bg-wash"
                   }`}
                   disabled={isSubmitting}
@@ -221,7 +230,7 @@ const CreatePostModal = ({
                 onClick={handleClose}
                 className={`${
                   isTowns
-                    ? "bg-[#43_36_73] text-white border-[#43_36_73] hover:bg-[#5A4B7A]"
+                    ? "bg-[#2B2449] text-white border-[#2B2449] hover:bg-[#5A4B7A]"
                     : "bg-neutral text-primary border border-line hover:bg-wash"
                 }`}
                 disabled={isSubmitting}
@@ -230,20 +239,28 @@ const CreatePostModal = ({
               </Button>
               <Button
                 type="submit"
-                className="text-white border border-black hover:bg-gray-800 text-sm"
-                style={{
-                  display: "flex",
-                  height: "36px",
-                  padding: "12px 20px",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "8px",
-                  flexShrink: 0,
-                  borderRadius: "8px",
-                  background: "#171717",
-                  boxShadow:
-                    "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-                }}
+                className={`${
+                  isTowns
+                    ? "bg-[#5A4B7A] text-white border-[#5A4B7A] hover:bg-[#6B5C8B]"
+                    : "text-white border border-black hover:bg-gray-800"
+                } text-sm`}
+                style={
+                  !isTowns
+                    ? {
+                        display: "flex",
+                        height: "36px",
+                        padding: "12px 20px",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gap: "8px",
+                        flexShrink: 0,
+                        borderRadius: "8px",
+                        background: "#171717",
+                        boxShadow:
+                          "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+                      }
+                    : undefined
+                }
                 disabled={
                   isSubmitting ||
                   !title.trim() ||

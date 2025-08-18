@@ -10,6 +10,8 @@ import toast from "react-hot-toast";
 import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DUNA_CATEGORY_ID } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 // Custom up-down chevron icon (outline)
 const UpDownChevronIcon = ({ className }: { className?: string }) => (
@@ -38,6 +40,10 @@ const QuarterlyReportsSection = ({
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [showAllReports, setShowAllReports] = useState(false);
   const { address } = useAccount();
+
+  // Check if current tenant is Towns
+  const { namespace } = Tenant.current();
+  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   const { createTopic, loading } = useForum();
   const { canCreateTopics } = useForumAdmin(DUNA_CATEGORY_ID);
@@ -120,8 +126,7 @@ const QuarterlyReportsSection = ({
           ? {
               ...report,
               comments: (report.comments || []).filter(
-                (comment) =>
-                  comment.id !== commentId && comment.parentId !== commentId
+                (comment) => comment.id !== commentId
               ),
             }
           : report
@@ -129,10 +134,8 @@ const QuarterlyReportsSection = ({
     );
   };
 
-  // Show only 2 latest reports initially
-  const initialReportsCount = 2;
+  const initialReportsCount = 3;
   const hasMoreReports = reports.length > initialReportsCount;
-
   const displayedReports = showAllReports
     ? reports
     : reports.slice(0, initialReportsCount);
@@ -145,24 +148,38 @@ const QuarterlyReportsSection = ({
     <div>
       {!hideHeader && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
-          <h4 className="text-lg font-bold text-primary">Quarterly Reports</h4>
+          <h4
+            className={`text-lg font-bold ${
+              isTowns ? "text-white" : "text-primary"
+            }`}
+          >
+            {isTowns ? "Community Dialogue" : "Quarterly Reports"}
+          </h4>
           {!!address && canCreateTopics && (
             <Button
               onClick={handleCreatePost}
-              className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto"
-              style={{
-                display: "flex",
-                height: "36px",
-                padding: "12px 20px",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "8px",
-                flexShrink: 0,
-                borderRadius: "8px",
-                background: "#171717",
-                boxShadow:
-                  "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-              }}
+              className={`${
+                isTowns
+                  ? "bg-[#5A4B7A] text-white border-[#5A4B7A] hover:bg-[#6B5C8B]"
+                  : "text-white border border-black hover:bg-gray-800"
+              } text-sm w-full sm:w-auto`}
+              style={
+                !isTowns
+                  ? {
+                      display: "flex",
+                      height: "36px",
+                      padding: "12px 20px",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: "8px",
+                      flexShrink: 0,
+                      borderRadius: "8px",
+                      background: "#171717",
+                      boxShadow:
+                        "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+                    }
+                  : undefined
+              }
             >
               Create new post
             </Button>
@@ -172,13 +189,15 @@ const QuarterlyReportsSection = ({
 
       {loading && (
         <div className="text-center py-4">
-          <div className="text-secondary">Creating report...</div>
+          <div className={isTowns ? "text-white" : "text-secondary"}>
+            Creating report...
+          </div>
         </div>
       )}
 
       {reports.length === 0 && (
         <div className="text-center py-8">
-          <div className="text-secondary">
+          <div className={isTowns ? "text-white" : "text-secondary"}>
             No reports found. Create the first one!
           </div>
         </div>
@@ -186,8 +205,12 @@ const QuarterlyReportsSection = ({
 
       {reports.length > 0 && (
         <div
-          className="border rounded-lg bg-white"
-          style={{ borderColor: "#E5E5E5" }}
+          className={`border rounded-lg ${
+            isTowns ? "bg-[#1E1A2F]" : "bg-white"
+          }`}
+          style={{
+            borderColor: isTowns ? "#2B2449" : "#E5E5E5",
+          }}
         >
           {displayedReports.map((report, index) => (
             <QuarterlyReportCard
@@ -203,18 +226,28 @@ const QuarterlyReportsSection = ({
           {/* Toggle button in the middle */}
           {hasMoreReports && (
             <div
-              className="flex justify-between items-center py-3 border-t px-4"
-              style={{ borderTopColor: "#E5E5E5" }}
+              className={`flex justify-between items-center py-3 border-t px-4 ${
+                isTowns ? "border-[#2B2449]" : ""
+              }`}
+              style={!isTowns ? { borderTopColor: "#E5E5E5" } : {}}
             >
               <button
                 onClick={handleToggleReports}
-                className="text-xs font-medium text-secondary hover:text-primary transition-colors"
+                className={`text-xs font-medium transition-colors ${
+                  isTowns
+                    ? "text-[#87819F] hover:text-white"
+                    : "text-secondary hover:text-primary"
+                }`}
               >
                 {showAllReports ? "SHOW LESS" : "VIEW OLDER POSTS"}
               </button>
               <button
                 onClick={handleToggleReports}
-                className="text-secondary hover:text-primary transition-colors"
+                className={`transition-colors ${
+                  isTowns
+                    ? "text-[#87819F] hover:text-white"
+                    : "text-secondary hover:text-primary"
+                }`}
               >
                 <UpDownChevronIcon className="w-4 h-4" />
               </button>

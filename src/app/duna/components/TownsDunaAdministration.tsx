@@ -7,22 +7,21 @@ import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 import { DUNA_CATEGORY_ID } from "@/lib/constants";
 
 const TownsDunaAdministration = async () => {
-  
   let dunaReports: ForumTopic[] = [];
   let documents: any[] = [];
-  
+
   try {
     const [topicsResult, documentsResult] = await Promise.all([
       getForumTopics(DUNA_CATEGORY_ID),
-      getForumAttachments()
+      getForumAttachments(),
     ]);
-    
+
     if (topicsResult.success) {
       dunaReports = transformForumTopics(topicsResult.data, {
         mergePostAttachments: true,
       });
     }
-    
+
     if (documentsResult.success) {
       documents = documentsResult.data;
     }
@@ -31,7 +30,7 @@ const TownsDunaAdministration = async () => {
   }
 
   return (
-    <div className="mt-12">
+    <div className="mt-12 towns-tenant">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-2xl font-black text-primary">
           DUNA Administration
@@ -48,7 +47,10 @@ const TownsDunaAdministration = async () => {
       {/* Community Dialogue Section - EXACT same as Uniswap */}
       <Card className="border border-line shadow-sm bg-[#1E1A2F] mt-6 [&_button]:!bg-white [&_button]:!text-black [&_button]:!border-gray-300 [&_button]:hover:!bg-gray-50">
         <CardContent className="p-6">
-          <QuarterlyReportsSection initialReports={dunaReports} hideHeader={false} />
+          <QuarterlyReportsSection
+            initialReports={dunaReports}
+            hideHeader={false}
+          />
         </CardContent>
       </Card>
 

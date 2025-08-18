@@ -40,37 +40,50 @@ const ToolbarButton = ({
   children: React.ReactNode;
   tooltip: string;
   shortcut?: string;
-}) => (
-  <TooltipProvider>
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          onClick={onClick}
-          disabled={disabled}
-          className={cn(
-            "h-8 w-8 p-1.5 rounded-md transition-colors inline-flex items-center justify-center",
-            isActive && !disabled
-              ? "bg-black text-white hover:bg-black/90"
-              : "text-secondary hover:text-primary hover:bg-wash",
-            disabled && "opacity-50 cursor-not-allowed"
-          )}
-          aria-pressed={isActive}
-        >
-          {children}
-        </button>
-      </TooltipTrigger>
-      <TooltipContent>
-        <div className="flex flex-col items-center gap-1">
-          <span>{tooltip}</span>
-          {shortcut && (
-            <span className="text-xs text-tertiary">{shortcut}</span>
-          )}
-        </div>
-      </TooltipContent>
-    </Tooltip>
-  </TooltipProvider>
-);
+}) => {
+  // Check if current tenant is Towns
+  const isTowns =
+    (typeof window !== "undefined" &&
+      window.location.hostname.includes("towns")) ||
+    (typeof process !== "undefined" &&
+      process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME === "towns");
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            onClick={onClick}
+            disabled={disabled}
+            className={cn(
+              "h-8 w-8 p-1.5 rounded-md transition-colors inline-flex items-center justify-center",
+              isActive && !disabled
+                ? isTowns
+                  ? "bg-[#5A4B7A] text-white hover:bg-[#6B5C8B]"
+                  : "bg-black text-white hover:bg-black/90"
+                : isTowns
+                  ? "text-white hover:bg-[#2A2338]"
+                  : "text-secondary hover:text-primary hover:bg-wash",
+              disabled && "opacity-50 cursor-not-allowed"
+            )}
+            aria-pressed={isActive}
+          >
+            {children}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <div className="flex flex-col items-center gap-1">
+            <span>{tooltip}</span>
+            {shortcut && (
+              <span className="text-xs text-tertiary">{shortcut}</span>
+            )}
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 // Link dialog component
 const LinkDialog = ({
@@ -117,7 +130,7 @@ const LinkDialog = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
       <div
         className={`rounded-lg shadow-lg p-4 w-80 max-w-[90vw] ${
-          isTowns ? "bg-[#1E1A2F] border border-[#43_36_73]" : "bg-white"
+          isTowns ? "bg-[#1E1A2F] border border-[#2B2449]" : "bg-white"
         }`}
       >
         <h3
@@ -136,7 +149,7 @@ const LinkDialog = ({
             placeholder="https://example.com"
             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:border-line ${
               isTowns
-                ? "bg-[#2A2338] text-white border-[#43_36_73] placeholder-[#87819F] focus:ring-[#5A4B7A] focus:border-[#5A4B7A]"
+                ? "bg-[#2A2338] text-white border-[#2B2449] placeholder-[#87819F] focus:ring-[#5A4B7A] focus:border-[#5A4B7A]"
                 : "bg-wash text-primary border-line focus:ring-line"
             }`}
             autoFocus
@@ -147,7 +160,7 @@ const LinkDialog = ({
               onClick={onClose}
               className={`flex-1 px-3 py-2 border rounded-md transition-colors ${
                 isTowns
-                  ? "bg-[#43_36_73] text-white border-[#43_36_73] hover:bg-[#5A4B7A]"
+                  ? "bg-[#2B2449] text-white border-[#2B2449] hover:bg-[#5A4B7A]"
                   : "bg-white text-primary border-line hover:bg-wash"
               }`}
             >
@@ -256,7 +269,7 @@ export default function DunaEditor({
           "prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1",
           "prose-li:my-0 prose-p:leading-relaxed",
           isTowns
-            ? "prose-ol:text-white prose-ul:text-white prose-li:text-white prose-ol:marker:text-white prose-ul:marker:text-white prose-a:text-white prose-a:underline hover:prose-a:no-underline prose-p:text-white prose-blockquote:text-white prose-code:text-white prose-pre:text-white prose-headings:text-white"
+            ? "prose-ol:text-white prose-ul:text-white prose-li:text-white prose-ol:marker:text-white prose-ul:marker:text-white prose-a:text-white prose-a:underline hover:prose-a:no-underline prose-p:text-white prose-blockquote:text-white prose-code:text-white prose-pre:text-white prose-headings:text-white prose-strong:text-white prose-b:text-white prose-em:text-white prose-i:text-white prose-del:text-white prose-s:text-white prose-ins:text-white prose-mark:text-white"
             : "prose-ol:text-primary prose-ul:text-primary prose-li:text-primary prose-ol:marker:text-primary prose-ul:marker:text-primary prose-a:text-primary prose-a:underline hover:prose-a:no-underline",
           "prose-ol:list-decimal prose-ul:list-disc"
         ),
@@ -425,14 +438,14 @@ export default function DunaEditor({
         variant === "post" ? "min-h-[200px]" : "min-h-[120px]",
         className,
         isTowns
-          ? "border-[#43_36_73] bg-[#2A2338] focus-within:ring-[#5A4B7A] focus-within:border-[#5A4B7A]"
+          ? "border-[#2B2449] bg-[#2A2338] focus-within:ring-[#5A4B7A] focus-within:border-[#5A4B7A]"
           : "border-line bg-white focus-within:ring-line"
       )}
     >
       {/* Toolbar */}
       <div
         className={`flex items-center gap-1 p-2 border-b rounded-t-lg ${
-          isTowns ? "border-[#43_36_73] bg-[#1E1A2F]" : "border-line bg-wash"
+          isTowns ? "border-[#2B2449] bg-[#1E1A2F]" : "border-line bg-wash"
         }`}
       >
         <ToolbarButton
@@ -563,6 +576,54 @@ export default function DunaEditor({
         onKeyDown={handleKeyDown}
         style={isTowns ? { color: "white" } : {}}
       >
+        {isTowns && (
+          <style jsx global>{`
+            .ProseMirror {
+              color: white !important;
+            }
+            .ProseMirror strong,
+            .ProseMirror b,
+            .ProseMirror em,
+            .ProseMirror i,
+            .ProseMirror u,
+            .ProseMirror s,
+            .ProseMirror del,
+            .ProseMirror ins,
+            .ProseMirror mark,
+            .ProseMirror code,
+            .ProseMirror pre,
+            .ProseMirror blockquote,
+            .ProseMirror h1,
+            .ProseMirror h2,
+            .ProseMirror h3,
+            .ProseMirror h4,
+            .ProseMirror h5,
+            .ProseMirror h6,
+            .ProseMirror p,
+            .ProseMirror li,
+            .ProseMirror a,
+            .ProseMirror span,
+            .ProseMirror div {
+              color: white !important;
+            }
+            /* Global list marker styling */
+            .ProseMirror ol li::marker,
+            .ProseMirror ul li::marker,
+            .ProseMirror ol li::before,
+            .ProseMirror ul li::before,
+            .ProseMirror li::marker,
+            .ProseMirror li::before {
+              color: white !important;
+            }
+            /* Force all list content to be white */
+            .ProseMirror ol,
+            .ProseMirror ul,
+            .ProseMirror ol li,
+            .ProseMirror ul li {
+              color: white !important;
+            }
+          `}</style>
+        )}
         <EditorContent editor={editor} />
       </div>
 

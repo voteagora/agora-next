@@ -17,6 +17,7 @@ import {
 import { useForum } from "@/hooks/useForum";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface DocumentUploadModalProps {
   isOpen: boolean;
@@ -44,7 +45,7 @@ export default function DocumentUploadModal({
 
   // Check if current tenant is Towns
   const { namespace } = Tenant.current();
-  const isTowns = namespace === "towns";
+  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   const validateFile = (file: File): { valid: boolean; error?: string } => {
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -223,7 +224,7 @@ export default function DocumentUploadModal({
     <Dialog open={isOpen} onOpenChange={handleModalClose}>
       <DialogContent
         className={`sm:max-w-md w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto ${
-          isTowns ? "bg-[#1E1A2F] border-[#43_36_73]" : ""
+          isTowns ? "bg-[#1E1A2F] border-[#2B2449]" : ""
         }`}
       >
         <DialogHeader>
@@ -251,7 +252,7 @@ export default function DocumentUploadModal({
                       ? "border-[#5A4B7A] bg-[#2A2338]"
                       : "border-gray-400 bg-gray-50 dark:bg-gray-900/20"
                     : isTowns
-                      ? "border-[#43_36_73] hover:border-[#5A4B7A]"
+                      ? "border-[#2B2449] hover:border-[#5A4B7A]"
                       : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
                 }
               `}
@@ -300,7 +301,7 @@ export default function DocumentUploadModal({
             <div
               className={`border rounded-lg p-3 sm:p-4 ${
                 isTowns
-                  ? "bg-[#2A2338] border-[#43_36_73]"
+                  ? "bg-[#2A2338] border-[#2B2449]"
                   : "bg-gray-50 dark:bg-gray-800"
               }`}
               style={!isTowns ? { borderColor: "#E5E5E5" } : {}}
@@ -363,9 +364,7 @@ export default function DocumentUploadModal({
                   </div>
                   <div
                     className={`w-full rounded-full h-2 ${
-                      isTowns
-                        ? "bg-[#43_36_73]"
-                        : "bg-gray-200 dark:bg-gray-700"
+                      isTowns ? "bg-[#2B2449]" : "bg-gray-200 dark:bg-gray-700"
                     }`}
                   >
                     <div
@@ -399,7 +398,7 @@ export default function DocumentUploadModal({
             disabled={isUploading}
             className={`w-full sm:w-auto order-2 sm:order-1 ${
               isTowns
-                ? "bg-[#43_36_73] text-white border-[#43_36_73] hover:bg-[#5A4B7A]"
+                ? "bg-[#2B2449] text-white border-[#2B2449] hover:bg-[#5A4B7A]"
                 : "bg-neutral text-primary border hover:bg-wash"
             }`}
             style={!isTowns ? { borderColor: "#E5E5E5" } : {}}
@@ -409,20 +408,28 @@ export default function DocumentUploadModal({
           <Button
             onClick={handleFileUpload}
             disabled={!selectedFile || isUploading}
-            className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto order-1 sm:order-2"
-            style={{
-              display: "flex",
-              height: "36px",
-              padding: "12px 20px",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "8px",
-              flexShrink: 0,
-              borderRadius: "8px",
-              background: "#171717",
-              boxShadow:
-                "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-            }}
+            className={`${
+              isTowns
+                ? "bg-[#5A4B7A] text-white border-[#5A4B7A] hover:bg-[#6B5C8B]"
+                : "text-white border border-black hover:bg-gray-800"
+            } text-sm w-full sm:w-auto order-1 sm:order-2`}
+            style={
+              !isTowns
+                ? {
+                    display: "flex",
+                    height: "36px",
+                    padding: "12px 20px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "8px",
+                    flexShrink: 0,
+                    borderRadius: "8px",
+                    background: "#171717",
+                    boxShadow:
+                      "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+                  }
+                : undefined
+            }
           >
             {isUploading ? "Uploading..." : "Upload Document"}
           </Button>
