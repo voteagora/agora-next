@@ -46,6 +46,10 @@ const QuarterlyReportCard = ({
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
+  // Check if current tenant is Towns
+  const { namespace } = Tenant.current();
+  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+
   const canArchive = canArchiveContent(
     address || "",
     report.author || "",

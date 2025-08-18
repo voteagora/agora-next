@@ -11,6 +11,17 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { FileIcon } from "lucide-react";
+import { DUNA_CATEGORY_ID } from "@/lib/constants";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+
+interface ForumDocument {
+  id: number;
+  name: string;
+  url: string;
+  ipfsCid: string;
+  createdAt: string;
+  uploadedBy: string;
+}
 
 interface ForumDocument {
   id: number;
@@ -34,13 +45,13 @@ const DocumentsSection = ({
     initialDocuments || []
   );
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const {
-    fetchDocuments,
-    deleteAttachment,
-    archiveAttachment,
-    loading,
-    error,
-  } = useForum();
+
+  // Check if current tenant is Towns
+  const { namespace } = Tenant.current();
+  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+
+  const { fetchDocuments, deleteAttachment, archiveAttachment } = useForum();
+
   const { address } = useAccount();
   const openDialog = useOpenDialog();
   const { dunaCategoryId } = useDunaCategory();
