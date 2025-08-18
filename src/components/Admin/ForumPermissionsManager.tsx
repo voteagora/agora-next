@@ -194,7 +194,7 @@ const ForumPermissionsManager = ({
     return (
       <div className="mt-12 text-center">
         <p className="text-tertiary">
-          You don't have permission to manage forum settings.
+          You don&apos;t have permission to manage forum settings.
         </p>
       </div>
     );
