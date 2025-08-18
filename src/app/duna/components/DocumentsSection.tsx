@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
@@ -12,11 +12,12 @@ import { DUNA_CATEGORY_ID } from "@/lib/constants";
 import { FileIcon } from "lucide-react";
 
 interface DocumentsSectionProps {
+  initialDocuments: any[];
   hideHeader?: boolean;
 }
 
-const DocumentsSection = ({ hideHeader = false }: DocumentsSectionProps) => {
-  const [documents, setDocuments] = useState<any[]>([]);
+const DocumentsSection = ({ initialDocuments, hideHeader = false }: DocumentsSectionProps) => {
+  const [documents, setDocuments] = useState<any[]>(initialDocuments || []);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const {
     fetchDocuments,
@@ -30,23 +31,11 @@ const DocumentsSection = ({ hideHeader = false }: DocumentsSectionProps) => {
   const { isAdmin, canCreateAttachments, canManageAttachments } =
     useForumAdmin(DUNA_CATEGORY_ID);
 
-  useEffect(() => {
-    loadDocuments();
-  }, []);
 
-  const loadDocuments = async () => {
+
+  const handleUploadComplete = async () => {
     const documentsData = await fetchDocuments();
     setDocuments(documentsData);
-  };
-
-  const handleUploadComplete = async (uploadedDocument: {
-    name: string;
-    url: string;
-    ipfsCid: string;
-    fileSize: number;
-    contentType: string;
-  }) => {
-    await loadDocuments();
     setIsUploadModalOpen(false);
   };
 

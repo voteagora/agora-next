@@ -1,34 +1,35 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import Tenant from "@/lib/tenant/tenant";
 import QuarterlyReportsSection from "./QuarterlyReportsSection";
 import DocumentsSection from "./DocumentsSection";
-import { useForum } from "@/hooks/useForum";
+import { getForumTopics, getForumAttachments } from "@/lib/actions/forum";
 import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 import { DUNA_CATEGORY_ID } from "@/lib/constants";
 
-const TownsDunaAdministration = () => {
-  const { ui } = Tenant.current();
-  const [topics, setTopics] = useState<ForumTopic[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { fetchTopics } = useForum();
-
-  useEffect(() => {
-    const loadTopics = async () => {
-      try {
-        const topicsData = await fetchTopics(DUNA_CATEGORY_ID);
-        setTopics(topicsData);
-      } catch (error) {
-        console.error("Error fetching topics:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadTopics();
-  }, [fetchTopics]);
+const TownsDunaAdministration = async () => {
+  
+  let dunaReports: ForumTopic[] = [];
+  let documents: any[] = [];
+  
+  try {
+    const topicsResult = await getForumTopics(DUNA_CATEGORY_ID);
+    if (topicsResult.success) {
+      dunaReports = transformForumTopics(topicsResult.data, {
+        mergePostAttachments: true,
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching forum topics:", error);
+  }
+  
+  try {
+    const documentsResult = await getForumAttachments();
+    if (documentsResult.success) {
+      documents = documentsResult.data;
+    }
+  } catch (error) {
+    console.error("Error fetching forum documents:", error);
+  }
 
   return (
     <div className="mt-12">
@@ -41,14 +42,14 @@ const TownsDunaAdministration = () => {
       {/* Documents Section - EXACT same as Uniswap */}
       <Card className="border border-line shadow-sm bg-[#1E1A2F] [&_button]:!bg-white [&_button]:!text-black [&_button]:!border-gray-300 [&_button]:hover:!bg-gray-50">
         <CardContent className="p-6">
-          <DocumentsSection hideHeader={false} />
+          <DocumentsSection initialDocuments={documents} hideHeader={false} />
         </CardContent>
       </Card>
 
       {/* Community Dialogue Section - EXACT same as Uniswap */}
       <Card className="border border-line shadow-sm bg-[#1E1A2F] mt-6 [&_button]:!bg-white [&_button]:!text-black [&_button]:!border-gray-300 [&_button]:hover:!bg-gray-50">
         <CardContent className="p-6">
-          <QuarterlyReportsSection initialReports={topics} hideHeader={false} />
+          <QuarterlyReportsSection initialReports={dunaReports} hideHeader={false} />
         </CardContent>
       </Card>
 
