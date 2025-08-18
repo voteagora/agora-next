@@ -269,6 +269,11 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
               alt="Agora Logo"
               width={82}
               height={21}
+              style={{
+                filter: ui.customization?.customFooterBackground
+                  ? "brightness(0) invert(1)"
+                  : "none",
+              }}
             />
             <div className="justify-start text-primary font-normal text-sm">
               Onchain Governance
