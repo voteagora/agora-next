@@ -215,7 +215,7 @@ export default function DAOMetricsHeader() {
                     >
                       <span>Total amount of {token.symbol} in existence</span>
                     </HoverCardContent>
-                  </HoverCard>
+                  </HoverCard>,
                   {contracts.token.isERC20() &&
                     !ui.customization?.customFooterHideVotableSupply && (
                       <HoverCard openDelay={100} closeDelay={100}>
