@@ -105,12 +105,29 @@ const LinkDialog = ({
     }
   };
 
+  // Check if current tenant is Towns
+  const isTowns =
+    (typeof window !== "undefined" &&
+      window.location.hostname.includes("towns")) ||
+    (typeof process !== "undefined" &&
+      process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME === "towns");
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
-      <div className="bg-white rounded-lg shadow-lg p-4 w-80 max-w-[90vw]">
-        <h3 className="text-sm font-medium text-primary mb-3">Add Link</h3>
+      <div
+        className={`rounded-lg shadow-lg p-4 w-80 max-w-[90vw] ${
+          isTowns ? "bg-[#1E1A2F] border border-[#43_36_73]" : "bg-white"
+        }`}
+      >
+        <h3
+          className={`text-sm font-medium mb-3 ${
+            isTowns ? "text-white" : "text-primary"
+          }`}
+        >
+          Add Link
+        </h3>
         <form>
           <input
             type="url"
@@ -125,7 +142,11 @@ const LinkDialog = ({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-3 py-2 border border-line rounded-md bg-white text-primary hover:bg-wash transition-colors"
+              className={`flex-1 px-3 py-2 border rounded-md transition-colors ${
+                isTowns
+                  ? "bg-[#43_36_73] text-white border-[#43_36_73] hover:bg-[#5A4B7A]"
+                  : "bg-white text-primary border-line hover:bg-wash"
+              }`}
             >
               Cancel
             </button>
@@ -168,6 +189,13 @@ export default function DunaEditor({
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [linkDialogUrl, setLinkDialogUrl] = useState("");
   const { ui } = Tenant.current();
+
+  // Check if current tenant is Towns
+  const isTowns =
+    (typeof window !== "undefined" &&
+      window.location.hostname.includes("towns")) ||
+    (typeof process !== "undefined" &&
+      process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME === "towns");
 
   // Debug link dialog state
   useEffect(() => {
@@ -393,7 +421,10 @@ export default function DunaEditor({
       className={cn(
         "border rounded-lg shadow-sm transition-all",
         variant === "post" ? "min-h-[200px]" : "min-h-[120px]",
-        className
+        className,
+        isTowns
+          ? "border-[#43_36_73] bg-[#2A2338] focus-within:ring-[#5A4B7A] focus-within:border-[#5A4B7A]"
+          : "border-line bg-white focus-within:ring-line"
       )}
       style={{
         backgroundColor: ui.customization?.cardBackground
