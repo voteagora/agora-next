@@ -36,7 +36,6 @@ const TownsDunaAdministration = async () => {
         mergePostAttachments: true,
       });
     }
-
     if (documentsResult.success) {
       documents = documentsResult.data;
     }
@@ -72,7 +71,7 @@ const TownsDunaAdministration = async () => {
       {/* Community Dialogue Section - EXACT same as Uniswap */}
       <Card className="border border-line shadow-sm bg-[#1E1A2F] mt-6 [&_button]:!bg-white [&_button]:!text-black [&_button]:!border-gray-300 [&_button]:hover:!bg-gray-50">
         <CardContent className="p-6">
-          <QuarterlyReportsSection initialReports={topics} hideHeader={false} />
+          <QuarterlyReportsSection initialReports={dunaReports} hideHeader={false} />
         </CardContent>
       </Card>
 
