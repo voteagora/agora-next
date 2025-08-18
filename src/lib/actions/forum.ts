@@ -313,10 +313,12 @@ async function _deleteForumTopicInternal(topicId: number) {
 }
 
 export async function deleteForumTopic(
-  data: z.infer<typeof deleteTopicSchema> | { topicId: number; _internal?: boolean }
+  data:
+    | z.infer<typeof deleteTopicSchema>
+    | { topicId: number; _internal?: boolean }
 ) {
   // Allow internal cleanup operations to bypass signature verification
-  if ('_internal' in data && data._internal) {
+  if ("_internal" in data && data._internal) {
     return _deleteForumTopicInternal(data.topicId);
   }
 
@@ -376,9 +378,7 @@ const deletePostSchema = z.object({
   message: z.string().min(1, "Signed message is required"),
 });
 
-export async function deleteForumPost(
-  data: z.infer<typeof deletePostSchema>
-) {
+export async function deleteForumPost(data: z.infer<typeof deletePostSchema>) {
   try {
     const validatedData = deletePostSchema.parse(data);
     const { slug } = Tenant.current();
@@ -1324,9 +1324,7 @@ const addAdminSchema = z.object({
   message: z.string().min(1, "Signed message is required"),
 });
 
-export async function addForumAdmin(
-  data: z.infer<typeof addAdminSchema>
-) {
+export async function addForumAdmin(data: z.infer<typeof addAdminSchema>) {
   try {
     const validatedData = addAdminSchema.parse(data);
     const { slug } = Tenant.current();
