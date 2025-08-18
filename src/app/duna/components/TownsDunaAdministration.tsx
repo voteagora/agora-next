@@ -12,23 +12,22 @@ const TownsDunaAdministration = async () => {
   let documents: any[] = [];
   
   try {
-    const topicsResult = await getForumTopics(DUNA_CATEGORY_ID);
+    const [topicsResult, documentsResult] = await Promise.all([
+      getForumTopics(DUNA_CATEGORY_ID),
+      getForumAttachments()
+    ]);
+    
     if (topicsResult.success) {
       dunaReports = transformForumTopics(topicsResult.data, {
         mergePostAttachments: true,
       });
     }
-  } catch (error) {
-    console.error("Error fetching forum topics:", error);
-  }
-  
-  try {
-    const documentsResult = await getForumAttachments();
+    
     if (documentsResult.success) {
       documents = documentsResult.data;
     }
   } catch (error) {
-    console.error("Error fetching forum documents:", error);
+    console.error("Error fetching forum data:", error);
   }
 
   return (
