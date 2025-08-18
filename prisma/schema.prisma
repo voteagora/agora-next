@@ -4851,3 +4851,45 @@ model ForumAttachment {
   @@map("forum_attachments")
   @@schema("alltenant")
 }
+
+enum forum_permission_type {
+  manage_topics
+  create_topics
+  manage_attachments
+  create_attachments
+
+  @@schema("alltenant")
+}
+
+enum permission_scope {
+  forum
+  category
+
+  @@schema("alltenant")
+}
+
+model ForumPermission {
+  id             Int                   @id @default(autoincrement())
+  dao_slug       DaoSlug
+  permissionType forum_permission_type @map("permission_type")
+  scope          permission_scope      @default(forum)
+  scopeId        Int?                  @map("scope_id")
+  address        String
+
+  @@unique([dao_slug, permissionType, scope, scopeId, address])
+  @@index([dao_slug, permissionType])
+  @@index([dao_slug, scope, scopeId])
+  @@index([dao_slug, address])
+  @@index([dao_slug, permissionType, address])
+  @@map("forum_permissions")
+  @@schema("alltenant")
+}
+
+model ForumAdmin {
+  dao_slug DaoSlug
+  address  String
+
+  @@id([dao_slug, address])
+  @@map("forum_admins")
+  @@schema("alltenant")
+}

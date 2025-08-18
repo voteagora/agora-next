@@ -23,7 +23,8 @@ const DocumentsSection = () => {
   } = useForum();
   const { address } = useAccount();
   const openDialog = useOpenDialog();
-  const { isAdmin } = useForumAdmin(DUNA_CATEGORY_ID);
+  const { isAdmin, canCreateAttachments, canManageAttachments } =
+    useForumAdmin(DUNA_CATEGORY_ID);
 
   useEffect(() => {
     loadDocuments();
@@ -99,7 +100,7 @@ const DocumentsSection = () => {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <h4 className="text-lg font-bold text-primary">Documents</h4>
-        {!!address && (
+        {!!address && canCreateAttachments && (
           <Button
             onClick={() => setIsUploadModalOpen(true)}
             className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto"
@@ -148,12 +149,12 @@ const DocumentsSection = () => {
             const canArchive = canArchiveContent(
               address || "",
               document.uploadedBy || "",
-              isAdmin
+              isAdmin || canManageAttachments
             );
             const canDelete = canDeleteContent(
               address || "",
               document.uploadedBy || "",
-              isAdmin
+              isAdmin || canManageAttachments
             );
 
             return (

@@ -5,7 +5,6 @@ import { PrismaClient, AttachableType } from "@prisma/client";
 import { uploadFileToPinata, getIPFSUrl } from "@/lib/pinata";
 import Tenant from "@/lib/tenant/tenant";
 import verifyMessage from "@/lib/serverVerifyMessage";
-import { UIForumConfig } from "../tenant/tenantUI";
 
 const prisma = new PrismaClient();
 
@@ -952,10 +951,23 @@ export async function unarchiveForumCategory(
 ) {
   try {
     const { slug } = Tenant.current();
-    const tenant = Tenant.current();
-    const forumToggle = tenant.ui.toggle("duna");
-    const forumConfig = forumToggle?.config as UIForumConfig | undefined;
-    const forumAdmins = forumConfig?.adminAddresses || [];
+
+    // Check if the person unarchiving is an admin
+    const currentAdmin = await prisma.forumAdmin.findUnique({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: adminAddress.toLowerCase(),
+        },
+      },
+    });
+
+    if (!currentAdmin) {
+      return {
+        success: false,
+        error: "Only forum admins can unarchive categories",
+      };
+    }
 
     const category = await prisma.forumCategory.findFirst({
       where: {
@@ -967,13 +979,6 @@ export async function unarchiveForumCategory(
 
     if (!category) {
       return { success: false, error: "Category not found" };
-    }
-
-    if (!forumAdmins.includes(adminAddress as `0x${string}`)) {
-      return {
-        success: false,
-        error: "Only forum admins can unarchive categories",
-      };
     }
 
     await prisma.forumCategory.update({
@@ -996,5 +1001,334 @@ export async function unarchiveForumCategory(
     };
   } finally {
     await prisma.$disconnect();
+  }
+}
+
+// Forum Admin Management
+
+export async function getForumAdmins() {
+  try {
+    const { slug } = Tenant.current();
+
+    const admins = await prisma.forumAdmin.findMany({
+      where: {
+        dao_slug: slug,
+      },
+      orderBy: {
+        address: "asc",
+      },
+    });
+
+    return {
+      success: true,
+      data: admins,
+    };
+  } catch (error) {
+    console.error("Error fetching forum admins:", error);
+    return {
+      success: false,
+      error: "Failed to fetch forum admins",
+      data: [],
+    };
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function addForumAdmin(address: string, adminAddress: string) {
+  try {
+    const { slug } = Tenant.current();
+
+    // Check if the person adding is already an admin
+    const currentAdmin = await prisma.forumAdmin.findUnique({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: adminAddress.toLowerCase(),
+        },
+      },
+    });
+
+    if (!currentAdmin) {
+      return {
+        success: false,
+        error: "Only forum admins can add new admins",
+      };
+    }
+
+    // Add new admin
+    const admin = await prisma.forumAdmin.create({
+      data: {
+        dao_slug: slug,
+        address: address.toLowerCase(),
+      },
+    });
+
+    return {
+      success: true,
+      data: admin,
+    };
+  } catch (error) {
+    console.error("Error adding forum admin:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error && error.message.includes("unique constraint")
+          ? "User is already an admin"
+          : "Failed to add forum admin",
+    };
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function removeForumAdmin(address: string, adminAddress: string) {
+  try {
+    const { slug } = Tenant.current();
+
+    // Check if the person removing is an admin
+    const currentAdmin = await prisma.forumAdmin.findUnique({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: adminAddress.toLowerCase(),
+        },
+      },
+    });
+
+    if (!currentAdmin) {
+      return {
+        success: false,
+        error: "Only forum admins can remove admins",
+      };
+    }
+
+    // Remove admin
+    await prisma.forumAdmin.delete({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: address.toLowerCase(),
+        },
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error removing forum admin:", error);
+    return {
+      success: false,
+      error: "Failed to remove forum admin",
+    };
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+// Forum Permission Management
+
+export async function getForumPermissions(address?: string) {
+  try {
+    const { slug } = Tenant.current();
+
+    const whereClause: any = {
+      dao_slug: slug,
+    };
+
+    if (address) {
+      whereClause.address = address.toLowerCase();
+    }
+
+    const permissions = await prisma.forumPermission.findMany({
+      where: whereClause,
+      orderBy: [{ address: "asc" }, { permissionType: "asc" }],
+    });
+
+    return {
+      success: true,
+      data: permissions,
+    };
+  } catch (error) {
+    console.error("Error fetching forum permissions:", error);
+    return {
+      success: false,
+      error: "Failed to fetch forum permissions",
+      data: [],
+    };
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function addForumPermission(
+  address: string,
+  permissionType: string,
+  scope: "forum" | "category",
+  scopeId: number | null,
+  adminAddress: string
+) {
+  try {
+    const { slug } = Tenant.current();
+
+    // Check if the person adding is an admin
+    const currentAdmin = await prisma.forumAdmin.findUnique({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: adminAddress.toLowerCase(),
+        },
+      },
+    });
+
+    if (!currentAdmin) {
+      return {
+        success: false,
+        error: "Only forum admins can manage permissions",
+      };
+    }
+
+    // Add permission
+    const permission = await prisma.forumPermission.create({
+      data: {
+        dao_slug: slug,
+        address: address.toLowerCase(),
+        permissionType: permissionType as any,
+        scope: scope,
+        scopeId: scopeId,
+      },
+    });
+
+    return {
+      success: true,
+      data: permission,
+    };
+  } catch (error) {
+    console.error("Error adding forum permission:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error && error.message.includes("unique constraint")
+          ? "Permission already exists"
+          : "Failed to add forum permission",
+    };
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function removeForumPermission(
+  permissionId: number,
+  adminAddress: string
+) {
+  try {
+    const { slug } = Tenant.current();
+
+    // Check if the person removing is an admin
+    const currentAdmin = await prisma.forumAdmin.findUnique({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: adminAddress.toLowerCase(),
+        },
+      },
+    });
+
+    if (!currentAdmin) {
+      return {
+        success: false,
+        error: "Only forum admins can manage permissions",
+      };
+    }
+
+    // Remove permission
+    await prisma.forumPermission.delete({
+      where: {
+        id: permissionId,
+        dao_slug: slug,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error removing forum permission:", error);
+    return {
+      success: false,
+      error: "Failed to remove forum permission",
+    };
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function checkForumPermissions(
+  address: string,
+  categoryId?: number
+) {
+  try {
+    const { slug } = Tenant.current();
+
+    // Check if user is a forum admin
+    const forumAdmin = await prisma.forumAdmin.findUnique({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: address.toLowerCase(),
+        },
+      },
+    });
+
+    const isAdmin = !!forumAdmin;
+
+    // If admin, grant all permissions
+    if (isAdmin) {
+      return {
+        isAdmin: true,
+        canCreateTopics: true,
+        canManageTopics: true,
+        canCreateAttachments: true,
+        canManageAttachments: true,
+      };
+    }
+
+    const permissions = await prisma.forumPermission.findMany({
+      where: {
+        dao_slug: slug,
+        address: address.toLowerCase(),
+        OR: [
+          { scope: "forum", scopeId: null },
+          ...(categoryId
+            ? [{ scope: "category" as any, scopeId: categoryId }]
+            : []),
+        ],
+      },
+    });
+
+    const permissionTypes = permissions.map((p) => p.permissionType);
+
+    // Check category restrictions
+    let canCreateTopics = true;
+    if (categoryId) {
+      const response = await getForumCategory(categoryId);
+      const category = response?.data;
+      canCreateTopics =
+        !category?.adminOnlyTopics || permissionTypes.includes("create_topics");
+    }
+
+    return {
+      isAdmin: false,
+      canCreateTopics,
+      canManageTopics: permissionTypes.includes("manage_topics"),
+      canCreateAttachments: permissionTypes.includes("create_attachments"),
+      canManageAttachments: permissionTypes.includes("manage_attachments"),
+    };
+  } catch (error) {
+    console.error("Error checking forum permissions:", error);
+    return {
+      isAdmin: false,
+      canCreateTopics: false,
+      canManageTopics: false,
+      canCreateAttachments: false,
+      canManageAttachments: false,
+    };
   }
 }

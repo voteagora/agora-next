@@ -19,6 +19,7 @@ import {
   unarchiveForumTopic,
   unarchiveForumAttachment,
   unarchiveForumCategory,
+  checkForumPermissions,
 } from "@/lib/actions/forum";
 import { uploadAttachment } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData, AttachmentData } from "@/lib/fileUtils";
@@ -30,7 +31,6 @@ import {
 } from "@/lib/forumUtils";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
-import { checkForumPermissions } from "@/lib/forumAdminUtils";
 
 interface ForumDocument {
   id: number;
@@ -740,7 +740,7 @@ export const useForum = () => {
   };
 };
 
-export const useForumAdmin = (categoryId: number) => {
+export const useForumAdmin = (categoryId?: number) => {
   const { address } = useAccount();
 
   const { data } = useQuery({
@@ -751,5 +751,8 @@ export const useForumAdmin = (categoryId: number) => {
   return {
     isAdmin: !!data?.isAdmin,
     canCreateTopics: !!data?.canCreateTopics,
+    canManageTopics: !!data?.canManageTopics,
+    canCreateAttachments: !!data?.canCreateAttachments,
+    canManageAttachments: !!data?.canManageAttachments,
   };
 };

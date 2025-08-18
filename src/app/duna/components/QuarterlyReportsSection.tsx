@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import QuarterlyReportCard from "./QuarterlyReportCard";
 import CreatePostModal from "./CreatePostModal";
-import { useForum } from "@/hooks/useForum";
+import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { ForumTopic, ForumPost } from "@/lib/forumUtils";
 import toast from "react-hot-toast";
 import { useAccount } from "wagmi";
@@ -38,6 +38,7 @@ const QuarterlyReportsSection = ({
   const { address } = useAccount();
 
   const { createTopic, loading } = useForum();
+  const { canCreateTopics } = useForumAdmin(DUNA_CATEGORY_ID);
   const openDialog = useOpenDialog();
 
   const handleReportClick = (report: ForumTopic) => {
@@ -142,7 +143,7 @@ const QuarterlyReportsSection = ({
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <h4 className="text-lg font-bold text-primary">Quarterly Reports</h4>
-        {!!address && (
+        {!!address && canCreateTopics && (
           <Button
             onClick={handleCreatePost}
             className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto"

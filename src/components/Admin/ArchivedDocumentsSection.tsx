@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForum } from "@/hooks/useForum";
+import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
 import { ArrowUpIcon, EyeIcon } from "@heroicons/react/20/solid";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { FileIcon } from "lucide-react";
 import { toast } from "react-hot-toast";
-import Tenant from "@/lib/tenant/tenant";
-import { UIForumConfig } from "@/lib/tenant/tenantUI";
+import { DUNA_CATEGORY_ID } from "@/lib/constants";
 
 interface ArchivedDocumentCardProps {
   document: any;
@@ -22,18 +21,13 @@ const ArchivedDocumentCard = ({
   const { address } = useAccount();
   const { unarchiveAttachment } = useForum();
   const openDialog = useOpenDialog();
-
-  const tenant = Tenant.current();
-  const forumToggle = tenant.ui.toggle("duna");
-  const forumConfig = forumToggle?.config as UIForumConfig | undefined;
-  const forumAdmins = forumConfig?.adminAddresses || [];
-  const isAdmin = forumAdmins.includes(address as `0x${string}`);
+  const { isAdmin, canManageAttachments } = useForumAdmin(DUNA_CATEGORY_ID);
 
   const handleUnarchive = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (!isAdmin) {
-      toast.error("Only forum admins can unarchive documents.");
+    if (!isAdmin && !canManageAttachments) {
+      toast.error("You don't have permission to unarchive documents.");
       return;
     }
 
@@ -79,14 +73,16 @@ const ArchivedDocumentCard = ({
         <button
           onClick={handleUnarchive}
           className={`p-1 transition-colors ${
-            isAdmin
+            isAdmin || canManageAttachments
               ? "text-blue-500 hover:text-blue-700"
               : "text-gray-400 cursor-not-allowed"
           }`}
           title={
-            isAdmin ? "Unarchive document" : "Only forum admins can unarchive"
+            isAdmin || canManageAttachments
+              ? "Unarchive document"
+              : "You don't have permission to unarchive"
           }
-          disabled={!isAdmin}
+          disabled={!isAdmin && !canManageAttachments}
         >
           <ArrowUpIcon className="w-4 h-4" />
         </button>
