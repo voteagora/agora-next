@@ -281,9 +281,45 @@ const deleteTopicSchema = z.object({
   message: z.string().min(1, "Signed message is required"),
 });
 
+// Internal function for cleanup operations (bypasses signature verification)
+async function _deleteForumTopicInternal(topicId: number) {
+  try {
+    const { slug } = Tenant.current();
+
+    await prisma.forumPost.deleteMany({
+      where: {
+        topicId: topicId,
+        dao_slug: slug,
+      },
+    });
+
+    await prisma.forumTopic.delete({
+      where: {
+        id: topicId,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting forum topic (internal):", error);
+    return {
+      success: false,
+      error: "Failed to delete topic",
+      details: error instanceof Error ? error.message : "Unknown error",
+    };
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 export async function deleteForumTopic(
-  data: z.infer<typeof deleteTopicSchema>
+  data: z.infer<typeof deleteTopicSchema> | { topicId: number; _internal?: boolean }
 ) {
+  // Allow internal cleanup operations to bypass signature verification
+  if ('_internal' in data && data._internal) {
+    return _deleteForumTopicInternal(data.topicId);
+  }
+
   try {
     const validatedData = deleteTopicSchema.parse(data);
     const { slug } = Tenant.current();

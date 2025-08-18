@@ -194,7 +194,17 @@ export const useForum = () => {
               },
             ];
           } catch (attachmentError) {
-            await deleteForumTopic(result.topic.id);
+            try {
+              await deleteForumTopic({
+                topicId: result.topic.id,
+                _internal: true,
+              });
+            } catch (cleanupError) {
+              console.error(
+                "Failed to clean up topic after attachment error:",
+                cleanupError
+              );
+            }
             throw attachmentError;
           }
         }
@@ -375,81 +385,87 @@ export const useForum = () => {
     [isConnected, address, signMessageAsync]
   );
 
-  const deleteTopic = useCallback(async (topicId: number): Promise<boolean> => {
-    if (!isConnected || !address) {
-      throw new Error("Please connect your wallet first");
-    }
-
-    setLoading(true);
-    const toastId = toast.loading("Deleting topic...");
-    setError(null);
-
-    try {
-      const message = `Delete forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
-      const signature = await signMessageAsync({ message });
-
-      const result = await deleteForumTopic({
-        topicId,
-        address,
-        signature,
-        message,
-      });
-
-      if (!result.success) {
-        throw new Error(result.error);
+  const deleteTopic = useCallback(
+    async (topicId: number): Promise<boolean> => {
+      if (!isConnected || !address) {
+        throw new Error("Please connect your wallet first");
       }
 
-      toast.success("Topic deleted successfully!");
-      return true;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to delete topic";
-      setError(errorMessage);
-      toast.error(errorMessage);
-      return false;
-    } finally {
-      setLoading(false);
-      toast.dismiss(toastId);
-    }
-  }, [isConnected, address, signMessageAsync]);
+      setLoading(true);
+      const toastId = toast.loading("Deleting topic...");
+      setError(null);
 
-  const deletePost = useCallback(async (postId: number): Promise<boolean> => {
-    if (!isConnected || !address) {
-      throw new Error("Please connect your wallet first");
-    }
+      try {
+        const message = `Delete forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
 
-    setLoading(true);
-    const toastId = toast.loading("Deleting post...");
-    setError(null);
+        const result = await deleteForumTopic({
+          topicId,
+          address,
+          signature,
+          message,
+        });
 
-    try {
-      const message = `Delete forum post: ${postId}\nTimestamp: ${Date.now()}`;
-      const signature = await signMessageAsync({ message });
+        if (!result.success) {
+          throw new Error(result.error);
+        }
 
-      const result = await deleteForumPost({
-        postId,
-        address,
-        signature,
-        message,
-      });
+        toast.success("Topic deleted successfully!");
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to delete topic";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        return false;
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastId);
+      }
+    },
+    [isConnected, address, signMessageAsync]
+  );
 
-      if (!result.success) {
-        throw new Error(result.error);
+  const deletePost = useCallback(
+    async (postId: number): Promise<boolean> => {
+      if (!isConnected || !address) {
+        throw new Error("Please connect your wallet first");
       }
 
-      toast.success("Post deleted successfully!");
-      return true;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to delete post";
-      setError(errorMessage);
-      toast.error(errorMessage);
-      return false;
-    } finally {
-      setLoading(false);
-      toast.dismiss(toastId);
-    }
-  }, [isConnected, address, signMessageAsync]);
+      setLoading(true);
+      const toastId = toast.loading("Deleting post...");
+      setError(null);
+
+      try {
+        const message = `Delete forum post: ${postId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+
+        const result = await deleteForumPost({
+          postId,
+          address,
+          signature,
+          message,
+        });
+
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        toast.success("Post deleted successfully!");
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to delete post";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        return false;
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastId);
+      }
+    },
+    [isConnected, address, signMessageAsync]
+  );
 
   const deleteAttachment = useCallback(
     async (attachmentId: number): Promise<boolean> => {
