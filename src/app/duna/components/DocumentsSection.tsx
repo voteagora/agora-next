@@ -11,7 +11,11 @@ import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 import { DUNA_CATEGORY_ID } from "@/lib/constants";
 import { FileIcon } from "lucide-react";
 
-const DocumentsSection = () => {
+interface DocumentsSectionProps {
+  hideHeader?: boolean;
+}
+
+const DocumentsSection = ({ hideHeader = false }: DocumentsSectionProps) => {
   const [documents, setDocuments] = useState<any[]>([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const {
@@ -98,30 +102,32 @@ const DocumentsSection = () => {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
-        <h4 className="text-lg font-bold text-primary">Documents</h4>
-        {!!address && canCreateAttachments && (
-          <Button
-            onClick={() => setIsUploadModalOpen(true)}
-            className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto"
-            style={{
-              display: "flex",
-              height: "36px",
-              padding: "12px 20px",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "8px",
-              flexShrink: 0,
-              borderRadius: "8px",
-              background: "#171717",
-              boxShadow:
-                "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-            }}
-          >
-            Upload new document
-          </Button>
-        )}
-      </div>
+      {!hideHeader && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+          <h4 className="text-lg font-bold text-primary">Documents</h4>
+          {!!address && canCreateAttachments && (
+            <Button
+              onClick={() => setIsUploadModalOpen(true)}
+              className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto"
+              style={{
+                display: "flex",
+                height: "36px",
+                padding: "12px 20px",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "8px",
+                flexShrink: 0,
+                borderRadius: "8px",
+                background: "#171717",
+                boxShadow:
+                  "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+              }}
+            >
+              Upload new document
+            </Button>
+          )}
+        </div>
+      )}
 
       {loading && (
         <div className="text-center py-4">

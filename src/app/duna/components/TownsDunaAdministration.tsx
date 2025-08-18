@@ -1,43 +1,34 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import Tenant from "@/lib/tenant/tenant";
-
-// Document data for Towns Administration
-const DUNA_DOCUMENTS = [
-  {
-    id: 1,
-    name: "Towns Lodge - Purpose",
-    url: "/documents/towns/Towns Lodge - Purpose.pdf",
-    createdAt: "2025-01-01T00:00:00Z",
-    uploadedBy: "Towns Governance Team",
-  },
-  {
-    id: 2,
-    name: "Towns Lodge - Association Agreement",
-    url: "/documents/towns/Towns Lodge - Association Agreement.pdf",
-    createdAt: "2025-01-01T00:00:00Z",
-    uploadedBy: "Towns Governance Team",
-  },
-  {
-    id: 3,
-    name: "Towns Lodge - Redacted EIN",
-    url: "/documents/towns/Towns Lodge - Redacted EIN.pdf",
-    createdAt: "2025-01-01T00:00:00Z",
-    uploadedBy: "Towns Governance Team",
-  },
-  {
-    id: 4,
-    name: "Towns Lodge - Existing Authorizations of Authority",
-    url: "/documents/towns/Towns Lodge - Existing Authorizations of Authority.pdf",
-    createdAt: "2025-01-01T00:00:00Z",
-    uploadedBy: "Towns Governance Team",
-  },
-];
+import QuarterlyReportsSection from "./QuarterlyReportsSection";
+import DocumentsSection from "./DocumentsSection";
+import { useForum } from "@/hooks/useForum";
+import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
+import { DUNA_CATEGORY_ID } from "@/lib/constants";
 
 const TownsDunaAdministration = () => {
   const { ui } = Tenant.current();
+  const [topics, setTopics] = useState<ForumTopic[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { fetchTopics } = useForum();
+
+  useEffect(() => {
+    const loadTopics = async () => {
+      try {
+        const topicsData = await fetchTopics(DUNA_CATEGORY_ID);
+        setTopics(topicsData);
+      } catch (error) {
+        console.error("Error fetching topics:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTopics();
+  }, [fetchTopics]);
 
   return (
     <div className="mt-12">
@@ -47,61 +38,17 @@ const TownsDunaAdministration = () => {
         </h3>
       </div>
 
-      <Card className="border border-line shadow-sm bg-[#1E1A2F]">
+      {/* Documents Section - EXACT same as Uniswap */}
+      <Card className="border border-line shadow-sm bg-[#1E1A2F] [&_button]:!bg-white [&_button]:!text-black [&_button]:!border-gray-300 [&_button]:hover:!bg-gray-50">
         <CardContent className="p-6">
-          {/* 2025 DUNA documents Section */}
-          <div>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
-              <h4 className="text-lg font-bold text-primary">
-                2025 DUNA documents
-              </h4>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {DUNA_DOCUMENTS.map((document: any) => (
-                <div
-                  key={document.id}
-                  className="flex items-center space-x-2 p-2 border border-line rounded-md hover:bg-neutral/50 transition-colors cursor-pointer"
-                  onClick={() => window.open(document.url, "_blank")}
-                >
-                  <div className="w-5 h-5 bg-tertiary/20 rounded flex items-center justify-center flex-shrink-0">
-                    <svg
-                      className="w-3 h-3 text-tertiary"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-medium text-primary text-sm truncate">
-                      {document.name}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <DocumentsSection hideHeader={false} />
         </CardContent>
       </Card>
 
-      {/* Community Dialogue Section */}
-      <Card className="border border-line shadow-sm bg-[#1E1A2F] mt-6">
+      {/* Community Dialogue Section - EXACT same as Uniswap */}
+      <Card className="border border-line shadow-sm bg-[#1E1A2F] mt-6 [&_button]:!bg-white [&_button]:!text-black [&_button]:!border-gray-300 [&_button]:hover:!bg-gray-50">
         <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
-            <h4 className="text-lg font-bold text-primary opacity-75">
-              Community Dialogue
-            </h4>
-          </div>
-          <div className="text-secondary text-sm opacity-75">
-            Coming Soon: this section will be available on August 20, 2025.
-          </div>
+          <QuarterlyReportsSection initialReports={topics} hideHeader={false} />
         </CardContent>
       </Card>
 

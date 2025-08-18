@@ -103,7 +103,9 @@ export default async function Page() {
             }}
           />
         )}
-        {hasDunaAdministration && <DunaDisclosures />}
+        {hasDunaAdministration && namespace !== TENANT_NAMESPACES.TOWNS && (
+          <DunaDisclosures />
+        )}
       </div>
     );
   } else {

@@ -27,10 +27,12 @@ const UpDownChevronIcon = ({ className }: { className?: string }) => (
 
 interface QuarterlyReportsSectionProps {
   initialReports: ForumTopic[];
+  hideHeader?: boolean;
 }
 
 const QuarterlyReportsSection = ({
   initialReports,
+  hideHeader = false,
 }: QuarterlyReportsSectionProps) => {
   const [reports, setReports] = useState<ForumTopic[]>(initialReports || []);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -141,30 +143,32 @@ const QuarterlyReportsSection = ({
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
-        <h4 className="text-lg font-bold text-primary">Quarterly Reports</h4>
-        {!!address && canCreateTopics && (
-          <Button
-            onClick={handleCreatePost}
-            className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto"
-            style={{
-              display: "flex",
-              height: "36px",
-              padding: "12px 20px",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "8px",
-              flexShrink: 0,
-              borderRadius: "8px",
-              background: "#171717",
-              boxShadow:
-                "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-            }}
-          >
-            Create new post
-          </Button>
-        )}
-      </div>
+      {!hideHeader && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+          <h4 className="text-lg font-bold text-primary">Quarterly Reports</h4>
+          {!!address && canCreateTopics && (
+            <Button
+              onClick={handleCreatePost}
+              className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto"
+              style={{
+                display: "flex",
+                height: "36px",
+                padding: "12px 20px",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "8px",
+                flexShrink: 0,
+                borderRadius: "8px",
+                background: "#171717",
+                boxShadow:
+                  "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+              }}
+            >
+              Create new post
+            </Button>
+          )}
+        </div>
+      )}
 
       {loading && (
         <div className="text-center py-4">

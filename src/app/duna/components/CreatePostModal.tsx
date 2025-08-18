@@ -13,6 +13,7 @@ import { PaperClipIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { ConnectKitButton } from "connectkit";
 import { DunaEditor } from "@/components/duna-editor";
+import Tenant from "@/lib/tenant/tenant";
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -34,6 +35,10 @@ const CreatePostModal = ({
   const [attachment, setAttachment] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { isConnected } = useAccount();
+
+  // Check if current tenant is Towns
+  const { namespace } = Tenant.current();
+  const isTowns = namespace === "towns";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,9 +86,17 @@ const CreatePostModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        className={`max-w-2xl w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto ${
+          isTowns ? "bg-[#1E1A2F] border-[#43_36_73]" : ""
+        }`}
+      >
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-primary">
+          <DialogTitle
+            className={`text-xl font-bold ${
+              isTowns ? "text-white" : "text-primary"
+            }`}
+          >
             Create New Post
           </DialogTitle>
         </DialogHeader>
@@ -119,7 +132,9 @@ const CreatePostModal = ({
             <div>
               <label
                 htmlFor="title"
-                className="block text-sm font-medium text-primary mb-2"
+                className={`block text-sm font-medium mb-2 ${
+                  isTowns ? "text-white" : "text-primary"
+                }`}
               >
                 Title
               </label>
@@ -128,8 +143,11 @@ const CreatePostModal = ({
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md bg-white text-primary focus:outline-none focus:ring-1 focus:ring-gray-200"
-                style={{ borderColor: "#E5E5E5" }}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-gray-200 ${
+                  isTowns
+                    ? "bg-[#2A2338] text-white border-[#43_36_73] placeholder-[#87819F]"
+                    : "bg-white text-primary border-[#E5E5E5]"
+                }`}
                 placeholder="Enter post title..."
                 required
                 disabled={isSubmitting}
@@ -139,7 +157,9 @@ const CreatePostModal = ({
             <div>
               <label
                 htmlFor="content"
-                className="block text-sm font-medium text-primary mb-2"
+                className={`block text-sm font-medium mb-2 ${
+                  isTowns ? "text-white" : "text-primary"
+                }`}
               >
                 Content
               </label>
@@ -155,7 +175,9 @@ const CreatePostModal = ({
             <div>
               <label
                 htmlFor="attachment"
-                className="block text-sm font-medium text-primary mb-2"
+                className={`block text-sm font-medium mb-2 ${
+                  isTowns ? "text-white" : "text-primary"
+                }`}
               >
                 Attachment (Optional)
               </label>
@@ -171,14 +193,22 @@ const CreatePostModal = ({
                 <Button
                   type="button"
                   onClick={() => document.getElementById("attachment")?.click()}
-                  className="bg-neutral text-primary border border-line hover:bg-wash w-full sm:w-auto"
+                  className={`w-full sm:w-auto ${
+                    isTowns
+                      ? "bg-[#43_36_73] text-white border-[#43_36_73] hover:bg-[#5A4B7A]"
+                      : "bg-neutral text-primary border border-line hover:bg-wash"
+                  }`}
                   disabled={isSubmitting}
                 >
                   <PaperClipIcon className="w-4 h-4 mr-2" />
                   Choose File
                 </Button>
                 {attachment && (
-                  <span className="text-sm text-primary truncate max-w-[200px]">
+                  <span
+                    className={`text-sm truncate max-w-[200px] ${
+                      isTowns ? "text-[#87819F]" : "text-primary"
+                    }`}
+                  >
                     {attachment.name}
                   </span>
                 )}
@@ -189,7 +219,11 @@ const CreatePostModal = ({
               <Button
                 type="button"
                 onClick={handleClose}
-                className="bg-neutral text-primary border border-line hover:bg-wash"
+                className={`${
+                  isTowns
+                    ? "bg-[#43_36_73] text-white border-[#43_36_73] hover:bg-[#5A4B7A]"
+                    : "bg-neutral text-primary border border-line hover:bg-wash"
+                }`}
                 disabled={isSubmitting}
               >
                 Cancel
