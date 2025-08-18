@@ -30,7 +30,9 @@ const uploadDocumentSchema = z.object({
   fileSize: z.number().min(1, "File size is required"),
   contentType: z.string().min(1, "Content type is required"),
   ipfsCid: z.string().min(1, "IPFS CID is required"),
-  uploadedBy: z.string().optional(),
+  address: z.string().min(1, "Address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
 });
 
 export async function getForumTopics(categoryId?: number) {
@@ -272,26 +274,55 @@ export async function createForumTopic(
   }
 }
 
-export async function deleteForumTopic(topicId: number) {
+const deleteTopicSchema = z.object({
+  topicId: z.number().min(1, "Topic ID is required"),
+  address: z.string().min(1, "Address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function deleteForumTopic(
+  data: z.infer<typeof deleteTopicSchema>
+) {
   try {
+    const validatedData = deleteTopicSchema.parse(data);
     const { slug } = Tenant.current();
+
+    const isValid = await verifyMessage({
+      address: validatedData.address as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
 
     await prisma.forumPost.deleteMany({
       where: {
-        topicId: topicId,
+        topicId: validatedData.topicId,
         dao_slug: slug,
       },
     });
 
     await prisma.forumTopic.delete({
       where: {
-        id: topicId,
+        id: validatedData.topicId,
       },
     });
 
     return { success: true };
   } catch (error) {
     console.error("Error deleting forum topic:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
     return {
       success: false,
       error: "Failed to delete topic",
@@ -302,12 +333,32 @@ export async function deleteForumTopic(topicId: number) {
   }
 }
 
-export async function deleteForumPost(postId: number) {
+const deletePostSchema = z.object({
+  postId: z.number().min(1, "Post ID is required"),
+  address: z.string().min(1, "Address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function deleteForumPost(
+  data: z.infer<typeof deletePostSchema>
+) {
   try {
+    const validatedData = deletePostSchema.parse(data);
     const { slug } = Tenant.current();
 
+    const isValid = await verifyMessage({
+      address: validatedData.address as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
+
     const post = await prisma.forumPost.findUnique({
-      where: { id: postId },
+      where: { id: validatedData.postId },
     });
 
     if (!post) {
@@ -316,7 +367,7 @@ export async function deleteForumPost(postId: number) {
 
     await prisma.forumPost.delete({
       where: {
-        id: postId,
+        id: validatedData.postId,
         dao_slug: slug,
       },
     });
@@ -324,6 +375,15 @@ export async function deleteForumPost(postId: number) {
     return { success: true };
   } catch (error) {
     console.error("Error deleting forum post:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
     return {
       success: false,
       error: "Failed to delete post",
@@ -334,12 +394,32 @@ export async function deleteForumPost(postId: number) {
   }
 }
 
-export async function deleteForumAttachment(attachmentId: number) {
+const deleteAttachmentSchema = z.object({
+  attachmentId: z.number().min(1, "Attachment ID is required"),
+  address: z.string().min(1, "Address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function deleteForumAttachment(
+  data: z.infer<typeof deleteAttachmentSchema>
+) {
   try {
+    const validatedData = deleteAttachmentSchema.parse(data);
     const { slug } = Tenant.current();
 
+    const isValid = await verifyMessage({
+      address: validatedData.address as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
+
     const attachment = await prisma.forumAttachment.findUnique({
-      where: { id: attachmentId },
+      where: { id: validatedData.attachmentId },
     });
 
     if (!attachment) {
@@ -348,7 +428,7 @@ export async function deleteForumAttachment(attachmentId: number) {
 
     await prisma.forumAttachment.delete({
       where: {
-        id: attachmentId,
+        id: validatedData.attachmentId,
         dao_slug: slug,
       },
     });
@@ -356,6 +436,15 @@ export async function deleteForumAttachment(attachmentId: number) {
     return { success: true };
   } catch (error) {
     console.error("Error deleting forum document:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
     return {
       success: false,
       error: "Failed to delete document",
@@ -481,6 +570,16 @@ export async function uploadForumDocument(
     const validatedData = uploadDocumentSchema.parse(data);
     const { slug } = Tenant.current();
 
+    const isValid = await verifyMessage({
+      address: validatedData.address as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
+
     const newAttachment = await prisma.forumAttachment.create({
       data: {
         dao_slug: slug,
@@ -488,7 +587,7 @@ export async function uploadForumDocument(
         fileName: validatedData.fileName,
         contentType: validatedData.contentType,
         fileSize: BigInt(validatedData.fileSize),
-        address: validatedData.uploadedBy,
+        address: validatedData.address,
         targetType: AttachableType.category,
         targetId: 0,
       },
@@ -568,7 +667,9 @@ interface AttachmentData {
 
 export async function uploadDocumentFromBase64(
   attachmentData: AttachmentData,
-  uploadedBy: string
+  address: string,
+  signature: string,
+  message: string
 ) {
   try {
     const buffer = Buffer.from(attachmentData.base64Data, "base64");
@@ -588,7 +689,9 @@ export async function uploadDocumentFromBase64(
       fileSize: attachmentData.fileSize,
       contentType: attachmentData.contentType,
       ipfsCid: ipfsResult.ipfsCid || "",
-      uploadedBy: uploadedBy,
+      address: address,
+      signature: signature,
+      message: message,
     });
 
     return result;
@@ -602,13 +705,33 @@ export async function uploadDocumentFromBase64(
   }
 }
 
-export async function archiveForumTopic(topicId: number) {
+const archiveTopicSchema = z.object({
+  topicId: z.number().min(1, "Topic ID is required"),
+  address: z.string().min(1, "Address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function archiveForumTopic(
+  data: z.infer<typeof archiveTopicSchema>
+) {
   try {
+    const validatedData = archiveTopicSchema.parse(data);
     const { slug } = Tenant.current();
+
+    const isValid = await verifyMessage({
+      address: validatedData.address as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
 
     await prisma.forumTopic.update({
       where: {
-        id: topicId,
+        id: validatedData.topicId,
         dao_slug: slug,
       },
       data: {
@@ -619,6 +742,15 @@ export async function archiveForumTopic(topicId: number) {
     return { success: true };
   } catch (error) {
     console.error("Error archiving forum topic:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
     return {
       success: false,
       error: "Failed to archive topic",
@@ -629,13 +761,33 @@ export async function archiveForumTopic(topicId: number) {
   }
 }
 
-export async function archiveForumAttachment(attachmentId: number) {
+const archiveAttachmentSchema = z.object({
+  attachmentId: z.number().min(1, "Attachment ID is required"),
+  address: z.string().min(1, "Address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function archiveForumAttachment(
+  data: z.infer<typeof archiveAttachmentSchema>
+) {
   try {
+    const validatedData = archiveAttachmentSchema.parse(data);
     const { slug } = Tenant.current();
+
+    const isValid = await verifyMessage({
+      address: validatedData.address as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
 
     await prisma.forumAttachment.update({
       where: {
-        id: attachmentId,
+        id: validatedData.attachmentId,
         dao_slug: slug,
       },
       data: {
@@ -646,6 +798,15 @@ export async function archiveForumAttachment(attachmentId: number) {
     return { success: true };
   } catch (error) {
     console.error("Error archiving forum attachment:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
     return {
       success: false,
       error: "Failed to archive attachment",
@@ -864,13 +1025,33 @@ export async function getArchivedForumAttachments() {
   }
 }
 
-export async function unarchiveForumTopic(topicId: number) {
+const unarchiveTopicSchema = z.object({
+  topicId: z.number().min(1, "Topic ID is required"),
+  address: z.string().min(1, "Address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function unarchiveForumTopic(
+  data: z.infer<typeof unarchiveTopicSchema>
+) {
   try {
+    const validatedData = unarchiveTopicSchema.parse(data);
     const { slug } = Tenant.current();
+
+    const isValid = await verifyMessage({
+      address: validatedData.address as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
 
     await prisma.forumTopic.update({
       where: {
-        id: topicId,
+        id: validatedData.topicId,
         dao_slug: slug,
       },
       data: {
@@ -881,6 +1062,15 @@ export async function unarchiveForumTopic(topicId: number) {
     return { success: true };
   } catch (error) {
     console.error("Error unarchiving forum topic:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
     return {
       success: false,
       error: "Failed to unarchive topic",
@@ -891,13 +1081,33 @@ export async function unarchiveForumTopic(topicId: number) {
   }
 }
 
-export async function unarchiveForumAttachment(attachmentId: number) {
+const unarchiveAttachmentSchema = z.object({
+  attachmentId: z.number().min(1, "Attachment ID is required"),
+  address: z.string().min(1, "Address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function unarchiveForumAttachment(
+  data: z.infer<typeof unarchiveAttachmentSchema>
+) {
   try {
+    const validatedData = unarchiveAttachmentSchema.parse(data);
     const { slug } = Tenant.current();
+
+    const isValid = await verifyMessage({
+      address: validatedData.address as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
 
     await prisma.forumAttachment.update({
       where: {
-        id: attachmentId,
+        id: validatedData.attachmentId,
         dao_slug: slug,
       },
       data: {
@@ -908,6 +1118,15 @@ export async function unarchiveForumAttachment(attachmentId: number) {
     return { success: true };
   } catch (error) {
     console.error("Error unarchiving forum attachment:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
     return {
       success: false,
       error: "Failed to unarchive attachment",
@@ -945,19 +1164,37 @@ export async function getArchivedForumCategories() {
   }
 }
 
+const unarchiveCategorySchema = z.object({
+  categoryId: z.number().min(1, "Category ID is required"),
+  adminAddress: z.string().min(1, "Admin address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
 export async function unarchiveForumCategory(
-  categoryId: number,
-  adminAddress: string
+  data: z.infer<typeof unarchiveCategorySchema>
 ) {
   try {
+    const validatedData = unarchiveCategorySchema.parse(data);
     const { slug } = Tenant.current();
+
+    // Verify the admin's signature
+    const isValid = await verifyMessage({
+      address: validatedData.adminAddress as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
 
     // Check if the person unarchiving is an admin
     const currentAdmin = await prisma.forumAdmin.findUnique({
       where: {
         dao_slug_address: {
           dao_slug: slug,
-          address: adminAddress.toLowerCase(),
+          address: validatedData.adminAddress.toLowerCase(),
         },
       },
     });
@@ -971,7 +1208,7 @@ export async function unarchiveForumCategory(
 
     const category = await prisma.forumCategory.findFirst({
       where: {
-        id: categoryId,
+        id: validatedData.categoryId,
         dao_slug: slug,
         archived: true,
       },
@@ -983,7 +1220,7 @@ export async function unarchiveForumCategory(
 
     await prisma.forumCategory.update({
       where: {
-        id: categoryId,
+        id: validatedData.categoryId,
         dao_slug: slug,
       },
       data: {
@@ -994,6 +1231,15 @@ export async function unarchiveForumCategory(
     return { success: true };
   } catch (error) {
     console.error("Error unarchiving forum category:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
     return {
       success: false,
       error: "Failed to unarchive category",
@@ -1035,16 +1281,37 @@ export async function getForumAdmins() {
   }
 }
 
-export async function addForumAdmin(address: string, adminAddress: string) {
+const addAdminSchema = z.object({
+  address: z.string().min(1, "Address is required"),
+  adminAddress: z.string().min(1, "Admin address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function addForumAdmin(
+  data: z.infer<typeof addAdminSchema>
+) {
   try {
+    const validatedData = addAdminSchema.parse(data);
     const { slug } = Tenant.current();
+
+    // Verify the admin's signature
+    const isValid = await verifyMessage({
+      address: validatedData.adminAddress as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
 
     // Check if the person adding is already an admin
     const currentAdmin = await prisma.forumAdmin.findUnique({
       where: {
         dao_slug_address: {
           dao_slug: slug,
-          address: adminAddress.toLowerCase(),
+          address: validatedData.adminAddress.toLowerCase(),
         },
       },
     });
@@ -1060,7 +1327,7 @@ export async function addForumAdmin(address: string, adminAddress: string) {
     const admin = await prisma.forumAdmin.create({
       data: {
         dao_slug: slug,
-        address: address.toLowerCase(),
+        address: validatedData.address.toLowerCase(),
       },
     });
 
@@ -1070,6 +1337,15 @@ export async function addForumAdmin(address: string, adminAddress: string) {
     };
   } catch (error) {
     console.error("Error adding forum admin:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
     return {
       success: false,
       error:
@@ -1082,16 +1358,37 @@ export async function addForumAdmin(address: string, adminAddress: string) {
   }
 }
 
-export async function removeForumAdmin(address: string, adminAddress: string) {
+const removeAdminSchema = z.object({
+  address: z.string().min(1, "Address is required"),
+  adminAddress: z.string().min(1, "Admin address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function removeForumAdmin(
+  data: z.infer<typeof removeAdminSchema>
+) {
   try {
+    const validatedData = removeAdminSchema.parse(data);
     const { slug } = Tenant.current();
+
+    // Verify the admin's signature
+    const isValid = await verifyMessage({
+      address: validatedData.adminAddress as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
 
     // Check if the person removing is an admin
     const currentAdmin = await prisma.forumAdmin.findUnique({
       where: {
         dao_slug_address: {
           dao_slug: slug,
-          address: adminAddress.toLowerCase(),
+          address: validatedData.adminAddress.toLowerCase(),
         },
       },
     });
@@ -1108,7 +1405,7 @@ export async function removeForumAdmin(address: string, adminAddress: string) {
       where: {
         dao_slug_address: {
           dao_slug: slug,
-          address: address.toLowerCase(),
+          address: validatedData.address.toLowerCase(),
         },
       },
     });
@@ -1116,6 +1413,15 @@ export async function removeForumAdmin(address: string, adminAddress: string) {
     return { success: true };
   } catch (error) {
     console.error("Error removing forum admin:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
     return {
       success: false,
       error: "Failed to remove forum admin",
@@ -1160,22 +1466,40 @@ export async function getForumPermissions(address?: string) {
   }
 }
 
+const addPermissionSchema = z.object({
+  address: z.string().min(1, "Address is required"),
+  permissionType: z.string().min(1, "Permission type is required"),
+  scope: z.enum(["forum", "category"]),
+  scopeId: z.number().nullable(),
+  adminAddress: z.string().min(1, "Admin address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
 export async function addForumPermission(
-  address: string,
-  permissionType: string,
-  scope: "forum" | "category",
-  scopeId: number | null,
-  adminAddress: string
+  data: z.infer<typeof addPermissionSchema>
 ) {
   try {
+    const validatedData = addPermissionSchema.parse(data);
     const { slug } = Tenant.current();
+
+    // Verify the admin's signature
+    const isValid = await verifyMessage({
+      address: validatedData.adminAddress as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
 
     // Check if the person adding is an admin
     const currentAdmin = await prisma.forumAdmin.findUnique({
       where: {
         dao_slug_address: {
           dao_slug: slug,
-          address: adminAddress.toLowerCase(),
+          address: validatedData.adminAddress.toLowerCase(),
         },
       },
     });
@@ -1191,10 +1515,10 @@ export async function addForumPermission(
     const permission = await prisma.forumPermission.create({
       data: {
         dao_slug: slug,
-        address: address.toLowerCase(),
-        permissionType: permissionType as any,
-        scope: scope,
-        scopeId: scopeId,
+        address: validatedData.address.toLowerCase(),
+        permissionType: validatedData.permissionType as any,
+        scope: validatedData.scope,
+        scopeId: validatedData.scopeId,
       },
     });
 
@@ -1204,6 +1528,15 @@ export async function addForumPermission(
     };
   } catch (error) {
     console.error("Error adding forum permission:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
     return {
       success: false,
       error:
@@ -1216,19 +1549,37 @@ export async function addForumPermission(
   }
 }
 
+const removePermissionSchema = z.object({
+  permissionId: z.number().min(1, "Permission ID is required"),
+  adminAddress: z.string().min(1, "Admin address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
 export async function removeForumPermission(
-  permissionId: number,
-  adminAddress: string
+  data: z.infer<typeof removePermissionSchema>
 ) {
   try {
+    const validatedData = removePermissionSchema.parse(data);
     const { slug } = Tenant.current();
+
+    // Verify the admin's signature
+    const isValid = await verifyMessage({
+      address: validatedData.adminAddress as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
 
     // Check if the person removing is an admin
     const currentAdmin = await prisma.forumAdmin.findUnique({
       where: {
         dao_slug_address: {
           dao_slug: slug,
-          address: adminAddress.toLowerCase(),
+          address: validatedData.adminAddress.toLowerCase(),
         },
       },
     });
@@ -1243,7 +1594,7 @@ export async function removeForumPermission(
     // Remove permission
     await prisma.forumPermission.delete({
       where: {
-        id: permissionId,
+        id: validatedData.permissionId,
         dao_slug: slug,
       },
     });
@@ -1251,6 +1602,15 @@ export async function removeForumPermission(
     return { success: true };
   } catch (error) {
     console.error("Error removing forum permission:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
     return {
       success: false,
       error: "Failed to remove forum permission",

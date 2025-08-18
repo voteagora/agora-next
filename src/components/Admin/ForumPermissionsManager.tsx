@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ import {
 import { useForumAdmin } from "@/hooks/useForum";
 import { PlusIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { DUNA_CATEGORY_ID } from "@/lib/constants";
+import AgoraLoader from "../shared/AgoraLoader/AgoraLoader";
 
 interface ForumAdmin {
   dao_slug: string;
@@ -63,6 +64,7 @@ const ForumPermissionsManager = ({
   categories,
 }: ForumPermissionsManagerProps) => {
   const { address } = useAccount();
+  const { signMessageAsync } = useSignMessage();
   const [admins, setAdmins] = useState<ForumAdmin[]>(initialAdmins);
   const [permissions, setPermissions] =
     useState<ForumPermission[]>(initialPermissions);
@@ -81,14 +83,22 @@ const ForumPermissionsManager = ({
   // >(null);
   const newPermissionScopeId = DUNA_CATEGORY_ID;
 
-  const { isAdmin } = useForumAdmin(DUNA_CATEGORY_ID);
+  const { isAdmin, isLoading } = useForumAdmin(DUNA_CATEGORY_ID);
 
   const handleAddAdmin = async () => {
     if (!address || !newAdminAddress.trim()) return;
 
     setLoading(true);
     try {
-      const result = await addForumAdmin(newAdminAddress.trim(), address);
+      const message = `Add forum admin: ${newAdminAddress.trim()}\nTimestamp: ${Date.now()}`;
+      const signature = await signMessageAsync({ message });
+
+      const result = await addForumAdmin({
+        address: newAdminAddress.trim(),
+        adminAddress: address,
+        signature,
+        message,
+      });
 
       if (result.success) {
         setAdmins([...admins, result.data as ForumAdmin]);
@@ -109,7 +119,15 @@ const ForumPermissionsManager = ({
 
     setLoading(true);
     try {
-      const result = await removeForumAdmin(adminAddress, address);
+      const message = `Remove forum admin: ${adminAddress}\nTimestamp: ${Date.now()}`;
+      const signature = await signMessageAsync({ message });
+
+      const result = await removeForumAdmin({
+        address: adminAddress,
+        adminAddress: address,
+        signature,
+        message,
+      });
 
       if (result.success) {
         setAdmins(admins.filter((admin) => admin.address !== adminAddress));
@@ -129,13 +147,18 @@ const ForumPermissionsManager = ({
 
     setLoading(true);
     try {
-      const result = await addForumPermission(
-        newPermissionAddress.trim(),
-        newPermissionType,
-        newPermissionScope,
-        newPermissionScopeId,
-        address
-      );
+      const message = `Add forum permission: ${newPermissionType} for ${newPermissionAddress.trim()}\nTimestamp: ${Date.now()}`;
+      const signature = await signMessageAsync({ message });
+
+      const result = await addForumPermission({
+        address: newPermissionAddress.trim(),
+        permissionType: newPermissionType,
+        scope: newPermissionScope,
+        scopeId: newPermissionScopeId,
+        adminAddress: address,
+        signature,
+        message,
+      });
 
       if (result.success) {
         setPermissions([...permissions, result.data as ForumPermission]);
@@ -159,7 +182,15 @@ const ForumPermissionsManager = ({
 
     setLoading(true);
     try {
-      const result = await removeForumPermission(permissionId, address);
+      const message = `Remove forum permission: ${permissionId}\nTimestamp: ${Date.now()}`;
+      const signature = await signMessageAsync({ message });
+
+      const result = await removeForumPermission({
+        permissionId,
+        adminAddress: address,
+        signature,
+        message,
+      });
 
       if (result.success) {
         setPermissions(permissions.filter((p) => p.id !== permissionId));
@@ -179,6 +210,10 @@ const ForumPermissionsManager = ({
     const category = categories.find((c) => c.id === id);
     return category?.name || "Unknown Category";
   };
+
+  if (isLoading) {
+    return <AgoraLoader />;
+  }
 
   if (!address) {
     return (
