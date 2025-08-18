@@ -19,8 +19,13 @@ export function DesktopConnectButton() {
           <div
             onClick={!isConnected ? () => show?.() : undefined}
             className={cn(
-              `lg:border text-primary font-medium p-0 lg:px-4 lg:py-2 rounded-full cursor-pointer hidden md:flex items-center transition-all hover:lg:shadow-newDefault h-[48px] relative border-line ${ui.customization?.customButtonBackground ? `lg:bg-[${ui.customization.customButtonBackground}]` : ""}`
+              `lg:border text-primary font-medium p-0 lg:px-4 lg:py-2 rounded-full cursor-pointer hidden md:flex items-center transition-all hover:lg:shadow-newDefault h-[48px] relative border-line`
             )}
+            style={
+              ui.customization?.customButtonBackground
+                ? { backgroundColor: ui.customization.customButtonBackground }
+                : {}
+            }
           >
             {isConnected ? (
               <>

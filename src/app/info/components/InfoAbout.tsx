@@ -76,7 +76,7 @@ const InfoAbout = () => {
     <>
       <h3 className="text-2xl font-black text-primary mt-12">{sectionTitle}</h3>
       <div
-        className={`mt-4 rounded-xl border border-line shadow-sm ${ui.customization?.customInfoSectionBackground ? "bg-[#1E1A2F]" : "bg-neutral"}`}
+        className={`mt-4 rounded-xl border border-line shadow-sm ${ui.customization?.customInfoSectionBackground ? `bg-[${ui.customization.customInfoSectionBackground}]` : "bg-neutral"}`}
       >
         <div
           className={`p-6 flex flex-row flex-wrap sm:flex-nowrap ${ui.customization?.customInfoLayout ? ui.customization.customInfoLayout : "gap-6"}`}
