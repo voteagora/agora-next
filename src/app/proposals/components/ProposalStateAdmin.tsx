@@ -47,7 +47,8 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
       namespace === TENANT_NAMESPACES.DERIVE ||
       namespace === TENANT_NAMESPACES.UNISWAP ||
       namespace === TENANT_NAMESPACES.LINEA ||
-      namespace === TENANT_NAMESPACES.B3);
+      namespace === TENANT_NAMESPACES.B3 ||
+      namespace === TENANT_NAMESPACES.PGUILD);
 
   const { data: adminAddress } = useGovernorAdmin({ enabled: isCancellable });
 
@@ -171,6 +172,7 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.LINEA:
     case TENANT_NAMESPACES.B3:
+    case TENANT_NAMESPACES.PGUILD:
       return (
         <div className="flex flex-row gap-2">
           {proposal.proposalType?.startsWith("OFFCHAIN") ? (
@@ -228,7 +230,12 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
       return <OZGovQueue proposal={proposal} />;
 
     default:
-      return <AgoraGovQueue proposal={proposal} />;
+      return (
+        <>
+          <AgoraGovCancel proposal={proposal} />
+          <AgoraGovQueue proposal={proposal} />
+        </>
+      );
   }
 };
 
@@ -241,6 +248,7 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.LINEA:
     case TENANT_NAMESPACES.B3:
+    case TENANT_NAMESPACES.PGUILD:
       return (
         <div className="flex flex-row gap-2">
           {proposal.proposalType?.startsWith("OFFCHAIN") ? (
@@ -285,7 +293,12 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
       return <BravoGovExecute proposal={proposal} />;
 
     default:
-      return <AgoraGovExecute proposal={proposal} />;
+      return (
+        <>
+          <AgoraGovCancel proposal={proposal} />
+          <AgoraGovExecute proposal={proposal} />
+        </>
+      );
   }
 };
 
@@ -298,6 +311,7 @@ const activeStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.LINEA:
     case TENANT_NAMESPACES.B3:
+    case TENANT_NAMESPACES.PGUILD:
       return proposal.proposalType?.startsWith("OFFCHAIN") ? (
         <OffchainCancel proposal={proposal} />
       ) : (
