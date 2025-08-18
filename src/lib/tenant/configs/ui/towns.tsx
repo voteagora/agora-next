@@ -18,6 +18,7 @@ export const townsTenantUIConfig = new TenantUI({
   logo: townsLogo,
   logoSize: "36px",
   tokens: [],
+  hideAgoraBranding: true,
 
   assets: {
     success: townsSuccess,
@@ -218,6 +219,10 @@ export const townsTenantUIConfig = new TenantUI({
     {
       name: "use-daonode-for-proposal-types",
       enabled: false,
+    },
+    {
+      name: "duna",
+      enabled: true,
     },
   ],
 });
