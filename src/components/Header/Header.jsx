@@ -9,9 +9,11 @@ import LogoLink from "./LogoLink";
 import { ConnectButton } from "./ConnectButton";
 import MobileNavMenu from "./MobileNavMenu";
 import { HamburgerIcon } from "@/icons/HamburgerIcon";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { ui } = Tenant.current();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -19,7 +21,9 @@ export default function Header() {
 
   return (
     <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
-      <VStack className="content-center rounded-full bg-wash border border-line p-2 shadow-newDefault">
+      <VStack
+        className={`content-center rounded-full border border-line p-2 shadow-newDefault ${ui.customization?.customInfoSectionBackground ? "bg-[#1E1A2F]" : "bg-wash"}`}
+      >
         <HStack className="flex flex-row w-full items-center gap-1  justify-between">
           <HamburgerIcon
             className="w-[24px] h-[24px] sm:hidden cursor-pointer stroke-primary"

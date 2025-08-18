@@ -11,9 +11,13 @@ export default function LogoLink() {
         <Image
           src={ui.logo}
           alt="logo"
-          width="48"
-          height="48"
-          className="h-[46px] w-auto"
+          width={ui.logoSize ? parseInt(ui.logoSize) : 48}
+          height={ui.logoSize ? parseInt(ui.logoSize) : 48}
+          className={
+            ui.logoSize
+              ? `h-[${parseInt(ui.logoSize) - 2}px] w-auto`
+              : "h-[46px] w-auto"
+          }
         />
         {!isProd && (
           <>

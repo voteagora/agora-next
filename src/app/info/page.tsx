@@ -71,7 +71,7 @@ export default async function Page() {
       <div className="flex flex-col">
         <InfoHero />
         <InfoAbout />
-        <GovernorSettings />
+        {namespace !== TENANT_NAMESPACES.TOWNS && <GovernorSettings />}
         {hasDunaAdministration && <DunaAdministration />}
         {treasuryData.result.length > 0 && (
           <ChartTreasury

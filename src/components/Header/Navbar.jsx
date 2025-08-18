@@ -18,7 +18,7 @@ export default function Navbar() {
 
   return (
     <div
-      className={`flex flex-row bg-neutral rounded-full border border-line p-1 font-medium`}
+      className={`flex flex-row rounded-full border border-line p-1 font-medium ${ui.customization?.customInfoTabBackground ? `bg-[${ui.customization.customInfoTabBackground}]` : "bg-neutral"}`}
     >
       {hasProposals && (
         <HeaderLink

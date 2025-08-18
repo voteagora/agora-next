@@ -19,8 +19,12 @@ export const InfoHero = () => {
 
   return (
     <div className="flex flex-col md:flex-col mt-12 gap-y-6 sm:gap-y-0 gap-x-0 sm:gap-x-6 flex-wrap sm:flex-nowrap lg:flex-row">
-      <div className="flex flex-col w-full lg:w-2/5">
-        <h1 className="text-4xl leading-[36px] sm:text-[40px] sm:leading-[40px] font-black text-primary">
+      <div
+        className={`flex flex-col w-full ${ui.customization?.customTitleSize ? "lg:w-3/5" : "lg:w-2/5"}`}
+      >
+        <h1
+          className={`font-black text-primary whitespace-pre-line ${ui.customization?.customTitleSize || "text-4xl leading-[36px] sm:text-[40px] sm:leading-[40px]"}`}
+        >
           {page!.title}
         </h1>
         <p className="text-base text-secondary mt-4">
@@ -45,6 +49,7 @@ export const InfoHero = () => {
             key={`card-${idx}`}
             link={link.url}
             linkText={link.title}
+            ui={ui}
           />
         ))}
       </div>
@@ -57,19 +62,23 @@ const Card = ({
   link,
   linkText,
   image,
+  ui,
 }: {
   className?: string;
   link: string;
   linkText: string;
   image: StaticImageData | string;
+  ui: any;
 }) => {
   return (
     <Link
       target="_blank"
       href={link}
-      className={`flex flex-col grow-0 p-1.5 bg-neutral border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)]} hover:rotate-0 transition-all hover:z-10 hover:scale-110 ${className}`}
+      className={`flex flex-col grow-0 p-1.5 border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)] hover:rotate-0 transition-all hover:z-10 hover:scale-110 ${ui.customization?.customInfoSectionBackground ? "bg-[#130C2F]" : "bg-neutral"} ${className}`}
     >
-      <div className="relative w-full sm:h-[130px] sm:w-[130px] lg:h-[150px] lg:w-[150px] aspect-square">
+      <div
+        className={`relative w-full aspect-square ${ui.customization?.customCardSize || "sm:h-[130px] sm:w-[130px] lg:h-[150px] lg:w-[150px]"}`}
+      >
         <Image
           src={image}
           className="w-full rounded scale"
@@ -84,7 +93,7 @@ const Card = ({
           width={12}
           height={12}
           alt="arrow pointing right"
-          className="self-start mt-1"
+          className={`self-start mt-1 ${ui.customization?.customInfoSectionBackground ? "brightness-0 invert" : ""}`}
         />
       </div>
     </Link>
