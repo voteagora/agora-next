@@ -90,6 +90,10 @@ const ForumPermissionsManager = ({
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
+  // Check if current tenant is Towns
+  const { namespace } = Tenant.current();
+  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+
   const handleAddAdmin = async () => {
     if (!address || !newAdminAddress.trim()) return;
 
@@ -243,7 +247,11 @@ const ForumPermissionsManager = ({
   return (
     <div className={`mt-12 space-y-8 ${useDarkStyling ? "towns-tenant" : ""}`}>
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-black text-primary">
+        <h1
+          className={`text-2xl font-black ${
+            isTowns ? "text-white" : "text-primary"
+          }`}
+        >
           Permissions Management
         </h1>
       </div>
@@ -252,7 +260,13 @@ const ForumPermissionsManager = ({
       <Card className="border shadow-sm bg-cardBackground">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-primary">Admins</h2>
+            <h2
+              className={`text-xl font-semibold ${
+                isTowns ? "text-white" : "text-primary"
+              }`}
+            >
+              Admins
+            </h2>
             <Badge variant="secondary">{admins.length} admins</Badge>
           </div>
 

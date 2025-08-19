@@ -21,6 +21,10 @@ export default async function ArchivedDataPage() {
     return <div>Route not supported for namespace</div>;
   }
 
+  // Check if current tenant is Towns
+  const { namespace } = Tenant.current();
+  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+
   try {
     const dunaCategoryId = await getDunaCategoryId();
     if (!dunaCategoryId) {
@@ -53,9 +57,13 @@ export default async function ArchivedDataPage() {
   }
 
   return (
-    <div className="mt-12">
+    <div className={`mt-12 ${isTowns ? "towns-tenant" : ""}`}>
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-black text-primary">
+        <h3
+          className={`text-2xl font-black ${
+            isTowns ? "text-white" : "text-primary"
+          }`}
+        >
           Archived Data Administration
         </h3>
       </div>
