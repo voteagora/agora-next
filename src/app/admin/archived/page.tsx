@@ -14,7 +14,7 @@ import {
 import { DUNA_CATEGORY_ID } from "@/lib/constants";
 import ArchivedReportsSection from "@/components/Admin/ArchivedReportsSection";
 import ArchivedDocumentsSection from "@/components/Admin/ArchivedDocumentsSection";
-import ArchivedCategoriesSection from "@/components/Admin/ArchivedCategoriesSection";
+// import ArchivedCategoriesSection from "@/components/Admin/ArchivedCategoriesSection";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
@@ -80,13 +80,13 @@ export default async function ArchivedDataPage() {
       >
         <CardContent className="p-6">
           <ArchivedReportsSection initialReports={archivedReports} />
-          <div
+          {/* <div
             className={`mt-8 pt-6 border-t ${
               isTowns ? "border-[#2B2449]" : "border-line"
             }`}
           >
             <ArchivedCategoriesSection initialCategories={archivedCategories} />
-          </div>
+          </div> */}
           <div
             className={`mt-8 pt-6 border-t ${
               isTowns ? "border-[#2B2449]" : "border-line"
