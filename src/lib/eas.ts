@@ -114,6 +114,14 @@ export async function createProposalAttestation({
   // Wait for transaction to be sent (not mined) to get the hash
   const receipt = await txResponse.wait(0);
 
+  if (!receipt) {
+    console.error(
+      "Transaction failed or was not mined. Full response:",
+      receipt
+    );
+    throw new Error("Transaction failed or was not mined.");
+  }
+
   return {
     transactionHash: receipt,
     id,
