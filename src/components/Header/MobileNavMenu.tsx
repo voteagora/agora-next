@@ -9,6 +9,8 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import Image from "next/image";
 import agoraLogo from "@/icons/agoraIconWithText.svg";
 import discordIcon from "@/icons/discord.svg";
+import XIcon from "@/icons/x.svg";
+import FarcasterIcon from "@/icons/farcaster.svg";
 import { useDAOMetrics } from "@/hooks/useDAOMetrics";
 import { formatNumber } from "@/lib/tokenUtils";
 
@@ -30,6 +32,8 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   const changeLogLink = ui.link("changelog");
   const faqLink = ui.link("faq");
   const discordLink = ui.link("discord");
+  const twitterLink = ui.link("townstwitter");
+  const farcasterLink = ui.link("townsfarcaster");
   const agoraLink = ui.link("agora");
 
   const proposalsToggle = ui.toggle("proposals");
@@ -47,6 +51,10 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
 
   const infoToggle = ui.toggle("info");
   const hasInfo = infoToggle !== undefined && infoToggle.enabled;
+
+  const comingSoonToggle = ui.toggle("coming-soon");
+  const hasComingSoon =
+    comingSoonToggle !== undefined && comingSoonToggle.enabled;
 
   // Format metrics
   const formattedMetrics = {
@@ -107,6 +115,16 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
           },
         ]
       : []),
+    ...(hasComingSoon
+      ? [
+          {
+            name: "Governance",
+            href: "/coming-soon",
+            target: "_self",
+            isActive: pathname.includes("coming-soon"),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -131,23 +149,29 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
 
         {/* Bottom Sections */}
         <div className="mt-auto text-tertiary text-base font-semibold leading-normal">
-          {(totalSupply > 0 || votableSupply > 0) && (
-            <div className="p-8 flex flex-col justify-center border-b border-t border-line items-start gap-3">
-              <div className="">
-                {isLoading ? "-" : formattedMetrics.totalSupply} {token.symbol}{" "}
-                total supply
-              </div>
-              {(contracts.token.isERC20() || contracts.token.isERC721()) && (
+          {(totalSupply > 0 || votableSupply > 0) &&
+            !ui.customization?.customFooterHideTotalSupply && (
+              <div className="p-8 flex flex-col justify-center border-b border-t border-line items-start gap-3">
                 <div className="">
-                  {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
-                  {token.symbol} votable supply
+                  {isLoading ? "-" : formattedMetrics.totalSupply}{" "}
+                  {token.symbol} total supply
                 </div>
-              )}
-            </div>
-          )}
+                {(contracts.token.isERC20() || contracts.token.isERC721()) &&
+                  !ui.customization?.customFooterHideVotableSupply && (
+                    <div className="">
+                      {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
+                      {token.symbol} votable supply
+                    </div>
+                  )}
+              </div>
+            )}
 
           {/* Links Section */}
-          {(changeLogLink || bugsLink || discordLink) && (
+          {(changeLogLink ||
+            bugsLink ||
+            discordLink ||
+            twitterLink ||
+            farcasterLink) && (
             <div className="p-8 border-b border-line flex flex-col justify-center items-start gap-2.5">
               <div className="flex flex-col justify-center items-start gap-6 font-medium">
                 {governanceForumLink && (
@@ -221,6 +245,11 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
               alt="Agora Logo"
               width={82}
               height={21}
+              style={{
+                filter: ui.customization?.customFooterBackground
+                  ? "brightness(0) invert(1)"
+                  : "none",
+              }}
             />
             <div className="justify-start text-primary font-normal text-sm">
               Onchain Governance
