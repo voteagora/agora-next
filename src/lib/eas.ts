@@ -110,18 +110,8 @@ export async function createProposalAttestation({
     },
   });
 
-  const receipt = await txResponse.wait(1);
-
-  if (!receipt) {
-    console.error(
-      "Transaction failed or was not mined. Full response:",
-      receipt
-    );
-    throw new Error("Transaction failed or was not mined.");
-  }
-
   return {
-    transactionHash: receipt,
+    transactionHash: txResponse.receipt?.hash,
     id,
   };
 }
@@ -145,10 +135,8 @@ export async function cancelProposalAttestation({
     },
   });
 
-  const receipt = await transaction.wait();
-
   return {
-    transactionHash: receipt,
+    transactionHash: transaction.receipt?.hash,
     attestationUID,
   };
 }
