@@ -59,6 +59,7 @@ export async function createProposalAttestation({
   calculationOptions: number;
 }) {
   eas.connect(signer as any);
+
   const id = BigInt(
     keccak256(
       defaultAbiCoder.encode(
@@ -110,8 +111,11 @@ export async function createProposalAttestation({
     },
   });
 
+  // Wait for transaction to be sent (not mined) to get the hash
+  const receipt = await txResponse.wait(0);
+
   return {
-    transactionHash: txResponse.receipt?.hash,
+    transactionHash: receipt,
     id,
   };
 }
@@ -135,8 +139,11 @@ export async function cancelProposalAttestation({
     },
   });
 
+  // Wait for transaction to be sent (not mined) to get the hash
+  const receipt = await transaction.wait(0);
+
   return {
-    transactionHash: transaction.receipt?.hash,
+    transactionHash: receipt,
     attestationUID,
   };
 }
