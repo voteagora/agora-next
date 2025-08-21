@@ -11,6 +11,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const { ui } = Tenant.current();
   const [activeIndicator, setActiveIndicator] = useState({ left: 0, width: 0 });
+  const [activeNavItem, setActiveNavItem] = useState(null);
   const navRef = useRef(null);
   const linkRefs = useRef({});
 
@@ -19,26 +20,34 @@ export default function Navbar() {
 
   const { address } = useAccount();
   const { isConnected } = useAgoraContext();
+  
+  // Handle nav link click
+  const handleNavClick = (key) => {
+    setActiveNavItem(key);
+  };
 
-  // Update the active indicator position when the pathname changes
+  // Initialize the active nav item based on pathname when component loads
   useEffect(() => {
-    // Find the active link based on pathname
-    const activeKey = Object.keys(linkRefs.current).find((key) => {
-      if (
-        key === "proposals" &&
-        (pathname.includes("proposals") || pathname === "/")
-      )
-        return true;
-      if (key === "delegates" && pathname.includes("delegates")) return true;
-      if (key === "staking" && pathname.includes("staking")) return true;
-      if (key === "retropgf" && pathname.includes("retropgf/3/summary"))
-        return true;
-      if (key === "info" && pathname.includes("info")) return true;
-      return false;
-    });
+    // Extract the first part of the pathname to determine the active section
+    const path = pathname === "/" ? "proposals" : pathname.split("/")[1];
+    
+    // Check if the path matches any of our nav items directly
+    // This avoids explicit pathname checks and makes adding new nav items easier
+    if (path && linkRefs.current[path]) {
+      setActiveNavItem(path);
+    } else if (pathname === "/" && linkRefs.current["proposals"]) {
+      // Special case for homepage
+      setActiveNavItem("proposals");
+    } else if (path === "retropgf" && linkRefs.current["retropgf"]) {
+      // Special case for retropgf which has a more complex path
+      setActiveNavItem("retropgf");
+    }
+  }, [pathname]);
 
-    if (activeKey && linkRefs.current[activeKey]) {
-      const linkElement = linkRefs.current[activeKey];
+  // Update the active indicator position when activeNavItem changes
+  useEffect(() => {
+    if (activeNavItem && linkRefs.current[activeNavItem]) {
+      const linkElement = linkRefs.current[activeNavItem];
       const rect = linkElement.getBoundingClientRect();
       const navRect = navRef.current.getBoundingClientRect();
 
@@ -47,7 +56,7 @@ export default function Navbar() {
         width: rect.width,
       });
     }
-  }, [pathname]);
+  }, [activeNavItem]);
 
   return (
     <div
@@ -69,7 +78,8 @@ export default function Navbar() {
           ref={(el) => (linkRefs.current.proposals = el)}
           href={hasProposalsHref ? ui.page("proposals")?.href : "/proposals"}
           target={hasProposalsHref ? "_blank" : "_self"}
-          isActive={pathname.includes("proposals") || pathname === "/"}
+          isActive={activeNavItem === "proposals"}
+          onClick={() => handleNavClick("proposals")}
         >
           Proposals
         </HeaderLink>
@@ -79,7 +89,8 @@ export default function Navbar() {
         <HeaderLink
           ref={(el) => (linkRefs.current.delegates = el)}
           href="/delegates"
-          isActive={pathname.includes("delegates")}
+          isActive={activeNavItem === "delegates"}
+          onClick={() => handleNavClick("delegates")}
         >
           Voters
         </HeaderLink>
@@ -89,7 +100,8 @@ export default function Navbar() {
         <HeaderLink
           ref={(el) => (linkRefs.current.staking = el)}
           href={isConnected && address ? `/staking/${address}` : "/staking"}
-          isActive={pathname.includes("staking")}
+          isActive={activeNavItem === "staking"}
+          onClick={() => handleNavClick("staking")}
         >
           Staking
         </HeaderLink>
@@ -99,7 +111,8 @@ export default function Navbar() {
         <HeaderLink
           ref={(el) => (linkRefs.current.retropgf = el)}
           href="/retropgf/3/summary"
-          isActive={pathname.includes("retropgf/3/summary")}
+          isActive={activeNavItem === "retropgf"}
+          onClick={() => handleNavClick("retropgf")}
         >
           RetroPGF
         </HeaderLink>
@@ -109,7 +122,8 @@ export default function Navbar() {
         <HeaderLink
           ref={(el) => (linkRefs.current.info = el)}
           href="/info"
-          isActive={pathname.includes("info")}
+          isActive={activeNavItem === "info"}
+          onClick={() => handleNavClick("info")}
         >
           Info
         </HeaderLink>
