@@ -225,7 +225,7 @@ export default function ProposalType({
       BigInt(index),
       Math.round(quorum * 100),
       Math.round(approvalThreshold * 100),
-      `${formValues.name}${formValues.name.toLowerCase().includes(votingModuleType) ? "" : ` - [${votingModuleType}]`}`,
+      `${formValues.name}${formValues.name.toLowerCase().includes(votingModuleType) || contracts.supportScopes ? "" : ` - [${votingModuleType}]`}`,
       formValues.description || "",
       proposalTypeAddress,
     ];

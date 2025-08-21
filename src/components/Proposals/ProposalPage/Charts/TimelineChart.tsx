@@ -135,20 +135,45 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
             }
             tickLine={false}
             axisLine={false}
-            tickCount={6}
-            interval={0}
             width={54}
             tickMargin={4}
+            tickCount={6}
+            interval={0}
             domain={[
               0,
               (dataMax: number) => {
                 const quorumValue = proposal.quorum
                   ? +proposal.quorum.toString()
                   : 0;
-                // Add 10% padding above the higher value between dataMax and quorum
-                return Math.max(dataMax, quorumValue) * 1.1;
+                const maxValue = Math.max(dataMax, quorumValue);
+
+                if (maxValue <= 1) {
+                  return 1;
+                } else if (maxValue <= 10) {
+                  return Math.ceil(maxValue);
+                } else {
+                  return maxValue * 1.1;
+                }
               },
             ]}
+            ticks={(() => {
+              const quorumValue = proposal.quorum
+                ? +proposal.quorum.toString()
+                : 0;
+              const maxValue = Math.max(
+                Math.max(...chartData.map((d) => d.total)),
+                quorumValue
+              );
+
+              if (maxValue <= 1) {
+                return [0, 1];
+              } else if (maxValue <= 10) {
+                return Array.from({ length: maxValue + 1 }, (_, i) => i);
+              } else {
+                const step = Math.ceil(maxValue / 5);
+                return Array.from({ length: 6 }, (_, i) => i * step);
+              }
+            })()}
           />
           {!!proposal.quorum && !isProposalCreatedBeforeUpgrade && (
             <ReferenceLine
@@ -252,6 +277,10 @@ const tickFormatter = (timeStr: string, index: number) => {
 };
 
 const yTickFormatter = (value: any, _: number, isSnapshot = false) => {
+  if (value <= 10) {
+    return value.toString();
+  }
+
   const roundedValue = Math.round(value);
   const isSciNotation = isScientificNotation(roundedValue.toString());
   const decimals = isSnapshot ? 0 : token.decimals;
