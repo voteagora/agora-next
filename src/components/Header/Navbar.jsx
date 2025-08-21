@@ -20,7 +20,7 @@ export default function Navbar() {
 
   const { address } = useAccount();
   const { isConnected } = useAgoraContext();
-  
+
   // Handle nav link click
   const handleNavClick = (key) => {
     setActiveNavItem(key);
@@ -30,7 +30,7 @@ export default function Navbar() {
   useEffect(() => {
     // Extract the first part of the pathname to determine the active section
     const path = pathname === "/" ? "proposals" : pathname.split("/")[1];
-    
+
     // Check if the path matches any of our nav items directly
     // This avoids explicit pathname checks and makes adding new nav items easier
     if (path && linkRefs.current[path]) {
@@ -87,7 +87,9 @@ export default function Navbar() {
 
       {ui.toggle("delegates") && ui.toggle("delegates").enabled && (
         <HeaderLink
-          ref={(el) => (linkRefs.current.delegates = el)}
+          ref={(el) => {
+            linkRefs.current.delegates = el;
+          }}
           href="/delegates"
           isActive={activeNavItem === "delegates"}
           onClick={() => handleNavClick("delegates")}
@@ -98,7 +100,9 @@ export default function Navbar() {
 
       {ui.toggle("staking") && ui.toggle("staking").enabled && (
         <HeaderLink
-          ref={(el) => (linkRefs.current.staking = el)}
+          ref={(el) => {
+            linkRefs.current.staking = el;
+          }}
           href={isConnected && address ? `/staking/${address}` : "/staking"}
           isActive={activeNavItem === "staking"}
           onClick={() => handleNavClick("staking")}
@@ -109,7 +113,9 @@ export default function Navbar() {
 
       {ui.toggle("retropgf") && ui.toggle("retropgf").enabled && (
         <HeaderLink
-          ref={(el) => (linkRefs.current.retropgf = el)}
+          ref={(el) => {
+            linkRefs.current.retropgf = el;
+          }}
           href="/retropgf/3/summary"
           isActive={activeNavItem === "retropgf"}
           onClick={() => handleNavClick("retropgf")}
@@ -120,7 +126,9 @@ export default function Navbar() {
 
       {ui.toggle("info") && ui.toggle("info").enabled && (
         <HeaderLink
-          ref={(el) => (linkRefs.current.info = el)}
+          ref={(el) => {
+            linkRefs.current.info = el;
+          }}
           href="/info"
           isActive={activeNavItem === "info"}
           onClick={() => handleNavClick("info")}
