@@ -75,7 +75,9 @@ export default function Navbar() {
 
       {hasProposals && (
         <HeaderLink
-          ref={(el) => (linkRefs.current.proposals = el)}
+          ref={(el) => {
+            linkRefs.current.proposals = el;
+          }}
           href={hasProposalsHref ? ui.page("proposals")?.href : "/proposals"}
           target={hasProposalsHref ? "_blank" : "_self"}
           isActive={activeNavItem === "proposals"}
