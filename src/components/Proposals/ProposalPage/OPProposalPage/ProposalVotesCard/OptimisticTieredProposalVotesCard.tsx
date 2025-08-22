@@ -37,7 +37,11 @@ interface Props {
 
 const { token } = Tenant.current();
 
-const HybridOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
+const OptimisticTieredProposalVotesGroup = ({
+  proposal,
+}: {
+  proposal: Proposal;
+}) => {
   const proposalResults =
     proposal.proposalResults as ParsedProposalResults["HYBRID_OPTIMISTIC_TIERED"]["kind"];
 
@@ -45,16 +49,13 @@ const HybridOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
     () => calculateHybridOptimisticProposalMetrics(proposal),
     [proposal]
   );
-  const categoryWeight =
-    proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
-      ? (HYBRID_VOTE_WEIGHTS.chains * 100).toFixed(2)
-      : "33.33";
 
   let voteGroups = [
     {
       name: "Chains",
       againstVotes: proposalResults?.CHAIN?.against || "0",
-      weight: categoryWeight,
+      vetoPercentage:
+        groupTallies.find((g) => g.name === "chains")?.vetoPercentage || 0,
       veto:
         groupTallies.find((g) => g.name === "chains")?.exceedsThreshold ||
         false,
@@ -62,14 +63,16 @@ const HybridOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
     {
       name: "Apps",
       againstVotes: proposalResults?.APP?.against || "0",
-      weight: categoryWeight,
+      vetoPercentage:
+        groupTallies.find((g) => g.name === "apps")?.vetoPercentage || 0,
       veto:
         groupTallies.find((g) => g.name === "apps")?.exceedsThreshold || false,
     },
     {
       name: "Users",
       againstVotes: proposalResults?.USER?.against || "0",
-      weight: categoryWeight,
+      vetoPercentage:
+        groupTallies.find((g) => g.name === "users")?.vetoPercentage || 0,
       veto:
         groupTallies.find((g) => g.name === "users")?.exceedsThreshold || false,
     },
@@ -82,7 +85,8 @@ const HybridOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
         againstVotes: formatNumber(
           (proposalResults?.DELEGATES?.against || "0").toString()
         ),
-        weight: (HYBRID_VOTE_WEIGHTS.delegates * 100).toFixed(2),
+        vetoPercentage:
+          groupTallies.find((g) => g.name === "delegates")?.vetoPercentage || 0,
         veto:
           groupTallies.find((g) => g.name === "delegates")?.exceedsThreshold ||
           false,
@@ -102,9 +106,12 @@ const HybridOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
           textColorClass: "text-negative",
         },
         {
-          key: "weight",
-          header: "% Weight",
+          key: "vetoPercentage",
+          header: "% Veto",
           width: "w-[60px]",
+          formatter: (value) => {
+            return value.toFixed(2);
+          },
         },
         {
           key: "veto",
@@ -123,7 +130,7 @@ const HybridOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
   );
 };
 
-const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
+const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState("results");
   const [isClicked, setIsClicked] = useState<boolean>(false);
@@ -148,7 +155,7 @@ const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
     return (
       <div className="flex items-center gap-0.5">
         <div className="text-black text-xs font-bold leading-[18px]">
-          Vote criteria
+          Veto criteria
         </div>
         <TooltipProvider delayDuration={0}>
           <Tooltip>
@@ -156,7 +163,7 @@ const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
               <InfoIcon className="w-3 h-3 fill-neutral stroke-tertiary" />
             </TooltipTrigger>
             <TooltipContent className="max-w-[300px] p-4 text-xs text-tertiary">
-              <p className="text-primary font-bold mb-2">Vote criteria</p>
+              <p className="text-primary font-bold mb-2">Veto criteria</p>
               <p className="line-height-[32px]">
                 2 groups {proposalData?.tiers?.[0] || 55}%
               </p>
@@ -211,18 +218,20 @@ const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
                   <div className="border-b border-line">
                     <div className="px-3 pt-4 pb-3 bg-neutral">
                       <div className="flex flex-col justify-start items-start">
-                        {vetoThresholdMet && (
-                          <div className="self-stretch justify-start text-negative text-sm font-bold leading-7">
-                            {proposal.status === "ACTIVE"
+                        <div className="self-stretch justify-start text-negative text-sm font-bold leading-7">
+                          {vetoThresholdMet
+                            ? proposal.status === "ACTIVE"
                               ? "Proposal will be vetoed"
-                              : "Proposal vetoed"}
-                          </div>
-                        )}
+                              : "Proposal vetoed"
+                            : proposal.status === "ACTIVE"
+                              ? "Proposal was not vetoed yet"
+                              : "Proposal was not vetoed"}
+                        </div>
                         <div className="flex justify-between w-full">
                           {vetoThresholdMet ? (
                             <>
                               <div className="text-primary text-xs font-bold">
-                                {2} Group Threshold %
+                                {vetoingGroupsCount} Group Threshold %
                               </div>
                               <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-1">
@@ -237,10 +246,10 @@ const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
                                   />
                                   <div className="text-right text-black text-xs font-semibold leading-none">
                                     {vetoingGroupsCount === 2
-                                      ? proposalData?.tiers?.[0] / 100 || 55
+                                      ? proposalData?.tiers?.[0] || 55
                                       : vetoingGroupsCount === 3
-                                        ? proposalData?.tiers?.[1] / 100 || 45
-                                        : proposalData?.tiers?.[2] / 100 || 35}
+                                        ? proposalData?.tiers?.[1] || 45
+                                        : proposalData?.tiers?.[2] || 35}
                                     %
                                   </div>
                                 </div>
@@ -254,7 +263,7 @@ const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
                               <div className="flex justify-end items-center">
                                 <div className="flex items-center gap-1">
                                   <div className="text-right text-black text-xs font-semibold leading-none">
-                                    {proposalData?.tiers?.[2] / 100 || 35}%
+                                    {proposalData?.tiers?.[2] || 35}%
                                   </div>
                                 </div>
                               </div>
@@ -264,7 +273,7 @@ const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
                       </div>
                     </div>
                   </div>
-                  <HybridOptimisticVotesGroup proposal={proposal} />
+                  <OptimisticTieredProposalVotesGroup proposal={proposal} />
                   <div className="w-full h-12 px-3 py-2 bg-wash border-t border-line">
                     <div className="h-8 flex justify-between items-center">
                       {renderVoteCriteriaTooltip()}
@@ -273,7 +282,7 @@ const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
                 </div>
               </div>
 
-              <div className="absolute bottom-0 w-full right-0 bg-neutral border-t">
+              <div className="absolute bottom-0 w-full right-0 bg-neutral border">
                 <div className="p-4">
                   <CastVoteInput proposal={proposal} isOptimistic />
                 </div>
@@ -308,4 +317,4 @@ const HybridOptimisticProposalVotesCard = ({ proposal }: Props) => {
   );
 };
 
-export default HybridOptimisticProposalVotesCard;
+export default OptimisticTieredProposalVotesCard;

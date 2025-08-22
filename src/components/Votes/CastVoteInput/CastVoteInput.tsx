@@ -66,7 +66,7 @@ export default function CastVoteInput({
 
   if (!isConnected) {
     return (
-      <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+      <div className="flex flex-col justify-between py-3 px-3 border-line">
         <Button className="w-full" onClick={() => setOpen(true)}>
           Connect wallet to vote
         </Button>
@@ -76,7 +76,7 @@ export default function CastVoteInput({
 
   if (isPending) {
     return (
-      <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+      <div className="flex flex-col justify-between py-3 px-3 border-line">
         <DisabledVoteButton reason="Loading..." />
       </div>
     );
@@ -84,7 +84,7 @@ export default function CastVoteInput({
 
   if (isSuccess && !delegate?.statement) {
     return (
-      <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+      <div className="flex flex-col justify-between py-3 px-3 border-line">
         <NoStatementView />
       </div>
     );

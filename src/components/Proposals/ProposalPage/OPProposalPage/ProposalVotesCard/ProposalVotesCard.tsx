@@ -58,7 +58,9 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
         {isOffchain ? (
           <OffchainCastVoteInput />
         ) : (
-          <CastVoteInput proposal={proposal} />
+          <div className="border-t border-line">
+            <CastVoteInput proposal={proposal} />
+          </div>
         )}
       </div>
     </div>
