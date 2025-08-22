@@ -282,7 +282,7 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
                 </div>
               </div>
 
-              <div className="absolute bottom-0 w-full right-0 bg-neutral border">
+              <div className="absolute bottom-0 w-full right-0 bg-neutral border rounded-bl-xl rounded-br-xl">
                 <div className="p-4">
                   <CastVoteInput proposal={proposal} isOptimistic />
                 </div>
