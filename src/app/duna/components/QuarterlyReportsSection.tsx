@@ -9,7 +9,7 @@ import { ForumTopic, ForumPost } from "@/lib/forumUtils";
 import toast from "react-hot-toast";
 import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { DUNA_CATEGORY_ID } from "@/lib/constants";
+import { useDunaCategory } from "@/hooks/useDunaCategory";
 
 // Custom up-down chevron icon (outline)
 const UpDownChevronIcon = ({ className }: { className?: string }) => (
@@ -38,7 +38,8 @@ const QuarterlyReportsSection = ({
   const { address } = useAccount();
 
   const { createTopic, loading } = useForum();
-  const { canCreateTopics } = useForumAdmin(DUNA_CATEGORY_ID);
+  const { dunaCategoryId } = useDunaCategory();
+  const { canCreateTopics } = useForumAdmin(dunaCategoryId || undefined);
   const openDialog = useOpenDialog();
 
   const handleReportClick = (report: ForumTopic) => {
@@ -70,7 +71,7 @@ const QuarterlyReportsSection = ({
       const newReport = await createTopic({
         title: data.title,
         content: data.content,
-        categoryId: DUNA_CATEGORY_ID,
+        categoryId: dunaCategoryId!,
         attachment: data.attachment,
       });
 

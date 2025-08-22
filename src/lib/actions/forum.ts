@@ -1726,3 +1726,422 @@ export async function checkForumPermissions(
     };
   }
 }
+
+// Forum Category Management
+
+const createCategorySchema = z.object({
+  name: z.string().min(1, "Category name is required"),
+  description: z.string().optional(),
+  adminOnlyTopics: z.boolean().default(false),
+  adminAddress: z.string().min(1, "Admin address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function createForumCategory(
+  data: z.infer<typeof createCategorySchema>
+) {
+  try {
+    const validatedData = createCategorySchema.parse(data);
+    const { slug } = Tenant.current();
+
+    // Verify the admin's signature
+    const isValid = await verifyMessage({
+      address: validatedData.adminAddress as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
+
+    // Check if the person creating is an admin
+    const currentAdmin = await prisma.forumAdmin.findUnique({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: validatedData.adminAddress.toLowerCase(),
+        },
+      },
+    });
+
+    if (!currentAdmin) {
+      return {
+        success: false,
+        error: "Only forum admins can create categories",
+      };
+    }
+
+    // Create category
+    const category = await prisma.forumCategory.create({
+      data: {
+        dao_slug: slug,
+        name: validatedData.name,
+        description: validatedData.description || null,
+        adminOnlyTopics: validatedData.adminOnlyTopics,
+      },
+    });
+
+    return {
+      success: true,
+      data: category,
+    };
+  } catch (error) {
+    console.error("Error creating forum category:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
+    return {
+      success: false,
+      error:
+        error instanceof Error && error.message.includes("unique constraint")
+          ? "Category with this name already exists"
+          : "Failed to create category",
+    };
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+const updateCategorySchema = z.object({
+  categoryId: z.number().min(1, "Category ID is required"),
+  name: z.string().min(1, "Category name is required").optional(),
+  description: z.string().optional(),
+  adminOnlyTopics: z.boolean().optional(),
+  adminAddress: z.string().min(1, "Admin address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function updateForumCategory(
+  data: z.infer<typeof updateCategorySchema>
+) {
+  try {
+    const validatedData = updateCategorySchema.parse(data);
+    const { slug } = Tenant.current();
+
+    // Verify the admin's signature
+    const isValid = await verifyMessage({
+      address: validatedData.adminAddress as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
+
+    // Check if the person updating is an admin
+    const currentAdmin = await prisma.forumAdmin.findUnique({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: validatedData.adminAddress.toLowerCase(),
+        },
+      },
+    });
+
+    if (!currentAdmin) {
+      return {
+        success: false,
+        error: "Only forum admins can update categories",
+      };
+    }
+
+    // Check if category exists and is not archived
+    const existingCategory = await prisma.forumCategory.findFirst({
+      where: {
+        id: validatedData.categoryId,
+        dao_slug: slug,
+        archived: false,
+      },
+    });
+
+    if (!existingCategory) {
+      return { success: false, error: "Category not found" };
+    }
+
+    // Prevent updating DUNA category
+    if (existingCategory.name === "DUNA") {
+      return {
+        success: false,
+        error: "DUNA category cannot be updated",
+      };
+    }
+
+    // Prepare update data
+    const updateData: any = {};
+    if (validatedData.name !== undefined) updateData.name = validatedData.name;
+    if (validatedData.description !== undefined)
+      updateData.description = validatedData.description || null;
+    if (validatedData.adminOnlyTopics !== undefined)
+      updateData.adminOnlyTopics = validatedData.adminOnlyTopics;
+
+    // Update category
+    const category = await prisma.forumCategory.update({
+      where: {
+        id: validatedData.categoryId,
+        dao_slug: slug,
+      },
+      data: updateData,
+    });
+
+    return {
+      success: true,
+      data: category,
+    };
+  } catch (error) {
+    console.error("Error updating forum category:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
+    return {
+      success: false,
+      error:
+        error instanceof Error && error.message.includes("unique constraint")
+          ? "Category with this name already exists"
+          : "Failed to update category",
+    };
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+const deleteCategorySchema = z.object({
+  categoryId: z.number().min(1, "Category ID is required"),
+  adminAddress: z.string().min(1, "Admin address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function deleteForumCategory(
+  data: z.infer<typeof deleteCategorySchema>
+) {
+  try {
+    const validatedData = deleteCategorySchema.parse(data);
+    const { slug } = Tenant.current();
+
+    // Verify the admin's signature
+    const isValid = await verifyMessage({
+      address: validatedData.adminAddress as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
+
+    // Check if the person deleting is an admin
+    const currentAdmin = await prisma.forumAdmin.findUnique({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: validatedData.adminAddress.toLowerCase(),
+        },
+      },
+    });
+
+    if (!currentAdmin) {
+      return {
+        success: false,
+        error: "Only forum admins can delete categories",
+      };
+    }
+
+    // Check if category exists
+    const existingCategory = await prisma.forumCategory.findFirst({
+      where: {
+        id: validatedData.categoryId,
+        dao_slug: slug,
+      },
+    });
+
+    if (!existingCategory) {
+      return { success: false, error: "Category not found" };
+    }
+
+    // Prevent deleting DUNA category
+    if (existingCategory.name === "DUNA") {
+      return {
+        success: false,
+        error: "DUNA category cannot be deleted",
+      };
+    }
+
+    // Check if category has topics
+    const topicsCount = await prisma.forumTopic.count({
+      where: {
+        categoryId: validatedData.categoryId,
+        dao_slug: slug,
+      },
+    });
+
+    if (topicsCount > 0) {
+      return {
+        success: false,
+        error:
+          "Cannot delete category that contains topics. Archive it instead or move topics to another category first.",
+      };
+    }
+
+    // Delete category
+    await prisma.forumCategory.delete({
+      where: {
+        id: validatedData.categoryId,
+        dao_slug: slug,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting forum category:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
+    return {
+      success: false,
+      error: "Failed to delete category",
+    };
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+const archiveCategorySchema = z.object({
+  categoryId: z.number().min(1, "Category ID is required"),
+  adminAddress: z.string().min(1, "Admin address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function archiveForumCategory(
+  data: z.infer<typeof archiveCategorySchema>
+) {
+  try {
+    const validatedData = archiveCategorySchema.parse(data);
+    const { slug } = Tenant.current();
+
+    // Verify the admin's signature
+    const isValid = await verifyMessage({
+      address: validatedData.adminAddress as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
+
+    // Check if the person archiving is an admin
+    const currentAdmin = await prisma.forumAdmin.findUnique({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: validatedData.adminAddress.toLowerCase(),
+        },
+      },
+    });
+
+    if (!currentAdmin) {
+      return {
+        success: false,
+        error: "Only forum admins can archive categories",
+      };
+    }
+
+    // Check if category exists and is not already archived
+    const existingCategory = await prisma.forumCategory.findFirst({
+      where: {
+        id: validatedData.categoryId,
+        dao_slug: slug,
+        archived: false,
+      },
+    });
+
+    if (!existingCategory) {
+      return {
+        success: false,
+        error: "Category not found or already archived",
+      };
+    }
+
+    // Prevent archiving DUNA category
+    if (existingCategory.name === "DUNA") {
+      return {
+        success: false,
+        error: "DUNA category cannot be archived",
+      };
+    }
+
+    // Archive category
+    await prisma.forumCategory.update({
+      where: {
+        id: validatedData.categoryId,
+        dao_slug: slug,
+      },
+      data: {
+        archived: true,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error archiving forum category:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
+    return {
+      success: false,
+      error: "Failed to archive category",
+    };
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function getDunaCategoryId() {
+  try {
+    const { slug } = Tenant.current();
+
+    const dunaCategory = await prisma.forumCategory.findFirst({
+      where: {
+        dao_slug: slug,
+        name: "DUNA",
+        archived: false,
+      },
+    });
+
+    return dunaCategory?.id || null;
+  } catch (error) {
+    console.error("Error fetching DUNA category ID:", error);
+    return null;
+  } finally {
+    await prisma.$disconnect();
+  }
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   PaperClipIcon,
@@ -17,7 +17,7 @@ import { useAccount } from "wagmi";
 import { ConnectKitButton } from "connectkit";
 import CommentList from "./CommentList";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { DUNA_CATEGORY_ID } from "@/lib/constants";
+import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 
 interface ReportModalProps {
@@ -46,7 +46,10 @@ const ReportModal = ({
   const { createPost, deleteTopic, archiveTopic } = useForum();
   const { address, isConnected } = useAccount();
   const openDialog = useOpenDialog();
-  const { isAdmin, canManageTopics } = useForumAdmin(DUNA_CATEGORY_ID);
+  const { dunaCategoryId } = useDunaCategory();
+  const { isAdmin, canManageTopics } = useForumAdmin(
+    dunaCategoryId || undefined
+  );
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();

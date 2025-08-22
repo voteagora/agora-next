@@ -11,7 +11,7 @@ import { canDeleteContent } from "@/lib/forumAdminUtils";
 import { DunaContentRenderer, DunaEditor } from "@/components/duna-editor";
 import { Button } from "@/components/ui/button";
 import { Reply } from "lucide-react";
-import { DUNA_CATEGORY_ID } from "@/lib/constants";
+import { useDunaCategory } from "@/hooks/useDunaCategory";
 
 interface CommentItemProps {
   comment: ForumPost;
@@ -44,7 +44,10 @@ const CommentItem = ({
   const { address } = useAccount();
   const { deletePost } = useForum();
   const openDialog = useOpenDialog();
-  const { isAdmin, canManageTopics } = useForumAdmin(DUNA_CATEGORY_ID);
+  const { dunaCategoryId } = useDunaCategory();
+  const { isAdmin, canManageTopics } = useForumAdmin(
+    dunaCategoryId || undefined
+  );
 
   // Get replies for this comment
   const replies = comments.filter(

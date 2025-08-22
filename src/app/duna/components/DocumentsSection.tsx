@@ -8,7 +8,7 @@ import { TrashIcon, ArchiveBoxIcon } from "@heroicons/react/20/solid";
 import DocumentUploadModal from "./DocumentUploadModal";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
-import { DUNA_CATEGORY_ID } from "@/lib/constants";
+import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { FileIcon } from "lucide-react";
 
 const DocumentsSection = () => {
@@ -23,8 +23,10 @@ const DocumentsSection = () => {
   } = useForum();
   const { address } = useAccount();
   const openDialog = useOpenDialog();
-  const { isAdmin, canCreateAttachments, canManageAttachments } =
-    useForumAdmin(DUNA_CATEGORY_ID);
+  const { dunaCategoryId } = useDunaCategory();
+  const { isAdmin, canCreateAttachments, canManageAttachments } = useForumAdmin(
+    dunaCategoryId || undefined
+  );
 
   useEffect(() => {
     loadDocuments();
@@ -35,13 +37,7 @@ const DocumentsSection = () => {
     setDocuments(documentsData);
   };
 
-  const handleUploadComplete = async (uploadedDocument: {
-    name: string;
-    url: string;
-    ipfsCid: string;
-    fileSize: number;
-    contentType: string;
-  }) => {
+  const handleUploadComplete = async () => {
     await loadDocuments();
     setIsUploadModalOpen(false);
   };

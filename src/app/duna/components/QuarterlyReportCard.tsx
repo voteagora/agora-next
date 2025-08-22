@@ -16,7 +16,7 @@ import { useAccount } from "wagmi";
 import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
-import { DUNA_CATEGORY_ID } from "@/lib/constants";
+import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { DunaContentRenderer } from "@/components/duna-editor";
 
 interface QuarterlyReportCardProps {
@@ -37,7 +37,10 @@ const QuarterlyReportCard = ({
   const { address } = useAccount();
   const { deleteTopic, archiveTopic } = useForum();
   const openDialog = useOpenDialog();
-  const { isAdmin, canManageTopics } = useForumAdmin(DUNA_CATEGORY_ID);
+  const { dunaCategoryId } = useDunaCategory();
+  const { isAdmin, canManageTopics } = useForumAdmin(
+    dunaCategoryId || undefined
+  );
 
   const canArchive = canArchiveContent(
     address || "",
