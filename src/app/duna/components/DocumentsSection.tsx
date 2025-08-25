@@ -145,12 +145,14 @@ const DocumentsSection = () => {
             const canArchive = canArchiveContent(
               address || "",
               document.uploadedBy || "",
-              isAdmin || canManageAttachments
+              isAdmin,
+              canManageAttachments
             );
             const canDelete = canDeleteContent(
               address || "",
               document.uploadedBy || "",
-              isAdmin || canManageAttachments
+              isAdmin,
+              canManageAttachments
             );
 
             return (

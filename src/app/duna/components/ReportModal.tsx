@@ -176,12 +176,14 @@ const ReportModal = ({
   const canArchive = canArchiveContent(
     address || "",
     report.author || "",
-    isAdmin || canManageTopics
+    isAdmin,
+    canManageTopics
   );
   const canDelete = canDeleteContent(
     address || "",
     report.author || "",
-    isAdmin || canManageTopics
+    isAdmin,
+    canManageTopics
   );
 
   return (
