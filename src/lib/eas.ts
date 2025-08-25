@@ -111,8 +111,7 @@ export async function createProposalAttestation({
     },
   });
 
-  // Wait for transaction to be sent (not mined) to get the hash
-  const receipt = await txResponse.wait(0);
+  const receipt = await txResponse.wait();
 
   if (!receipt) {
     console.error(
@@ -147,8 +146,7 @@ export async function cancelProposalAttestation({
     },
   });
 
-  // Wait for transaction to be sent (not mined) to get the hash
-  const receipt = await transaction.wait(0);
+  const receipt = await transaction.wait();
 
   return {
     transactionHash: receipt,
