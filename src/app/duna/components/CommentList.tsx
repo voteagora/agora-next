@@ -59,7 +59,8 @@ const CommentItem = ({
   const canDelete = canDeleteContent(
     address || "",
     comment.author || "",
-    isAdmin || canManageTopics
+    isAdmin,
+    canManageTopics
   );
 
   const handleDelete = async (e: React.MouseEvent) => {
