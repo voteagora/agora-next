@@ -24,7 +24,7 @@ export default function DelegateStatementForm({
   form: UseFormReturn<DelegateStatementFormValues>;
 }) {
   const router = useRouter();
-  const { ui } = Tenant.current();
+  const { ui, contracts } = Tenant.current();
   const { address } = useAccount();
   const walletClient = useWalletClient();
   const messageSigner = useSignMessage();
@@ -95,34 +95,39 @@ export default function DelegateStatementForm({
     };
 
     const serializedBody = JSON.stringify(body, undefined, "\t");
-    const signature = await messageSigner
-      .signMessageAsync({
+    console.log("serializedBody", serializedBody);
+    try {
+      const signature = await messageSigner.signMessageAsync({
         message: serializedBody,
-      })
-      .catch((error) => console.error(error));
+      });
 
-    if (!signature) {
+      if (!signature) {
+        setSubmissionError("Signature failed, please try again");
+        return;
+      }
+
+      const response = await submitDelegateStatement({
+        address: address as `0x${string}`,
+        delegateStatement: values,
+        signature,
+        message: serializedBody,
+        scwAddress,
+      }).catch((error) => console.error(error));
+
+      if (!response) {
+        setSubmissionError(
+          "There was an error submitting your form, please try again"
+        );
+        return;
+      }
+
+      setSaveSuccess(true);
+      router.push(`/delegates/${address}`);
+    } catch (error) {
+      console.error(error);
       setSubmissionError("Signature failed, please try again");
       return;
     }
-
-    const response = await submitDelegateStatement({
-      address: address as `0x${string}`,
-      delegateStatement: values,
-      signature,
-      message: serializedBody,
-      scwAddress,
-    }).catch((error) => console.error(error));
-
-    if (!response) {
-      setSubmissionError(
-        "There was an error submitting your form, please try again"
-      );
-      return;
-    }
-
-    setSaveSuccess(true);
-    router.push(`/delegates/${address}`);
   }
 
   const canSubmit =
