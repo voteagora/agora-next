@@ -13,7 +13,13 @@ import { useDelegatesSort } from "./useDelegatesSort";
 export default function DelegatesSortFilter() {
   const { ui } = Tenant.current();
   const [isOpen, setIsOpen] = useState(false);
-  const show7dChange = ui.toggle("show-7d-change")?.enabled ?? true;
+  const show7dChange = (() => {
+    const maybeToggle = (ui as any)?.toggle;
+    if (typeof maybeToggle === "function") {
+      return maybeToggle("show-7d-change")?.enabled ?? true;
+    }
+    return true;
+  })();
 
   // Use shared sort hook
   const { orderByParam, handleSortChange, resetSort } = useDelegatesSort();

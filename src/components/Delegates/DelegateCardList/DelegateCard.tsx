@@ -24,8 +24,20 @@ const DelegateCard = ({
 
   const sanitizedTruncatedStatement = sanitizeContent(truncatedStatement);
 
-  const showParticipation = ui.toggle("show-participation")?.enabled || false;
-  const show7dChange = ui.toggle("show-7d-change")?.enabled ?? true;
+  const showParticipation = (() => {
+    const maybeToggle = (ui as any)?.toggle;
+    if (typeof maybeToggle === "function") {
+      return maybeToggle("show-participation")?.enabled || false;
+    }
+    return false;
+  })();
+  const show7dChange = (() => {
+    const maybeToggle = (ui as any)?.toggle;
+    if (typeof maybeToggle === "function") {
+      return maybeToggle("show-7d-change")?.enabled ?? true;
+    }
+    return true;
+  })();
 
   return (
     <div
