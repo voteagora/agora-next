@@ -70,9 +70,6 @@
   display: none;
   opacity: 1;
   transition: 200ms ease;
-  &:active {
-    opacity: 0.6;
-  }
   @media (max-width: $screen-sm) {
     display: flex;
     align-items: center;

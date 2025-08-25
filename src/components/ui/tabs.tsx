@@ -38,7 +38,7 @@ const tabsTriggerVariants = cva(
     variants: {
       variant: {
         default:
-          "text-primary font-bold opacity-30 data-[state=active]:opacity-100 hover:opacity-50 transition-opacity",
+          "text-primary font-bold data-[state=active]:opacity-100 transition-colors",
         gray: "rounded-full py-1 px-3 text-secondary font-medium hover:bg-wash hover:text-primary data-[state=active]:text-primary data-[state=active]:bg-wash data-[state=active]:hover:bg-wash",
         bool: "text-primary p-3 flex-1 text-center hover:bg-neutral data-[state=active]:bg-neutral data-[state=active]:rounded-md data-[state=active]:shadow-newDefault",
         underlined:
