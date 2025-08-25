@@ -1,6 +1,6 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
-import HybridOptimisticProposalVotesCard from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/HybridOptimisticProposalVotesCard";
+import OptimisticTieredProposalVotesCard from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/OptimisticTieredProposalVotesCard";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import OffChainOptimisticProposalVotesCard from "./ProposalVotesCard/OffChainOptimisticProposalVotesCard";
 
@@ -16,7 +16,7 @@ export default async function HybridOptimisticProposalPage({
         <ProposalDescription proposal={proposal} />
         <div>
           {proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED" ? (
-            <HybridOptimisticProposalVotesCard proposal={proposal} />
+            <OptimisticTieredProposalVotesCard proposal={proposal} />
           ) : (
             <OffChainOptimisticProposalVotesCard proposal={proposal} />
           )}
