@@ -5,26 +5,45 @@ import {
   getArchivedForumTopics,
   getArchivedForumAttachments,
   getArchivedForumCategories,
+  getDunaCategoryId,
 } from "@/lib/actions/forum";
 import {
   transformForumTopics,
   ForumTopic,
   ForumCategory,
 } from "@/lib/forumUtils";
-import { DUNA_CATEGORY_ID } from "@/lib/constants";
 import ArchivedReportsSection from "@/components/Admin/ArchivedReportsSection";
 import ArchivedDocumentsSection from "@/components/Admin/ArchivedDocumentsSection";
 import ArchivedCategoriesSection from "@/components/Admin/ArchivedCategoriesSection";
+import Tenant from "@/lib/tenant/tenant";
 
 export default async function ArchivedDataPage() {
+  const { ui } = Tenant.current();
+
   let archivedReports: ForumTopic[] = [];
   let archivedDocuments: any[] = [];
   let archivedCategories: ForumCategory[] = [];
 
+  if (!ui.toggle("forum") && !ui.toggle("duna")) {
+    return <div>Route not supported for namespace</div>;
+  }
+
   try {
+    const dunaCategoryId = await getDunaCategoryId();
+    if (!dunaCategoryId) {
+      console.error("Could not find DUNA category ID");
+      return (
+        <div className="mt-12">
+          <div className="text-center py-8 text-red-500">
+            Error: Could not find DUNA category
+          </div>
+        </div>
+      );
+    }
+
     const [topicsResult, documentsResult, categoriesResult] = await Promise.all(
       [
-        getArchivedForumTopics(DUNA_CATEGORY_ID),
+        getArchivedForumTopics(dunaCategoryId),
         getArchivedForumAttachments(),
         getArchivedForumCategories(),
       ]

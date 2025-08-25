@@ -22,8 +22,8 @@ import {
 } from "@/lib/actions/forum";
 import { useForumAdmin } from "@/hooks/useForum";
 import { PlusIcon, TrashIcon } from "@heroicons/react/20/solid";
-import { DUNA_CATEGORY_ID } from "@/lib/constants";
 import AgoraLoader from "../shared/AgoraLoader/AgoraLoader";
+import useDunaCategory from "@/hooks/useDunaCategory";
 
 interface ForumAdmin {
   dao_slug: string;
@@ -74,16 +74,16 @@ const ForumPermissionsManager = ({
 
   const [newPermissionAddress, setNewPermissionAddress] = useState("");
   const [newPermissionType, setNewPermissionType] = useState("");
-  // const [newPermissionScope, setNewPermissionScope] = useState<
-  //   "forum" | "category"
-  // >("category");
-  const newPermissionScope = "category";
-  // const [newPermissionScopeId, setNewPermissionScopeId] = useState<
-  //   number | null
-  // >(null);
-  const newPermissionScopeId = DUNA_CATEGORY_ID;
+  const [newPermissionScope, setNewPermissionScope] = useState<
+    "forum" | "category"
+  >("category");
+  const [newPermissionScopeId, setNewPermissionScopeId] = useState<
+    number | null
+  >(null);
 
-  const { isAdmin, isLoading } = useForumAdmin(DUNA_CATEGORY_ID);
+  const { dunaCategoryId, isLoading: isDunaLoading } = useDunaCategory();
+
+  const { isAdmin, isLoading } = useForumAdmin(dunaCategoryId || undefined);
 
   const handleAddAdmin = async () => {
     if (!address || !newAdminAddress.trim()) return;
@@ -164,8 +164,8 @@ const ForumPermissionsManager = ({
         setPermissions([...permissions, result.data as ForumPermission]);
         setNewPermissionAddress("");
         setNewPermissionType("");
-        // setNewPermissionScope("forum");
-        // setNewPermissionScopeId(null);
+        setNewPermissionScope("forum");
+        setNewPermissionScopeId(null);
         toast.success("Permission added successfully!");
       } else {
         toast.error(result.error || "Failed to add permission");
@@ -211,7 +211,7 @@ const ForumPermissionsManager = ({
     return category?.name || "Unknown Category";
   };
 
-  if (isLoading) {
+  if (isLoading || isDunaLoading) {
     return <AgoraLoader />;
   }
 
@@ -309,7 +309,7 @@ const ForumPermissionsManager = ({
 
           <div className="space-y-4">
             {/* Add new permission */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-2">
               <Input
                 placeholder="Wallet address"
                 value={newPermissionAddress}
@@ -332,7 +332,7 @@ const ForumPermissionsManager = ({
                 </SelectContent>
               </Select>
 
-              {/* <Select
+              <Select
                 value={newPermissionScope}
                 onValueChange={(value: "forum" | "category") => {
                   setNewPermissionScope(value);
@@ -348,9 +348,9 @@ const ForumPermissionsManager = ({
                   <SelectItem value="forum">Forum-wide</SelectItem>
                   <SelectItem value="category">Category-specific</SelectItem>
                 </SelectContent>
-              </Select> */}
+              </Select>
 
-              {/* {newPermissionScope === "category" && (
+              {newPermissionScope === "category" && (
                 <Select
                   value={newPermissionScopeId?.toString() || ""}
                   onValueChange={(value) =>
@@ -373,7 +373,7 @@ const ForumPermissionsManager = ({
                       ))}
                   </SelectContent>
                 </Select>
-              )} */}
+              )}
 
               <Button
                 onClick={handleAddPermission}
