@@ -145,13 +145,15 @@ async function getVotesForDelegateForAddress({
       : await contracts.token.provider.getBlock("latest");
 
     const data = await Promise.all(
-      votes.map((vote) => {
-        const proposalData = parseProposalData(
-          JSON.stringify(vote.proposal_data || {}),
-          vote.proposal_type
-        );
-        return parseVote(vote, proposalData, latestBlock);
-      })
+      votes
+        .filter((vote) => vote.proposal_data !== null)
+        .map((vote) => {
+          const proposalData = parseProposalData(
+            JSON.stringify(vote.proposal_data),
+            vote.proposal_type
+          );
+          return parseVote(vote, proposalData, latestBlock);
+        })
     );
     return {
       meta,
