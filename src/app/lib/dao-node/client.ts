@@ -517,7 +517,7 @@ export const getVoteRecordFromDaoNode = async (
 
   const response = await fetch(
     `${url}v1/vote_record/${proposalId}?${queryParams}`);
-  const data: { vote_record: DaoNodeVoteRecord[], has_next: boolean } = 
+  const data: { vote_record: DaoNodeVoteRecord[], has_more: boolean } = 
     await response.json();
   return data;
 };

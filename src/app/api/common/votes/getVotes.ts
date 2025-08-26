@@ -597,7 +597,7 @@ async function getVotesForProposal({
 
           return {
             meta: {
-              has_next: voteRecordPage.has_next,
+              has_next: voteRecordPage.has_more,
               total_returned: votes.length,
               next_offset: pagination.offset + pagination.limit,
             },
