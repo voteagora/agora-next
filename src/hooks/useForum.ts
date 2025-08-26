@@ -868,15 +868,19 @@ export const useForum = () => {
           throw new Error(result.error);
         }
 
+        if (!result.data) {
+          throw new Error("Category data is missing from response");
+        }
+
         toast.success("Category created successfully!");
         return {
-          id: result.data!.id,
-          name: result.data!.name,
-          description: result.data!.description || undefined,
-          archived: result.data!.archived,
-          adminOnlyTopics: result.data!.adminOnlyTopics,
-          createdAt: result.data!.createdAt.toISOString(),
-          updatedAt: result.data!.updatedAt.toISOString(),
+          id: result.data.id,
+          name: result.data.name,
+          description: result.data.description || undefined,
+          archived: result.data.archived,
+          adminOnlyTopics: result.data.adminOnlyTopics,
+          createdAt: result.data.createdAt.toISOString(),
+          updatedAt: result.data.updatedAt.toISOString(),
         };
       } catch (err) {
         const errorMessage =
@@ -928,15 +932,19 @@ export const useForum = () => {
           throw new Error(result.error);
         }
 
+        if (!result.data) {
+          throw new Error("Category data is missing from response");
+        }
+
         toast.success("Category updated successfully!");
         return {
-          id: result.data!.id,
-          name: result.data!.name,
-          description: result.data!.description || undefined,
-          archived: result.data!.archived,
-          adminOnlyTopics: result.data!.adminOnlyTopics,
-          createdAt: result.data!.createdAt.toISOString(),
-          updatedAt: result.data!.updatedAt.toISOString(),
+          id: result.data.id,
+          name: result.data.name,
+          description: result.data.description || undefined,
+          archived: result.data.archived,
+          adminOnlyTopics: result.data.adminOnlyTopics,
+          createdAt: result.data.createdAt.toISOString(),
+          updatedAt: result.data.updatedAt.toISOString(),
         };
       } catch (err) {
         const errorMessage =
