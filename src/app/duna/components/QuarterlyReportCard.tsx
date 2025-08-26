@@ -5,34 +5,89 @@ import {
   ChatBubbleLeftIcon,
   ClockIcon,
   PaperClipIcon,
+  TrashIcon,
+  ArchiveBoxIcon,
 } from "@heroicons/react/20/solid";
 import ENSName from "@/components/shared/ENSName";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import { ForumTopic } from "@/lib/forumUtils";
 import { formatDistanceToNow } from "date-fns";
+import { useAccount } from "wagmi";
+import { useForum, useForumAdmin } from "@/hooks/useForum";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
+import { DUNA_CATEGORY_ID } from "@/lib/constants";
+import { DunaContentRenderer } from "@/components/duna-editor";
 
 interface QuarterlyReportCardProps {
   report: ForumTopic;
   onClick: () => void;
   isLast?: boolean;
+  onDelete?: () => void;
+  onArchive?: () => void;
 }
 
 const QuarterlyReportCard = ({
   report,
   onClick,
   isLast,
+  onDelete,
+  onArchive,
 }: QuarterlyReportCardProps) => {
-  // Use the full content and let CSS handle the line clamping
+  const { address } = useAccount();
+  const { deleteTopic, archiveTopic } = useForum();
+  const openDialog = useOpenDialog();
+  const { isAdmin, canManageTopics } = useForumAdmin(DUNA_CATEGORY_ID);
+
+  const canArchive = canArchiveContent(
+    address || "",
+    report.author || "",
+    isAdmin || canManageTopics
+  );
+  const canDelete = canDeleteContent(
+    address || "",
+    report.author || "",
+    isAdmin || canManageTopics
+  );
+
   const content = report.content;
 
   const commentsCount = report.comments ? report.comments.length : 0;
-  const lastCommentDate =
-    report.comments && report.comments.length > 0
-      ? formatDistanceToNow(
-          new Date(report.comments[report.comments.length - 1].createdAt),
-          { addSuffix: true }
-        )
-      : formatDistanceToNow(new Date(report.createdAt), { addSuffix: true });
+  const createdAt = new Date(report.createdAt);
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Delete Post",
+        message: "Are you sure you want to delete this post?",
+        onConfirm: async () => {
+          const success = await deleteTopic(report.id);
+          if (success && onDelete) {
+            onDelete();
+          }
+        },
+      },
+    });
+  };
+
+  const handleArchive = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Archive Post",
+        message: "Are you sure you want to archive this post?",
+        onConfirm: async () => {
+          const success = await archiveTopic(report.id);
+          if (success && onArchive) {
+            onArchive();
+          }
+        },
+      },
+    });
+  };
 
   return (
     <div
@@ -51,13 +106,35 @@ const QuarterlyReportCard = ({
         <div className="flex items-center gap-2 text-sm text-secondary sm:ml-4">
           <ENSAvatar ensName={report.author} className="w-6 h-6" />
           <ENSName address={report.author} />
+          {(canArchive || canDelete) && (
+            <>
+              {canArchive && (
+                <button
+                  onClick={handleArchive}
+                  className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+                  title="Archive post"
+                >
+                  <ArchiveBoxIcon className="w-4 h-4" />
+                </button>
+              )}
+              {canDelete && (
+                <button
+                  onClick={handleDelete}
+                  className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                  title="Delete post"
+                >
+                  <TrashIcon className="w-4 h-4" />
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
 
       <div className="mb-4">
-        <p className="text-sm text-secondary leading-relaxed line-clamp-2">
-          {content}
-        </p>
+        <div className="text-sm text-secondary leading-relaxed line-clamp-2">
+          <DunaContentRenderer content={content} />
+        </div>
       </div>
 
       <div className="flex items-center justify-between text-xs text-tertiary">
@@ -68,7 +145,7 @@ const QuarterlyReportCard = ({
           </div>
           <div className="flex items-center gap-1">
             <ClockIcon className="w-4 h-4" />
-            <span>{lastCommentDate}</span>
+            <span>{formatDistanceToNow(createdAt, { addSuffix: true })}</span>
           </div>
           <div className="flex items-center gap-1">
             <PaperClipIcon className="w-4 h-4" />

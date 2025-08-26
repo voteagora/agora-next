@@ -59,6 +59,7 @@ export async function createProposalAttestation({
   calculationOptions: number;
 }) {
   eas.connect(signer as any);
+
   const id = BigInt(
     keccak256(
       defaultAbiCoder.encode(
@@ -110,7 +111,7 @@ export async function createProposalAttestation({
     },
   });
 
-  const receipt = await txResponse.wait(1);
+  const receipt = await txResponse.wait();
 
   if (!receipt) {
     console.error(

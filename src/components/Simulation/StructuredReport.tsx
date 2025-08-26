@@ -98,6 +98,11 @@ interface StructuredReportProps {
 }
 
 export function StructuredReport({ report }: StructuredReportProps) {
+  const checksToShow =
+    report.status === "error"
+      ? report.checks.filter((check) => check.status === "failed")
+      : report.checks;
+
   return (
     <div className="w-full border border-line rounded-md shadow-sm max-h-[600px] overflow-y-auto">
       <div className="bg-wash p-6 border-b border-line">
@@ -141,7 +146,7 @@ export function StructuredReport({ report }: StructuredReportProps) {
             </div>
           ) : (
             <div className="space-y-4">
-              {report.checks.map((check: SimulationCheck, index: number) => (
+              {checksToShow.map((check: SimulationCheck, index: number) => (
                 <ExpandableCheckItem
                   key={`check-${check.title}-${index}`}
                   check={check}

@@ -305,7 +305,7 @@ export async function parseProposal(
   const proposalData = parseProposalData(
     JSON.stringify(proposal.proposal_data || {}),
     proposalType,
-    offChainProposalData?.calculation_options
+    offChainProposalData
   );
 
   let proposalResults;
@@ -641,7 +641,7 @@ function parseMultipleStringsSeparatedByComma(obj: string | object) {
 export function parseProposalData(
   proposalData: string,
   proposalType: ProposalType,
-  calculationOptions?: 0 | 1
+  offChainProposalData?: any
 ): ParsedProposalData[ProposalType] {
   switch (proposalType) {
     case "SNAPSHOT": {
@@ -691,7 +691,7 @@ export function parseProposalData(
                 functionArgsName,
               },
             ],
-            calculationOptions,
+            calculationOptions: offChainProposalData?.calculation_options,
           },
         };
       } catch (error) {
@@ -716,7 +716,7 @@ export function parseProposalData(
         key: proposalType,
         kind: {
           options: [],
-          tiers: parsedProposalData.tiers
+          tiers: offChainProposalData?.tiers
             .map((tier: number) => tier / 100)
             .sort((a: number, b: number) => b - a),
           created_attestation_hash: parsedProposalData.created_attestation_hash,
@@ -795,7 +795,7 @@ export function parseProposalData(
         kind: {
           options: [],
           tiers: parsedProposalData.tiers
-            .map((tier: number) => tier / 100)
+            ?.map((tier: number) => tier / 100)
             .sort((a: number, b: number) => b - a),
           onchainProposalId: parsedProposalData.onchain_proposalid,
           created_attestation_hash: parsedProposalData.created_attestation_hash,

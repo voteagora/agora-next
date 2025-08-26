@@ -16,7 +16,7 @@ import { fetchDraftProposal } from "@/app/api/common/draftProposals/getDraftProp
 import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 import { PLMConfig } from "@/app/proposals/draft/types";
 
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 export default async function DraftProposalPage({
   params,

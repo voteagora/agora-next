@@ -27,6 +27,16 @@ export interface ForumPost {
   attachments?: ForumAttachment[];
 }
 
+export interface ForumCategory {
+  id: number;
+  name: string;
+  description?: string;
+  archived: boolean;
+  adminOnlyTopics: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface TransformForumTopicsOptions {
   mergePostAttachments?: boolean;
 }

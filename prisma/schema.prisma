@@ -4735,13 +4735,15 @@ enum AttachableType {
 }
 
 model ForumCategory {
-  id          Int               @id @default(autoincrement())
-  dao_slug    DaoSlug
-  name        String
-  description String?
-  createdAt   DateTime          @default(now()) @map("created_at")
-  updatedAt   DateTime          @updatedAt @map("updated_at")
-  topics      ForumTopic[]
+  id                Int               @id @default(autoincrement())
+  dao_slug          DaoSlug
+  name              String
+  description       String?
+  archived          Boolean           @default(false)
+  adminOnlyTopics   Boolean           @default(false) @map("admin_only_topics")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+  topics            ForumTopic[]
 
   @@unique([dao_slug, name])
   @@index([dao_slug])
@@ -4759,6 +4761,7 @@ model ForumTopic {
   postsCount     Int               @default(0) @map("posts_count")
   upvotesCount   Int               @default(0) @map("upvotes_count")
   reactionsCount Int               @default(0) @map("reactions_count")
+  archived       Boolean           @default(false)
   createdAt      DateTime          @default(now()) @map("created_at")
   updatedAt      DateTime          @updatedAt @map("updated_at")
   posts          ForumPost[]
@@ -4841,9 +4844,52 @@ model ForumAttachment {
   address     String?
   targetType  AttachableType @map("target_type")
   targetId    Int            @map("target_id")
+  archived    Boolean        @default(false)
   createdAt   DateTime       @default(now()) @map("created_at")
 
   @@index([dao_slug, targetType, targetId])
   @@map("forum_attachments")
+  @@schema("alltenant")
+}
+
+enum forum_permission_type {
+  manage_topics
+  create_topics
+  manage_attachments
+  create_attachments
+
+  @@schema("alltenant")
+}
+
+enum permission_scope {
+  forum
+  category
+
+  @@schema("alltenant")
+}
+
+model ForumPermission {
+  id             Int                   @id @default(autoincrement())
+  dao_slug       DaoSlug
+  permissionType forum_permission_type @map("permission_type")
+  scope          permission_scope      @default(forum)
+  scopeId        Int?                  @map("scope_id")
+  address        String
+
+  @@unique([dao_slug, permissionType, scope, scopeId, address])
+  @@index([dao_slug, permissionType])
+  @@index([dao_slug, scope, scopeId])
+  @@index([dao_slug, address])
+  @@index([dao_slug, permissionType, address])
+  @@map("forum_permissions")
+  @@schema("alltenant")
+}
+
+model ForumAdmin {
+  dao_slug DaoSlug
+  address  String
+
+  @@id([dao_slug, address])
+  @@map("forum_admins")
   @@schema("alltenant")
 }

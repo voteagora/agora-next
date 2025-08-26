@@ -277,11 +277,6 @@ export const protocolGuildTenantUIConfig = new TenantUI({
             prodAddress: null,
             testnetAddress: null,
           },
-          {
-            type: "optimistic",
-            prodAddress: "0x2e360A2bb39B47749D5F34cf0E1A285C76c088c3",
-            testnetAddress: "0x4414D030cFfEC5Edc011a27c653Ce21704b12d85",
-          },
         ],
         copy: {
           helperText: `
@@ -301,7 +296,7 @@ export const protocolGuildTenantUIConfig = new TenantUI({
     },
     {
       name: "use-daonode-for-votable-supply",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "use-daonode-for-proposal-types",

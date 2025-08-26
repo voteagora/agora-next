@@ -24,7 +24,7 @@ interface OffchainProposalData {
 interface CreateOffchainProposalParams {
   proposalData: OffchainProposalData;
   id: string;
-  transactionHash: string;
+  transactionHash?: string;
   onchainProposalId: string | null;
 }
 
@@ -69,7 +69,7 @@ export async function createOffchainProposal({
         tiers: tiers,
         start_block: start_block.toString(),
         end_block: end_block.toString(),
-        created_attestation_hash: transactionHash,
+        created_attestation_hash: transactionHash ?? null,
         created_block: latestBlock,
         max_options: maxApprovals,
         criteria: criteria,
@@ -121,7 +121,7 @@ export async function cancelOffchainProposal({
       },
       data: {
         cancelled_block: latestBlock,
-        cancelled_attestation_hash: transactionHash,
+        cancelled_attestation_hash: transactionHash ?? null,
       },
     });
 

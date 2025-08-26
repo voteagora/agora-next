@@ -1,42 +1,52 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { PaperClipIcon } from "@heroicons/react/20/solid";
+import {
+  PaperClipIcon,
+  TrashIcon,
+  ArchiveBoxIcon,
+} from "@heroicons/react/20/solid";
 import ENSAvatar from "@/components/shared/ENSAvatar";
+import { DunaEditor, DunaContentRenderer } from "@/components/duna-editor";
 import ENSName from "@/components/shared/ENSName";
-import { useForum } from "@/hooks/useForum";
 import { ForumTopic, ForumPost } from "@/lib/forumUtils";
 import { format } from "date-fns";
+import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
 import { ConnectKitButton } from "connectkit";
 import CommentList from "./CommentList";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { DUNA_CATEGORY_ID } from "@/lib/constants";
+import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 
 interface ReportModalProps {
   report: ForumTopic | null;
-  isOpen: boolean;
-  onClose: () => void;
+  onDelete?: () => void;
+  onArchive?: () => void;
+  onCommentAdded?: (newComment: ForumPost) => void;
+  onCommentDeleted?: (commentId: number) => void;
+  closeDialog: () => void;
 }
 
-const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
+const ReportModal = ({
+  report,
+  onDelete,
+  onArchive,
+  onCommentAdded,
+  onCommentDeleted,
+  closeDialog,
+}: ReportModalProps) => {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<ForumPost[]>(report?.comments || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [replyingToId, setReplyingToId] = useState<number | null>(null);
+  const [replyContent, setReplyContent] = useState("");
 
-  const { createPost } = useForum();
+  const { createPost, deleteTopic, archiveTopic } = useForum();
   const { address, isConnected } = useAccount();
-
-  useEffect(() => {
-    if (report) {
-      setComments(report.comments || []);
-    }
-  }, [report]);
+  const openDialog = useOpenDialog();
+  const { isAdmin, canManageTopics } = useForumAdmin(DUNA_CATEGORY_ID);
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +67,7 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
           author: newCommentData.author || address || "",
         };
         setComments((prev) => [...prev, commentWithAuthor]);
+        onCommentAdded?.(commentWithAuthor);
         setNewComment("");
       }
     } catch (error) {
@@ -66,28 +77,153 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
     }
   };
 
+  const handleDeleteComment = (commentId: number) => {
+    setComments((prev) => prev.filter((comment) => comment.id !== commentId));
+    onCommentDeleted?.(commentId);
+  };
+
+  const handleDeleteTopic = async () => {
+    if (!report) return;
+
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Delete Topic",
+        message:
+          "Are you sure you want to delete this topic? This action cannot be undone.",
+        onConfirm: async () => {
+          const success = await deleteTopic(report.id);
+          if (success && onDelete) {
+            onDelete();
+            closeDialog();
+          }
+        },
+      },
+    });
+  };
+
+  const handleArchiveTopic = async () => {
+    if (!report) return;
+
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Archive Topic",
+        message:
+          "Are you sure you want to archive this topic? This action cannot be undone.",
+        onConfirm: async () => {
+          const success = await archiveTopic(report.id);
+          if (success && onArchive) {
+            onArchive();
+            closeDialog();
+          }
+        },
+      },
+    });
+  };
+
+  const handleReply = (commentId: number) => {
+    setReplyingToId(commentId);
+    setReplyContent("");
+  };
+
+  const handleSubmitReply = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+
+    if (!replyContent.trim() || !report || !replyingToId) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const newReplyData = await createPost(report.id, {
+        content: replyContent.trim(),
+        parentId: replyingToId,
+      });
+
+      if (newReplyData) {
+        const replyWithAuthor = {
+          ...newReplyData,
+          author: newReplyData.author || address || "",
+          parentId: newReplyData.parentId || replyingToId,
+        };
+        setComments((prev) => [...prev, replyWithAuthor]);
+        onCommentAdded?.(replyWithAuthor);
+        setReplyContent("");
+        setReplyingToId(null);
+      }
+    } catch (error) {
+      console.error("Error creating reply:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancelReply = () => {
+    setReplyingToId(null);
+    setReplyContent("");
+  };
+
   if (!report) {
     return null;
   }
 
+  const canArchive = canArchiveContent(
+    address || "",
+    report.author || "",
+    isAdmin || canManageTopics
+  );
+  const canDelete = canDeleteContent(
+    address || "",
+    report.author || "",
+    isAdmin || canManageTopics
+  );
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl w-[calc(100vw-2rem)] sm:w-full max-h-[90vh] overflow-y-auto overflow-x-hidden bg-white">
-        <DialogHeader className="pb-4 sm:pb-6 border-b border-line">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <DialogTitle className="text-xl sm:text-2xl font-black text-primary mb-2">
-                {report.title}
-              </DialogTitle>
-              <div className="text-xs sm:text-sm text-secondary">
+    <div className="max-w-3xl bg-white p-4">
+      <div className="pb-4 sm:pb-6 border-b border-line">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h2 className="text-xl sm:text-2xl font-black text-primary mb-2">
+              {report.title}
+            </h2>
+            <div className="text-xs sm:text-sm text-secondary flex gap-2 divide-x">
+              <span>
                 Created{" "}
-                {format(new Date(report.createdAt), "MMM d, yyyy hh:mm")}{" "}
-                {comments.length} comments {report.attachments?.length || 0}{" "}
-                attachment{(report.attachments?.length || 0) !== 1 ? "s" : ""}
-              </div>
+                {format(new Date(report.createdAt), "MMM d, yyyy hh:mm")}
+              </span>
+              <span className="pl-2">{comments.length} comments</span>
+              <span className="pl-2">
+                {report.attachments?.length || 0} attachment
+                {(report.attachments?.length || 0) !== 1 ? "s" : ""}
+              </span>
             </div>
           </div>
-        </DialogHeader>
+          {(canArchive || canDelete) && (
+            <div className="flex gap-2 mr-4">
+              {canArchive && (
+                <button
+                  onClick={handleArchiveTopic}
+                  className="p-2 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer border border-gray-500 rounded-md"
+                  title="Archive topic"
+                >
+                  <ArchiveBoxIcon className="w-5 h-5" />
+                </button>
+              )}
+              {canDelete && (
+                <button
+                  onClick={handleDeleteTopic}
+                  className="p-2 text-red-500 hover:text-red-700 transition-colors cursor-pointer border border-red-500 rounded-md"
+                  title="Delete topic"
+                >
+                  <TrashIcon className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
 
         <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-x-hidden">
           {/* Author and Content Section */}
@@ -108,15 +244,8 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
               </div>
 
               {/* Report Content */}
-              <div className="text-secondary leading-relaxed space-y-3 sm:space-y-4">
-                {report.content.split("\n\n").map((paragraph, index) => (
-                  <p
-                    key={index}
-                    className="text-xs sm:text-sm break-words whitespace-pre-wrap leading-relaxed"
-                  >
-                    {paragraph}
-                  </p>
-                ))}
+              <div className="text-secondary leading-relaxed">
+                <DunaContentRenderer content={report.content} />
               </div>
             </div>
           </div>
@@ -149,7 +278,17 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
               Comments ({comments.length})
             </h4>
 
-            <CommentList comments={comments} />
+            <CommentList
+              comments={comments}
+              onReply={handleReply}
+              isReplying={replyingToId !== null}
+              replyingToId={replyingToId}
+              replyContent={replyContent}
+              onReplyContentChange={setReplyContent}
+              onSubmitReply={handleSubmitReply}
+              onCancelReply={handleCancelReply}
+              onDelete={handleDeleteComment}
+            />
 
             {/* Comment Input */}
             <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-line">
@@ -181,13 +320,11 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmitComment}>
-                  <textarea
+                  <DunaEditor
+                    variant="comment"
+                    placeholder="Write a comment…"
                     value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    className="w-full p-2 sm:p-3 border rounded-md bg-white text-primary focus:outline-none focus:ring-1 focus:ring-gray-200 resize-none font-normal text-xs sm:text-sm"
-                    style={{ borderColor: "#E5E5E5" }}
-                    rows={3}
-                    placeholder="Write a comment..."
+                    onChange={(html) => setNewComment(html)}
                     disabled={isSubmitting}
                   />
                   <div className="flex justify-end mt-2">
@@ -217,8 +354,8 @@ const ReportModal = ({ report, isOpen, onClose }: ReportModalProps) => {
             </div>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };
 
