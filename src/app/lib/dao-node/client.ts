@@ -11,7 +11,10 @@ import { DelegateStats } from "@/lib/types";
 
 const { namespace, ui } = Tenant.current();
 
-import { DaoNodeDelegateVote, DaoNodeVoteRecord } from "@/app/api/common/votes/vote";
+import {
+  DaoNodeDelegateVote,
+  DaoNodeVoteRecord,
+} from "@/app/api/common/votes/vote";
 import { PaginationParams } from "../pagination";
 
 // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL TODO BELOW IS HANDLED
@@ -499,9 +502,9 @@ export const getVotingHistoryFromDaoNode = async (address: string) => {
 };
 
 export const getVoteRecordFromDaoNode = async (
-  proposalId: string, 
-  sortBy: string, 
-  pagination: PaginationParams | undefined, 
+  proposalId: string,
+  sortBy: string,
+  pagination: PaginationParams | undefined,
   reverse: true | false
 ) => {
   const url = getDaoNodeURLForNamespace(namespace);
@@ -518,13 +521,18 @@ export const getVoteRecordFromDaoNode = async (
     queryParams.append("full", "true");
   }
 
-
-  const response = await fetch(`${url}v1/vote_record/${proposalId}?${queryParams}`);
-  const data: { vote_record: DaoNodeVoteRecord[], has_more: boolean } = await response.json();
+  const response = await fetch(
+    `${url}v1/vote_record/${proposalId}?${queryParams}`
+  );
+  const data: { vote_record: DaoNodeVoteRecord[]; has_more: boolean } =
+    await response.json();
   return data;
-}
+};
 
-export const getUserVoteRecordFromDaoNode = async (proposalId: string, address: string) => {
+export const getUserVoteRecordFromDaoNode = async (
+  proposalId: string,
+  address: string
+) => {
   const url = getDaoNodeURLForNamespace(namespace);
 
   const queryParams = new URLSearchParams({
@@ -535,4 +543,4 @@ export const getUserVoteRecordFromDaoNode = async (proposalId: string, address: 
   const response = await fetch(`${url}v1/vote?${queryParams}`);
   const data: { vote: DaoNodeVoteRecord[] } = await response.json();
   return data;
-}
+};
