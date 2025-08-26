@@ -1794,9 +1794,14 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
     return sum + againstPercentage;
   }, 0);
 
+  const totalGroups =
+    proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED" ? 4 : 3;
+
+  const weightedPercentage = calculatedTotalAgainstVotes / totalGroups;
+
   return {
     vetoThresholdMet: vetoTriggered,
-    totalAgainstVotes: Number(calculatedTotalAgainstVotes.toFixed(2)),
+    totalAgainstVotes: Number(weightedPercentage.toFixed(2)),
     groupTallies: groupsExceedingThresholds,
     thresholds,
   };

@@ -175,7 +175,7 @@ function CastVoteInputContent({
       >
         <div className="flex flex-col items-stretch justify-between">
           {!isError && !showSuccessMessage && (
-            <div className="border-t border-line px-4 pb-3 pt-1">
+            <div className="px-4 pb-3 pt-1">
               {!isLoading && (
                 <div className="flex flex-col gap-2">
                   {proposal.status === "ACTIVE" && (
@@ -239,7 +239,7 @@ function CastVoteInputContent({
         <VotingBanner />
       )}
       {showSuccessMessage && (
-        <div className="border-t border-line">
+        <div className="p-4">
           <SuccessMessage
             proposal={proposal}
             votes={votes}

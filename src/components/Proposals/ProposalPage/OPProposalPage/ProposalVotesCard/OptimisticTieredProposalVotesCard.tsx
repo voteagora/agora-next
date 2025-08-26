@@ -30,6 +30,7 @@ import Image from "next/image";
 import checkIcon from "@/icons/check.svg";
 import { HStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
+import { cn } from "@/lib/utils";
 
 interface Props {
   proposal: Proposal;
@@ -183,7 +184,7 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
   return (
     <>
       <div
-        className={`fixed flex-col justify-between gap-4 md:sticky top-[auto] md:top-20 md:max-h-[calc(100vh-220px)] max-h-[calc(100%-160px)] items-stretch flex-shrink w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] md:w-[20rem] lg:w-[24rem] transition-all ${isClicked ? "bottom-[20px]" : "bottom-[calc(-100%+350px)] h-[calc(100%-160px)] md:h-auto"}`}
+        className={`fixed flex-col justify-between gap-4 md:sticky top-[auto] md:top-20 md:max-h-[calc(100vh-220px)] max-h-[calc(100%-160px)] items-stretch flex-shrink w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] md:w-[20rem] lg:w-[24rem] transition-all ${isClicked ? "bottom-[20px]" : "bottom-[calc(-100%+350px)] h-[calc(100%-320px)] md:h-auto"}`}
         style={{
           transition: "bottom 600ms cubic-bezier(0, 0.975, 0.015, 0.995)",
         }}
@@ -218,14 +219,22 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
                   <div className="border-b border-line">
                     <div className="px-3 pt-4 pb-3 bg-neutral">
                       <div className="flex flex-col justify-start items-start">
-                        <div className="self-stretch justify-start text-negative text-sm font-bold leading-7">
+                        <div
+                          className={cn(
+                            "self-stretch justify-start text-sm font-bold leading-7",
+                            {
+                              "text-negative": vetoThresholdMet,
+                              "text-positive": !vetoThresholdMet,
+                            }
+                          )}
+                        >
                           {vetoThresholdMet
                             ? proposal.status === "ACTIVE"
-                              ? "Proposal will be vetoed"
+                              ? "Veto threshold reached"
                               : "Proposal vetoed"
                             : proposal.status === "ACTIVE"
-                              ? "Proposal was not vetoed yet"
-                              : "Proposal was not vetoed"}
+                              ? "Veto threshold not reached"
+                              : "Proposal approved"}
                         </div>
                         <div className="flex justify-between w-full">
                           {vetoThresholdMet ? (
@@ -283,7 +292,7 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
               </div>
 
               <div className="absolute bottom-0 w-full right-0 bg-neutral border rounded-bl-xl rounded-br-xl">
-                <div className="p-4">
+                <div className="">
                   <CastVoteInput proposal={proposal} isOptimistic />
                 </div>
               </div>
