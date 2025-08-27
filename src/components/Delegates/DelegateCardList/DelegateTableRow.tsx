@@ -49,7 +49,7 @@ export default function DelegateTableRow({
         </div>
       </TableCell>
       <TableCell>{formatNumber(delegate.votingPower.total)}</TableCell>
-      {show7dChange && (
+      {!hide7dChange && (
         <TableCell>
           {delegate.vpChange7d ? (
             <span
