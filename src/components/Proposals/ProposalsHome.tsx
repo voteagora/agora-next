@@ -42,20 +42,40 @@ async function fetchGovernanceCalendar() {
 export default async function ProposalsHome() {
   const { ui } = Tenant.current();
 
-  if (!ui.toggle("proposals")) {
+  const hasToggle = typeof (ui as any)?.toggle === "function";
+  if (!(hasToggle ? ui.toggle("proposals") : { enabled: true })) {
     return <div>Route not supported for namespace</div>;
   }
 
-  const plmEnabled = ui.toggle("proposal-lifecycle")?.enabled;
-  const supportsNotifications = ui.toggle("email-subscriptions")?.enabled;
+  const plmEnabled = hasToggle
+    ? ui.toggle("proposal-lifecycle")?.enabled
+    : false;
+  const supportsNotifications = hasToggle
+    ? ui.toggle("email-subscriptions")?.enabled
+    : false;
+
+  const emptyPaginated = () => ({
+    meta: { has_next: false, total_returned: 0, next_offset: 0 },
+    data: [],
+  });
 
   const [governanceCalendar, relevantProposals, allProposals, votableSupply] =
-    await Promise.all([
-      fetchGovernanceCalendar(),
-      fetchProposals(proposalsFilterOptions.relevant.filter),
-      fetchProposals(proposalsFilterOptions.everything.filter),
-      fetchVotableSupply(),
-    ]);
+    await (async () => {
+      const results = await Promise.allSettled([
+        fetchGovernanceCalendar(),
+        fetchProposals(proposalsFilterOptions.relevant.filter),
+        fetchProposals(proposalsFilterOptions.everything.filter),
+        fetchVotableSupply(),
+      ]);
+
+      const gc = results[0].status === "fulfilled" ? results[0].value : null;
+      const rel =
+        results[1].status === "fulfilled" ? results[1].value : emptyPaginated();
+      const all =
+        results[2].status === "fulfilled" ? results[2].value : emptyPaginated();
+      const vs = results[3].status === "fulfilled" ? results[3].value : "0";
+      return [gc, rel, all, vs] as const;
+    })();
 
   return (
     <div className="flex flex-col">
