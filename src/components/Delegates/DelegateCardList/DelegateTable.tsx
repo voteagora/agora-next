@@ -155,7 +155,7 @@ export default function DelegateTable({
               <td
                 className="w-full p-4 bg-neutral text-center text-secondary text-sm"
                 colSpan={
-                  5 + (show7dChange ? 1 : 0) + (showParticipation ? 1 : 0)
+                  5 + (!hide7dChange ? 1 : 0) + (showParticipation ? 1 : 0)
                 }
               >
                 None found
@@ -173,7 +173,7 @@ export default function DelegateTable({
                   isAdvancedUser={isAdvancedUser}
                   delegators={advancedDelegators}
                   showParticipation={showParticipation}
-                  show7dChange={show7dChange}
+                  show7dChange={!hide7dChange}
                 />
               ))
             )}
