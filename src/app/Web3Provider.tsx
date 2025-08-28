@@ -14,7 +14,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import Tenant from "@/lib/tenant/tenant";
-import { getTransportForChain } from "@/lib/utils";
+import { getTransportForChain, toNumericChainId } from "@/lib/utils";
 import { hashFn } from "@wagmi/core/query";
 
 const queryClient = new QueryClient({
@@ -35,15 +35,18 @@ const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 const { contracts, ui } = Tenant.current();
 const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
+// Force a numeric id (handles cases like "eip155:11155420")
+const tokenChainId = toNumericChainId(contracts.token.chain.id);
+
+const normalizedTokenChain = { ...contracts.token.chain, id: tokenChainId };
+
 export const config = createConfig(
   getDefaultConfig({
     walletConnectProjectId: projectId,
-    chains: [contracts.token.chain, mainnet],
+    chains: [normalizedTokenChain, mainnet],
     transports: {
       [mainnet.id]: getTransportForChain(mainnet.id)!,
-      [contracts.token.chain.id]: getTransportForChain(
-        contracts.token.chain.id
-      )!,
+      [tokenChainId]: getTransportForChain(tokenChainId)!,
     },
     appName: metadata.name,
     appDescription: metadata.description,

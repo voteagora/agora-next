@@ -12,7 +12,6 @@ export default async function verifyMessage({
   message: string;
 }) {
   const publicClient = getPublicClient();
-
   return await publicClient.verifyMessage({
     address,
     message,
