@@ -80,7 +80,9 @@ const CreateProposalDraftButton = ({
           message,
           signature,
         });
-        window.location.href = `/proposals/draft/${proposal.id}`;
+        const nextId =
+          (proposal as { uuid?: string; id: number }).uuid || proposal.id;
+        window.location.href = `/proposals/draft/${nextId}`;
       }}
     >
       Create proposal

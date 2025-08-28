@@ -58,7 +58,10 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
       });
 
       setIsSkipPending(false);
-      router.push(`/proposals/draft/${draftProposal.id}?stage=3`);
+      const nextId =
+        (draftProposal as { uuid?: string; id: number }).uuid ||
+        draftProposal.id;
+      router.push(`/proposals/draft/${nextId}?stage=3`);
     } catch (e) {
       setIsSkipPending(false);
     }
@@ -101,7 +104,7 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         params: {
           // read stage from URL and redirect to next stage
           // get stage metadata to make sure it's not the last stage (it really shouldn't be though)
-          redirectUrl: `/proposals/draft/${draftProposal.id}?stage=3`,
+          redirectUrl: `/proposals/draft/${(draftProposal as { uuid?: string; id: number }).uuid || draftProposal.id}?stage=3`,
           githubUrl: link,
         },
       });
@@ -149,7 +152,9 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
               fullWidth={true}
               type="primary"
               onClick={() => {
-                router.push(`/proposals/draft/${draftProposal.id}?stage=3`);
+                router.push(
+                  `/proposals/draft/${(draftProposal as { uuid?: string; id: number }).uuid || draftProposal.id}?stage=3`
+                );
               }}
             >
               Continue
