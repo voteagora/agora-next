@@ -20,6 +20,10 @@ import {
   unarchiveForumAttachment,
   unarchiveForumCategory,
   checkForumPermissions,
+  createForumCategory,
+  updateForumCategory,
+  deleteForumCategory,
+  archiveForumCategory,
 } from "@/lib/actions/forum";
 import { uploadAttachment } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData, AttachmentData } from "@/lib/fileUtils";
@@ -832,6 +836,214 @@ export const useForum = () => {
     [isConnected, address, signMessageAsync]
   );
 
+  const createCategory = useCallback(
+    async (data: {
+      name: string;
+      description?: string;
+      adminOnlyTopics?: boolean;
+    }): Promise<ForumCategory | null> => {
+      if (!isConnected || !address) {
+        toast.error("Please connect your wallet first");
+        return null;
+      }
+
+      setLoading(true);
+      const toastId = toast.loading("Creating category...");
+      setError(null);
+
+      try {
+        const message = `Create forum category: ${data.name}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+
+        const result = await createForumCategory({
+          name: data.name,
+          description: data.description,
+          adminOnlyTopics: data.adminOnlyTopics || false,
+          adminAddress: address,
+          signature,
+          message,
+        });
+
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        if (!result.data) {
+          throw new Error("Category data is missing from response");
+        }
+
+        toast.success("Category created successfully!");
+        return {
+          id: result.data.id,
+          name: result.data.name,
+          description: result.data.description || undefined,
+          archived: result.data.archived,
+          adminOnlyTopics: result.data.adminOnlyTopics,
+          createdAt: result.data.createdAt.toISOString(),
+          updatedAt: result.data.updatedAt.toISOString(),
+        };
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to create category";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        return null;
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastId);
+      }
+    },
+    [isConnected, address, signMessageAsync]
+  );
+
+  const updateCategory = useCallback(
+    async (
+      categoryId: number,
+      data: {
+        name?: string;
+        description?: string;
+        adminOnlyTopics?: boolean;
+      }
+    ): Promise<ForumCategory | null> => {
+      if (!isConnected || !address) {
+        toast.error("Please connect your wallet first");
+        return null;
+      }
+
+      setLoading(true);
+      const toastId = toast.loading("Updating category...");
+      setError(null);
+
+      try {
+        const message = `Update forum category: ${categoryId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+
+        const result = await updateForumCategory({
+          categoryId,
+          name: data.name,
+          description: data.description,
+          adminOnlyTopics: data.adminOnlyTopics,
+          adminAddress: address,
+          signature,
+          message,
+        });
+
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        if (!result.data) {
+          throw new Error("Category data is missing from response");
+        }
+
+        toast.success("Category updated successfully!");
+        return {
+          id: result.data.id,
+          name: result.data.name,
+          description: result.data.description || undefined,
+          archived: result.data.archived,
+          adminOnlyTopics: result.data.adminOnlyTopics,
+          createdAt: result.data.createdAt.toISOString(),
+          updatedAt: result.data.updatedAt.toISOString(),
+        };
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to update category";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        return null;
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastId);
+      }
+    },
+    [isConnected, address, signMessageAsync]
+  );
+
+  const deleteCategory = useCallback(
+    async (categoryId: number): Promise<boolean> => {
+      if (!isConnected || !address) {
+        toast.error("Please connect your wallet first");
+        return false;
+      }
+
+      setLoading(true);
+      const toastId = toast.loading("Deleting category...");
+      setError(null);
+
+      try {
+        const message = `Delete forum category: ${categoryId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+
+        const result = await deleteForumCategory({
+          categoryId,
+          adminAddress: address,
+          signature,
+          message,
+        });
+
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        toast.success("Category deleted successfully!");
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to delete category";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        return false;
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastId);
+      }
+    },
+    [isConnected, address, signMessageAsync]
+  );
+
+  const archiveCategory = useCallback(
+    async (categoryId: number): Promise<boolean> => {
+      if (!isConnected || !address) {
+        toast.error("Please connect your wallet first");
+        return false;
+      }
+
+      setLoading(true);
+      const toastId = toast.loading("Archiving category...");
+      setError(null);
+
+      try {
+        const message = `Archive forum category: ${categoryId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+
+        const result = await archiveForumCategory({
+          categoryId,
+          adminAddress: address,
+          signature,
+          message,
+        });
+
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        toast.success("Category archived successfully!");
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to archive category";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        return false;
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastId);
+      }
+    },
+    [isConnected, address, signMessageAsync]
+  );
+
   return {
     loading,
     error,
@@ -854,6 +1066,10 @@ export const useForum = () => {
     unarchiveTopic,
     unarchiveAttachment,
     unarchiveCategory,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+    archiveCategory,
   };
 };
 
