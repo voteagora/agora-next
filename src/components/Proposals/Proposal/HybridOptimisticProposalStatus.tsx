@@ -18,31 +18,25 @@ export const HybridOptimisticProposalStatus = ({
   const proposalStatus = proposal.status;
 
   if (proposalStatus === "DEFEATED") {
-    // Determine which tier threshold was exceeded
+    // Use pre-calculated threshold information from metrics
     const { groupTallies, thresholds } = metrics;
 
-    const groupsExceedingFourThreshold = groupTallies.filter(
-      (g) => g.vetoPercentage >= thresholds.fourGroups
-    );
-    const groupsExceedingThreeThreshold = groupTallies.filter(
-      (g) => g.vetoPercentage >= thresholds.threeGroups
-    );
-    const groupsExceedingTwoThreshold = groupTallies.filter(
-      (g) => g.vetoPercentage >= thresholds.twoGroups
+    const groupsExceedingThreshold = groupTallies.filter(
+      (g) => g.exceedsThreshold
     );
 
     let thresholdText = "";
-    if (groupsExceedingFourThreshold.length >= 4) {
+    if (groupsExceedingThreshold.length >= 4) {
       thresholdText = `${metrics.totalAgainstVotes}% / ${thresholds.fourGroups}% against votes`;
-    } else if (groupsExceedingThreeThreshold.length >= 3) {
+    } else if (groupsExceedingThreshold.length >= 3) {
       thresholdText = `${metrics.totalAgainstVotes}% / ${thresholds.threeGroups}% against votes`;
-    } else if (groupsExceedingTwoThreshold.length >= 2) {
+    } else if (groupsExceedingThreshold.length >= 2) {
       thresholdText = `${metrics.totalAgainstVotes}% / ${thresholds.twoGroups}% against votes`;
     }
 
     proposalInfoTxt = thresholdText;
   } else {
-    proposalInfoTxt = `${metrics.totalAgainstVotes}% / ${tiers[0]}% against needed to defeat`;
+    proposalInfoTxt = `${metrics.totalAgainstVotes}% / ${tiers[tiers.length - 1]}% against needed to defeat`;
   }
   return (
     <div className="flex flex-col text-right text-primary">

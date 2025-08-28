@@ -130,7 +130,9 @@ const OptimisticProposalVotesCard = ({
         {isOffchain ? (
           <OffchainCastVoteInput />
         ) : (
-          <CastVoteInput proposal={proposal} isOptimistic />
+          <div className="border-t border-line">
+            <CastVoteInput proposal={proposal} isOptimistic />
+          </div>
         )}
         {/* Only show the voting instruction text if user hasn't voted yet */}
         {isVotingDataLoaded && !hasUserVoted && (
