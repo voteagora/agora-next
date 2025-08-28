@@ -1191,6 +1191,7 @@ view uniswapDelegateChangedEvents {
 
 model ProposalDraft {
   id                       Int                        @id @default(autoincrement())
+  uuid                     String                     @unique @db.Uuid @default(uuid())
   temp_check_link          String
   proposal_type            String?                    @db.VarChar(50)
   voting_module_type       String?                    @db.VarChar(50)
