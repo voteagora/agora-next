@@ -36,7 +36,7 @@ export const HybridOptimisticProposalStatus = ({
 
     proposalInfoTxt = thresholdText;
   } else {
-    proposalInfoTxt = `${metrics.totalAgainstVotes}% / ${tiers[tiers.length - 1]}% against needed to defeat`;
+    proposalInfoTxt = `${metrics.totalAgainstVotes}% / ${tiers[0]}% against needed to defeat`;
   }
   return (
     <div className="flex flex-col text-right text-primary">
