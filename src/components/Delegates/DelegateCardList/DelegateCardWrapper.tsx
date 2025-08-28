@@ -37,13 +37,7 @@ const DelegateCardWrapper = async ({
 
   // Get sort values directly from parsed params and sanitize based on UI flags
   const { ui } = Tenant.current();
-  const hide7dChange = (() => {
-    const maybeToggle = (ui as any)?.toggle;
-    if (typeof maybeToggle === "function") {
-      return maybeToggle("hide-7d-change")?.enabled ?? false;
-    }
-    return false;
-  })();
+  const hide7dChange = ui.toggle("hide-7d-change")?.enabled ?? false;
   const rawSort = parsedParams.orderBy;
   const sort =
     hide7dChange &&
