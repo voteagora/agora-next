@@ -23,13 +23,7 @@ import Tenant from "@/lib/tenant/tenant";
 
 export const MobileDelegatesFilter = () => {
   const { ui } = Tenant.current();
-  const hide7dChange = (() => {
-    const maybeToggle = (ui as any)?.toggle;
-    if (typeof maybeToggle === "function") {
-      return maybeToggle("hide-7d-change")?.enabled ?? false;
-    }
-    return false;
-  })();
+  const hide7dChange = ui.toggle("hide-7d-change")?.enabled ?? false;
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIssues, setSelectedIssues] = useState<string[]>([]);
   const [selectedStakeholders, setSelectedStakeholders] = useState<string[]>(

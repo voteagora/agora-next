@@ -71,6 +71,7 @@ vi.mock("@/lib/tenant/tenant", () => ({
         customization: {
           primary: "rgb(0, 0, 0)",
         },
+        toggle: vi.fn(() => ({ enabled: false })),
       },
     }),
   },
