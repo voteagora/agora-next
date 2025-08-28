@@ -15,7 +15,19 @@ export async function onSubmitAction(data: {
   link: string;
   draftProposalId: number;
   creatorAddress: string;
+  message: string;
+  signature: `0x${string}`;
 }): Promise<FormState> {
+  const { verifyOwnerAndSiweForDraft } = await import("./siweAuth");
+  const ownerCheck = await verifyOwnerAndSiweForDraft(data.draftProposalId, {
+    address: data.creatorAddress as `0x${string}`,
+    message: data.message,
+    signature: data.signature,
+  });
+  if (!ownerCheck.ok) {
+    return { ok: false, message: ownerCheck.reason };
+  }
+
   const currentIndex = getStageIndexForTenant("ADDING_GITHUB_PR") as number;
   try {
     const nextStage = getStageByIndex(currentIndex + 1);

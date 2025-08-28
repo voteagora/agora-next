@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 import { useState } from "react";
 import FormCard from "../form/FormCard";
 import { UpdatedButton } from "@/components/Button";
@@ -21,6 +21,7 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const router = useRouter();
   const openDialog = useOpenDialog();
   const { address } = useAccount();
+  const messageSigner = useSignMessage();
   const [isCreatePRPending, setIsCreatePRPending] = useState(false);
   const [isSkipPending, setIsSkipPending] = useState(false);
 
@@ -35,10 +36,25 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         throw new Error("No address found");
       }
 
+      const messagePayload = {
+        action: "githubChecklist",
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+        timestamp: new Date().toISOString(),
+      };
+      const message = JSON.stringify(messagePayload);
+      const signature = await messageSigner
+        .signMessageAsync({ message })
+        .catch(() => undefined);
+      if (!signature) {
+        throw new Error("Signature failed");
+      }
       await createGithubChecklistItem({
         draftProposalId: draftProposal.id,
         creatorAddress: address,
         link: "",
+        message,
+        signature,
       });
 
       setIsSkipPending(false);
@@ -57,10 +73,25 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
 
       const link = await createGithubProposal(draftProposal);
 
+      const messagePayload = {
+        action: "githubChecklist",
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+        timestamp: new Date().toISOString(),
+      };
+      const message = JSON.stringify(messagePayload);
+      const signature = await messageSigner
+        .signMessageAsync({ message })
+        .catch(() => undefined);
+      if (!signature) {
+        throw new Error("Signature failed");
+      }
       await createGithubChecklistItem({
         draftProposalId: draftProposal.id,
         creatorAddress: address,
         link: link,
+        message,
+        signature,
       });
 
       setIsCreatePRPending(false);

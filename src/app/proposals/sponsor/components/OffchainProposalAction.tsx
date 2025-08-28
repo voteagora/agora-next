@@ -13,7 +13,12 @@ import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
 import { ProposalType as LibProposalType } from "@/lib/types.d";
-import { useAccount, useReadContract, useWalletClient } from "wagmi";
+import {
+  useAccount,
+  useReadContract,
+  useWalletClient,
+  useSignMessage,
+} from "wagmi";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
 import { getPublicClient } from "@/lib/viem";
 import { generateProposalId } from "@/lib/seatbelt/simulate";
@@ -39,6 +44,7 @@ const OffchainProposalAction = ({
   const [isOffchainSubmitting, setIsOffchainSubmitting] = useState(false);
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient();
+  const messageSigner = useSignMessage();
 
   const { data: votingDelay } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
@@ -210,11 +216,25 @@ const OffchainProposalAction = ({
           txHash: transactionHash as `0x${string}`,
         },
       });
+      const messagePayload = {
+        action: "sponsorDraft",
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+        timestamp: new Date().toISOString(),
+      };
+      const message = JSON.stringify(messagePayload);
+      const signature = await messageSigner
+        .signMessageAsync({ message })
+        .catch(() => undefined);
+      if (!signature) throw new Error("Signature failed");
       await sponsorDraftProposal({
         draftProposalId: draftProposal.id,
         onchain_transaction_hash: transactionHash,
         is_offchain_submission: true,
         proposal_scope: draftProposal.proposal_scope,
+        creatorAddress: address as `0x${string}`,
+        message,
+        signature,
       });
     } catch (e: any) {
       console.error("Off-chain proposal submission error:", e);
