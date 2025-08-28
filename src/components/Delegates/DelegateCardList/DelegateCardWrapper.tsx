@@ -51,13 +51,7 @@ const DelegateCardWrapper = async ({
   const tab = parsedParams.tab;
   const seed = Math.random();
 
-  const showParticipation = (() => {
-    const maybeToggle = (ui as any)?.toggle;
-    if (typeof maybeToggle === "function") {
-      return maybeToggle("show-participation")?.enabled || false;
-    }
-    return false;
-  })();
+  const showParticipation = ui.toggle("show-participation")?.enabled || false;
 
   const delegates = await fetchDelegatesWithParams(
     sort,
