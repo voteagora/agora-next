@@ -25,6 +25,7 @@ export async function onSubmitAction(
   const { verifySiwe } = await import("./siweAuth");
   const Tenant = (await import("@/lib/tenant/tenant")).default;
   const { getPublicClient } = await import("@/lib/viem");
+  const { ProposalScope } = await import("../types");
   const isValidSig = await verifySiwe({
     address: data.creatorAddress as `0x${string}`,
     message: data.message,
@@ -52,12 +53,16 @@ export async function onSubmitAction(
     const tenant = Tenant.current();
     const offchainToggle = tenant.ui.toggle("proposals/offchain");
     const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+    const plmConfig = plmToggle?.config as
+      | { offchainProposalCreator?: string[] }
+      | undefined;
+    const isOffchainScope =
+      (draft.proposal_scope || "").toLowerCase() ===
+      ProposalScope.OFFCHAIN_ONLY;
     const allowOffchainCreator = Boolean(
       offchainToggle?.enabled &&
-        ((draft.proposal_scope as any) === "OFFCHAIN_ONLY" || data.is_offchain_submission) &&
-        (plmToggle?.config as any)?.offchainProposalCreator?.includes(
-          signer
-        )
+        (isOffchainScope || data.is_offchain_submission) &&
+        plmConfig?.offchainProposalCreator?.includes(signer)
     );
     if (allowOffchainCreator) {
       isAuthorized = true;
@@ -67,12 +72,14 @@ export async function onSubmitAction(
     if (!isAuthorized) {
       const publicClient = getPublicClient();
       try {
-        const manager: string = (await publicClient.readContract({
+        // manager() may not exist on all governors; ignore errors
+        // @ts-expect-error ABI may not include manager in all tenants
+        const manager: string = await publicClient.readContract({
           address: tenant.contracts.governor.address as `0x${string}`,
           abi: tenant.contracts.governor.abi,
-          functionName: "manager" as any,
+          functionName: "manager",
           args: [],
-        })) as any;
+        });
         if (manager && manager.toLowerCase() === signer) {
           isAuthorized = true;
         }
