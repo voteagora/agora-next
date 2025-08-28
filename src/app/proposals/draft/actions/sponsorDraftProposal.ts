@@ -17,8 +17,77 @@ export type FormState = {
 export async function onSubmitAction(
   data: z.output<typeof SponsorProposalSchema> & {
     draftProposalId: number;
+    creatorAddress: string;
+    message: string;
+    signature: `0x${string}`;
   }
 ): Promise<FormState> {
+  const { verifySiwe } = await import("./siweAuth");
+  const Tenant = (await import("@/lib/tenant/tenant")).default;
+  const { getPublicClient } = await import("@/lib/viem");
+  const isValidSig = await verifySiwe({
+    address: data.creatorAddress as `0x${string}`,
+    message: data.message,
+    signature: data.signature,
+  });
+  if (!isValidSig) {
+    return { ok: false, message: "Invalid signature" };
+  }
+
+  // Authorization: allow author OR governor manager OR configured offchainProposalCreator (when applicable)
+  const draft = await prismaWeb2Client.proposalDraft.findUnique({
+    where: { id: data.draftProposalId },
+    select: {
+      id: true,
+      author_address: true,
+      proposal_scope: true,
+    },
+  });
+  if (!draft) return { ok: false, message: "Draft not found" };
+
+  const signer = data.creatorAddress.toLowerCase();
+  let isAuthorized = signer === draft.author_address.toLowerCase();
+
+  try {
+    const tenant = Tenant.current();
+    const offchainToggle = tenant.ui.toggle("proposals/offchain");
+    const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+    const allowOffchainCreator = Boolean(
+      offchainToggle?.enabled &&
+        ((draft.proposal_scope as any) === "OFFCHAIN_ONLY" || data.is_offchain_submission) &&
+        (plmToggle?.config as any)?.offchainProposalCreator?.includes(
+          signer
+        )
+    );
+    if (allowOffchainCreator) {
+      isAuthorized = true;
+    }
+
+    // Try manager check if still not authorized
+    if (!isAuthorized) {
+      const publicClient = getPublicClient();
+      try {
+        const manager: string = (await publicClient.readContract({
+          address: tenant.contracts.governor.address as `0x${string}`,
+          abi: tenant.contracts.governor.abi,
+          functionName: "manager" as any,
+          args: [],
+        })) as any;
+        if (manager && manager.toLowerCase() === signer) {
+          isAuthorized = true;
+        }
+      } catch {
+        // manager() may not exist; ignore
+      }
+    }
+  } catch {
+    // tenant read failed; keep current isAuthorized
+  }
+
+  if (!isAuthorized) {
+    return { ok: false, message: "Unauthorized" };
+  }
+
   const parsed = SponsorProposalSchema.safeParse(data);
 
   if (!parsed.success) {
