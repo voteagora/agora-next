@@ -4,7 +4,7 @@ import Link from "next/link";
 export const HeaderLink = forwardRef(
   ({ className, children, href, target, isActive, onClick }, ref) => {
     const activeClass = isActive
-      ? "text-primary z-10" // Active links have primary text color and higher z-index
+      ? "text-gray-900 z-10" // Active links use dark text for contrast on white overlay
       : "text-tertiary"; // Inactive links have tertiary text color
 
     const handleClick = (e) => {
