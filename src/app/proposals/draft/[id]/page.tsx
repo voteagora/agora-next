@@ -34,7 +34,7 @@ export default async function DraftProposalPage({
     return <div>This feature is not supported by this tenant.</div>;
   }
 
-  const draftProposal = await fetchDraftProposal(parseInt(params.id));
+  const draftProposal = await fetchDraftProposal(isNaN(Number(params.id)) ? params.id : parseInt(params.id));
   const proposalTypes = await fetchProposalTypes();
 
   const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
