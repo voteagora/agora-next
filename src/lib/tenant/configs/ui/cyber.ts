@@ -234,6 +234,10 @@ export const cyberTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "dao-node/delegate/addr",
+      enabled: true,
+    },
+    {
       name: "info",
       enabled: true,
     },
@@ -321,6 +325,14 @@ If you meet the proposal threshold or are the manager of the governor, then you 
     },
     {
       name: "show-participation",
+      enabled: true,
+    },
+    {
+      name: "dao-node/votes-chart", // Need to handle approval vote support
+      enabled: true,
+    },
+    {
+      name: "dao-node/proposal-votes",
       enabled: true,
     },
   ],

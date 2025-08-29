@@ -564,7 +564,10 @@ export function findVotes({
 
   switch (namespace) {
     case TENANT_NAMESPACES.OPTIMISM:
-      return prismaWeb3Client.optimismVotes.findMany(condition);
+      console.log("optimismVotes ->", condition);
+      const out = prismaWeb3Client.optimismVotes.findMany(condition);
+      console.log("optimismVotes <-", out);
+      return out;
     case TENANT_NAMESPACES.ENS:
       return prismaWeb3Client.ensVotes.findMany(condition);
     case TENANT_NAMESPACES.ETHERFI:

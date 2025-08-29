@@ -8,6 +8,7 @@ import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { WriteContractErrorType } from "wagmi/actions";
+import { revalidateTag } from "next/cache";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -87,6 +88,7 @@ const useAdvancedVoting = ({
             address: address as `0x${string}`,
           });
         if (status === "success") {
+          revalidateTag("proposalFromDaoNode");
           await trackEvent({
             event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
             event_data: {
@@ -136,6 +138,7 @@ const useAdvancedVoting = ({
             address: address as `0x${string}`,
           });
         if (status === "success") {
+          revalidateTag("proposalFromDaoNode");
           await trackEvent({
             event_name: ANALYTICS_EVENT_NAMES.ADVANCED_VOTE,
             event_data: {

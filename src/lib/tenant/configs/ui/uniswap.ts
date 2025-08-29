@@ -236,6 +236,10 @@ export const uniswapTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "dao-node/delegate/addr",
+      enabled: true,
+    },
+    {
       name: "proposals",
       enabled: true,
     },
@@ -364,6 +368,14 @@ export const uniswapTenantUIConfig = new TenantUI({
     {
       name: "duna",
       enabled: false,
+    },
+    {
+      name: "dao-node/votes-chart",
+      enabled: true,
+    },
+    {
+      name: "dao-node/proposal-votes",
+      enabled: true,
     },
   ],
 

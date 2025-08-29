@@ -2,13 +2,44 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { SnapshotVotePayload, VotePayload } from "@/app/api/common/votes/vote";
 import { prismaWeb3Client } from "@/app/lib/prisma";
+import {
+  getProposalFromDaoNode,
+  getVoteRecordFromDaoNode,
+} from "@/app/lib/dao-node/client";
 
 export async function getVotesChart({
   proposalId,
 }: {
   proposalId: string;
 }): Promise<any[]> {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
+  const useDaoNode = ui.toggle("dao-node/votes-chart")?.enabled ?? false;
+  if (useDaoNode) {
+    try {
+      const pagination = undefined;
+      const reverse = false;
+      const sortBy = "BN";
+      const voteRecordPage = (
+        await getVoteRecordFromDaoNode(proposalId, sortBy, pagination, reverse)
+      ).vote_record;
+      const votes = voteRecordPage.map((vote) => {
+        return {
+          voter: vote.voter,
+          support: String(vote.support),
+          weight: ((vote.weight || 0) + (vote.votes || 0)).toLocaleString(
+            "fullwide",
+            {
+              useGrouping: false,
+            }
+          ),
+          block_number: String(vote.bn),
+        };
+      });
+      return votes;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   let eventsViewName;
 

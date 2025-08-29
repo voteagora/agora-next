@@ -163,6 +163,14 @@ export const etherfiTenantUIConfig = new TenantUI({
     },
     {
       name: "show-participation",
+      enabled: true,
+    },
+    {
+      name: "dao-node/votes-chart",
+      enabled: false,
+    },
+    {
+      name: "dao-node/proposal-votes",
       enabled: false,
     },
   ],

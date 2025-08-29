@@ -302,5 +302,13 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       name: "use-daonode-for-proposal-types",
       enabled: true,
     },
+    {
+      name: "dao-node/votes-chart",
+      enabled: true,
+    },
+    {
+      name: "dao-node/proposal-votes",
+      enabled: true,
+    },
   ],
 });
