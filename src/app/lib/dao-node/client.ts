@@ -222,7 +222,7 @@ export const getAllProposalsFromDaoNode = async () => {
   }
 };
 
-export const getVotableSupplyFromDaoNode = async () => {
+const getVotableSupplyFromDaoNodeInternal = async () => {
   const url = getDaoNodeURLForNamespace(namespace);
 
   try {
@@ -255,6 +255,17 @@ export const getVotableSupplyFromDaoNode = async () => {
     throw error;
   }
 };
+
+// Cache the DAO node call with React cache for request deduplication
+// and unstable_cache for cross-request caching
+export const getVotableSupplyFromDaoNode = unstable_cache(
+  cache(getVotableSupplyFromDaoNodeInternal),
+  ["votableSupplyFromDaoNode"],
+  {
+    tags: ["votableSupplyFromDaoNode"],
+    revalidate: 60 * 60, // 1 hour cache
+  }
+);
 
 export const getCachedAllProposalsFromDaoNode = cache(
   getAllProposalsFromDaoNode
