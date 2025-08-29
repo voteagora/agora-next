@@ -858,6 +858,8 @@ async function getUserVotesForProposal({
             timestamp: getHumanBlockTime(vote.bn, latestBlock),
             blockNumber: BigInt(vote.bn),
             transaction_index: vote.tid,
+            citizenType: null,
+            voterMetadata: null,
           };
         });
 
