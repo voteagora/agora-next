@@ -26,7 +26,7 @@ async function getDelegateStatementForAddress({
   const { slug } = Tenant.current();
 
   const result = await prismaWeb2Client.delegateStatements
-    .findFirst({ 
+    .findFirst({
       where: { address: address.toLowerCase(), dao_slug: slug },
       select: {
         address: true,
@@ -45,12 +45,12 @@ async function getDelegateStatementForAddress({
         created_at_ts: true,
         updated_at_ts: true,
         stage: true,
-      }
+      },
     })
     .catch((error) => console.error(error));
 
   // Remove email from payload if it exists
-  if (result && result.payload && typeof result.payload === 'object') {
+  if (result && result.payload && typeof result.payload === "object") {
     const { email: _, ...payloadWithoutEmail } = result.payload as any;
     result.payload = payloadWithoutEmail;
   }
@@ -98,7 +98,7 @@ export async function getDelegateStatementsForAddresses({
             created_at_ts: true,
             updated_at_ts: true,
             stage: true,
-          }
+          },
         })
         .catch((error) => {
           console.error(error);
@@ -106,8 +106,8 @@ export async function getDelegateStatementsForAddresses({
         });
 
       // Remove email from payload if it exists
-      return results.map(result => {
-        if (result.payload && typeof result.payload === 'object') {
+      return results.map((result) => {
+        if (result.payload && typeof result.payload === "object") {
           const { email: _, ...payloadWithoutEmail } = result.payload as any;
           result.payload = payloadWithoutEmail;
         }

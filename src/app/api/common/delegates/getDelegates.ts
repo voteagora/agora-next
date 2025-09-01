@@ -251,11 +251,16 @@ async function getDelegates({
 
           // Sanitize statement payload to remove email if it exists
           let sanitizedStatement = delegate.statement;
-          if (sanitizedStatement && sanitizedStatement.payload && typeof sanitizedStatement.payload === 'object') {
-            const { email: _, ...payloadWithoutEmail } = sanitizedStatement.payload as any;
+          if (
+            sanitizedStatement &&
+            sanitizedStatement.payload &&
+            typeof sanitizedStatement.payload === "object"
+          ) {
+            const { email: _, ...payloadWithoutEmail } =
+              sanitizedStatement.payload as any;
             sanitizedStatement = {
               ...sanitizedStatement,
-              payload: payloadWithoutEmail
+              payload: payloadWithoutEmail,
             };
           }
 
@@ -609,11 +614,16 @@ async function getDelegates({
         data: delegates.map((delegate) => {
           // Sanitize statement payload to remove email if it exists
           let sanitizedStatement = delegate.statement;
-          if (sanitizedStatement && sanitizedStatement.payload && typeof sanitizedStatement.payload === 'object') {
-            const { email: _, ...payloadWithoutEmail } = sanitizedStatement.payload as any;
+          if (
+            sanitizedStatement &&
+            sanitizedStatement.payload &&
+            typeof sanitizedStatement.payload === "object"
+          ) {
+            const { email: _, ...payloadWithoutEmail } =
+              sanitizedStatement.payload as any;
             sanitizedStatement = {
               ...sanitizedStatement,
-              payload: payloadWithoutEmail
+              payload: payloadWithoutEmail,
             };
           }
 
@@ -782,11 +792,16 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
 
     // Sanitize statement payload to remove email if it exists
     let sanitizedStatement = delegate?.statement;
-    if (sanitizedStatement && sanitizedStatement.payload && typeof sanitizedStatement.payload === 'object') {
-      const { email: _, ...payloadWithoutEmail } = sanitizedStatement.payload as any;
+    if (
+      sanitizedStatement &&
+      sanitizedStatement.payload &&
+      typeof sanitizedStatement.payload === "object"
+    ) {
+      const { email: _, ...payloadWithoutEmail } =
+        sanitizedStatement.payload as any;
       sanitizedStatement = {
         ...sanitizedStatement,
-        payload: payloadWithoutEmail
+        payload: payloadWithoutEmail,
       };
     }
 

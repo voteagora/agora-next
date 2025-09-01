@@ -15,7 +15,7 @@ async function getDelegateForSCW(address: string) {
     .catch((error) => console.error(error));
 
   // Remove email from payload if it exists
-  if (result && result.payload && typeof result.payload === 'object') {
+  if (result && result.payload && typeof result.payload === "object") {
     const { email: _, ...payloadWithoutEmail } = result.payload as any;
     result.payload = payloadWithoutEmail;
   }

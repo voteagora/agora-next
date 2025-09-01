@@ -143,7 +143,7 @@ const SubscribeDialog = ({
               }
               await updateNotificationPreferencesForAddress(
                 address,
-                existingEmail || email as string,
+                (existingEmail || email) as string,
                 {
                   wants_proposal_created_email: true,
                   wants_proposal_ending_soon_email: true,
