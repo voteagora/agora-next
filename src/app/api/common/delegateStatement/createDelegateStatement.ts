@@ -35,9 +35,10 @@ export async function createDelegateStatement({
     throw new Error("Invalid signature");
   }
 
-  // Sanitize the statement before storing
+  // Sanitize the statement before storing and remove email from payload
+  const { email: _, ...delegateStatementWithoutEmail } = delegateStatement;
   const sanitizedStatement = {
-    ...delegateStatement,
+    ...delegateStatementWithoutEmail,
     delegateStatement: sanitizeContent(delegateStatement.delegateStatement),
   };
 
@@ -45,7 +46,7 @@ export async function createDelegateStatement({
     .update(sanitizedStatement.delegateStatement)
     .digest("hex");
 
-  const data = {
+  const data: any = {
     address: address.toLowerCase(),
     dao_slug: slug,
     message_hash: stopGapMessageHash,
@@ -54,13 +55,17 @@ export async function createDelegateStatement({
     twitter,
     warpcast,
     discord,
-    email,
     scw_address: scwAddress?.toLowerCase(),
     notification_preferences: {
       ...notificationPreferences,
       last_updated: new Date().toISOString(),
     },
   };
+
+  // Only include email if it's not empty
+  if (email && email.trim() !== "") {
+    data.email = email;
+  }
 
   return prismaWeb2Client.delegateStatements.upsert({
     where: {
