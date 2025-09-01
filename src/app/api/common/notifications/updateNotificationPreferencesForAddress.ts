@@ -37,21 +37,27 @@ const updateNotificationPreferencesForAddress = async (
     });
     const { slug } = Tenant.current();
     const validatedAddress = validatedData.address.toLowerCase();
+    const updateData: any = {
+      notification_preferences: {
+        last_updated: new Date(),
+        wants_proposal_created_email:
+          validatedData.options.wants_proposal_created_email,
+        wants_proposal_ending_soon_email:
+          validatedData.options.wants_proposal_ending_soon_email,
+      },
+    };
+
+    // Only update email if it's not empty
+    if (validatedData.email && validatedData.email.trim() !== "") {
+      updateData.email = validatedData.email;
+    }
+
     const result = await prismaWeb2Client.delegateStatements.updateMany({
       where: {
         address: validatedAddress,
         dao_slug: slug,
       },
-      data: {
-        email: validatedData.email,
-        notification_preferences: {
-          last_updated: new Date(),
-          wants_proposal_created_email:
-            validatedData.options.wants_proposal_created_email,
-          wants_proposal_ending_soon_email:
-            validatedData.options.wants_proposal_ending_soon_email,
-        },
-      },
+      data: updateData,
     });
 
     revalidateDelegateAddressPage(validatedAddress);
