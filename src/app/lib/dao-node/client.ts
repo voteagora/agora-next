@@ -11,6 +11,12 @@ import { DelegateStats } from "@/lib/types";
 
 const { namespace, ui } = Tenant.current();
 
+import {
+  DaoNodeDelegateVote,
+  DaoNodeVoteRecord,
+} from "@/app/api/common/votes/vote";
+import { PaginationParams } from "../pagination";
+
 // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL TODO BELOW IS HANDLED
 export function adaptDAONodeResponse(
   apiResponse: ProposalPayloadFromDAONode,
@@ -68,10 +74,23 @@ export function adaptDAONodeResponse(
     throw new Error(`Unknown voting module name: ${votingModuleName}`);
   }
 
-  const proposalType = proposalTypes[String(apiResponse.proposal_type)];
-  const parsedProposalType = Object.assign(proposalType, {
-    proposal_type_id: String(apiResponse.proposal_type),
-  });
+  // Proposal Type is undefined for some proposals
+  const proposalType =
+    apiResponse.proposal_type !== undefined
+      ? proposalTypes[String(apiResponse.proposal_type)]
+      : undefined;
+  const parsedProposalType =
+    proposalType !== undefined
+      ? Object.assign(proposalType, {
+          proposal_type_id: String(apiResponse.proposal_type),
+        })
+      : undefined;
+
+  if (!parsedProposalType) {
+    console.warn(
+      `Proposal type not found for proposal ${apiResponse.id} (${apiResponse.proposal_type})`
+    );
+  }
 
   return {
     proposal_id: apiResponse.id,
@@ -203,17 +222,17 @@ export const getAllProposalsFromDaoNode = async () => {
   }
 };
 
-export const getVotableSupplyFromDaoNode = async () => {
+const getVotableSupplyFromDaoNodeInternal = async () => {
   const url = getDaoNodeURLForNamespace(namespace);
 
   try {
     const startTime = Date.now();
 
-    const response = await fetch(`${url}v1/voting_power`);
-
     const startTimeS = new Date(startTime).toLocaleString();
 
     console.log(`${startTimeS} -> getVotableSupplyFromDaoNode`);
+
+    const response = await fetch(`${url}v1/voting_power`);
 
     if (!response.ok) {
       throw new Error(`API responded with status: ${response.status} (${url})`);
@@ -236,6 +255,17 @@ export const getVotableSupplyFromDaoNode = async () => {
     throw error;
   }
 };
+
+// Cache the DAO node call with React cache for request deduplication
+// and unstable_cache for cross-request caching
+export const getVotableSupplyFromDaoNode = unstable_cache(
+  cache(getVotableSupplyFromDaoNodeInternal),
+  ["votableSupplyFromDaoNode"],
+  {
+    tags: ["votableSupplyFromDaoNode"],
+    revalidate: 60 * 60, // 1 hour cache
+  }
+);
 
 export const getCachedAllProposalsFromDaoNode = cache(
   getAllProposalsFromDaoNode
@@ -422,4 +452,106 @@ export const getDelegateDataFromDaoNode = async (
     console.error("Error in getDelegateDataFromDaoNode:", error);
     return null;
   }
+};
+
+export const getDelegateFromDaoNode = async (address: string) => {
+  const { namespace, ui } = Tenant.current();
+  const url = getDaoNodeURLForNamespace(namespace);
+  const isDaoNodeDelegateAddressEnabled = ui.toggle(
+    "dao-node/delegate/addr"
+  )?.enabled;
+  if (!url || !isDaoNodeDelegateAddressEnabled) {
+    return null;
+  }
+
+  try {
+    const response = await fetch(`${url}v1/delegate/${address}`);
+    const data: DaoNodeDelegate = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+export const getProposalFromDaoNode = unstable_cache(
+  async (proposalId: string) => {
+    const url = getDaoNodeURLForNamespace(namespace);
+
+    const startTime = Date.now();
+    const startTimeS = new Date(startTime).toLocaleString();
+    console.log(`${startTimeS} -> getProposalFromDaoNode`);
+
+    const qry = `${url}v1/proposal/${proposalId}`;
+    console.log(qry);
+
+    const response = await fetch(qry);
+    const data: {
+      proposal: ProposalPayloadFromDAONode;
+    } = await response.json();
+
+    const endTime = Date.now();
+    const endTimeS = new Date(endTime).toLocaleString();
+    console.log(
+      `${endTimeS} <- getProposalFromDaoNode took ${endTime - startTime}ms`
+    );
+    return data;
+  },
+  ["proposalFromDaoNode"],
+  {
+    tags: ["proposalFromDaoNode"],
+    revalidate: 60, // 1 minute
+  }
+);
+
+export const getVotingHistoryFromDaoNode = async (address: string) => {
+  const url = getDaoNodeURLForNamespace(namespace);
+  const response = await fetch(`${url}v1/delegate/${address}/voting_history`);
+  const data: { voting_history: DaoNodeDelegateVote[] } = await response.json();
+  return data;
+};
+
+export const getVoteRecordFromDaoNode = async (
+  proposalId: string,
+  sortBy: string,
+  pagination: PaginationParams | undefined,
+  reverse: true | false
+) => {
+  const url = getDaoNodeURLForNamespace(namespace);
+
+  const queryParams = new URLSearchParams({
+    sort_by: sortBy,
+    reverse: reverse ? "true" : "false", // For VP, you likely want "true", to sort by descending.  For Block Number, you likely want false, for ascending.
+  });
+
+  if (pagination) {
+    queryParams.append("page_size", pagination.limit.toString());
+    queryParams.append("offset", pagination.offset.toString());
+  } else {
+    queryParams.append("full", "true");
+  }
+
+  const response = await fetch(
+    `${url}v1/vote_record/${proposalId}?${queryParams}`
+  );
+  const data: { vote_record: DaoNodeVoteRecord[]; has_more: boolean } =
+    await response.json();
+  return data;
+};
+
+export const getUserVoteRecordFromDaoNode = async (
+  proposalId: string,
+  address: string
+) => {
+  const url = getDaoNodeURLForNamespace(namespace);
+
+  const queryParams = new URLSearchParams({
+    proposal_id: proposalId,
+    voter: address.toLowerCase(),
+  });
+
+  const response = await fetch(`${url}v1/vote?${queryParams}`);
+  const data: { vote: DaoNodeVoteRecord[] } = await response.json();
+  return data;
 };

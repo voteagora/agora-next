@@ -300,5 +300,13 @@ For a full walkthrough of the proposal process, check out the [ENS DAO docs](htt
       name: "show-participation",
       enabled: true,
     },
+    {
+      name: "dao-node/votes-chart",
+      enabled: true,
+    },
+    {
+      name: "dao-node/proposal-votes",
+      enabled: true,
+    },
   ],
 });

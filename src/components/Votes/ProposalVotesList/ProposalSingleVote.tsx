@@ -24,6 +24,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
+import { useInView } from "react-intersection-observer";
+import { useBnAndTidToHash } from "@/hooks/useBnAndTidToHash";
 
 const { token, ui } = Tenant.current();
 
@@ -37,9 +39,21 @@ const SUPPORT_TO_ICON: Record<Support, React.ReactNode> = {
 export function ProposalSingleVote({ vote }: { vote: Vote }) {
   const { address: connectedAddress } = useAccount();
   const [hovered, setHovered] = useState(false);
+
   const [hash1, hash2] = vote.transactionHash?.split("|") || [];
 
   const isOffchainVote = !!vote.citizenType;
+
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+
+  const { data: hash } = useBnAndTidToHash({
+    blockNumber: Number(vote.blockNumber),
+    transactionIndex: vote.transaction_index,
+    enabled: inView && !!vote.blockNumber && !!vote.transaction_index,
+  });
 
   const { data } = useEnsName({
     chainId: 1,
@@ -56,10 +70,10 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
   };
 
   return (
-    <VStack
+    <div
       key={vote.transactionHash}
-      gap={2}
-      className="text-xs text-tertiary px-0 py-1"
+      className="flex flex-col gap-2 text-xs text-tertiary px-0 py-1"
+      ref={ref}
     >
       <VStack>
         <HoverCard
@@ -108,13 +122,15 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                 )}
                 {hovered && (!!hash1 || !!hash2) && (
                   <>
-                    <a
-                      href={getBlockScanUrl(hash1)}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                    >
-                      <ArrowTopRightOnSquareIcon className="w-3 h-3" />
-                    </a>
+                    {hash1 || hash ? (
+                      <a
+                        href={getBlockScanUrl(hash1 || (hash as string))}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                      </a>
+                    ) : null}
                     {hash2 && (
                       <a
                         href={getBlockScanUrl(hash2)}
@@ -166,6 +182,6 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
       <pre className="text-xs font-medium text-secondary w-fit font-sans whitespace-pre-wrap [overflow-wrap:anywhere]">
         {vote.reason}
       </pre>
-    </VStack>
+    </div>
   );
 }

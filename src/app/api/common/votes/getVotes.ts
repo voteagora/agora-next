@@ -3,8 +3,17 @@ import {
   paginateResult,
   PaginationParams,
 } from "@/app/lib/pagination";
-import { parseProposalData } from "@/lib/proposalUtils";
-import { parseSnapshotVote, parseVote } from "@/lib/voteUtils";
+import {
+  getProposalTotalValue,
+  getTitleFromProposalDescription,
+  parseProposalData,
+} from "@/lib/proposalUtils";
+import {
+  parseParams,
+  parseSnapshotVote,
+  parseSupport,
+  parseVote,
+} from "@/lib/voteUtils";
 import { cache } from "react";
 import {
   SnapshotVote,
@@ -23,6 +32,17 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
+import {
+  adaptDAONodeResponse,
+  getCachedAllProposalsFromDaoNode,
+  getProposalFromDaoNode,
+  getProposalTypesFromDaoNode,
+  getUserVoteRecordFromDaoNode,
+  getVoteRecordFromDaoNode,
+  getVotingHistoryFromDaoNode,
+} from "@/app/lib/dao-node/client";
+import { getHumanBlockTime } from "@/lib/blockTimes";
+import { ProposalPayloadFromDAONode } from "../proposals/proposal";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -44,6 +64,62 @@ async function getVotesForDelegateForAddress({
 }) {
   return withMetrics("getVotesForDelegateForAddress", async () => {
     const { namespace, contracts, ui } = Tenant.current();
+
+    const useDaoNode = ui.toggle("dao-node/proposal-votes")?.enabled ?? false;
+
+    const latestBlock = ui.toggle("use-l1-block-number")?.enabled
+      ? await contracts.providerForTime?.getBlock("latest")
+      : await contracts.token.provider.getBlock("latest");
+
+    if (useDaoNode) {
+      try {
+        const votingHistory = (await getVotingHistoryFromDaoNode(address))
+          .voting_history;
+        if (votingHistory.length) {
+          let [proposals, typesFromApi] = await Promise.all([
+            getCachedAllProposalsFromDaoNode(),
+            getProposalTypesFromDaoNode(),
+          ]);
+
+          const parsedProposals = proposals.map(
+            (proposal: ProposalPayloadFromDAONode) =>
+              adaptDAONodeResponse(proposal, typesFromApi.proposal_types)
+          );
+          const parsedVotes = await Promise.all(
+            votingHistory.map(async (vote) => {
+              const proposal = parsedProposals.find(
+                (p) => p.proposal_id === vote.proposal_id
+              );
+              return await parseVote(
+                {
+                  ...vote,
+                  weight: Number(vote.weight).toLocaleString("fullwide", {
+                    useGrouping: false,
+                  }),
+                },
+                proposal
+                  ? parseProposalData(
+                      JSON.stringify(proposal.proposal_data || {}),
+                      proposal.proposal_type
+                    )
+                  : null,
+                latestBlock
+              );
+            })
+          );
+          return {
+            meta: {
+              has_next: false,
+              total_returned: votingHistory.length,
+              next_offset: 0,
+            },
+            data: parsedVotes,
+          };
+        }
+      } catch (error) {
+        // skip error
+      }
+    }
 
     let eventsViewName;
 
@@ -139,10 +215,6 @@ async function getVotesForDelegateForAddress({
         data: [],
       };
     }
-
-    const latestBlock = ui.toggle("use-l1-block-number")?.enabled
-      ? await contracts.providerForTime?.getBlock("latest")
-      : await contracts.token.provider.getBlock("latest");
 
     const data = await Promise.all(
       votes
@@ -458,6 +530,92 @@ async function getVotesForProposal({
     "getVotesForProposal",
     async () => {
       const { namespace, contracts, ui } = Tenant.current();
+      const useDaoNode = ui.toggle("dao-node/proposal-votes")?.enabled ?? false;
+
+      const latestBlockPromise: Promise<Block> = ui.toggle(
+        "use-l1-block-number"
+      )?.enabled
+        ? contracts.providerForTime?.getBlock("latest")
+        : contracts.token.provider.getBlock("latest");
+
+      if (useDaoNode && !offchainProposalId) {
+        console.log("😀 Using dao node for votes");
+        try {
+          const sortBy = "VP";
+          const reverse = true;
+          let [proposalResponse, typesFromApi, voteRecordPage, latestBlock] =
+            await Promise.all([
+              getProposalFromDaoNode(proposalId),
+              getProposalTypesFromDaoNode(),
+              getVoteRecordFromDaoNode(proposalId, sortBy, pagination, reverse),
+              latestBlockPromise,
+            ]);
+
+          const proposal = proposalResponse.proposal;
+
+          if (!proposal) {
+            // Will be caught and ignored below and move on to DB fallback
+            throw new Error("Proposal not found");
+          }
+          const parsedProposal = adaptDAONodeResponse(
+            proposal,
+            typesFromApi.proposal_types
+          );
+
+          const proposalData = parseProposalData(
+            JSON.stringify(parsedProposal.proposal_data || {}),
+            parsedProposal.proposal_type
+          );
+
+          const votes = voteRecordPage.vote_record?.map((vote) => {
+            return {
+              transactionHash: null,
+              transactionOrdinal:
+                BigInt(vote.bn) * BigInt(10000) +
+                BigInt(vote.tid * 100) +
+                BigInt(vote.lid),
+              address: vote.voter,
+              proposalId,
+              support: parseSupport(
+                String(vote.support),
+                parsedProposal.proposal_type,
+                String(proposal.start_block)
+              ),
+              weight: ((vote.weight || 0) + (vote.votes || 0)).toLocaleString(
+                "fullwide",
+                {
+                  useGrouping: false,
+                }
+              ),
+              reason: vote.reason ?? null,
+              params: vote.params
+                ? parseParams(JSON.stringify(vote.params), proposalData)
+                : [],
+              proposalValue: getProposalTotalValue(proposalData) ?? BigInt(0),
+              proposalTitle: getTitleFromProposalDescription(
+                proposal.description
+              ),
+              proposalType: parsedProposal.proposal_type,
+              timestamp: getHumanBlockTime(vote.bn, latestBlock),
+              blockNumber: BigInt(vote.bn),
+              transaction_index: vote.tid,
+              citizenType: null,
+              voterMetadata: null,
+            };
+          });
+
+          return {
+            meta: {
+              has_next: voteRecordPage.has_more,
+              total_returned: votes.length,
+              next_offset: pagination.offset + pagination.limit,
+            },
+            data: votes,
+          };
+        } catch (error) {
+          throw error;
+        }
+      }
 
       let eventsViewName;
 
@@ -579,12 +737,6 @@ async function getVotesForProposal({
         );
       };
 
-      const latestBlockPromise: Promise<Block> = ui.toggle(
-        "use-l1-block-number"
-      )?.enabled
-        ? contracts.providerForTime?.getBlock("latest")
-        : contracts.token.provider.getBlock("latest");
-
       const [{ meta, data: votes }, latestBlock] = await Promise.all([
         doInSpan({ name: "getVotesForProposal" }, async () =>
           paginateResult(queryFunction, pagination)
@@ -652,6 +804,71 @@ async function getUserVotesForProposal({
 }) {
   return withMetrics("getUserVotesForProposal", async () => {
     const { namespace, contracts, ui } = Tenant.current();
+    const useDaoNode = ui.toggle("dao-node/proposal-votes")?.enabled ?? false;
+
+    const latestBlock = ui.toggle("use-l1-block-number")?.enabled
+      ? await contracts.providerForTime?.getBlock("latest")
+      : await contracts.token.provider.getBlock("latest");
+
+    if (useDaoNode) {
+      try {
+        let [userVote, proposalResponse, typesFromApi] = await Promise.all([
+          getUserVoteRecordFromDaoNode(proposalId, address),
+          getProposalFromDaoNode(proposalId),
+          getProposalTypesFromDaoNode(),
+        ]);
+
+        const proposal = proposalResponse.proposal;
+        if (!proposal) {
+          // Will be caught and ignored below and move on to DB fallback
+          throw new Error("Proposal not found");
+        }
+        const parsedProposal = adaptDAONodeResponse(
+          proposal,
+          typesFromApi.proposal_types
+        );
+        const proposalData = parseProposalData(
+          JSON.stringify(parsedProposal.proposal_data || {}),
+          parsedProposal.proposal_type
+        );
+
+        const votes = userVote.vote?.map((vote) => {
+          return {
+            transactionHash: null,
+            address: vote.voter,
+            proposalId,
+            support: parseSupport(
+              String(vote.support),
+              parsedProposal.proposal_type,
+              String(proposal.start_block)
+            ),
+            weight: ((vote.weight || 0) + (vote.votes || 0)).toLocaleString(
+              "fullwide",
+              { useGrouping: false }
+            ),
+            reason: vote.reason ?? null,
+            params: vote.params
+              ? parseParams(JSON.stringify(vote.params), proposalData)
+              : [],
+            proposalValue: getProposalTotalValue(proposalData) ?? BigInt(0),
+            proposalTitle: getTitleFromProposalDescription(
+              proposal.description
+            ),
+            proposalType: parsedProposal.proposal_type,
+            timestamp: getHumanBlockTime(vote.bn, latestBlock),
+            blockNumber: BigInt(vote.bn),
+            transaction_index: vote.tid,
+            citizenType: null,
+            voterMetadata: null,
+          };
+        });
+
+        return votes;
+      } catch (error) {
+        throw error;
+      }
+    }
+
     const queryFunciton = prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
       `
       SELECT
@@ -677,10 +894,6 @@ async function getUserVotesForProposal({
       { name: "getUserVotesForProposal" },
       async () => queryFunciton
     );
-
-    const latestBlock = ui.toggle("use-l1-block-number")?.enabled
-      ? await contracts.providerForTime?.getBlock("latest")
-      : await contracts.token.provider.getBlock("latest");
 
     const data = Promise.all(
       votes.map((vote) =>

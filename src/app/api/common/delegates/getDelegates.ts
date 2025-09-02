@@ -23,6 +23,7 @@ import { getProxyAddress } from "@/lib/alligatorUtils";
 import { calculateBigIntRatio } from "../utils/bigIntRatio";
 import { withMetrics } from "@/lib/metricWrapper";
 import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
+import { getDelegateFromDaoNode } from "@/app/lib/dao-node/client";
 
 // Create a cached version of getDelegatesFromDaoNode
 const cachedGetDelegatesFromDaoNode = unstable_cache(
@@ -772,18 +773,25 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       BigInt(delegate?.voting_power || 0) +
       BigInt(delegate?.advanced_vp?.toFixed(0) || 0);
 
+    let usedNumOfDelegators;
     const cachedNumOfDelegators = BigInt(
       delegate.num_of_delegators?.toFixed() || "0"
     );
 
-    const usedNumOfDelegators =
-      cachedNumOfDelegators < 1000n
-        ? BigInt(
-            (
-              await numOfDelegationsResult
-            )?.[0]?.num_of_delegators?.toString() || "0"
-          )
-        : cachedNumOfDelegators;
+    const daoNodeDelegate = await getDelegateFromDaoNode(address);
+    if (daoNodeDelegate) {
+      const delegateData = daoNodeDelegate.delegate;
+      usedNumOfDelegators = BigInt(delegateData.from_cnt);
+    } else {
+      usedNumOfDelegators =
+        cachedNumOfDelegators < 1000n
+          ? BigInt(
+              (
+                await numOfDelegationsResult
+              )?.[0]?.num_of_delegators?.toString() || "0"
+            )
+          : cachedNumOfDelegators;
+    }
 
     const relativeVotingPowerToVotableSupply = calculateBigIntRatio(
       totalVotingPower,

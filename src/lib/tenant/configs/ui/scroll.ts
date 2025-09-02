@@ -241,6 +241,10 @@ export const scrollTenantUIConfig = new TenantUI({
       enabled: false,
     },
     {
+      name: "dao-node/delegate/addr",
+      enabled: true,
+    },
+    {
       name: "info",
       enabled: true,
     },
@@ -334,6 +338,14 @@ If you meet the proposal threshold or are the manager of the governor, then you 
     {
       name: "use-daonode-for-proposal-types",
       enabled: false,
+    },
+    {
+      name: "dao-node/votes-chart",
+      enabled: true,
+    },
+    {
+      name: "dao-node/proposal-votes",
+      enabled: true,
     },
   ],
 });
