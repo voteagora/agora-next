@@ -5,7 +5,7 @@ import { decodeJwt } from "jose";
 // TODO: this should probably be an environment variable
 const API_AUTH_PREFIX = "/api/v1/auth";
 const LOCAL_STORAGE_JWT_KEY = "agora-siwe-jwt";
-const AGORA_SIGN_IN = "Sign in to Agora with Ethereum";
+export const AGORA_SIGN_IN_MESSAGE = "Sign in to Agora with Ethereum";
 
 /* There's currently nothing stored on the backend to maintain session state.
 // All session state is stateless and stored in the JWT issued by the server.
@@ -30,7 +30,7 @@ export const siweProviderConfig: SIWEConfig = {
       version: "1",
       domain: window.location.host,
       uri: window.location.origin,
-      statement: AGORA_SIGN_IN,
+      statement: AGORA_SIGN_IN_MESSAGE,
       address,
       chainId,
       nonce,
