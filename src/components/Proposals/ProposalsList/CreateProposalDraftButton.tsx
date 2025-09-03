@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { UpdatedButton } from "@/components/Button";
-import createProposalDraft from "./actions/createProposalDraft";
 import classNames from "classnames";
 import Tenant from "@/lib/tenant/tenant";
 import { useSignMessage } from "wagmi";
@@ -76,6 +75,9 @@ const CreateProposalDraftButton = ({
           setIsPending(false);
           return;
         }
+        const { default: createProposalDraft } = await import(
+          "./actions/createProposalDraft"
+        );
         const proposal = await createProposalDraft(address, {
           message,
           signature,
