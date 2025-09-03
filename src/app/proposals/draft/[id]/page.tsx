@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Tenant from "@/lib/tenant/tenant";
 import DraftProposalForm from "../components/DraftProposalForm";
+import { permanentRedirect } from "next/navigation";
 import BackButton from "../components/BackButton";
 import {
   GET_DRAFT_STAGES,
@@ -34,7 +35,22 @@ export default async function DraftProposalPage({
     return <div>This feature is not supported by this tenant.</div>;
   }
 
-  const draftProposal = await fetchDraftProposal(isNaN(Number(params.id)) ? params.id : parseInt(params.id));
+  // Canonicalize URL: if numeric id is used, redirect permanently to UUID
+  const redirectStage = (searchParams?.stage || "0") as string;
+  const numericId = Number(params.id);
+  const isNumericParam = !isNaN(numericId);
+  if (isNumericParam) {
+    const draftById = await fetchDraftProposal(numericId);
+    if (draftById && (draftById as any).uuid) {
+      return permanentRedirect(
+        `/proposals/draft/${(draftById as any).uuid}?stage=${redirectStage}`
+      );
+    }
+  }
+
+  const draftProposal = await fetchDraftProposal(
+    isNaN(Number(params.id)) ? params.id : parseInt(params.id)
+  );
   const proposalTypes = await fetchProposalTypes();
 
   const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
@@ -61,7 +77,9 @@ export default async function DraftProposalPage({
           <div className="flex flex-row items-center space-x-6">
             {stageIndex > 0 && (
               <BackButton
-                draftProposalId={parseInt(params.id)}
+                draftProposalId={
+                  (draftProposal as any).uuid || String(draftProposal.id)
+                }
                 index={stageIndex}
               />
             )}
