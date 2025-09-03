@@ -429,8 +429,6 @@ export function toNumericChainId(
   // This format is relevant when using a wallet connect provider
   input: number | string | { id: number | string }
 ): number {
-  console.log({ input });
-
   const raw =
     typeof input === "object" && input !== null ? (input as any).id : input;
 
