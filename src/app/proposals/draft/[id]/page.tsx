@@ -35,16 +35,24 @@ export default async function DraftProposalPage({
     return <div>This feature is not supported by this tenant.</div>;
   }
 
-  // Canonicalize URL: if numeric id is used, redirect permanently to UUID
-  const redirectStage = (searchParams?.stage || "0") as string;
+  // Canonicalize URL: if numeric id is used, redirect permanently to UUID, preserving all query params
   const numericId = Number(params.id);
   const isNumericParam = !isNaN(numericId);
   if (isNumericParam) {
     const draftById = await fetchDraftProposal(numericId);
-    if (draftById && (draftById as any).uuid) {
-      return permanentRedirect(
-        `/proposals/draft/${(draftById as any).uuid}?stage=${redirectStage}`
+    const draftWithUuid = draftById as unknown as { uuid?: string; id: number };
+    if (draftById && draftWithUuid.uuid) {
+      const entries = Object.entries(searchParams || {}).flatMap(
+        ([key, value]) =>
+          Array.isArray(value)
+            ? value.map((v) => [key, String(v)] as [string, string])
+            : value !== undefined
+              ? [[key, String(value)] as [string, string]]
+              : []
       );
+      const qs = new URLSearchParams(entries).toString();
+      const target = `/proposals/draft/${draftWithUuid.uuid}${qs ? `?${qs}` : ""}`;
+      return permanentRedirect(target);
     }
   }
 
