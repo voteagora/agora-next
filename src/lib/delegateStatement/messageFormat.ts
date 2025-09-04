@@ -36,4 +36,3 @@ export function createDelegateStatementMessage(
   // Use consistent formatting with tab indentation
   return JSON.stringify(messageBody, undefined, "\t");
 }
-
