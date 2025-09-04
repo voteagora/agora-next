@@ -10,6 +10,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { PLMConfig } from "@/app/proposals/draft/types";
 import { useSIWE } from "connectkit";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { ConnectKitButton } from "connectkit";
+import { UpdatedButton } from "@/components/Button";
 
 type DraftResponse = any;
 
@@ -112,20 +114,57 @@ export default function DraftProposalPageClient({
 
   if (error) {
     const needsSiwe = error.toLowerCase().includes("not authenticated");
+    const chainName =
+      Tenant.current().contracts.governor.chain?.name || "Network";
     return (
-      <div className="text-secondary">
-        {error}
-        {needsSiwe && (
-          <div className="mt-4">
-            <button
-              onClick={handleSiwe}
-              disabled={!address || isSwitching}
-              className="px-4 py-2 rounded bg-primary text-white disabled:opacity-50"
-            >
-              Sign in with Ethereum
-            </button>
+      <div className="max-w-screen-xl mx-auto mt-10">
+        <div className="bg-wash border border-line rounded-2xl shadow-newDefault p-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-primary text-xl font-black">
+                Authentication required
+              </h2>
+              <p className="text-secondary mt-2 max-w-prose">
+                To access and edit this draft, please sign this access request.
+                We’ll verify your ownership securely.
+              </p>
+              <div className="flex items-center gap-2 mt-3">
+                <span className="text-xs uppercase tracking-wide text-tertiary">
+                  Current network
+                </span>
+                <span className="text-xs px-2 py-1 rounded-full border border-line text-primary bg-tertiary/5">
+                  {chainName}
+                </span>
+              </div>
+            </div>
           </div>
-        )}
+
+          <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            {!address ? (
+              <div className="sm:w-auto">
+                <ConnectKitButton.Custom>
+                  {({ show }) => (
+                    <UpdatedButton type="primary" onClick={show}>
+                      Connect wallet
+                    </UpdatedButton>
+                  )}
+                </ConnectKitButton.Custom>
+              </div>
+            ) : (
+              <UpdatedButton
+                type="primary"
+                onClick={handleSiwe}
+                isLoading={isSwitching}
+                className="sm:w-auto"
+              >
+                Sign access request
+              </UpdatedButton>
+            )}
+            <span className="text-tertiary text-xs">
+              {needsSiwe ? "Not authenticated" : error}
+            </span>
+          </div>
+        </div>
       </div>
     );
   }
