@@ -24,7 +24,14 @@ const isSiweEnabled = () => {
 
 export const siweProviderConfig: SIWEConfig = {
   getNonce: async () =>
-    fetch(`${API_AUTH_PREFIX}/nonce`).then((res) => res.text()),
+    fetch(`${API_AUTH_PREFIX}/nonce`).then(async (res) => {
+      const ct = res.headers.get("content-type") || "";
+      if (ct.includes("application/json")) {
+        const data = await res.json();
+        return data?.nonce ?? "";
+      }
+      return res.text();
+    }),
   createMessage: ({ nonce, address, chainId }) =>
     new SiweMessage({
       version: "1",
