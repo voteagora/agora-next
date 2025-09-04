@@ -1,0 +1,69 @@
+import { NextRequest, NextResponse } from "next/server";
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { verifyJwtAndGetAddress } = await import(
+      "@/app/proposals/draft/actions/siweAuth"
+    );
+    const { prismaWeb2Client } = await import("@/app/lib/prisma");
+    const Tenant = (await import("@/lib/tenant/tenant")).default;
+
+    // Extract bearer token and resolve SIWE address from JWT
+    const authz =
+      request.headers.get("authorization") ||
+      request.headers.get("Authorization");
+    const token = authz?.startsWith("Bearer ") ? authz.slice(7) : undefined;
+    if (!token) {
+      return NextResponse.json(
+        { message: "Missing bearer token" },
+        { status: 401 }
+      );
+    }
+    const siweAddress = await verifyJwtAndGetAddress(token);
+    if (!siweAddress) {
+      return NextResponse.json(
+        { message: "Invalid or expired token" },
+        { status: 401 }
+      );
+    }
+
+    const idOrUuid = params.id;
+    const isNumeric = /^\d+$/.test(idOrUuid);
+
+    const draft = await prismaWeb2Client.proposalDraft.findFirst({
+      where: isNumeric
+        ? { id: parseInt(idOrUuid, 10) }
+        : { uuid: String(idOrUuid) },
+      include: {
+        transactions: true,
+        social_options: true,
+        checklist_items: true,
+        approval_options: {
+          include: { transactions: true },
+        },
+      },
+    });
+
+    if (!draft) {
+      return NextResponse.json({ message: "Draft not found" }, { status: 404 });
+    }
+
+    // Authorization: Only owner can read draft via API (optionally allow tenant-config sharing later)
+    const owner = draft.author_address?.toLowerCase();
+    if (!owner || owner !== siweAddress.toLowerCase()) {
+      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
+
+    // Success
+    return NextResponse.json(draft, { status: 200 });
+  } catch (e: any) {
+    console.error("GET /api/v1/drafts/[id] error", e);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
