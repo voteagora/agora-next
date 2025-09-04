@@ -13,6 +13,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
+import { createDelegateStatementMessage } from "@/lib/delegateStatement/messageFormat";
 import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeholdersFormSection";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { useDelegate } from "@/hooks/useDelegate";
@@ -66,36 +67,19 @@ export default function DelegateStatementForm({
 
     values.topIssues = values.topIssues.filter((issue) => issue.value !== "");
 
-    const {
-      daoSlug,
-      discord,
-      delegateStatement,
-      email,
-      twitter,
-      warpcast,
-      topIssues,
-      topStakeholders,
-      notificationPreferences,
-    } = values;
-
     // User will only sign what they are seeing on the frontend
-    const body = {
-      agreeCodeConduct: values.agreeCodeConduct,
-      agreeDaoPrinciples: values.agreeDaoPrinciples,
-      daoSlug,
-      discord,
-      delegateStatement,
-      email,
-      twitter,
-      warpcast,
-      topIssues,
-      topStakeholders,
+    const serializedBody = createDelegateStatementMessage(values, {
+      daoSlug: values.daoSlug,
+      discord: values.discord,
+      email: values.email,
+      twitter: values.twitter,
+      warpcast: values.warpcast,
+      topIssues: values.topIssues,
+      topStakeholders: values.topStakeholders,
       scwAddress,
-      notificationPreferences,
-    };
+      notificationPreferences: values.notificationPreferences,
+    });
 
-    const serializedBody = JSON.stringify(body, undefined, "\t");
-    console.log("serializedBody", serializedBody);
     try {
       const signature = await messageSigner.signMessageAsync({
         message: serializedBody,

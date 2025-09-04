@@ -7,6 +7,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { Prisma } from "@prisma/client";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
 import { createHash } from "crypto";
+import { createDelegateStatementMessage } from "@/lib/delegateStatement/messageFormat";
 
 export async function createDelegateStatement({
   address,
@@ -25,9 +26,23 @@ export async function createDelegateStatement({
     delegateStatement;
   const { slug } = Tenant.current();
 
+  // Regenerate expected message from form data and compare
+  const expectedMessage = createDelegateStatementMessage(delegateStatement, {
+    daoSlug: slug,
+    discord,
+    email,
+    twitter,
+    warpcast,
+    topIssues: delegateStatement.topIssues,
+    topStakeholders: delegateStatement.topStakeholders,
+    scwAddress,
+    notificationPreferences,
+  });
+
+  // Verify signature against the message
   const valid = await verifyMessage({
     address,
-    message,
+    message: expectedMessage,
     signature,
   });
 
