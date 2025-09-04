@@ -53,10 +53,18 @@ export const siweProviderConfig: SIWEConfig = {
         signature,
       }),
     }).then(async (res) => {
-      // save JWT from verify to local storage
-      const token = await res.json();
-      localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
-      return res.ok;
+      if (!res.ok) {
+        // Avoid JSON parse errors on non-JSON error bodies
+        return false;
+      }
+      // save JWT from verify to local storage (expect JSON on success)
+      try {
+        const token = await res.json();
+        localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
+      } catch {
+        // ignore if body isn't JSON for some reason
+      }
+      return true;
     }),
   getSession: async () => {
     // return JWT from local storage

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { GET_DRAFT_STAGES, getStageMetadata } from "../utils/stages";
 import DraftProposalForm from "../components/DraftProposalForm";
 import DeleteDraftButton from "../components/DeleteDraftButton";
@@ -8,6 +8,8 @@ import BackButton from "../components/BackButton";
 import ReactMarkdown from "react-markdown";
 import Tenant from "@/lib/tenant/tenant";
 import { PLMConfig } from "@/app/proposals/draft/types";
+import { useSIWE } from "connectkit";
+import { useAccount, useChainId, useSwitchChain } from "wagmi";
 
 type DraftResponse = any;
 
@@ -31,50 +33,101 @@ export default function DraftProposalPageClient({
   const stageMetadata = getStageMetadata(stageObject.stage);
   const { ui } = Tenant.current();
   const config = ui.toggle("proposal-lifecycle")?.config as PLMConfig;
+  const targetChainId = Tenant.current().contracts.governor.chain.id;
+  const { address } = useAccount();
+  const currentChainId = useChainId();
+  const { switchChainAsync, isPending: isSwitching } = useSwitchChain();
+
+  const loadDraft = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const sessionRaw = localStorage.getItem("agora-siwe-jwt");
+      if (!sessionRaw) {
+        setError("Not authenticated (missing SIWE session)");
+        setLoading(false);
+        return;
+      }
+      const token = JSON.parse(sessionRaw)?.access_token as string | undefined;
+      if (!token) {
+        setError("Not authenticated (invalid session)");
+        setLoading(false);
+        return;
+      }
+      const res = await fetch(`/api/v1/drafts/${idParam}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        setError(`${res.status} ${res.statusText}`);
+        setLoading(false);
+        return;
+      }
+      const data = await res.json();
+      setDraft(data);
+      setError(null);
+      setLoading(false);
+    } catch (e: any) {
+      setError(e.message || "Failed to load draft");
+      setLoading(false);
+    }
+  }, [idParam]);
 
   useEffect(() => {
-    async function loadDraft() {
-      try {
-        setLoading(true);
-        const sessionRaw = localStorage.getItem("agora-siwe-jwt");
-        if (!sessionRaw) {
-          setError("Not authenticated (missing SIWE session)");
-          setLoading(false);
-          return;
-        }
-        const token = JSON.parse(sessionRaw)?.access_token as
-          | string
-          | undefined;
-        if (!token) {
-          setError("Not authenticated (invalid session)");
-          setLoading(false);
-          return;
-        }
-        const res = await fetch(`/api/v1/drafts/${idParam}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) {
-          setError(`${res.status} ${res.statusText}`);
-          setLoading(false);
-          return;
-        }
-        const data = await res.json();
-        setDraft(data);
-        setLoading(false);
-      } catch (e: any) {
-        setError(e.message || "Failed to load draft");
-        setLoading(false);
-      }
-    }
     loadDraft();
-  }, [idParam]);
+  }, [loadDraft]);
+
+  const { signIn } = useSIWE();
+  const handleSiwe = useCallback(async () => {
+    try {
+      // Ensure connected account and correct network for this tenant
+      if (!address) {
+        setError("Please connect your wallet before signing");
+        return;
+      }
+      if (currentChainId !== targetChainId && switchChainAsync) {
+        try {
+          await switchChainAsync({ chainId: targetChainId });
+        } catch (e) {
+          setError("Failed to switch network for this tenant");
+          return;
+        }
+      }
+      await signIn();
+      await loadDraft();
+    } catch {
+      // ignore
+    }
+  }, [
+    address,
+    currentChainId,
+    targetChainId,
+    switchChainAsync,
+    signIn,
+    loadDraft,
+  ]);
 
   if (loading) {
     return <div className="text-secondary">Loading…</div>;
   }
 
   if (error) {
-    return <div className="text-negative">{error}</div>;
+    const needsSiwe = error.toLowerCase().includes("not authenticated");
+    return (
+      <div className="text-secondary">
+        {error}
+        {needsSiwe && (
+          <div className="mt-4">
+            <button
+              onClick={handleSiwe}
+              disabled={!address || isSwitching}
+              className="px-4 py-2 rounded bg-primary text-white disabled:opacity-50"
+            >
+              Sign in with Ethereum
+            </button>
+          </div>
+        )}
+      </div>
+    );
   }
 
   if (!draft) {
