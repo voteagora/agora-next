@@ -4,6 +4,8 @@ import { useAccount } from "wagmi";
 import { useSearchParams } from "next/navigation";
 import Tenant from "@/lib/tenant/tenant";
 import { PLMConfig } from "@/app/proposals/draft/types";
+import AgoraLoader from "@/components/shared/AgoraLoader/AgoraLoader";
+import { LockClosedIcon } from "@heroicons/react/24/outline";
 
 const OnlyOwner = ({
   ownerAddresses,
@@ -19,20 +21,10 @@ const OnlyOwner = ({
   const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
   const config = proposalLifecycleToggle?.config as PLMConfig;
 
-  // causing jitter when loading... need to figure out a better long term solution
-  //   if (isConnecting || isReconnecting) {
-  //     return (
-  //       <main className="max-w-screen-xl mx-auto mt-10">
-  //         <div className="mb-4 flex flex-row items-center space-x-6">
-  //           <h1 className="font-black text-primary text-2xl m-0">Loading...</h1>
-  //         </div>
-  //         <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6">
-  //           <section className="col-span-1 sm:col-span-2 order-last sm:order-first h-36 bg-agora-stone-100 animate-pulse rounded-lg"></section>
-  //           <section className="col-span-1 h-12 bg-agora-stone-100 animate-pulse rounded-lg"></section>
-  //         </div>
-  //       </main>
-  //     );
-  //   }
+  // While the wallet/account state is resolving, show a centered loader to avoid a brief unauthorized flash
+  if (isConnecting || isReconnecting) {
+    return <AgoraLoader />;
+  }
 
   // Check if sharing via author address - configurable per tenant
   if (
@@ -47,8 +39,17 @@ const OnlyOwner = ({
 
   if (!ownerAddresses.includes(address as string)) {
     return (
-      <div className="text-primary">
-        You are not the owner of this proposal.
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="flex flex-col items-center text-center gap-3 p-6 border border-line rounded-lg bg-neutral max-w-md">
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-tertiary/20">
+            <LockClosedIcon className="w-5 h-5 text-secondary" />
+          </div>
+          <h2 className="text-lg font-bold text-primary">Access restricted</h2>
+          <p className="text-secondary text-sm">
+            You are not the owner of this draft. Switch to the author account or
+            request access to continue.
+          </p>
+        </div>
       </div>
     );
   }
