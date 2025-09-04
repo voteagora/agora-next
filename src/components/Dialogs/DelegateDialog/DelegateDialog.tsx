@@ -23,7 +23,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
-import { formatEther } from "viem";
+import { formatEther, createWalletClient, custom } from "viem";
+import { getPublicClient } from "@/lib/viem";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
@@ -97,12 +98,18 @@ export function DelegateDialog({
     data: delegateTxHash,
   } = useWriteContract();
 
+  const [localDelegateTxHash, setLocalDelegateTxHash] = useState<
+    `0x${string}` | undefined
+  >(undefined);
+
   const {
     isLoading: isProcessingDelegation,
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
   } = useWaitForTransactionReceipt({
-    hash: isGasRelayLive ? sponsoredTxnHash : delegateTxHash,
+    hash: isGasRelayLive
+      ? sponsoredTxnHash
+      : (localDelegateTxHash ?? delegateTxHash),
   });
 
   const fetchData = async () => {
@@ -123,7 +130,7 @@ export function DelegateDialog({
           delegator: accountAddress as `0x${string}`,
           transaction_hash: (isGasRelayLive
             ? sponsoredTxnHash
-            : delegateTxHash) as `0x${string}`,
+            : (localDelegateTxHash ?? delegateTxHash)) as `0x${string}`,
         },
       });
       if (isDelegationEncouragement) {
@@ -133,7 +140,7 @@ export function DelegateDialog({
             delegator: accountAddress as `0x${string}`,
             transaction_hash: (isGasRelayLive
               ? sponsoredTxnHash
-              : delegateTxHash) as `0x${string}`,
+              : (localDelegateTxHash ?? delegateTxHash)) as `0x${string}`,
           },
         });
       }
@@ -144,12 +151,39 @@ export function DelegateDialog({
     if (isGasRelayLive) {
       await call();
     } else {
-      write({
-        address: contracts.token.address as any,
-        abi: contracts.token.abi,
-        functionName: "delegate",
-        args: [delegate.address as any],
-      });
+      try {
+        // Bypass wagmi to avoid CAIP-2 chain id leakage from Safe provider
+        const publicClient = getPublicClient(contracts.token.chain);
+        const walletClient = createWalletClient({
+          chain: contracts.token.chain,
+          transport: custom(window.ethereum!),
+        });
+
+        const { request } = await publicClient.simulateContract({
+          address: contracts.token.address as `0x${string}`,
+          abi: contracts.token.abi,
+          functionName: "delegate",
+          args: [delegate.address as `0x${string}`],
+          account: accountAddress as `0x${string}`,
+        });
+
+        const txHash = await walletClient.writeContract(request);
+        setLocalDelegateTxHash(txHash);
+      } catch (error) {
+        console.error("delegate via viem failed", error);
+        // Fallback to wagmi write (may still fail under Safe CAIP-2)
+        try {
+          write({
+            address: contracts.token.address as any,
+            abi: contracts.token.abi,
+            functionName: "delegate",
+            args: [delegate.address as any],
+            chainId: contracts.token.chain.id,
+          });
+        } catch (innerError) {
+          console.error("delegate via wagmi fallback failed", innerError);
+        }
+      }
     }
   }
 
@@ -189,7 +223,11 @@ export function DelegateDialog({
             Delegation completed!
           </Button>
           <BlockScanUrls
-            hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
+            hash1={
+              isGasRelayLive
+                ? sponsoredTxnHash
+                : (localDelegateTxHash ?? delegateTxHash)
+            }
           />
         </div>
       );

@@ -1,4 +1,5 @@
 import {
+  Chain,
   concat,
   createWalletClient,
   custom,
@@ -27,6 +28,7 @@ import {
   DERIVE_MAINNET_RPC,
   DERIVE_TESTNET_RPC,
 } from "@/lib/tenant/configs/contracts/derive";
+import { toNumericChainId } from "@/lib/utils";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DUMB_SIGNATURE =
@@ -52,13 +54,20 @@ export const lyraEntrypoint = getEntryPoint(contracts.token.chain, {
 
 const combinedTransport = custom({
   async request({ method, params }) {
+    const rawChain = contracts.token.chain;
+    const numericId = toNumericChainId((rawChain as any).id ?? rawChain);
+    const normalizedChain = {
+      ...contracts.token.chain,
+      id: numericId,
+    } satisfies Chain;
+
     if (bundlerRpcMethods.has(method)) {
-      return bundlerTransport({ chain: contracts.token.chain }).request({
+      return bundlerTransport({ chain: normalizedChain }).request({
         method,
         params,
       });
     } else {
-      return nodeTransport({ chain: contracts.token.chain }).request({
+      return nodeTransport({ chain: normalizedChain }).request({
         method,
         params,
       });

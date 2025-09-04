@@ -424,7 +424,31 @@ export const isURL = (value: string) => {
 
 const FORK_NODE_URL = process.env.NEXT_PUBLIC_FORK_NODE_URL!;
 
+export function toNumericChainId(
+  // Normalize chain.id to a number even if it's a CAIP-2 string (e.g., "eip155:11155420")
+  // This format is relevant when using a wallet connect provider
+  input: number | string | { id: number | string }
+): number {
+  const raw =
+    typeof input === "object" && input !== null ? (input as any).id : input;
+
+  if (typeof raw === "number") return raw;
+
+  // Handle CAIP-2 strings like "eip155:11155420" or any "namespace:reference"
+  const parts = String(raw).split(":");
+  const maybeId = parts.length > 1 ? parts[parts.length - 1] : parts[0];
+  const id = Number(maybeId);
+
+  if (Number.isNaN(id)) {
+    throw new Error(`Invalid chain id: ${String(raw)}`);
+  }
+  console.log({ raw, parts, maybeId, id });
+  return id;
+}
+
 export const getTransportForChain = (chainId: number) => {
+  console.log({ getTransportForChainID: chainId });
+
   switch (chainId) {
     // mainnet
     case 1:
