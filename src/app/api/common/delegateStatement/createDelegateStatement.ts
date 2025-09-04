@@ -39,14 +39,10 @@ export async function createDelegateStatement({
     notificationPreferences,
   });
 
-  if (message !== expectedMessage) {
-    throw new Error("Message does not match the submitted form data");
-  }
-
   // Verify signature against the message
   const valid = await verifyMessage({
     address,
-    message,
+    message: expectedMessage,
     signature,
   });
 
