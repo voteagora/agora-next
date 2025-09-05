@@ -1,10 +1,12 @@
 import { SIWEConfig } from "connectkit";
+import { LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
 import { SiweMessage } from "siwe";
 import { decodeJwt } from "jose";
 
 // TODO: this should probably be an environment variable
 const API_AUTH_PREFIX = "/api/v1/auth";
-const LOCAL_STORAGE_JWT_KEY = "agora-siwe-jwt";
+
+const LOCAL_STORAGE_JWT_KEY = LOCAL_STORAGE_SIWE_JWT_KEY;
 export const AGORA_SIGN_IN_MESSAGE = "Sign in to Agora with Ethereum";
 
 /* There's currently nothing stored on the backend to maintain session state.
@@ -24,7 +26,14 @@ const isSiweEnabled = () => {
 
 export const siweProviderConfig: SIWEConfig = {
   getNonce: async () =>
-    fetch(`${API_AUTH_PREFIX}/nonce`).then((res) => res.text()),
+    fetch(`${API_AUTH_PREFIX}/nonce`).then(async (res) => {
+      const ct = res.headers.get("content-type") || "";
+      if (ct.includes("application/json")) {
+        const data = await res.json();
+        return data?.nonce ?? "";
+      }
+      return res.text();
+    }),
   createMessage: ({ nonce, address, chainId }) =>
     new SiweMessage({
       version: "1",
@@ -36,21 +45,40 @@ export const siweProviderConfig: SIWEConfig = {
       nonce,
     }).prepareMessage(),
   verifyMessage: async ({ message, signature }) =>
-    fetch(`${API_AUTH_PREFIX}/verify`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message,
-        signature,
-      }),
-    }).then(async (res) => {
-      // save JWT from verify to local storage
-      const token = await res.json();
-      localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
-      return res.ok;
-    }),
+    (function () {
+      try {
+        localStorage.setItem("agora-siwe-stage", "awaiting_response");
+      } catch {}
+      return fetch(`${API_AUTH_PREFIX}/verify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message,
+          signature,
+        }),
+      }).then(async (res) => {
+        if (!res.ok) {
+          // Avoid JSON parse errors on non-JSON error bodies
+          try {
+            localStorage.setItem("agora-siwe-stage", "error");
+          } catch {}
+          return false;
+        }
+        // save JWT from verify to local storage (expect JSON on success)
+        try {
+          const token = await res.json();
+          localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
+          try {
+            localStorage.setItem("agora-siwe-stage", "signed");
+          } catch {}
+        } catch {
+          // ignore if body isn't JSON for some reason
+        }
+        return true;
+      });
+    })(),
   getSession: async () => {
     // return JWT from local storage
     const session = localStorage.getItem(LOCAL_STORAGE_JWT_KEY);

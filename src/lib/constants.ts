@@ -1,4 +1,14 @@
 import { VoterTypes } from "@/app/api/common/votes/vote";
+import { type Chain } from "viem";
+import {
+  mainnet,
+  sepolia,
+  optimism,
+  scroll,
+  linea,
+  lineaSepolia,
+  cyber,
+} from "viem/chains";
 
 export const INDEXER_DELAY = 3000;
 
@@ -46,6 +56,22 @@ export const TENANT_NAMESPACES = {
   DEMO: "demo",
   LINEA: "linea",
 } as const;
+
+// SIWE localStorage keys
+export const LOCAL_STORAGE_SIWE_JWT_KEY = "agora-siwe-jwt";
+export const LOCAL_STORAGE_SIWE_STAGE_KEY = "agora-siwe-stage";
+
+// Canonical set of chains we support across tenants for read-only ops (e.g., 1271 checks)
+// Note: tenant-derived chains (e.g., deriveMainnet) are appended in helpers to avoid cycles
+export const SUPPORTED_CHAINS: Chain[] = [
+  mainnet,
+  sepolia,
+  optimism,
+  scroll,
+  linea,
+  lineaSepolia,
+  cyber,
+];
 
 export const proposalsFilterOptions = {
   relevant: {

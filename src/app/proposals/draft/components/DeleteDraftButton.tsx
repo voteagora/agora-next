@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAccount, useSignMessage } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { onSubmitAction as deleteAction } from "../actions/deleteDraftProposal";
@@ -35,6 +36,8 @@ export const DeleteDraftProposalDialog = ({
   closeDialog: () => void;
 }) => {
   const [isPending, setIsPending] = useState(false);
+  const { address } = useAccount();
+  const messageSigner = useSignMessage();
   return (
     <div>
       <h3 className="text-center text-primary font-semibold text-lg mb-1">
@@ -59,7 +62,25 @@ export const DeleteDraftProposalDialog = ({
           isLoading={isPending}
           onClick={async () => {
             setIsPending(true);
-            await deleteAction(proposalId);
+            const messagePayload = {
+              action: "deleteDraft",
+              draftProposalId: proposalId,
+              creatorAddress: address,
+              timestamp: new Date().toISOString(),
+            };
+            const message = JSON.stringify(messagePayload);
+            const signature = await messageSigner
+              .signMessageAsync({ message })
+              .catch(() => undefined);
+            if (!signature || !address) {
+              setIsPending(false);
+              return;
+            }
+            await deleteAction(proposalId, {
+              address: address as `0x${string}`,
+              message,
+              signature,
+            });
             window.location.href = "/";
           }}
         >

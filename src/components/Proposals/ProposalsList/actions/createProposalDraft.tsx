@@ -1,10 +1,14 @@
 "use server";
 
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import { verifySiwe } from "@/app/proposals/draft/actions/siweAuth";
 import Tenant from "@/lib/tenant/tenant";
 import { PLMConfig } from "@/app/proposals/draft/types";
 
-async function createProposalDraft(address: `0x${string}`) {
+async function createProposalDraft(
+  address: `0x${string}`,
+  params: { message: string; signature: `0x${string}` }
+) {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
 
@@ -12,6 +16,15 @@ async function createProposalDraft(address: `0x${string}`) {
     throw new Error(
       `Proposal lifecycle toggle not found for tenant ${tenant.ui.title}`
     );
+  }
+
+  const valid = await verifySiwe({
+    address,
+    message: params.message,
+    signature: params.signature,
+  });
+  if (!valid) {
+    throw new Error("Invalid signature");
   }
 
   const config = plmToggle.config as PLMConfig;
