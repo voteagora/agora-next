@@ -15,6 +15,12 @@ export default function AutoSiweOnConnect() {
     if (!isConnected) return;
     if (attemptedRef.current) return;
 
+    // Scope: only auto-trigger SIWE on draft pages
+    const isDraftScope =
+      typeof window !== "undefined" &&
+      /\/proposals\/draft\//.test(window.location.pathname);
+    if (!isDraftScope) return;
+
     const hasJwt = (() => {
       try {
         const session = localStorage.getItem(LOCAL_STORAGE_JWT_KEY);

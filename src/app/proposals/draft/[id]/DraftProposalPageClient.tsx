@@ -177,8 +177,9 @@ export default function DraftProposalPageClient({
     return () => clearInterval(id);
   }, [isSigning, loadDraft]);
 
-  if (loading) {
-    return <div className="text-secondary">Loading…</div>;
+  if (loading && !draft) {
+    // Let the page-level skeleton handle the loading UI
+    return null;
   }
 
   // Keep description text unchanged during signing; only buttons reflect state
