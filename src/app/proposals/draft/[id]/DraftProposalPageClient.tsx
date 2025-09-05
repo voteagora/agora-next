@@ -178,7 +178,7 @@ export default function DraftProposalPageClient({
   }, [isSigning, loadDraft]);
 
   if (loading && !draft) {
-    // Let the page-level skeleton handle the loading UI
+    // Defer to the route segment's loading.tsx skeleton
     return null;
   }
 

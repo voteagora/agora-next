@@ -116,10 +116,10 @@ export const getPublicClientByChainId = (chainId?: number) => {
   const { contracts } = Tenant.current();
   const effectiveChainId = chainId ?? contracts.token.chain.id;
 
-  // Usa el transport apropiado para el chainId solicitado
+  // Use the appropriate transport for the requested chainId
   const transport = getTransportForChain(effectiveChainId)!;
 
-  // Intenta encontrar una definición de chain conocida; si no, cae a la del tenant
+  // Try to find a known chain definition; if not, fall back to the tenant's chain
   const matched = SUPPORTED_CHAINS_INTERNAL.find(
     (c) => c.id === effectiveChainId
   );

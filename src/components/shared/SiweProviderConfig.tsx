@@ -1,10 +1,11 @@
 import { SIWEConfig } from "connectkit";
+import { LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
 import { SiweMessage } from "siwe";
 import { decodeJwt } from "jose";
 
 // TODO: this should probably be an environment variable
 const API_AUTH_PREFIX = "/api/v1/auth";
-const LOCAL_STORAGE_JWT_KEY = "agora-siwe-jwt";
+const LOCAL_STORAGE_JWT_KEY = LOCAL_STORAGE_SIWE_JWT_KEY;
 const AGORA_SIGN_IN = "Sign in to Agora with Ethereum";
 
 /* There's currently nothing stored on the backend to maintain session state.
