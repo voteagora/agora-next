@@ -22,6 +22,7 @@ import {
   deriveTestnet,
 } from "@/lib/tenant/configs/contracts/derive";
 import Tenant from "@/lib/tenant/tenant";
+import { SUPPORTED_CHAINS } from "@/lib/constants";
 
 export const getWalletClient = (chainId: number) => {
   let transport;
@@ -100,6 +101,32 @@ export const getPublicClient = (chain?: Chain) => {
 
   return createPublicClient({
     chain: chain ?? contracts.token.chain,
+    transport,
+  });
+};
+
+// Centraliza las chains soportadas y evita duplicar lógica en endpoints
+const SUPPORTED_CHAINS_INTERNAL: Chain[] = [
+  ...SUPPORTED_CHAINS,
+  deriveMainnet,
+  deriveTestnet,
+];
+
+export const getPublicClientByChainId = (chainId?: number) => {
+  const { contracts } = Tenant.current();
+  const effectiveChainId = chainId ?? contracts.token.chain.id;
+
+  // Usa el transport apropiado para el chainId solicitado
+  const transport = getTransportForChain(effectiveChainId)!;
+
+  // Intenta encontrar una definición de chain conocida; si no, cae a la del tenant
+  const matched = SUPPORTED_CHAINS_INTERNAL.find(
+    (c) => c.id === effectiveChainId
+  );
+  const chain: Chain = (matched ?? (contracts.token.chain as Chain)) as Chain;
+
+  return createPublicClient({
+    chain,
     transport,
   });
 };

@@ -36,14 +36,20 @@ export async function POST(request: NextRequest) {
     // If EOA check failed, try EIP-1271 (SCW / multisig) fallback
     if (!verification) {
       try {
-        const { getPublicClient } = await import("@/lib/viem");
+        const { getPublicClientByChainId } = await import("@/lib/viem");
         const { hashMessage } = await import("viem");
-        const publicClient = getPublicClient();
+        const siweChainId = Number(siweObject.chainId || 0);
+        const publicClient = getPublicClientByChainId(
+          Number.isFinite(siweChainId) && siweChainId > 0
+            ? siweChainId
+            : undefined
+        );
+
         const code = await publicClient.getBytecode({
           address: siweObject.address as `0x${string}`,
         });
         const isContract = !!code && code !== "0x";
-        console.info("[SIWE] 1271 fallback", { isContract });
+        console.info("[SIWE] 1271 fallback", { isContract, siweChainId });
         if (isContract) {
           const ERC1271_ABI = [
             {
@@ -66,7 +72,11 @@ export async function POST(request: NextRequest) {
             args: [msgHash, signature as `0x${string}`],
           })) as `0x${string}`;
           verification = res?.toLowerCase() === MAGIC;
-          console.info("[SIWE] 1271 result", { res, verification });
+          console.info("[SIWE] 1271 result", {
+            res,
+            verification,
+            siweChainId,
+          });
         }
       } catch (e) {
         console.error("[SIWE] 1271 fallback error", e);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GET_DRAFT_STAGES, getStageMetadata } from "../utils/stages";
 import DraftProposalForm from "../components/DraftProposalForm";
 import DeleteDraftButton from "../components/DeleteDraftButton";
@@ -12,6 +12,7 @@ import { useSIWE } from "connectkit";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { ConnectKitButton } from "connectkit";
 import { UpdatedButton } from "@/components/Button";
+import LoadingSpinner from "@/components/shared/LoadingSpinner";
 
 type DraftResponse = any;
 
@@ -27,6 +28,10 @@ export default function DraftProposalPageClient({
   const [draft, setDraft] = useState<DraftResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isSigning, setIsSigning] = useState<boolean>(false);
+  const [signLabel, setSignLabel] = useState<string | null>(null);
+  const [postSignGrace, setPostSignGrace] = useState<boolean>(false);
+  const hasDraftRef = useRef<boolean>(false);
 
   const stageParam = (searchParams?.stage || "0") as string;
   const stageIndex = useMemo(() => parseInt(stageParam, 10), [stageParam]);
@@ -40,47 +45,73 @@ export default function DraftProposalPageClient({
   const currentChainId = useChainId();
   const { switchChainAsync, isPending: isSwitching } = useSwitchChain();
 
-  const loadDraft = useCallback(async () => {
-    try {
-      setError(null);
-      setLoading(true);
-      const sessionRaw = localStorage.getItem("agora-siwe-jwt");
-      if (!sessionRaw) {
-        setError("Not authenticated (missing SIWE session)");
+  const loadDraft = useCallback(
+    async (silent = false) => {
+      try {
+        setError(null);
+        const manageLoading = !silent || !hasDraftRef.current;
+        if (manageLoading) setLoading(true);
+        const sessionRaw = localStorage.getItem("agora-siwe-jwt");
+        if (!sessionRaw) {
+          setError("Not authenticated (missing SIWE session)");
+          if (manageLoading) setLoading(false);
+          return;
+        }
+        const token = JSON.parse(sessionRaw)?.access_token as
+          | string
+          | undefined;
+        if (!token) {
+          setError("Not authenticated (invalid session)");
+          if (manageLoading) setLoading(false);
+          return;
+        }
+        const res = await fetch(`/api/v1/drafts/${idParam}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) {
+          setError(`${res.status} ${res.statusText}`);
+          if (manageLoading) setLoading(false);
+          return;
+        }
+        const data = await res.json();
+        setDraft(data);
+        hasDraftRef.current = true;
+        setError(null);
+        if (manageLoading) setLoading(false);
+      } catch (e: any) {
+        setError(e.message || "Failed to load draft");
         setLoading(false);
-        return;
       }
-      const token = JSON.parse(sessionRaw)?.access_token as string | undefined;
-      if (!token) {
-        setError("Not authenticated (invalid session)");
-        setLoading(false);
-        return;
-      }
-      const res = await fetch(`/api/v1/drafts/${idParam}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) {
-        setError(`${res.status} ${res.statusText}`);
-        setLoading(false);
-        return;
-      }
-      const data = await res.json();
-      setDraft(data);
-      setError(null);
-      setLoading(false);
-    } catch (e: any) {
-      setError(e.message || "Failed to load draft");
-      setLoading(false);
-    }
-  }, [idParam]);
+    },
+    [idParam]
+  );
 
   useEffect(() => {
     loadDraft();
   }, [loadDraft]);
 
   const { signIn } = useSIWE();
+  // Label watcher during signing (non-blocking)
+  useEffect(() => {
+    if (!isSigning) return;
+    const id = setInterval(() => {
+      try {
+        const stage = localStorage.getItem("agora-siwe-stage");
+        if (stage === "awaiting_response") setSignLabel("Awaiting response…");
+        else if (stage === "signed") setSignLabel("Signed");
+        else if (stage === "error") setSignLabel("Cancelled");
+      } catch {}
+    }, 200);
+    return () => clearInterval(id);
+  }, [isSigning]);
   const handleSiwe = useCallback(async () => {
     try {
+      if (isSigning) return;
+      setIsSigning(true);
+      setPostSignGrace(true);
+      try {
+        localStorage.removeItem("agora-siwe-stage");
+      } catch {}
       // Ensure connected account and correct network for this tenant
       if (!address) {
         setError("Please connect your wallet before signing");
@@ -94,12 +125,22 @@ export default function DraftProposalPageClient({
           return;
         }
       }
+      // Trigger SIWE flow without blocking the UI; proceed when JWT appears
+      // in localStorage (successful) or when timeout expires (failed)
+      setSignLabel("Awaiting Confirmation");
       await signIn();
-      await loadDraft();
+      setSignLabel("Signed");
+      await loadDraft(true);
     } catch {
-      // ignore
+      setSignLabel("Cancelled");
+      setError("Signature cancelled by user");
+    } finally {
+      setIsSigning(false);
+      setTimeout(() => setSignLabel(null), 1200);
+      setTimeout(() => setPostSignGrace(false), 600);
     }
   }, [
+    isSigning,
     address,
     currentChainId,
     targetChainId,
@@ -108,14 +149,42 @@ export default function DraftProposalPageClient({
     loadDraft,
   ]);
 
+  const loadedAfterJwtRef = useRef<boolean>(false);
+  // Poll localStorage to sync with SIWE modal (same-tab updates); advance automatically
+  useEffect(() => {
+    const id = setInterval(async () => {
+      try {
+        const stage = localStorage.getItem("agora-siwe-stage");
+        const sessionRaw = localStorage.getItem("agora-siwe-jwt");
+        const hasJwt = Boolean(sessionRaw);
+        if (stage === "awaiting_response") {
+          if (!isSigning) setIsSigning(true);
+          setSignLabel("Awaiting Confirmation");
+        } else if (stage === "signed") {
+          setSignLabel("Signed");
+          if (!loadedAfterJwtRef.current && hasJwt) {
+            loadedAfterJwtRef.current = true;
+            await loadDraft(true);
+          }
+          setTimeout(() => setSignLabel(null), 1200);
+        } else if (stage === "error") {
+          setIsSigning(false);
+          setSignLabel("Cancelled");
+          setError("Signature cancelled by user");
+        }
+      } catch {}
+    }, 200);
+    return () => clearInterval(id);
+  }, [isSigning, loadDraft]);
+
   if (loading) {
     return <div className="text-secondary">Loading…</div>;
   }
 
+  // Keep description text unchanged during signing; only buttons reflect state
+
   if (error) {
     const needsSiwe = error.toLowerCase().includes("not authenticated");
-    const chainName =
-      Tenant.current().contracts.governor.chain?.name || "Network";
     return (
       <div className="max-w-screen-xl mx-auto mt-10">
         <div className="bg-wash border border-line rounded-2xl shadow-newDefault p-6">
@@ -128,14 +197,6 @@ export default function DraftProposalPageClient({
                 To access and edit this draft, please sign this access request.
                 We’ll verify your ownership securely.
               </p>
-              <div className="flex items-center gap-2 mt-3">
-                <span className="text-xs uppercase tracking-wide text-tertiary">
-                  Current network
-                </span>
-                <span className="text-xs px-2 py-1 rounded-full border border-line text-primary bg-tertiary/5">
-                  {chainName}
-                </span>
-              </div>
             </div>
           </div>
 
@@ -154,22 +215,34 @@ export default function DraftProposalPageClient({
               <UpdatedButton
                 type="primary"
                 onClick={handleSiwe}
-                isLoading={isSwitching}
+                isLoading={false}
+                disabled={isSwitching || isSigning}
                 className="sm:w-auto"
               >
-                Sign access request
+                {isSigning ? (
+                  <span className="inline-flex items-center gap-2">
+                    {signLabel || "Awaiting Confirmation"}
+                    {(signLabel || "")
+                      .toLowerCase()
+                      .includes("awaiting confirmation") && (
+                      <LoadingSpinner className="text-white h-4 w-4" />
+                    )}
+                  </span>
+                ) : (
+                  "Sign access request"
+                )}
               </UpdatedButton>
             )}
-            <span className="text-tertiary text-xs">
-              {needsSiwe ? "Not authenticated" : error}
-            </span>
+            {!needsSiwe && (
+              <span className="text-tertiary text-xs">{error}</span>
+            )}
           </div>
         </div>
       </div>
     );
   }
 
-  if (!draft) {
+  if (!draft && !isSigning && !postSignGrace) {
     return <div className="text-secondary">Draft not found.</div>;
   }
 

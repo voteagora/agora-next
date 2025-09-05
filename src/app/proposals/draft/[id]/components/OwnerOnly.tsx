@@ -15,7 +15,6 @@ const OnlyOwner = ({
   const { address, isConnecting, isReconnecting } = useAccount();
   const searchParams = useSearchParams();
   const shareParam = searchParams?.get("share");
-  const bypassOwnerGuard = searchParams?.get("bypass") === "1";
   const { ui } = Tenant.current();
   const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
   const config = proposalLifecycleToggle?.config as PLMConfig;
@@ -34,11 +33,6 @@ const OnlyOwner = ({
   //       </main>
   //     );
   //   }
-
-  // Bypass temporal de guardia por query param para pruebas locales (no commitear)
-  if (bypassOwnerGuard) {
-    return <>{children}</>;
-  }
 
   // Check if sharing via author address - configurable per tenant
   if (
