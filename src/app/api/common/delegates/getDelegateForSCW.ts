@@ -8,11 +8,19 @@ import { unstable_cache } from "next/cache";
 async function getDelegateForSCW(address: string) {
   const { slug } = Tenant.current();
 
-  return prismaWeb2Client.delegateStatements
+  const result = await prismaWeb2Client.delegateStatements
     .findFirst({
       where: { scw_address: address.toLowerCase(), dao_slug: slug },
     })
     .catch((error) => console.error(error));
+
+  // Remove email from payload if it exists
+  if (result && result.payload && typeof result.payload === "object") {
+    const { email: _, ...payloadWithoutEmail } = result.payload as any;
+    result.payload = payloadWithoutEmail;
+  }
+
+  return result;
 }
 
 export const fetchDelegateForSCW = unstable_cache(

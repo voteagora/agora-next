@@ -25,9 +25,37 @@ async function getDelegateStatementForAddress({
 }) {
   const { slug } = Tenant.current();
 
-  return prismaWeb2Client.delegateStatements
-    .findFirst({ where: { address: address.toLowerCase(), dao_slug: slug } })
+  const result = await prismaWeb2Client.delegateStatements
+    .findFirst({
+      where: { address: address.toLowerCase(), dao_slug: slug },
+      select: {
+        address: true,
+        dao_slug: true,
+        message_hash: true,
+        signature: true,
+        payload: true,
+        twitter: true,
+        warpcast: true,
+        discord: true,
+        scw_address: true,
+        notification_preferences: true,
+        endorsed: true,
+        createdAt: true,
+        updatedAt: true,
+        created_at_ts: true,
+        updated_at_ts: true,
+        stage: true,
+      },
+    })
     .catch((error) => console.error(error));
+
+  // Remove email from payload if it exists
+  if (result && result.payload && typeof result.payload === "object") {
+    const { email: _, ...payloadWithoutEmail } = result.payload as any;
+    result.payload = payloadWithoutEmail;
+  }
+
+  return result;
 }
 
 /**
@@ -47,17 +75,44 @@ export async function getDelegateStatementsForAddresses({
     async () => {
       const lowercasedAddresses = addresses.map((addr) => addr.toLowerCase());
 
-      return prismaWeb2Client.delegateStatements
+      const results = await prismaWeb2Client.delegateStatements
         .findMany({
           where: {
             address: { in: lowercasedAddresses },
             dao_slug: slug,
+          },
+          select: {
+            address: true,
+            dao_slug: true,
+            message_hash: true,
+            signature: true,
+            payload: true,
+            twitter: true,
+            warpcast: true,
+            discord: true,
+            scw_address: true,
+            notification_preferences: true,
+            endorsed: true,
+            createdAt: true,
+            updatedAt: true,
+            created_at_ts: true,
+            updated_at_ts: true,
+            stage: true,
           },
         })
         .catch((error) => {
           console.error(error);
           return [];
         });
+
+      // Remove email from payload if it exists
+      return results.map((result) => {
+        if (result.payload && typeof result.payload === "object") {
+          const { email: _, ...payloadWithoutEmail } = result.payload as any;
+          result.payload = payloadWithoutEmail;
+        }
+        return result;
+      });
     }
   );
 }

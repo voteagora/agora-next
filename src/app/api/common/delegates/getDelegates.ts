@@ -249,6 +249,21 @@ async function getDelegates({
             advanced: "0",
           };
 
+          // Sanitize statement payload to remove email if it exists
+          let sanitizedStatement = delegate.statement;
+          if (
+            sanitizedStatement &&
+            sanitizedStatement.payload &&
+            typeof sanitizedStatement.payload === "object"
+          ) {
+            const { email: _, ...payloadWithoutEmail } =
+              sanitizedStatement.payload as any;
+            sanitizedStatement = {
+              ...sanitizedStatement,
+              payload: payloadWithoutEmail,
+            };
+          }
+
           return {
             address:
               typeof address === "string"
@@ -260,7 +275,7 @@ async function getDelegates({
               advanced: votingPower.advanced || "0",
             },
             citizen: false,
-            statement: delegate.statement || null,
+            statement: sanitizedStatement,
             numOfDelegators: BigInt(String(delegate.numOfDelegators || 0)),
             mostRecentDelegationBlock: BigInt(
               String(delegate.mostRecentDelegationBlock || 0)
@@ -596,17 +611,34 @@ async function getDelegates({
       // components
       return {
         meta,
-        data: delegates.map((delegate) => ({
-          address: delegate.delegate,
-          votingPower: {
-            total: delegate.voting_power?.toFixed(0) || "0",
-            direct: delegate.direct_vp?.toFixed(0) || "0",
-            advanced: delegate.advanced_vp?.toFixed(0) || "0",
-          },
-          statement: delegate.statement,
-          numOfDelegators: BigInt(delegate.num_of_delegators || "0"),
-          participation: 0,
-        })),
+        data: delegates.map((delegate) => {
+          // Sanitize statement payload to remove email if it exists
+          let sanitizedStatement = delegate.statement;
+          if (
+            sanitizedStatement &&
+            sanitizedStatement.payload &&
+            typeof sanitizedStatement.payload === "object"
+          ) {
+            const { email: _, ...payloadWithoutEmail } =
+              sanitizedStatement.payload as any;
+            sanitizedStatement = {
+              ...sanitizedStatement,
+              payload: payloadWithoutEmail,
+            };
+          }
+
+          return {
+            address: delegate.delegate,
+            votingPower: {
+              total: delegate.voting_power?.toFixed(0) || "0",
+              direct: delegate.direct_vp?.toFixed(0) || "0",
+              advanced: delegate.advanced_vp?.toFixed(0) || "0",
+            },
+            statement: sanitizedStatement,
+            numOfDelegators: BigInt(delegate.num_of_delegators || "0"),
+            participation: 0,
+          };
+        }),
         seed,
       };
     },
@@ -664,7 +696,6 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
                 signature,
                 payload,
                 twitter,
-                email,
                 discord,
                 created_at,
                 updated_at,
@@ -759,6 +790,21 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       BigInt(votableSupply)
     );
 
+    // Sanitize statement payload to remove email if it exists
+    let sanitizedStatement = delegate?.statement;
+    if (
+      sanitizedStatement &&
+      sanitizedStatement.payload &&
+      typeof sanitizedStatement.payload === "object"
+    ) {
+      const { email: _, ...payloadWithoutEmail } =
+        sanitizedStatement.payload as any;
+      sanitizedStatement = {
+        ...sanitizedStatement,
+        payload: payloadWithoutEmail,
+      };
+    }
+
     // Build out delegate JSON response
     return {
       address: address,
@@ -785,7 +831,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       lastTenProps: delegate?.last_10_props?.toFixed() || "0",
       numOfDelegators: usedNumOfDelegators,
       totalProposals: delegate?.total_proposals || 0,
-      statement: delegate?.statement || null,
+      statement: sanitizedStatement,
       relativeVotingPowerToVotableSupply,
       vpChange7d: 0n,
       participation: 0,

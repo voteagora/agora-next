@@ -122,15 +122,23 @@ const OptimisticProposalVotesCard = ({
         </div>
         {/* Show the scrolling list of votes for the proposal */}
         {showVoters ? (
-          <ProposalVotesList proposalId={proposal.id} />
+          <ProposalVotesList
+            proposalId={proposal.id}
+            offchainProposalId={proposal.offchainProposalId}
+          />
         ) : (
-          <ProposalNonVoterList proposal={proposal} />
+          <ProposalNonVoterList
+            proposal={proposal}
+            offchainProposalId={proposal.offchainProposalId}
+          />
         )}
         {/* Show the input for the user to vote on a proposal if allowed */}
         {isOffchain ? (
           <OffchainCastVoteInput />
         ) : (
-          <CastVoteInput proposal={proposal} isOptimistic />
+          <div className="border-t border-line">
+            <CastVoteInput proposal={proposal} isOptimistic />
+          </div>
         )}
         {/* Only show the voting instruction text if user hasn't voted yet */}
         {isVotingDataLoaded && !hasUserVoted && (

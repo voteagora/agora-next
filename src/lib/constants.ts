@@ -217,5 +217,3 @@ export const VOTER_TYPES: VoterTypes[] = [
     value: "Token House",
   },
 ];
-
-export const DUNA_CATEGORY_ID = 1;
