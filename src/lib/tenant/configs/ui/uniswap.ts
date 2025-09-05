@@ -363,7 +363,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "duna",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "forum",
