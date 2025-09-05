@@ -13,7 +13,7 @@ export const revalidate = 0;
 export default async function ForumPermissionsPage() {
   const { ui } = Tenant.current();
 
-  if (!ui.toggle("duna")) {
+  if (!ui.toggle("forum") && !ui.toggle("duna")) {
     return <div>Route not supported for namespace</div>;
   }
 
