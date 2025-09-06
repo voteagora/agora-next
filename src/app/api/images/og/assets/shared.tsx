@@ -47,7 +47,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         <svg
           width="80"
           height="80"
-          viewBox="0 0 80 80"
+          viewBox="0 0 16 16"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -87,7 +87,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         <svg
           width="80"
           height="80"
-          viewBox="0 0 80 80"
+          viewBox="0 0 32 32"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -122,7 +122,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         <svg
           width="80"
           height="80"
-          viewBox="0 0 80 80"
+          viewBox="0 0 15 15"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -155,7 +155,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         <svg
           width="80"
           height="80"
-          viewBox="0 0 80 80"
+          viewBox="0 0 16 16"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -183,7 +183,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         <svg
           width="80"
           height="80"
-          viewBox="0 0 80 80"
+          viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -203,7 +203,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         <svg
           width="80"
           height="80"
-          viewBox="0 0 80 80"
+          viewBox="0 0 32 32"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -250,7 +250,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         <svg
           width="80"
           height="80"
-          viewBox="0 0 80 80"
+          viewBox="0 0 22 22"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -299,7 +299,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         <svg
           width="80"
           height="80"
-          viewBox="0 0 80 80"
+          viewBox="0 0 90 90"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -350,7 +350,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         <svg
           width="80"
           height="80"
-          viewBox="0 0 80 80"
+          viewBox="0 0 32 32"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -392,7 +392,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         <svg
           width="80"
           height="80"
-          viewBox="0 0 80 80"
+          viewBox="0 0 16 16"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -423,7 +423,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         <svg
           width="80"
           height="80"
-          viewBox="0 0 80 80"
+          viewBox="0 0 36 36"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
