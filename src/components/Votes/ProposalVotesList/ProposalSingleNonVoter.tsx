@@ -22,7 +22,7 @@ export function ProposalSingleNonVoter({
   proposal: Proposal;
   voter: {
     delegate: string;
-    direct_vp: string;
+    voting_power: string;
     twitter: string | null;
     discord: string | null;
     warpcast: string | null;
@@ -149,8 +149,8 @@ export function ProposalSingleNonVoter({
           <TokenAmountDecorated
             amount={
               voter.citizen_type
-                ? voter.direct_vp
-                : pastVotes || voter.direct_vp
+                ? voter.voting_power
+                : pastVotes || voter.voting_power
             }
             hideCurrency
             specialFormatting
