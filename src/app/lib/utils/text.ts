@@ -1,10 +1,7 @@
 export const cleanString = (text: string) => {
   return text
     .replace(/#{1,6}\s/g, "") // Removes Markdown headings
-    .replace(/\n/g, " ") // Replaces newlines with space
-    .replace(/&quot;/g, "") // Decode HTML entity for double quotes
-    .replace(/&#39;/g, "") // Decode HTML entity for single quotes
-    .replace(/&amp;/g, "and"); // Decode HTML entity for ampersand
+    .replace(/\n/g, " "); // Replaces newlines with space
 };
 
 export const truncateString = (str: string, maxLength: number) => {
