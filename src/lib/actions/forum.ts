@@ -5,6 +5,7 @@ import { AttachableType } from "@prisma/client";
 import { uploadFileToPinata, getIPFSUrl } from "@/lib/pinata";
 import Tenant from "@/lib/tenant/tenant";
 import verifyMessage from "@/lib/serverVerifyMessage";
+import { prismaWeb2Client } from "@/app/lib/prisma";
 
 
 const createTopicSchema = z.object({
