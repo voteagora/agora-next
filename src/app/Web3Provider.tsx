@@ -1,6 +1,7 @@
 "use client";
 
 import { FC, PropsWithChildren } from "react";
+import { usePathname } from "next/navigation";
 import { createConfig, WagmiProvider, type Transport } from "wagmi";
 import { inter } from "@/styles/fonts";
 import { mainnet } from "wagmi/chains";
@@ -54,28 +55,39 @@ export const config = createConfig(
   })
 );
 
-const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
-  <WagmiProvider config={config}>
-    <QueryClientProvider client={queryClient}>
-      <SIWEProvider {...siweProviderConfig}>
-        <ConnectKitProvider options={{ enforceSupportedChains: false }}>
-          <body className={inter.variable}>
-            <noscript>You need to enable JavaScript to run this app.</noscript>
-            {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
-            {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
-            <ConnectButtonProvider>
-              <PageContainer>
-                <Toaster />
-                <AgoraProvider>{children}</AgoraProvider>
-              </PageContainer>
-            </ConnectButtonProvider>
-            {!shouldHideAgoraBranding && <Footer />}
-            <SpeedInsights />
-          </body>
-        </ConnectKitProvider>
-      </SIWEProvider>
-    </QueryClientProvider>
-  </WagmiProvider>
-);
+const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => {
+  const pathname = usePathname();
+  const isDraftScope =
+    typeof window !== "undefined" && pathname?.startsWith("/proposals/draft");
+
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <SIWEProvider
+          {...siweProviderConfig}
+          enabled={Boolean(isDraftScope) && siweProviderConfig.enabled}
+        >
+          <ConnectKitProvider options={{ enforceSupportedChains: false }}>
+            <body className={inter.variable}>
+              <noscript>
+                You need to enable JavaScript to run this app.
+              </noscript>
+              {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
+              {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
+              <ConnectButtonProvider>
+                <PageContainer>
+                  <Toaster />
+                  <AgoraProvider>{children}</AgoraProvider>
+                </PageContainer>
+              </ConnectButtonProvider>
+              {!shouldHideAgoraBranding && <Footer />}
+              <SpeedInsights />
+            </body>
+          </ConnectKitProvider>
+        </SIWEProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
+};
 
 export default Web3Provider;
