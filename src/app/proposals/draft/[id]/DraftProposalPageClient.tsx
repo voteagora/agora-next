@@ -1,22 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { GET_DRAFT_STAGES, getStageMetadata } from "../utils/stages";
 import DraftProposalForm from "../components/DraftProposalForm";
 import DeleteDraftButton from "../components/DeleteDraftButton";
-import BackButton from "../components/BackButton";
 import ReactMarkdown from "react-markdown";
-import Tenant from "@/lib/tenant/tenant";
-import {
-  PLMConfig,
-  DraftProposal as DraftProposalType,
-} from "@/app/proposals/draft/types";
+import { DraftProposal as DraftProposalType } from "@/app/proposals/draft/types";
 import { useSIWE } from "connectkit";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
-import { ConnectKitButton } from "connectkit";
-import { UpdatedButton } from "@/components/Button";
-import LoadingSpinner from "@/components/shared/LoadingSpinner";
+import { useDraftStage } from "./hooks/useDraftStage";
+import { DraftPageHeader } from "./components/DraftPageHeader";
+import { SiweAccessCard } from "./components/SiweAccessCard";
 
 type DraftResponse = DraftProposalType;
 
@@ -37,14 +31,14 @@ export default function DraftProposalPageClient({
   const [postSignGrace, setPostSignGrace] = useState<boolean>(false);
   const hasDraftRef = useRef<boolean>(false);
 
-  const stageParam = (searchParams?.stage || "0") as string;
-  const stageIndex = useMemo(() => parseInt(stageParam, 10), [stageParam]);
-  const DRAFT_STAGES_FOR_TENANT = GET_DRAFT_STAGES()!;
-  const stageObject = DRAFT_STAGES_FOR_TENANT[stageIndex];
-  const stageMetadata = getStageMetadata(stageObject.stage);
-  const { ui } = Tenant.current();
-  const config = ui.toggle("proposal-lifecycle")?.config as PLMConfig;
-  const targetChainId = Tenant.current().contracts.governor.chain.id;
+  const {
+    stageIndex,
+    stageObject,
+    stageMetadata,
+    DRAFT_STAGES_FOR_TENANT,
+    config,
+    targetChainId,
+  } = useDraftStage(searchParams);
   const { address } = useAccount();
   const currentChainId = useChainId();
   const { switchChainAsync, isPending: isSwitching } = useSwitchChain();
@@ -146,7 +140,7 @@ export default function DraftProposalPageClient({
     targetChainId,
     switchChainAsync,
     signIn,
-    loadDraft,
+    refetch,
   ]);
 
   const loadedAfterJwtRef = useRef<boolean>(false);
@@ -175,7 +169,7 @@ export default function DraftProposalPageClient({
       } catch {}
     }, 200);
     return () => clearInterval(id);
-  }, [isSigning, loadDraft]);
+  }, [isSigning, refetch]);
 
   if (loading && !draft) {
     // Defer to the route segment's loading.tsx skeleton
@@ -185,60 +179,17 @@ export default function DraftProposalPageClient({
   // Keep description text unchanged during signing; only buttons reflect state
 
   if (error) {
-    const needsSiwe = error.toLowerCase().includes("not authenticated");
     return (
       <div className="max-w-screen-xl mx-auto mt-10">
-        <div className="bg-wash border border-line rounded-2xl shadow-newDefault p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <h2 className="text-primary text-xl font-black">
-                Authentication required
-              </h2>
-              <p className="text-secondary mt-2 max-w-prose">
-                To access and edit this draft, please sign this access request.
-                We’ll verify your ownership securely.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            {!address ? (
-              <div className="sm:w-auto">
-                <ConnectKitButton.Custom>
-                  {({ show }) => (
-                    <UpdatedButton type="primary" onClick={show}>
-                      Connect wallet
-                    </UpdatedButton>
-                  )}
-                </ConnectKitButton.Custom>
-              </div>
-            ) : (
-              <UpdatedButton
-                type="primary"
-                onClick={handleSiwe}
-                isLoading={false}
-                disabled={isSwitching || isSigning}
-                className="sm:w-auto"
-              >
-                {isSigning ? (
-                  <span className="inline-flex items-center gap-2">
-                    {signLabel || "Awaiting Confirmation"}
-                    {(signLabel || "")
-                      .toLowerCase()
-                      .includes("awaiting confirmation") && (
-                      <LoadingSpinner className="text-white h-4 w-4" />
-                    )}
-                  </span>
-                ) : (
-                  "Sign access request"
-                )}
-              </UpdatedButton>
-            )}
-            {!needsSiwe && (
-              <span className="text-tertiary text-xs">{error}</span>
-            )}
-          </div>
-        </div>
+        <SiweAccessCard
+          error={error}
+          isSigning={isSigning}
+          signLabel={signLabel}
+          onConnectClick={() => {}}
+          onSignClick={handleSiwe}
+          isSwitching={isSwitching}
+          hasAddress={Boolean(address)}
+        />
       </div>
     );
   }
@@ -249,31 +200,29 @@ export default function DraftProposalPageClient({
 
   return (
     <main className="max-w-screen-xl mx-auto mt-10">
-      <div className="flex flex-row items-center justify-between">
-        <div className="flex flex-row items-center space-x-6">
-          {stageIndex > 0 && (
-            <BackButton
-              draftProposalId={(draft as any).uuid || String(draft.id)}
-              index={stageIndex}
-            />
-          )}
-          <h1 className="font-black text-primary text-2xl m-0">
-            {stageMetadata?.title}
-          </h1>
-          <span className="bg-tertiary/5 text-primary rounded-full px-2 py-1 text-sm">
-            Step {stageObject.order + 1}/{DRAFT_STAGES_FOR_TENANT.length}
-          </span>
-        </div>
-        <DeleteDraftButton proposalId={draft.id} />
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
-        <section className="col-span-1 sm:col-span-2 order-last sm:order-first">
-          <DraftProposalForm
-            proposalTypes={proposalTypes}
-            stage={stageObject.stage}
-            draftProposal={draft}
+      {draft && (
+        <>
+          <DraftPageHeader
+            stageIndex={stageIndex}
+            stageTitle={stageMetadata?.title}
+            totalStages={DRAFT_STAGES_FOR_TENANT.length}
+            draftIdForBack={(draft as any).uuid || String(draft.id)}
           />
-        </section>
+          <div className="flex items-center justify-end mt-4">
+            <DeleteDraftButton proposalId={draft.id} />
+          </div>
+        </>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
+        {draft && (
+          <section className="col-span-1 sm:col-span-2 order-last sm:order-first">
+            <DraftProposalForm
+              proposalTypes={proposalTypes}
+              stage={stageObject.stage}
+              draftProposal={draft}
+            />
+          </section>
+        )}
         <section className="col-span-1">
           <div className="bg-wash border border-line rounded-2xl p-4">
             <div className="mt-2">
