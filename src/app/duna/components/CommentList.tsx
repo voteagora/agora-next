@@ -7,17 +7,19 @@ import { useAccount } from "wagmi";
 import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { canDeleteContent } from "@/lib/forumAdminUtils";
+import { canDeleteContent } from "@/lib/forumUtils";
 import { DunaContentRenderer, DunaEditor } from "@/components/duna-editor";
 import { Button } from "@/components/ui/button";
 import { Reply } from "lucide-react";
 import Tenant from "@/lib/tenant/tenant";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
+import SoftDeletedContent from "@/components/Forum/SoftDeletedContent";
 
 interface CommentItemProps {
   comment: ForumPost;
   depth: number;
   onDelete?: (commentId: number) => void;
+  onUpdate?: (commentId: number, updates: Partial<ForumPost>) => void;
   comments: ForumPost[]; // Need this to count replies
   onReply: (commentId: number) => void;
   isReplying: boolean;
@@ -32,6 +34,7 @@ const CommentItem = ({
   comment,
   depth,
   onDelete,
+  onUpdate,
   comments,
   onReply,
   isReplying,
@@ -43,7 +46,7 @@ const CommentItem = ({
 }: CommentItemProps) => {
   const [showReplies, setShowReplies] = useState(false);
   const { address } = useAccount();
-  const { deletePost } = useForum();
+  const { deletePost, restorePost } = useForum();
   const openDialog = useOpenDialog();
   const { dunaCategoryId } = useDunaCategory();
   const { isAdmin, canManageTopics } = useForumAdmin(
@@ -72,17 +75,70 @@ const CommentItem = ({
     openDialog({
       type: "CONFIRM",
       params: {
-        title: "Delete Comment",
-        message: "Are you sure you want to delete this comment?",
+        title: isAdmin ? "Permanently Delete Comment" : "Delete Comment",
+        message: isAdmin
+          ? "Are you sure you want to permanently delete this comment? This action cannot be undone."
+          : "Are you sure you want to delete this comment?",
         onConfirm: async () => {
-          const success = await deletePost(comment.id);
-          if (success && onDelete) {
-            onDelete(comment.id);
+          const success = await deletePost(comment.id, isAdmin);
+          if (success) {
+            if (isAdmin) {
+              onDelete?.(comment.id);
+            } else {
+              onUpdate?.(comment.id, {
+                deletedAt: new Date().toISOString(),
+                deletedBy: address || "",
+              });
+            }
           }
         },
       },
     });
   };
+
+  const handleRestore = async (e: React.MouseEvent) => {
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Restore Comment",
+        message: "Are you sure you want to restore this comment?",
+        onConfirm: async () => {
+          const isAuthor =
+            comment.author?.toLowerCase() === address?.toLowerCase();
+          const success = await restorePost(comment.id, isAuthor);
+          if (success) {
+            onUpdate?.(comment.id, {
+              deletedAt: null,
+              deletedBy: null,
+            });
+          }
+        },
+      },
+    });
+  };
+
+  if (comment.deletedAt) {
+    const canDelete = canDeleteContent(
+      address || "",
+      comment.author || "",
+      isAdmin,
+      canManageTopics
+    );
+    return (
+      <div
+        className={`${depth > 0 ? "ml-4 sm:ml-8 mt-3 sm:mt-4" : "mt-3 sm:mt-4"}`}
+      >
+        <SoftDeletedContent
+          contentType="comment"
+          deletedAt={comment.deletedAt}
+          deletedBy={comment.deletedBy || ""}
+          canRestore={canDelete}
+          onRestore={() => handleRestore({} as React.MouseEvent)}
+          showRestoreButton={canDelete}
+        />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -178,6 +234,8 @@ const CommentItem = ({
               <CommentItem
                 comment={reply}
                 depth={depth + 1}
+                onDelete={onDelete}
+                onUpdate={onUpdate}
                 comments={comments}
                 onReply={onReply}
                 isReplying={isReplying}
@@ -268,6 +326,7 @@ interface CommentThreadProps {
   parentId: number | null;
   depth: number;
   onDelete?: (commentId: number) => void;
+  onUpdate?: (commentId: number, updates: Partial<ForumPost>) => void;
   onReply: (commentId: number) => void;
   isReplying: boolean;
   replyingToId: number | null;
@@ -282,6 +341,7 @@ const CommentThread = ({
   parentId,
   depth,
   onDelete,
+  onUpdate,
   onReply,
   isReplying,
   replyingToId,
@@ -305,6 +365,7 @@ const CommentThread = ({
             comment={comment}
             depth={depth}
             onDelete={onDelete}
+            onUpdate={onUpdate}
             comments={comments}
             onReply={onReply}
             isReplying={isReplying}
@@ -323,6 +384,7 @@ const CommentThread = ({
 interface CommentListProps {
   comments: ForumPost[];
   onDelete?: (commentId: number) => void;
+  onUpdate?: (commentId: number, updates: Partial<ForumPost>) => void;
   onReply: (commentId: number) => void;
   isReplying: boolean;
   replyingToId: number | null;
@@ -342,6 +404,7 @@ const CommentList = ({
   onSubmitReply,
   onCancelReply,
   onDelete,
+  onUpdate,
 }: CommentListProps) => {
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -350,6 +413,7 @@ const CommentList = ({
         parentId={null}
         depth={0}
         onDelete={onDelete}
+        onUpdate={onUpdate}
         onReply={onReply}
         isReplying={isReplying}
         replyingToId={replyingToId}

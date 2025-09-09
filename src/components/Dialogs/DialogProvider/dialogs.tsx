@@ -314,6 +314,7 @@ export type ReportModalDialogType = {
     onArchive?: () => void;
     onCommentAdded?: (newComment: ForumPost) => void;
     onCommentDeleted?: (commentId: number) => void;
+    onCommentUpdated?: (commentId: number, updates: Partial<ForumPost>) => void;
   };
 };
 
@@ -555,7 +556,7 @@ export const dialogs: DialogDefinitions<DialogType> = {
     );
   },
   REPORT_MODAL: (
-    { report, onDelete, onArchive, onCommentAdded, onCommentDeleted },
+    { report, onDelete, onArchive, onCommentAdded, onCommentDeleted, onCommentUpdated },
     closeDialog
   ) => {
     return (
@@ -565,6 +566,7 @@ export const dialogs: DialogDefinitions<DialogType> = {
         onArchive={onArchive}
         onCommentAdded={onCommentAdded}
         onCommentDeleted={onCommentDeleted}
+        onCommentUpdated={onCommentUpdated}
         closeDialog={closeDialog}
       />
     );
