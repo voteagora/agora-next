@@ -56,16 +56,12 @@ export const config = createConfig(
 );
 
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => {
-  const pathname = usePathname();
-  const isDraftScope =
-    typeof window !== "undefined" && pathname?.startsWith("/proposals/draft");
-
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <SIWEProvider
           {...siweProviderConfig}
-          enabled={Boolean(isDraftScope) && siweProviderConfig.enabled}
+          enabled={siweProviderConfig.enabled}
         >
           <ConnectKitProvider options={{ enforceSupportedChains: false }}>
             <body className={inter.variable}>

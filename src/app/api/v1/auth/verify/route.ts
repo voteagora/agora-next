@@ -13,13 +13,6 @@ export async function POST(request: NextRequest) {
     const { message, signature } = await request.json();
     // Parse the exact message signed by the client (EIP-4361)
     const siweObject = new SiweMessage(message);
-    console.info("[SIWE] verify request", {
-      address: siweObject.address,
-      chainId: siweObject.chainId,
-      domain: siweObject.domain,
-      nonceLen: String(siweObject.nonce || "").length,
-      hasJwtSecret: Boolean(process.env.JWT_SECRET),
-    });
 
     let verification = false;
     try {
@@ -29,27 +22,27 @@ export async function POST(request: NextRequest) {
         signature,
       });
     } catch (e) {
-      console.error("[SIWE] verifyMessage threw", e);
       verification = false;
     }
 
     // If EOA check failed, try EIP-1271 (SCW / multisig) fallback
     if (!verification) {
       try {
-        const { getPublicClientByChainId } = await import("@/lib/viem");
-        const { hashMessage } = await import("viem");
+        const { getPublicClient } = await import("@/lib/viem");
+        const { hashMessage, createPublicClient } = await import("viem");
+        const { SUPPORTED_CHAINS } = await import("@/lib/constants");
         const siweChainId = Number(siweObject.chainId || 0);
-        const publicClient = getPublicClientByChainId(
-          Number.isFinite(siweChainId) && siweChainId > 0
-            ? siweChainId
-            : undefined
-        );
+
+        // Resolve chain by id if present in supported list; otherwise fallback to tenant default via getPublicClient()
+        const matched = SUPPORTED_CHAINS.find((c) => c.id === siweChainId);
+        const publicClient = matched
+          ? getPublicClient(matched)
+          : getPublicClient();
 
         const code = await publicClient.getBytecode({
           address: siweObject.address as `0x${string}`,
         });
         const isContract = !!code && code !== "0x";
-        console.info("[SIWE] 1271 fallback", { isContract, siweChainId });
         if (isContract) {
           const ERC1271_ABI = [
             {
@@ -72,22 +65,13 @@ export async function POST(request: NextRequest) {
             args: [msgHash, signature as `0x${string}`],
           })) as `0x${string}`;
           verification = res?.toLowerCase() === MAGIC;
-          console.info("[SIWE] 1271 result", {
-            res,
-            verification,
-            siweChainId,
-          });
         }
       } catch (e) {
-        console.error("[SIWE] 1271 fallback error", e);
+        // ignore
       }
     }
 
     if (!verification) {
-      console.warn("[SIWE] invalid signature", {
-        address: siweObject.address,
-        chainId: siweObject.chainId,
-      });
       return NextResponse.json(
         { message: "Invalid signature" },
         { status: 401 }
@@ -110,10 +94,6 @@ export async function POST(request: NextRequest) {
     };
     return NextResponse.json(responseBody);
   } catch (e) {
-    console.error("[SIWE] /auth/verify error", {
-      hasJwtSecret: Boolean(process.env.JWT_SECRET),
-      error: e,
-    });
     return new Response("Internal server error", { status: 500 });
   }
 }

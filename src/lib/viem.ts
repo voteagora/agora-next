@@ -105,7 +105,6 @@ export const getPublicClient = (chain?: Chain) => {
   });
 };
 
-// Centraliza las chains soportadas y evita duplicar lógica en endpoints
 const SUPPORTED_CHAINS_INTERNAL: Chain[] = [
   ...SUPPORTED_CHAINS,
   deriveMainnet,
@@ -116,21 +115,10 @@ export const getPublicClientByChainId = (chainId?: number) => {
   const { contracts } = Tenant.current();
   const effectiveChainId = chainId ?? contracts.token.chain.id;
 
-  // Use the appropriate transport for the requested chainId; fallback to tenant chain if unavailable
-  let transport = getTransportForChain(effectiveChainId);
-
-  // Try to find a known chain definition; if not, fall back to the tenant's chain
   const matched = SUPPORTED_CHAINS_INTERNAL.find(
     (c) => c.id === effectiveChainId
   );
-  const chain: Chain = (matched ?? (contracts.token.chain as Chain)) as Chain;
-
-  if (!transport) {
-    transport = getTransportForChain(contracts.token.chain.id)!;
-  }
-
-  return createPublicClient({
-    chain,
-    transport: transport!,
-  });
+  const resolvedChain: Chain | undefined =
+    matched ?? (contracts.token.chain as Chain);
+  return getPublicClient(resolvedChain);
 };

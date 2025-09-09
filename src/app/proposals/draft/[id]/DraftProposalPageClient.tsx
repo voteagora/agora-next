@@ -1,20 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { GET_DRAFT_STAGES, getStageMetadata } from "../utils/stages";
 import DraftProposalForm from "../components/DraftProposalForm";
 import DeleteDraftButton from "../components/DeleteDraftButton";
 import BackButton from "../components/BackButton";
 import ReactMarkdown from "react-markdown";
 import Tenant from "@/lib/tenant/tenant";
-import { PLMConfig } from "@/app/proposals/draft/types";
+import {
+  PLMConfig,
+  DraftProposal as DraftProposalType,
+} from "@/app/proposals/draft/types";
 import { useSIWE } from "connectkit";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { ConnectKitButton } from "connectkit";
 import { UpdatedButton } from "@/components/Button";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 
-type DraftResponse = any;
+type DraftResponse = DraftProposalType;
 
 export default function DraftProposalPageClient({
   idParam,
@@ -45,50 +49,46 @@ export default function DraftProposalPageClient({
   const currentChainId = useChainId();
   const { switchChainAsync, isPending: isSwitching } = useSwitchChain();
 
-  const loadDraft = useCallback(
-    async (silent = false) => {
-      try {
-        setError(null);
-        const manageLoading = !silent || !hasDraftRef.current;
-        if (manageLoading) setLoading(true);
-        const sessionRaw = localStorage.getItem("agora-siwe-jwt");
-        if (!sessionRaw) {
-          setError("Not authenticated (missing SIWE session)");
-          if (manageLoading) setLoading(false);
-          return;
-        }
-        const token = JSON.parse(sessionRaw)?.access_token as
-          | string
-          | undefined;
-        if (!token) {
-          setError("Not authenticated (invalid session)");
-          if (manageLoading) setLoading(false);
-          return;
-        }
-        const res = await fetch(`/api/v1/drafts/${idParam}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) {
-          setError(`${res.status} ${res.statusText}`);
-          if (manageLoading) setLoading(false);
-          return;
-        }
-        const data = await res.json();
-        setDraft(data);
-        hasDraftRef.current = true;
-        setError(null);
-        if (manageLoading) setLoading(false);
-      } catch (e: any) {
-        setError(e.message || "Failed to load draft");
-        setLoading(false);
+  const {
+    data,
+    isLoading,
+    refetch,
+    error: queryError,
+  } = useQuery({
+    queryKey: ["draft", idParam],
+    queryFn: async (): Promise<DraftResponse> => {
+      const sessionRaw = localStorage.getItem("agora-siwe-jwt");
+      if (!sessionRaw) {
+        throw new Error("Not authenticated (missing SIWE session)");
       }
+      const token = JSON.parse(sessionRaw)?.access_token as string | undefined;
+      if (!token) {
+        throw new Error("Not authenticated (invalid session)");
+      }
+      const res = await fetch(`/api/v1/drafts/${idParam}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        throw new Error(`${res.status} ${res.statusText}`);
+      }
+      return res.json();
     },
-    [idParam]
-  );
+    refetchOnWindowFocus: false,
+  });
 
   useEffect(() => {
-    loadDraft();
-  }, [loadDraft]);
+    if (data) {
+      setDraft(data);
+      setError(null);
+      setLoading(false);
+      hasDraftRef.current = true;
+    } else if (isLoading) {
+      setLoading(true);
+    } else if (queryError) {
+      setError((queryError as Error).message);
+      setLoading(false);
+    }
+  }, [data, isLoading, queryError]);
 
   const { signIn } = useSIWE();
   // Label watcher during signing (non-blocking)
@@ -130,7 +130,7 @@ export default function DraftProposalPageClient({
       setSignLabel("Awaiting Confirmation");
       await signIn();
       setSignLabel("Signed");
-      await loadDraft(true);
+      await refetch();
     } catch {
       setSignLabel("Cancelled");
       setError("Signature cancelled by user");
@@ -164,7 +164,7 @@ export default function DraftProposalPageClient({
           setSignLabel("Signed");
           if (!loadedAfterJwtRef.current && hasJwt) {
             loadedAfterJwtRef.current = true;
-            await loadDraft(true);
+            await refetch();
           }
           setTimeout(() => setSignLabel(null), 1200);
         } else if (stage === "error") {

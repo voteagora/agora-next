@@ -1,16 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { verifyJwtAndGetAddress } from "@/app/proposals/draft/actions/siweAuth";
+import { prismaWeb2Client } from "@/app/lib/prisma";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { verifyJwtAndGetAddress } = await import(
-      "@/app/proposals/draft/actions/siweAuth"
-    );
-    const { prismaWeb2Client } = await import("@/app/lib/prisma");
-    const Tenant = (await import("@/lib/tenant/tenant")).default;
-
     // Extract bearer token and resolve SIWE address from JWT
     const authz =
       request.headers.get("authorization") ||
