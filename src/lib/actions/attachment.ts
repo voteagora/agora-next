@@ -1,8 +1,8 @@
 "use server";
 
-import { AttachableType } from "@prisma/client";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import { getIPFSUrl, uploadFileToPinata } from "@/lib/pinata";
 
 interface AttachmentData {
   fileName: string;
@@ -14,7 +14,7 @@ interface AttachmentData {
 export async function uploadAttachment(
   attachmentData: AttachmentData,
   address: string,
-  targetType: "topic" | "post",
+  targetType: "category" | "post",
   targetId: number
 ) {
   try {
@@ -26,8 +26,6 @@ export async function uploadAttachment(
     const file = new File([fileBlob], attachmentData.fileName, {
       type: attachmentData.contentType,
     });
-
-    const { uploadFileToPinata, getIPFSUrl } = await import("@/lib/pinata");
 
     const uploadResult = await uploadFileToPinata(file, {
       name: attachmentData.fileName,
@@ -45,19 +43,35 @@ export async function uploadAttachment(
       throw new Error("Pinata upload failed");
     }
 
-    const newAttachment = await prismaWeb2Client.forumAttachment.create({
-      data: {
-        dao_slug: slug,
-        ipfsCid: uploadResult.IpfsHash,
-        fileName: attachmentData.fileName,
-        contentType: attachmentData.contentType,
-        fileSize: BigInt(attachmentData.fileSize),
-        address: address,
-        targetType:
-          targetType === "topic" ? AttachableType.topic : AttachableType.post,
-        targetId: targetId,
-      },
-    });
+    let newAttachment;
+
+    if (targetType === "post") {
+      newAttachment = await prismaWeb2Client.forumPostAttachment.create({
+        data: {
+          dao_slug: slug,
+          ipfsCid: uploadResult.IpfsHash,
+          fileName: attachmentData.fileName,
+          contentType: attachmentData.contentType,
+          fileSize: BigInt(attachmentData.fileSize),
+          address: address,
+          postId: targetId,
+        },
+      });
+    } else if (targetType === "category") {
+      newAttachment = await prismaWeb2Client.forumCategoryAttachment.create({
+        data: {
+          dao_slug: slug,
+          ipfsCid: uploadResult.IpfsHash,
+          fileName: attachmentData.fileName,
+          contentType: attachmentData.contentType,
+          fileSize: BigInt(attachmentData.fileSize),
+          address: address,
+          categoryId: targetId,
+        },
+      });
+    } else {
+      throw new Error(`Invalid target type: ${targetType}`);
+    }
 
     const ipfsUrl = getIPFSUrl(uploadResult.IpfsHash);
 

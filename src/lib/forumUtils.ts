@@ -16,6 +16,9 @@ export interface ForumTopic {
   createdAt: string;
   comments: ForumPost[];
   attachments: ForumAttachment[];
+  deletedAt?: string | null;
+  deletedBy?: string | null;
+  isNsfw?: boolean;
 }
 
 export interface ForumPost {
@@ -25,6 +28,9 @@ export interface ForumPost {
   createdAt: string;
   parentId?: number;
   attachments?: ForumAttachment[];
+  deletedAt?: string | null;
+  deletedBy?: string | null;
+  isNsfw?: boolean;
 }
 
 export interface ForumCategory {
@@ -35,6 +41,7 @@ export interface ForumCategory {
   adminOnlyTopics: boolean;
   createdAt: string;
   updatedAt: string;
+  isDuna?: boolean;
 }
 
 export interface TransformForumTopicsOptions {
@@ -64,6 +71,8 @@ export function transformForumTopics(
         createdAt: post.createdAt,
         parentId: post.parentPostId || undefined,
         attachments: post.attachments || [],
+        deletedAt: post.deletedAt,
+        deletedBy: post.deletedBy,
       })) || [];
 
     return {
@@ -74,6 +83,28 @@ export function transformForumTopics(
       createdAt: topic.createdAt,
       comments,
       attachments,
+      deletedAt: topic.deletedAt,
+      deletedBy: topic.deletedBy,
     };
   });
+}
+
+export function canArchiveContent(
+  userAddress: string,
+  contentAuthor: string,
+  isAdmin: boolean,
+  isModerator: boolean
+): boolean {
+  const isAuthor = userAddress.toLowerCase() === contentAuthor.toLowerCase();
+  return isAuthor || isAdmin || isModerator;
+}
+
+export function canDeleteContent(
+  userAddress: string,
+  contentAuthor: string,
+  isAdmin: boolean,
+  isModerator: boolean
+): boolean {
+  const isAuthor = userAddress.toLowerCase() === contentAuthor.toLowerCase();
+  return isAuthor || isAdmin || isModerator;
 }
