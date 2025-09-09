@@ -57,10 +57,16 @@ export function useAutoSiwe(
 
   const withinScope = useMemo(() => {
     if (typeof window === "undefined") return false;
-    if (!scope) return true; // no scope => allowed everywhere by opt-in usage
     const path = window.location.pathname;
-    return typeof scope === "function" ? scope(path) : scope.test(path);
-  }, [scope]);
+    if (scope) {
+      return typeof scope === "function" ? scope(path) : scope.test(path);
+    }
+    // Default: only allow auto-trigger under drafts; manual calls can still opt-in elsewhere
+    if (autoTrigger) {
+      return path.startsWith("/proposals/draft");
+    }
+    return true;
+  }, [scope, autoTrigger]);
 
   const doSignIn = useCallback(async (): Promise<boolean> => {
     if (!isConnected) return false;
