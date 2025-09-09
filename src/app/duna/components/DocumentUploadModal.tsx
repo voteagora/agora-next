@@ -20,6 +20,7 @@ import { convertFileToAttachmentData } from "@/lib/fileUtils";
 interface DocumentUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
+  categoryId: number;
   onUploadComplete: (document: {
     name: string;
     url: string;
@@ -32,6 +33,7 @@ interface DocumentUploadModalProps {
 export default function DocumentUploadModal({
   isOpen,
   onClose,
+  categoryId,
   onUploadComplete,
 }: DocumentUploadModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -122,7 +124,7 @@ export default function DocumentUploadModal({
       }, 300);
 
       const attachmentData = await convertFileToAttachmentData(selectedFile);
-      const result = await uploadDocument(attachmentData);
+      const result = await uploadDocument(attachmentData, categoryId);
 
       clearInterval(progressInterval);
 
@@ -157,7 +159,7 @@ export default function DocumentUploadModal({
     } finally {
       setIsUploading(false);
     }
-  }, [selectedFile, uploadDocument, onUploadComplete, onClose]);
+  }, [selectedFile, uploadDocument, onUploadComplete, onClose, categoryId]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();

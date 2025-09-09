@@ -13,17 +13,11 @@ import {
   archiveForumTopic,
   archiveForumAttachment,
   getForumCategories,
-  getArchivedForumTopics,
-  getArchivedForumAttachments,
-  getArchivedForumCategories,
-  unarchiveForumTopic,
-  unarchiveForumAttachment,
-  unarchiveForumCategory,
   checkForumPermissions,
-  createForumCategory,
-  updateForumCategory,
-  deleteForumCategory,
-  archiveForumCategory,
+  softDeleteForumTopic,
+  softDeleteForumPost,
+  restoreForumTopic,
+  restoreForumPost,
 } from "@/lib/actions/forum";
 import { uploadAttachment } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData, AttachmentData } from "@/lib/fileUtils";
@@ -73,7 +67,13 @@ export const useForum = () => {
         const result = await getForumTopics(categoryId);
 
         if (!result.success) {
-          throw new Error(result.error);
+          throw new Error(
+            "error" in result ? result.error : "Failed to fetch topics"
+          );
+        }
+
+        if (!("data" in result)) {
+          throw new Error("No data received");
         }
 
         const transformedTopics = transformForumTopics(result.data);
@@ -98,22 +98,28 @@ export const useForum = () => {
       try {
         const result = await getForumTopic(topicId);
 
-        if (!result.success || !result.topic) {
-          throw new Error(result.error || "Topic not found");
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        const topic = result.data;
+
+        if (!topic) {
+          throw new Error("No topic data received");
         }
 
         return {
-          id: result.topic.id,
-          title: result.topic.title,
-          author: result.topic.address,
-          content: result.posts?.[0]?.content || "",
-          createdAt: result.topic.createdAt,
+          id: topic.id,
+          title: topic.title,
+          author: topic.address,
+          content: topic.posts?.[0]?.content || "",
+          createdAt: topic.createdAt.toISOString(),
           comments:
-            result.posts?.slice(1).map((post) => ({
+            topic.posts?.slice(1).map((post) => ({
               id: post.id,
               author: post.address,
               content: post.content,
-              createdAt: post.createdAt,
+              createdAt: post.createdAt.toISOString(),
               parentId: post.parentPostId || undefined,
             })) || [],
           attachments: [],
@@ -157,8 +163,8 @@ export const useForum = () => {
           message,
         });
 
-        if (!result.success || !result.topic || !result.post) {
-          throw new Error(result.error || "Failed to create topic");
+        if (!result.success) {
+          throw new Error(result.error);
         }
 
         let attachments: any[] = [];
@@ -172,8 +178,8 @@ export const useForum = () => {
             const attachmentResult = await uploadAttachment(
               attachmentData,
               address,
-              "topic",
-              result.topic.id
+              "post",
+              result.data?.post.id!
             );
 
             if (
@@ -200,7 +206,7 @@ export const useForum = () => {
           } catch (attachmentError) {
             try {
               await deleteForumTopic({
-                topicId: result.topic.id,
+                topicId: result.data?.topic.id!,
                 _internal: true,
               });
             } catch (cleanupError) {
@@ -213,12 +219,16 @@ export const useForum = () => {
           }
         }
 
+        if (!result.data) {
+          throw new Error("No data received from topic creation");
+        }
+
         return {
-          id: result.topic.id,
-          title: result.topic.title,
-          author: result.topic.address,
-          content: result.post.content,
-          createdAt: result.topic.createdAt,
+          id: result.data.topic.id,
+          title: result.data.topic.title,
+          author: result.data.topic.address,
+          content: result.data.post.content,
+          createdAt: result.data.topic.createdAt,
           comments: [],
           attachments,
         };
@@ -261,8 +271,8 @@ export const useForum = () => {
           message,
         });
 
-        if (!result.success || !result.post) {
-          throw new Error(result.error || "Failed to create post");
+        if (!result.success) {
+          throw new Error(result.error);
         }
 
         if (data.attachment) {
@@ -275,7 +285,7 @@ export const useForum = () => {
               attachmentData,
               address,
               "post",
-              result.post.id
+              result.data?.id!
             );
 
             if (attachmentResult && attachmentResult.success) {
@@ -296,12 +306,16 @@ export const useForum = () => {
           }
         }
 
+        if (!result.data) {
+          throw new Error("No data received from post creation");
+        }
+
         return {
-          id: result.post.id,
-          author: result.post.address,
-          content: result.post.content,
-          createdAt: result.post.createdAt,
-          parentId: result.post.parentPostId || undefined,
+          id: result.data.id,
+          author: result.data.address,
+          content: result.data.content,
+          createdAt: result.data.createdAt,
+          parentId: result.data.parentPostId || undefined,
         };
       } catch (err) {
         const errorMessage =
@@ -324,10 +338,20 @@ export const useForum = () => {
       const result = await getForumAttachments();
 
       if (!result.success) {
-        throw new Error(result.error);
+        throw new Error(
+          "error" in result ? result.error : "Failed to fetch attachments"
+        );
       }
 
-      return result.data;
+      if (!("data" in result)) {
+        throw new Error("No data received");
+      }
+
+      return result.data.map((doc: any) => ({
+        ...doc,
+        name: doc.name || "",
+        uploadedBy: doc.uploadedBy || "",
+      }));
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch documents"
@@ -339,7 +363,10 @@ export const useForum = () => {
   }, []);
 
   const uploadDocument = useCallback(
-    async (attachmentData: AttachmentData): Promise<ForumDocument | null> => {
+    async (
+      attachmentData: AttachmentData,
+      categoryId: number
+    ): Promise<ForumDocument | null> => {
       if (!isConnected || !address) {
         throw new Error("Please connect your wallet first");
       }
@@ -353,28 +380,30 @@ export const useForum = () => {
         const signature = await signMessageAsync({ message });
 
         const result = await uploadDocumentFromBase64(
-          attachmentData,
+          attachmentData.base64Data,
+          attachmentData.fileName,
+          attachmentData.contentType,
           address,
           signature,
-          message
+          message,
+          categoryId
         );
 
         if (!result.success) {
           throw new Error(result.error || "Failed to save document");
         }
 
-        const successResult = result as { success: true; document: any };
-        if (!successResult.document) {
+        if (!("data" in result) || !result.data) {
           throw new Error("No document returned from upload");
         }
 
         return {
-          id: successResult.document.id,
-          name: successResult.document.name,
-          url: successResult.document.url,
-          ipfsCid: successResult.document.ipfsCid,
-          createdAt: successResult.document.createdAt,
-          uploadedBy: successResult.document.uploadedBy,
+          id: result.data.id,
+          name: result.data.name || "",
+          url: result.data.url,
+          ipfsCid: result.data.ipfsCid,
+          createdAt: result.data.createdAt,
+          uploadedBy: result.data.uploadedBy || "",
         };
       } catch (err) {
         setError(
@@ -390,7 +419,7 @@ export const useForum = () => {
   );
 
   const deleteTopic = useCallback(
-    async (topicId: number): Promise<boolean> => {
+    async (topicId: number, isAdmin: boolean = false): Promise<boolean> => {
       if (!isConnected || !address) {
         throw new Error("Please connect your wallet first");
       }
@@ -403,12 +432,22 @@ export const useForum = () => {
         const message = `Delete forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
 
-        const result = await deleteForumTopic({
-          topicId,
-          address,
-          signature,
-          message,
-        });
+        let result;
+        if (isAdmin) {
+          result = await deleteForumTopic({
+            topicId,
+            address,
+            signature,
+            message,
+          });
+        } else {
+          result = await softDeleteForumTopic({
+            topicId,
+            address,
+            signature,
+            message,
+          });
+        }
 
         if (!result.success) {
           throw new Error(result.error);
@@ -431,7 +470,7 @@ export const useForum = () => {
   );
 
   const deletePost = useCallback(
-    async (postId: number): Promise<boolean> => {
+    async (postId: number, isAdmin: boolean = false): Promise<boolean> => {
       if (!isConnected || !address) {
         throw new Error("Please connect your wallet first");
       }
@@ -444,12 +483,22 @@ export const useForum = () => {
         const message = `Delete forum post: ${postId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
 
-        const result = await deleteForumPost({
-          postId,
-          address,
-          signature,
-          message,
-        });
+        let result;
+        if (isAdmin) {
+          result = await deleteForumPost({
+            postId,
+            address,
+            signature,
+            message,
+          });
+        } else {
+          result = await softDeleteForumPost({
+            postId,
+            address,
+            signature,
+            message,
+          });
+        }
 
         if (!result.success) {
           throw new Error(result.error);
@@ -472,7 +521,11 @@ export const useForum = () => {
   );
 
   const deleteAttachment = useCallback(
-    async (attachmentId: number): Promise<boolean> => {
+    async (
+      attachmentId: number,
+      targetType: "post" | "category",
+      isAuthor: boolean = true
+    ): Promise<boolean> => {
       if (!isConnected || !address) {
         throw new Error("Please connect your wallet first");
       }
@@ -487,7 +540,9 @@ export const useForum = () => {
 
         const result = await deleteForumAttachment({
           attachmentId,
+          targetType,
           address,
+          isAuthor,
           signature,
           message,
         });
@@ -513,7 +568,7 @@ export const useForum = () => {
   );
 
   const archiveTopic = useCallback(
-    async (topicId: number): Promise<boolean> => {
+    async (topicId: number, isAuthor: boolean = true): Promise<boolean> => {
       if (!isConnected || !address) {
         throw new Error("Please connect your wallet first");
       }
@@ -531,6 +586,7 @@ export const useForum = () => {
           address,
           signature,
           message,
+          isAuthor,
         });
 
         if (!result.success) {
@@ -554,7 +610,11 @@ export const useForum = () => {
   );
 
   const archiveAttachment = useCallback(
-    async (attachmentId: number): Promise<boolean> => {
+    async (
+      attachmentId: number,
+      targetType: "post" | "category",
+      isAuthor: boolean = true
+    ): Promise<boolean> => {
       if (!isConnected || !address) {
         throw new Error("Please connect your wallet first");
       }
@@ -569,7 +629,9 @@ export const useForum = () => {
 
         const result = await archiveForumAttachment({
           attachmentId,
+          targetType,
           address,
+          isAuthor,
           signature,
           message,
         });
@@ -602,7 +664,13 @@ export const useForum = () => {
       const result = await getForumCategories();
 
       if (!result.success) {
-        throw new Error(result.error);
+        throw new Error(
+          "error" in result ? result.error : "Failed to fetch categories"
+        );
+      }
+
+      if (!("data" in result)) {
+        throw new Error("No data received");
       }
 
       return result.data.map((category) => ({
@@ -624,124 +692,37 @@ export const useForum = () => {
     }
   }, []);
 
-  const fetchArchivedTopics = useCallback(
-    async (categoryId?: number): Promise<ForumTopic[]> => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const result = await getArchivedForumTopics(categoryId);
-
-        if (!result.success) {
-          throw new Error(result.error);
-        }
-
-        const transformedTopics = transformForumTopics(result.data);
-
-        return transformedTopics;
-      } catch (err) {
-        console.error("Error fetching archived topics:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch archived topics"
-        );
-        return [];
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
-
-  const fetchArchivedDocuments = useCallback(async (): Promise<
-    ForumDocument[]
-  > => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const result = await getArchivedForumAttachments();
-
-      if (!result.success) {
-        throw new Error(result.error);
-      }
-
-      return result.data;
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to fetch archived documents"
-      );
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const fetchArchivedCategories = useCallback(async (): Promise<
-    ForumCategory[]
-  > => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const result = await getArchivedForumCategories();
-
-      if (!result.success) {
-        throw new Error(result.error);
-      }
-
-      return result.data.map((category) => ({
-        id: category.id,
-        name: category.name,
-        description: category.description || undefined,
-        archived: category.archived,
-        adminOnlyTopics: category.adminOnlyTopics,
-        createdAt: category.createdAt.toISOString(),
-        updatedAt: category.updatedAt.toISOString(),
-      }));
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to fetch archived categories"
-      );
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const unarchiveTopic = useCallback(
-    async (topicId: number): Promise<boolean> => {
+  const restoreTopic = useCallback(
+    async (topicId: number, isAuthor: boolean = true): Promise<boolean> => {
       if (!isConnected || !address) {
         throw new Error("Please connect your wallet first");
       }
 
       setLoading(true);
-      const toastId = toast.loading("Unarchiving topic...");
+      const toastId = toast.loading("Restoring topic...");
       setError(null);
 
       try {
-        const message = `Unarchive forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
+        const message = `Restore forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
 
-        const result = await unarchiveForumTopic({
+        const result = await restoreForumTopic({
           topicId,
           address,
           signature,
           message,
+          isAuthor,
         });
 
         if (!result.success) {
           throw new Error(result.error);
         }
 
-        toast.success("Topic unarchived successfully!");
+        toast.success("Topic restored successfully!");
         return true;
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : "Failed to unarchive topic";
+          err instanceof Error ? err.message : "Failed to restore topic";
         setError(errorMessage);
         toast.error(errorMessage);
         return false;
@@ -753,286 +734,37 @@ export const useForum = () => {
     [isConnected, address, signMessageAsync]
   );
 
-  const unarchiveAttachment = useCallback(
-    async (attachmentId: number): Promise<boolean> => {
+  const restorePost = useCallback(
+    async (postId: number, isAuthor: boolean = true): Promise<boolean> => {
       if (!isConnected || !address) {
         throw new Error("Please connect your wallet first");
       }
 
       setLoading(true);
-      const toastId = toast.loading("Unarchiving attachment...");
+      const toastId = toast.loading("Restoring post...");
       setError(null);
 
       try {
-        const message = `Unarchive forum attachment: ${attachmentId}\nTimestamp: ${Date.now()}`;
+        const message = `Restore forum post: ${postId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
 
-        const result = await unarchiveForumAttachment({
-          attachmentId,
+        const result = await restoreForumPost({
+          postId,
           address,
           signature,
           message,
+          isAuthor,
         });
 
         if (!result.success) {
           throw new Error(result.error);
         }
 
-        toast.success("Attachment unarchived successfully!");
+        toast.success("Post restored successfully!");
         return true;
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : "Failed to unarchive attachment";
-        setError(errorMessage);
-        toast.error(errorMessage);
-        return false;
-      } finally {
-        setLoading(false);
-        toast.dismiss(toastId);
-      }
-    },
-    [isConnected, address, signMessageAsync]
-  );
-
-  const unarchiveCategory = useCallback(
-    async (categoryId: number): Promise<boolean> => {
-      if (!isConnected || !address) {
-        toast.error("Please connect your wallet first");
-        return false;
-      }
-
-      setLoading(true);
-      const toastId = toast.loading("Unarchiving category...");
-      setError(null);
-
-      try {
-        const message = `Unarchive forum category: ${categoryId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
-
-        const result = await unarchiveForumCategory({
-          categoryId,
-          adminAddress: address,
-          signature,
-          message,
-        });
-
-        if (!result.success) {
-          throw new Error(result.error);
-        }
-
-        toast.success("Category unarchived successfully!");
-        return true;
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to unarchive category";
-        setError(errorMessage);
-        toast.error(errorMessage);
-        return false;
-      } finally {
-        setLoading(false);
-        toast.dismiss(toastId);
-      }
-    },
-    [isConnected, address, signMessageAsync]
-  );
-
-  const createCategory = useCallback(
-    async (data: {
-      name: string;
-      description?: string;
-      adminOnlyTopics?: boolean;
-    }): Promise<ForumCategory | null> => {
-      if (!isConnected || !address) {
-        toast.error("Please connect your wallet first");
-        return null;
-      }
-
-      setLoading(true);
-      const toastId = toast.loading("Creating category...");
-      setError(null);
-
-      try {
-        const message = `Create forum category: ${data.name}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
-
-        const result = await createForumCategory({
-          name: data.name,
-          description: data.description,
-          adminOnlyTopics: data.adminOnlyTopics || false,
-          adminAddress: address,
-          signature,
-          message,
-        });
-
-        if (!result.success) {
-          throw new Error(result.error);
-        }
-
-        if (!result.data) {
-          throw new Error("Category data is missing from response");
-        }
-
-        toast.success("Category created successfully!");
-        return {
-          id: result.data.id,
-          name: result.data.name,
-          description: result.data.description || undefined,
-          archived: result.data.archived,
-          adminOnlyTopics: result.data.adminOnlyTopics,
-          createdAt: result.data.createdAt.toISOString(),
-          updatedAt: result.data.updatedAt.toISOString(),
-        };
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to create category";
-        setError(errorMessage);
-        toast.error(errorMessage);
-        return null;
-      } finally {
-        setLoading(false);
-        toast.dismiss(toastId);
-      }
-    },
-    [isConnected, address, signMessageAsync]
-  );
-
-  const updateCategory = useCallback(
-    async (
-      categoryId: number,
-      data: {
-        name?: string;
-        description?: string;
-        adminOnlyTopics?: boolean;
-      }
-    ): Promise<ForumCategory | null> => {
-      if (!isConnected || !address) {
-        toast.error("Please connect your wallet first");
-        return null;
-      }
-
-      setLoading(true);
-      const toastId = toast.loading("Updating category...");
-      setError(null);
-
-      try {
-        const message = `Update forum category: ${categoryId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
-
-        const result = await updateForumCategory({
-          categoryId,
-          name: data.name,
-          description: data.description,
-          adminOnlyTopics: data.adminOnlyTopics,
-          adminAddress: address,
-          signature,
-          message,
-        });
-
-        if (!result.success) {
-          throw new Error(result.error);
-        }
-
-        if (!result.data) {
-          throw new Error("Category data is missing from response");
-        }
-
-        toast.success("Category updated successfully!");
-        return {
-          id: result.data.id,
-          name: result.data.name,
-          description: result.data.description || undefined,
-          archived: result.data.archived,
-          adminOnlyTopics: result.data.adminOnlyTopics,
-          createdAt: result.data.createdAt.toISOString(),
-          updatedAt: result.data.updatedAt.toISOString(),
-        };
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to update category";
-        setError(errorMessage);
-        toast.error(errorMessage);
-        return null;
-      } finally {
-        setLoading(false);
-        toast.dismiss(toastId);
-      }
-    },
-    [isConnected, address, signMessageAsync]
-  );
-
-  const deleteCategory = useCallback(
-    async (categoryId: number): Promise<boolean> => {
-      if (!isConnected || !address) {
-        toast.error("Please connect your wallet first");
-        return false;
-      }
-
-      setLoading(true);
-      const toastId = toast.loading("Deleting category...");
-      setError(null);
-
-      try {
-        const message = `Delete forum category: ${categoryId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
-
-        const result = await deleteForumCategory({
-          categoryId,
-          adminAddress: address,
-          signature,
-          message,
-        });
-
-        if (!result.success) {
-          throw new Error(result.error);
-        }
-
-        toast.success("Category deleted successfully!");
-        return true;
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to delete category";
-        setError(errorMessage);
-        toast.error(errorMessage);
-        return false;
-      } finally {
-        setLoading(false);
-        toast.dismiss(toastId);
-      }
-    },
-    [isConnected, address, signMessageAsync]
-  );
-
-  const archiveCategory = useCallback(
-    async (categoryId: number): Promise<boolean> => {
-      if (!isConnected || !address) {
-        toast.error("Please connect your wallet first");
-        return false;
-      }
-
-      setLoading(true);
-      const toastId = toast.loading("Archiving category...");
-      setError(null);
-
-      try {
-        const message = `Archive forum category: ${categoryId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
-
-        const result = await archiveForumCategory({
-          categoryId,
-          adminAddress: address,
-          signature,
-          message,
-        });
-
-        if (!result.success) {
-          throw new Error(result.error);
-        }
-
-        toast.success("Category archived successfully!");
-        return true;
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to archive category";
+          err instanceof Error ? err.message : "Failed to restore post";
         setError(errorMessage);
         toast.error(errorMessage);
         return false;
@@ -1057,19 +789,11 @@ export const useForum = () => {
     deleteAttachment,
     fetchDocuments,
     uploadDocument,
+    fetchCategories,
     archiveTopic,
     archiveAttachment,
-    fetchCategories,
-    fetchArchivedTopics,
-    fetchArchivedDocuments,
-    fetchArchivedCategories,
-    unarchiveTopic,
-    unarchiveAttachment,
-    unarchiveCategory,
-    createCategory,
-    updateCategory,
-    deleteCategory,
-    archiveCategory,
+    restoreTopic,
+    restorePost,
   };
 };
 

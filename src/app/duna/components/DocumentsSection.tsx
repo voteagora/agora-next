@@ -7,8 +7,8 @@ import { useAccount } from "wagmi";
 import { TrashIcon, ArchiveBoxIcon } from "@heroicons/react/20/solid";
 import DocumentUploadModal from "./DocumentUploadModal";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
+import { canArchiveContent, canDeleteContent } from "@/lib/forumUtils";
 import { FileIcon } from "lucide-react";
 
 const DocumentsSection = () => {
@@ -59,7 +59,15 @@ const DocumentsSection = () => {
         title: "Delete Attachment",
         message: "Are you sure you want to delete this attachment?",
         onConfirm: async () => {
-          const success = await deleteAttachment(attachmentId);
+          const isAuthor =
+            documents
+              .find((doc) => doc.id === attachmentId)
+              ?.uploadedBy?.toLowerCase() === address?.toLowerCase();
+          const success = await deleteAttachment(
+            attachmentId,
+            "category",
+            isAuthor
+          );
           if (success) {
             setDocuments((prev) =>
               prev.filter((doc) => doc.id !== attachmentId)
@@ -81,7 +89,15 @@ const DocumentsSection = () => {
         title: "Archive Attachment",
         message: "Are you sure you want to archive this attachment?",
         onConfirm: async () => {
-          const success = await archiveAttachment(attachmentId);
+          const isAuthor =
+            documents
+              .find((doc) => doc.id === attachmentId)
+              ?.uploadedBy?.toLowerCase() === address?.toLowerCase();
+          const success = await archiveAttachment(
+            attachmentId,
+            "category",
+            isAuthor
+          );
           if (success) {
             setDocuments((prev) =>
               prev.filter((doc) => doc.id !== attachmentId)
@@ -133,9 +149,7 @@ const DocumentsSection = () => {
 
       {!loading && !error && documents.length === 0 && (
         <div className="text-center py-8">
-          <div className="text-secondary">
-            No documents found. Upload the first one!
-          </div>
+          <div className="text-secondary">No documents found.</div>
         </div>
       )}
 
@@ -199,6 +213,7 @@ const DocumentsSection = () => {
       <DocumentUploadModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
+        categoryId={dunaCategoryId!}
         onUploadComplete={handleUploadComplete}
       />
     </div>

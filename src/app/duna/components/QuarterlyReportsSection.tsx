@@ -54,6 +54,8 @@ const QuarterlyReportsSection = ({
           handleCommentAdded(report.id, newComment),
         onCommentDeleted: (commentId: number) =>
           handleCommentDeleted(report.id, commentId),
+        onCommentUpdated: (commentId: number, updates: Partial<ForumPost>) =>
+          handleCommentUpdated(report.id, commentId, updates),
       },
     });
   };
@@ -128,6 +130,21 @@ const QuarterlyReportsSection = ({
     );
   };
 
+  const handleCommentUpdated = (reportId: number, commentId: number, updates: Partial<ForumPost>) => {
+    setReports((prev) =>
+      prev.map((report) =>
+        report.id === reportId
+          ? {
+              ...report,
+              comments: (report.comments || []).map((comment) =>
+                comment.id === commentId ? { ...comment, ...updates } : comment
+              ),
+            }
+          : report
+      )
+    );
+  };
+
   // Show only 2 latest reports initially
   const initialReportsCount = 2;
   const hasMoreReports = reports.length > initialReportsCount;
@@ -175,9 +192,7 @@ const QuarterlyReportsSection = ({
 
       {reports.length === 0 && (
         <div className="text-center py-8">
-          <div className="text-secondary">
-            No reports found. Create the first one!
-          </div>
+          <div className="text-secondary">No reports found.</div>
         </div>
       )}
 
