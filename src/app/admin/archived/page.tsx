@@ -10,9 +10,14 @@ import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 import ArchivedReportsSection from "@/components/Admin/ArchivedReportsSection";
 import ArchivedDocumentsSection from "@/components/Admin/ArchivedDocumentsSection";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default async function ArchivedDataPage() {
   const { ui } = Tenant.current();
+
+  // Check if current tenant is Towns
+  const { namespace } = Tenant.current();
+  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   let archivedReports: ForumTopic[] = [];
   let archivedDocuments: any[] = [];
