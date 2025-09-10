@@ -11,7 +11,6 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { FileIcon } from "lucide-react";
-import { DUNA_CATEGORY_ID } from "@/lib/constants";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface ForumDocument {
@@ -54,18 +53,10 @@ const DocumentsSection = ({
   const { namespace } = Tenant.current();
   const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
-  const { fetchDocuments, deleteAttachment, archiveAttachment } = useForum();
-
-  const { address } = useAccount();
-  const { isAdmin, canManageAttachments } = useForumAdmin(DUNA_CATEGORY_ID);
 
   const handleUploadComplete = async () => {
     const documentsData = await fetchDocuments();
     setDocuments(documentsData);
-  };
-
-  const handleUploadComplete = async () => {
-    await loadDocuments();
     setIsUploadModalOpen(false);
   };
 
@@ -87,7 +78,8 @@ const DocumentsSection = ({
       (await canDeleteContent(
         address || "",
         doc.uploadedBy || "",
-        isAdmin || canManageAttachments
+        isAdmin || canManageAttachments,
+        canManageAttachments
       ))
     ) {
       try {
@@ -112,7 +104,8 @@ const DocumentsSection = ({
       (await canArchiveContent(
         address || "",
         doc.uploadedBy || "",
-        isAdmin || canManageAttachments
+        isAdmin || canManageAttachments,
+        canManageAttachments
       ))
     ) {
       try {
