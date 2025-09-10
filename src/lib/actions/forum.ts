@@ -1,12 +1,11 @@
 "use server";
 
 import { z } from "zod";
-import { PrismaClient, AttachableType } from "@prisma/client";
+import { AttachableType } from "@prisma/client";
 import { uploadFileToPinata, getIPFSUrl } from "@/lib/pinata";
 import Tenant from "@/lib/tenant/tenant";
 import verifyMessage from "@/lib/serverVerifyMessage";
-
-const prisma = new PrismaClient();
+import { prismaWeb2Client } from "@/app/lib/prisma";
 
 const createTopicSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -47,7 +46,7 @@ export async function getForumTopics(categoryId?: number) {
       whereClause.categoryId = categoryId;
     }
 
-    const topics = await prisma.forumTopic.findMany({
+    const topics = await prismaWeb2Client.forumTopic.findMany({
       where: whereClause,
       include: {
         posts: {
@@ -72,7 +71,7 @@ export async function getForumTopics(categoryId?: number) {
 
     const [topicAttachments, postAttachments] = await Promise.all([
       topicIds.length > 0
-        ? prisma.forumAttachment.findMany({
+        ? prismaWeb2Client.forumAttachment.findMany({
             where: {
               dao_slug: slug,
               targetType: AttachableType.topic,
@@ -82,7 +81,7 @@ export async function getForumTopics(categoryId?: number) {
           })
         : [],
       postIds.length > 0
-        ? prisma.forumAttachment.findMany({
+        ? prismaWeb2Client.forumAttachment.findMany({
             where: {
               dao_slug: slug,
               targetType: AttachableType.post,
@@ -151,13 +150,13 @@ export async function getForumTopics(categoryId?: number) {
       data: [],
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
 export async function getForumTopic(topicId: number) {
   try {
-    const topic = await prisma.forumTopic.findUnique({
+    const topic = await prismaWeb2Client.forumTopic.findUnique({
       where: {
         id: topicId,
         archived: false,
@@ -199,7 +198,7 @@ export async function getForumTopic(topicId: number) {
     console.error("Error fetching forum topic:", error);
     return { success: false, error: "Failed to fetch topic" };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -220,7 +219,7 @@ export async function createForumTopic(
       return { success: false, error: "Invalid signature" };
     }
 
-    const newTopic = await prisma.forumTopic.create({
+    const newTopic = await prismaWeb2Client.forumTopic.create({
       data: {
         title: validatedData.title,
         address: validatedData.address,
@@ -229,7 +228,7 @@ export async function createForumTopic(
       },
     });
 
-    const newPost = await prisma.forumPost.create({
+    const newPost = await prismaWeb2Client.forumPost.create({
       data: {
         content: validatedData.content,
         address: validatedData.address,
@@ -270,7 +269,7 @@ export async function createForumTopic(
       details: error instanceof Error ? error.message : "Unknown error",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -286,14 +285,14 @@ async function _deleteForumTopicInternal(topicId: number) {
   try {
     const { slug } = Tenant.current();
 
-    await prisma.forumPost.deleteMany({
+    await prismaWeb2Client.forumPost.deleteMany({
       where: {
         topicId: topicId,
         dao_slug: slug,
       },
     });
 
-    await prisma.forumTopic.delete({
+    await prismaWeb2Client.forumTopic.delete({
       where: {
         id: topicId,
       },
@@ -308,7 +307,7 @@ async function _deleteForumTopicInternal(topicId: number) {
       details: error instanceof Error ? error.message : "Unknown error",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -336,14 +335,14 @@ export async function deleteForumTopic(
       return { success: false, error: "Invalid signature" };
     }
 
-    await prisma.forumPost.deleteMany({
+    await prismaWeb2Client.forumPost.deleteMany({
       where: {
         topicId: validatedData.topicId,
         dao_slug: slug,
       },
     });
 
-    await prisma.forumTopic.delete({
+    await prismaWeb2Client.forumTopic.delete({
       where: {
         id: validatedData.topicId,
       },
@@ -367,7 +366,7 @@ export async function deleteForumTopic(
       details: error instanceof Error ? error.message : "Unknown error",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -393,7 +392,7 @@ export async function deleteForumPost(data: z.infer<typeof deletePostSchema>) {
       return { success: false, error: "Invalid signature" };
     }
 
-    const post = await prisma.forumPost.findUnique({
+    const post = await prismaWeb2Client.forumPost.findUnique({
       where: { id: validatedData.postId },
     });
 
@@ -401,7 +400,7 @@ export async function deleteForumPost(data: z.infer<typeof deletePostSchema>) {
       return { success: false, error: "Post not found" };
     }
 
-    await prisma.forumPost.delete({
+    await prismaWeb2Client.forumPost.delete({
       where: {
         id: validatedData.postId,
         dao_slug: slug,
@@ -426,7 +425,7 @@ export async function deleteForumPost(data: z.infer<typeof deletePostSchema>) {
       details: error instanceof Error ? error.message : "Unknown error",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -454,7 +453,7 @@ export async function deleteForumAttachment(
       return { success: false, error: "Invalid signature" };
     }
 
-    const attachment = await prisma.forumAttachment.findUnique({
+    const attachment = await prismaWeb2Client.forumAttachment.findUnique({
       where: { id: validatedData.attachmentId },
     });
 
@@ -462,7 +461,7 @@ export async function deleteForumAttachment(
       return { success: false, error: "Attachment not found" };
     }
 
-    await prisma.forumAttachment.delete({
+    await prismaWeb2Client.forumAttachment.delete({
       where: {
         id: validatedData.attachmentId,
         dao_slug: slug,
@@ -487,7 +486,7 @@ export async function deleteForumAttachment(
       details: error instanceof Error ? error.message : "Unknown error",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -509,7 +508,7 @@ export async function createForumPost(
       return { success: false, error: "Invalid signature" };
     }
 
-    const topic = await prisma.forumTopic.findUnique({
+    const topic = await prismaWeb2Client.forumTopic.findUnique({
       where: { id: topicId },
     });
 
@@ -517,7 +516,7 @@ export async function createForumPost(
       return { success: false, error: "Topic not found" };
     }
 
-    const newPost = await prisma.forumPost.create({
+    const newPost = await prismaWeb2Client.forumPost.create({
       data: {
         content: validatedData.content,
         address: validatedData.address,
@@ -554,7 +553,7 @@ export async function createForumPost(
       details: error instanceof Error ? error.message : "Unknown error",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -568,7 +567,7 @@ export async function getForumAttachments() {
       archived: false,
     };
 
-    const documents = await prisma.forumAttachment.findMany({
+    const documents = await prismaWeb2Client.forumAttachment.findMany({
       where: whereClause,
       orderBy: {
         createdAt: "desc",
@@ -595,7 +594,7 @@ export async function getForumAttachments() {
       data: [],
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -616,7 +615,7 @@ export async function uploadForumDocument(
       return { success: false, error: "Invalid signature" };
     }
 
-    const newAttachment = await prisma.forumAttachment.create({
+    const newAttachment = await prismaWeb2Client.forumAttachment.create({
       data: {
         dao_slug: slug,
         ipfsCid: validatedData.ipfsCid,
@@ -658,7 +657,7 @@ export async function uploadForumDocument(
       details: error instanceof Error ? error.message : "Unknown error",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -765,7 +764,7 @@ export async function archiveForumTopic(
       return { success: false, error: "Invalid signature" };
     }
 
-    await prisma.forumTopic.update({
+    await prismaWeb2Client.forumTopic.update({
       where: {
         id: validatedData.topicId,
         dao_slug: slug,
@@ -793,7 +792,7 @@ export async function archiveForumTopic(
       details: error instanceof Error ? error.message : "Unknown error",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -821,7 +820,7 @@ export async function archiveForumAttachment(
       return { success: false, error: "Invalid signature" };
     }
 
-    await prisma.forumAttachment.update({
+    await prismaWeb2Client.forumAttachment.update({
       where: {
         id: validatedData.attachmentId,
         dao_slug: slug,
@@ -849,7 +848,7 @@ export async function archiveForumAttachment(
       details: error instanceof Error ? error.message : "Unknown error",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -857,7 +856,7 @@ export async function getForumCategories() {
   try {
     const { slug } = Tenant.current();
 
-    const categories = await prisma.forumCategory.findMany({
+    const categories = await prismaWeb2Client.forumCategory.findMany({
       where: {
         dao_slug: slug,
         archived: false,
@@ -876,7 +875,7 @@ export async function getForumCategories() {
       data: [],
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -884,7 +883,7 @@ export async function getForumCategory(categoryId: number) {
   try {
     const { slug } = Tenant.current();
 
-    const category = await prisma.forumCategory.findFirst({
+    const category = await prismaWeb2Client.forumCategory.findFirst({
       where: {
         id: categoryId,
         dao_slug: slug,
@@ -897,7 +896,7 @@ export async function getForumCategory(categoryId: number) {
     console.error("Error fetching forum category:", error);
     return null;
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -913,7 +912,7 @@ export async function getArchivedForumTopics(categoryId?: number) {
       whereClause.categoryId = categoryId;
     }
 
-    const topics = await prisma.forumTopic.findMany({
+    const topics = await prismaWeb2Client.forumTopic.findMany({
       where: whereClause,
       include: {
         posts: {
@@ -938,7 +937,7 @@ export async function getArchivedForumTopics(categoryId?: number) {
 
     const [topicAttachments, postAttachments] = await Promise.all([
       topicIds.length > 0
-        ? prisma.forumAttachment.findMany({
+        ? prismaWeb2Client.forumAttachment.findMany({
             where: {
               dao_slug: slug,
               targetType: AttachableType.topic,
@@ -948,7 +947,7 @@ export async function getArchivedForumTopics(categoryId?: number) {
           })
         : [],
       postIds.length > 0
-        ? prisma.forumAttachment.findMany({
+        ? prismaWeb2Client.forumAttachment.findMany({
             where: {
               dao_slug: slug,
               targetType: AttachableType.post,
@@ -1016,7 +1015,7 @@ export async function getArchivedForumTopics(categoryId?: number) {
       data: [],
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -1030,7 +1029,7 @@ export async function getArchivedForumAttachments() {
       archived: true,
     };
 
-    const documents = await prisma.forumAttachment.findMany({
+    const documents = await prismaWeb2Client.forumAttachment.findMany({
       where: whereClause,
       orderBy: {
         createdAt: "desc",
@@ -1057,7 +1056,7 @@ export async function getArchivedForumAttachments() {
       data: [],
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -1085,7 +1084,7 @@ export async function unarchiveForumTopic(
       return { success: false, error: "Invalid signature" };
     }
 
-    await prisma.forumTopic.update({
+    await prismaWeb2Client.forumTopic.update({
       where: {
         id: validatedData.topicId,
         dao_slug: slug,
@@ -1113,7 +1112,7 @@ export async function unarchiveForumTopic(
       details: error instanceof Error ? error.message : "Unknown error",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -1141,7 +1140,7 @@ export async function unarchiveForumAttachment(
       return { success: false, error: "Invalid signature" };
     }
 
-    await prisma.forumAttachment.update({
+    await prismaWeb2Client.forumAttachment.update({
       where: {
         id: validatedData.attachmentId,
         dao_slug: slug,
@@ -1169,7 +1168,7 @@ export async function unarchiveForumAttachment(
       details: error instanceof Error ? error.message : "Unknown error",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -1177,7 +1176,7 @@ export async function getArchivedForumCategories() {
   try {
     const { slug } = Tenant.current();
 
-    const categories = await prisma.forumCategory.findMany({
+    const categories = await prismaWeb2Client.forumCategory.findMany({
       where: {
         dao_slug: slug,
         archived: true,
@@ -1196,7 +1195,7 @@ export async function getArchivedForumCategories() {
       data: [],
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -1226,7 +1225,7 @@ export async function unarchiveForumCategory(
     }
 
     // Check if the person unarchiving is an admin
-    const currentAdmin = await prisma.forumAdmin.findUnique({
+    const currentAdmin = await prismaWeb2Client.forumAdmin.findUnique({
       where: {
         dao_slug_address: {
           dao_slug: slug,
@@ -1242,7 +1241,7 @@ export async function unarchiveForumCategory(
       };
     }
 
-    const category = await prisma.forumCategory.findFirst({
+    const category = await prismaWeb2Client.forumCategory.findFirst({
       where: {
         id: validatedData.categoryId,
         dao_slug: slug,
@@ -1254,7 +1253,7 @@ export async function unarchiveForumCategory(
       return { success: false, error: "Category not found" };
     }
 
-    await prisma.forumCategory.update({
+    await prismaWeb2Client.forumCategory.update({
       where: {
         id: validatedData.categoryId,
         dao_slug: slug,
@@ -1282,7 +1281,7 @@ export async function unarchiveForumCategory(
       details: error instanceof Error ? error.message : "Unknown error",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -1292,7 +1291,7 @@ export async function getForumAdmins() {
   try {
     const { slug } = Tenant.current();
 
-    const admins = await prisma.forumAdmin.findMany({
+    const admins = await prismaWeb2Client.forumAdmin.findMany({
       where: {
         dao_slug: slug,
       },
@@ -1313,7 +1312,7 @@ export async function getForumAdmins() {
       data: [],
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -1341,7 +1340,7 @@ export async function addForumAdmin(data: z.infer<typeof addAdminSchema>) {
     }
 
     // Check if the person adding is already an admin
-    const currentAdmin = await prisma.forumAdmin.findUnique({
+    const currentAdmin = await prismaWeb2Client.forumAdmin.findUnique({
       where: {
         dao_slug_address: {
           dao_slug: slug,
@@ -1358,7 +1357,7 @@ export async function addForumAdmin(data: z.infer<typeof addAdminSchema>) {
     }
 
     // Add new admin
-    const admin = await prisma.forumAdmin.create({
+    const admin = await prismaWeb2Client.forumAdmin.create({
       data: {
         dao_slug: slug,
         address: validatedData.address.toLowerCase(),
@@ -1388,7 +1387,7 @@ export async function addForumAdmin(data: z.infer<typeof addAdminSchema>) {
           : "Failed to add forum admin",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -1418,7 +1417,7 @@ export async function removeForumAdmin(
     }
 
     // Check if the person removing is an admin
-    const currentAdmin = await prisma.forumAdmin.findUnique({
+    const currentAdmin = await prismaWeb2Client.forumAdmin.findUnique({
       where: {
         dao_slug_address: {
           dao_slug: slug,
@@ -1435,7 +1434,7 @@ export async function removeForumAdmin(
     }
 
     // Remove admin
-    await prisma.forumAdmin.delete({
+    await prismaWeb2Client.forumAdmin.delete({
       where: {
         dao_slug_address: {
           dao_slug: slug,
@@ -1461,7 +1460,7 @@ export async function removeForumAdmin(
       error: "Failed to remove forum admin",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -1479,7 +1478,7 @@ export async function getForumPermissions(address?: string) {
       whereClause.address = address.toLowerCase();
     }
 
-    const permissions = await prisma.forumPermission.findMany({
+    const permissions = await prismaWeb2Client.forumPermission.findMany({
       where: whereClause,
       orderBy: [{ address: "asc" }, { permissionType: "asc" }],
     });
@@ -1496,7 +1495,7 @@ export async function getForumPermissions(address?: string) {
       data: [],
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -1529,7 +1528,7 @@ export async function addForumPermission(
     }
 
     // Check if the person adding is an admin
-    const currentAdmin = await prisma.forumAdmin.findUnique({
+    const currentAdmin = await prismaWeb2Client.forumAdmin.findUnique({
       where: {
         dao_slug_address: {
           dao_slug: slug,
@@ -1546,7 +1545,7 @@ export async function addForumPermission(
     }
 
     // Add permission
-    const permission = await prisma.forumPermission.create({
+    const permission = await prismaWeb2Client.forumPermission.create({
       data: {
         dao_slug: slug,
         address: validatedData.address.toLowerCase(),
@@ -1579,7 +1578,7 @@ export async function addForumPermission(
           : "Failed to add forum permission",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -1609,7 +1608,7 @@ export async function removeForumPermission(
     }
 
     // Check if the person removing is an admin
-    const currentAdmin = await prisma.forumAdmin.findUnique({
+    const currentAdmin = await prismaWeb2Client.forumAdmin.findUnique({
       where: {
         dao_slug_address: {
           dao_slug: slug,
@@ -1626,7 +1625,7 @@ export async function removeForumPermission(
     }
 
     // Remove permission
-    await prisma.forumPermission.delete({
+    await prismaWeb2Client.forumPermission.delete({
       where: {
         id: validatedData.permissionId,
         dao_slug: slug,
@@ -1650,7 +1649,7 @@ export async function removeForumPermission(
       error: "Failed to remove forum permission",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -1662,7 +1661,7 @@ export async function checkForumPermissions(
     const { slug } = Tenant.current();
 
     // Check if user is a forum admin
-    const forumAdmin = await prisma.forumAdmin.findUnique({
+    const forumAdmin = await prismaWeb2Client.forumAdmin.findUnique({
       where: {
         dao_slug_address: {
           dao_slug: slug,
@@ -1684,7 +1683,7 @@ export async function checkForumPermissions(
       };
     }
 
-    const permissions = await prisma.forumPermission.findMany({
+    const permissions = await prismaWeb2Client.forumPermission.findMany({
       where: {
         dao_slug: slug,
         address: address.toLowerCase(),
@@ -1724,5 +1723,424 @@ export async function checkForumPermissions(
       canCreateAttachments: false,
       canManageAttachments: false,
     };
+  }
+}
+
+// Forum Category Management
+
+const createCategorySchema = z.object({
+  name: z.string().min(1, "Category name is required"),
+  description: z.string().optional(),
+  adminOnlyTopics: z.boolean().default(false),
+  adminAddress: z.string().min(1, "Admin address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function createForumCategory(
+  data: z.infer<typeof createCategorySchema>
+) {
+  try {
+    const validatedData = createCategorySchema.parse(data);
+    const { slug } = Tenant.current();
+
+    // Verify the admin's signature
+    const isValid = await verifyMessage({
+      address: validatedData.adminAddress as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
+
+    // Check if the person creating is an admin
+    const currentAdmin = await prismaWeb2Client.forumAdmin.findUnique({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: validatedData.adminAddress.toLowerCase(),
+        },
+      },
+    });
+
+    if (!currentAdmin) {
+      return {
+        success: false,
+        error: "Only forum admins can create categories",
+      };
+    }
+
+    // Create category
+    const category = await prismaWeb2Client.forumCategory.create({
+      data: {
+        dao_slug: slug,
+        name: validatedData.name,
+        description: validatedData.description || null,
+        adminOnlyTopics: validatedData.adminOnlyTopics,
+      },
+    });
+
+    return {
+      success: true,
+      data: category,
+    };
+  } catch (error) {
+    console.error("Error creating forum category:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
+    return {
+      success: false,
+      error:
+        error instanceof Error && error.message.includes("unique constraint")
+          ? "Category with this name already exists"
+          : "Failed to create category",
+    };
+  } finally {
+    await prismaWeb2Client.$disconnect();
+  }
+}
+
+const updateCategorySchema = z.object({
+  categoryId: z.number().min(1, "Category ID is required"),
+  name: z.string().min(1, "Category name is required").optional(),
+  description: z.string().optional(),
+  adminOnlyTopics: z.boolean().optional(),
+  adminAddress: z.string().min(1, "Admin address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function updateForumCategory(
+  data: z.infer<typeof updateCategorySchema>
+) {
+  try {
+    const validatedData = updateCategorySchema.parse(data);
+    const { slug } = Tenant.current();
+
+    // Verify the admin's signature
+    const isValid = await verifyMessage({
+      address: validatedData.adminAddress as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
+
+    // Check if the person updating is an admin
+    const currentAdmin = await prismaWeb2Client.forumAdmin.findUnique({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: validatedData.adminAddress.toLowerCase(),
+        },
+      },
+    });
+
+    if (!currentAdmin) {
+      return {
+        success: false,
+        error: "Only forum admins can update categories",
+      };
+    }
+
+    // Check if category exists and is not archived
+    const existingCategory = await prismaWeb2Client.forumCategory.findFirst({
+      where: {
+        id: validatedData.categoryId,
+        dao_slug: slug,
+        archived: false,
+      },
+    });
+
+    if (!existingCategory) {
+      return { success: false, error: "Category not found" };
+    }
+
+    // Prevent updating DUNA category
+    if (existingCategory.name === "DUNA") {
+      return {
+        success: false,
+        error: "DUNA category cannot be updated",
+      };
+    }
+
+    // Prepare update data
+    const updateData: any = {};
+    if (validatedData.name !== undefined) updateData.name = validatedData.name;
+    if (validatedData.description !== undefined)
+      updateData.description = validatedData.description || null;
+    if (validatedData.adminOnlyTopics !== undefined)
+      updateData.adminOnlyTopics = validatedData.adminOnlyTopics;
+
+    // Update category
+    const category = await prismaWeb2Client.forumCategory.update({
+      where: {
+        id: validatedData.categoryId,
+        dao_slug: slug,
+      },
+      data: updateData,
+    });
+
+    return {
+      success: true,
+      data: category,
+    };
+  } catch (error) {
+    console.error("Error updating forum category:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
+    return {
+      success: false,
+      error:
+        error instanceof Error && error.message.includes("unique constraint")
+          ? "Category with this name already exists"
+          : "Failed to update category",
+    };
+  } finally {
+    await prismaWeb2Client.$disconnect();
+  }
+}
+
+const deleteCategorySchema = z.object({
+  categoryId: z.number().min(1, "Category ID is required"),
+  adminAddress: z.string().min(1, "Admin address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function deleteForumCategory(
+  data: z.infer<typeof deleteCategorySchema>
+) {
+  try {
+    const validatedData = deleteCategorySchema.parse(data);
+    const { slug } = Tenant.current();
+
+    // Verify the admin's signature
+    const isValid = await verifyMessage({
+      address: validatedData.adminAddress as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
+
+    // Check if the person deleting is an admin
+    const currentAdmin = await prismaWeb2Client.forumAdmin.findUnique({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: validatedData.adminAddress.toLowerCase(),
+        },
+      },
+    });
+
+    if (!currentAdmin) {
+      return {
+        success: false,
+        error: "Only forum admins can delete categories",
+      };
+    }
+
+    // Check if category exists
+    const existingCategory = await prismaWeb2Client.forumCategory.findFirst({
+      where: {
+        id: validatedData.categoryId,
+        dao_slug: slug,
+      },
+    });
+
+    if (!existingCategory) {
+      return { success: false, error: "Category not found" };
+    }
+
+    // Prevent deleting DUNA category
+    if (existingCategory.name === "DUNA") {
+      return {
+        success: false,
+        error: "DUNA category cannot be deleted",
+      };
+    }
+
+    // Check if category has topics
+    const topicsCount = await prismaWeb2Client.forumTopic.count({
+      where: {
+        categoryId: validatedData.categoryId,
+        dao_slug: slug,
+      },
+    });
+
+    if (topicsCount > 0) {
+      return {
+        success: false,
+        error:
+          "Cannot delete category that contains topics. Archive it instead or move topics to another category first.",
+      };
+    }
+
+    // Delete category
+    await prismaWeb2Client.forumCategory.delete({
+      where: {
+        id: validatedData.categoryId,
+        dao_slug: slug,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting forum category:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
+    return {
+      success: false,
+      error: "Failed to delete category",
+    };
+  } finally {
+    await prismaWeb2Client.$disconnect();
+  }
+}
+
+const archiveCategorySchema = z.object({
+  categoryId: z.number().min(1, "Category ID is required"),
+  adminAddress: z.string().min(1, "Admin address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+export async function archiveForumCategory(
+  data: z.infer<typeof archiveCategorySchema>
+) {
+  try {
+    const validatedData = archiveCategorySchema.parse(data);
+    const { slug } = Tenant.current();
+
+    // Verify the admin's signature
+    const isValid = await verifyMessage({
+      address: validatedData.adminAddress as `0x${string}`,
+      message: validatedData.message,
+      signature: validatedData.signature as `0x${string}`,
+    });
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
+
+    // Check if the person archiving is an admin
+    const currentAdmin = await prismaWeb2Client.forumAdmin.findUnique({
+      where: {
+        dao_slug_address: {
+          dao_slug: slug,
+          address: validatedData.adminAddress.toLowerCase(),
+        },
+      },
+    });
+
+    if (!currentAdmin) {
+      return {
+        success: false,
+        error: "Only forum admins can archive categories",
+      };
+    }
+
+    // Check if category exists and is not already archived
+    const existingCategory = await prismaWeb2Client.forumCategory.findFirst({
+      where: {
+        id: validatedData.categoryId,
+        dao_slug: slug,
+        archived: false,
+      },
+    });
+
+    if (!existingCategory) {
+      return {
+        success: false,
+        error: "Category not found or already archived",
+      };
+    }
+
+    // Prevent archiving DUNA category
+    if (existingCategory.name === "DUNA") {
+      return {
+        success: false,
+        error: "DUNA category cannot be archived",
+      };
+    }
+
+    // Archive category
+    await prismaWeb2Client.forumCategory.update({
+      where: {
+        id: validatedData.categoryId,
+        dao_slug: slug,
+      },
+      data: {
+        archived: true,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error archiving forum category:", error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: "Validation error",
+        details: error.errors,
+      };
+    }
+
+    return {
+      success: false,
+      error: "Failed to archive category",
+    };
+  } finally {
+    await prismaWeb2Client.$disconnect();
+  }
+}
+
+export async function getDunaCategoryId() {
+  try {
+    const { slug } = Tenant.current();
+
+    const dunaCategory = await prismaWeb2Client.forumCategory.findFirst({
+      where: {
+        dao_slug: slug,
+        name: "DUNA",
+        archived: false,
+      },
+    });
+
+    return dunaCategory?.id || null;
+  } catch (error) {
+    console.error("Error fetching DUNA category ID:", error);
+    return null;
+  } finally {
+    await prismaWeb2Client.$disconnect();
   }
 }

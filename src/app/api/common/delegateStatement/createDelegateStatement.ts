@@ -7,6 +7,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { Prisma } from "@prisma/client";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
 import { createHash } from "crypto";
+import { createDelegateStatementMessage } from "@/lib/delegateStatement/messageFormat";
 
 export async function createDelegateStatement({
   address,
@@ -25,9 +26,23 @@ export async function createDelegateStatement({
     delegateStatement;
   const { slug } = Tenant.current();
 
+  // Regenerate expected message from form data and compare
+  const expectedMessage = createDelegateStatementMessage(delegateStatement, {
+    daoSlug: slug,
+    discord,
+    email,
+    twitter,
+    warpcast,
+    topIssues: delegateStatement.topIssues,
+    topStakeholders: delegateStatement.topStakeholders,
+    scwAddress,
+    notificationPreferences,
+  });
+
+  // Verify signature against the message
   const valid = await verifyMessage({
     address,
-    message,
+    message: expectedMessage,
     signature,
   });
 
@@ -35,9 +50,10 @@ export async function createDelegateStatement({
     throw new Error("Invalid signature");
   }
 
-  // Sanitize the statement before storing
+  // Sanitize the statement before storing and remove email from payload
+  const { email: _, ...delegateStatementWithoutEmail } = delegateStatement;
   const sanitizedStatement = {
-    ...delegateStatement,
+    ...delegateStatementWithoutEmail,
     delegateStatement: sanitizeContent(delegateStatement.delegateStatement),
   };
 
@@ -45,7 +61,7 @@ export async function createDelegateStatement({
     .update(sanitizedStatement.delegateStatement)
     .digest("hex");
 
-  const data = {
+  const data: any = {
     address: address.toLowerCase(),
     dao_slug: slug,
     message_hash: stopGapMessageHash,
@@ -54,13 +70,17 @@ export async function createDelegateStatement({
     twitter,
     warpcast,
     discord,
-    email,
     scw_address: scwAddress?.toLowerCase(),
     notification_preferences: {
       ...notificationPreferences,
       last_updated: new Date().toISOString(),
     },
   };
+
+  // Only include email if it's not empty
+  if (email && email.trim() !== "") {
+    data.email = email;
+  }
 
   return prismaWeb2Client.delegateStatements.upsert({
     where: {

@@ -305,7 +305,7 @@ export async function parseProposal(
   const proposalData = parseProposalData(
     JSON.stringify(proposal.proposal_data || {}),
     proposalType,
-    offChainProposalData?.calculation_options
+    offChainProposalData
   );
 
   let proposalResults;
@@ -331,6 +331,7 @@ export async function parseProposal(
       createdTime
     );
   }
+
   const calculateStartTime = (): Date | null => {
     if (proposalData.key === "SNAPSHOT") {
       return new Date(proposalData.kind.start_ts * 1000);
@@ -641,7 +642,7 @@ function parseMultipleStringsSeparatedByComma(obj: string | object) {
 export function parseProposalData(
   proposalData: string,
   proposalType: ProposalType,
-  calculationOptions?: 0 | 1
+  offChainProposalData?: any
 ): ParsedProposalData[ProposalType] {
   switch (proposalType) {
     case "SNAPSHOT": {
@@ -691,7 +692,7 @@ export function parseProposalData(
                 functionArgsName,
               },
             ],
-            calculationOptions,
+            calculationOptions: offChainProposalData?.calculation_options,
           },
         };
       } catch (error) {
@@ -716,7 +717,7 @@ export function parseProposalData(
         key: proposalType,
         kind: {
           options: [],
-          tiers: parsedProposalData.tiers
+          tiers: offChainProposalData?.tiers
             .map((tier: number) => tier / 100)
             .sort((a: number, b: number) => b - a),
           created_attestation_hash: parsedProposalData.created_attestation_hash,
@@ -795,7 +796,7 @@ export function parseProposalData(
         kind: {
           options: [],
           tiers: parsedProposalData.tiers
-            .map((tier: number) => tier / 100)
+            ?.map((tier: number) => tier / 100)
             .sort((a: number, b: number) => b - a),
           onchainProposalId: parsedProposalData.onchain_proposalid,
           created_attestation_hash: parsedProposalData.created_attestation_hash,
@@ -1679,19 +1680,6 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
     fourGroups: tiers[2],
   };
 
-  // Setup weights based on proposal type
-  let tallyWeights;
-  if (proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED") {
-    tallyWeights = [
-      HYBRID_VOTE_WEIGHTS.delegates,
-      HYBRID_VOTE_WEIGHTS.apps,
-      HYBRID_VOTE_WEIGHTS.users,
-      HYBRID_VOTE_WEIGHTS.chains,
-    ];
-  } else {
-    tallyWeights = [1 / 3, 1 / 3, 1 / 3];
-  }
-
   const calculateVetoTally = (category: any, eligibleCount: number) => {
     const againstVotes = category?.against ? Number(category.against) : 0;
     const vetoPercentage = (againstVotes / eligibleCount) * 100;
@@ -1738,14 +1726,11 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
   // Determine if veto is triggered based on tiered logic
   let vetoTriggered = false;
   if (proposal.proposalType === "OFFCHAIN_OPTIMISTIC_TIERED") {
-    const totalWeightedVetoPercentage = groupTallies.reduce(
-      (sum, tally, index) => {
-        const vetoPercentage = tally.vetoPercentage;
-        return sum + vetoPercentage * tallyWeights[index];
-      },
-      0
-    );
-    if (totalWeightedVetoPercentage >= tiers[0]) {
+    const totalWeightedVetoPercentage = groupTallies.reduce((sum, tally) => {
+      const vetoPercentage = tally.vetoPercentage;
+      return sum + vetoPercentage;
+    }, 0);
+    if (totalWeightedVetoPercentage / 3 >= tiers[0]) {
       vetoTriggered = true;
     }
   } else {
@@ -1767,14 +1752,35 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
     }
   }
 
+  // Determine which threshold applies based on how many groups actually exceed thresholds
+  const groupsExceedingFourThreshold = groupTallies.filter(
+    (g) => g.vetoPercentage >= thresholds.fourGroups
+  );
+  const groupsExceedingThreeThreshold = groupTallies.filter(
+    (g) => g.vetoPercentage >= thresholds.threeGroups
+  );
+  const groupsExceedingTwoThreshold = groupTallies.filter(
+    (g) => g.vetoPercentage >= thresholds.twoGroups
+  );
+
   const groupsExceedingThresholds = groupTallies.map((group) => {
     let exceedsThreshold = false;
-    if (groupTallies.length >= 4) {
-      exceedsThreshold = group.vetoPercentage >= thresholds.fourGroups;
-    } else if (groupTallies.length >= 3) {
-      exceedsThreshold = group.vetoPercentage >= thresholds.threeGroups;
-    } else if (groupTallies.length >= 2) {
-      exceedsThreshold = group.vetoPercentage >= thresholds.twoGroups;
+
+    if (
+      groupsExceedingFourThreshold.length >= 4 &&
+      group.vetoPercentage >= thresholds.fourGroups
+    ) {
+      exceedsThreshold = true;
+    } else if (
+      groupsExceedingThreeThreshold.length >= 3 &&
+      group.vetoPercentage >= thresholds.threeGroups
+    ) {
+      exceedsThreshold = true;
+    } else if (
+      groupsExceedingTwoThreshold.length >= 2 &&
+      group.vetoPercentage >= thresholds.twoGroups
+    ) {
+      exceedsThreshold = true;
     }
 
     return {
@@ -1783,18 +1789,19 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
     };
   });
 
-  // Calculate weighted total against votes as percentage of potential participation
-  const calculatedTotalAgainstVotes = groupTallies.reduce(
-    (sum, tally, index) => {
-      const againstPercentage = tally.vetoPercentage;
-      return sum + againstPercentage * tallyWeights[index];
-    },
-    0
-  );
+  const calculatedTotalAgainstVotes = groupTallies.reduce((sum, tally) => {
+    const againstPercentage = tally.vetoPercentage;
+    return sum + againstPercentage;
+  }, 0);
+
+  const totalGroups =
+    proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED" ? 4 : 3;
+
+  const weightedPercentage = calculatedTotalAgainstVotes / totalGroups;
 
   return {
     vetoThresholdMet: vetoTriggered,
-    totalAgainstVotes: Number(calculatedTotalAgainstVotes.toFixed(2)),
+    totalAgainstVotes: Number(weightedPercentage.toFixed(2)),
     groupTallies: groupsExceedingThresholds,
     thresholds,
   };

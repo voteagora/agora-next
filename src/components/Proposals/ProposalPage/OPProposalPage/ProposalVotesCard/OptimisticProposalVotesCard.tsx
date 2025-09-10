@@ -12,6 +12,9 @@ import { icons } from "@/assets/icons/icons";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import ProposalVotesFilter from "./ProposalVotesFilter";
 import Tenant from "@/lib/tenant/tenant";
+import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
+import { checkMissingVoteForDelegate } from "@/lib/voteUtils";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface Props {
   proposal: Proposal;
@@ -32,6 +35,26 @@ const OptimisticProposalVotesCard = ({
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [showVoters, setShowVoters] = useState(true);
   const isOffchain = proposal.proposalType?.startsWith("OFFCHAIN");
+
+  // Get voting data to check if user has already voted
+  const isOptimismTenant =
+    Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
+  const { data: votingData, isSuccess: isVotingDataLoaded } =
+    useFetchAllForVoting({
+      proposal,
+      blockNumber: isOptimismTenant ? proposal.snapshotBlockNumber : undefined,
+    });
+
+  // Check if user has already voted
+  const missingVote = checkMissingVoteForDelegate(
+    votingData?.votes ?? [],
+    votingData?.votingPower ?? {
+      advancedVP: "0",
+      directVP: "0",
+      totalVP: "0",
+    }
+  );
+  const hasUserVoted = missingVote === "NONE";
 
   const handleClick = () => {
     setIsClicked(!isClicked);
@@ -99,20 +122,31 @@ const OptimisticProposalVotesCard = ({
         </div>
         {/* Show the scrolling list of votes for the proposal */}
         {showVoters ? (
-          <ProposalVotesList proposalId={proposal.id} />
+          <ProposalVotesList
+            proposalId={proposal.id}
+            offchainProposalId={proposal.offchainProposalId}
+          />
         ) : (
-          <ProposalNonVoterList proposal={proposal} />
+          <ProposalNonVoterList
+            proposal={proposal}
+            offchainProposalId={proposal.offchainProposalId}
+          />
         )}
         {/* Show the input for the user to vote on a proposal if allowed */}
         {isOffchain ? (
           <OffchainCastVoteInput />
         ) : (
-          <CastVoteInput proposal={proposal} isOptimistic />
+          <div className="border-t border-line">
+            <CastVoteInput proposal={proposal} isOptimistic />
+          </div>
         )}
-        <p className="mx-4 text-xs text-secondary">
-          If you agree with this proposal, you don&apos;t need to vote. Only
-          vote against if you oppose this proposal.
-        </p>
+        {/* Only show the voting instruction text if user hasn't voted yet */}
+        {isVotingDataLoaded && !hasUserVoted && (
+          <p className="mx-4 text-xs text-secondary">
+            If you agree with this proposal, you don&apos;t need to vote. Only
+            vote against if you oppose this proposal.
+          </p>
+        )}
       </VStack>
     </div>
   );

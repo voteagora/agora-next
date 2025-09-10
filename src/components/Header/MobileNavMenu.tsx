@@ -136,7 +136,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
               key={item.name}
               href={item.href}
               target={item.target}
-              onClick={onClose}
+              onClick={() => setTimeout(onClose, 100)}
               className={cn(
                 "self-stretch pl-4 pr-2 py-2 h-12 flex items-center",
                 item.isActive ? "bg-tertiary/10" : ""

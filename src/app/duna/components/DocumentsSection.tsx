@@ -9,6 +9,7 @@ import DocumentUploadModal from "./DocumentUploadModal";
 import Tenant from "@/lib/tenant/tenant";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
+import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { FileIcon } from "lucide-react";
 import { DUNA_CATEGORY_ID } from "@/lib/constants";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -35,6 +36,19 @@ const DocumentsSection = ({
     initialDocuments || []
   );
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const {
+    fetchDocuments,
+    deleteAttachment,
+    archiveAttachment,
+    loading,
+    error,
+  } = useForum();
+  const { address } = useAccount();
+  const openDialog = useOpenDialog();
+  const { dunaCategoryId } = useDunaCategory();
+  const { isAdmin, canCreateAttachments, canManageAttachments } = useForumAdmin(
+    dunaCategoryId || undefined
+  );
 
   // Check if current tenant is Towns
   const { namespace } = Tenant.current();
@@ -48,6 +62,10 @@ const DocumentsSection = ({
   const handleUploadComplete = async () => {
     const documentsData = await fetchDocuments();
     setDocuments(documentsData);
+  };
+
+  const handleUploadComplete = async () => {
+    await loadDocuments();
     setIsUploadModalOpen(false);
   };
 
@@ -166,12 +184,14 @@ const DocumentsSection = ({
             const canArchive = canArchiveContent(
               address || "",
               document.uploadedBy || "",
-              isAdmin || canManageAttachments
+              isAdmin,
+              canManageAttachments
             );
             const canDelete = canDeleteContent(
               address || "",
               document.uploadedBy || "",
-              isAdmin || canManageAttachments
+              isAdmin,
+              canManageAttachments
             );
 
             return (

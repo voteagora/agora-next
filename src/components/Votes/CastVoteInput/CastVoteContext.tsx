@@ -90,6 +90,7 @@ const CastVoteContextProvider = ({
     SupportTextProps["supportType"] | null
   >(null);
   const [fallbackToStandardVote, setFallbackToStandardVote] = useState(false);
+  const [hasShownShareVote, setHasShownShareVote] = useState<boolean>(false);
   const openDialog = useOpenDialog();
   const { address } = useAccount();
 
@@ -165,7 +166,24 @@ const CastVoteContextProvider = ({
       newVote,
     });
 
+  const shareVoteSessionKey = `agora--share-vote-shown:${proposal.id}`;
+
+  useEffect(() => {
+    try {
+      const stored =
+        typeof window !== "undefined" &&
+        window.sessionStorage.getItem(shareVoteSessionKey);
+      setHasShownShareVote(stored === "1");
+    } catch (_) {}
+  }, [proposal.id, shareVoteSessionKey]);
+
   const openShareVoteDialog = useEffectEvent(() => {
+    try {
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem(shareVoteSessionKey, "1");
+      }
+    } catch (_) {}
+    setHasShownShareVote(true);
     openDialog({
       className: "sm:w-[32rem]",
       type: "SHARE_VOTE",
@@ -190,10 +208,10 @@ const CastVoteContextProvider = ({
   });
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccess && !hasShownShareVote) {
       openShareVoteDialog();
     }
-  }, [isSuccess]);
+  }, [isSuccess, hasShownShareVote, openShareVoteDialog]);
 
   return (
     <CastVoteContext.Provider

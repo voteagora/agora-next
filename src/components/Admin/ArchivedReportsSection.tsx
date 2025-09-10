@@ -6,9 +6,9 @@ import { ForumTopic } from "@/lib/forumUtils";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { ArrowUpIcon, EyeIcon } from "@heroicons/react/20/solid";
 import { toast } from "react-hot-toast";
-import { DUNA_CATEGORY_ID } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { useDunaCategory } from "@/hooks/useDunaCategory";
 
 interface ArchivedReportCardProps {
   report: ForumTopic;
@@ -23,7 +23,10 @@ const ArchivedReportCard = ({
 }: ArchivedReportCardProps) => {
   const { unarchiveTopic } = useForum();
   const openDialog = useOpenDialog();
-  const { isAdmin, canManageTopics } = useForumAdmin(DUNA_CATEGORY_ID);
+  const { dunaCategoryId } = useDunaCategory();
+  const { isAdmin, canManageTopics } = useForumAdmin(
+    dunaCategoryId || undefined
+  );
 
   // Check if current tenant is Towns
   const { namespace } = Tenant.current();

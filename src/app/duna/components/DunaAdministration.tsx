@@ -2,20 +2,26 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import QuarterlyReportsSection from "./QuarterlyReportsSection";
 import DocumentsSection from "./DocumentsSection";
-import { getForumTopics, getForumAttachments } from "@/lib/actions/forum";
+import { getForumTopics, getDunaCategoryId } from "@/lib/actions/forum";
 import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
-import { DUNA_CATEGORY_ID } from "@/lib/constants";
 
 const DunaAdministration = async () => {
   let dunaReports: ForumTopic[] = [];
   let documents: any[] = [];
   
   try {
-    const [topicsResult, documentsResult] = await Promise.all([
-      getForumTopics(DUNA_CATEGORY_ID),
-      getForumAttachments()
-    ]);
-    
+    const dunaCategoryId = await getDunaCategoryId();
+    if (!dunaCategoryId) {
+      console.error("Could not find DUNA category ID");
+      return (
+        <div className="mt-12">
+          <div className="text-center py-8 text-red-500">
+            Error: Could not find DUNA category
+          </div>
+        </div>
+      );
+    }
+    const topicsResult = await getForumTopics(dunaCategoryId);
     if (topicsResult.success) {
       dunaReports = transformForumTopics(topicsResult.data, {
         mergePostAttachments: true,

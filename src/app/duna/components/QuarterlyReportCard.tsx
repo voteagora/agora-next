@@ -16,7 +16,7 @@ import { useAccount } from "wagmi";
 import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
-import { DUNA_CATEGORY_ID } from "@/lib/constants";
+import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { DunaContentRenderer } from "@/components/duna-editor";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -39,7 +39,10 @@ const QuarterlyReportCard = ({
   const { address } = useAccount();
   const { deleteTopic, archiveTopic } = useForum();
   const openDialog = useOpenDialog();
-  const { isAdmin, canManageTopics } = useForumAdmin(DUNA_CATEGORY_ID);
+  const { dunaCategoryId } = useDunaCategory();
+  const { isAdmin, canManageTopics } = useForumAdmin(
+    dunaCategoryId || undefined
+  );
 
   // Check if current tenant is Towns
   const { namespace } = Tenant.current();
@@ -48,12 +51,14 @@ const QuarterlyReportCard = ({
   const canArchive = canArchiveContent(
     address || "",
     report.author || "",
-    isAdmin || canManageTopics
+    isAdmin,
+    canManageTopics
   );
   const canDelete = canDeleteContent(
     address || "",
     report.author || "",
-    isAdmin || canManageTopics
+    isAdmin,
+    canManageTopics
   );
 
   const content = report.content;

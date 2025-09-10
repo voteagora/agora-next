@@ -19,8 +19,11 @@ import DelegatesStakeholdersFilter from "./DelegatesStakeholdersFilter";
 import { CheckMark } from "@/icons/CheckMark";
 import { MobileSortOption } from "./FilterSortOption";
 import { useAccount } from "wagmi";
+import Tenant from "@/lib/tenant/tenant";
 
 export const MobileDelegatesFilter = () => {
+  const { ui } = Tenant.current();
+  const hide7dChange = ui.toggle("hide-7d-change")?.enabled ?? false;
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIssues, setSelectedIssues] = useState<string[]>([]);
   const [selectedStakeholders, setSelectedStakeholders] = useState<string[]>(
@@ -155,20 +158,35 @@ export const MobileDelegatesFilter = () => {
       <div className="self-stretch border-b border-line">
         <div className="p-[10px] pb-6">
           <div className="flex flex-col gap-[20px] p-3">
-            {Object.keys(delegatesFilterOptions).map((key) => {
-              const option =
-                delegatesFilterOptions[
-                  key as keyof typeof delegatesFilterOptions
-                ];
-              return (
-                <MobileSortOption
-                  key={key}
-                  label={option.value}
-                  checked={option.sort === tempSortParam}
-                  onClick={() => handleTempSortChange(option.sort)}
-                />
-              );
-            })}
+            {Object.keys(delegatesFilterOptions)
+              .filter((key) => {
+                const option =
+                  delegatesFilterOptions[
+                    key as keyof typeof delegatesFilterOptions
+                  ];
+                if (
+                  hide7dChange &&
+                  (option.sort === "vp_change_7d" ||
+                    option.sort === "vp_change_7d_desc")
+                ) {
+                  return false;
+                }
+                return true;
+              })
+              .map((key) => {
+                const option =
+                  delegatesFilterOptions[
+                    key as keyof typeof delegatesFilterOptions
+                  ];
+                return (
+                  <MobileSortOption
+                    key={key}
+                    label={option.value}
+                    checked={option.sort === tempSortParam}
+                    onClick={() => handleTempSortChange(option.sort)}
+                  />
+                );
+              })}
           </div>
         </div>
       </div>

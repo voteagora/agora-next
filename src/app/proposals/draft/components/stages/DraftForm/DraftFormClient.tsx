@@ -212,6 +212,10 @@ const DraftFormClient = ({
   }, [votingModuleType, proposalTypes, methods]);
 
   const onSubmit = async (data: z.output<typeof DraftProposalSchema>) => {
+    if (isPending) {
+      return;
+    }
+
     setIsPending(true);
 
     try {
@@ -237,7 +241,9 @@ const DraftFormClient = ({
     } catch (error: any) {
       setIsPending(false);
       console.error("An error was uncaught in `draftProposalAction`: ", error);
-      toast(error.message);
+      toast(error.message || "An unexpected error occurred");
+    } finally {
+      setIsPending(false);
     }
   };
 

@@ -2,14 +2,13 @@
 
 import React, { useState } from "react";
 import { useForum, useForumAdmin } from "@/hooks/useForum";
-import { useAccount } from "wagmi";
 import { ArrowUpIcon, EyeIcon } from "@heroicons/react/20/solid";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { FileIcon } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { DUNA_CATEGORY_ID } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { useDunaCategory } from "@/hooks/useDunaCategory";
 
 interface ArchivedDocumentCardProps {
   document: any;
@@ -20,10 +19,12 @@ const ArchivedDocumentCard = ({
   document,
   onUnarchive,
 }: ArchivedDocumentCardProps) => {
-  const { address } = useAccount();
   const { unarchiveAttachment } = useForum();
   const openDialog = useOpenDialog();
-  const { isAdmin, canManageAttachments } = useForumAdmin(DUNA_CATEGORY_ID);
+  const { dunaCategoryId } = useDunaCategory();
+  const { isAdmin, canManageAttachments } = useForumAdmin(
+    dunaCategoryId || undefined
+  );
 
   // Check if current tenant is Towns
   const { namespace } = Tenant.current();

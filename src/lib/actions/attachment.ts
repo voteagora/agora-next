@@ -1,9 +1,8 @@
 "use server";
 
-import { PrismaClient, AttachableType } from "@prisma/client";
+import { AttachableType } from "@prisma/client";
 import Tenant from "@/lib/tenant/tenant";
-
-const prisma = new PrismaClient();
+import { prismaWeb2Client } from "@/app/lib/prisma";
 
 interface AttachmentData {
   fileName: string;
@@ -46,7 +45,7 @@ export async function uploadAttachment(
       throw new Error("Pinata upload failed");
     }
 
-    const newAttachment = await prisma.forumAttachment.create({
+    const newAttachment = await prismaWeb2Client.forumAttachment.create({
       data: {
         dao_slug: slug,
         ipfsCid: uploadResult.IpfsHash,
@@ -81,6 +80,6 @@ export async function uploadAttachment(
       error: error instanceof Error ? error.message : "Upload failed",
     };
   } finally {
-    await prisma.$disconnect();
+    await prismaWeb2Client.$disconnect();
   }
 }

@@ -11,9 +11,9 @@ import { canDeleteContent } from "@/lib/forumAdminUtils";
 import { DunaContentRenderer, DunaEditor } from "@/components/duna-editor";
 import { Button } from "@/components/ui/button";
 import { Reply } from "lucide-react";
-import { DUNA_CATEGORY_ID } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { useDunaCategory } from "@/hooks/useDunaCategory";
 
 interface CommentItemProps {
   comment: ForumPost;
@@ -46,7 +46,10 @@ const CommentItem = ({
   const { address } = useAccount();
   const { deletePost } = useForum();
   const openDialog = useOpenDialog();
-  const { isAdmin, canManageTopics } = useForumAdmin(DUNA_CATEGORY_ID);
+  const { dunaCategoryId } = useDunaCategory();
+  const { isAdmin, canManageTopics } = useForumAdmin(
+    dunaCategoryId || undefined
+  );
 
   // Check if current tenant is Towns
   const { namespace } = Tenant.current();
@@ -62,7 +65,8 @@ const CommentItem = ({
   const canDelete = canDeleteContent(
     address || "",
     comment.author || "",
-    isAdmin || canManageTopics
+    isAdmin,
+    canManageTopics
   );
 
   const handleDelete = async (e: React.MouseEvent) => {

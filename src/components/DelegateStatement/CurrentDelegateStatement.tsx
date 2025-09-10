@@ -110,7 +110,7 @@ export default function CurrentDelegateStatement() {
       delegateStatement:
         (delegateStatement?.payload as { delegateStatement?: string })
           ?.delegateStatement || "",
-      email: delegateStatement?.email || "",
+      email: "",
       twitter: delegateStatement?.twitter || "",
       warpcast: delegateStatement?.warpcast || "",
       scwAddress: delegateStatement?.scw_address || "",

@@ -1,3 +1,4 @@
+import { AGORA_SIGN_IN_MESSAGE } from "@/components/shared/SiweProviderConfig";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -8,12 +9,12 @@ export async function POST(request: NextRequest) {
   );
 
   try {
-    const { message, signature } = await request.json();
-    const siweObject = new SiweMessage(message);
+    const { signature } = await request.json();
+    const siweObject = new SiweMessage(AGORA_SIGN_IN_MESSAGE);
 
     const verification = await verifyMessage({
       address: siweObject.address as `0x${string}`,
-      message,
+      message: siweObject.statement as string,
       signature,
     });
 
