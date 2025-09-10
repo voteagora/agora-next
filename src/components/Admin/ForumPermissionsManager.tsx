@@ -241,14 +241,12 @@ const ForumPermissionsManager = ({
     );
   }
 
+  const { ui } = Tenant.current();
+
   return (
     <div className={`mt-12 space-y-8 ${isTowns ? "towns-tenant" : ""}`}>
       <div className="flex items-center justify-between">
-        <h1
-          className={`text-2xl font-black ${
-            isTowns ? "text-white" : "text-primary"
-          }`}
-        >
+        <h1 className="text-2xl font-black text-primary">
           Permissions Management
         </h1>
       </div>
@@ -256,7 +254,9 @@ const ForumPermissionsManager = ({
       {/* Forum Admins Section */}
       <Card
         className={`border shadow-sm ${
-          isTowns ? "bg-[#1E1A2F] border-[#2B2449]" : "bg-white border-line"
+          ui.customization?.customCardBackground 
+            ? `bg-[${ui.customization.customCardBackground}] border-[${ui.customization.customCardBorder}]`
+            : "bg-white border-line"
         }`}
       >
         <CardContent className="p-6">

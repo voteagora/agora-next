@@ -40,6 +40,7 @@ export default function DAOMetricsHeader() {
     bugsLink,
     changeLogLink,
     faqLink,
+    discordLink,
     twitterLink,
     farcasterLink,
     agoraLink,
@@ -98,7 +99,14 @@ export default function DAOMetricsHeader() {
                     target="_blank"
                     rel="noreferrer noopener"
                   >
-                    <AgoraIconWithText className="fill-secondary h-5 transition-colors duration-200 hover:fill-primary" />
+                    <AgoraIconWithText
+                      className="fill-secondary h-5 transition-colors duration-200 hover:fill-primary"
+                      style={{
+                        filter: ui.customization?.customFooterBackground
+                          ? "brightness(0) invert(1)"
+                          : "none",
+                      }}
+                    />
                   </a>
                 </div>
               </div>
@@ -215,27 +223,26 @@ export default function DAOMetricsHeader() {
                     >
                       <span>Total amount of {token.symbol} in existence</span>
                     </HoverCardContent>
-                  </HoverCard>,
-                  {contracts.token.isERC20() &&
-                    !ui.customization?.customFooterHideVotableSupply && (
-                      <HoverCard openDelay={100} closeDelay={100}>
-                        <HoverCardTrigger className="flex">
-                          <span className="cursor-default content-center">
-                            {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
-                            {token.symbol} votable supply
-                          </span>
-                        </HoverCardTrigger>
-                        <HoverCardContent
-                          className="w-full shadow"
-                          side="bottom"
-                          sideOffset={3}
-                        >
-                          <span>
-                            {token.symbol} currently delegated to a voter
-                          </span>
-                        </HoverCardContent>
-                      </HoverCard>
-                    )}
+                  </HoverCard>
+                  {contracts.token.isERC20() | contracts.token.isERC721() && (
+                    <HoverCard openDelay={100} closeDelay={100}>
+                      <HoverCardTrigger className="flex">
+                        <span className="cursor-default content-center">
+                          {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
+                          {token.symbol} votable supply
+                        </span>
+                      </HoverCardTrigger>
+                      <HoverCardContent
+                        className="w-full shadow"
+                        side="bottom"
+                        sideOffset={3}
+                      >
+                        <span>
+                          {token.symbol} currently delegated to a voter
+                        </span>
+                      </HoverCardContent>
+                    </HoverCard>
+                  )}
                 </div>
               )}
             </div>

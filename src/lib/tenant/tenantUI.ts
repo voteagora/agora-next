@@ -147,6 +147,12 @@ type TenantUIParams = {
     customFooterHideVotableSupply?: boolean;
     customFooterHideTotalSupply?: boolean;
     customFooterBackground?: string;
+    customCardBackground?: string;
+    customCardBorder?: string;
+    customHoverBackground?: string;
+    customTextSecondary?: string;
+    hideGovernorSettings?: boolean;
+    hideHero?: boolean;
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -207,6 +213,12 @@ export class TenantUI {
     customFooterHideVotableSupply?: boolean;
     customFooterHideTotalSupply?: boolean;
     customFooterBackground?: string;
+    customCardBackground?: string;
+    customCardBorder?: string;
+    customHoverBackground?: string;
+    customTextSecondary?: string;
+    hideGovernorSettings?: boolean;
+    hideHero?: boolean;
   };
   private _theme: "light" | "dark";
   private _favicon?: {
@@ -345,6 +357,12 @@ export class TenantUI {
         customFooterHideVotableSupply?: boolean;
         customFooterHideTotalSupply?: boolean;
         customFooterBackground?: string;
+        customCardBackground?: string;
+        customCardBorder?: string;
+        customHoverBackground?: string;
+        customTextSecondary?: string;
+        hideGovernorSettings?: boolean;
+        hideHero?: boolean;
       }
     | undefined {
     return this._customization;

@@ -82,18 +82,16 @@ export default async function ArchivedDataPage() {
   return (
     <div className={`mt-12 ${isTowns ? "towns-tenant" : ""}`}>
       <div className="flex items-center justify-between mb-6">
-        <h3
-          className={`text-2xl font-black ${
-            isTowns ? "text-white" : "text-primary"
-          }`}
-        >
+        <h3 className="text-2xl font-black text-primary">
           Archived Data Administration
         </h3>
       </div>
 
       <Card
         className={`border shadow-sm ${
-          isTowns ? "bg-[#1E1A2F] border-[#2B2449]" : "bg-white border-line"
+          ui.customization?.customCardBackground 
+            ? `bg-[${ui.customization.customCardBackground}] border-[${ui.customization.customCardBorder}]`
+            : "bg-white border-line"
         }`}
       >
         <CardContent className="p-6">
@@ -107,7 +105,9 @@ export default async function ArchivedDataPage() {
           </div> */}
           <div
             className={`mt-8 pt-6 border-t ${
-              isTowns ? "border-[#2B2449]" : "border-line"
+              ui.customization?.customCardBorder 
+                ? `border-[${ui.customization.customCardBorder}]`
+                : "border-line"
             }`}
           >
             <ArchivedDocumentsSection initialDocuments={archivedDocuments} />

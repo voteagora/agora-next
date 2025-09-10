@@ -24,6 +24,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ListOrdered, Quote } from "lucide-react";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 // Toolbar button component
 const ToolbarButton = ({
@@ -42,11 +44,8 @@ const ToolbarButton = ({
   shortcut?: string;
 }) => {
   // Check if current tenant is Towns
-  const isTowns =
-    (typeof window !== "undefined" &&
-      window.location.hostname.includes("towns")) ||
-    (typeof process !== "undefined" &&
-      process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME === "towns");
+  const { namespace } = Tenant.current();
+  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   return (
     <TooltipProvider>
@@ -118,11 +117,8 @@ const LinkDialog = ({
   };
 
   // Check if current tenant is Towns
-  const isTowns =
-    (typeof window !== "undefined" &&
-      window.location.hostname.includes("towns")) ||
-    (typeof process !== "undefined" &&
-      process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME === "towns");
+  const { namespace } = Tenant.current();
+  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   if (!isOpen) return null;
 
@@ -206,11 +202,8 @@ export default function DunaEditor({
   const [linkDialogUrl, setLinkDialogUrl] = useState("");
 
   // Check if current tenant is Towns
-  const isTowns =
-    (typeof window !== "undefined" &&
-      window.location.hostname.includes("towns")) ||
-    (typeof process !== "undefined" &&
-      process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME === "towns");
+  const { namespace } = Tenant.current();
+  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   // Debug link dialog state
   useEffect(() => {

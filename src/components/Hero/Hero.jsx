@@ -14,8 +14,7 @@ export default function Hero({ page }) {
     return <div style={{ height: 24 }} />;
   }
 
-  const isTownsComingSoon =
-    namespace === TENANT_NAMESPACES.TOWNS && page === "coming-soon";
+  const shouldHideHero = ui.customization?.hideHero;
 
   return (
     <div className="flex-col hidden sm:flex sm:flex-row justify-between mt-12 mb-0 sm:my-12 max-w-full">
@@ -23,7 +22,7 @@ export default function Hero({ page }) {
         <h1 className="font-extrabold text-2xl mb-2 text-primary">{title}</h1>
         <p className="text-secondary text-base">{description}</p>
       </div>
-      {hero && !isTownsComingSoon && (
+      {hero && !shouldHideHero && (
         <Image
           className="h-auto sm:h-[110px] w-auto"
           alt={`${namespace} cover`}

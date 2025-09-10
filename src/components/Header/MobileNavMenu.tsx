@@ -156,13 +156,12 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
                   {isLoading ? "-" : formattedMetrics.totalSupply}{" "}
                   {token.symbol} total supply
                 </div>
-                {(contracts.token.isERC20() || contracts.token.isERC721()) &&
-                  !ui.customization?.customFooterHideVotableSupply && (
-                    <div className="">
-                      {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
-                      {token.symbol} votable supply
-                    </div>
-                  )}
+                {(contracts.token.isERC20() || contracts.token.isERC721()) && (
+                  <div className="">
+                    {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
+                    {token.symbol} votable supply
+                  </div>
+                )}
               </div>
             )}
 
@@ -234,6 +233,31 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
                     />
                   </a>
                 )}
+                {twitterLink && (
+                  <a
+                    href={twitterLink.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-6 h-6"
+                  >
+                    <Image src={XIcon} alt="Twitter" width={24} height={24} />
+                  </a>
+                )}
+                {farcasterLink && (
+                  <a
+                    href={farcasterLink.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-6 h-6"
+                  >
+                    <Image
+                      src={FarcasterIcon}
+                      alt="Farcaster"
+                      width={24}
+                      height={24}
+                    />
+                  </a>
+                )}
               </div>
             </div>
           )}
@@ -245,11 +269,6 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
               alt="Agora Logo"
               width={82}
               height={21}
-              style={{
-                filter: ui.customization?.customFooterBackground
-                  ? "brightness(0) invert(1)"
-                  : "none",
-              }}
             />
             <div className="justify-start text-primary font-normal text-sm">
               Onchain Governance
