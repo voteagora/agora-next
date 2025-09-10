@@ -11,7 +11,6 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { FileIcon } from "lucide-react";
-import { DUNA_CATEGORY_ID } from "@/lib/constants";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface ForumDocument {
