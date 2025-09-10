@@ -53,7 +53,6 @@ const DocumentsSection = ({
   const { namespace } = Tenant.current();
   const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
-
   const handleUploadComplete = async () => {
     const documentsData = await fetchDocuments();
     setDocuments(documentsData);

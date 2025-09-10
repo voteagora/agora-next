@@ -27,10 +27,6 @@ const DunaAdministration = async () => {
         mergePostAttachments: true,
       });
     }
-    
-    if (documentsResult.success) {
-      documents = documentsResult.data;
-    }
   } catch (error) {
     console.error("Error fetching forum data:", error);
   }
