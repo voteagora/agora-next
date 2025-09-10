@@ -16,9 +16,14 @@ import ArchivedReportsSection from "@/components/Admin/ArchivedReportsSection";
 import ArchivedDocumentsSection from "@/components/Admin/ArchivedDocumentsSection";
 import ArchivedCategoriesSection from "@/components/Admin/ArchivedCategoriesSection";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default async function ArchivedDataPage() {
   const { ui } = Tenant.current();
+
+  // Check if current tenant is Towns
+  const { namespace } = Tenant.current();
+  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   let archivedReports: ForumTopic[] = [];
   let archivedDocuments: any[] = [];
@@ -26,6 +31,7 @@ export default async function ArchivedDataPage() {
 
   if (!ui.toggle("forum") && !ui.toggle("duna")) {
     return <div>Route not supported for namespace</div>;
+  }
 
   try {
     const dunaCategoryId = await getDunaCategoryId();
@@ -42,7 +48,7 @@ export default async function ArchivedDataPage() {
 
     const [topicsResult, documentsResult, categoriesResult] = await Promise.all(
       [
-        getArchivedForumTopics(dunaCategoryId),
+        getArchivedForumTopics(dunaCategoryId!),
         getArchivedForumAttachments(),
         getArchivedForumCategories(),
       ]
