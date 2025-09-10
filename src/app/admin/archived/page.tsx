@@ -64,11 +64,7 @@ export default async function ArchivedDataPage() {
   return (
     <div className={`mt-12 ${isTowns ? "towns-tenant" : ""}`}>
       <div className="flex items-center justify-between mb-6">
-        <h3
-          className={`text-2xl font-black ${
-            isTowns ? "text-white" : "text-primary"
-          }`}
-        >
+        <h3 className="text-2xl font-black text-primary">
           Archived Data Administration
         </h3>
       </div>

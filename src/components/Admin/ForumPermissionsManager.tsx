@@ -244,14 +244,12 @@ const ForumPermissionsManager = ({
     );
   }
 
+  const { ui } = Tenant.current();
+
   return (
     <div className={`mt-12 space-y-8 ${useDarkStyling ? "towns-tenant" : ""}`}>
       <div className="flex items-center justify-between">
-        <h1
-          className={`text-2xl font-black ${
-            isTowns ? "text-white" : "text-primary"
-          }`}
-        >
+        <h1 className="text-2xl font-black text-primary">
           Permissions Management
         </h1>
       </div>
