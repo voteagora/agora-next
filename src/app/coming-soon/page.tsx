@@ -4,6 +4,7 @@ import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogR
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import townsHero from "@/assets/tenant/towns_hero.svg";
 import townsStaticProposals from "@/assets/tenant/towns_static_proposals.svg";
+import syndicateStaticProposals from "@/assets/tenant/syndicate_static_proposals.svg";
 
 export default async function ComingSoonPage() {
   const { ui, namespace } = Tenant.current();
@@ -13,7 +14,12 @@ export default async function ComingSoonPage() {
   }
 
   const supportsNotifications = ui.toggle("email-subscriptions")?.enabled;
+  // Choose asset and text based on current tenant namespace
   const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const proposalsImage = isTowns
+    ? townsStaticProposals
+    : syndicateStaticProposals;
+  const overlayText = isTowns ? "Coming soon in January 2026" : "Coming soon";
 
   return (
     <div className="flex flex-col">
@@ -46,30 +52,33 @@ export default async function ComingSoonPage() {
           </div>
         </div>
 
-        {isTowns && (
-          <div className="relative">
-            <img
-              src={townsStaticProposals.src}
-              alt="Towns Proposals"
-              className="w-full h-auto blur-sm opacity-60 block"
-            />
-            <img
-              src={townsStaticProposals.src}
-              alt="Towns Proposals"
-              className="w-full h-auto blur-sm opacity-60 block -mt-1 sm:hidden"
-            />
-            <img
-              src={townsStaticProposals.src}
-              alt="Towns Proposals"
-              className="w-full h-auto blur-sm opacity-60 block -mt-1 sm:hidden"
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-primary text-center text-base leading-6">
-                Coming soon in January 2026
-              </p>
+        {
+          // Show static proposals for Towns and for other tenants that don't yet have live proposals
+          (isTowns || namespace === TENANT_NAMESPACES.SYNDICATE) && (
+            <div className="relative">
+              <img
+                src={proposalsImage.src}
+                alt="Static proposals"
+                className="w-full h-auto blur-sm opacity-60 block"
+              />
+              <img
+                src={proposalsImage.src}
+                alt="Static proposals"
+                className="w-full h-auto blur-sm opacity-60 block -mt-1 sm:hidden"
+              />
+              <img
+                src={proposalsImage.src}
+                alt="Static proposals"
+                className="w-full h-auto blur-sm opacity-60 block -mt-1 sm:hidden"
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p className="text-primary text-center text-base leading-6">
+                  {overlayText}
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )
+        }
       </div>
     </div>
   );

@@ -129,6 +129,13 @@ export default class TenantTokenFactory {
           decimals: 18,
           address: "0x0000000000000000000000000000000000000000",
         };
+      case TENANT_NAMESPACES.SYNDICATE:
+        return {
+          name: "Syndicate Protocol",
+          symbol: "SYNDICATE",
+          decimals: 18,
+          address: "0x0000000000000000000000000000000000000000",
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

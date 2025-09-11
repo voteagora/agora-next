@@ -76,7 +76,12 @@ const InfoAbout = () => {
     <>
       <h3 className="text-2xl font-black text-primary mt-12">{sectionTitle}</h3>
       <div
-        className={`mt-4 rounded-xl border border-line shadow-sm ${ui.customization?.customInfoSectionBackground ? `bg-[${ui.customization.customInfoSectionBackground}]` : "bg-neutral"}`}
+        className={`mt-4 rounded-xl border border-line shadow-sm ${!ui.customization?.customInfoSectionBackground ? "bg-neutral" : ""}`}
+        style={
+          ui.customization?.customInfoSectionBackground
+            ? { backgroundColor: ui.customization.customInfoSectionBackground }
+            : {}
+        }
       >
         <div
           className={`p-6 flex flex-row flex-wrap sm:flex-nowrap ${ui.customization?.customInfoLayout ? ui.customization.customInfoLayout : "gap-6"}`}
@@ -127,8 +132,8 @@ const InfoAbout = () => {
             </div>
             <p className="text-secondary mt-3">
               <span className="italic">
-                “A complex system that works is invariably found to have evolved
-                from a simple system that worked.”
+                &ldquo;A complex system that works is invariably found to have
+                evolved from a simple system that worked.&rdquo;
               </span>{" "}
               - John Gall.
             </p>
@@ -145,7 +150,14 @@ const InfoAbout = () => {
           </div>
         )}
         <div
-          className={`p-6  rounded-b-xl border-t border-line ${ui.customization?.customInfoSectionBackground ? "bg-[#1E1A2F]" : "bg-neutral"}`}
+          className={`p-6  rounded-b-xl border-t border-line ${!ui.customization?.customInfoSectionBackground ? "bg-neutral" : ""}`}
+          style={
+            ui.customization?.customInfoSectionBackground
+              ? {
+                  backgroundColor: ui.customization.customInfoSectionBackground,
+                }
+              : {}
+          }
         >
           <div className="flex flex-row gap-6 flex-wrap sm:flex-nowrap mb-4">
             {activeTabs.map((item, index) => (

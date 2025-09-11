@@ -116,7 +116,12 @@ const Card = ({
       <Link
         target="_blank"
         href={link}
-        className={`flex flex-col grow-0 p-1.5 border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)] hover:rotate-0 transition-all hover:z-10 hover:scale-110 ${ui.customization?.customInfoSectionBackground ? "bg-[#130C2F]" : "bg-neutral"} ${className} ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
+        className={`flex flex-col grow-0 p-1.5 border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)] hover:rotate-0 transition-all hover:z-10 hover:scale-110 ${!ui.customization?.customInfoSectionBackground ? "bg-neutral" : ""} ${className} ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
+        style={
+          ui.customization?.customInfoSectionBackground
+            ? { backgroundColor: ui.customization.customInfoSectionBackground }
+            : {}
+        }
       >
         <div
           className={`relative w-full aspect-square ${ui.customization?.customCardSize || "sm:h-[130px] sm:w-[130px] lg:h-[150px] lg:w-[150px]"}`}

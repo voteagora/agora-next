@@ -43,7 +43,10 @@ export default function Navbar() {
     } else if (path === "retropgf" && linkRefs.current["retropgf"]) {
       // Special case for retropgf which has a more complex path
       setActiveNavItem("retropgf");
-    } else if (pathname.includes("coming-soon") && linkRefs.current["coming-soon"]) {
+    } else if (
+      pathname.includes("coming-soon") &&
+      linkRefs.current["coming-soon"]
+    ) {
       // Special case for coming-soon
       setActiveNavItem("coming-soon");
     }
@@ -66,7 +69,12 @@ export default function Navbar() {
   return (
     <div
       ref={navRef}
-      className={`relative flex flex-row rounded-full border border-line p-1 font-medium ${ui.customization?.customInfoTabBackground ? `bg-[${ui.customization.customInfoTabBackground}]` : "bg-neutral"}`}
+      className={`relative flex flex-row rounded-full border border-line p-1 font-medium ${!ui.customization?.customInfoTabBackground ? "bg-neutral" : ""}`}
+      style={
+        ui.customization?.customInfoTabBackground
+          ? { backgroundColor: ui.customization.customInfoTabBackground }
+          : undefined
+      }
     >
       {/* Sliding overlay */}
       {activeNavItem && (
@@ -76,7 +84,8 @@ export default function Navbar() {
             left: `${activeIndicator.left}px`,
             width: `${activeIndicator.width}px`,
             opacity: activeIndicator.width ? 1 : 0,
-            backgroundColor: ui.customization?.customButtonBackground || "rgb(255, 255, 255)",
+            backgroundColor:
+              ui.customization?.customButtonBackground || "rgb(255, 255, 255)",
           }}
         />
       )}
