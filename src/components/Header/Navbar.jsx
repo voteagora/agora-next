@@ -43,6 +43,12 @@ export default function Navbar() {
     } else if (path === "retropgf" && linkRefs.current["retropgf"]) {
       // Special case for retropgf which has a more complex path
       setActiveNavItem("retropgf");
+    } else if (
+      pathname.includes("coming-soon") &&
+      linkRefs.current["coming-soon"]
+    ) {
+      // Special case for coming-soon
+      setActiveNavItem("coming-soon");
     }
   }, [pathname]);
 
@@ -63,17 +69,21 @@ export default function Navbar() {
   return (
     <div
       ref={navRef}
-      className="flex flex-row rounded-full border border-line p-1 font-medium bg-infoTabBackground relative"
+      className={`relative flex flex-row rounded-full border border-line p-1 font-medium bg-infoTabBackground`}
     >
-      {/* Sliding overlay
-      <div
-        className="absolute bg-white rounded-full border border-line shadow-newDefault transition-all duration-300 ease-in-out h-[38px]"
-        style={{
-          left: `${activeIndicator.left}px`,
-          width: `${activeIndicator.width}px`,
-          opacity: activeIndicator.width ? 1 : 0,
-        }}
-      /> */}
+      {/* Sliding overlay */}
+      {activeNavItem && (
+        <div
+          className="absolute rounded-full border border-line shadow-newDefault transition-all duration-150 ease-in-out h-[38px]"
+          style={{
+            left: `${activeIndicator.left}px`,
+            width: `${activeIndicator.width}px`,
+            opacity: activeIndicator.width ? 1 : 0,
+            backgroundColor:
+              ui.customization?.customButtonBackground || "rgb(255, 255, 255)",
+          }}
+        />
+      )}
 
       {hasProposals && (
         <HeaderLink
@@ -91,8 +101,12 @@ export default function Navbar() {
 
       {hasComingSoon && (
         <HeaderLink
+          ref={(el) => {
+            linkRefs.current["coming-soon"] = el;
+          }}
           href="/coming-soon"
-          isActive={pathname.includes("coming-soon")}
+          isActive={activeNavItem === "coming-soon"}
+          onClick={() => handleNavClick("coming-soon")}
         >
           Governance
         </HeaderLink>
