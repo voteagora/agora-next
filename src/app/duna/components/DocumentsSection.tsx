@@ -11,7 +11,6 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { FileIcon } from "lucide-react";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface ForumDocument {
   id: number;
@@ -49,7 +48,6 @@ const DocumentsSection = ({
     dunaCategoryId || undefined
   );
 
-  // Check if current tenant is Towns
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 

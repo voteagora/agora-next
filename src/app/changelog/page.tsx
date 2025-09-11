@@ -3,7 +3,6 @@
 import { fetchChangelogForDAO } from "@/app/api/common/changelogs/getChangelogs";
 import ChangelogList from "@/components/Changelog/ChangelogList";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export async function generateMetadata() {
   const { brandName } = Tenant.current();
@@ -16,10 +15,10 @@ export async function generateMetadata() {
 export const revalidate = 300;
 
 export default async function Page() {
-  const { slug, namespace } = Tenant.current();
+  const { slug, ui } = Tenant.current();
 
-  // For towns tenant, use simplified version without database queries
-  if (namespace === TENANT_NAMESPACES.TOWNS) {
+  // Check if simplified changelog view is enabled via feature flag
+  if (ui.toggle("changelog/simplified-view")?.enabled) {
     return (
       <div className="px-6 py-16 lg:px-8">
         <div className="mx-auto max-w-3xl"></div>

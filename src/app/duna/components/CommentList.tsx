@@ -12,7 +12,6 @@ import { DunaContentRenderer, DunaEditor } from "@/components/duna-editor";
 import { Button } from "@/components/ui/button";
 import { Reply } from "lucide-react";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 
 interface CommentItemProps {

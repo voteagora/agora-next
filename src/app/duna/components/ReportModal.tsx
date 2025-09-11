@@ -20,7 +20,6 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface ReportModalProps {
   report: ForumTopic | null;
@@ -53,7 +52,6 @@ const ReportModal = ({
     dunaCategoryId || undefined
   );
 
-  // Check if current tenant is Towns
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 

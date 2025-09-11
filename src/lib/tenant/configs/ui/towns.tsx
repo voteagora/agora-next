@@ -272,6 +272,10 @@ export const townsTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "changelog/simplified-view",
+      enabled: true,
+    },
+    {
       name: "footer/hide-votable-supply",
       enabled: true,
     },

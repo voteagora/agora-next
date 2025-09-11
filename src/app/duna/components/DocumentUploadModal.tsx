@@ -17,7 +17,6 @@ import {
 import { useForum } from "@/hooks/useForum";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface DocumentUploadModalProps {
   isOpen: boolean;
@@ -43,7 +42,6 @@ export default function DocumentUploadModal({
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Check if current tenant is Towns
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 

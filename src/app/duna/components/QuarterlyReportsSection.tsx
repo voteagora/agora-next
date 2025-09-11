@@ -10,7 +10,6 @@ import toast from "react-hot-toast";
 import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 
 // Custom up-down chevron icon (outline)
@@ -41,7 +40,6 @@ const QuarterlyReportsSection = ({
   const [showAllReports, setShowAllReports] = useState(false);
   const { address } = useAccount();
 
-  // Check if current tenant is Towns
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 

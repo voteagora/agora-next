@@ -14,7 +14,6 @@ import toast from "react-hot-toast";
 import { ConnectKitButton } from "connectkit";
 import { DunaEditor } from "@/components/duna-editor";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface CreatePostModalProps {
   isOpen: boolean;

@@ -1,12 +1,10 @@
 import Hero from "@/components/Hero/Hero";
 import Tenant from "@/lib/tenant/tenant";
 import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
-import { TENANT_NAMESPACES } from "@/lib/constants";
-import townsHero from "@/assets/tenant/towns_hero.svg";
 import townsStaticProposals from "@/assets/tenant/towns_static_proposals.svg";
 
 export default async function ComingSoonPage() {
-  const { ui, namespace } = Tenant.current();
+  const { ui } = Tenant.current();
 
   if (!ui.toggle("coming-soon")) {
     return <div>Route not supported for namespace</div>;

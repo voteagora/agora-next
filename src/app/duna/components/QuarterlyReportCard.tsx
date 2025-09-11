@@ -19,7 +19,6 @@ import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { DunaContentRenderer } from "@/components/duna-editor";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface QuarterlyReportCardProps {
   report: ForumTopic;
@@ -44,7 +43,6 @@ const QuarterlyReportCard = ({
     dunaCategoryId || undefined
   );
 
-  // Check if current tenant is Towns
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
