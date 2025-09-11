@@ -15,7 +15,18 @@ export async function generateMetadata() {
 export const revalidate = 300;
 
 export default async function Page() {
-  const { slug } = Tenant.current();
+  const { slug, ui } = Tenant.current();
+
+  // Check if simplified changelog view is enabled via feature flag
+  if (ui.toggle("changelog/simplified-view")?.enabled) {
+    return (
+      <div className="px-6 py-16 lg:px-8">
+        <div className="mx-auto max-w-3xl"></div>
+      </div>
+    );
+  }
+
+  // For all other tenants, use the full changelog implementation
   const initChangelog = await fetchChangelogForDAO({
     daoSlug: slug,
     pagination: {

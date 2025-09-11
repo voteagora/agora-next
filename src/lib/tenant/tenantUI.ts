@@ -109,6 +109,7 @@ type TenantUIParams = {
   hideAgoraBranding?: boolean;
   links?: UILink[];
   logo: string;
+  logoSize?: string;
   organization?: UIOrganization;
   pages?: UIPage[];
   smartAccountConfig?: UISmartAccountConfig;
@@ -129,6 +130,23 @@ type TenantUIParams = {
     font?: string;
     tokenAmountFont?: string;
     letterSpacing?: string;
+    infoSectionBackground?: string;
+    infoTabBackground?: string;
+    buttonBackground?: string;
+    cardBackground?: string;
+    cardBorder?: string;
+    hoverBackground?: string;
+    textSecondary?: string;
+    footerBackground?: string;
+    customHeroImageSize?: string;
+    customInfoTabs?: Array<{ title: string; description: string }>;
+    customIconBackground?: string;
+    customInfoLayout?: string;
+    customTextContainer?: string;
+    customAboutSubtitle?: string;
+    customTitleSize?: string;
+    customCardSize?: string;
+    customIconColor?: string;
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -152,6 +170,7 @@ export class TenantUI {
   private _hideAgoraBranding?: boolean;
   private _links?: UILink[];
   private _logo: string;
+  private _logoSize?: string;
   private _organization?: UIOrganization;
   private _pages?: UIPage[];
   private _title: string;
@@ -171,6 +190,24 @@ export class TenantUI {
     font?: string;
     tokenAmountFont?: string;
     letterSpacing?: string;
+    infoSectionBackground?: string;
+    infoTabBackground?: string;
+    buttonBackground?: string;
+    cardBackground?: string;
+    cardBorder?: string;
+    hoverBackground?: string;
+    textSecondary?: string;
+    footerBackground?: string;
+    customHeroImageSize?: string;
+    customInfoTabs?: Array<{ title: string; description: string }>;
+    customTextColor?: string;
+    customIconBackground?: string;
+    customInfoLayout?: string;
+    customTextContainer?: string;
+    customAboutSubtitle?: string;
+    customTitleSize?: string;
+    customCardSize?: string;
+    customIconColor?: string;
   };
   private _theme: "light" | "dark";
   private _favicon?: {
@@ -201,6 +238,7 @@ export class TenantUI {
     hideAgoraBranding,
     links,
     logo,
+    logoSize,
     organization,
     pages,
     smartAccountConfig,
@@ -221,6 +259,7 @@ export class TenantUI {
     this._hideAgoraBranding = hideAgoraBranding;
     this._links = links;
     this._logo = logo;
+    this._logoSize = logoSize;
     this._organization = organization;
     this._pages = pages;
     this._smartAccountConfig = smartAccountConfig;
@@ -263,6 +302,10 @@ export class TenantUI {
     return this._logo;
   }
 
+  public get logoSize(): string | undefined {
+    return this._logoSize;
+  }
+
   public get organization(): UIOrganization | undefined {
     return this._organization;
   }
@@ -286,6 +329,24 @@ export class TenantUI {
         font?: string;
         tokenAmountFont?: string;
         letterSpacing?: string;
+        infoSectionBackground?: string;
+        infoTabBackground?: string;
+        buttonBackground?: string;
+        cardBackground?: string;
+        cardBorder?: string;
+        hoverBackground?: string;
+        textSecondary?: string;
+        footerBackground?: string;
+        customHeroImageSize?: string;
+        customInfoTabs?: Array<{ title: string; description: string }>;
+        customTextColor?: string;
+        customIconBackground?: string;
+        customInfoLayout?: string;
+        customTextContainer?: string;
+        customAboutSubtitle?: string;
+        customTitleSize?: string;
+        customCardSize?: string;
+        customIconColor?: string;
       }
     | undefined {
     return this._customization;
