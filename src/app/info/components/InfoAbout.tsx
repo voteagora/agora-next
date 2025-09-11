@@ -122,8 +122,8 @@ const InfoAbout = () => {
             </div>
             <p className="text-secondary mt-3">
               <span className="italic">
-                “A complex system that works is invariably found to have evolved
-                from a simple system that worked.”
+                &ldquo;A complex system that works is invariably found to have
+                evolved from a simple system that worked.&rdquo;
               </span>{" "}
               - John Gall.
             </p>
