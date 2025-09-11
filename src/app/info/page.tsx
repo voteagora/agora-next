@@ -72,7 +72,7 @@ export default async function Page() {
       <div className="flex flex-col">
         <InfoHero />
         <InfoAbout />
-        {!ui.customization?.hideGovernorSettings && <GovernorSettings />}
+        {!ui.toggle("hide-governor-settings")?.enabled && <GovernorSettings />}
         {hasDunaAdministration && namespace === TENANT_NAMESPACES.TOWNS ? (
           <TownsDunaAdministration />
         ) : (

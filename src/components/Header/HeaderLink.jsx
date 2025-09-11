@@ -6,9 +6,9 @@ export const HeaderLink = forwardRef(
   ({ className, children, href, target, isActive, onClick }, ref) => {
     const { ui } = Tenant.current();
 
-  const activeClass = isActive
-    ? `text-inherit text-primary border shadow-newDefault border-line`
-    : "text-tertiary";
+    const activeClass = isActive
+      ? `text-inherit text-primary border shadow-newDefault border-line`
+      : "text-tertiary";
 
     const handleClick = (e) => {
       if (onClick) {
@@ -24,10 +24,10 @@ export const HeaderLink = forwardRef(
         onClick={handleClick}
         className={`px-4 rounded-full text-sm sm:text-base h-[38px] content-center flex items-center relative ${activeClass} ${className || ""}`}
         style={
-          isActive && ui.customization?.customButtonBackground
+          isActive && ui.customization?.buttonBackground
             ? {
-                backgroundColor: ui.customization.customButtonBackground,
-                borderColor: ui.customization.customButtonBackground,
+                backgroundColor: `rgb(${ui.customization.buttonBackground})`,
+                borderColor: `rgb(${ui.customization.buttonBackground})`,
               }
             : {}
         }

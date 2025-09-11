@@ -51,9 +51,8 @@ const CommentItem = ({
     dunaCategoryId || undefined
   );
 
-  // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   // Get replies for this comment
   const replies = comments.filter(
@@ -99,12 +98,12 @@ const CommentItem = ({
         </div>
         <div className="flex-1">
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-            <div className={`${isTowns ? "text-white" : "text-primary"}`}>
+            <div className={`${useDarkStyling ? "text-white" : "text-primary"}`}>
               <ENSName address={comment.author || ""} />
             </div>
             <span
               className={`text-xs sm:text-sm ${
-                isTowns ? "text-[#87819F]" : "text-secondary"
+                useDarkStyling ? "text-[#87819F]" : "text-secondary"
               }`}
             >
               posted {format(new Date(comment.createdAt), "MMM d, yyyy hh:mm")}
@@ -113,7 +112,7 @@ const CommentItem = ({
               <button
                 onClick={handleDelete}
                 className={`p-1 transition-colors ${
-                  isTowns
+                  useDarkStyling
                     ? "text-red-400 hover:text-red-300"
                     : "text-red-500 hover:text-red-700"
                 }`}
@@ -125,7 +124,7 @@ const CommentItem = ({
           </div>
           <div
             className={`text-xs sm:text-sm mb-2 ${
-              isTowns ? "text-white" : "text-secondary"
+              useDarkStyling ? "text-white" : "text-secondary"
             }`}
           >
             <DunaContentRenderer content={comment.content} />
@@ -138,7 +137,7 @@ const CommentItem = ({
               size="sm"
               onClick={() => onReply(comment.id)}
               className={`text-xs p-1 h-6 ${
-                isTowns
+                useDarkStyling
                   ? "text-[#87819F] hover:text-white"
                   : "text-secondary hover:text-primary"
               }`}
@@ -153,7 +152,7 @@ const CommentItem = ({
               <button
                 onClick={() => setShowReplies(!showReplies)}
                 className={`text-xs transition-colors cursor-pointer ${
-                  isTowns
+                  useDarkStyling
                     ? "text-[#87819F] hover:text-white"
                     : "text-secondary hover:text-primary"
                 }`}
@@ -172,7 +171,7 @@ const CommentItem = ({
             <div
               key={reply.id}
               className={`border-l-2 pl-3 ${
-                isTowns ? "border-[#2B2449]" : "border-gray-200"
+                useDarkStyling ? "border-[#2B2449]" : "border-gray-200"
               }`}
             >
               <CommentItem
@@ -194,7 +193,7 @@ const CommentItem = ({
           <button
             onClick={() => setShowReplies(false)}
             className={`text-xs transition-colors cursor-pointer ${
-              isTowns
+              useDarkStyling
                 ? "text-[#87819F] hover:text-white"
                 : "text-secondary hover:text-primary"
             }`}
@@ -208,13 +207,13 @@ const CommentItem = ({
       {isThisCommentBeingRepliedTo && (
         <div
           className={`mt-3 ml-8 sm:ml-12 p-3 rounded-lg border ${
-            isTowns ? "bg-[#2A2338] border-[#2B2449]" : "bg-gray-50 border-line"
+            useDarkStyling ? "bg-inputBackgroundDark border-cardBorder" : "bg-gray-50 border-line"
           }`}
         >
           <div className="flex items-center gap-2 mb-2">
             <span
               className={`text-xs ${
-                isTowns ? "text-[#87819F]" : "text-secondary"
+                useDarkStyling ? "text-[#87819F]" : "text-secondary"
               }`}
             >
               Replying to this comment
@@ -234,8 +233,8 @@ const CommentItem = ({
               size="sm"
               onClick={onCancelReply}
               className={`text-xs ${
-                isTowns
-                  ? "border-[#2B2449] text-[#87819F] hover:bg-[#2A2338]"
+                useDarkStyling
+                  ? "border-[#2B2449] text-[#87819F] hover:bg-inputBackgroundDark"
                   : ""
               }`}
             >
@@ -247,8 +246,8 @@ const CommentItem = ({
               onClick={onSubmitReply}
               disabled={!replyContent.trim()}
               className={`text-xs ${
-                isTowns
-                  ? "bg-[#5A4B7A] text-white hover:bg-[#6B5C8B]"
+                useDarkStyling
+                  ? "bg-buttonPrimaryDark text-white hover:bg-buttonPrimaryDark/80"
                   : "bg-black text-white hover:bg-black/90"
               }`}
             >

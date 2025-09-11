@@ -26,9 +26,8 @@ const ArchivedDocumentCard = ({
     dunaCategoryId || undefined
   );
 
-  // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const handleUnarchive = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -62,21 +61,21 @@ const ArchivedDocumentCard = ({
   return (
     <div
       className={`flex items-center gap-2 px-3 py-2 rounded border transition-colors ${
-        isTowns
-          ? "bg-[#2A2338] border-[#2B2449] hover:bg-[#5A4B7A]"
+        useDarkStyling
+          ? "bg-inputBackgroundDark border-cardBorder hover:bg-buttonPrimaryDark"
           : "bg-white hover:bg-gray-50"
       }`}
     >
       <FileIcon
         className={`w-4 h-4 flex-shrink-0 ${
-          isTowns ? "text-white" : "text-gray-900"
+          useDarkStyling ? "text-white" : "text-gray-900"
         }`}
       />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <p
             className={`text-sm font-medium truncate ${
-              isTowns ? "text-white" : "text-gray-900"
+              useDarkStyling ? "text-white" : "text-gray-900"
             }`}
           >
             {document.name}
@@ -87,7 +86,7 @@ const ArchivedDocumentCard = ({
         <button
           onClick={handleViewDocument}
           className={`p-1 transition-colors ${
-            isTowns
+            useDarkStyling
               ? "text-[#87819F] hover:text-white"
               : "text-gray-500 hover:text-gray-700"
           }`}
@@ -99,10 +98,10 @@ const ArchivedDocumentCard = ({
           onClick={handleUnarchive}
           className={`p-1 transition-colors ${
             isAdmin || canManageAttachments
-              ? isTowns
+              ? useDarkStyling
                 ? "text-[#5A4B7A] hover:text-[#6B5C8B]"
                 : "text-blue-500 hover:text-blue-700"
-              : isTowns
+              : useDarkStyling
                 ? "text-[#87819F] cursor-not-allowed"
                 : "text-gray-400 cursor-not-allowed"
           }`}
@@ -130,9 +129,8 @@ const ArchivedDocumentsSection = ({
   const [documents, setDocuments] = useState<any[]>(initialDocuments || []);
   const { loading } = useForum();
 
-  // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const handleUnarchiveDocument = (documentToUnarchive: any) => {
     setDocuments((prev) =>
@@ -145,13 +143,13 @@ const ArchivedDocumentsSection = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <h4
           className={`text-lg font-bold ${
-            isTowns ? "text-white" : "text-primary"
+            useDarkStyling ? "text-white" : "text-primary"
           }`}
         >
           Archived Documents
         </h4>
         <div
-          className={`text-sm ${isTowns ? "text-[#87819F]" : "text-secondary"}`}
+          className={`text-sm ${useDarkStyling ? "text-[#87819F]" : "text-secondary"}`}
         >
           {documents.length} archived document
           {documents.length !== 1 ? "s" : ""}
@@ -160,7 +158,7 @@ const ArchivedDocumentsSection = ({
 
       {loading && (
         <div className="text-center py-4">
-          <div className={isTowns ? "text-white" : "text-secondary"}>
+          <div className={useDarkStyling ? "text-white" : "text-secondary"}>
             Loading archived documents...
           </div>
         </div>
@@ -168,7 +166,7 @@ const ArchivedDocumentsSection = ({
 
       {documents.length === 0 && (
         <div className="text-center py-8">
-          <div className={isTowns ? "text-white" : "text-secondary"}>
+          <div className={useDarkStyling ? "text-white" : "text-secondary"}>
             No archived documents found.
           </div>
         </div>

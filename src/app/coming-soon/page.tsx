@@ -13,7 +13,6 @@ export default async function ComingSoonPage() {
   }
 
   const supportsNotifications = ui.toggle("email-subscriptions")?.enabled;
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   return (
     <div className="flex flex-col">
@@ -46,7 +45,7 @@ export default async function ComingSoonPage() {
           </div>
         </div>
 
-        {isTowns && (
+        {ui.toggle("coming-soon/show-static-proposals")?.enabled && (
           <div className="relative">
             <img
               src={townsStaticProposals.src}

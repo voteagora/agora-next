@@ -36,9 +36,7 @@ export default function DunaContentRenderer({
 }: DunaContentRendererProps) {
   if (!content) return null;
 
-  // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const { ui } = Tenant.current();
 
   // Decode HTML entities if they exist
   const decodedContent = decodeHtmlEntities(content);
@@ -48,7 +46,7 @@ export default function DunaContentRenderer({
       data-testid="duna-content"
       className={cn(
         "text-sm prose prose-sm max-w-none",
-        isTowns
+        ui.customization?.cardBackground
           ? "prose-p:text-white prose-blockquote:text-white prose-code:text-white prose-pre:text-white prose-headings:text-white prose-strong:text-white prose-b:text-white prose-em:text-white prose-i:text-white prose-del:text-white prose-ins:text-white prose-mark:text-white prose-s:text-white prose-a:text-white prose-li:text-white prose-ul:text-white prose-ol:text-white"
           : "prose-a:text-primary prose-a:underline hover:prose-a:no-underline",
         "prose-a:font-medium",
@@ -57,7 +55,7 @@ export default function DunaContentRenderer({
       dangerouslySetInnerHTML={{ __html: decodedContent }}
       style={{
         // Force some basic styling to ensure content is visible
-        color: isTowns ? "white" : "inherit",
+        color: ui.customization?.cardBackground ? "white" : "inherit",
         fontSize: "inherit",
         lineHeight: "inherit",
       }}

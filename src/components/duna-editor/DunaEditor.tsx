@@ -225,7 +225,7 @@ export default function DunaEditor({
           "prose prose-sm max-w-none focus:outline-none",
           "prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1",
           "prose-li:my-0 prose-p:leading-relaxed",
-          ui.customization?.customCardBackground
+          ui.customization?.cardBackground
             ? "prose-ol:text-white prose-ul:text-white prose-li:text-white prose-ol:marker:text-white prose-ul:marker:text-white prose-a:text-white prose-a:underline hover:prose-a:no-underline prose-p:text-white prose-blockquote:text-white prose-code:text-white prose-pre:text-white prose-headings:text-white prose-strong:text-white prose-b:text-white prose-em:text-white prose-i:text-white prose-del:text-white prose-s:text-white prose-ins:text-white prose-mark:text-white"
             : "prose-ol:text-primary prose-ul:text-primary prose-li:text-primary prose-ol:marker:text-primary prose-ul:marker:text-primary prose-a:text-primary prose-a:underline hover:prose-a:no-underline",
           "prose-ol:list-decimal prose-ul:list-disc"
@@ -396,17 +396,16 @@ export default function DunaEditor({
         className
       )}
       style={{
-        backgroundColor: ui.customization?.customCardBackground || "white",
-        borderColor: ui.customization?.customCardBorder || "var(--line)",
+        backgroundColor: ui.customization?.cardBackground ? `rgb(${ui.customization.cardBackground})` : "white",
+        borderColor: ui.customization?.cardBorder ? `rgb(${ui.customization.cardBorder})` : "var(--line)",
       }}
     >
       {/* Toolbar */}
       <div
         className="flex items-center gap-1 p-2 border-b rounded-t-lg"
         style={{
-          backgroundColor:
-            ui.customization?.customHoverBackground || "var(--wash)",
-          borderColor: ui.customization?.customCardBorder || "var(--line)",
+          backgroundColor: ui.customization?.hoverBackground ? `rgb(${ui.customization.hoverBackground})` : "var(--wash)",
+          borderColor: ui.customization?.cardBorder ? `rgb(${ui.customization.cardBorder})` : "var(--line)",
         }}
       >
         <ToolbarButton
@@ -535,7 +534,7 @@ export default function DunaEditor({
         )}
         onKeyDown={handleKeyDown}
         style={{
-          color: ui.customization?.customCardBackground ? "white" : "inherit",
+          color: ui.customization?.cardBackground ? "white" : "inherit",
         }}
       >
         <EditorContent editor={editor} />

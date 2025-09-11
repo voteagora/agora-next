@@ -26,9 +26,8 @@ const ArchivedCategoryCard = ({
   const openDialog = useOpenDialog();
   const { isAdmin } = useForumAdmin();
 
-  // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const handleUnarchive = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -57,11 +56,11 @@ const ArchivedCategoryCard = ({
     <div
       className={`p-4 cursor-pointer transition-colors ${
         !isLast ? "border-b" : ""
-      } ${isTowns ? "hover:bg-[#2A2338]" : "hover:bg-gray-50"}`}
+      } ${useDarkStyling ? "hover:bg-inputBackgroundDark" : "hover:bg-gray-50"}`}
       style={
         !isLast
           ? {
-              borderBottomColor: isTowns ? "#2B2449" : "#E5E5E5",
+              borderBottomColor: useDarkStyling ? "#2B2449" : "#E5E5E5",
             }
           : {}
       }
@@ -71,7 +70,7 @@ const ArchivedCategoryCard = ({
           <div className="flex items-center gap-2 mb-1">
             <h5
               className={`font-bold text-base ${
-                isTowns ? "text-white" : "text-primary"
+                useDarkStyling ? "text-white" : "text-primary"
               }`}
             >
               {category.name}
@@ -80,7 +79,7 @@ const ArchivedCategoryCard = ({
           {category.description && (
             <p
               className={`text-sm mb-1 ${
-                isTowns ? "text-white" : "text-secondary"
+                useDarkStyling ? "text-white" : "text-secondary"
               }`}
             >
               {category.description}
@@ -88,7 +87,7 @@ const ArchivedCategoryCard = ({
           )}
           <p
             className={`text-xs ${
-              isTowns ? "text-[#87819F]" : "text-tertiary"
+              useDarkStyling ? "text-[#87819F]" : "text-tertiary"
             }`}
           >
             Created {new Date(category.createdAt).toLocaleDateString()}
@@ -99,10 +98,10 @@ const ArchivedCategoryCard = ({
             onClick={handleUnarchive}
             className={`p-1 transition-colors ${
               isAdmin
-                ? isTowns
+                ? useDarkStyling
                   ? "text-[#5A4B7A] hover:text-[#6B5C8B]"
                   : "text-blue-500 hover:text-blue-700"
-                : isTowns
+                : useDarkStyling
                   ? "text-[#87819F] cursor-not-allowed"
                   : "text-gray-400 cursor-not-allowed"
             }`}
@@ -118,7 +117,7 @@ const ArchivedCategoryCard = ({
 
       <div
         className={`flex items-center justify-between text-xs ${
-          isTowns ? "text-[#87819F]" : "text-tertiary"
+          useDarkStyling ? "text-[#87819F]" : "text-tertiary"
         }`}
       >
         <div className="flex items-center gap-4">
@@ -145,9 +144,8 @@ const ArchivedCategoriesSection = ({
   );
   const { loading } = useForum();
 
-  // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const handleUnarchiveCategory = (categoryToUnarchive: ForumCategory) => {
     setCategories((prev) =>
@@ -160,13 +158,13 @@ const ArchivedCategoriesSection = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <h4
           className={`text-lg font-bold ${
-            isTowns ? "text-white" : "text-primary"
+            useDarkStyling ? "text-white" : "text-primary"
           }`}
         >
           Archived Categories
         </h4>
         <div
-          className={`text-sm ${isTowns ? "text-[#87819F]" : "text-secondary"}`}
+          className={`text-sm ${useDarkStyling ? "text-[#87819F]" : "text-secondary"}`}
         >
           {categories.length} archived categor
           {categories.length !== 1 ? "ies" : "y"}
@@ -175,7 +173,7 @@ const ArchivedCategoriesSection = ({
 
       {loading && (
         <div className="text-center py-4">
-          <div className={isTowns ? "text-white" : "text-secondary"}>
+          <div className={useDarkStyling ? "text-white" : "text-secondary"}>
             Loading archived categories...
           </div>
         </div>
@@ -183,7 +181,7 @@ const ArchivedCategoriesSection = ({
 
       {categories.length === 0 && (
         <div className="text-center py-8">
-          <div className={isTowns ? "text-white" : "text-secondary"}>
+          <div className={useDarkStyling ? "text-white" : "text-secondary"}>
             No archived categories found.
           </div>
         </div>
@@ -192,10 +190,10 @@ const ArchivedCategoriesSection = ({
       {categories.length > 0 && (
         <div
           className={`border rounded-lg border-line ${
-            isTowns ? "bg-[#1E1A2F]" : "bg-white"
+            useDarkStyling ? "bg-modalBackgroundDark" : "bg-white"
           }`}
           style={{
-            borderColor: isTowns ? "#2B2449" : "#E5E5E5",
+            borderColor: useDarkStyling ? "#2B2449" : "#E5E5E5",
           }}
         >
           {categories.map((category, index) => (

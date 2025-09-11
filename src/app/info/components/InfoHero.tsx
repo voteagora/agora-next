@@ -116,7 +116,7 @@ const Card = ({
       <Link
         target="_blank"
         href={link}
-        className={`flex flex-col grow-0 p-1.5 border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)] hover:rotate-0 transition-all hover:z-10 hover:scale-110 ${ui.customization?.customInfoSectionBackground ? "bg-[#130C2F]" : "bg-neutral"} ${className} ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
+        className={`flex flex-col grow-0 p-1.5 border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)] hover:rotate-0 transition-all hover:z-10 hover:scale-110 bg-infoTabBackground ${className} ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
       >
         <div
           className={`relative w-full aspect-square ${ui.customization?.customCardSize || "sm:h-[130px] sm:w-[130px] lg:h-[150px] lg:w-[150px]"}`}
@@ -135,7 +135,7 @@ const Card = ({
             width={12}
             height={12}
             alt="arrow pointing right"
-            className={`self-start mt-1 ${ui.customization?.customInfoSectionBackground ? "brightness-0 invert" : ""} ${isDisabled ? "opacity-50" : ""}`}
+            className={`self-start mt-1 ${ui.customization?.infoSectionBackground ? "brightness-0 invert" : ""} ${isDisabled ? "opacity-50" : ""}`}
           />
         </div>
       </Link>

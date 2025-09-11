@@ -150,7 +150,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
         {/* Bottom Sections */}
         <div className="mt-auto text-tertiary text-base font-semibold leading-normal">
           {(totalSupply > 0 || votableSupply > 0) &&
-            !ui.customization?.customFooterHideTotalSupply && (
+            !ui.toggle("footer/hide-total-supply")?.enabled && (
               <div className="p-8 flex flex-col justify-center border-b border-t border-line items-start gap-3">
                 <div className="">
                   {isLoading ? "-" : formattedMetrics.totalSupply}{" "}

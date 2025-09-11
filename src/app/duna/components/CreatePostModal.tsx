@@ -37,9 +37,8 @@ const CreatePostModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { isConnected } = useAccount();
 
-  // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,13 +88,13 @@ const CreatePostModal = ({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
         className={`max-w-2xl w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto ${
-          isTowns ? "bg-[#1E1A2F] border-[#2B2449]" : ""
+          useDarkStyling ? "bg-modalBackgroundDark border-cardBorder" : ""
         }`}
       >
         <DialogHeader>
           <DialogTitle
             className={`text-xl font-bold ${
-              isTowns ? "text-white" : "text-primary"
+              useDarkStyling ? "text-white" : "text-primary"
             }`}
           >
             Create New Post
@@ -109,12 +108,12 @@ const CreatePostModal = ({
                 <Button
                   onClick={() => show?.()}
                   className={`${
-                    isTowns
-                      ? "bg-[#5A4B7A] text-white border-[#5A4B7A] hover:bg-[#6B5C8B]"
+                    useDarkStyling
+                      ? "bg-buttonPrimaryDark text-white border-[#5A4B7A] hover:bg-buttonPrimaryDark/80"
                       : "text-white border border-black hover:bg-gray-800"
                   } text-sm`}
                   style={
-                    !isTowns
+                    !useDarkStyling
                       ? {
                           display: "flex",
                           height: "36px",
@@ -142,7 +141,7 @@ const CreatePostModal = ({
               <label
                 htmlFor="title"
                 className={`block text-sm font-medium mb-2 ${
-                  isTowns ? "text-white" : "text-primary"
+                  useDarkStyling ? "text-white" : "text-primary"
                 }`}
               >
                 Title
@@ -153,8 +152,8 @@ const CreatePostModal = ({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 ${
-                  isTowns
-                    ? "bg-[#2A2338] text-white border-[#2B2449] placeholder-[#87819F] focus:ring-[#5A4B7A] focus:border-[#5A4B7A]"
+                  useDarkStyling
+                    ? "bg-inputBackgroundDark text-white border-[#2B2449] placeholder-[#87819F] focus:ring-[#5A4B7A] focus:border-[#5A4B7A]"
                     : "bg-white text-primary border-[#E5E5E5] focus:ring-gray-200"
                 }`}
                 placeholder="Enter post title..."
@@ -167,7 +166,7 @@ const CreatePostModal = ({
               <label
                 htmlFor="content"
                 className={`block text-sm font-medium mb-2 ${
-                  isTowns ? "text-white" : "text-primary"
+                  useDarkStyling ? "text-white" : "text-primary"
                 }`}
               >
                 Content
@@ -185,7 +184,7 @@ const CreatePostModal = ({
               <label
                 htmlFor="attachment"
                 className={`block text-sm font-medium mb-2 ${
-                  isTowns ? "text-white" : "text-primary"
+                  useDarkStyling ? "text-white" : "text-primary"
                 }`}
               >
                 Attachment (Optional)
@@ -203,8 +202,8 @@ const CreatePostModal = ({
                   type="button"
                   onClick={() => document.getElementById("attachment")?.click()}
                   className={`w-full sm:w-auto ${
-                    isTowns
-                      ? "bg-[#2B2449] text-white border-[#2B2449] hover:bg-[#5A4B7A]"
+                    useDarkStyling
+                      ? "bg-buttonSecondaryDark text-white border-[#2B2449] hover:bg-buttonPrimaryDark"
                       : "bg-neutral text-primary border border-line hover:bg-wash"
                   }`}
                   disabled={isSubmitting}
@@ -215,7 +214,7 @@ const CreatePostModal = ({
                 {attachment && (
                   <span
                     className={`text-sm truncate max-w-[200px] ${
-                      isTowns ? "text-[#87819F]" : "text-primary"
+                      useDarkStyling ? "text-[#87819F]" : "text-primary"
                     }`}
                   >
                     {attachment.name}
@@ -229,8 +228,8 @@ const CreatePostModal = ({
                 type="button"
                 onClick={handleClose}
                 className={`${
-                  isTowns
-                    ? "bg-[#2B2449] text-white border-[#2B2449] hover:bg-[#5A4B7A]"
+                  useDarkStyling
+                    ? "bg-buttonSecondaryDark text-white border-[#2B2449] hover:bg-buttonPrimaryDark"
                     : "bg-neutral text-primary border border-line hover:bg-wash"
                 }`}
                 disabled={isSubmitting}
@@ -240,12 +239,12 @@ const CreatePostModal = ({
               <Button
                 type="submit"
                 className={`${
-                  isTowns
-                    ? "bg-[#5A4B7A] text-white border-[#5A4B7A] hover:bg-[#6B5C8B]"
+                  useDarkStyling
+                    ? "bg-buttonPrimaryDark text-white border-[#5A4B7A] hover:bg-buttonPrimaryDark/80"
                     : "text-white border border-black hover:bg-gray-800"
                 } text-sm`}
                 style={
-                  !isTowns
+                  !useDarkStyling
                     ? {
                         display: "flex",
                         height: "36px",

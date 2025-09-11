@@ -45,8 +45,8 @@ const QuarterlyReportCard = ({
   );
 
   // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const canArchive = canArchiveContent(
     address || "",
@@ -104,11 +104,11 @@ const QuarterlyReportCard = ({
     <div
       className={`p-4 cursor-pointer transition-colors ${
         !isLast ? "border-b" : ""
-      } ${isTowns ? "hover:bg-[#2A2338]" : "hover:bg-gray-50"}`}
+      } ${useDarkStyling ? "hover:bg-inputBackgroundDark" : "hover:bg-gray-50"}`}
       style={
         !isLast
           ? {
-              borderBottomColor: isTowns ? "#2B2449" : "#E5E5E5",
+              borderBottomColor: useDarkStyling ? "#2B2449" : "#E5E5E5",
             }
           : {}
       }
@@ -118,7 +118,7 @@ const QuarterlyReportCard = ({
         <div className="flex-1">
           <h5
             className={`font-bold text-base mb-1 ${
-              isTowns ? "text-white" : "text-primary"
+              useDarkStyling ? "text-white" : "text-primary"
             }`}
           >
             {report.title}
@@ -126,7 +126,7 @@ const QuarterlyReportCard = ({
         </div>
         <div className="flex items-center gap-2 text-sm sm:ml-4">
           <ENSAvatar ensName={report.author} className="w-6 h-6" />
-          <div className={`${isTowns ? "text-white" : "text-[#87819F]"}`}>
+          <div className={`${useDarkStyling ? "text-white" : "text-[#87819F]"}`}>
             <ENSName address={report.author} />
           </div>
           {(canArchive || canDelete) && (
@@ -135,7 +135,7 @@ const QuarterlyReportCard = ({
                 <button
                   onClick={handleArchive}
                   className={`p-1 transition-colors ${
-                    isTowns
+                    useDarkStyling
                       ? "text-[#87819F] hover:text-white"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
@@ -148,7 +148,7 @@ const QuarterlyReportCard = ({
                 <button
                   onClick={handleDelete}
                   className={`p-1 transition-colors ${
-                    isTowns
+                    useDarkStyling
                       ? "text-red-400 hover:text-red-300"
                       : "text-red-500 hover:text-red-700"
                   }`}
@@ -165,7 +165,7 @@ const QuarterlyReportCard = ({
       <div className="mb-4">
         <div
           className={`text-sm leading-relaxed line-clamp-2 ${
-            isTowns ? "text-white" : "text-secondary"
+            useDarkStyling ? "text-white" : "text-secondary"
           }`}
         >
           <DunaContentRenderer content={content} />
@@ -174,7 +174,7 @@ const QuarterlyReportCard = ({
 
       <div
         className={`flex items-center justify-between text-xs ${
-          isTowns ? "text-[#87819F]" : "text-tertiary"
+          useDarkStyling ? "text-[#87819F]" : "text-tertiary"
         }`}
       >
         <div className="flex items-center gap-4">

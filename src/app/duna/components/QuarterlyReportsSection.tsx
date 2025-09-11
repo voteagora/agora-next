@@ -42,8 +42,8 @@ const QuarterlyReportsSection = ({
   const { address } = useAccount();
 
   // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const { createTopic, loading } = useForum();
   const { dunaCategoryId } = useDunaCategory();
@@ -151,21 +151,21 @@ const QuarterlyReportsSection = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
           <h4
             className={`text-lg font-bold ${
-              isTowns ? "text-white" : "text-primary"
+              useDarkStyling ? "text-white" : "text-primary"
             }`}
           >
-            {isTowns ? "Community Dialogue" : "Quarterly Reports"}
+            {ui.toggle("duna/use-community-dialogue-label")?.enabled ? "Community Dialogue" : "Quarterly Reports"}
           </h4>
           {!!address && canCreateTopics && (
             <Button
               onClick={handleCreatePost}
               className={`${
-                isTowns
-                  ? "bg-[#5A4B7A] text-white border-[#5A4B7A] hover:bg-[#6B5C8B]"
+                useDarkStyling
+                  ? "bg-buttonPrimaryDark text-white border-buttonPrimaryDark hover:bg-buttonPrimaryDark/80"
                   : "text-white border border-black hover:bg-gray-800"
               } text-sm w-full sm:w-auto`}
               style={
-                !isTowns
+                !useDarkStyling
                   ? {
                       display: "flex",
                       height: "36px",
@@ -190,7 +190,7 @@ const QuarterlyReportsSection = ({
 
       {loading && (
         <div className="text-center py-4">
-          <div className={isTowns ? "text-white" : "text-secondary"}>
+          <div className={useDarkStyling ? "text-white" : "text-secondary"}>
             Creating report...
           </div>
         </div>
@@ -198,7 +198,7 @@ const QuarterlyReportsSection = ({
 
       {reports.length === 0 && (
         <div className="text-center py-8">
-          <div className={isTowns ? "text-white" : "text-secondary"}>
+          <div className={useDarkStyling ? "text-white" : "text-secondary"}>
             No reports found. Create the first one!
           </div>
         </div>
@@ -207,10 +207,10 @@ const QuarterlyReportsSection = ({
       {reports.length > 0 && (
         <div
           className={`border rounded-lg ${
-            isTowns ? "bg-[#1E1A2F]" : "bg-white"
+            useDarkStyling ? "bg-modalBackgroundDark" : "bg-white"
           }`}
           style={{
-            borderColor: isTowns ? "#2B2449" : "#E5E5E5",
+            borderColor: useDarkStyling ? "#2B2449" : "#E5E5E5",
           }}
         >
           {displayedReports.map((report, index) => (
@@ -228,14 +228,14 @@ const QuarterlyReportsSection = ({
           {hasMoreReports && (
             <div
               className={`flex justify-between items-center py-3 border-t px-4 ${
-                isTowns ? "border-[#2B2449]" : ""
+                useDarkStyling ? "border-cardBorder" : ""
               }`}
-              style={!isTowns ? { borderTopColor: "#E5E5E5" } : {}}
+              style={!useDarkStyling ? { borderTopColor: "#E5E5E5" } : {}}
             >
               <button
                 onClick={handleToggleReports}
                 className={`text-xs font-medium transition-colors ${
-                  isTowns
+                  useDarkStyling
                     ? "text-[#87819F] hover:text-white"
                     : "text-secondary hover:text-primary"
                 }`}
@@ -245,7 +245,7 @@ const QuarterlyReportsSection = ({
               <button
                 onClick={handleToggleReports}
                 className={`transition-colors ${
-                  isTowns
+                  useDarkStyling
                     ? "text-[#87819F] hover:text-white"
                     : "text-secondary hover:text-primary"
                 }`}

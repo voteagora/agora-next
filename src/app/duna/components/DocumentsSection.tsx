@@ -50,8 +50,8 @@ const DocumentsSection = ({
   );
 
   // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const handleUploadComplete = async () => {
     const documentsData = await fetchDocuments();
@@ -123,7 +123,7 @@ const DocumentsSection = ({
         <div className="flex items-center justify-between">
           <h3
             className={`text-lg font-semibold ${
-              isTowns ? "text-white" : "text-primary"
+              useDarkStyling ? "text-white" : "text-primary"
             }`}
           >
             Documents
@@ -132,12 +132,12 @@ const DocumentsSection = ({
             <Button
               onClick={() => setIsUploadModalOpen(true)}
               className={`${
-                isTowns
-                  ? "bg-[#5A4B7A] text-white border-[#5A4B7A] hover:bg-[#6B5C8B]"
+                useDarkStyling
+                  ? "bg-buttonPrimaryDark text-white border-buttonPrimaryDark hover:bg-buttonPrimaryDark/80"
                   : "text-white border border-black hover:bg-gray-800"
               } text-sm`}
               style={
-                !isTowns
+                !useDarkStyling
                   ? {
                       display: "flex",
                       height: "36px",
@@ -164,7 +164,7 @@ const DocumentsSection = ({
         <div className="text-center py-8">
           <p
             className={`text-sm opacity-75 ${
-              isTowns ? "text-white" : "text-secondary"
+              useDarkStyling ? "text-white" : "text-secondary"
             }`}
           >
             No documents uploaded yet.
@@ -190,12 +190,12 @@ const DocumentsSection = ({
               <div
                 key={document.id || index}
                 className={`flex items-center gap-2 px-3 py-2 rounded border transition-colors cursor-pointer ${
-                  isTowns
-                    ? "border-[#2B2449] hover:bg-[#2A2338]"
+                  useDarkStyling
+                    ? "border-cardBorder hover:bg-inputBackgroundDark"
                     : "bg-white hover:bg-gray-50"
                 }`}
                 style={
-                  isTowns
+                  useDarkStyling
                     ? {
                         backgroundColor: "transparent",
                         borderColor: "#2B2449",
@@ -208,13 +208,13 @@ const DocumentsSection = ({
               >
                 <FileIcon
                   className={`w-4 h-4 flex-shrink-0 ${
-                    isTowns ? "text-white" : "text-gray-900"
+                    useDarkStyling ? "text-white" : "text-gray-900"
                   }`}
                 />
                 <div className="min-w-0 flex-1">
                   <p
                     className={`text-sm font-medium truncate ${
-                      isTowns ? "text-white" : "text-gray-900"
+                      useDarkStyling ? "text-white" : "text-gray-900"
                     }`}
                   >
                     {document.name}
@@ -226,7 +226,7 @@ const DocumentsSection = ({
                       <button
                         onClick={(e) => handleArchiveAttachment(document.id, e)}
                         className={`p-1 transition-colors ${
-                          isTowns
+                          useDarkStyling
                             ? "text-[#87819F] hover:text-white"
                             : "text-gray-500 hover:text-gray-700"
                         }`}
@@ -239,7 +239,7 @@ const DocumentsSection = ({
                       <button
                         onClick={(e) => handleDeleteAttachment(document.id, e)}
                         className={`p-1 transition-colors ${
-                          isTowns
+                          useDarkStyling
                             ? "text-red-400 hover:text-red-300"
                             : "text-red-500 hover:text-red-700"
                         }`}

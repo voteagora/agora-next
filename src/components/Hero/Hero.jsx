@@ -14,7 +14,7 @@ export default function Hero({ page }) {
     return <div style={{ height: 24 }} />;
   }
 
-  const shouldHideHero = ui.customization?.hideHero;
+  const shouldHideHero = ui.toggle("hide-hero")?.enabled;
 
   return (
     <div className="flex-col hidden sm:flex sm:flex-row justify-between mt-12 mb-0 sm:my-12 max-w-full">

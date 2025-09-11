@@ -49,14 +49,14 @@ const TownsDunaAdministration = async () => {
       </div>
 
       {/* Documents Section - EXACT same as Uniswap */}
-      <Card className="border border-line shadow-sm bg-[#1E1A2F] [&_button]:!bg-white [&_button]:!text-black [&_button]:!border-gray-300 [&_button]:hover:!bg-gray-50">
+      <Card className="border border-line shadow-sm bg-modalBackgroundDark [&_button]:!bg-white [&_button]:!text-black [&_button]:!border-gray-300 [&_button]:hover:!bg-gray-50">
         <CardContent className="p-6">
           <DocumentsSection initialDocuments={documents} hideHeader={false} />
         </CardContent>
       </Card>
 
       {/* Community Dialogue Section - EXACT same as Uniswap */}
-      <Card className="border border-line shadow-sm bg-[#1E1A2F] mt-6 [&_button]:!bg-white [&_button]:!text-black [&_button]:!border-gray-300 [&_button]:hover:!bg-gray-50">
+      <Card className="border border-line shadow-sm bg-modalBackgroundDark mt-6 [&_button]:!bg-white [&_button]:!text-black [&_button]:!border-gray-300 [&_button]:hover:!bg-gray-50">
         <CardContent className="p-6">
           <QuarterlyReportsSection
             initialReports={dunaReports}

@@ -77,8 +77,7 @@ export default function DAOMetricsHeader() {
         <div
           className="sticky z-50 bottom-0 hidden sm:flex left-0 rounded-t-xl justify-center border-t border-x border-line mx-auto max-w-[1280px] px-3 sm:px-8 h-12 shadow-newDefault"
           style={{
-            backgroundColor:
-              ui.customization?.customFooterBackground || "var(--neutral)",
+            backgroundColor: "rgb(var(--footer-background))",
           }}
         >
           <div
@@ -87,8 +86,7 @@ export default function DAOMetricsHeader() {
               "text-xs text-secondary font-inter font-medium"
             )}
             style={{
-              backgroundColor:
-                ui.customization?.customFooterBackground || "var(--wash)",
+              backgroundColor: "rgb(var(--footer-background))",
             }}
           >
             <div className="flex items-center justify-start">
@@ -102,7 +100,7 @@ export default function DAOMetricsHeader() {
                     <AgoraIconWithText
                       className="fill-secondary h-5 transition-colors duration-200 hover:fill-primary"
                       style={{
-                        filter: ui.customization?.customFooterBackground
+                        filter: ui.customization?.footerBackground
                           ? "brightness(0) invert(1)"
                           : "none",
                       }}
@@ -207,7 +205,7 @@ export default function DAOMetricsHeader() {
                   )}
                 </div>
               )}
-              {!ui.customization?.customFooterHideTotalSupply && (
+              {!ui.toggle("footer/hide-total-supply")?.enabled && (
                 <div className="flex px-6 gap-6 border-l border-line text-tertiary">
                   <HoverCard openDelay={100} closeDelay={100}>
                     <HoverCardTrigger className="flex">

@@ -23,7 +23,6 @@ export default async function ArchivedDataPage() {
 
   // Check if current tenant is Towns
   const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   let archivedReports: ForumTopic[] = [];
   let archivedDocuments: any[] = [];
@@ -80,7 +79,7 @@ export default async function ArchivedDataPage() {
   }
 
   return (
-    <div className={`mt-12 ${isTowns ? "towns-tenant" : ""}`}>
+    <div className="mt-12">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-2xl font-black text-primary">
           Archived Data Administration
@@ -89,24 +88,20 @@ export default async function ArchivedDataPage() {
 
       <Card
         className={`border shadow-sm ${
-          ui.customization?.customCardBackground 
-            ? `bg-[${ui.customization.customCardBackground}] border-[${ui.customization.customCardBorder}]`
+          ui.customization?.cardBackground 
+            ? "bg-cardBackground border-cardBorder"
             : "bg-white border-line"
         }`}
       >
         <CardContent className="p-6">
           <ArchivedReportsSection initialReports={archivedReports} />
-          {/* <div
-            className={`mt-8 pt-6 border-t ${
-              isTowns ? "border-[#2B2449]" : "border-line"
-            }`}
-          >
+          {/* <div className="mt-8 pt-6 border-t border-cardBorder">
             <ArchivedCategoriesSection initialCategories={archivedCategories} />
           </div> */}
           <div
             className={`mt-8 pt-6 border-t ${
-              ui.customization?.customCardBorder 
-                ? `border-[${ui.customization.customCardBorder}]`
+              ui.customization?.cardBorder 
+                ? "border-cardBorder"
                 : "border-line"
             }`}
           >

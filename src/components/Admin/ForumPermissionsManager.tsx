@@ -87,9 +87,8 @@ const ForumPermissionsManager = ({
 
   const { isAdmin, isLoading } = useForumAdmin(dunaCategoryId || undefined);
 
-  // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const handleAddAdmin = async () => {
     if (!address || !newAdminAddress.trim()) return;
@@ -241,10 +240,8 @@ const ForumPermissionsManager = ({
     );
   }
 
-  const { ui } = Tenant.current();
-
   return (
-    <div className={`mt-12 space-y-8 ${isTowns ? "towns-tenant" : ""}`}>
+    <div className={`mt-12 space-y-8 ${useDarkStyling ? "towns-tenant" : ""}`}>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black text-primary">
           Permissions Management
@@ -253,19 +250,11 @@ const ForumPermissionsManager = ({
 
       {/* Forum Admins Section */}
       <Card
-        className={`border shadow-sm ${
-          ui.customization?.customCardBackground 
-            ? `bg-[${ui.customization.customCardBackground}] border-[${ui.customization.customCardBorder}]`
-            : "bg-white border-line"
-        }`}
+        className="border shadow-sm bg-cardBackground border-cardBorder"
       >
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2
-              className={`text-xl font-semibold ${
-                isTowns ? "text-white" : "text-primary"
-              }`}
-            >
+            <h2 className="text-xl font-semibold text-primary">
               Admins
             </h2>
             <Badge variant="secondary">{admins.length} admins</Badge>
@@ -279,8 +268,8 @@ const ForumPermissionsManager = ({
                 value={newAdminAddress}
                 onChange={(e) => setNewAdminAddress(e.target.value)}
                 className={`flex-1 ${
-                  isTowns
-                    ? "bg-[#2A2338] text-white border-[#2B2449] placeholder-[#87819F] focus:ring-[#5A4B7A] focus:border-[#5A4B7A]"
+                  useDarkStyling
+                    ? "bg-inputBackgroundDark text-white border-cardBorder placeholder-[#87819F] focus:ring-[#5A4B7A] focus:border-[#5A4B7A]"
                     : ""
                 }`}
               />
@@ -289,8 +278,8 @@ const ForumPermissionsManager = ({
                 disabled={loading || !newAdminAddress.trim()}
                 size="sm"
                 className={
-                  isTowns
-                    ? "bg-[#5A4B7A] text-white border-[#5A4B7A] hover:bg-[#6B5C8B]"
+                  useDarkStyling
+                    ? "bg-buttonPrimaryDark text-white border-[#5A4B7A] hover:bg-buttonPrimaryDark/80"
                     : ""
                 }
               >
@@ -305,12 +294,12 @@ const ForumPermissionsManager = ({
                 <div
                   key={admin.address}
                   className={`flex items-center justify-between p-3 rounded-md ${
-                    isTowns ? "bg-[#2A2338] border border-[#2B2449]" : "bg-wash"
+                    useDarkStyling ? "bg-inputBackgroundDark border border-cardBorder" : "bg-wash"
                   }`}
                 >
                   <span
                     className={`font-mono text-sm ${
-                      isTowns ? "text-white" : ""
+                      useDarkStyling ? "text-white" : ""
                     }`}
                   >
                     {admin.address}
@@ -320,7 +309,7 @@ const ForumPermissionsManager = ({
                     size="sm"
                     onClick={() => handleRemoveAdmin(admin.address)}
                     disabled={loading || admin.address === address}
-                    className={isTowns ? "bg-red-500 hover:bg-red-600" : ""}
+                    className={useDarkStyling ? "bg-red-500 hover:bg-red-600" : ""}
                   >
                     <TrashIcon className="w-4 h-4" />
                   </Button>
@@ -331,7 +320,7 @@ const ForumPermissionsManager = ({
             {admins.length === 0 && (
               <p
                 className={`text-center py-4 ${
-                  isTowns ? "text-[#87819F]" : "text-tertiary"
+                  useDarkStyling ? "text-[#87819F]" : "text-tertiary"
                 }`}
               >
                 No forum admins configured
@@ -344,14 +333,14 @@ const ForumPermissionsManager = ({
       {/* Forum Permissions Section */}
       <Card
         className={`border shadow-sm ${
-          isTowns ? "bg-[#1E1A2F] border-[#2B2449]" : "bg-white border-line"
+          useDarkStyling ? "bg-cardBackgroundDark border-cardBorder" : "bg-white border-line"
         }`}
       >
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h2
               className={`text-xl font-semibold ${
-                isTowns ? "text-white" : "text-primary"
+                useDarkStyling ? "text-white" : "text-primary"
               }`}
             >
               Permissions
@@ -367,8 +356,8 @@ const ForumPermissionsManager = ({
                 value={newPermissionAddress}
                 onChange={(e) => setNewPermissionAddress(e.target.value)}
                 className={
-                  isTowns
-                    ? "bg-[#2A2338] text-white border-[#2B2449] placeholder-[#87819F] focus:ring-[#5A4B7A] focus:border-[#5A4B7A]"
+                  useDarkStyling
+                    ? "bg-inputBackgroundDark text-white border-cardBorder placeholder-[#87819F] focus:ring-[#5A4B7A] focus:border-[#5A4B7A]"
                     : ""
                 }
               />
@@ -379,21 +368,21 @@ const ForumPermissionsManager = ({
               >
                 <SelectTrigger
                   className={
-                    isTowns
-                      ? "bg-[#2A2338] text-white border-[#2B2449] focus:ring-[#5A4B7A] focus:border-[#5A4B7A]"
+                    useDarkStyling
+                      ? "bg-inputBackgroundDark text-white border-cardBorder focus:ring-[#5A4B7A] focus:border-[#5A4B7A]"
                       : ""
                   }
                 >
                   <SelectValue placeholder="Permission type" />
                 </SelectTrigger>
                 <SelectContent
-                  className={isTowns ? "bg-[#1E1A2F] border-[#2B2449]" : ""}
+                  className={useDarkStyling ? "bg-modalBackgroundDark border-cardBorder" : ""}
                 >
                   {PERMISSION_TYPES.map((type) => (
                     <SelectItem
                       key={type.value}
                       value={type.value}
-                      className={isTowns ? "text-white hover:bg-[#2A2338]" : ""}
+                      className={useDarkStyling ? "text-white hover:bg-inputBackgroundDark" : ""}
                     >
                       {type.label}
                     </SelectItem>
@@ -451,8 +440,8 @@ const ForumPermissionsManager = ({
                 }
                 size="sm"
                 className={
-                  isTowns
-                    ? "bg-[#5A4B7A] text-white border-[#5A4B7A] hover:bg-[#6B5C8B]"
+                  useDarkStyling
+                    ? "bg-buttonPrimaryDark text-white border-[#5A4B7A] hover:bg-buttonPrimaryDark/80"
                     : ""
                 }
               >
@@ -467,20 +456,20 @@ const ForumPermissionsManager = ({
                 <div
                   key={permission.id}
                   className={`flex items-center justify-between p-3 rounded-md ${
-                    isTowns ? "bg-[#2A2338] border border-[#2B2449]" : "bg-wash"
+                    useDarkStyling ? "bg-inputBackgroundDark border border-cardBorder" : "bg-wash"
                   }`}
                 >
                   <div className="flex-1">
                     <div
                       className={`font-mono text-sm ${
-                        isTowns ? "text-white" : ""
+                        useDarkStyling ? "text-white" : ""
                       }`}
                     >
                       {permission.address}
                     </div>
                     <div
                       className={`text-xs mt-1 ${
-                        isTowns ? "text-[#87819F]" : "text-tertiary"
+                        useDarkStyling ? "text-[#87819F]" : "text-tertiary"
                       }`}
                     >
                       {PERMISSION_TYPES.find(
@@ -497,7 +486,7 @@ const ForumPermissionsManager = ({
                     size="sm"
                     onClick={() => handleRemovePermission(permission.id)}
                     disabled={loading}
-                    className={isTowns ? "bg-red-500 hover:bg-red-600" : ""}
+                    className={useDarkStyling ? "bg-red-500 hover:bg-red-600" : ""}
                   >
                     <TrashIcon className="w-4 h-4" />
                   </Button>
@@ -508,7 +497,7 @@ const ForumPermissionsManager = ({
             {permissions.length === 0 && (
               <p
                 className={`text-center py-4 ${
-                  isTowns ? "text-[#87819F]" : "text-tertiary"
+                  useDarkStyling ? "text-[#87819F]" : "text-tertiary"
                 }`}
               >
                 No forum permissions configured yet.

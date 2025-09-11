@@ -54,8 +54,8 @@ const ReportModal = ({
   );
 
   // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,24 +192,24 @@ const ReportModal = ({
   );
 
   return (
-    <div className={`max-w-3xl p-4 ${isTowns ? "bg-[#1E1A2F]" : "bg-white"}`}>
+    <div className={`max-w-3xl p-4 ${useDarkStyling ? "bg-modalBackgroundDark" : "bg-white"}`}>
       <div
         className={`pb-4 sm:pb-6 border-b ${
-          isTowns ? "border-[#2B2449]" : "border-line"
+          useDarkStyling ? "border-cardBorder" : "border-line"
         }`}
       >
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h2
               className={`text-xl sm:text-2xl font-black mb-2 ${
-                isTowns ? "text-white" : "text-primary"
+                useDarkStyling ? "text-white" : "text-primary"
               }`}
             >
               {report.title}
             </h2>
             <div
               className={`text-xs sm:text-sm flex gap-2 divide-x ${
-                isTowns ? "text-[#87819F]" : "text-secondary"
+                useDarkStyling ? "text-[#87819F]" : "text-secondary"
               }`}
             >
               <span>
@@ -229,8 +229,8 @@ const ReportModal = ({
                 <button
                   onClick={handleArchiveTopic}
                   className={`p-2 transition-colors cursor-pointer border rounded-md ${
-                    isTowns
-                      ? "text-[#87819F] hover:text-white border-[#2B2449] hover:border-[#5A4B7A]"
+                    useDarkStyling
+                      ? "text-textSecondary hover:text-white border-cardBorder hover:border-buttonPrimaryDark"
                       : "text-gray-500 hover:text-gray-700 border-gray-500"
                   }`}
                   title="Archive topic"
@@ -242,7 +242,7 @@ const ReportModal = ({
                 <button
                   onClick={handleDeleteTopic}
                   className={`p-2 transition-colors cursor-pointer border rounded-md ${
-                    isTowns
+                    useDarkStyling
                       ? "text-red-400 hover:text-red-300 border-red-400 hover:border-red-300"
                       : "text-red-500 hover:text-red-700 border-red-500"
                   }`}
@@ -266,12 +266,12 @@ const ReportModal = ({
             </div>
             <div className="flex-1">
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
-                <div className={`${isTowns ? "text-white" : "text-primary"}`}>
+                <div className={`${useDarkStyling ? "text-white" : "text-primary"}`}>
                   <ENSName address={report.author || ""} />
                 </div>
                 <span
                   className={`text-xs sm:text-sm ${
-                    isTowns ? "text-[#87819F]" : "text-secondary"
+                    useDarkStyling ? "text-[#87819F]" : "text-secondary"
                   }`}
                 >
                   posted{" "}
@@ -282,7 +282,7 @@ const ReportModal = ({
               {/* Report Content */}
               <div
                 className={`leading-relaxed ${
-                  isTowns ? "text-white" : "text-secondary"
+                  useDarkStyling ? "text-white" : "text-secondary"
                 }`}
               >
                 <DunaContentRenderer content={report.content} />
@@ -294,12 +294,12 @@ const ReportModal = ({
           {report.attachments && report.attachments.length > 0 && (
             <div
               className={`border-t pt-3 sm:pt-4 ${
-                isTowns ? "border-[#2B2449]" : "border-line"
+                useDarkStyling ? "border-cardBorder" : "border-line"
               }`}
             >
               <div
                 className={`text-xs sm:text-sm font-semibold mb-2 sm:mb-3 ${
-                  isTowns ? "text-white" : "text-primary"
+                  useDarkStyling ? "text-white" : "text-primary"
                 }`}
               >
                 Attachment
@@ -310,8 +310,8 @@ const ReportModal = ({
                     key={attachment.id}
                     variant="outline"
                     className={`w-full justify-start text-xs sm:text-sm ${
-                      isTowns
-                        ? "bg-[#2A2338] border-[#2B2449] hover:bg-[#5A4B7A] text-white"
+                      useDarkStyling
+                        ? "bg-inputBackgroundDark border-cardBorder hover:bg-buttonPrimaryDark text-white"
                         : "bg-gray-50 border-gray-200 hover:bg-gray-100"
                     }`}
                     onClick={() => window.open(attachment.url, "_blank")}
@@ -327,12 +327,12 @@ const ReportModal = ({
           {/* Comments Section */}
           <div
             className={`border-t pt-3 sm:pt-4 ${
-              isTowns ? "border-[#2B2449]" : "border-line"
+              useDarkStyling ? "border-cardBorder" : "border-line"
             }`}
           >
             <h4
               className={`text-base sm:text-lg font-bold mb-3 sm:mb-4 ${
-                isTowns ? "text-white" : "text-primary"
+                useDarkStyling ? "text-white" : "text-primary"
               }`}
             >
               Comments ({comments.length})
@@ -353,7 +353,7 @@ const ReportModal = ({
             {/* Comment Input */}
             <div
               className={`mt-4 sm:mt-6 pt-3 sm:pt-4 border-t ${
-                isTowns ? "border-[#2B2449]" : "border-line"
+                useDarkStyling ? "border-cardBorder" : "border-line"
               }`}
             >
               {!isConnected ? (
@@ -363,12 +363,12 @@ const ReportModal = ({
                       <Button
                         onClick={() => show?.()}
                         className={`${
-                          isTowns
-                            ? "bg-[#5A4B7A] text-white border-[#5A4B7A] hover:bg-[#6B5C8B]"
+                          useDarkStyling
+                            ? "bg-buttonPrimaryDark text-white border-[#5A4B7A] hover:bg-buttonPrimaryDark/80"
                             : "text-white border border-black hover:bg-gray-800"
                         } text-xs sm:text-sm w-full sm:w-auto`}
                         style={
-                          !isTowns
+                          !useDarkStyling
                             ? {
                                 display: "flex",
                                 height: "36px",
@@ -404,12 +404,12 @@ const ReportModal = ({
                       type="submit"
                       disabled={isSubmitting || !newComment.trim()}
                       className={`${
-                        isTowns
-                          ? "bg-[#5A4B7A] text-white border-[#5A4B7A] hover:bg-[#6B5C8B]"
+                        useDarkStyling
+                          ? "bg-buttonPrimaryDark text-white border-[#5A4B7A] hover:bg-buttonPrimaryDark/80"
                           : "text-white border border-black hover:bg-gray-800"
                       } text-xs sm:text-sm w-full sm:w-auto`}
                       style={
-                        !isTowns
+                        !useDarkStyling
                           ? {
                               display: "flex",
                               height: "36px",

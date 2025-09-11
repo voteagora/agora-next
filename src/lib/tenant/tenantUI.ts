@@ -130,9 +130,14 @@ type TenantUIParams = {
     font?: string;
     tokenAmountFont?: string;
     letterSpacing?: string;
-    customInfoSectionBackground?: string;
-    customInfoTabBackground?: string;
-    customButtonBackground?: string;
+    infoSectionBackground?: string;
+    infoTabBackground?: string;
+    buttonBackground?: string;
+    cardBackground?: string;
+    cardBorder?: string;
+    hoverBackground?: string;
+    textSecondary?: string;
+    footerBackground?: string;
     customHeroImageSize?: string;
     customInfoTabs?: Array<{ title: string; description: string }>;
     customIconBackground?: string;
@@ -142,17 +147,6 @@ type TenantUIParams = {
     customTitleSize?: string;
     customCardSize?: string;
     customIconColor?: string;
-    customHeaderBackground?: string;
-    customFooterHideChangelog?: boolean;
-    customFooterHideVotableSupply?: boolean;
-    customFooterHideTotalSupply?: boolean;
-    customFooterBackground?: string;
-    customCardBackground?: string;
-    customCardBorder?: string;
-    customHoverBackground?: string;
-    customTextSecondary?: string;
-    hideGovernorSettings?: boolean;
-    hideHero?: boolean;
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -196,9 +190,14 @@ export class TenantUI {
     font?: string;
     tokenAmountFont?: string;
     letterSpacing?: string;
-    customInfoSectionBackground?: string;
-    customInfoTabBackground?: string;
-    customButtonBackground?: string;
+    infoSectionBackground?: string;
+    infoTabBackground?: string;
+    buttonBackground?: string;
+    cardBackground?: string;
+    cardBorder?: string;
+    hoverBackground?: string;
+    textSecondary?: string;
+    footerBackground?: string;
     customHeroImageSize?: string;
     customInfoTabs?: Array<{ title: string; description: string }>;
     customTextColor?: string;
@@ -209,16 +208,6 @@ export class TenantUI {
     customTitleSize?: string;
     customCardSize?: string;
     customIconColor?: string;
-    customFooterHideChangelog?: boolean;
-    customFooterHideVotableSupply?: boolean;
-    customFooterHideTotalSupply?: boolean;
-    customFooterBackground?: string;
-    customCardBackground?: string;
-    customCardBorder?: string;
-    customHoverBackground?: string;
-    customTextSecondary?: string;
-    hideGovernorSettings?: boolean;
-    hideHero?: boolean;
   };
   private _theme: "light" | "dark";
   private _favicon?: {
@@ -340,9 +329,14 @@ export class TenantUI {
         font?: string;
         tokenAmountFont?: string;
         letterSpacing?: string;
-        customInfoSectionBackground?: string;
-        customInfoTabBackground?: string;
-        customButtonBackground?: string;
+        infoSectionBackground?: string;
+        infoTabBackground?: string;
+        buttonBackground?: string;
+        cardBackground?: string;
+        cardBorder?: string;
+        hoverBackground?: string;
+        textSecondary?: string;
+        footerBackground?: string;
         customHeroImageSize?: string;
         customInfoTabs?: Array<{ title: string; description: string }>;
         customTextColor?: string;
@@ -353,16 +347,6 @@ export class TenantUI {
         customTitleSize?: string;
         customCardSize?: string;
         customIconColor?: string;
-        customFooterHideChangelog?: boolean;
-        customFooterHideVotableSupply?: boolean;
-        customFooterHideTotalSupply?: boolean;
-        customFooterBackground?: string;
-        customCardBackground?: string;
-        customCardBorder?: string;
-        customHoverBackground?: string;
-        customTextSecondary?: string;
-        hideGovernorSettings?: boolean;
-        hideHero?: boolean;
       }
     | undefined {
     return this._customization;

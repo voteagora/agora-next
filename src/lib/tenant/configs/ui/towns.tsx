@@ -38,15 +38,14 @@ export const townsTenantUIConfig = new TenantUI({
     brandPrimary: "255 255 255",
     brandSecondary: "23 20 34",
     tokenAmountFont: "font-chivoMono",
-    customInfoSectionBackground: "#1E1A2F",
-    customInfoTabBackground: "#130C2F",
-    customButtonBackground: "#19103E",
-    customCardBackground: "#1E1A2F",
-    customCardBorder: "#2B2449",
-    customHoverBackground: "#2A2338",
-    customTextSecondary: "#87819F",
-    hideGovernorSettings: true,
-    hideHero: true,
+    infoSectionBackground: "30 26 47",     // #1E1A2F
+    infoTabBackground: "19 12 47",         // #130C2F  
+    buttonBackground: "25 16 62",          // #19103E
+    cardBackground: "30 26 47",            // #1E1A2F
+    cardBorder: "43 36 73",                // #2B2449
+    hoverBackground: "42 35 56",           // #2A2338
+    textSecondary: "135 129 159",          // #87819F
+    footerBackground: "19 12 47",          // #130C2F
     customHeroImageSize: "w-auto h-auto",
     customIconBackground: "bg-transparent",
     customInfoLayout: "flex-col sm:flex-row gap-2",
@@ -54,10 +53,6 @@ export const townsTenantUIConfig = new TenantUI({
     customTitleSize: "text-5xl leading-[48px] sm:text-[56px] sm:leading-[56px]",
     customCardSize: "sm:h-[100px] sm:w-[100px] lg:h-[120px] lg:w-[120px]",
     customIconColor: "#87819F",
-    customFooterHideChangelog: true,
-    customFooterHideVotableSupply: true,
-    customFooterHideTotalSupply: true,
-    customFooterBackground: "#130C2F",
   },
 
   theme: "dark",
@@ -262,6 +257,38 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       name: "coming-soon",
+      enabled: true,
+    },
+    {
+      name: "hide-governor-settings",
+      enabled: true,
+    },
+    {
+      name: "hide-hero",
+      enabled: true,
+    },
+    {
+      name: "footer/hide-changelog",
+      enabled: true,
+    },
+    {
+      name: "footer/hide-votable-supply",
+      enabled: true,
+    },
+    {
+      name: "footer/hide-total-supply",
+      enabled: true,
+    },
+    {
+      name: "coming-soon/show-static-proposals",
+      enabled: true,
+    },
+    {
+      name: "duna/use-community-dialogue-label",
+      enabled: true,
+    },
+    {
+      name: "ui/use-dark-theme-styling",
       enabled: true,
     },
   ],

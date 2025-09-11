@@ -63,9 +63,9 @@ export default function Navbar() {
   return (
     <div
       ref={navRef}
-      className={`flex flex-row rounded-full border border-line p-1 font-medium ${ui.customization?.customInfoTabBackground ? `bg-[${ui.customization.customInfoTabBackground}]` : "bg-neutral"}`}
+      className="flex flex-row rounded-full border border-line p-1 font-medium bg-infoTabBackground"
     >
-      {/* Sliding overlay */}
+      {/* Sliding overlay
       <div
         className="absolute bg-white rounded-full border border-line shadow-newDefault transition-all duration-300 ease-in-out h-[38px]"
         style={{
@@ -73,7 +73,7 @@ export default function Navbar() {
           width: `${activeIndicator.width}px`,
           opacity: activeIndicator.width ? 1 : 0,
         }}
-      />
+      /> */}
 
       {hasProposals && (
         <HeaderLink

@@ -44,8 +44,8 @@ export default function DocumentUploadModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const validateFile = (file: File): { valid: boolean; error?: string } => {
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -224,11 +224,11 @@ export default function DocumentUploadModal({
     <Dialog open={isOpen} onOpenChange={handleModalClose}>
       <DialogContent
         className={`sm:max-w-md w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto ${
-          isTowns ? "bg-[#1E1A2F] border-[#2B2449]" : ""
+          useDarkStyling ? "bg-modalBackgroundDark border-cardBorder" : ""
         }`}
       >
         <DialogHeader>
-          <DialogTitle className={isTowns ? "text-white" : ""}>
+          <DialogTitle className={useDarkStyling ? "text-white" : ""}>
             Upload Document
           </DialogTitle>
         </DialogHeader>
@@ -248,15 +248,15 @@ export default function DocumentUploadModal({
                 border-2 border-dashed rounded-lg p-4 sm:p-8 text-center cursor-pointer transition-colors
                 ${
                   isDragOver
-                    ? isTowns
-                      ? "border-[#5A4B7A] bg-[#2A2338]"
+                    ? useDarkStyling
+                      ? "border-[#5A4B7A] bg-inputBackgroundDark"
                       : "border-gray-400 bg-gray-50 dark:bg-gray-900/20"
-                    : isTowns
+                    : useDarkStyling
                       ? "border-[#2B2449] hover:border-[#5A4B7A]"
                       : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
                 }
               `}
-              style={!isTowns ? { borderColor: "#E5E5E5" } : {}}
+              style={!useDarkStyling ? { borderColor: "#E5E5E5" } : {}}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
@@ -264,19 +264,19 @@ export default function DocumentUploadModal({
             >
               <DocumentIcon
                 className={`mx-auto h-8 w-8 sm:h-12 sm:w-12 mb-2 sm:mb-4 ${
-                  isTowns ? "text-[#87819F]" : "text-gray-400"
+                  useDarkStyling ? "text-[#87819F]" : "text-gray-400"
                 }`}
               />
               <p
                 className={`text-xs sm:text-sm ${
-                  isTowns
+                  useDarkStyling
                     ? "text-[#87819F]"
                     : "text-gray-500 dark:text-gray-400"
                 }`}
               >
                 <span
                   className={`font-medium ${
-                    isTowns
+                    useDarkStyling
                       ? "text-[#87819F]"
                       : "text-gray-500 dark:text-gray-400"
                   }`}
@@ -287,7 +287,7 @@ export default function DocumentUploadModal({
               </p>
               <p
                 className={`text-xs mt-1 sm:mt-2 ${
-                  isTowns
+                  useDarkStyling
                     ? "text-[#87819F]"
                     : "text-gray-500 dark:text-gray-500"
                 }`}
@@ -300,23 +300,23 @@ export default function DocumentUploadModal({
           {selectedFile && (
             <div
               className={`border rounded-lg p-3 sm:p-4 ${
-                isTowns
-                  ? "bg-[#2A2338] border-[#2B2449]"
+                useDarkStyling
+                  ? "bg-inputBackgroundDark border-[#2B2449]"
                   : "bg-gray-50 dark:bg-gray-800"
               }`}
-              style={!isTowns ? { borderColor: "#E5E5E5" } : {}}
+              style={!useDarkStyling ? { borderColor: "#E5E5E5" } : {}}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
                   <DocumentIcon
                     className={`h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0 ${
-                      isTowns ? "text-[#87819F]" : "text-gray-400"
+                      useDarkStyling ? "text-[#87819F]" : "text-gray-400"
                     }`}
                   />
                   <div className="min-w-0 flex-1">
                     <p
                       className={`text-xs sm:text-sm font-medium truncate max-w-[200px] ${
-                        isTowns
+                        useDarkStyling
                           ? "text-white"
                           : "text-gray-500 dark:text-gray-400"
                       }`}
@@ -325,7 +325,7 @@ export default function DocumentUploadModal({
                     </p>
                     <p
                       className={`text-xs break-words ${
-                        isTowns
+                        useDarkStyling
                           ? "text-[#87819F]"
                           : "text-gray-500 dark:text-gray-400"
                       }`}
@@ -339,7 +339,7 @@ export default function DocumentUploadModal({
                   <button
                     onClick={handleClearFile}
                     className={`p-1 flex-shrink-0 ${
-                      isTowns
+                      useDarkStyling
                         ? "text-[#87819F] hover:text-white"
                         : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     }`}
@@ -354,7 +354,7 @@ export default function DocumentUploadModal({
                 <div className="mt-4">
                   <div
                     className={`flex items-center justify-between text-xs mb-2 ${
-                      isTowns
+                      useDarkStyling
                         ? "text-[#87819F]"
                         : "text-gray-600 dark:text-gray-400"
                     }`}
@@ -364,7 +364,7 @@ export default function DocumentUploadModal({
                   </div>
                   <div
                     className={`w-full rounded-full h-2 ${
-                      isTowns ? "bg-[#2B2449]" : "bg-gray-200 dark:bg-gray-700"
+                      useDarkStyling ? "bg-buttonSecondaryDark" : "bg-gray-200 dark:bg-gray-700"
                     }`}
                   >
                     <div
@@ -397,11 +397,11 @@ export default function DocumentUploadModal({
             onClick={handleModalClose}
             disabled={isUploading}
             className={`w-full sm:w-auto order-2 sm:order-1 ${
-              isTowns
-                ? "bg-[#2B2449] text-white border-[#2B2449] hover:bg-[#5A4B7A]"
+              useDarkStyling
+                ? "bg-buttonSecondaryDark text-white border-[#2B2449] hover:bg-buttonPrimaryDark"
                 : "bg-neutral text-primary border hover:bg-wash"
             }`}
-            style={!isTowns ? { borderColor: "#E5E5E5" } : {}}
+            style={!useDarkStyling ? { borderColor: "#E5E5E5" } : {}}
           >
             Cancel
           </Button>
@@ -409,12 +409,12 @@ export default function DocumentUploadModal({
             onClick={handleFileUpload}
             disabled={!selectedFile || isUploading}
             className={`${
-              isTowns
-                ? "bg-[#5A4B7A] text-white border-[#5A4B7A] hover:bg-[#6B5C8B]"
+              useDarkStyling
+                ? "bg-buttonPrimaryDark text-white border-[#5A4B7A] hover:bg-buttonPrimaryDark/80"
                 : "text-white border border-black hover:bg-gray-800"
             } text-sm w-full sm:w-auto order-1 sm:order-2`}
             style={
-              !isTowns
+              !useDarkStyling
                 ? {
                     display: "flex",
                     height: "36px",
