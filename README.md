@@ -10,7 +10,80 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Environment Variables
 
-* *NEXT_PUBLIC_FORK_NODE_URL* - The URL of an optional node, most likely a fork, for testing purposes.  Leave blank to use alchemy.
+This project uses various environment variables for configuration. Below is a comprehensive list of all environment variables:
+
+### Core Configuration
+* **NEXT_PUBLIC_AGORA_ENV** - Environment setting (prod/dev)
+* **NODE_ENV** - Node environment (development/production)
+* **NEXT_RUNTIME** - Next.js runtime environment
+* **NEXT_PHASE** - Next.js build phase
+* **ENVIRONMENT** - General environment variable for deployments
+
+### API Keys & Authentication
+* **NEXT_PUBLIC_AGORA_API_KEY** - Agora API key for authentication
+* **NEXT_PUBLIC_ALCHEMY_ID** - Alchemy API ID for blockchain interactions
+* **NEXT_PUBLIC_ALCHEMY_SMART_ACCOUNT** - Alchemy smart account API key
+* **NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID** - WalletConnect project ID for wallet connections
+* **NEXT_PUBLIC_ETHERSCAN_API_KEY** - Etherscan API key for contract verification and data fetching
+* **JWT_SECRET** - Secret key for JWT token signing
+* **PR_BOT_TOKEN** - GitHub PR bot authentication token
+* **EAS_SENDER_PRIVATE_KEY** - Ethereum Attestation Service sender private key
+* **GAS_SPONSOR_PK** - Private key for gas sponsorship transactions
+
+### Instance Configuration
+* **NEXT_PUBLIC_AGORA_INSTANCE_TOKEN** - Token identifying the Agora instance (e.g., ENS, Optimism)
+* **NEXT_PUBLIC_AGORA_INSTANCE_NAME** - Name of the Agora instance
+* **NEXT_PUBLIC_AGORA_BASE_URL** - Base URL for Agora API endpoints
+* **NEXT_PUBLIC_AGORA_ROOT** - Root path for the application (default: "/")
+
+### Database
+* **DATABASE_URL** - PostgreSQL database connection URL
+
+### AWS Services
+* **AWS_ACCESS_KEY_ID** - AWS access key for S3 and other services
+* **AWS_SECRET_ACCESS_KEY** - AWS secret access key
+
+### Tenderly (Simulation & Testing)
+* **TENDERLY_ACCESS_KEY** - Tenderly API access key for transaction simulations
+* **TENDERLY_USER** - Tenderly user account
+* **TENDERLY_PROJECT** - Tenderly project name
+
+### Network & RPC Configuration
+* **NEXT_PUBLIC_FORK_NODE_URL** - The URL of an optional node, most likely a fork, for testing purposes. Leave blank to use Alchemy
+* **NEXT_PUBLIC_CONDUIT_KEY** - Conduit API key for custom RPC endpoints
+* **DAONODE_URL_TEMPLATE** - Template URL for DAO node endpoints
+
+### IPFS (Pinata)
+* **PINATA_API_KEY** - Pinata API key for IPFS uploads
+* **PINATA_SECRET_API_KEY** - Pinata secret API key
+* **PINATA_JWT** - Pinata JWT token for authentication
+
+### Feature Flags
+* **NEXT_PUBLIC_SIWE_ENABLED** - Enable/disable Sign-In with Ethereum (true/false)
+* **NEXT_PUBLIC_ENABLE_BI_METRICS_CAPTURE** - Enable business intelligence metrics capture (true/false)
+* **NEXT_PUBLIC_MUTE_QUERY_LOGGING** - Disable query logging for performance (true/false)
+
+### Monitoring & Analytics
+* **DD_API_KEY** - Datadog API key for monitoring
+* **DD_APP_KEY** - Datadog application key
+* **ENABLE_DD_METRICS** - Enable Datadog metrics collection (true/false)
+
+### Vercel Deployment
+* **VERCEL_ENV** - Vercel environment (production/preview/development)
+* **VERCEL_REGION** - Vercel deployment region
+* **VERCEL_GIT_COMMIT_SHA** - Git commit SHA for the deployment
+* **VERCEL_URL** - Vercel deployment URL
+* **VERCEL_BRANCH_URL** - Vercel branch-specific URL
+
+### Paymaster (Account Abstraction)
+* **PAYMASTER_SECRET** - Secret key for paymaster service
+
+### Storage
+* **STORAGE_BUCKET_URL** - URL for storage bucket (S3 or similar)
+
+### Testing & Development
+* **REACT_APP_DEPLOY_ENV** - React app deployment environment
+* **TESTNET_SNAPSHOT_SPACE** - Snapshot space for testnet proposals
 
 ## About this repo
 
