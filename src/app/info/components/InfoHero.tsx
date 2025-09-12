@@ -64,6 +64,43 @@ export const InfoHero = () => {
               </a>
             </div>
           </div>
+        ) : namespace === TENANT_NAMESPACES.SYNDICATE ? (
+          <div className="text-base text-secondary mt-4">
+            <div className="whitespace-pre-line">{page!.description}</div>
+            <div className="mt-4">
+              <a
+                href="#duna-administration"
+                className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 bg-[#F8F9F0] text-black rounded-[40px] hover:bg-[#F8F9F0]/90 transition-colors cursor-pointer text-sm sm:text-base"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  className="sm:w-4 sm:h-4 flex-shrink-0"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="8"
+                    cy="8"
+                    r="7"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M8 4V6M8 8V12"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <span className="whitespace-normal">
+                  View Syndicate DUNA Member{" "}
+                  <span className="underline">Disclosures</span>
+                </span>
+              </a>
+            </div>
+          </div>
         ) : (
           <p className="text-base text-secondary mt-4">
             {page!.description}
@@ -89,6 +126,7 @@ export const InfoHero = () => {
             link={link.url}
             linkText={link.title}
             ui={ui}
+            namespace={namespace}
           />
         ))}
       </div>
@@ -102,12 +140,14 @@ const Card = ({
   linkText,
   image,
   ui,
+  namespace,
 }: {
   className?: string;
   link: string;
   linkText: string;
   image: StaticImageData | string;
   ui: any;
+  namespace: string;
 }) => {
   const isDisabled = link === "" && ui.dunaDisclaimers;
 
@@ -135,7 +175,7 @@ const Card = ({
             width={12}
             height={12}
             alt="arrow pointing right"
-            className={`self-start mt-1 ${ui.customization?.infoSectionBackground ? "brightness-0 invert" : ""} ${isDisabled ? "opacity-50" : ""}`}
+            className={`self-start mt-1 ${ui.customization?.infoSectionBackground && ui.customization.infoSectionBackground !== "#FFFFFF" ? "brightness-0 invert" : ""} ${namespace === TENANT_NAMESPACES.SYNDICATE ? "brightness-0" : ""} ${isDisabled ? "opacity-50" : ""}`}
           />
         </div>
       </Link>
