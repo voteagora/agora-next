@@ -47,6 +47,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     customButtonBackground: "#FAFAFA",
     customInfoSectionBackground: "#FFFFFF",
     customCardBackground: "#FFFFFF",
+    customIconBackground: "#FCFCFC",
     customFooterHideChangelog: true,
     customFooterHideVotableSupply: true,
     customFooterHideTotalSupply: true,
@@ -122,10 +123,16 @@ export const syndicateTenantUIConfig = new TenantUI({
       },
       links: [
         {
+          name: "Syndicate Protocol",
+          title: "Syndicate Protocol",
+          url: "https://syndicate.io/", // TODO: Update with actual URL
+          image: syndicateInfoCard1,
+        },
+        {
           name: "Community Discord",
           title: "Community Discord",
           url: "https://discord.gg/syndicate", // TODO: Update with actual URL
-          image: syndicateInfoCard1,
+          image: syndicateInfoCard2,
         },
         {
           name: "Protocol Docs",
