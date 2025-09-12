@@ -131,7 +131,6 @@ export default function DraftProposalPageClient({
       setError("Signature cancelled by user");
       try {
         localStorage.setItem("agora-siwe-stage", "error");
-        localStorage.removeItem("agora-siwe-jwt");
       } catch {}
     } finally {
       setIsSigning(false);
