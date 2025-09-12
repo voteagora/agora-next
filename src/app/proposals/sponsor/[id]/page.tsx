@@ -8,11 +8,18 @@ import { isPostSubmission } from "../../draft/utils/stages";
 import ArchivedDraftProposal from "../../draft/components/ArchivedDraftProposal";
 import { DraftProposal } from "../../../proposals/draft/types";
 
-const getDraftProposal = async (id: number) => {
-  const draftProposal = await prismaWeb2Client.proposalDraft.findUnique({
-    where: {
-      id: id,
-    },
+const getDraftProposal = async (idOrUuid: number | string) => {
+  const isNumeric =
+    typeof idOrUuid === "number" || /^\d+$/.test(String(idOrUuid));
+  const draftProposal = await prismaWeb2Client.proposalDraft.findFirst({
+    where: isNumeric
+      ? {
+          id:
+            typeof idOrUuid === "number"
+              ? idOrUuid
+              : parseInt(String(idOrUuid), 10),
+        }
+      : { uuid: String(idOrUuid) },
     include: {
       transactions: true,
       social_options: true,
@@ -29,7 +36,9 @@ const getDraftProposal = async (id: number) => {
 };
 
 const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
-  const draftProposal = await getDraftProposal(parseInt(params.id));
+  const draftProposal = await getDraftProposal(
+    isNaN(Number(params.id)) ? params.id : parseInt(params.id)
+  );
   const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
 
   if (isPostSubmissionStage) {

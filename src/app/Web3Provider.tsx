@@ -1,6 +1,7 @@
 "use client";
 
 import { FC, PropsWithChildren } from "react";
+import { usePathname } from "next/navigation";
 import { createConfig, WagmiProvider, type Transport } from "wagmi";
 import { inter } from "@/styles/fonts";
 import { mainnet } from "wagmi/chains";
@@ -13,6 +14,7 @@ import { Toaster } from "react-hot-toast";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
+import { SIWE_ENABLED_PATH_PREFIXES } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import { getTransportForChain, toNumericChainId } from "@/lib/utils";
 import { hashFn } from "@wagmi/core/query";
@@ -54,28 +56,39 @@ export const config = createConfig(
   })
 );
 
-const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
-  <WagmiProvider config={config}>
-    <QueryClientProvider client={queryClient}>
-      <SIWEProvider {...siweProviderConfig}>
-        <ConnectKitProvider options={{ enforceSupportedChains: false }}>
-          <body className={inter.variable}>
-            <noscript>You need to enable JavaScript to run this app.</noscript>
-            {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
-            {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
-            <ConnectButtonProvider>
-              <PageContainer>
-                <Toaster />
-                <AgoraProvider>{children}</AgoraProvider>
-              </PageContainer>
-            </ConnectButtonProvider>
-            {!shouldHideAgoraBranding && <Footer />}
-            <SpeedInsights />
-          </body>
-        </ConnectKitProvider>
-      </SIWEProvider>
-    </QueryClientProvider>
-  </WagmiProvider>
-);
+const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => {
+  const pathname = usePathname();
+  const isSiweScope =
+    typeof window !== "undefined" &&
+    SIWE_ENABLED_PATH_PREFIXES.some((p) => pathname?.startsWith(p));
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <SIWEProvider
+          {...siweProviderConfig}
+          enabled={Boolean(isSiweScope) && siweProviderConfig.enabled}
+        >
+          <ConnectKitProvider options={{ enforceSupportedChains: false }}>
+            <body className={inter.variable}>
+              <noscript>
+                You need to enable JavaScript to run this app.
+              </noscript>
+              {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
+              {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
+              <ConnectButtonProvider>
+                <PageContainer>
+                  <Toaster />
+                  <AgoraProvider>{children}</AgoraProvider>
+                </PageContainer>
+              </ConnectButtonProvider>
+              {!shouldHideAgoraBranding && <Footer />}
+              <SpeedInsights />
+            </body>
+          </ConnectKitProvider>
+        </SIWEProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
+};
 
 export default Web3Provider;
