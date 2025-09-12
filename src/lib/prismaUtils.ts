@@ -140,6 +140,8 @@ export function findVotableSupply({
       return prismaWeb3Client.demoVotableSupply.findFirst({});
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaVotableSupply.findFirst({});
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve(null); // for now: towns is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -292,6 +294,10 @@ export function findProposalsQueryFromDB({
       return prismaWeb3Client.demoProposals.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findMany(condition);
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve([]); // for now: towns is info-only
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve([]); // for now: syndicate is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -337,6 +343,8 @@ export function findProposal({
       return prismaWeb3Client.demoProposals.findFirst(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findFirst(condition);
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve(null); // for now: towns is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -389,6 +397,10 @@ export function findProposalsByIds({
       return prismaWeb3Client.demoProposals.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findMany(condition);
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve([]); // for now: towns is info-only
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve([]); // for now: syndicate is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -441,6 +453,8 @@ export function findOffchainProposal({
       return prismaWeb3Client.demoProposals.findFirst(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findFirst(condition);
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve(null); // for now: towns is info-only
     default:
       return null;
   }
@@ -496,6 +510,8 @@ export function findOffchainProposalsByOnchainIds({
       return prismaWeb3Client.demoProposals.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findMany(condition);
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve([]); // for now: towns is info-only
     default:
       return [];
   }
@@ -544,6 +560,10 @@ export function findProposalType({
       return prismaWeb3Client.demoProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposalTypes.findMany(condition);
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve([]); // for now: towns is info-only
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve([]); // for now: syndicate is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -589,6 +609,10 @@ export function findVotes({
       return prismaWeb3Client.demoVotes.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaVotes.findMany(condition);
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve([]); // for now: towns is info-only
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve([]); // for now: syndicate is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -637,6 +661,8 @@ export function findVotingPower({
       return prismaWeb3Client.demoVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaVotingPower.findFirst(condition);
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve(null); // for now: towns is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -685,6 +711,8 @@ export function findAdvancedVotingPower({
       return prismaWeb3Client.demoAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaAdvancedVotingPower.findFirst(condition);
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve(null); // for now: towns is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -730,6 +758,8 @@ export async function findStakedDeposit({
       return prismaWeb3Client.demoStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaStakedDeposits.findFirst(condition);
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve(null); // for now: towns is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -787,6 +817,10 @@ export function findStakedDeposits({
       return prismaWeb3Client.demoStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaStakedDeposits.findMany(condition);
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve([]); // for now: towns is info-only
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve([]); // for now: syndicate is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -833,6 +867,8 @@ export function getProposalsCount({
       return prismaWeb3Client.demoProposals.count(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.count(condition);
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve(0); // for now: towns is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }

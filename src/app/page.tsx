@@ -2,6 +2,7 @@
 
 import Tenant from "@/lib/tenant/tenant";
 import ProposalsHome from "@/components/Proposals/ProposalsHome";
+import ComingSoonPage from "@/app/coming-soon/page";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
@@ -37,5 +38,17 @@ export async function generateMetadata() {
 }
 
 export default async function Home() {
+  const { ui } = Tenant.current();
+
+  // Check if coming-soon is enabled
+  const hasToggle = typeof (ui as any)?.toggle === "function";
+  const comingSoonEnabled = hasToggle
+    ? ui.toggle("coming-soon")?.enabled
+    : false;
+
+  if (comingSoonEnabled) {
+    return <ComingSoonPage />;
+  }
+
   return <ProposalsHome />;
 }
