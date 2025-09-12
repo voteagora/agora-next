@@ -49,7 +49,7 @@ export default function DraftProposalPageClient({
     refetch,
     error: queryError,
   } = useQuery({
-    queryKey: ["draft", idParam],
+    queryKey: ["draft", idParam, stageIndex],
     queryFn: async (): Promise<DraftResponse> => {
       const sessionRaw = localStorage.getItem("agora-siwe-jwt");
       if (!sessionRaw) {
@@ -68,6 +68,8 @@ export default function DraftProposalPageClient({
       return res.json();
     },
     refetchOnWindowFocus: false,
+    refetchOnMount: "always",
+    staleTime: 0,
   });
 
   useEffect(() => {
