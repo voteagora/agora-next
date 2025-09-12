@@ -125,11 +125,14 @@ export default function DraftProposalPageClient({
       // in localStorage (successful) or when timeout expires (failed)
       setSignLabel("Awaiting Confirmation");
       await signIn();
-      setSignLabel("Signed");
       await refetch();
     } catch {
       setSignLabel("Cancelled");
       setError("Signature cancelled by user");
+      try {
+        localStorage.setItem("agora-siwe-stage", "error");
+        localStorage.removeItem("agora-siwe-jwt");
+      } catch {}
     } finally {
       setIsSigning(false);
       setTimeout(() => setSignLabel(null), 1200);
@@ -157,8 +160,17 @@ export default function DraftProposalPageClient({
           if (!isSigning) setIsSigning(true);
           setSignLabel("Awaiting Confirmation");
         } else if (stage === "signed") {
+          if (!hasJwt) {
+            setIsSigning(false);
+            setSignLabel("Cancelled");
+            setError("Signature cancelled by user");
+            try {
+              localStorage.setItem("agora-siwe-stage", "error");
+            } catch {}
+            return;
+          }
           setSignLabel("Signed");
-          if (!loadedAfterJwtRef.current && hasJwt) {
+          if (!loadedAfterJwtRef.current) {
             loadedAfterJwtRef.current = true;
             await refetch();
           }
@@ -173,7 +185,7 @@ export default function DraftProposalPageClient({
     return () => clearInterval(id);
   }, [isSigning, refetch]);
 
-  if (loading && !draft) {
+  if (loading && !draft && !error) {
     // Defer to the route segment's loading.tsx skeleton
     return null;
   }
