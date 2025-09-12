@@ -8,14 +8,10 @@ import {
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
 import { ProposalScope } from "../types";
+import type { FormState } from "@/app/types";
 import { verifySiwe } from "./siweAuth";
 import Tenant from "@/lib/tenant/tenant";
 import { getPublicClient } from "@/lib/viem";
-
-export type FormState = {
-  ok: boolean;
-  message: string;
-};
 
 export async function onSubmitAction(
   data: z.output<typeof SponsorProposalSchema> & {

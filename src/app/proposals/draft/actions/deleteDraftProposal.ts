@@ -1,12 +1,8 @@
 "use server";
 
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import type { FormState } from "@/app/types";
 import { verifyOwnerAndSiweForDraft } from "./siweAuth";
-
-export type FormState = {
-  ok: boolean;
-  message: string;
-};
 
 // TODO: need to auth this route in some way
 // perhaps send down the owner address and a signature + nonce to verify

@@ -3,16 +3,12 @@
 import { z } from "zod";
 import { schema as tempCheckSchema } from "../schemas/tempCheckSchema";
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import type { FormState } from "@/app/types";
 import { verifyOwnerAndSiweForDraft } from "./siweAuth";
 import {
   getStageByIndex,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
-
-export type FormState = {
-  ok: boolean;
-  message: string;
-};
 
 export async function onSubmitAction(
   data: z.output<typeof tempCheckSchema> & {

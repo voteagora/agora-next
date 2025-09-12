@@ -4,6 +4,7 @@ import { z } from "zod";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { verifyOwnerAndSiweForDraft } from "./siweAuth";
 import { ProposalType } from "../types";
+import type { FormState } from "@/app/types";
 import { DraftProposalSchema } from "../schemas/DraftProposalSchema";
 import { ProposalDraftTransaction } from "@prisma/client";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
@@ -11,11 +12,6 @@ import {
   getStageByIndex,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
-
-export type FormState = {
-  ok: boolean;
-  message: string;
-};
 
 const formDataByType = (
   data: z.output<typeof DraftProposalSchema>,

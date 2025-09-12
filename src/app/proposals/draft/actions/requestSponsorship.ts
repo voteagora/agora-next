@@ -3,12 +3,8 @@
 import { z } from "zod";
 import { schema as RequestSponsorshipSchema } from "../schemas/requestSponsorshipSchema";
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import type { FormState } from "@/app/types";
 import { verifyOwnerAndSiweForDraft } from "./siweAuth";
-
-export type FormState = {
-  ok: boolean;
-  message: string;
-};
 
 export async function onSubmitAction(
   data: z.output<typeof RequestSponsorshipSchema> & {
