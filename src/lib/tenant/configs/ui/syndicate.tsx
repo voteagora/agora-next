@@ -128,12 +128,6 @@ export const syndicateTenantUIConfig = new TenantUI({
           image: syndicateInfoCard1,
         },
         {
-          name: "Governance Forums",
-          title: "Governance Forums",
-          url: "https://gov.syndicate.io", // TODO: Update with actual URL
-          image: syndicateInfoCard2,
-        },
-        {
           name: "Protocol Docs",
           title: "Protocol Docs",
           url: "https://docs.syndicate.io", // TODO: Update with actual URL
@@ -146,7 +140,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       title: "About Syndicate",
       hero: syndicateHero,
       description:
-        "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
+        "The Syndicate Protocol is an infrastructure system for creating and managing onchain investment vehicles, DAOs, and collective coordination tools. It is implemented through smart contracts designed to prioritize transparency, accessibility, and trustless collaboration, enabling users to pool resources and deploy capital without centralized intermediaries. The Syndicate Protocol is a public good owned and governed by its community of participants.",
       tabs: [
         {
           icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#000000" />,
