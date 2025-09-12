@@ -29,14 +29,14 @@ const SyndicateDunaDisclosures = () => {
           <div className="mt-6">
             <span>2. Regulatory Risk Disclosure</span>
             <p className="mt-2">
-              The U.S. Securities and Exchange Commission (&quot;SEC&quot;) closed its
-              inquiry into Syndicate Labs in February 2025 without enforcement
-              action. Future administrations or other agencies may reopen
-              investigations or pursue new theories of liability notwithstanding
-              this reprieve. Global regulators may not recognize a DUNA;
-              activities conducted under this wrapper could still trigger
-              securities-, commodities-, AML-, or tax-law obligations in other
-              jurisdictions.
+              The U.S. Securities and Exchange Commission (&quot;SEC&quot;)
+              closed its inquiry into Syndicate Labs in February 2025 without
+              enforcement action. Future administrations or other agencies may
+              reopen investigations or pursue new theories of liability
+              notwithstanding this reprieve. Global regulators may not recognize
+              a DUNA; activities conducted under this wrapper could still
+              trigger securities-, commodities-, AML-, or tax-law obligations in
+              other jurisdictions.
             </p>
           </div>
 
@@ -55,13 +55,13 @@ const SyndicateDunaDisclosures = () => {
           <div className="mt-6">
             <span>4. Governance-Token &amp; Fee-Switch Risks</span>
             <p className="mt-2">
-              The UNI token does not automatically convey a right to protocol
+              The SYND token does not automatically convey a right to protocol
               cash flows. Turning on the &quot;fee switch&quot; requires a
-              separate on-chain vote and may expose UNI holders and the DAO to
+              separate on-chain vote and may expose SYND holders and the DAO to
               additional regulatory scrutiny. Token-holder incentives may
               diverge from broader ecosystem interests, leading to extractive
               proposals that erode protocol competitiveness. The DAO treasury
-              (~$6 billion, majority in UNI) is highly concentrated; market
+              (~$6 billion, majority in SYND) is highly concentrated; market
               shocks or liquidity drains could impair runway. Deploying treasury
               assets through the DUNA could generate U.S. federal, state, or
               foreign tax liabilities at the DUNA level even if no distributions
@@ -74,13 +74,12 @@ const SyndicateDunaDisclosures = () => {
             <p className="mt-2">
               Smart-contract code is open-source and may contain
               vulnerabilities. Upgrades carry non-zero risk of governance
-              capture or execution error. Cross-chain deployments (e.g.,
-              Unichain, Base) increase surface area for bridge exploits and
-              consensus failures. UNI and related derivatives are subject to
-              extreme volatility, thin order books on certain pairs, and
-              potential delistings on centralized venues. Liquidity provider
-              (&quot;LP&quot;) incentives can change rapidly, affecting swap
-              pricing and protocol volume.
+              capture or execution error. Cross-chain deployments increase
+              surface area for bridge exploits and consensus failures. SYND and
+              related derivatives are subject to extreme volatility, thin order
+              books on certain pairs, and potential delistings on centralized
+              venues. Liquidity provider (&quot;LP&quot;) incentives can change
+              rapidly, affecting swap pricing and protocol volume.
             </p>
           </div>
 
@@ -98,9 +97,9 @@ const SyndicateDunaDisclosures = () => {
             <span>9. Conflict-of-Interest Statement</span>
             <p className="mt-2">
               Delegates, service providers, and authors of this document may
-              hold UNI or have commercial relationships with Syndicate Labs, the
-              Syndicate Foundation, or third-party vendors. Positions may change
-              without notice.
+              hold SYND or have commercial relationships with Syndicate Labs,
+              the Syndicate Foundation, or third-party vendors. Positions may
+              change without notice.
             </p>
           </div>
 
