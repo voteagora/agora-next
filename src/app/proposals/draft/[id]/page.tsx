@@ -40,8 +40,7 @@ export default async function DraftProposalPage({
   const isNumericParam = !isNaN(numericId);
   if (isNumericParam) {
     const draftById = await fetchDraftProposal(numericId);
-    const draftWithUuid = draftById as unknown as { uuid?: string; id: number };
-    if (draftById && draftWithUuid.uuid) {
+    if (draftById && (draftById as any).uuid) {
       const entries = Object.entries(searchParams || {}).flatMap(
         ([key, value]) =>
           Array.isArray(value)
@@ -51,7 +50,7 @@ export default async function DraftProposalPage({
               : []
       );
       const qs = new URLSearchParams(entries).toString();
-      const target = `/proposals/draft/${draftWithUuid.uuid}${qs ? `?${qs}` : ""}`;
+      const target = `/proposals/draft/${(draftById as any).uuid}${qs ? `?${qs}` : ""}`;
       return permanentRedirect(target);
     }
   }

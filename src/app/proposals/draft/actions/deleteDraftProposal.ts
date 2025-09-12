@@ -1,6 +1,7 @@
 "use server";
 
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import { verifyOwnerAndSiweForDraft } from "./siweAuth";
 
 export type FormState = {
   ok: boolean;
@@ -18,7 +19,6 @@ export async function onSubmitAction(
   }
 ): Promise<FormState> {
   try {
-    const { verifyOwnerAndSiweForDraft } = await import("./siweAuth");
     const ownerCheck = await verifyOwnerAndSiweForDraft(draftProposalId, {
       address: params.address,
       message: params.message,

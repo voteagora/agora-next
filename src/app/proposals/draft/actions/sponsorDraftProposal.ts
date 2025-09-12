@@ -8,6 +8,9 @@ import {
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
 import { ProposalScope } from "../types";
+import { verifySiwe } from "./siweAuth";
+import Tenant from "@/lib/tenant/tenant";
+import { getPublicClient } from "@/lib/viem";
 
 export type FormState = {
   ok: boolean;
@@ -22,10 +25,6 @@ export async function onSubmitAction(
     signature: `0x${string}`;
   }
 ): Promise<FormState> {
-  const { verifySiwe } = await import("./siweAuth");
-  const Tenant = (await import("@/lib/tenant/tenant")).default;
-  const { getPublicClient } = await import("@/lib/viem");
-  const { ProposalScope } = await import("../types");
   const isValidSig = await verifySiwe({
     address: data.creatorAddress as `0x${string}`,
     message: data.message,

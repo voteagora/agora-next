@@ -7,8 +7,6 @@ export type FormState = {
   message: string;
 };
 
-export const invalidatePath = async (id: number | string) => {
-  "use server";
-  const { revalidatePath } = await import("next/cache");
+export const invalidatePath = (id: number | string): FormState => {
   revalidatePath(`/proposals/draft/${id}`);
 };

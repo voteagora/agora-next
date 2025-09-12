@@ -20,20 +20,13 @@ export const AGORA_SIGN_IN_MESSAGE = "Sign in to Agora with Ethereum";
 // JWT tokens for SIWE should therefore be issued with a short expiry time.
 */
 
-const isSiweEnabled = () => {
-  return process.env.NEXT_PUBLIC_SIWE_ENABLED === "true";
-};
+const isSiweEnabled = () => true; // Keep SIWE available regardless of env; no auto-trigger elsewhere
 
 export const siweProviderConfig: SIWEConfig = {
   getNonce: async () =>
-    fetch(`${API_AUTH_PREFIX}/nonce`).then(async (res) => {
-      const ct = res.headers.get("content-type") || "";
-      if (ct.includes("application/json")) {
-        const data = await res.json();
-        return data?.nonce ?? "";
-      }
-      return res.text();
-    }),
+    fetch(`${API_AUTH_PREFIX}/nonce`)
+      .then((res) => res.json())
+      .then((data) => data?.nonce ?? ""),
   createMessage: ({ nonce, address, chainId }) =>
     new SiweMessage({
       version: "1",
@@ -44,41 +37,30 @@ export const siweProviderConfig: SIWEConfig = {
       chainId,
       nonce,
     }).prepareMessage(),
-  verifyMessage: async ({ message, signature }) =>
-    (function () {
+  verifyMessage: async ({ message, signature }) => {
+    try {
+      localStorage.setItem("agora-siwe-stage", "awaiting_response");
+    } catch {}
+    const res = await fetch(`${API_AUTH_PREFIX}/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, signature }),
+    });
+    if (!res.ok) {
       try {
-        localStorage.setItem("agora-siwe-stage", "awaiting_response");
+        localStorage.setItem("agora-siwe-stage", "error");
       } catch {}
-      return fetch(`${API_AUTH_PREFIX}/verify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message,
-          signature,
-        }),
-      }).then(async (res) => {
-        if (!res.ok) {
-          // Avoid JSON parse errors on non-JSON error bodies
-          try {
-            localStorage.setItem("agora-siwe-stage", "error");
-          } catch {}
-          return false;
-        }
-        // save JWT from verify to local storage (expect JSON on success)
-        try {
-          const token = await res.json();
-          localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
-          try {
-            localStorage.setItem("agora-siwe-stage", "signed");
-          } catch {}
-        } catch {
-          // ignore if body isn't JSON for some reason
-        }
-        return true;
-      });
-    })(),
+      return false;
+    }
+    try {
+      const token = await res.json();
+      localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
+      try {
+        localStorage.setItem("agora-siwe-stage", "signed");
+      } catch {}
+    } catch {}
+    return true;
+  },
   getSession: async () => {
     // return JWT from local storage
     const session = localStorage.getItem(LOCAL_STORAGE_JWT_KEY);

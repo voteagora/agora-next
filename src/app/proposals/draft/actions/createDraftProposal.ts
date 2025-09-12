@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import { verifyOwnerAndSiweForDraft } from "./siweAuth";
 import { ProposalType } from "../types";
 import { DraftProposalSchema } from "../schemas/DraftProposalSchema";
 import { ProposalDraftTransaction } from "@prisma/client";
@@ -142,7 +143,6 @@ export async function onSubmitAction(
     signature: `0x${string}`;
   }
 ): Promise<FormState> {
-  const { verifyOwnerAndSiweForDraft } = await import("./siweAuth");
   const ownerCheck = await verifyOwnerAndSiweForDraft(data.draftProposalId, {
     address: data.creatorAddress as `0x${string}`,
     message: data.message,

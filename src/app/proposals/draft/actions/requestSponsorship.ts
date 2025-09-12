@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { schema as RequestSponsorshipSchema } from "../schemas/requestSponsorshipSchema";
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import { verifyOwnerAndSiweForDraft } from "./siweAuth";
 
 export type FormState = {
   ok: boolean;
@@ -17,7 +18,6 @@ export async function onSubmitAction(
     signature: `0x${string}`;
   }
 ): Promise<FormState> {
-  const { verifyOwnerAndSiweForDraft } = await import("./siweAuth");
   const ownerCheck = await verifyOwnerAndSiweForDraft(data.draftProposalId, {
     address: data.creatorAddress as `0x${string}`,
     message: data.message,

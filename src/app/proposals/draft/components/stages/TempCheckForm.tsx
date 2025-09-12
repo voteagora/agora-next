@@ -73,9 +73,7 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         toast.error(res.message);
         return;
       }
-      const nextId =
-        (draftProposal as { uuid?: string; id: number }).uuid ||
-        draftProposal.id;
+      const nextId = draftProposal.uuid ?? draftProposal.id;
       router.push(`/proposals/draft/${nextId}?stage=${stageIndex + 1}`);
     } catch (e: any) {
       console.error("An error was uncaught in `tempCheckAction`: ", e);
