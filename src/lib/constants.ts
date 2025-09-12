@@ -73,6 +73,11 @@ export const SUPPORTED_CHAINS: Chain[] = [
   cyber,
 ];
 
+export const SIWE_ENABLED_PATH_PREFIXES: string[] = [
+  "/proposals/draft",
+  "/proposals/sponsor",
+];
+
 export const proposalsFilterOptions = {
   relevant: {
     value: "Relevant",
