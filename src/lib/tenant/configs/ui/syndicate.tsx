@@ -9,6 +9,9 @@ import syndicateInfoCard1 from "@/assets/tenant/syndicate_info_1.svg";
 import syndicateInfoCard2 from "@/assets/tenant/syndicate_info_2.svg";
 import syndicateInfoCard3 from "@/assets/tenant/syndicate_info_3.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
+import { CoinsIcon } from "@/icons/CoinsIcon";
+import { NotificationIcon } from "@/icons/NotificationIcon";
+import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
 
 export const syndicateTenantUIConfig = new TenantUI({
   title: "Syndicate Agora",
@@ -144,6 +147,32 @@ export const syndicateTenantUIConfig = new TenantUI({
       hero: syndicateHero,
       description:
         "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
+      tabs: [
+        {
+          icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#000000" />,
+          title: "Delegate voting power",
+          description:
+            "The collective is governed by the project's token holders.",
+        },
+        {
+          icon: (
+            <NotificationIcon className="w-[24px] h-[24px]" stroke="#000000" />
+          ),
+          title: "Browse proposals",
+          description: "Governance decisions begin as proposals.",
+        },
+        {
+          icon: (
+            <CheckCircleBrokenIcon
+              className="w-[24px] h-[24px]"
+              stroke="#000000"
+            />
+          ),
+          title: "Vote on proposals",
+          description:
+            "Proposals that move to a vote are accepted or rejected.",
+        },
+      ],
       meta: {
         title: "Syndicate Protocol Governance",
         description:
@@ -155,7 +184,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       route: "coming-soon",
-      title: "Syndicate governance is\ncoming soon",
+      title: "Welcome to Syndicate governance",
       description:
         "Syndicate voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
       meta: {
