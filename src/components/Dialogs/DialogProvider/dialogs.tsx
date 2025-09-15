@@ -556,7 +556,14 @@ export const dialogs: DialogDefinitions<DialogType> = {
     );
   },
   REPORT_MODAL: (
-    { report, onDelete, onArchive, onCommentAdded, onCommentDeleted, onCommentUpdated },
+    {
+      report,
+      onDelete,
+      onArchive,
+      onCommentAdded,
+      onCommentDeleted,
+      onCommentUpdated,
+    },
     closeDialog
   ) => {
     return (

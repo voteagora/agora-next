@@ -59,9 +59,9 @@ const ReportModal = ({
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
   // Track topic view when modal opens
-  useTopicViewTracking({ 
-    topicId: report?.id || 0, 
-    enabled: !!report?.id 
+  useTopicViewTracking({
+    topicId: report?.id || 0,
+    enabled: !!report?.id,
   });
 
   const handleSubmitComment = async (e: React.FormEvent) => {
@@ -98,7 +98,10 @@ const ReportModal = ({
     onCommentDeleted?.(commentId);
   };
 
-  const handleUpdateComment = (commentId: number, updates: Partial<ForumPost>) => {
+  const handleUpdateComment = (
+    commentId: number,
+    updates: Partial<ForumPost>
+  ) => {
     setComments((prev) =>
       prev.map((comment) =>
         comment.id === commentId ? { ...comment, ...updates } : comment

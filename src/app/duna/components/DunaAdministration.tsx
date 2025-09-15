@@ -32,7 +32,7 @@ const DunaAdministration = async () => {
         </div>
       );
     }
-    const topicsResult = await getForumTopics(dunaCategoryId);
+    const topicsResult = await getForumTopics({ categoryId: dunaCategoryId });
     if (topicsResult.success) {
       dunaReports = transformForumTopics(topicsResult.data, {
         mergePostAttachments: true,
