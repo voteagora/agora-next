@@ -16,6 +16,158 @@ import { logForumAuditAction } from "./admin";
 
 const { slug } = Tenant.current();
 
+// Lightweight schema for topic upvotes
+const topicVoteSchema = z.object({
+  topicId: z.number().min(1, "Topic ID is required"),
+  address: z.string().min(1, "Address is required"),
+  signature: z.string().min(1, "Signature is required"),
+  message: z.string().min(1, "Signed message is required"),
+});
+
+async function getRootPostId(topicId: number): Promise<number | null> {
+  const root = await prismaWeb2Client.forumPost.findFirst({
+    where: { dao_slug: slug, topicId, parentPostId: null },
+    orderBy: { createdAt: "asc" },
+    select: { id: true },
+  });
+  return root?.id ?? null;
+}
+
+export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
+  try {
+    const validated = topicVoteSchema.parse(data);
+
+    const isValid = await verifyMessage({
+      address: validated.address as `0x${string}`,
+      message: validated.message,
+      signature: validated.signature as `0x${string}`,
+    });
+    if (!isValid) return { success: false, error: "Invalid signature" } as const;
+
+    const topic = await prismaWeb2Client.forumTopic.findFirst({
+      where: { id: validated.topicId, dao_slug: slug },
+      select: { id: true },
+    });
+    if (!topic) return { success: false, error: "Topic not found" } as const;
+
+    const rootPostId = await getRootPostId(validated.topicId);
+    if (!rootPostId)
+      return { success: false, error: "Root post not found" } as const;
+
+    // Upsert an upvote (vote = 1) for this user on the root post
+    await prismaWeb2Client.forumPostVote.upsert({
+      where: {
+        dao_slug_address_postId: {
+          dao_slug: slug,
+          address: validated.address,
+          postId: rootPostId,
+        },
+      },
+      update: { vote: 1 },
+      create: {
+        dao_slug: slug,
+        address: validated.address,
+        postId: rootPostId,
+        vote: 1,
+      },
+    });
+
+    const upvotes = await prismaWeb2Client.forumPostVote.count({
+      where: { dao_slug: slug, postId: rootPostId, vote: 1 },
+    });
+
+    return { success: true as const, data: { postId: rootPostId, upvotes } };
+  } catch (error) {
+    console.error("Error upvoting forum topic:", error);
+    return handlePrismaError(error);
+  } finally {
+    await prismaWeb2Client.$disconnect();
+  }
+}
+
+export async function removeUpvoteForumTopic(
+  data: z.infer<typeof topicVoteSchema>
+) {
+  try {
+    const validated = topicVoteSchema.parse(data);
+
+    const isValid = await verifyMessage({
+      address: validated.address as `0x${string}`,
+      message: validated.message,
+      signature: validated.signature as `0x${string}`,
+    });
+    if (!isValid) return { success: false, error: "Invalid signature" } as const;
+
+    const rootPostId = await getRootPostId(validated.topicId);
+    if (!rootPostId)
+      return { success: false, error: "Root post not found" } as const;
+
+    await prismaWeb2Client.forumPostVote.deleteMany({
+      where: {
+        dao_slug: slug,
+        address: validated.address,
+        postId: rootPostId,
+      },
+    });
+
+    const upvotes = await prismaWeb2Client.forumPostVote.count({
+      where: { dao_slug: slug, postId: rootPostId, vote: 1 },
+    });
+
+    return { success: true as const, data: { postId: rootPostId, upvotes } };
+  } catch (error) {
+    console.error("Error removing upvote from forum topic:", error);
+    return handlePrismaError(error);
+  } finally {
+    await prismaWeb2Client.$disconnect();
+  }
+}
+
+export async function getForumTopicUpvotes(topicId: number) {
+  try {
+    const rootPostId = await getRootPostId(topicId);
+    if (!rootPostId) return { success: true as const, data: { postId: null, upvotes: 0 } };
+    const upvotes = await prismaWeb2Client.forumPostVote.count({
+      where: { dao_slug: slug, postId: rootPostId, vote: 1 },
+    });
+    return { success: true as const, data: { postId: rootPostId, upvotes } };
+  } catch (error) {
+    console.error("Error getting topic upvotes:", error);
+    return handlePrismaError(error);
+  } finally {
+    await prismaWeb2Client.$disconnect();
+  }
+}
+
+export async function getMyForumTopicVote(topicId: number, address: string) {
+  try {
+    const rootPostId = await getRootPostId(topicId);
+    if (!rootPostId)
+      return { success: true as const, data: { postId: null, hasVoted: false } };
+
+    const vote = await prismaWeb2Client.forumPostVote.findUnique({
+      where: {
+        dao_slug_address_postId: {
+          dao_slug: slug,
+          address,
+          postId: rootPostId,
+        },
+      },
+      select: { vote: true },
+    });
+
+    return {
+      success: true as const,
+      data: { postId: rootPostId, hasVoted: !!vote && vote.vote === 1 },
+    };
+  } catch (error) {
+    console.error("Error checking my topic vote:", error);
+    return handlePrismaError(error);
+  } finally {
+    await prismaWeb2Client.$disconnect();
+  }
+}
+
 export async function createForumPost(
   topicId: number,
   data: z.infer<typeof createPostSchema>
@@ -275,9 +427,24 @@ export async function getForumPostsByTopic(topicId: number) {
       orderBy: { createdAt: "asc" },
     });
 
+    const groupByEmojiAddresses = (reactions: any[] | undefined) => {
+      const out: Record<string, string[]> = {};
+      (reactions || []).forEach((r: any) => {
+        const e = (r.emoji || "").trim();
+        const addr = (r.address || "").toLowerCase();
+        if (!e || !addr) return;
+        if (!out[e]) out[e] = [];
+        if (!out[e].includes(addr)) out[e].push(addr);
+      });
+      return out;
+    };
+
     return {
       success: true,
-      data: posts,
+      data: posts.map((p) => ({
+        ...p,
+        reactionsByEmoji: groupByEmojiAddresses((p as any).reactions),
+      })),
     };
   } catch (error) {
     console.error("Error getting forum posts:", error);
@@ -316,12 +483,65 @@ export async function getForumPost(postId: number) {
       };
     }
 
+    const groupByEmojiAddresses = (reactions: any[] | undefined) => {
+      const out: Record<string, string[]> = {};
+      (reactions || []).forEach((r: any) => {
+        const e = (r.emoji || "").trim();
+        const addr = (r.address || "").toLowerCase();
+        if (!e || !addr) return;
+        if (!out[e]) out[e] = [];
+        if (!out[e].includes(addr)) out[e].push(addr);
+      });
+      return out;
+    };
+
     return {
       success: true,
-      data: post,
+      data: {
+        ...post,
+        reactionsByEmoji: groupByEmojiAddresses((post as any).reactions),
+      },
     };
   } catch (error) {
     console.error("Error getting forum post:", error);
+    return handlePrismaError(error);
+  } finally {
+    await prismaWeb2Client.$disconnect();
+  }
+}
+
+// Fetch the most recent non-NSFW, non-deleted post for the current tenant
+export async function getLatestForumPost() {
+  try {
+    const post = await prismaWeb2Client.forumPost.findFirst({
+      where: {
+        dao_slug: slug,
+        isNsfw: false,
+        deletedAt: null,
+      },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        createdAt: true,
+        topicId: true,
+      },
+    });
+
+    if (!post) return { success: true as const, data: null };
+
+    return {
+      success: true as const,
+      data: {
+        id: post.id,
+        createdAt:
+          post.createdAt instanceof Date
+            ? post.createdAt.toISOString()
+            : new Date(post.createdAt).toISOString(),
+        topicId: post.topicId,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting latest forum post:", error);
     return handlePrismaError(error);
   } finally {
     await prismaWeb2Client.$disconnect();

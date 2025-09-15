@@ -6,3 +6,4 @@ export * from "./analytics";
 export * from "./search";
 export * from "./shared";
 export * from "./admin";
+export * from "./reactions";

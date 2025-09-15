@@ -13,14 +13,23 @@ import { removeForumTopicFromIndex, indexForumTopic } from "./search";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import { getIPFSUrl } from "@/lib/pinata";
 import { logForumAuditAction } from "./admin";
 const { slug } = Tenant.current();
 
-export async function getForumTopics(
-  categoryId?: number,
-  limit: number = 20,
-  offset: number = 0
-) {
+interface GetForumTopicsOptions {
+  categoryId?: number;
+  excludeCategoryNames?: string[];
+  limit?: number;
+  offset?: number;
+}
+
+export async function getForumTopics({
+  categoryId,
+  excludeCategoryNames,
+  limit = 20,
+  offset = 0,
+}: GetForumTopicsOptions = {}) {
   try {
     const whereClause: any = {
       dao_slug: slug,
@@ -30,6 +39,14 @@ export async function getForumTopics(
 
     if (categoryId !== undefined) {
       whereClause.categoryId = categoryId;
+    } else if (excludeCategoryNames && excludeCategoryNames.length > 0) {
+      whereClause.NOT = {
+        category: {
+          name: {
+            in: excludeCategoryNames,
+          },
+        },
+      };
     }
 
     const topics = await prismaWeb2Client.forumTopic.findMany({
@@ -46,6 +63,9 @@ export async function getForumTopics(
         posts: {
           where: { isNsfw: false },
           orderBy: { createdAt: "asc" },
+          include: {
+            reactions: true,
+          },
         },
         _count: {
           select: {
@@ -60,10 +80,29 @@ export async function getForumTopics(
       skip: offset,
     });
 
+    const groupByEmojiAddresses = (reactions: any[] | undefined) => {
+      const out: Record<string, string[]> = {};
+      (reactions || []).forEach((r: any) => {
+        const e = (r.emoji || "").trim();
+        const addr = (r.address || "").toLowerCase();
+        if (!e || !addr) return;
+        if (!out[e]) out[e] = [];
+        if (!out[e].includes(addr)) out[e].push(addr);
+      });
+      return out;
+    };
+
     return {
       success: true,
-      data: topics.map((topic) => ({
+      data: topics.map((topic: any) => ({
         ...topic,
+        posts: topic.posts.map((p: any) => ({
+          ...p,
+          reactionsByEmoji: groupByEmojiAddresses(p.reactions),
+        })),
+        topicReactionsByEmoji: groupByEmojiAddresses(
+          topic.posts?.[0]?.reactions
+        ),
         postsCount: topic._count.posts,
       })),
     };
@@ -100,6 +139,7 @@ export async function getForumTopic(topicId: number) {
           include: {
             votes: true,
             reactions: true,
+            attachments: true,
           },
         },
       },
@@ -112,9 +152,43 @@ export async function getForumTopic(topicId: number) {
       };
     }
 
+    const groupByEmojiAddresses = (reactions: any[] | undefined) => {
+      const out: Record<string, string[]> = {};
+      (reactions || []).forEach((r: any) => {
+        const e = (r.emoji || "").trim();
+        const addr = (r.address || "").toLowerCase();
+        if (!e || !addr) return;
+        if (!out[e]) out[e] = [];
+        if (!out[e].includes(addr)) out[e].push(addr);
+      });
+      return out;
+    };
+
+    const mappedPosts = (topic as any).posts.map((p: any) => ({
+      ...p,
+      reactionsByEmoji: groupByEmojiAddresses(p.reactions),
+      attachments: (p.attachments || []).map((att: any) => ({
+        id: att.id,
+        fileName: att.fileName,
+        contentType: att.contentType,
+        fileSize: Number(att.fileSize ?? 0),
+        ipfsCid: att.ipfsCid,
+        url: getIPFSUrl(att.ipfsCid),
+        createdAt: (att.createdAt instanceof Date
+          ? att.createdAt
+          : new Date(att.createdAt)
+        ).toISOString(),
+        uploadedBy: att.address,
+      })),
+    }));
+
     return {
       success: true,
-      data: topic,
+      data: {
+        ...topic,
+        posts: mappedPosts,
+        topicReactionsByEmoji: groupByEmojiAddresses((topic as any).posts?.[0]?.reactions),
+      },
     };
   } catch (error) {
     console.error("Error getting forum topic:", error);
@@ -383,7 +457,7 @@ export async function restoreForumTopic(
     });
 
     if (restoredTopic) {
-      const firstPost = restoredTopic.posts[0];
+      const firstPost = (restoredTopic as any).posts[0];
       indexForumTopic({
         topicId: restoredTopic.id,
         daoSlug: slug,

@@ -31,6 +31,7 @@ export interface ForumPost {
   deletedAt?: string | null;
   deletedBy?: string | null;
   isNsfw?: boolean;
+  reactionsByEmoji?: Record<string, string[]>;
 }
 
 export interface ForumCategory {
@@ -73,6 +74,7 @@ export function transformForumTopics(
         attachments: post.attachments || [],
         deletedAt: post.deletedAt,
         deletedBy: post.deletedBy,
+        reactionsByEmoji: post.reactionsByEmoji,
       })) || [];
 
     return {

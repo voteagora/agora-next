@@ -19,6 +19,13 @@ import {
   restoreForumTopic,
   restoreForumPost,
 } from "@/lib/actions/forum";
+import { addForumReaction, removeForumReaction } from "@/lib/actions/forum";
+import {
+  upvoteForumTopic,
+  removeUpvoteForumTopic,
+  getForumTopicUpvotes,
+  getMyForumTopicVote,
+} from "@/lib/actions/forum";
 import { uploadAttachment } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData, AttachmentData } from "@/lib/fileUtils";
 import {
@@ -64,7 +71,7 @@ export const useForum = () => {
       setError(null);
 
       try {
-        const result = await getForumTopics(categoryId);
+        const result = await getForumTopics({ categoryId });
 
         if (!result.success) {
           throw new Error(
@@ -102,7 +109,7 @@ export const useForum = () => {
           throw new Error(result.error);
         }
 
-        const topic = result.data;
+        const topic: any = result.data;
 
         if (!topic) {
           throw new Error("No topic data received");
@@ -113,13 +120,19 @@ export const useForum = () => {
           title: topic.title,
           author: topic.address,
           content: topic.posts?.[0]?.content || "",
-          createdAt: topic.createdAt.toISOString(),
+          createdAt: (topic.createdAt instanceof Date
+            ? topic.createdAt
+            : new Date(topic.createdAt)
+          ).toISOString(),
           comments:
-            topic.posts?.slice(1).map((post) => ({
+            topic.posts?.slice(1).map((post: any) => ({
               id: post.id,
               author: post.address,
               content: post.content,
-              createdAt: post.createdAt.toISOString(),
+              createdAt: (post.createdAt instanceof Date
+                ? post.createdAt
+                : new Date(post.createdAt)
+              ).toISOString(),
               parentId: post.parentPostId || undefined,
             })) || [],
           attachments: [],
@@ -776,6 +789,152 @@ export const useForum = () => {
     [isConnected, address, signMessageAsync]
   );
 
+  const addReaction = useCallback(
+    async (
+      targetType: "topic" | "post",
+      targetId: number,
+      emoji: string
+    ): Promise<boolean> => {
+      if (!isConnected || !address) {
+        throw new Error("Please connect your wallet first");
+      }
+      try {
+        const message = `Add forum reaction: ${emoji} to ${targetType}:${targetId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+        const res = await addForumReaction({
+          // Only post reactions supported by schema
+          targetType: "post",
+          targetId,
+          emoji,
+          address,
+          signature,
+          message,
+        });
+        if (!res.success)
+          throw new Error(res.error || "Failed to add reaction");
+        return true;
+      } catch (err) {
+        const msg =
+          err instanceof Error ? err.message : "Failed to add reaction";
+        setError(msg);
+        toast.error(msg);
+        return false;
+      }
+    },
+    [isConnected, address, signMessageAsync]
+  );
+
+  const removeReaction = useCallback(
+    async (
+      targetType: "topic" | "post",
+      targetId: number,
+      emoji: string
+    ): Promise<boolean> => {
+      if (!isConnected || !address) {
+        throw new Error("Please connect your wallet first");
+      }
+      try {
+        const message = `Remove forum reaction: ${emoji} from ${targetType}:${targetId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+        const res = await removeForumReaction({
+          targetType: "post",
+          targetId,
+          emoji,
+          address,
+          signature,
+          message,
+        });
+        if (!res.success)
+          throw new Error(res.error || "Failed to remove reaction");
+        return true;
+      } catch (err) {
+        const msg =
+          err instanceof Error ? err.message : "Failed to remove reaction";
+        setError(msg);
+        toast.error(msg);
+        return false;
+      }
+    },
+    [isConnected, address, signMessageAsync]
+  );
+
+  const upvoteTopic = useCallback(
+    async (topicId: number): Promise<number | null> => {
+      if (!isConnected || !address) {
+        throw new Error("Please connect your wallet first");
+      }
+      try {
+        const message = `Upvote forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+        const res = await upvoteForumTopic({
+          topicId,
+          address,
+          signature,
+          message,
+        });
+        if (!res.success) throw new Error(res.error || "Failed to upvote");
+        return res.data?.upvotes ?? null;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Failed to upvote";
+        setError(msg);
+        toast.error(msg);
+        return null;
+      }
+    },
+    [isConnected, address, signMessageAsync]
+  );
+
+  const removeUpvoteTopic = useCallback(
+    async (topicId: number): Promise<number | null> => {
+      if (!isConnected || !address) {
+        throw new Error("Please connect your wallet first");
+      }
+      try {
+        const message = `Remove upvote forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
+        const signature = await signMessageAsync({ message });
+        const res = await removeUpvoteForumTopic({
+          topicId,
+          address,
+          signature,
+          message,
+        });
+        if (!res.success)
+          throw new Error(res.error || "Failed to remove upvote");
+        return res.data?.upvotes ?? null;
+      } catch (err) {
+        const msg =
+          err instanceof Error ? err.message : "Failed to remove upvote";
+        setError(msg);
+        toast.error(msg);
+        return null;
+      }
+    },
+    [isConnected, address, signMessageAsync]
+  );
+
+  const fetchTopicUpvotes = useCallback(async (topicId: number) => {
+    try {
+      const res = await getForumTopicUpvotes(topicId);
+      if (!res.success) throw new Error(res.error || "Failed to fetch upvotes");
+      return res.data?.upvotes ?? 0;
+    } catch (err) {
+      return 0;
+    }
+  }, []);
+
+  const hasUpvotedTopic = useCallback(
+    async (topicId: number): Promise<boolean> => {
+      if (!address) return false;
+      try {
+        const res = await getMyForumTopicVote(topicId, address);
+        return !!res.success && !!res.data?.hasVoted;
+      } catch {
+        return false;
+      }
+    },
+    [address]
+  );
+
   return {
     loading,
     error,
@@ -794,6 +953,12 @@ export const useForum = () => {
     archiveAttachment,
     restoreTopic,
     restorePost,
+    addReaction,
+    removeReaction,
+    upvoteTopic,
+    removeUpvoteTopic,
+    fetchTopicUpvotes,
+    hasUpvotedTopic,
   };
 };
 
