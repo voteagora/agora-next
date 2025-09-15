@@ -82,7 +82,7 @@ function JointHouseSettings({
         </div>
       )}
 
-      {proposal_scope !== ProposalScope.ONCHAIN_ONLY && (
+      {/* {proposal_scope !== ProposalScope.ONCHAIN_ONLY && (
         <>
           <div className="flex flex-col space-y-2 mt-6">
             <h3 className="text-sm font-semibold mb-2 text-primary">
@@ -105,7 +105,7 @@ function JointHouseSettings({
             onSelectionChanged={handleCalculationOptionsChange}
           />
         </>
-      )}
+      )} */}
     </div>
   );
 }
