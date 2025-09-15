@@ -63,7 +63,7 @@ export default function Navbar() {
   return (
     <div
       ref={navRef}
-      className="flex flex-row rounded-full border border-line p-1 font-medium bg-infoTabBackground"
+      className="flex flex-row rounded-full border border-line p-1 font-medium bg-infoTabBackground relative"
     >
       {/* Sliding overlay
       <div

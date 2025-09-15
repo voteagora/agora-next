@@ -131,6 +131,7 @@ type TenantUIParams = {
     tokenAmountFont?: string;
     letterSpacing?: string;
     infoSectionBackground?: string;
+    headerBackground?: string;
     infoTabBackground?: string;
     buttonBackground?: string;
     cardBackground?: string;
@@ -191,6 +192,7 @@ export class TenantUI {
     tokenAmountFont?: string;
     letterSpacing?: string;
     infoSectionBackground?: string;
+    headerBackground?: string;
     infoTabBackground?: string;
     buttonBackground?: string;
     cardBackground?: string;
@@ -330,6 +332,7 @@ export class TenantUI {
         tokenAmountFont?: string;
         letterSpacing?: string;
         infoSectionBackground?: string;
+        headerBackground?: string;
         infoTabBackground?: string;
         buttonBackground?: string;
         cardBackground?: string;

@@ -268,6 +268,7 @@ module.exports = {
         brandSecondary: "rgb(var(--brand-secondary) / <alpha-value>)",
         infoSectionBackground:
           "rgb(var(--info-section-background) / <alpha-value>)",
+        headerBackground: "rgb(var(--header-background) / <alpha-value>)",
         infoTabBackground: "rgb(var(--info-tab-background) / <alpha-value>)",
         buttonBackground: "rgb(var(--button-background) / <alpha-value>)",
         cardBackground: "rgb(var(--card-background) / <alpha-value>)",

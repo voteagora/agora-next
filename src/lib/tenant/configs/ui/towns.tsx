@@ -39,6 +39,7 @@ export const townsTenantUIConfig = new TenantUI({
     brandSecondary: "23 20 34",
     tokenAmountFont: "font-chivoMono",
     infoSectionBackground: "30 26 47",     // #1E1A2F
+    headerBackground: "30 26 47",     // #1E1A2F
     infoTabBackground: "19 12 47",         // #130C2F  
     buttonBackground: "25 16 62",          // #19103E
     cardBackground: "30 26 47",            // #1E1A2F

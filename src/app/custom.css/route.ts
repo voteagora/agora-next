@@ -42,7 +42,8 @@ export async function GET() {
     "--brand-secondary": brandSecondary,
     "--info-section-background":
       ui?.customization?.infoSectionBackground || neutral,
-    "--info-tab-background": ui?.customization?.infoTabBackground || wash,
+    "--header-background": ui?.customization?.headerBackground || wash,
+    "--info-tab-background": ui?.customization?.infoTabBackground || neutral,
     "--button-background": ui?.customization?.buttonBackground || primary,
     "--card-background": ui?.customization?.cardBackground || "255 255 255",
     "--card-border": ui?.customization?.cardBorder || "43 36 73",

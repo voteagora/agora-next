@@ -7,7 +7,7 @@ export const HeaderLink = forwardRef(
     const { ui } = Tenant.current();
 
     const activeClass = isActive
-      ? `text-inherit text-primary border shadow-newDefault border-line`
+      ? `text-primary border shadow-newDefault border-line z-10`
       : "text-tertiary";
 
     const handleClick = (e) => {
