@@ -90,6 +90,8 @@ const SuccessMessageCard = ({
   supportType,
   proposalType,
   proposal,
+  options,
+  totalOptions,
 }: {
   forPercentage: number;
   againstPercentage: number;
@@ -99,6 +101,16 @@ const SuccessMessageCard = ({
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
   proposalType: ProposalType;
   proposal: Proposal;
+  options: {
+    description: string;
+    votes: string;
+    votesAmountBN: string;
+    totalVotingPower: string;
+    proposalSettings: any;
+    thresholdPosition: number;
+    isApproved: boolean;
+  }[];
+  totalOptions: number;
 }) => {
   const { namespace, brandName } = Tenant.current();
   return (
@@ -143,7 +155,11 @@ const SuccessMessageCard = ({
         <div className="flex flex-col bg-white gap-3 sm:gap-0 rounded-lg border border-line mt-4 sm:mt-6">
           {proposalType === "APPROVAL" ? (
             <div className="py-2">
-              <OptionsResultsPanel proposal={proposal} showAllOptions={false} />
+              <OptionsResultsPanel
+                proposal={proposal}
+                showAllOptions={false}
+                overrideOptions={options}
+              />
             </div>
           ) : (
             <div className="flex flex-col gap-2 p-3 sm:p-4 pb-0">
@@ -315,6 +331,8 @@ export function ShareDialog({
         supportType={supportType}
         proposalType={proposalType}
         proposal={proposal}
+        options={options}
+        totalOptions={totalOptions}
       />
 
       <div className="pt-2 sm:pt-4 space-y-2 sm:space-y-4">
