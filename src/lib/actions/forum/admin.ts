@@ -4,6 +4,41 @@ import Tenant from "@/lib/tenant/tenant";
 import { getForumCategory } from "./categories";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 
+export async function getForumAdmins() {
+  try {
+    const { slug } = Tenant.current();
+
+    const admins = await prismaWeb2Client.forumAdmin.findMany({
+      where: {
+        dao_slug: slug,
+      },
+      select: {
+        address: true,
+        role: true,
+      },
+      orderBy: {
+        address: "asc",
+      },
+    });
+
+    return {
+      success: true as const,
+      data: admins.map((admin) => ({
+        address: admin.address.toLowerCase(),
+        role: admin.role,
+      })),
+    };
+  } catch (error) {
+    console.error("Error fetching forum admins:", error);
+    return {
+      success: false as const,
+      error: "Failed to load forum admins",
+    };
+  } finally {
+    await prismaWeb2Client.$disconnect();
+  }
+}
+
 export async function checkForumPermissions(
   address: string,
   categoryId?: number

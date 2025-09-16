@@ -2,6 +2,7 @@ import React from "react";
 import { ForumPost } from "@/lib/forumUtils";
 import Thread from "@/components/ForumShared/Thread";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
+import { useForumAdminsList } from "@/hooks/useForum";
 
 
 interface CommentListProps {
@@ -30,6 +31,11 @@ const CommentList = ({
   onUpdate,
 }: CommentListProps) => {
   const { dunaCategoryId } = useDunaCategory();
+  const { admins } = useForumAdminsList();
+  const adminAddresses = React.useMemo(
+    () => admins.map((admin) => admin.address).filter(Boolean),
+    [admins]
+  );
   return (
     <Thread
       comments={comments}
@@ -44,6 +50,7 @@ const CommentList = ({
       onCancelReply={onCancelReply}
       onDelete={onDelete}
       onUpdate={onUpdate}
+      adminAddresses={adminAddresses}
     />
   );
 };

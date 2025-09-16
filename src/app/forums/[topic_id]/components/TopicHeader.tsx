@@ -1,6 +1,7 @@
 import React from "react";
 import { truncateAddress } from "@/app/lib/utils/text";
 import ENSAvatar from "@/components/shared/ENSAvatar";
+import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 
 import TopicUpvote from "./TopicUpvote";
 import { formatRelative } from "@/components/ForumShared/utils";
@@ -13,9 +14,10 @@ interface TopicHeaderProps {
     authorName?: string;
     createdAt: string;
   };
+  isAdmin?: boolean;
 }
 
-export default function TopicHeader({ topic }: TopicHeaderProps) {
+export default function TopicHeader({ topic, isAdmin = false }: TopicHeaderProps) {
   const displayName =
     topic.authorName || (topic.address ? truncateAddress(topic.address) : "");
 
@@ -24,8 +26,9 @@ export default function TopicHeader({ topic }: TopicHeaderProps) {
       <div className="flex items-start mb-1.5 justify-between">
         <div className="flex items-center gap-2">
           <ENSAvatar ensName={topic.address} size={20} />
-          <div>
+          <div className="flex items-center gap-1">
             <div className="font-medium text-sm">{displayName}</div>
+            {isAdmin && <ForumAdminBadge className="text-[9px]" />}
           </div>
           <div className="text-xs text-gray-500 self-center">
             {formatRelative(topic.createdAt)}

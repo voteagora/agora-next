@@ -4,6 +4,7 @@ import React from "react";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
 import { ForumPost } from "@/lib/forumUtils";
+import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 
 import { useAccount } from "wagmi";
 import { useForum, useForumAdmin } from "@/hooks/useForum";
@@ -36,12 +37,14 @@ export interface ThreadProps {
   // Forums UX: reactions on. Replies always shown (no toggle)
   // Duna UX: reactions off. Replies always shown (no toggle)
   forForums?: boolean;
+  adminAddresses?: string[];
 }
 
 interface CommentItemProps extends Omit<ThreadProps, "comments"> {
   comment: ForumPost;
   depth: number;
   comments: ForumPost[];
+  adminAddressSet: Set<string>;
 }
 
 const CommentItem = ({
@@ -59,6 +62,7 @@ const CommentItem = ({
   onCancelReply,
   categoryId,
   forForums,
+  adminAddressSet,
 }: CommentItemProps) => {
   // Replies are always shown (no expand/collapse toggle)
   const { address } = useAccount();
@@ -72,6 +76,10 @@ const CommentItem = ({
   );
   const hasReplies = replies.length > 0;
   const isThisCommentBeingRepliedTo = replyingToId === comment.id;
+  const authorAddress = comment.author?.toLowerCase() || "";
+  const isAuthorAdmin = authorAddress
+    ? adminAddressSet.has(authorAddress)
+    : false;
 
   const canDelete = canDeleteContent(
     address || "",
@@ -168,7 +176,10 @@ const CommentItem = ({
         )}
         <div className="flex-1">
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-            <ENSName address={comment.author || ""} />
+            <div className="flex items-center gap-1">
+              <ENSName address={comment.author || ""} />
+              {isAuthorAdmin && <ForumAdminBadge className="text-[9px]" />}
+            </div>
             <span className="text-xs sm:text-sm text-secondary">
               {formatRelative(comment.createdAt)}
             </span>
@@ -242,6 +253,7 @@ const CommentItem = ({
                 onCancelReply={onCancelReply}
                 categoryId={categoryId}
                 forForums={forForums}
+                adminAddressSet={adminAddressSet}
               />
             </div>
           ))}
@@ -300,6 +312,7 @@ interface CommentThreadProps extends Omit<ThreadProps, "parentId" | "depth"> {
   comments: ForumPost[];
   parentId: number | null;
   depth: number;
+  adminAddressSet: Set<string>;
 }
 
 const CommentThread = ({
@@ -317,6 +330,7 @@ const CommentThread = ({
   onCancelReply,
   categoryId,
   forForums,
+  adminAddressSet,
 }: CommentThreadProps) => {
   const filteredComments = comments.filter((comment) => {
     if (parentId === null) return !comment.parentId;
@@ -342,6 +356,7 @@ const CommentThread = ({
             onCancelReply={onCancelReply}
             categoryId={categoryId}
             forForums={forForums}
+            adminAddressSet={adminAddressSet}
           />
         </div>
       ))}
@@ -362,7 +377,14 @@ export default function Thread({
   onUpdate,
   categoryId,
   forForums = true,
+  adminAddresses = [],
 }: ThreadProps) {
+  const adminAddressSet = React.useMemo(
+    () =>
+      new Set((adminAddresses || []).map((address) => address.toLowerCase())),
+    [adminAddresses]
+  );
+
   return (
     <div className="space-y-3 sm:space-y-4">
       <CommentThread
@@ -380,6 +402,7 @@ export default function Thread({
         onCancelReply={onCancelReply}
         categoryId={categoryId}
         forForums={forForums}
+        adminAddressSet={adminAddressSet}
       />
     </div>
   );
