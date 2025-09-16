@@ -393,7 +393,7 @@ export const uniswapTenantUIConfig = new TenantUI({
       },
     },
     {
-      name: "forum",
+      name: "forums",
       enabled: true,
     },
   ],
