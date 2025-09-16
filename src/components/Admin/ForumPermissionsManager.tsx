@@ -249,14 +249,10 @@ const ForumPermissionsManager = ({
       </div>
 
       {/* Forum Admins Section */}
-      <Card
-        className="border shadow-sm bg-cardBackground border-cardBorder"
-      >
+      <Card className="border shadow-sm bg-cardBackground">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-primary">
-              Admins
-            </h2>
+            <h2 className="text-xl font-semibold text-primary">Admins</h2>
             <Badge variant="secondary">{admins.length} admins</Badge>
           </div>
 
@@ -294,7 +290,9 @@ const ForumPermissionsManager = ({
                 <div
                   key={admin.address}
                   className={`flex items-center justify-between p-3 rounded-md ${
-                    useDarkStyling ? "bg-inputBackgroundDark border border-cardBorder" : "bg-wash"
+                    useDarkStyling
+                      ? "bg-inputBackgroundDark border border-cardBorder"
+                      : "bg-wash"
                   }`}
                 >
                   <span
@@ -309,7 +307,9 @@ const ForumPermissionsManager = ({
                     size="sm"
                     onClick={() => handleRemoveAdmin(admin.address)}
                     disabled={loading || admin.address === address}
-                    className={useDarkStyling ? "bg-red-500 hover:bg-red-600" : ""}
+                    className={
+                      useDarkStyling ? "bg-red-500 hover:bg-red-600" : ""
+                    }
                   >
                     <TrashIcon className="w-4 h-4" />
                   </Button>
@@ -333,7 +333,9 @@ const ForumPermissionsManager = ({
       {/* Forum Permissions Section */}
       <Card
         className={`border shadow-sm ${
-          useDarkStyling ? "bg-cardBackgroundDark border-cardBorder" : "bg-white border-line"
+          useDarkStyling
+            ? "bg-cardBackgroundDark border-cardBorder"
+            : "bg-white border-line"
         }`}
       >
         <CardContent className="p-6">
@@ -376,13 +378,21 @@ const ForumPermissionsManager = ({
                   <SelectValue placeholder="Permission type" />
                 </SelectTrigger>
                 <SelectContent
-                  className={useDarkStyling ? "bg-modalBackgroundDark border-cardBorder" : ""}
+                  className={
+                    useDarkStyling
+                      ? "bg-modalBackgroundDark border-cardBorder"
+                      : ""
+                  }
                 >
                   {PERMISSION_TYPES.map((type) => (
                     <SelectItem
                       key={type.value}
                       value={type.value}
-                      className={useDarkStyling ? "text-white hover:bg-inputBackgroundDark" : ""}
+                      className={
+                        useDarkStyling
+                          ? "text-white hover:bg-inputBackgroundDark"
+                          : ""
+                      }
                     >
                       {type.label}
                     </SelectItem>
@@ -456,7 +466,9 @@ const ForumPermissionsManager = ({
                 <div
                   key={permission.id}
                   className={`flex items-center justify-between p-3 rounded-md ${
-                    useDarkStyling ? "bg-inputBackgroundDark border border-cardBorder" : "bg-wash"
+                    useDarkStyling
+                      ? "bg-inputBackgroundDark border border-cardBorder"
+                      : "bg-wash"
                   }`}
                 >
                   <div className="flex-1">
@@ -486,7 +498,9 @@ const ForumPermissionsManager = ({
                     size="sm"
                     onClick={() => handleRemovePermission(permission.id)}
                     disabled={loading}
-                    className={useDarkStyling ? "bg-red-500 hover:bg-red-600" : ""}
+                    className={
+                      useDarkStyling ? "bg-red-500 hover:bg-red-600" : ""
+                    }
                   >
                     <TrashIcon className="w-4 h-4" />
                   </Button>

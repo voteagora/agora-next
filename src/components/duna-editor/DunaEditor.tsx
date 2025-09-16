@@ -118,7 +118,7 @@ const LinkDialog = ({
             onChange={(e) => setUrl(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="https://example.com"
-            className="w-full px-3 py-2 border border-line rounded-md bg-wash text-primary focus:outline-none focus:ring-1 focus:ring-line focus:border-line"
+            className="w-full px-3 py-2 border border-line rounded-md bg-wash text-primary outline-none"
             autoFocus
           />
           <div className="flex gap-2 mt-3">
@@ -222,7 +222,7 @@ export default function DunaEditor({
     editorProps: {
       attributes: {
         class: cn(
-          "prose prose-sm max-w-none focus:outline-none",
+          "prose prose-sm max-w-none outline-none",
           "prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1",
           "prose-li:my-0 prose-p:leading-relaxed",
           ui.customization?.cardBackground
@@ -391,21 +391,29 @@ export default function DunaEditor({
   return (
     <div
       className={cn(
-        "border rounded-lg shadow-sm focus-within:ring-2 focus-within:border-line transition-all",
+        "border rounded-lg shadow-sm transition-all",
         variant === "post" ? "min-h-[200px]" : "min-h-[120px]",
         className
       )}
       style={{
-        backgroundColor: ui.customization?.cardBackground ? `rgb(${ui.customization.cardBackground})` : "white",
-        borderColor: ui.customization?.cardBorder ? `rgb(${ui.customization.cardBorder})` : "var(--line)",
+        backgroundColor: ui.customization?.cardBackground
+          ? `rgb(${ui.customization.cardBackground})`
+          : "white",
+        borderColor: ui.customization?.cardBorder
+          ? `rgb(${ui.customization.cardBorder})`
+          : "",
       }}
     >
       {/* Toolbar */}
       <div
         className="flex items-center gap-1 p-2 border-b rounded-t-lg"
         style={{
-          backgroundColor: ui.customization?.hoverBackground ? `rgb(${ui.customization.hoverBackground})` : "var(--wash)",
-          borderColor: ui.customization?.cardBorder ? `rgb(${ui.customization.cardBorder})` : "var(--line)",
+          backgroundColor: ui.customization?.hoverBackground
+            ? `rgb(${ui.customization.hoverBackground})`
+            : "var(--wash)",
+          borderColor: ui.customization?.cardBorder
+            ? `rgb(${ui.customization.cardBorder})`
+            : "",
         }}
       >
         <ToolbarButton
@@ -529,7 +537,7 @@ export default function DunaEditor({
       {/* Editor content */}
       <div
         className={cn(
-          "p-3 focus:outline-none",
+          "p-3 outline-none",
           variant === "post" ? "min-h-[160px]" : "min-h-[80px]"
         )}
         onKeyDown={handleKeyDown}

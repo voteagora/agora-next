@@ -75,13 +75,11 @@ const InfoAbout = () => {
   return (
     <>
       <h3 className="text-2xl font-black text-primary mt-12">{sectionTitle}</h3>
-      <div
-        className="mt-4 rounded-xl border border-line shadow-sm bg-infoSectionBackground"
-      >
+      <div className="mt-4 rounded-xl border border-line shadow-sm bg-infoSectionBackground">
         <div
           className={`p-6 flex flex-row flex-wrap sm:flex-nowrap ${ui.customization?.customInfoLayout ? ui.customization.customInfoLayout : "gap-6"}`}
         >
-          {namespace !== TENANT_NAMESPACES.TOWNS && (
+          {!ui.toggle("hide-hero-image")?.enabled && (
             <div
               className={`w-full sm:w-1/2 relative ${ui.customization?.customHeroImageSize ? ui.customization.customHeroImageSize : "h-[200px] sm:h-auto"}`}
             >
@@ -94,19 +92,16 @@ const InfoAbout = () => {
             </div>
           )}
           <div
-            className={`${ui.customization?.customInfoLayout ? "sm:w-auto sm:ml-2" : namespace === TENANT_NAMESPACES.TOWNS ? "w-full" : "sm:w-1/2"}`}
+            className={`${ui.customization?.customInfoLayout ? "sm:w-auto sm:ml-2" : ui.toggle("hide-hero-image")?.enabled ? "w-full" : "sm:w-1/2"}`}
           >
             <div
               className={`${ui.customization?.customTextContainer ? ui.customization.customTextContainer : ""}`}
             >
               <h3 className="text-lg font-bold text-primary">
-                {ui.customization?.customAboutSubtitle ||
-                  (namespace === TENANT_NAMESPACES.DEMO
-                    ? "About Canopy"
-                    : "About " + brandName)}
+                {ui.customization?.customAboutSubtitle || "About " + brandName}
               </h3>
               <p
-                className={`text-secondary mt-3 ${namespace === TENANT_NAMESPACES.TOWNS ? "whitespace-pre-line" : ""}`}
+                className={`text-secondary mt-3 ${ui.toggle("hide-hero-image")?.enabled ? "whitespace-pre-line" : ""}`}
               >
                 {page.description}
               </p>
@@ -144,9 +139,7 @@ const InfoAbout = () => {
             </p>
           </div>
         )}
-        <div
-          className="p-6 rounded-b-xl border-t border-line bg-infoSectionBackground"
-        >
+        <div className="p-6 rounded-b-xl border-t border-line bg-infoSectionBackground">
           <div className="flex flex-row gap-6 flex-wrap sm:flex-nowrap mb-4">
             {activeTabs.map((item, index) => (
               <div
@@ -154,15 +147,13 @@ const InfoAbout = () => {
                 className="flex flex-row gap-3 justify-center items-center mt-3"
               >
                 <div
-                  className={`min-w-[72px] h-[72px] flex justify-center items-center rounded-full border border-line flex sm:hidden lg:flex ${ui.customization?.customIconBackground ? ui.customization.customIconBackground : "bg-tertiary/10"}`}
+                  className={`min-w-[72px] h-[72px] justify-center items-center rounded-full border border-line flex sm:hidden lg:flex ${ui.customization?.customIconBackground ? ui.customization.customIconBackground : "bg-tertiary/10"}`}
                 >
                   {item.icon}
                 </div>
                 <div>
                   <h3 className="font-semibold text-primary">{item.title}</h3>
-                  <p
-                    className={`font-normal ${ui.customization?.customTextColor ? ui.customization.customTextColor : "text-secondary"}`}
-                  >
+                  <p className={`font-normal text-secondary`}>
                     {item.description}
                   </p>
                 </div>

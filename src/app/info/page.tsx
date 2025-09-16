@@ -73,7 +73,8 @@ export default async function Page() {
         <InfoHero />
         <InfoAbout />
         {!ui.toggle("hide-governor-settings")?.enabled && <GovernorSettings />}
-        {hasDunaAdministration && namespace === TENANT_NAMESPACES.TOWNS ? (
+        {hasDunaAdministration &&
+        ui.toggle("towns-duna-administration")?.enabled ? (
           <TownsDunaAdministration />
         ) : (
           hasDunaAdministration && <DunaAdministration />
@@ -103,9 +104,10 @@ export default async function Page() {
             }}
           />
         )}
-        {hasDunaAdministration && namespace !== TENANT_NAMESPACES.TOWNS && (
-          <DunaDisclosures />
-        )}
+        {hasDunaAdministration &&
+          !ui.toggle("towns-duna-administration")?.enabled && (
+            <DunaDisclosures />
+          )}
       </div>
     );
   } else {

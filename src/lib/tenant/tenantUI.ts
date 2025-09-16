@@ -116,7 +116,7 @@ type TenantUIParams = {
   title: string;
   toggles?: UIToggle[];
   tokens?: TenantToken[];
-  customization?: {
+    customization?: {
     primary?: string;
     secondary?: string;
     tertiary?: string;
@@ -139,6 +139,7 @@ type TenantUIParams = {
     hoverBackground?: string;
     textSecondary?: string;
     footerBackground?: string;
+    innerFooterBackground?: string;
     customHeroImageSize?: string;
     customInfoTabs?: Array<{ title: string; description: string }>;
     customIconBackground?: string;
@@ -200,9 +201,9 @@ export class TenantUI {
     hoverBackground?: string;
     textSecondary?: string;
     footerBackground?: string;
+    innerFooterBackground?: string;
     customHeroImageSize?: string;
     customInfoTabs?: Array<{ title: string; description: string }>;
-    customTextColor?: string;
     customIconBackground?: string;
     customInfoLayout?: string;
     customTextContainer?: string;
@@ -340,9 +341,9 @@ export class TenantUI {
         hoverBackground?: string;
         textSecondary?: string;
         footerBackground?: string;
+        innerFooterBackground?: string;
         customHeroImageSize?: string;
         customInfoTabs?: Array<{ title: string; description: string }>;
-        customTextColor?: string;
         customIconBackground?: string;
         customInfoLayout?: string;
         customTextContainer?: string;

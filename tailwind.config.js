@@ -290,6 +290,8 @@ module.exports = {
         hoverBackground: "rgb(var(--hover-background) / <alpha-value>)",
         textSecondary: "rgb(var(--text-secondary) / <alpha-value>)",
         footerBackground: "rgb(var(--footer-background) / <alpha-value>)",
+        innerFooterBackground:
+          "rgb(var(--inner-footer-background) / <alpha-value>)",
         // shad?
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

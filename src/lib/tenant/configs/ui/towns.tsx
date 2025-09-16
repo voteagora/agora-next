@@ -38,15 +38,16 @@ export const townsTenantUIConfig = new TenantUI({
     brandPrimary: "255 255 255",
     brandSecondary: "23 20 34",
     tokenAmountFont: "font-chivoMono",
-    infoSectionBackground: "30 26 47",     // #1E1A2F
-    headerBackground: "30 26 47",     // #1E1A2F
-    infoTabBackground: "19 12 47",         // #130C2F  
-    buttonBackground: "25 16 62",          // #19103E
-    cardBackground: "30 26 47",            // #1E1A2F
-    cardBorder: "43 36 73",                // #2B2449
-    hoverBackground: "42 35 56",           // #2A2338
-    textSecondary: "135 129 159",          // #87819F
-    footerBackground: "19 12 47",          // #130C2F
+    infoSectionBackground: "30 26 47", // #1E1A2F
+    headerBackground: "30 26 47", // #1E1A2F
+    infoTabBackground: "19 12 47", // #130C2F
+    buttonBackground: "25 16 62", // #19103E
+    cardBackground: "30 26 47", // #1E1A2F
+    cardBorder: "43 36 73", // #2B2449
+    hoverBackground: "42 35 56", // #2A2338
+    textSecondary: "135 129 159", // #87819F
+    footerBackground: "19 12 47", // #130C2F
+    innerFooterBackground: "19 12 47", // #130C2F
     customHeroImageSize: "w-auto h-auto",
     customIconBackground: "bg-transparent",
     customInfoLayout: "flex-col sm:flex-row gap-2",
@@ -266,6 +267,18 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       name: "hide-hero",
+      enabled: true,
+    },
+    {
+      name: "hide-hero-image",
+      enabled: true,
+    },
+    {
+      name: "towns-hero-content",
+      enabled: true,
+    },
+    {
+      name: "towns-duna-administration",
       enabled: true,
     },
     {

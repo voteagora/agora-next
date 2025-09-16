@@ -125,7 +125,8 @@ const QuarterlyReportsSection = ({
           ? {
               ...report,
               comments: (report.comments || []).filter(
-                (comment) => comment.id !== commentId
+                (comment) =>
+                  comment.id !== commentId && comment.parentId !== commentId
               ),
             }
           : report
@@ -152,7 +153,9 @@ const QuarterlyReportsSection = ({
               useDarkStyling ? "text-white" : "text-primary"
             }`}
           >
-            {ui.toggle("duna/use-community-dialogue-label")?.enabled ? "Community Dialogue" : "Quarterly Reports"}
+            {ui.toggle("duna/use-community-dialogue-label")?.enabled
+              ? "Community Dialogue"
+              : "Quarterly Reports"}
           </h4>
           {!!address && canCreateTopics && (
             <Button
@@ -196,9 +199,13 @@ const QuarterlyReportsSection = ({
 
       {reports.length === 0 && (
         <div className="text-center py-8">
-          <div className={useDarkStyling ? "text-white" : "text-secondary"}>
-            No reports found. Create the first one!
-          </div>
+          <p
+            className={`text-sm opacity-75 ${
+              useDarkStyling ? "text-white" : "text-secondary"
+            }`}
+          >
+            No reports found.
+          </p>
         </div>
       )}
 

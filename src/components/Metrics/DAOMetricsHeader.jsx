@@ -74,20 +74,12 @@ export default function DAOMetricsHeader() {
   return (
     <>
       {createPortal(
-        <div
-          className="sticky z-50 bottom-0 hidden sm:flex left-0 rounded-t-xl justify-center border-t border-x border-line mx-auto max-w-[1280px] px-3 sm:px-8 h-12 shadow-newDefault"
-          style={{
-            backgroundColor: "rgb(var(--footer-background))",
-          }}
-        >
+        <div className="sticky bg-footerBackground z-50 bottom-0 hidden sm:flex left-0 rounded-t-xl justify-center border-t border-x border-line mx-auto max-w-[1280px] px-3 sm:px-8 h-12 shadow-newDefault">
           <div
             className={cn(
-              "flex flex-row w-full border-wash justify-between",
+              "flex flex-row w-full bg-innerFooterBackground border-wash justify-between",
               "text-xs text-secondary font-inter font-medium"
             )}
-            style={{
-              backgroundColor: "rgb(var(--footer-background))",
-            }}
           >
             <div className="flex items-center justify-start">
               <div className="flex gap-8">

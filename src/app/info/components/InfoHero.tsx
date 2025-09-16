@@ -27,7 +27,7 @@ export const InfoHero = () => {
         >
           {page!.title}
         </h1>
-        {namespace === TENANT_NAMESPACES.TOWNS ? (
+        {ui.toggle("towns-hero-content")?.enabled ? (
           <div className="text-base text-secondary mt-4">
             <div className="whitespace-pre-line">{page!.description}</div>
             <div className="mt-4">
