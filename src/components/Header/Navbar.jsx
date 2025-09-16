@@ -69,12 +69,17 @@ export default function Navbar() {
   return (
     <div
       ref={navRef}
-      className={`relative flex flex-row rounded-full border border-line p-1 font-medium bg-infoTabBackground`}
+      className={`relative flex flex-row rounded-full border border-line p-1 font-medium`}
+      style={
+        ui.customization?.infoTabBackground
+          ? { backgroundColor: ui.customization.infoTabBackground }
+          : {}
+      }
     >
       {/* Sliding overlay */}
       {activeNavItem && (
         <div
-          className="absolute rounded-full border border-line shadow-newDefault transition-all duration-150 ease-in-out h-[38px]"
+          className="absolute rounded-full shadow-newDefault transition-all duration-150 ease-in-out h-[38px]"
           style={{
             left: `${activeIndicator.left}px`,
             width: `${activeIndicator.width}px`,

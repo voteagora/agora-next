@@ -64,18 +64,18 @@ export const InfoHero = () => {
               </a>
             </div>
           </div>
-        ) : namespace === TENANT_NAMESPACES.SYNDICATE ? (
+        ) : ui.toggle("syndicate-hero-content")?.enabled ? (
           <div className="text-base text-secondary mt-4">
             <div className="whitespace-pre-line">{page!.description}</div>
             <div className="mt-4">
               <a
                 href="#duna-administration"
-                className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 bg-[#F8F9F0] text-black rounded-[40px] hover:bg-[#F8F9F0]/90 transition-colors cursor-pointer text-sm sm:text-base"
+                className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 bg-white text-black rounded-[40px] hover:bg-gray-50 transition-colors cursor-pointer text-sm sm:text-base"
               >
                 <svg
                   width="14"
                   height="14"
-                  className="sm:w-4 sm:h-4 flex-shrink-0"
+                  className="sm:w-4 sm:h-4 flex-shrink-0 text-red-500"
                   viewBox="0 0 16 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -94,7 +94,7 @@ export const InfoHero = () => {
                     strokeLinecap="round"
                   />
                 </svg>
-                <span className="whitespace-normal">
+                <span className="whitespace-normal text-red-500">
                   View Syndicate DUNA Member{" "}
                   <span className="underline">Disclosures</span>
                 </span>
@@ -156,7 +156,12 @@ const Card = ({
       <Link
         target="_blank"
         href={link}
-        className={`flex flex-col grow-0 p-1.5 border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)] hover:rotate-0 transition-all hover:z-10 hover:scale-110 bg-infoTabBackground ${className} ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
+        className={`flex flex-col grow-0 p-1.5 border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)] hover:rotate-0 transition-all hover:z-10 hover:scale-110 ${!ui.customization?.cardBackground ? "bg-neutral" : ""} ${className} ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
+        style={
+          ui.customization?.cardBackground
+            ? { backgroundColor: ui.customization.cardBackground }
+            : {}
+        }
       >
         <div
           className={`relative w-full aspect-square ${ui.customization?.customCardSize || "sm:h-[130px] sm:w-[130px] lg:h-[150px] lg:w-[150px]"}`}

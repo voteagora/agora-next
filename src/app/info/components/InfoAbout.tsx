@@ -75,7 +75,14 @@ const InfoAbout = () => {
   return (
     <>
       <h3 className="text-2xl font-black text-primary mt-12">{sectionTitle}</h3>
-      <div className="mt-4 rounded-xl border border-line shadow-sm bg-infoSectionBackground">
+      <div
+        className="mt-4 rounded-xl border border-line shadow-sm"
+        style={
+          ui.customization?.infoSectionBackground
+            ? { backgroundColor: ui.customization.infoSectionBackground }
+            : {}
+        }
+      >
         <div
           className={`p-6 flex flex-row flex-wrap sm:flex-nowrap ${ui.customization?.customInfoLayout ? ui.customization.customInfoLayout : "gap-6"}`}
         >
@@ -144,7 +151,7 @@ const InfoAbout = () => {
             {activeTabs.map((item, index) => (
               <div
                 key={index}
-                className="flex flex-row gap-3 justify-center items-center mt-3"
+                className="flex flex-row gap-3 justify-center items-center mt-3 flex-1 min-w-0"
               >
                 <div
                   className={`min-w-[72px] h-[72px] justify-center items-center rounded-full border border-line flex sm:hidden lg:flex ${ui.customization?.customIconBackground ? ui.customization.customIconBackground : "bg-tertiary/10"}`}

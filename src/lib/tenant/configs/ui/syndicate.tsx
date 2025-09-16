@@ -28,11 +28,14 @@ export const syndicateTenantUIConfig = new TenantUI({
     title: "Syndicate Protocol",
   },
 
+  dunaDisclaimers:
+    "*DUNA Administration Docs will archive upon Q3 financial statements and tax update.",
+
   customization: {
     primary: "0 0 0",
     secondary: "64 64 64",
     tertiary: "115 115 115",
-    neutral: "236 237 229", // #ECEDE5 - main background
+    neutral: "255 255 255", // #FFFFFF - main background
     wash: "236 237 229", // #ECEDE5 - main background
     line: "200 200 200",
     positive: "97 209 97",
@@ -46,8 +49,11 @@ export const syndicateTenantUIConfig = new TenantUI({
     buttonBackground: "#FAFAFA",
     infoSectionBackground: "#FFFFFF",
     cardBackground: "#FFFFFF",
-    customIconBackground: "#FCFCFC",
+    customIconBackground: "#FBFBFB",
     footerBackground: "#ECEDE5",
+    customAboutSubtitle: "About Syndicate Network Collective",
+    customIconColor: "#87819F",
+    customInfoLayout: "flex-col sm:flex-row gap-2",
   },
 
   links: [
@@ -106,9 +112,9 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       route: "info",
-      title: "Welcome to the Syndicate Community",
+      title: "Welcome to Syndicate Network Collective",
       description:
-        "Agora is your home for onchain proposals, voting, and governance",
+        "Your home for information about Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
       meta: {
         title: "Syndicate Protocol Governance",
         description:
@@ -119,55 +125,63 @@ export const syndicateTenantUIConfig = new TenantUI({
       },
       links: [
         {
-          name: "Syndicate Protocol",
-          title: "Syndicate Protocol",
-          url: "https://syndicate.io/", // TODO: Update with actual URL
+          name: "Protocol",
+          title: "Protocol",
+          url: "https://docs.syndicate.io/",
           image: syndicateInfoCard1,
         },
         {
-          name: "Community Discord",
-          title: "Community Discord",
-          url: "https://discord.gg/syndicate", // TODO: Update with actual URL
+          name: "Grants Program",
+          title: "Grants Program",
+          url: "https://discord.gg/syndicate", // TODO: Update with actual document
           image: syndicateInfoCard2,
         },
         {
-          name: "Protocol Docs",
-          title: "Protocol Docs",
-          url: "https://docs.syndicate.io", // TODO: Update with actual URL
+          name: "Governance",
+          title: "Governance",
+          url: "https://syndicatecollective.org/coming-soon", // TODO: Update with actual URL
+          image: syndicateInfoCard3,
+        },
+        {
+          name: "Docs Archive",
+          title: "Docs Archive*",
+          url: "",
           image: syndicateInfoCard3,
         },
       ],
     },
     {
       route: "info/about",
-      title: "About Syndicate",
+      title: "Syndicate Network Collective Roadmap",
       hero: syndicateHero,
       description:
-        "The Syndicate Protocol is an infrastructure system for creating and managing onchain investment vehicles, DAOs, and collective coordination tools. It is implemented through smart contracts designed to prioritize transparency, accessibility, and trustless collaboration, enabling users to pool resources and deploy capital without centralized intermediaries. The Syndicate Protocol is a public good owned and governed by its community of participants.",
+        "This dashboard is the focal point for information related to the Syndicate Network Collective DUNA. As a tax-paying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe Syndicate Protocol is supported by both a Swiss Association and the Syndicate Network Collective DUNA – with the $SYND governance token providing the members ultimate control over how the Treasury should be utilized. While the initial funding of the Swiss Association allows it to operate within established parameters, its role and funding will ultimately be decided by the members of the DUNA who, through their voting power, control whether to extend additional funding to the Swiss Association, redirect that funding to another entity, or take on more responsibilities within the DUNA.\n\nThe Syndicate Network Collective is an organizational framework for collective decision-making and innovation. It aims to provide a foundation for community-aligned platforms to reshape participation and contribution on the internet.",
+      sectionTitle: "Syndicate Network Collective Roadmap",
       tabs: [
         {
-          icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#000000" />,
-          title: "Delegate voting power",
+          icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#737373" />,
+          title: "September 22, 2025",
           description:
-            "The collective is governed by the project's token holders.",
+            "Messaging functionality opens for the DUNA Administration section.",
         },
         {
           icon: (
-            <NotificationIcon className="w-[24px] h-[24px]" stroke="#000000" />
+            <NotificationIcon className="w-[24px] h-[24px]" stroke="#737373" />
           ),
-          title: "Browse proposals",
-          description: "Governance decisions begin as proposals.",
+          title: "October 15, 2025",
+          description:
+            "Q3 financial statements and tax updates will be posted with messaging functionality enabled in the DUNA Administration section.",
         },
         {
           icon: (
             <CheckCircleBrokenIcon
               className="w-[24px] h-[24px]"
-              stroke="#000000"
+              stroke="#737373"
             />
           ),
-          title: "Vote on proposals",
+          title: "November 1, 2025",
           description:
-            "Proposals that move to a vote are accepted or rejected.",
+            "Token governance is live, with a temp check and tax reporting intake (via Cowrie – Administrator Services tooling) completed upon passage of the governance proposal.",
         },
       ],
       meta: {
@@ -182,8 +196,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     {
       route: "coming-soon",
       title: "Welcome to Syndicate governance",
-      description:
-        "Syndicate voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+      description: "Syndicate governance is coming soon.",
       meta: {
         title: "Syndicate Protocol Governance",
         description: "Syndicate Protocol governance coming soon",
@@ -280,6 +293,10 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "changelog/simplified-view",
+      enabled: true,
+    },
+    {
+      name: "syndicate-hero-content",
       enabled: true,
     },
   ],
