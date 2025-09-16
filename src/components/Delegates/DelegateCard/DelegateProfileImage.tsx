@@ -94,9 +94,9 @@ export function DelegateProfileImage({
         <ENSAvatar className="rounded-full w-[44px] h-[44px]" ensName={data} />
       </div>
 
-      <div className="flex flex-col">
-        <div className="text-primary flex flex-row gap-1 font-medium">
-          <div className={cn(truncateText && "truncate")}>
+      <div className="flex flex-col min-w-0">
+        <div className="text-primary flex flex-row gap-1 font-medium items-center min-w-0">
+          <div className={cn("min-w-0 max-w-full flex-1", truncateText && "truncate")}>
             {copyable ? (
               <CopyableHumanAddress address={address} />
             ) : (
