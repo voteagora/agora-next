@@ -39,7 +39,7 @@ function getRequestBaseUrl(): string {
   const host = forwardedHost || headerList.get("host") || "localhost:3000";
   const protoHeader = headerList.get("x-forwarded-proto");
   const protocol =
-    protoHeader || (host.startsWith("localhost") ? "http" : "https");
+    protoHeader || (host && host.startsWith("localhost") ? "http" : "https");
   return `${protocol}://${host}`;
 }
 
