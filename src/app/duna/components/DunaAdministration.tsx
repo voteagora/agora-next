@@ -5,6 +5,16 @@ import DocumentsSection from "./DocumentsSection";
 import { getForumTopics, getDunaCategoryId } from "@/lib/actions/forum";
 import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 import Tenant from "@/lib/tenant/tenant";
+import { UIDunaDescriptionConfig } from "@/lib/tenant/tenantUI";
+
+const DunaDescription = () => {
+  const { ui } = Tenant.current();
+  const toggle = ui.toggle("duna-description");
+  const content = (toggle?.config as UIDunaDescriptionConfig)?.content;
+
+  if (!toggle?.enabled || !content) return null;
+  return <p className="text-sm text-primary mb-6">{content}</p>;
+};
 
 const DunaAdministration = async () => {
   let dunaReports: ForumTopic[] = [];
@@ -37,14 +47,7 @@ const DunaAdministration = async () => {
           DUNA Administration
         </h3>
       </div>
-      {(function () {
-        const toggle = Tenant.current().ui.toggle("duna-description");
-        const content = (toggle?.config as { content?: React.ReactNode })
-          ?.content;
-        return toggle?.enabled && content ? (
-          <p className="text-sm text-primary mb-6">{content}</p>
-        ) : null;
-      })()}
+      <DunaDescription />
 
       <Card className="border border-line bg-white shadow-sm">
         <CardContent className="p-6">
