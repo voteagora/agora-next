@@ -1,4 +1,5 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
+import React from "react";
 import uniswapHero from "@/assets/tenant/uniswap_hero.svg";
 import uniswapLogo from "@/assets/tenant/uniswap_logo.svg";
 import successImage from "@/assets/tenant/uniswap_success.svg";
@@ -364,6 +365,32 @@ export const uniswapTenantUIConfig = new TenantUI({
     {
       name: "duna",
       enabled: true,
+    },
+    {
+      name: "duna-description",
+      enabled: true,
+      config: {
+        content: (
+          <>
+            As of September 9th, 2025, Uniswap Governance adopted a
+            Wyoming-registered Decentralized Unincorporated Nonprofit
+            Association (DUNA) as the legal structure for the Uniswap Governance
+            Protocol. This new legal entity, called &quot;DUNI&quot;, was
+            purpose-built to preserve Uniswap&apos;s decentralized governance
+            structure while enabling engagement with the offchain world. Learn
+            more about the DUNA formation at{" "}
+            <a
+              href="https://uniswapfoundation.org/duni"
+              className="underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              uniswapfoundation.org/duni
+            </a>
+            .
+          </>
+        ),
+      },
     },
     {
       name: "forum",
