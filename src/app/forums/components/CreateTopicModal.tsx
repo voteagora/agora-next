@@ -4,6 +4,7 @@ import React from "react";
 import { useForum } from "@/hooks/useForum";
 import { useRouter } from "next/navigation";
 import ComposerModal from "@/components/ForumShared/ComposerModal";
+import { buildForumTopicPath } from "@/lib/forumUtils";
 
 interface CreateTopicModalProps {
   isOpen: boolean;
@@ -34,7 +35,7 @@ export default function CreateTopicModal({ isOpen, onClose }: CreateTopicModalPr
         });
         if (created?.id) {
           onClose();
-          router.push(`/forums/${created.id}`);
+          router.push(buildForumTopicPath(created.id, created.title));
         }
       }}
     />

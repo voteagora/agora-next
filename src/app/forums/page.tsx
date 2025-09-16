@@ -1,4 +1,5 @@
 import React from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import ForumsSidebar from "./ForumsSidebar";
 import { getForumTopics, getForumTopicUpvotes } from "@/lib/actions/forum";
@@ -7,6 +8,31 @@ import { MessageCircle, Clock, ChevronUp } from "lucide-react";
 import { stripHtmlToText } from "./stripHtml";
 import NewTopicButton from "./components/NewTopicButton";
 import { formatRelative } from "@/components/ForumShared/utils";
+import { buildForumTopicPath } from "@/lib/forumUtils";
+import Tenant from "@/lib/tenant/tenant";
+
+const tenant = Tenant.current();
+const brandName = tenant.brandName || "Agora";
+
+export const metadata: Metadata = {
+  title: `${brandName} Forum Discussions`,
+  description: `Browse the latest topics, questions, and community updates from the ${brandName} forum.`,
+  alternates: {
+    canonical: "/forums",
+  },
+  openGraph: {
+    type: "website",
+    title: `${brandName} Forum Discussions`,
+    description: `Join the ${brandName} community conversations and explore trending forum topics.`,
+    url: "/forums",
+    siteName: `${brandName} Forum`,
+  },
+  twitter: {
+    card: "summary",
+    title: `${brandName} Forum Discussions`,
+    description: `Discover the latest conversations happening on the ${brandName} forum.`,
+  },
+};
 
 export default async function ForumsPage() {
   const [topicsResult] = await Promise.all([
@@ -70,7 +96,7 @@ export default async function ForumsPage() {
                 return (
                   <Link
                     key={topic.id}
-                    href={`/forums/${topic.id}`}
+                    href={buildForumTopicPath(topic.id, topic.title)}
                     className="group block bg-white border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow"
                   >
                     <div className="flex items-start gap-3">
