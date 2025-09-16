@@ -124,7 +124,9 @@ const QuarterlyReportCard = ({
         </div>
         <div className="flex items-center gap-2 text-sm sm:ml-4">
           <ENSAvatar ensName={report.author} className="w-6 h-6" />
-          <div className={`${useDarkStyling ? "text-white" : "text-[#87819F]"}`}>
+          <div
+            className={`${useDarkStyling ? "text-white" : "text-[#87819F]"}`}
+          >
             <ENSName address={report.author} />
           </div>
           {(canArchive || canDelete) && (

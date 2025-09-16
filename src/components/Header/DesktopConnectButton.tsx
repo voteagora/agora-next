@@ -23,7 +23,9 @@ export function DesktopConnectButton() {
             )}
             style={
               ui.customization?.buttonBackground
-                ? { backgroundColor: `rgb(${ui.customization.buttonBackground})` }
+                ? {
+                    backgroundColor: `rgb(${ui.customization.buttonBackground})`,
+                  }
                 : {}
             }
           >

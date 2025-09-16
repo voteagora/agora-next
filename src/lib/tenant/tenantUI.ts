@@ -116,7 +116,7 @@ type TenantUIParams = {
   title: string;
   toggles?: UIToggle[];
   tokens?: TenantToken[];
-    customization?: {
+  customization?: {
     primary?: string;
     secondary?: string;
     tertiary?: string;

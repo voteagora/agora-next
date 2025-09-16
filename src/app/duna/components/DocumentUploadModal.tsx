@@ -362,7 +362,9 @@ export default function DocumentUploadModal({
                   </div>
                   <div
                     className={`w-full rounded-full h-2 ${
-                      useDarkStyling ? "bg-buttonSecondaryDark" : "bg-gray-200 dark:bg-gray-700"
+                      useDarkStyling
+                        ? "bg-buttonSecondaryDark"
+                        : "bg-gray-200 dark:bg-gray-700"
                     }`}
                   >
                     <div

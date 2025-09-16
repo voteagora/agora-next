@@ -8,7 +8,7 @@ import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 const DunaAdministration = async () => {
   let dunaReports: ForumTopic[] = [];
   let documents: any[] = [];
-  
+
   try {
     const dunaCategoryId = await getDunaCategoryId();
     if (!dunaCategoryId) {

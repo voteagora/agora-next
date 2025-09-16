@@ -61,7 +61,8 @@ export async function GET() {
     "--hover-background": ui?.customization?.hoverBackground || tertiary,
     "--text-secondary": ui?.customization?.textSecondary || secondary,
     "--footer-background": ui?.customization?.footerBackground || neutral,
-    "--inner-footer-background": ui?.customization?.innerFooterBackground || wash,
+    "--inner-footer-background":
+      ui?.customization?.innerFooterBackground || wash,
   } as React.CSSProperties;
 
   const root = `

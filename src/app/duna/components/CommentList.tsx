@@ -97,7 +97,9 @@ const CommentItem = ({
         </div>
         <div className="flex-1">
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-            <div className={`${useDarkStyling ? "text-white" : "text-primary"}`}>
+            <div
+              className={`${useDarkStyling ? "text-white" : "text-primary"}`}
+            >
               <ENSName address={comment.author || ""} />
             </div>
             <span
@@ -206,7 +208,9 @@ const CommentItem = ({
       {isThisCommentBeingRepliedTo && (
         <div
           className={`mt-3 ml-8 sm:ml-12 p-3 rounded-lg border ${
-            useDarkStyling ? "bg-inputBackgroundDark border-cardBorder" : "bg-gray-50 border-line"
+            useDarkStyling
+              ? "bg-inputBackgroundDark border-cardBorder"
+              : "bg-gray-50 border-line"
           }`}
         >
           <div className="flex items-center gap-2 mb-2">

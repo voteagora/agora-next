@@ -190,7 +190,9 @@ const ReportModal = ({
   );
 
   return (
-    <div className={`max-w-3xl p-4 ${useDarkStyling ? "bg-modalBackgroundDark" : "bg-white"}`}>
+    <div
+      className={`max-w-3xl p-4 ${useDarkStyling ? "bg-modalBackgroundDark" : "bg-white"}`}
+    >
       <div
         className={`pb-4 sm:pb-6 border-b ${
           useDarkStyling ? "border-cardBorder" : "border-line"
@@ -264,7 +266,9 @@ const ReportModal = ({
             </div>
             <div className="flex-1">
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
-                <div className={`${useDarkStyling ? "text-white" : "text-primary"}`}>
+                <div
+                  className={`${useDarkStyling ? "text-white" : "text-primary"}`}
+                >
                   <ENSName address={report.author || ""} />
                 </div>
                 <span

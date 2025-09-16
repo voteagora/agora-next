@@ -6,10 +6,7 @@ import {
   getArchivedForumAttachments,
   getDunaCategoryId,
 } from "@/lib/actions/forum";
-import {
-  transformForumTopics,
-  ForumTopic,
-} from "@/lib/forumUtils";
+import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 import ArchivedReportsSection from "@/components/Admin/ArchivedReportsSection";
 import ArchivedDocumentsSection from "@/components/Admin/ArchivedDocumentsSection";
 import Tenant from "@/lib/tenant/tenant";
@@ -37,12 +34,10 @@ export default async function ArchivedDataPage() {
       );
     }
 
-    const [topicsResult, documentsResult] = await Promise.all(
-      [
-        getArchivedForumTopics(dunaCategoryId!),
-        getArchivedForumAttachments(),
-      ]
-    );
+    const [topicsResult, documentsResult] = await Promise.all([
+      getArchivedForumTopics(dunaCategoryId!),
+      getArchivedForumAttachments(),
+    ]);
 
     if (topicsResult.success) {
       archivedReports = transformForumTopics(topicsResult.data, {
@@ -53,8 +48,6 @@ export default async function ArchivedDataPage() {
     if (documentsResult.success) {
       archivedDocuments = documentsResult.data;
     }
-
-
   } catch (error) {
     console.error("Error fetching archived data:", error);
   }
@@ -69,7 +62,7 @@ export default async function ArchivedDataPage() {
 
       <Card
         className={`border shadow-sm ${
-          ui.customization?.cardBackground 
+          ui.customization?.cardBackground
             ? "bg-cardBackground border-cardBorder"
             : "bg-white border-line"
         }`}
@@ -78,9 +71,7 @@ export default async function ArchivedDataPage() {
           <ArchivedReportsSection initialReports={archivedReports} />
           <div
             className={`mt-8 pt-6 border-t ${
-              ui.customization?.cardBorder 
-                ? "border-cardBorder"
-                : "border-line"
+              ui.customization?.cardBorder ? "border-cardBorder" : "border-line"
             }`}
           >
             <ArchivedDocumentsSection initialDocuments={archivedDocuments} />

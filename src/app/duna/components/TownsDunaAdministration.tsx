@@ -2,7 +2,11 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import QuarterlyReportsSection from "./QuarterlyReportsSection";
 import DocumentsSection from "./DocumentsSection";
-import { getForumTopics, getForumAttachments, getDunaCategoryId } from "@/lib/actions/forum";
+import {
+  getForumTopics,
+  getForumAttachments,
+  getDunaCategoryId,
+} from "@/lib/actions/forum";
 import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 
 const TownsDunaAdministration = async () => {
