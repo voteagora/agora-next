@@ -27,7 +27,7 @@ const TownsDunaAdministration = async () => {
     }
 
     const [topicsResult, documentsResult] = await Promise.all([
-      getForumTopics(dunaCategoryId),
+      getForumTopics({ categoryId: dunaCategoryId }),
       getForumAttachments(),
     ]);
 
