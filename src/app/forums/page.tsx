@@ -66,7 +66,7 @@ export default async function ForumsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <div className="mt-6 max-w-7xl mx-auto px-6 sm:px-0">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold">Discussions</h1>
