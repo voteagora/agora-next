@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ForumsSidebar from "./ForumsSidebar";
 import { getForumTopics, getForumTopicUpvotes } from "@/lib/actions/forum";
+import { getForumAdmins } from "@/lib/actions/forum/admin";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import { MessageCircle, Clock, ChevronUp } from "lucide-react";
 import { stripHtmlToText } from "./stripHtml";
@@ -10,6 +11,7 @@ import NewTopicButton from "./components/NewTopicButton";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import Tenant from "@/lib/tenant/tenant";
+import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 
 const tenant = Tenant.current();
 const brandName = tenant.brandName || "Agora";
@@ -35,11 +37,18 @@ export const metadata: Metadata = {
 };
 
 export default async function ForumsPage() {
-  const [topicsResult] = await Promise.all([
+  const [topicsResult, adminsResult] = await Promise.all([
     getForumTopics({
       excludeCategoryNames: ["DUNA"],
     }),
+    getForumAdmins(),
   ]);
+
+  const adminAddresses = new Set<string>(
+    adminsResult?.success
+      ? adminsResult.data.map((admin) => admin.address.toLowerCase())
+      : []
+  );
 
   const getLastActivity = (topic: any) => {
     const posts = Array.isArray(topic.posts) ? topic.posts : [];
@@ -92,6 +101,10 @@ export default async function ForumsPage() {
                 );
                 const excerpt = stripHtmlToText(firstPost?.content || "");
                 const upvotes = upvoteCounts.get(topic.id) ?? 0;
+                const authorAddress = (topic.address || "").toLowerCase();
+                const isAuthorAdmin = authorAddress
+                  ? adminAddresses.has(authorAddress)
+                  : false;
 
                 return (
                   <Link
@@ -101,13 +114,16 @@ export default async function ForumsPage() {
                   >
                     <div className="flex items-start gap-3">
                       {/* Avatar */}
-                      <div className="flex-shrink-0">
+                      <div className="flex-shrink-0 relative">
                         {/* ENS avatar based on author address */}
                         <ENSAvatar
                           ensName={topic.address}
                           className="w-[42px] h-[42px]"
                           size={42}
                         />
+                        {isAuthorAdmin && (
+                          <ForumAdminBadge className="absolute -bottom-1 -right-1" />
+                        )}
                       </div>
 
                       {/* Content */}

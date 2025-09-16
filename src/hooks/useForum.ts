@@ -36,6 +36,7 @@ import {
 } from "@/lib/forumUtils";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
+import { getForumAdmins } from "@/lib/actions/forum/admin";
 
 interface ForumDocument {
   id: number;
@@ -977,5 +978,26 @@ export const useForumAdmin = (categoryId?: number) => {
     canCreateAttachments: !!data?.canCreateAttachments,
     canManageAttachments: !!data?.canManageAttachments,
     isLoading,
+  };
+};
+
+export const useForumAdminsList = () => {
+  const query = useQuery({
+    queryKey: ["forum-admins-list"],
+    queryFn: async () => {
+      const res = await getForumAdmins();
+      if (!res.success) {
+        throw new Error(res.error || "Failed to load forum admins");
+      }
+      return res.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  return {
+    admins: query.data ?? [],
+    isLoading: query.isLoading,
+    error: query.error instanceof Error ? query.error : undefined,
+    refetch: query.refetch,
   };
 };

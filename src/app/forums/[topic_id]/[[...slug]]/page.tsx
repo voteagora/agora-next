@@ -19,6 +19,7 @@ import { DunaContentRenderer } from "@/components/duna-editor";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { stripHtmlToText } from "../../stripHtml";
 import Tenant from "@/lib/tenant/tenant";
+import { getForumAdmins } from "@/lib/actions/forum/admin";
 
 interface PageProps {
   params: {
@@ -134,7 +135,10 @@ export async function generateMetadata({
 }
 
 export default async function ForumTopicPage({ params }: PageProps) {
-  const topicBundle = await loadTopic(params.topic_id);
+  const [topicBundle, adminsResult] = await Promise.all([
+    loadTopic(params.topic_id),
+    getForumAdmins(),
+  ]);
   if (!topicBundle) {
     return notFound();
   }
@@ -158,6 +162,14 @@ export default async function ForumTopicPage({ params }: PageProps) {
   const topicBody = transformed.content || "";
   const authorAddress = transformed.author || "";
   const createdAtIso = new Date(topicData.createdAt).toISOString();
+
+  const adminAddresses = adminsResult?.success
+    ? adminsResult.data.map((admin) => admin.address.toLowerCase())
+    : [];
+  const adminAddressSet = new Set(adminAddresses);
+  const isAuthorAdmin = authorAddress
+    ? adminAddressSet.has(authorAddress.toLowerCase())
+    : false;
 
   const headerTopic = {
     id: transformed.id,
@@ -183,7 +195,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
         <div className="flex gap-8">
           {/* Main Content */}
           <div className="flex-1 max-w-4xl">
-            <TopicHeader topic={headerTopic} />
+            <TopicHeader topic={headerTopic} isAdmin={isAuthorAdmin} />
 
             <div className="mt-2 mb-4">
               <DunaContentRenderer
@@ -228,6 +240,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
                 topicId={topicId}
                 initialComments={comments}
                 categoryId={categoryId}
+                adminAddresses={Array.from(adminAddressSet)}
               />
             </div>
           </div>
