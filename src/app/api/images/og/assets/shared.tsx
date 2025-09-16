@@ -1116,7 +1116,6 @@ export const ogLogoForShareVote = (namespace: TenantNamespace) => {
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
-            fill="none"
           >
             {/* Add background rectangle */}
             <rect width="201" height="205" fill="#1E1A2F" />

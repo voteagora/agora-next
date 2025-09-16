@@ -169,9 +169,6 @@ export default function DunaEditor({
   const [linkDialogUrl, setLinkDialogUrl] = useState("");
   const { ui } = Tenant.current();
 
-  // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   // Debug link dialog state
   useEffect(() => {

@@ -13,10 +13,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default async function ArchivedDataPage() {
-  const { ui } = Tenant.current();
-
-  // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
   const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   let archivedReports: ForumTopic[] = [];
@@ -25,10 +22,6 @@ export default async function ArchivedDataPage() {
   if (!ui.toggle("forum") && !ui.toggle("duna")) {
     return <div>Route not supported for namespace</div>;
   }
-
-  // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   try {
     const dunaCategoryId = await getDunaCategoryId();

@@ -40,18 +40,14 @@ export const syndicateTenantUIConfig = new TenantUI({
     brandPrimary: "0 0 0",
     brandSecondary: "236 237 229", // #ECEDE5 - header background
     tokenAmountFont: "font-chivoMono",
-    hideGovernorSettings: true,
     customTitleSize: "text-5xl leading-[48px] sm:text-[56px] sm:leading-[56px]",
     customCardSize: "sm:h-[100px] sm:w-[100px] lg:h-[120px] lg:w-[120px]",
-    customInfoTabBackground: "#FFFFFF",
-    customButtonBackground: "#FAFAFA",
-    customInfoSectionBackground: "#FFFFFF",
-    customCardBackground: "#FFFFFF",
+    infoTabBackground: "#FFFFFF",
+    buttonBackground: "#FAFAFA",
+    infoSectionBackground: "#FFFFFF",
+    cardBackground: "#FFFFFF",
     customIconBackground: "#FCFCFC",
-    customFooterHideChangelog: true,
-    customFooterHideVotableSupply: true,
-    customFooterHideTotalSupply: true,
-    customFooterBackground: "#ECEDE5",
+    footerBackground: "#ECEDE5",
   },
 
   links: [

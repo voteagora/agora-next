@@ -87,11 +87,8 @@ const ForumPermissionsManager = ({
 
   const { isAdmin, isLoading } = useForumAdmin(dunaCategoryId || undefined);
 
-  const { ui } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
-
-  // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
   const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   const handleAddAdmin = async () => {
@@ -243,8 +240,6 @@ const ForumPermissionsManager = ({
       </div>
     );
   }
-
-  const { ui } = Tenant.current();
 
   return (
     <div className={`mt-12 space-y-8 ${useDarkStyling ? "towns-tenant" : ""}`}>
