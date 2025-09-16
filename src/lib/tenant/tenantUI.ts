@@ -29,7 +29,11 @@ export type UIGasRelayConfig = {
 // UI config exists to give tenant specifc config options to a UI toggle
 // the canonical example is wanting to allow tenants to customize
 // their proposal lifecycle feature
-type UIConfig = PLMConfig;
+export type UIDunaDescriptionConfig = {
+  content: ReactNode;
+};
+
+type UIConfig = PLMConfig | UIDunaDescriptionConfig;
 
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account
