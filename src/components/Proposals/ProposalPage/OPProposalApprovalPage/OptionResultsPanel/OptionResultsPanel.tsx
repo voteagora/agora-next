@@ -89,7 +89,7 @@ export default function OptionsResultsPanel({
         className
       )}
     >
-      {(overrideOptions
+      {overrideOptions
         ? overrideOptions
             .slice(0, showAllOptions ? overrideOptions.length : optionsToShow)
             .map((opt, index) => (
@@ -145,13 +145,17 @@ export default function OptionsResultsPanel({
                   isApproved={isApproved}
                 />
               );
-            }))}
+            })}
       {!showAllOptions &&
-        (overrideOptions ? overrideOptions.length : sortedOptions.length) > optionsToShow && (
-        <div className="flex justify-center items-center text-primary bg-wash rounded-lg p-2 w-24 ml-auto">
-          +{(overrideOptions ? overrideOptions.length : sortedOptions.length) - optionsToShow} more
-        </div>
-      )}
+        (overrideOptions ? overrideOptions.length : sortedOptions.length) >
+          optionsToShow && (
+          <div className="flex justify-center items-center text-primary bg-wash rounded-lg p-2 w-24 ml-auto">
+            +
+            {(overrideOptions ? overrideOptions.length : sortedOptions.length) -
+              optionsToShow}{" "}
+            more
+          </div>
+        )}
     </div>
   );
 }
