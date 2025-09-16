@@ -18,6 +18,8 @@ const DunaDescription = () => {
 
 const DunaAdministration = async () => {
   let dunaReports: ForumTopic[] = [];
+  let documents: any[] = [];
+
   try {
     const dunaCategoryId = await getDunaCategoryId();
     if (!dunaCategoryId) {
@@ -37,7 +39,7 @@ const DunaAdministration = async () => {
       });
     }
   } catch (error) {
-    console.error("Error fetching forum topics:", error);
+    console.error("Error fetching forum data:", error);
   }
 
   return (
@@ -53,7 +55,7 @@ const DunaAdministration = async () => {
         <CardContent className="p-6">
           <QuarterlyReportsSection initialReports={dunaReports} />
           <div className="mt-4 pt-4">
-            <DocumentsSection />
+            <DocumentsSection initialDocuments={documents} />
           </div>
         </CardContent>
       </Card>

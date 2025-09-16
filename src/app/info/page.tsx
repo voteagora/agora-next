@@ -9,6 +9,7 @@ import GovernorSettings from "@/app/info/components/GovernorSettings";
 import GovernanceCharts from "@/app/info/components/GovernanceCharts";
 import DunaAdministration from "@/app/duna/components/DunaAdministration";
 import DunaDisclosures from "@/app/duna/components/DunaDisclosures";
+import TownsDunaAdministration from "@/app/duna/components/TownsDunaAdministration";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/getTreasuryBalanceTS";
@@ -71,8 +72,13 @@ export default async function Page() {
       <div className="flex flex-col">
         <InfoHero />
         <InfoAbout />
-        <GovernorSettings />
-        {hasDunaAdministration && <DunaAdministration />}
+        {!ui.toggle("hide-governor-settings")?.enabled && <GovernorSettings />}
+        {hasDunaAdministration &&
+        ui.toggle("towns-duna-administration")?.enabled ? (
+          <TownsDunaAdministration />
+        ) : (
+          hasDunaAdministration && <DunaAdministration />
+        )}
         {treasuryData.result.length > 0 && (
           <ChartTreasury
             initialData={treasuryData.result}
@@ -98,7 +104,10 @@ export default async function Page() {
             }}
           />
         )}
-        {hasDunaAdministration && <DunaDisclosures />}
+        {hasDunaAdministration &&
+          !ui.toggle("towns-duna-administration")?.enabled && (
+            <DunaDisclosures />
+          )}
       </div>
     );
   } else {

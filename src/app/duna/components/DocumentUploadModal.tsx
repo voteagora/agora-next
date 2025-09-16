@@ -16,6 +16,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useForum } from "@/hooks/useForum";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
+import Tenant from "@/lib/tenant/tenant";
 
 interface DocumentUploadModalProps {
   isOpen: boolean;
@@ -40,6 +41,9 @@ export default function DocumentUploadModal({
   const [error, setError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const validateFile = (file: File): { valid: boolean; error?: string } => {
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -216,9 +220,15 @@ export default function DocumentUploadModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleModalClose}>
-      <DialogContent className="sm:max-w-md w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        className={`sm:max-w-md w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto ${
+          useDarkStyling ? "bg-modalBackgroundDark border-cardBorder" : ""
+        }`}
+      >
         <DialogHeader>
-          <DialogTitle>Upload Document</DialogTitle>
+          <DialogTitle className={useDarkStyling ? "text-white" : ""}>
+            Upload Document
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -236,24 +246,50 @@ export default function DocumentUploadModal({
                 border-2 border-dashed rounded-lg p-4 sm:p-8 text-center cursor-pointer transition-colors
                 ${
                   isDragOver
-                    ? "border-gray-400 bg-gray-50 dark:bg-gray-900/20"
-                    : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                    ? useDarkStyling
+                      ? "border-[#5A4B7A] bg-inputBackgroundDark"
+                      : "border-gray-400 bg-gray-50 dark:bg-gray-900/20"
+                    : useDarkStyling
+                      ? "border-[#2B2449] hover:border-[#5A4B7A]"
+                      : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
                 }
               `}
-              style={{ borderColor: "#E5E5E5" }}
+              style={!useDarkStyling ? { borderColor: "#E5E5E5" } : {}}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={triggerFileInput}
             >
-              <DocumentIcon className="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-400 mb-2 sm:mb-4" />
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                <span className="font-medium text-gray-500 dark:text-gray-400">
+              <DocumentIcon
+                className={`mx-auto h-8 w-8 sm:h-12 sm:w-12 mb-2 sm:mb-4 ${
+                  useDarkStyling ? "text-[#87819F]" : "text-gray-400"
+                }`}
+              />
+              <p
+                className={`text-xs sm:text-sm ${
+                  useDarkStyling
+                    ? "text-[#87819F]"
+                    : "text-gray-500 dark:text-gray-400"
+                }`}
+              >
+                <span
+                  className={`font-medium ${
+                    useDarkStyling
+                      ? "text-[#87819F]"
+                      : "text-gray-500 dark:text-gray-400"
+                  }`}
+                >
                   Click to upload
                 </span>{" "}
                 or drag and drop
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 sm:mt-2">
+              <p
+                className={`text-xs mt-1 sm:mt-2 ${
+                  useDarkStyling
+                    ? "text-[#87819F]"
+                    : "text-gray-500 dark:text-gray-500"
+                }`}
+              >
                 PDF, Word, Excel, PowerPoint, images, and text files up to 10MB
               </p>
             </div>
@@ -261,17 +297,37 @@ export default function DocumentUploadModal({
 
           {selectedFile && (
             <div
-              className="border rounded-lg p-3 sm:p-4 bg-gray-50 dark:bg-gray-800"
-              style={{ borderColor: "#E5E5E5" }}
+              className={`border rounded-lg p-3 sm:p-4 ${
+                useDarkStyling
+                  ? "bg-inputBackgroundDark border-[#2B2449]"
+                  : "bg-gray-50 dark:bg-gray-800"
+              }`}
+              style={!useDarkStyling ? { borderColor: "#E5E5E5" } : {}}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
-                  <DocumentIcon className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400 flex-shrink-0" />
+                  <DocumentIcon
+                    className={`h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0 ${
+                      useDarkStyling ? "text-[#87819F]" : "text-gray-400"
+                    }`}
+                  />
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate max-w-[200px]">
+                    <p
+                      className={`text-xs sm:text-sm font-medium truncate max-w-[200px] ${
+                        useDarkStyling
+                          ? "text-white"
+                          : "text-gray-500 dark:text-gray-400"
+                      }`}
+                    >
                       {selectedFile.name}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 break-words">
+                    <p
+                      className={`text-xs break-words ${
+                        useDarkStyling
+                          ? "text-[#87819F]"
+                          : "text-gray-500 dark:text-gray-400"
+                      }`}
+                    >
                       {formatFileSize(selectedFile.size)} • {selectedFile.type}
                     </p>
                   </div>
@@ -280,7 +336,11 @@ export default function DocumentUploadModal({
                 {!isUploading && (
                   <button
                     onClick={handleClearFile}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 flex-shrink-0"
+                    className={`p-1 flex-shrink-0 ${
+                      useDarkStyling
+                        ? "text-[#87819F] hover:text-white"
+                        : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    }`}
                     title="Remove file"
                   >
                     <XMarkIcon className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -290,11 +350,23 @@ export default function DocumentUploadModal({
 
               {isUploading && (
                 <div className="mt-4">
-                  <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <div
+                    className={`flex items-center justify-between text-xs mb-2 ${
+                      useDarkStyling
+                        ? "text-[#87819F]"
+                        : "text-gray-600 dark:text-gray-400"
+                    }`}
+                  >
                     <span>Uploading to IPFS...</span>
                     <span>{Math.min(Math.round(progress), 100)}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div
+                    className={`w-full rounded-full h-2 ${
+                      useDarkStyling
+                        ? "bg-buttonSecondaryDark"
+                        : "bg-gray-200 dark:bg-gray-700"
+                    }`}
+                  >
                     <div
                       className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${Math.min(progress, 100)}%` }}
@@ -324,28 +396,40 @@ export default function DocumentUploadModal({
           <Button
             onClick={handleModalClose}
             disabled={isUploading}
-            className="bg-neutral text-primary border hover:bg-wash w-full sm:w-auto order-2 sm:order-1"
-            style={{ borderColor: "#E5E5E5" }}
+            className={`w-full sm:w-auto order-2 sm:order-1 ${
+              useDarkStyling
+                ? "bg-buttonSecondaryDark text-white border-[#2B2449] hover:bg-buttonPrimaryDark"
+                : "bg-neutral text-primary border hover:bg-wash"
+            }`}
+            style={!useDarkStyling ? { borderColor: "#E5E5E5" } : {}}
           >
             Cancel
           </Button>
           <Button
             onClick={handleFileUpload}
             disabled={!selectedFile || isUploading}
-            className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto order-1 sm:order-2"
-            style={{
-              display: "flex",
-              height: "36px",
-              padding: "12px 20px",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "8px",
-              flexShrink: 0,
-              borderRadius: "8px",
-              background: "#171717",
-              boxShadow:
-                "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-            }}
+            className={`${
+              useDarkStyling
+                ? "bg-buttonPrimaryDark text-white border-[#5A4B7A] hover:bg-buttonPrimaryDark/80"
+                : "text-white border border-black hover:bg-gray-800"
+            } text-sm w-full sm:w-auto order-1 sm:order-2`}
+            style={
+              !useDarkStyling
+                ? {
+                    display: "flex",
+                    height: "36px",
+                    padding: "12px 20px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "8px",
+                    flexShrink: 0,
+                    borderRadius: "8px",
+                    background: "#171717",
+                    boxShadow:
+                      "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+                  }
+                : undefined
+            }
           >
             {isUploading ? "Uploading..." : "Upload Document"}
           </Button>

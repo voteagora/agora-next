@@ -17,6 +17,8 @@ export default function Navbar() {
 
   const hasProposals = ui.toggle("proposals") && ui.toggle("proposals").enabled;
   const hasProposalsHref = Boolean(ui.page("proposals")?.href);
+  const hasComingSoon =
+    ui.toggle("coming-soon") && ui.toggle("coming-soon").enabled;
 
   const { address } = useAccount();
   const { isConnected } = useAgoraContext();
@@ -61,9 +63,9 @@ export default function Navbar() {
   return (
     <div
       ref={navRef}
-      className={`flex flex-row bg-neutral rounded-full border border-line p-1 font-medium relative`}
+      className="flex flex-row rounded-full border border-line p-1 font-medium bg-infoTabBackground relative"
     >
-      {/* Sliding overlay */}
+      {/* Sliding overlay
       <div
         className="absolute bg-white rounded-full border border-line shadow-newDefault transition-all duration-300 ease-in-out h-[38px]"
         style={{
@@ -71,7 +73,7 @@ export default function Navbar() {
           width: `${activeIndicator.width}px`,
           opacity: activeIndicator.width ? 1 : 0,
         }}
-      />
+      /> */}
 
       {hasProposals && (
         <HeaderLink
@@ -84,6 +86,15 @@ export default function Navbar() {
           onClick={() => handleNavClick("proposals")}
         >
           Proposals
+        </HeaderLink>
+      )}
+
+      {hasComingSoon && (
+        <HeaderLink
+          href="/coming-soon"
+          isActive={pathname.includes("coming-soon")}
+        >
+          Governance
         </HeaderLink>
       )}
 

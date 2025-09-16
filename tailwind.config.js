@@ -266,6 +266,32 @@ module.exports = {
         negative: "rgb(var(--negative) / <alpha-value>)",
         brandPrimary: "rgb(var(--brand-primary) / <alpha-value>)",
         brandSecondary: "rgb(var(--brand-secondary) / <alpha-value>)",
+        infoSectionBackground:
+          "rgb(var(--info-section-background) / <alpha-value>)",
+        headerBackground: "rgb(var(--header-background) / <alpha-value>)",
+        infoTabBackground: "rgb(var(--info-tab-background) / <alpha-value>)",
+        buttonBackground: "rgb(var(--button-background) / <alpha-value>)",
+        cardBackground: "rgb(var(--card-background) / <alpha-value>)",
+        cardBorder: "rgb(var(--card-border) / <alpha-value>)",
+        cardBackgroundLight:
+          "rgb(var(--card-background-light) / <alpha-value>)",
+        cardBackgroundDark: "rgb(var(--card-background-dark) / <alpha-value>)",
+        hoverBackgroundLight:
+          "rgb(var(--hover-background-light) / <alpha-value>)",
+        hoverBackgroundDark:
+          "rgb(var(--hover-background-dark) / <alpha-value>)",
+        modalBackgroundDark:
+          "rgb(var(--modal-background-dark) / <alpha-value>)",
+        inputBackgroundDark:
+          "rgb(var(--input-background-dark) / <alpha-value>)",
+        buttonPrimaryDark: "rgb(var(--button-primary-dark) / <alpha-value>)",
+        buttonSecondaryDark:
+          "rgb(var(--button-secondary-dark) / <alpha-value>)",
+        hoverBackground: "rgb(var(--hover-background) / <alpha-value>)",
+        textSecondary: "rgb(var(--text-secondary) / <alpha-value>)",
+        footerBackground: "rgb(var(--footer-background) / <alpha-value>)",
+        innerFooterBackground:
+          "rgb(var(--inner-footer-background) / <alpha-value>)",
         // shad?
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

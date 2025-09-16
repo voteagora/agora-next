@@ -19,6 +19,7 @@ import CommentList from "./CommentList";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
+import Tenant from "@/lib/tenant/tenant";
 
 interface ReportModalProps {
   report: ForumTopic | null;
@@ -50,6 +51,9 @@ const ReportModal = ({
   const { isAdmin, canManageTopics } = useForumAdmin(
     dunaCategoryId || undefined
   );
+
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,6 +131,10 @@ const ReportModal = ({
 
   const handleReply = (commentId: number) => {
     setReplyingToId(commentId);
+  };
+
+  const handleCancelReply = () => {
+    setReplyingToId(null);
     setReplyContent("");
   };
 
@@ -164,11 +172,6 @@ const ReportModal = ({
     }
   };
 
-  const handleCancelReply = () => {
-    setReplyingToId(null);
-    setReplyContent("");
-  };
-
   if (!report) {
     return null;
   }
@@ -187,14 +190,28 @@ const ReportModal = ({
   );
 
   return (
-    <div className="max-w-3xl bg-white p-4">
-      <div className="pb-4 sm:pb-6 border-b border-line">
+    <div
+      className={`max-w-3xl p-4 ${useDarkStyling ? "bg-modalBackgroundDark" : "bg-white"}`}
+    >
+      <div
+        className={`pb-4 sm:pb-6 border-b ${
+          useDarkStyling ? "border-cardBorder" : "border-line"
+        }`}
+      >
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h2 className="text-xl sm:text-2xl font-black text-primary mb-2">
+            <h2
+              className={`text-xl sm:text-2xl font-black mb-2 ${
+                useDarkStyling ? "text-white" : "text-primary"
+              }`}
+            >
               {report.title}
             </h2>
-            <div className="text-xs sm:text-sm text-secondary flex gap-2 divide-x">
+            <div
+              className={`text-xs sm:text-sm flex gap-2 divide-x ${
+                useDarkStyling ? "text-[#87819F]" : "text-secondary"
+              }`}
+            >
               <span>
                 Created{" "}
                 {format(new Date(report.createdAt), "MMM d, yyyy hh:mm")}
@@ -211,7 +228,11 @@ const ReportModal = ({
               {canArchive && (
                 <button
                   onClick={handleArchiveTopic}
-                  className="p-2 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer border border-gray-500 rounded-md"
+                  className={`p-2 transition-colors cursor-pointer border rounded-md ${
+                    useDarkStyling
+                      ? "text-textSecondary hover:text-white border-cardBorder hover:border-buttonPrimaryDark"
+                      : "text-gray-500 hover:text-gray-700 border-gray-500"
+                  }`}
                   title="Archive topic"
                 >
                   <ArchiveBoxIcon className="w-5 h-5" />
@@ -220,7 +241,11 @@ const ReportModal = ({
               {canDelete && (
                 <button
                   onClick={handleDeleteTopic}
-                  className="p-2 text-red-500 hover:text-red-700 transition-colors cursor-pointer border border-red-500 rounded-md"
+                  className={`p-2 transition-colors cursor-pointer border rounded-md ${
+                    useDarkStyling
+                      ? "text-red-400 hover:text-red-300 border-red-400 hover:border-red-300"
+                      : "text-red-500 hover:text-red-700 border-red-500"
+                  }`}
                   title="Delete topic"
                 >
                   <TrashIcon className="w-5 h-5" />
@@ -241,15 +266,27 @@ const ReportModal = ({
             </div>
             <div className="flex-1">
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
-                <ENSName address={report.author || ""} />
-                <span className="text-xs sm:text-sm text-secondary">
+                <div
+                  className={`${useDarkStyling ? "text-white" : "text-primary"}`}
+                >
+                  <ENSName address={report.author || ""} />
+                </div>
+                <span
+                  className={`text-xs sm:text-sm ${
+                    useDarkStyling ? "text-[#87819F]" : "text-secondary"
+                  }`}
+                >
                   posted{" "}
                   {format(new Date(report.createdAt), "MMM d, yyyy hh:mm")}
                 </span>
               </div>
 
               {/* Report Content */}
-              <div className="text-secondary leading-relaxed">
+              <div
+                className={`leading-relaxed ${
+                  useDarkStyling ? "text-white" : "text-secondary"
+                }`}
+              >
                 <DunaContentRenderer content={report.content} />
               </div>
             </div>
@@ -257,8 +294,16 @@ const ReportModal = ({
 
           {/* Attachments */}
           {report.attachments && report.attachments.length > 0 && (
-            <div className="border-t border-line pt-3 sm:pt-4">
-              <div className="text-xs sm:text-sm font-semibold text-primary mb-2 sm:mb-3">
+            <div
+              className={`border-t pt-3 sm:pt-4 ${
+                useDarkStyling ? "border-cardBorder" : "border-line"
+              }`}
+            >
+              <div
+                className={`text-xs sm:text-sm font-semibold mb-2 sm:mb-3 ${
+                  useDarkStyling ? "text-white" : "text-primary"
+                }`}
+              >
                 Attachment
               </div>
               <div className="space-y-2">
@@ -266,7 +311,11 @@ const ReportModal = ({
                   <Button
                     key={attachment.id}
                     variant="outline"
-                    className="w-full justify-start bg-gray-50 border-gray-200 hover:bg-gray-100 text-xs sm:text-sm"
+                    className={`w-full justify-start text-xs sm:text-sm ${
+                      useDarkStyling
+                        ? "bg-inputBackgroundDark border-cardBorder hover:bg-buttonPrimaryDark text-white"
+                        : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                    }`}
                     onClick={() => window.open(attachment.url, "_blank")}
                   >
                     <PaperClipIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
@@ -278,8 +327,16 @@ const ReportModal = ({
           )}
 
           {/* Comments Section */}
-          <div className="border-t border-line pt-3 sm:pt-4">
-            <h4 className="text-base sm:text-lg font-bold text-primary mb-3 sm:mb-4">
+          <div
+            className={`border-t pt-3 sm:pt-4 ${
+              useDarkStyling ? "border-cardBorder" : "border-line"
+            }`}
+          >
+            <h4
+              className={`text-base sm:text-lg font-bold mb-3 sm:mb-4 ${
+                useDarkStyling ? "text-white" : "text-primary"
+              }`}
+            >
               Comments ({comments.length})
             </h4>
 
@@ -296,27 +353,39 @@ const ReportModal = ({
             />
 
             {/* Comment Input */}
-            <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-line">
+            <div
+              className={`mt-4 sm:mt-6 pt-3 sm:pt-4 border-t ${
+                useDarkStyling ? "border-cardBorder" : "border-line"
+              }`}
+            >
               {!isConnected ? (
                 <div className="text-center py-3 sm:py-4 flex items-center justify-center">
                   <ConnectKitButton.Custom>
                     {({ show }) => (
                       <Button
                         onClick={() => show?.()}
-                        className="text-white border border-black hover:bg-gray-800 text-xs sm:text-sm w-full sm:w-auto"
-                        style={{
-                          display: "flex",
-                          height: "36px",
-                          padding: "12px 20px",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          gap: "8px",
-                          flexShrink: 0,
-                          borderRadius: "8px",
-                          background: "#171717",
-                          boxShadow:
-                            "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-                        }}
+                        className={`${
+                          useDarkStyling
+                            ? "bg-buttonPrimaryDark text-white border-[#5A4B7A] hover:bg-buttonPrimaryDark/80"
+                            : "text-white border border-black hover:bg-gray-800"
+                        } text-xs sm:text-sm w-full sm:w-auto`}
+                        style={
+                          !useDarkStyling
+                            ? {
+                                display: "flex",
+                                height: "36px",
+                                padding: "12px 20px",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                gap: "8px",
+                                flexShrink: 0,
+                                borderRadius: "8px",
+                                background: "#171717",
+                                boxShadow:
+                                  "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+                              }
+                            : undefined
+                        }
                       >
                         Connect your wallet to comment
                       </Button>
@@ -336,20 +405,28 @@ const ReportModal = ({
                     <Button
                       type="submit"
                       disabled={isSubmitting || !newComment.trim()}
-                      className="text-white border border-black hover:bg-gray-800 text-xs sm:text-sm w-full sm:w-auto"
-                      style={{
-                        display: "flex",
-                        height: "36px",
-                        padding: "12px 20px",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        gap: "8px",
-                        flexShrink: 0,
-                        borderRadius: "8px",
-                        background: "#171717",
-                        boxShadow:
-                          "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-                      }}
+                      className={`${
+                        useDarkStyling
+                          ? "bg-buttonPrimaryDark text-white border-[#5A4B7A] hover:bg-buttonPrimaryDark/80"
+                          : "text-white border border-black hover:bg-gray-800"
+                      } text-xs sm:text-sm w-full sm:w-auto`}
+                      style={
+                        !useDarkStyling
+                          ? {
+                              display: "flex",
+                              height: "36px",
+                              padding: "12px 20px",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              gap: "8px",
+                              flexShrink: 0,
+                              borderRadius: "8px",
+                              background: "#171717",
+                              boxShadow:
+                                "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+                            }
+                          : undefined
+                      }
                     >
                       {isSubmitting ? "Posting..." : "Post"}
                     </Button>

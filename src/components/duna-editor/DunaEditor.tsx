@@ -24,6 +24,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ListOrdered, Quote } from "lucide-react";
+import Tenant from "@/lib/tenant/tenant";
 
 // Toolbar button component
 const ToolbarButton = ({
@@ -117,7 +118,7 @@ const LinkDialog = ({
             onChange={(e) => setUrl(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="https://example.com"
-            className="w-full px-3 py-2 border border-line rounded-md bg-wash text-primary focus:outline-none focus:ring-1 focus:ring-line focus:border-line"
+            className="w-full px-3 py-2 border border-line rounded-md bg-wash text-primary outline-none"
             autoFocus
           />
           <div className="flex gap-2 mt-3">
@@ -166,6 +167,7 @@ export default function DunaEditor({
 }: DunaEditorProps) {
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [linkDialogUrl, setLinkDialogUrl] = useState("");
+  const { ui } = Tenant.current();
 
   // Debug link dialog state
   useEffect(() => {
@@ -220,13 +222,13 @@ export default function DunaEditor({
     editorProps: {
       attributes: {
         class: cn(
-          "prose prose-sm max-w-none focus:outline-none",
+          "prose prose-sm max-w-none outline-none",
           "prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1",
           "prose-li:my-0 prose-p:leading-relaxed",
-          "prose-ol:text-primary prose-ul:text-primary prose-li:text-primary",
-          "prose-ol:marker:text-primary prose-ul:marker:text-primary",
-          "prose-ol:list-decimal prose-ul:list-disc",
-          "prose-a:text-primary prose-a:underline hover:prose-a:no-underline"
+          ui.customization?.cardBackground
+            ? "prose-ol:text-white prose-ul:text-white prose-li:text-white prose-ol:marker:text-white prose-ul:marker:text-white prose-a:text-white prose-a:underline hover:prose-a:no-underline prose-p:text-white prose-blockquote:text-white prose-code:text-white prose-pre:text-white prose-headings:text-white prose-strong:text-white prose-b:text-white prose-em:text-white prose-i:text-white prose-del:text-white prose-s:text-white prose-ins:text-white prose-mark:text-white"
+            : "prose-ol:text-primary prose-ul:text-primary prose-li:text-primary prose-ol:marker:text-primary prose-ul:marker:text-primary prose-a:text-primary prose-a:underline hover:prose-a:no-underline",
+          "prose-ol:list-decimal prose-ul:list-disc"
         ),
       },
     },
@@ -389,13 +391,31 @@ export default function DunaEditor({
   return (
     <div
       className={cn(
-        "border border-line rounded-lg bg-white shadow-sm focus-within:ring-2 focus-within:ring-line focus-within:border-line transition-all",
+        "border rounded-lg shadow-sm transition-all",
         variant === "post" ? "min-h-[200px]" : "min-h-[120px]",
         className
       )}
+      style={{
+        backgroundColor: ui.customization?.cardBackground
+          ? `rgb(${ui.customization.cardBackground})`
+          : "white",
+        borderColor: ui.customization?.cardBorder
+          ? `rgb(${ui.customization.cardBorder})`
+          : "",
+      }}
     >
       {/* Toolbar */}
-      <div className="flex items-center gap-1 p-2 border-b border-line bg-wash rounded-t-lg">
+      <div
+        className="flex items-center gap-1 p-2 border-b rounded-t-lg"
+        style={{
+          backgroundColor: ui.customization?.hoverBackground
+            ? `rgb(${ui.customization.hoverBackground})`
+            : "var(--wash)",
+          borderColor: ui.customization?.cardBorder
+            ? `rgb(${ui.customization.cardBorder})`
+            : "",
+        }}
+      >
         <ToolbarButton
           isActive={editor.isActive("bold")}
           onClick={toggleBold}
@@ -517,10 +537,13 @@ export default function DunaEditor({
       {/* Editor content */}
       <div
         className={cn(
-          "p-3 focus:outline-none",
+          "p-3 outline-none",
           variant === "post" ? "min-h-[160px]" : "min-h-[80px]"
         )}
         onKeyDown={handleKeyDown}
+        style={{
+          color: ui.customization?.cardBackground ? "white" : "inherit",
+        }}
       >
         <EditorContent editor={editor} />
       </div>

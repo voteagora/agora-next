@@ -4,17 +4,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   getArchivedForumTopics,
   getArchivedForumAttachments,
-  getArchivedForumCategories,
   getDunaCategoryId,
 } from "@/lib/actions/forum";
-import {
-  transformForumTopics,
-  ForumTopic,
-  ForumCategory,
-} from "@/lib/forumUtils";
+import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 import ArchivedReportsSection from "@/components/Admin/ArchivedReportsSection";
 import ArchivedDocumentsSection from "@/components/Admin/ArchivedDocumentsSection";
-import ArchivedCategoriesSection from "@/components/Admin/ArchivedCategoriesSection";
 import Tenant from "@/lib/tenant/tenant";
 
 export default async function ArchivedDataPage() {
@@ -22,7 +16,6 @@ export default async function ArchivedDataPage() {
 
   let archivedReports: ForumTopic[] = [];
   let archivedDocuments: any[] = [];
-  let archivedCategories: ForumCategory[] = [];
 
   if (!ui.toggle("forum") && !ui.toggle("duna")) {
     return <div>Route not supported for namespace</div>;
@@ -41,13 +34,10 @@ export default async function ArchivedDataPage() {
       );
     }
 
-    const [topicsResult, documentsResult, categoriesResult] = await Promise.all(
-      [
-        getArchivedForumTopics(dunaCategoryId),
-        getArchivedForumAttachments(),
-        getArchivedForumCategories(),
-      ]
-    );
+    const [topicsResult, documentsResult] = await Promise.all([
+      getArchivedForumTopics(dunaCategoryId!),
+      getArchivedForumAttachments(),
+    ]);
 
     if (topicsResult.success) {
       archivedReports = transformForumTopics(topicsResult.data, {
@@ -57,18 +47,6 @@ export default async function ArchivedDataPage() {
 
     if (documentsResult.success) {
       archivedDocuments = documentsResult.data;
-    }
-
-    if (categoriesResult.success) {
-      archivedCategories = categoriesResult.data.map((category) => ({
-        id: category.id,
-        name: category.name,
-        description: category.description || undefined,
-        archived: category.archived,
-        adminOnlyTopics: category.adminOnlyTopics,
-        createdAt: category.createdAt.toISOString(),
-        updatedAt: category.updatedAt.toISOString(),
-      }));
     }
   } catch (error) {
     console.error("Error fetching archived data:", error);
@@ -82,13 +60,20 @@ export default async function ArchivedDataPage() {
         </h3>
       </div>
 
-      <Card className="border border-line bg-white shadow-sm">
+      <Card
+        className={`border shadow-sm ${
+          ui.customization?.cardBackground
+            ? "bg-cardBackground border-cardBorder"
+            : "bg-white border-line"
+        }`}
+      >
         <CardContent className="p-6">
           <ArchivedReportsSection initialReports={archivedReports} />
-          <div className="mt-8 pt-6 border-t border-line">
-            <ArchivedCategoriesSection initialCategories={archivedCategories} />
-          </div>
-          <div className="mt-8 pt-6 border-t border-line">
+          <div
+            className={`mt-8 pt-6 border-t ${
+              ui.customization?.cardBorder ? "border-cardBorder" : "border-line"
+            }`}
+          >
             <ArchivedDocumentsSection initialDocuments={archivedDocuments} />
           </div>
         </CardContent>
