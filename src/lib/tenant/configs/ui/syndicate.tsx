@@ -259,7 +259,31 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "hide-governor-settings",
+      enabled: true,
+    },
+    {
+      name: "hide-hero",
+      enabled: true,
+    },
+    {
       name: "hide-hero-image",
+      enabled: true,
+    },
+    {
+      name: "footer/hide-total-supply",
+      enabled: true,
+    },
+    {
+      name: "footer/hide-votable-supply",
+      enabled: true,
+    },
+    {
+      name: "footer/hide-changelog",
+      enabled: true,
+    },
+    {
+      name: "changelog/simplified-view",
       enabled: true,
     },
   ],
