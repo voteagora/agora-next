@@ -49,6 +49,47 @@ export interface TransformForumTopicsOptions {
   mergePostAttachments?: boolean;
 }
 
+/**
+ * Normalize a forum topic title into a URL-safe slug suitable for SEO-friendly paths.
+ */
+export function slugifyForumTopicTitle(title: string): string {
+  if (!title) return "";
+
+  const normalized = title
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+
+  return normalized
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .trim();
+}
+
+export function buildForumTopicSlug(title?: string | null): string {
+  return slugifyForumTopicTitle(title || "");
+}
+
+export function buildForumTopicPath(id: number, title?: string | null): string {
+  const numericId = Number(id);
+  const slug = buildForumTopicSlug(title);
+  if (!Number.isFinite(numericId)) {
+    return "/forums";
+  }
+  return slug ? `/forums/${Math.abs(Math.trunc(numericId))}/${slug}` : `/forums/${Math.abs(Math.trunc(numericId))}`;
+}
+
+export function extractForumTopicId(raw: string | string[] | undefined): number | null {
+  if (!raw) return null;
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  if (!value) return null;
+  const match = value.match(/^\d+/);
+  if (!match) return null;
+  const parsed = Number(match[0]);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 export function transformForumTopics(
   data: any[],
   options: TransformForumTopicsOptions = {}
