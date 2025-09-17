@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import QuarterlyReportsSection from "./QuarterlyReportsSection";
 import DocumentsSection from "./DocumentsSection";
-import { getForumTopics, getDunaCategoryId } from "@/lib/actions/forum";
+import { getForumTopics, getDunaCategoryId, getForumAttachments } from "@/lib/actions/forum";
 import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { UIDunaDescriptionConfig } from "@/lib/tenant/tenantUI";
@@ -32,11 +32,18 @@ const DunaAdministration = async () => {
         </div>
       );
     }
-    const topicsResult = await getForumTopics(dunaCategoryId);
+    const [topicsResult, documentsResult] = await Promise.all([
+      getForumTopics(dunaCategoryId),
+      getForumAttachments({ categoryId: dunaCategoryId }),
+    ]);
+
     if (topicsResult.success) {
       dunaReports = transformForumTopics(topicsResult.data, {
         mergePostAttachments: true,
       });
+    }
+    if (documentsResult.success) {
+      documents = documentsResult.data;
     }
   } catch (error) {
     console.error("Error fetching forum data:", error);

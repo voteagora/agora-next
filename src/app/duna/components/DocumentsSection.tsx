@@ -7,11 +7,9 @@ import { useAccount } from "wagmi";
 import { TrashIcon, ArchiveBoxIcon } from "@heroicons/react/20/solid";
 import DocumentUploadModal from "./DocumentUploadModal";
 import Tenant from "@/lib/tenant/tenant";
-import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { FileIcon } from "lucide-react";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface ForumDocument {
   id: number;
@@ -45,16 +43,11 @@ const DocumentsSection = ({
   );
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
-  // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
-
   const { fetchDocuments, deleteAttachment, archiveAttachment } = useForum();
 
   const { address } = useAccount();
-  const openDialog = useOpenDialog();
   const { dunaCategoryId } = useDunaCategory();
-  const { isAdmin, canCreateAttachments, canManageAttachments } = useForumAdmin(
+  const { isAdmin, canManageAttachments } = useForumAdmin(
     dunaCategoryId || undefined
   );
 
