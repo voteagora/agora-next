@@ -67,10 +67,13 @@ export default async function ForumsSidebar({
 
               {categories.map((cat: any, idx: number) => {
                 const isSelected = selectedCategoryId === cat.id;
+                const href = `/forums?id=${encodeURIComponent(
+                  cat.id
+                )}&title=${encodeURIComponent(cat.name)}`;
                 return (
                   <Link
                     key={cat.id}
-                    href={`/forums?id=${encodeURIComponent(cat.id)}&title=${encodeURIComponent(cat.name)}`}
+                    href={href}
                     aria-current={isSelected ? "page" : undefined}
                     className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
                       isSelected

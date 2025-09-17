@@ -163,12 +163,26 @@ export default async function ForumTopicPage({ params }: PageProps) {
   const authorAddress = transformed.author || "";
   const createdAtIso = new Date(topicData.createdAt).toISOString();
 
-  const adminAddresses = adminsResult?.success
-    ? adminsResult.data.map((admin) => admin.address.toLowerCase())
-    : [];
-  const adminAddressSet = new Set(adminAddresses);
-  const isAuthorAdmin = authorAddress
-    ? adminAddressSet.has(authorAddress.toLowerCase())
+  const adminRolesMap = adminsResult?.success
+    ? adminsResult.data.reduce((map, admin) => {
+        const normalizedAddress = (admin.address || "").toLowerCase();
+        if (!normalizedAddress) {
+          return map;
+        }
+        map.set(normalizedAddress, admin.role ?? null);
+        return map;
+      }, new Map<string, string | null>())
+    : new Map<string, string | null>();
+  const adminDirectory = Array.from(adminRolesMap.entries()).map(
+    ([address, role]) => ({
+      address,
+      role,
+    })
+  );
+  const normalizedAuthor = authorAddress.toLowerCase();
+  const authorRole = adminRolesMap.get(normalizedAuthor) || null;
+  const isAuthorAdmin = normalizedAuthor
+    ? adminRolesMap.has(normalizedAuthor)
     : false;
 
   const headerTopic = {
@@ -177,6 +191,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
     address: authorAddress,
     authorName: truncateAddress(authorAddress) || authorAddress,
     createdAt: createdAtIso,
+    adminRole: authorRole,
   };
 
   const rootPost = comments[0];
@@ -240,7 +255,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
                 topicId={topicId}
                 initialComments={comments}
                 categoryId={categoryId}
-                adminAddresses={Array.from(adminAddressSet)}
+                adminDirectory={adminDirectory}
               />
             </div>
           </div>

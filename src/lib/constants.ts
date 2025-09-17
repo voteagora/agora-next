@@ -193,3 +193,9 @@ export const VOTER_TYPES: VoterTypes[] = [
     value: "Token House",
   },
 ];
+
+export const ADMIN_TYPES: Record<string, string> = {
+  duna_admin: "DUNA_ADMIN",
+  admin: "ADMIN",
+  super_admin: "SUPER_ADMIN",
+};

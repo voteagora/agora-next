@@ -11,14 +11,14 @@ interface ForumThreadProps {
   topicId: number;
   initialComments: ForumPost[];
   categoryId?: number | null;
-  adminAddresses?: string[];
+  adminDirectory?: { address: string; role?: string | null }[];
 }
 
 export default function ForumThread({
   topicId,
   initialComments,
   categoryId,
-  adminAddresses,
+  adminDirectory,
 }: ForumThreadProps) {
   const [comments, setComments] = React.useState<ForumPost[]>(initialComments);
   const [isReplying, setIsReplying] = React.useState(false);
@@ -112,7 +112,7 @@ export default function ForumThread({
         comments={comments}
         forForums
         categoryId={categoryId ?? undefined}
-        adminAddresses={adminAddresses}
+        adminDirectory={adminDirectory}
         onReply={onReply}
         isReplying={isReplying}
         replyingToId={replyingToId}

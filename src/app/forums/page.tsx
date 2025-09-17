@@ -12,6 +12,7 @@ import { formatRelative } from "@/components/ForumShared/utils";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import Tenant from "@/lib/tenant/tenant";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
+import { ADMIN_TYPES } from "@/lib/constants";
 
 const tenant = Tenant.current();
 const brandName = tenant.brandName || "Agora";
@@ -43,8 +44,8 @@ interface ForumsPageProps {
 function parseCategoryId(
   searchParams?: Record<string, string | string[] | undefined>
 ) {
-  const id = searchParams?.id;
-  const value = Array.isArray(id) ? id[0] : id;
+  const param = searchParams?.id;
+  const value = Array.isArray(param) ? param[0] : param;
   if (!value) return null;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
@@ -73,11 +74,16 @@ export default async function ForumsPage({ searchParams }: ForumsPageProps) {
     getForumAdmins(),
   ]);
 
-  const adminAddresses = new Set<string>(
-    adminsResult?.success
-      ? adminsResult.data.map((admin) => admin.address.toLowerCase())
-      : []
-  );
+  const adminRolesMap = adminsResult?.success
+    ? adminsResult.data.reduce((map, admin) => {
+        const normalizedAddress = (admin.address || "").toLowerCase();
+        if (!normalizedAddress) {
+          return map;
+        }
+        map.set(normalizedAddress, admin.role ?? null);
+        return map;
+      }, new Map<string, string | null>())
+    : new Map<string, string | null>();
 
   const topics = topicsResult.success
     ? topicsResult.data.slice().sort((a: any, b: any) => {
@@ -126,8 +132,9 @@ export default async function ForumsPage({ searchParams }: ForumsPageProps) {
                 const excerpt = stripHtmlToText(firstPost?.content || "");
                 const upvotes = upvoteCounts.get(topic.id) ?? 0;
                 const authorAddress = (topic.address || "").toLowerCase();
+                const adminRole = adminRolesMap.get(authorAddress) || null;
                 const isAuthorAdmin = authorAddress
-                  ? adminAddresses.has(authorAddress)
+                  ? adminRolesMap.has(authorAddress)
                   : false;
 
                 return (
@@ -146,7 +153,10 @@ export default async function ForumsPage({ searchParams }: ForumsPageProps) {
                           size={42}
                         />
                         {isAuthorAdmin && (
-                          <ForumAdminBadge className="absolute -bottom-1 -right-1" />
+                          <ForumAdminBadge
+                            className="absolute -bottom-1 -right-1"
+                            type={adminRole ? ADMIN_TYPES[adminRole] : "Admin"}
+                          />
                         )}
                       </div>
 

@@ -19,6 +19,7 @@ import SoftDeletedContent from "@/components/Forum/SoftDeletedContent";
 import EmojiReactions from "@/components/Forum/EmojiReactions";
 import { cn } from "@/lib/utils";
 import { formatRelative } from "@/components/ForumShared/utils";
+import { ADMIN_TYPES } from "@/lib/constants";
 
 export interface ThreadProps {
   comments: ForumPost[];
@@ -39,6 +40,7 @@ export interface ThreadProps {
   // Duna UX: reactions off. Replies always shown (no toggle)
   forForums?: boolean;
   adminAddresses?: string[];
+  adminDirectory?: { address: string; role?: string | null }[];
 }
 
 interface CommentItemProps extends Omit<ThreadProps, "comments"> {
@@ -46,6 +48,7 @@ interface CommentItemProps extends Omit<ThreadProps, "comments"> {
   depth: number;
   comments: ForumPost[];
   adminAddressSet: Set<string>;
+  adminRoleMap: Map<string, string | null>;
 }
 
 const CommentItem = ({
@@ -64,6 +67,7 @@ const CommentItem = ({
   categoryId,
   forForums,
   adminAddressSet,
+  adminRoleMap,
 }: CommentItemProps) => {
   // Replies are always shown (no expand/collapse toggle)
   const { address } = useAccount();
@@ -78,9 +82,11 @@ const CommentItem = ({
   const hasReplies = replies.length > 0;
   const isThisCommentBeingRepliedTo = replyingToId === comment.id;
   const authorAddress = comment.author?.toLowerCase() || "";
+  const adminRole = adminRoleMap.get(authorAddress) || null;
   const isAuthorAdmin = authorAddress
     ? adminAddressSet.has(authorAddress)
     : false;
+  const adminLabel = adminRole || undefined;
   const profileHref = comment.author
     ? `/delegates/${encodeURIComponent(comment.author)}`
     : null;
@@ -210,9 +216,14 @@ const CommentItem = ({
                   <ENSName address={comment.author || ""} />
                 </span>
               )}
-              {isAuthorAdmin && <ForumAdminBadge className="text-[9px]" />}
+              {isAuthorAdmin && (
+                <ForumAdminBadge
+                  className="text-[9px]"
+                  type={adminLabel ? ADMIN_TYPES[adminLabel] : "Admin"}
+                />
+              )}
             </div>
-            <span className="text-xs sm:text-sm text-secondary">
+            <span className="text-xs text-gray-500 self-center">
               {formatRelative(comment.createdAt)}
             </span>
             {canDelete && (
@@ -286,6 +297,7 @@ const CommentItem = ({
                 categoryId={categoryId}
                 forForums={forForums}
                 adminAddressSet={adminAddressSet}
+                adminRoleMap={adminRoleMap}
               />
             </div>
           ))}
@@ -345,6 +357,7 @@ interface CommentThreadProps extends Omit<ThreadProps, "parentId" | "depth"> {
   parentId: number | null;
   depth: number;
   adminAddressSet: Set<string>;
+  adminRoleMap: Map<string, string | null>;
 }
 
 const CommentThread = ({
@@ -363,6 +376,7 @@ const CommentThread = ({
   categoryId,
   forForums,
   adminAddressSet,
+  adminRoleMap,
 }: CommentThreadProps) => {
   const filteredComments = comments.filter((comment) => {
     if (parentId === null) return !comment.parentId;
@@ -389,6 +403,7 @@ const CommentThread = ({
             categoryId={categoryId}
             forForums={forForums}
             adminAddressSet={adminAddressSet}
+            adminRoleMap={adminRoleMap}
           />
         </div>
       ))}
@@ -410,12 +425,37 @@ export default function Thread({
   categoryId,
   forForums = true,
   adminAddresses = [],
+  adminDirectory,
 }: ThreadProps) {
-  const adminAddressSet = React.useMemo(
-    () =>
-      new Set((adminAddresses || []).map((address) => address.toLowerCase())),
-    [adminAddresses]
-  );
+  const normalizedDirectory = React.useMemo(() => {
+    if (adminDirectory && adminDirectory.length) {
+      return adminDirectory
+        .map(({ address, role }) => ({
+          address: (address || "").toLowerCase(),
+          role: role ?? null,
+        }))
+        .filter((entry) => entry.address);
+    }
+
+    return (adminAddresses || [])
+      .map((address) => ({
+        address: (address || "").toLowerCase(),
+        role: null as string | null,
+      }))
+      .filter((entry) => entry.address);
+  }, [adminAddresses, adminDirectory]);
+
+  const adminAddressSet = React.useMemo(() => {
+    return new Set(normalizedDirectory.map((entry) => entry.address));
+  }, [normalizedDirectory]);
+
+  const adminRoleMap = React.useMemo(() => {
+    const map = new Map<string, string | null>();
+    normalizedDirectory.forEach(({ address, role }) => {
+      map.set(address, role);
+    });
+    return map;
+  }, [normalizedDirectory]);
 
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -435,6 +475,7 @@ export default function Thread({
         categoryId={categoryId}
         forForums={forForums}
         adminAddressSet={adminAddressSet}
+        adminRoleMap={adminRoleMap}
       />
     </div>
   );
