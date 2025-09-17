@@ -1,6 +1,5 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import QuarterlyReportsSection from "./QuarterlyReportsSection";
 import DocumentsSection from "./DocumentsSection";
 import {
   getForumTopics,
@@ -64,9 +63,8 @@ const DunaAdministration = async () => {
 
       <Card className="border border-line bg-white shadow-sm">
         <CardContent className="p-6">
-          <DocumentsSection initialDocuments={documents} />
-          <div className="mt-4 pt-4">
-            <QuarterlyReportsSection initialReports={dunaReports} />
+          <div className="">
+            <DocumentsSection initialDocuments={documents} />
           </div>
         </CardContent>
       </Card>

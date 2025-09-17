@@ -67,7 +67,9 @@ export default async function ForumsPage({ searchParams }: ForumsPageProps) {
       ? getForumTopics({
           categoryId: selectedCategoryId,
         })
-      : getForumTopics(),
+      : getForumTopics({
+          excludeCategoryNames: ["DUNA"],
+        }),
     getForumAdmins(),
   ]);
 
