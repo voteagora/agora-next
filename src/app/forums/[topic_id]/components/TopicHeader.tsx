@@ -6,6 +6,7 @@ import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 
 import TopicUpvote from "./TopicUpvote";
 import { formatRelative } from "@/components/ForumShared/utils";
+import { ADMIN_TYPES } from "@/lib/constants";
 
 interface TopicHeaderProps {
   topic: {
@@ -14,11 +15,15 @@ interface TopicHeaderProps {
     address?: string;
     authorName?: string;
     createdAt: string;
+    adminRole?: string | null;
   };
   isAdmin?: boolean;
 }
 
-export default function TopicHeader({ topic, isAdmin = false }: TopicHeaderProps) {
+export default function TopicHeader({
+  topic,
+  isAdmin = false,
+}: TopicHeaderProps) {
   const displayName =
     topic.authorName || (topic.address ? truncateAddress(topic.address) : "");
   const profileHref = topic.address
@@ -27,6 +32,7 @@ export default function TopicHeader({ topic, isAdmin = false }: TopicHeaderProps
   const profileLabel = displayName
     ? `View profile for ${displayName}`
     : "View profile";
+  const adminLabel = topic.adminRole || undefined;
 
   return (
     <div className="pb-2">
@@ -43,7 +49,12 @@ export default function TopicHeader({ topic, isAdmin = false }: TopicHeaderProps
                 <span className="font-medium text-sm hover:underline">
                   {displayName}
                 </span>
-                {isAdmin && <ForumAdminBadge className="text-[9px]" />}
+                {isAdmin && (
+                  <ForumAdminBadge
+                    className="text-[9px]"
+                    type={adminLabel ? ADMIN_TYPES[adminLabel] : "Admin"}
+                  />
+                )}
               </div>
             </Link>
           ) : (
@@ -51,7 +62,12 @@ export default function TopicHeader({ topic, isAdmin = false }: TopicHeaderProps
               <ENSAvatar ensName={topic.address} size={20} />
               <div className="flex items-center gap-1">
                 <div className="font-medium text-sm">{displayName}</div>
-                {isAdmin && <ForumAdminBadge className="text-[9px]" />}
+                {isAdmin && (
+                  <ForumAdminBadge
+                    className="text-[9px]"
+                    type={adminLabel ? ADMIN_TYPES[adminLabel] : "Admin"}
+                  />
+                )}
               </div>
             </div>
           )}
