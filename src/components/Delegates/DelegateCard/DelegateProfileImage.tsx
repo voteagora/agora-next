@@ -63,7 +63,6 @@ export function DelegateProfileImage({
   const formattedNumber = useMemo(() => {
     return formatNumber(votingPower);
   }, [votingPower]);
-  const forumAdminRole = useForumAdminRole(address);
 
   const endorsedToggle = ui.toggle("delegates/endorsed-filter");
   const hasEndorsedFilter = Boolean(
@@ -118,7 +117,7 @@ export function DelegateProfileImage({
               <ENSName address={address} />
             )}
           </div>
-          {forumAdminRole && <ForumAdminBadge label={forumAdminRole} />}
+
           {endorsed && hasEndorsedFilter && endorsedToggle && (
             <TooltipProvider delayDuration={0}>
               <Tooltip>
