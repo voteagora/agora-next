@@ -54,6 +54,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     customAboutSubtitle: "About Syndicate Network Collective",
     customIconColor: "#87819F",
     customInfoLayout: "flex-col sm:flex-row gap-2",
+    noReportsFound: "Quarterly Reports will be posted on October 15th, 2025.",
   },
 
   links: [
@@ -125,8 +126,8 @@ export const syndicateTenantUIConfig = new TenantUI({
       },
       links: [
         {
-          name: "Protocol",
-          title: "Protocol",
+          name: "Syndicate Network",
+          title: "Syndicate Network",
           url: "https://docs.syndicate.io/",
           image: syndicateInfoCard1,
         },
@@ -139,7 +140,7 @@ export const syndicateTenantUIConfig = new TenantUI({
         {
           name: "Governance",
           title: "Governance",
-          url: "https://syndicatecollective.org/coming-soon", // TODO: Update with actual URL
+          url: "https://www.syndicatecollective.org/coming-soon", // TODO: Update with actual URL
           image: syndicateInfoCard3,
         },
         {
@@ -155,14 +156,14 @@ export const syndicateTenantUIConfig = new TenantUI({
       title: "Syndicate Network Collective Roadmap",
       hero: syndicateHero,
       description:
-        "This dashboard is the focal point for information related to the Syndicate Network Collective DUNA. As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe $SYND governance token provides the members ultimate control over how the Treasury should be utilized in support of the Syndicate Network. \n\nThe Syndicate Network is established as an organizational framework for collective decision-making and innovation to pursue the common, nonprofit purpose of providing a foundation for community-aligned platforms to reshape how participation and contribution is valued on the internet.",
+        "This dashboard is the focal point for information related to the Syndicate Network Collective DUNA. As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe $SYND governance token provides the members with ultimate control over how the Treasury should be utilized in support of the Syndicate Network.\n\nThe Syndicate Network Collective is established as an organizational framework for collective decision-making and innovation to pursue the common, nonprofit purpose of providing a foundation for community-aligned platforms to reshape how participation and contribution is valued on the internet.",
       sectionTitle: "Syndicate Network Collective Roadmap",
       tabs: [
         {
           icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#737373" />,
           title: "September 22, 2025",
           description:
-            "Messaging functionality opens for the DUNA Administration section.",
+            "Messaging functionality opens for the DUNA Administration section and Grants Award Committee submissions go live.",
         },
         {
           icon: (
@@ -181,7 +182,7 @@ export const syndicateTenantUIConfig = new TenantUI({
           ),
           title: "November 1, 2025",
           description:
-            "Token governance is live, with a temp check and tax reporting intake (via Cowrie – Administrator Services tooling) completed upon passage of the governance proposal.",
+            "Token governance is live, with a temp-check and tax reporting intake (via Cowrie – Administrator Services tooling) completed upon passage of the governance proposal.",
         },
       ],
       meta: {
@@ -196,7 +197,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     {
       route: "coming-soon",
       title: "Welcome to Syndicate governance",
-      description: `Syndicate governance is coming soon. Syndicate voters are the stewards for the DAO. Temp-Checks and Governance Proposals will be available below when governance goes live.
+      description: `Syndicate governance goes live on November 3rd, 2025..
 `,
       meta: {
         title: "Syndicate Protocol Governance",

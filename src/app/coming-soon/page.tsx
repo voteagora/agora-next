@@ -18,9 +18,7 @@ export default async function ComingSoonPage() {
   const proposalsImage = isTowns
     ? townsStaticProposals
     : syndicateStaticProposals;
-  const overlayText = isTowns
-    ? "Coming soon in January 2026"
-    : "Coming soon in November 2025";
+  const overlayText = isTowns ? "Coming soon in January 2026" : "Coming Soon";
 
   return (
     <div className="flex flex-col">

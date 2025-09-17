@@ -203,7 +203,7 @@ const QuarterlyReportsSection = ({
               useDarkStyling ? "text-white" : "text-secondary"
             }`}
           >
-            No reports found.
+            {ui.customization?.noReportsFound || "No reports found."}
           </p>
         </div>
       )}

@@ -94,8 +94,8 @@ export const InfoHero = () => {
                     strokeLinecap="round"
                   />
                 </svg>
-                <span className="whitespace-normal text-red-500">
-                  View Syndicate Network Collective Member{" "}
+                <span className="whitespace-normal text-red-500 font-bold">
+                  View Syndicate DUNA Member{" "}
                   <span className="underline">Disclosures</span>
                 </span>
               </a>

@@ -10,7 +10,9 @@ const SyndicateDunaDisclosures = () => {
           lineHeight: "19px",
         }}
       >
-        <div className="mb-6 font-medium">SYNDICATE - DUNA DISCLOSURES</div>
+        <div className="mb-6 font-medium">
+          SYNDICATE NETWORK COLLECTIVE - DUNA DISCLOSURES
+        </div>
 
         <div className="font-medium">
           <p className="mt-2">
