@@ -11,6 +11,7 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { canArchiveContent, canDeleteContent } from "@/lib/forumUtils";
 import { FileIcon } from "lucide-react";
+import Link from "next/link";
 
 interface ForumDocument {
   id: number;
@@ -132,7 +133,7 @@ const DocumentsSection = ({
               useDarkStyling ? "text-white" : "text-primary"
             }`}
           >
-            Documents
+            Quaterly Reports
           </h3>
           {!!address && canManageAttachments && (
             <Button
@@ -268,6 +269,12 @@ const DocumentsSection = ({
         categoryId={dunaCategoryId!}
         onUploadComplete={handleUploadComplete}
       />
+      <Link
+        href={`/forums?id=${dunaCategoryId}&title=DUNA`}
+        className="text-center text-md text-primary font-semibold underline"
+      >
+        Official DUNA Communications
+      </Link>
     </div>
   );
 };

@@ -16,17 +16,9 @@ export default async function ForumsSidebar({
   ]);
 
   const categories = categoriesResult?.success
-    ? categoriesResult.data.sort((a: any, b: any) => {
-        const aTop =
-          a?.isDuna === true ||
-          (typeof a?.name === "string" && a.name.toUpperCase() === "DUNA");
-        const bTop =
-          b?.isDuna === true ||
-          (typeof b?.name === "string" && b.name.toUpperCase() === "DUNA");
-        if (aTop && !bTop) return -1;
-        if (bTop && !aTop) return 1;
-        return a.name.localeCompare(b.name);
-      })
+    ? categoriesResult.data.filter(
+        (cat: any) => cat.name.toUpperCase() !== "DUNA"
+      )
     : [];
   const totalTopics = categories.reduce(
     (sum: number, cat: any) => sum + (cat.topicsCount ?? 0),
