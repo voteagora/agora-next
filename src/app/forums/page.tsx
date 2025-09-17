@@ -36,11 +36,38 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function ForumsPage() {
+interface ForumsPageProps {
+  searchParams?: Record<string, string | string[] | undefined>;
+}
+
+function parseCategoryId(
+  searchParams?: Record<string, string | string[] | undefined>
+) {
+  const id = searchParams?.id;
+  const value = Array.isArray(id) ? id[0] : id;
+  if (!value) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function parseCategoryTitle(
+  searchParams?: Record<string, string | string[] | undefined>
+) {
+  const title = searchParams?.title;
+  const value = Array.isArray(title) ? title[0] : title;
+  if (!value) return null;
+  return value;
+}
+
+export default async function ForumsPage({ searchParams }: ForumsPageProps) {
+  const selectedCategoryId = parseCategoryId(searchParams);
+  const selectedCategoryTitle = parseCategoryTitle(searchParams);
   const [topicsResult, adminsResult] = await Promise.all([
-    getForumTopics({
-      excludeCategoryNames: ["DUNA"],
-    }),
+    selectedCategoryId
+      ? getForumTopics({
+          categoryId: selectedCategoryId,
+        })
+      : getForumTopics(),
     getForumAdmins(),
   ]);
 
@@ -50,17 +77,11 @@ export default async function ForumsPage() {
       : []
   );
 
-  const getLastActivity = (topic: any) => {
-    const posts = Array.isArray(topic.posts) ? topic.posts : [];
-    const latestPost = posts[posts.length - 1];
-    return latestPost?.createdAt || topic.createdAt;
-  };
-
   const topics = topicsResult.success
     ? topicsResult.data.slice().sort((a: any, b: any) => {
-        const lastA = getLastActivity(a);
-        const lastB = getLastActivity(b);
-        return new Date(lastB || 0).getTime() - new Date(lastA || 0).getTime();
+        return (
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
       })
     : [];
 
@@ -78,7 +99,9 @@ export default async function ForumsPage() {
     <div className="min-h-screen">
       <div className="mt-6 max-w-7xl mx-auto px-6 sm:px-0">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">Discussions</h1>
+          <h1 className="text-3xl font-bold">
+            {selectedCategoryTitle || "Discussions"}{" "}
+          </h1>
           <NewTopicButton />
         </div>
       </div>
@@ -93,8 +116,7 @@ export default async function ForumsPage() {
               topics.map((topic: any) => {
                 const posts = Array.isArray(topic.posts) ? topic.posts : [];
                 const firstPost = posts[0];
-                const createdAt =
-                  posts[posts.length - 1]?.createdAt || topic.createdAt;
+                const createdAt = topic.createdAt;
                 const replies = Math.max(
                   (topic.postsCount || posts.length) - 1,
                   0
@@ -110,7 +132,7 @@ export default async function ForumsPage() {
                   <Link
                     key={topic.id}
                     href={buildForumTopicPath(topic.id, topic.title)}
-                    className="group block bg-white border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow"
+                    className="group block bg-card border border-cardBorder rounded-lg p-3 hover:shadow-sm transition-shadow"
                   >
                     <div className="flex items-start gap-3">
                       {/* Avatar */}
@@ -184,7 +206,7 @@ export default async function ForumsPage() {
           </div>
         </div>
 
-        <ForumsSidebar />
+        <ForumsSidebar selectedCategoryId={selectedCategoryId ?? undefined} />
       </div>
     </div>
   );

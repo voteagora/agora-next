@@ -246,7 +246,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
           </div>
 
           {/* Sidebar */}
-          <ForumsSidebar />
+          <ForumsSidebar selectedCategoryId={categoryId} />
         </div>
       </div>
     </div>
