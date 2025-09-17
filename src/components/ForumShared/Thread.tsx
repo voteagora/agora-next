@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
 import { ForumPost } from "@/lib/forumUtils";
@@ -80,6 +81,12 @@ const CommentItem = ({
   const isAuthorAdmin = authorAddress
     ? adminAddressSet.has(authorAddress)
     : false;
+  const profileHref = comment.author
+    ? `/delegates/${encodeURIComponent(comment.author)}`
+    : null;
+  const profileLabel = comment.author
+    ? `View profile for ${comment.author}`
+    : "View profile";
 
   const canDelete = canDeleteContent(
     address || "",
@@ -163,10 +170,23 @@ const CommentItem = ({
     <div className={`${depth > 0 ? "" : ""}`}>
       <div className="flex gap-2 sm:gap-3 relative">
         <div className="flex-shrink-0">
-          <ENSAvatar
-            ensName={comment.author}
-            className="w-6 h-6 sm:w-8 sm:h-8"
-          />
+          {profileHref ? (
+            <Link
+              href={profileHref}
+              aria-label={profileLabel}
+              className="inline-flex rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black"
+            >
+              <ENSAvatar
+                ensName={comment.author}
+                className="w-6 h-6 sm:w-8 sm:h-8"
+              />
+            </Link>
+          ) : (
+            <ENSAvatar
+              ensName={comment.author}
+              className="w-6 h-6 sm:w-8 sm:h-8"
+            />
+          )}
         </div>
         {hasReplies && forForums && (
           <>
@@ -177,7 +197,19 @@ const CommentItem = ({
         <div className="flex-1">
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
             <div className="flex items-center gap-1">
-              <ENSName address={comment.author || ""} />
+              {profileHref ? (
+                <Link
+                  href={profileHref}
+                  aria-label={profileLabel}
+                  className="text-sm font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black rounded"
+                >
+                  <ENSName address={comment.author || ""} />
+                </Link>
+              ) : (
+                <span className="text-sm font-medium">
+                  <ENSName address={comment.author || ""} />
+                </span>
+              )}
               {isAuthorAdmin && <ForumAdminBadge className="text-[9px]" />}
             </div>
             <span className="text-xs sm:text-sm text-secondary">
