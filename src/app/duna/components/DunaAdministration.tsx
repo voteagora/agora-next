@@ -2,7 +2,11 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import QuarterlyReportsSection from "./QuarterlyReportsSection";
 import DocumentsSection from "./DocumentsSection";
-import { getForumTopics, getDunaCategoryId, getForumAttachments } from "@/lib/actions/forum";
+import {
+  getForumTopics,
+  getDunaCategoryId,
+  getForumAttachments,
+} from "@/lib/actions/forum";
 import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { UIDunaDescriptionConfig } from "@/lib/tenant/tenantUI";
@@ -60,9 +64,9 @@ const DunaAdministration = async () => {
 
       <Card className="border border-line bg-white shadow-sm">
         <CardContent className="p-6">
-          <QuarterlyReportsSection initialReports={dunaReports} />
+          <DocumentsSection initialDocuments={documents} />
           <div className="mt-4 pt-4">
-            <DocumentsSection initialDocuments={documents} />
+            <QuarterlyReportsSection initialReports={dunaReports} />
           </div>
         </CardContent>
       </Card>

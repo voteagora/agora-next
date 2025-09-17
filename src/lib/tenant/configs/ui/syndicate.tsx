@@ -133,7 +133,7 @@ export const syndicateTenantUIConfig = new TenantUI({
         {
           name: "Grants Program",
           title: "Grants Program",
-          url: "https://discord.gg/syndicate", // TODO: Update with actual document
+          url: "https://gateway.pinata.cloud/ipfs/QmSQn9P7LzGPa2RJsTDVMaKPw9UoqJTMRoxJTiABpi6YAR",
           image: syndicateInfoCard2,
         },
         {
@@ -155,7 +155,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       title: "Syndicate Network Collective Roadmap",
       hero: syndicateHero,
       description:
-        "This dashboard is the focal point for information related to the Syndicate Network Collective DUNA. As a tax-paying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe Syndicate Protocol is supported by both a Swiss Association and the Syndicate Network Collective DUNA – with the $SYND governance token providing the members ultimate control over how the Treasury should be utilized. While the initial funding of the Swiss Association allows it to operate within established parameters, its role and funding will ultimately be decided by the members of the DUNA who, through their voting power, control whether to extend additional funding to the Swiss Association, redirect that funding to another entity, or take on more responsibilities within the DUNA.\n\nThe Syndicate Network Collective is an organizational framework for collective decision-making and innovation. It aims to provide a foundation for community-aligned platforms to reshape participation and contribution on the internet.",
+        "This dashboard is the focal point for information related to the Syndicate Network Collective DUNA. As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe $SYND governance token provides the members ultimate control over how the Treasury should be utilized in support of the Syndicate Network. \n\nThe Syndicate Network is established as an organizational framework for collective decision-making and innovation to pursue the common, nonprofit purpose of providing a foundation for community-aligned platforms to reshape how participation and contribution is valued on the internet.",
       sectionTitle: "Syndicate Network Collective Roadmap",
       tabs: [
         {
@@ -196,7 +196,8 @@ export const syndicateTenantUIConfig = new TenantUI({
     {
       route: "coming-soon",
       title: "Welcome to Syndicate governance",
-      description: "Syndicate governance is coming soon.",
+      description: `Syndicate governance is coming soon. Syndicate voters are the stewards for the DAO. Temp-Checks and Governance Proposals will be available below when governance goes live.
+`,
       meta: {
         title: "Syndicate Protocol Governance",
         description: "Syndicate Protocol governance coming soon",
@@ -297,6 +298,10 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "syndicate-hero-content",
+      enabled: true,
+    },
+    {
+      name: "duna/use-community-dialogue-label",
       enabled: true,
     },
   ],

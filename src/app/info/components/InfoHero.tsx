@@ -95,7 +95,7 @@ export const InfoHero = () => {
                   />
                 </svg>
                 <span className="whitespace-normal text-red-500">
-                  View Syndicate DUNA Member{" "}
+                  View Syndicate Network Collective Member{" "}
                   <span className="underline">Disclosures</span>
                 </span>
               </a>
