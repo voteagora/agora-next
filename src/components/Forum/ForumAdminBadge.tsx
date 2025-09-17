@@ -1,7 +1,7 @@
 import React from "react";
 import { BadgeCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { rgbStringToHex } from "@/app/lib/utils/color";
+
 import {
   Tooltip,
   TooltipContent,
