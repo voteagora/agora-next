@@ -20,7 +20,7 @@ export const AGORA_SIGN_IN_MESSAGE = "Sign in to Agora with Ethereum";
 // JWT tokens for SIWE should therefore be issued with a short expiry time.
 */
 
-const isSiweEnabled = () => true; // Keep SIWE available regardless of env; no auto-trigger elsewhere
+const isSiweEnabled = () => false; // Disable SIWE by default; no auto-trigger
 
 export const siweProviderConfig: SIWEConfig = {
   getNonce: async () =>
