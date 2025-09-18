@@ -4626,6 +4626,7 @@ enum DaoSlug {
   DEMO
   LINEA
   TOWNS
+  SHAPE
   @@map("dao_slug")
   @@schema("config")
 }
