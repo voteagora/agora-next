@@ -11,6 +11,7 @@ import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { useDraftStage } from "./hooks/useDraftStage";
 import { DraftPageHeader } from "./components/DraftPageHeader";
 import { SiweAccessCard } from "./components/SiweAccessCard";
+import Loading from "./loading";
 
 type DraftResponse = DraftProposalType;
 
@@ -185,8 +186,7 @@ export default function DraftProposalPageClient({
   }, [isSigning, refetch]);
 
   if (loading && !draft && !error) {
-    // Defer to the route segment's loading.tsx skeleton
-    return null;
+    return <Loading />;
   }
 
   // Keep description text unchanged during signing; only buttons reflect state
