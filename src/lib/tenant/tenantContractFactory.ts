@@ -18,6 +18,7 @@ import { syndicateTenantConfig } from "./configs/contracts/syndicate";
 import { demo2TenantConfig } from "./configs/contracts/demo2";
 import { demo4TenantConfig } from "./configs/contracts/demo4";
 import { demo3TenantConfig } from "./configs/contracts/demo3";
+import { shapeTenantConfig } from "./configs/contracts/shape";
 
 export default class TenantContractFactory {
   public static create(
@@ -56,16 +57,14 @@ export default class TenantContractFactory {
         return townsTenantConfig({ isProd, alchemyId });
       case TENANT_NAMESPACES.SYNDICATE:
         return syndicateTenantConfig({ isProd, alchemyId });
-
       case TENANT_NAMESPACES.DEMO2:
         return demo2TenantConfig({ isProd, alchemyId });
-
       case TENANT_NAMESPACES.DEMO4:
         return demo4TenantConfig({ isProd, alchemyId });
-
       case TENANT_NAMESPACES.DEMO3:
         return demo3TenantConfig({ isProd, alchemyId });
-
+      case TENANT_NAMESPACES.SHAPE:
+        return shapeTenantConfig({ isProd, alchemyId });
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
