@@ -49,7 +49,7 @@ const MyDraftProposals = ({
           return (
             <Link
               key={proposal.id}
-              href={`/proposals/draft/${(proposal as any).uuid ?? proposal.id}?stage=${getStageIndexForTenant(proposal.stage)}`}
+              href={`/proposals/draft/${proposal.uuid ?? proposal.id}?stage=${getStageIndexForTenant(proposal.stage)}`}
               className="block"
             >
               <DraftProposalCard proposal={proposal} />
