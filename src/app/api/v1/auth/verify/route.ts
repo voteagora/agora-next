@@ -29,15 +29,8 @@ export async function POST(request: NextRequest) {
     if (!verification) {
       try {
         const { getPublicClient } = await import("@/lib/viem");
-        const { hashMessage, createPublicClient } = await import("viem");
-        const { SUPPORTED_CHAINS } = await import("@/lib/constants");
-        const siweChainId = Number(siweObject.chainId || 0);
-
-        // Resolve chain by id if present in supported list; otherwise fallback to tenant default via getPublicClient()
-        const matched = SUPPORTED_CHAINS.find((c) => c.id === siweChainId);
-        const publicClient = matched
-          ? getPublicClient(matched)
-          : getPublicClient();
+        const { hashMessage } = await import("viem");
+        const publicClient = getPublicClient();
 
         const code = await publicClient.getBytecode({
           address: siweObject.address as `0x${string}`,
