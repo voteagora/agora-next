@@ -47,7 +47,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     customCardSize: "sm:h-[100px] sm:w-[100px] lg:h-[120px] lg:w-[120px]",
     infoTabBackground: "#FFFFFF",
     buttonBackground: "#FAFAFA",
-    infoSectionBackground: "#FFFFFF",
+    infoSectionBackground: "255 255 255",
     cardBackground: "#FFFFFF",
     customIconBackground: "#FBFBFB",
     footerBackground: "236 237 229",
@@ -303,6 +303,10 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "duna/use-community-dialogue-label",
+      enabled: true,
+    },
+    {
+      name: "syndicate-duna-disclosures",
       enabled: true,
     },
   ],

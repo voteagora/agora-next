@@ -68,16 +68,6 @@ const TownsDunaAdministration = async () => {
         </CardContent>
       </Card>
 
-      {/* Community Dialogue Section - EXACT same as Uniswap */}
-      <Card className="border border-line shadow-sm bg-[#1E1A2F] mt-6 [&_button]:!bg-white [&_button]:!text-black [&_button]:!border-gray-300 [&_button]:hover:!bg-gray-50">
-        <CardContent className="p-6">
-          <QuarterlyReportsSection
-            initialReports={dunaReports}
-            hideHeader={false}
-          />
-        </CardContent>
-      </Card>
-
       {/* TOWNS DUNA DISCLOSURES Section */}
       <div id="duna-administration" className="mt-6">
         <div className="text-[#87819F] text-[14px] font-medium leading-[19px] mb-4">

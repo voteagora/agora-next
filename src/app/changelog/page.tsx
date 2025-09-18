@@ -3,7 +3,6 @@
 import { fetchChangelogForDAO } from "@/app/api/common/changelogs/getChangelogs";
 import ChangelogList from "@/components/Changelog/ChangelogList";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export async function generateMetadata() {
   const { brandName } = Tenant.current();

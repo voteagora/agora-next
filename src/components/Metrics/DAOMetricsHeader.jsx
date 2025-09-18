@@ -80,10 +80,6 @@ export default function DAOMetricsHeader() {
               "flex flex-row w-full bg-innerFooterBackground border-wash justify-between",
               "text-xs text-secondary font-inter font-medium"
             )}
-            style={{
-              backgroundColor:
-                ui.customization?.customFooterBackground || "var(--wash)",
-            }}
           >
             <div className="flex items-center justify-start">
               <div className="flex gap-8">

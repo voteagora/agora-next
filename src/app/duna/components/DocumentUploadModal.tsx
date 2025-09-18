@@ -17,7 +17,6 @@ import {
 import { useForum } from "@/hooks/useForum";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface DocumentUploadModalProps {
   isOpen: boolean;

@@ -41,10 +41,7 @@ export default async function Home() {
   const { ui } = Tenant.current();
 
   // Check if coming-soon is enabled
-  const hasToggle = typeof (ui as any)?.toggle === "function";
-  const comingSoonEnabled = hasToggle
-    ? ui.toggle("coming-soon")?.enabled
-    : false;
+  const comingSoonEnabled = ui.toggle("coming-soon")?.enabled
 
   if (comingSoonEnabled) {
     return <ComingSoonPage />;

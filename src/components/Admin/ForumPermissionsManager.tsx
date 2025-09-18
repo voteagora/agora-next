@@ -24,7 +24,6 @@ import { useForumAdmin } from "@/hooks/useForum";
 import { PlusIcon, TrashIcon } from "@heroicons/react/20/solid";
 import AgoraLoader from "../shared/AgoraLoader/AgoraLoader";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 import useDunaCategory from "@/hooks/useDunaCategory";
 
 interface ForumAdmin {
@@ -87,9 +86,8 @@ const ForumPermissionsManager = ({
 
   const { isAdmin, isLoading } = useForumAdmin(dunaCategoryId || undefined);
 
-  const { ui, namespace } = Tenant.current();
+  const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   const handleAddAdmin = async () => {
     if (!address || !newAdminAddress.trim()) return;
@@ -255,7 +253,7 @@ const ForumPermissionsManager = ({
           <div className="flex items-center justify-between mb-4">
             <h2
               className={`text-xl font-semibold ${
-                isTowns ? "text-white" : "text-primary"
+                useDarkStyling ? "text-white" : "text-primary"
               }`}
             >
               Admins

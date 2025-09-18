@@ -69,12 +69,7 @@ export default function Navbar() {
   return (
     <div
       ref={navRef}
-      className={`relative flex flex-row rounded-full border border-line p-1 font-medium`}
-      style={
-        ui.customization?.infoTabBackground
-          ? { backgroundColor: ui.customization.infoTabBackground }
-          : {}
-      }
+      className={`relative flex flex-row rounded-full border border-line p-1 font-medium bg-infoTabBackground`}
     >
       {/* Sliding overlay */}
       {activeNavItem && (

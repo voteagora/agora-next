@@ -216,16 +216,6 @@ export class TenantUI {
     customTitleSize?: string;
     customCardSize?: string;
     customIconColor?: string;
-    customFooterHideChangelog?: boolean;
-    customFooterHideVotableSupply?: boolean;
-    customFooterHideTotalSupply?: boolean;
-    customFooterBackground?: string;
-    customCardBackground?: string;
-    customCardBorder?: string;
-    customHoverBackground?: string;
-    customTextSecondary?: string;
-    hideGovernorSettings?: boolean;
-    hideHero?: boolean;
     noReportsFound?: string;
   };
   private _theme: "light" | "dark";
@@ -367,16 +357,6 @@ export class TenantUI {
         customTitleSize?: string;
         customCardSize?: string;
         customIconColor?: string;
-        customFooterHideChangelog?: boolean;
-        customFooterHideVotableSupply?: boolean;
-        customFooterHideTotalSupply?: boolean;
-        customFooterBackground?: string;
-        customCardBackground?: string;
-        customCardBorder?: string;
-        customHoverBackground?: string;
-        customTextSecondary?: string;
-        hideGovernorSettings?: boolean;
-        hideHero?: boolean;
         noReportsFound?: string;
       }
     | undefined {

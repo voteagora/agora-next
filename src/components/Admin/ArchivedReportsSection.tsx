@@ -7,7 +7,6 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { ArrowUpIcon, EyeIcon } from "@heroicons/react/20/solid";
 import { toast } from "react-hot-toast";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 
 interface ArchivedReportCardProps {
@@ -29,10 +28,6 @@ const ArchivedReportCard = ({
   );
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
-
-  // Check if current tenant is Towns
-  const { namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
 
   const handleUnarchive = async (e: React.MouseEvent) => {
     e.stopPropagation();

@@ -10,11 +10,9 @@ import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 import ArchivedReportsSection from "@/components/Admin/ArchivedReportsSection";
 import ArchivedDocumentsSection from "@/components/Admin/ArchivedDocumentsSection";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default async function ArchivedDataPage() {
-  const { ui, namespace } = Tenant.current();
-  const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
+  const { ui } = Tenant.current();
 
   let archivedReports: ForumTopic[] = [];
   let archivedDocuments: any[] = [];
@@ -55,7 +53,7 @@ export default async function ArchivedDataPage() {
   }
 
   return (
-    <div className={`mt-12 ${isTowns ? "towns-tenant" : ""}`}>
+    <div className={`mt-12`}>
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-2xl font-black text-primary">
           Archived Data Administration
