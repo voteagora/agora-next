@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { getForumCategories, getLatestForumPost } from "@/lib/actions/forum";
 import { formatRelative } from "@/components/ForumShared/utils";
+import { buildForumCategoryPath } from "@/lib/forumUtils";
 
 interface ForumsSidebarProps {
   selectedCategoryId?: number | null;
@@ -16,10 +17,21 @@ export default async function ForumsSidebar({
   ]);
 
   const categories = categoriesResult?.success
-    ? categoriesResult.data.filter(
-        (cat: any) => cat.name.toUpperCase() !== "DUNA"
-      )
+    ? categoriesResult.data
+        .sort((a: any, b: any) => {
+          const aTop =
+            a?.isDuna === true ||
+            (typeof a?.name === "string" && a.name.toUpperCase() === "DUNA");
+          const bTop =
+            b?.isDuna === true ||
+            (typeof b?.name === "string" && b.name.toUpperCase() === "DUNA");
+          if (aTop && !bTop) return -1;
+          if (bTop && !aTop) return 1;
+          return a.name.localeCompare(b.name);
+        })
+        .filter((cat: any) => cat.topicsCount > 0)
     : [];
+
   const totalTopics = categories.reduce(
     (sum: number, cat: any) => sum + (cat.topicsCount ?? 0),
     0
@@ -37,7 +49,7 @@ export default async function ForumsSidebar({
   ];
 
   return (
-    <div className="w-80 bg-card rounded-lg border border-cardBorder h-[100%]">
+    <div className="w-80 bg-card rounded-lg border border-cardBorder">
       <div className="p-4">
         <h3 className="text-lg font-semibold mb-4">Categories</h3>
 
@@ -67,9 +79,7 @@ export default async function ForumsSidebar({
 
               {categories.map((cat: any, idx: number) => {
                 const isSelected = selectedCategoryId === cat.id;
-                const href = `/forums?id=${encodeURIComponent(
-                  cat.id
-                )}&title=${encodeURIComponent(cat.name)}`;
+                const href = buildForumCategoryPath(cat.id, cat.name);
                 return (
                   <Link
                     key={cat.id}

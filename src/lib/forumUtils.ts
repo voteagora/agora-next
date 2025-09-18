@@ -80,6 +80,21 @@ export function buildForumTopicPath(id: number, title?: string | null): string {
   return slug ? `/forums/${Math.abs(Math.trunc(numericId))}/${slug}` : `/forums/${Math.abs(Math.trunc(numericId))}`;
 }
 
+export function buildForumCategoryPath(
+  id: number,
+  title?: string | null
+): string {
+  const numericId = Number(id);
+  if (!Number.isFinite(numericId)) {
+    return "/forums";
+  }
+  const safeId = Math.abs(Math.trunc(numericId));
+  const slug = buildForumTopicSlug(title);
+  return slug
+    ? `/forums/category/${safeId}/${slug}`
+    : `/forums/category/${safeId}`;
+}
+
 export function extractForumTopicId(raw: string | string[] | undefined): number | null {
   if (!raw) return null;
   const value = Array.isArray(raw) ? raw[0] : raw;

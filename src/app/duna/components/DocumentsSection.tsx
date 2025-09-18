@@ -8,7 +8,11 @@ import { TrashIcon, ArchiveBoxIcon } from "@heroicons/react/20/solid";
 import DocumentUploadModal from "./DocumentUploadModal";
 import Tenant from "@/lib/tenant/tenant";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
-import { canArchiveContent, canDeleteContent } from "@/lib/forumUtils";
+import {
+  buildForumCategoryPath,
+  canArchiveContent,
+  canDeleteContent,
+} from "@/lib/forumUtils";
 import { FileIcon } from "lucide-react";
 import Link from "next/link";
 
@@ -169,7 +173,6 @@ const DocumentsSection = ({
           )}
         </div>
       )}
-
       {documents.length === 0 ? (
         <div className="text-center py-8">
           <p
@@ -265,19 +268,25 @@ const DocumentsSection = ({
           })}
         </div>
       )}
-
       <DocumentUploadModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
         categoryId={dunaCategoryId!}
         onUploadComplete={handleUploadComplete}
       />
-      <Link
-        href={`/forums?id=${dunaCategoryId}&title=DUNA`}
-        className="text-center text-md text-primary font-semibold underline"
-      >
+      <p className="text-md text-primary font-semibold ">
         Official DUNA Communications
-      </Link>
+      </p>
+      <p className="text-sm text-primary">
+        Want to talk about official items for the DUNA Or discover discussions
+        on it? Please head to the{" "}
+        <Link
+          href={buildForumCategoryPath(dunaCategoryId!, "DUNA")}
+          className="underline"
+        >
+          DUNA forum.
+        </Link>
+      </p>
     </div>
   );
 };
