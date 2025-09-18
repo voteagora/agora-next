@@ -25,7 +25,7 @@ export const syndicateTenantUIConfig = new TenantUI({
   },
 
   organization: {
-    title: "Syndicate Protocol",
+    title: "Syndicate Network",
   },
 
   dunaDisclaimers:
@@ -75,7 +75,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       route: "/",
       title: "Agora is the home of Syndicate governance",
       description:
-        "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate protocol",
+        "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate Network",
       hero: syndicateHero,
       meta: {
         title: "Syndicate Agora",
@@ -88,7 +88,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       route: "delegates",
       title: "Agora is the home of Syndicate delegates",
       description:
-        "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate protocol",
+        "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate Network",
       hero: syndicateHero,
       meta: {
         title: "Voter on Agora",
@@ -102,7 +102,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       route: "proposals",
       title: "Agora is the home of Syndicate delegates",
       description:
-        "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate protocol",
+        "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate Network",
       hero: syndicateHero,
       meta: {
         title: "Syndicate Agora",
@@ -117,12 +117,12 @@ export const syndicateTenantUIConfig = new TenantUI({
       description:
         "Your home for information about Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
       meta: {
-        title: "Syndicate Protocol Governance",
+        title: "Syndicate Network Governance",
         description:
-          "Syndicate is a public good owned and governed by SYNDICATE token holders.",
-        imageTitle: "Syndicate Protocol Governance",
+          "Syndicate Network is a public good owned and governed by SYND token holders.",
+        imageTitle: "Syndicate Network Governance",
         imageDescription:
-          "Syndicate is a public good owned and governed by SYNDICATE token holders.",
+          "Syndicate Network is a public good owned and governed by SYND token holders.",
       },
       links: [
         {
@@ -186,12 +186,12 @@ export const syndicateTenantUIConfig = new TenantUI({
         },
       ],
       meta: {
-        title: "Syndicate Protocol Governance",
+        title: "Syndicate Network Governance",
         description:
-          "Syndicate is a public good owned and governed by SYNDICATE token holders.",
-        imageTitle: "Syndicate Protocol Governance",
+          "Syndicate Network is a public good owned and governed by SYND token holders.",
+        imageTitle: "Syndicate Network Governance",
         imageDescription:
-          "Syndicate is a public good owned and governed by SYNDICATE token holders.",
+          "Syndicate Network is a public good owned and governed by SYND token holders.",
       },
     },
     {
@@ -200,10 +200,10 @@ export const syndicateTenantUIConfig = new TenantUI({
       description: `Syndicate governance goes live on November 3rd, 2025..
 `,
       meta: {
-        title: "Syndicate Protocol Governance",
-        description: "Syndicate Protocol governance coming soon",
-        imageTitle: "Syndicate Protocol Governance",
-        imageDescription: "Syndicate Protocol governance coming soon",
+        title: "Syndicate Network Governance",
+        description: "Syndicate Network governance coming soon",
+        imageTitle: "Syndicate Network Governance",
+        imageDescription: "Syndicate Network governance coming soon",
       },
     },
   ],
