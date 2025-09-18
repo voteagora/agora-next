@@ -17,6 +17,10 @@ import {
 
 import "viem/window";
 import { getTransportForChain } from "./utils";
+import {
+  deriveMainnet,
+  deriveTestnet,
+} from "@/lib/tenant/configs/contracts/derive";
 import Tenant from "@/lib/tenant/tenant";
 
 export const getWalletClient = (chainId: number) => {
