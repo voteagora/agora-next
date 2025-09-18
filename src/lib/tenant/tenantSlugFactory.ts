@@ -41,6 +41,8 @@ export default class TenantSlugFactory {
         return "DEMO4" as any;
       case TENANT_NAMESPACES.DEMO3:
         return "DEMO3" as any;
+      case TENANT_NAMESPACES.SHAPE:
+        return "SHAPE" as any;
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
