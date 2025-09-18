@@ -1,6 +1,5 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import QuarterlyReportsSection from "./QuarterlyReportsSection";
 import DocumentsSection from "./DocumentsSection";
 import { getForumTopics, getDunaCategoryId } from "@/lib/actions/forum";
 import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
@@ -32,7 +31,7 @@ const DunaAdministration = async () => {
         </div>
       );
     }
-    const topicsResult = await getForumTopics(dunaCategoryId);
+    const topicsResult = await getForumTopics({ categoryId: dunaCategoryId });
     if (topicsResult.success) {
       dunaReports = transformForumTopics(topicsResult.data, {
         mergePostAttachments: true,
@@ -53,8 +52,7 @@ const DunaAdministration = async () => {
 
       <Card className="border border-line bg-white shadow-sm">
         <CardContent className="p-6">
-          <QuarterlyReportsSection initialReports={dunaReports} />
-          <div className="mt-4 pt-4">
+          <div className="">
             <DocumentsSection initialDocuments={documents} />
           </div>
         </CardContent>

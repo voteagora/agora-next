@@ -8,9 +8,14 @@ import { TrashIcon, ArchiveBoxIcon } from "@heroicons/react/20/solid";
 import DocumentUploadModal from "./DocumentUploadModal";
 import Tenant from "@/lib/tenant/tenant";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
+import {
+  buildForumCategoryPath,
+  canArchiveContent,
+  canDeleteContent,
+} from "@/lib/forumUtils";
 import { FileIcon } from "lucide-react";
+import Link from "next/link";
 
 interface ForumDocument {
   id: number;
@@ -68,25 +73,29 @@ const DocumentsSection = ({
     e: React.MouseEvent
   ) => {
     e.stopPropagation();
-    // Find the document to get uploadedBy
-    const doc = documents.find((d) => d.id === attachmentId);
-    if (
-      doc &&
-      (await canDeleteContent(
-        address || "",
-        doc.uploadedBy || "",
-        isAdmin || canManageAttachments,
-        canManageAttachments
-      ))
-    ) {
-      try {
-        await deleteAttachment(attachmentId);
-        const documentsData = await fetchDocuments();
-        setDocuments(documentsData);
-      } catch (error) {
-        console.error("Error deleting attachment:", error);
-      }
-    }
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Delete Attachment",
+        message: "Are you sure you want to delete this attachment?",
+        onConfirm: async () => {
+          const isAuthor =
+            documents
+              .find((doc) => doc.id === attachmentId)
+              ?.uploadedBy?.toLowerCase() === address?.toLowerCase();
+          const success = await deleteAttachment(
+            attachmentId,
+            "category",
+            isAuthor
+          );
+          if (success) {
+            setDocuments((prev) =>
+              prev.filter((doc) => doc.id !== attachmentId)
+            );
+          }
+        },
+      },
+    });
   };
 
   const handleArchiveAttachment = async (
@@ -94,25 +103,29 @@ const DocumentsSection = ({
     e: React.MouseEvent
   ) => {
     e.stopPropagation();
-    // Find the document to get uploadedBy
-    const doc = documents.find((d) => d.id === attachmentId);
-    if (
-      doc &&
-      (await canArchiveContent(
-        address || "",
-        doc.uploadedBy || "",
-        isAdmin || canManageAttachments,
-        canManageAttachments
-      ))
-    ) {
-      try {
-        await archiveAttachment(attachmentId);
-        const documentsData = await fetchDocuments();
-        setDocuments(documentsData);
-      } catch (error) {
-        console.error("Error archiving attachment:", error);
-      }
-    }
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Archive Attachment",
+        message: "Are you sure you want to archive this attachment?",
+        onConfirm: async () => {
+          const isAuthor =
+            documents
+              .find((doc) => doc.id === attachmentId)
+              ?.uploadedBy?.toLowerCase() === address?.toLowerCase();
+          const success = await archiveAttachment(
+            attachmentId,
+            "category",
+            isAuthor
+          );
+          if (success) {
+            setDocuments((prev) =>
+              prev.filter((doc) => doc.id !== attachmentId)
+            );
+          }
+        },
+      },
+    });
   };
 
   return (
@@ -124,7 +137,7 @@ const DocumentsSection = ({
               useDarkStyling ? "text-white" : "text-primary"
             }`}
           >
-            Documents
+            Quaterly Reports
           </h3>
           {!!address && canManageAttachments && (
             <Button
@@ -157,7 +170,6 @@ const DocumentsSection = ({
           )}
         </div>
       )}
-
       {documents.length === 0 ? (
         <div className="text-center py-8">
           <p
@@ -253,12 +265,25 @@ const DocumentsSection = ({
           })}
         </div>
       )}
-
       <DocumentUploadModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
+        categoryId={dunaCategoryId!}
         onUploadComplete={handleUploadComplete}
       />
+      <p className="text-md text-primary font-semibold ">
+        Official DUNA Communications
+      </p>
+      <p className="text-sm text-primary">
+        Want to talk about official items for the DUNA Or discover discussions
+        on it? Please head to the{" "}
+        <Link
+          href={buildForumCategoryPath(dunaCategoryId!, "DUNA")}
+          className="underline"
+        >
+          DUNA forum.
+        </Link>
+      </p>
     </div>
   );
 };

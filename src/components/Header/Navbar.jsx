@@ -43,6 +43,8 @@ export default function Navbar() {
     } else if (path === "retropgf" && linkRefs.current["retropgf"]) {
       // Special case for retropgf which has a more complex path
       setActiveNavItem("retropgf");
+    } else if (path === "forums" && linkRefs.current["forums"]) {
+      setActiveNavItem("forums");
     }
   }, [pathname]);
 
@@ -98,6 +100,18 @@ export default function Navbar() {
         </HeaderLink>
       )}
 
+      {ui.toggle("forums") && ui.toggle("forums").enabled && (
+        <HeaderLink
+          ref={(el) => {
+            linkRefs.current.forums = el;
+          }}
+          href="/forums"
+          isActive={activeNavItem === "forums"}
+          onClick={() => handleNavClick("forums")}
+        >
+          Discussions
+        </HeaderLink>
+      )}
       {ui.toggle("delegates") && ui.toggle("delegates").enabled && (
         <HeaderLink
           ref={(el) => {
