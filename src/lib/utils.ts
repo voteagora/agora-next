@@ -447,7 +447,7 @@ export function toNumericChainId(
 }
 
 export const getTransportForChain = (chainId: number) => {
-  console.log({ getTransportForChainID: chainId });
+  console.debug({ getTransportForChainID: chainId });
 
   switch (chainId) {
     // mainnet

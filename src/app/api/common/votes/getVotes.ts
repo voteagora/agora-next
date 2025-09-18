@@ -346,6 +346,22 @@ async function getVotersWhoHaveNotVotedForProposal({
           LEFT JOIN has_voted v ON d.delegate = v.voter 
           WHERE v.voter IS NULL
         ),
+            -- Aggregate delegate statements by address and DAO slug, keeping the latest updated_at
+            aggregated_delegate_statements AS (
+          SELECT
+          address,
+          dao_slug,
+          MAX(twitter) AS twitter,  
+          MAX(discord) AS discord,        
+          MAX(warpcast) AS warpcast,            
+          MAX(updated_at) AS latest_updated_at  
+          FROM
+          agora.delegate_statements
+          WHERE
+          dao_slug = $6::config.dao_slug
+          GROUP BY
+          address, dao_slug -- Ensures one row per address and DAO slug
+          ),
         unique_delegates AS (
           SELECT DISTINCT ON (del.delegate)
             del.delegate, 
@@ -356,9 +372,8 @@ async function getVotersWhoHaveNotVotedForProposal({
             ds.discord,
             ds.warpcast
           FROM delegates_who_havent_votes del 
-          LEFT JOIN agora.delegate_statements ds ON 
+          LEFT JOIN aggregated_delegate_statements ds ON 
             del.delegate = ds.address
-            AND ds.dao_slug = 'OP'
           ORDER BY del.delegate, del.voting_power DESC
         )
         SELECT 
@@ -373,12 +388,14 @@ async function getVotersWhoHaveNotVotedForProposal({
         ORDER BY voting_power DESC
         OFFSET $4 LIMIT $5`;
 
+      console.log({ slug, slugString: String(slug) });
       const params = [
         proposalId,
         contracts.token.address.toLowerCase(),
         contracts.governor.address.toLowerCase(),
         skip,
         take,
+        String(slug),
       ];
 
       // Add offchain proposal ID parameter if needed for citizen votes
