@@ -41,7 +41,7 @@ export default async function Home() {
   const { ui } = Tenant.current();
 
   // Check if coming-soon is enabled
-  const comingSoonEnabled = ui.toggle("coming-soon")?.enabled
+  const comingSoonEnabled = ui.toggle("coming-soon")?.enabled;
 
   if (comingSoonEnabled) {
     return <ComingSoonPage />;

@@ -557,7 +557,11 @@ export async function createForumPost(
   }
 }
 
-export async function getForumAttachments({ categoryId }: { categoryId?: number }) {
+export async function getForumAttachments({
+  categoryId,
+}: {
+  categoryId?: number;
+}) {
   try {
     const { slug } = Tenant.current();
     const whereClause: any = {

@@ -172,7 +172,7 @@ const Card = ({
             width={12}
             height={12}
             alt="arrow pointing right"
-            className={`self-start mt-1 ${ui.customization?.infoSectionBackground ? ui.customization.infoSectionBackground === "#FFFFFF" ? "brightness-0" : "brightness-0 invert" : ""} ${isDisabled ? "opacity-50" : ""}`}
+            className={`self-start mt-1 ${ui.customization?.infoSectionBackground ? (ui.customization.infoSectionBackground === "#FFFFFF" ? "brightness-0" : "brightness-0 invert") : ""} ${isDisabled ? "opacity-50" : ""}`}
           />
         </div>
       </Link>

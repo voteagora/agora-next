@@ -169,7 +169,6 @@ export default function DunaEditor({
   const [linkDialogUrl, setLinkDialogUrl] = useState("");
   const { ui } = Tenant.current();
 
-
   // Debug link dialog state
   useEffect(() => {
     console.log("Link dialog state:", { linkDialogOpen, linkDialogUrl });

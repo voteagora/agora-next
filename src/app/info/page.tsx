@@ -105,11 +105,15 @@ export default async function Page() {
             }}
           />
         )}
-        {hasDunaAdministration ? ui.toggle("towns-duna-administration")?.enabled  ? null : ui.toggle("syndicate-duna-disclosures")?.enabled ? (
+        {hasDunaAdministration ? (
+          ui.toggle("towns-duna-administration")?.enabled ? null : ui.toggle(
+              "syndicate-duna-disclosures"
+            )?.enabled ? (
             <SyndicateDunaDisclosures />
           ) : (
             <DunaDisclosures />
-          ) : null}
+          )
+        ) : null}
         {ui.dunaDisclaimers && (
           <div className="mt-12 pt-6 border-t border-line">
             <p className="text-secondary text-sm opacity-75">

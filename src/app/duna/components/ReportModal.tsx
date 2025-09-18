@@ -55,7 +55,6 @@ const ReportModal = ({
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
-
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
 

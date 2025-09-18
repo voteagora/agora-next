@@ -125,7 +125,8 @@ const QuarterlyReportsSection = ({
           ? {
               ...report,
               comments: (report.comments || []).filter(
-                (comment) => comment.id !== commentId && comment.parentId !== commentId
+                (comment) =>
+                  comment.id !== commentId && comment.parentId !== commentId
               ),
             }
           : report
