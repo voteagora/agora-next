@@ -28,7 +28,7 @@ const TownsDunaAdministration = async () => {
 
     const [topicsResult, documentsResult] = await Promise.all([
       getForumTopics(dunaCategoryId),
-      getForumAttachments(),
+      getForumAttachments({}),
     ]);
 
     if (topicsResult.success) {
@@ -36,7 +36,6 @@ const TownsDunaAdministration = async () => {
         mergePostAttachments: true,
       });
     }
-
     if (documentsResult.success) {
       documents = documentsResult.data;
     }

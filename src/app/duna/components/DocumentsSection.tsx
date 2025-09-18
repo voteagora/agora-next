@@ -7,10 +7,18 @@ import { useAccount } from "wagmi";
 import { TrashIcon, ArchiveBoxIcon } from "@heroicons/react/20/solid";
 import DocumentUploadModal from "./DocumentUploadModal";
 import Tenant from "@/lib/tenant/tenant";
-import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { FileIcon } from "lucide-react";
+
+interface ForumDocument {
+  id: number;
+  name: string;
+  url: string;
+  ipfsCid: string;
+  createdAt: string;
+  uploadedBy: string;
+}
 
 interface ForumDocument {
   id: number;
@@ -34,17 +42,12 @@ const DocumentsSection = ({
     initialDocuments || []
   );
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const {
-    fetchDocuments,
-    deleteAttachment,
-    archiveAttachment,
-    loading,
-    error,
-  } = useForum();
+
+  const { fetchDocuments, deleteAttachment, archiveAttachment } = useForum();
+
   const { address } = useAccount();
-  const openDialog = useOpenDialog();
   const { dunaCategoryId } = useDunaCategory();
-  const { isAdmin, canCreateAttachments, canManageAttachments } = useForumAdmin(
+  const { isAdmin, canManageAttachments } = useForumAdmin(
     dunaCategoryId || undefined
   );
 

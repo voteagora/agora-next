@@ -15,6 +15,7 @@ This project uses various environment variables for configuration. Below is a co
 ### 🔴 Critical Configuration (Required)
 
 #### **NEXT_PUBLIC_AGORA_INSTANCE_NAME**
+
 - **Purpose**: Identifies which DAO configuration to load (e.g., "ens", "uniswap", "optimism", "derive", "cyber", "xai", "boost", "scroll", "linea", "etherfi", "b3", "protocol-guild")
 - **Required**: YES - Application won't start without this
 - **Usage**: Controls the entire tenant configuration including contracts, UI theme, and features
@@ -22,6 +23,7 @@ This project uses various environment variables for configuration. Below is a co
 - **Related**: Works with `NEXT_PUBLIC_AGORA_ENV` to determine environment-specific settings
 
 #### **NEXT_PUBLIC_AGORA_INSTANCE_TOKEN**
+
 - **Purpose**: Token symbol for the DAO instance (e.g., "ENS", "OP", "UNI")
 - **Required**: YES - Used in UI displays and token references
 - **Usage**: Displayed throughout the UI when referring to the governance token
@@ -29,11 +31,12 @@ This project uses various environment variables for configuration. Below is a co
 - **Note**: Should match the actual token symbol of the DAO
 
 #### **NEXT_PUBLIC_AGORA_ENV**
+
 - **Purpose**: Determines production vs development environment
 - **Required**: YES
 - **Values**: `"prod"` for production, `"dev"` or any other value for development
 - **Impact**: Controls:
-  - Which database URLs are used (READ_WRITE_WEB2_DATABASE_URL_PROD vs _DEV)
+  - Which database URLs are used (READ_WRITE_WEB2_DATABASE_URL_PROD vs \_DEV)
   - Contract addresses (mainnet vs testnet)
   - Feature toggles and safety checks
   - API endpoints (prod vs dev environments)
@@ -43,6 +46,7 @@ This project uses various environment variables for configuration. Below is a co
 - **Note**: Also available as `AGORA_ENV` in some legacy components
 
 #### **NEXT_PUBLIC_ALCHEMY_ID**
+
 - **Purpose**: Alchemy API key for blockchain RPC access
 - **Required**: YES (unless using `NEXT_PUBLIC_FORK_NODE_URL`)
 - **Usage**: Used across all chain interactions for reading blockchain data
@@ -53,6 +57,7 @@ This project uses various environment variables for configuration. Below is a co
 ### 📊 Database Configuration
 
 #### **DATABASE_URL**
+
 - **Purpose**: PostgreSQL database connection string
 - **Required**: Conditional - see usage notes
 - **Special Values**:
@@ -62,13 +67,15 @@ This project uses various environment variables for configuration. Below is a co
 - **Format**: `postgres://user:password@host/database`
 - **Note**: If not set, falls back to environment-specific URLs below
 
-#### **READ_WRITE_WEB2_DATABASE_URL_[PROD|DEV]**
+#### **READ*WRITE_WEB2_DATABASE_URL*[PROD|DEV]**
+
 - **Purpose**: Database for user-generated content (profiles, settings)
 - **Required**: YES (based on `NEXT_PUBLIC_AGORA_ENV`)
 - **Usage**: Read-write operations for web2 data
 - **Example**: `READ_WRITE_WEB2_DATABASE_URL_PROD=postgres://...`
 
-#### **READ_ONLY_WEB3_DATABASE_URL_[PROD|DEV]**
+#### **READ*ONLY_WEB3_DATABASE_URL*[PROD|DEV]**
+
 - **Purpose**: Database for blockchain indexed data
 - **Required**: YES (based on `NEXT_PUBLIC_AGORA_ENV`)
 - **Usage**: Read-only operations for web3 data (proposals, votes, delegates)
@@ -77,6 +84,7 @@ This project uses various environment variables for configuration. Below is a co
 ### 🔐 Authentication & Security
 
 #### **GAS_SPONSOR_PK**
+
 - **Purpose**: Private key for sponsoring gas fees in relay transactions
 - **Required**: YES for gasless transactions feature
 - **Security**: CRITICAL - Never expose in client code or logs
@@ -85,6 +93,7 @@ This project uses various environment variables for configuration. Below is a co
 - **Location**: Server-side only (`/api/v1/relay/*`)
 
 #### **EAS_SENDER_PRIVATE_KEY**
+
 - **Purpose**: Private key for Ethereum Attestation Service operations
 - **Required**: YES for attestation features
 - **Security**: CRITICAL - Server-side only
@@ -92,6 +101,7 @@ This project uses various environment variables for configuration. Below is a co
 - **Format**: Hex string
 
 #### **JWT_SECRET**
+
 - **Purpose**: Secret for signing JWT tokens
 - **Required**: YES for authentication
 - **Security**: CRITICAL - Must be strong and unique per environment
@@ -99,6 +109,7 @@ This project uses various environment variables for configuration. Below is a co
 - **Minimum**: 32 characters recommended
 
 #### **NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID**
+
 - **Purpose**: WalletConnect v2 project identifier
 - **Required**: YES for wallet connections
 - **Usage**: Enables wallet connections via WalletConnect protocol
@@ -108,6 +119,7 @@ This project uses various environment variables for configuration. Below is a co
 ### 🌐 Network & RPC Configuration
 
 #### **NEXT_PUBLIC_FORK_NODE_URL**
+
 - **Purpose**: Override RPC endpoint for development/testing
 - **Required**: NO
 - **Usage**: Takes precedence over Alchemy when set
@@ -118,12 +130,14 @@ This project uses various environment variables for configuration. Below is a co
 - **Example**: `NEXT_PUBLIC_FORK_NODE_URL=http://localhost:8545`
 
 #### **NEXT_PUBLIC_CONDUIT_KEY**
+
 - **Purpose**: API key for Conduit RPC (Derive chain)
 - **Required**: YES for Derive tenant
 - **Usage**: Constructs RPC URLs for Derive mainnet/testnet
 - **Format**: Used in URL: `https://rpc.derive.xyz/{key}`
 
 #### **DAONODE_URL_TEMPLATE**
+
 - **Purpose**: Template for DAO-specific data endpoints
 - **Required**: YES
 - **Format**: `https://{TENANT_NAMESPACE}.{service-url}/`
@@ -133,6 +147,7 @@ This project uses various environment variables for configuration. Below is a co
 ### 📦 External Services
 
 #### **TENDERLY_USER**, **TENDERLY_PROJECT**, **TENDERLY_ACCESS_KEY**
+
 - **Purpose**: Transaction simulation for proposal execution
 - **Required**: NO (simulation features disabled if missing)
 - **Usage**: Simulates proposal execution before voting
@@ -140,6 +155,7 @@ This project uses various environment variables for configuration. Below is a co
 - **Related**: All three must be set for simulation to work
 
 #### **PINATA_API_KEY**, **PINATA_SECRET_API_KEY**, **PINATA_JWT**
+
 - **Purpose**: IPFS file storage via Pinata
 - **Required**: NO (IPFS features disabled if missing)
 - **Usage**: Stores proposal descriptions and supporting documents
@@ -147,6 +163,7 @@ This project uses various environment variables for configuration. Below is a co
 - **Get credentials**: https://pinata.cloud/
 
 #### **PR_BOT_TOKEN**
+
 - **Purpose**: GitHub token for creating pull requests
 - **Required**: NO (PR creation disabled if missing)
 - **Usage**: Creates PRs for ENS executable proposals
@@ -154,9 +171,10 @@ This project uses various environment variables for configuration. Below is a co
 - **Related**: Works with `ENVIRONMENT` variable
 
 #### **NEXT_PUBLIC_ETHERSCAN_API_KEY**
+
 - **Purpose**: Etherscan API for contract verification and ABI fetching
 - **Required**: Recommended
-- **Usage**: 
+- **Usage**:
   - Fetches contract ABIs dynamically
   - Decodes transaction data
   - Verifies contract source code
@@ -165,6 +183,7 @@ This project uses various environment variables for configuration. Below is a co
 ### 🎛️ Feature Flags
 
 #### **NEXT_PUBLIC_SIWE_ENABLED**
+
 - **Purpose**: Enable Sign-In with Ethereum
 - **Required**: NO
 - **Values**: `"true"` to enable, any other value disables
@@ -172,6 +191,7 @@ This project uses various environment variables for configuration. Below is a co
 - **Default**: Disabled
 
 #### **NEXT_PUBLIC_ENABLE_BI_METRICS_CAPTURE**
+
 - **Purpose**: Enable analytics event tracking
 - **Required**: NO
 - **Values**: `"true"` to enable
@@ -180,6 +200,7 @@ This project uses various environment variables for configuration. Below is a co
 - **Related**: Requires `NEXT_PUBLIC_AGORA_API_KEY`
 
 #### **NEXT_PUBLIC_MUTE_QUERY_LOGGING**
+
 - **Purpose**: Disable database query logging
 - **Required**: NO
 - **Values**: `"true"` to disable logging
@@ -189,12 +210,14 @@ This project uses various environment variables for configuration. Below is a co
 ### 📊 Monitoring & Analytics
 
 #### **DD_API_KEY**, **DD_APP_KEY**
+
 - **Purpose**: DataDog monitoring integration
 - **Required**: NO (monitoring disabled if missing)
 - **Usage**: Sends application metrics and alerts
 - **Related**: Must set `ENABLE_DD_METRICS=true`
 
 #### **ENABLE_DD_METRICS**
+
 - **Purpose**: Toggle DataDog metrics collection
 - **Required**: NO
 - **Values**: `"true"` to enable
@@ -204,16 +227,18 @@ This project uses various environment variables for configuration. Below is a co
 ### 🚀 Deployment
 
 #### **NODE_ENV**
+
 - **Purpose**: Node.js environment mode
 - **Required**: Automatically set by Next.js
 - **Values**: `"production"`, `"development"`, `"test"`
-- **Impact**: 
+- **Impact**:
   - Production mode enables optimizations and stricter error handling
   - Development mode enables hot reload and detailed error messages
   - Controls Prisma client behavior and caching
 - **Note**: Set automatically by `next dev` (development) and `next build` (production)
 
 #### **NEXT_RUNTIME**
+
 - **Purpose**: Next.js runtime environment
 - **Required**: Automatically set by Next.js
 - **Values**: `"nodejs"`, `"edge"`
@@ -221,6 +246,7 @@ This project uses various environment variables for configuration. Below is a co
 - **Note**: Don't set manually unless debugging
 
 #### **NEXT_PHASE**
+
 - **Purpose**: Next.js build phase indicator
 - **Required**: Automatically set during build
 - **Values**: `"phase-production-build"`, `"phase-development-server"`, etc.
@@ -228,6 +254,7 @@ This project uses various environment variables for configuration. Below is a co
 - **Note**: Referenced in commented code for build-time safety checks
 
 #### **VERCEL_ENV**, **VERCEL_REGION**, **VERCEL_URL**, etc.
+
 - **Purpose**: Vercel deployment metadata
 - **Required**: Automatically set by Vercel
 - **Usage**: OpenTelemetry tracing attributes for monitoring
@@ -240,6 +267,7 @@ This project uses various environment variables for configuration. Below is a co
 - **Note**: Don't set manually - Vercel provides these automatically
 
 #### **NEXT_PUBLIC_AGORA_BASE_URL**
+
 - **Purpose**: Application base URL for metadata
 - **Required**: YES
 - **Usage**: Used in wallet connection metadata and API calls
@@ -247,6 +275,7 @@ This project uses various environment variables for configuration. Below is a co
 - **Example**: `NEXT_PUBLIC_AGORA_BASE_URL=https://vote.ens.domains`
 
 #### **NEXT_PUBLIC_AGORA_ROOT**
+
 - **Purpose**: Application root path
 - **Required**: NO
 - **Default**: `"/"`
@@ -256,18 +285,21 @@ This project uses various environment variables for configuration. Below is a co
 ### 🧪 Testing & Development
 
 #### **REACT_APP_DEPLOY_ENV**
+
 - **Purpose**: Controls Snapshot space selection
 - **Required**: NO
 - **Values**: `"prod"` for production space
 - **Impact**: Determines which Snapshot space proposals are created in
 
 #### **TESTNET_SNAPSHOT_SPACE**
+
 - **Purpose**: Override testnet Snapshot space
 - **Required**: NO
 - **Default**: `"michaelagora.eth"`
 - **Usage**: Custom Snapshot space for testing
 
 #### **ENVIRONMENT**
+
 - **Purpose**: GitHub repository targeting
 - **Required**: NO
 - **Values**: `"prod"` targets main repo, others target fork
@@ -276,25 +308,29 @@ This project uses various environment variables for configuration. Below is a co
 ### 🔧 Advanced Features
 
 #### **NEXT_PUBLIC_ALCHEMY_SMART_ACCOUNT**
+
 - **Purpose**: Alchemy API key for smart account features
 - **Required**: NO (smart accounts disabled if missing)
 - **Usage**: Enables account abstraction features
 - **Get it from**: Alchemy dashboard (separate from regular API key)
 
 #### **PAYMASTER_SECRET**
+
 - **Purpose**: Secret for paymaster service integration
 - **Required**: NO (paymaster features disabled if missing)
 - **Usage**: Enables sponsored transactions
 
 #### **AWS_ACCESS_KEY_ID**, **AWS_SECRET_ACCESS_KEY**
+
 - **Purpose**: AWS credentials for S3 and other services
 - **Required**: NO (AWS features disabled if missing)
-- **Usage**: 
+- **Usage**:
   - DynamoDB access for certain features
   - S3 bucket operations
 - **Security**: Use IAM roles in production when possible
 
 #### **STORAGE_BUCKET_URL**
+
 - **Purpose**: Base URL for storage bucket
 - **Required**: NO
 - **Usage**: Fetches contract ABIs from backup storage
@@ -304,6 +340,7 @@ This project uses various environment variables for configuration. Below is a co
 ### 📋 Environment Setup Guide
 
 #### Minimum Required for Development:
+
 ```bash
 # Core Configuration
 NEXT_PUBLIC_AGORA_INSTANCE_NAME=ens
@@ -328,12 +365,14 @@ READ_ONLY_WEB3_DATABASE_URL_DEV=postgres://...
 ```
 
 #### Additional for Full Features:
+
 - Add Tenderly credentials for simulation
 - Add Pinata credentials for IPFS
 - Add gas sponsor keys for gasless transactions
 - Add monitoring keys for production
 
 #### Security Best Practices:
+
 1. Never commit `.env` files with real credentials
 2. Use different keys for development and production
 3. Rotate private keys regularly
@@ -533,9 +572,8 @@ npm run generate-apikey -- --email user@example.com --address 0x123345 --chain-i
 If for any reason you need an API key for a new chain, you'll need to run something like this against prod:
 
 ```
-INSERT INTO agora."chain" (id,  name,      created_at,  updated_at) VALUES 
+INSERT INTO agora."chain" (id,  name,      created_at,  updated_at) VALUES
                           ('10','Optimism','2025-06-09','2025-06-09');
 ```
 
-...where id is the chain id.  
-
+...where id is the chain id.

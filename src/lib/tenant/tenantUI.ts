@@ -153,6 +153,7 @@ type TenantUIParams = {
     customTitleSize?: string;
     customCardSize?: string;
     customIconColor?: string;
+    noReportsFound?: string;
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -215,6 +216,7 @@ export class TenantUI {
     customTitleSize?: string;
     customCardSize?: string;
     customIconColor?: string;
+    noReportsFound?: string;
   };
   private _theme: "light" | "dark";
   private _favicon?: {
@@ -355,6 +357,7 @@ export class TenantUI {
         customTitleSize?: string;
         customCardSize?: string;
         customIconColor?: string;
+        noReportsFound?: string;
       }
     | undefined {
     return this._customization;
