@@ -14,6 +14,7 @@ import { b3TenantConfig } from "./configs/contracts/b3";
 import { demoTenantConfig } from "./configs/contracts/demo";
 import { lineaTenantConfig } from "./configs/contracts/linea";
 import { townsTenantConfig } from "./configs/contracts/towns";
+import { shapeTenantConfig } from "./configs/contracts/shape";
 
 export default class TenantContractFactory {
   public static create(
@@ -50,6 +51,8 @@ export default class TenantContractFactory {
         return lineaTenantConfig({ isProd, alchemyId });
       case TENANT_NAMESPACES.TOWNS:
         return townsTenantConfig({ isProd, alchemyId });
+      case TENANT_NAMESPACES.SHAPE:
+        return shapeTenantConfig({ isProd, alchemyId });
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
