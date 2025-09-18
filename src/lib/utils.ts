@@ -442,12 +442,12 @@ export function toNumericChainId(
   if (Number.isNaN(id)) {
     throw new Error(`Invalid chain id: ${String(raw)}`);
   }
-  console.log({ raw, parts, maybeId, id });
+  // console.debug({ raw, parts, maybeId, id });
   return id;
 }
 
 export const getTransportForChain = (chainId: number) => {
-  console.log({ getTransportForChainID: chainId });
+  // console.debug({ getTransportForChainID: chainId });
 
   switch (chainId) {
     // mainnet
