@@ -147,7 +147,7 @@ const InfoAbout = () => {
           </div>
         )}
         <div className="p-6 rounded-b-xl border-t border-line bg-infoSectionBackground">
-          <div className="flex flex-row gap-6 flex-wrap sm:flex-nowrap mb-4">
+          <div className="flex lg:flex-row flex-col gap-6 flex-wrap sm:flex-nowrap mb-4">
             {activeTabs.map((item, index) => (
               <div
                 key={index}

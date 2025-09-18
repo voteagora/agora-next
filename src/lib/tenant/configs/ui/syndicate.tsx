@@ -50,7 +50,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     infoSectionBackground: "#FFFFFF",
     cardBackground: "#FFFFFF",
     customIconBackground: "#FBFBFB",
-    footerBackground: "#ECEDE5",
+    footerBackground: "236 237 229",
     customAboutSubtitle: "About Syndicate Network Collective",
     customIconColor: "#87819F",
     customInfoLayout: "flex-col sm:flex-row gap-2",
