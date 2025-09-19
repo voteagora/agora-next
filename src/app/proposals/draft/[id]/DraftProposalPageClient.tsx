@@ -32,6 +32,7 @@ export default function DraftProposalPageClient({
   const completedSignRef = useRef<boolean>(false);
   const pollIdRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const hasDraftRef = useRef<boolean>(false);
+  const wasConnectedRef = useRef<boolean>(false);
 
   const {
     stageIndex,
@@ -61,6 +62,22 @@ export default function DraftProposalPageClient({
         clearInterval(pollIdRef.current);
         pollIdRef.current = null;
       }
+    }
+  }, [address]);
+
+  // On wallet reconnect (transition from disconnected -> connected), drop any existing SIWE session
+  // to force a fresh sign-in aligned with the new connection lifecycle.
+  useEffect(() => {
+    if (address) {
+      if (!wasConnectedRef.current) {
+        try {
+          localStorage.removeItem("agora-siwe-jwt");
+          localStorage.removeItem("agora-siwe-stage");
+        } catch {}
+      }
+      wasConnectedRef.current = true;
+    } else {
+      wasConnectedRef.current = false;
     }
   }, [address]);
 
