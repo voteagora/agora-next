@@ -22,6 +22,7 @@ import {
   arbitrum,
   base,
   goerli,
+  mainnet,
   optimism,
   polygon,
   scroll,
