@@ -54,12 +54,23 @@ export const siweProviderConfig: SIWEConfig = {
     }
     try {
       const token = await res.json();
+      if (!token || !token.access_token) {
+        try {
+          localStorage.setItem("agora-siwe-stage", "error");
+        } catch {}
+        return false;
+      }
       localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
       try {
         localStorage.setItem("agora-siwe-stage", "signed");
       } catch {}
-    } catch {}
-    return true;
+      return true;
+    } catch {
+      try {
+        localStorage.setItem("agora-siwe-stage", "error");
+      } catch {}
+      return false;
+    }
   },
   getSession: async () => {
     // return JWT from local storage
