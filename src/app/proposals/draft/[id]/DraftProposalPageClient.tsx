@@ -12,7 +12,6 @@ import { DraftPageHeader } from "./components/DraftPageHeader";
 import { SiweAccessCard } from "./components/SiweAccessCard";
 import Loading from "./loading";
 
-
 type DraftResponse = DraftProposalType;
 
 export default function DraftProposalPageClient({
@@ -45,6 +44,25 @@ export default function DraftProposalPageClient({
   const { address } = useAccount();
   const currentChainId = useChainId();
   const { switchChainAsync, isPending: isSwitching } = useSwitchChain();
+
+  useEffect(() => {
+    if (!address) {
+      try {
+        localStorage.removeItem("agora-siwe-jwt");
+        localStorage.removeItem("agora-siwe-stage");
+      } catch {}
+      setDraft(null);
+      hasDraftRef.current = false;
+      setIsSigning(false);
+      setSignLabel(null);
+      setPostSignGrace(false);
+      setError(null);
+      if (pollIdRef.current) {
+        clearInterval(pollIdRef.current);
+        pollIdRef.current = null;
+      }
+    }
+  }, [address]);
 
   const {
     data,
@@ -82,7 +100,7 @@ export default function DraftProposalPageClient({
       setLoading(false);
       hasDraftRef.current = true;
     } else if (isLoading) {
-      setLoading(true);
+      if (!hasDraftRef.current) setLoading(true);
     } else if (queryError) {
       setError((queryError as Error).message);
       setLoading(false);
@@ -147,7 +165,8 @@ export default function DraftProposalPageClient({
         clearInterval(pollIdRef.current);
         pollIdRef.current = null;
       }
-    } finally {}
+    } finally {
+    }
   }, [
     isSigning,
     address,
@@ -155,7 +174,6 @@ export default function DraftProposalPageClient({
     targetChainId,
     switchChainAsync,
     signIn,
-    refetch,
   ]);
 
   const loadedAfterJwtRef = useRef<boolean>(false);
@@ -170,12 +188,17 @@ export default function DraftProposalPageClient({
           if (!completedSignRef.current) setSignLabel("Awaiting Confirmation");
         } else if (stage === "signed") {
           if (!hasJwt) {
+            setSignLabel(null);
             setIsSigning(false);
-            setSignLabel("Cancelled");
-            setError("Signature cancelled by user");
+            setPostSignGrace(false);
+            completedSignRef.current = false;
             try {
-              localStorage.setItem("agora-siwe-stage", "error");
+              localStorage.removeItem("agora-siwe-stage");
             } catch {}
+            if (pollIdRef.current) {
+              clearInterval(pollIdRef.current);
+              pollIdRef.current = null;
+            }
             return;
           }
           completedSignRef.current = true;
@@ -205,22 +228,29 @@ export default function DraftProposalPageClient({
               clearInterval(pollIdRef.current);
               pollIdRef.current = null;
             }
+            try {
+              localStorage.removeItem("agora-siwe-stage");
+            } catch {}
           }, 600);
+        } else {
+          if (!hasJwt) {
+            setSignLabel(null);
+            setIsSigning(false);
+            setPostSignGrace(false);
+            completedSignRef.current = false;
+          }
         }
       } catch {}
     }, 200);
     return () => clearInterval(id);
   }, [isSigning, refetch]);
 
-  if (loading && !draft && !error) {
-    return <Loading />;
-  }
-
-  if (error) {
+  if (!hasDraftRef.current && !draft && !error) {
+    if (loading) return <Loading />;
     return (
       <div className="max-w-screen-xl mx-auto mt-10">
         <SiweAccessCard
-          error={error}
+          error={null}
           isSigning={isSigning}
           signLabel={signLabel}
           onConnectClick={() => {}}
@@ -232,7 +262,23 @@ export default function DraftProposalPageClient({
     );
   }
 
-  if (!draft && !isSigning && !postSignGrace) {
+  if (error || ((isSigning || postSignGrace) && !draft)) {
+    return (
+      <div className="max-w-screen-xl mx-auto mt-10">
+        <SiweAccessCard
+          error={isSigning ? null : error}
+          isSigning={isSigning}
+          signLabel={signLabel}
+          onConnectClick={() => {}}
+          onSignClick={handleSiwe}
+          isSwitching={isSwitching}
+          hasAddress={Boolean(address)}
+        />
+      </div>
+    );
+  }
+
+  if (!draft && !isSigning && !postSignGrace && !error && hasDraftRef.current) {
     return <div className="text-secondary">Draft not found.</div>;
   }
 
@@ -249,28 +295,26 @@ export default function DraftProposalPageClient({
           <div className="flex items-center justify-end mt-4">
             <DeleteDraftButton proposalId={draft.id} />
           </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
+            <section className="col-span-1 sm:col-span-2 order-last sm:order-first">
+              <DraftProposalForm
+                proposalTypes={proposalTypes}
+                stage={stageObject.stage}
+                draftProposal={draft}
+              />
+            </section>
+            <section className="col-span-1">
+              <div className="bg-wash border border-line rounded-2xl p-4">
+                <div className="mt-2">
+                  <ReactMarkdown className="prose-h2:text-lg prose-h2:font-bold prose-h2:text-primary prose-p:text-secondary prose-p:mt-2 prose-li:list-inside prose-li:list-decimal prose-li:my-2 prose-a:text-primary prose-a:underline prose-li:text-secondary">
+                    {config?.copy?.helperText}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            </section>
+          </div>
         </>
       )}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
-        {draft && (
-          <section className="col-span-1 sm:col-span-2 order-last sm:order-first">
-            <DraftProposalForm
-              proposalTypes={proposalTypes}
-              stage={stageObject.stage}
-              draftProposal={draft}
-            />
-          </section>
-        )}
-        <section className="col-span-1">
-          <div className="bg-wash border border-line rounded-2xl p-4">
-            <div className="mt-2">
-              <ReactMarkdown className="prose-h2:text-lg prose-h2:font-bold prose-h2:text-primary prose-p:text-secondary prose-p:mt-2 prose-li:list-inside prose-li:list-decimal prose-li:my-2 prose-a:text-primary prose-a:underline prose-li:text-secondary">
-                {config?.copy?.helperText}
-              </ReactMarkdown>
-            </div>
-          </div>
-        </section>
-      </div>
     </main>
   );
 }
