@@ -22,8 +22,6 @@ import {
   arbitrum,
   base,
   goerli,
-  
-  net,
   optimism,
   polygon,
   scroll,
