@@ -7,7 +7,6 @@ import Tenant from "@/lib/tenant/tenant";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 
-
 const createTopicSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
@@ -558,13 +557,17 @@ export async function createForumPost(
   }
 }
 
-export async function getForumAttachments() {
+export async function getForumAttachments({
+  categoryId,
+}: {
+  categoryId?: number;
+}) {
   try {
     const { slug } = Tenant.current();
     const whereClause: any = {
       dao_slug: slug,
       targetType: AttachableType.category,
-      targetId: 0,
+      targetId: categoryId || 0,
       archived: false,
     };
 

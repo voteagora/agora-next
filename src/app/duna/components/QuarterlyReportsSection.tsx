@@ -9,6 +9,7 @@ import { ForumTopic, ForumPost } from "@/lib/forumUtils";
 import toast from "react-hot-toast";
 import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import Tenant from "@/lib/tenant/tenant";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 
 // Custom up-down chevron icon (outline)
@@ -27,15 +28,20 @@ const UpDownChevronIcon = ({ className }: { className?: string }) => (
 
 interface QuarterlyReportsSectionProps {
   initialReports: ForumTopic[];
+  hideHeader?: boolean;
 }
 
 const QuarterlyReportsSection = ({
   initialReports,
+  hideHeader = false,
 }: QuarterlyReportsSectionProps) => {
   const [reports, setReports] = useState<ForumTopic[]>(initialReports || []);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [showAllReports, setShowAllReports] = useState(false);
   const { address } = useAccount();
+
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const { createTopic, loading } = useForum();
   const { dunaCategoryId } = useDunaCategory();
@@ -128,10 +134,8 @@ const QuarterlyReportsSection = ({
     );
   };
 
-  // Show only 2 latest reports initially
-  const initialReportsCount = 2;
+  const initialReportsCount = 3;
   const hasMoreReports = reports.length > initialReportsCount;
-
   const displayedReports = showAllReports
     ? reports
     : reports.slice(0, initialReportsCount);
@@ -142,49 +146,77 @@ const QuarterlyReportsSection = ({
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
-        <h4 className="text-lg font-bold text-primary">Quarterly Reports</h4>
-        {!!address && canCreateTopics && (
-          <Button
-            onClick={handleCreatePost}
-            className="text-white border border-black hover:bg-gray-800 text-sm w-full sm:w-auto"
-            style={{
-              display: "flex",
-              height: "36px",
-              padding: "12px 20px",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "8px",
-              flexShrink: 0,
-              borderRadius: "8px",
-              background: "#171717",
-              boxShadow:
-                "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-            }}
+      {!hideHeader && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+          <h4
+            className={`text-lg font-bold ${
+              useDarkStyling ? "text-white" : "text-primary"
+            }`}
           >
-            Create new post
-          </Button>
-        )}
-      </div>
+            {ui.toggle("duna/use-community-dialogue-label")?.enabled
+              ? "Community Dialogue"
+              : "Quarterly Reports"}
+          </h4>
+          {!!address && canCreateTopics && (
+            <Button
+              onClick={handleCreatePost}
+              className={`${
+                useDarkStyling
+                  ? "bg-buttonPrimaryDark text-white border-buttonPrimaryDark hover:bg-buttonPrimaryDark/80"
+                  : "text-white border border-black hover:bg-gray-800"
+              } text-sm w-full sm:w-auto`}
+              style={
+                !useDarkStyling
+                  ? {
+                      display: "flex",
+                      height: "36px",
+                      padding: "12px 20px",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: "8px",
+                      flexShrink: 0,
+                      borderRadius: "8px",
+                      background: "#171717",
+                      boxShadow:
+                        "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+                    }
+                  : undefined
+              }
+            >
+              Create new post
+            </Button>
+          )}
+        </div>
+      )}
 
       {loading && (
         <div className="text-center py-4">
-          <div className="text-secondary">Creating report...</div>
+          <div className={useDarkStyling ? "text-white" : "text-secondary"}>
+            Creating report...
+          </div>
         </div>
       )}
 
       {reports.length === 0 && (
         <div className="text-center py-8">
-          <div className="text-secondary">
-            No reports found. Create the first one!
-          </div>
+          <p
+            className={`text-sm opacity-75 ${
+              useDarkStyling ? "text-white" : "text-secondary"
+            }`}
+          >
+            {ui.customization?.noReportsFound || "No reports found."}
+          </p>
         </div>
       )}
 
       {reports.length > 0 && (
         <div
-          className="border rounded-lg bg-white"
-          style={{ borderColor: "#E5E5E5" }}
+          className={`border rounded-lg ${
+            useDarkStyling ? "bg-modalBackgroundDark" : "bg-white"
+          }`}
+          style={{
+            borderColor: useDarkStyling ? "#2B2449" : "#E5E5E5",
+          }}
         >
           {displayedReports.map((report, index) => (
             <QuarterlyReportCard
@@ -200,18 +232,28 @@ const QuarterlyReportsSection = ({
           {/* Toggle button in the middle */}
           {hasMoreReports && (
             <div
-              className="flex justify-between items-center py-3 border-t px-4"
-              style={{ borderTopColor: "#E5E5E5" }}
+              className={`flex justify-between items-center py-3 border-t px-4 ${
+                useDarkStyling ? "border-cardBorder" : ""
+              }`}
+              style={!useDarkStyling ? { borderTopColor: "#E5E5E5" } : {}}
             >
               <button
                 onClick={handleToggleReports}
-                className="text-xs font-medium text-secondary hover:text-primary transition-colors"
+                className={`text-xs font-medium transition-colors ${
+                  useDarkStyling
+                    ? "text-[#87819F] hover:text-white"
+                    : "text-secondary hover:text-primary"
+                }`}
               >
                 {showAllReports ? "SHOW LESS" : "VIEW OLDER POSTS"}
               </button>
               <button
                 onClick={handleToggleReports}
-                className="text-secondary hover:text-primary transition-colors"
+                className={`transition-colors ${
+                  useDarkStyling
+                    ? "text-[#87819F] hover:text-white"
+                    : "text-secondary hover:text-primary"
+                }`}
               >
                 <UpDownChevronIcon className="w-4 h-4" />
               </button>

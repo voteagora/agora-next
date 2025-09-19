@@ -232,9 +232,10 @@ export async function getProposalStatus(
           ? (Number(forVotes) / Number(thresholdVotes)) * 100
           : 0;
       const apprThresholdPercent = Number(approvalThreshold) / 100;
-      const hasMetThreshold = Boolean(
-        voteThresholdPercent >= apprThresholdPercent
-      );
+
+      const hasMetThresholdOrNoThreshold =
+        Boolean(voteThresholdPercent >= apprThresholdPercent) ||
+        approvalThreshold === undefined;
 
       const quorumForGovernor = getProposalCurrentQuorum(
         proposalResults.kind,
@@ -244,7 +245,7 @@ export async function getProposalStatus(
       if (
         (quorum && quorumForGovernor < quorum) ||
         forVotes < againstVotes ||
-        !hasMetThreshold
+        !hasMetThresholdOrNoThreshold
       ) {
         return "DEFEATED";
       }
@@ -268,7 +269,6 @@ export async function getProposalStatus(
       if (tallies.quorumMet) {
         return "SUCCEEDED";
       }
-
       return "DEFEATED";
     }
     case "OPTIMISTIC": {

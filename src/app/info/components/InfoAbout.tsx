@@ -9,12 +9,15 @@ import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
 
 const { ui } = Tenant.current();
 
-const tabs = [
+const defaultTabs = [
   {
     icon: (
       <CoinsIcon
         className="w-[24px] h-[24px]"
-        stroke={rgbStringToHex(ui.customization?.brandPrimary)}
+        stroke={
+          ui.customization?.customIconColor ||
+          rgbStringToHex(ui.customization?.brandPrimary)
+        }
       />
     ),
     title: "Delegate voting power",
@@ -25,7 +28,10 @@ const tabs = [
     icon: (
       <NotificationIcon
         className="w-[24px] h-[24px]"
-        stroke={rgbStringToHex(ui.customization?.brandPrimary)}
+        stroke={
+          ui.customization?.customIconColor ||
+          rgbStringToHex(ui.customization?.brandPrimary)
+        }
       />
     ),
     title: "Browse proposals",
@@ -36,7 +42,10 @@ const tabs = [
     icon: (
       <CheckCircleBrokenIcon
         className="w-[24px] h-[24px]"
-        stroke={rgbStringToHex(ui.customization?.brandPrimary)}
+        stroke={
+          ui.customization?.customIconColor ||
+          rgbStringToHex(ui.customization?.brandPrimary)
+        }
       />
     ),
     title: "Vote on proposals",
@@ -53,27 +62,50 @@ const InfoAbout = () => {
     return <div>Page metadata not defined</div>;
   }
 
+  const tabs = ui.customization?.customInfoTabs
+    ? ui.customization.customInfoTabs.map((tab, index) => ({
+        ...tab,
+        icon: defaultTabs[index]?.icon,
+      }))
+    : defaultTabs;
+
   const activeTabs = page.tabs || tabs;
   const sectionTitle = page.sectionTitle || "Getting started";
 
   return (
     <>
       <h3 className="text-2xl font-black text-primary mt-12">{sectionTitle}</h3>
-      <div className="mt-4 rounded-xl border border-line bg-neutral shadow-sm">
-        <div className="p-6 flex flex-row flex-wrap sm:flex-nowrap gap-6">
-          <div className="w-full h-[200px] sm:h-auto sm:w-1/2 relative">
-            <Image
-              src={page.hero!}
-              alt={page.title}
-              fill
-              className="rounded-lg object-cover object-center"
-            />
-          </div>
-          <div className="sm:w-1/2">
-            <h3 className="text-lg font-bold text-primary">
-              {"About " + brandName}
-            </h3>
-            <p className="text-secondary mt-3">{page.description}</p>
+      <div className="mt-4 rounded-xl border border-line shadow-sm bg-infoSectionBackground">
+        <div
+          className={`p-6 flex flex-row flex-wrap sm:flex-nowrap ${ui.customization?.customInfoLayout ? ui.customization.customInfoLayout : "gap-6"}`}
+        >
+          {!ui.toggle("hide-hero-image")?.enabled && (
+            <div
+              className={`w-full sm:w-1/2 relative ${ui.customization?.customHeroImageSize ? ui.customization.customHeroImageSize : "h-[200px] sm:h-auto"}`}
+            >
+              <Image
+                src={page.hero!}
+                alt={page.title}
+                fill
+                className="rounded-lg object-cover object-center"
+              />
+            </div>
+          )}
+          <div
+            className={`${ui.customization?.customInfoLayout ? "sm:w-auto sm:ml-2" : ui.toggle("hide-hero-image")?.enabled ? "w-full" : "sm:w-1/2"}`}
+          >
+            <div
+              className={`${ui.customization?.customTextContainer ? ui.customization.customTextContainer : ""}`}
+            >
+              <h3 className="text-lg font-bold text-primary">
+                {ui.customization?.customAboutSubtitle || "About " + brandName}
+              </h3>
+              <p
+                className={`text-secondary mt-3 ${ui.toggle("hide-hero-image")?.enabled ? "whitespace-pre-line" : ""}`}
+              >
+                {page.description}
+              </p>
+            </div>
             {/* So the image doesn't look smooshed for scroll :eye-roll: */}
             {namespace === TENANT_NAMESPACES.SCROLL && (
               <div className="sm:h-[105px] block"></div>
@@ -90,8 +122,8 @@ const InfoAbout = () => {
             </div>
             <p className="text-secondary mt-3">
               <span className="italic">
-                “A complex system that works is invariably found to have evolved
-                from a simple system that worked.”
+                &ldquo;A complex system that works is invariably found to have
+                evolved from a simple system that worked.&rdquo;
               </span>{" "}
               - John Gall.
             </p>
@@ -107,19 +139,21 @@ const InfoAbout = () => {
             </p>
           </div>
         )}
-        <div className="p-6  rounded-b-xl bg-neutral border-t border-line">
-          <div className="flex flex-row gap-6 flex-wrap sm:flex-nowrap mb-4">
+        <div className="p-6 rounded-b-xl border-t border-line bg-infoSectionBackground">
+          <div className="flex lg:flex-row flex-col gap-6 flex-wrap sm:flex-nowrap mb-4">
             {activeTabs.map((item, index) => (
               <div
                 key={index}
-                className="flex flex-row gap-3 justify-center items-center mt-3"
+                className="flex flex-row gap-3 justify-center items-center mt-3 flex-1 min-w-0"
               >
-                <div className="min-w-[72px] h-[72px] flex justify-center items-center rounded-full border border-line bg-tertiary/10 flex sm:hidden lg:flex">
+                <div
+                  className={`min-w-[72px] h-[72px] justify-center items-center rounded-full border border-line flex sm:hidden lg:flex ${ui.customization?.customIconBackground ? ui.customization.customIconBackground : "bg-tertiary/10"}`}
+                >
                   {item.icon}
                 </div>
                 <div>
                   <h3 className="font-semibold text-primary">{item.title}</h3>
-                  <p className="font-normal text-secondary">
+                  <p className={`font-normal text-secondary`}>
                     {item.description}
                   </p>
                 </div>

@@ -13,6 +13,8 @@ import { PaperClipIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { ConnectKitButton } from "connectkit";
 import { DunaEditor } from "@/components/duna-editor";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -34,6 +36,9 @@ const CreatePostModal = ({
   const [attachment, setAttachment] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { isConnected } = useAccount();
+
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,9 +86,17 @@ const CreatePostModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        className={`max-w-2xl w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto ${
+          useDarkStyling ? "bg-modalBackgroundDark border-cardBorder" : ""
+        }`}
+      >
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-primary">
+          <DialogTitle
+            className={`text-xl font-bold ${
+              useDarkStyling ? "text-white" : "text-primary"
+            }`}
+          >
             Create New Post
           </DialogTitle>
         </DialogHeader>
@@ -94,20 +107,28 @@ const CreatePostModal = ({
               {({ show }) => (
                 <Button
                   onClick={() => show?.()}
-                  className="text-white border border-black hover:bg-gray-800 text-sm"
-                  style={{
-                    display: "flex",
-                    height: "36px",
-                    padding: "12px 20px",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: "8px",
-                    flexShrink: 0,
-                    borderRadius: "8px",
-                    background: "#171717",
-                    boxShadow:
-                      "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-                  }}
+                  className={`${
+                    useDarkStyling
+                      ? "bg-buttonPrimaryDark text-white border-[#5A4B7A] hover:bg-buttonPrimaryDark/80"
+                      : "text-white border border-black hover:bg-gray-800"
+                  } text-sm`}
+                  style={
+                    !useDarkStyling
+                      ? {
+                          display: "flex",
+                          height: "36px",
+                          padding: "12px 20px",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          gap: "8px",
+                          flexShrink: 0,
+                          borderRadius: "8px",
+                          background: "#171717",
+                          boxShadow:
+                            "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+                        }
+                      : undefined
+                  }
                 >
                   Connect your wallet to create a post
                 </Button>
@@ -119,7 +140,9 @@ const CreatePostModal = ({
             <div>
               <label
                 htmlFor="title"
-                className="block text-sm font-medium text-primary mb-2"
+                className={`block text-sm font-medium mb-2 ${
+                  useDarkStyling ? "text-white" : "text-primary"
+                }`}
               >
                 Title
               </label>
@@ -128,8 +151,11 @@ const CreatePostModal = ({
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md bg-white text-primary focus:outline-none focus:ring-1 focus:ring-gray-200"
-                style={{ borderColor: "#E5E5E5" }}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 ${
+                  useDarkStyling
+                    ? "bg-inputBackgroundDark text-white border-[#2B2449] placeholder-[#87819F] focus:ring-[#5A4B7A] focus:border-[#5A4B7A]"
+                    : "bg-white text-primary border-[#E5E5E5] focus:ring-gray-200"
+                }`}
                 placeholder="Enter post title..."
                 required
                 disabled={isSubmitting}
@@ -139,7 +165,9 @@ const CreatePostModal = ({
             <div>
               <label
                 htmlFor="content"
-                className="block text-sm font-medium text-primary mb-2"
+                className={`block text-sm font-medium mb-2 ${
+                  useDarkStyling ? "text-white" : "text-primary"
+                }`}
               >
                 Content
               </label>
@@ -155,7 +183,9 @@ const CreatePostModal = ({
             <div>
               <label
                 htmlFor="attachment"
-                className="block text-sm font-medium text-primary mb-2"
+                className={`block text-sm font-medium mb-2 ${
+                  useDarkStyling ? "text-white" : "text-primary"
+                }`}
               >
                 Attachment (Optional)
               </label>
@@ -171,14 +201,22 @@ const CreatePostModal = ({
                 <Button
                   type="button"
                   onClick={() => document.getElementById("attachment")?.click()}
-                  className="bg-neutral text-primary border border-line hover:bg-wash w-full sm:w-auto"
+                  className={`w-full sm:w-auto ${
+                    useDarkStyling
+                      ? "bg-buttonSecondaryDark text-white border-[#2B2449] hover:bg-buttonPrimaryDark"
+                      : "bg-neutral text-primary border border-line hover:bg-wash"
+                  }`}
                   disabled={isSubmitting}
                 >
                   <PaperClipIcon className="w-4 h-4 mr-2" />
                   Choose File
                 </Button>
                 {attachment && (
-                  <span className="text-sm text-primary truncate max-w-[200px]">
+                  <span
+                    className={`text-sm truncate max-w-[200px] ${
+                      useDarkStyling ? "text-[#87819F]" : "text-primary"
+                    }`}
+                  >
                     {attachment.name}
                   </span>
                 )}
@@ -189,27 +227,39 @@ const CreatePostModal = ({
               <Button
                 type="button"
                 onClick={handleClose}
-                className="bg-neutral text-primary border border-line hover:bg-wash"
+                className={`${
+                  useDarkStyling
+                    ? "bg-buttonSecondaryDark text-white border-[#2B2449] hover:bg-buttonPrimaryDark"
+                    : "bg-neutral text-primary border border-line hover:bg-wash"
+                }`}
                 disabled={isSubmitting}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="text-white border border-black hover:bg-gray-800 text-sm"
-                style={{
-                  display: "flex",
-                  height: "36px",
-                  padding: "12px 20px",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "8px",
-                  flexShrink: 0,
-                  borderRadius: "8px",
-                  background: "#171717",
-                  boxShadow:
-                    "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-                }}
+                className={`${
+                  useDarkStyling
+                    ? "bg-buttonPrimaryDark text-white border-[#5A4B7A] hover:bg-buttonPrimaryDark/80"
+                    : "text-white border border-black hover:bg-gray-800"
+                } text-sm`}
+                style={
+                  !useDarkStyling
+                    ? {
+                        display: "flex",
+                        height: "36px",
+                        padding: "12px 20px",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gap: "8px",
+                        flexShrink: 0,
+                        borderRadius: "8px",
+                        background: "#171717",
+                        boxShadow:
+                          "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+                      }
+                    : undefined
+                }
                 disabled={
                   isSubmitting ||
                   !title.trim() ||

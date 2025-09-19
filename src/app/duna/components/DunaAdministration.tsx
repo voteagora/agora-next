@@ -2,11 +2,28 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import QuarterlyReportsSection from "./QuarterlyReportsSection";
 import DocumentsSection from "./DocumentsSection";
-import { getForumTopics, getDunaCategoryId } from "@/lib/actions/forum";
+import {
+  getForumTopics,
+  getDunaCategoryId,
+  getForumAttachments,
+} from "@/lib/actions/forum";
 import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
+import Tenant from "@/lib/tenant/tenant";
+import { UIDunaDescriptionConfig } from "@/lib/tenant/tenantUI";
+
+const DunaDescription = () => {
+  const { ui } = Tenant.current();
+  const toggle = ui.toggle("duna-description");
+  const content = (toggle?.config as UIDunaDescriptionConfig)?.content;
+
+  if (!toggle?.enabled || !content) return null;
+  return <p className="text-sm text-primary mb-6">{content}</p>;
+};
 
 const DunaAdministration = async () => {
   let dunaReports: ForumTopic[] = [];
+  let documents: any[] = [];
+
   try {
     const dunaCategoryId = await getDunaCategoryId();
     if (!dunaCategoryId) {
@@ -19,14 +36,21 @@ const DunaAdministration = async () => {
         </div>
       );
     }
-    const topicsResult = await getForumTopics(dunaCategoryId);
+    const [topicsResult, documentsResult] = await Promise.all([
+      getForumTopics(dunaCategoryId),
+      getForumAttachments({ categoryId: dunaCategoryId }),
+    ]);
+
     if (topicsResult.success) {
       dunaReports = transformForumTopics(topicsResult.data, {
         mergePostAttachments: true,
       });
     }
+    if (documentsResult.success) {
+      documents = documentsResult.data;
+    }
   } catch (error) {
-    console.error("Error fetching forum topics:", error);
+    console.error("Error fetching forum data:", error);
   }
 
   return (
@@ -36,12 +60,13 @@ const DunaAdministration = async () => {
           DUNA Administration
         </h3>
       </div>
+      <DunaDescription />
 
       <Card className="border border-line bg-white shadow-sm">
         <CardContent className="p-6">
-          <QuarterlyReportsSection initialReports={dunaReports} />
+          <DocumentsSection initialDocuments={documents} />
           <div className="mt-4 pt-4">
-            <DocumentsSection />
+            <QuarterlyReportsSection initialReports={dunaReports} />
           </div>
         </CardContent>
       </Card>

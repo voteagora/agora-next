@@ -6,6 +6,7 @@ import { ArrowUpIcon, EyeIcon } from "@heroicons/react/20/solid";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { FileIcon } from "lucide-react";
 import { toast } from "react-hot-toast";
+import Tenant from "@/lib/tenant/tenant";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 
 interface ArchivedDocumentCardProps {
@@ -23,6 +24,9 @@ const ArchivedDocumentCard = ({
   const { isAdmin, canManageAttachments } = useForumAdmin(
     dunaCategoryId || undefined
   );
+
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const handleUnarchive = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -54,11 +58,25 @@ const ArchivedDocumentCard = ({
   };
 
   return (
-    <div className="flex items-center gap-2 px-3 py-2 rounded border bg-white hover:bg-gray-50 transition-colors">
-      <FileIcon className="w-4 h-4 text-gray-900 flex-shrink-0" />
+    <div
+      className={`flex items-center gap-2 px-3 py-2 rounded border transition-colors ${
+        useDarkStyling
+          ? "bg-inputBackgroundDark border-cardBorder hover:bg-buttonPrimaryDark"
+          : "bg-white hover:bg-gray-50"
+      }`}
+    >
+      <FileIcon
+        className={`w-4 h-4 flex-shrink-0 ${
+          useDarkStyling ? "text-white" : "text-gray-900"
+        }`}
+      />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <p className="text-sm font-medium text-gray-900 truncate">
+          <p
+            className={`text-sm font-medium truncate ${
+              useDarkStyling ? "text-white" : "text-gray-900"
+            }`}
+          >
             {document.name}
           </p>
         </div>
@@ -66,7 +84,11 @@ const ArchivedDocumentCard = ({
       <div className="flex items-center gap-1">
         <button
           onClick={handleViewDocument}
-          className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+          className={`p-1 transition-colors ${
+            useDarkStyling
+              ? "text-[#87819F] hover:text-white"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
           title="View document"
         >
           <EyeIcon className="w-4 h-4" />
@@ -75,8 +97,12 @@ const ArchivedDocumentCard = ({
           onClick={handleUnarchive}
           className={`p-1 transition-colors ${
             isAdmin || canManageAttachments
-              ? "text-blue-500 hover:text-blue-700"
-              : "text-gray-400 cursor-not-allowed"
+              ? useDarkStyling
+                ? "text-[#5A4B7A] hover:text-[#6B5C8B]"
+                : "text-blue-500 hover:text-blue-700"
+              : useDarkStyling
+                ? "text-[#87819F] cursor-not-allowed"
+                : "text-gray-400 cursor-not-allowed"
           }`}
           title={
             isAdmin || canManageAttachments
@@ -102,6 +128,9 @@ const ArchivedDocumentsSection = ({
   const [documents, setDocuments] = useState<any[]>(initialDocuments || []);
   const { loading } = useForum();
 
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
+
   const handleUnarchiveDocument = (documentToUnarchive: any) => {
     setDocuments((prev) =>
       prev.filter((doc) => doc.id !== documentToUnarchive.id)
@@ -111,8 +140,16 @@ const ArchivedDocumentsSection = ({
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
-        <h4 className="text-lg font-bold text-primary">Archived Documents</h4>
-        <div className="text-sm text-secondary">
+        <h4
+          className={`text-lg font-bold ${
+            useDarkStyling ? "text-white" : "text-primary"
+          }`}
+        >
+          Archived Documents
+        </h4>
+        <div
+          className={`text-sm ${useDarkStyling ? "text-[#87819F]" : "text-secondary"}`}
+        >
           {documents.length} archived document
           {documents.length !== 1 ? "s" : ""}
         </div>
@@ -120,13 +157,17 @@ const ArchivedDocumentsSection = ({
 
       {loading && (
         <div className="text-center py-4">
-          <div className="text-secondary">Loading archived documents...</div>
+          <div className={useDarkStyling ? "text-white" : "text-secondary"}>
+            Loading archived documents...
+          </div>
         </div>
       )}
 
       {documents.length === 0 && (
         <div className="text-center py-8">
-          <div className="text-secondary">No archived documents found.</div>
+          <div className={useDarkStyling ? "text-white" : "text-secondary"}>
+            No archived documents found.
+          </div>
         </div>
       )}
 

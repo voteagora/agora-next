@@ -17,6 +17,8 @@ export default function Navbar() {
 
   const hasProposals = ui.toggle("proposals") && ui.toggle("proposals").enabled;
   const hasProposalsHref = Boolean(ui.page("proposals")?.href);
+  const hasComingSoon =
+    ui.toggle("coming-soon") && ui.toggle("coming-soon").enabled;
 
   const { address } = useAccount();
   const { isConnected } = useAgoraContext();
@@ -41,6 +43,12 @@ export default function Navbar() {
     } else if (path === "retropgf" && linkRefs.current["retropgf"]) {
       // Special case for retropgf which has a more complex path
       setActiveNavItem("retropgf");
+    } else if (
+      pathname.includes("coming-soon") &&
+      linkRefs.current["coming-soon"]
+    ) {
+      // Special case for coming-soon
+      setActiveNavItem("coming-soon");
     }
   }, [pathname]);
 
@@ -61,17 +69,21 @@ export default function Navbar() {
   return (
     <div
       ref={navRef}
-      className={`flex flex-row bg-neutral rounded-full border border-line p-1 font-medium relative`}
+      className={`relative flex flex-row rounded-full border border-line p-1 font-medium bg-infoTabBackground`}
     >
       {/* Sliding overlay */}
-      <div
-        className="absolute bg-white rounded-full border border-line shadow-newDefault transition-all duration-300 ease-in-out h-[38px]"
-        style={{
-          left: `${activeIndicator.left}px`,
-          width: `${activeIndicator.width}px`,
-          opacity: activeIndicator.width ? 1 : 0,
-        }}
-      />
+      {activeNavItem && (
+        <div
+          className="absolute rounded-full shadow-newDefault transition-all duration-150 ease-in-out h-[38px]"
+          style={{
+            left: `${activeIndicator.left}px`,
+            width: `${activeIndicator.width}px`,
+            opacity: activeIndicator.width ? 1 : 0,
+            backgroundColor:
+              ui.customization?.customButtonBackground || "rgb(255, 255, 255)",
+          }}
+        />
+      )}
 
       {hasProposals && (
         <HeaderLink
@@ -84,6 +96,19 @@ export default function Navbar() {
           onClick={() => handleNavClick("proposals")}
         >
           Proposals
+        </HeaderLink>
+      )}
+
+      {hasComingSoon && (
+        <HeaderLink
+          ref={(el) => {
+            linkRefs.current["coming-soon"] = el;
+          }}
+          href="/coming-soon"
+          isActive={activeNavItem === "coming-soon"}
+          onClick={() => handleNavClick("coming-soon")}
+        >
+          Governance
         </HeaderLink>
       )}
 

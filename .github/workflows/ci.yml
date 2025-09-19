@@ -28,5 +28,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: yarn install
+      - name: Print Prettier Version
+        run: yarn prettier --version
       - name: Lint with Prettier
         run: yarn check-prettier

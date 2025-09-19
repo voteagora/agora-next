@@ -4626,7 +4626,8 @@ enum DaoSlug {
   B3
   DEMO
   LINEA
-
+  TOWNS
+  SYNDICATE
   @@map("dao_slug")
   @@schema("config")
 }
@@ -4760,14 +4761,10 @@ model ForumTopic {
   categoryId     Int?              @map("category_id")
   category       ForumCategory?    @relation(fields: [categoryId], references: [id])
   postsCount     Int               @default(0) @map("posts_count")
-  upvotesCount   Int               @default(0) @map("upvotes_count")
-  reactionsCount Int               @default(0) @map("reactions_count")
   archived       Boolean           @default(false)
   createdAt      DateTime          @default(now()) @map("created_at")
   updatedAt      DateTime          @updatedAt @map("updated_at")
   posts          ForumPost[]
-  votes          ForumVote[]
-  reactions      ForumReaction[]
 
   @@index([dao_slug])
   @@index([dao_slug, categoryId])
@@ -4785,53 +4782,12 @@ model ForumPost {
   parentPost     ForumPost?        @relation("PostToPost", fields: [parentPostId], references: [id])
   replies        ForumPost[]       @relation("PostToPost")
   content        String
-  upvotesCount   Int               @default(0) @map("upvotes_count")
-  reactionsCount Int               @default(0) @map("reactions_count")
   createdAt      DateTime          @default(now()) @map("created_at")
-  votes          ForumVote[]
-  reactions      ForumReaction[]
 
   @@index([dao_slug])
   @@index([dao_slug, topicId])
   @@index([dao_slug, parentPostId])
   @@map("forum_posts")
-  @@schema("alltenant")
-}
-
-model ForumVote {
-  id         Int            @id @default(autoincrement())
-  dao_slug   DaoSlug
-  address    String
-  targetType AttachableType @map("target_type")
-  targetId   Int            @map("target_id")
-  vote       Int // 1 or -1
-  createdAt  DateTime       @default(now()) @map("created_at")
-  topic      ForumTopic?    @relation(fields: [topicId], references: [id])
-  topicId    Int?
-  post       ForumPost?     @relation(fields: [postId], references: [id])
-  postId     Int?
-
-  @@unique([dao_slug, address, targetType, targetId])
-  @@index([dao_slug, targetType, targetId])
-  @@map("forum_votes")
-  @@schema("alltenant")
-}
-
-model ForumReaction {
-  dao_slug   DaoSlug
-  address    String
-  targetType AttachableType @map("target_type")
-  targetId   Int            @map("target_id")
-  emoji      String
-  createdAt  DateTime       @default(now()) @map("created_at")
-  topic      ForumTopic?    @relation(fields: [topicId], references: [id])
-  topicId    Int?
-  post       ForumPost?     @relation(fields: [postId], references: [id])
-  postId     Int?
-
-  @@id([dao_slug, address, targetType, targetId, emoji])
-  @@index([dao_slug, targetType, targetId])
-  @@map("forum_reactions")
   @@schema("alltenant")
 }
 

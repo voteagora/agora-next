@@ -4,7 +4,6 @@ import { AttachableType } from "@prisma/client";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 
-
 interface AttachmentData {
   fileName: string;
   contentType: string;

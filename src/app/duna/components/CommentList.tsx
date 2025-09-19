@@ -11,6 +11,7 @@ import { canDeleteContent } from "@/lib/forumAdminUtils";
 import { DunaContentRenderer, DunaEditor } from "@/components/duna-editor";
 import { Button } from "@/components/ui/button";
 import { Reply } from "lucide-react";
+import Tenant from "@/lib/tenant/tenant";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 
 interface CommentItemProps {
@@ -48,6 +49,9 @@ const CommentItem = ({
   const { isAdmin, canManageTopics } = useForumAdmin(
     dunaCategoryId || undefined
   );
+
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   // Get replies for this comment
   const replies = comments.filter(
@@ -93,21 +97,37 @@ const CommentItem = ({
         </div>
         <div className="flex-1">
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-            <ENSName address={comment.author || ""} />
-            <span className="text-xs sm:text-sm text-secondary">
+            <div
+              className={`${useDarkStyling ? "text-white" : "text-primary"}`}
+            >
+              <ENSName address={comment.author || ""} />
+            </div>
+            <span
+              className={`text-xs sm:text-sm ${
+                useDarkStyling ? "text-[#87819F]" : "text-secondary"
+              }`}
+            >
               posted {format(new Date(comment.createdAt), "MMM d, yyyy hh:mm")}
             </span>
             {canDelete && (
               <button
                 onClick={handleDelete}
-                className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                className={`p-1 transition-colors ${
+                  useDarkStyling
+                    ? "text-red-400 hover:text-red-300"
+                    : "text-red-500 hover:text-red-700"
+                }`}
                 title="Delete comment"
               >
                 <TrashIcon className="w-3 h-3" />
               </button>
             )}
           </div>
-          <div className="text-secondary text-xs sm:text-sm mb-2">
+          <div
+            className={`text-xs sm:text-sm mb-2 ${
+              useDarkStyling ? "text-white" : "text-secondary"
+            }`}
+          >
             <DunaContentRenderer content={comment.content} />
           </div>
 
@@ -117,7 +137,11 @@ const CommentItem = ({
               variant="ghost"
               size="sm"
               onClick={() => onReply(comment.id)}
-              className="text-xs text-secondary hover:text-primary p-1 h-6"
+              className={`text-xs p-1 h-6 ${
+                useDarkStyling
+                  ? "text-[#87819F] hover:text-white"
+                  : "text-secondary hover:text-primary"
+              }`}
               disabled={isReplying}
             >
               <Reply className="w-3 h-3 mr-1" />
@@ -128,7 +152,11 @@ const CommentItem = ({
             {hasReplies && (
               <button
                 onClick={() => setShowReplies(!showReplies)}
-                className="text-xs text-secondary hover:text-primary transition-colors cursor-pointer"
+                className={`text-xs transition-colors cursor-pointer ${
+                  useDarkStyling
+                    ? "text-[#87819F] hover:text-white"
+                    : "text-secondary hover:text-primary"
+                }`}
               >
                 {replies.length} {replies.length === 1 ? "reply" : "replies"}
               </button>
@@ -141,7 +169,12 @@ const CommentItem = ({
       {hasReplies && showReplies && (
         <div className="mt-3 ml-8 sm:ml-12 space-y-3">
           {replies.map((reply) => (
-            <div key={reply.id} className="border-l-2 border-gray-200 pl-3">
+            <div
+              key={reply.id}
+              className={`border-l-2 pl-3 ${
+                useDarkStyling ? "border-[#2B2449]" : "border-gray-200"
+              }`}
+            >
               <CommentItem
                 comment={reply}
                 depth={depth + 1}
@@ -160,7 +193,11 @@ const CommentItem = ({
           {/* Collapse button */}
           <button
             onClick={() => setShowReplies(false)}
-            className="text-xs text-secondary hover:text-primary transition-colors cursor-pointer"
+            className={`text-xs transition-colors cursor-pointer ${
+              useDarkStyling
+                ? "text-[#87819F] hover:text-white"
+                : "text-secondary hover:text-primary"
+            }`}
           >
             Hide replies
           </button>
@@ -169,9 +206,19 @@ const CommentItem = ({
 
       {/* Reply form appears right below this comment */}
       {isThisCommentBeingRepliedTo && (
-        <div className="mt-3 ml-8 sm:ml-12 p-3 bg-gray-50 rounded-lg border border-line">
+        <div
+          className={`mt-3 ml-8 sm:ml-12 p-3 rounded-lg border ${
+            useDarkStyling
+              ? "bg-inputBackgroundDark border-cardBorder"
+              : "bg-gray-50 border-line"
+          }`}
+        >
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs text-secondary">
+            <span
+              className={`text-xs ${
+                useDarkStyling ? "text-[#87819F]" : "text-secondary"
+              }`}
+            >
               Replying to this comment
             </span>
           </div>
@@ -188,7 +235,11 @@ const CommentItem = ({
               variant="outline"
               size="sm"
               onClick={onCancelReply}
-              className="text-xs"
+              className={`text-xs ${
+                useDarkStyling
+                  ? "border-[#2B2449] text-[#87819F] hover:bg-inputBackgroundDark"
+                  : ""
+              }`}
             >
               Cancel
             </Button>
@@ -197,7 +248,11 @@ const CommentItem = ({
               size="sm"
               onClick={onSubmitReply}
               disabled={!replyContent.trim()}
-              className="text-xs bg-black text-white hover:bg-black/90"
+              className={`text-xs ${
+                useDarkStyling
+                  ? "bg-buttonPrimaryDark text-white hover:bg-buttonPrimaryDark/80"
+                  : "bg-black text-white hover:bg-black/90"
+              }`}
             >
               Reply
             </Button>

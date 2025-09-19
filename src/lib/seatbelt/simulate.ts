@@ -522,7 +522,7 @@ export async function simulateProposed(
     governorType === GOVERNOR_TYPE.BRAVO
       ? BigInt(latestBlock.timestamp) +
         (simBlock - BigInt(proposal.endBlock!)) * 12n
-      : BigInt(proposal.endTime!.getTime() / 1000 + 1);
+      : BigInt(Math.floor(proposal.endTime!.getTime() / 1000 + 1));
 
   const eta = simTimestamp; // set proposal eta to be equal to the timestamp we simulate at
 

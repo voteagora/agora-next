@@ -18,6 +18,7 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { DunaContentRenderer } from "@/components/duna-editor";
+import Tenant from "@/lib/tenant/tenant";
 
 interface QuarterlyReportCardProps {
   report: ForumTopic;
@@ -41,6 +42,9 @@ const QuarterlyReportCard = ({
   const { isAdmin, canManageTopics } = useForumAdmin(
     dunaCategoryId || undefined
   );
+
+  const { ui } = Tenant.current();
+  const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
 
   const canArchive = canArchiveContent(
     address || "",
@@ -96,27 +100,45 @@ const QuarterlyReportCard = ({
 
   return (
     <div
-      className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
+      className={`p-4 cursor-pointer transition-colors ${
         !isLast ? "border-b" : ""
-      }`}
-      style={!isLast ? { borderBottomColor: "#E5E5E5" } : {}}
+      } ${useDarkStyling ? "hover:bg-inputBackgroundDark" : "hover:bg-gray-50"}`}
+      style={
+        !isLast
+          ? {
+              borderBottomColor: useDarkStyling ? "#2B2449" : "#E5E5E5",
+            }
+          : {}
+      }
       onClick={onClick}
     >
       <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-3 gap-2">
         <div className="flex-1">
-          <h5 className="font-bold text-primary text-base mb-1">
+          <h5
+            className={`font-bold text-base mb-1 ${
+              useDarkStyling ? "text-white" : "text-primary"
+            }`}
+          >
             {report.title}
           </h5>
         </div>
-        <div className="flex items-center gap-2 text-sm text-secondary sm:ml-4">
+        <div className="flex items-center gap-2 text-sm sm:ml-4">
           <ENSAvatar ensName={report.author} className="w-6 h-6" />
-          <ENSName address={report.author} />
+          <div
+            className={`${useDarkStyling ? "text-white" : "text-[#87819F]"}`}
+          >
+            <ENSName address={report.author} />
+          </div>
           {(canArchive || canDelete) && (
             <>
               {canArchive && (
                 <button
                   onClick={handleArchive}
-                  className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+                  className={`p-1 transition-colors ${
+                    useDarkStyling
+                      ? "text-[#87819F] hover:text-white"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
                   title="Archive post"
                 >
                   <ArchiveBoxIcon className="w-4 h-4" />
@@ -125,7 +147,11 @@ const QuarterlyReportCard = ({
               {canDelete && (
                 <button
                   onClick={handleDelete}
-                  className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                  className={`p-1 transition-colors ${
+                    useDarkStyling
+                      ? "text-red-400 hover:text-red-300"
+                      : "text-red-500 hover:text-red-700"
+                  }`}
                   title="Delete post"
                 >
                   <TrashIcon className="w-4 h-4" />
@@ -137,12 +163,20 @@ const QuarterlyReportCard = ({
       </div>
 
       <div className="mb-4">
-        <div className="text-sm text-secondary leading-relaxed line-clamp-2">
+        <div
+          className={`text-sm leading-relaxed line-clamp-2 ${
+            useDarkStyling ? "text-white" : "text-secondary"
+          }`}
+        >
           <DunaContentRenderer content={content} />
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-xs text-tertiary">
+      <div
+        className={`flex items-center justify-between text-xs ${
+          useDarkStyling ? "text-[#87819F]" : "text-tertiary"
+        }`}
+      >
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1">
             <ChatBubbleLeftIcon className="w-4 h-4" />

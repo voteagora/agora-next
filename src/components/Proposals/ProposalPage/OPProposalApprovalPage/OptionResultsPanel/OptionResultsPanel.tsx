@@ -15,11 +15,21 @@ export default function OptionsResultsPanel({
   className,
   optionsToShow = 5,
   showAllOptions = true,
+  overrideOptions,
 }: {
   proposal: Proposal;
   className?: string;
   optionsToShow?: number;
   showAllOptions?: boolean;
+  overrideOptions?: {
+    description: string;
+    votes: string;
+    votesAmountBN: string;
+    totalVotingPower: string;
+    proposalSettings: any;
+    thresholdPosition: number;
+    isApproved: boolean;
+  }[];
 }) {
   // Note: Defaulting to optimism token for now since the contract-scoped token
   // was exactly the same as the optimism token.
@@ -79,53 +89,73 @@ export default function OptionsResultsPanel({
         className
       )}
     >
-      {sortedOptions
-        .slice(0, showAllOptions ? sortedOptions.length : optionsToShow)
-        .map((option, index) => {
-          let isApproved = false;
-          const votesAmountBN = BigInt(option?.votes || 0);
+      {overrideOptions
+        ? overrideOptions
+            .slice(0, showAllOptions ? overrideOptions.length : optionsToShow)
+            .map((opt, index) => (
+              <SingleOption
+                key={index}
+                description={opt.description}
+                votes={BigInt(opt.votesAmountBN)}
+                votesAmountBN={BigInt(opt.votesAmountBN)}
+                totalVotingPower={BigInt(opt.totalVotingPower)}
+                proposalSettings={opt.proposalSettings}
+                thresholdPosition={opt.thresholdPosition}
+                isApproved={opt.isApproved}
+              />
+            ))
+        : sortedOptions
+            .slice(0, showAllOptions ? sortedOptions.length : optionsToShow)
+            .map((option, index) => {
+              let isApproved = false;
+              const votesAmountBN = BigInt(option?.votes || 0);
 
-          const optionBudget =
-            (proposal?.createdTime as Date) >
-            contracts.governor.optionBudgetChangeDate!
-              ? BigInt(option?.budgetTokensSpent || 0)
-              : parseUnits(
-                  option?.budgetTokensSpent?.toString() || "0",
-                  contractTokenDecimals
-                );
-          if (proposalSettings.criteria === "TOP_CHOICES") {
-            isApproved = index < Number(proposalSettings.criteriaValue);
-          } else if (proposalSettings.criteria === "THRESHOLD") {
-            const threshold = BigInt(proposalSettings.criteriaValue);
-            isApproved =
-              !isExceeded &&
-              votesAmountBN >= threshold &&
-              availableBudget >= optionBudget;
-            if (isApproved) {
-              availableBudget = availableBudget - optionBudget;
-            } else {
-              isExceeded = true;
-            }
-          }
+              const optionBudget =
+                (proposal?.createdTime as Date) >
+                contracts.governor.optionBudgetChangeDate!
+                  ? BigInt(option?.budgetTokensSpent || 0)
+                  : parseUnits(
+                      option?.budgetTokensSpent?.toString() || "0",
+                      contractTokenDecimals
+                    );
+              if (proposalSettings.criteria === "TOP_CHOICES") {
+                isApproved = index < Number(proposalSettings.criteriaValue);
+              } else if (proposalSettings.criteria === "THRESHOLD") {
+                const threshold = BigInt(proposalSettings.criteriaValue);
+                isApproved =
+                  !isExceeded &&
+                  votesAmountBN >= threshold &&
+                  availableBudget >= optionBudget;
+                if (isApproved) {
+                  availableBudget = availableBudget - optionBudget;
+                } else {
+                  isExceeded = true;
+                }
+              }
 
-          return (
-            <SingleOption
-              key={index}
-              description={option.option}
-              votes={option.votes}
-              votesAmountBN={votesAmountBN}
-              totalVotingPower={totalVotingPower}
-              proposalSettings={proposalSettings}
-              thresholdPosition={thresholdPosition}
-              isApproved={isApproved}
-            />
-          );
-        })}
-      {!showAllOptions && sortedOptions.length > optionsToShow && (
-        <div className="flex justify-center items-center text-primary bg-wash rounded-lg p-2 w-24 ml-auto">
-          +{sortedOptions.length - optionsToShow} more
-        </div>
-      )}
+              return (
+                <SingleOption
+                  key={index}
+                  description={option.option}
+                  votes={option.votes}
+                  votesAmountBN={votesAmountBN}
+                  totalVotingPower={totalVotingPower}
+                  proposalSettings={proposalSettings}
+                  thresholdPosition={thresholdPosition}
+                  isApproved={isApproved}
+                />
+              );
+            })}
+      {!showAllOptions &&
+        (overrideOptions ? overrideOptions.length : sortedOptions.length) >
+          optionsToShow && (
+          <div className="flex justify-center items-center text-primary bg-wash rounded-lg p-2 w-24 ml-auto">
+            +
+            {(overrideOptions ? overrideOptions.length : sortedOptions.length) -
+              optionsToShow}{" "}
+            more
+          </div>
+        )}
     </div>
   );
 }
