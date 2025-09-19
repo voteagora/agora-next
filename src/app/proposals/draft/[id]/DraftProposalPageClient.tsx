@@ -1,5 +1,4 @@
 "use client";
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DraftProposalForm from "../components/DraftProposalForm";
@@ -12,6 +11,7 @@ import { useDraftStage } from "./hooks/useDraftStage";
 import { DraftPageHeader } from "./components/DraftPageHeader";
 import { SiweAccessCard } from "./components/SiweAccessCard";
 import Loading from "./loading";
+
 
 type DraftResponse = DraftProposalType;
 
@@ -30,6 +30,8 @@ export default function DraftProposalPageClient({
   const [isSigning, setIsSigning] = useState<boolean>(false);
   const [signLabel, setSignLabel] = useState<string | null>(null);
   const [postSignGrace, setPostSignGrace] = useState<boolean>(false);
+  const completedSignRef = useRef<boolean>(false);
+  const pollIdRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const hasDraftRef = useRef<boolean>(false);
 
   const {
@@ -88,28 +90,36 @@ export default function DraftProposalPageClient({
   }, [data, isLoading, queryError]);
 
   const { signIn } = useSIWE();
-  // Label watcher during signing (non-blocking)
   useEffect(() => {
     if (!isSigning) return;
     const id = setInterval(() => {
       try {
         const stage = localStorage.getItem("agora-siwe-stage");
-        if (stage === "awaiting_response") setSignLabel("Awaiting response…");
-        else if (stage === "signed") setSignLabel("Signed");
-        else if (stage === "error") setSignLabel("Cancelled");
+        if (completedSignRef.current) return;
+        if (stage === "awaiting_response") {
+          setSignLabel("Awaiting Confirmation");
+        } else if (stage === "signed") {
+          completedSignRef.current = true;
+          setSignLabel("Signed");
+        } else if (stage === "error") {
+          setSignLabel("Cancelled");
+        }
       } catch {}
     }, 200);
+    pollIdRef.current = id;
     return () => clearInterval(id);
   }, [isSigning]);
+
   const handleSiwe = useCallback(async () => {
     try {
       if (isSigning) return;
       setIsSigning(true);
       setPostSignGrace(true);
+      setError(null);
+      completedSignRef.current = false;
       try {
         localStorage.removeItem("agora-siwe-stage");
       } catch {}
-      // Ensure connected account and correct network for this tenant
       if (!address) {
         setError("Please connect your wallet before signing");
         return;
@@ -122,22 +132,22 @@ export default function DraftProposalPageClient({
           return;
         }
       }
-      // Trigger SIWE flow without blocking the UI; proceed when JWT appears
-      // in localStorage (successful) or when timeout expires (failed)
       setSignLabel("Awaiting Confirmation");
       await signIn();
-      await refetch();
     } catch {
       setSignLabel("Cancelled");
       setError("Signature cancelled by user");
       try {
         localStorage.setItem("agora-siwe-stage", "error");
       } catch {}
-    } finally {
       setIsSigning(false);
-      setTimeout(() => setSignLabel(null), 1200);
-      setTimeout(() => setPostSignGrace(false), 600);
-    }
+      setPostSignGrace(false);
+      completedSignRef.current = false;
+      if (pollIdRef.current) {
+        clearInterval(pollIdRef.current);
+        pollIdRef.current = null;
+      }
+    } finally {}
   }, [
     isSigning,
     address,
@@ -149,7 +159,6 @@ export default function DraftProposalPageClient({
   ]);
 
   const loadedAfterJwtRef = useRef<boolean>(false);
-  // Poll localStorage to sync with SIWE modal (same-tab updates); advance automatically
   useEffect(() => {
     const id = setInterval(async () => {
       try {
@@ -158,7 +167,7 @@ export default function DraftProposalPageClient({
         const hasJwt = Boolean(sessionRaw);
         if (stage === "awaiting_response") {
           if (!isSigning) setIsSigning(true);
-          setSignLabel("Awaiting Confirmation");
+          if (!completedSignRef.current) setSignLabel("Awaiting Confirmation");
         } else if (stage === "signed") {
           if (!hasJwt) {
             setIsSigning(false);
@@ -169,16 +178,34 @@ export default function DraftProposalPageClient({
             } catch {}
             return;
           }
+          completedSignRef.current = true;
           setSignLabel("Signed");
           if (!loadedAfterJwtRef.current) {
             loadedAfterJwtRef.current = true;
             await refetch();
           }
-          setTimeout(() => setSignLabel(null), 1200);
+          setTimeout(() => {
+            setSignLabel(null);
+            setIsSigning(false);
+            setPostSignGrace(false);
+            if (pollIdRef.current) {
+              clearInterval(pollIdRef.current);
+              pollIdRef.current = null;
+            }
+          }, 600);
         } else if (stage === "error") {
           setIsSigning(false);
           setSignLabel("Cancelled");
           setError("Signature cancelled by user");
+          setTimeout(() => {
+            setSignLabel(null);
+            setPostSignGrace(false);
+            completedSignRef.current = false;
+            if (pollIdRef.current) {
+              clearInterval(pollIdRef.current);
+              pollIdRef.current = null;
+            }
+          }, 600);
         }
       } catch {}
     }, 200);
@@ -188,8 +215,6 @@ export default function DraftProposalPageClient({
   if (loading && !draft && !error) {
     return <Loading />;
   }
-
-  // Keep description text unchanged during signing; only buttons reflect state
 
   if (error) {
     return (
