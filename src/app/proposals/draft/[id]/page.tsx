@@ -1,7 +1,8 @@
 export const dynamic = "force-dynamic";
 
 import Tenant from "@/lib/tenant/tenant";
-import DraftProposalForm from "../components/DraftProposalForm";
+import DraftProposalPageClient from "./DraftProposalPageClient";
+import { permanentRedirect } from "next/navigation";
 import BackButton from "../components/BackButton";
 import {
   GET_DRAFT_STAGES,
@@ -34,81 +35,33 @@ export default async function DraftProposalPage({
     return <div>This feature is not supported by this tenant.</div>;
   }
 
-  const draftProposal = await fetchDraftProposal(parseInt(params.id));
-  const proposalTypes = await fetchProposalTypes();
-
-  const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
-
-  if (isPostSubmissionStage) {
-    return <ArchivedDraftProposal draftProposal={draftProposal} />;
+  // Canonicalize URL: if numeric id is used, redirect permanently to UUID, preserving all query params
+  const numericId = Number(params.id);
+  const isNumericParam = !isNaN(numericId);
+  if (isNumericParam) {
+    const draftById = await fetchDraftProposal(numericId);
+    if (draftById?.uuid) {
+      const entries = Object.entries(searchParams || {}).flatMap(
+        ([key, value]) =>
+          Array.isArray(value)
+            ? value.map((v) => [key, String(v)] as [string, string])
+            : value !== undefined
+              ? [[key, String(value)] as [string, string]]
+              : []
+      );
+      const qs = new URLSearchParams(entries).toString();
+      const target = `/proposals/draft/${draftById.uuid}${qs ? `?${qs}` : ""}`;
+      return permanentRedirect(target);
+    }
   }
 
-  const DRAFT_STAGES_FOR_TENANT = GET_DRAFT_STAGES()!;
-  const stageParam = (searchParams?.stage || "0") as string;
-  const stageIndex = parseInt(stageParam, 10);
-  const stageObject = DRAFT_STAGES_FOR_TENANT[stageIndex];
-  const stageMetadata = getStageMetadata(stageObject.stage);
-
-  const ownerAddresses = [
-    draftProposal.author_address,
-    ...(config.offchainProposalCreator || []),
-  ].filter(Boolean) as string[];
+  const proposalTypes = await fetchProposalTypes();
 
   return (
-    <OnlyOwner ownerAddresses={ownerAddresses}>
-      <main className="max-w-screen-xl mx-auto mt-10">
-        <div className="flex flex-row items-center justify-between">
-          <div className="flex flex-row items-center space-x-6">
-            {stageIndex > 0 && (
-              <BackButton
-                draftProposalId={parseInt(params.id)}
-                index={stageIndex}
-              />
-            )}
-            <h1 className="font-black text-primary text-2xl m-0">
-              {stageMetadata?.title}
-            </h1>
-            <span className="bg-tertiary/5 text-primary rounded-full px-2 py-1 text-sm">
-              {/* stageObject.order + 1 is becuase order is zero indexed */}
-              Step {stageObject.order + 1}/{DRAFT_STAGES_FOR_TENANT.length}
-            </span>
-          </div>
-          <DeleteDraftButton proposalId={draftProposal.id} />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
-          <section className="col-span-1 sm:col-span-2 order-last sm:order-first">
-            <DraftProposalForm
-              proposalTypes={proposalTypes}
-              stage={stageObject.stage}
-              draftProposal={draftProposal}
-            />
-          </section>
-          <section className="col-span-1">
-            <div className="bg-wash border border-line rounded-2xl p-4">
-              <div className="mt-2">
-                <ReactMarkdown
-                  className="prose-h2:text-lg
-                    prose-h2:font-bold
-                    prose-h2:text-primary
-                    prose-p:text-secondary
-                    prose-p:mt-2
-                    prose-li:list-inside
-                    prose-li:list-decimal
-                    prose-li:my-2
-                    prose-a:text-primary
-                    prose-a:underline
-                    prose-li:text-secondary"
-                >
-                  {
-                    (proposalLifecycleToggle.config as PLMConfig)?.copy
-                      .helperText
-                  }
-                </ReactMarkdown>
-              </div>
-            </div>
-          </section>
-        </div>
-      </main>
-    </OnlyOwner>
+    <DraftProposalPageClient
+      idParam={params.id}
+      searchParams={searchParams}
+      proposalTypes={proposalTypes}
+    />
   );
 }

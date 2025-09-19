@@ -1,4 +1,5 @@
-import { AGORA_SIGN_IN_MESSAGE } from "@/components/shared/SiweProviderConfig";
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -9,14 +10,59 @@ export async function POST(request: NextRequest) {
   );
 
   try {
-    const { signature } = await request.json();
-    const siweObject = new SiweMessage(AGORA_SIGN_IN_MESSAGE);
+    const { message, signature } = await request.json();
+    // Parse the exact message signed by the client (EIP-4361)
+    const siweObject = new SiweMessage(message);
 
-    const verification = await verifyMessage({
-      address: siweObject.address as `0x${string}`,
-      message: siweObject.statement as string,
-      signature,
-    });
+    let verification = false;
+    try {
+      verification = await verifyMessage({
+        address: siweObject.address as `0x${string}`,
+        message,
+        signature,
+      });
+    } catch (e) {
+      verification = false;
+    }
+
+    // If EOA check failed, try EIP-1271 (SCW / multisig) fallback
+    if (!verification) {
+      try {
+        const { getPublicClient } = await import("@/lib/viem");
+        const { hashMessage } = await import("viem");
+        const publicClient = getPublicClient();
+
+        const code = await publicClient.getBytecode({
+          address: siweObject.address as `0x${string}`,
+        });
+        const isContract = !!code && code !== "0x";
+        if (isContract) {
+          const ERC1271_ABI = [
+            {
+              type: "function",
+              name: "isValidSignature",
+              stateMutability: "view",
+              inputs: [
+                { name: "hash", type: "bytes32" },
+                { name: "signature", type: "bytes" },
+              ],
+              outputs: [{ name: "magicValue", type: "bytes4" }],
+            },
+          ] as const;
+          const MAGIC = "0x1626ba7e";
+          const msgHash = hashMessage(message);
+          const res = (await publicClient.readContract({
+            address: siweObject.address as `0x${string}`,
+            abi: ERC1271_ABI,
+            functionName: "isValidSignature",
+            args: [msgHash, signature as `0x${string}`],
+          })) as `0x${string}`;
+          verification = res?.toLowerCase() === MAGIC;
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
 
     if (!verification) {
       return NextResponse.json(
@@ -41,7 +87,6 @@ export async function POST(request: NextRequest) {
     };
     return NextResponse.json(responseBody);
   } catch (e) {
-    console.error(e);
     return new Response("Internal server error", { status: 500 });
   }
 }

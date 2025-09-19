@@ -1,10 +1,12 @@
 import { SIWEConfig } from "connectkit";
+import { LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
 import { SiweMessage } from "siwe";
 import { decodeJwt } from "jose";
 
 // TODO: this should probably be an environment variable
 const API_AUTH_PREFIX = "/api/v1/auth";
-const LOCAL_STORAGE_JWT_KEY = "agora-siwe-jwt";
+
+const LOCAL_STORAGE_JWT_KEY = LOCAL_STORAGE_SIWE_JWT_KEY;
 export const AGORA_SIGN_IN_MESSAGE = "Sign in to Agora with Ethereum";
 
 /* There's currently nothing stored on the backend to maintain session state.
@@ -18,13 +20,13 @@ export const AGORA_SIGN_IN_MESSAGE = "Sign in to Agora with Ethereum";
 // JWT tokens for SIWE should therefore be issued with a short expiry time.
 */
 
-const isSiweEnabled = () => {
-  return process.env.NEXT_PUBLIC_SIWE_ENABLED === "true";
-};
+const isSiweEnabled = () => false; // Disable SIWE by default; no auto-trigger
 
 export const siweProviderConfig: SIWEConfig = {
   getNonce: async () =>
-    fetch(`${API_AUTH_PREFIX}/nonce`).then((res) => res.text()),
+    fetch(`${API_AUTH_PREFIX}/nonce`)
+      .then((res) => res.json())
+      .then((data) => data?.nonce ?? ""),
   createMessage: ({ nonce, address, chainId }) =>
     new SiweMessage({
       version: "1",
@@ -35,22 +37,41 @@ export const siweProviderConfig: SIWEConfig = {
       chainId,
       nonce,
     }).prepareMessage(),
-  verifyMessage: async ({ message, signature }) =>
-    fetch(`${API_AUTH_PREFIX}/verify`, {
+  verifyMessage: async ({ message, signature }) => {
+    try {
+      localStorage.setItem("agora-siwe-stage", "awaiting_response");
+    } catch {}
+    const res = await fetch(`${API_AUTH_PREFIX}/verify`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message,
-        signature,
-      }),
-    }).then(async (res) => {
-      // save JWT from verify to local storage
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, signature }),
+    });
+    if (!res.ok) {
+      try {
+        localStorage.setItem("agora-siwe-stage", "error");
+      } catch {}
+      return false;
+    }
+    try {
       const token = await res.json();
+      if (!token || !token.access_token) {
+        try {
+          localStorage.setItem("agora-siwe-stage", "error");
+        } catch {}
+        return false;
+      }
       localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
-      return res.ok;
-    }),
+      try {
+        localStorage.setItem("agora-siwe-stage", "signed");
+      } catch {}
+      return true;
+    } catch {
+      try {
+        localStorage.setItem("agora-siwe-stage", "error");
+      } catch {}
+      return false;
+    }
+  },
   getSession: async () => {
     // return JWT from local storage
     const session = localStorage.getItem(LOCAL_STORAGE_JWT_KEY);

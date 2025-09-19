@@ -217,6 +217,7 @@ export type PLMConfig = {
 };
 
 export type BaseProposal = ProposalDraft & {
+  uuid?: string;
   checklist_items: ProposalChecklist[];
   proposal_scope?: ProposalScope;
   tiers_enabled?: boolean;
