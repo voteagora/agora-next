@@ -296,6 +296,8 @@ export function findProposalsQueryFromDB({
       return prismaWeb3Client.lineaProposals.findMany(condition);
     case TENANT_NAMESPACES.TOWNS:
       return Promise.resolve([]); // for now: towns is info-only
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve([]); // for now: syndicate is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -397,6 +399,8 @@ export function findProposalsByIds({
       return prismaWeb3Client.lineaProposals.findMany(condition);
     case TENANT_NAMESPACES.TOWNS:
       return Promise.resolve([]); // for now: towns is info-only
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve([]); // for now: syndicate is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -558,6 +562,8 @@ export function findProposalType({
       return prismaWeb3Client.lineaProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.TOWNS:
       return Promise.resolve([]); // for now: towns is info-only
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve([]); // for now: syndicate is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -605,6 +611,8 @@ export function findVotes({
       return prismaWeb3Client.lineaVotes.findMany(condition);
     case TENANT_NAMESPACES.TOWNS:
       return Promise.resolve([]); // for now: towns is info-only
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve([]); // for now: syndicate is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -811,6 +819,8 @@ export function findStakedDeposits({
       return prismaWeb3Client.lineaStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.TOWNS:
       return Promise.resolve([]); // for now: towns is info-only
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve([]); // for now: syndicate is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }

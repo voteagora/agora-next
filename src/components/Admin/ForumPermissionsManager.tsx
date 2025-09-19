@@ -24,7 +24,6 @@ import { useForumAdmin } from "@/hooks/useForum";
 import { PlusIcon, TrashIcon } from "@heroicons/react/20/solid";
 import AgoraLoader from "../shared/AgoraLoader/AgoraLoader";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 import useDunaCategory from "@/hooks/useDunaCategory";
 
 interface ForumAdmin {
@@ -252,7 +251,13 @@ const ForumPermissionsManager = ({
       <Card className="border shadow-sm bg-cardBackground">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-primary">Admins</h2>
+            <h2
+              className={`text-xl font-semibold ${
+                useDarkStyling ? "text-white" : "text-primary"
+              }`}
+            >
+              Admins
+            </h2>
             <Badge variant="secondary">{admins.length} admins</Badge>
           </div>
 

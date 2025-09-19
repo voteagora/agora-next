@@ -133,6 +133,10 @@ export default class TenantTokenFactory {
         return {
           name: "Shape",
           symbol: "SHAPE",
+      case TENANT_NAMESPACES.SYNDICATE:
+        return {
+          name: "Syndicate Protocol",
+          symbol: "SYNDICATE",
           decimals: 18,
           address: "0x0000000000000000000000000000000000000000",
         };

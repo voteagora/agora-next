@@ -9,6 +9,7 @@ import GovernorSettings from "@/app/info/components/GovernorSettings";
 import GovernanceCharts from "@/app/info/components/GovernanceCharts";
 import DunaAdministration from "@/app/duna/components/DunaAdministration";
 import DunaDisclosures from "@/app/duna/components/DunaDisclosures";
+import SyndicateDunaDisclosures from "@/app/duna/components/SyndicateDunaDisclosures";
 import TownsDunaAdministration from "@/app/duna/components/TownsDunaAdministration";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
@@ -104,10 +105,22 @@ export default async function Page() {
             }}
           />
         )}
-        {hasDunaAdministration &&
-          !ui.toggle("towns-duna-administration")?.enabled && (
+        {hasDunaAdministration ? (
+          ui.toggle("towns-duna-administration")?.enabled ? null : ui.toggle(
+              "syndicate-duna-disclosures"
+            )?.enabled ? (
+            <SyndicateDunaDisclosures />
+          ) : (
             <DunaDisclosures />
-          )}
+          )
+        ) : null}
+        {ui.dunaDisclaimers && (
+          <div className="mt-12 pt-6 border-t border-line">
+            <p className="text-secondary text-sm opacity-75">
+              {ui.dunaDisclaimers}
+            </p>
+          </div>
+        )}
       </div>
     );
   } else {

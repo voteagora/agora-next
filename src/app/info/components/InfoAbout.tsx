@@ -122,8 +122,8 @@ const InfoAbout = () => {
             </div>
             <p className="text-secondary mt-3">
               <span className="italic">
-                “A complex system that works is invariably found to have evolved
-                from a simple system that worked.”
+                &ldquo;A complex system that works is invariably found to have
+                evolved from a simple system that worked.&rdquo;
               </span>{" "}
               - John Gall.
             </p>
@@ -140,11 +140,11 @@ const InfoAbout = () => {
           </div>
         )}
         <div className="p-6 rounded-b-xl border-t border-line bg-infoSectionBackground">
-          <div className="flex flex-row gap-6 flex-wrap sm:flex-nowrap mb-4">
+          <div className="flex lg:flex-row flex-col gap-6 flex-wrap sm:flex-nowrap mb-4">
             {activeTabs.map((item, index) => (
               <div
                 key={index}
-                className="flex flex-row gap-3 justify-center items-center mt-3"
+                className="flex flex-row gap-3 justify-center items-center mt-3 flex-1 min-w-0"
               >
                 <div
                   className={`min-w-[72px] h-[72px] justify-center items-center rounded-full border border-line flex sm:hidden lg:flex ${ui.customization?.customIconBackground ? ui.customization.customIconBackground : "bg-tertiary/10"}`}

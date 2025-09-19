@@ -15,6 +15,7 @@ import { demoTenantUIConfig } from "@/lib/tenant/configs/ui/demo";
 import { lineaTenantUIConfig } from "@/lib/tenant/configs/ui/linea";
 import { townsTenantUIConfig } from "@/lib/tenant/configs/ui/towns";
 import { shapeTenantUIConfig } from "@/lib/tenant/configs/ui/shape";
+import { syndicateTenantUIConfig } from "@/lib/tenant/configs/ui/syndicate";
 
 export default class TenantUIFactory {
   public static create(namespace: TenantNamespace): any {
@@ -60,8 +61,13 @@ export default class TenantUIFactory {
 
       case TENANT_NAMESPACES.TOWNS:
         return townsTenantUIConfig;
+
       case TENANT_NAMESPACES.SHAPE:
         return shapeTenantUIConfig;
+
+      case TENANT_NAMESPACES.SYNDICATE:
+        return syndicateTenantUIConfig;
+
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

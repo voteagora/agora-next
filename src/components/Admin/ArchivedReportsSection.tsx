@@ -7,7 +7,6 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { ArrowUpIcon, EyeIcon } from "@heroicons/react/20/solid";
 import { toast } from "react-hot-toast";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 
 interface ArchivedReportCardProps {

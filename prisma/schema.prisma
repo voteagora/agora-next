@@ -4627,6 +4627,8 @@ enum DaoSlug {
   LINEA
   TOWNS
   SHAPE
+  SYNDICATE
+  
   @@map("dao_slug")
   @@schema("config")
 }
