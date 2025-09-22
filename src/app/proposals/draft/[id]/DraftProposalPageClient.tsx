@@ -10,6 +10,7 @@ import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { useDraftStage } from "./hooks/useDraftStage";
 import { DraftPageHeader } from "./components/DraftPageHeader";
 import { SiweAccessCard } from "./components/SiweAccessCard";
+import ForbiddenAccessCard from "./components/ForbiddenAccessCard";
 import Loading from "./loading";
 
 type DraftResponse = DraftProposalType;
@@ -92,9 +93,13 @@ export default function DraftProposalPageClient({
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
-        if (res.status === 401 || res.status === 403) {
+        if (res.status === 401) {
           // Soft-expiration handling: trigger SIWE CTA without clearing session
           throw new Error("Not authenticated");
+        }
+        if (res.status === 403) {
+          // Ownership mismatch (e.g., signed with a Safe that is not the author)
+          throw new Error("Forbidden, you are not the owner of this draft");
         }
         throw new Error(`${res.status} ${res.statusText}`);
       }
@@ -115,9 +120,15 @@ export default function DraftProposalPageClient({
       if (!hasDraftRef.current) setLoading(true);
     } else if (queryError) {
       setError((queryError as Error).message);
-      // Avoid sticky signing UI on auth errors
+      // Avoid sticky signing UI on auth errors and clear transient stage
       setIsSigning(false);
       setSignLabel(null);
+      try {
+        const msg = String((queryError as Error).message || "").toLowerCase();
+        if (msg.includes("forbidden") || msg.includes("not authenticated")) {
+          localStorage.removeItem("agora-siwe-stage");
+        }
+      } catch {}
       setLoading(false);
     }
   }, [data, isLoading, queryError]);
@@ -213,10 +224,19 @@ export default function DraftProposalPageClient({
         const stage = localStorage.getItem("agora-siwe-stage");
         const sessionRaw = localStorage.getItem("agora-siwe-jwt");
         const hasJwt = Boolean(sessionRaw);
-        const shouldAdvance = hasJwt && !draft;
+        const isForbidden = (error || "").toLowerCase().includes("forbidden");
+        const shouldAdvance = hasJwt && !draft && !isForbidden;
         if (hasJwt && stage !== "awaiting_response") {
           if (isSigning) setIsSigning(false);
           if (signLabel) setSignLabel(null);
+        }
+        if (isForbidden) {
+          // Stop signing UI and clear stage to avoid flicker when access is forbidden
+          setIsSigning(false);
+          setSignLabel(null);
+          try {
+            localStorage.removeItem("agora-siwe-stage");
+          } catch {}
         }
         if (stage === "awaiting_response") {
           if (!isSigning) setIsSigning(true);
@@ -301,7 +321,7 @@ export default function DraftProposalPageClient({
       } catch {}
     }, 250);
     return () => clearInterval(id);
-  }, [isSigning, signLabel, draft, refetch]);
+  }, [isSigning, signLabel, draft, error, refetch]);
 
   // If we are advancing after a successful sign, show skeleton regardless
   if (advancing) {
@@ -328,15 +348,19 @@ export default function DraftProposalPageClient({
   if (error || ((isSigning || postSignGrace) && !draft)) {
     return (
       <div className="max-w-screen-xl mx-auto mt-10">
-        <SiweAccessCard
-          error={isSigning ? null : error}
-          isSigning={isSigning}
-          signLabel={signLabel}
-          onConnectClick={() => {}}
-          onSignClick={handleSiwe}
-          isSwitching={isSwitching}
-          hasAddress={Boolean(address)}
-        />
+        {error && error.toLowerCase().includes("forbidden") ? (
+          <ForbiddenAccessCard message={error} />
+        ) : (
+          <SiweAccessCard
+            error={isSigning ? null : error}
+            isSigning={isSigning}
+            signLabel={signLabel}
+            onConnectClick={() => {}}
+            onSignClick={handleSiwe}
+            isSwitching={isSwitching}
+            hasAddress={Boolean(address)}
+          />
+        )}
       </div>
     );
   }
