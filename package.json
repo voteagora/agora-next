@@ -12,6 +12,7 @@
     "typecheck": "tsc --pretty --noEmit",
     "generate-apikey": "tsx src/scripts/generateApiKey.mjs",
     "generate-jwt": "tsx src/scripts/generateJwt.ts",
+    "init-forum-index": "tsx src/scripts/initializeForumIndex.ts",
     "check-prettier": "prettier --check src/",
     "prettier-src": "prettier -w src/",
     "test": "vitest"
@@ -158,6 +159,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "csv-parser": "^3.0.0",
     "cypress": "^12.11.0",
+    "dotenv": "^17.2.2",
     "jsdom": "^26.0.0",
     "prettier": "^3.2.5",
     "sass": "^1.62.1",
