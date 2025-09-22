@@ -49,10 +49,7 @@ export default function DraftProposalPageClient({
 
   useEffect(() => {
     if (!address) {
-      try {
-        localStorage.removeItem("agora-siwe-jwt");
-        localStorage.removeItem("agora-siwe-stage");
-      } catch {}
+      // Do not clear SIWE session on disconnect/refresh; only reset local UI state
       setDraft(null);
       hasDraftRef.current = false;
       setIsSigning(false);
@@ -66,15 +63,9 @@ export default function DraftProposalPageClient({
     }
   }, [address]);
 
-  // When the wallet reconnects (from disconnected to connected), ensure a fresh sign-in experience
+  // Preserve existing SIWE session across reconnect/refresh
   useEffect(() => {
     if (address) {
-      if (!wasConnectedRef.current) {
-        try {
-          localStorage.removeItem("agora-siwe-jwt");
-          localStorage.removeItem("agora-siwe-stage");
-        } catch {}
-      }
       wasConnectedRef.current = true;
     } else {
       wasConnectedRef.current = false;
@@ -101,6 +92,10 @@ export default function DraftProposalPageClient({
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          // Soft-expiration handling: trigger SIWE CTA without clearing session
+          throw new Error("Not authenticated");
+        }
         throw new Error(`${res.status} ${res.statusText}`);
       }
       return res.json();
@@ -120,11 +115,29 @@ export default function DraftProposalPageClient({
       if (!hasDraftRef.current) setLoading(true);
     } else if (queryError) {
       setError((queryError as Error).message);
+      // Avoid sticky signing UI on auth errors
+      setIsSigning(false);
+      setSignLabel(null);
       setLoading(false);
     }
   }, [data, isLoading, queryError]);
 
   const { signIn } = useSIWE();
+
+  // On mount: if user refreshed/closed while awaiting signature and no JWT exists, reset UI state
+  useEffect(() => {
+    try {
+      const stage = localStorage.getItem("agora-siwe-stage");
+      const hasJwt = Boolean(localStorage.getItem("agora-siwe-jwt"));
+      if (stage === "awaiting_response" && !hasJwt) {
+        localStorage.removeItem("agora-siwe-stage");
+        setIsSigning(false);
+        setSignLabel(null);
+        setPostSignGrace(false);
+        completedSignRef.current = false;
+      }
+    } catch {}
+  }, []);
   useEffect(() => {
     if (!isSigning) return;
     const id = setInterval(() => {
@@ -169,7 +182,6 @@ export default function DraftProposalPageClient({
       }
       setSignLabel("Awaiting Confirmation");
       await signIn();
-      // Avance delegado al poller mediante shouldAdvance (stage === "signed" && JWT presente)
     } catch {
       setSignLabel("Cancelled");
       setError("Signature cancelled by user");
@@ -201,7 +213,11 @@ export default function DraftProposalPageClient({
         const stage = localStorage.getItem("agora-siwe-stage");
         const sessionRaw = localStorage.getItem("agora-siwe-jwt");
         const hasJwt = Boolean(sessionRaw);
-        const shouldAdvance = stage === "signed" && hasJwt;
+        const shouldAdvance = hasJwt && !draft;
+        if (hasJwt && stage !== "awaiting_response") {
+          if (isSigning) setIsSigning(false);
+          if (signLabel) setSignLabel(null);
+        }
         if (stage === "awaiting_response") {
           if (!isSigning) setIsSigning(true);
           if (!completedSignRef.current) setSignLabel("Awaiting Confirmation");
@@ -224,6 +240,7 @@ export default function DraftProposalPageClient({
             completedSignRef.current = true;
             setSignLabel("Signed");
             setAdvancing(true);
+            setError(null);
             await refetch();
             setSignLabel(null);
             setIsSigning(false);
@@ -236,6 +253,26 @@ export default function DraftProposalPageClient({
               clearInterval(pollIdRef.current);
               pollIdRef.current = null;
             }
+          }
+        } else if (shouldAdvance) {
+          try {
+            localStorage.setItem("agora-siwe-stage", "signed");
+          } catch {}
+          completedSignRef.current = true;
+          setSignLabel("Signed");
+          setAdvancing(true);
+          setError(null);
+          await refetch();
+          setSignLabel(null);
+          setIsSigning(false);
+          setPostSignGrace(false);
+          setAdvancing(false);
+          try {
+            localStorage.removeItem("agora-siwe-stage");
+          } catch {}
+          if (pollIdRef.current) {
+            clearInterval(pollIdRef.current);
+            pollIdRef.current = null;
           }
         } else if (stage === "error") {
           setIsSigning(false);
@@ -264,7 +301,7 @@ export default function DraftProposalPageClient({
       } catch {}
     }, 250);
     return () => clearInterval(id);
-  }, [isSigning, refetch]);
+  }, [isSigning, signLabel, draft, refetch]);
 
   // If we are advancing after a successful sign, show skeleton regardless
   if (advancing) {

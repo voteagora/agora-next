@@ -88,8 +88,11 @@ export const siweProviderConfig: SIWEConfig = {
     };
   },
   signOut: () => {
-    // remove JWT from local storage
-    localStorage.removeItem(LOCAL_STORAGE_JWT_KEY);
+    // remove SIWE session data from local storage
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_JWT_KEY);
+      localStorage.removeItem("agora-siwe-stage");
+    } catch {}
     return Promise.resolve(true);
   },
   enabled: isSiweEnabled(),
