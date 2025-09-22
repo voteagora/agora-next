@@ -163,7 +163,7 @@ export const syndicateTenantUIConfig = new TenantUI({
           icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#737373" />,
           title: "September 22, 2025",
           description:
-            "Messaging functionality opens for the DUNA Administration section and Grants Award Committee submissions go live.",
+            "Messaging functionality opens for the DUNA Administration section.",
         },
         {
           icon: (
@@ -171,7 +171,7 @@ export const syndicateTenantUIConfig = new TenantUI({
           ),
           title: "October 15, 2025",
           description:
-            "Q3 financial statements and tax updates will be posted with messaging functionality enabled in the DUNA Administration section.",
+            "Q3 financial statements and tax updates will be posted with messaging functionality enabled in the DUNA Administration section and Grants Award Committee submissions go live.",
         },
         {
           icon: (
@@ -180,7 +180,7 @@ export const syndicateTenantUIConfig = new TenantUI({
               stroke="#737373"
             />
           ),
-          title: "November 1, 2025",
+          title: "November 3, 2025",
           description:
             "Token governance is live, with a temp-check and tax reporting intake (via Cowrie – Administrator Services tooling) completed upon passage of the governance proposal.",
         },
@@ -197,7 +197,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     {
       route: "coming-soon",
       title: "Welcome to Syndicate governance",
-      description: `Syndicate governance goes live on November 3rd, 2025..
+      description: `Syndicate governance goes live on November 3rd, 2025.
 `,
       meta: {
         title: "Syndicate Network Governance",
