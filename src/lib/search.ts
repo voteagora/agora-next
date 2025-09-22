@@ -1,6 +1,6 @@
 import { MeiliSearch, Index } from "meilisearch";
 
-const client = new MeiliSearch({
+const getClient = () => new MeiliSearch({
   host: process.env.MEILISEARCH_HOST as string,
   apiKey: process.env.MEILISEARCH_API_KEY as string,
 });
@@ -47,6 +47,7 @@ export interface SearchResult<T> {
 
 export class ForumSearchService {
   private getIndex(daoSlug: string): Index {
+    const client = getClient();
     return client.index(getForumIndexName(daoSlug));
   }
 
@@ -55,6 +56,7 @@ export class ForumSearchService {
       const indexName = getForumIndexName(daoSlug);
 
       // Create index if it doesn't exist
+      const client = getClient();
       await client.createIndex(indexName, { primaryKey: "id" });
 
       const index = this.getIndex(daoSlug);

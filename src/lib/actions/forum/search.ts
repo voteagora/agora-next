@@ -21,7 +21,7 @@ export async function indexForumTopic({
 }): Promise<void> {
   try {
     const document: ForumDocument = {
-      id: `${daoSlug}:topic:${topicId}`,
+      id: `${daoSlug}_topic_${topicId}`,
       contentType: "topic",
       topicId: topicId,
       daoSlug: daoSlug,
@@ -59,7 +59,7 @@ export async function indexForumPost({
 }): Promise<void> {
   try {
     const document: ForumDocument = {
-      id: `${daoSlug}:post:${postId}`,
+      id: `${daoSlug}_post_${postId}`,
       contentType: "post",
       postId: postId,
       daoSlug: daoSlug,
@@ -83,7 +83,7 @@ export async function removeForumTopicFromIndex(
   daoSlug: string
 ): Promise<void> {
   await forumSearchService.deleteDocument({
-    id: `${daoSlug}:topic:${topicId}`,
+    id: `${daoSlug}_topic_${topicId}`,
     daoSlug,
   });
 }
@@ -93,7 +93,7 @@ export async function removeForumPostFromIndex(
   daoSlug: string
 ): Promise<void> {
   await forumSearchService.deleteDocument({
-    id: `${daoSlug}:post:${postId}`,
+    id: `${daoSlug}_post_${postId}`,
     daoSlug,
   });
 }
