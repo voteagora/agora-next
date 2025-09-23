@@ -206,6 +206,20 @@ export const syndicateTenantUIConfig = new TenantUI({
         imageDescription: "Syndicate Network governance coming soon",
       },
     },
+    {
+      route: "grants",
+      title: "Syndicate Grants Program",
+      description:
+        "Apply for grants to support the Syndicate Network ecosystem",
+      meta: {
+        title: "Syndicate Grants Program",
+        description:
+          "Apply for grants to support the Syndicate Network ecosystem",
+        imageTitle: "Syndicate Grants Program",
+        imageDescription:
+          "Apply for grants to support the Syndicate Network ecosystem",
+      },
+    },
   ],
 
   toggles: [
@@ -307,6 +321,14 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "syndicate-duna-disclosures",
+      enabled: true,
+    },
+    {
+      name: "grants",
+      enabled: true,
+    },
+    {
+      name: "grants/intake-form",
       enabled: true,
     },
   ],

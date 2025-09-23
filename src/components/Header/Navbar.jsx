@@ -151,6 +151,19 @@ export default function Navbar() {
         </HeaderLink>
       )}
 
+      {ui.toggle("grants") && ui.toggle("grants").enabled && (
+        <HeaderLink
+          ref={(el) => {
+            linkRefs.current.grants = el;
+          }}
+          href="/grants"
+          isActive={activeNavItem === "grants"}
+          onClick={() => handleNavClick("grants")}
+        >
+          Grants
+        </HeaderLink>
+      )}
+
       {ui.toggle("info") && ui.toggle("info").enabled && (
         <HeaderLink
           ref={(el) => {
