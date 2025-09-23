@@ -20,7 +20,7 @@ export default function HybridStandardProposalStatus({
       </div>
 
       {totalForVotesPercentage > 0 && (
-        <div className="flex w-full h-1 bg-wash rounded-full">
+        <div className="flex w-52 h-1 bg-wash rounded-full">
           <div
             className=" bg-positive h-1 rounded-l-full"
             style={{ width: `${totalForVotesPercentage}%` }}
@@ -37,7 +37,7 @@ export default function HybridStandardProposalStatus({
       )}
 
       {totalForVotesPercentage === 0 && (
-        <div className="flex w-full h-1 bg-wash rounded-full">
+        <div className="flex w-52 h-1 bg-wash rounded-full">
           <div className=" bg-tertiary h-1" style={{ width: `100%` }}></div>
         </div>
       )}

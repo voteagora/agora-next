@@ -215,7 +215,8 @@ export function formatNumber(
       bigIntAmount = BigInt(amount);
     }
   } else {
-    bigIntAmount = amount || 0n;
+    // Ensure amount is converted to BigInt if it's a number
+    bigIntAmount = typeof amount === "number" ? BigInt(amount) : (amount ?? 0n);
   }
 
   // Convert to standard unit
@@ -447,8 +448,6 @@ export function toNumericChainId(
 }
 
 export const getTransportForChain = (chainId: number) => {
-  console.debug({ getTransportForChainID: chainId });
-
   switch (chainId) {
     // mainnet
     case 1:
