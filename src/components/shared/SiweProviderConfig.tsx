@@ -1,5 +1,8 @@
 import { SIWEConfig } from "connectkit";
-import { LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
+import {
+  LOCAL_STORAGE_SIWE_JWT_KEY,
+  LOCAL_STORAGE_SIWE_STAGE_KEY,
+} from "@/lib/constants";
 import { SiweMessage } from "siwe";
 import { decodeJwt } from "jose";
 
@@ -39,7 +42,7 @@ export const siweProviderConfig: SIWEConfig = {
     }).prepareMessage(),
   verifyMessage: async ({ message, signature }) => {
     try {
-      localStorage.setItem("agora-siwe-stage", "awaiting_response");
+      localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "awaiting_response");
     } catch {}
     const res = await fetch(`${API_AUTH_PREFIX}/verify`, {
       method: "POST",
@@ -48,7 +51,7 @@ export const siweProviderConfig: SIWEConfig = {
     });
     if (!res.ok) {
       try {
-        localStorage.setItem("agora-siwe-stage", "error");
+        localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "error");
       } catch {}
       return false;
     }
@@ -56,18 +59,18 @@ export const siweProviderConfig: SIWEConfig = {
       const token = await res.json();
       if (!token || !token.access_token) {
         try {
-          localStorage.setItem("agora-siwe-stage", "error");
+          localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "error");
         } catch {}
         return false;
       }
       localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
       try {
-        localStorage.setItem("agora-siwe-stage", "signed");
+        localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "signed");
       } catch {}
       return true;
     } catch {
       try {
-        localStorage.setItem("agora-siwe-stage", "error");
+        localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "error");
       } catch {}
       return false;
     }
@@ -91,7 +94,7 @@ export const siweProviderConfig: SIWEConfig = {
     // remove SIWE session data from local storage
     try {
       localStorage.removeItem(LOCAL_STORAGE_JWT_KEY);
-      localStorage.removeItem("agora-siwe-stage");
+      localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
     } catch {}
     return Promise.resolve(true);
   },

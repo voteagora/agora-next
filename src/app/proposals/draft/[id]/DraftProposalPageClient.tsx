@@ -10,6 +10,10 @@ import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { useDraftStage } from "./hooks/useDraftStage";
 import { DraftPageHeader } from "./components/DraftPageHeader";
 import { SiweAccessCard } from "./components/SiweAccessCard";
+import {
+  LOCAL_STORAGE_SIWE_JWT_KEY,
+  LOCAL_STORAGE_SIWE_STAGE_KEY,
+} from "@/lib/constants";
 import ForbiddenAccessCard from "./components/ForbiddenAccessCard";
 import Loading from "./loading";
 
@@ -81,7 +85,7 @@ export default function DraftProposalPageClient({
   } = useQuery({
     queryKey: ["draft", idParam, stageIndex],
     queryFn: async (): Promise<DraftResponse> => {
-      const sessionRaw = localStorage.getItem("agora-siwe-jwt");
+      const sessionRaw = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
       if (!sessionRaw) {
         throw new Error("Not authenticated (missing SIWE session)");
       }
@@ -126,7 +130,7 @@ export default function DraftProposalPageClient({
       try {
         const msg = String((queryError as Error).message || "").toLowerCase();
         if (msg.includes("forbidden") || msg.includes("not authenticated")) {
-          localStorage.removeItem("agora-siwe-stage");
+          localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
         }
       } catch {}
       setLoading(false);
@@ -138,10 +142,10 @@ export default function DraftProposalPageClient({
   // On mount: if user refreshed/closed while awaiting signature and no JWT exists, reset UI state
   useEffect(() => {
     try {
-      const stage = localStorage.getItem("agora-siwe-stage");
-      const hasJwt = Boolean(localStorage.getItem("agora-siwe-jwt"));
+      const stage = localStorage.getItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
+      const hasJwt = Boolean(localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY));
       if (stage === "awaiting_response" && !hasJwt) {
-        localStorage.removeItem("agora-siwe-stage");
+        localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
         setIsSigning(false);
         setSignLabel(null);
         setPostSignGrace(false);
@@ -153,7 +157,7 @@ export default function DraftProposalPageClient({
     if (!isSigning) return;
     const id = setInterval(() => {
       try {
-        const stage = localStorage.getItem("agora-siwe-stage");
+        const stage = localStorage.getItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
         if (completedSignRef.current) return;
         if (stage === "awaiting_response") {
           setSignLabel("Awaiting Confirmation");
@@ -177,7 +181,7 @@ export default function DraftProposalPageClient({
       setError(null);
       completedSignRef.current = false;
       try {
-        localStorage.removeItem("agora-siwe-stage");
+        localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
       } catch {}
       if (!address) {
         setError("Please connect your wallet before signing");
@@ -197,7 +201,7 @@ export default function DraftProposalPageClient({
       setSignLabel("Cancelled");
       setError("Signature cancelled by user");
       try {
-        localStorage.setItem("agora-siwe-stage", "error");
+        localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "error");
       } catch {}
       setIsSigning(false);
       setPostSignGrace(false);
@@ -221,8 +225,8 @@ export default function DraftProposalPageClient({
   useEffect(() => {
     const id = setInterval(async () => {
       try {
-        const stage = localStorage.getItem("agora-siwe-stage");
-        const sessionRaw = localStorage.getItem("agora-siwe-jwt");
+        const stage = localStorage.getItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
+        const sessionRaw = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
         const hasJwt = Boolean(sessionRaw);
         const isForbidden = (error || "").toLowerCase().includes("forbidden");
         const shouldAdvance = hasJwt && !draft && !isForbidden;
@@ -235,7 +239,7 @@ export default function DraftProposalPageClient({
           setIsSigning(false);
           setSignLabel(null);
           try {
-            localStorage.removeItem("agora-siwe-stage");
+            localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
           } catch {}
         }
         if (stage === "awaiting_response") {
@@ -248,7 +252,7 @@ export default function DraftProposalPageClient({
             setPostSignGrace(false);
             completedSignRef.current = false;
             try {
-              localStorage.removeItem("agora-siwe-stage");
+              localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
             } catch {}
             if (pollIdRef.current) {
               clearInterval(pollIdRef.current);
@@ -267,7 +271,7 @@ export default function DraftProposalPageClient({
             setPostSignGrace(false);
             setAdvancing(false);
             try {
-              localStorage.removeItem("agora-siwe-stage");
+              localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
             } catch {}
             if (pollIdRef.current) {
               clearInterval(pollIdRef.current);
@@ -276,7 +280,7 @@ export default function DraftProposalPageClient({
           }
         } else if (shouldAdvance) {
           try {
-            localStorage.setItem("agora-siwe-stage", "signed");
+            localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "signed");
           } catch {}
           completedSignRef.current = true;
           setSignLabel("Signed");
@@ -288,7 +292,7 @@ export default function DraftProposalPageClient({
           setPostSignGrace(false);
           setAdvancing(false);
           try {
-            localStorage.removeItem("agora-siwe-stage");
+            localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
           } catch {}
           if (pollIdRef.current) {
             clearInterval(pollIdRef.current);
@@ -307,7 +311,7 @@ export default function DraftProposalPageClient({
               pollIdRef.current = null;
             }
             try {
-              localStorage.removeItem("agora-siwe-stage");
+              localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
             } catch {}
           }, 600);
         } else {
