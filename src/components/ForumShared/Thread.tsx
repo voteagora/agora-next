@@ -20,10 +20,15 @@ import EmojiReactions from "@/components/Forum/EmojiReactions";
 import { cn } from "@/lib/utils";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { ADMIN_TYPES } from "@/lib/constants";
+import PostAttachments from "@/app/forums/[topic_id]/components/PostAttachments";
+import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { convertFileToAttachmentData } from "@/lib/fileUtils";
+import toast from "react-hot-toast";
 
 export interface ThreadProps {
   comments: ForumPost[];
   categoryId?: number | null;
+  topicId?: number;
   onDelete?: (commentId: number) => void;
   onUpdate?: (commentId: number, updates: Partial<ForumPost>) => void;
 
@@ -49,6 +54,7 @@ interface CommentItemProps extends Omit<ThreadProps, "comments"> {
   comments: ForumPost[];
   adminAddressSet: Set<string>;
   adminRoleMap: Map<string, string | null>;
+  onImageUpload?: (file: File) => Promise<string>;
 }
 
 const CommentItem = ({
@@ -68,6 +74,7 @@ const CommentItem = ({
   forForums,
   adminAddressSet,
   adminRoleMap,
+  onImageUpload,
 }: CommentItemProps) => {
   // Replies are always shown (no expand/collapse toggle)
   const { address } = useAccount();
@@ -240,6 +247,15 @@ const CommentItem = ({
             <DunaContentRenderer content={comment.content} />
           </div>
 
+          {comment.attachments && comment.attachments.filter((att) => !att.contentType?.startsWith('image/')).length > 0 && (
+            <PostAttachments
+              attachments={comment.attachments.filter((att) => !att.contentType?.startsWith('image/'))}
+              postId={comment.id}
+              postAuthor={comment.author}
+              categoryId={categoryId}
+            />
+          )}
+
           <div className="flex items-center gap-3">
             {Boolean(forForums) && (
               <EmojiReactions
@@ -298,6 +314,7 @@ const CommentItem = ({
                 forForums={forForums}
                 adminAddressSet={adminAddressSet}
                 adminRoleMap={adminRoleMap}
+                onImageUpload={onImageUpload}
               />
             </div>
           ))}
@@ -325,6 +342,7 @@ const CommentItem = ({
             value={replyContent}
             onChange={(html) => onReplyContentChange(html)}
             disabled={false}
+            onImageUpload={onImageUpload}
           />
           <div className="flex justify-end gap-2 mt-2">
             <Button
@@ -358,6 +376,7 @@ interface CommentThreadProps extends Omit<ThreadProps, "parentId" | "depth"> {
   depth: number;
   adminAddressSet: Set<string>;
   adminRoleMap: Map<string, string | null>;
+  onImageUpload?: (file: File) => Promise<string>;
 }
 
 const CommentThread = ({
@@ -377,6 +396,7 @@ const CommentThread = ({
   forForums,
   adminAddressSet,
   adminRoleMap,
+  onImageUpload,
 }: CommentThreadProps) => {
   const filteredComments = comments.filter((comment) => {
     if (parentId === null) return !comment.parentId;
@@ -404,6 +424,7 @@ const CommentThread = ({
             forForums={forForums}
             adminAddressSet={adminAddressSet}
             adminRoleMap={adminRoleMap}
+            onImageUpload={onImageUpload}
           />
         </div>
       ))}
@@ -423,6 +444,7 @@ export default function Thread({
   onDelete,
   onUpdate,
   categoryId,
+  topicId,
   forForums = true,
   adminAddresses = [],
   adminDirectory,
@@ -457,6 +479,24 @@ export default function Thread({
     return map;
   }, [normalizedDirectory]);
 
+  const { address } = useAccount();
+
+  const handleImageUpload = React.useCallback(async (file: File): Promise<string> => {
+    if (!address) {
+      throw new Error("Wallet not connected");
+    }
+
+    // Upload to IPFS only (no database record yet)
+    const attachmentData = await convertFileToAttachmentData(file);
+    const uploadResult = await uploadToIPFSOnly(attachmentData, address);
+
+    if (!uploadResult.success || !uploadResult.ipfsUrl) {
+      throw new Error(uploadResult.error || "Upload failed");
+    }
+
+    return uploadResult.ipfsUrl;
+  }, [address]);
+
   return (
     <div className="space-y-3 sm:space-y-4">
       <CommentThread
@@ -476,6 +516,7 @@ export default function Thread({
         forForums={forForums}
         adminAddressSet={adminAddressSet}
         adminRoleMap={adminRoleMap}
+        onImageUpload={handleImageUpload}
       />
     </div>
   );

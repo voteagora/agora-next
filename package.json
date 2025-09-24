@@ -63,6 +63,7 @@
     "@tiptap/extension-code": "^3.1.0",
     "@tiptap/extension-document": "^3.1.0",
     "@tiptap/extension-hard-break": "^3.1.0",
+    "@tiptap/extension-image": "^3.5.1",
     "@tiptap/extension-italic": "^3.1.0",
     "@tiptap/extension-link": "^3.1.0",
     "@tiptap/extension-list": "^3.1.0",

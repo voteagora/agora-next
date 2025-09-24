@@ -15,6 +15,7 @@ import ListItem from "@tiptap/extension-list-item";
 import Blockquote from "@tiptap/extension-blockquote";
 import HardBreak from "@tiptap/extension-hard-break";
 import Link from "@tiptap/extension-link";
+import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { cn } from "@/lib/utils";
 import {
@@ -25,6 +26,10 @@ import {
 } from "@/components/ui/tooltip";
 import { ListOrdered, Quote } from "lucide-react";
 import Tenant from "@/lib/tenant/tenant";
+import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { convertFileToAttachmentData } from "@/lib/fileUtils";
+import { useAccount, useSignMessage } from "wagmi";
+import toast from "react-hot-toast";
 
 // Toolbar button component
 const ToolbarButton = ({
@@ -153,6 +158,11 @@ export interface DunaEditorProps {
   disabled?: boolean;
   className?: string;
   variant?: "post" | "comment";
+  // For IPFS image uploads
+  targetType?: "post" | "category";
+  targetId?: number;
+  // For temporary uploads during composition
+  onImageUpload?: (file: File) => Promise<string>;
 }
 
 export default function DunaEditor({
@@ -164,10 +174,15 @@ export default function DunaEditor({
   disabled = false,
   className,
   variant = "post",
+  targetType = "post",
+  targetId,
+  onImageUpload,
 }: DunaEditorProps) {
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [linkDialogUrl, setLinkDialogUrl] = useState("");
   const { ui } = Tenant.current();
+  const { address, isConnected } = useAccount();
+  const { signMessageAsync } = useSignMessage();
 
   // Debug link dialog state
   useEffect(() => {
@@ -202,6 +217,13 @@ export default function DunaEditor({
           rel: "noopener noreferrer",
         },
         validate: (href) => /^https?:\/\//.test(href),
+      }),
+      Image.configure({
+        HTMLAttributes: {
+          class: "max-w-full h-auto rounded-lg my-2",
+        },
+        inline: false,
+        allowBase64: true,
       }),
       Placeholder.configure({
         placeholder,
@@ -315,6 +337,53 @@ export default function DunaEditor({
     editor?.chain().focus().toggleBlockquote().run();
     setForceUpdate((prev) => prev + 1);
   }, [editor]);
+
+  const addImage = useCallback(async () => {
+    if (!editor || !isConnected || !address) {
+      toast.error("Please connect your wallet to upload images");
+      return;
+    }
+    
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        // Show loading state
+        const loadingToast = toast.loading("Uploading image...");
+        
+        try {
+          let imageUrl: string;
+          
+          if (onImageUpload) {
+            // Use custom upload handler (for new posts)
+            imageUrl = await onImageUpload(file);
+          } else {
+            // Use IPFS upload only (no database record)
+            const attachmentData = await convertFileToAttachmentData(file);
+            const uploadResult = await uploadToIPFSOnly(attachmentData, address);
+            
+            if (!uploadResult.success || !uploadResult.ipfsUrl) {
+              throw new Error(uploadResult.error || "Upload failed");
+            }
+            
+            imageUrl = uploadResult.ipfsUrl;
+          }
+          
+          // Insert URL into editor
+          editor.chain().focus().setImage({ src: imageUrl }).run();
+          setForceUpdate((prev) => prev + 1);
+          toast.dismiss(loadingToast);
+          toast.success("Image uploaded successfully!");
+        } catch (error) {
+          toast.dismiss(loadingToast);
+          toast.error(error instanceof Error ? error.message : "Failed to upload image");
+        }
+      }
+    };
+    input.click();
+  }, [editor, isConnected, address, targetType, targetId, onImageUpload]);
 
   const handleLink = useCallback(() => {
     if (!editor) return;
@@ -529,6 +598,27 @@ export default function DunaEditor({
               strokeLinejoin="round"
               strokeWidth={2}
               d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+            />
+          </svg>
+        </ToolbarButton>
+
+            <ToolbarButton
+              onClick={addImage}
+              disabled={disabled}
+              tooltip="Add image"
+              isActive={false}
+            >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
         </ToolbarButton>
