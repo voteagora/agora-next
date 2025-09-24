@@ -465,16 +465,16 @@ async function getProposalTypes() {
     const typesFromApi = await getProposalTypesFromDaoNode();
 
     if (typesFromApi) {
-      const parsedTypes = Object.entries(typesFromApi.proposal_types)?.map(
-        ([proposalTypeId, type]: any) => ({
+      const parsedTypes = Object.entries(typesFromApi.proposal_types)
+        ?.filter(([proposalTypeId, type]: any) => !!type.name)
+        ?.map(([proposalTypeId, type]: any) => ({
           ...type,
           proposal_type_id: String(proposalTypeId),
           quorum: Number(type.quorum),
           approval_threshold: Number(type.approval_threshold),
           isClientSide: false,
           module: type.module,
-        })
-      );
+        }));
       types = parsedTypes;
     } else {
       types = await findProposalType({
