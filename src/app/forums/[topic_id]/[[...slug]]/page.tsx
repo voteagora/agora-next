@@ -9,6 +9,8 @@ import ForumThread from "../components/ForumThread";
 import { getForumTopic } from "@/lib/actions/forum";
 import { truncateAddress } from "@/app/lib/utils/text";
 import ForumsSidebar from "../../ForumsSidebar";
+import ForumsSearch from "../../components/ForumsSearch";
+import NewTopicButton from "../../components/NewTopicButton";
 import {
   transformForumTopics,
   buildForumTopicPath,
@@ -162,6 +164,14 @@ export default async function ForumTopicPage({ params }: PageProps) {
   const topicBody = transformed.content || "";
   const authorAddress = transformed.author || "";
   const createdAtIso = new Date(topicData.createdAt).toISOString();
+  const categoryName = topicData.category?.name || null;
+  const rawCategoryDescription = topicData.category?.description;
+  const categoryDescription =
+    typeof rawCategoryDescription === "string" &&
+    rawCategoryDescription.trim().length > 0
+      ? rawCategoryDescription
+      : null;
+  const heading = categoryName || "Discussions";
 
   const adminRolesMap = adminsResult?.success
     ? adminsResult.data.reduce((map, admin) => {
@@ -199,14 +209,26 @@ export default async function ForumTopicPage({ params }: PageProps) {
 
   const lastActivityAt =
     comments[comments.length - 1]?.createdAt || createdAtIso;
-  const labelName = topicData.category?.name ?? undefined;
+  const labelName = categoryName ?? undefined;
   const topicReactionsByEmoji = topicData.topicReactionsByEmoji || {};
   const rootPostId = rootPost?.id ?? undefined;
   const categoryId = topicData.category?.id ?? null;
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="mt-6 max-w-7xl mx-auto px-6 sm:px-0">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold">{heading}</h1>
+            {categoryDescription && (
+              <p className="text-sm text-gray-500">{categoryDescription}</p>
+            )}
+          </div>
+          <NewTopicButton isDuna={categoryName === "DUNA"} />
+        </div>
+        <ForumsSearch className="max-w-xl" />
+      </div>
+      <div className="max-w-7xl mx-auto px-6 sm:px-0 py-8">
         <div className="flex gap-8">
           {/* Main Content */}
           <div className="flex-1 max-w-4xl">

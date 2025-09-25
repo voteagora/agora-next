@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import ForumsSidebar from "./ForumsSidebar";
+import ForumsSearch from "./components/ForumsSearch";
 import { getForumTopics, getForumTopicUpvotes } from "@/lib/actions/forum";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
 import ENSAvatar from "@/components/shared/ENSAvatar";
@@ -81,6 +82,7 @@ export default async function ForumsPageContent({
           </div>
           <NewTopicButton isDuna={categoryTitle === "DUNA"} />
         </div>
+        <ForumsSearch className="max-w-xl" />
       </div>
       <div className="flex gap-8 max-w-7xl mx-auto px-6 sm:px-0">
         <div className="flex-1">

@@ -1,9 +1,28 @@
-import { MeiliSearch, Index } from "meilisearch";
+import { MeiliSearch, Index, MeiliSearchApiError } from "meilisearch";
 
-const getClient = () => new MeiliSearch({
-  host: process.env.MEILISEARCH_HOST as string,
-  apiKey: process.env.MEILISEARCH_API_KEY as string,
-});
+let cachedClient: MeiliSearch | null = null;
+
+const getClient = () => {
+  if (cachedClient) return cachedClient;
+
+  const host = process.env.NEXT_PUBLIC_MEILISEARCH_HOST;
+  const apiKey = process.env.NEXT_PUBLIC_MEILISEARCH_API_KEY;
+
+  if (!host) {
+    throw new Error(
+      "Missing NEXT_PUBLIC_MEILISEARCH_HOST environment variable"
+    );
+  }
+
+  if (!apiKey) {
+    throw new Error(
+      "Missing NEXT_PUBLIC_MEILISEARCH_API_KEY environment variable"
+    );
+  }
+
+  cachedClient = new MeiliSearch({ host, apiKey });
+  return cachedClient;
+};
 
 export const getForumIndexName = (daoSlug: string) => `forum_${daoSlug}`;
 
@@ -22,6 +41,10 @@ export interface ForumDocument {
   // Topic fields
   topicId?: number;
   categoryId?: number;
+  categoryName?: string;
+  postsCount?: number;
+  isDeleted?: boolean;
+  isNsfw?: boolean;
 
   // Post fields
   postId?: number;
@@ -51,25 +74,37 @@ export class ForumSearchService {
     return client.index(getForumIndexName(daoSlug));
   }
 
+  private async waitForTask(taskUid?: number): Promise<void> {
+    if (typeof taskUid !== "number") return;
+    const client = getClient();
+    await client.waitForTask(taskUid);
+  }
+
   async initializeIndex(daoSlug: string): Promise<void> {
     try {
+      const client = getClient();
       const indexName = getForumIndexName(daoSlug);
 
-      // Create index if it doesn't exist
-      const client = getClient();
-      await client.createIndex(indexName, { primaryKey: "id" });
+      try {
+        const { taskUid } = await client.createIndex(indexName, {
+          primaryKey: "id",
+        });
+        await this.waitForTask(taskUid);
+      } catch (error) {
+        if (
+          error instanceof MeiliSearchApiError &&
+          error.cause?.code === "index_already_exists"
+        ) {
+          // Index already exists, nothing to do here.
+        } else {
+          throw error;
+        }
+      }
 
       const index = this.getIndex(daoSlug);
 
-      await index.updateSettings({
-        searchableAttributes: [
-          "title",
-          "content",
-          "author",
-          "categoryName",
-          "topicTitle",
-          "description",
-        ],
+      const settingsTask = await index.updateSettings({
+        searchableAttributes: ["content"],
         filterableAttributes: [
           "daoSlug",
           "contentType",
@@ -90,6 +125,7 @@ export class ForumSearchService {
           "exactness",
         ],
       });
+      await this.waitForTask(settingsTask?.taskUid);
     } catch (error) {
       console.error(`Error initializing search index for ${daoSlug}:`, error);
       throw error;
@@ -99,9 +135,31 @@ export class ForumSearchService {
   async indexDocument(document: ForumDocument): Promise<void> {
     try {
       const index = this.getIndex(document.daoSlug);
-      await index.addDocuments([document]);
+      const task = await index.addDocuments([document]);
+      await this.waitForTask(task?.taskUid);
     } catch (error) {
       console.error(`Error indexing ${document.contentType}:`, error);
+      throw error;
+    }
+  }
+
+  async replaceDocuments(
+    daoSlug: string,
+    documents: ForumDocument[]
+  ): Promise<void> {
+    try {
+      const index = this.getIndex(daoSlug);
+      const deleteTask = await index.deleteAllDocuments();
+      await this.waitForTask(deleteTask?.taskUid);
+
+      if (!documents.length) {
+        return;
+      }
+
+      const addTask = await index.addDocuments(documents);
+      await this.waitForTask(addTask?.taskUid);
+    } catch (error) {
+      console.error(`Error replacing documents for ${daoSlug}:`, error);
       throw error;
     }
   }
@@ -115,9 +173,10 @@ export class ForumSearchService {
   }): Promise<void> {
     try {
       const index = this.getIndex(daoSlug);
-      await index.deleteDocument(id);
+      const task = await index.deleteDocument(id);
+      await this.waitForTask(task?.taskUid);
     } catch (error) {
-      console.error(`Error deleting ${document.contentType}:`, error);
+      console.error(`Error deleting document ${id}:`, error);
       throw error;
     }
   }
