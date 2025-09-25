@@ -12,9 +12,13 @@ import OnlyOwner from "./components/OwnerOnly";
 import ArchivedDraftProposal from "../components/ArchivedDraftProposal";
 import DeleteDraftButton from "../components/DeleteDraftButton";
 import ReactMarkdown from "react-markdown";
-import { fetchDraftProposal } from "@/app/api/common/draftProposals/getDraftProposals";
+import {
+  fetchDraftProposal,
+  getDraftProposalByUuid,
+} from "@/app/api/common/draftProposals/getDraftProposals";
 import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 import { PLMConfig } from "@/app/proposals/draft/types";
+import { permanentRedirect } from "next/navigation";
 
 export const maxDuration = 120;
 
@@ -34,7 +38,30 @@ export default async function DraftProposalPage({
     return <div>This feature is not supported by this tenant.</div>;
   }
 
-  const draftProposal = await fetchDraftProposal(parseInt(params.id));
+  // Canonicalize: if numeric id, fetch and redirect permanently to UUID preserving query params
+  const numericId = Number(params.id);
+  const isNumericParam = !isNaN(numericId);
+  if (isNumericParam) {
+    const draftById = await fetchDraftProposal(numericId);
+    if (draftById?.uuid) {
+      const entries = Object.entries(searchParams || {}).flatMap(
+        ([key, value]) =>
+          Array.isArray(value)
+            ? value.map((v) => [key, String(v)] as [string, string])
+            : value !== undefined
+              ? [[key, String(value)] as [string, string]]
+              : []
+      );
+      const qs = new URLSearchParams(entries).toString();
+      const target = `/proposals/draft/${draftById.uuid}${qs ? `?${qs}` : ""}`;
+      return permanentRedirect(target);
+    }
+  }
+
+  // Dual lookup: numeric id or UUID
+  const draftProposal = isNumericParam
+    ? await fetchDraftProposal(numericId)
+    : await getDraftProposalByUuid(params.id);
   const proposalTypes = await fetchProposalTypes();
 
   const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
