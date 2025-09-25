@@ -42,7 +42,8 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
       message: validated.message,
       signature: validated.signature as `0x${string}`,
     });
-    if (!isValid) return { success: false, error: "Invalid signature" } as const;
+    if (!isValid)
+      return { success: false, error: "Invalid signature" } as const;
 
     const topic = await prismaWeb2Client.forumTopic.findFirst({
       where: { id: validated.topicId, dao_slug: slug },
@@ -96,7 +97,8 @@ export async function removeUpvoteForumTopic(
       message: validated.message,
       signature: validated.signature as `0x${string}`,
     });
-    if (!isValid) return { success: false, error: "Invalid signature" } as const;
+    if (!isValid)
+      return { success: false, error: "Invalid signature" } as const;
 
     const rootPostId = await getRootPostId(validated.topicId);
     if (!rootPostId)
@@ -126,7 +128,8 @@ export async function removeUpvoteForumTopic(
 export async function getForumTopicUpvotes(topicId: number) {
   try {
     const rootPostId = await getRootPostId(topicId);
-    if (!rootPostId) return { success: true as const, data: { postId: null, upvotes: 0 } };
+    if (!rootPostId)
+      return { success: true as const, data: { postId: null, upvotes: 0 } };
     const upvotes = await prismaWeb2Client.forumPostVote.count({
       where: { dao_slug: slug, postId: rootPostId, vote: 1 },
     });
@@ -143,7 +146,10 @@ export async function getMyForumTopicVote(topicId: number, address: string) {
   try {
     const rootPostId = await getRootPostId(topicId);
     if (!rootPostId)
-      return { success: true as const, data: { postId: null, hasVoted: false } };
+      return {
+        success: true as const,
+        data: { postId: null, hasVoted: false },
+      };
 
     const vote = await prismaWeb2Client.forumPostVote.findUnique({
       where: {

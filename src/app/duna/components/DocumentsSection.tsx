@@ -15,6 +15,7 @@ import {
 } from "@/lib/forumUtils";
 import { FileIcon } from "lucide-react";
 import Link from "next/link";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
 interface ForumDocument {
   id: number;
@@ -47,6 +48,7 @@ const DocumentsSection = ({
     initialDocuments || []
   );
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const openDialog = useOpenDialog();
 
   const { fetchDocuments, deleteAttachment, archiveAttachment } = useForum();
 

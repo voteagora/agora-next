@@ -36,8 +36,8 @@ const DunaAdministration = async () => {
       );
     }
     const [topicsResult, documentsResult] = await Promise.all([
-      getForumTopics(dunaCategoryId),
-      getForumAttachments({ categoryId: dunaCategoryId }),
+      getForumTopics({ categoryId: dunaCategoryId }),
+      getForumAttachments(),
     ]);
 
     if (topicsResult.success) {

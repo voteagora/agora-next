@@ -349,7 +349,7 @@ export const useForum = () => {
     setError(null);
 
     try {
-      const result = await getForumAttachments({});
+      const result = await getForumAttachments();
 
       if (!result.success) {
         throw new Error(
