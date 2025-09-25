@@ -27,6 +27,44 @@ import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 
 const { token, ui } = Tenant.current();
 
+function isOffchain(vote: Vote) {
+  const proposalType = vote.proposalType || "";
+  // Consider offchain if proposal type denotes offchain or if citizenType is present (Optimism citizens)
+  return (
+    !!vote.citizenType ||
+    proposalType.includes("OFFCHAIN") ||
+    proposalType === "SNAPSHOT"
+  );
+}
+
+function getVoteTooltipText(vote: Vote) {
+  const proposalType = vote.proposalType || "";
+  const isOffchainVote = isOffchain(vote);
+  const isOptimistic = proposalType.includes("OPTIMISTIC");
+
+  // Amount string depends on offchain vs onchain
+  const amountStr = formatNumber(
+    vote.weight,
+    isOffchainVote ? 0 : token.decimals,
+    2,
+    false,
+    false
+  );
+  const supportText = capitalizeFirstLetter(vote.support);
+
+  if (isOffchainVote) {
+    // Offchain votes should be displayed as generic vote units
+    const numeric = parseFloat((amountStr || "").toString().replace(/,/g, ""));
+    const unit = numeric === 1 ? "Vote" : "Votes";
+    const verb = isOptimistic ? "For" : "Voted";
+    return `${amountStr} ${unit} ${verb} ${supportText}`;
+  }
+
+  // Onchain votes use token amount; keep Optimistic wording as "For"
+  const verb = isOptimistic ? "For" : "Voted";
+  return `${amountStr} ${token.symbol} ${verb} ${supportText}`;
+}
+
 // Using Lucide icons instead of Heroicons for better support of strokeWidth
 const SUPPORT_TO_ICON: Record<Support, React.ReactNode> = {
   ["FOR"]: <CheckIcon strokeWidth={4} className="w-3 h-3 text-positive" />,
@@ -39,7 +77,8 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
   const [hovered, setHovered] = useState(false);
   const [hash1, hash2] = vote.transactionHash?.split("|") || [];
 
-  const isOffchainVote = !!vote.citizenType;
+  const proposalTypeStr = vote.proposalType || "";
+  const isOffchainVote = isOffchain(vote);
 
   const { data } = useEnsName({
     chainId: 1,
@@ -154,7 +193,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="p-4">
-                      {`${formatNumber(vote.weight, isOffchainVote ? 0 : token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
+                      {getVoteTooltipText(vote)}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
