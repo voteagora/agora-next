@@ -348,19 +348,19 @@ async function getVotersWhoHaveNotVotedForProposal({
         ),
             -- Aggregate delegate statements by address and DAO slug, keeping the latest updated_at
             aggregated_delegate_statements AS (
-          SELECT
-          address,
-          dao_slug,
-          MAX(twitter) AS twitter,  
-          MAX(discord) AS discord,        
-          MAX(warpcast) AS warpcast,            
-          MAX(updated_at) AS latest_updated_at  
+          SELECT DISTINCT ON (address, dao_slug)
+            address,
+            dao_slug,
+            twitter,
+            discord,
+            warpcast,
+            updated_at AS latest_updated_at
           FROM
-          agora.delegate_statements
+            agora.delegate_statements
           WHERE
-          dao_slug = $6::config.dao_slug
-          GROUP BY
-          address, dao_slug -- Ensures one row per address and DAO slug
+            dao_slug = $6::config.dao_slug
+          ORDER BY
+            address, dao_slug, updated_at DESC
           ),
         unique_delegates AS (
           SELECT DISTINCT ON (del.delegate)
@@ -388,7 +388,6 @@ async function getVotersWhoHaveNotVotedForProposal({
         ORDER BY voting_power DESC
         OFFSET $4 LIMIT $5`;
 
-      console.log({ slug, slugString: String(slug) });
       const params = [
         proposalId,
         contracts.token.address.toLowerCase(),
