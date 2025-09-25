@@ -22,4 +22,19 @@ const getDraftProposal = async (id: number) => {
   return draftProposal as DraftProposal;
 };
 
+export const getDraftProposalByUuid = async (uuid: string) => {
+  const draftProposal = await prismaWeb2Client.proposalDraft.findUnique({
+    where: { uuid },
+    include: {
+      transactions: true,
+      social_options: true,
+      checklist_items: true,
+      approval_options: {
+        include: { transactions: true },
+      },
+    },
+  });
+  return draftProposal as DraftProposal;
+};
+
 export const fetchDraftProposal = cache(getDraftProposal);
