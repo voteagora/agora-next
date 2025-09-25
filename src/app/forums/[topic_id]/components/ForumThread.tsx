@@ -6,6 +6,10 @@ import type { ForumPost } from "@/lib/forumUtils";
 import { useForum } from "@/hooks/useForum";
 import { DunaEditor } from "@/components/duna-editor";
 import { Button } from "@/components/ui/button";
+import { useAccount } from "wagmi";
+import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { convertFileToAttachmentData } from "@/lib/fileUtils";
+import toast from "react-hot-toast";
 
 interface ForumThreadProps {
   topicId: number;
@@ -27,6 +31,7 @@ export default function ForumThread({
   const { createPost } = useForum();
   const [rootContent, setRootContent] = React.useState("");
   const [postingRoot, setPostingRoot] = React.useState(false);
+  const { address } = useAccount();
 
   React.useEffect(() => setComments(initialComments), [initialComments]);
 
@@ -77,6 +82,22 @@ export default function ForumThread({
     );
   };
 
+  const handleImageUpload = React.useCallback(async (file: File): Promise<string> => {
+    if (!address) {
+      throw new Error("Wallet not connected");
+    }
+
+    // Upload to IPFS only (no database record yet)
+    const attachmentData = await convertFileToAttachmentData(file);
+    const uploadResult = await uploadToIPFSOnly(attachmentData, address);
+
+    if (!uploadResult.success || !uploadResult.ipfsUrl) {
+      throw new Error(uploadResult.error || "Upload failed");
+    }
+
+    return uploadResult.ipfsUrl;
+  }, [address]);
+
   const submitRootReply = async () => {
     if (!rootContent.trim()) return;
     setPostingRoot(true);
@@ -112,6 +133,7 @@ export default function ForumThread({
         comments={comments}
         forForums
         categoryId={categoryId ?? undefined}
+        topicId={topicId}
         adminDirectory={adminDirectory}
         onReply={onReply}
         isReplying={isReplying}
@@ -132,6 +154,7 @@ export default function ForumThread({
           value={rootContent}
           onChange={setRootContent}
           disabled={postingRoot}
+          onImageUpload={handleImageUpload}
         />
         <div className="flex justify-end mt-2">
           <Button

@@ -23,6 +23,9 @@ import DelegationsContainerWrapper, {
 import VotesContainerWrapper, {
   VotesContainerSkeleton,
 } from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
+import DiscussionsContainerWrapper, {
+  DiscussionsContainerSkeleton,
+} from "@/components/Delegates/Discussions/DiscussionsContainerWrapper";
 import { DelegateStatement } from "@/app/api/common/delegates/delegate";
 
 export const dynamic = "force-dynamic"; // needed for both app and e2e
@@ -144,6 +147,10 @@ export default async function Page({
 
           <Suspense fallback={<DelegationsContainerSkeleton />}>
             <DelegationsContainerWrapper delegate={parsedDelegate} />
+          </Suspense>
+
+          <Suspense fallback={<DiscussionsContainerSkeleton />}>
+            <DiscussionsContainerWrapper delegate={parsedDelegate} />
           </Suspense>
         </div>
       ) : (

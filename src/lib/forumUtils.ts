@@ -6,6 +6,7 @@ export interface ForumAttachment {
   ipfsCid: string;
   url: string;
   createdAt: string;
+  uploadedBy?: string;
 }
 
 export interface ForumTopic {
@@ -37,12 +38,13 @@ export interface ForumPost {
 export interface ForumCategory {
   id: number;
   name: string;
-  description?: string;
+  description?: string | null;
   archived: boolean;
   adminOnlyTopics: boolean;
   createdAt: string;
   updatedAt: string;
   isDuna?: boolean;
+  topicsCount?: number;
 }
 
 export interface TransformForumTopicsOptions {

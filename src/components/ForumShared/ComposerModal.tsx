@@ -9,12 +9,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { PaperClipIcon } from "@heroicons/react/20/solid";
+import { PaperClipIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { ConnectKitButton } from "connectkit";
 import { DunaEditor } from "@/components/duna-editor";
 import { useForum } from "@/hooks/useForum";
 import type { ForumCategory } from "@/lib/forumUtils";
+import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { convertFileToAttachmentData } from "@/lib/fileUtils";
 
 export interface ComposerModalSubmitData {
   title?: string;
@@ -51,11 +53,12 @@ export default function ComposerModal({
   renderCategory = false,
   categoryLabel = "Category",
 }: ComposerModalProps) {
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const { fetchCategories } = useForum();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [attachment, setAttachment] = useState<File | null>(null);
+  const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [categoryId, setCategoryId] = useState<number | "">("");
@@ -99,6 +102,7 @@ export default function ComposerModal({
       setTitle("");
       setContent("");
       setAttachment(null);
+      setAttachmentPreview(null);
       setCategoryId("");
       onClose();
     } catch (error) {
@@ -110,7 +114,33 @@ export default function ComposerModal({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setAttachment(file);
+    if (file) {
+      setAttachment(file);
+      setAttachmentPreview(null);
+    }
+  };
+
+  const removeAttachment = () => {
+    setAttachment(null);
+    setAttachmentPreview(null);
+    const fileInput = document.getElementById("attachment") as HTMLInputElement;
+    if (fileInput) fileInput.value = "";
+  };
+
+  const handleImageUpload = async (file: File): Promise<string> => {
+    if (!address) {
+      throw new Error("Wallet not connected");
+    }
+
+    // Upload to IPFS only (no database record yet)
+    const attachmentData = await convertFileToAttachmentData(file);
+    const uploadResult = await uploadToIPFSOnly(attachmentData, address);
+
+    if (!uploadResult.success || !uploadResult.ipfsUrl) {
+      throw new Error(uploadResult.error || "Upload failed");
+    }
+
+    return uploadResult.ipfsUrl;
   };
 
   const handleClose = () => {
@@ -118,6 +148,7 @@ export default function ComposerModal({
       setTitle("");
       setContent("");
       setAttachment(null);
+      setAttachmentPreview(null);
       onClose();
     }
   };
@@ -220,6 +251,7 @@ export default function ComposerModal({
                 value={content}
                 onChange={(html) => setContent(html)}
                 disabled={isSubmitting}
+                onImageUpload={handleImageUpload}
               />
             </div>
 
@@ -228,31 +260,46 @@ export default function ComposerModal({
                 htmlFor="attachment"
                 className="block text-sm font-medium text-primary mb-2"
               >
-                Attachment (Optional)
+                Attach Document (Optional)
               </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  id="attachment"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  accept=".pdf,.doc,.docx,.txt"
-                  disabled={isSubmitting}
-                />
-                <Button
-                  type="button"
-                  onClick={() => document.getElementById("attachment")?.click()}
-                  className="bg-neutral text-primary border border-line hover:bg-wash w-full sm:w-auto"
-                  disabled={isSubmitting}
-                >
-                  <PaperClipIcon className="w-4 h-4 mr-2" />
-                  Choose File
-                </Button>
-                {attachment && (
-                  <span className="text-sm text-primary truncate max-w-[200px]">
-                    {attachment.name}
-                  </span>
-                )}
+              <p className="text-xs text-gray-500 mb-2">
+                Use the image button in the editor toolbar to add images inline. Documents will be attached as downloads.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    id="attachment"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.txt"
+                    disabled={isSubmitting}
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => document.getElementById("attachment")?.click()}
+                    className="bg-neutral text-primary border border-line hover:bg-wash w-full sm:w-auto"
+                    disabled={isSubmitting}
+                  >
+                    <PaperClipIcon className="w-4 h-4 mr-2" />
+                    Attach Document
+                  </Button>
+                  {attachment && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-primary truncate max-w-[200px]">
+                        {attachment.name}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={removeAttachment}
+                        className="text-red-500 hover:text-red-700 transition-colors"
+                        disabled={isSubmitting}
+                      >
+                        <XMarkIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 

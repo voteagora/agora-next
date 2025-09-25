@@ -26,6 +26,7 @@ interface ForumCategory {
   id: number;
   name: string;
   isDuna: boolean;
+  topicsCount?: number;
 }
 
 interface InstantSearchProps {
