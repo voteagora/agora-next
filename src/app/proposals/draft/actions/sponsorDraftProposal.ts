@@ -8,11 +8,7 @@ import {
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
 import { ProposalScope } from "../types";
-
-export type FormState = {
-  ok: boolean;
-  message: string;
-};
+import type { FormState } from "../types";
 
 export async function onSubmitAction(
   data: z.output<typeof SponsorProposalSchema> & {
