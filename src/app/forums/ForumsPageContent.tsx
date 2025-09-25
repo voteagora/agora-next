@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import ForumsSidebar from "./ForumsSidebar";
 import { getForumData } from "@/lib/actions/forum/topics";
+import ForumsSearch from "./components/ForumsSearch";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import { MessageCircle, Clock, ChevronUp } from "lucide-react";
 import { stripHtmlToText } from "./stripHtml";
@@ -10,6 +11,14 @@ import { formatRelative } from "@/components/ForumShared/utils";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import { ADMIN_TYPES } from "@/lib/constants";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 interface ForumsPageContentProps {
   categoryId: number | null;
@@ -53,12 +62,27 @@ export default async function ForumsPageContent({
       <div className="mt-6 max-w-7xl mx-auto px-6 sm:px-0">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl text-primary font-bold">{heading}</h1>
-            {description && (
-              <p className="text-sm text-gray-500">{description}</p>
-            )}
+            <Breadcrumb className="mb-2">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/forums">Forums</BreadcrumbLink>
+                </BreadcrumbItem>
+                {selectedCategoryTitle && (
+                  <>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>{selectedCategoryTitle}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </>
+                )}
+              </BreadcrumbList>
+            </Breadcrumb>
+            <h3 className="text-primary">{description}</h3>
           </div>
-          <NewTopicButton isDuna={categoryTitle === "DUNA"} />
+          <div className="flex gap-2">
+            <ForumsSearch className="max-w-xl" />
+            <NewTopicButton isDuna={categoryTitle === "DUNA"} />
+          </div>
         </div>
       </div>
       <div className="flex gap-8 max-w-7xl mx-auto px-6 sm:px-0">
