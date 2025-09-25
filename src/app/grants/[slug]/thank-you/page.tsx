@@ -1,80 +1,22 @@
-import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 
-// Mock grants data - will be replaced with database calls later
-const mockGrants = [
-  {
-    id: "marketing-grants",
-    title: "Marketing and Events Grants",
-    description:
-      "Support marketing initiatives and community events for the Syndicate Network ecosystem",
-    slug: "marketing-and-events-grants",
-    active: true,
-    budget: "$50,000",
-    deadline: "December 31, 2024",
-  },
-  {
-    id: "builder-grants",
-    title: "Builder Grants",
-    description:
-      "Fund development projects and technical contributions to the Syndicate Network",
-    slug: "builder-grants",
-    active: true,
-    budget: "$100,000",
-    deadline: "December 31, 2024",
-  },
-  {
-    id: "research-grants",
-    title: "Research and Development Grants",
-    description:
-      "Support research initiatives and academic contributions to blockchain technology",
-    slug: "research-and-development-grants",
-    active: true,
-    budget: "$75,000",
-    deadline: "January 15, 2025",
-  },
-];
-
 export const revalidate = 0;
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}): Promise<Metadata> {
-  const grant = mockGrants.find((g) => g.slug === params.slug);
-
-  if (!grant) {
-    return {
-      title: "Grant Not Found",
-      description: "The requested grant could not be found.",
-    };
-  }
-
+export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: `Application Submitted - ${grant.title}`,
-    description: `Thank you for submitting your application for ${grant.title}`,
-    robots: "noindex, nofollow", // Don't index thank you pages
+    title: `Application Submitted - Thank You`,
+    description: `Thank you for submitting your application.`,
+    robots: "noindex, nofollow",
   };
 }
 
-export default async function ThankYouPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function ThankYouPage() {
   const { ui } = Tenant.current();
 
   if (!ui.toggle("grants") || !ui.toggle("grants/intake-form")) {
     return <div>Route not supported for namespace</div>;
-  }
-
-  const grant = mockGrants.find((g) => g.slug === params.slug);
-
-  if (!grant || !grant.active) {
-    notFound();
   }
 
   return (
@@ -105,9 +47,8 @@ export default async function ThankYouPage({
           </h1>
 
           <p className="text-tertiary text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
-            Thank you for submitting your application for the{" "}
-            <span className="font-semibold text-primary">{grant.title}</span>.
-            Your application has been received and is now under review.
+            Thank you for submitting your application. Your application has been
+            received and is now under review.
           </p>
 
           {/* Important Information */}

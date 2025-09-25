@@ -3,32 +3,43 @@ import { Metadata } from "next";
 import Tenant from "@/lib/tenant/tenant";
 import GrantIntakeForm from "./components/GrantIntakeForm";
 
-// Mock grants data - will be replaced with database calls later
-const mockGrants = [
+interface Grant {
+  id: string;
+  title: string;
+  description: string;
+  slug: string;
+  active: boolean;
+  budgetRange: string;
+  deadline: string;
+  requirements: string[];
+}
+
+// Mock grants data - 11 categories with unique requirements
+const mockGrants: Grant[] = [
   {
-    id: "marketing-grants",
-    title: "Marketing and Events Grants",
+    id: "marketing-events",
+    title: "Marketing & Events",
     description:
-      "Support marketing initiatives and community events for the Syndicate Network ecosystem",
-    slug: "marketing-and-events-grants",
+      "Support for marketing campaigns, conferences, meetups, and community events that promote Syndicate Network adoption.",
+    slug: "marketing-events",
     active: true,
-    budget: "$50,000",
+    budgetRange: "$5,000 - $25,000",
     deadline: "December 31, 2024",
     requirements: [
       "Must be a member of the Syndicate Network community",
-      "Project must benefit the broader ecosystem",
-      "Clear budget breakdown required",
-      "Timeline and deliverables specified",
+      "Event must benefit the broader ecosystem",
+      "Clear marketing strategy and budget breakdown",
+      "Expected attendance and engagement metrics",
     ],
   },
   {
-    id: "builder-grants",
-    title: "Builder Grants",
+    id: "development-tools",
+    title: "Development & Tools",
     description:
-      "Fund development projects and technical contributions to the Syndicate Network",
-    slug: "builder-grants",
+      "Funding for building developer tools, SDKs, APIs, and infrastructure that enhances the Syndicate ecosystem.",
+    slug: "development-tools",
     active: true,
-    budget: "$100,000",
+    budgetRange: "$10,000 - $50,000",
     deadline: "December 31, 2024",
     requirements: [
       "Technical project with clear deliverables",
@@ -38,19 +49,147 @@ const mockGrants = [
     ],
   },
   {
-    id: "research-grants",
-    title: "Research and Development Grants",
+    id: "research-analysis",
+    title: "Research & Analysis",
     description:
-      "Support research initiatives and academic contributions to blockchain technology",
-    slug: "research-and-development-grants",
+      "Support for research projects, market analysis, technical studies, and academic papers related to Syndicate Network.",
+    slug: "research-analysis",
     active: true,
-    budget: "$75,000",
-    deadline: "January 15, 2025",
+    budgetRange: "$3,000 - $15,000",
+    deadline: "December 31, 2024",
     requirements: [
       "Academic or research institution affiliation",
       "Peer-reviewed research methodology",
       "Publication in academic journals",
       "Open access to research findings",
+    ],
+  },
+  {
+    id: "community-building",
+    title: "Community Building",
+    description:
+      "Grants for community management, ambassador programs, and initiatives that grow and engage the Syndicate community.",
+    slug: "community-building",
+    active: true,
+    budgetRange: "$2,000 - $20,000",
+    deadline: "December 31, 2024",
+    requirements: [
+      "Proven community management experience",
+      "Clear growth and engagement strategy",
+      "Regional or demographic focus",
+      "Measurable community metrics",
+    ],
+  },
+  {
+    id: "education-content",
+    title: "Education & Content",
+    description:
+      "Funding for educational content, tutorials, documentation, courses, and learning resources about Syndicate Network.",
+    slug: "education-content",
+    active: true,
+    budgetRange: "$1,000 - $10,000",
+    deadline: "December 31, 2024",
+    requirements: [
+      "High-quality educational content",
+      "Clear learning objectives",
+      "Accessible to target audience",
+      "Distribution and promotion plan",
+    ],
+  },
+  {
+    id: "security-audits",
+    title: "Security & Audits",
+    description:
+      "Support for security audits, bug bounty programs, and security-focused development of Syndicate protocols.",
+    slug: "security-audits",
+    active: true,
+    budgetRange: "$15,000 - $75,000",
+    deadline: "December 31, 2024",
+    requirements: [
+      "Certified security audit firm",
+      "Comprehensive audit methodology",
+      "Detailed security report",
+      "Follow-up remediation plan",
+    ],
+  },
+  {
+    id: "integration-partnerships",
+    title: "Integration & Partnerships",
+    description:
+      "Grants for integrating Syndicate with other protocols, platforms, and strategic partnerships.",
+    slug: "integration-partnerships",
+    active: true,
+    budgetRange: "$5,000 - $30,000",
+    deadline: "December 31, 2024",
+    requirements: [
+      "Established partnership agreement",
+      "Technical integration plan",
+      "Mutual benefit demonstration",
+      "Long-term sustainability plan",
+    ],
+  },
+  {
+    id: "governance-participation",
+    title: "Governance Participation",
+    description:
+      "Support for governance participation, voting mechanisms, and democratic processes within Syndicate Network.",
+    slug: "governance-participation",
+    active: true,
+    budgetRange: "$1,000 - $5,000",
+    deadline: "December 31, 2024",
+    requirements: [
+      "Active governance participation",
+      "Community engagement strategy",
+      "Democratic process improvement",
+      "Transparency and accountability",
+    ],
+  },
+  {
+    id: "sustainability-environmental",
+    title: "Sustainability & Environmental",
+    description:
+      "Funding for projects that promote environmental sustainability, carbon reduction, and green technology initiatives.",
+    slug: "sustainability-environmental",
+    active: true,
+    budgetRange: "$3,000 - $25,000",
+    deadline: "December 31, 2024",
+    requirements: [
+      "Environmental impact measurement",
+      "Carbon reduction methodology",
+      "Sustainability metrics",
+      "Long-term environmental benefits",
+    ],
+  },
+  {
+    id: "accessibility-inclusion",
+    title: "Accessibility & Inclusion",
+    description:
+      "Grants for making Syndicate Network more accessible to underrepresented communities and promoting diversity.",
+    slug: "accessibility-inclusion",
+    active: true,
+    budgetRange: "$2,000 - $15,000",
+    deadline: "December 31, 2024",
+    requirements: [
+      "Diversity and inclusion focus",
+      "Accessibility improvements",
+      "Community outreach plan",
+      "Measurable inclusion metrics",
+    ],
+  },
+  {
+    id: "innovation-prototyping",
+    title: "Innovation & Prototyping",
+    description:
+      "Support for experimental projects, proof-of-concepts, and innovative applications of Syndicate technology.",
+    slug: "innovation-prototyping",
+    active: true,
+    budgetRange: "$5,000 - $40,000",
+    deadline: "December 31, 2024",
+    requirements: [
+      "Novel technical approach",
+      "Proof-of-concept demonstration",
+      "Innovation impact assessment",
+      "Future development roadmap",
     ],
   },
 ];
@@ -129,7 +268,9 @@ export default async function GrantPage({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="bg-white border border-line rounded-lg p-4">
               <h3 className="font-semibold text-primary mb-2">Budget</h3>
-              <p className="text-2xl font-bold text-primary">{grant.budget}</p>
+              <p className="text-2xl font-bold text-primary">
+                {grant.budgetRange}
+              </p>
             </div>
             <div className="bg-white border border-line rounded-lg p-4">
               <h3 className="font-semibold text-primary mb-2">

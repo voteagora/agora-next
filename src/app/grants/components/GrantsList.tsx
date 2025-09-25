@@ -1,42 +1,43 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
 
-// Mock grants data - will be replaced with database calls later
-const mockGrants = [
-  {
-    id: "marketing-grants",
-    title: "Marketing and Events Grants",
-    description:
-      "Support marketing initiatives and community events for the Syndicate Network ecosystem",
-    slug: "marketing-and-events-grants",
-    active: true,
-    budget: "$50,000",
-    deadline: "December 31, 2024",
-  },
-  {
-    id: "builder-grants",
-    title: "Builder Grants",
-    description:
-      "Fund development projects and technical contributions to the Syndicate Network",
-    slug: "builder-grants",
-    active: true,
-    budget: "$100,000",
-    deadline: "December 31, 2024",
-  },
-  {
-    id: "research-grants",
-    title: "Research and Development Grants",
-    description:
-      "Support research initiatives and academic contributions to blockchain technology",
-    slug: "research-and-development-grants",
-    active: true,
-    budget: "$75,000",
-    deadline: "January 15, 2025",
-  },
-];
+interface Grant {
+  id: string;
+  title: string;
+  description: string;
+  slug: string;
+  active: boolean;
+  budgetRange: string;
+  deadline: string;
+}
 
 export default function GrantsList() {
   const { ui } = Tenant.current();
+  const [grants, setGrants] = useState<Grant[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchGrants = async () => {
+      try {
+        const response = await fetch("/api/grants");
+        if (!response.ok) {
+          throw new Error("Failed to fetch grants");
+        }
+        const data = await response.json();
+        setGrants(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGrants();
+  }, []);
 
   if (!ui.toggle("grants/intake-form")) {
     return (
@@ -44,6 +45,22 @@ export default function GrantsList() {
         <p className="text-tertiary">
           Grants intake form is currently unavailable.
         </p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-tertiary">Loading grants...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-negative">Error loading grants: {error}</p>
       </div>
     );
   }
@@ -59,18 +76,18 @@ export default function GrantsList() {
 
       <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
         <div>
-          {mockGrants.length === 0 ? (
+          {grants.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">
               No grants currently available
             </div>
           ) : (
             <div>
-              {mockGrants.map((grant, index) => (
+              {grants.map((grant, index) => (
                 <div
                   key={grant.id}
                   className={`border-b border-line last:border-b-0 ${
                     index === 0 ? "rounded-t-lg" : ""
-                  } ${index === mockGrants.length - 1 ? "rounded-b-lg" : ""}`}
+                  } ${index === grants.length - 1 ? "rounded-b-lg" : ""}`}
                 >
                   <div className="p-6 hover:bg-wash/50 transition-colors">
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
@@ -86,7 +103,7 @@ export default function GrantsList() {
                           <div className="flex items-center gap-2">
                             <span className="text-tertiary">Budget:</span>
                             <span className="font-medium text-primary">
-                              {grant.budget}
+                              {grant.budgetRange}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
