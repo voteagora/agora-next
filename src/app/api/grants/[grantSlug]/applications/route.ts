@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { z } from "zod";
@@ -76,31 +77,29 @@ export async function POST(
     }
 
     // 1) Upsert grant (create if doesn't exist)
-    const grantResult = await prismaWeb2Client.$queryRawUnsafe<
+    const grantResult = await prismaWeb2Client.$queryRaw<
       Array<{ id: string }>
     >(
-      `INSERT INTO alltenant.grants (dao_slug, slug, title, description, active)
-       VALUES ($1, $2, $3, $4, TRUE)
-       ON CONFLICT (dao_slug, slug)
-       DO UPDATE SET title = EXCLUDED.title, description = EXCLUDED.description, active = EXCLUDED.active
-       RETURNING id`,
-      slug,
-      grantSlug,
-      `Placeholder Grant: ${grantSlug}`,
-      `Auto-created placeholder for ${grantSlug}`
+      Prisma.sql`
+        INSERT INTO alltenant.grants (dao_slug, slug, title, description, active)
+        VALUES (${slug}::config.dao_slug, ${grantSlug}, ${`Placeholder Grant: ${grantSlug}`}, ${`Auto-created placeholder for ${grantSlug}`}, TRUE)
+        ON CONFLICT (dao_slug, slug)
+        DO UPDATE SET title = EXCLUDED.title, description = EXCLUDED.description, active = EXCLUDED.active
+        RETURNING id
+      `
     );
 
     const grantId = grantResult[0].id;
     console.log(`Grant upserted with ID: ${grantId}`);
 
     // 2) Check for duplicate application
-    const existingApp = await prismaWeb2Client.$queryRawUnsafe<
+    const existingApp = await prismaWeb2Client.$queryRaw<
       Array<{ id: string }>
     >(
-      `SELECT id FROM alltenant.grant_applications 
-       WHERE grant_id = $1 AND applicant_address = $2`,
-      grantId,
-      validatedData.applicantAddress || ""
+      Prisma.sql`
+        SELECT id FROM alltenant.grant_applications 
+        WHERE grant_id = ${grantId} AND applicant_address = ${validatedData.applicantAddress || ""}
+      `
     );
 
     if (existingApp.length > 0) {
@@ -111,29 +110,33 @@ export async function POST(
     }
 
     // 3) Insert application
-    const applicationResult = await prismaWeb2Client.$queryRawUnsafe<
+    const applicationResult = await prismaWeb2Client.$queryRaw<
       Array<{ id: string }>
     >(
-      `INSERT INTO alltenant.grant_applications (
-         grant_id,
-         applicant_address,
-         email,
-         telegram_handle,
-         organization,
-         data,
-         status,
-         signature,
-         signed_message_digest
-       ) VALUES ($1, $2, $3, $4, $5, $6::jsonb, 'submitted', $7, $8)
-       RETURNING id`,
-      grantId,
-      validatedData.applicantAddress || "",
-      validatedData.email,
-      validatedData.telegramHandle,
-      null,
-      JSON.stringify(applicationData),
-      "0x", // Placeholder signature
-      "submitted-via-ui"
+      Prisma.sql`
+        INSERT INTO alltenant.grant_applications (
+          grant_id,
+          applicant_address,
+          email,
+          telegram_handle,
+          organization,
+          data,
+          status,
+          signature,
+          signed_message_digest
+        ) VALUES (
+          ${grantId},
+          ${validatedData.applicantAddress || ""},
+          ${validatedData.email},
+          ${validatedData.telegramHandle},
+          ${null},
+          ${JSON.stringify(applicationData)}::jsonb,
+          'submitted',
+          ${"0x"},
+          ${"submitted-via-ui"}
+        )
+        RETURNING id
+      `
     );
 
     const applicationId = applicationResult[0].id;

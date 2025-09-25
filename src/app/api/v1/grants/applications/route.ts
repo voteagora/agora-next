@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -22,57 +23,44 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "50");
     const offset = parseInt(searchParams.get("offset") || "0");
 
-    // Build WHERE clause
-    let whereClause = `WHERE g.dao_slug = $1`;
-    const params: any[] = [slug];
-    let paramIndex = 2;
-
-    if (status) {
-      whereClause += ` AND ga.status = $${paramIndex}`;
-      params.push(status);
-      paramIndex++;
-    }
-
-    const query = `
-      SELECT 
-        ga.id,
-        ga.grant_id,
-        ga.applicant_address,
-        ga.email,
-        ga.telegram_handle,
-        ga.organization,
-        ga.data,
-        ga.status,
-        ga.created_at,
-        g.slug as grant_slug,
-        g.title as grant_title
-      FROM alltenant.grant_applications ga
-      JOIN alltenant.grants g ON ga.grant_id = g.id
-      ${whereClause}
-      ORDER BY ga.created_at DESC
-      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+    // Build WHERE clause with proper casting and parameterization
+    const whereSql = Prisma.sql`
+      WHERE g.dao_slug = ${slug}::config.dao_slug
+      ${status ? Prisma.sql` AND ga.status = ${status}` : Prisma.empty}
     `;
 
-    params.push(limit, offset);
-
-    const applications = await prismaWeb2Client.$queryRawUnsafe(
-      query,
-      ...params
+    const applications = await prismaWeb2Client.$queryRaw(
+      Prisma.sql`
+        SELECT 
+          ga.id,
+          ga.grant_id,
+          ga.applicant_address,
+          ga.email,
+          ga.telegram_handle,
+          ga.organization,
+          ga.data,
+          ga.status,
+          ga.created_at,
+          g.slug as grant_slug,
+          g.title as grant_title
+        FROM alltenant.grant_applications ga
+        JOIN alltenant.grants g ON ga.grant_id = g.id
+        ${whereSql}
+        ORDER BY ga.created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `
     );
 
     // Get total count for pagination
-    const countQuery = `
-      SELECT COUNT(*) as total
-      FROM alltenant.grant_applications ga
-      JOIN alltenant.grants g ON ga.grant_id = g.id
-      ${whereClause}
-    `;
-
-    const countResult = await prismaWeb2Client.$queryRawUnsafe<
+    const countResult = await prismaWeb2Client.$queryRaw<
       Array<{ total: bigint }>
     >(
-      countQuery,
-      ...params.slice(0, -2) // Remove limit/offset params
+      Prisma.sql`
+        SELECT COUNT(*) as total
+        FROM alltenant.grant_applications ga
+        JOIN alltenant.grants g ON ga.grant_id = g.id
+        ${whereSql}
+      `
     );
 
     const total = Number(countResult[0].total);

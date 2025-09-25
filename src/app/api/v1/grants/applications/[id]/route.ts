@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { z } from "zod";
 
@@ -26,16 +27,16 @@ export async function PATCH(
     const body = await req.json();
     const validatedData = updateStatusSchema.parse(body);
 
-    // Update application status
-    const result = await prismaWeb2Client.$queryRawUnsafe<
+    // Update application status (parameterized)
+    const result = await prismaWeb2Client.$queryRaw<
       Array<{ id: string }>
     >(
-      `UPDATE alltenant.grant_applications 
-       SET status = $1, updated_at = NOW()
-       WHERE id = $2
-       RETURNING id`,
-      validatedData.status,
-      id
+      Prisma.sql`
+        UPDATE alltenant.grant_applications 
+        SET status = ${validatedData.status}, updated_at = NOW()
+        WHERE id = ${id}
+        RETURNING id
+      `
     );
 
     if (result.length === 0) {
