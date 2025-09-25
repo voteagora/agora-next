@@ -28,7 +28,7 @@ export const protocolGuildTenantContractConfig = ({
 }: Props): TenantContracts => {
   const TOKEN = isProd
     ? "0xD6e705292f293Df65c9FB9C28f67C3794fC66D5F"
-    : "0xE3D4a55f780C5aD9B3009523CB6a3d900A8FA723";
+    : "0x6414E718495a9dB82Fa44B833260E2De10bb88D3";
 
   const GOVERNOR = isProd
     ? "0x4CEF361ACd29eA0E3b39Fd33fc6Dfa7c3BB83820"
