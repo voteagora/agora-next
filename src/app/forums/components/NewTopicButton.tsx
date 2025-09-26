@@ -3,14 +3,25 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import CreateTopicModal from "./CreateTopicModal";
+import useRequireLogin from "@/hooks/useRequireLogin";
 
 export default function NewTopicButton({ isDuna }: { isDuna: boolean }) {
   const [open, setOpen] = React.useState(false);
+  const requireLogin = useRequireLogin();
+
+  const handleClick = async () => {
+    const loggedIn = await requireLogin();
+    if (!loggedIn) {
+      return;
+    }
+    setOpen(true);
+  };
+
   return (
     <>
       <Button
-        onClick={() => setOpen(true)}
-        className="inline-flex h-9 px-4 py-2 items-center justify-center gap-2 shrink-0 rounded-md bg-brandPrimary text-neutral shadow-sm hover:bg-neutral-800 text-sm h-auto"
+        onClick={handleClick}
+        className="inline-flex h-9 px-4 py-2 items-center justify-center gap-2 shrink-0 rounded-md bg-primary text-white shadow-sm hover:bg-neutral-800 text-sm h-auto"
       >
         {isDuna ? "+ Discuss DUNA" : "+ New Topic"}
       </Button>

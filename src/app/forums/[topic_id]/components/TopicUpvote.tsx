@@ -4,6 +4,7 @@ import React from "react";
 import { ChevronUp } from "lucide-react";
 import { useForum } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
+import useRequireLogin from "@/hooks/useRequireLogin";
 import { rgbStringToHex } from "@/app/lib/utils/color";
 import Tenant from "@/lib/tenant/tenant";
 const { ui } = Tenant.current();
@@ -15,12 +16,28 @@ export default function TopicUpvote({
   topicId: number;
   className?: string;
 }) {
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
   const { upvoteTopic, removeUpvoteTopic, fetchTopicUpvotes, hasUpvotedTopic } =
     useForum();
   const [count, setCount] = React.useState<number>(0);
   const [mine, setMine] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
+  const requireLogin = useRequireLogin();
+  const upvoteTopicRef = React.useRef(upvoteTopic);
+  const removeUpvoteTopicRef = React.useRef(removeUpvoteTopic);
+  const mineRef = React.useRef(mine);
+
+  React.useEffect(() => {
+    upvoteTopicRef.current = upvoteTopic;
+  }, [upvoteTopic]);
+
+  React.useEffect(() => {
+    removeUpvoteTopicRef.current = removeUpvoteTopic;
+  }, [removeUpvoteTopic]);
+
+  React.useEffect(() => {
+    mineRef.current = mine;
+  }, [mine]);
 
   React.useEffect(() => {
     let mounted = true;
@@ -38,18 +55,17 @@ export default function TopicUpvote({
   }, [topicId, address, fetchTopicUpvotes, hasUpvotedTopic]);
 
   const toggle = async () => {
-    if (!isConnected) return; // upstream will toast in hook
-    if (loading) return;
+    if (loading || !(await requireLogin())) return;
     setLoading(true);
     try {
-      if (mine) {
-        const updated = await removeUpvoteTopic(topicId);
+      if (mineRef.current) {
+        const updated = await removeUpvoteTopicRef.current(topicId);
         if (updated !== null) {
           setCount(updated);
           setMine(false);
         }
       } else {
-        const updated = await upvoteTopic(topicId);
+        const updated = await upvoteTopicRef.current(topicId);
         if (updated !== null) {
           setCount(updated);
           setMine(true);

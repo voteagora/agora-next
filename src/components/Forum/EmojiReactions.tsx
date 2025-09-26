@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useForum } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
 import { SmilePlus } from "lucide-react";
+import useRequireLogin from "@/hooks/useRequireLogin";
 
 type AddressesByEmoji = Record<string, string[]>;
 
@@ -33,6 +34,27 @@ export default function EmojiReactions({
   const [open, setOpen] = React.useState(false);
   const [pending, setPending] = React.useState<Set<string>>(new Set());
   const { addReaction, removeReaction } = useForum();
+  const requireLogin = useRequireLogin();
+  const addReactionRef = React.useRef(addReaction);
+  const removeReactionRef = React.useRef(removeReaction);
+  const addressRef = React.useRef(address);
+  const byEmojiRef = React.useRef(byEmoji);
+
+  React.useEffect(() => {
+    addReactionRef.current = addReaction;
+  }, [addReaction]);
+
+  React.useEffect(() => {
+    removeReactionRef.current = removeReaction;
+  }, [removeReaction]);
+
+  React.useEffect(() => {
+    addressRef.current = address;
+  }, [address]);
+
+  React.useEffect(() => {
+    byEmojiRef.current = byEmoji;
+  }, [byEmoji]);
 
   const mineSet = React.useMemo(() => {
     const me = (address || "").toLowerCase();
@@ -47,19 +69,23 @@ export default function EmojiReactions({
     emoji: string,
     opts?: { closeOnAdd?: boolean }
   ) => {
-    const me = (address || "").toLowerCase();
-    const currentlyMine = mineSet.has(emoji);
-
-    if (!address) {
-      const ok = currentlyMine
-        ? await removeReaction(targetType, targetId, emoji)
-        : await addReaction(targetType, targetId, emoji);
-      if (ok && opts?.closeOnAdd && !currentlyMine) setOpen(false);
+    if (!(await requireLogin())) {
       return;
     }
 
+    const addr = addressRef.current;
+    if (!addr) {
+      return;
+    }
+
+    const me = (addr || "").toLowerCase();
+    const currentMap = byEmojiRef.current;
+    const currentlyMine = (currentMap[emoji] || []).some(
+      (a) => a.toLowerCase() === me
+    );
+
     setPending((p) => new Set(p).add(emoji));
-    const prev = byEmoji;
+    const prev = byEmojiRef.current;
     if (currentlyMine) {
       setByEmoji((prevState) => {
         const arr = (prevState[emoji] || []).filter((a) => a !== me);
@@ -68,7 +94,7 @@ export default function EmojiReactions({
         else next[emoji] = arr;
         return next;
       });
-      const ok = await removeReaction(targetType, targetId, emoji);
+      const ok = await removeReactionRef.current(targetType, targetId, emoji);
       if (!ok) setByEmoji(prev);
     } else {
       setByEmoji((prevState) => {
@@ -76,7 +102,7 @@ export default function EmojiReactions({
         if (!arr.includes(me)) arr.push(me);
         return { ...prevState, [emoji]: arr };
       });
-      const ok = await addReaction(targetType, targetId, emoji);
+      const ok = await addReactionRef.current(targetType, targetId, emoji);
       if (!ok) setByEmoji(prev);
       if (ok && opts?.closeOnAdd) setOpen(false);
     }

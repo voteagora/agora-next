@@ -159,9 +159,6 @@ export interface DunaEditorProps {
   className?: string;
   variant?: "post" | "comment";
   // For IPFS image uploads
-  targetType?: "post" | "category";
-  targetId?: number;
-  // For temporary uploads during composition
   onImageUpload?: (file: File) => Promise<string>;
 }
 
@@ -174,8 +171,6 @@ export default function DunaEditor({
   disabled = false,
   className,
   variant = "post",
-  targetType = "post",
-  targetId,
   onImageUpload,
 }: DunaEditorProps) {
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
