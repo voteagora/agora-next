@@ -134,8 +134,28 @@ export async function onSubmitAction(
   data: z.output<typeof DraftProposalSchema> & {
     draftProposalId: number;
     creatorAddress: string;
-  }
+  },
+  message: string,
+  signature: string
 ): Promise<FormState> {
+  // Verify SIWE authentication
+  try {
+    const { requireSiweAuth } = await import("./siweAuth");
+    const { address } = await requireSiweAuth(message, signature);
+    
+    // Verify the authenticated address matches the creator
+    if (address.toLowerCase() !== data.creatorAddress.toLowerCase()) {
+      return {
+        ok: false,
+        message: "Authentication failed: address mismatch",
+      };
+    }
+  } catch (error: any) {
+    return {
+      ok: false,
+      message: `Authentication failed: ${error.message}`,
+    };
+  }
   const parsed = DraftProposalSchema.safeParse(data);
 
   if (!parsed.success) {

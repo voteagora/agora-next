@@ -62,7 +62,7 @@ const CreateProposalDraftButton = ({
       onClick={async () => {
         setIsPending(true);
         const proposal = await createProposalDraft(address);
-        const nextId = (proposal as any).uuid ?? proposal.id;
+        const nextId = proposal.uuid ?? proposal.id;
         window.location.href = `/proposals/draft/${nextId}`;
       }}
     >

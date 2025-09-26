@@ -46,7 +46,7 @@ const MyDraftProposals = ({
       </h1>
       <div className="space-y-6">
         {draftProposals.map((proposal) => {
-          const nextId = (proposal as any).uuid ?? proposal.id;
+          const nextId = proposal.uuid ?? proposal.id;
           return (
             <Link
               key={proposal.id}
