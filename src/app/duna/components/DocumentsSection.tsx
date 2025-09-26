@@ -142,7 +142,7 @@ const DocumentsSection = ({
               useDarkStyling ? "text-white" : "text-primary"
             }`}
           >
-            Quaterly Reports
+            Documents
           </h3>
           {!!address && canManageAttachments && (
             <Button
@@ -280,7 +280,7 @@ const DocumentsSection = ({
         Official DUNA Communications
       </p>
       <p className="text-sm text-primary">
-        Want to talk about official items for the DUNA Or discover discussions
+        Want to talk about official items for the DUNA or discover discussions
         on it? Please head to the{" "}
         <Link
           href={buildForumCategoryPath(dunaCategoryId!, "DUNA")}

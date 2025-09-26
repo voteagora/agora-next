@@ -154,6 +154,7 @@ type TenantUIParams = {
     customCardSize?: string;
     customIconColor?: string;
     noReportsFound?: string;
+    customButtonBackground?: string;
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -217,6 +218,7 @@ export class TenantUI {
     customCardSize?: string;
     customIconColor?: string;
     noReportsFound?: string;
+    customButtonBackground?: string;
   };
   private _theme: "light" | "dark";
   private _favicon?: {
@@ -358,6 +360,7 @@ export class TenantUI {
         customCardSize?: string;
         customIconColor?: string;
         noReportsFound?: string;
+        customButtonBackground?: string;
       }
     | undefined {
     return this._customization;

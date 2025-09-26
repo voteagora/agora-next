@@ -49,9 +49,9 @@ export default async function ForumsSidebar({
   ];
 
   return (
-    <div className="w-80 bg-card rounded-lg border border-cardBorder">
+    <div className="w-80 bg-cardBackground rounded-lg border border-cardBorder">
       <div className="p-4">
-        <h3 className="text-lg font-semibold mb-4">Categories</h3>
+        <h3 className="text-lg text-primary font-semibold mb-4">Categories</h3>
 
         <div className="space-y-3">
           {categories.length === 0 ? (
@@ -111,7 +111,7 @@ export default async function ForumsSidebar({
         </div>
       </div>
       <div>
-        <div className="border-t">
+        <div className="border-t border-border">
           <div className="space-y-2 text-sm p-6">
             <div className="flex justify-between">
               <span className="text-gray-600">Last comment</span>

@@ -4,7 +4,7 @@ import DocumentsSection from "./DocumentsSection";
 import {
   getForumTopics,
   getDunaCategoryId,
-  getForumAttachments,
+  getForumCategoryAttachments,
 } from "@/lib/actions/forum";
 import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 import Tenant from "@/lib/tenant/tenant";
@@ -37,7 +37,7 @@ const DunaAdministration = async () => {
     }
     const [topicsResult, documentsResult] = await Promise.all([
       getForumTopics({ categoryId: dunaCategoryId }),
-      getForumAttachments(),
+      getForumCategoryAttachments({ categoryId: dunaCategoryId }),
     ]);
 
     if (topicsResult.success) {

@@ -74,7 +74,7 @@ export default async function ForumsPageContent({
       <div className="mt-6 max-w-7xl mx-auto px-6 sm:px-0">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold">{heading}</h1>
+            <h1 className="text-3xl text-primary font-bold">{heading}</h1>
             {description && (
               <p className="text-sm text-gray-500">{description}</p>
             )}
@@ -110,7 +110,7 @@ export default async function ForumsPageContent({
                   <Link
                     key={topic.id}
                     href={buildForumTopicPath(topic.id, topic.title)}
-                    className="group block bg-card border border-cardBorder rounded-lg p-3 hover:shadow-sm transition-shadow"
+                    className="group block bg-cardBackground border border-cardBorder rounded-lg p-3 hover:shadow-sm transition-shadow"
                   >
                     <div className="flex items-start gap-3">
                       {/* Avatar */}

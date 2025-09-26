@@ -260,3 +260,37 @@ export async function archiveForumAttachment(
     await prismaWeb2Client.$disconnect();
   }
 }
+
+export const getForumCategoryAttachments = async ({
+  categoryId,
+}: {
+  categoryId: number;
+}) => {
+  try {
+    const attachments = await prismaWeb2Client.forumCategoryAttachment.findMany(
+      {
+        where: {
+          dao_slug: slug,
+          categoryId,
+        },
+      }
+    );
+
+    return {
+      success: true,
+      data: attachments.map((attachment) => ({
+        id: attachment.id,
+        name: attachment.fileName,
+        url: getIPFSUrl(attachment.ipfsCid),
+        ipfsCid: attachment.ipfsCid,
+        createdAt: attachment.createdAt.toISOString(),
+        uploadedBy: attachment.address,
+      })),
+    };
+  } catch (error) {
+    console.error("Error getting forum category attachments:", error);
+    return handlePrismaError(error);
+  } finally {
+    await prismaWeb2Client.$disconnect();
+  }
+};
