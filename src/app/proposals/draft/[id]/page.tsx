@@ -34,6 +34,28 @@ export default async function DraftProposalPage({
     return <div>This feature is not supported by this tenant.</div>;
   }
 
+  // Validate UUID format before querying database
+  const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.id);
+  
+  if (!isValidUuid) {
+    return (
+      <div className="max-w-screen-xl mx-auto mt-10 text-center">
+        <h1 className="text-2xl font-bold text-primary mb-4">
+          Draft Not Found
+        </h1>
+        <p className="text-secondary mb-6">
+          Invalid draft URL. Numeric draft IDs are no longer supported for security reasons.
+        </p>
+        <a
+          href="/proposals"
+          className="inline-block bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+        >
+          Back to Proposals
+        </a>
+      </div>
+    );
+  }
+
   const draftProposal = await getDraftProposalByUuid(params.id);
 
   if (!draftProposal) {
