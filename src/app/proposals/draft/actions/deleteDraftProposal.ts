@@ -1,11 +1,7 @@
 "use server";
 
 import { prismaWeb2Client } from "@/app/lib/prisma";
-
-export type FormState = {
-  ok: boolean;
-  message: string;
-};
+import type { FormState } from "../types";
 
 // TODO: need to auth this route in some way
 // perhaps send down the owner address and a signature + nonce to verify
