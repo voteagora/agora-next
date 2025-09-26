@@ -34,8 +34,27 @@ export default async function DraftProposalPage({
     return <div>This feature is not supported by this tenant.</div>;
   }
 
-  // UUID-only lookup (all old drafts will be deleted before deployment)
   const draftProposal = await getDraftProposalByUuid(params.id);
+
+  if (!draftProposal) {
+    return (
+      <div className="max-w-screen-xl mx-auto mt-10 text-center">
+        <h1 className="text-2xl font-bold text-primary mb-4">
+          Draft Not Found
+        </h1>
+        <p className="text-secondary mb-6">
+          The draft you&apos;re looking for doesn&apos;t exist
+        </p>
+        <a
+          href="/proposals"
+          className="inline-block bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+        >
+          Back to Proposals
+        </a>
+      </div>
+    );
+  }
+
   const proposalTypes = await fetchProposalTypes();
 
   const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
