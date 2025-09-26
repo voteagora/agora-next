@@ -16,11 +16,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
 import ENSName from "@/components/shared/ENSName";
 import { CollapsibleText } from "@/components/shared/CollapsibleText";
 import { SCWProfileImage } from "./SCWProfileImage";
 import { cn } from "@/lib/utils";
+import { useForumAdminsList } from "@/hooks/useForum";
 
 interface Props {
   address: string;
@@ -32,6 +34,18 @@ interface Props {
   showVotingPower?: boolean;
   participation?: number;
   showParticipation?: boolean;
+}
+
+function useForumAdminRole(address: string) {
+  const { admins } = useForumAdminsList();
+  return React.useMemo(() => {
+    if (!Array.isArray(admins) || !address) return null;
+    const normalized = address.toLowerCase();
+    const match = admins.find(
+      (admin) => (admin.address || "").toLowerCase() === normalized
+    );
+    return match?.role ?? null;
+  }, [admins, address]);
 }
 
 export function DelegateProfileImage({
@@ -108,6 +122,7 @@ export function DelegateProfileImage({
               <ENSName address={address} />
             )}
           </div>
+
           {endorsed && hasEndorsedFilter && endorsedToggle && (
             <TooltipProvider delayDuration={0}>
               <Tooltip>
@@ -173,6 +188,7 @@ export function DelegateProfileImageWithMetadata({
   const formattedNumber = useMemo(() => {
     return formatNumber(votingPower);
   }, [votingPower]);
+  const forumAdminRole = useForumAdminRole(address);
 
   const endorsedToggle = ui.toggle("delegates/endorsed-filter");
   const hasEndorsedFilter = Boolean(
@@ -212,6 +228,23 @@ export function DelegateProfileImageWithMetadata({
     };
   }, [address, formattedNumber, refetchDelegate, setRefetchDelegate]);
 
+  const renderAdminBadges = () => {
+    if (!forumAdminRole) return null;
+    if (forumAdminRole === "super_admin") {
+      return (
+        <div className="flex flex-row gap-1 items-center">
+          <ForumAdminBadge type="DUNA_ADMIN" />
+          <ForumAdminBadge type="ADMIN" />
+        </div>
+      );
+    }
+    return (
+      <div className="flex flex-row gap-1 items-center">
+        <ForumAdminBadge type={forumAdminRole} />
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-row gap-4 items-center">
@@ -238,6 +271,7 @@ export function DelegateProfileImageWithMetadata({
                 />
               ) : null}
             </div>
+            {renderAdminBadges()}
             {endorsed && hasEndorsedFilter && endorsedToggle && (
               <TooltipProvider delayDuration={0}>
                 <Tooltip>

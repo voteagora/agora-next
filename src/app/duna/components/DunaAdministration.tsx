@@ -1,11 +1,10 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import QuarterlyReportsSection from "./QuarterlyReportsSection";
 import DocumentsSection from "./DocumentsSection";
 import {
   getForumTopics,
   getDunaCategoryId,
-  getForumAttachments,
+  getForumCategoryAttachments,
 } from "@/lib/actions/forum";
 import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 import Tenant from "@/lib/tenant/tenant";
@@ -37,8 +36,8 @@ const DunaAdministration = async () => {
       );
     }
     const [topicsResult, documentsResult] = await Promise.all([
-      getForumTopics(dunaCategoryId),
-      getForumAttachments({ categoryId: dunaCategoryId }),
+      getForumTopics({ categoryId: dunaCategoryId }),
+      getForumCategoryAttachments({ categoryId: dunaCategoryId }),
     ]);
 
     if (topicsResult.success) {
@@ -64,9 +63,8 @@ const DunaAdministration = async () => {
 
       <Card className="border border-line bg-white shadow-sm">
         <CardContent className="p-6">
-          <DocumentsSection initialDocuments={documents} />
-          <div className="mt-4 pt-4">
-            <QuarterlyReportsSection initialReports={dunaReports} />
+          <div className="">
+            <DocumentsSection initialDocuments={documents} />
           </div>
         </CardContent>
       </Card>

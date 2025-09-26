@@ -15,10 +15,11 @@ import { formatDistanceToNow } from "date-fns";
 import { useAccount } from "wagmi";
 import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
+import { canArchiveContent, canDeleteContent } from "@/lib/forumUtils";
 import { DunaContentRenderer } from "@/components/duna-editor";
 import Tenant from "@/lib/tenant/tenant";
+import SoftDeletedContent from "@/components/Forum/SoftDeletedContent";
 
 interface QuarterlyReportCardProps {
   report: ForumTopic;
@@ -36,7 +37,7 @@ const QuarterlyReportCard = ({
   onArchive,
 }: QuarterlyReportCardProps) => {
   const { address } = useAccount();
-  const { deleteTopic, archiveTopic } = useForum();
+  const { deleteTopic, archiveTopic, restoreTopic } = useForum();
   const openDialog = useOpenDialog();
   const { dunaCategoryId } = useDunaCategory();
   const { isAdmin, canManageTopics } = useForumAdmin(
@@ -69,10 +70,30 @@ const QuarterlyReportCard = ({
     openDialog({
       type: "CONFIRM",
       params: {
-        title: "Delete Post",
-        message: "Are you sure you want to delete this post?",
+        title: isAdmin ? "Permanently Delete Post" : "Delete Post",
+        message: isAdmin
+          ? "Are you sure you want to permanently delete this post? This action cannot be undone."
+          : "Are you sure you want to delete this post?",
         onConfirm: async () => {
-          const success = await deleteTopic(report.id);
+          const success = await deleteTopic(report.id, isAdmin);
+          if (success && onDelete) {
+            onDelete();
+          }
+        },
+      },
+    });
+  };
+
+  const handleRestore = async (e: React.MouseEvent) => {
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Restore Post",
+        message: "Are you sure you want to restore this post?",
+        onConfirm: async () => {
+          const isAuthor =
+            report.author?.toLowerCase() === address?.toLowerCase();
+          const success = await restoreTopic(report.id, isAuthor);
           if (success && onDelete) {
             onDelete();
           }
@@ -89,7 +110,9 @@ const QuarterlyReportCard = ({
         title: "Archive Post",
         message: "Are you sure you want to archive this post?",
         onConfirm: async () => {
-          const success = await archiveTopic(report.id);
+          const isAuthor =
+            report.author?.toLowerCase() === address?.toLowerCase();
+          const success = await archiveTopic(report.id, isAuthor);
           if (success && onArchive) {
             onArchive();
           }
@@ -97,6 +120,30 @@ const QuarterlyReportCard = ({
       },
     });
   };
+
+  if (report.deletedAt) {
+    const canDelete = canDeleteContent(
+      address || "",
+      report.author || "",
+      isAdmin,
+      canManageTopics
+    );
+    return (
+      <div
+        className={`p-4 ${!isLast ? "border-b" : ""}`}
+        style={!isLast ? { borderBottomColor: "#E5E5E5" } : {}}
+      >
+        <SoftDeletedContent
+          contentType="topic"
+          deletedAt={report.deletedAt}
+          deletedBy={report.deletedBy || ""}
+          canRestore={canDelete}
+          onRestore={() => handleRestore({} as React.MouseEvent)}
+          showRestoreButton={canDelete}
+        />
+      </div>
+    );
+  }
 
   return (
     <div

@@ -114,13 +114,6 @@ export default async function Page() {
             <DunaDisclosures />
           )
         ) : null}
-        {ui.dunaDisclaimers && (
-          <div className="mt-12 pt-6 border-t border-line">
-            <p className="text-secondary text-sm opacity-75">
-              {ui.dunaDisclaimers}
-            </p>
-          </div>
-        )}
       </div>
     );
   } else {
