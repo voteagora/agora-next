@@ -47,17 +47,6 @@ export default async function DraftProposalPage({
     return <div>This feature is not supported by this tenant.</div>;
   }
 
-  const isValidUuid =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      params.id
-    );
-
-  if (!isValidUuid) {
-    return (
-      <DraftNotFoundError message="Invalid draft URL. Numeric draft IDs are no longer supported for security reasons." />
-    );
-  }
-
   const draftProposal = await getDraftProposalByUuid(params.id);
 
   if (!draftProposal) {
