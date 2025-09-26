@@ -6,6 +6,10 @@ export const SECONDS_IN_HOUR = 3600;
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
+// SIWE localStorage keys
+export const LOCAL_STORAGE_SIWE_JWT_KEY = "agora-siwe-jwt";
+export const LOCAL_STORAGE_SIWE_STAGE_KEY = "agora-siwe-stage";
+
 export enum FREQUENCY_FILTERS {
   DAY = "24h",
   WEEK = "7d",

@@ -1,10 +1,13 @@
 import { SIWEConfig } from "connectkit";
 import { SiweMessage } from "siwe";
 import { decodeJwt } from "jose";
+import {
+  LOCAL_STORAGE_SIWE_JWT_KEY,
+  LOCAL_STORAGE_SIWE_STAGE_KEY,
+} from "@/lib/constants";
 
 // TODO: this should probably be an environment variable
 const API_AUTH_PREFIX = "/api/v1/auth";
-const LOCAL_STORAGE_JWT_KEY = "agora-siwe-jwt";
 export const AGORA_SIGN_IN_MESSAGE = "Sign in to Agora with Ethereum";
 
 /* There's currently nothing stored on the backend to maintain session state.
@@ -18,9 +21,7 @@ export const AGORA_SIGN_IN_MESSAGE = "Sign in to Agora with Ethereum";
 // JWT tokens for SIWE should therefore be issued with a short expiry time.
 */
 
-const isSiweEnabled = () => {
-  return process.env.NEXT_PUBLIC_SIWE_ENABLED === "true";
-};
+const isSiweEnabled = () => false;
 
 export const siweProviderConfig: SIWEConfig = {
   getNonce: async () =>
@@ -46,18 +47,25 @@ export const siweProviderConfig: SIWEConfig = {
         signature,
       }),
     }).then(async (res) => {
-      // save JWT from verify to local storage
-      const token = await res.json();
-      localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
+      try {
+        const token = await res.json();
+        if (token.access_token) {
+          localStorage.setItem(LOCAL_STORAGE_SIWE_JWT_KEY, token.access_token);
+          localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "signed");
+        } else {
+          localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "error");
+        }
+      } catch (e) {
+        localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "error");
+      }
       return res.ok;
     }),
   getSession: async () => {
     // return JWT from local storage
-    const session = localStorage.getItem(LOCAL_STORAGE_JWT_KEY);
-    if (!session) {
+    const jwt = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
+    if (!jwt) {
       return null;
     }
-    const jwt = JSON.parse(session).access_token;
     // decode JWT to get session info
     const decoded = decodeJwt(jwt);
     const siweData = decoded.siwe as { address: string; chainId: string };
@@ -67,8 +75,12 @@ export const siweProviderConfig: SIWEConfig = {
     };
   },
   signOut: () => {
-    // remove JWT from local storage
-    localStorage.removeItem(LOCAL_STORAGE_JWT_KEY);
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_SIWE_JWT_KEY);
+      localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
+    } catch (e) {
+      // ignore localStorage errors
+    }
     return Promise.resolve(true);
   },
   enabled: isSiweEnabled(),
