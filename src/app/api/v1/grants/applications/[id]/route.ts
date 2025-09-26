@@ -28,9 +28,7 @@ export async function PATCH(
     const validatedData = updateStatusSchema.parse(body);
 
     // Update application status (parameterized)
-    const result = await prismaWeb2Client.$queryRaw<
-      Array<{ id: string }>
-    >(
+    const result = await prismaWeb2Client.$queryRaw<Array<{ id: string }>>(
       Prisma.sql`
         UPDATE alltenant.grant_applications 
         SET status = ${validatedData.status}, updated_at = NOW()

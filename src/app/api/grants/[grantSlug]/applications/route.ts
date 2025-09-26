@@ -77,9 +77,7 @@ export async function POST(
     }
 
     // 1) Upsert grant (create if doesn't exist)
-    const grantResult = await prismaWeb2Client.$queryRaw<
-      Array<{ id: string }>
-    >(
+    const grantResult = await prismaWeb2Client.$queryRaw<Array<{ id: string }>>(
       Prisma.sql`
         INSERT INTO alltenant.grants (dao_slug, slug, title, description, active)
         VALUES (${slug}::config.dao_slug, ${grantSlug}, ${`Placeholder Grant: ${grantSlug}`}, ${`Auto-created placeholder for ${grantSlug}`}, TRUE)
@@ -93,9 +91,7 @@ export async function POST(
     console.log(`Grant upserted with ID: ${grantId}`);
 
     // 2) Check for duplicate application
-    const existingApp = await prismaWeb2Client.$queryRaw<
-      Array<{ id: string }>
-    >(
+    const existingApp = await prismaWeb2Client.$queryRaw<Array<{ id: string }>>(
       Prisma.sql`
         SELECT id FROM alltenant.grant_applications 
         WHERE grant_id = ${grantId} AND applicant_address = ${validatedData.applicantAddress || ""}

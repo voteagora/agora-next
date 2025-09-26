@@ -100,9 +100,12 @@ export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
       router.push(`/grants/${grant.slug}/thank-you`);
     } catch (error) {
       console.error("Error submitting grant application:", error);
-      toast.error(
-        "There was an error submitting your application. Please try again."
-      );
+      // Show the specific error message from the API
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "There was an error submitting your application. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
