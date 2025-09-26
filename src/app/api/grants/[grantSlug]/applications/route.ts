@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { z } from "zod";
+import { sendGrantConfirmationEmail } from "@/lib/email/mailgun";
 
 export const revalidate = 0;
 
@@ -77,9 +78,7 @@ export async function POST(
     }
 
     // 1) Upsert grant (create if doesn't exist)
-    const grantResult = await prismaWeb2Client.$queryRaw<
-      Array<{ id: string }>
-    >(
+    const grantResult = await prismaWeb2Client.$queryRaw<Array<{ id: string }>>(
       Prisma.sql`
         INSERT INTO alltenant.grants (dao_slug, slug, title, description, active)
         VALUES (${slug}::config.dao_slug, ${grantSlug}, ${`Placeholder Grant: ${grantSlug}`}, ${`Auto-created placeholder for ${grantSlug}`}, TRUE)
@@ -93,9 +92,7 @@ export async function POST(
     console.log(`Grant upserted with ID: ${grantId}`);
 
     // 2) Check for duplicate application
-    const existingApp = await prismaWeb2Client.$queryRaw<
-      Array<{ id: string }>
-    >(
+    const existingApp = await prismaWeb2Client.$queryRaw<Array<{ id: string }>>(
       Prisma.sql`
         SELECT id FROM alltenant.grant_applications 
         WHERE grant_id = ${grantId} AND applicant_address = ${validatedData.applicantAddress || ""}
@@ -141,6 +138,28 @@ export async function POST(
 
     const applicationId = applicationResult[0].id;
     console.log(`Application created with ID: ${applicationId}`);
+
+    // Send confirmation email (don't block the response if email fails)
+    try {
+      const grantTitle = `Placeholder Grant: ${grantSlug}`;
+      await sendGrantConfirmationEmail({
+        to: validatedData.email,
+        data: {
+          applicant_name: validatedData.name,
+          grant_title: grantTitle,
+          application_id: applicationId,
+          submission_date: applicationData.submittedAt,
+          funding_amount: validatedData.fundingAmount,
+          applicant_email: validatedData.email,
+          telegram_handle: validatedData.telegramHandle,
+          support_url: process.env.SUPPORT_URL || "https://support.agora.vote",
+        },
+      });
+      console.log(`Confirmation email sent to ${validatedData.email}`);
+    } catch (emailError) {
+      // Log email error but don't fail the application submission
+      console.error("Failed to send confirmation email:", emailError);
+    }
 
     return NextResponse.json(
       {
