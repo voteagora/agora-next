@@ -51,7 +51,7 @@ export default async function DraftProposalPage({
 
   if (!draftProposal) {
     return (
-      <DraftNotFoundError message="The draft you're looking for doesn't exist." />
+      <DraftNotFoundError message="The draft you're looking for doesn't exist. If you think this is an error, please contact jeff@voteagora.com." />
     );
   }
 
