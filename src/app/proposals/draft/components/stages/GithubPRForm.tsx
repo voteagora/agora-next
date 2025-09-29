@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 import { useState } from "react";
 import FormCard from "../form/FormCard";
 import { UpdatedButton } from "@/components/Button";
@@ -21,6 +21,7 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const router = useRouter();
   const openDialog = useOpenDialog();
   const { address } = useAccount();
+  const messageSigner = useSignMessage();
   const [isCreatePRPending, setIsCreatePRPending] = useState(false);
   const [isSkipPending, setIsSkipPending] = useState(false);
 
@@ -35,14 +36,29 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         throw new Error("No address found");
       }
 
+      const messagePayload = {
+        action: "githubChecklist",
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+        timestamp: new Date().toISOString(),
+      };
+      const message = JSON.stringify(messagePayload);
+      const signature = await messageSigner
+        .signMessageAsync({ message })
+        .catch(() => undefined);
+      if (!signature) {
+        throw new Error("Signature failed");
+      }
       await createGithubChecklistItem({
         draftProposalId: draftProposal.id,
         creatorAddress: address,
         link: "",
+        message,
+        signature,
       });
 
       setIsSkipPending(false);
-      const nextId = draftProposal.uuid ?? draftProposal.id;
+      const nextId = draftProposal.uuid;
       router.push(`/proposals/draft/${nextId}?stage=3`);
     } catch (e) {
       setIsSkipPending(false);
@@ -58,21 +74,35 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
 
       const link = await createGithubProposal(draftProposal);
 
+      const messagePayload = {
+        action: "githubChecklist",
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+        timestamp: new Date().toISOString(),
+      };
+      const message = JSON.stringify(messagePayload);
+      const signature = await messageSigner
+        .signMessageAsync({ message })
+        .catch(() => undefined);
+      if (!signature) {
+        throw new Error("Signature failed");
+      }
       await createGithubChecklistItem({
         draftProposalId: draftProposal.id,
         creatorAddress: address,
         link: link,
+        message,
+        signature,
       });
 
       setIsCreatePRPending(false);
 
-      const nextId = draftProposal.uuid ?? draftProposal.id;
       openDialog({
         type: "OPEN_GITHUB_PR",
         params: {
           // read stage from URL and redirect to next stage
           // get stage metadata to make sure it's not the last stage (it really shouldn't be though)
-          redirectUrl: `/proposals/draft/${nextId}?stage=3`,
+          redirectUrl: `/proposals/draft/${draftProposal.uuid}?stage=3`,
           githubUrl: link,
         },
       });
@@ -97,7 +127,7 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
           {!!github_pr_checklist_item ? (
             <span>
               You have already started creating docs for this draft proposal. If
-              you have since updated your proposal, please {""}
+              you have since updated your proposal, please{" "}
               <a
                 href={github_pr_checklist_item.link || ""}
                 className="underline"
@@ -120,8 +150,7 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
               fullWidth={true}
               type="primary"
               onClick={() => {
-                const nextId = draftProposal.uuid ?? draftProposal.id;
-                router.push(`/proposals/draft/${nextId}?stage=3`);
+                router.push(`/proposals/draft/${draftProposal.uuid}?stage=3`);
               }}
             >
               Continue

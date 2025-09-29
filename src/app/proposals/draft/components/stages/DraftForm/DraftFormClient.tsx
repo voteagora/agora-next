@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 import { useState, useEffect, useMemo } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -177,6 +177,7 @@ const DraftFormClient = ({
   );
   const router = useRouter();
   const { address } = useAccount();
+  const messageSigner = useSignMessage();
 
   const methods = useForm<z.output<typeof DraftProposalSchema>>({
     resolver: zodResolver(DraftProposalSchema),
@@ -223,10 +224,28 @@ const DraftFormClient = ({
         toast("Account not connected.");
         return;
       }
+      const messagePayload = {
+        action: "updateDraft",
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+        timestamp: new Date().toISOString(),
+      };
+      const message = JSON.stringify(messagePayload);
+      const signature = await messageSigner
+        .signMessageAsync({ message })
+        .catch(() => undefined);
+      if (!signature) {
+        setIsPending(false);
+        toast("Signature failed");
+        return;
+      }
+
       const res = await draftProposalAction({
         ...data,
         draftProposalId: draftProposal.id,
         creatorAddress: address,
+        message,
+        signature,
       });
       if (!res.ok) {
         setIsPending(false);
@@ -234,7 +253,7 @@ const DraftFormClient = ({
         return;
       } else {
         invalidatePath(draftProposal.id);
-        const nextId = draftProposal.uuid ?? draftProposal.id;
+        const nextId = draftProposal.uuid;
         router.push(`/proposals/draft/${nextId}?stage=${stageIndex + 1}`);
       }
     } catch (error: any) {
