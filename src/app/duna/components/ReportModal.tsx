@@ -18,7 +18,9 @@ import { ConnectKitButton } from "connectkit";
 import CommentList from "./CommentList";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
-import { canArchiveContent, canDeleteContent } from "@/lib/forumAdminUtils";
+import { canArchiveContent, canDeleteContent } from "@/lib/forumUtils";
+import SoftDeletedContent from "@/components/Forum/SoftDeletedContent";
+import { useTopicViewTracking } from "@/hooks/useTopicViewTracking";
 import Tenant from "@/lib/tenant/tenant";
 
 interface ReportModalProps {
@@ -27,6 +29,7 @@ interface ReportModalProps {
   onArchive?: () => void;
   onCommentAdded?: (newComment: ForumPost) => void;
   onCommentDeleted?: (commentId: number) => void;
+  onCommentUpdated?: (commentId: number, updates: Partial<ForumPost>) => void;
   closeDialog: () => void;
 }
 
@@ -36,6 +39,7 @@ const ReportModal = ({
   onArchive,
   onCommentAdded,
   onCommentDeleted,
+  onCommentUpdated,
   closeDialog,
 }: ReportModalProps) => {
   const [newComment, setNewComment] = useState("");
@@ -44,7 +48,7 @@ const ReportModal = ({
   const [replyingToId, setReplyingToId] = useState<number | null>(null);
   const [replyContent, setReplyContent] = useState("");
 
-  const { createPost, deleteTopic, archiveTopic } = useForum();
+  const { createPost, deleteTopic, archiveTopic, restoreTopic } = useForum();
   const { address, isConnected } = useAccount();
   const openDialog = useOpenDialog();
   const { dunaCategoryId } = useDunaCategory();
@@ -54,6 +58,11 @@ const ReportModal = ({
 
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
+  // Track topic view when modal opens
+  useTopicViewTracking({
+    topicId: report?.id || 0,
+    enabled: !!report?.id,
+  });
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,17 +98,51 @@ const ReportModal = ({
     onCommentDeleted?.(commentId);
   };
 
+  const handleUpdateComment = (
+    commentId: number,
+    updates: Partial<ForumPost>
+  ) => {
+    setComments((prev) =>
+      prev.map((comment) =>
+        comment.id === commentId ? { ...comment, ...updates } : comment
+      )
+    );
+    onCommentUpdated?.(commentId, updates);
+  };
+
   const handleDeleteTopic = async () => {
     if (!report) return;
 
     openDialog({
       type: "CONFIRM",
       params: {
-        title: "Delete Topic",
-        message:
-          "Are you sure you want to delete this topic? This action cannot be undone.",
+        title: isAdmin ? "Permanently Delete Topic" : "Delete Topic",
+        message: isAdmin
+          ? "Are you sure you want to permanently delete this topic? This action cannot be undone."
+          : "Are you sure you want to delete this topic?",
         onConfirm: async () => {
-          const success = await deleteTopic(report.id);
+          const success = await deleteTopic(report.id, isAdmin);
+          if (success && onDelete) {
+            onDelete();
+            closeDialog();
+          }
+        },
+      },
+    });
+  };
+
+  const handleRestoreTopic = async () => {
+    if (!report) return;
+
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Restore Topic",
+        message: "Are you sure you want to restore this topic?",
+        onConfirm: async () => {
+          const isAuthor =
+            report.author?.toLowerCase() === address?.toLowerCase();
+          const success = await restoreTopic(report.id, isAuthor);
           if (success && onDelete) {
             onDelete();
             closeDialog();
@@ -119,7 +162,9 @@ const ReportModal = ({
         message:
           "Are you sure you want to archive this topic? This action cannot be undone.",
         onConfirm: async () => {
-          const success = await archiveTopic(report.id);
+          const isAuthor =
+            report.author?.toLowerCase() === address?.toLowerCase();
+          const success = await archiveTopic(report.id, isAuthor);
           if (success && onArchive) {
             onArchive();
             closeDialog();
@@ -188,6 +233,29 @@ const ReportModal = ({
     isAdmin,
     canManageTopics
   );
+
+  if (report.deletedAt) {
+    const canDelete = canDeleteContent(
+      address || "",
+      report.author || "",
+      isAdmin,
+      canManageTopics
+    );
+    return (
+      <div className="max-w-3xl bg-white p-4">
+        <div className="pb-4 sm:pb-6 border-b border-line">
+          <SoftDeletedContent
+            contentType="topic"
+            deletedAt={report.deletedAt}
+            deletedBy={report.deletedBy || ""}
+            canRestore={canDelete}
+            onRestore={() => handleRestoreTopic()}
+            showRestoreButton={canDelete}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -350,6 +418,7 @@ const ReportModal = ({
               onSubmitReply={handleSubmitReply}
               onCancelReply={handleCancelReply}
               onDelete={handleDeleteComment}
+              onUpdate={handleUpdateComment}
             />
 
             {/* Comment Input */}

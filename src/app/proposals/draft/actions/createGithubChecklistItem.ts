@@ -5,11 +5,7 @@ import {
   getStageByIndex,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
-
-export type FormState = {
-  ok: boolean;
-  message: string;
-};
+import type { FormState } from "../types";
 
 export async function onSubmitAction(data: {
   link: string;

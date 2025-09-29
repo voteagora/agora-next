@@ -142,6 +142,8 @@ export function findVotableSupply({
       return prismaWeb3Client.lineaVotableSupply.findFirst({});
     case TENANT_NAMESPACES.TOWNS:
       return Promise.resolve(null); // for now: towns is info-only
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve(null);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }

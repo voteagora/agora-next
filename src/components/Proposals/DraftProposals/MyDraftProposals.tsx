@@ -46,10 +46,13 @@ const MyDraftProposals = ({
       </h1>
       <div className="space-y-6">
         {draftProposals.map((proposal) => {
+          const nextId = (proposal as any).uuid ?? proposal.id;
           return (
             <Link
               key={proposal.id}
-              href={`/proposals/draft/${proposal.id}?stage=${getStageIndexForTenant(proposal.stage)}`}
+              href={`/proposals/draft/${nextId}?stage=${getStageIndexForTenant(
+                proposal.stage
+              )}`}
               className="block"
             >
               <DraftProposalCard proposal={proposal} />

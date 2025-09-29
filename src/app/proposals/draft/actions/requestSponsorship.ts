@@ -3,11 +3,7 @@
 import { z } from "zod";
 import { schema as RequestSponsorshipSchema } from "../schemas/requestSponsorshipSchema";
 import { prismaWeb2Client } from "@/app/lib/prisma";
-
-export type FormState = {
-  ok: boolean;
-  message: string;
-};
+import type { FormState } from "../types";
 
 export async function onSubmitAction(
   data: z.output<typeof RequestSponsorshipSchema> & { draftProposalId: number }

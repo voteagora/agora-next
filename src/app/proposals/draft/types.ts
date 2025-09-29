@@ -351,3 +351,8 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
       };
   }
 };
+
+export type FormState = {
+  ok: boolean;
+  message: string;
+};

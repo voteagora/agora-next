@@ -234,9 +234,8 @@ const DraftFormClient = ({
         return;
       } else {
         invalidatePath(draftProposal.id);
-        router.push(
-          `/proposals/draft/${draftProposal.id}?stage=${stageIndex + 1}`
-        );
+        const nextId = draftProposal.uuid ?? draftProposal.id;
+        router.push(`/proposals/draft/${nextId}?stage=${stageIndex + 1}`);
       }
     } catch (error: any) {
       setIsPending(false);

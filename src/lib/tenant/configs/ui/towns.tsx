@@ -35,7 +35,7 @@ export const townsTenantUIConfig = new TenantUI({
     line: "43 36 73",
     positive: "97 209 97",
     negative: "226 54 54",
-    brandPrimary: "255 255 255",
+    brandPrimary: "31 234 154", // #31EA9A
     brandSecondary: "23 20 34",
     tokenAmountFont: "font-chivoMono",
     infoSectionBackground: "30 26 47", // #1E1A2F
@@ -55,6 +55,7 @@ export const townsTenantUIConfig = new TenantUI({
     customTitleSize: "text-5xl leading-[48px] sm:text-[56px] sm:leading-[56px]",
     customCardSize: "sm:h-[100px] sm:w-[100px] lg:h-[120px] lg:w-[120px]",
     customIconColor: "#87819F",
+    customButtonBackground: "#130C2F",
   },
 
   theme: "dark",
@@ -255,6 +256,10 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       name: "duna",
+      enabled: true,
+    },
+    {
+      name: "forums",
       enabled: true,
     },
     {

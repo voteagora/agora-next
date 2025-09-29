@@ -1191,6 +1191,7 @@ view uniswapDelegateChangedEvents {
 
 model ProposalDraft {
   id                       Int                        @id @default(autoincrement())
+  uuid                     String                     @unique @db.Uuid @default(uuid())
   temp_check_link          String
   proposal_type            String?                    @db.VarChar(50)
   voting_module_type       String?                    @db.VarChar(50)
@@ -4736,15 +4737,18 @@ enum AttachableType {
 }
 
 model ForumCategory {
-  id                Int               @id @default(autoincrement())
-  dao_slug          DaoSlug
-  name              String
-  description       String?
-  archived          Boolean           @default(false)
-  adminOnlyTopics   Boolean           @default(false) @map("admin_only_topics")
-  createdAt         DateTime          @default(now()) @map("created_at")
-  updatedAt         DateTime          @updatedAt @map("updated_at")
-  topics            ForumTopic[]
+  id              Int                         @id @default(autoincrement())
+  dao_slug        DaoSlug
+  name            String
+  description     String?
+  archived        Boolean                     @default(false)
+  adminOnlyTopics Boolean                     @default(false) @map("admin_only_topics")
+  isDuna          Boolean                     @default(false) @map("is_duna")
+  createdAt       DateTime                    @default(now()) @map("created_at")
+  updatedAt       DateTime                    @updatedAt @map("updated_at")
+  topics          ForumTopic[]
+  attachments     ForumCategoryAttachment[]
+  subscriptions   ForumCategorySubscription[]
 
   @@unique([dao_slug, name])
   @@index([dao_slug])
@@ -4753,17 +4757,22 @@ model ForumCategory {
 }
 
 model ForumTopic {
-  id             Int               @id @default(autoincrement())
+  id             Int                      @id @default(autoincrement())
   dao_slug       DaoSlug
   title          String
   address        String
-  categoryId     Int?              @map("category_id")
-  category       ForumCategory?    @relation(fields: [categoryId], references: [id])
-  postsCount     Int               @default(0) @map("posts_count")
-  archived       Boolean           @default(false)
-  createdAt      DateTime          @default(now()) @map("created_at")
-  updatedAt      DateTime          @updatedAt @map("updated_at")
+  categoryId     Int?                     @map("category_id")
+  category       ForumCategory?           @relation(fields: [categoryId], references: [id])
+  postsCount     Int                      @default(0) @map("posts_count")
+  archived       Boolean                  @default(false)
+  deletedAt      DateTime?                @map("deleted_at")
+  deletedBy      String?                  @map("deleted_by")
+  isNsfw         Boolean                  @default(false) @map("is_nsfw")
+  createdAt      DateTime                 @default(now()) @map("created_at")
+  updatedAt      DateTime                 @updatedAt @map("updated_at")
   posts          ForumPost[]
+  subscriptions  ForumTopicSubscription[]
+  viewStats      ForumTopicViewStats[]
 
   @@index([dao_slug])
   @@index([dao_slug, categoryId])
@@ -4772,16 +4781,22 @@ model ForumTopic {
 }
 
 model ForumPost {
-  id             Int               @id @default(autoincrement())
+  id             Int                   @id @default(autoincrement())
   dao_slug       DaoSlug
-  topicId        Int               @map("topic_id")
-  topic          ForumTopic        @relation(fields: [topicId], references: [id])
+  topicId        Int                   @map("topic_id")
+  topic          ForumTopic            @relation(fields: [topicId], references: [id])
   address        String
-  parentPostId   Int?              @map("parent_post_id")
-  parentPost     ForumPost?        @relation("PostToPost", fields: [parentPostId], references: [id])
-  replies        ForumPost[]       @relation("PostToPost")
+  parentPostId   Int?                  @map("parent_post_id")
+  parentPost     ForumPost?            @relation("PostToPost", fields: [parentPostId], references: [id])
+  replies        ForumPost[]           @relation("PostToPost")
   content        String
-  createdAt      DateTime          @default(now()) @map("created_at")
+  deletedAt      DateTime?             @map("deleted_at")
+  deletedBy      String?               @map("deleted_by")
+  isNsfw         Boolean               @default(false) @map("is_nsfw")
+  createdAt      DateTime              @default(now()) @map("created_at")
+  votes          ForumPostVote[]
+  reactions      ForumPostReaction[]
+  attachments    ForumPostAttachment[]
 
   @@index([dao_slug])
   @@index([dao_slug, topicId])
@@ -4790,21 +4805,67 @@ model ForumPost {
   @@schema("alltenant")
 }
 
-model ForumAttachment {
-  id          Int            @id @default(autoincrement())
-  dao_slug    DaoSlug
-  ipfsCid     String         @map("ipfs_cid")
-  fileName    String?        @map("file_name")
-  contentType String?        @map("content_type")
-  fileSize    BigInt?        @map("file_size")
-  address     String?
-  targetType  AttachableType @map("target_type")
-  targetId    Int            @map("target_id")
-  archived    Boolean        @default(false)
-  createdAt   DateTime       @default(now()) @map("created_at")
+model ForumPostVote {
+  dao_slug  DaoSlug
+  address   String
+  postId    Int       @map("post_id")
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  vote      Int // 1 or -1
+  createdAt DateTime  @default(now()) @map("created_at")
 
-  @@index([dao_slug, targetType, targetId])
-  @@map("forum_attachments")
+  @@id([dao_slug, address, postId])
+  @@index([dao_slug, postId])
+  @@map("forum_post_votes")
+  @@schema("alltenant")
+}
+
+model ForumPostReaction {
+  dao_slug  DaoSlug
+  address   String
+  postId    Int       @map("post_id")
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  emoji     String
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@id([dao_slug, address, postId, emoji])
+  @@index([dao_slug, postId])
+  @@map("forum_post_reactions")
+  @@schema("alltenant")
+}
+
+model ForumPostAttachment {
+  id          Int       @id @default(autoincrement())
+  dao_slug    DaoSlug
+  postId      Int       @map("post_id")
+  post        ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  ipfsCid     String    @map("ipfs_cid")
+  fileName    String?   @map("file_name")
+  contentType String?   @map("content_type")
+  fileSize    BigInt?   @map("file_size")
+  address     String?
+  archived    Boolean   @default(false) @map("archived")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([dao_slug, postId])
+  @@map("forum_post_attachments")
+  @@schema("alltenant")
+}
+
+model ForumCategoryAttachment {
+  id          Int           @id @default(autoincrement())
+  dao_slug    DaoSlug
+  categoryId  Int           @map("category_id")
+  category    ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  ipfsCid     String        @map("ipfs_cid")
+  fileName    String?       @map("file_name")
+  contentType String?       @map("content_type")
+  fileSize    BigInt?       @map("file_size")
+  address     String?
+  archived    Boolean       @default(false) @map("archived")
+  createdAt   DateTime      @default(now()) @map("created_at")
+
+  @@index([dao_slug, categoryId])
+  @@map("forum_category_attachments")
   @@schema("alltenant")
 }
 
@@ -4820,6 +4881,14 @@ enum forum_permission_type {
 enum permission_scope {
   forum
   category
+
+  @@schema("alltenant")
+}
+
+enum admin_role {
+  admin
+  duna_admin
+  super_admin
 
   @@schema("alltenant")
 }
@@ -4842,10 +4911,69 @@ model ForumPermission {
 }
 
 model ForumAdmin {
-  dao_slug DaoSlug
-  address  String
+  dao_slug        DaoSlug
+  address         String
+  role            admin_role @default(admin)
+  managedAccounts DaoSlug[]  @map("managed_accounts")
+  createdAt       DateTime   @default(now()) @map("created_at")
 
   @@id([dao_slug, address])
   @@map("forum_admins")
+  @@schema("alltenant")
+}
+
+model ForumTopicSubscription {
+  dao_slug  DaoSlug
+  address   String
+  topicId   Int        @map("topic_id")
+  topic     ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  @@id([dao_slug, address, topicId])
+  @@index([dao_slug, topicId])
+  @@index([dao_slug, address])
+  @@map("forum_topic_subscriptions")
+  @@schema("alltenant")
+}
+
+model ForumCategorySubscription {
+  dao_slug   DaoSlug
+  address    String
+  categoryId Int           @map("category_id")
+  category   ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  @@id([dao_slug, address, categoryId])
+  @@index([dao_slug, categoryId])
+  @@index([dao_slug, address])
+  @@map("forum_category_subscriptions")
+  @@schema("alltenant")
+}
+
+model ForumAuditLog {
+  id           Int            @id @default(autoincrement())
+  dao_slug     DaoSlug
+  adminAddress String         @map("admin_address")
+  action       String
+  targetType   AttachableType @map("target_type")
+  targetId     Int            @map("target_id")
+  createdAt    DateTime       @default(now()) @map("created_at")
+
+  @@index([dao_slug])
+  @@index([dao_slug, adminAddress])
+  @@index([dao_slug, targetType, targetId])
+  @@map("forum_audit_logs")
+  @@schema("alltenant")
+}
+
+model ForumTopicViewStats {
+  dao_slug    DaoSlug
+  topicId     Int       @map("topic_id")
+  topic       ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  views       Int       @default(0)
+  lastUpdated DateTime  @default(now()) @map("last_updated")
+
+  @@id([dao_slug, topicId])
+  @@map("forum_topic_view_stats")
   @@schema("alltenant")
 }

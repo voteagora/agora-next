@@ -42,7 +42,8 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
       });
 
       setIsSkipPending(false);
-      router.push(`/proposals/draft/${draftProposal.id}?stage=3`);
+      const nextId = draftProposal.uuid ?? draftProposal.id;
+      router.push(`/proposals/draft/${nextId}?stage=3`);
     } catch (e) {
       setIsSkipPending(false);
     }
@@ -65,12 +66,13 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
 
       setIsCreatePRPending(false);
 
+      const nextId = draftProposal.uuid ?? draftProposal.id;
       openDialog({
         type: "OPEN_GITHUB_PR",
         params: {
           // read stage from URL and redirect to next stage
           // get stage metadata to make sure it's not the last stage (it really shouldn't be though)
-          redirectUrl: `/proposals/draft/${draftProposal.id}?stage=3`,
+          redirectUrl: `/proposals/draft/${nextId}?stage=3`,
           githubUrl: link,
         },
       });
@@ -95,7 +97,7 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
           {!!github_pr_checklist_item ? (
             <span>
               You have already started creating docs for this draft proposal. If
-              you have since updated your proposal, please{" "}
+              you have since updated your proposal, please {""}
               <a
                 href={github_pr_checklist_item.link || ""}
                 className="underline"
@@ -118,7 +120,8 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
               fullWidth={true}
               type="primary"
               onClick={() => {
-                router.push(`/proposals/draft/${draftProposal.id}?stage=3`);
+                const nextId = draftProposal.uuid ?? draftProposal.id;
+                router.push(`/proposals/draft/${nextId}?stage=3`);
               }}
             >
               Continue

@@ -12,11 +12,24 @@ import OnlyOwner from "./components/OwnerOnly";
 import ArchivedDraftProposal from "../components/ArchivedDraftProposal";
 import DeleteDraftButton from "../components/DeleteDraftButton";
 import ReactMarkdown from "react-markdown";
-import { fetchDraftProposal } from "@/app/api/common/draftProposals/getDraftProposals";
+import { getDraftProposalByUuid } from "@/app/api/common/draftProposals/getDraftProposals";
 import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 import { PLMConfig } from "@/app/proposals/draft/types";
 
 export const maxDuration = 120;
+
+const DraftNotFoundError = ({ message }: { message: string }) => (
+  <div className="max-w-screen-xl mx-auto mt-10 text-center">
+    <h1 className="text-2xl font-bold text-primary mb-4">Draft Not Found</h1>
+    <p className="text-secondary mb-6">{message}</p>
+    <a
+      href="/proposals"
+      className="inline-block bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+    >
+      Back to Proposals
+    </a>
+  </div>
+);
 
 export default async function DraftProposalPage({
   params,
@@ -34,7 +47,14 @@ export default async function DraftProposalPage({
     return <div>This feature is not supported by this tenant.</div>;
   }
 
-  const draftProposal = await fetchDraftProposal(parseInt(params.id));
+  const draftProposal = await getDraftProposalByUuid(params.id);
+
+  if (!draftProposal) {
+    return (
+      <DraftNotFoundError message="The draft you're looking for doesn't exist. If you think this is an error, please contact jeff@voteagora.com." />
+    );
+  }
+
   const proposalTypes = await fetchProposalTypes();
 
   const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
@@ -61,7 +81,9 @@ export default async function DraftProposalPage({
           <div className="flex flex-row items-center space-x-6">
             {stageIndex > 0 && (
               <BackButton
-                draftProposalId={parseInt(params.id)}
+                draftProposalId={
+                  draftProposal.uuid ?? draftProposal.id.toString()
+                }
                 index={stageIndex}
               />
             )}
