@@ -7,7 +7,7 @@ const BackButton = ({
   draftProposalId,
   index,
 }: {
-  draftProposalId: string;
+  draftProposalId: string | number;
   index: number;
 }) => {
   return (
