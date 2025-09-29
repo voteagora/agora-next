@@ -125,5 +125,34 @@ export const parseError = (error: any) => {
   if (error.message.includes("one live proposal per proposer")) {
     return "You have an outstanding proposal that has not yet completed. Please wait for it to be processed before submitting or sponsoring a new one. ";
   }
+  const supportsScopes = Boolean(Tenant.current().contracts.supportScopes);
+  const msg = String(error?.message || "").toLowerCase();
+  const cause = String(error?.cause?.message || "").toLowerCase();
+
+  const combined = `${msg}\n${cause}`;
+
+  const signaturesToFlag = ["0x31f837ca"];
+
+  const indicativePhrases = [
+    "unable to decode signature",
+    "decodeerrorresult",
+    "invalid proposal type",
+    "scoped",
+  ];
+
+  const mentionsSignature = signaturesToFlag.some((sig) =>
+    combined.includes(sig)
+  );
+  const mentionsIndicative = indicativePhrases.some((p) =>
+    combined.includes(p)
+  );
+
+  if (supportsScopes && (mentionsSignature || mentionsIndicative)) {
+    return (
+      "This action is blocked by scopes. Please contact the DAO Admin or Manager " +
+      "to refine proposal types and scope definitions."
+    );
+  }
+
   return error.message;
 };
