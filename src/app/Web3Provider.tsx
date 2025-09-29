@@ -54,28 +54,35 @@ export const config = createConfig(
   })
 );
 
-const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
-  <WagmiProvider config={config}>
-    <QueryClientProvider client={queryClient}>
-      <SIWEProvider {...siweProviderConfig}>
-        <ConnectKitProvider options={{ enforceSupportedChains: false }}>
-          <body className={inter.variable}>
-            <noscript>You need to enable JavaScript to run this app.</noscript>
-            {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
-            {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
-            <ConnectButtonProvider>
-              <PageContainer>
-                <Toaster />
-                <AgoraProvider>{children}</AgoraProvider>
-              </PageContainer>
-            </ConnectButtonProvider>
-            {!shouldHideAgoraBranding && <Footer />}
-            <SpeedInsights />
-          </body>
-        </ConnectKitProvider>
-      </SIWEProvider>
-    </QueryClientProvider>
-  </WagmiProvider>
-);
+const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => {
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <SIWEProvider
+          {...siweProviderConfig}
+          enabled={siweProviderConfig.enabled}
+        >
+          <ConnectKitProvider options={{ enforceSupportedChains: false }}>
+            <body className={inter.variable}>
+              <noscript>
+                You need to enable JavaScript to run this app.
+              </noscript>
+              {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
+              {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
+              <ConnectButtonProvider>
+                <PageContainer>
+                  <Toaster />
+                  <AgoraProvider>{children}</AgoraProvider>
+                </PageContainer>
+              </ConnectButtonProvider>
+              {!shouldHideAgoraBranding && <Footer />}
+              <SpeedInsights />
+            </body>
+          </ConnectKitProvider>
+        </SIWEProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
+};
 
 export default Web3Provider;
