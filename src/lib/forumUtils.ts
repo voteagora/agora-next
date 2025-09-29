@@ -77,7 +77,9 @@ export function buildForumTopicPath(id: number, title?: string | null): string {
   if (!Number.isFinite(numericId)) {
     return "/forums";
   }
-  return slug ? `/forums/${Math.abs(Math.trunc(numericId))}/${slug}` : `/forums/${Math.abs(Math.trunc(numericId))}`;
+  return slug
+    ? `/forums/${Math.abs(Math.trunc(numericId))}/${slug}`
+    : `/forums/${Math.abs(Math.trunc(numericId))}`;
 }
 
 export function buildForumCategoryPath(
@@ -95,7 +97,9 @@ export function buildForumCategoryPath(
     : `/forums/category/${safeId}`;
 }
 
-export function extractForumTopicId(raw: string | string[] | undefined): number | null {
+export function extractForumTopicId(
+  raw: string | string[] | undefined
+): number | null {
   if (!raw) return null;
   const value = Array.isArray(raw) ? raw[0] : raw;
   if (!value) return null;

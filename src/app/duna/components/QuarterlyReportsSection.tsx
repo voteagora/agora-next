@@ -137,7 +137,11 @@ const QuarterlyReportsSection = ({
   };
 
   const initialReportsCount = 3;
-  const handleCommentUpdated = (reportId: number, commentId: number, updates: Partial<ForumPost>) => {
+  const handleCommentUpdated = (
+    reportId: number,
+    commentId: number,
+    updates: Partial<ForumPost>
+  ) => {
     setReports((prev) =>
       prev.map((report) =>
         report.id === reportId

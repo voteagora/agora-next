@@ -187,7 +187,9 @@ export async function getForumTopic(topicId: number) {
       data: {
         ...topic,
         posts: mappedPosts,
-        topicReactionsByEmoji: groupByEmojiAddresses((topic as any).posts?.[0]?.reactions),
+        topicReactionsByEmoji: groupByEmojiAddresses(
+          (topic as any).posts?.[0]?.reactions
+        ),
       },
     };
   } catch (error) {

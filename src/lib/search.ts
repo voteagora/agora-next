@@ -1,9 +1,10 @@
 import { MeiliSearch, Index } from "meilisearch";
 
-const getClient = () => new MeiliSearch({
-  host: process.env.MEILISEARCH_HOST as string,
-  apiKey: process.env.MEILISEARCH_API_KEY as string,
-});
+const getClient = () =>
+  new MeiliSearch({
+    host: process.env.MEILISEARCH_HOST as string,
+    apiKey: process.env.MEILISEARCH_API_KEY as string,
+  });
 
 export const getForumIndexName = (daoSlug: string) => `forum_${daoSlug}`;
 

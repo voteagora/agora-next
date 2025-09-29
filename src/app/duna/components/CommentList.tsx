@@ -4,7 +4,6 @@ import Thread from "@/components/ForumShared/Thread";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 import { useForumAdminsList } from "@/hooks/useForum";
 
-
 interface CommentListProps {
   comments: ForumPost[];
   onDelete?: (commentId: number) => void;

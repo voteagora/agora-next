@@ -6,10 +6,9 @@ config();
 
 import { ForumSearchService } from "@/lib/search";
 
-
 async function main() {
   console.log("🚀 Initializing forum index...");
-  
+
   try {
     const forumSearchService = new ForumSearchService();
     await forumSearchService.initializeIndex("UNI");

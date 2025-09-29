@@ -11,7 +11,10 @@ interface CreateTopicModalProps {
   onClose: () => void;
 }
 
-export default function CreateTopicModal({ isOpen, onClose }: CreateTopicModalProps) {
+export default function CreateTopicModal({
+  isOpen,
+  onClose,
+}: CreateTopicModalProps) {
   const router = useRouter();
   const { createTopic } = useForum();
 
