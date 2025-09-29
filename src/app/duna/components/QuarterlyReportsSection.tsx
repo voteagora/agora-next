@@ -60,6 +60,8 @@ const QuarterlyReportsSection = ({
           handleCommentAdded(report.id, newComment),
         onCommentDeleted: (commentId: number) =>
           handleCommentDeleted(report.id, commentId),
+        onCommentUpdated: (commentId: number, updates: Partial<ForumPost>) =>
+          handleCommentUpdated(report.id, commentId, updates),
       },
     });
   };
@@ -135,6 +137,25 @@ const QuarterlyReportsSection = ({
   };
 
   const initialReportsCount = 3;
+  const handleCommentUpdated = (
+    reportId: number,
+    commentId: number,
+    updates: Partial<ForumPost>
+  ) => {
+    setReports((prev) =>
+      prev.map((report) =>
+        report.id === reportId
+          ? {
+              ...report,
+              comments: (report.comments || []).map((comment) =>
+                comment.id === commentId ? { ...comment, ...updates } : comment
+              ),
+            }
+          : report
+      )
+    );
+  };
+
   const hasMoreReports = reports.length > initialReportsCount;
   const displayedReports = showAllReports
     ? reports

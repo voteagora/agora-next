@@ -1,6 +1,5 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import QuarterlyReportsSection from "./QuarterlyReportsSection";
 import DocumentsSection from "./DocumentsSection";
 import {
   getForumTopics,
@@ -27,8 +26,8 @@ const TownsDunaAdministration = async () => {
     }
 
     const [topicsResult, documentsResult] = await Promise.all([
-      getForumTopics(dunaCategoryId),
-      getForumAttachments({}),
+      getForumTopics({ categoryId: dunaCategoryId }),
+      getForumAttachments(),
     ]);
 
     if (topicsResult.success) {
@@ -55,16 +54,6 @@ const TownsDunaAdministration = async () => {
       <Card className="border border-line shadow-sm bg-modalBackgroundDark [&_button]:!bg-white [&_button]:!text-black [&_button]:!border-gray-300 [&_button]:hover:!bg-gray-50">
         <CardContent className="p-6">
           <DocumentsSection initialDocuments={documents} hideHeader={false} />
-        </CardContent>
-      </Card>
-
-      {/* Community Dialogue Section - EXACT same as Uniswap */}
-      <Card className="border border-line shadow-sm bg-modalBackgroundDark mt-6 [&_button]:!bg-white [&_button]:!text-black [&_button]:!border-gray-300 [&_button]:hover:!bg-gray-50">
-        <CardContent className="p-6">
-          <QuarterlyReportsSection
-            initialReports={dunaReports}
-            hideHeader={false}
-          />
         </CardContent>
       </Card>
 
