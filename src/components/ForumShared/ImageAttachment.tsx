@@ -15,6 +15,8 @@ import {
 import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import useRequireLogin from "@/hooks/useRequireLogin";
+import { useStableCallback } from "@/hooks/useStableCallback";
 
 interface ImageAttachmentProps {
   attachment: ForumAttachment;
@@ -38,6 +40,9 @@ export default function ImageAttachment({
     categoryId || undefined
   );
   const openDialog = useOpenDialog();
+  const requireLogin = useRequireLogin();
+  const stableDeleteAttachment = useStableCallback(deleteAttachment);
+  const stableArchiveAttachment = useStableCallback(archiveAttachment);
 
   const canDelete = (uploadedBy: string) =>
     canDeleteContent(
@@ -62,9 +67,18 @@ export default function ImageAttachment({
         title: "Delete Image",
         message: "Are you sure you want to delete this image?",
         onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
           const isAuthor =
-            (address || "").toLowerCase() === (postAuthor || "").toLowerCase();
-          const ok = await deleteAttachment(attachment.id, "post", isAuthor);
+            loggedInAddress.toLowerCase() === (postAuthor || "").toLowerCase();
+          const ok = await stableDeleteAttachment(
+            attachment.id,
+            "post",
+            isAuthor
+          );
           if (ok) {
             // The parent component will handle removing from the list
           }
@@ -80,9 +94,18 @@ export default function ImageAttachment({
         title: "Archive Image",
         message: "Are you sure you want to archive this image?",
         onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
           const isAuthor =
-            (address || "").toLowerCase() === (postAuthor || "").toLowerCase();
-          const ok = await archiveAttachment(attachment.id, "post", isAuthor);
+            loggedInAddress.toLowerCase() === (postAuthor || "").toLowerCase();
+          const ok = await stableArchiveAttachment(
+            attachment.id,
+            "post",
+            isAuthor
+          );
           if (ok) {
             // The parent component will handle removing from the list
           }

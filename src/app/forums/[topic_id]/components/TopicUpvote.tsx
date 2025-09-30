@@ -7,6 +7,7 @@ import { useAccount } from "wagmi";
 import useRequireLogin from "@/hooks/useRequireLogin";
 import { rgbStringToHex } from "@/app/lib/utils/color";
 import Tenant from "@/lib/tenant/tenant";
+import { useStableCallback } from "@/hooks/useStableCallback";
 const { ui } = Tenant.current();
 
 export default function TopicUpvote({
@@ -23,17 +24,9 @@ export default function TopicUpvote({
   const [mine, setMine] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
   const requireLogin = useRequireLogin();
-  const upvoteTopicRef = React.useRef(upvoteTopic);
-  const removeUpvoteTopicRef = React.useRef(removeUpvoteTopic);
+  const stableUpvoteTopic = useStableCallback(upvoteTopic);
+  const stableRemoveUpvoteTopic = useStableCallback(removeUpvoteTopic);
   const mineRef = React.useRef(mine);
-
-  React.useEffect(() => {
-    upvoteTopicRef.current = upvoteTopic;
-  }, [upvoteTopic]);
-
-  React.useEffect(() => {
-    removeUpvoteTopicRef.current = removeUpvoteTopic;
-  }, [removeUpvoteTopic]);
 
   React.useEffect(() => {
     mineRef.current = mine;
@@ -55,17 +48,19 @@ export default function TopicUpvote({
   }, [topicId, address, fetchTopicUpvotes, hasUpvotedTopic]);
 
   const toggle = async () => {
-    if (loading || !(await requireLogin())) return;
+    if (loading) return;
+    const loggedIn = await requireLogin();
+    if (!loggedIn) return;
     setLoading(true);
     try {
       if (mineRef.current) {
-        const updated = await removeUpvoteTopicRef.current(topicId);
+        const updated = await stableRemoveUpvoteTopic(topicId);
         if (updated !== null) {
           setCount(updated);
           setMine(false);
         }
       } else {
-        const updated = await upvoteTopicRef.current(topicId);
+        const updated = await stableUpvoteTopic(topicId);
         if (updated !== null) {
           setCount(updated);
           setMine(true);

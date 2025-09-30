@@ -5,6 +5,8 @@ import { useForum } from "@/hooks/useForum";
 import { useRouter } from "next/navigation";
 import ComposerModal from "@/components/ForumShared/ComposerModal";
 import { buildForumTopicPath } from "@/lib/forumUtils";
+import useRequireLogin from "@/hooks/useRequireLogin";
+import { useStableCallback } from "@/hooks/useStableCallback";
 
 interface CreateTopicModalProps {
   isOpen: boolean;
@@ -17,6 +19,8 @@ export default function CreateTopicModal({
 }: CreateTopicModalProps) {
   const router = useRouter();
   const { createTopic } = useForum();
+  const requireLogin = useRequireLogin();
+  const stableCreateTopic = useStableCallback(createTopic);
 
   return (
     <ComposerModal
@@ -30,7 +34,12 @@ export default function CreateTopicModal({
       contentPlaceholder="Write your topic…"
       renderCategory
       onSubmit={async ({ title, content, attachment, categoryId }) => {
-        const created = await createTopic({
+        const loggedIn = await requireLogin();
+        if (!loggedIn) {
+          return;
+        }
+
+        const created = await stableCreateTopic({
           title: (title || "").trim(),
           content: content.trim(),
           attachment: attachment || undefined,

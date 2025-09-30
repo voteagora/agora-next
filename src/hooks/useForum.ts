@@ -63,7 +63,7 @@ interface CreatePostData {
 export const useForum = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
 
   const fetchTopics = useCallback(
@@ -150,9 +150,7 @@ export const useForum = () => {
 
   const createTopic = useCallback(
     async (data: CreateTopicData): Promise<ForumTopic | null> => {
-      if (!isConnected || !address) {
-        throw new Error("Please connect your wallet first");
-      }
+      const currentAddress = address!;
 
       if (data.attachment && data.attachment.size > 10 * 1024 * 1024) {
         toast.error("File size must be less than 10MB");
@@ -172,7 +170,7 @@ export const useForum = () => {
           title: data.title,
           content: data.content,
           categoryId: data.categoryId,
-          address,
+          address: currentAddress,
           signature,
           message,
         });
@@ -191,7 +189,7 @@ export const useForum = () => {
 
             const attachmentResult = await uploadAttachment(
               attachmentData,
-              address,
+              currentAddress,
               "post",
               result.data?.post.id!
             );
@@ -256,7 +254,7 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [isConnected, address, signMessageAsync]
+    [address, signMessageAsync]
   );
 
   const createPost = useCallback(
@@ -264,9 +262,7 @@ export const useForum = () => {
       topicId: number,
       data: CreatePostData
     ): Promise<ForumPost | null> => {
-      if (!isConnected || !address) {
-        throw new Error("Please connect your wallet first");
-      }
+      const currentAddress = address!;
 
       setLoading(true);
       const toastId = toast.loading("Creating post...");
@@ -280,7 +276,7 @@ export const useForum = () => {
         const result = await createForumPost(topicId, {
           content: data.content,
           parentId: data.parentId,
-          address,
+          address: currentAddress,
           signature,
           message,
         });
@@ -297,7 +293,7 @@ export const useForum = () => {
 
             const attachmentResult = await uploadAttachment(
               attachmentData,
-              address,
+              currentAddress,
               "post",
               result.data?.id!
             );
@@ -341,7 +337,7 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [isConnected, address, signMessageAsync]
+    [address, signMessageAsync]
   );
 
   const fetchDocuments = useCallback(async (): Promise<ForumDocument[]> => {
@@ -381,9 +377,7 @@ export const useForum = () => {
       attachmentData: AttachmentData,
       categoryId: number
     ): Promise<ForumDocument | null> => {
-      if (!isConnected || !address) {
-        throw new Error("Please connect your wallet first");
-      }
+      const currentAddress = address!;
 
       setLoading(true);
       const toastId = toast.loading("Uploading document...");
@@ -397,7 +391,7 @@ export const useForum = () => {
           attachmentData.base64Data,
           attachmentData.fileName,
           attachmentData.contentType,
-          address,
+          currentAddress,
           signature,
           message,
           categoryId
@@ -429,14 +423,12 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [isConnected, address, signMessageAsync]
+    [address, signMessageAsync]
   );
 
   const deleteTopic = useCallback(
     async (topicId: number, isAdmin: boolean = false): Promise<boolean> => {
-      if (!isConnected || !address) {
-        throw new Error("Please connect your wallet first");
-      }
+      const currentAddress = address!;
 
       setLoading(true);
       const toastId = toast.loading("Deleting topic...");
@@ -450,14 +442,14 @@ export const useForum = () => {
         if (isAdmin) {
           result = await deleteForumTopic({
             topicId,
-            address,
+            address: currentAddress,
             signature,
             message,
           });
         } else {
           result = await softDeleteForumTopic({
             topicId,
-            address,
+            address: currentAddress,
             signature,
             message,
           });
@@ -480,14 +472,12 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [isConnected, address, signMessageAsync]
+    [address, signMessageAsync]
   );
 
   const deletePost = useCallback(
     async (postId: number, isAdmin: boolean = false): Promise<boolean> => {
-      if (!isConnected || !address) {
-        throw new Error("Please connect your wallet first");
-      }
+      const currentAddress = address!;
 
       setLoading(true);
       const toastId = toast.loading("Deleting post...");
@@ -501,14 +491,14 @@ export const useForum = () => {
         if (isAdmin) {
           result = await deleteForumPost({
             postId,
-            address,
+            address: currentAddress,
             signature,
             message,
           });
         } else {
           result = await softDeleteForumPost({
             postId,
-            address,
+            address: currentAddress,
             signature,
             message,
           });
@@ -531,7 +521,7 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [isConnected, address, signMessageAsync]
+    [address, signMessageAsync]
   );
 
   const deleteAttachment = useCallback(
@@ -540,9 +530,7 @@ export const useForum = () => {
       targetType: "post" | "category",
       isAuthor: boolean = true
     ): Promise<boolean> => {
-      if (!isConnected || !address) {
-        throw new Error("Please connect your wallet first");
-      }
+      const currentAddress = address!;
 
       setLoading(true);
       const toastId = toast.loading("Deleting attachment...");
@@ -555,7 +543,7 @@ export const useForum = () => {
         const result = await deleteForumAttachment({
           attachmentId,
           targetType,
-          address,
+          address: currentAddress,
           isAuthor,
           signature,
           message,
@@ -578,14 +566,12 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [isConnected, address, signMessageAsync]
+    [address, signMessageAsync]
   );
 
   const archiveTopic = useCallback(
     async (topicId: number, isAuthor: boolean = true): Promise<boolean> => {
-      if (!isConnected || !address) {
-        throw new Error("Please connect your wallet first");
-      }
+      const currentAddress = address!;
 
       setLoading(true);
       const toastId = toast.loading("Archiving topic...");
@@ -597,7 +583,7 @@ export const useForum = () => {
 
         const result = await archiveForumTopic({
           topicId,
-          address,
+          address: currentAddress,
           signature,
           message,
           isAuthor,
@@ -620,7 +606,7 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [isConnected, address, signMessageAsync]
+    [address, signMessageAsync]
   );
 
   const archiveAttachment = useCallback(
@@ -629,9 +615,7 @@ export const useForum = () => {
       targetType: "post" | "category",
       isAuthor: boolean = true
     ): Promise<boolean> => {
-      if (!isConnected || !address) {
-        throw new Error("Please connect your wallet first");
-      }
+      const currentAddress = address!;
 
       setLoading(true);
       const toastId = toast.loading("Archiving attachment...");
@@ -644,7 +628,7 @@ export const useForum = () => {
         const result = await archiveForumAttachment({
           attachmentId,
           targetType,
-          address,
+          address: currentAddress,
           isAuthor,
           signature,
           message,
@@ -667,7 +651,7 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [isConnected, address, signMessageAsync]
+    [address, signMessageAsync]
   );
 
   const fetchCategories = useCallback(async (): Promise<ForumCategory[]> => {
@@ -708,9 +692,7 @@ export const useForum = () => {
 
   const restoreTopic = useCallback(
     async (topicId: number, isAuthor: boolean = true): Promise<boolean> => {
-      if (!isConnected || !address) {
-        throw new Error("Please connect your wallet first");
-      }
+      const currentAddress = address!;
 
       setLoading(true);
       const toastId = toast.loading("Restoring topic...");
@@ -722,7 +704,7 @@ export const useForum = () => {
 
         const result = await restoreForumTopic({
           topicId,
-          address,
+          address: currentAddress,
           signature,
           message,
           isAuthor,
@@ -745,14 +727,12 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [isConnected, address, signMessageAsync]
+    [address, signMessageAsync]
   );
 
   const restorePost = useCallback(
     async (postId: number, isAuthor: boolean = true): Promise<boolean> => {
-      if (!isConnected || !address) {
-        throw new Error("Please connect your wallet first");
-      }
+      const currentAddress = address!;
 
       setLoading(true);
       const toastId = toast.loading("Restoring post...");
@@ -764,7 +744,7 @@ export const useForum = () => {
 
         const result = await restoreForumPost({
           postId,
-          address,
+          address: currentAddress,
           signature,
           message,
           isAuthor,
@@ -787,7 +767,7 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [isConnected, address, signMessageAsync]
+    [address, signMessageAsync]
   );
 
   const addReaction = useCallback(
@@ -796,9 +776,7 @@ export const useForum = () => {
       targetId: number,
       emoji: string
     ): Promise<boolean> => {
-      if (!isConnected || !address) {
-        throw new Error("Please connect your wallet first");
-      }
+      const currentAddress = address!;
       try {
         const message = `Add forum reaction: ${emoji} to ${targetType}:${targetId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
@@ -807,7 +785,7 @@ export const useForum = () => {
           targetType: "post",
           targetId,
           emoji,
-          address,
+          address: currentAddress,
           signature,
           message,
         });
@@ -822,7 +800,7 @@ export const useForum = () => {
         return false;
       }
     },
-    [isConnected, address, signMessageAsync]
+    [address, signMessageAsync]
   );
 
   const removeReaction = useCallback(
@@ -831,9 +809,7 @@ export const useForum = () => {
       targetId: number,
       emoji: string
     ): Promise<boolean> => {
-      if (!isConnected || !address) {
-        throw new Error("Please connect your wallet first");
-      }
+      const currentAddress = address!;
       try {
         const message = `Remove forum reaction: ${emoji} from ${targetType}:${targetId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
@@ -841,7 +817,7 @@ export const useForum = () => {
           targetType: "post",
           targetId,
           emoji,
-          address,
+          address: currentAddress,
           signature,
           message,
         });
@@ -856,20 +832,18 @@ export const useForum = () => {
         return false;
       }
     },
-    [isConnected, address, signMessageAsync]
+    [address, signMessageAsync]
   );
 
   const upvoteTopic = useCallback(
     async (topicId: number): Promise<number | null> => {
-      if (!isConnected || !address) {
-        throw new Error("Please connect your wallet first");
-      }
+      const currentAddress = address!;
       try {
         const message = `Upvote forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
         const res = await upvoteForumTopic({
           topicId,
-          address,
+          address: currentAddress,
           signature,
           message,
         });
@@ -882,20 +856,18 @@ export const useForum = () => {
         return null;
       }
     },
-    [isConnected, address, signMessageAsync]
+    [address, signMessageAsync]
   );
 
   const removeUpvoteTopic = useCallback(
     async (topicId: number): Promise<number | null> => {
-      if (!isConnected || !address) {
-        throw new Error("Please connect your wallet first");
-      }
+      const currentAddress = address!;
       try {
         const message = `Remove upvote forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
         const res = await removeUpvoteForumTopic({
           topicId,
-          address,
+          address: currentAddress,
           signature,
           message,
         });
@@ -910,7 +882,7 @@ export const useForum = () => {
         return null;
       }
     },
-    [isConnected, address, signMessageAsync]
+    [address, signMessageAsync]
   );
 
   const fetchTopicUpvotes = useCallback(async (topicId: number) => {

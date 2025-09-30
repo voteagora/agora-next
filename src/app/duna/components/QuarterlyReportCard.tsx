@@ -20,6 +20,8 @@ import { canArchiveContent, canDeleteContent } from "@/lib/forumUtils";
 import { DunaContentRenderer } from "@/components/duna-editor";
 import Tenant from "@/lib/tenant/tenant";
 import SoftDeletedContent from "@/components/Forum/SoftDeletedContent";
+import useRequireLogin from "@/hooks/useRequireLogin";
+import { useStableCallback } from "@/hooks/useStableCallback";
 
 interface QuarterlyReportCardProps {
   report: ForumTopic;
@@ -43,6 +45,10 @@ const QuarterlyReportCard = ({
   const { isAdmin, canManageTopics } = useForumAdmin(
     dunaCategoryId || undefined
   );
+  const requireLogin = useRequireLogin();
+  const stableDeleteTopic = useStableCallback(deleteTopic);
+  const stableArchiveTopic = useStableCallback(archiveTopic);
+  const stableRestoreTopic = useStableCallback(restoreTopic);
 
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
@@ -75,7 +81,12 @@ const QuarterlyReportCard = ({
           ? "Are you sure you want to permanently delete this post? This action cannot be undone."
           : "Are you sure you want to delete this post?",
         onConfirm: async () => {
-          const success = await deleteTopic(report.id, isAdmin);
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
+          const success = await stableDeleteTopic(report.id, isAdmin);
           if (success && onDelete) {
             onDelete();
           }
@@ -91,9 +102,14 @@ const QuarterlyReportCard = ({
         title: "Restore Post",
         message: "Are you sure you want to restore this post?",
         onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
           const isAuthor =
-            report.author?.toLowerCase() === address?.toLowerCase();
-          const success = await restoreTopic(report.id, isAuthor);
+            report.author?.toLowerCase() === loggedInAddress.toLowerCase();
+          const success = await stableRestoreTopic(report.id, isAuthor);
           if (success && onDelete) {
             onDelete();
           }
@@ -110,9 +126,14 @@ const QuarterlyReportCard = ({
         title: "Archive Post",
         message: "Are you sure you want to archive this post?",
         onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
           const isAuthor =
-            report.author?.toLowerCase() === address?.toLowerCase();
-          const success = await archiveTopic(report.id, isAuthor);
+            report.author?.toLowerCase() === loggedInAddress.toLowerCase();
+          const success = await stableArchiveTopic(report.id, isAuthor);
           if (success && onArchive) {
             onArchive();
           }

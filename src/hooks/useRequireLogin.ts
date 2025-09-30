@@ -4,14 +4,14 @@ import { useAccount } from "wagmi";
 
 /**
  * Ensures the user is logged in before continuing. If not logged in, triggers the
- * wallet connect modal and resolves once the user connects (true) or dismisses it (false).
+ * wallet connect modal and resolves with the address once connected, or null if dismissed.
  */
 const useRequireLogin = () => {
-  const { isConnected } = useAccount();
+  const { isConnected, address, isConnecting } = useAccount();
   const { setOpen, open } = useModal();
-  const resolversRef = useRef<Array<(value: boolean) => void>>([]);
+  const resolversRef = useRef<Array<(value: string | null) => void>>([]);
 
-  const resolveAll = useCallback((value: boolean) => {
+  const resolveAll = useCallback((value: string | null) => {
     if (!resolversRef.current.length) return;
     const resolvers = [...resolversRef.current];
     resolversRef.current = [];
@@ -19,33 +19,37 @@ const useRequireLogin = () => {
   }, []);
 
   useEffect(() => {
-    if (isConnected) {
-      resolveAll(true);
+    if (isConnected && address) {
+      resolveAll(address);
     }
-  }, [isConnected, resolveAll]);
+  }, [isConnected, address, resolveAll]);
 
   useEffect(() => {
-    if (open === false && !isConnected) {
-      resolveAll(false);
+    if (open === false && !isConnected && !isConnecting) {
+      resolveAll(null);
     }
-  }, [open, isConnected, resolveAll]);
+  }, [open, isConnected, resolveAll, isConnecting]);
 
   useEffect(() => {
     return () => {
-      resolveAll(false);
+      resolveAll(null);
     };
   }, [resolveAll]);
 
-  return useCallback((): Promise<boolean> => {
-    if (isConnected) {
-      return Promise.resolve(true);
+  return useCallback((): Promise<string | null> => {
+    // If already connected with address, resolve immediately
+    if (isConnected && address) {
+      return Promise.resolve(address);
     }
 
-    return new Promise<boolean>((resolve) => {
+    // Not connected or no address yet, open modal and wait
+    return new Promise<string | null>((resolve) => {
       resolversRef.current.push(resolve);
-      setOpen(true);
+      if (!open) {
+        setOpen(true);
+      }
     });
-  }, [isConnected, setOpen]);
+  }, [isConnected, address, setOpen, open]);
 };
 
 export default useRequireLogin;
