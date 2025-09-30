@@ -26,10 +26,5 @@ export const metadata: Metadata = {
 };
 
 export default async function ForumsPage() {
-  return (
-    <ForumsPageContent
-      categoryId={null}
-      categoryTitle={null}
-    />
-  );
+  return <ForumsPageContent categoryId={null} categoryTitle={null} />;
 }
