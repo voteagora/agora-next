@@ -82,21 +82,24 @@ export default function ForumThread({
     );
   };
 
-  const handleImageUpload = React.useCallback(async (file: File): Promise<string> => {
-    if (!address) {
-      throw new Error("Wallet not connected");
-    }
+  const handleImageUpload = React.useCallback(
+    async (file: File): Promise<string> => {
+      if (!address) {
+        throw new Error("Wallet not connected");
+      }
 
-    // Upload to IPFS only (no database record yet)
-    const attachmentData = await convertFileToAttachmentData(file);
-    const uploadResult = await uploadToIPFSOnly(attachmentData, address);
+      // Upload to IPFS only (no database record yet)
+      const attachmentData = await convertFileToAttachmentData(file);
+      const uploadResult = await uploadToIPFSOnly(attachmentData, address);
 
-    if (!uploadResult.success || !uploadResult.ipfsUrl) {
-      throw new Error(uploadResult.error || "Upload failed");
-    }
+      if (!uploadResult.success || !uploadResult.ipfsUrl) {
+        throw new Error(uploadResult.error || "Upload failed");
+      }
 
-    return uploadResult.ipfsUrl;
-  }, [address]);
+      return uploadResult.ipfsUrl;
+    },
+    [address]
+  );
 
   const submitRootReply = async () => {
     if (!rootContent.trim()) return;

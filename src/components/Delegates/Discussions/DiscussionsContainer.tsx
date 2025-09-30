@@ -40,15 +40,21 @@ interface ForumPostData {
 interface Props {
   initialTopics: PaginatedResult<ForumTopicData[]>;
   initialPosts: PaginatedResult<ForumPostData[]>;
-  fetchTopics: (pagination: { limit: number; offset: number }) => Promise<PaginatedResult<ForumTopicData[]>>;
-  fetchPosts: (pagination: { limit: number; offset: number }) => Promise<PaginatedResult<ForumPostData[]>>;
+  fetchTopics: (pagination: {
+    limit: number;
+    offset: number;
+  }) => Promise<PaginatedResult<ForumTopicData[]>>;
+  fetchPosts: (pagination: {
+    limit: number;
+    offset: number;
+  }) => Promise<PaginatedResult<ForumPostData[]>>;
 }
 
-const DiscussionsContainer = ({ 
-  initialTopics, 
-  initialPosts, 
-  fetchTopics, 
-  fetchPosts 
+const DiscussionsContainer = ({
+  initialTopics,
+  initialPosts,
+  fetchTopics,
+  fetchPosts,
 }: Props) => {
   const [activeTab, setActiveTab] = useState("topics");
   const [topics, setTopics] = useState(initialTopics.data);
@@ -67,7 +73,7 @@ const DiscussionsContainer = ({
           offset: topicsMeta.next_offset,
         });
         setTopicsMeta(data.meta);
-        setTopics(prev => [...prev, ...data.data]);
+        setTopics((prev) => [...prev, ...data.data]);
       } catch (error) {
         console.error("Error loading more topics:", error);
       } finally {
@@ -85,7 +91,7 @@ const DiscussionsContainer = ({
           offset: postsMeta.next_offset,
         });
         setPostsMeta(data.meta);
-        setPosts(prev => [...prev, ...data.data]);
+        setPosts((prev) => [...prev, ...data.data]);
       } catch (error) {
         console.error("Error loading more posts:", error);
       } finally {
@@ -107,15 +113,13 @@ const DiscussionsContainer = ({
   return (
     <div className="flex flex-col gap-6">
       <h3 className="text-lg font-semibold text-foreground">Discussions</h3>
-      
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="topics">
             Topics Created ({topics.length})
           </TabsTrigger>
-          <TabsTrigger value="posts">
-            Recent Posts ({posts.length})
-          </TabsTrigger>
+          <TabsTrigger value="posts">Recent Posts ({posts.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="topics" className="space-y-4">
@@ -126,7 +130,10 @@ const DiscussionsContainer = ({
               loadMore={loadMoreTopics}
               useWindow={false}
               loader={
-                <div key={0} className="flex justify-center py-6 text-sm text-secondary">
+                <div
+                  key={0}
+                  className="flex justify-center py-6 text-sm text-secondary"
+                >
                   Loading...
                 </div>
               }
@@ -152,7 +159,10 @@ const DiscussionsContainer = ({
                         </h3>
                         <div className="flex items-center gap-4 text-xs font-semibold text-[#6a6a6a]">
                           <div className="inline-flex items-center gap-1.5">
-                            <MessageCircle className="w-3.5 h-3.5" strokeWidth={1.7} />
+                            <MessageCircle
+                              className="w-3.5 h-3.5"
+                              strokeWidth={1.7}
+                            />
                             <span>{topic.postsCount}</span>
                           </div>
                           <div className="inline-flex items-center gap-1.5">
@@ -184,7 +194,10 @@ const DiscussionsContainer = ({
               loadMore={loadMorePosts}
               useWindow={false}
               loader={
-                <div key={0} className="flex justify-center py-6 text-sm text-secondary">
+                <div
+                  key={0}
+                  className="flex justify-center py-6 text-sm text-secondary"
+                >
                   Loading...
                 </div>
               }
@@ -194,7 +207,10 @@ const DiscussionsContainer = ({
               {posts.map((post) => (
                 <Link
                   key={post.id}
-                  href={buildForumTopicPath(post.topic?.id || 0, post.topic?.title || "")}
+                  href={buildForumTopicPath(
+                    post.topic?.id || 0,
+                    post.topic?.title || ""
+                  )}
                   className="group block bg-card border border-cardBorder rounded-lg p-3 hover:shadow-sm transition-shadow"
                 >
                   <div className="flex items-start gap-3">

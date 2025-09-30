@@ -154,7 +154,7 @@ export default async function ForumsPageContent({
         </div>
 
         <div className="w-80">
-          <ForumsSidebar 
+          <ForumsSidebar
             selectedCategoryId={selectedCategoryId}
             categories={categories}
             latestPost={latestPost}

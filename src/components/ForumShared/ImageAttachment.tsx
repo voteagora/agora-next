@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { TrashIcon, ArchiveBoxIcon, EyeIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import {
+  TrashIcon,
+  ArchiveBoxIcon,
+  EyeIcon,
+  XMarkIcon,
+} from "@heroicons/react/20/solid";
 import {
   ForumAttachment,
   canArchiveContent,
@@ -26,7 +31,7 @@ export default function ImageAttachment({
 }: ImageAttachmentProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [imageError, setImageError] = useState(false);
-  
+
   const { deleteAttachment, archiveAttachment } = useForum();
   const { address } = useAccount();
   const { isAdmin, canManageAttachments } = useForumAdmin(
@@ -102,7 +107,15 @@ export default function ImageAttachment({
           <span className="text-sm font-medium">Failed to load image</span>
         </div>
         <p className="text-sm text-red-500 mt-1">
-          {attachment.fileName} - <a href={attachment.url} target="_blank" rel="noreferrer" className="underline">View original</a>
+          {attachment.fileName} -{" "}
+          <a
+            href={attachment.url}
+            target="_blank"
+            rel="noreferrer"
+            className="underline"
+          >
+            View original
+          </a>
         </p>
       </div>
     );
@@ -115,14 +128,14 @@ export default function ImageAttachment({
           src={attachment.url}
           alt={attachment.fileName}
           className={`rounded-lg border border-line cursor-pointer transition-all duration-200 ${
-            isExpanded 
-              ? "max-w-none max-h-96" 
+            isExpanded
+              ? "max-w-none max-h-96"
               : "max-w-xs max-h-48 hover:shadow-lg"
           } object-contain`}
           onClick={toggleExpanded}
           onError={handleImageError}
         />
-        
+
         <div className="absolute top-2 right-2 flex gap-1 opacity-0 hover:opacity-100 transition-opacity">
           <button
             onClick={(e) => {
@@ -136,7 +149,7 @@ export default function ImageAttachment({
           </button>
         </div>
       </div>
-      
+
       <div className="flex items-center justify-between mt-2">
         <div className="text-sm text-gray-600">
           <span className="font-medium">{attachment.fileName}</span>
@@ -144,8 +157,9 @@ export default function ImageAttachment({
             ({Math.round(attachment.fileSize / 1024)} KB)
           </span>
         </div>
-        
-        {(canArchive(attachment.uploadedBy || postAuthor) || canDelete(attachment.uploadedBy || postAuthor)) && (
+
+        {(canArchive(attachment.uploadedBy || postAuthor) ||
+          canDelete(attachment.uploadedBy || postAuthor)) && (
           <div className="flex items-center gap-1">
             {canArchive(attachment.uploadedBy || postAuthor) && (
               <button
@@ -157,13 +171,13 @@ export default function ImageAttachment({
               </button>
             )}
             {canDelete(attachment.uploadedBy || postAuthor) && (
-            <button
-              onClick={handleDelete}
-              className="p-1 text-red-500 hover:text-red-700 transition-colors"
-              title="Delete image"
-            >
-              <TrashIcon className="w-4 h-4" />
-            </button>
+              <button
+                onClick={handleDelete}
+                className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                title="Delete image"
+              >
+                <TrashIcon className="w-4 h-4" />
+              </button>
             )}
           </div>
         )}

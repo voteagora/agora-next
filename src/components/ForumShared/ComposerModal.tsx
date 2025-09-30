@@ -58,7 +58,9 @@ export default function ComposerModal({
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [attachment, setAttachment] = useState<File | null>(null);
-  const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
+  const [attachmentPreview, setAttachmentPreview] = useState<string | null>(
+    null
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [categoryId, setCategoryId] = useState<number | "">("");
@@ -263,7 +265,8 @@ export default function ComposerModal({
                 Attach Document (Optional)
               </label>
               <p className="text-xs text-gray-500 mb-2">
-                Use the image button in the editor toolbar to add images inline. Documents will be attached as downloads.
+                Use the image button in the editor toolbar to add images inline.
+                Documents will be attached as downloads.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
@@ -277,7 +280,9 @@ export default function ComposerModal({
                   />
                   <Button
                     type="button"
-                    onClick={() => document.getElementById("attachment")?.click()}
+                    onClick={() =>
+                      document.getElementById("attachment")?.click()
+                    }
                     className="bg-neutral text-primary border border-line hover:bg-wash w-full sm:w-auto"
                     disabled={isSubmitting}
                   >

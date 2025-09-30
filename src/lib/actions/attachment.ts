@@ -199,22 +199,23 @@ export async function createAttachmentsFromContent(
 ) {
   try {
     // Extract IPFS URLs from img tags
-    const ipfsUrlRegex = /https:\/\/gateway\.pinata\.cloud\/ipfs\/([a-zA-Z0-9]+)/g;
+    const ipfsUrlRegex =
+      /https:\/\/gateway\.pinata\.cloud\/ipfs\/([a-zA-Z0-9]+)/g;
     const matches = Array.from(content.matchAll(ipfsUrlRegex));
-    
+
     if (matches.length === 0) {
       return []; // No images to process
     }
 
     const attachments = [];
-    
+
     for (const match of matches) {
       const ipfsCid = match[1];
       const ipfsUrl = match[0];
-      
+
       // Extract filename from URL or use a default
       const fileName = `image_${ipfsCid.substring(0, 8)}.jpg`; // Default filename
-      
+
       try {
         const attachment = await createAttachmentFromIPFS(
           ipfsCid,
@@ -225,14 +226,14 @@ export async function createAttachmentsFromContent(
           targetType,
           targetId
         );
-        
+
         attachments.push(attachment);
       } catch (error) {
         console.error(`Failed to create attachment for ${ipfsCid}:`, error);
         // Continue with other attachments even if one fails
       }
     }
-    
+
     return attachments;
   } catch (error) {
     console.error("Failed to create attachments from content:", error);

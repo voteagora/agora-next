@@ -13,16 +13,17 @@ const DiscussionsContainerWrapper = async ({ delegate }: Props) => {
     getForumPostsByUser(delegate.address, { limit: 10, offset: 0 }),
   ]);
 
-  const initialTopics: PaginatedResult<any[]> = topicsResult.success 
+  const initialTopics: PaginatedResult<any[]> = topicsResult.success
     ? {
         meta: topicsResult.data.meta,
-        data: topicsResult.data.data.map(topic => ({
+        data: topicsResult.data.data.map((topic) => ({
           id: topic.id,
           title: topic.title,
           address: topic.address,
-          createdAt: topic.createdAt instanceof Date 
-            ? topic.createdAt.toISOString() 
-            : new Date(topic.createdAt).toISOString(),
+          createdAt:
+            topic.createdAt instanceof Date
+              ? topic.createdAt.toISOString()
+              : new Date(topic.createdAt).toISOString(),
           category: topic.category,
           postsCount: topic.postsCount,
         })),
@@ -32,16 +33,17 @@ const DiscussionsContainerWrapper = async ({ delegate }: Props) => {
         data: [],
       };
 
-  const initialPosts: PaginatedResult<any[]> = postsResult.success 
+  const initialPosts: PaginatedResult<any[]> = postsResult.success
     ? {
         meta: postsResult.data.meta,
-        data: postsResult.data.data.map(post => ({
+        data: postsResult.data.data.map((post) => ({
           id: post.id,
           address: post.address,
           content: post.content,
-          createdAt: post.createdAt instanceof Date 
-            ? post.createdAt.toISOString() 
-            : new Date(post.createdAt).toISOString(),
+          createdAt:
+            post.createdAt instanceof Date
+              ? post.createdAt.toISOString()
+              : new Date(post.createdAt).toISOString(),
           topic: post.topic,
         })),
       }
@@ -60,19 +62,23 @@ const DiscussionsContainerWrapper = async ({ delegate }: Props) => {
         if (result.success) {
           return {
             meta: result.data.meta,
-            data: result.data.data.map(topic => ({
+            data: result.data.data.map((topic) => ({
               id: topic.id,
               title: topic.title,
               address: topic.address,
-              createdAt: topic.createdAt instanceof Date 
-                ? topic.createdAt.toISOString() 
-                : new Date(topic.createdAt).toISOString(),
+              createdAt:
+                topic.createdAt instanceof Date
+                  ? topic.createdAt.toISOString()
+                  : new Date(topic.createdAt).toISOString(),
               category: topic.category,
               postsCount: topic.postsCount,
             })),
           };
         }
-        return { meta: { has_next: false, total_returned: 0, next_offset: 0 }, data: [] };
+        return {
+          meta: { has_next: false, total_returned: 0, next_offset: 0 },
+          data: [],
+        };
       }}
       fetchPosts={async (pagination) => {
         "use server";
@@ -80,18 +86,22 @@ const DiscussionsContainerWrapper = async ({ delegate }: Props) => {
         if (result.success) {
           return {
             meta: result.data.meta,
-            data: result.data.data.map(post => ({
+            data: result.data.data.map((post) => ({
               id: post.id,
               address: post.address,
               content: post.content,
-              createdAt: post.createdAt instanceof Date 
-                ? post.createdAt.toISOString() 
-                : new Date(post.createdAt).toISOString(),
+              createdAt:
+                post.createdAt instanceof Date
+                  ? post.createdAt.toISOString()
+                  : new Date(post.createdAt).toISOString(),
               topic: post.topic,
             })),
           };
         }
-        return { meta: { has_next: false, total_returned: 0, next_offset: 0 }, data: [] };
+        return {
+          meta: { has_next: false, total_returned: 0, next_offset: 0 },
+          data: [],
+        };
       }}
     />
   );

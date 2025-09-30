@@ -41,7 +41,7 @@ export default function PostAttachments({
   if (!items.length) return null;
 
   const isImageAttachment = (attachment: ForumAttachment) => {
-    return attachment.contentType?.startsWith('image/') || false;
+    return attachment.contentType?.startsWith("image/") || false;
   };
 
   const documentAttachments = items.filter((att) => !isImageAttachment(att));
@@ -91,7 +91,9 @@ export default function PostAttachments({
     <div className="my-4">
       {documentAttachments.length > 0 && (
         <div>
-          <h4 className="text-sm font-semibold text-gray-900 mb-2">Attachments</h4>
+          <h4 className="text-sm font-semibold text-gray-900 mb-2">
+            Attachments
+          </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {documentAttachments.map((att) => (
               <a

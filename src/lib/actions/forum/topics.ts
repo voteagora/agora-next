@@ -202,10 +202,13 @@ export async function getForumTopic(topicId: number) {
   }
 }
 
-export async function getForumTopicsByUser(address: string, pagination: { limit: number; offset: number }) {
+export async function getForumTopicsByUser(
+  address: string,
+  pagination: { limit: number; offset: number }
+) {
   try {
     const { limit, offset } = pagination;
-    
+
     const topics = await prismaWeb2Client.forumTopic.findMany({
       where: {
         dao_slug: slug,
@@ -263,9 +266,7 @@ export async function getForumTopicsByUser(address: string, pagination: { limit:
         ...p,
         reactionsByEmoji: groupByEmojiAddresses(p.reactions),
       })),
-      topicReactionsByEmoji: groupByEmojiAddresses(
-        topic.posts?.[0]?.reactions
-      ),
+      topicReactionsByEmoji: groupByEmojiAddresses(topic.posts?.[0]?.reactions),
       postsCount: topic._count.posts,
     }));
 
@@ -343,7 +344,10 @@ export async function createForumTopic(
         newPost.id
       );
     } catch (attachmentError) {
-      console.error("Failed to create attachments for new topic:", attachmentError);
+      console.error(
+        "Failed to create attachments for new topic:",
+        attachmentError
+      );
       // Don't fail the entire operation if attachments fail
     }
 
@@ -681,10 +685,10 @@ const getForumDataUncached = async ({
               _count: {
                 select: {
                   votes: {
-                    where: { vote: 1 }
-                  }
-                }
-              }
+                    where: { vote: 1 },
+                  },
+                },
+              },
             },
           },
           _count: {
@@ -699,13 +703,13 @@ const getForumDataUncached = async ({
         take: limit,
         skip: offset,
       }),
-      
+
       prismaWeb2Client.forumAdmin.findMany({
         where: { dao_slug: slug },
         select: { address: true, role: true },
         orderBy: { address: "asc" },
       }),
-      
+
       prismaWeb2Client.forumCategory.findMany({
         where: { dao_slug: slug, archived: false },
         include: {
@@ -719,7 +723,7 @@ const getForumDataUncached = async ({
         },
         orderBy: { createdAt: "desc" },
       }),
-      
+
       prismaWeb2Client.forumPost.findFirst({
         where: {
           dao_slug: slug,
@@ -727,23 +731,29 @@ const getForumDataUncached = async ({
           deletedAt: null,
         },
         orderBy: { createdAt: "desc" },
-        select: { id: true, createdAt: true, topicId: true, address: true, content: true },
+        select: {
+          id: true,
+          createdAt: true,
+          topicId: true,
+          address: true,
+          content: true,
+        },
       }),
     ]);
 
     const adminRolesObj: Record<string, string | null> = {};
-    admins.forEach(admin => {
+    admins.forEach((admin) => {
       const normalizedAddress = admin.address.toLowerCase();
       adminRolesObj[normalizedAddress] = admin.role;
     });
 
-    const processedTopics = topics.map(topic => ({
+    const processedTopics = topics.map((topic) => ({
       ...topic,
       upvotes: (topic as any).posts[0]?._count?.votes || 0,
       firstPost: (topic as any).posts[0],
     }));
 
-    const processedCategories = categories.map(category => ({
+    const processedCategories = categories.map((category) => ({
       id: category.id,
       name: category.name,
       description: category.description,
@@ -761,20 +771,23 @@ const getForumDataUncached = async ({
         topics: processedTopics,
         admins: adminRolesObj,
         categories: processedCategories,
-        latestPost: latestPost ? {
-          id: latestPost.id,
-          author: latestPost.address,
-          content: latestPost.content,
-          createdAt: latestPost.createdAt instanceof Date
-            ? latestPost.createdAt.toISOString()
-            : new Date(latestPost.createdAt).toISOString(),
-          parentId: undefined,
-          attachments: undefined,
-          deletedAt: null,
-          deletedBy: null,
-          isNsfw: false,
-          reactionsByEmoji: undefined,
-        } : undefined,
+        latestPost: latestPost
+          ? {
+              id: latestPost.id,
+              author: latestPost.address,
+              content: latestPost.content,
+              createdAt:
+                latestPost.createdAt instanceof Date
+                  ? latestPost.createdAt.toISOString()
+                  : new Date(latestPost.createdAt).toISOString(),
+              parentId: undefined,
+              attachments: undefined,
+              deletedAt: null,
+              deletedBy: null,
+              isNsfw: false,
+              reactionsByEmoji: undefined,
+            }
+          : undefined,
       },
     };
   } catch (error) {
@@ -785,7 +798,8 @@ const getForumDataUncached = async ({
   }
 };
 
-export const getForumData = unstable_cache(getForumDataUncached,
+export const getForumData = unstable_cache(
+  getForumDataUncached,
   ["getForumData"],
   {
     revalidate: 60 * 1, // 1 minute

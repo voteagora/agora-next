@@ -230,7 +230,10 @@ export async function createForumPost(
         newPost.id
       );
     } catch (attachmentError) {
-      console.error("Failed to create attachments for new post:", attachmentError);
+      console.error(
+        "Failed to create attachments for new post:",
+        attachmentError
+      );
       // Don't fail the entire operation if attachments fail
     }
 
@@ -569,10 +572,13 @@ export async function getLatestForumPost() {
   }
 }
 
-export async function getForumPostsByUser(address: string, pagination: { limit: number; offset: number }) {
+export async function getForumPostsByUser(
+  address: string,
+  pagination: { limit: number; offset: number }
+) {
   try {
     const { limit, offset } = pagination;
-    
+
     const posts = await prismaWeb2Client.forumPost.findMany({
       where: {
         dao_slug: slug,
