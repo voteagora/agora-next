@@ -1,8 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import ForumsSidebar from "./ForumsSidebar";
-import { getForumTopics, getForumTopicUpvotes } from "@/lib/actions/forum";
-import { getForumAdmins } from "@/lib/actions/forum/admin";
+import { getForumData } from "@/lib/actions/forum/topics";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import { MessageCircle, Clock, ChevronUp } from "lucide-react";
 import { stripHtmlToText } from "./stripHtml";
@@ -29,43 +28,23 @@ export default async function ForumsPageContent({
       : null;
   const selectedCategoryTitle = categoryTitle || null;
 
-  const [topicsResult, adminsResult] = await Promise.all([
-    selectedCategoryId
-      ? getForumTopics({
-          categoryId: selectedCategoryId,
-        })
-      : getForumTopics(),
-    getForumAdmins(),
-  ]);
+  const result = await getForumData({
+    categoryId: selectedCategoryId || undefined,
+  });
 
-  const adminRolesMap = adminsResult?.success
-    ? adminsResult.data.reduce((map, admin) => {
-        const normalizedAddress = (admin.address || "").toLowerCase();
-        if (!normalizedAddress) {
-          return map;
-        }
-        map.set(normalizedAddress, admin.role ?? null);
-        return map;
-      }, new Map<string, string | null>())
-    : new Map<string, string | null>();
-
-  const topics = topicsResult.success
-    ? topicsResult.data.slice().sort((a: any, b: any) => {
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      })
-    : [];
-
-  const upvoteCounts = new Map<number, number>();
-
-  if (topics.length) {
-    for (const topic of topics) {
-      const res = await getForumTopicUpvotes(topic.id);
-      const count = res?.success ? (res.data?.upvotes ?? 0) : 0;
-      upvoteCounts.set(topic.id, count);
-    }
+  if (!result.success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-500">Error loading forum data</p>
+      </div>
+    );
   }
+
+  const { topics, admins, categories, latestPost } = result.data;
+
+  const sortedTopics = topics.slice().sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
 
   const heading = selectedCategoryTitle || "Discussions";
 
@@ -85,26 +64,20 @@ export default async function ForumsPageContent({
       <div className="flex gap-8 max-w-7xl mx-auto px-6 sm:px-0">
         <div className="flex-1">
           <div className="space-y-3">
-            {topics.length === 0 ? (
+            {sortedTopics.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-500">No topics found</p>
               </div>
             ) : (
-              topics.map((topic: any) => {
-                const posts = Array.isArray(topic.posts) ? topic.posts : [];
-                const firstPost = posts[0];
+              sortedTopics.map((topic: any) => {
+                const firstPost = topic.firstPost;
                 const createdAt = topic.createdAt;
-                const replies = Math.max(
-                  (topic.postsCount || posts.length) - 1,
-                  0
-                );
+                const replies = Math.max((topic.postsCount || 1) - 1, 0);
                 const excerpt = stripHtmlToText(firstPost?.content || "");
-                const upvotes = upvoteCounts.get(topic.id) ?? 0;
+                const upvotes = topic.upvotes || 0;
                 const authorAddress = (topic.address || "").toLowerCase();
-                const adminRole = adminRolesMap.get(authorAddress) || null;
-                const isAuthorAdmin = authorAddress
-                  ? adminRolesMap.has(authorAddress)
-                  : false;
+                const adminRole = admins[authorAddress] || null;
+                const isAuthorAdmin = authorAddress in admins;
 
                 return (
                   <Link
@@ -181,7 +154,11 @@ export default async function ForumsPageContent({
         </div>
 
         <div className="w-80">
-          <ForumsSidebar selectedCategoryId={selectedCategoryId} />
+          <ForumsSidebar
+            selectedCategoryId={selectedCategoryId}
+            categories={categories}
+            latestPost={latestPost}
+          />
         </div>
       </div>
     </div>

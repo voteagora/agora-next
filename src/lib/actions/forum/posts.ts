@@ -13,6 +13,8 @@ import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { logForumAuditAction } from "./admin";
+import { getIPFSUrl } from "@/lib/pinata";
+import { createAttachmentsFromContent } from "../attachment";
 
 const { slug } = Tenant.current();
 
@@ -218,6 +220,22 @@ export async function createForumPost(
         isNsfw,
       },
     });
+
+    // Create attachment records for any IPFS images in the content
+    try {
+      await createAttachmentsFromContent(
+        validatedData.content,
+        validatedData.address,
+        "post",
+        newPost.id
+      );
+    } catch (attachmentError) {
+      console.error(
+        "Failed to create attachments for new post:",
+        attachmentError
+      );
+      // Don't fail the entire operation if attachments fail
+    }
 
     if (!isNsfw) {
       // Index the new post for search (async, don't block response)
@@ -548,6 +566,93 @@ export async function getLatestForumPost() {
     };
   } catch (error) {
     console.error("Error getting latest forum post:", error);
+    return handlePrismaError(error);
+  } finally {
+    await prismaWeb2Client.$disconnect();
+  }
+}
+
+export async function getForumPostsByUser(
+  address: string,
+  pagination: { limit: number; offset: number }
+) {
+  try {
+    const { limit, offset } = pagination;
+
+    const posts = await prismaWeb2Client.forumPost.findMany({
+      where: {
+        dao_slug: slug,
+        address: address.toLowerCase(),
+        isNsfw: false,
+      },
+      include: {
+        votes: true,
+        reactions: true,
+        topic: {
+          select: {
+            title: true,
+            id: true,
+            category: {
+              select: {
+                name: true,
+                id: true,
+              },
+            },
+          },
+        },
+        attachments: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: limit + 1,
+      skip: offset,
+    });
+
+    const hasNext = posts.length > limit;
+    const data = posts.slice(0, limit);
+
+    const groupByEmojiAddresses = (reactions: any[] | undefined) => {
+      const out: Record<string, string[]> = {};
+      (reactions || []).forEach((r: any) => {
+        const e = (r.emoji || "").trim();
+        const addr = (r.address || "").toLowerCase();
+        if (!e || !addr) return;
+        if (!out[e]) out[e] = [];
+        if (!out[e].includes(addr)) out[e].push(addr);
+      });
+      return out;
+    };
+
+    const processedPosts = data.map((p) => ({
+      ...p,
+      reactionsByEmoji: groupByEmojiAddresses((p as any).reactions),
+      attachments: ((p as any).attachments || []).map((att: any) => ({
+        id: att.id,
+        fileName: att.fileName,
+        contentType: att.contentType,
+        fileSize: Number(att.fileSize ?? 0),
+        ipfsCid: att.ipfsCid,
+        url: getIPFSUrl(att.ipfsCid),
+        createdAt: (att.createdAt instanceof Date
+          ? att.createdAt
+          : new Date(att.createdAt)
+        ).toISOString(),
+        uploadedBy: att.address,
+      })),
+    }));
+
+    return {
+      success: true,
+      data: {
+        meta: {
+          has_next: hasNext,
+          total_returned: processedPosts.length,
+          next_offset: hasNext ? offset + limit : 0,
+        },
+        data: processedPosts,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting forum posts by user:", error);
     return handlePrismaError(error);
   } finally {
     await prismaWeb2Client.$disconnect();

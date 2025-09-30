@@ -15,6 +15,8 @@ import { format } from "date-fns";
 import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
 import { ConnectKitButton } from "connectkit";
+import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import CommentList from "./CommentList";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
@@ -58,6 +60,26 @@ const ReportModal = ({
 
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
+
+  const handleImageUpload = React.useCallback(
+    async (file: File): Promise<string> => {
+      if (!address) {
+        throw new Error("Wallet not connected");
+      }
+
+      // Upload to IPFS only (no database record yet)
+      const attachmentData = await convertFileToAttachmentData(file);
+      const uploadResult = await uploadToIPFSOnly(attachmentData, address);
+
+      if (!uploadResult.success || !uploadResult.ipfsUrl) {
+        throw new Error(uploadResult.error || "Upload failed");
+      }
+
+      return uploadResult.ipfsUrl;
+    },
+    [address]
+  );
+
   // Track topic view when modal opens
   useTopicViewTracking({
     topicId: report?.id || 0,
@@ -469,6 +491,7 @@ const ReportModal = ({
                     value={newComment}
                     onChange={(html) => setNewComment(html)}
                     disabled={isSubmitting}
+                    onImageUpload={handleImageUpload}
                   />
                   <div className="flex justify-end mt-2">
                     <Button

@@ -1,44 +1,43 @@
 import React from "react";
 import Link from "next/link";
-import { getForumCategories, getLatestForumPost } from "@/lib/actions/forum";
 import { formatRelative } from "@/components/ForumShared/utils";
-import { buildForumCategoryPath } from "@/lib/forumUtils";
+import {
+  buildForumCategoryPath,
+  ForumCategory,
+  ForumPost,
+} from "@/lib/forumUtils";
 
 interface ForumsSidebarProps {
   selectedCategoryId?: number | null;
+  categories?: ForumCategory[];
+  latestPost?: ForumPost;
 }
 
-export default async function ForumsSidebar({
+export default function ForumsSidebar({
   selectedCategoryId = null,
-}: ForumsSidebarProps = {}) {
-  const [categoriesResult, latestPostResult] = await Promise.all([
-    getForumCategories(),
-    getLatestForumPost(),
-  ]);
+  categories = [],
+  latestPost,
+}: ForumsSidebarProps) {
+  const sortedCategories = (categories || [])
+    .sort((a, b) => {
+      const aTop =
+        a?.isDuna === true ||
+        (typeof a?.name === "string" && a.name.toUpperCase() === "DUNA");
+      const bTop =
+        b?.isDuna === true ||
+        (typeof b?.name === "string" && b.name.toUpperCase() === "DUNA");
+      if (aTop && !bTop) return -1;
+      if (bTop && !aTop) return 1;
+      return a.name.localeCompare(b.name);
+    })
+    .filter((cat) => (cat.topicsCount ?? 0) > 0);
 
-  const categories = categoriesResult?.success
-    ? categoriesResult.data
-        .sort((a: any, b: any) => {
-          const aTop =
-            a?.isDuna === true ||
-            (typeof a?.name === "string" && a.name.toUpperCase() === "DUNA");
-          const bTop =
-            b?.isDuna === true ||
-            (typeof b?.name === "string" && b.name.toUpperCase() === "DUNA");
-          if (aTop && !bTop) return -1;
-          if (bTop && !aTop) return 1;
-          return a.name.localeCompare(b.name);
-        })
-        .filter((cat: any) => cat.topicsCount > 0)
-    : [];
-
-  const totalTopics = categories.reduce(
-    (sum: number, cat: any) => sum + (cat.topicsCount ?? 0),
+  const totalTopics = sortedCategories.reduce(
+    (sum: number, cat) => sum + (cat.topicsCount ?? 0),
     0
   );
-  const lastActivityAt = latestPostResult?.success
-    ? (latestPostResult.data?.createdAt as string | undefined)
-    : undefined;
+
+  const lastActivityAt = latestPost?.createdAt;
 
   const palette = [
     "bg-orange-500",
@@ -49,12 +48,12 @@ export default async function ForumsSidebar({
   ];
 
   return (
-    <div className="w-80 bg-cardBackground rounded-lg border border-cardBorder">
+    <div className="w-80 bg-cardBackground rounded-lg border border-cardBorder max-h-max">
       <div className="p-4">
         <h3 className="text-lg text-primary font-semibold mb-4">Categories</h3>
 
         <div className="space-y-3">
-          {categories.length === 0 ? (
+          {sortedCategories.length === 0 ? (
             <div className="text-sm text-gray-500">No categories found</div>
           ) : (
             <div className="space-y-2">
@@ -77,7 +76,7 @@ export default async function ForumsSidebar({
                 </span>
               </Link>
 
-              {categories.map((cat: any, idx: number) => {
+              {sortedCategories.map((cat, idx) => {
                 const isSelected = selectedCategoryId === cat.id;
                 const href = buildForumCategoryPath(cat.id, cat.name);
                 return (
