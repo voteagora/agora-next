@@ -343,34 +343,37 @@ export default function DunaEditor({
       toast.error("Please connect your wallet to upload images");
       return;
     }
-    
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
         // Show loading state
         const loadingToast = toast.loading("Uploading image...");
-        
+
         try {
           let imageUrl: string;
-          
+
           if (onImageUpload) {
             // Use custom upload handler (for new posts)
             imageUrl = await onImageUpload(file);
           } else {
             // Use IPFS upload only (no database record)
             const attachmentData = await convertFileToAttachmentData(file);
-            const uploadResult = await uploadToIPFSOnly(attachmentData, address);
-            
+            const uploadResult = await uploadToIPFSOnly(
+              attachmentData,
+              address
+            );
+
             if (!uploadResult.success || !uploadResult.ipfsUrl) {
               throw new Error(uploadResult.error || "Upload failed");
             }
-            
+
             imageUrl = uploadResult.ipfsUrl;
           }
-          
+
           // Insert URL into editor
           editor.chain().focus().setImage({ src: imageUrl }).run();
           setForceUpdate((prev) => prev + 1);
@@ -378,12 +381,14 @@ export default function DunaEditor({
           toast.success("Image uploaded successfully!");
         } catch (error) {
           toast.dismiss(loadingToast);
-          toast.error(error instanceof Error ? error.message : "Failed to upload image");
+          toast.error(
+            error instanceof Error ? error.message : "Failed to upload image"
+          );
         }
       }
     };
     input.click();
-  }, [editor, isConnected, address, targetType, targetId, onImageUpload]);
+  }, [editor, isConnected, address, onImageUpload]);
 
   const handleLink = useCallback(() => {
     if (!editor) return;
@@ -460,7 +465,7 @@ export default function DunaEditor({
   return (
     <div
       className={cn(
-        "border rounded-lg shadow-sm transition-all",
+        "border rounded-lg shadow-sm transition-all flex flex-col",
         variant === "post" ? "min-h-[200px]" : "min-h-[120px]",
         className
       )}
@@ -602,12 +607,12 @@ export default function DunaEditor({
           </svg>
         </ToolbarButton>
 
-            <ToolbarButton
-              onClick={addImage}
-              disabled={disabled}
-              tooltip="Add image"
-              isActive={false}
-            >
+        <ToolbarButton
+          onClick={addImage}
+          disabled={disabled}
+          tooltip="Add image"
+          isActive={false}
+        >
           <svg
             className="w-4 h-4"
             fill="none"
@@ -627,10 +632,11 @@ export default function DunaEditor({
       {/* Editor content */}
       <div
         className={cn(
-          "p-3 outline-none",
+          "p-3 outline-none flex-1 flex flex-col cursor-text",
           variant === "post" ? "min-h-[160px]" : "min-h-[80px]"
         )}
         onKeyDown={handleKeyDown}
+        onClick={() => editor?.chain().focus().run()}
         style={{
           color: ui.customization?.cardBackground ? "white" : "inherit",
         }}

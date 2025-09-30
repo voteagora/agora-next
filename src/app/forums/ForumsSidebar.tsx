@@ -1,7 +1,11 @@
 import React from "react";
 import Link from "next/link";
 import { formatRelative } from "@/components/ForumShared/utils";
-import { buildForumCategoryPath, ForumCategory, ForumPost } from "@/lib/forumUtils";
+import {
+  buildForumCategoryPath,
+  ForumCategory,
+  ForumPost,
+} from "@/lib/forumUtils";
 
 interface ForumsSidebarProps {
   selectedCategoryId?: number | null;
@@ -44,7 +48,7 @@ export default function ForumsSidebar({
   ];
 
   return (
-    <div className="w-80 bg-cardBackground rounded-lg border border-cardBorder">
+    <div className="w-80 bg-cardBackground rounded-lg border border-cardBorder max-h-max">
       <div className="p-4">
         <h3 className="text-lg text-primary font-semibold mb-4">Categories</h3>
 
