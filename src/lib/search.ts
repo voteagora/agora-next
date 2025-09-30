@@ -6,7 +6,7 @@ const getClient = () => {
   if (cachedClient) return cachedClient;
 
   const host = process.env.NEXT_PUBLIC_MEILISEARCH_HOST;
-  const apiKey = process.env.NEXT_PUBLIC_MEILISEARCH_API_KEY;
+  const apiKey = process.env.MEILISEARCH_API_KEY;
 
   if (!host) {
     throw new Error(

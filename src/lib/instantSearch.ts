@@ -2,7 +2,7 @@ import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
 import { getForumIndexName } from "./search";
 
 const MEILISEARCH_HOST = process.env.NEXT_PUBLIC_MEILISEARCH_HOST;
-const MEILISEARCH_API_KEY = process.env.NEXT_PUBLIC_MEILISEARCH_API_KEY;
+const MEILISEARCH_API_KEY = process.env.NEXT_PUBLIC_MEILISEARCH_CLIENT_API_KEY;
 
 if (!MEILISEARCH_HOST || !MEILISEARCH_API_KEY) {
   throw new Error("Missing Meilisearch host or API key environment variables");
