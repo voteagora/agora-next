@@ -27,7 +27,7 @@ export const protocolGuildTenantContractConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd
-    ? "0xbfc07a8c9615fe62979f02cd0d975caf61ed0d63"
+    ? "0x949f5b6183aA74272Ddad7f8f8DC309F8186E858"
     : "0xE3D4a55f780C5aD9B3009523CB6a3d900A8FA723";
 
   const GOVERNOR = isProd
