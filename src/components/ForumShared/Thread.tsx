@@ -9,6 +9,8 @@ import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 
 import { useAccount } from "wagmi";
 import { useForum, useForumAdmin } from "@/hooks/useForum";
+import useRequireLogin from "@/hooks/useRequireLogin";
+import { useStableCallback } from "@/hooks/useStableCallback";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { canDeleteContent } from "@/lib/forumUtils";
@@ -81,6 +83,9 @@ const CommentItem = ({
   const { deletePost, restorePost } = useForum();
   const openDialog = useOpenDialog();
   const { isAdmin, canManageTopics } = useForumAdmin(categoryId || undefined);
+  const requireLogin = useRequireLogin();
+  const stableDeletePost = useStableCallback(deletePost);
+  const stableRestorePost = useStableCallback(restorePost);
   const [showReplies, setShowReplies] = React.useState(forForums ?? false);
   // Get replies for this comment
   const replies = comments.filter(
@@ -118,14 +123,19 @@ const CommentItem = ({
           ? "Are you sure you want to permanently delete this comment? This action cannot be undone."
           : "Are you sure you want to delete this comment?",
         onConfirm: async () => {
-          const success = await deletePost(comment.id, isAdmin);
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
+          const success = await stableDeletePost(comment.id, isAdmin);
           if (success) {
             if (isAdmin) {
               onDelete?.(comment.id);
             } else {
               onUpdate?.(comment.id, {
                 deletedAt: new Date().toISOString(),
-                deletedBy: address || "",
+                deletedBy: loggedInAddress,
               });
             }
           }
@@ -141,9 +151,14 @@ const CommentItem = ({
         title: "Restore Comment",
         message: "Are you sure you want to restore this comment?",
         onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
           const isAuthor =
-            comment.author?.toLowerCase() === address?.toLowerCase();
-          const success = await restorePost(comment.id, isAuthor);
+            comment.author?.toLowerCase() === loggedInAddress.toLowerCase();
+          const success = await stableRestorePost(comment.id, isAuthor);
           if (success) {
             onUpdate?.(comment.id, {
               deletedAt: null,

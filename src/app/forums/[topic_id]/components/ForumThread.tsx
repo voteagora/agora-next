@@ -4,12 +4,12 @@ import React from "react";
 import Thread from "@/components/ForumShared/Thread";
 import type { ForumPost } from "@/lib/forumUtils";
 import { useForum } from "@/hooks/useForum";
+import useRequireLogin from "@/hooks/useRequireLogin";
 import { DunaEditor } from "@/components/duna-editor";
 import { Button } from "@/components/ui/button";
-import { useAccount } from "wagmi";
 import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
-import toast from "react-hot-toast";
+import { useStableCallback } from "@/hooks/useStableCallback";
 
 interface ForumThreadProps {
   topicId: number;
@@ -31,11 +31,15 @@ export default function ForumThread({
   const { createPost } = useForum();
   const [rootContent, setRootContent] = React.useState("");
   const [postingRoot, setPostingRoot] = React.useState(false);
-  const { address } = useAccount();
+  const requireLogin = useRequireLogin();
+  const stableCreatePost = useStableCallback(createPost);
 
   React.useEffect(() => setComments(initialComments), [initialComments]);
 
-  const onReply = (commentId: number) => {
+  const onReply = async (commentId: number) => {
+    if (!(await requireLogin())) {
+      return;
+    }
     setIsReplying(true);
     setReplyingToId(commentId);
     setReplyContent("");
@@ -49,7 +53,9 @@ export default function ForumThread({
 
   const onSubmitReply = async () => {
     if (!replyContent.trim() || replyingToId == null) return;
-    const newPost = await createPost(Number(topicId), {
+    const loggedIn = await requireLogin();
+    if (!loggedIn) return;
+    const newPost = await stableCreatePost(Number(topicId), {
       content: replyContent.trim(),
       parentId: replyingToId,
     });
@@ -83,14 +89,16 @@ export default function ForumThread({
   };
 
   const handleImageUpload = React.useCallback(
-    async (file: File): Promise<string> => {
-      if (!address) {
-        throw new Error("Wallet not connected");
-      }
+    async (file: File) => {
+      const loggedInAddress = await requireLogin();
+      if (!loggedInAddress) return;
 
       // Upload to IPFS only (no database record yet)
       const attachmentData = await convertFileToAttachmentData(file);
-      const uploadResult = await uploadToIPFSOnly(attachmentData, address);
+      const uploadResult = await uploadToIPFSOnly(
+        attachmentData,
+        loggedInAddress
+      );
 
       if (!uploadResult.success || !uploadResult.ipfsUrl) {
         throw new Error(uploadResult.error || "Upload failed");
@@ -98,14 +106,16 @@ export default function ForumThread({
 
       return uploadResult.ipfsUrl;
     },
-    [address]
+    [requireLogin]
   );
 
   const submitRootReply = async () => {
     if (!rootContent.trim()) return;
+    const loggedIn = await requireLogin();
+    if (!loggedIn) return;
     setPostingRoot(true);
     try {
-      const newPost = await createPost(Number(topicId), {
+      const newPost = await stableCreatePost(Number(topicId), {
         content: rootContent.trim(),
       });
       if (newPost) {

@@ -2,23 +2,14 @@ import React from "react";
 import Link from "next/link";
 import ForumsSidebar from "./ForumsSidebar";
 import { getForumData } from "@/lib/actions/forum/topics";
-import ForumsSearch from "./components/ForumsSearch";
+import ForumsHeader from "./components/ForumsHeader";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import { MessageCircle, Clock, ChevronUp } from "lucide-react";
 import { stripHtmlToText } from "./stripHtml";
-import NewTopicButton from "./components/NewTopicButton";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import { ADMIN_TYPES } from "@/lib/constants";
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 
 interface ForumsPageContentProps {
   categoryId: number | null;
@@ -55,36 +46,21 @@ export default async function ForumsPageContent({
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
-  const heading = selectedCategoryTitle || "Discussions";
+  const breadcrumbs = selectedCategoryTitle
+    ? [
+        { label: "Discussions", href: "/forums" },
+        { label: selectedCategoryTitle },
+      ]
+    : [];
 
   return (
     <div className="min-h-screen">
-      <div className="mt-6 max-w-7xl mx-auto px-6 sm:px-0">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <Breadcrumb className="mb-2">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/forums">Forums</BreadcrumbLink>
-                </BreadcrumbItem>
-                {selectedCategoryTitle && (
-                  <>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage>{selectedCategoryTitle}</BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </>
-                )}
-              </BreadcrumbList>
-            </Breadcrumb>
-            <h3 className="text-primary">{description}</h3>
-          </div>
-          <div className="flex gap-2">
-            <ForumsSearch className="max-w-xl" />
-            <NewTopicButton isDuna={categoryTitle === "DUNA"} />
-          </div>
-        </div>
-      </div>
+      <ForumsHeader
+        breadcrumbs={breadcrumbs}
+        showBreadcrumb={selectedCategoryTitle !== null}
+        description={description}
+        isDuna={categoryTitle === "DUNA"}
+      />
       <div className="flex gap-8 max-w-7xl mx-auto px-6 sm:px-0">
         <div className="flex-1">
           <div className="space-y-3">
@@ -111,7 +87,7 @@ export default async function ForumsPageContent({
                   >
                     <div className="flex items-start gap-3">
                       {/* Avatar */}
-                      <div className="flex-shrink-0 relative">
+                      <div className="flex-shrink-0 relative self-center">
                         {/* ENS avatar based on author address */}
                         <ENSAvatar
                           ensName={topic.address}

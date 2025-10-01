@@ -12,6 +12,8 @@ import {
 import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import useRequireLogin from "@/hooks/useRequireLogin";
+import { useStableCallback } from "@/hooks/useStableCallback";
 
 interface PostAttachmentsProps {
   attachments: ForumAttachment[];
@@ -37,6 +39,9 @@ export default function PostAttachments({
     categoryId || undefined
   );
   const openDialog = useOpenDialog();
+  const requireLogin = useRequireLogin();
+  const stableDeleteAttachment = useStableCallback(deleteAttachment);
+  const stableArchiveAttachment = useStableCallback(archiveAttachment);
 
   if (!items.length) return null;
 
@@ -53,9 +58,18 @@ export default function PostAttachments({
         title: "Delete Attachment",
         message: "Are you sure you want to delete this attachment?",
         onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
           const isAuthor =
-            (address || "").toLowerCase() === (postAuthor || "").toLowerCase();
-          const ok = await deleteAttachment(attachmentId, "post", isAuthor);
+            loggedInAddress.toLowerCase() === (postAuthor || "").toLowerCase();
+          const ok = await stableDeleteAttachment(
+            attachmentId,
+            "post",
+            isAuthor
+          );
           if (ok) setItems((prev) => prev.filter((a) => a.id !== attachmentId));
         },
       },
@@ -69,9 +83,18 @@ export default function PostAttachments({
         title: "Archive Attachment",
         message: "Are you sure you want to archive this attachment?",
         onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
           const isAuthor =
-            (address || "").toLowerCase() === (postAuthor || "").toLowerCase();
-          const ok = await archiveAttachment(attachmentId, "post", isAuthor);
+            loggedInAddress.toLowerCase() === (postAuthor || "").toLowerCase();
+          const ok = await stableArchiveAttachment(
+            attachmentId,
+            "post",
+            isAuthor
+          );
           if (ok) setItems((prev) => prev.filter((a) => a.id !== attachmentId));
         },
       },

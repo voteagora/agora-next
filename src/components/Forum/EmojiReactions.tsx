@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { useForum } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
 import { SmilePlus } from "lucide-react";
+import useRequireLogin from "@/hooks/useRequireLogin";
+import { useStableCallback } from "@/hooks/useStableCallback";
 
 type AddressesByEmoji = Record<string, string[]>;
 
@@ -33,6 +35,11 @@ export default function EmojiReactions({
   const [open, setOpen] = React.useState(false);
   const [pending, setPending] = React.useState<Set<string>>(new Set());
   const { addReaction, removeReaction } = useForum();
+  const requireLogin = useRequireLogin();
+
+  // Create stable callbacks that always use the latest values
+  const stableAddReaction = useStableCallback(addReaction);
+  const stableRemoveReaction = useStableCallback(removeReaction);
 
   const mineSet = React.useMemo(() => {
     const me = (address || "").toLowerCase();
@@ -43,49 +50,67 @@ export default function EmojiReactions({
     return s;
   }, [byEmoji, address]);
 
-  const handleToggle = async (
-    emoji: string,
-    opts?: { closeOnAdd?: boolean }
-  ) => {
-    const me = (address || "").toLowerCase();
-    const currentlyMine = mineSet.has(emoji);
+  const handleToggle = React.useCallback(
+    async (emoji: string, opts?: { closeOnAdd?: boolean }) => {
+      const loggedInAddress = await requireLogin();
+      if (!loggedInAddress) {
+        return;
+      }
 
-    if (!address) {
+      const me = loggedInAddress.toLowerCase();
+      const currentlyMine = (byEmoji[emoji] || []).some(
+        (a) => a.toLowerCase() === me
+      );
+
+      setPending((p) => new Set(p).add(emoji));
+
+      // Optimistically update UI
+      let previousState: AddressesByEmoji;
+      setByEmoji((prevState) => {
+        previousState = prevState;
+        if (currentlyMine) {
+          const arr = (prevState[emoji] || []).filter(
+            (a) => a.toLowerCase() !== me
+          );
+          const next = { ...prevState } as AddressesByEmoji;
+          if (arr.length === 0) delete next[emoji];
+          else next[emoji] = arr;
+          return next;
+        } else {
+          const arr = prevState[emoji] ? [...prevState[emoji]] : [];
+          if (!arr.some((a) => a.toLowerCase() === me))
+            arr.push(loggedInAddress);
+          return { ...prevState, [emoji]: arr };
+        }
+      });
+
+      // Make API call with stable callbacks
       const ok = currentlyMine
-        ? await removeReaction(targetType, targetId, emoji)
-        : await addReaction(targetType, targetId, emoji);
-      if (ok && opts?.closeOnAdd && !currentlyMine) setOpen(false);
-      return;
-    }
+        ? await stableRemoveReaction(targetType, targetId, emoji)
+        : await stableAddReaction(targetType, targetId, emoji);
 
-    setPending((p) => new Set(p).add(emoji));
-    const prev = byEmoji;
-    if (currentlyMine) {
-      setByEmoji((prevState) => {
-        const arr = (prevState[emoji] || []).filter((a) => a !== me);
-        const next = { ...prevState } as AddressesByEmoji;
-        if (arr.length === 0) delete next[emoji];
-        else next[emoji] = arr;
-        return next;
+      // Revert on failure
+      if (!ok) {
+        setByEmoji(previousState!);
+      } else if (opts?.closeOnAdd && !currentlyMine) {
+        setOpen(false);
+      }
+
+      setPending((p) => {
+        const n = new Set(p);
+        n.delete(emoji);
+        return n;
       });
-      const ok = await removeReaction(targetType, targetId, emoji);
-      if (!ok) setByEmoji(prev);
-    } else {
-      setByEmoji((prevState) => {
-        const arr = prevState[emoji] ? [...prevState[emoji]] : [];
-        if (!arr.includes(me)) arr.push(me);
-        return { ...prevState, [emoji]: arr };
-      });
-      const ok = await addReaction(targetType, targetId, emoji);
-      if (!ok) setByEmoji(prev);
-      if (ok && opts?.closeOnAdd) setOpen(false);
-    }
-    setPending((p) => {
-      const n = new Set(p);
-      n.delete(emoji);
-      return n;
-    });
-  };
+    },
+    [
+      byEmoji,
+      requireLogin,
+      stableAddReaction,
+      stableRemoveReaction,
+      targetType,
+      targetId,
+    ]
+  );
 
   const hasReactions = Object.keys(byEmoji).length > 0;
 

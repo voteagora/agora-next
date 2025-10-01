@@ -11,6 +11,8 @@ import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
+import useRequireLogin from "@/hooks/useRequireLogin";
+import { useStableCallback } from "@/hooks/useStableCallback";
 
 // Custom up-down chevron icon (outline)
 const UpDownChevronIcon = ({ className }: { className?: string }) => (
@@ -47,6 +49,8 @@ const QuarterlyReportsSection = ({
   const { dunaCategoryId } = useDunaCategory();
   const { canCreateTopics } = useForumAdmin(dunaCategoryId || undefined);
   const openDialog = useOpenDialog();
+  const requireLogin = useRequireLogin();
+  const stableCreateTopic = useStableCallback(createTopic);
 
   const handleReportClick = (report: ForumTopic) => {
     openDialog({
@@ -76,7 +80,12 @@ const QuarterlyReportsSection = ({
     attachment?: File;
   }) => {
     try {
-      const newReport = await createTopic({
+      const loggedIn = await requireLogin();
+      if (!loggedIn) {
+        return;
+      }
+
+      const newReport = await stableCreateTopic({
         title: data.title,
         content: data.content,
         categoryId: dunaCategoryId!,

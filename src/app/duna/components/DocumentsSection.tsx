@@ -16,6 +16,8 @@ import {
 import { FileIcon } from "lucide-react";
 import Link from "next/link";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import useRequireLogin from "@/hooks/useRequireLogin";
+import { useStableCallback } from "@/hooks/useStableCallback";
 
 interface ForumDocument {
   id: number;
@@ -60,6 +62,9 @@ const DocumentsSection = ({
 
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
+  const requireLogin = useRequireLogin();
+  const stableDeleteAttachment = useStableCallback(deleteAttachment);
+  const stableArchiveAttachment = useStableCallback(archiveAttachment);
 
   const handleUploadComplete = async () => {
     const documentsData = await fetchDocuments();
@@ -84,11 +89,16 @@ const DocumentsSection = ({
         title: "Delete Attachment",
         message: "Are you sure you want to delete this attachment?",
         onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
           const isAuthor =
             documents
               .find((doc) => doc.id === attachmentId)
-              ?.uploadedBy?.toLowerCase() === address?.toLowerCase();
-          const success = await deleteAttachment(
+              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
+          const success = await stableDeleteAttachment(
             attachmentId,
             "category",
             isAuthor
@@ -114,11 +124,16 @@ const DocumentsSection = ({
         title: "Archive Attachment",
         message: "Are you sure you want to archive this attachment?",
         onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
           const isAuthor =
             documents
               .find((doc) => doc.id === attachmentId)
-              ?.uploadedBy?.toLowerCase() === address?.toLowerCase();
-          const success = await archiveAttachment(
+              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
+          const success = await stableArchiveAttachment(
             attachmentId,
             "category",
             isAuthor

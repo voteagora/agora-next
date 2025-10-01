@@ -28,7 +28,7 @@ import { ListOrdered, Quote } from "lucide-react";
 import Tenant from "@/lib/tenant/tenant";
 import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
 
 // Toolbar button component
@@ -159,10 +159,7 @@ export interface DunaEditorProps {
   className?: string;
   variant?: "post" | "comment";
   // For IPFS image uploads
-  targetType?: "post" | "category";
-  targetId?: number;
-  // For temporary uploads during composition
-  onImageUpload?: (file: File) => Promise<string>;
+  onImageUpload?: (file: File) => Promise<string | undefined>;
 }
 
 export default function DunaEditor({
@@ -174,22 +171,18 @@ export default function DunaEditor({
   disabled = false,
   className,
   variant = "post",
-  targetType = "post",
-  targetId,
   onImageUpload,
 }: DunaEditorProps) {
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [linkDialogUrl, setLinkDialogUrl] = useState("");
   const { ui } = Tenant.current();
   const { address, isConnected } = useAccount();
-  const { signMessageAsync } = useSignMessage();
 
   // Debug link dialog state
   useEffect(() => {
     console.log("Link dialog state:", { linkDialogOpen, linkDialogUrl });
   }, [linkDialogOpen, linkDialogUrl]);
   const [isMounted, setIsMounted] = useState(false);
-  const [forceUpdate, setForceUpdate] = useState(0);
 
   // Ensure we're on the client side
   useEffect(() => {
@@ -263,30 +256,11 @@ export default function DunaEditor({
     }
   }, [value, editor]);
 
-  // Listen for editor updates to force re-renders
-  useEffect(() => {
-    if (!editor) return;
-
-    const handleUpdate = () => {
-      setForceUpdate((prev) => prev + 1);
-    };
-
-    editor.on("update", handleUpdate);
-    editor.on("selectionUpdate", handleUpdate);
-
-    return () => {
-      editor.off("update", handleUpdate);
-      editor.off("selectionUpdate", handleUpdate);
-    };
-  }, [editor]);
-
   // Handle submit
   const handleSubmit = useCallback(() => {
     if (editor && onSubmit) {
       const html = editor.getHTML();
       const text = editor.getText();
-      console.log("DunaEditor handleSubmit - HTML:", html);
-      console.log("DunaEditor handleSubmit - Text:", text);
       onSubmit(html, text);
     }
   }, [editor, onSubmit]);
@@ -305,37 +279,30 @@ export default function DunaEditor({
   // Toolbar actions
   const toggleBold = useCallback(() => {
     editor?.chain().focus().toggleBold().run();
-    setForceUpdate((prev) => prev + 1);
   }, [editor]);
 
   const toggleItalic = useCallback(() => {
     editor?.chain().focus().toggleItalic().run();
-    setForceUpdate((prev) => prev + 1);
   }, [editor]);
 
   const toggleStrike = useCallback(() => {
     editor?.chain().focus().toggleStrike().run();
-    setForceUpdate((prev) => prev + 1);
   }, [editor]);
 
   const toggleCode = useCallback(() => {
     editor?.chain().focus().toggleCode().run();
-    setForceUpdate((prev) => prev + 1);
   }, [editor]);
 
   const toggleOrderedList = useCallback(() => {
     editor?.chain().focus().toggleOrderedList().run();
-    setForceUpdate((prev) => prev + 1);
   }, [editor]);
 
   const toggleBulletList = useCallback(() => {
     editor?.chain().focus().toggleBulletList().run();
-    setForceUpdate((prev) => prev + 1);
   }, [editor]);
 
   const toggleBlockquote = useCallback(() => {
     editor?.chain().focus().toggleBlockquote().run();
-    setForceUpdate((prev) => prev + 1);
   }, [editor]);
 
   const addImage = useCallback(async () => {
@@ -354,7 +321,7 @@ export default function DunaEditor({
         const loadingToast = toast.loading("Uploading image...");
 
         try {
-          let imageUrl: string;
+          let imageUrl;
 
           if (onImageUpload) {
             // Use custom upload handler (for new posts)
@@ -373,10 +340,11 @@ export default function DunaEditor({
 
             imageUrl = uploadResult.ipfsUrl;
           }
-
+          if (!imageUrl) {
+            throw new Error("Failed to upload image");
+          }
           // Insert URL into editor
           editor.chain().focus().setImage({ src: imageUrl }).run();
-          setForceUpdate((prev) => prev + 1);
           toast.dismiss(loadingToast);
           toast.success("Image uploaded successfully!");
         } catch (error) {
@@ -399,7 +367,6 @@ export default function DunaEditor({
     if (isLink) {
       // Remove link if already active
       editor.chain().focus().unsetLink().run();
-      setForceUpdate((prev) => prev + 1);
     } else {
       // Open link dialog
       const selectedText = editor.state.doc.textBetween(from, to);
@@ -431,7 +398,6 @@ export default function DunaEditor({
           .run();
         console.log("Inserted link as text");
       }
-      setForceUpdate((prev) => prev + 1);
     },
     [editor]
   );

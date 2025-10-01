@@ -751,6 +751,7 @@ const getForumDataUncached = async ({
       ...topic,
       upvotes: (topic as any).posts[0]?._count?.votes || 0,
       firstPost: (topic as any).posts[0],
+      postsCount: (topic as any)._count.posts,
     }));
 
     const processedCategories = categories.map((category) => ({

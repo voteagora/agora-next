@@ -6,11 +6,10 @@ import TopicHeader from "../components/TopicHeader";
 import PostAttachments from "../components/PostAttachments";
 import EmojiReactions from "@/components/Forum/EmojiReactions";
 import ForumThread from "../components/ForumThread";
-import { getForumTopic } from "@/lib/actions/forum";
+import { getForumCategories, getForumTopic } from "@/lib/actions/forum";
 import { truncateAddress } from "@/app/lib/utils/text";
 import ForumsSidebar from "../../ForumsSidebar";
-import ForumsSearch from "../../components/ForumsSearch";
-import NewTopicButton from "../../components/NewTopicButton";
+import ForumsHeader from "../../components/ForumsHeader";
 import {
   transformForumTopics,
   buildForumTopicPath,
@@ -137,9 +136,10 @@ export async function generateMetadata({
 }
 
 export default async function ForumTopicPage({ params }: PageProps) {
-  const [topicBundle, adminsResult] = await Promise.all([
+  const [topicBundle, adminsResult, categoriesResult] = await Promise.all([
     loadTopic(params.topic_id),
     getForumAdmins(),
+    getForumCategories(),
   ]);
   if (!topicBundle) {
     return notFound();
@@ -165,13 +165,6 @@ export default async function ForumTopicPage({ params }: PageProps) {
   const authorAddress = transformed.author || "";
   const createdAtIso = new Date(topicData.createdAt).toISOString();
   const categoryName = topicData.category?.name || null;
-  const rawCategoryDescription = topicData.category?.description;
-  const categoryDescription =
-    typeof rawCategoryDescription === "string" &&
-    rawCategoryDescription.trim().length > 0
-      ? rawCategoryDescription
-      : null;
-  const heading = categoryName || "Discussions";
 
   const adminRolesMap = adminsResult?.success
     ? adminsResult.data.reduce((map, admin) => {
@@ -213,24 +206,34 @@ export default async function ForumTopicPage({ params }: PageProps) {
   const topicReactionsByEmoji = topicData.topicReactionsByEmoji || {};
   const rootPostId = rootPost?.id ?? undefined;
   const categoryId = topicData.category?.id ?? null;
+  const breadcrumbs = [
+    { label: "Discussions", href: "/forums" },
+    ...(categoryName && categoryId
+      ? [{ label: categoryName, href: `/forums/category/${categoryId}` }]
+      : []),
+  ];
+
+  const categories = categoriesResult.success
+    ? categoriesResult.data.map((cat) => ({
+        id: cat.id,
+        name: cat.name,
+        description: cat.description,
+        archived: cat.archived,
+        adminOnlyTopics: cat.adminOnlyTopics,
+        createdAt: cat.createdAt.toISOString(),
+        updatedAt: cat.updatedAt.toISOString(),
+        topicsCount: cat.topicsCount,
+        isDuna: cat.isDuna,
+      }))
+    : [];
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="mt-6 max-w-7xl mx-auto px-6 sm:px-0">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold">{heading}</h1>
-            {categoryDescription && (
-              <p className="text-sm text-gray-500">{categoryDescription}</p>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <ForumsSearch className="max-w-xl" />
-            <NewTopicButton isDuna={categoryName === "DUNA"} />
-          </div>
-        </div>
-      </div>
-      <div className="max-w-7xl mx-auto px-6 sm:px-0 py-8">
+      <ForumsHeader
+        breadcrumbs={breadcrumbs}
+        isDuna={categoryName === "DUNA"}
+      />
+      <div className="max-w-7xl mx-auto px-6 sm:px-0">
         <div className="flex gap-8">
           {/* Main Content */}
           <div className="flex-1 max-w-4xl">
@@ -252,7 +255,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
               />
             )}
 
-            <div className="flex items-center gap-6 text-xs font-semibold text-tertiary border-b pb-2 items-baseline">
+            <div className="flex items-center gap-6 text-xs font-semibold text-tertiary border-b pb-2">
               {rootPostId && (
                 <div className="">
                   <EmojiReactions
@@ -285,7 +288,11 @@ export default async function ForumTopicPage({ params }: PageProps) {
           </div>
 
           {/* Sidebar */}
-          <ForumsSidebar selectedCategoryId={categoryId} />
+          <ForumsSidebar
+            categories={categories}
+            latestPost={topicData}
+            selectedCategoryId={categoryId}
+          />
         </div>
       </div>
     </div>

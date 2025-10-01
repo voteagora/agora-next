@@ -17,6 +17,8 @@ import {
 import { useForum } from "@/hooks/useForum";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import Tenant from "@/lib/tenant/tenant";
+import useRequireLogin from "@/hooks/useRequireLogin";
+import { useStableCallback } from "@/hooks/useStableCallback";
 
 interface DocumentUploadModalProps {
   isOpen: boolean;
@@ -104,6 +106,8 @@ export default function DocumentUploadModal({
   }, []);
 
   const { uploadDocument, error: forumError } = useForum();
+  const requireLogin = useRequireLogin();
+  const stableUploadDocument = useStableCallback(uploadDocument);
 
   useEffect(() => {
     if (forumError) {
@@ -119,6 +123,11 @@ export default function DocumentUploadModal({
     setError(null);
 
     try {
+      const loggedIn = await requireLogin();
+      if (!loggedIn) {
+        return;
+      }
+
       const progressInterval = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 90) return prev;
@@ -128,7 +137,7 @@ export default function DocumentUploadModal({
       }, 300);
 
       const attachmentData = await convertFileToAttachmentData(selectedFile);
-      const result = await uploadDocument(attachmentData, categoryId);
+      const result = await stableUploadDocument(attachmentData, categoryId);
 
       clearInterval(progressInterval);
 
@@ -163,7 +172,15 @@ export default function DocumentUploadModal({
     } finally {
       setIsUploading(false);
     }
-  }, [selectedFile, uploadDocument, onUploadComplete, onClose, categoryId]);
+  }, [
+    selectedFile,
+    stableUploadDocument,
+    onUploadComplete,
+    onClose,
+    categoryId,
+    requireLogin,
+    forumError,
+  ]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
