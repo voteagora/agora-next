@@ -35,7 +35,10 @@ const cachedGetDelegatesFromDaoNode = unstable_cache(
       delegator?: `0x${string}`;
     };
     withParticipation?: boolean;
-  }) => getDelegatesFromDaoNode(args),
+  }) => {
+    console.log("cachedGetDelegatesFromDaoNode called with:", args);
+    return getDelegatesFromDaoNode(args);
+  },
   ["delegates-dao-node-filters"],
   {
     revalidate: 30, // Cache for 30 seconds
