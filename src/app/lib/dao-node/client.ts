@@ -391,6 +391,11 @@ export const getDelegatesFromDaoNode = async (options?: {
         delegates: mappedDelegates,
         totalBeforeInternalPagination: totalBeforeInternalPagination,
       };
+    } else {
+      return {
+        delegates: [],
+        totalBeforeInternalPagination: 0,
+      };
     }
   } catch (error) {
     console.error("Error fetching delegates from DAO node:", error);
