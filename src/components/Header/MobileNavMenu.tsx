@@ -56,6 +56,9 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   const hasComingSoon =
     comingSoonToggle !== undefined && comingSoonToggle.enabled;
 
+  const grantsToggle = ui.toggle("grants");
+  const hasGrants = grantsToggle !== undefined && grantsToggle.enabled;
+
   // Format metrics
   const formattedMetrics = {
     votableSupply: formatNumber(votableSupply),
@@ -102,6 +105,16 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
             href: "/retropgf/3/summary",
             target: "_self",
             isActive: pathname.includes("retropgf/3/summary"),
+          },
+        ]
+      : []),
+    ...(hasGrants
+      ? [
+          {
+            name: "Grants",
+            href: "/grants",
+            target: "_self",
+            isActive: pathname.includes("grants"),
           },
         ]
       : []),
