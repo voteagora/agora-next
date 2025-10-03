@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { UpdatedButton } from "@/components/Button";
-import createProposalDraft from "./actions/createProposalDraft";
 import classNames from "classnames";
 import Tenant from "@/lib/tenant/tenant";
+import { useSignMessage } from "wagmi";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
@@ -17,6 +17,7 @@ const CreateProposalDraftButton = ({
   className?: string;
 }) => {
   const [isPending, setIsPending] = useState(false);
+  const messageSigner = useSignMessage();
   const [isClient, setIsClient] = useState(false);
   const { ui } = Tenant.current();
   const protocolLevelCreateProposalButtonCheck = (
@@ -61,8 +62,27 @@ const CreateProposalDraftButton = ({
       className={classNames(className)}
       onClick={async () => {
         setIsPending(true);
-        const proposal = await createProposalDraft(address);
-        const nextId = (proposal as any).uuid ?? proposal.id;
+        const messagePayload = {
+          action: "createDraft",
+          creatorAddress: address,
+          timestamp: new Date().toISOString(),
+        };
+        const message = JSON.stringify(messagePayload);
+        const signature = await messageSigner
+          .signMessageAsync({ message })
+          .catch(() => undefined);
+        if (!signature) {
+          setIsPending(false);
+          return;
+        }
+        const { default: createProposalDraft } = await import(
+          "./actions/createProposalDraft"
+        );
+        const proposal = await createProposalDraft(address, {
+          message,
+          signature,
+        });
+        const nextId = proposal.uuid;
         window.location.href = `/proposals/draft/${nextId}`;
       }}
     >

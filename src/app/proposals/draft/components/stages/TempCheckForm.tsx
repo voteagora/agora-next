@@ -10,7 +10,7 @@ import TextInput from "../form/TextInput";
 import { UpdatedButton } from "@/components/Button";
 import { schema as tempCheckSchema } from "../../schemas/tempCheckSchema";
 import { onSubmitAction as tempCheckAction } from "../../actions/createTempCheck";
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 import Image from "next/image";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
 import { DraftProposal } from "../../types";
@@ -19,6 +19,7 @@ import toast from "react-hot-toast";
 const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const router = useRouter();
   const { address } = useAccount();
+  const messageSigner = useSignMessage();
   const [isSkipPending, setIsSkipPending] = useState(false);
   const [isSubmitPending, setIsSubmitPending] = useState(false);
   const methods = useForm<z.output<typeof tempCheckSchema>>({
@@ -47,16 +48,32 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         toast.error("No address connected");
         return;
       }
+      const messagePayload = {
+        action: "tempCheck",
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+        timestamp: new Date().toISOString(),
+      };
+      const message = JSON.stringify(messagePayload);
+      const signature = await messageSigner
+        .signMessageAsync({ message })
+        .catch(() => undefined);
+      if (!signature) {
+        toast.error("Signature failed");
+        return;
+      }
       const res = await tempCheckAction({
         ...data,
         draftProposalId: draftProposal.id,
         creatorAddress: address,
+        message,
+        signature,
       });
       if (!res.ok) {
         toast.error(res.message);
         return;
       }
-      const nextId = draftProposal.uuid ?? draftProposal.id;
+      const nextId = draftProposal.uuid;
       router.push(`/proposals/draft/${nextId}?stage=${stageIndex + 1}`);
     } catch (e: any) {
       console.error("An error was uncaught in `tempCheckAction`: ", e);
