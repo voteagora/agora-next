@@ -726,50 +726,63 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       fetchCurrentQuorum(),
     ]);
 
-    const numOfAdvancedDelegationsQuery = `SELECT count(*) as num_of_delegators
-            FROM ${namespace + ".advanced_delegatees"}
-            WHERE "to"=$1 AND contract=$2 AND delegated_amount > 0`;
-    var numOfDirectDelegationsQuery;
+    // Consolidated single query to compute num_of_delegators using CASE logic.
+    // Handles PARTIAL (advanced) vs DIRECT models and ERC20 vs ERC721 token types in one round-trip.
+    const numOfDelegationsQuery = `
+      WITH latest_delegations AS (
+        SELECT DISTINCT ON (delegator)
+          delegator,
+          to_delegate,
+          address,
+          block_number,
+          transaction_index,
+          log_index
+        FROM ${namespace}.delegate_changed_events
+        WHERE address = $4
+        ORDER BY
+          delegator,
+          block_number DESC,
+          transaction_index DESC,
+          log_index DESC
+      ),
+      direct_count AS (
+        SELECT CASE
+          WHEN $3 = 'ERC20' THEN (
+            SELECT COALESCE(SUM(
+              (CASE WHEN to_delegate = $1 THEN 1 ELSE 0 END) -
+              (CASE WHEN from_delegate = $1 THEN 1 ELSE 0 END)
+            ), 0)::bigint
+            FROM ${namespace}.delegate_changed_events
+            WHERE (to_delegate = $1 OR from_delegate = $1) AND address = $4
+          )
+          WHEN $3 = 'ERC721' THEN (
+            SELECT COUNT(*)::bigint FROM latest_delegations WHERE to_delegate = LOWER($1)
+          )
+          ELSE 0::bigint
+        END AS value
+      ),
+      advanced_count AS (
+        SELECT COUNT(*)::bigint AS value
+        FROM ${namespace}.advanced_delegatees
+        WHERE "to" = $1 AND contract = $2 AND delegated_amount > 0
+      )
+      SELECT
+        CASE
+          WHEN $5 = 'PARTIAL' THEN (SELECT value FROM advanced_count)
+          ELSE (SELECT value FROM direct_count)
+        END AS num_of_delegators;
+    `;
 
-    if (contracts.token.isERC20()) {
-      numOfDirectDelegationsQuery = `        SELECT
-            SUM((CASE WHEN to_delegate=$1 THEN 1 ELSE 0 END) - (CASE WHEN from_delegate=$1 THEN 1 ELSE 0 END)) as num_of_delegators
-          FROM ${namespace + ".delegate_changed_events"}
-          WHERE (to_delegate=$1 OR from_delegate=$1) AND address=$2`;
-    } else if (contracts.token.isERC721()) {
-      numOfDirectDelegationsQuery = `with latest_delegations AS (
-                                              SELECT DISTINCT ON (delegator)
-                                                  delegator,
-                                                  to_delegate,
-                                                  chain_id,
-                                                  address,
-                                                  block_number,
-                                                  transaction_index,
-                                                  log_index
-                                              FROM
-                                                  ${namespace}.delegate_changed_events WHERE address = $2
-                                              ORDER BY
-                                                  delegator,
-                                                  block_number DESC,
-                                                  transaction_index DESC,
-                                                  log_index DESC)
-
-                                              SELECT count(*) as num_of_delegators from latest_delegations where to_delegate = LOWER($1);`;
-    } else {
-      throw new Error("Token contract is neither ERC20 nor ERC721?");
-    }
-
-    let numOfDelegationsQuery;
-
-    if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
-      numOfDelegationsQuery = numOfAdvancedDelegationsQuery;
-    } else {
-      numOfDelegationsQuery = numOfDirectDelegationsQuery;
-    }
-
-    const numOfDelegationsResult = prismaWeb3Client.$queryRawUnsafe<
-      { num_of_delegators: BigInt }[]
-    >(numOfDirectDelegationsQuery, address, contracts.token.address);
+    const numOfDelegationsResult = await prismaWeb3Client.$queryRawUnsafe<
+      { num_of_delegators: bigint }[]
+    >(
+      numOfDelegationsQuery,
+      address,
+      (contracts.alligator?.address || "").toLowerCase(),
+      contracts.token.isERC20() ? "ERC20" : "ERC721",
+      contracts.token.address.toLowerCase(),
+      contracts.delegationModel === DELEGATION_MODEL.PARTIAL ? "PARTIAL" : "DIRECT"
+    );
 
     const totalVotingPower =
       BigInt(delegate?.voting_power || 0) +
@@ -782,9 +795,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     const usedNumOfDelegators =
       cachedNumOfDelegators < 1000n
         ? BigInt(
-            (
-              await numOfDelegationsResult
-            )?.[0]?.num_of_delegators?.toString() || "0"
+            numOfDelegationsResult?.[0]?.num_of_delegators?.toString() || "0"
           )
         : cachedNumOfDelegators;
 
@@ -792,6 +803,10 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       totalVotingPower,
       BigInt(votableSupply)
     );
+    const relativeVotingPowerToQuorumStr =
+      quorum && quorum > 0n
+        ? calculateBigIntRatio(totalVotingPower, quorum)
+        : "0";
 
     // Sanitize statement payload to remove email if it exists
     let sanitizedStatement = delegate?.statement;
@@ -819,11 +834,11 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       },
       votingPowerRelativeToVotableSupply:
         votableSupply && BigInt(votableSupply) > 0n
-          ? Number(totalVotingPower / BigInt(votableSupply || 0))
+          ? Number(relativeVotingPowerToVotableSupply)
           : 0,
       votingPowerRelativeToQuorum:
         quorum && quorum > 0n
-          ? Number((totalVotingPower * 10000n) / quorum) / 10000
+          ? Number(relativeVotingPowerToQuorumStr)
           : 0,
       proposalsCreated: delegate?.proposals_proposed || 0n,
       proposalsVotedOn: delegate?.proposals_voted || 0n,
