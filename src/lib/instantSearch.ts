@@ -4,14 +4,11 @@ import { getForumIndexName } from "./search";
 const MEILISEARCH_HOST = process.env.NEXT_PUBLIC_MEILISEARCH_HOST;
 const MEILISEARCH_API_KEY = process.env.NEXT_PUBLIC_MEILISEARCH_CLIENT_API_KEY;
 
-if (!MEILISEARCH_HOST || !MEILISEARCH_API_KEY) {
-  throw new Error("Missing Meilisearch host or API key environment variables");
-}
+let searchClient: any;
+let setMeiliSearchParams: any = () => {};
 
-const { searchClient, setMeiliSearchParams } = instantMeiliSearch(
-  MEILISEARCH_HOST,
-  MEILISEARCH_API_KEY,
-  {
+if (MEILISEARCH_HOST && MEILISEARCH_API_KEY) {
+  const res = instantMeiliSearch(MEILISEARCH_HOST, MEILISEARCH_API_KEY, {
     primaryKey: "id",
     placeholderSearch: false,
     meiliSearchParams: {
@@ -29,8 +26,16 @@ const { searchClient, setMeiliSearchParams } = instantMeiliSearch(
       highlightPostTag: "</mark>",
       attributesToSearchOn: ["content"],
     },
-  }
-);
+  });
+  searchClient = res.searchClient;
+  setMeiliSearchParams = res.setMeiliSearchParams;
+} else {
+  // No-op client to avoid build-time failure when MeiliSearch is not configured
+  searchClient = {
+    search: async () => ({ results: [] }),
+  } as any;
+  setMeiliSearchParams = () => {};
+}
 
 export { searchClient, setMeiliSearchParams };
 
