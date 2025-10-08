@@ -8,16 +8,19 @@ const getClient = () => {
   const host = process.env.NEXT_PUBLIC_MEILISEARCH_HOST;
   const apiKey = process.env.MEILISEARCH_API_KEY;
 
-  if (!host) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_MEILISEARCH_HOST environment variable"
-    );
-  }
-
-  if (!apiKey) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_MEILISEARCH_API_KEY environment variable"
-    );
+  if (!host || !apiKey) {
+    // Return a no-op client to avoid build-time crashes when search is not configured
+    const noop: any = {
+      index: () => ({
+        search: async () => ({ hits: [], query: "", processingTimeMs: 0 }),
+        deleteAllDocuments: async () => ({}),
+        addDocuments: async () => ({}),
+        updateSettings: async () => ({}),
+      }),
+      createIndex: async () => ({}),
+    };
+    cachedClient = noop as unknown as MeiliSearch;
+    return cachedClient;
   }
 
   cachedClient = new MeiliSearch({ host, apiKey });
@@ -76,6 +79,9 @@ export class ForumSearchService {
 
   async initializeIndex(daoSlug: string): Promise<void> {
     try {
+      const host = process.env.NEXT_PUBLIC_MEILISEARCH_HOST;
+      const apiKey = process.env.MEILISEARCH_API_KEY;
+      if (!host || !apiKey) return; // skip when not configured
       const client = getClient();
       const indexName = getForumIndexName(daoSlug);
 
@@ -166,6 +172,54 @@ export class ForumSearchService {
     } catch (error) {
       console.error(`Error deleting document ${id}:`, error);
       throw error;
+    }
+  }
+
+  async search(
+    daoSlug: string,
+    query: string,
+    { limit = 5, page = 1 }: { limit?: number; page?: number } = {}
+  ): Promise<SearchResult<ForumDocument>> {
+    try {
+      const index = this.getIndex(daoSlug);
+      const res = await index.search<ForumDocument>(query, {
+        limit,
+        page,
+      } as any);
+      return {
+        hits: res.hits as ForumDocument[],
+        query: res.query,
+        processingTimeMs: res.processingTimeMs,
+        hitsPerPage: (res as any).hitsPerPage ?? (res as any).limit ?? limit,
+        page: (res as any).page ?? page,
+        totalPages:
+          (res as any).totalPages ??
+          Math.max(
+            1,
+            Math.ceil(
+              ((res as any).totalHits ??
+                (res as any).estimatedTotalHits ??
+                res.hits?.length ??
+                0) /
+                ((res as any).hitsPerPage ?? (res as any).limit ?? limit) || 1
+            )
+          ),
+        totalHits:
+          (res as any).totalHits ??
+          (res as any).estimatedTotalHits ??
+          (res.hits?.length || 0),
+      };
+    } catch (error) {
+      // Fallback if search is not configured
+      return {
+        hits: [],
+        query,
+        processingTimeMs: 0,
+        hitsPerPage: limit,
+        page,
+        totalPages: 0,
+        totalHits: 0,
+      };
     }
   }
 }

@@ -54,14 +54,7 @@ export function Drawer({
     window.addEventListener("popstate", handlePopState);
     return () => {
       window.removeEventListener("popstate", handlePopState);
-      if (pushedHistoryRef.current && window.history.state?.__drawer) {
-        pushedHistoryRef.current = false;
-        try {
-          window.history.back();
-        } catch (_) {}
-      } else {
-        pushedHistoryRef.current = false;
-      }
+      pushedHistoryRef.current = false;
     };
   }, [isOpen, onClose, useHistoryBack]);
   const positionVariants = {
@@ -82,6 +75,17 @@ export function Drawer({
     },
   };
   const effectivePosition = position || side;
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Move focus inside the drawer so FAB doesn't capture keyboard events
+      const id = window.setTimeout(() => {
+        containerRef.current?.focus();
+      }, 0);
+      return () => window.clearTimeout(id);
+    }
+  }, [isOpen]);
 
   const content = (
     <AnimatePresence>
@@ -111,25 +115,28 @@ export function Drawer({
                 "inset-x-0 bottom-0 rounded-t-xl border-t",
               className
             )}
+            ref={containerRef}
             onKeyDown={(e) => {
               if (e.key === "Escape") onClose();
+              else e.stopPropagation();
             }}
             role="dialog"
             aria-modal="true"
+            tabIndex={-1}
           >
             {title && (
-              <div className="p-4 border-b border-line">
+              <div className="p-4 border-b border-line flex items-center justify-between">
                 <h2 className="text-primary font-semibold">{title}</h2>
+                {showCloseButton && (
+                  <button
+                    onClick={onClose}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-neutral"
+                    aria-label="Close"
+                  >
+                    <X className="h-5 w-5 text-primary" />
+                  </button>
+                )}
               </div>
-            )}
-            {showCloseButton && (
-              <button
-                onClick={onClose}
-                className="absolute top-3 right-3 inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-neutral"
-                aria-label="Close"
-              >
-                <X className="h-5 w-5 text-primary" />
-              </button>
             )}
             <div className="flex-1 overflow-auto">{children}</div>
           </motion.div>

@@ -7,6 +7,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { fontMapper, inter } from "@/styles/fonts";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import dynamic from "next/dynamic";
 
 declare global {
   interface BigInt {
@@ -159,6 +160,15 @@ export default async function RootLayout({
             {children}
           </div>
           <DAOMetricsHeader />
+          {/** Dynamic import to avoid SSR issues for client-only FAB */}
+          {/** eslint-disable-next-line @typescript-eslint/no-var-requires */}
+          {(() => {
+            const ChatLauncher = dynamic(
+              () => import("@/components/GovernanceChat/ChatLauncher"),
+              { ssr: false }
+            );
+            return <ChatLauncher />;
+          })()}
         </ClientLayout>
       </NuqsAdapter>
       {ui.googleAnalytics && <GoogleAnalytics gaId={ui.googleAnalytics} />}
