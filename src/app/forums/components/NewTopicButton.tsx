@@ -21,7 +21,7 @@ export default function NewTopicButton({ isDuna }: { isDuna: boolean }) {
     <>
       <Button
         onClick={handleClick}
-        className="inline-flex h-9 px-4 py-2 items-center justify-center gap-2 shrink-0 rounded-md bg-primary text-white shadow-sm hover:bg-neutral-800 text-sm h-auto"
+        className="inline-flex h-9 px-4 py-2 items-center justify-center gap-2 shrink-0 rounded-md bg-buttonBackground shadow-sm hover:bg-hoverBackground text-sm h-auto"
       >
         {isDuna ? "+ Discuss DUNA" : "+ New Topic"}
       </Button>

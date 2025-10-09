@@ -245,7 +245,7 @@ const CommentItem = ({
                 />
               )}
             </div>
-            <span className="text-xs text-gray-500 self-center">
+            <span className="text-xs text-tertiary self-center">
               {formatRelative(comment.createdAt)}
             </span>
             {canDelete && (
@@ -314,7 +314,7 @@ const CommentItem = ({
               key={reply.id}
               className={cn(
                 "pl-3",
-                forForums ? "" : "border-l-2 border-gray-200"
+                forForums ? "" : "border-l-2 border-line"
               )}
             >
               <CommentItem
@@ -350,7 +350,7 @@ const CommentItem = ({
       )}
 
       {isThisCommentBeingRepliedTo && (
-        <div className="mt-3 ml-8 sm:ml-12 p-3 bg-gray-50 rounded-lg border border-line">
+        <div className="mt-3 ml-8 sm:ml-12 p-3 bg-wash rounded-lg border border-line">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xs text-secondary">
               Replying to this comment

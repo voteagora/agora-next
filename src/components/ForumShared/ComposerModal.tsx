@@ -170,7 +170,7 @@ export default function ComposerModal({
               {({ show }) => (
                 <Button
                   onClick={() => show?.()}
-                  className="text-white border border-black hover:bg-gray-800 text-sm"
+                  className="text-primary border border-line hover:bg-hoverBackground text-sm bg-neutral"
                   style={{
                     display: "flex",
                     height: "36px",
@@ -180,7 +180,6 @@ export default function ComposerModal({
                     gap: "8px",
                     flexShrink: 0,
                     borderRadius: "8px",
-                    background: "#171717",
                     boxShadow:
                       "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
                   }}
@@ -205,8 +204,7 @@ export default function ComposerModal({
                   id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md bg-white text-primary focus:outline-none focus:ring-1 focus:ring-gray-200"
-                  style={{ borderColor: "#E5E5E5" }}
+                  className="w-full px-3 py-2 border border-cardBorder rounded-md bg-cardBackground text-primary focus:outline-none focus:ring-1 focus:ring-line"
                   placeholder="Enter title..."
                   required={titleRequired}
                   disabled={isSubmitting}
@@ -227,8 +225,7 @@ export default function ComposerModal({
                   onChange={(e) =>
                     setCategoryId(e.target.value ? Number(e.target.value) : "")
                   }
-                  className="w-full px-3 py-2 border rounded-md bg-white text-primary focus:outline-none focus:ring-1 focus:ring-gray-200"
-                  style={{ borderColor: "#E5E5E5" }}
+                  className="w-full px-3 py-2 border border-cardBorder rounded-md bg-cardBackground text-primary focus:outline-none focus:ring-1 focus:ring-line"
                   disabled={isSubmitting}
                 >
                   <option value="">No category</option>
@@ -264,7 +261,7 @@ export default function ComposerModal({
               >
                 Attach Document (Optional)
               </label>
-              <p className="text-xs text-gray-500 mb-2">
+              <p className="text-xs text-tertiary mb-2">
                 Use the image button in the editor toolbar to add images inline.
                 Documents will be attached as downloads.
               </p>
@@ -319,7 +316,7 @@ export default function ComposerModal({
               </Button>
               <Button
                 type="submit"
-                className="text-white border border-black hover:bg-gray-800 text-sm"
+                className="text-primary border border-line hover:bg-hoverBackground text-sm bg-buttonBackground"
                 style={{
                   display: "flex",
                   height: "36px",
@@ -329,7 +326,6 @@ export default function ComposerModal({
                   gap: "8px",
                   flexShrink: 0,
                   borderRadius: "8px",
-                  background: "#171717",
                   boxShadow:
                     "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
                 }}

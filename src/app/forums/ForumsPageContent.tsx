@@ -66,7 +66,7 @@ export default async function ForumsPageContent({
           <div className="space-y-3">
             {sortedTopics.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-500">No topics found</p>
+                <p className="text-tertiary">No topics found</p>
               </div>
             ) : (
               sortedTopics.map((topic: any) => {
@@ -106,10 +106,10 @@ export default async function ForumsPageContent({
                       <div className="flex-1 min-w-0">
                         {/* Title + Meta */}
                         <div className="flex items-center justify-between gap-3">
-                          <h3 className="text-base font-semibold text-black truncate group-hover:underline">
+                          <h3 className="text-base font-semibold text-primary truncate group-hover:underline">
                             {topic.title}
                           </h3>
-                          <div className="flex items-center gap-4 text-xs font-semibold text-[#6a6a6a]">
+                          <div className="flex items-center gap-4 text-xs font-semibold text-secondary">
                             {/* Replies */}
                             <div className="inline-flex items-center gap-1.5">
                               <MessageCircle
@@ -131,7 +131,7 @@ export default async function ForumsPageContent({
 
                         {/* Excerpt */}
                         {excerpt && (
-                          <p className="mt-1 text-neutral-700 text-sm leading-relaxed line-clamp-1 overflow-hidden max-w-full md:max-w-[556px] break-words">
+                          <p className="mt-1 text-secondary text-sm leading-relaxed line-clamp-1 overflow-hidden max-w-full md:max-w-[556px] break-words">
                             {excerpt}
                           </p>
                         )}
@@ -139,7 +139,7 @@ export default async function ForumsPageContent({
 
                       {/* Right compact stat (upvotes) */}
                       <div
-                        className="flex flex-col items-center justify-center text-neutral-700 py-1 px-2 rounded-md min-w-[52px]"
+                        className="flex flex-col items-center justify-center text-secondary py-1 px-2 rounded-md min-w-[52px]"
                         aria-label={`${upvotes} upvotes`}
                       >
                         <ChevronUp className="w-4 h-4" strokeWidth={1.7} />
