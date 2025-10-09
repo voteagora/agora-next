@@ -197,6 +197,7 @@ export const ogTenantUIConfig = new TenantUI({
     { name: "proposal-lifecycle", enabled: false },
     { name: "use-daonode-for-proposals", enabled: false },
     { name: "use-daonode-for-votable-supply", enabled: false },
+    { name: "forums", enabled: false },
     { name: "use-daonode-for-proposal-types", enabled: false },
     { name: "duna", enabled: true },
     { name: "coming-soon", enabled: true },
