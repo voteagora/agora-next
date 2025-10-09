@@ -223,12 +223,11 @@ export default async function ForumTopicPage({ params }: PageProps) {
         createdAt: cat.createdAt.toISOString(),
         updatedAt: cat.updatedAt.toISOString(),
         topicsCount: cat.topicsCount,
-        isDuna: cat.isDuna,
       }))
     : [];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-neutral">
       <ForumsHeader
         breadcrumbs={breadcrumbs}
         isDuna={categoryName === "DUNA"}
@@ -242,7 +241,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
             <div className="mt-2 mb-4">
               <DunaContentRenderer
                 content={topicBody}
-                className="text-gray-700 text-sm leading-relaxed"
+                className="text-secondary text-sm leading-relaxed"
               />
             </div>
 

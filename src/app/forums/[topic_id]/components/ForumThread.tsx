@@ -175,7 +175,7 @@ export default function ForumThread({
             disabled={
               !rootContent.replace(/<[^>]*>/g, "").trim() || postingRoot
             }
-            className="bg-black hover:bg-gray-800 text-white px-6 py-2 rounded-md text-sm"
+            className="bg-buttonBackground hover:bg-hoverBackground text-primary px-6 py-2 rounded-md text-sm"
           >
             {postingRoot ? "Posting..." : "Comment"}
           </Button>

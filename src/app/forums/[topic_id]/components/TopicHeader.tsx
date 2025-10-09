@@ -46,7 +46,7 @@ export default function TopicHeader({
             >
               <ENSAvatar ensName={topic.address} size={20} />
               <div className="flex items-center gap-1">
-                <span className="font-medium text-sm hover:underline">
+                <span className="font-medium text-sm text-primary hover:underline">
                   {displayName}
                 </span>
                 {isAdmin && (
@@ -71,7 +71,7 @@ export default function TopicHeader({
               </div>
             </div>
           )}
-          <div className="text-xs text-gray-500 self-center">
+          <div className="text-xs text-tertiary self-center">
             {formatRelative(topic.createdAt)}
           </div>
         </div>
@@ -80,7 +80,7 @@ export default function TopicHeader({
         </div>
       </div>
 
-      <h1 className="text-xl font-semibold text-gray-900">{topic.title}</h1>
+      <h1 className="text-xl font-semibold text-primary">{topic.title}</h1>
     </div>
   );
 }
