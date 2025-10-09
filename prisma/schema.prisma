@@ -4628,6 +4628,7 @@ enum DaoSlug {
   LINEA
   TOWNS
   SYNDICATE
+  ZEROG
   @@map("dao_slug")
   @@schema("config")
 }
