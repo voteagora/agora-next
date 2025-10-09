@@ -17,6 +17,12 @@ export const Chivo_Mono = () => ({
   variable: "--mock-chivo-mono",
 });
 
+export const FamiljenGrotesk = () => ({
+  style: { fontFamily: "FamiljenGrotesk" },
+  className: "mock-familjen-grotesk",
+  variable: "--mock-familjen-grotesk",
+});
+
 // Mock for next/font/local (default export)
 export default () => ({
   style: { fontFamily: "MockFont" },
