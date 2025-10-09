@@ -8,4 +8,7 @@ export const mockFonts = {
   Chivo_Mono: () => ({
     style: { fontFamily: "ChivoMono" },
   }),
+  Familjen_Grotesk: () => ({
+    style: { fontFamily: "FamiljenGrotesk" },
+  }),
 };
