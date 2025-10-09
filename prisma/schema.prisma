@@ -6073,6 +6073,7 @@ enum DaoSlug {
   LINEA
   TOWNS
   SYNDICATE
+  ZEROG
   @@map("dao_slug")
   DEMO2
   DEMO4

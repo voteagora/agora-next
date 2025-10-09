@@ -1,6 +1,7 @@
 import localFont from "next/font/local";
 import { NextFontWithVariable } from "next/dist/compiled/@next/font";
 
+
 export const inter = localFont({
   src: [
     {
@@ -77,8 +78,21 @@ export const chivoMono = localFont({
   display: "swap",
 });
 
+export const familjenGrotesk = localFont({
+  src: [
+    {
+      path: "../../public/fonts/FamiljenGrotesk-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+  ],
+  variable: "--font-familjen-grotesk",
+  display: "swap",
+});
+
 export const fontMapper = {
   "font-inter": inter,
   "font-rajdhani": rajdhani,
   "font-chivoMono": chivoMono,
+  "font-familjen-grotesk": familjenGrotesk,
 } as Record<string, NextFontWithVariable>;
