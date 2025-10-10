@@ -10,6 +10,7 @@ import GovernanceCharts from "@/app/info/components/GovernanceCharts";
 import DunaAdministration from "@/app/duna/components/DunaAdministration";
 import DunaDisclosures from "@/app/duna/components/DunaDisclosures";
 import SyndicateDunaDisclosures from "@/app/duna/components/SyndicateDunaDisclosures";
+import SyndicateDunaAdministration from "@/app/duna/components/SyndicateDunaAdministration";
 import TownsDunaAdministration from "@/app/duna/components/TownsDunaAdministration";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
@@ -77,6 +78,8 @@ export default async function Page() {
         {hasDunaAdministration &&
         ui.toggle("towns-duna-administration")?.enabled ? (
           <TownsDunaAdministration />
+        ) : namespace === "syndicate" ? (
+          <SyndicateDunaAdministration />
         ) : (
           hasDunaAdministration && <DunaAdministration />
         )}
