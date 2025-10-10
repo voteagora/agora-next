@@ -255,7 +255,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "forums",
-      enabled: false, // HOT FIX: Disabled due to Pinata issues
+      enabled: false,
     },
     {
       name: "coming-soon",

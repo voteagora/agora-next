@@ -300,5 +300,9 @@ For a full walkthrough of the proposal process, check out the [ENS DAO docs](htt
       name: "show-participation",
       enabled: true,
     },
+    {
+      name: "forums",
+      enabled: false,
+    },
   ],
 });

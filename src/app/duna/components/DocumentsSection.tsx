@@ -305,21 +305,15 @@ const DocumentsSection = ({
       <p className="text-md text-primary font-semibold ">
         Official DUNA Communications
       </p>
-      <p className="text-sm text-primary">
-        Want to talk about official items for the DUNA or discover discussions
-        on it? Please head to the{" "}
-        {/* HOT FIX: Disable forum link for towns since forums are disabled */}
-        {namespace === "towns" ? (
-          <span className="underline">DUNA forum (coming soon)</span>
-        ) : (
-          <Link
-            href={buildForumCategoryPath(dunaCategoryId!, "DUNA")}
-            className="underline"
-          >
-            DUNA forum.
-          </Link>
-        )}
-      </p>
+      <div className="text-center py-8">
+        <p
+          className={`text-sm opacity-75 ${
+            useDarkStyling ? "text-white" : "text-secondary"
+          }`}
+        >
+          Coming soon.
+        </p>
+      </div>
     </div>
   );
 };

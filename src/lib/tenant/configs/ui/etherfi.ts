@@ -165,5 +165,9 @@ export const etherfiTenantUIConfig = new TenantUI({
       name: "show-participation",
       enabled: false,
     },
+    {
+      name: "forums",
+      enabled: false,
+    },
   ],
 });
