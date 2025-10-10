@@ -175,7 +175,7 @@ export async function getForumTopic(topicId: number) {
         contentType: att.contentType,
         fileSize: Number(att.fileSize ?? 0),
         ipfsCid: att.ipfsCid,
-        url: getIPFSUrl(att.ipfsCid, "https://ipfs.io/ipfs/"),
+        url: getIPFSUrl(att.ipfsCid, "https://ipfs.io"),
         createdAt: (att.createdAt instanceof Date
           ? att.createdAt
           : new Date(att.createdAt)
