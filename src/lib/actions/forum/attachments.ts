@@ -47,7 +47,7 @@ export async function getForumAttachments() {
       data: attachments.map((attachment: any) => ({
         id: attachment.id,
         name: attachment.fileName,
-        url: getIPFSUrl(attachment.ipfsCid),
+        url: getIPFSUrl(attachment.ipfsCid, "https://bronze-abundant-swift-398.mypinata.cloud"),
         ipfsCid: attachment.ipfsCid,
         createdAt: attachment.createdAt.toISOString(),
         uploadedBy: attachment.address,
@@ -281,7 +281,7 @@ export const getForumCategoryAttachments = async ({
       data: attachments.map((attachment) => ({
         id: attachment.id,
         name: attachment.fileName,
-        url: getIPFSUrl(attachment.ipfsCid),
+        url: getIPFSUrl(attachment.ipfsCid, "https://bronze-abundant-swift-398.mypinata.cloud"),
         ipfsCid: attachment.ipfsCid,
         createdAt: attachment.createdAt.toISOString(),
         uploadedBy: attachment.address,
