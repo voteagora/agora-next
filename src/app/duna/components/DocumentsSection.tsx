@@ -294,16 +294,15 @@ const DocumentsSection = ({
       <p className="text-md text-primary font-semibold ">
         Official DUNA Communications
       </p>
-      <p className="text-sm text-primary">
-        Want to talk about official items for the DUNA or discover discussions
-        on it? Please head to the{" "}
-        <Link
-          href={buildForumCategoryPath(dunaCategoryId!, "DUNA")}
-          className="underline"
+      <div className="text-center py-8">
+        <p
+          className={`text-sm opacity-75 ${
+            useDarkStyling ? "text-white" : "text-secondary"
+          }`}
         >
-          DUNA forum.
-        </Link>
-      </p>
+          Coming soon.
+        </p>
+      </div>
     </div>
   );
 };
