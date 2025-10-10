@@ -3,14 +3,51 @@ import { Card, CardContent } from "@/components/ui/card";
 import DocumentsSection from "./DocumentsSection";
 import {
   getForumTopics,
-  getForumAttachments,
+  // getForumAttachments, // Commented out for hot fix - forums disabled for towns
   getDunaCategoryId,
 } from "@/lib/actions/forum";
 import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 
 const TownsDunaAdministration = async () => {
   let dunaReports: ForumTopic[] = [];
-  let documents: any[] = [];
+  // let documents: any[] = []; // Commented out - replaced with static documents below
+
+  // HOT FIX: Static documents for Towns Lodge - bypassing Pinata issues
+  // TODO: Remove this hot fix when forums are re-enabled for towns
+  const documents = [
+    {
+      id: 1,
+      name: "Towns Lodge - Purpose.pdf",
+      url: "/documents/towns/Towns Lodge - Purpose.pdf",
+      ipfsCid: "static-file",
+      createdAt: new Date().toISOString(),
+      uploadedBy: "system",
+    },
+    {
+      id: 2,
+      name: "Towns Lodge - Association Agreement.pdf",
+      url: "/documents/towns/Towns Lodge - Association Agreement.pdf",
+      ipfsCid: "static-file",
+      createdAt: new Date().toISOString(),
+      uploadedBy: "system",
+    },
+    {
+      id: 3,
+      name: "Towns Lodge - Redacted EIN.pdf",
+      url: "/documents/towns/Towns Lodge - Redacted EIN.pdf",
+      ipfsCid: "static-file",
+      createdAt: new Date().toISOString(),
+      uploadedBy: "system",
+    },
+    {
+      id: 4,
+      name: "Towns Lodge - Existing Authorizations of Authority.pdf",
+      url: "/documents/towns/Towns Lodge - Existing Authorizations of Authority.pdf",
+      ipfsCid: "static-file",
+      createdAt: new Date().toISOString(),
+      uploadedBy: "system",
+    },
+  ];
 
   try {
     const dunaCategoryId = await getDunaCategoryId();
@@ -25,19 +62,20 @@ const TownsDunaAdministration = async () => {
       );
     }
 
-    const [topicsResult, documentsResult] = await Promise.all([
-      getForumTopics({ categoryId: dunaCategoryId }),
-      getForumAttachments(),
-    ]);
+    const topicsResult = await getForumTopics({ categoryId: dunaCategoryId });
+    // const [topicsResult, documentsResult] = await Promise.all([
+    //   getForumTopics({ categoryId: dunaCategoryId }),
+    //   getForumAttachments(), // Commented out for hot fix - forums disabled for towns
+    // ]);
 
     if (topicsResult.success) {
       dunaReports = transformForumTopics(topicsResult.data, {
         mergePostAttachments: true,
       });
     }
-    if (documentsResult.success) {
-      documents = documentsResult.data;
-    }
+    // if (documentsResult.success) {
+    //   documents = documentsResult.data; // Commented out - using static documents instead
+    // }
   } catch (error) {
     console.error("Error fetching forum data:", error);
   }

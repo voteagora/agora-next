@@ -60,11 +60,16 @@ const DocumentsSection = ({
     dunaCategoryId || undefined
   );
 
-  const { ui } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
   const requireLogin = useRequireLogin();
   const stableDeleteAttachment = useStableCallback(deleteAttachment);
   const stableArchiveAttachment = useStableCallback(archiveAttachment);
+
+  // HOT FIX: Check if this is a static file (bypassing Pinata issues for towns)
+  // TODO: Remove this hot fix when forums are re-enabled for towns
+  const isStaticFile = (document: ForumDocument) =>
+    document.ipfsCid === "static-file";
 
   const handleUploadComplete = async () => {
     const documentsData = await fetchDocuments();
@@ -159,7 +164,8 @@ const DocumentsSection = ({
           >
             Documents
           </h3>
-          {!!address && canManageAttachments && (
+          {/* HOT FIX: Disable upload for towns since forums are disabled */}
+          {!!address && canManageAttachments && namespace !== "towns" && (
             <Button
               onClick={() => setIsUploadModalOpen(true)}
               className={`${
@@ -203,18 +209,23 @@ const DocumentsSection = ({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {documents.map((document, index) => {
-            const canArchive = canArchiveContent(
-              address || "",
-              document.uploadedBy || "",
-              isAdmin,
-              canManageAttachments
-            );
-            const canDelete = canDeleteContent(
-              address || "",
-              document.uploadedBy || "",
-              isAdmin,
-              canManageAttachments
-            );
+            // HOT FIX: Disable actions for static files (towns hot fix)
+            const canArchive =
+              !isStaticFile(document) &&
+              canArchiveContent(
+                address || "",
+                document.uploadedBy || "",
+                isAdmin,
+                canManageAttachments
+              );
+            const canDelete =
+              !isStaticFile(document) &&
+              canDeleteContent(
+                address || "",
+                document.uploadedBy || "",
+                isAdmin,
+                canManageAttachments
+              );
 
             return (
               <div
@@ -297,12 +308,17 @@ const DocumentsSection = ({
       <p className="text-sm text-primary">
         Want to talk about official items for the DUNA or discover discussions
         on it? Please head to the{" "}
-        <Link
-          href={buildForumCategoryPath(dunaCategoryId!, "DUNA")}
-          className="underline"
-        >
-          DUNA forum.
-        </Link>
+        {/* HOT FIX: Disable forum link for towns since forums are disabled */}
+        {namespace === "towns" ? (
+          <span className="underline">DUNA forum (coming soon)</span>
+        ) : (
+          <Link
+            href={buildForumCategoryPath(dunaCategoryId!, "DUNA")}
+            className="underline"
+          >
+            DUNA forum.
+          </Link>
+        )}
       </p>
     </div>
   );
