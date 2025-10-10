@@ -255,7 +255,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "forums",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "coming-soon",
