@@ -631,7 +631,7 @@ export async function getForumPostsByUser(
         contentType: att.contentType,
         fileSize: Number(att.fileSize ?? 0),
         ipfsCid: att.ipfsCid,
-        url: getIPFSUrl(att.ipfsCid),
+        url: getIPFSUrl(att.ipfsCid, "https://ipfs.io/ipfs/"),
         createdAt: (att.createdAt instanceof Date
           ? att.createdAt
           : new Date(att.createdAt)
