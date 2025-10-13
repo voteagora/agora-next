@@ -197,7 +197,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
     adminRole: authorRole,
   };
 
-  const rootPost = comments[0];
+  const rootPost = topicData.posts?.[0];
   const rootAttachments = (rootPost?.attachments as any[]) || [];
 
   const lastActivityAt =

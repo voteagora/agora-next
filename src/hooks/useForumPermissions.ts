@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 import useConnectedDelegate from "./useConnectedDelegate";
 import Tenant from "@/lib/tenant/tenant";
+import { checkForumPermissions } from "@/lib/actions/forum/admin";
 
 interface ForumSettings {
   minVpForTopics: number;
@@ -17,6 +18,7 @@ interface ForumPermissions {
   currentVP: string;
   settings: ForumSettings | null;
   isLoading: boolean;
+  isAdmin: boolean;
   reasons: {
     topics?: string;
     posts?: string;
@@ -26,6 +28,7 @@ interface ForumPermissions {
 
 /**
  * Hook to check if the connected user has sufficient voting power for forum actions
+ * Admins (admin, duna_admin, super_admin) bypass all VP requirements
  * Uses client-side checks to provide immediate feedback before server validation
  */
 export function useForumPermissions(): ForumPermissions {
@@ -50,7 +53,16 @@ export function useForumPermissions(): ForumPermissions {
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
-  const isLoading = delegateLoading || settingsLoading;
+  // Check if user is a forum admin
+  const { data: adminCheck, isLoading: adminLoading } = useQuery({
+    queryKey: ["forumAdmin", address],
+    queryFn: () => checkForumPermissions(address || ""),
+    enabled: !!address,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  const isLoading = delegateLoading || settingsLoading || adminLoading;
+  const isAdmin = adminCheck?.isAdmin || false;
 
   // If not connected or loading, return default permissions
   if (!address || isLoading || !delegate || !settings) {
@@ -62,29 +74,34 @@ export function useForumPermissions(): ForumPermissions {
       currentVP: "0",
       settings: settings || null,
       isLoading,
+      isAdmin: false,
       reasons: {},
     };
   }
 
   const currentVP = parseInt(delegate.votingPower.total || "0");
 
-  const canCreateTopic = currentVP >= settings.minVpForTopics;
-  const canCreatePost = currentVP >= settings.minVpForReplies;
-  const canUpvote = currentVP >= settings.minVpForActions;
-  const canReact = currentVP >= settings.minVpForActions;
+  // Admins bypass all VP requirements
+  const canCreateTopic = isAdmin || currentVP >= settings.minVpForTopics;
+  const canCreatePost = isAdmin || currentVP >= settings.minVpForReplies;
+  const canUpvote = isAdmin || currentVP >= settings.minVpForActions;
+  const canReact = isAdmin || currentVP >= settings.minVpForActions;
 
   const reasons: ForumPermissions["reasons"] = {};
 
-  if (!canCreateTopic) {
-    reasons.topics = `You need ${settings.minVpForTopics} voting power to create topics. You currently have ${currentVP}.`;
-  }
+  // Only show VP reasons for non-admins
+  if (!isAdmin) {
+    if (!canCreateTopic) {
+      reasons.topics = `You need ${settings.minVpForTopics} voting power to create topics. You currently have ${currentVP}.`;
+    }
 
-  if (!canCreatePost) {
-    reasons.posts = `You need ${settings.minVpForReplies} voting power to post replies. You currently have ${currentVP}.`;
-  }
+    if (!canCreatePost) {
+      reasons.posts = `You need ${settings.minVpForReplies} voting power to post replies. You currently have ${currentVP}.`;
+    }
 
-  if (!canUpvote || !canReact) {
-    reasons.actions = `You need ${settings.minVpForActions} voting power to upvote and react. You currently have ${currentVP}.`;
+    if (!canUpvote || !canReact) {
+      reasons.actions = `You need ${settings.minVpForActions} voting power to upvote and react. You currently have ${currentVP}.`;
+    }
   }
 
   return {
@@ -95,6 +112,7 @@ export function useForumPermissions(): ForumPermissions {
     currentVP: currentVP.toString(),
     settings,
     isLoading,
+    isAdmin,
     reasons,
   };
 }
