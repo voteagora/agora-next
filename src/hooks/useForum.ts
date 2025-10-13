@@ -189,7 +189,7 @@ export const useForum = () => {
 
   const createTopic = useCallback(
     async (data: CreateTopicData): Promise<ForumTopic | null> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       if (data.attachment && data.attachment.size > 10 * 1024 * 1024) {
         toast.error("File size must be less than 10MB");
@@ -301,7 +301,7 @@ export const useForum = () => {
       topicId: number,
       data: CreatePostData
     ): Promise<ForumPost | null> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Creating post...");
@@ -416,7 +416,7 @@ export const useForum = () => {
       attachmentData: AttachmentData,
       categoryId: number
     ): Promise<ForumDocument | null> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Uploading document...");
@@ -467,7 +467,7 @@ export const useForum = () => {
 
   const deleteTopic = useCallback(
     async (topicId: number, isAdmin: boolean = false): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Deleting topic...");
@@ -516,7 +516,7 @@ export const useForum = () => {
 
   const deletePost = useCallback(
     async (postId: number, isAdmin: boolean = false): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Deleting post...");
@@ -569,7 +569,7 @@ export const useForum = () => {
       targetType: "post" | "category",
       isAuthor: boolean = true
     ): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Deleting attachment...");
@@ -610,7 +610,7 @@ export const useForum = () => {
 
   const archiveTopic = useCallback(
     async (topicId: number, isAuthor: boolean = true): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Archiving topic...");
@@ -654,7 +654,7 @@ export const useForum = () => {
       targetType: "post" | "category",
       isAuthor: boolean = true
     ): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Archiving attachment...");
@@ -731,7 +731,7 @@ export const useForum = () => {
 
   const restoreTopic = useCallback(
     async (topicId: number, isAuthor: boolean = true): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Restoring topic...");
@@ -771,7 +771,7 @@ export const useForum = () => {
 
   const restorePost = useCallback(
     async (postId: number, isAuthor: boolean = true): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Restoring post...");
@@ -815,7 +815,7 @@ export const useForum = () => {
       targetId: number,
       emoji: string
     ): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
       try {
         const message = `Add forum reaction: ${emoji} to ${targetType}:${targetId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
@@ -848,7 +848,7 @@ export const useForum = () => {
       targetId: number,
       emoji: string
     ): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
       try {
         const message = `Remove forum reaction: ${emoji} from ${targetType}:${targetId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
@@ -876,7 +876,7 @@ export const useForum = () => {
 
   const upvoteTopic = useCallback(
     async (topicId: number): Promise<number | null> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
       try {
         const message = `Upvote forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
@@ -900,7 +900,7 @@ export const useForum = () => {
 
   const removeUpvoteTopic = useCallback(
     async (topicId: number): Promise<number | null> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
       try {
         const message = `Remove upvote forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });

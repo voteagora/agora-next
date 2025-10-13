@@ -53,11 +53,11 @@ export function useForumPermissions(): ForumPermissions {
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
-  // Check if user is a forum admin
+  const normalizedAddress = address?.toLowerCase();
   const { data: adminCheck, isLoading: adminLoading } = useQuery({
-    queryKey: ["forumAdmin", address],
-    queryFn: () => checkForumPermissions(address || ""),
-    enabled: !!address,
+    queryKey: ["forumAdmin", normalizedAddress],
+    queryFn: () => checkForumPermissions(normalizedAddress || ""),
+    enabled: !!normalizedAddress,
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
