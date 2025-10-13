@@ -7,6 +7,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { fontMapper, inter } from "@/styles/fonts";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { ForumPermissionsProvider } from "@/contexts/ForumPermissionsContext";
 
 declare global {
   interface BigInt {
@@ -154,11 +155,13 @@ export default async function RootLayout({
 
       <NuqsAdapter>
         <ClientLayout>
-          <Header />
-          <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
-            {children}
-          </div>
-          <DAOMetricsHeader />
+          <ForumPermissionsProvider>
+            <Header />
+            <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
+              {children}
+            </div>
+            <DAOMetricsHeader />
+          </ForumPermissionsProvider>
         </ClientLayout>
       </NuqsAdapter>
       {ui.googleAnalytics && <GoogleAnalytics gaId={ui.googleAnalytics} />}

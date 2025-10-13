@@ -16,7 +16,7 @@ export const townsTenantConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd
-    ? "0x0000000000000000000000000000000000000000" // Placeholder for prod
+    ? "0xc796953c443f542728eedf33aab32753d3f7a91a" // Placeholder for prod
     : "0xc796953c443f542728eedf33aab32753d3f7a91a"; // Placeholder for dev
 
   // dummy addresses; for now: towns is info-only
@@ -29,10 +29,10 @@ export const townsTenantConfig = ({
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
     : isProd
-      ? new AlchemyProvider("mainnet", alchemyId)
+      ? new AlchemyProvider("sepolia", alchemyId)
       : new AlchemyProvider("sepolia", alchemyId);
 
-  const chain = isProd ? mainnet : sepolia;
+  const chain = isProd ? sepolia : sepolia;
 
   return {
     token: createTokenContract({
