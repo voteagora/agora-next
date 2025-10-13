@@ -15,13 +15,13 @@ interface UseVPCheckReturn {
     callback: () => Promise<void> | void,
     skipVPCheck?: boolean
   ) => Promise<boolean>;
-  
+
   /** Whether the VP modal is currently shown */
   showVPModal: boolean;
-  
+
   /** Function to manually control modal visibility */
   setShowVPModal: (show: boolean) => void;
-  
+
   /** Forum permissions object */
   permissions: ReturnType<typeof useForum>["permissions"];
 }
@@ -29,18 +29,18 @@ interface UseVPCheckReturn {
 /**
  * Hook to handle VP checks with modal for forum actions
  * Consolidates the common pattern of checking login, checking VP, and showing modal
- * 
+ *
  * @param action - The type of action to check VP for
  * @returns Object with checkAndProceed function, modal state, and permissions
- * 
+ *
  * @example
  * ```tsx
  * const { checkAndProceed, showVPModal, setShowVPModal, permissions } = useVPCheck("upvote");
- * 
+ *
  * const handleUpvote = () => checkAndProceed(async () => {
  *   await upvoteTopic(topicId);
  * });
- * 
+ *
  * return (
  *   <>
  *     <button onClick={handleUpvote}>Upvote</button>

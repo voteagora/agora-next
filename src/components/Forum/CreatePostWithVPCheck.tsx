@@ -27,7 +27,7 @@ export function CreatePostWithVPCheck({
 
     // Check VP before proceeding
     const vpCheck = checkVPBeforeAction("post");
-    
+
     if (!vpCheck.canProceed) {
       // Show modal instead of blocking
       setShowVPModal(true);
@@ -38,7 +38,7 @@ export function CreatePostWithVPCheck({
     setIsSubmitting(true);
     try {
       const result = await createPost(topicId, { content });
-      
+
       if (result && "id" in result) {
         setContent("");
         onSuccess?.();
@@ -60,7 +60,7 @@ export function CreatePostWithVPCheck({
           className="w-full min-h-[100px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           disabled={isSubmitting}
         />
-        
+
         <div className="flex justify-end">
           <button
             type="submit"

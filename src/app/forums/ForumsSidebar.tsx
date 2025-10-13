@@ -6,6 +6,10 @@ import {
   ForumCategory,
   ForumPost,
 } from "@/lib/forumUtils";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+
+const { namespace } = Tenant.current();
 
 interface ForumsSidebarProps {
   selectedCategoryId?: number | null;
@@ -47,6 +51,16 @@ export default function ForumsSidebar({
     "bg-purple-500",
   ];
 
+  const bgStyle =
+    namespace === TENANT_NAMESPACES.SYNDICATE
+      ? "bg-hoverBackground text-neutral"
+      : "bg-neutral text-primary hover:bg-hoverBackground";
+
+  const textStyle =
+    namespace === TENANT_NAMESPACES.SYNDICATE
+      ? "text-primary"
+      : "text-secondary";
+
   return (
     <div className="w-80 bg-cardBackground rounded-lg border border-cardBorder max-h-max">
       <div className="p-4">
@@ -62,7 +76,7 @@ export default function ForumsSidebar({
                 aria-current={selectedCategoryId == null ? "page" : undefined}
                 className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
                   selectedCategoryId == null
-                    ? "bg-buttonBackground text-neutral"
+                    ? bgStyle
                     : "hover:bg-hoverBackground text-secondary"
                 }`}
               >
@@ -86,7 +100,7 @@ export default function ForumsSidebar({
                     aria-current={isSelected ? "page" : undefined}
                     className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
                       isSelected
-                        ? "bg-buttonBackground text-neutral"
+                        ? bgStyle
                         : "hover:bg-hoverBackground text-secondary"
                     }`}
                   >

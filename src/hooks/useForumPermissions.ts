@@ -32,7 +32,7 @@ export function useForumPermissions(): ForumPermissions {
   const { address } = useAccount();
   const delegateData = useConnectedDelegate();
   const { slug } = Tenant.current();
-  
+
   const delegate = delegateData.delegate;
   const delegateLoading = delegateData.isLoading;
 
@@ -74,15 +74,15 @@ export function useForumPermissions(): ForumPermissions {
   const canReact = currentVP >= settings.minVpForActions;
 
   const reasons: ForumPermissions["reasons"] = {};
-  
+
   if (!canCreateTopic) {
     reasons.topics = `You need ${settings.minVpForTopics} voting power to create topics. You currently have ${currentVP}.`;
   }
-  
+
   if (!canCreatePost) {
     reasons.posts = `You need ${settings.minVpForReplies} voting power to post replies. You currently have ${currentVP}.`;
   }
-  
+
   if (!canUpvote || !canReact) {
     reasons.actions = `You need ${settings.minVpForActions} voting power to upvote and react. You currently have ${currentVP}.`;
   }

@@ -227,7 +227,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
     : [];
 
   return (
-    <div className="min-h-screen bg-neutral">
+    <div className="min-h-screen">
       <ForumsHeader
         breadcrumbs={breadcrumbs}
         isDuna={categoryName === "DUNA"}

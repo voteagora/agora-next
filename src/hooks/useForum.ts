@@ -67,40 +67,43 @@ export const useForum = () => {
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const permissions = useForumPermissions();
-  
+
   // Check VP before action and return whether to proceed
-  const checkVPBeforeAction = useCallback((
-    action: "topic" | "post" | "upvote" | "react"
-  ): { canProceed: boolean; reason?: string } => {
-    if (permissions.isLoading) {
-      return { canProceed: false, reason: "Loading permissions..." };
-    }
-    
-    switch (action) {
-      case "topic":
-        return {
-          canProceed: permissions.canCreateTopic,
-          reason: permissions.reasons.topics,
-        };
-      case "post":
-        return {
-          canProceed: permissions.canCreatePost,
-          reason: permissions.reasons.posts,
-        };
-      case "upvote":
-        return {
-          canProceed: permissions.canUpvote,
-          reason: permissions.reasons.actions,
-        };
-      case "react":
-        return {
-          canProceed: permissions.canReact,
-          reason: permissions.reasons.actions,
-        };
-      default:
-        return { canProceed: true };
-    }
-  }, [permissions]);
+  const checkVPBeforeAction = useCallback(
+    (
+      action: "topic" | "post" | "upvote" | "react"
+    ): { canProceed: boolean; reason?: string } => {
+      if (permissions.isLoading) {
+        return { canProceed: false, reason: "Loading permissions..." };
+      }
+
+      switch (action) {
+        case "topic":
+          return {
+            canProceed: permissions.canCreateTopic,
+            reason: permissions.reasons.topics,
+          };
+        case "post":
+          return {
+            canProceed: permissions.canCreatePost,
+            reason: permissions.reasons.posts,
+          };
+        case "upvote":
+          return {
+            canProceed: permissions.canUpvote,
+            reason: permissions.reasons.actions,
+          };
+        case "react":
+          return {
+            canProceed: permissions.canReact,
+            reason: permissions.reasons.actions,
+          };
+        default:
+          return { canProceed: true };
+      }
+    },
+    [permissions]
+  );
 
   const fetchTopics = useCallback(
     async (categoryId?: number): Promise<ForumTopic[]> => {

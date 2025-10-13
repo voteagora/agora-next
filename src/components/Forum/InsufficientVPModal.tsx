@@ -39,8 +39,8 @@ export function InsufficientVPModal({
     action === "topic"
       ? permissions.settings?.minVpForTopics || 0
       : action === "post"
-      ? permissions.settings?.minVpForReplies || 0
-      : permissions.settings?.minVpForActions || 0;
+        ? permissions.settings?.minVpForReplies || 0
+        : permissions.settings?.minVpForActions || 0;
 
   const currentVP = parseInt(permissions.currentVP) || 0;
   return (

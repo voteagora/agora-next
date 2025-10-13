@@ -25,16 +25,18 @@ interface VPCheckResult {
  */
 async function getForumSettingsFromDB(daoSlug: string): Promise<ForumSettings> {
   try {
-    const result = await prismaWeb2Client.$queryRaw<Array<{
-      min_vp_for_topics: number;
-      min_vp_for_replies: number;
-      min_vp_for_actions: number;
-    }>>`
+    const result = await prismaWeb2Client.$queryRaw<
+      Array<{
+        min_vp_for_topics: number;
+        min_vp_for_replies: number;
+        min_vp_for_actions: number;
+      }>
+    >`
       SELECT min_vp_for_topics, min_vp_for_replies, min_vp_for_actions 
       FROM alltenant.dao_forum_settings 
       WHERE dao_slug = ${daoSlug}
     `;
-    
+
     if (result.length === 0) {
       // Return defaults if no settings found
       return {
@@ -43,14 +45,14 @@ async function getForumSettingsFromDB(daoSlug: string): Promise<ForumSettings> {
         minVpForActions: 1,
       };
     }
-    
+
     return {
       minVpForTopics: result[0].min_vp_for_topics,
       minVpForReplies: result[0].min_vp_for_replies,
       minVpForActions: result[0].min_vp_for_actions,
     };
   } catch (error) {
-    console.error('Error fetching forum settings from DB:', error);
+    console.error("Error fetching forum settings from DB:", error);
     // Return defaults on error
     return {
       minVpForTopics: 1,
@@ -76,14 +78,14 @@ export async function canCreateTopic(
   daoSlug: string
 ): Promise<VPCheckResult> {
   const settings = await getForumSettings(daoSlug);
-  
+
   if (currentVP >= settings.minVpForTopics) {
     return { allowed: true };
   }
 
   return {
     allowed: false,
-    reason: 'insufficient_voting_power',
+    reason: "insufficient_voting_power",
     requiredVP: settings.minVpForTopics,
     currentVP,
   };
@@ -97,14 +99,14 @@ export async function canCreatePost(
   daoSlug: string
 ): Promise<VPCheckResult> {
   const settings = await getForumSettings(daoSlug);
-  
+
   if (currentVP >= settings.minVpForReplies) {
     return { allowed: true };
   }
 
   return {
     allowed: false,
-    reason: 'insufficient_voting_power',
+    reason: "insufficient_voting_power",
     requiredVP: settings.minVpForReplies,
     currentVP,
   };
@@ -118,14 +120,14 @@ export async function canPerformAction(
   daoSlug: string
 ): Promise<VPCheckResult> {
   const settings = await getForumSettings(daoSlug);
-  
+
   if (currentVP >= settings.minVpForActions) {
     return { allowed: true };
   }
 
   return {
     allowed: false,
-    reason: 'insufficient_voting_power',
+    reason: "insufficient_voting_power",
     requiredVP: settings.minVpForActions,
     currentVP,
   };
@@ -135,7 +137,7 @@ export async function canPerformAction(
  * Format error message for insufficient VP
  */
 export function formatVPError(check: VPCheckResult, action: string): string {
-  if (check.allowed) return '';
-  
+  if (check.allowed) return "";
+
   return `You need ${check.requiredVP} voting power to ${action}. You currently have ${check.currentVP}.`;
 }

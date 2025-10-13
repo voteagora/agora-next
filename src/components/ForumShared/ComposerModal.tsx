@@ -17,6 +17,10 @@ import { useForum } from "@/hooks/useForum";
 import type { ForumCategory } from "@/lib/forumUtils";
 import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+
+const { namespace } = Tenant.current();
 
 export interface ComposerModalSubmitData {
   title?: string;
@@ -64,6 +68,11 @@ export default function ComposerModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [categoryId, setCategoryId] = useState<number | "">("");
+
+  const bgStyle =
+    namespace === TENANT_NAMESPACES.TOWNS
+      ? "bg-customBackground"
+      : "bg-background";
 
   useEffect(() => {
     if (!isOpen || !renderCategory) return;
@@ -157,7 +166,9 @@ export default function ComposerModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        className={`max-w-2xl w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto ${bgStyle}`}
+      >
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-primary">
             {dialogTitle}
@@ -316,10 +327,9 @@ export default function ComposerModal({
               </Button>
               <Button
                 type="submit"
-                className="text-primary border border-line hover:bg-hoverBackground text-sm bg-buttonBackground"
+                className="border border-line hover:bg-hoverBackground text-sm"
                 style={{
                   display: "flex",
-                  height: "36px",
                   padding: "12px 20px",
                   justifyContent: "center",
                   alignItems: "center",

@@ -35,7 +35,8 @@ export default function EmojiReactions({
   );
   const [open, setOpen] = React.useState(false);
   const [pending, setPending] = React.useState<Set<string>>(new Set());
-  const { addReaction, removeReaction, permissions, checkVPBeforeAction } = useForum();
+  const { addReaction, removeReaction, permissions, checkVPBeforeAction } =
+    useForum();
   const requireLogin = useRequireLogin();
   const [showVPModal, setShowVPModal] = useState(false);
 
