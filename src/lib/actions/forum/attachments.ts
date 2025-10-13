@@ -47,7 +47,7 @@ export async function getForumAttachments() {
       data: attachments.map((attachment: any) => ({
         id: attachment.id,
         name: attachment.fileName,
-        url: getIPFSUrl(attachment.ipfsCid, "https://bronze-abundant-swift-398.mypinata.cloud"),
+        url: getIPFSUrl(attachment.ipfsCid),
         ipfsCid: attachment.ipfsCid,
         createdAt: attachment.createdAt.toISOString(),
         uploadedBy: attachment.address,
@@ -113,7 +113,9 @@ export async function uploadDocumentFromBase64(
     }
 
     // Convert base64 to buffer
-    const base64Content = base64Data.split(",")[1];
+    const base64Content = base64Data.includes(",") 
+      ? base64Data.split(",")[1] 
+      : base64Data;
     const buffer = Buffer.from(base64Content, "base64");
 
     // Upload to IPFS
@@ -281,7 +283,7 @@ export const getForumCategoryAttachments = async ({
       data: attachments.map((attachment) => ({
         id: attachment.id,
         name: attachment.fileName,
-        url: getIPFSUrl(attachment.ipfsCid, "https://bronze-abundant-swift-398.mypinata.cloud"),
+        url: getIPFSUrl(attachment.ipfsCid),
         ipfsCid: attachment.ipfsCid,
         createdAt: attachment.createdAt.toISOString(),
         uploadedBy: attachment.address,
