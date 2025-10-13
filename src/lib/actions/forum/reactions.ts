@@ -5,6 +5,9 @@ import { AttachableType } from "@prisma/client";
 import Tenant from "@/lib/tenant/tenant";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import { fetchCurrentVotingPowerForNamespace } from "@/app/api/common/voting-power/getVotingPower";
+import { canPerformAction, formatVPError } from "@/lib/forumSettings";
+import { checkForumPermissions } from "./admin";
 
 const addReactionSchema = z.object({
   targetType: z.literal("post"),
@@ -48,12 +51,61 @@ export async function addForumReaction(
     const validated = addReactionSchema.parse(data);
     const { slug } = Tenant.current();
 
-    const isValid = await verifyMessage({
-      address: validated.address as `0x${string}`,
-      message: validated.message,
-      signature: validated.signature as `0x${string}`,
-    });
+    const [isValid, post] = await Promise.all([
+      verifyMessage({
+        address: validated.address as `0x${string}`,
+        message: validated.message,
+        signature: validated.signature as `0x${string}`,
+      }),
+      prismaWeb2Client.forumPost.findUnique({
+        where: { id: validated.targetId },
+        include: {
+          topic: {
+            select: { categoryId: true },
+          },
+        },
+      }),
+    ]);
+
     if (!isValid) return { success: false, error: "Invalid signature" };
+
+    if (!post) {
+      return { success: false, error: "Post not found" };
+    }
+
+    // Check if user is an admin (admins bypass VP requirements)
+    const adminCheck = await checkForumPermissions(
+      validated.address,
+      post.topic.categoryId || undefined
+    );
+
+    // Only check voting power for non-admins
+    if (!adminCheck.isAdmin) {
+      try {
+        const vpData = await fetchCurrentVotingPowerForNamespace(
+          validated.address
+        );
+        if (!vpData || !vpData.totalVP) {
+          return {
+            success: false,
+            error: "No voting power data available for address",
+          };
+        } else {
+          const currentVP = parseInt(vpData.totalVP);
+          const vpCheck = await canPerformAction(currentVP, slug);
+
+          if (!vpCheck.allowed) {
+            return {
+              success: false,
+              error: formatVPError(vpCheck, "react to posts"),
+            };
+          }
+        }
+      } catch (vpError) {
+        console.error("Failed to check voting power:", vpError);
+        // Continue if VP check fails - don't block legitimate users
+      }
+    }
 
     const emoji = normalizeEmoji(validated.emoji);
 

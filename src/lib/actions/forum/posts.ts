@@ -8,14 +8,19 @@ import {
   handlePrismaError,
 } from "./shared";
 import { moderateTextContent, isContentNSFW } from "@/lib/moderation";
-import { removeForumPostFromIndex, indexForumPost } from "./search";
+import { indexForumPost, removeForumPostFromIndex } from "./search";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
-import { logForumAuditAction } from "./admin";
-import { getIPFSUrl } from "@/lib/pinata";
+import { logForumAuditAction, checkForumPermissions } from "./admin";
 import { createAttachmentsFromContent } from "../attachment";
-
+import { fetchCurrentVotingPowerForNamespace } from "@/app/api/common/voting-power/getVotingPower";
+import {
+  canCreatePost,
+  canPerformAction,
+  formatVPError,
+} from "@/lib/forumSettings";
+import { getIPFSUrl } from "@/lib/pinata";
 const { slug } = Tenant.current();
 
 // Lightweight schema for topic upvotes
@@ -39,19 +44,59 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
   try {
     const validated = topicVoteSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validated.address as `0x${string}`,
-      message: validated.message,
-      signature: validated.signature as `0x${string}`,
-    });
+    // Parallelize independent operations
+    const [isValid, topic] = await Promise.all([
+      verifyMessage({
+        address: validated.address as `0x${string}`,
+        message: validated.message,
+        signature: validated.signature as `0x${string}`,
+      }),
+      prismaWeb2Client.forumTopic.findFirst({
+        where: { id: validated.topicId, dao_slug: slug },
+        select: { id: true, categoryId: true },
+      }),
+    ]);
+
     if (!isValid)
       return { success: false, error: "Invalid signature" } as const;
 
-    const topic = await prismaWeb2Client.forumTopic.findFirst({
-      where: { id: validated.topicId, dao_slug: slug },
-      select: { id: true },
-    });
     if (!topic) return { success: false, error: "Topic not found" } as const;
+
+    // Check if user is an admin (admins bypass VP requirements)
+    const adminCheck = await checkForumPermissions(
+      validated.address,
+      topic.categoryId || undefined
+    );
+
+    // Only check voting power for non-admins
+    if (!adminCheck.isAdmin) {
+      try {
+        const vpData = await fetchCurrentVotingPowerForNamespace(
+          validated.address
+        );
+
+        if (!vpData || !vpData.totalVP) {
+          console.warn(
+            "No voting power data available for address:",
+            validated.address
+          );
+          // Continue without VP check if data unavailable
+        } else {
+          const currentVP = parseInt(vpData.totalVP);
+          const vpCheck = await canPerformAction(currentVP, slug);
+
+          if (!vpCheck.allowed) {
+            return {
+              success: false,
+              error: formatVPError(vpCheck, "upvote"),
+            } as const;
+          }
+        }
+      } catch (vpError) {
+        console.error("Failed to check voting power:", vpError);
+        // Continue if VP check fails - don't block legitimate users
+      }
+    }
 
     const rootPostId = await getRootPostId(validated.topicId);
     if (!rootPostId)
@@ -183,22 +228,63 @@ export async function createForumPost(
   try {
     const validatedData = createPostSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
-      message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
-    });
+    // Parallelize independent operations
+    const [isValid, topic] = await Promise.all([
+      verifyMessage({
+        address: validatedData.address as `0x${string}`,
+        message: validatedData.message,
+        signature: validatedData.signature as `0x${string}`,
+      }),
+      prismaWeb2Client.forumTopic.findUnique({
+        where: { id: topicId },
+        include: {
+          category: true,
+        },
+      }),
+    ]);
 
     if (!isValid) {
       return { success: false, error: "Invalid signature" };
     }
 
-    const topic = await prismaWeb2Client.forumTopic.findUnique({
-      where: { id: topicId },
-    });
-
     if (!topic) {
       return { success: false, error: "Topic not found" };
+    }
+
+    // Check if user is an admin (admins bypass VP requirements)
+    const adminCheck = await checkForumPermissions(
+      validatedData.address,
+      topic.categoryId || undefined
+    );
+
+    // Only check voting power for non-admins
+    if (!adminCheck.isAdmin) {
+      try {
+        const vpData = await fetchCurrentVotingPowerForNamespace(
+          validatedData.address
+        );
+
+        if (!vpData || !vpData.totalVP) {
+          console.warn(
+            "No voting power data available for address:",
+            validatedData.address
+          );
+          // Continue without VP check if data unavailable
+        } else {
+          const currentVP = parseInt(vpData.totalVP);
+          const vpCheck = await canCreatePost(currentVP, slug);
+
+          if (!vpCheck.allowed) {
+            return {
+              success: false,
+              error: formatVPError(vpCheck, "post replies"),
+            };
+          }
+        }
+      } catch (vpError) {
+        console.error("Failed to check voting power:", vpError);
+        // Continue if VP check fails - don't block legitimate users
+      }
     }
 
     // Moderate post content automatically

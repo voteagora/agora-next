@@ -152,6 +152,7 @@ async function getCurrentVotingPowerForAddress({
 }): Promise<VotingPowerData> {
   return withMetrics("getCurrentVotingPowerForAddress", async () => {
     const { namespace, contracts } = Tenant.current();
+    console.log("address", address, contracts.token.address);
     const votingPower = await findVotingPower({
       namespace,
       address,
@@ -159,18 +160,13 @@ async function getCurrentVotingPowerForAddress({
     });
 
     // This query pulls only partially delegated voting power
-    const advancedVotingPower = await findAdvancedVotingPower({
-      namespace,
-      address,
-      contract: contracts.alligator!.address,
-    });
+    // const advancedVotingPower = null;
 
     return {
       directVP: votingPower?.voting_power ?? "0",
-      advancedVP: advancedVotingPower?.advanced_vp.toFixed(0) ?? "0",
+      advancedVP: "0",
       totalVP: (
-        BigInt(votingPower?.voting_power ?? "0") +
-        BigInt(advancedVotingPower?.advanced_vp.toFixed(0) ?? "0")
+        BigInt(votingPower?.voting_power ?? "0") + BigInt("0")
       ).toString(),
     };
   });
