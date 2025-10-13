@@ -37,7 +37,7 @@ import {
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
-import { useForumPermissions } from "./useForumPermissions";
+import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 
 interface ForumDocument {
   id: number;
@@ -66,7 +66,7 @@ export const useForum = () => {
   const [error, setError] = useState<string | null>(null);
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
-  const permissions = useForumPermissions();
+  const permissions = useForumPermissionsContext();
 
   // Check VP before action and return whether to proceed
   const checkVPBeforeAction = useCallback(

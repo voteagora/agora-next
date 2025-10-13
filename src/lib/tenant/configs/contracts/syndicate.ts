@@ -1,4 +1,4 @@
-import { ERC20__factory } from "@/lib/contracts/generated";
+import { UniswapToken__factory } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { mainnet, sepolia } from "viem/chains";
@@ -19,7 +19,7 @@ export const syndicateTenantConfig = ({
   // TODO: Replace with actual syndicate token address when available
   const TOKEN = isProd
     ? "0x0000000000000000000000000000000000000000" // Placeholder for prod
-    : "0x0000000000000000000000000000000000000000"; // Placeholder for dev
+    : "0xc796953c443f542728eedf33aab32753d3f7a91a"; // Placeholder for dev
 
   // dummy addresses; for now: syndicate is info-only
   const DUMMY_GOVERNOR = "0x0000000000000000000000000000000000000002";
@@ -38,10 +38,10 @@ export const syndicateTenantConfig = ({
 
   return {
     token: createTokenContract({
-      abi: ERC20__factory.abi,
+      abi: UniswapToken__factory.abi,
       address: TOKEN as `0x${string}`,
       chain,
-      contract: ERC20__factory.connect(TOKEN, provider),
+      contract: UniswapToken__factory.connect(TOKEN, provider),
       provider,
       type: "erc20",
     }),

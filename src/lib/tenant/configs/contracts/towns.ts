@@ -4,7 +4,7 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { BaseContract, AlchemyProvider, JsonRpcProvider } from "ethers";
 import { mainnet, sepolia } from "viem/chains";
 import { createTokenContract } from "@/lib/tokenUtils";
-import { ERC20__factory } from "@/lib/contracts/generated";
+import { UniswapToken__factory } from "@/lib/contracts/generated";
 
 interface Props {
   isProd: boolean;
@@ -16,8 +16,8 @@ export const townsTenantConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd
-    ? "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72"
-    : "0xca83e6932cf4F03cDd6238be0fFcF2fe97854f67";
+    ? "0x0000000000000000000000000000000000000000" // Placeholder for prod
+    : "0xc796953c443f542728eedf33aab32753d3f7a91a"; // Placeholder for dev
 
   // dummy addresses; for now: towns is info-only
   const DUMMY_GOVERNOR = "0x0000000000000000000000000000000000000002";
@@ -36,10 +36,10 @@ export const townsTenantConfig = ({
 
   return {
     token: createTokenContract({
-      abi: ERC20__factory.abi,
+      abi: UniswapToken__factory.abi,
       address: TOKEN as `0x${string}`,
       chain,
-      contract: ERC20__factory.connect(TOKEN, provider),
+      contract: UniswapToken__factory.connect(TOKEN, provider),
       provider,
       type: "erc20",
     }),

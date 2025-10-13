@@ -13,6 +13,7 @@ import { SmilePlus } from "lucide-react";
 import useRequireLogin from "@/hooks/useRequireLogin";
 import { useStableCallback } from "@/hooks/useStableCallback";
 import { InsufficientVPModal } from "./InsufficientVPModal";
+import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 
 type AddressesByEmoji = Record<string, string[]>;
 
@@ -35,8 +36,8 @@ export default function EmojiReactions({
   );
   const [open, setOpen] = React.useState(false);
   const [pending, setPending] = React.useState<Set<string>>(new Set());
-  const { addReaction, removeReaction, permissions, checkVPBeforeAction } =
-    useForum();
+  const { addReaction, removeReaction } = useForum();
+  const permissions = useForumPermissionsContext();
   const requireLogin = useRequireLogin();
   const [showVPModal, setShowVPModal] = useState(false);
 
@@ -67,8 +68,8 @@ export default function EmojiReactions({
 
       // Only check VP when adding reaction (not removing)
       if (!currentlyMine) {
-        const vpCheck = checkVPBeforeAction("react");
-        if (!vpCheck.canProceed) {
+        // Don't block if permissions are still loading
+        if (!permissions.isLoading && !permissions.canReact) {
           setShowVPModal(true);
           return;
         }
@@ -121,7 +122,8 @@ export default function EmojiReactions({
       stableRemoveReaction,
       targetType,
       targetId,
-      checkVPBeforeAction,
+      permissions.canReact,
+      permissions.isLoading,
     ]
   );
 

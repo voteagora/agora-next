@@ -176,6 +176,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
         return map;
       }, new Map<string, string | null>())
     : new Map<string, string | null>();
+
   const adminDirectory = Array.from(adminRolesMap.entries()).map(
     ([address, role]) => ({
       address,
