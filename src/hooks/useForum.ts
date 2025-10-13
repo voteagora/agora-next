@@ -37,6 +37,7 @@ import {
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
+import { useForumPermissions } from "./useForumPermissions";
 
 interface ForumDocument {
   id: number;
@@ -65,6 +66,41 @@ export const useForum = () => {
   const [error, setError] = useState<string | null>(null);
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const permissions = useForumPermissions();
+  
+  // Check VP before action and return whether to proceed
+  const checkVPBeforeAction = useCallback((
+    action: "topic" | "post" | "upvote" | "react"
+  ): { canProceed: boolean; reason?: string } => {
+    if (permissions.isLoading) {
+      return { canProceed: false, reason: "Loading permissions..." };
+    }
+    
+    switch (action) {
+      case "topic":
+        return {
+          canProceed: permissions.canCreateTopic,
+          reason: permissions.reasons.topics,
+        };
+      case "post":
+        return {
+          canProceed: permissions.canCreatePost,
+          reason: permissions.reasons.posts,
+        };
+      case "upvote":
+        return {
+          canProceed: permissions.canUpvote,
+          reason: permissions.reasons.actions,
+        };
+      case "react":
+        return {
+          canProceed: permissions.canReact,
+          reason: permissions.reasons.actions,
+        };
+      default:
+        return { canProceed: true };
+    }
+  }, [permissions]);
 
   const fetchTopics = useCallback(
     async (categoryId?: number): Promise<ForumTopic[]> => {
@@ -932,6 +968,8 @@ export const useForum = () => {
     removeUpvoteTopic,
     fetchTopicUpvotes,
     hasUpvotedTopic,
+    permissions, // Add permissions to return value
+    checkVPBeforeAction, // Helper to check VP before actions
   };
 };
 
