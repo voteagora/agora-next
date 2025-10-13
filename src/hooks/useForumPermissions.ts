@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
-import useConnectedDelegate from "./useConnectedDelegate";
 import Tenant from "@/lib/tenant/tenant";
 import { checkForumPermissions } from "@/lib/actions/forum/admin";
+import { getPublicClient } from "@/lib/viem";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface ForumSettings {
   minVpForTopics: number;
@@ -33,11 +34,55 @@ interface ForumPermissions {
  */
 export function useForumPermissions(): ForumPermissions {
   const { address } = useAccount();
-  const delegateData = useConnectedDelegate();
-  const { slug } = Tenant.current();
+  const { slug, contracts, namespace } = Tenant.current();
+  const client = getPublicClient();
+  console.log(address, "address", "loading permissions");
+  // Fetch voting power directly from the contract
+  const {
+    data: votingPower,
+    isLoading: vpLoading,
+    error: vpError,
+  } = useQuery({
+    queryKey: ["votingPower", address],
+    queryFn: async () => {
+      if (!address) return BigInt(0);
 
-  const delegate = delegateData.delegate;
-  const delegateLoading = delegateData.isLoading;
+      try {
+        // Get current block number
+        const blockNumber = await client.getBlockNumber();
+
+        let votes: bigint;
+        if (
+          namespace === TENANT_NAMESPACES.UNISWAP ||
+          namespace === TENANT_NAMESPACES.SYNDICATE ||
+          namespace === TENANT_NAMESPACES.TOWNS
+        ) {
+          votes = (await client.readContract({
+            abi: contracts.token.abi,
+            address: contracts.token.address as `0x${string}`,
+            functionName: "getPriorVotes",
+            args: [address, blockNumber - BigInt(1)],
+          })) as unknown as bigint;
+        } else {
+          votes = (await client.readContract({
+            abi: contracts.governor.abi,
+            address: contracts.governor.address as `0x${string}`,
+            functionName: "getVotes",
+            args: [address, blockNumber - BigInt(1)],
+          })) as unknown as bigint;
+        }
+
+        return votes;
+      } catch (error) {
+        console.error("Failed to fetch voting power:", error);
+        return BigInt(0);
+      }
+    },
+    enabled: !!address,
+    staleTime: 3 * 60 * 1000, // Cache for 3 minutes
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false, // Don't refetch on component mount if data exists
+  });
 
   // Fetch forum settings for current DAO
   const { data: settings, isLoading: settingsLoading } = useQuery({
@@ -61,11 +106,11 @@ export function useForumPermissions(): ForumPermissions {
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
-  const isLoading = delegateLoading || settingsLoading || adminLoading;
+  const isLoading = vpLoading || settingsLoading || adminLoading;
   const isAdmin = adminCheck?.isAdmin || false;
 
   // If not connected or loading, return default permissions
-  if (!address || isLoading || !delegate || !settings) {
+  if (!address || isLoading || !settings) {
     return {
       canCreateTopic: false,
       canCreatePost: false,
@@ -79,28 +124,33 @@ export function useForumPermissions(): ForumPermissions {
     };
   }
 
-  const currentVP = parseInt(delegate.votingPower.total || "0");
-
+  const vpBigInt = votingPower || BigInt(0);
+  const vpAsNumber = Number(vpBigInt);
   // Admins bypass all VP requirements
-  const canCreateTopic = isAdmin || currentVP >= settings.minVpForTopics;
-  const canCreatePost = isAdmin || currentVP >= settings.minVpForReplies;
-  const canUpvote = isAdmin || currentVP >= settings.minVpForActions;
-  const canReact = isAdmin || currentVP >= settings.minVpForActions;
+  // Ensure settings values are numbers for comparison
+  const minVpForTopics = Number(settings.minVpForTopics);
+  const minVpForReplies = Number(settings.minVpForReplies);
+  const minVpForActions = Number(settings.minVpForActions);
+
+  const canCreateTopic = isAdmin || vpAsNumber >= minVpForTopics;
+  const canCreatePost = isAdmin || vpAsNumber >= minVpForReplies;
+  const canUpvote = isAdmin || vpAsNumber >= minVpForActions;
+  const canReact = isAdmin || vpAsNumber >= minVpForActions;
 
   const reasons: ForumPermissions["reasons"] = {};
 
   // Only show VP reasons for non-admins
   if (!isAdmin) {
     if (!canCreateTopic) {
-      reasons.topics = `You need ${settings.minVpForTopics} voting power to create topics. You currently have ${currentVP}.`;
+      reasons.topics = `You need ${minVpForTopics} voting power to create topics. You currently have ${vpAsNumber}.`;
     }
 
     if (!canCreatePost) {
-      reasons.posts = `You need ${settings.minVpForReplies} voting power to post replies. You currently have ${currentVP}.`;
+      reasons.posts = `You need ${minVpForReplies} voting power to post replies. You currently have ${vpAsNumber}.`;
     }
 
     if (!canUpvote || !canReact) {
-      reasons.actions = `You need ${settings.minVpForActions} voting power to upvote and react. You currently have ${currentVP}.`;
+      reasons.actions = `You need ${minVpForActions} voting power to upvote and react. You currently have ${vpAsNumber}.`;
     }
   }
 
@@ -109,7 +159,7 @@ export function useForumPermissions(): ForumPermissions {
     canCreatePost,
     canUpvote,
     canReact,
-    currentVP: currentVP.toString(),
+    currentVP: vpAsNumber.toString(),
     settings,
     isLoading,
     isAdmin,

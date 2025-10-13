@@ -678,7 +678,7 @@ interface ForumDataOptions {
   offset?: number;
 }
 
-const getForumDataUncached = async ({
+export const getForumData = async ({
   categoryId,
   excludeCategoryNames,
   limit = 20,
@@ -837,11 +837,3 @@ const getForumDataUncached = async ({
     await prismaWeb2Client.$disconnect();
   }
 };
-
-export const getForumData = unstable_cache(
-  getForumDataUncached,
-  ["getForumData"],
-  {
-    revalidate: 60 * 1, // 1 minute
-  }
-);

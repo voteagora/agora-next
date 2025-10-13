@@ -485,13 +485,15 @@ export default function Thread({
   }, [adminAddresses, adminDirectory]);
 
   const adminAddressSet = React.useMemo(() => {
-    return new Set(normalizedDirectory.map((entry) => entry.address));
+    return new Set(
+      normalizedDirectory.map((entry) => entry.address.toLowerCase())
+    );
   }, [normalizedDirectory]);
 
   const adminRoleMap = React.useMemo(() => {
     const map = new Map<string, string | null>();
     normalizedDirectory.forEach(({ address, role }) => {
-      map.set(address, role);
+      map.set(address.toLowerCase(), role);
     });
     return map;
   }, [normalizedDirectory]);

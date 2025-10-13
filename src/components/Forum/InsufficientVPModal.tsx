@@ -6,7 +6,7 @@ import { useAccount } from "wagmi";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import Tenant from "@/lib/tenant/tenant";
 import { hasDelegateStatement } from "@/lib/delegateUtils";
-import { useForum } from "@/hooks/useForum";
+import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 
 interface InsufficientVPModalProps {
   isOpen: boolean;
@@ -28,7 +28,7 @@ export function InsufficientVPModal({
 }: InsufficientVPModalProps) {
   const { address } = useAccount();
   const delegateData = useConnectedDelegate();
-  const { permissions } = useForum();
+  const permissions = useForumPermissionsContext();
   const { token } = Tenant.current();
 
   const delegate = delegateData.delegate;
