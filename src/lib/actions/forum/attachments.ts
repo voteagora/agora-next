@@ -113,8 +113,8 @@ export async function uploadDocumentFromBase64(
     }
 
     // Convert base64 to buffer
-    const base64Content = base64Data.includes(",") 
-      ? base64Data.split(",")[1] 
+    const base64Content = base64Data.includes(",")
+      ? base64Data.split(",")[1]
       : base64Data;
     const buffer = Buffer.from(base64Content, "base64");
 
