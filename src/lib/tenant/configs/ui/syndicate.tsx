@@ -134,7 +134,7 @@ export const syndicateTenantUIConfig = new TenantUI({
         {
           name: "Grants Program",
           title: "Grants Program",
-          url: "https://gateway.pinata.cloud/ipfs/QmSQn9P7LzGPa2RJsTDVMaKPw9UoqJTMRoxJTiABpi6YAR",
+          url: "https://bronze-abundant-swift-398.mypinata.cloud/ipfs/QmSQn9P7LzGPa2RJsTDVMaKPw9UoqJTMRoxJTiABpi6YAR",
           image: syndicateInfoCard2,
         },
         {
