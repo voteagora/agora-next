@@ -317,19 +317,24 @@ export async function createForumTopic(
     // Only check voting power for non-admins
     if (!adminCheck.isAdmin) {
       try {
-        const vpData = await fetchCurrentVotingPowerForNamespace(validatedData.address);
-        
+        const vpData = await fetchCurrentVotingPowerForNamespace(
+          validatedData.address
+        );
+
         if (!vpData || !vpData.totalVP) {
-          console.warn("No voting power data available for address:", validatedData.address);
+          console.warn(
+            "No voting power data available for address:",
+            validatedData.address
+          );
           // Continue without VP check if data unavailable
         } else {
           const currentVP = parseInt(vpData.totalVP);
           const vpCheck = await canCreateTopic(currentVP, slug);
-          
+
           if (!vpCheck.allowed) {
-            return { 
-              success: false, 
-              error: formatVPError(vpCheck, 'create topics')
+            return {
+              success: false,
+              error: formatVPError(vpCheck, "create topics"),
             };
           }
         }

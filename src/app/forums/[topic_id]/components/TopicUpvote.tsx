@@ -19,8 +19,14 @@ export default function TopicUpvote({
   className?: string;
 }) {
   const { address } = useAccount();
-  const { upvoteTopic, removeUpvoteTopic, fetchTopicUpvotes, hasUpvotedTopic, permissions, checkVPBeforeAction } =
-    useForum();
+  const {
+    upvoteTopic,
+    removeUpvoteTopic,
+    fetchTopicUpvotes,
+    hasUpvotedTopic,
+    permissions,
+    checkVPBeforeAction,
+  } = useForum();
   const [count, setCount] = React.useState<number>(0);
   const [mine, setMine] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -53,7 +59,7 @@ export default function TopicUpvote({
     if (loading) return;
     const loggedIn = await requireLogin();
     if (!loggedIn) return;
-    
+
     // Only check VP when adding upvote (not removing)
     if (!mineRef.current) {
       const vpCheck = checkVPBeforeAction("upvote");
@@ -62,7 +68,7 @@ export default function TopicUpvote({
         return;
       }
     }
-    
+
     setLoading(true);
     try {
       if (mineRef.current) {

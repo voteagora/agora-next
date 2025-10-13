@@ -11,6 +11,10 @@ import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import { useStableCallback } from "@/hooks/useStableCallback";
 import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+
+const { namespace } = Tenant.current();
 
 interface ForumThreadProps {
   topicId: number;
@@ -38,6 +42,16 @@ export default function ForumThread({
 
   React.useEffect(() => setComments(initialComments), [initialComments]);
 
+  const bgStyle =
+    namespace === TENANT_NAMESPACES.SYNDICATE
+      ? "bg-white"
+      : "bg-buttonBackground";
+  const textStyle =
+    namespace === TENANT_NAMESPACES.SYNDICATE ||
+    namespace === TENANT_NAMESPACES.TOWNS
+      ? "text-primary"
+      : "text-neutral";
+
   const onReply = async (commentId: number) => {
     if (!(await requireLogin())) {
       return;
@@ -57,14 +71,14 @@ export default function ForumThread({
     if (!replyContent.trim() || replyingToId == null) return;
     const loggedIn = await requireLogin();
     if (!loggedIn) return;
-    
+
     // Check VP before posting
     const vpCheck = checkVPBeforeAction("post");
     if (!vpCheck.canProceed) {
       setShowVPModal(true);
       return;
     }
-    
+
     const newPost = await stableCreatePost(Number(topicId), {
       content: replyContent.trim(),
       parentId: replyingToId,
@@ -123,14 +137,14 @@ export default function ForumThread({
     if (!rootContent.trim()) return;
     const loggedIn = await requireLogin();
     if (!loggedIn) return;
-    
+
     // Check VP before posting
     const vpCheck = checkVPBeforeAction("post");
     if (!vpCheck.canProceed) {
       setShowVPModal(true);
       return;
     }
-    
+
     setPostingRoot(true);
     try {
       const newPost = await stableCreatePost(Number(topicId), {
@@ -179,7 +193,7 @@ export default function ForumThread({
         />
 
         {/* Root-level reply composer */}
-        <div className="mt-4 sticky bottom-[45px] bg-neutral pb-[10px]">
+        <div className="mt-4 sticky bottom-[45px] bg-brandSecondary pb-[10px]">
           <DunaEditor
             variant="comment"
             placeholder="Comment"
@@ -194,7 +208,7 @@ export default function ForumThread({
               disabled={
                 !rootContent.replace(/<[^>]*>/g, "").trim() || postingRoot
               }
-              className="bg-buttonBackground hover:bg-hoverBackground text-primary px-6 py-2 rounded-md text-sm"
+              className={`bg-buttonBackground shadow-sm hover:bg-hoverBackground text-sm px-6 py-2 rounded-md ${bgStyle} ${textStyle}`}
             >
               {postingRoot ? "Posting..." : "Comment"}
             </Button>

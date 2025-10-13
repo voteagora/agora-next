@@ -312,10 +312,7 @@ const CommentItem = ({
           {replies.map((reply) => (
             <div
               key={reply.id}
-              className={cn(
-                "pl-3",
-                forForums ? "" : "border-l-2 border-line"
-              )}
+              className={cn("pl-3", forForums ? "" : "border-l-2 border-line")}
             >
               <CommentItem
                 comment={reply}

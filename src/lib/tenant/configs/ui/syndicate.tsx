@@ -48,7 +48,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     infoTabBackground: "#FFFFFF",
     buttonBackground: "#FAFAFA",
     infoSectionBackground: "255 255 255",
-    cardBackground: "#FFFFFF",
+    // cardBackground: "#FFFFFF", // removing this for now since this causes text to be white in duna content rendere
     customIconBackground: "#FBFBFB",
     footerBackground: "236 237 229",
     customAboutSubtitle: "About Syndicate Network Collective",
