@@ -45,7 +45,5 @@ export async function GET(request: NextRequest) {
       { error: "Failed to fetch forum settings" },
       { status: 500 }
     );
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
