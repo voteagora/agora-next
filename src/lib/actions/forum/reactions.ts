@@ -5,9 +5,13 @@ import { AttachableType } from "@prisma/client";
 import Tenant from "@/lib/tenant/tenant";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import { prismaWeb2Client } from "@/app/lib/prisma";
-import { fetchCurrentVotingPowerForNamespace } from "@/app/api/common/voting-power/getVotingPower";
 import { canPerformAction, formatVPError } from "@/lib/forumSettings";
 import { checkForumPermissions } from "./admin";
+import {
+  fetchVotingPowerFromContract,
+  formatVotingPower,
+} from "@/lib/votingPowerUtils";
+import { getPublicClient } from "@/lib/viem";
 
 const addReactionSchema = z.object({
   targetType: z.literal("post"),
@@ -82,24 +86,28 @@ export async function addForumReaction(
     // Only check voting power for non-admins
     if (!adminCheck.isAdmin) {
       try {
-        const vpData = await fetchCurrentVotingPowerForNamespace(
-          validated.address
+        const tenant = Tenant.current();
+        const client = getPublicClient();
+        
+        // Fetch voting power directly from contract
+        const votingPowerBigInt = await fetchVotingPowerFromContract(
+          client,
+          validated.address,
+          {
+            namespace: tenant.namespace,
+            contracts: tenant.contracts,
+          }
         );
-        if (!vpData || !vpData.totalVP) {
+
+        // Convert to number for comparison
+        const currentVP = formatVotingPower(votingPowerBigInt);
+        const vpCheck = await canPerformAction(currentVP, slug);
+
+        if (!vpCheck.allowed) {
           return {
             success: false,
-            error: "No voting power data available for address",
+            error: formatVPError(vpCheck, "react to posts"),
           };
-        } else {
-          const currentVP = parseInt(vpData.totalVP);
-          const vpCheck = await canPerformAction(currentVP, slug);
-
-          if (!vpCheck.allowed) {
-            return {
-              success: false,
-              error: formatVPError(vpCheck, "react to posts"),
-            };
-          }
         }
       } catch (vpError) {
         console.error("Failed to check voting power:", vpError);

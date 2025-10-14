@@ -229,12 +229,12 @@ const CommentItem = ({
                 <Link
                   href={profileHref}
                   aria-label={profileLabel}
-                  className="text-sm font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black rounded"
+                  className="text-sm font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black rounded font-medium text-sm text-primary"
                 >
                   <ENSName address={comment.author || ""} />
                 </Link>
               ) : (
-                <span className="text-sm font-medium">
+                <span className="text-sm font-medium text-primary">
                   <ENSName address={comment.author || ""} />
                 </span>
               )}
@@ -276,7 +276,7 @@ const CommentItem = ({
               />
             )}
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 text-xs font-semibold text-tertiary">
             {Boolean(forForums) && (
               <EmojiReactions
                 targetType="post"

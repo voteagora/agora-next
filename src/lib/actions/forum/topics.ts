@@ -17,8 +17,12 @@ import { getIPFSUrl } from "@/lib/pinata";
 import { logForumAuditAction, checkForumPermissions } from "./admin";
 import { unstable_cache } from "next/cache";
 import { createAttachmentsFromContent } from "../attachment";
-import { fetchCurrentVotingPowerForNamespace } from "@/app/api/common/voting-power/getVotingPower";
 import { canCreateTopic, formatVPError } from "@/lib/forumSettings";
+import {
+  fetchVotingPowerFromContract,
+  formatVotingPower,
+} from "@/lib/votingPowerUtils";
+import { getPublicClient } from "@/lib/viem";
 const { slug } = Tenant.current();
 
 interface GetForumTopicsOptions {
@@ -317,26 +321,28 @@ export async function createForumTopic(
     // Only check voting power for non-admins
     if (!adminCheck.isAdmin) {
       try {
-        const vpData = await fetchCurrentVotingPowerForNamespace(
-          validatedData.address
+        const tenant = Tenant.current();
+        const client = getPublicClient();
+        
+        // Fetch voting power directly from contract
+        const votingPowerBigInt = await fetchVotingPowerFromContract(
+          client,
+          validatedData.address,
+          {
+            namespace: tenant.namespace,
+            contracts: tenant.contracts,
+          }
         );
 
-        if (!vpData || !vpData.totalVP) {
-          console.warn(
-            "No voting power data available for address:",
-            validatedData.address
-          );
-          // Continue without VP check if data unavailable
-        } else {
-          const currentVP = parseInt(vpData.totalVP);
-          const vpCheck = await canCreateTopic(currentVP, slug);
+        // Convert to number for comparison
+        const currentVP = formatVotingPower(votingPowerBigInt);
+        const vpCheck = await canCreateTopic(currentVP, slug);
 
-          if (!vpCheck.allowed) {
-            return {
-              success: false,
-              error: formatVPError(vpCheck, "create topics"),
-            };
-          }
+        if (!vpCheck.allowed) {
+          return {
+            success: false,
+            error: formatVPError(vpCheck, "create topics"),
+          };
         }
       } catch (vpError) {
         console.error("Failed to check voting power:", vpError);
