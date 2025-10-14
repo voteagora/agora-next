@@ -71,7 +71,7 @@ export default function ComposerModal({
 
   const bgStyle =
     namespace === TENANT_NAMESPACES.TOWNS
-      ? "bg-customBackground"
+      ? "bg-cardBackground"
       : "bg-background";
 
   useEffect(() => {
