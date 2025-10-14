@@ -732,7 +732,11 @@ export const getForumData = async ({
       }),
 
       prismaWeb2Client.forumAdmin.findMany({
-        where: { dao_slug: slug },
+        where: {
+          managedAccounts: {
+            has: slug,
+          },
+        },
         select: { address: true, role: true },
         orderBy: { address: "asc" },
       }),
