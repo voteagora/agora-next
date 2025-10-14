@@ -110,8 +110,6 @@ export function useForumPermissions(): ForumPermissions {
     retryDelay: 500, // Wait 500ms before retry
   });
 
-  console.log(settings, votingPower);
-
   const isLoading = vpLoading || settingsLoading || adminLoading;
   const isAdmin = adminCheck?.isAdmin || false;
 

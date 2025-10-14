@@ -6,6 +6,8 @@ import {
   http,
 } from "viem";
 import {
+  base,
+  bsc,
   cyber,
   mainnet,
   optimism,
@@ -88,6 +90,35 @@ export const getWalletClient = (chainId: number) => {
 
     default:
       throw new Error("Invalid chainId");
+  }
+};
+
+export const getChainById = (chainId: number): Chain | null => {
+  switch (chainId) {
+    case mainnet.id:
+      return mainnet;
+    case sepolia.id:
+      return sepolia;
+    case optimism.id:
+      return optimism;
+    case cyber.id:
+      return cyber;
+    case deriveTestnet.id:
+      return deriveTestnet;
+    case deriveMainnet.id:
+      return deriveMainnet;
+    case scroll.id:
+      return scroll;
+    case linea.id:
+      return linea;
+    case lineaSepolia.id:
+      return lineaSepolia;
+    case base.id:
+      return base;
+    case bsc.id:
+      return bsc;
+    default:
+      return null;
   }
 };
 
