@@ -260,7 +260,7 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       name: "forums",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "coming-soon",
