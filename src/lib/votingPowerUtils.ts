@@ -17,12 +17,14 @@ interface VotingPowerConfig {
 
 /**
  * Fetch voting power directly from the contract
+ * Checks both delegated voting power (getVotes) and token balance (balanceOf)
+ * Returns the maximum of the two values
  * Works on both client and server side
  *
  * @param client - Viem public client instance
  * @param address - Wallet address to check voting power for
  * @param config - Tenant configuration with contract details
- * @returns Voting power as bigint
+ * @returns Voting power as bigint (max of delegated votes and token balance)
  */
 export async function fetchVotingPowerFromContract(
   client: PublicClient,
@@ -33,32 +35,39 @@ export async function fetchVotingPowerFromContract(
     // Get current block number
     const blockNumber = await client.getBlockNumber();
 
-    let votes: bigint;
-
-    // Different contracts use different function names
-    if (
-      config.namespace === TENANT_NAMESPACES.UNISWAP ||
-      config.namespace === TENANT_NAMESPACES.SYNDICATE ||
-      config.namespace === TENANT_NAMESPACES.TOWNS
-    ) {
-      // Token contract with getPriorVotes
-      votes = (await client.readContract({
-        abi: config.contracts.token.abi,
-        address: config.contracts.token.address as `0x${string}`,
-        functionName: "getPriorVotes",
-        args: [address, blockNumber - BigInt(1)],
-      })) as unknown as bigint;
-    } else {
-      // Governor contract with getVotes
-      votes = (await client.readContract({
-        abi: config.contracts.governor.abi,
-        address: config.contracts.governor.address as `0x${string}`,
-        functionName: "getVotes",
-        args: [address, blockNumber - BigInt(1)],
-      })) as unknown as bigint;
-    }
-
-    return votes;
+    // Fetch both voting power and token balance in parallel
+    const [votes, balance] = await Promise.all([
+      // Get delegated voting power from governor contract
+      client
+        .readContract({
+          abi: config.contracts.governor.abi,
+          address: config.contracts.governor.address as `0x${string}`,
+          functionName: "getVotes",
+          args: [address, blockNumber - BigInt(1)],
+        })
+        .catch((error) => {
+          console.error("Failed to fetch voting power (getVotes):", error);
+          return BigInt(0);
+        }) as Promise<bigint>,
+      // Get token balance from token contract
+      client
+        .readContract({
+          abi: config.contracts.token.abi,
+          address: config.contracts.token.address as `0x${string}`,
+          functionName: "balanceOf",
+          args: [address],
+        })
+        .catch((error) => {
+          console.error("Failed to fetch token balance (balanceOf):", error);
+          return BigInt(0);
+        }) as Promise<bigint>,
+    ]);
+    console.log(votes, balance, "votes and balance");
+    // Return the maximum of voting power and token balance
+    // This ensures users with tokens but no delegation still have voting power
+    return (votes as bigint) > (balance as bigint)
+      ? (votes as bigint)
+      : (balance as bigint);
   } catch (error) {
     console.error("Failed to fetch voting power from contract:", error);
     return BigInt(0);

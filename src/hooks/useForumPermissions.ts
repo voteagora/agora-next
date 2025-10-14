@@ -39,6 +39,27 @@ export function useForumPermissions(): ForumPermissions {
   const { address } = useAccount();
   const { slug, contracts, namespace } = Tenant.current();
   const client = getPublicClient();
+  const normalizedAddress = address?.toLowerCase();
+
+  const { data: adminCheck, isLoading: adminLoading } = useQuery({
+    queryKey: ["forumAdmin", normalizedAddress],
+    queryFn: async () => {
+      try {
+        const result = await checkForumPermissions(normalizedAddress || "");
+        return result;
+      } catch (error) {
+        console.error("Failed to check admin permissions:", error);
+        // Default to non-admin on error
+        return { isAdmin: false };
+      }
+    },
+    enabled: !!normalizedAddress,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    retry: false, // Don't retry admin checks
+    placeholderData: { isAdmin: false }, // Optimistic default
+  });
+
   // Fetch voting power directly from the contract
   const { data: votingPower, isLoading: vpLoading } = useQuery({
     queryKey: ["votingPower", address],
@@ -65,12 +86,12 @@ export function useForumPermissions(): ForumPermissions {
     queryFn: async () => {
       try {
         const response = await fetch(`/api/forum/settings?daoSlug=${slug}`);
-        
+
         if (!response.ok) {
           console.error("Failed to fetch forum settings");
           return null;
         }
-        
+
         const data = await response.json();
         return data as ForumSettings;
       } catch (error) {
@@ -89,25 +110,7 @@ export function useForumPermissions(): ForumPermissions {
     retryDelay: 500, // Wait 500ms before retry
   });
 
-  const normalizedAddress = address?.toLowerCase();
-  const { data: adminCheck, isLoading: adminLoading } = useQuery({
-    queryKey: ["forumAdmin", normalizedAddress],
-    queryFn: async () => {
-      try {
-        const result = await checkForumPermissions(normalizedAddress || "");
-        return result;
-      } catch (error) {
-        console.error("Failed to check admin permissions:", error);
-        // Default to non-admin on error
-        return { isAdmin: false };
-      }
-    },
-    enabled: !!normalizedAddress,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
-    retry: false, // Don't retry admin checks
-    placeholderData: { isAdmin: false }, // Optimistic default
-  });
+  console.log(settings, votingPower);
 
   const isLoading = vpLoading || settingsLoading || adminLoading;
   const isAdmin = adminCheck?.isAdmin || false;

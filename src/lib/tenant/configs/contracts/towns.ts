@@ -2,9 +2,13 @@ import { TenantContracts } from "@/lib/types";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { BaseContract, AlchemyProvider, JsonRpcProvider } from "ethers";
-import { mainnet, sepolia } from "viem/chains";
+import { optimism } from "viem/chains";
 import { createTokenContract } from "@/lib/tokenUtils";
-import { UniswapToken__factory } from "@/lib/contracts/generated";
+import {
+  AgoraToken__factory,
+  AgoraGovernor__factory,
+} from "@/lib/contracts/generated";
+import { DELEGATION_MODEL } from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -16,11 +20,11 @@ export const townsTenantConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd
-    ? "0xc796953c443f542728eedf33aab32753d3f7a91a" // Placeholder for prod
-    : "0xc796953c443f542728eedf33aab32753d3f7a91a"; // Placeholder for dev
+    ? "0xd5741323b3ddfe5556c3477961b5160600c29c53" // Placeholder for prod
+    : "0xd5741323b3ddfe5556c3477961b5160600c29c53"; // Placeholder for dev
 
   // dummy addresses; for now: towns is info-only
-  const DUMMY_GOVERNOR = "0x0000000000000000000000000000000000000002";
+  const DUMMY_GOVERNOR = "0x95a35Cd8638b732E839C6CCDD0d8B7FA06319677";
   const DUMMY_TIMELOCK = "0x0000000000000000000000000000000000000003";
   const DUMMY_TYPES = "0x0000000000000000000000000000000000000004";
 
@@ -28,27 +32,25 @@ export const townsTenantConfig = ({
 
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : isProd
-      ? new AlchemyProvider("sepolia", alchemyId)
-      : new AlchemyProvider("sepolia", alchemyId);
+    : new AlchemyProvider("optimism", alchemyId);
 
-  const chain = isProd ? sepolia : sepolia;
+  const chain = optimism;
 
   return {
     token: createTokenContract({
-      abi: UniswapToken__factory.abi,
+      abi: AgoraToken__factory.abi,
       address: TOKEN as `0x${string}`,
       chain,
-      contract: UniswapToken__factory.connect(TOKEN, provider),
+      contract: AgoraToken__factory.connect(TOKEN, provider),
       provider,
       type: "erc20",
     }),
 
     governor: new TenantContract<IGovernorContract>({
-      abi: [],
+      abi: AgoraGovernor__factory.abi,
       address: DUMMY_GOVERNOR,
       chain,
-      contract: {} as IGovernorContract,
+      contract: AgoraGovernor__factory.connect(DUMMY_GOVERNOR, provider),
       provider,
     }),
 
@@ -67,7 +69,7 @@ export const townsTenantConfig = ({
       contract: {} as BaseContract,
       provider,
     }),
-
+    delegationModel: DELEGATION_MODEL.PARTIAL,
     treasury: [],
   };
 };
