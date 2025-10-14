@@ -97,7 +97,14 @@ export class ForumSearchService {
       const index = this.getIndex(daoSlug);
 
       const settingsTask = await index.updateSettings({
-        searchableAttributes: ["content"],
+        searchableAttributes: [
+          "title",
+          "content",
+          "author",
+          "categoryName",
+          "topicTitle",
+          "description"
+        ],
         filterableAttributes: [
           "daoSlug",
           "contentType",

@@ -27,7 +27,6 @@ const { searchClient, setMeiliSearchParams } = instantMeiliSearch(
       ],
       highlightPreTag: "<mark>",
       highlightPostTag: "</mark>",
-      attributesToSearchOn: ["content"],
     },
   }
 );
