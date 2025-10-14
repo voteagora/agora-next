@@ -17,7 +17,29 @@ export const townsTenantUIConfig = new TenantUI({
   title: "Towns Protocol",
   logo: townsLogo,
   logoSize: "36px",
-  tokens: [],
+  tokens: [
+    {
+      address: "0x000000Fa00b200406de700041CFc6b19BbFB4d13",
+      symbol: "TOWNS",
+      decimals: 18,
+      name: "Towns (ETH)",
+      chainId: 1,
+    },
+    {
+      address: "0x00000000bcA93b25a6694ca3d2109d545988b13B",
+      symbol: "TOWNS",
+      decimals: 18,
+      name: "Towns (BNB)",
+      chainId: 56,
+    },
+    {
+      address: "0x00000000A22C618fd6b4D7E9A335C4B96B189a38",
+      symbol: "TOWNS",
+      decimals: 18,
+      name: "Towns (Base)",
+      chainId: 8453,
+    },
+  ],
   hideAgoraBranding: true,
 
   assets: {

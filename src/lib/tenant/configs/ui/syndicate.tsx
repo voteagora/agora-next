@@ -16,7 +16,22 @@ import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
 export const syndicateTenantUIConfig = new TenantUI({
   title: "Syndicate Agora",
   logo: syndicateLogo,
-  tokens: [],
+  tokens: [
+    {
+      address: "0x1bAB804803159aD84b8854581AA53AC72455614E",
+      symbol: "SYND",
+      decimals: 18,
+      name: "Syndicate (ETH)",
+      chainId: 1,
+    },
+    {
+      address: "0x11dC28D01984079b7efE7763b533e6ed9E3722B9",
+      symbol: "SYND",
+      decimals: 18,
+      name: "Syndicate (Base)",
+      chainId: 8453,
+    },
+  ],
 
   assets: {
     success: syndicateSuccess,

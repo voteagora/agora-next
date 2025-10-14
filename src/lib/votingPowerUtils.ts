@@ -1,5 +1,6 @@
 import { PublicClient } from "viem";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
+import { getChainById, getPublicClient } from "@/lib/viem";
 
 interface VotingPowerConfig {
   namespace: string;
@@ -18,13 +19,14 @@ interface VotingPowerConfig {
 /**
  * Fetch voting power directly from the contract
  * Checks both delegated voting power (getVotes) and token balance (balanceOf)
- * Returns the maximum of the two values
+ * For multi-chain tokens, aggregates balances across all chains
+ * Returns the maximum of delegated votes and total token balance
  * Works on both client and server side
  *
  * @param client - Viem public client instance
  * @param address - Wallet address to check voting power for
  * @param config - Tenant configuration with contract details
- * @returns Voting power as bigint (max of delegated votes and token balance)
+ * @returns Voting power as bigint (max of delegated votes and total token balance across all chains)
  */
 export async function fetchVotingPowerFromContract(
   client: PublicClient,
@@ -32,25 +34,66 @@ export async function fetchVotingPowerFromContract(
   config: VotingPowerConfig
 ): Promise<bigint> {
   try {
-    // Get current block number
+    const tenant = Tenant.current();
+    const multiChainTokens = tenant.ui.tokens;
+
     const blockNumber = await client.getBlockNumber();
 
     // Fetch both voting power and token balance in parallel
-    const [votes, balance] = await Promise.all([
+    const [votes] = await Promise.all([
       // Get delegated voting power from governor contract
       client
         .readContract({
-          abi: config.contracts.governor.abi,
-          address: config.contracts.governor.address as `0x${string}`,
+          abi: config.contracts.token.abi,
+          address: config.contracts.token.address as `0x${string}`,
           functionName: "getVotes",
-          args: [address, blockNumber - BigInt(1)],
+          args: [address],
         })
         .catch((error) => {
           console.error("Failed to fetch voting power (getVotes):", error);
           return BigInt(0);
         }) as Promise<bigint>,
-      // Get token balance from token contract
-      client
+    ]);
+
+    let totalBalance = BigInt(0);
+
+    if (multiChainTokens && multiChainTokens.length > 1) {
+      const balancePromises = multiChainTokens.map(async (token) => {
+        if (!token.chainId) {
+          console.error(`Token ${token.address} is missing chainId`);
+          return BigInt(0);
+        }
+
+        const chain = getChainById(token.chainId);
+        if (!chain) {
+          console.error(`Unknown chain ID: ${token.chainId}`);
+          return BigInt(0);
+        }
+
+        try {
+          const chainClient = getPublicClient(chain);
+
+          const balance = await chainClient.readContract({
+            abi: config.contracts.token.abi,
+            address: token.address as `0x${string}`,
+            functionName: "balanceOf",
+            args: [address],
+          });
+
+          return balance as bigint;
+        } catch (error) {
+          console.error(
+            `Failed to fetch balance for token ${token.address} on ${chain.name}:`,
+            error
+          );
+          return BigInt(0);
+        }
+      });
+
+      const balances = await Promise.all(balancePromises);
+      totalBalance = balances.reduce((sum, bal) => sum + bal, BigInt(0));
+    } else {
+      const balance = await client
         .readContract({
           abi: config.contracts.token.abi,
           address: config.contracts.token.address as `0x${string}`,
@@ -60,14 +103,11 @@ export async function fetchVotingPowerFromContract(
         .catch((error) => {
           console.error("Failed to fetch token balance (balanceOf):", error);
           return BigInt(0);
-        }) as Promise<bigint>,
-    ]);
-    console.log(votes, balance, "votes and balance");
-    // Return the maximum of voting power and token balance
-    // This ensures users with tokens but no delegation still have voting power
-    return (votes as bigint) > (balance as bigint)
-      ? (votes as bigint)
-      : (balance as bigint);
+        });
+      totalBalance = balance as bigint;
+    }
+
+    return (votes as bigint) > totalBalance ? (votes as bigint) : totalBalance;
   } catch (error) {
     console.error("Failed to fetch voting power from contract:", error);
     return BigInt(0);

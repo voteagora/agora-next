@@ -2,11 +2,11 @@ import { TenantContracts } from "@/lib/types";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { BaseContract, AlchemyProvider, JsonRpcProvider } from "ethers";
-import { optimism } from "viem/chains";
+import { base } from "viem/chains";
 import { createTokenContract } from "@/lib/tokenUtils";
 import {
-  AgoraToken__factory,
   AgoraGovernor__factory,
+  ERC20__factory,
 } from "@/lib/contracts/generated";
 import { DELEGATION_MODEL } from "@/lib/constants";
 
@@ -20,8 +20,8 @@ export const townsTenantConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd
-    ? "0xd5741323b3ddfe5556c3477961b5160600c29c53" // Placeholder for prod
-    : "0xd5741323b3ddfe5556c3477961b5160600c29c53"; // Placeholder for dev
+    ? "0x00000000A22C618fd6b4D7E9A335C4B96B189a38"
+    : "0x00000000A22C618fd6b4D7E9A335C4B96B189a38";
 
   // dummy addresses; for now: towns is info-only
   const DUMMY_GOVERNOR = "0x95a35Cd8638b732E839C6CCDD0d8B7FA06319677";
@@ -32,16 +32,16 @@ export const townsTenantConfig = ({
 
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : new AlchemyProvider("optimism", alchemyId);
+    : new AlchemyProvider("base", alchemyId);
 
-  const chain = optimism;
+  const chain = base;
 
   return {
     token: createTokenContract({
-      abi: AgoraToken__factory.abi,
+      abi: ERC20__factory.abi,
       address: TOKEN as `0x${string}`,
       chain,
-      contract: AgoraToken__factory.connect(TOKEN, provider),
+      contract: ERC20__factory.connect(TOKEN, provider),
       provider,
       type: "erc20",
     }),
