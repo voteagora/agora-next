@@ -88,7 +88,7 @@ export async function addForumReaction(
       try {
         const tenant = Tenant.current();
         const client = getPublicClient();
-        
+
         // Fetch voting power directly from contract
         const votingPowerBigInt = await fetchVotingPowerFromContract(
           client,
@@ -147,8 +147,6 @@ export async function addForumReaction(
     }
     console.error("Error adding forum reaction:", error);
     return { success: false, error: "Failed to add reaction" };
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -207,7 +205,5 @@ export async function removeForumReaction(
     }
     console.error("Error removing forum reaction:", error);
     return { success: false, error: "Failed to remove reaction" };
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }

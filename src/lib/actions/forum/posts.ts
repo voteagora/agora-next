@@ -77,7 +77,7 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
       try {
         const tenant = Tenant.current();
         const client = getPublicClient();
-        
+
         // Fetch voting power directly from contract
         const votingPowerBigInt = await fetchVotingPowerFromContract(
           client,
@@ -134,8 +134,6 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
   } catch (error) {
     console.error("Error upvoting forum topic:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -173,8 +171,6 @@ export async function removeUpvoteForumTopic(
   } catch (error) {
     console.error("Error removing upvote from forum topic:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -190,8 +186,6 @@ export async function getForumTopicUpvotes(topicId: number) {
   } catch (error) {
     console.error("Error getting topic upvotes:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -222,8 +216,6 @@ export async function getMyForumTopicVote(topicId: number, address: string) {
   } catch (error) {
     console.error("Error checking my topic vote:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -268,7 +260,7 @@ export async function createForumPost(
       try {
         const tenant = Tenant.current();
         const client = getPublicClient();
-        
+
         // Fetch voting power directly from contract
         const votingPowerBigInt = await fetchVotingPowerFromContract(
           client,
@@ -358,8 +350,6 @@ export async function createForumPost(
   } catch (error) {
     console.error("Error creating forum post:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -405,8 +395,6 @@ export async function deleteForumPost(data: z.infer<typeof deletePostSchema>) {
   } catch (error) {
     console.error("Error deleting forum post:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -446,8 +434,6 @@ export async function softDeleteForumPost(
   } catch (error) {
     console.error("Error soft deleting forum post:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -517,8 +503,6 @@ export async function restoreForumPost(
   } catch (error) {
     console.error("Error restoring forum post:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -567,8 +551,6 @@ export async function getForumPostsByTopic(topicId: number) {
   } catch (error) {
     console.error("Error getting forum posts:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -623,8 +605,6 @@ export async function getForumPost(postId: number) {
   } catch (error) {
     console.error("Error getting forum post:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -661,8 +641,6 @@ export async function getLatestForumPost() {
   } catch (error) {
     console.error("Error getting latest forum post:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -748,7 +726,5 @@ export async function getForumPostsByUser(
   } catch (error) {
     console.error("Error getting forum posts by user:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
