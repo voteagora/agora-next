@@ -59,8 +59,6 @@ async function getForumSettingsFromDB(daoSlug: string): Promise<ForumSettings> {
       minVpForReplies: 1,
       minVpForActions: 1,
     };
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 

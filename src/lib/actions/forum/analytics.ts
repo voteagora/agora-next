@@ -81,8 +81,6 @@ export async function getForumViewStats(targetType: "topic", targetId: number) {
   } catch (error) {
     console.error("Error getting forum view stats:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -170,8 +168,6 @@ export async function subscribeToForumContent(
   } catch (error) {
     console.error("Error subscribing to forum content:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -225,8 +221,6 @@ export async function unsubscribeFromForumContent(
   } catch (error) {
     console.error("Error unsubscribing from forum content:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -259,7 +253,5 @@ export async function getForumSubscriptions(address: string) {
   } catch (error) {
     console.error("Error getting forum subscriptions:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }

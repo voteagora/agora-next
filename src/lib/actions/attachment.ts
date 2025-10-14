@@ -93,8 +93,6 @@ export async function uploadAttachment(
       success: false,
       error: error instanceof Error ? error.message : "Upload failed",
     };
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -185,8 +183,6 @@ export async function createAttachmentFromIPFS(
   } catch (error) {
     console.error("Attachment creation failed:", error);
     throw error;
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -238,7 +234,5 @@ export async function createAttachmentsFromContent(
   } catch (error) {
     console.error("Failed to create attachments from content:", error);
     throw error;
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }

@@ -30,35 +30,44 @@ export async function fetchVotingPowerFromContract(
   config: VotingPowerConfig
 ): Promise<bigint> {
   try {
-    // Get current block number
-    const blockNumber = await client.getBlockNumber();
+    // Race against timeout to prevent hanging
+    const timeoutPromise = new Promise<bigint>((_, reject) => {
+      setTimeout(() => reject(new Error("Contract call timeout")), 10000); // 10s timeout
+    });
 
-    let votes: bigint;
-    
-    // Different contracts use different function names
-    if (
-      config.namespace === TENANT_NAMESPACES.UNISWAP ||
-      config.namespace === TENANT_NAMESPACES.SYNDICATE ||
-      config.namespace === TENANT_NAMESPACES.TOWNS
-    ) {
-      // Token contract with getPriorVotes
-      votes = (await client.readContract({
-        abi: config.contracts.token.abi,
-        address: config.contracts.token.address as `0x${string}`,
-        functionName: "getPriorVotes",
-        args: [address, blockNumber - BigInt(1)],
-      })) as unknown as bigint;
-    } else {
-      // Governor contract with getVotes
-      votes = (await client.readContract({
-        abi: config.contracts.governor.abi,
-        address: config.contracts.governor.address as `0x${string}`,
-        functionName: "getVotes",
-        args: [address, blockNumber - BigInt(1)],
-      })) as unknown as bigint;
-    }
+    const fetchPromise = (async () => {
+      // Get current block number
+      const blockNumber = await client.getBlockNumber();
 
-    return votes;
+      let votes: bigint;
+      
+      // Different contracts use different function names
+      if (
+        config.namespace === TENANT_NAMESPACES.UNISWAP ||
+        config.namespace === TENANT_NAMESPACES.SYNDICATE ||
+        config.namespace === TENANT_NAMESPACES.TOWNS
+      ) {
+        // Token contract with getPriorVotes
+        votes = (await client.readContract({
+          abi: config.contracts.token.abi,
+          address: config.contracts.token.address as `0x${string}`,
+          functionName: "getPriorVotes",
+          args: [address, blockNumber - BigInt(1)],
+        })) as unknown as bigint;
+      } else {
+        // Governor contract with getVotes
+        votes = (await client.readContract({
+          abi: config.contracts.governor.abi,
+          address: config.contracts.governor.address as `0x${string}`,
+          functionName: "getVotes",
+          args: [address, blockNumber - BigInt(1)],
+        })) as unknown as bigint;
+      }
+
+      return votes;
+    })();
+
+    return await Promise.race([fetchPromise, timeoutPromise]);
   } catch (error) {
     console.error("Failed to fetch voting power from contract:", error);
     return BigInt(0);

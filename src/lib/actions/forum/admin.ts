@@ -34,8 +34,6 @@ export async function getForumAdmins() {
       success: false as const,
       error: "Failed to load forum admins",
     };
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 

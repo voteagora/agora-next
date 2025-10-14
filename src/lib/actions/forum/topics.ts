@@ -117,8 +117,6 @@ export async function getForumTopics({
   } catch (error) {
     console.error("Error getting forum topics:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -203,8 +201,6 @@ export async function getForumTopic(topicId: number) {
   } catch (error) {
     console.error("Error getting forum topic:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -290,8 +286,6 @@ export async function getForumTopicsByUser(
   } catch (error) {
     console.error("Error getting forum topics by user:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -323,7 +317,7 @@ export async function createForumTopic(
       try {
         const tenant = Tenant.current();
         const client = getPublicClient();
-        
+
         // Fetch voting power directly from contract
         const votingPowerBigInt = await fetchVotingPowerFromContract(
           client,
@@ -429,8 +423,6 @@ export async function createForumTopic(
   } catch (error) {
     console.error("Error creating forum topic:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -457,8 +449,6 @@ async function _deleteForumTopicInternal(topicId: number) {
       error: "Failed to delete topic",
       details: error instanceof Error ? error.message : "Unknown error",
     };
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -513,8 +503,6 @@ export async function deleteForumTopic(
   } catch (error) {
     console.error("Error deleting forum topic:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -554,8 +542,6 @@ export async function softDeleteForumTopic(
   } catch (error) {
     console.error("Error soft deleting forum topic:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -627,8 +613,6 @@ export async function restoreForumTopic(
   } catch (error) {
     console.error("Error restoring forum topic:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -672,8 +656,6 @@ export async function archiveForumTopic(
   } catch (error) {
     console.error("Error archiving forum topic:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 

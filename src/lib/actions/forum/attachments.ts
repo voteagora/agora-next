@@ -56,8 +56,6 @@ export async function getForumAttachments() {
   } catch (error) {
     console.error("Error getting forum attachments:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -156,8 +154,6 @@ export async function uploadDocumentFromBase64(
   } catch (error) {
     console.error("Error uploading document from base64:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -201,8 +197,6 @@ export async function deleteForumAttachment(
   } catch (error) {
     console.error("Error deleting forum attachment:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -258,8 +252,6 @@ export async function archiveForumAttachment(
   } catch (error) {
     console.error("Error archiving forum attachment:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -292,7 +284,5 @@ export const getForumCategoryAttachments = async ({
   } catch (error) {
     console.error("Error getting forum category attachments:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 };
