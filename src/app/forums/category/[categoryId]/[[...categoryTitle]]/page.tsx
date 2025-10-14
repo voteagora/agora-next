@@ -8,6 +8,9 @@ import { getForumCategory } from "@/lib/actions/forum/categories";
 const tenant = Tenant.current();
 const brandName = tenant.brandName || "Agora";
 
+// Force dynamic rendering - forum content changes frequently
+export const dynamic = 'force-dynamic';
+
 interface CategoryPageParams {
   categoryId: string;
   categoryTitle?: string[];
