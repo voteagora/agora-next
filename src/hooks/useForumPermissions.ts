@@ -128,17 +128,16 @@ export function useForumPermissions(): ForumPermissions {
   }
 
   const currentVotes = votingPower || BigInt(0);
-  const formattedVP = formatVotingPowerString(currentVotes);
-  
+
   // Convert voting power to number for comparisons
   const vpAsNumber = Number(currentVotes / BigInt(10 ** 18));
-  
+
   // Admins bypass all VP requirements
   // Ensure settings values are numbers for comparison
   const minVpForTopics = Number(settings?.minVpForTopics || 0);
   const minVpForReplies = Number(settings?.minVpForReplies || 0);
   const minVpForActions = Number(settings?.minVpForActions || 0);
-  
+
   const canCreateTopic = isAdmin || vpAsNumber >= minVpForTopics;
   const canCreatePost = isAdmin || vpAsNumber >= minVpForReplies;
   const canUpvote = isAdmin || vpAsNumber >= minVpForActions;

@@ -6,7 +6,7 @@ const tenant = Tenant.current();
 const brandName = tenant.brandName || "Agora";
 
 // Force dynamic rendering - forum content changes frequently
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: `${brandName} Forum Discussions`,
