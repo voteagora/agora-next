@@ -60,8 +60,7 @@ export function InsufficientVPModal({
           {/* Headline */}
           <div className="text-center space-y-2">
             <h2 className="text-2xl font-bold text-gray-900">
-              Oh no, you don&apos;t have enough voting power to{" "}
-              {ACTION_TEXT[action]}
+              Oh no, you don&apos;t have enough tokens to {ACTION_TEXT[action]}
             </h2>
             <p className="text-sm text-gray-600">
               It&apos;s important that conversations are aligned only to token
@@ -72,7 +71,9 @@ export function InsufficientVPModal({
           {/* VP Stats */}
           <div className="bg-gray-50 rounded-lg p-4 flex justify-between items-center">
             <div>
-              <p className="text-sm text-gray-600">Your voting power</p>
+              <p className="text-sm text-gray-600">
+                Your voting power and token balance
+              </p>
               <p className="text-2xl font-bold text-gray-900">
                 {currentVP.toLocaleString()}
               </p>
@@ -92,8 +93,7 @@ export function InsufficientVPModal({
             </h3>
 
             <div className="grid gap-4">
-              {/* Card 1: Delegate Statement */}
-              <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+              {/* <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                     <MessageSquare className="w-5 h-5 text-blue-600" />
@@ -128,7 +128,7 @@ export function InsufficientVPModal({
                     )}
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Card 2: Buy Tokens */}
               <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
@@ -138,23 +138,24 @@ export function InsufficientVPModal({
                   </div>
                   <div className="flex-1">
                     <h4 className="font-semibold text-gray-900 mb-1">
-                      Buy some {token.symbol} and self delegate
+                      Buy {token.symbol} tokens
                     </h4>
                     <p className="text-sm text-gray-600 mb-3">
-                      Purchase {token.symbol} tokens and then log in with your
-                      wallet to delegate them to yourself. This gives you
-                      immediate voting power.
+                      Purchase {token.symbol} tokens to gain voting power. Your
+                      token balance counts as voting power, even without
+                      delegation. You can also delegate to yourself or others
+                      for additional governance participation.
                     </p>
-                    <div className="flex gap-2">
+                    {/* <div className="flex gap-2">
                       {address && (
                         <a
                           href={`/delegates/${address}`}
                           className="inline-flex items-center text-sm font-medium text-green-600 hover:text-green-700"
                         >
-                          Self delegate →
+                          View delegation options →
                         </a>
                       )}
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

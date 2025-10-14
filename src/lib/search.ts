@@ -103,7 +103,7 @@ export class ForumSearchService {
           "author",
           "categoryName",
           "topicTitle",
-          "description"
+          "description",
         ],
         filterableAttributes: [
           "daoSlug",
