@@ -833,7 +833,5 @@ export const getForumData = async ({
   } catch (error) {
     console.error("Error getting optimized forum data:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 };
