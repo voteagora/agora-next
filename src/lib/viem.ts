@@ -91,25 +91,15 @@ export const getWalletClient = (chainId: number) => {
   }
 };
 
-// Cache clients to avoid creating multiple instances
-const clientCache = new Map<number, ReturnType<typeof createPublicClient>>();
-
 export const getPublicClient = (chain?: Chain) => {
   const { contracts } = Tenant.current();
-  const chainId = chain?.id ?? contracts.token.chain.id;
 
-  // Return cached client if available
-  if (clientCache.has(chainId)) {
-    return clientCache.get(chainId)!;
-  }
+  const transport = getTransportForChain(
+    chain?.id ?? contracts.token.chain.id
+  )!;
 
-  const transport = getTransportForChain(chainId)!;
-
-  const client = createPublicClient({
+  return createPublicClient({
     chain: chain ?? contracts.token.chain,
     transport,
   });
-
-  clientCache.set(chainId, client);
-  return client;
 };

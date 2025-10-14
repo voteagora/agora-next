@@ -23,7 +23,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
 
 // Force dynamic rendering - forum topics and posts change frequently
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: {

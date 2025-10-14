@@ -18,7 +18,7 @@ interface VotingPowerConfig {
 /**
  * Fetch voting power directly from the contract
  * Works on both client and server side
- * 
+ *
  * @param client - Viem public client instance
  * @param address - Wallet address to check voting power for
  * @param config - Tenant configuration with contract details
@@ -30,44 +30,35 @@ export async function fetchVotingPowerFromContract(
   config: VotingPowerConfig
 ): Promise<bigint> {
   try {
-    // Race against timeout to prevent hanging
-    const timeoutPromise = new Promise<bigint>((_, reject) => {
-      setTimeout(() => reject(new Error("Contract call timeout")), 10000); // 10s timeout
-    });
+    // Get current block number
+    const blockNumber = await client.getBlockNumber();
 
-    const fetchPromise = (async () => {
-      // Get current block number
-      const blockNumber = await client.getBlockNumber();
+    let votes: bigint;
 
-      let votes: bigint;
-      
-      // Different contracts use different function names
-      if (
-        config.namespace === TENANT_NAMESPACES.UNISWAP ||
-        config.namespace === TENANT_NAMESPACES.SYNDICATE ||
-        config.namespace === TENANT_NAMESPACES.TOWNS
-      ) {
-        // Token contract with getPriorVotes
-        votes = (await client.readContract({
-          abi: config.contracts.token.abi,
-          address: config.contracts.token.address as `0x${string}`,
-          functionName: "getPriorVotes",
-          args: [address, blockNumber - BigInt(1)],
-        })) as unknown as bigint;
-      } else {
-        // Governor contract with getVotes
-        votes = (await client.readContract({
-          abi: config.contracts.governor.abi,
-          address: config.contracts.governor.address as `0x${string}`,
-          functionName: "getVotes",
-          args: [address, blockNumber - BigInt(1)],
-        })) as unknown as bigint;
-      }
+    // Different contracts use different function names
+    if (
+      config.namespace === TENANT_NAMESPACES.UNISWAP ||
+      config.namespace === TENANT_NAMESPACES.SYNDICATE ||
+      config.namespace === TENANT_NAMESPACES.TOWNS
+    ) {
+      // Token contract with getPriorVotes
+      votes = (await client.readContract({
+        abi: config.contracts.token.abi,
+        address: config.contracts.token.address as `0x${string}`,
+        functionName: "getPriorVotes",
+        args: [address, blockNumber - BigInt(1)],
+      })) as unknown as bigint;
+    } else {
+      // Governor contract with getVotes
+      votes = (await client.readContract({
+        abi: config.contracts.governor.abi,
+        address: config.contracts.governor.address as `0x${string}`,
+        functionName: "getVotes",
+        args: [address, blockNumber - BigInt(1)],
+      })) as unknown as bigint;
+    }
 
-      return votes;
-    })();
-
-    return await Promise.race([fetchPromise, timeoutPromise]);
+    return votes;
   } catch (error) {
     console.error("Failed to fetch voting power from contract:", error);
     return BigInt(0);
@@ -76,7 +67,7 @@ export async function fetchVotingPowerFromContract(
 
 /**
  * Convert bigint voting power to number with proper decimals handling
- * 
+ *
  * @param votingPower - Voting power as bigint (typically 18 decimals)
  * @param decimals - Token decimals (default 18)
  * @returns Voting power as a number
@@ -92,7 +83,7 @@ export function formatVotingPower(
 
 /**
  * Format voting power as a string for display
- * 
+ *
  * @param votingPower - Voting power as bigint
  * @param decimals - Token decimals (default 18)
  * @param maxDecimals - Maximum decimal places to show (default 2)
@@ -106,14 +97,14 @@ export function formatVotingPowerString(
   const divisor = BigInt(10 ** decimals);
   const wholePart = votingPower / divisor;
   const fractionalPart = votingPower % divisor;
-  
+
   if (fractionalPart === BigInt(0)) {
     return wholePart.toString();
   }
-  
+
   const fractionalDivisor = BigInt(10 ** (decimals - maxDecimals));
   const roundedFractional = fractionalPart / fractionalDivisor;
-  const fractionalStr = roundedFractional.toString().padStart(maxDecimals, '0');
-  
+  const fractionalStr = roundedFractional.toString().padStart(maxDecimals, "0");
+
   return `${wholePart}.${fractionalStr}`;
 }
