@@ -18,7 +18,7 @@ export const syndicateTenantUIConfig = new TenantUI({
   logo: syndicateLogo,
   tokens: [
     {
-      address: "0x1bab804803159ad84b8854581aa53ac72455614e",
+      address: "0x1bAB804803159aD84b8854581AA53AC72455614E",
       symbol: "SYND",
       decimals: 18,
       name: "Syndicate (ETH)",

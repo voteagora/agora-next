@@ -20,8 +20,8 @@ export const syndicateTenantConfig = ({
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd
-    ? "0x1bab804803159ad84b8854581aa53ac72455614e"
-    : "0x1bab804803159ad84b8854581aa53ac72455614e";
+    ? "0x1bAB804803159aD84b8854581AA53AC72455614E"
+    : "0x1bAB804803159aD84b8854581AA53AC72455614E";
 
   // dummy addresses; for now: syndicate is info-only
   const DUMMY_GOVERNOR = "0x95a35Cd8638b732E839C6CCDD0d8B7FA06319677";
@@ -32,7 +32,7 @@ export const syndicateTenantConfig = ({
 
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : new AlchemyProvider("optimism", alchemyId);
+    : new AlchemyProvider("mainnet", alchemyId);
 
   const chain = mainnet;
 

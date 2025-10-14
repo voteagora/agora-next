@@ -21,7 +21,7 @@ export const useProfileData = () => {
   });
 
   const { data: tokenBalance } = useTokenBalance(
-    delegate ? (isSmartAccountEnabled ? scwAddress : address) : undefined
+    isSmartAccountEnabled ? scwAddress : address
   );
   const hasStatement = !!delegate?.statement;
 
