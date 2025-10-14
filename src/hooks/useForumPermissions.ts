@@ -1,9 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
+import { getPublicClient } from "@/lib/viem";
 import Tenant from "@/lib/tenant/tenant";
 import { checkForumPermissions } from "@/lib/actions/forum/admin";
-import { getPublicClient } from "@/lib/viem";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import {
+  fetchVotingPowerFromContract,
+  formatVotingPowerString,
+} from "@/lib/votingPowerUtils";
 
 interface ForumSettings {
   minVpForTopics: number;
@@ -36,74 +39,74 @@ export function useForumPermissions(): ForumPermissions {
   const { address } = useAccount();
   const { slug, contracts, namespace } = Tenant.current();
   const client = getPublicClient();
-  console.log(address, "address", "loading permissions");
   // Fetch voting power directly from the contract
-  const {
-    data: votingPower,
-    isLoading: vpLoading,
-    error: vpError,
-  } = useQuery({
+  const { data: votingPower, isLoading: vpLoading } = useQuery({
     queryKey: ["votingPower", address],
     queryFn: async () => {
       if (!address) return BigInt(0);
 
-      try {
-        // Get current block number
-        const blockNumber = await client.getBlockNumber();
-
-        let votes: bigint;
-        if (
-          namespace === TENANT_NAMESPACES.UNISWAP ||
-          namespace === TENANT_NAMESPACES.SYNDICATE ||
-          namespace === TENANT_NAMESPACES.TOWNS
-        ) {
-          votes = (await client.readContract({
-            abi: contracts.token.abi,
-            address: contracts.token.address as `0x${string}`,
-            functionName: "getPriorVotes",
-            args: [address, blockNumber - BigInt(1)],
-          })) as unknown as bigint;
-        } else {
-          votes = (await client.readContract({
-            abi: contracts.governor.abi,
-            address: contracts.governor.address as `0x${string}`,
-            functionName: "getVotes",
-            args: [address, blockNumber - BigInt(1)],
-          })) as unknown as bigint;
-        }
-
-        return votes;
-      } catch (error) {
-        console.error("Failed to fetch voting power:", error);
-        return BigInt(0);
-      }
+      return fetchVotingPowerFromContract(client, address, {
+        namespace,
+        contracts,
+      });
     },
     enabled: !!address,
     staleTime: 3 * 60 * 1000, // Cache for 3 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
     refetchOnWindowFocus: false, // Don't refetch when window regains focus
     refetchOnMount: false, // Don't refetch on component mount if data exists
+    retry: 1, // Retry once on failure
+    retryDelay: 500, // Wait 500ms before retry
   });
 
   // Fetch forum settings for current DAO
   const { data: settings, isLoading: settingsLoading } = useQuery({
     queryKey: ["forumSettings", slug],
     queryFn: async () => {
-      const response = await fetch(`/api/forum/settings?daoSlug=${slug}`);
-      if (!response.ok) {
-        console.error("Failed to fetch forum settings");
-        return null;
+      try {
+        const response = await fetch(`/api/forum/settings?daoSlug=${slug}`);
+        
+        if (!response.ok) {
+          console.error("Failed to fetch forum settings");
+          return null;
+        }
+        
+        const data = await response.json();
+        return data as ForumSettings;
+      } catch (error) {
+        console.error("Error fetching forum settings:", error);
+        // Return default settings on error
+        return {
+          minVpForTopics: 0,
+          minVpForReplies: 0,
+          minVpForActions: 0,
+        };
       }
-      return response.json() as Promise<ForumSettings>;
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    retry: 1, // Only retry once
+    retryDelay: 500, // Wait 500ms before retry
   });
 
   const normalizedAddress = address?.toLowerCase();
   const { data: adminCheck, isLoading: adminLoading } = useQuery({
     queryKey: ["forumAdmin", normalizedAddress],
-    queryFn: () => checkForumPermissions(normalizedAddress || ""),
+    queryFn: async () => {
+      try {
+        const result = await checkForumPermissions(normalizedAddress || "");
+        return result;
+      } catch (error) {
+        console.error("Failed to check admin permissions:", error);
+        // Default to non-admin on error
+        return { isAdmin: false };
+      }
+    },
     enabled: !!normalizedAddress,
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    retry: false, // Don't retry admin checks
+    placeholderData: { isAdmin: false }, // Optimistic default
   });
 
   const isLoading = vpLoading || settingsLoading || adminLoading;
@@ -124,14 +127,18 @@ export function useForumPermissions(): ForumPermissions {
     };
   }
 
-  const vpBigInt = votingPower || BigInt(0);
-  const vpAsNumber = Number(vpBigInt);
+  const currentVotes = votingPower || BigInt(0);
+  const formattedVP = formatVotingPowerString(currentVotes);
+  
+  // Convert voting power to number for comparisons
+  const vpAsNumber = Number(currentVotes / BigInt(10 ** 18));
+  
   // Admins bypass all VP requirements
   // Ensure settings values are numbers for comparison
-  const minVpForTopics = Number(settings.minVpForTopics);
-  const minVpForReplies = Number(settings.minVpForReplies);
-  const minVpForActions = Number(settings.minVpForActions);
-
+  const minVpForTopics = Number(settings?.minVpForTopics || 0);
+  const minVpForReplies = Number(settings?.minVpForReplies || 0);
+  const minVpForActions = Number(settings?.minVpForActions || 0);
+  
   const canCreateTopic = isAdmin || vpAsNumber >= minVpForTopics;
   const canCreatePost = isAdmin || vpAsNumber >= minVpForReplies;
   const canUpvote = isAdmin || vpAsNumber >= minVpForActions;
