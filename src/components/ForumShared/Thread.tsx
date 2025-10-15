@@ -231,11 +231,19 @@ const CommentItem = ({
                   aria-label={profileLabel}
                   className="text-sm font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black rounded font-medium text-sm text-primary"
                 >
-                  <ENSName address={comment.author || ""} />
+                  {isAuthorAdmin ? (
+                    "Cowrie"
+                  ) : (
+                    <ENSName address={comment.author || ""} />
+                  )}
                 </Link>
               ) : (
                 <span className="text-sm font-medium text-primary">
-                  <ENSName address={comment.author || ""} />
+                  {isAuthorAdmin ? (
+                    "Cowrie"
+                  ) : (
+                    <ENSName address={comment.author || ""} />
+                  )}
                 </span>
               )}
               {isAuthorAdmin && (

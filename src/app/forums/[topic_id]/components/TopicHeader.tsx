@@ -47,7 +47,7 @@ export default function TopicHeader({
               <ENSAvatar ensName={topic.address} size={20} />
               <div className="flex items-center gap-1">
                 <span className="font-medium text-sm text-primary hover:underline">
-                  {displayName}
+                  {isAdmin ? "Cowrie" : displayName}
                 </span>
                 {isAdmin && (
                   <ForumAdminBadge
@@ -61,7 +61,9 @@ export default function TopicHeader({
             <div className="flex items-center gap-2">
               <ENSAvatar ensName={topic.address} size={20} />
               <div className="flex items-center gap-1">
-                <div className="font-medium text-sm">{displayName}</div>
+                <div className="font-medium text-sm">
+                  {isAdmin ? "Cowrie" : displayName}
+                </div>
                 {isAdmin && (
                   <ForumAdminBadge
                     className="text-[9px]"
