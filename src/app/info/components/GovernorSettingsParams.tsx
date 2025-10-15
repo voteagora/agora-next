@@ -18,6 +18,10 @@ import { formatDuration, intervalToDuration } from "date-fns";
 const GovernorSettingsParams = () => {
   const { contracts, namespace } = Tenant.current();
 
+  if (namespace === TENANT_NAMESPACES.UNISWAP) {
+    return null;
+  }
+
   const { data: votingDelay, isFetched: isDelayFetched } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
     abi: contracts.governor.abi,
@@ -36,8 +40,7 @@ const GovernorSettingsParams = () => {
     useReadContract({
       address: contracts.timelock?.address as `0x${string}`,
       abi: contracts.timelock?.abi,
-      functionName:
-        namespace === TENANT_NAMESPACES.UNISWAP ? "delay" : "getMinDelay",
+      functionName: "getMinDelay",
       chainId: contracts.timelock?.chain.id,
     });
 
