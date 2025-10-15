@@ -159,8 +159,8 @@ export const syndicateTenantUIConfig = new TenantUI({
           image: syndicateInfoCard3,
         },
         {
-          name: "Docs Archive",
-          title: "Docs Archive*",
+          name: "Document Archive",
+          title: "Document Archive*",
           url: "/document-archive",
           image: syndicateInfoCard3,
         },
@@ -171,7 +171,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       title: "Syndicate Network Collective Roadmap",
       hero: syndicateHero,
       description:
-        "This dashboard is the focal point for information related to the Syndicate Network Collective DUNA. As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe $SYND governance token provides the members with ultimate control over how the Treasury should be utilized in support of the Syndicate Network.\n\nThe Syndicate Network Collective is established as an organizational framework for collective decision-making and innovation to pursue the common, nonprofit purpose of providing a foundation for community-aligned platforms to reshape how participation and contribution is valued on the internet.",
+        "This dashboard is the focal point for information related to the Syndicate Network Collective DUNA. As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe SYND governance token provides the members with ultimate control over how the Treasury should be utilized in support of the Syndicate Network.\n\nThe Syndicate Network Collective is established as an organizational framework for collective decision-making and innovation to pursue the common, nonprofit purpose of providing a foundation for community-aligned platforms to reshape how participation and contribution is valued on the internet.",
       sectionTitle: "Syndicate Network Collective Roadmap",
       tabs: [
         {

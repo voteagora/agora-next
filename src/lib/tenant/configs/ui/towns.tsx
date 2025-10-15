@@ -78,6 +78,7 @@ export const townsTenantUIConfig = new TenantUI({
     customCardSize: "sm:h-[100px] sm:w-[100px] lg:h-[120px] lg:w-[120px]",
     customIconColor: "#87819F",
     customButtonBackground: "#130C2F",
+    customHeroTitleWidth: "max-w-none",
   },
 
   theme: "dark",
@@ -178,7 +179,7 @@ export const townsTenantUIConfig = new TenantUI({
       title: "Towns Lodge Roadmap",
       hero: townsInfoHero,
       description:
-        "This dashboard is the focal point for information related to the Towns Lodge DUNA.  As a tax-paying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe Towns Protocol is supported by both a Swiss Association and the Towns Lodge DUNA – with the $TOWNS governance token providing the members ultimate control over how the Treasury should be utilized.  While the initial funding of the Swiss Association allows it to operate within established parameters, its role and funding will ultimately be decided by the members of the DUNA who, through their voting power, control whether to extend additional funding to the Swiss Association, redirect that funding to another entity, or take on more responsibilities within the DUNA.\n\nThe DUNA Governance does not go live until January 1, 2026, to allow the members of the community time to familiarize themselves with the Swiss Association and the Protocol.",
+        "This dashboard is the focal point for information related to the Towns Lodge DUNA.  As a tax-paying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe Towns Protocol is supported by both a Swiss Association and the Towns Lodge DUNA – with the TOWNS governance token providing the members ultimate control over how the Treasury should be utilized.  While the initial funding of the Swiss Association allows it to operate within established parameters, its role and funding will ultimately be decided by the members of the DUNA who, through their voting power, control whether to extend additional funding to the Swiss Association, redirect that funding to another entity, or take on more responsibilities within the DUNA.\n\nThe DUNA Governance does not go live until January 1, 2026, to allow the members of the community time to familiarize themselves with the Swiss Association and the Protocol.",
       sectionTitle: "Towns Lodge Roadmap",
       tabs: [
         {
@@ -204,9 +205,8 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       route: "coming-soon",
-      title: "Towns governance is\ncoming soon",
-      description:
-        "Towns voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+      title: "Towns Lodge governance goes live on January 1, 2026.",
+      description: "",
       hero: townsHero,
       meta: {
         title: "Towns Protocol Governance",

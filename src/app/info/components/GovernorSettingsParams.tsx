@@ -36,8 +36,7 @@ const GovernorSettingsParams = () => {
     useReadContract({
       address: contracts.timelock?.address as `0x${string}`,
       abi: contracts.timelock?.abi,
-      functionName:
-        namespace === TENANT_NAMESPACES.UNISWAP ? "delay" : "getMinDelay",
+      functionName: "getMinDelay",
       chainId: contracts.timelock?.chain.id,
     });
 
@@ -76,6 +75,10 @@ const GovernorSettingsParams = () => {
 
     return parts.join(", ");
   };
+
+  if (namespace === TENANT_NAMESPACES.UNISWAP) {
+    return null;
+  }
 
   return (
     <Table>
