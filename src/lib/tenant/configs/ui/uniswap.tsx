@@ -45,6 +45,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     brandPrimary: "0 0 0",
     brandSecondary: "255 255 255",
     tokenAmountFont: "font-chivoMono",
+    customAboutSubtitle: "About DUNI",
   },
 
   links: [
@@ -201,7 +202,7 @@ export const uniswapTenantUIConfig = new TenantUI({
       title: "About DUNI",
       hero: infoPageHero,
       description:
-        "This dashboard provides information related to DUNI, a Wyoming Decentralized Unincorporated Nonprofit Association.  As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.The Uniswap protocol is a peer-to-peer system designed for exchanging cryptocurrencies. The protocol is implemented as a set of persistent, non-upgradable smart contracts; designed to prioritize censorship resistance, security, self-custody, and to function without any trusted intermediaries who may selectively restrict access. The Uniswap Protocol is a public good owned and governed by UNI token holders.",
+        "This dashboard provides information related to DUNI, a Wyoming Decentralized Unincorporated Nonprofit Association. As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe UNI token governance token provides members with control over how the Treasury should be utilized in support of the Uniswap Protocol, as well as other limited protocol-specific parameters.\n\nDUNI is established as an organizational framework for community engagement and collective decision-making to pursue the development and acceleration of decentralized financial systems.",
       meta: {
         title: "Welcome to DUNI",
         description: "",
@@ -246,7 +247,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "info/governance-charts",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "sponsoredVote",
@@ -365,6 +366,14 @@ export const uniswapTenantUIConfig = new TenantUI({
     {
       name: "forums",
       enabled: false,
+    },
+    {
+      name: "hide-info-tabs",
+      enabled: true,
+    },
+    {
+      name: "hide-hero-image",
+      enabled: true,
     },
     {
       name: "duna-description",
