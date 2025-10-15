@@ -160,16 +160,13 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       route: "info",
-      title: "Uniswap Protocol Governance",
-      description:
-        "Uniswap is a public good owned and governed by UNI token holders.",
+      title: "Welcome to DUNI",
+      description: "",
       meta: {
-        title: "Uniswap Protocol Governance",
-        description:
-          "Uniswap is a public good owned and governed by UNI token holders.",
-        imageTitle: "Uniswap Protocol Governance",
-        imageDescription:
-          "Uniswap is a public good owned and governed by UNI token holders.",
+        title: "Welcome to DUNI",
+        description: "",
+        imageTitle: "Welcome to DUNI",
+        imageDescription: "",
       },
       links: [
         {
@@ -200,17 +197,15 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       route: "info/about",
-      title: "About Uniswap",
+      title: "About DUNI",
       hero: infoPageHero,
       description:
-        "The Uniswap protocol is a peer-to-peer system designed for exchanging cryptocurrencies. The protocol is implemented as a set of persistent, non-upgradable smart contracts; designed to prioritize censorship resistance, security, self-custody, and to function without any trusted intermediaries who may selectively restrict access. The Uniswap Protocol is a public good owned and governed by UNI token holders.",
+        "This dashboard provides information related to DUNI, a Wyoming Decentralized Unincorporated Nonprofit Association.  As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.The Uniswap protocol is a peer-to-peer system designed for exchanging cryptocurrencies. The protocol is implemented as a set of persistent, non-upgradable smart contracts; designed to prioritize censorship resistance, security, self-custody, and to function without any trusted intermediaries who may selectively restrict access. The Uniswap Protocol is a public good owned and governed by UNI token holders.",
       meta: {
-        title: "Uniswap Protocol Governance",
-        description:
-          "Uniswap is a public good owned and governed by UNI token holders.",
-        imageTitle: "Uniswap Protocol Governance",
-        imageDescription:
-          "Uniswap is a public good owned and governed by UNI token holders.",
+        title: "Welcome to DUNI",
+        description: "",
+        imageTitle: "Welcome to DUNI",
+        imageDescription: "",
       },
     },
   ],
