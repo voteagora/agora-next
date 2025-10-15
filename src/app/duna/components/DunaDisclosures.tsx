@@ -19,12 +19,12 @@ const DunaDisclosures = () => {
               By owning the token and engaging in the Uniswap Governance
               Protocol, you acknowledge and agree that you are electing to
               become a member of a Wyoming Decentralized Unincorporated
-              Nonprofit Association ("Association"). Your participation is
-              subject to the terms and conditions set forth in the Association
-              Agreement. You further acknowledge and agree that any dispute,
-              claim, or controversy arising out of or relating to the
-              Association Agreement, any governance proposal, or the rights and
-              obligations of members or administrators shall be submitted
+              Nonprofit Association (&quot;Association&quot;). Your
+              participation is subject to the terms and conditions set forth in
+              the Association Agreement. You further acknowledge and agree that
+              any dispute, claim, or controversy arising out of or relating to
+              the Association Agreement, any governance proposal, or the rights
+              and obligations of members or administrators shall be submitted
               exclusively to the Wyoming Chancery Court. In the event that the
               Wyoming Chancery Court declines to exercise jurisdiction over any
               such dispute, the parties agree that such dispute shall be
