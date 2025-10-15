@@ -160,13 +160,18 @@ async function getCurrentVotingPowerForAddress({
     });
 
     // This query pulls only partially delegated voting power
-    // const advancedVotingPower = null;
+    const advancedVotingPower = await findAdvancedVotingPower({
+      namespace,
+      address,
+      contract: contracts.alligator!.address,
+    });
 
     return {
       directVP: votingPower?.voting_power ?? "0",
-      advancedVP: "0",
+      advancedVP: advancedVotingPower?.advanced_vp.toFixed(0) ?? "0",
       totalVP: (
-        BigInt(votingPower?.voting_power ?? "0") + BigInt("0")
+        BigInt(votingPower?.voting_power ?? "0") +
+        BigInt(advancedVotingPower?.advanced_vp.toFixed(0) ?? "0")
       ).toString(),
     };
   });

@@ -723,6 +723,8 @@ export function findAdvancedVotingPower({
       return prismaWeb3Client.lineaAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.TOWNS:
       return Promise.resolve(null); // for now: towns is info-only
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve(null); // for now: syndicate is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
