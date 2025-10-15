@@ -147,7 +147,7 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
                   <span>{replies}</span>
                 </div>
                 {/* Time */}
-                <div className="inline-flex items-center gap-1.5">
+                <div className="hidden lg:inline-flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5" strokeWidth={1.7} />
                   <span>{formatRelative(createdAt)}</span>
                 </div>
