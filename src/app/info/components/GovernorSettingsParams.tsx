@@ -36,7 +36,8 @@ const GovernorSettingsParams = () => {
     useReadContract({
       address: contracts.timelock?.address as `0x${string}`,
       abi: contracts.timelock?.abi,
-      functionName: "getMinDelay",
+      functionName:
+        namespace === TENANT_NAMESPACES.UNISWAP ? "delay" : "getMinDelay",
       chainId: contracts.timelock?.chain.id,
     });
 
