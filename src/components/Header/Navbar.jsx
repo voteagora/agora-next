@@ -33,6 +33,9 @@ export default function Navbar() {
     // Extract the first part of the pathname to determine the active section
     const path = pathname === "/" ? "proposals" : pathname.split("/")[1];
 
+    console.log("path", path);
+    console.log("linkRefs.current", linkRefs.current);
+
     // Check if the path matches any of our nav items directly
     // This avoids explicit pathname checks and makes adding new nav items easier
     if (path && linkRefs.current[path]) {
@@ -51,6 +54,8 @@ export default function Navbar() {
       setActiveNavItem("coming-soon");
     } else if (path === "forums" && linkRefs.current["forums"]) {
       setActiveNavItem("forums");
+    } else if (path === "document-archive" && linkRefs.current["info"]) {
+      setActiveNavItem("info");
     }
   }, [pathname]);
 

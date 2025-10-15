@@ -16,7 +16,22 @@ import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
 export const syndicateTenantUIConfig = new TenantUI({
   title: "Syndicate Agora",
   logo: syndicateLogo,
-  tokens: [],
+  tokens: [
+    {
+      address: "0x1bAB804803159aD84b8854581AA53AC72455614E",
+      symbol: "SYND",
+      decimals: 18,
+      name: "Syndicate (ETH)",
+      chainId: 1,
+    },
+    {
+      address: "0x11dC28D01984079b7efE7763b533e6ed9E3722B9",
+      symbol: "SYND",
+      decimals: 18,
+      name: "Syndicate (Base)",
+      chainId: 8453,
+    },
+  ],
 
   assets: {
     success: syndicateSuccess,
@@ -29,7 +44,7 @@ export const syndicateTenantUIConfig = new TenantUI({
   },
 
   dunaDisclaimers:
-    "*DUNA Administration Docs will archive upon Q3 financial statements and tax update.",
+    "* DUNA Administration Docs will archive upon the release of the year-end financial statements and tax update.",
 
   customization: {
     primary: "0 0 0",
@@ -48,7 +63,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     infoTabBackground: "#FFFFFF",
     buttonBackground: "#FAFAFA",
     infoSectionBackground: "255 255 255",
-    cardBackground: "#FFFFFF",
+    // cardBackground: "#FFFFFF", // removing this for now since this causes text to be white in duna content rendere
     customIconBackground: "#FBFBFB",
     footerBackground: "236 237 229",
     customAboutSubtitle: "About Syndicate Network Collective",
@@ -144,9 +159,9 @@ export const syndicateTenantUIConfig = new TenantUI({
           image: syndicateInfoCard3,
         },
         {
-          name: "Docs Archive",
-          title: "Docs Archive*",
-          url: "",
+          name: "Document Archive",
+          title: "Document Archive*",
+          url: "/document-archive",
           image: syndicateInfoCard3,
         },
       ],
@@ -156,23 +171,9 @@ export const syndicateTenantUIConfig = new TenantUI({
       title: "Syndicate Network Collective Roadmap",
       hero: syndicateHero,
       description:
-        "This dashboard is the focal point for information related to the Syndicate Network Collective DUNA. As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe $SYND governance token provides the members with ultimate control over how the Treasury should be utilized in support of the Syndicate Network.\n\nThe Syndicate Network Collective is established as an organizational framework for collective decision-making and innovation to pursue the common, nonprofit purpose of providing a foundation for community-aligned platforms to reshape how participation and contribution is valued on the internet.",
+        "This dashboard is the focal point for information related to the Syndicate Network Collective DUNA. As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe SYND governance token provides the members with ultimate control over how the Treasury should be utilized in support of the Syndicate Network.\n\nThe Syndicate Network Collective is established as an organizational framework for collective decision-making and innovation to pursue the common, nonprofit purpose of providing a foundation for community-aligned platforms to reshape how participation and contribution is valued on the internet.",
       sectionTitle: "Syndicate Network Collective Roadmap",
       tabs: [
-        {
-          icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#737373" />,
-          title: "September 22, 2025",
-          description:
-            "Messaging functionality opens for the DUNA Administration section.",
-        },
-        {
-          icon: (
-            <NotificationIcon className="w-[24px] h-[24px]" stroke="#737373" />
-          ),
-          title: "October 15, 2025",
-          description:
-            "Q3 financial statements and tax updates will be posted with messaging functionality enabled in the DUNA Administration section and Grants Award Committee submissions go live.",
-        },
         {
           icon: (
             <CheckCircleBrokenIcon
@@ -255,7 +256,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "forums",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "coming-soon",

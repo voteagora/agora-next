@@ -22,6 +22,9 @@ import { stripHtmlToText } from "../../stripHtml";
 import Tenant from "@/lib/tenant/tenant";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
 
+// Force dynamic rendering - forum topics and posts change frequently
+export const dynamic = "force-dynamic";
+
 interface PageProps {
   params: {
     topic_id: string;
@@ -176,6 +179,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
         return map;
       }, new Map<string, string | null>())
     : new Map<string, string | null>();
+
   const adminDirectory = Array.from(adminRolesMap.entries()).map(
     ([address, role]) => ({
       address,
@@ -197,7 +201,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
     adminRole: authorRole,
   };
 
-  const rootPost = comments[0];
+  const rootPost = topicData.posts?.[0];
   const rootAttachments = (rootPost?.attachments as any[]) || [];
 
   const lastActivityAt =
@@ -223,12 +227,11 @@ export default async function ForumTopicPage({ params }: PageProps) {
         createdAt: cat.createdAt.toISOString(),
         updatedAt: cat.updatedAt.toISOString(),
         topicsCount: cat.topicsCount,
-        isDuna: cat.isDuna,
       }))
     : [];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <ForumsHeader
         breadcrumbs={breadcrumbs}
         isDuna={categoryName === "DUNA"}
@@ -242,7 +245,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
             <div className="mt-2 mb-4">
               <DunaContentRenderer
                 content={topicBody}
-                className="text-gray-700 text-sm leading-relaxed"
+                className="text-secondary text-sm leading-relaxed"
               />
             </div>
 

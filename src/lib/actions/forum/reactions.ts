@@ -5,6 +5,13 @@ import { AttachableType } from "@prisma/client";
 import Tenant from "@/lib/tenant/tenant";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import { canPerformAction, formatVPError } from "@/lib/forumSettings";
+import { checkForumPermissions } from "./admin";
+import {
+  fetchVotingPowerFromContract,
+  formatVotingPower,
+} from "@/lib/votingPowerUtils";
+import { getPublicClient } from "@/lib/viem";
 
 const addReactionSchema = z.object({
   targetType: z.literal("post"),
@@ -48,12 +55,65 @@ export async function addForumReaction(
     const validated = addReactionSchema.parse(data);
     const { slug } = Tenant.current();
 
-    const isValid = await verifyMessage({
-      address: validated.address as `0x${string}`,
-      message: validated.message,
-      signature: validated.signature as `0x${string}`,
-    });
+    const [isValid, post] = await Promise.all([
+      verifyMessage({
+        address: validated.address as `0x${string}`,
+        message: validated.message,
+        signature: validated.signature as `0x${string}`,
+      }),
+      prismaWeb2Client.forumPost.findUnique({
+        where: { id: validated.targetId },
+        include: {
+          topic: {
+            select: { categoryId: true },
+          },
+        },
+      }),
+    ]);
+
     if (!isValid) return { success: false, error: "Invalid signature" };
+
+    if (!post) {
+      return { success: false, error: "Post not found" };
+    }
+
+    // Check if user is an admin (admins bypass VP requirements)
+    const adminCheck = await checkForumPermissions(
+      validated.address,
+      post.topic.categoryId || undefined
+    );
+
+    // Only check voting power for non-admins
+    if (!adminCheck.isAdmin) {
+      try {
+        const tenant = Tenant.current();
+        const client = getPublicClient();
+
+        // Fetch voting power directly from contract
+        const votingPowerBigInt = await fetchVotingPowerFromContract(
+          client,
+          validated.address,
+          {
+            namespace: tenant.namespace,
+            contracts: tenant.contracts,
+          }
+        );
+
+        // Convert to number for comparison
+        const currentVP = formatVotingPower(votingPowerBigInt);
+        const vpCheck = await canPerformAction(currentVP, slug);
+
+        if (!vpCheck.allowed) {
+          return {
+            success: false,
+            error: formatVPError(vpCheck, "react to posts"),
+          };
+        }
+      } catch (vpError) {
+        console.error("Failed to check voting power:", vpError);
+        // Continue if VP check fails - don't block legitimate users
+      }
+    }
 
     const emoji = normalizeEmoji(validated.emoji);
 
@@ -87,8 +147,6 @@ export async function addForumReaction(
     }
     console.error("Error adding forum reaction:", error);
     return { success: false, error: "Failed to add reaction" };
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -147,7 +205,5 @@ export async function removeForumReaction(
     }
     console.error("Error removing forum reaction:", error);
     return { success: false, error: "Failed to remove reaction" };
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }

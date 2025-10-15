@@ -24,7 +24,19 @@ const getClient = () => {
   return cachedClient;
 };
 
-export const getForumIndexName = (daoSlug: string) => `forum_${daoSlug}`;
+const stripMarkdownAndHtml = (content: string): string => {
+  return content
+    .replace(/<[^>]*>/g, "")
+    .replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1")
+    .replace(/[*_~`#]/g, "")
+    .replace(/\n+/g, " ")
+    .trim();
+};
+
+export const getForumIndexName = (daoSlug: string) => {
+  const baseName = `forum_${daoSlug}`;
+  return baseName;
+};
 
 export interface ForumDocument {
   id: string; // Combination of dao_slug + type + item_id
@@ -97,7 +109,14 @@ export class ForumSearchService {
       const index = this.getIndex(daoSlug);
 
       const settingsTask = await index.updateSettings({
-        searchableAttributes: ["content"],
+        searchableAttributes: [
+          "title",
+          "content",
+          "author",
+          "categoryName",
+          "topicTitle",
+          "description",
+        ],
         filterableAttributes: [
           "daoSlug",
           "contentType",
@@ -126,8 +145,13 @@ export class ForumSearchService {
 
   async indexDocument(document: ForumDocument): Promise<void> {
     try {
+      const sanitizedDocument = {
+        ...document,
+        content: stripMarkdownAndHtml(document.content),
+        title: stripMarkdownAndHtml(document.title),
+      };
       const index = this.getIndex(document.daoSlug);
-      const task = await index.addDocuments([document]);
+      const task = await index.addDocuments([sanitizedDocument]);
     } catch (error) {
       console.error(`Error indexing ${document.contentType}:`, error);
       throw error;
@@ -146,7 +170,13 @@ export class ForumSearchService {
         return;
       }
 
-      const addTask = await index.addDocuments(documents);
+      const sanitizedDocuments = documents.map((doc) => ({
+        ...doc,
+        content: stripMarkdownAndHtml(doc.content),
+        title: stripMarkdownAndHtml(doc.title),
+      }));
+
+      const addTask = await index.addDocuments(sanitizedDocuments);
     } catch (error) {
       console.error(`Error replacing documents for ${daoSlug}:`, error);
       throw error;

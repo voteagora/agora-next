@@ -51,13 +51,12 @@ export async function getForumAttachments() {
         ipfsCid: attachment.ipfsCid,
         createdAt: attachment.createdAt.toISOString(),
         uploadedBy: attachment.address,
+        archived: attachment.archived,
       })),
     };
   } catch (error) {
     console.error("Error getting forum attachments:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -156,8 +155,6 @@ export async function uploadDocumentFromBase64(
   } catch (error) {
     console.error("Error uploading document from base64:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -201,8 +198,6 @@ export async function deleteForumAttachment(
   } catch (error) {
     console.error("Error deleting forum attachment:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -258,15 +253,15 @@ export async function archiveForumAttachment(
   } catch (error) {
     console.error("Error archiving forum attachment:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
 export const getForumCategoryAttachments = async ({
   categoryId,
+  archived = false,
 }: {
   categoryId: number;
+  archived?: boolean;
 }) => {
   try {
     const attachments = await prismaWeb2Client.forumCategoryAttachment.findMany(
@@ -274,6 +269,7 @@ export const getForumCategoryAttachments = async ({
         where: {
           dao_slug: slug,
           categoryId,
+          archived,
         },
       }
     );
@@ -287,12 +283,11 @@ export const getForumCategoryAttachments = async ({
         ipfsCid: attachment.ipfsCid,
         createdAt: attachment.createdAt.toISOString(),
         uploadedBy: attachment.address,
+        archived: attachment.archived,
       })),
     };
   } catch (error) {
     console.error("Error getting forum category attachments:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 };

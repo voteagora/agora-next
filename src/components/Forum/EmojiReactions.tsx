@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -12,6 +12,8 @@ import { useAccount } from "wagmi";
 import { SmilePlus } from "lucide-react";
 import useRequireLogin from "@/hooks/useRequireLogin";
 import { useStableCallback } from "@/hooks/useStableCallback";
+import { InsufficientVPModal } from "./InsufficientVPModal";
+import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 
 type AddressesByEmoji = Record<string, string[]>;
 
@@ -35,7 +37,9 @@ export default function EmojiReactions({
   const [open, setOpen] = React.useState(false);
   const [pending, setPending] = React.useState<Set<string>>(new Set());
   const { addReaction, removeReaction } = useForum();
+  const permissions = useForumPermissionsContext();
   const requireLogin = useRequireLogin();
+  const [showVPModal, setShowVPModal] = useState(false);
 
   // Create stable callbacks that always use the latest values
   const stableAddReaction = useStableCallback(addReaction);
@@ -61,6 +65,15 @@ export default function EmojiReactions({
       const currentlyMine = (byEmoji[emoji] || []).some(
         (a) => a.toLowerCase() === me
       );
+
+      // Only check VP when adding reaction (not removing)
+      if (!currentlyMine) {
+        // Don't block if permissions are still loading
+        if (!permissions.isLoading && !permissions.canReact) {
+          setShowVPModal(true);
+          return;
+        }
+      }
 
       setPending((p) => new Set(p).add(emoji));
 
@@ -109,6 +122,8 @@ export default function EmojiReactions({
       stableRemoveReaction,
       targetType,
       targetId,
+      permissions.canReact,
+      permissions.isLoading,
     ]
   );
 
@@ -129,55 +144,63 @@ export default function EmojiReactions({
   }, [byEmoji]);
 
   return (
-    <div className="flex items-center gap-2">
-      {hasReactions && (
-        <div className="flex items-center gap-2">
-          {sortedEntries.map(([emoji, addresses]) => (
-            <div
-              key={`${targetType}-${targetId}-${emoji}`}
-              className={`px-2.5 py-1 rounded-full inline-flex items-center gap-2 cursor-pointer ${
-                mineSet.has(emoji)
-                  ? "bg-primary/5 text-primary-700"
-                  : "border border-primary/5"
-              } ${pending.has(emoji) ? "opacity-70" : ""}`}
-              onClick={() => handleToggle(emoji)}
-              title="React"
-            >
-              <span className="text-neutral-900 text-xs font-semibold tracking-[3.60px]">
-                {emoji}
-              </span>
-              <span className="text-neutral-700 text-xs font-semibold">
-                {addresses?.length || 0}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-auto px-1.5 py-1 text-neutral-700"
-          >
-            <SmilePlus className="h-4 w-4" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent align="start" className="p-2 w-[220px]">
-          <div className="grid grid-cols-6 gap-1">
-            {DEFAULT_EMOJIS.map((e) => (
-              <button
-                key={`${targetType}-${targetId}-pick-${e}`}
-                className="text-base hover:bg-neutral-100 rounded px-1 py-0.5"
-                onClick={() => handleToggle(e, { closeOnAdd: true })}
+    <>
+      <div className="flex items-center gap-2">
+        {hasReactions && (
+          <div className="flex items-center gap-2">
+            {sortedEntries.map(([emoji, addresses]) => (
+              <div
+                key={`${targetType}-${targetId}-${emoji}`}
+                className={`px-2.5 py-1 rounded-full inline-flex items-center gap-2 cursor-pointer ${
+                  mineSet.has(emoji)
+                    ? "bg-primary/5 text-primary-700"
+                    : "border border-primary/5"
+                } ${pending.has(emoji) ? "opacity-70" : ""}`}
+                onClick={() => handleToggle(emoji)}
+                title="React"
               >
-                {e}
-              </button>
+                <span className="text-neutral-900 text-xs font-semibold tracking-[3.60px]">
+                  {emoji}
+                </span>
+                <span className="text-neutral-700 text-xs font-semibold">
+                  {addresses?.length || 0}
+                </span>
+              </div>
             ))}
           </div>
-        </PopoverContent>
-      </Popover>
-    </div>
+        )}
+
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-auto px-1.5 py-1 text-neutral-700"
+            >
+              <SmilePlus className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="start" className="p-2 w-[220px]">
+            <div className="grid grid-cols-6 gap-1">
+              {DEFAULT_EMOJIS.map((e) => (
+                <button
+                  key={`${targetType}-${targetId}-pick-${e}`}
+                  className="text-base hover:bg-neutral-100 rounded px-1 py-0.5"
+                  onClick={() => handleToggle(e, { closeOnAdd: true })}
+                >
+                  {e}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      <InsufficientVPModal
+        isOpen={showVPModal}
+        onClose={() => setShowVPModal(false)}
+        action="react"
+      />
+    </>
   );
 }

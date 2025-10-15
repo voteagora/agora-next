@@ -152,6 +152,7 @@ async function getCurrentVotingPowerForAddress({
 }): Promise<VotingPowerData> {
   return withMetrics("getCurrentVotingPowerForAddress", async () => {
     const { namespace, contracts } = Tenant.current();
+    console.log("address", address, contracts.token.address);
     const votingPower = await findVotingPower({
       namespace,
       address,

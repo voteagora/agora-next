@@ -45,6 +45,10 @@ export function findDelagatee({
       return prismaWeb3Client.demoDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaDelegatees.findFirst(condition);
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve(null);
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve(null);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -94,6 +98,10 @@ export function findAdvancedDelegatee({
       return prismaWeb3Client.demoAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaAdvancedDelegatees.findMany(condition);
+    case TENANT_NAMESPACES.TOWNS:
+      return Promise.resolve([]);
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve([]);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -715,6 +723,8 @@ export function findAdvancedVotingPower({
       return prismaWeb3Client.lineaAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.TOWNS:
       return Promise.resolve(null); // for now: towns is info-only
+    case TENANT_NAMESPACES.SYNDICATE:
+      return Promise.resolve(null); // for now: syndicate is info-only
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }

@@ -24,14 +24,14 @@ const SoftDeletedContent: React.FC<SoftDeletedContentProps> = ({
   const contentTypeLabel = contentType === "comment" ? "reply" : contentType;
 
   return (
-    <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+    <div className="p-4 bg-wash border border-line rounded-lg">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-gray-500 italic">
+          <span className="text-tertiary italic">
             [User has deleted this {contentTypeLabel}]
           </span>
           {showRestoreButton && (
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-tertiary">
               Deleted by {deletedBy} on{" "}
               {new Date(deletedAt).toLocaleDateString()}
             </span>

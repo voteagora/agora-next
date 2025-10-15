@@ -530,6 +530,13 @@ export const getTransportForChain = (chainId: number) => {
           `https://linea-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
 
+    // bsc (binance smart chain)
+    case 56:
+      return http(
+        FORK_NODE_URL ||
+          `https://bnb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
+
     // for each new dao with a new chainId add them here
     default:
       return null;
