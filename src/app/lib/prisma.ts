@@ -70,13 +70,23 @@ const makePrismaClient = (databaseUrl: string) => {
     throw lastError;
   };
 
-  return new PrismaClient({
+  const config: any = {
     datasources: {
-      db: {
-        url: databaseUrl,
+      db: { url: databaseUrl },
+    },
+    __internal: {
+      engine: {
+        env: {
+          PRISMA_CLIENT_ENGINE_CONFIG: JSON.stringify({
+            disable_prepared_statements: true,
+            pgbouncer: true,
+          }),
+        },
       },
     },
-  });
+  };
+
+  return new PrismaClient(config);
 };
 
 if (process.env.NODE_ENV === "production") {
