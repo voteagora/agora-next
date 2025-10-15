@@ -54,8 +54,8 @@ export default async function ForumsPageContent({
         description={description}
         isDuna={categoryTitle === "DUNA"}
       />
-      <div className="flex gap-8 max-w-7xl mx-auto px-6 sm:px-0">
-        <div className="flex-1">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
+        <div className="flex-1 min-w-0">
           <div className="space-y-3">
             {sortedTopics.length === 0 ? (
               <div className="text-center py-12">
@@ -69,7 +69,7 @@ export default async function ForumsPageContent({
           </div>
         </div>
 
-        <div className="w-80">
+        <div className="w-full lg:w-80 lg:flex-shrink-0">
           <ForumsSidebar
             selectedCategoryId={selectedCategoryId}
             categories={categories}
