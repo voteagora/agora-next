@@ -202,7 +202,7 @@ export const uniswapTenantUIConfig = new TenantUI({
       title: "About DUNI",
       hero: infoPageHero,
       description:
-        "This dashboard provides information related to DUNI, a Wyoming Decentralized Unincorporated Nonprofit Association. As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe UNI token governance token provides members with control over how the Treasury should be utilized in support of the Uniswap Protocol, as well as other limited protocol-specific parameters.\n\nDUNI is established as an organizational framework for community engagement and collective decision-making to pursue the development and acceleration of decentralized financial systems.",
+        "This dashboard provides information related to DUNI, a Wyoming Decentralized Unincorporated Nonprofit Association.  As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe UNI token governance token provides members with control over how the Treasury should be utilized in support of the Uniswap Protocol, as well as other limited protocol-specific parameters.\n\nDUNI is established as an organizational framework for community engagement and collective decision-making to purse the development and acceleration of decentralized financial systems.",
       meta: {
         title: "Welcome to DUNI",
         description: "",
