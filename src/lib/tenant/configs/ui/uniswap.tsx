@@ -1,12 +1,12 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import React from "react";
 import uniswapHero from "@/assets/tenant/uniswap_hero.svg";
-import uniswapLogo from "@/assets/tenant/uniswap_logo.svg";
+import uniswapLogo from "@/assets/tenant/uniswap_duni.svg";
 import successImage from "@/assets/tenant/uniswap_success.svg";
 import pendingImage from "@/assets/tenant/uniswap_pending.svg";
 import delegateImage from "@/assets/tenant/uniswap_delegate.svg";
 import infoPageCard01 from "@/assets/tenant/uniswap_info_1.png";
-import infoPageCard02 from "@/assets/tenant/uniswap_info_2.png";
+import infoPageCard02 from "@/assets/tenant/uniswap_info_2.svg";
 import infoPageCard03 from "@/assets/tenant/uniswap_info_3.png";
 import infoPageCard04 from "@/assets/tenant/uniswap_info_4.png";
 import infoPageHero from "@/assets/tenant/uniswap_info_hero.png";
@@ -18,6 +18,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 export const uniswapTenantUIConfig = new TenantUI({
   title: "Uniswap Agora",
   logo: uniswapLogo,
+  logoSize: "16",
   tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.UNISWAP)],
 
   googleAnalytics: "G-KBG8GS1R45",
