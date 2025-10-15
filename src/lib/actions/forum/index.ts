@@ -41,6 +41,7 @@ export {
   uploadDocumentFromBase64,
   deleteForumAttachment,
   archiveForumAttachment,
+  getForumCategoryAttachments,
 } from "./attachments";
 
 // Analytics
