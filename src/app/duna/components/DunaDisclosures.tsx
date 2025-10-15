@@ -11,105 +11,39 @@ const DunaDisclosures = () => {
           lineHeight: "19px",
         }}
       >
-        <div className="mb-6">UNISWAP DUNA DISCLOSURES</div>
+        <div className="mb-6">DUNI Disclosures</div>
 
         <div>
           <div>
-            <span>1. Forward-Looking Statement Legend</span>
             <p className="mt-2">
-              This document contains forward-looking statements, including
-              anticipated regulatory outcomes, governance upgrades, treasury
-              actions, and fee-switch economics. Actual results may differ
-              materially due to legislative shifts, market volatility, community
-              votes, or smart-contract failures. No duty to update these
-              statements is assumed.
+              By owning the token and engaging in the Uniswap Governance
+              Protocol, you acknowledge and agree that you are electing to
+              become a member of a Wyoming Decentralized Unincorporated
+              Nonprofit Association ("Association"). Your participation is
+              subject to the terms and conditions set forth in the Association
+              Agreement. You further acknowledge and agree that any dispute,
+              claim, or controversy arising out of or relating to the
+              Association Agreement, any governance proposal, or the rights and
+              obligations of members or administrators shall be submitted
+              exclusively to the Wyoming Chancery Court. In the event that the
+              Wyoming Chancery Court declines to exercise jurisdiction over any
+              such dispute, the parties agree that such dispute shall be
+              resolved exclusively in the District Court of Laramie County,
+              Wyoming, or in the United States District Court for the District
+              of Wyoming, as appropriate.
             </p>
-          </div>
 
-          <div className="mt-6">
-            <span>2. Regulatory Risk Disclosure</span>
             <p className="mt-2">
-              The U.S. Securities and Exchange Commission (&quot;SEC&quot;)
-              closed its inquiry into Uniswap Labs in February 2025 without
-              enforcement action. Future administrations or other agencies may
-              reopen investigations or pursue new theories of liability
-              notwithstanding this reprieve. Global regulators may not recognize
-              a DUNA; activities conducted under this wrapper could still
-              trigger securities-, commodities-, AML-, or tax-law obligations in
-              other jurisdictions.
-            </p>
-          </div>
-
-          <div className="mt-6">
-            <span>3. Legal-Structure Caveats</span>
-            <p className="mt-2">
-              A Wyoming DUNA provides limited liability only to the extent
-              Wyoming law is respected by the forum hearing a dispute. Foreign
-              courts and U.S. federal agencies are not bound to honor that
-              limitation. The DUNA framework is novel and untested at scale;
-              material aspects may be revised by future Wyoming legislative
-              sessions or challenged in court.
-            </p>
-          </div>
-
-          <div className="mt-6">
-            <span>4. Governance-Token & Fee-Switch Risks</span>
-            <p className="mt-2">
-              The UNI token does not automatically convey a right to protocol
-              cash flows. Turning on the &quot;fee switch&quot; requires a
-              separate on-chain vote and may expose UNI holders and the DAO to
-              additional regulatory scrutiny. Token-holder incentives may
-              diverge from broader ecosystem interests, leading to extractive
-              proposals that erode protocol competitiveness. The DAO treasury
-              (~$6 billion, majority in UNI) is highly concentrated; market
-              shocks or liquidity drains could impair runway. Deploying treasury
-              assets through the DUNA could generate U.S. federal, state, or
-              foreign tax liabilities at the DUNA level even if no distributions
-              are made to token holders.
-            </p>
-          </div>
-
-          <div className="mt-6">
-            <span>6. Technical & Operational Risks</span>
-            <p className="mt-2">
-              Smart-contract code is open-source and may contain
-              vulnerabilities. Upgrades carry non-zero risk of governance
-              capture or execution error. Cross-chain deployments (e.g.,
-              Unichain, Base) increase surface area for bridge exploits and
-              consensus failures. UNI and related derivatives are subject to
-              extreme volatility, thin order books on certain pairs, and
-              potential delistings on centralized venues. Liquidity provider
-              (&quot;LP&quot;) incentives can change rapidly, affecting swap
-              pricing and protocol volume.
-            </p>
-          </div>
-
-          <div className="mt-6">
-            <span>8. Tax & Accounting Disclaimer</span>
-            <p className="mt-2">
-              Neither the DAO nor this document provides tax advice. Token
-              holders should consult qualified advisers regarding income
-              recognition, cost-basis tracking, and potential self-employment or
-              excise taxes arising from governance participation.
-            </p>
-          </div>
-
-          <div className="mt-6">
-            <span>9. Conflict-of-Interest Statement</span>
-            <p className="mt-2">
-              Delegates, service providers, and authors of this document may
-              hold UNI or have commercial relationships with Uniswap Labs, the
-              Uniswap Foundation, or third-party vendors. Positions may change
-              without notice.
-            </p>
-          </div>
-
-          <div className="mt-6">
-            <span>10. No Offer or Solicitation</span>
-            <p className="mt-2">
-              Nothing herein constitutes an offer to sell, or the solicitation
-              of an offer to buy, any token, security, or other financial
-              instrument in any jurisdiction.
+              By becoming a member, you further agree that any dispute, claim,
+              or proceeding arising out of or relating to the Association
+              Agreement shall be resolved solely on an individual basis. You
+              expressly waive any right to participate as a plaintiff or class
+              member in any purported class, collective, consolidated, or
+              representative action, whether in arbitration or in court. No
+              class, collective, consolidated, or representative actions or
+              arbitrations shall be permitted, and you expressly waive any right
+              to participate in or recover relief under any such action or
+              proceeding.
             </p>
           </div>
         </div>
