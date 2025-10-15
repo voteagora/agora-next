@@ -77,10 +77,6 @@ const GovernorSettingsParams = () => {
     return parts.join(", ");
   };
 
-  if (namespace === TENANT_NAMESPACES.UNISWAP) {
-    return null;
-  }
-
   return (
     <Table>
       <TableHeader>
