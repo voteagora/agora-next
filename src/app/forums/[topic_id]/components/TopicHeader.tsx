@@ -7,6 +7,7 @@ import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import TopicUpvote from "./TopicUpvote";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { ADMIN_TYPES } from "@/lib/constants";
+import ENSName from "@/components/shared/ENSName";
 
 interface TopicHeaderProps {
   topic: {
@@ -24,13 +25,11 @@ export default function TopicHeader({
   topic,
   isAdmin = false,
 }: TopicHeaderProps) {
-  const displayName =
-    topic.authorName || (topic.address ? truncateAddress(topic.address) : "");
   const profileHref = topic.address
     ? `/delegates/${encodeURIComponent(topic.address)}`
     : null;
-  const profileLabel = displayName
-    ? `View profile for ${displayName}`
+  const profileLabel = topic.address
+    ? `View profile for ${topic.address}`
     : "View profile";
   const adminLabel = topic.adminRole || undefined;
 
@@ -47,7 +46,11 @@ export default function TopicHeader({
               <ENSAvatar ensName={topic.address} size={20} />
               <div className="flex items-center gap-1">
                 <span className="font-medium text-sm text-primary hover:underline">
-                  {isAdmin ? "Cowrie" : displayName}
+                  {isAdmin ? (
+                    "Cowrie"
+                  ) : (
+                    <ENSName address={topic.address || ""} />
+                  )}
                 </span>
                 {isAdmin && (
                   <ForumAdminBadge
@@ -62,7 +65,11 @@ export default function TopicHeader({
               <ENSAvatar ensName={topic.address} size={20} />
               <div className="flex items-center gap-1">
                 <div className="font-medium text-sm">
-                  {isAdmin ? "Cowrie" : displayName}
+                  {isAdmin ? (
+                    "Cowrie"
+                  ) : (
+                    <ENSName address={topic.address || ""} />
+                  )}
                 </div>
                 {isAdmin && (
                   <ForumAdminBadge
