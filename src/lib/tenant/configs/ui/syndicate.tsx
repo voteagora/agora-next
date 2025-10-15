@@ -161,7 +161,7 @@ export const syndicateTenantUIConfig = new TenantUI({
         {
           name: "Docs Archive",
           title: "Docs Archive*",
-          url: "",
+          url: "/document-archive",
           image: syndicateInfoCard3,
         },
       ],

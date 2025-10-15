@@ -51,6 +51,7 @@ export async function getForumAttachments() {
         ipfsCid: attachment.ipfsCid,
         createdAt: attachment.createdAt.toISOString(),
         uploadedBy: attachment.address,
+        archived: attachment.archived,
       })),
     };
   } catch (error) {
@@ -257,8 +258,10 @@ export async function archiveForumAttachment(
 
 export const getForumCategoryAttachments = async ({
   categoryId,
+  archived = false,
 }: {
   categoryId: number;
+  archived?: boolean;
 }) => {
   try {
     const attachments = await prismaWeb2Client.forumCategoryAttachment.findMany(
@@ -266,6 +269,7 @@ export const getForumCategoryAttachments = async ({
         where: {
           dao_slug: slug,
           categoryId,
+          archived,
         },
       }
     );
@@ -279,6 +283,7 @@ export const getForumCategoryAttachments = async ({
         ipfsCid: attachment.ipfsCid,
         createdAt: attachment.createdAt.toISOString(),
         uploadedBy: attachment.address,
+        archived: attachment.archived,
       })),
     };
   } catch (error) {

@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import DocumentsSection from "./DocumentsSection";
 import {
   getForumTopics,
-  getForumAttachments,
+  getForumCategoryAttachments,
   getDunaCategoryId,
 } from "@/lib/actions/forum";
 import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
@@ -27,7 +27,7 @@ const TownsDunaAdministration = async () => {
 
     const [topicsResult, documentsResult] = await Promise.all([
       getForumTopics({ categoryId: dunaCategoryId }),
-      getForumAttachments(),
+      getForumCategoryAttachments({ categoryId: dunaCategoryId }),
     ]);
 
     if (topicsResult.success) {

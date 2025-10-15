@@ -150,7 +150,7 @@ export const townsTenantUIConfig = new TenantUI({
         {
           name: "Protocol Docs",
           title: "Document Archive*",
-          url: "",
+          url: "/document-archive",
           image: townsInfoCard3,
         },
       ],
