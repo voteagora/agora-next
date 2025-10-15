@@ -139,28 +139,30 @@ const InfoAbout = () => {
             </p>
           </div>
         )}
-        <div className="p-6 rounded-b-xl border-t border-line bg-infoSectionBackground">
-          <div className="flex lg:flex-row flex-col gap-6 flex-wrap sm:flex-nowrap mb-4">
-            {activeTabs.map((item, index) => (
-              <div
-                key={index}
-                className="flex flex-row gap-3 justify-center items-center mt-3 flex-1 min-w-0"
-              >
+        {!ui.toggle("hide-info-tabs")?.enabled && (
+          <div className="p-6 rounded-b-xl border-t border-line bg-infoSectionBackground">
+            <div className="flex lg:flex-row flex-col gap-6 flex-wrap sm:flex-nowrap mb-4">
+              {activeTabs.map((item, index) => (
                 <div
-                  className={`min-w-[72px] h-[72px] justify-center items-center rounded-full border border-line flex sm:hidden lg:flex ${ui.customization?.customIconBackground ? ui.customization.customIconBackground : "bg-tertiary/10"}`}
+                  key={index}
+                  className="flex flex-row gap-3 justify-center items-center mt-3 flex-1 min-w-0"
                 >
-                  {item.icon}
+                  <div
+                    className={`min-w-[72px] h-[72px] justify-center items-center rounded-full border border-line flex sm:hidden lg:flex ${ui.customization?.customIconBackground ? ui.customization.customIconBackground : "bg-tertiary/10"}`}
+                  >
+                    {item.icon}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-primary">{item.title}</h3>
+                    <p className={`font-normal text-secondary`}>
+                      {item.description}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-primary">{item.title}</h3>
-                  <p className={`font-normal text-secondary`}>
-                    {item.description}
-                  </p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </>
   );
