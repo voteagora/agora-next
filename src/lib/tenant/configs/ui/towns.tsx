@@ -83,7 +83,7 @@ export const townsTenantUIConfig = new TenantUI({
   theme: "dark",
 
   dunaDisclaimers:
-    "* DUNA Administration Docs will archive upon the release of Q3 financial statements and tax update.",
+    "* DUNA Administration Docs will archive upon the release of the year-end financial statements and tax update.",
 
   organization: {
     title: "Towns Protocol",
@@ -181,20 +181,6 @@ export const townsTenantUIConfig = new TenantUI({
         "This dashboard is the focal point for information related to the Towns Lodge DUNA.  As a tax-paying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe Towns Protocol is supported by both a Swiss Association and the Towns Lodge DUNA – with the $TOWNS governance token providing the members ultimate control over how the Treasury should be utilized.  While the initial funding of the Swiss Association allows it to operate within established parameters, its role and funding will ultimately be decided by the members of the DUNA who, through their voting power, control whether to extend additional funding to the Swiss Association, redirect that funding to another entity, or take on more responsibilities within the DUNA.\n\nThe DUNA Governance does not go live until January 1, 2026, to allow the members of the community time to familiarize themselves with the Swiss Association and the Protocol.",
       sectionTitle: "Towns Lodge Roadmap",
       tabs: [
-        {
-          icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#87819F" />,
-          title: "August 20, 2025",
-          description:
-            "Messaging functionality opens for the DUNA Administration Section after time has elapsed for members to claim their $TOWNS.",
-        },
-        {
-          icon: (
-            <NotificationIcon className="w-[24px] h-[24px]" stroke="#87819F" />
-          ),
-          title: "October 15, 2025",
-          description:
-            "Q3 financial statements and tax updates will be posted with messaging functionality enabled in the DUNA Administration section.",
-        },
         {
           icon: (
             <CheckCircleBrokenIcon

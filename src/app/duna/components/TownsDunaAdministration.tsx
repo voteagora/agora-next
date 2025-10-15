@@ -104,8 +104,8 @@ const TownsDunaAdministration = async () => {
       {/* Disclaimer */}
       <div className="mt-12 pt-6 border-t border-line">
         <p className="text-secondary text-sm opacity-75">
-          * DUNA Administration Docs will archive upon the release of Q3
-          financial statements and tax update.
+          * DUNA Administration Docs will archive upon the release of the
+          year-end financial statements and tax update.
         </p>
       </div>
     </div>

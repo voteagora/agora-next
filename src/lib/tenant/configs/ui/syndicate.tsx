@@ -44,7 +44,7 @@ export const syndicateTenantUIConfig = new TenantUI({
   },
 
   dunaDisclaimers:
-    "*DUNA Administration Docs will archive upon Q3 financial statements and tax update.",
+    "* DUNA Administration Docs will archive upon the release of the year-end financial statements and tax update.",
 
   customization: {
     primary: "0 0 0",
@@ -174,20 +174,6 @@ export const syndicateTenantUIConfig = new TenantUI({
         "This dashboard is the focal point for information related to the Syndicate Network Collective DUNA. As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe $SYND governance token provides the members with ultimate control over how the Treasury should be utilized in support of the Syndicate Network.\n\nThe Syndicate Network Collective is established as an organizational framework for collective decision-making and innovation to pursue the common, nonprofit purpose of providing a foundation for community-aligned platforms to reshape how participation and contribution is valued on the internet.",
       sectionTitle: "Syndicate Network Collective Roadmap",
       tabs: [
-        {
-          icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#737373" />,
-          title: "September 22, 2025",
-          description:
-            "Messaging functionality opens for the DUNA Administration section.",
-        },
-        {
-          icon: (
-            <NotificationIcon className="w-[24px] h-[24px]" stroke="#737373" />
-          ),
-          title: "October 15, 2025",
-          description:
-            "Q3 financial statements and tax updates will be posted with messaging functionality enabled in the DUNA Administration section and Grants Award Committee submissions go live.",
-        },
         {
           icon: (
             <CheckCircleBrokenIcon
