@@ -190,9 +190,9 @@ export const uniswapTenantUIConfig = new TenantUI({
           image: infoPageCard03,
         },
         {
-          name: "Uniswap Labs",
-          title: "Uniswap Labs",
-          url: "https://x.com/Uniswap",
+          name: "Document Archive",
+          title: "Document Archive",
+          url: "/document-archive",
           image: infoPageCard04,
         },
       ],
