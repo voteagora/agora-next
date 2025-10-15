@@ -1,5 +1,8 @@
 import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
 import { getForumIndexName } from "./search";
+import Tenant from "./tenant/tenant";
+
+const { isProd } = Tenant.current();
 
 const MEILISEARCH_HOST = process.env.NEXT_PUBLIC_MEILISEARCH_HOST;
 const MEILISEARCH_API_KEY = process.env.NEXT_PUBLIC_MEILISEARCH_CLIENT_API_KEY;
@@ -34,7 +37,7 @@ const { searchClient, setMeiliSearchParams } = instantMeiliSearch(
 export { searchClient, setMeiliSearchParams };
 
 export const createForumSearchConfig = (daoSlug: string) => {
-  const candidate = getForumIndexName(daoSlug);
+  const candidate = getForumIndexName(daoSlug, isProd);
 
   return {
     indexName: candidate,
@@ -50,7 +53,7 @@ export const unifiedSearchConfiguration = {
 };
 
 export const createSortOptions = (daoSlug: string) => {
-  const indexName = getForumIndexName(daoSlug);
+  const indexName = getForumIndexName(daoSlug, isProd);
   return [
     { label: "Most Recent", value: indexName },
     {
