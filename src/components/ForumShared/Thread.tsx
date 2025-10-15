@@ -105,6 +105,8 @@ const CommentItem = ({
   const profileLabel = comment.author
     ? `View profile for ${comment.author}`
     : "View profile";
+  const isOwnComment =
+    address && authorAddress && address.toLowerCase() === authorAddress;
 
   const canDelete = canDeleteContent(
     address || "",
@@ -251,6 +253,9 @@ const CommentItem = ({
                   className="text-[9px]"
                   type={adminLabel ? ADMIN_TYPES[adminLabel] : "Admin"}
                 />
+              )}
+              {isOwnComment && (
+                <span className="text-xs text-tertiary font-normal">(you)</span>
               )}
             </div>
             <span className="text-xs text-tertiary self-center">

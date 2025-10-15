@@ -1,8 +1,11 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { truncateAddress } from "@/app/lib/utils/text";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
+import { useAccount } from "wagmi";
 
 import TopicUpvote from "./TopicUpvote";
 import { formatRelative } from "@/components/ForumShared/utils";
@@ -25,6 +28,7 @@ export default function TopicHeader({
   topic,
   isAdmin = false,
 }: TopicHeaderProps) {
+  const { address } = useAccount();
   const profileHref = topic.address
     ? `/delegates/${encodeURIComponent(topic.address)}`
     : null;
@@ -32,6 +36,10 @@ export default function TopicHeader({
     ? `View profile for ${topic.address}`
     : "View profile";
   const adminLabel = topic.adminRole || undefined;
+  const isOwnTopic =
+    address &&
+    topic.address &&
+    address.toLowerCase() === topic.address.toLowerCase();
 
   return (
     <div className="pb-2">
@@ -52,6 +60,11 @@ export default function TopicHeader({
                     <ENSName address={topic.address || ""} />
                   )}
                 </span>
+                {isOwnTopic && (
+                  <span className="text-xs text-tertiary font-normal">
+                    (you)
+                  </span>
+                )}
                 {isAdmin && (
                   <ForumAdminBadge
                     className="text-[9px]"
@@ -71,6 +84,11 @@ export default function TopicHeader({
                     <ENSName address={topic.address || ""} />
                   )}
                 </div>
+                {isOwnTopic && (
+                  <span className="text-xs text-tertiary font-normal">
+                    (you)
+                  </span>
+                )}
                 {isAdmin && (
                   <ForumAdminBadge
                     className="text-[9px]"
