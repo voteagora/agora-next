@@ -25,7 +25,7 @@ export default function ForumAdminBadge({
   const isDunaAdmin =
     normalizedType === "DUNA_ADMIN" ||
     (isDunaCategory && normalizedType === "SUPER_ADMIN");
-  const displayLabel = isDunaAdmin ? "DUNA Official" : "Admin";
+  const displayLabel = isDunaAdmin ? "Cowrie" : "Cowrie"; // TODO - straighten out if we need to differentiate, after launch.
 
   return (
     <TooltipProvider>

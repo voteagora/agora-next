@@ -291,18 +291,6 @@ const DocumentsSection = ({
         categoryId={dunaCategoryId!}
         onUploadComplete={handleUploadComplete}
       />
-      <p className="text-md text-primary font-semibold ">
-        Official DUNA Communications
-      </p>
-      <div className="text-center py-8">
-        <p
-          className={`text-sm opacity-75 ${
-            useDarkStyling ? "text-white" : "text-secondary"
-          }`}
-        >
-          Coming soon.
-        </p>
-      </div>
     </div>
   );
 };
