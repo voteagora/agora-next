@@ -245,7 +245,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "info/governance-charts",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "sponsoredVote",
