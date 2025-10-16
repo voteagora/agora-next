@@ -11,12 +11,14 @@ import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 import { CoinsIcon } from "@/icons/CoinsIcon";
 import { NotificationIcon } from "@/icons/NotificationIcon";
 import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
+import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export const ogTenantUIConfig = new TenantUI({
   title: "0g Agora",
   logo: ogLogo,
   logoSize: "24px",
-  tokens: [],
+  tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.DEMO)],
 
   assets: {
     success: syndicateSuccess,
