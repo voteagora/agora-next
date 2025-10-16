@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAccount, useSignMessage } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
 import {
@@ -24,6 +25,8 @@ const OptimisticProposalAction = ({
   const { contracts } = Tenant.current();
   const { inputData } = getInputData(draftProposal);
   const [proposalCreated, setProposalCreated] = useState(false);
+  const { address } = useAccount();
+  const messageSigner = useSignMessage();
 
   const {
     data: config,
@@ -67,11 +70,25 @@ const OptimisticProposalAction = ({
               },
             });
 
+            const messagePayload = {
+              action: "sponsorDraft",
+              draftProposalId: draftProposal.id,
+              creatorAddress: address,
+              timestamp: new Date().toISOString(),
+            };
+            const message = JSON.stringify(messagePayload);
+            const signature = await messageSigner
+              .signMessageAsync({ message })
+              .catch(() => undefined);
+            if (!signature) return;
             await sponsorDraftProposal({
               draftProposalId: draftProposal.id,
               onchain_transaction_hash: data,
               is_offchain_submission: false,
               proposal_scope: draftProposal.proposal_scope,
+              creatorAddress: address as `0x${string}`,
+              message,
+              signature,
             });
 
             openDialog({
