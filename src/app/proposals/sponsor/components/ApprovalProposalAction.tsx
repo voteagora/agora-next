@@ -10,6 +10,7 @@ import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/spon
 import { ApprovalProposal, ProposalScope } from "@/app/proposals/draft/types";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { parseError } from "../../draft/utils/stages";
 
 const ApprovalProposalAction = ({
   draftProposal,
@@ -86,8 +87,8 @@ const ApprovalProposalAction = ({
         Submit proposal
       </UpdatedButton>
       {onPrepareError && (
-        <div className="p-4 border border-line bg-wash rounded mt-4 text-sm text-tertiary break-words hyphens-auto">
-          {error?.message}
+        <div className="p-4 border border-negative bg-negative/10 rounded mt-4 text-sm text-negative break-words hyphens-auto">
+          {parseError(error)}
         </div>
       )}
     </>

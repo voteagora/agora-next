@@ -66,6 +66,7 @@ export type TenantToken = {
   symbol: string;
   decimals: number;
   address: string;
+  chainId?: number;
 };
 
 export type RetroPGFProject = {

@@ -39,15 +39,15 @@ export default function ForumAdminBadge({
               "w-4 h-4",
               className,
               isDunaAdmin
-                ? "border border-black text-black bg-black"
+                ? "border border-primary text-primary bg-primary"
                 : "text-[#3868c7]"
             )}
           >
             {isDunaAdmin ? (
-              <Star className="w-4 h-4 fill-white" strokeWidth={2} />
+              <Star className="w-4 h-4 fill-neutral" strokeWidth={2} />
             ) : (
               <BadgeCheck
-                className="w-4 h-4 stroke-[#3868c7] fill-white"
+                className="w-4 h-4 stroke-[#3868c7] fill-neutral"
                 strokeWidth={2.4}
               />
             )}

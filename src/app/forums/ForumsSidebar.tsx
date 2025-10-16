@@ -6,6 +6,10 @@ import {
   ForumCategory,
   ForumPost,
 } from "@/lib/forumUtils";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+
+const { namespace } = Tenant.current();
 
 interface ForumsSidebarProps {
   selectedCategoryId?: number | null;
@@ -47,6 +51,16 @@ export default function ForumsSidebar({
     "bg-purple-500",
   ];
 
+  const bgStyle =
+    namespace === TENANT_NAMESPACES.SYNDICATE
+      ? "bg-hoverBackground text-neutral"
+      : "bg-neutral text-primary hover:bg-hoverBackground";
+
+  const textStyle =
+    namespace === TENANT_NAMESPACES.SYNDICATE
+      ? "text-primary"
+      : "text-secondary";
+
   return (
     <div className="w-80 bg-cardBackground rounded-lg border border-cardBorder max-h-max">
       <div className="p-4">
@@ -54,7 +68,7 @@ export default function ForumsSidebar({
 
         <div className="space-y-3">
           {sortedCategories.length === 0 ? (
-            <div className="text-sm text-gray-500">No categories found</div>
+            <div className="text-sm text-tertiary">No categories found</div>
           ) : (
             <div className="space-y-2">
               <Link
@@ -62,12 +76,12 @@ export default function ForumsSidebar({
                 aria-current={selectedCategoryId == null ? "page" : undefined}
                 className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
                   selectedCategoryId == null
-                    ? "bg-black text-white"
-                    : "hover:bg-gray-100 text-gray-700"
+                    ? bgStyle
+                    : "hover:bg-hoverBackground text-secondary"
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-gray-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-tertiary"></div>
                   <span className="text-sm">All discussions</span>
                 </div>
                 <span className="text-xs">
@@ -86,8 +100,8 @@ export default function ForumsSidebar({
                     aria-current={isSelected ? "page" : undefined}
                     className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
                       isSelected
-                        ? "bg-black text-white"
-                        : "hover:bg-gray-100 text-gray-700"
+                        ? bgStyle
+                        : "hover:bg-hoverBackground text-secondary"
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -113,8 +127,8 @@ export default function ForumsSidebar({
         <div className="border-t border-border">
           <div className="space-y-2 text-sm p-6">
             <div className="flex justify-between">
-              <span className="text-gray-600">Last comment</span>
-              <span>
+              <span className="text-tertiary">Last comment</span>
+              <span className="text-secondary">
                 {lastActivityAt ? formatRelative(lastActivityAt) : "—"}
               </span>
             </div>

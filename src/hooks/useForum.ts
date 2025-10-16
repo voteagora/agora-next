@@ -37,6 +37,7 @@ import {
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
+import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 
 interface ForumDocument {
   id: number;
@@ -65,6 +66,44 @@ export const useForum = () => {
   const [error, setError] = useState<string | null>(null);
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const permissions = useForumPermissionsContext();
+
+  // Check VP before action and return whether to proceed
+  const checkVPBeforeAction = useCallback(
+    (
+      action: "topic" | "post" | "upvote" | "react"
+    ): { canProceed: boolean; reason?: string } => {
+      if (permissions.isLoading) {
+        return { canProceed: false, reason: "Loading permissions..." };
+      }
+
+      switch (action) {
+        case "topic":
+          return {
+            canProceed: permissions.canCreateTopic,
+            reason: permissions.reasons.topics,
+          };
+        case "post":
+          return {
+            canProceed: permissions.canCreatePost,
+            reason: permissions.reasons.posts,
+          };
+        case "upvote":
+          return {
+            canProceed: permissions.canUpvote,
+            reason: permissions.reasons.actions,
+          };
+        case "react":
+          return {
+            canProceed: permissions.canReact,
+            reason: permissions.reasons.actions,
+          };
+        default:
+          return { canProceed: true };
+      }
+    },
+    [permissions]
+  );
 
   const fetchTopics = useCallback(
     async (categoryId?: number): Promise<ForumTopic[]> => {
@@ -150,7 +189,7 @@ export const useForum = () => {
 
   const createTopic = useCallback(
     async (data: CreateTopicData): Promise<ForumTopic | null> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       if (data.attachment && data.attachment.size > 10 * 1024 * 1024) {
         toast.error("File size must be less than 10MB");
@@ -262,7 +301,7 @@ export const useForum = () => {
       topicId: number,
       data: CreatePostData
     ): Promise<ForumPost | null> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Creating post...");
@@ -377,7 +416,7 @@ export const useForum = () => {
       attachmentData: AttachmentData,
       categoryId: number
     ): Promise<ForumDocument | null> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Uploading document...");
@@ -428,7 +467,7 @@ export const useForum = () => {
 
   const deleteTopic = useCallback(
     async (topicId: number, isAdmin: boolean = false): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Deleting topic...");
@@ -477,7 +516,7 @@ export const useForum = () => {
 
   const deletePost = useCallback(
     async (postId: number, isAdmin: boolean = false): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Deleting post...");
@@ -530,7 +569,7 @@ export const useForum = () => {
       targetType: "post" | "category",
       isAuthor: boolean = true
     ): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Deleting attachment...");
@@ -571,7 +610,7 @@ export const useForum = () => {
 
   const archiveTopic = useCallback(
     async (topicId: number, isAuthor: boolean = true): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Archiving topic...");
@@ -615,7 +654,7 @@ export const useForum = () => {
       targetType: "post" | "category",
       isAuthor: boolean = true
     ): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Archiving attachment...");
@@ -692,7 +731,7 @@ export const useForum = () => {
 
   const restoreTopic = useCallback(
     async (topicId: number, isAuthor: boolean = true): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Restoring topic...");
@@ -732,7 +771,7 @@ export const useForum = () => {
 
   const restorePost = useCallback(
     async (postId: number, isAuthor: boolean = true): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
 
       setLoading(true);
       const toastId = toast.loading("Restoring post...");
@@ -776,7 +815,7 @@ export const useForum = () => {
       targetId: number,
       emoji: string
     ): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
       try {
         const message = `Add forum reaction: ${emoji} to ${targetType}:${targetId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
@@ -809,7 +848,7 @@ export const useForum = () => {
       targetId: number,
       emoji: string
     ): Promise<boolean> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
       try {
         const message = `Remove forum reaction: ${emoji} from ${targetType}:${targetId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
@@ -837,7 +876,7 @@ export const useForum = () => {
 
   const upvoteTopic = useCallback(
     async (topicId: number): Promise<number | null> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
       try {
         const message = `Upvote forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
@@ -861,7 +900,7 @@ export const useForum = () => {
 
   const removeUpvoteTopic = useCallback(
     async (topicId: number): Promise<number | null> => {
-      const currentAddress = address!;
+      const currentAddress = address!.toLowerCase();
       try {
         const message = `Remove upvote forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
         const signature = await signMessageAsync({ message });
@@ -932,6 +971,8 @@ export const useForum = () => {
     removeUpvoteTopic,
     fetchTopicUpvotes,
     hasUpvotedTopic,
+    permissions, // Add permissions to return value
+    checkVPBeforeAction, // Helper to check VP before actions
   };
 };
 

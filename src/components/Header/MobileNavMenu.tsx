@@ -55,6 +55,8 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   const comingSoonToggle = ui.toggle("coming-soon");
   const hasComingSoon =
     comingSoonToggle !== undefined && comingSoonToggle.enabled;
+  const forumsToggle = ui.toggle("forums");
+  const hasForums = forumsToggle !== undefined && forumsToggle.enabled;
 
   // Format metrics
   const formattedMetrics = {
@@ -122,6 +124,16 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
             href: "/coming-soon",
             target: "_self",
             isActive: pathname.includes("coming-soon"),
+          },
+        ]
+      : []),
+    ...(hasForums
+      ? [
+          {
+            name: "Discussions",
+            href: "/forums",
+            target: "_self",
+            isActive: pathname.includes("forums"),
           },
         ]
       : []),

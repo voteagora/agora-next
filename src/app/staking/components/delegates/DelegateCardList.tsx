@@ -8,6 +8,7 @@ import { capitalizeFirstLetter } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import { DelegateCard } from "@/app/staking/components/delegates/DelegateCard";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
+import { getTruncatedStatement } from "@/lib/delegateUtils";
 
 interface Props {
   address: string;
@@ -86,19 +87,10 @@ export default function DelegateCardList({
         {delegates.map((delegate) => {
           // Filter out the current user from the list of delegates
           if (delegate.address !== address.toLowerCase()) {
-            let truncatedStatement = "";
-
             const twitter = delegate?.statement?.twitter;
             const discord = delegate?.statement?.discord;
             const warpcast = delegate?.statement?.warpcast;
-
-            if (delegate?.statement?.payload) {
-              const delegateStatement = (
-                delegate?.statement?.payload as { delegateStatement: string }
-              ).delegateStatement;
-
-              truncatedStatement = delegateStatement.slice(0, 120);
-            }
+            const truncatedStatement = getTruncatedStatement(delegate, 120);
 
             return (
               <DelegateCard

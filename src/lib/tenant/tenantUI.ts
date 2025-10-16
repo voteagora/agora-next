@@ -155,6 +155,7 @@ type TenantUIParams = {
     customIconColor?: string;
     noReportsFound?: string;
     customButtonBackground?: string;
+    customHeroTitleWidth?: string;
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -219,6 +220,7 @@ export class TenantUI {
     customIconColor?: string;
     noReportsFound?: string;
     customButtonBackground?: string;
+    customHeroTitleWidth?: string;
   };
   private _theme: "light" | "dark";
   private _favicon?: {

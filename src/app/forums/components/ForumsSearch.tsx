@@ -71,7 +71,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
   return (
     <div className="relative">
-      <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+      <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-tertiary" />
       <input
         type="search"
         value={inputValue}
@@ -79,7 +79,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         onFocus={onFocus}
         onBlur={onBlur}
         placeholder={placeholder || "Search discussions"}
-        className="w-full rounded-md border border-cardBorder bg-card py-2 pl-10 pr-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-black focus:outline-none focus:ring-2 focus:ring-black"
+        className="w-full rounded-md border border-cardBorder bg-card py-2 pl-10 pr-10 text-sm text-primary placeholder:text-tertiary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
         aria-label="Search forum topics"
       />
     </div>
@@ -116,7 +116,7 @@ const DropdownHits: React.FC<DropdownHitsProps> = ({ open, onSelect }) => {
   return (
     <div className="absolute z-20 mt-2 w-full rounded-md border border-cardBorder bg-card shadow-lg">
       {filteredHits.length === 0 ? (
-        <div className="px-4 py-3 text-sm text-gray-500">No matches found.</div>
+        <div className="px-4 py-3 text-sm text-tertiary">No matches found.</div>
       ) : (
         <ul className="max-h-72 overflow-y-auto py-2">
           {filteredHits.map((hit) => {
@@ -131,12 +131,12 @@ const DropdownHits: React.FC<DropdownHitsProps> = ({ open, onSelect }) => {
                 <button
                   type="button"
                   onClick={() => onSelect(hit)}
-                  className="w-full px-4 py-3 text-left hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                  className="w-full px-4 py-3 text-left hover:bg-hoverBackground focus:bg-hoverBackground focus:outline-none"
                 >
-                  <div className="text-sm font-semibold text-gray-900">
+                  <div className="text-sm font-semibold text-primary">
                     {content}
                   </div>
-                  <div className="mt-1 text-xs text-gray-500">
+                  <div className="mt-1 text-xs text-tertiary">
                     {hit.categoryName && (
                       <span className="mr-2 uppercase tracking-wide">
                         {hit.categoryName}

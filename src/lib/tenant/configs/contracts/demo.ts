@@ -15,7 +15,7 @@ import {
   GOVERNOR_TYPE,
   TIMELOCK_TYPE,
 } from "@/lib/constants";
-import { optimism, optimismSepolia } from "viem/chains";
+import { optimism } from "viem/chains";
 
 interface Props {
   isProd: boolean;

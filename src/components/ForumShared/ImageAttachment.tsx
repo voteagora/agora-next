@@ -174,9 +174,9 @@ export default function ImageAttachment({
       </div>
 
       <div className="flex items-center justify-between mt-2">
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-secondary">
           <span className="font-medium">{attachment.fileName}</span>
-          <span className="ml-2 text-gray-500">
+          <span className="ml-2 text-tertiary">
             ({Math.round(attachment.fileSize / 1024)} KB)
           </span>
         </div>
@@ -187,7 +187,7 @@ export default function ImageAttachment({
             {canArchive(attachment.uploadedBy || postAuthor) && (
               <button
                 onClick={handleArchive}
-                className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+                className="p-1 text-tertiary hover:text-secondary transition-colors"
                 title="Archive image"
               >
                 <ArchiveBoxIcon className="w-4 h-4" />

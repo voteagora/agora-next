@@ -8,13 +8,8 @@ import { TrashIcon, ArchiveBoxIcon } from "@heroicons/react/20/solid";
 import DocumentUploadModal from "./DocumentUploadModal";
 import Tenant from "@/lib/tenant/tenant";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
-import {
-  buildForumCategoryPath,
-  canArchiveContent,
-  canDeleteContent,
-} from "@/lib/forumUtils";
+import { canArchiveContent, canDeleteContent } from "@/lib/forumUtils";
 import { FileIcon } from "lucide-react";
-import Link from "next/link";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import useRequireLogin from "@/hooks/useRequireLogin";
 import { useStableCallback } from "@/hooks/useStableCallback";
@@ -35,16 +30,19 @@ interface ForumDocument {
   ipfsCid: string;
   createdAt: string;
   uploadedBy: string;
+  archived?: boolean;
 }
 
 interface DocumentsSectionProps {
   initialDocuments: ForumDocument[];
   hideHeader?: boolean;
+  hideComms?: boolean;
 }
 
 const DocumentsSection = ({
   initialDocuments,
   hideHeader = false,
+  hideComms = false,
 }: DocumentsSectionProps) => {
   const [documents, setDocuments] = useState<ForumDocument[]>(
     initialDocuments || []
@@ -197,7 +195,7 @@ const DocumentsSection = ({
               useDarkStyling ? "text-white" : "text-secondary"
             }`}
           >
-            No documents uploaded yet.
+            No documents yet.
           </p>
         </div>
       ) : (
@@ -252,7 +250,7 @@ const DocumentsSection = ({
                 </div>
                 {(canArchive || canDelete) && (
                   <>
-                    {canArchive && (
+                    {canArchive && !document.archived && (
                       <button
                         onClick={(e) => handleArchiveAttachment(document.id, e)}
                         className={`p-1 transition-colors ${
@@ -291,19 +289,6 @@ const DocumentsSection = ({
         categoryId={dunaCategoryId!}
         onUploadComplete={handleUploadComplete}
       />
-      <p className="text-md text-primary font-semibold ">
-        Official DUNA Communications
-      </p>
-      <p className="text-sm text-primary">
-        Want to talk about official items for the DUNA or discover discussions
-        on it? Please head to the{" "}
-        <Link
-          href={buildForumCategoryPath(dunaCategoryId!, "DUNA")}
-          className="underline"
-        >
-          DUNA forum.
-        </Link>
-      </p>
     </div>
   );
 };

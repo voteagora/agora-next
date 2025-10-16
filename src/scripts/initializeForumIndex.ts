@@ -11,7 +11,7 @@ async function main() {
 
   try {
     const forumSearchService = new ForumSearchService();
-    await forumSearchService.initializeIndex("UNI");
+    await forumSearchService.initializeIndex("TOWNS");
     console.log("✅ Forum index initialized successfully!");
     process.exit(0);
   } catch (error) {

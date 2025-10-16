@@ -15,6 +15,13 @@ vi.mock("server-only", () => ({
   default: {},
 }));
 
+vi.mock("@/lib/pinata", () => ({
+  uploadFileToPinata: vi.fn(),
+  getIPFSUrl: vi.fn(
+    (hash: string) => `https://mock-gateway.cloud/ipfs/${hash}`
+  ),
+}));
+
 vi.mock(import("react"), async (importOriginal) => {
   const actual = await importOriginal();
   return {

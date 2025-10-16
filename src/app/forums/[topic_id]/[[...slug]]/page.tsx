@@ -22,6 +22,9 @@ import { stripHtmlToText } from "../../stripHtml";
 import Tenant from "@/lib/tenant/tenant";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
 
+// Force dynamic rendering - forum topics and posts change frequently
+export const dynamic = "force-dynamic";
+
 interface PageProps {
   params: {
     topic_id: string;
@@ -184,6 +187,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
         return map;
       }, new Map<string, string | null>())
     : new Map<string, string | null>();
+
   const adminDirectory = Array.from(adminRolesMap.entries()).map(
     ([address, role]) => ({
       address,
@@ -205,7 +209,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
     adminRole: authorRole,
   };
 
-  const rootPost = comments[0];
+  const rootPost = topicData.posts?.[0];
   const rootAttachments = (rootPost?.attachments as any[]) || [];
 
   const lastActivityAt =
@@ -231,26 +235,25 @@ export default async function ForumTopicPage({ params }: PageProps) {
         createdAt: cat.createdAt.toISOString(),
         updatedAt: cat.updatedAt.toISOString(),
         topicsCount: cat.topicsCount,
-        isDuna: cat.isDuna,
       }))
     : [];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <ForumsHeader
         breadcrumbs={breadcrumbs}
         isDuna={categoryName === "DUNA"}
       />
-      <div className="max-w-7xl mx-auto px-6 sm:px-0">
-        <div className="flex gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Main Content */}
-          <div className="flex-1 max-w-4xl">
+          <div className="flex-1 min-w-0 max-w-full lg:max-w-4xl">
             <TopicHeader topic={headerTopic} isAdmin={isAuthorAdmin} />
 
-            <div className="mt-2 mb-4">
+            <div className="mt-2 mb-4 break-words">
               <DunaContentRenderer
                 content={topicBody}
-                className="text-gray-700 text-sm leading-relaxed"
+                className="text-secondary text-sm leading-relaxed break-words"
               />
             </div>
 
@@ -263,7 +266,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
               />
             )}
 
-            <div className="flex items-center gap-6 text-xs font-semibold text-tertiary border-b pb-2">
+            <div className="flex flex-wrap items-center gap-3 lg:gap-6 text-xs font-semibold text-tertiary border-b pb-2">
               {rootPostId && (
                 <div className="">
                   <EmojiReactions
@@ -296,11 +299,13 @@ export default async function ForumTopicPage({ params }: PageProps) {
           </div>
 
           {/* Sidebar */}
-          <ForumsSidebar
-            categories={categories}
-            latestPost={topicData}
-            selectedCategoryId={categoryId}
-          />
+          <div className="w-full lg:w-auto">
+            <ForumsSidebar
+              categories={categories}
+              latestPost={topicData}
+              selectedCategoryId={categoryId}
+            />
+          </div>
         </div>
       </div>
     </div>

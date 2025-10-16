@@ -105,6 +105,8 @@ const CommentItem = ({
   const profileLabel = comment.author
     ? `View profile for ${comment.author}`
     : "View profile";
+  const isOwnComment =
+    address && authorAddress && address.toLowerCase() === authorAddress;
 
   const canDelete = canDeleteContent(
     address || "",
@@ -229,13 +231,21 @@ const CommentItem = ({
                 <Link
                   href={profileHref}
                   aria-label={profileLabel}
-                  className="text-sm font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black rounded"
+                  className="text-sm font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black rounded font-medium text-sm text-primary"
                 >
-                  <ENSName address={comment.author || ""} />
+                  {isAuthorAdmin ? (
+                    "Cowrie"
+                  ) : (
+                    <ENSName address={comment.author || ""} />
+                  )}
                 </Link>
               ) : (
-                <span className="text-sm font-medium">
-                  <ENSName address={comment.author || ""} />
+                <span className="text-sm font-medium text-primary">
+                  {isAuthorAdmin ? (
+                    "Cowrie"
+                  ) : (
+                    <ENSName address={comment.author || ""} />
+                  )}
                 </span>
               )}
               {isAuthorAdmin && (
@@ -244,8 +254,11 @@ const CommentItem = ({
                   type={adminLabel ? ADMIN_TYPES[adminLabel] : "Admin"}
                 />
               )}
+              {isOwnComment && (
+                <span className="text-xs text-tertiary font-normal">(you)</span>
+              )}
             </div>
-            <span className="text-xs text-gray-500 self-center">
+            <span className="text-xs text-tertiary self-center">
               {formatRelative(comment.createdAt)}
             </span>
             {canDelete && (
@@ -276,7 +289,7 @@ const CommentItem = ({
               />
             )}
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 text-xs font-semibold text-tertiary">
             {Boolean(forForums) && (
               <EmojiReactions
                 targetType="post"
@@ -312,10 +325,7 @@ const CommentItem = ({
           {replies.map((reply) => (
             <div
               key={reply.id}
-              className={cn(
-                "pl-3",
-                forForums ? "" : "border-l-2 border-gray-200"
-              )}
+              className={cn("pl-3", forForums ? "" : "border-l-2 border-line")}
             >
               <CommentItem
                 comment={reply}
@@ -350,7 +360,7 @@ const CommentItem = ({
       )}
 
       {isThisCommentBeingRepliedTo && (
-        <div className="mt-3 ml-8 sm:ml-12 p-3 bg-gray-50 rounded-lg border border-line">
+        <div className="mt-3 ml-8 sm:ml-12 p-3 bg-wash rounded-lg border border-line">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xs text-secondary">
               Replying to this comment
@@ -488,13 +498,15 @@ export default function Thread({
   }, [adminAddresses, adminDirectory]);
 
   const adminAddressSet = React.useMemo(() => {
-    return new Set(normalizedDirectory.map((entry) => entry.address));
+    return new Set(
+      normalizedDirectory.map((entry) => entry.address.toLowerCase())
+    );
   }, [normalizedDirectory]);
 
   const adminRoleMap = React.useMemo(() => {
     const map = new Map<string, string | null>();
     normalizedDirectory.forEach(({ address, role }) => {
-      map.set(address, role);
+      map.set(address.toLowerCase(), role);
     });
     return map;
   }, [normalizedDirectory]);

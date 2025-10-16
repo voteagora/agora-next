@@ -16505,6 +16505,11 @@ pify@^5.0.0:
   resolved "https://registry.npmjs.org/pify/-/pify-5.0.0.tgz"
   integrity sha512-eW/gHNMlxdSP6dmG6uJip6FXN0EQBwm2clYYd8Wul42Cwu/DK8HEftzsapcNdYe2MfLiIwZqsDk2RDEsTE79hA==
 
+pinata@^2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/pinata/-/pinata-2.5.1.tgz#59b689bce48bc7a8154d2daaca502e410ff53fde"
+  integrity sha512-AyQIlgeD1uI3C/qjqBOare5kj9J4O/x85hkDckPiB13RY2Fem4bvkMOLQsLWSv79xlkVeLAx15PO7slGItiClQ==
+
 pino-abstract-transport@^1.0.0:
   version "1.2.0"
   resolved "https://registry.npmjs.org/pino-abstract-transport/-/pino-abstract-transport-1.2.0.tgz"

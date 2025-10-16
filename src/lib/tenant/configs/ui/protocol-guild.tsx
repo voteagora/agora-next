@@ -302,5 +302,9 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       name: "use-daonode-for-proposal-types",
       enabled: true,
     },
+    {
+      name: "forums",
+      enabled: false,
+    },
   ],
 });

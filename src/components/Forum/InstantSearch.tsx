@@ -88,7 +88,7 @@ const ForumInstantSearch: React.FC<InstantSearchProps> = ({
           <h3 className="font-semibold text-lg">
             <Highlight hit={hit} attribute="title" />
           </h3>
-          <div className="flex gap-2 text-sm text-gray-600">
+          <div className="flex gap-2 text-sm text-secondary">
             <span
               className={`px-2 py-1 rounded text-xs ${contentTypeColors[hit.contentType]}`}
             >
@@ -96,12 +96,12 @@ const ForumInstantSearch: React.FC<InstantSearchProps> = ({
             </span>
             {hit.author && <span>{hit.author}</span>}
             {hit.categoryName && hit.contentType === "topic" && (
-              <span className="bg-gray-100 px-2 py-1 rounded">
+              <span className="bg-wash px-2 py-1 rounded">
                 {hit.categoryName}
               </span>
             )}
             {hit.topicTitle && hit.contentType === "post" && (
-              <span className="bg-gray-100 px-2 py-1 rounded text-xs">
+              <span className="bg-wash px-2 py-1 rounded text-xs">
                 in: {hit.topicTitle}
               </span>
             )}
@@ -113,7 +113,7 @@ const ForumInstantSearch: React.FC<InstantSearchProps> = ({
             <span>{new Date(hit.createdAt * 1000).toLocaleDateString()}</span>
           </div>
         </div>
-        <div className="text-gray-700">
+        <div className="text-secondary">
           <Highlight hit={hit} attribute="content" />
           {hit.description && hit.contentType === "category" && (
             <div className="mt-2">
@@ -121,7 +121,7 @@ const ForumInstantSearch: React.FC<InstantSearchProps> = ({
             </div>
           )}
         </div>
-        <div className="flex gap-4 text-sm text-gray-500">
+        <div className="flex gap-4 text-sm text-tertiary">
           {hit.contentType === "topic" && (
             <>
               <span>{hit.postsCount || 0} posts</span>
@@ -169,7 +169,7 @@ const ForumInstantSearch: React.FC<InstantSearchProps> = ({
           <div className="grid gap-4 md:grid-cols-[1fr_250px]">
             <div className="space-y-4">
               <SearchBox placeholder="Search" />
-              <Stats className="text-sm text-gray-600" />
+              <Stats className="text-sm text-secondary" />
               <Hits hitComponent={UnifiedHitComponent} />
               <Pagination />
             </div>

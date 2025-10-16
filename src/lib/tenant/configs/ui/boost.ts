@@ -188,5 +188,9 @@ If you need help creating transactions / calldata, please see this [video](https
       name: "use-daonode-for-proposal-types",
       enabled: false,
     },
+    {
+      name: "forums",
+      enabled: false,
+    },
   ],
 });

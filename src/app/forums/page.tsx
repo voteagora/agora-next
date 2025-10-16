@@ -5,6 +5,9 @@ import ForumsPageContent from "./ForumsPageContent";
 const tenant = Tenant.current();
 const brandName = tenant.brandName || "Agora";
 
+// Force dynamic rendering - forum content changes frequently
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: `${brandName} Forum Discussions`,
   description: `Browse the latest topics, questions, and community updates from the ${brandName} forum.`,

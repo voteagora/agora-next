@@ -60,6 +60,7 @@ export const proposalsFilterOptions = {
     filter: "everything",
   },
 };
+
 export const delegatesFilterOptions = {
   weightedRandom: {
     sort: "weighted_random",
