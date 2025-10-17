@@ -130,14 +130,14 @@ export const syndicateTenantUIConfig = new TenantUI({
       route: "info",
       title: "Welcome to Syndicate Network Collective",
       description:
-        "Your home for information about Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
+        "The Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
       meta: {
         title: "Syndicate Network Governance",
         description:
-          "Syndicate Network is a public good owned and governed by SYND token holders.",
+          "The Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
         imageTitle: "Syndicate Network Governance",
         imageDescription:
-          "Syndicate Network is a public good owned and governed by SYND token holders.",
+          "The Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
       },
       links: [
         {
@@ -189,10 +189,10 @@ export const syndicateTenantUIConfig = new TenantUI({
       meta: {
         title: "Syndicate Network Governance",
         description:
-          "Syndicate Network is a public good owned and governed by SYND token holders.",
+          "The Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
         imageTitle: "Syndicate Network Governance",
         imageDescription:
-          "Syndicate Network is a public good owned and governed by SYND token holders.",
+          "The Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
       },
     },
     {
