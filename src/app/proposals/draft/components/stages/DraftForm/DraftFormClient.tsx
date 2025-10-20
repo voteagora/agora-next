@@ -211,6 +211,17 @@ const DraftFormClient = ({
     }
   }, [votingModuleType, proposalTypes, methods]);
 
+  // Ensure proposalConfigType is set when returning from other stages
+  useEffect(() => {
+    const current = methods.getValues("proposalConfigType");
+    if (!current && validProposalTypes.length > 0) {
+      methods.setValue(
+        "proposalConfigType",
+        validProposalTypes[0].proposal_type_id
+      );
+    }
+  }, [validProposalTypes, methods]);
+
   const onSubmit = async (data: z.output<typeof DraftProposalSchema>) => {
     if (isPending) {
       return;
@@ -343,9 +354,10 @@ const DraftFormClient = ({
               <UpdatedButton
                 fullWidth={true}
                 type="primary"
-                isSubmit={true}
+                isSubmit={false}
                 className="w-[200px] flex items-center justify-center"
                 isLoading={isPending}
+                onClick={handleSubmit(onSubmit)}
               >
                 {draftProposal.title ? "Update draft" : "Create draft"}
               </UpdatedButton>
