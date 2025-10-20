@@ -363,14 +363,14 @@ async function getVotersWhoHaveNotVotedForProposal({
         )
         SELECT 
           delegate, 
-          voting_power, 
+          voting_power::text as voting_power, 
           citizen_type, 
           voter_metadata_text::json as "voterMetadata",
           twitter,
           discord,
           warpcast
         FROM unique_delegates
-        ORDER BY voting_power DESC
+        ORDER BY (voting_power::numeric) DESC
         OFFSET $4 LIMIT $5`;
 
       const params = [
