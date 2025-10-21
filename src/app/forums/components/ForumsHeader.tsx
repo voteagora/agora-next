@@ -66,6 +66,7 @@ export default function ForumsHeader({
           {description ? <h3 className="text-primary">{description}</h3> : null}
         </div>
         <div className="flex gap-2">
+          <ForumsSearch className="max-w-xl" />
           <NewTopicButton isDuna={isDuna} />
         </div>
       </div>
