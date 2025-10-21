@@ -1,0 +1,417 @@
+[
+  {
+    "proposer": "0xeBeD0BF2701e905b4C576B3dC943D797bAc226ed",
+    "targets": ["0x0000000000000000000000000000000000000000"],
+    "values": [0],
+    "signatures": [""],
+    "calldatas": [""],
+    "start_block": 23655097,
+    "end_block": 23957497,
+    "proposal_type": 0,
+    "block_number": "23568697",
+    "log_index": 0,
+    "transaction_index": 1,
+    "id": "28010776742906362391739712933780398054602700694698619869165969046644260069448",
+    "voting_module_name": "standard",
+    "totals": { "no-param": { "1": "23532269361760047573364" } },
+    "start_blocktime": 1760738761,
+    "end_blocktime": 1761343561,
+    "data_eng_properties": { "liveness": "live", "source": "dao_node" }
+  },
+  {
+    "proposer": "0xeBeD0BF2701e905b4C576B3dC943D797bAc226ed",
+    "targets": ["0x14778860E937f509e651192a90589dE711Fb88a9"],
+    "values": [0],
+    "signatures": [""],
+    "calldatas": [
+      "a9059cbb00000000000000000000000047a3e2d5fe89d0c9dcc1e790f338600777031ee20000000000000000000000000000000000000000000034f086f3b33b68400000"
+    ],
+    "start_block": 23653982,
+    "end_block": 23956382,
+    "proposal_type": 0,
+    "block_number": "23567582",
+    "log_index": 0,
+    "transaction_index": 1,
+    "id": "92234028137325331398672483756331790015874102979937094001946002038637940939637",
+    "voting_module_name": "standard",
+    "totals": { "no-param": { "1": "23532269361760047573364" } },
+    "start_blocktime": 1760736531,
+    "end_blocktime": 1761341331,
+    "data_eng_properties": { "liveness": "live", "source": "dao_node" }
+  },
+  {
+    "block_number": "22701580",
+    "transaction_index": 1,
+    "log_index": 0,
+    "proposer": "0xebed0bf2701e905b4c576b3dc943d797bac226ed",
+    "targets": ["0x0000000000000000000000000000000000000000"],
+    "values": [0],
+    "signatures": [""],
+    "calldatas": [""],
+    "start_block": 22787980,
+    "end_block": 23090380,
+    "proposal_type": 0,
+    "id": "33644489549517732575460464357467943337417339770887281173193299945316667912679",
+    "voting_module_name": "standard",
+    "totals": { "no-param": { "1": "81390947984116135548117", "0": "0" } },
+    "start_blocktime": 1759004527,
+    "end_blocktime": 1759609327,
+    "data_eng_properties": { "liveness": "live", "source": "dao_node" }
+  },
+  {
+    "block_number": "18342671",
+    "transaction_index": 1,
+    "log_index": 0,
+    "proposer": "0xebed0bf2701e905b4c576b3dc943d797bac226ed",
+    "targets": ["0x14778860e937f509e651192a90589de711fb88a9"],
+    "values": [0],
+    "signatures": [""],
+    "calldatas": [
+      "a9059cbb00000000000000000000000047a3e2d5fe89d0c9dcc1e790f338600777031ee2000000000000000000000000000000000000000000003f870857a3e0e3800000"
+    ],
+    "start_block": 18429071,
+    "end_block": 18731471,
+    "proposal_type": 0,
+    "id": "72632202831118589040926236054696792722825676801797403282713292252351025742144",
+    "voting_module_name": "standard",
+    "queue_event": {
+      "block_number": "18957132",
+      "transaction_index": 2,
+      "log_index": 2,
+      "eta": 1751472431,
+      "id": "72632202831118589040926236054696792722825676801797403282713292252351025742144"
+    },
+    "execute_event": {
+      "block_number": "19029206",
+      "transaction_index": 1,
+      "log_index": 0,
+      "id": "72632202831118589040926236054696792722825676801797403282713292252351025742144"
+    },
+    "totals": { "no-param": { "1": "278029819801596379003569" } },
+    "start_blocktime": 1750286709,
+    "end_blocktime": 1750891509,
+    "data_eng_properties": { "liveness": "archived", "source": "dao_node" }
+  },
+  {
+    "block_number": "18340037",
+    "transaction_index": 1,
+    "log_index": 0,
+    "proposer": "0xebed0bf2701e905b4c576b3dc943d797bac226ed",
+    "targets": ["0x0000000000000000000000000000000000000000"],
+    "values": [0],
+    "signatures": [""],
+    "calldatas": [""],
+    "start_block": 18426437,
+    "end_block": 18728837,
+    "proposal_type": 0,
+    "id": "50911998049910853136464694786245772785831547713228901636780656582528320804232",
+    "voting_module_name": "standard",
+    "totals": {
+      "no-param": {
+        "1": "277705453298949658042036",
+        "2": "25817498867766256453"
+      }
+    },
+    "start_blocktime": 1750281441,
+    "end_blocktime": 1750886241,
+    "data_eng_properties": { "liveness": "live", "source": "dao_node" }
+  },
+  {
+    "block_number": "15018163",
+    "transaction_index": 1,
+    "log_index": 0,
+    "proposer": "0xebed0bf2701e905b4c576b3dc943d797bac226ed",
+    "targets": ["0x58e53131c339aa3cba35904538ea5948f751050a"],
+    "values": [0],
+    "signatures": [""],
+    "calldatas": [""],
+    "start_block": 15104563,
+    "end_block": 15406963,
+    "proposal_type": 0,
+    "id": "51864681802578431055051774372360255768364008881797769364315800242780425500096",
+    "voting_module_name": "standard",
+    "queue_event": {
+      "block_number": "16157352",
+      "transaction_index": 1,
+      "log_index": 1,
+      "eta": 1745872871,
+      "id": "51864681802578431055051774372360255768364008881797769364315800242780425500096"
+    },
+    "totals": { "no-param": { "1": "365647633981654006077797" } },
+    "start_blocktime": 1743637693,
+    "end_blocktime": 1744242493,
+    "data_eng_properties": { "liveness": "live", "source": "dao_node" }
+  },
+  {
+    "block_number": "14586419",
+    "transaction_index": 1,
+    "log_index": 0,
+    "proposer": "0xebed0bf2701e905b4c576b3dc943d797bac226ed",
+    "targets": ["0x58e53131c339aa3cba35904538ea5948f751050a"],
+    "values": [0],
+    "signatures": [""],
+    "calldatas": [""],
+    "start_block": 14672819,
+    "end_block": 14975219,
+    "proposal_type": 0,
+    "id": "112708518748775910354956954757181736583219137500135235919980324756977043503005",
+    "voting_module_name": "standard",
+    "totals": { "no-param": { "1": "31259191179315567674505" } },
+    "start_blocktime": 1742774205,
+    "end_blocktime": 1743379005,
+    "data_eng_properties": { "liveness": "live", "source": "dao_node" }
+  },
+  {
+    "block_number": "14154061",
+    "transaction_index": 1,
+    "log_index": 0,
+    "proposer": "0xebed0bf2701e905b4c576b3dc943d797bac226ed",
+    "targets": ["0x14778860e937f509e651192a90589de711fb88a9"],
+    "values": [0],
+    "signatures": [""],
+    "calldatas": [
+      "a9059cbb00000000000000000000000047a3e2d5fe89d0c9dcc1e790f338600777031ee20000000000000000000000000000000000000000000021e19e0c9bab24000000"
+    ],
+    "start_block": 14155861,
+    "end_block": 14285461,
+    "proposal_type": 0,
+    "id": "87632040904216510080039327416865538840791745505224547908013545791319447937798",
+    "voting_module_name": "standard",
+    "queue_event": {
+      "block_number": "14418250",
+      "transaction_index": 1,
+      "log_index": 1,
+      "eta": 1742394667,
+      "id": "87632040904216510080039327416865538840791745505224547908013545791319447937798"
+    },
+    "execute_event": {
+      "block_number": "14491197",
+      "transaction_index": 1,
+      "log_index": 0,
+      "id": "87632040904216510080039327416865538840791745505224547908013545791319447937798"
+    },
+    "totals": {
+      "no-param": {
+        "1": "316401263711720455032080",
+        "0": "371482455628904018438",
+        "2": "25584036159295583380"
+      }
+    },
+    "start_blocktime": 1741740289,
+    "end_blocktime": 1741999489,
+    "data_eng_properties": { "liveness": "archived", "source": "dao_node" }
+  },
+  {
+    "block_number": "13540546",
+    "transaction_index": 3,
+    "log_index": 2,
+    "proposer": "0xebed0bf2701e905b4c576b3dc943d797bac226ed",
+    "targets": ["0x522d3a9c2bc14ce1c4d210ed41ab239fded02f2b"],
+    "values": [0],
+    "signatures": [""],
+    "calldatas": [
+      "a9059cbb00000000000000000000000047a3e2d5fe89d0c9dcc1e790f338600777031ee20000000000000000000000000000000000000000000021e19e0c9bab24000000"
+    ],
+    "start_block": 13626946,
+    "end_block": 13929346,
+    "proposal_type": 0,
+    "id": "4556327074767250472921078853926694849552378675473106879767012501879371202982",
+    "voting_module_name": "standard",
+    "cancel_event": {
+      "block_number": "14143509",
+      "transaction_index": 4,
+      "log_index": 13,
+      "id": "4556327074767250472921078853926694849552378675473106879767012501879371202982"
+    },
+    "queue_event": {
+      "block_number": "13967587",
+      "transaction_index": 1,
+      "log_index": 1,
+      "eta": 1741493341,
+      "id": "4556327074767250472921078853926694849552378675473106879767012501879371202982"
+    },
+    "totals": {
+      "no-param": {
+        "1": "286342520162593574040468",
+        "2": "473799459845332600493",
+        "0": "149894775308687675560"
+      }
+    },
+    "start_blocktime": 1740682459,
+    "end_blocktime": 1741287259,
+    "data_eng_properties": { "liveness": "archived", "source": "dao_node" }
+  },
+  {
+    "block_number": "9873538",
+    "transaction_index": 2,
+    "log_index": 0,
+    "proposer": "0xebed0bf2701e905b4c576b3dc943d797bac226ed",
+    "targets": ["0x14778860e937f509e651192a90589de711fb88a9"],
+    "values": [0],
+    "signatures": [""],
+    "calldatas": [
+      "a9059cbb00000000000000000000000047a3e2d5fe89d0c9dcc1e790f338600777031ee2000000000000000000000000000000000000000000001969368974c05b000000"
+    ],
+    "start_block": 9959938,
+    "end_block": 10262338,
+    "proposal_type": 0,
+    "id": "27179762766873972401718883782099212312815174462082321230485885790096160206500",
+    "voting_module_name": "standard",
+    "queue_event": {
+      "block_number": "10264828",
+      "transaction_index": 1,
+      "log_index": 1,
+      "eta": 1734087823,
+      "id": "27179762766873972401718883782099212312815174462082321230485885790096160206500"
+    },
+    "execute_event": {
+      "block_number": "10406775",
+      "transaction_index": 3,
+      "log_index": 2,
+      "id": "27179762766873972401718883782099212312815174462082321230485885790096160206500"
+    },
+    "totals": {
+      "no-param": {
+        "1": "281548275400210805886802",
+        "2": "1126090718575527782212"
+      }
+    },
+    "start_blocktime": 1733348443,
+    "end_blocktime": 1733953243,
+    "data_eng_properties": { "liveness": "archived", "source": "dao_node" }
+  },
+  {
+    "block_number": "9659817",
+    "transaction_index": 1,
+    "log_index": 0,
+    "proposer": "0xebed0bf2701e905b4c576b3dc943d797bac226ed",
+    "targets": ["0x58e53131c339aa3cba35904538ea5948f751050a"],
+    "values": [0],
+    "signatures": [""],
+    "calldatas": [""],
+    "start_block": 9746217,
+    "end_block": 10048617,
+    "proposal_type": 0,
+    "id": "75448677353223676977806688663112177034253117296912078788499719032483591083949",
+    "voting_module_name": "standard",
+    "queue_event": {
+      "block_number": "10076295",
+      "transaction_index": 2,
+      "log_index": 2,
+      "eta": 1733710757,
+      "id": "75448677353223676977806688663112177034253117296912078788499719032483591083949"
+    },
+    "totals": {
+      "no-param": {
+        "1": "259939657963236791492489",
+        "0": "497829570098537780978"
+      }
+    },
+    "start_blocktime": 1732921001,
+    "end_blocktime": 1733525801,
+    "data_eng_properties": { "liveness": "live", "source": "dao_node" }
+  },
+  {
+    "block_number": "6211076",
+    "transaction_index": 1,
+    "log_index": 0,
+    "proposer": "0xebed0bf2701e905b4c576b3dc943d797bac226ed",
+    "targets": ["0x0000000000000000000000000000000000000000"],
+    "values": [0],
+    "signatures": [""],
+    "calldatas": [""],
+    "start_block": 6297476,
+    "end_block": 6599876,
+    "proposal_type": 0,
+    "id": "79734562360126992026607436776104460821029995945289569539609176715985046310268",
+    "voting_module_name": "standard",
+    "queue_event": {
+      "block_number": "6605008",
+      "transaction_index": 2,
+      "log_index": 2,
+      "eta": 1726768183,
+      "id": "79734562360126992026607436776104460821029995945289569539609176715985046310268"
+    },
+    "execute_event": {
+      "block_number": "6738955",
+      "transaction_index": 3,
+      "log_index": 3,
+      "id": "79734562360126992026607436776104460821029995945289569539609176715985046310268"
+    },
+    "totals": {
+      "no-param": {
+        "1": "383197504463082773617281",
+        "0": "25283560939919305923454",
+        "2": "0"
+      }
+    },
+    "start_blocktime": 1726023519,
+    "end_blocktime": 1726628319,
+    "data_eng_properties": { "liveness": "archived", "source": "dao_node" }
+  },
+  {
+    "block_number": "6075443",
+    "transaction_index": 1,
+    "log_index": 0,
+    "proposer": "0xebed0bf2701e905b4c576b3dc943d797bac226ed",
+    "targets": ["0x0000000000000000000000000000000000000000"],
+    "values": [0],
+    "signatures": [""],
+    "calldatas": [""],
+    "start_block": 6161843,
+    "end_block": 6464243,
+    "proposal_type": 0,
+    "id": "69623037614021637831503863399170959356878151943207475417265378276591979241602",
+    "voting_module_name": "standard",
+    "cancel_event": {
+      "block_number": "6155588",
+      "transaction_index": 1,
+      "log_index": 1,
+      "id": "69623037614021637831503863399170959356878151943207475417265378276591979241602"
+    },
+    "totals": {},
+    "start_blocktime": 1725752253,
+    "end_blocktime": 1726357053,
+    "data_eng_properties": { "liveness": "archived", "source": "dao_node" }
+  },
+  {
+    "block_number": "5175013",
+    "transaction_index": 8,
+    "log_index": 6,
+    "proposer": "0xebed0bf2701e905b4c576b3dc943d797bac226ed",
+    "targets": ["0x11caa7df2a1fcaea7149fc01ac8d2db5d3c82421"],
+    "values": [0],
+    "signatures": [""],
+    "calldatas": [
+      "64d62353000000000000000000000000000000000000000000000000000000000001fa40"
+    ],
+    "start_block": 5261413,
+    "end_block": 5563813,
+    "proposal_type": 3,
+    "id": "7021164072602929922775875300186847497427943811385239539386505941445523083641",
+    "voting_module_name": "standard",
+    "queue_event": {
+      "block_number": "5566510",
+      "transaction_index": 2,
+      "log_index": 2,
+      "eta": 1724647987,
+      "id": "7021164072602929922775875300186847497427943811385239539386505941445523083641"
+    },
+    "execute_event": {
+      "block_number": "5654897",
+      "transaction_index": 4,
+      "log_index": 3,
+      "id": "7021164072602929922775875300186847497427943811385239539386505941445523083641"
+    },
+    "totals": {
+      "no-param": {
+        "1": "379368764092131744812136",
+        "2": "103000000000000000000",
+        "0": "10405130672675800000"
+      }
+    },
+    "start_blocktime": 1723951393,
+    "end_blocktime": 1724556193,
+    "data_eng_properties": { "liveness": "archived", "source": "dao_node" }
+  }
+]

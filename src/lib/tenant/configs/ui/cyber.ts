@@ -327,5 +327,9 @@ If you meet the proposal threshold or are the manager of the governor, then you 
       name: "forums",
       enabled: false,
     },
+    {
+      name: "proposalsFromArchive",
+      enabled: true,
+    },
   ],
 });

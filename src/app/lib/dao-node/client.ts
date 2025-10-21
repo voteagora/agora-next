@@ -20,8 +20,9 @@ export function adaptDAONodeResponse(
 
   let proposalResults;
   let proposalData;
-
+  // console.log("apiResponse", apiResponse);
   if (votingModuleName == "standard") {
+    // console.log("apiResponse", apiResponse);
     proposalData = {
       values: apiResponse.values,
       targets: apiResponse.targets,
@@ -68,11 +69,12 @@ export function adaptDAONodeResponse(
     throw new Error(`Unknown voting module name: ${votingModuleName}`);
   }
 
-  const proposalType = proposalTypes[String(apiResponse.proposal_type)];
+  const proposalType = proposalTypes[String(apiResponse.proposal_type || 0)];
+  // console.log("proposalType", proposalType, apiResponse.proposal_type);
   const parsedProposalType = Object.assign(proposalType, {
     proposal_type_id: String(apiResponse.proposal_type),
   });
-
+  // console.log("parsedProposalType", parsedProposalType);
   return {
     proposal_id: apiResponse.id,
     proposer: apiResponse.proposer.toLowerCase(),

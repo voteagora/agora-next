@@ -3,6 +3,7 @@ import {
   fetchDraftProposalForSponsor as apiFetchDraftProposalsForSponsorship,
   fetchDraftProposals as apiFetchDraftProposals,
   fetchProposals as apiFetchProposals,
+  fetchProposalsFromArchivedJson,
 } from "@/app/api/common/proposals/getProposals";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
@@ -21,6 +22,19 @@ async function fetchProposals(
   pagination = { limit: 10, offset: 0 }
 ) {
   "use server";
+  const { ui } = Tenant.current();
+  const hasToggle = typeof (ui as any)?.toggle === "function";
+  const useArchivedProposals = hasToggle
+    ? ui.toggle("proposalsFromArchive")?.enabled
+    : false;
+
+  if (useArchivedProposals) {
+    // console.log("useArchivedProposals", useArchivedProposals);
+    // return getProposalsFromArchivedJson({ filter, pagination });
+
+    return fetchProposalsFromArchivedJson({ filter, pagination });
+  }
+
   return apiFetchProposals({ filter, pagination });
 }
 

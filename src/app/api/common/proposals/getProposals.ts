@@ -16,7 +16,11 @@ import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import { Proposal, ProposalPayload } from "./proposal";
+import {
+  Proposal,
+  ProposalPayload,
+  ProposalPayloadFromDAONode,
+} from "./proposal";
 import { doInSpan } from "@/app/lib/logging";
 import {
   findOffchainProposal,
@@ -55,7 +59,7 @@ async function fetchProposalsFromDaoNode(
     ]);
 
     let proposals = data;
-
+    console.log("proposals", proposals);
     // Apply relevant filter
     if (filter === "relevant") {
       proposals = proposals.filter((proposal) => !proposal.cancel_event);
@@ -647,6 +651,164 @@ async function getTotalProposalsCount(): Promise<number> {
     });
   });
 }
+
+// New standalone function to fetch proposals from archived JSON files (without DAO Node)
+export async function getProposalsFromArchivedJson({
+  filter,
+  pagination,
+}: {
+  filter: string;
+  pagination: PaginationParams;
+}): Promise<PaginatedResult<Proposal[]>> {
+  return withMetrics(
+    "getProposalsFromArchivedJson",
+    async () => {
+      try {
+        const { namespace, contracts, ui } = Tenant.current();
+
+        // Fetch proposal types (with fallback logic built-in)
+        const proposalTypes = await getProposalTypes();
+
+        // Create a map for quick lookup
+        const proposalTypesMap: Record<string, any> = {};
+        proposalTypes.forEach((type: any) => {
+          proposalTypesMap[type.proposal_type_id] = type;
+        });
+
+        // Determine which JSON file to use based on namespace
+        let archivedData;
+        if (namespace === "cyber") {
+          archivedData = require("@/app/proposals/data/cyber.json");
+        } else if (namespace === "pguild") {
+          archivedData = require("@/app/proposals/data/pguild.json");
+        } else if (namespace === "scroll") {
+          archivedData = require("@/app/proposals/data/scroll.json");
+        } else {
+          archivedData = [];
+        }
+
+        // Load proposals from JSON file
+        let rawProposals =
+          archivedData as unknown as ProposalPayloadFromDAONode[];
+
+        // Apply filter
+        if (filter === "relevant") {
+          rawProposals = rawProposals.filter(
+            (proposal) => !proposal.cancel_event
+          );
+        }
+        console.log(rawProposals);
+        // Convert JSON proposals to ProposalPayload format directly
+        const adaptedProposals = rawProposals.map((proposal) => {
+          const votingModuleName = proposal.voting_module_name || "standard";
+
+          // Build proposal data
+          const proposalData = {
+            values: proposal.values,
+            targets: proposal.targets,
+            signatures: proposal.signatures,
+            calldatas: proposal.calldatas.map((c) =>
+              c.startsWith("0x") ? c : "0x" + c
+            ),
+          };
+
+          // Build proposal results
+          const proposalResults = {
+            standard: {
+              "0": BigInt(proposal.totals?.["no-param"]?.["0"] ?? "0"),
+              "1": BigInt(proposal.totals?.["no-param"]?.["1"] ?? "0"),
+              "2": BigInt(proposal.totals?.["no-param"]?.["2"] ?? "0"),
+            },
+            approval: null,
+          };
+
+          // Get proposal type data from the fetched types or use default
+          const proposalTypeId = String(proposal.proposal_type || 0);
+          const proposalTypeData = proposalTypesMap[proposalTypeId] || {
+            name: proposalTypeId === "3" ? "Governance" : "Standard",
+            description: `${proposalTypeId === "3" ? "Governance" : "Standard"} proposal`,
+            quorum: "0",
+            proposal_type_id: proposalTypeId,
+          };
+
+          return {
+            proposal_id: proposal.id,
+            proposer: proposal.proposer.toLowerCase(),
+            description: "", // No description in JSON
+            created_block: BigInt(proposal.block_number),
+            start_block: proposal.start_block.toString(),
+            end_block: proposal.end_block.toString(),
+            cancelled_block: proposal.cancel_event
+              ? BigInt(proposal.cancel_event.block_number)
+              : null,
+            executed_block: proposal.execute_event
+              ? BigInt(proposal.execute_event.block_number)
+              : null,
+            queued_block: proposal.queue_event
+              ? BigInt(proposal.queue_event.block_number)
+              : null,
+            proposal_data: proposalData,
+            proposal_type: votingModuleName.toUpperCase() as any,
+            proposal_type_data: proposalTypeData,
+            proposal_results: proposalResults,
+          } as ProposalPayload;
+        });
+
+        // Sort by start block descending
+        adaptedProposals.sort((a, b) => {
+          const aBlock = (a as any).start_block || "0";
+          const bBlock = (b as any).start_block || "0";
+          return Number(bBlock) - Number(aBlock);
+        });
+
+        // Apply pagination
+        const skip = pagination.offset;
+        const take = pagination.limit;
+        const paginatedProposals = adaptedProposals.slice(skip, skip + take);
+
+        // Fetch latest block and votable supply in parallel
+        const [latestBlock, votableSupply] = await Promise.all([
+          getLatestBlockPromise(ui, contracts),
+          fetchVotableSupply(),
+        ]);
+
+        // Parse proposals
+        const parsedProposals = await Promise.all(
+          paginatedProposals.map(async (proposal) => {
+            const quorum = await fetchQuorumForProposal(
+              proposal as ProposalPayload
+            );
+
+            return parseProposal(
+              proposal as ProposalPayload,
+              latestBlock,
+              quorum ?? null,
+              BigInt(votableSupply),
+              undefined
+            );
+          })
+        );
+
+        return {
+          meta: {
+            has_next: skip + take < adaptedProposals.length,
+            total_returned: paginatedProposals.length,
+            next_offset: skip + take,
+          },
+          data: parsedProposals.filter((p) => p !== null) as Proposal[],
+        };
+      } catch (error) {
+        console.error("Error fetching proposals from archived JSON:", error);
+        throw error;
+      }
+    },
+    { filter }
+  );
+}
+
+export const fetchProposalsFromArchivedJson = cache(
+  getProposalsFromArchivedJson
+);
 
 export const fetchProposalsCount = cache(getTotalProposalsCount);
 export const fetchDraftProposalForSponsor = cache(getDraftProposalForSponsor);
