@@ -18,14 +18,34 @@ import { apiFetchDelegateWeights } from "@/app/api/analytics/top/delegates/getTo
 import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/getProposalVoteCounts";
 import { apiFetchMetricTS } from "@/app/api/analytics/metric/[metric_id]/[frequency]/getMetricsTS";
 import Hero from "@/components/Hero/Hero";
+import { getPageContent } from "@/lib/actions/pages";
+import { BlockRenderer } from "@/components/Blocks/BlockRenderer";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({}) {
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams?: { preview?: string };
+}) {
   const tenant = Tenant.current();
-  const page = tenant.ui.page("info") || tenant.ui.page("/");
 
-  const { title, description } = page!.meta;
+  // Check for dynamic page metadata first
+  const version = searchParams?.preview === "true" ? "draft" : "published";
+  const dynamicPage = await getPageContent(tenant.slug, "info", version);
+
+  let title: string;
+  let description: string;
+
+  if (dynamicPage) {
+    title = dynamicPage.meta_title;
+    description = dynamicPage.meta_description;
+  } else {
+    // Fallback to static metadata
+    const page = tenant.ui.page("info") || tenant.ui.page("/");
+    title = page!.meta.title;
+    description = page!.meta.description;
+  }
 
   const preview = `/api/images/og/generic?title=${encodeURIComponent(
     title
@@ -51,14 +71,35 @@ export async function generateMetadata({}) {
   };
 }
 
-export default async function Page() {
-  const { ui, namespace } = Tenant.current();
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: { preview?: string };
+}) {
+  const { ui, namespace, slug } = Tenant.current();
 
   if (!ui.toggle("info")?.enabled) {
     return (
       <div className="text-primary">Route not supported for namespace</div>
     );
   }
+
+  // Check for dynamic page content from database
+  const version = searchParams?.preview === "true" ? "draft" : "published";
+  const dynamicPage = await getPageContent(slug, "info", version);
+
+  // If dynamic page exists, render it
+  if (dynamicPage && dynamicPage.blocks.length > 0) {
+    return (
+      <div className="flex flex-col">
+        {dynamicPage.blocks.map((block) => (
+          <BlockRenderer key={block.id} block={block} />
+        ))}
+      </div>
+    );
+  }
+
+  // Otherwise, fall back to static content below
 
   const hasGovernanceCharts =
     ui.toggle("info/governance-charts")?.enabled === true;

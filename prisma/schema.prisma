@@ -4609,6 +4609,46 @@ model AnalyticsEvent {
   @@schema("alltenant")
 }
 
+// Generic page model - can be info, landing, custom, etc
+model Page {
+  id                     String      @id @default(uuid())
+  dao_slug               DaoSlug
+  route                  String      // "info", "about", "custom/landing", etc
+  version                String      // "draft" or "published"
+  blocks                 PageBlock[]
+  // SEO/Meta
+  meta_title             String
+  meta_description       String
+  meta_image_title       String?
+  meta_image_description String?
+  created_at             DateTime    @default(now())
+  updated_at             DateTime    @updatedAt
+  published_at           DateTime?
+  created_by             String?     // address of creator
+
+  @@unique([dao_slug, route, version])
+  @@index([dao_slug, route, version])
+  @@map("pages")
+  @@schema("alltenant")
+}
+
+// Generic reusable blocks
+model PageBlock {
+  id         String   @id @default(uuid())
+  page_id    String
+  page       Page     @relation(fields: [page_id], references: [id], onDelete: Cascade)
+  block_type String   // "hero", "about", "card_grid", "text", "timeline", etc
+  order      Int      // Display order (0, 1, 2...)
+  config     Json     // Block-specific configuration
+  enabled    Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([page_id, order])
+  @@map("page_blocks")
+  @@schema("alltenant")
+}
+
 enum DaoSlug {
   OP
   ENS
