@@ -200,3 +200,21 @@ export const ADMIN_TYPES: Record<string, string> = {
   admin: "ADMIN",
   super_admin: "SUPER_ADMIN",
 };
+
+export const ARCHIVE_GCS_BUCKET =
+  process.env.NODE_ENV === "development"
+    ? "https://storage.googleapis.com/cpls-usmr-dev-25q3"
+    : "https://storage.googleapis.com/cpls-usmr-prd-25q3";
+
+export const getArchiveSlugGCSbucket = (namespace: string) => {
+  switch (namespace) {
+    case TENANT_NAMESPACES.SYNDICATE:
+      return `${ARCHIVE_GCS_BUCKET}/data/jeffdao`;
+    default:
+      return `${ARCHIVE_GCS_BUCKET}/data/${namespace}`;
+  }
+};
+
+export const getArchiveSlugAllProposals = (namespace: string) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal_list.full.ndjson`;
+};

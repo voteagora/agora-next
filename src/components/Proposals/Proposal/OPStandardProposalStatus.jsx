@@ -12,17 +12,18 @@ function formatNumber(amount, decimals) {
   }
 }
 
-export default function OPStandardProposalStatus({ proposal }) {
-  const forLength = formatNumber(proposal.proposalResults.for);
-  const againstLength = formatNumber(proposal.proposalResults.against);
-  const abstainLength = formatNumber(proposal.proposalResults.abstain);
+export function OPStandardStatusView(props) {
+  const { forAmount, againstAmount, abstainAmount, decimals } = props;
+  const forLength = formatNumber(forAmount, decimals);
+  const againstLength = formatNumber(againstAmount, decimals);
+  const abstainLength = formatNumber(abstainAmount, decimals);
   const totalLength = forLength + againstLength + abstainLength;
   return (
     <div className="flex flex-col items-end gap-1 justify-center">
       <div className="flex flex-row space-between text-primary gap-1">
         <div>
           {TokenAmountDisplay({
-            amount: proposal.proposalResults.for,
+            amount: forAmount,
             currency: "",
           })}{" "}
           For
@@ -30,7 +31,7 @@ export default function OPStandardProposalStatus({ proposal }) {
         <div>–</div>
         <div>
           {TokenAmountDisplay({
-            amount: proposal.proposalResults.against,
+            amount: againstAmount,
             currency: "",
           })}{" "}
           Against
@@ -43,10 +44,7 @@ export default function OPStandardProposalStatus({ proposal }) {
             className=" bg-positive h-1 rounded-l-full"
             style={{ width: `${(forLength / totalLength) * 100}%` }}
           ></div>
-          <div
-            className=" bg-tertiary h-1"
-            style={{ width: `${(abstainLength / totalLength) * 100}%` }}
-          ></div>
+          <div className=" bg-tertiary h-1" style={{ width: `${(abstainLength / totalLength) * 100}%` }}></div>
           <div
             className=" bg-negative h-1 rounded-r-full"
             style={{ width: `${(againstLength / totalLength) * 100}%` }}
@@ -60,5 +58,17 @@ export default function OPStandardProposalStatus({ proposal }) {
         </div>
       )}
     </div>
+  );
+}
+
+export default function OPStandardProposalStatus({ proposal }) {
+  const decimals = proposal.proposalResults.decimals ?? 18;
+  return (
+    <OPStandardStatusView
+      forAmount={proposal.proposalResults.for}
+      againstAmount={proposal.proposalResults.against}
+      abstainAmount={proposal.proposalResults.abstain}
+      decimals={decimals}
+    />
   );
 }
