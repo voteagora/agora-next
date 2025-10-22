@@ -16,7 +16,9 @@ export type BlockType =
   | "cta_section"
   | "governance_charts"
   | "custom_html"
-  | "governor_settings";
+  | "governor_settings"
+  | "duna_info"
+  | "disclosures";
 
 // Extended types with relations
 export type PageWithBlocks = Page & {
@@ -59,6 +61,7 @@ export interface AboutBlockConfig {
  */
 export interface CardGridBlockConfig {
   title?: string;
+  description?: string;
   columns: 2 | 3 | 4; // Grid columns
   cards: Array<{
     title: string;
@@ -145,6 +148,24 @@ export interface CustomHTMLBlockConfig {
 export interface GovernorSettingsBlockConfig {
   // No config needed - component is fully self-contained
   // All data comes from Tenant.current() and blockchain
+}
+
+/**
+ * DUNA Info - Displays DUNA Administration section
+ * Uses Tenant.current() for all configuration - no config needed
+ */
+export interface DUNAInfoBlockConfig {
+  // No config needed - component is fully self-contained
+  // All data comes from forum data
+}
+
+/**
+ * Disclosures - Displays legal disclosure text
+ */
+export interface DisclosuresBlockConfig {
+  title?: string;
+  content: string;
+  footer_note?: string;
 }
 
 // ============================================================================
@@ -234,4 +255,6 @@ export type BlockConfig =
   | CTASectionBlockConfig
   | GovernanceChartsBlockConfig
   | CustomHTMLBlockConfig
-  | GovernorSettingsBlockConfig;
+  | GovernorSettingsBlockConfig
+  | DUNAInfoBlockConfig
+  | DisclosuresBlockConfig;

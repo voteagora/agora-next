@@ -14,3 +14,5 @@ export { CTASectionBlock } from "./CTASectionBlock";
 export { GovernanceChartsBlock } from "./GovernanceChartsBlock";
 export { CustomHTMLBlock } from "./CustomHTMLBlock";
 export { GovernorSettingsBlock } from "./GovernorSettingsBlock";
+export { DUNAInfoBlock } from "./DUNAInfoBlock";
+export { DisclosuresBlock } from "./DisclosuresBlock";

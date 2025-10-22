@@ -20,11 +20,5 @@ interface GovernorSettingsBlockProps {
 export async function GovernorSettingsBlock({
   config,
 }: GovernorSettingsBlockProps) {
-  return (
-    <div className="py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <GovernorSettings />
-      </div>
-    </div>
-  );
+  return <GovernorSettings />;
 }

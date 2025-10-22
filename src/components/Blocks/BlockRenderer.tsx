@@ -9,6 +9,8 @@ import { CTASectionBlock } from "./CTASectionBlock";
 import { GovernanceChartsBlock } from "./GovernanceChartsBlock";
 import { CustomHTMLBlock } from "./CustomHTMLBlock";
 import { GovernorSettingsBlock } from "./GovernorSettingsBlock";
+import { DUNAInfoBlock } from "./DUNAInfoBlock";
+import { DisclosuresBlock } from "./DisclosuresBlock";
 import type {
   HeroBlockConfig,
   AboutBlockConfig,
@@ -20,6 +22,8 @@ import type {
   GovernanceChartsBlockConfig,
   CustomHTMLBlockConfig,
   GovernorSettingsBlockConfig,
+  DUNAInfoBlockConfig,
+  DisclosuresBlockConfig,
 } from "@/lib/blocks/types";
 
 interface BlockRendererProps {
@@ -100,6 +104,20 @@ export function BlockRenderer({ block }: BlockRendererProps) {
         return (
           <GovernorSettingsBlock
             config={block.config as unknown as GovernorSettingsBlockConfig}
+          />
+        );
+
+      case "duna_info":
+        return (
+          <DUNAInfoBlock
+            config={block.config as unknown as DUNAInfoBlockConfig}
+          />
+        );
+
+      case "disclosures":
+        return (
+          <DisclosuresBlock
+            config={block.config as unknown as DisclosuresBlockConfig}
           />
         );
 
