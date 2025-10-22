@@ -14,6 +14,9 @@ import { proposalsFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
 import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
+import path from "node:path";
+import { readFile } from "node:fs/promises";
+
 import { PaginationParams } from "@/app/lib/pagination";
 import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
 
@@ -67,20 +70,11 @@ export default async function ProposalsHome() {
   if (useArchiveForProposals) {
     let archivedProposals: any[] = [];
     try {
-      if (namespace === "cyber") {
-        archivedProposals = require("@/app/proposals/data/cyber.json");
-      } else if (namespace === "pguild") {
-        archivedProposals = require("@/app/proposals/data/pguild.json");
-      }
+      archivedProposals = await loadArchivedProposals(namespace);
     } catch (error) {
       console.error("Failed to load archived proposals:", error);
       archivedProposals = [];
     }
-
-    // Filter only standard proposals (proposal_type === 0)
-    const standardProposals = archivedProposals.filter(
-      (p: any) => p.proposal_type === 0 && p.voting_module_name === "standard"
-    );
 
     const [governanceCalendar] = await (async () => {
       const results = await Promise.allSettled([fetchGovernanceCalendar()]);
@@ -113,7 +107,7 @@ export default async function ProposalsHome() {
           votableSupply="0"
         />
         <ArchiveProposalsList
-          proposals={standardProposals}
+          proposals={archivedProposals}
           governanceCalendar={governanceCalendar}
         />
       </div>
@@ -177,4 +171,46 @@ export default async function ProposalsHome() {
       />
     </div>
   );
+}
+
+async function loadArchivedProposals(namespace: string) {
+  if (!namespace) {
+    return [];
+  }
+
+  const filePath = path.join(
+    process.cwd(),
+    "src",
+    "app",
+    "proposals",
+    "data",
+    `${namespace}.json`
+  );
+
+  const raw = await readFile(filePath, "utf8");
+  const trimmed = raw.trim();
+
+  if (!trimmed) {
+    return [];
+  }
+
+  const sanitize = (input: string) =>
+    input
+      .replace(
+        /"onchain_proposalid":\s*([0-9]+)/g,
+        '"onchain_proposalid":"$1"'
+      )
+      .replace(
+        /"onchainProposalId":\s*([0-9]+)/g,
+        '"onchainProposalId":"$1"'
+      );
+
+  if (trimmed.startsWith("[")) {
+    return JSON.parse(sanitize(trimmed));
+  }
+
+  return trimmed
+    .split(/\r?\n/)
+    .filter(Boolean)
+    .map((line) => JSON.parse(sanitize(line)));
 }

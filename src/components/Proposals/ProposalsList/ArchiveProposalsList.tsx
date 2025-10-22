@@ -7,27 +7,13 @@ import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStag
 import { useSearchParams } from "next/navigation";
 import Tenant from "@/lib/tenant/tenant";
 import CreateProposalDraftButton from "./CreateProposalDraftButton";
-import ArchiveStandardProposal from "../Proposal/ArchiveStandardProposal";
+
 import { useAccount } from "wagmi";
 import { DaoSlug } from "@prisma/client";
+import ArchiveProposalRow from "../Proposal/Archive/ArchiveProposalRow";
+import { normalizeArchiveProposals } from "../Proposal/Archive/normalizeArchiveProposal";
 
-type ArchiveProposal = {
-  id: string;
-  proposer: string;
-  block_number?: string;
-  start_block: number | string;
-  end_block?: number | string | null;
-  start_blocktime?: number;
-  end_blocktime?: number;
-  proposal_type?: number;
-  voting_module_name?: string;
-  totals?: any;
-  queue_event?: any;
-  execute_event?: any;
-  cancel_event?: any;
-  description?: string;
-  title?: string;
-};
+type ArchiveProposal = Record<string, any>;
 
 export default function ArchiveProposalsList({
   proposals,
@@ -42,7 +28,7 @@ export default function ArchiveProposalsList({
   } | null;
 }) {
   const { address } = useAccount();
-  const { ui, slug } = Tenant.current();
+  const { ui, slug, token, namespace } = Tenant.current();
   const filter = useSearchParams()?.get("filter") || "relevant";
   let tenantSupportsProposalLifecycle =
     ui.toggle("proposal-lifecycle")?.enabled;
@@ -63,6 +49,15 @@ export default function ArchiveProposalsList({
       return bBlock - aBlock;
     });
   }, [proposals]);
+
+  const normalizedProposals = React.useMemo(
+    () =>
+      normalizeArchiveProposals(sortedProposals, {
+        namespace,
+        tokenDecimals: token?.decimals ?? 18,
+      }),
+    [sortedProposals, namespace, token?.decimals]
+  );
 
   return (
     <div className="flex flex-col max-w-[76rem]">
@@ -87,28 +82,15 @@ export default function ArchiveProposalsList({
 
       <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
         <div>
-          {sortedProposals.length === 0 ? (
+          {normalizedProposals.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">
               No proposals currently
             </div>
           ) : (
             <div>
-              {sortedProposals.map((proposal) => {
-                // Only render standard proposals
-                if (
-                  proposal.proposal_type === 0 &&
-                  proposal.voting_module_name === "standard"
-                ) {
-                  return (
-                    <ArchiveStandardProposal
-                      key={`${proposal.id}`}
-                      proposal={proposal}
-                    />
-                  );
-                }
-                // Don't render non-standard proposals
-                return null;
-              })}
+              {normalizedProposals.map((proposal) => (
+                <ArchiveProposalRow key={proposal.id} proposal={proposal} />
+              ))}
             </div>
           )}
         </div>
