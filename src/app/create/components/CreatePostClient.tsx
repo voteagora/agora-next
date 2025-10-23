@@ -123,7 +123,7 @@ export function CreatePostClient({
             Math.floor((Date.now() + 7 * 24 * 60 * 60 * 1000) / 1000)
           ),
           tags: selectedPostType,
-          proposal_type_uid: selectedProposalType.proposal_type_id || undefined,
+          proposal_type_uid: selectedProposalType.id || undefined,
         });
 
         const targetType =
