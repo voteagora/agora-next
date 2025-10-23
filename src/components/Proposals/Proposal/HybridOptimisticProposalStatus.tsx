@@ -52,7 +52,9 @@ export const HybridOptimisticProposalStatus = ({
     }
   }
 
-  return <HybridOptimisticStatusView infoText={infoText} statusText={statusText} />;
+  return (
+    <HybridOptimisticStatusView infoText={infoText} statusText={statusText} />
+  );
 };
 
 export type HybridOptimisticStatusData = HybridOptimisticStatusViewProps;

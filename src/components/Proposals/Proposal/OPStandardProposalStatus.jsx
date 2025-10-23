@@ -44,7 +44,10 @@ export function OPStandardStatusView(props) {
             className=" bg-positive h-1 rounded-l-full"
             style={{ width: `${(forLength / totalLength) * 100}%` }}
           ></div>
-          <div className=" bg-tertiary h-1" style={{ width: `${(abstainLength / totalLength) * 100}%` }}></div>
+          <div
+            className=" bg-tertiary h-1"
+            style={{ width: `${(abstainLength / totalLength) * 100}%` }}
+          ></div>
           <div
             className=" bg-negative h-1 rounded-r-full"
             style={{ width: `${(againstLength / totalLength) * 100}%` }}
