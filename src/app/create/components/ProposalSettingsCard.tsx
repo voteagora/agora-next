@@ -14,6 +14,7 @@ interface ProposalSettingsCardProps {
   proposalTypes: ProposalType[];
   onProposalTypeChange: (typeId: string) => void;
   postType: PostType;
+  isLoading?: boolean;
 }
 
 export function ProposalSettingsCard({
@@ -21,20 +22,26 @@ export function ProposalSettingsCard({
   proposalTypes,
   onProposalTypeChange,
   postType,
+  isLoading = false,
 }: ProposalSettingsCardProps) {
   return (
     <Card>
       <CardContent className="p-6 space-y-6">
         <div className="space-y-3">
-          <Label className="text-sm font-medium text-secondary">Proposal type</Label>
+          <Label className="text-sm font-medium text-secondary">
+            Proposal type
+          </Label>
           {postType === "tempcheck" ? (
             <>
               <Select
                 value={selectedProposalType?.id || ""}
                 onValueChange={onProposalTypeChange}
+                disabled={isLoading}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a type" />
+                  <SelectValue
+                    placeholder={isLoading ? "Loading..." : "Select a type"}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {proposalTypes.map((type) => (
@@ -93,4 +100,3 @@ export function ProposalSettingsCard({
     </Card>
   );
 }
-

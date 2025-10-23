@@ -39,4 +39,3 @@ export function useProposalLinks({
     refetch: query.refetch,
   };
 }
-

@@ -2,7 +2,7 @@ export type PostType = "forum-post" | "tempcheck" | "gov-proposal";
 
 export const postTypeOptions = {
   "forum-post": "Forum post",
-  "tempcheck": "Temp check",
+  tempcheck: "Temp check",
   "gov-proposal": "Governance proposal",
 } as const;
 
@@ -21,6 +21,8 @@ export interface ProposalType {
   description: string;
   quorum: number;
   approvalThreshold: number;
+  proposal_type_id?: string;
+  module?: string;
 }
 
 export interface CreatePostFormData {
@@ -31,4 +33,3 @@ export interface CreatePostFormData {
   relatedDiscussions: RelatedItem[];
   relatedTempChecks: RelatedItem[];
 }
-

@@ -8,7 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RelatedItem } from "../types";
-import { Search, MessageSquare, Calendar, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Search,
+  MessageSquare,
+  Calendar,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { stripHtmlToText } from "@/app/forums/stripHtml";
 
 interface RelatedItemsDialogProps {
@@ -58,7 +65,7 @@ export function RelatedItemsDialog({
             Search {searchType === "forum" ? "Forum Posts" : "Temp Checks"}
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -84,7 +91,9 @@ export function RelatedItemsDialog({
               <div className="text-center py-12">
                 <Search className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                 <p className="text-sm text-gray-500">
-                  {searchTerm ? "No results found" : "Enter a search term to find posts"}
+                  {searchTerm
+                    ? "No results found"
+                    : "Enter a search term to find posts"}
                 </p>
               </div>
             ) : (
@@ -95,9 +104,10 @@ export function RelatedItemsDialog({
                     key={item.id}
                     className={`
                       relative p-3 border rounded-lg transition-all
-                      ${selected 
-                        ? "bg-green-50 border-green-200 cursor-not-allowed" 
-                        : "cursor-pointer hover:bg-gray-50 hover:border-gray-300"
+                      ${
+                        selected
+                          ? "bg-green-50 border-green-200 cursor-not-allowed"
+                          : "cursor-pointer hover:bg-gray-50 hover:border-gray-300"
                       }
                     `}
                     onClick={() => !selected && onSelect(item)}
@@ -139,7 +149,9 @@ export function RelatedItemsDialog({
               {showPagination && (
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-500">
-                    Showing {((page - 1) * 20) + 1}-{Math.min(page * 20, totalResults)} of {totalResults} results
+                    Showing {(page - 1) * 20 + 1}-
+                    {Math.min(page * 20, totalResults)} of {totalResults}{" "}
+                    results
                   </p>
                   <div className="flex items-center gap-2">
                     <Button
@@ -176,4 +188,3 @@ export function RelatedItemsDialog({
     </Dialog>
   );
 }
-

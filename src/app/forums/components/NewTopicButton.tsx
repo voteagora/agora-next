@@ -26,11 +26,14 @@ interface NewTopicButtonProps {
   topicContext?: TopicContext;
 }
 
-export default function NewTopicButton({ isDuna, topicContext }: NewTopicButtonProps) {
+export default function NewTopicButton({
+  isDuna,
+  topicContext,
+}: NewTopicButtonProps) {
   const [open, setOpen] = React.useState(false);
   const requireLogin = useRequireLogin();
   const router = useRouter();
-  
+
   const isEASV2Enabled = ui.toggle("enable-easv2-govlessvoting")?.enabled;
 
   const handleClick = async () => {
@@ -38,7 +41,7 @@ export default function NewTopicButton({ isDuna, topicContext }: NewTopicButtonP
     if (!loggedIn) {
       return;
     }
-    
+
     if (isEASV2Enabled) {
       router.push("/create");
     } else {
@@ -59,7 +62,9 @@ export default function NewTopicButton({ isDuna, topicContext }: NewTopicButtonP
         title: topicContext.title,
         description: topicContext.content,
         ...(topicContext.createdAt && { createdAt: topicContext.createdAt }),
-        ...(topicContext.commentsCount !== undefined && { commentsCount: topicContext.commentsCount.toString() }),
+        ...(topicContext.commentsCount !== undefined && {
+          commentsCount: topicContext.commentsCount.toString(),
+        }),
       });
       router.push(`/create?${params.toString()}`);
     }
@@ -78,7 +83,9 @@ export default function NewTopicButton({ isDuna, topicContext }: NewTopicButtonP
         title: topicContext.title,
         description: topicContext.content,
         ...(topicContext.createdAt && { createdAt: topicContext.createdAt }),
-        ...(topicContext.commentsCount !== undefined && { commentsCount: topicContext.commentsCount.toString() }),
+        ...(topicContext.commentsCount !== undefined && {
+          commentsCount: topicContext.commentsCount.toString(),
+        }),
       });
       router.push(`/create?${params.toString()}`);
     }
@@ -99,10 +106,7 @@ export default function NewTopicButton({ isDuna, topicContext }: NewTopicButtonP
     return (
       <div className="flex gap-2">
         {!topicContext.isTempCheck && (
-          <Button
-            onClick={handleCreateTempCheck}
-            size="lg"
-          >
+          <Button onClick={handleCreateTempCheck} size="lg">
             Create temp check
             <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
@@ -117,7 +121,11 @@ export default function NewTopicButton({ isDuna, topicContext }: NewTopicButtonP
         onClick={handleClick}
         className={`inline-flex h-9 px-4 py-2 items-center justify-center gap-2 shrink-0 rounded-md ${bgStyle} shadow-sm hover:bg-hoverBackground text-sm h-auto ${textStyle}`}
       >
-        {isDuna ? "+ Discuss DUNA" : isEASV2Enabled ? "+ Create" : "+ New Topic"}
+        {isDuna
+          ? "+ Discuss DUNA"
+          : isEASV2Enabled
+            ? "+ Create"
+            : "+ New Topic"}
       </Button>
 
       {!isEASV2Enabled && (

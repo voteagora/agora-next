@@ -26,7 +26,8 @@ export function RelatedItemsCard({
   onRemoveCard,
 }: RelatedItemsCardProps) {
   const showTempChecks = postType === "gov-proposal";
-  const hasSelectedItems = relatedDiscussions.length > 0 || relatedTempChecks.length > 0;
+  const hasSelectedItems =
+    relatedDiscussions.length > 0 || relatedTempChecks.length > 0;
 
   return (
     <Card className="relative">
@@ -69,4 +70,3 @@ export function RelatedItemsCard({
     </Card>
   );
 }
-

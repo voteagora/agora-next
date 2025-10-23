@@ -11,14 +11,14 @@ export function PostTypeSelector({ value, onChange }: PostTypeSelectorProps) {
   const selectorRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<Record<PostType, HTMLButtonElement | null>>({
     "forum-post": null,
-    "tempcheck": null,
+    tempcheck: null,
     "gov-proposal": null,
   });
 
   useLayoutEffect(() => {
     const buttonElement = buttonRefs.current[value];
     const selectorElement = selectorRef.current;
-    
+
     if (buttonElement && selectorElement) {
       const rect = buttonElement.getBoundingClientRect();
       const selectorRect = selectorElement.getBoundingClientRect();
@@ -62,4 +62,3 @@ export function PostTypeSelector({ value, onChange }: PostTypeSelectorProps) {
     </div>
   );
 }
-

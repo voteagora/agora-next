@@ -43,77 +43,72 @@ export function RelatedItemsSection({
   } = useRelatedItemsDialog({
     searchType,
     onSelect: onAdd,
-    existingItemIds: items.map(item => item.id),
+    existingItemIds: items.map((item) => item.id),
   });
 
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <Label className="text-xs font-semibold text-secondary">{label} (Optional)</Label>
+        <Label className="text-xs font-semibold text-secondary">
+          {label} (Optional)
+        </Label>
       </div>
 
       <div className="space-y-3">
         {items.map((item) => (
-            <div
-              key={item.id}
-              className="group relative flex items-start gap-3"
-            >
-              <Image 
-                src={ui.logo} 
-                alt="logo" 
-                width={40} 
-                height={40}
-                className="h-10 w-10 mt-0.5 flex-shrink-0"
-              />
-              <div className="flex-1 min-w-0 pr-8">
-                <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium text-sm leading-tight">
-                      {item.title}
-                    </p>
-                    {item.url && (
-                      <Link 
-                        href={item.url} 
-                        target="_blank"
-                        className="text-gray-500 hover:text-gray-700 transition-colors flex-shrink-0"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </Link>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <MessageSquare className="h-3 w-3" />
-                      {item.comments}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {item.timestamp}
-                    </span>
-                  </div>
-                </div>
-                {item.description && (
-                  <p className="text-xs text-gray-500 line-clamp-2">
-                    {stripHtmlToText(item.description)}
+          <div key={item.id} className="group relative flex items-start gap-3">
+            <Image
+              src={ui.logo}
+              alt="logo"
+              width={40}
+              height={40}
+              className="h-10 w-10 mt-0.5 flex-shrink-0"
+            />
+            <div className="flex-1 min-w-0 pr-8">
+              <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-sm leading-tight">
+                    {item.title}
                   </p>
-                )}
+                  {item.url && (
+                    <Link
+                      href={item.url}
+                      target="_blank"
+                      className="text-gray-500 hover:text-gray-700 transition-colors flex-shrink-0"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </Link>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <span className="flex items-center gap-1">
+                    <MessageSquare className="h-3 w-3" />
+                    {item.comments}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    {item.timestamp}
+                  </span>
+                </div>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => onRemove(item.id)}
-                className="absolute top-0 right-0 h-6 w-6 p-0"
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
+              {item.description && (
+                <p className="text-xs text-gray-500 line-clamp-2">
+                  {stripHtmlToText(item.description)}
+                </p>
+              )}
             </div>
-          ))}
-        
-        <Button 
-          variant="outline" 
-          onClick={openDialog}
-          className="w-full"
-        >
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onRemove(item.id)}
+              className="absolute top-0 right-0 h-6 w-6 p-0"
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        ))}
+
+        <Button variant="outline" onClick={openDialog} className="w-full">
           + Add Reference
         </Button>
       </div>
@@ -128,7 +123,7 @@ export function RelatedItemsSection({
         isLoading={isLoading}
         onSearch={handleSearch}
         onSelect={handleSelect}
-        existingItemIds={items.map(item => item.id)}
+        existingItemIds={items.map((item) => item.id)}
         page={page}
         totalPages={totalPages}
         totalResults={totalResults}
@@ -138,4 +133,3 @@ export function RelatedItemsSection({
     </div>
   );
 }
-

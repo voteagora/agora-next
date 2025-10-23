@@ -14,10 +14,10 @@ interface UseRelatedItemsDialogProps {
 
 const ITEMS_PER_PAGE = 20;
 
-export function useRelatedItemsDialog({ 
-  searchType, 
-  onSelect, 
-  existingItemIds 
+export function useRelatedItemsDialog({
+  searchType,
+  onSelect,
+  existingItemIds,
 }: UseRelatedItemsDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -56,7 +56,8 @@ export function useRelatedItemsDialog({
 
   const { results, totalResults, totalPages } = useMemo(() => {
     if (searchType === "forum") {
-      if (!topics.length) return { results: [], totalResults: 0, totalPages: 0 };
+      if (!topics.length)
+        return { results: [], totalResults: 0, totalPages: 0 };
 
       const filtered = topics.filter((topic) => {
         if (!debouncedSearchTerm) return true;
@@ -89,15 +90,18 @@ export function useRelatedItemsDialog({
     }
   }, [searchType, topics, debouncedSearchTerm, page]);
 
-  const handleSelect = useCallback((item: RelatedItem) => {
-    if (existingItemIds.includes(item.id)) {
-      return;
-    }
-    onSelect(item);
-    setIsOpen(false);
-    setSearchTerm("");
-    setPage(1);
-  }, [onSelect, existingItemIds]);
+  const handleSelect = useCallback(
+    (item: RelatedItem) => {
+      if (existingItemIds.includes(item.id)) {
+        return;
+      }
+      onSelect(item);
+      setIsOpen(false);
+      setSearchTerm("");
+      setPage(1);
+    },
+    [onSelect, existingItemIds]
+  );
 
   const openDialog = useCallback(() => {
     setIsOpen(true);
@@ -111,11 +115,11 @@ export function useRelatedItemsDialog({
   }, []);
 
   const nextPage = useCallback(() => {
-    setPage(p => Math.min(p + 1, totalPages));
+    setPage((p) => Math.min(p + 1, totalPages));
   }, [totalPages]);
 
   const prevPage = useCallback(() => {
-    setPage(p => Math.max(p - 1, 1));
+    setPage((p) => Math.max(p - 1, 1));
   }, []);
 
   return {
@@ -136,4 +140,3 @@ export function useRelatedItemsDialog({
     prevPage,
   };
 }
-

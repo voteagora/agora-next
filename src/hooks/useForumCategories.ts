@@ -3,7 +3,11 @@ import { getForumCategories } from "@/lib/actions/forum";
 import type { ForumCategory } from "@/lib/forumUtils";
 
 export const useForumCategories = () => {
-  const { data: categories = [], isLoading, error } = useQuery({
+  const {
+    data: categories = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["forum-categories"],
     queryFn: async () => {
       const result = await getForumCategories();

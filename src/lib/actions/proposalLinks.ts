@@ -74,7 +74,10 @@ export async function getProposalLinks({
 }: GetProposalLinksParams) {
   try {
     if (!sourceId && !targetId) {
-      return { success: false, error: "Either sourceId or targetId is required" };
+      return {
+        success: false,
+        error: "Either sourceId or targetId is required",
+      };
     }
 
     const where: any = {};
@@ -89,4 +92,3 @@ export async function getProposalLinks({
     return { success: false, error: "Failed to fetch proposal links" };
   }
 }
-

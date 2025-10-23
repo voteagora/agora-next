@@ -1,9 +1,7 @@
 import { useAccount, useWalletClient } from "wagmi";
 import { useMutation } from "@tanstack/react-query";
 import { BrowserProvider } from "ethers";
-import {
-  createV2CreateProposalAttestation,
-} from "@/lib/eas";
+import { createV2CreateProposalAttestation } from "@/lib/eas";
 import Tenant from "@/lib/tenant/tenant";
 
 export function useEASV2() {
@@ -56,7 +54,7 @@ export function useEASV2() {
       if ("isDelegated" in result && result.isDelegated) {
         const response = await fetch("/api/proposals/delegate", {
           method: "POST",
-          headers: { 
+          headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -64,16 +62,18 @@ export function useEASV2() {
             proposal_type_uid,
           }),
         });
-        
+
         if (!response.ok) {
           const error = await response.json();
-          throw new Error(error.error || "Failed to submit delegated attestation");
+          throw new Error(
+            error.error || "Failed to submit delegated attestation"
+          );
         }
-        
+
         const backendResult = await response.json();
-        return { 
-          transactionHash: backendResult.uid, 
-          proposal_id: result.proposal_id 
+        return {
+          transactionHash: backendResult.uid,
+          proposal_id: result.proposal_id,
         };
       }
 

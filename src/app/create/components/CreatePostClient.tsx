@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { keccak256, toUtf8Bytes } from "ethers";
@@ -11,6 +11,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { useEASV2 } from "@/hooks/useEASV2";
 import { useForum } from "@/hooks/useForum";
 import { useForumCategories } from "@/hooks/useForumCategories";
+import { useProposalTypes } from "@/hooks/useProposalTypes";
 import { createProposalLinks } from "@/lib/actions/proposalLinks";
 import toast from "react-hot-toast";
 import { buildForumTopicPath } from "@/lib/forumUtils";
@@ -27,16 +28,14 @@ import {
   RelatedItem,
 } from "../types";
 
-const proposalTypes: ProposalType[] = [
-  {
-    id: "default",
-    name: "Default",
-    description:
-      "Pass/fail proposal. Used for upgrading the protocol to do something different",
-    quorum: 30,
-    approvalThreshold: 51,
-  },
-];
+// Default proposal type fallback
+const defaultProposalType: ProposalType = {
+  id: "none",
+  name: "None",
+  description: "No proposal type created yet",
+  quorum: 0,
+  approvalThreshold: 0,
+};
 
 interface CreatePostClientProps {
   initialPostType: PostType;
@@ -54,10 +53,25 @@ export function CreatePostClient({
   const { createProposal } = useEASV2();
   const { createTopic } = useForum();
   const { categories } = useForumCategories();
+  const { data: proposalTypesData, isLoading: isLoadingProposalTypes } =
+    useProposalTypes();
   const permissions = useForumPermissionsContext();
 
-  const [selectedPostType, setSelectedPostType] = useState<PostType>(initialPostType);
-  const [selectedProposalType, setSelectedProposalType] = useState<ProposalType>(proposalTypes[0]);
+  const [selectedPostType, setSelectedPostType] =
+    useState<PostType>(initialPostType);
+
+  const proposalTypes: ProposalType[] = Array.isArray(proposalTypesData)
+    ? proposalTypesData.map((type) => ({
+        id: type.proposal_type_id,
+        name: type.name,
+        description: type.description,
+        quorum: type.quorum,
+        approvalThreshold: type.approval_threshold,
+      }))
+    : [defaultProposalType];
+
+  const [selectedProposalType, setSelectedProposalType] =
+    useState<ProposalType>(proposalTypes[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<CreatePostFormData>({
@@ -68,7 +82,8 @@ export function CreatePostClient({
 
   const relatedTempChecks = form.watch("relatedTempChecks") || [];
   const canCreateTempCheck = permissions.canCreateTopic;
-  const canCreateGovernanceProposal = permissions.canCreateTopic && relatedTempChecks.length > 0;
+  const canCreateGovernanceProposal =
+    permissions.canCreateTopic && relatedTempChecks.length > 0;
   const currentVP = parseInt(permissions.currentVP) || 0;
   const requiredVP = permissions.settings?.minVpForProposals || 0;
   const isAdmin = permissions.isAdmin;
@@ -91,7 +106,10 @@ export function CreatePostClient({
           toast.success("Forum post created successfully!");
           router.push(buildForumTopicPath(created.id, created.title));
         }
-      } else if (selectedPostType === "tempcheck" || selectedPostType === "gov-proposal") {
+      } else if (
+        selectedPostType === "tempcheck" ||
+        selectedPostType === "gov-proposal"
+      ) {
         if (!isEASV2Enabled) return;
 
         const proposalId = BigInt(
@@ -112,20 +130,23 @@ export function CreatePostClient({
           title: data.title,
           description: data.description,
           startts: BigInt(Math.floor(Date.now() / 1000)),
-          endts: BigInt(Math.floor((Date.now() + 7 * 24 * 60 * 60 * 1000) / 1000)),
+          endts: BigInt(
+            Math.floor((Date.now() + 7 * 24 * 60 * 60 * 1000) / 1000)
+          ),
           tags: selectedPostType,
-          proposal_type_uid: "0x07e4369a6f5dfdfe4e02f8cd82c7ff748e728bf27c88ff9fc1a8e8ad13f2eb72",
+          proposal_type_uid: selectedProposalType.proposal_type_id || undefined,
         });
 
-        const targetType = selectedPostType === "tempcheck" ? "tempcheck" : "gov";
+        const targetType =
+          selectedPostType === "tempcheck" ? "tempcheck" : "gov";
         const allLinks = [
-          ...(data.relatedDiscussions || []).map(d => ({
+          ...(data.relatedDiscussions || []).map((d) => ({
             sourceId: d.id,
             sourceType: "forum_topic",
             targetId: proposalId.toString(),
             targetType,
           })),
-          ...(data.relatedTempChecks || []).map(t => ({
+          ...(data.relatedTempChecks || []).map((t) => ({
             sourceId: t.id,
             sourceType: "tempcheck",
             targetId: proposalId.toString(),
@@ -135,11 +156,13 @@ export function CreatePostClient({
 
         if (allLinks.length > 0) {
           await Promise.all(
-            allLinks.map(link =>
+            allLinks.map((link) =>
               createProposalLinks({
                 sourceId: link.sourceId,
                 sourceType: link.sourceType,
-                links: [{ targetId: link.targetId, targetType: link.targetType }],
+                links: [
+                  { targetId: link.targetId, targetType: link.targetType },
+                ],
               })
             )
           );
@@ -154,21 +177,29 @@ export function CreatePostClient({
       }
     } catch (error) {
       console.error("Failed to create post:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to create post");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create post"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleAddRelatedItem = (field: "relatedDiscussions" | "relatedTempChecks") => (item: RelatedItem) => {
-    const current = form.getValues(field) || [];
-    form.setValue(field, [...current, item]);
-  };
+  const handleAddRelatedItem =
+    (field: "relatedDiscussions" | "relatedTempChecks") =>
+    (item: RelatedItem) => {
+      const current = form.getValues(field) || [];
+      form.setValue(field, [...current, item]);
+    };
 
-  const handleRemoveRelatedItem = (field: "relatedDiscussions" | "relatedTempChecks") => (id: string) => {
-    const current = form.getValues(field) || [];
-    form.setValue(field, current.filter((d) => d.id !== id));
-  };
+  const handleRemoveRelatedItem =
+    (field: "relatedDiscussions" | "relatedTempChecks") => (id: string) => {
+      const current = form.getValues(field) || [];
+      form.setValue(
+        field,
+        current.filter((d) => d.id !== id)
+      );
+    };
 
   const handleRemoveAllRelatedItems = () => {
     form.setValue("relatedDiscussions", []);
@@ -181,6 +212,12 @@ export function CreatePostClient({
     form.setValue("proposalTypeId", typeId);
   };
 
+  useEffect(() => {
+    if (proposalTypes.length > 0 && !selectedProposalType) {
+      setSelectedProposalType(proposalTypes[0]);
+    }
+  }, [proposalTypes, selectedProposalType]);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
@@ -190,7 +227,10 @@ export function CreatePostClient({
           </h1>
 
           {selectedPostType !== "gov-proposal" && (
-            <PostTypeSelector value={selectedPostType} onChange={setSelectedPostType} />
+            <PostTypeSelector
+              value={selectedPostType}
+              onChange={setSelectedPostType}
+            />
           )}
         </div>
       </div>
@@ -209,21 +249,27 @@ export function CreatePostClient({
             isAdmin={isAdmin}
             categories={categories}
             onAddRelatedDiscussion={handleAddRelatedItem("relatedDiscussions")}
-            onRemoveRelatedDiscussion={handleRemoveRelatedItem("relatedDiscussions")}
+            onRemoveRelatedDiscussion={handleRemoveRelatedItem(
+              "relatedDiscussions"
+            )}
             onAddRelatedTempCheck={handleAddRelatedItem("relatedTempChecks")}
-            onRemoveRelatedTempCheck={handleRemoveRelatedItem("relatedTempChecks")}
+            onRemoveRelatedTempCheck={handleRemoveRelatedItem(
+              "relatedTempChecks"
+            )}
             onRemoveRelatedItems={handleRemoveAllRelatedItems}
           />
         </div>
 
         <div className="space-y-6">
-          {(selectedPostType === "tempcheck" || selectedPostType === "gov-proposal") && (
-          <ProposalSettingsCard
-            selectedProposalType={selectedProposalType}
-            proposalTypes={proposalTypes}
-            onProposalTypeChange={handleProposalTypeChange}
-            postType={selectedPostType}
-          />
+          {(selectedPostType === "tempcheck" ||
+            selectedPostType === "gov-proposal") && (
+            <ProposalSettingsCard
+              selectedProposalType={selectedProposalType}
+              proposalTypes={proposalTypes}
+              onProposalTypeChange={handleProposalTypeChange}
+              postType={selectedPostType}
+              isLoading={isLoadingProposalTypes}
+            />
           )}
 
           {selectedPostType === "forum-post" && <CommunityGuidelinesCard />}
@@ -232,4 +278,3 @@ export function CreatePostClient({
     </div>
   );
 }
-

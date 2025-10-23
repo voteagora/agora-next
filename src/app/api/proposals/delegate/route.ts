@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { EAS, NO_EXPIRATION, ZERO_BYTES32 } from "@ethereum-attestation-service/eas-sdk";
+import {
+  EAS,
+  NO_EXPIRATION,
+  ZERO_BYTES32,
+} from "@ethereum-attestation-service/eas-sdk";
 import { ethers } from "ethers";
 import { EAS_V2_SCHEMA_IDS } from "@/lib/eas";
 import Tenant from "@/lib/tenant/tenant";
@@ -55,8 +59,8 @@ export async function POST(request: Request) {
 
     const newAttestationUID = await tx.wait();
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       uid: newAttestationUID,
     });
   } catch (error: any) {
@@ -67,4 +71,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

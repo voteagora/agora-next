@@ -9,9 +9,16 @@ export function CommunityGuidelinesCard() {
           ensure a positive experience for everyone:
         </p>
         <ol className="text-sm text-gray-600 space-y-2 list-decimal list-inside">
-          <li>Be respectful: Treat all members with kindness and consideration.</li>
-          <li>Stay on topic: Keep discussions relevant to the forum&apos;s purpose.</li>
-          <li>No spam: Avoid posting promotional content or irrelevant links.</li>
+          <li>
+            Be respectful: Treat all members with kindness and consideration.
+          </li>
+          <li>
+            Stay on topic: Keep discussions relevant to the forum&apos;s
+            purpose.
+          </li>
+          <li>
+            No spam: Avoid posting promotional content or irrelevant links.
+          </li>
           <li>
             Use appropriate language: Keep the conversation friendly and
             professional.
@@ -24,4 +31,3 @@ export function CommunityGuidelinesCard() {
     </Card>
   );
 }
-

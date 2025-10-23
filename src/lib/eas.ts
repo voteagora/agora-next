@@ -17,7 +17,8 @@ const CREATE_PROPOSAL_SCHEMA_ID =
     : "0xfc5b3c0472d09ac39f0cb9055869e70c4c59413041e3fd317f357789389971e4";
 
 const EAS_V2_SCHEMA_IDS = {
-  CREATE_PROPOSAL: "0x12e8600c9bb57b5b436fa09735cfc63e95098552122001c465b610261eea8a93",
+  CREATE_PROPOSAL:
+    "0x12e8600c9bb57b5b436fa09735cfc63e95098552122001c465b610261eea8a93",
 };
 
 const schemaEncoder = new SchemaEncoder(
@@ -205,10 +206,15 @@ export const signDelegatedAttestation = async ({
 
 // Schema encoders for EAS v2 attestations
 const v2SchemaEncoders = {
-  CREATE_PROPOSAL: new SchemaEncoder("uint256 proposal_id,string title,string description,uint64 startts,uint64 endts,string tags"),
+  CREATE_PROPOSAL: new SchemaEncoder(
+    "uint256 proposal_id,string title,string description,uint64 startts,uint64 endts,string tags"
+  ),
 };
 
-async function isContractAccount(address: string, signer: JsonRpcSigner): Promise<boolean> {
+async function isContractAccount(
+  address: string,
+  signer: JsonRpcSigner
+): Promise<boolean> {
   try {
     const code = await signer.provider.getCode(address);
     return code !== "0x";
@@ -248,11 +254,12 @@ export async function signV2DelegatedCreateProposalAttestation({
   ]);
 
   const delegated = await easV2.getDelegated();
-  
+
   const response = await delegated.signDelegatedAttestation(
     {
       schema: EAS_V2_SCHEMA_IDS.CREATE_PROPOSAL,
-      recipient: contracts.easRecipient || "0x0000000000000000000000000000000000000000",
+      recipient:
+        contracts.easRecipient || "0x0000000000000000000000000000000000000000",
       expirationTime: NO_EXPIRATION,
       revocable: true,
       refUID: proposal_type_uid || ZERO_BYTES32,
@@ -307,7 +314,9 @@ export async function createV2CreateProposalAttestation({
     const txResponse = await easV2.attest({
       schema: EAS_V2_SCHEMA_IDS.CREATE_PROPOSAL,
       data: {
-        recipient: contracts.easRecipient || "0x0000000000000000000000000000000000000000",
+        recipient:
+          contracts.easRecipient ||
+          "0x0000000000000000000000000000000000000000",
         expirationTime: NO_EXPIRATION,
         revocable: true,
         refUID: proposal_type_uid || ZERO_BYTES32,
@@ -335,4 +344,3 @@ export async function createV2CreateProposalAttestation({
 }
 
 export { EAS_V2_SCHEMA_IDS };
-
