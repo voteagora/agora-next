@@ -114,9 +114,7 @@ export async function fetchVotesForDelegateFromArchive(
     let participationRate = 0;
     if (process.env.USE_CPLS_ARCHIVE_PROPOSALS === "true") {
       const totalProposals = archiveProposals.data.length;
-      const distinctVotedProposals = new Set(
-        delegateVotes.map((vote) => vote.proposal_id)
-      ).size;
+      const distinctVotedProposals = delegateVotes.length; // Already distinct from query
 
       participationRate =
         totalProposals > 0
@@ -142,6 +140,44 @@ export async function fetchVotesForDelegateFromArchive(
 }
 
 /**
+ * Fetch distinct proposal IDs that a delegate has voted on
+ * Used for participation rate calculation - lightweight query
+ */
+async function fetchDistinctVotedProposals(
+  addressOrENSName: string
+): Promise<number> {
+  const { namespace, contracts } = Tenant.current();
+
+  let eventsViewName;
+  if (namespace === TENANT_NAMESPACES.OPTIMISM) {
+    eventsViewName = "vote_cast_with_params_events_v2";
+  } else {
+    eventsViewName = "vote_cast_with_params_events";
+  }
+
+  const query = `
+    SELECT COUNT(DISTINCT proposal_id) as count
+    FROM (
+      SELECT proposal_id
+      FROM ${namespace}.vote_cast_events
+      WHERE voter = $1 AND contract = $2
+      UNION ALL
+      SELECT proposal_id
+      FROM ${namespace}.${eventsViewName}
+      WHERE voter = $1 AND contract = $2
+    ) t;
+  `;
+
+  const result = await prismaWeb3Client.$queryRawUnsafe<[{ count: bigint }]>(
+    query,
+    addressOrENSName.toLowerCase(),
+    contracts.governor.address.toLowerCase()
+  );
+
+  return Number(result[0]?.count || 0);
+}
+
+/**
  * Fetch delegate votes from database (reusing existing logic from getVotes.ts)
  * This is the same query used by the existing delegate vote loading
  */
@@ -159,67 +195,17 @@ async function fetchDelegateVotesFromDB(
   }
 
   const query = `
-    SELECT
-      transaction_hash,
-      proposal_id,
-      voter,
-      support,
-      weight,
-      reason,
-      block_number,
-      params,
-      description,
-      proposal_data,
-      proposal_type
+    SELECT DISTINCT proposal_id
     FROM (
-      SELECT * FROM (
-      SELECT
-        STRING_AGG(transaction_hash,'|') as transaction_hash,
-        proposal_id,
-        voter,
-        support,
-        SUM(weight) as weight,
-        STRING_AGG(distinct reason, '\n --------- \n') as reason,
-        MAX(block_number) as block_number,
-        params
-      FROM (
-        SELECT
-            transaction_hash,
-            proposal_id,
-            voter,
-            support,
-            weight::numeric,
-            reason,
-            block_number,
-            params
-          FROM ${namespace}.vote_cast_events
-          WHERE voter = $1 AND contract = $2
-        UNION ALL
-          SELECT
-            transaction_hash,
-            proposal_id,
-            voter,
-            support,
-            weight::numeric,
-            reason,
-            block_number,
-            params
-          FROM ${namespace}.${eventsViewName}
-          WHERE voter = $1 AND contract = $2
-      ) t
-      GROUP BY 2,3,4,8
-      ) av
-      LEFT JOIN LATERAL (
-        SELECT
-          proposals.description,
-          proposals.proposal_data,
-          proposals.proposal_type::config.proposal_type AS proposal_type
-        FROM
-          ${namespace}.proposals_v2 proposals
-        WHERE
-          proposals.proposal_id = av.proposal_id AND proposals.contract = $2) p ON TRUE
-    ) q
-    ORDER BY block_number DESC
+      SELECT proposal_id
+      FROM ${namespace}.vote_cast_events
+      WHERE voter = $1 AND contract = $2
+      UNION ALL
+      SELECT proposal_id
+      FROM ${namespace}.${eventsViewName}
+      WHERE voter = $1 AND contract = $2
+    ) t
+    ORDER BY proposal_id DESC
     OFFSET $3
     LIMIT $4;
   `;
