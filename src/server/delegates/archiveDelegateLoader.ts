@@ -114,7 +114,8 @@ export async function fetchVotesForDelegateFromArchive(
     let participationRate = 0;
     if (process.env.USE_CPLS_ARCHIVE_PROPOSALS === "true") {
       const totalProposals = archiveProposals.data.length;
-      const distinctVotedProposals = delegateVotes.length; // Already distinct from query
+      const distinctVotedProposals =
+        await fetchDistinctVotedProposals(addressOrENSName);
 
       participationRate =
         totalProposals > 0
@@ -142,30 +143,17 @@ export async function fetchVotesForDelegateFromArchive(
 /**
  * Fetch distinct proposal IDs that a delegate has voted on
  * Used for participation rate calculation - lightweight query
+ * Uses votes table to include EAS votes
  */
 async function fetchDistinctVotedProposals(
   addressOrENSName: string
 ): Promise<number> {
   const { namespace, contracts } = Tenant.current();
 
-  let eventsViewName;
-  if (namespace === TENANT_NAMESPACES.OPTIMISM) {
-    eventsViewName = "vote_cast_with_params_events_v2";
-  } else {
-    eventsViewName = "vote_cast_with_params_events";
-  }
-
   const query = `
     SELECT COUNT(DISTINCT proposal_id) as count
-    FROM (
-      SELECT proposal_id
-      FROM ${namespace}.vote_cast_events
-      WHERE voter = $1 AND contract = $2
-      UNION ALL
-      SELECT proposal_id
-      FROM ${namespace}.${eventsViewName}
-      WHERE voter = $1 AND contract = $2
-    ) t;
+    FROM ${namespace}.votes
+    WHERE voter = $1 AND contract = $2;
   `;
 
   const result = await prismaWeb3Client.$queryRawUnsafe<[{ count: bigint }]>(
@@ -178,8 +166,8 @@ async function fetchDistinctVotedProposals(
 }
 
 /**
- * Fetch delegate votes from database (reusing existing logic from getVotes.ts)
- * This is the same query used by the existing delegate vote loading
+ * Fetch delegate votes from database using votes table
+ * Uses votes table to include EAS votes, not just on-chain events
  */
 async function fetchDelegateVotesFromDB(
   addressOrENSName: string,
@@ -187,24 +175,10 @@ async function fetchDelegateVotesFromDB(
 ): Promise<any[]> {
   const { namespace, contracts } = Tenant.current();
 
-  let eventsViewName;
-  if (namespace === TENANT_NAMESPACES.OPTIMISM) {
-    eventsViewName = "vote_cast_with_params_events_v2";
-  } else {
-    eventsViewName = "vote_cast_with_params_events";
-  }
-
   const query = `
     SELECT DISTINCT proposal_id
-    FROM (
-      SELECT proposal_id
-      FROM ${namespace}.vote_cast_events
-      WHERE voter = $1 AND contract = $2
-      UNION ALL
-      SELECT proposal_id
-      FROM ${namespace}.${eventsViewName}
-      WHERE voter = $1 AND contract = $2
-    ) t
+    FROM ${namespace}.votes
+    WHERE voter = $1 AND contract = $2
     ORDER BY proposal_id DESC
     OFFSET $3
     LIMIT $4;
