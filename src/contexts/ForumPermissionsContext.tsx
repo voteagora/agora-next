@@ -13,6 +13,7 @@ interface ForumPermissions {
     minVpForTopics: number;
     minVpForReplies: number;
     minVpForActions: number;
+    minVpForProposals: number;
   } | null;
   isLoading: boolean;
   isAdmin: boolean;

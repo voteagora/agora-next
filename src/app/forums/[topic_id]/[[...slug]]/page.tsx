@@ -235,6 +235,13 @@ export default async function ForumTopicPage({ params }: PageProps) {
       <ForumsHeader
         breadcrumbs={breadcrumbs}
         isDuna={categoryName === "DUNA"}
+        topicContext={{
+          id: headerTopic.id,
+          title: headerTopic.title,
+          content: topicBody,
+          createdAt: headerTopic.createdAt,
+          commentsCount: comments.length,
+        }}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">

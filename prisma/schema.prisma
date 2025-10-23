@@ -5255,3 +5255,15 @@ model ForumTopicViewStats {
   @@map("forum_topic_view_stats")
   @@schema("alltenant")
 }
+
+model ProposalLinks {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sourceId   String @map("source_id")
+  sourceType String @map("source_type")
+  targetId   String @map("target_id")
+  targetType String @map("target_type")
+
+  @@unique([sourceId, targetId])
+  @@map("proposal_links")
+  @@schema("alltenant")
+}

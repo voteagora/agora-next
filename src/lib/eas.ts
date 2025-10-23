@@ -9,12 +9,16 @@ import Tenant from "./tenant/tenant";
 import { keccak256 } from "viem";
 import { defaultAbiCoder } from "@ethersproject/abi";
 
-const { slug } = Tenant.current();
+const { slug, contracts } = Tenant.current();
 
 const CREATE_PROPOSAL_SCHEMA_ID =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
     ? "0x590765de6f34bbae3e51aa89e571f567fa6d63cf3f8225592d58133860a0ccda"
     : "0xfc5b3c0472d09ac39f0cb9055869e70c4c59413041e3fd317f357789389971e4";
+
+const EAS_V2_SCHEMA_IDS = {
+  CREATE_PROPOSAL: "0x12e8600c9bb57b5b436fa09735cfc63e95098552122001c465b610261eea8a93",
+};
 
 const schemaEncoder = new SchemaEncoder(
   "address contract,uint256 id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block, string proposal_type, uint256[] tiers, uint256 onchain_proposalid, uint8 max_approvals, uint8 criteria, uint128 criteria_value, uint8 calculationOptions"
@@ -24,6 +28,8 @@ const eas =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
     ? new EAS("0x4200000000000000000000000000000000000021")
     : new EAS("0x4200000000000000000000000000000000000021");
+
+const easV2 = new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e");
 
 export async function createProposalAttestation({
   contract,
@@ -195,3 +201,138 @@ export const signDelegatedAttestation = async ({
 
   return response.signature;
 };
+// EAS v2 Governance Functions
+
+// Schema encoders for EAS v2 attestations
+const v2SchemaEncoders = {
+  CREATE_PROPOSAL: new SchemaEncoder("uint256 proposal_id,string title,string description,uint64 startts,uint64 endts,string tags"),
+};
+
+async function isContractAccount(address: string, signer: JsonRpcSigner): Promise<boolean> {
+  try {
+    const code = await signer.provider.getCode(address);
+    return code !== "0x";
+  } catch {
+    return false;
+  }
+}
+
+export async function signV2DelegatedCreateProposalAttestation({
+  proposal_id,
+  title,
+  description,
+  startts,
+  endts,
+  tags,
+  proposal_type_uid,
+  signer,
+}: {
+  proposal_id: bigint;
+  title: string;
+  description: string;
+  startts: bigint;
+  endts: bigint;
+  tags: string;
+  proposal_type_uid?: string;
+  signer: JsonRpcSigner;
+}) {
+  easV2.connect(signer as any);
+
+  const encodedData = v2SchemaEncoders.CREATE_PROPOSAL.encodeData([
+    { name: "proposal_id", value: proposal_id, type: "uint256" },
+    { name: "title", value: title, type: "string" },
+    { name: "description", value: description, type: "string" },
+    { name: "startts", value: startts, type: "uint64" },
+    { name: "endts", value: endts, type: "uint64" },
+    { name: "tags", value: tags, type: "string" },
+  ]);
+
+  const delegated = await easV2.getDelegated();
+  
+  const response = await delegated.signDelegatedAttestation(
+    {
+      schema: EAS_V2_SCHEMA_IDS.CREATE_PROPOSAL,
+      recipient: contracts.easRecipient || "0x0000000000000000000000000000000000000000",
+      expirationTime: NO_EXPIRATION,
+      revocable: true,
+      refUID: proposal_type_uid || ZERO_BYTES32,
+      data: encodedData,
+      deadline: 0n,
+      value: 0n,
+    },
+    signer
+  );
+
+  return {
+    signature: response.signature,
+    attester: await signer.getAddress(),
+    data: encodedData,
+  };
+}
+
+export async function createV2CreateProposalAttestation({
+  proposal_id,
+  title,
+  description,
+  startts,
+  endts,
+  tags,
+  proposal_type_uid,
+  signer,
+}: {
+  proposal_id: bigint;
+  title: string;
+  description: string;
+  startts: bigint;
+  endts: bigint;
+  tags: string;
+  proposal_type_uid?: string;
+  signer: JsonRpcSigner;
+}) {
+  const attesterAddress = await signer.getAddress();
+  const isContract = await isContractAccount(attesterAddress, signer);
+
+  if (isContract) {
+    easV2.connect(signer as any);
+
+    const encodedData = v2SchemaEncoders.CREATE_PROPOSAL.encodeData([
+      { name: "proposal_id", value: proposal_id, type: "uint256" },
+      { name: "title", value: title, type: "string" },
+      { name: "description", value: description, type: "string" },
+      { name: "startts", value: startts, type: "uint64" },
+      { name: "endts", value: endts, type: "uint64" },
+      { name: "tags", value: tags, type: "string" },
+    ]);
+
+    const txResponse = await easV2.attest({
+      schema: EAS_V2_SCHEMA_IDS.CREATE_PROPOSAL,
+      data: {
+        recipient: contracts.easRecipient || "0x0000000000000000000000000000000000000000",
+        expirationTime: NO_EXPIRATION,
+        revocable: true,
+        refUID: proposal_type_uid || ZERO_BYTES32,
+        data: encodedData,
+        value: 0n,
+      },
+    });
+
+    const receipt = await txResponse.wait();
+    return { transactionHash: receipt };
+  } else {
+    const delegatedData = await signV2DelegatedCreateProposalAttestation({
+      proposal_id,
+      title,
+      description,
+      startts,
+      endts,
+      tags,
+      proposal_type_uid,
+      signer,
+    });
+
+    return { isDelegated: true, delegatedData, proposal_id };
+  }
+}
+
+export { EAS_V2_SCHEMA_IDS };
+
