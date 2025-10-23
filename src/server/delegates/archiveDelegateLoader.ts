@@ -110,7 +110,21 @@ export async function fetchVotesForDelegateFromArchive(
       })
     );
 
-    // Step 5: Apply pagination to the joined results
+    // Step 5: Calculate participation rate when archive feature is enabled
+    let participationRate = 0;
+    if (process.env.USE_CPLS_ARCHIVE_PROPOSALS === "true") {
+      const totalProposals = archiveProposals.data.length;
+      const distinctVotedProposals = new Set(
+        delegateVotes.map((vote) => vote.proposal_id)
+      ).size;
+
+      participationRate =
+        totalProposals > 0
+          ? (distinctVotedProposals / totalProposals) * 100
+          : 0;
+    }
+
+    // Step 6: Apply pagination to the joined results
     const start = pagination.offset;
     const end = start + pagination.limit;
     const paginatedVotes = joinedVotes.slice(start, end);
@@ -120,6 +134,7 @@ export async function fetchVotesForDelegateFromArchive(
         has_next: end < joinedVotes.length,
         total_returned: paginatedVotes.length,
         next_offset: end,
+        participationRate, // Add participation rate to meta
       },
       data: paginatedVotes,
     };
