@@ -212,7 +212,7 @@ export const syndicateTenantUIConfig = new TenantUI({
   toggles: [
     {
       name: "delegates",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "delegates/edit",
@@ -316,6 +316,10 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "syndicate-duna-disclosures",
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-delegates",
       enabled: true,
     },
   ],

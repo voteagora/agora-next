@@ -290,7 +290,9 @@ export const getDelegatesFromDaoNode = async (options?: {
   const url = getDaoNodeURLForNamespace(namespace);
 
   if (!url) {
-    throw new Error("DAO Node URL not found");
+    // Return null instead of throwing error to allow fallback to database
+    console.log("DAO Node URL not found, skipping DAO Node fetch");
+    return null;
   }
 
   try {

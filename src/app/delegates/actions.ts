@@ -4,6 +4,7 @@ import { fetchAllForAdvancedDelegation as apiFetchAllForAdvancedDelegation } fro
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { fetchVotesForDelegate as apiFetchVotesForDelegate } from "@/app/api/common/votes/getVotes";
+import { fetchVotesForDelegateFromArchiveCached } from "@/server/delegates/archiveDelegateLoader";
 import {
   fetchIsDelegatingToProxy,
   fetchVotingPowerAvailableForDirectDelegation,
@@ -128,6 +129,14 @@ export async function fetchVotesForDelegate(
     limit: number;
   }
 ) {
+  const tenant = Tenant.current();
+
+  // Use archive-backed proposals when feature flag is enabled
+  if (tenant.ui.toggle("use-archive-for-delegates")?.enabled) {
+    return fetchVotesForDelegateFromArchiveCached(addressOrENSName, pagination);
+  }
+
+  // Use standard delegate loader
   return apiFetchVotesForDelegate({
     addressOrENSName,
     pagination,
