@@ -215,12 +215,10 @@ export function CreatePostClient({
             Create {postTypeOptions[selectedPostType].toLowerCase()}
           </h1>
 
-          {selectedPostType !== "gov-proposal" && (
-            <PostTypeSelector
-              value={selectedPostType}
-              onChange={setSelectedPostType}
-            />
-          )}
+          <PostTypeSelector
+            value={selectedPostType}
+            onChange={setSelectedPostType}
+          />
         </div>
       </div>
 

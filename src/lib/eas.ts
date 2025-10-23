@@ -264,8 +264,8 @@ export async function signV2DelegatedCreateProposalAttestation({
       revocable: true,
       refUID: proposal_type_uid || ZERO_BYTES32,
       data: encodedData,
-      deadline: 0n,
       value: 0n,
+      deadline: NO_EXPIRATION,
     },
     signer
   );

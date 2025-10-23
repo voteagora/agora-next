@@ -46,7 +46,9 @@ export async function POST(request: Request) {
     const tx = await eas.attestByDelegation({
       schema: EAS_V2_SCHEMA_IDS.CREATE_PROPOSAL,
       data: {
-        recipient: "0x0000000000000000000000000000000000000000",
+        recipient:
+          contracts.easRecipient ||
+          "0x0000000000000000000000000000000000000000",
         expirationTime: NO_EXPIRATION,
         revocable: true,
         refUID: proposal_type_uid || ZERO_BYTES32,
@@ -54,7 +56,7 @@ export async function POST(request: Request) {
       },
       signature,
       attester,
-      deadline: 0n,
+      deadline: NO_EXPIRATION,
     });
 
     const newAttestationUID = await tx.wait();

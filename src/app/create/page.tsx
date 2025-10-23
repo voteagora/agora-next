@@ -91,8 +91,8 @@ export default async function CreatePostPage({
         id: type.proposal_type_id,
         name: type.name,
         description: type.description,
-        quorum: type.quorum,
-        approvalThreshold: type.approval_threshold,
+        quorum: type.quorum / 100,
+        approvalThreshold: type.approval_threshold / 100,
       }))
     : [
         {

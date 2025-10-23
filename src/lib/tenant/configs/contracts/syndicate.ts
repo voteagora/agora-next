@@ -4,7 +4,7 @@ import {
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
-import { mainnet } from "viem/chains";
+import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { AlchemyProvider, JsonRpcProvider, BaseContract } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
@@ -26,15 +26,15 @@ export const syndicateTenantConfig = ({
   // dummy addresses; for now: syndicate is info-only
   const DUMMY_GOVERNOR = "0x95a35Cd8638b732E839C6CCDD0d8B7FA06319677";
   const DUMMY_TIMELOCK = "0x0000000000000000000000000000000000000003";
-  const DUMMY_TYPES = "0x0000000000000000000000000000000000000004";
+  const DUMMY_TYPES = "0x0000000000000000000000000000000000000000";
 
   const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
 
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : new AlchemyProvider("mainnet", alchemyId);
+    : new AlchemyProvider("sepolia", alchemyId);
 
-  const chain = mainnet;
+  const chain = sepolia;
 
   return {
     token: createTokenContract({

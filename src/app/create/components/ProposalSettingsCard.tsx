@@ -48,17 +48,17 @@ export function ProposalSettingsCard({
               </Select>
               {selectedProposalType && (
                 <p className="text-sm text-tertiary leading-relaxed">
-                  {selectedProposalType.description}
+                  {selectedProposalType?.description}
                 </p>
               )}
             </>
           ) : (
             <>
               <div className="text-base text-primary font-medium">
-                {selectedProposalType.name}
+                {selectedProposalType?.name}
               </div>
               <p className="text-sm text-tertiary leading-relaxed">
-                {selectedProposalType.description}
+                {selectedProposalType?.description}
               </p>
             </>
           )}
@@ -68,13 +68,13 @@ export function ProposalSettingsCard({
           <div className="flex justify-between items-center">
             <span className="text-base text-secondary">Quorum</span>
             <span className="text-sm text-tertiary">
-              {`${selectedProposalType.quorum}%`}
+              {`${selectedProposalType?.quorum}%`}
             </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-base text-secondary">Approval threshold</span>
             <span className="text-sm text-tertiary">
-              {`${selectedProposalType.approvalThreshold}%`}
+              {`${selectedProposalType?.approvalThreshold}%`}
             </span>
           </div>
           {/* TODO <div className="flex justify-between items-center">
