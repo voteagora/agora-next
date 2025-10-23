@@ -1,7 +1,8 @@
 import { formatDistanceToNow } from "date-fns";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import { CreatePostClient } from "./components/CreatePostClient";
-import { PostType, CreatePostFormData } from "./types";
+import { PostType, CreatePostFormData, ProposalType } from "./types";
+import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 
 function getInitialPostType(searchParams: {
   [key: string]: string | string[] | undefined;
@@ -83,10 +84,31 @@ export default async function CreatePostPage({
   const initialPostType = getInitialPostType(params);
   const initialFormData = getInitialFormData(params);
 
+  // Fetch proposal types on the server
+  const proposalTypesData = await fetchProposalTypes();
+  const proposalTypes: ProposalType[] = Array.isArray(proposalTypesData)
+    ? proposalTypesData.map((type) => ({
+        id: type.proposal_type_id,
+        name: type.name,
+        description: type.description,
+        quorum: type.quorum,
+        approvalThreshold: type.approval_threshold,
+      }))
+    : [
+        {
+          id: "none",
+          name: "None",
+          description: "No proposal type created yet",
+          quorum: 0,
+          approvalThreshold: 0,
+        },
+      ];
+
   return (
     <CreatePostClient
       initialPostType={initialPostType}
       initialFormData={initialFormData}
+      proposalTypes={proposalTypes}
     />
   );
 }

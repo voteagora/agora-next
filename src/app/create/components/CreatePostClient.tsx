@@ -11,7 +11,6 @@ import Tenant from "@/lib/tenant/tenant";
 import { useEASV2 } from "@/hooks/useEASV2";
 import { useForum } from "@/hooks/useForum";
 import { useForumCategories } from "@/hooks/useForumCategories";
-import { useProposalTypes } from "@/hooks/useProposalTypes";
 import { createProposalLinks } from "@/lib/actions/proposalLinks";
 import toast from "react-hot-toast";
 import { buildForumTopicPath } from "@/lib/forumUtils";
@@ -40,11 +39,13 @@ const defaultProposalType: ProposalType = {
 interface CreatePostClientProps {
   initialPostType: PostType;
   initialFormData: Partial<CreatePostFormData>;
+  proposalTypes: ProposalType[];
 }
 
 export function CreatePostClient({
   initialPostType,
   initialFormData,
+  proposalTypes,
 }: CreatePostClientProps) {
   const { address } = useAccount();
   const router = useRouter();
@@ -53,22 +54,10 @@ export function CreatePostClient({
   const { createProposal } = useEASV2();
   const { createTopic } = useForum();
   const { categories } = useForumCategories();
-  const { data: proposalTypesData, isLoading: isLoadingProposalTypes } =
-    useProposalTypes();
   const permissions = useForumPermissionsContext();
 
   const [selectedPostType, setSelectedPostType] =
     useState<PostType>(initialPostType);
-
-  const proposalTypes: ProposalType[] = Array.isArray(proposalTypesData)
-    ? proposalTypesData.map((type) => ({
-        id: type.proposal_type_id,
-        name: type.name,
-        description: type.description,
-        quorum: type.quorum,
-        approvalThreshold: type.approval_threshold,
-      }))
-    : [defaultProposalType];
 
   const [selectedProposalType, setSelectedProposalType] =
     useState<ProposalType>(proposalTypes[0]);
@@ -268,7 +257,6 @@ export function CreatePostClient({
               proposalTypes={proposalTypes}
               onProposalTypeChange={handleProposalTypeChange}
               postType={selectedPostType}
-              isLoading={isLoadingProposalTypes}
             />
           )}
 

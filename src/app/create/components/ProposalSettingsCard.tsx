@@ -14,7 +14,6 @@ interface ProposalSettingsCardProps {
   proposalTypes: ProposalType[];
   onProposalTypeChange: (typeId: string) => void;
   postType: PostType;
-  isLoading?: boolean;
 }
 
 export function ProposalSettingsCard({
@@ -22,7 +21,6 @@ export function ProposalSettingsCard({
   proposalTypes,
   onProposalTypeChange,
   postType,
-  isLoading = false,
 }: ProposalSettingsCardProps) {
   return (
     <Card>
@@ -36,12 +34,9 @@ export function ProposalSettingsCard({
               <Select
                 value={selectedProposalType?.id || ""}
                 onValueChange={onProposalTypeChange}
-                disabled={isLoading}
               >
                 <SelectTrigger>
-                  <SelectValue
-                    placeholder={isLoading ? "Loading..." : "Select a type"}
-                  />
+                  <SelectValue placeholder="Select a type" />
                 </SelectTrigger>
                 <SelectContent>
                   {proposalTypes.map((type) => (
