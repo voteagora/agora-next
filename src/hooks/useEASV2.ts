@@ -51,32 +51,6 @@ export function useEASV2() {
         signer,
       });
 
-      if ("isDelegated" in result && result.isDelegated) {
-        const response = await fetch("/api/proposals/delegate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...result.delegatedData,
-            proposal_type_uid,
-          }),
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(
-            error.error || "Failed to submit delegated attestation"
-          );
-        }
-
-        const backendResult = await response.json();
-        return {
-          transactionHash: backendResult.uid,
-          proposal_id: result.proposal_id,
-        };
-      }
-
       return result;
     },
   });

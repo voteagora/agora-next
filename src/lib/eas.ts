@@ -211,72 +211,6 @@ const v2SchemaEncoders = {
   ),
 };
 
-async function isContractAccount(
-  address: string,
-  signer: JsonRpcSigner
-): Promise<boolean> {
-  try {
-    const code = await signer.provider.getCode(address);
-    return code !== "0x";
-  } catch {
-    return false;
-  }
-}
-
-export async function signV2DelegatedCreateProposalAttestation({
-  proposal_id,
-  title,
-  description,
-  startts,
-  endts,
-  tags,
-  proposal_type_uid,
-  signer,
-}: {
-  proposal_id: bigint;
-  title: string;
-  description: string;
-  startts: bigint;
-  endts: bigint;
-  tags: string;
-  proposal_type_uid?: string;
-  signer: JsonRpcSigner;
-}) {
-  easV2.connect(signer as any);
-
-  const encodedData = v2SchemaEncoders.CREATE_PROPOSAL.encodeData([
-    { name: "proposal_id", value: proposal_id, type: "uint256" },
-    { name: "title", value: title, type: "string" },
-    { name: "description", value: description, type: "string" },
-    { name: "startts", value: startts, type: "uint64" },
-    { name: "endts", value: endts, type: "uint64" },
-    { name: "tags", value: tags, type: "string" },
-  ]);
-
-  const delegated = await easV2.getDelegated();
-
-  const response = await delegated.signDelegatedAttestation(
-    {
-      schema: EAS_V2_SCHEMA_IDS.CREATE_PROPOSAL,
-      recipient:
-        contracts.easRecipient || "0x0000000000000000000000000000000000000000",
-      expirationTime: NO_EXPIRATION,
-      revocable: true,
-      refUID: proposal_type_uid || ZERO_BYTES32,
-      data: encodedData,
-      value: 0n,
-      deadline: NO_EXPIRATION,
-    },
-    signer
-  );
-
-  return {
-    signature: response.signature,
-    attester: await signer.getAddress(),
-    data: encodedData,
-  };
-}
-
 export async function createV2CreateProposalAttestation({
   proposal_id,
   title,
@@ -296,10 +230,7 @@ export async function createV2CreateProposalAttestation({
   proposal_type_uid?: string;
   signer: JsonRpcSigner;
 }) {
-  const attesterAddress = await signer.getAddress();
-  const isContract = await isContractAccount(attesterAddress, signer);
 
-  if (isContract) {
     easV2.connect(signer as any);
 
     const encodedData = v2SchemaEncoders.CREATE_PROPOSAL.encodeData([
@@ -327,20 +258,6 @@ export async function createV2CreateProposalAttestation({
 
     const receipt = await txResponse.wait();
     return { transactionHash: receipt };
-  } else {
-    const delegatedData = await signV2DelegatedCreateProposalAttestation({
-      proposal_id,
-      title,
-      description,
-      startts,
-      endts,
-      tags,
-      proposal_type_uid,
-      signer,
-    });
-
-    return { isDelegated: true, delegatedData, proposal_id };
-  }
 }
 
 export { EAS_V2_SCHEMA_IDS };
