@@ -268,3 +268,24 @@ export type ProposalType =
   | "HYBRID_APPROVAL"
   | "HYBRID_OPTIMISTIC"
   | "HYBRID_OPTIMISTIC_TIERED";
+
+// Execution Transaction Types
+export interface ExecutionTransaction {
+  id: string;
+  tenant: string;
+  proposal_id: string;
+  transaction_hash: string;
+  chain_id: number;
+  executed_by: string;
+  executed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AddExecutionTransactionRequest {
+  proposal_id: string;
+  transaction_hash: string;
+  chain_id: number;
+  executed_by: string;
+  executed_at: string;
+}
