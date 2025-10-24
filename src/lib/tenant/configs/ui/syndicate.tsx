@@ -220,7 +220,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "proposals",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "info",

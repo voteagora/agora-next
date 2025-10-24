@@ -5,11 +5,12 @@ import styles from "./proposalDescription.module.scss";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
 import ProposalTransactionDisplay from "../ApprovedTransactions/ProposalTransactionDisplay";
 import ProposalChart from "../ProposalChart/ProposalChart";
+import ExecutionTransactions from "../../ExecutionTransactions/ExecutionTransactions";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import Tenant from "@/lib/tenant/tenant";
 
-const { contracts } = Tenant.current();
+const { contracts, namespace } = Tenant.current();
 
 export default function ProposalDescription({
   proposal,
@@ -106,6 +107,7 @@ export default function ProposalDescription({
             executedTransactionHash={proposal.executedTransactionHash}
           />
         )}
+
         <div className={styles.proposal_description_md}>
           <Markdown
             content={stripTitleFromDescription(
@@ -114,6 +116,9 @@ export default function ProposalDescription({
             )}
           />
         </div>
+
+        {/* Execution Transactions Section - positioned at the very end */}
+        <ExecutionTransactions proposalId={proposal.id} tenant={namespace} />
       </div>
     </div>
   );
