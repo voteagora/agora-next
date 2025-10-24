@@ -70,7 +70,7 @@ export const syndicateTenantConfig = ({
       provider,
     }),
 
-    delegationModel: DELEGATION_MODEL.PARTIAL,
+    delegationModel: DELEGATION_MODEL.FULL,
     treasury: [],
   };
 };
