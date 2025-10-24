@@ -68,7 +68,12 @@ export default function ArchiveProposalRow({
             <div>
               {proposal.typeLabel}{" "}
               <span className="hidden sm:inline">
-                by <ENSName address={proposal.proposerAddress} />
+                by{" "}
+                {proposal.proposerEns ? (
+                  proposal.proposerEns
+                ) : (
+                  <ENSName address={proposal.proposerAddress} />
+                )}
               </span>
             </div>
             <div className="block sm:hidden">

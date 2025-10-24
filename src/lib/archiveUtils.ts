@@ -1,6 +1,6 @@
 import { PaginatedResult } from "@/app/lib/pagination";
-import { Proposal } from "@/app/api/common/proposals/proposal";
 import { getArchiveSlugAllProposals } from "./constants";
+import { ArchiveListProposal } from "./types/archiveProposal";
 
 /**
  * Parse NDJSON (Newline Delimited JSON) string to array of objects
@@ -28,9 +28,8 @@ function parseNDJSON<T>(ndjsonString: string): T[] {
  */
 export async function fetchProposalsFromArchive(
   namespace: string,
-  filter: string,
-  pagination: { limit: number; offset: number }
-): Promise<PaginatedResult<Proposal[]>> {
+  filter: string
+): Promise<PaginatedResult<ArchiveListProposal[]>> {
   try {
     const archiveUrl = getArchiveSlugAllProposals(namespace);
     const response = await fetch(archiveUrl, {
@@ -44,29 +43,24 @@ export async function fetchProposalsFromArchive(
     }
 
     const ndjsonText = await response.text();
-    const allProposals = parseNDJSON<Proposal>(ndjsonText);
+    const allProposals = parseNDJSON<ArchiveListProposal>(ndjsonText);
 
     // Apply filter if needed
     let filteredProposals = allProposals;
     if (filter === "relevant") {
       // Filter out cancelled proposals for "relevant" filter
       filteredProposals = allProposals.filter(
-        (proposal) => !proposal.cancelledTime
+        (proposal) => !proposal.cancel_event
       );
     }
 
-    // Apply pagination
-    const start = pagination.offset;
-    const end = start + pagination.limit;
-    const paginatedProposals = filteredProposals.slice(start, end);
-
     return {
       meta: {
-        has_next: end < filteredProposals.length,
-        total_returned: paginatedProposals.length,
-        next_offset: end,
+        has_next: false,
+        total_returned: filteredProposals.length,
+        next_offset: 0,
       },
-      data: paginatedProposals,
+      data: filteredProposals,
     };
   } catch (error) {
     console.error("Error fetching proposals from archive:", error);
