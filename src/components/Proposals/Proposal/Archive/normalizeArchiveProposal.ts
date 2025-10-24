@@ -1,6 +1,7 @@
 import { formatUnits } from "ethers";
 
 import { capitalizeFirstLetter, getProposalTypeText } from "@/lib/utils";
+import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 
 export type ArchiveProposalMetrics = {
   kind: "standard";
@@ -75,17 +76,17 @@ const toDate = (value: number | string | undefined | null) => {
 };
 
 const deriveTimeStatus = (
-  proposal: Record<string, any>,
+  proposal: ArchiveListProposal,
   normalizedStatus: string
 ) => {
   const proposalStartTime = toDate(proposal.start_blocktime);
   const proposalEndTime = toDate(proposal.end_blocktime);
-  const proposalCancelledTime =
-    toDate(proposal.cancel_event?.blocktime) ||
-    toDate(proposal.cancelled_event?.blocktime);
-  const proposalExecutedTime =
-    toDate(proposal.execute_event?.blocktime) ||
-    toDate(proposal.executed_event?.blocktime);
+  const proposalCancelledTime = toDate(
+    proposal.cancel_event?.timestamp ?? proposal.cancel_event?.blocktime
+  );
+  const proposalExecutedTime = toDate(
+    proposal.execute_event?.timestamp ?? proposal.execute_event?.blocktime
+  );
 
   return {
     proposalStatus: normalizedStatus,
@@ -98,11 +99,50 @@ const deriveTimeStatus = (
 
 const TEN_DAYS_IN_SECONDS = 10 * 24 * 60 * 60;
 
-// Quorum threshold: proposal needs at least this percentage of votes to pass
-const QUORUM_THRESHOLD_PERCENT = 4; // 4% quorum requirement
+// Default thresholds if not specified in proposal type
+const DEFAULT_QUORUM_PERCENT = 4;
+const DEFAULT_APPROVAL_THRESHOLD_PERCENT = 50;
+
+/**
+ * Extract quorum and approval threshold from proposal type
+ * Returns percentages (0-100)
+ */
+const extractThresholds = (
+  proposalType: ArchiveListProposal["proposal_type"]
+): { quorum: number; approvalThreshold: number } => {
+  // Handle FixedProposalType (eas-oodao)
+  if (
+    typeof proposalType === "object" &&
+    proposalType !== null &&
+    "quorum" in proposalType
+  ) {
+    return {
+      quorum: proposalType.quorum / 100, // Convert basis points to percentage
+      approvalThreshold: proposalType.approval_threshold / 100,
+    };
+  }
+
+  // Handle RangeProposalType (eas-oodao) - use max values
+  if (
+    typeof proposalType === "object" &&
+    proposalType !== null &&
+    "max_quorum_pct" in proposalType
+  ) {
+    return {
+      quorum: proposalType.min_quorum_pct / 100,
+      approvalThreshold: proposalType.min_approval_threshold_pct / 100,
+    };
+  }
+
+  // Handle number type (dao_node) or unknown - use defaults
+  return {
+    quorum: DEFAULT_QUORUM_PERCENT,
+    approvalThreshold: DEFAULT_APPROVAL_THRESHOLD_PERCENT,
+  };
+};
 
 const deriveStatus = (
-  proposal: Record<string, any>,
+  proposal: ArchiveListProposal,
   decimals: number
 ): string => {
   // Check terminal states first
@@ -141,19 +181,57 @@ const deriveStatus = (
 
   const forVotes = convertToNumber(voteTotals["1"], decimals);
   const againstVotes = convertToNumber(voteTotals["0"], decimals);
+  const abstainVotes = convertToNumber(voteTotals["2"], decimals);
 
-  // Calculate quorum (for + abstain) and vote thresholds
-  const totalVotes = forVotes + againstVotes;
-  const forPercentage = totalVotes > 0 ? (forVotes / totalVotes) * 100 : 0;
+  // Extract thresholds from proposal type
+  const thresholds = extractThresholds(proposal.proposal_type);
+
+  // Calculate vote threshold percentage (for / (for + against))
+  // Note: abstain is NOT included in threshold calculation, only for quorum
+  const thresholdVotes = forVotes + againstVotes;
+  const voteThresholdPercent =
+    thresholdVotes > 0 ? (forVotes / thresholdVotes) * 100 : 0;
+
+  // Check approval threshold
+  const hasMetThresholdOrNoThreshold =
+    voteThresholdPercent >= thresholds.approvalThreshold ||
+    thresholds.approvalThreshold === 0;
+
+  // Calculate quorum (for + abstain votes) - similar to getProposalCurrentQuorum
+  const quorumForGovernor = forVotes + abstainVotes;
+
+  // Check quorum - we always have the threshold from proposal_type
+  // but need total voting power to calculate if it's met
+  let quorumMet = true;
+
+  if (proposal.total_voting_power_at_start) {
+    // We have total voting power - calculate quorum percentage
+    const totalPower = convertToNumber(
+      proposal.total_voting_power_at_start,
+      decimals
+    );
+    const quorumPercentage =
+      totalPower > 0 ? (quorumForGovernor / totalPower) * 100 : 0;
+    quorumMet = quorumPercentage >= thresholds.quorum;
+  }
+  // If total_voting_power_at_start is not available, we can't check quorum
+  // This happens for proposals that haven't started voting yet
+  // Default to true to avoid incorrectly marking as defeated
 
   // Proposal is defeated if:
-  // 1. For votes don't meet approval threshold, we dont have the values yet.
-  // 2. For votes <= Against votes
-  if (forPercentage < QUORUM_THRESHOLD_PERCENT || forVotes <= againstVotes) {
+  // 1. Quorum not met, OR
+  // 2. For votes < Against votes, OR
+  // 3. Approval threshold not met
+  if (!quorumMet || forVotes < againstVotes || !hasMetThresholdOrNoThreshold) {
     return "DEFEATED";
   }
 
-  return "SUCCEEDED";
+  // Succeeded if for > against
+  if (forVotes > againstVotes) {
+    return "SUCCEEDED";
+  }
+
+  return "FAILED";
 };
 
 const deriveType = (): string => {
@@ -162,7 +240,7 @@ const deriveType = (): string => {
 };
 
 export function normalizeArchiveProposal(
-  proposal: Record<string, any>,
+  proposal: ArchiveListProposal,
   options: NormalizeOptions = {}
 ): ArchiveProposalDisplay {
   const decimals = options.tokenDecimals ?? 18;
@@ -239,7 +317,7 @@ export function normalizeArchiveProposal(
 }
 
 export function normalizeArchiveProposals(
-  proposals: Record<string, any>[],
+  proposals: ArchiveListProposal[],
   options: NormalizeOptions = {}
 ) {
   return proposals.map((proposal) =>

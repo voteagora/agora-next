@@ -14,9 +14,10 @@ import { proposalsFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
 import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
-import { PaginationParams } from "@/app/lib/pagination";
+import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
 import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
+import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 
 async function fetchProposals(
   filter: string,
@@ -69,21 +70,23 @@ export default async function ProposalsHome() {
   let relevantProposals;
   let allProposals;
   let votableSupply;
-  let archivedProposals: Array<Record<string, any>> = [];
+  let archivedProposals: PaginatedResult<ArchiveListProposal[]> = {
+    meta: { has_next: false, total_returned: 0, next_offset: 0 },
+    data: [],
+  };
 
   if (useArchiveForProposals) {
-    [governanceCalendar, archivedProposals] = await Promise.all([
+    [governanceCalendar, archivedProposals, votableSupply] = await Promise.all([
       fetchGovernanceCalendar(),
       fetchProposalsFromArchive(
         namespace,
-        proposalsFilterOptions.relevant.filter,
-        { limit: 1000, offset: 0 }
-      ).then((result) => result.data),
+        proposalsFilterOptions.relevant.filter
+      ),
+      fetchVotableSupply(),
     ]);
 
     relevantProposals = emptyPaginated();
     allProposals = emptyPaginated();
-    votableSupply = "0";
   } else {
     [governanceCalendar, relevantProposals, allProposals, votableSupply] =
       await Promise.all([
@@ -120,7 +123,7 @@ export default async function ProposalsHome() {
       />
       {useArchiveForProposals ? (
         <ArchiveProposalsList
-          proposals={archivedProposals}
+          proposals={archivedProposals.data}
           governanceCalendar={governanceCalendar}
         />
       ) : (

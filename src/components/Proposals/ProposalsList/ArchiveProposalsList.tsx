@@ -10,14 +10,13 @@ import CreateProposalDraftButton from "./CreateProposalDraftButton";
 import { useAccount } from "wagmi";
 import ArchiveProposalRow from "../Proposal/Archive/ArchiveProposalRow";
 import { normalizeArchiveProposals } from "../Proposal/Archive/normalizeArchiveProposal";
-
-type ArchiveProposal = Record<string, any>;
+import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 
 export default function ArchiveProposalsList({
   proposals,
   governanceCalendar,
 }: {
-  proposals: ArchiveProposal[];
+  proposals: ArchiveListProposal[];
   governanceCalendar?: {
     title: string;
     endDate: string;
