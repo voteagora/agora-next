@@ -21,7 +21,7 @@ export const syndicateTenantConfig = ({
 }: Props): TenantContracts => {
   const TOKEN = isProd
     ? "0x1bAB804803159aD84b8854581AA53AC72455614E"
-    : "0x1bAB804803159aD84b8854581AA53AC72455614E";
+    : "0x55f6e82a8BF5736d46837246DcBEAf7e61b3c27C";
 
   // dummy addresses; for now: syndicate is info-only
   const DUMMY_GOVERNOR = "0x95a35Cd8638b732E839C6CCDD0d8B7FA06319677";
