@@ -12,6 +12,7 @@ interface ForumSettings {
   minVpForTopics: number;
   minVpForReplies: number;
   minVpForActions: number;
+  minVpForProposals: number;
 }
 
 interface ForumPermissions {
@@ -101,6 +102,7 @@ export function useForumPermissions(): ForumPermissions {
           minVpForTopics: 0,
           minVpForReplies: 0,
           minVpForActions: 0,
+          minVpForProposals: 0,
         };
       }
     },
@@ -138,7 +140,6 @@ export function useForumPermissions(): ForumPermissions {
   const minVpForTopics = Number(settings?.minVpForTopics || 0);
   const minVpForReplies = Number(settings?.minVpForReplies || 0);
   const minVpForActions = Number(settings?.minVpForActions || 0);
-
   const canCreateTopic = isAdmin || vpAsNumber >= minVpForTopics;
   const canCreatePost = isAdmin || vpAsNumber >= minVpForReplies;
   const canUpvote = isAdmin || vpAsNumber >= minVpForActions;

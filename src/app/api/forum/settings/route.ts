@@ -18,9 +18,10 @@ export async function GET(request: NextRequest) {
         min_vp_for_topics: number;
         min_vp_for_replies: number;
         min_vp_for_actions: number;
+        min_vp_for_proposals: number;
       }>
     >`
-      SELECT min_vp_for_topics, min_vp_for_replies, min_vp_for_actions 
+      SELECT min_vp_for_topics, min_vp_for_replies, min_vp_for_actions, min_vp_for_proposals
       FROM alltenant.dao_forum_settings 
       WHERE dao_slug = ${daoSlug}
     `;
@@ -31,6 +32,7 @@ export async function GET(request: NextRequest) {
         minVpForTopics: 1,
         minVpForReplies: 1,
         minVpForActions: 1,
+        minVpForProposals: 1,
       });
     }
 
@@ -38,6 +40,7 @@ export async function GET(request: NextRequest) {
       minVpForTopics: result[0].min_vp_for_topics,
       minVpForReplies: result[0].min_vp_for_replies,
       minVpForActions: result[0].min_vp_for_actions,
+      minVpForProposals: result[0].min_vp_for_proposals,
     });
   } catch (error) {
     console.error("Failed to fetch forum settings:", error);

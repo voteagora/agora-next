@@ -532,7 +532,7 @@ export function findProposalType({
   contract,
 }: {
   namespace: TenantNamespace;
-  contract: string;
+  contract?: string;
 }) {
   const condition = {
     where: {

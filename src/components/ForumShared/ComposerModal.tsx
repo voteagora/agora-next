@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAccount } from "wagmi";
 import {
   Dialog,
@@ -13,8 +13,7 @@ import { PaperClipIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { ConnectKitButton } from "connectkit";
 import { DunaEditor } from "@/components/duna-editor";
-import { useForum } from "@/hooks/useForum";
-import type { ForumCategory } from "@/lib/forumUtils";
+import { useForumCategories } from "@/hooks/useForumCategories";
 import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import Tenant from "@/lib/tenant/tenant";
@@ -58,7 +57,7 @@ export default function ComposerModal({
   categoryLabel = "Category",
 }: ComposerModalProps) {
   const { isConnected, address } = useAccount();
-  const { fetchCategories } = useForum();
+  const { categories } = useForumCategories();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [attachment, setAttachment] = useState<File | null>(null);
@@ -66,28 +65,12 @@ export default function ComposerModal({
     null
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [categoryId, setCategoryId] = useState<number | "">("");
 
   const bgStyle =
     namespace === TENANT_NAMESPACES.TOWNS
       ? "bg-cardBackground"
       : "bg-background";
-
-  useEffect(() => {
-    if (!isOpen || !renderCategory) return;
-    let active = true;
-    fetchCategories()
-      .then((cats) => {
-        if (active) setCategories(cats);
-      })
-      .catch(() => {
-        if (active) setCategories([]);
-      });
-    return () => {
-      active = false;
-    };
-  }, [isOpen, renderCategory, fetchCategories]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
