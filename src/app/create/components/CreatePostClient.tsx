@@ -11,6 +11,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { useEASV2 } from "@/hooks/useEASV2";
 import { useForum } from "@/hooks/useForum";
 import { useForumCategories } from "@/hooks/useForumCategories";
+import { useDaoSettings } from "@/hooks/useDaoSettings";
 import { createProposalLinks } from "@/lib/actions/proposalLinks";
 import toast from "react-hot-toast";
 import { buildForumTopicPath } from "@/lib/forumUtils";
@@ -50,11 +51,12 @@ export function CreatePostClient({
   const { address } = useAccount();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { ui, slug } = Tenant.current();
+  const { ui, slug, contracts } = Tenant.current();
   const { createProposal } = useEASV2();
   const { createTopic } = useForum();
   const { categories } = useForumCategories();
   const permissions = useForumPermissionsContext();
+  const { data: daoSettings } = useDaoSettings(contracts.easRecipient);
 
   const [selectedPostType, setSelectedPostType] =
     useState<PostType>(initialPostType);
@@ -114,13 +116,16 @@ export function CreatePostClient({
           )
         );
 
+        const votingPeriodSeconds = daoSettings?.votingPeriod || 7 * 24 * 60 * 60;
+        const votingDelaySeconds = daoSettings?.votingDelay || 0;
+
         await createProposal({
           proposal_id: proposalId,
           title: data.title,
           description: data.description,
-          startts: BigInt(Math.floor(Date.now() / 1000)),
+          startts: BigInt(Math.floor(Date.now() / 1000) + votingDelaySeconds),
           endts: BigInt(
-            Math.floor((Date.now() + 7 * 24 * 60 * 60 * 1000) / 1000)
+            Math.floor((Date.now() + votingPeriodSeconds * 1000) / 1000)
           ),
           tags: selectedPostType,
           proposal_type_uid: selectedProposalType.id || undefined,

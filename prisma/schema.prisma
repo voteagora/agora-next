@@ -1896,6 +1896,17 @@ view syndicateDelegateChangedEvents {
   @@schema("syndicate")
 }
 
+view syndicateDaoSettings {
+  dao_id       String
+  param_name   String
+  param_value  String
+  block_number BigInt
+
+  @@id([dao_id, param_name])
+  @@map("dao_settings")
+  @@schema("syndicate")
+}
+
 view syndicate_delegates_wrapper {
   delegate          String?
   num_of_delegators Decimal? @db.Decimal
