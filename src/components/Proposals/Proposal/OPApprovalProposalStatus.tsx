@@ -2,6 +2,25 @@ import { pluralize } from "@/lib/utils";
 import { type Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 
+type ApprovalStatusViewProps = {
+  maxOptions: number;
+  optionCount: number;
+};
+
+export function ApprovalStatusView({
+  maxOptions,
+  optionCount,
+}: ApprovalStatusViewProps) {
+  return (
+    <div className="flex flex-col items-end">
+      <div className="text-xs text-secondary">Select {maxOptions} of</div>
+      <div className="flex flex-row gap-1">
+        {pluralize("Option", optionCount)}
+      </div>
+    </div>
+  );
+}
+
 export default function OPApprovalProposalStatus({
   proposal,
 }: {
@@ -11,12 +30,10 @@ export default function OPApprovalProposalStatus({
     proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
   const maxOptions = proposalData.proposalSettings.maxApprovals;
   return (
-    <div className="flex flex-col items-end">
-      <div className="text-xs text-secondary">Select {maxOptions} of</div>
-      <div className="flex flex-row gap-1">
-        {pluralize("Option", proposalData.options.length)}
-      </div>
-    </div>
+    <ApprovalStatusView
+      maxOptions={maxOptions}
+      optionCount={proposalData.options.length}
+    />
   );
 }
 
@@ -29,11 +46,11 @@ export function OffchainApprovalProposalStatus({
     proposal.proposalData as ParsedProposalData["OFFCHAIN_APPROVAL"]["kind"];
   const maxOptions = proposalData.choices.length;
   return (
-    <div className="flex flex-col items-end">
-      <div className="text-xs text-secondary">Select {maxOptions} of</div>
-      <div className="flex flex-row gap-1">
-        {pluralize("Option", proposalData.choices.length)}
-      </div>
-    </div>
+    <ApprovalStatusView
+      maxOptions={maxOptions}
+      optionCount={proposalData.choices.length}
+    />
   );
 }
+
+export type ApprovalStatusData = ApprovalStatusViewProps;

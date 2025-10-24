@@ -5255,3 +5255,21 @@ model ForumTopicViewStats {
   @@map("forum_topic_view_stats")
   @@schema("alltenant")
 }
+
+model ProposalExecutionTransaction {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant          String
+  proposal_id     String    @map("proposal_id")
+  transaction_hash String    @map("transaction_hash")
+  chain_id        Int       @map("chain_id")
+  executed_by     String    @map("executed_by")
+  executed_at     DateTime  @map("executed_at")
+  created_at      DateTime  @default(now()) @map("created_at")
+  updated_at      DateTime  @default(now()) @map("updated_at")
+
+  @@unique([tenant, proposal_id, transaction_hash])
+  @@index([tenant, proposal_id])
+  @@index([executed_at])
+  @@map("proposal_execution_transactions")
+  @@schema("alltenant")
+}

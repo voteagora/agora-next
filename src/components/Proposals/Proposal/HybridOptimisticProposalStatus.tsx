@@ -4,48 +4,57 @@ import {
   getProposalTiers,
 } from "@/lib/proposalUtils";
 
+type HybridOptimisticStatusViewProps = {
+  infoText: string;
+  statusText: string;
+};
+
+export function HybridOptimisticStatusView({
+  infoText,
+  statusText,
+}: HybridOptimisticStatusViewProps) {
+  return (
+    <div className="flex flex-col text-right text-primary">
+      <div>
+        <div className="text-xs text-secondary">
+          <p>{infoText}</p>
+        </div>
+        <p>Optimistically {statusText}</p>
+      </div>
+    </div>
+  );
+}
+
 export const HybridOptimisticProposalStatus = ({
   proposal,
 }: {
   proposal: Proposal;
 }) => {
   const metrics = calculateHybridOptimisticProposalMetrics(proposal);
-
-  let proposalInfoTxt = "";
   const tiers = getProposalTiers(proposal);
 
-  const statusTxt = proposal.status === "DEFEATED" ? "defeated" : "approved";
-  const proposalStatus = proposal.status;
+  const statusText = proposal.status === "DEFEATED" ? "defeated" : "approved";
 
-  if (proposalStatus === "DEFEATED") {
-    // Use pre-calculated threshold information from metrics
+  let infoText = `${metrics.totalAgainstVotes}% / ${tiers[0]}% against needed to defeat`;
+
+  if (proposal.status === "DEFEATED") {
     const { groupTallies, thresholds } = metrics;
-
     const groupsExceedingThreshold = groupTallies.filter(
       (g) => g.exceedsThreshold
     );
 
-    let thresholdText = "";
     if (groupsExceedingThreshold.length >= 4) {
-      thresholdText = `${metrics.totalAgainstVotes}% / ${thresholds.fourGroups}% against votes`;
+      infoText = `${metrics.totalAgainstVotes}% / ${thresholds.fourGroups}% against votes`;
     } else if (groupsExceedingThreshold.length >= 3) {
-      thresholdText = `${metrics.totalAgainstVotes}% / ${thresholds.threeGroups}% against votes`;
+      infoText = `${metrics.totalAgainstVotes}% / ${thresholds.threeGroups}% against votes`;
     } else if (groupsExceedingThreshold.length >= 2) {
-      thresholdText = `${metrics.totalAgainstVotes}% / ${thresholds.twoGroups}% against votes`;
+      infoText = `${metrics.totalAgainstVotes}% / ${thresholds.twoGroups}% against votes`;
     }
-
-    proposalInfoTxt = thresholdText;
-  } else {
-    proposalInfoTxt = `${metrics.totalAgainstVotes}% / ${tiers[0]}% against needed to defeat`;
   }
+
   return (
-    <div className="flex flex-col text-right text-primary">
-      <div>
-        <div className="text-xs text-secondary">
-          <p>{proposalInfoTxt}</p>
-        </div>
-        <p>Optimistically {statusTxt}</p>
-      </div>
-    </div>
+    <HybridOptimisticStatusView infoText={infoText} statusText={statusText} />
   );
 };
+
+export type HybridOptimisticStatusData = HybridOptimisticStatusViewProps;
