@@ -27,8 +27,8 @@ const schemaEncoder = new SchemaEncoder(
 
 const eas =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? new EAS("0x4200000000000000000000000000000000000021")
-    : new EAS("0x4200000000000000000000000000000000000021");
+    ? new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e")
+    : new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e");
 
 const easV2 = new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e");
 
@@ -257,5 +257,62 @@ export async function createV2CreateProposalAttestation({
   const receipt = await txResponse.wait();
   return { transactionHash: receipt };
 }
-
 export { EAS_V2_SCHEMA_IDS };
+
+// Vote attestation schema: uint256 Proposal_id, uint8 Choice, string Reason
+const VOTE_SCHEMA_ID =
+  "0xffcc8fe77f55448bee5f0e24844ee76f83c3c2718dcf8a75de750cf4797ad0bc";
+
+const voteSchemaEncoder = new SchemaEncoder(
+  "uint256 proposal_id,int8 choice,string reason"
+);
+
+export async function createVoteAttestation({
+  proposalId,
+  choice,
+  reason,
+  signer,
+}: {
+  proposalId: string;
+  choice: number; // 0 = against, 1 = for, 2 = abstain
+  reason: string;
+  signer: JsonRpcSigner;
+}) {
+  eas.connect(signer as any);
+
+  const encodedData = voteSchemaEncoder.encodeData([
+    { name: "proposal_id", value: BigInt(proposalId), type: "uint256" },
+    { name: "choice", value: choice, type: "int8" },
+    { name: "reason", value: reason, type: "string" },
+  ]);
+
+  const recipient = "0x73796e6469636174652e00aa36a7000000a58d9f";
+  const expirationTime = NO_EXPIRATION;
+  const revocable = false;
+
+  const txResponse = await eas.attest({
+    schema: VOTE_SCHEMA_ID,
+    data: {
+      recipient,
+      expirationTime,
+      revocable,
+      refUID: ZERO_BYTES32,
+      data: encodedData,
+      value: 0n,
+    },
+  });
+
+  const receipt = await txResponse.wait();
+
+  if (!receipt) {
+    console.error(
+      "Transaction failed or was not mined. Full response:",
+      receipt
+    );
+    throw new Error("Transaction failed or was not mined.");
+  }
+
+  return {
+    transactionHash: receipt,
+  };
+}

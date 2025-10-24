@@ -1,6 +1,10 @@
 import { PaginatedResult } from "@/app/lib/pagination";
-import { getArchiveSlugAllProposals } from "./constants";
 import { ArchiveListProposal } from "./types/archiveProposal";
+import {
+  getArchiveSlugAllProposals,
+  getArchiveSlugForDaoNodeProposal,
+  getArchiveSlugForEasOodaoProposal,
+} from "./constants";
 
 /**
  * Parse NDJSON (Newline Delimited JSON) string to array of objects
@@ -71,3 +75,44 @@ export async function fetchProposalsFromArchive(
     throw error;
   }
 }
+
+export const fetchProposalFromArchive = async (
+  namespace: string,
+  proposalId: string
+) => {
+  try {
+    const archiveDaoNodeUrl = getArchiveSlugForDaoNodeProposal(
+      namespace,
+      proposalId
+    );
+    const archiveEasOodaoUrl = getArchiveSlugForEasOodaoProposal(
+      namespace,
+      proposalId
+    );
+    const [responseDaoNode, responseEasOodao] = await Promise.all([
+      fetch(archiveDaoNodeUrl, { cache: "no-store" }),
+      fetch(archiveEasOodaoUrl, { cache: "no-store" }),
+    ]);
+
+    if (!responseDaoNode.ok && !responseEasOodao.ok) {
+      throw new Error(
+        `Failed to fetch archive data: daoNode ${responseDaoNode.status} ${responseDaoNode.statusText}; easOodao ${responseEasOodao.status} ${responseEasOodao.statusText}`
+      );
+    }
+
+    const [jsonTextDaoNode, jsonTextEasOodao] = await Promise.all([
+      responseDaoNode.ok ? responseDaoNode.text() : Promise.resolve(""),
+      responseEasOodao.ok ? responseEasOodao.text() : Promise.resolve(""),
+    ]);
+    const allProposalsDaoNode = responseDaoNode.ok
+      ? JSON.parse(jsonTextDaoNode)
+      : undefined;
+    const allProposalsEasOodao = responseEasOodao.ok
+      ? JSON.parse(jsonTextEasOodao)
+      : undefined;
+    return allProposalsDaoNode || allProposalsEasOodao;
+  } catch (error) {
+    console.error("Error fetching proposals from archive:", error);
+    throw error;
+  }
+};

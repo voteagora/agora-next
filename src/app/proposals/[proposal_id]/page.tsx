@@ -12,6 +12,7 @@ import CopelandProposalPage from "@/components/Proposals/ProposalPage/CopelandPr
 import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
 import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
 import StandardProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/StandardProposalPage";
+import ArchiveStandardProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/ArchiveStandardProposalPage";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { calculateVoteMetadata } from "@/lib/voteUtils";
@@ -21,8 +22,44 @@ import HybridStandardProposalPage from "@/components/Proposals/ProposalPage/OPPr
 import HybridApprovalProposalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/HybridApprovalProposalPage";
 import HybridOptimisticProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/HybridOptimisticProposalPage";
 import { redirect } from "next/navigation";
+import { fetchProposalFromArchive } from "@/lib/archiveUtils";
+import {
+  isArchiveStandardProposal,
+  normalizeArchiveStandardProposal,
+} from "@/components/Proposals/Proposal/Archive/normalizeArchiveProposalDetail";
 
 export const maxDuration = 60;
+
+async function loadProposal(
+  proposalId: string,
+  fetchLiveProposal: (proposalId: string) => Promise<Proposal>
+): Promise<Proposal> {
+  const { namespace, token, ui } = Tenant.current();
+  const useArchive = ui.toggle("use-archive-for-proposals")?.enabled;
+
+  if (useArchive) {
+    const archiveResults = await fetchProposalFromArchive(
+      namespace,
+      proposalId
+    );
+
+    const archiveProposal = archiveResults ? archiveResults : undefined;
+    if (archiveProposal && isArchiveStandardProposal(archiveProposal)) {
+      const normalizedProposal = normalizeArchiveStandardProposal(
+        archiveProposal,
+        {
+          namespace,
+          tokenDecimals: token.decimals ?? 18,
+        }
+      );
+      return normalizedProposal;
+    }
+
+    throw new Error("Proposal not found in archive");
+  }
+
+  return await fetchLiveProposal(proposalId);
+}
 
 // Share my vote metadata
 async function generateVoterMetadata(
@@ -86,12 +123,24 @@ export async function generateMetadata({
   params: { proposal_id: string };
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const proposal = await fetchProposalUnstableCache(params.proposal_id);
+  const proposal = await loadProposal(
+    params.proposal_id,
+    fetchProposalUnstableCache
+  );
   const title = truncateString(cleanString(proposal.markdowntitle), 40);
   const description = truncateString(
     cleanString(proposal.description || ""),
     80
   );
+
+  const offchainProposalData =
+    proposal.proposalType === "OFFCHAIN_STANDARD"
+      ? (proposal.proposalData as ParsedProposalData["OFFCHAIN_STANDARD"]["kind"])
+      : null;
+
+  if (offchainProposalData?.onchainProposalId) {
+    redirect(`/proposals/${offchainProposalData.onchainProposalId}`);
+  }
 
   const support = searchParams.support as string;
   const reason = searchParams.reason as string;
@@ -150,17 +199,28 @@ export default async function Page({
 }: {
   params: { proposal_id: string };
 }) {
-  const proposal = await fetchProposal(proposal_id);
+  const loadedProposal = await loadProposal(proposal_id, fetchProposal);
+
   const proposalData =
-    proposal.proposalData as ParsedProposalData["OFFCHAIN_STANDARD"]["kind"];
-  if (proposalData.onchainProposalId) {
+    loadedProposal.proposalType === "OFFCHAIN_STANDARD"
+      ? (loadedProposal.proposalData as ParsedProposalData["OFFCHAIN_STANDARD"]["kind"])
+      : null;
+
+  if (proposalData?.onchainProposalId) {
     redirect(`/proposals/${proposalData.onchainProposalId}`);
   }
 
+  const { ui } = Tenant.current();
+  const useArchive = ui.toggle("use-archive-for-proposals")?.enabled;
+
   let RenderComponent;
-  switch (proposal.proposalType) {
+  switch (loadedProposal.proposalType) {
     case "STANDARD":
-      RenderComponent = StandardProposalPage;
+      if (useArchive) {
+        RenderComponent = ArchiveStandardProposalPage;
+      } else {
+        RenderComponent = StandardProposalPage;
+      }
       break;
 
     case "OFFCHAIN_STANDARD":
@@ -184,7 +244,7 @@ export default async function Page({
       break;
     case "SNAPSHOT":
       if (
-        (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
+        (loadedProposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
           ?.type === "copeland"
       ) {
         RenderComponent = CopelandProposalPage;
@@ -197,7 +257,9 @@ export default async function Page({
 
   return (
     <div className="flex justify-between mt-12">
-      <div>{RenderComponent && <RenderComponent proposal={proposal} />}</div>
+      <div>
+        {RenderComponent && <RenderComponent proposal={loadedProposal} />}
+      </div>
     </div>
   );
 }

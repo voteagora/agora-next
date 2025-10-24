@@ -9,8 +9,8 @@ import ProposalTimeStatus from "../ProposalTimeStatus.jsx";
 import {
   ArchiveProposalDisplay,
   ArchiveProposalMetrics,
-  formatArchiveTagLabel,
 } from "./normalizeArchiveProposal";
+import { formatArchiveTagLabel } from "./archiveProposalUtils";
 import { OPStandardStatusView } from "../OPStandardProposalStatus";
 
 type ArchiveProposalRowProps = {

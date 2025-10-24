@@ -9,6 +9,8 @@ import syndicateInfoCard1 from "@/assets/tenant/syndicate_info_1.svg";
 import syndicateInfoCard2 from "@/assets/tenant/syndicate_info_2.svg";
 import syndicateInfoCard3 from "@/assets/tenant/syndicate_info_3.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
+import { CoinsIcon } from "@/icons/CoinsIcon";
+import { NotificationIcon } from "@/icons/NotificationIcon";
 import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
 
 export const syndicateTenantUIConfig = new TenantUI({
