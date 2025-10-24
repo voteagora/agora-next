@@ -212,11 +212,11 @@ export const syndicateTenantUIConfig = new TenantUI({
   toggles: [
     {
       name: "delegates",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "delegates/edit",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "proposals",
