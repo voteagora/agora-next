@@ -685,7 +685,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
         LEFT JOIN
             (SELECT num_of_delegators FROM ${namespace + ".delegates"} nd WHERE delegate = $1 AND nd.contract = $5 LIMIT 1) b ON TRUE
         LEFT JOIN
-            (SELECT * FROM ${namespace + ".voting_power"} vp WHERE vp.delegate = $1 AND vp.contract = $5 LIMIT 1) c ON TRUE
+            (SELECT * FROM ${namespace + ".voting_power"} vp WHERE vp.delegate = $1${namespace === "syndicate" ? "" : " AND vp.contract = $5"} LIMIT 1) c ON TRUE
         LEFT JOIN
             (SELECT COUNT(*) as count
              FROM ${namespace + ".proposals_v2"} p
