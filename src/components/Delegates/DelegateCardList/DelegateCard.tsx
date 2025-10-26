@@ -44,7 +44,7 @@ const DelegateCard = ({
                 address={delegate.address}
                 votingPower={delegate.votingPower.total}
                 participation={delegate.participation}
-                showParticipation={true}
+                showParticipation={showParticipation}
                 showVotingPower={true}
               />
             </div>

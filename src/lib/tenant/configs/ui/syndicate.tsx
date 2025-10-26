@@ -318,5 +318,9 @@ export const syndicateTenantUIConfig = new TenantUI({
       name: "syndicate-duna-disclosures",
       enabled: true,
     },
+    {
+      name: "show-participation",
+      enabled: false,
+    },
   ],
 });
