@@ -237,6 +237,10 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: false,
     },
     {
+      name: "use-archive-for-proposals",
+      enabled: false,
+    },
+    {
       name: "use-daonode-for-proposals",
       enabled: false,
     },
