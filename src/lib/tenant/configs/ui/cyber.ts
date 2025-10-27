@@ -309,7 +309,7 @@ If you meet the proposal threshold or are the manager of the governor, then you 
     },
     {
       name: "use-archive-for-proposals",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "use-daonode-for-proposals",
