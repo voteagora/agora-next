@@ -368,5 +368,9 @@ export const syndicateTenantUIConfig = new TenantUI({
       name: "easv2-govlessvoting",
       enabled: true,
     },
+    {
+      name: "show-participation",
+      enabled: false,
+    },
   ],
 });
