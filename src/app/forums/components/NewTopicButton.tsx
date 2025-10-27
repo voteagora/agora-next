@@ -34,7 +34,7 @@ export default function NewTopicButton({
   const requireLogin = useRequireLogin();
   const router = useRouter();
 
-  const isEASV2Enabled = ui.toggle("enable-easv2-govlessvoting")?.enabled;
+  const isEASV2Enabled = ui.toggle("easv2-govlessvoting")?.enabled;
 
   const handleClick = async () => {
     const loggedIn = await requireLogin();

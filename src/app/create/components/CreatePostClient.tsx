@@ -69,7 +69,7 @@ export function CreatePostClient({
     defaultValues: initialFormData,
   });
 
-  const isEASV2Enabled = ui.toggle("enable-easv2-govlessvoting")?.enabled;
+  const isEASV2Enabled = ui.toggle("easv2-govlessvoting")?.enabled;
 
   const relatedTempChecks = form.watch("relatedTempChecks") || [];
   const canCreateTempCheck = permissions.canCreateTopic;

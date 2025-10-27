@@ -32,9 +32,11 @@ export const syndicateTenantConfig = ({
 
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : new AlchemyProvider("sepolia", alchemyId);
+    : isProd
+      ? new AlchemyProvider("mainnet", alchemyId)
+      : new AlchemyProvider("sepolia", alchemyId);
 
-  const chain = sepolia;
+  const chain = isProd ? mainnet : sepolia;
 
   return {
     token: createTokenContract({
@@ -72,6 +74,6 @@ export const syndicateTenantConfig = ({
 
     delegationModel: DELEGATION_MODEL.PARTIAL,
     treasury: [],
-    easRecipient: "0xAAaa0FfB73F3e8BC40e3630e42CE716E22145eDa",
+    easRecipient: isProd ? "0x73796e6469636174652e000000010000008e2647" : "0x73796e6469636174652e00aa36a7000000a58d9f",
   };
 };

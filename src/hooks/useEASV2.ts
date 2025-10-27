@@ -9,7 +9,7 @@ export function useEASV2() {
   const { data: walletClient } = useWalletClient();
   const { ui } = Tenant.current();
 
-  const isEASV2Enabled = ui.toggle("enable-easv2-govlessvoting")?.enabled;
+  const isEASV2Enabled = ui.toggle("easv2-govlessvoting")?.enabled;
 
   const getSigner = async () => {
     if (!walletClient) {
