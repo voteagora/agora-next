@@ -679,17 +679,17 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
         FROM
             (SELECT 1 as dummy) dummy_table
         LEFT JOIN
-            (SELECT * FROM ${namespace + ".voter_stats"} WHERE voter = $1 AND contract = $4) a ON TRUE
+            (SELECT * FROM ${namespace + ".voter_stats"} WHERE voter = $1${namespace === "syndicate" ? "" : " AND contract = $4"}) a ON TRUE
         LEFT JOIN
           ${namespace + ".advanced_voting_power"} av ON av.delegate = $1 AND av.contract = $2
         LEFT JOIN
-            (SELECT num_of_delegators FROM ${namespace + ".delegates"} nd WHERE delegate = $1 AND nd.contract = $5 LIMIT 1) b ON TRUE
+            (SELECT num_of_delegators FROM ${namespace + ".delegates"} nd WHERE delegate = $1${namespace === "syndicate" ? "" : " AND nd.contract = $5"} LIMIT 1) b ON TRUE
         LEFT JOIN
             (SELECT * FROM ${namespace + ".voting_power"} vp WHERE vp.delegate = $1${namespace === "syndicate" ? "" : " AND vp.contract = $5"} LIMIT 1) c ON TRUE
         LEFT JOIN
             (SELECT COUNT(*) as count
              FROM ${namespace + ".proposals_v2"} p
-             WHERE p.contract = $4
+             WHERE ${namespace === "syndicate" ? "1=1" : "p.contract = $4"}
              AND p.cancelled_block IS NULL
             ) total_proposals ON TRUE
         LEFT JOIN
