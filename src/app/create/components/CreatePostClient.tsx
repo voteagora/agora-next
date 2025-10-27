@@ -152,16 +152,12 @@ export function CreatePostClient({
         ];
 
         if (allLinks.length > 0) {
-          await Promise.all(
-            allLinks.map((link) =>
-              createProposalLinks({
-                sourceId: link.sourceId,
-                sourceType: link.sourceType,
-                links: [
-                  { targetId: link.targetId, targetType: link.targetType },
-                ],
-              })
-            )
+          allLinks.forEach((link) =>
+            createProposalLinks({
+              sourceId: link.sourceId,
+              sourceType: link.sourceType,
+              links: [{ targetId: link.targetId, targetType: link.targetType }],
+            }).catch(() => {})
           );
         }
 

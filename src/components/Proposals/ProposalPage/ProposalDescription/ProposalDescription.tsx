@@ -8,6 +8,7 @@ import ProposalChart from "../ProposalChart/ProposalChart";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import Tenant from "@/lib/tenant/tenant";
+import RelatedProposalLinks from "../RelatedProposalLinks/RelatedProposalLinks";
 
 const { contracts } = Tenant.current();
 
@@ -106,6 +107,7 @@ export default function ProposalDescription({
             executedTransactionHash={proposal.executedTransactionHash}
           />
         )}
+        <RelatedProposalLinks proposalId={proposal.id} />
         <div className={styles.proposal_description_md}>
           <Markdown
             content={stripTitleFromDescription(
