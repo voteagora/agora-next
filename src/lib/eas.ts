@@ -257,7 +257,7 @@ export async function createV2CreateProposalAttestation({
 export { EAS_V2_SCHEMA_IDS };
 
 const VOTE_SCHEMA_ID =
-  "0xa68afde70897d2955e726c1a1da9e77ab466994b5da6666ceb518a5c538edc1e";
+  "0x2b0e624e00310c7e88a1b7840238e285152b38ab00160b14c0d4e54e0a53a3aa";
 
 const voteSchemaEncoder = new SchemaEncoder(
   "int8 choice,string reason"
