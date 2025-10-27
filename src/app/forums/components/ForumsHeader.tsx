@@ -15,12 +15,23 @@ interface ForumsBreadcrumbItem {
   href?: string;
 }
 
+interface TopicContext {
+  id: number;
+  title: string;
+  content: string;
+  createdAt?: string;
+  commentsCount?: number;
+  isTempCheck?: boolean;
+  tempCheckPassed?: boolean;
+}
+
 interface ForumsHeaderProps {
   breadcrumbs?: ForumsBreadcrumbItem[];
   description?: string | null;
   showBreadcrumb?: boolean;
   fallbackTitle?: string;
   isDuna?: boolean;
+  topicContext?: TopicContext;
 }
 
 export default function ForumsHeader({
@@ -29,6 +40,7 @@ export default function ForumsHeader({
   showBreadcrumb = breadcrumbs.length > 0,
   fallbackTitle = "Discussions",
   isDuna = false,
+  topicContext,
 }: ForumsHeaderProps) {
   const shouldRenderBreadcrumb = showBreadcrumb && breadcrumbs.length > 0;
 
@@ -66,7 +78,7 @@ export default function ForumsHeader({
           {description ? <h3 className="text-primary">{description}</h3> : null}
         </div>
         <div className="flex gap-2">
-          <NewTopicButton isDuna={isDuna} />
+          <NewTopicButton isDuna={isDuna} topicContext={topicContext} />
         </div>
       </div>
     </div>

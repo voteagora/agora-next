@@ -477,9 +477,12 @@ async function getProposalTypes() {
         }));
       types = parsedTypes;
     } else {
+      const contractExists =
+        configuratorContract.address !==
+        "0x0000000000000000000000000000000000000000";
       types = await findProposalType({
         namespace,
-        contract: configuratorContract.address,
+        contract: contractExists ? configuratorContract.address : undefined,
       });
     }
 

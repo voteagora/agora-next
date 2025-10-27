@@ -1896,6 +1896,17 @@ view syndicateDelegateChangedEvents {
   @@schema("syndicate")
 }
 
+view syndicateDaoSettings {
+  dao_id       String
+  param_name   String
+  param_value  String
+  block_number BigInt
+
+  @@id([dao_id, param_name])
+  @@map("dao_settings")
+  @@schema("syndicate")
+}
+
 view syndicate_delegates_wrapper {
   delegate          String?
   num_of_delegators Decimal? @db.Decimal
@@ -5253,5 +5264,17 @@ model ForumTopicViewStats {
 
   @@id([dao_slug, topicId])
   @@map("forum_topic_view_stats")
+  @@schema("alltenant")
+}
+
+model ProposalLinks {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sourceId   String @map("source_id")
+  sourceType String @map("source_type")
+  targetId   String @map("target_id")
+  targetType String @map("target_type")
+
+  @@unique([sourceId, targetId])
+  @@map("proposal_links")
   @@schema("alltenant")
 }
