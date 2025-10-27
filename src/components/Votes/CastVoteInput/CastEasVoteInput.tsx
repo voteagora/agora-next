@@ -51,10 +51,10 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
     );
   }
 
-  return <CastEasVoteInputContent />;
+  return <CastEasVoteInputContent proposal={proposal} />;
 }
 
-function CastEasVoteInputContent() {
+function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient();
   const [selectedVote, setSelectedVote] = useState<VoteOption>(null);
@@ -89,6 +89,7 @@ function CastEasVoteInputContent() {
         choice: choiceMap[selectedVote],
         reason: reason || "",
         signer,
+        proposalId: proposal.id,
       });
 
       // Reset form on success

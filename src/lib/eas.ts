@@ -256,7 +256,6 @@ export async function createV2CreateProposalAttestation({
 }
 export { EAS_V2_SCHEMA_IDS };
 
-// Vote attestation schema: uint256 Proposal_id, uint8 Choice, string Reason
 const VOTE_SCHEMA_ID =
   "0xa68afde70897d2955e726c1a1da9e77ab466994b5da6666ceb518a5c538edc1e";
 
@@ -268,10 +267,12 @@ export async function createVoteAttestation({
   choice,
   reason,
   signer,
+  proposalId,
 }: {
   choice: number; // 0 = against, 1 = for, 2 = abstain
   reason: string;
   signer: JsonRpcSigner;
+  proposalId: string;
 }) {
   eas.connect(signer as any);
 
@@ -280,7 +281,7 @@ export async function createVoteAttestation({
     { name: "reason", value: reason, type: "string" },
   ]);
 
-  const recipient = "0x73796e6469636174652e00aa36a7000000a58d9f";
+  const recipient = contracts.easRecipient || "0x0000000000000000000000000000000000000000";
   const expirationTime = NO_EXPIRATION;
   const revocable = false;
 
@@ -290,7 +291,7 @@ export async function createVoteAttestation({
       recipient,
       expirationTime,
       revocable,
-      refUID: ZERO_BYTES32,
+      refUID: proposalId,
       data: encodedData,
       value: 0n,
     },
