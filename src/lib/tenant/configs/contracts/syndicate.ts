@@ -21,10 +21,12 @@ export const syndicateTenantConfig = ({
 }: Props): TenantContracts => {
   const TOKEN = isProd
     ? "0x1bAB804803159aD84b8854581AA53AC72455614E"
-    : "0x1bAB804803159aD84b8854581AA53AC72455614E";
+    : "0x55f6e82a8BF5736d46837246DcBEAf7e61b3c27C";
 
-  // dummy addresses; for now: syndicate is info-only
-  const DUMMY_GOVERNOR = "0x95a35Cd8638b732E839C6CCDD0d8B7FA06319677";
+  const DAO_ID = isProd
+    ? "0x73796e6469636174652e000000010000008e2647"
+    : "0x73796e6469636174652e00aa36a7000000a58d9f";
+
   const DUMMY_TIMELOCK = "0x0000000000000000000000000000000000000003";
   const DUMMY_TYPES = "0x0000000000000000000000000000000000000000";
 
@@ -50,9 +52,9 @@ export const syndicateTenantConfig = ({
 
     governor: new TenantContract<IGovernorContract>({
       abi: AgoraGovernor__factory.abi,
-      address: DUMMY_GOVERNOR,
+      address: DAO_ID,
       chain,
-      contract: AgoraGovernor__factory.connect(DUMMY_GOVERNOR, provider),
+      contract: AgoraGovernor__factory.connect(DAO_ID, provider),
       provider,
     }),
 
@@ -72,7 +74,7 @@ export const syndicateTenantConfig = ({
       provider,
     }),
 
-    delegationModel: DELEGATION_MODEL.PARTIAL,
+    delegationModel: DELEGATION_MODEL.FULL,
     treasury: [],
     easRecipient: isProd
       ? "0x73796e6469636174652e000000010000008e2647"
