@@ -23,8 +23,10 @@ export const syndicateTenantConfig = ({
     ? "0x1bAB804803159aD84b8854581AA53AC72455614E"
     : "0x55f6e82a8BF5736d46837246DcBEAf7e61b3c27C";
 
-  // dummy addresses; for now: syndicate is info-only
-  const DUMMY_GOVERNOR = "0xAAAA0FfB73F3E8bC40E3630E42ce716E22145EdA";
+  const DAO_ID = isProd
+   ? "0x73796e6469636174652e00aa36a7000000a58d9f"
+   : "0x73796e6469636174652e000000010000008e2647";
+
   const DUMMY_TIMELOCK = "0x0000000000000000000000000000000000000003";
   const DUMMY_TYPES = "0x0000000000000000000000000000000000000004";
 
@@ -32,7 +34,9 @@ export const syndicateTenantConfig = ({
 
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : new AlchemyProvider("mainnet", alchemyId);
+    : isProd
+      ? new AlchemyProvider("mainnet", alchemyId)
+      : new AlchemyProvider("sepolia", alchemyId);
 
   const chain = mainnet;
 
@@ -48,9 +52,9 @@ export const syndicateTenantConfig = ({
 
     governor: new TenantContract<IGovernorContract>({
       abi: AgoraGovernor__factory.abi,
-      address: DUMMY_GOVERNOR,
+      address: DAO_ID,
       chain,
-      contract: AgoraGovernor__factory.connect(DUMMY_GOVERNOR, provider),
+      contract: AgoraGovernor__factory.connect(DAO_ID, provider),
       provider,
     }),
 
