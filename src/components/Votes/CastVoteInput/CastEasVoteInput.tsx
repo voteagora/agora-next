@@ -9,8 +9,6 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
-import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 type VoteOption = "for" | "against" | "abstain" | null;
 
@@ -53,10 +51,10 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
     );
   }
 
-  return <CastEasVoteInputContent proposal={proposal} />;
+  return <CastEasVoteInputContent />;
 }
 
-function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
+function CastEasVoteInputContent() {
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient();
   const [selectedVote, setSelectedVote] = useState<VoteOption>(null);
@@ -88,7 +86,6 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
       };
 
       await createVoteAttestation({
-        proposalId: proposal.id,
         choice: choiceMap[selectedVote],
         reason: reason || "",
         signer,

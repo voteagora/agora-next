@@ -18,7 +18,7 @@ const CREATE_PROPOSAL_SCHEMA_ID =
 
 const EAS_V2_SCHEMA_IDS = {
   CREATE_PROPOSAL:
-    "0x12e8600c9bb57b5b436fa09735cfc63e95098552122001c465b610261eea8a93",
+    "0x442d586d8424b5485de1ff46cb235dcb96b41d19834926bbad1cd157fbeeb8fc",
 };
 
 const schemaEncoder = new SchemaEncoder(
@@ -207,12 +207,11 @@ export const signDelegatedAttestation = async ({
 // Schema encoders for EAS v2 attestations
 const v2SchemaEncoders = {
   CREATE_PROPOSAL: new SchemaEncoder(
-    "uint256 proposal_id,string title,string description,uint64 startts,uint64 endts,string tags"
+    "string title,string description,uint64 startts,uint64 endts,string tags"
   ),
 };
 
 export async function createV2CreateProposalAttestation({
-  proposal_id,
   title,
   description,
   startts,
@@ -221,7 +220,6 @@ export async function createV2CreateProposalAttestation({
   proposal_type_uid,
   signer,
 }: {
-  proposal_id: bigint;
   title: string;
   description: string;
   startts: bigint;
@@ -233,7 +231,6 @@ export async function createV2CreateProposalAttestation({
   easV2.connect(signer as any);
 
   const encodedData = v2SchemaEncoders.CREATE_PROPOSAL.encodeData([
-    { name: "proposal_id", value: proposal_id, type: "uint256" },
     { name: "title", value: title, type: "string" },
     { name: "description", value: description, type: "string" },
     { name: "startts", value: startts, type: "uint64" },
@@ -261,19 +258,17 @@ export { EAS_V2_SCHEMA_IDS };
 
 // Vote attestation schema: uint256 Proposal_id, uint8 Choice, string Reason
 const VOTE_SCHEMA_ID =
-  "0xffcc8fe77f55448bee5f0e24844ee76f83c3c2718dcf8a75de750cf4797ad0bc";
+  "0xa68afde70897d2955e726c1a1da9e77ab466994b5da6666ceb518a5c538edc1e";
 
 const voteSchemaEncoder = new SchemaEncoder(
-  "uint256 proposal_id,int8 choice,string reason"
+  "int8 choice,string reason"
 );
 
 export async function createVoteAttestation({
-  proposalId,
   choice,
   reason,
   signer,
 }: {
-  proposalId: string;
   choice: number; // 0 = against, 1 = for, 2 = abstain
   reason: string;
   signer: JsonRpcSigner;
@@ -281,7 +276,6 @@ export async function createVoteAttestation({
   eas.connect(signer as any);
 
   const encodedData = voteSchemaEncoder.encodeData([
-    { name: "proposal_id", value: BigInt(proposalId), type: "uint256" },
     { name: "choice", value: choice, type: "int8" },
     { name: "reason", value: reason, type: "string" },
   ]);
