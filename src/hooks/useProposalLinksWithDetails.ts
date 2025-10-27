@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getProposalLinksWithDetails } from "@/lib/actions/proposalLinksWithDetails";
+import Tenant from "@/lib/tenant/tenant";
 
 interface LinkedItemDetails {
   id: string;
@@ -15,6 +16,9 @@ interface LinkedItemDetails {
 }
 
 export function useProposalLinksWithDetails(targetId: string) {
+  const { ui } = Tenant.current();
+  const isEnabled = ui.toggle("easv2-govlessvoting")?.enabled;
+
   const query = useQuery({
     queryKey: ["proposalLinksWithDetails", targetId],
     queryFn: async () => {
@@ -24,7 +28,7 @@ export function useProposalLinksWithDetails(targetId: string) {
       }
       return result.links as LinkedItemDetails[];
     },
-    enabled: !!targetId,
+    enabled: !!targetId && isEnabled,
   });
 
   return {
@@ -34,4 +38,3 @@ export function useProposalLinksWithDetails(targetId: string) {
     refetch: query.refetch,
   };
 }
-

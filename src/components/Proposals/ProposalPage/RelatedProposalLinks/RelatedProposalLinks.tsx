@@ -43,7 +43,7 @@ function RelatedLinkCard({
   if (link.type === "forum_topic") {
     linkUrl = buildForumTopicPath(parseInt(link.id), link.title);
   } else {
-    linkUrl = `/proposals/${link.id}`
+    linkUrl = `/proposals/${link.id}`;
   }
 
   return (
@@ -129,4 +129,3 @@ export default function RelatedProposalLinks({
     </div>
   );
 }
-

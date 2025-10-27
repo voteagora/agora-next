@@ -156,9 +156,7 @@ export function CreatePostClient({
             createProposalLinks({
               sourceId: link.sourceId,
               sourceType: link.sourceType,
-              links: [
-                { targetId: link.targetId, targetType: link.targetType },
-              ],
+              links: [{ targetId: link.targetId, targetType: link.targetType }],
             }).catch(() => {})
           );
         }
