@@ -230,34 +230,32 @@ export async function createV2CreateProposalAttestation({
   proposal_type_uid?: string;
   signer: JsonRpcSigner;
 }) {
+  easV2.connect(signer as any);
 
-    easV2.connect(signer as any);
+  const encodedData = v2SchemaEncoders.CREATE_PROPOSAL.encodeData([
+    { name: "proposal_id", value: proposal_id, type: "uint256" },
+    { name: "title", value: title, type: "string" },
+    { name: "description", value: description, type: "string" },
+    { name: "startts", value: startts, type: "uint64" },
+    { name: "endts", value: endts, type: "uint64" },
+    { name: "tags", value: tags, type: "string" },
+  ]);
 
-    const encodedData = v2SchemaEncoders.CREATE_PROPOSAL.encodeData([
-      { name: "proposal_id", value: proposal_id, type: "uint256" },
-      { name: "title", value: title, type: "string" },
-      { name: "description", value: description, type: "string" },
-      { name: "startts", value: startts, type: "uint64" },
-      { name: "endts", value: endts, type: "uint64" },
-      { name: "tags", value: tags, type: "string" },
-    ]);
+  const txResponse = await easV2.attest({
+    schema: EAS_V2_SCHEMA_IDS.CREATE_PROPOSAL,
+    data: {
+      recipient:
+        contracts.easRecipient || "0x0000000000000000000000000000000000000000",
+      expirationTime: NO_EXPIRATION,
+      revocable: true,
+      refUID: proposal_type_uid || ZERO_BYTES32,
+      data: encodedData,
+      value: 0n,
+    },
+  });
 
-    const txResponse = await easV2.attest({
-      schema: EAS_V2_SCHEMA_IDS.CREATE_PROPOSAL,
-      data: {
-        recipient:
-          contracts.easRecipient ||
-          "0x0000000000000000000000000000000000000000",
-        expirationTime: NO_EXPIRATION,
-        revocable: true,
-        refUID: proposal_type_uid || ZERO_BYTES32,
-        data: encodedData,
-        value: 0n,
-      },
-    });
-
-    const receipt = await txResponse.wait();
-    return { transactionHash: receipt };
+  const receipt = await txResponse.wait();
+  return { transactionHash: receipt };
 }
 
 export { EAS_V2_SCHEMA_IDS };

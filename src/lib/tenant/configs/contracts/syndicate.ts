@@ -74,6 +74,8 @@ export const syndicateTenantConfig = ({
 
     delegationModel: DELEGATION_MODEL.PARTIAL,
     treasury: [],
-    easRecipient: isProd ? "0x73796e6469636174652e000000010000008e2647" : "0x73796e6469636174652e00aa36a7000000a58d9f",
+    easRecipient: isProd
+      ? "0x73796e6469636174652e000000010000008e2647"
+      : "0x73796e6469636174652e00aa36a7000000a58d9f",
   };
 };

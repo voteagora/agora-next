@@ -313,7 +313,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "enable-easv2-govlessvoting",
+      name: "easv2-govlessvoting",
       enabled: false,
     },
   ],

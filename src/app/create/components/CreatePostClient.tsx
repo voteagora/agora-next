@@ -116,7 +116,8 @@ export function CreatePostClient({
           )
         );
 
-        const votingPeriodSeconds = daoSettings?.votingPeriod || 7 * 24 * 60 * 60;
+        const votingPeriodSeconds =
+          daoSettings?.votingPeriod || 7 * 24 * 60 * 60;
         const votingDelaySeconds = daoSettings?.votingDelay || 0;
 
         const proposal = await createProposal({
