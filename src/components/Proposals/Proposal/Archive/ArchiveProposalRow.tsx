@@ -58,9 +58,9 @@ export default function ArchiveProposalRow({
 
   const isEasOodaoSource = proposal.source === "eas-oodao";
   const primaryTagLabel = isEasOodaoSource
-    ? formatArchiveTagLabel(proposal.tags?.[0]) ??
+    ? (formatArchiveTagLabel(proposal.tags?.[0]) ??
       proposal.tags?.[0] ??
-      "Temp Check"
+      "Temp Check")
     : "Gov Proposal";
 
   return (

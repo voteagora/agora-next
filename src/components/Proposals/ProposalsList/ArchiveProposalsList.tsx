@@ -43,7 +43,9 @@ export default function ArchiveProposalsList({
       );
     }
 
-    return proposals.filter((proposal) => !proposal.cancel_event);
+    return proposals.filter(
+      (proposal) => !proposal.cancel_event && !proposal.delete_event
+    );
   }, [filter, proposals]);
 
   const sortedProposals = React.useMemo(() => {

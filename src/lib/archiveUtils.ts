@@ -48,9 +48,9 @@ export async function fetchProposalsFromArchive(
     // Apply filter if needed
     let filteredProposals = allProposals;
     if (filter === "relevant") {
-      // Filter out cancelled proposals for "relevant" filter
+      // Filter out cancelled/deleted proposals for "relevant" filter
       filteredProposals = allProposals.filter(
-        (proposal) => !proposal.cancel_event
+        (proposal) => !proposal.cancel_event && !proposal.delete_event
       );
     } else if (filter === "temp-checks") {
       filteredProposals = allProposals.filter(

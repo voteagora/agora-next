@@ -32,8 +32,7 @@ export default function ProposalsFilter() {
 
   const filterParam = searchParams?.get("filter");
   const selected = useMemo(() => {
-    const candidate =
-      filterParam ?? proposalsFilterOptions.relevant.filter;
+    const candidate = filterParam ?? proposalsFilterOptions.relevant.filter;
 
     return options.some((option) => option.filter === candidate)
       ? candidate
@@ -43,8 +42,7 @@ export default function ProposalsFilter() {
   const handleChange = useCallback(
     (nextFilter: string) => {
       const basePath = pathname === "/" ? "/" : "/proposals";
-      const isRelevant =
-        nextFilter === proposalsFilterOptions.relevant.filter;
+      const isRelevant = nextFilter === proposalsFilterOptions.relevant.filter;
 
       if (isRelevant) {
         router.push(basePath);
@@ -61,9 +59,8 @@ export default function ProposalsFilter() {
         <Listbox.Button className="text-primary w-full sm:w-fit bg-neutral font-medium border-wash rounded-full py-2 px-4 flex items-center">
           {
             (
-              options.find(
-                (option) => option.filter === selected
-              ) ?? proposalsFilterOptions.relevant
+              options.find((option) => option.filter === selected) ??
+              proposalsFilterOptions.relevant
             ).value
           }
           <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />

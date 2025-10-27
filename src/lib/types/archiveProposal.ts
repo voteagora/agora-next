@@ -12,6 +12,16 @@ export type ArchiveProposalEvent = {
   eta?: number;
 };
 
+export type ArchiveProposalDeleteEvent = {
+  transaction_hash: string;
+  dao_id: string;
+  uid: string;
+  deleter: string;
+  chain_id: number;
+  ref_uid: string;
+  attestation_time: number;
+};
+
 // Proposal type with fixed configuration (eas-oodao)
 export type FixedProposalType = {
   name: string;
@@ -75,7 +85,7 @@ export type ArchiveListProposal = {
   queue_event?: ArchiveProposalEvent;
   execute_event?: ArchiveProposalEvent;
   cancel_event?: ArchiveProposalEvent;
-
+  delete_event?: ArchiveProposalDeleteEvent;
   // eas-oodao specific fields
   transaction_hash?: string;
   dao_id?: string;

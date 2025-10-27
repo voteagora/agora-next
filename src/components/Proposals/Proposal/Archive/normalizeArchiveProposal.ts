@@ -83,9 +83,13 @@ const deriveTimeStatus = (
 ) => {
   const proposalStartTime = toDate(proposal.start_blocktime);
   const proposalEndTime = toDate(proposal.end_blocktime);
-  const proposalCancelledTime = toDate(
-    proposal.cancel_event?.timestamp ?? proposal.cancel_event?.blocktime
-  );
+
+  // Check both cancel_event and delete_event for cancelled time
+  const proposalCancelledTime =
+    toDate(
+      proposal.cancel_event?.timestamp ?? proposal.cancel_event?.blocktime
+    ) ?? toDate(proposal.delete_event?.attestation_time);
+
   const proposalExecutedTime = toDate(
     proposal.execute_event?.timestamp ?? proposal.execute_event?.blocktime
   );
@@ -147,8 +151,8 @@ const deriveStatus = (
   proposal: ArchiveListProposal,
   decimals: number
 ): string => {
-  // Check terminal states first
-  if (proposal.cancel_event) {
+  // Check terminal states first - both cancel_event and delete_event mean CANCELLED
+  if (proposal.cancel_event || proposal.delete_event) {
     return "CANCELLED";
   } else if (proposal.execute_event) {
     return "EXECUTED";
@@ -252,14 +256,12 @@ const getProposalTypeName = (
   ) {
     return proposalType.name;
   }
-  
+
   // RangeProposalType or number - default to "Standard"
   return "Standard";
 };
 
-export const formatArchiveTagLabel = (
-  tag?: string | null
-): string | null => {
+export const formatArchiveTagLabel = (tag?: string | null): string | null => {
   if (!tag) {
     return null;
   }
@@ -278,9 +280,7 @@ const formatVotingModuleName = (name?: string | null): string => {
   }
 
   const cleaned = name.replace(/_/g, " ").trim();
-  return cleaned
-    ? capitalizeFirstLetter(cleaned)
-    : "Governance";
+  return cleaned ? capitalizeFirstLetter(cleaned) : "Governance";
 };
 
 const deriveTypeLabel = (proposal: ArchiveListProposal): string => {
