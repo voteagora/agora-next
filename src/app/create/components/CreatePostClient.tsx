@@ -119,7 +119,7 @@ export function CreatePostClient({
         const votingPeriodSeconds = daoSettings?.votingPeriod || 7 * 24 * 60 * 60;
         const votingDelaySeconds = daoSettings?.votingDelay || 0;
 
-        await createProposal({
+        const proposal = await createProposal({
           proposal_id: proposalId,
           title: data.title,
           description: data.description,
@@ -131,19 +131,21 @@ export function CreatePostClient({
           proposal_type_uid: selectedProposalType.id || undefined,
         });
 
+        const target = proposal.transactionHash;
+
         const targetType =
           selectedPostType === "tempcheck" ? "tempcheck" : "gov";
         const allLinks = [
           ...(data.relatedDiscussions || []).map((d) => ({
             sourceId: d.id,
             sourceType: "forum_topic",
-            targetId: proposalId.toString(),
+            targetId: target,
             targetType,
           })),
           ...(data.relatedTempChecks || []).map((t) => ({
             sourceId: t.id,
             sourceType: "tempcheck",
-            targetId: proposalId.toString(),
+            targetId: target,
             targetType,
           })),
         ];
