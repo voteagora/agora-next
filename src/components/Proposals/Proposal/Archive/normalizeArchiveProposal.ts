@@ -1,6 +1,6 @@
 import { formatUnits } from "ethers";
 
-import { capitalizeFirstLetter, getProposalTypeText } from "@/lib/utils";
+import { capitalizeFirstLetter } from "@/lib/utils";
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 
 export type ArchiveProposalMetrics = {
@@ -24,6 +24,8 @@ export type ArchiveProposalDisplay = {
   proposerAddress: string;
   proposerEns?: string;
   statusLabel: string;
+  tags?: string[];
+  source?: string;
   timeStatus: {
     proposalStatus: string;
     proposalStartTime: Date | null;
@@ -234,9 +236,66 @@ const deriveStatus = (
   return "FAILED";
 };
 
-const deriveType = (): string => {
-  // Only support STANDARD proposals for now
-  return "STANDARD";
+/**
+ * Extract proposal type name from proposal_type field
+ * Returns the name if available, otherwise "Standard"
+ */
+const getProposalTypeName = (
+  proposalType: ArchiveListProposal["proposal_type"]
+): string => {
+  // FixedProposalType has a name field
+  if (
+    typeof proposalType === "object" &&
+    proposalType !== null &&
+    "name" in proposalType &&
+    proposalType.name
+  ) {
+    return proposalType.name;
+  }
+  
+  // RangeProposalType or number - default to "Standard"
+  return "Standard";
+};
+
+export const formatArchiveTagLabel = (
+  tag?: string | null
+): string | null => {
+  if (!tag) {
+    return null;
+  }
+
+  const normalized = tag.toLowerCase();
+  if (normalized === "tempcheck" || normalized === "temp-check") {
+    return "Temp Check";
+  }
+
+  return tag;
+};
+
+const formatVotingModuleName = (name?: string | null): string => {
+  if (!name) {
+    return "Governance";
+  }
+
+  const cleaned = name.replace(/_/g, " ").trim();
+  return cleaned
+    ? capitalizeFirstLetter(cleaned)
+    : "Governance";
+};
+
+const deriveTypeLabel = (proposal: ArchiveListProposal): string => {
+  const source = proposal.data_eng_properties?.source;
+
+  if (source === "dao_node") {
+    return formatVotingModuleName(proposal.voting_module_name);
+  }
+
+  const primaryTag = formatArchiveTagLabel(proposal.tags?.[0]);
+  if (primaryTag) {
+    return primaryTag;
+  }
+
+  return getProposalTypeName(proposal.proposal_type);
 };
 
 export function normalizeArchiveProposal(
@@ -244,17 +303,9 @@ export function normalizeArchiveProposal(
   options: NormalizeOptions = {}
 ): ArchiveProposalDisplay {
   const decimals = options.tokenDecimals ?? 18;
-  const type = deriveType();
   const status = deriveStatus(proposal, decimals);
   const normalizedStatus = STATUS_LABEL_MAP[status] ? status : "UNKNOWN";
-  const fallbackLabel = capitalizeFirstLetter(
-    type.toLowerCase().replace(/_/g, " ")
-  );
-  const typeLabel =
-    getProposalTypeText(
-      type,
-      type === "SNAPSHOT" ? (proposal as any).proposalData : undefined
-    ) || fallbackLabel;
+  const typeLabel = deriveTypeLabel(proposal);
 
   // Handle different data sources: EAS-OODAO vs standard
   const source = proposal.data_eng_properties?.source;
@@ -305,6 +356,8 @@ export function normalizeArchiveProposal(
     href: `/proposals/${proposal.id}`,
     title,
     typeLabel,
+    tags: Array.isArray(proposal.tags) ? proposal.tags : undefined,
+    source: proposal.data_eng_properties?.source,
     proposerAddress: proposal.proposer,
     proposerEns:
       typeof proposal.proposer_ens === "string"

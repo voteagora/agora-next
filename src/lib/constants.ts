@@ -58,6 +58,10 @@ export const proposalsFilterOptions = {
     value: "Everything",
     filter: "everything",
   },
+  tempChecks: {
+    value: "Temp Checks",
+    filter: "temp-checks",
+  },
 };
 
 export const delegatesFilterOptions = {

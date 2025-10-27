@@ -76,14 +76,15 @@ export default async function ProposalsHome() {
   };
 
   if (useArchiveForProposals) {
-    [governanceCalendar, archivedProposals, votableSupply] = await Promise.all([
-      fetchGovernanceCalendar(),
-      fetchProposalsFromArchive(
-        namespace,
-        proposalsFilterOptions.relevant.filter
-      ),
-      fetchVotableSupply(),
-    ]);
+    [governanceCalendar, archivedProposals, votableSupply] =
+      await Promise.all([
+        fetchGovernanceCalendar(),
+        fetchProposalsFromArchive(
+          namespace,
+          proposalsFilterOptions.everything.filter
+        ),
+        fetchVotableSupply(),
+      ]);
 
     relevantProposals = emptyPaginated();
     allProposals = emptyPaginated();

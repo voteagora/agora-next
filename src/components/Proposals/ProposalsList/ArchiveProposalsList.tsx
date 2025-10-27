@@ -11,6 +11,8 @@ import { useAccount } from "wagmi";
 import ArchiveProposalRow from "../Proposal/Archive/ArchiveProposalRow";
 import { normalizeArchiveProposals } from "../Proposal/Archive/normalizeArchiveProposal";
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
+import { useSearchParams } from "next/navigation";
+import { proposalsFilterOptions } from "@/lib/constants";
 
 export default function ArchiveProposalsList({
   proposals,
@@ -26,14 +28,31 @@ export default function ArchiveProposalsList({
 }) {
   const { address } = useAccount();
   const { token, namespace } = Tenant.current();
+  const searchParams = useSearchParams();
+  const filter =
+    searchParams?.get("filter") ?? proposalsFilterOptions.relevant.filter;
+
+  const filteredProposals = React.useMemo(() => {
+    if (filter === proposalsFilterOptions.everything.filter) {
+      return proposals;
+    }
+
+    if (filter === proposalsFilterOptions.tempChecks.filter) {
+      return proposals.filter(
+        (proposal) => proposal.data_eng_properties?.source === "eas-oodao"
+      );
+    }
+
+    return proposals.filter((proposal) => !proposal.cancel_event);
+  }, [filter, proposals]);
 
   const sortedProposals = React.useMemo(() => {
-    return [...proposals].sort((a, b) => {
+    return [...filteredProposals].sort((a, b) => {
       const aBlock = Number(a.start_block) || 0;
       const bBlock = Number(b.start_block) || 0;
       return bBlock - aBlock;
     });
-  }, [proposals]);
+  }, [filteredProposals]);
 
   const normalizedProposals = React.useMemo(
     () =>
