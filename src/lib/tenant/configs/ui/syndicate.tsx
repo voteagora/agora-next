@@ -220,7 +220,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "proposals",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "info",
@@ -240,7 +240,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "use-archive-for-proposals",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "use-daonode-for-proposals",
@@ -264,7 +264,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "coming-soon",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "admin",
@@ -320,7 +320,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "easv2-govlessvoting",
-      enabled: false,
+      enabled: true,
     },
   ],
 });
