@@ -259,9 +259,7 @@ export { EAS_V2_SCHEMA_IDS };
 const VOTE_SCHEMA_ID =
   "0x2b0e624e00310c7e88a1b7840238e285152b38ab00160b14c0d4e54e0a53a3aa";
 
-const voteSchemaEncoder = new SchemaEncoder(
-  "int8 choice,string reason"
-);
+const voteSchemaEncoder = new SchemaEncoder("int8 choice,string reason");
 
 export async function createVoteAttestation({
   choice,
@@ -281,7 +279,8 @@ export async function createVoteAttestation({
     { name: "reason", value: reason, type: "string" },
   ]);
 
-  const recipient = contracts.easRecipient || "0x0000000000000000000000000000000000000000";
+  const recipient =
+    contracts.easRecipient || "0x0000000000000000000000000000000000000000";
   const expirationTime = NO_EXPIRATION;
   const revocable = false;
 

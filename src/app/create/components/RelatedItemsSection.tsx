@@ -52,9 +52,7 @@ export function RelatedItemsSection({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <Label className="text-xs font-semibold text-secondary">
-          {label}
-        </Label>
+        <Label className="text-xs font-semibold text-secondary">{label}</Label>
       </div>
 
       <div className="space-y-3">
