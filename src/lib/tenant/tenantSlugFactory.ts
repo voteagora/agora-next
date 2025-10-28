@@ -35,6 +35,8 @@ export default class TenantSlugFactory {
         return "TOWNS" as any;
       case TENANT_NAMESPACES.SYNDICATE:
         return "SYNDICATE" as any;
+      case TENANT_NAMESPACES.OG:
+        return "ZEROG" as any;
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

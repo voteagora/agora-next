@@ -47,6 +47,7 @@ export const TENANT_NAMESPACES = {
   LINEA: "linea",
   TOWNS: "towns",
   SYNDICATE: "syndicate",
+  OG: "0g",
 } as const;
 
 export const proposalsFilterOptions = {

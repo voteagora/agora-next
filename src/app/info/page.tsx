@@ -11,6 +11,7 @@ import DunaAdministration from "@/app/duna/components/DunaAdministration";
 import DunaDisclosures from "@/app/duna/components/DunaDisclosures";
 import SyndicateDunaDisclosures from "@/app/duna/components/SyndicateDunaDisclosures";
 import TownsDunaAdministration from "@/app/duna/components/TownsDunaAdministration";
+import OgDunaDisclosures from "@/app/duna/components/0gDunaDisclosures";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/getTreasuryBalanceTS";
@@ -110,6 +111,8 @@ export default async function Page() {
               "syndicate-duna-disclosures"
             )?.enabled ? (
             <SyndicateDunaDisclosures />
+          ) : ui.toggle("0g-duna-administration")?.enabled ? (
+            <OgDunaDisclosures />
           ) : (
             <DunaDisclosures />
           )
