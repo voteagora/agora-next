@@ -110,4 +110,5 @@ export type ArchiveListProposal = {
   chain_id?: number;
   tags?: string[];
   total_voting_power_at_start?: string;
+  lifecycle_stage: string;
 };

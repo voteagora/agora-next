@@ -1,10 +1,7 @@
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 import {
-  STATUS_LABEL_MAP,
   convertToNumber,
-  toDate,
   deriveTimeStatus,
-  deriveStatus,
   deriveTypeLabel,
 } from "./archiveProposalUtils";
 
@@ -46,15 +43,6 @@ type NormalizeOptions = {
   tokenDecimals?: number;
 };
 
-// Re-export shared utilities for backward compatibility
-export {
-  STATUS_LABEL_MAP,
-  convertToNumber,
-  toDate,
-  deriveTimeStatus,
-  deriveStatus,
-};
-
 const ensurePercentage = (value: number) => {
   if (!Number.isFinite(value) || value < 0) return 0;
   if (value > 100) return 100;
@@ -79,8 +67,7 @@ export function normalizeArchiveProposal(
   options: NormalizeOptions = {}
 ): ArchiveProposalDisplay {
   const decimals = options.tokenDecimals ?? 18;
-  const status = deriveStatus(proposal, decimals);
-  const normalizedStatus = STATUS_LABEL_MAP[status] ? status : "UNKNOWN";
+  const proposalStatus = proposal.lifecycle_stage;
   const typeLabel = deriveTypeLabel(proposal);
 
   // Handle different data sources: EAS-OODAO vs standard
@@ -139,8 +126,8 @@ export function normalizeArchiveProposal(
       typeof proposal.proposer_ens === "string"
         ? proposal.proposer_ens
         : proposal.proposer_ens?.detail,
-    statusLabel: STATUS_LABEL_MAP[normalizedStatus],
-    timeStatus: deriveTimeStatus(proposal, normalizedStatus),
+    statusLabel: proposalStatus,
+    timeStatus: deriveTimeStatus(proposal, proposalStatus),
     metrics,
   };
 }

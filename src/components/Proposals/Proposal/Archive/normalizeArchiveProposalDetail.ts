@@ -1,8 +1,6 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import {
-  deriveStatus,
   deriveTimeStatus,
-  STATUS_LABEL_MAP,
   toDate,
   safeBigInt,
   safeBigIntOrNull,
@@ -51,14 +49,9 @@ export function normalizeArchiveStandardProposal(
   options: NormalizeArchiveProposalOptions = {}
 ): Proposal {
   const decimals = options.tokenDecimals ?? 18;
-  const namespace = options.namespace ?? null;
 
-  const statusKey = deriveStatus(proposal, decimals);
-  const normalizedStatusKey = STATUS_LABEL_MAP[statusKey]
-    ? statusKey
-    : "ACTIVE";
-
-  const timeStatus = deriveTimeStatus(proposal, normalizedStatusKey);
+  const statusKey = proposal.lifecycle_stage;
+  const timeStatus = deriveTimeStatus(proposal, statusKey);
 
   const createdTime =
     toDate(proposal.created_event?.blocktime) ||
@@ -162,7 +155,7 @@ export function normalizeArchiveStandardProposal(
       : null,
     proposalResults,
     proposalType: "STANDARD",
-    status: normalizedStatusKey as Proposal["status"],
+    status: statusKey,
     createdTransactionHash: null,
     cancelledTransactionHash: proposal.cancel_event?.transaction_hash ?? null,
     executedTransactionHash: proposal.execute_event?.transaction_hash ?? null,
