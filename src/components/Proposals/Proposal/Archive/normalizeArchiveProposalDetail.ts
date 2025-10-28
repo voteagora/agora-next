@@ -176,6 +176,7 @@ export function normalizeArchiveStandardProposal(
     typeLabel: deriveTypeLabel(proposal),
     proposerEns,
     rawProposalType: proposal.proposal_type,
+    defaultProposalTypeRanges: proposal.default_proposal_type_ranges,
   };
 
   return {

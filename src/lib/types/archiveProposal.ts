@@ -72,7 +72,8 @@ export type ArchiveListProposal = {
   };
 
   // Proposal type - different formats for different sources
-  proposal_type: number | FixedProposalType | RangeProposalType;
+  proposal_type: number | FixedProposalType;
+  default_proposal_type_ranges?: RangeProposalType;
 
   // dao_node specific fields
   block_number?: string;

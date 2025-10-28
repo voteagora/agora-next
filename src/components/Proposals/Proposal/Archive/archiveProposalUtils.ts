@@ -95,13 +95,30 @@ const DEFAULT_QUORUM_PERCENT = 4;
 const DEFAULT_APPROVAL_THRESHOLD_PERCENT = 50;
 
 /**
- * Extract quorum and approval threshold from proposal type
+ * Extract quorum and approval threshold from proposal
+ * If default_proposal_type_ranges exists, the proposal is pending approval (use min values)
+ * Otherwise, use the fixed values from proposal_type
  * Returns percentages (0-100)
  */
 export const extractThresholds = (
-  proposalType: ArchiveListProposal["proposal_type"]
+  proposal: ArchiveListProposal
 ): { quorum: number; approvalThreshold: number } => {
-  // Handle FixedProposalType (eas-oodao)
+  const proposalType = proposal.proposal_type;
+  const defaultProposalTypeRanges = proposal.default_proposal_type_ranges;
+
+  // If default_proposal_type_ranges exists, proposal is pending approval - use min values
+  if (
+    defaultProposalTypeRanges &&
+    typeof defaultProposalTypeRanges === "object"
+  ) {
+    return {
+      quorum: defaultProposalTypeRanges.min_quorum_pct / 100,
+      approvalThreshold:
+        defaultProposalTypeRanges.min_approval_threshold_pct / 100,
+    };
+  }
+
+  // Handle FixedProposalType (eas-oodao) - proposal type is approved
   if (
     typeof proposalType === "object" &&
     proposalType !== null &&
@@ -110,18 +127,6 @@ export const extractThresholds = (
     return {
       quorum: proposalType.quorum / 100, // Convert basis points to percentage
       approvalThreshold: proposalType.approval_threshold / 100,
-    };
-  }
-
-  // Handle RangeProposalType (eas-oodao) - use min values
-  if (
-    typeof proposalType === "object" &&
-    proposalType !== null &&
-    "max_quorum_pct" in proposalType
-  ) {
-    return {
-      quorum: proposalType.max_quorum_pct / 100,
-      approvalThreshold: proposalType.max_approval_threshold_pct / 100,
     };
   }
 
@@ -175,8 +180,8 @@ export const deriveStatus = (
   const againstVotes = convertToNumber(voteTotals["0"], decimals);
   const abstainVotes = convertToNumber(voteTotals["2"], decimals);
 
-  // Extract thresholds from proposal type
-  const thresholds = extractThresholds(proposal.proposal_type);
+  // Extract thresholds from proposal
+  const thresholds = extractThresholds(proposal);
 
   // Calculate vote threshold percentage (for / (for + against))
   // Note: abstain is NOT included in threshold calculation, only for quorum
@@ -277,14 +282,6 @@ export const resolveArchiveThresholds = (proposal: ArchiveListProposal) => {
       return {
         quorum: safeBigInt(0),
         approvalThreshold: safeBigInt(0),
-      };
-    }
-
-    if ("max_quorum_pct" in type && "max_approval_threshold_pct" in type) {
-      // Use the maximum values provided
-      return {
-        quorum: safeBigInt(type.max_quorum_pct),
-        approvalThreshold: safeBigInt(type.max_approval_threshold_pct),
       };
     }
 

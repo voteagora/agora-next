@@ -34,6 +34,7 @@ export default function ArchiveProposalTypeApproval({
       archiveMetadata?: {
         source?: string;
         rawProposalType?: any;
+        defaultProposalTypeRanges?: any;
       };
     }
   ).archiveMetadata;
@@ -43,19 +44,25 @@ export default function ArchiveProposalTypeApproval({
     return null;
   }
 
-  const rawProposalType = archiveMetadata.rawProposalType as
-    | RangeProposalType
-    | undefined;
+  // Check for default_proposal_type_ranges (pending approval)
+  const defaultProposalTypeRanges =
+    archiveMetadata.defaultProposalTypeRanges as RangeProposalType | undefined;
 
-  // Only show for RangeProposalType (has min/max percentages)
-  if (!rawProposalType || !("min_quorum_pct" in rawProposalType)) {
+  // Only show if default_proposal_type_ranges exists (pending approval)
+  if (
+    !defaultProposalTypeRanges ||
+    typeof defaultProposalTypeRanges !== "object" ||
+    !("min_quorum_pct" in defaultProposalTypeRanges)
+  ) {
     return null;
   }
 
-  const minQuorum = rawProposalType.min_quorum_pct / 100;
-  const maxQuorum = rawProposalType.max_quorum_pct / 100;
-  const minApproval = rawProposalType.min_approval_threshold_pct / 100;
-  const maxApproval = rawProposalType.max_approval_threshold_pct / 100;
+  const minQuorum = defaultProposalTypeRanges.min_quorum_pct / 100;
+  const maxQuorum = defaultProposalTypeRanges.max_quorum_pct / 100;
+  const minApproval =
+    defaultProposalTypeRanges.min_approval_threshold_pct / 100;
+  const maxApproval =
+    defaultProposalTypeRanges.max_approval_threshold_pct / 100;
 
   // Calculate time remaining
   const endTime = proposal.endTime;
