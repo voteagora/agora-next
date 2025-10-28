@@ -104,7 +104,7 @@ export default function ProposalDescription({
             By {proposerBadge}
           </div>
           <div className="px-2 py-0.5 bg-black/10 rounded-[3px] text-neutral-700 text-xs font-semibold leading-4">
-            {typeBadgeLabel}
+            Standard
           </div>
         </div>
       )}

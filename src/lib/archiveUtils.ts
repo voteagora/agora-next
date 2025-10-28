@@ -6,6 +6,13 @@ import {
   getArchiveSlugForEasOodaoProposal,
 } from "./constants";
 
+const withCacheBust = (url: string) => {
+  const now = Math.floor(Date.now() / 1000);
+  const rounded = now - (now % 15);
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}t=${rounded}`;
+};
+
 /**
  * Parse NDJSON (Newline Delimited JSON) string to array of objects
  */
@@ -35,7 +42,7 @@ export async function fetchProposalsFromArchive(
   filter: string
 ): Promise<PaginatedResult<ArchiveListProposal[]>> {
   try {
-    const archiveUrl = getArchiveSlugAllProposals(namespace);
+    const archiveUrl = withCacheBust(getArchiveSlugAllProposals(namespace));
     const response = await fetch(archiveUrl, {
       cache: "no-store", // Disable caching for fresh data
     });
@@ -90,8 +97,8 @@ export const fetchProposalFromArchive = async (
       proposalId
     );
     const [responseDaoNode, responseEasOodao] = await Promise.all([
-      fetch(archiveDaoNodeUrl, { cache: "no-store" }),
-      fetch(archiveEasOodaoUrl, { cache: "no-store" }),
+      fetch(withCacheBust(archiveDaoNodeUrl), { cache: "no-store" }),
+      fetch(withCacheBust(archiveEasOodaoUrl), { cache: "no-store" }),
     ]);
 
     if (!responseDaoNode.ok && !responseEasOodao.ok) {
