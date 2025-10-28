@@ -47,7 +47,7 @@ export default function ArchiveProposalsList({
       (proposal) => !proposal.cancel_event && !proposal.delete_event
     );
   }, [filter, proposals]);
-  console.log("filteredProposals", filteredProposals);
+
   const sortedProposals = React.useMemo(() => {
     return [...filteredProposals].sort((a, b) => {
       const aBlock = Number(a.start_blocktime) || 0;
