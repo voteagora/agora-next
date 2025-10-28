@@ -120,8 +120,8 @@ export const extractThresholds = (
     "max_quorum_pct" in proposalType
   ) {
     return {
-      quorum: proposalType.min_quorum_pct / 100,
-      approvalThreshold: proposalType.min_approval_threshold_pct / 100,
+      quorum: proposalType.max_quorum_pct / 100,
+      approvalThreshold: proposalType.max_approval_threshold_pct / 100,
     };
   }
 
@@ -266,4 +266,57 @@ export const deriveTypeLabel = (proposal: ArchiveListProposal): string => {
   }
 
   return "Governance";
+};
+
+export const resolveArchiveThresholds = (proposal: ArchiveListProposal) => {
+  const source = proposal.data_eng_properties?.source;
+
+  const resolveFromEas = () => {
+    const type = proposal.proposal_type as any;
+    if (!type || typeof type !== "object") {
+      return {
+        quorum: safeBigInt(0),
+        approvalThreshold: safeBigInt(0),
+      };
+    }
+
+    if ("max_quorum_pct" in type && "max_approval_threshold_pct" in type) {
+      // Use the maximum values provided
+      return {
+        quorum: safeBigInt(type.max_quorum_pct),
+        approvalThreshold: safeBigInt(type.max_approval_threshold_pct),
+      };
+    }
+
+    return {
+      quorum: safeBigInt(type.quorum ?? 0),
+      approvalThreshold: safeBigInt(type.approval_threshold ?? 0),
+    };
+  };
+
+  const quotaValues =
+    source === "eas-oodao"
+      ? resolveFromEas()
+      : {
+          quorum: safeBigInt(proposal.quorum ?? proposal.quorumVotes ?? 0),
+          approvalThreshold: safeBigInt(proposal.approval_threshold ?? 0),
+        };
+
+  const totalVotingPowerRaw = safeBigInt(
+    proposal.total_voting_power_at_start ?? 0
+  );
+
+  let quorumValue = quotaValues.quorum / 100n;
+
+  if (source === "eas-oodao" && quorumValue > 0n && totalVotingPowerRaw > 0n) {
+    quorumValue = (totalVotingPowerRaw * quorumValue) / 100n;
+  }
+
+  const votableSupply = safeBigInt(proposal.total_voting_power_at_start ?? 0);
+
+  return {
+    quorum: quorumValue,
+    approvalThreshold: quotaValues.approvalThreshold,
+    votableSupply,
+  };
 };

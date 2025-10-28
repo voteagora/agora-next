@@ -6,6 +6,12 @@ import { formatDistanceToNow } from "date-fns";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type RangeProposalType = {
   min_quorum_pct: number;
@@ -98,8 +104,18 @@ export default function ArchiveProposalTypeApproval({
           {endTime && endTime > now && (
             <div className="flex items-center justify-between text-xs font-semibold text-secondary">
               <span className="inline-flex items-center gap-2">
-                <InformationCircleIcon className="h-4 w-4" />
                 Proposal type not yet approved
+                <TooltipProvider delayDuration={150}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <InformationCircleIcon className="h-4 w-4 cursor-pointer text-secondary hover:text-primary" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs text-xs text-secondary">
+                      This temp check still needs admin approval with proposal
+                      type before it can proceed to a governance proposal.
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </span>
               <span>{timeRemaining}</span>
             </div>

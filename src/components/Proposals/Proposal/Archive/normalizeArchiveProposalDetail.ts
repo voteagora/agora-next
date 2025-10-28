@@ -8,6 +8,7 @@ import {
   safeBigIntOrNull,
   formatArchiveTagLabel,
   deriveTypeLabel,
+  resolveArchiveThresholds,
 } from "./archiveProposalUtils";
 import { ARCHIVE_PROPOSAL_DEFAULTS } from "@/app/proposals/data/archiveDefaults";
 import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
@@ -79,27 +80,12 @@ export function normalizeArchiveStandardProposal(
   const againstVotes = safeBigInt(voteTotals["0"]);
   const abstainVotes = safeBigInt(voteTotals["2"]);
 
-  // For eas-oodao proposals, get quorum and approval threshold from proposal_type
-  const proposalType = proposal.proposal_type as
-    | { quorum?: number; approval_threshold?: number }
-    | undefined;
+  const {
+    quorum: quorumValue,
+    approvalThreshold: approvalThresholdValue,
+    votableSupply: votableSupplyValue,
+  } = resolveArchiveThresholds(proposal);
 
-  const quorumValue = safeBigInt(
-    source === "eas-oodao"
-      ? proposalType?.quorum
-      : (proposal.quorum ?? proposal.quorumVotes ?? 0)
-  );
-
-  const votableSupplyValue = safeBigInt(
-    proposal.votableSupply ?? proposal.votable_supply ?? 0
-  );
-
-  const approvalThresholdValue = safeBigInt(
-    source === "eas-oodao"
-      ? proposalType?.approval_threshold
-      : (proposal.approval_threshold ?? 0)
-  );
-  // console.log("proposal", proposal);
   const markdowntitle =
     typeof proposal.title === "string" && proposal.title.trim().length > 0
       ? proposal.title
