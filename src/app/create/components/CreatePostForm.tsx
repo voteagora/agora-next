@@ -72,7 +72,6 @@ export function CreatePostForm({
               {...register("title", { required: "Title is required" })}
               placeholder="Add new appchain to Syndicate"
               className="mt-2"
-              disabled={postType === "gov-proposal"}
             />
             {errors.title && (
               <p className="text-sm text-red-600 mt-1">
@@ -118,7 +117,6 @@ export function CreatePostForm({
                 label="Body"
                 name="description"
                 required={true}
-                disabled={postType === "gov-proposal"}
               />
             </div>
           </div>

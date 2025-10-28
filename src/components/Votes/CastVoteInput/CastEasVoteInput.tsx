@@ -9,6 +9,7 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
+import { CheckCircleIcon } from "@heroicons/react/20/solid";
 
 type VoteOption = "for" | "against" | "abstain" | null;
 
@@ -43,13 +44,13 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
     );
   }
 
-  if (!hasVotingPower) {
-    return (
-      <div className="flex flex-col justify-between py-3 px-3 border-line">
-        <DisabledVoteButton reason="You need voting power to vote" />
-      </div>
-    );
-  }
+  // if (!hasVotingPower) {
+  //   return (
+  //     <div className="flex flex-col justify-between py-3 px-3 border-line">
+  //       <DisabledVoteButton reason="You need voting power to vote" />
+  //     </div>
+  //   );
+  // }
 
   return <CastEasVoteInputContent proposal={proposal} />;
 }
@@ -92,7 +93,6 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
         proposalId: proposal.id,
       });
 
-      // Reset form on success
       setSelectedVote(null);
       setReason("");
       setIsSuccess(true);
@@ -107,9 +107,14 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
   if (isSuccess) {
     return (
       <div className="w-full rounded-lg border border-line bg-neutral p-4">
-        <div className="flex flex-col items-center gap-3 py-4">
-          <div className="text-positive text-lg font-semibold">
-            Vote submitted successfully!
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <CheckCircleIcon className="h-6 w-6 text-positive flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-primary">
+                Vote submitted successfully!
+              </p>
+            </div>
           </div>
         </div>
       </div>

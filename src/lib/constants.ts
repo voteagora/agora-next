@@ -215,36 +215,19 @@ export const getArchiveSlugGCSbucket = (namespace: string) => {
 };
 
 export const getArchiveSlugAllProposals = (namespace: string) => {
-  switch (namespace) {
-    case TENANT_NAMESPACES.SYNDICATE:
-      return `${ARCHIVE_GCS_BUCKET}/data/jeffdao/proposal_list.full.ndjson`;
-    default:
-      return `${getArchiveSlugGCSbucket(namespace)}/proposal_list.full.ndjson`;
-  }
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal_list.full.ndjson`;
 };
 
 export const getArchiveSlugForDaoNodeProposal = (
   namespace: string,
   proposalId: string
 ) => {
-  switch (namespace) {
-    case TENANT_NAMESPACES.SYNDICATE:
-      return `${ARCHIVE_GCS_BUCKET}/data/jeffdao/proposal/dao_node/raw/${proposalId}.json`;
-    default:
-      return `${getArchiveSlugGCSbucket(namespace)}/proposal/dao_node/raw/${proposalId}.json`;
-  }
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal/dao_node/raw/${proposalId}.json`;
 };
 
 export const getArchiveSlugForEasOodaoProposal = (
   namespace: string,
   proposalId: string
 ) => {
-  switch (namespace) {
-    case TENANT_NAMESPACES.SYNDICATE:
-      const url = `${ARCHIVE_GCS_BUCKET}/data/jeffdao/proposal/eas-oodao/raw/${proposalId}.json`;
-      console.log("url", url);
-      return url;
-    default:
-      return `${getArchiveSlugGCSbucket(namespace)}/proposal/eas-oodao/raw/${proposalId}.json`;
-  }
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal/eas-oodao/raw/${proposalId}.json`;
 };
