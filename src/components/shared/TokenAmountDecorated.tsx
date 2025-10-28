@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import React from "react";
 import TokenAmount from "./TokenAmount";
 import Tenant from "@/lib/tenant/tenant";
-const { token } = Tenant.current();
 
 type Props = {
   amount: string | bigint;
@@ -17,20 +16,23 @@ type Props = {
 
 export default function TokenAmountDecorated({
   amount,
-  decimals = token.decimals,
-  currency = token.symbol,
+  decimals,
+  currency,
   maximumSignificantDigits = 2,
   hideCurrency = false,
   icon,
   specialFormatting = false,
   className,
 }: Props) {
+  const { token } = Tenant.current();
+  const finalDecimals = decimals ?? token.decimals;
+  const finalCurrency = currency ?? token.symbol;
   return (
     <span className={cn(icon ? "flex items-center gap-1" : "", className)}>
       <TokenAmount
         amount={amount}
-        decimals={decimals}
-        currency={currency}
+        decimals={finalDecimals}
+        currency={finalCurrency}
         maximumSignificantDigits={maximumSignificantDigits}
         specialFormatting={specialFormatting}
         hideCurrency={hideCurrency}

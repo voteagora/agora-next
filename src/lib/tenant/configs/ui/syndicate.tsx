@@ -10,6 +10,8 @@ import syndicateInfoCard2 from "@/assets/tenant/syndicate_info_2.svg";
 import syndicateInfoCard3 from "@/assets/tenant/syndicate_info_3.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 
 export const syndicateTenantUIConfig = new TenantUI({
   title: "Syndicate Agora",
@@ -210,7 +212,7 @@ export const syndicateTenantUIConfig = new TenantUI({
   toggles: [
     {
       name: "delegates",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "delegates/edit",
@@ -218,7 +220,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "proposals",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "info",
@@ -234,11 +236,57 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "proposal-lifecycle",
-      enabled: false,
+      enabled: true,
+      config: {
+        stages: [
+          {
+            stage: PrismaProposalStage.DRAFTING,
+            order: 0,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.AWAITING_SUBMISSION,
+            order: 1,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.PENDING,
+            order: 2,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.QUEUED,
+            order: 3,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.EXECUTED,
+            order: 4,
+            isPreSubmission: false,
+          },
+        ],
+        proposalTypes: [
+          {
+            type: ProposalType?.BASIC,
+            prodAddress: null,
+            testnetAddress: null,
+          },
+        ],
+        copy: {
+          helperText: `
+                ## Proposal checklist
+- Make sure that you have simulated and review your transactions before seeking sponsorship.
+- Check your markdown previews to ensure you didn't break any links.
+- Review your description and make sure it's clear and concise.
+- Remember that everything lasts forever onchain, check your spelling and grammar and make this one count. You got this.
+`.trim(),
+        },
+        gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
+      },
     },
     {
       name: "use-archive-for-proposals",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "use-daonode-for-proposals",
@@ -262,7 +310,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "coming-soon",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "admin",
@@ -318,7 +366,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "easv2-govlessvoting",
-      enabled: false,
+      enabled: true,
     },
   ],
 });

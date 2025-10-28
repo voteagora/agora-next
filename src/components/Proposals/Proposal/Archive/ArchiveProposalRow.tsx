@@ -9,8 +9,8 @@ import ProposalTimeStatus from "../ProposalTimeStatus.jsx";
 import {
   ArchiveProposalDisplay,
   ArchiveProposalMetrics,
-  formatArchiveTagLabel,
 } from "./normalizeArchiveProposal";
+import { formatArchiveTagLabel } from "./archiveProposalUtils";
 import { OPStandardStatusView } from "../OPStandardProposalStatus";
 
 type ArchiveProposalRowProps = {
@@ -99,7 +99,7 @@ export default function ArchiveProposalRow({
             {/* Proposal type badge */}
             <div className="px-2 py-0.5 bg-black/10 rounded-[3px] flex justify-center items-center gap-0.5">
               <div className="text-neutral-700 text-xs font-semibold leading-4">
-                {proposal.typeLabel}
+                Standard
               </div>
             </div>
 

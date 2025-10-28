@@ -46,12 +46,13 @@ export function RelatedItemsSection({
     existingItemIds: items.map((item) => item.id),
   });
 
+  const isTempCheck = searchType === "tempcheck";
+  const hasTempCheck = isTempCheck && items.length > 0;
+
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <Label className="text-xs font-semibold text-secondary">
-          {label} (Optional)
-        </Label>
+        <Label className="text-xs font-semibold text-secondary">{label}</Label>
       </div>
 
       <div className="space-y-3">
@@ -101,16 +102,18 @@ export function RelatedItemsSection({
               variant="ghost"
               size="sm"
               onClick={() => onRemove(item.id)}
-              className="absolute top-0 right-0 h-6 w-6 p-0"
+              className="h-6 w-6 p-0 rounded-full border"
             >
               <X className="h-3.5 w-3.5" />
             </Button>
           </div>
         ))}
 
-        <Button variant="outline" onClick={openDialog} className="w-full">
-          + Add Reference
-        </Button>
+        {!hasTempCheck && (
+          <Button variant="outline" onClick={openDialog} className="w-full">
+            + Add Reference
+          </Button>
+        )}
       </div>
 
       <RelatedItemsDialog

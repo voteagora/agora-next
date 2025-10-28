@@ -9,6 +9,7 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import Tenant from "@/lib/tenant/tenant";
 import RelatedProposalLinks from "../RelatedProposalLinks/RelatedProposalLinks";
+import ENSName from "@/components/shared/ENSName";
 
 const { contracts } = Tenant.current();
 
@@ -55,11 +56,58 @@ export default function ProposalDescription({
   // @ts-ignore
   const options = proposal.proposalData?.options;
   const option = options?.[0];
+  const { ui } = Tenant.current();
+  const useArchiveForProposals =
+    ui.toggle("use-archive-for-proposals")?.enabled ?? false;
+  const archiveMetadata = useArchiveForProposals
+    ? ((
+        proposal as unknown as {
+          archiveMetadata?: {
+            tagLabel?: string;
+            typeLabel?: string;
+            source?: string;
+            proposerEns?: string;
+          };
+        }
+      ).archiveMetadata ?? null)
+    : null;
+
+  const tagLabel = archiveMetadata
+    ? archiveMetadata.tagLabel ||
+      (archiveMetadata.source === "eas-oodao" ? "Temp Check" : "Gov Proposal")
+    : null;
+
+  const tagBadgeLabel = tagLabel
+    ? `${archiveMetadata?.source === "eas-oodao" ? "🌡️" : "⚖️️"} ${tagLabel}`
+    : null;
+
+  const proposerBadge = archiveMetadata?.proposerEns ? (
+    archiveMetadata.proposerEns
+  ) : (
+    <ENSName address={proposal.proposer} />
+  );
+
+  const typeBadgeLabel = archiveMetadata?.typeLabel ?? "Governance";
 
   return (
     <div
       className={`flex flex-col gap-4 sm:max-w-[48rem] w-full md:min-w-[20rem] lg:min-w-[32rem] xl:min-w-[48rem] max-w-[calc(100vw-2rem)]`}
     >
+      {archiveMetadata && (
+        <div className="inline-flex justify-start items-center gap-2 flex-wrap">
+          {tagBadgeLabel && (
+            <div className="px-2 py-0.5 bg-black/10 rounded-[3px] text-neutral-700 text-xs font-semibold leading-4">
+              {tagBadgeLabel}
+            </div>
+          )}
+          <div className="px-2 py-0.5 bg-black/10 rounded-[3px] text-neutral-700 text-xs font-semibold leading-4">
+            By {proposerBadge}
+          </div>
+          <div className="px-2 py-0.5 bg-black/10 rounded-[3px] text-neutral-700 text-xs font-semibold leading-4">
+            Standard
+          </div>
+        </div>
+      )}
       <ProposalTitle title={shortTitle} proposal={proposal} />
       {proposal.proposalType?.includes("HYBRID") && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

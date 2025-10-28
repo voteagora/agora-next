@@ -5,6 +5,7 @@ import { getForumTopics } from "@/lib/actions/forum";
 import { transformForumTopics } from "@/lib/forumUtils";
 import { RelatedItem } from "../types";
 import { buildForumTopicPath } from "@/lib/forumUtils";
+import { getArchivedProposals } from "@/lib/actions/archive";
 
 interface UseRelatedItemsDialogProps {
   searchType: "forum" | "tempcheck";
@@ -33,9 +34,18 @@ export function useRelatedItemsDialog({
       return transformForumTopics(result.data);
     },
     enabled: isOpen && searchType === "forum",
-    staleTime: 30 * 1000,
-    gcTime: 5 * 60 * 1000,
   });
+
+  const { data: tempCheckProposals = [], isLoading: isLoadingTempChecks } =
+    useQuery({
+      queryKey: ["tempCheckProposals"],
+      queryFn: async () => {
+        const result = await getArchivedProposals("temp-checks");
+        if (!result.success) return [];
+        return result.data || [];
+      },
+      enabled: isOpen && searchType === "tempcheck",
+    });
 
   useEffect(() => {
     if (debounceTimer.current) {
@@ -85,10 +95,43 @@ export function useRelatedItemsDialog({
       }));
 
       return { results, totalResults, totalPages };
+    } else if (searchType === "tempcheck") {
+      if (!tempCheckProposals.length)
+        return { results: [], totalResults: 0, totalPages: 0 };
+
+      const filtered = tempCheckProposals.filter((proposal) => {
+        if (!debouncedSearchTerm) return true;
+        const searchLower = debouncedSearchTerm.toLowerCase();
+        return (
+          proposal.title.toLowerCase().includes(searchLower) ||
+          proposal.description?.toLowerCase().includes(searchLower)
+        );
+      });
+
+      const totalResults = filtered.length;
+      const totalPages = Math.ceil(totalResults / ITEMS_PER_PAGE);
+      const startIdx = (page - 1) * ITEMS_PER_PAGE;
+      const endIdx = startIdx + ITEMS_PER_PAGE;
+
+      const results = filtered.slice(startIdx, endIdx).map((proposal) => ({
+        id: proposal.id,
+        title: proposal.title,
+        description: proposal.description || "",
+        comments: 0,
+        timestamp: formatDistanceToNow(
+          new Date(proposal.start_blocktime * 1000),
+          {
+            addSuffix: true,
+          }
+        ),
+        url: `/proposals/${proposal.id}`,
+      }));
+
+      return { results, totalResults, totalPages };
     } else {
       return { results: [], totalResults: 0, totalPages: 0 };
     }
-  }, [searchType, topics, debouncedSearchTerm, page]);
+  }, [searchType, topics, tempCheckProposals, debouncedSearchTerm, page]);
 
   const handleSelect = useCallback(
     (item: RelatedItem) => {
@@ -126,7 +169,7 @@ export function useRelatedItemsDialog({
     isOpen,
     searchTerm,
     results,
-    isLoading: isLoadingTopics,
+    isLoading: isLoadingTopics || isLoadingTempChecks,
     openDialog,
     closeDialog,
     setSearchTerm,

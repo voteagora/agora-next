@@ -20,7 +20,6 @@ export function useEASV2() {
 
   const createProposalMutation = useMutation({
     mutationFn: async ({
-      proposal_id,
       title,
       description,
       startts,
@@ -28,7 +27,6 @@ export function useEASV2() {
       tags,
       proposal_type_uid,
     }: {
-      proposal_id: bigint;
       title: string;
       description: string;
       startts: bigint;
@@ -41,7 +39,6 @@ export function useEASV2() {
       }
       const signer = await getSigner();
       const result = await createV2CreateProposalAttestation({
-        proposal_id,
         title,
         description,
         startts,

@@ -31,16 +31,6 @@ export function RelatedItemsCard({
 
   return (
     <Card className="relative">
-      {hasSelectedItems && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onRemoveCard}
-          className="absolute -top-2 -right-2 h-6 w-6 p-0 z-10 rounded-full border bg-white hover:bg-gray-100"
-        >
-          <X className="h-3.5 w-3.5" />
-        </Button>
-      )}
       <CardContent className="mt-4">
         <div className="space-y-6">
           <RelatedItemsSection

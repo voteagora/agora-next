@@ -50,8 +50,8 @@ export default function ArchiveProposalsList({
 
   const sortedProposals = React.useMemo(() => {
     return [...filteredProposals].sort((a, b) => {
-      const aBlock = Number(a.start_block) || 0;
-      const bBlock = Number(b.start_block) || 0;
+      const aBlock = Number(a.start_blocktime) || 0;
+      const bBlock = Number(b.start_blocktime) || 0;
       return bBlock - aBlock;
     });
   }, [filteredProposals]);

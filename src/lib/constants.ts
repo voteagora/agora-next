@@ -206,19 +206,28 @@ export const ADMIN_TYPES: Record<string, string> = {
 };
 
 export const ARCHIVE_GCS_BUCKET =
-  process.env.NEXT_PUBLIC_AGORA_ENV === "prd"
-    ? "https://storage.googleapis.com/cpls-usmr-prd-25q3"
+  process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+    ? "https://storage.googleapis.com/cpls-usmr-prd-25q4"
     : "https://storage.googleapis.com/cpls-usmr-dev-25q3";
 
 export const getArchiveSlugGCSbucket = (namespace: string) => {
-  switch (namespace) {
-    case TENANT_NAMESPACES.SYNDICATE:
-      return `${ARCHIVE_GCS_BUCKET}/data/jeffdao`;
-    default:
-      return `${ARCHIVE_GCS_BUCKET}/data/${namespace}`;
-  }
+  return `${ARCHIVE_GCS_BUCKET}/data/${namespace}`;
 };
 
 export const getArchiveSlugAllProposals = (namespace: string) => {
   return `${getArchiveSlugGCSbucket(namespace)}/proposal_list.full.ndjson`;
+};
+
+export const getArchiveSlugForDaoNodeProposal = (
+  namespace: string,
+  proposalId: string
+) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal/dao_node/raw/${proposalId}.json`;
+};
+
+export const getArchiveSlugForEasOodaoProposal = (
+  namespace: string,
+  proposalId: string
+) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal/eas-oodao/raw/${proposalId}.json`;
 };

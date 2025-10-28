@@ -3,13 +3,14 @@
  */
 
 export type ArchiveProposalEvent = {
-  block_number: string;
-  transaction_index: number;
-  log_index: number;
-  id: string;
-  timestamp: number;
+  block_number?: string;
+  transaction_index?: number;
+  log_index?: number;
+  id?: string;
+  timestamp?: number;
   blocktime?: number;
   eta?: number;
+  transaction_hash?: string;
 };
 
 export type ArchiveProposalDeleteEvent = {
@@ -71,7 +72,8 @@ export type ArchiveListProposal = {
   };
 
   // Proposal type - different formats for different sources
-  proposal_type: number | FixedProposalType | RangeProposalType;
+  proposal_type: number | FixedProposalType;
+  default_proposal_type_ranges?: RangeProposalType;
 
   // dao_node specific fields
   block_number?: string;
@@ -81,7 +83,22 @@ export type ArchiveListProposal = {
   values?: number[];
   signatures?: string[];
   calldatas?: string[];
+  description?: string;
   voting_module_name?: string;
+  decoded_proposal_data?: {
+    functionArgsName?: {
+      functionName: string;
+      functionArgs: string[];
+    }[];
+  };
+  proposal_data?: string;
+  quorum?: string | number;
+  quorumVotes?: string | number;
+  votableSupply?: string | number;
+  votable_supply?: string | number;
+  approval_threshold?: string | number;
+  blocktime?: number;
+  created_event?: ArchiveProposalEvent;
   queue_event?: ArchiveProposalEvent;
   execute_event?: ArchiveProposalEvent;
   cancel_event?: ArchiveProposalEvent;

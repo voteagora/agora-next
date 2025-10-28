@@ -18,7 +18,7 @@ const CREATE_PROPOSAL_SCHEMA_ID =
 
 const EAS_V2_SCHEMA_IDS = {
   CREATE_PROPOSAL:
-    "0x12e8600c9bb57b5b436fa09735cfc63e95098552122001c465b610261eea8a93",
+    "0x442d586d8424b5485de1ff46cb235dcb96b41d19834926bbad1cd157fbeeb8fc",
 };
 
 const schemaEncoder = new SchemaEncoder(
@@ -27,8 +27,8 @@ const schemaEncoder = new SchemaEncoder(
 
 const eas =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? new EAS("0x4200000000000000000000000000000000000021")
-    : new EAS("0x4200000000000000000000000000000000000021");
+    ? new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e")
+    : new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e");
 
 const easV2 = new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e");
 
@@ -207,12 +207,11 @@ export const signDelegatedAttestation = async ({
 // Schema encoders for EAS v2 attestations
 const v2SchemaEncoders = {
   CREATE_PROPOSAL: new SchemaEncoder(
-    "uint256 proposal_id,string title,string description,uint64 startts,uint64 endts,string tags"
+    "string title,string description,uint64 startts,uint64 endts,string tags"
   ),
 };
 
 export async function createV2CreateProposalAttestation({
-  proposal_id,
   title,
   description,
   startts,
@@ -221,7 +220,6 @@ export async function createV2CreateProposalAttestation({
   proposal_type_uid,
   signer,
 }: {
-  proposal_id: bigint;
   title: string;
   description: string;
   startts: bigint;
@@ -233,7 +231,6 @@ export async function createV2CreateProposalAttestation({
   easV2.connect(signer as any);
 
   const encodedData = v2SchemaEncoders.CREATE_PROPOSAL.encodeData([
-    { name: "proposal_id", value: proposal_id, type: "uint256" },
     { name: "title", value: title, type: "string" },
     { name: "description", value: description, type: "string" },
     { name: "startts", value: startts, type: "uint64" },
@@ -257,5 +254,59 @@ export async function createV2CreateProposalAttestation({
   const receipt = await txResponse.wait();
   return { transactionHash: receipt };
 }
-
 export { EAS_V2_SCHEMA_IDS };
+
+const VOTE_SCHEMA_ID =
+  "0x2b0e624e00310c7e88a1b7840238e285152b38ab00160b14c0d4e54e0a53a3aa";
+
+const voteSchemaEncoder = new SchemaEncoder("int8 choice,string reason");
+
+export async function createVoteAttestation({
+  choice,
+  reason,
+  signer,
+  proposalId,
+}: {
+  choice: number; // 0 = against, 1 = for, 2 = abstain
+  reason: string;
+  signer: JsonRpcSigner;
+  proposalId: string;
+}) {
+  eas.connect(signer as any);
+
+  const encodedData = voteSchemaEncoder.encodeData([
+    { name: "choice", value: choice, type: "int8" },
+    { name: "reason", value: reason, type: "string" },
+  ]);
+
+  const recipient =
+    contracts.easRecipient || "0x0000000000000000000000000000000000000000";
+  const expirationTime = NO_EXPIRATION;
+  const revocable = false;
+
+  const txResponse = await eas.attest({
+    schema: VOTE_SCHEMA_ID,
+    data: {
+      recipient,
+      expirationTime,
+      revocable,
+      refUID: proposalId,
+      data: encodedData,
+      value: 0n,
+    },
+  });
+
+  const receipt = await txResponse.wait();
+
+  if (!receipt) {
+    console.error(
+      "Transaction failed or was not mined. Full response:",
+      receipt
+    );
+    throw new Error("Transaction failed or was not mined.");
+  }
+
+  return {
+    transactionHash: receipt,
+  };
+}

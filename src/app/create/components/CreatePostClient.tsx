@@ -3,10 +3,8 @@
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
-import { keccak256, toUtf8Bytes } from "ethers";
 import { useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
-import { defaultAbiCoder } from "@ethersproject/abi";
 import Tenant from "@/lib/tenant/tenant";
 import { useEASV2 } from "@/hooks/useEASV2";
 import { useForum } from "@/hooks/useForum";
@@ -27,15 +25,6 @@ import {
   CreatePostFormData,
   RelatedItem,
 } from "../types";
-
-// Default proposal type fallback
-const defaultProposalType: ProposalType = {
-  id: "none",
-  name: "None",
-  description: "No proposal type created yet",
-  quorum: 0,
-  approvalThreshold: 0,
-};
 
 interface CreatePostClientProps {
   initialPostType: PostType;
@@ -103,25 +92,11 @@ export function CreatePostClient({
       ) {
         if (!isEASV2Enabled) return;
 
-        const proposalId = BigInt(
-          keccak256(
-            defaultAbiCoder.encode(
-              ["bytes32", "bytes32", "bytes32"],
-              [
-                keccak256(toUtf8Bytes(slug)),
-                keccak256(toUtf8Bytes(data.description)),
-                keccak256(toUtf8Bytes(Date.now().toString())),
-              ]
-            ) as `0x${string}`
-          )
-        );
-
         const votingPeriodSeconds =
           daoSettings?.votingPeriod || 7 * 24 * 60 * 60;
         const votingDelaySeconds = daoSettings?.votingDelay || 0;
 
         const proposal = await createProposal({
-          proposal_id: proposalId,
           title: data.title,
           description: data.description,
           startts: BigInt(Math.floor(Date.now() / 1000) + votingDelaySeconds),

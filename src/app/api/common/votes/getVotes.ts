@@ -3,7 +3,7 @@ import {
   paginateResult,
   PaginationParams,
 } from "@/app/lib/pagination";
-import { parseProposalData } from "@/lib/proposalUtils";
+import { ParsedProposalData, parseProposalData } from "@/lib/proposalUtils";
 import { parseSnapshotVote, parseVote } from "@/lib/voteUtils";
 import { cache } from "react";
 import {
@@ -23,6 +23,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
+import { ProposalType } from "@/lib/types";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -599,10 +600,16 @@ async function getVotesForProposal({
         };
       }
 
-      const proposalData = parseProposalData(
-        JSON.stringify(votes[0]?.proposal_data || {}),
-        votes[0]?.proposal_type
-      );
+      let proposalData: ParsedProposalData[ProposalType] | undefined =
+        undefined;
+      try {
+        proposalData = parseProposalData(
+          JSON.stringify(votes[0]?.proposal_data || {}),
+          votes[0]?.proposal_type
+        );
+      } catch (error) {
+        console.error("Error parsing proposal data", error);
+      }
 
       const data = await Promise.all(
         votes.map((vote) => parseVote(vote, proposalData, latestBlock))
