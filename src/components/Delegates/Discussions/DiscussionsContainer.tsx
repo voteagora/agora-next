@@ -104,22 +104,25 @@ const DiscussionsContainer = ({
 
   if (!hasContent) {
     return (
-      <div className="p-8 text-center text-secondary align-middle bg-wash border border-line rounded-xl shadow-newDefault">
-        No discussions found.
+      <div className="flex flex-col gap-2">
+        <h2 className="text-2xl font-bold text-primary">Discussions</h2>
+        <div className="p-8 text-center text-secondary align-middle bg-wash border border-line rounded-xl shadow-newDefault">
+          No discussions found.
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <h3 className="text-lg font-semibold text-foreground">Discussions</h3>
-
+    <div className="flex flex-col gap-2">
+      <h2 className="text-2xl font-bold text-primary">Discussions</h2>
+      <div className="flex flex-col gap-6 p-6 bg-neutral border border-line rounded-xl shadow-newDefault">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="topics">
+          <TabsTrigger value="topics" className="data-[state=inactive]:text-tertiary">
             Topics Created ({topics.length})
           </TabsTrigger>
-          <TabsTrigger value="posts">Recent Posts ({posts.length})</TabsTrigger>
+          <TabsTrigger value="posts" className="data-[state=inactive]:text-tertiary">Recent Posts ({posts.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="topics" className="space-y-4">
@@ -180,7 +183,7 @@ const DiscussionsContainer = ({
               ))}
             </InfiniteScroll>
           ) : (
-            <div className="p-8 text-center text-secondary align-middle bg-wash border border-line rounded-xl">
+            <div className="p-8 text-center text-secondary align-middle bg-wash border border-line rounded-xl shadow-newDefault">
               No topics created yet.
             </div>
           )}
@@ -243,12 +246,13 @@ const DiscussionsContainer = ({
               ))}
             </InfiniteScroll>
           ) : (
-            <div className="p-8 text-center text-secondary align-middle bg-wash border border-line rounded-xl">
+            <div className="p-8 text-center text-secondary align-middle bg-wash border border-line rounded-xl shadow-newDefault">
               No posts made yet.
             </div>
           )}
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 };

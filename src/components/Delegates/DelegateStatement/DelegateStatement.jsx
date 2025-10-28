@@ -23,7 +23,7 @@ export default function DelegateStatement({ statement }) {
   return (
     <div className="flex flex-col gap-2">
       <h2 className="text-2xl font-bold text-primary">Delegate Statement</h2>
-      <div className="relative p-4 text-secondary bg-wash rounded-xl shadow-newDefault border border-line">
+      <div className="relative p-4 text-secondary bg-neutral rounded-xl shadow-newDefault border border-line">
         <div
           ref={contentRef}
           className={`overflow-hidden transition-all duration-300 ${
@@ -40,7 +40,7 @@ export default function DelegateStatement({ statement }) {
 
         {/* Gradient overlay when collapsed */}
         {shouldShowButton && !isExpanded && (
-          <div className="absolute bottom-10 left-0 right-0 h-24 bg-gradient-to-t from-wash to-transparent pointer-events-none" />
+          <div className="absolute bottom-10 left-0 right-0 h-24 bg-gradient-to-t from-neutral to-transparent pointer-events-none" />
         )}
 
         {/* Expand/Collapse button */}

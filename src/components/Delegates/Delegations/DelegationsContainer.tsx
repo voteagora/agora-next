@@ -92,16 +92,16 @@ function DelegationsContainer({
       >
         <div className="flex flex-row items-center justify-between">
           <TabsList>
-            <TabsTrigger className="text-2xl" value="delegatedFrom">
+            <TabsTrigger className="text-2xl data-[state=inactive]:text-tertiary" value="delegatedFrom">
               Delegated from
             </TabsTrigger>
-            <TabsTrigger className="text-2xl" value="delegatedTo">
+            <TabsTrigger className="text-2xl data-[state=inactive]:text-tertiary" value="delegatedTo">
               Delegated to
             </TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="delegatedFrom" className="max-w-full">
-          <div className="flex flex-col gap-3 border border-line shadow-sm rounded-xl overflow-auto max-h-[500px] bg-wash">
+          <div className="flex flex-col gap-3 border border-line shadow-sm rounded-xl overflow-auto max-h-[500px] bg-neutral">
             <div className="w-full overflow-x-auto">
               <div className="min-w-[600px]">
                 <Table className="min-w-full">
@@ -155,7 +155,7 @@ function DelegationsContainer({
           </div>
         </TabsContent>
         <TabsContent value="delegatedTo">
-          <div className="flex flex-col gap-3 border border-line shadow-sm rounded-xl overflow-auto max-h-[500px]">
+          <div className="flex flex-col gap-3 border border-line shadow-sm rounded-xl overflow-auto max-h-[500px] bg-neutral">
             <Table>
               <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
                 <TableRow>
