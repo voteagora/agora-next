@@ -456,7 +456,8 @@ async function getProposalTypes() {
 
     const configuratorContract = contracts.proposalTypesConfigurator;
 
-    const easV2GovlessVotingEnabled = ui.toggle("easv2-govlessvoting")?.enabled ?? false;
+    const easV2GovlessVotingEnabled =
+      ui.toggle("easv2-govlessvoting")?.enabled ?? false;
 
     if (!configuratorContract) {
       return [];
@@ -482,7 +483,11 @@ async function getProposalTypes() {
       const contractExists =
         configuratorContract.address !==
         "0x0000000000000000000000000000000000000000";
-      const contractToUse = easV2GovlessVotingEnabled ? contracts.governor.address : (contractExists ? configuratorContract.address : undefined);
+      const contractToUse = easV2GovlessVotingEnabled
+        ? contracts.governor.address
+        : contractExists
+          ? configuratorContract.address
+          : undefined;
       types = await findProposalType({
         namespace,
         contract: contractToUse,
