@@ -24,6 +24,8 @@ import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
 import { ProposalType } from "@/lib/types";
+import { fetchProposalFromArchive } from "@/lib/archiveUtils";
+import { isArchiveStandardProposal, normalizeArchiveStandardProposal } from "@/components/Proposals/Proposal/Archive/normalizeArchiveProposalDetail";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -141,9 +143,64 @@ async function getVotesForDelegateForAddress({
       };
     }
 
+    const useArchive = ui.toggle("use-archive-for-proposals")?.enabled;
     const latestBlock = ui.toggle("use-l1-block-number")?.enabled
       ? await contracts.providerForTime?.getBlock("latest")
       : await contracts.token.provider.getBlock("latest");
+
+    // If using archive, fetch proposal data from archive for votes that don't have proposal_data
+    if (useArchive) {
+      const votesWithoutProposalData = votes.filter(
+        (vote) => !vote.proposal_data
+      );
+      const uniqueProposalIds = [
+        ...new Set(votesWithoutProposalData.map((v) => v.proposal_id)),
+      ];
+
+      // Fetch archive data for missing proposals
+      const archiveProposalsMap = new Map();
+      for (const proposalId of uniqueProposalIds) {
+        try {
+          const archiveProposal = await fetchProposalFromArchive(
+            namespace,
+            proposalId
+          );
+          if (
+            archiveProposal &&
+            isArchiveStandardProposal(archiveProposal)
+          ) {
+            archiveProposalsMap.set(proposalId, archiveProposal);
+          }
+        } catch (error) {
+          console.error(
+            `Failed to fetch archive proposal ${proposalId}:`,
+            error
+          );
+        }
+      }
+
+      // Merge archive proposal data into votes
+      for (const vote of votes) {
+        if (!vote.proposal_data) {
+          const archiveProposal = archiveProposalsMap.get(vote.proposal_id);
+          if (archiveProposal) {
+            const normalized = normalizeArchiveStandardProposal(
+              archiveProposal,
+              {
+                namespace,
+                tokenDecimals: Tenant.current().token.decimals,
+              }
+            );
+            vote.proposal_data = {
+              description: normalized.description || "",
+              proposalData: normalized.proposalData,
+            } as any;
+            vote.proposal_type = normalized.proposalType;
+            vote.description = normalized.markdowntitle || "";
+          }
+        }
+      }
+    }
 
     const data = await Promise.all(
       votes
