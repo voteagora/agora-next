@@ -12,11 +12,22 @@ interface RelatedProposalLinksProps {
   proposalId: string;
 }
 
-function getHeaderText(type: string, metadata?: any) {
+function getHeaderText(type: string, relationship: "source" | "target") {
   if (type === "forum_topic") {
-    return "Related Discussion";
+    return relationship === "target" 
+      ? "Related Discussion" 
+      : "Referenced in Discussion";
   }
-  return "Related Temp check";
+  
+  if (type === "tempcheck") {
+    return relationship === "target" 
+      ? "Related Temp check" 
+      : "Referenced in Temp check";
+  }
+  
+  return relationship === "target" 
+    ? "Related Proposal" 
+    : "Referenced in Proposal";
 }
 
 function RelatedLinkCard({
@@ -28,6 +39,7 @@ function RelatedLinkCard({
     title: string;
     description: string;
     createdAt: string;
+    relationship: "source" | "target";
     metadata?: {
       commentsCount?: number;
       category?: string;
@@ -36,8 +48,9 @@ function RelatedLinkCard({
   };
 }) {
   const { ui } = Tenant.current();
-  const headerText = getHeaderText(link.type, link.metadata);
-  const isTempCheck = headerText === "Related Temp check";
+  const headerText = getHeaderText(link.type, link.relationship);
+  const isTempCheck = link.type === "tempcheck";
+  const isForumTopic = link.type === "forum_topic";
 
   let linkUrl = "#";
   if (link.type === "forum_topic") {
@@ -82,7 +95,7 @@ function RelatedLinkCard({
             </Link>
 
             <div className="flex items-center gap-3 text-xs font-semibold text-secondary flex-shrink-0">
-              {!isTempCheck && link.metadata?.commentsCount !== undefined && (
+              {isForumTopic && link.metadata?.commentsCount !== undefined && (
                 <div className="inline-flex items-center gap-1.5">
                   <MessageCircle className="w-3.5 h-3.5" strokeWidth={1.7} />
                   <span>{link.metadata.commentsCount}</span>

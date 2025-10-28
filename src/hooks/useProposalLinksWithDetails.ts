@@ -8,6 +8,7 @@ interface LinkedItemDetails {
   title: string;
   description: string;
   createdAt: string;
+  relationship: "source" | "target";
   metadata?: {
     commentsCount?: number;
     category?: string;
@@ -19,10 +20,14 @@ export function useProposalLinksWithDetails(targetId: string) {
   const { ui } = Tenant.current();
   const isEnabled = ui.toggle("easv2-govlessvoting")?.enabled;
 
+  console.log("isEnabled", isEnabled);
+  console.log("targetId", targetId);
+
   const query = useQuery({
     queryKey: ["proposalLinksWithDetails", targetId],
     queryFn: async () => {
       const result = await getProposalLinksWithDetails(targetId);
+      console.log("result", result);
       if (!result.success) {
         throw new Error(result.error || "Failed to fetch proposal links");
       }

@@ -44,7 +44,7 @@ export function CreatePostClient({
   const { address } = useAccount();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { ui, slug, contracts } = Tenant.current();
+  const { ui, contracts } = Tenant.current();
   const { createProposal } = useEASV2();
   const { createTopic } = useForum();
   const { categories } = useForumCategories();
