@@ -241,6 +241,10 @@ export const formatArchiveTagLabel = (tag?: string | null): string | null => {
     return "Temp Check";
   }
 
+  if (normalized === "gov-proposal" || normalized === "govproposal") {
+    return "Gov Proposal";
+  }
+
   return tag;
 };
 

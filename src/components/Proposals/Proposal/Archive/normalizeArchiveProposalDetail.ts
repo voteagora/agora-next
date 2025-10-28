@@ -120,10 +120,7 @@ export function normalizeArchiveStandardProposal(
       ? proposal.proposer_ens
       : proposal.proposer_ens?.detail;
   const rawTag = Array.isArray(proposal.tags) ? proposal.tags[0] : undefined;
-  const formattedTag =
-    formatArchiveTagLabel(rawTag) ??
-    rawTag ??
-    (source === "eas-oodao" ? "Temp Check" : "Gov Proposal");
+  const formattedTag = formatArchiveTagLabel(rawTag);
 
   const normalizedProposal: Proposal = {
     id: String(proposal.id),
