@@ -19,6 +19,10 @@ import { ProposalSettingsCard } from "./ProposalSettingsCard";
 import { CommunityGuidelinesCard } from "./CommunityGuidelinesCard";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import {
+  canCreateTempCheck as canCreateTempCheckUtil,
+  canCreateGovernanceProposal as canCreateGovernanceProposalUtil,
+} from "@/lib/forumPermissionUtils";
+import {
   PostType,
   postTypeOptions,
   ProposalType,
@@ -61,9 +65,11 @@ export function CreatePostClient({
   const isEASV2Enabled = ui.toggle("easv2-govlessvoting")?.enabled;
 
   const relatedTempChecks = form.watch("relatedTempChecks") || [];
-  const canCreateTempCheck = permissions.canCreateTopic;
-  const canCreateGovernanceProposal =
-    permissions.canCreateTopic && relatedTempChecks.length > 0;
+  const canCreateTempCheck = canCreateTempCheckUtil(permissions);
+  const canCreateGovernanceProposal = canCreateGovernanceProposalUtil(
+    permissions,
+    relatedTempChecks.length > 0
+  );
   const currentVP = parseInt(permissions.currentVP) || 0;
   const requiredVP = permissions.settings?.minVpForProposals || 0;
   const isAdmin = permissions.isAdmin;
