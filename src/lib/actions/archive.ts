@@ -1,6 +1,9 @@
 "use server";
 
-import { fetchProposalsFromArchive, fetchProposalFromArchive } from "@/lib/archiveUtils";
+import {
+  fetchProposalsFromArchive,
+  fetchProposalFromArchive,
+} from "@/lib/archiveUtils";
 import Tenant from "@/lib/tenant/tenant";
 
 const { namespace } = Tenant.current();

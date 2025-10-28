@@ -14,19 +14,19 @@ interface RelatedProposalLinksProps {
 
 function getHeaderText(type: string, relationship: "source" | "target") {
   if (type === "forum_topic") {
-    return relationship === "target" 
-      ? "Related Discussion" 
+    return relationship === "target"
+      ? "Related Discussion"
       : "Referenced in Discussion";
   }
-  
+
   if (type === "tempcheck") {
-    return relationship === "target" 
-      ? "Related Temp check" 
+    return relationship === "target"
+      ? "Related Temp check"
       : "Referenced in Temp check";
   }
-  
-  return relationship === "target" 
-    ? "Related Proposal" 
+
+  return relationship === "target"
+    ? "Related Proposal"
     : "Referenced in Proposal";
 }
 

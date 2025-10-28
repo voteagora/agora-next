@@ -49,13 +49,18 @@ export default function ArchiveProposalTypeApproval({
   const defaultProposalTypeRanges =
     archiveMetadata.defaultProposalTypeRanges as RangeProposalType | undefined;
 
-
-  const minQuorum = defaultProposalTypeRanges ? defaultProposalTypeRanges.min_quorum_pct / 100 : null;
-  const maxQuorum = defaultProposalTypeRanges ? defaultProposalTypeRanges.max_quorum_pct / 100 : null;
-  const minApproval =
-    defaultProposalTypeRanges ? defaultProposalTypeRanges.min_approval_threshold_pct / 100 : null;
-  const maxApproval =
-    defaultProposalTypeRanges ? defaultProposalTypeRanges.max_approval_threshold_pct / 100 : null;
+  const minQuorum = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.min_quorum_pct / 100
+    : null;
+  const maxQuorum = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.max_quorum_pct / 100
+    : null;
+  const minApproval = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.min_approval_threshold_pct / 100
+    : null;
+  const maxApproval = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.max_approval_threshold_pct / 100
+    : null;
 
   // Calculate time remaining
   const endTime = proposal.endTime;
@@ -83,7 +88,13 @@ export default function ArchiveProposalTypeApproval({
   };
   const now = new Date();
 
-  if (!showCreateButton && !minQuorum && !maxQuorum && !minApproval && !maxApproval) {
+  if (
+    !showCreateButton &&
+    !minQuorum &&
+    !maxQuorum &&
+    !minApproval &&
+    !maxApproval
+  ) {
     return null;
   }
 

@@ -27,11 +27,18 @@ export async function getProposalLinksWithDetails(proposalId: string) {
     ]);
 
     if (!asTargetResult.success && !asSourceResult.success) {
-      return { success: false, error: asTargetResult.error || asSourceResult.error };
+      return {
+        success: false,
+        error: asTargetResult.error || asSourceResult.error,
+      };
     }
 
-    const asTargetLinks = asTargetResult.success ? asTargetResult.links || [] : [];
-    const asSourceLinks = asSourceResult.success ? asSourceResult.links || [] : [];
+    const asTargetLinks = asTargetResult.success
+      ? asTargetResult.links || []
+      : [];
+    const asSourceLinks = asSourceResult.success
+      ? asSourceResult.links || []
+      : [];
 
     const fetchItemDetails = async (itemId: string, itemType: string) => {
       if (itemType === "forum_topic") {
@@ -74,10 +81,18 @@ export async function getProposalLinksWithDetails(proposalId: string) {
     const targetLinksWithDetails = await Promise.all(
       asTargetLinks.map(async (link) => {
         try {
-          const details = await fetchItemDetails(link.sourceId, link.sourceType);
-          return details ? { ...details, relationship: "target" as const } : null;
+          const details = await fetchItemDetails(
+            link.sourceId,
+            link.sourceType
+          );
+          return details
+            ? { ...details, relationship: "target" as const }
+            : null;
         } catch (error) {
-          console.error(`Error fetching source details for link ${link.id}:`, error);
+          console.error(
+            `Error fetching source details for link ${link.id}:`,
+            error
+          );
           return null;
         }
       })
@@ -86,17 +101,30 @@ export async function getProposalLinksWithDetails(proposalId: string) {
     const sourceLinksWithDetails = await Promise.all(
       asSourceLinks.map(async (link) => {
         try {
-          const details = await fetchItemDetails(link.targetId, link.targetType);
-          return details ? { ...details, relationship: "source" as const } : null;
+          const details = await fetchItemDetails(
+            link.targetId,
+            link.targetType
+          );
+          return details
+            ? { ...details, relationship: "source" as const }
+            : null;
         } catch (error) {
-          console.error(`Error fetching target details for link ${link.id}:`, error);
+          console.error(
+            `Error fetching target details for link ${link.id}:`,
+            error
+          );
           return null;
         }
       })
     );
 
-    const allLinks: (LinkedItemDetails | null)[] = [...targetLinksWithDetails, ...sourceLinksWithDetails];
-    const validLinks = allLinks.filter((link): link is LinkedItemDetails => link !== null);
+    const allLinks: (LinkedItemDetails | null)[] = [
+      ...targetLinksWithDetails,
+      ...sourceLinksWithDetails,
+    ];
+    const validLinks = allLinks.filter(
+      (link): link is LinkedItemDetails => link !== null
+    );
 
     return { success: true, links: validLinks };
   } catch (error) {
