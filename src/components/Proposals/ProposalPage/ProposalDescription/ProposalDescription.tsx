@@ -72,22 +72,13 @@ export default function ProposalDescription({
       ).archiveMetadata ?? null)
     : null;
 
-  const tagLabel = archiveMetadata
-    ? archiveMetadata.tagLabel ||
-      (archiveMetadata.source === "eas-oodao" ? "Temp Check" : "Gov Proposal")
-    : null;
-
-  const tagBadgeLabel = tagLabel
-    ? `${archiveMetadata?.source === "eas-oodao" ? "🌡️" : "⚖️️"} ${tagLabel}`
-    : null;
-
   const proposerBadge = archiveMetadata?.proposerEns ? (
     archiveMetadata.proposerEns
   ) : (
     <ENSName address={proposal.proposer} />
   );
 
-  const typeBadgeLabel = archiveMetadata?.typeLabel ?? "Governance";
+  const typeBadgeLabel = archiveMetadata?.typeLabel;
 
   return (
     <div
@@ -95,9 +86,11 @@ export default function ProposalDescription({
     >
       {archiveMetadata && (
         <div className="inline-flex justify-start items-center gap-2 flex-wrap">
-          {tagBadgeLabel && (
+          {typeBadgeLabel && (
             <div className="px-2 py-0.5 bg-black/10 rounded-[3px] text-neutral-700 text-xs font-semibold leading-4">
-              {tagBadgeLabel}
+              {typeBadgeLabel === "Gov Proposal"
+                ? "⚖️️ Gov Proposal"
+                : "🌡️ Temp Check"}
             </div>
           )}
           <div className="px-2 py-0.5 bg-black/10 rounded-[3px] text-neutral-700 text-xs font-semibold leading-4">

@@ -57,11 +57,7 @@ export default function ArchiveProposalRow({
   } as const;
 
   const isEasOodaoSource = proposal.source === "eas-oodao";
-  const primaryTagLabel = isEasOodaoSource
-    ? (formatArchiveTagLabel(proposal.tags?.[0]) ??
-      proposal.tags?.[0] ??
-      "Temp Check")
-    : "Gov Proposal";
+  const primaryTagLabel = proposal.typeLabel;
 
   return (
     <Link href={proposal.href}>
@@ -77,9 +73,9 @@ export default function ArchiveProposalRow({
             {primaryTagLabel && (
               <div className="px-2 py-0.5 bg-black/10 rounded-[3px] flex justify-center items-center gap-0.5">
                 <div className="text-neutral-700 text-xs font-semibold leading-4">
-                  {isEasOodaoSource
-                    ? `🌡️ ${primaryTagLabel}`
-                    : `⚖️️ ${primaryTagLabel}`}
+                  {primaryTagLabel === "Gov Proposal"
+                    ? `⚖️️ ${primaryTagLabel}`
+                    : `🌡️ ${primaryTagLabel}`}
                 </div>
               </div>
             )}

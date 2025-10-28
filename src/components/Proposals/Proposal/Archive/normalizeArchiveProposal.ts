@@ -61,19 +61,6 @@ const ensurePercentage = (value: number) => {
   return value;
 };
 
-export const formatArchiveTagLabel = (tag?: string | null): string | null => {
-  if (!tag) {
-    return null;
-  }
-
-  const normalized = tag.toLowerCase();
-  if (normalized === "tempcheck" || normalized === "temp-check") {
-    return "Temp Check";
-  }
-
-  return tag;
-};
-
 export function normalizeArchiveProposal(
   proposal: ArchiveListProposal,
   options: NormalizeOptions = {}
