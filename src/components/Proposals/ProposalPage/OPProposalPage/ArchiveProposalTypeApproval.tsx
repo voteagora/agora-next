@@ -4,6 +4,7 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { InformationCircleIcon } from "@heroicons/react/20/solid";
 import { formatDistanceToNow } from "date-fns";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
+import { canCreateGovernanceProposal } from "@/lib/forumPermissionUtils";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,21 +49,18 @@ export default function ArchiveProposalTypeApproval({
   const defaultProposalTypeRanges =
     archiveMetadata.defaultProposalTypeRanges as RangeProposalType | undefined;
 
-  // Only show if default_proposal_type_ranges exists (pending approval)
-  if (
-    !defaultProposalTypeRanges ||
-    typeof defaultProposalTypeRanges !== "object" ||
-    !("min_quorum_pct" in defaultProposalTypeRanges)
-  ) {
-    return null;
-  }
-
-  const minQuorum = defaultProposalTypeRanges.min_quorum_pct / 100;
-  const maxQuorum = defaultProposalTypeRanges.max_quorum_pct / 100;
-  const minApproval =
-    defaultProposalTypeRanges.min_approval_threshold_pct / 100;
-  const maxApproval =
-    defaultProposalTypeRanges.max_approval_threshold_pct / 100;
+  const minQuorum = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.min_quorum_pct / 100
+    : null;
+  const maxQuorum = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.max_quorum_pct / 100
+    : null;
+  const minApproval = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.min_approval_threshold_pct / 100
+    : null;
+  const maxApproval = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.max_approval_threshold_pct / 100
+    : null;
 
   // Calculate time remaining
   const endTime = proposal.endTime;
@@ -73,7 +71,7 @@ export default function ArchiveProposalTypeApproval({
   // Check if proposal is successful and user has permissions
   const isSuccessful =
     proposal.status === "EXECUTED" || proposal.status === "SUCCEEDED";
-  const canCreateProposal = permissions.canCreateTopic;
+  const canCreateProposal = canCreateGovernanceProposal(permissions, true);
   const showCreateButton = isSuccessful && canCreateProposal;
 
   const handleCreateGovProposal = () => {
@@ -90,8 +88,18 @@ export default function ArchiveProposalTypeApproval({
   };
   const now = new Date();
 
+  if (
+    !showCreateButton &&
+    !minQuorum &&
+    !maxQuorum &&
+    !minApproval &&
+    !maxApproval
+  ) {
+    return null;
+  }
+
   return (
-    <div className="mb-6 rounded-2xl border border-black/10 bg-[#f3f3f1] p-4 shadow-sm pb-[60px] mb-[-40px]">
+    <div className="rounded-2xl border border-black/10 bg-[#f3f3f1] p-4 shadow-sm pb-[60px] mb-[-40px]">
       {showCreateButton ? (
         <div className="relative">
           <div className="flex items-center justify-between">

@@ -3,7 +3,7 @@
 import React, { createContext, useContext } from "react";
 import { useForumPermissions } from "@/hooks/useForumPermissions";
 
-interface ForumPermissions {
+export interface ForumPermissions {
   canCreateTopic: boolean;
   canCreatePost: boolean;
   canUpvote: boolean;

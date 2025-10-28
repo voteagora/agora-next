@@ -21,6 +21,7 @@ import { formatRelative } from "@/components/ForumShared/utils";
 import { stripHtmlToText } from "../../stripHtml";
 import Tenant from "@/lib/tenant/tenant";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
+import RelatedProposalLinks from "@/components/Proposals/ProposalPage/RelatedProposalLinks/RelatedProposalLinks";
 
 // Force dynamic rendering - forum topics and posts change frequently
 export const dynamic = "force-dynamic";
@@ -264,6 +265,10 @@ export default async function ForumTopicPage({ params }: PageProps) {
                 categoryId={categoryId}
               />
             )}
+
+            <div className="my-4">
+              <RelatedProposalLinks proposalId={topicId.toString()} />
+            </div>
 
             <div className="flex flex-wrap items-center gap-3 lg:gap-6 text-xs font-semibold text-tertiary border-b pb-2">
               {rootPostId && (

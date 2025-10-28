@@ -8,6 +8,7 @@ interface LinkedItemDetails {
   title: string;
   description: string;
   createdAt: string;
+  relationship: "source" | "target";
   metadata?: {
     commentsCount?: number;
     category?: string;
