@@ -65,7 +65,7 @@ async function getInitialFormData(
       typeof proposalType === "object" &&
       "quorum" in proposalType
         ? {
-            id: proposalType.proposal_type_id,
+            id: proposalType.eas_uid,
             name: proposalType.name,
             description: proposalType.description,
             quorum: proposalType.quorum / 100,
@@ -126,7 +126,7 @@ export default async function CreatePostPage({
     if (typeof proposalType === "object" && "quorum" in proposalType) {
       proposalTypes = [
         {
-          id: proposalType.proposal_type_id,
+          id: proposalType.eas_uid,
           name: proposalType.name,
           description: proposalType.description,
           quorum: proposalType.quorum / 100,
