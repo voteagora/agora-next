@@ -1,7 +1,6 @@
-export type PostType = "forum-post" | "tempcheck" | "gov-proposal";
+export type PostType = "tempcheck" | "gov-proposal";
 
 export const postTypeOptions = {
-  "forum-post": "Forum post",
   tempcheck: "Temp check",
   "gov-proposal": "Governance proposal",
 } as const;
@@ -13,6 +12,7 @@ export interface RelatedItem {
   comments: number;
   timestamp: string;
   url?: string;
+  status?: string;
 }
 
 export interface ProposalType {

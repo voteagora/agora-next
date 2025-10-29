@@ -14,6 +14,7 @@ interface ProposalSettingsCardProps {
   proposalTypes: ProposalType[];
   onProposalTypeChange: (typeId: string) => void;
   postType: PostType;
+  isGovProposal: boolean;
 }
 
 export function ProposalSettingsCard({
@@ -21,6 +22,7 @@ export function ProposalSettingsCard({
   proposalTypes,
   onProposalTypeChange,
   postType,
+  isGovProposal,
 }: ProposalSettingsCardProps) {
   return (
     <Card>
@@ -88,8 +90,9 @@ export function ProposalSettingsCard({
 
       <div className="border-t border-line px-6 py-4">
         <p className="text-xs text-tertiary leading-relaxed">
-          All proposal type selections must be approved by the DUNA admin before
-          the vote is allowed to pass.
+          {isGovProposal
+            ? "Proposal Type is being inherited from the approved Temp Check as per the governance docs."
+            : "All proposal type selections must be approved by the DUNA admin beforethe vote is allowed to pass."}
         </p>
       </div>
     </Card>

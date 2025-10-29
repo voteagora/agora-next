@@ -1,6 +1,7 @@
 import {
   fetchProposalVotes,
   fetchSnapshotProposalVotes,
+  fetchUserVotesForProposal,
 } from "@/app/proposals/actions";
 
 import { useQuery } from "@tanstack/react-query";
@@ -63,4 +64,29 @@ export const useSnapshotProposalVotes = ({
   });
 
   return { data, isFetching, isFetched, queryKey: QK };
+};
+
+export const useUserVotes = ({
+  proposalId,
+  address,
+}: {
+  proposalId: string;
+  address: string | `0x${string}` | undefined;
+}) => {
+  const { data, isFetching, isFetched } = useQuery({
+    enabled: !!address && !!proposalId,
+    queryKey: ["userVotes", proposalId, address],
+    queryFn: async () => {
+      if (!address) return [];
+      return await fetchUserVotesForProposal(proposalId, address);
+    },
+    staleTime: 60000,
+  });
+
+  return {
+    votes: data || [],
+    isLoading: isFetching,
+    isFetched,
+    hasVoted: (data?.length || 0) > 0,
+  };
 };

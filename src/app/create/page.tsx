@@ -8,9 +8,9 @@ function getInitialPostType(searchParams: {
   [key: string]: string | string[] | undefined;
 }): PostType {
   const type = searchParams.type as PostType;
-  return type && ["forum-post", "tempcheck", "gov-proposal"].includes(type)
+  return type && ["tempcheck", "gov-proposal"].includes(type)
     ? type
-    : "forum-post";
+    : "tempcheck";
 }
 
 function getInitialFormData(searchParams: {

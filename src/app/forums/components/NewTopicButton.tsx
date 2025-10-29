@@ -4,10 +4,11 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import CreateTopicModal from "./CreateTopicModal";
+import { ExistingTempCheckModal } from "./ExistingTempCheckModal";
 import useRequireLogin from "@/hooks/useRequireLogin";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { getForumTopicTempChecks } from "@/lib/actions/proposalLinks";
 
 const { namespace, ui } = Tenant.current();
 
@@ -30,7 +31,11 @@ export default function NewTopicButton({
   isDuna,
   topicContext,
 }: NewTopicButtonProps) {
-  const [open, setOpen] = React.useState(false);
+  const [showExistingTempCheckModal, setShowExistingTempCheckModal] =
+    React.useState(false);
+  const [existingTempCheckId, setExistingTempCheckId] = React.useState<
+    string | null
+  >(null);
   const requireLogin = useRequireLogin();
   const router = useRouter();
 
@@ -42,11 +47,7 @@ export default function NewTopicButton({
       return;
     }
 
-    if (isEASV2Enabled) {
-      router.push("/create");
-    } else {
-      setOpen(true);
-    }
+    router.push("/forums/new");
   };
 
   const handleCreateTempCheck = async () => {
@@ -55,6 +56,20 @@ export default function NewTopicButton({
       return;
     }
 
+    if (topicContext) {
+      const result = await getForumTopicTempChecks(topicContext.id.toString());
+
+      if (result.success && result.tempChecks && result.tempChecks.length > 0) {
+        setExistingTempCheckId(result.tempChecks[0].targetId);
+        setShowExistingTempCheckModal(true);
+        return;
+      }
+
+      proceedToCreateTempCheck();
+    }
+  };
+
+  const proceedToCreateTempCheck = () => {
     if (topicContext) {
       const params = new URLSearchParams({
         type: "tempcheck",
@@ -68,6 +83,18 @@ export default function NewTopicButton({
       });
       router.push(`/create?${params.toString()}`);
     }
+  };
+
+  const handleViewTempCheck = () => {
+    if (existingTempCheckId) {
+      router.push(`/proposals/${existingTempCheckId}`);
+    }
+    setShowExistingTempCheckModal(false);
+  };
+
+  const handleCreateNewTempCheck = () => {
+    setShowExistingTempCheckModal(false);
+    proceedToCreateTempCheck();
   };
 
   const handleCreateGovProposal = async () => {
@@ -104,14 +131,25 @@ export default function NewTopicButton({
 
   if (isEASV2Enabled && topicContext) {
     return (
-      <div className="flex gap-2">
-        {!topicContext.isTempCheck && (
-          <Button onClick={handleCreateTempCheck} size="lg">
-            Create temp check
-            <ArrowRight className="h-4 w-4 ml-2" />
-          </Button>
+      <>
+        <div className="flex gap-2">
+          {!topicContext.isTempCheck && (
+            <Button onClick={handleCreateTempCheck} size="lg">
+              Create temp check
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          )}
+        </div>
+
+        {existingTempCheckId && (
+          <ExistingTempCheckModal
+            isOpen={showExistingTempCheckModal}
+            onClose={() => setShowExistingTempCheckModal(false)}
+            onViewTempCheck={handleViewTempCheck}
+            onCreateNew={handleCreateNewTempCheck}
+          />
         )}
-      </div>
+      </>
     );
   }
 
@@ -128,8 +166,13 @@ export default function NewTopicButton({
             : "+ New Topic"}
       </Button>
 
-      {!isEASV2Enabled && (
-        <CreateTopicModal isOpen={open} onClose={() => setOpen(false)} />
+      {existingTempCheckId && (
+        <ExistingTempCheckModal
+          isOpen={showExistingTempCheckModal}
+          onClose={() => setShowExistingTempCheckModal(false)}
+          onViewTempCheck={handleViewTempCheck}
+          onCreateNew={handleCreateNewTempCheck}
+        />
       )}
     </>
   );

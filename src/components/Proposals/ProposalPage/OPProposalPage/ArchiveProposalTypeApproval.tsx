@@ -13,6 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { RelatedItem } from "@/app/create/types";
 
 type RangeProposalType = {
   min_quorum_pct: number;
@@ -71,8 +72,15 @@ export default function ArchiveProposalTypeApproval({
   // Check if proposal is successful and user has permissions
   const isSuccessful =
     proposal.status === "EXECUTED" || proposal.status === "SUCCEEDED";
-  const canCreateProposal = canCreateGovernanceProposal(permissions, true);
+  const isDefeated =
+    proposal.status === "DEFEATED" || proposal.status === "REJECTED";
+  const canCreateProposal = canCreateGovernanceProposal(permissions, [
+    {
+      status: "SUCCEEDED",
+    } as RelatedItem,
+  ]);
   const showCreateButton = isSuccessful && canCreateProposal;
+  const showCreateDiscussionButton = isDefeated && permissions.canCreateTopic;
 
   const handleCreateGovProposal = () => {
     const params = new URLSearchParams({
@@ -86,10 +94,20 @@ export default function ArchiveProposalTypeApproval({
 
     router.push(`/create?${params.toString()}`);
   };
+
+  const handleCreateDiscussion = () => {
+    const params = new URLSearchParams({
+      title: proposal.markdowntitle || "",
+      description: proposal.description || "",
+    });
+
+    router.push(`/forums/new?${params.toString()}`);
+  };
   const now = new Date();
 
   if (
     !showCreateButton &&
+    !showCreateDiscussionButton &&
     !minQuorum &&
     !maxQuorum &&
     !minApproval &&
@@ -111,6 +129,20 @@ export default function ArchiveProposalTypeApproval({
               onClick={handleCreateGovProposal}
             >
               Create gov proposal
+            </Button>
+          </div>
+        </div>
+      ) : showCreateDiscussionButton ? (
+        <div className="relative">
+          <div className="flex items-center justify-between">
+            <div className="w-[151px] text-xs font-semibold text-[#444444]">
+              Want to discuss this temp check further?
+            </div>
+            <Button
+              className="px-5 py-3 text-xs font-semibold"
+              onClick={handleCreateDiscussion}
+            >
+              Create discussion
             </Button>
           </div>
         </div>

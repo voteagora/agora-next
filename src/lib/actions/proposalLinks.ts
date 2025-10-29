@@ -92,3 +92,24 @@ export async function getProposalLinks({
     return { success: false, error: "Failed to fetch proposal links" };
   }
 }
+
+export async function getForumTopicTempChecks(topicId: string) {
+  try {
+    const links = await prismaWeb2Client.proposalLinks.findMany({
+      where: {
+        sourceId: topicId,
+        sourceType: "forum_topic",
+        targetType: "tempcheck",
+      },
+    });
+
+    return { success: true, tempChecks: links };
+  } catch (error) {
+    console.error("Error fetching temp checks for topic:", error);
+    return {
+      success: false,
+      error: "Failed to fetch temp checks",
+      tempChecks: [],
+    };
+  }
+}

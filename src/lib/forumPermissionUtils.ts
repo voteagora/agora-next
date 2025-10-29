@@ -1,4 +1,5 @@
 import { ForumPermissions } from "@/contexts/ForumPermissionsContext";
+import { RelatedItem } from "@/app/create/types";
 
 export function canCreateTempCheck(permissions: ForumPermissions): boolean {
   if (permissions.isAdmin) return true;
@@ -10,9 +11,13 @@ export function canCreateTempCheck(permissions: ForumPermissions): boolean {
 
 export function canCreateGovernanceProposal(
   permissions: ForumPermissions,
-  hasRelatedTempChecks: boolean
+  relatedTempChecks: RelatedItem[]
 ): boolean {
-  if (!hasRelatedTempChecks) return false;
+  const hasApprovedTempCheck =
+    Array.isArray(relatedTempChecks) &&
+    relatedTempChecks.some((tc) => tc.status === "SUCCEEDED");
+
+  if (!hasApprovedTempCheck) return false;
   if (permissions.isAdmin) return true;
 
   const currentVP = parseInt(permissions.currentVP) || 0;
