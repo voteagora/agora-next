@@ -75,6 +75,8 @@ export default function ArchiveProposalTypeApproval({
 
   const isDefeated =
     proposal.status === "DEFEATED" || proposal.status === "REJECTED";
+  const isSuccessful =
+    proposal.status === "EXECUTED" || proposal.status === "SUCCEEDED";
   const canCreateProposal = canCreateGovernanceProposal(permissions, [
     {
       status: "SUCCEEDED",
@@ -84,7 +86,7 @@ export default function ArchiveProposalTypeApproval({
   const showCreateDiscussionButton = isDefeated && permissions.canCreateTopic;
 
   const showCreateButton =
-    !isDefeated &&
+    isSuccessful &&
     canCreateProposal &&
     !isLoadingLinks &&
     !hasLinkedGovProposal;
