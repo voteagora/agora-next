@@ -18,6 +18,7 @@ interface CreatePostFormProps {
   currentVP: number;
   requiredVP: number;
   isAdmin: boolean;
+  hasInitialTempCheck: boolean;
   onAddRelatedDiscussion: (item: RelatedItem) => void;
   onRemoveRelatedDiscussion: (id: string) => void;
   onAddRelatedTempCheck: (item: RelatedItem) => void;
@@ -35,6 +36,7 @@ export function CreatePostForm({
   currentVP,
   requiredVP,
   isAdmin,
+  hasInitialTempCheck,
   onAddRelatedDiscussion,
   onRemoveRelatedDiscussion,
   onAddRelatedTempCheck,
@@ -51,6 +53,23 @@ export function CreatePostForm({
   const relatedTempChecks = watch("relatedTempChecks") || [];
   const title = watch("title");
   const description = watch("description");
+
+  if (postType === "gov-proposal" && !hasInitialTempCheck) {
+    return (
+      <Card>
+        <CardContent className="py-8">
+          <div className="text-secondary">
+            <div className="mb-4">
+              Authorized users can create governance proposals after a successful temp check has passed.
+            </div>
+            <div>
+              So in order to create a governance proposal, please go to your successful temp check and create one from there.
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <FormProvider {...form}>

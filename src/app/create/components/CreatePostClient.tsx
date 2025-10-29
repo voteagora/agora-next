@@ -55,6 +55,8 @@ export function CreatePostClient({
   const permissions = useForumPermissionsContext();
   const { data: daoSettings } = useDaoSettings(contracts.easRecipient);
 
+  const hasInitialTempCheck = (initialFormData.relatedTempChecks?.length || 0) > 0;
+
   const [selectedPostType, setSelectedPostType] =
     useState<PostType>(initialPostType);
 
@@ -211,6 +213,7 @@ export function CreatePostClient({
             currentVP={currentVP}
             requiredVP={requiredVP}
             isAdmin={isAdmin}
+            hasInitialTempCheck={hasInitialTempCheck}
             onAddRelatedDiscussion={handleAddRelatedItem("relatedDiscussions")}
             onRemoveRelatedDiscussion={handleRemoveRelatedItem(
               "relatedDiscussions"
@@ -223,7 +226,7 @@ export function CreatePostClient({
           />
         </div>
 
-        <div className="space-y-6">
+        {selectedPostType === "gov-proposal" && !hasInitialTempCheck ? null :<div className="space-y-6">
           <ProposalSettingsCard
             selectedProposalType={selectedProposalType}
             proposalTypes={proposalTypes}
@@ -234,7 +237,7 @@ export function CreatePostClient({
               relatedTempChecks.length > 0
             }
           />
-        </div>
+        </div>}
       </div>
 
       <Dialog open={showIndexingModal} onOpenChange={setShowIndexingModal}>
