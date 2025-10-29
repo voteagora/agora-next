@@ -41,7 +41,7 @@ export default function ArchiveProposalTypeApproval({
         source?: string;
         rawProposalType?: any;
         defaultProposalTypeRanges?: any;
-        rawTag?: string
+        rawTag?: string;
       };
     }
   ).archiveMetadata;
@@ -52,14 +52,16 @@ export default function ArchiveProposalTypeApproval({
     return null;
   }
 
-  const isDefeated =
-    proposal.status === "DEFEATED";
+  const isDefeated = proposal.status === "DEFEATED";
   const isSuccessful = proposal.status === "SUCCEEDED";
   const isActive = !isDefeated && !isSuccessful;
 
   // Check for default_proposal_type_ranges (pending approval)
-  const defaultProposalTypeRanges = isActive ?
-    archiveMetadata.defaultProposalTypeRanges as RangeProposalType | undefined : null;
+  const defaultProposalTypeRanges = isActive
+    ? (archiveMetadata.defaultProposalTypeRanges as
+        | RangeProposalType
+        | undefined)
+    : null;
 
   const minQuorum = defaultProposalTypeRanges
     ? defaultProposalTypeRanges.min_quorum_pct / 100
@@ -79,7 +81,6 @@ export default function ArchiveProposalTypeApproval({
   const timeRemaining = endTime
     ? formatDistanceToNow(endTime, { addSuffix: true })
     : "Unavailable";
-
 
   const canCreateProposal = canCreateGovernanceProposal(permissions, [
     {
@@ -145,7 +146,8 @@ export default function ArchiveProposalTypeApproval({
         <div className="relative">
           <div className="flex items-center justify-between">
             <div className="w-[151px] text-xs font-semibold text-[#444444]">
-              Want to discuss this {isTempCheck ? "temp check" : "proposal"} further?
+              Want to discuss this {isTempCheck ? "temp check" : "proposal"}{" "}
+              further?
             </div>
             <Button
               className="px-5 py-3 text-xs font-semibold"

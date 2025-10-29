@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProposalType, PostType } from "../types";
+import { ProposalType, PostType, RelatedItem } from "../types";
 
 interface ProposalSettingsCardProps {
   selectedProposalType: ProposalType;
@@ -15,6 +15,7 @@ interface ProposalSettingsCardProps {
   onProposalTypeChange: (typeId: string) => void;
   postType: PostType;
   isGovProposal: boolean;
+  relatedTempChecks?: RelatedItem[];
 }
 
 export function ProposalSettingsCard({
@@ -23,7 +24,13 @@ export function ProposalSettingsCard({
   onProposalTypeChange,
   postType,
   isGovProposal,
+  relatedTempChecks = [],
 }: ProposalSettingsCardProps) {
+  const hasRelatedTempCheck = relatedTempChecks.length > 0;
+  const showDetails =
+    postType === "tempcheck" ||
+    (postType === "gov-proposal" && hasRelatedTempCheck);
+
   return (
     <Card>
       <CardContent className="p-6 space-y-6">
@@ -56,45 +63,53 @@ export function ProposalSettingsCard({
             </>
           ) : (
             <>
-              <div className="text-base text-primary font-medium">
-                {selectedProposalType?.name}
-              </div>
-              <p className="text-sm text-tertiary leading-relaxed">
-                {selectedProposalType?.description}
-              </p>
+              {hasRelatedTempCheck ? (
+                <>
+                  <div className="text-base text-primary font-medium">
+                    {selectedProposalType?.name}
+                  </div>
+                  <p className="text-sm text-tertiary leading-relaxed">
+                    {selectedProposalType?.description}
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm text-tertiary">
+                  Select a temp check to view proposal type details
+                </p>
+              )}
             </>
           )}
         </div>
 
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-base text-secondary">Quorum</span>
-            <span className="text-sm text-tertiary">
-              {`${selectedProposalType?.quorum}%`}
-            </span>
+        {showDetails && (
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-base text-secondary">Quorum</span>
+              <span className="text-sm text-tertiary">
+                {`${selectedProposalType?.quorum}%`}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-base text-secondary">
+                Approval threshold
+              </span>
+              <span className="text-sm text-tertiary">
+                {`${selectedProposalType?.approvalThreshold}%`}
+              </span>
+            </div>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-base text-secondary">Approval threshold</span>
-            <span className="text-sm text-tertiary">
-              {`${selectedProposalType?.approvalThreshold}%`}
-            </span>
-          </div>
-          {/* TODO <div className="flex justify-between items-center">
-            <span className="text-base text-secondary">Vote duration</span>
-            <span className="text-sm text-tertiary">
-              {selectedProposalType.voteDuration} days
-            </span>
-          </div> */}
-        </div>
+        )}
       </CardContent>
 
-      <div className="border-t border-line px-6 py-4">
-        <p className="text-xs text-tertiary leading-relaxed">
-          {isGovProposal
-            ? "Proposal Type is being inherited from the approved Temp Check as per the governance docs."
-            : "All proposal type selections must be approved by the DUNA admin beforethe vote is allowed to pass."}
-        </p>
-      </div>
+      {showDetails && (
+        <div className="border-t border-line px-6 py-4">
+          <p className="text-xs text-tertiary leading-relaxed">
+            {isGovProposal
+              ? "Proposal Type is being inherited from the approved Temp Check as per the governance docs."
+              : "All proposal type selections must be approved by the DUNA admin beforethe vote is allowed to pass."}
+          </p>
+        </div>
+      )}
     </Card>
   );
 }

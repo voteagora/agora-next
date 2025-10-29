@@ -54,23 +54,6 @@ export function CreatePostForm({
   const title = watch("title");
   const description = watch("description");
 
-  if (postType === "gov-proposal" && !hasInitialTempCheck) {
-    return (
-      <Card>
-        <CardContent className="py-8">
-          <div className="text-secondary">
-            <div className="mb-4">
-              Authorized users can create governance proposals after a successful temp check has passed.
-            </div>
-            <div>
-              So in order to create a governance proposal, please go to your successful temp check and create one from there.
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <FormProvider {...form}>
       <Card>
@@ -141,7 +124,12 @@ export function CreatePostForm({
               )}
               {postType === "gov-proposal" && (
                 <div>
-                  {canCreateGovernanceProposal ? (
+                  {!relatedTempChecks?.length ? (
+                    <span className="text-secondary flex items-center gap-1">
+                      <XMarkIcon className="h-4 w-4" />
+                      Select a successful temp check to continue
+                    </span>
+                  ) : canCreateGovernanceProposal ? (
                     <span className="text-green-600 flex items-center gap-1">
                       <CheckIcon className="h-4 w-4" />
                       You are authorized to create proposal
@@ -152,17 +140,17 @@ export function CreatePostForm({
                       Requires successful temp check
                     </span>
                   )}
-                  <div className="text-xs mt-1">
-                    {isAdmin && canCreateGovernanceProposal
-                      ? "Admin permissions"
-                      : !relatedTempChecks?.length
-                        ? "Must reference a successful temp check"
+                  {relatedTempChecks?.length > 0 && (
+                    <div className="text-xs mt-1">
+                      {isAdmin && canCreateGovernanceProposal
+                        ? "Admin permissions"
                         : relatedTempChecks.some(
                               (tc) => tc.status === "SUCCEEDED"
                             )
                           ? `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power required`
                           : "Referenced temp check must be approved"}
-                  </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
