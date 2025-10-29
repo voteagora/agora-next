@@ -15,6 +15,7 @@ import { rgbStringToHex } from "@/app/lib/utils/color";
 import Tenant from "@/lib/tenant/tenant";
 import { useStableCallback } from "@/hooks/useStableCallback";
 import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
+import ENSName from "@/components/shared/ENSName";
 
 const { ui } = Tenant.current();
 
@@ -97,17 +98,12 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
     }
   };
 
-  const firstPost = topic.firstPost;
   const createdAt = topic.createdAt;
   const replies = Math.max((topic.postsCount || 1) - 1, 0);
-  const excerpt = firstPost?.content
-    ? firstPost.content.replace(/<[^>]*>/g, "").substring(0, 150)
-    : "";
   const authorAddress = (topic.address || "").toLowerCase();
+
   const adminRole = admins[authorAddress] || null;
   const isAuthorAdmin = authorAddress in admins;
-  const isOwnTopic =
-    address && authorAddress && address.toLowerCase() === authorAddress;
 
   return (
     <>
@@ -154,12 +150,14 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
               </div>
             </div>
 
-            {/* Excerpt */}
-            {excerpt && (
-              <p className="mt-1 text-secondary text-sm leading-relaxed line-clamp-1 overflow-hidden max-w-full md:max-w-[556px] break-words">
-                {excerpt}
-              </p>
-            )}
+            <p className="mt-1 text-secondary text-sm leading-relaxed line-clamp-1 overflow-hidden max-w-full md:max-w-[556px] break-words">
+              By:{" "}
+              {isAuthorAdmin ? (
+                <span className="text-primary">Cowrie</span>
+              ) : (
+                <ENSName address={topic.address} />
+              )}
+            </p>
           </div>
 
           {/* Right compact stat (upvotes) - now clickable */}

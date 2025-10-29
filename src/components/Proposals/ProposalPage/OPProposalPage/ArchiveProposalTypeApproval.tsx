@@ -149,7 +149,7 @@ export default function ArchiveProposalTypeApproval({
       ) : (
         <>
           {endTime && endTime > now && (
-            <div className="flex items-center justify-between text-xs font-semibold text-secondary">
+            <div className="flex items-center justify-between text-xs font-semibold text-secondary mb-4">
               <span className="inline-flex items-center gap-2">
                 Proposal type not yet approved
                 <TooltipProvider delayDuration={150}>
@@ -168,7 +168,7 @@ export default function ArchiveProposalTypeApproval({
             </div>
           )}
 
-          <div className="mt-4 space-y-2 text-xs font-semibold text-secondary">
+          <div className="space-y-2 text-xs font-semibold text-secondary">
             <div className="flex items-center justify-between">
               <span>Quorum</span>
               <span>
