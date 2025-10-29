@@ -15,49 +15,72 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  Loader2,
 } from "lucide-react";
 import { stripHtmlToText } from "@/app/forums/stripHtml";
+import { useRelatedItemsDialog } from "../hooks/useRelatedItemsDialog";
+import { useEffect } from "react";
 
 interface RelatedItemsDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   searchType: "forum" | "tempcheck";
-  searchTerm: string;
-  onSearchTermChange: (term: string) => void;
-  results: RelatedItem[];
-  isLoading: boolean;
-  onSearch: () => void;
   onSelect: (item: RelatedItem) => void;
   existingItemIds: string[];
-  page?: number;
-  totalPages?: number;
-  totalResults?: number;
-  onNextPage?: () => void;
-  onPrevPage?: () => void;
 }
 
 export function RelatedItemsDialog({
   isOpen,
   onOpenChange,
   searchType,
-  searchTerm,
-  onSearchTermChange,
-  results,
-  isLoading,
-  onSearch,
   onSelect,
   existingItemIds,
-  page = 1,
-  totalPages = 1,
-  totalResults = 0,
-  onNextPage,
-  onPrevPage,
 }: RelatedItemsDialogProps) {
+  const {
+    isOpen: hookIsOpen,
+    searchTerm,
+    results,
+    isLoading,
+    setSearchTerm,
+    handleSearch,
+    handleSelect: hookHandleSelect,
+    setIsOpen,
+    page,
+    totalPages,
+    totalResults,
+    nextPage,
+    prevPage,
+  } = useRelatedItemsDialog({
+    searchType,
+    onSelect: onSelect,
+    existingItemIds,
+  });
+
+  useEffect(() => {
+    if (isOpen && !hookIsOpen) {
+      setIsOpen(true);
+    } else if (!isOpen && hookIsOpen) {
+      setIsOpen(false);
+    }
+  }, [isOpen, hookIsOpen, setIsOpen]);
+
   const isAlreadySelected = (id: string) => existingItemIds.includes(id);
   const showPagination = totalPages > 1;
 
+  const handleOpenChange = (open: boolean) => {
+    onOpenChange(open);
+    if (!open) {
+      setIsOpen(false);
+    }
+  };
+
+  const handleItemSelect = (item: RelatedItem) => {
+    hookHandleSelect(item);
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={hookIsOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -72,10 +95,11 @@ export function RelatedItemsDialog({
             <Input
               placeholder={`Search ${searchType === "forum" ? "forum posts" : "temp checks"}...`}
               value={searchTerm}
-              onChange={(e) => onSearchTermChange(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && onSearch()}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="pl-9"
               autoFocus
+              disabled={isLoading}
             />
           </div>
 
@@ -83,18 +107,14 @@ export function RelatedItemsDialog({
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="flex flex-col items-center gap-2">
-                  <div className="animate-spin h-8 w-8 border-2 border-gray-300 border-t-black rounded-full" />
-                  <p className="text-sm text-gray-500">Searching...</p>
+                  <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+                  <p className="text-sm text-gray-500">Loading...</p>
                 </div>
               </div>
             ) : results.length === 0 ? (
               <div className="text-center py-12">
                 <Search className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">
-                  {searchTerm
-                    ? "No results found"
-                    : "Enter a search term to find posts"}
-                </p>
+                <p className="text-sm text-gray-500">No results found</p>
               </div>
             ) : (
               results.map((item) => {
@@ -106,11 +126,11 @@ export function RelatedItemsDialog({
                       relative p-3 border rounded-lg transition-all
                       ${
                         selected
-                          ? "bg-green-50 border-green-200 cursor-not-allowed"
+                          ? "bg-green-50 border-green-200 cursor-not-allowed opacity-60"
                           : "cursor-pointer hover:bg-gray-50 hover:border-gray-300"
                       }
                     `}
-                    onClick={() => !selected && onSelect(item)}
+                    onClick={() => !selected && handleItemSelect(item)}
                   >
                     {selected && (
                       <div className="absolute top-2 right-2">
@@ -144,7 +164,7 @@ export function RelatedItemsDialog({
             )}
           </div>
 
-          {results.length > 0 && (
+          {results.length > 0 && !isLoading && (
             <div className="border-t pt-3 space-y-2">
               {showPagination && (
                 <div className="flex items-center justify-between">
@@ -157,8 +177,8 @@ export function RelatedItemsDialog({
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={onPrevPage}
-                      disabled={page === 1}
+                      onClick={prevPage}
+                      disabled={page === 1 || isLoading}
                       className="h-8 w-8 p-0"
                     >
                       <ChevronLeft className="h-4 w-4" />
@@ -169,8 +189,8 @@ export function RelatedItemsDialog({
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={onNextPage}
-                      disabled={page === totalPages}
+                      onClick={nextPage}
+                      disabled={page === totalPages || isLoading}
                       className="h-8 w-8 p-0"
                     >
                       <ChevronRight className="h-4 w-4" />

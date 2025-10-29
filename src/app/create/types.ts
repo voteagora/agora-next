@@ -13,6 +13,13 @@ export interface RelatedItem {
   timestamp: string;
   url?: string;
   status?: string;
+  proposalType?: {
+    id: string;
+    name: string;
+    description: string;
+    quorum: number;
+    approvalThreshold: number;
+  };
 }
 
 export interface ProposalType {

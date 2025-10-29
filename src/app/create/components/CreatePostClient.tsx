@@ -55,6 +55,9 @@ export function CreatePostClient({
   const permissions = useForumPermissionsContext();
   const { data: daoSettings } = useDaoSettings(contracts.easRecipient);
 
+  const hasInitialTempCheck =
+    (initialFormData.relatedTempChecks?.length || 0) > 0;
+
   const [selectedPostType, setSelectedPostType] =
     useState<PostType>(initialPostType);
 
@@ -184,6 +187,15 @@ export function CreatePostClient({
     }
   }, [proposalTypes, selectedProposalType]);
 
+  useEffect(() => {
+    if (selectedPostType === "gov-proposal" && relatedTempChecks.length > 0) {
+      const tempCheck = relatedTempChecks[0];
+      if (tempCheck.proposalType) {
+        setSelectedProposalType(tempCheck.proposalType);
+      }
+    }
+  }, [relatedTempChecks, selectedPostType]);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
@@ -211,6 +223,7 @@ export function CreatePostClient({
             currentVP={currentVP}
             requiredVP={requiredVP}
             isAdmin={isAdmin}
+            hasInitialTempCheck={hasInitialTempCheck}
             onAddRelatedDiscussion={handleAddRelatedItem("relatedDiscussions")}
             onRemoveRelatedDiscussion={handleRemoveRelatedItem(
               "relatedDiscussions"
@@ -233,6 +246,7 @@ export function CreatePostClient({
               selectedPostType === "gov-proposal" &&
               relatedTempChecks.length > 0
             }
+            relatedTempChecks={relatedTempChecks}
           />
         </div>
       </div>

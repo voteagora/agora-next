@@ -98,100 +98,100 @@ export default function NewForumTopicPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardContent className="space-y-6 mt-4">
-              <div>
-                <Label
-                  className="text-xs font-semibold text-secondary"
-                  htmlFor="title"
-                >
-                  Title
-                </Label>
-                <Input
-                  id="title"
-                  {...register("title", { required: "Title is required" })}
-                  placeholder="Topic title"
-                  className="mt-2"
-                />
-                {errors.title && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.title.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label
-                  className="text-xs font-semibold text-secondary"
-                  htmlFor="category"
-                >
-                  Category
-                </Label>
-                <select
-                  id="category"
-                  value={categoryId || ""}
-                  onChange={(e) =>
-                    setValue(
-                      "categoryId",
-                      e.target.value ? Number(e.target.value) : undefined
-                    )
-                  }
-                  className="w-full mt-2 px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                  disabled={isSubmitting}
-                >
-                  <option value="">No category</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <div className="mt-2">
-                  <MarkdownTextareaInput
-                    control={form.control}
-                    label="Body"
-                    name="description"
-                    required={true}
+          <div className="lg:col-span-2 space-y-6">
+            <Card>
+              <CardContent className="space-y-6 mt-4">
+                <div>
+                  <Label
+                    className="text-xs font-semibold text-secondary"
+                    htmlFor="title"
+                  >
+                    Title
+                  </Label>
+                  <Input
+                    id="title"
+                    {...register("title", { required: "Title is required" })}
+                    placeholder="Topic title"
+                    className="mt-2"
                   />
+                  {errors.title && (
+                    <p className="text-sm text-red-600 mt-1">
+                      {errors.title.message}
+                    </p>
+                  )}
                 </div>
-              </div>
 
-              <div className="flex items-center justify-between pt-6 border-t">
-                <div className="text-sm text-gray-500">
-                  This will post on the forums
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => router.back()}
+                <div>
+                  <Label
+                    className="text-xs font-semibold text-secondary"
+                    htmlFor="category"
+                  >
+                    Category
+                  </Label>
+                  <select
+                    id="category"
+                    value={categoryId || ""}
+                    onChange={(e) =>
+                      setValue(
+                        "categoryId",
+                        e.target.value ? Number(e.target.value) : undefined
+                      )
+                    }
+                    className="w-full mt-2 px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                     disabled={isSubmitting}
                   >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleSubmit}
-                    disabled={
-                      isSubmitting || !title?.trim() || !description?.trim()
-                    }
-                    className="bg-black text-white hover:bg-gray-800"
-                  >
-                    {isSubmitting ? "Creating..." : "Create topic"}
-                  </Button>
+                    <option value="">No category</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
-        <div className="space-y-6">
-          <CommunityGuidelinesCard />
+                <div>
+                  <div className="mt-2">
+                    <MarkdownTextareaInput
+                      control={form.control}
+                      label="Body"
+                      name="description"
+                      required={true}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-6 border-t">
+                  <div className="text-sm text-gray-500">
+                    This will post on the forums
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => router.back()}
+                      disabled={isSubmitting}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={
+                        isSubmitting || !title?.trim() || !description?.trim()
+                      }
+                      className="bg-black text-white hover:bg-gray-800"
+                    >
+                      {isSubmitting ? "Creating..." : "Create topic"}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="space-y-6">
+            <CommunityGuidelinesCard />
+          </div>
         </div>
-      </div>
 
         <InsufficientVPModal
           isOpen={showVPModal}

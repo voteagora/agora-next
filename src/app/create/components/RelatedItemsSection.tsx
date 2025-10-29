@@ -2,12 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { X, MessageSquare, Calendar, ExternalLink } from "lucide-react";
 import { RelatedItem } from "../types";
-import { useRelatedItemsDialog } from "../hooks/useRelatedItemsDialog";
 import { RelatedItemsDialog } from "./RelatedItemsDialog";
 import { stripHtmlToText } from "@/app/forums/stripHtml";
 import Link from "next/link";
 import Image from "next/image";
 import Tenant from "@/lib/tenant/tenant";
+import { useState } from "react";
 
 interface RelatedItemsSectionProps {
   label: string;
@@ -25,26 +25,7 @@ export function RelatedItemsSection({
   searchType,
 }: RelatedItemsSectionProps) {
   const { ui } = Tenant.current();
-  const {
-    isOpen,
-    searchTerm,
-    results,
-    isLoading,
-    openDialog,
-    setSearchTerm,
-    handleSearch,
-    handleSelect,
-    setIsOpen,
-    page,
-    totalPages,
-    totalResults,
-    nextPage,
-    prevPage,
-  } = useRelatedItemsDialog({
-    searchType,
-    onSelect: onAdd,
-    existingItemIds: items.map((item) => item.id),
-  });
+  const [isOpen, setIsOpen] = useState(false);
 
   const isTempCheck = searchType === "tempcheck";
   const hasTempCheck = isTempCheck && items.length > 0;
@@ -110,7 +91,11 @@ export function RelatedItemsSection({
         ))}
 
         {!hasTempCheck && (
-          <Button variant="outline" onClick={openDialog} className="w-full">
+          <Button
+            variant="outline"
+            onClick={() => setIsOpen(true)}
+            className="w-full"
+          >
             + Add Reference
           </Button>
         )}
@@ -120,18 +105,8 @@ export function RelatedItemsSection({
         isOpen={isOpen}
         onOpenChange={setIsOpen}
         searchType={searchType}
-        searchTerm={searchTerm}
-        onSearchTermChange={setSearchTerm}
-        results={results}
-        isLoading={isLoading}
-        onSearch={handleSearch}
-        onSelect={handleSelect}
+        onSelect={onAdd}
         existingItemIds={items.map((item) => item.id)}
-        page={page}
-        totalPages={totalPages}
-        totalResults={totalResults}
-        onNextPage={nextPage}
-        onPrevPage={prevPage}
       />
     </div>
   );

@@ -58,6 +58,21 @@ async function getInitialFormData(
   if (fromTempCheckId && fetchedProposal) {
     data.title = fetchedProposal.title || "";
     data.description = fetchedProposal.description || "";
+
+    const proposalType = fetchedProposal.proposal_type;
+    const proposalTypeData =
+      proposalType &&
+      typeof proposalType === "object" &&
+      "quorum" in proposalType
+        ? {
+            id: proposalType.eas_uid,
+            name: proposalType.name,
+            description: proposalType.description,
+            quorum: proposalType.quorum / 100,
+            approvalThreshold: proposalType.approval_threshold / 100,
+          }
+        : undefined;
+
     data.relatedTempChecks = [
       {
         id: fromTempCheckId,
@@ -65,11 +80,12 @@ async function getInitialFormData(
         description: fetchedProposal.description || "",
         comments: 0,
         timestamp: formatDistanceToNow(
-          new Date((fetchedProposal.start_blocktime * 1000) || new Date()),
+          new Date(fetchedProposal.start_blocktime * 1000 || new Date()),
           { addSuffix: true }
         ),
         url: `/proposals/${fromTempCheckId}`,
         status: deriveStatus(fetchedProposal, 18),
+        proposalType: proposalTypeData,
       },
     ];
   }
@@ -104,16 +120,13 @@ export default async function CreatePostPage({
 
   let proposalTypes: ProposalType[] = [];
 
-  if (
-    tempCheckProposal?.proposal_type &&
-    initialPostType === "gov-proposal"
-  ) {
+  if (tempCheckProposal?.proposal_type && initialPostType === "gov-proposal") {
     const proposalType = tempCheckProposal.proposal_type;
 
     if (typeof proposalType === "object" && "quorum" in proposalType) {
       proposalTypes = [
         {
-          id: proposalType.proposal_type_id,
+          id: proposalType.eas_uid,
           name: proposalType.name,
           description: proposalType.description,
           quorum: proposalType.quorum / 100,

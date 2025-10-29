@@ -18,6 +18,7 @@ interface CreatePostFormProps {
   currentVP: number;
   requiredVP: number;
   isAdmin: boolean;
+  hasInitialTempCheck: boolean;
   onAddRelatedDiscussion: (item: RelatedItem) => void;
   onRemoveRelatedDiscussion: (id: string) => void;
   onAddRelatedTempCheck: (item: RelatedItem) => void;
@@ -35,6 +36,7 @@ export function CreatePostForm({
   currentVP,
   requiredVP,
   isAdmin,
+  hasInitialTempCheck,
   onAddRelatedDiscussion,
   onRemoveRelatedDiscussion,
   onAddRelatedTempCheck,
@@ -122,7 +124,12 @@ export function CreatePostForm({
               )}
               {postType === "gov-proposal" && (
                 <div>
-                  {canCreateGovernanceProposal ? (
+                  {!relatedTempChecks?.length ? (
+                    <span className="text-secondary flex items-center gap-1">
+                      <XMarkIcon className="h-4 w-4" />
+                      Select a successful temp check to continue
+                    </span>
+                  ) : canCreateGovernanceProposal ? (
                     <span className="text-green-600 flex items-center gap-1">
                       <CheckIcon className="h-4 w-4" />
                       You are authorized to create proposal
@@ -133,17 +140,17 @@ export function CreatePostForm({
                       Requires successful temp check
                     </span>
                   )}
-                  <div className="text-xs mt-1">
-                    {isAdmin && canCreateGovernanceProposal
-                      ? "Admin permissions"
-                      : !relatedTempChecks?.length
-                        ? "Must reference a successful temp check"
+                  {relatedTempChecks?.length > 0 && (
+                    <div className="text-xs mt-1">
+                      {isAdmin && canCreateGovernanceProposal
+                        ? "Admin permissions"
                         : relatedTempChecks.some(
                               (tc) => tc.status === "SUCCEEDED"
                             )
                           ? `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power required`
                           : "Referenced temp check must be approved"}
-                  </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
