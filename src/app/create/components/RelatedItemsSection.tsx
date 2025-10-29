@@ -26,7 +26,7 @@ export function RelatedItemsSection({
 }: RelatedItemsSectionProps) {
   const { ui } = Tenant.current();
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const isTempCheck = searchType === "tempcheck";
   const hasTempCheck = isTempCheck && items.length > 0;
 
@@ -91,7 +91,11 @@ export function RelatedItemsSection({
         ))}
 
         {!hasTempCheck && (
-          <Button variant="outline" onClick={() => setIsOpen(true)} className="w-full">
+          <Button
+            variant="outline"
+            onClick={() => setIsOpen(true)}
+            className="w-full"
+          >
             + Add Reference
           </Button>
         )}

@@ -66,7 +66,7 @@ export function RelatedItemsDialog({
 
   const isAlreadySelected = (id: string) => existingItemIds.includes(id);
   const showPagination = totalPages > 1;
-  
+
   const handleOpenChange = (open: boolean) => {
     onOpenChange(open);
     if (!open) {
@@ -114,9 +114,7 @@ export function RelatedItemsDialog({
             ) : results.length === 0 ? (
               <div className="text-center py-12">
                 <Search className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">
-                  No results found
-                </p>
+                <p className="text-sm text-gray-500">No results found</p>
               </div>
             ) : (
               results.map((item) => {
