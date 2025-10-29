@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { MessageCircle, Clock, ExternalLink, FileText, Thermometer } from "lucide-react";
+import {
+  MessageCircle,
+  Clock,
+  ExternalLink,
+  FileText,
+  Thermometer,
+} from "lucide-react";
 import { useProposalLinksWithDetails } from "@/hooks/useProposalLinksWithDetails";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { buildForumTopicPath } from "@/lib/forumUtils";

@@ -40,7 +40,7 @@ export default function NewForumTopicPage() {
   useEffect(() => {
     const title = searchParams?.get("title");
     const description = searchParams?.get("description");
-    
+
     if (title) {
       form.setValue("title", title);
     }
@@ -174,7 +174,9 @@ export default function NewForumTopicPage() {
                   </Button>
                   <Button
                     onClick={handleSubmit}
-                    disabled={isSubmitting || !title?.trim() || !description?.trim()}
+                    disabled={
+                      isSubmitting || !title?.trim() || !description?.trim()
+                    }
                     className="bg-black text-white hover:bg-gray-800"
                   >
                     {isSubmitting ? "Creating..." : "Create topic"}
@@ -198,4 +200,3 @@ export default function NewForumTopicPage() {
     </div>
   );
 }
-

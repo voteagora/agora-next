@@ -1,6 +1,11 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
@@ -35,14 +40,20 @@ export function ExistingTempCheckModal({
 
         <div className="space-y-6 py-4">
           <p className="text-secondary">
-            There is already a temp check for this discussion. Do you want to see that one, or create a new one?
+            There is already a temp check for this discussion. Do you want to
+            see that one, or create a new one?
           </p>
 
           <div className="flex flex-col gap-3">
             <Button onClick={onViewTempCheck} size="lg" className="w-full">
               View Temp Check
             </Button>
-            <Button onClick={onCreateNew} size="lg" variant="outline" className="w-full">
+            <Button
+              onClick={onCreateNew}
+              size="lg"
+              variant="outline"
+              className="w-full"
+            >
               Create a New One
             </Button>
           </div>
@@ -51,4 +62,3 @@ export function ExistingTempCheckModal({
     </Dialog>
   );
 }
-

@@ -121,11 +121,13 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
       setIsSuccess(true);
     } catch (err) {
       console.error("Error submitting vote:", err);
-      
+
       const errorMessage = err instanceof Error ? err.message : String(err);
-      
+
       if (errorMessage.includes("0xb8daf542")) {
-        setError("Invalid attester - you are not authorized to vote on this proposal");
+        setError(
+          "Invalid attester - you are not authorized to vote on this proposal"
+        );
       } else if (errorMessage.includes("0x7c9a1cf9")) {
         setError("You have already voted on this proposal");
       } else if (errorMessage.includes("0x7fa01202")) {

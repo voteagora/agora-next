@@ -13,9 +13,9 @@ export function canCreateGovernanceProposal(
   permissions: ForumPermissions,
   relatedTempChecks: RelatedItem[]
 ): boolean {
-  const hasApprovedTempCheck = Array.isArray(relatedTempChecks) && relatedTempChecks.some(
-    (tc) => tc.status === "SUCCEEDED"
-  );
+  const hasApprovedTempCheck =
+    Array.isArray(relatedTempChecks) &&
+    relatedTempChecks.some((tc) => tc.status === "SUCCEEDED");
 
   if (!hasApprovedTempCheck) return false;
   if (permissions.isAdmin) return true;

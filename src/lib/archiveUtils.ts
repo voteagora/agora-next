@@ -64,8 +64,8 @@ export async function fetchProposalsFromArchive(
         (proposal) => !proposal.cancel_event && !proposal.delete_event
       );
     } else if (filter === "temp-checks") {
-      filteredProposals = allProposals.filter(
-        (proposal) => proposal.tags?.includes("tempcheck")
+      filteredProposals = allProposals.filter((proposal) =>
+        proposal.tags?.includes("tempcheck")
       );
     }
 

@@ -31,8 +31,11 @@ export default function NewTopicButton({
   isDuna,
   topicContext,
 }: NewTopicButtonProps) {
-  const [showExistingTempCheckModal, setShowExistingTempCheckModal] = React.useState(false);
-  const [existingTempCheckId, setExistingTempCheckId] = React.useState<string | null>(null);
+  const [showExistingTempCheckModal, setShowExistingTempCheckModal] =
+    React.useState(false);
+  const [existingTempCheckId, setExistingTempCheckId] = React.useState<
+    string | null
+  >(null);
   const requireLogin = useRequireLogin();
   const router = useRouter();
 
@@ -55,7 +58,7 @@ export default function NewTopicButton({
 
     if (topicContext) {
       const result = await getForumTopicTempChecks(topicContext.id.toString());
-      
+
       if (result.success && result.tempChecks && result.tempChecks.length > 0) {
         setExistingTempCheckId(result.tempChecks[0].targetId);
         setShowExistingTempCheckModal(true);

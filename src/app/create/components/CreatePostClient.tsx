@@ -88,8 +88,7 @@ export function CreatePostClient({
     try {
       if (!isEASV2Enabled) return;
 
-      const votingPeriodSeconds =
-        daoSettings?.votingPeriod || 7 * 24 * 60 * 60;
+      const votingPeriodSeconds = daoSettings?.votingPeriod || 7 * 24 * 60 * 60;
       const votingDelaySeconds = daoSettings?.votingDelay || 0;
 
       const proposal = await createProposal({
@@ -105,8 +104,7 @@ export function CreatePostClient({
 
       const target = proposal.transactionHash;
 
-      const targetType =
-        selectedPostType === "tempcheck" ? "tempcheck" : "gov";
+      const targetType = selectedPostType === "tempcheck" ? "tempcheck" : "gov";
       const allLinks = [
         ...(data.relatedDiscussions || []).map((d) => ({
           sourceId: d.id,
@@ -244,13 +242,16 @@ export function CreatePostClient({
           <DialogHeader>
             <DialogTitle>Created Successfully</DialogTitle>
             <DialogDescription>
-              Your {selectedPostType === "tempcheck" ? "temp check" : "governance proposal"} has been submitted to the blockchain. It may take a couple of minutes for the data to be indexed and appear.
+              Your{" "}
+              {selectedPostType === "tempcheck"
+                ? "temp check"
+                : "governance proposal"}{" "}
+              has been submitted to the blockchain. It may take a couple of
+              minutes for the data to be indexed and appear.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={handleCloseIndexingModal}>
-              Got it
-            </Button>
+            <Button onClick={handleCloseIndexingModal}>Got it</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

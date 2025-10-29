@@ -106,6 +106,10 @@ export async function getForumTopicTempChecks(topicId: string) {
     return { success: true, tempChecks: links };
   } catch (error) {
     console.error("Error fetching temp checks for topic:", error);
-    return { success: false, error: "Failed to fetch temp checks", tempChecks: [] };
+    return {
+      success: false,
+      error: "Failed to fetch temp checks",
+      tempChecks: [],
+    };
   }
 }

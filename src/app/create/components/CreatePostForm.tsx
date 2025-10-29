@@ -139,9 +139,8 @@ export function CreatePostForm({
                       : !relatedTempChecks?.length
                         ? "Must reference a successful temp check"
                         : relatedTempChecks.some(
-                            (tc) =>
-                              tc.status === "SUCCEEDED"
-                          )
+                              (tc) => tc.status === "SUCCEEDED"
+                            )
                           ? `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power required`
                           : "Referenced temp check must be approved"}
                   </div>
