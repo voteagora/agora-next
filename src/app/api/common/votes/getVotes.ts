@@ -25,7 +25,10 @@ import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
 import { ProposalType } from "@/lib/types";
 import { fetchProposalFromArchive } from "@/lib/archiveUtils";
-import { isArchiveStandardProposal, normalizeArchiveStandardProposal } from "@/components/Proposals/Proposal/Archive/normalizeArchiveProposalDetail";
+import {
+  isArchiveStandardProposal,
+  normalizeArchiveStandardProposal,
+} from "@/components/Proposals/Proposal/Archive/normalizeArchiveProposalDetail";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -157,19 +160,16 @@ async function getVotesForDelegateForAddress({
         ...new Set(votesWithoutProposalData.map((v) => v.proposal_id)),
       ];
 
-      // Fetch archive data for missing proposals
+      // Fetch archive data for missing proposals in parallel using Promise.all
       const archiveProposalsMap = new Map();
-      for (const proposalId of uniqueProposalIds) {
+      const fetchPromises = uniqueProposalIds.map(async (proposalId) => {
         try {
           const archiveProposal = await fetchProposalFromArchive(
             namespace,
             proposalId
           );
-          if (
-            archiveProposal &&
-            isArchiveStandardProposal(archiveProposal)
-          ) {
-            archiveProposalsMap.set(proposalId, archiveProposal);
+          if (archiveProposal && isArchiveStandardProposal(archiveProposal)) {
+            return { proposalId, archiveProposal };
           }
         } catch (error) {
           console.error(
@@ -177,7 +177,18 @@ async function getVotesForDelegateForAddress({
             error
           );
         }
-      }
+        return null;
+      });
+
+      // Wait for all fetches to complete in parallel
+      const results = await Promise.all(fetchPromises);
+
+      // Build the map from successful results
+      results.forEach((result) => {
+        if (result) {
+          archiveProposalsMap.set(result.proposalId, result.archiveProposal);
+        }
+      });
 
       // Merge archive proposal data into votes
       for (const vote of votes) {

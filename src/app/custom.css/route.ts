@@ -63,6 +63,7 @@ export async function GET() {
     "--footer-background": ui?.customization?.footerBackground || neutral,
     "--inner-footer-background":
       ui?.customization?.innerFooterBackground || wash,
+    "--delegate-card-background": ui?.customization?.delegateCardBg || neutral,
   } as React.CSSProperties;
 
   const root = `
