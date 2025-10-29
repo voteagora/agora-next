@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { MessageCircle, Clock, ExternalLink } from "lucide-react";
+import { MessageCircle, Clock, ExternalLink, FileText, Thermometer } from "lucide-react";
 import { useProposalLinksWithDetails } from "@/hooks/useProposalLinksWithDetails";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { buildForumTopicPath } from "@/lib/forumUtils";
-import Tenant from "@/lib/tenant/tenant";
 
 interface RelatedProposalLinksProps {
   proposalId: string;
@@ -30,6 +28,16 @@ function getHeaderText(type: string, relationship: "source" | "target") {
     : "Referenced in Proposal";
 }
 
+function getIcon(type: string) {
+  if (type === "forum_topic") {
+    return MessageCircle;
+  }
+  if (type === "tempcheck") {
+    return Thermometer;
+  }
+  return FileText;
+}
+
 function RelatedLinkCard({
   link,
 }: {
@@ -47,10 +55,10 @@ function RelatedLinkCard({
     };
   };
 }) {
-  const { ui } = Tenant.current();
   const headerText = getHeaderText(link.type, link.relationship);
   const isTempCheck = link.type === "tempcheck";
   const isForumTopic = link.type === "forum_topic";
+  const Icon = getIcon(link.type);
 
   let linkUrl = "#";
   if (link.type === "forum_topic") {
@@ -60,39 +68,31 @@ function RelatedLinkCard({
   }
 
   return (
-    <div className="    border border-line rounded-lg p-4">
-      <div className="flex items-center justify-between mb-3">
+    <Link
+      href={linkUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block border border-line rounded-lg p-3 cursor-pointer"
+    >
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-secondary">
             {headerText}
           </span>
-          <Link href={linkUrl} target="_blank" rel="noopener noreferrer">
-            <ExternalLink className="w-3.5 h-3.5 text-secondary" />
-          </Link>
+          <ExternalLink className="w-3.5 h-3.5 text-secondary" />
         </div>
       </div>
 
       <div className="flex items-start gap-3">
-        <Image
-          src={ui.logo}
-          alt="logo"
-          width={40}
-          height={40}
-          className="h-10 w-10 mt-0.5 flex-shrink-0"
-        />
+        <div className="h-8 w-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-wash">
+          <Icon className="w-4 h-4 text-secondary" strokeWidth={1.7} />
+        </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-3">
-            <Link
-              href={linkUrl}
-              className="flex-1 min-w-0"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <h3 className="text-base font-semibold text-primary hover:underline">
-                {link.title}
-              </h3>
-            </Link>
+            <h3 className="text-base font-semibold text-primary flex-1 min-w-0">
+              {link.title}
+            </h3>
 
             <div className="flex items-center gap-3 text-xs font-semibold text-secondary flex-shrink-0">
               {isForumTopic && link.metadata?.commentsCount !== undefined && (
@@ -113,15 +113,9 @@ function RelatedLinkCard({
               )}
             </div>
           </div>
-
-          {link.description && (
-            <p className="mt-2 text-sm text-secondary line-clamp-2">
-              {link.description}
-            </p>
-          )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -135,7 +129,7 @@ export default function RelatedProposalLinks({
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       {links.map((link) => (
         <RelatedLinkCard key={link.id} link={link} />
       ))}

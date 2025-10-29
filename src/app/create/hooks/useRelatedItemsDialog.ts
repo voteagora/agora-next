@@ -6,6 +6,7 @@ import { transformForumTopics } from "@/lib/forumUtils";
 import { RelatedItem } from "../types";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import { getArchivedProposals } from "@/lib/actions/archive";
+import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
 
 interface UseRelatedItemsDialogProps {
   searchType: "forum" | "tempcheck";
@@ -125,6 +126,7 @@ export function useRelatedItemsDialog({
           }
         ),
         url: `/proposals/${proposal.id}`,
+        status: deriveStatus(proposal, 18),
       }));
 
       return { results, totalResults, totalPages };

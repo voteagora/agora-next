@@ -39,8 +39,8 @@ export default function ArchiveProposalsList({
     }
 
     if (filter === proposalsFilterOptions.tempChecks.filter) {
-      return proposals.filter(
-        (proposal) => proposal.data_eng_properties?.source === "eas-oodao"
+      return proposals.filter((proposal) =>
+        proposal.tags?.includes("tempcheck")
       );
     }
 

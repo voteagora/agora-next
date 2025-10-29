@@ -10,7 +10,6 @@ export function PostTypeSelector({ value, onChange }: PostTypeSelectorProps) {
   const [activeIndicator, setActiveIndicator] = useState({ left: 0, width: 0 });
   const selectorRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<Record<PostType, HTMLButtonElement | null>>({
-    "forum-post": null,
     tempcheck: null,
     "gov-proposal": null,
   });

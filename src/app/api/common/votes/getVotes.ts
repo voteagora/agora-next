@@ -690,16 +690,19 @@ async function getUserVotesForProposal({
       : await contracts.token.provider.getBlock("latest");
 
     const data = Promise.all(
-      votes.map((vote) =>
-        parseVote(
-          vote,
-          parseProposalData(
+      votes.map((vote) => {
+        let proposalData: ParsedProposalData[ProposalType] | undefined =
+          undefined;
+        try {
+          proposalData = parseProposalData(
             JSON.stringify(vote.proposal_data || {}),
             vote.proposal_type
-          ),
-          latestBlock
-        )
-      )
+          );
+        } catch (error) {
+          console.error("Error parsing proposal data", error);
+        }
+        return parseVote(vote, proposalData, latestBlock);
+      })
     );
 
     return data;

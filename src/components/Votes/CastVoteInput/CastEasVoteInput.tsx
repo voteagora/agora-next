@@ -8,23 +8,40 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
-import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
+import { useUserVotes } from "@/hooks/useProposalVotes";
 
 type VoteOption = "for" | "against" | "abstain" | null;
+
+function VoteSuccessMessage() {
+  return (
+    <div className="w-full rounded-lg border border-line bg-neutral p-4">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-3">
+          <CheckCircleIcon className="h-6 w-6 text-positive flex-shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-primary">
+              Vote submitted successfully!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
-  const permissions = useForumPermissionsContext();
+  const { address } = useAccount();
+  const { hasVoted, isLoading } = useUserVotes({
+    proposalId: proposal.id,
+    address,
+  });
 
   // Check if proposal hasn't started yet
   const now = new Date();
   const hasNotStarted = proposal.startTime && proposal.startTime > now;
-
-  // Check if user has voting power
-  const currentVP = parseInt(permissions.currentVP) || 0;
-  const hasVotingPower = currentVP > 0;
 
   if (!isConnected) {
     return (
@@ -44,13 +61,19 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
     );
   }
 
-  // if (!hasVotingPower) {
-  //   return (
-  //     <div className="flex flex-col justify-between py-3 px-3 border-line">
-  //       <DisabledVoteButton reason="You need voting power to vote" />
-  //     </div>
-  //   );
-  // }
+  if (isLoading) {
+    return (
+      <div className="w-full rounded-lg border border-line bg-neutral p-4">
+        <div className="flex items-center justify-center">
+          <div className="text-sm text-secondary">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasVoted) {
+    return <VoteSuccessMessage />;
+  }
 
   return <CastEasVoteInputContent proposal={proposal} />;
 }
@@ -98,41 +121,41 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
       setIsSuccess(true);
     } catch (err) {
       console.error("Error submitting vote:", err);
-      setError(err instanceof Error ? err.message : "Failed to submit vote");
+      
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      
+      if (errorMessage.includes("0xb8daf542")) {
+        setError("Invalid attester - you are not authorized to vote on this proposal");
+      } else if (errorMessage.includes("0x7c9a1cf9")) {
+        setError("You have already voted on this proposal");
+      } else if (errorMessage.includes("0x7fa01202")) {
+        setError("Voting has not started yet");
+      } else if (errorMessage.includes("0x7a19ed05")) {
+        setError("Voting has ended for this proposal");
+      } else {
+        setError(err instanceof Error ? err.message : "Failed to submit vote");
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
   if (isSuccess) {
-    return (
-      <div className="w-full rounded-lg border border-line bg-neutral p-4">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <CheckCircleIcon className="h-6 w-6 text-positive flex-shrink-0" />
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-primary">
-                Vote submitted successfully!
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <VoteSuccessMessage />;
   }
 
   return (
-    <div className="w-full rounded-lg border border-line bg-neutral p-4">
+    <div className="w-full rounded-lg border border-line bg-neutral p-3">
       <textarea
         value={reason}
         onChange={(e) => setReason(e.target.value)}
         placeholder="I believe..."
-        className="mb-4 w-full resize-none rounded border-none  bg-neutral px-3 py-2 text-sm text-secondary outline-none focus:border-primary focus:ring-0"
-        rows={2}
+        className="w-full resize-none rounded border-none  bg-neutral px-3 text-sm text-secondary outline-none focus:border-primary focus:ring-0"
+        rows={1}
         disabled={isSubmitting}
       />
 
-      <div className="flex gap-2 mb-3">
+      <div className="flex gap-2 mb-2">
         <button
           onClick={() => setSelectedVote("for")}
           disabled={isSubmitting}

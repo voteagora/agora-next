@@ -7,7 +7,6 @@ import { CreatePostFormData, PostType, RelatedItem } from "../types";
 import { RelatedItemsCard } from "./RelatedItemsCard";
 import MarkdownTextareaInput from "@/app/proposals/draft/components/form/MarkdownTextareaInput";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { ForumCategory } from "@/lib/forumUtils";
 
 interface CreatePostFormProps {
   form: UseFormReturn<CreatePostFormData>;
@@ -19,7 +18,6 @@ interface CreatePostFormProps {
   currentVP: number;
   requiredVP: number;
   isAdmin: boolean;
-  categories: ForumCategory[];
   onAddRelatedDiscussion: (item: RelatedItem) => void;
   onRemoveRelatedDiscussion: (id: string) => void;
   onAddRelatedTempCheck: (item: RelatedItem) => void;
@@ -37,7 +35,6 @@ export function CreatePostForm({
   currentVP,
   requiredVP,
   isAdmin,
-  categories,
   onAddRelatedDiscussion,
   onRemoveRelatedDiscussion,
   onAddRelatedTempCheck,
@@ -54,7 +51,6 @@ export function CreatePostForm({
   const relatedTempChecks = watch("relatedTempChecks") || [];
   const title = watch("title");
   const description = watch("description");
-  const categoryId = watch("categoryId");
 
   return (
     <FormProvider {...form}>
@@ -80,36 +76,6 @@ export function CreatePostForm({
             )}
           </div>
 
-          {postType === "forum-post" && (
-            <div>
-              <Label
-                className="text-xs font-semibold text-secondary"
-                htmlFor="category"
-              >
-                Category
-              </Label>
-              <select
-                id="category"
-                value={categoryId || ""}
-                onChange={(e) =>
-                  setValue(
-                    "categoryId",
-                    e.target.value ? Number(e.target.value) : undefined
-                  )
-                }
-                className="w-full mt-2 px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                disabled={isSubmitting}
-              >
-                <option value="">No category</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
           <div>
             <div className="mt-2">
               <MarkdownTextareaInput
@@ -121,23 +87,19 @@ export function CreatePostForm({
             </div>
           </div>
 
-          {(postType === "tempcheck" || postType === "gov-proposal") && (
-            <RelatedItemsCard
-              postType={postType}
-              relatedDiscussions={relatedDiscussions}
-              relatedTempChecks={relatedTempChecks}
-              onAddRelatedDiscussion={onAddRelatedDiscussion}
-              onRemoveRelatedDiscussion={onRemoveRelatedDiscussion}
-              onAddRelatedTempCheck={onAddRelatedTempCheck}
-              onRemoveRelatedTempCheck={onRemoveRelatedTempCheck}
-              onRemoveCard={onRemoveRelatedItems}
-            />
-          )}
+          <RelatedItemsCard
+            postType={postType}
+            relatedDiscussions={relatedDiscussions}
+            relatedTempChecks={relatedTempChecks}
+            onAddRelatedDiscussion={onAddRelatedDiscussion}
+            onRemoveRelatedDiscussion={onRemoveRelatedDiscussion}
+            onAddRelatedTempCheck={onAddRelatedTempCheck}
+            onRemoveRelatedTempCheck={onRemoveRelatedTempCheck}
+            onRemoveCard={onRemoveRelatedItems}
+          />
 
           <div className="flex items-center justify-between pt-6 border-t">
             <div className="text-sm text-gray-500">
-              {postType === "forum-post" &&
-                "This will post on the Syndicate forums"}
               {postType === "tempcheck" && (
                 <div>
                   {canCreateTempCheck ? (
@@ -174,9 +136,14 @@ export function CreatePostForm({
                   <div className="text-xs mt-1">
                     {isAdmin && canCreateGovernanceProposal
                       ? "Admin permissions"
-                      : relatedTempChecks.length === 0
+                      : !relatedTempChecks?.length
                         ? "Must reference a successful temp check"
-                        : `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power required`}
+                        : relatedTempChecks.some(
+                            (tc) =>
+                              tc.status === "SUCCEEDED"
+                          )
+                          ? `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power required`
+                          : "Referenced temp check must be approved"}
                   </div>
                 </div>
               )}
@@ -195,11 +162,9 @@ export function CreatePostForm({
               >
                 {isSubmitting
                   ? "Creating..."
-                  : postType === "forum-post"
-                    ? "Create post"
-                    : postType === "tempcheck"
-                      ? "Create temp check"
-                      : "Create Proposal"}
+                  : postType === "tempcheck"
+                    ? "Create temp check"
+                    : "Create Proposal"}
               </Button>
             </div>
           </div>

@@ -65,7 +65,7 @@ export async function fetchProposalsFromArchive(
       );
     } else if (filter === "temp-checks") {
       filteredProposals = allProposals.filter(
-        (proposal) => proposal.data_eng_properties?.source === "eas-oodao"
+        (proposal) => proposal.tags?.includes("tempcheck")
       );
     }
 
