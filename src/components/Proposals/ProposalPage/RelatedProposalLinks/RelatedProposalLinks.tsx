@@ -78,19 +78,19 @@ function RelatedLinkCard({
       href={linkUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="block border border-line rounded-lg p-3 cursor-pointer"
+      className="border border-[#e0e0e0] rounded-lg p-3 cursor-pointer"
     >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-secondary">
+          <span className="text-xs font-semibold text-secondary">
             {headerText}
           </span>
           <ExternalLink className="w-3.5 h-3.5 text-secondary" />
         </div>
       </div>
 
-      <div className="flex items-start gap-3">
-        <div className="h-8 w-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-wash">
+      <div className="flex items-start gap-1">
+        <div className="h-6 w-6 flex-shrink-0 flex items-center justify-center rounded-lg bg-wash">
           <Icon className="w-4 h-4 text-secondary" strokeWidth={1.7} />
         </div>
 
@@ -135,7 +135,7 @@ export default function RelatedProposalLinks({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3 mb-2">
       {links.map((link) => (
         <RelatedLinkCard key={link.id} link={link} />
       ))}

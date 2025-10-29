@@ -14,6 +14,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { RelatedItem } from "@/app/create/types";
+import { useProposalLinksWithDetails } from "@/hooks/useProposalLinksWithDetails";
 
 type RangeProposalType = {
   min_quorum_pct: number;
@@ -29,6 +30,9 @@ export default function ArchiveProposalTypeApproval({
 }) {
   const permissions = useForumPermissionsContext();
   const router = useRouter();
+  const { links: relatedLinks, isLoading: isLoadingLinks } =
+    useProposalLinksWithDetails(proposal.id);
+  const hasLinkedGovProposal = relatedLinks.some((link) => link.type === "gov");
 
   // Check if this is an archive proposal with metadata
   const archiveMetadata = (
@@ -69,18 +73,23 @@ export default function ArchiveProposalTypeApproval({
     ? formatDistanceToNow(endTime, { addSuffix: true })
     : "Unavailable";
 
-  // Check if proposal is successful and user has permissions
-  const isSuccessful =
-    proposal.status === "EXECUTED" || proposal.status === "SUCCEEDED";
   const isDefeated =
     proposal.status === "DEFEATED" || proposal.status === "REJECTED";
+  const isSuccessful =
+    proposal.status === "EXECUTED" || proposal.status === "SUCCEEDED";
   const canCreateProposal = canCreateGovernanceProposal(permissions, [
     {
       status: "SUCCEEDED",
     } as RelatedItem,
   ]);
-  const showCreateButton = isSuccessful && canCreateProposal;
+
   const showCreateDiscussionButton = isDefeated && permissions.canCreateTopic;
+
+  const showCreateButton =
+    isSuccessful &&
+    canCreateProposal &&
+    !isLoadingLinks &&
+    !hasLinkedGovProposal;
 
   const handleCreateGovProposal = () => {
     const params = new URLSearchParams({
@@ -149,7 +158,7 @@ export default function ArchiveProposalTypeApproval({
       ) : (
         <>
           {endTime && endTime > now && (
-            <div className="flex items-center justify-between text-xs font-semibold text-secondary">
+            <div className="flex items-center justify-between text-xs font-semibold text-secondary mb-4">
               <span className="inline-flex items-center gap-2">
                 Proposal type not yet approved
                 <TooltipProvider delayDuration={150}>
@@ -168,7 +177,7 @@ export default function ArchiveProposalTypeApproval({
             </div>
           )}
 
-          <div className="mt-4 space-y-2 text-xs font-semibold text-secondary">
+          <div className="space-y-2 text-xs font-semibold text-secondary">
             <div className="flex items-center justify-between">
               <span>Quorum</span>
               <span>
