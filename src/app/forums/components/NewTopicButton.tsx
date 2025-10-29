@@ -74,12 +74,6 @@ export default function NewTopicButton({
       const params = new URLSearchParams({
         type: "tempcheck",
         fromTopicId: topicContext.id.toString(),
-        title: topicContext.title,
-        description: topicContext.content,
-        ...(topicContext.createdAt && { createdAt: topicContext.createdAt }),
-        ...(topicContext.commentsCount !== undefined && {
-          commentsCount: topicContext.commentsCount.toString(),
-        }),
       });
       router.push(`/create?${params.toString()}`);
     }
@@ -95,27 +89,6 @@ export default function NewTopicButton({
   const handleCreateNewTempCheck = () => {
     setShowExistingTempCheckModal(false);
     proceedToCreateTempCheck();
-  };
-
-  const handleCreateGovProposal = async () => {
-    const loggedIn = await requireLogin();
-    if (!loggedIn) {
-      return;
-    }
-
-    if (topicContext) {
-      const params = new URLSearchParams({
-        type: "gov-proposal",
-        fromTempCheckId: topicContext.id.toString(),
-        title: topicContext.title,
-        description: topicContext.content,
-        ...(topicContext.createdAt && { createdAt: topicContext.createdAt }),
-        ...(topicContext.commentsCount !== undefined && {
-          commentsCount: topicContext.commentsCount.toString(),
-        }),
-      });
-      router.push(`/create?${params.toString()}`);
-    }
   };
 
   //Todo: the colors for syndicate and towns need to be chagned in theme. cant make it conhesive with other tenants atm

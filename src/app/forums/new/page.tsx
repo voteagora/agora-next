@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { useForum } from "@/hooks/useForum";
 import { useForumCategories } from "@/hooks/useForumCategories";
 import { buildForumTopicPath } from "@/lib/forumUtils";
@@ -91,12 +91,13 @@ export default function NewForumTopicPage() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-8">Create new topic</h1>
-      </div>
+    <FormProvider {...form}>
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold mb-8">Create new topic</h1>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardContent className="space-y-6 mt-4">
@@ -192,11 +193,12 @@ export default function NewForumTopicPage() {
         </div>
       </div>
 
-      <InsufficientVPModal
-        isOpen={showVPModal}
-        onClose={() => setShowVPModal(false)}
-        action="topic"
-      />
-    </div>
+        <InsufficientVPModal
+          isOpen={showVPModal}
+          onClose={() => setShowVPModal(false)}
+          action="topic"
+        />
+      </div>
+    </FormProvider>
   );
 }

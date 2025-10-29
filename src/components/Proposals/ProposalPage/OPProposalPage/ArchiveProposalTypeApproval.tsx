@@ -95,10 +95,6 @@ export default function ArchiveProposalTypeApproval({
     const params = new URLSearchParams({
       type: "gov-proposal",
       fromTempCheckId: proposal.id,
-      title: proposal.markdowntitle || "",
-      description: proposal.description || "",
-      createdAt:
-        proposal.createdTime?.toISOString() || new Date().toISOString(),
     });
 
     router.push(`/create?${params.toString()}`);
