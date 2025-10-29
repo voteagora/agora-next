@@ -89,8 +89,8 @@ function RelatedLinkCard({
         </div>
       </div>
 
-      <div className="flex items-start gap-3">
-        <div className="h-8 w-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-wash">
+      <div className="flex items-start gap-1">
+        <div className="h-6 w-6 flex-shrink-0 flex items-center justify-center rounded-lg bg-wash">
           <Icon className="w-4 h-4 text-secondary" strokeWidth={1.7} />
         </div>
 

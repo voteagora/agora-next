@@ -14,6 +14,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { RelatedItem } from "@/app/create/types";
+import { useProposalLinksWithDetails } from "@/hooks/useProposalLinksWithDetails";
 
 type RangeProposalType = {
   min_quorum_pct: number;
@@ -29,6 +30,9 @@ export default function ArchiveProposalTypeApproval({
 }) {
   const permissions = useForumPermissionsContext();
   const router = useRouter();
+  const { links: relatedLinks, isLoading: isLoadingLinks } =
+    useProposalLinksWithDetails(proposal.id);
+  const hasLinkedGovProposal = relatedLinks.some((link) => link.type === "gov");
 
   // Check if this is an archive proposal with metadata
   const archiveMetadata = (
@@ -69,9 +73,6 @@ export default function ArchiveProposalTypeApproval({
     ? formatDistanceToNow(endTime, { addSuffix: true })
     : "Unavailable";
 
-  // Check if proposal is successful and user has permissions
-  const isSuccessful =
-    proposal.status === "EXECUTED" || proposal.status === "SUCCEEDED";
   const isDefeated =
     proposal.status === "DEFEATED" || proposal.status === "REJECTED";
   const canCreateProposal = canCreateGovernanceProposal(permissions, [
@@ -79,8 +80,14 @@ export default function ArchiveProposalTypeApproval({
       status: "SUCCEEDED",
     } as RelatedItem,
   ]);
-  const showCreateButton = isSuccessful && canCreateProposal;
+
   const showCreateDiscussionButton = isDefeated && permissions.canCreateTopic;
+
+  const showCreateButton =
+    !isDefeated &&
+    canCreateProposal &&
+    !isLoadingLinks &&
+    !hasLinkedGovProposal;
 
   const handleCreateGovProposal = () => {
     const params = new URLSearchParams({
