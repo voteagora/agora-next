@@ -58,7 +58,12 @@ const nextConfig = {
   experimental: {
     instrumentationHook: true,
     // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297
-    serverComponentsExternalPackages: ["@opentelemetry/sdk-node"],
+    serverComponentsExternalPackages: [
+      "@opentelemetry/sdk-node",
+      "isomorphic-dompurify",
+      "jsdom",
+      "parse5",
+    ],
     serverActions: {
       bodySizeLimit: "10mb",
     },
