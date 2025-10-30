@@ -1,4 +1,7 @@
-import ForumNewClient, { type FormData, type RelatedProposal } from "./ForumNewClient";
+import ForumNewClient, {
+  type FormData,
+  type RelatedProposal,
+} from "./ForumNewClient";
 import { fetchProposalFromArchive } from "@/lib/archiveUtils";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -6,7 +9,10 @@ const { namespace } = Tenant.current();
 
 async function getInitialFormData(searchParams: {
   [key: string]: string | string[] | undefined;
-}): Promise<{ formData: FormData; relatedProposal: RelatedProposal | undefined }> {
+}): Promise<{
+  formData: FormData;
+  relatedProposal: RelatedProposal | undefined;
+}> {
   const fromProposalId = searchParams.fromProposalId as string | undefined;
   const proposalTag = searchParams.proposalTag as string | undefined;
 
