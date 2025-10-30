@@ -40,7 +40,9 @@ export default function DelegateCardList({
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
-  const showParticipation = ui.toggle("show-participation")?.enabled || false;
+  const showParticipation =
+    (ui.toggle("show-participation")?.enabled || false) &&
+    !(ui.toggle("hide-participation-delegates-page")?.enabled || false);
 
   useEffect(() => {
     setDelegates(initialDelegates.data.slice(0, batchSize));
