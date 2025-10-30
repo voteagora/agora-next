@@ -825,13 +825,10 @@ async function getVotesCountForDelegateForAddress({
   return withMetrics("getVotesCountForDelegateForAddress", async () => {
     const { namespace, contracts } = Tenant.current();
 
-    // Count distinct proposals the delegate has voted on via votes table, joined by proposal_id
+    // Count distinct proposals the delegate has voted on via votes table
     const query = `
       SELECT COUNT(DISTINCT v.proposal_id)::int AS count
       FROM ${namespace}.votes v
-      INNER JOIN ${namespace}.proposals_v2 p
-        ON p.proposal_id = v.proposal_id
-       AND p.contract = $2
       WHERE v.voter = $1
         AND v.contract = $2
     `;
