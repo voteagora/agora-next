@@ -5,10 +5,8 @@ import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalVotesSummary from "./ProposalVotesSummary/ProposalVotesSummary";
-import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import CastEasVoteInput from "@/components/Votes/CastVoteInput/CastEasVoteInput";
 import ProposalVotesFilter from "./ProposalVotesCard/ProposalVotesFilter";
-import { VoteOnAtlas } from "@/components/common/VoteOnAtlas";
 import { icons } from "@/assets/icons/icons";
 import { Vote } from "@/app/api/common/votes/vote";
 import { ProposalSingleVote } from "@/components/Votes/ProposalVotesList/ProposalSingleVote";
@@ -127,22 +125,13 @@ export default function ArchiveProposalVotesCard({
             />
           )}
 
-          {isProposalActive &&
-            (isFromDaoNode ? (
-              <div className="border-t border-line">
-                <CastVoteInput proposal={proposal} />
-              </div>
-            ) : (
-              <div className="p-4">
-                <CastEasVoteInput proposal={proposal} />
-              </div>
-            ))}
+          {isProposalActive && (
+            <div className="p-4">
+              <CastEasVoteInput proposal={proposal} />
+            </div>
+          )}
         </div>
       </div>
-
-      <VoteOnAtlas
-        offchainProposalId={proposal.offchainProposalId || proposal.id}
-      />
     </>
   );
 }

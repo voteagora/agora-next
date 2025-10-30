@@ -85,9 +85,6 @@ async function fetchArchiveVotes({
   );
 }
 
-/**
- * Custom hook to fetch and transform archive votes using TanStack Query
- */
 export function useArchiveVotes({
   proposalId,
   proposalType,
@@ -141,7 +138,7 @@ async function fetchArchiveNonVoters({
 
   // Transform raw data on client side and deduplicate
   const seen = new Set<string>();
-  return (
+  const nonVoters =
     payload.data?.reduce<ArchiveNonVoter[]>((acc, row) => {
       const address = row.addr?.toLowerCase();
       if (!address || seen.has(address)) {
@@ -167,13 +164,19 @@ async function fetchArchiveNonVoters({
       });
 
       return acc;
-    }, []) ?? []
+    }, []) ?? [];
+
+  const parseVotingPower = (value: string) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
+  return nonVoters.sort(
+    (a, b) =>
+      parseVotingPower(b.voting_power) - parseVotingPower(a.voting_power)
   );
 }
 
-/**
- * Custom hook to fetch and transform archive non-voters using TanStack Query
- */
 export function useArchiveNonVoters({ proposalId }: { proposalId: string }) {
   const { data, isLoading, error } = useQuery({
     queryKey: [ARCHIVE_NON_VOTERS_QK, proposalId],
