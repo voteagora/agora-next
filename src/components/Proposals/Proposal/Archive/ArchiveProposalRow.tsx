@@ -56,8 +56,8 @@ export default function ArchiveProposalRow({
     id: proposal.id,
   } as const;
 
-  const isEasOodaoSource = proposal.source === "eas-oodao";
-  const primaryTagLabel = proposal.typeLabel;
+  const proposalTypeName = proposal.proposalTypeName;
+  const proposalTypeTag = proposal.proposalTypeTag;
 
   return (
     <Link href={proposal.href}>
@@ -70,12 +70,12 @@ export default function ArchiveProposalRow({
         >
           <div className="inline-flex justify-start items-center gap-1.5 flex-wrap">
             {/* Tag badge */}
-            {primaryTagLabel && (
+            {proposalTypeTag && (
               <div className="px-2 py-0.5 bg-black/10 rounded-[3px] flex justify-center items-center gap-0.5">
                 <div className="text-neutral-700 text-xs font-semibold leading-4">
-                  {primaryTagLabel === "Gov Proposal"
-                    ? `⚖️️ ${primaryTagLabel}`
-                    : `🌡️ ${primaryTagLabel}`}
+                  {proposalTypeTag === "Gov Proposal"
+                    ? `⚖️️ ${proposalTypeTag}`
+                    : `🌡️ ${proposalTypeTag}`}
                 </div>
               </div>
             )}
@@ -95,7 +95,7 @@ export default function ArchiveProposalRow({
             {/* Proposal type badge */}
             <div className="px-2 py-0.5 bg-black/10 rounded-[3px] flex justify-center items-center gap-0.5">
               <div className="text-neutral-700 text-xs font-semibold leading-4">
-                Standard
+                {proposalTypeName}
               </div>
             </div>
 

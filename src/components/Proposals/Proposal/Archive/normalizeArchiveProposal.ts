@@ -5,7 +5,7 @@ import {
   toDate,
   deriveTimeStatus,
   deriveStatus,
-  deriveTypeLabel,
+  deriveProposalTag,
 } from "./archiveProposalUtils";
 
 export type ArchiveProposalMetrics = {
@@ -25,7 +25,7 @@ export type ArchiveProposalDisplay = {
   id: string;
   href: string;
   title: string;
-  typeLabel: string;
+  proposalTypeTag: string;
   proposerAddress: string;
   proposerEns?: string;
   statusLabel: string;
@@ -39,6 +39,7 @@ export type ArchiveProposalDisplay = {
     proposalExecutedTime: Date | null;
   };
   metrics: ArchiveProposalMetrics;
+  proposalTypeName: string;
 };
 
 type NormalizeOptions = {
@@ -68,7 +69,7 @@ export function normalizeArchiveProposal(
   const decimals = options.tokenDecimals ?? 18;
   const status = deriveStatus(proposal, decimals);
   const normalizedStatus = STATUS_LABEL_MAP[status] ? status : "UNKNOWN";
-  const typeLabel = deriveTypeLabel(proposal);
+  const proposalTag = deriveProposalTag(proposal);
 
   // Handle different data sources: EAS-OODAO vs standard
   const source = proposal.data_eng_properties?.source;
@@ -118,7 +119,7 @@ export function normalizeArchiveProposal(
     id: proposal.id,
     href: `/proposals/${proposal.id}`,
     title,
-    typeLabel,
+    proposalTypeTag: proposalTag,
     tags: Array.isArray(proposal.tags) ? proposal.tags : undefined,
     source: proposal.data_eng_properties?.source,
     proposerAddress: proposal.proposer,
@@ -129,6 +130,10 @@ export function normalizeArchiveProposal(
     statusLabel: STATUS_LABEL_MAP[normalizedStatus],
     timeStatus: deriveTimeStatus(proposal, normalizedStatus),
     metrics,
+    proposalTypeName:
+      typeof proposal.proposal_type === "object"
+        ? proposal.proposal_type?.name
+        : "Standard",
   };
 }
 

@@ -7,7 +7,7 @@ import {
   safeBigInt,
   safeBigIntOrNull,
   formatArchiveTagLabel,
-  deriveTypeLabel,
+  deriveProposalTag,
   resolveArchiveThresholds,
 } from "./archiveProposalUtils";
 import { ARCHIVE_PROPOSAL_DEFAULTS } from "@/app/proposals/data/archiveDefaults";
@@ -120,7 +120,6 @@ export function normalizeArchiveStandardProposal(
       ? proposal.proposer_ens
       : proposal.proposer_ens?.detail;
   const rawTag = Array.isArray(proposal.tags) ? proposal.tags[0] : undefined;
-  const formattedTag = formatArchiveTagLabel(rawTag);
 
   const normalizedProposal: Proposal = {
     id: String(proposal.id),
@@ -169,8 +168,11 @@ export function normalizeArchiveStandardProposal(
   const archiveMetadata = {
     source,
     rawTag,
-    tagLabel: formattedTag,
-    typeLabel: deriveTypeLabel(proposal),
+    proposalTypeName:
+      typeof proposal.proposal_type === "object"
+        ? proposal.proposal_type?.name
+        : "Standard",
+    proposalTypeTag: deriveProposalTag(proposal),
     proposerEns,
     rawProposalType: proposal.proposal_type,
     defaultProposalTypeRanges: proposal.default_proposal_type_ranges,

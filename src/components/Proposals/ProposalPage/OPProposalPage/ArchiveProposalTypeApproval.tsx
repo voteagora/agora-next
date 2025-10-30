@@ -94,7 +94,8 @@ export default function ArchiveProposalTypeApproval({
     isSuccessful &&
     canCreateProposal &&
     !isLoadingLinks &&
-    !hasLinkedGovProposal;
+    !hasLinkedGovProposal &&
+    isTempCheck;
 
   const handleCreateGovProposal = () => {
     const params = new URLSearchParams({

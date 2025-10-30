@@ -257,13 +257,7 @@ export const formatVotingModuleName = (name?: string | null): string => {
   return cleaned ? capitalizeFirstLetter(cleaned) : "Governance";
 };
 
-export const deriveTypeLabel = (proposal: ArchiveListProposal): string => {
-  const source = proposal.data_eng_properties?.source;
-
-  if (source === "dao_node") {
-    return formatVotingModuleName(proposal.voting_module_name);
-  }
-
+export const deriveProposalTag = (proposal: ArchiveListProposal): string => {
   const rawTag = Array.isArray(proposal.tags) ? proposal.tags[0] : undefined;
   const formattedTag = formatArchiveTagLabel(rawTag);
   if (formattedTag) {
@@ -281,7 +275,7 @@ export const resolveArchiveThresholds = (proposal: ArchiveListProposal) => {
   const source = proposal.data_eng_properties?.source;
 
   const resolveFromEas = () => {
-    const type = proposal.proposal_type as any;
+    const type = proposal.proposal_type;
     if (!type || typeof type !== "object") {
       return {
         quorum: safeBigInt(0),
