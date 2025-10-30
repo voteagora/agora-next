@@ -63,8 +63,8 @@ export default function ProposalDescription({
     ? ((
         proposal as unknown as {
           archiveMetadata?: {
-            tagLabel?: string;
-            typeLabel?: string;
+            proposalTypeName?: string;
+            proposalTypeTag?: string;
             source?: string;
             proposerEns?: string;
           };
@@ -78,7 +78,7 @@ export default function ProposalDescription({
     <ENSName address={proposal.proposer} />
   );
 
-  const typeBadgeLabel = archiveMetadata?.typeLabel;
+  const typeBadgeLabel = archiveMetadata?.proposalTypeTag;
 
   return (
     <div
@@ -97,7 +97,7 @@ export default function ProposalDescription({
             By {proposerBadge}
           </div>
           <div className="px-2 py-0.5 bg-black/10 rounded-[3px] text-neutral-700 text-xs font-semibold leading-4">
-            Standard
+            {archiveMetadata?.proposalTypeName}
           </div>
         </div>
       )}

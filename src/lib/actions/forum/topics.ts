@@ -677,6 +677,14 @@ export const getForumData = async ({
       dao_slug: slug,
       archived: false,
       isNsfw: false,
+      deletedAt: null,
+      // Only include topics that have at least one valid post
+      posts: {
+        some: {
+          isNsfw: false,
+          deletedAt: null,
+        },
+      },
     };
 
     if (categoryId !== undefined) {
@@ -704,7 +712,7 @@ export const getForumData = async ({
             },
           },
           posts: {
-            where: { isNsfw: false },
+            where: { isNsfw: false, deletedAt: null },
             orderBy: { createdAt: "asc" },
             take: 1,
             include: {
@@ -721,7 +729,7 @@ export const getForumData = async ({
           _count: {
             select: {
               posts: {
-                where: { isNsfw: false },
+                where: { isNsfw: false, deletedAt: null },
               },
             },
           },
