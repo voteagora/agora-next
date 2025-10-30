@@ -29,8 +29,10 @@ function shortPropTitle(title: string, proosalId: string) {
 
 function propHeader(vote: Vote) {
   let headerString = "";
+  const isTempCheck = (vote as any).isTempCheck === true;
+  const noun = isTempCheck ? "temp check" : "proposal";
   if (vote.proposalType === "STANDARD" || vote.proposalType === "OPTIMISTIC")
-    headerString = `Voted ${vote.support.toLowerCase()} this proposal `;
+    headerString = `Voted ${vote.support.toLowerCase()} this ${noun} `;
 
   if (vote.proposalType === "APPROVAL")
     if (!vote.params || vote.params?.length === 0) {

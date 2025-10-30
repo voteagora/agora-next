@@ -779,8 +779,14 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       delegate.num_of_delegators?.toFixed() || "0"
     );
 
-    const usedNumOfDelegators =
-      cachedNumOfDelegators < 1000n
+    // If proposals are sourced from archive (offchain), prefer DB value to avoid
+    // discrepancies caused by reconstructing counts from onchain events.
+    const preferDbCount =
+      Tenant.current().ui.toggle("use-archive-for-proposals")?.enabled || false;
+
+    const usedNumOfDelegators = preferDbCount
+      ? cachedNumOfDelegators
+      : cachedNumOfDelegators < 1000n
         ? BigInt(
             (
               await numOfDelegationsResult

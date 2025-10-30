@@ -1,7 +1,11 @@
 "use client";
 
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { useVoterStats, useDelegateStats } from "@/hooks/useVoterStats";
+import {
+  useVoterStats,
+  useDelegateStats,
+  useArchiveParticipation,
+} from "@/hooks/useVoterStats";
 import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
@@ -16,55 +20,57 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
     });
 
   const { ui } = Tenant.current();
-
   const showParticipation = ui.toggle("show-participation")?.enabled || false;
+  const useArchiveForProposals =
+    ui.toggle("use-archive-for-proposals")?.enabled || false;
 
-  if (
-    !voterStats ||
-    !delegateResponse ||
-    delegateStatsError ||
-    !showParticipation
-  ) {
+  // Always call archive hook to keep hook order stable across renders
+  const { data: archiveParticipation } = useArchiveParticipation({
+    address: delegate.address,
+    enabled: useArchiveForProposals,
+  });
+
+  const showHeader = showParticipation || useArchiveForProposals;
+
+  if (!delegateResponse || delegateStatsError || !showHeader) {
     return null;
   }
 
   const delegateStats = delegateResponse.delegate;
-
   const numRecentVotes = delegateStats.participation[0];
   const numRecentProposals = delegateStats.participation[1];
 
-  const eligible = numRecentProposals >= 10;
-
-  if (!eligible) {
-    return <PendingActivityHeader />;
+  // Minimal change: optionally override counts for archive tenants
+  let votesCount = numRecentVotes;
+  let totalProposals = numRecentProposals;
+  if (useArchiveForProposals) {
+    if (!archiveParticipation) return <PendingActivityHeader />;
+    votesCount = archiveParticipation.participated;
+    totalProposals = archiveParticipation.totalProposals;
   }
 
-  const participationRate =
-    numRecentVotes / // Numerator
-    numRecentProposals; // Denominator
+  const eligible = totalProposals >= 10;
+  if (!eligible) return <PendingActivityHeader />;
 
+  const participationRate = votesCount / totalProposals;
   const participationString = Math.floor(participationRate * 100);
 
   if (participationRate > 0.5) {
     return (
       <ActiveHeader
-        outOfTen={numRecentVotes.toString()}
-        totalProposals={numRecentProposals}
+        outOfTen={votesCount.toString()}
+        totalProposals={totalProposals}
         percentParticipation={participationString}
       />
     );
-  } else if (participationRate <= 0.5) {
-    return (
-      <InactiveHeader
-        outOfTen={numRecentVotes.toString()}
-        totalProposals={numRecentProposals}
-        percentParticipation={participationString}
-      />
-    );
-  } else {
-    //   Fallback to pending if something goes wrong
-    return <PendingActivityHeader />;
   }
+  return (
+    <InactiveHeader
+      outOfTen={votesCount.toString()}
+      totalProposals={totalProposals}
+      percentParticipation={participationString}
+    />
+  );
 };
 
 const ActiveHeader = ({

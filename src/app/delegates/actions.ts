@@ -25,6 +25,10 @@ import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
 import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
+import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
+import { proposalsFilterOptions } from "@/lib/constants";
+import { fetchVotesCountForDelegate } from "@/app/api/common/votes/getVotes";
+import { prismaWeb3Client } from "@/app/lib/prisma";
 
 export const fetchDelegate = async (address: string) => {
   try {
@@ -194,4 +198,64 @@ export async function updateNotificationPreferencesForAddress(
 
 export const fetchDelegateStats = async (address: string) => {
   return getDelegateDataFromDaoNode(address);
+};
+
+// Archive-based participation rate for tenants using archive-backed proposals
+export const fetchArchiveParticipation = async (address: string) => {
+  const { namespace, ui } = Tenant.current();
+  const useArchive = ui.toggle("use-archive-for-proposals")?.enabled ?? false;
+
+  if (!useArchive) {
+    return null;
+  }
+
+  // Pull archive proposals then consider only the 10 most recent by start_blocktime
+  const archiveList = await fetchProposalsFromArchive(
+    namespace,
+    proposalsFilterOptions.everything.filter
+  );
+
+  const proposals = archiveList?.data ?? [];
+  const recentProposals = [...proposals]
+    .filter((p) => typeof p.start_blocktime === "number")
+    .sort(
+      (a, b) => Number(b.start_blocktime || 0) - Number(a.start_blocktime || 0)
+    )
+    .slice(0, 10);
+
+  const totalProposals = recentProposals.length;
+
+  if (totalProposals === 0) {
+    return { participated: 0, totalProposals: 0, rate: 0 };
+  }
+
+  const proposalIds = recentProposals.map((p) => String(p.id));
+
+  // Count distinct proposals among the recent ones that this delegate voted on
+  const { contracts } = Tenant.current();
+  const rows = await prismaWeb3Client.$queryRawUnsafe<
+    {
+      count: number;
+    }[]
+  >(
+    `
+      SELECT COUNT(DISTINCT v.proposal_id)::int AS count
+      FROM ${namespace}.votes v
+      WHERE v.voter = $1
+        AND v.contract = $2
+        AND v.proposal_id = ANY($3::text[])
+    `,
+    address.toLowerCase(),
+    contracts.governor.address.toLowerCase(),
+    proposalIds
+  );
+
+  const participated = rows?.[0]?.count ?? 0;
+  const rate = totalProposals > 0 ? participated / totalProposals : 0;
+
+  return {
+    participated,
+    totalProposals,
+    rate,
+  };
 };
