@@ -231,3 +231,17 @@ export const getArchiveSlugForEasOodaoProposal = (
 ) => {
   return `${getArchiveSlugGCSbucket(namespace)}/proposal/eas-oodao/raw/${proposalId}.json`;
 };
+
+export const getArchiveSlugForProposalVotes = (
+  namespace: string,
+  proposalId: string
+) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/votes/${proposalId}.ndjson.gz`;
+};
+
+export const getArchiveSlugForProposalNonVoters = (
+  namespace: string,
+  proposalId: string
+) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/hasnt_voted/${proposalId}.ndjson.gz`;
+};
