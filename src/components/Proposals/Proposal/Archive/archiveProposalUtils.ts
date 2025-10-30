@@ -142,7 +142,7 @@ export const deriveStatus = (
   decimals: number
 ): string => {
   // Check terminal states first
-  if (proposal.cancel_event) {
+  if (proposal.cancel_event || proposal.lifecycle_stage === "CANCELLED") {
     return "CANCELLED";
   } else if (proposal.execute_event) {
     return "EXECUTED";

@@ -45,7 +45,10 @@ export default function ArchiveProposalsList({
     }
 
     return proposals.filter(
-      (proposal) => !proposal.cancel_event && !proposal.delete_event
+      (proposal) =>
+        !proposal.cancel_event &&
+        !proposal.delete_event &&
+        proposal.lifecycle_stage !== "CANCELLED"
     );
   }, [filter, proposals]);
 

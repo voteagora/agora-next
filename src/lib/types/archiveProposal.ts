@@ -51,6 +51,7 @@ export type ArchiveListProposal = {
   end_blocktime: number;
   start_block: number;
   end_block: number;
+  lifecycle_stage?: string;
   data_eng_properties: {
     liveness: "live" | "archived";
     source: "dao_node" | "eas-oodao" | string;
