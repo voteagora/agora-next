@@ -75,6 +75,7 @@ describe("calculateVoteMetadata", () => {
       abstain: BigInt(0),
     },
     proposalType: "STANDARD" as any,
+    proposalTypeData: null,
     status: "ACTIVE" as any,
     createdTransactionHash: "0x",
     cancelledTransactionHash: "0x",

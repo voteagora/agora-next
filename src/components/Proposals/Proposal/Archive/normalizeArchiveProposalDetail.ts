@@ -121,6 +121,18 @@ export function normalizeArchiveStandardProposal(
       : proposal.proposer_ens?.detail;
   const rawTag = Array.isArray(proposal.tags) ? proposal.tags[0] : undefined;
 
+  const proposalTypeData =
+    typeof proposal.proposal_type === "object" && proposal.proposal_type
+      ? {
+          proposal_type_id: Number(proposal.proposal_type.eas_uid || 0),
+          name: proposal.proposal_type.name || "Standard",
+          quorum: safeBigInt(proposal.proposal_type.quorum || 0),
+          approval_threshold: safeBigInt(
+            proposal.proposal_type.approval_threshold || 0
+          ),
+        }
+      : null;
+
   const normalizedProposal: Proposal = {
     id: String(proposal.id),
     proposer:
@@ -158,6 +170,7 @@ export function normalizeArchiveStandardProposal(
       : null,
     proposalResults,
     proposalType: "STANDARD",
+    proposalTypeData,
     status: normalizedStatusKey as Proposal["status"],
     createdTransactionHash: null,
     cancelledTransactionHash: proposal.cancel_event?.transaction_hash ?? null,

@@ -25,6 +25,7 @@ export type ArchiveProposalDeleteEvent = {
 
 // Proposal type with fixed configuration (eas-oodao)
 export type FixedProposalType = {
+  eas_uid: string;
   name: string;
   class: "STANDARD" | "OPTIMISTIC" | "APPROVAL";
   quorum: number; // basis points (e.g., 3520 = 35.2%)

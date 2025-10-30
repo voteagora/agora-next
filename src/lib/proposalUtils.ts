@@ -4,6 +4,7 @@ import {
   BlockBasedProposal,
   TimestampBasedProposal,
   ProposalPayload,
+  ProposalTypeData,
 } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData, keccak256, parseUnits } from "viem";
 import Tenant from "./tenant/tenant";
@@ -411,6 +412,7 @@ export async function parseProposal(
     unformattedProposalData: proposal.proposal_data_raw,
     proposalResults: proposalResults.kind,
     proposalType,
+    proposalTypeData,
     status: latestBlock
       ? await getProposalStatus(
           proposal,
@@ -1064,13 +1066,6 @@ export const proposalToCallArgs = (proposal: Proposal) => {
       : "",
     keccak256(toUtf8Bytes(proposal.description!)),
   ];
-};
-
-type ProposalTypeData = {
-  proposal_type_id: number;
-  name: string;
-  quorum: bigint;
-  approval_threshold: bigint;
 };
 
 /**

@@ -88,7 +88,9 @@ export default function ArchiveProposalTypeApproval({
     } as RelatedItem,
   ]);
 
-  const showCreateDiscussionButton = isDefeated && permissions.canCreateTopic;
+  const showCreateDiscussionButton = isTempCheck
+    ? isDefeated && permissions.canCreateTopic
+    : (isDefeated || isSuccessful) && permissions.canCreateTopic;
 
   const showCreateButton =
     isSuccessful &&
@@ -108,8 +110,8 @@ export default function ArchiveProposalTypeApproval({
 
   const handleCreateDiscussion = () => {
     const params = new URLSearchParams({
-      title: proposal.markdowntitle || "",
-      description: proposal.description || "",
+      fromProposalId: proposal.id,
+      proposalTag: isTempCheck ? "tempcheck" : "gov",
     });
 
     router.push(`/forums/new?${params.toString()}`);
