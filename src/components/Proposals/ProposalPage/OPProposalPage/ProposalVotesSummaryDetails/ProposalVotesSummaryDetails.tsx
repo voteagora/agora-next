@@ -132,7 +132,13 @@ export default function ProposalVotesSummaryDetails({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 w-[calc(100%+32px)] mt-4 bg-wash border-t border-b border-line -ml-4 p-4">
+      <div className="flex flex-col gap-2 w-[calc(100%+32px)] mt-2 bg-wash border-t border-b border-line -ml-4 p-4">
+        {!!proposal.proposalTypeData?.name && (
+          <div className="flex justify-between text-secondary font-semibold text-xs">
+            Proposal Type
+            <span>{proposal.proposalTypeData.name}</span>
+          </div>
+        )}
         <div className="flex justify-between">
           <div className="flex items-center gap-1 text-secondary font-semibold text-xs">
             Quorum
