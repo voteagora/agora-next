@@ -196,6 +196,13 @@ async function getVotesForDelegateForAddress({
             if (archiveTitle && archiveTitle.trim().length > 0) {
               parsed.proposalTitle = archiveTitle;
             }
+            // Surface a simple hint for UI copy (e.g., temp check vs proposal)
+            const tags: string[] = Array.isArray(archiveProposal?.tags)
+              ? archiveProposal.tags
+              : [];
+            if (tags.includes("tempcheck")) {
+              (parsed as any).isTempCheck = true;
+            }
           } catch (_) {
             // ignore archive fetch errors; keep parsed title as-is
           }
