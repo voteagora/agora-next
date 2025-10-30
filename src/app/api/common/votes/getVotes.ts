@@ -24,6 +24,7 @@ import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
 import { ProposalType } from "@/lib/types";
+import { fetchProposalFromArchive } from "@/lib/archiveUtils";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -145,16 +146,63 @@ async function getVotesForDelegateForAddress({
       ? await contracts.providerForTime?.getBlock("latest")
       : await contracts.token.provider.getBlock("latest");
 
+    const archiveMode =
+      ui.toggle("use-archive-for-proposals")?.enabled ?? false;
+
     const data = await Promise.all(
-      votes
-        .filter((vote) => vote.proposal_data !== null)
-        .map((vote) => {
-          const proposalData = parseProposalData(
-            JSON.stringify(vote.proposal_data),
-            vote.proposal_type
-          );
-          return parseVote(vote, proposalData, latestBlock);
-        })
+      votes.map(async (vote) => {
+        // When using archive-backed proposals, DB may not have proposal_data/type.
+        // Render past votes anyway with sane defaults.
+        const safeProposalType =
+          (vote as any).proposal_type ??
+          (archiveMode ? ("STANDARD" as ProposalType) : (undefined as any));
+
+        let proposalData: ParsedProposalData[ProposalType] | undefined =
+          undefined;
+        try {
+          if (vote.proposal_data) {
+            proposalData = parseProposalData(
+              JSON.stringify(vote.proposal_data),
+              safeProposalType
+            );
+          }
+        } catch (e) {
+          // Ignore parse errors; we can still show minimal vote info
+          proposalData = undefined;
+        }
+
+        // Pass through proposal_type default if missing in archive mode
+        const voteWithType = safeProposalType
+          ? ({
+              ...(vote as any),
+              proposal_type: safeProposalType,
+            } as VotePayload)
+          : (vote as VotePayload);
+
+        const parsed = await parseVote(voteWithType, proposalData, latestBlock);
+
+        // Always source the proposal title from the archive when archive mode is enabled
+        if (archiveMode) {
+          try {
+            const { namespace } = Tenant.current();
+            const archiveProposal: any = await fetchProposalFromArchive(
+              namespace,
+              vote.proposal_id as unknown as string
+            );
+            const archiveTitle =
+              typeof archiveProposal?.title === "string"
+                ? archiveProposal.title
+                : "";
+            if (archiveTitle && archiveTitle.trim().length > 0) {
+              parsed.proposalTitle = archiveTitle;
+            }
+          } catch (_) {
+            // ignore archive fetch errors; keep parsed title as-is
+          }
+        }
+
+        return parsed;
+      })
     );
     return {
       meta,
