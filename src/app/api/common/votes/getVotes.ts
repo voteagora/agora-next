@@ -767,3 +767,38 @@ export const fetchSnapshotVotesForProposal = cache(getSnapshotVotesForProposal);
 export const fetchSnapshotUserVotesForProposal = cache(
   getUserSnapshotVotesForProposal
 );
+
+// Count distinct proposals a delegate has voted on (DB), used for archive participation rate
+async function getVotesCountForDelegateForAddress({
+  address,
+}: {
+  address: string;
+}) {
+  return withMetrics("getVotesCountForDelegateForAddress", async () => {
+    const { namespace, contracts } = Tenant.current();
+
+    // Count distinct proposals the delegate has voted on via votes table, joined by proposal_id
+    const query = `
+      SELECT COUNT(DISTINCT v.proposal_id)::int AS count
+      FROM ${namespace}.votes v
+      INNER JOIN ${namespace}.proposals_v2 p
+        ON p.proposal_id = v.proposal_id
+       AND p.contract = $2
+      WHERE v.voter = $1
+        AND v.contract = $2
+    `;
+
+    const rows = await prismaWeb3Client.$queryRawUnsafe<{ count: number }[]>(
+      query,
+      address.toLowerCase(),
+      contracts.governor.address.toLowerCase()
+    );
+
+    const count = rows?.[0]?.count ?? 0;
+    return count as number;
+  });
+}
+
+export const fetchVotesCountForDelegate = cache(
+  getVotesCountForDelegateForAddress
+);

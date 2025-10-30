@@ -25,6 +25,9 @@ import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
 import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
+import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
+import { proposalsFilterOptions } from "@/lib/constants";
+import { fetchVotesCountForDelegate } from "@/app/api/common/votes/getVotes";
 
 export const fetchDelegate = async (address: string) => {
   try {
@@ -194,4 +197,32 @@ export async function updateNotificationPreferencesForAddress(
 
 export const fetchDelegateStats = async (address: string) => {
   return getDelegateDataFromDaoNode(address);
+};
+
+// Archive-based participation rate for tenants using archive-backed proposals
+export const fetchArchiveParticipation = async (address: string) => {
+  const { namespace, ui } = Tenant.current();
+  const useArchive = ui.toggle("use-archive-for-proposals")?.enabled ?? false;
+
+  if (!useArchive) {
+    return null;
+  }
+
+  const [archiveList, votesCount] = await Promise.all([
+    fetchProposalsFromArchive(
+      namespace,
+      proposalsFilterOptions.everything.filter
+    ),
+    fetchVotesCountForDelegate({ address }),
+  ]);
+
+  const totalProposals = archiveList?.data?.length ?? 0;
+  const participated = votesCount ?? 0;
+  const rate = totalProposals > 0 ? participated / totalProposals : 0;
+
+  return {
+    participated,
+    totalProposals,
+    rate,
+  };
 };
