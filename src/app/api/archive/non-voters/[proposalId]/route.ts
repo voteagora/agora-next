@@ -8,10 +8,7 @@ export async function GET(
 ) {
   const { proposalId } = params;
   if (!proposalId) {
-    return NextResponse.json(
-      { error: "Missing proposal id" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Missing proposal id" }, { status: 400 });
   }
 
   const { namespace } = Tenant.current();
