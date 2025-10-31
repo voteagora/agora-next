@@ -52,8 +52,8 @@ export default function ArchiveProposalTypeApproval({
     return null;
   }
 
-  const isDefeated = proposal.status === "DEFEATED";
-  const isSuccessful = proposal.status === "SUCCEEDED";
+  const isDefeated = proposal.status === "Defeated";
+  const isSuccessful = proposal.status === "Succeeded";
   const isActive = !isDefeated && !isSuccessful;
 
   // Check for default_proposal_type_ranges (pending approval)
@@ -83,9 +83,7 @@ export default function ArchiveProposalTypeApproval({
     : "Unavailable";
 
   const canCreateProposal = canCreateGovernanceProposal(permissions, [
-    {
-      status: "SUCCEEDED",
-    } as RelatedItem,
+    { status: "SUCCEEDED" } as RelatedItem,
   ]);
 
   const showCreateDiscussionButton = isDefeated && permissions.canCreateTopic;

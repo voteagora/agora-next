@@ -86,9 +86,7 @@ export default function Markdown({
           ),
           className)
         }
-        wrapperElement={{
-          "data-color-mode": "light",
-        }}
+        wrapperElement={{ "data-color-mode": "light" }}
         rehypePlugins={[() => rehypeExternalLinks({ target: "_blank" })]}
         components={{
           h2: ({ node, ...props }) => (

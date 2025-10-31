@@ -13,9 +13,7 @@ import {
 import { formatArchiveTagLabel } from "./archiveProposalUtils";
 import { OPStandardStatusView } from "../OPStandardProposalStatus";
 
-type ArchiveProposalRowProps = {
-  proposal: ArchiveProposalDisplay;
-};
+type ArchiveProposalRowProps = { proposal: ArchiveProposalDisplay };
 
 const truncate = (value: string) =>
   value.length > 80 ? `${value.slice(0, 80)}...` : value;
@@ -59,6 +57,15 @@ export default function ArchiveProposalRow({
   const proposalTypeName = proposal.proposalTypeName;
   const proposalTypeTag = proposal.proposalTypeTag;
 
+  // Check if proposal has ranges (pending approval)
+  const isDefeated = proposal.statusLabel === "Defeated";
+  const isSuccessful = proposal.statusLabel === "Succeeded";
+  const isActive = !isDefeated && !isSuccessful;
+  const hasPendingRanges =
+    isActive &&
+    proposal.source === "eas-oodao" &&
+    !!proposal.defaultProposalTypeRanges;
+
   return (
     <Link href={proposal.href}>
       <div className="border-b border-line items-center flex flex-row bg-neutral">
@@ -93,8 +100,12 @@ export default function ArchiveProposalRow({
             </div>
 
             {/* Proposal type badge */}
-            <div className="px-2 py-0.5 bg-black/10 rounded-[3px] flex justify-center items-center gap-0.5">
-              <div className="text-neutral-700 text-xs font-semibold leading-4">
+            <div
+              className={`px-2 py-0.5 rounded-[3px] flex justify-center items-center gap-0.5 bg-black/10 ${
+                hasPendingRanges ? "opacity-50" : ""
+              }`}
+            >
+              <div className="text-xs font-semibold leading-4 text-neutral-700">
                 {proposalTypeName}
               </div>
             </div>

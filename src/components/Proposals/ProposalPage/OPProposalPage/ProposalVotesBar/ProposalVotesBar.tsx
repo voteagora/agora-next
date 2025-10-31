@@ -5,6 +5,13 @@ interface Props {
   proposal: Proposal;
 }
 
+type RangeProposalType = {
+  min_quorum_pct: number;
+  max_quorum_pct: number;
+  min_approval_threshold_pct: number;
+  max_approval_threshold_pct: number;
+};
+
 export default function ProposalVotesBar({ proposal }: Props) {
   const thresholdPercent = Math.round(Number(proposal.approvalThreshold) / 100);
 
@@ -13,6 +20,31 @@ export default function ProposalVotesBar({ proposal }: Props) {
   const totalVotesCount =
     Number(results.for) + Number(results.against) + Number(results.abstain);
   const hasVotes = totalVotesCount > 0;
+
+  // Check if this is an archive proposal with ranges (pending state)
+  const archiveMetadata = (
+    proposal as unknown as {
+      archiveMetadata?: { source?: string; defaultProposalTypeRanges?: any };
+    }
+  ).archiveMetadata;
+
+  const isDefeated = proposal.status === "Defeated";
+  const isSuccessful = proposal.status === "Succeeded";
+  const isActive = !isDefeated && !isSuccessful;
+
+  const defaultProposalTypeRanges =
+    isActive && archiveMetadata?.source === "eas-oodao"
+      ? (archiveMetadata.defaultProposalTypeRanges as
+          | RangeProposalType
+          | undefined)
+      : null;
+
+  const minApprovalThreshold = defaultProposalTypeRanges
+    ? Math.round(defaultProposalTypeRanges.min_approval_threshold_pct / 100)
+    : null;
+  const maxApprovalThreshold = defaultProposalTypeRanges
+    ? Math.round(defaultProposalTypeRanges.max_approval_threshold_pct / 100)
+    : null;
 
   return (
     <div id="chartContainer" className="relative flex items-stretch gap-x-0.5">
@@ -41,11 +73,34 @@ export default function ProposalVotesBar({ proposal }: Props) {
         <div className="w-full bg-wash h-[10px]"></div>
       )}
 
-      {proposal.approvalThreshold && (
-        <div
-          className="bg-primary h-4 w-[2px] absolute -top-[3px] z-50"
-          style={{ left: `${thresholdPercent}%` }}
-        />
+      {minApprovalThreshold !== null && maxApprovalThreshold !== null ? (
+        <>
+          {/* Min threshold marker */}
+          <div
+            className="bg-primary/60 h-4 w-[2px] absolute -top-[3px] z-50"
+            style={{ left: `${minApprovalThreshold}%` }}
+          />
+          {/* Max threshold marker */}
+          <div
+            className="bg-primary/60 h-4 w-[2px] absolute -top-[3px] z-50"
+            style={{ left: `${maxApprovalThreshold}%` }}
+          />
+          {/* Range fill between min and max */}
+          <div
+            className="bg-primary/10 h-[10px] absolute top-0 z-40"
+            style={{
+              left: `${minApprovalThreshold}%`,
+              width: `${maxApprovalThreshold - minApprovalThreshold}%`,
+            }}
+          />
+        </>
+      ) : (
+        proposal.approvalThreshold && (
+          <div
+            className="bg-primary h-4 w-[2px] absolute -top-[3px] z-50"
+            style={{ left: `${thresholdPercent}%` }}
+          />
+        )
       )}
     </div>
   );

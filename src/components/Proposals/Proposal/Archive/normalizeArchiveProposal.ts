@@ -31,6 +31,12 @@ export type ArchiveProposalDisplay = {
   statusLabel: string;
   tags?: string[];
   source?: string;
+  defaultProposalTypeRanges?: {
+    min_quorum_pct: number;
+    max_quorum_pct: number;
+    min_approval_threshold_pct: number;
+    max_approval_threshold_pct: number;
+  };
   timeStatus: {
     proposalStatus: string;
     proposalStartTime: Date | null;
@@ -122,6 +128,7 @@ export function normalizeArchiveProposal(
     proposalTypeTag: proposalTag,
     tags: Array.isArray(proposal.tags) ? proposal.tags : undefined,
     source: proposal.data_eng_properties?.source,
+    defaultProposalTypeRanges: proposal.default_proposal_type_ranges,
     proposerAddress: proposal.proposer,
     proposerEns:
       typeof proposal.proposer_ens === "string"
