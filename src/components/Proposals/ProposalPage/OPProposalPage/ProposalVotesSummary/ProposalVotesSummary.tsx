@@ -44,18 +44,14 @@ export default function ProposalVotesSummary({ proposal }: Props) {
     }
   ).archiveMetadata;
 
-  const isDefeated = proposal.status === "Defeated";
-  const isSuccessful = proposal.status === "Succeeded";
-  const isActive = !isDefeated && !isSuccessful;
-
   const defaultProposalTypeRanges =
-    isActive && archiveMetadata?.source === "eas-oodao"
+    archiveMetadata?.source === "eas-oodao"
       ? (archiveMetadata.defaultProposalTypeRanges as
           | RangeProposalType
           | undefined)
       : null;
 
-  const hasPendingRanges = !!defaultProposalTypeRanges;
+  const hasPendingRanges = (proposal as any).proposalTypeApproval === "PENDING";
 
   const minApprovalThreshold = defaultProposalTypeRanges
     ? defaultProposalTypeRanges.min_approval_threshold_pct / 100

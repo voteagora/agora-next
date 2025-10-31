@@ -128,18 +128,14 @@ export default function ProposalVotesSummaryDetails({
     }
   ).archiveMetadata;
 
-  const isDefeated = proposal.status === "Defeated";
-  const isSuccessful = proposal.status === "Succeeded";
-  const isActive = !isDefeated && !isSuccessful;
-
   const defaultProposalTypeRanges =
-    isActive && archiveMetadata?.source === "eas-oodao"
+    archiveMetadata?.source === "eas-oodao"
       ? (archiveMetadata.defaultProposalTypeRanges as
           | RangeProposalType
           | undefined)
       : null;
 
-  const hasPendingRanges = !!defaultProposalTypeRanges;
+  const hasPendingRanges = (proposal as any).proposalTypeApproval === "PENDING";
 
   const minQuorum = defaultProposalTypeRanges
     ? defaultProposalTypeRanges.min_quorum_pct / 100

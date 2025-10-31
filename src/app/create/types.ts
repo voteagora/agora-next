@@ -13,6 +13,7 @@ export interface RelatedItem {
   timestamp: string;
   url?: string;
   status?: string;
+  proposer?: string;
   proposalType?: {
     id: string;
     name: string;

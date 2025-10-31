@@ -8,6 +8,8 @@ import { getProposalLinks } from "@/lib/actions/proposalLinks";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import { getArchivedProposals } from "@/lib/actions/archive";
 import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
+import { useAccount } from "wagmi";
+import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 
 interface UseRelatedItemsDialogProps {
   searchType: "forum" | "tempcheck";
@@ -27,6 +29,8 @@ export function useRelatedItemsDialog({
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+  const { address } = useAccount();
+  const permissions = useForumPermissionsContext();
 
   const { data: topics = [], isLoading: isLoadingTopics } = useQuery({
     queryKey: ["forumTopics"],
@@ -137,6 +141,9 @@ export function useRelatedItemsDialog({
         const status = deriveStatus(proposal, 18);
         if (status !== "SUCCEEDED") return false;
         if (tempCheckLinksMap.get(proposal.id)) return false;
+        const isAuthor =
+          address?.toLowerCase() === proposal.proposer?.toLowerCase();
+        if (!permissions.isAdmin && !isAuthor) return false;
         if (!debouncedSearchTerm) return true;
         const searchLower = debouncedSearchTerm.toLowerCase();
         return (
@@ -165,6 +172,7 @@ export function useRelatedItemsDialog({
           ),
           url: `/proposals/${proposal.id}`,
           status: deriveStatus(proposal, 18),
+          proposer: proposal.proposer,
           proposalType:
             proposalType &&
             typeof proposalType === "object" &&
@@ -192,6 +200,8 @@ export function useRelatedItemsDialog({
     debouncedSearchTerm,
     page,
     tempCheckLinksMap,
+    address,
+    permissions.isAdmin,
   ]);
 
   const handleSelect = useCallback(

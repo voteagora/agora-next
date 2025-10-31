@@ -11,16 +11,14 @@ export function canCreateTempCheck(permissions: ForumPermissions): boolean {
 
 export function canCreateGovernanceProposal(
   permissions: ForumPermissions,
-  relatedTempChecks: RelatedItem[]
+  relatedTempChecks: RelatedItem[],
+  isAuthor: boolean
 ): boolean {
   const hasApprovedTempCheck =
     Array.isArray(relatedTempChecks) &&
     relatedTempChecks.some((tc) => tc.status === "SUCCEEDED");
 
-  if (!hasApprovedTempCheck) return false;
-  if (permissions.isAdmin) return true;
+  if ((permissions.isAdmin || isAuthor) && hasApprovedTempCheck) return true;
 
-  const currentVP = parseInt(permissions.currentVP) || 0;
-  const requiredVP = permissions.settings?.minVpForProposals || 0;
-  return currentVP >= requiredVP;
+  return false;
 }

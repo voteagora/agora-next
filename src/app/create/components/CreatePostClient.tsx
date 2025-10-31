@@ -74,9 +74,13 @@ export function CreatePostClient({
 
   const relatedTempChecks = form.watch("relatedTempChecks") || [];
   const canCreateTempCheck = canCreateTempCheckUtil(permissions);
+  const isAuthorOfTempChecks = relatedTempChecks.every(
+    (tc) => tc.proposer?.toLowerCase() === address?.toLowerCase()
+  );
   const canCreateGovernanceProposal = canCreateGovernanceProposalUtil(
     permissions,
-    relatedTempChecks
+    relatedTempChecks,
+    isAuthorOfTempChecks
   );
   const currentVP = parseInt(permissions.currentVP) || 0;
   const requiredVP = permissions.settings?.minVpForProposals || 0;
@@ -178,7 +182,7 @@ export function CreatePostClient({
 
   const handleCloseIndexingModal = () => {
     setShowIndexingModal(false);
-    router.push("/forums");
+    router.push("/");
   };
 
   useEffect(() => {

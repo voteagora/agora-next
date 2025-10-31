@@ -176,6 +176,7 @@ export function normalizeArchiveStandardProposal(
     cancelledTransactionHash: proposal.cancel_event?.transaction_hash ?? null,
     executedTransactionHash: proposal.execute_event?.transaction_hash ?? null,
     offchainProposalId: undefined,
+    proposalTypeApproval: proposal.proposal_type_approval,
   };
 
   const archiveMetadata = {

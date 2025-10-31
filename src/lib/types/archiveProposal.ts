@@ -110,6 +110,7 @@ export type ArchiveListProposal = {
   dao_id?: string;
   uid?: string;
   chain_id?: number;
+  proposal_type_approval?: string;
   tags?: string[];
   total_voting_power_at_start?: string;
 };
