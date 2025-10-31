@@ -25,6 +25,7 @@ const sdk = new NodeSDK({
     "vercel.branch_host": process.env.VERCEL_BRANCH_URL,
   }),
   traceExporter: new OTLPTraceExporter(),
+  // @ts-ignore - Type compatibility issue with OpenTelemetry versions
   metricReader: new PeriodicExportingMetricReader({
     exporter: new OTLPMetricExporter(),
   }),

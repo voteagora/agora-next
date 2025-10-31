@@ -3,7 +3,11 @@ import path from "path";
 
 export async function loadFont(filename: string): Promise<ArrayBuffer> {
   const filePath = path.join(process.cwd(), "public", "fonts", filename);
-  return fs.readFile(filePath);
+  const buffer = await fs.readFile(filePath);
+  return buffer.buffer.slice(
+    buffer.byteOffset,
+    buffer.byteOffset + buffer.byteLength
+  );
 }
 
 export async function loadImage(filename: string): Promise<string> {

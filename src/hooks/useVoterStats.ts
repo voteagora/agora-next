@@ -52,11 +52,15 @@ export const useVoterStats = ({
 export const useDelegateStats = ({
   address,
 }: Props): UseQueryResult<DelegateResponse, Error> => {
-  return useQuery({
+  return useQuery<DelegateResponse, Error>({
     enabled: !!address,
     queryKey: [DELEGATE_STATS_QK, address],
     queryFn: async () => {
-      return await fetchDelegateStats(address!);
+      const result = await fetchDelegateStats(address!);
+      if (!result) {
+        throw new Error("Failed to fetch delegate stats");
+      }
+      return { delegate: result };
     },
     staleTime: CACHE_TIME,
   });
