@@ -138,6 +138,9 @@ export default function ProposalDescription({
           <ProposalChart proposal={proposal} />
         )}
 
+      {/* Execution Transactions - shown right below chart for succeeded proposals */}
+      <ExecutionTransactions proposalId={proposal.id} tenant={namespace} />
+
       <div className="flex flex-col gap-2">
         {/* Right now I'm only sure this better decoded component works for standard proposals */}
         {/* This is a feature for ENS, they use standard only, so we should be good for now */}
@@ -171,9 +174,6 @@ export default function ProposalDescription({
             )}
           />
         </div>
-
-        {/* Execution Transactions Section - positioned at the very end */}
-        <ExecutionTransactions proposalId={proposal.id} tenant={namespace} />
       </div>
     </div>
   );
