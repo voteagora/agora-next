@@ -28,6 +28,8 @@ const DelegateCard = ({
     (ui.toggle("show-participation")?.enabled || false) &&
     !(ui.toggle("hide-participation-delegates-page")?.enabled || false);
   const hide7dChange = ui.toggle("hide-7d-change")?.enabled ?? false;
+  const useNeutral =
+    ui.toggle("syndicate-colours-fix-delegate-pages")?.enabled ?? false;
 
   return (
     <div
@@ -38,7 +40,9 @@ const DelegateCard = ({
       )}
     >
       <Link href={`/delegates/${delegate.address}`}>
-        <div className="flex flex-col gap-4 h-full rounded-xl bg-wash border border-line shadow-newDefault">
+        <div
+          className={`flex flex-col gap-4 h-full rounded-xl ${useNeutral ? "bg-neutral" : "bg-wash"} border border-line shadow-newDefault`}
+        >
           <div className="flex flex-col gap-4 justify-center pt-4">
             <div className="px-4">
               <DelegateProfileImage

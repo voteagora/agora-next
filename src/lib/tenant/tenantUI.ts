@@ -33,7 +33,11 @@ export type UIDunaDescriptionConfig = {
   content: ReactNode;
 };
 
-type UIConfig = PLMConfig | UIDunaDescriptionConfig;
+export type UIVotingPowerInfoConfig = {
+  text: string;
+};
+
+type UIConfig = PLMConfig | UIDunaDescriptionConfig | UIVotingPowerInfoConfig;
 
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account

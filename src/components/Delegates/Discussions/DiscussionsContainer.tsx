@@ -111,15 +111,27 @@ const DiscussionsContainer = ({
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <h3 className="text-lg font-semibold text-foreground">Discussions</h3>
+    <div className="flex flex-col space-y-4">
+      <div className="flex flex-row justify-between items-center relative">
+        <h2 className="text-primary text-2xl font-bold flex-grow">
+          Discussions
+        </h2>
+      </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="topics">
+          <TabsTrigger
+            className="opacity-60 data-[state=active]:opacity-100"
+            value="topics"
+          >
             Topics Created ({topics.length})
           </TabsTrigger>
-          <TabsTrigger value="posts">Recent Posts ({posts.length})</TabsTrigger>
+          <TabsTrigger
+            className="opacity-60 data-[state=active]:opacity-100"
+            value="posts"
+          >
+            Recent Posts ({posts.length})
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="topics" className="space-y-4">
