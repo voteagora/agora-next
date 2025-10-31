@@ -39,10 +39,6 @@ function DelegationsContainer({
     shallow: true,
   });
 
-  const handleSubtabChange = (value: string) => {
-    setSubtab(value);
-  };
-
   const { data: tokenBalance } = useTokenBalance(delegatees[0]?.from);
   const isLoadingRef = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -86,16 +82,22 @@ function DelegationsContainer({
   return (
     <div className="max-w-full text-primary">
       <Tabs
-        className="max-w-full mb-8"
-        value={subtab}
-        onValueChange={handleSubtabChange}
+        className="max-w-full"
+        value={subtab || "delegatedFrom"}
+        onValueChange={setSubtab}
       >
         <div className="flex flex-row items-center justify-between">
           <TabsList>
-            <TabsTrigger className="text-2xl" value="delegatedFrom">
+            <TabsTrigger
+              className="text-2xl opacity-60 data-[state=active]:opacity-100"
+              value="delegatedFrom"
+            >
               Delegated from
             </TabsTrigger>
-            <TabsTrigger className="text-2xl" value="delegatedTo">
+            <TabsTrigger
+              className="text-2xl opacity-60 data-[state=active]:opacity-100"
+              value="delegatedTo"
+            >
               Delegated to
             </TabsTrigger>
           </TabsList>
