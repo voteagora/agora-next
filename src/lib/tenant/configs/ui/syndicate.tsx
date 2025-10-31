@@ -330,7 +330,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "hide-hero",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "hide-hero-image",
@@ -366,6 +366,10 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "easv2-govlessvoting",
+      enabled: true,
+    },
+    {
+      name: "syndicate-colours-fix-delegate-pages",
       enabled: true,
     },
   ],

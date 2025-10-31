@@ -5,6 +5,7 @@ import { Delegate } from "@/app/api/common/delegates/delegate";
 import { SCWProfileImage } from "@/components/Delegates/DelegateCard/SCWProfileImage";
 import { DelegateCardHeader } from "@/components/Delegates/DelegateCard/DelegateCardHeader";
 import { DelegateCardEditProfile } from "./DelegateCardEditProfile";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function DelegateCard({
   delegate,
@@ -23,10 +24,16 @@ export default function DelegateCard({
 }) {
   // Display SCW if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
+  const { ui } = Tenant.current();
+  const useNeutral =
+    ui.toggle("syndicate-colours-fix-delegate-pages")?.enabled ?? false;
+
   return (
     <div className="flex flex-col static sm:sticky top-16 flex-shrink-0 width-[20rem]">
       <DelegateCardHeader delegate={delegate} />
-      <div className="flex flex-col bg-wash border border-line shadow-newDefault rounded-xl">
+      <div
+        className={`flex flex-col ${useNeutral ? "bg-neutral" : "bg-wash"} border border-line shadow-newDefault rounded-xl`}
+      >
         <div className="flex flex-col items-stretch p-7">
           <DelegateProfileImageWithMetadata
             endorsed={delegate.statement?.endorsed}
