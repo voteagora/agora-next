@@ -19,9 +19,10 @@ const CREATE_PROPOSAL_SCHEMA_ID =
 const EAS_V2_SCHEMA_IDS = {
   CREATE_PROPOSAL:
     "0x442d586d8424b5485de1ff46cb235dcb96b41d19834926bbad1cd157fbeeb8fc",
-  VOTE: process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-  ? "0x2b0e624e00310c7e88a1b7840238e285152b38ab00160b14c0d4e54e0a53a3aa"
-  : "0x3bc2cb5268eedcc69ce64646cd096ed4ef2ed0537cb6bbed80e5f7a844060610"
+  VOTE:
+    process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
+      ? "0x2b0e624e00310c7e88a1b7840238e285152b38ab00160b14c0d4e54e0a53a3aa"
+      : "0x3bc2cb5268eedcc69ce64646cd096ed4ef2ed0537cb6bbed80e5f7a844060610",
 };
 
 const schemaEncoder = new SchemaEncoder(
@@ -33,9 +34,10 @@ const eas =
     ? new EAS("0x4200000000000000000000000000000000000021")
     : new EAS("0x4200000000000000000000000000000000000021");
 
-const easV2 = process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-  ? new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e")
-  : new EAS("0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587");
+const easV2 =
+  process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
+    ? new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e")
+    : new EAS("0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587");
 
 export async function createProposalAttestation({
   contract,

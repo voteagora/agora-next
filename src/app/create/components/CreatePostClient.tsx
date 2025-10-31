@@ -182,7 +182,7 @@ export function CreatePostClient({
 
   const handleCloseIndexingModal = () => {
     setShowIndexingModal(false);
-    router.push("/forums");
+    router.push("/");
   };
 
   useEffect(() => {
