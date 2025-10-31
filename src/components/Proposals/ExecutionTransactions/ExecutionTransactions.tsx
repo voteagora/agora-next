@@ -83,7 +83,7 @@ export default function ExecutionTransactions({
   if (loading) {
     return (
       <div
-        className="mb-6 border rounded-lg p-4"
+        className="mb-1 border rounded-lg p-4"
         style={{ borderColor: "#E0E0E0" }}
       >
         <div className="text-sm" style={{ color: "#4F4F4F" }}>
@@ -98,7 +98,7 @@ export default function ExecutionTransactions({
       error instanceof Error ? error.message : "An error occurred";
     return (
       <div
-        className="mb-6 border rounded-lg p-4"
+        className="mb-1 border rounded-lg p-4"
         style={{ borderColor: "#E0E0E0" }}
       >
         <div className="text-sm" style={{ color: "#4F4F4F" }}>
@@ -114,7 +114,7 @@ export default function ExecutionTransactions({
 
   return (
     <div
-      className="mb-6 border rounded-lg p-4"
+      className="mb-1 border rounded-lg p-4"
       style={{ borderColor: "#E0E0E0" }}
     >
       <table className="w-full">
