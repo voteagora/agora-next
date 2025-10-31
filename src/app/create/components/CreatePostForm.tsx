@@ -137,7 +137,8 @@ export function CreatePostForm({
                   ) : (
                     <span className="text-red-600 flex items-center gap-1">
                       <XMarkIcon className="h-4 w-4" />
-                      Requires successful temp check
+                      Only admins or temp check authors can create governance
+                      proposals
                     </span>
                   )}
                   {relatedTempChecks?.length > 0 && (
@@ -147,7 +148,7 @@ export function CreatePostForm({
                         : relatedTempChecks.some(
                               (tc) => tc.status === "SUCCEEDED"
                             )
-                          ? `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power required`
+                          ? "You are the author of this temp check"
                           : "Referenced temp check must be approved"}
                     </div>
                   )}

@@ -85,6 +85,7 @@ async function getInitialFormData(
         ),
         url: `/proposals/${fromTempCheckId}`,
         status: deriveStatus(fetchedProposal, 18),
+        proposer: fetchedProposal.proposer,
         proposalType: proposalTypeData,
       },
     ];

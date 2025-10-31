@@ -139,7 +139,7 @@ export default function ProposalVotesSummaryDetails({
           | undefined)
       : null;
 
-  const hasPendingRanges = !!defaultProposalTypeRanges;
+  const hasPendingRanges = (proposal as any).proposalTypeApproval === "PENDING";
 
   const minQuorum = defaultProposalTypeRanges
     ? defaultProposalTypeRanges.min_quorum_pct / 100

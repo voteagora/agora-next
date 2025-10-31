@@ -46,6 +46,7 @@ export type ArchiveProposalDisplay = {
   };
   metrics: ArchiveProposalMetrics;
   proposalTypeName: string;
+  proposalTypeApproval?: string;
 };
 
 type NormalizeOptions = {
@@ -141,6 +142,7 @@ export function normalizeArchiveProposal(
       typeof proposal.proposal_type === "object"
         ? proposal.proposal_type?.name
         : "Standard",
+    proposalTypeApproval: proposal.proposal_type_approval,
   };
 }
 

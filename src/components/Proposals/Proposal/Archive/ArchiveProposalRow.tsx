@@ -62,9 +62,7 @@ export default function ArchiveProposalRow({
   const isSuccessful = proposal.statusLabel === "Succeeded";
   const isActive = !isDefeated && !isSuccessful;
   const hasPendingRanges =
-    isActive &&
-    proposal.source === "eas-oodao" &&
-    !!proposal.defaultProposalTypeRanges;
+    isActive && proposal.proposalTypeApproval === "PENDING";
 
   return (
     <Link href={proposal.href}>

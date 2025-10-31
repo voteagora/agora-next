@@ -7,6 +7,7 @@ import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import { canCreateGovernanceProposal } from "@/lib/forumPermissionUtils";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useAccount } from "wagmi";
 import {
   Tooltip,
   TooltipContent,
@@ -30,6 +31,7 @@ export default function ArchiveProposalTypeApproval({
 }) {
   const permissions = useForumPermissionsContext();
   const router = useRouter();
+  const { address } = useAccount();
   const { links: relatedLinks, isLoading: isLoadingLinks } =
     useProposalLinksWithDetails(proposal.id);
   const hasLinkedGovProposal = relatedLinks.some((link) => link.type === "gov");
@@ -82,9 +84,12 @@ export default function ArchiveProposalTypeApproval({
     ? formatDistanceToNow(endTime, { addSuffix: true })
     : "Unavailable";
 
-  const canCreateProposal = canCreateGovernanceProposal(permissions, [
-    { status: "SUCCEEDED" } as RelatedItem,
-  ]);
+  const isAuthor = address?.toLowerCase() === proposal.proposer?.toLowerCase();
+  const canCreateProposal = canCreateGovernanceProposal(
+    permissions,
+    [{ status: "SUCCEEDED" } as RelatedItem],
+    isAuthor
+  );
 
   const showCreateDiscussionButton = isTempCheck
     ? isDefeated && permissions.canCreateTopic

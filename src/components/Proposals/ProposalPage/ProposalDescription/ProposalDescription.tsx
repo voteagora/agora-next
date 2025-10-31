@@ -92,9 +92,7 @@ export default function ProposalDescription({
   const isSuccessful = proposal.status === "Succeeded";
   const isActive = !isDefeated && !isSuccessful;
   const hasPendingRanges =
-    isActive &&
-    archiveMetadata?.source === "eas-oodao" &&
-    !!archiveMetadata?.defaultProposalTypeRanges;
+    isActive && (proposal as any).proposalTypeApproval === "PENDING";
 
   return (
     <div

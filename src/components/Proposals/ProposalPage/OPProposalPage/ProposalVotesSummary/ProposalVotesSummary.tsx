@@ -55,7 +55,7 @@ export default function ProposalVotesSummary({ proposal }: Props) {
           | undefined)
       : null;
 
-  const hasPendingRanges = !!defaultProposalTypeRanges;
+  const hasPendingRanges = (proposal as any).proposalTypeApproval === "PENDING";
 
   const minApprovalThreshold = defaultProposalTypeRanges
     ? defaultProposalTypeRanges.min_approval_threshold_pct / 100
