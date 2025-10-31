@@ -43,6 +43,13 @@ export const QuorumTooltip = () => {
   );
 };
 
+type RangeProposalType = {
+  min_quorum_pct: number;
+  max_quorum_pct: number;
+  min_approval_threshold_pct: number;
+  max_approval_threshold_pct: number;
+};
+
 function AmountAndPercent({
   amount,
   total,
@@ -114,6 +121,40 @@ export default function ProposalVotesSummaryDetails({
   const isProposalCreatedBeforeUpgrade =
     isProposalCreatedBeforeUpgradeCheck(proposal);
 
+  // Check if this is an archive proposal with ranges (pending state)
+  const archiveMetadata = (
+    proposal as unknown as {
+      archiveMetadata?: { source?: string; defaultProposalTypeRanges?: any };
+    }
+  ).archiveMetadata;
+
+  const isDefeated = proposal.status === "Defeated";
+  const isSuccessful = proposal.status === "Succeeded";
+  const isActive = !isDefeated && !isSuccessful;
+
+  const defaultProposalTypeRanges =
+    isActive && archiveMetadata?.source === "eas-oodao"
+      ? (archiveMetadata.defaultProposalTypeRanges as
+          | RangeProposalType
+          | undefined)
+      : null;
+
+  const hasPendingRanges = !!defaultProposalTypeRanges;
+
+  const minQuorum = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.min_quorum_pct / 100
+    : null;
+  const maxQuorum = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.max_quorum_pct / 100
+    : null;
+
+  const minApprovalThreshold = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.min_approval_threshold_pct / 100
+    : null;
+  const maxApprovalThreshold = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.max_approval_threshold_pct / 100
+    : null;
+
   return (
     <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[317px] sm:min-w-[317px] bg-wash">
       <ProposalVotesBar proposal={proposal} />
@@ -144,52 +185,73 @@ export default function ProposalVotesSummaryDetails({
             Quorum
             {isProposalCreatedBeforeUpgrade && <QuorumTooltip />}
           </div>
-          {proposal.quorum && (
-            <div className="flex items-center gap-1 ">
-              {hasMetQuorum && (
-                <Image
-                  width="12"
-                  height="12"
-                  src={checkIcon}
-                  alt="check icon"
-                />
-              )}
+          {hasPendingRanges ? (
+            <div className="flex items-center gap-1">
               <p className="text-xs font-semibold text-secondary">
-                <TokenAmountDecorated
-                  amount={quorumVotes}
-                  decimals={token.decimals}
-                  hideCurrency
-                  specialFormatting
-                />{" "}
-                /{" "}
-                <TokenAmountDecorated
-                  amount={proposal.quorum}
-                  decimals={token.decimals}
-                  hideCurrency
-                  specialFormatting
-                />
-                {isProposalCreatedBeforeUpgrade && "0"} Required
+                {minQuorum}% – {maxQuorum}% Required
               </p>
             </div>
+          ) : (
+            proposal.quorum && (
+              <div className="flex items-center gap-1 ">
+                {hasMetQuorum && (
+                  <Image
+                    width="12"
+                    height="12"
+                    src={checkIcon}
+                    alt="check icon"
+                  />
+                )}
+                <p className="text-xs font-semibold text-secondary">
+                  <TokenAmountDecorated
+                    amount={quorumVotes}
+                    decimals={token.decimals}
+                    hideCurrency
+                    specialFormatting
+                  />{" "}
+                  /{" "}
+                  <TokenAmountDecorated
+                    amount={proposal.quorum}
+                    decimals={token.decimals}
+                    hideCurrency
+                    specialFormatting
+                  />
+                  {isProposalCreatedBeforeUpgrade && "0"} Required
+                </p>
+              </div>
+            )
           )}
         </div>
-        {proposal.approvalThreshold && (
+        {hasPendingRanges ? (
           <div className="flex justify-between">
             <div className="flex flex-row gap-1 text-secondary font-semibold text-xs">
               Threshold
             </div>
-            <div className="flex flex-row gap-1 ">
-              {hasMetThreshold ? (
-                <Image src={checkIcon} alt="check icon" />
-              ) : (
-                <X className="h-4 w-4 text-negative" />
-              )}
-              <p className=" text-xs font-semibold text-secondary">
-                {voteThresholdPercent.toFixed(2)}% /{" "}
-                {`${apprThresholdPercent}%`} Required
+            <div className="flex flex-row gap-1">
+              <p className="text-xs font-semibold text-secondary">
+                {minApprovalThreshold}% – {maxApprovalThreshold}% Required
               </p>
             </div>
           </div>
+        ) : (
+          proposal.approvalThreshold && (
+            <div className="flex justify-between">
+              <div className="flex flex-row gap-1 text-secondary font-semibold text-xs">
+                Threshold
+              </div>
+              <div className="flex flex-row gap-1 ">
+                {hasMetThreshold ? (
+                  <Image src={checkIcon} alt="check icon" />
+                ) : (
+                  <X className="h-4 w-4 text-negative" />
+                )}
+                <p className=" text-xs font-semibold text-secondary">
+                  {voteThresholdPercent.toFixed(2)}% /{" "}
+                  {`${apprThresholdPercent}%`} Required
+                </p>
+              </div>
+            </div>
+          )
         )}
       </div>
       <ol className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-wash -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg">
