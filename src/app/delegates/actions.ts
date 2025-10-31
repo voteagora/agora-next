@@ -231,7 +231,8 @@ export const fetchArchiveParticipation = async (address: string) => {
 
   const proposalIds = recentProposals.map((p) => String(p.id));
 
-  // Count distinct proposals among the recent ones that this delegate voted on
+  // Count proposals among the recent ones that this delegate voted on
+  // Using CTE to filter by voter and contract first (most selective), then proposal ID
   const { contracts } = Tenant.current();
   const rows = await prismaWeb3Client.$queryRawUnsafe<
     {
@@ -239,11 +240,16 @@ export const fetchArchiveParticipation = async (address: string) => {
     }[]
   >(
     `
-      SELECT COUNT(DISTINCT v.proposal_id)::int AS count
-      FROM ${namespace}.votes v
-      WHERE v.voter = $1
-        AND v.contract = $2
-        AND v.proposal_id = ANY($3::text[])
+      WITH filtered_votes AS (
+        SELECT proposal_id
+        FROM ${namespace}.votes
+        WHERE voter = $1
+          AND contract = $2
+        GROUP BY proposal_id
+      )
+      SELECT COUNT(*)::int AS count
+      FROM filtered_votes
+      WHERE proposal_id = ANY($3::text[])
     `,
     address.toLowerCase(),
     contracts.governor.address.toLowerCase(),
