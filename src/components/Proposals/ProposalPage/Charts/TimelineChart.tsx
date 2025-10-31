@@ -64,12 +64,8 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
     }
   ).archiveMetadata;
 
-  const isDefeated = proposal.status === "Defeated";
-  const isSuccessful = proposal.status === "Succeeded";
-  const isActive = !isDefeated && !isSuccessful;
-
   const defaultProposalTypeRanges =
-    isActive && archiveMetadata?.source === "eas-oodao"
+    archiveMetadata?.source === "eas-oodao"
       ? (archiveMetadata.defaultProposalTypeRanges as
           | RangeProposalType
           | undefined)

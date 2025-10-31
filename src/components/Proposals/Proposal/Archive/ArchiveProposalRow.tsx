@@ -57,12 +57,7 @@ export default function ArchiveProposalRow({
   const proposalTypeName = proposal.proposalTypeName;
   const proposalTypeTag = proposal.proposalTypeTag;
 
-  // Check if proposal has ranges (pending approval)
-  const isDefeated = proposal.statusLabel === "Defeated";
-  const isSuccessful = proposal.statusLabel === "Succeeded";
-  const isActive = !isDefeated && !isSuccessful;
-  const hasPendingRanges =
-    isActive && proposal.proposalTypeApproval === "PENDING";
+  const hasPendingRanges = proposal.proposalTypeApproval === "PENDING";
 
   return (
     <Link href={proposal.href}>

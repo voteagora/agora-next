@@ -88,11 +88,7 @@ export default function ProposalDescription({
   const typeBadgeLabel = archiveMetadata?.proposalTypeTag;
 
   // Check if this is an archive proposal with ranges (pending state)
-  const isDefeated = proposal.status === "Defeated";
-  const isSuccessful = proposal.status === "Succeeded";
-  const isActive = !isDefeated && !isSuccessful;
-  const hasPendingRanges =
-    isActive && (proposal as any).proposalTypeApproval === "PENDING";
+  const hasPendingRanges = (proposal as any).proposalTypeApproval === "PENDING";
 
   return (
     <div
