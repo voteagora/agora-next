@@ -6,6 +6,13 @@ import { SCWProfileImage } from "@/components/Delegates/DelegateCard/SCWProfileI
 import { DelegateCardHeader } from "@/components/Delegates/DelegateCard/DelegateCardHeader";
 import { DelegateCardEditProfile } from "./DelegateCardEditProfile";
 import Tenant from "@/lib/tenant/tenant";
+import { InfoOutlineIcon } from "@/icons/InfoOutlineIcon";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function DelegateCard({
   delegate,
@@ -27,6 +34,7 @@ export default function DelegateCard({
   const { ui } = Tenant.current();
   const useNeutral =
     ui.toggle("syndicate-colours-fix-delegate-pages")?.enabled ?? false;
+  const vpTooltip = ui.toggle("voting-power-info-tooltip");
 
   return (
     <div className="flex flex-col static sm:sticky top-16 flex-shrink-0 width-[20rem]">
@@ -51,7 +59,28 @@ export default function DelegateCard({
           <div className="flex flex-col p-7 border-t border-line">
             <div className="flex flex-col gap-4">
               <PanelRow
-                title="Voting power"
+                title={
+                  <span className="inline-flex items-center">
+                    Voting power
+                    {vpTooltip?.enabled && (vpTooltip as any)?.config?.text ? (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="inline-flex items-center ml-1">
+                              <InfoOutlineIcon
+                                className="w-4 h-4"
+                                fill="#737373"
+                              />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-[320px] p-4 rounded-xl bg-black text-neutral text-sm leading-snug shadow-md whitespace-normal break-words">
+                            {(vpTooltip as any).config.text}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ) : null}
+                  </span>
+                }
                 detail={formatNumber(delegate.votingPower.total)}
               />
               <PanelRow
@@ -94,7 +123,7 @@ export const PanelRow = ({
   detail,
   className,
 }: {
-  title: string;
+  title: React.ReactNode;
   detail: string | JSX.Element;
   className?: string;
 }) => {
