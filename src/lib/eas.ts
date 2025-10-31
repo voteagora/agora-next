@@ -19,6 +19,9 @@ const CREATE_PROPOSAL_SCHEMA_ID =
 const EAS_V2_SCHEMA_IDS = {
   CREATE_PROPOSAL:
     "0x442d586d8424b5485de1ff46cb235dcb96b41d19834926bbad1cd157fbeeb8fc",
+  VOTE: process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
+  ? "0x2b0e624e00310c7e88a1b7840238e285152b38ab00160b14c0d4e54e0a53a3aa"
+  : "0x3bc2cb5268eedcc69ce64646cd096ed4ef2ed0537cb6bbed80e5f7a844060610"
 };
 
 const schemaEncoder = new SchemaEncoder(
@@ -27,10 +30,12 @@ const schemaEncoder = new SchemaEncoder(
 
 const eas =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e")
-    : new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e");
+    ? new EAS("0x4200000000000000000000000000000000000021")
+    : new EAS("0x4200000000000000000000000000000000000021");
 
-const easV2 = new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e");
+const easV2 = process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
+  ? new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e")
+  : new EAS("0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587");
 
 export async function createProposalAttestation({
   contract,
@@ -209,6 +214,7 @@ const v2SchemaEncoders = {
   CREATE_PROPOSAL: new SchemaEncoder(
     "string title,string description,uint64 startts,uint64 endts,string tags"
   ),
+  VOTE: new SchemaEncoder("int8 choice,string reason"),
 };
 
 export async function createV2CreateProposalAttestation({
@@ -256,11 +262,6 @@ export async function createV2CreateProposalAttestation({
 }
 export { EAS_V2_SCHEMA_IDS };
 
-const VOTE_SCHEMA_ID =
-  "0x2b0e624e00310c7e88a1b7840238e285152b38ab00160b14c0d4e54e0a53a3aa";
-
-const voteSchemaEncoder = new SchemaEncoder("int8 choice,string reason");
-
 export async function createVoteAttestation({
   choice,
   reason,
@@ -272,9 +273,9 @@ export async function createVoteAttestation({
   signer: JsonRpcSigner;
   proposalId: string;
 }) {
-  eas.connect(signer as any);
+  easV2.connect(signer as any);
 
-  const encodedData = voteSchemaEncoder.encodeData([
+  const encodedData = v2SchemaEncoders.VOTE.encodeData([
     { name: "choice", value: choice, type: "int8" },
     { name: "reason", value: reason, type: "string" },
   ]);
@@ -284,8 +285,8 @@ export async function createVoteAttestation({
   const expirationTime = NO_EXPIRATION;
   const revocable = false;
 
-  const txResponse = await eas.attest({
-    schema: VOTE_SCHEMA_ID,
+  const txResponse = await easV2.attest({
+    schema: EAS_V2_SCHEMA_IDS.VOTE,
     data: {
       recipient,
       expirationTime,
