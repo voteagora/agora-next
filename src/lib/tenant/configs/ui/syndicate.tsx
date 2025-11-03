@@ -70,6 +70,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     customIconColor: "#87819F",
     customInfoLayout: "flex-col sm:flex-row gap-2",
     noReportsFound: "Quarterly Reports will be posted on October 15th, 2025.",
+    customHeroImageSize: "sm:h-[160px]",
   },
 
   links: [
@@ -115,9 +116,9 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       route: "proposals",
-      title: "Agora is the home of Syndicate delegates",
+      title: "Syndicate Network Collective is the home of SYND delegates",
       description:
-        "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate Network",
+        "SNC is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
       hero: syndicateHero,
       meta: {
         title: "Syndicate Agora",
