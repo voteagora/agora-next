@@ -16,6 +16,8 @@ import {
 import ProposalVotesSummaryDetails, {
   QuorumTooltip,
 } from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesSummaryDetails/ProposalVotesSummaryDetails";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface Props {
   proposal: Proposal;
@@ -33,6 +35,9 @@ export default function ProposalVotesSummary({ proposal }: Props) {
 
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
+
+  const isTempCheck =
+    proposal.archiveMetadata?.proposalTypeTag === "Temp Check";
 
   const isProposalCreatedBeforeUpgrade =
     isProposalCreatedBeforeUpgradeCheck(proposal);

@@ -21,6 +21,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { AlertTriangle, X } from "lucide-react";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 export const QuorumTooltip = () => {
   return (
@@ -121,6 +122,9 @@ export default function ProposalVotesSummaryDetails({
   const isProposalCreatedBeforeUpgrade =
     isProposalCreatedBeforeUpgradeCheck(proposal);
 
+  const isTempCheck =
+    proposal.archiveMetadata?.proposalTypeTag === "Temp Check";
+
   // Check if this is an archive proposal with ranges (pending state)
   const archiveMetadata = (
     proposal as unknown as {
@@ -181,6 +185,45 @@ export default function ProposalVotesSummaryDetails({
             <div className="flex items-center gap-1 text-secondary font-semibold text-xs">
               Quorum
               {isProposalCreatedBeforeUpgrade && <QuorumTooltip />}
+              {namespace === TENANT_NAMESPACES.SYNDICATE && isTempCheck && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="inline-flex items-center">
+                        <InformationCircleIcon className="w-4 h-4 text-primary cursor-pointer" />
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm">
+                      <div className="text-xs space-y-2">
+                        <p>
+                          Most temp checks require 5% of tokens in circulation;
+                          however, to replace parties as authorized through
+                          governance proposal (currently, Syndicate Labs) to
+                          make changes to the construction or function of the
+                          smart contracts comprising the Syndicate Network
+                          require higher percentages to ensure operational
+                          stability.
+                        </p>
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>
+                            Nov 3, 2025 - Nov 2, 2026: 30% of tokens in
+                            circulation
+                          </li>
+                          <li>
+                            Nov 3, 2026 - Nov 2, 2027: 20% of tokens in
+                            circulation
+                          </li>
+                          <li>
+                            Nov 3, 2027 - Nov 2, 2028: 10% of tokens in
+                            circulation
+                          </li>
+                          <li>Nov 3, 2028 onward: Reverts to standard 5%</li>
+                        </ul>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
             </div>
             {hasPendingRanges ? (
               <div className="flex items-center gap-1">
