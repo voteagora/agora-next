@@ -22,10 +22,11 @@ export async function GET(
 
     return NextResponse.json({ data: rawNonVoters });
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes("404") || errorMessage.includes("Not Found")) {
+      return NextResponse.json({ data: [] });
+    }
     console.error("Error fetching archive non-voters:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch archive non-voters" },
-      { status: 500 }
-    );
+    return NextResponse.json({ data: [] });
   }
 }

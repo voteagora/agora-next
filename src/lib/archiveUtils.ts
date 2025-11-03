@@ -49,6 +49,17 @@ export async function fetchProposalsFromArchive(
       cache: "no-store", // Disable caching for fresh data
     });
 
+    if (response.status === 404) {
+      return {
+        meta: {
+          has_next: false,
+          total_returned: 0,
+          next_offset: 0,
+        },
+        data: [],
+      };
+    }
+
     if (!response.ok) {
       throw new Error(
         `Failed to fetch archive data: ${response.status} ${response.statusText}`
@@ -83,6 +94,17 @@ export async function fetchProposalsFromArchive(
       data: filteredProposals,
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes("404") || errorMessage.includes("Not Found")) {
+      return {
+        meta: {
+          has_next: false,
+          total_returned: 0,
+          next_offset: 0,
+        },
+        data: [],
+      };
+    }
     console.error("Error fetching proposals from archive:", error);
     throw error;
   }
@@ -107,6 +129,9 @@ export const fetchProposalFromArchive = async (
     ]);
 
     if (!responseDaoNode.ok && !responseEasOodao.ok) {
+      if (responseDaoNode.status === 404 && responseEasOodao.status === 404) {
+        return null;
+      }
       throw new Error(
         `Failed to fetch archive data: daoNode ${responseDaoNode.status} ${responseDaoNode.statusText}; easOodao ${responseEasOodao.status} ${responseEasOodao.statusText}`
       );
@@ -124,6 +149,10 @@ export const fetchProposalFromArchive = async (
       : undefined;
     return allProposalsDaoNode || allProposalsEasOodao;
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes("404") || errorMessage.includes("Not Found")) {
+      return null;
+    }
     console.error("Error fetching proposals from archive:", error);
     throw error;
   }
@@ -221,6 +250,10 @@ export async function fetchRawProposalVotesFromArchive({
       getArchiveSlugForProposalVotes(namespace, proposalId)
     );
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes("404") || errorMessage.includes("Not Found")) {
+      return [];
+    }
     console.error("Error fetching raw votes from archive:", error);
     throw error;
   }
@@ -256,6 +289,10 @@ export async function fetchRawProposalNonVotersFromArchive({
       getArchiveSlugForProposalNonVoters(namespace, proposalId)
     );
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes("404") || errorMessage.includes("Not Found")) {
+      return [];
+    }
     console.error("Error fetching raw non-voters from archive:", error);
     throw error;
   }
