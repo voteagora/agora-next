@@ -22,7 +22,7 @@ const EAS_V2_SCHEMA_IDS = {
   VOTE:
     process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
       ? "0x2b0e624e00310c7e88a1b7840238e285152b38ab00160b14c0d4e54e0a53a3aa"
-      : "0x3bc2cb5268eedcc69ce64646cd096ed4ef2ed0537cb6bbed80e5f7a844060610",
+      : "0xa6abd1e115de8e83b71f6db6db22d44d730a217f21e6008034f94e682efe9c70",
 };
 
 const schemaEncoder = new SchemaEncoder(
