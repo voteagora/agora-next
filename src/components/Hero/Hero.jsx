@@ -28,12 +28,6 @@ export default function Hero({ page }) {
   const customHeroTitleWidth =
     ui.customization?.customHeroTitleWidth || "max-w-[36rem]";
 
-  // Hide description on Syndicate delegates page when voters-page content flag is enabled
-  const shouldHideDescription =
-    namespace === TENANT_NAMESPACES.SYNDICATE &&
-    page === "delegates" &&
-    ui.toggle("syndicate-voters-page-content")?.enabled;
-
   return (
     <div className="flex-col hidden sm:flex sm:flex-row justify-between mt-12 mb-0 sm:my-12 max-w-full">
       <div
