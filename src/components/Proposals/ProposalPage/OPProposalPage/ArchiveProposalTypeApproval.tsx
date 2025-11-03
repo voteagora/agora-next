@@ -186,18 +186,22 @@ export default function ArchiveProposalTypeApproval({
           )}
 
           <div className="space-y-2 text-xs font-semibold text-secondary">
-            <div className="flex items-center justify-between">
-              <span>Quorum</span>
-              <span>
-                {minQuorum}% – {maxQuorum}% until type approved
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>Approval Threshold</span>
-              <span>
-                {minApproval}% – {maxApproval}% until type approved
-              </span>
-            </div>
+            {minQuorum !== maxQuorum && (
+              <div className="flex items-center justify-between">
+                <span>Quorum</span>
+                <span>
+                  {minQuorum}% – {maxQuorum}% until type approved
+                </span>
+              </div>
+            )}
+            {minApproval !== maxApproval && (
+              <div className="flex items-center justify-between">
+                <span>Approval Threshold</span>
+                <span>
+                  {minApproval}% – {maxApproval}% until type approved
+                </span>
+              </div>
+            )}
           </div>
         </>
       )}

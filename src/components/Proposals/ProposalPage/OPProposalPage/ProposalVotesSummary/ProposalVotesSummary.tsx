@@ -101,11 +101,11 @@ export default function ProposalVotesSummary({ proposal }: Props) {
             <div className="flex flex-col font-medium">
               <div className="flex flex-row text-secondary pb-2 justify-between">
                 <>
-                  {hasPendingRanges ? (
+                  {hasPendingRanges && minQuorum !== maxQuorum ? (
                     <div>
                       <p>{`Quorum ${minQuorum}% – ${maxQuorum}%`}</p>
                     </div>
-                  ) : (
+                  ) : !hasPendingRanges ? (
                     proposal.quorum && (
                       <div>
                         Quorum{" "}
@@ -122,14 +122,14 @@ export default function ProposalVotesSummary({ proposal }: Props) {
                         )}
                       </div>
                     )
-                  )}
+                  ) : null}
                 </>
                 <>
-                  {hasPendingRanges ? (
+                  {hasPendingRanges && minApprovalThreshold !== maxApprovalThreshold ? (
                     <div>
                       <p>{`Threshold ${minApprovalThreshold}% – ${maxApprovalThreshold}%`}</p>
                     </div>
-                  ) : (
+                  ) : !hasPendingRanges ? (
                     proposal.approvalThreshold && (
                       <div>
                         <p>{`Threshold ${
@@ -137,7 +137,7 @@ export default function ProposalVotesSummary({ proposal }: Props) {
                         }%`}</p>
                       </div>
                     )
-                  )}
+                  ) : null}
                 </>
               </div>
             </div>
