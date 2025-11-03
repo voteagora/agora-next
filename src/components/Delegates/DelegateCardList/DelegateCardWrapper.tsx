@@ -7,6 +7,8 @@ import { PaginationParams } from "@/app/lib/pagination";
 import { SearchParams } from "nuqs/server";
 import { buildDelegateFilters } from "./delegateUtils";
 import Tenant from "@/lib/tenant/tenant";
+import { SelfDelegationBanner } from "../SelfDelegationBanner";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 async function fetchDelegatesWithParams(
   sort: string,
@@ -36,7 +38,7 @@ const DelegateCardWrapper = async ({
   const parsedParams = loadDelegatesSearchParams(searchParams);
 
   // Get sort values directly from parsed params and sanitize based on UI flags
-  const { ui } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
   const hide7dChange = ui.toggle("hide-7d-change")?.enabled ?? false;
   const rawSort = parsedParams.orderBy;
   const sort =
@@ -63,27 +65,30 @@ const DelegateCardWrapper = async ({
     showParticipation
   );
   return (
-    <DelegateTabs>
-      <TabsContent value="delegates">
-        <DelegateContent
-          initialDelegates={delegates}
-          fetchDelegates={async ({
-            pagination = { offset: 0, limit: 500 },
-            seed,
-            showParticipation,
-          }) => {
-            "use server";
-            return fetchDelegatesWithParams(
-              sort,
-              filters,
-              pagination,
+    <>
+      {namespace === TENANT_NAMESPACES.SYNDICATE && <SelfDelegationBanner />}
+      <DelegateTabs>
+        <TabsContent value="delegates">
+          <DelegateContent
+            initialDelegates={delegates}
+            fetchDelegates={async ({
+              pagination = { offset: 0, limit: 500 },
               seed,
-              showParticipation
-            );
-          }}
-        />
-      </TabsContent>
-    </DelegateTabs>
+              showParticipation,
+            }) => {
+              "use server";
+              return fetchDelegatesWithParams(
+                sort,
+                filters,
+                pagination,
+                seed,
+                showParticipation
+              );
+            }}
+          />
+        </TabsContent>
+      </DelegateTabs>
+    </>
   );
 };
 

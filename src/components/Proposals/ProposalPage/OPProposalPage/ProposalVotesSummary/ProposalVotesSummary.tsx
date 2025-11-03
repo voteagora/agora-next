@@ -125,7 +125,8 @@ export default function ProposalVotesSummary({ proposal }: Props) {
                   ) : null}
                 </>
                 <>
-                  {hasPendingRanges && minApprovalThreshold !== maxApprovalThreshold ? (
+                  {hasPendingRanges &&
+                  minApprovalThreshold !== maxApprovalThreshold ? (
                     <div>
                       <p>{`Threshold ${minApprovalThreshold}% – ${maxApprovalThreshold}%`}</p>
                     </div>

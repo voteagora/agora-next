@@ -26,8 +26,13 @@ export default function DelegateContent({
   fetchDelegates,
 }: Props) {
   const { ui } = Tenant.current();
-  const delegatesLayout = ui.toggle("delegates-layout-list")?.enabled ? "list" : "grid";
-  const [layout] = useQueryState("layout", parseAsString.withDefault(delegatesLayout));
+  const delegatesLayout = ui.toggle("delegates-layout-list")?.enabled
+    ? "list"
+    : "grid";
+  const [layout] = useQueryState(
+    "layout",
+    parseAsString.withDefault(delegatesLayout)
+  );
   const { address } = useAccount();
   const [showDialog, setShowDialog] = useState(false);
   const openDialog = useOpenDialog();
@@ -70,15 +75,19 @@ export default function DelegateContent({
     }
   }, [address]);
 
-  return layout === "grid" ? (
-    <DelegateCardList
-      initialDelegates={initialDelegates}
-      fetchDelegates={fetchDelegates}
-    />
-  ) : (
-    <DelegateTable
-      initialDelegates={initialDelegates}
-      fetchDelegates={fetchDelegates}
-    />
+  return (
+    <>
+      {layout === "grid" ? (
+        <DelegateCardList
+          initialDelegates={initialDelegates}
+          fetchDelegates={fetchDelegates}
+        />
+      ) : (
+        <DelegateTable
+          initialDelegates={initialDelegates}
+          fetchDelegates={fetchDelegates}
+        />
+      )}
+    </>
   );
 }

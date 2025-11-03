@@ -8,6 +8,13 @@
   }
 }
 
+.code {
+  :global(.wmde-markdown pre code),
+  :global(.wmde-markdown pre tt) {
+    color: rgb(var(--primary)) !important;
+  }
+}
+
 .agora_markdown {
   h1 {
     font-size: $font-size-2xl;
