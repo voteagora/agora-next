@@ -24,6 +24,7 @@ export function UndelegateButton({
       type={useNeutral ? "secondary" : "primary"}
       onClick={(e: any) => {
         e.preventDefault();
+        e.stopPropagation();
         openDialog({
           type: "UNDELEGATE",
           params: {

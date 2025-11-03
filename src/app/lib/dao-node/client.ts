@@ -322,15 +322,12 @@ export const getDelegatesFromDaoNode = async (options?: {
       queryParams.append("delegator", filters.delegator);
     }
 
-    console.log(`${url}v1/delegates?${queryParams}`);
     const response = await fetch(`${url}v1/delegates?${queryParams}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch delegates: ${response.status}`);
     }
 
     const data = await response.json();
-
-    console.log(data);
 
     if (data && data.delegates && data.delegates.length > 0) {
       const allRawDelegatesFromApi = data.delegates;

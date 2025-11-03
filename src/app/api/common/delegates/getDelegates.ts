@@ -36,7 +36,6 @@ const cachedGetDelegatesFromDaoNode = unstable_cache(
     };
     withParticipation?: boolean;
   }) => {
-    console.log("cachedGetDelegatesFromDaoNode called with:", args);
     return getDelegatesFromDaoNode(args);
   },
   ["delegates-dao-node-filters"],
@@ -120,14 +119,6 @@ async function getDelegates({
         filters?.endorsed ||
         filters?.hasStatement;
       const isWeightedRandomSort = sort === "weighted_random" && seed;
-
-      console.log({
-        filters,
-        isAllowListEnabled,
-        isWeightedRandomSort,
-        sort,
-        seed,
-      });
 
       const daoNodeResult = await cachedGetDelegatesFromDaoNode({
         sortBy: daoNodeSortBy,
