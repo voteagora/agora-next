@@ -69,7 +69,9 @@ export default function ProposalVotesBar({ proposal }: Props) {
         <div className="w-full bg-wash h-[10px]"></div>
       )}
 
-      {minApprovalThreshold !== null && maxApprovalThreshold !== null ? (
+      {minApprovalThreshold !== null &&
+      maxApprovalThreshold !== null &&
+      minApprovalThreshold !== maxApprovalThreshold ? (
         <>
           {/* Min threshold marker */}
           <div
