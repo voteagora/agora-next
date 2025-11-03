@@ -34,13 +34,13 @@ export function SyndicateDelegateInfo() {
       <div
         className={`flex flex-col space-y-4 p-6 ${useNeutral ? "bg-neutral" : "bg-wash"} border border-line shadow-newDefault rounded-xl`}
       >
-        <h2 className="text-2xl font-bold text-primary">Self-Delegation</h2>
-        <div className="flex flex-col space-y-4 text-secondary">
+        <h2 className="text-lg font-bold text-primary">Self-Delegation</h2>
+        <div className="flex flex-col space-y-4 text-secondary text-sm leading-relaxed">
           <p>
             Self-delegating activates your voting power so you can vote directly
             in onchain proposals.
           </p>
-          <ul className="list-disc list-inside space-y-2 ml-4">
+          <ul className="list-disc list-inside space-y-2 ml-4 text-sm">
             <li>
               Onchain action: Call delegate(
               {address ? (
@@ -75,10 +75,10 @@ export function SyndicateDelegateInfo() {
       <div
         className={`flex flex-col space-y-4 p-6 ${useNeutral ? "bg-neutral" : "bg-wash"} border border-line shadow-newDefault rounded-xl`}
       >
-        <h2 className="text-2xl font-bold text-primary">
+        <h2 className="text-lg font-bold text-primary">
           Delegate to Other Members
         </h2>
-        <div className="flex flex-col space-y-4 text-secondary">
+        <div className="flex flex-col space-y-4 text-secondary text-sm leading-relaxed">
           <p>
             You can point your voting power to a trusted delegate. This helps
             active representatives vote on your behalf while{" "}
