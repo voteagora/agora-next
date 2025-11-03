@@ -94,10 +94,12 @@ export const syndicateTenantUIConfig = new TenantUI({
         "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate Network",
       hero: syndicateHero,
       meta: {
-        title: "Syndicate Agora",
-        description: "Home of token governance",
-        imageTitle: "Syndicate Agora",
-        imageDescription: "Home of token governance",
+        title: "Syndicate Network Collective Governance",
+        description:
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Syndicate Network Collective Governance",
+        imageDescription:
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
     },
     {
@@ -107,11 +109,12 @@ export const syndicateTenantUIConfig = new TenantUI({
         "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate Network",
       hero: syndicateHero,
       meta: {
-        title: "Voter on Agora",
-        description: "Delegate your voting power to a trusted representative",
-        imageTitle: "Voter on Agora",
+        title: "Syndicate Network Collective Governance",
+        description:
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Syndicate Network Collective Governance",
         imageDescription:
-          "Delegate your voting power to a trusted representative",
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
     },
     {
@@ -121,10 +124,12 @@ export const syndicateTenantUIConfig = new TenantUI({
         "SNC is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
       hero: syndicateHero,
       meta: {
-        title: "Syndicate Agora",
-        description: "Home of token governance",
-        imageTitle: "Syndicate Agora",
-        imageDescription: "Home of token governance",
+        title: "Syndicate Network Collective Governance",
+        description:
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Syndicate Network Collective Governance",
+        imageDescription:
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
     },
     {
@@ -133,12 +138,12 @@ export const syndicateTenantUIConfig = new TenantUI({
       description:
         "The Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
       meta: {
-        title: "Syndicate Network Governance",
+        title: "Syndicate Network Collective Governance",
         description:
-          "The Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
-        imageTitle: "Syndicate Network Governance",
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Syndicate Network Collective Governance",
         imageDescription:
-          "The Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
       links: [
         {
@@ -188,12 +193,12 @@ export const syndicateTenantUIConfig = new TenantUI({
         },
       ],
       meta: {
-        title: "Syndicate Network Governance",
+        title: "Syndicate Network Collective Governance",
         description:
-          "The Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
-        imageTitle: "Syndicate Network Governance",
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Syndicate Network Collective Governance",
         imageDescription:
-          "The Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
     },
     {
@@ -202,10 +207,12 @@ export const syndicateTenantUIConfig = new TenantUI({
       description: `Syndicate governance goes live on November 3rd, 2025.
 `,
       meta: {
-        title: "Syndicate Network Governance",
-        description: "Syndicate Network governance coming soon",
-        imageTitle: "Syndicate Network Governance",
-        imageDescription: "Syndicate Network governance coming soon",
+        title: "Syndicate Network Collective Governance",
+        description:
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Syndicate Network Collective Governance",
+        imageDescription:
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
     },
   ],
