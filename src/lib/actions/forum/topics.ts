@@ -726,99 +726,100 @@ export const getForumData = async ({
       };
     }
 
-    const [topics, totalCount, admins, categories, latestPost] = await Promise.all([
-      prismaWeb2Client.forumTopic.findMany({
-        where: whereClause,
-        include: {
-          category: {
-            select: {
-              name: true,
-              id: true,
-              adminOnlyTopics: true,
-              isDuna: true,
+    const [topics, totalCount, admins, categories, latestPost] =
+      await Promise.all([
+        prismaWeb2Client.forumTopic.findMany({
+          where: whereClause,
+          include: {
+            category: {
+              select: {
+                name: true,
+                id: true,
+                adminOnlyTopics: true,
+                isDuna: true,
+              },
             },
-          },
-          posts: {
-            where: { isNsfw: false, deletedAt: null },
-            orderBy: { createdAt: "asc" },
-            take: 1,
-            include: {
-              reactions: true,
-              _count: {
-                select: {
-                  votes: {
-                    where: { vote: 1 },
+            posts: {
+              where: { isNsfw: false, deletedAt: null },
+              orderBy: { createdAt: "asc" },
+              take: 1,
+              include: {
+                reactions: true,
+                _count: {
+                  select: {
+                    votes: {
+                      where: { vote: 1 },
+                    },
                   },
                 },
               },
             },
-          },
-          _count: {
-            select: {
-              posts: {
-                where: { isNsfw: false, deletedAt: null },
+            _count: {
+              select: {
+                posts: {
+                  where: { isNsfw: false, deletedAt: null },
+                },
               },
             },
           },
-        },
-        orderBy: [{ archived: "asc" }, { createdAt: "desc" }],
-        take: limit,
-        skip: offset,
-      }),
+          orderBy: [{ archived: "asc" }, { createdAt: "desc" }],
+          take: limit,
+          skip: offset,
+        }),
 
-      prismaWeb2Client.forumTopic.count({
-        where: whereClause,
-      }),
+        prismaWeb2Client.forumTopic.count({
+          where: whereClause,
+        }),
 
-      prismaWeb2Client.forumAdmin.findMany({
-        where: {
-          managedAccounts: {
-            has: slug,
+        prismaWeb2Client.forumAdmin.findMany({
+          where: {
+            managedAccounts: {
+              has: slug,
+            },
           },
-        },
-        select: { address: true, role: true },
-        orderBy: { address: "asc" },
-      }),
+          select: { address: true, role: true },
+          orderBy: { address: "asc" },
+        }),
 
-      prismaWeb2Client.forumCategory.findMany({
-        where: { dao_slug: slug, archived: false },
-        include: {
-          _count: {
-            select: {
-              topics: {
-                where: {
-                  archived: false,
-                  deletedAt: null,
-                  posts: {
-                    some: {
-                      isNsfw: false,
-                      deletedAt: null,
+        prismaWeb2Client.forumCategory.findMany({
+          where: { dao_slug: slug, archived: false },
+          include: {
+            _count: {
+              select: {
+                topics: {
+                  where: {
+                    archived: false,
+                    deletedAt: null,
+                    posts: {
+                      some: {
+                        isNsfw: false,
+                        deletedAt: null,
+                      },
                     },
                   },
                 },
               },
             },
           },
-        },
-        orderBy: { createdAt: "desc" },
-      }),
+          orderBy: { createdAt: "desc" },
+        }),
 
-      prismaWeb2Client.forumPost.findFirst({
-        where: {
-          dao_slug: slug,
-          isNsfw: false,
-          deletedAt: null,
-        },
-        orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          createdAt: true,
-          topicId: true,
-          address: true,
-          content: true,
-        },
-      }),
-    ]);
+        prismaWeb2Client.forumPost.findFirst({
+          where: {
+            dao_slug: slug,
+            isNsfw: false,
+            deletedAt: null,
+          },
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            createdAt: true,
+            topicId: true,
+            address: true,
+            content: true,
+          },
+        }),
+      ]);
 
     const adminRolesObj: Record<string, string | null> = {};
     admins.forEach((admin) => {
