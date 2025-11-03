@@ -14,6 +14,15 @@ export default function Hero({ page }) {
     return <div style={{ height: 24 }} />;
   }
 
+  // For Syndicate delegates page with voters-page content flag, hide the entire hero
+  if (
+    namespace === TENANT_NAMESPACES.SYNDICATE &&
+    page === "delegates" &&
+    ui.toggle("syndicate-voters-page-content")?.enabled
+  ) {
+    return null;
+  }
+
   const shouldHideHero = ui.toggle("hide-hero")?.enabled;
 
   const customHeroTitleWidth =

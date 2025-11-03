@@ -380,6 +380,10 @@ export const syndicateTenantUIConfig = new TenantUI({
       },
     },
     {
+      name: "syndicate-voters-page-content",
+      enabled: true,
+    },
+    {
       name: "delegates-layout-list",
       enabled: true,
     },
