@@ -38,7 +38,7 @@ export default function Hero({ page }) {
       </div>
       {hero && !shouldHideHero && (
         <Image
-          className="h-auto sm:h-[110px] w-auto"
+          className={`h-auto ${ui.customization?.customHeroImageSize || "sm:h-[110px]"} w-auto`}
           alt={`${namespace} cover`}
           src={hero}
         />
