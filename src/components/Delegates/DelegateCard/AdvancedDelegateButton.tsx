@@ -66,6 +66,7 @@ const DelegateButton = ({
       className={isDisabled ? "!cursor-not-allowed" : ""}
       onClick={(e: any) => {
         e.preventDefault();
+        e.stopPropagation();
         openDialog({
           type: "ADVANCED_DELEGATE",
           params: {

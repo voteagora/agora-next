@@ -21,6 +21,7 @@ export function DelegateButton({
       type={useNeutral ? "primary" : "secondary"}
       onClick={(e: any) => {
         e.preventDefault();
+        e.stopPropagation();
         openDialog({
           type: "DELEGATE",
           params: {
