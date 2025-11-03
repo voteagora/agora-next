@@ -3,6 +3,7 @@ import { ParsedProposalResults } from "@/lib/proposalUtils";
 
 interface Props {
   proposal: Proposal;
+  barColor?: string;
 }
 
 type RangeProposalType = {
@@ -12,7 +13,10 @@ type RangeProposalType = {
   max_approval_threshold_pct: number;
 };
 
-export default function ProposalVotesBar({ proposal }: Props) {
+export default function ProposalVotesBar({
+  proposal,
+  barColor = "wash",
+}: Props) {
   const thresholdPercent = Math.round(Number(proposal.approvalThreshold) / 100);
 
   const results =
@@ -66,7 +70,7 @@ export default function ProposalVotesBar({ proposal }: Props) {
           )}
         </>
       ) : (
-        <div className="w-full bg-wash h-[10px]"></div>
+        <div className={`w-full bg-${barColor} h-[10px]`}></div>
       )}
 
       {minApprovalThreshold !== null &&

@@ -45,6 +45,7 @@ export default function Markdown({
     <div
       className={cn(
         styles.proposal_description_md,
+        styles.code,
         "max-w-full text-primary",
         wrapperClassName
       )}

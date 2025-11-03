@@ -62,7 +62,7 @@ function AmountAndPercent({
   return (
     <span>
       <TokenAmountDecorated amount={amount} hideCurrency specialFormatting />
-      {percent && `(${percent}%)`}
+      {percent ? `(${percent}%)` : "0%"}
     </span>
   );
 }
@@ -153,7 +153,7 @@ export default function ProposalVotesSummaryDetails({
 
   return (
     <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[317px] sm:min-w-[317px] bg-wash">
-      <ProposalVotesBar proposal={proposal} />
+      <ProposalVotesBar proposal={proposal} barColor="neutral" />
 
       <div className="flex flex-col gap-2 w-full mt-4">
         <div className="flex justify-between text-positive">
