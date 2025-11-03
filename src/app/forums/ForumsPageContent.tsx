@@ -33,7 +33,7 @@ export default async function ForumsPageContent({
     );
   }
 
-  const { topics, admins, categories, latestPost } = result.data;
+  const { topics, totalCount, admins, categories, latestPost } = result.data;
 
   const sortedTopics = topics.slice().sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -74,6 +74,7 @@ export default async function ForumsPageContent({
             selectedCategoryId={selectedCategoryId}
             categories={categories}
             latestPost={latestPost}
+            totalTopicsCount={totalCount}
           />
         </div>
       </div>

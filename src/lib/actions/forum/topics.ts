@@ -666,6 +666,33 @@ interface ForumDataOptions {
   offset?: number;
 }
 
+export const getForumTopicsCount = async () => {
+  try {
+    const count = await prismaWeb2Client.forumTopic.count({
+      where: {
+        dao_slug: slug,
+        archived: false,
+        isNsfw: false,
+        deletedAt: null,
+        posts: {
+          some: {
+            isNsfw: false,
+            deletedAt: null,
+          },
+        },
+      },
+    });
+
+    return {
+      success: true,
+      data: count,
+    };
+  } catch (error) {
+    console.error("Error getting forum topics count:", error);
+    return handlePrismaError(error);
+  }
+};
+
 export const getForumData = async ({
   categoryId,
   excludeCategoryNames,
@@ -699,7 +726,7 @@ export const getForumData = async ({
       };
     }
 
-    const [topics, admins, categories, latestPost] = await Promise.all([
+    const [topics, totalCount, admins, categories, latestPost] = await Promise.all([
       prismaWeb2Client.forumTopic.findMany({
         where: whereClause,
         include: {
@@ -739,6 +766,10 @@ export const getForumData = async ({
         skip: offset,
       }),
 
+      prismaWeb2Client.forumTopic.count({
+        where: whereClause,
+      }),
+
       prismaWeb2Client.forumAdmin.findMany({
         where: {
           managedAccounts: {
@@ -755,7 +786,16 @@ export const getForumData = async ({
           _count: {
             select: {
               topics: {
-                where: { archived: false, deletedAt: null },
+                where: {
+                  archived: false,
+                  deletedAt: null,
+                  posts: {
+                    some: {
+                      isNsfw: false,
+                      deletedAt: null,
+                    },
+                  },
+                },
               },
             },
           },
@@ -809,6 +849,7 @@ export const getForumData = async ({
       success: true,
       data: {
         topics: processedTopics,
+        totalCount,
         admins: adminRolesObj,
         categories: processedCategories,
         latestPost: latestPost

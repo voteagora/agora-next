@@ -9,6 +9,7 @@ export {
   restoreForumTopic,
   archiveForumTopic,
   getForumData,
+  getForumTopicsCount,
 } from "./topics";
 
 // Posts

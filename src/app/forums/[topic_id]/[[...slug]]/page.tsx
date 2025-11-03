@@ -6,7 +6,7 @@ import TopicHeader from "../components/TopicHeader";
 import PostAttachments from "../components/PostAttachments";
 import EmojiReactions from "@/components/Forum/EmojiReactions";
 import ForumThread from "../components/ForumThread";
-import { getForumCategories, getForumTopic } from "@/lib/actions/forum";
+import { getForumCategories, getForumTopic, getForumTopicsCount } from "@/lib/actions/forum";
 import { truncateAddress } from "@/app/lib/utils/text";
 import ForumsSidebar from "../../ForumsSidebar";
 import ForumsHeader from "../../components/ForumsHeader";
@@ -140,10 +140,11 @@ export async function generateMetadata({
 }
 
 export default async function ForumTopicPage({ params }: PageProps) {
-  const [topicBundle, adminsResult, categoriesResult] = await Promise.all([
+  const [topicBundle, adminsResult, categoriesResult, topicsCountResult] = await Promise.all([
     loadTopic(params.topic_id),
     getForumAdmins(),
     getForumCategories(),
+    getForumTopicsCount(),
   ]);
   if (!topicBundle) {
     return notFound();
@@ -231,6 +232,8 @@ export default async function ForumTopicPage({ params }: PageProps) {
       }))
     : [];
 
+  const totalTopicsCount = topicsCountResult.success ? topicsCountResult.data : 0;
+
   return (
     <div className="min-h-screen">
       <ForumsHeader
@@ -308,6 +311,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
               categories={categories}
               latestPost={topicData}
               selectedCategoryId={categoryId}
+              totalTopicsCount={totalTopicsCount}
             />
           </div>
         </div>

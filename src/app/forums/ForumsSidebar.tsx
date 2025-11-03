@@ -15,12 +15,14 @@ interface ForumsSidebarProps {
   selectedCategoryId?: number | null;
   categories?: ForumCategory[];
   latestPost?: ForumPost;
+  totalTopicsCount: number;
 }
 
 export default function ForumsSidebar({
   selectedCategoryId = null,
   categories = [],
   latestPost,
+  totalTopicsCount,
 }: ForumsSidebarProps) {
   const sortedCategories = (categories || [])
     .sort((a, b) => {
@@ -35,11 +37,6 @@ export default function ForumsSidebar({
       return a.name.localeCompare(b.name);
     })
     .filter((cat) => (cat.topicsCount ?? 0) > 0);
-
-  const totalTopics = sortedCategories.reduce(
-    (sum: number, cat) => sum + (cat.topicsCount ?? 0),
-    0
-  );
 
   const lastActivityAt = latestPost?.createdAt;
 
@@ -85,8 +82,8 @@ export default function ForumsSidebar({
                   <span className="text-sm">All discussions</span>
                 </div>
                 <span className="text-xs">
-                  {totalTopics}
-                  {totalTopics === 1 ? " topic" : " topics"}
+                  {totalTopicsCount}
+                  {totalTopicsCount === 1 ? " topic" : " topics"}
                 </span>
               </Link>
 
