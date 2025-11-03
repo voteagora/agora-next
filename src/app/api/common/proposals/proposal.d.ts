@@ -121,7 +121,7 @@ export type ProposalTypeData = {
 };
 
 export type Proposal = {
-  archiveMetadata: any;
+  archiveMetadata?: any;
   id: string;
   proposer: string;
   snapshotBlockNumber: number;
