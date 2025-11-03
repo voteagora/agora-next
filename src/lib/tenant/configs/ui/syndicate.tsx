@@ -94,10 +94,13 @@ export const syndicateTenantUIConfig = new TenantUI({
         "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate Network",
       hero: syndicateHero,
       meta: {
-        title: "Syndicate Agora",
-        description: "Home of token governance",
-        imageTitle: "Syndicate Agora",
-        imageDescription: "Home of token governance",
+        title: "Syndicate Network Collective is the home of SYND delegates",
+        description:
+          "SNC is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
+        imageTitle:
+          "Syndicate Network Collective is the home of SYND delegates",
+        imageDescription:
+          "SNC is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
       },
     },
     {
@@ -107,11 +110,13 @@ export const syndicateTenantUIConfig = new TenantUI({
         "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate Network",
       hero: syndicateHero,
       meta: {
-        title: "Voter on Agora",
-        description: "Delegate your voting power to a trusted representative",
-        imageTitle: "Voter on Agora",
+        title: "Syndicate Network Collective is the home of SYND delegates",
+        description:
+          "SNC is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
+        imageTitle:
+          "Syndicate Network Collective is the home of SYND delegates",
         imageDescription:
-          "Delegate your voting power to a trusted representative",
+          "SNC is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
       },
     },
     {
@@ -121,10 +126,13 @@ export const syndicateTenantUIConfig = new TenantUI({
         "SNC is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
       hero: syndicateHero,
       meta: {
-        title: "Syndicate Agora",
-        description: "Home of token governance",
-        imageTitle: "Syndicate Agora",
-        imageDescription: "Home of token governance",
+        title: "Syndicate Network Collective is the home of SYND delegates",
+        description:
+          "SNC is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
+        imageTitle:
+          "Syndicate Network Collective is the home of SYND delegates",
+        imageDescription:
+          "SNC is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
       },
     },
     {
@@ -202,10 +210,13 @@ export const syndicateTenantUIConfig = new TenantUI({
       description: `Syndicate governance goes live on November 3rd, 2025.
 `,
       meta: {
-        title: "Syndicate Network Governance",
-        description: "Syndicate Network governance coming soon",
-        imageTitle: "Syndicate Network Governance",
-        imageDescription: "Syndicate Network governance coming soon",
+        title: "Syndicate Network Collective is the home of SYND delegates",
+        description:
+          "SNC is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
+        imageTitle:
+          "Syndicate Network Collective is the home of SYND delegates",
+        imageDescription:
+          "SNC is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
       },
     },
   ],
