@@ -22,16 +22,20 @@ export default function SyndicateVotersPageContent() {
             should live:
           </p>
           <ul className="list-disc list-inside space-y-2 ml-4">
-            <li>Self-delegate to vote directly from your own wallet.</li>
             <li>
-              Delegate to someone you trust so they can vote on your behalf.
+              <strong>Self-delegate</strong> to vote directly from your own
+              wallet.
+            </li>
+            <li>
+              <strong>Delegate to someone you trust</strong> so they can vote on
+              your behalf.
             </li>
           </ul>
           <p>
-            Either way, you keep full ownership of your tokens. Delegation does
-            not let anyone move your tokens or claim them; it only points your
-            voting power. You can change or revoke delegation at any time by
-            making a new delegation.
+            Either way, you keep full ownership of your tokens. Delegation{" "}
+            <strong>does not</strong> let anyone move your tokens or claim them;
+            it only points your voting power. You can change or revoke
+            delegation at any time by making a new delegation.
           </p>
         </div>
       </div>
@@ -42,7 +46,7 @@ export default function SyndicateVotersPageContent() {
         </h2>
         <p className="text-secondary">
           This model keeps everyday transfers cheaper and lets governance use
-          reliable onchain snapshots of voting power at specific blocks
+          reliable onchain snapshots of voting power at specific blocks.
         </p>
       </div>
     </div>
