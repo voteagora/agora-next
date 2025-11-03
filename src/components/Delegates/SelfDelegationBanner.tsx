@@ -35,6 +35,8 @@ export function SelfDelegationBanner() {
   const [status, setStatus] = useState<DelegationStatus>("loading");
   const [tokenBalance, setTokenBalance] = useState<string>("0");
   const [isLoading, setIsLoading] = useState(true);
+  const [shouldOpenDelegateDialog, setShouldOpenDelegateDialog] =
+    useState(false);
 
   useEffect(() => {
     async function checkDelegationStatus() {
@@ -73,8 +75,48 @@ export function SelfDelegationBanner() {
     checkDelegationStatus();
   }, [address, isConnected]);
 
+  // Effect to open delegation dialog after user connects wallet
+  useEffect(() => {
+    if (
+      shouldOpenDelegateDialog &&
+      address &&
+      isConnected &&
+      status === "not-delegated" &&
+      tokenBalance !== "0"
+    ) {
+      const selfDelegate = {
+        address: address,
+        votingPower: {
+          total: tokenBalance,
+        },
+      };
+
+      openDialog({
+        type: "DELEGATE",
+        params: {
+          delegate: selfDelegate as any,
+          fetchDirectDelegatee,
+          isDelegationEncouragement: true,
+        },
+      });
+
+      setShouldOpenDelegateDialog(false);
+    } else if (shouldOpenDelegateDialog && tokenBalance === "0") {
+      // Reset flag if user has no tokens
+      setShouldOpenDelegateDialog(false);
+    }
+  }, [
+    shouldOpenDelegateDialog,
+    address,
+    isConnected,
+    status,
+    tokenBalance,
+    openDialog,
+  ]);
+
   const handleSelfDelegate = () => {
     if (!address) {
+      setShouldOpenDelegateDialog(true);
       setOpen(true);
       return;
     }
@@ -107,7 +149,8 @@ export function SelfDelegationBanner() {
     return null;
   }
 
-  if (tokenBalance === "0") {
+  // Don't show banner if logged-in user has zero tokens
+  if (isConnected && tokenBalance === "0") {
     return null;
   }
 
@@ -196,11 +239,7 @@ export function SelfDelegationBanner() {
                 <Info className="w-5 h-5 text-blue-500 flex-shrink-0" />
                 <p className="text-sm text-blue-500">{getBannerText()}</p>
               </div>
-              <Button
-                onClick={handleSelfDelegate}
-                size="sm"
-                className="flex-shrink-0"
-              >
+              <Button onClick={handleSelfDelegate} className="flex-shrink-0">
                 Self-Delegate
               </Button>
             </div>
