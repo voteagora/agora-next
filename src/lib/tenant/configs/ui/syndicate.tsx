@@ -215,6 +215,10 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "delegation-encouragement",
+      enabled: true,
+    },
+    {
       name: "delegates/edit",
       enabled: false,
     },

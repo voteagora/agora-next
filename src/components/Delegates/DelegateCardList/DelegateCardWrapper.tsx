@@ -7,8 +7,6 @@ import { PaginationParams } from "@/app/lib/pagination";
 import { SearchParams } from "nuqs/server";
 import { buildDelegateFilters } from "./delegateUtils";
 import Tenant from "@/lib/tenant/tenant";
-import { SelfDelegationBanner } from "../SelfDelegationBanner";
-import { TENANT_NAMESPACES } from "@/lib/constants";
 
 async function fetchDelegatesWithParams(
   sort: string,
@@ -66,7 +64,6 @@ const DelegateCardWrapper = async ({
   );
   return (
     <>
-      {namespace === TENANT_NAMESPACES.SYNDICATE && <SelfDelegationBanner />}
       <DelegateTabs>
         <TabsContent value="delegates">
           <DelegateContent
