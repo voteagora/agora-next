@@ -59,7 +59,7 @@ export default function SyndicateVotersPageContent() {
             <ul className="list-[circle] list-outside space-y-2 ml-6 mt-2 text-sm leading-relaxed">
               <li>
                 first be submitted as a <strong>Temp-Check</strong>, which is a
-                five-day period during which <strong>Members</strong> can
+                seven-day period during which <strong>Members</strong> can
                 utilize their SYND token to indicate support for a proposal. In
                 order for a proposal to transition from a{" "}
                 <strong>Temp-Check</strong> to a vote of the membership, the{" "}
@@ -69,7 +69,7 @@ export default function SyndicateVotersPageContent() {
               </li>
               <li>
                 upon a successful <strong>Temp-Check</strong>, the{" "}
-                <strong>Governance Proposal</strong> period is open for five
+                <strong>Governance Proposal</strong> period is open for seven
                 days, during which time <strong>Members</strong> can utilize
                 their SYND token to affirm, deny, or participate without voting
                 on the proposal. A proposal:
