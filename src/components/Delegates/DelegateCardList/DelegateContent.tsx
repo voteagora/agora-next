@@ -25,11 +25,17 @@ export default function DelegateContent({
   initialDelegates,
   fetchDelegates,
 }: Props) {
-  const [layout] = useQueryState("layout", parseAsString.withDefault("grid"));
+  const { ui } = Tenant.current();
+  const delegatesLayout = ui.toggle("delegates-layout-list")?.enabled
+    ? "list"
+    : "grid";
+  const [layout] = useQueryState(
+    "layout",
+    parseAsString.withDefault(delegatesLayout)
+  );
   const { address } = useAccount();
   const [showDialog, setShowDialog] = useState(false);
   const openDialog = useOpenDialog();
-  const { ui } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;

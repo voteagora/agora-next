@@ -204,7 +204,9 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
               }
             })()}
           />
-          {minQuorumValue !== null && maxQuorumValue !== null ? (
+          {minQuorumValue !== null &&
+          maxQuorumValue !== null &&
+          minQuorumValue !== maxQuorumValue ? (
             <>
               {/* Min quorum line */}
               <ReferenceLine

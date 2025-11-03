@@ -379,5 +379,9 @@ export const syndicateTenantUIConfig = new TenantUI({
         text: "SYND voting power is only coming from Mainnet. In order to get voting power, you must bridge to Mainnet.",
       },
     },
+    {
+      name: "delegates-layout-list",
+      enabled: true,
+    },
   ],
 });

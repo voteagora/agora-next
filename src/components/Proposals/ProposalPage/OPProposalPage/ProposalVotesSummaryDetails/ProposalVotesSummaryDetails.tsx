@@ -176,49 +176,51 @@ export default function ProposalVotesSummaryDetails({
             <span>{proposal.proposalTypeData.name}</span>
           </div>
         )}
-        <div className="flex justify-between">
-          <div className="flex items-center gap-1 text-secondary font-semibold text-xs">
-            Quorum
-            {isProposalCreatedBeforeUpgrade && <QuorumTooltip />}
-          </div>
-          {hasPendingRanges ? (
-            <div className="flex items-center gap-1">
-              <p className="text-xs font-semibold text-secondary">
-                {minQuorum}% – {maxQuorum}% Required
-              </p>
+        {(!hasPendingRanges || minQuorum !== maxQuorum) && (
+          <div className="flex justify-between">
+            <div className="flex items-center gap-1 text-secondary font-semibold text-xs">
+              Quorum
+              {isProposalCreatedBeforeUpgrade && <QuorumTooltip />}
             </div>
-          ) : (
-            proposal.quorum && (
-              <div className="flex items-center gap-1 ">
-                {hasMetQuorum && (
-                  <Image
-                    width="12"
-                    height="12"
-                    src={checkIcon}
-                    alt="check icon"
-                  />
-                )}
+            {hasPendingRanges ? (
+              <div className="flex items-center gap-1">
                 <p className="text-xs font-semibold text-secondary">
-                  <TokenAmountDecorated
-                    amount={quorumVotes}
-                    decimals={token.decimals}
-                    hideCurrency
-                    specialFormatting
-                  />{" "}
-                  /{" "}
-                  <TokenAmountDecorated
-                    amount={proposal.quorum}
-                    decimals={token.decimals}
-                    hideCurrency
-                    specialFormatting
-                  />
-                  {isProposalCreatedBeforeUpgrade && "0"} Required
+                  {minQuorum}% – {maxQuorum}% Required
                 </p>
               </div>
-            )
-          )}
-        </div>
-        {hasPendingRanges ? (
+            ) : (
+              proposal.quorum && (
+                <div className="flex items-center gap-1 ">
+                  {hasMetQuorum && (
+                    <Image
+                      width="12"
+                      height="12"
+                      src={checkIcon}
+                      alt="check icon"
+                    />
+                  )}
+                  <p className="text-xs font-semibold text-secondary">
+                    <TokenAmountDecorated
+                      amount={quorumVotes}
+                      decimals={token.decimals}
+                      hideCurrency
+                      specialFormatting
+                    />{" "}
+                    /{" "}
+                    <TokenAmountDecorated
+                      amount={proposal.quorum}
+                      decimals={token.decimals}
+                      hideCurrency
+                      specialFormatting
+                    />
+                    {isProposalCreatedBeforeUpgrade && "0"} Required
+                  </p>
+                </div>
+              )
+            )}
+          </div>
+        )}
+        {hasPendingRanges && minApprovalThreshold !== maxApprovalThreshold ? (
           <div className="flex justify-between">
             <div className="flex flex-row gap-1 text-secondary font-semibold text-xs">
               Threshold
@@ -229,7 +231,7 @@ export default function ProposalVotesSummaryDetails({
               </p>
             </div>
           </div>
-        ) : (
+        ) : !hasPendingRanges ? (
           proposal.approvalThreshold && (
             <div className="flex justify-between">
               <div className="flex flex-row gap-1 text-secondary font-semibold text-xs">
@@ -248,7 +250,7 @@ export default function ProposalVotesSummaryDetails({
               </div>
             </div>
           )
-        )}
+        ) : null}
       </div>
       <ol className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-wash -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg">
         <StepperRow
