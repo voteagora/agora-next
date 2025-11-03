@@ -16,6 +16,9 @@ import {
 } from "@/components/ui/tooltip";
 import { RelatedItem } from "@/app/create/types";
 import { useProposalLinksWithDetails } from "@/hooks/useProposalLinksWithDetails";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import SyndicateTempCheckTooltip from "./SyndicateTempCheckTooltip";
 
 type RangeProposalType = {
   min_quorum_pct: number;
@@ -48,6 +51,7 @@ export default function ArchiveProposalTypeApproval({
     }
   ).archiveMetadata;
   const isTempCheck = archiveMetadata?.rawTag === "tempcheck";
+  const { namespace } = Tenant.current();
 
   // Only show for eas-oodao proposals
   if (archiveMetadata?.source !== "eas-oodao") {
@@ -188,7 +192,12 @@ export default function ArchiveProposalTypeApproval({
           <div className="space-y-2 text-xs font-semibold text-secondary">
             {minQuorum !== maxQuorum && (
               <div className="flex items-center justify-between">
-                <span>Quorum</span>
+                <div className="flex items-center gap-1">
+                  <span>Quorum</span>
+                  {namespace === TENANT_NAMESPACES.SYNDICATE && isTempCheck && (
+                    <SyndicateTempCheckTooltip />
+                  )}
+                </div>
                 <span>
                   {minQuorum}% – {maxQuorum}% until type approved
                 </span>

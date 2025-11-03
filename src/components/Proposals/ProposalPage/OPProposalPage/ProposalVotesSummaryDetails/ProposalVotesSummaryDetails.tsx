@@ -21,6 +21,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { AlertTriangle, X } from "lucide-react";
+import SyndicateTempCheckTooltip from "../SyndicateTempCheckTooltip";
 
 export const QuorumTooltip = () => {
   return (
@@ -151,6 +152,9 @@ export default function ProposalVotesSummaryDetails({
     ? defaultProposalTypeRanges.max_approval_threshold_pct / 100
     : null;
 
+  const isTempCheck =
+    proposal.archiveMetadata?.proposalTypeTag === "Temp Check";
+
   return (
     <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[317px] sm:min-w-[317px] bg-wash">
       <ProposalVotesBar proposal={proposal} barColor="neutral" />
@@ -181,6 +185,9 @@ export default function ProposalVotesSummaryDetails({
             <div className="flex items-center gap-1 text-secondary font-semibold text-xs">
               Quorum
               {isProposalCreatedBeforeUpgrade && <QuorumTooltip />}
+              {namespace === TENANT_NAMESPACES.SYNDICATE && isTempCheck && (
+                <SyndicateTempCheckTooltip />
+              )}
             </div>
             {hasPendingRanges ? (
               <div className="flex items-center gap-1">

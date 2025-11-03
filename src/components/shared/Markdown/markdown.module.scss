@@ -7,7 +7,7 @@
     table-layout: fixed !important;
   }
 }
-code {
+.code {
   :global(.wmde-markdown pre code),
   :global(.wmde-markdown pre tt) {
     color: rgb(var(--primary)) !important;
