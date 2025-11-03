@@ -385,6 +385,10 @@ export const syndicateTenantUIConfig = new TenantUI({
       },
     },
     {
+      name: "syndicate-proposals-page-content",
+      enabled: true,
+    },
+    {
       name: "syndicate-voters-page-content",
       enabled: true,
     },
