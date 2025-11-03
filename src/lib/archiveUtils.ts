@@ -7,9 +7,6 @@ import {
   getArchiveSlugForProposalNonVoters,
   getArchiveSlugForProposalVotes,
 } from "./constants";
-import { Vote } from "@/app/api/common/votes/vote";
-import { ProposalType } from "./types";
-import { parseSupport } from "./voteUtils";
 
 const withCacheBust = (url: string) => {
   const now = Math.floor(Date.now() / 1000);
