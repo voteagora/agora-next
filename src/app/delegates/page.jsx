@@ -4,6 +4,8 @@ import DelegateCardWrapper, {
   DelegateCardLoadingState,
 } from "@/components/Delegates/DelegateCardList/DelegateCardWrapper";
 import Hero from "@/components/Hero/Hero";
+import SyndicateVotersPageContent from "@/components/Delegates/SyndicateVotersPageContent";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export const dynamic = "force-dynamic"; //nuqs does not consider params changes for filters otherwise
 
@@ -37,9 +39,15 @@ export async function generateMetadata({}, parent) {
 }
 
 export default async function Page({ searchParams }) {
+  const { ui, namespace } = Tenant.current();
+  const showVotersPageContent =
+    namespace === TENANT_NAMESPACES.SYNDICATE &&
+    ui.toggle("syndicate-voters-page-content")?.enabled;
+
   return (
     <section>
       <Hero page="delegates" />
+      {showVotersPageContent && <SyndicateVotersPageContent />}
       <Suspense fallback={<DelegateCardLoadingState />}>
         <DelegateCardWrapper searchParams={searchParams} />
       </Suspense>

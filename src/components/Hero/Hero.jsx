@@ -14,10 +14,25 @@ export default function Hero({ page }) {
     return <div style={{ height: 24 }} />;
   }
 
+  // For Syndicate delegates page with voters-page content flag, hide the entire hero
+  if (
+    namespace === TENANT_NAMESPACES.SYNDICATE &&
+    page === "delegates" &&
+    ui.toggle("syndicate-voters-page-content")?.enabled
+  ) {
+    return null;
+  }
+
   const shouldHideHero = ui.toggle("hide-hero")?.enabled;
 
   const customHeroTitleWidth =
     ui.customization?.customHeroTitleWidth || "max-w-[36rem]";
+
+  // Hide description on Syndicate delegates page when voters-page content flag is enabled
+  const shouldHideDescription =
+    namespace === TENANT_NAMESPACES.SYNDICATE &&
+    page === "delegates" &&
+    ui.toggle("syndicate-voters-page-content")?.enabled;
 
   return (
     <div className="flex-col hidden sm:flex sm:flex-row justify-between mt-12 mb-0 sm:my-12 max-w-full">
