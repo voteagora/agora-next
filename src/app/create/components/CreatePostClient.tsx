@@ -96,14 +96,15 @@ export function CreatePostClient({
       if (!isEASV2Enabled) return;
 
       const isTempCheck = selectedPostType === "tempcheck";
-      const tempcheckOverrideSeconds = (() => {
+      const getTempcheckOverrideSeconds = (): number | undefined => {
         const raw = (daoSettings as any)?.tempcheck_voting_period as
           | string
           | undefined;
         if (!raw) return undefined;
         const parsed = parseInt(raw, 10);
         return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
-      })();
+      };
+      const tempcheckOverrideSeconds = getTempcheckOverrideSeconds();
 
       const votingPeriodSeconds =
         isTempCheck && tempcheckOverrideSeconds
