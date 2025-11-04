@@ -95,7 +95,20 @@ export function CreatePostClient({
     try {
       if (!isEASV2Enabled) return;
 
-      const votingPeriodSeconds = daoSettings?.votingPeriod || 7 * 24 * 60 * 60;
+      const isTempCheck = selectedPostType === "tempcheck";
+      const tempcheckOverrideSeconds = (() => {
+        const raw = (daoSettings as any)?.tempcheck_voting_period as
+          | string
+          | undefined;
+        if (!raw) return undefined;
+        const parsed = parseInt(raw, 10);
+        return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+      })();
+
+      const votingPeriodSeconds =
+        isTempCheck && tempcheckOverrideSeconds
+          ? tempcheckOverrideSeconds
+          : daoSettings?.votingPeriod || 7 * 24 * 60 * 60;
       const votingDelaySeconds = daoSettings?.votingDelay || 0;
 
       const proposal = await createProposal({
