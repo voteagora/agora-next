@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import MarkdownTextareaInput from "@/app/proposals/draft/components/form/MarkdownTextareaInput";
+import { DunaEditor, DunaContentRenderer } from "@/components/duna-editor";
 import { CommunityGuidelinesCard } from "@/app/create/components/CommunityGuidelinesCard";
 import toast from "react-hot-toast";
 import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
@@ -20,6 +20,10 @@ import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { ExternalLink, FileText, Thermometer, Clock } from "lucide-react";
 import { formatRelative } from "@/components/ForumShared/utils";
+import { useAccount } from "wagmi";
+import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { convertFileToAttachmentData } from "@/lib/fileUtils";
+import { cn } from "@/lib/utils";
 
 export interface FormData {
   title: string;
@@ -48,8 +52,10 @@ export default function ForumNewClient({
   const { createTopic, checkVPBeforeAction } = useForum();
   const { categories } = useForumCategories();
   const permissions = useForumPermissionsContext();
+  const { address } = useAccount();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showVPModal, setShowVPModal] = useState(false);
+  const [previewMode, setPreviewMode] = useState(false);
 
   const form = useForm<FormData>({
     defaultValues: initialFormData,
@@ -66,6 +72,21 @@ export default function ForumNewClient({
   const title = watch("title");
   const description = watch("description");
   const categoryId = watch("categoryId");
+
+  const handleImageUpload = async (file: File): Promise<string> => {
+    if (!address) {
+      throw new Error("Wallet not connected");
+    }
+
+    const attachmentData = await convertFileToAttachmentData(file);
+    const uploadResult = await uploadToIPFSOnly(attachmentData, address);
+
+    if (!uploadResult.success || !uploadResult.ipfsUrl) {
+      throw new Error(uploadResult.error || "Upload failed");
+    }
+
+    return uploadResult.ipfsUrl;
+  };
 
   const vpCheck = checkVPBeforeAction("topic");
   const currentVP = parseInt(permissions.currentVP) || 0;
@@ -228,14 +249,69 @@ export default function ForumNewClient({
                 </div>
 
                 <div>
+                  <Label
+                    className="text-xs font-semibold text-secondary mb-2 block"
+                    htmlFor="description"
+                  >
+                    Body
+                  </Label>
                   <div className="mt-2">
-                    <MarkdownTextareaInput
-                      control={form.control}
-                      label="Body"
-                      name="description"
-                      required={true}
-                    />
+                    <div className="border border-line rounded-t-lg overflow-hidden">
+                      {previewMode ? (
+                        <div className="min-h-[200px] p-4 bg-wash">
+                          <DunaContentRenderer
+                            content={description || ""}
+                            className="text-secondary text-sm leading-relaxed break-words"
+                          />
+                        </div>
+                      ) : (
+                        <DunaEditor
+                          variant="post"
+                          placeholder="Write your discussion…"
+                          value={description}
+                          onChange={(html) => setValue("description", html)}
+                          disabled={isSubmitting}
+                          onImageUpload={handleImageUpload}
+                          className="border-0 rounded-none shadow-none"
+                        />
+                      )}
+                    </div>
+                    <div className="w-full flex flex-row justify-end py-3 gap-x-1 rounded-b-lg border-x border-b border-line pr-2 bg-wash">
+                      <button
+                        type="button"
+                        className={cn(
+                          "py-2 px-3 rounded-full font-medium",
+                          !previewMode
+                            ? "bg-tertiary/5 text-primary"
+                            : "text-tertiary",
+                          isSubmitting && "opacity-60 cursor-not-allowed"
+                        )}
+                        onClick={() => setPreviewMode(false)}
+                        disabled={isSubmitting}
+                      >
+                        Write
+                      </button>
+                      <button
+                        type="button"
+                        className={cn(
+                          "py-2 px-3 rounded-full font-medium",
+                          previewMode
+                            ? "bg-tertiary/5 text-primary"
+                            : "text-tertiary",
+                          isSubmitting && "opacity-60 cursor-not-allowed"
+                        )}
+                        onClick={() => setPreviewMode(true)}
+                        disabled={isSubmitting}
+                      >
+                        Preview
+                      </button>
+                    </div>
                   </div>
+                  {errors.description && (
+                    <p className="text-sm text-red-600 mt-1">
+                      {errors.description.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between pt-6 border-t">
@@ -269,7 +345,9 @@ export default function ForumNewClient({
                     <Button
                       onClick={handleSubmit}
                       disabled={
-                        isSubmitting || !title?.trim() || !description?.trim()
+                        isSubmitting ||
+                        !title?.trim() ||
+                        !description?.replace(/<[^>]*>/g, "").trim()
                       }
                       className="bg-black text-white hover:bg-gray-800"
                     >
