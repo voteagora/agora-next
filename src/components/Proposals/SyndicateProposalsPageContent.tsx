@@ -11,7 +11,7 @@ export default function SyndicateProposalsPageContent() {
           <ul className="list-[circle] list-outside space-y-2 ml-6 mt-2 text-sm leading-relaxed">
             <li>
               first be submitted as a <strong>Temp-Check</strong>, which is a
-              seven-day period during which <strong>Members</strong> can utilize
+              five-day period during which <strong>Members</strong> can utilize
               their SYND token to indicate support for a proposal. In order for
               a proposal to transition from a <strong>Temp-Check</strong> to a
               vote of the membership, the <strong>Temp-Check</strong> must
