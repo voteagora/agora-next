@@ -139,7 +139,9 @@ export default function ProposalDescription({
         )}
 
       {/* Execution Transactions - shown right below chart for succeeded proposals */}
-      <ExecutionTransactions proposalId={proposal.id} tenant={namespace} />
+      {useArchiveForProposals && (
+        <ExecutionTransactions proposalId={proposal.id} tenant={namespace} />
+      )}
 
       <div className="flex flex-col gap-2">
         {/* Right now I'm only sure this better decoded component works for standard proposals */}
