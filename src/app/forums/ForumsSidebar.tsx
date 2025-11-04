@@ -8,6 +8,7 @@ import {
 } from "@/lib/forumUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 
 const { namespace } = Tenant.current();
 
@@ -121,6 +122,18 @@ export default function ForumsSidebar({
               })}
             </div>
           )}
+        </div>
+
+        {/* Official DUNA Admin Badge */}
+        <div className="mt-4 pt-4 border-t border-border">
+          <div className="bg-wash border border-line rounded-lg shadow-sm p-3">
+            <div className="flex items-center gap-2 text-sm">
+              <ForumAdminBadge type="ADMIN" />
+              <span className="text-primary font-medium">
+                Official DUNA Admin
+              </span>
+            </div>
+          </div>
         </div>
       </div>
       <div>
