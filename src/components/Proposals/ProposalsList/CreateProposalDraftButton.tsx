@@ -10,9 +10,6 @@ import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { PLMConfig } from "@/app/proposals/draft/types";
 
-let cachedCreateProposalDraft:
-  | null
-  | (typeof import("./actions/createProposalDraft"))["default"] = null;
 const CreateProposalDraftButton = ({
   address,
   className,
@@ -80,14 +77,19 @@ const CreateProposalDraftButton = ({
           if (!signature) {
             return;
           }
-          if (!cachedCreateProposalDraft) {
-            const mod = await import("./actions/createProposalDraft");
-            cachedCreateProposalDraft = mod.default;
-          }
-          const proposal = await cachedCreateProposalDraft(address, {
-            message,
-            signature,
+          const res = await fetch("/api/v1/drafts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              creatorAddress: address,
+              message,
+              signature,
+            }),
           });
+          if (!res.ok) {
+            throw new Error("Failed to create draft");
+          }
+          const proposal = await res.json();
           const nextId = proposal.uuid;
           window.location.href = `/proposals/draft/${nextId}`;
         } catch (error) {
