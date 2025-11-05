@@ -22,7 +22,10 @@ export async function POST(request: NextRequest) {
 
     if (!creatorAddress || !message || !signature) {
       return NextResponse.json(
-        { message: "Missing required fields: creatorAddress, message, signature" },
+        {
+          message:
+            "Missing required fields: creatorAddress, message, signature",
+        },
         { status: 400 }
       );
     }
@@ -35,13 +38,19 @@ export async function POST(request: NextRequest) {
     });
 
     if (!isValid) {
-      return NextResponse.json({ message: "Invalid signature" }, { status: 401 });
+      return NextResponse.json(
+        { message: "Invalid signature" },
+        { status: 401 }
+      );
     }
 
     // Resolve tenant config and initial stage
     const tenant = Tenant.current();
     const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-    if (!plmToggle?.config || !Array.isArray((plmToggle.config as any)?.stages)) {
+    if (
+      !plmToggle?.config ||
+      !Array.isArray((plmToggle.config as any)?.stages)
+    ) {
       return NextResponse.json(
         { message: "Proposal lifecycle configuration not found for tenant" },
         { status: 400 }

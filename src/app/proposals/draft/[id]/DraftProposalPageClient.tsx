@@ -53,8 +53,8 @@ export default function DraftProposalPageClient({
   const { switchChainAsync, isPending: isSwitching } = useSwitchChain();
 
   useEffect(() => {
+    // Do not clear SIWE session on disconnect/refresh; only reset local UI state
     if (!address) {
-      // Do not clear SIWE session on disconnect/refresh; only reset local UI state
       setDraft(null);
       hasDraftRef.current = false;
       setIsSigning(false);
@@ -65,16 +65,11 @@ export default function DraftProposalPageClient({
         clearInterval(pollIdRef.current);
         pollIdRef.current = null;
       }
-    }
-  }, [address]);
-
-  // Preserve existing SIWE session across reconnect/refresh
-  useEffect(() => {
-    if (address) {
-      wasConnectedRef.current = true;
-    } else {
       wasConnectedRef.current = false;
+      return;
     }
+    // Connected
+    wasConnectedRef.current = true;
   }, [address]);
 
   const {
@@ -153,25 +148,7 @@ export default function DraftProposalPageClient({
       }
     } catch {}
   }, []);
-  useEffect(() => {
-    if (!isSigning) return;
-    const id = setInterval(() => {
-      try {
-        const stage = localStorage.getItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
-        if (completedSignRef.current) return;
-        if (stage === "awaiting_response") {
-          setSignLabel("Awaiting Confirmation");
-        } else if (stage === "signed") {
-          completedSignRef.current = true;
-          setSignLabel("Signed");
-        } else if (stage === "error") {
-          setSignLabel("Cancelled");
-        }
-      } catch {}
-    }, 200);
-    pollIdRef.current = id;
-    return () => clearInterval(id);
-  }, [isSigning]);
+  // consolidated into main polling effect
 
   const handleSiwe = useCallback(async () => {
     try {
@@ -324,6 +301,7 @@ export default function DraftProposalPageClient({
         }
       } catch {}
     }, 250);
+    pollIdRef.current = id;
     return () => clearInterval(id);
   }, [isSigning, signLabel, draft, error, refetch]);
 
@@ -333,7 +311,7 @@ export default function DraftProposalPageClient({
   }
 
   if (!hasDraftRef.current && !draft && !error) {
-    if (loading) return <Loading />;
+    if (isLoading) return <Loading />;
     return (
       <div className="max-w-screen-xl mx-auto mt-10">
         <SiweAccessCard
