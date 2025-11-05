@@ -1,4 +1,4 @@
-@import "@/styles/variables";
+@use "@/styles/variables" as *;
 
 .proposal_description {
   width: $max-width-3xl;
