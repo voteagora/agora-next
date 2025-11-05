@@ -27,7 +27,7 @@ export async function generateMetadata({}) {
   const page = tenant.ui.page("info") || tenant.ui.page("/");
 
   const { title, description } = page!.meta;
-  const metadataBase = getMetadataBaseUrl();
+  const metadataBase = await getMetadataBaseUrl();
 
   const preview = `/api/images/og/generic?title=${encodeURIComponent(
     title

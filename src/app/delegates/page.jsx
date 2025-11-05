@@ -15,7 +15,7 @@ export async function generateMetadata({}, parent) {
   const page = ui.page("delegates");
   const { title, description, imageTitle, imageDescription } = page.meta;
 
-  const metadataBase = getMetadataBaseUrl();
+  const metadataBase = await getMetadataBaseUrl();
   const preview = `/api/images/og/generic?title=${encodeURIComponent(
     imageTitle
   )}&description=${encodeURIComponent(imageDescription)}`;
@@ -46,6 +46,7 @@ export async function generateMetadata({}, parent) {
 }
 
 export default async function Page({ searchParams }) {
+  const resolvedSearchParams = await searchParams;
   const { ui, namespace } = Tenant.current();
   const showVotersPageContent =
     namespace === TENANT_NAMESPACES.SYNDICATE &&
@@ -56,7 +57,7 @@ export default async function Page({ searchParams }) {
       <Hero page="delegates" />
       {showVotersPageContent && <SyndicateVotersPageContent />}
       <Suspense fallback={<DelegateCardLoadingState />}>
-        <DelegateCardWrapper searchParams={searchParams} />
+        <DelegateCardWrapper searchParams={resolvedSearchParams} />
       </Suspense>
     </section>
   );
