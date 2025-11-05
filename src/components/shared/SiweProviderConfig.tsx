@@ -1,10 +1,10 @@
 import { SIWEConfig } from "connectkit";
+import { SiweMessage } from "siwe";
+import { decodeJwt } from "jose";
 import {
   LOCAL_STORAGE_SIWE_JWT_KEY,
   LOCAL_STORAGE_SIWE_STAGE_KEY,
 } from "@/lib/constants";
-import { SiweMessage } from "siwe";
-import { decodeJwt } from "jose";
 
 // TODO: this should probably be an environment variable
 const API_AUTH_PREFIX = "/api/v1/auth";
@@ -22,8 +22,6 @@ export const AGORA_SIGN_IN_MESSAGE = "Sign in to Agora with Ethereum";
 //
 // JWT tokens for SIWE should therefore be issued with a short expiry time.
 */
-
-const isSiweEnabled = () => false; // Disable SIWE by default; no auto-trigger
 
 export const siweProviderConfig: SIWEConfig = {
   getNonce: async () =>
@@ -98,5 +96,5 @@ export const siweProviderConfig: SIWEConfig = {
     } catch {}
     return Promise.resolve(true);
   },
-  enabled: isSiweEnabled(),
+  enabled: false,
 };
