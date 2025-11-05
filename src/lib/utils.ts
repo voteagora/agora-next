@@ -443,7 +443,7 @@ export function toNumericChainId(
   if (Number.isNaN(id)) {
     throw new Error(`Invalid chain id: ${String(raw)}`);
   }
-  // console.debug({ raw, parts, maybeId, id });
+
   return id;
 }
 
