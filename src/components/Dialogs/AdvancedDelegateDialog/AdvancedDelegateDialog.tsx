@@ -33,7 +33,7 @@ import { fetchDelegate } from "@/app/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
 import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;

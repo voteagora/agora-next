@@ -7,7 +7,7 @@ import AgoraAPI from "@/app/lib/agoraAPI";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useGovernorName } from "@/hooks/useGovernorName";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 import { useAccount } from "wagmi";
 
 const types = {

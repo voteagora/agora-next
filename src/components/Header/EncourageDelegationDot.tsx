@@ -1,7 +1,7 @@
 import { useProfileData } from "@/hooks/useProfileData";
 import { useEffect, useMemo } from "react";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 import { useAccount } from "wagmi";
 import { ZERO_ADDRESS } from "@/lib/constants";
 

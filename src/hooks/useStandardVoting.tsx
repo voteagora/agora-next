@@ -4,7 +4,7 @@ import { useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { trackEvent } from "@/lib/analytics";
 import { useAccount } from "wagmi";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import { WriteContractErrorType } from "wagmi/actions";
 

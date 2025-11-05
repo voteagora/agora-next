@@ -3,7 +3,7 @@
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types";
 import { getPublicClient } from "@/lib/viem";
 
 interface OffchainProposalData {

@@ -12,7 +12,7 @@ import {
 import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
-import { ProposalType as LibProposalType } from "@/lib/types.d";
+import { ProposalType as LibProposalType } from "@/lib/types";
 import { useAccount, useReadContract, useWalletClient } from "wagmi";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
 import { getPublicClient } from "@/lib/viem";

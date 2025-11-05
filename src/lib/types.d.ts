@@ -5,9 +5,18 @@ import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
 import { TENANT_NAMESPACES } from "./constants";
-import { TenantContract } from "@/lib/tenant/tenantContract";
-import { DelegateChunk } from "@/app/staking/components/delegates/DelegateCardList";
-import { Chain } from "viem/chains";
+import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+
+// Simple type definition to avoid importing runtime TenantContract
+export type TenantContract<ContractType> = {
+  abi: any;
+  chain: any;
+  contract: ContractType;
+  optionBudgetChangeDate?: Date;
+  provider: any;
+  v6UpgradeBlock?: number;
+};
+
 export type MetricTimeSeriesValue = {
   day: string;
   date: string;
@@ -56,7 +65,7 @@ export type TenantContracts = {
   governorType?: GOVERNOR_TYPE;
   timelockType?: TIMELOCK_TYPE;
   supportScopes?: boolean;
-  chainForTime?: Chain;
+  chainForTime?: any;
   providerForTime?: AlchemyProvider;
   supportScopes?: boolean;
   easRecipient?: string;
