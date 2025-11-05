@@ -72,9 +72,7 @@ export const deriveTimeStatus = (
 ) => {
   const proposalStartTime = toDate(proposal.start_blocktime);
   const proposalEndTime = toDate(proposal.end_blocktime);
-  const proposalCancelledTime = toDate(
-    proposal.cancel_event?.timestamp ?? proposal.cancel_event?.blocktime
-  );
+  const proposalCancelledTime = toDate(proposal.delete_event?.attestation_time);
   const proposalExecutedTime = toDate(
     proposal.execute_event?.timestamp ?? proposal.execute_event?.blocktime
   );
