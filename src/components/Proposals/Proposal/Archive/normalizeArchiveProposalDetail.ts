@@ -51,8 +51,6 @@ export function normalizeArchiveStandardProposal(
   options: NormalizeArchiveProposalOptions = {}
 ): Proposal {
   const decimals = options.tokenDecimals ?? 18;
-  const namespace = options.namespace ?? null;
-
   const statusKey = deriveStatus(proposal, decimals);
   const normalizedStatusKey = STATUS_LABEL_MAP[statusKey]
     ? statusKey
@@ -149,7 +147,7 @@ export function normalizeArchiveStandardProposal(
     endBlock: safeBigIntOrNull(proposal.end_block),
     cancelledTime:
       timeStatus.proposalCancelledTime ||
-      toDate(proposal.cancel_event?.blocktime) ||
+      toDate(proposal.delete_event?.attestation_time) ||
       null,
     executedTime:
       timeStatus.proposalExecutedTime ||
