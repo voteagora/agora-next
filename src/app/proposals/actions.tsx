@@ -19,46 +19,50 @@ export async function fetchProposalsCount() {
   });
 }
 
-export const fetchVotersWhoHaveNotVotedForProposal = (
+export async function fetchVotersWhoHaveNotVotedForProposal(
   proposalId: string,
   pagination?: PaginationParams,
   offchainProposalId?: string,
   type?: VoterTypes["type"]
-) =>
-  apiFetchVotersWhoHaveNotVotedForProposal({
+) {
+  return apiFetchVotersWhoHaveNotVotedForProposal({
     proposalId,
     pagination,
     offchainProposalId,
     type,
   });
+}
 
-export const fetchProposalVotes = (
+export async function fetchProposalVotes(
   proposalId: string,
   pagination?: PaginationParams,
   sort?: VotesSort,
   offchainProposalId?: string
-) =>
-  apiFetchVotesForProposal({
+) {
+  return apiFetchVotesForProposal({
     proposalId,
     pagination,
     sort,
     offchainProposalId,
   });
+}
 
-export const fetchSnapshotProposalVotes = (
+export async function fetchSnapshotProposalVotes(
   proposalId: string,
   pagination?: PaginationParams
-) =>
-  apiFetchSnapshotVotesForProposal({
+) {
+  return apiFetchSnapshotVotesForProposal({
     proposalId,
     pagination,
   });
+}
 
-export const fetchUserVotesForProposal = (
+export async function fetchUserVotesForProposal(
   proposalId: string,
   address: string | `0x${string}`
-) =>
-  apiFetchUserVotesForProposal({
+) {
+  return apiFetchUserVotesForProposal({
     proposalId,
     address,
   });
+}
