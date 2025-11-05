@@ -8,7 +8,6 @@ export function SiweAccessCard({
   error,
   isSigning,
   signLabel,
-  onConnectClick,
   onSignClick,
   isSwitching,
   hasAddress,
@@ -16,7 +15,6 @@ export function SiweAccessCard({
   error: string | null;
   isSigning: boolean;
   signLabel: string | null;
-  onConnectClick: () => void;
   onSignClick: () => void;
   isSwitching: boolean;
   hasAddress: boolean;
@@ -44,7 +42,6 @@ export function SiweAccessCard({
                 <UpdatedButton
                   type="primary"
                   onClick={() => {
-                    onConnectClick();
                     if (typeof show === "function") show();
                   }}
                 >

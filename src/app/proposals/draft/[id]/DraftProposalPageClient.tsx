@@ -340,7 +340,6 @@ export default function DraftProposalPageClient({
           error={null}
           isSigning={isSigning}
           signLabel={signLabel}
-          onConnectClick={() => {}}
           onSignClick={handleSiwe}
           isSwitching={isSwitching}
           hasAddress={Boolean(address)}
@@ -359,7 +358,6 @@ export default function DraftProposalPageClient({
             error={isSigning ? null : error}
             isSigning={isSigning}
             signLabel={signLabel}
-            onConnectClick={() => {}}
             onSignClick={handleSiwe}
             isSwitching={isSwitching}
             hasAddress={Boolean(address)}
