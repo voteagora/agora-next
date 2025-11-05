@@ -9,7 +9,10 @@ import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { PLMConfig } from "@/app/proposals/draft/types";
-import createProposalDraft from "./actions/createProposalDraft";
+
+let cachedCreateProposalDraft:
+  | null
+  | (typeof import("./actions/createProposalDraft"))["default"] = null;
 const CreateProposalDraftButton = ({
   address,
   className,
@@ -77,7 +80,11 @@ const CreateProposalDraftButton = ({
           if (!signature) {
             return;
           }
-          const proposal = await createProposalDraft(address, {
+          if (!cachedCreateProposalDraft) {
+            const mod = await import("./actions/createProposalDraft");
+            cachedCreateProposalDraft = mod.default;
+          }
+          const proposal = await cachedCreateProposalDraft(address, {
             message,
             signature,
           });
