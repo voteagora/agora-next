@@ -37,7 +37,7 @@ import { FormattedProposalType } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSettings";
 import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import { TENANT_NAMESPACES, LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
 
 const { ui, namespace } = Tenant.current();
 
@@ -222,6 +222,19 @@ const DraftFormClient = ({
     try {
       if (!address) {
         toast("Account not connected.");
+        return;
+      }
+      // Guard: require SIWE JWT before prompting signature for this action
+      try {
+        const session = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
+        if (!session) {
+          toast("Session expired. Please sign in to continue.");
+          window.location.reload();
+          return;
+        }
+      } catch {
+        toast("Session expired. Please sign in to continue.");
+        window.location.reload();
         return;
       }
       const messagePayload = {
