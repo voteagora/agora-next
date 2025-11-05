@@ -1,17 +1,29 @@
 "use server";
 
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import type { FormState } from "@/app/types";
+import { verifyOwnerAndSiweForDraft } from "./siweAuth";
 import {
   getStageByIndex,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
-import type { FormState } from "../types";
 
 export async function onSubmitAction(data: {
   link: string;
   draftProposalId: number;
   creatorAddress: string;
+  message: string;
+  signature: `0x${string}`;
 }): Promise<FormState> {
+  const ownerCheck = await verifyOwnerAndSiweForDraft(data.draftProposalId, {
+    address: data.creatorAddress as `0x${string}`,
+    message: data.message,
+    signature: data.signature,
+  });
+  if (!ownerCheck.ok) {
+    return { ok: false, message: ownerCheck.reason };
+  }
+
   const currentIndex = getStageIndexForTenant("ADDING_GITHUB_PR") as number;
   try {
     const nextStage = getStageByIndex(currentIndex + 1);
