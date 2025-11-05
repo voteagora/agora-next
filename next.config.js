@@ -51,14 +51,32 @@ const nextConfig = {
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.resolve.fallback = { fs: false, net: false, tls: false };
+    
+    // Fix for isomorphic-dompurify/jsdom issue
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push({
+        canvas: 'commonjs canvas',
+      });
+    }
+    
+    // Suppress MetaMask SDK warnings about React Native dependencies
+    config.ignoreWarnings = [
+      { module: /node_modules\/@metamask\/sdk/ },
+    ];
+    
     return config;
   },
+  // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297
+  // and to fix isomorphic-dompurify/jsdom issues
+  serverExternalPackages: [
+    "@opentelemetry/sdk-node",
+    "isomorphic-dompurify",
+    "jsdom",
+  ],
   experimental: {
-    instrumentationHook: true,
-    // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297
-    serverComponentsExternalPackages: ["@opentelemetry/sdk-node"],
     serverActions: {
       bodySizeLimit: "10mb",
     },
