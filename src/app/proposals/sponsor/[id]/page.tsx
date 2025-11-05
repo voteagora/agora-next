@@ -28,8 +28,9 @@ const getDraftProposal = async (id: number) => {
   return draftProposal as DraftProposal;
 };
 
-const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
-  const draftProposal = await getDraftProposal(parseInt(params.id));
+const ProposalSponsorPage = async ({ params }: { params: Promise<{ id: string }> }) => {
+  const { id } = await params;
+  const draftProposal = await getDraftProposal(parseInt(id));
   const isPostSubmissionStage = isPostSubmission(draftProposal.stage);
 
   if (isPostSubmissionStage) {

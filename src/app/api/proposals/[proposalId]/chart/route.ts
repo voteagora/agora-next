@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { proposalId: string } }
+  { params }: { params: Promise<{ proposalId: string }> }
 ) {
+  const { proposalId } = await params;
   const { getVotesChart } = await import("@/app/api/proposals/getVotesChart");
   const { getSnapshotVotesChart } = await import(
     "@/app/api/proposals/getVotesChart"
@@ -15,10 +16,10 @@ export async function GET(
     const votes =
       proposalType === "SNAPSHOT"
         ? await getSnapshotVotesChart({
-            proposalId: params.proposalId,
+            proposalId,
           })
         : await getVotesChart({
-            proposalId: params.proposalId,
+            proposalId,
           });
     return NextResponse.json(votes);
   } catch (e: any) {

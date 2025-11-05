@@ -27,10 +27,10 @@ import RelatedProposalLinks from "@/components/Proposals/ProposalPage/RelatedPro
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     topic_id: string;
     slug?: string[];
-  };
+  }>;
 }
 
 type TopicBundle = {
@@ -39,8 +39,8 @@ type TopicBundle = {
   transformed: ForumTopic;
 };
 
-function getRequestBaseUrl(): string {
-  const headerList = headers();
+async function getRequestBaseUrl(): Promise<string> {
+  const headerList = await headers();
   const forwardedHost = headerList.get("x-forwarded-host");
   const host = forwardedHost || headerList.get("host") || "localhost:3000";
   const protoHeader = headerList.get("x-forwarded-proto");
@@ -93,13 +93,14 @@ function buildDescription(content: string, title: string): string {
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const topicBundle = await loadTopic(params.topic_id);
+  const { topic_id } = await params;
+  const topicBundle = await loadTopic(topic_id);
   if (!topicBundle) {
     return {};
   }
 
   const { topicId, topicData, transformed } = topicBundle;
-  const baseUrl = getRequestBaseUrl();
+  const baseUrl = await getRequestBaseUrl();
   const canonicalPath = buildForumTopicPath(topicId, transformed.title);
   const canonicalUrl = `${baseUrl}${canonicalPath}`;
   const description = buildDescription(
@@ -140,8 +141,9 @@ export async function generateMetadata({
 }
 
 export default async function ForumTopicPage({ params }: PageProps) {
+  const { topic_id, slug } = await params;
   const [topicBundle, adminsResult, categoriesResult] = await Promise.all([
-    loadTopic(params.topic_id),
+    loadTopic(topic_id),
     getForumAdmins(),
     getForumCategories(),
   ]);
@@ -151,7 +153,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
 
   const { topicId, topicData, transformed } = topicBundle;
   const canonicalSlug = buildForumTopicSlug(transformed.title);
-  const slugParam = params.slug?.[0] ?? "";
+  const slugParam = slug?.[0] ?? "";
 
   if (
     (canonicalSlug && slugParam !== canonicalSlug) ||
@@ -160,7 +162,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
     redirect(buildForumTopicPath(topicId, transformed.title));
   }
 
-  if ((params.slug?.length ?? 0) > 1) {
+  if ((slug?.length ?? 0) > 1) {
     redirect(buildForumTopicPath(topicId, transformed.title));
   }
 

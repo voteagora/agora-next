@@ -3,8 +3,9 @@ import { traceWithUserId } from "../../apiUtils";
 
 export async function GET(
   request: NextRequest,
-  route: { params: { addressOrENSName: string } }
+  route: { params: Promise<{ addressOrENSName: string }> }
 ) {
+  const { addressOrENSName } = await route.params;
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { fetchDelegate } = await import(
     "@/app/api/common/delegates/getDelegates"
@@ -18,7 +19,6 @@ export async function GET(
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
-      const { addressOrENSName } = route.params;
       const delegate = await fetchDelegate(addressOrENSName);
       return NextResponse.json(delegate);
     } catch (e: any) {

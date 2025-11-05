@@ -5,13 +5,14 @@ import { ParsedProposalData } from "@/lib/proposalUtils";
 
 export async function GET(
   request: NextRequest,
-  route: { params: { proposalId: string } }
+  route: { params: Promise<{ proposalId: string }> }
 ) {
+  const { proposalId } = await route.params;
   try {
     const [proposal, snapshotVotes] = await Promise.all([
-      fetchProposalUnstableCache(route.params.proposalId),
+      fetchProposalUnstableCache(proposalId),
       fetchSnapshotVotesForProposal({
-        proposalId: route.params.proposalId,
+        proposalId,
         pagination: {
           offset: 0,
           limit: 100000,
@@ -44,7 +45,7 @@ export async function GET(
     return new Response(csvContent, {
       headers: {
         "Content-Type": "text/csv",
-        "Content-Disposition": `attachment; filename="votes-${route.params.proposalId}-${Date.now()}.csv"`,
+        "Content-Disposition": `attachment; filename="votes-${proposalId}-${Date.now()}.csv"`,
       },
     });
   } catch (e: any) {

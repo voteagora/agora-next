@@ -3,8 +3,9 @@ import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
 export async function GET(
   request: NextRequest,
-  route: { params: { roundId: string } }
+  route: { params: Promise<{ roundId: string }> }
 ) {
+  const { roundId } = await route.params;
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
 
   const { fetchRetroFundingRound } = await import(
@@ -18,7 +19,6 @@ export async function GET(
   }
 
   return await traceWithUserId(authResponse.userId as string, async () => {
-    const { roundId } = route.params;
 
     try {
       const round = await fetchRetroFundingRound(roundId);

@@ -3,8 +3,9 @@ import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { roundId: string } }
+  { params }: { params: Promise<{ roundId: string }> }
 ) {
+  const { roundId } = await params;
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
 
   const { fetchImpactMetricsApi } = await import(
@@ -19,7 +20,6 @@ export async function GET(
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
-      const { roundId } = params;
       const impactMetrics = await fetchImpactMetricsApi(roundId);
       return NextResponse.json(impactMetrics);
     } catch (e: any) {

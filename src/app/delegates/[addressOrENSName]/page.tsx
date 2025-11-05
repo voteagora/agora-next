@@ -32,14 +32,15 @@ export const dynamic = "force-dynamic"; // needed for both app and e2e
 export const revalidate = 0;
 
 export async function generateMetadata(
-  { params }: { params: { addressOrENSName: string } },
+  { params }: { params: Promise<{ addressOrENSName: string }> },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
+  const { addressOrENSName } = await params;
   // cache ENS address upfront for all subsequent queries
   // TODO: change subqueries to use react cache
   const [address, ensOrTruncatedAddress] = await Promise.all([
-    ensNameToAddress(params.addressOrENSName),
-    processAddressOrEnsName(params.addressOrENSName),
+    ensNameToAddress(addressOrENSName),
+    processAddressOrEnsName(addressOrENSName),
   ]);
 
   const delegate = await fetchDelegate(address);
@@ -85,12 +86,14 @@ export async function generateMetadata(
 }
 
 export default async function Page({
-  params: { addressOrENSName },
+  params,
   searchParams,
 }: {
-  params: { addressOrENSName: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ addressOrENSName: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const { addressOrENSName } = await params;
+  await searchParams; // Await searchParams even if not used directly
   const { ui } = Tenant.current();
   const address = await ensNameToAddress(addressOrENSName);
 

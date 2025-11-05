@@ -57,13 +57,14 @@ const BUDGET_1Y = 3000000;
 
 export async function GET(
   request: NextRequest,
-  route: { params: { proposalId: string } }
+  route: { params: Promise<{ proposalId: string }> }
 ) {
+  const { proposalId } = await route.params;
   try {
     const [proposal, snapshotVotes] = await Promise.all([
-      fetchProposalUnstableCache(route.params.proposalId),
+      fetchProposalUnstableCache(proposalId),
       fetchSnapshotVotesForProposal({
-        proposalId: route.params.proposalId,
+        proposalId,
         pagination: {
           offset: 0,
           limit: 100000,

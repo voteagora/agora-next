@@ -35,9 +35,11 @@ export default async function DraftProposalPage({
   params,
   searchParams,
 }: {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const { id } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const { ui } = Tenant.current();
   const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
   const config = proposalLifecycleToggle?.config as PLMConfig;
@@ -47,7 +49,7 @@ export default async function DraftProposalPage({
     return <div>This feature is not supported by this tenant.</div>;
   }
 
-  const draftProposal = await getDraftProposalByUuid(params.id);
+  const draftProposal = await getDraftProposalByUuid(id);
 
   if (!draftProposal) {
     return (
@@ -64,7 +66,7 @@ export default async function DraftProposalPage({
   }
 
   const DRAFT_STAGES_FOR_TENANT = GET_DRAFT_STAGES()!;
-  const stageParam = (searchParams?.stage || "0") as string;
+  const stageParam = (resolvedSearchParams?.stage || "0") as string;
   const stageIndex = parseInt(stageParam, 10);
   const stageObject = DRAFT_STAGES_FOR_TENANT[stageIndex];
   const stageMetadata = getStageMetadata(stageObject.stage);

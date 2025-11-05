@@ -28,8 +28,9 @@ const offsetValidator = createOptionalNumberValidator(
 
 export async function GET(
   request: NextRequest,
-  route: { params: { roundId: string; impactMetricId: string } }
+  route: { params: Promise<{ roundId: string; impactMetricId: string }> }
 ) {
+  const { roundId, impactMetricId } = await route.params;
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
 
   const { fetchImpactMetricComments } = await import(
@@ -43,7 +44,6 @@ export async function GET(
   }
 
   return await traceWithUserId(authResponse.userId as string, async () => {
-    const { roundId, impactMetricId } = route.params;
 
     const searchParams = request.nextUrl.searchParams;
     try {

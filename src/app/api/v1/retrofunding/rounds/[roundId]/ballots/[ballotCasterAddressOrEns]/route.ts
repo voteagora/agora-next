@@ -3,8 +3,9 @@ import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { roundId: string; ballotCasterAddressOrEns: string } }
+  { params }: { params: Promise<{ roundId: string; ballotCasterAddressOrEns: string }> }
 ) {
+  const { roundId, ballotCasterAddressOrEns } = await params;
   const { authenticateApiUser, getCategoryScope, validateAddressScope } =
     await import("@/app/lib/auth/serverAuth");
   const { fetchBallot } = await import("@/app/api/common/ballots/getBallots");
@@ -14,8 +15,6 @@ export async function GET(
   if (!authResponse.authenticated) {
     return new Response(authResponse.failReason, { status: 401 });
   }
-
-  const { roundId, ballotCasterAddressOrEns } = params;
   const scopeError = await validateAddressScope(
     ballotCasterAddressOrEns,
     authResponse

@@ -120,11 +120,14 @@ export async function generateMetadata({
   params,
   searchParams,
 }: {
-  params: { proposal_id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ proposal_id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const { proposal_id } = await params;
+  const resolvedSearchParams = await searchParams;
+  
   const proposal = await loadProposal(
-    params.proposal_id,
+    proposal_id,
     fetchProposalUnstableCache
   );
   const title = truncateString(cleanString(proposal.markdowntitle), 40);
@@ -142,12 +145,12 @@ export async function generateMetadata({
     redirect(`/proposals/${offchainProposalData.onchainProposalId}`);
   }
 
-  const support = searchParams.support as string;
-  const reason = searchParams.reason as string;
-  const weight = searchParams.weight as string;
-  const voteParams = searchParams.params as string;
-  const blockNumber = searchParams.blockNumber as string;
-  const timestamp = searchParams.timestamp as string;
+  const support = resolvedSearchParams.support as string;
+  const reason = resolvedSearchParams.reason as string;
+  const weight = resolvedSearchParams.weight as string;
+  const voteParams = resolvedSearchParams.params as string;
+  const blockNumber = resolvedSearchParams.blockNumber as string;
+  const timestamp = resolvedSearchParams.timestamp as string;
 
   if (support) {
     const voteParamsParsed = voteParams
@@ -195,10 +198,11 @@ export async function generateMetadata({
 }
 
 export default async function Page({
-  params: { proposal_id },
+  params,
 }: {
-  params: { proposal_id: string };
+  params: Promise<{ proposal_id: string }>;
 }) {
+  const { proposal_id } = await params;
   const loadedProposal = await loadProposal(proposal_id, fetchProposal);
 
   const proposalData =

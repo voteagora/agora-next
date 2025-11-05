@@ -37,8 +37,9 @@ const offsetValidator = createOptionalNumberValidator(
 
 export async function GET(
   request: NextRequest,
-  route: { params: { roundId: string } }
+  route: { params: Promise<{ roundId: string }> }
 ) {
+  const { roundId } = await route.params;
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
 
   const { fetchProjectsApi } = await import(
@@ -54,7 +55,6 @@ export async function GET(
   return await traceWithUserId(authResponse.userId as string, async () => {
     const params = request.nextUrl.searchParams;
     try {
-      const { roundId } = route.params;
       const category = filterValidator.parse(params.get("category"));
       const limit = limitValidator.parse(params.get("limit"));
       const offset = offsetValidator.parse(params.get("offset"));
