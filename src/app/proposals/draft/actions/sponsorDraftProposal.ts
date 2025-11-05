@@ -11,7 +11,6 @@ import { ProposalScope } from "../types";
 import type { FormState } from "@/app/types";
 import { verifySiwe } from "./siweAuth";
 import Tenant from "@/lib/tenant/tenant";
-import { getPublicClient } from "@/lib/viem";
 
 export async function onSubmitAction(
   data: z.output<typeof SponsorProposalSchema> & {
@@ -61,26 +60,6 @@ export async function onSubmitAction(
     );
     if (allowOffchainCreator) {
       isAuthorized = true;
-    }
-
-    // Try manager check if still not authorized
-    if (!isAuthorized) {
-      const publicClient = getPublicClient();
-      try {
-        // manager() may not exist on all governors; ignore errors
-        // @ts-expect-error ABI may not include manager in all tenants
-        const manager: string = await publicClient.readContract({
-          address: tenant.contracts.governor.address as `0x${string}`,
-          abi: tenant.contracts.governor.abi,
-          functionName: "manager",
-          args: [],
-        });
-        if (manager && manager.toLowerCase() === signer) {
-          isAuthorized = true;
-        }
-      } catch {
-        // manager() may not exist; ignore
-      }
     }
   } catch {
     // tenant read failed; keep current isAuthorized
