@@ -27,7 +27,6 @@ export function Drawer({
   showCloseButton = true,
   className,
   title,
-  useHistoryBack = true,
 }: DrawerProps) {
   const pushedHistoryRef = useRef(false);
 
@@ -41,7 +40,7 @@ export function Drawer({
   }, [isOpen]);
 
   useEffect(() => {
-    if (!isOpen || !useHistoryBack) return;
+    if (!isOpen) return;
     try {
       window.history.pushState({ __drawer: true }, "");
       pushedHistoryRef.current = true;
@@ -63,7 +62,7 @@ export function Drawer({
         pushedHistoryRef.current = false;
       }
     };
-  }, [isOpen, onClose, useHistoryBack]);
+  }, [isOpen, onClose]);
   const positionVariants = {
     left: {
       initial: { x: "-100%" },

@@ -24,7 +24,10 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
   };
 
   const handleCloseDrawer = () => {
-    setIsOpen(false);
+    // Add a small delay to allow navigation to start before closing the drawer
+    setTimeout(() => {
+      setIsOpen(false);
+    }, 100);
   };
 
   return (

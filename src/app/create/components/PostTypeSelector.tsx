@@ -32,7 +32,7 @@ export function PostTypeSelector({ value, onChange }: PostTypeSelectorProps) {
   return (
     <div
       ref={selectorRef}
-      className="relative flex flex-row rounded-full border border-line p-1 font-medium bg-wash"
+      className="relative flex flex-row rounded-full border border-line p-1 font-medium bg-wash mt-2 lg:mt-0"
     >
       <div
         className="absolute rounded-full shadow-newDefault transition-all duration-150 ease-in-out h-[38px] bg-white"

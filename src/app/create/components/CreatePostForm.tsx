@@ -100,7 +100,7 @@ export function CreatePostForm({
             onRemoveCard={onRemoveRelatedItems}
           />
 
-          <div className="flex items-center justify-between pt-6 border-t">
+          <div className="flex flex-col lg:flex-row items-center justify-between pt-6 border-t">
             <div className="text-sm text-gray-500">
               {postType === "tempcheck" && (
                 <div>
@@ -155,7 +155,7 @@ export function CreatePostForm({
                 </div>
               )}
             </div>
-            <div className="flex justify-end">
+            <div className="flex justify-end mt-2 lg:mt-0">
               <Button
                 onClick={onSubmit}
                 disabled={
