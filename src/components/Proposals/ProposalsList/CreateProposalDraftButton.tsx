@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UpdatedButton } from "@/components/Button";
 import classNames from "classnames";
-import Tenant from "@/lib/tenant/tenant";
 import { useSignMessage } from "wagmi";
+import { UpdatedButton } from "@/components/Button";
+import Tenant from "@/lib/tenant/tenant";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { PLMConfig } from "@/app/proposals/draft/types";
+import createProposalDraft from "./actions/createProposalDraft";
 const CreateProposalDraftButton = ({
   address,
   className,
@@ -61,29 +62,32 @@ const CreateProposalDraftButton = ({
       isLoading={isPending}
       className={classNames(className)}
       onClick={async () => {
+        if (isPending) return;
         setIsPending(true);
-        const messagePayload = {
-          action: "createDraft",
-          creatorAddress: address,
-          timestamp: new Date().toISOString(),
-        };
-        const message = JSON.stringify(messagePayload);
-        const signature = await messageSigner
-          .signMessageAsync({ message })
-          .catch(() => undefined);
-        if (!signature) {
+        try {
+          const messagePayload = {
+            action: "createDraft",
+            creatorAddress: address,
+            timestamp: new Date().toISOString(),
+          };
+          const message = JSON.stringify(messagePayload);
+          const signature = await messageSigner
+            .signMessageAsync({ message })
+            .catch(() => undefined);
+          if (!signature) {
+            return;
+          }
+          const proposal = await createProposalDraft(address, {
+            message,
+            signature,
+          });
+          const nextId = proposal.uuid;
+          window.location.href = `/proposals/draft/${nextId}`;
+        } catch (error) {
+          console.error("Error creating draft proposal:", error);
+        } finally {
           setIsPending(false);
-          return;
         }
-        const { default: createProposalDraft } = await import(
-          "./actions/createProposalDraft"
-        );
-        const proposal = await createProposalDraft(address, {
-          message,
-          signature,
-        });
-        const nextId = proposal.uuid;
-        window.location.href = `/proposals/draft/${nextId}`;
       }}
     >
       Create proposal
