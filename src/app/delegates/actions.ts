@@ -209,7 +209,7 @@ export const fetchArchiveParticipation = async (address: string) => {
     return null;
   }
 
-  // Pull archive proposals then consider only the 10 most recent by start_blocktime
+  // Pull archive proposals then consider only the 10 most recent by created_time/created_block_number
   const archiveList = await fetchProposalsFromArchive(
     namespace,
     proposalsFilterOptions.everything.filter
@@ -217,10 +217,39 @@ export const fetchArchiveParticipation = async (address: string) => {
 
   const proposals = archiveList?.data ?? [];
   const recentProposals = [...proposals]
-    .filter((p) => typeof p.start_blocktime === "number")
-    .sort(
-      (a, b) => Number(b.start_blocktime || 0) - Number(a.start_blocktime || 0)
-    )
+    // Keep proposals that have a numeric created time (direct or via created_event)
+    .filter((p) => {
+      const createdTs =
+        (p as any).created_time ??
+        p.created_event?.timestamp ??
+        p.created_event?.blocktime;
+      return typeof createdTs === "number" && !Number.isNaN(createdTs);
+    })
+    // Sort by created_time desc; tie-break by created_block_number desc when available
+    .sort((a, b) => {
+      const aTime =
+        (a as any).created_time ??
+        a.created_event?.timestamp ??
+        a.created_event?.blocktime ??
+        0;
+      const bTime =
+        (b as any).created_time ??
+        b.created_event?.timestamp ??
+        b.created_event?.blocktime ??
+        0;
+
+      if (bTime !== aTime) {
+        return Number(bTime) - Number(aTime);
+      }
+
+      const aBlock = Number(
+        (a as any).created_block_number ?? a.created_event?.block_number ?? 0
+      );
+      const bBlock = Number(
+        (b as any).created_block_number ?? b.created_event?.block_number ?? 0
+      );
+      return bBlock - aBlock;
+    })
     .slice(0, 10);
 
   const totalProposals = recentProposals.length;
