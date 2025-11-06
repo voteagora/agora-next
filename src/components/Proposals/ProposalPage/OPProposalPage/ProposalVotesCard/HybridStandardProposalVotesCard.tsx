@@ -3,13 +3,16 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useState } from "react";
 import HybridStandardProposalVotesSummary from "../ProposalVotesSummary/HybridStandardProposalVotesSummary";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
+import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/ArchiveProposalVotesList";
+import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
-import ProposalVotesFilter from "./ProposalVotesFilter";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
+import ProposalVotesFilter from "./ProposalVotesFilter";
 import { ProposalVotesTab } from "@/components/common/ProposalVotesTab";
 import { VoteOnAtlas } from "@/components/common/VoteOnAtlas";
 import { HStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
+import Tenant from "@/lib/tenant/tenant";
 
 const HybridStandardProposalVotesCard = ({
   proposal,
@@ -19,6 +22,8 @@ const HybridStandardProposalVotesCard = ({
   const [activeTab, setTab] = useState("results");
   const [showVoters, setShowVoters] = useState(true);
   const [isClicked, setIsClicked] = useState<boolean>(false);
+  const { ui } = Tenant.current();
+  const useArchiveVoteHistory = ui.toggle("use-archive-vote-history")?.enabled;
 
   const handleClick = () => {
     setIsClicked(!isClicked);
@@ -68,7 +73,13 @@ const HybridStandardProposalVotesCard = ({
                   }}
                 />
               </div>
-              {showVoters ? (
+              {useArchiveVoteHistory ? (
+                showVoters ? (
+                  <ArchiveProposalVotesList proposal={proposal} />
+                ) : (
+                  <ArchiveProposalNonVoterList proposal={proposal} />
+                )
+              ) : showVoters ? (
                 <ProposalVotesList
                   proposalId={proposal.id}
                   offchainProposalId={proposal.offchainProposalId}

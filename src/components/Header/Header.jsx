@@ -7,7 +7,7 @@ import Navbar from "./Navbar";
 import { HStack, VStack } from "../Layout/Stack";
 import LogoLink from "./LogoLink";
 import { ConnectButton } from "./ConnectButton";
-import MobileNavMenu from "./MobileNavMenu";
+// import MobileNavMenu from "./MobileNavMenu";
 import { HamburgerIcon } from "@/icons/HamburgerIcon";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -39,10 +39,10 @@ export default function Header() {
         </HStack>
       </VStack>
 
-      <MobileNavMenu
+      {/* <MobileNavMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
-      />
+      /> */}
     </div>
   );
 }

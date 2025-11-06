@@ -158,6 +158,10 @@ export const ensTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "use-archive-vote-history",
+      enabled: false,
+    },
+    {
       name: "sponsoredVote",
       enabled: true,
       config: {

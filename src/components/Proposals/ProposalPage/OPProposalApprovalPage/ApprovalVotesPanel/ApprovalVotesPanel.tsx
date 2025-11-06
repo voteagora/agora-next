@@ -4,15 +4,19 @@ import { useState, useTransition } from "react";
 import { motion } from "framer-motion";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import OptionsResultsPanel from "../OptionResultsPanel/OptionResultsPanel";
+import ArchiveApprovalProposalVotesList from "@/components/Votes/ApprovalProposalVotesList/ArchiveApprovalProposalVotesList";
 import ApprovalProposalVotesList from "@/components/Votes/ApprovalProposalVotesList/ApprovalProposalVotesList";
 import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalProposalCriteria";
 import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/ApprovalCastVoteButton";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
-import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
+import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import { ParsedProposalData } from "@/lib/proposalUtils";
+import { PaginationParams } from "@/app/lib/pagination";
+import { Vote } from "@/app/api/common/votes/vote";
+import { PaginatedResult } from "@/app/lib/pagination";
+import Tenant from "@/lib/tenant/tenant";
 
 type Props = {
   proposal: Proposal;
@@ -20,7 +24,7 @@ type Props = {
     proposalId: string,
     pagination?: PaginationParams
   ) => Promise<PaginatedResult<Vote[]>>;
-  fetchUserVotesForProposal: (
+  fetchUserVotes: (
     proposalId: string,
     address: string | `0x${string}`
   ) => Promise<Vote[]>;
@@ -29,11 +33,14 @@ type Props = {
 export default function ApprovalVotesPanel({
   proposal,
   fetchVotesForProposal,
-  fetchUserVotesForProposal,
+  fetchUserVotes,
 }: Props) {
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
+  const { ui } = Tenant.current();
+  const useArchiveVoteHistory = ui.toggle("use-archive-vote-history")?.enabled;
+
   function handleTabsChange(index: number) {
     startTransition(() => {
       setActiveTab(index);
@@ -43,6 +50,21 @@ export default function ApprovalVotesPanel({
   const isThresholdCriteria =
     (proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"])
       .proposalSettings.criteria === "THRESHOLD";
+
+  // Wrapper functions to match ApprovalProposalVotesList's expected signatures
+  const handleFetchVotesForProposal = async (
+    proposalId: string,
+    pagination: PaginationParams
+  ) => {
+    return fetchVotesForProposal(proposalId, pagination);
+  };
+
+  const handleFetchUserVotes = async (
+    proposalId: string,
+    address: string
+  ) => {
+    return fetchUserVotes(proposalId, address as `0x${string}`);
+  };
 
   return (
     <motion.div
@@ -82,10 +104,19 @@ export default function ApprovalVotesPanel({
                 }}
               />
             </div>
-            {showVoters ? (
+            {useArchiveVoteHistory ? (
+              showVoters ? (
+                <ArchiveApprovalProposalVotesList
+                  proposal={proposal}
+                  isThresholdCriteria={isThresholdCriteria}
+                />
+              ) : (
+                <ArchiveProposalNonVoterList proposal={proposal} />
+              )
+            ) : showVoters ? (
               <ApprovalProposalVotesList
-                fetchVotesForProposal={fetchVotesForProposal}
-                fetchUserVotes={fetchUserVotesForProposal}
+                fetchVotesForProposal={handleFetchVotesForProposal}
+                fetchUserVotes={handleFetchUserVotes}
                 proposalId={proposal.id}
                 isThresholdCriteria={isThresholdCriteria}
               />

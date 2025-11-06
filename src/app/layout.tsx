@@ -2,7 +2,7 @@ import "@/styles/globals.scss";
 import ClientLayout from "./Web3Provider";
 import Header from "@/components/Header/Header";
 import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
-import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
+// import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import Tenant from "@/lib/tenant/tenant";
 import { fontMapper, inter } from "@/styles/fonts";
 import { GoogleAnalytics } from "@next/third-parties/google";
@@ -160,7 +160,7 @@ export default async function RootLayout({
             <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
               {children}
             </div>
-            <DAOMetricsHeader />
+            {/* <DAOMetricsHeader /> */}
           </ForumPermissionsProvider>
         </ClientLayout>
       </NuqsAdapter>

@@ -2,19 +2,24 @@
 
 import { useState } from "react";
 import ProposalVotesSummary from "../ProposalVotesSummary/ProposalVotesSummary";
+import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/ArchiveProposalVotesList";
+import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import CastVoteInput, {
   OffchainCastVoteInput,
 } from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalVotesFilter from "./ProposalVotesFilter";
-import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
+import Tenant from "@/lib/tenant/tenant";
 
 const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
   const [isClicked, setIsClicked] = useState(false);
   const [showVoters, setShowVoters] = useState(true);
   const isOffchain = proposal.proposalType?.startsWith("OFFCHAIN");
+  const { ui } = Tenant.current();
+  const useArchiveVoteHistory = ui.toggle("use-archive-vote-history")?.enabled;
 
   const handleClick = () => {
     setIsClicked(!isClicked);
@@ -49,7 +54,13 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
           </div>
         </div>
 
-        {showVoters ? (
+        {useArchiveVoteHistory ? (
+          showVoters ? (
+            <ArchiveProposalVotesList proposal={proposal} />
+          ) : (
+            <ArchiveProposalNonVoterList proposal={proposal} />
+          )
+        ) : showVoters ? (
           <ProposalVotesList
             proposalId={proposal.id}
             offchainProposalId={proposal.offchainProposalId}

@@ -2,7 +2,6 @@ import * as otel from "@opentelemetry/api";
 import { performance } from "perf_hooks";
 import * as util from "util";
 
-import { SEMATTRS_EXCEPTION_ESCAPED } from "@opentelemetry/semantic-conventions";
 import { SERVICE_NAME } from "@/instrumentation";
 
 // 'dev' is used in vercel dev and preview, both of which need to have coloring disabled
@@ -128,7 +127,6 @@ export const doInSpan = <T>(
       const catchError = (error: otel.Exception) => {
         span.recordException(error);
         span.setStatus({ code: otel.SpanStatusCode.ERROR });
-        span.setAttribute(SEMATTRS_EXCEPTION_ESCAPED, true);
         span.end();
         throw error;
       };

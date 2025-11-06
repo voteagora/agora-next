@@ -3,8 +3,6 @@
 import { useState, useMemo } from "react";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
-import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
-import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import ProposalVotesFilter from "./ProposalVotesFilter";
 import VotesGroupTable from "@/components/common/VotesGroupTable";
 import {
@@ -31,6 +29,10 @@ import checkIcon from "@/icons/check.svg";
 import { HStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
 import { cn } from "@/lib/utils";
+import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/ArchiveProposalVotesList";
+import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
+import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 
 interface Props {
   proposal: Proposal;
@@ -135,6 +137,8 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState("results");
   const [isClicked, setIsClicked] = useState<boolean>(false);
+  const { ui } = Tenant.current();
+  const useArchiveVoteHistory = ui.toggle("use-archive-vote-history")?.enabled;
   const proposalData =
     proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"];
 
@@ -307,7 +311,13 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
                   }}
                 />
               </div>
-              {showVoters ? (
+              {useArchiveVoteHistory ? (
+                showVoters ? (
+                  <ArchiveProposalVotesList proposal={proposal} />
+                ) : (
+                  <ArchiveProposalNonVoterList proposal={proposal} />
+                )
+              ) : showVoters ? (
                 <ProposalVotesList
                   proposalId={proposal.id}
                   offchainProposalId={proposal.offchainProposalId}
