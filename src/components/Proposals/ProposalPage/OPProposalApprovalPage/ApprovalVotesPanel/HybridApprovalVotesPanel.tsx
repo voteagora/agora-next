@@ -5,14 +5,14 @@ import HybridOptionsResultsPanel from "../OptionResultsPanel/HybridOptionsResult
 import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/ApprovalCastVoteButton";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
-import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
+import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import {
   calculateHybridApprovalUniqueParticipationPercentage,
   ParsedProposalData,
 } from "@/lib/proposalUtils";
 import { ProposalVotesTab } from "@/components/common/ProposalVotesTab";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
-import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import ArchiveApprovalProposalVotesList from "@/components/Votes/ApprovalProposalVotesList/ArchiveApprovalProposalVotesList";
 import { HybridApprovalCriteria } from "../ApprovalProposalCriteria/HybridApprovalCriteria";
 import { VoteOnAtlas } from "@/components/common/VoteOnAtlas";
 import { HStack } from "@/components/Layout/Stack";
@@ -37,6 +37,9 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
     proposal.proposalResults,
     Number(proposal.quorum)
   );
+
+  const isThresholdCriteria =
+    hybridApprovalData?.proposalSettings?.criteria === "THRESHOLD";
 
   return (
     <>
@@ -94,15 +97,12 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
                 />
               </div>
               {showVoters ? (
-                <ProposalVotesList
-                  proposalId={proposal.id}
-                  offchainProposalId={proposal.offchainProposalId}
+                <ArchiveApprovalProposalVotesList
+                  proposal={proposal}
+                  isThresholdCriteria={isThresholdCriteria}
                 />
               ) : (
-                <ProposalNonVoterList
-                  proposal={proposal}
-                  offchainProposalId={proposal.offchainProposalId}
-                />
+                <ArchiveProposalNonVoterList proposal={proposal} />
               )}
             </>
           )}

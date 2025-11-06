@@ -1,36 +1,7 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import {
-  fetchUserVotesForProposal as apiFetchUserVotesForProposal,
-  fetchVotesForProposal,
-} from "@/app/api/common/votes/getVotes";
-import { PaginationParams } from "@/app/lib/pagination";
 import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
-
-async function fetchProposalVotes(
-  proposalId: string,
-  pagination?: PaginationParams
-) {
-  "use server";
-
-  return fetchVotesForProposal({
-    proposalId,
-    pagination,
-  });
-}
-
-async function fetchUserVotesForProposal(
-  proposalId: string,
-  address: string | `0x${string}`
-) {
-  "use server";
-
-  return await apiFetchUserVotesForProposal({
-    proposalId,
-    address,
-  });
-}
 
 export default async function OPProposalApprovalPage({
   proposal,
@@ -50,11 +21,7 @@ export default async function OPProposalApprovalPage({
           <div className="flex flex-col gap-4 sticky top-20 flex-shrink bg-neutral border-line border rounded-xl shadow-newDefault mb-8 items-stretch sm:items-start justify-end sm:justify-between w-full max-h-none h-auto">
             <div className="flex flex-col gap-4 w-full">
               {/* Show the results of the approval vote w/ a tab for votes */}
-              <ApprovalVotesPanel
-                proposal={proposal}
-                fetchVotesForProposal={fetchProposalVotes}
-                fetchUserVotesForProposal={fetchUserVotesForProposal}
-              />
+              <ApprovalVotesPanel proposal={proposal} />
             </div>
           </div>
         </div>

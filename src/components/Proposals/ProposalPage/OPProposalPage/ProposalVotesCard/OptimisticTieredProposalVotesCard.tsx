@@ -3,8 +3,6 @@
 import { useState, useMemo } from "react";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
-import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
-import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import ProposalVotesFilter from "./ProposalVotesFilter";
 import VotesGroupTable from "@/components/common/VotesGroupTable";
 import {
@@ -31,6 +29,8 @@ import checkIcon from "@/icons/check.svg";
 import { HStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
 import { cn } from "@/lib/utils";
+import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/ArchiveProposalVotesList";
+import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 
 interface Props {
   proposal: Proposal;
@@ -308,15 +308,9 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
                 />
               </div>
               {showVoters ? (
-                <ProposalVotesList
-                  proposalId={proposal.id}
-                  offchainProposalId={proposal.offchainProposalId}
-                />
+                <ArchiveProposalVotesList proposal={proposal} />
               ) : (
-                <ProposalNonVoterList
-                  proposal={proposal}
-                  offchainProposalId={proposal.offchainProposalId}
-                />
+                <ArchiveProposalNonVoterList proposal={proposal} />
               )}
             </>
           )}

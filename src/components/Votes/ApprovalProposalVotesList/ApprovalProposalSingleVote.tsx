@@ -20,6 +20,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
+import Markdown from "@/components/shared/Markdown/Markdown";
 
 const { token, ui } = Tenant.current();
 
@@ -33,6 +34,7 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
     weight,
     transactionHash,
   } = vote;
+
   const [hovered, setHovered] = useState(false);
   const [hash1, hash2] = transactionHash?.split("|") || [];
 
@@ -121,14 +123,21 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
       </HoverCard>
       <VStack className={"text-xs leading-4 mb-2"}>
         {params?.map((option: string, index: number) => (
-          <p
+          <div
             key={index}
             className={
-              "sm:whitespace-nowrap text-ellipsis overflow-hidden pl-3 border-l border-line text-secondary font-medium"
+              "pl-3 border-l border-line text-secondary font-medium"
             }
           >
-            {++index}. {option}
-          </p>
+            <span className="mr-1">{++index}.</span>
+            <span className="inline-block">
+              <Markdown
+                content={option}
+                className="text-xs prose-a:text-xs prose-a:no-underline prose-p:text-xs"
+                wrapperClassName="inline"
+              />
+            </span>
+          </div>
         ))}
         {support === "ABSTAIN" && (
           <p className="pl-3 border-l border-line text-secondary font-medium">

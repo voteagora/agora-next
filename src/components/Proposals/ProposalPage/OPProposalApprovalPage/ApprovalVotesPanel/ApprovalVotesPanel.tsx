@@ -4,33 +4,19 @@ import { useState, useTransition } from "react";
 import { motion } from "framer-motion";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import OptionsResultsPanel from "../OptionResultsPanel/OptionResultsPanel";
-import ApprovalProposalVotesList from "@/components/Votes/ApprovalProposalVotesList/ApprovalProposalVotesList";
+import ArchiveApprovalProposalVotesList from "@/components/Votes/ApprovalProposalVotesList/ArchiveApprovalProposalVotesList";
 import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalProposalCriteria";
 import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/ApprovalCastVoteButton";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
-import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
-import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
+import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 
 type Props = {
   proposal: Proposal;
-  fetchVotesForProposal: (
-    proposalId: string,
-    pagination?: PaginationParams
-  ) => Promise<PaginatedResult<Vote[]>>;
-  fetchUserVotesForProposal: (
-    proposalId: string,
-    address: string | `0x${string}`
-  ) => Promise<Vote[]>;
 };
 
-export default function ApprovalVotesPanel({
-  proposal,
-  fetchVotesForProposal,
-  fetchUserVotesForProposal,
-}: Props) {
+export default function ApprovalVotesPanel({ proposal }: Props) {
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
@@ -83,14 +69,12 @@ export default function ApprovalVotesPanel({
               />
             </div>
             {showVoters ? (
-              <ApprovalProposalVotesList
-                fetchVotesForProposal={fetchVotesForProposal}
-                fetchUserVotes={fetchUserVotesForProposal}
-                proposalId={proposal.id}
+              <ArchiveApprovalProposalVotesList
+                proposal={proposal}
                 isThresholdCriteria={isThresholdCriteria}
               />
             ) : (
-              <ProposalNonVoterList proposal={proposal} />
+              <ArchiveProposalNonVoterList proposal={proposal} />
             )}
           </>
         )}

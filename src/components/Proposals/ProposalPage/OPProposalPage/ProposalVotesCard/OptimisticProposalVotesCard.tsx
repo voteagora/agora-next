@@ -4,12 +4,12 @@ import { useState } from "react";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
-import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/ArchiveProposalVotesList";
 import CastVoteInput, {
   OffchainCastVoteInput,
 } from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
-import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
+import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import ProposalVotesFilter from "./ProposalVotesFilter";
 import Tenant from "@/lib/tenant/tenant";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
@@ -122,15 +122,9 @@ const OptimisticProposalVotesCard = ({
         </div>
         {/* Show the scrolling list of votes for the proposal */}
         {showVoters ? (
-          <ProposalVotesList
-            proposalId={proposal.id}
-            offchainProposalId={proposal.offchainProposalId}
-          />
+          <ArchiveProposalVotesList proposal={proposal} />
         ) : (
-          <ProposalNonVoterList
-            proposal={proposal}
-            offchainProposalId={proposal.offchainProposalId}
-          />
+          <ArchiveProposalNonVoterList proposal={proposal} />
         )}
         {/* Show the input for the user to vote on a proposal if allowed */}
         {isOffchain ? (

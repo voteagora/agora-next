@@ -3,9 +3,9 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useState } from "react";
 import HybridStandardProposalVotesSummary from "../ProposalVotesSummary/HybridStandardProposalVotesSummary";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
-import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/ArchiveProposalVotesList";
 import ProposalVotesFilter from "./ProposalVotesFilter";
-import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
+import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import { ProposalVotesTab } from "@/components/common/ProposalVotesTab";
 import { VoteOnAtlas } from "@/components/common/VoteOnAtlas";
 import { HStack } from "@/components/Layout/Stack";
@@ -69,15 +69,9 @@ const HybridStandardProposalVotesCard = ({
                 />
               </div>
               {showVoters ? (
-                <ProposalVotesList
-                  proposalId={proposal.id}
-                  offchainProposalId={proposal.offchainProposalId}
-                />
+                <ArchiveProposalVotesList proposal={proposal} />
               ) : (
-                <ProposalNonVoterList
-                  proposal={proposal}
-                  offchainProposalId={proposal.offchainProposalId}
-                />
+                <ArchiveProposalNonVoterList proposal={proposal} />
               )}
             </>
           )}
