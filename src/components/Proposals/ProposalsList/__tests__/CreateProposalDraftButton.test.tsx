@@ -33,6 +33,7 @@ const createMockQueryResult = (data: any): UseQueryResult<any, Error> => ({
   isInitialLoading: false,
   failureReason: null,
   isPaused: false,
+  isEnabled: true,
   isPlaceholderData: false,
   isStale: false,
   fetchStatus: "idle",

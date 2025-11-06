@@ -30,7 +30,7 @@ const ChangelogList: React.FC<ChangelogListProps> = ({
   const [meta, setMeta] = useState(initChangelog.meta);
   const fetching = useRef(false);
 
-  const loadMore = async () => {
+  const loadMore = async (_page: number) => {
     if (fetching.current || !meta.has_next) return;
     fetching.current = true;
 
