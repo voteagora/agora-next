@@ -161,7 +161,7 @@ export const syndicateTenantUIConfig = new TenantUI({
         {
           name: "Governance",
           title: "Governance",
-          url: "https://www.syndicatecollective.org/coming-soon", // TODO: Update with actual URL
+          url: "https://www.syndicatecollective.org/",
           image: syndicateInfoCard3,
         },
         {
