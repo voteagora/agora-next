@@ -34,7 +34,7 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
     return null;
   }
 
-  const delegateStats = delegateResponse;
+  const delegateStats = delegateResponse.delegate;
   const numRecentVotes = delegateStats.participation[0];
   const numRecentProposals = delegateStats.participation[1];
 

@@ -51,7 +51,7 @@ export const useVoterStats = ({
 
 export const useDelegateStats = ({
   address,
-}: Props): UseQueryResult<DelegateStats | null, Error> => {
+}: Props): UseQueryResult<DelegateResponse | null, Error> => {
   return useQuery({
     enabled: !!address,
     queryKey: [DELEGATE_STATS_QK, address],
