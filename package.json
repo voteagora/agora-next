@@ -133,14 +133,24 @@
     "tailwindcss-animate": "^1.0.6",
     "utf-8-validate": "^6.0.3",
     "uuid": "^9.0.1",
-    "viem": "2.21.16",
+    "viem": "^2.37.0",
     "wagmi": "^2.13.0",
     "yargs": "^17.7.2",
     "zod": "^3.22.4",
     "zustand": "^5.0.3"
   },
   "resolutions": {
-    "viem": "2.21.16"
+    "parse5": "^7.1.2",
+    "viem": "^2.37.0",
+    "@wagmi/core": "^2.22.1",
+    "@noble/hashes": "^1.5.0",
+    "@noble/curves": "^1.6.0"
+  },
+  "overrides": {
+    "viem": "^2.37.0",
+    "@wagmi/core": "^2.22.1",
+    "@noble/hashes": "^1.5.0",
+    "@noble/curves": "^1.6.0"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.454.0",
@@ -172,5 +182,5 @@
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.0.5"
   },
-  "packageManager": "yarn@1.22.19+sha512.ff4579ab459bb25aa7c0ff75b62acebe576f6084b36aa842971cf250a5d8c6cd3bc9420b22ce63c7f93a0857bc6ef29291db39c3e7a23aab5adfd5a4dd6c5d71"
+  "packageManager": "yarn@1.22.22"
 }

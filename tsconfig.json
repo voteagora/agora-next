@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -17,10 +13,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "typeRoots": [
-      "./src/app/types",
-      "./node_modules/@types"
-    ],
+    "typeRoots": ["./src/app/types", "./node_modules/@types"],
+    "types": ["node", "hapi__catbox"],
     "incremental": true,
     "plugins": [
       {
@@ -28,8 +22,13 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
+      "@/*": ["./src/*"],
+      "isomorphic-dompurify": ["./src/lib/shims/isomorphicDompurify"],
+      "viem/actions": ["./src/lib/shims/viemActionsCompat"],
+      "react-infinite-scroller": ["./src/lib/shims/InfiniteScroll"],
+      "swagger-ui-react": ["./src/lib/shims/SwaggerUI"],
+      "@react-native-async-storage/async-storage": [
+        "./src/lib/shims/asyncStorage"
       ]
     }
   },
@@ -42,7 +41,5 @@
     ".next/types/**/*.ts",
     "setupTests.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

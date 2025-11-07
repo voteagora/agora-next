@@ -2,7 +2,6 @@
 
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import {
-  useVoterStats,
   useDelegateStats,
   useArchiveParticipation,
 } from "@/hooks/useVoterStats";
@@ -13,7 +12,6 @@ interface Props {
 }
 
 export const DelegateCardHeader = ({ delegate }: Props) => {
-  const { data: voterStats } = useVoterStats({ address: delegate.address });
   const { data: delegateResponse, error: delegateStatsError } =
     useDelegateStats({
       address: delegate.address,
@@ -36,7 +34,7 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
     return null;
   }
 
-  const delegateStats = delegateResponse.delegate;
+  const delegateStats = delegateResponse;
   const numRecentVotes = delegateStats.participation[0];
   const numRecentProposals = delegateStats.participation[1];
 

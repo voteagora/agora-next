@@ -4,7 +4,7 @@ import {
   fetchVoterStats,
   fetchArchiveParticipation,
 } from "@/app/delegates/actions";
-import { VoterStats, DelegateResponse } from "@/lib/types";
+import { VoterStats, DelegateResponse, DelegateStats } from "@/lib/types";
 import { getPublicClient } from "@/lib/viem";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -51,7 +51,7 @@ export const useVoterStats = ({
 
 export const useDelegateStats = ({
   address,
-}: Props): UseQueryResult<DelegateResponse, Error> => {
+}: Props): UseQueryResult<DelegateStats | null, Error> => {
   return useQuery({
     enabled: !!address,
     queryKey: [DELEGATE_STATS_QK, address],
