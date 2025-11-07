@@ -141,6 +141,30 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: "10mb",
     },
+    outputFileTracingIncludes: {
+      "/": ["./node_modules/jsdom/lib/jsdom/browser/default-stylesheet.css"],
+      "/delegates": [
+        "./node_modules/jsdom/lib/jsdom/browser/default-stylesheet.css",
+      ],
+      "/delegates/[addressOrENSName]": [
+        "./node_modules/jsdom/lib/jsdom/browser/default-stylesheet.css",
+      ],
+      "/proposals": [
+        "./node_modules/jsdom/lib/jsdom/browser/default-stylesheet.css",
+      ],
+      "/proposals/[proposal_id]": [
+        "./node_modules/jsdom/lib/jsdom/browser/default-stylesheet.css",
+      ],
+      "/forums/[topic_id]/[[...slug]]": [
+        "./node_modules/jsdom/lib/jsdom/browser/default-stylesheet.css",
+      ],
+      "/forums": [
+        "./node_modules/jsdom/lib/jsdom/browser/default-stylesheet.css",
+      ],
+      "/info": [
+        "./node_modules/jsdom/lib/jsdom/browser/default-stylesheet.css",
+      ],
+    },
   },
   output: "standalone", // Optional, good for Docker
 };
