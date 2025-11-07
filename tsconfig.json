@@ -23,7 +23,6 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "isomorphic-dompurify": ["./src/lib/shims/isomorphicDompurify"],
       "viem/actions": ["./src/lib/shims/viemActionsCompat"],
       "react-infinite-scroller": ["./src/lib/shims/InfiniteScroll"],
       "swagger-ui-react": ["./src/lib/shims/SwaggerUI"],
