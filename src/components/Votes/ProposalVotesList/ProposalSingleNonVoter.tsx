@@ -41,7 +41,9 @@ export function ProposalSingleNonVoter({
   const { data: pastVotes } = useGetVotes({
     address: voter.delegate as `0x${string}`,
     blockNumber: BigInt(proposal.snapshotBlockNumber),
-    enabled: namespace !== TENANT_NAMESPACES.UNISWAP && proposal.snapshotBlockNumber !== undefined,
+    enabled:
+      namespace !== TENANT_NAMESPACES.UNISWAP &&
+      proposal.snapshotBlockNumber !== undefined,
   });
 
   return (
@@ -66,7 +68,10 @@ export function ProposalSingleNonVoter({
               />
             </div>
           ) : (
-            <ENSAvatar ensName={voter.voterMetadata?.name} className="w-8 h-8" />
+            <ENSAvatar
+              ensName={voter.voterMetadata?.name}
+              className="w-8 h-8"
+            />
           )}
           <div className="flex flex-col">
             <div className="text-primary font-bold hover:underline">
@@ -142,13 +147,12 @@ export function ProposalSingleNonVoter({
           )}
         </HStack>
         <HStack className="text-primary" alignItems="items-center">
-          {
-            voter.citizen_type ? (
-              <span className={"flex items-center gap-1"}>
+          {voter.citizen_type ? (
+            <span className={"flex items-center gap-1"}>
               {voter.voting_power}
             </span>
-            ) : (
-              <TokenAmountDecorated
+          ) : (
+            <TokenAmountDecorated
               amount={
                 voter.citizen_type
                   ? voter.voting_power
@@ -160,8 +164,7 @@ export function ProposalSingleNonVoter({
                 fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
               }
             />
-            )
-          }
+          )}
         </HStack>
       </HStack>
     </VStack>

@@ -6,6 +6,7 @@ import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/Ap
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
+import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import {
   calculateHybridApprovalUniqueParticipationPercentage,
   ParsedProposalData,
@@ -17,6 +18,8 @@ import { HybridApprovalCriteria } from "../ApprovalProposalCriteria/HybridApprov
 import { VoteOnAtlas } from "@/components/common/VoteOnAtlas";
 import { HStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
+import Tenant from "@/lib/tenant/tenant";
+import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 
 type Props = {
   proposal: Proposal;
@@ -26,6 +29,8 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState("results");
   const [isClicked, setIsClicked] = useState<boolean>(false);
+  const { ui } = Tenant.current();
+  const useArchiveVoteHistory = ui.toggle("use-archive-vote-history")?.enabled;
   const hybridApprovalData =
     proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"];
 
@@ -96,13 +101,25 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
                   }}
                 />
               </div>
-              {showVoters ? (
-                <ArchiveApprovalProposalVotesList
-                  proposal={proposal}
-                  isThresholdCriteria={isThresholdCriteria}
+              {useArchiveVoteHistory ? (
+                showVoters ? (
+                  <ArchiveApprovalProposalVotesList
+                    proposal={proposal}
+                    isThresholdCriteria={isThresholdCriteria}
+                  />
+                ) : (
+                  <ArchiveProposalNonVoterList proposal={proposal} />
+                )
+              ) : showVoters ? (
+                <ProposalVotesList
+                  proposalId={proposal.id}
+                  offchainProposalId={proposal.offchainProposalId}
                 />
               ) : (
-                <ArchiveProposalNonVoterList proposal={proposal} />
+                <ProposalNonVoterList
+                  proposal={proposal}
+                  offchainProposalId={proposal.offchainProposalId}
+                />
               )}
             </>
           )}

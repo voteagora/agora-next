@@ -233,6 +233,10 @@ export const optimismTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "use-archive-vote-history",
+      enabled: false,
+    },
+    {
       name: "email-subscriptions",
       enabled: true,
     },

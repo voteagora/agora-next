@@ -62,7 +62,9 @@ export default function ArchiveApprovalProposalVotesList({
       | ParsedProposalData["APPROVAL"]["kind"]
       | ParsedProposalData["HYBRID_APPROVAL"]["kind"];
 
-    return data?.options?.map((option) => option.description)?.filter(Boolean) ?? [];
+    return (
+      data?.options?.map((option) => option.description)?.filter(Boolean) ?? []
+    );
   }, [proposal.proposalData, proposalType]);
 
   const normalizedVotes = useMemo(() => {

@@ -125,9 +125,7 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
         {params?.map((option: string, index: number) => (
           <div
             key={index}
-            className={
-              "pl-3 border-l border-line text-secondary font-medium"
-            }
+            className={"pl-3 border-l border-line text-secondary font-medium"}
           >
             <span className="mr-1">{++index}.</span>
             <span className="inline-block">

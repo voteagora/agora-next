@@ -5,11 +5,13 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/ArchiveProposalVotesList";
+import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
+import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import CastVoteInput, {
   OffchainCastVoteInput,
 } from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
-import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import ProposalVotesFilter from "./ProposalVotesFilter";
 import Tenant from "@/lib/tenant/tenant";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
@@ -31,10 +33,11 @@ const OptimisticProposalVotesCard = ({
   againstLengthString,
   status,
 }: Props) => {
-  const { token } = Tenant.current();
+  const { token, ui } = Tenant.current();
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [showVoters, setShowVoters] = useState(true);
   const isOffchain = proposal.proposalType?.startsWith("OFFCHAIN");
+  const useArchiveVoteHistory = ui.toggle("use-archive-vote-history")?.enabled;
 
   // Get voting data to check if user has already voted
   const isOptimismTenant =
@@ -121,10 +124,22 @@ const OptimisticProposalVotesCard = ({
           />
         </div>
         {/* Show the scrolling list of votes for the proposal */}
-        {showVoters ? (
-          <ArchiveProposalVotesList proposal={proposal} />
+        {useArchiveVoteHistory ? (
+          showVoters ? (
+            <ArchiveProposalVotesList proposal={proposal} />
+          ) : (
+            <ArchiveProposalNonVoterList proposal={proposal} />
+          )
+        ) : showVoters ? (
+          <ProposalVotesList
+            proposalId={proposal.id}
+            offchainProposalId={proposal.offchainProposalId}
+          />
         ) : (
-          <ArchiveProposalNonVoterList proposal={proposal} />
+          <ProposalNonVoterList
+            proposal={proposal}
+            offchainProposalId={proposal.offchainProposalId}
+          />
         )}
         {/* Show the input for the user to vote on a proposal if allowed */}
         {isOffchain ? (
