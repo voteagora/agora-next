@@ -75,6 +75,11 @@ function setCorsHeaders(request: NextRequest, response: Response) {
 */
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
+  const startTime = Date.now();
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(`🔷 [MIDDLEWARE START] ${request.method} ${path}`);
+  }
 
   if (path === "/" && ROOT_PATH !== "/") {
     return NextResponse.redirect(new URL(ROOT_PATH, request.url));
@@ -82,7 +87,13 @@ export async function middleware(request: NextRequest) {
 
   // Handle preflight OPTIONS requests
   if (request.method === "OPTIONS") {
-    return setOptionsCorsHeaders(request);
+    const response = setOptionsCorsHeaders(request);
+    if (process.env.NODE_ENV === "development") {
+      console.log(
+        `🔶 [MIDDLEWARE END] ${request.method} ${path} - ${Date.now() - startTime}ms (OPTIONS)`
+      );
+    }
+    return response;
   }
 
   if (path.startsWith(API_PREFIX)) {
@@ -94,18 +105,35 @@ export async function middleware(request: NextRequest) {
     ) {
       const authResponse = await validateBearerToken(request);
       if (!authResponse.authenticated) {
-        return setCorsHeaders(
+        const response = setCorsHeaders(
           request,
           new Response(authResponse.failReason, {
             status: 401,
           })
         );
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            `🔶 [MIDDLEWARE END] ${request.method} ${path} - ${Date.now() - startTime}ms (UNAUTHORIZED)`
+          );
+        }
+        return response;
       }
     }
-    return setCorsHeaders(request, NextResponse.next());
+    const response = setCorsHeaders(request, NextResponse.next());
+    if (process.env.NODE_ENV === "development") {
+      console.log(
+        `🔶 [MIDDLEWARE END] ${request.method} ${path} - ${Date.now() - startTime}ms (API)`
+      );
+    }
+    return response;
   }
 
   // For non-API routes, just call next() without setting CORS headers
+  if (process.env.NODE_ENV === "development") {
+    console.log(
+      `🔶 [MIDDLEWARE END] ${request.method} ${path} - ${Date.now() - startTime}ms`
+    );
+  }
   return NextResponse.next();
 }
 

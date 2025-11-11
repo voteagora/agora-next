@@ -70,13 +70,35 @@ const makePrismaClient = (databaseUrl: string) => {
     throw lastError;
   };
 
-  return new PrismaClient({
+  const client = new PrismaClient({
     datasources: {
       db: {
         url: databaseUrl,
       },
     },
+    log:
+      process.env.NODE_ENV === "development"
+        ? [
+            { level: "query", emit: "event" },
+            { level: "error", emit: "stdout" },
+            { level: "warn", emit: "stdout" },
+          ]
+        : ["error"],
   });
+
+  // Attach query logging in development
+  if (process.env.NODE_ENV === "development") {
+    client.$on("query" as any, (e: any) => {
+      console.log(
+        `🗄️  [PRISMA QUERY] ${e.query.substring(0, 100)}... - ${e.duration}ms`
+      );
+      if (e.duration > 1000) {
+        console.warn(`⚠️  [SLOW QUERY] took ${e.duration}ms`);
+      }
+    });
+  }
+
+  return client;
 };
 
 if (process.env.NODE_ENV === "production") {

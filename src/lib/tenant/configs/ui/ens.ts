@@ -197,11 +197,11 @@ export const ensTenantUIConfig = new TenantUI({
     },
     {
       name: "show-efp-stats",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "show-ens-text-records",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "proposal-lifecycle",

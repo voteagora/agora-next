@@ -241,9 +241,26 @@ async function processAndParseProposals(
   filter: string,
   type?: string
 ): Promise<Proposal[]> {
+  if (process.env.NODE_ENV === "development") {
+    console.log(
+      `🔴 [processAndParseProposals] Starting parsing ${proposals.length} proposals for filter="${filter}"`
+    );
+  }
+
   const resolvedProposals = await Promise.all(
-    proposals.map(async (proposal) => {
+    proposals.map(async (proposal, index) => {
+      if (process.env.NODE_ENV === "development") {
+        console.log(
+          `🔴 [processAndParseProposals] Processing proposal ${index + 1}/${proposals.length} (${proposal.proposal_id.substring(0, 10)}...)`
+        );
+      }
+
       if (shouldSkipProposal(proposal, filter, type)) {
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            `🔴 [processAndParseProposals] Skipping proposal ${index + 1}`
+          );
+        }
         return null;
       }
 
@@ -253,17 +270,43 @@ async function processAndParseProposals(
         offchainProposalsMap
       );
 
+      if (process.env.NODE_ENV === "development") {
+        console.log(
+          `🔴 [processAndParseProposals] Fetching quorum for proposal ${index + 1}`
+        );
+      }
+
       const quorum = await fetchQuorumForProposal(baseProposal);
 
-      return parseProposal(
+      if (process.env.NODE_ENV === "development") {
+        console.log(
+          `🔴 [processAndParseProposals] Quorum fetched for proposal ${index + 1}, now parsing...`
+        );
+      }
+
+      const result = await parseProposal(
         baseProposal,
         latestBlock,
         quorum ?? null,
         BigInt(votableSupply),
         offchainProposal as ProposalPayload
       );
+
+      if (process.env.NODE_ENV === "development") {
+        console.log(
+          `🔴 [processAndParseProposals] Completed parsing proposal ${index + 1}`
+        );
+      }
+
+      return result;
     })
   );
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(
+      `🔴 [processAndParseProposals] All proposals parsed for filter="${filter}"`
+    );
+  }
 
   return resolvedProposals.filter((p) => p !== null) as Proposal[];
 }
@@ -299,6 +342,12 @@ export async function getProposals({
           ui.toggle("use-daonode-for-proposals")?.enabled ?? false;
         const useSnapshot = ui.toggle("snapshotVotes")?.enabled ?? false;
 
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            `🟡 [getProposals] Starting fetch for filter="${filter}"`
+          );
+        }
+
         // Fetch initial proposals and supporting data in parallel
         const [proposals, latestBlock, votableSupply] = await Promise.all([
           fetchInitialProposals(
@@ -313,6 +362,12 @@ export async function getProposals({
           getLatestBlockPromise(ui, contracts),
           fetchVotableSupply(),
         ]);
+
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            `🟡 [getProposals] Initial data fetched for filter="${filter}", found ${proposals.data.length} proposals`
+          );
+        }
 
         const referencedOnchainIds = extractOnchainIdsFromOffchainProposals(
           proposals.data
@@ -336,6 +391,12 @@ export async function getProposals({
           }),
         ]);
 
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            `🟡 [getProposals] Related proposals fetched for filter="${filter}"`
+          );
+        }
+
         const parsedProposals = await processAndParseProposals(
           proposals.data,
           onchainProposalsMap,
@@ -345,6 +406,12 @@ export async function getProposals({
           filter,
           type
         );
+
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            `🟡 [getProposals] Parsing complete for filter="${filter}", returning ${parsedProposals.length} proposals`
+          );
+        }
 
         return {
           meta: proposals.meta,

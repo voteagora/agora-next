@@ -265,10 +265,22 @@ export async function parseProposal(
   votableSupply: bigint,
   offchainProposal?: ProposalPayload
 ): Promise<Proposal> {
+  if (process.env.NODE_ENV === "development") {
+    console.log(
+      `🟣 [parseProposal] START for proposal ${proposal.proposal_id.substring(0, 10)}...`
+    );
+  }
+
   const { contracts, ui } = Tenant.current();
   const isTimeStampBasedTenant = ui.toggle(
     "use-timestamp-for-proposals"
   )?.enabled;
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(
+      `🟣 [parseProposal] Got tenant, chain.id=${contracts.governor.chain.id}`
+    );
+  }
 
   // Use the safe accessor functions
   let startBlock: bigint | string | null = getStartBlock(proposal) || null;
@@ -283,6 +295,12 @@ export async function parseProposal(
   if (offChainProposalData) {
     proposalType = mapOffchainProposalType(
       offchainProposal?.proposal_type as ProposalType
+    );
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(
+      `🟣 [parseProposal] Blocks extracted, checking Arbitrum mapping...`
     );
   }
 
@@ -303,19 +321,40 @@ export async function parseProposal(
       ? await mapArbitrumBlockToMainnetBlock(createdBlock)
       : null;
   }
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(`🟣 [parseProposal] Parsing proposal data...`);
+  }
+
   const proposalData = parseProposalData(
     JSON.stringify(proposal.proposal_data || {}),
     proposalType,
     offChainProposalData
   );
 
+  if (process.env.NODE_ENV === "development") {
+    console.log(
+      `🟣 [parseProposal] Proposal data parsed, type=${proposalData.key}`
+    );
+  }
+
   let proposalResults;
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(`🟣 [parseProposal] Getting created time...`);
+  }
 
   const createdTime = getProposalCreatedTime({
     proposalData,
     latestBlock,
     createdBlock,
   });
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(
+      `🟣 [parseProposal] Created time: ${createdTime}, parsing results...`
+    );
+  }
 
   if (proposal.proposal_type.includes("OFFCHAIN") && !offChainProposalData) {
     proposalResults = parseOffChainProposalResults(
@@ -331,6 +370,10 @@ export async function parseProposal(
       Number(quorum),
       createdTime
     );
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(`🟣 [parseProposal] Results parsed, calculating times...`);
   }
 
   const calculateStartTime = (): Date | null => {
@@ -357,6 +400,10 @@ export async function parseProposal(
     return null;
   };
 
+  if (process.env.NODE_ENV === "development") {
+    console.log(`🟣 [parseProposal] Times calculated, building response...`);
+  }
+
   const proposalTypeData =
     proposal.proposal_type_data as ProposalTypeData | null;
 
@@ -369,6 +416,27 @@ export async function parseProposal(
   const offchainProposalId = proposalType.startsWith("OFFCHAIN")
     ? proposal.proposal_id
     : offchainProposal?.proposal_id;
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(`🟣 [parseProposal] Getting proposal status (ASYNC CALL)...`);
+  }
+
+  const status = latestBlock
+    ? await getProposalStatus(
+        proposal,
+        proposalResults,
+        proposalData,
+        latestBlock,
+        quorum,
+        votableSupply,
+        hardcodedThreshold ??
+          (proposalTypeData && proposalTypeData.approval_threshold)
+      )
+    : null;
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(`🟣 [parseProposal] Status retrieved: ${status}, returning...`);
+  }
 
   return {
     id: proposal.proposal_id,
@@ -413,18 +481,7 @@ export async function parseProposal(
     proposalResults: proposalResults.kind,
     proposalType,
     proposalTypeData,
-    status: latestBlock
-      ? await getProposalStatus(
-          proposal,
-          proposalResults,
-          proposalData,
-          latestBlock,
-          quorum,
-          votableSupply,
-          hardcodedThreshold ??
-            (proposalTypeData && proposalTypeData.approval_threshold)
-        )
-      : null,
+    status,
     createdTransactionHash: proposal.created_transaction_hash,
     cancelledTransactionHash: proposal.cancelled_transaction_hash,
     executedTransactionHash: proposal.executed_transaction_hash,
@@ -624,21 +681,97 @@ export function parseIfNecessary(obj: string | object) {
 }
 
 function parseMultipleStringsSeparatedByComma(obj: string | object) {
-  return typeof obj === "string"
-    ? obj
-        .split(/(?![^(]*\)),\s*/)
-        .map((item) => item.replace(/^['"]|['"]$/g, ""))
-    : Array.isArray(obj)
-      ? obj
-          .map((item) =>
-            typeof item === "string"
-              ? item
-                  .split(/(?![^(]*\)),\s*/)
-                  .map((i) => i.replace(/^['"]|['"]$/g, ""))
-              : item
-          )
-          .flat()
-      : obj;
+  if (process.env.NODE_ENV === "development") {
+    const arrayLength = Array.isArray(obj) ? obj.length : "N/A";
+    const firstItemType =
+      Array.isArray(obj) && obj.length > 0 ? typeof obj[0] : "N/A";
+    const firstItemLength =
+      Array.isArray(obj) && obj.length > 0 && typeof obj[0] === "string"
+        ? obj[0].length
+        : "N/A";
+    console.log(
+      `🟠 [parseMultipleStringsSeparatedByComma] START, type=${typeof obj}, isArray=${Array.isArray(obj)}, arrayLength=${arrayLength}, firstItemType=${firstItemType}, firstItemLength=${firstItemLength}`
+    );
+  }
+
+  // Helper function to split string without catastrophic backtracking
+  // This replaces the dangerous regex: /(?![^(]*\)),\s*/
+  const safeSplit = (str: string): string[] => {
+    // For very large strings (>100KB), skip complex parsing to avoid hanging
+    if (str.length > 100000) {
+      if (process.env.NODE_ENV === "development") {
+        console.log(
+          `🟠 [parseMultipleStringsSeparatedByComma] String too large (${str.length} chars), returning as-is`
+        );
+      }
+      return [str];
+    }
+
+    const result: string[] = [];
+    let current = "";
+    let parenDepth = 0;
+
+    for (let i = 0; i < str.length; i++) {
+      const char = str[i];
+
+      if (char === "(") {
+        parenDepth++;
+        current += char;
+      } else if (char === ")") {
+        parenDepth--;
+        current += char;
+      } else if (char === "," && parenDepth === 0) {
+        // Only split on commas outside of parentheses
+        if (current.trim()) {
+          result.push(current.trim().replace(/^['"]|['"]$/g, ""));
+        }
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+
+    // Add the last item
+    if (current.trim()) {
+      result.push(current.trim().replace(/^['"]|['"]$/g, ""));
+    }
+
+    return result;
+  };
+
+  const result =
+    typeof obj === "string"
+      ? safeSplit(obj)
+      : Array.isArray(obj)
+        ? obj
+            .map((item, index) => {
+              if (process.env.NODE_ENV === "development") {
+                console.log(
+                  `🟠 [parseMultipleStringsSeparatedByComma] Processing item ${index + 1}/${obj.length}, type=${typeof item}, length=${typeof item === "string" ? item.length : "N/A"}`
+                );
+              }
+
+              const itemResult =
+                typeof item === "string" ? safeSplit(item) : item;
+
+              if (process.env.NODE_ENV === "development") {
+                console.log(
+                  `🟠 [parseMultipleStringsSeparatedByComma] Item ${index + 1} processed`
+                );
+              }
+
+              return itemResult;
+            })
+            .flat()
+        : obj;
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(
+      `🟠 [parseMultipleStringsSeparatedByComma] DONE, result length=${Array.isArray(result) ? result.length : "N/A"}`
+    );
+  }
+
+  return result;
 }
 
 export function parseProposalData(
@@ -646,8 +779,15 @@ export function parseProposalData(
   proposalType: ProposalType,
   offChainProposalData?: any
 ): ParsedProposalData[ProposalType] {
+  if (process.env.NODE_ENV === "development") {
+    console.log(`🟠 [parseProposalData] START, type=${proposalType}`);
+  }
+
   switch (proposalType) {
     case "SNAPSHOT": {
+      if (process.env.NODE_ENV === "development") {
+        console.log(`🟠 [parseProposalData] Handling SNAPSHOT`);
+      }
       const parsedProposalData = JSON.parse(proposalData);
       return {
         key: proposalType,
@@ -668,8 +808,16 @@ export function parseProposalData(
     }
     case "STANDARD":
     case "HYBRID_STANDARD": {
+      if (process.env.NODE_ENV === "development") {
+        console.log(`🟠 [parseProposalData] Handling STANDARD/HYBRID_STANDARD`);
+      }
       const parsedProposalData = JSON.parse(proposalData);
       try {
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            `🟠 [parseProposalData] Parsing comma-separated strings...`
+          );
+        }
         const calldatas: any = parseMultipleStringsSeparatedByComma(
           parseIfNecessary(parsedProposalData.calldatas)
         );
@@ -680,7 +828,15 @@ export function parseProposalData(
         const signatures: any = parseMultipleStringsSeparatedByComma(
           parseIfNecessary(parsedProposalData.signatures)
         );
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            `🟠 [parseProposalData] Decoding calldata (${calldatas?.length || 0} items)...`
+          );
+        }
         const functionArgsName = decodeCalldata(calldatas);
+        if (process.env.NODE_ENV === "development") {
+          console.log(`🟠 [parseProposalData] Calldata decoded, returning`);
+        }
 
         return {
           key: proposalType,
