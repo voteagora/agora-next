@@ -9,6 +9,18 @@ import { WagmiProvider, createConfig, http } from "wagmi";
 import { mainnet } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+// Mock Next.js App Router (next/navigation) to avoid "expected app router to be mounted"
+vi.mock("next/navigation", () => {
+  const push = vi.fn();
+  const replace = vi.fn();
+  const prefetch = vi.fn();
+  const back = vi.fn();
+  return {
+    useRouter: () => ({ push, replace, prefetch, back }),
+    useSearchParams: () => ({ get: vi.fn() }),
+  };
+});
+
 vi.mock("@/components/Button", () => ({
   UpdatedButton: ({
     children,
