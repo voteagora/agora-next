@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import classNames from "classnames";
 import { useSignMessage } from "wagmi";
+import { useSIWE } from "connectkit";
 import { UpdatedButton } from "@/components/Button";
 import Tenant from "@/lib/tenant/tenant";
 import { useGetVotes } from "@/hooks/useGetVotes";
@@ -24,6 +25,7 @@ const CreateProposalDraftButton = ({
   const messageSigner = useSignMessage();
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
+  const { signIn } = useSIWE();
   const { ui } = Tenant.current();
   const protocolLevelCreateProposalButtonCheck = (
     ui.toggle("proposal-lifecycle")?.config as PLMConfig
@@ -80,9 +82,22 @@ const CreateProposalDraftButton = ({
             jwt = parsed?.access_token as string | undefined;
           } catch {}
           if (!jwt) {
-            toast("Session expired. Please sign in to continue.");
-            setIsPending(false);
-            return;
+            // Try to initiate SIWE sign-in and then proceed
+            try {
+              await signIn();
+              const session = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
+              const parsed = session ? JSON.parse(session) : null;
+              jwt = parsed?.access_token as string | undefined;
+            } catch (e) {
+              toast("Sign-in cancelled or failed. Please try again.");
+              setIsPending(false);
+              return;
+            }
+            if (!jwt) {
+              toast("Session expired. Please sign in to continue.");
+              setIsPending(false);
+              return;
+            }
           }
 
           const messagePayload = {
