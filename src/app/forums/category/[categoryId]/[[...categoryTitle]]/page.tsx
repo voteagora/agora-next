@@ -30,6 +30,15 @@ async function loadCategory(categoryIdParam: string) {
     return null;
   }
 
+  // Special case: categoryId = 0 means uncategorized topics
+  if (id === 0) {
+    return {
+      id: 0,
+      name: "Uncategorized",
+      description: "Topics without a category",
+    };
+  }
+
   const response = await getForumCategory(id);
   if (!response?.success || !response.data) {
     return null;

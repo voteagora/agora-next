@@ -10,6 +10,7 @@ import {
   getForumCategories,
   getForumTopic,
   getForumTopicsCount,
+  getUncategorizedTopicsCount,
 } from "@/lib/actions/forum";
 import { truncateAddress } from "@/app/lib/utils/text";
 import ForumsSidebar from "../../ForumsSidebar";
@@ -144,13 +145,19 @@ export async function generateMetadata({
 }
 
 export default async function ForumTopicPage({ params }: PageProps) {
-  const [topicBundle, adminsResult, categoriesResult, topicsCountResult] =
-    await Promise.all([
-      loadTopic(params.topic_id),
-      getForumAdmins(),
-      getForumCategories(),
-      getForumTopicsCount(),
-    ]);
+  const [
+    topicBundle,
+    adminsResult,
+    categoriesResult,
+    topicsCountResult,
+    uncategorizedCountResult,
+  ] = await Promise.all([
+    loadTopic(params.topic_id),
+    getForumAdmins(),
+    getForumCategories(),
+    getForumTopicsCount(),
+    getUncategorizedTopicsCount(),
+  ]);
   if (!topicBundle) {
     return notFound();
   }
@@ -241,6 +248,10 @@ export default async function ForumTopicPage({ params }: PageProps) {
     ? topicsCountResult.data
     : 0;
 
+  const uncategorizedCount = uncategorizedCountResult.success
+    ? uncategorizedCountResult.data
+    : 0;
+
   return (
     <div className="min-h-screen">
       <ForumsHeader
@@ -319,6 +330,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
               latestPost={topicData}
               selectedCategoryId={categoryId}
               totalTopicsCount={totalTopicsCount}
+              uncategorizedCount={uncategorizedCount}
             />
           </div>
         </div>

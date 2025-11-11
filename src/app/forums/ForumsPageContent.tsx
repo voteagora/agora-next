@@ -22,7 +22,7 @@ export default async function ForumsPageContent({
   const selectedCategoryTitle = categoryTitle || null;
 
   const result = await getForumData({
-    categoryId: selectedCategoryId || undefined,
+    categoryId: selectedCategoryId !== null ? selectedCategoryId : undefined,
   });
 
   if (!result.success) {
@@ -33,7 +33,14 @@ export default async function ForumsPageContent({
     );
   }
 
-  const { topics, totalCount, admins, categories, latestPost } = result.data;
+  const {
+    topics,
+    totalCount,
+    admins,
+    categories,
+    latestPost,
+    uncategorizedCount,
+  } = result.data;
 
   const sortedTopics = topics.slice().sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -75,6 +82,7 @@ export default async function ForumsPageContent({
             categories={categories}
             latestPost={latestPost}
             totalTopicsCount={totalCount}
+            uncategorizedCount={uncategorizedCount}
           />
         </div>
       </div>

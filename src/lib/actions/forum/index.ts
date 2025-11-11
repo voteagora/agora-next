@@ -10,6 +10,7 @@ export {
   archiveForumTopic,
   getForumData,
   getForumTopicsCount,
+  getUncategorizedTopicsCount,
 } from "./topics";
 
 // Posts

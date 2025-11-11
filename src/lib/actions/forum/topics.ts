@@ -693,6 +693,34 @@ export const getForumTopicsCount = async () => {
   }
 };
 
+export const getUncategorizedTopicsCount = async () => {
+  try {
+    const count = await prismaWeb2Client.forumTopic.count({
+      where: {
+        dao_slug: slug,
+        archived: false,
+        isNsfw: false,
+        deletedAt: null,
+        categoryId: null,
+        posts: {
+          some: {
+            isNsfw: false,
+            deletedAt: null,
+          },
+        },
+      },
+    });
+
+    return {
+      success: true,
+      data: count,
+    };
+  } catch (error) {
+    console.error("Error getting uncategorized topics count:", error);
+    return handlePrismaError(error);
+  }
+};
+
 export const getForumData = async ({
   categoryId,
   excludeCategoryNames,
@@ -715,7 +743,12 @@ export const getForumData = async ({
     };
 
     if (categoryId !== undefined) {
-      whereClause.categoryId = categoryId;
+      // Special case: categoryId = 0 means uncategorized topics
+      if (categoryId === 0) {
+        whereClause.categoryId = null;
+      } else {
+        whereClause.categoryId = categoryId;
+      }
     } else if (excludeCategoryNames && excludeCategoryNames.length > 0) {
       whereClause.NOT = {
         category: {
@@ -726,100 +759,139 @@ export const getForumData = async ({
       };
     }
 
-    const [topics, totalCount, admins, categories, latestPost] =
-      await Promise.all([
-        prismaWeb2Client.forumTopic.findMany({
-          where: whereClause,
-          include: {
-            category: {
-              select: {
-                name: true,
-                id: true,
-                adminOnlyTopics: true,
-                isDuna: true,
-              },
-            },
-            posts: {
-              where: { isNsfw: false, deletedAt: null },
-              orderBy: { createdAt: "asc" },
-              take: 1,
-              include: {
-                reactions: true,
-                _count: {
-                  select: {
-                    votes: {
-                      where: { vote: 1 },
-                    },
-                  },
-                },
-              },
-            },
-            _count: {
-              select: {
-                posts: {
-                  where: { isNsfw: false, deletedAt: null },
-                },
-              },
+    // Base where clause for all topics (for total count - always unfiltered)
+    const baseWhereClause: any = {
+      dao_slug: slug,
+      archived: false,
+      isNsfw: false,
+      deletedAt: null,
+      // Only include topics that have at least one valid post
+      posts: {
+        some: {
+          isNsfw: false,
+          deletedAt: null,
+        },
+      },
+    };
+
+    const [
+      topics,
+      totalCount,
+      admins,
+      categories,
+      latestPost,
+      uncategorizedCount,
+    ] = await Promise.all([
+      prismaWeb2Client.forumTopic.findMany({
+        where: whereClause,
+        include: {
+          category: {
+            select: {
+              name: true,
+              id: true,
+              adminOnlyTopics: true,
+              isDuna: true,
             },
           },
-          orderBy: [{ archived: "asc" }, { createdAt: "desc" }],
-          take: limit,
-          skip: offset,
-        }),
-
-        prismaWeb2Client.forumTopic.count({
-          where: whereClause,
-        }),
-
-        prismaWeb2Client.forumAdmin.findMany({
-          where: {
-            managedAccounts: {
-              has: slug,
-            },
-          },
-          select: { address: true, role: true },
-          orderBy: { address: "asc" },
-        }),
-
-        prismaWeb2Client.forumCategory.findMany({
-          where: { dao_slug: slug, archived: false },
-          include: {
-            _count: {
-              select: {
-                topics: {
-                  where: {
-                    archived: false,
-                    deletedAt: null,
-                    posts: {
-                      some: {
-                        isNsfw: false,
-                        deletedAt: null,
-                      },
-                    },
+          posts: {
+            where: { isNsfw: false, deletedAt: null },
+            orderBy: { createdAt: "asc" },
+            take: 1,
+            include: {
+              reactions: true,
+              _count: {
+                select: {
+                  votes: {
+                    where: { vote: 1 },
                   },
                 },
               },
             },
           },
-          orderBy: { createdAt: "desc" },
-        }),
+          _count: {
+            select: {
+              posts: {
+                where: { isNsfw: false, deletedAt: null },
+              },
+            },
+          },
+        },
+        orderBy: [{ archived: "asc" }, { createdAt: "desc" }],
+        take: limit,
+        skip: offset,
+      }),
 
-        prismaWeb2Client.forumPost.findFirst({
-          where: {
-            dao_slug: slug,
-            isNsfw: false,
-            deletedAt: null,
+      // Total count across all categories (always unfiltered)
+      prismaWeb2Client.forumTopic.count({
+        where: baseWhereClause,
+      }),
+
+      prismaWeb2Client.forumAdmin.findMany({
+        where: {
+          managedAccounts: {
+            has: slug,
           },
-          orderBy: { createdAt: "desc" },
-          select: {
-            id: true,
-            createdAt: true,
-            topicId: true,
-            address: true,
-            content: true,
+        },
+        select: { address: true, role: true },
+        orderBy: { address: "asc" },
+      }),
+
+      prismaWeb2Client.forumCategory.findMany({
+        where: { dao_slug: slug, archived: false },
+        include: {
+          _count: {
+            select: {
+              topics: {
+                where: {
+                  archived: false,
+                  deletedAt: null,
+                  posts: {
+                    some: {
+                      isNsfw: false,
+                      deletedAt: null,
+                    },
+                  },
+                },
+              },
+            },
           },
-        }),
-      ]);
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+
+      prismaWeb2Client.forumPost.findFirst({
+        where: {
+          dao_slug: slug,
+          isNsfw: false,
+          deletedAt: null,
+        },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          createdAt: true,
+          topicId: true,
+          address: true,
+          content: true,
+        },
+      }),
+
+      // Count uncategorized topics
+      prismaWeb2Client.forumTopic.count({
+        where: {
+          dao_slug: slug,
+          archived: false,
+          isNsfw: false,
+          deletedAt: null,
+          categoryId: null,
+          posts: {
+            some: {
+              isNsfw: false,
+              deletedAt: null,
+            },
+          },
+        },
+      }),
+    ]);
 
     const adminRolesObj: Record<string, string | null> = {};
     admins.forEach((admin) => {
@@ -853,6 +925,7 @@ export const getForumData = async ({
         totalCount,
         admins: adminRolesObj,
         categories: processedCategories,
+        uncategorizedCount,
         latestPost: latestPost
           ? {
               id: latestPost.id,
