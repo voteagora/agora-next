@@ -3,13 +3,9 @@ import { isAddress } from "viem";
 import { AlchemyProvider } from "ethers";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
-import { createLoggingProvider } from "@/lib/debug/providerLogger";
 
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID;
-const mainnetProvider = createLoggingProvider(
-  new AlchemyProvider("mainnet", alchemyId),
-  "ENS-Mainnet"
-) as AlchemyProvider;
+const mainnetProvider = new AlchemyProvider("mainnet", alchemyId);
 
 export const ensNameToAddress = unstable_cache(
   async (nameOrAddress) => {

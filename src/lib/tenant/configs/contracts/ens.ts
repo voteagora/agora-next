@@ -15,7 +15,6 @@ import {
   GOVERNOR_TYPE,
   TIMELOCK_TYPE,
 } from "@/lib/constants";
-import { createLoggingProvider } from "@/lib/debug/providerLogger";
 
 interface Props {
   isProd: boolean;
@@ -40,16 +39,11 @@ export const ensTenantContractConfig = ({
 
   const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
 
-  const baseProvider = usingForkedNode
+  const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
     : isProd
       ? new AlchemyProvider("mainnet", alchemyId)
       : new AlchemyProvider("sepolia", alchemyId);
-
-  const provider = createLoggingProvider(
-    baseProvider,
-    `ENS-Contract-${isProd ? "mainnet" : "sepolia"}`
-  ) as typeof baseProvider;
 
   const chain = isProd ? mainnet : sepolia;
 

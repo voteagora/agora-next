@@ -76,10 +76,6 @@ export default async function ProposalsHome() {
     data: [],
   };
 
-  if (process.env.NODE_ENV === "development") {
-    console.log("🟢 [ProposalsHome] Starting data fetches...");
-  }
-
   if (useArchiveForProposals) {
     [governanceCalendar, archivedProposals, votableSupply] = await Promise.all([
       fetchGovernanceCalendar(),
@@ -100,10 +96,6 @@ export default async function ProposalsHome() {
         fetchProposals(proposalsFilterOptions.everything.filter),
         fetchVotableSupply(),
       ]);
-  }
-
-  if (process.env.NODE_ENV === "development") {
-    console.log("🟢 [ProposalsHome] Data fetches complete, rendering...");
   }
 
   return (
