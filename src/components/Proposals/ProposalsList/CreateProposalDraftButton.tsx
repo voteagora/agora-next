@@ -64,6 +64,9 @@ const CreateProposalDraftButton = ({
       variant="rounded"
       type="primary"
       isLoading={isPending}
+      disabled={isPending}
+      aria-busy={isPending}
+      aria-disabled={isPending}
       className={classNames(className)}
       onClick={async () => {
         if (isPending) return;
