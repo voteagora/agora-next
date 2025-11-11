@@ -1,0 +1,40 @@
+---
+alwaysApply: true
+---
+
+# How to conduct design improvements.
+
+Use these rules when you are being asked to do redesigns or design improvements. Follow these step by step. Reference other rules files if called for.
+
+## Process
+
+Step 0: Undertand the context
+
+- First, understand what pages exist, what are their purpose, what are the primary flows and actions in this app. Use both images and screenhots. Good design work always starts with an indepth understanding of the context of the app.
+  - If screenshots of the whole app exists, look at these first. Carefully look at each screenshot to understand how the app works.
+  - Then, visit the primary pages of the app, and visit the entire component tree contained in them to understand how the app is put together. You don't need to read each components line by line. Instead focus on what components they use, and identify major actions they support.
+  - Don't rabbithole on only the areas relevant to the issue at hand. Develop a hollistic understanding.
+- Write down your understanding of the context in the design-context.md doc. Be comprehensive and specific. Your task at this stage is strictly to understand the app. Do not concern yourself with your current design task.
+
+Step 1: Understand the issue
+
+- Think hard about why the current design isn't working. If it's not clear, ask the user for clarification.
+- Create a list of the top design issues. write these in desig-issues.md.
+
+Step 2: Explore directions
+
+- There's always more than one way to solve a problem. Think of at least 3 different approaches to solving this problem. Make sure sure that these are five significantly different ideas, so that we are exploring divergent ideas and covering many possible solutions.
+- When thinking of directions, don't be afraid to consider big changes if they are warranted. Don't be afraid to delete things if needed. Do not be biased towards small incremental changes unless the situation actually warrants it. In fact, at least one of your directions should try something unexpected. Please be in depth when describing each direction. Explain each direction to the user.
+- When describing each direction: give a 1-2 liner high level explanation of the direction, then create a comprehensive lists of the changes required for this direction. Treat this list as a work order for a coding model that will implement these changes, meaning that it has be specific and comprehensive. Don't share technical implementation directions. Think of yourself as a senior product designer describing their solution with words.
+- Bad example: "Improve NUX with a first‑visit guided tour: A 2-step overlay tour (Popover/Dialog) guiding primary actions, shown once per device."
+- Good example: "Improve NUX with a first‑visit guided tour: A 2-step overlay tour (Popover/Dialog) guiding primary actions, shown once per device. First step: added to the main page in this location, shows this copy. Second step: added to this page, shows this copy. We can then remove such and such copy from this page, and put it on this other page instead"
+- Write down your five directions in the design-ideas.md doc.
+
+Step 3: Critique directions
+
+- Then take a step back, and think hard about your plan for each direction. Be critical. You're an expert product designer critiquing solution from another expert colleague.
+  - First, do they solve the issues identified?
+  - Look at the design-context and all the images again again, does our direction make sense in this context?
+  - Is there any opportunity to make things even simpler?
+  - Did we forget any necessary changes or steps in our implementation plan?
+- Repeat the same exercise for each direction. Update the ideas doc after each critique with the improved version. Do not suggest a winner and do not rate the directions. Do not blend the distinct directions together.
