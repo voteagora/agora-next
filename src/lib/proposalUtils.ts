@@ -630,9 +630,10 @@ function parseMultipleStringsSeparatedByComma(obj: string | object) {
   // This replaces the dangerous regex: /(?![^(]*\)),\s*/
   const safeSplit = (str: string): string[] => {
     // For very large strings (>100KB), skip complex parsing to avoid hanging
-    if (str.length > 100000) {
-      return [str];
-    }
+    // if (str.length > 100000 && process.env.NODE_ENV === "development") {
+    //   console.log("Skipping complex parsing for large string when in development mode.");
+    //   return [str];
+    // }
 
     const result: string[] = [];
     let current = "";
