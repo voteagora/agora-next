@@ -14,7 +14,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "typeRoots": ["./src/app/types", "./node_modules/@types"],
-    "types": ["node", "hapi__catbox"],
+    "types": ["node"],
     "incremental": true,
     "plugins": [
       {
@@ -23,7 +23,6 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "viem/actions": ["./src/lib/shims/viemActionsCompat"],
       "react-infinite-scroller": ["./src/lib/shims/InfiniteScroll"],
       "swagger-ui-react": ["./src/lib/shims/SwaggerUI"],
       "@react-native-async-storage/async-storage": [
