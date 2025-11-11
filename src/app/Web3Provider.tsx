@@ -40,19 +40,28 @@ const tokenChainId = toNumericChainId(contracts.token.chain.id);
 
 const normalizedTokenChain = { ...contracts.token.chain, id: tokenChainId };
 
-export const config = createConfig(
-  getDefaultConfig({
-    walletConnectProjectId: projectId,
-    chains: [normalizedTokenChain, mainnet],
-    transports: {
-      [mainnet.id]: getTransportForChain(mainnet.id)!,
-      [tokenChainId]: getTransportForChain(tokenChainId)!,
-    },
-    appName: metadata.name,
-    appDescription: metadata.description,
-    appUrl: metadata.url,
-  })
-);
+// Create config only on client side to avoid SSR issues with indexedDB
+export const config = typeof window !== 'undefined' 
+  ? createConfig(
+      getDefaultConfig({
+        walletConnectProjectId: projectId,
+        chains: [normalizedTokenChain, mainnet],
+        transports: {
+          [mainnet.id]: getTransportForChain(mainnet.id)!,
+          [tokenChainId]: getTransportForChain(tokenChainId)!,
+        },
+        appName: metadata.name,
+        appDescription: metadata.description,
+        appUrl: metadata.url,
+      })
+    )
+  : createConfig({
+      chains: [normalizedTokenChain, mainnet],
+      transports: {
+        [mainnet.id]: getTransportForChain(mainnet.id)!,
+        [tokenChainId]: getTransportForChain(tokenChainId)!,
+      },
+    });
 
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => {
   return (
