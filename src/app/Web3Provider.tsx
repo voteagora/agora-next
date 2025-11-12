@@ -54,6 +54,7 @@ export const config =
           appName: metadata.name,
           appDescription: metadata.description,
           appUrl: metadata.url,
+          enableFamily: false,
         })
       )
     : createConfig({
