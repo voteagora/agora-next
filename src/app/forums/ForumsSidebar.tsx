@@ -123,7 +123,6 @@ export default function ForumsSidebar({
             </div>
           )}
         </div>
-
         {/* Official DUNA Admin Badge */}
         <div className="mt-4 pt-4 border-t border-border">
           <div className="bg-wash border border-line rounded-lg shadow-sm p-3">

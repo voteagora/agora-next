@@ -53,6 +53,17 @@ const nextConfig = {
   },
   webpack: (config) => {
     config.resolve.fallback = { fs: false, net: false, tls: false };
+    config.resolve.alias = config.resolve.alias || {};
+    config.resolve.alias["react-infinite-scroller$"] = path.resolve(
+      __dirname,
+      "src/lib/shims/InfiniteScroll.tsx"
+    );
+    config.resolve.alias["swagger-ui-react$"] = path.resolve(
+      __dirname,
+      "src/lib/shims/SwaggerUI.tsx"
+    );
+    config.resolve.alias["@react-native-async-storage/async-storage$"] =
+      path.resolve(__dirname, "src/lib/shims/asyncStorage.ts");
     return config;
   },
   experimental: {

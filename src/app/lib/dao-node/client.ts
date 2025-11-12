@@ -3,7 +3,7 @@ import {
   ProposalPayloadFromDB,
 } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import { ProposalType } from "@/lib/types";
+import { DelegateResponse, ProposalType } from "@/lib/types";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
@@ -407,7 +407,7 @@ export const getDelegatesFromDaoNode = async (options?: {
  */
 export const getDelegateDataFromDaoNode = async (
   address: string
-): Promise<DelegateStats | null> => {
+): Promise<DelegateResponse | null> => {
   const url = getDaoNodeURLForNamespace(namespace);
   if (!url) {
     return null;
@@ -423,7 +423,7 @@ export const getDelegateDataFromDaoNode = async (
       return null;
     }
 
-    return (await delegateRes.json()) as DelegateStats;
+    return (await delegateRes.json()) as DelegateResponse;
   } catch (error) {
     console.error("Error in getDelegateDataFromDaoNode:", error);
     return null;

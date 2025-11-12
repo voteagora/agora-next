@@ -76,7 +76,6 @@
     "@tiptap/extensions": "^3.1.0",
     "@tiptap/pm": "^3.1.0",
     "@tiptap/react": "^3.1.0",
-    "@types/swagger-ui-react": "^4.18.3",
     "@uiw/react-markdown-preview": "^5.1.1",
     "@upstash/redis": "^1.35.3",
     "@vercel/analytics": "^1.1.1",
@@ -98,7 +97,6 @@
     "faker": "4.1.0",
     "framer-motion": "^10.16.5",
     "ipdata": "^2.2.4",
-    "isomorphic-dompurify": "^2.21.0",
     "jose": "^5.2.4",
     "lodash": "^4.17.0",
     "lokijs": "^1.5.12",
@@ -126,21 +124,32 @@
     "rehype-external-links": "^3.0.0",
     "remark": "^15.0.1",
     "remark-toc": "^9.0.0",
+    "sanitize-html": "^2.17.0",
     "siwe": "^2.3.2",
-    "swagger-ui-react": "5.16.2",
+    "swagger-ui-react": "5.30.2",
     "tailwind-merge": "^1.13.2",
     "tailwindcss": "3.3.2",
     "tailwindcss-animate": "^1.0.6",
     "utf-8-validate": "^6.0.3",
     "uuid": "^9.0.1",
-    "viem": "2.21.16",
+    "viem": "^2.37.0",
     "wagmi": "^2.13.0",
     "yargs": "^17.7.2",
     "zod": "^3.22.4",
     "zustand": "^5.0.3"
   },
   "resolutions": {
-    "viem": "2.21.16"
+    "parse5": "^7.1.2",
+    "viem": "^2.37.0",
+    "@wagmi/core": "^2.22.1",
+    "@noble/hashes": "^1.5.0",
+    "@noble/curves": "^1.6.0"
+  },
+  "overrides": {
+    "viem": "^2.37.0",
+    "@wagmi/core": "^2.22.1",
+    "@noble/hashes": "^1.5.0",
+    "@noble/curves": "^1.6.0"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.454.0",
@@ -151,12 +160,13 @@
     "@testing-library/react": "^16.2.0",
     "@typechain/ethers-v6": "^0.5.1",
     "@types/d3": "^7.4.3",
-    "@types/dompurify": "^3.2.0",
     "@types/node": "^22.7.5",
     "@types/react": "^18.2.8",
     "@types/react-dom": "^18.2.25",
     "@types/react-infinite-scroller": "^1.2.5",
+    "@types/sanitize-html": "^2.16.0",
     "@types/swagger-ui-dist": "^3.30.4",
+    "@types/swagger-ui-react": "^5.18.0",
     "@types/uuid": "^9.0.8",
     "@vitejs/plugin-react": "^4.3.4",
     "csv-parser": "^3.0.0",
@@ -172,5 +182,5 @@
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.0.5"
   },
-  "packageManager": "yarn@1.22.19+sha512.ff4579ab459bb25aa7c0ff75b62acebe576f6084b36aa842971cf250a5d8c6cd3bc9420b22ce63c7f93a0857bc6ef29291db39c3e7a23aab5adfd5a4dd6c5d71"
+  "packageManager": "yarn@1.22.22"
 }
