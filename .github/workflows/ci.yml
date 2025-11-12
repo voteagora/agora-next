@@ -27,7 +27,5 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: npm ci
-      - name: Print Prettier Version
-        run: npm run prettier -- --version
       - name: Lint with Prettier
         run: npm run check-prettier
