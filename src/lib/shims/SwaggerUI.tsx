@@ -1,7 +1,4 @@
-import React, {
-  type CSSProperties,
-  type ReactNode,
-} from "react";
+import React, { type CSSProperties, type ReactNode } from "react";
 
 // Avoid resolving to this shim by importing from the package entry via require.
 const RawSwaggerUI: React.ComponentType<any> =
@@ -46,4 +43,3 @@ const SwaggerUI = (props: SwaggerUIProps): JSX.Element => {
 };
 
 export default SwaggerUI;
-
