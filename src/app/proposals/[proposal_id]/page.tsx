@@ -211,12 +211,12 @@ export default async function Page({
   }
 
   const { ui } = Tenant.current();
-  const useArchive = ui.toggle("use-archive-for-proposals")?.enabled;
-
+  const useArchiveForProposals = ui.toggle("use-archive-for-proposals")?.enabled;
+  console.log("useArchiveForProposals", loadedProposal.proposalType);
   let RenderComponent;
   switch (loadedProposal.proposalType) {
     case "STANDARD":
-      if (useArchive) {
+      if (useArchiveForProposals) {
         RenderComponent = ArchiveStandardProposalPage;
       } else {
         RenderComponent = StandardProposalPage;

@@ -25,11 +25,7 @@ export type ArchiveNonVoter = {
   warpcast: string | null;
   discord: string | null;
   citizen_type: string | null;
-  voterMetadata: {
-    name: string;
-    image: string;
-    type: string;
-  } | null;
+  voterMetadata: null;
 };
 
 const ARCHIVE_VOTES_QK = "archiveVotes";
@@ -99,7 +95,7 @@ async function fetchArchiveVotes({
   const payload = (await response.json()) as {
     data?: ArchiveVoteRow[];
   };
-  console.log("payload", payload);
+
   // Transform raw data using proposal details
   const startBlockString =
     startBlock !== undefined && startBlock !== null
@@ -206,7 +202,7 @@ async function fetchArchiveNonVoters({
   const payload = (await response.json()) as {
     data?: ArchiveNonVoterRow[];
   };
-  console.log("payload", payload);
+
   // Transform raw data on client side and deduplicate
   const seen = new Set<string>();
   const nonVoters =
@@ -225,13 +221,7 @@ async function fetchArchiveNonVoters({
         warpcast: row.warpcast ?? null,
         discord: row.discord ?? null,
         citizen_type: row.citizen_type ?? null,
-        voterMetadata: row.ens
-          ? {
-              name: row.ens,
-              image: "",
-              type: "",
-            }
-          : null,
+        voterMetadata: null,
       });
 
       return acc;

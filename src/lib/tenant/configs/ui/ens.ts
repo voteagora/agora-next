@@ -158,10 +158,6 @@ export const ensTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "use-archive-vote-history",
-      enabled: false,
-    },
-    {
       name: "sponsoredVote",
       enabled: true,
       config: {
@@ -299,6 +295,10 @@ For a full walkthrough of the proposal process, check out the [ENS DAO docs](htt
     {
       name: "use-daonode-for-proposal-types",
       enabled: false,
+    },
+    {
+      name: "use-archive-vote-history",
+      enabled: true,
     },
     {
       name: "show-participation",
