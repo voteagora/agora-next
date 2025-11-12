@@ -12,8 +12,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy only what's needed to install deps
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+COPY package.json package-lock.json* ./
+RUN npm ci
 
 # ---------- Stage 2: builder ----------
 FROM node:22-bullseye-slim AS builder
@@ -46,8 +46,8 @@ RUN find src/app src/pages -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed
 
 # Build
 RUN npx prisma generate
-RUN yarn generate-typechain
-RUN yarn build
+RUN npm run generate-typechain
+RUN npm run build
 
 # ---------- Stage 3: runner ----------
 FROM node:22-bullseye-slim AS runner
@@ -55,12 +55,11 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-RUN corepack enable && corepack prepare yarn@stable --activate && \
-    groupadd --system --gid 1001 nodejs && \
+RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 nextjs
 
 COPY --chown=nextjs:nodejs --from=builder /app/package.json ./
-COPY --chown=nextjs:nodejs --from=builder /app/yarn.lock ./
+COPY --chown=nextjs:nodejs --from=builder /app/package-lock.json* ./
 COPY --chown=nextjs:nodejs --from=builder /app/.next ./.next
 COPY --chown=nextjs:nodejs --from=builder /app/public ./public
 COPY --chown=nextjs:nodejs --from=builder /app/node_modules ./node_modules
@@ -69,4 +68,4 @@ COPY --chown=nextjs:nodejs --from=builder /app/node_modules ./node_modules
 RUN mkdir -p /home/nextjs/.cache && chown -R nextjs:nodejs /home/nextjs
 USER nextjs
 EXPOSE 3000
-CMD ["yarn","start"]
+CMD ["npm","start"]

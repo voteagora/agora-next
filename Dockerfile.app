@@ -25,8 +25,8 @@ ENV NEXT_PUBLIC_AGORA_INSTANCE_NAME=$NEXT_PUBLIC_AGORA_INSTANCE_NAME
 
 # Build
 RUN npx prisma generate
-RUN yarn generate-typechain
-RUN yarn build
+RUN npm run generate-typechain
+RUN npm run build
 
 # ---------- Stage 3: runner ----------
 FROM node:22-bullseye-slim AS runner
@@ -34,12 +34,11 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-RUN corepack enable && corepack prepare yarn@stable --activate && \
-    groupadd --system --gid 1001 nodejs && \
+RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 nextjs
 
 COPY --chown=nextjs:nodejs --from=builder /app/package.json ./
-COPY --chown=nextjs:nodejs --from=builder /app/yarn.lock ./
+COPY --chown=nextjs:nodejs --from=builder /app/package-lock.json* ./
 COPY --chown=nextjs:nodejs --from=builder /app/.next ./.next
 COPY --chown=nextjs:nodejs --from=builder /app/public ./public
 COPY --chown=nextjs:nodejs --from=builder /app/node_modules ./node_modules
@@ -48,4 +47,4 @@ COPY --chown=nextjs:nodejs --from=builder /app/node_modules ./node_modules
 RUN mkdir -p /home/nextjs/.cache && chown -R nextjs:nodejs /home/nextjs
 USER nextjs
 EXPOSE 3000
-CMD ["yarn","start"]
+CMD ["npm","start"]
