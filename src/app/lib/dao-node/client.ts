@@ -7,7 +7,6 @@ import { DelegateResponse, ProposalType } from "@/lib/types";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
-import { DelegateStats } from "@/lib/types";
 
 const { namespace, ui } = Tenant.current();
 
@@ -426,6 +425,18 @@ export const getDelegateDataFromDaoNode = async (
     return (await delegateRes.json()) as DelegateResponse;
   } catch (error) {
     console.error("Error in getDelegateDataFromDaoNode:", error);
+    return null;
+  }
+};
+
+export const getDelegateVotingPowerFromDaoNode = async (
+  address: string
+): Promise<string | null> => {
+  try {
+    const delegateData = await getDelegateDataFromDaoNode(address);
+    return delegateData?.delegate?.voting_power ?? null;
+  } catch (error) {
+    console.error("Failed to load DAO node voting power:", error);
     return null;
   }
 };
