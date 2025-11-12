@@ -311,7 +311,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "use-daonode-for-votable-supply",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "use-daonode-for-proposal-types",
@@ -359,11 +359,11 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "footer/hide-total-supply",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "footer/hide-votable-supply",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "footer/hide-changelog",
@@ -555,6 +555,10 @@ export const syndicateTenantUIConfig = new TenantUI({
           },
         ],
       },
+    },
+    {
+      name: "include-l3-staking",
+      enabled: true,
     },
   ],
 });
