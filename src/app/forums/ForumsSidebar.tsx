@@ -16,12 +16,16 @@ interface ForumsSidebarProps {
   selectedCategoryId?: number | null;
   categories?: ForumCategory[];
   latestPost?: ForumPost;
+  totalTopicsCount: number;
+  uncategorizedCount?: number;
 }
 
 export default function ForumsSidebar({
   selectedCategoryId = null,
   categories = [],
   latestPost,
+  totalTopicsCount,
+  uncategorizedCount = 0,
 }: ForumsSidebarProps) {
   const sortedCategories = (categories || [])
     .sort((a, b) => {
@@ -36,11 +40,6 @@ export default function ForumsSidebar({
       return a.name.localeCompare(b.name);
     })
     .filter((cat) => (cat.topicsCount ?? 0) > 0);
-
-  const totalTopics = sortedCategories.reduce(
-    (sum: number, cat) => sum + (cat.topicsCount ?? 0),
-    0
-  );
 
   const lastActivityAt = latestPost?.createdAt;
 
@@ -86,8 +85,8 @@ export default function ForumsSidebar({
                   <span className="text-sm">All discussions</span>
                 </div>
                 <span className="text-xs">
-                  {totalTopics}
-                  {totalTopics === 1 ? " topic" : " topics"}
+                  {totalTopicsCount}
+                  {totalTopicsCount === 1 ? " topic" : " topics"}
                 </span>
               </Link>
 
@@ -120,6 +119,27 @@ export default function ForumsSidebar({
                   </Link>
                 );
               })}
+
+              {uncategorizedCount > 0 && (
+                <Link
+                  href="/forums/category/0/uncategorized"
+                  aria-current={selectedCategoryId === 0 ? "page" : undefined}
+                  className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
+                    selectedCategoryId === 0
+                      ? bgStyle
+                      : "hover:bg-hoverBackground text-secondary"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-gray-400"></div>
+                    <span className="text-sm">Uncategorized</span>
+                  </div>
+                  <span className="text-xs">
+                    {uncategorizedCount}
+                    {uncategorizedCount === 1 ? " topic" : " topics"}
+                  </span>
+                </Link>
+              )}
             </div>
           )}
         </div>

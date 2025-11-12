@@ -666,6 +666,61 @@ interface ForumDataOptions {
   offset?: number;
 }
 
+export const getForumTopicsCount = async () => {
+  try {
+    const count = await prismaWeb2Client.forumTopic.count({
+      where: {
+        dao_slug: slug,
+        archived: false,
+        isNsfw: false,
+        deletedAt: null,
+        posts: {
+          some: {
+            isNsfw: false,
+            deletedAt: null,
+          },
+        },
+      },
+    });
+
+    return {
+      success: true,
+      data: count,
+    };
+  } catch (error) {
+    console.error("Error getting forum topics count:", error);
+    return handlePrismaError(error);
+  }
+};
+
+export const getUncategorizedTopicsCount = async () => {
+  try {
+    const count = await prismaWeb2Client.forumTopic.count({
+      where: {
+        dao_slug: slug,
+        archived: false,
+        isNsfw: false,
+        deletedAt: null,
+        categoryId: null,
+        posts: {
+          some: {
+            isNsfw: false,
+            deletedAt: null,
+          },
+        },
+      },
+    });
+
+    return {
+      success: true,
+      data: count,
+    };
+  } catch (error) {
+    console.error("Error getting uncategorized topics count:", error);
+    return handlePrismaError(error);
+  }
+};
+
 export const getForumData = async ({
   categoryId,
   excludeCategoryNames,
@@ -688,7 +743,12 @@ export const getForumData = async ({
     };
 
     if (categoryId !== undefined) {
-      whereClause.categoryId = categoryId;
+      // Special case: categoryId = 0 means uncategorized topics
+      if (categoryId === 0) {
+        whereClause.categoryId = null;
+      } else {
+        whereClause.categoryId = categoryId;
+      }
     } else if (excludeCategoryNames && excludeCategoryNames.length > 0) {
       whereClause.NOT = {
         category: {
@@ -699,7 +759,29 @@ export const getForumData = async ({
       };
     }
 
-    const [topics, admins, categories, latestPost] = await Promise.all([
+    // Base where clause for all topics (for total count - always unfiltered)
+    const baseWhereClause: any = {
+      dao_slug: slug,
+      archived: false,
+      isNsfw: false,
+      deletedAt: null,
+      // Only include topics that have at least one valid post
+      posts: {
+        some: {
+          isNsfw: false,
+          deletedAt: null,
+        },
+      },
+    };
+
+    const [
+      topics,
+      totalCount,
+      admins,
+      categories,
+      latestPost,
+      uncategorizedCount,
+    ] = await Promise.all([
       prismaWeb2Client.forumTopic.findMany({
         where: whereClause,
         include: {
@@ -739,6 +821,11 @@ export const getForumData = async ({
         skip: offset,
       }),
 
+      // Total count across all categories (always unfiltered)
+      prismaWeb2Client.forumTopic.count({
+        where: baseWhereClause,
+      }),
+
       prismaWeb2Client.forumAdmin.findMany({
         where: {
           managedAccounts: {
@@ -755,7 +842,16 @@ export const getForumData = async ({
           _count: {
             select: {
               topics: {
-                where: { archived: false, deletedAt: null },
+                where: {
+                  archived: false,
+                  deletedAt: null,
+                  posts: {
+                    some: {
+                      isNsfw: false,
+                      deletedAt: null,
+                    },
+                  },
+                },
               },
             },
           },
@@ -776,6 +872,23 @@ export const getForumData = async ({
           topicId: true,
           address: true,
           content: true,
+        },
+      }),
+
+      // Count uncategorized topics
+      prismaWeb2Client.forumTopic.count({
+        where: {
+          dao_slug: slug,
+          archived: false,
+          isNsfw: false,
+          deletedAt: null,
+          categoryId: null,
+          posts: {
+            some: {
+              isNsfw: false,
+              deletedAt: null,
+            },
+          },
         },
       }),
     ]);
@@ -809,8 +922,10 @@ export const getForumData = async ({
       success: true,
       data: {
         topics: processedTopics,
+        totalCount,
         admins: adminRolesObj,
         categories: processedCategories,
+        uncategorizedCount,
         latestPost: latestPost
           ? {
               id: latestPost.id,
