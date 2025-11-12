@@ -16,21 +16,21 @@ Keep the order of imports consistent, with the following order:
 
 ## Available formatting commands:
 
-- `yarn prettier-src` - Format all files in src/
-- `yarn check-prettier` - Check if files are properly formatted
+- `npm run prettier-src` - Format all files in src/
+- `npm run check-prettier` - Check if files are properly formatted
 
 ## Project Scripts
 
-- `yarn dev` - Start development server
-- `yarn build` - Build for production
-- `yarn lint` - Run ESLint
-- `yarn typecheck` - Run TypeScript type checking
-- `yarn test` - Run tests
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run lint` - Run ESLint
+- `npm run typecheck` - Run TypeScript type checking
+- `npm test` - Run tests
 
 ## Before committing
 
 Always run these commands before committing:
 
-1. `yarn prettier-src` - Format code
-2. `yarn lint` - Check for linting errors
-3. `yarn typecheck` - Check for TypeScript errors
+1. `npm run prettier-src` - Format code
+2. `npm run lint` - Check for linting errors
+3. `npm run typecheck` - Check for TypeScript errors
