@@ -1,0 +1,87 @@
+---
+alwaysApply: true
+---
+
+# How to run this app in worktrees
+
+When being asked to run this app while in a worktree, you'll need to:
+
+1. Creat an .env file
+2. Install dependencies using yarn
+3. Then only after that will the run work
+4. When in a worktree, there might be multiple localhosts running, so pick a port that isn't being used.
+
+---
+
+Here's the .env file content:
+
+# test contracts
+
+# NEXT_PUBLIC_AGORA_ENV=dev
+
+# main contracts
+
+NEXT_PUBLIC_AGORA_ENV=dev
+NEXT_PUBLIC_ALCHEMY_ID=...
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=cf92cad2f27456d5f8cedc63923d5bc8
+NEXT_PUBLIC_AGORA_API_KEY=...
+NEXT_PUBLIC_AGORA_INSTANCE_TOKEN=SYNDICATE
+NEXT_PUBLIC_AGORA_BASE_URL=http://localhost:3000/api/v1
+NEXT_PUBLIC_AGORA_INSTANCE_NAME=syndicate
+NEXT_PUBLIC_ENABLE_BI_METRICS_CAPTURE=false
+
+# prod
+
+# DATABASE_URL=...
+
+# dev
+
+DATABASE_URL=...
+TENDERLY_ACCESS_KEY=...
+TENDERLY_USER=Agora
+TENDERLY_PROJECT=project
+NEXT_PUBLIC_CONDUIT_KEY=...
+
+# DAONODE_URL_TEMPLATE=https://{TENANT_NAMESPACE}.prod.agoradata.xyz/
+
+DAONODE_URL_TEMPLATE=https://{TENANT_NAMESPACE}.dev.agoradata.xyz/
+
+# NEXT_PUBLIC_FORK_NODE_URL=https://scroll-tests.prod.agoradata.xyz/anvil/
+
+SPONSOR_PRIVATE_KEY=...
+GAS_SPONSOR_PK=...
+NEXT_PUBLIC_ETHERSCAN_API_KEY=...
+EAS_SENDER_PRIVATE_KEY=...
+
+# NEW PROPOSAL SYSTEM CONFIGURATION
+
+# Enable the new domain-driven proposal architecture
+
+USE_NEW_PROPOSAL_SYSTEM=true
+
+# Percentage of traffic to route to new system (0-100)
+
+NEW_SYSTEM_PERCENTAGE=100
+
+# Enable comparison logging between old and new systems
+
+ENABLE_SYSTEM_COMPARISON=false
+
+# Log level for proposal system debugging (error, warn, info, debug)
+
+PROPOSAL_SYSTEM_LOG_LEVEL=debug
+
+# READ_ONLY_WEB3_DATABASE_URL_PROD=...
+
+READ\*WRITE_WEB2_DATABASE_URL_PROD=...
+UPSTASH_REDIS_REST_TOKEN=...
+UPSTASH_REDIS_REST_URL=...
+NEXT_PUBLIC_MEILISEARCH_HOST=...
+MEILISEARCH_API_KEY=...
+NEXT_PUBLIC_MEILISEARCH_CLIENT_API_KEY=...
+OPENAI_SECRET_API_KEY=...
+PINATA_API_KEY=...
+PINATA_SECRET_API_KEY=...
+PINATA_JWT=...
+NEXT_PUBLIC_SIWE_ENABLED=false
+OPENAI_API_KEY=...
