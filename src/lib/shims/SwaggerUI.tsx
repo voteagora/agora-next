@@ -1,12 +1,10 @@
 import React, {
-  type ComponentType,
   type CSSProperties,
   type ReactNode,
 } from "react";
 
 // Avoid resolving to this shim by importing from the package entry via require.
-
-const RawSwaggerUI: ComponentType<any> =
+const RawSwaggerUI: React.ComponentType<any> =
   require("swagger-ui-react").default ?? require("swagger-ui-react");
 
 export type SwaggerUIProps = {
@@ -43,8 +41,9 @@ export type SwaggerUIProps = {
   children?: ReactNode;
 };
 
-const SwaggerUI = (props: SwaggerUIProps) => {
+const SwaggerUI = (props: SwaggerUIProps): JSX.Element => {
   return <RawSwaggerUI {...props} />;
 };
 
 export default SwaggerUI;
+
