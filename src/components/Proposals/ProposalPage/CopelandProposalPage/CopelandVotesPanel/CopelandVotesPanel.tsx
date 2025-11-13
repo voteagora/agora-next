@@ -7,13 +7,16 @@ import { SnapshotVote, VotesSort } from "@/app/api/common/votes/vote";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
+import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import CopelandProposalCriteria from "../CopelandProposalCriteria/CopelandProposalCriteria";
 import CopelandProposalVotesList from "@/components/Votes/CopelandProposalVotesList/CopelandProposalVotesList";
+import ArchiveCopelandProposalVotesList from "@/components/Votes/CopelandProposalVotesList/ArchiveCopelandProposalVotesList";
 import OptionsResultsPanel from "../OptionsResultsPanel/OptionsResultsPanel";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import { Button } from "@/components/ui/button";
 import { Download, Check } from "lucide-react";
+import Tenant from "@/lib/tenant/tenant";
 
 type Props = {
   proposal: Proposal;
@@ -36,6 +39,8 @@ export default function CopelandVotesPanel({
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
+  const { ui } = Tenant.current();
+  const useArchiveVoteHistory = ui.toggle("use-archive-vote-history")?.enabled;
   const hasVotes =
     Number(
       (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"]).votes
@@ -144,7 +149,13 @@ export default function CopelandVotesPanel({
                 }}
               />
             </div>
-            {showVoters ? (
+            {useArchiveVoteHistory ? (
+              showVoters ? (
+                <ArchiveCopelandProposalVotesList proposal={proposal} />
+              ) : (
+                <ArchiveProposalNonVoterList proposal={proposal} />
+              )
+            ) : showVoters ? (
               <CopelandProposalVotesList
                 fetchVotesForProposal={fetchVotesForProposal}
                 fetchUserVotes={fetchUserVotesForProposal}
