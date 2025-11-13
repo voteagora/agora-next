@@ -5,6 +5,7 @@
 **High-level approach**: Replace walls of text with contextual UI elements that appear only when relevant. Leverage the existing HelpButton system and add smart, state-aware components.
 
 ### Proposals Page:
+
 - Remove the "Voting process" info box completely
 - Show clean interface to all users - just hero and proposals list
 - Do NOT add any banners (removed from original plan based on critique)
@@ -13,6 +14,7 @@
 - Enhance the existing HelpButton in header to include comprehensive voting process information
 
 ### Voters Page:
+
 - Remove all four information boxes completely
 - Show clean hero and delegate table to all users
 - For connected users who haven't delegated, show contextual activation card above the delegate table:
@@ -29,12 +31,14 @@
 - Enhance the existing HelpButton to include all delegation information including DUNA legal language
 
 ### Help Panel Enhancements:
+
 - Update `HelpButton` component's `ProposalsHelpContent` with all voting process details
 - Update `HelpButton` component's `VotersHelpContent` with all delegation and legal information
 - Use existing visual patterns (numbered circles, clear sections)
 - Add link at bottom of Help Panel: "For complete documentation, see our Governance Guide" (links to Info tab)
 
 ### Technical Details:
+
 - Use `useAccount()` hook to check if wallet is connected
 - Use `useProfileData()` hook to check if user is delegated (this is already used in existing code)
 - Create one new component: `VoterActivationCard.tsx` for the two-option card
@@ -50,11 +54,13 @@
 ### Proposals Page States:
 
 **State 1: Not Connected**
+
 - Show hero section and proposals list as normal
 - No banners or messages - just clean read-only interface
 - Proposals are clickable but show "Connect wallet to vote" message in the voting UI
 
 **State 2: Connected but Not Delegated**
+
 - Show hero section and proposals list
 - Add one dismissible card between hero and list:
   - Icon + message: "Ready to participate? Activate your voting power on the Voters page"
@@ -64,6 +70,7 @@
 - When user tries to vote without delegation, modal explains and links to Voters page
 
 **State 3: Connected and Delegated**
+
 - Clean interface - just hero and proposals list
 - No messages, banners, or guidance
 - User can immediately interact with all features
@@ -71,6 +78,7 @@
 ### Voters Page States:
 
 **State 1: Not Connected**
+
 - Show hero section
 - Show centered empty state replacing the delegate table:
   - Wallet icon
@@ -79,19 +87,23 @@
   - "Connect Wallet" button (styled prominently)
 
 **State 2: Connected but Not Delegated**
+
 - Show hero section
 - Show activation card with two clear options:
+
   - Heading: "Activate your voting power"
   - Subheading: "Choose how you want to participate:"
   - Two cards side-by-side (stack on mobile):
-    
+
     **Option 1: Self-Delegate**
+
     - User icon
     - "Vote directly"
     - Short description: "Vote on proposals from your wallet"
     - "Delegate to self" button (primary style)
-    
+
     **Option 2: Choose a Delegate**
+
     - Users icon
     - "Delegate to others"
     - Short description: "Select a trusted representative below"
@@ -101,30 +113,36 @@
   - Options: `grid grid-cols-1 md:grid-cols-2 gap-6`
   - Each option: `bg-neutral border border-line rounded-lg p-6 space-y-3`
   - This card has a small dismiss "X" in top-right (persists to session)
+
 - Show full delegate table below the activation card
 
 **State 3: Connected and Delegated to Self**
+
 - Show hero section
 - Show delegate table immediately
 - Small status badge in top-right of page: "✓ Self-delegated" with subtle green accent
 - No large status indicators or messages
 
 **State 4: Connected and Delegated to Others**
+
 - Show hero section
 - Show delegate table with the delegated person's row having a subtle highlight (very light blue background)
 - Small status text above table: "Delegated to [name/address]" with a "Change delegation" link
 - Otherwise clean interface
 
 ### Individual Delegate Profile Pages:
+
 - If viewing a delegate and user is not delegated to anyone: Show sticky bottom bar on desktop, inline button on mobile: "Delegate to [name]" with primary button styling
 - If user is already delegated to someone else: Bar shows "Switch delegation to [name]?" instead
 
 ### Help System:
+
 - Keep existing HelpButton in header for comprehensive information
 - Add info icon tooltips next to technical terms (Voting power, Delegation, etc.)
 - Tooltips are concise - 1-2 sentences max
 
 ### Technical Implementation:
+
 - Create `useDelegationStatus()` hook that returns: `{ isConnected, isDelegated, delegatedTo, hasVotingPower }`
 - Create components:
   - `VoterActivationCard.tsx` - The two-option card
@@ -134,6 +152,7 @@
 - Mobile-responsive: All cards stack appropriately, status badges remain visible
 
 ### Edge Cases:
+
 - Delegated but zero voting power: Show status with "(0 voting power)" and subtle warning icon with tooltip "Your voting power is based on your token balance"
 - Delegation changes mid-session: Listen to wagmi wallet events and update UI reactively
 - Mobile: Status indicators move from top-right to top-center on small screens
@@ -147,6 +166,7 @@
 ### First-Visit Onboarding:
 
 **Detection:**
+
 - Use localStorage: `syndicate_onboarding_completed` (boolean)
 - If true, never show onboarding again
 - If false and this is first visit, show onboarding after 2-second delay (gives user time to orient)
@@ -154,6 +174,7 @@
 **Onboarding Flow (2 Steps):**
 
 **Step 1: Welcome & Voting Process**
+
 - Modal: `max-w-3xl` centered with translucent backdrop
 - Progress: "1 of 2" at top
 - Heading: "Welcome to Syndicate Governance"
@@ -164,6 +185,7 @@
 - Buttons: "Skip tour" (text link, bottom-left) | "Next" (primary button, bottom-right)
 
 **Step 2: Activating Your Power**
+
 - Progress: "2 of 2"
 - Heading: "Ready to participate?"
 - Content:
@@ -175,6 +197,7 @@
 - "Get Started" navigates to Voters page and marks onboarding complete
 
 **After Onboarding:**
+
 - Proposals page: Clean hero + proposals list, no info boxes
 - Voters page: Show the same state-aware UI from Direction 2 (activation card for connected-not-delegated users, clean table for others)
 - "Take tour again" link in footer for users who want to see it again
@@ -184,10 +207,12 @@
 Create new page: `/info/governance`
 
 **Page Structure:**
+
 - Sidebar table of contents (desktop) / collapsible menu (mobile)
 - Main content area with sections:
 
   **Section 1: How Voting Works**
+
   - Overview paragraph
   - Subsections:
     - Temp-Check Phase (requirements, duration, threshold)
@@ -198,6 +223,7 @@ Create new page: `/info/governance`
   - Use visual timeline (same one from onboarding) for process flow
 
   **Section 2: Delegation & Voting Power**
+
   - What is delegation
   - ERC20Votes explanation (keep technical but clear)
   - How to self-delegate (step-by-step)
@@ -206,17 +232,20 @@ Create new page: `/info/governance`
   - Token ownership vs. voting power
 
   **Section 3: DUNA Legal Structure**
+
   - Wyoming DUNA explanation
   - Membership status (all the current legal language lives here)
   - Association Agreement references
   - Rules Committee role and authority
 
   **Section 4: Getting Started**
+
   - Quick start guide for new token holders
   - FAQ section
   - Troubleshooting common issues
 
 **Styling:**
+
 - Typography hierarchy from ui-style.md:
   - `text-3xl font-extrabold text-primary` - Page title
   - `text-2xl font-bold text-primary` - Section headings
@@ -227,12 +256,14 @@ Create new page: `/info/governance`
 - Mobile: Sidebar becomes expandable accordion above content
 
 **Discovery:**
+
 - Add to main Info dropdown menu: "Governance Guide"
 - Link from HelpButton content: "For detailed documentation, visit the Governance Guide"
 - Link in footer: "How Syndicate governance works"
 - Add metadata so it ranks in search engines
 
 ### Onboarding Component Implementation:
+
 - Create `OnboardingFlow.tsx` component
 - Use existing Dialog component from shadcn/ui for modal
 - Simple progress indicator: "1 of 2" text, no fancy graphics
@@ -241,11 +272,13 @@ Create new page: `/info/governance`
 - Mobile: Modal is full-screen on small devices (`h-screen` on `sm:` breakpoint)
 
 ### Re-triggering:
+
 - Add link in footer: "Take tour again"
 - Clicking clears `syndicate_onboarding_completed` and reloads page
 - Also accessible from Help menu dropdown
 
 ### Simplified Approach (based on critique):
+
 - NO analytics tracking initially - keep it simple
 - NO complex "dismiss counting" logic - either completed or not
 - NO different onboarding paths for different entry points - one flow, works everywhere
@@ -253,7 +286,9 @@ Create new page: `/info/governance`
 - YES to skippable and dismissible - never block user against their will
 
 ### Post-Onboarding UX (on Proposals and Voters pages):
+
 Use the same state-aware UI components from Direction 2:
+
 - Connected-not-delegated: Show activation card on Voters page
 - Connected-delegated: Clean interface
 - Not connected: Simple "Connect wallet" messaging
@@ -261,5 +296,3 @@ Use the same state-aware UI components from Direction 2:
 This way, Direction 3 is: Onboarding (first visit only) + Documentation Hub (always available) + Smart state-based UI (ongoing).
 
 ---
-
-
