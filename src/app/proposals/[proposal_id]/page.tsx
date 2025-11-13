@@ -211,7 +211,9 @@ export default async function Page({
   }
 
   const { ui } = Tenant.current();
-  const useArchiveForProposals = ui.toggle("use-archive-for-proposals")?.enabled;
+  const useArchiveForProposals = ui.toggle(
+    "use-archive-for-proposals"
+  )?.enabled;
   console.log("useArchiveForProposals", loadedProposal.proposalType);
   let RenderComponent;
   switch (loadedProposal.proposalType) {

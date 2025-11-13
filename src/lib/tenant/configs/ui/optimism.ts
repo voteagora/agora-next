@@ -233,10 +233,6 @@ export const optimismTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "use-archive-vote-history",
-      enabled: false,
-    },
-    {
       name: "email-subscriptions",
       enabled: true,
     },
@@ -339,6 +335,10 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
     {
       name: "use-daonode-for-proposal-types",
       enabled: false,
+    },
+    {
+      name: "use-archive-vote-history",
+      enabled: true,
     },
     {
       name: "show-participation",

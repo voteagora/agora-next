@@ -59,10 +59,7 @@ export default function ApprovalVotesPanel({
     return fetchVotesForProposal(proposalId, pagination);
   };
 
-  const handleFetchUserVotes = async (
-    proposalId: string,
-    address: string
-  ) => {
+  const handleFetchUserVotes = async (proposalId: string, address: string) => {
     return fetchUserVotes(proposalId, address as `0x${string}`);
   };
 
