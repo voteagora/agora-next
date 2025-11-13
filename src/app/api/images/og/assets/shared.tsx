@@ -1,9 +1,7 @@
-import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { TenantNamespace } from "@/lib/types";
 
-export const LogoPill = () => {
-  const { namespace } = Tenant.current();
+export const LogoPill = ({ namespace }: { namespace: TenantNamespace }) => {
 
   return (
     <div tw="flex">
