@@ -303,6 +303,10 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "use-archive-vote-history",
+      enabled: true,
+    },
+    {
       name: "forums",
       enabled: false,
     },

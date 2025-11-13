@@ -324,6 +324,10 @@ If you meet the proposal threshold or are the manager of the governor, then you 
       enabled: false,
     },
     {
+      name: "use-archive-vote-history",
+      enabled: true,
+    },
+    {
       name: "show-participation",
       enabled: true,
     },

@@ -305,6 +305,10 @@ If you need help creating transactions / calldata, please see this [video](https
       enabled: false,
     },
     {
+      name: "use-archive-vote-history",
+      enabled: true,
+    },
+    {
       name: "forums",
       enabled: false,
     },
