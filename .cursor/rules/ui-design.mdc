@@ -1,0 +1,72 @@
+---
+alwaysApply: true
+---
+
+# Ui design rules
+
+Always follow these rules when you're modifying or creating new UI
+
+## Design process
+
+### First, understand the UI style context
+
+General:
+
+- Do this phase only if ui-style.md is empty. If already exists, read the context carefully and skip to step 1.
+- This step is meant to take a lot of time. It's ok if we spend a lot of context and tokens here. Do not be hasty to infer understanding. You should be comprehensive in your search before writing down your understanding. You should use search, read, and grep liberally.
+- Read any global css styles, themes, and configs carefully line by line.
+- Look at lots of example components to see patterns in usage. Answer each question carefully. Do not skip. Do not guess answers. For every question in the layout pattern section, you should need to search, grep, and read a few files. If you don't, you are not being comprehensive enough.
+- Be brief, and precise.
+
+First, lets understand the design system of this repo:
+
+- What colors exist and how are they typically used?
+- What common type sizes exist and how are they typically used?
+- How do we use spacing in the app? what are the most common spacing sizes we use?
+- How do we handle icons & illustrations? What assets are avialable? When do we use them? How do we determine sizes?
+- How do we handle borders and border radius? What types of styles do we use when?
+- How do we handle shadows & elevation? What shadow / elevation styles do we have and when do we use them?
+- Animations & transitions: what styles do we have in the app today, and when do we use them?
+- Generally, err on the side of being detailed in describing the usage patterns. have Dos and Don'ts
+- There are often errors and inconsistencies for how styles are used in the codebase. Write down your notes as the system is meant to work, not as it does work in practice given bugs and inconsistencies. For example: don't write down legacy styles that are no longer meant to be used. Keep things simply to what's relevant now.
+
+Then, understand the layout patterns. What's available, and when do we typically use which pattern
+
+- How do we handle navigation, tabs, segmente controllers. When do we use each?
+- How do we handle table, lists, filters, sorting
+- What are the main page layout patterns for the major pages?
+- Generally, when do we use center alignment vs left alignment?
+- How do we lay out forms with lots of inputs and buttons?
+- How do we seperate content when composing layout? When do we use whitespace, cards, dividers, etc?
+- How do we notify or explain things to users? Do we have toasts, info icons, banners? When do we use which?
+
+When you are done, update the ui-style.md with your findings. Be comprehensive and specific.
+
+### Create UI that fits in its context and applies our design principles
+
+## Design principles
+
+Follow these general guidelines when working on UI
+
+Positive patterns:
+
+- ALWAYS READ the ui-style.md in full before generating UI
+- Do spend the time to make the design beautiful.
+- Do use micro-interactions and animations.
+- Do make sure that table rows should generally span the full width of their parent.
+- Do use a grid when doing layout. Large blocks of UI should only be allowed full, 1/3, 2/3, 1/4, 3/4, 1/2 width of the page and the page itself should always be the same width unless good reason not to.
+
+Common mistakes:
+
+- Don't make the UI feel "floaty" where nothign is aligned and things just seem to float in space randomly
+- Don't use too many colors and gradients. Never use colors in UI for decoration. Color should have meaning. Links should not be blue by default.
+- Don't overuse of purple. Choose a different color by default unless purple is called for the user or in existing styling.
+- Don't make icons bigger than they are originally sized to be
+- Don't use Emojis
+- Don't overuse cards
+- Don't repeat the same information twice or more on the same page in different components.
+
+Component usage:
+
+- Don't use components for things they're not meant for (cards as table rows, or buttons for nav items in sidebar)
+- Use existing components without modification where possible
