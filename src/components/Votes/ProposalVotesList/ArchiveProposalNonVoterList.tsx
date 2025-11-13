@@ -32,7 +32,7 @@ export default function ArchiveProposalNonVoterList({
 
   useEffect(() => {
     setVisibleCount(NON_VOTERS_PAGE_SIZE);
-  }, [nonVoters.length, selectedVoterType]);
+  }, [selectedVoterType]);
 
   // Determine if we should show the filter
   const shouldShowFilter =
@@ -102,12 +102,15 @@ export default function ArchiveProposalNonVoterList({
     );
   }
 
+  const isOffchain = proposal.proposalType?.includes("OFFCHAIN") ?? false;
+
   return (
     <>
       {shouldShowFilter && (
         <ProposalVoterListFilter
           selectedVoterType={selectedVoterType}
           onVoterTypeChange={setSelectedVoterType}
+          isOffchain={isOffchain}
         />
       )}
       <div
@@ -119,6 +122,7 @@ export default function ArchiveProposalNonVoterList({
         }}
       >
         <InfiniteScroll
+          key={selectedVoterType.type}
           hasMore={hasMore}
           pageStart={0}
           loadMore={loadMore}

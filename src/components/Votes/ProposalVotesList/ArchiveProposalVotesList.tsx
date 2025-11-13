@@ -9,7 +9,7 @@ import { ProposalSingleVote } from "./ProposalSingleVote";
 import type { ProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";
 
-const VOTES_PAGE_SIZE = 10;
+const VOTES_PAGE_SIZE = 20;
 
 type ArchiveProposalVotesListProps = {
   proposal: Proposal;

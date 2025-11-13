@@ -143,12 +143,15 @@ export const ProposalNonVoterList = ({
       : VOTER_TYPES[VOTER_TYPES.length - 1]
   );
 
+  const isOffchain = proposal.proposalType?.includes("OFFCHAIN") ?? false;
+
   return (
     <>
       {offchainProposalId && (
         <ProposalVoterListFilter
           selectedVoterType={selectedVoterType}
           onVoterTypeChange={setSelectedVoterType}
+          isOffchain={isOffchain}
         />
       )}
       <ProposalNonVoterListContent
