@@ -81,15 +81,8 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
   const isOffchainVote = isOffchain(vote);
   const { ui } = Tenant.current();
 
-  const useArchiveVoteHistory = ui.toggle(
-    "use-archive-for-vote-history"
-  )?.enabled;
-  const shouldfetchEnsName =
-    !useArchiveVoteHistory && !vote.voterMetadata?.name;
-
-  const { data: ensName } = useBlockCacheWrappedEns({
+  const { data: ensFromBlockCache } = useBlockCacheWrappedEns({
     address: vote.address as `0x${string}`,
-    enabled: shouldfetchEnsName,
   });
 
   const _onOpenChange = async (open: boolean) => {
@@ -100,6 +93,8 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
       setHovered(open);
     }
   };
+
+  const name = vote.voterMetadata?.name || ensFromBlockCache;
 
   const ensAvatar = () => {
     if (vote.voterMetadata?.image) {
@@ -116,7 +111,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
         </div>
       );
     }
-    return <ENSAvatar ensName={ensName || vote.address} className="w-8 h-8" />;
+    return <ENSAvatar ensName={ensFromBlockCache} className="w-8 h-8" />;
   };
 
   return (
@@ -141,11 +136,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                 <div className="flex flex-col">
                   <div className="text-primary font-bold hover:underline">
                     <Link href={`/delegates/${vote.address}`}>
-                      {vote.voterMetadata?.name ? (
-                        vote.voterMetadata.name
-                      ) : (
-                        <ENSName address={vote.address} />
-                      )}
+                      {name ? name : <ENSName address={vote.address} />}
                     </Link>
                   </div>
                   {vote.citizenType && (
