@@ -42,7 +42,7 @@ ENV NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=$NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
 ENV NEXT_PUBLIC_AGORA_INSTANCE_NAME=$NEXT_PUBLIC_AGORA_INSTANCE_NAME
 
 # this line is uncomments the export const dynamic = 'force-dynamic'; for e2e tests, sprinkled throughout the app
-RUN find src/app src/pages -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i '/\/\/ export const dynamic = .*/s/^...//' {} +
+# RUN find src/app src/pages -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i '/\/\/ export const dynamic = .*/s/^...//' {} +
 
 # Build
 RUN npx prisma generate
