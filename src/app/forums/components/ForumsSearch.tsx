@@ -120,10 +120,13 @@ const DropdownHits: React.FC<DropdownHitsProps> = ({ open, onSelect }) => {
       ) : (
         <ul className="max-h-72 overflow-y-auto py-2">
           {filteredHits.map((hit) => {
-            const content = stripHtmlToText(hit.content || "");
+            const content =
+              hit.contentType === "post"
+                ? stripHtmlToText(hit.content || "")
+                : hit.title;
             const contextLabel =
-              hit.contentType === "post" && hit.topicTitle
-                ? `in ${hit.topicTitle}`
+              hit.contentType === "post" && hit.title
+                ? `in ${hit.title}`
                 : null;
             const createdAt = formatDate(hit.createdAt);
             return (
@@ -131,17 +134,13 @@ const DropdownHits: React.FC<DropdownHitsProps> = ({ open, onSelect }) => {
                 <button
                   type="button"
                   onClick={() => onSelect(hit)}
-                  className="w-full px-4 py-3 text-left hover:bg-hoverBackground focus:bg-hoverBackground focus:outline-none"
+                  className="w-full px-4 py-3 text-left focus:outline-none hover:bg-hoverBackground/5"
                 >
                   <div className="text-sm font-semibold text-primary">
-                    {content}
+                    {content?.slice(0, 100)}
+                    {(content?.length ?? 0) > 100 && "..."}
                   </div>
                   <div className="mt-1 text-xs text-tertiary">
-                    {hit.categoryName && (
-                      <span className="mr-2 uppercase tracking-wide">
-                        {hit.categoryName}
-                      </span>
-                    )}
                     {contextLabel && (
                       <span className="mr-2 lowercase tracking-wide">
                         {contextLabel}

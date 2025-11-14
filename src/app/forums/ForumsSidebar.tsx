@@ -77,7 +77,7 @@ export default function ForumsSidebar({
                 className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
                   selectedCategoryId == null
                     ? bgStyle
-                    : "hover:bg-hoverBackground text-secondary"
+                    : "hover:bg-hoverBackground/5 text-secondary"
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -101,7 +101,7 @@ export default function ForumsSidebar({
                     className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
                       isSelected
                         ? bgStyle
-                        : "hover:bg-hoverBackground text-secondary"
+                        : "hover:bg-hoverBackground/5 text-secondary"
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -127,7 +127,7 @@ export default function ForumsSidebar({
                   className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
                     selectedCategoryId === 0
                       ? bgStyle
-                      : "hover:bg-hoverBackground text-secondary"
+                      : "hover:bg-hoverBackground/5 text-secondary"
                   }`}
                 >
                   <div className="flex items-center gap-2">
