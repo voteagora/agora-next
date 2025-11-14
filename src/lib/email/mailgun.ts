@@ -64,7 +64,9 @@ export async function sendGrantConfirmationEmail({
       .replace("over-50k", "Over $50,000");
 
     // Prepare template variables
+    // Include both the original variable names and the template-specific names
     const templateData = {
+      // Original variable names (for backward compatibility)
       applicant_name: data.applicant_name,
       grant_title: data.grant_title,
       application_id: data.application_id,
@@ -73,10 +75,11 @@ export async function sendGrantConfirmationEmail({
       applicant_email: data.applicant_email,
       telegram_handle: data.telegram_handle,
       support_url: data.support_url || "https://support.agora.vote",
+      // Template-specific variable names
+      org_name: process.env.ORG_NAME || "Syndicate Network Collective",
+      submitted_on: formattedDate,
+      contact_email: data.applicant_email,
     };
-
-    console.log("Sending grant confirmation email to:", to);
-    console.log("Template data:", templateData);
 
     // Send email using Mailgun template
     const result = await mg.messages.create(domain, {
@@ -87,7 +90,6 @@ export async function sendGrantConfirmationEmail({
       "h:X-Mailgun-Variables": JSON.stringify(templateData),
     });
 
-    console.log("Email sent successfully:", result);
     return result;
   } catch (error) {
     console.error("Failed to send grant confirmation email:", error);
@@ -127,19 +129,12 @@ export async function testEmailService() {
     support_url: "https://support.agora.vote",
   };
 
-  console.log("Testing email service...");
-  console.log("Email config valid:", validateEmailConfig());
-
   if (!validateEmailConfig()) {
-    console.error("Email configuration is invalid");
     return false;
   }
 
-  const result = await sendGrantConfirmationEmail({
+  return await sendGrantConfirmationEmail({
     to: "test@example.com",
     data: testData,
   });
-
-  console.log("Test email result:", result);
-  return result;
 }

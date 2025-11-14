@@ -87,21 +87,6 @@ export default async function ThankYouPage() {
                   </p>
                 </div>
               </div>
-
-              <div className="flex items-start">
-                <div className="flex-shrink-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">
-                  3
-                </div>
-                <div>
-                  <h3 className="font-medium text-primary mb-1">
-                    Privacy Protection
-                  </h3>
-                  <p className="text-tertiary text-sm">
-                    Your application remains private until accepted. Only
-                    successful applications become public.
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
 

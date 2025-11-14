@@ -10,8 +10,8 @@ interface Grant {
   description: string;
   slug: string;
   active: boolean;
-  budgetRange: string;
-  deadline: string;
+  budgetRange?: string | null;
+  deadline?: string | null;
 }
 
 export default function GrantsList() {
@@ -67,13 +67,6 @@ export default function GrantsList() {
 
   return (
     <div className="space-y-6">
-      <div className="text-tertiary mb-6">
-        <p>
-          Apply for grants to support the Syndicate Network ecosystem. All
-          applications are private until accepted.
-        </p>
-      </div>
-
       <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
         <div>
           {grants.length === 0 ? (
@@ -99,20 +92,26 @@ export default function GrantsList() {
                           {grant.description}
                         </p>
 
-                        <div className="flex flex-wrap gap-4 text-sm">
-                          <div className="flex items-center gap-2">
-                            <span className="text-tertiary">Budget:</span>
-                            <span className="font-medium text-primary">
-                              {grant.budgetRange}
-                            </span>
+                        {(grant.budgetRange || grant.deadline) && (
+                          <div className="flex flex-wrap gap-4 text-sm">
+                            {grant.budgetRange && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-tertiary">Budget:</span>
+                                <span className="font-medium text-primary">
+                                  {grant.budgetRange}
+                                </span>
+                              </div>
+                            )}
+                            {grant.deadline && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-tertiary">Deadline:</span>
+                                <span className="font-medium text-primary">
+                                  {grant.deadline}
+                                </span>
+                              </div>
+                            )}
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-tertiary">Deadline:</span>
-                            <span className="font-medium text-primary">
-                              {grant.deadline}
-                            </span>
-                          </div>
-                        </div>
+                        )}
                       </div>
 
                       <div className="flex-shrink-0">
