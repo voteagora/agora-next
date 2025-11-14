@@ -13,5 +13,5 @@ RUN apt-get update && apt-get install -y \
 
 # Copy only what's needed to install deps
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile  --legacy-peer-deps
 
