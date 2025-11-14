@@ -297,11 +297,11 @@ For a full walkthrough of the proposal process, check out the [ENS DAO docs](htt
       enabled: false,
     },
     {
-      name: "use-archive-vote-history",
+      name: "use-archive-for-vote-history",
       enabled: true,
     },
     {
-      name: "use-archive-vote-history",
+      name: "use-archive-for-vote-history",
       enabled: true,
     },
     {

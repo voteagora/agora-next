@@ -40,7 +40,9 @@ export default function CopelandVotesPanel({
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
   const { ui } = Tenant.current();
-  const useArchiveVoteHistory = ui.toggle("use-archive-vote-history")?.enabled;
+  const useArchiveVoteHistory = ui.toggle(
+    "use-archive-for-vote-history"
+  )?.enabled;
   const hasVotes =
     Number(
       (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"]).votes

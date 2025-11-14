@@ -1,5 +1,5 @@
 import { Vote } from "@/app/api/common/votes/vote";
-import { useAccount, useEnsName } from "wagmi";
+import { useAccount } from "wagmi";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
@@ -24,6 +24,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
+import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
 
 const { token, ui } = Tenant.current();
 
@@ -77,12 +78,18 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
   const [hovered, setHovered] = useState(false);
   const [hash1, hash2] = vote.transactionHash?.split("|") || [];
 
-  const proposalTypeStr = vote.proposalType || "";
   const isOffchainVote = isOffchain(vote);
+  const { ui } = Tenant.current();
 
-  const { data } = useEnsName({
-    chainId: 1,
+  const useArchiveVoteHistory = ui.toggle(
+    "use-archive-for-vote-history"
+  )?.enabled;
+  const shouldfetchEnsName =
+    !useArchiveVoteHistory && !vote.voterMetadata?.name;
+
+  const { data: ensName } = useBlockCacheWrappedEns({
     address: vote.address as `0x${string}`,
+    enabled: shouldfetchEnsName,
   });
 
   const _onOpenChange = async (open: boolean) => {
@@ -92,6 +99,24 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
       await timeout(100);
       setHovered(open);
     }
+  };
+
+  const ensAvatar = () => {
+    if (vote.voterMetadata?.image) {
+      return (
+        <div
+          className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={vote.voterMetadata.image}
+            alt="avatar"
+            className="w-full h-full object-cover"
+          />
+        </div>
+      );
+    }
+    return <ENSAvatar ensName={ensName || vote.address} className="w-8 h-8" />;
   };
 
   return (
@@ -112,19 +137,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
               className="font-semibold text-secondary"
             >
               <HStack gap={1} alignItems="items-center">
-                {vote.voterMetadata?.image ? (
-                  <div
-                    className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
-                  >
-                    <img
-                      src={vote.voterMetadata.image}
-                      alt="avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <ENSAvatar ensName={data} className="w-8 h-8" />
-                )}
+                {ensAvatar()}
                 <div className="flex flex-col">
                   <div className="text-primary font-bold hover:underline">
                     <Link href={`/delegates/${vote.address}`}>

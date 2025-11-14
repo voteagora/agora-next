@@ -9,6 +9,7 @@ import CopelandProposalSingleVote from "./CopelandProposalSingleVote";
 import type { ProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";
 import { cn } from "@/lib/utils";
+import { ParsedProposalData } from "@/lib/proposalUtils";
 
 const VOTES_PAGE_SIZE = 20;
 
@@ -23,7 +24,9 @@ export default function ArchiveCopelandProposalVotesList({
   const [visibleCount, setVisibleCount] = useState(VOTES_PAGE_SIZE);
 
   const proposalType: ProposalType = proposal.proposalType ?? "SNAPSHOT";
-
+  const choices =
+    (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
+      ?.choices ?? [];
   let startBlock: bigint | number | null = null;
   if (proposal.startBlock !== null && proposal.startBlock !== undefined) {
     startBlock =
@@ -47,7 +50,7 @@ export default function ArchiveCopelandProposalVotesList({
   const normalizedVotes = useMemo(() => {
     return votes.map((vote): SnapshotVote => {
       // For Copeland votes, params contains the ranked choices
-      const choiceLabels = vote.params?.map((idx) => `Choice ${idx + 1}`) ?? [];
+      const choiceLabels = vote.params?.map((idx) => choices[idx - 1]) ?? [];
 
       return {
         id: vote.transactionHash || `${vote.address}-${vote.blockNumber}`,

@@ -19,7 +19,9 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
   const [showVoters, setShowVoters] = useState(true);
   const isOffchain = proposal.proposalType?.startsWith("OFFCHAIN");
   const { ui } = Tenant.current();
-  const useArchiveVoteHistory = ui.toggle("use-archive-vote-history")?.enabled;
+  const useArchiveVoteHistory = ui.toggle(
+    "use-archive-for-vote-history"
+  )?.enabled;
 
   const handleClick = () => {
     setIsClicked(!isClicked);

@@ -214,7 +214,7 @@ export default async function Page({
   const useArchiveForProposals = ui.toggle(
     "use-archive-for-proposals"
   )?.enabled;
-  console.log("useArchiveForProposals", loadedProposal.proposalType);
+
   let RenderComponent;
   switch (loadedProposal.proposalType) {
     case "STANDARD":

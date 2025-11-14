@@ -138,7 +138,9 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
   const [activeTab, setActiveTab] = useState("results");
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const { ui } = Tenant.current();
-  const useArchiveVoteHistory = ui.toggle("use-archive-vote-history")?.enabled;
+  const useArchiveVoteHistory = ui.toggle(
+    "use-archive-for-vote-history"
+  )?.enabled;
   const proposalData =
     proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"];
 

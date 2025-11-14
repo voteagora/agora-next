@@ -6,10 +6,14 @@ import { parseSupport } from "@/lib/voteUtils";
 export type ArchiveVote = {
   transactionHash: string | null;
   address: string;
-  support: "AGAINST" | "ABSTAIN" | "FOR";
+  support: "AGAINST" | "ABSTAIN" | "FOR" | null;
   weight: string;
   citizenType: string | null;
-  voterMetadata: null;
+  voterMetadata: {
+    name: string | null;
+    image: string | null;
+    type: string | null;
+  } | null;
   proposalId: string;
   proposalType: ProposalType;
   params: number[] | null;
@@ -25,7 +29,11 @@ export type ArchiveNonVoter = {
   warpcast: string | null;
   discord: string | null;
   citizen_type: string | null;
-  voterMetadata: null;
+  voterMetadata: {
+    name: string;
+    image: string;
+    type: string;
+  } | null;
 };
 
 const ARCHIVE_VOTES_QK = "archiveVotes";
@@ -111,35 +119,32 @@ async function fetchArchiveVotes({
 
   const votes =
     payload.data?.map((row) => {
-      const support = parseSupport(
-        row.support ?? null,
-        proposalType,
-        startBlockString
-      );
-
-      const normalizedParams = (() => {
-        if (!row.params || !Array.isArray(row.params)) {
-          return null;
-        }
-
-        const numericParams = row.params
-          .map((value) => Number(value))
-          .filter((value) => Number.isFinite(value));
-
-        return numericParams.length > 0 ? numericParams : null;
-      })();
+      const support =
+        row.support === null
+          ? null
+          : parseSupport(row.support ?? null, proposalType, startBlockString);
+      const vp = row.weight !== undefined ? String(row.weight) : undefined;
+      const vpForCopelanProposalType =
+        row.vp !== undefined ? String(row.vp) : undefined;
 
       return {
         transactionHash: row.transaction_hash ?? null,
         address: row.voter?.toLowerCase(),
         support,
-        weight: row.weight !== undefined ? String(row.weight) : "0",
+        weight: vp || vpForCopelanProposalType || "0",
         citizenType: row.citizen_type ?? null,
-        voterMetadata: null,
+        voterMetadata:
+          row.name || row.ens
+            ? {
+                name: row.name || row.ens || "",
+                image: row.image ?? null,
+                type: row.citizen_type || "",
+              }
+            : null,
         proposalId,
         proposalType,
         reason: row.reason ?? null,
-        params: normalizedParams,
+        params: row.params || row.choice || null,
         blockNumber: row.block_number,
         timestamp: row.ts ? new Date(Number(row.ts)) : null,
       } satisfies ArchiveVote;
@@ -221,8 +226,15 @@ async function fetchArchiveNonVoters({
         warpcast: row.warpcast ?? null,
         discord: row.discord ?? null,
         citizen_type: row.citizen_type ?? null,
-        voterMetadata: null,
-      });
+        voterMetadata:
+          row.name || row.ens
+            ? {
+                name: row.name || row.ens || "",
+                image: row.image || "",
+                type: row.citizen_type || "",
+              }
+            : null,
+      } satisfies ArchiveNonVoter);
 
       return acc;
     }, []) ?? [];

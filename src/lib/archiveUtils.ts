@@ -167,11 +167,16 @@ export type ArchiveVoteRow = {
   support?: string | null;
   weight?: string | number;
   reason?: string | null;
-  params?: Array<string | number> | string | null;
+  params?: Array<number> | null;
+  choice?: Array<number> | null; // for Copeland proposal type
+  vp?: string | number; // for Copeland proposal type
   ts?: number | string | null;
   x?: string | null;
   warpcast?: string | null;
   discord?: string | null;
+  name?: string | null;
+  image?: string | null;
+  ens?: string | null;
 };
 
 export type ArchiveNonVoterRow = {
@@ -183,6 +188,8 @@ export type ArchiveNonVoterRow = {
   x?: string | null;
   warpcast?: string | null;
   discord?: string | null;
+  name?: string | null;
+  image?: string | null;
 };
 
 const isBrowser = typeof window !== "undefined";

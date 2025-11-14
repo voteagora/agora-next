@@ -1,7 +1,7 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import ENSAvatar from "@/components/shared/ENSAvatar";
-import { useAccount, useEnsName } from "wagmi";
+import { useAccount } from "wagmi";
 import discordIcon from "@/icons/discord.svg";
 import xIcon from "@/icons/x.svg";
 import warpcastIcon from "@/icons/warpcast.svg";
@@ -14,6 +14,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import ENSName from "@/components/shared/ENSName";
 import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
+import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
 
 export function ProposalSingleNonVoter({
   voter,
@@ -36,15 +37,42 @@ export function ProposalSingleNonVoter({
 }) {
   const { namespace, ui } = Tenant.current();
 
+  const useArchiveVoteHistory = ui.toggle(
+    "use-archive-for-vote-history"
+  )?.enabled;
+  const shouldfetchEnsName =
+    !useArchiveVoteHistory && !voter.voterMetadata?.name;
+
+  const { data: ensName } = useBlockCacheWrappedEns({
+    address: voter.delegate as `0x${string}`,
+    enabled: shouldfetchEnsName,
+  });
+
   const { address: connectedAddress } = useAccount();
 
   const { data: pastVotes } = useGetVotes({
     address: voter.delegate as `0x${string}`,
     blockNumber: BigInt(proposal.snapshotBlockNumber),
-    enabled:
-      namespace !== TENANT_NAMESPACES.UNISWAP &&
-      proposal.snapshotBlockNumber !== undefined,
+    enabled: namespace !== TENANT_NAMESPACES.UNISWAP && !useArchiveVoteHistory,
   });
+
+  const ensAvatar = () => {
+    if (voter.voterMetadata?.image) {
+      return (
+        <div
+          className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={voter.voterMetadata.image}
+            alt="avatar"
+            className="w-full h-full object-cover"
+          />
+        </div>
+      );
+    }
+    return <ENSAvatar ensName={voter.delegate} className="w-8 h-8" />;
+  };
 
   return (
     <VStack
@@ -57,22 +85,7 @@ export function ProposalSingleNonVoter({
         className="font-semibold text-secondary"
       >
         <HStack gap={1} alignItems="items-center">
-          {voter.voterMetadata?.image ? (
-            <div
-              className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
-            >
-              <img
-                src={voter.voterMetadata.image}
-                alt="avatar"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ) : (
-            <ENSAvatar
-              ensName={voter.voterMetadata?.name}
-              className="w-8 h-8"
-            />
-          )}
+          {ensAvatar()}
           <div className="flex flex-col">
             <div className="text-primary font-bold hover:underline">
               <Link href={`/delegates/${voter.delegate}`}>

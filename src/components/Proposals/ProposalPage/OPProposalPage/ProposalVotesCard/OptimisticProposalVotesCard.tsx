@@ -37,7 +37,9 @@ const OptimisticProposalVotesCard = ({
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [showVoters, setShowVoters] = useState(true);
   const isOffchain = proposal.proposalType?.startsWith("OFFCHAIN");
-  const useArchiveVoteHistory = ui.toggle("use-archive-vote-history")?.enabled;
+  const useArchiveVoteHistory = ui.toggle(
+    "use-archive-for-vote-history"
+  )?.enabled;
 
   // Get voting data to check if user has already voted
   const isOptimismTenant =
