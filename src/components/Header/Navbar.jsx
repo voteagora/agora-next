@@ -51,6 +51,8 @@ export default function Navbar() {
       setActiveNavItem("coming-soon");
     } else if (path === "forums" && linkRefs.current["forums"]) {
       setActiveNavItem("forums");
+    } else if (path === "document-archive" && linkRefs.current["info"]) {
+      setActiveNavItem("info");
     }
   }, [pathname]);
 

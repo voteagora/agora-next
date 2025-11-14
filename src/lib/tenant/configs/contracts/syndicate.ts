@@ -1,11 +1,14 @@
-import { ERC20__factory } from "@/lib/contracts/generated";
+import {
+  AgoraGovernor__factory,
+  ERC20__factory,
+} from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { AlchemyProvider, JsonRpcProvider } from "ethers";
+import { AlchemyProvider, JsonRpcProvider, BaseContract } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
-import { BaseContract } from "ethers";
+import { DELEGATION_MODEL } from "@/lib/constants";
 
 interface Props {
   isProd: boolean;
@@ -16,15 +19,16 @@ export const syndicateTenantConfig = ({
   isProd,
   alchemyId,
 }: Props): TenantContracts => {
-  // TODO: Replace with actual syndicate token address when available
   const TOKEN = isProd
-    ? "0x0000000000000000000000000000000000000000" // Placeholder for prod
-    : "0x0000000000000000000000000000000000000000"; // Placeholder for dev
+    ? "0x1bAB804803159aD84b8854581AA53AC72455614E"
+    : "0x55f6e82a8BF5736d46837246DcBEAf7e61b3c27C";
 
-  // dummy addresses; for now: syndicate is info-only
-  const DUMMY_GOVERNOR = "0x0000000000000000000000000000000000000002";
+  const DAO_ID = isProd
+    ? "0x73796e6469636174652e000000010000008e2647"
+    : "0x73796e6469636174652e00aa36a7000000a58d9f";
+
   const DUMMY_TIMELOCK = "0x0000000000000000000000000000000000000003";
-  const DUMMY_TYPES = "0x0000000000000000000000000000000000000004";
+  const DUMMY_TYPES = "0x0000000000000000000000000000000000000000";
 
   const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
 
@@ -47,10 +51,10 @@ export const syndicateTenantConfig = ({
     }),
 
     governor: new TenantContract<IGovernorContract>({
-      abi: [],
-      address: DUMMY_GOVERNOR,
+      abi: AgoraGovernor__factory.abi,
+      address: DAO_ID,
       chain,
-      contract: {} as IGovernorContract,
+      contract: AgoraGovernor__factory.connect(DAO_ID, provider),
       provider,
     }),
 
@@ -70,6 +74,10 @@ export const syndicateTenantConfig = ({
       provider,
     }),
 
+    delegationModel: DELEGATION_MODEL.FULL,
     treasury: [],
+    easRecipient: isProd
+      ? "0x73796e6469636174652e000000010000008e2647"
+      : "0x73796e6469636174652e00aa36a7000000a58d9f",
   };
 };

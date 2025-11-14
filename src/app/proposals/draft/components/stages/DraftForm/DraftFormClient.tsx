@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 import { useState, useEffect, useMemo } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,7 +37,7 @@ import { FormattedProposalType } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSettings";
 import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import { TENANT_NAMESPACES, LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
 
 const { ui, namespace } = Tenant.current();
 
@@ -177,6 +177,7 @@ const DraftFormClient = ({
   );
   const router = useRouter();
   const { address } = useAccount();
+  const messageSigner = useSignMessage();
 
   const methods = useForm<z.output<typeof DraftProposalSchema>>({
     resolver: zodResolver(DraftProposalSchema),
@@ -211,6 +212,17 @@ const DraftFormClient = ({
     }
   }, [votingModuleType, proposalTypes, methods]);
 
+  // Ensure proposalConfigType is set when returning from other stages
+  useEffect(() => {
+    const current = methods.getValues("proposalConfigType");
+    if (!current && validProposalTypes.length > 0) {
+      methods.setValue(
+        "proposalConfigType",
+        validProposalTypes[0].proposal_type_id
+      );
+    }
+  }, [validProposalTypes, methods]);
+
   const onSubmit = async (data: z.output<typeof DraftProposalSchema>) => {
     if (isPending) {
       return;
@@ -223,10 +235,41 @@ const DraftFormClient = ({
         toast("Account not connected.");
         return;
       }
+      // Guard: require SIWE JWT before prompting signature for this action
+      try {
+        const session = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
+        if (!session) {
+          toast("Session expired. Please sign in to continue.");
+          window.location.reload();
+          return;
+        }
+      } catch {
+        toast("Session expired. Please sign in to continue.");
+        window.location.reload();
+        return;
+      }
+      const messagePayload = {
+        action: "updateDraft",
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+        timestamp: new Date().toISOString(),
+      };
+      const message = JSON.stringify(messagePayload);
+      const signature = await messageSigner
+        .signMessageAsync({ message })
+        .catch(() => undefined);
+      if (!signature) {
+        setIsPending(false);
+        toast("Signature failed");
+        return;
+      }
+
       const res = await draftProposalAction({
         ...data,
         draftProposalId: draftProposal.id,
         creatorAddress: address,
+        message,
+        signature,
       });
       if (!res.ok) {
         setIsPending(false);
@@ -234,7 +277,7 @@ const DraftFormClient = ({
         return;
       } else {
         invalidatePath(draftProposal.id);
-        const nextId = draftProposal.uuid ?? draftProposal.id;
+        const nextId = draftProposal.uuid;
         router.push(`/proposals/draft/${nextId}?stage=${stageIndex + 1}`);
       }
     } catch (error: any) {
@@ -343,9 +386,10 @@ const DraftFormClient = ({
               <UpdatedButton
                 fullWidth={true}
                 type="primary"
-                isSubmit={true}
+                isSubmit={false}
                 className="w-[200px] flex items-center justify-center"
                 isLoading={isPending}
+                onClick={handleSubmit(onSubmit)}
               >
                 {draftProposal.title ? "Update draft" : "Create draft"}
               </UpdatedButton>

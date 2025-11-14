@@ -15,6 +15,7 @@ import ListItem from "@tiptap/extension-list-item";
 import Blockquote from "@tiptap/extension-blockquote";
 import HardBreak from "@tiptap/extension-hard-break";
 import Link from "@tiptap/extension-link";
+import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { cn } from "@/lib/utils";
 import {
@@ -25,6 +26,10 @@ import {
 } from "@/components/ui/tooltip";
 import { ListOrdered, Quote } from "lucide-react";
 import Tenant from "@/lib/tenant/tenant";
+import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { convertFileToAttachmentData } from "@/lib/fileUtils";
+import { useAccount } from "wagmi";
+import toast from "react-hot-toast";
 
 // Toolbar button component
 const ToolbarButton = ({
@@ -153,6 +158,8 @@ export interface DunaEditorProps {
   disabled?: boolean;
   className?: string;
   variant?: "post" | "comment";
+  // For IPFS image uploads
+  onImageUpload?: (file: File) => Promise<string | undefined>;
 }
 
 export default function DunaEditor({
@@ -164,17 +171,18 @@ export default function DunaEditor({
   disabled = false,
   className,
   variant = "post",
+  onImageUpload,
 }: DunaEditorProps) {
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [linkDialogUrl, setLinkDialogUrl] = useState("");
   const { ui } = Tenant.current();
+  const { address, isConnected } = useAccount();
 
   // Debug link dialog state
   useEffect(() => {
     console.log("Link dialog state:", { linkDialogOpen, linkDialogUrl });
   }, [linkDialogOpen, linkDialogUrl]);
   const [isMounted, setIsMounted] = useState(false);
-  const [forceUpdate, setForceUpdate] = useState(0);
 
   // Ensure we're on the client side
   useEffect(() => {
@@ -202,6 +210,13 @@ export default function DunaEditor({
           rel: "noopener noreferrer",
         },
         validate: (href) => /^https?:\/\//.test(href),
+      }),
+      Image.configure({
+        HTMLAttributes: {
+          class: "max-w-full h-auto rounded-lg my-2",
+        },
+        inline: false,
+        allowBase64: true,
       }),
       Placeholder.configure({
         placeholder,
@@ -241,30 +256,11 @@ export default function DunaEditor({
     }
   }, [value, editor]);
 
-  // Listen for editor updates to force re-renders
-  useEffect(() => {
-    if (!editor) return;
-
-    const handleUpdate = () => {
-      setForceUpdate((prev) => prev + 1);
-    };
-
-    editor.on("update", handleUpdate);
-    editor.on("selectionUpdate", handleUpdate);
-
-    return () => {
-      editor.off("update", handleUpdate);
-      editor.off("selectionUpdate", handleUpdate);
-    };
-  }, [editor]);
-
   // Handle submit
   const handleSubmit = useCallback(() => {
     if (editor && onSubmit) {
       const html = editor.getHTML();
       const text = editor.getText();
-      console.log("DunaEditor handleSubmit - HTML:", html);
-      console.log("DunaEditor handleSubmit - Text:", text);
       onSubmit(html, text);
     }
   }, [editor, onSubmit]);
@@ -283,38 +279,84 @@ export default function DunaEditor({
   // Toolbar actions
   const toggleBold = useCallback(() => {
     editor?.chain().focus().toggleBold().run();
-    setForceUpdate((prev) => prev + 1);
   }, [editor]);
 
   const toggleItalic = useCallback(() => {
     editor?.chain().focus().toggleItalic().run();
-    setForceUpdate((prev) => prev + 1);
   }, [editor]);
 
   const toggleStrike = useCallback(() => {
     editor?.chain().focus().toggleStrike().run();
-    setForceUpdate((prev) => prev + 1);
   }, [editor]);
 
   const toggleCode = useCallback(() => {
     editor?.chain().focus().toggleCode().run();
-    setForceUpdate((prev) => prev + 1);
   }, [editor]);
 
   const toggleOrderedList = useCallback(() => {
     editor?.chain().focus().toggleOrderedList().run();
-    setForceUpdate((prev) => prev + 1);
   }, [editor]);
 
   const toggleBulletList = useCallback(() => {
     editor?.chain().focus().toggleBulletList().run();
-    setForceUpdate((prev) => prev + 1);
   }, [editor]);
 
   const toggleBlockquote = useCallback(() => {
     editor?.chain().focus().toggleBlockquote().run();
-    setForceUpdate((prev) => prev + 1);
   }, [editor]);
+
+  const addImage = useCallback(async () => {
+    if (!editor || !isConnected || !address) {
+      toast.error("Please connect your wallet to upload images");
+      return;
+    }
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        // Show loading state
+        const loadingToast = toast.loading("Uploading image...");
+
+        try {
+          let imageUrl;
+
+          if (onImageUpload) {
+            // Use custom upload handler (for new posts)
+            imageUrl = await onImageUpload(file);
+          } else {
+            // Use IPFS upload only (no database record)
+            const attachmentData = await convertFileToAttachmentData(file);
+            const uploadResult = await uploadToIPFSOnly(
+              attachmentData,
+              address
+            );
+
+            if (!uploadResult.success || !uploadResult.ipfsUrl) {
+              throw new Error(uploadResult.error || "Upload failed");
+            }
+
+            imageUrl = uploadResult.ipfsUrl;
+          }
+          if (!imageUrl) {
+            throw new Error("Failed to upload image");
+          }
+          // Insert URL into editor
+          editor.chain().focus().setImage({ src: imageUrl }).run();
+          toast.dismiss(loadingToast);
+          toast.success("Image uploaded successfully!");
+        } catch (error) {
+          toast.dismiss(loadingToast);
+          toast.error(
+            error instanceof Error ? error.message : "Failed to upload image"
+          );
+        }
+      }
+    };
+    input.click();
+  }, [editor, isConnected, address, onImageUpload]);
 
   const handleLink = useCallback(() => {
     if (!editor) return;
@@ -325,7 +367,6 @@ export default function DunaEditor({
     if (isLink) {
       // Remove link if already active
       editor.chain().focus().unsetLink().run();
-      setForceUpdate((prev) => prev + 1);
     } else {
       // Open link dialog
       const selectedText = editor.state.doc.textBetween(from, to);
@@ -357,7 +398,6 @@ export default function DunaEditor({
           .run();
         console.log("Inserted link as text");
       }
-      setForceUpdate((prev) => prev + 1);
     },
     [editor]
   );
@@ -391,7 +431,7 @@ export default function DunaEditor({
   return (
     <div
       className={cn(
-        "border rounded-lg shadow-sm transition-all",
+        "border rounded-lg shadow-sm transition-all flex flex-col",
         variant === "post" ? "min-h-[200px]" : "min-h-[120px]",
         className
       )}
@@ -532,15 +572,37 @@ export default function DunaEditor({
             />
           </svg>
         </ToolbarButton>
+
+        <ToolbarButton
+          onClick={addImage}
+          disabled={disabled}
+          tooltip="Add image"
+          isActive={false}
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+        </ToolbarButton>
       </div>
 
       {/* Editor content */}
       <div
         className={cn(
-          "p-3 outline-none",
+          "p-3 outline-none flex-1 flex flex-col cursor-text",
           variant === "post" ? "min-h-[160px]" : "min-h-[80px]"
         )}
         onKeyDown={handleKeyDown}
+        onClick={() => editor?.chain().focus().run()}
         style={{
           color: ui.customization?.cardBackground ? "white" : "inherit",
         }}

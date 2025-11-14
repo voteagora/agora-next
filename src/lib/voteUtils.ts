@@ -192,8 +192,8 @@ export function parseSnapshotVote(vote: SnapshotVotePayload): SnapshotVote {
 
 export async function parseVote(
   vote: VotePayload,
-  proposalData: ParsedProposalData[ProposalType],
-  latestBlock: Block | null
+  proposalData?: ParsedProposalData[ProposalType],
+  latestBlock?: Block | null
 ): Promise<Vote> {
   const { contracts } = Tenant.current();
   let blockNumber = vote.block_number;
@@ -211,8 +211,10 @@ export async function parseVote(
     support: parseSupport(vote.support, vote.proposal_type, vote.start_block),
     weight: vote.weight.toFixed(0),
     reason: vote.reason,
-    params: parseParams(vote.params, proposalData),
-    proposalValue: getProposalTotalValue(proposalData) || BigInt(0),
+    params: proposalData ? parseParams(vote.params, proposalData) : null,
+    proposalValue: proposalData
+      ? (getProposalTotalValue(proposalData) ?? BigInt(0))
+      : BigInt(0),
     proposalTitle: getTitleFromProposalDescription(vote.description || ""),
     proposalType: vote.proposal_type,
     blockNumber: vote.block_number,

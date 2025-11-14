@@ -20,6 +20,7 @@ import {
   ProposalType,
 } from "../types";
 import Tenant from "@/lib/tenant/tenant";
+import { useAccount, useSignMessage } from "wagmi";
 
 const RequestSponsorshipForm = ({
   draftProposal,
@@ -31,6 +32,8 @@ const RequestSponsorshipForm = ({
   const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
   const [isPending, setIsPending] = useState(false);
   const { watch, control } = useFormContext();
+  const { address: creatorAddress } = useAccount();
+  const messageSigner = useSignMessage();
 
   const address = watch("sponsorAddress");
   const votingModuleType = draftProposal.voting_module_type;
@@ -121,9 +124,26 @@ const RequestSponsorshipForm = ({
         onClick={async () => {
           if (canAddressSponsor) {
             setIsPending(true);
+            const messagePayload = {
+              action: "requestSponsorship",
+              draftProposalId: draftProposal.id,
+              creatorAddress,
+              timestamp: new Date().toISOString(),
+            };
+            const message = JSON.stringify(messagePayload);
+            const signature = await messageSigner
+              .signMessageAsync({ message })
+              .catch(() => undefined);
+            if (!signature) {
+              setIsPending(false);
+              return;
+            }
             const res = await requestSponsorshipAction({
               draftProposalId: draftProposal.id,
               sponsor_address: address,
+              creatorAddress: creatorAddress as `0x${string}`,
+              message,
+              signature,
             });
             setIsPending(false);
             if (res.ok) {

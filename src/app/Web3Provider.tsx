@@ -40,42 +40,61 @@ const tokenChainId = toNumericChainId(contracts.token.chain.id);
 
 const normalizedTokenChain = { ...contracts.token.chain, id: tokenChainId };
 
-export const config = createConfig(
-  getDefaultConfig({
-    walletConnectProjectId: projectId,
-    chains: [normalizedTokenChain, mainnet],
-    transports: {
-      [mainnet.id]: getTransportForChain(mainnet.id)!,
-      [tokenChainId]: getTransportForChain(tokenChainId)!,
-    },
-    appName: metadata.name,
-    appDescription: metadata.description,
-    appUrl: metadata.url,
-  })
-);
+// Create config only on client side to avoid SSR issues with indexedDB
+export const config =
+  typeof window !== "undefined"
+    ? createConfig(
+        getDefaultConfig({
+          walletConnectProjectId: projectId,
+          chains: [normalizedTokenChain, mainnet],
+          transports: {
+            [mainnet.id]: getTransportForChain(mainnet.id)!,
+            [tokenChainId]: getTransportForChain(tokenChainId)!,
+          },
+          appName: metadata.name,
+          appDescription: metadata.description,
+          appUrl: metadata.url,
+          enableFamily: false,
+        })
+      )
+    : createConfig({
+        chains: [normalizedTokenChain, mainnet],
+        transports: {
+          [mainnet.id]: getTransportForChain(mainnet.id)!,
+          [tokenChainId]: getTransportForChain(tokenChainId)!,
+        },
+      });
 
-const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
-  <WagmiProvider config={config}>
-    <QueryClientProvider client={queryClient}>
-      <SIWEProvider {...siweProviderConfig}>
-        <ConnectKitProvider options={{ enforceSupportedChains: false }}>
-          <body className={inter.variable}>
-            <noscript>You need to enable JavaScript to run this app.</noscript>
-            {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
-            {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
-            <ConnectButtonProvider>
-              <PageContainer>
-                <Toaster />
-                <AgoraProvider>{children}</AgoraProvider>
-              </PageContainer>
-            </ConnectButtonProvider>
-            {!shouldHideAgoraBranding && <Footer />}
-            <SpeedInsights />
-          </body>
-        </ConnectKitProvider>
-      </SIWEProvider>
-    </QueryClientProvider>
-  </WagmiProvider>
-);
+const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => {
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <SIWEProvider
+          {...siweProviderConfig}
+          enabled={siweProviderConfig.enabled}
+        >
+          <ConnectKitProvider options={{ enforceSupportedChains: false }}>
+            <body className={inter.variable}>
+              <noscript>
+                You need to enable JavaScript to run this app.
+              </noscript>
+              {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
+
+              {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
+              <ConnectButtonProvider>
+                <PageContainer>
+                  <Toaster />
+                  <AgoraProvider>{children}</AgoraProvider>
+                </PageContainer>
+              </ConnectButtonProvider>
+              {!shouldHideAgoraBranding && <Footer />}
+              <SpeedInsights />
+            </body>
+          </ConnectKitProvider>
+        </SIWEProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
+};
 
 export default Web3Provider;

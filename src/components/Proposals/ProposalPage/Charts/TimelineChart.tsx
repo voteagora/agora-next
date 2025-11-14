@@ -43,12 +43,43 @@ type ChartData = {
   total: number;
 };
 
+type RangeProposalType = {
+  min_quorum_pct: number;
+  max_quorum_pct: number;
+  min_approval_threshold_pct: number;
+  max_approval_threshold_pct: number;
+};
+
 export const TimelineChart = ({ votes, proposal }: Props) => {
   const { data: block } = useLatestBlock({ enabled: true });
   const [chartData, setChartData] = useState<ChartData[] | null>(null);
 
   const isProposalCreatedBeforeUpgrade =
     isProposalCreatedBeforeUpgradeCheck(proposal);
+
+  // Check if this is an archive proposal with ranges (pending state)
+  const archiveMetadata = (
+    proposal as unknown as {
+      archiveMetadata?: { source?: string; defaultProposalTypeRanges?: any };
+    }
+  ).archiveMetadata;
+
+  const defaultProposalTypeRanges =
+    archiveMetadata?.source === "eas-oodao"
+      ? (archiveMetadata.defaultProposalTypeRanges as
+          | RangeProposalType
+          | undefined)
+      : null;
+
+  // Calculate quorum values from ranges (assuming max votes per token is similar to standard)
+  const minQuorumValue = defaultProposalTypeRanges
+    ? (defaultProposalTypeRanges.min_quorum_pct / 10000) *
+      Number(proposal.quorum || 0)
+    : null;
+  const maxQuorumValue = defaultProposalTypeRanges
+    ? (defaultProposalTypeRanges.max_quorum_pct / 10000) *
+      Number(proposal.quorum || 0)
+    : null;
 
   let stackIds: { [key: string]: string } = {
     for: "1",
@@ -127,9 +158,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
 
           <YAxis
             className="text-xs font-inter font-semibold fill:text-primary/30 fill"
-            tick={{
-              fill: rgbStringToHex(ui.customization?.tertiary),
-            }}
+            tick={{ fill: rgbStringToHex(ui.customization?.tertiary) }}
             tickFormatter={(value, index) =>
               yTickFormatter(value, index, proposal.proposalType === "SNAPSHOT")
             }
@@ -175,19 +204,55 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
               }
             })()}
           />
-          {!!proposal.quorum && !isProposalCreatedBeforeUpgrade && (
-            <ReferenceLine
-              y={+proposal.quorum.toString()}
-              strokeWidth={1}
-              strokeDasharray="3 3"
-              stroke="#4F4F4F"
-              label={{
-                position: "insideBottomLeft",
-                value: "QUORUM",
-                className: "text-xs font-inter font-semibold",
-                fill: "#565656",
-              }}
-            />
+          {minQuorumValue !== null &&
+          maxQuorumValue !== null &&
+          minQuorumValue !== maxQuorumValue ? (
+            <>
+              {/* Min quorum line */}
+              <ReferenceLine
+                y={minQuorumValue}
+                strokeWidth={1}
+                strokeDasharray="3 3"
+                stroke="#4F4F4F"
+                strokeOpacity={0.6}
+                label={{
+                  position: "insideBottomLeft",
+                  value: "MIN QUORUM",
+                  className: "text-xs font-inter font-semibold",
+                  fill: "#565656",
+                }}
+              />
+              {/* Max quorum line */}
+              <ReferenceLine
+                y={maxQuorumValue}
+                strokeWidth={1}
+                strokeDasharray="3 3"
+                stroke="#4F4F4F"
+                strokeOpacity={0.6}
+                label={{
+                  position: "insideTopLeft",
+                  value: "MAX QUORUM",
+                  className: "text-xs font-inter font-semibold",
+                  fill: "#565656",
+                }}
+              />
+            </>
+          ) : (
+            !!proposal.quorum &&
+            !isProposalCreatedBeforeUpgrade && (
+              <ReferenceLine
+                y={+proposal.quorum.toString()}
+                strokeWidth={1}
+                strokeDasharray="3 3"
+                stroke="#4F4F4F"
+                label={{
+                  position: "insideBottomLeft",
+                  value: "QUORUM",
+                  className: "text-xs font-inter font-semibold",
+                  fill: "#565656",
+                }}
+              />
+            )
           )}
 
           <Tooltip

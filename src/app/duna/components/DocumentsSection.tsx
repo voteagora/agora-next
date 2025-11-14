@@ -8,14 +8,11 @@ import { TrashIcon, ArchiveBoxIcon } from "@heroicons/react/20/solid";
 import DocumentUploadModal from "./DocumentUploadModal";
 import Tenant from "@/lib/tenant/tenant";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
-import {
-  buildForumCategoryPath,
-  canArchiveContent,
-  canDeleteContent,
-} from "@/lib/forumUtils";
+import { canArchiveContent, canDeleteContent } from "@/lib/forumUtils";
 import { FileIcon } from "lucide-react";
-import Link from "next/link";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import useRequireLogin from "@/hooks/useRequireLogin";
+import { useStableCallback } from "@/hooks/useStableCallback";
 
 interface ForumDocument {
   id: number;
@@ -33,16 +30,19 @@ interface ForumDocument {
   ipfsCid: string;
   createdAt: string;
   uploadedBy: string;
+  archived?: boolean;
 }
 
 interface DocumentsSectionProps {
   initialDocuments: ForumDocument[];
   hideHeader?: boolean;
+  hideComms?: boolean;
 }
 
 const DocumentsSection = ({
   initialDocuments,
   hideHeader = false,
+  hideComms = false,
 }: DocumentsSectionProps) => {
   const [documents, setDocuments] = useState<ForumDocument[]>(
     initialDocuments || []
@@ -60,6 +60,9 @@ const DocumentsSection = ({
 
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
+  const requireLogin = useRequireLogin();
+  const stableDeleteAttachment = useStableCallback(deleteAttachment);
+  const stableArchiveAttachment = useStableCallback(archiveAttachment);
 
   const handleUploadComplete = async () => {
     const documentsData = await fetchDocuments();
@@ -84,11 +87,16 @@ const DocumentsSection = ({
         title: "Delete Attachment",
         message: "Are you sure you want to delete this attachment?",
         onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
           const isAuthor =
             documents
               .find((doc) => doc.id === attachmentId)
-              ?.uploadedBy?.toLowerCase() === address?.toLowerCase();
-          const success = await deleteAttachment(
+              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
+          const success = await stableDeleteAttachment(
             attachmentId,
             "category",
             isAuthor
@@ -114,11 +122,16 @@ const DocumentsSection = ({
         title: "Archive Attachment",
         message: "Are you sure you want to archive this attachment?",
         onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
           const isAuthor =
             documents
               .find((doc) => doc.id === attachmentId)
-              ?.uploadedBy?.toLowerCase() === address?.toLowerCase();
-          const success = await archiveAttachment(
+              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
+          const success = await stableArchiveAttachment(
             attachmentId,
             "category",
             isAuthor
@@ -182,7 +195,7 @@ const DocumentsSection = ({
               useDarkStyling ? "text-white" : "text-secondary"
             }`}
           >
-            No documents uploaded yet.
+            No documents yet.
           </p>
         </div>
       ) : (
@@ -237,7 +250,7 @@ const DocumentsSection = ({
                 </div>
                 {(canArchive || canDelete) && (
                   <>
-                    {canArchive && (
+                    {canArchive && !document.archived && (
                       <button
                         onClick={(e) => handleArchiveAttachment(document.id, e)}
                         className={`p-1 transition-colors ${
@@ -276,19 +289,6 @@ const DocumentsSection = ({
         categoryId={dunaCategoryId!}
         onUploadComplete={handleUploadComplete}
       />
-      <p className="text-md text-primary font-semibold ">
-        Official DUNA Communications
-      </p>
-      <p className="text-sm text-primary">
-        Want to talk about official items for the DUNA or discover discussions
-        on it? Please head to the{" "}
-        <Link
-          href={buildForumCategoryPath(dunaCategoryId!, "DUNA")}
-          className="underline"
-        >
-          DUNA forum.
-        </Link>
-      </p>
     </div>
   );
 };

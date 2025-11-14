@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useSimulateContract, useWriteContract } from "wagmi";
+import {
+  useSimulateContract,
+  useWriteContract,
+  useAccount,
+  useSignMessage,
+} from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
 import { BasicProposal, ProposalScope } from "../../../proposals/draft/types";
@@ -22,6 +27,8 @@ const BasicProposalAction = ({
   const { inputData } = getInputData(draftProposal);
   const [proposalCreated, setProposalCreated] = useState(false);
   const proposal_scope = draftProposal.proposal_scope;
+  const { address } = useAccount();
+  const messageSigner = useSignMessage();
 
   /**
    * Notes on proposal methods per governor:
@@ -81,11 +88,25 @@ const BasicProposalAction = ({
               },
             });
 
+            const messagePayload = {
+              action: "sponsorDraft",
+              draftProposalId: draftProposal.id,
+              creatorAddress: address,
+              timestamp: new Date().toISOString(),
+            };
+            const message = JSON.stringify(messagePayload);
+            const signature = await messageSigner
+              .signMessageAsync({ message })
+              .catch(() => undefined);
+            if (!signature) return;
             await sponsorDraftProposal({
               draftProposalId: draftProposal.id,
               onchain_transaction_hash: data,
               is_offchain_submission: false,
               proposal_scope: draftProposal.proposal_scope,
+              creatorAddress: address as `0x${string}`,
+              message,
+              signature,
             });
             openDialog({
               type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL",

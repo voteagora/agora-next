@@ -37,7 +37,7 @@ const MySponsorshipRequests = ({
         {draftProposals.map((proposal) => (
           <Link
             key={proposal.id}
-            href={`/proposals/sponsor/${proposal.id}`}
+            href={`/proposals/sponsor/${proposal.uuid || proposal.id}`}
             className="block"
           >
             <DraftProposalCard proposal={proposal} />

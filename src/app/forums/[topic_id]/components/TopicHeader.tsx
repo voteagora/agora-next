@@ -1,12 +1,16 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { truncateAddress } from "@/app/lib/utils/text";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
+import { useAccount } from "wagmi";
 
 import TopicUpvote from "./TopicUpvote";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { ADMIN_TYPES } from "@/lib/constants";
+import ENSName from "@/components/shared/ENSName";
 
 interface TopicHeaderProps {
   topic: {
@@ -24,15 +28,18 @@ export default function TopicHeader({
   topic,
   isAdmin = false,
 }: TopicHeaderProps) {
-  const displayName =
-    topic.authorName || (topic.address ? truncateAddress(topic.address) : "");
+  const { address } = useAccount();
   const profileHref = topic.address
     ? `/delegates/${encodeURIComponent(topic.address)}`
     : null;
-  const profileLabel = displayName
-    ? `View profile for ${displayName}`
+  const profileLabel = topic.address
+    ? `View profile for ${topic.address}`
     : "View profile";
   const adminLabel = topic.adminRole || undefined;
+  const isOwnTopic =
+    address &&
+    topic.address &&
+    address.toLowerCase() === topic.address.toLowerCase();
 
   return (
     <div className="pb-2">
@@ -46,9 +53,18 @@ export default function TopicHeader({
             >
               <ENSAvatar ensName={topic.address} size={20} />
               <div className="flex items-center gap-1">
-                <span className="font-medium text-sm hover:underline">
-                  {displayName}
+                <span className="font-medium text-sm text-primary hover:underline">
+                  {isAdmin ? (
+                    "Cowrie"
+                  ) : (
+                    <ENSName address={topic.address || ""} />
+                  )}
                 </span>
+                {isOwnTopic && (
+                  <span className="text-xs text-tertiary font-normal">
+                    (you)
+                  </span>
+                )}
                 {isAdmin && (
                   <ForumAdminBadge
                     className="text-[9px]"
@@ -61,7 +77,18 @@ export default function TopicHeader({
             <div className="flex items-center gap-2">
               <ENSAvatar ensName={topic.address} size={20} />
               <div className="flex items-center gap-1">
-                <div className="font-medium text-sm">{displayName}</div>
+                <div className="font-medium text-sm">
+                  {isAdmin ? (
+                    "Cowrie"
+                  ) : (
+                    <ENSName address={topic.address || ""} />
+                  )}
+                </div>
+                {isOwnTopic && (
+                  <span className="text-xs text-tertiary font-normal">
+                    (you)
+                  </span>
+                )}
                 {isAdmin && (
                   <ForumAdminBadge
                     className="text-[9px]"
@@ -71,7 +98,7 @@ export default function TopicHeader({
               </div>
             </div>
           )}
-          <div className="text-xs text-gray-500 self-center">
+          <div className="text-xs text-tertiary self-center">
             {formatRelative(topic.createdAt)}
           </div>
         </div>
@@ -80,7 +107,7 @@ export default function TopicHeader({
         </div>
       </div>
 
-      <h1 className="text-xl font-semibold text-gray-900">{topic.title}</h1>
+      <h1 className="text-xl font-semibold text-primary">{topic.title}</h1>
     </div>
   );
 }

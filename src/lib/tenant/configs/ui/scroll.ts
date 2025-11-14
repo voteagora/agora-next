@@ -335,5 +335,9 @@ If you meet the proposal threshold or are the manager of the governor, then you 
       name: "use-daonode-for-proposal-types",
       enabled: false,
     },
+    {
+      name: "forums",
+      enabled: false,
+    },
   ],
 });

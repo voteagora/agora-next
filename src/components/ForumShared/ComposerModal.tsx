@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAccount } from "wagmi";
 import {
   Dialog,
@@ -9,12 +9,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { PaperClipIcon } from "@heroicons/react/20/solid";
+import { PaperClipIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { ConnectKitButton } from "connectkit";
 import { DunaEditor } from "@/components/duna-editor";
-import { useForum } from "@/hooks/useForum";
-import type { ForumCategory } from "@/lib/forumUtils";
+import { useForumCategories } from "@/hooks/useForumCategories";
+import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { convertFileToAttachmentData } from "@/lib/fileUtils";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+
+const { namespace } = Tenant.current();
 
 export interface ComposerModalSubmitData {
   title?: string;
@@ -51,29 +56,21 @@ export default function ComposerModal({
   renderCategory = false,
   categoryLabel = "Category",
 }: ComposerModalProps) {
-  const { isConnected } = useAccount();
-  const { fetchCategories } = useForum();
+  const { isConnected, address } = useAccount();
+  const { categories } = useForumCategories();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [attachment, setAttachment] = useState<File | null>(null);
+  const [attachmentPreview, setAttachmentPreview] = useState<string | null>(
+    null
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [categoryId, setCategoryId] = useState<number | "">("");
 
-  useEffect(() => {
-    if (!isOpen || !renderCategory) return;
-    let active = true;
-    fetchCategories()
-      .then((cats) => {
-        if (active) setCategories(cats);
-      })
-      .catch(() => {
-        if (active) setCategories([]);
-      });
-    return () => {
-      active = false;
-    };
-  }, [isOpen, renderCategory, fetchCategories]);
+  const bgStyle =
+    namespace === TENANT_NAMESPACES.TOWNS
+      ? "bg-cardBackground"
+      : "bg-background";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,6 +96,7 @@ export default function ComposerModal({
       setTitle("");
       setContent("");
       setAttachment(null);
+      setAttachmentPreview(null);
       setCategoryId("");
       onClose();
     } catch (error) {
@@ -110,7 +108,33 @@ export default function ComposerModal({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setAttachment(file);
+    if (file) {
+      setAttachment(file);
+      setAttachmentPreview(null);
+    }
+  };
+
+  const removeAttachment = () => {
+    setAttachment(null);
+    setAttachmentPreview(null);
+    const fileInput = document.getElementById("attachment") as HTMLInputElement;
+    if (fileInput) fileInput.value = "";
+  };
+
+  const handleImageUpload = async (file: File): Promise<string> => {
+    if (!address) {
+      throw new Error("Wallet not connected");
+    }
+
+    // Upload to IPFS only (no database record yet)
+    const attachmentData = await convertFileToAttachmentData(file);
+    const uploadResult = await uploadToIPFSOnly(attachmentData, address);
+
+    if (!uploadResult.success || !uploadResult.ipfsUrl) {
+      throw new Error(uploadResult.error || "Upload failed");
+    }
+
+    return uploadResult.ipfsUrl;
   };
 
   const handleClose = () => {
@@ -118,13 +142,16 @@ export default function ComposerModal({
       setTitle("");
       setContent("");
       setAttachment(null);
+      setAttachmentPreview(null);
       onClose();
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        className={`max-w-2xl w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto ${bgStyle}`}
+      >
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-primary">
             {dialogTitle}
@@ -137,7 +164,7 @@ export default function ComposerModal({
               {({ show }) => (
                 <Button
                   onClick={() => show?.()}
-                  className="text-white border border-black hover:bg-gray-800 text-sm"
+                  className="text-primary border border-line hover:bg-hoverBackground text-sm bg-neutral"
                   style={{
                     display: "flex",
                     height: "36px",
@@ -147,7 +174,6 @@ export default function ComposerModal({
                     gap: "8px",
                     flexShrink: 0,
                     borderRadius: "8px",
-                    background: "#171717",
                     boxShadow:
                       "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
                   }}
@@ -172,8 +198,7 @@ export default function ComposerModal({
                   id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md bg-white text-primary focus:outline-none focus:ring-1 focus:ring-gray-200"
-                  style={{ borderColor: "#E5E5E5" }}
+                  className="w-full px-3 py-2 border border-cardBorder rounded-md bg-cardBackground text-primary focus:outline-none focus:ring-1 focus:ring-line"
                   placeholder="Enter title..."
                   required={titleRequired}
                   disabled={isSubmitting}
@@ -194,8 +219,7 @@ export default function ComposerModal({
                   onChange={(e) =>
                     setCategoryId(e.target.value ? Number(e.target.value) : "")
                   }
-                  className="w-full px-3 py-2 border rounded-md bg-white text-primary focus:outline-none focus:ring-1 focus:ring-gray-200"
-                  style={{ borderColor: "#E5E5E5" }}
+                  className="w-full px-3 py-2 border border-cardBorder rounded-md bg-cardBackground text-primary focus:outline-none focus:ring-1 focus:ring-line"
                   disabled={isSubmitting}
                 >
                   <option value="">No category</option>
@@ -220,6 +244,7 @@ export default function ComposerModal({
                 value={content}
                 onChange={(html) => setContent(html)}
                 disabled={isSubmitting}
+                onImageUpload={handleImageUpload}
               />
             </div>
 
@@ -228,31 +253,49 @@ export default function ComposerModal({
                 htmlFor="attachment"
                 className="block text-sm font-medium text-primary mb-2"
               >
-                Attachment (Optional)
+                Attach Document (Optional)
               </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  id="attachment"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  accept=".pdf,.doc,.docx,.txt"
-                  disabled={isSubmitting}
-                />
-                <Button
-                  type="button"
-                  onClick={() => document.getElementById("attachment")?.click()}
-                  className="bg-neutral text-primary border border-line hover:bg-wash w-full sm:w-auto"
-                  disabled={isSubmitting}
-                >
-                  <PaperClipIcon className="w-4 h-4 mr-2" />
-                  Choose File
-                </Button>
-                {attachment && (
-                  <span className="text-sm text-primary truncate max-w-[200px]">
-                    {attachment.name}
-                  </span>
-                )}
+              <p className="text-xs text-tertiary mb-2">
+                Use the image button in the editor toolbar to add images inline.
+                Documents will be attached as downloads.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    id="attachment"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.txt"
+                    disabled={isSubmitting}
+                  />
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      document.getElementById("attachment")?.click()
+                    }
+                    className="bg-neutral text-primary border border-line hover:bg-wash w-full sm:w-auto"
+                    disabled={isSubmitting}
+                  >
+                    <PaperClipIcon className="w-4 h-4 mr-2" />
+                    Attach Document
+                  </Button>
+                  {attachment && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-primary truncate max-w-[200px]">
+                        {attachment.name}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={removeAttachment}
+                        className="text-red-500 hover:text-red-700 transition-colors"
+                        disabled={isSubmitting}
+                      >
+                        <XMarkIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -267,17 +310,15 @@ export default function ComposerModal({
               </Button>
               <Button
                 type="submit"
-                className="text-white border border-black hover:bg-gray-800 text-sm"
+                className="border border-line hover:bg-hoverBackground text-sm"
                 style={{
                   display: "flex",
-                  height: "36px",
                   padding: "12px 20px",
                   justifyContent: "center",
                   alignItems: "center",
                   gap: "8px",
                   flexShrink: 0,
                   borderRadius: "8px",
-                  background: "#171717",
                   boxShadow:
                     "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
                 }}

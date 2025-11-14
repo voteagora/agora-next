@@ -9,14 +9,29 @@ import syndicateInfoCard1 from "@/assets/tenant/syndicate_info_1.svg";
 import syndicateInfoCard2 from "@/assets/tenant/syndicate_info_2.svg";
 import syndicateInfoCard3 from "@/assets/tenant/syndicate_info_3.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
-import { CoinsIcon } from "@/icons/CoinsIcon";
-import { NotificationIcon } from "@/icons/NotificationIcon";
 import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 
 export const syndicateTenantUIConfig = new TenantUI({
   title: "Syndicate Agora",
   logo: syndicateLogo,
-  tokens: [],
+  tokens: [
+    {
+      address: "0x1bAB804803159aD84b8854581AA53AC72455614E",
+      symbol: "SYND",
+      decimals: 18,
+      name: "Syndicate (ETH)",
+      chainId: 1,
+    },
+    {
+      address: "0x11dC28D01984079b7efE7763b533e6ed9E3722B9",
+      symbol: "SYND",
+      decimals: 18,
+      name: "Syndicate (Base)",
+      chainId: 8453,
+    },
+  ],
 
   assets: {
     success: syndicateSuccess,
@@ -29,7 +44,7 @@ export const syndicateTenantUIConfig = new TenantUI({
   },
 
   dunaDisclaimers:
-    "*DUNA Administration Docs will archive upon Q3 financial statements and tax update.",
+    "* DUNA Administration Docs will archive upon the release of the year-end financial statements and tax update.",
 
   customization: {
     primary: "0 0 0",
@@ -48,13 +63,14 @@ export const syndicateTenantUIConfig = new TenantUI({
     infoTabBackground: "#FFFFFF",
     buttonBackground: "#FAFAFA",
     infoSectionBackground: "255 255 255",
-    cardBackground: "#FFFFFF",
+    // cardBackground: "#FFFFFF", // removing this for now since this causes text to be white in duna content rendere
     customIconBackground: "#FBFBFB",
     footerBackground: "236 237 229",
     customAboutSubtitle: "About Syndicate Network Collective",
     customIconColor: "#87819F",
     customInfoLayout: "flex-col sm:flex-row gap-2",
     noReportsFound: "Quarterly Reports will be posted on October 15th, 2025.",
+    customHeroImageSize: "sm:h-[160px]",
   },
 
   links: [
@@ -78,10 +94,12 @@ export const syndicateTenantUIConfig = new TenantUI({
         "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate Network",
       hero: syndicateHero,
       meta: {
-        title: "Syndicate Agora",
-        description: "Home of token governance",
-        imageTitle: "Syndicate Agora",
-        imageDescription: "Home of token governance",
+        title: "Syndicate Network Collective Governance",
+        description:
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Syndicate Network Collective Governance",
+        imageDescription:
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
     },
     {
@@ -91,38 +109,41 @@ export const syndicateTenantUIConfig = new TenantUI({
         "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate Network",
       hero: syndicateHero,
       meta: {
-        title: "Voter on Agora",
-        description: "Delegate your voting power to a trusted representative",
-        imageTitle: "Voter on Agora",
+        title: "Syndicate Network Collective Governance",
+        description:
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Syndicate Network Collective Governance",
         imageDescription:
-          "Delegate your voting power to a trusted representative",
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
     },
     {
       route: "proposals",
-      title: "Agora is the home of Syndicate delegates",
+      title: "Syndicate Network Collective is the home of SYND delegates",
       description:
-        "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate Network",
+        "SNC is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
       hero: syndicateHero,
       meta: {
-        title: "Syndicate Agora",
-        description: "Home of token governance",
-        imageTitle: "Syndicate Agora",
-        imageDescription: "Home of token governance",
+        title: "Syndicate Network Collective Governance",
+        description:
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Syndicate Network Collective Governance",
+        imageDescription:
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
     },
     {
       route: "info",
       title: "Welcome to Syndicate Network Collective",
       description:
-        "Your home for information about Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
+        "The Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
       meta: {
-        title: "Syndicate Network Governance",
+        title: "Syndicate Network Collective Governance",
         description:
-          "Syndicate Network is a public good owned and governed by SYND token holders.",
-        imageTitle: "Syndicate Network Governance",
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Syndicate Network Collective Governance",
         imageDescription:
-          "Syndicate Network is a public good owned and governed by SYND token holders.",
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
       links: [
         {
@@ -134,19 +155,19 @@ export const syndicateTenantUIConfig = new TenantUI({
         {
           name: "Grants Program",
           title: "Grants Program",
-          url: "https://gateway.pinata.cloud/ipfs/QmSQn9P7LzGPa2RJsTDVMaKPw9UoqJTMRoxJTiABpi6YAR",
+          url: "https://bronze-abundant-swift-398.mypinata.cloud/ipfs/QmSQn9P7LzGPa2RJsTDVMaKPw9UoqJTMRoxJTiABpi6YAR",
           image: syndicateInfoCard2,
         },
         {
           name: "Governance",
           title: "Governance",
-          url: "https://www.syndicatecollective.org/coming-soon", // TODO: Update with actual URL
+          url: "https://www.syndicatecollective.org/",
           image: syndicateInfoCard3,
         },
         {
-          name: "Docs Archive",
-          title: "Docs Archive*",
-          url: "",
+          name: "Document Archive",
+          title: "Document Archive*",
+          url: "/document-archive",
           image: syndicateInfoCard3,
         },
       ],
@@ -156,23 +177,9 @@ export const syndicateTenantUIConfig = new TenantUI({
       title: "Syndicate Network Collective Roadmap",
       hero: syndicateHero,
       description:
-        "This dashboard is the focal point for information related to the Syndicate Network Collective DUNA. As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe $SYND governance token provides the members with ultimate control over how the Treasury should be utilized in support of the Syndicate Network.\n\nThe Syndicate Network Collective is established as an organizational framework for collective decision-making and innovation to pursue the common, nonprofit purpose of providing a foundation for community-aligned platforms to reshape how participation and contribution is valued on the internet.",
+        "This dashboard is the focal point for information related to the Syndicate Network Collective DUNA. As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe SYND governance token provides the members with ultimate control over how the Treasury should be utilized in support of the Syndicate Network.\n\nThe Syndicate Network Collective is established as an organizational framework for collective decision-making and innovation to pursue the common, nonprofit purpose of providing a foundation for community-aligned platforms to reshape how participation and contribution is valued on the internet.",
       sectionTitle: "Syndicate Network Collective Roadmap",
       tabs: [
-        {
-          icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#737373" />,
-          title: "September 22, 2025",
-          description:
-            "Messaging functionality opens for the DUNA Administration section.",
-        },
-        {
-          icon: (
-            <NotificationIcon className="w-[24px] h-[24px]" stroke="#737373" />
-          ),
-          title: "October 15, 2025",
-          description:
-            "Q3 financial statements and tax updates will be posted with messaging functionality enabled in the DUNA Administration section and Grants Award Committee submissions go live.",
-        },
         {
           icon: (
             <CheckCircleBrokenIcon
@@ -186,12 +193,12 @@ export const syndicateTenantUIConfig = new TenantUI({
         },
       ],
       meta: {
-        title: "Syndicate Network Governance",
+        title: "Syndicate Network Collective Governance",
         description:
-          "Syndicate Network is a public good owned and governed by SYND token holders.",
-        imageTitle: "Syndicate Network Governance",
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Syndicate Network Collective Governance",
         imageDescription:
-          "Syndicate Network is a public good owned and governed by SYND token holders.",
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
     },
     {
@@ -200,10 +207,12 @@ export const syndicateTenantUIConfig = new TenantUI({
       description: `Syndicate governance goes live on November 3rd, 2025.
 `,
       meta: {
-        title: "Syndicate Network Governance",
-        description: "Syndicate Network governance coming soon",
-        imageTitle: "Syndicate Network Governance",
-        imageDescription: "Syndicate Network governance coming soon",
+        title: "Syndicate Network Collective Governance",
+        description:
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Syndicate Network Collective Governance",
+        imageDescription:
+          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
     },
     {
@@ -225,7 +234,11 @@ export const syndicateTenantUIConfig = new TenantUI({
   toggles: [
     {
       name: "delegates",
-      enabled: false,
+      enabled: true,
+    },
+    {
+      name: "delegation-encouragement",
+      enabled: true,
     },
     {
       name: "delegates/edit",
@@ -233,7 +246,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "proposals",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "info",
@@ -249,7 +262,57 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "proposal-lifecycle",
-      enabled: false,
+      enabled: true,
+      config: {
+        stages: [
+          {
+            stage: PrismaProposalStage.DRAFTING,
+            order: 0,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.AWAITING_SUBMISSION,
+            order: 1,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.PENDING,
+            order: 2,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.QUEUED,
+            order: 3,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.EXECUTED,
+            order: 4,
+            isPreSubmission: false,
+          },
+        ],
+        proposalTypes: [
+          {
+            type: ProposalType?.BASIC,
+            prodAddress: null,
+            testnetAddress: null,
+          },
+        ],
+        copy: {
+          helperText: `
+                ## Proposal checklist
+- Make sure that you have simulated and review your transactions before seeking sponsorship.
+- Check your markdown previews to ensure you didn't break any links.
+- Review your description and make sure it's clear and concise.
+- Remember that everything lasts forever onchain, check your spelling and grammar and make this one count. You got this.
+`.trim(),
+        },
+        gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
+      },
+    },
+    {
+      name: "use-archive-for-proposals",
+      enabled: true,
     },
     {
       name: "use-daonode-for-proposals",
@@ -273,7 +336,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "coming-soon",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "admin",
@@ -293,7 +356,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "hide-hero",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "hide-hero-image",
@@ -333,6 +396,33 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "grants/intake-form",
+      enabled: true,
+    },
+    {
+      name: "easv2-govlessvoting",
+      enabled: true,
+    },
+    {
+      name: "syndicate-colours-fix-delegate-pages",
+      enabled: true,
+    },
+    {
+      name: "voting-power-info-tooltip",
+      enabled: true,
+      config: {
+        text: "SYND voting power is only coming from Mainnet. In order to get voting power, you must bridge to Mainnet.",
+      },
+    },
+    {
+      name: "syndicate-proposals-page-content",
+      enabled: true,
+    },
+    {
+      name: "syndicate-voters-page-content",
+      enabled: true,
+    },
+    {
+      name: "delegates-layout-list",
       enabled: true,
     },
   ],

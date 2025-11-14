@@ -17,7 +17,29 @@ export const townsTenantUIConfig = new TenantUI({
   title: "Towns Protocol",
   logo: townsLogo,
   logoSize: "36px",
-  tokens: [],
+  tokens: [
+    {
+      address: "0x000000Fa00b200406de700041CFc6b19BbFB4d13",
+      symbol: "TOWNS",
+      decimals: 18,
+      name: "Towns (ETH)",
+      chainId: 1,
+    },
+    {
+      address: "0x00000000bcA93b25a6694ca3d2109d545988b13B",
+      symbol: "TOWNS",
+      decimals: 18,
+      name: "Towns (BNB)",
+      chainId: 56,
+    },
+    {
+      address: "0x00000000A22C618fd6b4D7E9A335C4B96B189a38",
+      symbol: "TOWNS",
+      decimals: 18,
+      name: "Towns (Base)",
+      chainId: 8453,
+    },
+  ],
   hideAgoraBranding: true,
 
   assets: {
@@ -56,12 +78,13 @@ export const townsTenantUIConfig = new TenantUI({
     customCardSize: "sm:h-[100px] sm:w-[100px] lg:h-[120px] lg:w-[120px]",
     customIconColor: "#87819F",
     customButtonBackground: "#130C2F",
+    customHeroTitleWidth: "max-w-none",
   },
 
   theme: "dark",
 
   dunaDisclaimers:
-    "* DUNA Administration Docs will archive upon the release of Q3 financial statements and tax update.",
+    "* DUNA Administration Docs will archive upon the release of the year-end financial statements and tax update.",
 
   organization: {
     title: "Towns Protocol",
@@ -128,7 +151,7 @@ export const townsTenantUIConfig = new TenantUI({
         {
           name: "Protocol Docs",
           title: "Document Archive*",
-          url: "",
+          url: "/document-archive",
           image: townsInfoCard3,
         },
       ],
@@ -156,23 +179,9 @@ export const townsTenantUIConfig = new TenantUI({
       title: "Towns Lodge Roadmap",
       hero: townsInfoHero,
       description:
-        "This dashboard is the focal point for information related to the Towns Lodge DUNA.  As a tax-paying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe Towns Protocol is supported by both a Swiss Association and the Towns Lodge DUNA – with the $TOWNS governance token providing the members ultimate control over how the Treasury should be utilized.  While the initial funding of the Swiss Association allows it to operate within established parameters, its role and funding will ultimately be decided by the members of the DUNA who, through their voting power, control whether to extend additional funding to the Swiss Association, redirect that funding to another entity, or take on more responsibilities within the DUNA.\n\nThe DUNA Governance does not go live until January 1, 2026, to allow the members of the community time to familiarize themselves with the Swiss Association and the Protocol.",
+        "This dashboard is the focal point for information related to the Towns Lodge DUNA.  As a tax-paying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe Towns Protocol is supported by both a Swiss Association and the Towns Lodge DUNA – with the TOWNS governance token providing the members ultimate control over how the Treasury should be utilized.  While the initial funding of the Swiss Association allows it to operate within established parameters, its role and funding will ultimately be decided by the members of the DUNA who, through their voting power, control whether to extend additional funding to the Swiss Association, redirect that funding to another entity, or take on more responsibilities within the DUNA.\n\nThe DUNA Governance does not go live until January 1, 2026, to allow the members of the community time to familiarize themselves with the Swiss Association and the Protocol.",
       sectionTitle: "Towns Lodge Roadmap",
       tabs: [
-        {
-          icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#87819F" />,
-          title: "August 20, 2025",
-          description:
-            "Messaging functionality opens for the DUNA Administration Section after time has elapsed for members to claim their $TOWNS.",
-        },
-        {
-          icon: (
-            <NotificationIcon className="w-[24px] h-[24px]" stroke="#87819F" />
-          ),
-          title: "October 15, 2025",
-          description:
-            "Q3 financial statements and tax updates will be posted with messaging functionality enabled in the DUNA Administration section.",
-        },
         {
           icon: (
             <CheckCircleBrokenIcon
@@ -196,9 +205,8 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       route: "coming-soon",
-      title: "Towns governance is\ncoming soon",
-      description:
-        "Towns voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+      title: "Towns Lodge governance goes live on January 1, 2026.",
+      description: "",
       hero: townsHero,
       meta: {
         title: "Towns Protocol Governance",

@@ -38,8 +38,6 @@ export async function getForumCategories() {
   } catch (error) {
     console.error("Error getting forum categories:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -81,8 +79,6 @@ export async function getForumCategory(categoryId: number) {
   } catch (error) {
     console.error("Error getting forum category:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -103,7 +99,5 @@ export async function getDunaCategoryId(): Promise<number | null> {
   } catch (error) {
     console.error("Error getting duna category ID:", error);
     return null;
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }

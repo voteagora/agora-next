@@ -16,8 +16,17 @@ import {
 import DelegateTableRow from "./DelegateTableRow";
 import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import { SyndicateDelegateInfo } from "./SyndicateDelegateInfo";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
+import { InfoOutlineIcon } from "@/icons/InfoOutlineIcon";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -43,11 +52,13 @@ export default function DelegateTable({
   );
   const fetching = useRef(false);
 
-  const { ui } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
-  const showParticipation = ui.toggle("show-participation")?.enabled || false;
+  const showParticipation =
+    (ui.toggle("show-participation")?.enabled || false) &&
+    !(ui.toggle("hide-participation-delegates-page")?.enabled || false);
   const hide7dChange = ui.toggle("hide-7d-change")?.enabled ?? false;
   const { isAdvancedUser } = useIsAdvancedUser();
   const { advancedDelegators } = useConnectedDelegate();
@@ -97,6 +108,7 @@ export default function DelegateTable({
   return (
     <DialogProvider>
       {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
+      {namespace === TENANT_NAMESPACES.SYNDICATE && <SyndicateDelegateInfo />}
 
       <div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg mt-6">
         <Table className="min-w-full">
@@ -104,7 +116,31 @@ export default function DelegateTable({
             <TableRow className="bg-tertiary/5">
               <TableHead className="h-10 text-secondary">Name</TableHead>
               <TableHead className="h-10 text-secondary">
-                Voting power
+                <span className="inline-flex items-center">
+                  Voting power
+                  {ui.toggle("voting-power-info-tooltip")?.enabled &&
+                  (ui.toggle("voting-power-info-tooltip") as any)?.config
+                    ?.text ? (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex items-center ml-1">
+                            <InfoOutlineIcon
+                              className="w-4 h-4"
+                              fill="#737373"
+                            />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-[320px] p-4 rounded-xl bg-black text-neutral text-sm leading-snug shadow-md whitespace-normal break-words">
+                          {
+                            (ui.toggle("voting-power-info-tooltip") as any)
+                              .config.text
+                          }
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ) : null}
+                </span>
               </TableHead>
               {!hide7dChange && (
                 <TableHead className="h-10 text-secondary">7d Change</TableHead>

@@ -16,9 +16,9 @@ const SyndicateDunaDisclosures = () => {
 
         <div className="font-medium">
           <p className="mt-2">
-            By owning the token and participating in the governance of Syndicate
-            on this forum, you acknowledge and agree that you are electing to
-            become a member of a Wyoming Decentralized Unincorporated Nonprofit
+            By owning the token and participating in the governance of
+            Syndicate, you acknowledge and agree that you are electing to become
+            a member of a Wyoming Decentralized Unincorporated Nonprofit
             Association (&quot;Association&quot;). Your participation is subject
             to the terms and conditions set forth in the Association Agreement.
             You further acknowledge and agree that any dispute, claim, or
@@ -43,6 +43,14 @@ const SyndicateDunaDisclosures = () => {
             recover relief under any such action or proceeding.
           </p>
         </div>
+      </div>
+
+      {/* Disclaimer */}
+      <div className="mt-12 pt-6 border-t border-line">
+        <p className="text-secondary text-sm opacity-75">
+          * DUNA Administration Docs will archive upon the release of the
+          year-end financial statements and tax update.
+        </p>
       </div>
     </div>
   );

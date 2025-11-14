@@ -9,6 +9,8 @@ import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 
 import { useAccount } from "wagmi";
 import { useForum, useForumAdmin } from "@/hooks/useForum";
+import useRequireLogin from "@/hooks/useRequireLogin";
+import { useStableCallback } from "@/hooks/useStableCallback";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { canDeleteContent } from "@/lib/forumUtils";
@@ -20,10 +22,15 @@ import EmojiReactions from "@/components/Forum/EmojiReactions";
 import { cn } from "@/lib/utils";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { ADMIN_TYPES } from "@/lib/constants";
+import PostAttachments from "@/app/forums/[topic_id]/components/PostAttachments";
+import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { convertFileToAttachmentData } from "@/lib/fileUtils";
+import toast from "react-hot-toast";
 
 export interface ThreadProps {
   comments: ForumPost[];
   categoryId?: number | null;
+  topicId?: number;
   onDelete?: (commentId: number) => void;
   onUpdate?: (commentId: number, updates: Partial<ForumPost>) => void;
 
@@ -49,6 +56,7 @@ interface CommentItemProps extends Omit<ThreadProps, "comments"> {
   comments: ForumPost[];
   adminAddressSet: Set<string>;
   adminRoleMap: Map<string, string | null>;
+  onImageUpload?: (file: File) => Promise<string>;
 }
 
 const CommentItem = ({
@@ -68,12 +76,16 @@ const CommentItem = ({
   forForums,
   adminAddressSet,
   adminRoleMap,
+  onImageUpload,
 }: CommentItemProps) => {
   // Replies are always shown (no expand/collapse toggle)
   const { address } = useAccount();
   const { deletePost, restorePost } = useForum();
   const openDialog = useOpenDialog();
   const { isAdmin, canManageTopics } = useForumAdmin(categoryId || undefined);
+  const requireLogin = useRequireLogin();
+  const stableDeletePost = useStableCallback(deletePost);
+  const stableRestorePost = useStableCallback(restorePost);
   const [showReplies, setShowReplies] = React.useState(forForums ?? false);
   // Get replies for this comment
   const replies = comments.filter(
@@ -93,6 +105,8 @@ const CommentItem = ({
   const profileLabel = comment.author
     ? `View profile for ${comment.author}`
     : "View profile";
+  const isOwnComment =
+    address && authorAddress && address.toLowerCase() === authorAddress;
 
   const canDelete = canDeleteContent(
     address || "",
@@ -111,14 +125,19 @@ const CommentItem = ({
           ? "Are you sure you want to permanently delete this comment? This action cannot be undone."
           : "Are you sure you want to delete this comment?",
         onConfirm: async () => {
-          const success = await deletePost(comment.id, isAdmin);
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
+          const success = await stableDeletePost(comment.id, isAdmin);
           if (success) {
             if (isAdmin) {
               onDelete?.(comment.id);
             } else {
               onUpdate?.(comment.id, {
                 deletedAt: new Date().toISOString(),
-                deletedBy: address || "",
+                deletedBy: loggedInAddress,
               });
             }
           }
@@ -134,9 +153,14 @@ const CommentItem = ({
         title: "Restore Comment",
         message: "Are you sure you want to restore this comment?",
         onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
           const isAuthor =
-            comment.author?.toLowerCase() === address?.toLowerCase();
-          const success = await restorePost(comment.id, isAuthor);
+            comment.author?.toLowerCase() === loggedInAddress.toLowerCase();
+          const success = await stableRestorePost(comment.id, isAuthor);
           if (success) {
             onUpdate?.(comment.id, {
               deletedAt: null,
@@ -207,13 +231,21 @@ const CommentItem = ({
                 <Link
                   href={profileHref}
                   aria-label={profileLabel}
-                  className="text-sm font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black rounded"
+                  className="text-sm font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black rounded font-medium text-sm text-primary"
                 >
-                  <ENSName address={comment.author || ""} />
+                  {isAuthorAdmin ? (
+                    "Cowrie"
+                  ) : (
+                    <ENSName address={comment.author || ""} />
+                  )}
                 </Link>
               ) : (
-                <span className="text-sm font-medium">
-                  <ENSName address={comment.author || ""} />
+                <span className="text-sm font-medium text-primary">
+                  {isAuthorAdmin ? (
+                    "Cowrie"
+                  ) : (
+                    <ENSName address={comment.author || ""} />
+                  )}
                 </span>
               )}
               {isAuthorAdmin && (
@@ -222,8 +254,11 @@ const CommentItem = ({
                   type={adminLabel ? ADMIN_TYPES[adminLabel] : "Admin"}
                 />
               )}
+              {isOwnComment && (
+                <span className="text-xs text-tertiary font-normal">(you)</span>
+              )}
             </div>
-            <span className="text-xs text-gray-500 self-center">
+            <span className="text-xs text-tertiary self-center">
               {formatRelative(comment.createdAt)}
             </span>
             {canDelete && (
@@ -240,7 +275,21 @@ const CommentItem = ({
             <DunaContentRenderer content={comment.content} />
           </div>
 
-          <div className="flex items-center gap-3">
+          {comment.attachments &&
+            comment.attachments.filter(
+              (att) => !att.contentType?.startsWith("image/")
+            ).length > 0 && (
+              <PostAttachments
+                attachments={comment.attachments.filter(
+                  (att) => !att.contentType?.startsWith("image/")
+                )}
+                postId={comment.id}
+                postAuthor={comment.author}
+                categoryId={categoryId}
+              />
+            )}
+
+          <div className="flex items-center gap-3 text-xs font-semibold text-tertiary">
             {Boolean(forForums) && (
               <EmojiReactions
                 targetType="post"
@@ -276,10 +325,7 @@ const CommentItem = ({
           {replies.map((reply) => (
             <div
               key={reply.id}
-              className={cn(
-                "pl-3",
-                forForums ? "" : "border-l-2 border-gray-200"
-              )}
+              className={cn("pl-3", forForums ? "" : "border-l-2 border-line")}
             >
               <CommentItem
                 comment={reply}
@@ -298,6 +344,7 @@ const CommentItem = ({
                 forForums={forForums}
                 adminAddressSet={adminAddressSet}
                 adminRoleMap={adminRoleMap}
+                onImageUpload={onImageUpload}
               />
             </div>
           ))}
@@ -313,7 +360,7 @@ const CommentItem = ({
       )}
 
       {isThisCommentBeingRepliedTo && (
-        <div className="mt-3 ml-8 sm:ml-12 p-3 bg-gray-50 rounded-lg border border-line">
+        <div className="mt-3 ml-8 sm:ml-12 p-3 bg-wash rounded-lg border border-line">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xs text-secondary">
               Replying to this comment
@@ -325,6 +372,7 @@ const CommentItem = ({
             value={replyContent}
             onChange={(html) => onReplyContentChange(html)}
             disabled={false}
+            onImageUpload={onImageUpload}
           />
           <div className="flex justify-end gap-2 mt-2">
             <Button
@@ -358,6 +406,7 @@ interface CommentThreadProps extends Omit<ThreadProps, "parentId" | "depth"> {
   depth: number;
   adminAddressSet: Set<string>;
   adminRoleMap: Map<string, string | null>;
+  onImageUpload?: (file: File) => Promise<string>;
 }
 
 const CommentThread = ({
@@ -377,6 +426,7 @@ const CommentThread = ({
   forForums,
   adminAddressSet,
   adminRoleMap,
+  onImageUpload,
 }: CommentThreadProps) => {
   const filteredComments = comments.filter((comment) => {
     if (parentId === null) return !comment.parentId;
@@ -404,6 +454,7 @@ const CommentThread = ({
             forForums={forForums}
             adminAddressSet={adminAddressSet}
             adminRoleMap={adminRoleMap}
+            onImageUpload={onImageUpload}
           />
         </div>
       ))}
@@ -423,6 +474,7 @@ export default function Thread({
   onDelete,
   onUpdate,
   categoryId,
+  topicId,
   forForums = true,
   adminAddresses = [],
   adminDirectory,
@@ -446,16 +498,39 @@ export default function Thread({
   }, [adminAddresses, adminDirectory]);
 
   const adminAddressSet = React.useMemo(() => {
-    return new Set(normalizedDirectory.map((entry) => entry.address));
+    return new Set(
+      normalizedDirectory.map((entry) => entry.address.toLowerCase())
+    );
   }, [normalizedDirectory]);
 
   const adminRoleMap = React.useMemo(() => {
     const map = new Map<string, string | null>();
     normalizedDirectory.forEach(({ address, role }) => {
-      map.set(address, role);
+      map.set(address.toLowerCase(), role);
     });
     return map;
   }, [normalizedDirectory]);
+
+  const { address } = useAccount();
+
+  const handleImageUpload = React.useCallback(
+    async (file: File): Promise<string> => {
+      if (!address) {
+        throw new Error("Wallet not connected");
+      }
+
+      // Upload to IPFS only (no database record yet)
+      const attachmentData = await convertFileToAttachmentData(file);
+      const uploadResult = await uploadToIPFSOnly(attachmentData, address);
+
+      if (!uploadResult.success || !uploadResult.ipfsUrl) {
+        throw new Error(uploadResult.error || "Upload failed");
+      }
+
+      return uploadResult.ipfsUrl;
+    },
+    [address]
+  );
 
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -476,6 +551,7 @@ export default function Thread({
         forForums={forForums}
         adminAddressSet={adminAddressSet}
         adminRoleMap={adminRoleMap}
+        onImageUpload={handleImageUpload}
       />
     </div>
   );

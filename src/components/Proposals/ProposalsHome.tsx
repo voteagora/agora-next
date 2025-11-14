@@ -7,14 +7,18 @@ import {
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import Hero from "@/components/Hero/Hero";
+import SyndicateProposalsPageContent from "@/components/Proposals/SyndicateProposalsPageContent";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
+import ArchiveProposalsList from "@/components/Proposals/ProposalsList/ArchiveProposalsList";
 import { proposalsFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
 import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
-import { PaginationParams } from "@/app/lib/pagination";
+import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
+import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
+import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 
 async function fetchProposals(
   filter: string,
@@ -40,7 +44,7 @@ async function fetchGovernanceCalendar() {
 }
 
 export default async function ProposalsHome() {
-  const { ui } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
 
   const hasToggle = typeof (ui as any)?.toggle === "function";
   if (!(hasToggle ? ui.toggle("proposals") : { enabled: true })) {
@@ -53,34 +57,54 @@ export default async function ProposalsHome() {
   const supportsNotifications = hasToggle
     ? ui.toggle("email-subscriptions")?.enabled
     : false;
+  const useArchiveForProposals = hasToggle
+    ? ui.toggle("use-archive-for-proposals")?.enabled
+    : false;
 
   const emptyPaginated = () => ({
     meta: { has_next: false, total_returned: 0, next_offset: 0 },
     data: [],
   });
 
-  const [governanceCalendar, relevantProposals, allProposals, votableSupply] =
-    await (async () => {
-      const results = await Promise.allSettled([
+  // Fetch data based on archive toggle
+  let governanceCalendar;
+  let relevantProposals;
+  let allProposals;
+  let votableSupply;
+  let archivedProposals: PaginatedResult<ArchiveListProposal[]> = {
+    meta: { has_next: false, total_returned: 0, next_offset: 0 },
+    data: [],
+  };
+
+  if (useArchiveForProposals) {
+    [governanceCalendar, archivedProposals, votableSupply] = await Promise.all([
+      fetchGovernanceCalendar(),
+      fetchProposalsFromArchive(
+        namespace,
+        proposalsFilterOptions.everything.filter
+      ),
+      fetchVotableSupply(),
+    ]);
+
+    relevantProposals = emptyPaginated();
+    allProposals = emptyPaginated();
+  } else {
+    [governanceCalendar, relevantProposals, allProposals, votableSupply] =
+      await Promise.all([
         fetchGovernanceCalendar(),
         fetchProposals(proposalsFilterOptions.relevant.filter),
         fetchProposals(proposalsFilterOptions.everything.filter),
         fetchVotableSupply(),
       ]);
-
-      const gc = results[0].status === "fulfilled" ? results[0].value : null;
-      const rel =
-        results[1].status === "fulfilled" ? results[1].value : emptyPaginated();
-      const all =
-        results[2].status === "fulfilled" ? results[2].value : emptyPaginated();
-      const vs = results[3].status === "fulfilled" ? results[3].value : "0";
-      return [gc, rel, all, vs] as const;
-    })();
+  }
 
   return (
     <div className="flex flex-col">
       {supportsNotifications && <SubscribeDialogLauncher />}
       <Hero page="proposals" />
+      {ui.toggle("syndicate-proposals-page-content")?.enabled && (
+        <SyndicateProposalsPageContent />
+      )}
       {plmEnabled && (
         <>
           <MyDraftProposals
@@ -101,19 +125,26 @@ export default async function ProposalsHome() {
         fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
         votableSupply={votableSupply}
       />
-      <ProposalsList
-        initRelevantProposals={relevantProposals}
-        initAllProposals={allProposals}
-        fetchProposals={async (
-          pagination: PaginationParams,
-          filter: string
-        ) => {
-          "use server";
-          return fetchProposals(filter, pagination);
-        }}
-        governanceCalendar={governanceCalendar}
-        votableSupply={votableSupply}
-      />
+      {useArchiveForProposals ? (
+        <ArchiveProposalsList
+          proposals={archivedProposals.data}
+          governanceCalendar={governanceCalendar}
+        />
+      ) : (
+        <ProposalsList
+          initRelevantProposals={relevantProposals}
+          initAllProposals={allProposals}
+          fetchProposals={async (
+            pagination: PaginationParams,
+            filter: string
+          ) => {
+            "use server";
+            return fetchProposals(filter, pagination);
+          }}
+          governanceCalendar={governanceCalendar}
+          votableSupply={votableSupply}
+        />
+      )}
     </div>
   );
 }

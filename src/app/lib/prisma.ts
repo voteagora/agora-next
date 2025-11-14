@@ -29,14 +29,13 @@ const resolveDbUrl = (type: "WEB2" | "WEB3") => {
     return databaseUrl;
   }
 
-  return process.env[
-    `${type === "WEB2" ? "READ_WRITE_WEB2" : "READ_ONLY_WEB3"}_DATABASE_URL_${envSuffix}`
-  ];
+  const envVarName = `${type === "WEB2" ? "READ_WRITE_WEB2" : "READ_ONLY_WEB3"}_DATABASE_URL_${envSuffix}`;
+  const url = process.env[envVarName];
+  return url;
 };
 
 const readWriteWeb2Url = resolveDbUrl("WEB2");
 const readOnlyWeb3Url = resolveDbUrl("WEB3");
-
 let prismaWeb2Client: PrismaClient;
 let prismaWeb3Client: PrismaClient;
 

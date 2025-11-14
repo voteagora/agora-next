@@ -113,7 +113,15 @@ export interface BlockBasedProposal {
 }
 
 // Complete Proposal type with all additional properties
+export type ProposalTypeData = {
+  proposal_type_id: number;
+  name: string;
+  quorum: bigint;
+  approval_threshold: bigint;
+};
+
 export type Proposal = {
+  archiveMetadata?: any;
   id: string;
   proposer: string;
   snapshotBlockNumber: number;
@@ -135,9 +143,11 @@ export type Proposal = {
   unformattedProposalData: `0x${string}` | null | any;
   proposalResults: ParsedProposalResults[ProposalType]["kind"];
   proposalType: ProposalType | null;
+  proposalTypeData: ProposalTypeData | null;
   status: ProposalStatus | null;
   createdTransactionHash: string | null;
   cancelledTransactionHash: string | null;
   executedTransactionHash: string | null;
   offchainProposalId?: string;
+  proposalTypeApproval?: string;
 };

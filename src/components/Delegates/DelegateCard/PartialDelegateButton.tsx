@@ -21,6 +21,7 @@ export const PartialDelegateButton = ({
       type={isConnectedAccountDelegate ? "primary" : "secondary"}
       onClick={(e: any) => {
         e.preventDefault();
+        e.stopPropagation();
         openDialog({
           type: "PARTIAL_DELEGATE",
           params: {

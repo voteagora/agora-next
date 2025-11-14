@@ -3,7 +3,7 @@ import {
   paginateResult,
   PaginationParams,
 } from "@/app/lib/pagination";
-import { parseProposalData } from "@/lib/proposalUtils";
+import { ParsedProposalData, parseProposalData } from "@/lib/proposalUtils";
 import { parseSnapshotVote, parseVote } from "@/lib/voteUtils";
 import { cache } from "react";
 import {
@@ -23,6 +23,8 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
+import { ProposalType } from "@/lib/types";
+import { fetchProposalFromArchive } from "@/lib/archiveUtils";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -144,16 +146,70 @@ async function getVotesForDelegateForAddress({
       ? await contracts.providerForTime?.getBlock("latest")
       : await contracts.token.provider.getBlock("latest");
 
+    const archiveMode =
+      ui.toggle("use-archive-for-proposals")?.enabled ?? false;
+
     const data = await Promise.all(
-      votes
-        .filter((vote) => vote.proposal_data !== null)
-        .map((vote) => {
-          const proposalData = parseProposalData(
-            JSON.stringify(vote.proposal_data),
-            vote.proposal_type
-          );
-          return parseVote(vote, proposalData, latestBlock);
-        })
+      votes.map(async (vote) => {
+        // When using archive-backed proposals, DB may not have proposal_data/type.
+        // Render past votes anyway with sane defaults.
+        const safeProposalType =
+          (vote as any).proposal_type ??
+          (archiveMode ? ("STANDARD" as ProposalType) : (undefined as any));
+
+        let proposalData: ParsedProposalData[ProposalType] | undefined =
+          undefined;
+        try {
+          if (vote.proposal_data) {
+            proposalData = parseProposalData(
+              JSON.stringify(vote.proposal_data),
+              safeProposalType
+            );
+          }
+        } catch (e) {
+          // Ignore parse errors; we can still show minimal vote info
+          proposalData = undefined;
+        }
+
+        // Pass through proposal_type default if missing in archive mode
+        const voteWithType = safeProposalType
+          ? ({
+              ...(vote as any),
+              proposal_type: safeProposalType,
+            } as VotePayload)
+          : (vote as VotePayload);
+
+        const parsed = await parseVote(voteWithType, proposalData, latestBlock);
+
+        // Always source the proposal title from the archive when archive mode is enabled
+        if (archiveMode) {
+          try {
+            const { namespace } = Tenant.current();
+            const archiveProposal: any = await fetchProposalFromArchive(
+              namespace,
+              vote.proposal_id as unknown as string
+            );
+            const archiveTitle =
+              typeof archiveProposal?.title === "string"
+                ? archiveProposal.title
+                : "";
+            if (archiveTitle && archiveTitle.trim().length > 0) {
+              parsed.proposalTitle = archiveTitle;
+            }
+            // Surface a simple hint for UI copy (e.g., temp check vs proposal)
+            const tags: string[] = Array.isArray(archiveProposal?.tags)
+              ? archiveProposal.tags
+              : [];
+            if (tags.includes("tempcheck")) {
+              (parsed as any).isTempCheck = true;
+            }
+          } catch (_) {
+            // ignore archive fetch errors; keep parsed title as-is
+          }
+        }
+
+        return parsed;
+      })
     );
     return {
       meta,
@@ -599,10 +655,16 @@ async function getVotesForProposal({
         };
       }
 
-      const proposalData = parseProposalData(
-        JSON.stringify(votes[0]?.proposal_data || {}),
-        votes[0]?.proposal_type
-      );
+      let proposalData: ParsedProposalData[ProposalType] | undefined =
+        undefined;
+      try {
+        proposalData = parseProposalData(
+          JSON.stringify(votes[0]?.proposal_data || {}),
+          votes[0]?.proposal_type
+        );
+      } catch (error) {
+        console.error("Error parsing proposal data", error);
+      }
 
       const data = await Promise.all(
         votes.map((vote) => parseVote(vote, proposalData, latestBlock))
@@ -683,16 +745,19 @@ async function getUserVotesForProposal({
       : await contracts.token.provider.getBlock("latest");
 
     const data = Promise.all(
-      votes.map((vote) =>
-        parseVote(
-          vote,
-          parseProposalData(
+      votes.map((vote) => {
+        let proposalData: ParsedProposalData[ProposalType] | undefined =
+          undefined;
+        try {
+          proposalData = parseProposalData(
             JSON.stringify(vote.proposal_data || {}),
             vote.proposal_type
-          ),
-          latestBlock
-        )
-      )
+          );
+        } catch (error) {
+          console.error("Error parsing proposal data", error);
+        }
+        return parseVote(vote, proposalData, latestBlock);
+      })
     );
 
     return data;
@@ -756,4 +821,36 @@ export const fetchVotesForProposalAndDelegateUnstableCache = unstable_cache(
 export const fetchSnapshotVotesForProposal = cache(getSnapshotVotesForProposal);
 export const fetchSnapshotUserVotesForProposal = cache(
   getUserSnapshotVotesForProposal
+);
+
+// Count distinct proposals a delegate has voted on (DB), used for archive participation rate
+async function getVotesCountForDelegateForAddress({
+  address,
+}: {
+  address: string;
+}) {
+  return withMetrics("getVotesCountForDelegateForAddress", async () => {
+    const { namespace, contracts } = Tenant.current();
+
+    // Count distinct proposals the delegate has voted on via votes table
+    const query = `
+      SELECT COUNT(DISTINCT v.proposal_id)::int AS count
+      FROM ${namespace}.votes v
+      WHERE v.voter = $1
+        AND v.contract = $2
+    `;
+
+    const rows = await prismaWeb3Client.$queryRawUnsafe<{ count: number }[]>(
+      query,
+      address.toLowerCase(),
+      contracts.governor.address.toLowerCase()
+    );
+
+    const count = rows?.[0]?.count ?? 0;
+    return count as number;
+  });
+}
+
+export const fetchVotesCountForDelegate = cache(
+  getVotesCountForDelegateForAddress
 );

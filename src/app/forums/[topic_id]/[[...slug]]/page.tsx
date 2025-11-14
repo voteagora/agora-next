@@ -6,9 +6,15 @@ import TopicHeader from "../components/TopicHeader";
 import PostAttachments from "../components/PostAttachments";
 import EmojiReactions from "@/components/Forum/EmojiReactions";
 import ForumThread from "../components/ForumThread";
-import { getForumTopic } from "@/lib/actions/forum";
+import {
+  getForumCategories,
+  getForumTopic,
+  getForumTopicsCount,
+  getUncategorizedTopicsCount,
+} from "@/lib/actions/forum";
 import { truncateAddress } from "@/app/lib/utils/text";
 import ForumsSidebar from "../../ForumsSidebar";
+import ForumsHeader from "../../components/ForumsHeader";
 import {
   transformForumTopics,
   buildForumTopicPath,
@@ -20,6 +26,10 @@ import { formatRelative } from "@/components/ForumShared/utils";
 import { stripHtmlToText } from "../../stripHtml";
 import Tenant from "@/lib/tenant/tenant";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
+import RelatedProposalLinks from "@/components/Proposals/ProposalPage/RelatedProposalLinks/RelatedProposalLinks";
+
+// Force dynamic rendering - forum topics and posts change frequently
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: {
@@ -135,9 +145,18 @@ export async function generateMetadata({
 }
 
 export default async function ForumTopicPage({ params }: PageProps) {
-  const [topicBundle, adminsResult] = await Promise.all([
+  const [
+    topicBundle,
+    adminsResult,
+    categoriesResult,
+    topicsCountResult,
+    uncategorizedCountResult,
+  ] = await Promise.all([
     loadTopic(params.topic_id),
     getForumAdmins(),
+    getForumCategories(),
+    getForumTopicsCount(),
+    getUncategorizedTopicsCount(),
   ]);
   if (!topicBundle) {
     return notFound();
@@ -162,6 +181,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
   const topicBody = transformed.content || "";
   const authorAddress = transformed.author || "";
   const createdAtIso = new Date(topicData.createdAt).toISOString();
+  const categoryName = topicData.category?.name || null;
 
   const adminRolesMap = adminsResult?.success
     ? adminsResult.data.reduce((map, admin) => {
@@ -173,6 +193,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
         return map;
       }, new Map<string, string | null>())
     : new Map<string, string | null>();
+
   const adminDirectory = Array.from(adminRolesMap.entries()).map(
     ([address, role]) => ({
       address,
@@ -194,28 +215,66 @@ export default async function ForumTopicPage({ params }: PageProps) {
     adminRole: authorRole,
   };
 
-  const rootPost = comments[0];
+  const rootPost = topicData.posts?.[0];
   const rootAttachments = (rootPost?.attachments as any[]) || [];
 
   const lastActivityAt =
     comments[comments.length - 1]?.createdAt || createdAtIso;
-  const labelName = topicData.category?.name ?? undefined;
+  const labelName = categoryName ?? undefined;
   const topicReactionsByEmoji = topicData.topicReactionsByEmoji || {};
   const rootPostId = rootPost?.id ?? undefined;
   const categoryId = topicData.category?.id ?? null;
+  const breadcrumbs = [
+    { label: "Discussions", href: "/forums" },
+    ...(categoryName && categoryId
+      ? [{ label: categoryName, href: `/forums/category/${categoryId}` }]
+      : []),
+  ];
+
+  const categories = categoriesResult.success
+    ? categoriesResult.data.map((cat) => ({
+        id: cat.id,
+        name: cat.name,
+        description: cat.description,
+        archived: cat.archived,
+        adminOnlyTopics: cat.adminOnlyTopics,
+        createdAt: cat.createdAt.toISOString(),
+        updatedAt: cat.updatedAt.toISOString(),
+        topicsCount: cat.topicsCount,
+      }))
+    : [];
+
+  const totalTopicsCount = topicsCountResult.success
+    ? topicsCountResult.data
+    : 0;
+
+  const uncategorizedCount = uncategorizedCountResult.success
+    ? uncategorizedCountResult.data
+    : 0;
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex gap-8">
+    <div className="min-h-screen">
+      <ForumsHeader
+        breadcrumbs={breadcrumbs}
+        isDuna={categoryName === "DUNA"}
+        topicContext={{
+          id: headerTopic.id,
+          title: headerTopic.title,
+          content: topicBody,
+          createdAt: headerTopic.createdAt,
+          commentsCount: comments.length,
+        }}
+      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Main Content */}
-          <div className="flex-1 max-w-4xl">
+          <div className="flex-1 min-w-0 max-w-full lg:max-w-4xl">
             <TopicHeader topic={headerTopic} isAdmin={isAuthorAdmin} />
 
-            <div className="mt-2 mb-4">
+            <div className="mt-2 mb-4 break-words">
               <DunaContentRenderer
                 content={topicBody}
-                className="text-gray-700 text-sm leading-relaxed"
+                className="text-secondary text-sm leading-relaxed break-words"
               />
             </div>
 
@@ -228,7 +287,11 @@ export default async function ForumTopicPage({ params }: PageProps) {
               />
             )}
 
-            <div className="flex items-center gap-6 text-xs font-semibold text-tertiary border-b pb-2 items-baseline">
+            <div className="my-4">
+              <RelatedProposalLinks proposalId={topicId.toString()} />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 lg:gap-6 text-xs font-semibold text-tertiary border-b pb-2">
               {rootPostId && (
                 <div className="">
                   <EmojiReactions
@@ -261,7 +324,15 @@ export default async function ForumTopicPage({ params }: PageProps) {
           </div>
 
           {/* Sidebar */}
-          <ForumsSidebar selectedCategoryId={categoryId} />
+          <div className="w-full lg:w-auto">
+            <ForumsSidebar
+              categories={categories}
+              latestPost={topicData}
+              selectedCategoryId={categoryId}
+              totalTopicsCount={totalTopicsCount}
+              uncategorizedCount={uncategorizedCount}
+            />
+          </div>
         </div>
       </div>
     </div>

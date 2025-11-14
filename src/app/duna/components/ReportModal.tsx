@@ -15,6 +15,8 @@ import { format } from "date-fns";
 import { useForum, useForumAdmin } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
 import { ConnectKitButton } from "connectkit";
+import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import CommentList from "./CommentList";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
@@ -22,6 +24,8 @@ import { canArchiveContent, canDeleteContent } from "@/lib/forumUtils";
 import SoftDeletedContent from "@/components/Forum/SoftDeletedContent";
 import { useTopicViewTracking } from "@/hooks/useTopicViewTracking";
 import Tenant from "@/lib/tenant/tenant";
+import useRequireLogin from "@/hooks/useRequireLogin";
+import { useStableCallback } from "@/hooks/useStableCallback";
 
 interface ReportModalProps {
   report: ForumTopic | null;
@@ -55,9 +59,38 @@ const ReportModal = ({
   const { isAdmin, canManageTopics } = useForumAdmin(
     dunaCategoryId || undefined
   );
+  const requireLogin = useRequireLogin();
+  const stableCreatePost = useStableCallback(createPost);
+  const stableDeleteTopic = useStableCallback(deleteTopic);
+  const stableArchiveTopic = useStableCallback(archiveTopic);
+  const stableRestoreTopic = useStableCallback(restoreTopic);
 
   const { ui } = Tenant.current();
   const useDarkStyling = ui.toggle("ui/use-dark-theme-styling")?.enabled;
+
+  const handleImageUpload = React.useCallback(
+    async (file: File): Promise<string> => {
+      const loggedInAddress = await requireLogin();
+      if (!loggedInAddress) {
+        throw new Error("Wallet not connected");
+      }
+
+      // Upload to IPFS only (no database record yet)
+      const attachmentData = await convertFileToAttachmentData(file);
+      const uploadResult = await uploadToIPFSOnly(
+        attachmentData,
+        loggedInAddress
+      );
+
+      if (!uploadResult.success || !uploadResult.ipfsUrl) {
+        throw new Error(uploadResult.error || "Upload failed");
+      }
+
+      return uploadResult.ipfsUrl;
+    },
+    [requireLogin]
+  );
+
   // Track topic view when modal opens
   useTopicViewTracking({
     topicId: report?.id || 0,
@@ -71,16 +104,21 @@ const ReportModal = ({
       return;
     }
 
+    const loggedIn = await requireLogin();
+    if (!loggedIn) {
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const newCommentData = await createPost(report.id, {
+      const newCommentData = await stableCreatePost(report.id, {
         content: newComment.trim(),
       });
 
       if (newCommentData) {
         const commentWithAuthor = {
           ...newCommentData,
-          author: newCommentData.author || address || "",
+          author: newCommentData.author || loggedIn,
         };
         setComments((prev) => [...prev, commentWithAuthor]);
         onCommentAdded?.(commentWithAuthor);
@@ -121,7 +159,12 @@ const ReportModal = ({
           ? "Are you sure you want to permanently delete this topic? This action cannot be undone."
           : "Are you sure you want to delete this topic?",
         onConfirm: async () => {
-          const success = await deleteTopic(report.id, isAdmin);
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
+          const success = await stableDeleteTopic(report.id, isAdmin);
           if (success && onDelete) {
             onDelete();
             closeDialog();
@@ -140,9 +183,14 @@ const ReportModal = ({
         title: "Restore Topic",
         message: "Are you sure you want to restore this topic?",
         onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
           const isAuthor =
-            report.author?.toLowerCase() === address?.toLowerCase();
-          const success = await restoreTopic(report.id, isAuthor);
+            report.author?.toLowerCase() === loggedInAddress.toLowerCase();
+          const success = await stableRestoreTopic(report.id, isAuthor);
           if (success && onDelete) {
             onDelete();
             closeDialog();
@@ -162,9 +210,14 @@ const ReportModal = ({
         message:
           "Are you sure you want to archive this topic? This action cannot be undone.",
         onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
           const isAuthor =
-            report.author?.toLowerCase() === address?.toLowerCase();
-          const success = await archiveTopic(report.id, isAuthor);
+            report.author?.toLowerCase() === loggedInAddress.toLowerCase();
+          const success = await stableArchiveTopic(report.id, isAuthor);
           if (success && onArchive) {
             onArchive();
             closeDialog();
@@ -192,9 +245,14 @@ const ReportModal = ({
       return;
     }
 
+    const loggedIn = await requireLogin();
+    if (!loggedIn) {
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const newReplyData = await createPost(report.id, {
+      const newReplyData = await stableCreatePost(report.id, {
         content: replyContent.trim(),
         parentId: replyingToId,
       });
@@ -202,7 +260,7 @@ const ReportModal = ({
       if (newReplyData) {
         const replyWithAuthor = {
           ...newReplyData,
-          author: newReplyData.author || address || "",
+          author: newReplyData.author || loggedIn,
           parentId: newReplyData.parentId || replyingToId,
         };
         setComments((prev) => [...prev, replyWithAuthor]);
@@ -469,6 +527,7 @@ const ReportModal = ({
                     value={newComment}
                     onChange={(html) => setNewComment(html)}
                     disabled={isSubmitting}
+                    onImageUpload={handleImageUpload}
                   />
                   <div className="flex justify-end mt-2">
                     <Button

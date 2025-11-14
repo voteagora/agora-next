@@ -18,6 +18,7 @@ import { apiFetchDelegateWeights } from "@/app/api/analytics/top/delegates/getTo
 import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/getProposalVoteCounts";
 import { apiFetchMetricTS } from "@/app/api/analytics/metric/[metric_id]/[frequency]/getMetricsTS";
 import Hero from "@/components/Hero/Hero";
+import { getMetadataBaseUrl } from "@/app/lib/utils/metadata";
 
 export const dynamic = "force-dynamic";
 
@@ -26,20 +27,26 @@ export async function generateMetadata({}) {
   const page = tenant.ui.page("info") || tenant.ui.page("/");
 
   const { title, description } = page!.meta;
+  const metadataBase = getMetadataBaseUrl();
 
   const preview = `/api/images/og/generic?title=${encodeURIComponent(
     title
   )}&description=${encodeURIComponent(description)}`;
 
   return {
+    metadataBase,
     title: title,
     description: description,
     openGraph: {
+      type: "website",
+      title: title,
+      description: description,
       images: [
         {
           url: preview,
           width: 1200,
           height: 630,
+          alt: title,
         },
       ],
     },

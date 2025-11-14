@@ -11,6 +11,8 @@ import DelegateCard from "./DelegateCard";
 import { stripMarkdown } from "@/lib/sanitizationUtils";
 import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import { SyndicateDelegateInfo } from "./SyndicateDelegateInfo";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -36,11 +38,13 @@ export default function DelegateCardList({
     initialDelegates.data
   );
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
-  const { ui } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
-  const showParticipation = ui.toggle("show-participation")?.enabled || false;
+  const showParticipation =
+    (ui.toggle("show-participation")?.enabled || false) &&
+    !(ui.toggle("hide-participation-delegates-page")?.enabled || false);
 
   useEffect(() => {
     setDelegates(initialDelegates.data.slice(0, batchSize));
@@ -92,6 +96,7 @@ export default function DelegateCardList({
   return (
     <DialogProvider>
       {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
+      {namespace === TENANT_NAMESPACES.SYNDICATE && <SyndicateDelegateInfo />}
       {/* @ts-ignore */}
       <InfiniteScroll
         className="grid grid-flow-row grid-cols-1 md:grid-cols-2 lg:grid-cols-3  justify-around sm:justify-between py-4 gap-4 sm:gap-8"

@@ -8,6 +8,9 @@ import { getForumCategory } from "@/lib/actions/forum/categories";
 const tenant = Tenant.current();
 const brandName = tenant.brandName || "Agora";
 
+// Force dynamic rendering - forum content changes frequently
+export const dynamic = "force-dynamic";
+
 interface CategoryPageParams {
   categoryId: string;
   categoryTitle?: string[];
@@ -25,6 +28,15 @@ async function loadCategory(categoryIdParam: string) {
   const id = parseCategoryId(categoryIdParam);
   if (id == null) {
     return null;
+  }
+
+  // Special case: categoryId = 0 means uncategorized topics
+  if (id === 0) {
+    return {
+      id: 0,
+      name: "Uncategorized",
+      description: "Topics without a category",
+    };
   }
 
   const response = await getForumCategory(id);

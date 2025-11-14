@@ -23,34 +23,38 @@ export default function ProposalTitle({
     proposalData
   );
   const { ui } = Tenant.current();
+  const useArchiveForProposals =
+    ui.toggle("use-archive-for-proposals")?.enabled ?? false;
 
   return (
     <div className="flex-col items-start">
-      <div className="text-xs font-semibold text-secondary flex items-center">
-        {proposalText} by
-        {Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM ? (
-          ` The ${ui.organization?.title}`
-        ) : (
-          <>
-            &nbsp;
-            <ENSName address={proposal.proposer} />{" "}
-          </>
-        )}
-        <a
-          href={
-            proposal.proposalType === "SNAPSHOT"
-              ? proposalData?.link
-              : getBlockScanUrl(
-                  proposal.createdTransactionHash ?? "",
-                  isOffchain
-                )
-          }
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
-        </a>
-      </div>
+      {!useArchiveForProposals && (
+        <div className="text-xs font-semibold text-secondary flex items-center">
+          {proposalText} by
+          {Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM ? (
+            ` The ${ui.organization?.title}`
+          ) : (
+            <>
+              &nbsp;
+              <ENSName address={proposal.proposer} />{" "}
+            </>
+          )}
+          <a
+            href={
+              proposal.proposalType === "SNAPSHOT"
+                ? proposalData?.link
+                : getBlockScanUrl(
+                    proposal.createdTransactionHash ?? "",
+                    isOffchain
+                  )
+            }
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+          </a>
+        </div>
+      )}
       <h2 className="font-black text-2xl text-primary">{title}</h2>
     </div>
   );

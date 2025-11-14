@@ -443,7 +443,7 @@ export function toNumericChainId(
   if (Number.isNaN(id)) {
     throw new Error(`Invalid chain id: ${String(raw)}`);
   }
-  console.log({ raw, parts, maybeId, id });
+
   return id;
 }
 
@@ -528,6 +528,13 @@ export const getTransportForChain = (chainId: number) => {
       return http(
         FORK_NODE_URL ||
           `https://linea-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+      );
+
+    // bsc (binance smart chain)
+    case 56:
+      return http(
+        FORK_NODE_URL ||
+          `https://bnb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
       );
 
     // for each new dao with a new chainId add them here

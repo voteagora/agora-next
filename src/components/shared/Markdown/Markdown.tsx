@@ -45,6 +45,7 @@ export default function Markdown({
     <div
       className={cn(
         styles.proposal_description_md,
+        styles.code,
         "max-w-full text-primary",
         wrapperClassName
       )}
@@ -86,9 +87,7 @@ export default function Markdown({
           ),
           className)
         }
-        wrapperElement={{
-          "data-color-mode": "light",
-        }}
+        wrapperElement={{ "data-color-mode": "light" }}
         rehypePlugins={[() => rehypeExternalLinks({ target: "_blank" })]}
         components={{
           h2: ({ node, ...props }) => (

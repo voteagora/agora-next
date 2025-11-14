@@ -17,6 +17,10 @@ import { ListViewIcon } from "@/icons/ListViewIcon";
 import { MobileDelegatesFilter } from "../DelegatesFilter/MobileDelegatesFilter";
 
 export default function DelegatesTabs({ children }: { children: ReactNode }) {
+  const { ui } = Tenant.current();
+  const delegatesLayout = ui.toggle("delegates-layout-list")?.enabled
+    ? "list"
+    : "grid";
   const [isPending, startTransition] = useTransition();
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [tab, setTab] = useQueryState("tab", {
@@ -25,10 +29,8 @@ export default function DelegatesTabs({ children }: { children: ReactNode }) {
     startTransition,
   });
   const [layout, setLayout] = useQueryState("layout", {
-    defaultValue: "grid",
+    defaultValue: delegatesLayout,
   });
-
-  const { ui } = Tenant.current();
 
   const handleTabChange = (value: string) => {
     setTab(value);

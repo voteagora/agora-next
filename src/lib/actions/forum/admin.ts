@@ -10,7 +10,9 @@ export async function getForumAdmins() {
 
     const admins = await prismaWeb2Client.forumAdmin.findMany({
       where: {
-        dao_slug: slug,
+        managedAccounts: {
+          has: slug,
+        },
       },
       select: {
         address: true,
@@ -34,8 +36,6 @@ export async function getForumAdmins() {
       success: false as const,
       error: "Failed to load forum admins",
     };
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -47,11 +47,11 @@ export async function checkForumPermissions(
     const { slug } = Tenant.current();
 
     // Check if user is a forum admin
-    const forumAdmin = await prismaWeb2Client.forumAdmin.findUnique({
+    const forumAdmin = await prismaWeb2Client.forumAdmin.findFirst({
       where: {
-        dao_slug_address: {
-          dao_slug: slug,
-          address: address.toLowerCase(),
+        address: address.toLowerCase(),
+        managedAccounts: {
+          has: slug,
         },
       },
     });

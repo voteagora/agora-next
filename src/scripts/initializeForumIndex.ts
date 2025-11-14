@@ -1,8 +1,8 @@
 #!/usr/bin/env tsx
 
 // Load environment variables FIRST, before any other imports
-import { config } from "dotenv";
-config();
+import { config as loadEnv } from "dotenv";
+loadEnv();
 
 import { ForumSearchService } from "@/lib/search";
 
@@ -11,7 +11,7 @@ async function main() {
 
   try {
     const forumSearchService = new ForumSearchService();
-    await forumSearchService.initializeIndex("UNI");
+    await forumSearchService.initializeIndex("TOWNS");
     console.log("✅ Forum index initialized successfully!");
     process.exit(0);
   } catch (error) {

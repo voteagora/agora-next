@@ -4,6 +4,7 @@ import {
   BlockBasedProposal,
   TimestampBasedProposal,
   ProposalPayload,
+  ProposalTypeData,
 } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData, keccak256, parseUnits } from "viem";
 import Tenant from "./tenant/tenant";
@@ -369,6 +370,19 @@ export async function parseProposal(
     ? proposal.proposal_id
     : offchainProposal?.proposal_id;
 
+  const status = latestBlock
+    ? await getProposalStatus(
+        proposal,
+        proposalResults,
+        proposalData,
+        latestBlock,
+        quorum,
+        votableSupply,
+        hardcodedThreshold ??
+          (proposalTypeData && proposalTypeData.approval_threshold)
+      )
+    : null;
+
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
@@ -411,18 +425,8 @@ export async function parseProposal(
     unformattedProposalData: proposal.proposal_data_raw,
     proposalResults: proposalResults.kind,
     proposalType,
-    status: latestBlock
-      ? await getProposalStatus(
-          proposal,
-          proposalResults,
-          proposalData,
-          latestBlock,
-          quorum,
-          votableSupply,
-          hardcodedThreshold ??
-            (proposalTypeData && proposalTypeData.approval_threshold)
-        )
-      : null,
+    proposalTypeData,
+    status,
     createdTransactionHash: proposal.created_transaction_hash,
     cancelledTransactionHash: proposal.cancelled_transaction_hash,
     executedTransactionHash: proposal.executed_transaction_hash,
@@ -622,19 +626,52 @@ export function parseIfNecessary(obj: string | object) {
 }
 
 function parseMultipleStringsSeparatedByComma(obj: string | object) {
+  // Helper function to split string without catastrophic backtracking
+  // This replaces the dangerous regex: /(?![^(]*\)),\s*/
+  const safeSplit = (str: string): string[] => {
+    // For very large strings (>100KB), skip complex parsing to avoid hanging
+    // if (str.length > 100000 && process.env.NODE_ENV === "development") {
+    //   console.log("Skipping complex parsing for large string when in development mode.");
+    //   return [str];
+    // }
+
+    const result: string[] = [];
+    let current = "";
+    let parenDepth = 0;
+
+    for (let i = 0; i < str.length; i++) {
+      const char = str[i];
+
+      if (char === "(") {
+        parenDepth++;
+        current += char;
+      } else if (char === ")") {
+        parenDepth--;
+        current += char;
+      } else if (char === "," && parenDepth === 0) {
+        // Only split on commas outside of parentheses
+        if (current.trim()) {
+          result.push(current.trim().replace(/^['"]|['"]$/g, ""));
+        }
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+
+    // Add the last item
+    if (current.trim()) {
+      result.push(current.trim().replace(/^['"]|['"]$/g, ""));
+    }
+
+    return result;
+  };
+
   return typeof obj === "string"
-    ? obj
-        .split(/(?![^(]*\)),\s*/)
-        .map((item) => item.replace(/^['"]|['"]$/g, ""))
+    ? safeSplit(obj)
     : Array.isArray(obj)
       ? obj
-          .map((item) =>
-            typeof item === "string"
-              ? item
-                  .split(/(?![^(]*\)),\s*/)
-                  .map((i) => i.replace(/^['"]|['"]$/g, ""))
-              : item
-          )
+          .map((item) => (typeof item === "string" ? safeSplit(item) : item))
           .flat()
       : obj;
 }
@@ -1064,13 +1101,6 @@ export const proposalToCallArgs = (proposal: Proposal) => {
       : "",
     keccak256(toUtf8Bytes(proposal.description!)),
   ];
-};
-
-type ProposalTypeData = {
-  proposal_type_id: number;
-  name: string;
-  quorum: bigint;
-  approval_threshold: bigint;
 };
 
 /**

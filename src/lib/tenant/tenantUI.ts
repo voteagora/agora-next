@@ -33,7 +33,11 @@ export type UIDunaDescriptionConfig = {
   content: ReactNode;
 };
 
-type UIConfig = PLMConfig | UIDunaDescriptionConfig;
+export type UIVotingPowerInfoConfig = {
+  text: string;
+};
+
+type UIConfig = PLMConfig | UIDunaDescriptionConfig | UIVotingPowerInfoConfig;
 
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account
@@ -155,6 +159,7 @@ type TenantUIParams = {
     customIconColor?: string;
     noReportsFound?: string;
     customButtonBackground?: string;
+    customHeroTitleWidth?: string;
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -219,6 +224,7 @@ export class TenantUI {
     customIconColor?: string;
     noReportsFound?: string;
     customButtonBackground?: string;
+    customHeroTitleWidth?: string;
   };
   private _theme: "light" | "dark";
   private _favicon?: {

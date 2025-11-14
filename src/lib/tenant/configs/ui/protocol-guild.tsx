@@ -61,9 +61,9 @@ export const protocolGuildTenantUIConfig = new TenantUI({
         "Protocol Guild is the leading independent organization dedicated to sustainable funding for Ethereum’s core protocol development. Our mission is to secure Ethereum’s future by funding core contributors.",
       meta: {
         title: "Protocol Guild Agora",
-        description: "Home of Ethereum L1 R&D governance",
+        description: "Home of Protocol Guild Governance",
         imageTitle: "Protocol Guild Agora",
-        imageDescription: "Home of Ethereum L1 R&D governance",
+        imageDescription: "Home of Protocol Guild Governance",
       },
     },
     {
@@ -73,9 +73,9 @@ export const protocolGuildTenantUIConfig = new TenantUI({
         "Protocol Guild is the leading independent organization dedicated to sustainable funding for Ethereum’s core protocol development. Our mission is to secure Ethereum’s future by funding core contributors.",
       meta: {
         title: "Protocol Guild Agora",
-        description: "Home of Ethereum L1 R&D governance",
+        description: "Home of Protocol Guild Governance",
         imageTitle: "Protocol Guild Agora",
-        imageDescription: "Home of Ethereum L1 R&D governance",
+        imageDescription: "Home of Protocol Guild Governance",
       },
     },
     {
@@ -301,6 +301,10 @@ export const protocolGuildTenantUIConfig = new TenantUI({
     {
       name: "use-daonode-for-proposal-types",
       enabled: true,
+    },
+    {
+      name: "forums",
+      enabled: false,
     },
   ],
 });

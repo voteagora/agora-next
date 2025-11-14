@@ -2,12 +2,14 @@ import { useState, useRef, useEffect } from "react";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function DelegateStatement({ statement }) {
   const sanitizedStatement = sanitizeContent(statement);
   const [isExpanded, setIsExpanded] = useState(false);
   const [shouldShowButton, setShouldShowButton] = useState(false);
   const contentRef = useRef(null);
+  const { ui } = Tenant.current();
 
   // Maximum height in pixels before truncation (approximately 10 lines)
   const MAX_HEIGHT = 200;
@@ -20,10 +22,15 @@ export default function DelegateStatement({ statement }) {
     }
   }, [sanitizedStatement]);
 
+  const useNeutral =
+    ui.toggle("syndicate-colours-fix-delegate-pages")?.enabled ?? false;
+
   return (
     <div className="flex flex-col gap-2">
       <h2 className="text-2xl font-bold text-primary">Delegate Statement</h2>
-      <div className="relative p-4 text-secondary bg-wash rounded-xl shadow-newDefault border border-line">
+      <div
+        className={`relative p-4 text-secondary ${useNeutral ? "bg-neutral" : "bg-wash"} rounded-xl shadow-newDefault border border-line`}
+      >
         <div
           ref={contentRef}
           className={`overflow-hidden transition-all duration-300 ${
@@ -40,7 +47,9 @@ export default function DelegateStatement({ statement }) {
 
         {/* Gradient overlay when collapsed */}
         {shouldShowButton && !isExpanded && (
-          <div className="absolute bottom-10 left-0 right-0 h-24 bg-gradient-to-t from-wash to-transparent pointer-events-none" />
+          <div
+            className={`absolute bottom-10 left-0 right-0 h-24 bg-gradient-to-t ${useNeutral ? "from-neutral" : "from-wash"} to-transparent pointer-events-none`}
+          />
         )}
 
         {/* Expand/Collapse button */}

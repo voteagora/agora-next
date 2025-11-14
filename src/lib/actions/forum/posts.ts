@@ -8,12 +8,23 @@ import {
   handlePrismaError,
 } from "./shared";
 import { moderateTextContent, isContentNSFW } from "@/lib/moderation";
-import { removeForumPostFromIndex, indexForumPost } from "./search";
+import { indexForumPost, removeForumPostFromIndex } from "./search";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
-import { logForumAuditAction } from "./admin";
-
+import { logForumAuditAction, checkForumPermissions } from "./admin";
+import { createAttachmentsFromContent } from "../attachment";
+import {
+  canCreatePost,
+  canPerformAction,
+  formatVPError,
+} from "@/lib/forumSettings";
+import {
+  fetchVotingPowerFromContract,
+  formatVotingPower,
+} from "@/lib/votingPowerUtils";
+import { getPublicClient } from "@/lib/viem";
+import { getIPFSUrl } from "@/lib/pinata";
 const { slug } = Tenant.current();
 
 // Lightweight schema for topic upvotes
@@ -37,19 +48,61 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
   try {
     const validated = topicVoteSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validated.address as `0x${string}`,
-      message: validated.message,
-      signature: validated.signature as `0x${string}`,
-    });
+    // Parallelize independent operations
+    const [isValid, topic] = await Promise.all([
+      verifyMessage({
+        address: validated.address as `0x${string}`,
+        message: validated.message,
+        signature: validated.signature as `0x${string}`,
+      }),
+      prismaWeb2Client.forumTopic.findFirst({
+        where: { id: validated.topicId, dao_slug: slug },
+        select: { id: true, categoryId: true },
+      }),
+    ]);
+
     if (!isValid)
       return { success: false, error: "Invalid signature" } as const;
 
-    const topic = await prismaWeb2Client.forumTopic.findFirst({
-      where: { id: validated.topicId, dao_slug: slug },
-      select: { id: true },
-    });
     if (!topic) return { success: false, error: "Topic not found" } as const;
+
+    // Check if user is an admin (admins bypass VP requirements)
+    const adminCheck = await checkForumPermissions(
+      validated.address,
+      topic.categoryId || undefined
+    );
+
+    // Only check voting power for non-admins
+    if (!adminCheck.isAdmin) {
+      try {
+        const tenant = Tenant.current();
+        const client = getPublicClient();
+
+        // Fetch voting power directly from contract
+        const votingPowerBigInt = await fetchVotingPowerFromContract(
+          client,
+          validated.address,
+          {
+            namespace: tenant.namespace,
+            contracts: tenant.contracts,
+          }
+        );
+
+        // Convert to number for comparison
+        const currentVP = formatVotingPower(votingPowerBigInt);
+        const vpCheck = await canPerformAction(currentVP, slug);
+
+        if (!vpCheck.allowed) {
+          return {
+            success: false,
+            error: formatVPError(vpCheck, "upvote"),
+          } as const;
+        }
+      } catch (vpError) {
+        console.error("Failed to check voting power:", vpError);
+        // Continue if VP check fails - don't block legitimate users
+      }
+    }
 
     const rootPostId = await getRootPostId(validated.topicId);
     if (!rootPostId)
@@ -81,8 +134,6 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
   } catch (error) {
     console.error("Error upvoting forum topic:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -120,8 +171,6 @@ export async function removeUpvoteForumTopic(
   } catch (error) {
     console.error("Error removing upvote from forum topic:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -137,8 +186,6 @@ export async function getForumTopicUpvotes(topicId: number) {
   } catch (error) {
     console.error("Error getting topic upvotes:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -169,8 +216,6 @@ export async function getMyForumTopicVote(topicId: number, address: string) {
   } catch (error) {
     console.error("Error checking my topic vote:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -181,22 +226,65 @@ export async function createForumPost(
   try {
     const validatedData = createPostSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
-      message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
-    });
+    // Parallelize independent operations
+    const [isValid, topic] = await Promise.all([
+      verifyMessage({
+        address: validatedData.address as `0x${string}`,
+        message: validatedData.message,
+        signature: validatedData.signature as `0x${string}`,
+      }),
+      prismaWeb2Client.forumTopic.findUnique({
+        where: { id: topicId },
+        include: {
+          category: true,
+        },
+      }),
+    ]);
 
     if (!isValid) {
       return { success: false, error: "Invalid signature" };
     }
 
-    const topic = await prismaWeb2Client.forumTopic.findUnique({
-      where: { id: topicId },
-    });
-
     if (!topic) {
       return { success: false, error: "Topic not found" };
+    }
+
+    // Check if user is an admin (admins bypass VP requirements)
+    const adminCheck = await checkForumPermissions(
+      validatedData.address,
+      topic.categoryId || undefined
+    );
+
+    // Only check voting power for non-admins
+    if (!adminCheck.isAdmin) {
+      try {
+        const tenant = Tenant.current();
+        const client = getPublicClient();
+
+        // Fetch voting power directly from contract
+        const votingPowerBigInt = await fetchVotingPowerFromContract(
+          client,
+          validatedData.address,
+          {
+            namespace: tenant.namespace,
+            contracts: tenant.contracts,
+          }
+        );
+
+        // Convert to number for comparison
+        const currentVP = formatVotingPower(votingPowerBigInt);
+        const vpCheck = await canCreatePost(currentVP, slug);
+
+        if (!vpCheck.allowed) {
+          return {
+            success: false,
+            error: formatVPError(vpCheck, "post replies"),
+          };
+        }
+      } catch (vpError) {
+        console.error("Failed to check voting power:", vpError);
+        // Continue if VP check fails - don't block legitimate users
+      }
     }
 
     // Moderate post content automatically
@@ -218,6 +306,22 @@ export async function createForumPost(
         isNsfw,
       },
     });
+
+    // Create attachment records for any IPFS images in the content
+    try {
+      await createAttachmentsFromContent(
+        validatedData.content,
+        validatedData.address,
+        "post",
+        newPost.id
+      );
+    } catch (attachmentError) {
+      console.error(
+        "Failed to create attachments for new post:",
+        attachmentError
+      );
+      // Don't fail the entire operation if attachments fail
+    }
 
     if (!isNsfw) {
       // Index the new post for search (async, don't block response)
@@ -246,8 +350,6 @@ export async function createForumPost(
   } catch (error) {
     console.error("Error creating forum post:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -293,8 +395,6 @@ export async function deleteForumPost(data: z.infer<typeof deletePostSchema>) {
   } catch (error) {
     console.error("Error deleting forum post:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -334,8 +434,6 @@ export async function softDeleteForumPost(
   } catch (error) {
     console.error("Error soft deleting forum post:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -405,8 +503,6 @@ export async function restoreForumPost(
   } catch (error) {
     console.error("Error restoring forum post:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -455,8 +551,6 @@ export async function getForumPostsByTopic(topicId: number) {
   } catch (error) {
     console.error("Error getting forum posts:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -511,8 +605,6 @@ export async function getForumPost(postId: number) {
   } catch (error) {
     console.error("Error getting forum post:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }
 
@@ -549,7 +641,90 @@ export async function getLatestForumPost() {
   } catch (error) {
     console.error("Error getting latest forum post:", error);
     return handlePrismaError(error);
-  } finally {
-    await prismaWeb2Client.$disconnect();
+  }
+}
+
+export async function getForumPostsByUser(
+  address: string,
+  pagination: { limit: number; offset: number }
+) {
+  try {
+    const { limit, offset } = pagination;
+
+    const posts = await prismaWeb2Client.forumPost.findMany({
+      where: {
+        dao_slug: slug,
+        address: address.toLowerCase(),
+        isNsfw: false,
+      },
+      include: {
+        votes: true,
+        reactions: true,
+        topic: {
+          select: {
+            title: true,
+            id: true,
+            category: {
+              select: {
+                name: true,
+                id: true,
+              },
+            },
+          },
+        },
+        attachments: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: limit + 1,
+      skip: offset,
+    });
+
+    const hasNext = posts.length > limit;
+    const data = posts.slice(0, limit);
+
+    const groupByEmojiAddresses = (reactions: any[] | undefined) => {
+      const out: Record<string, string[]> = {};
+      (reactions || []).forEach((r: any) => {
+        const e = (r.emoji || "").trim();
+        const addr = (r.address || "").toLowerCase();
+        if (!e || !addr) return;
+        if (!out[e]) out[e] = [];
+        if (!out[e].includes(addr)) out[e].push(addr);
+      });
+      return out;
+    };
+
+    const processedPosts = data.map((p) => ({
+      ...p,
+      reactionsByEmoji: groupByEmojiAddresses((p as any).reactions),
+      attachments: ((p as any).attachments || []).map((att: any) => ({
+        id: att.id,
+        fileName: att.fileName,
+        contentType: att.contentType,
+        fileSize: Number(att.fileSize ?? 0),
+        ipfsCid: att.ipfsCid,
+        url: getIPFSUrl(att.ipfsCid),
+        createdAt: (att.createdAt instanceof Date
+          ? att.createdAt
+          : new Date(att.createdAt)
+        ).toISOString(),
+        uploadedBy: att.address,
+      })),
+    }));
+
+    return {
+      success: true,
+      data: {
+        meta: {
+          has_next: hasNext,
+          total_returned: processedPosts.length,
+          next_offset: hasNext ? offset + limit : 0,
+        },
+        data: processedPosts,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting forum posts by user:", error);
+    return handlePrismaError(error);
   }
 }

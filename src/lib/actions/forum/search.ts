@@ -23,13 +23,13 @@ export async function indexForumTopic({
     const document: ForumDocument = {
       id: `${daoSlug}_topic_${topicId}`,
       contentType: "topic",
-      topicId: topicId,
-      daoSlug: daoSlug,
-      title: title,
-      content: content,
-      author: author,
-      categoryId: categoryId,
-      createdAt: createdAt ? createdAt.getTime() : Date.now(),
+      topicId,
+      daoSlug,
+      title,
+      content,
+      author,
+      categoryId,
+      createdAt: createdAt?.getTime() ?? Date.now(),
     };
 
     await forumSearchService.indexDocument(document);
@@ -61,15 +61,15 @@ export async function indexForumPost({
     const document: ForumDocument = {
       id: `${daoSlug}_post_${postId}`,
       contentType: "post",
-      postId: postId,
-      daoSlug: daoSlug,
+      postId,
+      daoSlug,
       title: `Re: ${topicTitle}`,
-      topicId: topicId,
-      topicTitle: topicTitle,
-      content: content,
-      author: author,
-      parentPostId: parentPostId,
-      createdAt: createdAt ? createdAt.getTime() : Date.now(),
+      topicId,
+      topicTitle,
+      content,
+      author,
+      parentPostId,
+      createdAt: createdAt?.getTime() ?? Date.now(),
     };
 
     await forumSearchService.indexDocument(document);

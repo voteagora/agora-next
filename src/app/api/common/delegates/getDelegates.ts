@@ -35,7 +35,9 @@ const cachedGetDelegatesFromDaoNode = unstable_cache(
       delegator?: `0x${string}`;
     };
     withParticipation?: boolean;
-  }) => getDelegatesFromDaoNode(args),
+  }) => {
+    return getDelegatesFromDaoNode(args);
+  },
   ["delegates-dao-node-filters"],
   {
     revalidate: 30, // Cache for 30 seconds
@@ -117,14 +119,6 @@ async function getDelegates({
         filters?.endorsed ||
         filters?.hasStatement;
       const isWeightedRandomSort = sort === "weighted_random" && seed;
-
-      console.log({
-        filters,
-        isAllowListEnabled,
-        isWeightedRandomSort,
-        sort,
-        seed,
-      });
 
       const daoNodeResult = await cachedGetDelegatesFromDaoNode({
         sortBy: daoNodeSortBy,
