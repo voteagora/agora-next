@@ -6,7 +6,7 @@ import ComingSoonPage from "@/app/coming-soon/page";
 import { getMetadataBaseUrl } from "@/app/lib/utils/metadata";
 
 // Revalidate cache every 60 seconds
-export const revalidate = 60;
+export const revalidate = 'force-dynamic';
 
 export async function generateMetadata() {
   const { ui } = Tenant.current();

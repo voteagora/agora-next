@@ -2,7 +2,7 @@
 
 import ProposalsHome from "@/components/Proposals/ProposalsHome";
 
-export const revalidate = 60;
+export const revalidate = 'force-dynamic';
 
 export { generateMetadata } from "../page";
 export default ProposalsHome;
