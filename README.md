@@ -491,7 +491,6 @@ The main usage of direct Tailwind classes can be found in a single component
 import React, { ReactNode } from "react";
 
 import { VStack } from "@/components/Layout/Stack";
-import { Analytics } from "@vercel/analytics/react";
 
 type Props = {
   children: ReactNode,
@@ -503,7 +502,6 @@ export function PageContainer({ children }: Props) {
       <div className="gl_bg-dotted-pattern" />
       <div className="gl_bg-radial-gradient" />
       {children}
-      <Analytics />
     </div>
   );
 }
