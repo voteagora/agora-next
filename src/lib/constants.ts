@@ -56,6 +56,7 @@ export const TENANT_NAMESPACES = {
   DEMO: "demo",
   LINEA: "linea",
   TOWNS: "towns",
+  SHAPE: "shape",
   SYNDICATE: "syndicate",
 } as const;
 
