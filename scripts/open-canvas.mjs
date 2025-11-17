@@ -2,29 +2,66 @@
 
 /**
  * Trigger script to open Eames Canvas with agora-next routes
- * 
- * This script:
- * 1. Detects the current project path
- * 2. Reads the dev server port from next.config.js or uses default
- * 3. Calls the Eames Bridge API to load all routes in Canvas
  */
 
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const projectPath = join(__dirname, '..');
 
 const BRIDGE_URL = 'http://localhost:4000';
-const DEV_PORT = 3000; // agora-next dev server port
+
+// Get port from command line arg or try to detect it
+async function getDevServerPort() {
+  // Check if port provided as argument
+  const portArg = process.argv.find(arg => arg.startsWith('--port='));
+  if (portArg) {
+    return parseInt(portArg.split('=')[1]);
+  }
+
+  // Try to detect running Next.js dev server
+  try {
+    const { stdout } = await execAsync('lsof -ti:3001,3000,3002 -sTCP:LISTEN');
+    const pids = stdout.trim().split('\n').filter(Boolean);
+    
+    for (const pid of pids) {
+      try {
+        const { stdout: cmdOutput } = await execAsync(`ps -p ${pid} -o command=`);
+        if (cmdOutput.includes('next dev')) {
+          // Found Next.js dev server, check which port
+          const { stdout: portOutput } = await execAsync(`lsof -Pan -p ${pid} -iTCP -sTCP:LISTEN | grep LISTEN`);
+          const match = portOutput.match(/:(\d+)/);
+          if (match) {
+            return parseInt(match[1]);
+          }
+        }
+      } catch (e) {
+        // Continue checking other PIDs
+      }
+    }
+  } catch (e) {
+    // Could not detect, fall back to default
+  }
+
+  // Default to 3000
+  return 3000;
+}
 
 async function openCanvas() {
   console.log('🎨 Opening Eames Canvas...\n');
-  console.log(`Project: ${projectPath}`);
-  console.log(`Dev Server: http://localhost:${DEV_PORT}\n`);
 
   try {
+    const DEV_PORT = await getDevServerPort();
+    
+    console.log(`Project: ${projectPath}`);
+    console.log(`Dev Server: http://localhost:${DEV_PORT}\n`);
+
     const response = await fetch(`${BRIDGE_URL}/api/canvas/open`, {
       method: 'POST',
       headers: {
@@ -72,4 +109,3 @@ async function openCanvas() {
 }
 
 openCanvas();
-
