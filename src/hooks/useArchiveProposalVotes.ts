@@ -6,12 +6,20 @@ import { parseSupport } from "@/lib/voteUtils";
 export type ArchiveVote = {
   transactionHash: string | null;
   address: string;
-  support: "AGAINST" | "ABSTAIN" | "FOR";
+  support: "AGAINST" | "ABSTAIN" | "FOR" | null;
   weight: string;
   citizenType: string | null;
-  voterMetadata: null;
+  voterMetadata: {
+    name: string | null;
+    image: string | null;
+    type: string | null;
+  } | null;
   proposalId: string;
   proposalType: ProposalType;
+  params: number[] | null;
+  reason: string | null;
+  blockNumber: bigint;
+  timestamp: Date | null;
 };
 
 export type ArchiveNonVoter = {
@@ -30,6 +38,47 @@ export type ArchiveNonVoter = {
 
 const ARCHIVE_VOTES_QK = "archiveVotes";
 const ARCHIVE_NON_VOTERS_QK = "archiveNonVoters";
+
+/**
+ * Get citizen type priority for sorting
+ */
+function getCitizenTypePriority(
+  citizenType: string | null | undefined
+): number {
+  const citizenTypePriority: Record<string, number> = {
+    CHAIN: 1,
+    APP: 2,
+    USER: 3,
+  };
+
+  if (!citizenType || typeof citizenType !== "string") {
+    return 999;
+  }
+
+  return citizenTypePriority[citizenType.toUpperCase()] ?? 999;
+}
+
+/**
+ * Sort by citizen type priority, then by numeric value (descending)
+ */
+function sortByCitizenTypeAndValue<T>(
+  items: T[],
+  getValue: (item: T) => number,
+  getCitizenType: (item: T) => string | null | undefined
+): T[] {
+  return items.sort((a, b) => {
+    const aPriority = getCitizenTypePriority(getCitizenType(a));
+    const bPriority = getCitizenTypePriority(getCitizenType(b));
+
+    // First sort by citizen type priority
+    if (aPriority !== bPriority) {
+      return aPriority - bPriority;
+    }
+
+    // Then sort by value (descending) within the same citizen type
+    return getValue(b) - getValue(a);
+  });
+}
 
 /**
  * Fetch and transform archive votes
@@ -63,25 +112,48 @@ async function fetchArchiveVotes({
         : String(startBlock)
       : null;
 
-  return (
+  const parseWeight = (value: string) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
+  const votes =
     payload.data?.map((row) => {
-      const support = parseSupport(
-        row.support ?? null,
-        proposalType,
-        startBlockString
-      );
+      const support =
+        row.support === null
+          ? null
+          : parseSupport(row.support ?? null, proposalType, startBlockString);
+      const vp = row.weight !== undefined ? String(row.weight) : undefined;
+      const vpForCopelanProposalType =
+        row.vp !== undefined ? String(row.vp) : undefined;
 
       return {
         transactionHash: row.transaction_hash ?? null,
         address: row.voter?.toLowerCase(),
         support,
-        weight: row.weight !== undefined ? String(row.weight) : "0",
-        citizenType: null,
-        voterMetadata: null,
+        weight: vp || vpForCopelanProposalType || "0",
+        citizenType: row.citizen_type ?? null,
+        voterMetadata:
+          row.name || row.ens
+            ? {
+                name: row.name || row.ens || "",
+                image: row.image ?? null,
+                type: row.citizen_type || "",
+              }
+            : null,
         proposalId,
         proposalType,
-      };
-    }) ?? []
+        reason: row.reason ?? null,
+        params: row.params || row.choice || null,
+        blockNumber: row.block_number,
+        timestamp: row.ts ? new Date(Number(row.ts)) : null,
+      } satisfies ArchiveVote;
+    }) ?? [];
+
+  return sortByCitizenTypeAndValue(
+    votes,
+    (vote) => parseWeight(vote.weight),
+    (vote) => vote.citizenType
   );
 }
 
@@ -153,15 +225,16 @@ async function fetchArchiveNonVoters({
         twitter: row.x ?? null,
         warpcast: row.warpcast ?? null,
         discord: row.discord ?? null,
-        citizen_type: null,
-        voterMetadata: row.ens
-          ? {
-              name: row.ens,
-              image: "",
-              type: "",
-            }
-          : null,
-      });
+        citizen_type: row.citizen_type ?? null,
+        voterMetadata:
+          row.name || row.ens
+            ? {
+                name: row.name || row.ens || "",
+                image: row.image || "",
+                type: row.citizen_type || "",
+              }
+            : null,
+      } satisfies ArchiveNonVoter);
 
       return acc;
     }, []) ?? [];
@@ -171,9 +244,10 @@ async function fetchArchiveNonVoters({
     return Number.isFinite(parsed) ? parsed : 0;
   };
 
-  return nonVoters.sort(
-    (a, b) =>
-      parseVotingPower(b.voting_power) - parseVotingPower(a.voting_power)
+  return sortByCitizenTypeAndValue(
+    nonVoters,
+    (nonVoter) => parseVotingPower(nonVoter.voting_power),
+    (nonVoter) => nonVoter.citizen_type
   );
 }
 

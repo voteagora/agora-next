@@ -337,6 +337,10 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
       enabled: false,
     },
     {
+      name: "use-archive-for-vote-history",
+      enabled: true,
+    },
+    {
       name: "show-participation",
       enabled: true,
     },

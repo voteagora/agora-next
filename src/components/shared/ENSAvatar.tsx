@@ -5,6 +5,7 @@ import { useEnsAvatar } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { GetEnsNameData } from "wagmi/query";
 import Image from "next/image";
+import { resolveIPFSUrl } from "@/lib/utils";
 
 // TODO: Might be better to load the avatar on the server
 export default function ENSAvatar({
@@ -26,7 +27,15 @@ export default function ENSAvatar({
 
   useEffect(() => {
     if (data) {
-      setAvatar(data);
+      // Resolve IPFS URLs to HTTP gateway URLs
+      // Note: resolveIPFSUrl returns null for NFT references (eip155:...)
+      // wagmi's useEnsAvatar should already resolve NFT avatars, but if it returns
+      // an unresolved NFT reference, we skip it and show the placeholder
+      const resolvedUrl = resolveIPFSUrl(data);
+      setAvatar(resolvedUrl);
+    } else {
+      // Reset avatar when data changes to null
+      setAvatar(null);
     }
   }, [data, ensName]);
 

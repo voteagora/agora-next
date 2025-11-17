@@ -19,11 +19,6 @@ BigInt.prototype.toJSON = function (): string {
   return this.toString();
 };
 
-async function fetchDaoMetrics() {
-  "use server";
-  return fetchMetrics();
-}
-
 const defaults = {
   primary: "23 23 23",
   secondary: "64 64 64",

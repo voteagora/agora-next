@@ -396,6 +396,10 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "use-archive-for-vote-history",
+      enabled: false,
+    },
+    {
       name: "syndicate-voters-page-content",
       enabled: true,
     },

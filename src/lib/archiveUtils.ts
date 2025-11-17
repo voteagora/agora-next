@@ -159,19 +159,28 @@ export const fetchProposalFromArchive = async (
 };
 
 export type ArchiveVoteRow = {
+  citizen_type?: string | null;
   transaction_hash?: string | null;
-  block_number?: number | string;
-  chain_id?: number;
+  block_number: bigint;
+  chain_id?: number | null;
   voter: string;
   support?: string | null;
   weight?: string | number;
-  ts?: number;
+  reason?: string | null;
+  params?: Array<number> | null;
+  choice?: Array<number> | null; // for Copeland proposal type
+  vp?: string | number; // for Copeland proposal type
+  ts?: number | string | null;
   x?: string | null;
   warpcast?: string | null;
   discord?: string | null;
+  name?: string | null;
+  image?: string | null;
+  ens?: string | null;
 };
 
 export type ArchiveNonVoterRow = {
+  citizen_type?: string | null;
   addr: string;
   vp?: string | number;
   ens?: string | null;
@@ -179,6 +188,8 @@ export type ArchiveNonVoterRow = {
   x?: string | null;
   warpcast?: string | null;
   discord?: string | null;
+  name?: string | null;
+  image?: string | null;
 };
 
 const isBrowser = typeof window !== "undefined";
@@ -294,56 +305,6 @@ export async function fetchRawProposalNonVotersFromArchive({
       return [];
     }
     console.error("Error fetching raw non-voters from archive:", error);
-    throw error;
-  }
-}
-
-/**
- * Fetch and transform non-voter data from archive
- * @deprecated Use fetchRawProposalNonVotersFromArchive and transform on client side when possible
- */
-export async function fetchProposalNonVotersFromArchive({
-  namespace,
-  proposalId,
-}: {
-  namespace: string;
-  proposalId: string;
-}): Promise<ArchiveNonVoter[]> {
-  try {
-    const rows = await fetchArchiveNdjson<ArchiveNonVoterRow>(
-      getArchiveSlugForProposalNonVoters(namespace, proposalId)
-    );
-
-    const seen = new Set<string>();
-
-    return rows.reduce<ArchiveNonVoter[]>((acc, row) => {
-      const address = row.addr?.toLowerCase();
-      if (!address || seen.has(address)) {
-        return acc;
-      }
-
-      seen.add(address);
-
-      acc.push({
-        delegate: address,
-        voting_power: row.vp !== undefined ? String(row.vp) : "0",
-        twitter: row.x ?? null,
-        warpcast: row.warpcast ?? null,
-        discord: row.discord ?? null,
-        citizen_type: null,
-        voterMetadata: row.ens
-          ? {
-              name: row.ens,
-              image: "",
-              type: "",
-            }
-          : null,
-      });
-
-      return acc;
-    }, []);
-  } catch (error) {
-    console.error("Error fetching non-voters from archive:", error);
     throw error;
   }
 }

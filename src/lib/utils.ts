@@ -42,6 +42,47 @@ export function shortAddress(address: string) {
   );
 }
 
+export function resolveIPFSUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+
+  // If it's already an HTTP/HTTPS URL, return as is
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  // Detect NFT references (eip155:chainId/erc721:contract/tokenId)
+  // Example: eip155:1/erc721:0x9dfffe8ccc228900ad4a348a3e0e7dd72f4711f7/132
+  // These require async resolution, so return null to let wagmi's useEnsAvatar handle it
+  if (url.match(/^eip155:\d+\/erc(721|1155):/)) {
+    return null;
+  }
+
+  const ipfsGateway = "https://ipfs.io";
+
+  // Convert ipfs:// to IPFS gateway URL
+  if (url.startsWith("ipfs://")) {
+    const ipfsPath = url.replace("ipfs://", "");
+    // Check if there's an NFT reference as a query parameter
+    if (ipfsPath.includes("?")) {
+      const [path, query] = ipfsPath.split("?");
+      // If query contains NFT reference, we still resolve the IPFS path
+      // The NFT reference would be handled separately if needed
+      return `${ipfsGateway}/ipfs/${path}${query ? `?${query}` : ""}`;
+    }
+    return `${ipfsGateway}/ipfs/${ipfsPath}`;
+  }
+
+  // If it's just an IPFS hash, convert it
+  if (
+    url.match(/^[Qm][1-9A-HJ-NP-Za-km-z]{44,}/) ||
+    url.match(/^ba[a-z0-9]{56,}/)
+  ) {
+    return `${ipfsGateway}/ipfs/${url}`;
+  }
+
+  return url;
+}
+
 export function bpsToString(bps: number) {
   return `${(Math.round(bps * 100) / 100).toFixed(2)}%`;
 }
