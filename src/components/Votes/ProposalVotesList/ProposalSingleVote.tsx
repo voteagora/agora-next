@@ -8,6 +8,7 @@ import {
   formatNumber,
   getBlockScanUrl,
   timeout,
+  resolveIPFSUrl,
 } from "@/lib/utils";
 import { useState } from "react";
 import ENSAvatar from "@/components/shared/ENSAvatar";
@@ -94,7 +95,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
     }
   };
 
-  const name = vote.voterMetadata?.name || ensFromBlockCache;
+  const name = vote.voterMetadata?.name || ensFromBlockCache?.name;
 
   const ensAvatar = () => {
     if (vote.voterMetadata?.image) {
@@ -111,7 +112,24 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
         </div>
       );
     }
-    return <ENSAvatar ensName={ensFromBlockCache} className="w-8 h-8" />;
+    if (ensFromBlockCache?.avatar) {
+      const avatarUrl = resolveIPFSUrl(ensFromBlockCache.avatar);
+      if (avatarUrl) {
+        return (
+          <div
+            className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={avatarUrl}
+              alt="avatar"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        );
+      }
+    }
+    return <ENSAvatar ensName={ensFromBlockCache?.name} className="w-8 h-8" />;
   };
 
   return (

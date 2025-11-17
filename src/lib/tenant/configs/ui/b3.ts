@@ -272,7 +272,7 @@ If you meet the proposal threshold or are the manager of the governor, then you 
     },
     {
       name: "use-archive-for-vote-history",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "forums",

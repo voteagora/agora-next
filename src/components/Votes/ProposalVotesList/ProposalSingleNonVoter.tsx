@@ -15,6 +15,7 @@ import ENSName from "@/components/shared/ENSName";
 import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
+import { resolveIPFSUrl } from "@/lib/utils";
 
 export function ProposalSingleNonVoter({
   voter,
@@ -40,12 +41,9 @@ export function ProposalSingleNonVoter({
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"
   )?.enabled;
-  const shouldfetchEnsName =
-    !useArchiveVoteHistory && !voter.voterMetadata?.name;
 
-  const { data: ensName } = useBlockCacheWrappedEns({
+  const { data: ensFromBlockCache } = useBlockCacheWrappedEns({
     address: voter.delegate as `0x${string}`,
-    enabled: shouldfetchEnsName,
   });
 
   const { address: connectedAddress } = useAccount();
@@ -71,7 +69,29 @@ export function ProposalSingleNonVoter({
         </div>
       );
     }
-    return <ENSAvatar ensName={voter.delegate} className="w-8 h-8" />;
+    if (ensFromBlockCache?.avatar) {
+      const avatarUrl = resolveIPFSUrl(ensFromBlockCache.avatar);
+      if (avatarUrl) {
+        return (
+          <div
+            className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={avatarUrl}
+              alt="avatar"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        );
+      }
+    }
+    return (
+      <ENSAvatar
+        ensName={ensFromBlockCache?.name || voter.delegate}
+        className="w-8 h-8"
+      />
+    );
   };
 
   return (
@@ -89,8 +109,8 @@ export function ProposalSingleNonVoter({
           <div className="flex flex-col">
             <div className="text-primary font-bold hover:underline">
               <Link href={`/delegates/${voter.delegate}`}>
-                {voter.voterMetadata?.name ? (
-                  voter.voterMetadata.name
+                {voter.voterMetadata?.name || ensFromBlockCache?.name ? (
+                  voter.voterMetadata?.name || ensFromBlockCache?.name
                 ) : (
                   <ENSName address={voter.delegate} />
                 )}

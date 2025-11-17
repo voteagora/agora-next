@@ -6,12 +6,17 @@ interface UseBlockCacheWrappedEnsProps {
   enabled?: boolean;
 }
 
+interface EnsData {
+  name: string | null;
+  avatar: string | null;
+}
+
 const useBlockCacheWrappedEns = ({
   address,
   chainId = 1,
   enabled = true,
 }: UseBlockCacheWrappedEnsProps) => {
-  const { data } = useQuery({
+  const { data } = useQuery<EnsData>({
     queryKey: ["blockCacheEns", chainId, address],
     queryFn: async () => {
       const headers: HeadersInit = {};
@@ -22,25 +27,28 @@ const useBlockCacheWrappedEns = ({
       }
 
       const response = await fetch(
-        `https://blockcache-production.up.railway.app/ens/${chainId}/${address}`,
+        `https://blockcache-production.up.railway.app/ens_avatar/${chainId}/${address}`,
         {
           headers,
         }
       );
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch ENS name: ${response.statusText}`);
+        throw new Error(`Failed to fetch ENS data: ${response.statusText}`);
       }
 
       const data = await response.json();
 
       // Handle different response formats
       if (typeof data === "string") {
-        return data || null;
+        return { name: data || null, avatar: null };
       }
 
-      // If it's an object, try to extract the name field
-      return data?.name || data?.ensName || null;
+      // If it's an object, extract both name and avatar fields
+      return {
+        name: data?.name || data?.ensName || null,
+        avatar: data?.avatar || null,
+      };
     },
     enabled: !!address && enabled,
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes

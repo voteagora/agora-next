@@ -163,7 +163,7 @@ export const etherfiTenantUIConfig = new TenantUI({
     },
     {
       name: "use-archive-for-vote-history",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "show-participation",

@@ -320,7 +320,7 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       name: "use-archive-for-vote-history",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "ui/use-dark-theme-styling",

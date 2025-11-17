@@ -134,7 +134,7 @@ export default function ArchiveProposalNonVoterList({
           }
           element="main"
         >
-          <ul className="flex flex-col">
+          <ul className="flex flex-col gap-2">
             {paginatedNonVoters.map((nonVoter) => (
               <li key={nonVoter.delegate}>
                 <ProposalSingleNonVoter voter={nonVoter} proposal={proposal} />

@@ -377,11 +377,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "use-archive-for-vote-history",
-      enabled: true,
-    },
-    {
-      name: "use-archive-for-vote-history",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "duna-description",

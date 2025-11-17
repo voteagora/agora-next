@@ -190,7 +190,7 @@ If you need help creating transactions / calldata, please see this [video](https
     },
     {
       name: "use-archive-for-vote-history",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "forums",
