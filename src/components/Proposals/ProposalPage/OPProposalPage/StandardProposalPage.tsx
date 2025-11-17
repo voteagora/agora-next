@@ -1,6 +1,7 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalVotesCard from "./ProposalVotesCard/ProposalVotesCard";
+import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
 
 export default async function StandardProposalPage({
   proposal,
