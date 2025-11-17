@@ -33,7 +33,7 @@ async function getDevServerPort() {
     for (const pid of pids) {
       try {
         const { stdout: cmdOutput } = await execAsync(`ps -p ${pid} -o command=`);
-        if (cmdOutput.includes('next dev')) {
+        if (cmdOutput.includes('next dev') || cmdOutput.includes('next-server')) {
           // Found Next.js dev server, check which port
           const { stdout: portOutput } = await execAsync(`lsof -Pan -p ${pid} -iTCP -sTCP:LISTEN | grep LISTEN`);
           const match = portOutput.match(/:(\d+)/);
