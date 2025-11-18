@@ -1,4 +1,1 @@
-[
-  "cp $ROOT_WORKTREE_PATH/.env .env",
-  "yarn install"
-]
+["cp $ROOT_WORKTREE_PATH/.env .env", "yarn install"]
