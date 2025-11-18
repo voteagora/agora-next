@@ -27,9 +27,11 @@ Follow these when creating design directions. Break these guidelines only if use
 
 Follow these when implementing UI changes
 
+- For each component you create or edit, check the ui-refence folder to see if you can find patterns to leverage
 - When using dividers or border that act like dividers inside a container or card that has a border, make sure that the dividers span all the way to the edge and touch and connect with the borders of the container.
 - Avoid using bold or underline to emphasize text in paragraphs, find other ways to call attention to parts of paragraphs, or rephrase the paragraphs so that the important elements are more obvious.
-- When creating banners, don't assume they always have to be at the top. If they are relevant to a specific section, place them on top of that section and attach the banner to that section visually
+- When creating banners, don't assume they always have to be at the top. If they are relevant to a specific section or card, place them on top of that section and attach the banner to that section visually.
 - Don't use an icon on the left side of a tall multi-line banner. only use icons on short banners, otherwise it looks unbalanced.
 - Avoid using bullet points in UI text or explainers. Prefer short sinccinct prose.
 - When using a learn more text link inline with a paragraph, don't bold the text or add an arrow. treat it like a text link.
+- A banner should not have too much content and should serve to convey a simple message. Best is to keep it to a single line. Use a title a a single body line if more content. If even more is needed, take the user somewhere else to read things in full.
