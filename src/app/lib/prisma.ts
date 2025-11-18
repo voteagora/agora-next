@@ -69,13 +69,34 @@ const makePrismaClient = (databaseUrl: string) => {
     throw lastError;
   };
 
-  return new PrismaClient({
+  const url = databaseUrl.includes("?")
+    ? `${databaseUrl}&connect_timeout=300`
+    : `${databaseUrl}?connect_timeout=300`;
+  const client = new PrismaClient({
     datasources: {
       db: {
-        url: databaseUrl,
+        url: url,
       },
     },
   });
+  client.$use(async (params, next) => {
+    let attempt = 0;
+    const maxRetries = 2;
+    while (true) {
+      try {
+        return await next(params);
+      } catch (error) {
+        const msg = (error && (error as Error).message) || "";
+        if (attempt < maxRetries && (msg.includes("P1001") || msg.includes("Can't reach database server"))) {
+          attempt += 1;
+          await new Promise((r) => setTimeout(r, 500 * attempt));
+          continue;
+        }
+        throw error;
+      }
+    }
+  });
+  return client;
 };
 
 if (process.env.NODE_ENV === "production") {
