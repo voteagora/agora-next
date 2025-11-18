@@ -1,0 +1,6 @@
+{
+    "scripts": {
+        "setup": "cp $CONDUCTOR_ROOT_PATH/.env.local .env.local; yarn",
+        "run": "yarn dev"
+    }
+}
