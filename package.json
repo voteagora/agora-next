@@ -2,6 +2,9 @@
   "name": "agora-next",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "npm run generate-typechain & npx prisma generate & next dev",
     "build": "next build",
