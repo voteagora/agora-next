@@ -11,3 +11,5 @@ Before you implement, you need to understand the context of the ask by doing the
 3. Then, read the @design-guidance.md for how you should tackle this task. Follow this instruction there.
 
 Once you have done all that, implement "Direction 1" in the @design-directions.md file. Once you are done, run it on port 3001. Use your browser to confirm that it works. Fix bugs that come up. Don't declare success until there are no more bugs and you've done everything in the Direction.
+
+The command to run the app is yarn dev.
