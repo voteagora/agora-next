@@ -1,5 +1,5 @@
 # ---------- Stage 1: base with deps ----------
-FROM node:22-bullseye-slim AS deps
+FROM node:20-bullseye-slim AS deps
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ COPY package.json package-lock.json* ./
 RUN npm ci
 
 # ---------- Stage 2: builder ----------
-FROM node:22-bullseye-slim AS builder
+FROM node:20-bullseye-slim AS builder
 
 WORKDIR /app
 
