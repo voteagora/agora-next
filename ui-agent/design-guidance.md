@@ -13,8 +13,10 @@
 
 ## Design guidelines
 
-Follow these when creating design directions
+Follow these when creating design directions. Break these guidelines only if user's instruction explicitly ask for it.
 
+- Don't create new pages or sub-pages unless we're implementing large, significant new functionality. Prefer to modify existing pages. Second preference is to use modals or other pop up patterns
+- When there are multiple informational UI elements, consider combining them.
 - Don't call for new UI patterns unless it's the best way to do something. E.g. if an app never uses slide-over panels and you want to call for one, think first if there are ways to achieve the same outcome by using existing patterns.
 - Educational content should not live permanently on any pages other than pages that are primary about education / information / faq. Education content can be displayed anywhere, but outside of info pages, it should be fully dismissable.
 - Often when we need to move content / UI to a more appropriate place, we need to consider moving it to a completely different page / component. Forget where it lives now: if we started from scratch, where should it live?
