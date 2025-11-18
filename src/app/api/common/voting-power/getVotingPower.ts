@@ -1,4 +1,5 @@
 import { prismaWeb3Client } from "@/app/lib/prisma";
+import { getDelegateVotingPowerFromDaoNode } from "@/app/lib/dao-node/client";
 import { cache } from "react";
 import {
   getProxyAddress,
@@ -151,27 +152,45 @@ async function getCurrentVotingPowerForAddress({
   address: string;
 }): Promise<VotingPowerData> {
   return withMetrics("getCurrentVotingPowerForAddress", async () => {
-    const { namespace, contracts } = Tenant.current();
-    const votingPower = await findVotingPower({
-      namespace,
-      address,
-      contract: contracts.token.address,
-    });
+    const { namespace, contracts, ui } = Tenant.current();
+    const includeL3Staking = ui.toggle("include-l3-staking")?.enabled ?? false;
 
-    // This query pulls only partially delegated voting power
-    const advancedVotingPower = await findAdvancedVotingPower({
-      namespace,
-      address,
-      contract: contracts.alligator!.address,
-    });
+    const daoNodeVotingPowerPromise = includeL3Staking
+      ? getDelegateVotingPowerFromDaoNode(address)
+      : Promise.resolve<string | null>(null);
+
+    const [votingPower, advancedVotingPower, daoNodeVotingPower] =
+      await Promise.all([
+        findVotingPower({
+          namespace,
+          address,
+          contract: contracts.token.address,
+        }),
+        findAdvancedVotingPower({
+          namespace,
+          address,
+          contract: contracts.alligator!.address,
+        }),
+        daoNodeVotingPowerPromise,
+      ]);
+
+    const fallbackDirectVotingPower = votingPower?.voting_power ?? "0";
+    const fallbackAdvancedVotingPower =
+      advancedVotingPower?.advanced_vp.toFixed(0) ?? "0";
+
+    const directVP = daoNodeVotingPower ?? fallbackDirectVotingPower;
+    const advancedVP = daoNodeVotingPower ? "0" : fallbackAdvancedVotingPower;
+    const totalVP = daoNodeVotingPower
+      ? daoNodeVotingPower
+      : (
+          BigInt(fallbackDirectVotingPower) +
+          BigInt(fallbackAdvancedVotingPower)
+        ).toString();
 
     return {
-      directVP: votingPower?.voting_power ?? "0",
-      advancedVP: advancedVotingPower?.advanced_vp.toFixed(0) ?? "0",
-      totalVP: (
-        BigInt(votingPower?.voting_power ?? "0") +
-        BigInt(advancedVotingPower?.advanced_vp.toFixed(0) ?? "0")
-      ).toString(),
+      directVP,
+      advancedVP,
+      totalVP,
     };
   });
 }
