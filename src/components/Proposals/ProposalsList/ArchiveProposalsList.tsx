@@ -6,6 +6,8 @@ import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFil
 import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
 import Tenant from "@/lib/tenant/tenant";
 import CreateProposalDraftButton from "./CreateProposalDraftButton";
+import ProposalsPageInfoBanner from "../ProposalsPageInfoBanner";
+import { useInfoBannerVisibility } from "@/hooks/useInfoBannerVisibility";
 
 import { useAccount } from "wagmi";
 import ArchiveProposalRow from "../Proposal/Archive/ArchiveProposalRow";
@@ -69,6 +71,12 @@ export default function ArchiveProposalsList({
     [sortedProposals, namespace, token?.decimals]
   );
 
+  // Check if banner is configured and visible
+  const { ui } = Tenant.current();
+  const bannerConfig = ui.toggle("proposals-page-info-banner");
+  const isBannerEnabled = bannerConfig?.enabled && bannerConfig?.config;
+  const isBannerVisible = useInfoBannerVisibility("proposals-page-info-banner");
+
   return (
     <div className="flex flex-col max-w-[76rem]">
       <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
@@ -97,20 +105,24 @@ export default function ArchiveProposalsList({
           votingPeriod={governanceCalendar.votingPeriod}
         />
       )}
-
-      <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
-        <div>
-          {normalizedProposals.length === 0 ? (
-            <div className="flex flex-row justify-center py-8 text-secondary">
-              No proposals currently
-            </div>
-          ) : (
-            <div>
-              {normalizedProposals.map((proposal) => (
-                <ArchiveProposalRow key={proposal.id} proposal={proposal} />
-              ))}
-            </div>
-          )}
+      <div className="relative">
+        <ProposalsPageInfoBanner />
+        <div
+          className={`flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden relative z-10 ${isBannerEnabled ? (isBannerVisible ? "-mt-4" : "mt-4") : ""}`}
+        >
+          <div>
+            {normalizedProposals.length === 0 ? (
+              <div className="flex flex-row justify-center py-8 text-secondary">
+                No proposals currently
+              </div>
+            ) : (
+              <div>
+                {normalizedProposals.map((proposal) => (
+                  <ArchiveProposalRow key={proposal.id} proposal={proposal} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
