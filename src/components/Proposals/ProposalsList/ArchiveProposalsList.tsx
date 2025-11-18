@@ -71,7 +71,10 @@ export default function ArchiveProposalsList({
     [sortedProposals, namespace, token?.decimals]
   );
 
-  // Check if banner is visible
+  // Check if banner is configured and visible
+  const { ui } = Tenant.current();
+  const bannerConfig = ui.toggle("proposals-page-info-banner");
+  const isBannerEnabled = bannerConfig?.enabled && bannerConfig?.config;
   const isBannerVisible = useInfoBannerVisibility("proposals-page-info-banner");
 
   return (
@@ -105,7 +108,7 @@ export default function ArchiveProposalsList({
       <div className="relative">
         <ProposalsPageInfoBanner />
         <div
-          className={`flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden relative z-10 ${isBannerVisible ? "-mt-4" : "mt-4"}`}
+          className={`flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden relative z-10 ${isBannerEnabled ? (isBannerVisible ? "-mt-4" : "mt-4") : ""}`}
         >
           <div>
             {normalizedProposals.length === 0 ? (

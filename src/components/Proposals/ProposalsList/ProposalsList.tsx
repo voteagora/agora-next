@@ -82,7 +82,9 @@ export default function ProposalsList({
 
   const proposals = pages.flatMap((page) => page.data);
 
-  // Check if banner is visible
+  // Check if banner is configured and visible
+  const bannerConfig = ui.toggle("proposals-page-info-banner");
+  const isBannerEnabled = bannerConfig?.enabled && bannerConfig?.config;
   const isBannerVisible = useInfoBannerVisibility("proposals-page-info-banner");
 
   return (
@@ -109,7 +111,7 @@ export default function ProposalsList({
       <div className="relative">
         <ProposalsPageInfoBanner />
         <div
-          className={`flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden relative z-10 ${isBannerVisible ? "-mt-4" : "mt-4"}`}
+          className={`flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden relative z-10 ${isBannerEnabled ? (isBannerVisible ? "-mt-4" : "mt-4") : ""}`}
         >
           <div>
             {proposals.length === 0 ? (
