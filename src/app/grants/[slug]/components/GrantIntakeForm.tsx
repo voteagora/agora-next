@@ -139,48 +139,127 @@ export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
       grant.form_schema.forEach((field) => {
         switch (field.type) {
           case "text":
-            let textSchema: z.ZodString = z.string();
+            let textSchema:
+              | z.ZodString
+              | z.ZodEffects<z.ZodString, string, string> = z.string();
             if (field.required) {
               textSchema = textSchema.min(1, `${field.label} is required`);
-            }
-            if (field.validation?.minLength) {
-              textSchema = textSchema.min(
-                field.validation.minLength,
-                `Must be at least ${field.validation.minLength} characters`
-              );
-            }
-            if (field.validation?.maxLength) {
-              textSchema = textSchema.max(
-                field.validation.maxLength,
-                `Must be no more than ${field.validation.maxLength} characters`
-              );
-            }
-            if (field.validation?.pattern) {
-              textSchema = textSchema.regex(
-                new RegExp(field.validation.pattern),
-                "Invalid format"
+              if (field.validation?.minLength) {
+                textSchema = textSchema.min(
+                  field.validation.minLength,
+                  `Must be at least ${field.validation.minLength} characters`
+                );
+              }
+              if (field.validation?.maxLength) {
+                textSchema = textSchema.max(
+                  field.validation.maxLength,
+                  `Must be no more than ${field.validation.maxLength} characters`
+                );
+              }
+              if (field.validation?.pattern) {
+                textSchema = textSchema.regex(
+                  new RegExp(field.validation.pattern),
+                  "Invalid format"
+                );
+              }
+            } else if (
+              field.validation?.minLength ||
+              field.validation?.maxLength ||
+              field.validation?.pattern
+            ) {
+              // For optional fields, only validate when value is not empty
+              textSchema = textSchema.refine(
+                (val) =>
+                  val === "" ||
+                  ((!field.validation?.minLength ||
+                    val.length >= field.validation.minLength) &&
+                    (!field.validation?.maxLength ||
+                      val.length <= field.validation.maxLength) &&
+                    (!field.validation?.pattern ||
+                      new RegExp(field.validation.pattern).test(val))),
+                (val) => {
+                  if (val === "") return { message: "" };
+                  if (
+                    field.validation?.minLength &&
+                    val.length < field.validation.minLength
+                  ) {
+                    return {
+                      message: `Must be at least ${field.validation.minLength} characters`,
+                    };
+                  }
+                  if (
+                    field.validation?.maxLength &&
+                    val.length > field.validation.maxLength
+                  ) {
+                    return {
+                      message: `Must be no more than ${field.validation.maxLength} characters`,
+                    };
+                  }
+                  if (
+                    field.validation?.pattern &&
+                    !new RegExp(field.validation.pattern).test(val)
+                  ) {
+                    return { message: "Invalid format" };
+                  }
+                  return { message: "" };
+                }
               );
             }
             allFields[field.id] = textSchema;
             break;
           case "textarea":
-            let textareaSchema: z.ZodString = z.string();
+            let textareaSchema:
+              | z.ZodString
+              | z.ZodEffects<z.ZodString, string, string> = z.string();
             if (field.required) {
               textareaSchema = textareaSchema.min(
                 1,
                 `${field.label} is required`
               );
-            }
-            if (field.validation?.minLength) {
-              textareaSchema = textareaSchema.min(
-                field.validation.minLength,
-                `Must be at least ${field.validation.minLength} characters`
-              );
-            }
-            if (field.validation?.maxLength) {
-              textareaSchema = textareaSchema.max(
-                field.validation.maxLength,
-                `Must be no more than ${field.validation.maxLength} characters`
+              if (field.validation?.minLength) {
+                textareaSchema = textareaSchema.min(
+                  field.validation.minLength,
+                  `Must be at least ${field.validation.minLength} characters`
+                );
+              }
+              if (field.validation?.maxLength) {
+                textareaSchema = textareaSchema.max(
+                  field.validation.maxLength,
+                  `Must be no more than ${field.validation.maxLength} characters`
+                );
+              }
+            } else if (
+              field.validation?.minLength ||
+              field.validation?.maxLength
+            ) {
+              // For optional fields, only validate when value is not empty
+              textareaSchema = textareaSchema.refine(
+                (val) =>
+                  val === "" ||
+                  ((!field.validation?.minLength ||
+                    val.length >= field.validation.minLength) &&
+                    (!field.validation?.maxLength ||
+                      val.length <= field.validation.maxLength)),
+                (val) => {
+                  if (val === "") return { message: "" };
+                  if (
+                    field.validation?.minLength &&
+                    val.length < field.validation.minLength
+                  ) {
+                    return {
+                      message: `Must be at least ${field.validation.minLength} characters`,
+                    };
+                  }
+                  if (
+                    field.validation?.maxLength &&
+                    val.length > field.validation.maxLength
+                  ) {
+                    return {
+                      message: `Must be no more than ${field.validation.maxLength} characters`,
+                    };
+                  }
+                  return { message: "" };
+                }
               );
             }
             allFields[field.id] = textareaSchema;
