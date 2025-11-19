@@ -19,11 +19,9 @@ export default function DelegatingSectionContent() {
           <ul className="list-disc list-inside space-y-2 ml-4 text-sm">
             <li>
               Onchain action: Call delegate(
-              {address ? (
-                <span className="font-mono">{address}</span>
-              ) : (
-                "0xYOUR-WALLET-HERE"
-              )}
+              <span className="font-mono">
+                {address || "0xYOUR-WALLET-HERE"}
+              </span>
               ).
             </li>
             <li>
