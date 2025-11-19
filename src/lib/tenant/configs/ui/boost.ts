@@ -189,6 +189,10 @@ If you need help creating transactions / calldata, please see this [video](https
       enabled: false,
     },
     {
+      name: "use-archive-for-vote-history",
+      enabled: false,
+    },
+    {
       name: "forums",
       enabled: false,
     },

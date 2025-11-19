@@ -1,41 +1,17 @@
 "use client";
 
 import { useAccount } from "wagmi";
-import { useProfileData } from "@/hooks/useProfileData";
-import { DelegateToSelf } from "../Delegations/DelegateToSelf";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
-import Tenant from "@/lib/tenant/tenant";
 
-export function SyndicateDelegateInfo() {
+export default function DelegatingSectionContent() {
   const { address } = useAccount();
-  const { delegate } = useProfileData();
-  const { ui } = Tenant.current();
-  const useNeutral =
-    ui.toggle("syndicate-colours-fix-delegate-pages")?.enabled ?? false;
-
-  const selfDelegate: DelegateChunk | null = delegate
-    ? {
-        address: delegate.address,
-        votingPower: delegate.votingPower,
-        statement: delegate.statement,
-        participation: delegate.participation,
-      }
-    : address
-      ? {
-          address: address,
-          votingPower: { total: "0", direct: "0", advanced: "0" },
-          statement: null,
-          participation: 0,
-        }
-      : null;
 
   return (
-    <div className="flex flex-col space-y-8 mb-8">
-      <div
-        className={`flex flex-col space-y-4 p-6 ${useNeutral ? "bg-neutral" : "bg-wash"} border border-line shadow-newDefault rounded-xl`}
-      >
-        <h2 className="text-lg font-bold text-primary">Self-Delegation</h2>
-        <div className="flex flex-col space-y-4 text-secondary text-sm leading-relaxed">
+    <div className="flex flex-col space-y-6">
+      <div className="flex flex-col space-y-2">
+        <h3 className="text-[15px] font-semibold text-primary">
+          Self-Delegation:
+        </h3>
+        <div className="flex flex-col space-y-3">
           <p>
             Self-delegating activates your voting power so you can vote directly
             in onchain proposals.
@@ -64,21 +40,14 @@ export function SyndicateDelegateInfo() {
               </p>
             )}
           </div>
-          {selfDelegate && (
-            <div className="pt-2">
-              <DelegateToSelf delegate={selfDelegate} />
-            </div>
-          )}
         </div>
       </div>
 
-      <div
-        className={`flex flex-col space-y-4 p-6 ${useNeutral ? "bg-neutral" : "bg-wash"} border border-line shadow-newDefault rounded-xl`}
-      >
-        <h2 className="text-lg font-bold text-primary">
-          Delegate to Other Members
-        </h2>
-        <div className="flex flex-col space-y-4 text-secondary text-sm leading-relaxed">
+      <div className="flex flex-col space-y-3">
+        <h3 className="text-[15px] font-semibold text-primary">
+          Delegate to Other Members:
+        </h3>
+        <div className="flex flex-col space-y-3">
           <p>
             You can point your voting power to a trusted delegate. This helps
             active representatives vote on your behalf while{" "}

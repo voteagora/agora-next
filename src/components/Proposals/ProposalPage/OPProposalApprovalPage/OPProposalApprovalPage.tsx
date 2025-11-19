@@ -1,12 +1,12 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
 import {
-  fetchUserVotesForProposal as apiFetchUserVotesForProposal,
   fetchVotesForProposal,
+  fetchUserVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
 import { PaginationParams } from "@/app/lib/pagination";
-import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
 
 async function fetchProposalVotes(
   proposalId: string,
@@ -20,13 +20,13 @@ async function fetchProposalVotes(
   });
 }
 
-async function fetchUserVotesForProposal(
+async function fetchUserVotes(
   proposalId: string,
   address: string | `0x${string}`
 ) {
   "use server";
 
-  return await apiFetchUserVotesForProposal({
+  return await fetchUserVotesForProposal({
     proposalId,
     address,
   });
@@ -53,7 +53,7 @@ export default async function OPProposalApprovalPage({
               <ApprovalVotesPanel
                 proposal={proposal}
                 fetchVotesForProposal={fetchProposalVotes}
-                fetchUserVotesForProposal={fetchUserVotesForProposal}
+                fetchUserVotes={fetchUserVotes}
               />
             </div>
           </div>

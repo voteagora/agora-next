@@ -10,8 +10,7 @@ export default async function StandardProposalPage({
 }) {
   return (
     <div className="flex flex-col">
-      {/* ignore for now */}
-      {/* <ProposalStateAdmin proposal={proposal} /> */}
+      <ProposalStateAdmin proposal={proposal} />
       <div className="flex gap-0 md:gap-16 justify-between items-start max-w-[76rem] flex-col md:flex-row md:items-start md:justify-between">
         <div className="w-full proposal-description pb-8 md:pb-0">
           <ProposalDescription proposal={proposal} />
