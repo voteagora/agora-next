@@ -32,6 +32,10 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
   errors,
   watch,
 }) => {
+  // Only include placeholder for text and textarea fields
+  const shouldIncludePlaceholder =
+    field.type === "text" || field.type === "textarea";
+
   const commonProps = {
     id: field.id,
     ...register(field.id, {
@@ -55,7 +59,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
           }
         : undefined,
     }),
-    placeholder: field.placeholder,
+    ...(shouldIncludePlaceholder && { placeholder: field.placeholder }),
     className:
       "w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary",
   };
@@ -68,7 +72,13 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         return <textarea rows={field.rows || 4} {...commonProps} />;
       case "dropdown":
         return (
-          <select {...commonProps}>
+          <select
+            id={field.id}
+            {...register(field.id, {
+              required: field.required ? `${field.label} is required` : false,
+            })}
+            className="w-full px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+          >
             <option value="">Select an option</option>
             {field.options?.map((option) => (
               <option key={option.value} value={option.value}>
