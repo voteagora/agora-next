@@ -8,4 +8,4 @@ Then check the @design-brief folder, read the @design-brief.md carefully, and ex
 
 Then, read the @design-guidance.md for how you should tackle this task. Follow this instruction there.
 
-Give your output directly in this chat
+Output all three directions in the chat. Then choose the most promising one and create an inplementation plan for it. Start your implementation plan by forcing the agent to read through the @design-guidance.md once more
