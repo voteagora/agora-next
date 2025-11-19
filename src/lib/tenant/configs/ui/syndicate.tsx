@@ -78,7 +78,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     {
       name: "syndicatetwitter",
       title: "Twitter",
-      url: "https://x.com/SyndicateProtocol",
+      url: "https://x.com/syndicateio",
     },
     {
       name: "syndicatefarcaster",

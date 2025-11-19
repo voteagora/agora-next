@@ -399,10 +399,10 @@ export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
             <li>
               • Make sure you follow us on{" "}
               <a
-                href="https://x.com/SyndicateProtocol"
+                href="https://x.com/syndicateio"
                 className="text-primary hover:underline"
               >
-                @syndicateCollective
+                @syndicateio
               </a>
             </li>
           </ul>
