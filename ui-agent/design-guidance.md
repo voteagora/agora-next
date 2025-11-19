@@ -1,22 +1,6 @@
-# Follow these rules when you create design directions
+## UX Design guidelines
 
-## Process
-
-1. Always check out the screenshots in the app-context folder before starting your task. Look at each screenshot to understand the overall design & layout of the app
-2. For any surface you suggest changes to, make sure to read the code for that surface to understand its layout, content and core features before you suggest anything.
-3. Always think of 3 distinct solutions
-4. Each direction should be formatted as such:
-   - one sentence explanation of the core concept
-   - Bullet points that describe the changes needed to execute this direction. The bullet points should be 1 sentence. Bullet points should capture all changes needed. Make sure to address what should be done with every element called out in the brief, even if the action is "do nothing".
-   - Bullet points must address what to do with all the elements highlighted in the brief. For example: "Delete [insert element] and replace it with [something new that does this, this, and that] on this page at the top of the right column"
-   - For each component you calll to create or edit, check the ui-refence folder to see if you can find patterns to leverage. if a file seems relevant, open it and look at the image carefully.
-   - Finish with 2-3 sentences to explain the general reasoning of the direction
-
-5. Think hard about which direction is best, and show the user the best direction in the chat
-
-## Design guidelines
-
-Follow these when creating design directions. Break these guidelines only if user's instruction explicitly ask for it.
+Follow these when thinking UX. Break these guidelines only if user's instruction explicitly ask for it.
 
 - Don't create new pages or sub-pages unless we're implementing large, significant new functionality. Prefer to modify existing pages. Second preference is to use modals or other pop up patterns
 - Don't call for new UI patterns unless it's the best way to do something. E.g. if an app never uses slide-over panels and you want to call for one, think first if there are ways to achieve the same outcome by using existing patterns.
@@ -28,9 +12,9 @@ Follow these when creating design directions. Break these guidelines only if use
 - Avoid having multiple educational sections on the same page, unless it's explicitly a page about learning / information OR if the educational content is very small. Try to combine them where possible.
 - Generally, where there are opportunities to reduce the number of cards on a page by combining them if they are related, do so. Especially avoid having multiple small sections on the same page. Find a way to combine them.
 
-## UI implementation guidelines
+## UI Design guidelines
 
-Follow these when implementing UI changes
+Follow these when implementing UI changes. Break these guidelines only if user's instruction explicitly ask for it.
 
 - When using dividers or border that act like dividers inside a container or card that has a border, make sure that the dividers span all the way to the edge and touch and connect with the borders of the container.
 - Avoid using bold or underline to emphasize text in paragraphs, find other ways to call attention to parts of paragraphs, or rephrase the paragraphs so that the important elements are more obvious.

@@ -6,6 +6,8 @@ First, check out the @app-context folder and carefully look at every screenshot 
 
 Then check the @design-brief folder, read the @design-brief.md carefully, and examine the supporting images to understand your task.
 
-Then, read the @design-guidance.md for how you should tackle this task. Follow this instruction there.
+Then, read the @design-guidance.md for how design best practices.
 
-Output all three directions in the chat. Then choose the most promising one and create an inplementation plan for it. Start your implementation plan by forcing the agent to read through the @design-guidance.md once more
+Finally, read @design-exploration-process.md for the process you must follow to tackle this task. Follow this instruction there.
+
+Output all three directions in the chat.
