@@ -106,33 +106,6 @@ export default async function ThankYouPage() {
               Return to Home
             </Link>
           </div>
-
-          {/* Additional Information */}
-          <div className="mt-12 pt-8 border-t border-line">
-            <div className="bg-wash rounded-lg p-6 max-w-2xl mx-auto">
-              <h3 className="font-semibold text-primary mb-3">Need Help?</h3>
-              <p className="text-sm text-tertiary mb-4">
-                If you have any questions about your application or the grants
-                process, please don&apos;t hesitate to reach out to our team.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="mailto:grants@syndicatecollective.io"
-                  className="inline-flex items-center text-sm text-primary hover:text-primary/80 transition-colors"
-                >
-                  📧 grants@syndicatecollective.io
-                </a>
-                <a
-                  href="https://discord.gg/syndicate"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center text-sm text-primary hover:text-primary/80 transition-colors"
-                >
-                  💬 Discord Community
-                </a>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
