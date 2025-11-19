@@ -9,8 +9,10 @@
    - one sentence explanation of the core concept
    - Bullet points that describe the changes needed to execute this direction. The bullet points should be 1 sentence. Bullet points should capture all changes needed. Make sure to address what should be done with every element called out in the brief, even if the action is "do nothing".
    - Bullet points must address what to do with all the elements highlighted in the brief. For example: "Delete [insert element] and replace it with [something new that does this, this, and that] on this page at the top of the right column"
-   - 2-3 sentences to explain the general reasoning of the direction
    - For each component you calll to create or edit, check the ui-refence folder to see if you can find patterns to leverage. if a file seems relevant, open it and look at the image carefully.
+   - Finish with 2-3 sentences to explain the general reasoning of the direction
+
+5. Think hard about which direction is best, and show the user the best direction in the chat
 
 ## Design guidelines
 
@@ -34,6 +36,6 @@ Follow these when implementing UI changes
 - Avoid using bold or underline to emphasize text in paragraphs, find other ways to call attention to parts of paragraphs, or rephrase the paragraphs so that the important elements are more obvious.
 - When creating banners, don't assume they always have to be at the top. If they are relevant to a specific cards, place them on top of that card and attach the banner to that card visually.
 - Don't use an icon on the left side of a tall multi-line banner. only use icons on short banners, otherwise it looks unbalanced.
-- Avoid using bullet points in UI text or explainers. Prefer short sinccinct prose.
+- Avoid using bullet points in UI text or explainers. If it's long, consider if it might be better represented as a diagram. If it's short, see if you can turn it into a short paragraph.
 - When using a learn more text link inline with a paragraph, don't bold the text or add an arrow. treat it like a text link.
 - A banner should not have too much content and should serve to convey a simple message. Best is to keep it to a single line. Use a title a a single body line if more content. If even more is needed, take the user somewhere else to read things in full.
