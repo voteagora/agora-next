@@ -47,7 +47,7 @@ You create **implementation specs**, not design suggestions. Solutions must be d
 
 ### 5. Visual Hierarchy & Icons
 
-- Include illustrations every 100-150 words on Info pages
+- **Suggest placeholder illustrations to break up walls of text** - When sections exceed ~100 words, recommend adding illustration placeholders
 - Alternate text-left/image-right with image-left/text-right
 - Use `aspect-video` for consistent illustration proportions
 - **Icons must represent meaning**: Choose icons from Lucide library that match the content
@@ -60,6 +60,8 @@ You create **implementation specs**, not design suggestions. Solutions must be d
 
 ### Quality Copy Principles
 
+- **Preserve all information and context** - When improving copy, never remove information or reduce length of context
+- **Default to moving, not rewriting** - Move existing copy verbatim; only change when it violates word limits or clarity standards
 - **Human-legible, not marketing copy** - Write how people actually talk
 - **Explain what it is, not how to use it** - "Learn about voting power" not "Vote in two steps"
 - **Complete sentences, not 3-word punchlines** - Be clear and descriptive
@@ -95,11 +97,13 @@ You create **implementation specs**, not design suggestions. Solutions must be d
 
 **Body Copy:**
 
+- **Preserve existing copy when moving content** - Don't rewrite unless necessary
 - Use short, clear sentences
 - Avoid jargon unless it's standard in the domain
 - Break up complex explanations with bullets
 - Don't sacrifice clarity for brevity
 - Explain what something is before explaining how to use it
+- Can consolidate/restructure as long as all original information is preserved
 
 **Icons:**
 
@@ -143,10 +147,12 @@ You create **implementation specs**, not design suggestions. Solutions must be d
    - Full-width container with `flex items-start gap-8`
    - Text and image each `flex-1` (50/50 split)
    - Alternate: Section 1 (text-left/image-right), Section 2 (image-left/text-right)
-   - Each section: heading + icon, 1-2 paragraphs, 3-4 bullets, illustration
+   - Each section: heading + icon, existing content from task page, illustration placeholder
+   - **Preserve existing copy verbatim when moving from task pages**
    - Anchor IDs for deep linking
+   - **Add illustration placeholders after sections with >~100 words of text**
 3. Documents/resources
-4. Legal/disclosures (with illustrations between sections)
+4. Legal/disclosures (with illustrations between sections to break up long text)
 
 ---
 
@@ -239,11 +245,12 @@ Checklist of what must be true when done.
 
 **Copy Quality:**
 
+- [ ] **Existing copy preserved verbatim** when moving from task pages to Info pages
+- [ ] Only modify copy when it violates word limits (banners >10 words, etc.)
+- [ ] All original information and context retained (nothing removed or shortened)
 - [ ] Page titles are clear and action-oriented
 - [ ] Banner messages explain what (not how), ≤10 words
-- [ ] All copy uses short, clear sentences
 - [ ] No vague copy like "Learn more", "Vote in two steps", or "Delegation drives quorum"
-- [ ] Copy explains what something is, not how to use it
 
 **Icons:**
 
@@ -257,6 +264,8 @@ Checklist of what must be true when done.
 - [ ] Info page uses single-column stack (NOT grid)
 - [ ] Text/image alternating pattern
 - [ ] No uneven card heights
+- [ ] **Illustration placeholders suggested after sections with >~100 words**
+- [ ] Long text blocks broken up with visual elements
 
 **Scope:**
 
@@ -273,11 +282,17 @@ Checklist of what must be true when done.
 ❌ **Poor copy:** "Delegates" (title), "Vote in two steps" (banner), "Delegation drives quorum" (banner)
 ✅ **Good copy:** "Delegate your voting power" (title), "Learn about the voting process" (banner), "Learn about voting power & delegation" (banner)
 
+❌ **Rewriting existing copy:** Condensing 3 paragraphs of context into 1 short paragraph, removing information
+✅ **Preserving existing copy:** Moving all 3 paragraphs verbatim to Info page, can restructure but keep all content
+
 ❌ **Poor icons:** Info icon on all banners, decorative icons that don't match content
 ✅ **Good icons:** Vote icon for proposals banner, Users icon for delegates banner, icons from Lucide that reinforce meaning
 
 ❌ **Poor layout:** 4-card grid with varying heights
 ✅ **Good layout:** Single-column vertical stack with alternating text/image
+
+❌ **Missing illustrations:** Long text sections (>100 words) with no visual breaks
+✅ **Illustrations included:** Placeholder illustrations suggested after sections with substantial text (~100+ words)
 
 ❌ **Scope creep:** Redesigning navigation not mentioned in problem
 ✅ **Scope discipline:** Only modify elements explicitly mentioned
