@@ -10,25 +10,26 @@
    - Bullet points that describe the changes needed to execute this direction. The bullet points should be 1 sentence. Bullet points should capture all changes needed. Make sure to address what should be done with every element called out in the brief, even if the action is "do nothing".
    - Bullet points must address what to do with all the elements highlighted in the brief. For example: "Delete [insert element] and replace it with [something new that does this, this, and that] on this page at the top of the right column"
    - 2-3 sentences to explain the general reasoning of the direction
+   - For each component you calll to create or edit, check the ui-refence folder to see if you can find patterns to leverage. if a file seems relevant, open it and look at the image carefully.
 
 ## Design guidelines
 
 Follow these when creating design directions. Break these guidelines only if user's instruction explicitly ask for it.
 
 - Don't create new pages or sub-pages unless we're implementing large, significant new functionality. Prefer to modify existing pages. Second preference is to use modals or other pop up patterns
-- When there are multiple informational UI elements, consider combining them.
 - Don't call for new UI patterns unless it's the best way to do something. E.g. if an app never uses slide-over panels and you want to call for one, think first if there are ways to achieve the same outcome by using existing patterns.
 - Educational content should not live permanently on any pages other than pages that are primary about education / information / faq. Education content can be displayed anywhere, but outside of info pages, it should be fully dismissable.
 - Dismissed content do not need a way to be reopened again or any lightweight reminder where they used to be. They should fully disappear.
 - Often when we need to move content / UI to a more appropriate place, we need to consider moving it to a completely different page / component. Forget where it lives now: if we started from scratch, where should it live?
+- When there are multiple informational UI elements, consider combining them.
 - Avoid having multiple banners on the same page. See if you can combine them, use different patterns, or avoid getting into this situation.
 - Avoid having multiple educational sections on the same page, unless it's explicitly a page about learning / information OR if the educational content is very small. Try to combine them where possible.
+- Generally, where there are opportunities to reduce the number of cards on a page by combining them if they are related, do so. Especially avoid having multiple small sections on the same page. Find a way to combine them.
 
 ## UI implementation guidelines
 
 Follow these when implementing UI changes
 
-- For each component you create or edit, check the ui-refence folder to see if you can find patterns to leverage. if a file seems relevant, open it and look at the image carefully.
 - When using dividers or border that act like dividers inside a container or card that has a border, make sure that the dividers span all the way to the edge and touch and connect with the borders of the container.
 - Avoid using bold or underline to emphasize text in paragraphs, find other ways to call attention to parts of paragraphs, or rephrase the paragraphs so that the important elements are more obvious.
 - When creating banners, don't assume they always have to be at the top. If they are relevant to a specific section or card, place them on top of that section and attach the banner to that section visually.
