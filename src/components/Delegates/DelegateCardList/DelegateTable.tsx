@@ -18,6 +18,7 @@ import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { SyndicateDelegateInfo } from "./SyndicateDelegateInfo";
+import SyndicateVotersPageContent from "@/components/Delegates/SyndicateVotersPageContent";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { InfoOutlineIcon } from "@/icons/InfoOutlineIcon";
@@ -56,6 +57,9 @@ export default function DelegateTable({
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
+  const showVotersPageContent =
+    namespace === TENANT_NAMESPACES.SYNDICATE &&
+    ui.toggle("syndicate-voters-page-content")?.enabled;
   const showParticipation =
     (ui.toggle("show-participation")?.enabled || false) &&
     !(ui.toggle("hide-participation-delegates-page")?.enabled || false);
@@ -107,10 +111,12 @@ export default function DelegateTable({
 
   return (
     <DialogProvider>
-      {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
       {namespace === TENANT_NAMESPACES.SYNDICATE && <SyndicateDelegateInfo />}
 
       <div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg mt-6">
+        {showVotersPageContent && (
+          <SyndicateVotersPageContent attachedToCard={true} />
+        )}
         <Table className="min-w-full">
           <TableHeader className="text-sm text-secondary sticky top-0 bg-neutral z-10 rounded-t-lg">
             <TableRow className="bg-tertiary/5">

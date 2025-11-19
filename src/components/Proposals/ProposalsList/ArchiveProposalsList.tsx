@@ -14,6 +14,7 @@ import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 import { useSearchParams } from "next/navigation";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { UpdatedButton } from "@/components/Button";
+import SyndicateProposalsPageContent from "@/components/Proposals/SyndicateProposalsPageContent";
 
 export default function ArchiveProposalsList({
   proposals,
@@ -28,10 +29,13 @@ export default function ArchiveProposalsList({
   } | null;
 }) {
   const { address } = useAccount();
-  const { token, namespace } = Tenant.current();
+  const { token, namespace, ui } = Tenant.current();
   const searchParams = useSearchParams();
   const filter =
     searchParams?.get("filter") ?? proposalsFilterOptions.relevant.filter;
+  const showSyndicateBanner = ui.toggle(
+    "syndicate-proposals-page-content"
+  )?.enabled;
 
   const filteredProposals = React.useMemo(() => {
     if (filter === proposalsFilterOptions.everything.filter) {
@@ -99,6 +103,9 @@ export default function ArchiveProposalsList({
       )}
 
       <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+        {showSyndicateBanner && (
+          <SyndicateProposalsPageContent attachedToCard={true} />
+        )}
         <div>
           {normalizedProposals.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">

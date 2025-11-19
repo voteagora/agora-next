@@ -102,9 +102,6 @@ export default async function ProposalsHome() {
     <div className="flex flex-col">
       {supportsNotifications && <SubscribeDialogLauncher />}
       <Hero page="proposals" />
-      {ui.toggle("syndicate-proposals-page-content")?.enabled && (
-        <SyndicateProposalsPageContent />
-      )}
       {plmEnabled && (
         <>
           <MyDraftProposals

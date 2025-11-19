@@ -13,6 +13,7 @@ import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { SyndicateDelegateInfo } from "./SyndicateDelegateInfo";
+import SyndicateVotersPageContent from "@/components/Delegates/SyndicateVotersPageContent";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -42,6 +43,9 @@ export default function DelegateCardList({
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
+  const showVotersPageContent =
+    namespace === TENANT_NAMESPACES.SYNDICATE &&
+    ui.toggle("syndicate-voters-page-content")?.enabled;
   const showParticipation =
     (ui.toggle("show-participation")?.enabled || false) &&
     !(ui.toggle("hide-participation-delegates-page")?.enabled || false);
@@ -95,8 +99,12 @@ export default function DelegateCardList({
 
   return (
     <DialogProvider>
-      {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
       {namespace === TENANT_NAMESPACES.SYNDICATE && <SyndicateDelegateInfo />}
+      {showVotersPageContent && (
+        <div className="mb-4">
+          <SyndicateVotersPageContent attachedToCard={false} />
+        </div>
+      )}
       {/* @ts-ignore */}
       <InfiniteScroll
         className="grid grid-flow-row grid-cols-1 md:grid-cols-2 lg:grid-cols-3  justify-around sm:justify-between py-4 gap-4 sm:gap-8"

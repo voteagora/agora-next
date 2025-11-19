@@ -14,6 +14,7 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
 import Proposal from "../Proposal/Proposal";
 import { DaoSlug } from "@prisma/client";
+import SyndicateProposalsPageContent from "@/components/Proposals/SyndicateProposalsPageContent";
 
 export default function ProposalsList({
   initRelevantProposals,
@@ -40,6 +41,8 @@ export default function ProposalsList({
   const { ui, slug } = Tenant.current();
   let tenantSupportsProposalLifecycle =
     ui.toggle("proposal-lifecycle")?.enabled;
+  const showSyndicateBanner =
+    ui.toggle("syndicate-proposals-page-content")?.enabled;
 
   if (slug === DaoSlug.OP) {
     const proposalCreators = [
@@ -102,6 +105,9 @@ export default function ProposalsList({
         />
       )}
       <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+        {showSyndicateBanner && (
+          <SyndicateProposalsPageContent attachedToCard={true} />
+        )}
         <div>
           {proposals.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">

@@ -9,5 +9,3 @@ You are being tasked with implementing a design solution to a design problem. He
 3. Then, read the @design-guidance.md for how you should tackle this task. Follow this instruction there when implementing
 
 4. Finally, look at design-directions for instructions on how to solve the design problem. The instructions in this doc are high level and do not always specificy exactly how things should be implemented visually. Use your judgment as a designer and follow our design-guidance.md to fill in the rest.
-
-Once you have done all that, implement changes in the @design-directions.md file.

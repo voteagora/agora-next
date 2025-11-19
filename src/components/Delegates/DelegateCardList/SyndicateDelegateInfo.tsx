@@ -5,10 +5,13 @@ import { useProfileData } from "@/hooks/useProfileData";
 import { DelegateToSelf } from "../Delegations/DelegateToSelf";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import Tenant from "@/lib/tenant/tenant";
+import Link from "next/link";
+import { useMemo } from "react";
+import { ZERO_ADDRESS } from "@/lib/constants";
 
 export function SyndicateDelegateInfo() {
   const { address } = useAccount();
-  const { delegate } = useProfileData();
+  const { delegate, delegatees, tokenBalance } = useProfileData();
   const { ui } = Tenant.current();
   const useNeutral =
     ui.toggle("syndicate-colours-fix-delegate-pages")?.enabled ?? false;
@@ -29,78 +32,58 @@ export function SyndicateDelegateInfo() {
         }
       : null;
 
-  return (
-    <div className="flex flex-col space-y-8 mb-8">
-      <div
-        className={`flex flex-col space-y-4 p-6 ${useNeutral ? "bg-neutral" : "bg-wash"} border border-line shadow-newDefault rounded-xl`}
-      >
-        <h2 className="text-lg font-bold text-primary">Self-Delegation</h2>
-        <div className="flex flex-col space-y-4 text-secondary text-sm leading-relaxed">
-          <p>
-            Self-delegating activates your voting power so you can vote directly
-            in onchain proposals.
-          </p>
-          <ul className="list-disc list-inside space-y-2 ml-4 text-sm">
-            <li>
-              Onchain action: Call delegate(
-              {address ? (
-                <span className="font-mono">{address}</span>
-              ) : (
-                "0xYOUR-WALLET-HERE"
-              )}
-              ).
-            </li>
-            <li>
-              After this one-time step (per address, per chain), your votes will
-              track your token balance automatically. No need to repeat unless
-              you later delegate to someone else.
-            </li>
-          </ul>
-          <div className="flex flex-col space-y-2">
-            <p className="font-medium">Vote directly from your wallet</p>
-            {address && (
-              <p className="text-primary font-mono text-sm">
-                Your wallet: {address}
-              </p>
-            )}
-          </div>
-          {selfDelegate && (
-            <div className="pt-2">
-              <DelegateToSelf delegate={selfDelegate} />
-            </div>
-          )}
-        </div>
-      </div>
+  // Check delegation status
+  const filteredDelegations = useMemo(() => {
+    return delegatees?.filter((delegation) => delegation.to !== ZERO_ADDRESS);
+  }, [delegatees]);
+  const hasDelegated =
+    Array.isArray(filteredDelegations) && filteredDelegations.length > 0;
+  const isSelfDelegated =
+    hasDelegated &&
+    filteredDelegations?.some(
+      (delegation) =>
+        delegation.to.toLowerCase() === address?.toLowerCase()
+    );
 
-      <div
-        className={`flex flex-col space-y-4 p-6 ${useNeutral ? "bg-neutral" : "bg-wash"} border border-line shadow-newDefault rounded-xl`}
-      >
-        <h2 className="text-lg font-bold text-primary">
-          Delegate to Other Members
-        </h2>
-        <div className="flex flex-col space-y-4 text-secondary text-sm leading-relaxed">
-          <p>
-            You can point your voting power to a trusted delegate. This helps
-            active representatives vote on your behalf while{" "}
-            <strong>you retain token ownership</strong> and can re-delegate at
-            any time.
-          </p>
-          <p>
-            <strong>You are still a member of the WY DUNA.</strong>
-          </p>
-          <p>
-            Under Wyoming&apos;s Decentralized Unincorporated Nonprofit
-            Association Act, a <strong>member</strong> is someone who may
-            participate in selecting administrators or shaping policies. A{" "}
-            <strong>membership interest</strong> is the voting right defined by
-            those principles, and the Act explicitly contemplates that voting
-            can be administered by smart contracts. Delegating your votes{" "}
-            <strong>does not transfer your tokens</strong> or your membership;
-            it only authorizes another address to cast votes using your voting
-            power.
-          </p>
+  // Determine status message
+  let statusMessage = "You haven't set your voting power yet";
+  if (isSelfDelegated) {
+    statusMessage = "You are self-delegated";
+  } else if (hasDelegated) {
+    statusMessage = "You have delegated to another member";
+  }
+
+  // Only show if user has connected wallet
+  if (!address) {
+    return null;
+  }
+
+  return (
+    <div
+      className={`flex items-center justify-between gap-4 px-4 py-3 mb-3 ${useNeutral ? "bg-neutral/30" : "bg-wash/30"} border-b border-line`}
+    >
+      <div className="flex-1 min-w-0">
+        <div className="flex items-baseline gap-2 mb-1">
+          <span className="text-sm font-medium text-primary">
+            Your voting setup:
+          </span>
+          <span className="text-sm text-secondary">{statusMessage}</span>
         </div>
+        <p className="text-xs text-tertiary">
+          Delegating never moves your tokens; it only points your voting power.{" "}
+          <Link
+            href="/info#delegation"
+            className="text-link hover:underline"
+          >
+            Learn about delegation
+          </Link>
+        </p>
       </div>
+      {selfDelegate && !isSelfDelegated && (
+        <div className="flex-shrink-0">
+          <DelegateToSelf delegate={selfDelegate} />
+        </div>
+      )}
     </div>
   );
 }
