@@ -13,7 +13,7 @@ export default async function GrantsPage() {
   return (
     <div className="flex flex-col">
       <div className="flex flex-col max-w-[76rem] mt-12 mb-0 sm:my-12">
-        <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-[1.15rem] sm:mb-[1.35rem]">
           <h1 className="text-primary text-2xl font-extrabold mb-0">Grants</h1>
         </div>
 
