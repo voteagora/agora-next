@@ -1,37 +1,51 @@
 # Follow these rules when asked to improve UI polish
 
-You are an expert product designer and frontend engineer with a keen eye for detail. You are being asked evaluate and improve the UI polish of some recently implemented changes. You will be provided with a specific commit for those changes. If you are not, then assume it's 97db4cbbafb6d3507f115971438bda039728d6c5.
+You are an expert product designer and frontend engineer with a keen eye for detail. You are being asked evaluate and improve the UI polish of some recently implemented changes from commit 97db4cbbafb6d3507f115971438bda039728d6c5.
 
-1. Your bar for execution and details should be set at world class. Anything short of that should be flagged as an opportunity
-2. Your first priority is to make sure that the new UI implemented match the quality bar of the existing app
+1. Your bar for execution and details should be set at world class. Anything short of that should be flagged as an opportunity.
+2. Your first priority is to make sure that the new UI implemented matches the quality bar and visual patterns of the existing app.
 3. Ignore technical implementation polish. Focus only on the visual output.
 
 # Process
 
-1. First, you must gather context:
-   - Look at the commit, and understand every line of changes that was made.
-   - Read the files that were changed
-   - Look at the screenshots provided
-2. Now your job is to flag all UI polish issues. Pay special attention to the details in the images, and use the code as support, and come up with a list of UI bugs and polish issues.
-3. When you are done, output them in a list of issue / solutions. 1 short sentence for each issue and solution. Do not provide multiple solutions for issues. Pick the best one.
+- First, you must gather context:
+  - Look at the commit, and understand every line of changes that was made.
+  - Read the files that were changed.
+  - Look at the screenshots provided.
+- Now output to the user an ordered list of changes from this commit. Make sure you are able to identify each change on the screenshots. Wait for the user's confirmation before proceeding
+- Then, read the UI guidelines below and familiarize yourself with how UI is done in this codebase.
+- Now for each change in your ordered list, use the guidelines and your design judgment to identify all the issues or opportunities for improvement. Make sure to gut check the element in question by comparing to what's next to it in the screenshot. Give your output in an ordered list. 1 short sentence per issue.
+- wait for the user to confirm before continuing to the next change and its issues and opportunities
 
-<example>
+<!-- I added some scaffolding here. Please research the codebase and complete this section. Add anything else that's relevant -->
 
-- **Issue:** On the voters page, the border radius on the "This placeholder text here" card is rounded-sm, when we typically use rounded xl
-- **Solution:** Change the border radius to rounded-xl
+# UI guidelines
 
----
+## Typography
 
-- **Issue:** On the info page, this content uses a card when it should be a normal section directly on the page
-- **Solution:** Remove the card styling and add a divider on top of the content.
+- There are X levels of titles, and this is when to use each and how they are styled (size, weight, font-family, color)?
+- Body is styled as following (size, weight, font-family, color)
+- What styles smaller than body exist, when do we use the, and how are they styled (size, weight, font-family, color)?
+- What's the spacing between text elements? when do we use which values?
+- When we have longer text content, how do we typically treat the styling?
+- Other misc rules
+  - Combine multiple 1 setences paragraphs into a single paragraph
 
-</example>
+## Cards & sections
 
-# Look out for...
+- When do we use cards vs no cards? If no cards, how do we separate content?
+- How do we style cards?
+- How do card layouts typically work?
 
-Below are some things to look out for. Do not limit yourself to just these:
+## Borders & dividers
 
-1. Typography: are we using the right type size, weight, and color? Look at other content around it for reference
-2. Card / section structure: do our cards and sections use the same design pattern and layout as what already exists around it?
-3. General UI bugs: are there problems with our dividers, borders, and border radius?
-4. UI element sizing: are any of the UI elements too big or too small?
+- When do we use borders and how are they styled?
+- When do we use dividers and how are they styled?
+
+## Border radius
+
+(if more than one intentional style, say when each is used)
+
+- Cards use rounded-x
+- Buttons use rounded-x
+- What else?
