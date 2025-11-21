@@ -69,6 +69,10 @@ Here is your output visually. Could you please audit your own visuals to see if 
 
 8. Judge Guideline and Process
 
+```
+Here is your output visually for the pages. Could you please grade your output using the DESIGN_JUDGE_RUBRIC.md file. Then for each area that requires improvements, please use the DESIGN_JUDGE_GUIDELINES.md, please implement the solution appropriately.
+```
+
 ## Future improvements
 
 - Have another agent for rewriting the human prompt into a better UX design prompt for the AI to ingest.
