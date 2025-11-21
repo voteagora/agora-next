@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema", "views"]
+  previewFeatures = ["views"]
   binaryTargets   = ["native", "debian-openssl-3.0.x"]
 }
 
@@ -72,7 +72,7 @@ view Citizens {
   retro_funding_round String
   time_created        BigInt?
 
-  @@id([address, dao_slug, retro_funding_round])
+  @@unique([address, dao_slug, retro_funding_round])
   @@map("citizens")
   @@schema("agora")
 }
@@ -84,7 +84,7 @@ view Badgeholders {
   time_created        BigInt
   metadata            String
 
-  @@id([address, dao_slug, retro_funding_round])
+  @@unique([address, dao_slug, retro_funding_round])
   @@map("badgeholders")
   @@schema("agora")
 }
@@ -530,7 +530,7 @@ view OptimismProposalTypes {
 }
 
 view OptimismVotingPowerSnaps {
-  id                String   @id
+  id                String   @unique
   delegate          String?
   balance           String?
   block_number      BigInt?
@@ -696,7 +696,7 @@ view ensVotingPower {
 }
 
 view ensVotingPowerSnaps {
-  id                String   @id
+  id                String   @unique
   delegate          String?
   balance           String?
   block_number      BigInt?
@@ -833,7 +833,7 @@ view etherfiVotingPower {
 }
 
 view etherfiVotingPowerSnaps {
-  id                String   @id
+  id                String   @unique
   delegate          String?
   balance           String?
   block_number      BigInt?
@@ -1031,7 +1031,7 @@ view uniswapVotingPower {
 }
 
 view uniswapVotingPowerSnaps {
-  id                String   @id
+  id                String   @unique
   delegate          String?
   balance           String?
   block_number      BigInt?
@@ -1739,7 +1739,7 @@ view syndicateVotingPower {
 }
 
 view syndicateVotingPowerSnaps {
-  id                String   @id
+  id                String   @unique
   delegate          String?
   balance           String?
   block_number      BigInt?
@@ -1902,7 +1902,7 @@ view syndicateDaoSettings {
   param_value  String
   block_number BigInt
 
-  @@id([dao_id, param_name])
+  @@unique([dao_id, param_name])
   @@map("dao_settings")
   @@schema("syndicate")
 }
@@ -2418,7 +2418,7 @@ model changelog {
 }
 
 view cyberVotingPowerSnaps {
-  id                String   @id
+  id                String   @unique
   delegate          String?
   balance           String?
   block_number      BigInt?
@@ -2739,7 +2739,7 @@ view scrollVotingPower {
 }
 
 view scrollVotingPowerSnaps {
-  id                String   @id
+  id                String   @unique
   delegate          String?
   balance           String?
   block_number      BigInt?
@@ -3061,7 +3061,7 @@ view deriveVotingPower {
 }
 
 view deriveVotingPowerSnaps {
-  id                String   @id
+  id                String   @unique
   delegate          String?
   balance           String?
   block_number      BigInt?
@@ -3383,7 +3383,7 @@ view pguildVotingPower {
 }
 
 view pguildVotingPowerSnaps {
-  id                String   @id
+  id                String   @unique
   delegate          String?
   balance           String?
   block_number      BigInt?
@@ -3704,7 +3704,7 @@ view boostVotingPower {
 }
 
 view boostVotingPowerSnaps {
-  id                String   @id
+  id                String   @unique
   delegate          String?
   balance           String?
   block_number      BigInt?
@@ -4026,7 +4026,7 @@ view xaiVotingPower {
 }
 
 view xaiVotingPowerSnaps {
-  id                String   @id
+  id                String   @unique
   delegate          String?
   balance           String?
   block_number      BigInt?
@@ -4231,7 +4231,7 @@ view b3VotingPower {
 }
 
 view b3VotingPowerSnaps {
-  id                String   @id
+  id                String   @unique
   delegate          String?
   balance           String?
   block_number      BigInt?
@@ -4552,7 +4552,7 @@ view demoVotingPower {
 }
 
 view demoVotingPowerSnaps {
-  id                String   @id
+  id                String   @unique
   delegate          String?
   balance           String?
   block_number      BigInt?
@@ -4873,7 +4873,7 @@ view lineaVotingPower {
 }
 
 view lineaVotingPowerSnaps {
-  id                String   @id
+  id                String   @unique
   delegate          String?
   balance           String?
   block_number      BigInt?
