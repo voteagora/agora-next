@@ -5296,3 +5296,109 @@ model ProposalExecutionTransaction {
   @@map("proposal_execution_transactions")
   @@schema("alltenant")
 }
+
+// =============================================================================
+// RBAC System Models
+// =============================================================================
+
+model ForumRole {
+    id          Int      @id @default(autoincrement())
+    daoSlug     DaoSlug? @map("dao_slug") // NULL for system roles, required for custom roles
+    name        String
+    slug        String
+    description String?
+    isSystem    Boolean  @default(false) @map("is_system")
+    isDefault   Boolean  @default(false) @map("is_default")
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+    // Relations
+    rolePermissions ForumRolePermission[]
+    userRoles       ForumUserRole[]
+
+    // System roles have unique slug globally, custom roles unique per DAO
+    @@unique([daoSlug, slug])
+    @@index([daoSlug])
+    @@index([isSystem])
+    @@map("forum_roles")
+    @@schema("alltenant")
+}
+
+model Permission {
+    id          Int      @id @default(autoincrement())
+    module      String
+    resource    String
+    action      String
+    description String?
+    createdAt   DateTime @default(now()) @map("created_at")
+
+    // Relations
+    rolePermissions ForumRolePermission[]
+
+    @@unique([module, resource, action])
+    @@index([module])
+    @@map("permissions")
+    @@schema("alltenant")
+}
+
+model ForumRolePermission {
+    id           Int      @id @default(autoincrement())
+    roleId       Int      @map("role_id")
+    permissionId Int      @map("permission_id")
+    conditions   Json?
+    createdAt    DateTime @default(now()) @map("created_at")
+
+    // Relations
+    role       ForumRole  @relation(fields: [roleId], references: [id], onDelete: Cascade)
+    permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+    @@unique([roleId, permissionId])
+    @@index([roleId])
+    @@index([permissionId])
+    @@map("forum_role_permissions")
+    @@schema("alltenant")
+}
+
+model ForumUserRole {
+    id         Int       @id @default(autoincrement())
+    daoSlug    DaoSlug?  @map("dao_slug") // NULL for system-wide roles (e.g., Super Admin)
+    address    String
+    name       String?   // Optional user name
+    roleId     Int       @map("role_id")
+    grantedBy  String    @map("granted_by")
+    grantedAt  DateTime  @default(now()) @map("granted_at")
+    revokedAt  DateTime? @map("revoked_at")
+    revokedBy  String?   @map("revoked_by")
+    isActive   Boolean   @default(true) @map("is_active")
+
+    // Relations
+    role ForumRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+    @@unique([daoSlug, address, roleId])
+    @@index([daoSlug, address])
+    @@index([roleId])
+    @@index([isActive])
+    @@map("forum_user_roles")
+    @@schema("alltenant")
+}
+
+model ForumRoleChangeAudit {
+    id                Int      @id @default(autoincrement())
+    daoSlug           DaoSlug? @map("dao_slug") // NULL for system-wide operations
+    action            String
+    actor             String
+    targetUser        String?  @map("target_user")
+    roleId            Int?     @map("role_id")
+    roleName          String?  @map("role_name")
+    permissionChanges Json?    @map("permission_changes")
+    context           Json?
+    timestamp         DateTime @default(now())
+
+    @@index([daoSlug])
+    @@index([actor])
+    @@index([targetUser])
+    @@index([timestamp])
+    @@index([daoSlug, timestamp])
+    @@map("forum_role_change_audit")
+    @@schema("alltenant")
+}

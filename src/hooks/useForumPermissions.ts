@@ -2,11 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 import { getPublicClient } from "@/lib/viem";
 import Tenant from "@/lib/tenant/tenant";
-import { checkForumPermissions } from "@/lib/actions/forum/admin";
 import {
   fetchVotingPowerFromContract,
   formatVotingPowerString,
 } from "@/lib/votingPowerUtils";
+import { useUserPermissions, useIsSuperAdmin } from "./useRbacPermissions";
+import type { DaoSlug } from "@prisma/client";
 
 interface ForumSettings {
   minVpForTopics: number;
@@ -24,6 +25,7 @@ interface ForumPermissions {
   settings: ForumSettings | null;
   isLoading: boolean;
   isAdmin: boolean;
+  hasRbacPermissions: boolean; // New: indicates RBAC permissions available
   reasons: {
     topics?: string;
     posts?: string;
@@ -33,7 +35,10 @@ interface ForumPermissions {
 
 /**
  * Hook to check if the connected user has sufficient voting power for forum actions
- * Admins (admin, duna_admin, super_admin) bypass all VP requirements
+ * Integrates RBAC permissions:
+ * - Users with RBAC roles bypass all VP requirements
+ * - RBAC permissions used for granular admin actions
+ * - VP requirements still apply for regular users
  * Uses client-side checks to provide immediate feedback before server validation
  */
 export function useForumPermissions(): ForumPermissions {
@@ -42,24 +47,13 @@ export function useForumPermissions(): ForumPermissions {
   const client = getPublicClient();
   const normalizedAddress = address?.toLowerCase();
 
-  const { data: adminCheck, isLoading: adminLoading } = useQuery({
-    queryKey: ["forumAdmin", normalizedAddress],
-    queryFn: async () => {
-      try {
-        const result = await checkForumPermissions(normalizedAddress || "");
-        return result;
-      } catch (error) {
-        console.error("Failed to check admin permissions:", error);
-        // Default to non-admin on error
-        return { isAdmin: false };
-      }
-    },
-    enabled: !!normalizedAddress,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
-    retry: false, // Don't retry admin checks
-    placeholderData: { isAdmin: false }, // Optimistic default
-  });
+  // RBAC permission checks
+  const { data: rbacPermissions, isLoading: rbacLoading } = useUserPermissions(
+    normalizedAddress,
+    slug as DaoSlug
+  );
+  const { data: isSuperAdmin, isLoading: superAdminLoading } =
+    useIsSuperAdmin(normalizedAddress);
 
   // Fetch voting power directly from the contract
   const { data: votingPower, isLoading: vpLoading } = useQuery({
@@ -112,8 +106,13 @@ export function useForumPermissions(): ForumPermissions {
     retryDelay: 500, // Wait 500ms before retry
   });
 
-  const isLoading = vpLoading || settingsLoading || adminLoading;
-  const isAdmin = adminCheck?.isAdmin || false;
+  const isLoading =
+    vpLoading || settingsLoading || rbacLoading || superAdminLoading;
+
+  // Check if user is admin via RBAC system
+  const hasRbacPerms =
+    (rbacPermissions?.permissions.length || 0) > 0 || isSuperAdmin || false;
+  const isAdmin = hasRbacPerms;
 
   // If not connected or loading, return default permissions
   if (!address || isLoading || !settings) {
@@ -126,6 +125,7 @@ export function useForumPermissions(): ForumPermissions {
       settings: settings || null,
       isLoading,
       isAdmin: false,
+      hasRbacPermissions: false,
       reasons: {},
     };
   }
@@ -135,7 +135,7 @@ export function useForumPermissions(): ForumPermissions {
   // Convert voting power to number for comparisons
   const vpAsNumber = Number(currentVotes / BigInt(10 ** 18));
 
-  // Admins bypass all VP requirements
+  // Admins with RBAC roles bypass all VP requirements
   // Ensure settings values are numbers for comparison
   const minVpForTopics = Number(settings?.minVpForTopics || 0);
   const minVpForReplies = Number(settings?.minVpForReplies || 0);
@@ -171,6 +171,7 @@ export function useForumPermissions(): ForumPermissions {
     settings,
     isLoading,
     isAdmin,
+    hasRbacPermissions: hasRbacPerms,
     reasons,
   };
 }

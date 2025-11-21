@@ -15,6 +15,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { getIPFSUrl } from "@/lib/pinata";
 import { logForumAuditAction, checkForumPermissions } from "./admin";
+import { requirePermission } from "@/lib/rbac";
 import { unstable_cache } from "next/cache";
 import { createAttachmentsFromContent } from "../attachment";
 import { canCreateTopic, formatVPError } from "@/lib/forumSettings";
@@ -512,15 +513,16 @@ export async function softDeleteForumTopic(
   try {
     const validatedData = softDeleteTopicSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
+    // Verify signature and check permission
+    await requirePermission({
+      address: validatedData.address,
       message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
+      signature: validatedData.signature,
+      daoSlug: slug as any,
+      module: "forums",
+      resource: "topics",
+      action: "soft_delete",
     });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
-    }
 
     await prismaWeb2Client.forumTopic.update({
       where: {
@@ -551,15 +553,16 @@ export async function restoreForumTopic(
   try {
     const validatedData = softDeleteTopicSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
+    // Verify signature and check permission
+    await requirePermission({
+      address: validatedData.address,
       message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
+      signature: validatedData.signature,
+      daoSlug: slug as any,
+      module: "forums",
+      resource: "topics",
+      action: "restore",
     });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
-    }
 
     await prismaWeb2Client.forumTopic.update({
       where: {
@@ -622,15 +625,16 @@ export async function archiveForumTopic(
   try {
     const validatedData = archiveTopicSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
+    // Verify signature and check permission
+    await requirePermission({
+      address: validatedData.address,
       message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
+      signature: validatedData.signature,
+      daoSlug: slug as any,
+      module: "forums",
+      resource: "topics",
+      action: "archive",
     });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
-    }
 
     await prismaWeb2Client.forumTopic.update({
       where: {

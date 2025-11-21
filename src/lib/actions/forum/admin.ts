@@ -46,17 +46,23 @@ export async function checkForumPermissions(
   try {
     const { slug } = Tenant.current();
 
-    // Check if user is a forum admin
-    const forumAdmin = await prismaWeb2Client.forumAdmin.findFirst({
+    // Check RBAC permissions
+    const rbacUser = await prismaWeb2Client.forumUserRole.findFirst({
       where: {
         address: address.toLowerCase(),
-        managedAccounts: {
-          has: slug,
-        },
+        OR: [
+          { daoSlug: slug as any }, // DAO-specific roles
+          { daoSlug: null }, // System-wide roles (Super Admin)
+        ],
+        isActive: true,
+        revokedAt: null,
+      },
+      include: {
+        role: true,
       },
     });
 
-    const isAdmin = !!forumAdmin;
+    const isAdmin = !!rbacUser;
 
     // If admin, grant all permissions
     if (isAdmin) {
@@ -69,6 +75,7 @@ export async function checkForumPermissions(
       };
     }
 
+    // Check legacy forum permissions (for non-admins)
     const permissions = await prismaWeb2Client.forumPermission.findMany({
       where: {
         dao_slug: slug,

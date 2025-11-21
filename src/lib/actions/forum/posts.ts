@@ -13,6 +13,7 @@ import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { logForumAuditAction, checkForumPermissions } from "./admin";
+import { requirePermission } from "@/lib/rbac";
 import { createAttachmentsFromContent } from "../attachment";
 import {
   canCreatePost,
@@ -404,15 +405,16 @@ export async function softDeleteForumPost(
   try {
     const validatedData = softDeletePostSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
+    // Verify signature and check permission
+    await requirePermission({
+      address: validatedData.address,
       message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
+      signature: validatedData.signature,
+      daoSlug: slug as any,
+      module: "forums",
+      resource: "posts",
+      action: "soft_delete",
     });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
-    }
 
     await prismaWeb2Client.forumPost.update({
       where: {
@@ -443,15 +445,16 @@ export async function restoreForumPost(
   try {
     const validatedData = softDeletePostSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
+    // Verify signature and check permission
+    await requirePermission({
+      address: validatedData.address,
       message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
+      signature: validatedData.signature,
+      daoSlug: slug as any,
+      module: "forums",
+      resource: "posts",
+      action: "restore",
     });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
-    }
 
     await prismaWeb2Client.forumPost.update({
       where: {
