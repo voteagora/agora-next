@@ -1,7 +1,11 @@
 /** @type {import('next').NextConfig} */
 const path = require("path");
 
-const nextConfig = {
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
+
+const nextConfig = withBundleAnalyzer({
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
   },
@@ -75,6 +79,6 @@ const nextConfig = {
     },
   },
   output: "standalone", // Optional, good for Docker
-};
+});
 
 module.exports = nextConfig;
