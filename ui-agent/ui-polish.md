@@ -21,28 +21,6 @@ You are an expert product designer and frontend engineer with a keen eye for det
 
 # UI guidelines
 
-## Typography
-
-- **Fonts & colors**
-  - **Text colors**: Use **`text-primary`** for headings and key labels; **`text-secondary`** for standard body text; **`text-tertiary`** for hints, captions, and secondary labels.
-
-- **Title levels**
-  - **Page hero / H1**: Large page titles (e.g. info hero) use `font-black` with **`text-4xl`** on desktop, tight line-height (`leading-tight` / custom `leading-[36px]`), and `text-primary`. Use for the single main title of a page.
-  - **Section titles / H2**: Major sections like “Voting process” or “How voting power works” use `text-2xl font-black text-primary` with a top margin (`mt-8`–`mt-12`) from the previous section. Use when a new page-level section begins.
-  - **Subsection titles / H3**: Subtitles inside cards and modals (e.g. “About …”, dialog titles) use `text-xl font-bold text-primary`. Use when labeling a card, modal, or major panel within a section.
-  - **Inline subheadings / step titles (H4–H5)**: Small headings inside info sections and lists use `text-base font-semibold text-primary` or `text-sm font-semibold text-primary` (e.g. numbered steps in governance guides, small callouts).
-
-- **Body text**
-  - **Default body**: Use **`text-base text-secondary`** with normal or relaxed line-height for multi-line copy. This is used for hero descriptions, info cards, and standard paragraphs.
-
-- **Smaller-than-body styles and when to use them**
-  - **`text-sm`**: Form descriptions (`InputDescription`), card descriptions (`CardDescription`), banner body text, and small supporting labels. Weight is usually `font-normal` or `font-medium`; color is `text-secondary` or `text-muted-foreground`.
-  - **`text-xs`**: Only for legal copy (e.g. explanatory footnotes inside info sections). Pair with `text-tertiary` and keep line length short so it remains legible.
-
-- **Other misc rules**
-  - Combine multiple one-sentence paragraphs into a single paragraph where possible so pages don’t look like a stack of tiny text blocks.
-  - Use hierarchy (title sizes, `text-primary` vs `text-secondary`) and layout to create emphasis instead of bolding or underlining random phrases inside paragraphs.
-
 ## Cards & sections
 
 - **How we style cards**
@@ -63,24 +41,6 @@ You are an expert product designer and frontend engineer with a keen eye for det
   - Inside a bordered container, use **full-width dividers** so the line visually connects to the card’s border. Implement this as `border-t border-line` on child sections or with the `Separator` component (`bg-line`, `h-[1px] w-full`).
   - Never leave dividers “floating” with side paddings that don’t meet the outer border; align them edge-to-edge within the card.
   - Use vertical dividers (`Separator` with `orientation="vertical"` or `w-[1px]`) sparingly for dense layouts; keep them aligned with other borders and avoid cutting through text.
-
-## Border radius
-
-- **Cards**
-  - Standard data and content cards use **`rounded-lg`** or **`rounded-xl`**; info sections and larger feature cards lean toward `rounded-xl` (e.g. info page sections, governance guide blocks).
-  - Avoid mixing multiple radius styles in the same visual cluster (e.g. an `rounded-md` card next to a `rounded-2xl` card) unless there is a strong reason (like a pill overlay).
-
-- **Buttons and controls**
-  - Shadcn `Button` defaults to **`rounded-md`**; this is the baseline for primary, secondary, and outline buttons.
-  - Pills and special actions (e.g. header connect button, info hero CTAs, chip-like filters) use **`rounded-full`** or explicit large radii like `rounded-[40px]`.
-  - Small controls such as number badges or icon-only chips may use `rounded-full` for perfectly circular shapes.
-
-- **Banners and other elements**
-  - Standalone banners use **`rounded-lg`** (see `DismissibleBanner`), matching the card radius but with slightly lighter shadow.
-  - Banners **attached to cards** do not add extra radius; they align flush with the card’s top edge and use a `border-b` divider instead.
-  - Avatars and circular icons always use **`rounded-full`**; thumbnail images inside info cards use `rounded-lg`.
-
-## Commmon patterns
 
 ### Card sections in the info page
 
