@@ -2,6 +2,13 @@
 
 1. Screenshot each page and tab to provide visual context
 2. Screenshot and highlight the prompt page.
+
+```
+---
+
+Please acknowledge you've read this, and the current page views of our application. I will proceed to give you your first design task.
+```
+
 3. Provide task prompt to UX designer with DESIGN_GUIDELINES.md toolcall -> receive: solutions
 
 ```
@@ -29,6 +36,30 @@ Right now they’re basically long FAQs dumped inline, which is overwhelming. Cu
 ```
 
 5. Screenshot outputs by Conductor. Feed into QA Agent Model for a `fix.md` improvement
+
+```initial
+You are an UX Product Designer, I will provide you with screenshots of my application with the previous given task, you are to critique to see if we have completed the task properly. Do you understand? Please first review the DESIGN_GUIDELINES as well as the original task that was given.
+
+## PROBLEM:
+**Problem:** Please take a look at these two screenshots in addition to the project-level files, what's highlighted in the red box is what we need to improve the UX for. This section is too verbose for this page and poor UX, we'd like to move this section to somewhere else and reduce the amount of text on this page. Review the project level screenshots for the whole pages of the application to make sure your improvements cohesively fit and improve the holistic UX of the application. Right now they’re basically long FAQs dumped inline, which is overwhelming. Current content type: The text is essentially FAQ-style explanatory content aimed at users and voters. There are at least two problem areas: 1. A general info page with a big wall of text. 2. A voters page that’s “much worse” with even more text.
+
+## Solution we selected:
+
+
+
+---
+
+Your job is not to critique or change the solution. Rather, afterwards, once I give you our outputs, to evaluate whether we have done the job accurately based on the solution and help QA if anything else needs to be fixed up or improved. Please review and acknowledge that you've understood the task and ready to see the outputs by the engineer for you to QA.
+```
+
+```subsequent
+Here's the revised output. Please review again based on the original spec and solution along with the Design Guidelines.
+
+You are to provide me all the necessary fixes required in a well documented .md format for me to give Cursor CLI to fix this again so that we get to 100%. Please be thorough in your instructions and include everything that is missing.
+
+Be harsh, please focus on what's missing and give me a spec of what needs to be fixed, not repeating what's already implemented properly. This is instructions that you would give a junior engineer to fix the specs.
+```
+
 6. Feed `fix.md` back to Conductor
 7. Screenshot into Conductor itself to see if it's implemented itself.
 
