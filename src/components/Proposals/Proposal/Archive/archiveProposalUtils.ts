@@ -169,6 +169,56 @@ export const deriveStatus = (
     return "ACTIVE";
   }
 
+  // Determine proposal type for status logic
+  const votingData = proposal.govless_proposal || proposal;
+
+  // Use voting_module_name to determine base proposal type
+  const getBaseProposalType = (): string | null => {
+    // First check if proposal_type is already a string
+    if (typeof votingData.proposal_type === "string") {
+      // Extract base type from HYBRID_* or OFFCHAIN_* variants
+      const type = votingData.proposal_type;
+      if (type.startsWith("HYBRID_")) return type.replace("HYBRID_", "");
+      if (type.startsWith("OFFCHAIN_")) return type.replace("OFFCHAIN_", "");
+      return type;
+    }
+
+    // Use voting_module_name to determine type
+    const moduleName = votingData.voting_module_name;
+    if (moduleName === "approval") {
+      return "APPROVAL";
+    }
+    if (moduleName === "optimistic") {
+      return votingData.tiers ? "OPTIMISTIC_TIERED" : "OPTIMISTIC";
+    }
+    if (moduleName === "standard") {
+      return "STANDARD";
+    }
+
+    return null;
+  };
+
+  const baseType = getBaseProposalType();
+
+  // For OPTIMISTIC and OPTIMISTIC_TIERED proposals, they succeed unless vetoed
+  if (baseType === "OPTIMISTIC" || baseType === "OPTIMISTIC_TIERED") {
+    // Check if lifecycle_stage explicitly says DEFEATED
+    if (proposal.lifecycle_stage === "DEFEATED") {
+      return "DEFEATED";
+    }
+    // Otherwise, optimistic proposals succeed (they pass unless vetoed)
+    return "SUCCEEDED";
+  }
+
+  // For APPROVAL proposals, check if they succeeded
+  if (baseType === "APPROVAL") {
+    // Check lifecycle_stage
+    if (proposal.lifecycle_stage === "DEFEATED") {
+      return "DEFEATED";
+    }
+    return "SUCCEEDED";
+  }
+
   // For STANDARD proposals, use vote-based logic
   // Handle different data sources: EAS-OODAO vs standard
   const source = proposal.data_eng_properties?.source;

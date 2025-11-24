@@ -40,7 +40,7 @@ export type DataEngProperties = {
 // Proposal Class (base voting mechanism)
 // =============================================================================
 
-export type ProposalClass = "STANDARD";
+export type ProposalClass = "STANDARD" | "OPTIMISTIC" | "APPROVAL";
 
 // =============================================================================
 // Lifecycle Events
@@ -145,7 +145,25 @@ export type StandardVotingFields = {
   voting_module_name?: "standard";
 };
 
-export type VotingModuleFields = StandardVotingFields;
+/** Approval voting fields (multi-choice) */
+export type ApprovalVotingFields = {
+  voting_module_name?: "approval";
+  choices?: string[];
+  max_approvals?: number;
+  criteria?: number; // 1 = top N winners, 99 = threshold
+  criteria_value?: number;
+};
+
+/** Optimistic voting fields (veto-based) */
+export type OptimisticVotingFields = {
+  voting_module_name?: "optimistic";
+  tiers?: number[]; // basis points for tiered thresholds [1100, 1400, 1700]
+};
+
+export type VotingModuleFields =
+  | StandardVotingFields
+  | ApprovalVotingFields
+  | OptimisticVotingFields;
 
 // =============================================================================
 // Source-Specific Proposal Types
@@ -169,7 +187,8 @@ export type DaoNodeProposalFields = {
 
   // Voting module
   voting_module?: string;
-  voting_module_name?: "standard";
+
+  voting_module_name?: "standard" | "approval" | "optimistic";
 
   // Quorum/threshold
   quorum?: string | number;
@@ -218,7 +237,7 @@ export type EasAtlasProposalFields = {
 
   // Proposal type info
   proposal_type_id: number;
-  proposal_type: "STANDARD";
+  proposal_type: "STANDARD" | "OPTIMISTIC" | "OPTIMISTIC_TIERED" | "APPROVAL";
 
   // Voting configuration
   choices?: string[];
@@ -334,29 +353,61 @@ export function deriveProposalType(
   proposal: ArchiveProposalBySource | ArchiveListProposal
 ): ProposalType {
   const source = proposal.data_eng_properties.source;
+  const hybrid = "hybrid" in proposal && proposal.hybrid === true;
 
-  // Snapshot proposals are identified purely by source
+  // Handle snapshot proposals
   if (source === "snapshot") {
     return "SNAPSHOT";
   }
 
-  // For now we only support:
-  // - STANDARD onchain proposals (dao_node)
-  // - OFFCHAIN_STANDARD proposals from eas-atlas / eas-oodao without onchain link
-  // - HYBRID_STANDARD proposals (dao_node with govless_proposal)
+  // Determine base class
+  let baseClass: ProposalClass;
+  let isTiered = false;
 
   if (source === "dao_node") {
     const daoProposal = proposal as DaoNodeProposal;
+    const votingModule = daoProposal.voting_module_name;
 
-    // Hybrid proposals with nested govless_proposal
-    if (daoProposal.hybrid && daoProposal.govless_proposal) {
-      return "HYBRID_STANDARD";
+    if (votingModule === "approval") {
+      baseClass = "APPROVAL";
+    } else if (votingModule === "optimistic") {
+      baseClass = "OPTIMISTIC";
+      // Check govless_proposal for tiered info
+      if (daoProposal.govless_proposal?.tiers?.length) {
+        isTiered = true;
+      }
+    } else {
+      baseClass = "STANDARD";
     }
+  } else if (source === "eas-atlas") {
+    const atlasProposal = proposal as EasAtlasProposal;
+    const propType = atlasProposal.proposal_type;
 
-    // Plain onchain standard proposals
-    return "STANDARD";
+    if (propType === "APPROVAL") {
+      baseClass = "APPROVAL";
+    } else if (propType === "OPTIMISTIC" || propType === "OPTIMISTIC_TIERED") {
+      baseClass = "OPTIMISTIC";
+      isTiered =
+        propType === "OPTIMISTIC_TIERED" || !!atlasProposal.tiers?.length;
+    } else {
+      baseClass = "STANDARD";
+    }
+  } else if (source === "eas-oodao") {
+    const oodaoProposal = proposal as EasOodaoProposal;
+    baseClass = oodaoProposal.proposal_type.class;
+  } else {
+    baseClass = "STANDARD";
   }
 
+  // Determine final type based on hybrid/offchain status
+  if (hybrid) {
+    if (baseClass === "OPTIMISTIC" && isTiered) {
+      return "HYBRID_OPTIMISTIC_TIERED";
+    }
+    return `HYBRID_${baseClass}` as ProposalType;
+  }
+
+  // Offchain-only proposals (eas-atlas without onchain link, or eas-oodao)
   if (source === "eas-atlas" || source === "eas-oodao") {
     const hasOnchainId =
       "onchain_proposalid" in proposal &&
@@ -364,15 +415,15 @@ export function deriveProposalType(
       proposal.onchain_proposalid !== 0;
 
     if (!hasOnchainId) {
-      return "OFFCHAIN_STANDARD";
+      if (baseClass === "OPTIMISTIC" && isTiered) {
+        return "OFFCHAIN_OPTIMISTIC_TIERED";
+      }
+      return `OFFCHAIN_${baseClass}` as ProposalType;
     }
-
-    // If there is an onchain id, treat it as hybrid-standard
-    return "HYBRID_STANDARD";
   }
 
-  // Fallback: treat unknown sources as STANDARD
-  return "STANDARD";
+  // Onchain dao_node proposals
+  return baseClass as ProposalType;
 }
 
 // =============================================================================
@@ -417,7 +468,36 @@ export function isHybridProposal(
   );
 }
 
-// We only support standard-style proposals in the archive list (no approval/optimistic routing)
+export function isApprovalProposal(proposal: ArchiveProposalBySource): boolean {
+  if (isDaoNodeProposal(proposal)) {
+    return proposal.voting_module_name === "approval";
+  }
+  if (isEasAtlasProposal(proposal)) {
+    return proposal.proposal_type === "APPROVAL";
+  }
+  if (isEasOodaoProposal(proposal)) {
+    return proposal.proposal_type.class === "APPROVAL";
+  }
+  return false;
+}
+
+export function isOptimisticProposal(
+  proposal: ArchiveProposalBySource
+): boolean {
+  if (isDaoNodeProposal(proposal)) {
+    return proposal.voting_module_name === "optimistic";
+  }
+  if (isEasAtlasProposal(proposal)) {
+    return (
+      proposal.proposal_type === "OPTIMISTIC" ||
+      proposal.proposal_type === "OPTIMISTIC_TIERED"
+    );
+  }
+  if (isEasOodaoProposal(proposal)) {
+    return proposal.proposal_type.class === "OPTIMISTIC";
+  }
+  return false;
+}
 
 // =============================================================================
 // Legacy Compatibility (ArchiveListProposal)
@@ -519,3 +599,614 @@ export type ArchiveListProposal = {
   approval_check?: boolean;
   total_voting_power_at_start?: string;
 };
+
+// =============================================================================
+// Proposal Status (mirrors proposalUtils/proposalStatus.ts)
+// =============================================================================
+
+/**
+ * Proposal status enum - matches ProposalStatus from proposalUtils/proposalStatus.ts
+ */
+export type ArchiveProposalStatus =
+  | "CANCELLED"
+  | "SUCCEEDED"
+  | "DEFEATED"
+  | "ACTIVE"
+  | "FAILED"
+  | "PENDING"
+  | "QUEUED"
+  | "EXECUTED"
+  | "CLOSED"
+  | "PASSED";
+
+// =============================================================================
+// Parsed Proposal Results (mirrors proposalUtils/parseProposalResults.ts)
+// =============================================================================
+
+/** Standard vote tallies (for/against/abstain) */
+export type StandardVoteTallies = {
+  for: bigint;
+  against: bigint;
+  abstain: bigint;
+};
+
+/** Citizen category vote tallies for hybrid/offchain proposals */
+export type CitizenCategoryTallies = {
+  APP: StandardVoteTallies;
+  USER: StandardVoteTallies;
+  CHAIN: StandardVoteTallies;
+};
+
+/** Approval option with votes */
+export type ApprovalOptionResult = {
+  option: string;
+  votes: bigint;
+};
+
+/** Approval option with weighted metrics (for hybrid/offchain) */
+export type ApprovalOptionMetrics = {
+  option: string;
+  weightedPercentage: number;
+  isApproved: boolean;
+};
+
+/** Citizen category approval tallies (option -> votes mapping) */
+export type CitizenCategoryApprovalTallies = {
+  APP: Record<string, bigint>;
+  USER: Record<string, bigint>;
+  CHAIN: Record<string, bigint>;
+};
+
+/**
+ * Parsed proposal results - discriminated union by proposal type.
+ * Mirrors ParsedProposalResults from proposalUtils.ts
+ */
+export type ArchiveParsedProposalResults = {
+  STANDARD: {
+    key: "STANDARD";
+    kind: StandardVoteTallies;
+  };
+  OFFCHAIN_STANDARD: {
+    key: "OFFCHAIN_STANDARD";
+    kind: StandardVoteTallies & CitizenCategoryTallies;
+  };
+  OPTIMISTIC: {
+    key: "OPTIMISTIC";
+    kind: StandardVoteTallies;
+  };
+  APPROVAL: {
+    key: "APPROVAL";
+    kind: StandardVoteTallies & {
+      options: ApprovalOptionResult[];
+      criteria: "TOP_CHOICES" | "THRESHOLD";
+      criteriaValue: bigint;
+    };
+  };
+  OFFCHAIN_APPROVAL: {
+    key: "OFFCHAIN_APPROVAL";
+    kind: StandardVoteTallies & {
+      options: ApprovalOptionMetrics[];
+    };
+  };
+  HYBRID_STANDARD: {
+    key: "HYBRID_STANDARD";
+    kind: CitizenCategoryTallies & {
+      DELEGATES: StandardVoteTallies;
+    };
+  };
+  HYBRID_OPTIMISTIC: {
+    key: "HYBRID_OPTIMISTIC";
+    kind: CitizenCategoryTallies & {
+      DELEGATES: StandardVoteTallies;
+    };
+  };
+  HYBRID_OPTIMISTIC_TIERED: {
+    key: "HYBRID_OPTIMISTIC_TIERED";
+    kind: CitizenCategoryTallies &
+      StandardVoteTallies & {
+        DELEGATES: StandardVoteTallies;
+      };
+  };
+  OFFCHAIN_OPTIMISTIC: {
+    key: "OFFCHAIN_OPTIMISTIC";
+    kind: StandardVoteTallies & CitizenCategoryTallies;
+  };
+  OFFCHAIN_OPTIMISTIC_TIERED: {
+    key: "OFFCHAIN_OPTIMISTIC_TIERED";
+    kind: StandardVoteTallies & CitizenCategoryTallies;
+  };
+  HYBRID_APPROVAL: {
+    key: "HYBRID_APPROVAL";
+    kind: StandardVoteTallies &
+      CitizenCategoryApprovalTallies & {
+        DELEGATES: Record<string, bigint>;
+        options: ApprovalOptionMetrics[];
+        criteria: "TOP_CHOICES" | "THRESHOLD";
+        criteriaValue: bigint;
+        totals?: Record<string, unknown>;
+      };
+  };
+};
+
+// =============================================================================
+// Parsing Functions (mirrors parseProposalResults logic)
+// =============================================================================
+
+/**
+ * Helper to extract vote value from EasAtlasVoteOutcome format.
+ * Handles both simple numbers and nested { "1": number } objects.
+ */
+function extractVoteValue(value: number | { "1": number } | undefined): number {
+  if (value === undefined) return 0;
+  if (typeof value === "number") return value;
+  if (typeof value === "object" && "1" in value) return value["1"];
+  return 0;
+}
+
+/**
+ * Helper to process citizen category tallies from outcome data.
+ * Used for eas-atlas and govless_proposal outcome format.
+ */
+function processCitizenTallies(
+  outcome: EasAtlasVoteOutcome | undefined
+): CitizenCategoryTallies {
+  const processTallySource = (
+    sourceData: { [choiceIndex: string]: number | { "1": number } } | undefined
+  ): StandardVoteTallies => ({
+    for: BigInt(
+      extractVoteValue(sourceData?.["1"]) ||
+        extractVoteValue(sourceData?.["2"]) ||
+        0
+    ),
+    against: BigInt(extractVoteValue(sourceData?.["0"]) || 0),
+    abstain: BigInt(extractVoteValue(sourceData?.["2"]) || 0),
+  });
+
+  return {
+    APP: processTallySource(outcome?.APP),
+    USER: processTallySource(outcome?.USER),
+    CHAIN: processTallySource(outcome?.CHAIN),
+  };
+}
+
+/**
+ * Helper to process dao_node standard vote totals.
+ */
+function processDaoNodeStandardTotals(
+  totals: DaoNodeVoteTotals | undefined
+): StandardVoteTallies {
+  const noParamTotals = totals?.["no-param"];
+  return {
+    for: BigInt(noParamTotals?.["1"] ?? 0),
+    against: BigInt(noParamTotals?.["0"] ?? 0),
+    abstain: BigInt(noParamTotals?.["2"] ?? 0),
+  };
+}
+
+/**
+ * Helper to process dao_node approval vote totals.
+ */
+function processDaoNodeApprovalTotals(
+  totals: DaoNodeVoteTotals | undefined,
+  options: string[]
+): ApprovalOptionResult[] {
+  return options.map((option, idx) => ({
+    option,
+    votes: BigInt(totals?.[idx.toString()]?.["1"] ?? 0),
+  }));
+}
+
+/**
+ * Helper to process citizen category approval tallies.
+ */
+function processCitizenApprovalTallies(
+  outcome: EasAtlasVoteOutcome | undefined
+): CitizenCategoryApprovalTallies {
+  const processApprovalSource = (
+    sourceData: { [choiceIndex: string]: number | { "1": number } } | undefined
+  ): Record<string, bigint> => {
+    if (!sourceData) return {};
+    const result: Record<string, bigint> = {};
+    for (const [key, value] of Object.entries(sourceData)) {
+      result[key] = BigInt(
+        extractVoteValue(value as number | { "1": number }) ?? 0
+      );
+    }
+    return result;
+  };
+
+  return {
+    APP: processApprovalSource(outcome?.APP),
+    USER: processApprovalSource(outcome?.USER),
+    CHAIN: processApprovalSource(outcome?.CHAIN),
+  };
+}
+
+/**
+ * Parse archive proposal into structured results based on proposal type.
+ * Mirrors parseProposalResults from proposalUtils/parseProposalResults.ts
+ */
+export function parseArchiveProposalResults(
+  proposal: ArchiveListProposal,
+  proposalType: ProposalType
+): ArchiveParsedProposalResults[keyof ArchiveParsedProposalResults] {
+  const source = proposal.data_eng_properties?.source;
+  const isHybrid = proposal.hybrid && proposal.govless_proposal;
+  const govlessOutcome = proposal.govless_proposal?.outcome as
+    | EasAtlasVoteOutcome
+    | undefined;
+
+  switch (proposalType) {
+    case "STANDARD":
+    case "OPTIMISTIC": {
+      const tallies = processDaoNodeStandardTotals(proposal.totals);
+      return {
+        key: proposalType,
+        kind: tallies,
+      };
+    }
+
+    case "OFFCHAIN_STANDARD": {
+      const outcome = proposal.outcome as EasAtlasVoteOutcome | undefined;
+      const citizenTallies = processCitizenTallies(outcome);
+      const combined: StandardVoteTallies = {
+        for:
+          citizenTallies.APP.for +
+          citizenTallies.USER.for +
+          citizenTallies.CHAIN.for,
+        against:
+          citizenTallies.APP.against +
+          citizenTallies.USER.against +
+          citizenTallies.CHAIN.against,
+        abstain:
+          citizenTallies.APP.abstain +
+          citizenTallies.USER.abstain +
+          citizenTallies.CHAIN.abstain,
+      };
+      return {
+        key: "OFFCHAIN_STANDARD",
+        kind: { ...combined, ...citizenTallies },
+      };
+    }
+
+    case "HYBRID_STANDARD": {
+      const delegateTallies = processDaoNodeStandardTotals(proposal.totals);
+      const citizenTallies = processCitizenTallies(govlessOutcome);
+      return {
+        key: "HYBRID_STANDARD",
+        kind: {
+          ...citizenTallies,
+          DELEGATES: delegateTallies,
+        },
+      };
+    }
+
+    case "HYBRID_OPTIMISTIC": {
+      const delegateTallies = processDaoNodeStandardTotals(proposal.totals);
+      const citizenTallies = processCitizenTallies(govlessOutcome);
+      return {
+        key: "HYBRID_OPTIMISTIC",
+        kind: {
+          ...citizenTallies,
+          DELEGATES: delegateTallies,
+        },
+      };
+    }
+
+    case "HYBRID_OPTIMISTIC_TIERED": {
+      const delegateTallies = processDaoNodeStandardTotals(proposal.totals);
+      const citizenTallies = processCitizenTallies(govlessOutcome);
+      return {
+        key: "HYBRID_OPTIMISTIC_TIERED",
+        kind: {
+          ...citizenTallies,
+          ...delegateTallies,
+          DELEGATES: delegateTallies,
+        },
+      };
+    }
+
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED": {
+      const outcome = proposal.outcome as EasAtlasVoteOutcome | undefined;
+      const citizenTallies = processCitizenTallies(outcome);
+      const combined: StandardVoteTallies = {
+        for:
+          citizenTallies.APP.for +
+          citizenTallies.USER.for +
+          citizenTallies.CHAIN.for,
+        against:
+          citizenTallies.APP.against +
+          citizenTallies.USER.against +
+          citizenTallies.CHAIN.against,
+        abstain:
+          citizenTallies.APP.abstain +
+          citizenTallies.USER.abstain +
+          citizenTallies.CHAIN.abstain,
+      };
+      return {
+        key: proposalType,
+        kind: { ...combined, ...citizenTallies },
+      };
+    }
+
+    case "APPROVAL": {
+      const tallies = processDaoNodeStandardTotals(proposal.totals);
+      const options = proposal.choices || [];
+      const optionResults = processDaoNodeApprovalTotals(
+        proposal.totals,
+        options
+      );
+      const criteria =
+        proposal.criteria === 0 ? "TOP_CHOICES" : ("THRESHOLD" as const);
+      return {
+        key: "APPROVAL",
+        kind: {
+          ...tallies,
+          options: optionResults,
+          criteria,
+          criteriaValue: BigInt(proposal.criteria_value ?? 0),
+        },
+      };
+    }
+
+    case "OFFCHAIN_APPROVAL": {
+      const outcome = proposal.outcome as EasAtlasVoteOutcome | undefined;
+      const citizenTallies = processCitizenTallies(outcome);
+      const combined: StandardVoteTallies = {
+        for:
+          citizenTallies.APP.for +
+          citizenTallies.USER.for +
+          citizenTallies.CHAIN.for,
+        against:
+          citizenTallies.APP.against +
+          citizenTallies.USER.against +
+          citizenTallies.CHAIN.against,
+        abstain:
+          citizenTallies.APP.abstain +
+          citizenTallies.USER.abstain +
+          citizenTallies.CHAIN.abstain,
+      };
+      const options = (proposal.choices || []).map((choice) => ({
+        option: choice,
+        weightedPercentage: 0,
+        isApproved: false,
+      }));
+      return {
+        key: "OFFCHAIN_APPROVAL",
+        kind: { ...combined, options },
+      };
+    }
+
+    case "HYBRID_APPROVAL": {
+      const delegateTallies = processDaoNodeStandardTotals(proposal.totals);
+      const citizenApprovalTallies =
+        processCitizenApprovalTallies(govlessOutcome);
+      const choices = proposal.choices || [];
+
+      // Build DELEGATES option mapping
+      const delegatesOptions: Record<string, bigint> = {};
+      choices.forEach((choice, idx) => {
+        delegatesOptions[choice] = BigInt(
+          proposal.totals?.[idx.toString()]?.["1"] ?? 0
+        );
+      });
+
+      const options = choices.map((choice) => ({
+        option: choice,
+        weightedPercentage: 0,
+        isApproved: false,
+      }));
+
+      const criteria =
+        proposal.criteria === 0 ? "TOP_CHOICES" : ("THRESHOLD" as const);
+
+      return {
+        key: "HYBRID_APPROVAL",
+        kind: {
+          ...delegateTallies,
+          ...citizenApprovalTallies,
+          DELEGATES: delegatesOptions,
+          options,
+          criteria,
+          criteriaValue: BigInt(proposal.criteria_value ?? 0),
+        },
+      };
+    }
+
+    default:
+      // Fallback for unknown types
+      return {
+        key: "STANDARD",
+        kind: { for: 0n, against: 0n, abstain: 0n },
+      };
+  }
+}
+
+// =============================================================================
+// Status Derivation (mirrors proposalUtils/proposalStatus.ts logic)
+// =============================================================================
+
+/**
+ * Derive proposal status from archive proposal data.
+ * Mirrors getProposalStatus from proposalUtils/proposalStatus.ts
+ *
+ * @param proposal - The archive proposal
+ * @param proposalType - The derived proposal type
+ * @param currentTimestamp - Current timestamp (seconds) for time-based checks
+ * @param quorum - Optional quorum value (in voting power units)
+ * @param votableSupply - Optional votable supply for optimistic checks
+ * @param approvalThreshold - Optional approval threshold (basis points, e.g., 5100 = 51%)
+ */
+export function getArchiveProposalStatus(
+  proposal: ArchiveListProposal,
+  proposalType: ProposalType,
+  currentTimestamp: number,
+  quorum?: bigint,
+  votableSupply?: bigint,
+  approvalThreshold?: bigint
+): ArchiveProposalStatus {
+  // 1. Check lifecycle events first (cancelled, executed, queued)
+  if (proposal.cancel_event || proposal.lifecycle_stage === "CANCELED") {
+    return "CANCELLED";
+  }
+
+  if (proposal.execute_event || proposal.lifecycle_stage === "EXECUTED") {
+    return "EXECUTED";
+  }
+
+  if (proposal.queue_event || proposal.lifecycle_stage === "QUEUED") {
+    // Check if queued for more than 10 days without execution (PASSED for no-calldata proposals)
+    const TEN_DAYS_IN_SECONDS = 10 * 24 * 60 * 60;
+    const queuedTime = proposal.queue_event?.blocktime;
+    if (queuedTime && currentTimestamp - queuedTime > TEN_DAYS_IN_SECONDS) {
+      // Would need to check calldata here, but for archive we assume PASSED
+      return "PASSED";
+    }
+    return "QUEUED";
+  }
+
+  // 2. Check time-based status (PENDING, ACTIVE)
+  const startTime = proposal.start_blocktime;
+  const endTime = proposal.end_blocktime;
+
+  if (startTime && currentTimestamp < startTime) {
+    return "PENDING";
+  }
+
+  if (endTime && currentTimestamp < endTime) {
+    return "ACTIVE";
+  }
+
+  // 3. Voting has ended - determine outcome based on results
+  const results = parseArchiveProposalResults(proposal, proposalType);
+
+  switch (results.key) {
+    case "STANDARD":
+    case "OFFCHAIN_STANDARD": {
+      const { for: forVotes, against: againstVotes } = results.kind;
+
+      // Threshold check (if provided)
+      if (approvalThreshold !== undefined) {
+        const thresholdVotes = forVotes + againstVotes;
+        const voteThresholdPercent =
+          thresholdVotes > 0n
+            ? (Number(forVotes) / Number(thresholdVotes)) * 100
+            : 0;
+        const apprThresholdPercent = Number(approvalThreshold) / 100;
+        if (voteThresholdPercent < apprThresholdPercent) {
+          return "DEFEATED";
+        }
+      }
+
+      // Quorum check
+      if (quorum !== undefined) {
+        const quorumVotes = forVotes + againstVotes; // Or for + abstain depending on config
+        if (quorumVotes < quorum) {
+          return "DEFEATED";
+        }
+      }
+
+      // For vs Against
+      if (forVotes > againstVotes) {
+        return "SUCCEEDED";
+      } else if (againstVotes > forVotes) {
+        return "DEFEATED";
+      }
+      return "FAILED";
+    }
+
+    case "OPTIMISTIC": {
+      const { against: againstVotes } = results.kind;
+      // Optimistic: defeated only if against > 50% of votable supply
+      if (votableSupply && againstVotes > votableSupply / 2n) {
+        return "DEFEATED";
+      }
+      return "SUCCEEDED";
+    }
+
+    case "APPROVAL": {
+      const {
+        for: forVotes,
+        abstain: abstainVotes,
+        options,
+        criteria,
+        criteriaValue,
+      } = results.kind;
+      const proposalQuorumVotes = forVotes + abstainVotes;
+
+      // Quorum check
+      if (quorum && proposalQuorumVotes < quorum) {
+        return "DEFEATED";
+      }
+
+      // Criteria check
+      if (criteria === "THRESHOLD") {
+        for (const option of options) {
+          if (option.votes > criteriaValue) {
+            return "SUCCEEDED";
+          }
+        }
+        return "DEFEATED";
+      }
+      return "SUCCEEDED";
+    }
+
+    case "OFFCHAIN_APPROVAL": {
+      const { for: forVotes, abstain: abstainVotes } = results.kind;
+      const proposalQuorumVotes = forVotes + abstainVotes;
+
+      if (quorum && proposalQuorumVotes < quorum) {
+        return "DEFEATED";
+      }
+      return "SUCCEEDED";
+    }
+
+    case "HYBRID_STANDARD": {
+      // For hybrid standard, need weighted calculation
+      // Simplified: check if total for > total against across all categories
+      const { APP, USER, CHAIN, DELEGATES } = results.kind;
+      const totalFor = APP.for + USER.for + CHAIN.for + DELEGATES.for;
+      const totalAgainst =
+        APP.against + USER.against + CHAIN.against + DELEGATES.against;
+
+      if (totalFor > totalAgainst) {
+        return "SUCCEEDED";
+      }
+      return "DEFEATED";
+    }
+
+    case "HYBRID_OPTIMISTIC":
+    case "HYBRID_OPTIMISTIC_TIERED":
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED": {
+      // For optimistic variants, check weighted against percentage
+      const { APP, USER, CHAIN } = results.kind;
+      const totalAgainst = APP.against + USER.against + CHAIN.against;
+      const totalFor = APP.for + USER.for + CHAIN.for;
+      const totalVotes = totalFor + totalAgainst;
+
+      // Veto threshold check (typically 17%)
+      const VETO_THRESHOLD = 17;
+      const againstPercentage =
+        totalVotes > 0n ? (Number(totalAgainst) / Number(totalVotes)) * 100 : 0;
+
+      if (againstPercentage >= VETO_THRESHOLD) {
+        return "DEFEATED";
+      }
+      return "SUCCEEDED";
+    }
+
+    case "HYBRID_APPROVAL": {
+      const { options } = results.kind;
+
+      // Quorum check would require weighted calculation
+      // Simplified: check if any option meets threshold
+      const anyApproved = options.some((opt) => opt.isApproved);
+      return anyApproved ? "SUCCEEDED" : "DEFEATED";
+    }
+
+    default:
+      return "FAILED";
+  }
+}
