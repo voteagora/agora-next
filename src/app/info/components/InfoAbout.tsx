@@ -70,7 +70,7 @@ const InfoAbout = () => {
     : defaultTabs;
 
   const activeTabs = page.tabs || tabs;
-  const sectionTitle = page.sectionTitle || "Getting started";
+  const sectionTitle = page.sectionTitle || "Getting Started";
 
   return (
     <>

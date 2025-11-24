@@ -11,6 +11,11 @@ import DunaAdministration from "@/app/duna/components/DunaAdministration";
 import DunaDisclosures from "@/app/duna/components/DunaDisclosures";
 import SyndicateDunaDisclosures from "@/app/duna/components/SyndicateDunaDisclosures";
 import TownsDunaAdministration from "@/app/duna/components/TownsDunaAdministration";
+import {
+  DelegationAndVotingPowerSection,
+  VotingProcessSection,
+} from "@/app/info/components/GovernanceEducation";
+import { InfoAnchorScroll } from "@/app/info/components/InfoAnchorScroll";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/getTreasuryBalanceTS";
@@ -60,6 +65,7 @@ export async function generateMetadata({}) {
 
 export default async function Page() {
   const { ui, namespace } = Tenant.current();
+  const showGovernanceEducation = namespace === TENANT_NAMESPACES.SYNDICATE;
 
   if (!ui.toggle("info")?.enabled) {
     return (
@@ -78,6 +84,7 @@ export default async function Page() {
 
     return (
       <div className="flex flex-col">
+        <InfoAnchorScroll />
         <InfoHero />
         <InfoAbout />
         {!ui.toggle("hide-governor-settings")?.enabled && <GovernorSettings />}
@@ -86,6 +93,12 @@ export default async function Page() {
           <TownsDunaAdministration />
         ) : (
           hasDunaAdministration && <DunaAdministration />
+        )}
+        {showGovernanceEducation && (
+          <>
+            <VotingProcessSection />
+            <DelegationAndVotingPowerSection />
+          </>
         )}
         {treasuryData.result.length > 0 && (
           <ChartTreasury
@@ -125,7 +138,8 @@ export default async function Page() {
     );
   } else {
     return (
-      <div>
+      <div className="space-y-12">
+        <InfoAnchorScroll />
         <Hero page="info" />
         <div>
           <div className="flex gap-6">

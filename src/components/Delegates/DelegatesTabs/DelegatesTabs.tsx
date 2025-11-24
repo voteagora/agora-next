@@ -15,6 +15,10 @@ import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { GridLayoutIcon } from "@/icons/GridLayoutIcon";
 import { ListViewIcon } from "@/icons/ListViewIcon";
 import { MobileDelegatesFilter } from "../DelegatesFilter/MobileDelegatesFilter";
+import { useAccount } from "wagmi";
+import { useProfileData } from "@/hooks/useProfileData";
+import { DelegateToSelf } from "@/components/Delegates/Delegations/DelegateToSelf";
+import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 
 export default function DelegatesTabs({ children }: { children: ReactNode }) {
   const { ui } = Tenant.current();
@@ -40,85 +44,100 @@ export default function DelegatesTabs({ children }: { children: ReactNode }) {
     setIsMobileSearchOpen((prev) => !prev);
   };
 
+  const { address } = useAccount();
+  const { delegate } = useProfileData();
+  const canSelfDelegate = Boolean(address && delegate);
+
   return (
     <Tabs
       className="max-w-full"
       value={tab}
       onValueChange={(value) => handleTabChange(value)}
     >
-      <div className="flex flex-row justify-between items-baseline gap-2 mt-3 md:mt-0">
-        <TabsList>
-          <TabsTrigger className="text-2xl font-extrabold" value="delegates">
-            Delegates
-          </TabsTrigger>
-        </TabsList>
-        <div className="flex flex-row self-end md:justify-between gap-2 w-fit">
-          <DelegatesSearch className="hidden md:block" />
-          <div
-            className={cn(isMobileSearchOpen ? "hidden" : "block md:hidden")}
-          >
-            <button
-              onClick={() => toggleExpandMobileSearch()}
-              className="flex items-center justify-center p-3 rounded-sm md:rounded-lg bg-wash border border-line"
-              aria-label="Open search"
-            >
-              <MagnifyingGlassIcon className="text-primary w-4 h-4" />
-            </button>
-          </div>
-          <div className="items-center gap-2 hidden md:flex">
-            <DelegatesSortFilter />
-            <DelegatesFilter />
-          </div>
-          <div className="block md:hidden">
-            <MobileDelegatesFilter />
-          </div>
-          <div className="flex items-center gap-2 bg-wash rounded-sm md:rounded-lg border border-line px-3 py-3 shrink-0">
-            <button
-              onClick={() => {
-                setLayout("grid");
-              }}
-              className={layout === "grid" ? "hidden md:block" : ""}
-              disabled={layout === "grid"}
-            >
-              <GridLayoutIcon
-                className={
-                  layout === "grid"
-                    ? "h-4 w-4 fill-primary"
-                    : "h-4 w-4 md:fill-secondary/30 fill-primary"
-                }
-              />
-            </button>
-            <button
-              onClick={() => {
-                setLayout("list");
-              }}
-              className={layout === "list" ? "hidden md:block" : ""}
-              disabled={layout === "list"}
-            >
-              <ListViewIcon
-                className={
-                  layout === "list"
-                    ? "h-4 w-4 fill-primary"
-                    : "h-4 w-4 md:fill-secondary/30 fill-primary"
-                }
-              />
-            </button>
-          </div>
+      <div className="flex flex-col gap-3 mt-3 md:mt-0">
+        <div className="flex flex-row justify-between items-baseline gap-2">
+          <TabsList>
+            <TabsTrigger className="text-2xl font-extrabold" value="delegates">
+              Delegates
+            </TabsTrigger>
+          </TabsList>
         </div>
+
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 w-full">
+            <div className="flex flex-row items-center gap-2">
+              <DelegatesSearch className="hidden md:block" />
+              <div
+                className={cn(isMobileSearchOpen ? "hidden" : "block md:hidden")}
+              >
+                <button
+                  onClick={() => toggleExpandMobileSearch()}
+                  className="flex items-center justify-center p-3 rounded-sm md:rounded-lg bg-wash border border-line"
+                  aria-label="Open search"
+                >
+                  <MagnifyingGlassIcon className="text-primary w-4 h-4" />
+                </button>
+              </div>
+              <div className="items-center gap-2 hidden md:flex">
+                <DelegatesSortFilter />
+                <DelegatesFilter />
+                {canSelfDelegate && (
+                  <DelegateToSelf
+                    delegate={delegate as DelegateChunk}
+                    variant="default"
+                    className="px-4 py-2 h-10 text-sm"
+                  />
+                )}
+              </div>
+              <div className="block md:hidden">
+                <MobileDelegatesFilter />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 bg-wash rounded-sm md:rounded-lg border border-line px-3 py-3 shrink-0 self-start md:self-center">
+              <button
+                onClick={() => {
+                  setLayout("grid");
+                }}
+                className={layout === "grid" ? "hidden md:block" : ""}
+                disabled={layout === "grid"}
+              >
+                <GridLayoutIcon
+                  className={
+                    layout === "grid"
+                      ? "h-4 w-4 fill-primary"
+                      : "h-4 w-4 md:fill-secondary/30 fill-primary"
+                  }
+                />
+              </button>
+              <button
+                onClick={() => {
+                  setLayout("list");
+                }}
+                className={layout === "list" ? "hidden md:block" : ""}
+                disabled={layout === "list"}
+              >
+                <ListViewIcon
+                  className={
+                    layout === "list"
+                      ? "h-4 w-4 fill-primary"
+                      : "h-4 w-4 md:fill-secondary/30 fill-primary"
+                  }
+                />
+              </button>
+            </div>
+          </div>
+
+          {isMobileSearchOpen && (
+            <DelegatesSearch
+              className="block md:hidden"
+              closeButton
+              onClose={toggleExpandMobileSearch}
+            />
+          )}
+          <DelegatesFilterChips />
+        </div>
+        <div className={cn(isPending && "animate-pulse")}>{children}</div>
       </div>
-      <div>
-        {isMobileSearchOpen && (
-          <DelegatesSearch
-            className="block md:hidden mt-2.5"
-            closeButton
-            onClose={toggleExpandMobileSearch}
-          />
-        )}
-      </div>
-      <div>
-        <DelegatesFilterChips />
-      </div>
-      <div className={cn(isPending && "animate-pulse")}>{children}</div>
     </Tabs>
   );
 }

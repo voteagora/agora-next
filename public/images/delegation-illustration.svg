@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="770" height="326" viewBox="0 0 770 326" fill="none">
+  <style>
+    .marching {
+      stroke-dasharray: 4 6;
+      animation: march 6s linear infinite;
+    }
+    @keyframes march {
+      to { stroke-dashoffset: -40; }
+    }
+  </style>
+
+  <rect width="770" height="326" fill="#f7f7f2" />
+
+  <g transform="translate(0 -65)">
+    <!-- Upper right card (aligned with purple wallet) -->
+    <g transform="translate(0 -102.5)">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M561.713 198.5C555.086 198.5 549.713 203.873 549.713 210.5C549.713 211.114 550.184 211.623 550.793 211.704C562.039 213.209 570.713 222.842 570.713 234.5C570.713 246.499 561.524 256.353 549.799 257.407C549.751 257.411 549.713 257.451 549.713 257.5C549.713 264.127 555.086 269.5 561.713 269.5H635.713C642.341 269.5 647.713 264.127 647.713 257.5V210.5C647.713 203.873 642.341 198.5 635.713 198.5H561.713Z" fill="color(display-p3 0.282353 0.670588 1)" />
+    <circle cx="547.713" cy="234.5" r="17" fill="color(display-p3 0.101961 0.533333 0.972549)" />
+    <g transform="translate(539.313 226.1) scale(0.7)" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M11.5 15H7a4 4 0 0 0-4 4v2" />
+      <path d="M21.378 16.626a1 1 0 0 0-3.004-3.004l-4.01 4.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z" />
+      <circle cx="10" cy="7" r="4" />
+    </g>
+    <rect x="576" y="215" width="38" height="6" rx="3" fill="#BFD7F5" />
+    <rect x="576" y="231" width="48" height="6" rx="3" fill="#BFD7F5" />
+    <rect x="576" y="247" width="42" height="6" rx="3" fill="#BFD7F5" />
+  </g>
+
+    <!-- Right card -->
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M561.713 198.5C555.086 198.5 549.713 203.873 549.713 210.5C549.713 211.114 550.184 211.623 550.793 211.704C562.039 213.209 570.713 222.842 570.713 234.5C570.713 246.499 561.524 256.353 549.799 257.407C549.751 257.411 549.713 257.451 549.713 257.5C549.713 264.127 555.086 269.5 561.713 269.5H635.713C642.341 269.5 647.713 264.127 647.713 257.5V210.5C647.713 203.873 642.341 198.5 635.713 198.5H561.713Z" fill="color(display-p3 0.282353 0.670588 1)" />
+  <circle cx="547.713" cy="234.5" r="17" fill="color(display-p3 0.101961 0.533333 0.972549)" />
+    <g transform="translate(539.313 226.1) scale(0.7)" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M15 13a3 3 0 1 0-6 0" />
+      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+      <circle cx="12" cy="8" r="2" />
+    </g>
+  <rect x="576" y="215" width="38" height="6" rx="3" fill="#BFD7F5" />
+  <rect x="576" y="231" width="48" height="6" rx="3" fill="#BFD7F5" />
+  <rect x="576" y="247" width="42" height="6" rx="3" fill="#BFD7F5" />
+
+    <!-- Marching lines -->
+    <!-- Direct line to upper card (purple wallet to top blue card) -->
+    <path class="marching" d="M255.287 129H525.287" stroke="color(display-p3 0.737255 0.733333 0.733333)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)" />
+    <!-- Direct line from black wallet to main blue card -->
+    <path class="marching" d="M246.5 234.5H525.287" stroke="color(display-p3 0.737255 0.733333 0.733333)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)" />
+    <!-- Curved orthogonal line from purple wallet to main blue card -->
+    <path class="marching" d="M255.287 129 H390 Q410 129 410 144 V199 Q410 219 430 219 H525.287" stroke="color(display-p3 0.737255 0.733333 0.733333)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)" />
+    <!-- Curved orthogonal line from green wallet to main blue card -->
+    <path class="marching" d="M247 347 H390 Q410 347 410 327 V270 Q410 250 430 250 H525.287" stroke="color(display-p3 0.737255 0.733333 0.733333)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)" />
+
+    <!-- Left card and accents -->
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M153.287 198C146.659 198 141.287 203.373 141.287 210C141.287 210.614 141.757 211.123 142.366 211.204C153.613 212.709 162.287 222.342 162.287 234C162.287 245.999 153.098 255.853 141.372 256.907C141.324 256.911 141.287 256.951 141.287 257C141.287 263.627 146.659 269 153.287 269H227.287C233.914 269 239.287 263.627 239.287 257V210C239.287 203.373 233.914 198 227.287 198H153.287Z" fill="#FFFFFF" />
+  <circle cx="139.287" cy="234" r="17" fill="#FFFFFF" />
+  <rect x="168" y="215" width="43" height="6" rx="3" fill="#D8D8D8" />
+  <rect x="168" y="229" width="50" height="6" rx="3" fill="#D8D8D8" />
+  <rect x="168" y="243" width="45" height="6" rx="3" fill="#D8D8D8" />
+  <rect x="233.287" y="220" width="28" height="28" rx="14" fill="#FF0420" />
+  <rect x="230.787" y="218.25" width="32" height="32" rx="16" fill="#25292E" />
+  <rect x="230.787" y="218.25" width="32" height="32" rx="16" stroke="color(display-p3 0.988235 0.984314 0.984314)" stroke-width="4" fill="none" />
+  <g transform="translate(238.387 225.6) scale(0.7)" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
+    <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+  </g>
+
+  <!-- Top left card -->
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M153.287 93C146.659 93 141.287 98.3726 141.287 105C141.287 105.614 141.757 106.123 142.366 106.204C153.613 107.709 162.287 117.342 162.287 129C162.287 140.999 153.098 150.853 141.372 151.907C141.324 151.911 141.287 151.951 141.287 152C141.287 158.627 146.659 164 153.287 164H227.287C233.914 164 239.287 158.627 239.287 152V105C239.287 98.3726 233.914 93 227.287 93H153.287Z" fill="#FFFFFF" />
+  <circle cx="139.287" cy="129" r="17" fill="#FFFFFF" />
+  <rect x="168" y="113" width="43" height="6" rx="3" fill="#D8D8D8" />
+  <rect x="168" y="126" width="50" height="6" rx="3" fill="#D8D8D8" />
+  <rect x="168" y="139" width="45" height="6" rx="3" fill="#D8D8D8" />
+  <g fill="none">
+    <rect x="230.287" y="115" width="28" height="28" rx="14" fill="#B9A6D6" />
+    <rect x="228.287" y="113" width="32" height="32" rx="16" stroke="color(display-p3 0.988235 0.984314 0.984314)" stroke-width="4" fill="none" />
+    <g transform="translate(235.887 120.6) scale(0.7)" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
+      <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+    </g>
+  </g>
+
+  <!-- Bottom left card -->
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M153.287 311C146.659 311 141.287 316.373 141.287 323C141.287 323.614 141.757 324.123 142.366 324.204C153.613 325.709 162.287 335.342 162.287 347C162.287 358.999 153.098 368.853 141.372 369.907C141.324 369.911 141.287 369.951 141.287 370C141.287 376.627 146.659 382 153.287 382H227.287C233.914 382 239.287 376.627 239.287 370V323C239.287 316.373 233.914 311 227.287 311H153.287Z" fill="#FFFFFF" />
+  <circle cx="139.287" cy="347" r="17" fill="#FFFFFF" />
+  <rect x="168" y="332" width="43" height="6" rx="3" fill="#D8D8D8" />
+  <rect x="168" y="344" width="50" height="6" rx="3" fill="#D8D8D8" />
+  <rect x="168" y="356" width="45" height="6" rx="3" fill="#D8D8D8" />
+  <rect x="233.287" y="333" width="28" height="28" rx="14" fill="#FFFFFF" />
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M261.287 347C261.287 354.732 255.019 361 247.287 361C239.555 361 233.287 354.732 233.287 347C233.287 339.268 239.555 333 247.287 333C255.019 333 261.287 339.268 261.287 347Z" fill="#74B79C" />
+  <rect x="231.287" y="331" width="32" height="32" rx="16" stroke="color(display-p3 0.988235 0.984314 0.984314)" stroke-width="4" fill="none" />
+  <g transform="translate(238.887 338.6) scale(0.7)" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
+    <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+  </g>
+
+  <!-- Small right arrows removed with central hub -->
+
+  <!-- Left stacked lines -->
+  <!-- leave as is -->
+
+  <!-- Right stacked lines -->
+  <!-- leave as is -->
+
+  </g>
+
+  <defs>
+    <marker id="arrowhead" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0L6 3.5L0 7Z" fill="color(display-p3 0.737255 0.733333 0.733333)" stroke="#f7f7f2" stroke-width="1.5" />
+    </marker>
+    <marker id="arrowhead-small" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0L5 3L0 6Z" fill="color(display-p3 0.737255 0.733333 0.733333)" stroke="#f7f7f2" stroke-width="1.2" />
+    </marker>
+    <linearGradient id="paint0_linear_471_43" x1="246.786" y1="235.538" x2="246.786" y2="243.795" gradientUnits="userSpaceOnUse">
+      <stop stop-color="white" />
+      <stop offset="1" stop-color="white" stop-opacity="0.85" />
+    </linearGradient>
+    <linearGradient id="paint1_linear_471_43" x1="423.282" y1="242.889" x2="423.282" y2="280.636" gradientUnits="userSpaceOnUse">
+      <stop stop-color="white" />
+      <stop offset="1" stop-color="white" stop-opacity="0.85" />
+    </linearGradient>
+  </defs>
+</svg>

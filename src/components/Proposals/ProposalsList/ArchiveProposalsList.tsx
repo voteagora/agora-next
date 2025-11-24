@@ -14,6 +14,8 @@ import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 import { useSearchParams } from "next/navigation";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { UpdatedButton } from "@/components/Button";
+import { LearnMoreBanner } from "@/components/LearnMoreBanner";
+import { BookOpen } from "lucide-react";
 
 export default function ArchiveProposalsList({
   proposals,
@@ -99,6 +101,11 @@ export default function ArchiveProposalsList({
       )}
 
       <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+        <LearnMoreBanner
+          icon={BookOpen}
+          text="Understand how proposal voting works"
+          href="/info#voting-process"
+        />
         <div>
           {normalizedProposals.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">

@@ -14,6 +14,8 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
 import Proposal from "../Proposal/Proposal";
 import { DaoSlug } from "@prisma/client";
+import { LearnMoreBanner } from "@/components/LearnMoreBanner";
+import { BookOpen } from "lucide-react";
 
 export default function ProposalsList({
   initRelevantProposals,
@@ -102,6 +104,11 @@ export default function ProposalsList({
         />
       )}
       <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+        <LearnMoreBanner
+          icon={BookOpen}
+          text="Understand how proposal voting works"
+          href="/info#voting-process"
+        />
         <div>
           {proposals.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">
