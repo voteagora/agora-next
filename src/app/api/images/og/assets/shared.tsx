@@ -2,7 +2,6 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { TenantNamespace } from "@/lib/types";
 
 export const LogoPill = ({ namespace }: { namespace: TenantNamespace }) => {
-
   return (
     <div tw="flex">
       <div tw="flex flex-row items-center border border-gray-300 rounded-full px-[26px] py-[14px]">
