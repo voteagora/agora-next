@@ -51,7 +51,7 @@ const nextConfig = {
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  webpack: (config) => {
+  webpack: (config, { dev, isServer }) => {
     config.resolve.fallback = { fs: false, net: false, tls: false };
     config.resolve.alias = config.resolve.alias || {};
     config.resolve.alias["react-infinite-scroller$"] = path.resolve(
@@ -64,6 +64,15 @@ const nextConfig = {
     );
     config.resolve.alias["@react-native-async-storage/async-storage$"] =
       path.resolve(__dirname, "src/lib/shims/asyncStorage.ts");
+
+    if (!dev && !isServer) {
+      const MAX_BUNDLE_SIZE_BYTES = 2 * 1024 * 1024; // 2 MB limit
+      config.performance = config.performance || {};
+      config.performance.maxAssetSize = MAX_BUNDLE_SIZE_BYTES;
+      config.performance.maxEntrypointSize = MAX_BUNDLE_SIZE_BYTES;
+      config.performance.hints = "error";
+    }
+
     return config;
   },
   experimental: {
