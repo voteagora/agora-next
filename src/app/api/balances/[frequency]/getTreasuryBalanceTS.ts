@@ -34,7 +34,7 @@ async function getTreasuryBalanceTS(
               ORDER BY day`;
 
   const result =
-    await prismaWeb2Client.$queryRawUnsafe<MetricTimeSeriesValue[]>(QRY);
+    (await prismaWeb2Client.$queryRawUnsafe(QRY)) as MetricTimeSeriesValue[];
   return { result };
 }
 

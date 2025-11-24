@@ -82,8 +82,8 @@ async function getMetricTS(
     );
   }
 
-  const data: MetricTimeSeriesValue[] =
-    await prismaWeb2Client.$queryRawUnsafe<MetricTimeSeriesValue[]>(QRY);
+  const data =
+    (await prismaWeb2Client.$queryRawUnsafe(QRY)) as MetricTimeSeriesValue[];
 
   return { result: data };
 }

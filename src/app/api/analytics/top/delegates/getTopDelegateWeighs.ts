@@ -32,7 +32,9 @@ async function getTopDelegateWeights() {
                 ORDER  BY fraction_of_voting_power DESC
                 LIMIT 10; `;
 
-  const result = await prismaWeb3Client.$queryRawUnsafe<AddressWeight[]>(QRY);
+  const result = (await prismaWeb3Client.$queryRawUnsafe(
+    QRY
+  )) as AddressWeight[];
   return { result };
 }
 

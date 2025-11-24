@@ -41,7 +41,7 @@ async function getProposalVoteCounts() {
                 ON        pc.proposal_id::text = p.proposal_id 
                 ORDER BY  ${isTimeStampBasedTenant ? "p.start_timestamp" : "p.start_block"}`;
 
-  const result = await prismaWeb3Client.$queryRawUnsafe<ProposalCount[]>(QRY);
+  const result = (await prismaWeb3Client.$queryRawUnsafe(QRY)) as ProposalCount[];
 
   return { result };
 }
