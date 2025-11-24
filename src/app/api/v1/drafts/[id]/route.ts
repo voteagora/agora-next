@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyJwtAndGetAddress } from "@/app/proposals/draft/actions/siweAuth";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
+import { PLMConfig } from "@/app/proposals/draft/types";
 
 export async function GET(
   request: NextRequest,
@@ -44,9 +45,24 @@ export async function GET(
       return NextResponse.json({ message: "Draft not found" }, { status: 404 });
     }
 
-    // Authorization: Only owner can read draft via API (optionally allow tenant-config sharing later)
+    // Authorization: Owner or addresses in offchainProposalCreators can read/edit draft
     const owner = draft.author_address?.toLowerCase();
-    if (!owner || owner !== siweAddress.toLowerCase()) {
+    const addressLower = siweAddress.toLowerCase();
+
+    let isAuthorized = owner === addressLower;
+
+    if (!isAuthorized) {
+      const tenant = Tenant.current();
+      const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+      const offchainCreators =
+        (plmToggle?.config as PLMConfig)?.offchainProposalCreator || [];
+
+      isAuthorized = offchainCreators.some(
+        (creator) => creator.toLowerCase() === addressLower
+      );
+    }
+
+    if (!owner || !isAuthorized) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
