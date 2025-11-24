@@ -53,11 +53,11 @@ const DunaAdministration = async () => {
   }
 
   return (
-    <div className="mt-12">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-black text-primary">
+    <div className="mt-12 space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-black text-primary">
           DUNA Administration
-        </h3>
+        </h2>
       </div>
       <DunaDescription />
 

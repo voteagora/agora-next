@@ -15,12 +15,12 @@ import {
 } from "@/components/ui/table";
 import DelegateTableRow from "./DelegateTableRow";
 import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
-import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
-import { SyndicateDelegateInfo } from "./SyndicateDelegateInfo";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { InfoOutlineIcon } from "@/icons/InfoOutlineIcon";
+import Tenant from "@/lib/tenant/tenant";
+import { LearnMoreBanner } from "@/components/LearnMoreBanner";
+import { Users } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -52,7 +52,7 @@ export default function DelegateTable({
   );
   const fetching = useRef(false);
 
-  const { ui, namespace } = Tenant.current();
+  const { ui } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
@@ -108,9 +108,14 @@ export default function DelegateTable({
   return (
     <DialogProvider>
       {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
-      {namespace === TENANT_NAMESPACES.SYNDICATE && <SyndicateDelegateInfo />}
 
-      <div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg mt-6">
+      <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden mt-6">
+        <LearnMoreBanner
+          icon={Users}
+          text="Understand delegation and voting power"
+          href="/info#delegation"
+          className=""
+        />
         <Table className="min-w-full">
           <TableHeader className="text-sm text-secondary sticky top-0 bg-neutral z-10 rounded-t-lg">
             <TableRow className="bg-tertiary/5">

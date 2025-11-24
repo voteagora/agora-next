@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
 import ForumsSearch from "./ForumsSearch";
 import NewTopicButton from "./NewTopicButton";
+import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -74,6 +75,15 @@ export default function ForumsHeader({
           ) : (
             <h3 className="text-primary font-bold">{fallbackTitle}</h3>
           )}
+          <p className="text-sm text-secondary mt-1">
+            New here?{" "}
+            <Link
+              href="/info#voting-process"
+              className="text-primary underline-offset-2 hover:underline"
+            >
+              Learn how proposals and voting work.
+            </Link>
+          </p>
 
           {description ? <h3 className="text-primary">{description}</h3> : null}
         </div>

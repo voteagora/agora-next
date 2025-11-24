@@ -1,0 +1,175 @@
+<svg width="770" height="474" viewBox="0 0 770 474" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .card-group {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: cardPulse 5s ease-in-out infinite;
+    }
+
+    @keyframes cardPulse {
+      0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 0 rgba(208, 206, 197, 0.0));
+      }
+      50% {
+        transform: scale(1.015);
+        filter: drop-shadow(0 6px 14px rgba(208, 206, 197, 0.2));
+      }
+    }
+
+    text {
+      dominant-baseline: middle;
+    }
+
+    .overlay-1 { animation: tint1 5s ease-in-out infinite; }
+    .overlay-2 { animation: tint2 5s ease-in-out infinite; }
+    .overlay-3 { animation: tint3 5s ease-in-out infinite; }
+    .overlay-4 { animation: tint4 5s ease-in-out infinite; }
+    .overlay-5 { animation: tint5 5s ease-in-out infinite; }
+    .overlay-6 { animation: tint6 5s ease-in-out infinite; }
+
+    @keyframes tint1 {
+      0%, 100% { opacity: 0.08; fill: #D0CEC5; }
+      50% { opacity: 0.20; fill: #D5E4F5; }
+    }
+    @keyframes tint2 {
+      0%, 100% { opacity: 0.08; fill: #D0CEC5; }
+      50% { opacity: 0.20; fill: #C7E3D4; }
+    }
+    @keyframes tint3 {
+      0%, 100% { opacity: 0.08; fill: #D0CEC5; }
+      50% { opacity: 0.20; fill: #D6D9EF; }
+    }
+    @keyframes tint4 {
+      0%, 100% { opacity: 0.08; fill: #D0CEC5; }
+      50% { opacity: 0.20; fill: #E4D6CD; }
+    }
+    @keyframes tint5 {
+      0%, 100% { opacity: 0.08; fill: #D0CEC5; }
+      50% { opacity: 0.20; fill: #D4E4F2; }
+    }
+    @keyframes tint6 {
+      0%, 100% { opacity: 0.08; fill: #D0CEC5; }
+      50% { opacity: 0.20; fill: #D6E7DC; }
+    }
+  </style>
+
+  <!-- Background -->
+  <rect width="770" height="474" fill="none"/>
+
+  <!-- ============================= -->
+  <!-- STEP 1: Temp-Check            -->
+  <!-- ============================= -->
+  <g class="card-group">
+    <rect x="120" y="32" width="400" height="57" rx="12" fill="#FFFFFF"/>
+    <rect x="120" y="32" width="400" height="57" rx="12" class="overlay-1" fill="#D0CEC5" opacity="0.04"/>
+    <text x="320" y="60.5"
+          fill="#222220"
+          font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="14" font-weight="500" letter-spacing="-0.09px" text-anchor="middle">
+      Temp-Check
+    </text>
+  </g>
+
+  <!-- ============================= -->
+  <!-- STEP 2: Proposal Voting Period -->
+  <!-- ============================= -->
+  <g class="card-group">
+    <rect x="120" y="103" width="400" height="57" rx="12" fill="#FFFFFF"/>
+    <rect x="120" y="103" width="400" height="57" rx="12" class="overlay-2" fill="#D0CEC5" opacity="0.04"/>
+    <text x="320" y="131.5"
+          fill="#222220"
+          font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="14" font-weight="500" letter-spacing="-0.09px" text-anchor="middle">
+      Proposal Voting Period
+    </text>
+  </g>
+
+  <!-- ===================================== -->
+  <!-- STEP 3: Rules Committee Review        -->
+  <!-- ===================================== -->
+  <g class="card-group">
+    <rect x="120" y="174" width="400" height="57" rx="12" fill="#FFFFFF"/>
+    <rect x="120" y="174" width="400" height="57" rx="12" class="overlay-3" fill="#D0CEC5" opacity="0.04"/>
+    <text x="320" y="202.5"
+          fill="#222220"
+          font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="14" font-weight="500" letter-spacing="-0.09px" text-anchor="middle">
+      Rules Committee Review
+    </text>
+  </g>
+
+  <!-- ============================= -->
+  <!-- STEP 4: Voting Completed      -->
+  <!-- ============================= -->
+  <g class="card-group">
+    <rect x="120" y="245" width="400" height="57" rx="12" fill="#FFFFFF"/>
+    <rect x="120" y="245" width="400" height="57" rx="12" class="overlay-4" fill="#D0CEC5" opacity="0.04"/>
+    <text x="320" y="273.5"
+          fill="#222220"
+          font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="14" font-weight="500" letter-spacing="-0.09px" text-anchor="middle">
+      Voting Completed
+    </text>
+  </g>
+
+  <!-- ============================= -->
+  <!-- STEP 5: Tax Reporting Intake  -->
+  <!-- ============================= -->
+  <g class="card-group">
+    <rect x="120" y="316" width="400" height="57" rx="12" fill="#FFFFFF"/>
+    <rect x="120" y="316" width="400" height="57" rx="12" class="overlay-5" fill="#D0CEC5" opacity="0.04"/>
+    <text x="320" y="344.5"
+          fill="#222220"
+          font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="14" font-weight="500" letter-spacing="-0.09px" text-anchor="middle">
+      Tax Reporting Intake
+    </text>
+  </g>
+
+  <!-- ============================= -->
+  <!-- STEP 6: Execution             -->
+  <!-- ============================= -->
+  <g class="card-group">
+    <rect x="120" y="387" width="400" height="57" rx="12" fill="#FFFFFF"/>
+    <rect x="120" y="387" width="400" height="57" rx="12" class="overlay-6" fill="#D0CEC5" opacity="0.04"/>
+    <text x="320" y="415.5"
+          fill="#222220"
+          font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="14" font-weight="500" letter-spacing="-0.09px" text-anchor="middle">
+      Execution
+    </text>
+  </g>
+
+  <!-- ====================================== -->
+  <!-- VERTICAL TRACKS (Meta Labels + Coral)  -->
+  <!-- ====================================== -->
+
+  <!-- Track 1: Signal & Temp-Check -->
+  <rect x="540" y="35" width="12" height="54" rx="4" fill="#B9A6D6"/>
+  <text x="562" y="62"
+        fill="#B9A6D6"
+        font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="14" font-weight="500" letter-spacing="-0.09px">
+    Signal &amp; Temp-Check
+  </text>
+
+  <!-- Track 2: Voting & Governance (Coral multi-tone) -->
+  <rect x="540" y="103" width="12" height="158" rx="4" fill="#74B79C"/>
+  <text x="562" y="182"
+        fill="#74B79C"
+        font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="14" font-weight="500" letter-spacing="-0.09px">
+    Voting &amp; Governance
+  </text>
+
+  <!-- Track 3: Execution & Reporting -->
+  <rect x="540" y="275" width="12" height="169" rx="4" fill="#7DA9D8"/>
+  <text x="562" y="360"
+        fill="#7DA9D8"
+        font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="14" font-weight="500" letter-spacing="-0.09px">
+    Execution &amp; Reporting
+  </text>
+
+</svg>

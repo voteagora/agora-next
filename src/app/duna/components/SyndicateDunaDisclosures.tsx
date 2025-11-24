@@ -13,7 +13,6 @@ const SyndicateDunaDisclosures = () => {
         <div className="mb-6 font-medium">
           SYNDICATE NETWORK COLLECTIVE - DUNA DISCLOSURES
         </div>
-
         <div className="font-medium">
           <p className="mt-2">
             By owning the token and participating in the governance of
