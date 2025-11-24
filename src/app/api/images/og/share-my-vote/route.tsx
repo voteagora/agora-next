@@ -11,7 +11,7 @@ import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import { ogLogoForShareVote } from "../assets/shared";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 // No access to tenant in edge runtime, so we need to create the tenantUI and tenantToken manually
 
