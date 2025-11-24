@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "npm run generate-typechain & npx prisma generate & next dev",
     "build": "next build",
+    "analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "next lint",
     "cypress": "cypress open",
@@ -156,6 +157,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.454.0",
+    "@next/bundle-analyzer": "^16.0.3",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
     "@testing-library/dom": "^10.4.0",
