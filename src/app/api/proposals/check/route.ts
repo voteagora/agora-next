@@ -168,36 +168,44 @@ export async function POST(request: NextRequest) {
 
     const targetType = postType === "tempcheck" ? "tempcheck" : "gov";
 
-    createCheckProposalAttestation({
+    const attestationPromise = createCheckProposalAttestation({
       proposalId,
       daoUuid:
         contracts.easRecipient || "0x0000000000000000000000000000000000000000",
       passed: [],
       failed: [],
-    }).catch((error) => {
-      console.error("Attestation failed:", error);
-    });
+    })
+      .then(() => {
+        console.log("Attestation created successfully");
+      })
+      .catch((error) => {
+        console.error("Attestation failed:", error);
+      });
 
+    const linkPromises: Promise<void>[] = [];
     if (relatedLinks.length > 0) {
-      const promises = relatedLinks.map(async (linkId) => {
-        if (linkId.startsWith("0x")) {
+      relatedLinks.forEach((linkId) => {
+        const linkPromise = (async () => {
+          if (linkId.startsWith("0x")) {
+            return createProposalLinks({
+              sourceId: linkId,
+              sourceType: "tempcheck",
+              links: [{ targetId: proposalId, targetType }],
+            });
+          }
           return createProposalLinks({
             sourceId: linkId,
-            sourceType: "tempcheck",
+            sourceType: "forum_topic",
             links: [{ targetId: proposalId, targetType }],
           });
-        }
-        return createProposalLinks({
-          sourceId: linkId,
-          sourceType: "forum_topic",
-          links: [{ targetId: proposalId, targetType }],
+        })().catch((error) => {
+          console.error("Link creation failed:", error);
         });
-      });
-
-      Promise.allSettled(promises).catch((error) => {
-        console.error("Link creation failed:", error);
+        linkPromises.push(linkPromise as Promise<void>);
       });
     }
+
+    Promise.allSettled([attestationPromise, ...linkPromises]);
 
     return NextResponse.json({
       success: true,
