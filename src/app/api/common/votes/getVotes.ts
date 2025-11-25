@@ -266,11 +266,7 @@ async function getSnapshotVotesForDelegateForAddress({
           OFFSET ${skip}
           LIMIT ${take};
         `;
-      return prismaWeb3Client.$queryRawUnsafe<SnapshotVotePayload[]>(
-        query,
-        skip,
-        take
-      );
+      return prismaWeb3Client.$queryRawUnsafe<SnapshotVotePayload[]>(query);
     };
 
     const { meta, data: votes } = await paginateResult(
