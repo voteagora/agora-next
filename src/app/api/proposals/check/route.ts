@@ -107,8 +107,7 @@ async function checkProposal(attester: string, tags: string[]) {
       ) {
         isAuthorOfTempCheck = true;
       }
-
-      if (tempCheckProposal.lifecycle_stage === "SUCCEEDED") {
+      if (tempCheckProposal.lifecycle_stage === "PASSED") {
         hasApprovedTempCheck = true;
         break;
       }
