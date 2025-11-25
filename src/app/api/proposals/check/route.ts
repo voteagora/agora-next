@@ -8,6 +8,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { DaoSlug } from "@prisma/client";
 
+export const maxDuration = 60;
+
 async function isAdmin(address: string, daoSlug: string): Promise<boolean> {
   try {
     const result = await prismaWeb2Client.forumAdmin.findFirst({
@@ -168,44 +170,32 @@ export async function POST(request: NextRequest) {
 
     const targetType = postType === "tempcheck" ? "tempcheck" : "gov";
 
-    const attestationPromise = createCheckProposalAttestation({
+    if (relatedLinks.length > 0) {
+      const linkPromises = relatedLinks.map((linkId) => {
+        if (linkId.startsWith("0x")) {
+          return createProposalLinks({
+            sourceId: linkId,
+            sourceType: "tempcheck",
+            links: [{ targetId: proposalId, targetType }],
+          });
+        }
+        return createProposalLinks({
+          sourceId: linkId,
+          sourceType: "forum_topic",
+          links: [{ targetId: proposalId, targetType }],
+        });
+      });
+
+      await Promise.allSettled(linkPromises);
+    }
+
+    await createCheckProposalAttestation({
       proposalId,
       daoUuid:
         contracts.easRecipient || "0x0000000000000000000000000000000000000000",
       passed: [],
       failed: [],
-    })
-      .then(() => {
-        console.log("Attestation created successfully");
-      })
-      .catch((error) => {
-        console.error("Attestation failed:", error);
-      });
-
-    const linkPromises: Promise<void>[] = [];
-    if (relatedLinks.length > 0) {
-      relatedLinks.forEach((linkId) => {
-        const linkPromise = (async () => {
-          if (linkId.startsWith("0x")) {
-            return createProposalLinks({
-              sourceId: linkId,
-              sourceType: "tempcheck",
-              links: [{ targetId: proposalId, targetType }],
-            });
-          }
-          return createProposalLinks({
-            sourceId: linkId,
-            sourceType: "forum_topic",
-            links: [{ targetId: proposalId, targetType }],
-          });
-        })().catch((error) => {
-          console.error("Link creation failed:", error);
-        });
-        linkPromises.push(linkPromise as Promise<void>);
-      });
-    }
-
-    Promise.allSettled([attestationPromise, ...linkPromises]);
+    });
 
     return NextResponse.json({
       success: true,
