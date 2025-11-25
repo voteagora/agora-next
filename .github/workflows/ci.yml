@@ -27,7 +27,5 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: npm ci
-      - name: Verify OpenSSL Version
-        run: openssl version
       - name: Lint with Prettier
         run: npm run check-prettier
