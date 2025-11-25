@@ -12,7 +12,7 @@ async function getAuthorityChains({
   blockNumber: number;
 }): Promise<Array<string[]>> {
   const { namespace, contracts, ui } = Tenant.current();
-  const chainsQuery = prismaWeb2Client.$queryRawUnsafe<AuthorityChainsSnaps[]>(
+  const chainsQuery = (await prismaWeb2Client.$queryRawUnsafe(
     `
     SELECT
       ac.chain,
@@ -40,7 +40,7 @@ async function getAuthorityChains({
     address.toLowerCase(),
     contracts.alligator?.address,
     blockNumber
-  );
+  )) as AuthorityChainsSnaps[];
 
   const latestBlockNumberPromise: Promise<number> = ui.toggle(
     "use-l1-block-number"

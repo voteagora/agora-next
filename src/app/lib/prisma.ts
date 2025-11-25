@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { time_this } from "@/app/lib/logging";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
 // if (process.env.NODE_ENV === "production" && process.env.NEXT_PHASE === "phase-production-build") {
 //   throw new Error("🚨 Prisma query during build!");
@@ -39,42 +40,18 @@ const readOnlyWeb3Url = resolveDbUrl("WEB3");
 let prismaWeb2Client: PrismaClient;
 let prismaWeb3Client: PrismaClient;
 
-// Logging middleware
-const makePrismaClient = (databaseUrl: string) => {
-  const execRaw = async (
-    query: (args: any) => Promise<any>,
-    args: any,
-    operation: string
-  ) => {
-    const maxRetries = 2;
-    let lastError: Error | null = null;
+// Allows tuning connection pool size without code changes
+const configuredPoolMax = Number(process.env.PG_ADAPTER_POOL_MAX ?? "10");
+const POOL_MAX = Number.isFinite(configuredPoolMax) ? configuredPoolMax : 10;
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        return await time_this(async () => await query(args), {
-          operation,
-          args,
-        });
-      } catch (error) {
-        lastError = error as Error;
-        if (error instanceof Error && error.message.includes("P1017")) {
-          if (attempt < maxRetries) {
-            await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
-            continue;
-          }
-        }
-        throw error;
-      }
-    }
-    throw lastError;
-  };
+const makePrismaClient = (databaseUrl: string) => {
+  const pool = new Pool({
+    connectionString: databaseUrl,
+    max: POOL_MAX,
+  });
 
   return new PrismaClient({
-    datasources: {
-      db: {
-        url: databaseUrl,
-      },
-    },
+    adapter: new PrismaPg(pool),
   });
 };
 

@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { LogoPill } from "@/app/api/images/og/assets/shared";
 import { loadFont, loadImage } from "@/app/lib/utils/og";
+import { TenantNamespace } from "@/lib/types";
 
 export const size = {
   width: 1200,
@@ -30,6 +31,9 @@ export default async function OGImage({ params }: { params: { id: string } }) {
   const interRegularFont = await loadFont("Inter/Inter-Medium.ttf");
   const bgImage = await loadImage("og-generic-bg.png");
 
+  const namespace = (process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME ||
+    "optimism") as TenantNamespace;
+
   return new ImageResponse(
     (
       <div
@@ -48,7 +52,7 @@ export default async function OGImage({ params }: { params: { id: string } }) {
         <img src={bgImage} style={{ position: "absolute" }} />
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
           <div tw="flex flex-col justify-between h-full w-full">
-            <LogoPill />
+            <LogoPill namespace={namespace} />
             <div tw="flex flex-col">
               <div tw="font-bold text-5xl w-full">Sponsor proposal request</div>
               <div tw="font-normal mt-[30px] text-4xl text-secondary">
