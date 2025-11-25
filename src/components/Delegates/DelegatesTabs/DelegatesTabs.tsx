@@ -68,7 +68,9 @@ export default function DelegatesTabs({ children }: { children: ReactNode }) {
             <div className="flex flex-row items-center gap-2">
               <DelegatesSearch className="hidden md:block" />
               <div
-                className={cn(isMobileSearchOpen ? "hidden" : "block md:hidden")}
+                className={cn(
+                  isMobileSearchOpen ? "hidden" : "block md:hidden"
+                )}
               >
                 <button
                   onClick={() => toggleExpandMobileSearch()}

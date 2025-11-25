@@ -1,23 +1,3 @@
-const InfoIllustration = ({ label, src }: { label: string; src?: string }) => (
-  <div className="w-full rounded-lg bg-[#f7f7f2] overflow-hidden px-4 pt-2 pb-2">
-    {src ? (
-      <div className="flex w-full justify-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={src}
-          alt={label}
-          className="w-full max-w-[720px] h-auto object-contain scale-95 origin-top"
-          loading="lazy"
-        />
-      </div>
-    ) : (
-      <div className="flex h-56 w-full items-center justify-center px-6 text-secondary text-sm font-medium text-center">
-        {label}
-      </div>
-    )}
-  </div>
-);
-
 export function VotingProcessSection() {
   return (
     <section className="mt-12 scroll-mt-24 flex flex-col space-y-4">
@@ -61,10 +41,6 @@ export function VotingProcessSection() {
             </p>
           </div>
         </div>
-        <InfoIllustration
-          label="Voting process flow"
-          src="/images/voting-process-placeholder.svg"
-        />
       </div>
     </section>
   );
@@ -116,10 +92,6 @@ export function DelegationAndVotingPowerSection() {
             </p>
           </div>
         </div>
-        <InfoIllustration
-          label="Delegation & voting power"
-          src="/images/delegation-illustration.svg"
-        />
       </div>
     </section>
   );
