@@ -14,6 +14,7 @@ import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockCo
 import {
   DELEGATION_MODEL,
   GOVERNOR_TYPE,
+  PROPOSAL_TYPES_CONFIGURATOR_FACTORY,
   TIMELOCK_TYPE,
 } from "@/lib/constants";
 
@@ -134,5 +135,7 @@ export const cyberTenantConfig = ({
     governorType: GOVERNOR_TYPE.AGORA,
     timelockType:
       TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
+    proposalTypesConfiguratorFactory:
+      PROPOSAL_TYPES_CONFIGURATOR_FACTORY.WITHOUT_DESCRIPTION,
   };
 };
