@@ -23,6 +23,7 @@ import { useEnsName } from "wagmi";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { DelegateToSelf } from "../Delegates/Delegations/DelegateToSelf";
 import { ZERO_ADDRESS } from "@/lib/constants";
+import CopyableHumanAddress from "../shared/CopyableHumanAddress";
 
 interface Props {
   ensName: string | undefined;
@@ -178,13 +179,19 @@ export const ProfileDropDownContent = ({
             {ensName ? (
               <>
                 <span className="text-primary font-bold">{ensName}</span>
-                <span className="text-xs text-secondary">
-                  {shortAddress(address!)}
-                </span>
+                <CopyableHumanAddress
+                  address={address!}
+                  useAddress
+                  className="text-xs text-secondary"
+                />
               </>
             ) : (
               <>
-                <span className="text-primary">{shortAddress(address!)}</span>
+                <CopyableHumanAddress
+                  address={address!}
+                  useAddress
+                  className="text-primary"
+                />
               </>
             )}
           </div>
