@@ -147,7 +147,7 @@ async function getVotesForDelegateForAddress({
       : await contracts.token.provider.getBlock("latest");
 
     const archiveMode =
-      ui.toggle("use-archive-for-proposals")?.enabled ?? false;
+      ui.toggle("use-archive-for-proposal-details")?.enabled ?? false;
 
     const data = await Promise.all(
       votes.map(async (vote) => {
