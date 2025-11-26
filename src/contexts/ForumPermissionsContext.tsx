@@ -17,6 +17,7 @@ export interface ForumPermissions {
   } | null;
   isLoading: boolean;
   isAdmin: boolean;
+  hasRbacPermissions: boolean; // New: indicates RBAC permissions available
   reasons: {
     topics?: string;
     posts?: string;

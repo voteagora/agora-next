@@ -26,6 +26,7 @@ import PostAttachments from "@/app/forums/[topic_id]/components/PostAttachments"
 import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import toast from "react-hot-toast";
+import { useHasPermission } from "@/hooks/useRbacPermissions";
 
 export interface ThreadProps {
   comments: ForumPost[];
@@ -87,6 +88,18 @@ const CommentItem = ({
   const stableDeletePost = useStableCallback(deletePost);
   const stableRestorePost = useStableCallback(restorePost);
   const [showReplies, setShowReplies] = React.useState(forForums ?? false);
+
+  // RBAC permission checks
+  const { hasPermission: canSoftDelete } = useHasPermission(
+    "forums",
+    "posts",
+    "soft_delete"
+  );
+  const { hasPermission: canRestorePost } = useHasPermission(
+    "forums",
+    "posts",
+    "restore"
+  );
   // Get replies for this comment
   const replies = comments.filter(
     (reply: ForumPost) => reply.parentId === comment.id
@@ -108,12 +121,10 @@ const CommentItem = ({
   const isOwnComment =
     address && authorAddress && address.toLowerCase() === authorAddress;
 
-  const canDelete = canDeleteContent(
-    address || "",
-    comment.author || "",
-    isAdmin,
-    canManageTopics
-  );
+  // Check if user can delete: either own comment OR has RBAC permission
+  const isOwnPost =
+    address && authorAddress && address.toLowerCase() === authorAddress;
+  const canDelete = isOwnPost || canSoftDelete;
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -173,12 +184,8 @@ const CommentItem = ({
   };
 
   if (comment.deletedAt) {
-    const canDelete = canDeleteContent(
-      address || "",
-      comment.author || "",
-      isAdmin,
-      canManageTopics
-    );
+    // Check if user can restore: either own comment OR has RBAC permission
+    const canRestore = isOwnPost || canRestorePost;
     return (
       <div
         className={`${depth > 0 ? "ml-2 sm:ml-4 mt-3 sm:mt-4" : "mt-3 sm:mt-4"}`}
@@ -187,9 +194,9 @@ const CommentItem = ({
           contentType="comment"
           deletedAt={comment.deletedAt}
           deletedBy={comment.deletedBy || ""}
-          canRestore={canDelete}
+          canRestore={canRestore}
           onRestore={() => handleRestore({} as React.MouseEvent)}
-          showRestoreButton={canDelete}
+          showRestoreButton={canRestore}
         />
       </div>
     );
