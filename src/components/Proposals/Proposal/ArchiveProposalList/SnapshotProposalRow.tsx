@@ -10,7 +10,7 @@ import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 
 // Snapshot voting types
-type SnapshotVotingType = "copeland" | "basic";
+type SnapshotVotingType = "copeland" | "basic" | "approval" | "ranked-choice";
 
 // Type for snapshot-specific fields
 type SnapshotProposal = ArchiveListProposal & {
@@ -49,6 +49,9 @@ function mapSnapshotState(state: string | undefined): string {
  */
 function getSnapshotLink(proposal: SnapshotProposal): string {
   // Use the link field if available (from archive data)
+  if (!isExternalLink(proposal)) {
+    return `/proposals/${proposal.id}`;
+  }
   if (proposal.link) {
     return proposal.link;
   }
@@ -61,8 +64,6 @@ function getSnapshotLink(proposal: SnapshotProposal): string {
   if (snapshotId.startsWith("0x") || snapshotId.startsWith("Qm")) {
     return `https://snapshot.box/#/s:${space}/proposal/${snapshotId}`;
   }
-
-  // Fallback to internal link
   return `/proposals/${proposal.id}`;
 }
 
@@ -71,7 +72,15 @@ function getSnapshotLink(proposal: SnapshotProposal): string {
  */
 function isExternalLink(proposal: SnapshotProposal): boolean {
   // If we have a link field, it's external
-  if (proposal.link && proposal.type === "basic") {
+  const isExternal = proposal.link && proposal.type !== "copeland";
+  console.log(
+    "isExternalLink:",
+    proposal.id,
+    isExternal,
+    proposal.link,
+    proposal.type
+  );
+  if (isExternal) {
     return true;
   }
   return false;
@@ -223,7 +232,7 @@ export function SnapshotProposalRow({ proposal }: ArchiveRowProps) {
 
   const linkProps = displayData.isExternal
     ? { href: displayData.href, target: "_blank" as const }
-    : { href: displayData.href };
+    : { href: `/proposals/${proposal.id}` };
 
   return (
     <Link {...linkProps}>
