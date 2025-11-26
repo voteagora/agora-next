@@ -74,7 +74,7 @@ export default async function ProposalsHome() {
     meta: { has_next: false, total_returned: 0, next_offset: 0 },
     data: [],
   };
-  console.log("useArchiveForProposals:", useArchiveForProposals);
+
   if (useArchiveForProposals) {
     [governanceCalendar, archivedProposals, votableSupply] = await Promise.all([
       fetchGovernanceCalendar(),
@@ -96,17 +96,6 @@ export default async function ProposalsHome() {
         fetchVotableSupply(),
       ]);
   }
-
-  console.log(
-    "archivedProposals:",
-    archivedProposals.data.map((proposal) => {
-      return {
-        id: proposal.id,
-        title: proposal.title,
-        status: proposal.outcome,
-      };
-    })
-  );
 
   return (
     <div className="flex flex-col">

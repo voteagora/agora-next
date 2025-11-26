@@ -145,13 +145,7 @@ export function StandardProposalRow({
     const metrics = extractStandardMetrics(proposal, decimals, isHybrid);
     return { displayData, metrics };
   }, [proposal, decimals, proposalType, isHybrid]);
-  //   console.log("StandardProposalRow props:", {
-  //     proposal,
-  //     tokenDecimals,
-  //     proposalType,
-  //     isHybrid,
-  //     metrics,
-  //   });
+
   // Use different status views for hybrid vs standard proposals
   const metricsContent = isHybrid ? (
     <HybridStandardStatusView

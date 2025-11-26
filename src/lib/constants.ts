@@ -244,7 +244,6 @@ export const getArchiveSlugGCSbucket = (namespace: string) => {
 };
 
 export const getArchiveSlugAllProposals = (namespace: string): string[] => {
-  console.log("Fetching archive proposals for namespace:", namespace);
   if (namespace === "optimism") {
     return [
       getArchiveDaoNodeProposals(namespace),
