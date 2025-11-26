@@ -1,6 +1,9 @@
 import { formatUnits } from "ethers";
 import { capitalizeFirstLetter } from "@/lib/utils";
-import { ArchiveListProposal } from "@/lib/types/archiveProposal";
+import {
+  ArchiveListProposal,
+  EasOodaoVoteOutcome,
+} from "@/lib/types/archiveProposal";
 
 /**
  * Shared utilities for normalizing archive proposals
@@ -166,17 +169,23 @@ export const deriveStatus = (
     return "ACTIVE";
   }
 
-  // Voting has ended, determine outcome for standard proposals
+  // For STANDARD proposals, use vote-based logic
   // Handle different data sources: EAS-OODAO vs standard
   const source = proposal.data_eng_properties?.source;
   const voteTotals =
     source === "eas-oodao"
-      ? proposal.outcome?.["token-holders"] || {}
+      ? (proposal.outcome as EasOodaoVoteOutcome)?.["token-holders"] || {}
       : proposal.totals?.["no-param"] || {};
 
-  const forVotes = convertToNumber(voteTotals["1"], decimals);
-  const againstVotes = convertToNumber(voteTotals["0"], decimals);
-  const abstainVotes = convertToNumber(voteTotals["2"], decimals);
+  const forVotes = convertToNumber(String(voteTotals["1"] ?? "0"), decimals);
+  const againstVotes = convertToNumber(
+    String(voteTotals["0"] ?? "0"),
+    decimals
+  );
+  const abstainVotes = convertToNumber(
+    String(voteTotals["2"] ?? "0"),
+    decimals
+  );
 
   // Extract thresholds from proposal
   const thresholds = extractThresholds(proposal);
