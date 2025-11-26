@@ -35,7 +35,7 @@ async function loadProposal(
   fetchLiveProposal: (proposalId: string) => Promise<Proposal>
 ): Promise<Proposal> {
   const { namespace, token, ui } = Tenant.current();
-  const useArchive = ui.toggle("use-archive-for-proposals")?.enabled;
+  const useArchive = ui.toggle("use-archive-for-proposal-details")?.enabled;
 
   if (useArchive) {
     const archiveResults = await fetchProposalFromArchive(
@@ -212,7 +212,7 @@ export default async function Page({
 
   const { ui } = Tenant.current();
   const useArchiveForProposals = ui.toggle(
-    "use-archive-for-proposals"
+    "use-archive-for-proposal-details"
   )?.enabled;
 
   let RenderComponent;

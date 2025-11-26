@@ -20,7 +20,7 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
   const { ui } = Tenant.current();
   const showParticipation = ui.toggle("show-participation")?.enabled || false;
   const useArchiveForProposals =
-    ui.toggle("use-archive-for-proposals")?.enabled || false;
+    ui.toggle("use-archive-for-proposal-details")?.enabled || false;
 
   // Always call archive hook to keep hook order stable across renders
   const { data: archiveParticipation } = useArchiveParticipation({
