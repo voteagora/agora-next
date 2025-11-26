@@ -203,7 +203,8 @@ export const fetchDelegateStats = async (address: string) => {
 // Archive-based participation rate for tenants using archive-backed proposals
 export const fetchArchiveParticipation = async (address: string) => {
   const { namespace, ui } = Tenant.current();
-  const useArchive = ui.toggle("use-archive-for-proposals")?.enabled ?? false;
+  const useArchive =
+    ui.toggle("use-archive-for-proposal-details")?.enabled ?? false;
 
   if (!useArchive) {
     return null;
