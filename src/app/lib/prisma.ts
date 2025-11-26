@@ -41,13 +41,20 @@ let prismaWeb2Client: PrismaClient;
 let prismaWeb3Client: PrismaClient;
 
 // Allows tuning connection pool size without code changes
-const configuredPoolMax = Number(process.env.PG_ADAPTER_POOL_MAX ?? "10");
-const POOL_MAX = Number.isFinite(configuredPoolMax) ? configuredPoolMax : 10;
+const configuredPoolMax = Number(process.env.PG_ADAPTER_POOL_MAX ?? "2");
+const POOL_MAX = Number.isFinite(configuredPoolMax) ? configuredPoolMax : 2;
 
 const makePrismaClient = (databaseUrl: string) => {
   const pool = new Pool({
     connectionString: databaseUrl,
     max: POOL_MAX,
+    connectionTimeoutMillis: 5000, // return an error after 5 seconds if connection could not be established
+    idleTimeoutMillis: 30000, // close idle clients after 30 seconds
+  });
+
+  pool.on("error", (err) => {
+    console.error("Unexpected error on idle client", err);
+    process.exit(-1);
   });
 
   return new PrismaClient({
