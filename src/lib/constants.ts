@@ -243,8 +243,38 @@ export const getArchiveSlugGCSbucket = (namespace: string) => {
   return `${ARCHIVE_GCS_BUCKET}/data/${namespace}`;
 };
 
-export const getArchiveSlugAllProposals = (namespace: string) => {
-  return `${getArchiveSlugGCSbucket(namespace)}/proposal_list.full.ndjson`;
+export const getArchiveSlugAllProposals = (namespace: string): string[] => {
+  console.log("Fetching archive proposals for namespace:", namespace);
+  if (namespace === "optimism") {
+    return [
+      getArchiveDaoNodeProposals(namespace),
+      getArchiveEasAtlas(namespace),
+    ];
+  } else if (namespace === "ens") {
+    return [
+      getArchiveDaoNodeProposals(namespace),
+      getArchiveSnapshotProposals(namespace),
+    ];
+  } else if (namespace === "derive") {
+    return [getArchiveSnapshotProposals(namespace)];
+  }
+  return [`${getArchiveSlugGCSbucket(namespace)}/proposal_list.full.ndjson`];
+};
+
+export const getArchiveDaoNodeProposals = (namespace: string) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal_list/dao_node/raw.ndjson.gz`;
+};
+
+export const getArchiveEasOodaoProposals = (namespace: string) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal_list/eas-oodao/raw.ndjson.gz`;
+};
+
+export const getArchiveEasAtlas = (namespace: string) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal_list/eas-atlas/raw.ndjson.gz`;
+};
+
+export const getArchiveSnapshotProposals = (namespace: string) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal_list/snapshot/raw.ndjson.gz`;
 };
 
 export const getArchiveSlugForDaoNodeProposal = (

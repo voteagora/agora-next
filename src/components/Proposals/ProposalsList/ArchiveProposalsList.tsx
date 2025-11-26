@@ -10,8 +10,7 @@ import ProposalsPageInfoBanner from "../ProposalsPageInfoBanner";
 import { useInfoBannerVisibility } from "@/hooks/useInfoBannerVisibility";
 
 import { useAccount } from "wagmi";
-import ArchiveProposalRow from "../Proposal/Archive/ArchiveProposalRow";
-import { normalizeArchiveProposals } from "../Proposal/Archive/normalizeArchiveProposal";
+import { ArchiveProposalRow } from "../Proposal/ArchiveProposalList";
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 import { useSearchParams } from "next/navigation";
 import { proposalsFilterOptions } from "@/lib/constants";
@@ -62,14 +61,7 @@ export default function ArchiveProposalsList({
     });
   }, [filteredProposals]);
 
-  const normalizedProposals = React.useMemo(
-    () =>
-      normalizeArchiveProposals(sortedProposals, {
-        namespace,
-        tokenDecimals: token?.decimals ?? 18,
-      }),
-    [sortedProposals, namespace, token?.decimals]
-  );
+  const tokenDecimals = token?.decimals ?? 18;
 
   // Check if banner is configured and visible
   const { ui } = Tenant.current();
@@ -111,14 +103,18 @@ export default function ArchiveProposalsList({
           className={`flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden relative z-10 ${isBannerEnabled ? (isBannerVisible ? "-mt-4" : "mt-4") : ""}`}
         >
           <div>
-            {normalizedProposals.length === 0 ? (
+            {sortedProposals.length === 0 ? (
               <div className="flex flex-row justify-center py-8 text-secondary">
                 No proposals currently
               </div>
             ) : (
               <div>
-                {normalizedProposals.map((proposal) => (
-                  <ArchiveProposalRow key={proposal.id} proposal={proposal} />
+                {sortedProposals.map((proposal) => (
+                  <ArchiveProposalRow
+                    key={proposal.id}
+                    proposal={proposal}
+                    tokenDecimals={tokenDecimals}
+                  />
                 ))}
               </div>
             )}

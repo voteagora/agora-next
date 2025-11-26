@@ -12,11 +12,27 @@ import {
 } from "./archiveProposalUtils";
 import { ARCHIVE_PROPOSAL_DEFAULTS } from "@/app/proposals/data/archiveDefaults";
 import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
-import { ArchiveListProposal } from "@/lib/types/archiveProposal";
+import {
+  ArchiveListProposal,
+  DaoNodeVoteTotals,
+  EasOodaoVoteOutcome,
+  DecodedStandardProposalData,
+} from "@/lib/types/archiveProposal";
 
 type NormalizeArchiveProposalOptions = {
   namespace?: string | null;
   tokenDecimals?: number;
+};
+
+const getFunctionArgsName = (
+  decodedData: ArchiveListProposal["decoded_proposal_data"]
+) => {
+  if (!decodedData || Array.isArray(decodedData)) {
+    return [];
+  }
+
+  const { functionArgsName } = decodedData as DecodedStandardProposalData;
+  return Array.isArray(functionArgsName) ? functionArgsName : [];
 };
 
 const normalizeOption = (proposal: ArchiveListProposal) => {
@@ -35,7 +51,7 @@ const normalizeOption = (proposal: ArchiveListProposal) => {
           ? (data as `0x${string}`)
           : (`0x${data}` as `0x${string}`)
       ) ?? [],
-    functionArgsName: proposal.decoded_proposal_data?.functionArgsName ?? [],
+    functionArgsName: getFunctionArgsName(proposal.decoded_proposal_data),
   };
 };
 
@@ -71,8 +87,8 @@ export function normalizeArchiveStandardProposal(
   const source = proposal.data_eng_properties?.source;
   const voteTotals =
     source === "eas-oodao"
-      ? proposal.outcome?.["token-holders"] || {}
-      : proposal.totals?.["no-param"] || {};
+      ? ((proposal.outcome as EasOodaoVoteOutcome)?.["token-holders"] ?? {})
+      : ((proposal.totals as DaoNodeVoteTotals)?.["no-param"] ?? {});
 
   const forVotes = safeBigInt(voteTotals["1"]);
   const againstVotes = safeBigInt(voteTotals["0"]);
