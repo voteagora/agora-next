@@ -7,10 +7,11 @@ import { OPOptimisticTieredArchiveStatusView } from "./OPOptimisticTieredArchive
 import { BaseRowLayout } from "./BaseRowLayout";
 import { ArchiveRowProps } from "./types";
 import { extractDisplayData, getVotingData, deriveStatus } from "./utils";
-import { HYBRID_VOTE_WEIGHTS, OFFCHAIN_THRESHOLDS } from "@/lib/constants";
-
-// Citizen types for aggregating offchain votes
-const CITIZEN_TYPES = ["USER", "APP", "CHAIN"] as const;
+import {
+  HYBRID_VOTE_WEIGHTS,
+  OFFCHAIN_THRESHOLDS,
+  CITIZEN_TYPES,
+} from "@/lib/constants";
 
 /**
  * Aggregate votes across citizen types

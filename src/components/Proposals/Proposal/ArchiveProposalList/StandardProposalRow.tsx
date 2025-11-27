@@ -11,35 +11,22 @@ import { OPStandardStatusView } from "../OPStandardProposalStatus";
 import { HybridStandardStatusView } from "../HybridStandardProposalStatus";
 import { BaseRowLayout } from "./BaseRowLayout";
 import { ArchiveRowProps } from "./types";
+import { extractDisplayData, convertToNumber, ensurePercentage } from "./utils";
 import {
-  extractDisplayData,
-  getVotingData,
-  convertToNumber,
-  ensurePercentage,
-} from "./utils";
-import { HYBRID_VOTE_WEIGHTS, OFFCHAIN_THRESHOLDS } from "@/lib/constants";
+  HYBRID_VOTE_WEIGHTS,
+  OFFCHAIN_THRESHOLDS,
+  CITIZEN_TYPES,
+} from "@/lib/constants";
 
-// Citizen types for aggregating offchain votes
-const CITIZEN_TYPES = ["USER", "APP", "CHAIN"] as const;
+// Vote keys: "1" = for, "0" = against, "2" = abstain
+type VoteData = {
+  forVotes: number;
+  againstVotes: number;
+  abstainVotes: number;
+};
+type RawVoteData = { forRaw: string; againstRaw: string; abstainRaw: string };
 
-/**
- * Aggregate votes across citizen types for offchain proposals
- */
-function aggregateVotes(
-  outcome: Record<string, Record<string, number>>,
-  key: string
-): number {
-  let total = 0;
-  for (const type of CITIZEN_TYPES) {
-    total += Number(outcome?.[type]?.[key] ?? 0);
-  }
-  return total;
-}
-
-type StandardMetrics = {
-  forRaw: string;
-  againstRaw: string;
-  abstainRaw: string;
+type StandardMetrics = RawVoteData & {
   segments: {
     forPercentage: number;
     againstPercentage: number;
@@ -48,9 +35,135 @@ type StandardMetrics = {
   hasVotes: boolean;
 };
 
+/** Extract vote values from a totals object (keys: "0", "1", "2") */
+function extractFromTotals(
+  totals: Record<string, string | number> | undefined,
+  decimals: number
+): VoteData & RawVoteData {
+  const forRaw = String(totals?.["1"] ?? "0");
+  const againstRaw = String(totals?.["0"] ?? "0");
+  const abstainRaw = String(totals?.["2"] ?? "0");
+
+  return {
+    forRaw,
+    againstRaw,
+    abstainRaw,
+    forVotes: convertToNumber(forRaw, decimals),
+    againstVotes: convertToNumber(againstRaw, decimals),
+    abstainVotes: convertToNumber(abstainRaw, decimals),
+  };
+}
+
+/** Aggregate offchain votes across citizen types (USER, APP, CHAIN) */
+function aggregateOffchainVotes(
+  outcome: Record<string, Record<string, number>> | undefined
+): VoteData & RawVoteData {
+  let forVotes = 0,
+    againstVotes = 0,
+    abstainVotes = 0;
+  for (const t of CITIZEN_TYPES) {
+    forVotes += Number(outcome?.[t]?.["1"] ?? 0);
+    againstVotes += Number(outcome?.[t]?.["0"] ?? 0);
+    abstainVotes += Number(outcome?.[t]?.["2"] ?? 0);
+  }
+  return {
+    forVotes,
+    againstVotes,
+    abstainVotes,
+    forRaw: String(forVotes),
+    againstRaw: String(againstVotes),
+    abstainRaw: String(abstainVotes),
+  };
+}
+
+/** Calculate weighted hybrid percentage for a single vote type */
+function calcWeightedPct(
+  onchainVotes: number,
+  eligibleDelegates: number,
+  offchain: { user: number; app: number; chain: number }
+): number {
+  const delegatePct = (onchainVotes / eligibleDelegates) * 100;
+  const userPct = (offchain.user / OFFCHAIN_THRESHOLDS.USER) * 100;
+  const appPct = (offchain.app / OFFCHAIN_THRESHOLDS.APP) * 100;
+  const chainPct = (offchain.chain / OFFCHAIN_THRESHOLDS.CHAIN) * 100;
+  return (
+    delegatePct * HYBRID_VOTE_WEIGHTS.delegates +
+    userPct * HYBRID_VOTE_WEIGHTS.users +
+    appPct * HYBRID_VOTE_WEIGHTS.apps +
+    chainPct * HYBRID_VOTE_WEIGHTS.chains
+  );
+}
+
+/** Extract hybrid (onchain + offchain weighted) metrics */
+function extractHybridMetrics(
+  proposal: ArchiveListProposal,
+  decimals: number
+): VoteData & RawVoteData {
+  const voteTotals = (proposal.totals as DaoNodeVoteTotals)?.["no-param"] || {};
+  const {
+    forRaw,
+    againstRaw,
+    abstainRaw,
+    forVotes: onFor,
+    againstVotes: onAgainst,
+    abstainVotes: onAbstain,
+  } = extractFromTotals(voteTotals, decimals);
+
+  const offchainOutcome = proposal.govless_proposal?.outcome || {};
+  const rawEligible = Number(proposal.total_voting_power_at_start);
+  const eligibleDelegates = rawEligible > 0 ? rawEligible : 1;
+
+  return {
+    forRaw,
+    againstRaw,
+    abstainRaw,
+    forVotes: calcWeightedPct(onFor, eligibleDelegates, {
+      user: Number(offchainOutcome?.USER?.["1"] ?? 0),
+      app: Number(offchainOutcome?.APP?.["1"] ?? 0),
+      chain: Number(offchainOutcome?.CHAIN?.["1"] ?? 0),
+    }),
+    againstVotes: calcWeightedPct(onAgainst, eligibleDelegates, {
+      user: Number(offchainOutcome?.USER?.["0"] ?? 0),
+      app: Number(offchainOutcome?.APP?.["0"] ?? 0),
+      chain: Number(offchainOutcome?.CHAIN?.["0"] ?? 0),
+    }),
+    abstainVotes: calcWeightedPct(onAbstain, eligibleDelegates, {
+      user: Number(offchainOutcome?.USER?.["2"] ?? 0),
+      app: Number(offchainOutcome?.APP?.["2"] ?? 0),
+      chain: Number(offchainOutcome?.CHAIN?.["2"] ?? 0),
+    }),
+  };
+}
+
+/** Compute percentage segments from vote counts */
+function computeSegments(
+  votes: VoteData,
+  useDirectPercentages: boolean
+): StandardMetrics["segments"] {
+  const { forVotes, againstVotes, abstainVotes } = votes;
+  const total = forVotes + againstVotes + abstainVotes;
+
+  if (useDirectPercentages) {
+    // Hybrid: values are already weighted percentages
+    return {
+      forPercentage: ensurePercentage(forVotes),
+      againstPercentage: ensurePercentage(againstVotes),
+      abstainPercentage: ensurePercentage(abstainVotes),
+    };
+  }
+  if (total === 0) {
+    return { forPercentage: 0, againstPercentage: 0, abstainPercentage: 0 };
+  }
+  return {
+    forPercentage: ensurePercentage((forVotes / total) * 100),
+    againstPercentage: ensurePercentage((againstVotes / total) * 100),
+    abstainPercentage: ensurePercentage((abstainVotes / total) * 100),
+  };
+}
+
 /**
- * Extract standard voting metrics from proposal
- * For hybrid proposals, uses weighted calculation across onchain delegates and offchain citizens
+ * Extract standard voting metrics from proposal.
+ * Handles: eas-oodao, eas-atlas (offchain), dao_node (onchain), and hybrid proposals.
  */
 function extractStandardMetrics(
   proposal: ArchiveListProposal,
@@ -58,178 +171,44 @@ function extractStandardMetrics(
   isHybrid: boolean
 ): StandardMetrics {
   const source = proposal.data_eng_properties?.source;
+  const isHybridProposal = isHybrid && !!proposal.govless_proposal;
 
-  let forVotes = 0;
-  let againstVotes = 0;
-  let abstainVotes = 0;
-  let forVotesRaw = "0";
-  let againstVotesRaw = "0";
-  let abstainVotesRaw = "0";
+  let data: VoteData & RawVoteData;
 
   if (source === "eas-oodao") {
-    const tokenHolderOutcome = (proposal.outcome as EasOodaoVoteOutcome)?.[
-      "token-holders"
-    ];
-
-    if (!tokenHolderOutcome) {
-      forVotes = 0;
-      againstVotes = 0;
-      abstainVotes = 0;
-      forVotesRaw = "0";
-      againstVotesRaw = "0";
-      abstainVotesRaw = "0";
-    } else {
-      const forRawValue = tokenHolderOutcome["1"] ?? "0";
-      const againstRawValue = tokenHolderOutcome["0"] ?? "0";
-      const abstainRawValue = tokenHolderOutcome["2"] ?? "0";
-
-      forVotes = Number(forRawValue ?? 0);
-      againstVotes = Number(againstRawValue ?? 0);
-      abstainVotes = Number(abstainRawValue ?? 0);
-
-      forVotesRaw = String(forRawValue);
-      againstVotesRaw = String(againstRawValue);
-      abstainVotesRaw = String(abstainRawValue);
-    }
-  } else {
-    // ONCHAIN ONLY (dao_node): Use totals
-    const voteTotals =
-      (proposal.totals as DaoNodeVoteTotals)?.["no-param"] || {};
-    if (isHybrid && proposal.govless_proposal) {
-      // HYBRID: Use weighted calculation across all houses
-      // 1. Get onchain delegate votes from proposal.totals
-      const onchainTotals = proposal.totals?.["no-param"] || {};
-      const onchainForRaw = String(onchainTotals["1"] ?? "0");
-      const onchainAgainstRaw = String(onchainTotals["0"] ?? "0");
-      const onchainAbstainRaw = String(onchainTotals["2"] ?? "0");
-
-      const onchainFor = convertToNumber(onchainForRaw, decimals);
-      const onchainAgainst = convertToNumber(onchainAgainstRaw, decimals);
-      const onchainAbstain = convertToNumber(onchainAbstainRaw, decimals);
-
-      // Store raw values for non-percentage display
-      forVotesRaw = onchainForRaw;
-      againstVotesRaw = onchainAgainstRaw;
-      abstainVotesRaw = onchainAbstainRaw;
-
-      // 2. Get offchain votes from govless_proposal.outcome
-      const offchainOutcome = (proposal.govless_proposal.outcome ||
-        {}) as Record<string, Record<string, number>>;
-      const userFor = Number(offchainOutcome?.USER?.["1"] ?? 0);
-      const userAgainst = Number(offchainOutcome?.USER?.["0"] ?? 0);
-      const userAbstain = Number(offchainOutcome?.USER?.["2"] ?? 0);
-      const appFor = Number(offchainOutcome?.APP?.["1"] ?? 0);
-      const appAgainst = Number(offchainOutcome?.APP?.["0"] ?? 0);
-      const appAbstain = Number(offchainOutcome?.APP?.["2"] ?? 0);
-      const chainFor = Number(offchainOutcome?.CHAIN?.["1"] ?? 0);
-      const chainAgainst = Number(offchainOutcome?.CHAIN?.["0"] ?? 0);
-      const chainAbstain = Number(offchainOutcome?.CHAIN?.["2"] ?? 0);
-
-      // 3. Calculate weighted percentages
-      // Delegate percentage is based on eligible delegates (quorum * 100/30)
-      const eligibleDelegates =
-        Number(proposal.total_voting_power_at_start) || 1;
-
-      // Calculate weighted FOR votes
-      const delegateForPct = (onchainFor / eligibleDelegates) * 100;
-      const userForPct = (userFor / OFFCHAIN_THRESHOLDS.USER) * 100;
-      const appForPct = (appFor / OFFCHAIN_THRESHOLDS.APP) * 100;
-      const chainForPct = (chainFor / OFFCHAIN_THRESHOLDS.CHAIN) * 100;
-      forVotes =
-        delegateForPct * HYBRID_VOTE_WEIGHTS.delegates +
-        userForPct * HYBRID_VOTE_WEIGHTS.users +
-        appForPct * HYBRID_VOTE_WEIGHTS.apps +
-        chainForPct * HYBRID_VOTE_WEIGHTS.chains;
-
-      // Calculate weighted AGAINST votes
-      const delegateAgainstPct = (onchainAgainst / eligibleDelegates) * 100;
-      const userAgainstPct = (userAgainst / OFFCHAIN_THRESHOLDS.USER) * 100;
-      const appAgainstPct = (appAgainst / OFFCHAIN_THRESHOLDS.APP) * 100;
-      const chainAgainstPct = (chainAgainst / OFFCHAIN_THRESHOLDS.CHAIN) * 100;
-      againstVotes =
-        delegateAgainstPct * HYBRID_VOTE_WEIGHTS.delegates +
-        userAgainstPct * HYBRID_VOTE_WEIGHTS.users +
-        appAgainstPct * HYBRID_VOTE_WEIGHTS.apps +
-        chainAgainstPct * HYBRID_VOTE_WEIGHTS.chains;
-
-      // Calculate weighted ABSTAIN votes
-      const delegateAbstainPct = (onchainAbstain / eligibleDelegates) * 100;
-      const userAbstainPct = (userAbstain / OFFCHAIN_THRESHOLDS.USER) * 100;
-      const appAbstainPct = (appAbstain / OFFCHAIN_THRESHOLDS.APP) * 100;
-      const chainAbstainPct = (chainAbstain / OFFCHAIN_THRESHOLDS.CHAIN) * 100;
-      abstainVotes =
-        delegateAbstainPct * HYBRID_VOTE_WEIGHTS.delegates +
-        userAbstainPct * HYBRID_VOTE_WEIGHTS.users +
-        appAbstainPct * HYBRID_VOTE_WEIGHTS.apps +
-        chainAbstainPct * HYBRID_VOTE_WEIGHTS.chains;
-    } else if (source === "eas-atlas" || source === "eas-oodao") {
-      // OFFCHAIN ONLY: Use outcome data
-      const outcome = (proposal.outcome || {}) as Record<
-        string,
-        Record<string, number>
-      >;
-      forVotes = aggregateVotes(outcome, "1");
-      againstVotes = aggregateVotes(outcome, "0");
-      abstainVotes = aggregateVotes(outcome, "2");
-
-      forVotesRaw = forVotes.toString();
-      againstVotesRaw = againstVotes.toString();
-      abstainVotesRaw = abstainVotes.toString();
-    } else {
-      // ONCHAIN ONLY (dao_node): Use totals
-      const voteTotals = proposal.totals?.["no-param"] || {};
-      const forVal = voteTotals["1"];
-      const againstVal = voteTotals["0"];
-      const abstainVal = voteTotals["2"];
-
-      forVotesRaw = typeof forVal === "string" ? forVal : String(forVal ?? "0");
-      againstVotesRaw =
-        typeof againstVal === "string" ? againstVal : String(againstVal ?? "0");
-      abstainVotesRaw =
-        typeof abstainVal === "string" ? abstainVal : String(abstainVal ?? "0");
-
-      forVotes = convertToNumber(forVotesRaw, decimals);
-      againstVotes = convertToNumber(againstVotesRaw, decimals);
-      abstainVotes = convertToNumber(abstainVotesRaw, decimals);
-    }
-
-    // For hybrid proposals, forVotes/againstVotes/abstainVotes are already weighted percentages
-    // For non-hybrid, they are vote counts that need to be converted to percentages
-    const totalVotes = forVotes + againstVotes + abstainVotes;
-
-    // Determine if we should use the values directly as percentages (hybrid) or calculate them
-    const segments =
-      isHybrid && proposal.govless_proposal
-        ? {
-            // For hybrid, use the weighted percentages directly
-            forPercentage: ensurePercentage(forVotes),
-            abstainPercentage: ensurePercentage(abstainVotes),
-            againstPercentage: ensurePercentage(againstVotes),
-          }
-        : totalVotes > 0
-          ? {
-              forPercentage: ensurePercentage((forVotes / totalVotes) * 100),
-              abstainPercentage: ensurePercentage(
-                (abstainVotes / totalVotes) * 100
-              ),
-              againstPercentage: ensurePercentage(
-                (againstVotes / totalVotes) * 100
-              ),
-            }
-          : {
-              forPercentage: 0,
-              abstainPercentage: 0,
-              againstPercentage: 0,
-            };
-
-    return {
-      forRaw: forVotesRaw,
-      againstRaw: againstVotesRaw,
-      abstainRaw: abstainVotesRaw,
-      segments,
-      hasVotes: totalVotes > 0 || (isHybrid && !!proposal.govless_proposal),
+    // EAS OODAO: token-holders outcome
+    const th = (proposal.outcome as EasOodaoVoteOutcome)?.["token-holders"];
+    data = {
+      forRaw: String(th?.["1"] ?? "0"),
+      againstRaw: String(th?.["0"] ?? "0"),
+      abstainRaw: String(th?.["2"] ?? "0"),
+      forVotes: Number(th?.["1"] ?? 0),
+      againstVotes: Number(th?.["0"] ?? 0),
+      abstainVotes: Number(th?.["2"] ?? 0),
     };
+  } else if (isHybridProposal) {
+    // Hybrid: weighted onchain + offchain
+    data = extractHybridMetrics(proposal, decimals);
+  } else if (source === "eas-atlas") {
+    // Offchain only: aggregate citizen votes
+    data = aggregateOffchainVotes(
+      proposal.outcome as Record<string, Record<string, number>>
+    );
+  } else {
+    // Onchain only (dao_node)
+    const voteTotals = (proposal.totals as DaoNodeVoteTotals)?.["no-param"];
+    data = extractFromTotals(voteTotals, decimals);
   }
+
+  const total = data.forVotes + data.againstVotes + data.abstainVotes;
+
+  return {
+    forRaw: data.forRaw,
+    againstRaw: data.againstRaw,
+    abstainRaw: data.abstainRaw,
+    segments: computeSegments(data, isHybridProposal),
+    hasVotes: total > 0 || isHybridProposal,
+  };
 }
 
 /**
@@ -252,7 +231,7 @@ export function StandardProposalRow({
     const metrics = extractStandardMetrics(proposal, decimals, isHybrid);
     return { displayData, metrics };
   }, [proposal, decimals, proposalType, isHybrid]);
-
+  console.log("metrics.segments:", metrics, proposal, displayData);
   // Use different status views for hybrid vs standard proposals
   const metricsContent = isHybrid ? (
     <HybridStandardStatusView

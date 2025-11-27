@@ -12,10 +12,11 @@ import {
   convertToNumber,
   deriveStatus,
 } from "./utils";
-import { HYBRID_VOTE_WEIGHTS, OFFCHAIN_THRESHOLDS } from "@/lib/constants";
-
-// Citizen types for aggregating offchain votes
-const CITIZEN_TYPES = ["USER", "APP", "CHAIN"] as const;
+import {
+  HYBRID_VOTE_WEIGHTS,
+  OFFCHAIN_THRESHOLDS,
+  CITIZEN_TYPES,
+} from "@/lib/constants";
 
 /**
  * Aggregate votes across citizen types
@@ -50,7 +51,10 @@ function extractOptimisticMetrics(
   const votingData = getVotingData(proposal);
   const vd = votingData as ArchiveListProposal;
   const status = deriveStatus(proposal, decimals);
-  const defeatThreshold = 17; // Standard 17% threshold
+  const decodedProposalData = vd.decoded_proposal_data;
+
+  const disapprovalThreshold =
+    Number((decodedProposalData as any)?.[0]?.[0] || 2000) / 100;
 
   if (isHybridOrOffchain) {
     // HYBRID/OFFCHAIN OPTIMISTIC: Uses weighted citizen percentages
@@ -98,7 +102,7 @@ function extractOptimisticMetrics(
     return {
       againstCount,
       againstPercentage: Math.round(weightedAgainstPercentage * 10) / 10,
-      defeatThreshold,
+      defeatThreshold: disapprovalThreshold,
       isDefeated: status === "DEFEATED",
     };
   } else {
@@ -122,7 +126,7 @@ function extractOptimisticMetrics(
     return {
       againstCount,
       againstPercentage,
-      defeatThreshold,
+      defeatThreshold: disapprovalThreshold,
       isDefeated: status === "DEFEATED",
     };
   }
@@ -152,6 +156,7 @@ export function OptimisticProposalRow({
       decimals,
       isHybridOrOffchain
     );
+
     return { displayData, metrics };
   }, [proposal, decimals, isHybridOrOffchain]);
 

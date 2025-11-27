@@ -200,6 +200,7 @@ export const ISSUES_FILTER_PARAM = "issueFilter";
 export const STAKEHOLDERS_FILTER_PARAM = "stakeholderFilter";
 
 export const OFFCHAIN_THRESHOLDS = { APP: 100, USER: 1000, CHAIN: 15 };
+export const CITIZEN_TYPES = ["USER", "APP", "CHAIN"] as const;
 
 export const HYBRID_VOTE_WEIGHTS = {
   delegates: 0.5,

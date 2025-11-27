@@ -12,9 +12,7 @@ import {
   convertToNumber,
   ensurePercentage,
 } from "./utils";
-
-// Citizen types for aggregating offchain votes
-const CITIZEN_TYPES = ["USER", "APP", "CHAIN"] as const;
+import { CITIZEN_TYPES } from "@/lib/constants";
 
 /**
  * Aggregate approval votes across citizen types for a specific choice

@@ -2,8 +2,6 @@ import {
   ArchiveListProposal,
   deriveProposalType,
   parseArchiveProposalResults,
-  getArchiveProposalStatus,
-  ArchiveProposalStatus,
   ArchiveParsedProposalResults,
   GovlessProposal,
 } from "@/lib/types/archiveProposal";
@@ -17,7 +15,11 @@ import {
 } from "./archiveProposalUtils";
 import { getProposalTypeText } from "@/lib/utils";
 import { ProposalType } from "@/lib/types";
-import { HYBRID_VOTE_WEIGHTS, OFFCHAIN_THRESHOLDS } from "@/lib/constants";
+import {
+  CITIZEN_TYPES,
+  HYBRID_VOTE_WEIGHTS,
+  OFFCHAIN_THRESHOLDS,
+} from "@/lib/constants";
 
 export type ArchiveProposalMetrics =
   | {
@@ -119,9 +121,6 @@ function getVotingData(
     ? proposal.govless_proposal
     : proposal;
 }
-
-// Helper to aggregate votes across citizen types (USER, APP, CHAIN)
-const CITIZEN_TYPES = ["USER", "APP", "CHAIN"] as const;
 
 const aggregateVotes = (
   outcome: any,
