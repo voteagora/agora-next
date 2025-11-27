@@ -61,21 +61,12 @@ export function ArchiveProposalRow({
 
     // Optimistic variants (non-tiered)
     case "OPTIMISTIC":
-      return (
-        <OptimisticProposalRow
-          proposal={proposal}
-          tokenDecimals={tokenDecimals}
-          isHybridOrOffchain={false}
-        />
-      );
-
     case "HYBRID_OPTIMISTIC":
     case "OFFCHAIN_OPTIMISTIC":
       return (
         <OptimisticProposalRow
           proposal={proposal}
           tokenDecimals={tokenDecimals}
-          isHybridOrOffchain={true}
         />
       );
 
