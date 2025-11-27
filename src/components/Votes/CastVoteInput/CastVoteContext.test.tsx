@@ -7,8 +7,19 @@ import useStandardVoting from "@/hooks/useStandardVoting";
 import React from "react";
 
 vi.mock("next/font/google", async () => {
-  const { mockFonts } = await import("@/__mocks__/fonts");
-  return mockFonts;
+  const fonts = await import("@/__mocks__/fonts");
+  return {
+    Inter: fonts.Inter,
+    Rajdhani: fonts.Rajdhani,
+    Chivo_Mono: fonts.Chivo_Mono,
+  };
+});
+
+vi.mock("next/font/local", async () => {
+  const fonts = await import("@/__mocks__/fonts");
+  return {
+    default: fonts.default,
+  };
 });
 
 vi.mock("server-only", () => ({

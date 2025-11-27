@@ -10,27 +10,27 @@ export const inter = Inter({
 export const rajdhani = localFont({
   src: [
     {
-      path: "../../public/fonts/Rajdhani/Rajdhani-Light.ttf",
+      path: "../../public/fonts/Rajdhani/Rajdhani-Light.woff2",
       weight: "300",
       style: "normal",
     },
     {
-      path: "../../public/fonts/Rajdhani/Rajdhani-Regular.ttf",
+      path: "../../public/fonts/Rajdhani/Rajdhani-Regular.woff2",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../../public/fonts/Rajdhani/Rajdhani-Medium.ttf",
+      path: "../../public/fonts/Rajdhani/Rajdhani-Medium.woff2",
       weight: "500",
       style: "normal",
     },
     {
-      path: "../../public/fonts/Rajdhani/Rajdhani-SemiBold.ttf",
+      path: "../../public/fonts/Rajdhani/Rajdhani-SemiBold.woff2",
       weight: "600",
       style: "normal",
     },
     {
-      path: "../../public/fonts/Rajdhani/Rajdhani-Bold.ttf",
+      path: "../../public/fonts/Rajdhani/Rajdhani-Bold.woff2",
       weight: "700",
       style: "normal",
     },
