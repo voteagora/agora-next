@@ -2,6 +2,7 @@ import { formatUnits } from "ethers";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import {
   ArchiveListProposal,
+  deriveProposalType,
   EasOodaoVoteOutcome,
 } from "@/lib/types/archiveProposal";
 
@@ -168,40 +169,10 @@ export const deriveStatus = (
   if (endTime > now) {
     return "ACTIVE";
   }
-
-  // Determine proposal type for status logic
-  const votingData = proposal.govless_proposal || proposal;
-
-  // Use voting_module_name to determine base proposal type
-  const getBaseProposalType = (): string | null => {
-    // First check if proposal_type is already a string
-    if (typeof votingData.proposal_type === "string") {
-      // Extract base type from HYBRID_* or OFFCHAIN_* variants
-      const type = votingData.proposal_type;
-      if (type.startsWith("HYBRID_")) return type.replace("HYBRID_", "");
-      if (type.startsWith("OFFCHAIN_")) return type.replace("OFFCHAIN_", "");
-      return type;
-    }
-
-    // Use voting_module_name to determine type
-    const moduleName = votingData.voting_module_name;
-    if (moduleName === "approval") {
-      return "APPROVAL";
-    }
-    if (moduleName === "optimistic") {
-      return votingData.tiers ? "OPTIMISTIC_TIERED" : "OPTIMISTIC";
-    }
-    if (moduleName === "standard") {
-      return "STANDARD";
-    }
-
-    return null;
-  };
-
-  const baseType = getBaseProposalType();
+  const baseType = deriveProposalType(proposal);
 
   // For OPTIMISTIC and OPTIMISTIC_TIERED proposals, they succeed unless vetoed
-  if (baseType === "OPTIMISTIC" || baseType === "OPTIMISTIC_TIERED") {
+  if (baseType.includes("OPTIMISTIC")) {
     // Check if lifecycle_stage explicitly says DEFEATED
     if (proposal.lifecycle_stage === "DEFEATED") {
       return "DEFEATED";
@@ -261,7 +232,7 @@ export const deriveStatus = (
   if (proposal.total_voting_power_at_start) {
     // We have total voting power - calculate quorum percentage
     const totalPower = convertToNumber(
-      proposal.total_voting_power_at_start,
+      (BigInt(proposal.total_voting_power_at_start) / 3n).toString(),
       decimals
     );
     const quorumPercentage =

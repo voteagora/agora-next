@@ -31,7 +31,6 @@ export function ArchiveProposalRow({
 }: ArchiveRowProps) {
   // Derive the proposal type from raw data
   const proposalType = deriveProposalType(proposal);
-
   // Route to the appropriate row component
   switch (proposalType) {
     case "SNAPSHOT":

@@ -70,15 +70,23 @@ function calcOffchainPercentage(
  * Calculate weighted hybrid percentage (onchain delegates + offchain citizens)
  */
 function calcHybridPercentage(
-  onchainAgainst: number,
-  eligibleDelegates: number,
+  onchainAgainst: bigint,
+  eligibleDelegates: bigint,
   userAgainst: number,
   appAgainst: number,
   chainAgainst: number
 ): number {
   let weightedPct = 0;
-  weightedPct +=
-    (onchainAgainst / eligibleDelegates) * HYBRID_VOTE_WEIGHTS.delegates * 100;
+
+  // Delegate percentage: precision loss from Number conversion is acceptable
+  // since both values scale similarly and result is rounded to 1 decimal place
+  if (eligibleDelegates > 0n) {
+    weightedPct +=
+      (Number(onchainAgainst) / Number(eligibleDelegates)) *
+      HYBRID_VOTE_WEIGHTS.delegates *
+      100;
+  }
+
   weightedPct +=
     (appAgainst / OFFCHAIN_THRESHOLDS.APP) * HYBRID_VOTE_WEIGHTS.apps * 100;
   weightedPct +=
@@ -153,12 +161,16 @@ export function extractOptimisticMetrics(
 
     let weightedAgainstPercentage: number;
 
-    if (isHybrid && "quorum" in proposal && proposal.quorum) {
+    if (
+      isHybrid &&
+      "total_voting_power_at_start" in proposal &&
+      proposal.total_voting_power_at_start
+    ) {
       // For hybrid proposals, also account for onchain delegates
       const onchainAgainst = hasDaoNodeTotals(proposal)
-        ? Number((proposal.totals as DaoNodeVoteTotals)["no-param"]?.["0"] ?? 0)
-        : 0;
-      const eligibleDelegates = Number(proposal.quorum) * (100 / 30);
+        ? BigInt((proposal.totals as DaoNodeVoteTotals)["no-param"]?.["0"] ?? 0)
+        : BigInt(0);
+      const eligibleDelegates = BigInt(proposal.total_voting_power_at_start);
 
       weightedAgainstPercentage = calcHybridPercentage(
         onchainAgainst,
@@ -178,7 +190,7 @@ export function extractOptimisticMetrics(
 
     return {
       againstCount,
-      againstPercentage: Math.round(weightedAgainstPercentage * 10) / 10,
+      againstPercentage: Math.round(weightedAgainstPercentage * 100) / 100,
       defeatThreshold,
       isDefeated: status === "DEFEATED",
     };
@@ -193,16 +205,19 @@ export function extractOptimisticMetrics(
       typeof againstVal === "string" ? againstVal : String(againstVal ?? "0");
     const againstCount = convertToNumber(againstVotesRaw, tokenDecimals);
 
-    // Calculate percentage based on quorum
+    // Calculate percentage based on total voting power
     let againstPercentage = 0;
-    if ("quorum" in proposal && proposal.quorum) {
-      const quorumValue = convertToNumber(
-        String(proposal.quorum),
+    if (
+      "total_voting_power_at_start" in proposal &&
+      proposal.total_voting_power_at_start
+    ) {
+      const totalPower = convertToNumber(
+        String(proposal.total_voting_power_at_start),
         tokenDecimals
       );
       againstPercentage =
-        quorumValue > 0
-          ? Math.round((againstCount / quorumValue) * 100 * 10) / 10
+        totalPower > 0
+          ? Math.round((againstCount / totalPower) * 100 * 10) / 10
           : 0;
     }
 
@@ -255,13 +270,12 @@ export function extractOptimisticTieredMetrics(
 
   let weightedAgainstPercentage: number;
 
-  if (isHybrid && "quorum" in proposal && proposal.quorum) {
+  if (isHybrid && proposal.total_voting_power_at_start) {
     // For hybrid proposals, also account for onchain delegates
     const onchainAgainst = hasDaoNodeTotals(proposal)
-      ? Number((proposal.totals as DaoNodeVoteTotals)["no-param"]?.["0"] ?? 0)
-      : 0;
-    const eligibleDelegates = Number(proposal.quorum) * (100 / 30);
-
+      ? BigInt((proposal.totals as DaoNodeVoteTotals)["no-param"]?.["0"] ?? 0)
+      : BigInt(0);
+    const eligibleDelegates = BigInt(proposal.total_voting_power_at_start);
     weightedAgainstPercentage = calcHybridPercentage(
       onchainAgainst,
       eligibleDelegates,

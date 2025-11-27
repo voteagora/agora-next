@@ -771,9 +771,9 @@ function processDaoNodeApprovalTotals(
   totals: DaoNodeVoteTotals | undefined,
   options: string[]
 ): ApprovalOptionResult[] {
-  return options.map((option, idx) => ({
+  return options.map((option) => ({
     option,
-    votes: BigInt(totals?.[idx.toString()]?.["1"] ?? 0),
+    votes: BigInt(totals?.[option as keyof DaoNodeVoteTotals]?.["1"] ?? 0),
   }));
 }
 
@@ -969,7 +969,7 @@ export function parseArchiveProposalResults(
       const delegatesOptions: Record<string, bigint> = {};
       choices.forEach((choice, idx) => {
         delegatesOptions[choice] = BigInt(
-          proposal.totals?.[idx.toString()]?.["1"] ?? 0
+          proposal.totals?.[choice as keyof DaoNodeVoteTotals]?.["1"] ?? 0
         );
       });
 

@@ -192,13 +192,12 @@ export function extractHybridVotes(
   const offchainOutcome = (govlessProposal?.outcome ??
     {}) as EasAtlasVoteOutcome;
 
-  // Get eligible delegates for percentage calculation
-  const rawEligible = Number(
-    ("total_voting_power_at_start" in proposal &&
-      proposal.total_voting_power_at_start) ||
-      0
-  );
-  const eligibleDelegates = rawEligible > 0 ? rawEligible : 1;
+  // Get eligible delegates for percentage calculation (converted to same units as votes)
+  const eligibleDelegates =
+    "total_voting_power_at_start" in proposal &&
+    proposal.total_voting_power_at_start
+      ? convertToNumber(String(proposal.total_voting_power_at_start), decimals)
+      : 1;
 
   return {
     forRaw,
