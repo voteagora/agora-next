@@ -3,6 +3,8 @@
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import { jwtVerify } from "jose";
+import Tenant from "@/lib/tenant/tenant";
+import { PLMConfig } from "@/app/proposals/draft/types";
 
 export type SiweAuthParams = {
   address: `0x${string}`;
@@ -17,6 +19,27 @@ export async function verifySiwe({
 }: SiweAuthParams) {
   const isValid = await verifyMessage({ address, message, signature });
   return isValid;
+}
+
+function isAddressAuthorizedForDraft(
+  address: string,
+  draftAuthorAddress: string
+): boolean {
+  const addressLower = address.toLowerCase();
+  const authorLower = draftAuthorAddress.toLowerCase();
+
+  if (addressLower === authorLower) {
+    return true;
+  }
+
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+  const offchainCreators =
+    (plmToggle?.config as PLMConfig)?.offchainProposalCreator || [];
+
+  return offchainCreators.some(
+    (creator) => creator.toLowerCase() === addressLower
+  );
 }
 
 export async function verifyOwnerAndSiweForDraft(
@@ -37,8 +60,8 @@ export async function verifyOwnerAndSiweForDraft(
     return { ok: false as const, reason: "Draft not found" };
   }
 
-  if (draft.author_address.toLowerCase() !== address.toLowerCase()) {
-    return { ok: false as const, reason: "Unauthorized: not owner" };
+  if (!isAddressAuthorizedForDraft(address, draft.author_address)) {
+    return { ok: false as const, reason: "Unauthorized" };
   }
 
   return { ok: true as const };
@@ -75,8 +98,8 @@ export async function verifyOwnerAndJwtForDraft(
     select: { id: true, author_address: true },
   });
   if (!draft) return { ok: false as const, reason: "Draft not found" };
-  if (draft.author_address.toLowerCase() !== address.toLowerCase()) {
-    return { ok: false as const, reason: "Unauthorized: not owner" };
+  if (!isAddressAuthorizedForDraft(address, draft.author_address)) {
+    return { ok: false as const, reason: "Unauthorized" };
   }
   return { ok: true as const };
 }
