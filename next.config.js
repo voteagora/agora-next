@@ -9,6 +9,16 @@ const nextConfig = withBundleAnalyzer({
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
   },
+  typescript: {
+    // Type checking is handled and flagged by CI (GitHub Actions).
+    // Skipping here to reduce Vercel build time and memory usage.
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // Linting is handled and flagged by CI (GitHub Actions).
+    // Skipping here to reduce Vercel build time and memory usage.
+    ignoreDuringBuilds: true,
+  },
   async redirects() {
     return [];
   },

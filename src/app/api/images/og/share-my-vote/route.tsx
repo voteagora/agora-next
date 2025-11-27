@@ -655,7 +655,7 @@ const SuccessMessageCard = ({
 };
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
+  const { searchParams, origin } = req.nextUrl;
   const namespace = searchParams.get("namespace") as TenantNamespace;
   const forPercentage = Number(searchParams.get("forPercentage"));
   const againstPercentage = Number(searchParams.get("againstPercentage"));
@@ -670,20 +670,20 @@ export async function GET(req: NextRequest) {
     | "AGAINST"
     | "ABSTAIN";
 
-  const bgData = await fetch(
-    new URL("../assets/grid-share.png", import.meta.url)
-  ).then((res) => res.arrayBuffer());
+  const bgData = await fetch(new URL(`${origin}/images/grid-share.png`)).then(
+    (res) => res.arrayBuffer()
+  );
 
   const interBoldFont = await fetch(
-    new URL("../assets/Inter-Bold.ttf", import.meta.url)
+    new URL(`${origin}/fonts/Inter/Inter-Bold.ttf`)
   ).then((res) => res.arrayBuffer());
 
   const interRegularFont = await fetch(
-    new URL("../assets/Inter-Regular.ttf", import.meta.url)
+    new URL(`${origin}/fonts/Inter/Inter-Regular.ttf`)
   ).then((res) => res.arrayBuffer());
 
   const interSemiBoldFont = await fetch(
-    new URL("../assets/Inter-SemiBold.ttf", import.meta.url)
+    new URL(`${origin}/fonts/Inter/Inter-SemiBold.ttf`)
   ).then((res) => res.arrayBuffer());
 
   const bgBase64 = `data:image/png;base64,${Buffer.from(bgData).toString("base64")}`;
