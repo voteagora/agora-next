@@ -33,9 +33,9 @@ const stripMarkdownAndHtml = (content: string): string => {
     .trim();
 };
 
-export const getForumIndexName = (daoSlug: string) => {
+export const getForumIndexName = (daoSlug: string, isProd = false) => {
   const baseName = `forum_${daoSlug}`;
-  return baseName;
+  return isProd ? `${baseName}_prod` : baseName;
 };
 
 export interface ForumDocument {
@@ -81,15 +81,15 @@ export interface SearchResult<T> {
 }
 
 export class ForumSearchService {
-  private getIndex(daoSlug: string): Index {
+  private getIndex(daoSlug: string, isProd = false): Index {
     const client = getClient();
-    return client.index(getForumIndexName(daoSlug));
+    return client.index(getForumIndexName(daoSlug, isProd));
   }
 
-  async initializeIndex(daoSlug: string): Promise<void> {
+  async initializeIndex(daoSlug: string, isProd = false): Promise<void> {
     try {
       const client = getClient();
-      const indexName = getForumIndexName(daoSlug);
+      const indexName = getForumIndexName(daoSlug, isProd);
 
       try {
         const { taskUid } = await client.createIndex(indexName, {
@@ -106,7 +106,7 @@ export class ForumSearchService {
         }
       }
 
-      const index = this.getIndex(daoSlug);
+      const index = this.getIndex(daoSlug, isProd);
 
       const settingsTask = await index.updateSettings({
         searchableAttributes: [
@@ -143,14 +143,14 @@ export class ForumSearchService {
     }
   }
 
-  async indexDocument(document: ForumDocument): Promise<void> {
+  async indexDocument(document: ForumDocument, isProd = false): Promise<void> {
     try {
       const sanitizedDocument = {
         ...document,
         content: stripMarkdownAndHtml(document.content),
         title: stripMarkdownAndHtml(document.title),
       };
-      const index = this.getIndex(document.daoSlug);
+      const index = this.getIndex(document.daoSlug, isProd);
       const task = await index.addDocuments([sanitizedDocument]);
     } catch (error) {
       console.error(`Error indexing ${document.contentType}:`, error);
@@ -158,40 +158,17 @@ export class ForumSearchService {
     }
   }
 
-  async replaceDocuments(
-    daoSlug: string,
-    documents: ForumDocument[]
-  ): Promise<void> {
-    try {
-      const index = this.getIndex(daoSlug);
-      const deleteTask = await index.deleteAllDocuments();
-
-      if (!documents.length) {
-        return;
-      }
-
-      const sanitizedDocuments = documents.map((doc) => ({
-        ...doc,
-        content: stripMarkdownAndHtml(doc.content),
-        title: stripMarkdownAndHtml(doc.title),
-      }));
-
-      const addTask = await index.addDocuments(sanitizedDocuments);
-    } catch (error) {
-      console.error(`Error replacing documents for ${daoSlug}:`, error);
-      throw error;
-    }
-  }
-
   async deleteDocument({
     id,
     daoSlug,
+    isProd = false,
   }: {
     id: string;
     daoSlug: string;
+    isProd?: boolean;
   }): Promise<void> {
     try {
-      const index = this.getIndex(daoSlug);
+      const index = this.getIndex(daoSlug, isProd);
       const task = await index.deleteDocument(id);
     } catch (error) {
       console.error(`Error deleting document ${id}:`, error);
