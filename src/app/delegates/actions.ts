@@ -29,6 +29,7 @@ import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { fetchVotesCountForDelegate } from "@/app/api/common/votes/getVotes";
 import { prismaWeb3Client } from "@/app/lib/prisma";
+import { fetchBadgesForDelegate as apiFetchBadgesForDelegate } from "@/app/api/common/badges/getBadges";
 
 export const fetchDelegate = async (address: string) => {
   try {
@@ -199,6 +200,17 @@ export async function updateNotificationPreferencesForAddress(
 export const fetchDelegateStats = async (address: string) => {
   return getDelegateDataFromDaoNode(address);
 };
+
+export const fetchBadgesForDelegate = unstable_cache(
+  async (address: string) => {
+    return apiFetchBadgesForDelegate(address);
+  },
+  ["delegateBadges"],
+  {
+    revalidate: 300,
+    tags: ["delegateBadges"],
+  }
+);
 
 // Archive-based participation rate for tenants using archive-backed proposals
 export const fetchArchiveParticipation = async (address: string) => {

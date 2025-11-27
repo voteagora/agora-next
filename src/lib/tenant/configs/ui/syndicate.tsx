@@ -408,6 +408,10 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "show-delegate-badges",
+      enabled: true,
+    },
+    {
       name: "easv2-govlessvoting",
       enabled: true,
     },
