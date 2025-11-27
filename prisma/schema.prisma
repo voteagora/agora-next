@@ -4,10 +4,32 @@ generator client {
   binaryTargets   = ["native", "debian-openssl-3.0.x"]
 }
 
-datasource db {
+datasource web2dev {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("READ_WRITE_WEB2_DATABASE_URL_DEV")
   schemas  = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "syndicate", "uniswap", "xai", "b3", "demo", "linea"]
+  connection_limit = 1
+}
+
+datasource web2prod {
+  provider = "postgresql"
+  url      = env("READ_WRITE_WEB2_DATABASE_URL_PROD")
+  schemas  = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "syndicate", "uniswap", "xai", "b3", "demo", "linea"]
+  connection_limit = 1
+}
+
+datasource web3dev {
+  provider = "postgresql"
+  url      = env("READ_ONLY_WEB3_DATABASE_URL_DEV")
+  schemas  = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "syndicate", "uniswap", "xai", "b3", "demo", "linea"]
+  connection_limit = 1
+}
+
+datasource web3prod {
+  provider = "postgresql"
+  url      = env("READ_ONLY_WEB3_DATABASE_URL_PROD")
+  schemas  = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "syndicate", "uniswap", "xai", "b3", "demo", "linea"]
+  connection_limit = 1
 }
 
 enum stage_status {
