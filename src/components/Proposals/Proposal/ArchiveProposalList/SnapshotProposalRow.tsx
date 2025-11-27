@@ -73,13 +73,6 @@ function getSnapshotLink(proposal: SnapshotProposal): string {
 function isExternalLink(proposal: SnapshotProposal): boolean {
   // If we have a link field, it's external
   const isExternal = proposal.link && proposal.type !== "copeland";
-  console.log(
-    "isExternalLink:",
-    proposal.id,
-    isExternal,
-    proposal.link,
-    proposal.type
-  );
   if (isExternal) {
     return true;
   }

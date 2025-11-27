@@ -65,7 +65,7 @@ export async function getSnapshotVotesChart({
       created,
       vp
     FROM "snapshot".votes
-    WHERE proposal_id = $1 AND dao_slug = '${slug}'
+    WHERE proposal_id = $1 AND dao_slug = $2
     ORDER BY created ASC;
   `;
 

@@ -148,10 +148,11 @@ export default async function Page({
           <Suspense fallback={<DelegationsContainerSkeleton />}>
             <DelegationsContainerWrapper delegate={parsedDelegate} />
           </Suspense>
-
-          <Suspense fallback={<DiscussionsContainerSkeleton />}>
-            <DiscussionsContainerWrapper delegate={parsedDelegate} />
-          </Suspense>
+          {ui.toggle("forums")?.enabled && (
+            <Suspense fallback={<DiscussionsContainerSkeleton />}>
+              <DiscussionsContainerWrapper delegate={parsedDelegate} />
+            </Suspense>
+          )}
         </div>
       ) : (
         <DelegateStatementWrapper delegate={parsedDelegate} />

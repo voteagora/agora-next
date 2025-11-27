@@ -326,6 +326,10 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "has-eas-oodao",
+      enabled: true,
+    },
+    {
       name: "coming-soon",
       enabled: false,
     },

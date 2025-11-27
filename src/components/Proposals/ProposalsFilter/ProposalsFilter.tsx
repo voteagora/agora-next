@@ -12,10 +12,7 @@ export default function ProposalsFilter() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { ui } = Tenant.current();
-  const hasToggle = typeof (ui as any)?.toggle === "function";
-  const useArchiveForProposals = hasToggle
-    ? ui.toggle("use-archive-for-proposals")?.enabled === true
-    : false;
+  const tenantHaseasOO = ui.toggle("has-eas-oodao")?.enabled === true;
 
   const options = useMemo(() => {
     const base = [
@@ -23,12 +20,12 @@ export default function ProposalsFilter() {
       proposalsFilterOptions.everything,
     ];
 
-    if (useArchiveForProposals) {
+    if (tenantHaseasOO) {
       base.push(proposalsFilterOptions.tempChecks);
     }
 
     return base;
-  }, [useArchiveForProposals]);
+  }, [tenantHaseasOO]);
 
   const filterParam = searchParams?.get("filter");
   const selected = useMemo(() => {
