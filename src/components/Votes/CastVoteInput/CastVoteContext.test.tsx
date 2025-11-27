@@ -15,13 +15,6 @@ vi.mock("next/font/google", async () => {
   };
 });
 
-vi.mock("next/font/local", async () => {
-  const fonts = await import("@/__mocks__/fonts");
-  return {
-    default: fonts.default,
-  };
-});
-
 vi.mock("server-only", () => ({
   default: {},
 }));
