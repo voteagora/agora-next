@@ -1,22 +1,46 @@
-import { NextFont, NextFontWithVariable } from "next/dist/compiled/@next/font";
+import { NextFontWithVariable } from "next/dist/compiled/@next/font";
 import { Inter } from "next/font/google";
-import { Rajdhani } from "next/font/google";
-import { Chivo_Mono } from "next/font/google";
+import localFont from "next/font/local";
 
 export const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
 });
 
-export const rajdhani = Rajdhani({
+export const rajdhani = localFont({
+  src: [
+    {
+      path: "../../public/fonts/Rajdhani/Rajdhani-Light.ttf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Rajdhani/Rajdhani-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Rajdhani/Rajdhani-Medium.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Rajdhani/Rajdhani-SemiBold.ttf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Rajdhani/Rajdhani-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
   variable: "--font-rajdhani",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
 });
 
-export const chivoMono = Chivo_Mono({
+export const chivoMono = localFont({
+  src: "../../public/fonts/ChivoMono/ChivoMono-Variable.woff2",
   variable: "--font-chivo-mono",
-  subsets: ["latin"],
 });
 
 export const fontMapper = {
