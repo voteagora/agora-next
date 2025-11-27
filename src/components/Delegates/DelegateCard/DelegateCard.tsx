@@ -13,6 +13,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { IdentityBadge } from "@/app/api/common/badges/getBadges";
+import { DelegateBadges } from "./DelegateBadges";
 
 export default function DelegateCard({
   delegate,
@@ -21,6 +23,7 @@ export default function DelegateCard({
   followersCount,
   followingCount,
   isEditMode,
+  badges,
 }: {
   delegate: Delegate;
   description?: string;
@@ -28,6 +31,7 @@ export default function DelegateCard({
   followersCount?: string;
   followingCount?: string;
   isEditMode?: boolean;
+  badges?: IdentityBadge[] | null;
 }) {
   // Display SCW if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
@@ -42,7 +46,7 @@ export default function DelegateCard({
       <div
         className={`flex flex-col ${useNeutral ? "bg-neutral" : "bg-wash"} border border-line shadow-newDefault rounded-xl`}
       >
-        <div className="flex flex-col items-stretch p-7">
+        <div className="flex flex-col items-stretch p-7 gap-4">
           <DelegateProfileImageWithMetadata
             endorsed={delegate.statement?.endorsed}
             address={delegate.address}
@@ -54,6 +58,9 @@ export default function DelegateCard({
             followingCount={followingCount}
             scwAddress={delegate.statement?.scw_address}
           />
+        </div>
+        <div className="overflow-visible -mt-2 mb-4">
+          <DelegateBadges badges={badges ?? []} />
         </div>
         {!isEditMode && (
           <div className="flex flex-col p-7 border-t border-line">
