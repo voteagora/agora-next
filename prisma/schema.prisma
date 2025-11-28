@@ -7,7 +7,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "syndicate", "uniswap", "xai", "b3", "demo", "linea", "towns"]
+  schemas = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "syndicate", "uniswap", "xai", "b3", "demo", "linea", "towns", "demo2"]
 }
 
 enum stage_status {
@@ -5207,6 +5207,7 @@ enum DaoSlug {
   TOWNS
   SYNDICATE
   @@map("dao_slug")
+  DEMO2
   @@schema("config")
 }
 

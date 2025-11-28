@@ -1,5 +1,5 @@
 import { type TenantNamespace, type TenantToken } from "@/lib/types";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import { TENANT_NAMESPACES, ZERO_ADDRESS } from "@/lib/constants";
 
 const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
 
@@ -135,6 +135,15 @@ export default class TenantTokenFactory {
           symbol: "SYNDICATE",
           decimals: 18,
           address: "0x0000000000000000000000000000000000000000",
+        };
+      case TENANT_NAMESPACES.DEMO2:
+        return {
+          name: "Demo Governance Token",
+          symbol: "DEMO",
+          decimals: 18,
+          address: isProd
+            ? ZERO_ADDRESS
+            : "0xf727988dbbeed852760a3876414b8d29f47998d3",
         };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
