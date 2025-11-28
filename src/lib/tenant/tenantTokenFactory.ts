@@ -145,14 +145,23 @@ export default class TenantTokenFactory {
             ? ZERO_ADDRESS
             : "0xf727988dbbeed852760a3876414b8d29f47998d3",
         };
-            case TENANT_NAMESPACES.DEMO4:
+      case TENANT_NAMESPACES.DEMO4:
         return {
           name: "Demo Governance Token",
           symbol: "DEMO4",
           decimals: 18,
           address: isProd
-            ? "None"
+            ? ZERO_ADDRESS
             : "0x54e196a89b17fa042bf7ec8b53dac922f5f714e9",
+        };
+      case TENANT_NAMESPACES.DEMO3:
+        return {
+          name: "Demo Governance Token",
+          symbol: "DEMO3",
+          decimals: 18,
+          address: isProd
+            ? ZERO_ADDRESS
+            : "0xf1f9686d8144c7c5f16feffc8fdf93ec64058dec",
         };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
