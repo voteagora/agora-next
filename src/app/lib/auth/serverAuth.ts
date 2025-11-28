@@ -17,6 +17,7 @@ import { AuthInfo } from "@/app/lib/auth/types";
 import { ensNameToAddress } from "../ENSUtils";
 import { SiweMessage } from "siwe";
 import { fetchProjectApi } from "@/app/api/common/projects/getProjects";
+import { prismaWeb2Client } from "@/app/lib/web2";
 
 const HASH_FN = "sha256";
 const DEFAULT_JWT_TTL = 60 * 60 * 24; // 24 hours
@@ -32,8 +33,7 @@ type SiweData = {
 export async function authenticateApiUser(
   request: NextRequest
 ): Promise<AuthInfo> {
-  const prismaModule = require("@/app/lib/prisma");
-  const prisma = prismaModule.prismaWeb2Client as PrismaClient;
+
   let authResponse: AuthInfo = await validateBearerToken(request);
 
   if (!authResponse.authenticated) {
@@ -49,7 +49,7 @@ export async function authenticateApiUser(
 
   // TODO: caching logic, rate limiting
   // lookup hashed API key if authResponse is an API key
-  const user = await prisma.api_user.findFirst({
+  const user = await prismaWeb2Client.api_user.findFirst({
     where: {
       api_key: hashApiKey(key),
     },
