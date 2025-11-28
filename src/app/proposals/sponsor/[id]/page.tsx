@@ -1,30 +1,11 @@
-import { prismaWeb2Client } from "@/app/lib/web2";
-import SponsorForm from "../components/SponsorForm";
 import Image from "next/image";
 import { icons } from "@/icons/icons";
+import SponsorForm from "../components/SponsorForm";
 import SponsorAuthCheck from "../components/SponsorAuthCheck";
 import ENSName from "@/components/shared/ENSName";
 import { isPostSubmission } from "../../draft/utils/stages";
 import ArchivedDraftProposal from "../../draft/components/ArchivedDraftProposal";
-import { DraftProposal } from "../../../proposals/draft/types";
-
-const getDraftProposalByUuid = async (uuid: string) => {
-  const draftProposal = await prismaWeb2Client.proposalDraft.findUnique({
-    where: { uuid: String(uuid) },
-    include: {
-      transactions: true,
-      social_options: true,
-      checklist_items: true,
-      approval_options: {
-        include: {
-          transactions: true,
-        },
-      },
-    },
-  });
-
-  return draftProposal as DraftProposal;
-};
+import { getDraftProposalByUuid } from "@/app/api/common/draftProposals/getDraftProposals";
 
 const ProposalSponsorPage = async ({ params }: { params: { id: string } }) => {
   const draftProposal = await getDraftProposalByUuid(params.id);

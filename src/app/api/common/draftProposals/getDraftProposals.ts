@@ -24,3 +24,14 @@ const getDraftProposalByUuidInternal = async (uuid: string) => {
 export const getDraftProposalByUuid = async (uuid: string) =>
   getDraftProposalByUuidInternal(uuid);
 export const fetchDraftProposalByUuid = cache(getDraftProposalByUuidInternal);
+
+const getDraftProposalByIdInternal = async (id: number) => {
+  const draftProposal = await prismaWeb2Client.proposalDraft.findUnique({
+    where: { id },
+  });
+  return draftProposal;
+};
+
+export const getDraftProposalById = async (id: number) =>
+  getDraftProposalByIdInternal(id);
+export const fetchDraftProposalById = cache(getDraftProposalByIdInternal);

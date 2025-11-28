@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { LogoPill } from "@/app/api/images/og/assets/shared";
 import { loadFont, loadImage } from "@/app/lib/utils/og";
 import { TenantNamespace } from "@/lib/types";
-import { prismaWeb2Client } from "@/app/lib/web2";
+import { getDraftProposalById } from "@/app/api/common/draftProposals/getDraftProposals";
 
 export const size = {
   width: 1200,
@@ -10,21 +10,10 @@ export const size = {
 };
 export const contentType = "image/png";
 
-const getDraftProposal = async (id: number) => {
-
-  const draftProposal = await prismaWeb2Client.proposalDraft.findUnique({
-    where: {
-      id: id,
-    },
-  });
-
-  return draftProposal;
-};
-
 export default async function OGImage({ params }: { params: { id: string } }) {
   const id = params.id;
 
-  const draftProposal = await getDraftProposal(parseInt(id));
+  const draftProposal = await getDraftProposalById(parseInt(id));
   const title = draftProposal?.title || "Agora Proposal";
 
   const interBoldFont = await loadFont("Inter/Inter-Black.ttf");
