@@ -58,6 +58,7 @@ export const TENANT_NAMESPACES = {
   TOWNS: "towns",
   SYNDICATE: "syndicate",
   DEMO2: "demo2",
+  DEMO4: "demo4",
 } as const;
 
 // SIWE localStorage keys

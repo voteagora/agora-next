@@ -37,6 +37,8 @@ export default class TenantSlugFactory {
         return "SYNDICATE" as any;
             case TENANT_NAMESPACES.DEMO2:
         return "DEMO2" as any;
+            case TENANT_NAMESPACES.DEMO4:
+        return "DEMO4" as any;
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

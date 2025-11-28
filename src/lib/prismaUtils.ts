@@ -49,6 +49,9 @@ export function findDelagatee({
       return prismaWeb3Client.townsDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateDelegatees.findFirst(condition);
+
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4Delegatees.findFirst(condition);
     case TENANT_NAMESPACES.DEMO2:
       return prismaWeb3Client.demo2Delegatees.findFirst(condition);
     default:
@@ -104,6 +107,9 @@ export function findAdvancedDelegatee({
       return prismaWeb3Client.townsAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateAdvancedDelegatees.findMany(condition);
+
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4AdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.DEMO2:
       return prismaWeb3Client.demo2AdvancedDelegatees.findMany(condition);
     default:
@@ -156,6 +162,9 @@ export function findVotableSupply({
       return prismaWeb3Client.townsVotableSupply.findFirst({});
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateVotableSupply.findFirst({});
+
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4VotableSupply.findFirst({});
     case TENANT_NAMESPACES.DEMO2:
       return prismaWeb3Client.demo2VotableSupply.findFirst({});
     default:
@@ -314,6 +323,9 @@ export function findProposalsQueryFromDB({
       return prismaWeb3Client.townsProposals.findMany(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposals.findMany(condition);
+
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4Proposals.findMany(condition);
     case TENANT_NAMESPACES.DEMO2:
       return prismaWeb3Client.demo2Proposals.findMany(condition);
     default:
@@ -419,6 +431,9 @@ export function findProposalsByIds({
       return prismaWeb3Client.townsProposals.findMany(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposals.findMany(condition);
+
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4Proposals.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -582,6 +597,9 @@ export function findProposalType({
       return prismaWeb3Client.townsProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposalTypes.findMany(condition);
+
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4ProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.DEMO2:
       return prismaWeb3Client.demo2ProposalTypes.findMany(condition);
     default:
@@ -633,6 +651,9 @@ export function findVotes({
       return prismaWeb3Client.townsVotes.findMany(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateVotes.findMany(condition);
+
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4Votes.findMany(condition);
     case TENANT_NAMESPACES.DEMO2:
       return prismaWeb3Client.demo2Votes.findMany(condition);
     default:
@@ -737,6 +758,9 @@ export function findAdvancedVotingPower({
       return prismaWeb3Client.townsAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateAdvancedVotingPower.findFirst(condition);
+
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4AdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.DEMO2:
       return prismaWeb3Client.demo2AdvancedVotingPower.findFirst(condition);
     default:
@@ -847,6 +871,9 @@ export function findStakedDeposits({
       return prismaWeb3Client.townsStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateStakedDeposits.findMany(condition);
+
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4StakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.DEMO2:
       return prismaWeb3Client.demo2StakedDeposits.findMany(condition);
     default:
