@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const { default: Tenant } = await import("@/lib/tenant/tenant");
-  const { prismaWeb2Client } = await import("@/app/lib/prisma");
+  const { prismaWeb2Client } = await import("@/app/lib/web2");
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
 
   const { slug } = Tenant.current();
