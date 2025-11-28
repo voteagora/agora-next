@@ -25,7 +25,7 @@ export const demo2TenantConfig = ({
 
   const DAO_ID = isProd
     ? ZERO_ADDRESS
-    : "0x64656d6f322e0000000000000000000b00aa36a7";
+    : "0x64656d6f322e2e2e2e2e00aa36a70000007f6937";
 
   const DUMMY_TIMELOCK = "0x0000000000000000000000000000000000000003";
   const DUMMY_TYPES = ZERO_ADDRESS;
@@ -78,6 +78,6 @@ export const demo2TenantConfig = ({
     treasury: [],
     easRecipient: isProd
       ? ZERO_ADDRESS
-      : "0x64656d6f322e0000000000000000000b00aa36a7",
+      : "0x64656d6f322e2e2e2e2e00aa36a70000007f6937",
   };
 };
