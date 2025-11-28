@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const { namespace } = Tenant.current();
     const { searchParams } = new URL(request.url);
     const daoId = searchParams.get("daoId");
-
+    const { namespace } = Tenant.current();
     if (!daoId) {
       return NextResponse.json({ error: "daoId is required" }, { status: 400 });
     }
