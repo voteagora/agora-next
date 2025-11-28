@@ -8,25 +8,17 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { fetchVotableSupplyUnstableCache } from "@/app/api/common/votableSupply/getVotableSupply";
 import { Vote } from "@/app/api/common/votes/vote";
 import { cleanString, truncateString } from "@/app/lib/utils/text";
-import CopelandProposalPage from "@/components/Proposals/ProposalPage/CopelandProposalPage/CopelandProposalPage";
-import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";
-import OPProposalOptimisticPage from "@/components/Proposals/ProposalPage/OPProposalPage/OPProposalOptimisticPage";
-import StandardProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/StandardProposalPage";
-import ArchiveStandardProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/ArchiveStandardProposalPage";
+import {
+  getProposalPageComponent,
+  requiresSpecialHandling,
+} from "@/components/Proposals/ProposalPage/registry";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { calculateVoteMetadata } from "@/lib/voteUtils";
 import { format } from "date-fns";
-import React from "react";
-import HybridStandardProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/HybridStandardProposalPage";
-import HybridApprovalProposalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/HybridApprovalProposalPage";
-import HybridOptimisticProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/HybridOptimisticProposalPage";
 import { redirect } from "next/navigation";
 import { fetchProposalFromArchive } from "@/lib/archiveUtils";
-import {
-  isArchiveStandardProposal,
-  normalizeArchiveStandardProposal,
-} from "@/components/Proposals/Proposal/Archive/normalizeArchiveProposalDetail";
+import { archiveToProposal } from "@/lib/proposals";
 
 export const maxDuration = 60;
 
@@ -38,21 +30,16 @@ async function loadProposal(
   const useArchive = ui.toggle("use-archive-for-proposal-details")?.enabled;
 
   if (useArchive) {
-    const archiveResults = await fetchProposalFromArchive(
+    const archiveProposal = await fetchProposalFromArchive(
       namespace,
       proposalId
     );
 
-    const archiveProposal = archiveResults ? archiveResults : undefined;
-    if (archiveProposal && isArchiveStandardProposal(archiveProposal)) {
-      const normalizedProposal = normalizeArchiveStandardProposal(
-        archiveProposal,
-        {
-          namespace,
-          tokenDecimals: token.decimals ?? 18,
-        }
-      );
-      return normalizedProposal;
+    if (archiveProposal) {
+      return archiveToProposal(archiveProposal, {
+        namespace,
+        tokenDecimals: token.decimals ?? 18,
+      });
     }
 
     throw new Error("Proposal not found in archive");
@@ -215,52 +202,19 @@ export default async function Page({
     "use-archive-for-proposal-details"
   )?.enabled;
 
-  let RenderComponent;
-  switch (loadedProposal.proposalType) {
-    case "STANDARD":
-      if (useArchiveForProposals) {
-        RenderComponent = ArchiveStandardProposalPage;
-      } else {
-        RenderComponent = StandardProposalPage;
-      }
-      break;
-
-    case "OFFCHAIN_STANDARD":
-    case "HYBRID_STANDARD":
-      RenderComponent = HybridStandardProposalPage;
-      break;
-
-    case "OPTIMISTIC":
-      RenderComponent = OPProposalOptimisticPage;
-      break;
-    case "OFFCHAIN_OPTIMISTIC":
-    case "OFFCHAIN_OPTIMISTIC_TIERED":
-    case "HYBRID_OPTIMISTIC_TIERED":
-      RenderComponent = HybridOptimisticProposalPage;
-      break;
-    case "APPROVAL":
-      RenderComponent = OPProposalApprovalPage;
-      break;
-    case "HYBRID_APPROVAL":
-      RenderComponent = HybridApprovalProposalPage;
-      break;
-    case "SNAPSHOT":
-      if (
-        (loadedProposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
-          ?.type === "copeland"
-      ) {
-        RenderComponent = CopelandProposalPage;
-      }
-      break;
-    default:
-      // Default to standard proposal page
-      RenderComponent = StandardProposalPage;
-  }
+  // Check for special handling (e.g., Copeland)
+  const specialComponent = requiresSpecialHandling(loadedProposal);
+  const RenderComponent =
+    specialComponent ||
+    getProposalPageComponent(
+      loadedProposal.proposalType ?? "STANDARD",
+      useArchiveForProposals
+    );
 
   return (
     <div className="flex justify-between mt-12">
       <div>
-        {RenderComponent && <RenderComponent proposal={loadedProposal} />}
+        <RenderComponent proposal={loadedProposal} />
       </div>
     </div>
   );

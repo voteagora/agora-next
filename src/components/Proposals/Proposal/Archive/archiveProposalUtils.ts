@@ -2,6 +2,7 @@ import { formatUnits } from "ethers";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import {
   ArchiveListProposal,
+  deriveProposalType,
   EasOodaoVoteOutcome,
 } from "@/lib/types/archiveProposal";
 
@@ -168,6 +169,26 @@ export const deriveStatus = (
   if (endTime > now) {
     return "ACTIVE";
   }
+  const baseType = deriveProposalType(proposal);
+
+  // For OPTIMISTIC and OPTIMISTIC_TIERED proposals, they succeed unless vetoed
+  if (baseType.includes("OPTIMISTIC")) {
+    // Check if lifecycle_stage explicitly says DEFEATED
+    if (proposal.lifecycle_stage === "DEFEATED") {
+      return "DEFEATED";
+    }
+    // Otherwise, optimistic proposals succeed (they pass unless vetoed)
+    return "SUCCEEDED";
+  }
+
+  // For APPROVAL proposals, check if they succeeded
+  if (baseType === "APPROVAL") {
+    // Check lifecycle_stage
+    if (proposal.lifecycle_stage === "DEFEATED") {
+      return "DEFEATED";
+    }
+    return "SUCCEEDED";
+  }
 
   // For STANDARD proposals, use vote-based logic
   // Handle different data sources: EAS-OODAO vs standard
@@ -211,7 +232,7 @@ export const deriveStatus = (
   if (proposal.total_voting_power_at_start) {
     // We have total voting power - calculate quorum percentage
     const totalPower = convertToNumber(
-      proposal.total_voting_power_at_start,
+      (BigInt(proposal.total_voting_power_at_start) / 3n).toString(),
       decimals
     );
     const quorumPercentage =
