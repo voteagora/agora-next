@@ -1,29 +1,18 @@
-import React from "react";
 import { TenantUI } from "@/lib/tenant/tenantUI";
-import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
-// Using demo assets as placeholder - replace with actual demo2 assets later
+import demoHero from "@/assets/tenant/demo_hero.png";
 import demoHeroV2 from "@/assets/tenant/demo_logo.svg";
 import demoDelegate from "@/assets/tenant/demo_delegate.svg";
-import syndicateHero from "@/assets/tenant/syndicate_hero.svg";
-import syndicateInfoCard1 from "@/assets/tenant/syndicate_info_1.svg";
-import syndicateInfoCard2 from "@/assets/tenant/syndicate_info_2.svg";
-import syndicateInfoCard3 from "@/assets/tenant/syndicate_info_3.svg";
-import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
+import demoDocs from "@/assets/tenant/demo_docs.png";
+import demoVision from "@/assets/tenant/demo_vision.png";
+import demoForum from "@/assets/tenant/demo_forum.png";
+import demoDiscord from "@/assets/tenant/demo_discord.png";
+import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import DelegatingSectionContent from "@/app/info/components/DelegatingSectionContent";
 
 export const demo2TenantUIConfig = new TenantUI({
-  title: "Demo OODAO Agora",
+  title: "Canopy Agora",
   logo: demoHeroV2,
-  tokens: [
-    {
-      address: "None",
-      symbol: "DEMO",
-      decimals: 18,
-      name: "Demo Governance Token",
-      chainId: 1,
-    },
-  ],
 
   assets: {
     success: demoHeroV2,
@@ -32,162 +21,159 @@ export const demo2TenantUIConfig = new TenantUI({
   },
 
   organization: {
-    title: "Demo OODAO",
+    title: "Canopy Agora",
+  },
+
+  delegates: {
+    allowed: [],
+    advanced: [],
+    retired: [],
   },
 
   customization: {
-    primary: "0 0 0",
+    primary: "23 23 23",
     secondary: "64 64 64",
     tertiary: "115 115 115",
-    neutral: "255 255 255",
-    wash: "236 237 229",
-    line: "200 200 200",
-    positive: "97 209 97",
-    negative: "226 54 54",
-    brandPrimary: "0 0 0",
-    brandSecondary: "236 237 229",
+    neutral: "252 251 247",
+    wash: "255 255 255",
+    line: "223 223 223",
+    positive: "66 122 43",
+    negative: "182 13 13",
+    brandPrimary: "144 193 41",
+    brandSecondary: "242 242 242",
   },
 
   links: [
     {
-      name: "syndicatetwitter",
-      title: "Twitter",
-      url: "https://x.com/SyndicateProtocol",
+      name: "code-of-conduct",
+      title: "Code of Conduct",
+      url: "https://www.agora.xyz/deploy",
     },
     {
-      name: "syndicatefarcaster",
-      title: "Farcaster",
-      url: "https://farcaster.xyz/syndicate",
+      name: "changelog",
+      title: "Change log",
+      url: "/changelog",
+    },
+  ],
+
+  governanceIssues: [
+    {
+      icon: "piggyBank",
+      title: "Grants",
+      key: "grants",
+    },
+    {
+      icon: "ballot",
+      title: "Decentralization",
+      key: "decentralization",
+    },
+    {
+      icon: "globe",
+      title: "Ecosystem development",
+      key: "ecosystemDevelopment",
+    },
+    {
+      icon: "sparks",
+      title: "Public Goods",
+      key: "publicGoods",
+    },
+    {
+      icon: "community",
+      key: "daoWorkingGroups",
+      title: "DAO working groups",
     },
   ],
 
   pages: [
     {
       route: "/",
-      title: "Agora is the home of Syndicate governance",
+      title: "Welcome to TKN governance",
+      hero: demoHero,
       description:
-        "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate Network",
-      hero: syndicateHero,
+        "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
       meta: {
-        title: "Syndicate Network Collective Governance",
-        description:
-          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
-        imageTitle: "Syndicate Network Collective Governance",
-        imageDescription:
-          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        title: "Welcome to Canopy governance",
+        description: "Home of token governance",
+        imageTitle: "IN IMAGE",
+        imageDescription: "IN IMAGE DESCRIPTION",
       },
     },
     {
       route: "delegates",
-      title: "Agora is the home of Syndicate delegates",
+      title: "Welcome to TKN governance",
       description:
-        "Syndicate governance is a collective of companies, communities, and token holders working together to steward the future of the Syndicate Network",
-      hero: syndicateHero,
+        "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
+      hero: demoHero,
       meta: {
-        title: "Syndicate Network Collective Governance",
+        title: "Contribute to Canopy with your staked TKN",
         description:
-          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
-        imageTitle: "Syndicate Network Collective Governance",
-        imageDescription:
-          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+          "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
+        imageTitle: "Canopy Governance",
+        imageDescription: "Participate in Canopy Governance",
       },
     },
     {
       route: "proposals",
-      title: "Syndicate Network Collective is the home of SYND delegates",
+      title: "Welcome to TKN governance",
       description:
-        "SNC is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
-      hero: syndicateHero,
+        "L. Cassius ille, quem populus Romanus verissimum et sapientissimum iudicem putabat, identidem in causis quaerere solebat, cui bono fuisset",
+      hero: demoHero,
       meta: {
-        title: "Syndicate Network Collective Governance",
-        description:
-          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
-        imageTitle: "Syndicate Network Collective Governance",
-        imageDescription:
-          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        title: "Voter on Canopy",
+        description: "Delegate your voting power to a trusted representative",
+        imageTitle: "Canopy Governance",
+        imageDescription: "Participate in Canopy Governance",
       },
     },
     {
       route: "info",
-      title: "Welcome to Syndicate Network Collective",
+      title: "Welcome to the Community",
       description:
-        "The Syndicate Network Collective, a Wyoming DUNA. Member Dashboard for DUNA documents, onchain proposals, voting and governance.",
+        "Canopy is your home for onchain proposals, voting, and governance",
       meta: {
-        title: "Syndicate Network Collective Governance",
-        description:
-          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
-        imageTitle: "Syndicate Network Collective Governance",
-        imageDescription:
-          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        title: "Canopy Agora",
+        description: "Home of Canopy governance",
+        imageTitle: "Canopy Agora",
+        imageDescription: "Home of Canopy governance",
       },
       links: [
         {
-          name: "Syndicate Network",
-          title: "Syndicate Network",
-          url: "https://docs.syndicate.io/",
-          image: syndicateInfoCard1,
+          name: "Community Discord",
+          title: "Community Discord",
+          url: "https://www.agora.xyz/deploy",
+          image: demoDiscord,
         },
         {
-          name: "Grants Program",
-          title: "Grants Program",
-          url: "https://bronze-abundant-swift-398.mypinata.cloud/ipfs/QmSQn9P7LzGPa2RJsTDVMaKPw9UoqJTMRoxJTiABpi6YAR",
-          image: syndicateInfoCard2,
+          name: "Governance Forums",
+          title: "Governance Forums",
+          url: "https://www.agora.xyz/deploy",
+          image: demoForum,
         },
         {
-          name: "Governance",
-          title: "Governance",
-          url: "https://www.syndicatecollective.org/",
-          image: syndicateInfoCard3,
+          name: "Protocol Docs",
+          title: "Protocol Docs",
+          url: "https://www.agora.xyz/deploy",
+          image: demoDocs,
         },
         {
-          name: "Document Archive",
-          title: "Document Archive*",
-          url: "/document-archive",
-          image: syndicateInfoCard3,
+          name: "Protocol Vision",
+          title: "Protocol Vision",
+          url: "https://www.agora.xyz/deploy",
+          image: demoVision,
         },
       ],
     },
     {
       route: "info/about",
-      title: "Syndicate Network Collective Roadmap",
-      hero: syndicateHero,
+      title: "About Canopy",
+      hero: demoHero,
       description:
-        "This dashboard is the focal point for information related to the Syndicate Network Collective DUNA. As a taxpaying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe SYND governance token provides the members with ultimate control over how the Treasury should be utilized in support of the Syndicate Network.\n\nThe Syndicate Network Collective is established as an organizational framework for collective decision-making and innovation to pursue the common, nonprofit purpose of providing a foundation for community-aligned platforms to reshape how participation and contribution is valued on the internet.",
-      sectionTitle: "Syndicate Network Collective Roadmap",
-      tabs: [
-        {
-          icon: (
-            <CheckCircleBrokenIcon
-              className="w-[24px] h-[24px]"
-              stroke="#737373"
-            />
-          ),
-          title: "November 3, 2025",
-          description:
-            "Token governance is live, with a temp-check and tax reporting intake (via Cowrie – Administrator Services tooling) completed upon passage of the governance proposal.",
-        },
-      ],
+        "At vero eos et accusamus et iust odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
       meta: {
-        title: "Syndicate Network Collective Governance",
-        description:
-          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
-        imageTitle: "Syndicate Network Collective Governance",
-        imageDescription:
-          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
-      },
-    },
-    {
-      route: "coming-soon",
-      title: "Welcome to Syndicate governance",
-      description: `Syndicate governance goes live on November 3rd, 2025.
-`,
-      meta: {
-        title: "Syndicate Network Collective Governance",
-        description:
-          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
-        imageTitle: "Syndicate Network Collective Governance",
-        imageDescription:
-          "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        title: "Info about Canopy",
+        description: "Welcome to the Canopy Agora",
+        imageTitle: "",
+        imageDescription: "",
       },
     },
   ],
@@ -372,13 +358,6 @@ export const demo2TenantUIConfig = new TenantUI({
       enabled: false,
     },
     {
-      name: "voting-power-info-tooltip",
-      enabled: true,
-      config: {
-        text: "SYND voting power is only coming from Mainnet. In order to get voting power, you must bridge to Mainnet.",
-      },
-    },
-    {
       name: "syndicate-proposals-page-content",
       enabled: false,
     },
@@ -416,7 +395,7 @@ export const demo2TenantUIConfig = new TenantUI({
       name: "info/governance-sections",
       enabled: true,
       config: {
-        title: "Voting in the Syndicate Collective",
+        title: "Voting in the Canopy Agora",
         sections: [
           {
             id: "voting-process",
@@ -430,29 +409,29 @@ export const demo2TenantUIConfig = new TenantUI({
                     <li>
                       first be submitted as a <strong>Temp-Check</strong>, which
                       is a five-day period during which <strong>Members</strong>{" "}
-                      can utilize their SYND token to indicate support for a
+                      can utilize their TKN token to indicate support for a
                       proposal. In order for a proposal to transition from a{" "}
                       <strong>Temp-Check</strong> to a vote of the membership,
                       the <strong>Temp-Check</strong> must attain the support of
-                      5% of the SYND tokens in circulation, except as limited by
+                      5% of the TKN tokens in circulation, except as limited by
                       Article 13 of the Association Agreement.
                     </li>
                     <li>
                       upon a successful <strong>Temp-Check</strong>, the{" "}
                       <strong>Governance Proposal</strong> period is open for
                       seven days, during which time
-                      <strong> Members</strong> can utilize their SYND token to
+                      <strong> Members</strong> can utilize their TKN token to
                       affirm, deny, or participate without voting on the
                       proposal. A proposal:
                       <ul className="list-[square] list-outside space-y-1 ml-6 mt-2 text-sm leading-relaxed">
                         <li>
                           <strong>passes</strong> if the majority of votes
-                          affirm the proposal and 10% of the SYND tokens in
+                          affirm the proposal and 10% of the TKN tokens in
                           circulation participate in the vote; and
                         </li>
                         <li>
                           <strong>fails</strong> if the majority of votes deny
-                          the proposal or 10% of the SYND tokens in circulation
+                          the proposal or 10% of the TKN tokens in circulation
                           did not participate in the vote.
                         </li>
                       </ul>
@@ -489,7 +468,7 @@ export const demo2TenantUIConfig = new TenantUI({
                 <div className="flex flex-col space-y-3">
                   <div className="flex flex-col space-y-3">
                     <p>
-                      The SYND token uses OpenZeppelin&apos;s ERC20Votes. Your
+                      The TKN token uses OpenZeppelin&apos;s ERC20Votes. Your
                       tokens don&apos;t count as votes until you choose where
                       your voting power should live:
                     </p>
