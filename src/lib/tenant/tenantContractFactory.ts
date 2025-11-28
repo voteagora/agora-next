@@ -16,6 +16,7 @@ import { lineaTenantConfig } from "./configs/contracts/linea";
 import { townsTenantConfig } from "./configs/contracts/towns";
 import { syndicateTenantConfig } from "./configs/contracts/syndicate";
 import { demo2TenantConfig } from "./configs/contracts/demo2";
+import { demo4TenantConfig } from "./configs/contracts/demo4";
 
 export default class TenantContractFactory {
   public static create(
@@ -57,6 +58,9 @@ export default class TenantContractFactory {
 
             case TENANT_NAMESPACES.DEMO2:
         return demo2TenantConfig({ isProd, alchemyId });
+
+            case TENANT_NAMESPACES.DEMO4:
+        return demo4TenantConfig({ isProd, alchemyId });
 
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
