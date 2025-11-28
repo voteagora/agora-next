@@ -45,6 +45,7 @@
     "@opentelemetry/semantic-conventions": "^1.22.0",
     "@prisma/adapter-pg": "^5.22.0",
     "@prisma/client": "^5.22.0",
+    "@prisma/extension-accelerate": "^2.0.2",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-dialog": "^1.1.14",

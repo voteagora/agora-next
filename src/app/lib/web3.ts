@@ -1,30 +1,20 @@
+// lib/prisma/web2.ts
 
 import { PrismaClient } from "@prisma/client";
+import { withAccelerate } from "@prisma/extension-accelerate";
 
-const globalForWeb3 = globalThis as unknown as {
-  web3Prisma?: PrismaClient;
+type AcceleratedClient = ReturnType<
+  PrismaClient['$extends']
+>; // This produces the correct extended type
+
+const globalForWeb2 = globalThis as unknown as {
+  web2Prisma?: AcceleratedClient;
 };
 
-const isDev = process.env.DATABASE_URL === "dev";
+export const prismaWeb2Client =
+  globalForWeb2.web2Prisma ??
+  new PrismaClient().$extends(withAccelerate());
 
-const datasourceUrl = isDev
-  ? process.env.READ_ONLY_WEB3_DATABASE_URL_DEV
-  : process.env.READ_ONLY_WEB3_DATABASE_URL_PROD;
-
-if (!datasourceUrl) {
-  throw new Error("Missing WEB3 database URL environment variable");
+if (process.env.NODE_ENV !== "production") {
+  globalForWeb2.web2Prisma = prismaWeb2Client;
 }
-
-export const prismaWeb3Client =
-  globalForWeb3.web3Prisma ??
-  new PrismaClient({
-    datasourceUrl: `${datasourceUrl}?pgbouncer=true&pool_timeout=0&connection_limit=1`,
-    log: ["error"],
-  });
-
-globalForWeb3.web3Prisma = prismaWeb3Client;
-
-// Prisma BigInt serialization
-BigInt.prototype.toJSON = function () {
-  return this.toString();
-};
