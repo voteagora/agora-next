@@ -7,7 +7,6 @@ generator client {
 datasource db {
   provider          = "postgresql"
   url               = env("DATABASE_URL")
-  connection_limit  = 1
   schemas = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "syndicate", "uniswap", "xai", "b3", "demo", "linea"]
 }
 

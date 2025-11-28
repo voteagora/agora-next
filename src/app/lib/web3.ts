@@ -18,7 +18,7 @@ if (!datasourceUrl) {
 export const prismaWeb3Client =
   globalForWeb3.web2Prisma ??
   new PrismaClient({
-    datasourceUrl,
+    datasourceUrl: `${datasourceUrl}?pgbouncer=true&pool_timeout=0&connection_limit=1`,
     log: ["error"],
   });
 
