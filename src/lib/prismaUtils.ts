@@ -50,6 +50,8 @@ export function findDelagatee({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateDelegatees.findFirst(condition);
 
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3Delegatees.findFirst(condition);
     case TENANT_NAMESPACES.DEMO4:
       return prismaWeb3Client.demo4Delegatees.findFirst(condition);
     case TENANT_NAMESPACES.DEMO2:
@@ -108,6 +110,8 @@ export function findAdvancedDelegatee({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateAdvancedDelegatees.findMany(condition);
 
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3AdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.DEMO4:
       return prismaWeb3Client.demo4AdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.DEMO2:
@@ -163,6 +167,8 @@ export function findVotableSupply({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateVotableSupply.findFirst({});
 
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3VotableSupply.findFirst({});
     case TENANT_NAMESPACES.DEMO4:
       return prismaWeb3Client.demo4VotableSupply.findFirst({});
     case TENANT_NAMESPACES.DEMO2:
@@ -324,6 +330,8 @@ export function findProposalsQueryFromDB({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposals.findMany(condition);
 
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3Proposals.findMany(condition);
     case TENANT_NAMESPACES.DEMO4:
       return prismaWeb3Client.demo4Proposals.findMany(condition);
     case TENANT_NAMESPACES.DEMO2:
@@ -432,6 +440,8 @@ export function findProposalsByIds({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposals.findMany(condition);
 
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3Proposals.findMany(condition);
     case TENANT_NAMESPACES.DEMO4:
       return prismaWeb3Client.demo4Proposals.findMany(condition);
     default:
@@ -598,6 +608,8 @@ export function findProposalType({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposalTypes.findMany(condition);
 
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3ProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.DEMO4:
       return prismaWeb3Client.demo4ProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.DEMO2:
@@ -652,6 +664,8 @@ export function findVotes({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateVotes.findMany(condition);
 
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3Votes.findMany(condition);
     case TENANT_NAMESPACES.DEMO4:
       return prismaWeb3Client.demo4Votes.findMany(condition);
     case TENANT_NAMESPACES.DEMO2:
@@ -759,6 +773,8 @@ export function findAdvancedVotingPower({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateAdvancedVotingPower.findFirst(condition);
 
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3AdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.DEMO4:
       return prismaWeb3Client.demo4AdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.DEMO2:
@@ -872,6 +888,8 @@ export function findStakedDeposits({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateStakedDeposits.findMany(condition);
 
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3StakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.DEMO4:
       return prismaWeb3Client.demo4StakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.DEMO2:
