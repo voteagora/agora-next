@@ -5,7 +5,7 @@ import { handlePrismaError, archiveAttachmentSchema } from "./shared";
 import { uploadFileToPinata, getIPFSUrl } from "@/lib/pinata";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import { logForumAuditAction } from "./admin";
 
 const { slug } = Tenant.current();

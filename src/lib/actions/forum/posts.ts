@@ -11,7 +11,7 @@ import { moderateTextContent, isContentNSFW } from "@/lib/moderation";
 import { indexForumPost, removeForumPostFromIndex } from "./search";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import { logForumAuditAction, checkForumPermissions } from "./admin";
 import { createAttachmentsFromContent } from "../attachment";
 import {

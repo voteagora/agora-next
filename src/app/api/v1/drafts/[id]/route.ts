@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyJwtAndGetAddress } from "@/app/proposals/draft/actions/siweAuth";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import Tenant from "@/lib/tenant/tenant";
 
 export async function GET(

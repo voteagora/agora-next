@@ -1,7 +1,7 @@
 "use server";
 
 import Tenant from "@/lib/tenant/tenant";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import { getIPFSUrl, uploadFileToPinata } from "@/lib/pinata";
 
 interface AttachmentData {

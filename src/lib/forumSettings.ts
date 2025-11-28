@@ -3,7 +3,7 @@
  * Fetches and validates voting power requirements for forum actions
  */
 
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import { cache } from "react";
 
 interface ForumSettings {

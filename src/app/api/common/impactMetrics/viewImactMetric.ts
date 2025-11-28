@@ -1,5 +1,5 @@
 import { addressOrEnsNameWrap } from "../utils/ensName";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 
 const viewImpactMetric = async ({
   addressOrENSName,

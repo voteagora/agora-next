@@ -1,7 +1,7 @@
 "use server";
 
 import Tenant from "@/lib/tenant/tenant";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types.d";
 import { getPublicClient } from "@/lib/viem";

@@ -28,7 +28,7 @@ import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
 import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { fetchVotesCountForDelegate } from "@/app/api/common/votes/getVotes";
-import { prismaWeb3Client } from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/web3";
 
 export const fetchDelegate = async (address: string) => {
   try {

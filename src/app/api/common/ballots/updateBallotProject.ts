@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { fetchBallot } from "./getBallots";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 
 const updateBallotProjectAllocationApi = async (
   allocation: string,

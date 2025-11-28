@@ -1,6 +1,6 @@
 "use server";
 
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import { jwtVerify } from "jose";
 

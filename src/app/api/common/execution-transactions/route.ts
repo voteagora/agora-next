@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ExecutionTransaction } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
-import { prismaWeb3Client } from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/web3";
 
 export async function GET(request: NextRequest) {
   try {

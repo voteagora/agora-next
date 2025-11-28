@@ -1,7 +1,7 @@
 import { MetricTimeSeriesValue } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 import { frequencyToLookbackDayCount } from "@/app/api/common/utils/frequencyHandling";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import { cache } from "react";
 
 async function getMetricTS(

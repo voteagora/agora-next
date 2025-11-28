@@ -1,4 +1,4 @@
-import { prismaWeb3Client } from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/web3";
 import { cache } from "react";
 import {
   getProxyAddress,

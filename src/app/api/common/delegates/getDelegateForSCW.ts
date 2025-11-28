@@ -1,6 +1,6 @@
 import "server-only";
 
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import Tenant from "@/lib/tenant/tenant";
 import { unstable_cache } from "next/cache";
 

@@ -1,7 +1,7 @@
 import { type Delegation } from "./delegation";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { cache } from "react";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";

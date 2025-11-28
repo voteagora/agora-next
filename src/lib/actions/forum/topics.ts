@@ -12,7 +12,7 @@ import { moderateTextContent, isContentNSFW } from "@/lib/moderation";
 import { removeForumTopicFromIndex, indexForumTopic } from "./search";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import { getIPFSUrl } from "@/lib/pinata";
 import { logForumAuditAction, checkForumPermissions } from "./admin";
 import { unstable_cache } from "next/cache";

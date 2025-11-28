@@ -1,4 +1,4 @@
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import SponsorForm from "../components/SponsorForm";
 import Image from "next/image";
 import { icons } from "@/icons/icons";

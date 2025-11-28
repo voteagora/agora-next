@@ -1,6 +1,6 @@
 "use server";
 
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import { verifySiwe } from "@/app/proposals/draft/actions/siweAuth";
 import Tenant from "@/lib/tenant/tenant";
 import { PLMConfig } from "@/app/proposals/draft/types";

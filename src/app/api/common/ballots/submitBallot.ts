@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import verifyMessage from "@/lib/serverVerifyMessage";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import {
   MetricsBallotSubmission,
   ProjectsBallotSubmission,

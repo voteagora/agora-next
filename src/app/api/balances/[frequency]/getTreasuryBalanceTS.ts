@@ -1,6 +1,6 @@
 import Tenant from "@/lib/tenant/tenant";
 import { frequencyToLookbackDayCount } from "@/app/api/common/utils/frequencyHandling";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import type { MetricTimeSeriesValue } from "@/lib/types";
 import { cache } from "react";
 

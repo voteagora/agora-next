@@ -1,6 +1,6 @@
 import "server-only";
 
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import { DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";

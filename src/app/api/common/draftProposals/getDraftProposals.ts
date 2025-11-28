@@ -1,4 +1,4 @@
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import { Prisma } from "@prisma/client";
 import { DraftProposal } from "@/app/proposals/draft/types";
 import { cache } from "react";

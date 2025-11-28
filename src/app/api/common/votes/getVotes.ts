@@ -14,7 +14,7 @@ import {
   VoterTypes,
   VotesSort,
 } from "./vote";
-import { prismaWeb3Client } from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/web3";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
 import { doInSpan } from "@/app/lib/logging";

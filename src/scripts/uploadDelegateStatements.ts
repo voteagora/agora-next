@@ -1,7 +1,7 @@
 const { DaoSlug } = require("@prisma/client");
 const fs = require("fs");
 const readline = require("readline");
-import { prismaWeb3Client } from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/web3";
 
 async function main(
   filePath: string,

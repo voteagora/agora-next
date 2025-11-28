@@ -3,7 +3,7 @@ import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { Ballots, Prisma, ProjectApplicants } from "@prisma/client";
 import { Ballot } from "./ballot";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import { calculateAllocations } from "./ballotAllocations";
 
 async function getBallotsApi({

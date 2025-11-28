@@ -2,7 +2,7 @@ import { CATEGORY_ROLES } from "@/app/lib/auth/constants";
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 
 const allowlist = [
   "0xa18d0226043a76683950f3baabf0a87cfb32e1cb",

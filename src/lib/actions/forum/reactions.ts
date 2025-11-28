@@ -4,7 +4,7 @@ import { z } from "zod";
 import { AttachableType } from "@prisma/client";
 import Tenant from "@/lib/tenant/tenant";
 import verifyMessage from "@/lib/serverVerifyMessage";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import { canPerformAction, formatVPError } from "@/lib/forumSettings";
 import { checkForumPermissions } from "./admin";
 import {

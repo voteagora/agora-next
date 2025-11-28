@@ -1,6 +1,6 @@
 import { PaginatedResult, paginateResult } from "@/app/lib/pagination";
 import { cache } from "react";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import {
   ImpactMetrciCommentPayload,
   ImpactMetricComment,

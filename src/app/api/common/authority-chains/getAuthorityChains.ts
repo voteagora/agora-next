@@ -1,4 +1,4 @@
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import { AuthorityChainsSnaps } from "./authorityChains";
 import { validateChain } from "@/lib/alligatorUtils";
 import Tenant from "@/lib/tenant/tenant";

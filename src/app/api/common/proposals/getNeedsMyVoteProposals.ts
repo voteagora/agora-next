@@ -1,6 +1,6 @@
 import { parseProposal } from "@/lib/proposalUtils";
 import { cache } from "react";
-import { prismaWeb3Client } from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/web3";
 import Tenant from "@/lib/tenant/tenant";
 import { ProposalPayload } from "./proposal";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";

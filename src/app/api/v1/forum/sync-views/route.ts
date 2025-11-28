@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ViewTracker } from "@/lib/redis";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import Tenant from "@/lib/tenant/tenant";
 
 const { slug } = Tenant.current();

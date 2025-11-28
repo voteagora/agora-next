@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import Tenant from "@/lib/tenant/tenant";
 import { verifySiwe } from "@/app/proposals/draft/actions/siweAuth";
 

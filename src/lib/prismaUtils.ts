@@ -1,4 +1,4 @@
-import { prismaWeb3Client } from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/web3";
 import { TENANT_NAMESPACES } from "./constants";
 import { TenantNamespace } from "./types";
 

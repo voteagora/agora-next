@@ -1,6 +1,6 @@
 "use server";
 
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 import type { FormState } from "@/app/types";
 import { verifyOwnerAndSiweForDraft } from "./siweAuth";
 

@@ -2,7 +2,7 @@
 
 import Tenant from "@/lib/tenant/tenant";
 import { getForumCategory } from "./categories";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 
 export async function getForumAdmins() {
   try {

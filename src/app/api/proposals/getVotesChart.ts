@@ -1,7 +1,7 @@
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { SnapshotVotePayload, VotePayload } from "@/app/api/common/votes/vote";
-import { prismaWeb3Client } from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/web3";
 
 export async function getVotesChart({
   proposalId,

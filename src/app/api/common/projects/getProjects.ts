@@ -4,7 +4,7 @@ import {
   PaginationParams,
 } from "@/app/lib/pagination";
 import { cache } from "react";
-import { prismaWeb3Client } from "@/app/lib/prisma";
+import { prismaWeb3Client } from "@/app/lib/web3";
 import { Project } from "./project";
 
 const filterMap = {

@@ -5,7 +5,7 @@ import { handlePrismaError } from "./shared";
 import { ViewTracker } from "@/lib/redis";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/app/lib/web2";
 
 const { slug } = Tenant.current();
 
