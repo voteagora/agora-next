@@ -22,9 +22,9 @@ export const prismaWeb2Client =
     log: ["error"],
   });
 
-if (process.env.NODE_ENV !== "production") {
+
   globalForWeb2.web2Prisma = prismaWeb2Client;
-}
+
 
 // Prisma BigInt serialization
 BigInt.prototype.toJSON = function () {

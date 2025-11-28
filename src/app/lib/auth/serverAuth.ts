@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { createHash } from "crypto";
 import { SignJWT, type JWTPayload } from "jose";
-import { PrismaClient } from "@prisma/client";
 
 import {
   REASON_DISABLED_USER,
