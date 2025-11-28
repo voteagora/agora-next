@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prismaWeb3Client } from "@/app/lib/prisma";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const daoId = searchParams.get("daoId");
-
+    const { namespace } = Tenant.current();
     if (!daoId) {
       return NextResponse.json({ error: "daoId is required" }, { status: 400 });
     }
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
       }>
     >`
       SELECT param_name, param_value
-      FROM syndicate.dao_settings 
+      FROM ${namespace}.dao_settings 
       WHERE dao_id = ${daoId.toLowerCase()}
     `;
 
