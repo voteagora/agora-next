@@ -235,7 +235,7 @@ async function getCurrentDelegatorsForAddress({
                                                   log_index,
                                                   transaction_hash
                                               FROM
-                                                  ${namespace}.delegate_changed_events WHERE address = $2
+                                                  ${namespace}.delegate_changed_events WHERE address = $3
                                               ORDER BY
                                                   delegator,
                                                   block_number DESC,
