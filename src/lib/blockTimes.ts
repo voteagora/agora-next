@@ -1,7 +1,20 @@
 // Cast for more accurate arithmetic
 import Tenant from "@/lib/tenant/tenant";
 import { Block } from "ethers";
-import { scroll } from "viem/chains";
+import { optimism, scroll } from "viem/chains";
+
+const VARIABLE_BLOCK_TIMES = [
+    {
+        id: optimism.id,
+        secondsBeforeUpdate: 0.5,
+        updateBlockNumber: 105235062
+    },
+    {
+        id: scroll.id,
+        secondsBeforeUpdate: 1.5,
+        updateBlockNumber: 25688713
+    }
+];
 
 const { contracts, ui } = Tenant.current();
 
@@ -60,37 +73,13 @@ export function getHumanBlockTime(
   forceTokenChain: boolean = false
 ) {
   const chainIdToUse = forceTokenChain ? forceTokenChainId : chainId;
-
-  // Special case for Optimism mainnet due to Bedrock upgrade
-  if (chainIdToUse === 10) {
+  
+  const update = VARIABLE_BLOCK_TIMES.find(b => b.id === chainIdToUse);
+  // Handle changes in block time production for Optimism and scroll
+  if (update) {
     const blockSeconds = getSecondsPerBlock(chainIdToUse);
-    const secondsPerBlockBeforeBedrock = 0.5;
-    const bedrockBlockNumber = 105235062;
-
-    const blocksBeforeBedrock = Math.max(
-      bedrockBlockNumber - Number(blockNumber),
-      0
-    );
-
-    const blocksAfterBedrock = Math.min(
-      Number(latestBlock.number) - bedrockBlockNumber,
-      Number(latestBlock.number) - Number(blockNumber)
-    );
-
-    const timeBeforeBedrock =
-      blocksBeforeBedrock * secondsPerBlockBeforeBedrock;
-    const timeAfterBedrock = blocksAfterBedrock * blockSeconds;
-
-    return new Date(
-      (latestBlock.timestamp - timeBeforeBedrock - timeAfterBedrock) * 1000
-    );
-  }
-
-  // Special case for Scroll mainnet block time change
-  if (chainIdToUse === scroll.id) {
-    const blockSeconds = getSecondsPerBlock(chainIdToUse);
-    const secondsPerBlockBeforeUpdate = 1.5;
-    const blockTimeUpdateBlockNumber = 25688713;
+    const secondsPerBlockBeforeUpdate = update.secondsBeforeUpdate;
+    const blockTimeUpdateBlockNumber = update.updateBlockNumber;
 
     const blocksBeforeUpdate = Math.max(
       blockTimeUpdateBlockNumber - Number(blockNumber),
