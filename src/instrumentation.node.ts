@@ -27,6 +27,7 @@ const sdk = new NodeSDK({
   traceExporter: new OTLPTraceExporter(),
   metricReader: new PeriodicExportingMetricReader({
     exporter: new OTLPMetricExporter(),
+    exportIntervalMillis: 660000, // 11 minutes
   }),
   // @ts-ignore
   spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],

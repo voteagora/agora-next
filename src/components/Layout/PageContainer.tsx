@@ -3,7 +3,6 @@
 // find their styles in the global.scss file
 
 import React, { ReactNode } from "react";
-import { Analytics } from "@vercel/analytics/react";
 import { DialogProvider } from "../Dialogs/DialogProvider/DialogProvider";
 
 type Props = {
@@ -17,7 +16,6 @@ export function PageContainer({ children }: Props) {
         <div className="bg-dotted-pattern" />
         <div className="bg-radial-gradient" />
         {children}
-        <Analytics />
       </div>
     </DialogProvider>
   );
