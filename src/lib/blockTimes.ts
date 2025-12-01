@@ -4,16 +4,16 @@ import { Block } from "ethers";
 import { optimism, scroll } from "viem/chains";
 
 const VARIABLE_BLOCK_TIMES = [
-    {
-        id: optimism.id,
-        secondsBeforeUpdate: 0.5,
-        updateBlockNumber: 105235062
-    },
-    {
-        id: scroll.id,
-        secondsBeforeUpdate: 1.5,
-        updateBlockNumber: 25688713
-    }
+  {
+    id: optimism.id,
+    secondsBeforeUpdate: 0.5,
+    updateBlockNumber: 105235062,
+  },
+  {
+    id: scroll.id,
+    secondsBeforeUpdate: 1.5,
+    updateBlockNumber: 25688713,
+  },
 ];
 
 const { contracts, ui } = Tenant.current();
@@ -73,8 +73,8 @@ export function getHumanBlockTime(
   forceTokenChain: boolean = false
 ) {
   const chainIdToUse = forceTokenChain ? forceTokenChainId : chainId;
-  
-  const update = VARIABLE_BLOCK_TIMES.find(b => b.id === chainIdToUse);
+
+  const update = VARIABLE_BLOCK_TIMES.find((b) => b.id === chainIdToUse);
   // Handle changes in block time production for Optimism and scroll
   if (update) {
     const blockSeconds = getSecondsPerBlock(chainIdToUse);
