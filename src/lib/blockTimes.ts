@@ -1,6 +1,7 @@
 // Cast for more accurate arithmetic
 import Tenant from "@/lib/tenant/tenant";
 import { Block } from "ethers";
+import { scroll } from "viem/chains";
 
 const { contracts, ui } = Tenant.current();
 
@@ -82,6 +83,30 @@ export function getHumanBlockTime(
 
     return new Date(
       (latestBlock.timestamp - timeBeforeBedrock - timeAfterBedrock) * 1000
+    );
+  }
+
+  // Special case for Scroll mainnet block time change
+  if (chainIdToUse === scroll.id) {
+    const blockSeconds = getSecondsPerBlock(chainIdToUse);
+    const secondsPerBlockBeforeUpdate = 1.5;
+    const blockTimeUpdateBlockNumber = 25688713;
+
+    const blocksBeforeUpdate = Math.max(
+      blockTimeUpdateBlockNumber - Number(blockNumber),
+      0
+    );
+
+    const blocksAfterUpdate = Math.min(
+      Number(latestBlock.number) - blockTimeUpdateBlockNumber,
+      Number(latestBlock.number) - Number(blockNumber)
+    );
+
+    const timeBeforeUpdate = blocksBeforeUpdate * secondsPerBlockBeforeUpdate;
+    const timeAfterUpdate = blocksAfterUpdate * blockSeconds;
+
+    return new Date(
+      (latestBlock.timestamp - timeBeforeUpdate - timeAfterUpdate) * 1000
     );
   }
 
