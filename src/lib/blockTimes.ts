@@ -70,6 +70,7 @@ export function getHumanBlockTime(
       bedrockBlockNumber - Number(blockNumber),
       0
     );
+
     const blocksAfterBedrock = Math.min(
       Number(latestBlock.number) - bedrockBlockNumber,
       Number(latestBlock.number) - Number(blockNumber)
