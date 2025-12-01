@@ -32,7 +32,7 @@ export function getSecondsPerBlock(chainId: number | undefined): number {
       return 2;
 
     case 534352: // Scroll
-      return 1.5;
+      return 2;
 
     case 42161: // Arbitrum one
     case 421614: // Arbitrum sepolia
