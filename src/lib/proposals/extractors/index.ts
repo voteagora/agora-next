@@ -21,6 +21,7 @@ export type {
   StandardMetrics,
   StandardVoteSegments,
   ApprovalChoice,
+  ApprovalOption,
   ApprovalMetrics,
   OptimisticMetrics,
   OptimisticTieredMetrics,

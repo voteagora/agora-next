@@ -27,6 +27,37 @@ import { convertToNumber, ensurePercentage } from "./standard";
 // =============================================================================
 
 /**
+ * Safely convert a value to BigInt, handling scientific notation
+ */
+function safeBigInt(value: unknown): bigint {
+  if (value === null || value === undefined) return 0n;
+  if (typeof value === "bigint") return value;
+  if (typeof value === "number") {
+    // Handle scientific notation by converting to fixed-point string
+    if (!Number.isFinite(value)) return 0n;
+    return BigInt(Math.floor(value));
+  }
+  if (typeof value === "string") {
+    // Handle scientific notation in strings (e.g., "1.77068e+25")
+    if (value.includes("e") || value.includes("E")) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return 0n;
+      return BigInt(Math.floor(num));
+    }
+    // Handle decimal strings
+    if (value.includes(".")) {
+      return BigInt(Math.floor(Number(value)));
+    }
+    try {
+      return BigInt(value);
+    } catch {
+      return 0n;
+    }
+  }
+  return 0n;
+}
+
+/**
  * Aggregate approval votes across citizen types for a specific choice
  */
 function aggregateApprovalVotes(
@@ -46,34 +77,91 @@ function aggregateApprovalVotes(
 /**
  * Extract choices from dao_node decoded_proposal_data
  */
+type DecodedApprovalData = {
+  choices: ApprovalChoice[];
+  maxApprovals: number;
+  criteria: number;
+  criteriaValue: bigint;
+  budgetToken: string;
+  budgetAmount: bigint;
+  options: {
+    targets: string[];
+    values: string[];
+    calldatas: string[];
+    description: string;
+    budgetTokensSpent: bigint | null;
+  }[];
+};
+
 function extractChoicesFromDaoNode(
-  decodedProposalData: unknown[][] | undefined
-): { choices: string[]; maxApprovals: number; criteriaValue: number } {
-  let choices: string[] = [];
+  decodedProposalData: unknown[][] | undefined,
+  tokenDecimals: number
+): DecodedApprovalData {
+  let choices: ApprovalChoice[] = [];
   let maxApprovals = 0;
-  let criteriaValue = 0;
+  let criteria = 0;
+  let criteriaValue = 0n;
+  let budgetToken = "";
+  let budgetAmount = 0n;
+  const options: DecodedApprovalData["options"] = [];
 
   if (Array.isArray(decodedProposalData)) {
     // decoded_proposal_data[0] is array of options
+    // Each option: [targets[], values[], calldatas[], ?, description, budgetTokensSpent?]
     const optionsArray = decodedProposalData[0];
     if (Array.isArray(optionsArray)) {
-      choices = optionsArray.map((opt: unknown, idx: number) => {
+      optionsArray.forEach((opt: unknown, idx: number) => {
         const optArr = opt as unknown[];
-        return typeof optArr?.[4] === "string"
-          ? optArr[4]
-          : `Option ${idx + 1}`;
+        const description =
+          typeof optArr?.[4] === "string" ? optArr[4] : `Option ${idx + 1}`;
+        const budgetTokensSpent = optArr?.[5]
+          ? BigInt(String(optArr[5]))
+          : null;
+
+        choices.push({
+          index: idx,
+          text: description,
+          approvals: 0,
+          percentage: 0,
+        });
+
+        options.push({
+          targets: Array.isArray(optArr?.[0]) ? optArr[0] : [],
+          values: Array.isArray(optArr?.[1])
+            ? optArr[1].map((v: unknown) => String(v))
+            : [],
+          calldatas: Array.isArray(optArr?.[2])
+            ? optArr[2].map((c: unknown) =>
+                String(c).startsWith("0x") ? String(c) : `0x${String(c)}`
+              )
+            : [],
+          description,
+          budgetTokensSpent,
+        });
       });
     }
 
-    // decoded_proposal_data[1] contains [maxApprovals, criteria, address, criteriaValue, ...]
+    // decoded_proposal_data[1] contains [maxApprovals, criteria, budgetToken, criteriaValue, budgetAmount]
     const settingsArray = decodedProposalData[1];
     if (Array.isArray(settingsArray)) {
       maxApprovals = Number(settingsArray[0]) || 0;
-      criteriaValue = Number(settingsArray[3]) || 0;
+      criteria = Number(settingsArray[1]) || 0;
+      budgetToken =
+        typeof settingsArray[2] === "string" ? settingsArray[2] : "";
+      criteriaValue = safeBigInt(settingsArray[3]);
+      budgetAmount = safeBigInt(settingsArray[4]);
     }
   }
 
-  return { choices, maxApprovals, criteriaValue };
+  return {
+    choices,
+    maxApprovals,
+    criteria,
+    criteriaValue,
+    budgetToken,
+    budgetAmount,
+    options,
+  };
 }
 
 // =============================================================================
@@ -95,26 +183,41 @@ export function extractApprovalMetrics(
   const votingData = getVotingData(proposal);
   const source = proposal.data_eng_properties?.source;
 
+  let decodedData: DecodedApprovalData | null = null;
   let choices: string[] = [];
   let maxApprovals = 0;
-  let criteriaValue = 0;
+  let criteria = 0;
+  let criteriaValue = 0n;
+  let budgetToken = "";
+  let budgetAmount = 0n;
 
   // Extract choices based on source
   if (isDaoNodeSource(proposal)) {
-    const decoded = extractChoicesFromDaoNode(
-      proposal.decoded_proposal_data as unknown[][] | undefined
+    decodedData = extractChoicesFromDaoNode(
+      proposal.decoded_proposal_data as unknown[][] | undefined,
+      tokenDecimals
     );
-    choices = decoded.choices;
-    maxApprovals = decoded.maxApprovals;
-    criteriaValue = decoded.criteriaValue;
+    choices = decodedData.choices.map((c) => c.text);
+    maxApprovals = decodedData.maxApprovals;
+    criteria = decodedData.criteria;
+    criteriaValue = decodedData.criteriaValue;
+    budgetToken = decodedData.budgetToken;
+    budgetAmount = decodedData.budgetAmount;
   } else if ("choices" in votingData && Array.isArray(votingData.choices)) {
     // eas-atlas/eas-oodao format: choices is a string array
     choices = votingData.choices as string[];
     maxApprovals =
       ("max_approvals" in votingData && Number(votingData.max_approvals)) || 0;
-    criteriaValue =
-      ("criteria_value" in votingData && Number(votingData.criteria_value)) ||
-      0;
+    criteria = ("criteria" in votingData && Number(votingData.criteria)) || 0;
+    criteriaValue = BigInt(
+      ("criteria_value" in votingData && String(votingData.criteria_value)) ||
+        "0"
+    );
+    budgetToken =
+      ("budget_token" in votingData && String(votingData.budget_token)) || "";
+    budgetAmount = BigInt(
+      ("budget_amount" in votingData && String(votingData.budget_amount)) || "0"
+    );
   }
 
   // Extract votes from outcome or totals
@@ -181,7 +284,11 @@ export function extractApprovalMetrics(
   return {
     choices: choicesWithApprovals,
     maxApprovals,
+    criteria,
     criteriaValue,
+    budgetToken,
+    budgetAmount,
     totalVoters,
+    options: decodedData?.options ?? [],
   };
 }

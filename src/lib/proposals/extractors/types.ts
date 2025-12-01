@@ -54,11 +54,23 @@ export type ApprovalChoice = {
   percentage: number;
 };
 
+export type ApprovalOption = {
+  targets: string[];
+  values: string[];
+  calldatas: string[];
+  description: string;
+  budgetTokensSpent: bigint | null;
+};
+
 export type ApprovalMetrics = {
   choices: ApprovalChoice[];
   maxApprovals: number;
-  criteriaValue: number;
-  totalVoters: number;
+  criteria: number;
+  criteriaValue: bigint;
+  budgetToken: string;
+  budgetAmount: bigint;
+  totalVoters?: number;
+  options: ApprovalOption[];
 };
 
 // =============================================================================

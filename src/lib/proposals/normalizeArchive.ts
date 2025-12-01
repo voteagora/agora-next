@@ -241,14 +241,44 @@ function normalizeApprovalProposal(
 
   const metrics = extractApprovalMetrics(proposal, { tokenDecimals: decimals });
 
-  const proposalData = {
-    options: metrics.choices.map((c) => ({ description: c.text })),
-    criteria:
-      metrics.criteriaValue > 0
-        ? ("THRESHOLD" as const)
-        : ("TOP_CHOICES" as const),
-    criteriaValue: BigInt(metrics.criteriaValue),
-    maxApprovals: metrics.maxApprovals,
+  // Build options array with full structure
+  // Use extracted options if available (dao_node), otherwise build from choices
+  const options =
+    metrics.options.length > 0
+      ? metrics.options.map((opt) => ({
+          ...opt,
+          functionArgsName: [] as {
+            functionName: string;
+            functionArgs: string[];
+          }[],
+        }))
+      : metrics.choices.map((c) => ({
+          targets: [] as string[],
+          values: [] as string[],
+          calldatas: [] as string[],
+          description: c.text,
+          functionArgsName: [] as {
+            functionName: string;
+            functionArgs: string[];
+          }[],
+          budgetTokensSpent: null,
+        }));
+
+  // Determine criteria: 0 = TOP_CHOICES, non-zero = THRESHOLD
+  const criteriaType =
+    metrics.criteria === 0 ? ("TOP_CHOICES" as const) : ("THRESHOLD" as const);
+
+  const proposalData: ParsedProposalData["APPROVAL"]["kind"] & {
+    source?: string;
+  } = {
+    options,
+    proposalSettings: {
+      maxApprovals: metrics.maxApprovals,
+      criteria: criteriaType,
+      budgetToken: metrics.budgetToken,
+      criteriaValue: metrics.criteriaValue,
+      budgetAmount: metrics.budgetAmount,
+    },
     source,
   };
 
@@ -257,11 +287,8 @@ function normalizeApprovalProposal(
       option: c.text,
       votes: BigInt(Math.floor(c.approvals)),
     })),
-    criteria:
-      metrics.criteriaValue > 0
-        ? ("THRESHOLD" as const)
-        : ("TOP_CHOICES" as const),
-    criteriaValue: BigInt(metrics.criteriaValue),
+    criteria: criteriaType,
+    criteriaValue: metrics.criteriaValue,
     for: BigInt(0),
     against: BigInt(0),
     abstain: BigInt(0),
@@ -285,25 +312,36 @@ function normalizeOptimisticProposal(
     tokenDecimals: decimals,
   });
 
-  const proposalData = {
+  // Extract raw vote values (same pattern as standard proposal)
+  const voteTotals =
+    source === "eas-oodao"
+      ? ((proposal.outcome as EasOodaoVoteOutcome)?.["token-holders"] ?? {})
+      : ((proposal.totals as DaoNodeVoteTotals)?.["no-param"] ?? {});
+
+  const forVotes = safeBigInt(voteTotals["1"]);
+  const againstVotes = safeBigInt(voteTotals["0"]);
+  const abstainVotes = safeBigInt(voteTotals["2"]);
+
+  const proposalData: ParsedProposalData["OPTIMISTIC"]["kind"] & {
+    source?: string;
+  } = {
     options: [],
     disapprovalThreshold: metrics.defeatThreshold,
     source,
   };
 
   const proposalResults = {
-    for: BigInt(0),
-    against: BigInt(Math.floor(metrics.againstCount)),
-    abstain: BigInt(0),
-    decimals,
-  };
+    for: forVotes,
+    against: againstVotes,
+    abstain: abstainVotes,
+  } satisfies ParsedProposalResults["OPTIMISTIC"]["kind"];
 
   return {
     ...baseFields,
     proposalType: "OPTIMISTIC",
     proposalData,
     proposalResults,
-  } as unknown as Proposal;
+  } as Proposal;
 }
 
 function normalizeOptimisticTieredProposal(
@@ -316,26 +354,45 @@ function normalizeOptimisticTieredProposal(
     tokenDecimals: decimals,
   });
 
-  const proposalData = {
+  // Get govless_proposal outcome for citizen category breakdown
+  const govlessOutcome = (proposal.govless_proposal?.outcome ?? {}) as Record<
+    string,
+    Record<string, number | string>
+  >;
+
+  const proposalData: ParsedProposalData["OFFCHAIN_OPTIMISTIC_TIERED"]["kind"] & {
+    source?: string;
+  } = {
     options: [],
     tiers: metrics.tiers,
-    currentTier: metrics.currentTier,
     source,
   };
 
-  const proposalResults = {
-    for: BigInt(Math.floor(metrics.supportCount)),
-    against: BigInt(Math.floor(metrics.againstCount)),
-    abstain: BigInt(0),
-    decimals,
-  };
+  // Build citizen category results
+  const proposalResults: ParsedProposalResults["OFFCHAIN_OPTIMISTIC_TIERED"]["kind"] =
+    {
+      CHAIN: {
+        for: safeBigInt(govlessOutcome?.CHAIN?.["1"]),
+        against: safeBigInt(govlessOutcome?.CHAIN?.["0"]),
+      },
+      APP: {
+        for: safeBigInt(govlessOutcome?.APP?.["1"]),
+        against: safeBigInt(govlessOutcome?.APP?.["0"]),
+      },
+      USER: {
+        for: safeBigInt(govlessOutcome?.USER?.["1"]),
+        against: safeBigInt(govlessOutcome?.USER?.["0"]),
+      },
+      for: safeBigInt(metrics.supportCount),
+      against: safeBigInt(metrics.againstCount),
+    };
 
   return {
     ...baseFields,
     proposalType: "OFFCHAIN_OPTIMISTIC_TIERED",
     proposalData,
     proposalResults,
-  } as unknown as Proposal;
+  } as Proposal;
 }
 
 // =============================================================================
