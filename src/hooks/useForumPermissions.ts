@@ -6,8 +6,7 @@ import {
   fetchVotingPowerFromContract,
   formatVotingPowerString,
 } from "@/lib/votingPowerUtils";
-import { useUserPermissions, useIsSuperAdmin } from "./useRbacPermissions";
-import type { DaoSlug } from "@prisma/client";
+import { useHasPermission } from "./useRbacPermissions";
 
 interface ForumSettings {
   minVpForTopics: number;
@@ -24,8 +23,6 @@ interface ForumPermissions {
   currentVP: string;
   settings: ForumSettings | null;
   isLoading: boolean;
-  isAdmin: boolean;
-  hasRbacPermissions: boolean; // New: indicates RBAC permissions available
   reasons: {
     topics?: string;
     posts?: string;
@@ -36,24 +33,20 @@ interface ForumPermissions {
 /**
  * Hook to check if the connected user has sufficient voting power for forum actions
  * Integrates RBAC permissions:
- * - Users with RBAC roles bypass all VP requirements
- * - RBAC permissions used for granular admin actions
- * - VP requirements still apply for regular users
+ * - Users with specific RBAC permissions can bypass VP requirements for their permitted actions
+ * - VP requirements still apply for users without specific permissions
  * Uses client-side checks to provide immediate feedback before server validation
  */
 export function useForumPermissions(): ForumPermissions {
   const { address } = useAccount();
   const { slug, contracts, namespace } = Tenant.current();
   const client = getPublicClient();
-  const normalizedAddress = address?.toLowerCase();
 
-  // RBAC permission checks
-  const { data: rbacPermissions, isLoading: rbacLoading } = useUserPermissions(
-    normalizedAddress,
-    slug as DaoSlug
-  );
-  const { data: isSuperAdmin, isLoading: superAdminLoading } =
-    useIsSuperAdmin(normalizedAddress);
+  // Specific RBAC permission checks for each action
+  const { hasPermission: hasTopicPermission, isLoading: topicPermLoading } =
+    useHasPermission("forums", "topics", "create");
+  const { hasPermission: hasPostPermission, isLoading: postPermLoading } =
+    useHasPermission("forums", "posts", "create");
 
   // Fetch voting power directly from the contract
   const { data: votingPower, isLoading: vpLoading } = useQuery({
@@ -107,12 +100,7 @@ export function useForumPermissions(): ForumPermissions {
   });
 
   const isLoading =
-    vpLoading || settingsLoading || rbacLoading || superAdminLoading;
-
-  // Check if user is admin via RBAC system
-  const hasRbacPerms =
-    (rbacPermissions?.permissions.length || 0) > 0 || isSuperAdmin || false;
-  const isAdmin = hasRbacPerms;
+    vpLoading || settingsLoading || topicPermLoading || postPermLoading;
 
   // If not connected or loading, return default permissions
   if (!address || isLoading || !settings) {
@@ -124,8 +112,6 @@ export function useForumPermissions(): ForumPermissions {
       currentVP: "0",
       settings: settings || null,
       isLoading,
-      isAdmin: false,
-      hasRbacPermissions: false,
       reasons: {},
     };
   }
@@ -135,33 +121,41 @@ export function useForumPermissions(): ForumPermissions {
   // Convert voting power to number for comparisons
   const vpAsNumber = Number(currentVotes / BigInt(10 ** 18));
 
-  // Admins with RBAC roles bypass all VP requirements
-  // Ensure settings values are numbers for comparison
+  // Get VP thresholds from settings
   const minVpForTopics = Number(settings?.minVpForTopics || 0);
   const minVpForReplies = Number(settings?.minVpForReplies || 0);
   const minVpForActions = Number(settings?.minVpForActions || 0);
-  const canCreateTopic = isAdmin || vpAsNumber >= minVpForTopics;
-  const canCreatePost = isAdmin || vpAsNumber >= minVpForReplies;
-  const canUpvote = isAdmin || vpAsNumber >= minVpForActions;
-  const canReact = isAdmin || vpAsNumber >= minVpForActions;
+
+  // Permission checks: RBAC permission OR sufficient voting power
+  // - forums.topics.create permission bypasses VP for topic creation
+  // - forums.posts.create permission bypasses VP for posts, upvotes, and reactions
+  const canCreateTopic = hasTopicPermission || vpAsNumber >= minVpForTopics;
+  const canCreatePost = hasPostPermission || vpAsNumber >= minVpForReplies;
+  const canUpvote = hasPostPermission || vpAsNumber >= minVpForActions;
+  const canReact = hasPostPermission || vpAsNumber >= minVpForActions;
 
   const reasons: ForumPermissions["reasons"] = {};
 
-  // Only show VP reasons for non-admins
-  if (!isAdmin) {
-    if (!canCreateTopic) {
-      reasons.topics = `You need ${minVpForTopics} voting power to create topics. You currently have ${vpAsNumber}.`;
-    }
-
-    if (!canCreatePost) {
-      reasons.posts = `You need ${minVpForReplies} voting power to post replies. You currently have ${vpAsNumber}.`;
-    }
-
-    if (!canUpvote || !canReact) {
-      reasons.actions = `You need ${minVpForActions} voting power to upvote and react. You currently have ${vpAsNumber}.`;
-    }
+  // Only show VP reasons for users without RBAC permissions
+  if (!canCreateTopic && !hasTopicPermission) {
+    reasons.topics = `You need ${minVpForTopics} voting power to create topics. You currently have ${vpAsNumber}.`;
   }
 
+  if (!canCreatePost && !hasPostPermission) {
+    reasons.posts = `You need ${minVpForReplies} voting power to post replies. You currently have ${vpAsNumber}.`;
+  }
+
+  if ((!canUpvote || !canReact) && !hasPostPermission) {
+    reasons.actions = `You need ${minVpForActions} voting power to upvote and react. You currently have ${vpAsNumber}.`;
+  }
+  console.log("Forum permissions debug:", {
+    hasTopicPermission,
+    hasPostPermission,
+    vpAsNumber,
+    minVpForTopics,
+    minVpForReplies,
+    minVpForActions,
+  });
   return {
     canCreateTopic,
     canCreatePost,
@@ -170,8 +164,6 @@ export function useForumPermissions(): ForumPermissions {
     currentVP: vpAsNumber.toString(),
     settings,
     isLoading,
-    isAdmin,
-    hasRbacPermissions: hasRbacPerms,
     reasons,
   };
 }

@@ -141,9 +141,10 @@ export function useRelatedItemsDialog({
         const status = deriveStatus(proposal, 18);
         if (status !== "SUCCEEDED") return false;
         if (tempCheckLinksMap.get(proposal.id)) return false;
+        // Only show temp checks where user is the author
         const isAuthor =
           address?.toLowerCase() === proposal.proposer?.toLowerCase();
-        if (!permissions.isAdmin && !isAuthor) return false;
+        if (!isAuthor) return false;
         if (!debouncedSearchTerm) return true;
         const searchLower = debouncedSearchTerm.toLowerCase();
         return (
@@ -200,7 +201,6 @@ export function useRelatedItemsDialog({
     page,
     tempCheckLinksMap,
     address,
-    permissions.isAdmin,
   ]);
 
   const handleSelect = useCallback(

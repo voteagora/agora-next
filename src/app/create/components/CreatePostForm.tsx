@@ -17,7 +17,6 @@ interface CreatePostFormProps {
   canCreateGovernanceProposal: boolean;
   currentVP: number;
   requiredVP: number;
-  isAdmin: boolean;
   hasInitialTempCheck: boolean;
   onAddRelatedDiscussion: (item: RelatedItem) => void;
   onRemoveRelatedDiscussion: (id: string) => void;
@@ -35,7 +34,6 @@ export function CreatePostForm({
   canCreateGovernanceProposal,
   currentVP,
   requiredVP,
-  isAdmin,
   hasInitialTempCheck,
   onAddRelatedDiscussion,
   onRemoveRelatedDiscussion,
@@ -107,7 +105,7 @@ export function CreatePostForm({
                   {canCreateTempCheck ? (
                     <span className="text-green-600 flex items-center gap-1">
                       <CheckIcon className="h-4 w-4" />
-                      Temp check creation permission
+                      You can create temp checks
                     </span>
                   ) : (
                     <span className="text-red-600 flex items-center gap-1">
@@ -116,9 +114,7 @@ export function CreatePostForm({
                     </span>
                   )}
                   <div className="text-xs mt-1">
-                    {isAdmin && canCreateTempCheck
-                      ? "Admin permissions"
-                      : `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power required`}
+                    {`${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power`}
                   </div>
                 </div>
               )}
@@ -143,13 +139,9 @@ export function CreatePostForm({
                   )}
                   {relatedTempChecks?.length > 0 && (
                     <div className="text-xs mt-1">
-                      {isAdmin && canCreateGovernanceProposal
-                        ? "Admin permissions"
-                        : relatedTempChecks.some(
-                              (tc) => tc.status === "SUCCEEDED"
-                            )
-                          ? "You are the author of this temp check"
-                          : "Referenced temp check must be approved"}
+                      {relatedTempChecks.some((tc) => tc.status === "SUCCEEDED")
+                        ? "You are the author of this temp check"
+                        : "Referenced temp check must be approved"}
                     </div>
                   )}
                 </div>

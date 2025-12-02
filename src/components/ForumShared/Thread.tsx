@@ -90,16 +90,12 @@ const CommentItem = ({
   const [showReplies, setShowReplies] = React.useState(forForums ?? false);
 
   // RBAC permission checks
-  const { hasPermission: canSoftDelete } = useHasPermission(
+  const { hasPermission: canSoftDeleteOrRestore } = useHasPermission(
     "forums",
     "posts",
-    "soft_delete"
+    "archive"
   );
-  const { hasPermission: canRestorePost } = useHasPermission(
-    "forums",
-    "posts",
-    "restore"
-  );
+
   // Get replies for this comment
   const replies = comments.filter(
     (reply: ForumPost) => reply.parentId === comment.id
@@ -124,7 +120,7 @@ const CommentItem = ({
   // Check if user can delete: either own comment OR has RBAC permission
   const isOwnPost =
     address && authorAddress && address.toLowerCase() === authorAddress;
-  const canDelete = isOwnPost || canSoftDelete;
+  const canDelete = isOwnPost || canSoftDeleteOrRestore;
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -185,7 +181,7 @@ const CommentItem = ({
 
   if (comment.deletedAt) {
     // Check if user can restore: either own comment OR has RBAC permission
-    const canRestore = isOwnPost || canRestorePost;
+    const canRestore = isOwnPost || canSoftDeleteOrRestore;
     return (
       <div
         className={`${depth > 0 ? "ml-2 sm:ml-4 mt-3 sm:mt-4" : "mt-3 sm:mt-4"}`}
