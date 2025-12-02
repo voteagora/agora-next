@@ -16,8 +16,6 @@ export interface ForumPermissions {
     minVpForProposals: number;
   } | null;
   isLoading: boolean;
-  isAdmin: boolean;
-  hasRbacPermissions: boolean; // New: indicates RBAC permissions available
   reasons: {
     topics?: string;
     posts?: string;

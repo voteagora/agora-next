@@ -2,15 +2,12 @@ import { ForumPermissions } from "@/contexts/ForumPermissionsContext";
 import { RelatedItem } from "@/app/create/types";
 
 export function canCreateTempCheck(permissions: ForumPermissions): boolean {
-  if (permissions.isAdmin) return true;
-
-  const currentVP = parseInt(permissions.currentVP) || 0;
-  const requiredVP = permissions.settings?.minVpForProposals || 0;
-  return currentVP >= requiredVP;
+  // User can create temp check if they have topic creation permission (via RBAC or VP)
+  return permissions.canCreateTopic;
 }
 
 export function canCreateGovernanceProposal(
-  permissions: ForumPermissions,
+  _permissions: ForumPermissions,
   relatedTempChecks: RelatedItem[],
   isAuthor: boolean
 ): boolean {
@@ -18,7 +15,8 @@ export function canCreateGovernanceProposal(
     Array.isArray(relatedTempChecks) &&
     relatedTempChecks.some((tc) => tc.status === "SUCCEEDED");
 
-  if ((permissions.isAdmin || isAuthor) && hasApprovedTempCheck) return true;
+  // Author with approved temp check can create governance proposal
+  if (isAuthor && hasApprovedTempCheck) return true;
 
   return false;
 }

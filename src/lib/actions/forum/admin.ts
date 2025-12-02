@@ -1,8 +1,9 @@
 "use server";
 
 import Tenant from "@/lib/tenant/tenant";
-import { getForumCategory } from "./categories";
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import { checkPermission, isSuperAdmin } from "@/lib/rbac";
+import type { DaoSlug } from "@prisma/client";
 
 export async function getForumAdmins() {
   try {
@@ -41,71 +42,35 @@ export async function getForumAdmins() {
 
 export async function checkForumPermissions(
   address: string,
-  categoryId?: number
+  _categoryId?: number
 ) {
   try {
     const { slug } = Tenant.current();
+    const daoSlug = slug as DaoSlug;
 
-    // Check RBAC permissions
-    const rbacUser = await prismaWeb2Client.forumUserRole.findFirst({
-      where: {
-        address: address.toLowerCase(),
-        OR: [
-          { daoSlug: slug as any }, // DAO-specific roles
-          { daoSlug: null }, // System-wide roles (Super Admin)
-        ],
-        isActive: true,
-        revokedAt: null,
-      },
-      include: {
-        role: true,
-      },
-    });
-
-    const isAdmin = !!rbacUser;
-
-    // If admin, grant all permissions
-    if (isAdmin) {
+    // Check if super admin (has all permissions)
+    const superAdmin = await isSuperAdmin(address);
+    if (superAdmin) {
       return {
         isAdmin: true,
         canCreateTopics: true,
         canManageTopics: true,
-        canCreateAttachments: true,
-        canManageAttachments: true,
       };
     }
 
-    // Check legacy forum permissions (for non-admins)
-    const permissions = await prismaWeb2Client.forumPermission.findMany({
-      where: {
-        dao_slug: slug,
-        address: address.toLowerCase(),
-        OR: [
-          { scope: "forum", scopeId: null },
-          ...(categoryId
-            ? [{ scope: "category" as any, scopeId: categoryId }]
-            : []),
-        ],
-      },
-    });
+    // Check specific RBAC permissions
+    const [canCreateTopics, canManageTopics] = await Promise.all([
+      checkPermission(address, daoSlug, "forums", "topics", "create"),
+      checkPermission(address, daoSlug, "forums", "topics", "update"),
+    ]);
 
-    const permissionTypes = permissions.map((p) => p.permissionType);
-
-    // Check category restrictions
-    let canCreateTopics = true;
-    if (categoryId) {
-      const response = await getForumCategory(categoryId);
-      const category = response?.success ? response.data : null;
-      canCreateTopics =
-        !category?.adminOnlyTopics || permissionTypes.includes("create_topics");
-    }
+    // isAdmin if user has management permissions
+    const isAdmin = canManageTopics;
 
     return {
-      isAdmin: false,
+      isAdmin,
       canCreateTopics,
-      canManageTopics: permissionTypes.includes("manage_topics"),
-      canCreateAttachments: permissionTypes.includes("create_attachments"),
-      canManageAttachments: permissionTypes.includes("manage_attachments"),
+      canManageTopics,
     };
   } catch (error) {
     console.error("Error checking forum permissions:", error);
@@ -113,8 +78,6 @@ export async function checkForumPermissions(
       isAdmin: false,
       canCreateTopics: false,
       canManageTopics: false,
-      canCreateAttachments: false,
-      canManageAttachments: false,
     };
   }
 }

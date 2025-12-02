@@ -1012,20 +1012,18 @@ export const useForum = () => {
   };
 };
 
-export const useForumAdmin = (categoryId?: number) => {
+export const useForumAdmin = (_categoryId?: number) => {
   const { address } = useAccount();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["forum-admin", categoryId, address],
-    queryFn: () => checkForumPermissions(address || "", categoryId),
+    queryKey: ["forum-admin", address],
+    queryFn: () => checkForumPermissions(address || ""),
   });
 
   return {
     isAdmin: !!data?.isAdmin,
     canCreateTopics: !!data?.canCreateTopics,
     canManageTopics: !!data?.canManageTopics,
-    canCreateAttachments: !!data?.canCreateAttachments,
-    canManageAttachments: !!data?.canManageAttachments,
     isLoading,
   };
 };

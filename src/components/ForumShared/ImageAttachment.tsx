@@ -7,12 +7,9 @@ import {
   EyeIcon,
   XMarkIcon,
 } from "@heroicons/react/20/solid";
-import {
-  ForumAttachment,
-  canArchiveContent,
-  canDeleteContent,
-} from "@/lib/forumUtils";
-import { useForum, useForumAdmin } from "@/hooks/useForum";
+import { ForumAttachment } from "@/lib/forumUtils";
+import { useForum } from "@/hooks/useForum";
+import { useHasPermission } from "@/hooks/useRbacPermissions";
 import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import useRequireLogin from "@/hooks/useRequireLogin";
@@ -36,29 +33,29 @@ export default function ImageAttachment({
 
   const { deleteAttachment, archiveAttachment } = useForum();
   const { address } = useAccount();
-  const { isAdmin, canManageAttachments } = useForumAdmin(
-    categoryId || undefined
-  );
   const openDialog = useOpenDialog();
   const requireLogin = useRequireLogin();
   const stableDeleteAttachment = useStableCallback(deleteAttachment);
   const stableArchiveAttachment = useStableCallback(archiveAttachment);
 
-  const canDelete = (uploadedBy: string) =>
-    canDeleteContent(
-      address || "",
-      uploadedBy || postAuthor || "",
-      isAdmin,
-      canManageAttachments
-    );
+  // RBAC permission for posts (attachments are tied to posts)
+  const { hasPermission: hasPostPermission } = useHasPermission(
+    "forums",
+    "posts",
+    "delete"
+  );
 
-  const canArchive = (uploadedBy: string) =>
-    canArchiveContent(
-      address || "",
-      uploadedBy || postAuthor || "",
-      isAdmin,
-      canManageAttachments
-    );
+  const canDelete = (uploadedBy: string) => {
+    const isAuthor =
+      address?.toLowerCase() === (uploadedBy || postAuthor || "").toLowerCase();
+    return hasPostPermission || isAuthor;
+  };
+
+  const canArchive = (uploadedBy: string) => {
+    const isAuthor =
+      address?.toLowerCase() === (uploadedBy || postAuthor || "").toLowerCase();
+    return hasPostPermission || isAuthor;
+  };
 
   const handleDelete = () => {
     openDialog({

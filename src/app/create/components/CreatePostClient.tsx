@@ -84,7 +84,6 @@ export function CreatePostClient({
   );
   const currentVP = parseInt(permissions.currentVP) || 0;
   const requiredVP = permissions.settings?.minVpForProposals || 0;
-  const isAdmin = permissions.isAdmin;
 
   const handleSubmit = async () => {
     if (!address) return;
@@ -240,7 +239,6 @@ export function CreatePostClient({
             canCreateGovernanceProposal={canCreateGovernanceProposal}
             currentVP={currentVP}
             requiredVP={requiredVP}
-            isAdmin={isAdmin}
             hasInitialTempCheck={hasInitialTempCheck}
             onAddRelatedDiscussion={handleAddRelatedItem("relatedDiscussions")}
             onRemoveRelatedDiscussion={handleRemoveRelatedItem(
