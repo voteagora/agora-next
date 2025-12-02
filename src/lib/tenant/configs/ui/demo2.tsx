@@ -41,6 +41,7 @@ export const demo2TenantUIConfig = new TenantUI({
     negative: "182 13 13",
     brandPrimary: "144 193 41",
     brandSecondary: "242 242 242",
+    footerBackground: "255 255 255",
   },
 
   links: [
