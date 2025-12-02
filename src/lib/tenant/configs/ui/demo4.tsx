@@ -67,6 +67,8 @@ export const demo4TenantUIConfig = new TenantUI({
     brandPrimary: "144 193 41",
 
     brandSecondary: "242 242 242",
+
+    footerBackground: "255 255 255",
   },
 
   links: [
