@@ -2,6 +2,7 @@ import {
   ArchiveListProposal,
   deriveProposalType,
   EasOodaoVoteOutcome,
+  EasAtlasVoteOutcome,
 } from "@/lib/types/archiveProposal";
 import {
   HYBRID_OPTIMISTIC_TIERED_THRESHOLD,
@@ -10,6 +11,11 @@ import {
   OFFCHAIN_THRESHOLDS,
 } from "@/lib/constants";
 import { convertToNumber } from "../converters";
+import {
+  isDaoNodeSource,
+  isEasAtlasSource,
+  isEasOodaoSource,
+} from "../extractors/guards";
 
 /**
  * Derive status for OPTIMISTIC proposal types
@@ -20,8 +26,9 @@ export const deriveOptimisticStatus = (
   proposalType: string,
   decimals: number
 ): string => {
-  // For simple OPTIMISTIC: veto if against > 50% of votable supply
-  if (proposalType === "OPTIMISTIC") {
+  // For simple OPTIMISTIC (dao_node only): veto if against > 50% of votable supply
+  if (proposalType === "OPTIMISTIC" && isDaoNodeSource(proposal)) {
+    // console.log("Optimistic proposal", proposal);
     const votableSupply = convertToNumber(
       String(proposal.votableSupply ?? proposal.votable_supply ?? "0"),
       decimals
@@ -39,12 +46,29 @@ export const deriveOptimisticStatus = (
   }
 
   // For TIERED variants: check tiered veto thresholds
-  // HYBRID_OPTIMISTIC_TIERED, OFFCHAIN_OPTIMISTIC_TIERED, OFFCHAIN_OPTIMISTIC
-  const tiers = proposal.tiers || getDefaultTiers(proposalType);
+  const tiers = getTiers(proposal, proposalType);
   const vetoResult = calculateTieredVeto(proposal, tiers, decimals);
 
   return vetoResult.vetoTriggered ? "DEFEATED" : "SUCCEEDED";
 };
+
+/**
+ * Get tiers from proposal or use defaults
+ */
+function getTiers(
+  proposal: ArchiveListProposal,
+  proposalType: string
+): number[] {
+  // Check for tiers in eas-atlas proposals
+  if (isEasAtlasSource(proposal) && proposal.tiers?.length) {
+    return proposal.tiers;
+  }
+  // Check for tiers in dao_node hybrid proposals
+  if (isDaoNodeSource(proposal) && proposal.govless_proposal?.tiers?.length) {
+    return proposal.govless_proposal.tiers;
+  }
+  return getDefaultTiers(proposalType);
+}
 
 /**
  * Get default veto tiers based on proposal type
@@ -75,10 +99,16 @@ export const calculateTieredVeto = (
   tiers: number[],
   decimals: number
 ): TieredVetoResult => {
-  // Get offchain vote data from govless_proposal or outcome
-  const offchainData =
-    proposal.govless_proposal?.outcome ||
-    (proposal.outcome as EasOodaoVoteOutcome);
+  // Get offchain vote data based on source
+  let offchainData: EasAtlasVoteOutcome | EasOodaoVoteOutcome | undefined;
+
+  if (isDaoNodeSource(proposal) && proposal.govless_proposal?.outcome) {
+    offchainData = proposal.govless_proposal.outcome as EasAtlasVoteOutcome;
+  } else if (isEasAtlasSource(proposal) && proposal.outcome) {
+    offchainData = proposal.outcome as EasAtlasVoteOutcome;
+  } else if (isEasOodaoSource(proposal) && proposal.outcome) {
+    offchainData = proposal.outcome as EasOodaoVoteOutcome;
+  }
 
   if (!offchainData) {
     // No offchain data - can't calculate veto, default to not vetoed
@@ -87,7 +117,7 @@ export const calculateTieredVeto = (
 
   // Calculate veto percentages for each group
   const getVetoPercentage = (groupKey: string, eligible: number): number => {
-    const groupData = offchainData[groupKey as keyof typeof offchainData];
+    const groupData = offchainData![groupKey as keyof typeof offchainData];
     if (!groupData || typeof groupData !== "object") return 0;
     const against = Number((groupData as Record<string, unknown>)["0"] ?? 0);
     return eligible > 0 ? (against / eligible) * 100 : 0;
@@ -106,7 +136,11 @@ export const calculateTieredVeto = (
 
   // For HYBRID: also include delegates
   let delegateVeto = 0;
-  if (proposal.hybrid && proposal.total_voting_power_at_start) {
+  if (
+    isDaoNodeSource(proposal) &&
+    proposal.hybrid &&
+    proposal.total_voting_power_at_start
+  ) {
     const delegateEligible = convertToNumber(
       String(proposal.total_voting_power_at_start),
       decimals

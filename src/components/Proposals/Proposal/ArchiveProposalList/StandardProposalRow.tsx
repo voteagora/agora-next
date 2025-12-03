@@ -6,7 +6,7 @@ import { OPStandardStatusView } from "../OPStandardProposalStatus";
 import { HybridStandardStatusView } from "../HybridStandardProposalStatus";
 import { BaseRowLayout } from "./BaseRowLayout";
 import { ArchiveRowProps } from "./types";
-import { extractDisplayData } from "./utils";
+import { extractDisplayData, isHybridProposal } from "./utils";
 import {
   extractStandardMetrics,
   type StandardMetrics,
@@ -22,7 +22,8 @@ export function StandardProposalRow({
 }: ArchiveRowProps) {
   const { token } = Tenant.current();
   const decimals = tokenDecimals ?? token.decimals ?? 18;
-  const isHybrid = proposalType === "HYBRID_STANDARD" || !!proposal.hybrid;
+  const isHybrid =
+    proposalType === "HYBRID_STANDARD" || isHybridProposal(proposal);
 
   // Compute display data and metrics
   const { displayData, metrics } = useMemo(() => {

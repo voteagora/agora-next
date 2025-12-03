@@ -45,6 +45,11 @@ export const deriveStatus = (
     return "QUEUED";
   }
 
+  // eas-oodao specific: check delete_event
+  if (proposal.delete_event) {
+    return "CANCELLED";
+  }
+
   // Check if proposal is still active or pending
   const now = Math.floor(Date.now() / 1000);
   const startTime = Number(proposal.start_blocktime) || 0;

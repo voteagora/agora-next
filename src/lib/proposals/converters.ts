@@ -1,5 +1,6 @@
 import { formatUnits } from "ethers";
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
+import { isDaoNodeSource, isEasOodaoSource } from "./extractors/guards";
 
 /**
  * Type conversion utilities for proposal data
@@ -72,10 +73,20 @@ export const deriveTimeStatus = (
 ) => {
   const proposalStartTime = toDate(proposal.start_blocktime);
   const proposalEndTime = toDate(proposal.end_blocktime);
-  const proposalCancelledTime = toDate(proposal.delete_event?.attestation_time);
-  const proposalExecutedTime = toDate(
-    proposal.execute_event?.timestamp ?? proposal.execute_event?.blocktime
-  );
+
+  // Get cancelled time based on source
+  let proposalCancelledTime: Date | null = null;
+  if (isEasOodaoSource(proposal) && proposal.delete_event) {
+    proposalCancelledTime = toDate(proposal.delete_event.attestation_time);
+  }
+
+  // Get executed time (dao_node only)
+  let proposalExecutedTime: Date | null = null;
+  if (isDaoNodeSource(proposal) && proposal.execute_event) {
+    proposalExecutedTime = toDate(
+      proposal.execute_event.timestamp ?? proposal.execute_event.blocktime
+    );
+  }
 
   return {
     proposalStatus: normalizedStatus,

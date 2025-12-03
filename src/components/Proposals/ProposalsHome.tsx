@@ -95,10 +95,6 @@ export default async function ProposalsHome() {
         fetchProposals(proposalsFilterOptions.everything.filter),
         fetchVotableSupply(),
       ]);
-    console.log("relevantProposals", relevantProposals);
-    // console.log("allProposals", allProposals);
-    // console.log("votableSupply", votableSupply);
-    // console.log("governanceCalendar", governanceCalendar);
   }
 
   return (

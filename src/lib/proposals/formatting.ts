@@ -1,5 +1,6 @@
 import { capitalizeFirstLetter } from "@/lib/utils";
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
+import { isEasOodaoSource } from "./extractors/guards";
 
 /**
  * Formatting utilities for archive proposals
@@ -59,14 +60,16 @@ export const formatVotingModuleName = (name?: string | null): string => {
  * Falls back to "Governance" if no tag is available
  */
 export const deriveProposalTag = (proposal: ArchiveListProposal): string => {
-  const rawTag = Array.isArray(proposal.tags) ? proposal.tags[0] : undefined;
-  const formattedTag = formatArchiveTagLabel(rawTag);
-  if (formattedTag) {
-    return formattedTag;
-  }
-
-  if (rawTag) {
-    return rawTag;
+  // Only eas-oodao proposals have tags
+  if (isEasOodaoSource(proposal) && Array.isArray(proposal.tags)) {
+    const rawTag = proposal.tags[0];
+    const formattedTag = formatArchiveTagLabel(rawTag);
+    if (formattedTag) {
+      return formattedTag;
+    }
+    if (rawTag) {
+      return rawTag;
+    }
   }
 
   return "Governance";

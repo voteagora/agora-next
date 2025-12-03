@@ -1,9 +1,11 @@
-import {
-  ArchiveListProposal,
-  EasOodaoVoteOutcome,
-} from "@/lib/types/archiveProposal";
+import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 import { convertToNumber } from "../converters";
 import { extractThresholds } from "../thresholds";
+import {
+  isDaoNodeSource,
+  isEasAtlasSource,
+  isEasOodaoSource,
+} from "../extractors/guards";
 
 /**
  * Derive status for STANDARD proposal types
@@ -13,11 +15,24 @@ export const deriveStandardStatus = (
   proposalType: string,
   decimals: number
 ): string => {
-  const source = proposal.data_eng_properties?.source;
-  const voteTotals =
-    source === "eas-oodao"
-      ? (proposal.outcome as EasOodaoVoteOutcome)?.["token-holders"] || {}
-      : proposal.totals?.["no-param"] || {};
+  // Get vote totals based on source
+  let voteTotals: Record<string, string | undefined> = {};
+  let totalVotingPower: string | undefined;
+  let calculationOptions = 0;
+
+  if (isEasOodaoSource(proposal)) {
+    const outcome = proposal.outcome as
+      | { "token-holders"?: Record<string, string> }
+      | undefined;
+    voteTotals = outcome?.["token-holders"] || {};
+    totalVotingPower = proposal.total_voting_power_at_start;
+  } else if (isDaoNodeSource(proposal)) {
+    voteTotals = proposal.totals?.["no-param"] || {};
+    totalVotingPower = proposal.total_voting_power_at_start;
+  } else if (isEasAtlasSource(proposal)) {
+    // eas-atlas uses different vote structure
+    calculationOptions = proposal.calculationOptions ?? 0;
+  }
 
   const forVotes = convertToNumber(String(voteTotals["1"] ?? "0"), decimals);
   const againstVotes = convertToNumber(
@@ -43,17 +58,13 @@ export const deriveStandardStatus = (
 
   // Calculate quorum based on calculationOptions
   // calculationOptions=1 means for only, otherwise for+abstain
-  const calculationOptions = proposal.calculationOptions ?? 0;
   const quorumVotes =
     calculationOptions === 1 ? forVotes : forVotes + abstainVotes;
 
   // Check quorum
   let quorumMet = true;
-  if (proposal.total_voting_power_at_start) {
-    const totalPower = convertToNumber(
-      String(proposal.total_voting_power_at_start),
-      decimals
-    );
+  if (totalVotingPower) {
+    const totalPower = convertToNumber(String(totalVotingPower), decimals);
     const quorumPercentage =
       totalPower > 0 ? (quorumVotes / totalPower) * 100 : 0;
     quorumMet = quorumPercentage >= thresholds.quorum;

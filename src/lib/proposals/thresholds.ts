@@ -1,5 +1,6 @@
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 import { safeBigInt } from "./converters";
+import { isDaoNodeSource, isEasOodaoSource } from "./extractors/guards";
 
 /**
  * Threshold extraction utilities for archive proposals
@@ -23,34 +24,29 @@ export interface ProposalThresholds {
 export const extractThresholds = (
   proposal: ArchiveListProposal
 ): ProposalThresholds => {
-  const proposalType = proposal.proposal_type;
-  const defaultProposalTypeRanges = proposal.default_proposal_type_ranges;
-
-  // If default_proposal_type_ranges exists, proposal is pending approval - use min values
-  if (
-    defaultProposalTypeRanges &&
-    typeof defaultProposalTypeRanges === "object"
-  ) {
+  // Handle eas-oodao proposals
+  if (isEasOodaoSource(proposal)) {
+    // Check for pending approval ranges
+    if (proposal.default_proposal_type_ranges) {
+      return {
+        quorum: proposal.default_proposal_type_ranges.min_quorum_pct / 100,
+        approvalThreshold:
+          proposal.default_proposal_type_ranges.min_approval_threshold_pct /
+          100,
+      };
+    }
+    // Use fixed proposal type values - proposal_type is FixedProposalType for eas-oodao
+    const propType = proposal.proposal_type as {
+      quorum: number;
+      approval_threshold: number;
+    };
     return {
-      quorum: defaultProposalTypeRanges.min_quorum_pct / 100,
-      approvalThreshold:
-        defaultProposalTypeRanges.min_approval_threshold_pct / 100,
+      quorum: propType.quorum / 100,
+      approvalThreshold: propType.approval_threshold / 100,
     };
   }
 
-  // Handle FixedProposalType (eas-oodao) - proposal type is approved
-  if (
-    typeof proposalType === "object" &&
-    proposalType !== null &&
-    "quorum" in proposalType
-  ) {
-    return {
-      quorum: proposalType.quorum / 100, // Convert basis points to percentage
-      approvalThreshold: proposalType.approval_threshold / 100,
-    };
-  }
-
-  // Handle number type (dao_node) or unknown - use defaults
+  // Handle dao_node proposals - use defaults
   return {
     quorum: DEFAULT_QUORUM_PERCENT,
     approvalThreshold: DEFAULT_APPROVAL_THRESHOLD_PERCENT,
@@ -70,46 +66,42 @@ export interface ResolvedThresholds {
 export const resolveArchiveThresholds = (
   proposal: ArchiveListProposal
 ): ResolvedThresholds => {
-  const source = proposal.data_eng_properties?.source;
+  if (isEasOodaoSource(proposal)) {
+    const propType = proposal.proposal_type as {
+      quorum: number;
+      approval_threshold: number;
+    };
+    const quorumBp = safeBigInt(propType.quorum ?? 0);
+    const approvalThresholdBp = safeBigInt(propType.approval_threshold ?? 0);
+    const totalVotingPower = safeBigInt(
+      proposal.total_voting_power_at_start ?? 0
+    );
 
-  const resolveFromEas = () => {
-    const type = proposal.proposal_type;
-    if (!type || typeof type !== "object") {
-      return {
-        quorum: safeBigInt(0),
-        approvalThreshold: safeBigInt(0),
-      };
+    // Convert basis points to actual quorum value
+    let quorumValue = quorumBp / 100n;
+    if (quorumValue > 0n && totalVotingPower > 0n) {
+      quorumValue = (totalVotingPower * quorumValue) / 100n;
     }
 
     return {
-      quorum: safeBigInt(type.quorum ?? 0),
-      approvalThreshold: safeBigInt(type.approval_threshold ?? 0),
+      quorum: quorumValue,
+      approvalThreshold: approvalThresholdBp,
+      votableSupply: totalVotingPower,
     };
-  };
-
-  const quotaValues =
-    source === "eas-oodao"
-      ? resolveFromEas()
-      : {
-          quorum: safeBigInt(proposal.quorum ?? proposal.quorumVotes ?? 0),
-          approvalThreshold: safeBigInt(proposal.approval_threshold ?? 0),
-        };
-
-  const totalVotingPowerRaw = safeBigInt(
-    proposal.total_voting_power_at_start ?? 0
-  );
-
-  let quorumValue = quotaValues.quorum / 100n;
-
-  if (source === "eas-oodao" && quorumValue > 0n && totalVotingPowerRaw > 0n) {
-    quorumValue = (totalVotingPowerRaw * quorumValue) / 100n;
   }
 
-  const votableSupply = safeBigInt(proposal.total_voting_power_at_start ?? 0);
+  if (isDaoNodeSource(proposal)) {
+    return {
+      quorum: safeBigInt(proposal.quorum ?? proposal.quorumVotes ?? 0),
+      approvalThreshold: safeBigInt(proposal.approval_threshold ?? 0),
+      votableSupply: safeBigInt(proposal.total_voting_power_at_start ?? 0),
+    };
+  }
 
+  // Fallback for eas-atlas
   return {
-    quorum: quorumValue,
-    approvalThreshold: quotaValues.approvalThreshold,
-    votableSupply,
+    quorum: 0n,
+    approvalThreshold: 0n,
+    votableSupply: 0n,
   };
 };
