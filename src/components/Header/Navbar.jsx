@@ -179,6 +179,17 @@ export default function Navbar() {
           Info
         </HeaderLink>
       )}
+
+      <HeaderLink
+        ref={(el) => {
+          linkRefs.current.help = el;
+        }}
+        href="/help"
+        isActive={activeNavItem === "help"}
+        onClick={() => handleNavClick("help")}
+      >
+        Help
+      </HeaderLink>
     </div>
   );
 }
