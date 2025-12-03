@@ -17,7 +17,7 @@ import DelegateTableRow from "./DelegateTableRow";
 import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import { SyndicateDelegateInfo } from "./SyndicateDelegateInfo";
+import { SyndicateEducationBanner } from "@/components/shared/SyndicateEducationBanner";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { InfoOutlineIcon } from "@/icons/InfoOutlineIcon";
@@ -56,6 +56,9 @@ export default function DelegateTable({
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
+  const showSyndicateBanner =
+    namespace === TENANT_NAMESPACES.SYNDICATE &&
+    ui.toggle("syndicate-voters-page-content")?.enabled;
   const showParticipation =
     (ui.toggle("show-participation")?.enabled || false) &&
     !(ui.toggle("hide-participation-delegates-page")?.enabled || false);
@@ -108,7 +111,15 @@ export default function DelegateTable({
   return (
     <DialogProvider>
       {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
-      {namespace === TENANT_NAMESPACES.SYNDICATE && <SyndicateDelegateInfo />}
+      {showSyndicateBanner && (
+        <SyndicateEducationBanner
+          storageKey="syndicate-delegates-banner-dismissed"
+          message="Learn how voting power and delegation work."
+          linkHref="/info#voting-power"
+          linkText="View guide"
+          className="mb-4 rounded-lg border border-line bg-neutral"
+        />
+      )}
 
       <div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg mt-6">
         <Table className="min-w-full">

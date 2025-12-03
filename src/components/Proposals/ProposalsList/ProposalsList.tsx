@@ -14,6 +14,7 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
 import Proposal from "../Proposal/Proposal";
 import { DaoSlug } from "@prisma/client";
+import { SyndicateEducationBanner } from "@/components/shared/SyndicateEducationBanner";
 
 export default function ProposalsList({
   initRelevantProposals,
@@ -102,6 +103,15 @@ export default function ProposalsList({
         />
       )}
       <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+        {ui.toggle("syndicate-proposals-page-content")?.enabled && (
+          <SyndicateEducationBanner
+            storageKey="syndicate-proposals-banner-dismissed"
+            message="New to Syndicate governance?"
+            linkHref="/info#voting-process"
+            linkText="Learn the voting process"
+            className="border-b border-line"
+          />
+        )}
         <div>
           {proposals.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">
