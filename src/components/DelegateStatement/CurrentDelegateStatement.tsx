@@ -75,6 +75,12 @@ const formSchema = z.object({
       z.literal("prompted"),
       z.boolean(),
     ]),
+    discord_webhook_url: z
+      .string()
+      .url()
+      .startsWith("https://discord.com/api/webhooks/")
+      .optional()
+      .or(z.literal("")),
   }),
 });
 
@@ -120,7 +126,7 @@ export default function CurrentDelegateStatement() {
             topIssues: {
               value: string;
               type: string;
-            }[];
+              }[];
           }
         )?.topIssues.length > 0
           ? (
@@ -167,9 +173,11 @@ export default function CurrentDelegateStatement() {
       notificationPreferences: (delegateStatement?.notification_preferences as {
         wants_proposal_created_email: "prompt" | "prompted" | boolean;
         wants_proposal_ending_soon_email: "prompt" | "prompted" | boolean;
+        discord_webhook_url?: string;
       }) || {
         wants_proposal_created_email: "prompt",
         wants_proposal_ending_soon_email: "prompt",
+        discord_webhook_url: "",
       },
       last_updated: new Date().toISOString(),
     };
