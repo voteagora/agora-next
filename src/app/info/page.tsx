@@ -11,6 +11,7 @@ import DunaAdministration from "@/app/duna/components/DunaAdministration";
 import DunaDisclosures from "@/app/duna/components/DunaDisclosures";
 import SyndicateDunaDisclosures from "@/app/duna/components/SyndicateDunaDisclosures";
 import TownsDunaAdministration from "@/app/duna/components/TownsDunaAdministration";
+import SyndicateGovernanceInfo from "@/app/info/components/SyndicateGovernanceInfo";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/getTreasuryBalanceTS";
@@ -70,6 +71,7 @@ export default async function Page() {
   const hasGovernanceCharts =
     ui.toggle("info/governance-charts")?.enabled === true;
   const hasDunaAdministration = ui.toggle("duna")?.enabled === true;
+  const showSyndicateGovernanceInfo = namespace === TENANT_NAMESPACES.SYNDICATE;
 
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
     const treasuryData = await apiFetchTreasuryBalanceTS(
@@ -121,6 +123,7 @@ export default async function Page() {
             <DunaDisclosures />
           )
         ) : null}
+        {showSyndicateGovernanceInfo && <SyndicateGovernanceInfo />}
       </div>
     );
   } else {

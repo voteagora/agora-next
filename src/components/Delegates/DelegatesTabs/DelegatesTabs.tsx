@@ -15,9 +15,12 @@ import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { GridLayoutIcon } from "@/icons/GridLayoutIcon";
 import { ListViewIcon } from "@/icons/ListViewIcon";
 import { MobileDelegatesFilter } from "../DelegatesFilter/MobileDelegatesFilter";
+import DismissableBanner from "@/components/shared/DismissableBanner";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default function DelegatesTabs({ children }: { children: ReactNode }) {
-  const { ui } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
+  const showSyndicateBanner = namespace === TENANT_NAMESPACES.SYNDICATE;
   const delegatesLayout = ui.toggle("delegates-layout-list")?.enabled
     ? "list"
     : "grid";
@@ -118,6 +121,16 @@ export default function DelegatesTabs({ children }: { children: ReactNode }) {
       <div>
         <DelegatesFilterChips />
       </div>
+      {showSyndicateBanner && (
+        <div className="mt-4 rounded-lg border border-line overflow-hidden">
+          <DismissableBanner
+            storageKey="syndicate-voters-banner-dismissed"
+            message="Learn about voting power and delegation"
+            linkText="How delegation works"
+            linkHref="/info#delegation-voting-power"
+          />
+        </div>
+      )}
       <div className={cn(isPending && "animate-pulse")}>{children}</div>
     </Tabs>
   );

@@ -14,6 +14,8 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
 import Proposal from "../Proposal/Proposal";
 import { DaoSlug } from "@prisma/client";
+import DismissableBanner from "@/components/shared/DismissableBanner";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default function ProposalsList({
   initRelevantProposals,
@@ -37,7 +39,8 @@ export default function ProposalsList({
   } | null;
 }) {
   const { address } = useAccount();
-  const { ui, slug } = Tenant.current();
+  const { ui, slug, namespace } = Tenant.current();
+  const showSyndicateBanner = namespace === TENANT_NAMESPACES.SYNDICATE;
   let tenantSupportsProposalLifecycle =
     ui.toggle("proposal-lifecycle")?.enabled;
 
@@ -102,6 +105,14 @@ export default function ProposalsList({
         />
       )}
       <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+        {showSyndicateBanner && (
+          <DismissableBanner
+            storageKey="syndicate-proposals-banner-dismissed"
+            message="Learn about the voting process"
+            linkText="View governance rules"
+            linkHref="/info#governance-voting-process"
+          />
+        )}
         <div>
           {proposals.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">

@@ -14,6 +14,8 @@ import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 import { useSearchParams } from "next/navigation";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { UpdatedButton } from "@/components/Button";
+import DismissableBanner from "@/components/shared/DismissableBanner";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default function ArchiveProposalsList({
   proposals,
@@ -29,6 +31,7 @@ export default function ArchiveProposalsList({
 }) {
   const { address } = useAccount();
   const { token, namespace } = Tenant.current();
+  const showSyndicateBanner = namespace === TENANT_NAMESPACES.SYNDICATE;
   const searchParams = useSearchParams();
   const filter =
     searchParams?.get("filter") ?? proposalsFilterOptions.relevant.filter;
@@ -99,6 +102,14 @@ export default function ArchiveProposalsList({
       )}
 
       <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+        {showSyndicateBanner && (
+          <DismissableBanner
+            storageKey="syndicate-proposals-banner-dismissed"
+            message="Learn about the voting process"
+            linkText="View governance rules"
+            linkHref="/info#governance-voting-process"
+          />
+        )}
         <div>
           {normalizedProposals.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">
