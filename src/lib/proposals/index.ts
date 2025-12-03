@@ -41,7 +41,39 @@ export {
   extractApprovalMetrics,
   extractOptimisticMetrics,
   extractOptimisticTieredMetrics,
-  // Utilities
-  convertToNumber,
+  // Utilities (note: convertToNumber is exported from ./converters instead)
   ensurePercentage,
 } from "./extractors";
+
+// Converters
+export {
+  convertToNumber,
+  safeBigInt,
+  safeBigIntOrNull,
+  toDate,
+  deriveTimeStatus,
+} from "./converters";
+
+// Thresholds
+export {
+  extractThresholds,
+  resolveArchiveThresholds,
+  type ProposalThresholds,
+  type ResolvedThresholds,
+} from "./thresholds";
+
+// Formatting
+export {
+  STATUS_LABEL_MAP,
+  formatArchiveTagLabel,
+  formatVotingModuleName,
+  deriveProposalTag,
+} from "./formatting";
+
+// Status derivation
+export {
+  deriveStatus,
+  deriveOptimisticStatus,
+  deriveApprovalStatus,
+  deriveStandardStatus,
+} from "./status";
