@@ -4,7 +4,7 @@ import DelegateCardWrapper, {
   DelegateCardLoadingState,
 } from "@/components/Delegates/DelegateCardList/DelegateCardWrapper";
 import Hero from "@/components/Hero/Hero";
-import SyndicateVotersPageContent from "@/components/Delegates/SyndicateVotersPageContent";
+import DismissibleInfoBanner from "@/components/shared/DismissibleInfoBanner";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getMetadataBaseUrl } from "@/app/lib/utils/metadata";
 
@@ -54,7 +54,14 @@ export default async function Page({ searchParams }) {
   return (
     <section>
       <Hero page="delegates" />
-      {showVotersPageContent && <SyndicateVotersPageContent />}
+      {showVotersPageContent && (
+        <DismissibleInfoBanner
+          id="delegates-voting-power"
+          message="New to voting power & delegation?"
+          linkText="Learn how delegation works"
+          linkHref="/info#delegation"
+        />
+      )}
       <Suspense fallback={<DelegateCardLoadingState />}>
         <DelegateCardWrapper searchParams={searchParams} />
       </Suspense>
