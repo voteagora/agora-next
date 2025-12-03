@@ -1,9 +1,11 @@
 "use client";
 
 import { useAccount } from "wagmi";
+import { UserCheck, UserPlus } from "lucide-react";
 import { useProfileData } from "@/hooks/useProfileData";
 import { DelegateToSelf } from "../Delegations/DelegateToSelf";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { QuickReferenceCard } from "@/components/shared/QuickReferenceCard";
 import Tenant from "@/lib/tenant/tenant";
 
 export function SyndicateDelegateInfo() {
@@ -29,78 +31,50 @@ export function SyndicateDelegateInfo() {
         }
       : null;
 
+  const isDelegated = delegate?.address === address;
+
   return (
-    <div className="flex flex-col space-y-8 mb-8">
-      <div
-        className={`flex flex-col space-y-4 p-6 ${useNeutral ? "bg-neutral" : "bg-wash"} border border-line shadow-newDefault rounded-xl`}
+    <div className="flex flex-col space-y-4 mb-8">
+      <QuickReferenceCard
+        icon={UserCheck}
+        title="Self-Delegation Action Card"
+        learnMoreHref="/help#self-delegation"
+        learnMoreText="Learn about self-delegation"
+        variant={useNeutral ? "neutral" : "default"}
       >
-        <h2 className="text-lg font-bold text-primary">Self-Delegation</h2>
-        <div className="flex flex-col space-y-4 text-secondary text-sm leading-relaxed">
-          <p>
-            Self-delegating activates your voting power so you can vote directly
-            in onchain proposals.
-          </p>
-          <ul className="list-disc list-inside space-y-2 ml-4 text-sm">
-            <li>
-              Onchain action: Call delegate(
-              {address ? (
-                <span className="font-mono">{address}</span>
-              ) : (
-                "0xYOUR-WALLET-HERE"
-              )}
-              ).
-            </li>
-            <li>
-              After this one-time step (per address, per chain), your votes will
-              track your token balance automatically. No need to repeat unless
-              you later delegate to someone else.
-            </li>
-          </ul>
-          <div className="flex flex-col space-y-2">
-            <p className="font-medium">Vote directly from your wallet</p>
-            {address && (
-              <p className="text-primary font-mono text-sm">
-                Your wallet: {address}
-              </p>
+        <div className="flex flex-col space-y-3">
+          <div className="flex items-center gap-2">
+            <p>Activate your voting power</p>
+            {isDelegated ? (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                Active
+              </span>
+            ) : (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                Not activated
+              </span>
             )}
           </div>
           {selfDelegate && (
-            <div className="pt-2">
+            <div>
               <DelegateToSelf delegate={selfDelegate} />
             </div>
           )}
         </div>
-      </div>
+      </QuickReferenceCard>
 
-      <div
-        className={`flex flex-col space-y-4 p-6 ${useNeutral ? "bg-neutral" : "bg-wash"} border border-line shadow-newDefault rounded-xl`}
+      <QuickReferenceCard
+        icon={UserPlus}
+        title="Delegation Info Card"
+        learnMoreHref="/help#delegate-to-others"
+        learnMoreText="About delegation & WY DUNA"
+        variant={useNeutral ? "neutral" : "default"}
       >
-        <h2 className="text-lg font-bold text-primary">
-          Delegate to Other Members
-        </h2>
-        <div className="flex flex-col space-y-4 text-secondary text-sm leading-relaxed">
-          <p>
-            You can point your voting power to a trusted delegate. This helps
-            active representatives vote on your behalf while{" "}
-            <strong>you retain token ownership</strong> and can re-delegate at
-            any time.
-          </p>
-          <p>
-            <strong>You are still a member of the WY DUNA.</strong>
-          </p>
-          <p>
-            Under Wyoming&apos;s Decentralized Unincorporated Nonprofit
-            Association Act, a <strong>member</strong> is someone who may
-            participate in selecting administrators or shaping policies. A{" "}
-            <strong>membership interest</strong> is the voting right defined by
-            those principles, and the Act explicitly contemplates that voting
-            can be administered by smart contracts. Delegating your votes{" "}
-            <strong>does not transfer your tokens</strong> or your membership;
-            it only authorizes another address to cast votes using your voting
-            power.
-          </p>
-        </div>
-      </div>
+        <p>
+          Delegate to active members below. You keep token ownership, delegate
+          votes on your behalf.
+        </p>
+      </QuickReferenceCard>
     </div>
   );
 }

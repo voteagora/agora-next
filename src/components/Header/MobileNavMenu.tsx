@@ -117,6 +117,12 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
           },
         ]
       : []),
+    {
+      name: "Help",
+      href: "/help",
+      target: "_self",
+      isActive: pathname.includes("help"),
+    },
     ...(hasComingSoon
       ? [
           {
