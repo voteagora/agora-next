@@ -7,7 +7,7 @@ import {
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api/common/governanceCalendar/getGovernanceCalendar";
 import Hero from "@/components/Hero/Hero";
-import SyndicateProposalsPageContent from "@/components/Proposals/SyndicateProposalsPageContent";
+import { LearnMoreLink } from "@/components/shared/LearnMoreLink";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import ArchiveProposalsList from "@/components/Proposals/ProposalsList/ArchiveProposalsList";
@@ -103,7 +103,11 @@ export default async function ProposalsHome() {
       {supportsNotifications && <SubscribeDialogLauncher />}
       <Hero page="proposals" />
       {ui.toggle("syndicate-proposals-page-content")?.enabled && (
-        <SyndicateProposalsPageContent />
+        <LearnMoreLink
+          href="/info#voting-guide"
+          text="Learn about the voting process"
+          description="Temp-checks, governance proposals, and more"
+        />
       )}
       {plmEnabled && (
         <>

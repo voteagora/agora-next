@@ -4,7 +4,7 @@ import DelegateCardWrapper, {
   DelegateCardLoadingState,
 } from "@/components/Delegates/DelegateCardList/DelegateCardWrapper";
 import Hero from "@/components/Hero/Hero";
-import SyndicateVotersPageContent from "@/components/Delegates/SyndicateVotersPageContent";
+import { LearnMoreLink } from "@/components/shared/LearnMoreLink";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getMetadataBaseUrl } from "@/app/lib/utils/metadata";
 
@@ -54,7 +54,13 @@ export default async function Page({ searchParams }) {
   return (
     <section>
       <Hero page="delegates" />
-      {showVotersPageContent && <SyndicateVotersPageContent />}
+      {showVotersPageContent && (
+        <LearnMoreLink
+          href="/info#voting-guide"
+          text="Learn about voting power & delegation"
+          description="Self-delegation, delegating to others, and DUNA membership"
+        />
+      )}
       <Suspense fallback={<DelegateCardLoadingState />}>
         <DelegateCardWrapper searchParams={searchParams} />
       </Suspense>

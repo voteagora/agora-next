@@ -11,6 +11,7 @@ import DunaAdministration from "@/app/duna/components/DunaAdministration";
 import DunaDisclosures from "@/app/duna/components/DunaDisclosures";
 import SyndicateDunaDisclosures from "@/app/duna/components/SyndicateDunaDisclosures";
 import TownsDunaAdministration from "@/app/duna/components/TownsDunaAdministration";
+import SyndicateEducationalContent from "@/app/info/components/SyndicateEducationalContent";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/getTreasuryBalanceTS";
@@ -80,6 +81,9 @@ export default async function Page() {
       <div className="flex flex-col">
         <InfoHero />
         <InfoAbout />
+        {namespace === TENANT_NAMESPACES.SYNDICATE && (
+          <SyndicateEducationalContent />
+        )}
         {!ui.toggle("hide-governor-settings")?.enabled && <GovernorSettings />}
         {hasDunaAdministration &&
         ui.toggle("towns-duna-administration")?.enabled ? (
