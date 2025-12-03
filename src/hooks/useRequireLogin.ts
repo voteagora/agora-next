@@ -20,7 +20,8 @@ const useRequireLogin = () => {
 
   useEffect(() => {
     if (isConnected && address) {
-      resolveAll(address);
+      // This will cause the function to stop executing which is what we want
+      resolveAll(null);
     }
   }, [isConnected, address, resolveAll]);
 
