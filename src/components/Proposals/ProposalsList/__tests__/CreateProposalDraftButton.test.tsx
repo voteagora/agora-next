@@ -58,6 +58,7 @@ const createMockQueryResult = (data: any): UseQueryResult<any, Error> => ({
   fetchStatus: "idle",
   refetch: vi.fn(),
   promise: Promise.resolve(data),
+  isEnabled: true,
 });
 
 vi.mock("@/hooks/useGetVotes");
