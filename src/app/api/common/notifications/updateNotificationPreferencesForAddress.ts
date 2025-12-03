@@ -16,6 +16,12 @@ const NotificationPreferencesOptionsSchema = z.object({
     z.literal("prompted"),
     z.boolean(),
   ]),
+  discord_webhook_url: z
+    .string()
+    .url()
+    .startsWith("https://discord.com/api/webhooks/")
+    .optional()
+    .or(z.literal("")),
 });
 
 const UpdateNotificationPreferencesSchema = z.object({
@@ -44,6 +50,7 @@ const updateNotificationPreferencesForAddress = async (
           validatedData.options.wants_proposal_created_email,
         wants_proposal_ending_soon_email:
           validatedData.options.wants_proposal_ending_soon_email,
+        discord_webhook_url: validatedData.options.discord_webhook_url,
       },
     };
 
