@@ -6,6 +6,7 @@ import { useForumPermissions } from "@/hooks/useForumPermissions";
 export interface ForumPermissions {
   canCreateTopic: boolean;
   canCreatePost: boolean;
+  canCreateProposal: boolean;
   canUpvote: boolean;
   canReact: boolean;
   currentVP: string;
