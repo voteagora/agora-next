@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Vote } from "lucide-react";
+
 import InfiniteScroll from "react-infinite-scroller";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
@@ -11,8 +13,8 @@ import DelegateCard from "./DelegateCard";
 import { stripMarkdown } from "@/lib/sanitizationUtils";
 import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
-import { SyndicateDelegateInfo } from "./SyndicateDelegateInfo";
+
+import { EducationBanner } from "@/components/shared/EducationBanner";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -38,7 +40,7 @@ export default function DelegateCardList({
     initialDelegates.data
   );
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
-  const { ui, namespace } = Tenant.current();
+  const { ui } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
@@ -96,7 +98,12 @@ export default function DelegateCardList({
   return (
     <DialogProvider>
       {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
-      {namespace === TENANT_NAMESPACES.SYNDICATE && <SyndicateDelegateInfo />}
+      <EducationBanner
+        icon={<Vote className="h-5 w-5" />}
+        message="Learn how voting power works"
+        href="/info#voting-power"
+        storageKey="voters-banner-dismissed"
+      />
       {/* @ts-ignore */}
       <InfiniteScroll
         className="grid grid-flow-row grid-cols-1 md:grid-cols-2 lg:grid-cols-3  justify-around sm:justify-between py-4 gap-4 sm:gap-8"

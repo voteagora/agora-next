@@ -3,6 +3,8 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
+import { BookOpen } from "lucide-react";
+
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFilter";
 import InfiniteScroll from "react-infinite-scroller";
@@ -14,6 +16,8 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
 import Proposal from "../Proposal/Proposal";
 import { DaoSlug } from "@prisma/client";
+
+import { EducationBanner } from "@/components/shared/EducationBanner";
 
 export default function ProposalsList({
   initRelevantProposals,
@@ -102,6 +106,12 @@ export default function ProposalsList({
         />
       )}
       <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+        <EducationBanner
+          icon={<BookOpen className="h-5 w-5" />}
+          message="Learn about the voting process"
+          href="/info#voting-process"
+          storageKey="proposals-banner-dismissed"
+        />
         <div>
           {proposals.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">
