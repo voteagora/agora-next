@@ -11,11 +11,10 @@ import DelegateCard from "./DelegateCard";
 import { stripMarkdown } from "@/lib/sanitizationUtils";
 import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
-import { SyndicateDelegateInfo } from "./SyndicateDelegateInfo";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
+  banner?: React.ReactNode;
   fetchDelegates: (args: {
     pagination?: PaginationParams;
     seed?: number;
@@ -27,6 +26,7 @@ const batchSize = 50;
 
 export default function DelegateCardList({
   initialDelegates,
+  banner,
   fetchDelegates,
 }: Props) {
   const fetching = useRef(false);
@@ -38,7 +38,7 @@ export default function DelegateCardList({
     initialDelegates.data
   );
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
-  const { ui, namespace } = Tenant.current();
+  const { ui } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
@@ -96,46 +96,48 @@ export default function DelegateCardList({
   return (
     <DialogProvider>
       {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
-      {namespace === TENANT_NAMESPACES.SYNDICATE && <SyndicateDelegateInfo />}
-      {/* @ts-ignore */}
-      <InfiniteScroll
-        className="grid grid-flow-row grid-cols-1 md:grid-cols-2 lg:grid-cols-3  justify-around sm:justify-between py-4 gap-4 sm:gap-8"
-        hasMore={meta.has_next}
-        pageStart={1}
-        loadMore={loadMore}
-        loader={
-          <div
-            className="w-full h-full min-h-[140px] bg-wash rounded-xl text-tertiary flex items-center justify-center"
-            key="loader"
-          >
-            Loading...
-          </div>
-        }
-        element="div"
-      >
-        {delegates?.map((delegate, idx) => {
-          let truncatedStatement = "";
-
-          if (delegate?.statement?.payload) {
-            const delegateStatement = (
-              delegate?.statement?.payload as { delegateStatement: string }
-            ).delegateStatement;
-
-            const plainTextStatement = stripMarkdown(delegateStatement);
-            truncatedStatement = plainTextStatement.slice(0, 120);
+      <div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg mt-6">
+        {banner}
+        {/* @ts-ignore */}
+        <InfiniteScroll
+          className="grid grid-flow-row grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-around sm:justify-between py-4 gap-4 sm:gap-8"
+          hasMore={meta.has_next}
+          pageStart={1}
+          loadMore={loadMore}
+          loader={
+            <div
+              className="w-full h-full min-h-[140px] bg-wash rounded-xl text-tertiary flex items-center justify-center"
+              key="loader"
+            >
+              Loading...
+            </div>
           }
+          element="div"
+        >
+          {delegates?.map((delegate, idx) => {
+            let truncatedStatement = "";
 
-          return (
-            <DelegateCard
-              key={delegate.address + idx}
-              delegate={delegate}
-              truncatedStatement={truncatedStatement}
-              isDelegatesFiltering={isDelegatesFiltering}
-              isAdvancedUser={isAdvancedUser}
-            />
-          );
-        })}
-      </InfiniteScroll>
+            if (delegate?.statement?.payload) {
+              const delegateStatement = (
+                delegate?.statement?.payload as { delegateStatement: string }
+              ).delegateStatement;
+
+              const plainTextStatement = stripMarkdown(delegateStatement);
+              truncatedStatement = plainTextStatement.slice(0, 120);
+            }
+
+            return (
+              <DelegateCard
+                key={delegate.address + idx}
+                delegate={delegate}
+                truncatedStatement={truncatedStatement}
+                isDelegatesFiltering={isDelegatesFiltering}
+                isAdvancedUser={isAdvancedUser}
+              />
+            );
+          })}
+        </InfiniteScroll>
+      </div>
     </DialogProvider>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFilter";
@@ -21,6 +21,7 @@ export default function ProposalsList({
   fetchProposals,
   votableSupply,
   governanceCalendar,
+  banner,
 }: {
   initRelevantProposals: PaginatedResult<ProposalType[]>;
   initAllProposals: PaginatedResult<ProposalType[]>;
@@ -35,6 +36,7 @@ export default function ProposalsList({
     reviewPeriod: boolean;
     votingPeriod: boolean;
   } | null;
+  banner?: ReactNode;
 }) {
   const { address } = useAccount();
   const { ui, slug } = Tenant.current();
@@ -102,6 +104,7 @@ export default function ProposalsList({
         />
       )}
       <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+        {banner}
         <div>
           {proposals.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">

@@ -14,6 +14,7 @@ import { trackEvent } from "@/lib/analytics";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
+  banner?: React.ReactNode;
   fetchDelegates: (args: {
     pagination?: PaginationParams;
     seed?: number;
@@ -23,6 +24,7 @@ interface Props {
 
 export default function DelegateContent({
   initialDelegates,
+  banner,
   fetchDelegates,
 }: Props) {
   const { ui } = Tenant.current();
@@ -78,11 +80,13 @@ export default function DelegateContent({
   return layout === "grid" ? (
     <DelegateCardList
       initialDelegates={initialDelegates}
+      banner={banner}
       fetchDelegates={fetchDelegates}
     />
   ) : (
     <DelegateTable
       initialDelegates={initialDelegates}
+      banner={banner}
       fetchDelegates={fetchDelegates}
     />
   );

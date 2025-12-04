@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { ReactNode } from "react";
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFilter";
 import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
@@ -18,6 +19,7 @@ import { UpdatedButton } from "@/components/Button";
 export default function ArchiveProposalsList({
   proposals,
   governanceCalendar,
+  banner,
 }: {
   proposals: ArchiveListProposal[];
   governanceCalendar?: {
@@ -26,6 +28,7 @@ export default function ArchiveProposalsList({
     reviewPeriod: boolean;
     votingPeriod: boolean;
   } | null;
+  banner?: ReactNode;
 }) {
   const { address } = useAccount();
   const { token, namespace } = Tenant.current();
@@ -99,6 +102,7 @@ export default function ArchiveProposalsList({
       )}
 
       <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+        {banner}
         <div>
           {normalizedProposals.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">

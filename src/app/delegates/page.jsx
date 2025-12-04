@@ -54,9 +54,11 @@ export default async function Page({ searchParams }) {
   return (
     <section>
       <Hero page="delegates" />
-      {showVotersPageContent && <SyndicateVotersPageContent />}
       <Suspense fallback={<DelegateCardLoadingState />}>
-        <DelegateCardWrapper searchParams={searchParams} />
+        <DelegateCardWrapper
+          searchParams={searchParams}
+          banner={showVotersPageContent ? <SyndicateVotersPageContent /> : null}
+        />
       </Suspense>
     </section>
   );

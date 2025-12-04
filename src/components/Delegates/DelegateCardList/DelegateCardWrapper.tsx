@@ -30,8 +30,10 @@ async function fetchDelegatesWithParams(
 
 const DelegateCardWrapper = async ({
   searchParams,
+  banner,
 }: {
   searchParams: SearchParams;
+  banner?: React.ReactNode;
 }) => {
   const parsedParams = loadDelegatesSearchParams(searchParams);
 
@@ -67,6 +69,7 @@ const DelegateCardWrapper = async ({
       <TabsContent value="delegates">
         <DelegateContent
           initialDelegates={delegates}
+          banner={banner}
           fetchDelegates={async ({
             pagination = { offset: 0, limit: 500 },
             seed,

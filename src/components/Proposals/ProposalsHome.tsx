@@ -98,13 +98,14 @@ export default async function ProposalsHome() {
       ]);
   }
 
+  const showSyndicateBanner = ui.toggle(
+    "syndicate-proposals-page-content"
+  )?.enabled;
+
   return (
     <div className="flex flex-col">
       {supportsNotifications && <SubscribeDialogLauncher />}
       <Hero page="proposals" />
-      {ui.toggle("syndicate-proposals-page-content")?.enabled && (
-        <SyndicateProposalsPageContent />
-      )}
       {plmEnabled && (
         <>
           <MyDraftProposals
@@ -129,6 +130,9 @@ export default async function ProposalsHome() {
         <ArchiveProposalsList
           proposals={archivedProposals.data}
           governanceCalendar={governanceCalendar}
+          banner={
+            showSyndicateBanner ? <SyndicateProposalsPageContent /> : null
+          }
         />
       ) : (
         <ProposalsList
@@ -143,6 +147,9 @@ export default async function ProposalsHome() {
           }}
           governanceCalendar={governanceCalendar}
           votableSupply={votableSupply}
+          banner={
+            showSyndicateBanner ? <SyndicateProposalsPageContent /> : null
+          }
         />
       )}
     </div>
