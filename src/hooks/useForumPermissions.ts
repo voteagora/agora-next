@@ -18,6 +18,7 @@ interface ForumSettings {
 interface ForumPermissions {
   canCreateTopic: boolean;
   canCreatePost: boolean;
+  canCreateProposal: boolean;
   canUpvote: boolean;
   canReact: boolean;
   currentVP: string;
@@ -47,7 +48,10 @@ export function useForumPermissions(): ForumPermissions {
     useHasPermission("forums", "topics", "create");
   const { hasPermission: hasPostPermission, isLoading: postPermLoading } =
     useHasPermission("forums", "posts", "create");
-
+  const {
+    hasPermission: hasProposalPermission,
+    isLoading: proposalPermLoading,
+  } = useHasPermission("proposals", "proposals", "create");
   // Fetch voting power directly from the contract
   const { data: votingPower, isLoading: vpLoading } = useQuery({
     queryKey: ["votingPower", address],
@@ -100,13 +104,18 @@ export function useForumPermissions(): ForumPermissions {
   });
 
   const isLoading =
-    vpLoading || settingsLoading || topicPermLoading || postPermLoading;
+    vpLoading ||
+    settingsLoading ||
+    topicPermLoading ||
+    postPermLoading ||
+    proposalPermLoading;
 
   // If not connected or loading, return default permissions
   if (!address || isLoading || !settings) {
     return {
       canCreateTopic: false,
       canCreatePost: false,
+      canCreateProposal: false,
       canUpvote: false,
       canReact: false,
       currentVP: "0",
@@ -133,6 +142,7 @@ export function useForumPermissions(): ForumPermissions {
   const canCreatePost = hasPostPermission || vpAsNumber >= minVpForReplies;
   const canUpvote = hasPostPermission || vpAsNumber >= minVpForActions;
   const canReact = hasPostPermission || vpAsNumber >= minVpForActions;
+  const canCreateProposal = hasProposalPermission;
 
   const reasons: ForumPermissions["reasons"] = {};
 
@@ -148,17 +158,11 @@ export function useForumPermissions(): ForumPermissions {
   if ((!canUpvote || !canReact) && !hasPostPermission) {
     reasons.actions = `You need ${minVpForActions} voting power to upvote and react. You currently have ${vpAsNumber}.`;
   }
-  console.log("Forum permissions debug:", {
-    hasTopicPermission,
-    hasPostPermission,
-    vpAsNumber,
-    minVpForTopics,
-    minVpForReplies,
-    minVpForActions,
-  });
+
   return {
     canCreateTopic,
     canCreatePost,
+    canCreateProposal,
     canUpvote,
     canReact,
     currentVP: vpAsNumber.toString(),
