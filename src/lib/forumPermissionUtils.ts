@@ -16,7 +16,7 @@ export function canCreateGovernanceProposal(
 ): boolean {
   const hasApprovedTempCheck =
     Array.isArray(relatedTempChecks) &&
-    relatedTempChecks.some((tc) => tc.status === "SUCCEEDED");
+    relatedTempChecks.some((tc) => tc.status === "PASSED");
 
   if ((permissions.isAdmin || isAuthor) && hasApprovedTempCheck) return true;
 

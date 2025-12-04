@@ -141,7 +141,7 @@ export function useRelatedItemsDialog({
 
       const filtered = tempCheckProposals.filter((proposal) => {
         const status = proposal.lifecycle_stage;
-        if (status !== "SUCCEEDED") return false;
+        if (status !== "SUCCEEDED" && status !== "PASSED") return false;
         if (tempCheckLinksMap.get(proposal.id)) return false;
         const isAuthor =
           address?.toLowerCase() === proposal.proposer?.toLowerCase();
