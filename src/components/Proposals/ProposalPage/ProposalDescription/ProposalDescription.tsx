@@ -19,6 +19,7 @@ export default function ProposalDescription({
 }: {
   proposal: Proposal;
 }) {
+  console.log("proposal", proposal);
   const proposalsWithBadDescription = [
     "94365805422398770067924881378455503928423439630602149628781926844759467250082",
     "64930538748268257621925093712454552173772860987977453334165023026835711650357",
@@ -60,25 +61,8 @@ export default function ProposalDescription({
   const { ui } = Tenant.current();
   const useArchiveForProposals =
     ui.toggle("use-archive-for-proposal-details")?.enabled ?? false;
-  const archiveMetadata = useArchiveForProposals
-    ? ((
-        proposal as unknown as {
-          archiveMetadata?: {
-            proposalTypeName?: string;
-            proposalTypeTag?: string;
-            source?: string;
-            proposerEns?: string;
-            defaultProposalTypeRanges?: {
-              min_quorum_pct: number;
-              max_quorum_pct: number;
-              min_approval_threshold_pct: number;
-              max_approval_threshold_pct: number;
-            };
-          };
-        }
-      ).archiveMetadata ?? null)
-    : null;
-
+  const archiveMetadata = proposal.archiveMetadata;
+  const useIsEasOOProposal = ui.toggle("has-eas-oodao")?.enabled ?? false;
   const proposerBadge = archiveMetadata?.proposerEns ? (
     archiveMetadata.proposerEns
   ) : (
@@ -94,7 +78,7 @@ export default function ProposalDescription({
     <div
       className={`flex flex-col gap-4 sm:max-w-[48rem] w-full md:min-w-[20rem] lg:min-w-[32rem] xl:min-w-[48rem] max-w-[calc(100vw-2rem)]`}
     >
-      {archiveMetadata && (
+      {useIsEasOOProposal && (
         <div className="inline-flex justify-start items-center gap-2 flex-wrap">
           {typeBadgeLabel && (
             <div className="px-2 py-0.5 bg-black/10 rounded-[3px] text-neutral-700 text-xs font-semibold leading-4">
