@@ -229,8 +229,6 @@ export default function DunaEditor({
       if (onChange) {
         const html = editor.getHTML();
         const text = editor.getText();
-        console.log("DunaEditor onUpdate - HTML:", html);
-        console.log("DunaEditor onUpdate - Text:", text);
         onChange(html, text);
       }
     },
