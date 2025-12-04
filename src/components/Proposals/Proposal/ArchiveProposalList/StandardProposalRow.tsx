@@ -27,7 +27,6 @@ export function StandardProposalRow({
 
   // Compute display data and metrics
   const { displayData, metrics } = useMemo(() => {
-    // Use the actual proposal type for correct display name
     const effectiveType = isHybrid ? "HYBRID_STANDARD" : proposalType;
     const displayData = extractDisplayData(proposal, effectiveType, decimals);
     const metrics = extractStandardMetrics(proposal, {

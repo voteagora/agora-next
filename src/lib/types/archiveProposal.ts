@@ -184,7 +184,7 @@ export type DaoNodeProposalFields = {
   description?: string;
   proposal_data?: string;
   decoded_proposal_data?: unknown[][] | DecodedStandardProposalData;
-
+  proposal_type_info: FixedProposalType;
   // Voting module
   voting_module?: string;
 
@@ -426,6 +426,11 @@ export function deriveProposalType(
   return baseClass as ProposalType;
 }
 
+export type ProposalTypeInfo = {
+  quorum: number;
+  approval_threshold: number;
+};
+
 // =============================================================================
 // Legacy Compatibility (ArchiveListProposal)
 // =============================================================================
@@ -446,7 +451,6 @@ export type ArchiveListProposal = {
   end_block: number;
   lifecycle_stage?: string;
   data_eng_properties: DataEngProperties;
-
   // Vote data - different keys for different sources
   totals?: DaoNodeVoteTotals;
   outcome?: EasAtlasVoteOutcome | EasOodaoVoteOutcome;
@@ -485,7 +489,7 @@ export type ArchiveListProposal = {
   voting_module_name?: "standard" | "approval" | "optimistic";
   decoded_proposal_data?: unknown[][] | DecodedStandardProposalData;
   proposal_data?: string;
-  quorum?: string | number;
+  quorum: string;
   quorumVotes?: string | number;
   votableSupply?: string | number;
   votable_supply?: string | number;
@@ -525,4 +529,5 @@ export type ArchiveListProposal = {
   quorum_check?: boolean;
   approval_check?: boolean;
   total_voting_power_at_start?: string;
+  proposal_type_info?: ProposalTypeInfo;
 };

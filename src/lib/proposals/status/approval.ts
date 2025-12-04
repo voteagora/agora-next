@@ -1,124 +1,91 @@
-import {
-  ArchiveListProposal,
-  EasAtlasVoteOutcome,
-} from "@/lib/types/archiveProposal";
-import { OFFCHAIN_THRESHOLDS, HYBRID_VOTE_WEIGHTS } from "@/lib/constants";
+import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 import { convertToNumber } from "../converters";
-import { extractThresholds } from "../thresholds";
-import {
-  isDaoNodeSource,
-  isEasOodaoSource,
-  isHybridProposal,
-  isEasAtlasSource,
-} from "../extractors/guards";
+import { isDaoNodeSource, isEasOodaoSource } from "../extractors/guards";
+import { extractApprovalMetrics } from "../extractors/approval";
+
+// Criteria types for approval voting (raw values from decoded_proposal_data)
+// See toApprovalVotingCriteria() in proposalUtils.ts
+const CRITERIA_THRESHOLD = 0; // Options must meet a threshold
+const CRITERIA_TOP_CHOICES = 1; // Top N options win
 
 /**
- * Calculate weighted participation for hybrid/offchain approval proposals
- * Returns participation percentage (0-100)
+ * Get quorum value for approval proposals
+ * Uses proposal.quorum if available (including 0), otherwise total_voting_power_at_start / 3
  */
-function calculateWeightedParticipation(
+function getApprovalQuorum(
   proposal: ArchiveListProposal,
   decimals: number
 ): number {
-  // Get offchain outcome
-  let offchainOutcome: EasAtlasVoteOutcome | undefined;
-
-  if (isHybridProposal(proposal)) {
-    offchainOutcome = proposal.govless_proposal?.outcome as EasAtlasVoteOutcome;
-  } else if (isEasAtlasSource(proposal)) {
-    offchainOutcome = proposal.outcome as EasAtlasVoteOutcome;
+  // First check if quorum is directly specified (including explicit 0)
+  if (proposal.quorum && Number(proposal.quorum) > 0) {
+    return convertToNumber(String(proposal.quorum), decimals);
+  }
+  if (proposal.quorumVotes && Number(proposal.quorumVotes) > 0) {
+    return convertToNumber(String(proposal.quorumVotes), decimals);
   }
 
-  if (!offchainOutcome) {
-    return 0;
-  }
-
-  // Calculate participation for each citizen group
-  const getGroupParticipation = (
-    groupKey: "USER" | "APP" | "CHAIN",
-    eligible: number
-  ): number => {
-    const groupData = offchainOutcome?.[groupKey];
-    if (!groupData || eligible === 0) return 0;
-    const totalVotes =
-      Number(groupData["0"] ?? 0) +
-      Number(groupData["1"] ?? 0) +
-      Number(groupData["2"] ?? 0);
-    return (totalVotes / eligible) * 100;
-  };
-
-  const userParticipation = getGroupParticipation(
-    "USER",
-    OFFCHAIN_THRESHOLDS.USER
+  // Otherwise use total_voting_power_at_start * 0.3
+  const totalVotingPower = convertToNumber(
+    String(proposal.total_voting_power_at_start ?? "0"),
+    decimals
   );
-  const appParticipation = getGroupParticipation(
-    "APP",
-    OFFCHAIN_THRESHOLDS.APP
-  );
-  const chainParticipation = getGroupParticipation(
-    "CHAIN",
-    OFFCHAIN_THRESHOLDS.CHAIN
-  );
-
-  // For hybrid, also include delegate participation
-  if (isHybridProposal(proposal) && isDaoNodeSource(proposal)) {
-    const totalVotingPower = convertToNumber(
-      String(proposal.total_voting_power_at_start ?? "0"),
-      decimals
-    );
-    const voteTotals = proposal.totals?.["no-param"] || {};
-    const delegateVotes =
-      convertToNumber(String(voteTotals["0"] ?? "0"), decimals) +
-      convertToNumber(String(voteTotals["1"] ?? "0"), decimals) +
-      convertToNumber(String(voteTotals["2"] ?? "0"), decimals);
-    const delegateParticipation =
-      totalVotingPower > 0 ? (delegateVotes / totalVotingPower) * 100 : 0;
-
-    // Weighted average across 4 groups
-    return (
-      delegateParticipation * HYBRID_VOTE_WEIGHTS.delegates +
-      userParticipation * HYBRID_VOTE_WEIGHTS.users +
-      appParticipation * HYBRID_VOTE_WEIGHTS.apps +
-      chainParticipation * HYBRID_VOTE_WEIGHTS.chains
-    );
-  }
-
-  // For offchain only, average across 3 groups
-  return (userParticipation + appParticipation + chainParticipation) / 3;
+  return totalVotingPower * 0.3;
 }
 
 /**
  * Derive status for APPROVAL proposal types
+ *
+ * Uses extractApprovalMetrics to get voting data and criteria configuration.
  */
 export const deriveApprovalStatus = (
   proposal: ArchiveListProposal,
   proposalType: string,
   decimals: number
 ): string => {
-  const thresholds = extractThresholds(proposal);
+  // Get quorum: use proposal.quorum or total_voting_power_at_start / 3
+  const quorumValue = getApprovalQuorum(proposal, decimals);
 
-  // For HYBRID_APPROVAL and OFFCHAIN_APPROVAL: check weighted participation quorum
-  if (
-    proposalType === "HYBRID_APPROVAL" ||
-    proposalType === "OFFCHAIN_APPROVAL"
-  ) {
-    const weightedParticipation = calculateWeightedParticipation(
-      proposal,
-      decimals
-    );
+  // Use the existing extractor to get all approval metrics
+  const approvalMetrics = extractApprovalMetrics(proposal, {
+    tokenDecimals: decimals,
+  });
 
-    // Check if participation meets quorum threshold (default 30%)
-    const quorumThreshold = thresholds.quorum || 30;
-    if (weightedParticipation < quorumThreshold) {
+  const { choices, criteria, criteriaValue } = approvalMetrics;
+  // For OFFCHAIN_APPROVAL: matches old proposalStatus.ts - just quorum check, no criteria
+  // Note: HYBRID_APPROVAL requires calculateHybridApprovalProposalMetrics() which needs parsed data
+  if (proposalType === "OFFCHAIN_APPROVAL") {
+    // Old code: just checks for + abstain against quorum
+    const totalApprovals = choices.reduce((sum, c) => sum + c.approvals, 0);
+
+    if (totalApprovals < quorumValue) {
       return "DEFEATED";
     }
-
-    // For approval voting, if quorum is met, it succeeds
-    // (the actual winner determination is separate from pass/fail)
     return "SUCCEEDED";
   }
 
-  // For standard APPROVAL: check quorum and criteria based on source
+  // HYBRID_APPROVAL should use calculateHybridApprovalProposalMetrics in calling code
+  // This function doesn't have access to the parsed proposalData needed for weighted calculation
+  if (proposalType === "HYBRID_APPROVAL") {
+    // Fallback: simple quorum + criteria check (may not match old behavior exactly)
+    const totalApprovals = choices.reduce((sum, c) => sum + c.approvals, 0);
+
+    if (totalApprovals < quorumValue) {
+      return "DEFEATED";
+    }
+
+    if (criteria === CRITERIA_THRESHOLD) {
+      const thresholdVotes = convertToNumber(String(criteriaValue), decimals);
+      for (const choice of choices) {
+        if (choice.approvals > thresholdVotes) {
+          return "SUCCEEDED";
+        }
+      }
+      return "DEFEATED";
+    }
+    return "SUCCEEDED";
+  }
+
+  // For standard APPROVAL (onchain only): check quorum and criteria
   let voteTotals: Record<string, string | undefined> = {};
   let totalVotingPower: string | undefined;
 
@@ -133,10 +100,6 @@ export const deriveApprovalStatus = (
     totalVotingPower = proposal.total_voting_power_at_start;
   }
 
-  // criteria fields are on ArchiveListProposal directly
-  const criteria = proposal.criteria ?? 0;
-  const criteriaValue = proposal.criteria_value ?? 0;
-
   const forVotes = convertToNumber(String(voteTotals["1"] ?? "0"), decimals);
   const abstainVotes = convertToNumber(
     String(voteTotals["2"] ?? "0"),
@@ -146,23 +109,24 @@ export const deriveApprovalStatus = (
   // Quorum for approval = for + abstain
   const quorumVotes = forVotes + abstainVotes;
 
-  // Check quorum
-  if (totalVotingPower) {
-    const totalPower = convertToNumber(String(totalVotingPower), decimals);
-    const quorumPercentage =
-      totalPower > 0 ? (quorumVotes / totalPower) * 100 : 0;
-    if (quorumPercentage < thresholds.quorum) {
-      return "DEFEATED";
+  // Check quorum - use quorumValue calculated from proposal.quorum or VP/3
+  if (quorumVotes < quorumValue) {
+    return "DEFEATED";
+  }
+
+  // Check criteria - matches old proposalStatus.ts logic
+  if (criteria === CRITERIA_THRESHOLD) {
+    // THRESHOLD: at least one option must have votes > criteriaValue
+    const thresholdVotes = convertToNumber(String(criteriaValue), decimals);
+
+    for (const choice of choices) {
+      if (choice.approvals > thresholdVotes) {
+        return "SUCCEEDED";
+      }
     }
+    return "DEFEATED";
+  } else {
+    // TOP_CHOICES: auto-succeeds if quorum met (old behavior)
+    return "SUCCEEDED";
   }
-
-  // Check criteria (THRESHOLD = 0, TOP_CHOICES = 1)
-  if (criteria === 0 && criteriaValue > 0) {
-    // THRESHOLD: at least one option must exceed criteriaValue
-    // Without per-option vote data, we can't verify this
-    // Rely on lifecycle_stage or default to succeeded
-  }
-
-  // TOP_CHOICES: auto-succeeds if quorum met
-  return "SUCCEEDED";
 };

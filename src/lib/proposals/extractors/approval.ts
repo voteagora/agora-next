@@ -230,13 +230,16 @@ export function extractApprovalMetrics(
   const approvalVotesMap: Record<string, number> = {};
 
   if (source !== "eas-atlas" && source !== "eas-oodao") {
-    // dao_node format: totals[optionIndex]["1"] = approval votes
+    // dao_node format: totals[optionIndex] contains votes
+    // Try key "1" first (newer format), then key "0" (older format where "0" = approval votes)
     Object.entries(totals)
       .filter(([key]) => key !== "no-param")
       .forEach(([param, votes]) => {
         const voteObj = votes as Record<string, string>;
+        // Check for votes under key "1" first, then "0"
+        const voteValue = voteObj["1"] ?? voteObj["0"] ?? "0";
         approvalVotesMap[param] = convertToNumber(
-          String(voteObj["1"] ?? "0"),
+          String(voteValue),
           tokenDecimals
         );
       });

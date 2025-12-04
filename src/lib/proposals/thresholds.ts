@@ -11,7 +11,7 @@ const DEFAULT_QUORUM_PERCENT = 4;
 const DEFAULT_APPROVAL_THRESHOLD_PERCENT = 50;
 
 export interface ProposalThresholds {
-  quorum: number;
+  quorum: number | bigint;
   approvalThreshold: number;
 }
 
@@ -48,7 +48,7 @@ export const extractThresholds = (
 
   // Handle dao_node proposals - use defaults
   return {
-    quorum: DEFAULT_QUORUM_PERCENT,
+    quorum: safeBigInt(proposal.quorum),
     approvalThreshold: DEFAULT_APPROVAL_THRESHOLD_PERCENT,
   };
 };
