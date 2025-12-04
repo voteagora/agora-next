@@ -7,7 +7,6 @@ import { RelatedItem } from "../types";
 import { getProposalLinks } from "@/lib/actions/proposalLinks";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import { getArchivedProposals } from "@/lib/actions/archive";
-import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
 import { useAccount } from "wagmi";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 
@@ -56,7 +55,10 @@ export function useRelatedItemsDialog({
   const succeededTempCheckIds = useMemo(() => {
     if (searchType !== "tempcheck" || !tempCheckProposals.length) return [];
     return tempCheckProposals
-      .filter((p) => deriveStatus(p, 18) === "SUCCEEDED")
+      .filter(
+        (p) =>
+          p.lifecycle_stage === "PASSED" || p.lifecycle_stage === "SUCCEEDED"
+      )
       .map((p) => p.id);
   }, [tempCheckProposals, searchType]);
 
@@ -138,7 +140,7 @@ export function useRelatedItemsDialog({
         return { results: [], totalResults: 0, totalPages: 0 };
 
       const filtered = tempCheckProposals.filter((proposal) => {
-        const status = deriveStatus(proposal, 18);
+        const status = proposal.lifecycle_stage;
         if (status !== "SUCCEEDED") return false;
         if (tempCheckLinksMap.get(proposal.id)) return false;
         const isAuthor =
@@ -171,7 +173,7 @@ export function useRelatedItemsDialog({
             }
           ),
           url: `/proposals/${proposal.id}`,
-          status: deriveStatus(proposal, 18),
+          status: proposal.lifecycle_stage,
           proposer: proposal.proposer,
           proposalType:
             proposalType &&

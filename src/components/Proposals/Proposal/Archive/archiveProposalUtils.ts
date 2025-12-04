@@ -16,8 +16,10 @@ export const STATUS_LABEL_MAP: Record<string, string> = {
   DEFEATED: "Defeated",
   QUEUED: "Queued",
   CANCELLED: "Cancelled",
-  PASSED: "Passed",
+  PASSED: "Succeeded",
   UNKNOWN: "Unknown",
+  PENDING: "Pending",
+  EXPIRED: "Expired",
 };
 
 /**
@@ -136,106 +138,6 @@ export const extractThresholds = (
     quorum: DEFAULT_QUORUM_PERCENT,
     approvalThreshold: DEFAULT_APPROVAL_THRESHOLD_PERCENT,
   };
-};
-
-export const deriveStatus = (
-  proposal: ArchiveListProposal,
-  decimals: number
-): string => {
-  // Check terminal states first
-  if (proposal.cancel_event || proposal.lifecycle_stage === "CANCELLED") {
-    return "CANCELLED";
-  } else if (proposal.execute_event) {
-    return "EXECUTED";
-  } else if (proposal.queue_event) {
-    const queueEvent = proposal.queue_event;
-    const queueTimestamp = Number(
-      queueEvent?.timestamp ?? queueEvent?.blocktime ?? 0
-    );
-    //TODO: we should check for no onchain actions
-    if (
-      queueTimestamp > 0 &&
-      Math.floor(Date.now() / 1000) - queueTimestamp > TEN_DAYS_IN_SECONDS
-    ) {
-      return "PASSED";
-    }
-    return "QUEUED";
-  }
-
-  // Check if proposal is still active
-  const now = Math.floor(Date.now() / 1000);
-  const endTime = Number(proposal.end_blocktime) || 0;
-  if (endTime > now) {
-    return "ACTIVE";
-  }
-
-  // For STANDARD proposals, use vote-based logic
-  // Handle different data sources: EAS-OODAO vs standard
-  const source = proposal.data_eng_properties?.source;
-  const voteTotals =
-    source === "eas-oodao"
-      ? (proposal.outcome as EasOodaoVoteOutcome)?.["token-holders"] || {}
-      : proposal.totals?.["no-param"] || {};
-
-  const forVotes = convertToNumber(String(voteTotals["1"] ?? "0"), decimals);
-  const againstVotes = convertToNumber(
-    String(voteTotals["0"] ?? "0"),
-    decimals
-  );
-  const abstainVotes = convertToNumber(
-    String(voteTotals["2"] ?? "0"),
-    decimals
-  );
-
-  // Extract thresholds from proposal
-  const thresholds = extractThresholds(proposal);
-
-  // Calculate vote threshold percentage (for / (for + against))
-  // Note: abstain is NOT included in threshold calculation, only for quorum
-  const thresholdVotes = forVotes + againstVotes;
-  const voteThresholdPercent =
-    thresholdVotes > 0 ? (forVotes / thresholdVotes) * 100 : 0;
-
-  // Check approval threshold
-  const hasMetThresholdOrNoThreshold =
-    voteThresholdPercent >= thresholds.approvalThreshold ||
-    thresholds.approvalThreshold === 0;
-
-  // Calculate quorum (for + abstain votes) - similar to getProposalCurrentQuorum
-  const quorumForGovernor = forVotes + abstainVotes;
-
-  // Check quorum - we always have the threshold from proposal_type
-  // but need total voting power to calculate if it's met
-  let quorumMet = true;
-
-  if (proposal.total_voting_power_at_start) {
-    // We have total voting power - calculate quorum percentage
-    const totalPower = convertToNumber(
-      proposal.total_voting_power_at_start,
-      decimals
-    );
-    const quorumPercentage =
-      totalPower > 0 ? (quorumForGovernor / totalPower) * 100 : 0;
-    quorumMet = quorumPercentage >= thresholds.quorum;
-  }
-  // If total_voting_power_at_start is not available, we can't check quorum
-  // This happens for proposals that haven't started voting yet
-  // Default to true to avoid incorrectly marking as defeated
-
-  // Proposal is defeated if:
-  // 1. Quorum not met, OR
-  // 2. For votes < Against votes, OR
-  // 3. Approval threshold not met
-  if (!quorumMet || forVotes < againstVotes || !hasMetThresholdOrNoThreshold) {
-    return "DEFEATED";
-  }
-
-  // Succeeded if for > against
-  if (forVotes > againstVotes) {
-    return "SUCCEEDED";
-  }
-
-  return "FAILED";
 };
 
 export const formatArchiveTagLabel = (tag?: string | null): string | null => {

@@ -6,7 +6,6 @@ import {
   STATUS_LABEL_MAP,
   convertToNumber,
   deriveTimeStatus,
-  deriveStatus,
   deriveProposalTag,
 } from "../Archive/archiveProposalUtils";
 import { getProposalTypeText } from "@/lib/utils";
@@ -38,8 +37,12 @@ export function extractDisplayData(
   proposalType: ProposalType,
   tokenDecimals: number
 ): RowDisplayData {
-  const status = deriveStatus(proposal, tokenDecimals);
-  const normalizedStatus = STATUS_LABEL_MAP[status] ? status : "UNKNOWN";
+  const status = proposal.lifecycle_stage;
+  const normalizedStatus = STATUS_LABEL_MAP[
+    status as keyof typeof STATUS_LABEL_MAP
+  ]
+    ? status
+    : "UNKNOWN";
   const proposalTag = deriveProposalTag(proposal);
   const votingData = getVotingData(proposal);
 
@@ -67,12 +70,17 @@ export function extractDisplayData(
     title: proposal.title || "Untitled Proposal",
     proposerAddress,
     proposerEns,
-    statusLabel: STATUS_LABEL_MAP[normalizedStatus],
+    statusLabel:
+      STATUS_LABEL_MAP[normalizedStatus as keyof typeof STATUS_LABEL_MAP] ??
+      "UNKNOWN",
     proposalTypeName: getProposalTypeText(proposalType),
     proposalTypeTag: proposalTag,
     source: proposal.data_eng_properties?.source,
     hasPendingRanges,
-    timeStatus: deriveTimeStatus(proposal, normalizedStatus),
+    timeStatus: deriveTimeStatus(
+      proposal,
+      normalizedStatus as keyof typeof STATUS_LABEL_MAP
+    ),
   };
 }
 
@@ -86,4 +94,4 @@ export const ensurePercentage = (value: number) => {
 };
 
 // Re-export commonly used utilities
-export { convertToNumber, deriveStatus, STATUS_LABEL_MAP };
+export { convertToNumber, STATUS_LABEL_MAP };

@@ -6,7 +6,6 @@ import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 import { fetchProposalFromArchive } from "@/lib/archiveUtils";
 import { getForumTopic } from "@/lib/actions/forum/topics";
 import Tenant from "@/lib/tenant/tenant";
-import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
 
 const { namespace, ui } = Tenant.current();
 
@@ -84,7 +83,7 @@ async function getInitialFormData(
           { addSuffix: true }
         ),
         url: `/proposals/${fromTempCheckId}`,
-        status: deriveStatus(fetchedProposal, 18),
+        status: fetchedProposal.lifecycle_stage,
         proposer: fetchedProposal.proposer,
         proposalType: proposalTypeData,
       },

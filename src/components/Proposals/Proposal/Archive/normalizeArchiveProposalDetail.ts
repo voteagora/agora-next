@@ -1,6 +1,5 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import {
-  deriveStatus,
   deriveTimeStatus,
   STATUS_LABEL_MAP,
   toDate,
@@ -67,12 +66,17 @@ export function normalizeArchiveStandardProposal(
   options: NormalizeArchiveProposalOptions = {}
 ): Proposal {
   const decimals = options.tokenDecimals ?? 18;
-  const statusKey = deriveStatus(proposal, decimals);
-  const normalizedStatusKey = STATUS_LABEL_MAP[statusKey]
+  const statusKey = proposal.lifecycle_stage;
+  const normalizedStatusKey = STATUS_LABEL_MAP[
+    statusKey as keyof typeof STATUS_LABEL_MAP
+  ]
     ? statusKey
     : "ACTIVE";
 
-  const timeStatus = deriveTimeStatus(proposal, normalizedStatusKey);
+  const timeStatus = deriveTimeStatus(
+    proposal,
+    normalizedStatusKey as keyof typeof STATUS_LABEL_MAP
+  );
 
   const createdTime =
     toDate(proposal.created_event?.blocktime) ||
