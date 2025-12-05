@@ -85,9 +85,20 @@ const CreateProposalDraftButton = ({
             // Try to initiate SIWE sign-in and then proceed
             try {
               await signIn();
-              const session = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
-              const parsed = session ? JSON.parse(session) : null;
-              jwt = parsed?.access_token as string | undefined;
+              
+              // Retry fetching the session for up to 10 seconds to handle potential race conditions
+              // specifically observed with Brave Wallet
+              let retries = 0;
+              while (!jwt && retries < 50) {
+                const session = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
+                const parsed = session ? JSON.parse(session) : null;
+                jwt = parsed?.access_token as string | undefined;
+                
+                if (jwt) break;
+                
+                await new Promise((resolve) => setTimeout(resolve, 200));
+                retries++;
+              }
             } catch (e) {
               toast("Sign-in cancelled or failed. Please try again.");
               setIsPending(false);
