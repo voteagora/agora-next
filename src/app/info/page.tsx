@@ -2,7 +2,9 @@
 
 import React from "react";
 import InfoAbout from "@/app/info/components/InfoAbout";
+import InfoGovernance from "@/app/info/components/InfoGovernance";
 import { InfoHero } from "@/app/info/components/InfoHero";
+import { SyndicateUpdates } from "@/app/info/components/SyndicateUpdates";
 
 import { ChartTreasury } from "@/app/info/components/ChartTreasury";
 import GovernorSettings from "@/app/info/components/GovernorSettings";
@@ -76,10 +78,15 @@ export default async function Page() {
       FREQUENCY_FILTERS.YEAR
     );
 
+    const showSyndicateUpdates =
+      ui.toggle("syndicate-duna-disclosures")?.enabled === true;
+
     return (
       <div className="flex flex-col">
         <InfoHero />
+        {showSyndicateUpdates && <SyndicateUpdates />}
         <InfoAbout />
+        <InfoGovernance />
         {!ui.toggle("hide-governor-settings")?.enabled && <GovernorSettings />}
         {hasDunaAdministration &&
         ui.toggle("towns-duna-administration")?.enabled ? (

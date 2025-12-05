@@ -41,6 +41,7 @@ import { DraftProposal } from "@/app/proposals/draft/types";
 import { ConfirmDialog } from "../ConfirmDialog/ConfirmDialog";
 import { ForumPost, ForumTopic } from "@/lib/forumUtils";
 import ReportModal from "@/app/duna/components/ReportModal";
+import { TreasuryWrappedModal } from "@/components/TreasuryWrapped/TreasuryWrappedModal";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -66,7 +67,8 @@ export type DialogType =
   | AccountActionDialogType
   | SponsorOffchainDraftProposalDialog
   | ConfirmDialogType
-  | ReportModalDialogType;
+  | ReportModalDialogType
+  | TreasuryWrappedDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -316,6 +318,13 @@ export type ReportModalDialogType = {
     onCommentDeleted?: (commentId: number) => void;
     onCommentUpdated?: (commentId: number, updates: Partial<ForumPost>) => void;
   };
+};
+
+export type TreasuryWrappedDialogType = {
+  type: "TREASURY_WRAPPED";
+  transparent: boolean;
+  className?: string;
+  params: {};
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -577,6 +586,9 @@ export const dialogs: DialogDefinitions<DialogType> = {
         closeDialog={closeDialog}
       />
     );
+  },
+  TREASURY_WRAPPED: ({}, closeDialog) => {
+    return <TreasuryWrappedModal isOpen={true} onClose={closeDialog} />;
   },
   // FAQ: () => {
   //   return <FaqDialog />;
