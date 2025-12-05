@@ -48,6 +48,7 @@ export default function ProposalsList({
       "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8", // Op Gov Manager for Prod
       "0xE4553b743E74dA3424Ac51f8C1E586fd43aE226F",
       "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB", // Dev Wallet for testing on op-sepolia
+      "0xb8CF6C0425FD799D617351C24fF35B493eD06Cb4", // Jonas's EOA
     ];
 
     tenantSupportsProposalLifecycle = proposalCreators.includes(address || "");
