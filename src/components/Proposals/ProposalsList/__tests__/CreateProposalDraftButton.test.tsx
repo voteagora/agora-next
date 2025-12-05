@@ -34,6 +34,7 @@ vi.mock("@/components/Button", () => ({
 
 const createMockQueryResult = (data: any): UseQueryResult<any, Error> => ({
   data,
+  isEnabled: true,
   isFetched: true,
   isFetching: false,
   isPending: false,
