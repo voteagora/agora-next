@@ -7,6 +7,7 @@ import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import Tenant from "@/lib/tenant/tenant";
 import { hasDelegateStatement } from "@/lib/delegateUtils";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
+import { VotingPowerInfoTooltip } from "@/components/shared/VotingPowerInfoTooltip";
 
 interface InsufficientVPModalProps {
   isOpen: boolean;
@@ -71,15 +72,19 @@ export function InsufficientVPModal({
           {/* VP Stats */}
           <div className="bg-gray-50 rounded-lg p-4 flex justify-between items-center">
             <div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 inline-flex items-center">
                 Your voting power and token balance
+                <VotingPowerInfoTooltip />
               </p>
               <p className="text-2xl font-bold text-gray-900">
                 {currentVP.toLocaleString()}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-600">Required voting power</p>
+              <p className="text-sm text-gray-600 inline-flex items-center justify-end">
+                Required voting power
+                <VotingPowerInfoTooltip />
+              </p>
               <p className="text-2xl font-bold text-blue-600">
                 {requiredVP.toLocaleString()}
               </p>

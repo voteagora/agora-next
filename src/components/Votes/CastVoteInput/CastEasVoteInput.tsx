@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { useUserVotes } from "@/hooks/useProposalVotes";
+import { useArchiveUserVotingPower } from "@/hooks/useArchiveUserVotingPower";
+import { TokenAmountDisplay } from "@/lib/utils";
 
 type VoteOption = "for" | "against" | "abstain" | null;
 
@@ -86,6 +88,11 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const { data: votingPower } = useArchiveUserVotingPower({
+    proposalId: proposal.id,
+    userAddress: address,
+  });
 
   const handleSubmitVote = async () => {
     if (!selectedVote || !address || !walletClient || !chain) {
@@ -202,7 +209,19 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
         disabled={!selectedVote || !address || isSubmitting}
         className="w-full rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {isSubmitting ? "Submitting..." : "Submit Vote"}
+        {isSubmitting ? (
+          "Submitting..."
+        ) : (
+          <>
+            Submit vote
+            {votingPower && (
+              <>
+                {" "}
+                with{"\u00A0"} <TokenAmountDisplay amount={votingPower} />
+              </>
+            )}
+          </>
+        )}
       </button>
     </div>
   );

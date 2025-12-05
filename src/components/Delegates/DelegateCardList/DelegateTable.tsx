@@ -20,13 +20,7 @@ import DelegatesPageInfoBanner from "../DelegatesPageInfoBanner";
 import { useInfoBannerVisibility } from "@/hooks/useInfoBannerVisibility";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
-import { InfoOutlineIcon } from "@/icons/InfoOutlineIcon";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { VotingPowerInfoTooltip } from "@/components/shared/VotingPowerInfoTooltip";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -123,28 +117,7 @@ export default function DelegateTable({
                 <TableHead className="h-10 text-secondary">
                   <span className="inline-flex items-center">
                     Voting power
-                    {ui.toggle("voting-power-info-tooltip")?.enabled &&
-                    (ui.toggle("voting-power-info-tooltip") as any)?.config
-                      ?.text ? (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="inline-flex items-center ml-1">
-                              <InfoOutlineIcon
-                                className="w-4 h-4"
-                                fill="#737373"
-                              />
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-[320px] p-4 rounded-xl bg-black text-neutral text-sm leading-snug shadow-md whitespace-normal break-words">
-                            {
-                              (ui.toggle("voting-power-info-tooltip") as any)
-                                .config.text
-                            }
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    ) : null}
+                    <VotingPowerInfoTooltip />
                   </span>
                 </TableHead>
                 {!hide7dChange && (
