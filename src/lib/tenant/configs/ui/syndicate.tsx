@@ -397,7 +397,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       name: "voting-power-info-tooltip",
       enabled: true,
       config: {
-        text: "SYND voting power is only coming from Mainnet. In order to get voting power, you must bridge to Mainnet.",
+        text: "Voting power comes from multiple sources: SYND token delegation on Ethereum mainnet, Aerodrome LP positions on Base, and staked balances on Syndicate's L3. All sources are combined to calculate your total voting power.",
       },
     },
     {
