@@ -1,10 +1,35 @@
 import localFont from "next/font/local";
-import { Inter } from "next/font/google";
 import { NextFontWithVariable } from "next/dist/compiled/@next/font";
 
-export const inter = Inter({
+export const inter = localFont({
+  src: [
+    {
+      path: "../../public/fonts/Inter/Inter-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Inter/Inter-Medium.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Inter/Inter-SemiBold.ttf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Inter/Inter-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Inter/Inter-Black.ttf",
+      weight: "900",
+      style: "normal",
+    },
+  ],
   variable: "--font-inter",
-  subsets: ["latin"],
   display: "swap",
 });
 
