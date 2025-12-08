@@ -2,11 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 import { getPublicClient } from "@/lib/viem";
 import Tenant from "@/lib/tenant/tenant";
-import { checkForumPermissions } from "@/lib/actions/forum/admin";
 import {
   fetchVotingPowerFromContract,
   formatVotingPowerString,
 } from "@/lib/votingPowerUtils";
+import { useHasPermission } from "./useRbacPermissions";
 
 interface ForumSettings {
   minVpForTopics: number;
@@ -18,12 +18,12 @@ interface ForumSettings {
 interface ForumPermissions {
   canCreateTopic: boolean;
   canCreatePost: boolean;
+  canCreateProposal: boolean;
   canUpvote: boolean;
   canReact: boolean;
   currentVP: string;
   settings: ForumSettings | null;
   isLoading: boolean;
-  isAdmin: boolean;
   reasons: {
     topics?: string;
     posts?: string;
@@ -33,34 +33,25 @@ interface ForumPermissions {
 
 /**
  * Hook to check if the connected user has sufficient voting power for forum actions
- * Admins (admin, duna_admin, super_admin) bypass all VP requirements
+ * Integrates RBAC permissions:
+ * - Users with specific RBAC permissions can bypass VP requirements for their permitted actions
+ * - VP requirements still apply for users without specific permissions
  * Uses client-side checks to provide immediate feedback before server validation
  */
 export function useForumPermissions(): ForumPermissions {
   const { address } = useAccount();
   const { slug, contracts, namespace } = Tenant.current();
   const client = getPublicClient();
-  const normalizedAddress = address?.toLowerCase();
 
-  const { data: adminCheck, isLoading: adminLoading } = useQuery({
-    queryKey: ["forumAdmin", normalizedAddress],
-    queryFn: async () => {
-      try {
-        const result = await checkForumPermissions(normalizedAddress || "");
-        return result;
-      } catch (error) {
-        console.error("Failed to check admin permissions:", error);
-        // Default to non-admin on error
-        return { isAdmin: false };
-      }
-    },
-    enabled: !!normalizedAddress,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
-    retry: false, // Don't retry admin checks
-    placeholderData: { isAdmin: false }, // Optimistic default
-  });
-
+  // Specific RBAC permission checks for each action
+  const { hasPermission: hasTopicPermission, isLoading: topicPermLoading } =
+    useHasPermission("forums", "topics", "create");
+  const { hasPermission: hasPostPermission, isLoading: postPermLoading } =
+    useHasPermission("forums", "posts", "create");
+  const {
+    hasPermission: hasProposalPermission,
+    isLoading: proposalPermLoading,
+  } = useHasPermission("proposals", "proposals", "create");
   // Fetch voting power directly from the contract
   const { data: votingPower, isLoading: vpLoading } = useQuery({
     queryKey: ["votingPower", address],
@@ -112,20 +103,24 @@ export function useForumPermissions(): ForumPermissions {
     retryDelay: 500, // Wait 500ms before retry
   });
 
-  const isLoading = vpLoading || settingsLoading || adminLoading;
-  const isAdmin = adminCheck?.isAdmin || false;
+  const isLoading =
+    vpLoading ||
+    settingsLoading ||
+    topicPermLoading ||
+    postPermLoading ||
+    proposalPermLoading;
 
   // If not connected or loading, return default permissions
   if (!address || isLoading || !settings) {
     return {
       canCreateTopic: false,
       canCreatePost: false,
+      canCreateProposal: false,
       canUpvote: false,
       canReact: false,
       currentVP: "0",
       settings: settings || null,
       isLoading,
-      isAdmin: false,
       reasons: {},
     };
   }
@@ -135,42 +130,44 @@ export function useForumPermissions(): ForumPermissions {
   // Convert voting power to number for comparisons
   const vpAsNumber = Number(currentVotes / BigInt(10 ** 18));
 
-  // Admins bypass all VP requirements
-  // Ensure settings values are numbers for comparison
+  // Get VP thresholds from settings
   const minVpForTopics = Number(settings?.minVpForTopics || 0);
   const minVpForReplies = Number(settings?.minVpForReplies || 0);
   const minVpForActions = Number(settings?.minVpForActions || 0);
-  const canCreateTopic = isAdmin || vpAsNumber >= minVpForTopics;
-  const canCreatePost = isAdmin || vpAsNumber >= minVpForReplies;
-  const canUpvote = isAdmin || vpAsNumber >= minVpForActions;
-  const canReact = isAdmin || vpAsNumber >= minVpForActions;
+
+  // Permission checks: RBAC permission OR sufficient voting power
+  // - forums.topics.create permission bypasses VP for topic creation
+  // - forums.posts.create permission bypasses VP for posts, upvotes, and reactions
+  const canCreateTopic = hasTopicPermission || vpAsNumber >= minVpForTopics;
+  const canCreatePost = hasPostPermission || vpAsNumber >= minVpForReplies;
+  const canUpvote = hasPostPermission || vpAsNumber >= minVpForActions;
+  const canReact = hasPostPermission || vpAsNumber >= minVpForActions;
+  const canCreateProposal = hasProposalPermission;
 
   const reasons: ForumPermissions["reasons"] = {};
 
-  // Only show VP reasons for non-admins
-  if (!isAdmin) {
-    if (!canCreateTopic) {
-      reasons.topics = `You need ${minVpForTopics} voting power to create topics. You currently have ${vpAsNumber}.`;
-    }
+  // Only show VP reasons for users without RBAC permissions
+  if (!canCreateTopic && !hasTopicPermission) {
+    reasons.topics = `You need ${minVpForTopics} voting power to create topics. You currently have ${vpAsNumber}.`;
+  }
 
-    if (!canCreatePost) {
-      reasons.posts = `You need ${minVpForReplies} voting power to post replies. You currently have ${vpAsNumber}.`;
-    }
+  if (!canCreatePost && !hasPostPermission) {
+    reasons.posts = `You need ${minVpForReplies} voting power to post replies. You currently have ${vpAsNumber}.`;
+  }
 
-    if (!canUpvote || !canReact) {
-      reasons.actions = `You need ${minVpForActions} voting power to upvote and react. You currently have ${vpAsNumber}.`;
-    }
+  if ((!canUpvote || !canReact) && !hasPostPermission) {
+    reasons.actions = `You need ${minVpForActions} voting power to upvote and react. You currently have ${vpAsNumber}.`;
   }
 
   return {
     canCreateTopic,
     canCreatePost,
+    canCreateProposal,
     canUpvote,
     canReact,
     currentVP: vpAsNumber.toString(),
     settings,
     isLoading,
-    isAdmin,
     reasons,
   };
 }

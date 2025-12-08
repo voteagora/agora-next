@@ -12,7 +12,9 @@ import { indexForumPost, removeForumPostFromIndex } from "./search";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
-import { logForumAuditAction, checkForumPermissions } from "./admin";
+import { logForumAuditAction } from "./admin";
+import { requirePermission, checkPermission } from "@/lib/rbac";
+import type { DaoSlug } from "@prisma/client";
 import { createAttachmentsFromContent } from "../attachment";
 import {
   canCreatePost,
@@ -66,14 +68,17 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
 
     if (!topic) return { success: false, error: "Topic not found" } as const;
 
-    // Check if user is an admin (admins bypass VP requirements)
-    const adminCheck = await checkForumPermissions(
+    // Check if user has posts.create permission (bypasses VP requirements)
+    const hasPostPermission = await checkPermission(
       validated.address,
-      topic.categoryId || undefined
+      slug as DaoSlug,
+      "forums",
+      "posts",
+      "create"
     );
 
-    // Only check voting power for non-admins
-    if (!adminCheck.isAdmin) {
+    // Only check voting power if user doesn't have RBAC permission
+    if (!hasPostPermission) {
       try {
         const tenant = Tenant.current();
         const client = getPublicClient();
@@ -249,14 +254,17 @@ export async function createForumPost(
       return { success: false, error: "Topic not found" };
     }
 
-    // Check if user is an admin (admins bypass VP requirements)
-    const adminCheck = await checkForumPermissions(
+    // Check if user has posts.create permission (bypasses VP requirements)
+    const hasPostPermission = await checkPermission(
       validatedData.address,
-      topic.categoryId || undefined
+      slug as DaoSlug,
+      "forums",
+      "posts",
+      "create"
     );
 
-    // Only check voting power for non-admins
-    if (!adminCheck.isAdmin) {
+    // Only check voting power if user doesn't have RBAC permission
+    if (!hasPostPermission) {
       try {
         const tenant = Tenant.current();
         const client = getPublicClient();
@@ -404,15 +412,16 @@ export async function softDeleteForumPost(
   try {
     const validatedData = softDeletePostSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
+    // Verify signature and check permission
+    await requirePermission({
+      address: validatedData.address,
       message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
+      signature: validatedData.signature,
+      daoSlug: slug as any,
+      module: "forums",
+      resource: "posts",
+      action: "archive",
     });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
-    }
 
     await prismaWeb2Client.forumPost.update({
       where: {
@@ -443,15 +452,16 @@ export async function restoreForumPost(
   try {
     const validatedData = softDeletePostSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
+    // Verify signature and check permission
+    await requirePermission({
+      address: validatedData.address,
       message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
+      signature: validatedData.signature,
+      daoSlug: slug as any,
+      module: "forums",
+      resource: "posts",
+      action: "archive",
     });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
-    }
 
     await prismaWeb2Client.forumPost.update({
       where: {
