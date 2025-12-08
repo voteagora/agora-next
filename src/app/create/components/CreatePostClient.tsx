@@ -124,7 +124,12 @@ export function CreatePostClient({
         description: data.description,
         startts: BigInt(Math.floor(Date.now() / 1000) + votingDelaySeconds),
         endts: BigInt(
-          Math.floor((Date.now() + votingPeriodSeconds * 1000) / 1000)
+          Math.floor(
+            (Date.now() +
+              votingDelaySeconds * 1000 +
+              votingPeriodSeconds * 1000) /
+              1000
+          )
         ),
         tags: tagsString,
         proposal_type_uid: selectedProposalType.id || undefined,
