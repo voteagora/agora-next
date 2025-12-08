@@ -61,7 +61,7 @@ export async function checkForumPermissions(
     // Check specific RBAC permissions
     const [canCreateTopics, canManageTopics] = await Promise.all([
       checkPermission(address, daoSlug, "forums", "topics", "create"),
-      checkPermission(address, daoSlug, "forums", "topics", "update"),
+      checkPermission(address, daoSlug, "forums", "topics", "archive"),
     ]);
 
     // isAdmin if user has management permissions

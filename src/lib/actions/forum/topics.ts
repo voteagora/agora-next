@@ -565,7 +565,7 @@ export async function restoreForumTopic(
       daoSlug: slug as any,
       module: "forums",
       resource: "topics",
-      action: "restore",
+      action: "archive",
     });
 
     await prismaWeb2Client.forumTopic.update({
