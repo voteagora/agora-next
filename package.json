@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run generate-typechain & npx prisma generate & next dev",
-    "build": "npm run generate-typechain && npx prisma generate && next build",
+    "build": "next build",
     "analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "next lint",
