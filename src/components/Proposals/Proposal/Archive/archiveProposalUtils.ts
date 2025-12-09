@@ -314,7 +314,7 @@ export const resolveArchiveThresholds = (proposal: ArchiveListProposal) => {
     quotaValues.quorum > 0n &&
     totalVotingPowerRaw > 0n
   ) {
-    quorumValue = (totalVotingPowerRaw * quotaValues.quorum) / 100n;
+    quorumValue = (totalVotingPowerRaw * quotaValues.quorum) / 10000n;
   } else if (quotaValues.quorum > 0n) {
     quorumValue = quotaValues.quorum;
   }
