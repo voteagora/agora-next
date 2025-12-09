@@ -307,10 +307,16 @@ export const resolveArchiveThresholds = (proposal: ArchiveListProposal) => {
     proposal.total_voting_power_at_start ?? 0
   );
 
-  let quorumValue = quotaValues.quorum / 100n;
+  let quorumValue = 0n;
 
-  if (source === "eas-oodao" && quorumValue > 0n && totalVotingPowerRaw > 0n) {
-    quorumValue = (totalVotingPowerRaw * quorumValue) / 100n;
+  if (
+    source === "eas-oodao" &&
+    quotaValues.quorum > 0n &&
+    totalVotingPowerRaw > 0n
+  ) {
+    quorumValue = (totalVotingPowerRaw * quotaValues.quorum) / 100n;
+  } else if (quotaValues.quorum > 0n) {
+    quorumValue = quotaValues.quorum;
   }
 
   const votableSupply = safeBigInt(proposal.total_voting_power_at_start ?? 0);
