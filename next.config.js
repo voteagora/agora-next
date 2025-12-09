@@ -89,6 +89,7 @@ const nextConfig = withBundleAnalyzer({
     },
   },
   output: "standalone", // Optional, good for Docker
+  productionBrowserSourceMaps: false,
 });
 
 module.exports = nextConfig;
