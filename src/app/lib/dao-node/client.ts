@@ -440,3 +440,34 @@ export const getDelegateVotingPowerFromDaoNode = async (
     return null;
   }
 };
+
+export const getUserNonIVotesVPAtBlock = async (
+  address: string,
+  blockNumber: number
+): Promise<string | null> => {
+  const url = getDaoNodeURLForNamespace(namespace);
+  if (!url) {
+    return null;
+  }
+  try {
+    const response = await fetch(
+      `${url}v1/nonivotes/user/${address}/at-block/${blockNumber}`
+    );
+    if (!response.ok) {
+      console.error(
+        `Failed to fetch user non-ivotes vp at block: ${response.status} ${response.statusText}`
+      );
+      return null;
+    }
+
+    const data = (await response.json()) as {
+      address: string;
+      block_number: number;
+      vp: string;
+    };
+    return data?.vp ?? null;
+  } catch (error) {
+    console.error("Error in getUserStakeAtBlock:", error);
+    return null;
+  }
+};
