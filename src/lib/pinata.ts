@@ -1,15 +1,17 @@
 import { PinataSDK } from "pinata";
 
-if (!process.env.PINATA_JWT) {
-  throw new Error("PINATA_JWT is missing from env");
-}
-
 const GATEWAY_URL = "bronze-abundant-swift-398.mypinata.cloud";
 
-const pinata = new PinataSDK({
-  pinataJwt: process.env.PINATA_JWT,
-  pinataGateway: GATEWAY_URL,
-});
+const getPinata = () => {
+  if (!process.env.PINATA_JWT) {
+    throw new Error("PINATA_JWT is missing from env");
+  }
+
+  return new PinataSDK({
+    pinataJwt: process.env.PINATA_JWT,
+    pinataGateway: GATEWAY_URL,
+  });
+};
 
 export interface PinataUploadResponse {
   IpfsHash: string;
@@ -40,6 +42,7 @@ export async function uploadFileToPinata(
   options?: PinataOptions
 ): Promise<PinataUploadResponse> {
   let uploadBuilder;
+  const pinata = getPinata();
 
   if (Buffer.isBuffer(file)) {
     const base64 = file.toString("base64");
