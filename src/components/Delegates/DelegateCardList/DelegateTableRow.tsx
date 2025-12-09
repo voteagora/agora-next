@@ -54,12 +54,14 @@ export default function DelegateTableRow({
           {delegate.vpChange7d ? (
             <span
               className={
-                Number(delegate.vpChange7d) >= 0
+                Number(delegate.vpChange7d) > 0
                   ? "text-green-500"
-                  : "text-red-500"
+                  : Number(delegate.vpChange7d) < 0
+                    ? "text-red-500"
+                    : "text-secondary"
               }
             >
-              {Number(delegate.vpChange7d) >= 0 ? "+" : ""}
+              {Number(delegate.vpChange7d) > 0 ? "+" : ""}
               {formatNumber(delegate.vpChange7d)}
             </span>
           ) : (
