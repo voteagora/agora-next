@@ -21,10 +21,12 @@ const SUBTAB_PARAM = "subtab";
 function DelegationsContainer({
   delegatees,
   initialDelegators,
+  numOfDelegators,
   fetchDelegators,
 }: {
   delegatees: Delegation[];
   initialDelegators: PaginatedResult<Delegation[]>;
+  numOfDelegators: bigint;
   fetchDelegators: (params: {
     offset: number;
     limit: number;
@@ -129,7 +131,9 @@ function DelegationsContainer({
                         className="w-full p-4 bg-neutral text-center text-secondary text-sm"
                         colSpan={6}
                       >
-                        None found
+                        {numOfDelegators > 0n
+                          ? "Accounts with OVP or Dust are hidden"
+                          : "None found"}
                       </td>
                     ) : (
                       delegators.map((delegation) => (
