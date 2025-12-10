@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterAll } from "vitest";
-import { resolveSafeTx, wrappedWaitForTransactionReceipt } from "../utils";
+import { resolveSafeTx, wrappedWaitForTransactionReceipt, getProposalTypeText } from "../utils";
 import { mainnet } from "viem/chains";
 import { getPublicClient } from "../viem";
 
@@ -219,6 +219,35 @@ describe("Safe Transaction Utils", () => {
       await expect(wrappedWaitForTransactionReceipt(params)).rejects.toThrow(
         "no chain on public client"
       );
+    });
+  });
+  describe("getProposalTypeText", () => {
+    it("should return custom label if provided", () => {
+      expect(getProposalTypeText("STANDARD", undefined, "Custom Label")).toBe(
+        "Custom Label"
+      );
+    });
+
+    it("should return 'Optimistic Proposal' for OFFCHAIN_OPTIMISTIC", () => {
+      expect(getProposalTypeText("OFFCHAIN_OPTIMISTIC")).toBe(
+        "Optimistic Proposal"
+      );
+    });
+
+    it("should return 'Standard Proposal' for OFFCHAIN_STANDARD", () => {
+      expect(getProposalTypeText("OFFCHAIN_STANDARD")).toBe(
+        "Standard Proposal"
+      );
+    });
+
+    it("should return 'Approval Vote Proposal' for OFFCHAIN_APPROVAL", () => {
+      expect(getProposalTypeText("OFFCHAIN_APPROVAL")).toBe(
+        "Approval Vote Proposal"
+      );
+    });
+
+    it("should return 'Optimistic Proposal' for OPTIMISTIC", () => {
+      expect(getProposalTypeText("OPTIMISTIC")).toBe("Optimistic Proposal");
     });
   });
 });
