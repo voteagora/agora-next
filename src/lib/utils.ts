@@ -89,8 +89,13 @@ export function bpsToString(bps: number) {
 
 export const getProposalTypeText = (
   proposalType: string,
-  proposalData?: ParsedProposalData["SNAPSHOT"]["kind"]
+  proposalData?: ParsedProposalData["SNAPSHOT"]["kind"],
+  customTypeLabel?: string
 ) => {
+  if (customTypeLabel) {
+    return customTypeLabel;
+  }
+
   switch (proposalType) {
     case "OPTIMISTIC":
       return "Optimistic Proposal";
@@ -104,11 +109,11 @@ export const getProposalTypeText = (
       }
     case "OFFCHAIN_OPTIMISTIC":
     case "OFFCHAIN_OPTIMISTIC_TIERED":
-      return "Optimistic Proposal (Offchain)";
+      return "Optimistic Proposal";
     case "OFFCHAIN_STANDARD":
-      return "Standard Proposal (Offchain)";
+      return "Standard Proposal";
     case "OFFCHAIN_APPROVAL":
-      return "Approval Vote Proposal (Offchain)";
+      return "Approval Vote Proposal";
     case "HYBRID_STANDARD":
       return "Joint House Standard Proposal";
     case "HYBRID_APPROVAL":
