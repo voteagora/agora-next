@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterAll } from "vitest";
-import { resolveSafeTx, wrappedWaitForTransactionReceipt, getProposalTypeText } from "../utils";
+import {
+  resolveSafeTx,
+  wrappedWaitForTransactionReceipt,
+  getProposalTypeText,
+} from "../utils";
 import { mainnet } from "viem/chains";
 import { getPublicClient } from "../viem";
 
