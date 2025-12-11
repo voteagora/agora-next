@@ -29,7 +29,8 @@ export default function Proposal({
     proposal.proposalType ?? "",
     proposal.proposalType === "SNAPSHOT"
       ? (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
-      : undefined
+      : undefined,
+    proposal.proposalTypeData?.name
   );
 
   const shouldNavigateToSnapshot =

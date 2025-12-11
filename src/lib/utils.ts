@@ -89,8 +89,19 @@ export function bpsToString(bps: number) {
 
 export const getProposalTypeText = (
   proposalType: string,
-  proposalData?: ParsedProposalData["SNAPSHOT"]["kind"]
+  proposalData?: ParsedProposalData["SNAPSHOT"]["kind"],
+  customTypeLabel?: string
 ) => {
+  if (customTypeLabel) {
+    return customTypeLabel;
+  }
+
+  // Check if archive service is enabled for proposals
+  // If so, we want to remove the (Offchain) suffix from the label
+  // This is based on specific tenant requirements (e.g. Syndicate wants it clean, OP wants the suffix)
+  const useArchive =
+    Tenant.current().ui.toggle("use-archive-for-proposals")?.enabled === true;
+
   switch (proposalType) {
     case "OPTIMISTIC":
       return "Optimistic Proposal";
@@ -104,11 +115,15 @@ export const getProposalTypeText = (
       }
     case "OFFCHAIN_OPTIMISTIC":
     case "OFFCHAIN_OPTIMISTIC_TIERED":
-      return "Optimistic Proposal (Offchain)";
+      return useArchive
+        ? "Optimistic Proposal"
+        : "Optimistic Proposal (Offchain)";
     case "OFFCHAIN_STANDARD":
-      return "Standard Proposal (Offchain)";
+      return useArchive ? "Standard Proposal" : "Standard Proposal (Offchain)";
     case "OFFCHAIN_APPROVAL":
-      return "Approval Vote Proposal (Offchain)";
+      return useArchive
+        ? "Approval Vote Proposal"
+        : "Approval Vote Proposal (Offchain)";
     case "HYBRID_STANDARD":
       return "Joint House Standard Proposal";
     case "HYBRID_APPROVAL":
