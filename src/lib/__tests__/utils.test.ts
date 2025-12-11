@@ -232,21 +232,21 @@ describe("Safe Transaction Utils", () => {
       );
     });
 
-    it("should return 'Optimistic Proposal' for OFFCHAIN_OPTIMISTIC", () => {
+    it("should return 'Optimistic Proposal (Offchain)' for OFFCHAIN_OPTIMISTIC", () => {
       expect(getProposalTypeText("OFFCHAIN_OPTIMISTIC")).toBe(
-        "Optimistic Proposal"
+        "Optimistic Proposal (Offchain)"
       );
     });
 
-    it("should return 'Standard Proposal' for OFFCHAIN_STANDARD", () => {
+    it("should return 'Standard Proposal (Offchain)' for OFFCHAIN_STANDARD", () => {
       expect(getProposalTypeText("OFFCHAIN_STANDARD")).toBe(
-        "Standard Proposal"
+        "Standard Proposal (Offchain)"
       );
     });
 
-    it("should return 'Approval Vote Proposal' for OFFCHAIN_APPROVAL", () => {
+    it("should return 'Approval Vote Proposal (Offchain)' for OFFCHAIN_APPROVAL", () => {
       expect(getProposalTypeText("OFFCHAIN_APPROVAL")).toBe(
-        "Approval Vote Proposal"
+        "Approval Vote Proposal (Offchain)"
       );
     });
 

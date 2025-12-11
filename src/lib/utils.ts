@@ -109,11 +109,11 @@ export const getProposalTypeText = (
       }
     case "OFFCHAIN_OPTIMISTIC":
     case "OFFCHAIN_OPTIMISTIC_TIERED":
-      return "Optimistic Proposal";
+      return "Optimistic Proposal (Offchain)";
     case "OFFCHAIN_STANDARD":
-      return "Standard Proposal";
+      return "Standard Proposal (Offchain)";
     case "OFFCHAIN_APPROVAL":
-      return "Approval Vote Proposal";
+      return "Approval Vote Proposal (Offchain)";
     case "HYBRID_STANDARD":
       return "Joint House Standard Proposal";
     case "HYBRID_APPROVAL":
