@@ -26,6 +26,9 @@ export type Vote = {
     image: string;
     type: string;
   }> | null;
+  easOodaoMetadata?: {
+    createdBlockNumber: number;
+  } | null;
 };
 
 export type SnapshotVotePayload = {

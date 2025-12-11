@@ -10,6 +10,7 @@ import {
  */
 
 export const STATUS_LABEL_MAP: Record<string, string> = {
+  PENDING: "Pending",
   ACTIVE: "Active",
   SUCCEEDED: "Succeeded",
   EXECUTED: "Executed",
@@ -97,29 +98,18 @@ const DEFAULT_APPROVAL_THRESHOLD_PERCENT = 50;
 
 /**
  * Extract quorum and approval threshold from proposal
- * If default_proposal_type_ranges exists, the proposal is pending approval (use min values)
- * Otherwise, use the fixed values from proposal_type
- * Returns percentages (0-100)
+ * Always uses proposal_type values (author's proposed or approved type)
+ * Note: default_proposal_type_ranges is for display only, not status calculation
+ * Returns values as percentages (0-100, e.g., 4 = 4%, 100 = 100%)
  */
 export const extractThresholds = (
   proposal: ArchiveListProposal
 ): { quorum: number; approvalThreshold: number } => {
   const proposalType = proposal.proposal_type;
-  const defaultProposalTypeRanges = proposal.default_proposal_type_ranges;
 
-  // If default_proposal_type_ranges exists, proposal is pending approval - use min values
-  if (
-    defaultProposalTypeRanges &&
-    typeof defaultProposalTypeRanges === "object"
-  ) {
-    return {
-      quorum: defaultProposalTypeRanges.min_quorum_pct / 100,
-      approvalThreshold:
-        defaultProposalTypeRanges.min_approval_threshold_pct / 100,
-    };
-  }
-
-  // Handle FixedProposalType (eas-oodao) - proposal type is approved
+  // Handle FixedProposalType (eas-oodao) - both approved and pending proposals
+  // Server sends these in basis points (e.g., 400 = 4%, 10000 = 100%)
+  // Convert to percentage by dividing by 100
   if (
     typeof proposalType === "object" &&
     proposalType !== null &&
@@ -152,19 +142,34 @@ export const deriveStatus = (
     const queueTimestamp = Number(
       queueEvent?.timestamp ?? queueEvent?.blocktime ?? 0
     );
-    //TODO: we should check for no onchain actions
+    // Check for no onchain actions (calldatas empty or all zeros)
+    const hasNoOnchainActions =
+      !proposal.calldatas ||
+      proposal.calldatas.length === 0 ||
+      proposal.calldatas.every((c) => c === "0x" || c === "");
     if (
       queueTimestamp > 0 &&
-      Math.floor(Date.now() / 1000) - queueTimestamp > TEN_DAYS_IN_SECONDS
+      Math.floor(Date.now() / 1000) - queueTimestamp > TEN_DAYS_IN_SECONDS &&
+      hasNoOnchainActions
     ) {
       return "PASSED";
     }
     return "QUEUED";
   }
 
-  // Check if proposal is still active
+  // eas-oodao specific: check delete_event
+  if (proposal.delete_event) {
+    return "CANCELLED";
+  }
+
+  // Check if proposal is still active or pending
   const now = Math.floor(Date.now() / 1000);
+  const startTime = Number(proposal.start_blocktime) || 0;
   const endTime = Number(proposal.end_blocktime) || 0;
+
+  if (startTime > now) {
+    return "PENDING";
+  }
   if (endTime > now) {
     return "ACTIVE";
   }
@@ -187,36 +192,30 @@ export const deriveStatus = (
     decimals
   );
 
-  // Extract thresholds from proposal
+  // Extract thresholds from proposal (as percentages, e.g., 4 = 4%, 100 = 100%)
   const thresholds = extractThresholds(proposal);
 
-  // Calculate vote threshold percentage (for / (for + against))
-  // Note: abstain is NOT included in threshold calculation, only for quorum
-  const thresholdVotes = forVotes + againstVotes;
-  const voteThresholdPercent =
-    thresholdVotes > 0 ? (forVotes / thresholdVotes) * 100 : 0;
-
-  // Check approval threshold
-  const hasMetThresholdOrNoThreshold =
-    voteThresholdPercent >= thresholds.approvalThreshold ||
-    thresholds.approvalThreshold === 0;
-
-  // Calculate quorum (for + abstain votes) - similar to getProposalCurrentQuorum
-  const quorumForGovernor = forVotes + abstainVotes;
-
-  // Check quorum - we always have the threshold from proposal_type
-  // but need total voting power to calculate if it's met
+  // Check quorum and approval threshold - we need total voting power
   let quorumMet = true;
+  let hasMetThreshold = true;
 
   if (proposal.total_voting_power_at_start) {
-    // We have total voting power - calculate quorum percentage
     const totalPower = convertToNumber(
       proposal.total_voting_power_at_start,
       decimals
     );
-    const quorumPercentage =
-      totalPower > 0 ? (quorumForGovernor / totalPower) * 100 : 0;
-    quorumMet = quorumPercentage >= thresholds.quorum;
+
+    // Quorum check: (FOR + AGAINST + ABSTAIN) >= (quorum% × total_voting_power)
+    const quorumVotes = forVotes + againstVotes + abstainVotes;
+    const passingQuorum = (thresholds.quorum / 100) * totalPower;
+    quorumMet = quorumVotes >= passingQuorum;
+
+    // Approval threshold check: FOR >= (approval_threshold% × total_voting_power)
+    const passingApprovalThreshold =
+      (thresholds.approvalThreshold / 100) * totalPower;
+    hasMetThreshold =
+      forVotes >= passingApprovalThreshold ||
+      thresholds.approvalThreshold === 0;
   }
   // If total_voting_power_at_start is not available, we can't check quorum
   // This happens for proposals that haven't started voting yet
@@ -224,9 +223,9 @@ export const deriveStatus = (
 
   // Proposal is defeated if:
   // 1. Quorum not met, OR
-  // 2. For votes < Against votes, OR
-  // 3. Approval threshold not met
-  if (!quorumMet || forVotes < againstVotes || !hasMetThresholdOrNoThreshold) {
+  // 2. Approval threshold not met
+  // Note: We don't check for > against here, the approval threshold handles that
+  if (!quorumMet || !hasMetThreshold) {
     return "DEFEATED";
   }
 
@@ -308,10 +307,16 @@ export const resolveArchiveThresholds = (proposal: ArchiveListProposal) => {
     proposal.total_voting_power_at_start ?? 0
   );
 
-  let quorumValue = quotaValues.quorum / 100n;
+  let quorumValue = 0n;
 
-  if (source === "eas-oodao" && quorumValue > 0n && totalVotingPowerRaw > 0n) {
-    quorumValue = (totalVotingPowerRaw * quorumValue) / 100n;
+  if (
+    source === "eas-oodao" &&
+    quotaValues.quorum > 0n &&
+    totalVotingPowerRaw > 0n
+  ) {
+    quorumValue = (totalVotingPowerRaw * quotaValues.quorum) / 10000n;
+  } else if (quotaValues.quorum > 0n) {
+    quorumValue = quotaValues.quorum;
   }
 
   const votableSupply = safeBigInt(proposal.total_voting_power_at_start ?? 0);

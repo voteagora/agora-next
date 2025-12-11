@@ -23,6 +23,7 @@ import { useEnsName } from "wagmi";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { DelegateToSelf } from "../Delegates/Delegations/DelegateToSelf";
 import { ZERO_ADDRESS } from "@/lib/constants";
+import { VotingPowerInfoTooltip } from "@/components/shared/VotingPowerInfoTooltip";
 
 interface Props {
   ensName: string | undefined;
@@ -251,7 +252,12 @@ export const ProfileDropDownContent = ({
             }
           />
           <PanelRow
-            title="My voting power"
+            title={
+              <span className="inline-flex items-center">
+                My voting power
+                <VotingPowerInfoTooltip />
+              </span>
+            }
             detail={
               <RowSkeletonWrapper isLoading={isFetching}>
                 <TokenAmountDecorated

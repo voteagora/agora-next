@@ -1,6 +1,7 @@
 import { PublicClient } from "viem";
 import Tenant from "@/lib/tenant/tenant";
 import { getChainById, getPublicClient } from "@/lib/viem";
+import { getDelegateVotingPowerFromDaoNode } from "@/app/lib/dao-node/server-client";
 
 interface VotingPowerConfig {
   namespace: string;
@@ -36,6 +37,13 @@ export async function fetchVotingPowerFromContract(
   try {
     const tenant = Tenant.current();
     const multiChainTokens = tenant.ui.tokens;
+    const { ui } = tenant;
+    const includeL3Staking = ui.toggle("include-l3-staking")?.enabled ?? false;
+
+    if (includeL3Staking) {
+      const votingPower = await getDelegateVotingPowerFromDaoNode(address);
+      return votingPower ? BigInt(votingPower) : BigInt(0);
+    }
 
     const blockNumber = await client.getBlockNumber();
 

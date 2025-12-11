@@ -178,8 +178,7 @@ export function useRelatedItemsDialog({
             typeof proposalType === "object" &&
             "quorum" in proposalType
               ? {
-                  id:
-                    (proposalType as any).proposal_type_id || proposalType.name,
+                  id: (proposalType as any).eas_uid,
                   name: proposalType.name,
                   description: proposalType.description,
                   quorum: proposalType.quorum / 100,

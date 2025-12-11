@@ -18,11 +18,11 @@ const CREATE_PROPOSAL_SCHEMA_ID =
 
 const EAS_V2_SCHEMA_IDS = {
   CREATE_PROPOSAL:
-    "0x442d586d8424b5485de1ff46cb235dcb96b41d19834926bbad1cd157fbeeb8fc",
+    "0x38bfba767c2f41790962f09bcf52923713cfff3ad6d7604de7cc77c15fcf169a",
   VOTE:
     process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-      ? "0x2b0e624e00310c7e88a1b7840238e285152b38ab00160b14c0d4e54e0a53a3aa"
-      : "0xa6abd1e115de8e83b71f6db6db22d44d730a217f21e6008034f94e682efe9c70",
+      ? "0x19c36b80a224c4800fd6ed68901ec21f591563c8a5cb2dd95382d430603f91ff"
+      : "0x12cd8679de42e111a5ece9f2aee44dc8b8351024dea881cda97c2ff5b58349f6",
 };
 
 const schemaEncoder = new SchemaEncoder(
@@ -214,7 +214,7 @@ export const signDelegatedAttestation = async ({
 // Schema encoders for EAS v2 attestations
 const v2SchemaEncoders = {
   CREATE_PROPOSAL: new SchemaEncoder(
-    "string title,string description,uint64 startts,uint64 endts,string tags"
+    "string title,string description,uint64 startts,uint64 endts,string tags, string kwargs"
   ),
   VOTE: new SchemaEncoder("int8 choice,string reason"),
 };
@@ -244,6 +244,7 @@ export async function createV2CreateProposalAttestation({
     { name: "startts", value: startts, type: "uint64" },
     { name: "endts", value: endts, type: "uint64" },
     { name: "tags", value: tags, type: "string" },
+    { name: "kwargs", value: "{'voting_module': 'standard'}", type: "string" },
   ]);
 
   const txResponse = await easV2.attest({

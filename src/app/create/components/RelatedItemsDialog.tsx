@@ -81,7 +81,7 @@ export function RelatedItemsDialog({
 
   return (
     <Dialog open={hookIsOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh]">
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-x-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Search className="h-5 w-5" />
@@ -89,7 +89,7 @@ export function RelatedItemsDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-x-hidden">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
@@ -103,7 +103,7 @@ export function RelatedItemsDialog({
             />
           </div>
 
-          <div className="max-h-[50vh] overflow-y-auto space-y-2 pr-2">
+          <div className="max-h-[50vh] overflow-y-auto overflow-x-hidden space-y-2 pr-2">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="flex flex-col items-center gap-2">
@@ -123,7 +123,7 @@ export function RelatedItemsDialog({
                   <div
                     key={item.id}
                     className={`
-                      relative p-3 border rounded-lg transition-all
+                      relative p-3 border rounded-lg transition-all overflow-hidden
                       ${
                         selected
                           ? "bg-green-50 border-green-200 cursor-not-allowed opacity-60"
@@ -133,22 +133,22 @@ export function RelatedItemsDialog({
                     onClick={() => !selected && handleItemSelect(item)}
                   >
                     {selected && (
-                      <div className="absolute top-2 right-2">
+                      <div className="absolute top-2 right-2 z-10">
                         <Badge className="bg-green-600 text-white flex items-center gap-1">
                           <Check className="h-3 w-3" />
                           Added
                         </Badge>
                       </div>
                     )}
-                    <p className="font-medium text-sm leading-tight mb-1 pr-20">
+                    <p className="font-medium text-sm leading-tight mb-1 pr-20 break-words">
                       {item.title}
                     </p>
                     {item.description && (
-                      <p className="text-xs text-gray-500 line-clamp-2 mb-2">
+                      <p className="text-xs text-gray-500 line-clamp-2 mb-2 break-words">
                         {stripHtmlToText(item.description)}
                       </p>
                     )}
-                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                    <div className="flex items-center gap-3 text-xs text-gray-500 flex-wrap">
                       <span className="flex items-center gap-1">
                         <MessageSquare className="h-3 w-3" />
                         {item.comments}
@@ -165,15 +165,15 @@ export function RelatedItemsDialog({
           </div>
 
           {results.length > 0 && !isLoading && (
-            <div className="border-t pt-3 space-y-2">
+            <div className="border-t pt-3 space-y-2 overflow-x-hidden">
               {showPagination && (
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-500">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <p className="text-xs text-gray-500 break-words">
                     Showing {(page - 1) * 20 + 1}-
                     {Math.min(page * 20, totalResults)} of {totalResults}{" "}
                     results
                   </p>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <Button
                       size="sm"
                       variant="outline"
@@ -198,7 +198,7 @@ export function RelatedItemsDialog({
                   </div>
                 </div>
               )}
-              <p className="text-xs text-gray-500 text-center">
+              <p className="text-xs text-gray-500 text-center break-words">
                 Click on an item to add it as a reference
               </p>
             </div>
