@@ -78,7 +78,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     {
       name: "syndicatetwitter",
       title: "Twitter",
-      url: "https://x.com/SyndicateProtocol",
+      url: "https://x.com/syndicateio",
     },
     {
       name: "syndicatefarcaster",
@@ -214,6 +214,20 @@ export const syndicateTenantUIConfig = new TenantUI({
         imageTitle: "Syndicate Network Collective Governance",
         imageDescription:
           "The SNC, an organizational framework for community engagement, collective decision making, and innovation. Member dashboard for DUNA documents, proposals, voting, and governance.",
+      },
+    },
+    {
+      route: "grants",
+      title: "Syndicate Grants Program",
+      description:
+        "Apply for grants to support the Syndicate Network ecosystem",
+      meta: {
+        title: "Syndicate Grants Program",
+        description:
+          "Apply for grants to support the Syndicate Network ecosystem",
+        imageTitle: "Syndicate Grants Program",
+        imageDescription:
+          "Apply for grants to support the Syndicate Network ecosystem",
       },
     },
   ],
@@ -383,6 +397,14 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "syndicate-duna-disclosures",
+      enabled: true,
+    },
+    {
+      name: "grants",
+      enabled: true,
+    },
+    {
+      name: "grants/intake-form",
       enabled: true,
     },
     {

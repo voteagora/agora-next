@@ -1,0 +1,113 @@
+import { Metadata } from "next";
+import Link from "next/link";
+import Tenant from "@/lib/tenant/tenant";
+
+export const revalidate = 0;
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `Application Submitted - Thank You`,
+    description: `Thank you for submitting your application.`,
+    robots: "noindex, nofollow",
+  };
+}
+
+export default async function ThankYouPage() {
+  const { ui } = Tenant.current();
+
+  if (!ui.toggle("grants") || !ui.toggle("grants/intake-form")) {
+    return <div>Route not supported for namespace</div>;
+  }
+
+  return (
+    <div className="flex flex-col">
+      <div className="flex flex-col max-w-[76rem] mt-12 mb-0 sm:my-12">
+        <div className="text-center">
+          {/* Success Icon */}
+          <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+            <svg
+              className="w-8 h-8 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+
+          {/* Thank You Message */}
+          <h1 className="text-primary text-3xl font-extrabold mb-4">
+            Application Submitted Successfully!
+          </h1>
+
+          <p className="text-tertiary text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
+            Thank you for submitting your application. Your application has been
+            received and is now under review.
+          </p>
+
+          {/* Important Information */}
+          <div className="bg-white border border-line rounded-lg p-8 mb-8 max-w-2xl mx-auto">
+            <h2 className="text-xl font-semibold text-primary mb-4">
+              What happens next?
+            </h2>
+
+            <div className="space-y-4 text-left">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">
+                  1
+                </div>
+                <div>
+                  <h3 className="font-medium text-primary mb-1">
+                    Review Process
+                  </h3>
+                  <p className="text-tertiary text-sm">
+                    Our grants committee will review your application within 2-3
+                    weeks.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">
+                  2
+                </div>
+                <div>
+                  <h3 className="font-medium text-primary mb-1">
+                    Email Notification
+                  </h3>
+                  <p className="text-tertiary text-sm">
+                    You&apos;ll receive an email with the decision and next
+                    steps.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/grants"
+              className="inline-flex items-center px-6 py-3 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors font-medium"
+            >
+              View All Grants
+            </Link>
+
+            <Link
+              href="/"
+              className="inline-flex items-center px-6 py-3 border border-line text-primary rounded-md hover:bg-wash transition-colors font-medium"
+            >
+              Return to Home
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
