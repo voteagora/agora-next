@@ -214,7 +214,7 @@ export const signDelegatedAttestation = async ({
 // Schema encoders for EAS v2 attestations
 const v2SchemaEncoders = {
   CREATE_PROPOSAL: new SchemaEncoder(
-    "string title,string description,uint64 startts,uint64 endts,string tags"
+    "string title,string description,uint64 startts,uint64 endts,string tags, string kwargs"
   ),
   VOTE: new SchemaEncoder("int8 choice,string reason"),
 };
@@ -244,6 +244,7 @@ export async function createV2CreateProposalAttestation({
     { name: "startts", value: startts, type: "uint64" },
     { name: "endts", value: endts, type: "uint64" },
     { name: "tags", value: tags, type: "string" },
+    { name: "kwargs", value: "{'voting_module': 'standard'}", type: "string" },
   ]);
 
   const txResponse = await easV2.attest({
