@@ -22,7 +22,10 @@ import { DELEGATION_MODEL, TENANT_NAMESPACES } from "@/lib/constants";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { calculateBigIntRatio } from "../utils/bigIntRatio";
 import { withMetrics } from "@/lib/metricWrapper";
-import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
+import {
+  getDelegateDataFromDaoNode,
+  getDelegatesFromDaoNode,
+} from "@/app/lib/dao-node/client";
 
 // Create a cached version of getDelegatesFromDaoNode
 const cachedGetDelegatesFromDaoNode = unstable_cache(
@@ -717,6 +720,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       fetchCurrentQuorum(),
     ]);
 
+    const daoNodeDelegate = await getDelegateDataFromDaoNode(address);
+
     const numOfAdvancedDelegationsQuery = `SELECT count(*) as num_of_delegators
             FROM ${namespace + ".advanced_delegatees"}
             WHERE "to"=$1 AND contract=$2 AND delegated_amount > 0`;
@@ -767,17 +772,24 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       BigInt(delegate?.advanced_vp?.toFixed(0) || 0);
 
     const cachedNumOfDelegators = BigInt(
-      delegate.num_of_delegators?.toFixed() || "0"
+      delegate?.num_of_delegators?.toFixed() || "0"
     );
 
+    const daoNodeNumOfDelegators =
+      daoNodeDelegate?.delegate?.from_cnt !== undefined
+        ? BigInt(daoNodeDelegate.delegate.from_cnt)
+        : null;
+
     const usedNumOfDelegators =
-      cachedNumOfDelegators < 1000n
-        ? BigInt(
-            (
-              await numOfDelegationsResult
-            )?.[0]?.num_of_delegators?.toString() || "0"
-          )
-        : cachedNumOfDelegators;
+      daoNodeNumOfDelegators !== null
+        ? daoNodeNumOfDelegators
+        : cachedNumOfDelegators < 1000n
+          ? BigInt(
+              (
+                await numOfDelegationsResult
+              )?.[0]?.num_of_delegators?.toString() || "0"
+            )
+          : cachedNumOfDelegators;
 
     const relativeVotingPowerToVotableSupply = calculateBigIntRatio(
       totalVotingPower,
