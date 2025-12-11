@@ -6,6 +6,27 @@ import {
 } from "../utils";
 import { mainnet } from "viem/chains";
 import { getPublicClient } from "../viem";
+import Tenant from "../tenant/tenant";
+
+import Tenant from "../tenant/tenant";
+
+const { mockedCurrent } = vi.hoisted(() => {
+  return { mockedCurrent: vi.fn() };
+});
+
+vi.mock("../tenant/tenant", () => ({
+  default: {
+    current: mockedCurrent,
+  },
+}));
+
+// Default mock implementation to prevent crashes during module import
+mockedCurrent.mockReturnValue({
+  ui: {
+    toggle: () => ({ enabled: false }),
+  },
+  token: {},
+});
 
 vi.mock("next/font/google", () => ({
   Inter: () => ({
@@ -232,21 +253,87 @@ describe("Safe Transaction Utils", () => {
       );
     });
 
-    it("should return 'Optimistic Proposal (Offchain)' for OFFCHAIN_OPTIMISTIC", () => {
+    it("should return 'Optimistic Proposal (Offchain)' for OFFCHAIN_OPTIMISTIC when archive is disabled", () => {
+      mockedCurrent.mockReturnValue({
+        ui: {
+          toggle: (name: string) => {
+            if (name === "use-archive-for-proposals") return { enabled: false };
+            return { enabled: true };
+          },
+        },
+      } as any);
       expect(getProposalTypeText("OFFCHAIN_OPTIMISTIC")).toBe(
         "Optimistic Proposal (Offchain)"
       );
     });
 
-    it("should return 'Standard Proposal (Offchain)' for OFFCHAIN_STANDARD", () => {
+    it("should return 'Optimistic Proposal' for OFFCHAIN_OPTIMISTIC when archive is enabled", () => {
+      mockedCurrent.mockReturnValue({
+        ui: {
+          toggle: (name: string) => {
+            if (name === "use-archive-for-proposals") return { enabled: true };
+            return { enabled: true };
+          },
+        },
+      } as any);
+      expect(getProposalTypeText("OFFCHAIN_OPTIMISTIC")).toBe(
+        "Optimistic Proposal"
+      );
+    });
+
+    it("should return 'Standard Proposal (Offchain)' for OFFCHAIN_STANDARD when archive is disabled", () => {
+      mockedCurrent.mockReturnValue({
+        ui: {
+          toggle: (name: string) => {
+            if (name === "use-archive-for-proposals") return { enabled: false };
+            return { enabled: true };
+          },
+        },
+      } as any);
       expect(getProposalTypeText("OFFCHAIN_STANDARD")).toBe(
         "Standard Proposal (Offchain)"
       );
     });
 
-    it("should return 'Approval Vote Proposal (Offchain)' for OFFCHAIN_APPROVAL", () => {
+    it("should return 'Standard Proposal' for OFFCHAIN_STANDARD when archive is enabled", () => {
+      mockedCurrent.mockReturnValue({
+        ui: {
+          toggle: (name: string) => {
+            if (name === "use-archive-for-proposals") return { enabled: true };
+            return { enabled: true };
+          },
+        },
+      } as any);
+      expect(getProposalTypeText("OFFCHAIN_STANDARD")).toBe(
+        "Standard Proposal"
+      );
+    });
+
+    it("should return 'Approval Vote Proposal (Offchain)' for OFFCHAIN_APPROVAL when archive is disabled", () => {
+      mockedCurrent.mockReturnValue({
+        ui: {
+          toggle: (name: string) => {
+            if (name === "use-archive-for-proposals") return { enabled: false };
+            return { enabled: true };
+          },
+        },
+      } as any);
       expect(getProposalTypeText("OFFCHAIN_APPROVAL")).toBe(
         "Approval Vote Proposal (Offchain)"
+      );
+    });
+
+    it("should return 'Approval Vote Proposal' for OFFCHAIN_APPROVAL when archive is enabled", () => {
+       mockedCurrent.mockReturnValue({
+        ui: {
+          toggle: (name: string) => {
+            if (name === "use-archive-for-proposals") return { enabled: true };
+            return { enabled: true };
+          },
+        },
+      } as any);
+      expect(getProposalTypeText("OFFCHAIN_APPROVAL")).toBe(
+        "Approval Vote Proposal"
       );
     });
 
