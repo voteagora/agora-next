@@ -20,11 +20,19 @@ function BadgeIcon({ name }: { name: string }) {
     return <Shield className="w-5 h-5" />;
   }
 
-  if (lowerName.includes("verified") || lowerName.includes("human")) {
+  if (
+    lowerName.includes("verified") ||
+    lowerName.includes("human") ||
+    lowerName.includes("developer")
+  ) {
     return <BadgeCheck className="w-5 h-5" />;
   }
 
-  if (lowerName.includes("grants") || lowerName.includes("treasury")) {
+  if (
+    lowerName.includes("grants") ||
+    lowerName.includes("treasury") ||
+    lowerName.includes("governance")
+  ) {
     return <Wallet className="w-5 h-5" />;
   }
 
@@ -106,11 +114,6 @@ export function DelegateBadges({ badges }: DelegateBadgesProps) {
                   <span className="text-sm text-neutral-300">
                     {badge.definition.description}
                   </span>
-                  {badge.metadata && (
-                    <span className="text-xs text-neutral-400 mt-1">
-                      {badge.metadata}
-                    </span>
-                  )}
                   <div className="flex items-center gap-2 text-xs text-neutral-400 mt-2 pt-2 border-t border-neutral-700">
                     <span>
                       Issued:{" "}
