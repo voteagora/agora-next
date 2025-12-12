@@ -528,7 +528,10 @@ export async function simulateProposed(
 
   // Compute transaction hashes used by the Timelock
   const txHashes = targets.map((target, i) => {
-    const [val, sig, calldata] = [values[i], sigs[i], calldatas[i]];
+    const val = values[i];
+    const sig = sigs[i] || "";
+    const calldata = calldatas[i];
+
     const valBigInt = BigInt(val);
     return keccak256(
       defaultAbiCoder.encode(
