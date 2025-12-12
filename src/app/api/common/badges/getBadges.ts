@@ -38,9 +38,9 @@ export async function fetchBadgesForDelegate(
     JOIN ${namespace}.badge_definitions bd 
       ON ib.badge_definition_id = bd.badge_definition_id 
       AND ib.dao_id = bd.dao_id
-    WHERE ib.dao_id = $1 
-      AND ib.revoked = false
-      AND LOWER(ib."user") = $2
+    WHERE ib.revoked = false
+      AND ib."user" = $1
+      AND ib.dao_id = $2
     ORDER BY ib.attestation_time DESC
   `;
 
@@ -55,7 +55,7 @@ export async function fetchBadgesForDelegate(
       description: string;
       revocable: string;
     }[]
-  >(query, daoId, address.toLowerCase());
+  >(query, address.toLowerCase(), daoId);
 
   return results.map((row) => ({
     badge_definition_id: row.badge_definition_id,
