@@ -10,7 +10,7 @@ export async function getVotesChart({
   proposalId: string;
 }): Promise<any[]> {
   const { namespace, contracts, ui } = Tenant.current();
-  const includeL3Staking = ui.toggle("include-l3-staking")?.enabled ?? false;
+  const includeL3Staking = ui.toggle("include-nonivotes")?.enabled ?? false;
 
   if (includeL3Staking) {
     const archiveVotes = await fetchRawProposalVotesFromArchive({

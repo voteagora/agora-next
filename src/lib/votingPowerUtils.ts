@@ -38,7 +38,7 @@ export async function fetchVotingPowerFromContract(
     const tenant = Tenant.current();
     const multiChainTokens = tenant.ui.tokens;
     const { ui } = tenant;
-    const includeL3Staking = ui.toggle("include-l3-staking")?.enabled ?? false;
+    const includeL3Staking = ui.toggle("include-nonivotes")?.enabled ?? false;
 
     if (includeL3Staking) {
       const votingPower = await getDelegateVotingPowerFromDaoNode(address);

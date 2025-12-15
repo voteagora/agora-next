@@ -153,7 +153,7 @@ async function getCurrentVotingPowerForAddress({
 }): Promise<VotingPowerData> {
   return withMetrics("getCurrentVotingPowerForAddress", async () => {
     const { namespace, contracts, ui } = Tenant.current();
-    const includeL3Staking = ui.toggle("include-l3-staking")?.enabled ?? false;
+    const includeL3Staking = ui.toggle("include-nonivotes")?.enabled ?? false;
 
     const daoNodeVotingPowerPromise = includeL3Staking
       ? getDelegateVotingPowerFromDaoNode(address)

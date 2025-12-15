@@ -557,7 +557,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       },
     },
     {
-      name: "include-l3-staking",
+      name: "include-nonivotes",
       enabled: true,
     },
   ],

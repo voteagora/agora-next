@@ -650,7 +650,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     const address = isAddress(addressOrENSName)
       ? addressOrENSName.toLowerCase()
       : await ensNameToAddress(addressOrENSName);
-    const includeL3Staking = ui.toggle("include-l3-staking")?.enabled ?? false;
+    const includeL3Staking = ui.toggle("include-nonivotes")?.enabled ?? false;
 
     // Eventually want to deprecate voter_stats from this query
     // we are already relying on getVoterStats below
