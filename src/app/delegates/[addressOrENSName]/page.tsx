@@ -4,7 +4,8 @@ import { Metadata, ResolvingMetadata } from "next";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { fetchDelegateForSCW } from "@/app/api/common/delegates/getDelegateForSCW";
-import { fetchDelegate, fetchBadgesForDelegate } from "@/app/delegates/actions";
+import { fetchDelegate } from "@/app/delegates/actions";
+import { fetchBadgesForDelegate } from "@/app/api/common/badges/getBadges";
 
 import { formatNumber } from "@/lib/tokenUtils";
 import {
