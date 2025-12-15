@@ -29,6 +29,7 @@ import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { fetchVotesCountForDelegate } from "@/app/api/common/votes/getVotes";
 import { prismaWeb3Client } from "@/app/lib/prisma";
+import { fetchBadgesForDelegate as apiFetchBadgesForDelegate } from "@/app/api/common/badges/getBadges";
 
 export const fetchDelegate = async (address: string) => {
   try {
