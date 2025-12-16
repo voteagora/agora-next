@@ -582,6 +582,26 @@ export const syndicateTenantUIConfig = new TenantUI({
                       Aerodrome.
                     </p>
                     <p>
+                      The following three pools are included in the calculation:
+                      <ul className="list-disc list-inside space-y-2 ml-4 text-sm">
+                        <li>
+                          <code>
+                            base:0xA6f77321B8726FaAB89B72f28C2603b667448BC2
+                          </code>
+                        </li>
+                        <li>
+                          <code>
+                            base:0x9dCBB8258e0015d6cB81061b3F5c47D5C5D6188f
+                          </code>
+                        </li>
+                        <li>
+                          <code>
+                            base:0x50F8F7fFBD70c6C87b1668EEe4E03F5AC057DE3F
+                          </code>
+                        </li>
+                      </ul>
+                    </p>
+                    <p>
                       Like SYND staked on Commons, users do not need to delegate
                       voting power for Aerodrome LP positions on Base. This
                       voting power is automatically recognized during the
