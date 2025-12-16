@@ -156,14 +156,11 @@ export default function ProposalVotesSummaryDetails({
     proposal.archiveMetadata?.proposalTypeTag === "Temp Check";
 
   const isProposalCancelled = proposal.status === "CANCELLED";
+  const isProposalExecuted = proposal.status === "EXECUTED";
   const isProposalCancelledBeforeVoteStarts =
     proposal.cancelledTime &&
     proposal.startTime &&
     proposal.cancelledTime < proposal.startTime;
-  const isProposalCancelledAfterVoteEnds =
-    proposal.cancelledTime &&
-    proposal.endTime &&
-    proposal.cancelledTime > proposal.endTime;
 
   return (
     <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[317px] sm:min-w-[317px] bg-wash">
@@ -280,31 +277,23 @@ export default function ProposalVotesSummaryDetails({
             value={formatTime(proposal.startTime)}
           />
         )}
-        {isProposalCancelledAfterVoteEnds && (
-          <StepperRow
-            label="Voting period end"
-            value={formatTime(proposal.endTime)}
-          />
-        )}
+        <StepperRow
+          label="Voting period end"
+          value={formatTime(proposal.endTime)}
+        />
         {isProposalCancelled ? (
           <StepperRow
             isLastStep
             label={`Proposal ${proposal.status?.toLocaleLowerCase()}`}
             value={formatTime(proposal.cancelledTime)}
           />
-        ) : (
-          <>
-            <StepperRow
-              isLastStep
-              label={`Proposal ${proposal.status?.toLocaleLowerCase()}`}
-              value={
-                proposal.status === "EXECUTED"
-                  ? formatTime(proposal.executedTime)
-                  : formatTime(proposal.endTime)
-              }
-            />
-          </>
-        )}
+        ) : isProposalExecuted ? (
+          <StepperRow
+            isLastStep
+            label={`Proposal ${proposal.status?.toLocaleLowerCase()}`}
+            value={formatTime(proposal.executedTime)}
+          />
+        ) : null}
       </ol>
     </div>
   );

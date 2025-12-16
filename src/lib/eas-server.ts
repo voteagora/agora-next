@@ -26,8 +26,8 @@ const easV2 =
 
 const CHECK_PROPOSAL_SCHEMA_ID =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? "0xd0fa030b9d06e954b910a86eeffc02aa641eaeef4216f9402ab4503f44c8e6a8"
-    : "0x675048a4668d59d117cdbc5810912a1da791eb927fc8986ddbacccb4473d8b30";
+    ? "0x08df8e6e629077cabef4ed15cd4ff4f2359c2a60ad65b8355ac1f905b8f23a6f"
+    : "0x80155c3a8c4ea17ce96e8899f7ab1ceca9e85382d7f893619a1d03947a70f844";
 
 export const attestByDelegationServer = async ({
   recipient,

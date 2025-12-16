@@ -2,13 +2,29 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { SnapshotVotePayload, VotePayload } from "@/app/api/common/votes/vote";
 import { prismaWeb3Client } from "@/app/lib/prisma";
+import { fetchRawProposalVotesFromArchive } from "@/lib/archiveUtils";
 
 export async function getVotesChart({
   proposalId,
 }: {
   proposalId: string;
 }): Promise<any[]> {
-  const { namespace, contracts } = Tenant.current();
+  const { namespace, contracts, ui } = Tenant.current();
+  const includeL3Staking = ui.toggle("include-nonivotes")?.enabled ?? false;
+
+  if (includeL3Staking) {
+    const archiveVotes = await fetchRawProposalVotesFromArchive({
+      namespace,
+      proposalId,
+    });
+
+    return archiveVotes.map((vote) => ({
+      voter: vote.voter,
+      support: vote.support,
+      weight: vote.weight,
+      block_number: vote.block_number,
+    }));
+  }
 
   let eventsViewName;
 

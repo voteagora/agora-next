@@ -81,6 +81,13 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
       Number(proposal.quorum || 0)
     : null;
 
+  const minQuorumPct = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.min_quorum_pct / 100
+    : null;
+  const maxQuorumPct = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.max_quorum_pct / 100
+    : null;
+
   let stackIds: { [key: string]: string } = {
     for: "1",
     abstain: "1",
@@ -259,6 +266,8 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
             content={
               <CustomTooltip
                 quorum={isProposalCreatedBeforeUpgrade ? null : proposal.quorum}
+                minQuorumPct={minQuorumPct}
+                maxQuorumPct={maxQuorumPct}
               />
             }
             cursor={{ stroke: "#666", strokeWidth: 1, strokeDasharray: "4 4" }}
@@ -372,7 +381,14 @@ const customizedXTick = (props: any) => {
   );
 };
 
-const CustomTooltip = ({ active, payload, label, quorum }: any) => {
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+  quorum,
+  minQuorumPct,
+  maxQuorumPct,
+}: any) => {
   const forVotes = payload.find((p: any) => p.name === "For");
   const againstVotes = payload.find((p: any) => p.name === "Against");
   const abstainVotes = payload.find((p: any) => p.name === "Abstain");
@@ -407,6 +423,11 @@ const CustomTooltip = ({ active, payload, label, quorum }: any) => {
       quorumVotes = BigInt(integerForVotes);
     }
 
+    const hasQuorumRange =
+      minQuorumPct !== null &&
+      maxQuorumPct !== null &&
+      minQuorumPct !== maxQuorumPct;
+
     return (
       <div className="bg-neutral p-3 border border-line rounded-lg shadow-newDefault">
         <p className="text-xs font-semibold mb-2 text-primary">
@@ -429,30 +450,38 @@ const CustomTooltip = ({ active, payload, label, quorum }: any) => {
             </span>
           </div>
         ))}
-        {!!quorum && (
+        {(!!quorum || hasQuorumRange) && (
           <div className="flex justify-between items-center gap-4 text-xs pt-2 border-t border-line border-dashed mt-2">
             <span className="text-secondary">Quorum:</span>
-            <div className="flex items-center gap-1">
-              <span
-                className={`font-mono ${
-                  quorumVotes > quorum ? "text-primary" : "text-tertiary"
-                }`}
-              >
-                {formatNumber(
-                  BigInt(quorumVotes),
-                  isSnapshot ? 0 : token.decimals,
-                  quorumVotes > 1_000_000 ? 2 : 4
-                )}
-              </span>
-              <span className="text-primary">/</span>
-              <span className="font-mono text-primary">
-                {formatNumber(
-                  BigInt(quorum),
-                  isSnapshot ? 0 : token.decimals,
-                  quorum > 1_000_000 ? 2 : 4
-                )}
-              </span>
-            </div>
+            {hasQuorumRange ? (
+              <div className="flex items-center gap-1">
+                <span className="font-mono text-primary">
+                  {`${minQuorumPct}% – ${maxQuorumPct}%`}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1">
+                <span
+                  className={`font-mono ${
+                    quorumVotes > quorum ? "text-primary" : "text-tertiary"
+                  }`}
+                >
+                  {formatNumber(
+                    BigInt(quorumVotes),
+                    isSnapshot ? 0 : token.decimals,
+                    quorumVotes > 1_000_000 ? 2 : 4
+                  )}
+                </span>
+                <span className="text-primary">/</span>
+                <span className="font-mono text-primary">
+                  {formatNumber(
+                    BigInt(quorum),
+                    isSnapshot ? 0 : token.decimals,
+                    quorum > 1_000_000 ? 2 : 4
+                  )}
+                </span>
+              </div>
+            )}
           </div>
         )}
       </div>
