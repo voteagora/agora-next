@@ -38,6 +38,7 @@ import {
   getCachedAllProposalsFromDaoNode,
   getProposalTypesFromDaoNode,
 } from "@/app/lib/dao-node/client";
+import { fetchProposalTaxFormMetadata } from "./getProposalTaxFormMetadata";
 
 // Helper function to fetch proposals from DAO Node
 async function fetchProposalsFromDaoNode(
@@ -389,11 +390,13 @@ async function getProposal(proposalId: string) {
         })
     );
 
-    const [proposal, offchainProposal, votableSupply] = await Promise.all([
-      getProposalExecution,
-      getOffchainProposal,
-      fetchVotableSupply(),
-    ]);
+    const [proposal, offchainProposal, votableSupply, taxFormMetadata] =
+      await Promise.all([
+        getProposalExecution,
+        getOffchainProposal,
+        fetchVotableSupply(),
+        fetchProposalTaxFormMetadata(proposalId),
+      ]);
 
     if (!proposal) {
       return notFound();
@@ -440,13 +443,18 @@ async function getProposal(proposalId: string) {
       ? null
       : await fetchQuorumForProposal(baseProposal);
 
-    return parseProposal(
+    const parsed = await parseProposal(
       baseProposal,
       latestBlock,
       quorum ?? null,
       BigInt(votableSupply),
       resolvedOffchainProposal
     );
+
+    return {
+      ...parsed,
+      taxFormMetadata,
+    };
   });
 }
 

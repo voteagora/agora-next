@@ -27,6 +27,7 @@ import {
   isArchiveStandardProposal,
   normalizeArchiveStandardProposal,
 } from "@/components/Proposals/Proposal/Archive/normalizeArchiveProposalDetail";
+import { fetchProposalTaxFormMetadata } from "@/app/api/common/proposals/getProposalTaxFormMetadata";
 
 export const maxDuration = 60;
 
@@ -38,10 +39,10 @@ async function loadProposal(
   const useArchive = ui.toggle("use-archive-for-proposal-details")?.enabled;
 
   if (useArchive) {
-    const archiveResults = await fetchProposalFromArchive(
-      namespace,
-      proposalId
-    );
+    const [archiveResults, taxFormMetadata] = await Promise.all([
+      fetchProposalFromArchive(namespace, proposalId),
+      fetchProposalTaxFormMetadata(proposalId),
+    ]);
 
     const archiveProposal = archiveResults ? archiveResults : undefined;
     if (archiveProposal && isArchiveStandardProposal(archiveProposal)) {
@@ -52,7 +53,10 @@ async function loadProposal(
           tokenDecimals: token.decimals ?? 18,
         }
       );
-      return normalizedProposal;
+      return {
+        ...normalizedProposal,
+        taxFormMetadata,
+      };
     }
 
     throw new Error("Proposal not found in archive");
@@ -199,7 +203,10 @@ export default async function Page({
 }: {
   params: { proposal_id: string };
 }) {
-  const loadedProposal = await loadProposal(proposal_id, fetchProposal);
+  const loadedProposal = await loadProposal(
+    proposal_id,
+    fetchProposalUnstableCache
+  );
 
   const proposalData =
     loadedProposal.proposalType === "OFFCHAIN_STANDARD"
