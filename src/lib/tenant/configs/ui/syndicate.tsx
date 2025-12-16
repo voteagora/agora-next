@@ -505,10 +505,13 @@ export const syndicateTenantUIConfig = new TenantUI({
           },
           {
             id: "voting-power",
-            title: "How voting power works",
+            title: "How voting power works across chains",
             content: (
               <div className="flex flex-col space-y-6">
                 <div className="flex flex-col space-y-3">
+                  <h3 className="text-[16px] font-semibold text-primary">
+                    SYND on Ethereum Mainnet
+                  </h3>
                   <div className="flex flex-col space-y-3">
                     <p>
                       The SYND token uses OpenZeppelin&apos;s ERC20Votes. Your
@@ -532,26 +535,62 @@ export const syndicateTenantUIConfig = new TenantUI({
                       You can change or revoke delegation at any time by making
                       a new delegation.
                     </p>
+                    <p>
+                      This model keeps everyday transfers cheaper and lets
+                      governance use reliable onchain snapshots of voting power
+                      at specific blocks.
+                    </p>
                   </div>
                 </div>
-
-                <div className="flex flex-col space-y-3">
-                  <h3 className="text-[15px] font-semibold text-primary">
-                    Why it&apos;s designed this way:
+                <div className="flex flex-col space-y-2">
+                  <h3 className="text-[16px] font-semibold text-primary">
+                    Delegating to yourself and others
                   </h3>
-                  <p>
-                    This model keeps everyday transfers cheaper and lets
-                    governance use reliable onchain snapshots of voting power at
-                    specific blocks.
-                  </p>
+                  <DelegatingSectionContent />
+                </div>
+                <div className="flex flex-col space-y-2 border-t border-line pt-6">
+                  <h3 className="text-[16px] font-semibold text-primary">
+                    SYND staked on Commons
+                  </h3>
+                  <div className="flex flex-col space-y-3">
+                    <p>
+                      In addition to Ethereum Mainnet SYND that can be voted via
+                      the OZ ERC20Votes standard, Agora also recognizes voting
+                      power for staked SYND on Commons Chain. This voting power
+                      does not have to be delegated, and is calculated via
+                      snapshot at the time of a temp check or vote going live.
+                      At this time gate, any address staked on Commons will have
+                      this voting power added to their mainnet voting power to
+                      determine total voting power.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col space-y-2 border-t border-line pt-6">
+                  <h3 className="text-[16px] font-semibold text-primary">
+                    SYND provided as liquidity on Base
+                  </h3>
+                  <div className="flex flex-col space-y-3">
+                    <p>
+                      SYND launched via Aerodrome and maintains its deepest DEX
+                      liquidity on both Aerodrome basic and concentrated pools.
+                      These SYND tokens provide an important service to the
+                      community, and as such, voting for SYND in all Aerodrome
+                      pools is added to Ethereum Mainnet and Commons staked SYND
+                      voting power to sum total voting power. Agora recognizes
+                      LP positions that are both staked and unstaked within
+                      Aerodrome.
+                    </p>
+                    <p>
+                      Like SYND staked on Commons, users do not need to delegate
+                      voting power for Aerodrome LP positions on Base. This
+                      voting power is automatically recognized during the
+                      snapshot taken at the time of any temp check or proposal
+                      voting period.
+                    </p>
+                  </div>
                 </div>
               </div>
             ),
-          },
-          {
-            id: "delegating",
-            title: "Delegating to yourself and others",
-            content: <DelegatingSectionContent />,
           },
         ],
       },
