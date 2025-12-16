@@ -577,10 +577,8 @@ export const syndicateTenantUIConfig = new TenantUI({
                       These SYND tokens provide an important service to the
                       community, and as such, voting for SYND in all Aerodrome
                       pools is added to Ethereum Mainnet and Commons staked SYND
-                      voting power to sum total voting power. Agora recognizes LP 
-                      positions that are both staked and unstaked, for the 0xA6f7 
-                      (Uniswap V2 style) pool. 
-
+                      voting power to sum total voting power. Agora recognizes
+                      LP positions that are both staked and unstaked.
                     </p>
                     <p>
                       The following three pools are included in the calculation:
