@@ -7,6 +7,7 @@ import {
   fetchUserVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
 import { PaginationParams } from "@/app/lib/pagination";
+import { TaxFormBanner } from "../TaxFormBanner";
 
 async function fetchProposalVotes(
   proposalId: string,
@@ -40,6 +41,7 @@ export default async function OPProposalApprovalPage({
   return (
     // 2 Colum Layout: Description on left w/ transactions and Votes / voting on the right
     <div className="flex flex-col">
+      <TaxFormBanner proposal={proposal} />
       <ProposalStateAdmin proposal={proposal} />
 
       <div className="flex gap-0 md:gap-16 justify-between items-start max-w-[76rem] flex-col sm:flex-row sm:items-start sm:justify-between">

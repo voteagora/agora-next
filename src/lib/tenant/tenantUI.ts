@@ -54,12 +54,17 @@ export type UIInfoBannerConfig = {
   storageKey: string;
 };
 
+export type UITaxFormConfig = {
+  payeeFormUrl?: string;
+};
+
 type UIConfig =
   | PLMConfig
   | UIDunaDescriptionConfig
   | UIVotingPowerInfoConfig
   | UIGovernanceInfoConfig
-  | UIInfoBannerConfig;
+  | UIInfoBannerConfig
+  | UITaxFormConfig;
 
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account

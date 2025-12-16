@@ -344,6 +344,13 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "tax-form-banner",
+      enabled: true,
+      config: {
+        payeeFormUrl: "https://www.agora.xyz/",
+      },
+    },
+    {
       name: "coming-soon",
       enabled: false,
     },
