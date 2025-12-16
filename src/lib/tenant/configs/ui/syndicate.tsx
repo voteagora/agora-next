@@ -555,13 +555,14 @@ export const syndicateTenantUIConfig = new TenantUI({
                   <div className="flex flex-col space-y-3">
                     <p>
                       In addition to Ethereum Mainnet SYND that can be voted via
-                      the OZ ERC20Votes standard, Agora also recognizes voting
-                      power for staked SYND on Commons Chain. This voting power
-                      does not have to be delegated, and is calculated via
-                      snapshot at the time of a temp check or vote going live.
-                      At this time gate, any address staked on Commons will have
-                      this voting power added to their mainnet voting power to
-                      determine total voting power.
+                      the OZ ERC20Votes standard, the voting power snapshots
+                      also recognize staked SYND on Commons Chain. This voting
+                      power does not need to be self-delegated, and cannot be
+                      delegated to others. It is calculated via a snapshot using
+                      the timestamp from the block where the voting period
+                      begins. At this time snapshot, any address staked on
+                      Commons will have this voting power added to their mainnet
+                      voting power to determine total voting power.
                     </p>
                   </div>
                 </div>
@@ -584,8 +585,8 @@ export const syndicateTenantUIConfig = new TenantUI({
                       Like SYND staked on Commons, users do not need to delegate
                       voting power for Aerodrome LP positions on Base. This
                       voting power is automatically recognized during the
-                      snapshot taken at the time of any temp check or proposal
-                      voting period.
+                      snapshot taken at the time of start of any temp check or
+                      proposal voting period.
                     </p>
                   </div>
                 </div>
