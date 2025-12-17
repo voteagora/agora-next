@@ -40,7 +40,7 @@ export const getGrant = cache(
           created_at,
           updated_at
         FROM alltenant.grants
-        WHERE dao_slug = ${slug}::config.dao_slug
+        WHERE dao_slug::text = ${slug}
           AND slug = ${grantSlug}
           AND active = TRUE;
       `;

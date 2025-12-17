@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
 
     // Build WHERE clause with proper casting and parameterization
     const whereSql = Prisma.sql`
-      WHERE g.dao_slug = ${slug}::config.dao_slug
+      WHERE g.dao_slug::text = ${slug}
       ${status ? Prisma.sql` AND ga.status = ${status}` : Prisma.empty}
     `;
 
