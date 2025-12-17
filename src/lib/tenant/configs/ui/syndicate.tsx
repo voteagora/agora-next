@@ -456,8 +456,9 @@ export const syndicateTenantUIConfig = new TenantUI({
                       proposal. In order for a proposal to transition from a{" "}
                       <strong>Temp-Check</strong> to a vote of the membership,
                       the <strong>Temp-Check</strong> must attain the support of
-                      5% of the SYND tokens in circulation, except as limited by
-                      Article 13 of the Association Agreement.
+                      5% of the SYND tokens minted (excludes future emissions),
+                      except as limited by Article 13 of the Association
+                      Agreement.
                     </li>
                     <li>
                       upon a successful <strong>Temp-Check</strong>, the{" "}
@@ -469,13 +470,15 @@ export const syndicateTenantUIConfig = new TenantUI({
                       <ul className="list-[square] list-outside space-y-1 ml-6 mt-2 text-sm leading-relaxed">
                         <li>
                           <strong>passes</strong> if the majority of votes
-                          affirm the proposal and 10% of the SYND tokens in
-                          circulation participate in the vote; and
+                          affirm the proposal and 10% of the minted SYND tokens
+                          (excludes future emissions) participate in the vote;
+                          and
                         </li>
                         <li>
                           <strong>fails</strong> if the majority of votes deny
-                          the proposal or 10% of the SYND tokens in circulation
-                          did not participate in the vote.
+                          the proposal or 10% of the SYND tokens minted
+                          (excludes future emissions) did not participate in the
+                          vote.
                         </li>
                       </ul>
                     </li>
