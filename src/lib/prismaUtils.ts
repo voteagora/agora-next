@@ -49,6 +49,13 @@ export function findDelagatee({
       return Promise.resolve(null);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateDelegatees.findFirst(condition);
+
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3Delegatees.findFirst(condition);
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4Delegatees.findFirst(condition);
+    case TENANT_NAMESPACES.DEMO2:
+      return prismaWeb3Client.demo2Delegatees.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -102,6 +109,13 @@ export function findAdvancedDelegatee({
       return Promise.resolve([]);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateAdvancedDelegatees.findMany(condition);
+
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3AdvancedDelegatees.findMany(condition);
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4AdvancedDelegatees.findMany(condition);
+    case TENANT_NAMESPACES.DEMO2:
+      return prismaWeb3Client.demo2AdvancedDelegatees.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -152,6 +166,13 @@ export function findVotableSupply({
       return Promise.resolve(null); // for now: towns is info-only
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateVotableSupply.findFirst({});
+
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3VotableSupply.findFirst({});
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4VotableSupply.findFirst({});
+    case TENANT_NAMESPACES.DEMO2:
+      return prismaWeb3Client.demo2VotableSupply.findFirst({});
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -308,6 +329,13 @@ export function findProposalsQueryFromDB({
       return Promise.resolve([]); // for now: towns is info-only
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposals.findMany(condition);
+
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3Proposals.findMany(condition);
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4Proposals.findMany(condition);
+    case TENANT_NAMESPACES.DEMO2:
+      return prismaWeb3Client.demo2Proposals.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -411,6 +439,11 @@ export function findProposalsByIds({
       return Promise.resolve([]); // for now: towns is info-only
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposals.findMany(condition);
+
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3Proposals.findMany(condition);
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4Proposals.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -574,6 +607,13 @@ export function findProposalType({
       return Promise.resolve([]); // for now: towns is info-only
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposalTypes.findMany(condition);
+
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3ProposalTypes.findMany(condition);
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4ProposalTypes.findMany(condition);
+    case TENANT_NAMESPACES.DEMO2:
+      return prismaWeb3Client.demo2ProposalTypes.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -623,6 +663,13 @@ export function findVotes({
       return Promise.resolve([]); // for now: towns is info-only
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateVotes.findMany(condition);
+
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3Votes.findMany(condition);
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4Votes.findMany(condition);
+    case TENANT_NAMESPACES.DEMO2:
+      return prismaWeb3Client.demo2Votes.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -725,6 +772,13 @@ export function findAdvancedVotingPower({
       return Promise.resolve(null); // for now: towns is info-only
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateAdvancedVotingPower.findFirst(condition);
+
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3AdvancedVotingPower.findFirst(condition);
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4AdvancedVotingPower.findFirst(condition);
+    case TENANT_NAMESPACES.DEMO2:
+      return prismaWeb3Client.demo2AdvancedVotingPower.findFirst(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }
@@ -833,6 +887,13 @@ export function findStakedDeposits({
       return Promise.resolve([]); // for now: towns is info-only
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateStakedDeposits.findMany(condition);
+
+    case TENANT_NAMESPACES.DEMO3:
+      return prismaWeb3Client.demo3StakedDeposits.findMany(condition);
+    case TENANT_NAMESPACES.DEMO4:
+      return prismaWeb3Client.demo4StakedDeposits.findMany(condition);
+    case TENANT_NAMESPACES.DEMO2:
+      return prismaWeb3Client.demo2StakedDeposits.findMany(condition);
     default:
       throw new Error(`Unknown namespace: ${namespace}`);
   }

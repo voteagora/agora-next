@@ -321,9 +321,13 @@ export const getDelegatesFromDaoNode = async (options?: {
       queryParams.append("delegator", filters.delegator);
     }
 
-    const response = await fetch(`${url}v1/delegates?${queryParams}`);
+    const fullUrl = `${url}v1/delegates?${queryParams}`;
+
+    const response = await fetch(fullUrl);
     if (!response.ok) {
-      throw new Error(`Failed to fetch delegates: ${response.status}`);
+      throw new Error(
+        `Failed to fetch delegates: ${response.status} : ${fullUrl}`
+      );
     }
 
     const data = await response.json();
