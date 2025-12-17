@@ -31,11 +31,10 @@ async function getNeedsMyVoteProposals(address: string) {
       throw new Error("Could not get latest block");
     }
 
-    const prodDataOnly =
-      process.env.NEXT_PUBLIC_AGORA_ENV === "prod" ? `AND contract = $3` : "";
+    const isProdEnv = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
+    const prodDataOnly = isProdEnv ? `AND contract = $3` : "";
 
-    const proposals = await prismaWeb3Client.$queryRawUnsafe<ProposalPayload[]>(
-      `
+    const query = `
         SELECT p.*
         FROM (
           SELECT *
@@ -56,10 +55,20 @@ async function getNeedsMyVoteProposals(address: string) {
         } v ON p.proposal_id = v.proposal_id AND v.voter = $2
         WHERE v.proposal_id IS NULL
         ORDER BY p.ordinal DESC;
-        `,
+        `;
+
+    const params: (string | number)[] = [
       isTimeStampBasedTenant ? latestBlock.timestamp : latestBlock.number,
       address.toLowerCase(),
-      contracts.governor.address
+    ];
+
+    if (isProdEnv) {
+      params.push(contracts.governor.address.toLowerCase());
+    }
+
+    const proposals = await prismaWeb3Client.$queryRawUnsafe<ProposalPayload[]>(
+      query,
+      ...params
     );
 
     // Collect IDs of all non-offchain proposals (onchain and hybrid)

@@ -317,6 +317,10 @@ If you meet the proposal threshold or are the manager of the governor, then you 
       enabled: false,
     },
     {
+      name: "use-archive-for-proposals",
+      enabled: true,
+    },
+    {
       name: "forums",
       enabled: false,
     },

@@ -147,7 +147,7 @@ async function getVotesForDelegateForAddress({
       : await contracts.token.provider.getBlock("latest");
 
     const archiveMode =
-      ui.toggle("use-archive-for-proposals")?.enabled ?? false;
+      ui.toggle("use-archive-for-proposal-details")?.enabled ?? false;
 
     const data = await Promise.all(
       votes.map(async (vote) => {
@@ -179,7 +179,9 @@ async function getVotesForDelegateForAddress({
             } as VotePayload)
           : (vote as VotePayload);
 
-        const parsed = await parseVote(voteWithType, proposalData, latestBlock);
+        let archiveTitle = "";
+        let isTempCheck = false;
+        let easOodaoMetadata: { createdBlockNumber: number } | null = null;
 
         // Always source the proposal title from the archive when archive mode is enabled
         if (archiveMode) {
@@ -189,22 +191,48 @@ async function getVotesForDelegateForAddress({
               namespace,
               vote.proposal_id as unknown as string
             );
-            const archiveTitle =
-              typeof archiveProposal?.title === "string"
-                ? archiveProposal.title
-                : "";
-            if (archiveTitle && archiveTitle.trim().length > 0) {
-              parsed.proposalTitle = archiveTitle;
-            }
-            // Surface a simple hint for UI copy (e.g., temp check vs proposal)
-            const tags: string[] = Array.isArray(archiveProposal?.tags)
-              ? archiveProposal.tags
-              : [];
-            if (tags.includes("tempcheck")) {
-              (parsed as any).isTempCheck = true;
+
+            if (archiveProposal) {
+              archiveTitle =
+                typeof archiveProposal?.title === "string"
+                  ? archiveProposal.title
+                  : "";
+
+              // Surface a simple hint for UI copy (e.g., temp check vs proposal)
+              const tags: string[] = Array.isArray(archiveProposal?.tags)
+                ? archiveProposal.tags
+                : [];
+              if (tags.includes("tempcheck")) {
+                isTempCheck = true;
+              }
+
+              // For eas-oodao proposals, pass metadata for client-side lazy loading
+              if (
+                archiveProposal?.data_eng_properties?.source === "eas-oodao" &&
+                archiveProposal?.created_block_number
+              ) {
+                easOodaoMetadata = {
+                  createdBlockNumber: archiveProposal.created_block_number,
+                };
+              }
             }
           } catch (_) {
             // ignore archive fetch errors; keep parsed title as-is
+          }
+        }
+
+        const parsed = await parseVote(voteWithType, proposalData, latestBlock);
+
+        // Apply archive data to parsed vote
+        if (archiveMode) {
+          if (archiveTitle && archiveTitle.trim().length > 0) {
+            parsed.proposalTitle = archiveTitle;
+          }
+          if (isTempCheck) {
+            (parsed as any).isTempCheck = true;
+          }
+          if (easOodaoMetadata) {
+            parsed.easOodaoMetadata = easOodaoMetadata;
           }
         }
 
@@ -266,11 +294,7 @@ async function getSnapshotVotesForDelegateForAddress({
           OFFSET ${skip}
           LIMIT ${take};
         `;
-      return prismaWeb3Client.$queryRawUnsafe<SnapshotVotePayload[]>(
-        query,
-        skip,
-        take
-      );
+      return prismaWeb3Client.$queryRawUnsafe<SnapshotVotePayload[]>(query);
     };
 
     const { meta, data: votes } = await paginateResult(

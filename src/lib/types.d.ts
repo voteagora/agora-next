@@ -4,7 +4,10 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
-import { TENANT_NAMESPACES } from "./constants";
+import {
+  PROPOSAL_TYPES_CONFIGURATOR_FACTORY,
+  TENANT_NAMESPACES,
+} from "./constants";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { DelegateChunk } from "@/app/staking/components/delegates/DelegateCardList";
 import { Chain } from "viem/chains";
@@ -60,6 +63,7 @@ export type TenantContracts = {
   providerForTime?: AlchemyProvider;
   supportScopes?: boolean;
   easRecipient?: string;
+  proposalTypesConfiguratorFactory?: PROPOSAL_TYPES_CONFIGURATOR_FACTORY;
 };
 
 export type TenantToken = {

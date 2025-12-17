@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
 import { LogoPill } from "@/app/api/images/og/assets/shared";
+import { TenantNamespace } from "@/lib/types";
 
 export const runtime = "edge";
 
@@ -9,6 +10,8 @@ export async function GET(req: NextRequest) {
 
   const title = searchParams.get("title") || "";
   const description = searchParams.get("description") || "";
+  const namespace = (process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME ||
+    "optimism") as TenantNamespace;
 
   const interBoldFont = await fetch(
     new URL("../assets/Inter-Black.ttf", import.meta.url)
@@ -41,7 +44,7 @@ export async function GET(req: NextRequest) {
         <img src={bg} style={{ position: "absolute" }} />
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
           <div tw="flex flex-col justify-between h-full w-[470px]">
-            <LogoPill />
+            <LogoPill namespace={namespace} />
 
             <div tw="flex flex-col">
               <div tw="font-bold text-5xl w-full">{title}</div>

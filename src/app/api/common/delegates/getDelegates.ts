@@ -22,7 +22,11 @@ import { DELEGATION_MODEL, TENANT_NAMESPACES } from "@/lib/constants";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { calculateBigIntRatio } from "../utils/bigIntRatio";
 import { withMetrics } from "@/lib/metricWrapper";
-import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
+import {
+  getDelegateDataFromDaoNode,
+  getDelegatesFromDaoNode,
+  getDelegateVotingPowerFromDaoNode,
+} from "@/app/lib/dao-node/client";
 
 // Create a cached version of getDelegatesFromDaoNode
 const cachedGetDelegatesFromDaoNode = unstable_cache(
@@ -642,10 +646,11 @@ async function getDelegates({
 
 async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   return withMetrics("getDelegate", async () => {
-    const { namespace, contracts, slug } = Tenant.current();
+    const { namespace, contracts, slug, ui } = Tenant.current();
     const address = isAddress(addressOrENSName)
       ? addressOrENSName.toLowerCase()
       : await ensNameToAddress(addressOrENSName);
+    const includeL3Staking = ui.toggle("include-nonivotes")?.enabled ?? false;
 
     // Eventually want to deprecate voter_stats from this query
     // we are already relying on getVoterStats below
@@ -711,11 +716,19 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       contracts.token.address
     );
 
-    const [delegate, votableSupply, quorum] = await Promise.all([
-      delegateQuery.then((result) => result?.[0] || undefined),
-      fetchVotableSupply(),
-      fetchCurrentQuorum(),
-    ]);
+    const daoNodeVotingPowerPromise = includeL3Staking
+      ? getDelegateVotingPowerFromDaoNode(address)
+      : Promise.resolve<string | null>(null);
+
+    const [delegate, votableSupply, quorum, daoNodeVotingPower] =
+      await Promise.all([
+        delegateQuery.then((result) => result?.[0] || undefined),
+        fetchVotableSupply(),
+        fetchCurrentQuorum(),
+        daoNodeVotingPowerPromise,
+      ]);
+
+    const daoNodeDelegate = await getDelegateDataFromDaoNode(address);
 
     const numOfAdvancedDelegationsQuery = `SELECT count(*) as num_of_delegators
             FROM ${namespace + ".advanced_delegatees"}
@@ -762,22 +775,36 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       { num_of_delegators: BigInt }[]
     >(numOfDirectDelegationsQuery, address, contracts.token.address);
 
-    const totalVotingPower =
-      BigInt(delegate?.voting_power || 0) +
-      BigInt(delegate?.advanced_vp?.toFixed(0) || 0);
+    const fallbackDirectVotingPower = delegate?.voting_power?.toString() || "0";
+    const fallbackAdvancedVotingPower =
+      delegate?.advanced_vp?.toFixed(0) || "0";
+    const directVotingPower = daoNodeVotingPower ?? fallbackDirectVotingPower;
+    const advancedVotingPower = daoNodeVotingPower
+      ? "0"
+      : fallbackAdvancedVotingPower;
+    const totalVotingPower = daoNodeVotingPower
+      ? BigInt(directVotingPower)
+      : BigInt(fallbackDirectVotingPower) + BigInt(fallbackAdvancedVotingPower);
 
     const cachedNumOfDelegators = BigInt(
-      delegate.num_of_delegators?.toFixed() || "0"
+      delegate?.num_of_delegators?.toFixed() || "0"
     );
 
+    const daoNodeNumOfDelegators =
+      daoNodeDelegate?.delegate?.from_cnt !== undefined
+        ? BigInt(daoNodeDelegate.delegate.from_cnt)
+        : null;
+
     const usedNumOfDelegators =
-      cachedNumOfDelegators < 1000n
-        ? BigInt(
-            (
-              await numOfDelegationsResult
-            )?.[0]?.num_of_delegators?.toString() || "0"
-          )
-        : cachedNumOfDelegators;
+      daoNodeNumOfDelegators !== null
+        ? daoNodeNumOfDelegators
+        : cachedNumOfDelegators < 1000n
+          ? BigInt(
+              (
+                await numOfDelegationsResult
+              )?.[0]?.num_of_delegators?.toString() || "0"
+            )
+          : cachedNumOfDelegators;
 
     const relativeVotingPowerToVotableSupply = calculateBigIntRatio(
       totalVotingPower,
@@ -805,8 +832,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       citizen: false,
       votingPower: {
         total: totalVotingPower.toString(),
-        direct: delegate?.voting_power?.toString() || "0",
-        advanced: delegate?.advanced_vp?.toFixed(0) || "0",
+        direct: directVotingPower,
+        advanced: advancedVotingPower,
       },
       votingPowerRelativeToVotableSupply:
         votableSupply && BigInt(votableSupply) > 0n

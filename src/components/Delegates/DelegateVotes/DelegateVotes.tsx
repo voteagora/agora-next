@@ -12,6 +12,7 @@ import { pluralizeVote } from "@/lib/tokenUtils";
 import DelegateVoteIcon from "./DelegateVoteIcon";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { Vote } from "@/app/api/common/votes/vote";
+import LazyVotingPower from "./LazyVotingPower";
 
 function shortPropTitle(title: string, proosalId: string) {
   // This is a hack to hide a proposal formatting mistake from the OP Foundation
@@ -106,7 +107,18 @@ export default function DelegateVotes({
                   <HStack justifyContent="justify-between" gap={2}>
                     <VStack>
                       <span className="text-tertiary text-xs font-medium">
-                        {`${propHeader(vote)} with ${pluralizeVote(BigInt(vote.weight))}`}
+                        {`${propHeader(vote)} with `}
+                        {vote.easOodaoMetadata ? (
+                          <LazyVotingPower
+                            address={vote.address}
+                            blockNumber={
+                              vote.easOodaoMetadata.createdBlockNumber
+                            }
+                            baseWeight={vote.weight}
+                          />
+                        ) : (
+                          pluralizeVote(BigInt(vote.weight))
+                        )}
                       </span>
                       <h2 className="px-0 pt-1 overflow-hidden text-base text-primary text-ellipsis">
                         {shortPropTitle(vote.proposalTitle, vote.proposalId)}

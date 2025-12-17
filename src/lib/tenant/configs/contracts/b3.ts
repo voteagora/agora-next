@@ -1,7 +1,6 @@
 import {
   AgoraGovernor__factory,
   AgoraTimelock__factory,
-  CyberProposalTypes__factory,
   ERC20__factory,
   ProposalTypesConfigurator__factory,
 } from "@/lib/contracts/generated";

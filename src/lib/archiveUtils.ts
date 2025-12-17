@@ -44,31 +44,24 @@ export async function fetchProposalsFromArchive(
   filter: string
 ): Promise<PaginatedResult<ArchiveListProposal[]>> {
   try {
-    const archiveUrl = withCacheBust(getArchiveSlugAllProposals(namespace));
-    const response = await fetch(archiveUrl, {
-      cache: "no-store", // Disable caching for fresh data
-    });
+    const archiveUrls = getArchiveSlugAllProposals(namespace);
+    const proposalBuckets = await Promise.all(
+      archiveUrls.map((url) => fetchArchiveNdjson<ArchiveListProposal>(url))
+    );
 
-    if (response.status === 404) {
-      return {
-        meta: {
-          has_next: false,
-          total_returned: 0,
-          next_offset: 0,
-        },
-        data: [],
-      };
-    }
-
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch archive data: ${response.status} ${response.statusText}`
-      );
-    }
-
-    const ndjsonText = await response.text();
-    const allProposals = parseNDJSON<ArchiveListProposal>(ndjsonText);
-
+    const allProposals = proposalBuckets
+      .flat()
+      .filter((proposal) => {
+        return !(
+          proposal.hybrid === true &&
+          proposal.data_eng_properties?.source === "eas-atlas"
+        );
+      })
+      .sort((a, b) => {
+        const aTime = Number(a.start_blocktime ?? a.start_block ?? 0);
+        const bTime = Number(b.start_blocktime ?? b.start_block ?? 0);
+        return bTime - aTime;
+      });
     // Apply filter if needed
     let filteredProposals = allProposals;
     if (filter === "relevant") {

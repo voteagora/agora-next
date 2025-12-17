@@ -59,7 +59,7 @@ export default function ProposalDescription({
   const option = options?.[0];
   const { ui } = Tenant.current();
   const useArchiveForProposals =
-    ui.toggle("use-archive-for-proposals")?.enabled ?? false;
+    ui.toggle("use-archive-for-proposal-details")?.enabled ?? false;
   const archiveMetadata = useArchiveForProposals
     ? ((
         proposal as unknown as {

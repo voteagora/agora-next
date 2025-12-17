@@ -243,10 +243,11 @@ export const optimismTenantUIConfig = new TenantUI({
         // Temporary: allow public draft sharing via ?share=AuthorAddress
         allowDraftSharing: true,
         offchainProposalCreator: [
-          "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB",
-          "0xa7f8Ad892F3E6f25BB042c8AD7a220e74aCebAd8",
+          "0xcC0B26236AFa80673b0859312a7eC16d2b72C1ea",
+          "0xb8CF6C0425FD799D617351C24fF35B493eD06Cb4", // Jonas's prod EOA
           "0x011B83250067782A4435FAb0B0119Ec835404E60",
           "0x77a1c4669D642E8A25B1da8bAE4a7466f0f3a7c3",
+          "0x4a6894Dd556fab996f8D50b521f900CAEedC168e", // Jonas's test EOA
         ],
         stages: [
           {

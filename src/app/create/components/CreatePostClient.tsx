@@ -8,7 +8,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import Tenant from "@/lib/tenant/tenant";
 import { useEASV2 } from "@/hooks/useEASV2";
 import { useDaoSettings } from "@/hooks/useDaoSettings";
-import { createProposalLinks } from "@/lib/actions/proposalLinks";
 import toast from "react-hot-toast";
 import { PostTypeSelector } from "./PostTypeSelector";
 import { CreatePostForm } from "./CreatePostForm";
@@ -112,44 +111,29 @@ export function CreatePostClient({
           : daoSettings?.votingPeriod || 7 * 24 * 60 * 60;
       const votingDelaySeconds = daoSettings?.votingDelay || 0;
 
+      const relatedLinks = [
+        ...(data.relatedDiscussions || []).map((d) => d.id),
+        ...(data.relatedTempChecks || []).map((t) => t.id),
+      ].filter((url): url is string => !!url);
+
+      const tagsArray = [selectedPostType, ...relatedLinks];
+      const tagsString = tagsArray.join(",");
+
       const proposal = await createProposal({
         title: data.title,
         description: data.description,
         startts: BigInt(Math.floor(Date.now() / 1000) + votingDelaySeconds),
         endts: BigInt(
-          Math.floor((Date.now() + votingPeriodSeconds * 1000) / 1000)
+          Math.floor(
+            (Date.now() +
+              votingDelaySeconds * 1000 +
+              votingPeriodSeconds * 1000) /
+              1000
+          )
         ),
-        tags: selectedPostType,
+        tags: tagsString,
         proposal_type_uid: selectedProposalType.id || undefined,
       });
-
-      const target = proposal.transactionHash;
-
-      const targetType = selectedPostType === "tempcheck" ? "tempcheck" : "gov";
-      const allLinks = [
-        ...(data.relatedDiscussions || []).map((d) => ({
-          sourceId: d.id,
-          sourceType: "forum_topic",
-          targetId: target,
-          targetType,
-        })),
-        ...(data.relatedTempChecks || []).map((t) => ({
-          sourceId: t.id,
-          sourceType: "tempcheck",
-          targetId: target,
-          targetType,
-        })),
-      ];
-
-      if (allLinks.length > 0) {
-        allLinks.forEach((link) =>
-          createProposalLinks({
-            sourceId: link.sourceId,
-            sourceType: link.sourceType,
-            links: [{ targetId: link.targetId, targetType: link.targetType }],
-          }).catch(() => {})
-        );
-      }
 
       await queryClient.invalidateQueries({ queryKey: ["forumTopics"] });
 

@@ -1,9 +1,23 @@
 /** @type {import('next').NextConfig} */
 const path = require("path");
 
-const nextConfig = {
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
+
+const nextConfig = withBundleAnalyzer({
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
+  },
+  typescript: {
+    // Type checking is handled and flagged by CI (GitHub Actions).
+    // Skipping here to reduce Vercel build time and memory usage.
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // Linting is handled and flagged by CI (GitHub Actions).
+    // Skipping here to reduce Vercel build time and memory usage.
+    ignoreDuringBuilds: true,
   },
   async redirects() {
     return [];
@@ -75,6 +89,6 @@ const nextConfig = {
     },
   },
   output: "standalone", // Optional, good for Docker
-};
+});
 
 module.exports = nextConfig;
