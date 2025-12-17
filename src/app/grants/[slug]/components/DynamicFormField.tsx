@@ -26,6 +26,60 @@ interface DynamicFormFieldProps {
   watch: UseFormWatch<any>;
 }
 
+// Render helper text with markdown-style links [text](url)
+function renderTextWithLinks(text: string) {
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  const parts: Array<{ type: "text" | "link"; content: string; url?: string }> =
+    [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = linkRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({
+        type: "text",
+        content: text.substring(lastIndex, match.index),
+      });
+    }
+    if (match[1] && match[2]) {
+      parts.push({
+        type: "link",
+        content: match[1],
+        url: match[2],
+      });
+    }
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push({ type: "text", content: text.substring(lastIndex) });
+  }
+
+  if (parts.length === 0) {
+    return <>{text}</>;
+  }
+
+  return (
+    <>
+      {parts.map((part, idx) =>
+        part.type === "link" && part.url ? (
+          <a
+            key={idx}
+            href={part.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary underline hover:text-primary/80"
+          >
+            {part.content}
+          </a>
+        ) : (
+          <span key={idx}>{part.content}</span>
+        )
+      )}
+    </>
+  );
+}
+
 const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
   field,
   register,
@@ -170,7 +224,9 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
       )}
       {renderField()}
       {field.helperText && (
-        <p className="text-xs text-muted-foreground">{field.helperText}</p>
+        <p className="text-xs text-muted-foreground">
+          {renderTextWithLinks(field.helperText)}
+        </p>
       )}
       {errors[field.id] && (
         <p className="mt-1 text-sm text-negative">
