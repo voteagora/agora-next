@@ -30,6 +30,9 @@ export async function GET(
           })
         : "No deadline",
       form_schema: grant.form_schema || [],
+      bottom_text_config: grant.bottom_text_config || null,
+      bottom_text: grant.bottom_text || null,
+      category: grant.category || null,
     };
 
     return NextResponse.json(transformedGrant, { status: 200 });
