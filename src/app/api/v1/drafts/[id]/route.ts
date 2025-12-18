@@ -41,11 +41,17 @@ export async function GET(
     const draft = await prismaWeb2Client.proposalDraft.findUnique({
       where: { uuid: String(params.id) },
       include: {
-        transactions: true,
+        transactions: {
+          orderBy: { order: "asc" },
+        },
         social_options: true,
         checklist_items: true,
         approval_options: {
-          include: { transactions: true },
+          include: {
+            transactions: {
+              orderBy: { order: "asc" },
+            },
+          },
         },
       },
     });
