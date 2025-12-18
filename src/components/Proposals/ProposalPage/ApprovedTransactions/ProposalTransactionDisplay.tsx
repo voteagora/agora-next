@@ -226,12 +226,14 @@ const ProposalTransactionDisplay = ({
                   <button
                     className={`px-2 py-1 text-xs font-semibold ${viewMode === "summary" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
                     onClick={() => setViewMode("summary")}
+                    type="button"
                   >
                     Summary
                   </button>
                   <button
                     className={`px-2 py-1 text-xs font-semibold ${viewMode === "raw" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
                     onClick={() => setViewMode("raw")}
+                    type="button"
                   >
                     Raw
                   </button>

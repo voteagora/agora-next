@@ -12,12 +12,16 @@ const getDraftProposalByUuid = async (uuid: string) => {
   const draftProposal = await prismaWeb2Client.proposalDraft.findUnique({
     where: { uuid: String(uuid) },
     include: {
-      transactions: true,
+      transactions: {
+        orderBy: { order: "asc" },
+      },
       social_options: true,
       checklist_items: true,
       approval_options: {
         include: {
-          transactions: true,
+          transactions: {
+            orderBy: { order: "asc" },
+          },
         },
       },
     },

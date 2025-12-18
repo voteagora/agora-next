@@ -223,6 +223,7 @@ export type BaseProposal = ProposalDraft & {
   tiers_enabled?: boolean;
   tiers?: number[];
   calculationOptions?: number;
+  transactions: ProposalDraftTransaction[];
 };
 
 export type BasicProposal = BaseProposal & {

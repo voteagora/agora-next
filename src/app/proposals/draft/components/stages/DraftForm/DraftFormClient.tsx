@@ -26,11 +26,12 @@ import ApprovalProposalForm from "../../ApprovalProposalForm";
 import OptimisticProposalForm from "../../OptimisticProposalForm";
 import SwitchInput from "../../form/SwitchInput";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   getProposalTypeAddress,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
+import { buildDraftUrl } from "@/app/proposals/draft/utils/shareParam";
 import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
 import { ScopeDetails } from "@/components/Admin/ScopeDetails";
 import { FormattedProposalType } from "@/lib/types";
@@ -176,6 +177,8 @@ const DraftFormClient = ({
     getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
   );
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const shareParam = searchParams?.get("share");
   const { address } = useAccount();
   const messageSigner = useSignMessage();
 
@@ -278,7 +281,7 @@ const DraftFormClient = ({
       } else {
         invalidatePath(draftProposal.id);
         const nextId = draftProposal.uuid;
-        router.push(`/proposals/draft/${nextId}?stage=${stageIndex + 1}`);
+        router.push(buildDraftUrl(nextId, stageIndex + 1, shareParam));
       }
     } catch (error: any) {
       setIsPending(false);
