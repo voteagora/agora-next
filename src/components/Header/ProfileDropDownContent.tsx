@@ -304,6 +304,13 @@ export const ProfileDropDownContent = ({
                 >
                   Edit delegate statement
                 </Link>
+                <Link
+                  href={`/notification-preferences`}
+                  onClick={handleCloseDrawer}
+                  className="self-stretch h-12 pl-4 flex text-secondary items-center hover:bg-neutral hover:font-bold hover:rounded-md"
+                >
+                  Set notification preferences
+                </Link>
               </>
             )}
           </div>
