@@ -28,7 +28,7 @@ export const checkLogs: ProposalCheck = {
           (isTimelock && log.name === "ExecuteTransaction");
         // Skip logs as required and add the rest to our logs object
         if (shouldSkipLog) return logs;
-        if (!logs[addr]) logs[addr] = [log];
+        if (!logs[addr]) logs[addr] = [];
         logs[addr].push(log);
         return logs;
       },
