@@ -2,17 +2,6 @@ export const dynamic = "force-dynamic";
 
 import Tenant from "@/lib/tenant/tenant";
 import DraftProposalPageClient from "./DraftProposalPageClient";
-import BackButton from "../components/BackButton";
-import {
-  GET_DRAFT_STAGES,
-  getStageMetadata,
-  isPostSubmission,
-} from "../utils/stages";
-import OnlyOwner from "./components/OwnerOnly";
-import ArchivedDraftProposal from "../components/ArchivedDraftProposal";
-import DeleteDraftButton from "../components/DeleteDraftButton";
-import ReactMarkdown from "react-markdown";
-import { getDraftProposalByUuid } from "@/app/api/common/draftProposals/getDraftProposals";
 import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
 import { PLMConfig } from "@/app/proposals/draft/types";
 

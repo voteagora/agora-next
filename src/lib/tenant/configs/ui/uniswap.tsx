@@ -341,6 +341,7 @@ export const uniswapTenantUIConfig = new TenantUI({
   `.trim(),
         },
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
+        allowDraftSharing: true,
       },
     },
     {
