@@ -6,14 +6,11 @@ export type ProposalTaxFormMetadata = Record<string, unknown>;
 export async function fetchProposalTaxFormMetadata(
   proposalId: string
 ): Promise<ProposalTaxFormMetadata> {
-  const { namespace } = Tenant.current();
+  const { slug } = Tenant.current();
 
   const rows = await prismaWeb2Client.proposalTaxFormMetadata.findMany({
     where: {
-      tenant: {
-        equals: namespace,
-        mode: "insensitive",
-      },
+      dao_slug: slug,
       proposalId,
     },
     select: {
@@ -23,7 +20,7 @@ export async function fetchProposalTaxFormMetadata(
   });
 
   const metadata: ProposalTaxFormMetadata = {};
-  rows.forEach(({ key, value }) => {
+  rows.forEach(({ key, value }: { key: string; value: unknown }) => {
     metadata[key] = value;
   });
 
