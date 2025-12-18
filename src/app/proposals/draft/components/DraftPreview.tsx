@@ -20,7 +20,6 @@ import toast from "react-hot-toast";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { useEffect, useState } from "react";
-import { getInputData } from "../utils/getInputData";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -41,11 +40,10 @@ const DraftPreview = ({
   const config = plmToggle?.config as PLMConfig;
   const gatingType = config?.gatingType;
   const votingModuleType = proposalDraft.voting_module_type;
-  const { inputData } = getInputData(proposalDraft);
-  const targets = inputData?.[0];
-  const values = inputData?.[1];
-  const calldatas = inputData?.[2];
-  const description = inputData?.[3];
+  const targets = proposalDraft.transactions.map((t) => t.target);
+  const values = proposalDraft.transactions.map((t) => parseInt(t.value));
+  const calldatas = proposalDraft.transactions.map((t) => t.calldata);
+  const description = proposalDraft.transactions.map((t) => t.description);
 
   const { address } = useAccount();
   const { data: threshold } = useProposalThreshold();
