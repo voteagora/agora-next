@@ -33,7 +33,6 @@ import { Vote } from "@/app/api/common/votes/vote";
 import { SimulationReportDialog } from "../SimulationReportDialog/SimulationReportDialog";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { EncourageConnectWalletDialog } from "@/components/Delegates/Delegations/EncourageConnectWalletDialog";
-import { CreateScopeDialog } from "@/components/Admin/CreateScopeDialog";
 import { ScopeData } from "@/lib/types";
 import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActionDialog";
 import SponsorOffchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOffchainProposalDialog";
@@ -62,7 +61,6 @@ export type DialogType =
   | ShareVoteDialogType
   | SimulationReportDialogType
   | EncourageConnectWalletDialogType
-  | CreateScopeDialogType
   | AccountActionDialogType
   | SponsorOffchainDraftProposalDialog
   | ConfirmDialogType
@@ -280,15 +278,6 @@ export type SimulationReportDialogType = {
 export type EncourageConnectWalletDialogType = {
   type: "ENCOURAGE_CONNECT_WALLET";
   params: {};
-};
-
-export type CreateScopeDialogType = {
-  type: "CREATE_SCOPE";
-  params: {
-    proposalTypeId: number;
-    onSuccess: (scope: ScopeData) => void;
-  };
-  className?: string;
 };
 
 export type AccountActionDialogType = {
@@ -533,15 +522,6 @@ export const dialogs: DialogDefinitions<DialogType> = {
   ENCOURAGE_CONNECT_WALLET: ({}, closeDialog) => (
     <EncourageConnectWalletDialog closeDialog={closeDialog} />
   ),
-  CREATE_SCOPE: ({ proposalTypeId, onSuccess }, closeDialog) => {
-    return (
-      <CreateScopeDialog
-        proposalTypeId={proposalTypeId}
-        onSuccess={onSuccess}
-        closeDialog={closeDialog}
-      />
-    );
-  },
   ACCOUNT_ACTION: ({}, closeDialog) => {
     return <CreateAccountActionDialog closeDialog={closeDialog} />;
   },

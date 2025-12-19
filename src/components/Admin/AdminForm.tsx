@@ -1,4 +1,3 @@
-import ProposalTypeSettings from "./ProposalTypeSettings";
 import GovernorSettings from "./GovernorSettings";
 import FAQs from "./FAQs";
 import { FormattedProposalType } from "@/lib/types";
@@ -16,10 +15,6 @@ export default function AdminForm({
     <div className="space-y-8 sm:space-y-0 sm:flex sm:gap-12 mt-12">
       <div className="space-y-8 sm:flex-grow">
         <GovernorSettings />
-        <ProposalTypeSettings
-          votableSupply={votableSupply}
-          proposalTypes={proposalTypes}
-        />
         <AdminAccountActions />
       </div>
       <FAQs />
