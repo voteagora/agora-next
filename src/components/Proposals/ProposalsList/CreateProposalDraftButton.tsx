@@ -13,6 +13,7 @@ import { PLMConfig } from "@/app/proposals/draft/types";
 import { LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
 const CreateProposalDraftButton = ({
   address,
@@ -26,6 +27,7 @@ const CreateProposalDraftButton = ({
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
   const { signIn } = useSIWE();
+  const openDialog = useOpenDialog();
   const { ui } = Tenant.current();
   const protocolLevelCreateProposalButtonCheck = (
     ui.toggle("proposal-lifecycle")?.config as PLMConfig
@@ -144,7 +146,22 @@ const CreateProposalDraftButton = ({
           }
           const proposal = await res.json();
           const nextId = proposal.uuid;
-          router.push(`/proposals/draft/${nextId}`);
+
+          // Fetch proposal types for the modal
+          const proposalTypesRes = await fetch("/api/v1/proposal-types");
+          const proposalTypes = proposalTypesRes.ok
+            ? await proposalTypesRes.json()
+            : [];
+
+          // Open modal instead of navigating
+          openDialog({
+            type: "CREATE_PROPOSAL_MODAL",
+            className: "sm:w-[90vw] sm:max-w-4xl",
+            params: {
+              idParam: nextId,
+              proposalTypes,
+            },
+          });
         } catch (error) {
           console.error("Error creating draft proposal:", error);
           const message = (error as any)?.message || "Error creating draft";

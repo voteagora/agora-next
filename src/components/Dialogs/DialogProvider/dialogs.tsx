@@ -41,12 +41,14 @@ import { DraftProposal } from "@/app/proposals/draft/types";
 import { ConfirmDialog } from "../ConfirmDialog/ConfirmDialog";
 import { ForumPost, ForumTopic } from "@/lib/forumUtils";
 import ReportModal from "@/app/duna/components/ReportModal";
+import CreateProposalModal from "@/app/proposals/draft/components/CreateProposalModal";
 
 export type DialogType =
   | AdvancedDelegateDialogType
   | ApprovalCastVoteDialogType
   | CastVoteDialogType
   | CreateDraftProposalDialog
+  | CreateProposalModalDialogType
   | DelegateDialogType
   | DeleteDraftProposalDialog
   | OpenGithubPRDialog
@@ -318,6 +320,15 @@ export type ReportModalDialogType = {
   };
 };
 
+export type CreateProposalModalDialogType = {
+  type: "CREATE_PROPOSAL_MODAL";
+  className?: string;
+  params: {
+    idParam: string;
+    proposalTypes: any[];
+  };
+};
+
 export const dialogs: DialogDefinitions<DialogType> = {
   DELEGATE: (
     { delegate, fetchDirectDelegatee, isDelegationEncouragement },
@@ -574,6 +585,15 @@ export const dialogs: DialogDefinitions<DialogType> = {
         onCommentAdded={onCommentAdded}
         onCommentDeleted={onCommentDeleted}
         onCommentUpdated={onCommentUpdated}
+        closeDialog={closeDialog}
+      />
+    );
+  },
+  CREATE_PROPOSAL_MODAL: ({ idParam, proposalTypes }, closeDialog) => {
+    return (
+      <CreateProposalModal
+        idParam={idParam}
+        proposalTypes={proposalTypes}
         closeDialog={closeDialog}
       />
     );
