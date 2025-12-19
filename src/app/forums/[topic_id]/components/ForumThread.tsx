@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import { useStableCallback } from "@/hooks/useStableCallback";
-import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
@@ -38,7 +37,6 @@ export default function ForumThread({
   const [postingRoot, setPostingRoot] = React.useState(false);
   const requireLogin = useRequireLogin();
   const stableCreatePost = useStableCallback(createPost);
-  const [showVPModal, setShowVPModal] = useState(false);
 
   React.useEffect(() => setComments(initialComments), [initialComments]);
 
@@ -75,7 +73,7 @@ export default function ForumThread({
     // Check VP before posting
     const vpCheck = checkVPBeforeAction("post");
     if (!vpCheck.canProceed) {
-      setShowVPModal(true);
+      console.log("Insufficient voting power to post reply");
       return;
     }
 
@@ -141,7 +139,7 @@ export default function ForumThread({
     // Check VP before posting
     const vpCheck = checkVPBeforeAction("post");
     if (!vpCheck.canProceed) {
-      setShowVPModal(true);
+      console.log("Insufficient voting power to post reply");
       return;
     }
 
@@ -215,12 +213,6 @@ export default function ForumThread({
           </div>
         </div>
       </div>
-
-      <InsufficientVPModal
-        isOpen={showVPModal}
-        onClose={() => setShowVPModal(false)}
-        action="post"
-      />
     </>
   );
 }

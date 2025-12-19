@@ -14,7 +14,6 @@ import useRequireLogin from "@/hooks/useRequireLogin";
 import { rgbStringToHex } from "@/app/lib/utils/color";
 import Tenant from "@/lib/tenant/tenant";
 import { useStableCallback } from "@/hooks/useStableCallback";
-import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
 import ENSName from "@/components/shared/ENSName";
 
 const { ui } = Tenant.current();
@@ -40,7 +39,6 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
   const stableUpvoteTopic = useStableCallback(upvoteTopic);
   const stableRemoveUpvoteTopic = useStableCallback(removeUpvoteTopic);
   const mineRef = React.useRef(mine);
-  const [showVPModal, setShowVPModal] = React.useState(false);
 
   React.useEffect(() => {
     mineRef.current = mine;
@@ -73,7 +71,7 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
     if (!mineRef.current) {
       const vpCheck = checkVPBeforeAction("upvote");
       if (!vpCheck.canProceed) {
-        setShowVPModal(true);
+        console.log("Insufficient voting power to upvote");
         return;
       }
     }
@@ -182,12 +180,6 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
           </button>
         </div>
       </Link>
-
-      <InsufficientVPModal
-        isOpen={showVPModal}
-        onClose={() => setShowVPModal(false)}
-        action="upvote"
-      />
     </>
   );
 }

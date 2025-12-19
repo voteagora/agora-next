@@ -12,7 +12,6 @@ import { useAccount } from "wagmi";
 import { SmilePlus } from "lucide-react";
 import useRequireLogin from "@/hooks/useRequireLogin";
 import { useStableCallback } from "@/hooks/useStableCallback";
-import { InsufficientVPModal } from "./InsufficientVPModal";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 
 type AddressesByEmoji = Record<string, string[]>;
@@ -39,7 +38,6 @@ export default function EmojiReactions({
   const { addReaction, removeReaction } = useForum();
   const permissions = useForumPermissionsContext();
   const requireLogin = useRequireLogin();
-  const [showVPModal, setShowVPModal] = useState(false);
 
   // Create stable callbacks that always use the latest values
   const stableAddReaction = useStableCallback(addReaction);
@@ -70,7 +68,7 @@ export default function EmojiReactions({
       if (!currentlyMine) {
         // Don't block if permissions are still loading
         if (!permissions.isLoading && !permissions.canReact) {
-          setShowVPModal(true);
+          console.log("Insufficient voting power to react");
           return;
         }
       }
@@ -195,12 +193,6 @@ export default function EmojiReactions({
           </PopoverContent>
         </Popover>
       </div>
-
-      <InsufficientVPModal
-        isOpen={showVPModal}
-        onClose={() => setShowVPModal(false)}
-        action="react"
-      />
     </>
   );
 }

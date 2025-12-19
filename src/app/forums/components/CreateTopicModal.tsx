@@ -7,7 +7,6 @@ import ComposerModal from "@/components/ForumShared/ComposerModal";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import useRequireLogin from "@/hooks/useRequireLogin";
 import { useStableCallback } from "@/hooks/useStableCallback";
-import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
 
 interface CreateTopicModalProps {
   isOpen: boolean;
@@ -22,7 +21,6 @@ export default function CreateTopicModal({
   const { createTopic, permissions, checkVPBeforeAction } = useForum();
   const requireLogin = useRequireLogin();
   const stableCreateTopic = useStableCallback(createTopic);
-  const [showVPModal, setShowVPModal] = useState(false);
 
   return (
     <>
@@ -45,7 +43,7 @@ export default function CreateTopicModal({
           // Check VP before creating topic
           const vpCheck = checkVPBeforeAction("topic");
           if (!vpCheck.canProceed) {
-            setShowVPModal(true);
+            console.log("Insufficient voting power to create topic");
             return;
           }
 
@@ -60,12 +58,6 @@ export default function CreateTopicModal({
             router.push(buildForumTopicPath(created.id, created.title));
           }
         }}
-      />
-
-      <InsufficientVPModal
-        isOpen={showVPModal}
-        onClose={() => setShowVPModal(false)}
-        action="topic"
       />
     </>
   );

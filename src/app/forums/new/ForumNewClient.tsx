@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { DunaEditor, DunaContentRenderer } from "@/components/duna-editor";
 import { CommunityGuidelinesCard } from "@/app/create/components/CommunityGuidelinesCard";
 import toast from "react-hot-toast";
-import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
 import { createProposalLinks } from "@/lib/actions/proposalLinks";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
@@ -54,7 +53,6 @@ export default function ForumNewClient({
   const permissions = useForumPermissionsContext();
   const { address } = useAccount();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showVPModal, setShowVPModal] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
 
   const form = useForm<FormData>({
@@ -96,7 +94,7 @@ export default function ForumNewClient({
   const handleSubmit = hookFormHandleSubmit(async (data) => {
     const vpCheck = checkVPBeforeAction("topic");
     if (!vpCheck.canProceed) {
-      setShowVPModal(true);
+      console.log("Insufficient voting power to create topic");
       return;
     }
 
@@ -363,12 +361,6 @@ export default function ForumNewClient({
             <CommunityGuidelinesCard />
           </div>
         </div>
-
-        <InsufficientVPModal
-          isOpen={showVPModal}
-          onClose={() => setShowVPModal(false)}
-          action="topic"
-        />
       </div>
     </FormProvider>
   );
