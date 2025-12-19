@@ -167,11 +167,7 @@ export function CreatePostForm({
                 }
                 className="bg-black text-white hover:bg-gray-800"
               >
-                {isSubmitting
-                  ? "Creating..."
-                  : postType === "tempcheck"
-                    ? "Create temp check"
-                    : "Create Proposal"}
+                Continue to Preview
               </Button>
             </div>
           </div>

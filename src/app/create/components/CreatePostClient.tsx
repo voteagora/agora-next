@@ -11,6 +11,8 @@ import { useDaoSettings } from "@/hooks/useDaoSettings";
 import toast from "react-hot-toast";
 import { PostTypeSelector } from "./PostTypeSelector";
 import { CreatePostForm } from "./CreatePostForm";
+import { PreviewStep } from "./PreviewStep";
+import { WalletVerificationStep } from "./WalletVerificationStep";
 import { ProposalSettingsCard } from "./ProposalSettingsCard";
 import { CommunityGuidelinesCard } from "./CommunityGuidelinesCard";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
@@ -64,6 +66,9 @@ export function CreatePostClient({
     useState<ProposalType>(proposalTypes[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showIndexingModal, setShowIndexingModal] = useState(false);
+  const [currentStep, setCurrentStep] = useState<"form" | "preview" | "verify">(
+    "form"
+  );
 
   const form = useForm<CreatePostFormData>({
     defaultValues: initialFormData,
@@ -84,6 +89,24 @@ export function CreatePostClient({
   const currentVP = parseInt(permissions.currentVP) || 0;
   const requiredVP = permissions.settings?.minVpForProposals || 0;
   const isAdmin = permissions.isAdmin;
+
+  const handleFormSubmit = () => {
+    // Move to preview step instead of submitting directly
+    setCurrentStep("preview");
+  };
+
+  const handlePreviewNext = () => {
+    // Move to wallet verification step
+    setCurrentStep("verify");
+  };
+
+  const handleBackToForm = () => {
+    setCurrentStep("form");
+  };
+
+  const handleBackToPreview = () => {
+    setCurrentStep("preview");
+  };
 
   const handleSubmit = async () => {
     if (!address) return;
@@ -215,27 +238,48 @@ export function CreatePostClient({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <CreatePostForm
-            form={form}
-            postType={selectedPostType}
-            onSubmit={handleSubmit}
-            isSubmitting={isSubmitting}
-            canCreateTempCheck={canCreateTempCheck}
-            canCreateGovernanceProposal={canCreateGovernanceProposal}
-            currentVP={currentVP}
-            requiredVP={requiredVP}
-            isAdmin={isAdmin}
-            hasInitialTempCheck={hasInitialTempCheck}
-            onAddRelatedDiscussion={handleAddRelatedItem("relatedDiscussions")}
-            onRemoveRelatedDiscussion={handleRemoveRelatedItem(
-              "relatedDiscussions"
-            )}
-            onAddRelatedTempCheck={handleAddRelatedItem("relatedTempChecks")}
-            onRemoveRelatedTempCheck={handleRemoveRelatedItem(
-              "relatedTempChecks"
-            )}
-            onRemoveRelatedItems={handleRemoveAllRelatedItems}
-          />
+          {currentStep === "form" && (
+            <CreatePostForm
+              form={form}
+              postType={selectedPostType}
+              onSubmit={handleFormSubmit}
+              isSubmitting={isSubmitting}
+              canCreateTempCheck={canCreateTempCheck}
+              canCreateGovernanceProposal={canCreateGovernanceProposal}
+              currentVP={currentVP}
+              requiredVP={requiredVP}
+              isAdmin={isAdmin}
+              hasInitialTempCheck={hasInitialTempCheck}
+              onAddRelatedDiscussion={handleAddRelatedItem("relatedDiscussions")}
+              onRemoveRelatedDiscussion={handleRemoveRelatedItem(
+                "relatedDiscussions"
+              )}
+              onAddRelatedTempCheck={handleAddRelatedItem("relatedTempChecks")}
+              onRemoveRelatedTempCheck={handleRemoveRelatedItem(
+                "relatedTempChecks"
+              )}
+              onRemoveRelatedItems={handleRemoveAllRelatedItems}
+            />
+          )}
+
+          {currentStep === "preview" && (
+            <PreviewStep
+              formData={form.getValues()}
+              postType={selectedPostType}
+              onBack={handleBackToForm}
+              onNext={handlePreviewNext}
+            />
+          )}
+
+          {currentStep === "verify" && (
+            <WalletVerificationStep
+              address={address}
+              postType={selectedPostType}
+              onBack={handleBackToPreview}
+              onSubmit={handleSubmit}
+              isSubmitting={isSubmitting}
+            />
+          )}
         </div>
 
         <div className="space-y-6">
