@@ -78,9 +78,11 @@ export default function GovernorSettings() {
   const [votingPeriod, setVotingPeriod] = useState("");
 
   function convertToBlocks(valueInHours: string) {
-    return BigInt(
-      Math.floor((Number(valueInHours) * SECONDS_IN_HOUR) / secondsPerBlock)
-    );
+    const hours = Number(valueInHours);
+    if (isNaN(hours) || !secondsPerBlock) {
+      return 0n;
+    }
+    return BigInt(Math.floor((hours * SECONDS_IN_HOUR) / secondsPerBlock));
   }
 
   const { data: votingPeriodConfig, isError: votingPeriodError } =

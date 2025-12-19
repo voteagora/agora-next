@@ -57,7 +57,8 @@ export function getSecondsPerBlock(chainId: number | undefined): number {
       return 12;
 
     default:
-      throw new Error(`Block time for chain:${chainId} not specified`);
+      // Return a safe default instead of throwing to prevent runtime errors
+      return 12;
   }
 }
 
