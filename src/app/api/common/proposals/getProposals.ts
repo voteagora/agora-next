@@ -601,58 +601,6 @@ async function getProposalTypes() {
   });
 }
 
-async function getDraftProposals(address: `0x${string}`) {
-  return withMetrics("getDraftProposals", async () => {
-    const { contracts } = Tenant.current();
-    return await prismaWeb2Client.proposalDraft.findMany({
-      where: {
-        author_address: address,
-        chain_id: contracts.governor.chain.id,
-        contract: contracts.governor.address.toLowerCase(),
-        stage: {
-          in: [
-            PrismaProposalStage.ADDING_TEMP_CHECK,
-            PrismaProposalStage.DRAFTING,
-            PrismaProposalStage.ADDING_GITHUB_PR,
-            PrismaProposalStage.AWAITING_SUBMISSION,
-          ],
-        },
-      },
-      include: {
-        transactions: {
-          orderBy: { order: "asc" },
-        },
-      },
-    });
-  });
-}
-
-async function getDraftProposalForSponsor(address: `0x${string}`) {
-  return withMetrics("getDraftProposalForSponsor", async () => {
-    const { contracts } = Tenant.current();
-    return await prismaWeb2Client.proposalDraft.findMany({
-      where: {
-        sponsor_address: address,
-        chain_id: contracts.governor.chain.id,
-        contract: contracts.governor.address.toLowerCase(),
-        stage: {
-          in: [
-            PrismaProposalStage.ADDING_TEMP_CHECK,
-            PrismaProposalStage.DRAFTING,
-            PrismaProposalStage.ADDING_GITHUB_PR,
-            PrismaProposalStage.AWAITING_SUBMISSION,
-          ],
-        },
-      },
-      include: {
-        transactions: {
-          orderBy: { order: "asc" },
-        },
-      },
-    });
-  });
-}
-
 async function getTotalProposalsCount(): Promise<number> {
   return withMetrics("getTotalProposalsCount", async () => {
     const { namespace, contracts } = Tenant.current();
@@ -664,8 +612,6 @@ async function getTotalProposalsCount(): Promise<number> {
 }
 
 export const fetchProposalsCount = cache(getTotalProposalsCount);
-export const fetchDraftProposalForSponsor = cache(getDraftProposalForSponsor);
-export const fetchDraftProposals = cache(getDraftProposals);
 export const fetchProposals = cache(getProposals);
 export const fetchProposal = cache(getProposal);
 export const fetchProposalTypes = cache(getProposalTypes);

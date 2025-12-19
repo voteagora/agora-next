@@ -1,6 +1,6 @@
 import { StaticImageData } from "next/image";
 import { icons } from "@/icons/icons";
-import { PLMConfig } from "@/app/proposals/draft/types";
+import { PLMConfig } from "@/lib/types";
 import { TenantToken } from "../types";
 import React, { ReactNode } from "react";
 

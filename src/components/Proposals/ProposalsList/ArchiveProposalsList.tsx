@@ -5,7 +5,6 @@ import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFilter";
 import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
 import Tenant from "@/lib/tenant/tenant";
-import CreateProposalDraftButton from "./CreateProposalDraftButton";
 import ProposalsPageInfoBanner from "../ProposalsPageInfoBanner";
 import { useInfoBannerVisibility } from "@/hooks/useInfoBannerVisibility";
 

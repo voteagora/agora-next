@@ -22,7 +22,7 @@ import { AgoraOptimismGovCancel } from "@/app/proposals/components/AgoraOptimism
 import { AgoraOptimismGovQueue } from "@/app/proposals/components/AgoraOptimismGovQueue";
 import { AgoraOptimismGovExecute } from "@/app/proposals/components/AgoraOptimismGovExecute";
 import { OffchainCancel } from "@/app/proposals/components/OffchainCancel";
-import { PLMConfig } from "../draft/types";
+import { PLMConfig } from "@/lib/types";
 
 interface Props {
   proposal: Proposal;

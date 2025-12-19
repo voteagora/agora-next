@@ -2,19 +2,16 @@
 
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { useAccount } from "wagmi";
 import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFilter";
 import InfiniteScroll from "react-infinite-scroller";
 import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
 import { useSearchParams } from "next/navigation";
 import Tenant from "@/lib/tenant/tenant";
-import CreateProposalDraftButton from "./CreateProposalDraftButton";
 import ProposalsPageInfoBanner from "../ProposalsPageInfoBanner";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
 import Proposal from "../Proposal/Proposal";
-import { DaoSlug } from "@prisma/client";
 import { useInfoBannerVisibility } from "@/hooks/useInfoBannerVisibility";
 
 export default function ProposalsList({
@@ -38,23 +35,7 @@ export default function ProposalsList({
     votingPeriod: boolean;
   } | null;
 }) {
-  const { address } = useAccount();
-  const { ui, slug } = Tenant.current();
-  let tenantSupportsProposalLifecycle =
-    ui.toggle("proposal-lifecycle")?.enabled;
-
-  if (slug === DaoSlug.OP) {
-    const proposalCreators = [
-      "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8", // Op Gov Manager for Prod
-      "0xE4553b743E74dA3424Ac51f8C1E586fd43aE226F",
-      "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB", // Dev Wallet for testing on op-sepolia
-      "0xb8CF6C0425FD799D617351C24fF35B493eD06Cb4", // Jonas's prod EOA
-      "0x4a6894Dd556fab996f8D50b521f900CAEedC168e", // Jonas's test EOA
-    ];
-
-    tenantSupportsProposalLifecycle = proposalCreators.includes(address || "");
-  }
-
+  const { ui } = Tenant.current();
   const filter = useSearchParams()?.get("filter") || "relevant";
   const fetching = useRef(false);
   const [pages, setPages] = useState([initRelevantProposals]);
@@ -96,9 +77,6 @@ export default function ProposalsList({
         <PageHeader headerText="All Proposals" />
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit items-center">
           <ProposalsFilter />
-          {tenantSupportsProposalLifecycle && address && (
-            <CreateProposalDraftButton address={address} />
-          )}
         </div>
       </div>
 

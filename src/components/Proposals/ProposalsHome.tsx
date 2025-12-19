@@ -1,7 +1,5 @@
 import { fetchNeedsMyVoteProposals as apiFetchNeedsMyVoteProposals } from "@/app/api/common/proposals/getNeedsMyVoteProposals";
 import {
-  fetchDraftProposalForSponsor as apiFetchDraftProposalsForSponsorship,
-  fetchDraftProposals as apiFetchDraftProposals,
   fetchProposals as apiFetchProposals,
 } from "@/app/api/common/proposals/getProposals";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
@@ -12,8 +10,6 @@ import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import ArchiveProposalsList from "@/components/Proposals/ProposalsList/ArchiveProposalsList";
 import { proposalsFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
-import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
-import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
 import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
@@ -50,9 +46,6 @@ export default async function ProposalsHome() {
     return <div>Route not supported for namespace</div>;
   }
 
-  const plmEnabled = hasToggle
-    ? ui.toggle("proposal-lifecycle")?.enabled
-    : false;
   const supportsNotifications = hasToggle
     ? ui.toggle("email-subscriptions")?.enabled
     : false;
@@ -101,22 +94,6 @@ export default async function ProposalsHome() {
     <div className="flex flex-col">
       {supportsNotifications && <SubscribeDialogLauncher />}
       <Hero page="proposals" />
-      {plmEnabled && (
-        <>
-          <MyDraftProposals
-            fetchDraftProposals={async (address) => {
-              "use server";
-              return apiFetchDraftProposals(address);
-            }}
-          />
-          <MySponsorshipRequests
-            fetchDraftProposals={async (address) => {
-              "use server";
-              return apiFetchDraftProposalsForSponsorship(address);
-            }}
-          />
-        </>
-      )}
       <NeedsMyVoteProposalsList
         fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
         votableSupply={votableSupply}

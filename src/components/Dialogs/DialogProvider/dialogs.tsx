@@ -18,12 +18,6 @@ import {
   Delegation,
 } from "@/app/api/common/delegations/delegation";
 import { Chain } from "viem/chains";
-import { DeleteDraftProposalDialog } from "@/app/proposals/draft/components/DeleteDraftButton";
-import CreateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/CreateDraftProposalDialog";
-import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/UpdateDraftProposalDialog";
-import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOnchainProposalDialog";
-import SponsorSnapshotProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorSnapshotProposalDialog";
-import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithubPRDialog";
 import { ProposalType, StakedDeposit } from "@/lib/types";
 import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
@@ -36,8 +30,6 @@ import { EncourageConnectWalletDialog } from "@/components/Delegates/Delegations
 import { CreateScopeDialog } from "@/components/Admin/CreateScopeDialog";
 import { ScopeData } from "@/lib/types";
 import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActionDialog";
-import SponsorOffchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOffchainProposalDialog";
-import { DraftProposal } from "@/app/proposals/draft/types";
 import { ConfirmDialog } from "../ConfirmDialog/ConfirmDialog";
 import { ForumPost, ForumTopic } from "@/lib/forumUtils";
 import ReportModal from "@/app/duna/components/ReportModal";
@@ -46,25 +38,17 @@ export type DialogType =
   | AdvancedDelegateDialogType
   | ApprovalCastVoteDialogType
   | CastVoteDialogType
-  | CreateDraftProposalDialog
   | DelegateDialogType
-  | DeleteDraftProposalDialog
-  | OpenGithubPRDialog
   | PartialDelegateDialogType
   | RetroPGFShareCardDialog
-  | SponsorOnchainDraftProposalDialog
-  | SponsorSnapshotDraftProposalDialog
   | SwithcNetworkDialogType
   | UndelegateDialogType
-  | UpdateDraftProposalDialog
-  | OpenGithubPRDialog
   | SubscribeDialog
   | ShareVoteDialogType
   | SimulationReportDialogType
   | EncourageConnectWalletDialogType
   | CreateScopeDialogType
   | AccountActionDialogType
-  | SponsorOffchainDraftProposalDialog
   | ConfirmDialogType
   | ReportModalDialogType;
 // | FaqDialogType
@@ -222,46 +206,6 @@ export type ApprovalCastVoteDialogProps = {
 export type ApprovalCastVoteDialogType = {
   type: "APPROVAL_CAST_VOTE";
   params: Omit<ApprovalCastVoteDialogProps, "closeDialog">;
-};
-
-export type DeleteDraftProposalDialog = {
-  type: "DELETE_DRAFT_PROPOSAL";
-  params: { proposalId: number };
-};
-
-export type CreateDraftProposalDialog = {
-  type: "CREATE_DRAFT_PROPOSAL";
-  params: { redirectUrl: string; githubUrl: string };
-};
-
-export type UpdateDraftProposalDialog = {
-  type: "UPDATE_DRAFT_PROPOSAL";
-  params: { redirectUrl: string };
-};
-
-export type SponsorSnapshotDraftProposalDialog = {
-  type: "SPONSOR_SNAPSHOT_DRAFT_PROPOSAL";
-  params: { redirectUrl: string; snapshotLink: string };
-};
-
-export type SponsorOnchainDraftProposalDialog = {
-  type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL";
-  params: {
-    redirectUrl: string;
-    txHash: `0x${string}`;
-    isHybrid: boolean;
-    draftProposal: DraftProposal;
-  };
-};
-
-export type SponsorOffchainDraftProposalDialog = {
-  type: "SPONSOR_OFFCHAIN_DRAFT_PROPOSAL";
-  params: { redirectUrl: string; txHash: `0x${string}` };
-};
-
-export type OpenGithubPRDialog = {
-  type: "OPEN_GITHUB_PR";
-  params: { redirectUrl: string; githubUrl: string };
 };
 
 export type SubscribeDialog = {
@@ -472,57 +416,6 @@ export const dialogs: DialogDefinitions<DialogType> = {
   },
   SWITCH_NETWORK: ({ chain }: { chain: Chain }, closeDialog) => (
     <SwitchNetwork chain={chain} closeDialog={closeDialog} />
-  ),
-  DELETE_DRAFT_PROPOSAL: ({ proposalId }, closeDialog) => (
-    <DeleteDraftProposalDialog
-      closeDialog={closeDialog}
-      proposalId={proposalId}
-    />
-  ),
-  CREATE_DRAFT_PROPOSAL: ({ redirectUrl, githubUrl }) => (
-    <CreateDraftProposalDialog
-      redirectUrl={redirectUrl}
-      githubUrl={githubUrl}
-    />
-  ),
-  UPDATE_DRAFT_PROPOSAL: ({ redirectUrl }, closeDialog) => (
-    <UpdateDraftProposalDialog redirectUrl={redirectUrl} />
-  ),
-  SPONSOR_ONCHAIN_DRAFT_PROPOSAL: (
-    { redirectUrl, txHash, isHybrid, draftProposal },
-    closeDialog
-  ) => (
-    <SponsorOnchainProposalDialog
-      redirectUrl={redirectUrl}
-      txHash={txHash}
-      closeDialog={closeDialog}
-      isHybrid={isHybrid}
-      draftProposal={draftProposal}
-    />
-  ),
-  SPONSOR_OFFCHAIN_DRAFT_PROPOSAL: ({ redirectUrl, txHash }, closeDialog) => (
-    <SponsorOffchainProposalDialog
-      redirectUrl={redirectUrl}
-      txHash={txHash}
-      closeDialog={closeDialog}
-    />
-  ),
-  SPONSOR_SNAPSHOT_DRAFT_PROPOSAL: (
-    { redirectUrl, snapshotLink },
-    closeDialog
-  ) => (
-    <SponsorSnapshotProposalDialog
-      redirectUrl={redirectUrl}
-      snapshotLink={snapshotLink}
-      closeDialog={closeDialog}
-    />
-  ),
-  OPEN_GITHUB_PR: ({ redirectUrl, githubUrl }, closeDialog) => (
-    <AddGithubPRDialog
-      redirectUrl={redirectUrl}
-      githubUrl={githubUrl}
-      closeDialog={closeDialog}
-    />
   ),
   SUBSCRIBE: ({ type }, closeDialog) => {
     return <SubscribeDialog closeDialog={closeDialog} type={type} />;

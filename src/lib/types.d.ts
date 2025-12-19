@@ -293,3 +293,17 @@ export interface AddExecutionTransactionRequest {
   executed_by: string;
   executed_at: string;
 }
+
+export type PLMConfig = {
+  stages?: any[];
+  proposalTypes?: any[];
+  copy?: any;
+  snapshotConfig?: {
+    domain: string;
+    requiredTokens: number;
+  };
+  gatingType?: string;
+  protocolLevelCreateProposalButtonCheck?: boolean;
+  offchainProposalCreator?: string[];
+  allowDraftSharing?: boolean;
+};
