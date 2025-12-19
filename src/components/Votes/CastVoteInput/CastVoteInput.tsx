@@ -555,14 +555,8 @@ function NoStatementView() {
     <div className="flex flex-col gap-3">
       <div className="py-2 px-4 bg-line text-xs text-secondary rounded-lg flex items-center gap-2">
         <Image src={icons.info} alt="Info" width={24} height={24} />
-        Voting requires a delegate statement. Set yours one now to participate.
+        Voting requires a delegate statement. Contact the administrator to set up your statement.
       </div>
-      <Button
-        className="w-full"
-        onClick={() => (window.location.href = "/delegates/create")}
-      >
-        Set up statement
-      </Button>
     </div>
   );
 }

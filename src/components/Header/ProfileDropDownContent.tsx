@@ -280,32 +280,13 @@ export const ProfileDropDownContent = ({
           </div>
         ) : (
           <div className="flex flex-col p-6 font-medium">
-            {canCreateDelegateStatement && !hasStatement ? (
-              <Link
-                href={`/delegates/create`}
-                className="self-stretch h-12 pl-4 text-secondary flex items-center hover:bg-neutral hover:rounded-md"
-                onClick={handleCloseDrawer}
-              >
-                Create delegate statement
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href={`/delegates/${ensName ?? address}`}
-                  onClick={handleCloseDrawer}
-                  className="self-stretch h-12 pl-4 text-secondary flex items-center hover:bg-neutral hover:font-bold hover:rounded-md"
-                >
-                  View my profile
-                </Link>
-                <Link
-                  href={`/delegates/create`}
-                  onClick={handleCloseDrawer}
-                  className="self-stretch h-12 pl-4 flex text-secondary items-center hover:bg-neutral hover:font-bold hover:rounded-md"
-                >
-                  Edit delegate statement
-                </Link>
-              </>
-            )}
+            <Link
+              href={`/delegates/${ensName ?? address}`}
+              onClick={handleCloseDrawer}
+              className="self-stretch h-12 pl-4 text-secondary flex items-center hover:bg-neutral hover:font-bold hover:rounded-md"
+            >
+              View my profile
+            </Link>
           </div>
         )}
       </div>

@@ -423,14 +423,7 @@ export function LoadingVote() {
 export function NoStatementView({ closeDialog }: { closeDialog: () => void }) {
   return (
     <div className="py-2 px-4 z-[1099] bg-line text-xs text-secondary rounded-lg">
-      You do not have a delegate statement.{" "}
-      <Link
-        href={"/delegates/create"}
-        className="underline"
-        onClick={closeDialog}
-      >
-        Please set one up to vote.
-      </Link>
+      You do not have a delegate statement. Please contact the administrator to set one up to vote.
     </div>
   );
 }

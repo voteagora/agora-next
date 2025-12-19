@@ -1,7 +1,6 @@
 "use server";
 
 import { fetchAllForAdvancedDelegation as apiFetchAllForAdvancedDelegation } from "@/app/api/delegations/getDelegations";
-import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { fetchVotesForDelegate as apiFetchVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import {
@@ -20,7 +19,6 @@ import {
   fetchCurrentDelegators as apiFetchCurrentDelegators,
   fetchDirectDelegatee as apiFetchDirectDelegatee,
 } from "@/app/api/common/delegations/getDelegations";
-import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
@@ -97,32 +95,6 @@ export async function fetchBalanceForDirectDelegation(
 
 export async function fetchDirectDelegatee(addressOrENSName: string) {
   return apiFetchDirectDelegatee(addressOrENSName);
-}
-
-export async function submitDelegateStatement({
-  address,
-  delegateStatement,
-  signature,
-  message,
-  scwAddress,
-}: {
-  address: `0x${string}`;
-  delegateStatement: DelegateStatementFormValues;
-  signature: `0x${string}`;
-  message: string;
-  scwAddress?: string;
-}) {
-  const response = await createDelegateStatement({
-    address,
-    delegateStatement,
-    signature,
-    message,
-    scwAddress,
-  });
-
-  revalidateDelegateAddressPage(address.toLowerCase());
-  revalidatePath("/delegates/create", "page");
-  return response;
 }
 
 export async function fetchVotesForDelegate(
