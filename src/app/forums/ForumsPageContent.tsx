@@ -59,7 +59,6 @@ export default async function ForumsPageContent({
         breadcrumbs={breadcrumbs}
         showBreadcrumb={selectedCategoryTitle !== null}
         description={description}
-        isDuna={categoryTitle === "DUNA"}
       />
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
         <div className="flex-1 min-w-0">

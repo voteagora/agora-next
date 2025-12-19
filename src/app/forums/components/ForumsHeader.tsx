@@ -1,6 +1,5 @@
 import React, { Fragment } from "react";
 import ForumsSearch from "./ForumsSearch";
-import NewTopicButton from "./NewTopicButton";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -15,23 +14,11 @@ interface ForumsBreadcrumbItem {
   href?: string;
 }
 
-interface TopicContext {
-  id: number;
-  title: string;
-  content: string;
-  createdAt?: string;
-  commentsCount?: number;
-  isTempCheck?: boolean;
-  tempCheckPassed?: boolean;
-}
-
 interface ForumsHeaderProps {
   breadcrumbs?: ForumsBreadcrumbItem[];
   description?: string | null;
   showBreadcrumb?: boolean;
   fallbackTitle?: string;
-  isDuna?: boolean;
-  topicContext?: TopicContext;
 }
 
 export default function ForumsHeader({
@@ -39,8 +26,6 @@ export default function ForumsHeader({
   description,
   showBreadcrumb = breadcrumbs.length > 0,
   fallbackTitle = "Discussions",
-  isDuna = false,
-  topicContext,
 }: ForumsHeaderProps) {
   const shouldRenderBreadcrumb = showBreadcrumb && breadcrumbs.length > 0;
 
@@ -79,7 +64,6 @@ export default function ForumsHeader({
         </div>
         <div className="flex gap-2">
           <ForumsSearch />
-          <NewTopicButton isDuna={isDuna} topicContext={topicContext} />
         </div>
       </div>
     </div>

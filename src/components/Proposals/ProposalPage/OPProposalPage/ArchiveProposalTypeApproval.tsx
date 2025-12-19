@@ -95,10 +95,6 @@ export default function ArchiveProposalTypeApproval({
     isAuthor
   );
 
-  const showCreateDiscussionButton = isTempCheck
-    ? isDefeated && permissions.canCreateTopic
-    : (isDefeated || isSuccessful) && permissions.canCreateTopic;
-
   const showCreateButton =
     isSuccessful &&
     canCreateProposal &&
@@ -115,19 +111,10 @@ export default function ArchiveProposalTypeApproval({
     router.push(`/create?${params.toString()}`);
   };
 
-  const handleCreateDiscussion = () => {
-    const params = new URLSearchParams({
-      fromProposalId: proposal.id,
-      proposalTag: isTempCheck ? "tempcheck" : "gov",
-    });
-
-    router.push(`/forums/new?${params.toString()}`);
-  };
   const now = new Date();
 
   if (
     !showCreateButton &&
-    !showCreateDiscussionButton &&
     !minQuorum &&
     !maxQuorum &&
     !minApproval &&
@@ -149,21 +136,6 @@ export default function ArchiveProposalTypeApproval({
               onClick={handleCreateGovProposal}
             >
               Create gov proposal
-            </Button>
-          </div>
-        </div>
-      ) : showCreateDiscussionButton ? (
-        <div className="relative">
-          <div className="flex items-center justify-between">
-            <div className="w-[151px] text-xs font-semibold text-[#444444]">
-              Want to discuss this {isTempCheck ? "temp check" : "proposal"}{" "}
-              further?
-            </div>
-            <Button
-              className="px-5 py-3 text-xs font-semibold"
-              onClick={handleCreateDiscussion}
-            >
-              Create discussion
             </Button>
           </div>
         </div>
