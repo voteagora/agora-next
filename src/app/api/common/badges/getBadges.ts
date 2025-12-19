@@ -1,5 +1,6 @@
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
+import { unstable_cache } from "next/cache";
 
 export type BadgeDefinition = {
   badge_definition_id: string;
@@ -17,6 +18,58 @@ export type IdentityBadge = {
   block_number: bigint;
   definition: BadgeDefinition;
 };
+
+export async function fetchBadgeDefinition(
+  badgeDefinitionId: string
+): Promise<BadgeDefinition | null> {
+  const { namespace, contracts } = Tenant.current();
+  const daoId = contracts.governor.address.toLowerCase();
+
+  const query = `
+    SELECT 
+      badge_definition_id,
+      name,
+      description,
+      revocable,
+      block_number
+    FROM ${namespace}.badge_definitions
+    WHERE badge_definition_id = $1
+      AND dao_id = $2
+    LIMIT 1
+  `;
+
+  const results = await prismaWeb3Client.$queryRawUnsafe<
+    {
+      badge_definition_id: string;
+      name: string;
+      description: string;
+      revocable: string;
+      block_number: bigint;
+    }[]
+  >(query, badgeDefinitionId, daoId);
+
+  if (results.length === 0) {
+    return null;
+  }
+
+  const row = results[0];
+  return {
+    badge_definition_id: row.badge_definition_id,
+    name: row.name,
+    description: row.description,
+    revocable: row.revocable,
+    block_number: row.block_number,
+  };
+}
+
+export const getBadgeDefinition = unstable_cache(
+  fetchBadgeDefinition,
+  ["badgeDefinition"],
+  {
+    tags: ["badgeDefinition"],
+    revalidate: 300,
+  }
+);
 
 export async function fetchBadgesForDelegate(
   address: string

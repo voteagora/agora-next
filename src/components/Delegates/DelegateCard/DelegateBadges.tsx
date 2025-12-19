@@ -6,6 +6,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Shield, BadgeCheck, Wallet, Users, Eye, Info } from "lucide-react";
+import Link from "next/link";
 
 type DelegateBadgesProps = {
   badges: IdentityBadge[];
@@ -96,15 +97,16 @@ export function DelegateBadges({ badges }: DelegateBadgesProps) {
           <TooltipProvider key={badge.badge_definition_id}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div
-                  className={`inline-flex items-center gap-2 px-4 py-3 border-2 rounded-full cursor-help transition-all hover:scale-105 flex-shrink-0 shadow-sm ${getBadgeStyle(badge.definition.name, index)}`}
+                <Link
+                  href={`/badges/${badge.badge_definition_id}`}
+                  className={`inline-flex items-center gap-2 px-4 py-3 border-2 rounded-full cursor-pointer transition-all hover:scale-105 flex-shrink-0 shadow-sm ${getBadgeStyle(badge.definition.name, index)}`}
                   style={{ transform: `rotate(${rotation}deg)` }}
                 >
                   <BadgeIcon name={badge.definition.name} />
                   <span className="text-base font-medium whitespace-nowrap">
                     {badge.definition.name}
                   </span>
-                </div>
+                </Link>
               </TooltipTrigger>
               <TooltipContent className="max-w-[300px] p-4 rounded-xl bg-black text-neutral shadow-xl">
                 <div className="flex flex-col gap-2">
