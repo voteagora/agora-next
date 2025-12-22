@@ -20,8 +20,7 @@ export default function ProposalTitle({
       : undefined;
   const proposalText = getProposalTypeText(
     proposal.proposalType ?? "",
-    proposalData,
-    proposal.proposalTypeData?.name
+    proposalData
   );
   const { ui } = Tenant.current();
   const useArchiveForProposals =
