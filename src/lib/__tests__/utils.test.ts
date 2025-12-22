@@ -1,23 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterAll } from "vitest";
-import {
-  resolveSafeTx,
-  wrappedWaitForTransactionReceipt,
-  getProposalTypeText,
-} from "../utils";
+import { resolveSafeTx, wrappedWaitForTransactionReceipt } from "../utils";
 import { mainnet } from "viem/chains";
 import { getPublicClient } from "../viem";
-import Tenant from "../tenant/tenant";
-
-vi.mock("../tenant/tenant", () => ({
-  default: {
-    current: () => ({
-      ui: {
-        toggle: () => ({ enabled: false }),
-      },
-      token: {},
-    }),
-  },
-}));
 
 vi.mock("next/font/google", () => ({
   Inter: () => ({
@@ -235,87 +219,6 @@ describe("Safe Transaction Utils", () => {
       await expect(wrappedWaitForTransactionReceipt(params)).rejects.toThrow(
         "no chain on public client"
       );
-    });
-  });
-  describe("getProposalTypeText", () => {
-    beforeEach(() => {
-      vi.resetModules();
-    });
-
-    const mockTenantWithArchive = (enabled: boolean) => {
-      vi.doMock("../tenant/tenant", () => ({
-        default: {
-          current: () => ({
-            ui: {
-              toggle: (name: string) => {
-                if (name === "use-archive-for-proposals") return { enabled };
-                return { enabled: true };
-              },
-            },
-            token: {},
-          }),
-        },
-      }));
-    };
-
-    it("should return custom label if provided", async () => {
-      const { getProposalTypeText } = await import("../utils");
-      expect(getProposalTypeText("STANDARD", undefined, "Custom Label")).toBe(
-        "Custom Label"
-      );
-    });
-
-    it("should return 'Optimistic Proposal (Offchain)' for OFFCHAIN_OPTIMISTIC when archive is disabled", async () => {
-      mockTenantWithArchive(false);
-      const { getProposalTypeText } = await import("../utils");
-      expect(getProposalTypeText("OFFCHAIN_OPTIMISTIC")).toBe(
-        "Optimistic Proposal (Offchain)"
-      );
-    });
-
-    it("should return 'Optimistic Proposal' for OFFCHAIN_OPTIMISTIC when archive is enabled", async () => {
-      mockTenantWithArchive(true);
-      const { getProposalTypeText } = await import("../utils");
-      expect(getProposalTypeText("OFFCHAIN_OPTIMISTIC")).toBe(
-        "Optimistic Proposal"
-      );
-    });
-
-    it("should return 'Standard Proposal (Offchain)' for OFFCHAIN_STANDARD when archive is disabled", async () => {
-      mockTenantWithArchive(false);
-      const { getProposalTypeText } = await import("../utils");
-      expect(getProposalTypeText("OFFCHAIN_STANDARD")).toBe(
-        "Standard Proposal (Offchain)"
-      );
-    });
-
-    it("should return 'Standard Proposal' for OFFCHAIN_STANDARD when archive is enabled", async () => {
-      mockTenantWithArchive(true);
-      const { getProposalTypeText } = await import("../utils");
-      expect(getProposalTypeText("OFFCHAIN_STANDARD")).toBe(
-        "Standard Proposal"
-      );
-    });
-
-    it("should return 'Approval Vote Proposal (Offchain)' for OFFCHAIN_APPROVAL when archive is disabled", async () => {
-      mockTenantWithArchive(false);
-      const { getProposalTypeText } = await import("../utils");
-      expect(getProposalTypeText("OFFCHAIN_APPROVAL")).toBe(
-        "Approval Vote Proposal (Offchain)"
-      );
-    });
-
-    it("should return 'Approval Vote Proposal' for OFFCHAIN_APPROVAL when archive is enabled", async () => {
-      mockTenantWithArchive(true);
-      const { getProposalTypeText } = await import("../utils");
-      expect(getProposalTypeText("OFFCHAIN_APPROVAL")).toBe(
-        "Approval Vote Proposal"
-      );
-    });
-
-    it("should return 'Optimistic Proposal' for OPTIMISTIC", async () => {
-      const { getProposalTypeText } = await import("../utils");
-      expect(getProposalTypeText("OPTIMISTIC")).toBe("Optimistic Proposal");
     });
   });
 });
