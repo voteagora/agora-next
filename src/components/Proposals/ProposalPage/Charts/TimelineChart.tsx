@@ -19,7 +19,7 @@ import {
   formatNumberWithScientificNotation,
   isScientificNotation,
 } from "@/lib/utils";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import { GOVERNOR_TYPE } from "@/lib/constants";
 import { rgbStringToHex } from "@/app/lib/utils/color";
 import { ChartVote } from "@/lib/types";
 import { getHumanBlockTime } from "@/lib/blockTimes";
@@ -28,7 +28,7 @@ import { useLatestBlock } from "@/hooks/useLatestBlock";
 import { useEffect, useState } from "react";
 import { ChartSkeleton } from "@/components/Proposals/ProposalPage/ProposalChart/ProposalChart";
 import { isProposalCreatedBeforeUpgradeCheck } from "@/lib/proposalUtils";
-const { token, namespace, ui } = Tenant.current();
+const { token, ui, contracts } = Tenant.current();
 
 interface Props {
   proposal: Proposal;
@@ -41,6 +41,7 @@ type ChartData = {
   against: number;
   abstain: number;
   total: number;
+  quorumTotal: number;
 };
 
 type RangeProposalType = {
@@ -88,23 +89,16 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
     ? defaultProposalTypeRanges.max_quorum_pct / 100
     : null;
 
+  const governorType = contracts.governorType;
   let stackIds: { [key: string]: string } = {
     for: "1",
     abstain: "1",
     against: "1",
   };
 
-  /**
-   * This is a temporary fix for ENS and UNI.
-   * https://voteagora.atlassian.net/browse/ENG-903
-   * ENS does not count against votes in the quorum calculation.
-   * UNI does not count against or abstain votes in the quorum calculation.
-   * This is a temporary fix stack for + abstain, but not against.
-   * A future fix will read each tenant and stack depending on how the tenant counts quorum.
-   */
-  if (namespace === TENANT_NAMESPACES.ENS) {
+  if (governorType === GOVERNOR_TYPE.ENS) {
     stackIds.against = "2";
-  } else if (namespace === TENANT_NAMESPACES.UNISWAP) {
+  } else if (governorType === GOVERNOR_TYPE.BRAVO) {
     stackIds.against = "2";
     stackIds.abstain = "3";
   }
@@ -115,6 +109,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
         votes: votes,
         block,
         proposalType: proposal.proposalType ?? undefined,
+        governorType: contracts.governorType,
       });
 
       setChartData([
@@ -124,6 +119,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
           against: 0,
           abstain: 0,
           total: 0,
+          quorumTotal: 0,
         },
         ...transformedData,
         {
@@ -132,6 +128,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
           abstain: transformedData[transformedData.length - 1]?.abstain,
           against: transformedData[transformedData.length - 1]?.against,
           total: transformedData[transformedData.length - 1]?.total,
+          quorumTotal: transformedData[transformedData.length - 1]?.quorumTotal,
         },
       ]);
     }
@@ -177,11 +174,14 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
             interval={0}
             domain={[
               0,
-              (dataMax: number) => {
+              () => {
                 const quorumValue = proposal.quorum
                   ? +proposal.quorum.toString()
                   : 0;
-                const maxValue = Math.max(dataMax, quorumValue);
+                const maxQuorumTotal = Math.max(
+                  ...chartData.map((d) => d.quorumTotal)
+                );
+                const maxValue = Math.max(maxQuorumTotal, quorumValue);
 
                 if (maxValue <= 1) {
                   return 1;
@@ -197,7 +197,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
                 ? +proposal.quorum.toString()
                 : 0;
               const maxValue = Math.max(
-                Math.max(...chartData.map((d) => d.total)),
+                Math.max(...chartData.map((d) => d.quorumTotal)),
                 quorumValue
               );
 
@@ -268,6 +268,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
                 quorum={isProposalCreatedBeforeUpgrade ? null : proposal.quorum}
                 minQuorumPct={minQuorumPct}
                 maxQuorumPct={maxQuorumPct}
+                governorType={contracts.governorType}
               />
             }
             cursor={{ stroke: "#666", strokeWidth: 1, strokeDasharray: "4 4" }}
@@ -283,7 +284,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
           <Area
             type="step"
             dataKey="abstain"
-            stackId={1}
+            stackId={stackIds.abstain}
             stroke={rgbStringToHex(ui.customization?.tertiary)}
             fill={rgbStringToHex(ui.customization?.tertiary)}
             name="Abstain"
@@ -309,10 +310,12 @@ const transformVotesToChartData = ({
   votes,
   block,
   proposalType,
+  governorType,
 }: {
   votes: ChartVote[];
   block: Block;
   proposalType?: string;
+  governorType?: GOVERNOR_TYPE;
 }) => {
   let forCount = 0;
   let abstain = 0;
@@ -329,6 +332,13 @@ const transformVotesToChartData = ({
       timestamp = getHumanBlockTime(vote.block_number, block);
     }
 
+    let quorumTotal = forCount + abstain + against;
+    if (governorType === GOVERNOR_TYPE.ENS) {
+      quorumTotal = forCount + abstain;
+    } else if (governorType === GOVERNOR_TYPE.BRAVO) {
+      quorumTotal = forCount;
+    }
+
     return {
       weight: Number(vote.weight),
       for: forCount,
@@ -336,6 +346,7 @@ const transformVotesToChartData = ({
       against: against,
       timestamp: timestamp,
       total: forCount + abstain + against,
+      quorumTotal: quorumTotal,
       isSnapshot: proposalType === "SNAPSHOT",
     };
   });
@@ -388,6 +399,7 @@ const CustomTooltip = ({
   quorum,
   minQuorumPct,
   maxQuorumPct,
+  governorType,
 }: any) => {
   const forVotes = payload.find((p: any) => p.name === "For");
   const againstVotes = payload.find((p: any) => p.name === "Against");
@@ -409,17 +421,11 @@ const CustomTooltip = ({
       BigInt(integerAbstainVotes) +
       BigInt(integerAgainstVotes);
 
-    /**
-     * ENS does not count against votes in the quorum calculation.
-     */
-    if (namespace === TENANT_NAMESPACES.ENS) {
+    if (governorType === GOVERNOR_TYPE.ENS) {
       quorumVotes = quorumVotes - BigInt(integerAgainstVotes);
     }
 
-    /**
-     * Only FOR votes are counted towards quorum for Uniswap.
-     */
-    if (namespace === TENANT_NAMESPACES.UNISWAP) {
+    if (governorType === GOVERNOR_TYPE.BRAVO) {
       quorumVotes = BigInt(integerForVotes);
     }
 
