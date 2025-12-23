@@ -202,7 +202,7 @@ export function CreatePostClient({
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
         <div className="flex flex-col lg:flex-row items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl font-bold text-primary">
             Create {postTypeOptions[selectedPostType].toLowerCase()}
           </h1>
 
