@@ -308,3 +308,11 @@ export const getArchiveSlugForProposalNonVoters = (
 ) => {
   return `${getArchiveSlugGCSbucket(namespace)}/hasnt_voted/${proposalId}.ndjson.gz`;
 };
+
+export const EAS_ADDRESS: Record<number, string> = {
+  10: "0x4200000000000000000000000000000000000021",
+  11155420: "0x4200000000000000000000000000000000000021",
+  1: "0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587",
+  11155111: "0xC2679fBD37d54388Ce493F1DB75320D236e1815e",
+  8453: "0x4200000000000000000000000000000000000021",
+};

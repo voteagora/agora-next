@@ -47,7 +47,7 @@ const DunaAdministrationArchive = async () => {
         </h4>
       </div>
 
-      <Card className="border border-line bg-white shadow-sm">
+      <Card className="border border-line bg-cardBackground shadow-sm">
         <CardContent className="p-6">
           <div className="">
             <DocumentsSection

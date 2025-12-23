@@ -10,24 +10,19 @@ import {
 
 import { ethers } from "ethers";
 import Tenant from "./tenant/tenant";
+import { EAS_ADDRESS } from "./constants";
 
 const { contracts } = Tenant.current();
 const provider = contracts.token.provider;
 
-const eas =
-  process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? new EAS("0x4200000000000000000000000000000000000021")
-    : new EAS("0x4200000000000000000000000000000000000021");
+const eas = new EAS(EAS_ADDRESS[contracts.token.chain.id]);
 
-const easV2 =
-  process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e")
-    : new EAS("0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587");
-
-const CHECK_PROPOSAL_SCHEMA_ID =
-  process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? "0x08df8e6e629077cabef4ed15cd4ff4f2359c2a60ad65b8355ac1f905b8f23a6f"
-    : "0x80155c3a8c4ea17ce96e8899f7ab1ceca9e85382d7f893619a1d03947a70f844";
+const CHECK_PROPOSAL_SCHEMA_ID: Record<number, string> = {
+  1: "0x80155c3a8c4ea17ce96e8899f7ab1ceca9e85382d7f893619a1d03947a70f844",
+  11155111:
+    "0x08df8e6e629077cabef4ed15cd4ff4f2359c2a60ad65b8355ac1f905b8f23a6f",
+  8453: "0xe8d4638f7eb0d8d480f81365b9fe99a9826dd42a012f0ecd3e3621bfe1602b41",
+};
 
 export const attestByDelegationServer = async ({
   recipient,
@@ -90,7 +85,7 @@ export async function createCheckProposalAttestation({
   }
 
   const sender = new ethers.Wallet(EAS_SENDER_PRIVATE_KEY, provider);
-  easV2.connect(sender as any);
+  eas.connect(sender as any);
 
   const schemaEncoder = new SchemaEncoder("string[] passed,string[] failed");
 
@@ -99,8 +94,8 @@ export async function createCheckProposalAttestation({
     { name: "failed", value: failed, type: "string[]" },
   ]);
 
-  const txResponse = await easV2.attest({
-    schema: CHECK_PROPOSAL_SCHEMA_ID,
+  const txResponse = await eas.attest({
+    schema: CHECK_PROPOSAL_SCHEMA_ID[contracts.token.chain.id],
     data: {
       recipient: daoUuid,
       expirationTime: NO_EXPIRATION,

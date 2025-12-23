@@ -61,7 +61,7 @@ const DunaAdministration = async () => {
       </div>
       <DunaDescription />
 
-      <Card className="border border-line bg-white shadow-sm">
+      <Card className="border border-line bg-cardBackground shadow-sm">
         <CardContent className="p-6">
           <div className="">
             <DocumentsSection initialDocuments={documents} />

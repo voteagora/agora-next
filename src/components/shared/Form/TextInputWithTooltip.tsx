@@ -42,7 +42,7 @@ export function TextInputWithTooltip({
         onBlur={handleInputBlur}
       />
       {isTooltipVisible && (
-        <div className="absolute bg-black bg-opacity-75 text-neutral rounded-[4px] py-1 px-2 text-xs bottom-[100%] left-0 mb-1 z-50">
+        <div className="absolute bg-black bg-opacity-75 text-white rounded-[4px] py-1 px-2 text-xs bottom-[100%] left-0 mb-1 z-50">
           {tooltipMessage ? sanitizeContent(tooltipMessage) : null}
         </div>
       )}
