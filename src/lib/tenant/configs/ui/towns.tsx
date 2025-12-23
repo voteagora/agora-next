@@ -9,9 +9,10 @@ import townsInfoCard1 from "@/assets/tenant/towns_info_1.svg";
 import townsInfoCard2 from "@/assets/tenant/towns_info_2.svg";
 import townsInfoCard3 from "@/assets/tenant/towns_info_3.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
-import { CoinsIcon } from "@/icons/CoinsIcon";
-import { NotificationIcon } from "@/icons/NotificationIcon";
 import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
+import { ProposalStage as PrismaProposalStage } from "@prisma/client";
+import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import DelegatingSectionContent from "@/app/info/components/DelegatingSectionContent";
 
 export const townsTenantUIConfig = new TenantUI({
   title: "Towns Protocol",
@@ -24,13 +25,6 @@ export const townsTenantUIConfig = new TenantUI({
       decimals: 18,
       name: "Towns (ETH)",
       chainId: 1,
-    },
-    {
-      address: "0x00000000bcA93b25a6694ca3d2109d545988b13B",
-      symbol: "TOWNS",
-      decimals: 18,
-      name: "Towns (BNB)",
-      chainId: 56,
     },
     {
       address: "0x00000000A22C618fd6b4D7E9A335C4B96B189a38",
@@ -219,27 +213,27 @@ export const townsTenantUIConfig = new TenantUI({
 
   toggles: [
     {
-      name: "admin",
-      enabled: false,
-    },
-    {
-      name: "proposals",
-      enabled: false,
-    },
-    {
-      name: "info",
+      name: "delegates",
       enabled: true,
     },
     {
-      name: "delegates",
-      enabled: false,
+      name: "delegation-encouragement",
+      enabled: true,
     },
     {
       name: "delegates/edit",
       enabled: false,
     },
     {
-      name: "snapshotVotes",
+      name: "proposals",
+      enabled: true,
+    },
+    {
+      name: "info",
+      enabled: true,
+    },
+    {
+      name: "info/governance-charts",
       enabled: false,
     },
     {
@@ -248,7 +242,61 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       name: "proposal-lifecycle",
-      enabled: false,
+      enabled: true,
+      config: {
+        stages: [
+          {
+            stage: PrismaProposalStage.DRAFTING,
+            order: 0,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.AWAITING_SUBMISSION,
+            order: 1,
+            isPreSubmission: true,
+          },
+          {
+            stage: PrismaProposalStage.PENDING,
+            order: 2,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.QUEUED,
+            order: 3,
+            isPreSubmission: false,
+          },
+          {
+            stage: PrismaProposalStage.EXECUTED,
+            order: 4,
+            isPreSubmission: false,
+          },
+        ],
+        proposalTypes: [
+          {
+            type: ProposalType?.BASIC,
+            prodAddress: null,
+            testnetAddress: null,
+          },
+        ],
+        copy: {
+          helperText: `
+                ## Proposal checklist
+- Make sure that you have simulated and review your transactions before seeking sponsorship.
+- Check your markdown previews to ensure you didn't break any links.
+- Review your description and make sure it's clear and concise.
+- Remember that everything lasts forever onchain, check your spelling and grammar and make this one count. You got this.
+`.trim(),
+        },
+        gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
+      },
+    },
+    {
+      name: "use-archive-for-proposals",
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
     },
     {
       name: "use-daonode-for-proposals",
@@ -256,7 +304,7 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       name: "use-daonode-for-votable-supply",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "use-daonode-for-proposal-types",
@@ -271,8 +319,24 @@ export const townsTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "coming-soon",
+      name: "has-eas-oodao",
       enabled: true,
+    },
+    {
+      name: "coming-soon",
+      enabled: false,
+    },
+    {
+      name: "admin",
+      enabled: false,
+    },
+    {
+      name: "snapshotVotes",
+      enabled: false,
+    },
+    {
+      name: "coming-soon/show-static-proposals",
+      enabled: false,
     },
     {
       name: "hide-governor-settings",
@@ -291,7 +355,7 @@ export const townsTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "towns-duna-administration",
+      name: "duna/use-community-dialogue-label",
       enabled: true,
     },
     {
@@ -304,26 +368,174 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       name: "footer/hide-votable-supply",
+      enabled: false,
+    },
+    {
+      name: "easv2-govlessvoting",
       enabled: true,
     },
     {
-      name: "footer/hide-total-supply",
+      name: "voting-power-info-tooltip",
       enabled: true,
+      config: {
+        text: "Voting power comes from multiple sources: TOWNS token delegation on Ethereum mainnet, and TOWNS token delegation on Base. All sources are combined to calculate your total voting power.",
+      },
     },
     {
-      name: "coming-soon/show-static-proposals",
+      name: "proposals-page-info-banner",
       enabled: true,
-    },
-    {
-      name: "duna/use-community-dialogue-label",
-      enabled: true,
+      config: {
+        text: "Learn more about the voting process",
+        link: "/info#voting-process",
+        storageKey: "towns-voting-process-banner-dismissed",
+      },
     },
     {
       name: "use-archive-for-vote-history",
       enabled: false,
     },
     {
+      name: "delegates-page-info-banner",
+      enabled: true,
+      config: {
+        text: "Learn more about voting power & delegation",
+        link: "/info#voting-power",
+        storageKey: "towns-voting-power-banner-dismissed",
+      },
+    },
+    {
+      name: "delegates-layout-list",
+      enabled: true,
+    },
+    {
+      name: "info/governance-sections",
+      enabled: true,
+      config: {
+        title: "Voting in Towns Protocol",
+        sections: [
+          {
+            id: "voting-process",
+            title: "Voting process",
+            content: (
+              <ul className="list-disc list-outside space-y-2 ml-6">
+                <li>
+                  In order for a <strong>Governance Proposal</strong> to be
+                  enacted, it must:
+                  <ul className="list-[circle] list-outside space-y-2 ml-6 mt-2 text-sm leading-relaxed">
+                    <li>
+                      first be submitted as a <strong>Temp-Check</strong>, which
+                      is a five-day period during which <strong>Members</strong>{" "}
+                      can utilize their TOWNS token to indicate support for a
+                      proposal. In order for a proposal to transition from a{" "}
+                      <strong>Temp-Check</strong> to a vote of the membership,
+                      the <strong>Temp-Check</strong> must attain the support of
+                      5% of the TOWNS tokens minted (excludes future emissions),
+                      except as limited by Article 13 of the Association
+                      Agreement.
+                    </li>
+                    <li>
+                      upon a successful <strong>Temp-Check</strong>, the{" "}
+                      <strong>Governance Proposal</strong> period is open for
+                      seven days, during which time
+                      <strong> Members</strong> can utilize their TOWNS token to
+                      affirm, deny, or participate without voting on the
+                      proposal. A proposal:
+                      <ul className="list-[square] list-outside space-y-1 ml-6 mt-2 text-sm leading-relaxed">
+                        <li>
+                          <strong>passes</strong> if the majority of votes
+                          affirm the proposal and 10% of the minted TOWNS tokens
+                          (excludes future emissions) participate in the vote;
+                          and
+                        </li>
+                        <li>
+                          <strong>fails</strong> if the majority of votes deny
+                          the proposal or 10% of the TOWNS tokens minted
+                          (excludes future emissions) did not participate in the
+                          vote.
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  A passed <strong>Governance Proposal</strong> can be reverted
+                  for further consideration and modification pursuant to Article
+                  14 of the Association Agreement if it is determined by the{" "}
+                  <strong>Rules Committee</strong> within 3-days of passage to
+                  be violative of legal requirements, technically unfeasible, or
+                  malicious. If the 3-day period expires without reversion or
+                  the <strong>Rules Committee</strong> affirms the{" "}
+                  <strong>Governance Proposal</strong>, it is enacted.
+                </li>
+                <li>
+                  Upon enactment of a <strong>Governance Proposal</strong>, any
+                  recipients of funds must complete a tax reporting intake
+                  through tooling provided by the
+                  <strong> Rules Committee Administrator</strong> within 15
+                  days, or the payment will expire, and the recipient shall not
+                  be eligible to receive the funds absent future{" "}
+                  <strong>Governance Proposal</strong>.
+                </li>
+              </ul>
+            ),
+          },
+          {
+            id: "voting-power",
+            title: "How voting power works across chains",
+            content: (
+              <div className="flex flex-col space-y-6">
+                <div className="flex flex-col space-y-3">
+                  <h3 className="text-[16px] font-semibold text-primary">
+                    TOWNS on Ethereum Mainnet
+                  </h3>
+                  <div className="flex flex-col space-y-3">
+                    <p>
+                      The TOWNS token uses OpenZeppelin&apos;s ERC20Votes. Your
+                      tokens don&apos;t count as votes until you choose where
+                      your voting power should live:
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 ml-4 text-sm">
+                      <li>
+                        <strong>Self-delegate</strong> to vote directly from
+                        your own wallet.
+                      </li>
+                      <li>
+                        <strong>Delegate to someone you trust</strong> so they
+                        can vote on your behalf.
+                      </li>
+                    </ul>
+                    <p>
+                      Either way, you keep full ownership of your tokens.
+                      Delegation <strong>does not</strong> let anyone move your
+                      tokens or claim them; it only points your voting power.
+                      You can change or revoke delegation at any time by making
+                      a new delegation.
+                    </p>
+                    <p>
+                      This model keeps everyday transfers cheaper and lets
+                      governance use reliable onchain snapshots of voting power
+                      at specific blocks.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col space-y-2">
+                  <h3 className="text-[16px] font-semibold text-primary">
+                    Delegating to yourself and others
+                  </h3>
+                  <DelegatingSectionContent />
+                </div>
+              </div>
+            ),
+          },
+        ],
+      },
+    },
+    {
       name: "ui/use-dark-theme-styling",
+      enabled: true,
+    },
+    {
+      name: "include-nonivotes",
       enabled: true,
     },
   ],
