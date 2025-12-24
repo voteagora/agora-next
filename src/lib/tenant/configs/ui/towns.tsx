@@ -378,7 +378,7 @@ export const townsTenantUIConfig = new TenantUI({
       name: "voting-power-info-tooltip",
       enabled: true,
       config: {
-        text: "Voting power comes from multiple sources: TOWNS token delegation on Ethereum mainnet, and TOWNS token delegation on Base. All sources are combined to calculate your total voting power.",
+        text: "Voting power comes from multiple sources: TOWNS token delegation on Base, and TOWNS token delegation on Ethereum mainnet. All sources are combined to calculate your total voting power.",
       },
     },
     {
@@ -536,6 +536,10 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       name: "include-nonivotes",
+      enabled: true,
+    },
+    {
+      name: "towns-duna-disclosures",
       enabled: true,
     },
   ],
