@@ -139,7 +139,7 @@ export const townsTenantUIConfig = new TenantUI({
         {
           name: "Governance Forums",
           title: "Governance",
-          url: "/coming-soon",
+          url: "/proposals",
           image: townsInfoCard2,
         },
         {

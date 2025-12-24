@@ -49,7 +49,7 @@ export function RelatedItemsSection({
             <div className="flex-1 min-w-0 pr-8">
               <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
                 <div className="flex items-center gap-2">
-                  <p className="font-medium text-sm leading-tight">
+                  <p className="font-medium text-sm leading-tight text-primary">
                     {item.title}
                   </p>
                   {item.url && (
@@ -83,7 +83,7 @@ export function RelatedItemsSection({
               variant="ghost"
               size="sm"
               onClick={() => onRemove(item.id)}
-              className="h-6 w-6 p-0 rounded-full border"
+              className="h-6 w-6 p-0 rounded-full border text-secondary"
             >
               <X className="h-3.5 w-3.5" />
             </Button>

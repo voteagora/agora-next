@@ -79,7 +79,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         onFocus={onFocus}
         onBlur={onBlur}
         placeholder={placeholder || "Search discussions"}
-        className="w-full rounded-md border border-cardBorder bg-card py-2 pl-10 pr-10 text-sm text-primary placeholder:text-tertiary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
+        className="w-full rounded-md border border-cardBorder bg-cardBackground py-2 pl-10 pr-10 text-sm text-primary placeholder:text-tertiary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
         aria-label="Search forum topics"
       />
     </div>
@@ -114,7 +114,7 @@ const DropdownHits: React.FC<DropdownHitsProps> = ({ open, onSelect }) => {
   if (!open) return null;
 
   return (
-    <div className="absolute z-20 mt-2 w-full rounded-md border border-cardBorder bg-card shadow-lg">
+    <div className="absolute z-20 mt-2 w-full rounded-md border border-cardBorder bg-cardBackground shadow-lg">
       {filteredHits.length === 0 ? (
         <div className="px-4 py-3 text-sm text-tertiary">No matches found.</div>
       ) : (

@@ -27,7 +27,7 @@ export const DelegateToSelfBanner = () => {
   return (
     <div className="w-full p-4 rounded-lg border border-negative inline-flex justify-start items-start gap-4 mt-3 mb-1">
       <ExclamationCircleIcon className="w-6 h-6 stroke-negative" />
-      <div className="flex-1 flex-col justify-start items-start gap-1 text-neutral-900">
+      <div className="flex-1 flex-col justify-start items-start gap-1 text-primary">
         <div className="text-base font-bold leading-normal">
           Your tokens can&#39;t be voted with!
         </div>

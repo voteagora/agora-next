@@ -83,7 +83,7 @@ const ForumInstantSearch: React.FC<InstantSearchProps> = ({
     };
 
     return (
-      <div className="border rounded-lg p-4 space-y-2">
+      <div className="border rounded-lg p-4 space-y-2 bg-cardBackground">
         <div className="flex justify-between items-start">
           <h3 className="font-semibold text-lg">
             <Highlight hit={hit} attribute="title" />
