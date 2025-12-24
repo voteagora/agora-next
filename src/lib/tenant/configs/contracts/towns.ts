@@ -24,8 +24,8 @@ export const townsTenantConfig = ({
     : "0x55f6e82a8BF5736d46837246DcBEAf7e61b3c27C";
 
   const DAO_ID = isProd
-    ? "0x746f776e732e2e2e2e2e0000210500000030435d"
-    : "0x746f776e732e2e2e2e2e00aa36a70000003d1154";
+    ? "0x746f776e732e2e2e2e2e00002105010000e5ebe1"
+    : "0x746f776e732e2e2e2e2e00aa36a7010000ca3006";
 
   const DUMMY_TIMELOCK = "0x0000000000000000000000000000000000000003";
   const DUMMY_TYPES = "0x0000000000000000000000000000000000000004";
@@ -75,5 +75,8 @@ export const townsTenantConfig = ({
     }),
     delegationModel: DELEGATION_MODEL.FULL,
     treasury: [],
+    easRecipient: isProd
+      ? "0x746f776e732e2e2e2e2e00002105010000e5ebe1"
+      : "0x746f776e732e2e2e2e2e00aa36a7010000ca3006",
   };
 };
