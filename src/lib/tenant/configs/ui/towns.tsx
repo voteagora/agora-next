@@ -115,7 +115,7 @@ export const townsTenantUIConfig = new TenantUI({
       route: "proposals",
       title: "Towns Protocol Proposals",
       description:
-        "Towns Protocol is currently setting up its governance infrastructure. Proposal functionality will be available soon.",
+        "Towns Protocol is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
       meta: {
         title: "Towns Protocol Proposals",
         description: "View and vote on Towns Protocol proposals",
