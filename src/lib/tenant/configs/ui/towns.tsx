@@ -433,6 +433,14 @@ export const townsTenantUIConfig = new TenantUI({
                       except as limited by Article 13 of the Association
                       Agreement.
                     </li>
+                    <ul>
+                      <li>
+                      Towns Node Operators are able to submit proposals directly
+                      as Governance Proposals (thereby skipping the Temp-Check)
+                      by connecting a wallet containing a Towns Node Operator
+                      NFT.
+                      </li>
+                    </ul>
                     <li>
                       upon a successful <strong>Temp-Check</strong>, the{" "}
                       <strong>Governance Proposal</strong> period is open for
