@@ -12,8 +12,13 @@ export function canCreateTempCheck(permissions: ForumPermissions): boolean {
 export function canCreateGovernanceProposal(
   permissions: ForumPermissions,
   relatedTempChecks: RelatedItem[],
-  isAuthor: boolean
+  isAuthor: boolean,
+  hasTownsNFT?: boolean
 ): boolean {
+  if (hasTownsNFT) {
+    return true;
+  }
+
   const hasApprovedTempCheck =
     Array.isArray(relatedTempChecks) &&
     relatedTempChecks.some((tc) => tc.status === "SUCCEEDED");

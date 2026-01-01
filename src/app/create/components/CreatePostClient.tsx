@@ -18,6 +18,7 @@ import {
   canCreateTempCheck as canCreateTempCheckUtil,
   canCreateGovernanceProposal as canCreateGovernanceProposalUtil,
 } from "@/lib/forumPermissionUtils";
+import { useHasTownsNFT } from "@/hooks/useHasTownsNFT";
 import {
   PostType,
   postTypeOptions,
@@ -76,10 +77,12 @@ export function CreatePostClient({
   const isAuthorOfTempChecks = relatedTempChecks.every(
     (tc) => tc.proposer?.toLowerCase() === address?.toLowerCase()
   );
+  const { hasNFT: hasTownsNFT } = useHasTownsNFT();
   const canCreateGovernanceProposal = canCreateGovernanceProposalUtil(
     permissions,
     relatedTempChecks,
-    isAuthorOfTempChecks
+    isAuthorOfTempChecks,
+    hasTownsNFT
   );
   const currentVP = parseInt(permissions.currentVP) || 0;
   const requiredVP = permissions.settings?.minVpForProposals || 0;
@@ -224,6 +227,7 @@ export function CreatePostClient({
             currentVP={currentVP}
             requiredVP={requiredVP}
             hasInitialTempCheck={hasInitialTempCheck}
+            hasTownsNFT={hasTownsNFT}
             onAddRelatedDiscussion={handleAddRelatedItem("relatedDiscussions")}
             onRemoveRelatedDiscussion={handleRemoveRelatedItem(
               "relatedDiscussions"

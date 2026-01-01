@@ -18,6 +18,7 @@ interface CreatePostFormProps {
   currentVP: number;
   requiredVP: number;
   hasInitialTempCheck: boolean;
+  hasTownsNFT?: boolean;
   onAddRelatedDiscussion: (item: RelatedItem) => void;
   onRemoveRelatedDiscussion: (id: string) => void;
   onAddRelatedTempCheck: (item: RelatedItem) => void;
@@ -35,6 +36,7 @@ export function CreatePostForm({
   currentVP,
   requiredVP,
   hasInitialTempCheck,
+  hasTownsNFT,
   onAddRelatedDiscussion,
   onRemoveRelatedDiscussion,
   onAddRelatedTempCheck,
@@ -120,7 +122,13 @@ export function CreatePostForm({
               )}
               {postType === "gov-proposal" && (
                 <div>
-                  {!relatedTempChecks?.length ? (
+                  {hasTownsNFT ? (
+                    <span className="text-green-600 flex items-center gap-1">
+                      <CheckIcon className="h-4 w-4" />
+                      You are authorized to create proposal as a Towns Node
+                      Operator
+                    </span>
+                  ) : !relatedTempChecks?.length ? (
                     <span className="text-secondary flex items-center gap-1">
                       <XMarkIcon className="h-4 w-4" />
                       Select a successful temp check to continue
@@ -137,7 +145,7 @@ export function CreatePostForm({
                       proposals
                     </span>
                   )}
-                  {relatedTempChecks?.length > 0 && (
+                  {!hasTownsNFT && relatedTempChecks?.length > 0 && (
                     <div className="text-xs mt-1">
                       {relatedTempChecks.some((tc) => tc.status === "SUCCEEDED")
                         ? "You are the author of this temp check"
