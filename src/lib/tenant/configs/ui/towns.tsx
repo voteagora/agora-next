@@ -435,10 +435,10 @@ export const townsTenantUIConfig = new TenantUI({
                     </li>
                     <ul>
                       <li>
-                      Towns Node Operators are able to submit proposals directly
-                      as Governance Proposals (thereby skipping the Temp-Check)
-                      by connecting a wallet containing a Towns Node Operator
-                      NFT.
+                        Towns Node Operators are able to submit proposals
+                        directly as Governance Proposals (thereby skipping the
+                        Temp-Check) by connecting a wallet containing a Towns
+                        Node Operator NFT.
                       </li>
                     </ul>
                     <li>
