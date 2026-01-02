@@ -10,12 +10,12 @@ import {
 
 import { ethers } from "ethers";
 import Tenant from "./tenant/tenant";
-import { EAS_ADDRESS } from "./constants";
+import { getEASAddress } from "./constants";
 
 const { contracts } = Tenant.current();
 const provider = contracts.token.provider;
 
-const eas = new EAS(EAS_ADDRESS[contracts.token.chain.id]);
+const eas = new EAS(getEASAddress(contracts.token.chain.id));
 
 const CHECK_PROPOSAL_SCHEMA_ID: Record<number, string> = {
   1: "0x80155c3a8c4ea17ce96e8899f7ab1ceca9e85382d7f893619a1d03947a70f844",

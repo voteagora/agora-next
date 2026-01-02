@@ -8,7 +8,7 @@ import { JsonRpcSigner, toUtf8Bytes } from "ethers";
 import Tenant from "./tenant/tenant";
 import { keccak256 } from "viem";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { EAS_ADDRESS } from "./constants";
+import { getEASAddress } from "./constants";
 
 const { slug, contracts } = Tenant.current();
 
@@ -32,7 +32,7 @@ const schemaEncoder = new SchemaEncoder(
   "address contract,uint256 id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block, string proposal_type, uint256[] tiers, uint256 onchain_proposalid, uint8 max_approvals, uint8 criteria, uint128 criteria_value, uint8 calculationOptions"
 );
 
-const eas = new EAS(EAS_ADDRESS[contracts.token.chain.id]);
+const eas = new EAS(getEASAddress(contracts.token.chain.id));
 
 export async function createProposalAttestation({
   contract,
