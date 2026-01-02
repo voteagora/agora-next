@@ -36,7 +36,9 @@ export async function POST(request: NextRequest) {
         recipient_id: address, // Or user ID
         channel: "pwa",
         config: {
-          subscription,
+          type: "pwa",
+          endpoint: subscription.endpoint,
+          keys: subscription.keys,
         },
       }),
     });
