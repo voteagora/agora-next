@@ -19,7 +19,9 @@ export const useProposalActionAuth = () => {
       }
 
       const message = JSON.stringify(messagePayload);
-      const signature = await signMessageAsync({ message }).catch(() => undefined);
+      const signature = await signMessageAsync({ message }).catch(
+        () => undefined
+      );
 
       if (!signature) {
         return null;
