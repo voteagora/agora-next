@@ -18,6 +18,7 @@ import {
   canCreateTempCheck as canCreateTempCheckUtil,
   canCreateGovernanceProposal as canCreateGovernanceProposalUtil,
 } from "@/lib/forumPermissionUtils";
+import { useHasTownsNFT } from "@/hooks/useHasTownsNFT";
 import {
   PostType,
   postTypeOptions,
@@ -76,14 +77,15 @@ export function CreatePostClient({
   const isAuthorOfTempChecks = relatedTempChecks.every(
     (tc) => tc.proposer?.toLowerCase() === address?.toLowerCase()
   );
+  const { hasNFT: hasTownsNFT } = useHasTownsNFT();
   const canCreateGovernanceProposal = canCreateGovernanceProposalUtil(
     permissions,
     relatedTempChecks,
-    isAuthorOfTempChecks
+    isAuthorOfTempChecks,
+    hasTownsNFT
   );
   const currentVP = parseInt(permissions.currentVP) || 0;
   const requiredVP = permissions.settings?.minVpForProposals || 0;
-  const isAdmin = permissions.isAdmin;
 
   const handleSubmit = async () => {
     if (!address) return;
@@ -202,7 +204,7 @@ export function CreatePostClient({
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
         <div className="flex flex-col lg:flex-row items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl font-bold text-primary">
             Create {postTypeOptions[selectedPostType].toLowerCase()}
           </h1>
 
@@ -224,8 +226,8 @@ export function CreatePostClient({
             canCreateGovernanceProposal={canCreateGovernanceProposal}
             currentVP={currentVP}
             requiredVP={requiredVP}
-            isAdmin={isAdmin}
             hasInitialTempCheck={hasInitialTempCheck}
+            hasTownsNFT={hasTownsNFT}
             onAddRelatedDiscussion={handleAddRelatedItem("relatedDiscussions")}
             onRemoveRelatedDiscussion={handleRemoveRelatedItem(
               "relatedDiscussions"

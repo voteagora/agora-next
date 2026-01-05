@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import classNames from "classnames";
-import { useSignMessage } from "wagmi";
 import { useSIWE } from "connectkit";
 import { UpdatedButton } from "@/components/Button";
 import Tenant from "@/lib/tenant/tenant";
@@ -10,6 +9,7 @@ import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { PLMConfig } from "@/app/proposals/draft/types";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { getStoredSiweJwt, waitForStoredSiweJwt } from "@/lib/siweSession";
@@ -22,7 +22,7 @@ const CreateProposalDraftButton = ({
   className?: string;
 }) => {
   const [isPending, setIsPending] = useState(false);
-  const messageSigner = useSignMessage();
+  const { getAuthenticationData } = useProposalActionAuth();
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
   const { signIn } = useSIWE();
@@ -104,23 +104,23 @@ const CreateProposalDraftButton = ({
             creatorAddress: address,
             timestamp: new Date().toISOString(),
           };
-          const message = JSON.stringify(messagePayload);
-          const signature = await messageSigner
-            .signMessageAsync({ message })
-            .catch(() => undefined);
-          if (!signature) {
+
+          const auth = await getAuthenticationData(messagePayload);
+          if (!auth) {
+            setIsPending(false);
             return;
           }
+
           const res = await fetch("/api/v1/drafts", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${jwt}`,
+              Authorization: auth.jwt ? `Bearer ${auth.jwt}` : "",
             },
             body: JSON.stringify({
               creatorAddress: address,
-              message,
-              signature,
+              message: auth.message,
+              signature: auth.signature,
             }),
           });
           if (!res.ok) {

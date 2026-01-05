@@ -9,24 +9,37 @@ import {
 } from "@/app/proposals/draft/utils/stages";
 import { ProposalScope } from "../types";
 import type { FormState } from "@/app/types";
-import { verifySiwe } from "./siweAuth";
+import { verifySiwe, verifyJwtAndGetAddress } from "./siweAuth";
 import Tenant from "@/lib/tenant/tenant";
 
 export async function onSubmitAction(
   data: z.output<typeof SponsorProposalSchema> & {
     draftProposalId: number;
     creatorAddress: string;
-    message: string;
-    signature: `0x${string}`;
+    message?: string;
+    signature?: `0x${string}`;
+    jwt?: string;
   }
 ): Promise<FormState> {
-  const isValidSig = await verifySiwe({
-    address: data.creatorAddress as `0x${string}`,
-    message: data.message,
-    signature: data.signature,
-  });
-  if (!isValidSig) {
-    return { ok: false, message: "Invalid signature" };
+  if (data.jwt) {
+    const jwtAddress = await verifyJwtAndGetAddress(data.jwt);
+    if (!jwtAddress) {
+      return { ok: false, message: "Invalid token" };
+    }
+    if (jwtAddress.toLowerCase() !== data.creatorAddress.toLowerCase()) {
+      return { ok: false, message: "Token address mismatch" };
+    }
+  } else if (data.message && data.signature) {
+    const isValidSig = await verifySiwe({
+      address: data.creatorAddress as `0x${string}`,
+      message: data.message,
+      signature: data.signature,
+    });
+    if (!isValidSig) {
+      return { ok: false, message: "Invalid signature" };
+    }
+  } else {
+    return { ok: false, message: "Missing authentication" };
   }
 
   // Authorization: allow author OR governor manager OR configured offchainProposalCreator (when applicable)

@@ -7,6 +7,7 @@ import { InfoHero } from "../info/components/InfoHero";
 import SyndicateDunaDisclosures from "../duna/components/SyndicateDunaDisclosures";
 import DunaDisclosures from "../duna/components/DunaDisclosures";
 import { getMetadataBaseUrl } from "@/app/lib/utils/metadata";
+import { TownsDunaDisclosures } from "../duna/components/TownsDunaAdministration";
 
 export const dynamic = "force-dynamic";
 
@@ -71,6 +72,8 @@ export default async function Page() {
             "syndicate-duna-disclosures"
           )?.enabled ? (
           <SyndicateDunaDisclosures />
+        ) : ui.toggle("towns-duna-disclosures")?.enabled ? (
+          <TownsDunaDisclosures />
         ) : (
           <DunaDisclosures />
         )

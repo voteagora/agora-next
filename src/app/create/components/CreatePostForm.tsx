@@ -17,8 +17,8 @@ interface CreatePostFormProps {
   canCreateGovernanceProposal: boolean;
   currentVP: number;
   requiredVP: number;
-  isAdmin: boolean;
   hasInitialTempCheck: boolean;
+  hasTownsNFT?: boolean;
   onAddRelatedDiscussion: (item: RelatedItem) => void;
   onRemoveRelatedDiscussion: (id: string) => void;
   onAddRelatedTempCheck: (item: RelatedItem) => void;
@@ -35,8 +35,8 @@ export function CreatePostForm({
   canCreateGovernanceProposal,
   currentVP,
   requiredVP,
-  isAdmin,
   hasInitialTempCheck,
+  hasTownsNFT,
   onAddRelatedDiscussion,
   onRemoveRelatedDiscussion,
   onAddRelatedTempCheck,
@@ -107,7 +107,7 @@ export function CreatePostForm({
                   {canCreateTempCheck ? (
                     <span className="text-green-600 flex items-center gap-1">
                       <CheckIcon className="h-4 w-4" />
-                      Temp check creation permission
+                      You can create temp checks
                     </span>
                   ) : (
                     <span className="text-red-600 flex items-center gap-1">
@@ -116,15 +116,19 @@ export function CreatePostForm({
                     </span>
                   )}
                   <div className="text-xs mt-1">
-                    {isAdmin && canCreateTempCheck
-                      ? "Admin permissions"
-                      : `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power required`}
+                    {`${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power`}
                   </div>
                 </div>
               )}
               {postType === "gov-proposal" && (
                 <div>
-                  {!relatedTempChecks?.length ? (
+                  {hasTownsNFT ? (
+                    <span className="text-green-600 flex items-center gap-1">
+                      <CheckIcon className="h-4 w-4" />
+                      You are authorized to create proposal as a Towns Node
+                      Operator
+                    </span>
+                  ) : !relatedTempChecks?.length ? (
                     <span className="text-secondary flex items-center gap-1">
                       <XMarkIcon className="h-4 w-4" />
                       Select a successful temp check to continue
@@ -141,15 +145,11 @@ export function CreatePostForm({
                       proposals
                     </span>
                   )}
-                  {relatedTempChecks?.length > 0 && (
+                  {!hasTownsNFT && relatedTempChecks?.length > 0 && (
                     <div className="text-xs mt-1">
-                      {isAdmin && canCreateGovernanceProposal
-                        ? "Admin permissions"
-                        : relatedTempChecks.some(
-                              (tc) => tc.status === "SUCCEEDED"
-                            )
-                          ? "You are the author of this temp check"
-                          : "Referenced temp check must be approved"}
+                      {relatedTempChecks.some((tc) => tc.status === "SUCCEEDED")
+                        ? "You are the author of this temp check"
+                        : "Referenced temp check must be approved"}
                     </div>
                   )}
                 </div>

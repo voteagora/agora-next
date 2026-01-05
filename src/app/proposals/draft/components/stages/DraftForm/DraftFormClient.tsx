@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount } from "wagmi";
 import { useState, useEffect, useMemo } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -40,6 +40,7 @@ import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSetti
 import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getStoredSiweJwt } from "@/lib/siweSession";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const { ui, namespace } = Tenant.current();
 
@@ -181,7 +182,7 @@ const DraftFormClient = ({
   const searchParams = useSearchParams();
   const shareParam = searchParams?.get("share");
   const { address } = useAccount();
-  const messageSigner = useSignMessage();
+  const { getAuthenticationData } = useProposalActionAuth();
 
   const methods = useForm<z.output<typeof DraftProposalSchema>>({
     resolver: zodResolver(DraftProposalSchema),
@@ -252,13 +253,11 @@ const DraftFormClient = ({
         creatorAddress: address,
         timestamp: new Date().toISOString(),
       };
-      const message = JSON.stringify(messagePayload);
-      const signature = await messageSigner
-        .signMessageAsync({ message })
-        .catch(() => undefined);
-      if (!signature) {
+
+      const auth = await getAuthenticationData(messagePayload);
+      if (!auth) {
         setIsPending(false);
-        toast("Signature failed");
+        toast("Authentication failed");
         return;
       }
 
@@ -266,8 +265,9 @@ const DraftFormClient = ({
         ...data,
         draftProposalId: draftProposal.id,
         creatorAddress: address,
-        message,
-        signature,
+        message: auth.message,
+        signature: auth.signature,
+        jwt: auth.jwt,
       });
       if (!res.ok) {
         setIsPending(false);

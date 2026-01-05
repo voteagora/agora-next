@@ -6,7 +6,8 @@ import Tenant from "@/lib/tenant/tenant";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { canPerformAction, formatVPError } from "@/lib/forumSettings";
-import { checkForumPermissions } from "./admin";
+import { checkPermission } from "@/lib/rbac";
+import type { DaoSlug } from "@prisma/client";
 import {
   fetchVotingPowerFromContract,
   formatVotingPower,
@@ -81,14 +82,17 @@ export async function addForumReaction(
       return { success: false, error: "Post not found" };
     }
 
-    // Check if user is an admin (admins bypass VP requirements)
-    const adminCheck = await checkForumPermissions(
+    // Check if user has posts.create permission (bypasses VP requirements for reactions)
+    const hasPostPermission = await checkPermission(
       validated.address,
-      post.topic.categoryId || undefined
+      slug as DaoSlug,
+      "forums",
+      "posts",
+      "create"
     );
 
-    // Only check voting power for non-admins
-    if (!adminCheck.isAdmin) {
+    // Only check voting power if user doesn't have RBAC permission
+    if (!hasPostPermission) {
       try {
         const tenant = Tenant.current();
         const client = getPublicClient();

@@ -185,7 +185,11 @@ export const useForum = () => {
         const result = await getForumTopic(topicId);
 
         if (!result.success) {
-          throw new Error(result.error);
+          throw new Error(
+            "error" in result && typeof result.error === "string"
+              ? result.error
+              : "Failed to delete topic"
+          );
         }
 
         const topic: any = result.data;
@@ -254,7 +258,11 @@ export const useForum = () => {
         });
 
         if (!result.success) {
-          throw new Error(result.error);
+          throw new Error(
+            "error" in result && typeof result.error === "string"
+              ? result.error
+              : "Failed to delete topic"
+          );
         }
 
         let attachments: any[] = [];
@@ -360,7 +368,11 @@ export const useForum = () => {
         });
 
         if (!result.success) {
-          throw new Error(result.error);
+          throw new Error(
+            "error" in result && typeof result.error === "string"
+              ? result.error
+              : "Failed to delete topic"
+          );
         }
 
         if (data.attachment) {
@@ -534,7 +546,11 @@ export const useForum = () => {
         }
 
         if (!result.success) {
-          throw new Error(result.error);
+          throw new Error(
+            "error" in result && typeof result.error === "string"
+              ? result.error
+              : "Failed to delete topic"
+          );
         }
 
         toast.success("Topic deleted successfully!");
@@ -583,7 +599,11 @@ export const useForum = () => {
         }
 
         if (!result.success) {
-          throw new Error(result.error);
+          throw new Error(
+            "error" in result && typeof result.error === "string"
+              ? result.error
+              : "Failed to delete topic"
+          );
         }
 
         toast.success("Post deleted successfully!");
@@ -628,7 +648,11 @@ export const useForum = () => {
         });
 
         if (!result.success) {
-          throw new Error(result.error);
+          throw new Error(
+            "error" in result && typeof result.error === "string"
+              ? result.error
+              : "Failed to delete topic"
+          );
         }
 
         toast.success("Attachment deleted successfully!");
@@ -668,7 +692,11 @@ export const useForum = () => {
         });
 
         if (!result.success) {
-          throw new Error(result.error);
+          throw new Error(
+            "error" in result && typeof result.error === "string"
+              ? result.error
+              : "Failed to delete topic"
+          );
         }
 
         toast.success("Topic archived successfully!");
@@ -713,7 +741,11 @@ export const useForum = () => {
         });
 
         if (!result.success) {
-          throw new Error(result.error);
+          throw new Error(
+            "error" in result && typeof result.error === "string"
+              ? result.error
+              : "Failed to delete topic"
+          );
         }
 
         toast.success("Attachment archived successfully!");
@@ -789,7 +821,9 @@ export const useForum = () => {
         });
 
         if (!result.success) {
-          throw new Error(result.error);
+          throw new Error(
+            "error" in result ? result.error : "Failed to restore topic"
+          );
         }
 
         toast.success("Topic restored successfully!");
@@ -829,7 +863,9 @@ export const useForum = () => {
         });
 
         if (!result.success) {
-          throw new Error(result.error);
+          throw new Error(
+            "error" in result ? result.error : "Failed to restore post"
+          );
         }
 
         toast.success("Post restored successfully!");
@@ -1079,20 +1115,18 @@ export const useForum = () => {
   };
 };
 
-export const useForumAdmin = (categoryId?: number) => {
+export const useForumAdmin = (_categoryId?: number) => {
   const { address } = useAccount();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["forum-admin", categoryId, address],
-    queryFn: () => checkForumPermissions(address || "", categoryId),
+    queryKey: ["forum-admin", address],
+    queryFn: () => checkForumPermissions(address || ""),
   });
 
   return {
     isAdmin: !!data?.isAdmin,
     canCreateTopics: !!data?.canCreateTopics,
     canManageTopics: !!data?.canManageTopics,
-    canCreateAttachments: !!data?.canCreateAttachments,
-    canManageAttachments: !!data?.canManageAttachments,
     isLoading,
   };
 };
