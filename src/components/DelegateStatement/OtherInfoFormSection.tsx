@@ -4,8 +4,8 @@ import DelegateStatementBoolSelector, {
 } from "./DelegateStatementBoolSelector";
 import { type UseFormReturn } from "react-hook-form";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
-import NotificationSelector from "./NotificationSelector";
 import Tenant from "@/lib/tenant/tenant";
+import Link from "next/link";
 
 export default function OtherInfoFormSection({
   form,
@@ -53,7 +53,15 @@ export default function OtherInfoFormSection({
           {requireDaoPrinciples && (
             <DelegateStatementDaoPrinciplesSelector form={form} />
           )}
-          {supportsNotifications && <NotificationSelector form={form} />}
+          {supportsNotifications && (
+            <div className="mt-4 text-sm text-secondary">
+              Manage your notification settings in{" "}
+              <Link href="/notification-preferences" className="underline">
+                Notification Preferences
+              </Link>
+              .
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -700,8 +700,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
                 updated_at,
                 warpcast,
                 endorsed,
-                scw_address,
-                notification_preferences
+                scw_address
               FROM agora.delegate_statements s
               WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug
               ORDER BY s.updated_at_ts DESC

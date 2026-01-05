@@ -54,11 +54,6 @@ type DelegateStatement = {
   updated_at: Date;
   warpcast: string | null;
   scw_address: string | null;
-  notification_preferences: {
-    wants_proposal_created_email: "prompt" | "prompted" | true | false;
-    wants_proposal_ending_soon_email: "prompt" | "prompted" | true | false;
-    last_updated_at: Date;
-  };
 };
 
 export type DelegateStats = {

@@ -15,7 +15,6 @@ export function createDelegateStatementMessage(
     topIssues: Array<{ type: string; value: string }>;
     topStakeholders: Array<{ type: string; value: string }>;
     scwAddress?: string;
-    notificationPreferences: any;
   }
 ): string {
   const messageBody = {
@@ -30,7 +29,6 @@ export function createDelegateStatementMessage(
     topIssues: additionalData.topIssues,
     topStakeholders: additionalData.topStakeholders,
     scwAddress: additionalData.scwAddress,
-    notificationPreferences: additionalData.notificationPreferences,
   };
 
   // Use consistent formatting with tab indentation

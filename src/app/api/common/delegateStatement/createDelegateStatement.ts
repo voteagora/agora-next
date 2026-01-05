@@ -22,8 +22,7 @@ export async function createDelegateStatement({
   message: string;
   scwAddress?: string;
 }) {
-  const { twitter, warpcast, discord, email, notificationPreferences } =
-    delegateStatement;
+  const { twitter, warpcast, discord, email } = delegateStatement;
   const { slug } = Tenant.current();
 
   // Regenerate expected message from form data and compare
@@ -36,7 +35,6 @@ export async function createDelegateStatement({
     topIssues: delegateStatement.topIssues,
     topStakeholders: delegateStatement.topStakeholders,
     scwAddress,
-    notificationPreferences,
   });
 
   // Verify signature against the message
@@ -71,10 +69,7 @@ export async function createDelegateStatement({
     warpcast,
     discord,
     scw_address: scwAddress?.toLowerCase(),
-    notification_preferences: {
-      ...notificationPreferences,
-      last_updated: new Date().toISOString(),
-    },
+    notification_preferences: Prisma.DbNull,
   };
 
   // Only include email if it's not empty
