@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { onSubmitAction as deleteAction } from "../actions/deleteDraftProposal";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
   const openDialog = useOpenDialog();
@@ -39,7 +40,7 @@ export const DeleteDraftProposalDialog = ({
 }) => {
   const [isPending, setIsPending] = useState(false);
   const { address } = useAccount();
-  const messageSigner = useSignMessage();
+  const { getAuthenticationData } = useProposalActionAuth();
   return (
     <div>
       <h3 className="text-center text-primary font-semibold text-lg mb-1">
@@ -85,18 +86,17 @@ export const DeleteDraftProposalDialog = ({
               creatorAddress: address,
               timestamp: new Date().toISOString(),
             };
-            const message = JSON.stringify(messagePayload);
-            const signature = await messageSigner
-              .signMessageAsync({ message })
-              .catch(() => undefined);
-            if (!signature || !address) {
+            const auth = await getAuthenticationData(messagePayload);
+            if (!auth || !address) {
               setIsPending(false);
               return;
             }
+
             await deleteAction(proposalId, {
               address: address as `0x${string}`,
-              message,
-              signature,
+              message: auth.message,
+              signature: auth.signature,
+              jwt: auth.jwt,
             });
             window.location.href = "/";
           }}

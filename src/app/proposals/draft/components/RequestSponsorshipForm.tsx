@@ -20,7 +20,9 @@ import {
   ProposalType,
 } from "../types";
 import Tenant from "@/lib/tenant/tenant";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount } from "wagmi";
+
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const RequestSponsorshipForm = ({
   draftProposal,
@@ -33,7 +35,7 @@ const RequestSponsorshipForm = ({
   const [isPending, setIsPending] = useState(false);
   const { watch, control } = useFormContext();
   const { address: creatorAddress } = useAccount();
-  const messageSigner = useSignMessage();
+  const { getAuthenticationData } = useProposalActionAuth();
 
   const address = watch("sponsorAddress");
   const votingModuleType = draftProposal.voting_module_type;
@@ -130,20 +132,19 @@ const RequestSponsorshipForm = ({
               creatorAddress,
               timestamp: new Date().toISOString(),
             };
-            const message = JSON.stringify(messagePayload);
-            const signature = await messageSigner
-              .signMessageAsync({ message })
-              .catch(() => undefined);
-            if (!signature) {
+            const auth = await getAuthenticationData(messagePayload);
+            if (!auth) {
               setIsPending(false);
               return;
             }
+
             const res = await requestSponsorshipAction({
               draftProposalId: draftProposal.id,
               sponsor_address: address,
               creatorAddress: creatorAddress as `0x${string}`,
-              message,
-              signature,
+              message: auth.message,
+              signature: auth.signature,
+              jwt: auth.jwt,
             });
             setIsPending(false);
             if (res.ok) {
