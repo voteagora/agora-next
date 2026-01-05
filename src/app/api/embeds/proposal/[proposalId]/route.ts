@@ -19,6 +19,9 @@ type ProposalEmbedData = {
   proposer: string;
   proposalType: string;
   voteStats?: {
+    for: string;
+    against: string;
+    abstain: string;
     forPercentage: number;
     againstPercentage: number;
     abstainPercentage: number;
@@ -79,6 +82,9 @@ async function getProposalEmbedData(
 
       if (totalVotes > 0n) {
         voteStats = {
+          for: formatNumber(forVotes),
+          against: formatNumber(againstVotes),
+          abstain: formatNumber(abstainVotes),
           forPercentage: Number((forVotes * 100n) / totalVotes),
           againstPercentage: Number((againstVotes * 100n) / totalVotes),
           abstainPercentage: Number((abstainVotes * 100n) / totalVotes),

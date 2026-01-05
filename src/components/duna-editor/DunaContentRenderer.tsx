@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useLayoutEffect } from "react";
 import { cn } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import InternalLinkEmbed from "@/components/ForumShared/Embeds/InternalLinkEmbed";
@@ -54,10 +54,6 @@ function isInternalEmbeddableLink(href: string): boolean {
 }
 
 function parseContentWithEmbeds(htmlContent: string): React.ReactNode {
-  if (typeof window === "undefined") {
-    return <div dangerouslySetInnerHTML={{ __html: htmlContent }} />;
-  }
-
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlContent, "text/html");
   const elements: React.ReactNode[] = [];
@@ -195,16 +191,21 @@ export default function DunaContentRenderer({
   if (!content) return null;
 
   const { ui } = Tenant.current();
+  const [mounted, setMounted] = useState(false);
+
+  useLayoutEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Decode HTML entities if they exist
   const decodedContent = decodeHtmlEntities(content);
 
   const renderedContent = useMemo(() => {
-    if (!enableEmbeds) {
+    if (!enableEmbeds || !mounted) {
       return <div dangerouslySetInnerHTML={{ __html: decodedContent }} />;
     }
     return parseContentWithEmbeds(decodedContent);
-  }, [decodedContent, enableEmbeds]);
+  }, [decodedContent, enableEmbeds, mounted]);
 
   return (
     <div

@@ -96,7 +96,7 @@ export default function DelegateEmbed({
               </div>
               {data.proposalsCreated > 0 && (
                 <div className="flex items-center gap-1">
-                  <span className="text-secondary">Proposals</span>
+                  <span className="text-secondary">Proposals Created</span>
                   <span className="text-primary font-semibold">
                     {data.proposalsCreated}
                   </span>

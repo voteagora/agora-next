@@ -13,6 +13,9 @@ type ProposalEmbedData = {
   proposer: string;
   proposalType: string;
   voteStats?: {
+    for: string;
+    against: string;
+    abstain: string;
     forPercentage: number;
     againstPercentage: number;
     abstainPercentage: number;
@@ -103,20 +106,20 @@ export default function ProposalEmbed({ proposalId }: ProposalEmbedProps) {
             <div className="flex items-center gap-3 text-xs flex-wrap">
               <div className="flex items-center gap-1">
                 <span className="text-positive font-bold">
-                  {data.voteStats.forPercentage}%
+                  {data.voteStats.for}
                 </span>
                 <span className="text-secondary">For</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-negative font-bold">
-                  {data.voteStats.againstPercentage}%
+                  {data.voteStats.against}
                 </span>
                 <span className="text-secondary">Against</span>
               </div>
               {data.voteStats.abstainPercentage > 0 && (
                 <div className="flex items-center gap-1">
                   <span className="text-tertiary font-bold">
-                    {data.voteStats.abstainPercentage}%
+                    {data.voteStats.abstain}
                   </span>
                   <span className="text-secondary">Abstain</span>
                 </div>
