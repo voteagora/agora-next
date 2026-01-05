@@ -22,6 +22,7 @@ import ForbiddenAccessCard from "./components/ForbiddenAccessCard";
 import Loading from "./loading";
 import Tenant from "@/lib/tenant/tenant";
 import ShareDraftLink from "./components/ShareDraftLink";
+import { getStoredSiweJwt } from "@/lib/siweSession";
 
 type DraftResponse = DraftProposalType;
 
@@ -111,14 +112,8 @@ export default function DraftProposalPageClient({
         return res.json();
       }
 
-      const sessionRaw = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
-      if (!sessionRaw) {
-        throw new Error("Not authenticated (missing SIWE session)");
-      }
-      const token = JSON.parse(sessionRaw)?.access_token as string | undefined;
-      if (!token) {
-        throw new Error("Not authenticated (invalid session)");
-      }
+      const token = getStoredSiweJwt({ expectedAddress: address });
+      if (!token) throw new Error("Not authenticated (missing SIWE session)");
       const res = await fetch(`/api/v1/drafts/${idParam}`, {
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -1,16 +1,17 @@
 import { SIWEConfig } from "connectkit";
 import { SiweMessage } from "siwe";
-import { decodeJwt } from "jose";
 import {
   LOCAL_STORAGE_SIWE_JWT_KEY,
   LOCAL_STORAGE_SIWE_STAGE_KEY,
 } from "@/lib/constants";
+import { clearStoredSiweSession, getStoredSiweSession } from "@/lib/siweSession";
 
-// TODO: this should probably be an environment variable
 const API_AUTH_PREFIX = "/api/v1/auth";
 
 const LOCAL_STORAGE_JWT_KEY = LOCAL_STORAGE_SIWE_JWT_KEY;
 export const AGORA_SIGN_IN_MESSAGE = "Sign in to Agora with Ethereum";
+
+const SIWE_ENABLED = process.env.NEXT_PUBLIC_SIWE_ENABLED === "true";
 
 /* There's currently nothing stored on the backend to maintain session state.
 // All session state is stateless and stored in the JWT issued by the server.
@@ -74,27 +75,14 @@ export const siweProviderConfig: SIWEConfig = {
     }
   },
   getSession: async () => {
-    // return JWT from local storage
-    const session = localStorage.getItem(LOCAL_STORAGE_JWT_KEY);
-    if (!session) {
-      return null;
-    }
-    const jwt = JSON.parse(session).access_token;
-    // decode JWT to get session info
-    const decoded = decodeJwt(jwt);
-    const siweData = decoded.siwe as { address: string; chainId: string };
-    return {
-      address: siweData.address as `0x${string}`,
-      chainId: Number(siweData.chainId),
-    };
+    const session = getStoredSiweSession();
+    if (!session) return null;
+    return { address: session.address, chainId: session.chainId };
   },
   signOut: () => {
     // remove SIWE session data from local storage
-    try {
-      localStorage.removeItem(LOCAL_STORAGE_JWT_KEY);
-      localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
-    } catch {}
+    clearStoredSiweSession();
     return Promise.resolve(true);
   },
-  enabled: false,
+  enabled: SIWE_ENABLED,
 };

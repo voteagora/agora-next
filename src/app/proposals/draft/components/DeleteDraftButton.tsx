@@ -7,7 +7,7 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { onSubmitAction as deleteAction } from "../actions/deleteDraftProposal";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
-import { LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
+import { getStoredSiweJwt } from "@/lib/siweSession";
 
 const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
   const openDialog = useOpenDialog();
@@ -65,15 +65,7 @@ export const DeleteDraftProposalDialog = ({
           onClick={async () => {
             setIsPending(true);
             // Require SIWE JWT before prompting for action signature
-            try {
-              const session = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
-              if (!session) {
-                toast("Session expired. Please sign in to continue.");
-                setIsPending(false);
-                window.location.reload();
-                return;
-              }
-            } catch {
+            if (!getStoredSiweJwt({ expectedAddress: address })) {
               toast("Session expired. Please sign in to continue.");
               setIsPending(false);
               window.location.reload();
