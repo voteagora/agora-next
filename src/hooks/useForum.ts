@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount, useSignMessage, useSignTypedData } from "wagmi";
 import {
   getForumTopics,
   getForumTopic,
@@ -18,6 +18,9 @@ import {
   softDeleteForumPost,
   restoreForumTopic,
   restoreForumPost,
+  subscribeToForumContent,
+  unsubscribeFromForumContent,
+  getForumSubscriptions,
 } from "@/lib/actions/forum";
 import { addForumReaction, removeForumReaction } from "@/lib/actions/forum";
 import {
@@ -38,6 +41,13 @@ import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
+import {
+  FORUM_SUBSCRIPTIONS_PRIMARY_TYPE,
+  FORUM_SUBSCRIPTIONS_TYPED_DATA_DOMAIN,
+  FORUM_SUBSCRIPTIONS_TYPED_DATA_TYPES,
+  hashForumSubscriptionsPayload,
+  type ForumSubscriptionsAction,
+} from "@/lib/forumSubscriptionsSignedRequests";
 
 interface ForumDocument {
   id: number;
@@ -66,7 +76,36 @@ export const useForum = () => {
   const [error, setError] = useState<string | null>(null);
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const { signTypedDataAsync } = useSignTypedData();
   const permissions = useForumPermissionsContext();
+
+  const createForumSubscriptionSignedRequest = useCallback(
+    async (action: ForumSubscriptionsAction, payload: unknown) => {
+      if (!address) throw new Error("Wallet not connected");
+
+      const timestamp = Math.floor(Date.now() / 1000);
+      const nonce =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `${timestamp}-${Math.random()}`;
+
+      const signature = await signTypedDataAsync({
+        domain: FORUM_SUBSCRIPTIONS_TYPED_DATA_DOMAIN,
+        types: FORUM_SUBSCRIPTIONS_TYPED_DATA_TYPES,
+        primaryType: FORUM_SUBSCRIPTIONS_PRIMARY_TYPE,
+        message: {
+          action,
+          address,
+          timestamp: BigInt(timestamp),
+          nonce,
+          payload_hash: hashForumSubscriptionsPayload(payload),
+        },
+      });
+
+      return { address, signature, action, timestamp, nonce, payload };
+    },
+    [address, signTypedDataAsync]
+  );
 
   // Check VP before action and return whether to proceed
   const checkVPBeforeAction = useCallback(
@@ -947,6 +986,67 @@ export const useForum = () => {
     [address]
   );
 
+  const subscribeToCategory = useCallback(
+    async (categoryId: number): Promise<boolean> => {
+      try {
+        const signed = await createForumSubscriptionSignedRequest("subscribe", {
+          targetType: "category",
+          targetId: categoryId,
+        });
+        const res = await subscribeToForumContent(signed);
+        if (!res.success)
+          throw new Error(res.error || "Failed to subscribe to category");
+        toast.success("Subscribed to category!");
+        return true;
+      } catch (err) {
+        const msg =
+          err instanceof Error ? err.message : "Failed to subscribe to category";
+        setError(msg);
+        toast.error(msg);
+        return false;
+      }
+    },
+    [createForumSubscriptionSignedRequest]
+  );
+
+  const unsubscribeFromCategory = useCallback(
+    async (categoryId: number): Promise<boolean> => {
+      try {
+        const signed = await createForumSubscriptionSignedRequest("unsubscribe", {
+          targetType: "category",
+          targetId: categoryId,
+        });
+        const res = await unsubscribeFromForumContent(signed);
+        if (!res.success)
+          throw new Error(res.error || "Failed to unsubscribe from category");
+        toast.success("Unsubscribed from category");
+        return true;
+      } catch (err) {
+        const msg =
+          err instanceof Error ? err.message : "Failed to unsubscribe from category";
+        setError(msg);
+        toast.error(msg);
+        return false;
+      }
+    },
+    [createForumSubscriptionSignedRequest]
+  );
+
+  const fetchSubscriptions = useCallback(async () => {
+    if (!address) return { topicSubscriptions: [], categorySubscriptions: [] };
+    try {
+      const signed = await createForumSubscriptionSignedRequest(
+        "read_subscriptions",
+        {}
+      );
+      const res = await getForumSubscriptions(signed);
+      if (!res.success) throw new Error("Failed to fetch subscriptions");
+      return res.data;
+    } catch {
+      return { topicSubscriptions: [], categorySubscriptions: [] };
+    }
+  }, [address, createForumSubscriptionSignedRequest]);
+
   return {
     loading,
     error,
@@ -971,6 +1071,9 @@ export const useForum = () => {
     removeUpvoteTopic,
     fetchTopicUpvotes,
     hasUpvotedTopic,
+    subscribeToCategory,
+    unsubscribeFromCategory,
+    fetchSubscriptions,
     permissions, // Add permissions to return value
     checkVPBeforeAction, // Helper to check VP before actions
   };
