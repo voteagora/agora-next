@@ -111,6 +111,14 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
         proposalType: proposal.proposalType ?? undefined,
         governorType: contracts.governorType,
       });
+      const lastPoint = transformedData[transformedData.length - 1];
+      const safeLastPoint = lastPoint ?? {
+        for: 0,
+        against: 0,
+        abstain: 0,
+        total: 0,
+        quorumTotal: 0,
+      };
 
       setChartData([
         {
@@ -124,11 +132,11 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
         ...transformedData,
         {
           timestamp: proposal.endTime,
-          for: transformedData[transformedData.length - 1]?.for,
-          abstain: transformedData[transformedData.length - 1]?.abstain,
-          against: transformedData[transformedData.length - 1]?.against,
-          total: transformedData[transformedData.length - 1]?.total,
-          quorumTotal: transformedData[transformedData.length - 1]?.quorumTotal,
+          for: safeLastPoint.for ?? 0,
+          abstain: safeLastPoint.abstain ?? 0,
+          against: safeLastPoint.against ?? 0,
+          total: safeLastPoint.total ?? 0,
+          quorumTotal: safeLastPoint.quorumTotal ?? 0,
         },
       ]);
     }
@@ -179,7 +187,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
                   ? +proposal.quorum.toString()
                   : 0;
                 const maxQuorumTotal = Math.max(
-                  ...chartData.map((d) => d.quorumTotal)
+                  ...chartData.map((d) => d.quorumTotal ?? 0)
                 );
                 const maxValue = Math.max(maxQuorumTotal, quorumValue);
 
@@ -197,7 +205,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
                 ? +proposal.quorum.toString()
                 : 0;
               const maxValue = Math.max(
-                Math.max(...chartData.map((d) => d.quorumTotal)),
+                Math.max(...chartData.map((d) => d.quorumTotal ?? 0)),
                 quorumValue
               );
 
