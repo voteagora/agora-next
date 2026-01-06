@@ -2276,6 +2276,873 @@ view towns_vote_cast_with_params_events {
   @@schema("towns")
 }
 
+view demo2Delegatees {
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  contract         String? @db.VarChar(42)
+  transaction_hash String? @db.VarChar(66)
+
+  @@map("delegatees")
+  @@schema("demo2")
+}
+
+view demo2Delegates {
+  delegate          String   @unique
+  num_of_delegators Decimal? @db.Decimal
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       Decimal? @db.Decimal
+  voting_power      Decimal? @db.Decimal
+  contract          String?  @db.VarChar(42)
+
+  @@map("delegates")
+  @@schema("demo2")
+}
+
+view demo2VotableSupply {
+  votable_supply String @unique
+
+  @@map("votable_supply")
+  @@schema("demo2")
+}
+
+view demo2VotingPower {
+  delegate     String  @unique
+  voting_power String?
+  contract     String  @db.VarChar(42)
+
+  @@map("voting_power")
+  @@schema("demo2")
+}
+
+view demo2VotingPowerSnaps {
+  id                String   @id
+  delegate          String?
+  balance           String?
+  block_number      BigInt?
+  ordinal           Decimal? @db.Decimal
+  transaction_index Int?
+  log_index         Int?
+
+  @@map("voting_power_snaps")
+  @@schema("demo2")
+}
+
+view demo2Proposals {
+  proposal_id                String  @unique
+  contract                   String  @db.VarChar
+  proposer                   String
+  description                String?
+  ordinal                    Decimal @db.Decimal
+  created_block              BigInt?
+  start_block                String
+  end_block                  String?
+  cancelled_block            BigInt?
+  queued_block               BigInt?
+  executed_block             BigInt?
+  proposal_data              Json?
+  proposal_data_raw          String?
+  proposal_type              String
+  proposal_type_data         Json?
+  proposal_results           Json?
+  created_transaction_hash   String?
+  queued_transaction_hash    String?
+  cancelled_transaction_hash String?
+  executed_transaction_hash  String?
+
+  @@map("proposals_v2")
+  @@schema("demo2")
+}
+
+view demo2VoterStats {
+  voter              String   @unique
+  proposals_voted    BigInt?
+  participation_rate Float?
+  last_10_props      Decimal? @db.Decimal
+  for                BigInt?
+  abstain            BigInt?
+  against            BigInt?
+  proposals_proposed BigInt?
+
+  @@map("voter_stats")
+  @@schema("demo2")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view demo2Votes {
+  transaction_hash String  @unique @db.VarChar
+  proposal_id      String
+  voter            String
+  support          String
+  weight           Decimal @db.Decimal
+  reason           String?
+  block_number     BigInt
+  params           String?
+  start_block      String?
+  description      String?
+  proposal_data    Json
+  proposal_type    String
+  contract         String?
+  chain_id         Int?
+
+  @@map("votes")
+  @@schema("demo2")
+}
+
+view demo2AdvancedDelegatees {
+  pair             String  @unique
+  from             String
+  to               String
+  delegated_amount Decimal @db.Decimal
+  delegated_share  Decimal @db.Decimal
+  block_number     BigInt
+  contract         String? @db.VarChar
+  transaction_hash String?
+
+  @@map("advanced_delegatees")
+  @@schema("demo2")
+}
+
+view demo2AdvancedVotingPower {
+  delegate                 String   @unique
+  vp_allowance             Decimal  @db.Decimal
+  vp_delegatable_allowance Decimal  @db.Decimal
+  delegated_vp             Decimal  @db.Decimal
+  advanced_vp              Decimal  @db.Decimal
+  subdelegated_share       Decimal? @db.Decimal
+  contract                 String   @db.VarChar
+
+  @@map("advanced_voting_power")
+  @@schema("demo2")
+}
+
+view demo2AuthorityChainsSnaps {
+  id                   String   @unique
+  delegate             String
+  rules                Json[]
+  chain                String[]
+  proxy                String
+  balance              Decimal  @db.Decimal
+  allowance            Decimal  @db.Decimal
+  contract             String?  @db.VarChar
+  balance_block_number BigInt
+  balance_ordinal      Decimal? @db.Decimal
+
+  @@map("authority_chains_snaps")
+  @@schema("demo2")
+}
+
+view demo2ProposalTypes {
+  id                 String @unique
+  contract           String @db.VarChar
+  block_number       BigInt
+  proposal_type_id   String
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
+
+  @@map("proposal_types")
+  @@schema("demo2")
+}
+
+view demo2StakedDeposits {
+  deposit_id  BigInt  @unique
+  depositor   String
+  beneficiary String
+  delegatee   String
+  amount      Decimal @db.Decimal
+
+  @@map("staked_deposits")
+  @@schema("demo2")
+}
+
+view demo2DelegateChangedEvents {
+  chain_id          Int
+  address           String @db.VarChar(42)
+  block_number      BigInt
+  block_hash        String @db.VarChar(66)
+  log_index         Int
+  transaction_index Int
+  transaction_hash  String @unique @db.VarChar(66)
+  delegator         String
+  from_delegate     String
+  to_delegate       String
+
+  @@map("delegate_changed_events")
+  @@schema("demo2")
+}
+
+view demo2DaoSettings {
+  dao_id       String
+  param_name   String
+  param_value  String
+  block_number BigInt
+
+  @@id([dao_id, param_name])
+  @@map("dao_settings")
+  @@schema("demo2")
+}
+
+view demo2_delegates_wrapper {
+  delegate          String?
+  num_of_delegators Decimal? @db.Decimal
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       Decimal? @db.Decimal
+  voting_power      Decimal? @db.Decimal
+
+  @@map("delegates_wrapper")
+  @@ignore
+  @@schema("demo2")
+}
+
+view demo2_advanced_voting_power_raw_snaps {
+  chain_str           String?
+  delegate            String?
+  chain                String[]
+  rules                Json?
+  allowance            Decimal? @db.Decimal
+  subdelegated_share   Decimal? @db.Decimal
+  subdelegated_amount  Decimal? @db.Decimal
+  balance              Decimal? @db.Decimal
+  block_number         BigInt?
+  proxy                String?
+  contract             String?  @db.VarChar
+  ordinal              Decimal? @db.Decimal
+
+  @@map("advanced_voting_power_raw_snaps")
+  @@ignore
+  @@schema("demo2")
+}
+
+view demo2_authority_chains {
+  delegate  String?
+  rules     Json?
+  chain     String[]
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+  contract  String?  @db.VarChar
+
+  @@map("authority_chains")
+  @@ignore
+  @@schema("demo2")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view demo2_vote_cast_events {
+  transaction_hash String?  @db.VarChar
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+  contract         String?
+  chain_id         Int?
+
+  @@map("vote_cast_events")
+  @@ignore
+  @@schema("demo2")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view demo2_vote_cast_with_params_events {
+  transaction_hash String?  @db.VarChar
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+  contract         String?
+  chain_id         Int?
+
+  @@map("vote_cast_with_params_events")
+  @@ignore
+  @@schema("demo2")
+}
+
+view demo3Delegatees {
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  contract         String? @db.VarChar(42)
+  transaction_hash String? @db.VarChar(66)
+
+  @@map("delegatees")
+  @@schema("demo3")
+}
+
+view demo3Delegates {
+  delegate          String   @unique
+  num_of_delegators Decimal? @db.Decimal
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       Decimal? @db.Decimal
+  voting_power      Decimal? @db.Decimal
+  contract          String?  @db.VarChar(42)
+
+  @@map("delegates")
+  @@schema("demo3")
+}
+
+view demo3VotableSupply {
+  votable_supply String @unique
+
+  @@map("votable_supply")
+  @@schema("demo3")
+}
+
+view demo3VotingPower {
+  delegate     String  @unique
+  voting_power String?
+  contract     String  @db.VarChar(42)
+
+  @@map("voting_power")
+  @@schema("demo3")
+}
+
+view demo3VotingPowerSnaps {
+  id                String   @id
+  delegate          String?
+  balance           String?
+  block_number      BigInt?
+  ordinal           Decimal? @db.Decimal
+  transaction_index Int?
+  log_index         Int?
+
+  @@map("voting_power_snaps")
+  @@schema("demo3")
+}
+
+view demo3Proposals {
+  proposal_id                String  @unique
+  contract                   String  @db.VarChar
+  proposer                   String
+  description                String?
+  ordinal                    Decimal @db.Decimal
+  created_block              BigInt?
+  start_block                String
+  end_block                  String?
+  cancelled_block            BigInt?
+  queued_block               BigInt?
+  executed_block             BigInt?
+  proposal_data              Json?
+  proposal_data_raw          String?
+  proposal_type              String
+  proposal_type_data         Json?
+  proposal_results           Json?
+  created_transaction_hash   String?
+  queued_transaction_hash    String?
+  cancelled_transaction_hash String?
+  executed_transaction_hash  String?
+
+  @@map("proposals_v2")
+  @@schema("demo3")
+}
+
+view demo3VoterStats {
+  voter              String   @unique
+  proposals_voted    BigInt?
+  participation_rate Float?
+  last_10_props      Decimal? @db.Decimal
+  for                BigInt?
+  abstain            BigInt?
+  against            BigInt?
+  proposals_proposed BigInt?
+
+  @@map("voter_stats")
+  @@schema("demo3")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view demo3Votes {
+  transaction_hash String  @unique @db.VarChar
+  proposal_id      String
+  voter            String
+  support          String
+  weight           Decimal @db.Decimal
+  reason           String?
+  block_number     BigInt
+  params           String?
+  start_block      String?
+  description      String?
+  proposal_data    Json
+  proposal_type    String
+  contract         String?
+  chain_id         Int?
+
+  @@map("votes")
+  @@schema("demo3")
+}
+
+view demo3AdvancedDelegatees {
+  pair             String  @unique
+  from             String
+  to               String
+  delegated_amount Decimal @db.Decimal
+  delegated_share  Decimal @db.Decimal
+  block_number     BigInt
+  contract         String? @db.VarChar
+  transaction_hash String?
+
+  @@map("advanced_delegatees")
+  @@schema("demo3")
+}
+
+view demo3AdvancedVotingPower {
+  delegate                 String   @unique
+  vp_allowance             Decimal  @db.Decimal
+  vp_delegatable_allowance Decimal  @db.Decimal
+  delegated_vp             Decimal  @db.Decimal
+  advanced_vp              Decimal  @db.Decimal
+  subdelegated_share       Decimal? @db.Decimal
+  contract                 String   @db.VarChar
+
+  @@map("advanced_voting_power")
+  @@schema("demo3")
+}
+
+view demo3AuthorityChainsSnaps {
+  id                   String   @unique
+  delegate             String
+  rules                Json[]
+  chain                String[]
+  proxy                String
+  balance              Decimal  @db.Decimal
+  allowance            Decimal  @db.Decimal
+  contract             String?  @db.VarChar
+  balance_block_number BigInt
+  balance_ordinal      Decimal? @db.Decimal
+
+  @@map("authority_chains_snaps")
+  @@schema("demo3")
+}
+
+view demo3ProposalTypes {
+  id                 String @unique
+  contract           String @db.VarChar
+  block_number       BigInt
+  proposal_type_id   String
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
+
+  @@map("proposal_types")
+  @@schema("demo3")
+}
+
+view demo3StakedDeposits {
+  deposit_id  BigInt  @unique
+  depositor   String
+  beneficiary String
+  delegatee   String
+  amount      Decimal @db.Decimal
+
+  @@map("staked_deposits")
+  @@schema("demo3")
+}
+
+view demo3DelegateChangedEvents {
+  chain_id          Int
+  address           String @db.VarChar(42)
+  block_number      BigInt
+  block_hash        String @db.VarChar(66)
+  log_index         Int
+  transaction_index Int
+  transaction_hash  String @unique @db.VarChar(66)
+  delegator         String
+  from_delegate     String
+  to_delegate       String
+
+  @@map("delegate_changed_events")
+  @@schema("demo3")
+}
+
+view demo3DaoSettings {
+  dao_id       String
+  param_name   String
+  param_value  String
+  block_number BigInt
+
+  @@id([dao_id, param_name])
+  @@map("dao_settings")
+  @@schema("demo3")
+}
+
+view demo3_delegates_wrapper {
+  delegate          String?
+  num_of_delegators Decimal? @db.Decimal
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       Decimal? @db.Decimal
+  voting_power      Decimal? @db.Decimal
+
+  @@map("delegates_wrapper")
+  @@ignore
+  @@schema("demo3")
+}
+
+view demo3_advanced_voting_power_raw_snaps {
+  chain_str           String?
+  delegate            String?
+  chain                String[]
+  rules                Json?
+  allowance            Decimal? @db.Decimal
+  subdelegated_share   Decimal? @db.Decimal
+  subdelegated_amount  Decimal? @db.Decimal
+  balance              Decimal? @db.Decimal
+  block_number         BigInt?
+  proxy                String?
+  contract             String?  @db.VarChar
+  ordinal              Decimal? @db.Decimal
+
+  @@map("advanced_voting_power_raw_snaps")
+  @@ignore
+  @@schema("demo3")
+}
+
+view demo3_authority_chains {
+  delegate  String?
+  rules     Json?
+  chain     String[]
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+  contract  String?  @db.VarChar
+
+  @@map("authority_chains")
+  @@ignore
+  @@schema("demo3")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view demo3_vote_cast_events {
+  transaction_hash String?  @db.VarChar
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+  contract         String?
+  chain_id         Int?
+
+  @@map("vote_cast_events")
+  @@ignore
+  @@schema("demo3")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view demo3_vote_cast_with_params_events {
+  transaction_hash String?  @db.VarChar
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+  contract         String?
+  chain_id         Int?
+
+  @@map("vote_cast_with_params_events")
+  @@ignore
+  @@schema("demo3")
+}
+
+view demo4Delegatees {
+  delegator        String  @unique
+  delegatee        String
+  block_number     BigInt
+  balance          Decimal @db.Decimal
+  contract         String? @db.VarChar(42)
+  transaction_hash String? @db.VarChar(66)
+
+  @@map("delegatees")
+  @@schema("demo4")
+}
+
+view demo4Delegates {
+  delegate          String   @unique
+  num_of_delegators Decimal? @db.Decimal
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       Decimal? @db.Decimal
+  voting_power      Decimal? @db.Decimal
+  contract          String?  @db.VarChar(42)
+
+  @@map("delegates")
+  @@schema("demo4")
+}
+
+view demo4VotableSupply {
+  votable_supply String @unique
+
+  @@map("votable_supply")
+  @@schema("demo4")
+}
+
+view demo4VotingPower {
+  delegate     String  @unique
+  voting_power String?
+  contract     String  @db.VarChar(42)
+
+  @@map("voting_power")
+  @@schema("demo4")
+}
+
+view demo4VotingPowerSnaps {
+  id                String   @id
+  delegate          String?
+  balance           String?
+  block_number      BigInt?
+  ordinal           Decimal? @db.Decimal
+  transaction_index Int?
+  log_index         Int?
+
+  @@map("voting_power_snaps")
+  @@schema("demo4")
+}
+
+view demo4Proposals {
+  proposal_id                String  @unique
+  contract                   String  @db.VarChar
+  proposer                   String
+  description                String?
+  ordinal                    Decimal @db.Decimal
+  created_block              BigInt?
+  start_block                String
+  end_block                  String?
+  cancelled_block            BigInt?
+  queued_block               BigInt?
+  executed_block             BigInt?
+  proposal_data              Json?
+  proposal_data_raw          String?
+  proposal_type              String
+  proposal_type_data         Json?
+  proposal_results           Json?
+  created_transaction_hash   String?
+  queued_transaction_hash    String?
+  cancelled_transaction_hash String?
+  executed_transaction_hash  String?
+
+  @@map("proposals_v2")
+  @@schema("demo4")
+}
+
+view demo4VoterStats {
+  voter              String   @unique
+  proposals_voted    BigInt?
+  participation_rate Float?
+  last_10_props      Decimal? @db.Decimal
+  for                BigInt?
+  abstain            BigInt?
+  against            BigInt?
+  proposals_proposed BigInt?
+
+  @@map("voter_stats")
+  @@schema("demo4")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view demo4Votes {
+  transaction_hash String  @unique @db.VarChar
+  proposal_id      String
+  voter            String
+  support          String
+  weight           Decimal @db.Decimal
+  reason           String?
+  block_number     BigInt
+  params           String?
+  start_block      String?
+  description      String?
+  proposal_data    Json
+  proposal_type    String
+  contract         String?
+  chain_id         Int?
+
+  @@map("votes")
+  @@schema("demo4")
+}
+
+view demo4AdvancedDelegatees {
+  pair             String  @unique
+  from             String
+  to               String
+  delegated_amount Decimal @db.Decimal
+  delegated_share  Decimal @db.Decimal
+  block_number     BigInt
+  contract         String? @db.VarChar
+  transaction_hash String?
+
+  @@map("advanced_delegatees")
+  @@schema("demo4")
+}
+
+view demo4AdvancedVotingPower {
+  delegate                 String   @unique
+  vp_allowance             Decimal  @db.Decimal
+  vp_delegatable_allowance Decimal  @db.Decimal
+  delegated_vp             Decimal  @db.Decimal
+  advanced_vp              Decimal  @db.Decimal
+  subdelegated_share       Decimal? @db.Decimal
+  contract                 String   @db.VarChar
+
+  @@map("advanced_voting_power")
+  @@schema("demo4")
+}
+
+view demo4AuthorityChainsSnaps {
+  id                   String   @unique
+  delegate             String
+  rules                Json[]
+  chain                String[]
+  proxy                String
+  balance              Decimal  @db.Decimal
+  allowance            Decimal  @db.Decimal
+  contract             String?  @db.VarChar
+  balance_block_number BigInt
+  balance_ordinal      Decimal? @db.Decimal
+
+  @@map("authority_chains_snaps")
+  @@schema("demo4")
+}
+
+view demo4ProposalTypes {
+  id                 String @unique
+  contract           String @db.VarChar
+  block_number       BigInt
+  proposal_type_id   String
+  quorum             String
+  approval_threshold String
+  name               String
+  inputs             Json
+
+  @@map("proposal_types")
+  @@schema("demo4")
+}
+
+view demo4StakedDeposits {
+  deposit_id  BigInt  @unique
+  depositor   String
+  beneficiary String
+  delegatee   String
+  amount      Decimal @db.Decimal
+
+  @@map("staked_deposits")
+  @@schema("demo4")
+}
+
+view demo4DelegateChangedEvents {
+  chain_id          Int
+  address           String @db.VarChar(42)
+  block_number      BigInt
+  block_hash        String @db.VarChar(66)
+  log_index         Int
+  transaction_index Int
+  transaction_hash  String @unique @db.VarChar(66)
+  delegator         String
+  from_delegate     String
+  to_delegate       String
+
+  @@map("delegate_changed_events")
+  @@schema("demo4")
+}
+
+view demo4DaoSettings {
+  dao_id       String
+  param_name   String
+  param_value  String
+  block_number BigInt
+
+  @@id([dao_id, param_name])
+  @@map("dao_settings")
+  @@schema("demo4")
+}
+
+view demo4_delegates_wrapper {
+  delegate          String?
+  num_of_delegators Decimal? @db.Decimal
+  direct_vp         Decimal? @db.Decimal
+  advanced_vp       Decimal? @db.Decimal
+  voting_power      Decimal? @db.Decimal
+
+  @@map("delegates_wrapper")
+  @@ignore
+  @@schema("demo4")
+}
+
+view demo4_advanced_voting_power_raw_snaps {
+  chain_str           String?
+  delegate            String?
+  chain                String[]
+  rules                Json?
+  allowance            Decimal? @db.Decimal
+  subdelegated_share   Decimal? @db.Decimal
+  subdelegated_amount  Decimal? @db.Decimal
+  balance              Decimal? @db.Decimal
+  block_number         BigInt?
+  proxy                String?
+  contract             String?  @db.VarChar
+  ordinal              Decimal? @db.Decimal
+
+  @@map("advanced_voting_power_raw_snaps")
+  @@ignore
+  @@schema("demo4")
+}
+
+view demo4_authority_chains {
+  delegate  String?
+  rules     Json?
+  chain     String[]
+  balance   Decimal? @db.Decimal
+  allowance Decimal? @db.Decimal
+  contract  String?  @db.VarChar
+
+  @@map("authority_chains")
+  @@ignore
+  @@schema("demo4")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view demo4_vote_cast_events {
+  transaction_hash String?  @db.VarChar
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+  contract         String?
+  chain_id         Int?
+
+  @@map("vote_cast_events")
+  @@ignore
+  @@schema("demo4")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view demo4_vote_cast_with_params_events {
+  transaction_hash String?  @db.VarChar
+  proposal_id      String?
+  voter            String?
+  support          String?
+  weight           Decimal? @db.Decimal
+  reason           String?
+  block_number     BigInt?
+  params           String?
+  contract         String?
+  chain_id         Int?
+
+  @@map("vote_cast_with_params_events")
+  @@ignore
+  @@schema("demo4")
+}
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view uniswap_advanced_voting_power_raw_snaps {
   chain_str           String?
