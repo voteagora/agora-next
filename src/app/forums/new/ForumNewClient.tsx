@@ -91,7 +91,6 @@ export default function ForumNewClient({
   const vpCheck = checkVPBeforeAction("topic");
   const currentVP = parseInt(permissions.currentVP) || 0;
   const requiredVP = permissions.settings?.minVpForTopics || 0;
-  const isAdmin = permissions.isAdmin;
 
   const handleSubmit = hookFormHandleSubmit(async (data) => {
     const vpCheck = checkVPBeforeAction("topic");
@@ -328,9 +327,7 @@ export default function ForumNewClient({
                       </span>
                     )}
                     <div className="text-xs mt-1">
-                      {isAdmin && vpCheck.canProceed
-                        ? "Admin permissions"
-                        : `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power required`}
+                      {`${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power`}
                     </div>
                   </div>
                   <div className="flex gap-2">

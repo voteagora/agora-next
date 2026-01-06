@@ -3,6 +3,12 @@
 import { useEffect, useState } from "react";
 import { useEnsName } from "wagmi";
 import { truncateAddress } from "@/app/lib/utils/text";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ENSNameProps {
   address: string;
@@ -28,7 +34,20 @@ export default function ENSName({ address, truncate = true }: ENSNameProps) {
     }
   }, [data, address, truncate]);
 
-  return truncate
-    ? ensName || `${address.slice(0, 6)}...${address.slice(-4)}`
+  const displayText = truncate
+    ? ensName || truncateAddress(address)
     : ensName || address;
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span>{displayText}</span>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{address}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 }

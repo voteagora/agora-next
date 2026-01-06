@@ -2,7 +2,11 @@
 
 import Tenant from "@/lib/tenant/tenant";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { PROPOSAL_STATUS, TENANT_NAMESPACES } from "@/lib/constants";
+import {
+  GOVERNOR_TYPE,
+  PROPOSAL_STATUS,
+  TENANT_NAMESPACES,
+} from "@/lib/constants";
 import { AgoraGovExecute } from "@/app/proposals/components/AgoraGovExecute";
 import { useAccount } from "wagmi";
 import { AgoraGovCancel } from "@/app/proposals/components/AgoraGovCancel";
@@ -25,7 +29,9 @@ interface Props {
 }
 
 export const ProposalStateAdmin = ({ proposal }: Props) => {
-  const { ui } = Tenant.current();
+  const { ui, contracts } = Tenant.current();
+  const governorType = contracts.governorType;
+  const isBravoGovernor = governorType === GOVERNOR_TYPE.BRAVO;
   const { isConnected, address } = useAccount();
   const { namespace } = Tenant.current();
 
@@ -83,7 +89,9 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
         if (proposal.proposalType?.startsWith("OFFCHAIN")) {
           return "This proposal can still be cancelled by the creator.";
         }
-        return "This proposal can still be cancelled by the admin.";
+        return isBravoGovernor
+          ? "This proposal can still be cancelled by the proposer."
+          : "This proposal can still be cancelled by the admin.";
       case PROPOSAL_STATUS.SUCCEEDED:
         if (namespace === TENANT_NAMESPACES.OPTIMISM) {
           if (

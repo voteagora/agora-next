@@ -81,10 +81,7 @@ export default function InfoBanner({ toggleName }: InfoBannerProps) {
   const config = bannerConfig.config as UIInfoBannerConfig;
 
   return (
-    <div
-      className="flex items-center justify-between gap-4 px-4 pt-4 pb-6 mb-0 border border-line shadow-newDefault rounded-lg relative z-0"
-      style={{ backgroundColor: "#F9FAF3" }}
-    >
+    <div className="flex items-center justify-between gap-4 px-4 pt-4 pb-6 mb-0 border border-line shadow-newDefault rounded-lg relative z-0 bg-wash">
       <div className="flex items-center gap-3 flex-1">
         <BookOpenIcon className="w-5 h-5 text-primary flex-shrink-0" />
         <Link

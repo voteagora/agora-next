@@ -3,13 +3,9 @@
 import React from "react";
 import { FileIcon } from "lucide-react";
 import { TrashIcon, ArchiveBoxIcon } from "@heroicons/react/20/solid";
-import {
-  ForumAttachment,
-  canArchiveContent,
-  canDeleteContent,
-} from "@/lib/forumUtils";
-
-import { useForum, useForumAdmin } from "@/hooks/useForum";
+import { ForumAttachment } from "@/lib/forumUtils";
+import { useForum } from "@/hooks/useForum";
+import { useHasPermission } from "@/hooks/useRbacPermissions";
 import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import useRequireLogin from "@/hooks/useRequireLogin";
@@ -35,13 +31,17 @@ export default function PostAttachments({
 
   const { deleteAttachment, archiveAttachment } = useForum();
   const { address } = useAccount();
-  const { isAdmin, canManageAttachments } = useForumAdmin(
-    categoryId || undefined
-  );
   const openDialog = useOpenDialog();
   const requireLogin = useRequireLogin();
   const stableDeleteAttachment = useStableCallback(deleteAttachment);
   const stableArchiveAttachment = useStableCallback(archiveAttachment);
+
+  // RBAC permission for posts (attachments are tied to posts)
+  const { hasPermission: hasPostPermission } = useHasPermission(
+    "forums",
+    "posts",
+    "delete"
+  );
 
   if (!items.length) return null;
 
@@ -102,12 +102,9 @@ export default function PostAttachments({
   };
 
   const canManage = (uploadedBy: string) => {
-    return canDeleteContent(
-      address || "",
-      uploadedBy || postAuthor || "",
-      isAdmin,
-      canManageAttachments
-    );
+    const isAuthor =
+      address?.toLowerCase() === (uploadedBy || postAuthor || "").toLowerCase();
+    return hasPostPermission || isAuthor;
   };
 
   return (

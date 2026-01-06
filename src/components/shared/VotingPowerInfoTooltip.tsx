@@ -32,7 +32,7 @@ export function VotingPowerInfoTooltip({
             <InfoOutlineIcon className={iconClassName} fill="#737373" />
           </span>
         </TooltipTrigger>
-        <TooltipContent className="max-w-[320px] p-4 rounded-xl bg-black text-neutral text-sm leading-snug shadow-md whitespace-normal break-words">
+        <TooltipContent className="max-w-[320px] p-4 rounded-xl bg-black text-white text-sm leading-snug shadow-md whitespace-normal break-words">
           {(vpTooltip as any).config.text}
         </TooltipContent>
       </Tooltip>

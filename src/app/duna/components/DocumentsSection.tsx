@@ -2,26 +2,17 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useForum, useForumAdmin } from "@/hooks/useForum";
+import { useForum } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
 import { TrashIcon, ArchiveBoxIcon } from "@heroicons/react/20/solid";
 import DocumentUploadModal from "./DocumentUploadModal";
 import Tenant from "@/lib/tenant/tenant";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
-import { canArchiveContent, canDeleteContent } from "@/lib/forumUtils";
+import { useHasPermission } from "@/hooks/useRbacPermissions";
 import { FileIcon } from "lucide-react";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import useRequireLogin from "@/hooks/useRequireLogin";
 import { useStableCallback } from "@/hooks/useStableCallback";
-
-interface ForumDocument {
-  id: number;
-  name: string;
-  url: string;
-  ipfsCid: string;
-  createdAt: string;
-  uploadedBy: string;
-}
 
 interface ForumDocument {
   id: number;
@@ -54,8 +45,22 @@ const DocumentsSection = ({
 
   const { address } = useAccount();
   const { dunaCategoryId } = useDunaCategory();
-  const { isAdmin, canManageAttachments } = useForumAdmin(
-    dunaCategoryId || undefined
+
+  // RBAC permissions for DUNA filings
+  const { hasPermission: canCreateFilings } = useHasPermission(
+    "duna_filings",
+    "filings",
+    "create"
+  );
+  const { hasPermission: canArchiveFilings } = useHasPermission(
+    "duna_filings",
+    "filings",
+    "archive"
+  );
+  const { hasPermission: canDeleteFilings } = useHasPermission(
+    "duna_filings",
+    "filings",
+    "delete"
   );
 
   const { ui } = Tenant.current();
@@ -157,7 +162,7 @@ const DocumentsSection = ({
           >
             Documents
           </h3>
-          {!!address && canManageAttachments && (
+          {!!address && canCreateFilings && (
             <Button
               onClick={() => setIsUploadModalOpen(true)}
               className={`${
@@ -200,19 +205,14 @@ const DocumentsSection = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-          {documents.map((document, index) => {
-            const canArchive = canArchiveContent(
-              address || "",
-              document.uploadedBy || "",
-              isAdmin,
-              canManageAttachments
-            );
-            const canDelete = canDeleteContent(
-              address || "",
-              document.uploadedBy || "",
-              isAdmin,
-              canManageAttachments
-            );
+          {documents.map((document: ForumDocument, index) => {
+            // Check if user is the author
+            const isAuthor =
+              address?.toLowerCase() === document.uploadedBy?.toLowerCase();
+            // Can archive if: has RBAC permission OR is author
+            const canArchive = canArchiveFilings || isAuthor;
+            // Can delete if: has RBAC permission
+            const canDelete = canDeleteFilings;
 
             return (
               <div

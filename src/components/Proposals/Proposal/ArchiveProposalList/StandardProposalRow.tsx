@@ -5,6 +5,7 @@ import {
   ArchiveListProposal,
   EasOodaoVoteOutcome,
   DaoNodeVoteTotals,
+  FixedProposalType,
 } from "@/lib/types/archiveProposal";
 import Tenant from "@/lib/tenant/tenant";
 import { OPStandardStatusView } from "../OPStandardProposalStatus";
@@ -138,12 +139,17 @@ export function StandardProposalRow({
   const isHybrid = proposalType === "HYBRID_STANDARD" || !!proposal.hybrid;
 
   // Compute display data and metrics
-  const { displayData, metrics } = useMemo(() => {
+  const { displayData, metrics, proposalTypeName } = useMemo(() => {
     // Use the actual proposal type for correct display name
     const effectiveType = isHybrid ? "HYBRID_STANDARD" : proposalType;
     const displayData = extractDisplayData(proposal, effectiveType, decimals);
     const metrics = extractStandardMetrics(proposal, decimals, isHybrid);
-    return { displayData, metrics };
+    return {
+      displayData,
+      metrics,
+      proposalTypeName:
+        (proposal.proposal_type as FixedProposalType)?.name ?? proposalType,
+    };
   }, [proposal, decimals, proposalType, isHybrid]);
 
   // Use different status views for hybrid vs standard proposals
@@ -166,5 +172,11 @@ export function StandardProposalRow({
     />
   );
 
-  return <BaseRowLayout data={displayData} metricsContent={metricsContent} />;
+  return (
+    <BaseRowLayout
+      data={displayData}
+      metricsContent={metricsContent}
+      proposalTypeName={proposalTypeName}
+    />
+  );
 }

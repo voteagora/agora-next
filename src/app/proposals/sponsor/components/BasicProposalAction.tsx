@@ -1,21 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import {
-  useSimulateContract,
-  useWriteContract,
-  useAccount,
-  useSignMessage,
-} from "wagmi";
+import { useSimulateContract, useWriteContract, useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
 import { BasicProposal, ProposalScope } from "../../../proposals/draft/types";
 import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
+
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { parseError } from "../../draft/utils/stages";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const BasicProposalAction = ({
   draftProposal,
@@ -28,7 +25,7 @@ const BasicProposalAction = ({
   const [proposalCreated, setProposalCreated] = useState(false);
   const proposal_scope = draftProposal.proposal_scope;
   const { address } = useAccount();
-  const messageSigner = useSignMessage();
+  const { getAuthenticationData } = useProposalActionAuth();
 
   /**
    * Notes on proposal methods per governor:
@@ -94,19 +91,19 @@ const BasicProposalAction = ({
               creatorAddress: address,
               timestamp: new Date().toISOString(),
             };
-            const message = JSON.stringify(messagePayload);
-            const signature = await messageSigner
-              .signMessageAsync({ message })
-              .catch(() => undefined);
-            if (!signature) return;
+
+            const auth = await getAuthenticationData(messagePayload);
+            if (!auth) return;
+
             await sponsorDraftProposal({
               draftProposalId: draftProposal.id,
               onchain_transaction_hash: data,
               is_offchain_submission: false,
               proposal_scope: draftProposal.proposal_scope,
               creatorAddress: address as `0x${string}`,
-              message,
-              signature,
+              message: auth.message,
+              signature: auth.signature,
+              jwt: auth.jwt,
             });
             openDialog({
               type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL",

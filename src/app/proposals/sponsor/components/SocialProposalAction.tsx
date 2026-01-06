@@ -5,9 +5,10 @@ import { UpdatedButton } from "@/components/Button";
 import Tenant from "@/lib/tenant/tenant";
 import { createSnapshot } from "../../draft/utils/createSnapshot";
 import { PLMConfig, SocialProposal } from "../../../proposals/draft/types";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const SocialProposalAction = ({
   draftProposal,
@@ -20,7 +21,7 @@ const SocialProposalAction = ({
   const [isSnapshotPending, setIsSnapshotPending] = useState<boolean>(false);
   const openDialog = useOpenDialog();
   const { address } = useAccount();
-  const messageSigner = useSignMessage();
+  const { getAuthenticationData } = useProposalActionAuth();
 
   return (
     <UpdatedButton
@@ -46,20 +47,20 @@ const SocialProposalAction = ({
             creatorAddress: address,
             timestamp: new Date().toISOString(),
           };
-          const message = JSON.stringify(messagePayload);
-          const signature = await messageSigner
-            .signMessageAsync({ message })
-            .catch(() => undefined);
-          if (!signature) {
+
+          const auth = await getAuthenticationData(messagePayload);
+          if (!auth) {
             setIsSnapshotPending(false);
             return;
           }
+
           await sponsorDraftProposal({
             draftProposalId: draftProposal.id,
             snapshot_link: snapshotLink,
             creatorAddress: address as `0x${string}`,
-            message,
-            signature,
+            message: auth.message,
+            signature: auth.signature,
+            jwt: auth.jwt,
           });
 
           setIsSnapshotPending(false);

@@ -46,7 +46,7 @@ export function findDelagatee({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.TOWNS:
-      return Promise.resolve(null);
+      return prismaWeb3Client.townsDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateDelegatees.findFirst(condition);
     default:
@@ -99,7 +99,7 @@ export function findAdvancedDelegatee({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.TOWNS:
-      return Promise.resolve([]);
+      return prismaWeb3Client.townsAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateAdvancedDelegatees.findMany(condition);
     default:
@@ -149,7 +149,7 @@ export function findVotableSupply({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaVotableSupply.findFirst({});
     case TENANT_NAMESPACES.TOWNS:
-      return Promise.resolve(null); // for now: towns is info-only
+      return prismaWeb3Client.townsVotableSupply.findFirst({});
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateVotableSupply.findFirst({});
     default:
@@ -305,7 +305,7 @@ export function findProposalsQueryFromDB({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findMany(condition);
     case TENANT_NAMESPACES.TOWNS:
-      return Promise.resolve([]); // for now: towns is info-only
+      return prismaWeb3Client.townsProposals.findMany(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposals.findMany(condition);
     default:
@@ -408,7 +408,7 @@ export function findProposalsByIds({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findMany(condition);
     case TENANT_NAMESPACES.TOWNS:
-      return Promise.resolve([]); // for now: towns is info-only
+      return prismaWeb3Client.townsProposals.findMany(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposals.findMany(condition);
     default:
@@ -571,7 +571,7 @@ export function findProposalType({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.TOWNS:
-      return Promise.resolve([]); // for now: towns is info-only
+      return prismaWeb3Client.townsProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposalTypes.findMany(condition);
     default:
@@ -620,7 +620,7 @@ export function findVotes({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaVotes.findMany(condition);
     case TENANT_NAMESPACES.TOWNS:
-      return Promise.resolve([]); // for now: towns is info-only
+      return prismaWeb3Client.townsVotes.findMany(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateVotes.findMany(condition);
     default:
@@ -722,7 +722,7 @@ export function findAdvancedVotingPower({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.TOWNS:
-      return Promise.resolve(null); // for now: towns is info-only
+      return prismaWeb3Client.townsAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateAdvancedVotingPower.findFirst(condition);
     default:
@@ -830,7 +830,7 @@ export function findStakedDeposits({
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.TOWNS:
-      return Promise.resolve([]); // for now: towns is info-only
+      return prismaWeb3Client.townsStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateStakedDeposits.findMany(condition);
     default:

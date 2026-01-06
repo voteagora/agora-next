@@ -1,0 +1,135 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import Tenant from "@/lib/tenant/tenant";
+
+interface Grant {
+  id: string;
+  title: string;
+  description: string;
+  slug: string;
+  active: boolean;
+  budgetRange?: string | null;
+  deadline?: string | null;
+}
+
+export default function GrantsList() {
+  const { ui } = Tenant.current();
+  const [grants, setGrants] = useState<Grant[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchGrants = async () => {
+      try {
+        const response = await fetch("/api/grants");
+        if (!response.ok) {
+          throw new Error("Failed to fetch grants");
+        }
+        const data = await response.json();
+        setGrants(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGrants();
+  }, []);
+
+  if (!ui.toggle("grants/intake-form")) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-tertiary">
+          Grants intake form is currently unavailable.
+        </p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-tertiary">Loading grants...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-negative">Error loading grants: {error}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+        <div>
+          {grants.length === 0 ? (
+            <div className="flex flex-row justify-center py-8 text-secondary">
+              No grants currently available
+            </div>
+          ) : (
+            <div>
+              {grants.map((grant, index) => (
+                <div
+                  key={grant.id}
+                  className={`border-b border-line last:border-b-0 ${
+                    index === 0 ? "rounded-t-lg" : ""
+                  } ${index === grants.length - 1 ? "rounded-b-lg" : ""}`}
+                >
+                  <div className="p-6 hover:bg-wash/50 transition-colors">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-primary mb-2">
+                          {grant.title}
+                        </h3>
+                        <p className="text-tertiary mb-4 text-sm leading-relaxed">
+                          {grant.description}
+                        </p>
+
+                        {(grant.budgetRange || grant.deadline) && (
+                          <div className="flex flex-wrap gap-4 text-sm">
+                            {grant.budgetRange && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-tertiary">Budget:</span>
+                                <span className="font-medium text-primary">
+                                  {grant.budgetRange}
+                                </span>
+                              </div>
+                            )}
+                            {grant.deadline && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-tertiary">Deadline:</span>
+                                <span className="font-medium text-primary">
+                                  {grant.deadline}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex-shrink-0">
+                        <Link
+                          href={`/grants/${grant.slug}`}
+                          className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+                        >
+                          Apply Now
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

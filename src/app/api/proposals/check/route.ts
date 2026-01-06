@@ -7,6 +7,8 @@ import { getPublicClient } from "@/lib/viem";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { DaoSlug } from "@prisma/client";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import { erc721Abi } from "viem";
 
 export const maxDuration = 60;
 
@@ -35,7 +37,7 @@ async function getForumSettings(daoSlug: string) {
       }>
     >`
       SELECT min_vp_for_proposals
-      FROM alltenant.dao_forum_settings 
+      FROM alltenant.dao_forum_settings
       WHERE dao_slug = ${daoSlug}
     `;
 
@@ -52,6 +54,26 @@ async function getForumSettings(daoSlug: string) {
   }
 }
 
+async function hasNFT(
+  address: string,
+  nftContractAddress: `0x${string}`
+): Promise<boolean> {
+  try {
+    const client = getPublicClient();
+    const balance = await client.readContract({
+      address: nftContractAddress,
+      abi: erc721Abi,
+      functionName: "balanceOf",
+      args: [address as `0x${string}`],
+    });
+
+    return balance > 0n;
+  } catch (error) {
+    console.error("Error checking NFT balance:", error);
+    return false;
+  }
+}
+
 async function checkProposal(attester: string, tags: string[]) {
   const { slug, namespace, contracts } = Tenant.current();
   const client = getPublicClient();
@@ -61,24 +83,19 @@ async function checkProposal(attester: string, tags: string[]) {
 
   const isTempCheck = postType === "tempcheck";
   const isGovProposal = postType === "gov-proposal";
-
-  const votingPower = await fetchVotingPowerFromContract(client, attester, {
-    namespace,
-    contracts,
-  });
-  const currentVP = Number(votingPower / BigInt(10 ** 18));
-
-  const settings = await getForumSettings(slug);
-  const requiredVP = settings.minVpForProposals;
   const adminStatus = await isAdmin(attester, slug);
 
-  if (isTempCheck) {
-    if (!adminStatus && currentVP < requiredVP) {
-      return { passed: false, relatedLinks, postType };
-    }
-  }
-
   if (isGovProposal) {
+    if (namespace === TENANT_NAMESPACES.TOWNS) {
+      const townsNFTAddress =
+        "0x7c0422b31401C936172C897802CF0373B35B7698" as `0x${string}`;
+      const userHasNFT = await hasNFT(attester, townsNFTAddress);
+
+      if (userHasNFT) {
+        return { passed: true, relatedLinks, postType };
+      }
+    }
+
     const relatedTempChecks = relatedLinks.filter((link) =>
       link.includes("0x")
     );
@@ -114,6 +131,21 @@ async function checkProposal(attester: string, tags: string[]) {
     }
 
     if (!(adminStatus || isAuthorOfTempCheck) || !hasApprovedTempCheck) {
+      return { passed: false, relatedLinks, postType };
+    }
+  }
+
+  const votingPower = await fetchVotingPowerFromContract(client, attester, {
+    namespace,
+    contracts,
+  });
+  const currentVP = Number(votingPower / BigInt(10 ** 18));
+
+  const settings = await getForumSettings(slug);
+  const requiredVP = settings.minVpForProposals;
+
+  if (isTempCheck) {
+    if (!adminStatus && currentVP < requiredVP) {
       return { passed: false, relatedLinks, postType };
     }
   }

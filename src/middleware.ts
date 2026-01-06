@@ -92,14 +92,20 @@ export async function middleware(request: NextRequest) {
         path.startsWith(`${API_PREFIX}${route}`)
       )
     ) {
-      const authResponse = await validateBearerToken(request);
-      if (!authResponse.authenticated) {
-        return setCorsHeaders(
-          request,
-          new Response(authResponse.failReason, {
-            status: 401,
-          })
-        );
+      const isDraftShareRequest =
+        path.startsWith(`${API_PREFIX}/drafts/`) &&
+        request.nextUrl.searchParams.has("share");
+
+      if (!isDraftShareRequest) {
+        const authResponse = await validateBearerToken(request);
+        if (!authResponse.authenticated) {
+          return setCorsHeaders(
+            request,
+            new Response(authResponse.failReason, {
+              status: 401,
+            })
+          );
+        }
       }
     }
     return setCorsHeaders(request, NextResponse.next());

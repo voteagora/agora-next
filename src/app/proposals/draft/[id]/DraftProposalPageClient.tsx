@@ -1,10 +1,14 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import DraftProposalForm from "../components/DraftProposalForm";
 import DeleteDraftButton from "../components/DeleteDraftButton";
 import ReactMarkdown from "react-markdown";
-import { DraftProposal as DraftProposalType } from "@/app/proposals/draft/types";
+import {
+  DraftProposal as DraftProposalType,
+  PLMConfig,
+} from "@/app/proposals/draft/types";
 import { useSIWE } from "connectkit";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { useDraftStage } from "./hooks/useDraftStage";
@@ -16,6 +20,9 @@ import {
 } from "@/lib/constants";
 import ForbiddenAccessCard from "./components/ForbiddenAccessCard";
 import Loading from "./loading";
+import Tenant from "@/lib/tenant/tenant";
+import ShareDraftLink from "./components/ShareDraftLink";
+import { getStoredSiweJwt } from "@/lib/siweSession";
 
 type DraftResponse = DraftProposalType;
 
@@ -39,6 +46,12 @@ export default function DraftProposalPageClient({
   const pollIdRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const hasDraftRef = useRef<boolean>(false);
   const wasConnectedRef = useRef<boolean>(false);
+
+  const urlSearchParams = useSearchParams();
+  const shareParam = urlSearchParams?.get("share");
+  const { ui } = Tenant.current();
+  const plmConfig = ui.toggle("proposal-lifecycle")?.config as PLMConfig;
+  const isShareMode = Boolean(plmConfig?.allowDraftSharing && shareParam);
 
   const {
     stageIndex,
@@ -78,16 +91,29 @@ export default function DraftProposalPageClient({
     refetch,
     error: queryError,
   } = useQuery({
-    queryKey: ["draft", idParam, stageIndex],
+    queryKey: ["draft", idParam, stageIndex, shareParam],
     queryFn: async (): Promise<DraftResponse> => {
-      const sessionRaw = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
-      if (!sessionRaw) {
-        throw new Error("Not authenticated (missing SIWE session)");
+      const currentShareParam = new URLSearchParams(window.location.search).get(
+        "share"
+      );
+      const shouldUseShareMode =
+        plmConfig?.allowDraftSharing && currentShareParam;
+
+      if (shouldUseShareMode) {
+        const res = await fetch(
+          `/api/v1/drafts/${idParam}?share=${currentShareParam}`
+        );
+        if (!res.ok) {
+          if (res.status === 403) {
+            throw new Error("Invalid share link");
+          }
+          throw new Error(`${res.status} ${res.statusText}`);
+        }
+        return res.json();
       }
-      const token = JSON.parse(sessionRaw)?.access_token as string | undefined;
-      if (!token) {
-        throw new Error("Not authenticated (invalid session)");
-      }
+
+      const token = getStoredSiweJwt({ expectedAddress: address });
+      if (!token) throw new Error("Not authenticated (missing SIWE session)");
       const res = await fetch(`/api/v1/drafts/${idParam}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -97,7 +123,6 @@ export default function DraftProposalPageClient({
           throw new Error("Not authenticated");
         }
         if (res.status === 403) {
-          // Ownership mismatch (e.g., signed with a Safe that is not the author)
           throw new Error("Forbidden, you are not the owner of this draft");
         }
         throw new Error(`${res.status} ${res.statusText}`);
@@ -305,44 +330,54 @@ export default function DraftProposalPageClient({
     return () => clearInterval(id);
   }, [isSigning, signLabel, draft, error, refetch]);
 
-  // If we are advancing after a successful sign, show skeleton regardless
   if (advancing) {
     return <Loading />;
   }
 
-  if (!hasDraftRef.current && !draft && !error) {
+  if (isShareMode) {
     if (isLoading) return <Loading />;
-    return (
-      <div className="max-w-screen-xl mx-auto mt-10">
-        <SiweAccessCard
-          error={null}
-          isSigning={isSigning}
-          signLabel={signLabel}
-          onSignClick={handleSiwe}
-          isSwitching={isSwitching}
-          hasAddress={Boolean(address)}
-        />
-      </div>
-    );
-  }
-
-  if (error || ((isSigning || postSignGrace) && !draft)) {
-    return (
-      <div className="max-w-screen-xl mx-auto mt-10">
-        {error && error.toLowerCase().includes("forbidden") ? (
+    if (error) {
+      return (
+        <div className="max-w-screen-xl mx-auto mt-10">
           <ForbiddenAccessCard message={error} />
-        ) : (
+        </div>
+      );
+    }
+  } else {
+    if (!hasDraftRef.current && !draft && !error) {
+      if (isLoading) return <Loading />;
+      return (
+        <div className="max-w-screen-xl mx-auto mt-10">
           <SiweAccessCard
-            error={isSigning ? null : error}
+            error={null}
             isSigning={isSigning}
             signLabel={signLabel}
             onSignClick={handleSiwe}
             isSwitching={isSwitching}
             hasAddress={Boolean(address)}
           />
-        )}
-      </div>
-    );
+        </div>
+      );
+    }
+
+    if (error || ((isSigning || postSignGrace) && !draft)) {
+      return (
+        <div className="max-w-screen-xl mx-auto mt-10">
+          {error && error.toLowerCase().includes("forbidden") ? (
+            <ForbiddenAccessCard message={error} />
+          ) : (
+            <SiweAccessCard
+              error={isSigning ? null : error}
+              isSigning={isSigning}
+              signLabel={signLabel}
+              onSignClick={handleSiwe}
+              isSwitching={isSwitching}
+              hasAddress={Boolean(address)}
+            />
+          )}
+        </div>
+      );
+    }
   }
 
   if (!draft && !isSigning && !postSignGrace && !error && hasDraftRef.current) {
@@ -359,9 +394,22 @@ export default function DraftProposalPageClient({
             totalStages={DRAFT_STAGES_FOR_TENANT.length}
             draftIdForBack={(draft as any).uuid}
           />
-          <div className="flex items-center justify-end mt-4">
-            <DeleteDraftButton proposalId={draft.id} />
-          </div>
+          {!isShareMode && (
+            <div className="flex items-center justify-end gap-4 mt-4">
+              {plmConfig?.allowDraftSharing && (
+                <ShareDraftLink
+                  draftUuid={(draft as any).uuid}
+                  authorAddress={draft.author_address}
+                />
+              )}
+              <DeleteDraftButton proposalId={draft.id} />
+            </div>
+          )}
+          {isShareMode && (
+            <div className="mt-4 p-3 bg-wash border border-line rounded-lg text-secondary text-sm">
+              You are viewing a shared draft proposal (read-only).
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 sm:gap-y-0 gap-x-0 sm:gap-x-6 mt-6">
             <section className="col-span-1 sm:col-span-2 order-last sm:order-first">
               <DraftProposalForm

@@ -11,13 +11,18 @@ type BaseRowLayoutProps = {
   data: RowDisplayData;
   /** Metrics component to render in the right column */
   metricsContent: React.ReactNode;
+  proposalTypeName: string;
 };
 
 /**
  * Shared layout for all archive proposal rows.
  * Each proposal type provides its own metrics content.
  */
-export function BaseRowLayout({ data, metricsContent }: BaseRowLayoutProps) {
+export function BaseRowLayout({
+  data,
+  metricsContent,
+  proposalTypeName,
+}: BaseRowLayoutProps) {
   const { ui } = Tenant.current();
   const isOODao = data.source === "eas-oodao";
 
@@ -37,7 +42,11 @@ export function BaseRowLayout({ data, metricsContent }: BaseRowLayoutProps) {
           )}
         >
           {isOODao ? (
-            <OODaoBadges data={data} statusProposal={statusProposal} />
+            <OODaoBadges
+              data={data}
+              statusProposal={statusProposal}
+              proposalTypeName={proposalTypeName}
+            />
           ) : (
             <StandardHeader
               data={data}
@@ -77,9 +86,11 @@ export function BaseRowLayout({ data, metricsContent }: BaseRowLayoutProps) {
 function OODaoBadges({
   data,
   statusProposal,
+  proposalTypeName,
 }: {
   data: RowDisplayData;
   statusProposal: { status: string; id: string };
+  proposalTypeName: string;
 }) {
   return (
     <div className="inline-flex justify-start items-center gap-1.5 flex-wrap">
@@ -113,7 +124,7 @@ function OODaoBadges({
         }`}
       >
         <div className="text-xs font-semibold leading-4 text-neutral-700">
-          {data.proposalTypeName}
+          {proposalTypeName}
         </div>
       </div>
 
@@ -141,7 +152,7 @@ function StandardHeader({
     <div className="flex flex-row text-xs text-secondary gap-1">
       <div>
         {data.proposalTypeName}{" "}
-        <span className="hidden sm:inline">by The {organizationTitle}</span>
+        <span className="hidden sm:inline"> | The {organizationTitle}</span>
       </div>
       <div className="block sm:hidden">
         <ProposalStatus proposal={statusProposal} />

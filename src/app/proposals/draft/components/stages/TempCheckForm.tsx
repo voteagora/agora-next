@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { z } from "zod";
 import { useForm, FormProvider } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormCard from "../form/FormCard";
 import TextInput from "../form/TextInput";
@@ -13,11 +13,14 @@ import { onSubmitAction as tempCheckAction } from "../../actions/createTempCheck
 import { useAccount, useSignMessage } from "wagmi";
 import Image from "next/image";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
+import { buildDraftUrl } from "@/app/proposals/draft/utils/shareParam";
 import { DraftProposal } from "../../types";
 import toast from "react-hot-toast";
 
 const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const shareParam = searchParams?.get("share");
   const { address } = useAccount();
   const messageSigner = useSignMessage();
   const [isSkipPending, setIsSkipPending] = useState(false);
@@ -74,7 +77,7 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         return;
       }
       const nextId = draftProposal.uuid;
-      router.push(`/proposals/draft/${nextId}?stage=${stageIndex + 1}`);
+      router.push(buildDraftUrl(nextId, stageIndex + 1, shareParam));
     } catch (e: any) {
       console.error("An error was uncaught in `tempCheckAction`: ", e);
       toast.error(e.message);

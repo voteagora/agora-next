@@ -6,12 +6,17 @@ import Tenant from "@/lib/tenant/tenant";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { canPerformAction, formatVPError } from "@/lib/forumSettings";
-import { checkForumPermissions } from "./admin";
+import { checkPermission } from "@/lib/rbac";
+import type { DaoSlug } from "@prisma/client";
 import {
   fetchVotingPowerFromContract,
   formatVotingPower,
 } from "@/lib/votingPowerUtils";
 import { getPublicClient } from "@/lib/viem";
+import {
+  buildForumPostUrl,
+  emitDirectEvent,
+} from "@/lib/notification-center/emitter";
 
 const addReactionSchema = z.object({
   targetType: z.literal("post"),
@@ -65,7 +70,7 @@ export async function addForumReaction(
         where: { id: validated.targetId },
         include: {
           topic: {
-            select: { categoryId: true },
+            select: { categoryId: true, title: true },
           },
         },
       }),
@@ -77,14 +82,17 @@ export async function addForumReaction(
       return { success: false, error: "Post not found" };
     }
 
-    // Check if user is an admin (admins bypass VP requirements)
-    const adminCheck = await checkForumPermissions(
+    // Check if user has posts.create permission (bypasses VP requirements for reactions)
+    const hasPostPermission = await checkPermission(
       validated.address,
-      post.topic.categoryId || undefined
+      slug as DaoSlug,
+      "forums",
+      "posts",
+      "create"
     );
 
-    // Only check voting power for non-admins
-    if (!adminCheck.isAdmin) {
+    // Only check voting power if user doesn't have RBAC permission
+    if (!hasPostPermission) {
       try {
         const tenant = Tenant.current();
         const client = getPublicClient();
@@ -135,6 +143,22 @@ export async function addForumReaction(
         emoji,
       },
     });
+
+    const normalizedReactor = validated.address.toLowerCase();
+    if (post.address && post.address.toLowerCase() !== normalizedReactor) {
+      emitDirectEvent(
+        "forum_reaction_received",
+        post.address,
+        `${post.id}:${normalizedReactor}:${emoji}`,
+        {
+          dao_name: slug,
+          topic_title: post.topic?.title ?? "Forum discussion",
+          post_url: buildForumPostUrl(post.topicId, post.topic?.title, post.id),
+          reaction_emoji: emoji,
+          reactor_address: normalizedReactor,
+        }
+      );
+    }
 
     return { success: true, data: created };
   } catch (error) {

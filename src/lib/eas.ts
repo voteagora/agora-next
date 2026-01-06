@@ -8,6 +8,7 @@ import { JsonRpcSigner, toUtf8Bytes } from "ethers";
 import Tenant from "./tenant/tenant";
 import { keccak256 } from "viem";
 import { defaultAbiCoder } from "@ethersproject/abi";
+import { getEASAddress } from "./constants";
 
 const { slug, contracts } = Tenant.current();
 
@@ -19,25 +20,19 @@ const CREATE_PROPOSAL_SCHEMA_ID =
 const EAS_V2_SCHEMA_IDS = {
   CREATE_PROPOSAL:
     "0x38bfba767c2f41790962f09bcf52923713cfff3ad6d7604de7cc77c15fcf169a",
-  VOTE:
-    process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-      ? "0x19c36b80a224c4800fd6ed68901ec21f591563c8a5cb2dd95382d430603f91ff"
-      : "0x12cd8679de42e111a5ece9f2aee44dc8b8351024dea881cda97c2ff5b58349f6",
+  VOTE: {
+    1: "0x12cd8679de42e111a5ece9f2aee44dc8b8351024dea881cda97c2ff5b58349f6",
+    11155111:
+      "0x19c36b80a224c4800fd6ed68901ec21f591563c8a5cb2dd95382d430603f91ff",
+    8453: "0x72edbb9603b8ff8ae5310c1d33912f4a7998bea0c03afc0e06a64e41d32b78b9",
+  } as Record<number, string>,
 };
 
 const schemaEncoder = new SchemaEncoder(
   "address contract,uint256 id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block, string proposal_type, uint256[] tiers, uint256 onchain_proposalid, uint8 max_approvals, uint8 criteria, uint128 criteria_value, uint8 calculationOptions"
 );
 
-const eas =
-  process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? new EAS("0x4200000000000000000000000000000000000021")
-    : new EAS("0x4200000000000000000000000000000000000021");
-
-const easV2 =
-  process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e")
-    : new EAS("0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587");
+const eas = new EAS(getEASAddress(contracts.token.chain.id));
 
 export async function createProposalAttestation({
   contract,
@@ -236,7 +231,7 @@ export async function createV2CreateProposalAttestation({
   proposal_type_uid?: string;
   signer: JsonRpcSigner;
 }) {
-  easV2.connect(signer as any);
+  eas.connect(signer as any);
 
   const encodedData = v2SchemaEncoders.CREATE_PROPOSAL.encodeData([
     { name: "title", value: title, type: "string" },
@@ -247,7 +242,7 @@ export async function createV2CreateProposalAttestation({
     { name: "kwargs", value: "{'voting_module': 'standard'}", type: "string" },
   ]);
 
-  const txResponse = await easV2.attest({
+  const txResponse = await eas.attest({
     schema: EAS_V2_SCHEMA_IDS.CREATE_PROPOSAL,
     data: {
       recipient:
@@ -276,7 +271,7 @@ export async function createVoteAttestation({
   signer: JsonRpcSigner;
   proposalId: string;
 }) {
-  easV2.connect(signer as any);
+  eas.connect(signer as any);
 
   const encodedData = v2SchemaEncoders.VOTE.encodeData([
     { name: "choice", value: choice, type: "int8" },
@@ -288,8 +283,8 @@ export async function createVoteAttestation({
   const expirationTime = NO_EXPIRATION;
   const revocable = false;
 
-  const txResponse = await easV2.attest({
-    schema: EAS_V2_SCHEMA_IDS.VOTE,
+  const txResponse = await eas.attest({
+    schema: EAS_V2_SCHEMA_IDS.VOTE[contracts.token.chain.id],
     data: {
       recipient,
       expirationTime,

@@ -4,7 +4,10 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
-import { verifySiwe } from "@/app/proposals/draft/actions/siweAuth";
+import {
+  verifySiwe,
+  verifyJwtAndGetAddress,
+} from "@/app/proposals/draft/actions/siweAuth";
 
 type CreateDraftBody = {
   creatorAddress?: `0x${string}` | string;
@@ -20,28 +23,52 @@ export async function POST(request: NextRequest) {
     const message = body?.message as string | undefined;
     const signature = body?.signature as `0x${string}` | undefined;
 
-    if (!creatorAddress || !message || !signature) {
+    const authz =
+      request.headers.get("authorization") ||
+      request.headers.get("Authorization");
+    const token = authz?.startsWith("Bearer ") ? authz.slice(7) : undefined;
+    let jwtAddress: `0x${string}` | null = null;
+    if (token) {
+      jwtAddress = await verifyJwtAndGetAddress(token);
+    }
+
+    if (!creatorAddress) {
+      return NextResponse.json(
+        { message: "Missing required field: creatorAddress" },
+        { status: 400 }
+      );
+    }
+
+    if (!jwtAddress && (!message || !signature)) {
       return NextResponse.json(
         {
-          message:
-            "Missing required fields: creatorAddress, message, signature",
+          message: "Missing required fields: message, signature (or valid JWT)",
         },
         { status: 400 }
       );
     }
 
     // Verify SIWE signature (EOA, with 1271 fallback handled by verifySiwe stack)
-    const isValid = await verifySiwe({
-      address: creatorAddress,
-      message,
-      signature,
-    });
+    if (jwtAddress) {
+      if (jwtAddress.toLowerCase() !== creatorAddress.toLowerCase()) {
+        return NextResponse.json(
+          { message: "Token address mismatch" },
+          { status: 401 }
+        );
+      }
+    } else {
+      const isValid = await verifySiwe({
+        address: creatorAddress,
+        message: message!,
+        signature: signature!,
+      });
 
-    if (!isValid) {
-      return NextResponse.json(
-        { message: "Invalid signature" },
-        { status: 401 }
-      );
+      if (!isValid) {
+        return NextResponse.json(
+          { message: "Invalid signature" },
+          { status: 401 }
+        );
+      }
     }
 
     // Resolve tenant config and initial stage

@@ -12,7 +12,6 @@ import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import useStandardVoting from "@/hooks/useStandardVoting";
 import Tenant from "@/lib/tenant/tenant";
 import { useScwVoting } from "@/hooks/useScwVoting";
-import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import ENSName from "@/components/shared/ENSName";
 
 export type SupportTextProps = {
@@ -120,15 +119,6 @@ const BasicVoteDialog = ({
   delegate,
   missingVote,
 }: CastVoteDialogProps) => {
-  const openDialog = useOpenDialog();
-  const [hasShownVoteEmailDialog, setHasShownVoteEmailDialog] =
-    useState<boolean>(false);
-
-  useEffect(() => {
-    setHasShownVoteEmailDialog(
-      localStorage.getItem("agora-email-subscriptions--vote") === "prompted"
-    );
-  }, []);
   const { write, isLoading, isSuccess, data } = useStandardVoting({
     proposalId,
     support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
@@ -137,19 +127,6 @@ const BasicVoteDialog = ({
   });
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
-
-  useEffect(() => {
-    if (isSuccess) {
-      if (!hasShownVoteEmailDialog) {
-        openDialog({
-          type: "SUBSCRIBE",
-          params: {
-            type: "vote",
-          },
-        });
-      }
-    }
-  }, [isSuccess]);
 
   if (!delegate) {
     return null;
@@ -209,9 +186,7 @@ const BasicVoteDialog = ({
           </div>
         </div>
       )}
-      {isSuccess && hasShownVoteEmailDialog && (
-        <SuccessMessage closeDialog={closeDialog} data={data} />
-      )}
+      {isSuccess && <SuccessMessage closeDialog={closeDialog} data={data} />}
     </>
   );
 };
@@ -226,16 +201,6 @@ function AdvancedVoteDialog({
   authorityChains,
   missingVote,
 }: CastVoteDialogProps) {
-  const openDialog = useOpenDialog();
-  const [hasShownVoteEmailDialog, setHasShownVoteEmailDialog] =
-    useState<boolean>(false);
-
-  useEffect(() => {
-    setHasShownVoteEmailDialog(
-      localStorage.getItem("agora-email-subscriptions--vote") === "prompted"
-    );
-  }, []);
-
   const { write, isLoading, isSuccess, data } = useAdvancedVoting({
     proposalId,
     support: ["AGAINST", "FOR", "ABSTAIN"].indexOf(supportType),
@@ -246,19 +211,6 @@ function AdvancedVoteDialog({
   });
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
-
-  useEffect(() => {
-    if (isSuccess) {
-      if (!hasShownVoteEmailDialog) {
-        openDialog({
-          type: "SUBSCRIBE",
-          params: {
-            type: "vote",
-          },
-        });
-      }
-    }
-  }, [isSuccess]);
 
   if (!delegate) {
     // todo: log
@@ -319,9 +271,7 @@ function AdvancedVoteDialog({
           </div>
         </div>
       )}
-      {isSuccess && hasShownVoteEmailDialog && (
-        <SuccessMessage closeDialog={closeDialog} data={data} />
-      )}
+      {isSuccess && <SuccessMessage closeDialog={closeDialog} data={data} />}
     </>
   );
 }

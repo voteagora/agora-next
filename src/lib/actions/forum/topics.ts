@@ -14,7 +14,9 @@ import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { getIPFSUrl } from "@/lib/pinata";
-import { logForumAuditAction, checkForumPermissions } from "./admin";
+import { logForumAuditAction } from "./admin";
+import { requirePermission, checkPermission } from "@/lib/rbac";
+import type { DaoSlug } from "@prisma/client";
 import { unstable_cache } from "next/cache";
 import { createAttachmentsFromContent } from "../attachment";
 import { canCreateTopic, formatVPError } from "@/lib/forumSettings";
@@ -23,6 +25,11 @@ import {
   formatVotingPower,
 } from "@/lib/votingPowerUtils";
 import { getPublicClient } from "@/lib/viem";
+import {
+  addRecipientAttributeValue,
+  buildForumTopicUrl,
+  emitBroadcastEvent,
+} from "@/lib/notification-center/emitter";
 const { slug } = Tenant.current();
 
 interface GetForumTopicsOptions {
@@ -295,16 +302,19 @@ export async function createForumTopic(
   try {
     const validatedData = createTopicSchema.parse(data);
 
-    // Parallelize signature verification and admin check
-    const [isValid, adminCheck] = await Promise.all([
+    // Parallelize signature verification and permission check
+    const [isValid, hasTopicPermission] = await Promise.all([
       verifyMessage({
         address: validatedData.address as `0x${string}`,
         message: validatedData.message,
         signature: validatedData.signature as `0x${string}`,
       }),
-      checkForumPermissions(
+      checkPermission(
         validatedData.address,
-        validatedData.categoryId || undefined
+        slug as DaoSlug,
+        "forums",
+        "topics",
+        "create"
       ),
     ]);
 
@@ -312,8 +322,10 @@ export async function createForumTopic(
       return { success: false, error: "Invalid signature" };
     }
 
-    // Only check voting power for non-admins
-    if (!adminCheck.isAdmin) {
+    const normalizedAddress = validatedData.address.toLowerCase();
+
+    // Only check voting power if user doesn't have RBAC permission
+    if (!hasTopicPermission) {
       try {
         const tenant = Tenant.current();
         const client = getPublicClient();
@@ -401,6 +413,32 @@ export async function createForumTopic(
         categoryId: validatedData.categoryId || undefined,
         createdAt: newTopic.createdAt,
       }).catch((error) => console.error("Failed to index new topic:", error));
+    }
+
+    addRecipientAttributeValue(normalizedAddress, "authored_topics", newTopic.id);
+    addRecipientAttributeValue(normalizedAddress, "engaged_topics", newTopic.id);
+
+    if (!isNsfw && newTopic.categoryId) {
+      const category = await prismaWeb2Client.forumCategory.findUnique({
+        where: { id: newTopic.categoryId },
+        select: { name: true },
+      });
+
+      emitBroadcastEvent(
+        "forum_discussion_in_watched_category",
+        String(newTopic.id),
+        {
+          attributes: { subscribed_categories: { $contains: newTopic.categoryId } },
+          exclude_recipient_ids: [normalizedAddress],
+        },
+        {
+          dao_name: slug,
+          topic_title: newTopic.title,
+          topic_url: buildForumTopicUrl(newTopic.id, newTopic.title),
+          category_name: category?.name ?? "General",
+          author_address: normalizedAddress,
+        }
+      );
     }
 
     return {
@@ -512,15 +550,16 @@ export async function softDeleteForumTopic(
   try {
     const validatedData = softDeleteTopicSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
+    // Verify signature and check permission
+    await requirePermission({
+      address: validatedData.address,
       message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
+      signature: validatedData.signature,
+      daoSlug: slug as any,
+      module: "forums",
+      resource: "topics",
+      action: "archive",
     });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
-    }
 
     await prismaWeb2Client.forumTopic.update({
       where: {
@@ -551,15 +590,16 @@ export async function restoreForumTopic(
   try {
     const validatedData = softDeleteTopicSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
+    // Verify signature and check permission
+    await requirePermission({
+      address: validatedData.address,
       message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
+      signature: validatedData.signature,
+      daoSlug: slug as any,
+      module: "forums",
+      resource: "topics",
+      action: "archive",
     });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
-    }
 
     await prismaWeb2Client.forumTopic.update({
       where: {
@@ -622,15 +662,16 @@ export async function archiveForumTopic(
   try {
     const validatedData = archiveTopicSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
+    // Verify signature and check permission
+    await requirePermission({
+      address: validatedData.address,
       message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
+      signature: validatedData.signature,
+      daoSlug: slug as any,
+      module: "forums",
+      resource: "topics",
+      action: "archive",
     });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
-    }
 
     await prismaWeb2Client.forumTopic.update({
       where: {

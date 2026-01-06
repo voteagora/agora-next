@@ -5,15 +5,19 @@ import { cache } from "react";
 
 const getDraftProposalByUuidInternal = async (uuid: string) => {
   const include = {
-    transactions: true,
+    transactions: {
+      orderBy: { order: "asc" as const },
+    },
     social_options: true,
     checklist_items: true,
     approval_options: {
       include: {
-        transactions: true,
+        transactions: {
+          orderBy: { order: "asc" as const },
+        },
       },
     },
-  } as const;
+  };
   const draftProposal = await prismaWeb2Client.proposalDraft.findUnique({
     where: { uuid },
     include,

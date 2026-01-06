@@ -12,7 +12,9 @@ import { indexForumPost, removeForumPostFromIndex } from "./search";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
-import { logForumAuditAction, checkForumPermissions } from "./admin";
+import { logForumAuditAction } from "./admin";
+import { requirePermission, checkPermission } from "@/lib/rbac";
+import type { DaoSlug } from "@prisma/client";
 import { createAttachmentsFromContent } from "../attachment";
 import {
   canCreatePost,
@@ -25,7 +27,25 @@ import {
 } from "@/lib/votingPowerUtils";
 import { getPublicClient } from "@/lib/viem";
 import { getIPFSUrl } from "@/lib/pinata";
+import { stripHtmlToText } from "@/app/forums/stripHtml";
+import {
+  addRecipientAttributeValue,
+  buildForumPostUrl,
+  buildForumTopicUrl,
+  emitBroadcastEvent,
+  emitDirectEvent,
+} from "@/lib/notification-center/emitter";
 const { slug } = Tenant.current();
+
+const PREVIEW_LENGTH = 180;
+
+function buildPreview(content: string): string {
+  const plain = stripHtmlToText(content);
+  if (plain.length <= PREVIEW_LENGTH) {
+    return plain;
+  }
+  return `${plain.slice(0, PREVIEW_LENGTH - 3).trim()}...`;
+}
 
 // Lightweight schema for topic upvotes
 const topicVoteSchema = z.object({
@@ -57,7 +77,7 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
       }),
       prismaWeb2Client.forumTopic.findFirst({
         where: { id: validated.topicId, dao_slug: slug },
-        select: { id: true, categoryId: true },
+        select: { id: true, categoryId: true, address: true, title: true },
       }),
     ]);
 
@@ -66,14 +86,17 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
 
     if (!topic) return { success: false, error: "Topic not found" } as const;
 
-    // Check if user is an admin (admins bypass VP requirements)
-    const adminCheck = await checkForumPermissions(
+    // Check if user has posts.create permission (bypasses VP requirements)
+    const hasPostPermission = await checkPermission(
       validated.address,
-      topic.categoryId || undefined
+      slug as DaoSlug,
+      "forums",
+      "posts",
+      "create"
     );
 
-    // Only check voting power for non-admins
-    if (!adminCheck.isAdmin) {
+    // Only check voting power if user doesn't have RBAC permission
+    if (!hasPostPermission) {
       try {
         const tenant = Tenant.current();
         const client = getPublicClient();
@@ -104,6 +127,7 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
       }
     }
 
+    const normalizedVoter = validated.address.toLowerCase();
     const rootPostId = await getRootPostId(validated.topicId);
     if (!rootPostId)
       return { success: false, error: "Root post not found" } as const;
@@ -129,6 +153,20 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
     const upvotes = await prismaWeb2Client.forumPostVote.count({
       where: { dao_slug: slug, postId: rootPostId, vote: 1 },
     });
+
+    if (topic.address && topic.address.toLowerCase() !== normalizedVoter) {
+      emitDirectEvent(
+        "forum_topic_upvoted",
+        topic.address,
+        `${topic.id}:${normalizedVoter}`,
+        {
+          dao_name: slug,
+          topic_title: topic.title,
+          topic_url: buildForumTopicUrl(topic.id, topic.title),
+          voter_address: normalizedVoter,
+        }
+      );
+    }
 
     return { success: true as const, data: { postId: rootPostId, upvotes } };
   } catch (error) {
@@ -249,14 +287,19 @@ export async function createForumPost(
       return { success: false, error: "Topic not found" };
     }
 
-    // Check if user is an admin (admins bypass VP requirements)
-    const adminCheck = await checkForumPermissions(
+    const normalizedAddress = validatedData.address.toLowerCase();
+
+    // Check if user has posts.create permission (bypasses VP requirements)
+    const hasPostPermission = await checkPermission(
       validatedData.address,
-      topic.categoryId || undefined
+      slug as DaoSlug,
+      "forums",
+      "posts",
+      "create"
     );
 
-    // Only check voting power for non-admins
-    if (!adminCheck.isAdmin) {
+    // Only check voting power if user doesn't have RBAC permission
+    if (!hasPostPermission) {
       try {
         const tenant = Tenant.current();
         const client = getPublicClient();
@@ -337,6 +380,86 @@ export async function createForumPost(
       }).catch((error) => console.error("Failed to index new post:", error));
     }
 
+    if (!isNsfw) {
+      const preview = buildPreview(validatedData.content);
+      const topicUrl = buildForumTopicUrl(topicId, topic.title);
+
+      // Notify users engaged in this topic (excludes author)
+      emitBroadcastEvent(
+        "forum_comment_engaged",
+        String(newPost.id),
+        {
+          attributes: { engaged_topics: { $contains: topicId } },
+          exclude_recipient_ids: [normalizedAddress],
+        },
+        {
+          dao_name: slug,
+          topic_title: topic.title,
+          topic_url: topicUrl,
+          comment_preview: preview,
+          author_address: normalizedAddress,
+        }
+      );
+
+      // Notify users watching this topic (excludes author)
+      // Note: Users who are both engaged AND watching may receive duplicate notifications
+      // This is intentional as they've expressed interest in both ways
+      emitBroadcastEvent(
+        "forum_comment_watched",
+        String(newPost.id),
+        {
+          attributes: { subscribed_topics: { $contains: topicId } },
+          exclude_recipient_ids: [normalizedAddress],
+        },
+        {
+          dao_name: slug,
+          topic_title: topic.title,
+          topic_url: topicUrl,
+          comment_preview: preview,
+          author_address: normalizedAddress,
+        }
+      );
+
+      if (validatedData.parentId) {
+        const parentPost = await prismaWeb2Client.forumPost.findUnique({
+          where: { id: validatedData.parentId },
+          select: { address: true },
+        });
+
+        if (
+          parentPost?.address &&
+          parentPost.address.toLowerCase() !== normalizedAddress
+        ) {
+          // Link directly to the reply post
+          const postUrl = buildForumPostUrl(topicId, topic.title, newPost.id);
+          emitDirectEvent(
+            "forum_reply_to_your_comment",
+            parentPost.address,
+            String(newPost.id),
+            {
+              dao_name: slug,
+              topic_title: topic.title,
+              topic_url: postUrl,
+              reply_preview: preview,
+              replier_address: normalizedAddress,
+            }
+          );
+        }
+      }
+    }
+
+    const engagementCount = await prismaWeb2Client.forumPost.count({
+      where: {
+        dao_slug: slug,
+        topicId: topicId,
+        address: validatedData.address,
+      },
+    });
+
+    if (engagementCount === 1) {
+      addRecipientAttributeValue(normalizedAddress, "engaged_topics", topicId);
+    }
+
     return {
       success: true as const,
       data: {
@@ -404,15 +527,16 @@ export async function softDeleteForumPost(
   try {
     const validatedData = softDeletePostSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
+    // Verify signature and check permission
+    await requirePermission({
+      address: validatedData.address,
       message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
+      signature: validatedData.signature,
+      daoSlug: slug as any,
+      module: "forums",
+      resource: "posts",
+      action: "archive",
     });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
-    }
 
     await prismaWeb2Client.forumPost.update({
       where: {
@@ -443,15 +567,16 @@ export async function restoreForumPost(
   try {
     const validatedData = softDeletePostSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
+    // Verify signature and check permission
+    await requirePermission({
+      address: validatedData.address,
       message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
+      signature: validatedData.signature,
+      daoSlug: slug as any,
+      module: "forums",
+      resource: "posts",
+      action: "archive",
     });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
-    }
 
     await prismaWeb2Client.forumPost.update({
       where: {

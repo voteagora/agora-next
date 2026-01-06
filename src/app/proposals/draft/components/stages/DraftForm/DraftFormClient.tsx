@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount } from "wagmi";
 import { useState, useEffect, useMemo } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,18 +26,21 @@ import ApprovalProposalForm from "../../ApprovalProposalForm";
 import OptimisticProposalForm from "../../OptimisticProposalForm";
 import SwitchInput from "../../form/SwitchInput";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   getProposalTypeAddress,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
+import { buildDraftUrl } from "@/app/proposals/draft/utils/shareParam";
 import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
 import { ScopeDetails } from "@/components/Admin/ScopeDetails";
 import { FormattedProposalType } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSettings";
 import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
-import { TENANT_NAMESPACES, LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import { getStoredSiweJwt } from "@/lib/siweSession";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const { ui, namespace } = Tenant.current();
 
@@ -176,8 +179,10 @@ const DraftFormClient = ({
     getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
   );
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const shareParam = searchParams?.get("share");
   const { address } = useAccount();
-  const messageSigner = useSignMessage();
+  const { getAuthenticationData } = useProposalActionAuth();
 
   const methods = useForm<z.output<typeof DraftProposalSchema>>({
     resolver: zodResolver(DraftProposalSchema),
@@ -236,14 +241,8 @@ const DraftFormClient = ({
         return;
       }
       // Guard: require SIWE JWT before prompting signature for this action
-      try {
-        const session = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
-        if (!session) {
-          toast("Session expired. Please sign in to continue.");
-          window.location.reload();
-          return;
-        }
-      } catch {
+      const jwt = getStoredSiweJwt({ expectedAddress: address });
+      if (!jwt) {
         toast("Session expired. Please sign in to continue.");
         window.location.reload();
         return;
@@ -254,13 +253,11 @@ const DraftFormClient = ({
         creatorAddress: address,
         timestamp: new Date().toISOString(),
       };
-      const message = JSON.stringify(messagePayload);
-      const signature = await messageSigner
-        .signMessageAsync({ message })
-        .catch(() => undefined);
-      if (!signature) {
+
+      const auth = await getAuthenticationData(messagePayload);
+      if (!auth) {
         setIsPending(false);
-        toast("Signature failed");
+        toast("Authentication failed");
         return;
       }
 
@@ -268,8 +265,9 @@ const DraftFormClient = ({
         ...data,
         draftProposalId: draftProposal.id,
         creatorAddress: address,
-        message,
-        signature,
+        message: auth.message,
+        signature: auth.signature,
+        jwt: auth.jwt,
       });
       if (!res.ok) {
         setIsPending(false);
@@ -278,7 +276,7 @@ const DraftFormClient = ({
       } else {
         invalidatePath(draftProposal.id);
         const nextId = draftProposal.uuid;
-        router.push(`/proposals/draft/${nextId}?stage=${stageIndex + 1}`);
+        router.push(buildDraftUrl(nextId, stageIndex + 1, shareParam));
       }
     } catch (error: any) {
       setIsPending(false);

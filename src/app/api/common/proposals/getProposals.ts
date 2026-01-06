@@ -619,7 +619,9 @@ async function getDraftProposals(address: `0x${string}`) {
         },
       },
       include: {
-        transactions: true,
+        transactions: {
+          orderBy: { order: "asc" },
+        },
       },
     });
   });
@@ -643,7 +645,9 @@ async function getDraftProposalForSponsor(address: `0x${string}`) {
         },
       },
       include: {
-        transactions: true,
+        transactions: {
+          orderBy: { order: "asc" },
+        },
       },
     });
   });
