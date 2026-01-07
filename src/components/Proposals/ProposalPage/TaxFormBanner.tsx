@@ -22,7 +22,6 @@ type Props = {
 
 export function TaxFormBanner({ proposal }: Props) {
   const { address, isConnected } = useAccount();
-  const metadata = proposal.taxFormMetadata ?? {};
   const { ui } = Tenant.current();
   const taxFormToggle = ui.toggle("tax-form") ?? ui.toggle("tax-form-banner");
   const isEnabled = taxFormToggle?.enabled ?? false;
@@ -32,36 +31,44 @@ export function TaxFormBanner({ proposal }: Props) {
       | undefined
   )?.payeeFormUrl;
 
-  const { hasPayeeKey, currentUserIsPayee, isFormCompleted, payeeFormUrl } =
-    useMemo(() => {
-      const { hasPayeeKey, payeeAddress } = extractPayeeFromMetadata(metadata);
-      const hasCowrieStatus = Object.prototype.hasOwnProperty.call(
-        metadata,
-        COWRIE_VERIFICATION_COMPLETED_KEY
-      );
-      const isCowrieComplete = normalizeBoolean(
-        metadata[COWRIE_VERIFICATION_COMPLETED_KEY]
-      );
-      const isFormCompleted = hasCowrieStatus
-        ? isCowrieComplete
-        : normalizeBoolean(metadata[FORM_COMPLETED_KEY]);
+  const {
+    hasPayeeKey,
+    payeeAddress,
+    currentUserIsPayee,
+    isFormCompleted,
+    payeeFormUrl,
+  } = useMemo(() => {
+    const metadata = proposal.taxFormMetadata ?? {};
+    const { hasPayeeKey, payeeAddress } = extractPayeeFromMetadata(metadata);
+    const hasCowrieStatus = Object.prototype.hasOwnProperty.call(
+      metadata,
+      COWRIE_VERIFICATION_COMPLETED_KEY
+    );
+    const isCowrieComplete = normalizeBoolean(
+      metadata[COWRIE_VERIFICATION_COMPLETED_KEY]
+    );
+    const isFormCompleted = hasCowrieStatus
+      ? isCowrieComplete
+      : normalizeBoolean(metadata[FORM_COMPLETED_KEY]);
 
-      return {
-        hasPayeeKey,
-        currentUserIsPayee:
-          hasPayeeKey && addressesMatch(payeeAddress, address ?? null),
-        isFormCompleted,
-        payeeFormUrl:
-          (metadata[PAYEE_FORM_URL_KEY] as string | undefined) ??
-          togglePayeeFormUrl,
-      };
-    }, [address, metadata, togglePayeeFormUrl]);
+    return {
+      hasPayeeKey,
+      payeeAddress,
+      currentUserIsPayee:
+        hasPayeeKey && addressesMatch(payeeAddress, address ?? null),
+      isFormCompleted,
+      payeeFormUrl:
+        (metadata[PAYEE_FORM_URL_KEY] as string | undefined) ??
+        togglePayeeFormUrl,
+    };
+  }, [address, proposal.taxFormMetadata, togglePayeeFormUrl]);
 
   const isWaitingForPayment = proposal.status === PROPOSAL_STATUS.SUCCEEDED;
-  const isSignedIn = Boolean(address) || isConnected;
+  const isSignedIn = Boolean(address);
+  const requiresTaxForm = isEnabled && isWaitingForPayment && !isFormCompleted;
 
-  // Global off: feature disabled, wrong status, or completed
-  if (!isEnabled || !isWaitingForPayment || isFormCompleted) {
+  // Global off: feature disabled, wrong status, already completed, or no payee
+  if (!requiresTaxForm) {
     return null;
   }
 
@@ -89,38 +96,11 @@ export function TaxFormBanner({ proposal }: Props) {
     );
   }
 
-  // Post-login: payee set
-  if (hasPayeeKey) {
-    if (!currentUserIsPayee) {
-      return null;
-    }
-    return (
-      <div className={bannerClass}>
-        <div className={contentClass}>
-          <div className="bg-wash rounded-md p-1.5">
-            <CheckCircleBrokenIcon className="w-4 h-4" stroke="#7A7A7A" />
-          </div>
-          <p className="text-secondary text-sm md:text-sm">
-            You’re almost ready to receive the funds from this proposal. Please
-            complete your payment information to proceed.
-          </p>
-        </div>
-        {payeeFormUrl ? (
-          <UpdatedButton
-            href={payeeFormUrl}
-            type="primary"
-            className={payeeButtonClass}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Complete payee form
-          </UpdatedButton>
-        ) : null}
-      </div>
-    );
+  // Post-login: only show for the designated payee with a known address
+  if (!hasPayeeKey || !payeeAddress || !currentUserIsPayee) {
+    return null;
   }
 
-  // Post-login: no payee set -> generic banner (no CTA)
   return (
     <div className={bannerClass}>
       <div className={contentClass}>
@@ -128,10 +108,21 @@ export function TaxFormBanner({ proposal }: Props) {
           <CheckCircleBrokenIcon className="w-4 h-4" stroke="#7A7A7A" />
         </div>
         <p className="text-secondary text-sm md:text-sm">
-          This proposal has passed. If you are the payee, please sign in to
-          complete your payment information.
+          You’re almost ready to receive the funds from this proposal. Please
+          complete your payment information to proceed.
         </p>
       </div>
+      {payeeFormUrl ? (
+        <UpdatedButton
+          href={payeeFormUrl}
+          type="primary"
+          className={payeeButtonClass}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Complete payee form
+        </UpdatedButton>
+      ) : null}
     </div>
   );
 }

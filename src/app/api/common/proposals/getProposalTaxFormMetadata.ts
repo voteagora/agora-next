@@ -15,7 +15,6 @@ export async function fetchProposalTaxFormMetadata(
 ): Promise<ProposalTaxFormMetadata> {
   const { slug, ui } = Tenant.current();
 
-  // @ts-expect-error proposalTaxFormMetadata exists on the generated Prisma client
   const rows = await prismaWeb2Client.proposalTaxFormMetadata.findMany({
     where: {
       dao_slug: slug,
