@@ -58,7 +58,7 @@ export default function ENSName({
     ? ensName || truncateAddress(address)
     : ensName || address;
 
-  const fullText = ensName || address;
+  const fullText = data || address;
 
   const copyToClipboard = (e: React.MouseEvent) => {
     e.preventDefault();
