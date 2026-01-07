@@ -1,13 +1,120 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ChannelStatusBadge, { type ChannelStatus } from "./ChannelStatusBadge";
 
+function isValidEmail(email: string): boolean {
+  if (!email) return true; // Empty is valid (handled by other checks)
+  // Basic email validation regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 interface ChannelStatusInfo {
   status: ChannelStatus;
   label?: string;
+}
+
+interface TelegramInfo {
+  username?: string;
+  chatId?: string;
+  linkingUrl?: string | null;
+  expiresAt?: number | null;
+  isInitiating: boolean;
+  error?: string | null;
+  onStartLinking: () => Promise<unknown>;
+}
+
+function TelegramChannelRow({
+  telegramStatus,
+  telegram,
+}: {
+  telegramStatus: ChannelStatusInfo;
+  telegram: TelegramInfo;
+}) {
+  const isLinked = !!telegram.chatId;
+  const expiresInMinutes =
+    telegram.expiresAt && !isLinked
+      ? Math.max(0, Math.ceil((telegram.expiresAt - Date.now()) / 60000))
+      : null;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-wide text-tertiary">
+          Telegram
+        </span>
+        <ChannelStatusBadge
+          status={telegramStatus.status}
+          label={telegramStatus.label}
+        />
+      </div>
+
+      {isLinked ? (
+        <div className="rounded-xl border border-line bg-neutral/40 p-3">
+          <div className="text-sm font-medium text-primary">
+            Linked as{" "}
+            {telegram.username ? `@${telegram.username}` : "Telegram user"}
+          </div>
+          <div className="mt-0.5 text-xs text-tertiary">
+            Chat ID: {telegram.chatId}
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {telegram.linkingUrl ? (
+            <div className="rounded-xl border border-line bg-neutral/40 p-3">
+              <div className="text-sm font-medium text-primary">
+                Complete linking in Telegram
+              </div>
+              <p className="mt-0.5 text-xs text-tertiary">
+                {expiresInMinutes !== null
+                  ? `Link expires in ${expiresInMinutes} minute${expiresInMinutes === 1 ? "" : "s"}.`
+                  : "Link is active."}
+              </p>
+              <Button
+                size="sm"
+                className="mt-2"
+                onClick={() =>
+                  window.open(
+                    telegram.linkingUrl!,
+                    "_blank",
+                    "noopener,noreferrer"
+                  )
+                }
+              >
+                Open Telegram
+              </Button>
+            </div>
+          ) : (
+            <Button
+              size="sm"
+              variant="elevatedOutline"
+              disabled={telegram.isInitiating}
+              onClick={async () => {
+                try {
+                  await telegram.onStartLinking();
+                } catch {
+                  return;
+                }
+              }}
+            >
+              {telegram.isInitiating ? "Starting..." : "Link Telegram"}
+            </Button>
+          )}
+          {telegram.error ? (
+            <p className="text-xs text-negative">{telegram.error}</p>
+          ) : null}
+        </div>
+      )}
+
+      <p className="text-xs text-tertiary">
+        Link Telegram to receive priority alerts on mobile.
+      </p>
+    </div>
+  );
 }
 
 interface ContactInformationSectionProps {
@@ -17,6 +124,8 @@ interface ContactInformationSectionProps {
   emailStatus: ChannelStatusInfo;
   discordStatus: ChannelStatusInfo;
   slackStatus: ChannelStatusInfo;
+  telegramStatus: ChannelStatusInfo;
+  telegram: TelegramInfo;
   onUpdateEmail: (email: string) => Promise<unknown>;
   onUpdateDiscord: (url: string) => Promise<unknown>;
   onUpdateSlack: (url: string) => Promise<unknown>;
@@ -35,6 +144,8 @@ export default function ContactInformationSection({
   emailStatus,
   discordStatus,
   slackStatus,
+  telegramStatus,
+  telegram,
   onUpdateEmail,
   onUpdateDiscord,
   onUpdateSlack,
@@ -60,6 +171,9 @@ export default function ContactInformationSection({
   const emailDirty = trimmedEmail !== email;
   const discordDirty = trimmedDiscord !== discordWebhook;
   const slackDirty = trimmedSlack !== slackWebhook;
+
+  const emailValid = useMemo(() => isValidEmail(trimmedEmail), [trimmedEmail]);
+  const showEmailError = trimmedEmail && !emailValid;
 
   return (
     <section className="rounded-2xl border border-line bg-white p-6 shadow-newDefault">
@@ -93,7 +207,9 @@ export default function ContactInformationSection({
             <Button
               size="sm"
               variant="elevatedOutline"
-              disabled={!trimmedEmail || !emailDirty || isUpdatingEmail}
+              disabled={
+                !trimmedEmail || !emailDirty || !emailValid || isUpdatingEmail
+              }
               onClick={async () => {
                 try {
                   await onUpdateEmail(trimmedEmail);
@@ -105,6 +221,11 @@ export default function ContactInformationSection({
               {isUpdatingEmail ? "Saving..." : "Save"}
             </Button>
           </div>
+          {showEmailError && (
+            <p className="text-xs text-negative">
+              Please enter a valid email address.
+            </p>
+          )}
           {email && emailStatus.status === "pending" && onSendVerification && (
             <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-center">
               <Button
@@ -129,6 +250,11 @@ export default function ContactInformationSection({
             </div>
           )}
         </div>
+
+        <TelegramChannelRow
+          telegramStatus={telegramStatus}
+          telegram={telegram}
+        />
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">

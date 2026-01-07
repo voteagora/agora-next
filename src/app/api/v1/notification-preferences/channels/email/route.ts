@@ -25,20 +25,29 @@ export async function POST(request: NextRequest) {
 
   const parsed = BodySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ message: "Invalid request payload" }, { status: 400 });
+    return NextResponse.json(
+      { message: "Invalid email address" },
+      { status: 400 }
+    );
   }
 
   try {
     await ensureNotificationRecipient(auth.recipientId);
-    const response = await notificationCenterClient.updateChannel(auth.recipientId, "email", {
-      type: "email",
-      address: parsed.data.email,
-      verified: false,
-    });
+    const response = await notificationCenterClient.updateChannel(
+      auth.recipientId,
+      "email",
+      {
+        type: "email",
+        address: parsed.data.email,
+        verified: false,
+      }
+    );
     return NextResponse.json(response);
   } catch (error) {
     console.error("Failed to update email channel", error);
-    return NextResponse.json({ message: "Failed to update email channel" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to update email channel" },
+      { status: 500 }
+    );
   }
 }
-
