@@ -370,7 +370,7 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       name: "footer/hide-votable-supply",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "easv2-govlessvoting",

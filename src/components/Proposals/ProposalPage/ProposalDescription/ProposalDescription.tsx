@@ -67,6 +67,7 @@ export default function ProposalDescription({
       }
     : undefined;
   const tagTextClass = tagBackground ? "text-white" : "text-neutral-700";
+  const tagBgClass = tagBackground ? "" : "bg-black/10";
   const useArchiveForProposals =
     ui.toggle("use-archive-for-proposal-details")?.enabled ?? false;
   const archiveMetadata = useArchiveForProposals
@@ -107,7 +108,7 @@ export default function ProposalDescription({
         <div className="inline-flex justify-start items-center gap-2 flex-wrap">
           {typeBadgeLabel && (
             <div
-              className={`px-2 py-0.5 bg-black/10 rounded-[3px] text-xs font-semibold leading-4 ${tagTextClass}`}
+              className={`px-2 py-0.5 rounded-[3px] text-xs font-semibold leading-4 ${tagBgClass} ${tagTextClass}`}
               style={tagBgStyle}
             >
               {typeBadgeLabel === "Gov Proposal"
@@ -116,13 +117,13 @@ export default function ProposalDescription({
             </div>
           )}
           <div
-            className={`px-2 py-0.5 bg-black/10 rounded-[3px] text-xs font-semibold leading-4 ${tagTextClass}`}
+            className={`px-2 py-0.5 rounded-[3px] text-xs font-semibold leading-4 ${tagBgClass} ${tagTextClass}`}
             style={tagBgStyle}
           >
             By {proposerBadge}
           </div>
           <div
-            className={`px-2 py-0.5 rounded-[3px] text-xs font-semibold leading-4 bg-black/10 ${
+            className={`px-2 py-0.5 rounded-[3px] text-xs font-semibold leading-4 ${tagBgClass} ${
               hasPendingRanges ? "opacity-50" : ""
             } ${tagTextClass}`}
             style={tagBgStyle}

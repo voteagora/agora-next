@@ -101,13 +101,14 @@ function OODaoBadges({
       }
     : undefined;
   const tagTextClass = tagBackground ? "text-white" : "text-neutral-700";
+  const tagBgClass = tagBackground ? "" : "bg-black/10";
 
   return (
     <div className="inline-flex justify-start items-center gap-1.5 flex-wrap">
       {/* Tag badge */}
       {data.proposalTypeTag && (
         <div
-          className="px-2 py-0.5 rounded-[3px] flex justify-center items-center gap-0.5"
+          className={`px-2 py-0.5 rounded-[3px] flex justify-center items-center gap-0.5 ${tagBgClass}`}
           style={tagBgStyle}
         >
           <div className={`${tagTextClass} text-xs font-semibold leading-4`}>
@@ -120,7 +121,7 @@ function OODaoBadges({
 
       {/* Author badge */}
       <div
-        className="px-2 py-0.5 rounded-[3px] flex justify-center items-center gap-0.5"
+        className={`px-2 py-0.5 rounded-[3px] flex justify-center items-center gap-0.5 ${tagBgClass}`}
         style={tagBgStyle}
       >
         <div className={`${tagTextClass} text-xs font-semibold leading-4`}>
@@ -135,7 +136,7 @@ function OODaoBadges({
 
       {/* Proposal type badge */}
       <div
-        className={`px-2 py-0.5 rounded-[3px] flex justify-center items-center gap-0.5 ${
+        className={`px-2 py-0.5 rounded-[3px] flex justify-center items-center gap-0.5 ${tagBgClass} ${
           data.hasPendingRanges ? "opacity-50" : ""
         }`}
         style={tagBgStyle}
