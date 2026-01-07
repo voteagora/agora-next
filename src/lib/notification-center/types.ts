@@ -1,4 +1,4 @@
-export type ChannelType = "email" | "discord" | "telegram" | "slack";
+export type ChannelType = "email" | "discord" | "telegram" | "slack" | "pwa";
 export type PreferenceState = "on" | "off";
 export type Frequency = "instant" | "daily_summary" | "weekly_digest";
 export type RecipientType = "wallet_address" | "atlas_user" | "email_only";
@@ -26,17 +26,28 @@ export interface TelegramChannelConfig {
   username?: string;
 }
 
+export interface PwaChannelConfig {
+  type: "pwa";
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+}
+
 export type ChannelConfig =
   | EmailChannelConfig
   | DiscordChannelConfig
   | SlackChannelConfig
-  | TelegramChannelConfig;
+  | TelegramChannelConfig
+  | PwaChannelConfig;
 
 export interface ChannelConfigs {
   email?: EmailChannelConfig;
   discord?: DiscordChannelConfig;
   slack?: SlackChannelConfig;
   telegram?: TelegramChannelConfig;
+  pwa?: PwaChannelConfig;
 }
 
 export interface Recipient {
