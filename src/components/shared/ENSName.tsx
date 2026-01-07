@@ -13,10 +13,11 @@ import {
 interface ENSNameProps {
   address: string;
   truncate?: boolean;
+  includeCtoC?: boolean;
 }
 
 // This component will display the ENS name for a given address
-export default function ENSName({ address, truncate = true }: ENSNameProps) {
+export default function ENSName({ address, truncate = true, includeCtoC = false }: ENSNameProps) {
   const [ensName, setEnsName] = useState(
     truncate ? truncateAddress(address || "") : address || ""
   );
@@ -37,6 +38,12 @@ export default function ENSName({ address, truncate = true }: ENSNameProps) {
   const displayText = truncate
     ? ensName || truncateAddress(address)
     : ensName || address;
+  
+  const fullText = ensName || address;
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(fullText);
+  };
 
   return (
     <TooltipProvider>
@@ -48,6 +55,15 @@ export default function ENSName({ address, truncate = true }: ENSNameProps) {
           <p>{address}</p>
         </TooltipContent>
       </Tooltip>
+      {includeCtoC && (
+        <button
+          onClick={copyToClipboard}
+          className="ml-1 opacity-50 hover:opacity-100 cursor-pointer"
+          aria-label="Copy to clipboard"
+        >
+          📋
+        </button>
+      )}
     </TooltipProvider>
   );
 }
