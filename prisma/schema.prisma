@@ -5447,58 +5447,8 @@ model ForumCategoryAttachment {
   @@schema("alltenant")
 }
 
-enum forum_permission_type {
-  manage_topics
-  create_topics
-  manage_attachments
-  create_attachments
-
-  @@schema("alltenant")
-}
-
-enum permission_scope {
-  forum
-  category
-
-  @@schema("alltenant")
-}
-
-enum admin_role {
-  admin
-  duna_admin
-  super_admin
-
-  @@schema("alltenant")
-}
-
-model ForumPermission {
-  id             Int                   @id @default(autoincrement())
-  dao_slug       DaoSlug
-  permissionType forum_permission_type @map("permission_type")
-  scope          permission_scope      @default(forum)
-  scopeId        Int?                  @map("scope_id")
-  address        String
-
-  @@unique([dao_slug, permissionType, scope, scopeId, address])
-  @@index([dao_slug, permissionType])
-  @@index([dao_slug, scope, scopeId])
-  @@index([dao_slug, address])
-  @@index([dao_slug, permissionType, address])
-  @@map("forum_permissions")
-  @@schema("alltenant")
-}
-
-model ForumAdmin {
-  dao_slug        DaoSlug
-  address         String
-  role            admin_role @default(admin)
-  managedAccounts DaoSlug[]  @map("managed_accounts")
-  createdAt       DateTime   @default(now()) @map("created_at")
-
-  @@id([dao_slug, address])
-  @@map("forum_admins")
-  @@schema("alltenant")
-}
+// Legacy admin and permission models removed - replaced by RBAC system
+// See ForumRole, ForumPermission (renamed from Permission), ForumUserRole models below
 
 model ForumTopicSubscription {
   dao_slug  DaoSlug
@@ -5613,7 +5563,7 @@ model ForumRole {
     @@schema("alltenant")
 }
 
-model Permission {
+model ForumPermission {
     id          Int      @id @default(autoincrement())
     module      String
     resource    String
@@ -5626,7 +5576,7 @@ model Permission {
 
     @@unique([module, resource, action])
     @@index([module])
-    @@map("permissions")
+    @@map("forum_permissions")
     @@schema("alltenant")
 }
 
@@ -5638,8 +5588,8 @@ model ForumRolePermission {
     createdAt    DateTime @default(now()) @map("created_at")
 
     // Relations
-    role       ForumRole  @relation(fields: [roleId], references: [id], onDelete: Cascade)
-    permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+    role       ForumRole        @relation(fields: [roleId], references: [id], onDelete: Cascade)
+    permission ForumPermission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
     @@unique([roleId, permissionId])
     @@index([roleId])
