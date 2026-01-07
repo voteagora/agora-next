@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
@@ -16,7 +16,7 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { canDeleteContent } from "@/lib/forumUtils";
 import { DunaContentRenderer, DunaEditor } from "@/components/duna-editor";
 import { Button } from "@/components/ui/button";
-import { Reply } from "lucide-react";
+import { Reply, Link as LinkIcon } from "lucide-react";
 import SoftDeletedContent from "@/components/Forum/SoftDeletedContent";
 import EmojiReactions from "@/components/Forum/EmojiReactions";
 import { cn } from "@/lib/utils";
@@ -58,6 +58,7 @@ interface CommentItemProps extends Omit<ThreadProps, "comments"> {
   adminAddressSet: Set<string>;
   adminRoleMap: Map<string, string | null>;
   onImageUpload?: (file: File) => Promise<string>;
+  topicSlug?: string;
 }
 
 const CommentItem = ({
@@ -78,6 +79,8 @@ const CommentItem = ({
   adminAddressSet,
   adminRoleMap,
   onImageUpload,
+  topicSlug,
+  topicId,
 }: CommentItemProps) => {
   // Replies are always shown (no expand/collapse toggle)
   const { address } = useAccount();
@@ -179,6 +182,20 @@ const CommentItem = ({
     });
   };
 
+  const handleCopyLink = async () => {
+    if (!topicId) return;
+
+    const url = new URL(window.location.href);
+    url.search = `?post=${comment.id}`;
+
+    try {
+      await navigator.clipboard.writeText(url.toString());
+      toast.success("Link copied to clipboard!");
+    } catch (err) {
+      toast.error("Failed to copy link");
+    }
+  };
+
   if (comment.deletedAt) {
     // Check if user can restore: either own comment OR has RBAC permission
     const canRestore = isOwnPost || canSoftDeleteOrRestore;
@@ -200,7 +217,7 @@ const CommentItem = ({
 
   return (
     // ml-2 sm:ml-4 mt-3 sm:mt-4 removed styles below
-    <div className={`${depth > 0 ? "" : ""}`}>
+    <div id={`post-${comment.id}`} className={`${depth > 0 ? "" : ""}`}>
       <div className="flex gap-2 sm:gap-3 relative">
         <div className="flex-shrink-0">
           {profileHref ? (
@@ -311,6 +328,19 @@ const CommentItem = ({
               Reply
             </Button>
 
+            {topicId && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCopyLink}
+                className="text-xs text-secondary hover:text-primary p-1 h-6"
+                title="Copy link to this comment"
+              >
+                <LinkIcon className="w-3 h-3 mr-1" />
+                Share
+              </Button>
+            )}
+
             {hasReplies && !forForums && (
               <button
                 onClick={() => setShowReplies(!showReplies)}
@@ -348,6 +378,8 @@ const CommentItem = ({
                 adminAddressSet={adminAddressSet}
                 adminRoleMap={adminRoleMap}
                 onImageUpload={onImageUpload}
+                topicSlug={topicSlug}
+                topicId={topicId}
               />
             </div>
           ))}
@@ -410,6 +442,7 @@ interface CommentThreadProps extends Omit<ThreadProps, "parentId" | "depth"> {
   adminAddressSet: Set<string>;
   adminRoleMap: Map<string, string | null>;
   onImageUpload?: (file: File) => Promise<string>;
+  topicSlug?: string;
 }
 
 const CommentThread = ({
@@ -426,10 +459,12 @@ const CommentThread = ({
   onSubmitReply,
   onCancelReply,
   categoryId,
+  topicId,
   forForums,
   adminAddressSet,
   adminRoleMap,
   onImageUpload,
+  topicSlug,
 }: CommentThreadProps) => {
   const filteredComments = comments.filter((comment) => {
     if (parentId === null) return !comment.parentId;
@@ -454,10 +489,12 @@ const CommentThread = ({
             onSubmitReply={onSubmitReply}
             onCancelReply={onCancelReply}
             categoryId={categoryId}
+            topicId={topicId}
             forForums={forForums}
             adminAddressSet={adminAddressSet}
             adminRoleMap={adminRoleMap}
             onImageUpload={onImageUpload}
+            topicSlug={topicSlug}
           />
         </div>
       ))}
@@ -482,6 +519,29 @@ export default function Thread({
   adminAddresses = [],
   adminDirectory,
 }: ThreadProps) {
+  const hasScrolledRef = useRef(false);
+
+  // Scroll to specific post if URL contains post parameter
+  useEffect(() => {
+    if (hasScrolledRef.current) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get("post");
+
+    if (postId) {
+      hasScrolledRef.current = true;
+      const element = document.getElementById(`post-${postId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        element.style.transition = "background-color 0.5s ease";
+        element.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
+        setTimeout(() => {
+          element.style.backgroundColor = "";
+        }, 1000);
+      }
+    }
+  }, []);
+
   const normalizedDirectory = React.useMemo(() => {
     if (adminDirectory && adminDirectory.length) {
       return adminDirectory
@@ -551,6 +611,7 @@ export default function Thread({
         onSubmitReply={onSubmitReply}
         onCancelReply={onCancelReply}
         categoryId={categoryId}
+        topicId={topicId}
         forForums={forForums}
         adminAddressSet={adminAddressSet}
         adminRoleMap={adminRoleMap}

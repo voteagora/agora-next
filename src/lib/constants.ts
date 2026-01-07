@@ -242,7 +242,7 @@ export const ADMIN_TYPES: Record<string, string> = {
 export const ARCHIVE_GCS_BUCKET =
   process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
     ? "https://storage.googleapis.com/cpls-usmr-prd-25q4"
-    : "https://storage.googleapis.com/cpls-usmr-dev-test-25q4";
+    : "https://storage.googleapis.com/cpls-usmr-dev-25q3";
 
 export const getArchiveSlugGCSbucket = (namespace: string) => {
   return `${ARCHIVE_GCS_BUCKET}/data/${namespace}`;

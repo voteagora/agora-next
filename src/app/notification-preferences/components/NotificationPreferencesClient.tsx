@@ -22,7 +22,6 @@ import {
   waitForStoredSiweJwt,
 } from "@/lib/siweSession";
 import ContactInformationSection from "./ContactInformationSection";
-import TelegramLinkingSection from "./TelegramLinkingSection";
 import PreferencesMatrix from "./PreferencesMatrix";
 import type { ChannelStatus } from "./ChannelStatusBadge";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -397,11 +396,15 @@ export default function NotificationPreferencesClient() {
 
       return { previous };
     },
-    onError: (_error, _email, context) => {
+    onError: (error, _email, context) => {
       if (context?.previous) {
         queryClient.setQueryData(queryKey, context.previous);
       }
-      toast.error("Failed to update email.");
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : "Failed to update email.";
+      toast.error(message);
     },
     onSuccess: () => {
       toast.success("Email updated.");
@@ -765,6 +768,16 @@ export default function NotificationPreferencesClient() {
         emailStatus={channelStatus.email}
         discordStatus={channelStatus.discord}
         slackStatus={channelStatus.slack}
+        telegramStatus={channelStatus.telegram}
+        telegram={{
+          username: recipient?.channels?.telegram?.username,
+          chatId: recipient?.channels?.telegram?.chat_id,
+          linkingUrl: telegramLink?.url,
+          expiresAt: telegramLink?.expiresAt,
+          isInitiating: telegramLinkMutation.isPending,
+          error: telegramError,
+          onStartLinking: telegramLinkMutation.mutateAsync,
+        }}
         onUpdateEmail={updateEmailMutation.mutateAsync}
         onUpdateDiscord={updateDiscordMutation.mutateAsync}
         onUpdateSlack={updateSlackMutation.mutateAsync}
@@ -776,19 +789,7 @@ export default function NotificationPreferencesClient() {
         verificationSentAt={verificationSentAt}
       />
 
-      <TelegramLinkingSection
-        telegramStatus={channelStatus.telegram}
-        username={recipient?.channels?.telegram?.username}
-        chatId={recipient?.channels?.telegram?.chat_id}
-        linkingUrl={telegramLink?.url}
-        expiresAt={telegramLink?.expiresAt}
-        isInitiating={telegramLinkMutation.isPending}
-        error={telegramError}
-        onStartLinking={telegramLinkMutation.mutateAsync}
-      />
-
       <PushNotificationSection status={channelStatus.pwa.status} />
-
       <PreferencesMatrix
         eventTypes={eventTypes}
         preferences={preferences}

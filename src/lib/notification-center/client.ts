@@ -29,7 +29,6 @@ export interface UpdateRecipientInput {
 
 export interface PreferenceUpdateEntry {
   state: PreferenceState;
-  frequency?: "instant" | "daily_summary" | "weekly_digest";
 }
 
 export type PreferencesUpdate = Record<string, Record<ChannelType, PreferenceUpdateEntry>>;

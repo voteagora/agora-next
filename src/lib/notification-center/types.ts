@@ -1,6 +1,5 @@
 export type ChannelType = "email" | "discord" | "telegram" | "slack" | "pwa";
 export type PreferenceState = "on" | "off";
-export type Frequency = "instant" | "daily_summary" | "weekly_digest";
 export type RecipientType = "wallet_address" | "atlas_user" | "email_only";
 
 export interface EmailChannelConfig {
@@ -62,7 +61,6 @@ export interface Recipient {
 
 export interface PreferenceEntry {
   state: PreferenceState;
-  frequency?: Frequency;
   updated_at?: string;
 }
 
