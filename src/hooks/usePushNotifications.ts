@@ -22,6 +22,7 @@ interface UsePushNotificationsReturn {
   permission: NotificationPermission;
   subscribe: (address: string) => Promise<void>;
   unsubscribe: () => Promise<void>;
+  subscription: PushSubscription | null;
   loading: boolean;
   error: string | null;
 }
@@ -29,6 +30,7 @@ interface UsePushNotificationsReturn {
 export const usePushNotifications = (): UsePushNotificationsReturn => {
   const [isSupported, setIsSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subscription, setSubscription] = useState<PushSubscription | null>(null);
   const [permission, setPermission] =
     useState<NotificationPermission>("default");
   const [loading, setLoading] = useState(false);
@@ -45,8 +47,9 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
 
       // Check initial subscription state
       navigator.serviceWorker.ready.then(async (registration) => {
-        const subscription = await registration.pushManager.getSubscription();
-        setIsSubscribed(!!subscription);
+        const sub = await registration.pushManager.getSubscription();
+        setIsSubscribed(!!sub);
+        setSubscription(sub);
       });
     }
   }, []);
@@ -59,6 +62,7 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
 
       // 1. Request Permission
       const permissionResult = await Notification.requestPermission();
+      
       setPermission(permissionResult);
       if (permissionResult !== "granted") {
         throw new Error("Permission denied");
@@ -93,6 +97,7 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
 
       console.log("Push Subscription Registered");
       setIsSubscribed(true);
+      setSubscription(subscription);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to subscribe");
       console.error("Push Subscription Error:", err);
@@ -111,6 +116,7 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
         await subscription.unsubscribe();
         // TODO: Notify server about unsubscription
         setIsSubscribed(false);
+        setSubscription(null);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to unsubscribe");
@@ -122,6 +128,7 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
   return {
     isSupported,
     isSubscribed,
+    subscription, 
     permission,
     subscribe,
     unsubscribe,

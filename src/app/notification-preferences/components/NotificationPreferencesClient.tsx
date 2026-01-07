@@ -25,8 +25,10 @@ import ContactInformationSection from "./ContactInformationSection";
 import TelegramLinkingSection from "./TelegramLinkingSection";
 import PreferencesMatrix from "./PreferencesMatrix";
 import type { ChannelStatus } from "./ChannelStatusBadge";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+import PushNotificationSection from "./PushNotificationSection";
 
-const CHANNEL_ORDER: ChannelType[] = ["email", "telegram", "discord", "slack"];
+const CHANNEL_ORDER: ChannelType[] = ["email", "telegram", "discord", "slack", "pwa"];
 
 type TelegramLinkState = {
   url: string;
@@ -49,6 +51,7 @@ export default function NotificationPreferencesClient() {
   const [siweJwt, setSiweJwt] = useState<string | null | undefined>(undefined);
   const [siweError, setSiweError] = useState<string | null>(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const { isSubscribed: isPushSubscribed } = usePushNotifications();
 
   const recipientId = address?.toLowerCase() ?? "";
   const queryKey = ["notification-settings", recipientId];
@@ -287,8 +290,11 @@ export default function NotificationPreferencesClient() {
       slack: slack?.webhook_url
         ? { status: "connected", label: "Connected" }
         : { status: "disconnected", label: "Not connected" },
+      pwa: isPushSubscribed
+        ? { status: "connected", label: "Active" }
+        : { status: "disconnected", label: "Inactive" },
     };
-  }, [recipient]);
+  }, [recipient, isPushSubscribed]);
 
   const updateCachedRecipient = (
     updater: (current: Recipient) => Recipient
@@ -753,6 +759,8 @@ export default function NotificationPreferencesClient() {
         error={telegramError}
         onStartLinking={telegramLinkMutation.mutateAsync}
       />
+
+      <PushNotificationSection status={channelStatus.pwa.status} />
 
       <PreferencesMatrix
         eventTypes={eventTypes}
