@@ -1191,7 +1191,7 @@ view uniswapDelegateChangedEvents {
 
 model ProposalDraft {
   id                       Int                        @id @default(autoincrement())
-  uuid                     String                     @unique @default(uuid()) @db.Uuid
+  uuid                     String                     @unique @db.Uuid @default(uuid())
   temp_check_link          String
   proposal_type            String?                    @db.VarChar(50)
   voting_module_type       String?                    @db.VarChar(50)
@@ -1922,16 +1922,16 @@ view syndicate_delegates_wrapper {
 view syndicate_advanced_voting_power_raw_snaps {
   chain_str           String?
   delegate            String?
-  chain               String[]
-  rules               Json?
-  allowance           Decimal? @db.Decimal
-  subdelegated_share  Decimal? @db.Decimal
-  subdelegated_amount Decimal? @db.Decimal
-  balance             Decimal? @db.Decimal
-  block_number        BigInt?
-  proxy               String?
-  contract            String?  @db.VarChar
-  ordinal             Decimal? @db.Decimal
+  chain                String[]
+  rules                Json?
+  allowance            Decimal? @db.Decimal
+  subdelegated_share   Decimal? @db.Decimal
+  subdelegated_amount  Decimal? @db.Decimal
+  balance              Decimal? @db.Decimal
+  block_number         BigInt?
+  proxy                String?
+  contract             String?  @db.VarChar
+  ordinal              Decimal? @db.Decimal
 
   @@map("advanced_voting_power_raw_snaps")
   @@ignore
@@ -5206,7 +5206,6 @@ enum DaoSlug {
   LINEA
   TOWNS
   SYNDICATE
-
   @@map("dao_slug")
   @@schema("config")
 }
@@ -5336,22 +5335,22 @@ model ForumCategory {
 }
 
 model ForumTopic {
-  id            Int                      @id @default(autoincrement())
-  dao_slug      DaoSlug
-  title         String
-  address       String
-  categoryId    Int?                     @map("category_id")
-  category      ForumCategory?           @relation(fields: [categoryId], references: [id])
-  postsCount    Int                      @default(0) @map("posts_count")
-  archived      Boolean                  @default(false)
-  deletedAt     DateTime?                @map("deleted_at")
-  deletedBy     String?                  @map("deleted_by")
-  isNsfw        Boolean                  @default(false) @map("is_nsfw")
-  createdAt     DateTime                 @default(now()) @map("created_at")
-  updatedAt     DateTime                 @updatedAt @map("updated_at")
-  posts         ForumPost[]
-  subscriptions ForumTopicSubscription[]
-  viewStats     ForumTopicViewStats[]
+  id             Int                      @id @default(autoincrement())
+  dao_slug       DaoSlug
+  title          String
+  address        String
+  categoryId     Int?                     @map("category_id")
+  category       ForumCategory?           @relation(fields: [categoryId], references: [id])
+  postsCount     Int                      @default(0) @map("posts_count")
+  archived       Boolean                  @default(false)
+  deletedAt      DateTime?                @map("deleted_at")
+  deletedBy      String?                  @map("deleted_by")
+  isNsfw         Boolean                  @default(false) @map("is_nsfw")
+  createdAt      DateTime                 @default(now()) @map("created_at")
+  updatedAt      DateTime                 @updatedAt @map("updated_at")
+  posts          ForumPost[]
+  subscriptions  ForumTopicSubscription[]
+  viewStats      ForumTopicViewStats[]
 
   @@index([dao_slug])
   @@index([dao_slug, categoryId])
@@ -5360,22 +5359,22 @@ model ForumTopic {
 }
 
 model ForumPost {
-  id           Int                   @id @default(autoincrement())
-  dao_slug     DaoSlug
-  topicId      Int                   @map("topic_id")
-  topic        ForumTopic            @relation(fields: [topicId], references: [id])
-  address      String
-  parentPostId Int?                  @map("parent_post_id")
-  parentPost   ForumPost?            @relation("PostToPost", fields: [parentPostId], references: [id])
-  replies      ForumPost[]           @relation("PostToPost")
-  content      String
-  deletedAt    DateTime?             @map("deleted_at")
-  deletedBy    String?               @map("deleted_by")
-  isNsfw       Boolean               @default(false) @map("is_nsfw")
-  createdAt    DateTime              @default(now()) @map("created_at")
-  votes        ForumPostVote[]
-  reactions    ForumPostReaction[]
-  attachments  ForumPostAttachment[]
+  id             Int                   @id @default(autoincrement())
+  dao_slug       DaoSlug
+  topicId        Int                   @map("topic_id")
+  topic          ForumTopic            @relation(fields: [topicId], references: [id])
+  address        String
+  parentPostId   Int?                  @map("parent_post_id")
+  parentPost     ForumPost?            @relation("PostToPost", fields: [parentPostId], references: [id])
+  replies        ForumPost[]           @relation("PostToPost")
+  content        String
+  deletedAt      DateTime?             @map("deleted_at")
+  deletedBy      String?               @map("deleted_by")
+  isNsfw         Boolean               @default(false) @map("is_nsfw")
+  createdAt      DateTime              @default(now()) @map("created_at")
+  votes          ForumPostVote[]
+  reactions      ForumPostReaction[]
+  attachments    ForumPostAttachment[]
 
   @@index([dao_slug])
   @@index([dao_slug, topicId])
@@ -5547,10 +5546,10 @@ model ForumAuditLog {
 
 model ForumTopicViewStats {
   dao_slug    DaoSlug
-  topicId     Int        @map("topic_id")
+  topicId     Int       @map("topic_id")
   topic       ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  views       Int        @default(0)
-  lastUpdated DateTime   @default(now()) @map("last_updated")
+  views       Int       @default(0)
+  lastUpdated DateTime  @default(now()) @map("last_updated")
 
   @@id([dao_slug, topicId])
   @@map("forum_topic_view_stats")
@@ -5570,20 +5569,35 @@ model ProposalLinks {
 }
 
 model ProposalExecutionTransaction {
-  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tenant           String
-  proposal_id      String   @map("proposal_id")
-  transaction_hash String   @map("transaction_hash")
-  chain_id         Int      @map("chain_id")
-  executed_by      String   @map("executed_by")
-  executed_at      DateTime @map("executed_at")
-  created_at       DateTime @default(now()) @map("created_at")
-  updated_at       DateTime @default(now()) @map("updated_at")
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant          String
+  proposal_id     String    @map("proposal_id")
+  transaction_hash String    @map("transaction_hash")
+  chain_id        Int       @map("chain_id")
+  executed_by     String    @map("executed_by")
+  executed_at     DateTime  @map("executed_at")
+  created_at      DateTime  @default(now()) @map("created_at")
+  updated_at      DateTime  @default(now()) @map("updated_at")
 
   @@unique([tenant, proposal_id, transaction_hash])
   @@index([tenant, proposal_id])
   @@index([executed_at])
   @@map("proposal_execution_transactions")
+  @@schema("alltenant")
+}
+
+model ProposalTaxFormMetadata {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dao_slug   DaoSlug
+  proposalId String   @map("proposal_id")
+  key        String
+  value      Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+
+  @@unique([dao_slug, proposalId, key])
+  @@index([dao_slug, proposalId])
+  @@map("proposal_tax_form_metadata")
   @@schema("alltenant")
 }
 
@@ -5691,18 +5705,4 @@ model ForumRoleChangeAudit {
     @@index([daoSlug, timestamp])
     @@map("forum_role_change_audit")
     @@schema("alltenant")
-}
-model ProposalTaxFormMetadata {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  dao_slug   DaoSlug
-  proposalId String   @map("proposal_id")
-  key        String
-  value      Json?
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @default(now()) @map("updated_at")
-
-  @@unique([dao_slug, proposalId, key])
-  @@index([dao_slug, proposalId])
-  @@map("proposal_tax_form_metadata")
-  @@schema("alltenant")
 }
