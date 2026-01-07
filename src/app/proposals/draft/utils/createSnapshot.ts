@@ -3,6 +3,7 @@ import { ProposalDraft } from "@prisma/client";
 import crossFetch from "cross-fetch";
 import Tenant from "@/lib/tenant/tenant";
 import { mainnet } from "viem/chains";
+import { isMainContractDeployment } from "@/lib/envConfig";
 
 export const proposalTypes = {
   Proposal: [
@@ -38,10 +39,9 @@ export const domain = {
   // chainId: 1
 };
 
-const hub =
-  process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-    ? "https://hub.snapshot.org/api/msg"
-    : "https://testnet.hub.snapshot.org/api/msg";
+const hub = isMainContractDeployment()
+  ? "https://hub.snapshot.org/api/msg"
+  : "https://testnet.hub.snapshot.org/api/msg";
 
 export interface SnapshotProposalMessage {
   from?: string;

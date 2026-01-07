@@ -15,7 +15,7 @@ const SocialProposalAction = ({
 }: {
   draftProposal: SocialProposal;
 }) => {
-  const { ui, isProd } = Tenant.current();
+  const { ui, isMain } = Tenant.current();
   const plmToggle = ui.toggle("proposal-lifecycle");
 
   const [isSnapshotPending, setIsSnapshotPending] = useState<boolean>(false);
@@ -37,7 +37,7 @@ const SocialProposalAction = ({
           });
 
           // TODO: make snapshot pull from config
-          const snapshotLink = isProd
+          const snapshotLink = isMain
             ? `https://snapshot.org/#/${(plmToggle?.config as PLMConfig)?.snapshotConfig?.domain}/proposal/${proposalId}`
             : `https://testnet.snapshot.org/#/michaelagora.eth/proposal/${proposalId}`;
 

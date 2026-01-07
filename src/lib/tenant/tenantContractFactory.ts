@@ -19,40 +19,40 @@ import { syndicateTenantConfig } from "./configs/contracts/syndicate";
 export default class TenantContractFactory {
   public static create(
     namespace: TenantNamespace,
-    isProd: boolean,
+    isMain: boolean,
     alchemyId: string
   ): TenantContracts {
     switch (namespace) {
       case TENANT_NAMESPACES.ETHERFI:
-        return etherfiTenantContractConfig({ isProd, alchemyId });
+        return etherfiTenantContractConfig({ isMain, alchemyId });
       case TENANT_NAMESPACES.ENS:
-        return ensTenantContractConfig({ isProd, alchemyId });
+        return ensTenantContractConfig({ isMain, alchemyId });
       case TENANT_NAMESPACES.OPTIMISM:
-        return optimismTenantContractConfig({ isProd, alchemyId });
+        return optimismTenantContractConfig({ isMain, alchemyId });
       case TENANT_NAMESPACES.UNISWAP:
-        return uniswapTenantContractConfig({ isProd, alchemyId });
+        return uniswapTenantContractConfig({ isMain, alchemyId });
       case TENANT_NAMESPACES.CYBER:
-        return cyberTenantConfig({ isProd, alchemyId });
+        return cyberTenantConfig({ isMain, alchemyId });
       case TENANT_NAMESPACES.DERIVE:
-        return deriveTenantConfig({ isProd, alchemyId });
+        return deriveTenantConfig({ isMain, alchemyId });
       case TENANT_NAMESPACES.SCROLL:
-        return scrollTenantContractConfig({ isProd, alchemyId });
+        return scrollTenantContractConfig({ isMain, alchemyId });
       case TENANT_NAMESPACES.PGUILD:
-        return protocolGuildTenantContractConfig({ isProd, alchemyId });
+        return protocolGuildTenantContractConfig({ isMain, alchemyId });
       case TENANT_NAMESPACES.BOOST:
-        return boostTenantConfig({ isProd, alchemyId });
+        return boostTenantConfig({ isMain, alchemyId });
       case TENANT_NAMESPACES.XAI:
-        return xaiTenantConfig({ isProd, alchemyId });
+        return xaiTenantConfig({ isMain, alchemyId });
       case TENANT_NAMESPACES.B3:
-        return b3TenantConfig({ isProd, alchemyId });
+        return b3TenantConfig({ isMain, alchemyId });
       case TENANT_NAMESPACES.DEMO:
-        return demoTenantConfig({ isProd, alchemyId });
+        return demoTenantConfig({ isMain, alchemyId });
       case TENANT_NAMESPACES.LINEA:
-        return lineaTenantConfig({ isProd, alchemyId });
+        return lineaTenantConfig({ isMain, alchemyId });
       case TENANT_NAMESPACES.TOWNS:
-        return townsTenantConfig({ isProd, alchemyId });
+        return townsTenantConfig({ isMain, alchemyId });
       case TENANT_NAMESPACES.SYNDICATE:
-        return syndicateTenantConfig({ isProd, alchemyId });
+        return syndicateTenantConfig({ isMain, alchemyId });
 
       default:
         throw new Error(`Invalid namespace: ${namespace}`);

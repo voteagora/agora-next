@@ -18,27 +18,27 @@ import {
 } from "@/lib/constants";
 
 interface Props {
-  isProd: boolean;
+  isMain: boolean;
   alchemyId: string;
 }
 
 export const protocolGuildTenantContractConfig = ({
-  isProd,
+  isMain,
   alchemyId,
 }: Props): TenantContracts => {
-  const TOKEN = isProd
+  const TOKEN = isMain
     ? "0x949f5b6183aA74272Ddad7f8f8DC309F8186E858"
     : "0xE3D4a55f780C5aD9B3009523CB6a3d900A8FA723";
 
-  const GOVERNOR = isProd
+  const GOVERNOR = isMain
     ? "0x85d6bcc74877a1c6fc66a8cd14369f939663f68f"
     : "0x2A6a9a2A3f6f3420e26410CA5868ED1cb241A7bA";
 
-  const TIMELOCK = isProd
+  const TIMELOCK = isMain
     ? "0xaac9059248a06233db16fc9c25426365b7afb481"
     : "0xF5B87BD1206d7658C344Fe1CB56D9498B4286A67";
 
-  const TYPES = isProd
+  const TYPES = isMain
     ? "0xbfc07a8c9615fe62979f02cd0d975caf61ed0d63"
     : "0xb1155A59A8B2bff8f028d5f22EEB18d2841B821E";
 
@@ -48,11 +48,11 @@ export const protocolGuildTenantContractConfig = ({
 
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : isProd
+    : isMain
       ? new AlchemyProvider("mainnet", alchemyId)
       : new AlchemyProvider("sepolia", alchemyId);
 
-  const chain = isProd ? mainnet : sepolia;
+  const chain = isMain ? mainnet : sepolia;
 
   return {
     token: createTokenContract({

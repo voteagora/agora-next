@@ -17,23 +17,23 @@ import {
 } from "@/lib/constants";
 
 interface Props {
-  isProd: boolean;
+  isMain: boolean;
   alchemyId: string;
 }
 
 export const ensTenantContractConfig = ({
-  isProd,
+  isMain,
   alchemyId,
 }: Props): TenantContracts => {
-  const TOKEN = isProd
+  const TOKEN = isMain
     ? "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72"
     : "0xca83e6932cf4F03cDd6238be0fFcF2fe97854f67";
 
-  const GOVERNOR = isProd
+  const GOVERNOR = isMain
     ? "0x323A76393544d5ecca80cd6ef2A560C6a395b7E3"
     : "0xb65c031ac61128ae791d42ae43780f012e2f7f89";
 
-  const TIMELOCK = isProd
+  const TIMELOCK = isMain
     ? "0xFe89cc7aBB2C4183683ab71653C4cdc9B02D44b7"
     : "0x1E9BE5E89AE5ccBf047477Ac01D3d4b0eBFB328e";
 
@@ -41,11 +41,11 @@ export const ensTenantContractConfig = ({
 
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : isProd
+    : isMain
       ? new AlchemyProvider("mainnet", alchemyId)
       : new AlchemyProvider("sepolia", alchemyId);
 
-  const chain = isProd ? mainnet : sepolia;
+  const chain = isMain ? mainnet : sepolia;
 
   return {
     token: createTokenContract({

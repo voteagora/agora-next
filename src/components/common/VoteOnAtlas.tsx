@@ -1,9 +1,9 @@
 import Link from "next/link";
+import { isMainContractDeployment } from "@/lib/envConfig";
 
-const ATLAS_URL =
-  process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-    ? "https://atlas.optimism.io/"
-    : "https://op-atlas-fx6v5dqp9-voteagora.vercel.app/";
+const ATLAS_URL = isMainContractDeployment()
+  ? "https://atlas.optimism.io/"
+  : "https://op-atlas-fx6v5dqp9-voteagora.vercel.app/";
 
 export const VoteOnAtlas = ({
   offchainProposalId,

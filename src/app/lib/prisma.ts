@@ -18,7 +18,7 @@ if (process.env.DATABASE_URL === "dev") {
 } else if (process.env.DATABASE_URL === "prod") {
   envSuffix = "PROD";
 } else {
-  const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
+  const isProd = process.env.NEXT_PUBLIC_AGORA_INFRA_ENV === "prod";
   envSuffix = isProd ? "PROD" : "DEV";
 }
 

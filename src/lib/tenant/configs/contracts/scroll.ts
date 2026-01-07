@@ -19,31 +19,31 @@ import {
 } from "@/lib/constants";
 
 interface Props {
-  isProd: boolean;
+  isMain: boolean;
   alchemyId: string;
 }
 
 export const scrollTenantContractConfig = ({
-  isProd,
+  isMain,
   alchemyId,
 }: Props): TenantContracts => {
-  const TOKEN = isProd
+  const TOKEN = isMain
     ? "0xd29687c813D741E2F938F4aC377128810E217b1b"
     : "0xBa61Bf34b51aD4710a784dc5B675df67817FCDa6";
 
-  const GOVERNOR = isProd
+  const GOVERNOR = isMain
     ? "0x2f3F2054776bd3C2fc30d750734A8F539Bb214f0"
     : "0x9394E163ce253f29086A4A2733BcfC0ca28fFc6c";
 
-  const TREASURY = isProd
+  const TREASURY = isMain
     ? ["0x79D83D1518e2eAA64cdc0631df01b06e2762CC14"]
     : ["0xE27B7b6DB440b27249b49E3C0A686B82c36A0D7e"];
 
-  const TYPES = isProd
+  const TYPES = isMain
     ? "0xfDa7cF1D9C51b3fab41E2e4093374DD8715D640E"
     : "0x011EE4D990219F5ee8718005fc3484890E170042";
 
-  const TIMELOCK = isProd
+  const TIMELOCK = isMain
     ? "0x79D83D1518e2eAA64cdc0631df01b06e2762CC14"
     : "0xE27B7b6DB440b27249b49E3C0A686B82c36A0D7e";
 

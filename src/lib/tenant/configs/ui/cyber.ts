@@ -13,8 +13,9 @@ import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { isMainContractDeployment } from "@/lib/envConfig";
 
-const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
+const isMain = isMainContractDeployment();
 
 const prodTokens = [
   {
@@ -29,7 +30,7 @@ export const cyberTenantUIConfig = new TenantUI({
   title: "Cyber Agora",
   logo: cyberLogo,
   tokens: [
-    ...(isProd ? prodTokens : []),
+    ...(isMain ? prodTokens : []),
     TenantTokenFactory.create(TENANT_NAMESPACES.CYBER),
   ],
 

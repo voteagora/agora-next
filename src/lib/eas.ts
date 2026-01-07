@@ -9,11 +9,12 @@ import Tenant from "./tenant/tenant";
 import { keccak256 } from "viem";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { getEASAddress } from "./constants";
+import { getContractDeployment } from "@/lib/envConfig";
 
 const { slug, contracts } = Tenant.current();
 
 const CREATE_PROPOSAL_SCHEMA_ID =
-  process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
+  getContractDeployment() === "test"
     ? "0x590765de6f34bbae3e51aa89e571f567fa6d63cf3f8225592d58133860a0ccda"
     : "0xfc5b3c0472d09ac39f0cb9055869e70c4c59413041e3fd317f357789389971e4";
 

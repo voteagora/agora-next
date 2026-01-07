@@ -18,32 +18,32 @@ import {
 } from "@/lib/constants";
 
 interface Props {
-  isProd: boolean;
+  isMain: boolean;
   alchemyId: string;
 }
 
 export const xaiTenantConfig = ({
-  isProd,
+  isMain,
   alchemyId,
 }: Props): TenantContracts => {
-  const TOKEN = isProd
+  const TOKEN = isMain
     ? "0x9d9c7d3C7ffe27b8F7b7e6d80AaDeFEC12453A21"
     : "0x415777DeB21bde51369F2218db4618e61419D4Dc";
 
-  const GOVERNOR = isProd
+  const GOVERNOR = isMain
     ? "0x14BDED20143C563D3898C01A6e9E7a68De43Ce1F"
     : "0xD89f0BAB19e31EfEaa89fC625E3f08050d65CF33";
 
   // TODO: wasn't sure what to put here so defaulting to timelock
-  const TREASURY = isProd
+  const TREASURY = isMain
     ? ["0x23C70cB62A7FC60AE7118c33068eF42c125654Bc"]
     : ["0x5d729d4c0bf5d0a2fa0f801c6e0023bd450c4fd6"];
 
-  const TYPES = isProd
+  const TYPES = isMain
     ? "0x05a9C4a400cfA64C9639cc2f00B2CF95710f9af1"
     : "0x7d377a66c4a803bbb457b4541e5ec62b1dce2ad3";
 
-  const TIMELOCK = isProd
+  const TIMELOCK = isMain
     ? "0x23C70cB62A7FC60AE7118c33068eF42c125654Bc"
     : "0x5d729d4c0bf5d0a2fa0f801c6e0023bd450c4fd6";
 
@@ -51,19 +51,19 @@ export const xaiTenantConfig = ({
 
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : isProd
+    : isMain
       ? new AlchemyProvider("arbitrum", alchemyId)
       : new AlchemyProvider("arbitrum-sepolia", alchemyId);
 
-  const chain = isProd ? arbitrum : arbitrumSepolia;
+  const chain = isMain ? arbitrum : arbitrumSepolia;
 
   const providerForTime = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL) // TODO: Setup a second anvil fork for actual time for E2E tests.  E2E tests related to time will just be wrong or fail for XAI until we fix this.
-    : isProd
+    : isMain
       ? new AlchemyProvider("mainnet", alchemyId)
       : new AlchemyProvider("sepolia", alchemyId);
 
-  const chainForTime = isProd ? mainnet : sepolia;
+  const chainForTime = isMain ? mainnet : sepolia;
 
   return {
     token: createTokenContract({

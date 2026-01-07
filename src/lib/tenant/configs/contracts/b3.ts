@@ -18,31 +18,31 @@ import {
 import { base } from "viem/chains";
 
 interface Props {
-  isProd: boolean;
+  isMain: boolean;
   alchemyId: string;
 }
 
 export const b3TenantConfig = ({
-  isProd,
+  isMain,
   alchemyId,
 }: Props): TenantContracts => {
-  const TOKEN = isProd
+  const TOKEN = isMain
     ? "0xB3B32F9f8827D4634fE7d973Fa1034Ec9fdDB3B3"
     : "0x375039472E76B393b6ea945eeb1478c869CF8618";
 
-  const GOVERNOR = isProd
+  const GOVERNOR = isMain
     ? "0x4d56a1F3dAB23A0518536C3f42A78B21198Fb30c"
     : "0xE1d4E3a4926A91385b2081D1167127D3E0151A26";
 
-  const TYPES = isProd
+  const TYPES = isMain
     ? "0x7d377a66c4A803bbB457b4541e5ec62b1dCe2Ad3"
     : "0x5F47B13d9930FF115da90c6CEa7Db88D297aC2Fe";
 
-  const TIMELOCK = isProd
+  const TIMELOCK = isMain
     ? "0x5d729d4c0BF5d0a2Fa0F801c6e0023BD450c4fd6"
     : "0xaDe915ec0208a77d464C4837b252bC6a822F457A";
 
-  const APPROVAL_MODULE = isProd
+  const APPROVAL_MODULE = isMain
     ? "0x4990CcE6e8CD9596305b83C4860D4C0f3Bf4e8fa"
     : "0x2c349e564037e184Fe787CA4906C53507c70A7E0";
 

@@ -11,19 +11,19 @@ import {
 import { DELEGATION_MODEL } from "@/lib/constants";
 
 interface Props {
-  isProd: boolean;
+  isMain: boolean;
   alchemyId: string;
 }
 
 export const townsTenantConfig = ({
-  isProd,
+  isMain,
   alchemyId,
 }: Props): TenantContracts => {
-  const TOKEN = isProd
+  const TOKEN = isMain
     ? "0x00000000A22C618fd6b4D7E9A335C4B96B189a38"
     : "0x55f6e82a8BF5736d46837246DcBEAf7e61b3c27C";
 
-  const DAO_ID = isProd
+  const DAO_ID = isMain
     ? "0x746f776e732e2e2e2e2e00002105010000e5ebe1"
     : "0x746f776e732e2e2e2e2e00aa36a7010000ca3006";
 
@@ -34,11 +34,11 @@ export const townsTenantConfig = ({
 
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : isProd
+    : isMain
       ? new AlchemyProvider("base", alchemyId)
       : new AlchemyProvider("sepolia", alchemyId);
 
-  const chain = isProd ? base : sepolia;
+  const chain = isMain ? base : sepolia;
 
   return {
     token: createTokenContract({
@@ -75,7 +75,7 @@ export const townsTenantConfig = ({
     }),
     delegationModel: DELEGATION_MODEL.FULL,
     treasury: [],
-    easRecipient: isProd
+    easRecipient: isMain
       ? "0x746f776e732e2e2e2e2e00002105010000e5ebe1"
       : "0x746f776e732e2e2e2e2e00aa36a7010000ca3006",
   };

@@ -1,8 +1,8 @@
 import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
 import { getForumIndexName } from "./search";
-import Tenant from "./tenant/tenant";
+import { isProdInfra } from "@/lib/envConfig";
 
-const { isProd } = Tenant.current();
+const isProd = isProdInfra();
 
 const MEILISEARCH_HOST = process.env.NEXT_PUBLIC_MEILISEARCH_HOST;
 const MEILISEARCH_API_KEY = process.env.NEXT_PUBLIC_MEILISEARCH_CLIENT_API_KEY;

@@ -22,35 +22,35 @@ import {
 import { IVotableSupplyOracleContract } from "@/lib/contracts/common/interfaces/IVotableSupplyOracleContract";
 
 interface Props {
-  isProd: boolean;
+  isMain: boolean;
   alchemyId: string;
 }
 
 export const optimismTenantContractConfig = ({
-  isProd,
+  isMain,
   alchemyId,
 }: Props): TenantContracts => {
-  const TOKEN = isProd
+  const TOKEN = isMain
     ? "0x4200000000000000000000000000000000000042"
     : "0xd828b681F717E5a03C41540Bc6A31b146b5C1Ac6";
 
-  const GOVERNOR = isProd
+  const GOVERNOR = isMain
     ? "0xcDF27F107725988f2261Ce2256bDfCdE8B382B10"
     : "0x368723068b6C762b416e5A7d506a605E8b816C22";
 
-  const ALLIGATOR = isProd
+  const ALLIGATOR = isMain
     ? "0x7f08F3095530B67CdF8466B7a923607944136Df0"
     : "0x5d729d4c0BF5d0a2Fa0F801c6e0023BD450c4fd6";
 
-  const TYPES = isProd
+  const TYPES = isMain
     ? "0xCE52b7cc490523B3e81C3076D5ae5Cca9a3e2D6F"
     : "0xb88131610ff4D7D46050c9d1DEE413f8b6b8A5bd";
 
-  const TIMELOCK = isProd
+  const TIMELOCK = isMain
     ? "0x0eDd4B2cCCf41453D8B5443FBB96cc577d1d06bF"
     : "0xf8D15c3132eFA557989A1C9331B6667Ca8Caa3a9";
 
-  const VOTABLE_ORACLE = isProd
+  const VOTABLE_ORACLE = isMain
     ? "0x1b7CA7437748375302bAA8954A2447fC3FBE44CC"
     : "0x2451dAF2153B1293Da2abF19C36c450321835C55";
 
@@ -58,11 +58,11 @@ export const optimismTenantContractConfig = ({
 
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : isProd
+    : isMain
       ? new AlchemyProvider("optimism", alchemyId)
       : new AlchemyProvider("optimism-sepolia", alchemyId);
 
-  const chain = isProd ? optimism : optimismSepolia;
+  const chain = isMain ? optimism : optimismSepolia;
 
   return {
     token: createTokenContract({
@@ -80,7 +80,7 @@ export const optimismTenantContractConfig = ({
       chain,
       contract: OptimismGovernor__factory.connect(GOVERNOR, provider),
       optionBudgetChangeDate: new Date("2024-02-21T12:00:00"),
-      v6UpgradeBlock: isProd ? 114995000 : 100, // TODO: get the right block number
+      v6UpgradeBlock: isMain ? 114995000 : 100, // TODO: get the right block number
       provider,
     }),
 

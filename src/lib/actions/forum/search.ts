@@ -1,7 +1,7 @@
 "use server";
 
 import { forumSearchService, ForumDocument } from "@/lib/search";
-import Tenant from "@/lib/tenant/tenant";
+import { isProdInfra } from "@/lib/envConfig";
 
 export async function indexForumTopic({
   topicId,
@@ -20,7 +20,7 @@ export async function indexForumTopic({
   categoryId?: number;
   createdAt?: Date;
 }): Promise<void> {
-  const { isProd } = Tenant.current();
+  const isProd = isProdInfra();
   try {
     const document: ForumDocument = {
       id: `${daoSlug}_topic_${topicId}`,
@@ -60,7 +60,7 @@ export async function indexForumPost({
   createdAt?: Date;
 }): Promise<void> {
   try {
-    const { isProd } = Tenant.current();
+    const isProd = isProdInfra();
     const document: ForumDocument = {
       id: `${daoSlug}_post_${postId}`,
       contentType: "post",
@@ -85,7 +85,7 @@ export async function removeForumTopicFromIndex(
   topicId: number,
   daoSlug: string
 ): Promise<void> {
-  const { isProd } = Tenant.current();
+  const isProd = isProdInfra();
   await forumSearchService.deleteDocument({
     id: `${daoSlug}_topic_${topicId}`,
     daoSlug,
@@ -97,7 +97,7 @@ export async function removeForumPostFromIndex(
   postId: number,
   daoSlug: string
 ): Promise<void> {
-  const { isProd } = Tenant.current();
+  const isProd = isProdInfra();
   await forumSearchService.deleteDocument({
     id: `${daoSlug}_post_${postId}`,
     daoSlug,

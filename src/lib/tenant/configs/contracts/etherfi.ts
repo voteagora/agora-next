@@ -15,12 +15,12 @@ import {
 } from "@/lib/constants";
 
 interface Props {
-  isProd: boolean;
+  isMain: boolean;
   alchemyId: string;
 }
 
 export const etherfiTenantContractConfig = ({
-  isProd,
+  isMain,
   alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB";
@@ -30,11 +30,11 @@ export const etherfiTenantContractConfig = ({
 
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : isProd
+    : isMain
       ? new AlchemyProvider("mainnet", alchemyId)
       : new AlchemyProvider("sepolia", alchemyId);
 
-  const chain = isProd ? mainnet : sepolia;
+  const chain = isMain ? mainnet : sepolia;
 
   return {
     token: createTokenContract({

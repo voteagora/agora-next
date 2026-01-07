@@ -20,7 +20,7 @@ This project uses various environment variables for configuration. Below is a co
 - **Required**: YES - Application won't start without this
 - **Usage**: Controls the entire tenant configuration including contracts, UI theme, and features
 - **Example**: `NEXT_PUBLIC_AGORA_INSTANCE_NAME=ens`
-- **Related**: Works with `NEXT_PUBLIC_AGORA_ENV` to determine environment-specific settings
+- **Related**: Works with `NEXT_PUBLIC_AGORA_INFRA_ENV` and `NEXT_PUBLIC_AGORA_CONTRACT_DEPLOYMENT` to determine environment-specific settings
 
 #### **NEXT_PUBLIC_AGORA_INSTANCE_TOKEN**
 
@@ -30,20 +30,42 @@ This project uses various environment variables for configuration. Below is a co
 - **Example**: `NEXT_PUBLIC_AGORA_INSTANCE_TOKEN=ENS`
 - **Note**: Should match the actual token symbol of the DAO
 
-#### **NEXT_PUBLIC_AGORA_ENV**
+#### **NEXT_PUBLIC_AGORA_INFRA_ENV**
 
-- **Purpose**: Determines production vs development environment
-- **Required**: YES
-- **Values**: `"prod"` for production, `"dev"` or any other value for development
-- **Impact**: Controls:
+- **Purpose**: Determines infrastructure/deployment environment
+- **Required**: YES (or use deprecated `NEXT_PUBLIC_AGORA_ENV`)
+- **Values**: `"prod"` for production, `"dev"` for development
+- **Impact**: Controls infrastructure concerns:
   - Which database URLs are used (READ_WRITE_WEB2_DATABASE_URL_PROD vs \_DEV)
+  - Cloud storage bucket selection (GCS buckets)
+  - Logging and monitoring configuration
+  - Search service (Meilisearch) environment
+- **Example**: `NEXT_PUBLIC_AGORA_INFRA_ENV=prod`
+
+#### **NEXT_PUBLIC_AGORA_CONTRACT_DEPLOYMENT**
+
+- **Purpose**: Determines which smart contracts to use (mainnet vs testnet)
+- **Required**: NO - defaults based on `NEXT_PUBLIC_AGORA_INFRA_ENV` if not set
+- **Values**: `"main"` for mainnet contracts, `"test"` for testnet contracts
+- **Default**: `"main"` when `NEXT_PUBLIC_AGORA_INFRA_ENV=prod`, `"test"` when `NEXT_PUBLIC_AGORA_INFRA_ENV=dev`
+- **Impact**: Controls contract/chain concerns:
   - Contract addresses (mainnet vs testnet)
-  - Feature toggles and safety checks
-  - API endpoints (prod vs dev environments)
-  - EAS schema selection (different schemas for prod/dev)
+  - Chain selection (e.g., mainnet vs sepolia)
+  - EAS schema selection
   - Snapshot space selection
-- **Example**: `NEXT_PUBLIC_AGORA_ENV=prod`
-- **Note**: Also available as `AGORA_ENV` in some legacy components
+- **Example**: `NEXT_PUBLIC_AGORA_CONTRACT_DEPLOYMENT=main`
+- **Use case**: Set to `"test"` with `NEXT_PUBLIC_AGORA_INFRA_ENV=prod` to run production infrastructure against testnet contracts
+
+#### **NEXT_PUBLIC_AGORA_ENV** _(Deprecated)_
+
+- **Purpose**: Legacy variable that previously controlled both infrastructure and contract deployment
+- **Required**: NO - use `NEXT_PUBLIC_AGORA_INFRA_ENV` and `NEXT_PUBLIC_AGORA_CONTRACT_DEPLOYMENT` instead
+- **Values**: `"prod"` or `"dev"`
+- **Backwards Compatibility**: If the new variables are not set, this variable is used as a fallback:
+  - `"prod"` → `NEXT_PUBLIC_AGORA_INFRA_ENV=prod` + `NEXT_PUBLIC_AGORA_CONTRACT_DEPLOYMENT=main`
+  - `"dev"` → `NEXT_PUBLIC_AGORA_INFRA_ENV=dev` + `NEXT_PUBLIC_AGORA_CONTRACT_DEPLOYMENT=test`
+- **Migration**: Replace with the two new variables for more granular control
+- **Example**: `NEXT_PUBLIC_AGORA_ENV=prod` _(deprecated, use new variables)_
 
 #### **NEXT_PUBLIC_ALCHEMY_ID**
 
@@ -70,14 +92,14 @@ This project uses various environment variables for configuration. Below is a co
 #### **READ*WRITE_WEB2_DATABASE_URL*[PROD|DEV]**
 
 - **Purpose**: Database for user-generated content (profiles, settings)
-- **Required**: YES (based on `NEXT_PUBLIC_AGORA_ENV`)
+- **Required**: YES (based on `NEXT_PUBLIC_AGORA_INFRA_ENV`)
 - **Usage**: Read-write operations for web2 data
 - **Example**: `READ_WRITE_WEB2_DATABASE_URL_PROD=postgres://...`
 
 #### **READ*ONLY_WEB3_DATABASE_URL*[PROD|DEV]**
 
 - **Purpose**: Database for blockchain indexed data
-- **Required**: YES (based on `NEXT_PUBLIC_AGORA_ENV`)
+- **Required**: YES (based on `NEXT_PUBLIC_AGORA_INFRA_ENV`)
 - **Usage**: Read-only operations for web3 data (proposals, votes, delegates)
 - **Example**: `READ_ONLY_WEB3_DATABASE_URL_PROD=postgres://...`
 
@@ -345,7 +367,8 @@ This project uses various environment variables for configuration. Below is a co
 # Core Configuration
 NEXT_PUBLIC_AGORA_INSTANCE_NAME=ens
 NEXT_PUBLIC_AGORA_INSTANCE_TOKEN=ENS
-NEXT_PUBLIC_AGORA_ENV=dev
+NEXT_PUBLIC_AGORA_INFRA_ENV=dev
+# NEXT_PUBLIC_AGORA_CONTRACT_DEPLOYMENT=test  # Optional - defaults based on INFRA_ENV
 
 # API Keys
 NEXT_PUBLIC_ALCHEMY_ID=your_alchemy_key

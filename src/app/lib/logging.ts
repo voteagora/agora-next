@@ -8,8 +8,8 @@ import { SERVICE_NAME } from "@/instrumentation";
 // 'dev' is used in vercel dev and preview, both of which need to have coloring disabled
 // for emission and ingestion of logs into datadog
 const log_emission =
-  process.env.NEXT_PUBLIC_AGORA_ENV === "prod" ||
-  process.env.NEXT_PUBLIC_AGORA_ENV === "dev";
+  process.env.NEXT_PUBLIC_AGORA_INFRA_ENV === "prod" ||
+  process.env.NEXT_PUBLIC_AGORA_INFRA_ENV === "dev";
 
 export const OTEL_API_TRACER = otel.trace.getTracer(SERVICE_NAME);
 
