@@ -56,6 +56,7 @@ export type UIInfoBannerConfig = {
 
 export type UITaxFormConfig = {
   payeeFormUrl?: string;
+  provider?: string;
 };
 
 type UIConfig =

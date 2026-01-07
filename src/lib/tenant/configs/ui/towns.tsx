@@ -1,5 +1,5 @@
 import React from "react";
-import { TenantUI } from "@/lib/tenant/tenantUI";
+import { TenantUI, type UITaxFormConfig } from "@/lib/tenant/tenantUI";
 import townsLogo from "@/assets/tenant/towns_logo.svg";
 import townsHero from "@/assets/tenant/towns_hero.svg";
 import townsSuccess from "@/assets/tenant/towns_success.svg";
@@ -321,6 +321,14 @@ export const townsTenantUIConfig = new TenantUI({
     {
       name: "has-eas-oodao",
       enabled: true,
+    },
+    {
+      name: "tax-form",
+      enabled: true,
+      config: {
+        payeeFormUrl: "http://cowrie.io/tax",
+        provider: "cowrie",
+      } as UITaxFormConfig,
     },
     {
       name: "coming-soon",
