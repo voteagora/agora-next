@@ -24,8 +24,16 @@ import {
 import ContactInformationSection from "./ContactInformationSection";
 import PreferencesMatrix from "./PreferencesMatrix";
 import type { ChannelStatus } from "./ChannelStatusBadge";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+import PushNotificationSection from "./PushNotificationSection";
 
-const CHANNEL_ORDER: ChannelType[] = ["email", "telegram", "discord", "slack"];
+const CHANNEL_ORDER: ChannelType[] = [
+  "email",
+  "telegram",
+  "discord",
+  "slack",
+  "pwa",
+];
 
 type TelegramLinkState = {
   url: string;
@@ -52,6 +60,8 @@ export default function NotificationPreferencesClient() {
   const [siweJwt, setSiweJwt] = useState<string | null | undefined>(undefined);
   const [siweError, setSiweError] = useState<string | null>(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const pushState = usePushNotifications();
+  const { isSubscribed: isPushSubscribed } = pushState;
 
   const recipientId = address?.toLowerCase() ?? "";
   const queryKey = ["notification-settings", recipientId];
@@ -287,8 +297,11 @@ export default function NotificationPreferencesClient() {
       slack: slack?.webhook_url
         ? { status: "connected", label: "Connected" }
         : { status: "disconnected", label: "Not connected" },
+      pwa: isPushSubscribed
+        ? { status: "connected", label: "Active" }
+        : { status: "disconnected", label: "Inactive" },
     };
-  }, [recipient]);
+  }, [recipient, isPushSubscribed]);
 
   const updateCachedRecipient = (
     updater: (current: Recipient) => Recipient
@@ -777,6 +790,14 @@ export default function NotificationPreferencesClient() {
         verificationSentAt={verificationSentAt}
       />
 
+      <PushNotificationSection
+        status={channelStatus.pwa.status}
+        isSubscribed={pushState.isSubscribed}
+        loading={pushState.loading}
+        error={pushState.error}
+        subscribe={pushState.subscribe}
+        unsubscribe={pushState.unsubscribe}
+      />
       <PreferencesMatrix
         eventTypes={eventTypes}
         preferences={preferences}
