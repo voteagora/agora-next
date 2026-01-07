@@ -440,6 +440,9 @@ export function findProposalsByIds({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposals.findMany(condition);
 
+    case TENANT_NAMESPACES.DEMO2:
+      return prismaWeb3Client.demo2Proposals.findMany(condition);
+
     case TENANT_NAMESPACES.DEMO3:
       return prismaWeb3Client.demo3Proposals.findMany(condition);
     case TENANT_NAMESPACES.DEMO4:
