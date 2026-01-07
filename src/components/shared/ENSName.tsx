@@ -17,7 +17,11 @@ interface ENSNameProps {
 }
 
 // This component will display the ENS name for a given address
-export default function ENSName({ address, truncate = true, includeCtoC = false }: ENSNameProps) {
+export default function ENSName({
+  address,
+  truncate = true,
+  includeCtoC = false,
+}: ENSNameProps) {
   const [ensName, setEnsName] = useState(
     truncate ? truncateAddress(address || "") : address || ""
   );
@@ -38,7 +42,7 @@ export default function ENSName({ address, truncate = true, includeCtoC = false 
   const displayText = truncate
     ? ensName || truncateAddress(address)
     : ensName || address;
-  
+
   const fullText = ensName || address;
 
   const copyToClipboard = () => {
