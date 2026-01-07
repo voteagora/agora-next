@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { isProdInfra } from "@/lib/envConfig";
 
 // if (process.env.NODE_ENV === "production" && process.env.NEXT_PHASE === "phase-production-build") {
 //   throw new Error("🚨 Prisma query during build!");
@@ -18,8 +19,7 @@ if (process.env.DATABASE_URL === "dev") {
 } else if (process.env.DATABASE_URL === "prod") {
   envSuffix = "PROD";
 } else {
-  const isProd = process.env.NEXT_PUBLIC_AGORA_INFRA_ENV === "prod";
-  envSuffix = isProd ? "PROD" : "DEV";
+  envSuffix = isProdInfra() ? "PROD" : "DEV";
 }
 
 const resolveDbUrl = (type: "WEB2" | "WEB3") => {

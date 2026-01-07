@@ -4,12 +4,12 @@ import * as util from "util";
 
 import { SEMATTRS_EXCEPTION_ESCAPED } from "@opentelemetry/semantic-conventions";
 import { SERVICE_NAME } from "@/instrumentation";
+import { getInfraEnv } from "@/lib/envConfig";
 
 // 'dev' is used in vercel dev and preview, both of which need to have coloring disabled
 // for emission and ingestion of logs into datadog
-const log_emission =
-  process.env.NEXT_PUBLIC_AGORA_INFRA_ENV === "prod" ||
-  process.env.NEXT_PUBLIC_AGORA_INFRA_ENV === "dev";
+const infraEnv = getInfraEnv();
+const log_emission = infraEnv === "prod" || infraEnv === "dev";
 
 export const OTEL_API_TRACER = otel.trace.getTracer(SERVICE_NAME);
 
