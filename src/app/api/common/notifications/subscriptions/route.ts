@@ -27,16 +27,23 @@ export async function POST(request: NextRequest) {
     }
 
     // MOCK: Log the payload that WOULD be sent to the Hub
-    console.log("MOCK BACKEND RECEIVED:", JSON.stringify({
-      tenant: namespace,
-      recipient_id: address,
-      channel: "pwa",
-      config: {
-        type: "pwa",
-        endpoint: subscription.endpoint,
-        keys: subscription.keys,
-      },
-    }, null, 2));
+    console.log(
+      "MOCK BACKEND RECEIVED:",
+      JSON.stringify(
+        {
+          tenant: namespace,
+          recipient_id: address,
+          channel: "pwa",
+          config: {
+            type: "pwa",
+            endpoint: subscription.endpoint,
+            keys: subscription.keys,
+          },
+        },
+        null,
+        2
+      )
+    );
 
     // Simulate success
     return NextResponse.json({ success: true });
@@ -71,7 +78,6 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json({ success: true });
     */
-
   } catch (error) {
     console.error("Proxy Subscription Error:", error);
     return NextResponse.json(

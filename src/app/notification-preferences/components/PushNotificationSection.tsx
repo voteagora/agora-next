@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useAccount } from "wagmi";
@@ -10,9 +9,12 @@ interface PushNotificationSectionProps {
   status: ChannelStatus;
 }
 
-export default function PushNotificationSection({ status }: PushNotificationSectionProps) {
+export default function PushNotificationSection({
+  status,
+}: PushNotificationSectionProps) {
   const { address } = useAccount();
-  const { subscribe, unsubscribe, loading, error, isSubscribed } = usePushNotifications();
+  const { subscribe, unsubscribe, loading, error, isSubscribed } =
+    usePushNotifications();
 
   return (
     <section className="rounded-2xl border border-line bg-white p-6 shadow-newDefault">
@@ -38,9 +40,9 @@ export default function PushNotificationSection({ status }: PushNotificationSect
 
         <div className="flex flex-col gap-2">
           {error && <p className="text-sm text-red-500">{error}</p>}
-          
+
           {isSubscribed ? (
-             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <span className="text-sm text-secondary">
                 This device is subscribed to push notifications.
               </span>
@@ -62,7 +64,7 @@ export default function PushNotificationSection({ status }: PushNotificationSect
                 disabled={loading || !address}
                 onClick={() => address && subscribe(address)}
               >
-                 {loading ? "Enabling..." : "Enable Push Notifications"}
+                {loading ? "Enabling..." : "Enable Push Notifications"}
               </Button>
             </div>
           )}

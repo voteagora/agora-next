@@ -30,7 +30,9 @@ interface UsePushNotificationsReturn {
 export const usePushNotifications = (): UsePushNotificationsReturn => {
   const [isSupported, setIsSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [subscription, setSubscription] = useState<PushSubscription | null>(null);
+  const [subscription, setSubscription] = useState<PushSubscription | null>(
+    null
+  );
   const [permission, setPermission] =
     useState<NotificationPermission>("default");
   const [loading, setLoading] = useState(false);
@@ -62,7 +64,7 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
 
       // 1. Request Permission
       const permissionResult = await Notification.requestPermission();
-      
+
       setPermission(permissionResult);
       if (permissionResult !== "granted") {
         throw new Error("Permission denied");
@@ -128,7 +130,7 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
   return {
     isSupported,
     isSubscribed,
-    subscription, 
+    subscription,
     permission,
     subscribe,
     unsubscribe,

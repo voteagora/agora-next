@@ -66,7 +66,10 @@ export interface PreferenceEntry {
   updated_at?: string;
 }
 
-export type PreferencesByEvent = Record<string, Record<ChannelType, PreferenceEntry>>;
+export type PreferencesByEvent = Record<
+  string,
+  Record<ChannelType, PreferenceEntry>
+>;
 
 export interface PreferencesResponse {
   client_id: string;

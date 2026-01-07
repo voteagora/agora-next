@@ -1,50 +1,49 @@
+console.log("[SW] Service Worker Loaded");
 
-console.log('[SW] Service Worker Loaded');
-
-self.addEventListener('install', (event) => {
-  console.log('[SW] Install Event processing');
+self.addEventListener("install", (event) => {
+  console.log("[SW] Install Event processing");
   self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
-  console.log('[SW] Activate Event processing');
+self.addEventListener("activate", (event) => {
+  console.log("[SW] Activate Event processing");
   return self.clients.claim();
 });
 
-self.addEventListener('push', function (event) {
-  console.log('[SW] Push Received');
+self.addEventListener("push", function (event) {
+  console.log("[SW] Push Received");
   if (!event.data) {
-    console.log('[SW] Push event but no data');
+    console.log("[SW] Push event but no data");
     return;
   }
 
   try {
     const data = event.data.json();
-    console.log('[SW] Push Data:', data);
-    
-      const options = {
-        body: data.body,
-        icon: data.icon || '/favicon/android-chrome-192x192.png',
-        badge: '/favicon/favicon-32x32.png',
-        vibrate: [100, 50, 100],
-        tag: 'agora-notification',
-        renotify: true,
-        requireInteraction: true,
-        data: {
-          dateOfArrival: Date.now(),
-          primaryKey: '2',
-          url: data.data?.url || '/',
-        },
-        actions: data.data?.actions || [],
-      };
+    console.log("[SW] Push Data:", data);
+
+    const options = {
+      body: data.body,
+      icon: data.icon || "/favicon/android-chrome-192x192.png",
+      badge: "/favicon/favicon-32x32.png",
+      vibrate: [100, 50, 100],
+      tag: "agora-notification",
+      renotify: true,
+      requireInteraction: true,
+      data: {
+        dateOfArrival: Date.now(),
+        primaryKey: "2",
+        url: data.data?.url || "/",
+      },
+      actions: data.data?.actions || [],
+    };
 
     event.waitUntil(self.registration.showNotification(data.title, options));
   } catch (err) {
-    console.log('[SW] Push Error:', err);
+    console.log("[SW] Push Error:", err);
   }
 });
 
-self.addEventListener('notificationclick', function (event) {
+self.addEventListener("notificationclick", function (event) {
   event.notification.close();
 
   const urlToOpen = event.notification.data.url;
@@ -52,7 +51,7 @@ self.addEventListener('notificationclick', function (event) {
   event.waitUntil(
     clients
       .matchAll({
-        type: 'window',
+        type: "window",
         includeUncontrolled: true,
       })
       .then(function (clientList) {

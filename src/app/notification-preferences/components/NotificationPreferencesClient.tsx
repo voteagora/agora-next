@@ -28,7 +28,13 @@ import type { ChannelStatus } from "./ChannelStatusBadge";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import PushNotificationSection from "./PushNotificationSection";
 
-const CHANNEL_ORDER: ChannelType[] = ["email", "telegram", "discord", "slack", "pwa"];
+const CHANNEL_ORDER: ChannelType[] = [
+  "email",
+  "telegram",
+  "discord",
+  "slack",
+  "pwa",
+];
 
 type TelegramLinkState = {
   url: string;
@@ -45,9 +51,13 @@ export default function NotificationPreferencesClient() {
   const { setOpen } = useModal();
   const { signIn, signOut } = useSIWE();
   const queryClient = useQueryClient();
-  const [telegramLink, setTelegramLink] = useState<TelegramLinkState | null>(null);
+  const [telegramLink, setTelegramLink] = useState<TelegramLinkState | null>(
+    null
+  );
   const [telegramError, setTelegramError] = useState<string | null>(null);
-  const [verificationSentAt, setVerificationSentAt] = useState<number | null>(null);
+  const [verificationSentAt, setVerificationSentAt] = useState<number | null>(
+    null
+  );
   const [siweJwt, setSiweJwt] = useState<string | null | undefined>(undefined);
   const [siweError, setSiweError] = useState<string | null>(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
@@ -175,9 +185,9 @@ export default function NotificationPreferencesClient() {
       }
 
       if (!res.ok) {
-        const parsedBody = (await res.json().catch(() => null)) as
-          | { message?: string }
-          | null;
+        const parsedBody = (await res.json().catch(() => null)) as {
+          message?: string;
+        } | null;
         const message =
           typeof parsedBody?.message === "string" && parsedBody.message.trim()
             ? parsedBody.message
@@ -192,13 +202,7 @@ export default function NotificationPreferencesClient() {
     [clearSiweSession, siweJwt]
   );
 
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey,
     queryFn: async () => {
       return (await authedFetchJson(
@@ -212,7 +216,10 @@ export default function NotificationPreferencesClient() {
         return 3000;
       }
       // Poll for email verification completion (5s interval for 10 minutes after sending)
-      if (verificationSentAt && Date.now() - verificationSentAt < 10 * 60 * 1000) {
+      if (
+        verificationSentAt &&
+        Date.now() - verificationSentAt < 10 * 60 * 1000
+      ) {
         return 5000;
       }
       return false;
@@ -314,7 +321,9 @@ export default function NotificationPreferencesClient() {
 
       return {
         ...base,
-        eventTypes: base.eventTypes?.length ? base.eventTypes : fallbackEventTypes,
+        eventTypes: base.eventTypes?.length
+          ? base.eventTypes
+          : fallbackEventTypes,
         recipient: updater(existingRecipient),
       };
     });
@@ -328,20 +337,21 @@ export default function NotificationPreferencesClient() {
     queryClient.setQueryData<NotificationSettings>(queryKey, (current) => {
       const base = current ?? buildBaseSettings();
 
-      const preferencesResponse: PreferencesResponse =
-        base.preferences ?? {
-          client_id: "",
-          recipient_id: recipientId,
-          preferences: {},
-          created_at: null,
-          updated_at: null,
-        };
+      const preferencesResponse: PreferencesResponse = base.preferences ?? {
+        client_id: "",
+        recipient_id: recipientId,
+        preferences: {},
+        created_at: null,
+        updated_at: null,
+      };
 
       const existingEvent = preferencesResponse.preferences[eventType] ?? {};
 
       return {
         ...base,
-        eventTypes: base.eventTypes?.length ? base.eventTypes : fallbackEventTypes,
+        eventTypes: base.eventTypes?.length
+          ? base.eventTypes
+          : fallbackEventTypes,
         preferences: {
           ...preferencesResponse,
           preferences: {
@@ -361,10 +371,13 @@ export default function NotificationPreferencesClient() {
 
   const updateEmailMutation = useMutation({
     mutationFn: async (email: string) => {
-      return await authedFetchJson("/api/v1/notification-preferences/channels/email", {
-        method: "POST",
-        json: { email },
-      });
+      return await authedFetchJson(
+        "/api/v1/notification-preferences/channels/email",
+        {
+          method: "POST",
+          json: { email },
+        }
+      );
     },
     onMutate: async (email) => {
       await queryClient.cancelQueries({ queryKey });
@@ -569,10 +582,17 @@ export default function NotificationPreferencesClient() {
       const errorMsg = error instanceof Error ? error.message : "";
       let message = "Failed to send verification email.";
 
-      if (errorMsg.includes("EMAIL_ALREADY_VERIFIED") || errorMsg.includes("already verified")) {
+      if (
+        errorMsg.includes("EMAIL_ALREADY_VERIFIED") ||
+        errorMsg.includes("already verified")
+      ) {
         message = "Email is already verified.";
-      } else if (errorMsg.includes("RATE_LIMITED") || errorMsg.includes("429")) {
-        message = "Too many attempts. Please wait before requesting another email.";
+      } else if (
+        errorMsg.includes("RATE_LIMITED") ||
+        errorMsg.includes("429")
+      ) {
+        message =
+          "Too many attempts. Please wait before requesting another email.";
       }
 
       toast.error(message);
@@ -633,7 +653,9 @@ export default function NotificationPreferencesClient() {
           <p className="text-secondary">
             Sign in with Ethereum to manage notification settings.
           </p>
-          {siweError ? <p className="text-sm text-negative">{siweError}</p> : null}
+          {siweError ? (
+            <p className="text-sm text-negative">{siweError}</p>
+          ) : null}
         </div>
         <Button
           className="w-fit"
@@ -670,7 +692,8 @@ export default function NotificationPreferencesClient() {
   }
 
   if (isError && !data) {
-    const message = (error as Error | undefined)?.message ?? "Failed to load settings.";
+    const message =
+      (error as Error | undefined)?.message ?? "Failed to load settings.";
     return (
       <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
         <div className="flex flex-col gap-2">
@@ -690,8 +713,10 @@ export default function NotificationPreferencesClient() {
 
   const preferences: PreferencesByEvent = data?.preferences?.preferences ?? {};
   const eventTypes =
-    data?.eventTypes && data.eventTypes.length ? data.eventTypes : fallbackEventTypes;
-  const loadErrorMessage = isError ? (error as Error)?.message ?? "" : null;
+    data?.eventTypes && data.eventTypes.length
+      ? data.eventTypes
+      : fallbackEventTypes;
+  const loadErrorMessage = isError ? ((error as Error)?.message ?? "") : null;
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
@@ -706,7 +731,9 @@ export default function NotificationPreferencesClient() {
           {loadErrorMessage ? (
             <p className="text-sm text-negative">{loadErrorMessage}</p>
           ) : null}
-          {siweError ? <p className="text-sm text-negative">{siweError}</p> : null}
+          {siweError ? (
+            <p className="text-sm text-negative">{siweError}</p>
+          ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
           {loadErrorMessage ? (
