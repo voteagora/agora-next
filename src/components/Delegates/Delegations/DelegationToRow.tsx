@@ -23,7 +23,7 @@ export default function DelegationToRow({
           maximumSignificantDigits: 3,
         })}{" "}
       </TableCell>
-      <TableCell>{format(delegation.timestamp || 0, "MM/dd/yyyy")}</TableCell>
+      <TableCell>{format(delegation.timestamp || 0, "yyyy/MM/dd")}</TableCell>
       <TableCell>
         <Link
           href={`/delegates/${delegation.to}`}
