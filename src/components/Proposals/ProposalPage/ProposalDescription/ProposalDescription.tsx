@@ -58,6 +58,15 @@ export default function ProposalDescription({
   const options = proposal.proposalData?.options;
   const option = options?.[0];
   const { ui } = Tenant.current();
+  const tagBackground = ui.customization?.tagBackground;
+  const tagBgStyle = tagBackground
+    ? {
+        backgroundColor: tagBackground.startsWith("#")
+          ? tagBackground
+          : `rgb(${tagBackground})`,
+      }
+    : undefined;
+  const tagTextClass = tagBackground ? "text-white" : "text-neutral-700";
   const useArchiveForProposals =
     ui.toggle("use-archive-for-proposal-details")?.enabled ?? false;
   const archiveMetadata = useArchiveForProposals
@@ -97,19 +106,26 @@ export default function ProposalDescription({
       {archiveMetadata && (
         <div className="inline-flex justify-start items-center gap-2 flex-wrap">
           {typeBadgeLabel && (
-            <div className="px-2 py-0.5 bg-black/10 rounded-[3px] text-neutral-700 text-xs font-semibold leading-4">
+            <div
+              className={`px-2 py-0.5 bg-black/10 rounded-[3px] text-xs font-semibold leading-4 ${tagTextClass}`}
+              style={tagBgStyle}
+            >
               {typeBadgeLabel === "Gov Proposal"
                 ? "⚖️️ Gov Proposal"
                 : "🌡️ Temp Check"}
             </div>
           )}
-          <div className="px-2 py-0.5 bg-black/10 rounded-[3px] text-neutral-700 text-xs font-semibold leading-4">
+          <div
+            className={`px-2 py-0.5 bg-black/10 rounded-[3px] text-xs font-semibold leading-4 ${tagTextClass}`}
+            style={tagBgStyle}
+          >
             By {proposerBadge}
           </div>
           <div
-            className={`px-2 py-0.5 rounded-[3px] text-xs font-semibold leading-4 bg-black/10 text-neutral-700 ${
+            className={`px-2 py-0.5 rounded-[3px] text-xs font-semibold leading-4 bg-black/10 ${
               hasPendingRanges ? "opacity-50" : ""
-            }`}
+            } ${tagTextClass}`}
+            style={tagBgStyle}
           >
             {archiveMetadata?.proposalTypeName}
           </div>
