@@ -1,25 +1,16 @@
-console.log("[SW] Service Worker Loaded");
-
 self.addEventListener("install", (event) => {
-  console.log("[SW] Install Event processing");
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
-  console.log("[SW] Activate Event processing");
   return self.clients.claim();
 });
 
 self.addEventListener("push", function (event) {
-  console.log("[SW] Push Received");
-  if (!event.data) {
-    console.log("[SW] Push event but no data");
-    return;
-  }
+  if (!event.data) return;
 
   try {
     const data = event.data.json();
-    console.log("[SW] Push Data:", data);
 
     const options = {
       body: data.body,
@@ -39,7 +30,7 @@ self.addEventListener("push", function (event) {
 
     event.waitUntil(self.registration.showNotification(data.title, options));
   } catch (err) {
-    console.log("[SW] Push Error:", err);
+    console.error("Push Error:", err);
   }
 });
 

@@ -97,12 +97,10 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
         body: JSON.stringify({ subscription, address }),
       });
 
-      console.log("Push Subscription Registered");
       setIsSubscribed(true);
       setSubscription(subscription);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to subscribe");
-      console.error("Push Subscription Error:", err);
     } finally {
       setLoading(false);
     }

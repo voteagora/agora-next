@@ -3,18 +3,25 @@
 import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import ChannelStatusBadge, { type ChannelStatus } from "./ChannelStatusBadge";
-import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 interface PushNotificationSectionProps {
   status: ChannelStatus;
+  isSubscribed: boolean;
+  loading: boolean;
+  error: string | null;
+  subscribe: (address: string) => Promise<void>;
+  unsubscribe: () => Promise<void>;
 }
 
 export default function PushNotificationSection({
   status,
+  isSubscribed,
+  loading,
+  error,
+  subscribe,
+  unsubscribe,
 }: PushNotificationSectionProps) {
   const { address } = useAccount();
-  const { subscribe, unsubscribe, loading, error, isSubscribed } =
-    usePushNotifications();
 
   return (
     <section className="rounded-2xl border border-line bg-white p-6 shadow-newDefault">

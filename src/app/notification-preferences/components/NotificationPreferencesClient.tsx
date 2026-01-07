@@ -60,7 +60,8 @@ export default function NotificationPreferencesClient() {
   const [siweJwt, setSiweJwt] = useState<string | null | undefined>(undefined);
   const [siweError, setSiweError] = useState<string | null>(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
-  const { isSubscribed: isPushSubscribed } = usePushNotifications();
+  const pushState = usePushNotifications();
+  const { isSubscribed: isPushSubscribed } = pushState;
 
   const recipientId = address?.toLowerCase() ?? "";
   const queryKey = ["notification-settings", recipientId];
@@ -789,7 +790,14 @@ export default function NotificationPreferencesClient() {
         verificationSentAt={verificationSentAt}
       />
 
-      <PushNotificationSection status={channelStatus.pwa.status} />
+      <PushNotificationSection
+        status={channelStatus.pwa.status}
+        isSubscribed={pushState.isSubscribed}
+        loading={pushState.loading}
+        error={pushState.error}
+        subscribe={pushState.subscribe}
+        unsubscribe={pushState.unsubscribe}
+      />
       <PreferencesMatrix
         eventTypes={eventTypes}
         preferences={preferences}
