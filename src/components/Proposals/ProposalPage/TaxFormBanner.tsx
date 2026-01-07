@@ -65,9 +65,17 @@ export function TaxFormBanner({ proposal }: Props) {
 
   const isWaitingForPayment = proposal.status === PROPOSAL_STATUS.SUCCEEDED;
   const isSignedIn = Boolean(address);
-  const requiresTaxForm = isEnabled && isWaitingForPayment && !isFormCompleted;
+  const rawTag =
+    proposal.archiveMetadata?.rawTag ??
+    (Array.isArray((proposal as unknown as { tags?: string[] }).tags)
+      ? (proposal as unknown as { tags?: string[] }).tags?.[0]
+      : undefined);
+  const normalizedTag = rawTag?.toLowerCase();
+  const isGovProposal = normalizedTag === "gov-proposal" || normalizedTag === "govproposal";
+  const requiresTaxForm =
+    isEnabled && isWaitingForPayment && isGovProposal && !isFormCompleted;
 
-  // Global off: feature disabled, wrong status, already completed, or no payee
+  // Skip when globally off or non-gov proposals
   if (!requiresTaxForm) {
     return null;
   }
