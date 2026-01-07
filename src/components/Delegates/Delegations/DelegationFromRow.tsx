@@ -27,7 +27,7 @@ export default function DelegationFromRow({
           href={`/delegates/${delegation.from}`}
           title={`Address ${delegation.from}`}
         >
-          <ENSName address={delegation.to} includeCtoC={true} />
+          <ENSName address={delegation.from} includeCtoC={true} />
         </Link>
       </TableCell>
       <TableCell>
