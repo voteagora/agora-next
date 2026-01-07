@@ -5,6 +5,7 @@ import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { fetchDelegateForSCW } from "@/app/api/common/delegates/getDelegateForSCW";
 import { fetchDelegate } from "@/app/delegates/actions";
+import { fetchBadgesForDelegate } from "@/app/api/common/badges/getBadges";
 
 import { formatNumber } from "@/lib/tokenUtils";
 import {
@@ -103,12 +104,15 @@ export default async function Page({
     return redirect(`/delegates/${scwDelegate.address}`);
   }
 
-  const [delegate, textRecords, efpStats] = await Promise.all([
+  const [delegate, textRecords, efpStats, badges] = await Promise.all([
     fetchDelegate(address),
     ui.toggle("show-ens-text-records")?.enabled
       ? resolveENSTextRecords(address, ["description", "location"])
       : null,
     ui.toggle("show-efp-stats")?.enabled ? resolveEFPStats(address) : null,
+    ui.toggle("show-delegate-badges")?.enabled
+      ? fetchBadgesForDelegate(address)
+      : null,
   ]);
 
   if (!delegate) {
@@ -135,6 +139,7 @@ export default async function Page({
           location={textRecords?.location}
           followersCount={efpStats?.followers_count}
           followingCount={efpStats?.following_count}
+          badges={badges}
         />
       </div>
       {!scwDelegate ? (
