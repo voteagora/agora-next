@@ -54,12 +54,18 @@ export type UIInfoBannerConfig = {
   storageKey: string;
 };
 
+export type UIDunaDisclosuresConfig = {
+  content: ReactNode;
+  disclaimer?: ReactNode;
+};
+
 type UIConfig =
   | PLMConfig
   | UIDunaDescriptionConfig
   | UIVotingPowerInfoConfig
   | UIGovernanceInfoConfig
-  | UIInfoBannerConfig;
+  | UIInfoBannerConfig
+  | UIDunaDisclosuresConfig;
 
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account
