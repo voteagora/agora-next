@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { useAccount, useWalletClient } from "wagmi";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
-import { createVoteAttestation } from "@/lib/eas";
+import {
+  createVoteAttestation,
+  parseVotingTypeFromTags,
+  EAS_VOTING_TYPE,
+} from "@/lib/eas";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
@@ -12,8 +16,38 @@ import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { useUserVotes } from "@/hooks/useProposalVotes";
 import { useArchiveUserVotingPower } from "@/hooks/useArchiveUserVotingPower";
 import { TokenAmountDisplay } from "@/lib/utils";
+import CastEasApprovalVoteInput from "./CastEasApprovalVoteInput";
+import CastEasOptimisticVoteInput from "./CastEasOptimisticVoteInput";
 
 type VoteOption = "for" | "against" | "abstain" | null;
+
+// Helper to extract voting type info from proposal
+function getProposalVotingTypeInfo(proposal: Proposal): {
+  votingType: number;
+  choices: string[];
+  maxApprovals: number;
+  tiers: number[];
+} {
+  // Try to get from proposal data first (if available from indexed data)
+  const proposalData = proposal.proposalData as any;
+
+  if (proposalData?.votingType !== undefined) {
+    return {
+      votingType: proposalData.votingType,
+      choices: proposalData.choices || [],
+      maxApprovals: proposalData.maxApprovals || 1,
+      tiers: proposalData.tiers || [],
+    };
+  }
+
+  // Default to standard voting
+  return {
+    votingType: EAS_VOTING_TYPE.STANDARD,
+    choices: [],
+    maxApprovals: 1,
+    tiers: [],
+  };
+}
 
 function VoteSuccessMessage() {
   return (
@@ -40,6 +74,9 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
     proposalId: proposal.id,
     address,
   });
+
+  console.log("votingTypeInfo", proposal);
+  // Get voting type info from proposal
 
   // Check if proposal hasn't started yet
   const now = new Date();
@@ -77,6 +114,31 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
     return <VoteSuccessMessage />;
   }
 
+  // Route to appropriate vote input based on voting type
+  if (proposal.proposalType === "APPROVAL") {
+    return (
+      <CastEasApprovalVoteInput
+        proposal={proposal}
+        options={(proposal.proposalData as any).options.map(
+          (option: any, index: number) => ({
+            index,
+            title: option.description,
+          })
+        )}
+        maxApprovals={
+          (proposal.proposalData as any).proposalSettings.maxApprovals
+        }
+      />
+    );
+  }
+  console.log("proposal.proposalType", proposal.proposalType);
+  if (proposal.proposalType === "OPTIMISTIC") {
+    return (
+      <CastEasOptimisticVoteInput proposal={proposal} vetoThreshold={20} />
+    );
+  }
+
+  // Default to standard voting
   return <CastEasVoteInputContent proposal={proposal} />;
 }
 

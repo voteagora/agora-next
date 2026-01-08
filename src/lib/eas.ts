@@ -9,6 +9,7 @@ import Tenant from "./tenant/tenant";
 import { keccak256 } from "viem";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { getEASAddress } from "./constants";
+import { easVotingTypeToNumber } from "@/app/create/types";
 
 const { slug, contracts } = Tenant.current();
 
@@ -26,6 +27,12 @@ const EAS_V2_SCHEMA_IDS = {
       "0x19c36b80a224c4800fd6ed68901ec21f591563c8a5cb2dd95382d430603f91ff",
     8453: "0x72edbb9603b8ff8ae5310c1d33912f4a7998bea0c03afc0e06a64e41d32b78b9",
   } as Record<number, string>,
+  ADVANCED_VOTE: {
+    1: "0xc4465af5d96b474b1c7a6418500461d3de1fc35552679bf695eb2b3124817dce",
+    11155111:
+      "0x991b014c62b19364882fc89dbf3baa6104b4598ee2c4f29152be2cbcfcb4cb81",
+    8453: "0x72edbb9603b8ff8ae5310c1d33912f4a7998bea0c03afc0e06a64e41d32b78b9",
+  },
 };
 
 const schemaEncoder = new SchemaEncoder(
@@ -204,7 +211,21 @@ export const signDelegatedAttestation = async ({
 
   return response.signature;
 };
-// EAS v2 Governance Functions
+
+// EAS v2 Governance Functions (Syndicate)
+
+// Voting type constants
+export const EAS_VOTING_TYPE = {
+  STANDARD: 0,
+  APPROVAL: 1,
+  OPTIMISTIC: 2,
+} as const;
+
+// Approval criteria constants
+export const EAS_APPROVAL_CRITERIA = {
+  THRESHOLD: 0,
+  TOP_CHOICES: 1,
+} as const;
 
 // Schema encoders for EAS v2 attestations
 const v2SchemaEncoders = {
@@ -212,6 +233,7 @@ const v2SchemaEncoders = {
     "string title,string description,uint64 startts,uint64 endts,string tags, string kwargs"
   ),
   VOTE: new SchemaEncoder("int8 choice,string reason"),
+  ADVANCED_VOTE: new SchemaEncoder("string choice,string reason"),
 };
 
 export async function createV2CreateProposalAttestation({
@@ -222,6 +244,12 @@ export async function createV2CreateProposalAttestation({
   tags,
   proposal_type_uid,
   signer,
+  votingType = "standard",
+  choices = [],
+  maxApprovals = 1,
+  criteria = EAS_APPROVAL_CRITERIA.THRESHOLD,
+  criteriaValue = 0,
+  budget = 0,
 }: {
   title: string;
   description: string;
@@ -230,8 +258,29 @@ export async function createV2CreateProposalAttestation({
   tags: string;
   proposal_type_uid?: string;
   signer: JsonRpcSigner;
+  votingType?: string;
+  choices?: string[];
+  maxApprovals?: number;
+  criteria?: number;
+  criteriaValue?: number;
+  budget?: number;
 }) {
   eas.connect(signer as any);
+  let kwargs;
+  if (votingType === "approval") {
+    kwargs = {
+      choices,
+      max_approvals: maxApprovals,
+      criteria,
+      criteria_value: criteriaValue,
+      voting_module: votingType,
+      budget,
+    };
+  } else {
+    kwargs = {
+      voting_module: votingType,
+    };
+  }
 
   const encodedData = v2SchemaEncoders.CREATE_PROPOSAL.encodeData([
     { name: "title", value: title, type: "string" },
@@ -239,7 +288,7 @@ export async function createV2CreateProposalAttestation({
     { name: "startts", value: startts, type: "uint64" },
     { name: "endts", value: endts, type: "uint64" },
     { name: "tags", value: tags, type: "string" },
-    { name: "kwargs", value: "{'voting_module': 'standard'}", type: "string" },
+    { name: "kwargs", value: JSON.stringify(kwargs), type: "string" },
   ]);
 
   const txResponse = await eas.attest({
@@ -258,6 +307,7 @@ export async function createV2CreateProposalAttestation({
   const receipt = await txResponse.wait();
   return { transactionHash: receipt };
 }
+
 export { EAS_V2_SCHEMA_IDS };
 
 export async function createVoteAttestation({
@@ -285,6 +335,124 @@ export async function createVoteAttestation({
 
   const txResponse = await eas.attest({
     schema: EAS_V2_SCHEMA_IDS.VOTE[contracts.token.chain.id],
+    data: {
+      recipient,
+      expirationTime,
+      revocable,
+      refUID: proposalId,
+      data: encodedData,
+      value: 0n,
+    },
+  });
+
+  const receipt = await txResponse.wait();
+
+  if (!receipt) {
+    console.error(
+      "Transaction failed or was not mined. Full response:",
+      receipt
+    );
+    throw new Error("Transaction failed or was not mined.");
+  }
+
+  return {
+    transactionHash: receipt,
+  };
+}
+
+/**
+ * Create an approval vote attestation (multi-choice selection)
+ * Uses ADVANCED_VOTE schema: "string choice,string reason"
+ * Choice is comma-separated indices (e.g., "0,2,3")
+ */
+export async function createApprovalVoteAttestation({
+  choices,
+  reason,
+  signer,
+  proposalId,
+}: {
+  choices: number[];
+  reason: string;
+  signer: JsonRpcSigner;
+  proposalId: string;
+}) {
+  eas.connect(signer as any);
+
+  const choiceString = choices.join(",");
+
+  const encodedData = v2SchemaEncoders.ADVANCED_VOTE.encodeData([
+    { name: "choice", value: choiceString, type: "string" },
+    { name: "reason", value: reason, type: "string" },
+  ]);
+
+  const recipient =
+    contracts.easRecipient || "0x0000000000000000000000000000000000000000";
+  const expirationTime = NO_EXPIRATION;
+  const revocable = false;
+
+  const txResponse = await eas.attest({
+    schema:
+      EAS_V2_SCHEMA_IDS.ADVANCED_VOTE[
+        contracts.token.chain.id as keyof typeof EAS_V2_SCHEMA_IDS.ADVANCED_VOTE
+      ],
+    data: {
+      recipient,
+      expirationTime,
+      revocable,
+      refUID: proposalId,
+      data: encodedData,
+      value: 0n,
+    },
+  });
+
+  const receipt = await txResponse.wait();
+
+  if (!receipt) {
+    console.error(
+      "Transaction failed or was not mined. Full response:",
+      receipt
+    );
+    throw new Error("Transaction failed or was not mined.");
+  }
+
+  return {
+    transactionHash: receipt,
+  };
+}
+
+/**
+ * Create an optimistic vote attestation (veto vote)
+ * Uses ADVANCED_VOTE schema: "string choice,string reason"
+ * Choice is "0" (AGAINST/VETO)
+ */
+export async function createOptimisticVoteAttestation({
+  reason,
+  signer,
+  proposalId,
+}: {
+  reason: string;
+  signer: JsonRpcSigner;
+  proposalId: string;
+}) {
+  eas.connect(signer as any);
+
+  const choiceString = "0"; // 0 = AGAINST/VETO
+
+  const encodedData = v2SchemaEncoders.ADVANCED_VOTE.encodeData([
+    { name: "choice", value: choiceString, type: "string" },
+    { name: "reason", value: reason, type: "string" },
+  ]);
+
+  const recipient =
+    contracts.easRecipient || "0x0000000000000000000000000000000000000000";
+  const expirationTime = NO_EXPIRATION;
+  const revocable = false;
+
+  const txResponse = await eas.attest({
+    schema:
+      EAS_V2_SCHEMA_IDS.ADVANCED_VOTE[
+        contracts.token.chain.id as keyof typeof EAS_V2_SCHEMA_IDS.ADVANCED_VOTE
+      ],
     data: {
       recipient,
       expirationTime,
