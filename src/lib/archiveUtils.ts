@@ -140,7 +140,10 @@ export const fetchProposalFromArchive = async (
     const allProposalsEasOodao = responseEasOodao.ok
       ? JSON.parse(jsonTextEasOodao)
       : undefined;
-    return allProposalsDaoNode || allProposalsEasOodao;
+
+    let proposal = allProposalsDaoNode || allProposalsEasOodao;
+
+    return proposal;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     if (errorMessage.includes("404") || errorMessage.includes("Not Found")) {

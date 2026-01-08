@@ -134,6 +134,7 @@ export type ArchiveProposalBase = {
   num_of_votes?: number;
   lifecycle_stage?: string;
   data_eng_properties: DataEngProperties;
+  kwargs?: Record<string, unknown>;
 };
 
 // =============================================================================
@@ -264,6 +265,8 @@ export type EasOodaoProposalFields = {
 
   // Vote outcome
   outcome?: EasOodaoVoteOutcome;
+  kwargs?: Record<string, unknown>;
+  voting_module?: string;
 };
 
 // =============================================================================
@@ -357,7 +360,7 @@ export function deriveProposalType(
     return "STANDARD";
   }
 
-  if (source === "eas-atlas" || source === "eas-oodao") {
+  if (source === "eas-atlas") {
     const hasOnchainId =
       "onchain_proposalid" in proposal &&
       proposal.onchain_proposalid &&
@@ -369,6 +372,17 @@ export function deriveProposalType(
 
     // If there is an onchain id, treat it as hybrid-standard
     return "HYBRID_STANDARD";
+  }
+
+  if (source === "eas-oodao") {
+    const easOodaoProposal = proposal as EasOodaoProposal;
+    if (easOodaoProposal.voting_module === "approval") {
+      return "APPROVAL";
+    }
+    if (easOodaoProposal.voting_module === "optimistic") {
+      return "OPTIMISTIC";
+    }
+    return "STANDARD";
   }
 
   // Fallback: treat unknown sources as STANDARD
@@ -518,4 +532,5 @@ export type ArchiveListProposal = {
   quorum_check?: boolean;
   approval_check?: boolean;
   total_voting_power_at_start?: string;
+  kwargs?: Record<string, unknown>;
 };
