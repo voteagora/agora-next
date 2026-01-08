@@ -18,8 +18,9 @@ import { useCalculateCopelandResult } from "@/hooks/useCalculateCopelandResult";
 import React, { useMemo } from "react";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { ParsedProposalData } from "@/lib/proposalUtils";
+import { isProdInfra } from "@/lib/envConfig";
 
-const { ui, isProd } = Tenant.current();
+const { ui } = Tenant.current();
 
 // Helper function to check if an option is an extended version
 const EXTENDED_SUFFIX = " - ext";
@@ -86,7 +87,7 @@ const FUNDING_VALUES_DEV: Record<
   "A long name foundation": { ext: null, std: 400000, isEligibleFor2Y: false },
 };
 
-const FUNDING_VALUES = isProd ? FUNDING_VALUES_PROD : FUNDING_VALUES_DEV;
+const FUNDING_VALUES = isProdInfra() ? FUNDING_VALUES_PROD : FUNDING_VALUES_DEV;
 
 export default function OptionsResultsPanel({
   proposal,

@@ -14,6 +14,7 @@ import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { isMainContractDeployment } from "@/lib/envConfig";
 
 const PROPOSAL_PAGE_TEXT =
   "Governance decisions are initiated as proposals, providing insights into the priorities of the community. Proposals can be submitted for community discussion in Xai Discord in the #ecosystem-proposals channel.  Proposals are voted on by delegates. Voting power is given to delegates based on XAI + esXAI + staked esXAI. We aggregate each of these to calculate vXAI";
@@ -21,7 +22,7 @@ const ROOT_PAGE_TEXT = PROPOSAL_PAGE_TEXT;
 const DELEGATE_PAGE_TEXT = `Delegates represent the Xai ecosystem, guiding governance decisions on behalf of Xai token holders to ensure the platform evolves in line with community priorities.  Voting power is based on owned XAI + esXAI + staked esXAI. We aggregate each of these to calculate vXAI.`;
 const INFO_PAGE_TEXT = `Xai Gov is the home of Xai DAO governance, where Xai tokenholders delegate, vote, and make decisions to steward the future of the ecosystem.  Voting power is based on owned XAI + esXAI + staked esXAI. We aggregate each of these to calculate vXAI.`;
 
-const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
+const isMain = isMainContractDeployment();
 
 const prodTokens = [
   {
@@ -48,7 +49,7 @@ export const xaiTenantUIConfig = new TenantUI({
   title: "Xai Agora",
   logo: xaiLogo,
   tokens: [
-    ...(isProd ? prodTokens : []),
+    ...(isMain ? prodTokens : []),
     TenantTokenFactory.create(TENANT_NAMESPACES.XAI),
   ],
   googleAnalytics: "G-BSFWRZVGEB",

@@ -8,6 +8,7 @@ import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { fetchOffchainProposalsMap } from "./fetchOffchainProposalsMap";
+import { isMainContractDeployment } from "@/lib/envConfig";
 
 async function getNeedsMyVoteProposals(address: string) {
   return withMetrics("getNeedsMyVoteProposals", async () => {
@@ -31,8 +32,8 @@ async function getNeedsMyVoteProposals(address: string) {
       throw new Error("Could not get latest block");
     }
 
-    const isProdEnv = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
-    const prodDataOnly = isProdEnv ? `AND contract = $3` : "";
+    const isMain = isMainContractDeployment();
+    const prodDataOnly = isMain ? `AND contract = $3` : "";
 
     const query = `
         SELECT p.*
@@ -62,7 +63,7 @@ async function getNeedsMyVoteProposals(address: string) {
       address.toLowerCase(),
     ];
 
-    if (isProdEnv) {
+    if (isMain) {
       params.push(contracts.governor.address.toLowerCase());
     }
 

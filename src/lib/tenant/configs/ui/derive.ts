@@ -13,8 +13,9 @@ import infoPageCard04 from "@/assets/tenant/derive_info_3.png";
 import infoPageHero from "@/assets/tenant/derive_gov.png";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { isMainContractDeployment } from "@/lib/envConfig";
 
-const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
+const isMain = isMainContractDeployment();
 export const deriveTenantUIConfig = new TenantUI({
   title: "Derive Agora",
   logo: deriveLogo,
@@ -66,16 +67,16 @@ export const deriveTenantUIConfig = new TenantUI({
   ],
 
   smartAccountConfig: {
-    bundlerUrl: isProd
+    bundlerUrl: isMain
       ? `https://bundler-lyra-mainnet-0.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`
       : `https://bundler-prod-testnet-0eakp60405.t.conduit.xyz/${process.env.NEXT_PUBLIC_CONDUIT_KEY}`,
 
     entryPointAddress: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
     factoryAddress: "0x000000893A26168158fbeaDD9335Be5bC96592E2",
-    paymasterAddress: isProd
+    paymasterAddress: isMain
       ? "0xa179c3b32d3eE58353d3F277b32D1e03DD33fFCA"
       : "0x5a6499b442711feeA0Aa73C6574042EC5E2e5945",
-    paymasterUrl: isProd
+    paymasterUrl: isMain
       ? "https://derive.xyz/api/paymaster"
       : "https://testnet.derive.xyz/api/paymaster",
     salt: BigInt(0),

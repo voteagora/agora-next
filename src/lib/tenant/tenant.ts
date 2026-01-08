@@ -9,6 +9,7 @@ import TenantSlugFactory from "@/lib/tenant/tenantSlugFactory";
 import TenantUIFactory from "@/lib/tenant/tenantUIFactory";
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import { type DaoSlug } from "@prisma/client";
+import { isMainContractDeployment } from "@/lib/envConfig";
 
 export const BRAND_NAME_MAPPINGS: Record<string, string> = {
   ens: "ENS",
@@ -22,7 +23,7 @@ export default class Tenant {
   private static instance: Tenant;
 
   private readonly _contracts: TenantContracts;
-  private readonly _isProd: boolean;
+  private readonly _isMain: boolean;
   private readonly _namespace: TenantNamespace;
   private readonly _slug: DaoSlug;
   private readonly _token: TenantToken;
@@ -32,10 +33,10 @@ export default class Tenant {
   private constructor() {
     this._namespace = process.env
       .NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace;
-    this._isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
+    this._isMain = isMainContractDeployment();
     this._contracts = TenantContractFactory.create(
       this._namespace,
-      this._isProd,
+      this._isMain,
       process.env.NEXT_PUBLIC_ALCHEMY_ID as string
     );
     this._slug = TenantSlugFactory.create(this._namespace);
@@ -48,8 +49,15 @@ export default class Tenant {
     return this._contracts;
   }
 
+  public get isMain(): boolean {
+    return this._isMain;
+  }
+
+  /**
+   * @deprecated Use isMain instead
+   */
   public get isProd(): boolean {
-    return this._isProd;
+    return this._isMain;
   }
 
   public get namespace(): TenantNamespace {

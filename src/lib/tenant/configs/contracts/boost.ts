@@ -18,32 +18,32 @@ import {
 } from "@/lib/constants";
 
 interface Props {
-  isProd: boolean;
+  isMain: boolean;
   alchemyId: string;
 }
 
 export const boostTenantConfig = ({
-  isProd,
+  isMain,
   alchemyId,
 }: Props): TenantContracts => {
-  const TOKEN = isProd
+  const TOKEN = isMain
     ? "0xcDdf69F9d290F591896DD1A27cbb32E4935D47b6"
     : "0x9323dd7c1fa5f05dc1e922763ae12529133c0848";
 
-  const GOVERNOR = isProd
+  const GOVERNOR = isMain
     ? "0xb4e9d0ca820320ebac45a4d60b020f64f0d6d4be"
     : "0x3b66f791ae98292ecc8602bc91a0b7dacab00cbf";
 
   // TODO: wasn't sure what to put here so defaulting to timelock
-  const TREASURY = isProd
+  const TREASURY = isMain
     ? ["0x0cabe65b0adc1634f56ea66a36abb70f2d4232c5"]
     : ["0x7af51c3ed3b691a58a7ab2cd5876a33751d3bc6f"];
 
-  const TYPES = isProd
+  const TYPES = isMain
     ? "0xa78db4a8efccd5812e0044496edcc571da3d24c6"
     : "0x736d1339634691ed06f34fb4504013a7272bf4ea";
 
-  const TIMELOCK = isProd
+  const TIMELOCK = isMain
     ? "0x0cabe65b0adc1634f56ea66a36abb70f2d4232c5"
     : "0x7af51c3ed3b691a58a7ab2cd5876a33751d3bc6f";
 
@@ -51,11 +51,11 @@ export const boostTenantConfig = ({
 
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : isProd
+    : isMain
       ? new AlchemyProvider("optimism", alchemyId)
       : new AlchemyProvider("optimism-sepolia", alchemyId);
 
-  const chain = isProd ? optimism : optimismSepolia;
+  const chain = isMain ? optimism : optimismSepolia;
 
   return {
     token: createTokenContract({

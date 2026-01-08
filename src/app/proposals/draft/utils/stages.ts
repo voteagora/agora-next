@@ -118,7 +118,7 @@ export const getProposalTypeAddress = (
     throw new Error(`Proposal type ${type} for tenant ${tenant.ui.title}`);
   }
 
-  return tenant.isProd ? proposalType.prodAddress : proposalType.testnetAddress;
+  return tenant.isMain ? proposalType.prodAddress : proposalType.testnetAddress;
 };
 
 export const parseError = (error: any) => {

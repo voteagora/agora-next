@@ -12,6 +12,7 @@ import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { isMainContractDeployment } from "@/lib/envConfig";
 
 export const ensTenantUIConfig = new TenantUI({
   title: "ENS Agora",
@@ -164,10 +165,9 @@ export const ensTenantUIConfig = new TenantUI({
         signature: {
           version: "1",
         },
-        sponsorAddress:
-          process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-            ? "0x7735C385081568e9338aEc70492Debfd2d5c3450"
-            : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
+        sponsorAddress: isMainContractDeployment()
+          ? "0x7735C385081568e9338aEc70492Debfd2d5c3450"
+          : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
         minBalance: "0.001",
         minVPToUseGasRelay: "10",
       },
@@ -179,10 +179,9 @@ export const ensTenantUIConfig = new TenantUI({
         signature: {
           version: "1",
         },
-        sponsorAddress:
-          process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-            ? "0x7735C385081568e9338aEc70492Debfd2d5c3450"
-            : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
+        sponsorAddress: isMainContractDeployment()
+          ? "0x7735C385081568e9338aEc70492Debfd2d5c3450"
+          : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
         minBalance: "0.001",
         minVPToUseGasRelay: "10",
       },

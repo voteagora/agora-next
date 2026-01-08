@@ -29,6 +29,7 @@ import {
   DERIVE_TESTNET_RPC,
 } from "@/lib/tenant/configs/contracts/derive";
 import { toNumericChainId } from "@/lib/utils";
+import { isMainContractDeployment } from "@/lib/envConfig";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DUMB_SIGNATURE =
@@ -40,9 +41,7 @@ const bundlerRpcMethods = new Set([
   "eth_getUserOperationByHash",
   "eth_getUserOperationReceipt",
   "eth_supportedEntryPoints",
-  process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-    ? "pimlico_getUserOperationGasPrice"
-    : null,
+  isMainContractDeployment() ? "pimlico_getUserOperationGasPrice" : null,
 ]);
 
 const { contracts, ui } = Tenant.current();
@@ -83,9 +82,7 @@ const lyraBundlerClient = createBundlerClient({
 
 const bundlerTransport = http(ui.smartAccountConfig?.bundlerUrl);
 const nodeTransport = http(
-  process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-    ? DERIVE_MAINNET_RPC
-    : DERIVE_TESTNET_RPC
+  isMainContractDeployment() ? DERIVE_MAINNET_RPC : DERIVE_TESTNET_RPC
 );
 
 const dummyPaymasterAndData = (): `0x${string}` => {

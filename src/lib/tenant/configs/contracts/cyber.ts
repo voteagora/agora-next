@@ -19,7 +19,7 @@ import {
 } from "@/lib/constants";
 
 interface Props {
-  isProd: boolean;
+  isMain: boolean;
   alchemyId: string;
 }
 
@@ -54,30 +54,30 @@ export const cyber = /*#__PURE__*/ defineChain({
 });
 
 export const cyberTenantConfig = ({
-  isProd,
+  isMain,
   alchemyId,
 }: Props): TenantContracts => {
-  const TOKEN = isProd
+  const TOKEN = isMain
     ? "0x522d3a9c2bc14ce1c4d210ed41ab239fded02f2b"
     : "0x8dfC3B23EE4ca0b8C4af1e4EC7F72D2efbAB70E3";
 
-  const GOVERNOR = isProd
+  const GOVERNOR = isMain
     ? "0x58E53131c339aA3cBA35904538eA5948f751050a"
     : "0x963f3645ff2dB82f607fcf5b70c8bB133D53bD36";
 
-  const TREASURY = isProd
+  const TREASURY = isMain
     ? ["0x23f4F627EC82001c422658d87BA65C2D4AdDa794"]
     : ["0xEb3aef5D867109E734fB08E7b1f7b7bba8226aa3"];
 
-  const TYPES = isProd
+  const TYPES = isMain
     ? "0x36a8529335AdBE769Dd9180C275e9b8eCD3C6C72"
     : "0x0B629B2ff953a9f0216816342685514798E18819";
 
-  const TIMELOCK = isProd
+  const TIMELOCK = isMain
     ? "0x11caA7DF2a1FCAea7149fc01aC8D2DB5d3C82421"
     : "0xa9E1A6856bcd9e8b3c4B336f229061c1C5461Bc6";
 
-  const APPROVAL_MODULE = isProd
+  const APPROVAL_MODULE = isMain
     ? "0x751a4989E01776522B6989511D0B969311Dd5f4e"
     : "0x096F1e0e82CaD5540BF04bd95A6802C0350d8E49";
 

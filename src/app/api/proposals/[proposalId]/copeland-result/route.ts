@@ -47,9 +47,9 @@ const FUNDING_VALUES_DEV: Record<
   "A long name foundation": { ext: null, std: 400000, isEligibleFor2Y: false },
 };
 
-const { isProd } = Tenant.current();
+const { isMain } = Tenant.current();
 
-const FUNDING_VALUES = isProd ? FUNDING_VALUES_PROD : FUNDING_VALUES_DEV;
+const FUNDING_VALUES = isMain ? FUNDING_VALUES_PROD : FUNDING_VALUES_DEV;
 
 // Total budget of $4.5M for 12 months
 const BUDGET_2Y = 1500000;

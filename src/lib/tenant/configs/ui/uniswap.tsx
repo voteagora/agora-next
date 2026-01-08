@@ -14,6 +14,7 @@ import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { isMainContractDeployment } from "@/lib/envConfig";
 
 export const uniswapTenantUIConfig = new TenantUI({
   title: "Uniswap Agora",
@@ -253,10 +254,9 @@ export const uniswapTenantUIConfig = new TenantUI({
       name: "sponsoredVote",
       enabled: true,
       config: {
-        sponsorAddress:
-          process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-            ? "0xc1B333d56Af681F4Db3194F8Dc6cEdF860a8c950"
-            : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
+        sponsorAddress: isMainContractDeployment()
+          ? "0xc1B333d56Af681F4Db3194F8Dc6cEdF860a8c950"
+          : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
         minBalance: "0.1",
         minVPToUseGasRelay: "10",
       },
@@ -265,10 +265,9 @@ export const uniswapTenantUIConfig = new TenantUI({
       name: "sponsoredDelegate",
       enabled: true,
       config: {
-        sponsorAddress:
-          process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-            ? "0xc1B333d56Af681F4Db3194F8Dc6cEdF860a8c950"
-            : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
+        sponsorAddress: isMainContractDeployment()
+          ? "0xc1B333d56Af681F4Db3194F8Dc6cEdF860a8c950"
+          : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
         minBalance: "0.1",
         minVPToUseGasRelay: "10",
       },

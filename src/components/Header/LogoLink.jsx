@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function LogoLink() {
-  const { ui, isProd } = Tenant.current();
+  const { ui, isMain } = Tenant.current();
 
   return (
     <Link href="/" className="flex flex-row justify-between w-full">
@@ -19,7 +19,7 @@ export default function LogoLink() {
               : "h-[46px] w-auto"
           }
         />
-        {!isProd && (
+        {!isMain && (
           <>
             <div className="h-3 w-[2px] bg-line rounded-full hidden sm:block"></div>
             <span className="hidden sm:block font-semibold text-primary bg-tertiary/10 px-1.5 py-0.5 rounded-lg text-xs border border-line whitespace-nowrap">

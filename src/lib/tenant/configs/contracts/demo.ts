@@ -18,7 +18,7 @@ import {
 import { optimism } from "viem/chains";
 
 interface Props {
-  isProd: boolean;
+  isMain: boolean;
   alchemyId: string;
 }
 export const demoTenantConfig = ({ alchemyId }: Props): TenantContracts => {
