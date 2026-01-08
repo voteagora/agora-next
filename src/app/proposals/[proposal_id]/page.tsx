@@ -25,8 +25,14 @@ import { redirect } from "next/navigation";
 import { fetchProposalFromArchive } from "@/lib/archiveUtils";
 import {
   isArchiveStandardProposal,
+  isArchiveOptimisticProposal,
+  isArchiveApprovalProposal,
   normalizeArchiveStandardProposal,
+  normalizeArchiveOptimisticProposal,
+  normalizeArchiveApprovalProposal,
 } from "@/components/Proposals/Proposal/Archive/normalizeArchiveProposalDetail";
+import ArchiveOptimisticProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/ArchiveOptimisticProposalPage";
+import ArchiveApprovalProposalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/ArchiveApprovalProposalPage";
 
 export const maxDuration = 60;
 
@@ -44,15 +50,32 @@ async function loadProposal(
     );
 
     const archiveProposal = archiveResults ? archiveResults : undefined;
-    if (archiveProposal && isArchiveStandardProposal(archiveProposal)) {
-      const normalizedProposal = normalizeArchiveStandardProposal(
-        archiveProposal,
-        {
-          namespace,
-          tokenDecimals: token.decimals ?? 18,
-        }
-      );
-      return normalizedProposal;
+    if (archiveProposal) {
+      const normalizeOptions = {
+        namespace,
+        tokenDecimals: token.decimals ?? 18,
+      };
+
+      if (isArchiveOptimisticProposal(archiveProposal)) {
+        return normalizeArchiveOptimisticProposal(
+          archiveProposal,
+          normalizeOptions
+        );
+      }
+
+      if (isArchiveApprovalProposal(archiveProposal)) {
+        return normalizeArchiveApprovalProposal(
+          archiveProposal,
+          normalizeOptions
+        );
+      }
+
+      if (isArchiveStandardProposal(archiveProposal)) {
+        return normalizeArchiveStandardProposal(
+          archiveProposal,
+          normalizeOptions
+        );
+      }
     }
 
     throw new Error("Proposal not found in archive");
@@ -231,7 +254,11 @@ export default async function Page({
       break;
 
     case "OPTIMISTIC":
-      RenderComponent = OPProposalOptimisticPage;
+      if (useArchiveForProposals) {
+        RenderComponent = ArchiveOptimisticProposalPage;
+      } else {
+        RenderComponent = OPProposalOptimisticPage;
+      }
       break;
     case "OFFCHAIN_OPTIMISTIC":
     case "OFFCHAIN_OPTIMISTIC_TIERED":
@@ -239,7 +266,11 @@ export default async function Page({
       RenderComponent = HybridOptimisticProposalPage;
       break;
     case "APPROVAL":
-      RenderComponent = OPProposalApprovalPage;
+      if (useArchiveForProposals) {
+        RenderComponent = ArchiveApprovalProposalPage;
+      } else {
+        RenderComponent = OPProposalApprovalPage;
+      }
       break;
     case "HYBRID_APPROVAL":
       RenderComponent = HybridApprovalProposalPage;
