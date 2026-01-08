@@ -49,7 +49,6 @@ const makePrismaClient = (databaseUrl: string) => {
     connectionString: databaseUrl,
     max: POOL_MAX,
     connectionTimeoutMillis: 5000, // return an error after 5 seconds if connection could not be established
-    idleTimeoutMillis: 30000, // close idle clients after 30 seconds
   });
 
   pool.on("error", (err) => {
