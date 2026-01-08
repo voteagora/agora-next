@@ -15,7 +15,7 @@ self.addEventListener("push", function (event) {
     const options = {
       body: data.body,
       icon: data.icon || "/favicon/android-chrome-192x192.png",
-      badge: "/favicon/favicon-32x32.png",
+      badge: data.badge || "/favicon/favicon-32x32.png",
       vibrate: [100, 50, 100],
       tag: "agora-notification",
       renotify: true,
@@ -25,7 +25,7 @@ self.addEventListener("push", function (event) {
         primaryKey: "2",
         url: data.data?.url || "/",
       },
-      actions: data.data?.actions || [],
+      actions: data.actions || [],
     };
 
     event.waitUntil(self.registration.showNotification(data.title, options));
@@ -37,7 +37,11 @@ self.addEventListener("push", function (event) {
 self.addEventListener("notificationclick", function (event) {
   event.notification.close();
 
-  const urlToOpen = event.notification.data.url;
+  // If an action button was clicked, event.action contains the URL (as mapped in backend)
+  // Otherwise, fallback to the main notification data.url
+  const urlToOpen = event.action || event.notification.data.url;
+
+  if (!urlToOpen) return;
 
   event.waitUntil(
     clients
@@ -46,20 +50,17 @@ self.addEventListener("notificationclick", function (event) {
         includeUncontrolled: true,
       })
       .then(function (clientList) {
-        if (clientList.length > 0) {
-          let client = clientList[0];
-          for (let i = 0; i < clientList.length; i++) {
-            if (clientList[i].focused) {
-              client = clientList[i];
-            }
-          }
-          if (client.url === urlToOpen) {
+        // Try to focus an existing window first
+        for (let i = 0; i < clientList.length; i++) {
+          const client = clientList[i];
+          if (client.url === urlToOpen && "focus" in client) {
             return client.focus();
-          } else {
-            return client.navigate(urlToOpen).then((client) => client.focus());
           }
         }
-        return clients.openWindow(urlToOpen);
+        // If no matching window found, open a new one
+        if (clients.openWindow) {
+          return clients.openWindow(urlToOpen);
+        }
       })
   );
 });
