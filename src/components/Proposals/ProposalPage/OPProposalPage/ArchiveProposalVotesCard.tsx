@@ -18,7 +18,7 @@ export default function ArchiveProposalVotesCard({
 }: ArchiveProposalVotesCardProps) {
   const [isClicked, setIsClicked] = useState(false);
   const [showVoters, setShowVoters] = useState(true);
-
+  console.log("proposal", proposal);
   const now = new Date();
   const isProposalActive =
     proposal.endTime && proposal.endTime > now && proposal.status === "ACTIVE";
