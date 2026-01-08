@@ -3,6 +3,8 @@
 import { deriveProposalType } from "@/lib/types/archiveProposal";
 import { StandardProposalRow } from "./StandardProposalRow";
 import { SnapshotProposalRow } from "./SnapshotProposalRow";
+import { ApprovalProposalRow } from "./ApprovalProposalRow";
+import { OptimisticProposalRow } from "./OptimisticProposalRow";
 import { ArchiveRowProps } from "./types";
 
 /**
@@ -41,6 +43,23 @@ export function ArchiveProposalRow({
     case "OFFCHAIN_STANDARD":
       return (
         <StandardProposalRow
+          proposal={proposal}
+          tokenDecimals={tokenDecimals}
+          proposalType={proposalType}
+        />
+      );
+    case "APPROVAL":
+      return (
+        <ApprovalProposalRow
+          proposal={proposal}
+          tokenDecimals={tokenDecimals}
+          proposalType={proposalType}
+        />
+      );
+
+    case "OPTIMISTIC":
+      return (
+        <OptimisticProposalRow
           proposal={proposal}
           tokenDecimals={tokenDecimals}
           proposalType={proposalType}

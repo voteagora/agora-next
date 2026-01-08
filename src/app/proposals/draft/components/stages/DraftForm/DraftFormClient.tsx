@@ -309,7 +309,7 @@ const DraftFormClient = ({
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <SwitchInput
                     control={control}
-                    label="Voting module"
+                    label=""
                     required={true}
                     options={enabledProposalTypesFromConfigAndAPI}
                     name="type"

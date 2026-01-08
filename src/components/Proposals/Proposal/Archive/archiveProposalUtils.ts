@@ -194,12 +194,66 @@ export const deriveStatus = (
 
   // Extract thresholds from proposal (as percentages, e.g., 4 = 4%, 100 = 100%)
   const thresholds = extractThresholds(proposal);
-
   // Check quorum and approval threshold - we need total voting power
   let quorumMet = true;
   let hasMetThreshold = true;
 
-  if (proposal.total_voting_power_at_start) {
+  if (proposal.kwargs?.voting_module === "optimistic") {
+    const qorumVotes = againstVotes;
+    const totalPower = convertToNumber(
+      proposal.total_voting_power_at_start,
+      decimals
+    );
+    const failingQorum = (thresholds.quorum / 100) * totalPower;
+    quorumMet = qorumVotes < failingQorum;
+    if (quorumMet) {
+      return "SUCCEEDED";
+    }
+    return "DEFEATED";
+  } else if (proposal.kwargs?.voting_module === "approval") {
+    // Handle approval voting module
+    const criteria = proposal.kwargs?.criteria;
+    const thresholdRaw =
+      proposal.kwargs?.threshold ?? proposal.kwargs?.criteria_value ?? 0;
+
+    const isThresholdCriteria =
+      criteria === "THRESHOLD" ||
+      criteria === "threshold" ||
+      criteria === 0 ||
+      criteria === "0";
+
+    if (isThresholdCriteria) {
+      const threshold = safeBigInt(
+        typeof thresholdRaw === "string" || typeof thresholdRaw === "number"
+          ? thresholdRaw
+          : 0
+      );
+
+      const totals = (proposal.totals ?? {}) as Record<
+        string,
+        Record<string, string>
+      >;
+
+      let succeeded = false;
+      for (const [optionKey, supportDict] of Object.entries(totals)) {
+        if (optionKey === "no-param") continue;
+
+        let optionVotes = 0n;
+        for (const rawVotes of Object.values(supportDict ?? {})) {
+          optionVotes += safeBigInt(rawVotes);
+        }
+
+        if (optionVotes > threshold) {
+          succeeded = true;
+          break;
+        }
+      }
+
+      return succeeded ? "SUCCEEDED" : "DEFEATED";
+    }
+
+    return "SUCCEEDED";
+  } else if (proposal.total_voting_power_at_start) {
     const totalPower = convertToNumber(
       proposal.total_voting_power_at_start,
       decimals
