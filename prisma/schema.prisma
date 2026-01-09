@@ -5563,7 +5563,7 @@ model ForumRole {
     @@schema("alltenant")
 }
 
-model ForumPermission {
+model Permission {
     id          Int      @id @default(autoincrement())
     module      String
     resource    String
@@ -5576,7 +5576,7 @@ model ForumPermission {
 
     @@unique([module, resource, action])
     @@index([module])
-    @@map("forum_permissions")
+    @@map("permissions")
     @@schema("alltenant")
 }
 
@@ -5588,8 +5588,8 @@ model ForumRolePermission {
     createdAt    DateTime @default(now()) @map("created_at")
 
     // Relations
-    role       ForumRole        @relation(fields: [roleId], references: [id], onDelete: Cascade)
-    permission ForumPermission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+    role       ForumRole   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+    permission Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
     @@unique([roleId, permissionId])
     @@index([roleId])

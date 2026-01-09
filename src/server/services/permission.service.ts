@@ -169,7 +169,7 @@ export class PermissionService {
    * Get permission matrix (all permissions grouped by module and resource)
    */
   async getPermissionMatrix() {
-    const permissions = await db.forumPermission.findMany({
+    const permissions = await db.permission.findMany({
       orderBy: [{ module: "asc" }, { resource: "asc" }, { action: "asc" }],
     });
 
