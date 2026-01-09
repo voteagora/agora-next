@@ -22,6 +22,9 @@ type ProposalEmbedData = {
     for: string;
     against: string;
     abstain: string;
+    forRaw?: string;
+    againstRaw?: string;
+    abstainRaw?: string;
     forPercentage: number;
     againstPercentage: number;
     abstainPercentage: number;
@@ -85,6 +88,9 @@ async function getProposalEmbedData(
           for: formatNumber(forVotes),
           against: formatNumber(againstVotes),
           abstain: formatNumber(abstainVotes),
+          forRaw: forVotes.toString(),
+          againstRaw: againstVotes.toString(),
+          abstainRaw: abstainVotes.toString(),
           forPercentage: Number((forVotes * 100n) / totalVotes),
           againstPercentage: Number((againstVotes * 100n) / totalVotes),
           abstainPercentage: Number((abstainVotes * 100n) / totalVotes),

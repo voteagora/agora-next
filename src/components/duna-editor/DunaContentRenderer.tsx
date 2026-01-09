@@ -32,11 +32,17 @@ interface DunaContentRendererProps {
 }
 
 function isInternalEmbeddableLink(href: string): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
   try {
-    const url = new URL(
-      href,
-      typeof window !== "undefined" ? window.location.origin : ""
-    );
+    const url = new URL(href, window.location.origin);
+
+    if (url.origin !== window.location.origin) {
+      return false;
+    }
+
     const pathname = url.pathname;
 
     if (pathname.match(/^\/proposals\/[^\/]+$/)) {
@@ -56,129 +62,90 @@ function isInternalEmbeddableLink(href: string): boolean {
 function parseContentWithEmbeds(htmlContent: string): React.ReactNode {
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlContent, "text/html");
-  const elements: React.ReactNode[] = [];
 
-  Array.from(doc.body.childNodes).forEach((node, index) => {
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      const element = node as Element;
+  const processNode = (node: Node, key: string): React.ReactNode => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return node.textContent || null;
+    }
 
-      if (element.tagName === "P") {
-        const processNode = (
-          node: Node,
-          partIndex: number
-        ): React.ReactNode[] => {
-          const result: React.ReactNode[] = [];
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return null;
+    }
 
-          if (node.nodeType === Node.ELEMENT_NODE) {
-            const el = node as Element;
-            if (el.tagName === "A") {
-              const href = el.getAttribute("href") || "";
-              const linkText = el.textContent?.trim() || "";
+    const element = node as Element;
 
-              if (isInternalEmbeddableLink(href)) {
-                result.push(
-                  <InternalLinkEmbed
-                    key={`embed-${index}-${partIndex}`}
-                    href={href}
-                    originalLink={
-                      <a
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary underline hover:no-underline font-medium"
-                      >
-                        {linkText}
-                      </a>
-                    }
-                  />
-                );
-              } else {
-                result.push(
-                  <a
-                    key={`link-${index}-${partIndex}`}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary underline hover:no-underline font-medium"
-                  >
-                    {linkText}
-                  </a>
-                );
-              }
-            } else if (el.tagName === "BR") {
-              result.push(<br key={`br-${index}-${partIndex}`} />);
-            } else {
-              const children: React.ReactNode[] = [];
-              let childIndex = 0;
-              Array.from(el.childNodes).forEach((child) => {
-                const processed = processNode(child, partIndex + childIndex);
-                children.push(...processed);
-                childIndex += processed.length;
-              });
+    if (element.tagName === "A") {
+      const href = element.getAttribute("href") || "";
+      const linkText = element.textContent || "";
+      const className =
+        element.getAttribute("class") ||
+        "text-primary underline hover:no-underline font-medium";
 
-              const Tag =
-                el.tagName.toLowerCase() as keyof JSX.IntrinsicElements;
-              result.push(
-                <Tag
-                  key={`el-${index}-${partIndex}`}
-                  {...Object.fromEntries(
-                    Array.from(el.attributes).map((attr) => [
-                      attr.name,
-                      attr.value,
-                    ])
-                  )}
-                >
-                  {children}
-                </Tag>
-              );
-            }
-          } else if (node.nodeType === Node.TEXT_NODE) {
-            const text = node.textContent;
-            if (text) {
-              result.push(
-                <React.Fragment key={`text-${index}-${partIndex}`}>
-                  {text}
-                </React.Fragment>
-              );
-            }
+      const linkElement = (
+        <a
+          href={href}
+          className={className}
+          target={isInternalEmbeddableLink(href) ? undefined : "_blank"}
+          rel={
+            isInternalEmbeddableLink(href) ? undefined : "noopener noreferrer"
           }
-
-          return result;
-        };
-
-        const parts: React.ReactNode[] = [];
-        let partIndex = 0;
-        Array.from(element.childNodes).forEach((child) => {
-          const processed = processNode(child, partIndex);
-          parts.push(...processed);
-          partIndex += processed.length;
-        });
-
-        if (parts.length > 0) {
-          elements.push(
-            <p key={`p-${index}`} className="my-2">
-              {parts}
-            </p>
-          );
-          return;
-        }
-      }
-
-      elements.push(
-        <div
-          key={`html-${index}`}
-          dangerouslySetInnerHTML={{ __html: element.outerHTML }}
-        />
+        >
+          {linkText}
+        </a>
       );
-    } else if (node.nodeType === Node.TEXT_NODE) {
-      const text = node.textContent;
-      if (text && text.trim()) {
-        elements.push(
-          <React.Fragment key={`text-${index}`}>{text}</React.Fragment>
+
+      if (isInternalEmbeddableLink(href)) {
+        return (
+          <InternalLinkEmbed key={key} href={href} originalLink={linkElement} />
         );
       }
+
+      return <React.Fragment key={key}>{linkElement}</React.Fragment>;
     }
-  });
+
+    const voidElements = new Set([
+      "BR",
+      "HR",
+      "IMG",
+      "INPUT",
+      "META",
+      "LINK",
+      "AREA",
+      "BASE",
+      "COL",
+      "EMBED",
+      "SOURCE",
+      "TRACK",
+      "WBR",
+    ]);
+
+    if (voidElements.has(element.tagName)) {
+      const Tag = element.tagName.toLowerCase() as keyof JSX.IntrinsicElements;
+      const attributes = Object.fromEntries(
+        Array.from(element.attributes).map((attr) => [attr.name, attr.value])
+      );
+      return <Tag key={key} {...attributes} />;
+    }
+
+    const children = Array.from(element.childNodes).map((child, index) =>
+      processNode(child, `${key}-${index}`)
+    );
+
+    const Tag = element.tagName.toLowerCase() as keyof JSX.IntrinsicElements;
+    const attributes = Object.fromEntries(
+      Array.from(element.attributes).map((attr) => [attr.name, attr.value])
+    );
+
+    return (
+      <Tag key={key} {...attributes}>
+        {children}
+      </Tag>
+    );
+  };
+
+  const elements = Array.from(doc.body.childNodes).map((node, index) =>
+    processNode(node, `node-${index}`)
+  );
 
   return <>{elements}</>;
 }

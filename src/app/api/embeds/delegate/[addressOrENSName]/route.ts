@@ -10,6 +10,7 @@ export const runtime = "nodejs";
 type DelegateEmbedData = {
   address: string;
   votingPower: string;
+  votingPowerRaw?: string;
   delegatorsCount: number;
   proposalsCreated: number;
   voteStats?: {
@@ -38,6 +39,9 @@ async function getDelegateEmbedData(
     address: delegate.address,
     votingPower: delegate.votingPower?.total
       ? `${formatNumber(delegate.votingPower.total)} ${token.symbol}`
+      : "0",
+    votingPowerRaw: delegate.votingPower?.total
+      ? delegate.votingPower.total.toString()
       : "0",
     delegatorsCount: Number(delegate.numOfDelegators || 0n),
     proposalsCreated: Number(delegate.proposalsCreated || 0n),
