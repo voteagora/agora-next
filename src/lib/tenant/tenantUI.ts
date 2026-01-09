@@ -59,13 +59,19 @@ export type UIDunaDisclosuresConfig = {
   disclaimer?: ReactNode;
 };
 
+export type UITaxFormConfig = {
+  payeeFormUrl?: string;
+  provider?: string;
+};
+
 type UIConfig =
   | PLMConfig
   | UIDunaDescriptionConfig
   | UIVotingPowerInfoConfig
   | UIGovernanceInfoConfig
   | UIInfoBannerConfig
-  | UIDunaDisclosuresConfig;
+  | UIDunaDisclosuresConfig
+  | UITaxFormConfig;
 
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account

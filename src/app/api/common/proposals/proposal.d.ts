@@ -150,4 +150,5 @@ export type Proposal = {
   executedTransactionHash: string | null;
   offchainProposalId?: string;
   proposalTypeApproval?: string;
+  taxFormMetadata?: Record<string, unknown>;
 };
