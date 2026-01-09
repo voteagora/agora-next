@@ -22,7 +22,7 @@ export async function fetchProposalTaxFormMetadata(
     return {};
   }
 
-  const rows = await prismaWeb2Client.proposalTaxFormMetadata.findMany({
+  const rows = await (prismaWeb2Client as any).proposalMetadataKv.findMany({
     where: {
       dao_slug: slug,
       proposalId,
@@ -34,7 +34,7 @@ export async function fetchProposalTaxFormMetadata(
   });
 
   const metadata: ProposalTaxFormMetadata = {};
-  rows.forEach(({ key, value }: { key: string; value: unknown }) => {
+  rows.forEach(({ key, value }: { key: string; value: string | null }) => {
     metadata[key] = value;
   });
 
