@@ -1,9 +1,6 @@
 export const dynamic = "force-dynamic"; // needed for app and e2e
 
-import {
-  fetchProposal,
-  fetchProposalUnstableCache,
-} from "@/app/api/common/proposals/getProposals";
+import { fetchProposal } from "@/app/api/common/proposals/getProposals";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { fetchVotableSupplyUnstableCache } from "@/app/api/common/votableSupply/getVotableSupply";
 import { Vote } from "@/app/api/common/votes/vote";
@@ -37,11 +34,15 @@ async function loadProposal(
 ): Promise<Proposal> {
   const { namespace, token, ui } = Tenant.current();
   const useArchive = ui.toggle("use-archive-for-proposal-details")?.enabled;
+  const taxFormToggle = ui.toggle("tax-form") ?? ui.toggle("tax-form-banner");
+  const shouldFetchTaxFormMetadata = taxFormToggle?.enabled ?? false;
 
   if (useArchive) {
     const [archiveResults, taxFormMetadata] = await Promise.all([
       fetchProposalFromArchive(namespace, proposalId),
-      fetchProposalTaxFormMetadata(proposalId),
+      shouldFetchTaxFormMetadata
+        ? fetchProposalTaxFormMetadata(proposalId)
+        : Promise.resolve(undefined),
     ]);
 
     const archiveProposal = archiveResults ? archiveResults : undefined;
@@ -53,10 +54,13 @@ async function loadProposal(
           tokenDecimals: token.decimals ?? 18,
         }
       );
-      return {
-        ...normalizedProposal,
-        taxFormMetadata,
-      };
+      if (shouldFetchTaxFormMetadata) {
+        return {
+          ...normalizedProposal,
+          taxFormMetadata,
+        };
+      }
+      return normalizedProposal;
     }
 
     throw new Error("Proposal not found in archive");
@@ -127,10 +131,7 @@ export async function generateMetadata({
   params: { proposal_id: string };
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const proposal = await loadProposal(
-    params.proposal_id,
-    fetchProposalUnstableCache
-  );
+  const proposal = await loadProposal(params.proposal_id, fetchProposal);
   const title = truncateString(cleanString(proposal.markdowntitle), 40);
   const description = truncateString(
     cleanString(proposal.description || ""),
@@ -203,10 +204,7 @@ export default async function Page({
 }: {
   params: { proposal_id: string };
 }) {
-  const loadedProposal = await loadProposal(
-    proposal_id,
-    fetchProposalUnstableCache
-  );
+  const loadedProposal = await loadProposal(proposal_id, fetchProposal);
 
   const proposalData =
     loadedProposal.proposalType === "OFFCHAIN_STANDARD"

@@ -31,7 +31,6 @@ import { fetchOffchainProposalsMap } from "./fetchOffchainProposalsMap";
 import { Block } from "ethers";
 
 import { withMetrics } from "@/lib/metricWrapper";
-import { unstable_cache } from "next/cache";
 import { getPublicClient } from "@/lib/viem";
 import {
   adaptDAONodeResponse,
@@ -390,12 +389,18 @@ async function getProposal(proposalId: string) {
         })
     );
 
+    const taxFormToggle =
+      ui.toggle("tax-form") ?? ui.toggle("tax-form-banner") ?? undefined;
+    const shouldFetchTaxFormMetadata = taxFormToggle?.enabled ?? false;
+
     const [proposal, offchainProposal, votableSupply, taxFormMetadata] =
       await Promise.all([
         getProposalExecution,
         getOffchainProposal,
         fetchVotableSupply(),
-        fetchProposalTaxFormMetadata(proposalId),
+        shouldFetchTaxFormMetadata
+          ? fetchProposalTaxFormMetadata(proposalId)
+          : Promise.resolve(undefined),
       ]);
 
     if (!proposal) {
@@ -451,10 +456,14 @@ async function getProposal(proposalId: string) {
       resolvedOffchainProposal
     );
 
-    return {
-      ...parsed,
-      taxFormMetadata,
-    };
+    if (shouldFetchTaxFormMetadata) {
+      return {
+        ...parsed,
+        taxFormMetadata,
+      };
+    }
+
+    return parsed;
   });
 }
 
@@ -677,7 +686,3 @@ export const fetchDraftProposals = cache(getDraftProposals);
 export const fetchProposals = cache(getProposals);
 export const fetchProposal = cache(getProposal);
 export const fetchProposalTypes = cache(getProposalTypes);
-export const fetchProposalUnstableCache = unstable_cache(getProposal, [], {
-  tags: ["proposal"],
-  revalidate: 3600, // 1 hour
-});
