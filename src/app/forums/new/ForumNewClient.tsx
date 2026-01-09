@@ -24,6 +24,7 @@ import { useAccount } from "wagmi";
 import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import { cn } from "@/lib/utils";
+import Tenant from "@/lib/tenant/tenant";
 
 export interface FormData {
   title: string;
@@ -72,6 +73,14 @@ export default function ForumNewClient({
   const title = watch("title");
   const description = watch("description");
   const categoryId = watch("categoryId");
+  const { ui } = Tenant.current();
+  const isDarkTenant = ui.theme === "dark";
+  const selectClassName = [
+    "w-full mt-2 px-3 py-2 rounded-md focus:outline-none focus:ring-1 focus:ring-ring",
+    isDarkTenant
+      ? "border border-line bg-wash text-primary"
+      : "border border-input bg-background text-foreground",
+  ].join(" ");
 
   const handleImageUpload = async (file: File): Promise<string> => {
     if (!address) {
@@ -235,7 +244,7 @@ export default function ForumNewClient({
                         e.target.value ? Number(e.target.value) : undefined
                       )
                     }
-                    className="w-full mt-2 px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                    className={selectClassName}
                     disabled={isSubmitting}
                   >
                     <option value="">No category</option>
