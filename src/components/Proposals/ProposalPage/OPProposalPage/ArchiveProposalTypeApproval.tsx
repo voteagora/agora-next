@@ -19,6 +19,7 @@ import { useProposalLinksWithDetails } from "@/hooks/useProposalLinksWithDetails
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import SyndicateTempCheckTooltip from "./SyndicateTempCheckTooltip";
+import { cn } from "@/lib/utils";
 
 type RangeProposalType = {
   min_quorum_pct: number;
@@ -51,7 +52,8 @@ export default function ArchiveProposalTypeApproval({
     }
   ).archiveMetadata;
   const isTempCheck = archiveMetadata?.rawTag === "tempcheck";
-  const { namespace } = Tenant.current();
+  const { namespace, ui } = Tenant.current();
+  const isDark = ui.theme === "dark";
 
   // Only show for eas-oodao proposals
   if (archiveMetadata?.source !== "eas-oodao") {
@@ -137,7 +139,14 @@ export default function ArchiveProposalTypeApproval({
   }
 
   return (
-    <div className="rounded-2xl border border-black/10 bg-[#f3f3f1] p-4 shadow-sm pb-[60px] mb-[-40px]">
+    <div
+      className={cn(
+        "rounded-2xl border p-4 shadow-sm pb-[60px] mb-[-40px]",
+        isDark
+          ? "bg-cardBackground text-primary border-line"
+          : "bg-[#f3f3f1] text-[#444444] border-black/10"
+      )}
+    >
       {showCreateButton ? (
         <div className="relative">
           <div className="flex items-center justify-between">

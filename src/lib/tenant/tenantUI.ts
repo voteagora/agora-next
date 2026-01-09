@@ -188,6 +188,8 @@ type TenantUIParams = {
     noReportsFound?: string;
     customButtonBackground?: string;
     customHeroTitleWidth?: string;
+    tagBackground?: string;
+    infoBannerBackground?: string;
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -253,6 +255,8 @@ export class TenantUI {
     noReportsFound?: string;
     customButtonBackground?: string;
     customHeroTitleWidth?: string;
+    tagBackground?: string;
+    infoBannerBackground?: string;
   };
   private _theme: "light" | "dark";
   private _favicon?: {
@@ -395,6 +399,8 @@ export class TenantUI {
         customIconColor?: string;
         noReportsFound?: string;
         customButtonBackground?: string;
+        tagBackground?: string;
+        infoBannerBackground?: string;
       }
     | undefined {
     return this._customization;

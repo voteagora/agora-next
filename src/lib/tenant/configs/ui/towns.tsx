@@ -64,6 +64,8 @@ export const townsTenantUIConfig = new TenantUI({
     textSecondary: "135 129 159", // #87819F
     footerBackground: "19 12 47", // #130C2F
     innerFooterBackground: "19 12 47", // #130C2F
+    tagBackground: "#3A3454",
+    infoBannerBackground: "#1E1A2F",
     customHeroImageSize: "w-auto h-auto",
     customIconBackground: "bg-transparent",
     customInfoLayout: "flex-col sm:flex-row gap-2",
@@ -368,7 +370,7 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       name: "footer/hide-votable-supply",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "easv2-govlessvoting",

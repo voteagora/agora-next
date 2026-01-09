@@ -92,12 +92,26 @@ function OODaoBadges({
   statusProposal: { status: string; id: string };
   proposalTypeName: string;
 }) {
+  const tagBackground = Tenant.current().ui.customization?.tagBackground;
+  const tagBgStyle = tagBackground
+    ? {
+        backgroundColor: tagBackground.startsWith("#")
+          ? tagBackground
+          : `rgb(${tagBackground})`,
+      }
+    : undefined;
+  const tagTextClass = tagBackground ? "text-white" : "text-neutral-700";
+  const tagBgClass = tagBackground ? "" : "bg-black/10";
+
   return (
     <div className="inline-flex justify-start items-center gap-1.5 flex-wrap">
       {/* Tag badge */}
       {data.proposalTypeTag && (
-        <div className="px-2 py-0.5 bg-black/10 rounded-[3px] flex justify-center items-center gap-0.5">
-          <div className="text-neutral-700 text-xs font-semibold leading-4">
+        <div
+          className={`px-2 py-0.5 rounded-[3px] flex justify-center items-center gap-0.5 ${tagBgClass}`}
+          style={tagBgStyle}
+        >
+          <div className={`${tagTextClass} text-xs font-semibold leading-4`}>
             {data.proposalTypeTag === "Gov Proposal"
               ? `⚖️️ ${data.proposalTypeTag}`
               : `🌡️ ${data.proposalTypeTag}`}
@@ -106,8 +120,11 @@ function OODaoBadges({
       )}
 
       {/* Author badge */}
-      <div className="px-2 py-0.5 bg-black/10 rounded-[3px] flex justify-center items-center gap-0.5">
-        <div className="text-neutral-700 text-xs font-semibold leading-4">
+      <div
+        className={`px-2 py-0.5 rounded-[3px] flex justify-center items-center gap-0.5 ${tagBgClass}`}
+        style={tagBgStyle}
+      >
+        <div className={`${tagTextClass} text-xs font-semibold leading-4`}>
           By{" "}
           {data.proposerEns ? (
             data.proposerEns
@@ -119,11 +136,12 @@ function OODaoBadges({
 
       {/* Proposal type badge */}
       <div
-        className={`px-2 py-0.5 rounded-[3px] flex justify-center items-center gap-0.5 bg-black/10 ${
+        className={`px-2 py-0.5 rounded-[3px] flex justify-center items-center gap-0.5 ${tagBgClass} ${
           data.hasPendingRanges ? "opacity-50" : ""
         }`}
+        style={tagBgStyle}
       >
-        <div className="text-xs font-semibold leading-4 text-neutral-700">
+        <div className={`${tagTextClass} text-xs font-semibold leading-4`}>
           {proposalTypeName}
         </div>
       </div>

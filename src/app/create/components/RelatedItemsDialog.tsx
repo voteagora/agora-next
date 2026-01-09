@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { stripHtmlToText } from "@/app/forums/stripHtml";
 import { useRelatedItemsDialog } from "../hooks/useRelatedItemsDialog";
+import Tenant from "@/lib/tenant/tenant";
 import { useEffect } from "react";
 
 interface RelatedItemsDialogProps {
@@ -36,6 +37,26 @@ export function RelatedItemsDialog({
   onSelect,
   existingItemIds,
 }: RelatedItemsDialogProps) {
+  const { ui } = Tenant.current();
+  const isDarkTenant = ui.theme === "dark";
+  const resultItemClass = (selected: boolean) =>
+    [
+      "relative p-3 border rounded-lg transition-all overflow-hidden",
+      selected
+        ? "bg-green-50 border-green-200 cursor-not-allowed opacity-60"
+        : isDarkTenant
+          ? "bg-wash border-line cursor-pointer hover:bg-hoverBackground"
+          : "cursor-pointer bg-white hover:bg-gray-50 hover:border-gray-300 border-gray-200",
+    ].join(" ");
+  const titleClass =
+    "font-medium text-sm leading-tight mb-1 pr-20 break-words text-primary";
+  const descriptionClass = isDarkTenant
+    ? "text-xs text-secondary line-clamp-2 mb-2 break-words"
+    : "text-xs text-gray-500 line-clamp-2 mb-2 break-words";
+  const metaClass = isDarkTenant
+    ? "flex items-center gap-3 text-xs text-secondary flex-wrap"
+    : "flex items-center gap-3 text-xs text-gray-500 flex-wrap";
+
   const {
     isOpen: hookIsOpen,
     searchTerm,
@@ -122,14 +143,7 @@ export function RelatedItemsDialog({
                 return (
                   <div
                     key={item.id}
-                    className={`
-                      relative p-3 border rounded-lg transition-all overflow-hidden
-                      ${
-                        selected
-                          ? "bg-green-50 border-green-200 cursor-not-allowed opacity-60"
-                          : "cursor-pointer hover:bg-gray-50 hover:border-gray-300"
-                      }
-                    `}
+                    className={resultItemClass(selected)}
                     onClick={() => !selected && handleItemSelect(item)}
                   >
                     {selected && (
@@ -140,15 +154,13 @@ export function RelatedItemsDialog({
                         </Badge>
                       </div>
                     )}
-                    <p className="font-medium text-sm leading-tight mb-1 pr-20 break-words">
-                      {item.title}
-                    </p>
+                    <p className={titleClass}>{item.title}</p>
                     {item.description && (
-                      <p className="text-xs text-gray-500 line-clamp-2 mb-2 break-words">
+                      <p className={descriptionClass}>
                         {stripHtmlToText(item.description)}
                       </p>
                     )}
-                    <div className="flex items-center gap-3 text-xs text-gray-500 flex-wrap">
+                    <div className={metaClass}>
                       <span className="flex items-center gap-1">
                         <MessageSquare className="h-3 w-3" />
                         {item.comments}
