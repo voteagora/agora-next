@@ -74,7 +74,7 @@ export const demo2TenantConfig = ({
       provider,
     }),
 
-    delegationModel: DELEGATION_MODEL.FULL,
+    delegationModel: DELEGATION_MODEL.PARTIAL,
     treasury: [],
     easRecipient: isProd
       ? ZERO_ADDRESS
