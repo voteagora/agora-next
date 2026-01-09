@@ -17,7 +17,6 @@ import { getIPFSUrl } from "@/lib/pinata";
 import { logForumAuditAction } from "./admin";
 import { requirePermission, checkPermission } from "@/lib/rbac";
 import type { DaoSlug } from "@prisma/client";
-import { unstable_cache } from "next/cache";
 import { createAttachmentsFromContent } from "../attachment";
 import { canCreateTopic, formatVPError } from "@/lib/forumSettings";
 import {
@@ -834,13 +833,21 @@ export const getForumData = async ({
         where: baseWhereClause,
       }),
 
-      prismaWeb2Client.forumAdmin.findMany({
+      // Fetch users with active RBAC roles for this DAO
+      prismaWeb2Client.forumUserRole.findMany({
         where: {
-          managedAccounts: {
-            has: slug,
+          daoSlug: slug,
+          isActive: true,
+          revokedAt: null,
+        },
+        include: {
+          role: {
+            select: {
+              slug: true,
+              name: true,
+            },
           },
         },
-        select: { address: true, role: true },
         orderBy: { address: "asc" },
       }),
 
@@ -901,10 +908,30 @@ export const getForumData = async ({
       }),
     ]);
 
+    // Map RBAC user roles to legacy admin format for compatibility
     const adminRolesObj: Record<string, string | null> = {};
-    admins.forEach((admin) => {
-      const normalizedAddress = admin.address.toLowerCase();
-      adminRolesObj[normalizedAddress] = admin.role;
+    const adminMap = new Map<string, string>();
+
+    admins.forEach((userRole) => {
+      const normalizedAddress = userRole.address.toLowerCase();
+      const roleSlug = userRole.role.slug;
+
+      // Map RBAC roles to legacy role format
+      let legacyRole = "admin";
+      if (roleSlug === "duna_admin") {
+        legacyRole = "duna_admin";
+      }
+
+      // Keep highest role per address
+      const existing = adminMap.get(normalizedAddress);
+      if (!existing || legacyRole !== "duna_admin") {
+        adminMap.set(normalizedAddress, legacyRole);
+      }
+    });
+
+    // Convert map to object
+    adminMap.forEach((role, address) => {
+      adminRolesObj[address] = role;
     });
 
     const processedTopics = topics.map((topic) => ({

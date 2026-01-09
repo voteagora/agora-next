@@ -5,31 +5,57 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { checkPermission, isSuperAdmin } from "@/lib/rbac";
 import type { DaoSlug } from "@prisma/client";
 
+/**
+ * Get forum admins using RBAC system
+ * Returns users with active roles in the current DAO
+ */
 export async function getForumAdmins() {
   try {
     const { slug } = Tenant.current();
 
-    const admins = await prismaWeb2Client.forumAdmin.findMany({
+    // Fetch users with active roles for this DAO
+    const userRoles = await prismaWeb2Client.forumUserRole.findMany({
       where: {
-        managedAccounts: {
-          has: slug,
-        },
+        daoSlug: slug as DaoSlug,
+        isActive: true,
+        revokedAt: null,
       },
-      select: {
-        address: true,
-        role: true,
+      include: {
+        role: {
+          select: {
+            slug: true,
+            name: true,
+          },
+        },
       },
       orderBy: {
         address: "asc",
       },
     });
 
+    // Group by address and determine highest role
+    const adminMap = new Map<string, { address: string; role: string }>();
+
+    for (const userRole of userRoles) {
+      const address = userRole.address.toLowerCase();
+      const roleSlug = userRole.role.slug;
+
+      // Map RBAC roles to legacy role format for compatibility
+      let legacyRole = "admin";
+      if (roleSlug === "duna_admin") {
+        legacyRole = "duna_admin";
+      }
+
+      // Keep highest role (duna_admin > admin)
+      const existing = adminMap.get(address);
+      if (!existing || legacyRole !== "duna_admin") {
+        adminMap.set(address, { address, role: legacyRole });
+      }
+    }
+
     return {
       success: true as const,
-      data: admins.map((admin) => ({
-        address: admin.address.toLowerCase(),
-        role: admin.role,
-      })),
+      data: Array.from(adminMap.values()),
     };
   } catch (error) {
     console.error("Error fetching forum admins:", error);
