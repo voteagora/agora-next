@@ -7,6 +7,7 @@ import { CreatePostFormData, PostType, RelatedItem } from "../types";
 import { RelatedItemsCard } from "./RelatedItemsCard";
 import MarkdownTextareaInput from "@/app/proposals/draft/components/form/MarkdownTextareaInput";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import Tenant from "@/lib/tenant/tenant";
 
 interface CreatePostFormProps {
   form: UseFormReturn<CreatePostFormData>;
@@ -53,6 +54,11 @@ export function CreatePostForm({
   const relatedTempChecks = watch("relatedTempChecks") || [];
   const title = watch("title");
   const description = watch("description");
+  const { ui } = Tenant.current();
+  const isDarkTenant = ui.theme === "dark";
+  const submitClassName = isDarkTenant
+    ? "bg-wash border border-line text-primary hover:bg-hoverBackground"
+    : "bg-black text-white hover:bg-gray-800";
 
   return (
     <FormProvider {...form}>
@@ -165,7 +171,7 @@ export function CreatePostForm({
                   (postType === "tempcheck" && !canCreateTempCheck) ||
                   (postType === "gov-proposal" && !canCreateGovernanceProposal)
                 }
-                className="bg-black text-white hover:bg-gray-800"
+                className={submitClassName}
               >
                 {isSubmitting
                   ? "Creating..."
