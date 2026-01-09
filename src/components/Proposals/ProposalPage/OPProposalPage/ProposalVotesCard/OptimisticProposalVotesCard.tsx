@@ -17,6 +17,7 @@ import Tenant from "@/lib/tenant/tenant";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
 import { checkMissingVoteForDelegate } from "@/lib/voteUtils";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import CastEasOptimisticVoteInput from "@/components/Votes/CastVoteInput/CastEasOptimisticVoteInput";
 
 interface Props {
   proposal: Proposal;
@@ -40,7 +41,6 @@ const OptimisticProposalVotesCard = ({
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"
   )?.enabled;
-
   // Get voting data to check if user has already voted
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
@@ -64,6 +64,25 @@ const OptimisticProposalVotesCard = ({
   const handleClick = () => {
     setIsClicked(!isClicked);
   };
+
+  const renderVoteButton = () => {
+    if (isOffchain) {
+      return <OffchainCastVoteInput />;
+    } else if (proposal.archiveMetadata.source === "eas-oodao") {
+      return (
+        <CastEasOptimisticVoteInput
+          proposal={proposal}
+          vetoThreshold={Number(proposal.proposalTypeData?.quorum) / 100}
+        />
+      );
+    }
+    return (
+      <div className="border-t border-line">
+        <CastVoteInput proposal={proposal} isOptimistic />
+      </div>
+    );
+  };
+
   return (
     <div
       className={`fixed flex justify-between gap-4 md:sticky top-[auto] md:top-20 md:max-h-[calc(100vh-220px)] max-h-[calc(100%-160px)] items-stretch flex-shrink w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] md:w-[20rem] lg:w-[24rem] bg-neutral border border-line rounded-xl shadow-newDefault mb-8 transition-all ${isClicked ? "bottom-[20px]" : "bottom-[calc(-100%+350px)] h-[calc(100%-160px)] md:h-auto"} sm:overflow-y-auto`}
@@ -144,13 +163,7 @@ const OptimisticProposalVotesCard = ({
           />
         )}
         {/* Show the input for the user to vote on a proposal if allowed */}
-        {isOffchain ? (
-          <OffchainCastVoteInput />
-        ) : (
-          <div className="border-t border-line">
-            <CastVoteInput proposal={proposal} isOptimistic />
-          </div>
-        )}
+        {renderVoteButton()}
         {/* Only show the voting instruction text if user hasn't voted yet */}
         {isVotingDataLoaded && !hasUserVoted && (
           <p className="mx-4 text-xs text-secondary">

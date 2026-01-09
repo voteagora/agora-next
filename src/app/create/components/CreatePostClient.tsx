@@ -12,7 +12,6 @@ import toast from "react-hot-toast";
 import { PostTypeSelector } from "./PostTypeSelector";
 import { CreatePostForm } from "./CreatePostForm";
 import { ProposalSettingsCard } from "./ProposalSettingsCard";
-import { CommunityGuidelinesCard } from "./CommunityGuidelinesCard";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import {
   canCreateTempCheck as canCreateTempCheckUtil,
@@ -25,6 +24,9 @@ import {
   ProposalType,
   CreatePostFormData,
   RelatedItem,
+  EASVotingType,
+  ApprovalProposalSettings,
+  defaultApprovalSettings,
 } from "../types";
 import {
   Dialog,
@@ -51,7 +53,7 @@ export function CreatePostClient({
   const router = useRouter();
   const queryClient = useQueryClient();
   const { ui, contracts } = Tenant.current();
-  const { createProposal } = useEASV2();
+  const { createProposalWithVotingType } = useEASV2();
   const permissions = useForumPermissionsContext();
   const { data: daoSettings } = useDaoSettings(contracts.easRecipient);
 
@@ -66,11 +68,19 @@ export function CreatePostClient({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showIndexingModal, setShowIndexingModal] = useState(false);
 
+  // Voting type state
+  const [selectedVotingType, setSelectedVotingType] =
+    useState<EASVotingType>("standard");
+  const [approvalSettings, setApprovalSettings] =
+    useState<ApprovalProposalSettings>(defaultApprovalSettings);
+
   const form = useForm<CreatePostFormData>({
     defaultValues: initialFormData,
   });
 
   const isEASV2Enabled = ui.toggle("easv2-govlessvoting")?.enabled;
+  // Check if extended voting types are enabled for this tenant
+  const isExtendedVotingEnabled = ui.toggle("easv2-extended-voting")?.enabled;
 
   const relatedTempChecks = form.watch("relatedTempChecks") || [];
   const canCreateTempCheck = canCreateTempCheckUtil(permissions);
@@ -121,7 +131,7 @@ export function CreatePostClient({
       const tagsArray = [selectedPostType, ...relatedLinks];
       const tagsString = tagsArray.join(",");
 
-      const proposal = await createProposal({
+      await createProposalWithVotingType({
         title: data.title,
         description: data.description,
         startts: BigInt(Math.floor(Date.now() / 1000) + votingDelaySeconds),
@@ -135,6 +145,22 @@ export function CreatePostClient({
         ),
         tags: tagsString,
         proposal_type_uid: selectedProposalType.id || undefined,
+        votingType: selectedVotingType,
+        choices:
+          selectedVotingType === "approval"
+            ? approvalSettings.choices.map((c) => c.title)
+            : [],
+        maxApprovals:
+          selectedVotingType === "approval" ? approvalSettings.maxApprovals : 1,
+        criteria:
+          selectedVotingType === "approval"
+            ? approvalSettings.criteria
+            : "threshold",
+        criteriaValue:
+          selectedVotingType === "approval"
+            ? approvalSettings.criteriaValue
+            : 0,
+        budget: selectedVotingType === "approval" ? approvalSettings.budget : 0,
       });
 
       await queryClient.invalidateQueries({ queryKey: ["forumTopics"] });
@@ -151,6 +177,15 @@ export function CreatePostClient({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const changeSelectedVotingType = (type: EASVotingType) => {
+    setSelectedVotingType(type);
+    const filteredProposalsTypes = proposalTypes.filter(
+      (pType) => pType.module?.toLowerCase() === type.toLowerCase()
+    );
+
+    setSelectedProposalType(filteredProposalsTypes[0]);
   };
 
   const handleAddRelatedItem =
@@ -207,7 +242,6 @@ export function CreatePostClient({
           <h1 className="text-2xl font-bold text-primary">
             Create {postTypeOptions[selectedPostType].toLowerCase()}
           </h1>
-
           <PostTypeSelector
             value={selectedPostType}
             onChange={setSelectedPostType}
@@ -237,6 +271,12 @@ export function CreatePostClient({
               "relatedTempChecks"
             )}
             onRemoveRelatedItems={handleRemoveAllRelatedItems}
+            // Voting type settings - now in the form
+            showVotingTypeSettings={isExtendedVotingEnabled}
+            selectedVotingType={selectedVotingType}
+            onVotingTypeChange={changeSelectedVotingType}
+            approvalSettings={approvalSettings}
+            onApprovalSettingsChange={setApprovalSettings}
           />
         </div>
 
@@ -251,6 +291,7 @@ export function CreatePostClient({
               relatedTempChecks.length > 0
             }
             relatedTempChecks={relatedTempChecks}
+            selectedVotingType={selectedVotingType}
           />
         </div>
       </div>

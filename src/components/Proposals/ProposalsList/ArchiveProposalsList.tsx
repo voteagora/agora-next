@@ -36,7 +36,10 @@ export default function ArchiveProposalsList({
 
   const filteredProposals = React.useMemo(() => {
     if (filter === proposalsFilterOptions.everything.filter) {
-      return proposals;
+      return proposals.map((proposal) => ({
+        ...proposal,
+        kwargs: proposal.kwargs ? JSON.parse(proposal.kwargs) : {},
+      }));
     }
 
     if (filter === proposalsFilterOptions.tempChecks.filter) {
@@ -45,12 +48,20 @@ export default function ArchiveProposalsList({
       );
     }
 
-    return proposals.filter(
-      (proposal) =>
-        !proposal.cancel_event &&
-        !proposal.delete_event &&
-        proposal.lifecycle_stage !== "CANCELLED"
-    );
+    return proposals
+      .filter(
+        (proposal) =>
+          !proposal.cancel_event &&
+          !proposal.delete_event &&
+          proposal.lifecycle_stage !== "CANCELLED"
+      )
+      .map((proposal) => ({
+        ...proposal,
+        kwargs:
+          typeof proposal.kwargs === "string"
+            ? JSON.parse(proposal.kwargs.replace(/'/g, '"'))
+            : proposal.kwargs,
+      }));
   }, [filter, proposals]);
 
   const sortedProposals = React.useMemo(() => {

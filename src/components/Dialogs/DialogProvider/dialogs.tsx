@@ -8,6 +8,7 @@ import {
 } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
 import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelegateDialog";
 import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
+import { EasApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/EasApprovalCastVoteDialog/EasApprovalCastVoteDialog";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import RetroPGFShareCardDialog from "@/components/RetroPGF/RetroPGFShareCardDialog";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
@@ -45,6 +46,7 @@ import ReportModal from "@/app/duna/components/ReportModal";
 export type DialogType =
   | AdvancedDelegateDialogType
   | ApprovalCastVoteDialogType
+  | EasApprovalCastVoteDialogType
   | CastVoteDialogType
   | CreateDraftProposalDialog
   | DelegateDialogType
@@ -222,6 +224,17 @@ export type ApprovalCastVoteDialogProps = {
 export type ApprovalCastVoteDialogType = {
   type: "APPROVAL_CAST_VOTE";
   params: Omit<ApprovalCastVoteDialogProps, "closeDialog">;
+};
+
+export type EasApprovalCastVoteDialogProps = {
+  proposal: Proposal;
+  votingPower: string | null;
+  closeDialog: () => void;
+};
+
+export type EasApprovalCastVoteDialogType = {
+  type: "EAS_APPROVAL_CAST_VOTE";
+  params: Omit<EasApprovalCastVoteDialogProps, "closeDialog">;
 };
 
 export type DeleteDraftProposalDialog = {
@@ -406,6 +419,15 @@ export const dialogs: DialogDefinitions<DialogType> = {
         votingPower={votingPower}
         authorityChains={authorityChains}
         missingVote={missingVote}
+      />
+    );
+  },
+  EAS_APPROVAL_CAST_VOTE: ({ proposal, votingPower }, closeDialog) => {
+    return (
+      <EasApprovalCastVoteDialog
+        proposal={proposal}
+        votingPower={votingPower}
+        closeDialog={closeDialog}
       />
     );
   },

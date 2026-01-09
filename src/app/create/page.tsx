@@ -132,6 +132,7 @@ export default async function CreatePostPage({
           description: proposalType.description,
           quorum: proposalType.quorum / 100,
           approvalThreshold: proposalType.approval_threshold / 100,
+          module: proposalType.module,
         },
       ];
     }
@@ -147,6 +148,7 @@ export default async function CreatePostPage({
           description: type.description,
           quorum: type.quorum / 100,
           approvalThreshold: type.approval_threshold / 100,
+          module: type.module,
         }))
       : [
           {
@@ -155,6 +157,7 @@ export default async function CreatePostPage({
             description: "No proposal type created yet",
             quorum: 0,
             approvalThreshold: 0,
+            module: "STANDARD",
           },
         ];
   }
