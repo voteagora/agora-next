@@ -11,7 +11,6 @@ export default function ApprovalProposalCriteria({ proposal }) {
   const proposalData = proposal.proposalData;
   const currentQuorum = getProposalCurrentQuorum(proposal.proposalResults);
   const proposalSettings = proposalData.proposalSettings;
-
   const isProposalCreatedBeforeUpgrade =
     isProposalCreatedBeforeUpgradeCheck(proposal);
 

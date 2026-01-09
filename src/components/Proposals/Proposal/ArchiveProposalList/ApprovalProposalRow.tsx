@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import { ArchiveListProposal } from "@/lib/types/archiveProposal";
+import {
+  ArchiveListProposal,
+  FixedProposalType,
+} from "@/lib/types/archiveProposal";
 import Tenant from "@/lib/tenant/tenant";
 import { ApprovalStatusView } from "../OPApprovalProposalStatus";
 import { BaseRowLayout } from "./BaseRowLayout";
@@ -42,10 +45,12 @@ export function ApprovalProposalRow({
   const decimals = tokenDecimals ?? token.decimals ?? 18;
 
   // Compute display data and approval metrics
-  const { displayData, approvalData } = useMemo(() => {
+  const { displayData, approvalData, proposalTypeName } = useMemo(() => {
     const displayData = extractDisplayData(proposal, proposalType, decimals);
     const approvalData = extractApprovalData(proposal);
-    return { displayData, approvalData };
+    const proposalTypeName =
+      (proposal.proposal_type as FixedProposalType)?.name ?? proposalType;
+    return { displayData, approvalData, proposalTypeName };
   }, [proposal, decimals, proposalType]);
 
   // Render approval status view showing "Select X of Y Options"
@@ -56,7 +61,13 @@ export function ApprovalProposalRow({
     />
   );
 
-  return <BaseRowLayout data={displayData} metricsContent={metricsContent} />;
+  return (
+    <BaseRowLayout
+      data={displayData}
+      metricsContent={metricsContent}
+      proposalTypeName={proposalTypeName}
+    />
+  );
 }
 
 export default ApprovalProposalRow;

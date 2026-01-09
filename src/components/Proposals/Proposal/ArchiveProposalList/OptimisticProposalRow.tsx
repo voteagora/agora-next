@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import { ArchiveListProposal } from "@/lib/types/archiveProposal";
+import {
+  ArchiveListProposal,
+  FixedProposalType,
+} from "@/lib/types/archiveProposal";
 import Tenant from "@/lib/tenant/tenant";
 import { OPOptimisticStatusView } from "../OPOptimisticProposalStatus";
 import { BaseRowLayout } from "./BaseRowLayout";
@@ -72,12 +75,14 @@ export function OptimisticProposalRow({
 }: ArchiveRowProps) {
   const { token } = Tenant.current();
   const decimals = tokenDecimals ?? token.decimals ?? 18;
-
+  console.log("proposal", proposal);
   // Compute display data and optimistic metrics
-  const { displayData, optimisticData } = useMemo(() => {
+  const { displayData, optimisticData, proposalTypeName } = useMemo(() => {
     const displayData = extractDisplayData(proposal, proposalType, decimals);
     const optimisticData = extractOptimisticData(proposal);
-    return { displayData, optimisticData };
+    const proposalTypeName =
+      (proposal.proposal_type as FixedProposalType)?.name ?? proposalType;
+    return { displayData, optimisticData, proposalTypeName };
   }, [proposal, decimals, proposalType]);
 
   // Render optimistic status view
@@ -89,7 +94,13 @@ export function OptimisticProposalRow({
     />
   );
 
-  return <BaseRowLayout data={displayData} metricsContent={metricsContent} />;
+  return (
+    <BaseRowLayout
+      data={displayData}
+      metricsContent={metricsContent}
+      proposalTypeName={proposalTypeName}
+    />
+  );
 }
 
 export default OptimisticProposalRow;

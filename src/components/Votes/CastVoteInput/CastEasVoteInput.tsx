@@ -74,8 +74,6 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
     proposalId: proposal.id,
     address,
   });
-
-  console.log("votingTypeInfo", proposal);
   // Get voting type info from proposal
 
   // Check if proposal hasn't started yet
@@ -131,7 +129,6 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
       />
     );
   }
-  console.log("proposal.proposalType", proposal.proposalType);
   if (proposal.proposalType === "OPTIMISTIC") {
     return (
       <CastEasOptimisticVoteInput proposal={proposal} vetoThreshold={20} />

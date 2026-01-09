@@ -53,7 +53,6 @@ async function fetchProposalsFromDaoNode(
       getCachedAllProposalsFromDaoNode(),
       getProposalTypesFromDaoNode(),
     ]);
-    console.log(typesFromApi);
 
     let proposals = data;
 

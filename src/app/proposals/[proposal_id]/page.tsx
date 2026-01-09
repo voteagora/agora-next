@@ -27,9 +27,9 @@ import {
   isArchiveStandardProposal,
   isArchiveOptimisticProposal,
   isArchiveApprovalProposal,
-  normalizeArchiveStandardProposal,
   normalizeArchiveOptimisticProposal,
   normalizeArchiveApprovalProposal,
+  normalizeArchiveStandardProposal,
 } from "@/components/Proposals/Proposal/Archive/normalizeArchiveProposalDetail";
 import ArchiveOptimisticProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/ArchiveOptimisticProposalPage";
 import ArchiveApprovalProposalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/ArchiveApprovalProposalPage";

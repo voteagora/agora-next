@@ -41,7 +41,6 @@ const OptimisticProposalVotesCard = ({
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"
   )?.enabled;
-  console.log("useArchiveVoteHistory", proposal);
   // Get voting data to check if user has already voted
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;

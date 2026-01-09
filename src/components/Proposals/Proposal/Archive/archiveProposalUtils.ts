@@ -333,7 +333,6 @@ export const deriveProposalTag = (proposal: ArchiveListProposal): string => {
 
 export const resolveArchiveThresholds = (proposal: ArchiveListProposal) => {
   const source = proposal.data_eng_properties?.source;
-
   const resolveFromEas = () => {
     const type = proposal.proposal_type;
     if (!type || typeof type !== "object") {
