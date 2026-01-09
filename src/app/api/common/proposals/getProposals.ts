@@ -121,7 +121,7 @@ async function fetchOnchainProposalsByIds(
       contract: contracts.governor.address,
     });
 
-    onchainProposals.forEach((proposal) => {
+    onchainProposals.forEach((proposal: ProposalPayload | undefined) => {
       if (proposal) {
         onchainProposalsMap.set(
           proposal.proposal_id,
@@ -503,7 +503,7 @@ async function getProposalTypes() {
     }
 
     if (!contracts.supportScopes) {
-      const formattedTypes = types.map((type) => {
+      const formattedTypes = types.map((type: any) => {
         return {
           ...type,
           proposal_type_id: String(type.proposal_type_id),
@@ -518,7 +518,7 @@ async function getProposalTypes() {
     }
 
     const formattedTypes = await Promise.all(
-      types.map(async (type) => {
+      types.map(async (type: any) => {
         const scopes =
           typesFromApi?.proposal_types?.[type.proposal_type_id]?.scopes;
         const formattedScopes: {

@@ -66,6 +66,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
     votableSupply: formatNumber(votableSupply),
     totalSupply: formatNumber(totalSupply),
   };
+  const hideVotableSupply = ui.toggle("footer/hide-votable-supply")?.enabled;
 
   const navItems = [
     ...(hasProposals
@@ -181,12 +182,13 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
                   {isLoading ? "-" : formattedMetrics.totalSupply}{" "}
                   {token.symbol} total supply
                 </div>
-                {(contracts.token.isERC20() || contracts.token.isERC721()) && (
-                  <div className="">
-                    {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
-                    {token.symbol} votable supply
-                  </div>
-                )}
+                {!hideVotableSupply &&
+                  (contracts.token.isERC20() || contracts.token.isERC721()) && (
+                    <div className="">
+                      {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
+                      {token.symbol} votable supply
+                    </div>
+                  )}
               </div>
             )}
 

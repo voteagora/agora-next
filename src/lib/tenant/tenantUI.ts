@@ -54,6 +54,11 @@ export type UIInfoBannerConfig = {
   storageKey: string;
 };
 
+export type UIDunaDisclosuresConfig = {
+  content: ReactNode;
+  disclaimer?: ReactNode;
+};
+
 export type UITaxFormConfig = {
   payeeFormUrl?: string;
   provider?: string;
@@ -65,6 +70,7 @@ type UIConfig =
   | UIVotingPowerInfoConfig
   | UIGovernanceInfoConfig
   | UIInfoBannerConfig
+  | UIDunaDisclosuresConfig
   | UITaxFormConfig;
 
 // Note: Modular accounts are not yet supported
@@ -188,6 +194,8 @@ type TenantUIParams = {
     noReportsFound?: string;
     customButtonBackground?: string;
     customHeroTitleWidth?: string;
+    tagBackground?: string;
+    infoBannerBackground?: string;
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -253,6 +261,8 @@ export class TenantUI {
     noReportsFound?: string;
     customButtonBackground?: string;
     customHeroTitleWidth?: string;
+    tagBackground?: string;
+    infoBannerBackground?: string;
   };
   private _theme: "light" | "dark";
   private _favicon?: {
@@ -395,6 +405,8 @@ export class TenantUI {
         customIconColor?: string;
         noReportsFound?: string;
         customButtonBackground?: string;
+        tagBackground?: string;
+        infoBannerBackground?: string;
       }
     | undefined {
     return this._customization;

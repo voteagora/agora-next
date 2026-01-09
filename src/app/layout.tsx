@@ -113,7 +113,7 @@ export default async function RootLayout({
   } as React.CSSProperties;
 
   return (
-    <html lang="en" style={style}>
+    <html lang="en" style={style} className={ui.theme === "dark" ? "dark" : ""}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link

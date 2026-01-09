@@ -91,6 +91,8 @@ const LinkDialog = ({
   initialUrl?: string;
 }) => {
   const [url, setUrl] = useState(initialUrl);
+  const { ui } = Tenant.current();
+  const isDarkTenant = ui.theme === "dark";
 
   useEffect(() => {
     setUrl(initialUrl);
@@ -113,8 +115,12 @@ const LinkDialog = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
-      <div className="bg-white rounded-lg shadow-lg p-4 w-80 max-w-[90vw]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+      <div
+        className={`rounded-lg shadow-lg p-4 w-80 max-w-[90vw] ${
+          isDarkTenant ? "bg-wash border border-line" : "bg-white"
+        }`}
+      >
         <h3 className="text-sm font-medium text-primary mb-3">Add Link</h3>
         <form>
           <input
@@ -123,14 +129,22 @@ const LinkDialog = ({
             onChange={(e) => setUrl(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="https://example.com"
-            className="w-full px-3 py-2 border border-line rounded-md bg-wash text-primary outline-none"
+            className={`w-full px-3 py-2 border rounded-md outline-none ${
+              isDarkTenant
+                ? "border-line bg-wash text-primary"
+                : "border-line bg-white text-primary"
+            }`}
             autoFocus
           />
           <div className="flex gap-2 mt-3">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-3 py-2 border border-line rounded-md bg-white text-primary hover:bg-wash transition-colors"
+              className={`flex-1 px-3 py-2 border border-line rounded-md transition-colors ${
+                isDarkTenant
+                  ? "bg-wash text-primary hover:bg-hoverBackground"
+                  : "bg-white text-primary hover:bg-wash"
+              }`}
             >
               Cancel
             </button>
@@ -138,7 +152,11 @@ const LinkDialog = ({
               type="button"
               disabled={!url.trim()}
               onClick={handleSubmit}
-              className="flex-1 px-3 py-2 rounded-md bg-black text-white hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`flex-1 px-3 py-2 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                isDarkTenant
+                  ? "bg-primary text-neutral hover:bg-primary/90"
+                  : "bg-black text-white hover:bg-black/90"
+              }`}
             >
               Add Link
             </button>

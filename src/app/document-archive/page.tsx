@@ -4,10 +4,8 @@ import Tenant from "@/lib/tenant/tenant";
 import TownsDunaAdministrationArchive from "../duna/components/TownsDunaAdministrationArchive";
 import DunaAdministrationArchive from "../duna/components/DunaAdministrationArchive";
 import { InfoHero } from "../info/components/InfoHero";
-import SyndicateDunaDisclosures from "../duna/components/SyndicateDunaDisclosures";
-import DunaDisclosures from "../duna/components/DunaDisclosures";
+import DunaDisclosuresContent from "../duna/components/DunaDisclosuresContent";
 import { getMetadataBaseUrl } from "@/app/lib/utils/metadata";
-import { TownsDunaDisclosures } from "../duna/components/TownsDunaAdministration";
 
 export const dynamic = "force-dynamic";
 
@@ -67,16 +65,8 @@ export default async function Page() {
       ) : (
         hasDunaAdministration && <DunaAdministrationArchive />
       )}
-      {hasDunaAdministration ? (
-        ui.toggle("towns-duna-administration")?.enabled ? null : ui.toggle(
-            "syndicate-duna-disclosures"
-          )?.enabled ? (
-          <SyndicateDunaDisclosures />
-        ) : ui.toggle("towns-duna-disclosures")?.enabled ? (
-          <TownsDunaDisclosures />
-        ) : (
-          <DunaDisclosures />
-        )
+      {hasDunaAdministration && ui.toggle("duna-disclosures")?.enabled ? (
+        <DunaDisclosuresContent />
       ) : null}
 
       {ui.toggle("towns-duna-administration")?.enabled ? (
