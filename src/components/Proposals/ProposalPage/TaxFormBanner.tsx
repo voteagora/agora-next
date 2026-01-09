@@ -71,8 +71,7 @@ export function TaxFormBanner({ proposal }: Props) {
       ? (proposal as unknown as { tags?: string[] }).tags?.[0]
       : undefined);
   const normalizedTag = rawTag?.toLowerCase();
-  const isGovProposal =
-    normalizedTag === "gov-proposal" || normalizedTag === "govproposal";
+  const isGovProposal = normalizedTag === "gov-proposal" || normalizedTag === "govproposal";
   const requiresTaxForm =
     isEnabled && isWaitingForPayment && isGovProposal && !isFormCompleted;
 

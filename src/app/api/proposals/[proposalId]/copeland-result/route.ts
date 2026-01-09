@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchProposal } from "@/app/api/common/proposals/getProposals";
+import { fetchProposalUnstableCache } from "@/app/api/common/proposals/getProposals";
 import { fetchSnapshotVotesForProposal } from "@/app/api/common/votes/getVotes";
 import { calculateCopelandVote } from "@/lib/copelandCalculation";
 import { ParsedProposalData } from "@/lib/proposalUtils";
@@ -61,7 +61,7 @@ export async function GET(
 ) {
   try {
     const [proposal, snapshotVotes] = await Promise.all([
-      fetchProposal(route.params.proposalId),
+      fetchProposalUnstableCache(route.params.proposalId),
       fetchSnapshotVotesForProposal({
         proposalId: route.params.proposalId,
         pagination: {
