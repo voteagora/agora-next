@@ -203,10 +203,7 @@ export default async function Page({
 }: {
   params: { proposal_id: string };
 }) {
-  const loadedProposal = await loadProposal(
-    proposal_id,
-    fetchProposalUnstableCache
-  );
+  const loadedProposal = await loadProposal(proposal_id, fetchProposal);
 
   const proposalData =
     loadedProposal.proposalType === "OFFCHAIN_STANDARD"

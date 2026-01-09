@@ -15,6 +15,13 @@ export async function fetchProposalTaxFormMetadata(
 ): Promise<ProposalTaxFormMetadata> {
   const { slug, ui } = Tenant.current();
 
+  const taxFormToggle =
+    ui.toggle("tax-form") ?? ui.toggle("tax-form-banner") ?? undefined;
+  const isTaxFormEnabled = taxFormToggle?.enabled ?? false;
+  if (!isTaxFormEnabled) {
+    return {};
+  }
+
   const rows = await (prismaWeb2Client as any).proposalMetadataKv.findMany({
     where: {
       dao_slug: slug,
@@ -31,9 +38,6 @@ export async function fetchProposalTaxFormMetadata(
     metadata[key] = value;
   });
 
-  const taxFormToggle =
-    ui.toggle("tax-form") ?? ui.toggle("tax-form-banner") ?? undefined;
-  const isTaxFormEnabled = taxFormToggle?.enabled ?? false;
   const provider = (taxFormToggle?.config as { provider?: string } | undefined)
     ?.provider;
 
