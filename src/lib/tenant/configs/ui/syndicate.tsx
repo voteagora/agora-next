@@ -1,5 +1,5 @@
 import React from "react";
-import { TenantUI } from "@/lib/tenant/tenantUI";
+import { TenantUI, type UITaxFormConfig } from "@/lib/tenant/tenantUI";
 // TODO: Replace with actual syndicate assets
 import syndicateLogo from "@/assets/tenant/syndicate_logo.svg";
 import syndicateHero from "@/assets/tenant/syndicate_hero.svg";
@@ -342,6 +342,14 @@ export const syndicateTenantUIConfig = new TenantUI({
     {
       name: "has-eas-oodao",
       enabled: true,
+    },
+    {
+      name: "tax-form",
+      enabled: true,
+      config: {
+        payeeFormUrl: "http://cowrie.io/tax",
+        provider: "cowrie",
+      } as UITaxFormConfig,
     },
     {
       name: "coming-soon",

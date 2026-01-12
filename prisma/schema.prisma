@@ -6456,6 +6456,23 @@ model ProposalExecutionTransaction {
   @@schema("alltenant")
 }
 
+model ProposalMetadataKv {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dao_slug    DaoSlug
+  proposalId  String   @map("proposal_id")
+  key         String
+  value       String?
+  creatorAddr String?  @map("creator_addr")
+  note        String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  @@unique([dao_slug, proposalId, key])
+  @@index([dao_slug, proposalId])
+  @@map("proposal_metadata_kv")
+  @@schema("alltenant")
+}
+
 // =============================================================================
 // RBAC System Models
 // =============================================================================

@@ -9,6 +9,7 @@ import {
 } from "@/lib/proposalUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import { TaxFormBanner } from "../TaxFormBanner";
 
 export default async function OPProposalPage({
   proposal,
@@ -36,6 +37,7 @@ export default async function OPProposalPage({
 
   return (
     <div className="flex flex-col">
+      <TaxFormBanner proposal={proposal} />
       <ProposalStateAdmin proposal={proposal} />
       <div className="flex gap-0 md:gap-16 justify-between items-start max-w-[76rem] flex-col md:flex-row md:items-start md:justify-between">
         <div className="w-full proposal-description pb-6 md:pb-0">
