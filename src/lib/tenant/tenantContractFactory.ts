@@ -57,13 +57,13 @@ export default class TenantContractFactory {
       case TENANT_NAMESPACES.SYNDICATE:
         return syndicateTenantConfig({ isProd, alchemyId });
 
-            case TENANT_NAMESPACES.DEMO2:
+      case TENANT_NAMESPACES.DEMO2:
         return demo2TenantConfig({ isProd, alchemyId });
 
-            case TENANT_NAMESPACES.DEMO4:
+      case TENANT_NAMESPACES.DEMO4:
         return demo4TenantConfig({ isProd, alchemyId });
 
-            case TENANT_NAMESPACES.DEMO3:
+      case TENANT_NAMESPACES.DEMO3:
         return demo3TenantConfig({ isProd, alchemyId });
 
       default:
