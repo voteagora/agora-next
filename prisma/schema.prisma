@@ -5447,8 +5447,6 @@ model ForumCategoryAttachment {
   @@schema("alltenant")
 }
 
-// Legacy admin and permission models removed - replaced by RBAC system
-// See ForumRole, ForumPermission (renamed from Permission), ForumUserRole models below
 
 model ForumTopicSubscription {
   dao_slug  DaoSlug
