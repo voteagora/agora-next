@@ -29,7 +29,11 @@ export default function ArchiveOptimisticProposalPage({
   const totalVotes = Number(againstVotes) + Number(forVotes);
 
   const againstRelativeAmount =
-    totalVotes > 0 ? Math.round((Number(againstVotes) / totalVotes) * 100) : 0;
+    totalVotes > 0
+      ? Math.round(
+          (Number(againstVotes) / Number(proposal.votableSupply)) * 100
+        )
+      : 0;
 
   const againstLengthString = formatNumber(
     againstVotes.toString(),

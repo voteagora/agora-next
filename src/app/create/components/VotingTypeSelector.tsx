@@ -44,12 +44,18 @@ export function VotingTypeSelector({
       <Label className="text-xs font-semibold text-secondary">
         Voting Module
       </Label>
-      <Switch
-        options={options}
-        selection={currentLabel}
-        onSelectionChanged={handleSelectionChanged}
-      />
-      <p className="text-sm text-secondary">{metadata.description}</p>
+      <div className={disabled ? "opacity-50 pointer-events-none" : ""}>
+        <Switch
+          options={options}
+          selection={currentLabel}
+          onSelectionChanged={handleSelectionChanged}
+        />
+      </div>
+      <p className="text-sm text-secondary">
+        {disabled
+          ? "Voting module is locked to match the selected temp check"
+          : metadata.description}
+      </p>
     </div>
   );
 }

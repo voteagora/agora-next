@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { motion } from "framer-motion";
 import { VStack, HStack } from "@/components/Layout/Stack";
-import OptionsResultsPanel from "../OptionResultsPanel/OptionResultsPanel";
+import OptionResultsPanel from "../OptionResultsPanel/OptionResultsPanel";
 import ArchiveApprovalProposalVotesList from "@/components/Votes/ApprovalProposalVotesList/ArchiveApprovalProposalVotesList";
 import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalProposalCriteria";
 import EasApprovalCastVoteButton from "@/components/Votes/EasApprovalCastVoteButton/EasApprovalCastVoteButton";
@@ -60,7 +60,7 @@ export default function ArchiveApprovalVotesPanel({ proposal }: Props) {
           ))}
         </HStack>
         {activeTab === 1 ? (
-          <OptionsResultsPanel proposal={proposal} />
+          <OptionResultsPanel proposal={proposal} />
         ) : (
           <>
             <div className="px-4">

@@ -37,12 +37,8 @@ function extractOptimisticData(proposal: ArchiveListProposal): {
 
   if (tokenHolderOutcome) {
     const againstVotes = Number(tokenHolderOutcome["0"] ?? 0);
-    const forVotes = Number(tokenHolderOutcome["1"] ?? 0);
-    const totalVotes = againstVotes + forVotes;
-
-    if (totalVotes > 0) {
-      againstRelativeAmount = Math.round((againstVotes / totalVotes) * 100);
-    }
+    const votableSupply = Number(proposal.total_voting_power_at_start);
+    againstRelativeAmount = Math.round((againstVotes / votableSupply) * 100);
   }
 
   // Derive status from lifecycle_stage
@@ -75,7 +71,7 @@ export function OptimisticProposalRow({
 }: ArchiveRowProps) {
   const { token } = Tenant.current();
   const decimals = tokenDecimals ?? token.decimals ?? 18;
-  console.log("proposal", proposal);
+
   // Compute display data and optimistic metrics
   const { displayData, optimisticData, proposalTypeName } = useMemo(() => {
     const displayData = extractDisplayData(proposal, proposalType, decimals);

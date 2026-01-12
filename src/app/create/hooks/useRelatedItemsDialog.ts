@@ -160,6 +160,7 @@ export function useRelatedItemsDialog({
 
       const results = filtered.slice(startIdx, endIdx).map((proposal) => {
         const proposalType = proposal.proposal_type;
+
         return {
           id: proposal.id,
           title: proposal.title,
@@ -184,6 +185,7 @@ export function useRelatedItemsDialog({
                   description: proposalType.description,
                   quorum: proposalType.quorum / 100,
                   approvalThreshold: proposalType.approval_threshold / 100,
+                  type: proposalType.class,
                 }
               : undefined,
         };

@@ -231,6 +231,18 @@ export function CreatePostClient({
       const tempCheck = relatedTempChecks[0];
       if (tempCheck.proposalType) {
         setSelectedProposalType(tempCheck.proposalType);
+
+        // Automatically set voting type based on temp check's proposal type class
+        if (tempCheck.proposalType.type) {
+          const proposalClass = tempCheck.proposalType.type.toUpperCase();
+          if (proposalClass === "OPTIMISTIC") {
+            setSelectedVotingType("optimistic");
+          } else if (proposalClass === "APPROVAL") {
+            setSelectedVotingType("approval");
+          } else if (proposalClass === "STANDARD") {
+            setSelectedVotingType("standard");
+          }
+        }
       }
     }
   }, [relatedTempChecks, selectedPostType]);

@@ -72,6 +72,7 @@ export interface RelatedItem {
     description: string;
     quorum: number;
     approvalThreshold: number;
+    type?: string; // OPTIMISTIC, STANDARD, or APPROVAL
   };
 }
 

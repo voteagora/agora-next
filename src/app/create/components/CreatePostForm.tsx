@@ -73,6 +73,10 @@ export function CreatePostForm({
   const title = watch("title");
   const description = watch("description");
 
+  // Disable voting type selector when governance proposal has a related temp check
+  const isVotingTypeLocked =
+    postType === "gov-proposal" && relatedTempChecks.length > 0;
+
   return (
     <FormProvider {...form}>
       <Card>
@@ -83,6 +87,7 @@ export function CreatePostForm({
               <VotingTypeSelector
                 value={selectedVotingType}
                 onChange={onVotingTypeChange}
+                disabled={isVotingTypeLocked}
               />
             </div>
           )}

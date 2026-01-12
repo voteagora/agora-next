@@ -89,13 +89,35 @@ export function normalizeArchiveApprovalProposal(
     },
   };
 
+  // Parse vote data from outcome field
+  const outcome = proposal.outcome as any;
+  const tokenHolderVotes = outcome?.["token-holders"] || {};
+
+  // Extract votes for each option
+  const optionVotes = choices.map((_, index) => {
+    const voteData = tokenHolderVotes[String(index)];
+    if (voteData && typeof voteData === "object") {
+      // Sum up all votes for this option
+      const totalVotes = Object.values(voteData).reduce((sum: bigint, vote) => {
+        return sum + safeBigInt(vote as string | number);
+      }, 0n);
+      return totalVotes;
+    }
+    return 0n;
+  });
+
+  // Calculate total for, against, abstain
+  const totalFor = outcome?.["no-param"]?.["1"]
+    ? BigInt(outcome["no-param"]["1"])
+    : 0n;
+
   const proposalResults = {
-    for: 0n,
+    for: totalFor,
     against: 0n,
     abstain: 0n,
-    options: choices.map((choice) => ({
+    options: choices.map((choice, index) => ({
       option: choice,
-      votes: 0n,
+      votes: optionVotes[index] || 0n,
     })),
     criteria: criteria === 1 ? "THRESHOLD" : "TOP_CHOICES",
     criteriaValue: BigInt(criteriaValue),

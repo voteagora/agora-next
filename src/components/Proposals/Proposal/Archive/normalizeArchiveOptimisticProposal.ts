@@ -26,7 +26,6 @@ export function normalizeArchiveOptimisticProposal(
   proposal: ArchiveListProposal,
   options: NormalizeArchiveProposalOptions = {}
 ): Proposal {
-  console.log("proposal", proposal);
   const decimals = options.tokenDecimals ?? 18;
   const statusKey = deriveStatus(proposal, decimals);
   const normalizedStatusKey = STATUS_LABEL_MAP[statusKey]
@@ -60,9 +59,7 @@ export function normalizeArchiveOptimisticProposal(
     approvalThreshold: approvalThresholdValue,
     votableSupply: votableSupplyValue,
   } = resolveArchiveThresholds(proposal);
-  console.log("quorumValue", quorumValue);
-  console.log("approvalThresholdValue", approvalThresholdValue);
-  console.log("votableSupplyValue", votableSupplyValue);
+
   const markdowntitle =
     typeof proposal.title === "string" && proposal.title.trim().length > 0
       ? proposal.title
@@ -135,7 +132,7 @@ export function normalizeArchiveOptimisticProposal(
     queuedTime,
     markdowntitle,
     description,
-    quorum: votableSupplyValue / (quorumValue / 100n),
+    quorum: quorumValue,
     votableSupply: votableSupplyValue,
     approvalThreshold: approvalThresholdValue,
     proposalData,
