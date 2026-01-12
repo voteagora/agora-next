@@ -67,11 +67,11 @@ export default class TenantUIFactory {
       case TENANT_NAMESPACES.SYNDICATE:
         return syndicateTenantUIConfig;
 
-            case TENANT_NAMESPACES.DEMO2:
+      case TENANT_NAMESPACES.DEMO2:
         return demo2TenantUIConfig;
-            case TENANT_NAMESPACES.DEMO4:
+      case TENANT_NAMESPACES.DEMO4:
         return demo4TenantUIConfig;
-            case TENANT_NAMESPACES.DEMO3:
+      case TENANT_NAMESPACES.DEMO3:
         return demo3TenantUIConfig;
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
