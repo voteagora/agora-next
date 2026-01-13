@@ -36,8 +36,7 @@ export function useRecentlyReleasedStatement() {
       }
 
       const financialStatements = documentsResult.data.filter(
-        (doc) =>
-          doc.name?.toLowerCase().includes("financial statement") ?? false
+        (doc) => doc.isFinancialStatement ?? false
       );
 
       if (financialStatements.length === 0) {

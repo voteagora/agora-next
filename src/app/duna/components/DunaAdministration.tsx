@@ -64,14 +64,10 @@ const DunaAdministration = async () => {
     financialStatementsToggle?.config as UIFinancialStatementsConfig;
 
   const financialStatements = isFinancialStatementsEnabled
-    ? documents.filter((doc) =>
-        doc.name.toLowerCase().includes("financial statement")
-      )
+    ? documents.filter((doc) => doc.isFinancialStatement ?? false)
     : [];
   const otherDocuments = isFinancialStatementsEnabled
-    ? documents.filter(
-        (doc) => !doc.name.toLowerCase().includes("financial statement")
-      )
+    ? documents.filter((doc) => !(doc.isFinancialStatement ?? false))
     : documents;
 
   return (

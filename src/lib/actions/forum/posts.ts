@@ -741,6 +741,7 @@ export async function getForumPostsByUser(
           : new Date(att.createdAt)
         ).toISOString(),
         uploadedBy: att.address,
+        isFinancialStatement: att.isFinancialStatement ?? false,
         revealTime: att.revealTime
           ? att.revealTime instanceof Date
             ? att.revealTime.toISOString()

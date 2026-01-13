@@ -92,6 +92,7 @@ export async function getForumAttachments() {
         createdAt: attachment.createdAt.toISOString(),
         uploadedBy: attachment.address,
         archived: attachment.archived,
+        isFinancialStatement: attachment.isFinancialStatement ?? false,
         revealTime: attachment.revealTime?.toISOString() ?? null,
         expirationTime: attachment.expirationTime?.toISOString() ?? null,
       })),
@@ -356,6 +357,7 @@ export const getForumCategoryAttachments = async ({
           attachment.archived ||
           (attachment.expirationTime !== null &&
             attachment.expirationTime <= now),
+        isFinancialStatement: attachment.isFinancialStatement ?? false,
         revealTime: attachment.revealTime?.toISOString() ?? null,
         expirationTime: attachment.expirationTime?.toISOString() ?? null,
       })),
