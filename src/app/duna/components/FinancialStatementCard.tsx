@@ -42,34 +42,35 @@ export default function FinancialStatementCard({
 
   return (
     <div
-      className={`relative rounded-lg overflow-hidden cursor-pointer transition-all`}
+      className="relative rounded-lg overflow-hidden cursor-pointer transition-all hover:shadow-lg group"
       style={{
         background: bgColor,
-        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.12)",
       }}
       onClick={onCardClick}
     >
       <div className="w-[320px] flex flex-col">
-        <div className="flex-1 p-5 flex flex-col min-h-[120px]">
-          {isRecentlyReleased && (
-            <div className="mb-3">
-              <span className="inline-block px-3 py-1 rounded-lg text-xs font-medium bg-neutral text-primary">
+        <div className="flex-1 p-4 flex flex-col min-h-[120px] relative z-10">
+          <div className="mb-2 min-h-[28px]">
+            {isRecentlyReleased && (
+              <span className="inline-block px-3 py-1 rounded-lg text-xs font-medium bg-neutral backdrop-blur-sm text-primary shadow-sm">
                 Recently released
               </span>
-            </div>
-          )}
-          <h3 className="text-lg font-bold text-gray-900 line-clamp-2 mb-auto">
+            )}
+          </div>
+          <h3 className="text-lg font-bold text-primary line-clamp-2 mb-auto drop-shadow-sm">
             {displayName}
           </h3>
         </div>
         <div className="relative h-[280px] overflow-hidden">
           <div
             dangerouslySetInnerHTML={{ __html: patternSvg }}
-            className="w-full h-full"
+            className="w-full h-full transition-transform duration-500 group-hover:scale-105"
             style={{
               filter: "none",
             }}
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-events-none" />
         </div>
       </div>
     </div>
