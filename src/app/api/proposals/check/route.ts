@@ -12,23 +12,6 @@ import { erc721Abi } from "viem";
 
 export const maxDuration = 60;
 
-async function isAdmin(address: string, daoSlug: string): Promise<boolean> {
-  try {
-    const result = await prismaWeb2Client.forumAdmin.findFirst({
-      where: {
-        address: address.toLowerCase(),
-        managedAccounts: {
-          has: daoSlug as DaoSlug,
-        },
-      },
-    });
-    return !!result;
-  } catch (error) {
-    console.error("Error checking admin status:", error);
-    return false;
-  }
-}
-
 async function getForumSettings(daoSlug: string) {
   try {
     const result = await prismaWeb2Client.$queryRaw<

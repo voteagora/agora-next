@@ -154,7 +154,6 @@ export class PermissionService {
             resource: rp.permission.resource,
             action: rp.permission.action,
             description: rp.permission.description,
-            conditions: rp.conditions as Record<string, unknown> | null,
             roleId: userRole.role.id,
             roleName: userRole.role.name,
           });
