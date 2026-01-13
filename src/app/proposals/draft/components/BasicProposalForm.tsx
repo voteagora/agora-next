@@ -162,6 +162,9 @@ const BasicProposalForm = () => {
   }, [watch, validateTransactionForms, updateSimulationState]);
 
   const simulateTransactions = async () => {
+    const isValid = await trigger("transactions");
+    if (!isValid) return;
+
     setSimulationPending(true);
     const transactions = getValues("transactions");
 
