@@ -8,11 +8,8 @@ import { ChartTreasury } from "@/app/info/components/ChartTreasury";
 import GovernorSettings from "@/app/info/components/GovernorSettings";
 import GovernanceCharts from "@/app/info/components/GovernanceCharts";
 import DunaAdministration from "@/app/duna/components/DunaAdministration";
-import DunaDisclosures from "@/app/duna/components/DunaDisclosures";
-import SyndicateDunaDisclosures from "@/app/duna/components/SyndicateDunaDisclosures";
-import TownsDunaAdministration, {
-  TownsDunaDisclosures,
-} from "@/app/duna/components/TownsDunaAdministration";
+import DunaDisclosuresContent from "@/app/duna/components/DunaDisclosuresContent";
+import TownsDunaAdministration from "@/app/duna/components/TownsDunaAdministration";
 import GovernanceInfoSections from "@/app/info/components/GovernanceInfoSections";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
@@ -116,16 +113,8 @@ export default async function Page() {
             }}
           />
         )}
-        {hasDunaAdministration ? (
-          ui.toggle("towns-duna-administration")?.enabled ? null : ui.toggle(
-              "syndicate-duna-disclosures"
-            )?.enabled ? (
-            <SyndicateDunaDisclosures />
-          ) : ui.toggle("towns-duna-disclosures")?.enabled ? (
-            <TownsDunaDisclosures />
-          ) : (
-            <DunaDisclosures />
-          )
+        {hasDunaAdministration && ui.toggle("duna-disclosures")?.enabled ? (
+          <DunaDisclosuresContent />
         ) : null}
       </div>
     );

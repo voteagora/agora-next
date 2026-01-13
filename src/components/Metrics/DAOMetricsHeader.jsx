@@ -28,7 +28,9 @@ export default function DAOMetricsHeader() {
   const { address } = useAccount();
   const governanceForumLink = ui.link("governance-forum");
   const bugsLink = ui.link("bugs");
-  const changeLogLink = ui.link("changelog");
+  const changeLogLink = !ui.toggle("footer/hide-changelog")?.enabled
+    ? ui.link("changelog")
+    : undefined;
   const faqLink = ui.link("faq");
   const discordLink = ui.link("discord");
   const twitterLink = ui.link("townstwitter");
@@ -66,6 +68,7 @@ export default function DAOMetricsHeader() {
     votableSupply: formatNumber(votableSupply),
     totalSupply: formatNumber(totalSupply),
   };
+  const hideVotableSupply = ui.toggle("footer/hide-votable-supply")?.enabled;
 
   if (!isClient) {
     return null;
@@ -214,25 +217,26 @@ export default function DAOMetricsHeader() {
                       <span>Total amount of {token.symbol} in existence</span>
                     </HoverCardContent>
                   </HoverCard>
-                  {contracts.token.isERC20() | contracts.token.isERC721() && (
-                    <HoverCard openDelay={100} closeDelay={100}>
-                      <HoverCardTrigger className="flex">
-                        <span className="cursor-default content-center">
-                          {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
-                          {token.symbol} votable supply
-                        </span>
-                      </HoverCardTrigger>
-                      <HoverCardContent
-                        className="w-full shadow"
-                        side="bottom"
-                        sideOffset={3}
-                      >
-                        <span>
-                          {token.symbol} currently delegated to a voter
-                        </span>
-                      </HoverCardContent>
-                    </HoverCard>
-                  )}
+                  {!hideVotableSupply &&
+                    contracts.token.isERC20() | contracts.token.isERC721() && (
+                      <HoverCard openDelay={100} closeDelay={100}>
+                        <HoverCardTrigger className="flex">
+                          <span className="cursor-default content-center">
+                            {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
+                            {token.symbol} votable supply
+                          </span>
+                        </HoverCardTrigger>
+                        <HoverCardContent
+                          className="w-full shadow"
+                          side="bottom"
+                          sideOffset={3}
+                        >
+                          <span>
+                            {token.symbol} currently delegated to a voter
+                          </span>
+                        </HoverCardContent>
+                      </HoverCard>
+                    )}
                 </div>
               )}
             </div>

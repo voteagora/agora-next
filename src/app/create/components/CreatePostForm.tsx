@@ -16,6 +16,7 @@ import { ApprovalOptionsInput } from "./ApprovalOptionsInput";
 import { OptimisticSettingsInput } from "./OptimisticSettingsInput";
 import MarkdownTextareaInput from "@/app/proposals/draft/components/form/MarkdownTextareaInput";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import Tenant from "@/lib/tenant/tenant";
 
 interface CreatePostFormProps {
   form: UseFormReturn<CreatePostFormData>;
@@ -72,6 +73,14 @@ export function CreatePostForm({
   const relatedTempChecks = watch("relatedTempChecks") || [];
   const title = watch("title");
   const description = watch("description");
+  const tenant = Tenant.current();
+  const { ui } = tenant;
+  const isDarkTenant = ui.theme === "dark";
+  const tenantName = tenant.brandName || ui.organization?.title || ui.title;
+  const titlePlaceholder = `Add new appchain to ${tenantName}`;
+  const submitClassName = isDarkTenant
+    ? "bg-wash border border-line text-primary hover:bg-hoverBackground"
+    : "bg-black text-white hover:bg-gray-800";
 
   // Disable voting type selector when governance proposal has a related temp check
   const isVotingTypeLocked =
@@ -103,7 +112,7 @@ export function CreatePostForm({
             <Input
               id="title"
               {...register("title", { required: "Title is required" })}
-              placeholder="Add new appchain to Syndicate"
+              placeholder={titlePlaceholder}
               className="mt-2"
             />
             {errors.title && (
@@ -213,7 +222,7 @@ export function CreatePostForm({
                   (postType === "tempcheck" && !canCreateTempCheck) ||
                   (postType === "gov-proposal" && !canCreateGovernanceProposal)
                 }
-                className="bg-black text-white hover:bg-gray-800"
+                className={submitClassName}
               >
                 {isSubmitting
                   ? "Creating..."

@@ -33,6 +33,7 @@ import {
 } from "@/components/Proposals/Proposal/Archive/normalizeArchiveProposalDetail";
 import ArchiveOptimisticProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/ArchiveOptimisticProposalPage";
 import ArchiveApprovalProposalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/ArchiveApprovalProposalPage";
+import { fetchProposalTaxFormMetadata } from "@/app/api/common/proposals/getProposalTaxFormMetadata";
 
 export const maxDuration = 60;
 
@@ -44,10 +45,10 @@ async function loadProposal(
   const useArchive = ui.toggle("use-archive-for-proposal-details")?.enabled;
 
   if (useArchive) {
-    const archiveResults = await fetchProposalFromArchive(
-      namespace,
-      proposalId
-    );
+    const [archiveResults, taxFormMetadata] = await Promise.all([
+      fetchProposalFromArchive(namespace, proposalId),
+      fetchProposalTaxFormMetadata(proposalId),
+    ]);
 
     const archiveProposal = archiveResults ? archiveResults : undefined;
     if (archiveProposal) {
@@ -57,24 +58,36 @@ async function loadProposal(
       };
 
       if (isArchiveOptimisticProposal(archiveProposal)) {
-        return normalizeArchiveOptimisticProposal(
+        const formatedProposal = normalizeArchiveOptimisticProposal(
           archiveProposal,
           normalizeOptions
         );
+        return {
+          ...formatedProposal,
+          taxFormMetadata,
+        };
       }
 
       if (isArchiveApprovalProposal(archiveProposal)) {
-        return normalizeArchiveApprovalProposal(
+        const formatedProposal = normalizeArchiveApprovalProposal(
           archiveProposal,
           normalizeOptions
         );
+        return {
+          ...formatedProposal,
+          taxFormMetadata,
+        };
       }
 
       if (isArchiveStandardProposal(archiveProposal)) {
-        return normalizeArchiveStandardProposal(
+        const formatedProposal = normalizeArchiveStandardProposal(
           archiveProposal,
           normalizeOptions
         );
+        return {
+          ...formatedProposal,
+          taxFormMetadata,
+        };
       }
     }
 

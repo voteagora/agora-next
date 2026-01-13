@@ -225,12 +225,6 @@ erDiagram
         enum category
     }
 
-    admin_role {
-        enum admin
-        enum duna_admin
-        enum super_admin
-    }
-
     forum_categories ||--o{ forum_topics : "has many"
     forum_topics ||--o{ forum_posts : "has many"
     forum_posts ||--o{ forum_posts : "replies to"
