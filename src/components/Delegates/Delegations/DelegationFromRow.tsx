@@ -21,13 +21,13 @@ export default function DelegationFromRow({
           maximumSignificantDigits: 3,
         })}
       </TableCell>
-      <TableCell>{format(delegation.timestamp || 0, "MM/dd/yyyy")}</TableCell>
+      <TableCell>{format(delegation.timestamp || 0, "yyyy/MM/dd")}</TableCell>
       <TableCell>
         <Link
           href={`/delegates/${delegation.from}`}
           title={`Address ${delegation.from}`}
         >
-          <ENSName address={delegation.from} />
+          <ENSName address={delegation.from} includeCtoC={true} />
         </Link>
       </TableCell>
       <TableCell>

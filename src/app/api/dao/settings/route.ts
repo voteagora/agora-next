@@ -4,24 +4,24 @@ import Tenant from "@/lib/tenant/tenant";
 
 export async function GET(request: NextRequest) {
   try {
-    const { namespace } = Tenant.current();
     const { searchParams } = new URL(request.url);
     const daoId = searchParams.get("daoId");
-
+    const { namespace } = Tenant.current();
     if (!daoId) {
       return NextResponse.json({ error: "daoId is required" }, { status: 400 });
     }
 
-    const result = await prismaWeb3Client.$queryRaw<
+    const result = await prismaWeb3Client.$queryRawUnsafe<
       Array<{
         param_name: string;
         param_value: string;
       }>
-    >`
-      SELECT param_name, param_value
+    >(
+      `SELECT param_name, param_value
       FROM ${namespace}.dao_settings 
-      WHERE dao_id = ${daoId.toLowerCase()}
-    `;
+      WHERE dao_id = $1`,
+      daoId.toLowerCase()
+    );
 
     const settings: Record<string, string> = {};
     for (const row of result) {
