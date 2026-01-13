@@ -22,6 +22,8 @@ interface ForumDocument {
   createdAt: string;
   uploadedBy: string;
   archived?: boolean;
+  revealTime?: string | null;
+  expirationTime?: string | null;
 }
 
 interface DocumentsSectionProps {
@@ -206,12 +208,9 @@ const DocumentsSection = ({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {documents.map((document: ForumDocument, index) => {
-            // Check if user is the author
             const isAuthor =
               address?.toLowerCase() === document.uploadedBy?.toLowerCase();
-            // Can archive if: has RBAC permission OR is author
             const canArchive = canArchiveFilings || isAuthor;
-            // Can delete if: has RBAC permission
             const canDelete = canDeleteFilings;
 
             return (

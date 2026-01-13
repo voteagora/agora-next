@@ -64,6 +64,10 @@ export type UITaxFormConfig = {
   provider?: string;
 };
 
+export type UIFinancialStatementsConfig = {
+  title: string;
+};
+
 type UIConfig =
   | PLMConfig
   | UIDunaDescriptionConfig
@@ -71,7 +75,8 @@ type UIConfig =
   | UIGovernanceInfoConfig
   | UIInfoBannerConfig
   | UIDunaDisclosuresConfig
-  | UITaxFormConfig;
+  | UITaxFormConfig
+  | UIFinancialStatementsConfig;
 
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account

@@ -129,6 +129,27 @@ export async function getForumTopic(topicId: number) {
       isNsfw: false,
     };
 
+    const now = new Date();
+    const attachmentWhere = {
+      archived: false,
+      OR: [
+        {
+          revealTime: null,
+          expirationTime: null,
+        },
+        {
+          AND: [
+            {
+              OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+            },
+            {
+              OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+            },
+          ],
+        },
+      ],
+    };
+
     const topic = await prismaWeb2Client.forumTopic.findFirst({
       where: whereClause,
       include: {
@@ -146,7 +167,9 @@ export async function getForumTopic(topicId: number) {
           include: {
             votes: true,
             reactions: true,
-            attachments: true,
+            attachments: {
+              where: attachmentWhere,
+            },
           },
         },
       },
@@ -186,6 +209,16 @@ export async function getForumTopic(topicId: number) {
           : new Date(att.createdAt)
         ).toISOString(),
         uploadedBy: att.address,
+        revealTime: att.revealTime
+          ? att.revealTime instanceof Date
+            ? att.revealTime.toISOString()
+            : new Date(att.revealTime).toISOString()
+          : null,
+        expirationTime: att.expirationTime
+          ? att.expirationTime instanceof Date
+            ? att.expirationTime.toISOString()
+            : new Date(att.expirationTime).toISOString()
+          : null,
       })),
     }));
 

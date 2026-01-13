@@ -21,11 +21,32 @@ const deleteAttachmentSchema = z.object({
 
 export async function getForumAttachments() {
   try {
+    const now = new Date();
+
     const postAttachments = await prismaWeb2Client.forumPostAttachment.findMany(
       {
         where: {
           dao_slug: slug,
           archived: false,
+          OR: [
+            {
+              revealTime: null,
+              expirationTime: null,
+            },
+            {
+              AND: [
+                {
+                  OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+                },
+                {
+                  OR: [
+                    { expirationTime: null },
+                    { expirationTime: { gt: now } },
+                  ],
+                },
+              ],
+            },
+          ],
         },
         orderBy: { createdAt: "desc" },
       }
@@ -36,6 +57,25 @@ export async function getForumAttachments() {
         where: {
           dao_slug: slug,
           archived: false,
+          OR: [
+            {
+              revealTime: null,
+              expirationTime: null,
+            },
+            {
+              AND: [
+                {
+                  OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+                },
+                {
+                  OR: [
+                    { expirationTime: null },
+                    { expirationTime: { gt: now } },
+                  ],
+                },
+              ],
+            },
+          ],
         },
         orderBy: { createdAt: "desc" },
       });
@@ -52,6 +92,8 @@ export async function getForumAttachments() {
         createdAt: attachment.createdAt.toISOString(),
         uploadedBy: attachment.address,
         archived: attachment.archived,
+        revealTime: attachment.revealTime?.toISOString() ?? null,
+        expirationTime: attachment.expirationTime?.toISOString() ?? null,
       })),
     };
   } catch (error) {
@@ -111,13 +153,11 @@ export async function uploadDocumentFromBase64(
       return { success: false, error: "Invalid signature" };
     }
 
-    // Convert base64 to buffer
     const base64Content = base64Data.includes(",")
       ? base64Data.split(",")[1]
       : base64Data;
     const buffer = Buffer.from(base64Content, "base64");
 
-    // Upload to IPFS
     const result = await uploadFileToPinata(buffer, {
       name: fileName,
       keyvalues: {
@@ -128,7 +168,6 @@ export async function uploadDocumentFromBase64(
       },
     });
 
-    // Save to database
     const document = await prismaWeb2Client.forumCategoryAttachment.create({
       data: {
         fileName: fileName,
@@ -264,12 +303,42 @@ export const getForumCategoryAttachments = async ({
   archived?: boolean;
 }) => {
   try {
+    const now = new Date();
+
     const attachments = await prismaWeb2Client.forumCategoryAttachment.findMany(
       {
         where: {
           dao_slug: slug,
           categoryId,
-          archived,
+          ...(archived
+            ? {
+                OR: [{ archived: true }, { expirationTime: { lte: now } }],
+              }
+            : {
+                archived: false,
+                OR: [
+                  {
+                    revealTime: null,
+                    expirationTime: null,
+                  },
+                  {
+                    AND: [
+                      {
+                        OR: [
+                          { revealTime: null },
+                          { revealTime: { lte: now } },
+                        ],
+                      },
+                      {
+                        OR: [
+                          { expirationTime: null },
+                          { expirationTime: { gt: now } },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              }),
         },
       }
     );
@@ -283,7 +352,12 @@ export const getForumCategoryAttachments = async ({
         ipfsCid: attachment.ipfsCid,
         createdAt: attachment.createdAt.toISOString(),
         uploadedBy: attachment.address,
-        archived: attachment.archived,
+        archived:
+          attachment.archived ||
+          (attachment.expirationTime !== null &&
+            attachment.expirationTime <= now),
+        revealTime: attachment.revealTime?.toISOString() ?? null,
+        expirationTime: attachment.expirationTime?.toISOString() ?? null,
       })),
     };
   } catch (error) {
