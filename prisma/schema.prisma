@@ -5582,7 +5582,6 @@ model ForumRolePermission {
     id           Int      @id @default(autoincrement())
     roleId       Int      @map("role_id")
     permissionId Int      @map("permission_id")
-    conditions   Json?
     createdAt    DateTime @default(now()) @map("created_at")
 
     // Relations
