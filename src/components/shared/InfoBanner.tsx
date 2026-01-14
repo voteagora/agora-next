@@ -16,6 +16,20 @@ export default function InfoBanner({ toggleName }: InfoBannerProps) {
   const { ui } = Tenant.current();
   const bannerConfig = ui.toggle(toggleName);
   const { address } = useAccount();
+  const infoBannerBackground = ui.customization?.infoBannerBackground;
+  const bannerHasCustomBg = Boolean(infoBannerBackground);
+  const bannerBgStyle = bannerHasCustomBg
+    ? {
+        backgroundColor: infoBannerBackground?.startsWith("#")
+          ? infoBannerBackground
+          : `rgb(${infoBannerBackground})`,
+      }
+    : undefined;
+  const bannerTextClass = bannerHasCustomBg ? "text-white" : "text-primary";
+  const bannerIconClass = bannerHasCustomBg ? "text-white" : "text-primary";
+  const dismissHoverClass = bannerHasCustomBg
+    ? "hover:bg-white/10"
+    : "hover:bg-tertiary/10";
 
   const [isDismissed, setIsDismissed] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -81,22 +95,25 @@ export default function InfoBanner({ toggleName }: InfoBannerProps) {
   const config = bannerConfig.config as UIInfoBannerConfig;
 
   return (
-    <div className="flex items-center justify-between gap-4 px-4 pt-4 pb-6 mb-0 border border-line shadow-newDefault rounded-lg relative z-0 bg-wash">
+    <div
+      className="flex items-center justify-between gap-4 px-4 pt-4 pb-6 mb-0 border border-line shadow-newDefault rounded-lg relative z-0 bg-wash"
+      style={bannerBgStyle}
+    >
       <div className="flex items-center gap-3 flex-1">
-        <BookOpenIcon className="w-5 h-5 text-primary flex-shrink-0" />
+        <BookOpenIcon className={`w-5 h-5 flex-shrink-0 ${bannerIconClass}`} />
         <Link
           href={config.link}
-          className="text-sm text-primary font-medium hover:opacity-80 transition-opacity"
+          className={`text-sm font-medium hover:opacity-80 transition-opacity ${bannerTextClass}`}
         >
           {config.text}
         </Link>
       </div>
       <button
         onClick={handleDismiss}
-        className="flex-shrink-0 p-1 hover:bg-tertiary/10 rounded transition-colors"
+        className={`flex-shrink-0 p-1 rounded transition-colors ${dismissHoverClass}`}
         aria-label="Dismiss banner"
       >
-        <XMarkIcon className="w-5 h-5 text-primary" />
+        <XMarkIcon className={`w-5 h-5 ${bannerIconClass}`} />
       </button>
     </div>
   );

@@ -25,6 +25,15 @@ export function RelatedItemsSection({
   searchType,
 }: RelatedItemsSectionProps) {
   const { ui } = Tenant.current();
+  const isDarkTenant = ui.theme === "dark";
+  const addButtonClass = [
+    "w-full",
+    isDarkTenant
+      ? "bg-wash border-line text-primary hover:bg-hoverBackground"
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
   const [isOpen, setIsOpen] = useState(false);
 
   const isTempCheck = searchType === "tempcheck";
@@ -94,7 +103,7 @@ export function RelatedItemsSection({
           <Button
             variant="outline"
             onClick={() => setIsOpen(true)}
-            className="w-full"
+            className={addButtonClass}
           >
             + Add Reference
           </Button>

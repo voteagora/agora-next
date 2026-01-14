@@ -4,7 +4,13 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export default function Hero({ page }) {
   const { namespace, ui } = Tenant.current();
-  const { title, description, hero } = ui.page(page);
+  const pageData = ui.page(page);
+
+  if (!pageData) {
+    return null;
+  }
+
+  const { title, description, hero } = pageData;
 
   // For Protocol Guild proposals/delegates, render nothing (no whitespace)
   if (

@@ -6,6 +6,7 @@ import {
   fetchSnapshotUserVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
 import { PaginationParams } from "@/app/lib/pagination";
+import { TaxFormBanner } from "../TaxFormBanner";
 
 async function fetchProposalVotes(
   proposalId: string,
@@ -39,6 +40,9 @@ export default async function CopelandProposalPage({
   const proposalState = proposal.status;
   return (
     <div className="flex gap-16 justify-between items-start max-w-[76rem] flex-col sm:flex-row sm:items-start sm:justify-between">
+      <div className="w-full sm:w-auto sm:flex-1">
+        <TaxFormBanner proposal={proposal} />
+      </div>
       <div className="flex-1 proposal-description pb-6 md:pb-0">
         <ProposalDescription proposal={proposal} />
       </div>
