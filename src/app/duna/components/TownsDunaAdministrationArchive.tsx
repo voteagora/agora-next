@@ -2,7 +2,6 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import DocumentsSection from "./DocumentsSection";
 import {
-  getForumAttachments,
   getDunaCategoryId,
   getForumCategoryAttachments,
 } from "@/lib/actions/forum";

@@ -7,6 +7,9 @@ export interface ForumAttachment {
   url: string;
   createdAt: string;
   uploadedBy?: string;
+  isFinancialStatement?: boolean;
+  revealTime?: string | null;
+  expirationTime?: string | null;
 }
 
 export interface ForumTopic {

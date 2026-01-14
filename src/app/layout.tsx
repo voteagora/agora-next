@@ -8,6 +8,7 @@ import { fontMapper, inter } from "@/styles/fonts";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ForumPermissionsProvider } from "@/contexts/ForumPermissionsContext";
+import RecentlyReleasedBanner from "@/components/shared/RecentlyReleasedBanner";
 
 declare global {
   interface BigInt {
@@ -153,6 +154,7 @@ export default async function RootLayout({
           <ForumPermissionsProvider>
             <Header />
             <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
+              <RecentlyReleasedBanner />
               {children}
             </div>
             <DAOMetricsHeader />

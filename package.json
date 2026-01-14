@@ -92,6 +92,7 @@
     "csstype": "^3.0.10",
     "d3": "^7.9.0",
     "date-fns": "^2.30.0",
+    "embla-carousel-react": "^8.6.0",
     "encoding": "^0.1.13",
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.1",

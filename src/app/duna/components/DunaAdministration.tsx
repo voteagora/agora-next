@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import DocumentsSection from "./DocumentsSection";
+import FinancialStatementsClient from "./FinancialStatementsClient";
 import {
   getForumTopics,
   getDunaCategoryId,
@@ -8,7 +9,10 @@ import {
 } from "@/lib/actions/forum";
 import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
 import Tenant from "@/lib/tenant/tenant";
-import { UIDunaDescriptionConfig } from "@/lib/tenant/tenantUI";
+import {
+  UIDunaDescriptionConfig,
+  UIFinancialStatementsConfig,
+} from "@/lib/tenant/tenantUI";
 
 const DunaDescription = () => {
   const { ui } = Tenant.current();
@@ -52,6 +56,20 @@ const DunaAdministration = async () => {
     console.error("Error fetching forum data:", error);
   }
 
+  const { ui } = Tenant.current();
+  const financialStatementsToggle = ui.toggle("duna/financial-statements");
+  const isFinancialStatementsEnabled =
+    financialStatementsToggle?.enabled ?? false;
+  const financialStatementsConfig =
+    financialStatementsToggle?.config as UIFinancialStatementsConfig;
+
+  const financialStatements = isFinancialStatementsEnabled
+    ? documents.filter((doc) => doc.isFinancialStatement ?? false)
+    : [];
+  const otherDocuments = isFinancialStatementsEnabled
+    ? documents.filter((doc) => !(doc.isFinancialStatement ?? false))
+    : documents;
+
   return (
     <div className="mt-12">
       <div className="flex items-center justify-between mb-6">
@@ -61,13 +79,24 @@ const DunaAdministration = async () => {
       </div>
       <DunaDescription />
 
-      <Card className="border border-line bg-cardBackground shadow-sm">
-        <CardContent className="p-6">
-          <div className="">
-            <DocumentsSection initialDocuments={documents} />
-          </div>
-        </CardContent>
-      </Card>
+      {isFinancialStatementsEnabled && financialStatements.length > 0 && (
+        <div className="mb-6">
+          <FinancialStatementsClient
+            statements={financialStatements}
+            title={financialStatementsConfig?.title ?? "Financial Statements"}
+          />
+        </div>
+      )}
+
+      {otherDocuments.length > 0 && (
+        <Card className="border border-line bg-cardBackground shadow-sm">
+          <CardContent className="p-6">
+            <div className="">
+              <DocumentsSection initialDocuments={otherDocuments} />
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
