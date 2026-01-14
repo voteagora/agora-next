@@ -165,6 +165,42 @@ export class PermissionService {
   }
 
   /**
+   * Get all wallet addresses that have a specific permission within a DAO,
+   * including system-wide roles (daoSlug = null).
+   */
+  async getAddressesWithPermission(
+    daoSlug: DaoSlug,
+    permission: PermissionCheck
+  ): Promise<string[]> {
+    const { module, resource, action } = permission;
+
+    const userRoles = await db.forumUserRole.findMany({
+      where: {
+        isActive: true,
+        revokedAt: null,
+        OR: [{ daoSlug }, { daoSlug: null }],
+        role: {
+          rolePermissions: {
+            some: {
+              permission: { module, resource, action },
+            },
+          },
+        },
+      },
+      select: {
+        address: true,
+      },
+    });
+
+    const deduped = new Set<string>();
+    for (const entry of userRoles) {
+      deduped.add(normalizeAddress(entry.address));
+    }
+
+    return Array.from(deduped);
+  }
+
+  /**
    * Get permission matrix (all permissions grouped by module and resource)
    */
   async getPermissionMatrix() {

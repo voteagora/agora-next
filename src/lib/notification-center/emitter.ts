@@ -110,7 +110,7 @@ function normalizeRecipientId(recipientId: string): string {
   return recipientId.toLowerCase();
 }
 
-function getSiteBaseUrl(): string {
+export function getSiteBaseUrl(): string {
   const explicit = process.env.NEXT_PUBLIC_BASE_URL;
   if (explicit) {
     return explicit.replace(/\/+$/, "");

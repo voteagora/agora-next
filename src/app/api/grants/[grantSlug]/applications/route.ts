@@ -5,6 +5,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { z } from "zod";
 import { sendGrantConfirmationEmail } from "@/lib/email/mailgun";
 import { getGrant } from "@/app/api/common/grants/getGrant";
+import { emitDirectEvent, getSiteBaseUrl } from "@/lib/notification-center/emitter";
+import { permissionService } from "@/server/services/permission.service";
 
 export const revalidate = 0;
 
@@ -190,6 +192,7 @@ export async function POST(
   { params }: { params: { grantSlug: string } }
 ) {
   const { grantSlug } = params;
+  const { slug: daoSlug, ui } = Tenant.current();
 
   try {
     // First, verify the grant exists
@@ -369,6 +372,42 @@ export async function POST(
     );
 
     const applicationId = applicationResult[0].id;
+
+    // Emit admin notification (non-blocking)
+    const grantsEnabled = ui.toggle("grants")?.enabled !== false;
+    if (grantsEnabled) {
+      void (async () => {
+        try {
+          const adminRecipients = await permissionService.getAddressesWithPermission(daoSlug, {
+            module: "grants",
+            resource: "applications",
+            action: "read",
+          });
+
+          if (adminRecipients.length === 0) return;
+
+          const adminLinkBase = getSiteBaseUrl();
+          const adminLinkPath = `/admin/grants/applications?dao_slug=${encodeURIComponent(
+            daoSlug
+          )}`;
+          const adminLink = adminLinkBase ? `${adminLinkBase}${adminLinkPath}` : adminLinkPath;
+
+          const notificationData = {
+            dao_slug: daoSlug,
+            grant_slug: grant.slug,
+            grant_id: grantId,
+            application_id: applicationId,
+            admin_link: adminLink,
+          };
+
+          for (const recipient of adminRecipients) {
+            emitDirectEvent("grants.application.submitted", recipient, applicationId, notificationData);
+          }
+        } catch (notifyError) {
+          console.error("Failed to emit grant submission notification", notifyError);
+        }
+      })();
+    }
 
     // Send confirmation email (don't block the response if email fails)
     // Only send if email field exists in the form and is not empty
