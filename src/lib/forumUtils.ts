@@ -23,6 +23,9 @@ export interface ForumTopic {
   deletedAt?: string | null;
   deletedBy?: string | null;
   isNsfw?: boolean;
+  isFinancialStatement?: boolean;
+  revealTime?: string | null;
+  expirationTime?: string | null;
 }
 
 export interface ForumPost {

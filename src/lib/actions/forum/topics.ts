@@ -40,10 +40,27 @@ export async function getForumTopics({
   offset = 0,
 }: GetForumTopicsOptions = {}) {
   try {
+    const now = new Date();
     const whereClause: any = {
       dao_slug: slug,
       archived: false,
       isNsfw: false,
+      OR: [
+        {
+          revealTime: null,
+          expirationTime: null,
+        },
+        {
+          AND: [
+            {
+              OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+            },
+            {
+              OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+            },
+          ],
+        },
+      ],
     };
 
     if (categoryId !== undefined) {
@@ -245,6 +262,7 @@ export async function getForumTopicsByUser(
 ) {
   try {
     const { limit, offset } = pagination;
+    const now = new Date();
 
     const topics = await prismaWeb2Client.forumTopic.findMany({
       where: {
@@ -252,6 +270,22 @@ export async function getForumTopicsByUser(
         address: address.toLowerCase(),
         archived: false,
         isNsfw: false,
+        OR: [
+          {
+            revealTime: null,
+            expirationTime: null,
+          },
+          {
+            AND: [
+              {
+                OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+              },
+              {
+                OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+              },
+            ],
+          },
+        ],
       },
       include: {
         category: {
@@ -709,6 +743,7 @@ interface ForumDataOptions {
 
 export const getForumTopicsCount = async () => {
   try {
+    const now = new Date();
     const count = await prismaWeb2Client.forumTopic.count({
       where: {
         dao_slug: slug,
@@ -721,6 +756,22 @@ export const getForumTopicsCount = async () => {
             deletedAt: null,
           },
         },
+        OR: [
+          {
+            revealTime: null,
+            expirationTime: null,
+          },
+          {
+            AND: [
+              {
+                OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+              },
+              {
+                OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+              },
+            ],
+          },
+        ],
       },
     });
 
@@ -736,6 +787,7 @@ export const getForumTopicsCount = async () => {
 
 export const getUncategorizedTopicsCount = async () => {
   try {
+    const now = new Date();
     const count = await prismaWeb2Client.forumTopic.count({
       where: {
         dao_slug: slug,
@@ -749,6 +801,22 @@ export const getUncategorizedTopicsCount = async () => {
             deletedAt: null,
           },
         },
+        OR: [
+          {
+            revealTime: null,
+            expirationTime: null,
+          },
+          {
+            AND: [
+              {
+                OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+              },
+              {
+                OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+              },
+            ],
+          },
+        ],
       },
     });
 
@@ -769,6 +837,7 @@ export const getForumData = async ({
   offset = 0,
 }: ForumDataOptions = {}) => {
   try {
+    const now = new Date();
     const whereClause: any = {
       dao_slug: slug,
       archived: false,
@@ -781,6 +850,22 @@ export const getForumData = async ({
           deletedAt: null,
         },
       },
+      OR: [
+        {
+          revealTime: null,
+          expirationTime: null,
+        },
+        {
+          AND: [
+            {
+              OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+            },
+            {
+              OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+            },
+          ],
+        },
+      ],
     };
 
     if (categoryId !== undefined) {
@@ -813,6 +898,22 @@ export const getForumData = async ({
           deletedAt: null,
         },
       },
+      OR: [
+        {
+          revealTime: null,
+          expirationTime: null,
+        },
+        {
+          AND: [
+            {
+              OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+            },
+            {
+              OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+            },
+          ],
+        },
+      ],
     };
 
     const [
