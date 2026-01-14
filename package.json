@@ -95,7 +95,7 @@
     "encoding": "^0.1.13",
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.1",
-    "ethers": "^6.6.2",
+    "ethers": "^6.16.0",
     "ethers-multicall-provider": "^5.0.0",
     "faker": "4.1.0",
     "form-data": "^4.0.5",
