@@ -4,6 +4,7 @@ import OptimisticProposalVotesCard from "./ProposalVotesCard/OptimisticProposalV
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import { formatNumber } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
+import ArchiveProposalTypeApproval from "../OPProposalPage/ArchiveProposalTypeApproval";
 
 export default function ArchiveOptimisticProposalPage({
   proposal,
@@ -15,8 +16,7 @@ export default function ArchiveOptimisticProposalPage({
 
   const proposalData =
     proposal.proposalData as ParsedProposalData["OPTIMISTIC"]["kind"];
-  const disapprovalThreshold = proposalData?.disapprovalThreshold ?? 51;
-
+  const disapprovalThreshold = proposalData.disapprovalThreshold;
   // Calculate against relative amount from proposal results
   const proposalResults = proposal.proposalResults as {
     for: bigint;
@@ -30,9 +30,7 @@ export default function ArchiveOptimisticProposalPage({
 
   const againstRelativeAmount =
     totalVotes > 0
-      ? Math.round(
-          (Number(againstVotes) / Number(proposal.votableSupply)) * 100
-        )
+      ? (Number(againstVotes) / Number(proposal.votableSupply)) * 100
       : 0;
 
   const againstLengthString = formatNumber(
@@ -57,9 +55,10 @@ export default function ArchiveOptimisticProposalPage({
           <ProposalDescription proposal={proposal} />
         </div>
         <div className="w-full md:max-w-[24rem]">
+          <ArchiveProposalTypeApproval proposal={proposal} />
           <OptimisticProposalVotesCard
             proposal={proposal}
-            againstRelativeAmount={againstRelativeAmount.toString()}
+            againstRelativeAmount={againstRelativeAmount.toFixed(2)}
             againstLengthString={againstLengthString}
             disapprovalThreshold={disapprovalThreshold}
             status={status}

@@ -204,9 +204,11 @@ export const deriveStatus = (
       proposal.total_voting_power_at_start,
       decimals
     );
-    const failingQorum = (thresholds.quorum / 100) * totalPower;
+    const failingQorum = thresholds.quorum * totalPower;
     quorumMet = qorumVotes < failingQorum;
-    if (quorumMet) {
+    const approvalThreshold = thresholds.approvalThreshold * totalPower;
+    hasMetThreshold = qorumVotes < approvalThreshold;
+    if (quorumMet && hasMetThreshold) {
       return "SUCCEEDED";
     }
     return "DEFEATED";
@@ -368,7 +370,6 @@ export const resolveArchiveThresholds = (proposal: ArchiveListProposal) => {
     totalVotingPowerRaw > 0n
   ) {
     quorumValue = (totalVotingPowerRaw * quotaValues.quorum) / 10000n;
-    console.log("quorumValue", quorumValue);
   } else if (quotaValues.quorum > 0n) {
     quorumValue = quotaValues.quorum;
   }

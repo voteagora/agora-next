@@ -70,6 +70,7 @@ async function getInitialFormData(
             description: proposalType.description,
             quorum: proposalType.quorum / 100,
             approvalThreshold: proposalType.approval_threshold / 100,
+            type: proposalType.class,
           }
         : undefined;
 

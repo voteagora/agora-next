@@ -60,17 +60,43 @@ export function CreatePostClient({
   const hasInitialTempCheck =
     (initialFormData.relatedTempChecks?.length || 0) > 0;
 
+  // Calculate initial proposal type and voting type from temp check
+  const getInitialProposalType = () => {
+    if (
+      hasInitialTempCheck &&
+      initialFormData.relatedTempChecks?.[0]?.proposalType
+    ) {
+      return initialFormData.relatedTempChecks[0].proposalType;
+    }
+    return proposalTypes[0];
+  };
+
+  const getInitialVotingType = (): EASVotingType => {
+    if (
+      hasInitialTempCheck &&
+      initialFormData.relatedTempChecks?.[0]?.proposalType?.type
+    ) {
+      const proposalClass =
+        initialFormData.relatedTempChecks[0].proposalType.type.toUpperCase();
+      if (proposalClass === "OPTIMISTIC") return "optimistic";
+      if (proposalClass === "APPROVAL") return "approval";
+      if (proposalClass === "STANDARD") return "standard";
+    }
+    return "standard";
+  };
+
   const [selectedPostType, setSelectedPostType] =
     useState<PostType>(initialPostType);
 
   const [selectedProposalType, setSelectedProposalType] =
-    useState<ProposalType>(proposalTypes[0]);
+    useState<ProposalType>(getInitialProposalType());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showIndexingModal, setShowIndexingModal] = useState(false);
 
   // Voting type state
-  const [selectedVotingType, setSelectedVotingType] =
-    useState<EASVotingType>("standard");
+  const [selectedVotingType, setSelectedVotingType] = useState<EASVotingType>(
+    getInitialVotingType()
+  );
   const [approvalSettings, setApprovalSettings] =
     useState<ApprovalProposalSettings>(defaultApprovalSettings);
 
@@ -227,7 +253,11 @@ export function CreatePostClient({
   }, [proposalTypes, selectedProposalType]);
 
   useEffect(() => {
-    if (selectedPostType === "gov-proposal" && relatedTempChecks.length > 0) {
+    if (
+      selectedPostType === "gov-proposal" &&
+      relatedTempChecks.length > 0 &&
+      !hasInitialTempCheck
+    ) {
       const tempCheck = relatedTempChecks[0];
       if (tempCheck.proposalType) {
         setSelectedProposalType(tempCheck.proposalType);
@@ -245,7 +275,7 @@ export function CreatePostClient({
         }
       }
     }
-  }, [relatedTempChecks, selectedPostType]);
+  }, [relatedTempChecks, selectedPostType, hasInitialTempCheck]);
 
   return (
     <div className="container mx-auto px-4 py-8">
