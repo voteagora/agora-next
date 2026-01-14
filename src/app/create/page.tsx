@@ -60,33 +60,6 @@ async function getInitialFormData(
     data.title = fetchedProposal.title || "";
     data.description = fetchedProposal.description || "";
 
-    const allProposalTypesData = await fetchProposalTypes();
-    const allProposalTypes: ProposalType[] = Array.isArray(allProposalTypesData)
-      ? allProposalTypesData.map((type) => ({
-          id: type.proposal_type_id,
-          name: type.name,
-          description: type.description,
-          quorum: type.quorum / 100,
-          approvalThreshold: type.approval_threshold / 100,
-          module: type.module,
-        }))
-      : [];
-
-    const govProposalTypes = filterProposalTypesByType(
-      allProposalTypes,
-      "gov-proposal"
-    );
-    const proposalTypeData =
-      govProposalTypes.length > 0
-        ? {
-            id: govProposalTypes[0].id,
-            name: govProposalTypes[0].name,
-            description: govProposalTypes[0].description,
-            quorum: govProposalTypes[0].quorum,
-            approvalThreshold: govProposalTypes[0].approvalThreshold,
-          }
-        : undefined;
-
     // Extract approval-specific data from kwargs or direct fields
     const kwargs = fetchedProposal.kwargs || {};
     const approvalData =
@@ -123,7 +96,6 @@ async function getInitialFormData(
         url: `/proposals/${fromTempCheckId}`,
         status: deriveStatus(fetchedProposal, 18),
         proposer: fetchedProposal.proposer,
-        proposalType: proposalTypeData,
         approvalData,
       },
     ];
@@ -159,24 +131,6 @@ export default async function CreatePostPage({
 
   let proposalTypes: ProposalType[] = [];
 
-  if (tempCheckProposal?.proposal_type && initialPostType === "gov-proposal") {
-    const proposalType = tempCheckProposal.proposal_type;
-
-    if (typeof proposalType === "object" && "quorum" in proposalType) {
-      proposalTypes = [
-        {
-          id: proposalType.eas_uid,
-          name: proposalType.name,
-          description: proposalType.description,
-          quorum: proposalType.quorum / 100,
-          approvalThreshold: proposalType.approval_threshold / 100,
-          module: proposalType.module,
-        },
-      ];
-    }
-  }
-
-  // Fallback: fetch all proposal types if not from temp check or if fetch failed
   if (proposalTypes.length === 0) {
     const proposalTypesData = await fetchProposalTypes();
     proposalTypes = Array.isArray(proposalTypesData)

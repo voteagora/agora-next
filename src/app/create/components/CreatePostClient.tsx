@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -61,17 +61,6 @@ export function CreatePostClient({
   const hasInitialTempCheck =
     (initialFormData.relatedTempChecks?.length || 0) > 0;
 
-  // Calculate initial proposal type and voting type from temp check
-  const getInitialProposalType = () => {
-    if (
-      hasInitialTempCheck &&
-      initialFormData.relatedTempChecks?.[0]?.proposalType
-    ) {
-      return initialFormData.relatedTempChecks[0].proposalType;
-    }
-    return proposalTypes[0];
-  };
-
   const getInitialVotingType = (): EASVotingType => {
     if (
       hasInitialTempCheck &&
@@ -109,8 +98,14 @@ export function CreatePostClient({
   const [selectedPostType, setSelectedPostType] =
     useState<PostType>(initialPostType);
 
+  const filteredProposalTypes = useMemo(
+    () => filterProposalTypesByType(proposalTypes, selectedPostType),
+    [proposalTypes, selectedPostType]
+  );
+
   const [selectedProposalType, setSelectedProposalType] =
-    useState<ProposalType>(getInitialProposalType());
+    useState<ProposalType>(filteredProposalTypes[0]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showIndexingModal, setShowIndexingModal] = useState(false);
 
@@ -274,14 +269,8 @@ export function CreatePostClient({
   };
 
   useEffect(() => {
-    const filteredByPostType = filterProposalTypesByType(
-      proposalTypes,
-      selectedPostType
-    );
-    if (filteredByPostType.length > 0 && !selectedProposalType) {
-      setSelectedProposalType(filteredByPostType[0]);
-    }
-  }, [proposalTypes, selectedPostType]);
+    setSelectedProposalType(filteredProposalTypes[0]);
+  }, [selectedPostType]);
 
   useEffect(() => {
     if (
@@ -290,49 +279,32 @@ export function CreatePostClient({
       !hasInitialTempCheck
     ) {
       const tempCheck = relatedTempChecks[0];
-      if (tempCheck.proposalType) {
-        const filteredByPostType = filterProposalTypesByType(
-          proposalTypes,
-          selectedPostType
-        );
-        const matchingType = filteredByPostType.find(
-          (pt) => pt.id === tempCheck.proposalType?.id
-        );
-        if (matchingType) {
-          setSelectedProposalType(matchingType);
-        } else {
-          setSelectedProposalType(tempCheck.proposalType);
-        }
-
+      if (tempCheck.votingModule) {
         // Automatically set voting type based on temp check's proposal type class
-        if (tempCheck.proposalType.type) {
-          const proposalClass = tempCheck.proposalType.type.toUpperCase();
-          if (proposalClass === "OPTIMISTIC") {
-            setSelectedVotingType("optimistic");
-          } else if (proposalClass === "APPROVAL") {
-            setSelectedVotingType("approval");
+        const proposalClass = tempCheck.votingModule.toUpperCase();
+        if (proposalClass === "OPTIMISTIC") {
+          setSelectedVotingType("optimistic");
+        } else if (proposalClass === "APPROVAL") {
+          setSelectedVotingType("approval");
 
-            // Auto-fill approval settings from temp check data
-            if (tempCheck.approvalData) {
-              setApprovalSettings({
-                budget: tempCheck.approvalData.budget,
-                maxApprovals: tempCheck.approvalData.maxApprovals,
-                criteria:
-                  tempCheck.approvalData.criteria === 0
-                    ? "threshold"
-                    : "top-choices",
-                criteriaValue: tempCheck.approvalData.criteriaValue,
-                choices: tempCheck.approvalData.choices.map(
-                  (choice, index) => ({
-                    id: `choice-${index}`,
-                    title: choice,
-                  })
-                ),
-              });
-            }
-          } else if (proposalClass === "STANDARD") {
-            setSelectedVotingType("standard");
+          // Auto-fill approval settings from temp check data
+          if (tempCheck.approvalData) {
+            setApprovalSettings({
+              budget: tempCheck.approvalData.budget,
+              maxApprovals: tempCheck.approvalData.maxApprovals,
+              criteria:
+                tempCheck.approvalData.criteria === 0
+                  ? "threshold"
+                  : "top-choices",
+              criteriaValue: tempCheck.approvalData.criteriaValue,
+              choices: tempCheck.approvalData.choices.map((choice, index) => ({
+                id: `choice-${index}`,
+                title: choice,
+              })),
+            });
           }
+        } else {
+          setSelectedVotingType("standard");
         }
       }
     }
@@ -391,13 +363,6 @@ export function CreatePostClient({
               selectedPostType
             )}
             onProposalTypeChange={handleProposalTypeChange}
-            postType={selectedPostType}
-            isGovProposal={
-              selectedPostType === "gov-proposal" &&
-              relatedTempChecks.length > 0
-            }
-            relatedTempChecks={relatedTempChecks}
-            selectedVotingType={selectedVotingType}
           />
         </div>
       </div>
