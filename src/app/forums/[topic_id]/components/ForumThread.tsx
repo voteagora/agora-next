@@ -174,7 +174,7 @@ export default function ForumThread({
 
   return (
     <>
-      <div className="space-y-6">
+      <div id="forum-thread-section" className="space-y-6">
         <Thread
           comments={comments}
           forForums

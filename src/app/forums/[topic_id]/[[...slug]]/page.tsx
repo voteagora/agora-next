@@ -28,6 +28,7 @@ import { stripHtmlToText } from "../../stripHtml";
 import Tenant from "@/lib/tenant/tenant";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
 import RelatedProposalLinks from "@/components/Proposals/ProposalPage/RelatedProposalLinks/RelatedProposalLinks";
+import FinancialStatementLayout from "../components/FinancialStatementLayout";
 
 // Force dynamic rendering - forum topics and posts change frequently
 export const dynamic = "force-dynamic";
@@ -298,6 +299,12 @@ export default async function ForumTopicPage({ params }: PageProps) {
   const rootPost = topicData.posts?.[0];
   const rootAttachments = (rootPost?.attachments as any[]) || [];
 
+  const isFinancialStatement = (topicData as any).isFinancialStatement ?? false;
+  const pdfAttachment = rootAttachments.find(
+    (att: any) => att.contentType === "application/pdf"
+  );
+  const pdfUrl = pdfAttachment?.url ?? null;
+
   const lastActivityAt =
     comments[comments.length - 1]?.createdAt || createdAtIso;
   const labelName = categoryName ?? undefined;
@@ -349,58 +356,78 @@ export default async function ForumTopicPage({ params }: PageProps) {
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Main Content */}
           <div className="flex-1 min-w-0 max-w-full lg:max-w-4xl">
-            <TopicHeader topic={headerTopic} isAdmin={isAuthorAdmin} />
-
-            <div className="mt-2 mb-4 break-words">
-              <DunaContentRenderer
-                content={topicBody}
-                className="text-secondary text-sm leading-relaxed break-words"
-              />
-            </div>
-
-            {rootAttachments.length > 0 && (
-              <PostAttachments
-                attachments={rootAttachments}
-                postId={rootPost?.id}
-                postAuthor={authorAddress}
-                categoryId={categoryId}
-              />
-            )}
-
-            <div className="my-4">
-              <RelatedProposalLinks proposalId={topicId.toString()} />
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 lg:gap-6 text-xs font-semibold text-tertiary border-b pb-2">
-              {rootPostId && (
-                <div className="">
-                  <EmojiReactions
-                    targetType="post"
-                    targetId={rootPostId}
-                    initialByEmoji={topicReactionsByEmoji}
+            {isFinancialStatement ? (
+              <>
+                <FinancialStatementLayout
+                  title={transformed.title}
+                  content={topicBody}
+                  pdfUrl={pdfUrl}
+                />
+                <div className="mt-8">
+                  <ForumThread
+                    topicId={topicId}
+                    initialComments={comments}
+                    categoryId={categoryId}
+                    adminDirectory={adminDirectory}
                   />
                 </div>
-              )}
-              <div className="">
-                Last activity {formatRelative(lastActivityAt)}
-              </div>
-              <div className="">{comments.length} comments</div>
-              {labelName && (
-                <span className=" pr-4 py-1 bg-neutral-50 rounded-full text-neutral-700">
-                  {labelName}
-                </span>
-              )}
-            </div>
+              </>
+            ) : (
+              <>
+                <TopicHeader topic={headerTopic} isAdmin={isAuthorAdmin} />
 
-            {/* Replies Section */}
-            <div className="mt-8">
-              <ForumThread
-                topicId={topicId}
-                initialComments={comments}
-                categoryId={categoryId}
-                adminDirectory={adminDirectory}
-              />
-            </div>
+                <div className="mt-2 mb-4 break-words">
+                  <DunaContentRenderer
+                    content={topicBody}
+                    className="text-secondary text-sm leading-relaxed break-words"
+                  />
+                </div>
+
+                {rootAttachments.length > 0 && (
+                  <PostAttachments
+                    attachments={rootAttachments}
+                    postId={rootPost?.id}
+                    postAuthor={authorAddress}
+                    categoryId={categoryId}
+                  />
+                )}
+
+                <div className="my-4">
+                  <RelatedProposalLinks proposalId={topicId.toString()} />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 lg:gap-6 text-xs font-semibold text-tertiary border-b pb-2">
+                  {rootPostId && (
+                    <div className="">
+                      <EmojiReactions
+                        targetType="post"
+                        targetId={rootPostId}
+                        initialByEmoji={topicReactionsByEmoji}
+                      />
+                    </div>
+                  )}
+                  <div className="">
+                    Last activity {formatRelative(lastActivityAt)}
+                  </div>
+                  <div className="">{comments.length} comments</div>
+                  {labelName && (
+                    <span className=" pr-4 py-1 bg-neutral-50 rounded-full text-neutral-700">
+                      {labelName}
+                    </span>
+                  )}
+                </div>
+
+                {/* Replies Section */}
+                <div className="mt-8">
+                  <ForumThread
+                    topicId={topicId}
+                    initialComments={comments}
+                    categoryId={categoryId}
+                    adminDirectory={adminDirectory}
+                  />
+                </div>
+              </>
+            )}
           </div>
 
           {/* Sidebar */}
