@@ -32,7 +32,7 @@ export default function FinancialStatementLayout({
           variant="default"
           className="bg-primary text-white hover:bg-primary/90"
         >
-          Discuss on forums
+          Discuss
         </Button>
         {pdfUrl && (
           <Button
