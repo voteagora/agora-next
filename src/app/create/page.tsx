@@ -7,6 +7,7 @@ import { fetchProposalFromArchive } from "@/lib/archiveUtils";
 import { getForumTopic } from "@/lib/actions/forum/topics";
 import Tenant from "@/lib/tenant/tenant";
 import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
+import { filterProposalTypesByType } from "./utils/proposalTypeUtils";
 
 const { namespace, ui } = Tenant.current();
 
@@ -59,25 +60,37 @@ async function getInitialFormData(
     data.title = fetchedProposal.title || "";
     data.description = fetchedProposal.description || "";
 
-    const proposalType = fetchedProposal.proposal_type;
+    const allProposalTypesData = await fetchProposalTypes();
+    const allProposalTypes: ProposalType[] = Array.isArray(allProposalTypesData)
+      ? allProposalTypesData.map((type) => ({
+          id: type.proposal_type_id,
+          name: type.name,
+          description: type.description,
+          quorum: type.quorum / 100,
+          approvalThreshold: type.approval_threshold / 100,
+          module: type.module,
+        }))
+      : [];
+
+    const govProposalTypes = filterProposalTypesByType(
+      allProposalTypes,
+      "gov-proposal"
+    );
     const proposalTypeData =
-      proposalType &&
-      typeof proposalType === "object" &&
-      "quorum" in proposalType
+      govProposalTypes.length > 0
         ? {
-            id: proposalType.eas_uid,
-            name: proposalType.name,
-            description: proposalType.description,
-            quorum: proposalType.quorum / 100,
-            approvalThreshold: proposalType.approval_threshold / 100,
-            type: proposalType.class,
+            id: govProposalTypes[0].id,
+            name: govProposalTypes[0].name,
+            description: govProposalTypes[0].description,
+            quorum: govProposalTypes[0].quorum,
+            approvalThreshold: govProposalTypes[0].approvalThreshold,
           }
         : undefined;
 
     // Extract approval-specific data from kwargs or direct fields
     const kwargs = fetchedProposal.kwargs || {};
     const approvalData =
-      proposalTypeData?.type?.toUpperCase() === "APPROVAL"
+      fetchedProposal?.voting_module?.toUpperCase() === "APPROVAL"
         ? {
             choices:
               (kwargs.choices as string[]) || fetchedProposal.choices || [],

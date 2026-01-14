@@ -28,6 +28,7 @@ import {
   ApprovalProposalSettings,
   defaultApprovalSettings,
 } from "../types";
+import { filterProposalTypesByType } from "../utils/proposalTypeUtils";
 import {
   Dialog,
   DialogContent,
@@ -227,11 +228,12 @@ export function CreatePostClient({
 
   const changeSelectedVotingType = (type: EASVotingType) => {
     setSelectedVotingType(type);
-    const filteredProposalsTypes = proposalTypes.filter(
-      (pType) => pType.module?.toLowerCase() === type.toLowerCase()
+    const filteredByPostType = filterProposalTypesByType(
+      proposalTypes,
+      selectedPostType
     );
 
-    setSelectedProposalType(filteredProposalsTypes[0]);
+    setSelectedProposalType(filteredByPostType[0] || proposalTypes[0]);
   };
 
   const handleAddRelatedItem =
@@ -272,10 +274,14 @@ export function CreatePostClient({
   };
 
   useEffect(() => {
-    if (proposalTypes.length > 0 && !selectedProposalType) {
-      setSelectedProposalType(proposalTypes[0]);
+    const filteredByPostType = filterProposalTypesByType(
+      proposalTypes,
+      selectedPostType
+    );
+    if (filteredByPostType.length > 0 && !selectedProposalType) {
+      setSelectedProposalType(filteredByPostType[0]);
     }
-  }, [proposalTypes, selectedProposalType]);
+  }, [proposalTypes, selectedPostType]);
 
   useEffect(() => {
     if (
@@ -285,7 +291,19 @@ export function CreatePostClient({
     ) {
       const tempCheck = relatedTempChecks[0];
       if (tempCheck.proposalType) {
-        setSelectedProposalType(tempCheck.proposalType);
+        const filteredByPostType = filterProposalTypesByType(
+          proposalTypes,
+          selectedPostType
+        );
+        const matchingType = filteredByPostType.find(
+          (pt) => pt.id === tempCheck.proposalType?.id
+        );
+        if (matchingType) {
+          setSelectedProposalType(matchingType);
+        } else {
+          setSelectedProposalType(tempCheck.proposalType);
+        }
+
         // Automatically set voting type based on temp check's proposal type class
         if (tempCheck.proposalType.type) {
           const proposalClass = tempCheck.proposalType.type.toUpperCase();
@@ -318,7 +336,7 @@ export function CreatePostClient({
         }
       }
     }
-  }, [relatedTempChecks, selectedPostType, hasInitialTempCheck]);
+  }, [relatedTempChecks, selectedPostType, proposalTypes]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -368,7 +386,10 @@ export function CreatePostClient({
         <div className="space-y-6">
           <ProposalSettingsCard
             selectedProposalType={selectedProposalType}
-            proposalTypes={proposalTypes}
+            proposalTypes={filterProposalTypesByType(
+              proposalTypes,
+              selectedPostType
+            )}
             onProposalTypeChange={handleProposalTypeChange}
             postType={selectedPostType}
             isGovProposal={
