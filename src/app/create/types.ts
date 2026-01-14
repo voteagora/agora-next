@@ -74,6 +74,14 @@ export interface RelatedItem {
     approvalThreshold: number;
     type?: string; // OPTIMISTIC, STANDARD, or APPROVAL
   };
+  // Approval-specific data from temp check
+  approvalData?: {
+    choices: string[];
+    maxApprovals: number;
+    criteria: number;
+    criteriaValue: number;
+    budget: number;
+  };
 }
 
 export interface ProposalType {

@@ -160,6 +160,41 @@ export function useRelatedItemsDialog({
 
       const results = filtered.slice(startIdx, endIdx).map((proposal) => {
         const proposalType = proposal.proposal_type;
+        const proposalTypeData =
+          proposalType &&
+          typeof proposalType === "object" &&
+          "quorum" in proposalType
+            ? {
+                id: (proposalType as any).eas_uid,
+                name: proposalType.name,
+                description: proposalType.description,
+                quorum: proposalType.quorum / 100,
+                approvalThreshold: proposalType.approval_threshold / 100,
+                type: proposalType.class,
+              }
+            : undefined;
+
+        // Extract approval-specific data from kwargs or direct fields
+        const kwargs = proposal.kwargs || {};
+        const approvalData =
+          proposalTypeData?.type?.toUpperCase() === "APPROVAL"
+            ? {
+                choices: (kwargs.choices as string[]) || proposal.choices || [],
+                maxApprovals:
+                  typeof kwargs.max_approvals === "number"
+                    ? kwargs.max_approvals
+                    : proposal.max_approvals || 1,
+                criteria:
+                  typeof kwargs.criteria === "number"
+                    ? kwargs.criteria
+                    : proposal.criteria || 0,
+                criteriaValue:
+                  typeof kwargs.criteria_value === "number"
+                    ? kwargs.criteria_value
+                    : proposal.criteria_value || 0,
+                budget: typeof kwargs.budget === "number" ? kwargs.budget : 0,
+              }
+            : undefined;
 
         return {
           id: proposal.id,
@@ -175,19 +210,8 @@ export function useRelatedItemsDialog({
           url: `/proposals/${proposal.id}`,
           status: deriveStatus(proposal, 18),
           proposer: proposal.proposer,
-          proposalType:
-            proposalType &&
-            typeof proposalType === "object" &&
-            "quorum" in proposalType
-              ? {
-                  id: (proposalType as any).eas_uid,
-                  name: proposalType.name,
-                  description: proposalType.description,
-                  quorum: proposalType.quorum / 100,
-                  approvalThreshold: proposalType.approval_threshold / 100,
-                  type: proposalType.class,
-                }
-              : undefined,
+          proposalType: proposalTypeData,
+          approvalData,
         };
       });
 

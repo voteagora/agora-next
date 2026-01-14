@@ -85,6 +85,26 @@ export function CreatePostClient({
     return "standard";
   };
 
+  const getInitialApprovalSettings = (): ApprovalProposalSettings => {
+    if (
+      hasInitialTempCheck &&
+      initialFormData.relatedTempChecks?.[0]?.approvalData
+    ) {
+      const approvalData = initialFormData.relatedTempChecks[0].approvalData;
+      return {
+        budget: approvalData.budget,
+        maxApprovals: approvalData.maxApprovals,
+        criteria: approvalData.criteria === 0 ? "threshold" : "top-choices",
+        criteriaValue: approvalData.criteriaValue,
+        choices: approvalData.choices.map((choice, index) => ({
+          id: `choice-${index}`,
+          title: choice,
+        })),
+      };
+    }
+    return defaultApprovalSettings;
+  };
+
   const [selectedPostType, setSelectedPostType] =
     useState<PostType>(initialPostType);
 
@@ -98,7 +118,7 @@ export function CreatePostClient({
     getInitialVotingType()
   );
   const [approvalSettings, setApprovalSettings] =
-    useState<ApprovalProposalSettings>(defaultApprovalSettings);
+    useState<ApprovalProposalSettings>(getInitialApprovalSettings());
 
   const form = useForm<CreatePostFormData>({
     defaultValues: initialFormData,
@@ -224,15 +244,20 @@ export function CreatePostClient({
   const handleRemoveRelatedItem =
     (field: "relatedDiscussions" | "relatedTempChecks") => (id: string) => {
       const current = form.getValues(field) || [];
-      form.setValue(
-        field,
-        current.filter((d) => d.id !== id)
-      );
+      const filtered = current.filter((d) => d.id !== id);
+      form.setValue(field, filtered);
+
+      // Reset approval settings if removing a temp check with approval data
+      if (field === "relatedTempChecks" && filtered.length === 0) {
+        setApprovalSettings(defaultApprovalSettings);
+      }
     };
 
   const handleRemoveAllRelatedItems = () => {
     form.setValue("relatedDiscussions", []);
     form.setValue("relatedTempChecks", []);
+    // Reset approval settings when all temp checks are removed
+    setApprovalSettings(defaultApprovalSettings);
   };
 
   const handleProposalTypeChange = (typeId: string) => {
@@ -261,7 +286,6 @@ export function CreatePostClient({
       const tempCheck = relatedTempChecks[0];
       if (tempCheck.proposalType) {
         setSelectedProposalType(tempCheck.proposalType);
-
         // Automatically set voting type based on temp check's proposal type class
         if (tempCheck.proposalType.type) {
           const proposalClass = tempCheck.proposalType.type.toUpperCase();
@@ -269,6 +293,25 @@ export function CreatePostClient({
             setSelectedVotingType("optimistic");
           } else if (proposalClass === "APPROVAL") {
             setSelectedVotingType("approval");
+
+            // Auto-fill approval settings from temp check data
+            if (tempCheck.approvalData) {
+              setApprovalSettings({
+                budget: tempCheck.approvalData.budget,
+                maxApprovals: tempCheck.approvalData.maxApprovals,
+                criteria:
+                  tempCheck.approvalData.criteria === 0
+                    ? "threshold"
+                    : "top-choices",
+                criteriaValue: tempCheck.approvalData.criteriaValue,
+                choices: tempCheck.approvalData.choices.map(
+                  (choice, index) => ({
+                    id: `choice-${index}`,
+                    title: choice,
+                  })
+                ),
+              });
+            }
           } else if (proposalClass === "STANDARD") {
             setSelectedVotingType("standard");
           }

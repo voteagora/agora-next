@@ -111,7 +111,7 @@ export default function ArchiveApprovalProposalVotesList({
       } satisfies Vote;
     });
   }, [votes, proposal.id, proposal.markdowntitle, approvalOptionLabels]);
-  console.log("normalizedVotes", normalizedVotes);
+
   const connectedAddressLower = connectedAddress?.toLowerCase();
 
   const userVotes = useMemo(() => {

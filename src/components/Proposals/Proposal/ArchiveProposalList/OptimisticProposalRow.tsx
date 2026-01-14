@@ -24,7 +24,7 @@ function extractOptimisticData(proposal: ArchiveListProposal): {
   // Default disapproval threshold (can be overridden by kwargs if available)
   const thresholds = extractThresholds(proposal);
 
-  const disapprovalThreshold = thresholds.approvalThreshold;
+  const disapprovalThreshold = thresholds.quorum;
 
   // Calculate against percentage from outcome if available
   let againstRelativeAmount = 0;
@@ -38,20 +38,19 @@ function extractOptimisticData(proposal: ArchiveListProposal): {
   if (tokenHolderOutcome) {
     const againstVotes = Number(tokenHolderOutcome["0"] ?? 0);
     const votableSupply = Number(proposal.total_voting_power_at_start);
-    againstRelativeAmount = Math.round((againstVotes / votableSupply) * 100);
+    againstRelativeAmount = Number(
+      ((againstVotes / votableSupply) * 100).toFixed(2)
+    );
   }
 
   // Derive status from lifecycle_stage
-  let status = "Pending";
+  let status = "Failed";
   const lifecycleStage = proposal.lifecycle_stage?.toUpperCase();
 
   if (lifecycleStage === "EXECUTED" || lifecycleStage === "SUCCEEDED") {
     status = "Approved";
   } else if (lifecycleStage === "CANCELLED") {
     status = "Cancelled";
-  } else {
-    status =
-      againstRelativeAmount >= disapprovalThreshold ? "Defeated" : "Approved";
   }
 
   return {

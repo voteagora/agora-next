@@ -52,6 +52,21 @@ export const safeBigInt = (
   }
 };
 
+/**
+ * Extract vote value from either flat string or nested object structure
+ * For approval voting: { "1": "1000" } -> "1000"
+ * For standard voting: "1000" -> "1000"
+ */
+export const extractVoteValue = (
+  value: string | { [supportType: string]: string } | undefined
+): string => {
+  if (!value) return "0";
+  if (typeof value === "string") return value;
+  // For nested objects, extract the "1" key (for votes)
+  if (typeof value === "object" && value["1"]) return value["1"];
+  return "0";
+};
+
 export const safeBigIntOrNull = (
   value: string | number | undefined | null
 ): bigint | null => {
@@ -132,7 +147,7 @@ export const deriveStatus = (
   proposal: ArchiveListProposal,
   decimals: number
 ): string => {
-  // Check terminal states first
+  const { quorumVotes, approvalThreshold } = resolveArchiveThresholds(proposal);
   if (proposal.cancel_event || proposal.lifecycle_stage === "CANCELLED") {
     return "CANCELLED";
   } else if (proposal.execute_event) {
@@ -177,52 +192,52 @@ export const deriveStatus = (
   // For STANDARD proposals, use vote-based logic
   // Handle different data sources: EAS-OODAO vs standard
   const source = proposal.data_eng_properties?.source;
+  const isApprovalVoting = proposal.kwargs?.voting_module === "approval";
+
+  // For approval voting, use no-param for total votes, otherwise use token-holders
   const voteTotals =
     source === "eas-oodao"
-      ? (proposal.outcome as EasOodaoVoteOutcome)?.["token-holders"] || {}
+      ? isApprovalVoting
+        ? (proposal.outcome as EasOodaoVoteOutcome)?.["no-param"] || {}
+        : (proposal.outcome as EasOodaoVoteOutcome)?.["token-holders"] || {}
       : proposal.totals?.["no-param"] || {};
 
-  const forVotes = convertToNumber(String(voteTotals["1"] ?? "0"), decimals);
+  const forVotes = convertToNumber(extractVoteValue(voteTotals["1"]), decimals);
   const againstVotes = convertToNumber(
-    String(voteTotals["0"] ?? "0"),
+    extractVoteValue(voteTotals["0"]),
     decimals
   );
   const abstainVotes = convertToNumber(
-    String(voteTotals["2"] ?? "0"),
+    extractVoteValue(voteTotals["2"]),
     decimals
   );
+  const quorum = convertToNumber(String(quorumVotes), decimals);
 
-  // Extract thresholds from proposal (as percentages, e.g., 4 = 4%, 100 = 100%)
-  const thresholds = extractThresholds(proposal);
-  // Check quorum and approval threshold - we need total voting power
   let quorumMet = true;
   let hasMetThreshold = true;
 
   if (proposal.kwargs?.voting_module === "optimistic") {
     const qorumVotes = againstVotes;
-    const totalPower = convertToNumber(
-      proposal.total_voting_power_at_start,
-      decimals
-    );
-    const failingQorum = thresholds.quorum * totalPower;
-    quorumMet = qorumVotes < failingQorum;
-    const approvalThreshold = thresholds.approvalThreshold * totalPower;
-    hasMetThreshold = qorumVotes < approvalThreshold;
-    if (quorumMet && hasMetThreshold) {
+    quorumMet = qorumVotes < quorum;
+
+    if (quorumMet) {
       return "SUCCEEDED";
     }
     return "DEFEATED";
   } else if (proposal.kwargs?.voting_module === "approval") {
     // Handle approval voting module
     const criteria = proposal.kwargs?.criteria;
-    const thresholdRaw =
-      proposal.kwargs?.threshold ?? proposal.kwargs?.criteria_value ?? 0;
+    const thresholdRaw = proposal.kwargs?.criteria_value ?? 0;
 
     const isThresholdCriteria =
       criteria === "THRESHOLD" ||
       criteria === "threshold" ||
       criteria === 0 ||
       criteria === "0";
+
+    if (quorum > forVotes) {
+      return "DEFEATED";
+    }
 
     if (isThresholdCriteria) {
       const threshold = safeBigInt(
@@ -231,10 +246,8 @@ export const deriveStatus = (
           : 0
       );
 
-      const totals = (proposal.totals ?? {}) as Record<
-        string,
-        Record<string, string>
-      >;
+      const totals =
+        (proposal.outcome as EasOodaoVoteOutcome)?.["token-holders"] || {};
 
       let succeeded = false;
       for (const [optionKey, supportDict] of Object.entries(totals)) {
@@ -261,26 +274,12 @@ export const deriveStatus = (
       decimals
     );
 
-    // Quorum check: (FOR + AGAINST + ABSTAIN) >= (quorum% × total_voting_power)
-    const quorumVotes = forVotes + againstVotes + abstainVotes;
-    const passingQuorum = (thresholds.quorum / 100) * totalPower;
-    quorumMet = quorumVotes >= passingQuorum;
+    quorumMet = forVotes > quorum;
 
-    // Approval threshold check: FOR >= (approval_threshold% × total_voting_power)
-    const passingApprovalThreshold =
-      (thresholds.approvalThreshold / 100) * totalPower;
     hasMetThreshold =
-      forVotes >= passingApprovalThreshold ||
-      thresholds.approvalThreshold === 0;
+      forVotes / (forVotes + againstVotes) >= approvalThreshold / 100;
   }
-  // If total_voting_power_at_start is not available, we can't check quorum
-  // This happens for proposals that haven't started voting yet
-  // Default to true to avoid incorrectly marking as defeated
 
-  // Proposal is defeated if:
-  // 1. Quorum not met, OR
-  // 2. Approval threshold not met
-  // Note: We don't check for > against here, the approval threshold handles that
   if (!quorumMet || !hasMetThreshold) {
     return "DEFEATED";
   }
@@ -339,14 +338,14 @@ export const resolveArchiveThresholds = (proposal: ArchiveListProposal) => {
     const type = proposal.proposal_type;
     if (!type || typeof type !== "object") {
       return {
-        quorum: safeBigInt(0),
-        approvalThreshold: safeBigInt(0),
+        quorum: 0,
+        approvalThreshold: 0,
       };
     }
 
     return {
-      quorum: safeBigInt(type.quorum ?? 0),
-      approvalThreshold: safeBigInt(type.approval_threshold ?? 0),
+      quorum: type.quorum,
+      approvalThreshold: type.approval_threshold ?? 0,
     };
   };
 
@@ -354,30 +353,22 @@ export const resolveArchiveThresholds = (proposal: ArchiveListProposal) => {
     source === "eas-oodao"
       ? resolveFromEas()
       : {
-          quorum: safeBigInt(proposal.quorum ?? proposal.quorumVotes ?? 0),
-          approvalThreshold: safeBigInt(proposal.approval_threshold ?? 0),
+          quorum: Number(proposal.quorum) ?? 0,
+          approvalThreshold: Number(proposal.approval_threshold) ?? 0,
         };
-
-  const totalVotingPowerRaw = safeBigInt(
-    proposal.total_voting_power_at_start ?? 0
-  );
-
-  let quorumValue = 0n;
-
-  if (
-    source === "eas-oodao" &&
-    quotaValues.quorum > 0n &&
-    totalVotingPowerRaw > 0n
-  ) {
-    quorumValue = (totalVotingPowerRaw * quotaValues.quorum) / 10000n;
-  } else if (quotaValues.quorum > 0n) {
-    quorumValue = quotaValues.quorum;
-  }
 
   const votableSupply = safeBigInt(proposal.total_voting_power_at_start ?? 0);
 
+  let quorumValue = 0n;
+
+  if (source === "eas-oodao" && quotaValues.quorum > 0 && votableSupply > 0n) {
+    quorumValue = (votableSupply * BigInt(quotaValues.quorum)) / 10000n;
+  } else if (quotaValues.quorum > 0) {
+    quorumValue = BigInt(quotaValues.quorum);
+  }
+
   return {
-    quorum: quorumValue,
+    quorumVotes: quorumValue,
     approvalThreshold: quotaValues.approvalThreshold,
     votableSupply,
   };

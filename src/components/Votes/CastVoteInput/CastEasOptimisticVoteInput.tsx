@@ -9,10 +9,9 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useUserVotes } from "@/hooks/useProposalVotes";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
-import { formatDistanceToNow, format } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import shareIcon from "@/icons/share.svg";
 import Image from "next/image";
 import { icons } from "@/icons/icons";
 import {
@@ -34,14 +33,13 @@ export default function CastEasOptimisticVoteInput({
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
   const { address } = useAccount();
-  const { hasVoted, isLoading } = useUserVotes({
+  const { hasVoted, isLoading, votes } = useUserVotes({
     proposalId: proposal.id,
     address,
   });
 
   const now = new Date();
   const hasNotStarted = proposal.startTime && proposal.startTime > now;
-
   if (!isConnected) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-line">
@@ -79,7 +77,7 @@ export default function CastEasOptimisticVoteInput({
           proposal={proposal}
           transactionHash={null}
           reason=""
-          timestamp={null}
+          timestamp={votes?.[0]?.timestamp}
         />
       </div>
     );
@@ -300,58 +298,15 @@ function LoadingVote() {
   );
 }
 
-function VoteSuccessMessage({
-  proposal,
+export function VoteSuccessMessage({
   transactionHash,
-  reason,
   timestamp,
 }: {
-  proposal: Proposal;
   transactionHash: string | null;
-  reason?: string;
   timestamp?: Date | null;
 }) {
-  const openDialog = useOpenDialog();
-
   return (
     <div className="flex flex-col w-full text-sm text-secondary font-medium p-4 pb-2 bg-transparent rounded-b-lg">
-      <Button
-        onClick={() => {
-          openDialog({
-            className: "sm:w-[32rem]",
-            type: "SHARE_VOTE",
-            params: {
-              againstPercentage: 0,
-              forPercentage: 0,
-              endsIn: null,
-              blockNumber: null,
-              voteDate: timestamp
-                ? format(timestamp, "MMM d, yyyy h:mm a")
-                : "",
-              supportType: "AGAINST",
-              voteReason: reason || "",
-              proposalId: proposal.id,
-              proposalTitle: proposal.markdowntitle,
-              proposalType: proposal.proposalType ?? "OPTIMISTIC",
-              proposal: proposal,
-              options: [],
-              totalOptions: 0,
-              votes: null,
-              newVote: {
-                support: "AGAINST",
-                reason: reason || "",
-                params: [],
-                weight: "",
-              },
-            },
-          });
-        }}
-        variant="outline"
-        className="w-full text-secondary font-semibold text-xs gap-2 rounded-full border-primary h-8"
-      >
-        <Image src={shareIcon.src} alt="Share icon" height={18} width={18} />
-        <span>Share your vote</span>
-      </Button>
       <p className="text-[14px] font-bold text-secondary text-center mt-2">
         You voted for this proposal{" "}
         {timestamp ? formatDistanceToNow(timestamp) : "just now"} ago

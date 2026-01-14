@@ -8,6 +8,7 @@ import {
   safeBigIntOrNull,
   deriveProposalTag,
   resolveArchiveThresholds,
+  extractVoteValue,
 } from "./archiveProposalUtils";
 import { ARCHIVE_PROPOSAL_DEFAULTS } from "@/app/proposals/data/archiveDefaults";
 import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
@@ -82,12 +83,12 @@ export function normalizeArchiveStandardProposal(
       ? ((proposal.outcome as EasOodaoVoteOutcome)?.["token-holders"] ?? {})
       : ((proposal.totals as DaoNodeVoteTotals)?.["no-param"] ?? {});
 
-  const forVotes = safeBigInt(voteTotals["1"]);
-  const againstVotes = safeBigInt(voteTotals["0"]);
-  const abstainVotes = safeBigInt(voteTotals["2"]);
+  const forVotes = safeBigInt(extractVoteValue(voteTotals["1"]));
+  const againstVotes = safeBigInt(extractVoteValue(voteTotals["0"]));
+  const abstainVotes = safeBigInt(extractVoteValue(voteTotals["2"]));
 
   const {
-    quorum: quorumValue,
+    quorumVotes: quorumValue,
     approvalThreshold: approvalThresholdValue,
     votableSupply: votableSupplyValue,
   } = resolveArchiveThresholds(proposal);
@@ -167,7 +168,7 @@ export function normalizeArchiveStandardProposal(
     description,
     quorum: quorumValue,
     votableSupply: votableSupplyValue,
-    approvalThreshold: approvalThresholdValue,
+    approvalThreshold: BigInt(approvalThresholdValue),
     proposalData,
     unformattedProposalData: proposal.proposal_data
       ? proposal.proposal_data.startsWith("0x")

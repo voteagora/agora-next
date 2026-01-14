@@ -20,6 +20,7 @@ export function ReviewEasApprovalVoteDialog({
   votingPower,
   onClose,
   isSubmitting,
+  abstain,
 }: {
   selectedOptions: number[];
   options: ParsedProposalData["APPROVAL"]["kind"]["options"];
@@ -28,6 +29,7 @@ export function ReviewEasApprovalVoteDialog({
   votingPower: string | null;
   onClose: () => void;
   isSubmitting: boolean;
+  abstain: boolean;
 }) {
   const { address } = useAccount();
   const { data } = useEnsName({
@@ -43,10 +45,14 @@ export function ReviewEasApprovalVoteDialog({
             <span className="text-xs">
               {data || truncateAddress(address as string)}
             </span>
-            <p className="text-xl font-extrabold">
-              Casting vote for {selectedOptions.length} option
-              {selectedOptions.length > 1 && "s"}
-            </p>
+            {!abstain ? (
+              <p className="text-xl font-extrabold">
+                Casting vote for {selectedOptions.length} option
+                {selectedOptions.length > 1 && "s"}
+              </p>
+            ) : (
+              <p className="text-xl font-extrabold">Casting vote as Abstain</p>
+            )}
           </div>
           {votingPower ? (
             <div className="flex flex-col">
@@ -57,28 +63,30 @@ export function ReviewEasApprovalVoteDialog({
             </div>
           ) : null}
         </div>
-        <div className="border border-line rounded-lg p-4 space-y-4 mt-6">
-          {selectedOptions.map((optionId, index) => {
-            const option = options[optionId];
-            return (
-              <div
-                className="flex flex-row items-center justify-between relative"
-                key={`option-${index}`}
-              >
-                <p className="font-medium max-w-[calc(100%-24px)]">
-                  <Markdown content={option.description} />
-                </p>
+        {selectedOptions.length > 0 && (
+          <div className="border border-line rounded-lg p-4 space-y-4 mt-6">
+            {selectedOptions.map((optionId, index) => {
+              const option = options[optionId];
+              return (
                 <div
-                  className={
-                    "border border-line bg-primary absolute right-0 top-1/2 -translate-y-1/2 rounded-sm w-4 h-4 flex items-center justify-center transition-all"
-                  }
+                  className="flex flex-row items-center justify-between relative"
+                  key={`option-${index}`}
                 >
-                  <CheckIcon className="w-4 h-4 text-neutral" />
+                  <p className="font-medium max-w-[calc(100%-24px)]">
+                    <Markdown content={option.description} />
+                  </p>
+                  <div
+                    className={
+                      "border border-line bg-primary absolute right-0 top-1/2 -translate-y-1/2 rounded-sm w-4 h-4 flex items-center justify-center transition-all"
+                    }
+                  >
+                    <CheckIcon className="w-4 h-4 text-neutral" />
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
         <div className="line-clamp-5 overflow-hidden">
           {!!reason ? (
             <p className="mt-6 text-secondary">{reason}</p>
@@ -99,7 +107,9 @@ export function ReviewEasApprovalVoteDialog({
             "Submitting..."
           ) : (
             <>
-              Vote for {selectedOptions.length} option
+              {abstain
+                ? "Vote as Abstain"
+                : `Vote for ${selectedOptions.length} option`}
               {selectedOptions.length > 1 && "s"}
               {votingPower ? (
                 <>
@@ -221,6 +231,7 @@ export function EasApprovalCastVoteDialog({
         onClose={() => {
           setInReviewStep(false);
         }}
+        abstain={abstain}
       />
     );
   }

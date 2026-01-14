@@ -18,6 +18,8 @@ import { useArchiveUserVotingPower } from "@/hooks/useArchiveUserVotingPower";
 import { useUserVotes } from "@/hooks/useProposalVotes";
 import { useAccount } from "wagmi";
 import { SuccessMessage } from "../CastVoteInput/CastVoteInput";
+import { Vote } from "@/app/api/common/votes/vote";
+import { VoteSuccessMessage } from "../CastVoteInput/CastEasOptimisticVoteInput";
 
 type Props = {
   proposal: Proposal;
@@ -33,7 +35,11 @@ export default function EasApprovalCastVoteButton({ proposal }: Props) {
       userAddress: address,
     });
 
-  const { hasVoted, isLoading: isLoadingVotes } = useUserVotes({
+  const {
+    hasVoted,
+    isLoading: isLoadingVotes,
+    votes,
+  } = useUserVotes({
     proposalId: proposal.id,
     address,
   });
@@ -104,6 +110,7 @@ export default function EasApprovalCastVoteButton({ proposal }: Props) {
           hasVoted={hasVoted}
           isReady={!isLoading}
           votingPower={votingPower ?? null}
+          votes={votes}
         />
       </VStack>
     </VStack>
@@ -115,8 +122,7 @@ function VoteButton({
   proposalStatus,
   hasVoted,
   isReady,
-  votingPower,
-  proposal,
+  votes,
 }: {
   onClick: () => void;
   proposalStatus: Proposal["status"];
@@ -124,13 +130,17 @@ function VoteButton({
   isReady: boolean;
   votingPower: string | null;
   proposal: Proposal;
+  votes: Vote[] | null;
 }) {
   const { isConnected } = useAgoraContext();
   const { setOpen } = useModal();
 
   if (hasVoted) {
     return (
-      <SuccessMessage proposal={proposal} votes={[]} className="px-0 pb-0" />
+      <VoteSuccessMessage
+        transactionHash={votes?.[0]?.transactionHash ?? null}
+        timestamp={votes?.[0]?.timestamp ?? null}
+      />
     );
   }
 

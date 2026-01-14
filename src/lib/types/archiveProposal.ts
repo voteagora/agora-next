@@ -112,6 +112,12 @@ export type EasAtlasVoteOutcome = {
 /** Vote outcome for eas-oodao - keyed by "token-holders" */
 export type EasOodaoVoteOutcome = {
   "token-holders": {
+    // Can be either:
+    // - Standard voting: flat string values (e.g., "0": "1000", "1": "2000")
+    // - Approval voting: nested objects (e.g., "0": { "1": "1000" }, "2": { "1": "2000" })
+    [key: string]: string | { [supportType: string]: string } | undefined;
+  };
+  "no-param": {
     "0"?: string; // against votes (wei)
     "1"?: string; // for votes (wei)
     "2"?: string; // abstain votes (wei)

@@ -43,7 +43,7 @@ export function normalizeArchiveApprovalProposal(
   const source = proposal.data_eng_properties?.source;
 
   const {
-    quorum: quorumValue,
+    quorumVotes: quorumValue,
     approvalThreshold: approvalThresholdValue,
     votableSupply: votableSupplyValue,
   } = resolveArchiveThresholds(proposal);
@@ -82,7 +82,7 @@ export function normalizeArchiveApprovalProposal(
     })),
     proposalSettings: {
       maxApprovals,
-      criteria: criteria === 1 ? "THRESHOLD" : "TOP_CHOICES",
+      criteria: criteria === 0 ? "THRESHOLD" : "TOP_CHOICES",
       criteriaValue: BigInt(criteriaValue),
       budgetToken: "",
       budgetAmount: BigInt(budget),
@@ -119,7 +119,7 @@ export function normalizeArchiveApprovalProposal(
       option: choice,
       votes: optionVotes[index] || 0n,
     })),
-    criteria: criteria === 1 ? "THRESHOLD" : "TOP_CHOICES",
+    criteria: criteria === 0 ? "THRESHOLD" : "TOP_CHOICES",
     criteriaValue: BigInt(criteriaValue),
   } as ParsedProposalResults["APPROVAL"]["kind"];
 
@@ -169,7 +169,7 @@ export function normalizeArchiveApprovalProposal(
     description,
     quorum: quorumValue,
     votableSupply: votableSupplyValue,
-    approvalThreshold: approvalThresholdValue,
+    approvalThreshold: BigInt(approvalThresholdValue),
     proposalData,
     unformattedProposalData: proposal.proposal_data
       ? proposal.proposal_data.startsWith("0x")

@@ -13,6 +13,7 @@ export default function ApprovalProposalCriteria({ proposal }) {
   const proposalSettings = proposalData.proposalSettings;
   const isProposalCreatedBeforeUpgrade =
     isProposalCreatedBeforeUpgradeCheck(proposal);
+  const source = proposal.archiveMetadata?.source;
 
   return (
     <VStack className="p-4 pb-2 border-t border-line">
@@ -67,11 +68,19 @@ export default function ApprovalProposalCriteria({ proposal }) {
           <p>
             In this threshold-based proposal, all options passing the approval
             threshold of{" "}
-            <TokenAmountDecorated amount={proposalSettings.criteriaValue} />{" "}
+            {source === "eas-oodao" ? (
+              <>{proposalSettings.criteriaValue} </>
+            ) : (
+              <TokenAmountDecorated amount={proposalSettings.criteriaValue} />
+            )}{" "}
             votes will be executed in order from most to least popular, until
             the total budget of{" "}
-            <TokenAmountDecorated amount={proposalSettings.budgetAmount} /> runs
-            out. Voters can select up to {proposalSettings.maxApprovals}{" "}
+            {source === "eas-oodao" ? (
+              <>{proposalSettings.budgetAmount} </>
+            ) : (
+              <TokenAmountDecorated amount={proposalSettings.budgetAmount} />
+            )}{" "}
+            runs out. Voters can select up to {proposalSettings.maxApprovals}{" "}
             options. If the quorum is not met, no options will be executed.
           </p>
         )}

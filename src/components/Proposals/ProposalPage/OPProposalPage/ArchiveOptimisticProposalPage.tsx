@@ -14,9 +14,6 @@ export default function ArchiveOptimisticProposalPage({
   const { token } = Tenant.current();
   const tokenDecimals = token.decimals ?? 18;
 
-  const proposalData =
-    proposal.proposalData as ParsedProposalData["OPTIMISTIC"]["kind"];
-  const disapprovalThreshold = proposalData.disapprovalThreshold;
   // Calculate against relative amount from proposal results
   const proposalResults = proposal.proposalResults as {
     for: bigint;
@@ -44,8 +41,6 @@ export default function ArchiveOptimisticProposalPage({
   let status = "approved";
   if (proposal.status === "DEFEATED" || proposal.status === "CANCELLED") {
     status = "defeated";
-  } else if (againstRelativeAmount >= disapprovalThreshold) {
-    status = "failing";
   }
 
   return (
@@ -60,7 +55,9 @@ export default function ArchiveOptimisticProposalPage({
             proposal={proposal}
             againstRelativeAmount={againstRelativeAmount.toFixed(2)}
             againstLengthString={againstLengthString}
-            disapprovalThreshold={disapprovalThreshold}
+            disapprovalThreshold={
+              Number(proposal.proposalTypeData?.quorum) / 100
+            }
             status={status}
           />
         </div>

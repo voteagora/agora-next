@@ -431,7 +431,7 @@ export function SuccessMessage({
     votableSupply,
     newVote,
   });
-
+  console.log(votes);
   const supportColor =
     support?.toLowerCase() === "for"
       ? "text-positive"
