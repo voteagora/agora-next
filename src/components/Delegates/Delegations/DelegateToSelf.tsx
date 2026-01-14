@@ -46,6 +46,15 @@ export const DelegateToSelf = ({
             isDelegationEncouragement: true,
           },
         });
+      } else {
+        openDialog({
+          type: "DELEGATE",
+          params: {
+            delegate,
+            fetchDirectDelegatee,
+            isDelegationEncouragement: true,
+          },
+        });
       }
     } else {
       openDialog({
