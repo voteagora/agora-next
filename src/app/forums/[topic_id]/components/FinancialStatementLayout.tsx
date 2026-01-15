@@ -77,9 +77,9 @@ export default function FinancialStatementLayout({
           )}
         </div>
 
-        <div className="bg-cardBackground rounded-lg p-8 shadow-sm relative z-10">
+        <div className="bg-cardBackground rounded-lg p-0 shadow-sm relative z-10">
           <div
-            className="text-secondary text-sm leading-relaxed break-words"
+            className="text-secondary text-sm leading-relaxed break-words overflow-x-auto"
             dangerouslySetInnerHTML={{ __html: content }}
           />
         </div>
