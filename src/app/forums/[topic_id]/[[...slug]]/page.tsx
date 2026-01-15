@@ -26,6 +26,7 @@ import { DunaContentRenderer } from "@/components/duna-editor";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { stripHtmlToText } from "../../stripHtml";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
 import RelatedProposalLinks from "@/components/Proposals/ProposalPage/RelatedProposalLinks/RelatedProposalLinks";
 import FinancialStatementLayout from "../components/FinancialStatementLayout";
@@ -263,6 +264,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
   const authorAddress = transformed.author || "";
   const createdAtIso = new Date(topicData.createdAt).toISOString();
   const categoryName = topicData.category?.name || null;
+  const { namespace } = Tenant.current();
 
   const adminRolesMap = adminsResult?.success
     ? adminsResult.data.reduce((map, admin) => {
@@ -367,7 +369,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
                   title={transformed.title}
                   content={topicBody}
                   pdfUrl={pdfUrl}
-                  isOnArticlePage={false}
+                  isOnArticlePage={namespace === TENANT_NAMESPACES.UNISWAP}
                 />
                 <div className="mt-8">
                   <ForumThread
