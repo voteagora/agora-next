@@ -355,7 +355,11 @@ export default async function ForumTopicPage({ params }: PageProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Main Content */}
-          <div className="flex-1 min-w-0 max-w-full lg:max-w-4xl">
+          <div
+            className={`flex-1 min-w-0 max-w-full ${
+              isFinancialStatement ? "lg:max-w-5xl xl:max-w-6xl" : "lg:max-w-4xl"
+            }`}
+          >
             {isFinancialStatement ? (
               <>
                 <FinancialStatementLayout
@@ -433,7 +437,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
           </div>
 
           {/* Sidebar */}
-          <div className="w-full lg:w-auto">
+          <div className="w-full lg:w-72 xl:w-64 lg:ml-auto flex-shrink-0">
             <ForumsSidebar
               categories={categories}
               latestPost={topicData}

@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { DunaContentRenderer } from "@/components/duna-editor";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import { generatePatternSvg } from "@/lib/utils/generatePatternSvg";
 
@@ -52,7 +51,9 @@ export default function FinancialStatementLayout({
           />
         </div>
       )}
-      <div className="max-w-4xl mx-auto relative">
+      <div
+        className={`${isOnArticlePage ? "max-w-5xl" : "max-w-6xl"} mx-auto relative`}
+      >
         <h1 className="text-4xl font-bold text-primary mb-6">{title}</h1>
 
         <div className="flex flex-wrap gap-4 mb-8">
@@ -78,10 +79,14 @@ export default function FinancialStatementLayout({
           )}
         </div>
 
-        <div className="bg-cardBackground rounded-lg p-8 shadow-sm relative z-10">
-          <DunaContentRenderer
-            content={content}
-            className="text-secondary text-sm leading-relaxed break-words"
+        <div className="bg-cardBackground rounded-lg p-0 shadow-sm relative z-10">
+          <div
+            className={`text-secondary text-sm leading-relaxed break-words ${
+              isOnArticlePage
+                ? "overflow-x-auto"
+                : "overflow-x-hidden max-w-full [&_*]:max-w-full [&_*]:break-words"
+            }`}
+            dangerouslySetInnerHTML={{ __html: content }}
           />
         </div>
       </div>

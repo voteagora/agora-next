@@ -62,7 +62,7 @@ export default function ForumsSidebar({
       : "text-secondary";
 
   return (
-    <div className="w-80 bg-cardBackground rounded-lg border border-cardBorder max-h-max">
+    <div className="w-full lg:w-72 xl:w-64 bg-cardBackground rounded-lg border border-cardBorder max-h-max ml-auto">
       <div className="p-4">
         <h3 className="text-lg text-primary font-semibold mb-4">Categories</h3>
 

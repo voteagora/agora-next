@@ -105,10 +105,7 @@ export async function generateMetadata({
   const tenant = Tenant.current();
   const brandName = tenant.brandName || "Agora";
 
-  const description = buildDescription(
-    transformed.content || "",
-    transformed.title
-  );
+  const description = " ";
   const suffix = ` | ${brandName}`;
   const metaTitle = truncateTitleForMeta(transformed.title, suffix, 60);
   const authorAddress = transformed.author;
