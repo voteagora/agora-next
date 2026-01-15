@@ -40,6 +40,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     neutral: "250 250 250",
     wash: "255 255 255",
     line: "229 229 229",
+    infoBannerBackground: "#E134B0",
     positive: "97 209 97",
     negative: "226 54 54",
     brandPrimary: "0 0 0",
