@@ -57,28 +57,20 @@ export default function FinancialStatementLayout({
 
         <div className="flex flex-wrap gap-4 mb-8">
           {isOnArticlePage ? (
-            <Button
-              asChild
-              variant="default"
-              className="bg-primary text-white hover:bg-primary/90"
-            >
+            <Button asChild variant="outline" className="text-primary">
               <Link href={forumPagePath}>{discussButtonText}</Link>
             </Button>
           ) : (
             <Button
               onClick={handleScrollToComments}
-              variant="default"
-              className="bg-primary text-white hover:bg-primary/90"
+              variant="outline"
+              className="text-primary"
             >
               {discussButtonText}
             </Button>
           )}
           {pdfUrl && (
-            <Button
-              asChild
-              variant="outline"
-              className="border-line bg-white hover:bg-wash"
-            >
+            <Button asChild variant="outline" className="text-primary">
               <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
                 View PDF
               </a>
@@ -86,7 +78,7 @@ export default function FinancialStatementLayout({
           )}
         </div>
 
-        <div className="bg-white rounded-lg p-8 shadow-sm relative z-10">
+        <div className="bg-cardBackground rounded-lg p-8 shadow-sm relative z-10">
           <DunaContentRenderer
             content={content}
             className="text-secondary text-sm leading-relaxed break-words"
