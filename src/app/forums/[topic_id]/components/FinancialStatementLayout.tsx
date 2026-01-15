@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import { generatePatternSvg } from "@/lib/utils/generatePatternSvg";
+import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 interface FinancialStatementLayoutProps {
   topicId: number;
@@ -27,6 +29,10 @@ export default function FinancialStatementLayout({
       commentsSection.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
+
+  const { namespace } = Tenant.current();
+  const hideDiscussButton =
+    namespace === TENANT_NAMESPACES.UNISWAP && isOnArticlePage;
 
   const forumPagePath = buildForumTopicPath(topicId, title);
   const discussButtonText = isOnArticlePage ? "Discuss on forums" : "Discuss";
@@ -57,19 +63,20 @@ export default function FinancialStatementLayout({
         <h1 className="text-4xl font-bold text-primary mb-6">{title}</h1>
 
         <div className="flex flex-wrap gap-4 mb-8">
-          {isOnArticlePage ? (
-            <Button asChild variant="outline" className="text-primary">
-              <Link href={forumPagePath}>{discussButtonText}</Link>
-            </Button>
-          ) : (
-            <Button
-              onClick={handleScrollToComments}
-              variant="outline"
-              className="text-primary"
-            >
-              {discussButtonText}
-            </Button>
-          )}
+          {!hideDiscussButton &&
+            (isOnArticlePage ? (
+              <Button asChild variant="outline" className="text-primary">
+                <Link href={forumPagePath}>{discussButtonText}</Link>
+              </Button>
+            ) : (
+              <Button
+                onClick={handleScrollToComments}
+                variant="outline"
+                className="text-primary"
+              >
+                {discussButtonText}
+              </Button>
+            ))}
           {pdfUrl && (
             <Button asChild variant="outline" className="text-primary">
               <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
