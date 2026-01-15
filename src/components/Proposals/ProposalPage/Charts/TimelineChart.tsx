@@ -44,12 +44,50 @@ type ChartData = {
   quorumTotal: number;
 };
 
+type RangeProposalType = {
+  min_quorum_pct: number;
+  max_quorum_pct: number;
+  min_approval_threshold_pct: number;
+  max_approval_threshold_pct: number;
+};
+
 export const TimelineChart = ({ votes, proposal }: Props) => {
   const { data: block } = useLatestBlock({ enabled: true });
   const [chartData, setChartData] = useState<ChartData[] | null>(null);
 
   const isProposalCreatedBeforeUpgrade =
     isProposalCreatedBeforeUpgradeCheck(proposal);
+
+  // Check if this is an archive proposal with ranges (pending state)
+  const archiveMetadata = (
+    proposal as unknown as {
+      archiveMetadata?: { source?: string; defaultProposalTypeRanges?: any };
+    }
+  ).archiveMetadata;
+
+  const defaultProposalTypeRanges =
+    archiveMetadata?.source === "eas-oodao"
+      ? (archiveMetadata.defaultProposalTypeRanges as
+          | RangeProposalType
+          | undefined)
+      : null;
+
+  // Calculate quorum values from ranges (assuming max votes per token is similar to standard)
+  const minQuorumValue = defaultProposalTypeRanges
+    ? (defaultProposalTypeRanges.min_quorum_pct / 10000) *
+      Number(proposal.quorum || 0)
+    : null;
+  const maxQuorumValue = defaultProposalTypeRanges
+    ? (defaultProposalTypeRanges.max_quorum_pct / 10000) *
+      Number(proposal.quorum || 0)
+    : null;
+
+  const minQuorumPct = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.min_quorum_pct / 100
+    : null;
+  const maxQuorumPct = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.max_quorum_pct / 100
+    : null;
 
   const governorType = contracts.governorType;
   let stackIds: { [key: string]: string } = {
@@ -181,25 +219,63 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
               }
             })()}
           />
-          {!!proposal.quorum && !isProposalCreatedBeforeUpgrade && (
-            <ReferenceLine
-              y={+proposal.quorum.toString()}
-              strokeWidth={1}
-              strokeDasharray="3 3"
-              stroke="#4F4F4F"
-              label={{
-                position: "insideBottomLeft",
-                value: "QUORUM",
-                className: "text-xs font-inter font-semibold",
-                fill: "#565656",
-              }}
-            />
+          {minQuorumValue !== null &&
+          maxQuorumValue !== null &&
+          minQuorumValue !== maxQuorumValue ? (
+            <>
+              {/* Min quorum line */}
+              <ReferenceLine
+                y={minQuorumValue}
+                strokeWidth={1}
+                strokeDasharray="3 3"
+                stroke="#4F4F4F"
+                strokeOpacity={0.6}
+                label={{
+                  position: "insideBottomLeft",
+                  value: "MIN QUORUM",
+                  className: "text-xs font-inter font-semibold",
+                  fill: "#565656",
+                }}
+              />
+              {/* Max quorum line */}
+              <ReferenceLine
+                y={maxQuorumValue}
+                strokeWidth={1}
+                strokeDasharray="3 3"
+                stroke="#4F4F4F"
+                strokeOpacity={0.6}
+                label={{
+                  position: "insideTopLeft",
+                  value: "MAX QUORUM",
+                  className: "text-xs font-inter font-semibold",
+                  fill: "#565656",
+                }}
+              />
+            </>
+          ) : (
+            !!proposal.quorum &&
+            !isProposalCreatedBeforeUpgrade && (
+              <ReferenceLine
+                y={+proposal.quorum.toString()}
+                strokeWidth={1}
+                strokeDasharray="3 3"
+                stroke="#4F4F4F"
+                label={{
+                  position: "insideBottomLeft",
+                  value: "QUORUM",
+                  className: "text-xs font-inter font-semibold",
+                  fill: "#565656",
+                }}
+              />
+            )
           )}
 
           <Tooltip
             content={
               <CustomTooltip
                 quorum={isProposalCreatedBeforeUpgrade ? null : proposal.quorum}
+                minQuorumPct={minQuorumPct}
+                maxQuorumPct={maxQuorumPct}
                 governorType={contracts.governorType}
               />
             }
@@ -329,6 +405,8 @@ const CustomTooltip = ({
   payload,
   label,
   quorum,
+  minQuorumPct,
+  maxQuorumPct,
   governorType,
 }: any) => {
   const forVotes = payload.find((p: any) => p.name === "For");
@@ -359,6 +437,11 @@ const CustomTooltip = ({
       quorumVotes = BigInt(integerForVotes);
     }
 
+    const hasQuorumRange =
+      minQuorumPct !== null &&
+      maxQuorumPct !== null &&
+      minQuorumPct !== maxQuorumPct;
+
     return (
       <div className="bg-neutral p-3 border border-line rounded-lg shadow-newDefault">
         <p className="text-xs font-semibold mb-2 text-primary">
@@ -381,30 +464,38 @@ const CustomTooltip = ({
             </span>
           </div>
         ))}
-        {!!quorum && (
+        {(!!quorum || hasQuorumRange) && (
           <div className="flex justify-between items-center gap-4 text-xs pt-2 border-t border-line border-dashed mt-2">
             <span className="text-secondary">Quorum:</span>
-            <div className="flex items-center gap-1">
-              <span
-                className={`font-mono ${
-                  quorumVotes > quorum ? "text-primary" : "text-tertiary"
-                }`}
-              >
-                {formatNumber(
-                  BigInt(quorumVotes),
-                  isSnapshot ? 0 : token.decimals,
-                  quorumVotes > 1_000_000 ? 2 : 4
-                )}
-              </span>
-              <span className="text-primary">/</span>
-              <span className="font-mono text-primary">
-                {formatNumber(
-                  BigInt(quorum),
-                  isSnapshot ? 0 : token.decimals,
-                  quorum > 1_000_000 ? 2 : 4
-                )}
-              </span>
-            </div>
+            {hasQuorumRange ? (
+              <div className="flex items-center gap-1">
+                <span className="font-mono text-primary">
+                  {`${minQuorumPct}% – ${maxQuorumPct}%`}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1">
+                <span
+                  className={`font-mono ${
+                    quorumVotes > quorum ? "text-primary" : "text-tertiary"
+                  }`}
+                >
+                  {formatNumber(
+                    BigInt(quorumVotes),
+                    isSnapshot ? 0 : token.decimals,
+                    quorumVotes > 1_000_000 ? 2 : 4
+                  )}
+                </span>
+                <span className="text-primary">/</span>
+                <span className="font-mono text-primary">
+                  {formatNumber(
+                    BigInt(quorum),
+                    isSnapshot ? 0 : token.decimals,
+                    quorum > 1_000_000 ? 2 : 4
+                  )}
+                </span>
+              </div>
+            )}
           </div>
         )}
       </div>

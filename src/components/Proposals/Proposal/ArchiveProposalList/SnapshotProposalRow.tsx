@@ -102,6 +102,7 @@ function extractSnapshotDisplayData(
     proposalTypeName: getSnapshotTypeName(proposal.type),
     proposalTypeTag: undefined,
     source: "snapshot",
+    hasPendingRanges: false,
     isExternal: isExternalLink(proposal),
     timeStatus: {
       proposalStatus: statusLabel,

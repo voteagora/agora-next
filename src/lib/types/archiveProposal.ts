@@ -81,6 +81,14 @@ export type FixedProposalType = {
   approval_threshold: number; // basis points (e.g., 5000 = 50%)
 };
 
+/** Range-based proposal type configuration (eas-oodao) */
+export type RangeProposalType = {
+  min_quorum_pct: number;
+  max_quorum_pct: number;
+  min_approval_threshold_pct: number;
+  max_approval_threshold_pct: number;
+};
+
 // =============================================================================
 // Vote Outcome Types
 // =============================================================================
@@ -245,6 +253,8 @@ export type EasOodaoProposalFields = {
 
   // Proposal type as object with full config
   proposal_type: FixedProposalType;
+  proposal_type_approval?: "PENDING" | "APPROVED";
+  default_proposal_type_ranges?: RangeProposalType;
 
   // Metadata
   tags?: string[];
@@ -281,6 +291,8 @@ export type GovlessProposal = Partial<EasAtlasProposalFields> & {
   end_blocktime?: number;
   num_of_votes?: number;
   data_eng_properties?: DataEngProperties;
+  // eas-oodao fields that may be present in govless_proposal
+  proposal_type_approval?: "PENDING" | "APPROVED";
 };
 
 /** dao_node hybrid proposal with nested govless_proposal */
@@ -454,6 +466,7 @@ export type ArchiveListProposal = {
 
   // Proposal type - different formats for different sources
   proposal_type: number | string | FixedProposalType;
+  default_proposal_type_ranges?: RangeProposalType;
 
   // Approval-specific fields
   choices?: string[];
@@ -518,6 +531,7 @@ export type ArchiveListProposal = {
   transaction_hash?: string;
   dao_id?: string;
   chain_id?: number | string;
+  proposal_type_approval?: "PENDING" | "APPROVED";
   tags?: string[];
   created_block_number?: number;
   created_time?: number;
