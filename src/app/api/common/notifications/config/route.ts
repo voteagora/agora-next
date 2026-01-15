@@ -2,14 +2,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import Tenant from "@/lib/tenant/tenant";
 
 export async function GET(request: NextRequest) {
-  const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const vapidPublicKey = process.env.VAPID_PUBLIC_KEY;
 
   if (!vapidPublicKey) {
-    console.log(
-      "VAPID Config Error. Available Env Vars:",
-      Object.keys(process.env)
-    );
-
     return NextResponse.json(
       {
         error: "VAPID Public Key not configured",
