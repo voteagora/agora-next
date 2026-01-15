@@ -24,32 +24,58 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const response = await fetch(`${hubUrl}/v1/recipients/subscriptions`, {
+    // 1. Upsert Recipient (Ensure user exists)
+    // We use POST /recipients which handles upsert logic in the Hub
+    const upsertRes = await fetch(`${hubUrl}/v1/recipients`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-api-key": apiKey,
       },
       body: JSON.stringify({
-        tenant: namespace,
         recipient_id: address,
-        channel: "pwa",
-        config: {
-          type: "pwa",
-          endpoint: subscription.endpoint,
-          keys: subscription.keys,
+        recipient_type: "wallet_address",
+        attributes: {
+          tenant: namespace,
         },
       }),
     });
 
-    if (!response.ok) {
-      const err = await response.text();
-      console.error("Hub Subscription Error", err);
+    if (!upsertRes.ok) {
+      const err = await upsertRes.text();
+      console.error("Hub Recipient Upsert Error", err);
       return NextResponse.json(
-        { error: "Failed to register subscription" },
-        { status: response.status }
+        { error: "Failed to register recipient" },
+        { status: upsertRes.status }
       );
     }
+
+    // 2. Add/Update PWA Channel
+    const channelRes = await fetch(
+      `${hubUrl}/v1/recipients/${address}/channels/pwa`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+        },
+        body: JSON.stringify({
+          type: "pwa",
+          endpoint: subscription.endpoint,
+          keys: subscription.keys,
+        }),
+      }
+    );
+
+    if (!channelRes.ok) {
+      const err = await channelRes.text();
+      console.error("Hub Channel Config Error", err);
+      return NextResponse.json(
+        { error: "Failed to configure PWA channel" },
+        { status: channelRes.status }
+      );
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Proxy Subscription Error:", error);
