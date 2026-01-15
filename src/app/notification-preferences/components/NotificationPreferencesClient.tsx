@@ -255,6 +255,12 @@ export default function NotificationPreferencesClient() {
     return () => clearTimeout(timeout);
   }, [telegramLink]);
 
+  useEffect(() => {
+    if (siweJwt) {
+      setSiweError(null);
+    }
+  }, [siweJwt]);
+
   const recipient = data?.recipient ?? null;
 
   useEffect(() => {
@@ -655,7 +661,8 @@ export default function NotificationPreferencesClient() {
             Notification Preferences
           </h1>
           <p className="text-secondary">
-            Sign in with Ethereum to manage notification settings.
+            To manage your notification preferences, please sign this access
+            request.
           </p>
           {siweError ? (
             <p className="text-sm text-negative">{siweError}</p>
@@ -666,8 +673,17 @@ export default function NotificationPreferencesClient() {
           disabled={isSigningIn}
           onClick={async () => {
             try {
-              await ensureSiweSession();
+              const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(
+                  () =>
+                    reject(new Error("Sign-in timed out. Please try again.")),
+                  60000
+                )
+              );
+
+              await Promise.race([ensureSiweSession(), timeoutPromise]);
             } catch (signInError) {
+              setIsSigningIn(false);
               setSiweError(
                 signInError instanceof Error
                   ? signInError.message
@@ -676,7 +692,7 @@ export default function NotificationPreferencesClient() {
             }
           }}
         >
-          {isSigningIn ? "Signing in..." : "Sign in"}
+          {isSigningIn ? "Awaiting Confirmation..." : "Sign access request"}
         </Button>
       </main>
     );

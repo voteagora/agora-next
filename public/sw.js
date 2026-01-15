@@ -17,7 +17,7 @@ self.addEventListener("push", function (event) {
       icon: data.icon || "/favicon/android-chrome-192x192.png",
       badge: data.badge || "/favicon/favicon-32x32.png",
       vibrate: [100, 50, 100],
-      tag: "agora-notification",
+      tag: "agora-" + Date.now(),
       renotify: true,
       requireInteraction: true,
       data: {
