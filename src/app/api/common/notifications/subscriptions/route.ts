@@ -14,6 +14,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const body = await request.json();
+    const { address, subscription } = body;
+
+    if (!address || !subscription) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
     const response = await fetch(`${hubUrl}/v1/recipients/subscriptions`, {
       method: "POST",
       headers: {
