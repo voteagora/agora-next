@@ -51,48 +51,10 @@ export default function EasApprovalCastVoteButton({ proposal }: Props) {
       <VStack alignItems="items-stretch">
         {!isLoading && votingPower && (
           <div className="pt-3">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger className="w-full flex items-center justify-center gap-1 text-primary font-medium cursor-help">
-                  <span className="flex items-center text-xs font-semibold text-primary">
-                    Proposal voting power{"\u00A0"}
-                    {votingPower && <TokenAmountDisplay amount={votingPower} />}
-                    <InformationCircleIcon className="w-4 h-4 ml-1" />
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  align="center"
-                  className="bg-neutral p-4 rounded-lg border border-line shadow-newDefault w-[calc(100vw-32px)] sm:w-[400px]"
-                >
-                  <div className="flex flex-col gap-4">
-                    <div>
-                      <div className="text-sm font-semibold text-primary">
-                        Proposal launched
-                      </div>
-                      <div className="text-sm font-semibold text-primary">
-                        {new Intl.DateTimeFormat("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                          hour: "numeric",
-                          minute: "numeric",
-                          timeZoneName: "short",
-                        }).format(new Date(proposal.startTime ?? ""))}
-                      </div>
-                    </div>
-                    <div className="text-sm font-medium text-primary">
-                      Your voting power is captured when proposals launch based
-                      on your token holdings and delegations at that time.
-                    </div>
-                    <div className="text-sm font-medium text-primary">
-                      Any changes to your holdings after launch will not affect
-                      voting on this proposal.
-                    </div>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <span className="flex items-center content-center text-xs font-semibold text-primary">
+              Proposal voting power{"\u00A0"}
+              {votingPower && <TokenAmountDisplay amount={votingPower} />}
+            </span>
           </div>
         )}
         <VoteButton

@@ -73,15 +73,28 @@ export default function ApprovalProposalCriteria({ proposal }) {
             ) : (
               <TokenAmountDecorated amount={proposalSettings.criteriaValue} />
             )}{" "}
-            votes will be executed in order from most to least popular, until
-            the total budget of{" "}
+            votes will be executed in order from most to least popular,
             {source === "eas-oodao" ? (
-              <>{proposalSettings.budgetAmount} </>
+              <>
+                {proposalSettings.budgetAmount > 0 && (
+                  <>
+                    {" "}
+                    until the total budget of {
+                      proposalSettings.budgetAmount
+                    }{" "}
+                    runs out.
+                  </>
+                )}
+              </>
             ) : (
-              <TokenAmountDecorated amount={proposalSettings.budgetAmount} />
+              <>
+                until the total budget of{" "}
+                <TokenAmountDecorated amount={proposalSettings.budgetAmount} />{" "}
+                runs out.
+              </>
             )}{" "}
-            runs out. Voters can select up to {proposalSettings.maxApprovals}{" "}
-            options. If the quorum is not met, no options will be executed.
+            Voters can select up to {proposalSettings.maxApprovals} options. If
+            the quorum is not met, no options will be executed.
           </p>
         )}
       </div>

@@ -44,13 +44,15 @@ function extractOptimisticData(proposal: ArchiveListProposal): {
   }
 
   // Derive status from lifecycle_stage
-  let status = "Failed";
+  let status = "Pending";
   const lifecycleStage = proposal.lifecycle_stage?.toUpperCase();
-
+  console.log(lifecycleStage);
   if (lifecycleStage === "EXECUTED" || lifecycleStage === "SUCCEEDED") {
     status = "Approved";
   } else if (lifecycleStage === "CANCELLED") {
     status = "Cancelled";
+  } else if (lifecycleStage === "DEFEATED") {
+    status = "Defeated";
   }
 
   return {
