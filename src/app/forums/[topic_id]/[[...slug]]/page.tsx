@@ -359,9 +359,11 @@ export default async function ForumTopicPage({ params }: PageProps) {
             {isFinancialStatement ? (
               <>
                 <FinancialStatementLayout
+                  topicId={topicId}
                   title={transformed.title}
                   content={topicBody}
                   pdfUrl={pdfUrl}
+                  isOnArticlePage={false}
                 />
                 <div className="mt-8">
                   <ForumThread

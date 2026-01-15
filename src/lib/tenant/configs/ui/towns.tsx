@@ -613,6 +613,13 @@ export const townsTenantUIConfig = new TenantUI({
         ),
       },
     },
+    {
+      name: "duna/financial-statements",
+      enabled: true,
+      config: {
+        title: "TOWNS Lodge Updates",
+      },
+    },
   ],
 });
 

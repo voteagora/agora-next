@@ -1,16 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { getForumCategoryAttachments } from "@/lib/actions/forum/attachments";
+import { getForumTopics } from "@/lib/actions/forum";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 import Tenant from "@/lib/tenant/tenant";
 
 interface FinancialStatement {
   id: number;
-  name: string;
-  url: string;
-  ipfsCid: string;
+  title: string;
   createdAt: string;
-  uploadedBy: string;
-  archived?: boolean;
   revealTime?: string | null;
   expirationTime?: string | null;
 }
@@ -27,16 +23,16 @@ export function useRecentlyReleasedStatement() {
     queryFn: async (): Promise<FinancialStatement | null> => {
       if (!dunaCategoryId) return null;
 
-      const documentsResult = await getForumCategoryAttachments({
+      const topicsResult = await getForumTopics({
         categoryId: dunaCategoryId,
       });
 
-      if (!documentsResult.success || !documentsResult.data) {
+      if (!topicsResult.success || !topicsResult.data) {
         return null;
       }
 
-      const financialStatements = documentsResult.data.filter(
-        (doc) => doc.isFinancialStatement ?? false
+      const financialStatements = topicsResult.data.filter(
+        (topic: any) => topic.isFinancialStatement ?? false
       );
 
       if (financialStatements.length === 0) {
@@ -44,11 +40,13 @@ export function useRecentlyReleasedStatement() {
       }
 
       const now = new Date();
-      const sortedStatements = [...financialStatements].sort((a, b) => {
-        const dateA = new Date(a.revealTime ?? a.createdAt);
-        const dateB = new Date(b.revealTime ?? b.createdAt);
-        return dateB.getTime() - dateA.getTime();
-      });
+      const sortedStatements = [...financialStatements].sort(
+        (a: any, b: any) => {
+          const dateA = new Date(a.revealTime ?? a.createdAt);
+          const dateB = new Date(b.revealTime ?? b.createdAt);
+          return dateB.getTime() - dateA.getTime();
+        }
+      );
 
       const mostRecentStatement = sortedStatements[0];
       const revealTime = mostRecentStatement.revealTime
@@ -60,7 +58,13 @@ export function useRecentlyReleasedStatement() {
         revealTime > now.getTime() - 7 * 24 * 60 * 60 * 1000;
 
       return isRecentlyReleased
-        ? (mostRecentStatement as FinancialStatement)
+        ? {
+            id: mostRecentStatement.id,
+            title: mostRecentStatement.title,
+            createdAt: mostRecentStatement.createdAt,
+            revealTime: mostRecentStatement.revealTime,
+            expirationTime: mostRecentStatement.expirationTime,
+          }
         : null;
     },
     enabled:

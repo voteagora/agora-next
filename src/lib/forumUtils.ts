@@ -105,6 +105,20 @@ export function buildForumCategoryPath(
     : `/forums/category/${safeId}`;
 }
 
+export function buildForumArticlePath(
+  id: number,
+  title?: string | null
+): string {
+  const numericId = Number(id);
+  const slug = buildForumTopicSlug(title);
+  if (!Number.isFinite(numericId)) {
+    return "/forums";
+  }
+  return slug
+    ? `/forum-article/${Math.abs(Math.trunc(numericId))}/${slug}`
+    : `/forum-article/${Math.abs(Math.trunc(numericId))}`;
+}
+
 export function extractForumTopicId(
   raw: string | string[] | undefined
 ): number | null {

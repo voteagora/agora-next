@@ -2,14 +2,9 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useRecentlyReleasedStatement } from "@/hooks/useRecentlyReleasedStatement";
-import { useAccount } from "wagmi";
 import { Megaphone, X } from "lucide-react";
-
-function removeFileExtension(filename: string): string {
-  const lastDotIndex = filename.lastIndexOf(".");
-  if (lastDotIndex === -1) return filename;
-  return filename.substring(0, lastDotIndex);
-}
+import { useRouter } from "next/navigation";
+import { buildForumArticlePath } from "@/lib/forumUtils";
 
 function useBannerDismissal(statementId: number | null) {
   const [isDismissed, setIsDismissed] = useState(false);
@@ -53,20 +48,22 @@ export default function RecentlyReleasedBanner() {
   const { isDismissed, dismiss } = useBannerDismissal(
     recentlyReleasedStatement?.id ?? null
   );
+  const router = useRouter();
 
   if (isLoading || !recentlyReleasedStatement || isDismissed) {
     return null;
   }
 
-  const displayName = removeFileExtension(recentlyReleasedStatement.name);
+  const articlePath = buildForumArticlePath(
+    recentlyReleasedStatement.id,
+    recentlyReleasedStatement.title
+  );
 
   const handleClick = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest("button")) {
       return;
     }
-    if (recentlyReleasedStatement.url) {
-      window.open(recentlyReleasedStatement.url, "_blank");
-    }
+    router.push(articlePath);
   };
 
   return (
@@ -79,7 +76,7 @@ export default function RecentlyReleasedBanner() {
           <Megaphone className="w-5 h-5 text-green-100" />
         </div>
         <p className="text-green-100 text-sm truncate">
-          New - <strong>{displayName}</strong> now available
+          New - <strong>{recentlyReleasedStatement.title}</strong> now available
         </p>
       </div>
       <button

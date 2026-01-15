@@ -450,5 +450,12 @@ export const uniswapTenantUIConfig = new TenantUI({
         ),
       },
     },
+    {
+      name: "duna/financial-statements",
+      enabled: true,
+      config: {
+        title: "DUNI Updates",
+      },
+    },
   ],
 });

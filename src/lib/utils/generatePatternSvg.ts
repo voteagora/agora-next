@@ -32,7 +32,10 @@ const colorPalettes = [
 export function generatePatternSvg(
   metadata: string,
   width: number = 400,
-  height: number = 280
+  height: number = 280,
+  backgroundColor?: string,
+  accentColor?: string,
+  gridSizeForced?: number
 ): { svg: string; bgColor: string } {
   const hash = hashString(metadata);
   const random = seedRandom(hash);
@@ -40,7 +43,7 @@ export function generatePatternSvg(
   const colorIndex = hash % colorPalettes.length;
   const colorset = colorPalettes[colorIndex];
 
-  const gridSize = 6;
+  const gridSize = gridSizeForced || 6;
   const cellSize = width / gridSize;
   const shapes: string[] = [];
 
@@ -65,32 +68,32 @@ export function generatePatternSvg(
       switch (shapeType) {
         case 0:
           shapes.push(
-            `<circle cx="${centerX}" cy="${centerY}" r="${cellSize * 0.4}" fill="${fillColor}" opacity="${opacity}"/>`
+            `<circle cx="${centerX}" cy="${centerY}" r="${cellSize * 0.4}" fill="${accentColor || fillColor}" opacity="${opacity}"/>`
           );
           break;
         case 1:
           shapes.push(
-            `<path d="M ${x} ${y} L ${x + cellSize} ${y} L ${centerX} ${y + cellSize} Z" fill="${fillColor}" opacity="${opacity}"${transform ? ` transform="${transform}"` : ""}/>`
+            `<path d="M ${x} ${y} L ${x + cellSize} ${y} L ${centerX} ${y + cellSize} Z" fill="${accentColor || fillColor}" opacity="${opacity}"${transform ? ` transform="${transform}"` : ""}/>`
           );
           break;
         case 2:
           shapes.push(
-            `<path d="M ${centerX} ${y} L ${x + cellSize} ${centerY} L ${centerX} ${y + cellSize} L ${x} ${centerY} Z" fill="${fillColor}" opacity="${opacity}"${transform ? ` transform="${transform}"` : ""}/>`
+            `<path d="M ${centerX} ${y} L ${x + cellSize} ${centerY} L ${centerX} ${y + cellSize} L ${x} ${centerY} Z" fill="${accentColor || fillColor}" opacity="${opacity}"${transform ? ` transform="${transform}"` : ""}/>`
           );
           break;
         case 3:
           shapes.push(
-            `<g fill="${fillColor}" opacity="${opacity}" transform="translate(${x}, ${y}) scale(${scale})"><path d="M240 240A240 240 0 0 0 0 480h120a120 120 0 0 1 240 0h120a240 240 0 0 0-240-240Z"></path><path d="M480 0H360a120 120 0 0 1-240 0H0a240 240 0 1 0 480 0Z"></path></g>`
+            `<g fill="${accentColor || fillColor}" opacity="${opacity}" transform="translate(${x}, ${y}) scale(${scale})"><path d="M240 240A240 240 0 0 0 0 480h120a120 120 0 0 1 240 0h120a240 240 0 0 0-240-240Z"></path><path d="M480 0H360a120 120 0 0 1-240 0H0a240 240 0 1 0 480 0Z"></path></g>`
           );
           break;
         case 4:
           shapes.push(
-            `<path d="M ${x} ${centerY} A ${cellSize * 0.4} ${cellSize * 0.4} 0 0 1 ${x + cellSize} ${centerY} L ${x + cellSize} ${y + cellSize} L ${x} ${y + cellSize} Z" fill="${fillColor}" opacity="${opacity}"${transform ? ` transform="${transform}"` : ""}/>`
+            `<path d="M ${x} ${centerY} A ${cellSize * 0.4} ${cellSize * 0.4} 0 0 1 ${x + cellSize} ${centerY} L ${x + cellSize} ${y + cellSize} L ${x} ${y + cellSize} Z" fill="${accentColor || fillColor}" opacity="${opacity}"${transform ? ` transform="${transform}"` : ""}/>`
           );
           break;
         case 5:
           shapes.push(
-            `<path d="M480 0A339.4 339.4 0 0 1 0 0a339.4 339.4 0 0 1 0 480 339.4 339.4 0 0 1 480 0 339.4 339.4 0 0 1 0-480Z" fill="${fillColor}" opacity="${opacity}" transform="translate(${x}, ${y}) scale(${scale})"></path>`
+            `<path d="M480 0A339.4 339.4 0 0 1 0 0a339.4 339.4 0 0 1 0 480 339.4 339.4 0 0 1 480 0 339.4 339.4 0 0 1 0-480Z" fill="${accentColor || fillColor}" opacity="${opacity}" transform="translate(${x}, ${y}) scale(${scale})"></path>`
           );
           break;
         case 6:
@@ -99,7 +102,7 @@ export function generatePatternSvg(
           const rectY = centerY - rectSize / 2;
           const cornerRadius = cellSize * 0.15;
           shapes.push(
-            `<path d="M ${rectX + cornerRadius} ${rectY} L ${rectX + rectSize - cornerRadius} ${rectY} Q ${rectX + rectSize} ${rectY} ${rectX + rectSize} ${rectY + cornerRadius} L ${rectX + rectSize} ${rectY + rectSize - cornerRadius} Q ${rectX + rectSize} ${rectY + rectSize} ${rectX + rectSize - cornerRadius} ${rectY + rectSize} L ${rectX + cornerRadius} ${rectY + rectSize} Q ${rectX} ${rectY + rectSize} ${rectX} ${rectY + rectSize - cornerRadius} L ${rectX} ${rectY + cornerRadius} Q ${rectX} ${rectY} ${rectX + cornerRadius} ${rectY} Z" fill="${fillColor}" opacity="${opacity}"${transform ? ` transform="${transform}"` : ""}/>`
+            `<path d="M ${rectX + cornerRadius} ${rectY} L ${rectX + rectSize - cornerRadius} ${rectY} Q ${rectX + rectSize} ${rectY} ${rectX + rectSize} ${rectY + cornerRadius} L ${rectX + rectSize} ${rectY + rectSize - cornerRadius} Q ${rectX + rectSize} ${rectY + rectSize} ${rectX + rectSize - cornerRadius} ${rectY + rectSize} L ${rectX + cornerRadius} ${rectY + rectSize} Q ${rectX} ${rectY + rectSize} ${rectX} ${rectY + rectSize - cornerRadius} L ${rectX} ${rectY + cornerRadius} Q ${rectX} ${rectY} ${rectX + cornerRadius} ${rectY} Z" fill="${accentColor || fillColor}" opacity="${opacity}"${transform ? ` transform="${transform}"` : ""}/>`
           );
           break;
       }
@@ -112,13 +115,13 @@ export function generatePatternSvg(
     svg: `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style="stop-color:${colorset.bg};stop-opacity:1" />
-        <stop offset="100%" style="stop-color:${colorset.accent};stop-opacity:0.7" />
+        <stop offset="0%" style="stop-color:${backgroundColor || colorset.bg};stop-opacity:1" />
+        <stop offset="100%" style="stop-color:${backgroundColor || colorset.accent};stop-opacity:0.7" />
       </linearGradient>
     </defs>
     <rect width="${width}" height="${height}" fill="url(#${gradientId})"/>
     ${shapes.join("\n    ")}
   </svg>`,
-    bgColor: colorset.bg,
+    bgColor: backgroundColor || colorset.bg,
   };
 }
