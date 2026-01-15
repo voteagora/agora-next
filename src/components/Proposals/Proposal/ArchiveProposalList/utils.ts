@@ -57,9 +57,6 @@ export function extractDisplayData(
       ? proposal.govless_proposal.proposer_ens
       : (proposal.govless_proposal?.proposer_ens?.detail ?? undefined);
 
-  const vd = votingData as ArchiveListProposal;
-  const hasPendingRanges = vd.proposal_type_approval === "PENDING";
-
   return {
     id: proposal.id,
     href: `/proposals/${proposal.id}`,
@@ -70,7 +67,6 @@ export function extractDisplayData(
     proposalTypeName: getProposalTypeText(proposalType),
     proposalTypeTag: proposalTag,
     source: proposal.data_eng_properties?.source,
-    hasPendingRanges,
     timeStatus: deriveTimeStatus(proposal, normalizedStatus),
   };
 }

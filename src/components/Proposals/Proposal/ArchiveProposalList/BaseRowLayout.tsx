@@ -135,9 +135,7 @@ function OODaoBadges({
 
       {/* Proposal type badge */}
       <div
-        className={`px-2 py-0.5 rounded-[3px] flex justify-center items-center gap-0.5 ${tagBgClass} ${
-          data.hasPendingRanges ? "opacity-50" : ""
-        }`}
+        className={`px-2 py-0.5 rounded-[3px] flex justify-center items-center gap-0.5 ${tagBgClass}`}
         style={tagBgStyle}
       >
         <div className={`${tagTextClass} text-xs font-semibold leading-4`}>

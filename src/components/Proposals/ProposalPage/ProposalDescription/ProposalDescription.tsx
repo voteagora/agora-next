@@ -78,12 +78,6 @@ export default function ProposalDescription({
             proposalTypeTag?: string;
             source?: string;
             proposerEns?: string;
-            defaultProposalTypeRanges?: {
-              min_quorum_pct: number;
-              max_quorum_pct: number;
-              min_approval_threshold_pct: number;
-              max_approval_threshold_pct: number;
-            };
           };
         }
       ).archiveMetadata ?? null)
@@ -96,9 +90,6 @@ export default function ProposalDescription({
   );
 
   const typeBadgeLabel = archiveMetadata?.proposalTypeTag;
-
-  // Check if this is an archive proposal with ranges (pending state)
-  const hasPendingRanges = (proposal as any).proposalTypeApproval === "PENDING";
 
   return (
     <div
@@ -123,9 +114,7 @@ export default function ProposalDescription({
             By {proposerBadge}
           </div>
           <div
-            className={`px-2 py-0.5 rounded-[3px] text-xs font-semibold leading-4 ${tagBgClass} ${
-              hasPendingRanges ? "opacity-50" : ""
-            } ${tagTextClass}`}
+            className={`px-2 py-0.5 rounded-[3px] text-xs font-semibold leading-4 ${tagBgClass} ${tagTextClass}`}
             style={tagBgStyle}
           >
             {archiveMetadata?.proposalTypeName}

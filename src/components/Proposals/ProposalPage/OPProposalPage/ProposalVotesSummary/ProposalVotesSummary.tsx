@@ -21,13 +21,6 @@ interface Props {
   proposal: Proposal;
 }
 
-type RangeProposalType = {
-  min_quorum_pct: number;
-  max_quorum_pct: number;
-  min_approval_threshold_pct: number;
-  max_approval_threshold_pct: number;
-};
-
 export default function ProposalVotesSummary({ proposal }: Props) {
   const [showDetails, setShowDetails] = useState(false);
 
@@ -36,36 +29,6 @@ export default function ProposalVotesSummary({ proposal }: Props) {
 
   const isProposalCreatedBeforeUpgrade =
     isProposalCreatedBeforeUpgradeCheck(proposal);
-
-  // Check if this is an archive proposal with ranges (pending state)
-  const archiveMetadata = (
-    proposal as unknown as {
-      archiveMetadata?: { source?: string; defaultProposalTypeRanges?: any };
-    }
-  ).archiveMetadata;
-
-  const defaultProposalTypeRanges =
-    archiveMetadata?.source === "eas-oodao"
-      ? (archiveMetadata.defaultProposalTypeRanges as
-          | RangeProposalType
-          | undefined)
-      : null;
-
-  const hasPendingRanges = (proposal as any).proposalTypeApproval === "PENDING";
-
-  const minApprovalThreshold = defaultProposalTypeRanges
-    ? defaultProposalTypeRanges.min_approval_threshold_pct / 100
-    : null;
-  const maxApprovalThreshold = defaultProposalTypeRanges
-    ? defaultProposalTypeRanges.max_approval_threshold_pct / 100
-    : null;
-
-  const minQuorum = defaultProposalTypeRanges
-    ? defaultProposalTypeRanges.min_quorum_pct / 100
-    : null;
-  const maxQuorum = defaultProposalTypeRanges
-    ? defaultProposalTypeRanges.max_quorum_pct / 100
-    : null;
 
   return (
     <HoverCard
@@ -100,46 +63,29 @@ export default function ProposalVotesSummary({ proposal }: Props) {
 
             <div className="flex flex-col font-medium">
               <div className="flex flex-row text-secondary pb-2 justify-between">
-                <>
-                  {hasPendingRanges && minQuorum !== maxQuorum ? (
-                    <div>
-                      <p>{`Quorum ${minQuorum}% – ${maxQuorum}%`}</p>
-                    </div>
-                  ) : !hasPendingRanges ? (
-                    proposal.quorum && (
-                      <div>
-                        Quorum{" "}
-                        <TokenAmountDecorated
-                          amount={proposal.quorum}
-                          hideCurrency
-                          specialFormatting
-                        />
-                        {isProposalCreatedBeforeUpgrade && (
-                          <span className="inline-flex items-center">
-                            0
-                            <QuorumTooltip />
-                          </span>
-                        )}
-                      </div>
-                    )
-                  ) : null}
-                </>
-                <>
-                  {hasPendingRanges &&
-                  minApprovalThreshold !== maxApprovalThreshold ? (
-                    <div>
-                      <p>{`Threshold ${minApprovalThreshold}% – ${maxApprovalThreshold}%`}</p>
-                    </div>
-                  ) : !hasPendingRanges ? (
-                    proposal.approvalThreshold && (
-                      <div>
-                        <p>{`Threshold ${
-                          Number(proposal.approvalThreshold) / 100
-                        }%`}</p>
-                      </div>
-                    )
-                  ) : null}
-                </>
+                {proposal.quorum && (
+                  <div>
+                    Quorum{" "}
+                    <TokenAmountDecorated
+                      amount={proposal.quorum}
+                      hideCurrency
+                      specialFormatting
+                    />
+                    {isProposalCreatedBeforeUpgrade && (
+                      <span className="inline-flex items-center">
+                        0
+                        <QuorumTooltip />
+                      </span>
+                    )}
+                  </div>
+                )}
+                {proposal.approvalThreshold && (
+                  <div>
+                    <p>{`Threshold ${
+                      Number(proposal.approvalThreshold) / 100
+                    }%`}</p>
+                  </div>
+                )}
               </div>
             </div>
           </HoverCardTrigger>

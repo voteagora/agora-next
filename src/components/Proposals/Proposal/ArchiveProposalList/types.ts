@@ -24,7 +24,6 @@ export type RowDisplayData = {
   proposalTypeName: string;
   proposalTypeTag?: string;
   source?: string;
-  hasPendingRanges: boolean;
   timeStatus: {
     proposalStatus: string;
     proposalStartTime: Date | null;

@@ -1,32 +1,15 @@
 "use client";
 
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { InformationCircleIcon } from "@heroicons/react/20/solid";
-import { formatDistanceToNow } from "date-fns";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import { canCreateGovernanceProposal } from "@/lib/forumPermissionUtils";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAccount } from "wagmi";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { RelatedItem } from "@/app/create/types";
 import { useProposalLinksWithDetails } from "@/hooks/useProposalLinksWithDetails";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
-import SyndicateTempCheckTooltip from "./SyndicateTempCheckTooltip";
 import { cn } from "@/lib/utils";
-
-type RangeProposalType = {
-  min_quorum_pct: number;
-  max_quorum_pct: number;
-  min_approval_threshold_pct: number;
-  max_approval_threshold_pct: number;
-};
 
 export default function ArchiveProposalTypeApproval({
   proposal,
@@ -40,13 +23,10 @@ export default function ArchiveProposalTypeApproval({
     useProposalLinksWithDetails(proposal.id);
   const hasLinkedGovProposal = relatedLinks.some((link) => link.type === "gov");
 
-  // Check if this is an archive proposal with metadata
   const archiveMetadata = (
     proposal as unknown as {
       archiveMetadata?: {
         source?: string;
-        rawProposalType?: any;
-        defaultProposalTypeRanges?: any;
         rawTag?: string;
       };
     }
@@ -55,40 +35,12 @@ export default function ArchiveProposalTypeApproval({
   const { namespace, ui } = Tenant.current();
   const isDark = ui.theme === "dark";
 
-  // Only show for eas-oodao proposals
   if (archiveMetadata?.source !== "eas-oodao") {
     return null;
   }
 
   const isDefeated = proposal.status === "DEFEATED";
   const isSuccessful = proposal.status === "SUCCEEDED";
-  const isActive = !isDefeated && !isSuccessful;
-
-  // Check for default_proposal_type_ranges (pending approval)
-  const defaultProposalTypeRanges = isActive
-    ? (archiveMetadata.defaultProposalTypeRanges as
-        | RangeProposalType
-        | undefined)
-    : null;
-
-  const minQuorum = defaultProposalTypeRanges
-    ? defaultProposalTypeRanges.min_quorum_pct / 100
-    : null;
-  const maxQuorum = defaultProposalTypeRanges
-    ? defaultProposalTypeRanges.max_quorum_pct / 100
-    : null;
-  const minApproval = defaultProposalTypeRanges
-    ? defaultProposalTypeRanges.min_approval_threshold_pct / 100
-    : null;
-  const maxApproval = defaultProposalTypeRanges
-    ? defaultProposalTypeRanges.max_approval_threshold_pct / 100
-    : null;
-
-  // Calculate time remaining
-  const endTime = proposal.endTime;
-  const timeRemaining = endTime
-    ? formatDistanceToNow(endTime, { addSuffix: true })
-    : "Unavailable";
 
   const isAuthor = address?.toLowerCase() === proposal.proposer?.toLowerCase();
   const canCreateProposal = canCreateGovernanceProposal(
@@ -125,16 +77,8 @@ export default function ArchiveProposalTypeApproval({
 
     router.push(`/forums/new?${params.toString()}`);
   };
-  const now = new Date();
 
-  if (
-    !showCreateButton &&
-    !showCreateDiscussionButton &&
-    !minQuorum &&
-    !maxQuorum &&
-    !minApproval &&
-    !maxApproval
-  ) {
+  if (!showCreateButton && !showCreateDiscussionButton) {
     return null;
   }
 
@@ -176,53 +120,7 @@ export default function ArchiveProposalTypeApproval({
             </Button>
           </div>
         </div>
-      ) : (
-        <>
-          {endTime && endTime > now && (
-            <div className="flex items-center justify-between text-xs font-semibold text-secondary mb-4">
-              <span className="inline-flex items-center gap-2">
-                Proposal type not yet approved
-                <TooltipProvider delayDuration={150}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <InformationCircleIcon className="h-4 w-4 cursor-pointer text-secondary hover:text-primary" />
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-xs text-xs text-secondary">
-                      This temp check still needs admin approval with proposal
-                      type before it can proceed to a governance proposal.
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </span>
-              <span>{timeRemaining}</span>
-            </div>
-          )}
-
-          <div className="space-y-2 text-xs font-semibold text-secondary">
-            {minQuorum !== maxQuorum && (
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <span>Quorum</span>
-                  {namespace === TENANT_NAMESPACES.SYNDICATE && isTempCheck && (
-                    <SyndicateTempCheckTooltip />
-                  )}
-                </div>
-                <span>
-                  {minQuorum}% – {maxQuorum}% until type approved
-                </span>
-              </div>
-            )}
-            {minApproval !== maxApproval && (
-              <div className="flex items-center justify-between">
-                <span>Approval Threshold</span>
-                <span>
-                  {minApproval}% – {maxApproval}% until type approved
-                </span>
-              </div>
-            )}
-          </div>
-        </>
-      )}
+      ) : null}
     </div>
   );
 }

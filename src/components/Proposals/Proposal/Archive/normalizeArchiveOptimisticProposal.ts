@@ -151,7 +151,6 @@ export function normalizeArchiveOptimisticProposal(
     cancelledTransactionHash: proposal.cancel_event?.transaction_hash ?? null,
     executedTransactionHash: proposal.execute_event?.transaction_hash ?? null,
     offchainProposalId: undefined,
-    proposalTypeApproval: proposal.proposal_type_approval,
   };
 
   const archiveMetadata = {
@@ -164,7 +163,6 @@ export function normalizeArchiveOptimisticProposal(
     proposalTypeTag: deriveProposalTag(proposal),
     proposerEns,
     rawProposalType: proposal.proposal_type,
-    defaultProposalTypeRanges: proposal.default_proposal_type_ranges,
   };
 
   return {
