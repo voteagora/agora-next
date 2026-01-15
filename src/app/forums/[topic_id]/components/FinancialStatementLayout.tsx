@@ -43,55 +43,56 @@ export default function FinancialStatementLayout({
   );
 
   return (
-    <div className="max-w-4xl mx-auto relative">
-      <h1 className="text-4xl font-bold text-primary mb-6">{title}</h1>
-
-      <div className="flex flex-wrap gap-4 mb-8">
-        {isOnArticlePage ? (
-          <Button
-            asChild
-            variant="default"
-            className="bg-primary text-white hover:bg-primary/90"
-          >
-            <Link href={forumPagePath}>{discussButtonText}</Link>
-          </Button>
-        ) : (
-          <Button
-            onClick={handleScrollToComments}
-            variant="default"
-            className="bg-primary text-white hover:bg-primary/90"
-          >
-            {discussButtonText}
-          </Button>
-        )}
-        {pdfUrl && (
-          <Button
-            asChild
-            variant="outline"
-            className="border-line bg-white hover:bg-wash"
-          >
-            <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
-              View PDF
-            </a>
-          </Button>
-        )}
-      </div>
-
-      <div className="bg-white rounded-lg p-8 shadow-sm relative z-10">
-        <DunaContentRenderer
-          content={content}
-          className="text-secondary text-sm leading-relaxed break-words"
-        />
-      </div>
-
+    <>
       {isOnArticlePage && (
-        <div className="hidden md:block fixed top-[20%] right-0 opacity-30">
+        <div className="hidden md:block absolute top-[20%] right-0 opacity-30 pointer-events-none">
           <div
             className="w-[600px] h-[300px]"
             dangerouslySetInnerHTML={{ __html: patternSvg }}
           />
         </div>
       )}
-    </div>
+      <div className="max-w-4xl mx-auto relative">
+        <h1 className="text-4xl font-bold text-primary mb-6">{title}</h1>
+
+        <div className="flex flex-wrap gap-4 mb-8">
+          {isOnArticlePage ? (
+            <Button
+              asChild
+              variant="default"
+              className="bg-primary text-white hover:bg-primary/90"
+            >
+              <Link href={forumPagePath}>{discussButtonText}</Link>
+            </Button>
+          ) : (
+            <Button
+              onClick={handleScrollToComments}
+              variant="default"
+              className="bg-primary text-white hover:bg-primary/90"
+            >
+              {discussButtonText}
+            </Button>
+          )}
+          {pdfUrl && (
+            <Button
+              asChild
+              variant="outline"
+              className="border-line bg-white hover:bg-wash"
+            >
+              <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
+                View PDF
+              </a>
+            </Button>
+          )}
+        </div>
+
+        <div className="bg-white rounded-lg p-8 shadow-sm relative z-10">
+          <DunaContentRenderer
+            content={content}
+            className="text-secondary text-sm leading-relaxed break-words"
+          />
+        </div>
+      </div>
+    </>
   );
 }

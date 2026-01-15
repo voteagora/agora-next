@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useRecentlyReleasedStatement } from "@/hooks/useRecentlyReleasedStatement";
 import { Megaphone, X } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { buildForumArticlePath } from "@/lib/forumUtils";
 
 function useBannerDismissal(statementId: number | null) {
@@ -49,6 +49,23 @@ export default function RecentlyReleasedBanner() {
     recentlyReleasedStatement?.id ?? null
   );
   const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (!recentlyReleasedStatement || isDismissed) return;
+
+    const articlePath = buildForumArticlePath(
+      recentlyReleasedStatement.id,
+      recentlyReleasedStatement.title
+    );
+
+    if (
+      pathname === articlePath ||
+      pathname?.startsWith(`/forum-article/${recentlyReleasedStatement.id}`)
+    ) {
+      dismiss();
+    }
+  }, [pathname, recentlyReleasedStatement, isDismissed, dismiss]);
 
   if (isLoading || !recentlyReleasedStatement || isDismissed) {
     return null;
@@ -64,6 +81,7 @@ export default function RecentlyReleasedBanner() {
       return;
     }
     router.push(articlePath);
+    dismiss();
   };
 
   return (
