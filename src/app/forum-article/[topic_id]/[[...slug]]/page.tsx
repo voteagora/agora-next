@@ -105,6 +105,7 @@ export async function generateMetadata({
   const tenant = Tenant.current();
   const brandName = tenant.brandName || "Agora";
 
+  const description = " ";
   const suffix = ` | ${brandName}`;
   const metaTitle = truncateTitleForMeta(transformed.title, suffix, 60);
   const authorAddress = transformed.author;
@@ -115,10 +116,11 @@ export async function generateMetadata({
 
   const ogImageUrl = `${baseUrl}/api/images/og/generic?title=${encodeURIComponent(
     transformed.title
-  )}`;
+  )}&description=${encodeURIComponent(description)}`;
 
   return {
     title: metaTitle,
+    description,
     alternates: {
       canonical: `${baseUrl}${canonicalPath}`,
     },
@@ -126,6 +128,7 @@ export async function generateMetadata({
       type: "article",
       url: `${baseUrl}${canonicalPath}`,
       title: metaTitle,
+      description,
       siteName: brandName,
       publishedTime: createdAt,
       modifiedTime: updatedAt,
@@ -142,6 +145,7 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: metaTitle,
+      description,
       images: [ogImageUrl],
     },
   };
