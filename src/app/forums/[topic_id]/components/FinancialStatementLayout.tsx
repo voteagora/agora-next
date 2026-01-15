@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { DunaContentRenderer } from "@/components/duna-editor";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import { generatePatternSvg } from "@/lib/utils/generatePatternSvg";
 
@@ -52,7 +51,7 @@ export default function FinancialStatementLayout({
           />
         </div>
       )}
-      <div className="max-w-4xl mx-auto relative">
+      <div className="max-w-5xl mx-auto relative">
         <h1 className="text-4xl font-bold text-primary mb-6">{title}</h1>
 
         <div className="flex flex-wrap gap-4 mb-8">
@@ -79,9 +78,9 @@ export default function FinancialStatementLayout({
         </div>
 
         <div className="bg-cardBackground rounded-lg p-8 shadow-sm relative z-10">
-          <DunaContentRenderer
-            content={content}
+          <div
             className="text-secondary text-sm leading-relaxed break-words"
+            dangerouslySetInnerHTML={{ __html: content }}
           />
         </div>
       </div>
