@@ -1,8 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import Tenant from "@/lib/tenant/tenant";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
-  const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const vapidPublicKey = process.env.VAPID_PUBLIC_KEY;
 
   if (!vapidPublicKey) {
     return NextResponse.json(
