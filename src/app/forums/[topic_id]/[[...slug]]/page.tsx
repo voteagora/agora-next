@@ -359,7 +359,9 @@ export default async function ForumTopicPage({ params }: PageProps) {
           {/* Main Content */}
           <div
             className={`flex-1 min-w-0 max-w-full ${
-              isFinancialStatement ? "lg:max-w-5xl xl:max-w-6xl" : "lg:max-w-4xl"
+              isFinancialStatement
+                ? "lg:max-w-5xl xl:max-w-6xl"
+                : "lg:max-w-4xl"
             }`}
           >
             {isFinancialStatement ? (
