@@ -34,6 +34,7 @@ export default function CategoryList({
   const { address } = useAccount();
   const { isCategoryWatched, toggleCategoryWatch, isLoading, isReady } =
     useForumSubscriptions();
+  const isBusy = !isReady || isLoading;
 
   const handleToggle = (
     e: React.MouseEvent,
@@ -72,23 +73,25 @@ export default function CategoryList({
               <span className="text-sm truncate">{cat.name}</span>
             </Link>
             <div className="flex items-center gap-1 flex-shrink-0">
-              {isReady && address && (
+              {address && (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
                         onClick={(e) => handleToggle(e, cat.id, cat.name)}
-                        disabled={isLoading}
+                        disabled={isBusy}
                         className={`p-1 rounded transition-colors ${
-                          isLoading ? "opacity-50 cursor-not-allowed" : ""
+                          isBusy ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                         aria-label={
-                          isWatching
+                          isBusy
+                            ? `Loading watch status for ${cat.name}`
+                            : isWatching
                             ? `Unwatch ${cat.name}`
                             : `Watch ${cat.name}`
                         }
                       >
-                        {isLoading ? (
+                        {isBusy ? (
                           <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
                         ) : isWatching ? (
                           <Bell className="w-4 h-4 fill-amber-500 text-amber-500 hover:text-amber-600" />

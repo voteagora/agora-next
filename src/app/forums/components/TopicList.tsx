@@ -45,6 +45,7 @@ export default function TopicList({ topics, admins }: TopicListProps) {
   const { address } = useAccount();
   const { isTopicWatched, toggleTopicWatch, isLoading, isReady } =
     useForumSubscriptions();
+  const watchBusy = !isReady || isLoading;
 
   const handleToggleWatch = (
     e: React.MouseEvent,
@@ -64,8 +65,8 @@ export default function TopicList({ topics, admins }: TopicListProps) {
           topic={topic}
           admins={admins}
           isWatching={isTopicWatched(topic.id)}
-          watchLoading={isLoading}
-          showWatchButton={isReady && !!address}
+          watchLoading={watchBusy}
+          showWatchButton={!!address}
           onToggleWatch={(e) => handleToggleWatch(e, topic.id, topic.title)}
         />
       ))}
@@ -107,6 +108,8 @@ function TopicCard({
   const [showVPModal, setShowVPModal] = useState(false);
 
   useEffect(() => {
+    if (watchLoading) return;
+
     let mounted = true;
     (async () => {
       const c = await fetchTopicUpvotes(topic.id);
@@ -119,7 +122,7 @@ function TopicCard({
     return () => {
       mounted = false;
     };
-  }, [topic.id, address, fetchTopicUpvotes, hasUpvotedTopic]);
+  }, [watchLoading, topic.id, address, fetchTopicUpvotes, hasUpvotedTopic]);
 
   const handleUpvote = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -229,11 +232,23 @@ function TopicCard({
                       type="button"
                       onClick={onToggleWatch}
                       disabled={watchLoading}
-                      title={isWatching ? "Stop watching" : "Watch topic"}
+                      title={
+                        watchLoading
+                          ? "Loading watch status"
+                          : isWatching
+                          ? "Stop watching"
+                          : "Watch topic"
+                      }
                       className={`flex items-center justify-center text-secondary rounded-md min-w-[40px] h-[42px] hover:bg-neutral transition-colors ${
                         watchLoading ? "opacity-50 cursor-not-allowed" : ""
                       }`}
-                      aria-label={isWatching ? "Stop watching" : "Watch topic"}
+                      aria-label={
+                        watchLoading
+                          ? "Loading watch status"
+                          : isWatching
+                          ? "Stop watching"
+                          : "Watch topic"
+                      }
                     >
                       {watchLoading ? (
                         <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
@@ -245,7 +260,13 @@ function TopicCard({
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{isWatching ? "Stop watching" : "Get notified of new comments"}</p>
+                    <p>
+                      {watchLoading
+                        ? "Loading watch status"
+                        : isWatching
+                        ? "Stop watching"
+                        : "Get notified of new comments"}
+                    </p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

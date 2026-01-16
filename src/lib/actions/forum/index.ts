@@ -50,10 +50,14 @@ export {
 export {
   trackForumView,
   getForumViewStats,
+} from "./analytics";
+
+// Subscriptions
+export {
   subscribeToForumContent,
   unsubscribeFromForumContent,
   getForumSubscriptions,
-} from "./analytics";
+} from "./subscriptions";
 
 // Search
 export {
