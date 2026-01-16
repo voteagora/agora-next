@@ -22,7 +22,11 @@ interface PreferencesMatrixProps {
   preferences: PreferencesByEvent;
   channelOrder: ChannelType[];
   channelStatus: Record<ChannelType, ChannelStatusInfo>;
-  onToggle: (eventType: string, channel: ChannelType, nextState: PreferenceState) => void;
+  onToggle: (
+    eventType: string,
+    channel: ChannelType,
+    nextState: PreferenceState
+  ) => void;
   isUpdating: (eventType: string, channel: ChannelType) => boolean;
 }
 
@@ -50,7 +54,9 @@ export default function PreferencesMatrix({
 
   const orderedCategories = [
     ...EVENT_CATEGORIES.map((category) => category.id),
-    ...Array.from(grouped.keys()).filter((category) => !CATEGORY_LABELS.has(category)),
+    ...Array.from(grouped.keys()).filter(
+      (category) => !CATEGORY_LABELS.has(category)
+    ),
   ];
 
   let rowIndex = 0;
@@ -95,7 +101,8 @@ export default function PreferencesMatrix({
                     </td>
                   </tr>
                   {items.map((eventType) => {
-                    const stateByChannel = preferences[eventType.event_type] ?? {};
+                    const stateByChannel =
+                      preferences[eventType.event_type] ?? {};
                     const isEven = rowIndex % 2 === 0;
                     rowIndex += 1;
 
@@ -121,7 +128,9 @@ export default function PreferencesMatrix({
                         </td>
                         {channelOrder.map((channel) => {
                           const currentState =
-                            stateByChannel[channel]?.state ?? eventType.default_state ?? "off";
+                            stateByChannel[channel]?.state ??
+                            eventType.default_state ??
+                            "off";
                           const checked = currentState === "on";
 
                           return (
@@ -129,8 +138,14 @@ export default function PreferencesMatrix({
                               <div className="flex justify-center">
                                 <PreferenceToggle
                                   checked={checked}
-                                  disabled={channelStatus[channel].status !== "connected"}
-                                  isLoading={isUpdating(eventType.event_type, channel)}
+                                  disabled={
+                                    channelStatus[channel].status !==
+                                    "connected"
+                                  }
+                                  isLoading={isUpdating(
+                                    eventType.event_type,
+                                    channel
+                                  )}
                                   label={`${eventType.display_name} via ${channel}`}
                                   onChange={(nextValue) =>
                                     onToggle(

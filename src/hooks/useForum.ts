@@ -1036,7 +1036,9 @@ export const useForum = () => {
         return true;
       } catch (err) {
         const msg =
-          err instanceof Error ? err.message : "Failed to subscribe to category";
+          err instanceof Error
+            ? err.message
+            : "Failed to subscribe to category";
         setError(msg);
         toast.error(msg);
         return false;
@@ -1048,10 +1050,13 @@ export const useForum = () => {
   const unsubscribeFromCategory = useCallback(
     async (categoryId: number): Promise<boolean> => {
       try {
-        const signed = await createForumSubscriptionSignedRequest("unsubscribe", {
-          targetType: "category",
-          targetId: categoryId,
-        });
+        const signed = await createForumSubscriptionSignedRequest(
+          "unsubscribe",
+          {
+            targetType: "category",
+            targetId: categoryId,
+          }
+        );
         const res = await unsubscribeFromForumContent(signed);
         if (!res.success)
           throw new Error(res.error || "Failed to unsubscribe from category");
@@ -1059,7 +1064,9 @@ export const useForum = () => {
         return true;
       } catch (err) {
         const msg =
-          err instanceof Error ? err.message : "Failed to unsubscribe from category";
+          err instanceof Error
+            ? err.message
+            : "Failed to unsubscribe from category";
         setError(msg);
         toast.error(msg);
         return false;

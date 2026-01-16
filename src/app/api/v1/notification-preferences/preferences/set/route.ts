@@ -27,7 +27,10 @@ export async function POST(request: NextRequest) {
 
   const parsed = BodySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ message: "Invalid request payload" }, { status: 400 });
+    return NextResponse.json(
+      { message: "Invalid request payload" },
+      { status: 400 }
+    );
   }
 
   try {
@@ -47,4 +50,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

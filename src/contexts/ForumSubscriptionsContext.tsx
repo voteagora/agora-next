@@ -33,16 +33,26 @@ interface ForumSubscriptionsContextValue {
 
   // Actions
   toggleTopicWatch: (topicId: number, topicTitle?: string) => Promise<boolean>;
-  toggleCategoryWatch: (categoryId: number, categoryName: string) => Promise<boolean>;
+  toggleCategoryWatch: (
+    categoryId: number,
+    categoryName: string
+  ) => Promise<boolean>;
   isTopicWatched: (topicId: number) => boolean;
   isCategoryWatched: (categoryId: number) => boolean;
 }
 
-const ForumSubscriptionsContext = createContext<ForumSubscriptionsContextValue | null>(null);
+const ForumSubscriptionsContext =
+  createContext<ForumSubscriptionsContextValue | null>(null);
 
-export function ForumSubscriptionsProvider({ children }: { children: ReactNode }) {
+export function ForumSubscriptionsProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [watchedTopics, setWatchedTopics] = useState<Set<number>>(new Set());
-  const [watchedCategories, setWatchedCategories] = useState<Set<number>>(new Set());
+  const [watchedCategories, setWatchedCategories] = useState<Set<number>>(
+    new Set()
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -96,10 +106,18 @@ export function ForumSubscriptionsProvider({ children }: { children: ReactNode }
         if (cancelled) return;
         if (res.success && res.data) {
           setWatchedTopics(
-            new Set(res.data.topicSubscriptions.map((s: { topicId: number }) => s.topicId))
+            new Set(
+              res.data.topicSubscriptions.map(
+                (s: { topicId: number }) => s.topicId
+              )
+            )
           );
           setWatchedCategories(
-            new Set(res.data.categorySubscriptions.map((s: { categoryId: number }) => s.categoryId))
+            new Set(
+              res.data.categorySubscriptions.map(
+                (s: { categoryId: number }) => s.categoryId
+              )
+            )
           );
         }
       } catch (err) {
@@ -292,7 +310,9 @@ export function ForumSubscriptionsProvider({ children }: { children: ReactNode }
 export function useForumSubscriptions() {
   const context = useContext(ForumSubscriptionsContext);
   if (!context) {
-    throw new Error("useForumSubscriptions must be used within ForumSubscriptionsProvider");
+    throw new Error(
+      "useForumSubscriptions must be used within ForumSubscriptionsProvider"
+    );
   }
   return context;
 }

@@ -4,7 +4,10 @@ import {
   LOCAL_STORAGE_SIWE_JWT_KEY,
   LOCAL_STORAGE_SIWE_STAGE_KEY,
 } from "@/lib/constants";
-import { clearStoredSiweSession, getStoredSiweSession } from "@/lib/siweSession";
+import {
+  clearStoredSiweSession,
+  getStoredSiweSession,
+} from "@/lib/siweSession";
 
 const API_AUTH_PREFIX = "/api/v1/auth";
 

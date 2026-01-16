@@ -87,8 +87,8 @@ export default function CategoryList({
                           isBusy
                             ? `Loading watch status for ${cat.name}`
                             : isWatching
-                            ? `Unwatch ${cat.name}`
-                            : `Watch ${cat.name}`
+                              ? `Unwatch ${cat.name}`
+                              : `Watch ${cat.name}`
                         }
                       >
                         {isBusy ? (

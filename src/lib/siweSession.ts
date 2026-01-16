@@ -133,7 +133,9 @@ export async function waitForStoredSiweJwt(options?: {
   const startedAt = Date.now();
 
   while (Date.now() - startedAt < timeoutMs) {
-    const token = getStoredSiweJwt({ expectedAddress: options?.expectedAddress });
+    const token = getStoredSiweJwt({
+      expectedAddress: options?.expectedAddress,
+    });
     if (token) return token;
     await new Promise((resolve) => setTimeout(resolve, intervalMs));
   }

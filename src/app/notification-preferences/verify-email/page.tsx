@@ -10,7 +10,9 @@ interface VerifyEmailPageProps {
   }>;
 }
 
-export default async function VerifyEmailPage({ searchParams }: VerifyEmailPageProps) {
+export default async function VerifyEmailPage({
+  searchParams,
+}: VerifyEmailPageProps) {
   const { status, error, email } = await searchParams;
 
   const isSuccess = status === "success";

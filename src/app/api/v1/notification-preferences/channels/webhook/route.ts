@@ -26,7 +26,10 @@ export async function POST(request: NextRequest) {
 
   const parsed = BodySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ message: "Invalid request payload" }, { status: 400 });
+    return NextResponse.json(
+      { message: "Invalid request payload" },
+      { status: 400 }
+    );
   }
 
   const payload =
@@ -51,7 +54,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(response);
   } catch (error) {
     console.error("Failed to update webhook channel", error);
-    return NextResponse.json({ message: "Failed to update webhook channel" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to update webhook channel" },
+      { status: 500 }
+    );
   }
 }
-

@@ -5,4 +5,3 @@ export type NotificationSettings = {
   preferences: PreferencesResponse | null;
   eventTypes: EventType[];
 };
-
