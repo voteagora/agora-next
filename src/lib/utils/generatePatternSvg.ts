@@ -1,3 +1,5 @@
+type ColorPalette = { bg: string; dark: string; accent: string };
+
 function hashString(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -29,19 +31,122 @@ const colorPalettes = [
   { bg: "#D4A5E5", dark: "#BA7ACC", accent: "#C98FD9" },
 ];
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function hexToHsl(hex: string) {
+  const sanitized = hex.replace("#", "");
+  const r = parseInt(sanitized.substring(0, 2), 16) / 255;
+  const g = parseInt(sanitized.substring(2, 4), 16) / 255;
+  const b = parseInt(sanitized.substring(4, 6), 16) / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      default:
+        h = (r - g) / d + 4;
+        break;
+    }
+    h /= 6;
+  }
+
+  return { h: h * 360, s: s * 100, l: l * 100 };
+}
+
+function hslToHex(h: number, s: number, l: number) {
+  const normalizedH = h / 360;
+  const normalizedS = s / 100;
+  const normalizedL = l / 100;
+
+  if (normalizedS === 0) {
+    const value = Math.round(normalizedL * 255)
+      .toString(16)
+      .padStart(2, "0");
+    return `#${value}${value}${value}`.toUpperCase();
+  }
+
+  const hueToRgb = (p: number, q: number, t: number) => {
+    let tempT = t;
+    if (tempT < 0) tempT += 1;
+    if (tempT > 1) tempT -= 1;
+    if (tempT < 1 / 6) return p + (q - p) * 6 * tempT;
+    if (tempT < 1 / 2) return q;
+    if (tempT < 2 / 3) return p + (q - p) * (2 / 3 - tempT) * 6;
+    return p;
+  };
+
+  const q =
+    normalizedL < 0.5
+      ? normalizedL * (1 + normalizedS)
+      : normalizedL + normalizedS - normalizedL * normalizedS;
+  const p = 2 * normalizedL - q;
+
+  const r = hueToRgb(p, q, normalizedH + 1 / 3);
+  const g = hueToRgb(p, q, normalizedH);
+  const b = hueToRgb(p, q, normalizedH - 1 / 3);
+
+  const toHex = (value: number) =>
+    Math.round(value * 255)
+      .toString(16)
+      .padStart(2, "0");
+
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+}
+
+function toDarkColor(
+  hex: string,
+  { emphasis = 0 }: { emphasis?: number } = {}
+) {
+  const { h, s, l } = hexToHsl(hex);
+  const adjustedS = clamp(s * 0.8, 18, 72);
+  const baseLightness = clamp(l * 0.3, 12, 24);
+  const adjustedL = clamp(baseLightness + emphasis, 12, 32);
+  return hslToHex(h, adjustedS, adjustedL);
+}
+
+function paletteForMode(
+  palette: ColorPalette,
+  mode: "light" | "dark"
+): ColorPalette {
+  if (mode === "light") {
+    return palette;
+  }
+
+  return {
+    bg: toDarkColor(palette.bg),
+    dark: toDarkColor(palette.dark, { emphasis: 2 }),
+    accent: toDarkColor(palette.accent, { emphasis: 6 }),
+  };
+}
+
 export function generatePatternSvg(
   metadata: string,
   width: number = 400,
   height: number = 280,
   backgroundColor?: string,
   accentColor?: string,
-  gridSizeForced?: number
+  gridSizeForced?: number,
+  mode: "light" | "dark" = "light"
 ): { svg: string; bgColor: string } {
   const hash = hashString(metadata);
   const random = seedRandom(hash);
 
   const colorIndex = hash % colorPalettes.length;
-  const colorset = colorPalettes[colorIndex];
+  const colorset = paletteForMode(colorPalettes[colorIndex], mode);
 
   const gridSize = gridSizeForced || 6;
   const cellSize = width / gridSize;
