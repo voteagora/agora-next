@@ -10,7 +10,7 @@ import { notificationCenterClient } from "@/lib/notification-center/client";
 
 const BodySchema = z.object({
   eventType: z.string().min(1),
-  channel: z.enum(["email", "discord", "telegram", "slack"]),
+  channel: z.enum(["email", "discord", "telegram", "slack", "pwa"]),
   state: z.enum(["on", "off"]),
 });
 

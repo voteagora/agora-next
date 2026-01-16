@@ -814,6 +814,18 @@ export default function NotificationPreferencesClient() {
         subscribe={pushState.subscribe}
         unsubscribe={pushState.unsubscribe}
       />
+      
+      {/* DEBUG: Temporary box to copy keys */}
+      {pushState.subscription && (
+        <div className="mt-8 p-4 bg-gray-100 rounded-lg">
+          <p className="text-xs font-bold mb-2">DEBUG PWA KEYS (Copy ME):</p>
+          <textarea 
+            className="w-full h-32 text-xs font-mono p-2 border rounded"
+            readOnly
+            value={JSON.stringify(pushState.subscription, null, 2)}
+          />
+        </div>
+      )}
       <PreferencesMatrix
         eventTypes={eventTypes}
         preferences={preferences}
