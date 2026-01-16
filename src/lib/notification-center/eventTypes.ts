@@ -3,6 +3,7 @@ import type { PreferenceState } from "./types";
 export const EVENT_CATEGORIES = [
   { id: "proposals", label: "Proposals" },
   { id: "forums", label: "Forums" },
+  { id: "grants", label: "Grants" },
 ] as const;
 
 export type EventCategoryId = (typeof EVENT_CATEGORIES)[number]["id"];
@@ -21,6 +22,27 @@ export const EVENT_TYPE_DEFINITIONS: EventTypeDefinition[] = [
     display_name: "New Proposal Created",
     description: "When a new governance proposal is published",
     category: "proposals",
+    default_state: "on",
+  },
+  {
+    event_type: "grants.application.submitted",
+    display_name: "Grant Application Submitted",
+    description: "A new grant application was submitted",
+    category: "grants",
+    default_state: "on",
+  },
+  {
+    event_type: "grants.application.accepted",
+    display_name: "Grant Application Accepted",
+    description: "A grant application was accepted",
+    category: "grants",
+    default_state: "on",
+  },
+  {
+    event_type: "grants.application.rejected",
+    display_name: "Grant Application Rejected",
+    description: "A grant application was rejected",
+    category: "grants",
     default_state: "on",
   },
   {
