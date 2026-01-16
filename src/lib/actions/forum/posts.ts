@@ -32,7 +32,7 @@ import {
   addRecipientAttributeValue,
   buildForumPostUrl,
   buildForumTopicUrl,
-  emitBroadcastEvent,
+  emitCompoundEvent,
   emitDirectEvent,
 } from "@/lib/notification-center/emitter";
 const { slug } = Tenant.current();
@@ -433,41 +433,10 @@ export async function createForumPost(
       const preview = buildPreview(validatedData.content);
       const topicUrl = buildForumTopicUrl(topicId, topic.title);
 
-      // Notify users engaged in this topic (excludes author)
-      emitBroadcastEvent(
-        "forum_comment_engaged",
-        String(newPost.id),
-        {
-          attributes: { engaged_topics: { $contains: topicId } },
-          exclude_recipient_ids: [normalizedAddress],
-        },
-        {
-          dao_name: slug,
-          topic_title: topic.title,
-          topic_url: topicUrl,
-          comment_preview: preview,
-          author_address: normalizedAddress,
-        }
-      );
+      const dedupeGroup = "forum_post_created";
+      const dedupeKey = `forum_post:${newPost.id}`;
 
-      // Notify users watching this topic (excludes author)
-      // Note: Users who are both engaged AND watching may receive duplicate notifications
-      // This is intentional as they've expressed interest in both ways
-      emitBroadcastEvent(
-        "forum_comment_watched",
-        String(newPost.id),
-        {
-          attributes: { subscribed_topics: { $contains: topicId } },
-          exclude_recipient_ids: [normalizedAddress],
-        },
-        {
-          dao_name: slug,
-          topic_title: topic.title,
-          topic_url: topicUrl,
-          comment_preview: preview,
-          author_address: normalizedAddress,
-        }
-      );
+      const candidates: Parameters<typeof emitCompoundEvent>[2] = [];
 
       if (validatedData.parentId) {
         const parentPost = await prismaWeb2Client.forumPost.findUnique({
@@ -481,20 +450,59 @@ export async function createForumPost(
         ) {
           // Link directly to the reply post
           const postUrl = buildForumPostUrl(topicId, topic.title, newPost.id);
-          emitDirectEvent(
-            "forum_reply_to_your_comment",
-            parentPost.address,
-            String(newPost.id),
-            {
+          candidates.push({
+            kind: "direct",
+            eventType: "forum_reply_to_your_comment",
+            entityId: String(newPost.id),
+            recipientIds: [parentPost.address],
+            data: {
               dao_name: slug,
               topic_title: topic.title,
               topic_url: postUrl,
               reply_preview: preview,
               replier_address: normalizedAddress,
-            }
-          );
+            },
+          });
         }
       }
+
+      // Prefer "watched" over "engaged" when audiences overlap.
+      candidates.push(
+        {
+          kind: "broadcast",
+          eventType: "forum_comment_watched",
+          entityId: String(newPost.id),
+          filter: {
+            attributes: { subscribed_topics: { $contains: topicId } },
+            exclude_recipient_ids: [normalizedAddress],
+          },
+          data: {
+            dao_name: slug,
+            topic_title: topic.title,
+            topic_url: topicUrl,
+            comment_preview: preview,
+            author_address: normalizedAddress,
+          },
+        },
+        {
+          kind: "broadcast",
+          eventType: "forum_comment_engaged",
+          entityId: String(newPost.id),
+          filter: {
+            attributes: { engaged_topics: { $contains: topicId } },
+            exclude_recipient_ids: [normalizedAddress],
+          },
+          data: {
+            dao_name: slug,
+            topic_title: topic.title,
+            topic_url: topicUrl,
+            comment_preview: preview,
+            author_address: normalizedAddress,
+          },
+        }
+      );
+
+      emitCompoundEvent(dedupeGroup, dedupeKey, candidates);
     }
 
     const engagementCount = await prismaWeb2Client.forumPost.count({

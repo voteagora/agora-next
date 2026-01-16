@@ -83,6 +83,38 @@ export interface BroadcastEventPayload {
   priority?: "high" | "normal" | "low";
 }
 
+export type CompoundEventCandidatePayload =
+  | {
+      kind: "direct";
+      event_type: string;
+      entity_id?: string;
+      recipients: Array<{ recipient_id: string; channels: ChannelType[] }>;
+      data: Record<string, unknown>;
+      template_id?: string;
+      priority?: "high" | "normal" | "low";
+    }
+  | {
+      kind: "broadcast";
+      event_type: string;
+      entity_id?: string;
+      filter?: {
+        attributes?: Record<string, unknown>;
+        recipient_ids?: string[];
+        recipient_type?: RecipientType;
+        exclude_recipient_ids?: string[];
+      };
+      channels: ChannelType[];
+      data: Record<string, unknown>;
+      template_id?: string;
+      priority?: "high" | "normal" | "low";
+    };
+
+export interface CompoundEventPayload {
+  dedupe_group: string;
+  dedupe_key: string;
+  candidates: CompoundEventCandidatePayload[];
+}
+
 function getClientConfig() {
   const baseUrl = process.env.NOTIFICATION_CENTER_URL;
   const apiKey = process.env.NOTIFICATION_CENTER_API_KEY;
@@ -486,6 +518,23 @@ export class NotificationCenterClient {
       : undefined;
     return jsonRequest<EventAcceptedResponse>(
       "/events/broadcast",
+      "POST",
+      payload,
+      false,
+      "idempotent",
+      headers
+    );
+  }
+
+  async sendCompoundEvent(
+    payload: CompoundEventPayload,
+    options?: { idempotencyKey?: string }
+  ): Promise<EventAcceptedResponse | null> {
+    const headers = options?.idempotencyKey
+      ? { "Idempotency-Key": options.idempotencyKey }
+      : undefined;
+    return jsonRequest<EventAcceptedResponse>(
+      "/events/compound",
       "POST",
       payload,
       false,

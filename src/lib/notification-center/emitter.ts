@@ -5,6 +5,7 @@ import { hashStableJson } from "@/lib/crypto/stableJson";
 import {
   notificationCenterClient,
   type BroadcastEventPayload,
+  type CompoundEventPayload,
   type SendEventPayload,
 } from "./client";
 import type { ChannelType, RecipientType } from "./types";
@@ -193,6 +194,88 @@ export function emitBroadcastEvent(
       idempotencyKey,
     });
   })().catch((error) => console.error("Failed to emit broadcast event", error));
+}
+
+export type CompoundCandidateInput =
+  | {
+      kind: "direct";
+      eventType: string;
+      entityId: string;
+      recipientIds: string[];
+      data: Record<string, unknown>;
+      templateId?: string;
+      priority?: "high" | "normal" | "low";
+    }
+  | {
+      kind: "broadcast";
+      eventType: string;
+      entityId: string;
+      filter?: AudienceFilter;
+      data: Record<string, unknown>;
+      templateId?: string;
+      priority?: "high" | "normal" | "low";
+    };
+
+export function emitCompoundEvent(
+  dedupeGroup: string,
+  dedupeKey: string,
+  candidates: CompoundCandidateInput[]
+) {
+  if (!candidates.length) {
+    return;
+  }
+
+  void (async () => {
+    const channels = await resolveEmissionChannels();
+
+    const payload: CompoundEventPayload = {
+      dedupe_group: dedupeGroup,
+      dedupe_key: dedupeKey,
+      candidates: candidates.map((candidate) => {
+        if (candidate.kind === "direct") {
+          return {
+            kind: "direct",
+            event_type: candidate.eventType,
+            entity_id: candidate.entityId,
+            recipients: candidate.recipientIds.map((recipientId) => ({
+              recipient_id: normalizeRecipientId(recipientId),
+              channels,
+            })),
+            data: candidate.data,
+            ...(candidate.templateId !== undefined
+              ? { template_id: candidate.templateId }
+              : {}),
+            ...(candidate.priority !== undefined
+              ? { priority: candidate.priority }
+              : {}),
+          };
+        }
+
+        return {
+          kind: "broadcast",
+          event_type: candidate.eventType,
+          entity_id: candidate.entityId,
+          ...(candidate.filter !== undefined ? { filter: candidate.filter } : {}),
+          channels,
+          data: candidate.data,
+          ...(candidate.templateId !== undefined
+            ? { template_id: candidate.templateId }
+            : {}),
+          ...(candidate.priority !== undefined
+            ? { priority: candidate.priority }
+            : {}),
+        };
+      }),
+    };
+
+    const idempotencyKey = `agora-${hashStableJson({
+      kind: "compound",
+      dedupe_group: payload.dedupe_group,
+      dedupe_key: payload.dedupe_key,
+    }).slice(2)}`;
+
+    await notificationCenterClient.sendCompoundEvent(payload, { idempotencyKey });
+  })().catch((error) => console.error("Failed to emit compound event", error));
 }
 
 type AttributeKey =
