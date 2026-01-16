@@ -4,8 +4,8 @@ import Tenant from "@/lib/tenant/tenant";
 export async function POST(request: NextRequest) {
   try {
     const { namespace } = Tenant.current();
-    const hubUrl = process.env.NOTIFICATION_HUB_API_URL;
-    const apiKey = process.env.NOTIFICATION_HUB_API_KEY;
+    const hubUrl = process.env.NOTIFICATION_CENTER_URL;
+    const apiKey = process.env.NOTIFICATION_CENTER_API_KEY;
 
     if (!hubUrl || !apiKey) {
       return NextResponse.json(
