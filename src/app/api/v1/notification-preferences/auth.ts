@@ -28,4 +28,3 @@ export async function requireNotificationPreferencesAuth(
 
   return { ok: true, recipientId: auth.userId.toLowerCase() };
 }
-

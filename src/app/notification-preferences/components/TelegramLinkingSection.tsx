@@ -31,7 +31,9 @@ export default function TelegramLinkingSection({
 }: TelegramLinkingSectionProps) {
   const isLinked = !!chatId;
   const expiresInMinutes =
-    expiresAt && !isLinked ? Math.max(0, Math.ceil((expiresAt - Date.now()) / 60000)) : null;
+    expiresAt && !isLinked
+      ? Math.max(0, Math.ceil((expiresAt - Date.now()) / 60000))
+      : null;
 
   return (
     <section className="rounded-2xl border border-line bg-white p-6 shadow-newDefault">
@@ -70,7 +72,9 @@ export default function TelegramLinkingSection({
               <Button
                 size="sm"
                 className="mt-3"
-                onClick={() => window.open(linkingUrl, "_blank", "noopener,noreferrer")}
+                onClick={() =>
+                  window.open(linkingUrl, "_blank", "noopener,noreferrer")
+                }
               >
                 Open Telegram
               </Button>

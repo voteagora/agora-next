@@ -5,16 +5,12 @@ import { hashStableJson } from "@/lib/crypto/stableJson";
 import {
   notificationCenterClient,
   type BroadcastEventPayload,
+  type CompoundEventPayload,
   type SendEventPayload,
 } from "./client";
 import type { ChannelType, RecipientType } from "./types";
 
-const ALL_CHANNELS: ChannelType[] = [
-  "email",
-  "telegram",
-  "discord",
-  "slack",
-];
+const ALL_CHANNELS: ChannelType[] = ["email", "telegram", "discord", "slack"];
 
 const CHANNEL_SET = new Set<ChannelType>(ALL_CHANNELS);
 const ALLOWED_CHANNELS_CACHE_TTL_MS = 5 * 60 * 1000;
@@ -31,7 +27,9 @@ function parseChannelsList(value: string): ChannelType[] {
   const channels = value
     .split(/[,\s]+/)
     .map((entry) => entry.trim().toLowerCase())
-    .filter((entry): entry is ChannelType => CHANNEL_SET.has(entry as ChannelType));
+    .filter((entry): entry is ChannelType =>
+      CHANNEL_SET.has(entry as ChannelType)
+    );
 
   return [...new Set(channels)];
 }
@@ -55,7 +53,9 @@ async function resolveEmissionChannels(): Promise<ChannelType[]> {
   allowedChannelsInflight = (async () => {
     try {
       const me = await notificationCenterClient.getMe();
-      const allowed = (me?.allowed_channels ?? []).filter((channel) => CHANNEL_SET.has(channel));
+      const allowed = (me?.allowed_channels ?? []).filter((channel) =>
+        CHANNEL_SET.has(channel)
+      );
 
       const resolved = allowed.length ? allowed : ALL_CHANNELS;
       allowedChannelsCache = {
@@ -64,7 +64,10 @@ async function resolveEmissionChannels(): Promise<ChannelType[]> {
       };
       return resolved;
     } catch (error) {
-      console.warn("Failed to resolve Notification Center allowed channels", error);
+      console.warn(
+        "Failed to resolve Notification Center allowed channels",
+        error
+      );
       allowedChannelsCache = {
         channels: ALL_CHANNELS,
         expiresAtMs: Date.now() + 30_000,
@@ -106,7 +109,10 @@ function getSiteBaseUrl(): string {
   return "";
 }
 
-export function buildForumTopicUrl(topicId: number, title?: string | null): string {
+export function buildForumTopicUrl(
+  topicId: number,
+  title?: string | null
+): string {
   const path = buildForumTopicPath(topicId, title);
   const baseUrl = getSiteBaseUrl();
   return baseUrl ? `${baseUrl}${path}` : path;
@@ -184,8 +190,92 @@ export function emitBroadcastEvent(
       data,
     };
 
-    await notificationCenterClient.sendBroadcastEvent(payload, { idempotencyKey });
+    await notificationCenterClient.sendBroadcastEvent(payload, {
+      idempotencyKey,
+    });
   })().catch((error) => console.error("Failed to emit broadcast event", error));
+}
+
+export type CompoundCandidateInput =
+  | {
+      kind: "direct";
+      eventType: string;
+      entityId: string;
+      recipientIds: string[];
+      data: Record<string, unknown>;
+      templateId?: string;
+      priority?: "high" | "normal" | "low";
+    }
+  | {
+      kind: "broadcast";
+      eventType: string;
+      entityId: string;
+      filter?: AudienceFilter;
+      data: Record<string, unknown>;
+      templateId?: string;
+      priority?: "high" | "normal" | "low";
+    };
+
+export function emitCompoundEvent(
+  dedupeGroup: string,
+  dedupeKey: string,
+  candidates: CompoundCandidateInput[]
+) {
+  if (!candidates.length) {
+    return;
+  }
+
+  void (async () => {
+    const channels = await resolveEmissionChannels();
+
+    const payload: CompoundEventPayload = {
+      dedupe_group: dedupeGroup,
+      dedupe_key: dedupeKey,
+      candidates: candidates.map((candidate) => {
+        if (candidate.kind === "direct") {
+          return {
+            kind: "direct",
+            event_type: candidate.eventType,
+            entity_id: candidate.entityId,
+            recipients: candidate.recipientIds.map((recipientId) => ({
+              recipient_id: normalizeRecipientId(recipientId),
+              channels,
+            })),
+            data: candidate.data,
+            ...(candidate.templateId !== undefined
+              ? { template_id: candidate.templateId }
+              : {}),
+            ...(candidate.priority !== undefined
+              ? { priority: candidate.priority }
+              : {}),
+          };
+        }
+
+        return {
+          kind: "broadcast",
+          event_type: candidate.eventType,
+          entity_id: candidate.entityId,
+          ...(candidate.filter !== undefined ? { filter: candidate.filter } : {}),
+          channels,
+          data: candidate.data,
+          ...(candidate.templateId !== undefined
+            ? { template_id: candidate.templateId }
+            : {}),
+          ...(candidate.priority !== undefined
+            ? { priority: candidate.priority }
+            : {}),
+        };
+      }),
+    };
+
+    const idempotencyKey = `agora-${hashStableJson({
+      kind: "compound",
+      dedupe_group: payload.dedupe_group,
+      dedupe_key: payload.dedupe_key,
+    }).slice(2)}`;
+
+    await notificationCenterClient.sendCompoundEvent(payload, { idempotencyKey });
+  })().catch((error) => console.error("Failed to emit compound event", error));
 }
 
 type AttributeKey =
@@ -242,16 +332,20 @@ async function updateRecipientAttributeListAtomicOrThrow(
 
   if (action === "add") {
     await ensureRecipientExists(normalizedId);
-    await notificationCenterClient.addRecipientAttributeArrayValues(normalizedId, key, [
-      normalizedValue,
-    ]);
+    await notificationCenterClient.addRecipientAttributeArrayValues(
+      normalizedId,
+      key,
+      [normalizedValue]
+    );
     return;
   }
 
   try {
-    await notificationCenterClient.removeRecipientAttributeArrayValues(normalizedId, key, [
-      normalizedValue,
-    ]);
+    await notificationCenterClient.removeRecipientAttributeArrayValues(
+      normalizedId,
+      key,
+      [normalizedValue]
+    );
   } catch (error) {
     if (isNotFoundError(error)) {
       return;
@@ -265,7 +359,12 @@ export async function addRecipientAttributeValueAtomic(
   key: AttributeKey,
   value: AttributeValue
 ) {
-  await updateRecipientAttributeListAtomicOrThrow(recipientId, key, value, "add");
+  await updateRecipientAttributeListAtomicOrThrow(
+    recipientId,
+    key,
+    value,
+    "add"
+  );
 }
 
 export async function removeRecipientAttributeValueAtomic(
@@ -273,7 +372,12 @@ export async function removeRecipientAttributeValueAtomic(
   key: AttributeKey,
   value: AttributeValue
 ) {
-  await updateRecipientAttributeListAtomicOrThrow(recipientId, key, value, "remove");
+  await updateRecipientAttributeListAtomicOrThrow(
+    recipientId,
+    key,
+    value,
+    "remove"
+  );
 }
 
 export function addRecipientAttributeValue(
@@ -281,8 +385,8 @@ export function addRecipientAttributeValue(
   key: AttributeKey,
   value: AttributeValue
 ) {
-  void addRecipientAttributeValueAtomic(recipientId, key, value).catch((error) =>
-    console.error("Failed to update recipient attributes", error)
+  void addRecipientAttributeValueAtomic(recipientId, key, value).catch(
+    (error) => console.error("Failed to update recipient attributes", error)
   );
 }
 
@@ -291,7 +395,7 @@ export function removeRecipientAttributeValue(
   key: AttributeKey,
   value: AttributeValue
 ) {
-  void removeRecipientAttributeValueAtomic(recipientId, key, value).catch((error) =>
-    console.error("Failed to update recipient attributes", error)
+  void removeRecipientAttributeValueAtomic(recipientId, key, value).catch(
+    (error) => console.error("Failed to update recipient attributes", error)
   );
 }

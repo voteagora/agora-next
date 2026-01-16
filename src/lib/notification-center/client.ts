@@ -31,7 +31,10 @@ export interface PreferenceUpdateEntry {
   state: PreferenceState;
 }
 
-export type PreferencesUpdate = Record<string, Record<ChannelType, PreferenceUpdateEntry>>;
+export type PreferencesUpdate = Record<
+  string,
+  Record<ChannelType, PreferenceUpdateEntry>
+>;
 
 export interface SuccessResponse {
   success: boolean;
@@ -78,6 +81,38 @@ export interface BroadcastEventPayload {
   data: Record<string, unknown>;
   template_id?: string;
   priority?: "high" | "normal" | "low";
+}
+
+export type CompoundEventCandidatePayload =
+  | {
+      kind: "direct";
+      event_type: string;
+      entity_id?: string;
+      recipients: Array<{ recipient_id: string; channels: ChannelType[] }>;
+      data: Record<string, unknown>;
+      template_id?: string;
+      priority?: "high" | "normal" | "low";
+    }
+  | {
+      kind: "broadcast";
+      event_type: string;
+      entity_id?: string;
+      filter?: {
+        attributes?: Record<string, unknown>;
+        recipient_ids?: string[];
+        recipient_type?: RecipientType;
+        exclude_recipient_ids?: string[];
+      };
+      channels: ChannelType[];
+      data: Record<string, unknown>;
+      template_id?: string;
+      priority?: "high" | "normal" | "low";
+    };
+
+export interface CompoundEventPayload {
+  dedupe_group: string;
+  dedupe_key: string;
+  candidates: CompoundEventCandidatePayload[];
 }
 
 function getClientConfig() {
@@ -128,11 +163,23 @@ function isNoRetryError(error: unknown): error is NoRetryError {
 }
 
 function isRetryableStatus(status: number): boolean {
-  return status === 408 || status === 425 || status === 429 || status === 502 || status === 503 || status === 504;
+  return (
+    status === 408 ||
+    status === 425 ||
+    status === 429 ||
+    status === 502 ||
+    status === 503 ||
+    status === 504
+  );
 }
 
 function isIdempotentMethod(method: string): boolean {
-  return method === "GET" || method === "HEAD" || method === "PUT" || method === "DELETE";
+  return (
+    method === "GET" ||
+    method === "HEAD" ||
+    method === "PUT" ||
+    method === "DELETE"
+  );
 }
 
 function isIdempotentRequest(method: string, headers: Headers): boolean {
@@ -196,7 +243,9 @@ async function request<T>(
 
   const method = (options.method ?? "GET").toUpperCase();
   const resolvedRetryMode =
-    retryMode === "idempotent" && isIdempotentRequest(method, headers) ? retryMode : "none";
+    retryMode === "idempotent" && isIdempotentRequest(method, headers)
+      ? retryMode
+      : "none";
 
   const timeoutMs = DEFAULT_TIMEOUT_MS;
   const maxRetries = resolvedRetryMode === "idempotent" ? DEFAULT_RETRIES : 0;
@@ -284,18 +333,34 @@ export class NotificationCenterClient {
   }
 
   async getRecipient(recipientId: string): Promise<Recipient | null> {
-    return request<Recipient>(`/recipients/${recipientId}`, { method: "GET" }, true);
+    return request<Recipient>(
+      `/recipients/${recipientId}`,
+      { method: "GET" },
+      true
+    );
   }
 
-  async createRecipient(payload: CreateRecipientInput): Promise<SuccessResponse | null> {
-    return jsonRequest<SuccessResponse>("/recipients", "POST", payload, false, "none");
+  async createRecipient(
+    payload: CreateRecipientInput
+  ): Promise<SuccessResponse | null> {
+    return jsonRequest<SuccessResponse>(
+      "/recipients",
+      "POST",
+      payload,
+      false,
+      "none"
+    );
   }
 
   async updateRecipient(
     recipientId: string,
     payload: UpdateRecipientInput
   ): Promise<SuccessResponse | null> {
-    return jsonRequest<SuccessResponse>(`/recipients/${recipientId}`, "PUT", payload);
+    return jsonRequest<SuccessResponse>(
+      `/recipients/${recipientId}`,
+      "PUT",
+      payload
+    );
   }
 
   async updateChannel(
@@ -312,7 +377,10 @@ export class NotificationCenterClient {
     );
   }
 
-  async deleteChannel(recipientId: string, channel: ChannelType): Promise<SuccessResponse | null> {
+  async deleteChannel(
+    recipientId: string,
+    channel: ChannelType
+  ): Promise<SuccessResponse | null> {
     return jsonRequest<SuccessResponse>(
       `/recipients/${recipientId}/channels/${channel}`,
       "DELETE",
@@ -348,8 +416,12 @@ export class NotificationCenterClient {
     );
   }
 
-  async getPreferences(recipientId: string): Promise<PreferencesResponse | null> {
-    return request<PreferencesResponse>(`/preferences/${recipientId}`, { method: "GET" });
+  async getPreferences(
+    recipientId: string
+  ): Promise<PreferencesResponse | null> {
+    return request<PreferencesResponse>(`/preferences/${recipientId}`, {
+      method: "GET",
+    });
   }
 
   async updatePreferences(
@@ -367,11 +439,17 @@ export class NotificationCenterClient {
     channel: ChannelType,
     state: PreferenceState
   ): Promise<SuccessResponse | null> {
-    return jsonRequest<SuccessResponse>(`/preferences/${recipientId}/set`, "POST", {
-      event_type: eventType,
-      channel,
-      state,
-    }, false, "none");
+    return jsonRequest<SuccessResponse>(
+      `/preferences/${recipientId}/set`,
+      "POST",
+      {
+        event_type: eventType,
+        channel,
+        state,
+      },
+      false,
+      "none"
+    );
   }
 
   async getEventTypes(): Promise<EventTypesResponse | null> {
@@ -389,15 +467,29 @@ export class NotificationCenterClient {
       metadata?: Record<string, unknown>;
     }>
   ): Promise<BatchCreateEventTypesResponse | null> {
-    return jsonRequest<BatchCreateEventTypesResponse>("/event-types/batch", "POST", {
-      event_types,
-    }, false, "none");
+    return jsonRequest<BatchCreateEventTypesResponse>(
+      "/event-types/batch",
+      "POST",
+      {
+        event_types,
+      },
+      false,
+      "none"
+    );
   }
 
-  async initiateTelegramLinking(recipientId: string): Promise<LinkingInitResponse | null> {
-    return jsonRequest<LinkingInitResponse>("/link/telegram/initiate", "POST", {
-      recipient_id: recipientId,
-    }, false, "none");
+  async initiateTelegramLinking(
+    recipientId: string
+  ): Promise<LinkingInitResponse | null> {
+    return jsonRequest<LinkingInitResponse>(
+      "/link/telegram/initiate",
+      "POST",
+      {
+        recipient_id: recipientId,
+      },
+      false,
+      "none"
+    );
   }
 
   async sendEvent(
@@ -434,20 +526,49 @@ export class NotificationCenterClient {
     );
   }
 
+  async sendCompoundEvent(
+    payload: CompoundEventPayload,
+    options?: { idempotencyKey?: string }
+  ): Promise<EventAcceptedResponse | null> {
+    const headers = options?.idempotencyKey
+      ? { "Idempotency-Key": options.idempotencyKey }
+      : undefined;
+    return jsonRequest<EventAcceptedResponse>(
+      "/events/compound",
+      "POST",
+      payload,
+      false,
+      "idempotent",
+      headers
+    );
+  }
+
   async initiateEmailVerification(
     recipientId: string
   ): Promise<EmailVerificationInitResponse | null> {
-    return jsonRequest<EmailVerificationInitResponse>("/email/verify/initiate", "POST", {
-      recipient_id: recipientId,
-    }, false, "none");
+    return jsonRequest<EmailVerificationInitResponse>(
+      "/email/verify/initiate",
+      "POST",
+      {
+        recipient_id: recipientId,
+      },
+      false,
+      "none"
+    );
   }
 
   async resendEmailVerification(
     recipientId: string
   ): Promise<EmailVerificationInitResponse | null> {
-    return jsonRequest<EmailVerificationInitResponse>("/email/verify/resend", "POST", {
-      recipient_id: recipientId,
-    }, false, "none");
+    return jsonRequest<EmailVerificationInitResponse>(
+      "/email/verify/resend",
+      "POST",
+      {
+        recipient_id: recipientId,
+      },
+      false,
+      "none"
+    );
   }
 }
 

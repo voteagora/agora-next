@@ -13,7 +13,9 @@ export async function POST(request: NextRequest) {
 
   try {
     await ensureNotificationRecipient(auth.recipientId);
-    const response = await notificationCenterClient.resendEmailVerification(auth.recipientId);
+    const response = await notificationCenterClient.resendEmailVerification(
+      auth.recipientId
+    );
     return NextResponse.json(response);
   } catch (error) {
     console.error("Failed to resend email verification", error);
@@ -23,4 +25,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

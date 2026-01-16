@@ -87,13 +87,18 @@ type CacheEntry = {
 };
 
 const subscriptionsCache = new Map<string, CacheEntry>();
-const subscriptionsInFlight = new Map<string, Promise<ForumSubscriptionsResult>>();
+const subscriptionsInFlight = new Map<
+  string,
+  Promise<ForumSubscriptionsResult>
+>();
 
 function getCacheKey(address: string): string {
   return address.toLowerCase();
 }
 
-function getCachedSubscriptions(address: string): ForumSubscriptionsResult | null {
+function getCachedSubscriptions(
+  address: string
+): ForumSubscriptionsResult | null {
   const key = getCacheKey(address);
   const entry = subscriptionsCache.get(key);
   if (!entry) return null;
@@ -104,7 +109,10 @@ function getCachedSubscriptions(address: string): ForumSubscriptionsResult | nul
   return entry.value;
 }
 
-function setCachedSubscriptions(address: string, value: ForumSubscriptionsResult) {
+function setCachedSubscriptions(
+  address: string,
+  value: ForumSubscriptionsResult
+) {
   const key = getCacheKey(address);
   subscriptionsCache.set(key, {
     value,
@@ -185,9 +193,7 @@ export async function unsubscribeFromForumContent(data: SignedRequest) {
   }
 }
 
-export async function getForumSubscriptions(
-  address: string
-) {
+export async function getForumSubscriptions(address: string) {
   try {
     const recipientId = address.toLowerCase();
 
@@ -204,22 +210,30 @@ export async function getForumSubscriptions(
     }
 
     const fetchPromise = (async (): Promise<ForumSubscriptionsResult> => {
-      const recipient = await notificationCenterClient.getRecipient(recipientId);
+      const recipient =
+        await notificationCenterClient.getRecipient(recipientId);
 
-      const attributes = (recipient?.attributes as Record<string, unknown>) ?? {};
+      const attributes =
+        (recipient?.attributes as Record<string, unknown>) ?? {};
 
       const subscribedTopics = Array.isArray(attributes.subscribed_topics)
         ? attributes.subscribed_topics
         : [];
-      const subscribedCategories = Array.isArray(attributes.subscribed_categories)
+      const subscribedCategories = Array.isArray(
+        attributes.subscribed_categories
+      )
         ? attributes.subscribed_categories
         : [];
 
       const result: ForumSubscriptionsResult = {
-        topicSubscriptions: subscribedTopics.map((topicId: number) => ({ topicId })),
-        categorySubscriptions: subscribedCategories.map((categoryId: number) => ({
-          categoryId,
+        topicSubscriptions: subscribedTopics.map((topicId: number) => ({
+          topicId,
         })),
+        categorySubscriptions: subscribedCategories.map(
+          (categoryId: number) => ({
+            categoryId,
+          })
+        ),
       };
 
       setCachedSubscriptions(recipientId, result);

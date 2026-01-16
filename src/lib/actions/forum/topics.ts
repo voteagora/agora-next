@@ -414,8 +414,16 @@ export async function createForumTopic(
       }).catch((error) => console.error("Failed to index new topic:", error));
     }
 
-    addRecipientAttributeValue(normalizedAddress, "authored_topics", newTopic.id);
-    addRecipientAttributeValue(normalizedAddress, "engaged_topics", newTopic.id);
+    addRecipientAttributeValue(
+      normalizedAddress,
+      "authored_topics",
+      newTopic.id
+    );
+    addRecipientAttributeValue(
+      normalizedAddress,
+      "engaged_topics",
+      newTopic.id
+    );
 
     if (!isNsfw && newTopic.categoryId) {
       const category = await prismaWeb2Client.forumCategory.findUnique({
@@ -427,7 +435,9 @@ export async function createForumTopic(
         "forum_discussion_in_watched_category",
         String(newTopic.id),
         {
-          attributes: { subscribed_categories: { $contains: newTopic.categoryId } },
+          attributes: {
+            subscribed_categories: { $contains: newTopic.categoryId },
+          },
           exclude_recipient_ids: [normalizedAddress],
         },
         {
