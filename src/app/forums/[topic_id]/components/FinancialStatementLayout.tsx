@@ -30,7 +30,9 @@ export default function FinancialStatementLayout({
     }
   };
 
-  const { namespace } = Tenant.current();
+  const tenant = Tenant.current();
+  const { namespace } = tenant;
+  const mode = tenant.ui.theme;
   const hideDiscussButton =
     namespace === TENANT_NAMESPACES.UNISWAP && isOnArticlePage;
 
@@ -44,7 +46,8 @@ export default function FinancialStatementLayout({
     300,
     "transparent",
     "#000000",
-    9
+    9,
+    mode
   );
 
   return (

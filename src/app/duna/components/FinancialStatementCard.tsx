@@ -2,6 +2,7 @@
 
 import React from "react";
 import { generatePatternSvg } from "@/lib/utils/generatePatternSvg";
+import Tenant from "@/lib/tenant/tenant";
 
 interface FinancialStatementCardProps {
   document: {
@@ -32,10 +33,15 @@ export default function FinancialStatementCard({
   isRecentlyReleased = false,
 }: FinancialStatementCardProps) {
   const metadataString = `${document.ipfsCid}-${document.name}-${document.createdAt}`;
+  const mode = Tenant.current().ui.theme;
   const { svg: patternSvg, bgColor } = generatePatternSvg(
     metadataString,
     400,
-    280
+    280,
+    undefined,
+    undefined,
+    undefined,
+    mode
   );
 
   const displayName = removeFileExtension(document.name);
