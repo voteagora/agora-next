@@ -257,6 +257,55 @@ export async function getMyForumTopicVote(topicId: number, address: string) {
   }
 }
 
+export async function getMyVotesForTopics(topicIds: number[], address: string) {
+  try {
+    if (topicIds.length === 0) {
+      return {
+        success: true as const,
+        data: { votedTopicIds: [] as number[] },
+      };
+    }
+
+    const rootPosts = await prismaWeb2Client.forumPost.findMany({
+      where: {
+        dao_slug: slug,
+        topicId: { in: topicIds },
+        parentPostId: null,
+      },
+      select: { id: true, topicId: true },
+    });
+
+    if (rootPosts.length === 0) {
+      return {
+        success: true as const,
+        data: { votedTopicIds: [] as number[] },
+      };
+    }
+
+    const postIdToTopicId = new Map(rootPosts.map((p) => [p.id, p.topicId]));
+    const postIds = rootPosts.map((p) => p.id);
+
+    const votes = await prismaWeb2Client.forumPostVote.findMany({
+      where: {
+        dao_slug: slug,
+        address,
+        postId: { in: postIds },
+        vote: 1,
+      },
+      select: { postId: true },
+    });
+
+    const votedTopicIds = votes
+      .map((v) => postIdToTopicId.get(v.postId))
+      .filter((id): id is number => id !== undefined);
+
+    return { success: true as const, data: { votedTopicIds } };
+  } catch (error) {
+    console.error("Error getting votes for topics:", error);
+    return handlePrismaError(error);
+  }
+}
+
 export async function createForumPost(
   topicId: number,
   data: z.infer<typeof createPostSchema>

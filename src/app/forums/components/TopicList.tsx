@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Bell, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useAccount } from "wagmi";
@@ -24,6 +24,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { useStableCallback } from "@/hooks/useStableCallback";
 import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
 import { useForumSubscriptions } from "@/contexts/ForumSubscriptionsContext";
+import { getMyVotesForTopics } from "@/lib/actions/forum";
 
 const { ui } = Tenant.current();
 
@@ -47,6 +48,51 @@ export default function TopicList({ topics, admins }: TopicListProps) {
     useForumSubscriptions();
   const watchBusy = !isReady || isLoading;
 
+  const [myVotes, setMyVotes] = useState<Set<number>>(new Set());
+  const [votesLoading, setVotesLoading] = useState(false);
+
+  const topicIds = useMemo(() => topics.map((t) => t.id), [topics]);
+
+  useEffect(() => {
+    if (!address || topicIds.length === 0) {
+      setMyVotes(new Set());
+      setVotesLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setVotesLoading(true);
+
+    (async () => {
+      try {
+        const res = await getMyVotesForTopics(topicIds, address);
+        if (!cancelled && res.success && res.data) {
+          setMyVotes(new Set(res.data.votedTopicIds));
+        }
+      } catch {
+        // Silently fail - votes just won't be highlighted
+      } finally {
+        if (!cancelled) setVotesLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [address, topicIds]);
+
+  const setVoted = useCallback((topicId: number, voted: boolean) => {
+    setMyVotes((prev) => {
+      const next = new Set(prev);
+      if (voted) {
+        next.add(topicId);
+      } else {
+        next.delete(topicId);
+      }
+      return next;
+    });
+  }, []);
+
   const handleToggleWatch = (
     e: React.MouseEvent,
     topicId: number,
@@ -68,6 +114,9 @@ export default function TopicList({ topics, admins }: TopicListProps) {
           watchLoading={watchBusy}
           showWatchButton={!!address}
           onToggleWatch={(e) => handleToggleWatch(e, topic.id, topic.title)}
+          hasUpvoted={myVotes.has(topic.id)}
+          votesLoading={votesLoading}
+          onVoteChange={setVoted}
         />
       ))}
     </>
@@ -81,6 +130,9 @@ interface TopicCardProps {
   watchLoading: boolean;
   showWatchButton: boolean;
   onToggleWatch: (e: React.MouseEvent) => void;
+  hasUpvoted: boolean;
+  votesLoading: boolean;
+  onVoteChange: (topicId: number, voted: boolean) => void;
 }
 
 function TopicCard({
@@ -90,49 +142,27 @@ function TopicCard({
   watchLoading,
   showWatchButton,
   onToggleWatch,
+  hasUpvoted,
+  votesLoading,
+  onVoteChange,
 }: TopicCardProps) {
-  const { address } = useAccount();
-  const {
-    upvoteTopic,
-    removeUpvoteTopic,
-    fetchTopicUpvotes,
-    hasUpvotedTopic,
-    checkVPBeforeAction,
-  } = useForum();
+  const { upvoteTopic, removeUpvoteTopic, checkVPBeforeAction } = useForum();
   const [count, setCount] = useState<number>(topic.upvotes || 0);
-  const [mine, setMine] = useState<boolean>(false);
   const [upvoteLoading, setUpvoteLoading] = useState<boolean>(false);
   const requireLogin = useRequireLogin();
   const stableUpvoteTopic = useStableCallback(upvoteTopic);
   const stableRemoveUpvoteTopic = useStableCallback(removeUpvoteTopic);
   const [showVPModal, setShowVPModal] = useState(false);
 
-  useEffect(() => {
-    if (watchLoading) return;
-
-    let mounted = true;
-    (async () => {
-      const c = await fetchTopicUpvotes(topic.id);
-      const m = await hasUpvotedTopic(topic.id);
-      if (mounted) {
-        setCount(c);
-        setMine(m);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [watchLoading, topic.id, address, fetchTopicUpvotes, hasUpvotedTopic]);
-
   const handleUpvote = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (upvoteLoading) return;
+    if (upvoteLoading || votesLoading) return;
     const loggedIn = await requireLogin();
     if (!loggedIn) return;
 
-    if (!mine) {
+    if (!hasUpvoted) {
       const vpCheck = checkVPBeforeAction("upvote");
       if (!vpCheck.canProceed) {
         setShowVPModal(true);
@@ -142,17 +172,17 @@ function TopicCard({
 
     setUpvoteLoading(true);
     try {
-      if (mine) {
+      if (hasUpvoted) {
         const updated = await stableRemoveUpvoteTopic(topic.id);
         if (updated !== null) {
           setCount(updated);
-          setMine(false);
+          onVoteChange(topic.id, false);
         }
       } else {
         const updated = await stableUpvoteTopic(topic.id);
         if (updated !== null) {
           setCount(updated);
-          setMine(true);
+          onVoteChange(topic.id, true);
         }
       }
     } finally {
@@ -236,8 +266,8 @@ function TopicCard({
                         watchLoading
                           ? "Loading watch status"
                           : isWatching
-                          ? "Stop watching"
-                          : "Watch topic"
+                            ? "Stop watching"
+                            : "Watch topic"
                       }
                       className={`flex items-center justify-center text-secondary rounded-md min-w-[40px] h-[42px] hover:bg-neutral transition-colors ${
                         watchLoading ? "opacity-50 cursor-not-allowed" : ""
@@ -246,8 +276,8 @@ function TopicCard({
                         watchLoading
                           ? "Loading watch status"
                           : isWatching
-                          ? "Stop watching"
-                          : "Watch topic"
+                            ? "Stop watching"
+                            : "Watch topic"
                       }
                     >
                       {watchLoading ? (
@@ -264,8 +294,8 @@ function TopicCard({
                       {watchLoading
                         ? "Loading watch status"
                         : isWatching
-                        ? "Stop watching"
-                        : "Get notified of new comments"}
+                          ? "Stop watching"
+                          : "Get notified of new comments"}
                     </p>
                   </TooltipContent>
                 </Tooltip>
@@ -276,8 +306,8 @@ function TopicCard({
             <button
               type="button"
               onClick={handleUpvote}
-              disabled={upvoteLoading}
-              title={mine ? "Remove upvote" : "Upvote"}
+              disabled={upvoteLoading || votesLoading}
+              title={hasUpvoted ? "Remove upvote" : "Upvote"}
               className="flex flex-col items-center justify-center text-secondary rounded-md min-w-[40px] h-[42px] hover:bg-neutral transition-colors"
               aria-label={`${count} upvotes`}
             >
@@ -285,7 +315,7 @@ function TopicCard({
                 className="w-4 h-4"
                 strokeWidth={1.7}
                 color={
-                  mine
+                  hasUpvoted
                     ? rgbStringToHex(ui.customization?.positive)
                     : "currentColor"
                 }

@@ -19,6 +19,7 @@ export {
   removeUpvoteForumTopic,
   getForumTopicUpvotes,
   getMyForumTopicVote,
+  getMyVotesForTopics,
   createForumPost,
   deleteForumPost,
   softDeleteForumPost,
@@ -47,10 +48,7 @@ export {
 } from "./attachments";
 
 // Analytics
-export {
-  trackForumView,
-  getForumViewStats,
-} from "./analytics";
+export { trackForumView, getForumViewStats } from "./analytics";
 
 // Subscriptions
 export {
