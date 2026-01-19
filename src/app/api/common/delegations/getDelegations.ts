@@ -71,34 +71,37 @@ async function getCurrentDelegateesForAddress({
     }
 
     const latestBlock = await contracts.token.provider.getBlock("latest");
+    let advancedDelegateesData: any[] = [];
 
-    const advancedDelegateesDataPromises = advancedDelegatees.map(
-      async (advancedDelegatee) => {
-        return {
-          from: advancedDelegatee.from,
-          to: advancedDelegatee.to,
-          allowance: advancedDelegatee.delegated_amount.toFixed(0),
-          percentage: advancedDelegatee.delegated_share.toString(),
-          timestamp: latestBlock
-            ? getHumanBlockTime(
-                advancedDelegatee.block_number,
-                latestBlock,
-                true
-              )
-            : null,
-          type: "ADVANCED" as const,
-          amount:
-            Number(advancedDelegatee.delegated_share.toFixed(3)) === 1
-              ? ("FULL" as const)
-              : ("PARTIAL" as const),
-          transaction_hash: advancedDelegatee.transaction_hash || "",
-        };
-      }
-    );
+    if (advancedDelegatees.length > 0) {
+      const advancedDelegateesDataPromises = advancedDelegatees.map(
+        async (advancedDelegatee) => {
+          return {
+            from: advancedDelegatee.from,
+            to: advancedDelegatee.to,
+            allowance: advancedDelegatee.delegated_amount.toFixed(0),
+            percentage: advancedDelegatee.delegated_share.toString(),
+            timestamp: latestBlock
+              ? getHumanBlockTime(
+                  advancedDelegatee.block_number,
+                  latestBlock,
+                  true
+                )
+              : null,
+            type: "ADVANCED" as const,
+            amount:
+              Number(advancedDelegatee.delegated_share.toFixed(3)) === 1
+                ? ("FULL" as const)
+                : ("PARTIAL" as const),
+            transaction_hash: advancedDelegatee.transaction_hash || "",
+          };
+        }
+      );
 
-    const advancedDelegateesData = await Promise.all(
-      advancedDelegateesDataPromises
-    );
+      const advancedDelegateesData = await Promise.all(
+        advancedDelegateesDataPromises
+      );
+    }
 
     const directDelegateeData = directDelegatee && {
       from: directDelegatee.delegator,
@@ -234,6 +237,7 @@ async function getCurrentDelegatorsForAddress({
       ? contracts.alligator.address
       : contracts.token.address;
 
+    console.log(contractAddress);
     // Replace with the Agora Governor flag
     if (
       contracts.alligator ||
@@ -378,73 +382,83 @@ async function getCurrentDelegatorsForAddress({
         LIMIT $5;
       `;
 
-    const [delegators, latestBlock] = await Promise.all([
-      paginateResult(async (skip: number, take: number) => {
-        return prismaWeb2Client.$queryRawUnsafe<
-          {
-            from: string;
-            to: string;
-            allowance: Prisma.Decimal;
-            type: "DIRECT" | "ADVANCED";
-            block_number: bigint;
-            amount: "FULL" | "PARTIAL";
-            transaction_hash: string;
-          }[]
-        >(
-          delegatorsQry,
-          address,
-          contractAddress,
-          contracts.token.address,
-          skip,
-          take
-        );
-      }, pagination),
-      contracts.token.provider.getBlock("latest"),
-    ]);
+    try {
+      const [delegators, latestBlock] = await Promise.all([
+        paginateResult(async (skip: number, take: number) => {
+          return prismaWeb2Client.$queryRawUnsafe<
+            {
+              from: string;
+              to: string;
+              allowance: Prisma.Decimal;
+              type: "DIRECT" | "ADVANCED";
+              block_number: bigint;
+              amount: "FULL" | "PARTIAL";
+              transaction_hash: string;
+            }[]
+          >(
+            delegatorsQry,
+            address,
+            contractAddress,
+            contracts.token.address,
+            skip,
+            take
+          );
+        }, pagination),
+        contracts.token.provider.getBlock("latest"),
+      ]);
 
-    const delagtorsData = await Promise.all(
-      delegators.data.map(async (delegator) => ({
-        from: delegator.from,
-        to: delegator.to,
-        allowance:
-          delegator.type === "ADVANCED"
-            ? delegator.allowance.toFixed(0)
-            : (
-                await contracts.token.contract.balanceOf(delegator.from)
-              ).toString(),
-        percentage: "0", // Only used in Agora token partial delegation
-        timestamp: latestBlock
-          ? getHumanBlockTime(delegator.block_number, latestBlock, true)
-          : null,
-        type: delegator.type,
-        amount: delegator.amount,
-        transaction_hash: delegator.transaction_hash,
-      }))
-    );
-
-    var balanceFilter = BigInt(0);
-
-    if (contracts.token.isERC20()) {
-      balanceFilter = BigInt(1e15);
-    } else if (contracts.token.isERC721()) {
-      balanceFilter = BigInt(0);
-    } else {
-      throw new Error(
-        "Token is neither ERC20 nor ERC721, therefore unsupported."
+      const delagtorsData = await Promise.all(
+        delegators.data.map(async (delegator) => ({
+          from: delegator.from,
+          to: delegator.to,
+          allowance:
+            delegator.type === "ADVANCED"
+              ? delegator.allowance.toFixed(0)
+              : (
+                  await contracts.token.contract.balanceOf(delegator.from)
+                ).toString(),
+          percentage: "0", // Only used in Agora token partial delegation
+          timestamp: latestBlock
+            ? getHumanBlockTime(delegator.block_number, latestBlock, true)
+            : null,
+          type: delegator.type,
+          amount: delegator.amount,
+          transaction_hash: delegator.transaction_hash,
+        }))
       );
+
+      var balanceFilter = BigInt(0);
+
+      if (contracts.token.isERC20()) {
+        balanceFilter = BigInt(1e15);
+      } else if (contracts.token.isERC721()) {
+        balanceFilter = BigInt(0);
+      } else {
+        throw new Error(
+          "Token is neither ERC20 nor ERC721, therefore unsupported."
+        );
+      }
+
+      const filteredDelegatorsData = delagtorsData.filter(
+        (delegator) => BigInt(delegator.allowance) > balanceFilter // filter out delegators with 0 (or close to 0) balance
+      );
+
+      return {
+        meta: {
+          ...delegators.meta,
+          total_returned: filteredDelegatorsData.length,
+        },
+        data: filteredDelegatorsData,
+      };
+    } catch (error) {
+      console.log("Error fetching delegates", error);
+      return {
+        meta: {
+          total_returned: 0,
+        },
+        data: [],
+      };
     }
-
-    const filteredDelegatorsData = delagtorsData.filter(
-      (delegator) => BigInt(delegator.allowance) > balanceFilter // filter out delegators with 0 (or close to 0) balance
-    );
-
-    return {
-      meta: {
-        ...delegators.meta,
-        total_returned: filteredDelegatorsData.length,
-      },
-      data: filteredDelegatorsData,
-    };
   });
 }
 
