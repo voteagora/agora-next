@@ -51,7 +51,7 @@ export default function EasApprovalCastVoteButton({ proposal }: Props) {
       <VStack alignItems="items-stretch">
         {!isLoading && votingPower && (
           <div className="pt-3">
-            <span className="flex items-center content-center text-xs font-semibold text-primary">
+            <span className="flex items-center justify-center text-xs font-semibold text-primary">
               Proposal voting power{"\u00A0"}
               {votingPower && <TokenAmountDisplay amount={votingPower} />}
             </span>
