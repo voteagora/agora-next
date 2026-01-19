@@ -87,7 +87,9 @@ export const DeleteAllDraftProposalsDialog = ({
               // Require SIWE JWT before prompting for action signature
               let jwt: string | undefined;
               try {
-                const session = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
+                const session = localStorage.getItem(
+                  LOCAL_STORAGE_SIWE_JWT_KEY
+                );
                 const parsed = session ? JSON.parse(session) : null;
                 jwt = parsed?.access_token as string | undefined;
               } catch {}

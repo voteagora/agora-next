@@ -18,12 +18,8 @@ import {
   Delegation,
 } from "@/app/api/common/delegations/delegation";
 import { Chain } from "viem/chains";
-import {
-  DeleteDraftProposalDialog,
-} from "@/app/proposals/draft/components/DeleteDraftButton";
-import {
-  DeleteAllDraftProposalsDialog as DeleteAllDraftProposalsDialogComponent,
-} from "@/components/Proposals/DraftProposals/ClearAllDraftsButton";
+import { DeleteDraftProposalDialog } from "@/app/proposals/draft/components/DeleteDraftButton";
+import { DeleteAllDraftProposalsDialog as DeleteAllDraftProposalsDialogComponent } from "@/components/Proposals/DraftProposals/ClearAllDraftsButton";
 import CreateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/CreateDraftProposalDialog";
 import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/UpdateDraftProposalDialog";
 import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOnchainProposalDialog";

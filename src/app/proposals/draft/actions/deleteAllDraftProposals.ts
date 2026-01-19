@@ -4,14 +4,12 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import type { FormState } from "@/app/types";
 import { verifySiwe, verifyJwtAndGetAddress } from "./siweAuth";
 
-export async function onSubmitAction(
-  params: {
-    address: `0x${string}`;
-    message?: string;
-    signature?: `0x${string}`;
-    jwt?: string;
-  }
-): Promise<FormState & { deletedCount?: number }> {
+export async function onSubmitAction(params: {
+  address: `0x${string}`;
+  message?: string;
+  signature?: `0x${string}`;
+  jwt?: string;
+}): Promise<FormState & { deletedCount?: number }> {
   try {
     let verifiedAddress: `0x${string}` | null = null;
 

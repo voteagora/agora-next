@@ -61,10 +61,18 @@ export function ProposalsTabsClient({
       <TabsContent value="proposals" className="mt-0">
         {children}
       </TabsContent>
-      <TabsContent value="drafts" className="mt-0 data-[state=inactive]:hidden" forceMount>
+      <TabsContent
+        value="drafts"
+        className="mt-0 data-[state=inactive]:hidden"
+        forceMount
+      >
         {draftsComponent}
       </TabsContent>
-      <TabsContent value="sponsorship" className="mt-0 data-[state=inactive]:hidden" forceMount>
+      <TabsContent
+        value="sponsorship"
+        className="mt-0 data-[state=inactive]:hidden"
+        forceMount
+      >
         {sponsorshipComponent}
       </TabsContent>
     </Tabs>
