@@ -113,6 +113,7 @@ export const getProposalTypeText = (
       return "Joint House Standard Proposal";
     case "HYBRID_APPROVAL":
       return "Joint House Approval Proposal";
+    case "HYBRID_OPTIMISTIC":
     case "HYBRID_OPTIMISTIC_TIERED":
       return "Joint House Optimistic Proposal";
     default:
