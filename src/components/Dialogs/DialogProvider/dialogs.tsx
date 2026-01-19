@@ -18,7 +18,12 @@ import {
   Delegation,
 } from "@/app/api/common/delegations/delegation";
 import { Chain } from "viem/chains";
-import { DeleteDraftProposalDialog } from "@/app/proposals/draft/components/DeleteDraftButton";
+import {
+  DeleteDraftProposalDialog,
+} from "@/app/proposals/draft/components/DeleteDraftButton";
+import {
+  DeleteAllDraftProposalsDialog as DeleteAllDraftProposalsDialogComponent,
+} from "@/components/Proposals/DraftProposals/ClearAllDraftsButton";
 import CreateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/CreateDraftProposalDialog";
 import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/UpdateDraftProposalDialog";
 import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOnchainProposalDialog";
@@ -49,6 +54,7 @@ export type DialogType =
   | CreateDraftProposalDialog
   | DelegateDialogType
   | DeleteDraftProposalDialog
+  | DeleteAllDraftProposalsDialog
   | OpenGithubPRDialog
   | PartialDelegateDialogType
   | RetroPGFShareCardDialog
@@ -226,7 +232,12 @@ export type ApprovalCastVoteDialogType = {
 
 export type DeleteDraftProposalDialog = {
   type: "DELETE_DRAFT_PROPOSAL";
-  params: { proposalId: number };
+  params: { proposalId: number; onDeleteSuccess?: () => void };
+};
+
+export type DeleteAllDraftProposalsDialog = {
+  type: "DELETE_ALL_DRAFT_PROPOSALS";
+  params: { draftCount: number; onSuccess?: () => void };
 };
 
 export type CreateDraftProposalDialog = {
@@ -473,10 +484,18 @@ export const dialogs: DialogDefinitions<DialogType> = {
   SWITCH_NETWORK: ({ chain }: { chain: Chain }, closeDialog) => (
     <SwitchNetwork chain={chain} closeDialog={closeDialog} />
   ),
-  DELETE_DRAFT_PROPOSAL: ({ proposalId }, closeDialog) => (
+  DELETE_DRAFT_PROPOSAL: ({ proposalId, onDeleteSuccess }, closeDialog) => (
     <DeleteDraftProposalDialog
       closeDialog={closeDialog}
       proposalId={proposalId}
+      onDeleteSuccess={onDeleteSuccess}
+    />
+  ),
+  DELETE_ALL_DRAFT_PROPOSALS: ({ draftCount, onSuccess }, closeDialog) => (
+    <DeleteAllDraftProposalsDialogComponent
+      closeDialog={closeDialog}
+      draftCount={draftCount}
+      onSuccess={onSuccess}
     />
   ),
   CREATE_DRAFT_PROPOSAL: ({ redirectUrl, githubUrl }) => (
