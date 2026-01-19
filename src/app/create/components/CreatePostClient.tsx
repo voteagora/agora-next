@@ -64,13 +64,13 @@ export function CreatePostClient({
   const getInitialVotingType = (): EASVotingType => {
     if (
       hasInitialTempCheck &&
-      initialFormData.relatedTempChecks?.[0]?.proposalType?.type
+      initialFormData.relatedTempChecks?.[0]?.votingModule
     ) {
-      const proposalClass =
-        initialFormData.relatedTempChecks[0].proposalType.type.toUpperCase();
-      if (proposalClass === "OPTIMISTIC") return "optimistic";
-      if (proposalClass === "APPROVAL") return "approval";
-      if (proposalClass === "STANDARD") return "standard";
+      const votingModule =
+        initialFormData.relatedTempChecks[0].votingModule.toUpperCase();
+      if (votingModule === "OPTIMISTIC") return "optimistic";
+      if (votingModule === "APPROVAL") return "approval";
+      if (votingModule === "STANDARD") return "standard";
     }
     return "standard";
   };

@@ -97,6 +97,7 @@ async function getInitialFormData(
         status: deriveStatus(fetchedProposal, 18),
         proposer: fetchedProposal.proposer,
         approvalData,
+        votingModule: fetchedProposal.voting_module,
       },
     ];
   }
