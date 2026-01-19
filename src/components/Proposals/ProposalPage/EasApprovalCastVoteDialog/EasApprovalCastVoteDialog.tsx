@@ -20,7 +20,6 @@ export function ReviewEasApprovalVoteDialog({
   votingPower,
   onClose,
   isSubmitting,
-  abstain,
 }: {
   selectedOptions: number[];
   options: ParsedProposalData["APPROVAL"]["kind"]["options"];
@@ -29,7 +28,6 @@ export function ReviewEasApprovalVoteDialog({
   votingPower: string | null;
   onClose: () => void;
   isSubmitting: boolean;
-  abstain: boolean;
 }) {
   const { address } = useAccount();
   const { data } = useEnsName({
@@ -45,14 +43,10 @@ export function ReviewEasApprovalVoteDialog({
             <span className="text-xs">
               {data || truncateAddress(address as string)}
             </span>
-            {!abstain ? (
-              <p className="text-xl font-extrabold">
-                Casting vote for {selectedOptions.length} option
-                {selectedOptions.length > 1 && "s"}
-              </p>
-            ) : (
-              <p className="text-xl font-extrabold">Casting vote as Abstain</p>
-            )}
+            <p className="text-xl font-extrabold">
+              Casting vote for {selectedOptions.length} option
+              {selectedOptions.length > 1 && "s"}
+            </p>
           </div>
           {votingPower ? (
             <div className="flex flex-col">
@@ -107,9 +101,7 @@ export function ReviewEasApprovalVoteDialog({
             "Submitting..."
           ) : (
             <>
-              {abstain
-                ? "Vote as Abstain"
-                : `Vote for ${selectedOptions.length} option`}
+              {`Vote for ${selectedOptions.length} option`}
               {selectedOptions.length > 1 && "s"}
               {votingPower ? (
                 <>
@@ -135,33 +127,17 @@ export function EasApprovalCastVoteDialog({
     proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"];
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [reason, setReason] = useState<string>("");
-  const [abstain, setAbstain] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const maxChecked = proposalData.proposalSettings.maxApprovals;
-  const abstainOptionId = proposalData.options.length;
 
   const { createApprovalVote, isCreatingApprovalVote } = useEASV2();
 
   const handleOnChange = (optionId: number) => {
-    if (optionId === abstainOptionId) {
-      if (abstain) {
-        setSelectedOptions((prev) =>
-          prev.filter((value) => value !== optionId)
-        );
-      } else {
-        setSelectedOptions([]);
-      }
-      setAbstain((prev) => !prev);
-    } else {
-      if (selectedOptions.includes(optionId)) {
-        setSelectedOptions((prev) =>
-          prev.filter((value) => value !== optionId)
-        );
-      } else if (selectedOptions.length < maxChecked) {
-        setAbstain(false);
-        setSelectedOptions((prev) => [...prev, optionId]);
-      }
+    if (selectedOptions.includes(optionId)) {
+      setSelectedOptions((prev) => prev.filter((value) => value !== optionId));
+    } else if (selectedOptions.length < maxChecked) {
+      setSelectedOptions((prev) => [...prev, optionId]);
     }
   };
 
@@ -231,7 +207,6 @@ export function EasApprovalCastVoteDialog({
         onClose={() => {
           setInReviewStep(false);
         }}
-        abstain={abstain}
       />
     );
   }
@@ -259,20 +234,9 @@ export function EasApprovalCastVoteDialog({
               title={option.description}
               description={<p></p>}
               checked={selectedOptions.includes(index)}
-              checkedOptions={selectedOptions.length}
               onClick={() => handleOnChange(index)}
-              abstain={abstain}
             />
           ))}
-          <CheckCard
-            key={proposalData.options.length}
-            title={"Abstain: vote for no options"}
-            description={""}
-            checked={!!abstain}
-            checkedOptions={selectedOptions.length}
-            onClick={() => handleOnChange(abstainOptionId)}
-            abstain={abstain}
-          />
         </div>
         <CastVoteWithReason
           onVoteClick={() => {
@@ -281,7 +245,6 @@ export function EasApprovalCastVoteDialog({
           reason={reason}
           setReason={setReason}
           numberOfOptions={selectedOptions.length}
-          abstain={abstain}
           votingPower={votingPower}
         />
       </div>
@@ -294,7 +257,6 @@ function CastVoteWithReason({
   setReason,
   onVoteClick,
   numberOfOptions,
-  abstain,
   votingPower,
   copy,
 }: {
@@ -302,7 +264,6 @@ function CastVoteWithReason({
   reason: string;
   setReason: React.Dispatch<React.SetStateAction<string>>;
   numberOfOptions: number;
-  abstain: boolean;
   votingPower: string | null;
   copy?: string;
 }) {
@@ -315,7 +276,7 @@ function CastVoteWithReason({
         onChange={(e) => setReason(e.target.value)}
       />
       <div className="flex flex-col justify-between items-stretch">
-        {!abstain && numberOfOptions > 0 && (
+        {numberOfOptions > 0 && (
           <Button onClick={() => onVoteClick()}>
             Vote for {numberOfOptions} option
             {numberOfOptions > 1 && "s"}
@@ -327,25 +288,8 @@ function CastVoteWithReason({
             ) : null}
           </Button>
         )}
-        {!abstain && numberOfOptions === 0 && (
+        {numberOfOptions === 0 && (
           <Button disabled>Select at least one option</Button>
-        )}
-        {abstain && (
-          <Button onClick={() => onVoteClick()}>
-            {!copy ? (
-              <>
-                Abstain from voting
-                {votingPower ? (
-                  <>
-                    {" "}
-                    with{"\u00A0"} <TokenAmountDecorated amount={votingPower} />
-                  </>
-                ) : null}
-              </>
-            ) : (
-              copy
-            )}
-          </Button>
         )}
       </div>
     </div>
@@ -357,15 +301,11 @@ function CheckCard({
   checked,
   onClick,
   description,
-  checkedOptions,
-  abstain,
 }: {
   title: string;
   checked: boolean;
   onClick: () => void;
   description: string | JSX.Element;
-  checkedOptions: number;
-  abstain: boolean;
 }) {
   return (
     <div className="py-2 cursor-pointer relative" onClick={onClick}>
