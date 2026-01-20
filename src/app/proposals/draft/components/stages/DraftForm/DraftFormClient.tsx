@@ -186,7 +186,8 @@ const DraftFormClient = ({
   const methods = useForm<z.output<typeof DraftProposalSchema>>({
     resolver: zodResolver(DraftProposalSchema),
     mode: "onBlur",
-    defaultValues: parseProposalToForm(draftProposal) || DEFAULT_FORM,
+    defaultValues: (parseProposalToForm(draftProposal) ||
+      DEFAULT_FORM) as z.output<typeof DraftProposalSchema>,
   });
 
   const { watch, handleSubmit, control } = methods;
@@ -207,14 +208,7 @@ const DraftFormClient = ({
     );
 
     setValidProposalTypes(newValidProposalTypes);
-
-    if (newValidProposalTypes.length > 0) {
-      methods.setValue(
-        "proposalConfigType",
-        newValidProposalTypes[0].proposal_type_id
-      );
-    }
-  }, [votingModuleType, proposalTypes, methods]);
+  }, [votingModuleType, proposalTypes]);
 
   // Ensure proposalConfigType is set when returning from other stages
   useEffect(() => {
