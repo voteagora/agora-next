@@ -255,7 +255,9 @@ export function emitCompoundEvent(
           kind: "broadcast",
           event_type: candidate.eventType,
           entity_id: candidate.entityId,
-          ...(candidate.filter !== undefined ? { filter: candidate.filter } : {}),
+          ...(candidate.filter !== undefined
+            ? { filter: candidate.filter }
+            : {}),
           channels,
           data: candidate.data,
           ...(candidate.templateId !== undefined
@@ -274,7 +276,9 @@ export function emitCompoundEvent(
       dedupe_key: payload.dedupe_key,
     }).slice(2)}`;
 
-    await notificationCenterClient.sendCompoundEvent(payload, { idempotencyKey });
+    await notificationCenterClient.sendCompoundEvent(payload, {
+      idempotencyKey,
+    });
   })().catch((error) => console.error("Failed to emit compound event", error));
 }
 

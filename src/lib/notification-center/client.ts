@@ -543,6 +543,19 @@ export class NotificationCenterClient {
     );
   }
 
+  async validateWebhook(
+    channel: "discord" | "slack",
+    webhookUrl: string
+  ): Promise<{ valid: boolean; errors?: string[] } | null> {
+    return jsonRequest<{ valid: boolean; errors?: string[] }>(
+      `/channels/${channel}/validate-webhook`,
+      "POST",
+      { webhook_url: webhookUrl },
+      false,
+      "none"
+    );
+  }
+
   async initiateEmailVerification(
     recipientId: string
   ): Promise<EmailVerificationInitResponse | null> {

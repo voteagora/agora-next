@@ -21,6 +21,7 @@ import {
   getStoredSiweJwt,
   waitForStoredSiweJwt,
 } from "@/lib/siweSession";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import ContactInformationSection from "./ContactInformationSection";
 import PreferencesMatrix from "./PreferencesMatrix";
 import type { ChannelStatus } from "./ChannelStatusBadge";
@@ -50,6 +51,7 @@ export default function NotificationPreferencesClient() {
   const { setOpen } = useModal();
   const { signIn, signOut } = useSIWE();
   const queryClient = useQueryClient();
+  const openDialog = useOpenDialog();
   const [telegramLink, setTelegramLink] = useState<TelegramLinkState | null>(
     null
   );
@@ -421,8 +423,22 @@ export default function NotificationPreferencesClient() {
     },
   });
 
-  const updateDiscordMutation = useMutation({
+  const validateAndSaveDiscordMutation = useMutation({
     mutationFn: async (url: string) => {
+      const validationResult = (await authedFetchJson(
+        "/api/v1/notification-preferences/channels/validate-webhook",
+        {
+          method: "POST",
+          json: { channel: "discord", url },
+        }
+      )) as { valid: boolean; errors?: string[] } | null;
+
+      if (!validationResult?.valid) {
+        const errorMsg =
+          validationResult?.errors?.[0] || "Invalid Discord webhook";
+        throw new Error(errorMsg);
+      }
+
       return await authedFetchJson(
         "/api/v1/notification-preferences/channels/webhook",
         {
@@ -449,11 +465,15 @@ export default function NotificationPreferencesClient() {
 
       return { previous };
     },
-    onError: (_error, _url, context) => {
+    onError: (error, _url, context) => {
       if (context?.previous) {
         queryClient.setQueryData(queryKey, context.previous);
       }
-      toast.error("Failed to update Discord webhook.");
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : "Failed to update Discord webhook.";
+      toast.error(message);
     },
     onSuccess: () => {
       toast.success("Discord webhook updated.");
@@ -463,8 +483,22 @@ export default function NotificationPreferencesClient() {
     },
   });
 
-  const updateSlackMutation = useMutation({
+  const validateAndSaveSlackMutation = useMutation({
     mutationFn: async (url: string) => {
+      const validationResult = (await authedFetchJson(
+        "/api/v1/notification-preferences/channels/validate-webhook",
+        {
+          method: "POST",
+          json: { channel: "slack", url },
+        }
+      )) as { valid: boolean; errors?: string[] } | null;
+
+      if (!validationResult?.valid) {
+        const errorMsg =
+          validationResult?.errors?.[0] || "Invalid Slack webhook";
+        throw new Error(errorMsg);
+      }
+
       return await authedFetchJson(
         "/api/v1/notification-preferences/channels/webhook",
         {
@@ -490,11 +524,15 @@ export default function NotificationPreferencesClient() {
 
       return { previous };
     },
-    onError: (_error, _url, context) => {
+    onError: (error, _url, context) => {
       if (context?.previous) {
         queryClient.setQueryData(queryKey, context.previous);
       }
-      toast.error("Failed to update Slack webhook.");
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : "Failed to update Slack webhook.";
+      toast.error(message);
     },
     onSuccess: () => {
       toast.success("Slack webhook updated.");
@@ -503,6 +541,20 @@ export default function NotificationPreferencesClient() {
       queryClient.invalidateQueries({ queryKey });
     },
   });
+
+  const handleSlackSave = (url: string) => {
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Test Slack Webhook",
+        message:
+          "To verify this webhook works, we'll send a test message to your Slack channel. Continue?",
+        onConfirm: () => {
+          validateAndSaveSlackMutation.mutate(url);
+        },
+      },
+    });
+  };
 
   const setPreferenceMutation = useMutation({
     mutationFn: async ({
@@ -606,6 +658,53 @@ export default function NotificationPreferencesClient() {
       }
 
       toast.error(message);
+    },
+  });
+
+  const deleteChannelMutation = useMutation({
+    mutationFn: async (channel: ChannelType) => {
+      return await authedFetchJson(
+        `/api/v1/notification-preferences/channels/${channel}`,
+        { method: "DELETE" }
+      );
+    },
+    onMutate: async (channel) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<NotificationSettings>(queryKey);
+
+      updateCachedRecipient((current) => {
+        const channels = current.channels ?? {};
+        const { [channel]: _, ...remainingChannels } = channels;
+        return {
+          ...current,
+          channels: remainingChannels,
+        };
+      });
+
+      return { previous, channel };
+    },
+    onError: (error, channel, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(queryKey, context.previous);
+      }
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : `Failed to disconnect ${channel}.`;
+      toast.error(message);
+    },
+    onSuccess: (_data, channel) => {
+      const channelLabels: Record<ChannelType, string> = {
+        email: "Email",
+        telegram: "Telegram",
+        discord: "Discord",
+        slack: "Slack",
+        pwa: "Push notifications",
+      };
+      toast.success(`${channelLabels[channel]} disconnected.`);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey });
     },
   });
 
@@ -794,16 +893,25 @@ export default function NotificationPreferencesClient() {
           isInitiating: telegramLinkMutation.isPending,
           error: telegramError,
           onStartLinking: telegramLinkMutation.mutateAsync,
+          onUnlink: () => deleteChannelMutation.mutateAsync("telegram"),
         }}
         onUpdateEmail={updateEmailMutation.mutateAsync}
-        onUpdateDiscord={updateDiscordMutation.mutateAsync}
-        onUpdateSlack={updateSlackMutation.mutateAsync}
+        onUpdateDiscord={validateAndSaveDiscordMutation.mutateAsync}
+        onUpdateSlack={handleSlackSave}
         onSendVerification={emailVerificationMutation.mutateAsync}
+        onUnlinkEmail={() => deleteChannelMutation.mutateAsync("email")}
+        onUnlinkDiscord={() => deleteChannelMutation.mutateAsync("discord")}
+        onUnlinkSlack={() => deleteChannelMutation.mutateAsync("slack")}
         isUpdatingEmail={updateEmailMutation.isPending}
-        isUpdatingDiscord={updateDiscordMutation.isPending}
-        isUpdatingSlack={updateSlackMutation.isPending}
+        isUpdatingDiscord={validateAndSaveDiscordMutation.isPending}
+        isUpdatingSlack={validateAndSaveSlackMutation.isPending}
         isVerifying={emailVerificationMutation.isPending}
         verificationSentAt={verificationSentAt}
+        unlinkingChannel={
+          deleteChannelMutation.isPending
+            ? deleteChannelMutation.variables
+            : null
+        }
       />
 
       <PushNotificationSection
