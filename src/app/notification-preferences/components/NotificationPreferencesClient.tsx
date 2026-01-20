@@ -819,104 +819,172 @@ export default function NotificationPreferencesClient() {
   const loadErrorMessage = isError ? ((error as Error)?.message ?? "") : null;
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-primary">
-            Notification Preferences
-          </h1>
-          <p className="text-secondary">
-            Customize how you hear about proposals, discussions, and engagement.
-          </p>
-          {loadErrorMessage ? (
-            <p className="text-sm text-negative">{loadErrorMessage}</p>
-          ) : null}
-          {siweError ? (
-            <p className="text-sm text-negative">{siweError}</p>
-          ) : null}
+    <main className="mx-auto flex max-w-screen-xl flex-col gap-8 px-4 pb-16 pt-12 lg:px-0">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 flex flex-col gap-6">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-2xl font-extrabold text-primary">
+              Notification Preferences
+            </h1>
+            <p className="text-secondary">
+              Customize how you hear about proposals, discussions, and
+              engagement.
+            </p>
+            {loadErrorMessage ? (
+              <p className="text-sm text-negative">{loadErrorMessage}</p>
+            ) : null}
+            {siweError ? (
+              <p className="text-sm text-negative">{siweError}</p>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {loadErrorMessage ? (
+              <Button
+                size="sm"
+                variant="elevatedOutline"
+                onClick={async () => {
+                  try {
+                    await refetch();
+                  } catch (retryError) {
+                    setSiweError(
+                      retryError instanceof Error
+                        ? retryError.message
+                        : "Unable to refresh settings."
+                    );
+                  }
+                }}
+              >
+                Retry load
+              </Button>
+            ) : null}
+          </div>
+
+          <ContactInformationSection
+            email={recipient?.channels?.email?.address ?? ""}
+            discordWebhook={recipient?.channels?.discord?.webhook_url ?? ""}
+            slackWebhook={recipient?.channels?.slack?.webhook_url ?? ""}
+            emailStatus={channelStatus.email}
+            discordStatus={channelStatus.discord}
+            slackStatus={channelStatus.slack}
+            telegramStatus={channelStatus.telegram}
+            telegram={{
+              username: recipient?.channels?.telegram?.username,
+              chatId: recipient?.channels?.telegram?.chat_id,
+              linkingUrl: telegramLink?.url,
+              expiresAt: telegramLink?.expiresAt,
+              isInitiating: telegramLinkMutation.isPending,
+              error: telegramError,
+              onStartLinking: telegramLinkMutation.mutateAsync,
+              onUnlink: () => deleteChannelMutation.mutateAsync("telegram"),
+            }}
+            onUpdateEmail={updateEmailMutation.mutateAsync}
+            onUpdateDiscord={validateAndSaveDiscordMutation.mutateAsync}
+            onUpdateSlack={handleSlackSave}
+            onSendVerification={emailVerificationMutation.mutateAsync}
+            onUnlinkEmail={() => deleteChannelMutation.mutateAsync("email")}
+            onUnlinkDiscord={() => deleteChannelMutation.mutateAsync("discord")}
+            onUnlinkSlack={() => deleteChannelMutation.mutateAsync("slack")}
+            isUpdatingEmail={updateEmailMutation.isPending}
+            isUpdatingDiscord={validateAndSaveDiscordMutation.isPending}
+            isUpdatingSlack={validateAndSaveSlackMutation.isPending}
+            isVerifying={emailVerificationMutation.isPending}
+            verificationSentAt={verificationSentAt}
+            unlinkingChannel={
+              deleteChannelMutation.isPending
+                ? deleteChannelMutation.variables
+                : null
+            }
+          />
+
+          <PushNotificationSection
+            status={channelStatus.pwa.status}
+            isSubscribed={pushState.isSubscribed}
+            loading={pushState.loading}
+            error={pushState.error}
+            subscribe={pushState.subscribe}
+            unsubscribe={pushState.unsubscribe}
+          />
+          <PreferencesMatrix
+            eventTypes={eventTypes}
+            preferences={preferences}
+            channelOrder={CHANNEL_ORDER}
+            channelStatus={channelStatus}
+            onToggle={(eventType, channel, nextState) =>
+              setPreferenceMutation.mutate({
+                eventType,
+                channel,
+                state: nextState,
+              })
+            }
+            isUpdating={(eventType, channel) =>
+              setPreferenceMutation.isPending &&
+              setPreferenceMutation.variables?.eventType === eventType &&
+              setPreferenceMutation.variables?.channel === channel
+            }
+          />
         </div>
-        <div className="flex flex-wrap gap-2">
-          {loadErrorMessage ? (
-            <Button
-              size="sm"
-              variant="elevatedOutline"
-              onClick={async () => {
-                try {
-                  await refetch();
-                } catch (retryError) {
-                  setSiweError(
-                    retryError instanceof Error
-                      ? retryError.message
-                      : "Unable to refresh settings."
-                  );
-                }
-              }}
-            >
-              Retry load
-            </Button>
-          ) : null}
-        </div>
+
+        <aside className="space-y-4">
+          <div className="rounded-2xl border border-line bg-cardBackground p-6 shadow-newDefault">
+            <h2 className="text-lg font-semibold text-primary">
+              Welcome to your Notifications Center
+            </h2>
+            <div className="mt-4 space-y-4 text-sm text-secondary">
+              <div className="flex gap-3">
+                <span className="text-base leading-6" aria-hidden>
+                  🔗
+                </span>
+                <div className="space-y-1">
+                  <p className="font-semibold text-primary">
+                    Connect your channels
+                  </p>
+                  <p>Choose where you’d like to receive updates.</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-base leading-6" aria-hidden>
+                  ⚙️
+                </span>
+                <div className="space-y-1">
+                  <p className="font-semibold text-primary">
+                    Set your preferences
+                  </p>
+                  <p>
+                    Customize notifications per channel across different
+                    categories.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-base leading-6" aria-hidden>
+                  🔔
+                </span>
+                <div className="space-y-1">
+                  <p className="font-semibold text-primary">
+                    Enable browser notifications
+                  </p>
+                  <p>
+                    Turn on browser push with a quick, device-specific
+                    signature.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-base leading-6" aria-hidden>
+                  🔄
+                </span>
+                <div className="space-y-1">
+                  <p className="font-semibold text-primary">Manage anytime</p>
+                  <p>
+                    Update or disconnect channels whenever you need - your
+                    preferences stay saved.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
-
-      <ContactInformationSection
-        email={recipient?.channels?.email?.address ?? ""}
-        discordWebhook={recipient?.channels?.discord?.webhook_url ?? ""}
-        slackWebhook={recipient?.channels?.slack?.webhook_url ?? ""}
-        emailStatus={channelStatus.email}
-        discordStatus={channelStatus.discord}
-        slackStatus={channelStatus.slack}
-        telegramStatus={channelStatus.telegram}
-        telegram={{
-          username: recipient?.channels?.telegram?.username,
-          chatId: recipient?.channels?.telegram?.chat_id,
-          linkingUrl: telegramLink?.url,
-          expiresAt: telegramLink?.expiresAt,
-          isInitiating: telegramLinkMutation.isPending,
-          error: telegramError,
-          onStartLinking: telegramLinkMutation.mutateAsync,
-          onUnlink: () => deleteChannelMutation.mutateAsync("telegram"),
-        }}
-        onUpdateEmail={updateEmailMutation.mutateAsync}
-        onUpdateDiscord={validateAndSaveDiscordMutation.mutateAsync}
-        onUpdateSlack={handleSlackSave}
-        onSendVerification={emailVerificationMutation.mutateAsync}
-        onUnlinkEmail={() => deleteChannelMutation.mutateAsync("email")}
-        onUnlinkDiscord={() => deleteChannelMutation.mutateAsync("discord")}
-        onUnlinkSlack={() => deleteChannelMutation.mutateAsync("slack")}
-        isUpdatingEmail={updateEmailMutation.isPending}
-        isUpdatingDiscord={validateAndSaveDiscordMutation.isPending}
-        isUpdatingSlack={validateAndSaveSlackMutation.isPending}
-        isVerifying={emailVerificationMutation.isPending}
-        verificationSentAt={verificationSentAt}
-        unlinkingChannel={
-          deleteChannelMutation.isPending
-            ? deleteChannelMutation.variables
-            : null
-        }
-      />
-
-      <PushNotificationSection
-        status={channelStatus.pwa.status}
-        isSubscribed={pushState.isSubscribed}
-        loading={pushState.loading}
-        error={pushState.error}
-        subscribe={pushState.subscribe}
-        unsubscribe={pushState.unsubscribe}
-      />
-      <PreferencesMatrix
-        eventTypes={eventTypes}
-        preferences={preferences}
-        channelOrder={CHANNEL_ORDER}
-        channelStatus={channelStatus}
-        onToggle={(eventType, channel, nextState) =>
-          setPreferenceMutation.mutate({ eventType, channel, state: nextState })
-        }
-        isUpdating={(eventType, channel) =>
-          setPreferenceMutation.isPending &&
-          setPreferenceMutation.variables?.eventType === eventType &&
-          setPreferenceMutation.variables?.channel === channel
-        }
-      />
     </main>
   );
 }
