@@ -126,9 +126,9 @@ export const optimismTenantUIConfig = new TenantUI({
       hero: optimismHero,
       meta: {
         title: "Optimism Agora",
-        description: "Home of token house governance and RPGF",
+        description: "Home of Optimism governance",
         imageTitle: "Optimism Agora",
-        imageDescription: "Home of token house governance and RPGF",
+        imageDescription: "Home of Optimism governance",
       },
     },
     {
@@ -139,9 +139,9 @@ export const optimismTenantUIConfig = new TenantUI({
       hero: optimismHero,
       meta: {
         title: "Optimism Agora",
-        description: "Home of token house governance and RPGF",
+        description: "Home of Optimism governance",
         imageTitle: "Optimism Agora",
-        imageDescription: "Home of token house governance and RPGF",
+        imageDescription: "Home of Optimism governance",
       },
     },
     {
