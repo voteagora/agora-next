@@ -26,7 +26,6 @@ import ContactInformationSection from "./ContactInformationSection";
 import PreferencesMatrix from "./PreferencesMatrix";
 import type { ChannelStatus } from "./ChannelStatusBadge";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
-import PushNotificationSection from "./PushNotificationSection";
 
 const CHANNEL_ORDER: ChannelType[] = [
   "email",
@@ -867,6 +866,7 @@ export default function NotificationPreferencesClient() {
             discordStatus={channelStatus.discord}
             slackStatus={channelStatus.slack}
             telegramStatus={channelStatus.telegram}
+            pwaStatus={channelStatus.pwa}
             telegram={{
               username: recipient?.channels?.telegram?.username,
               chatId: recipient?.channels?.telegram?.chat_id,
@@ -884,6 +884,16 @@ export default function NotificationPreferencesClient() {
             onUnlinkEmail={() => deleteChannelMutation.mutateAsync("email")}
             onUnlinkDiscord={() => deleteChannelMutation.mutateAsync("discord")}
             onUnlinkSlack={() => deleteChannelMutation.mutateAsync("slack")}
+            onEnablePush={async () => {
+              if (!recipientId) {
+                throw new Error("Wallet not connected");
+              }
+              await pushState.subscribe(recipientId);
+            }}
+            onDisablePush={pushState.unsubscribe}
+            isPushSubscribed={pushState.isSubscribed}
+            isPushLoading={pushState.loading}
+            pushError={pushState.error}
             isUpdatingEmail={updateEmailMutation.isPending}
             isUpdatingDiscord={validateAndSaveDiscordMutation.isPending}
             isUpdatingSlack={validateAndSaveSlackMutation.isPending}
@@ -894,15 +904,6 @@ export default function NotificationPreferencesClient() {
                 ? deleteChannelMutation.variables
                 : null
             }
-          />
-
-          <PushNotificationSection
-            status={channelStatus.pwa.status}
-            isSubscribed={pushState.isSubscribed}
-            loading={pushState.loading}
-            error={pushState.error}
-            subscribe={pushState.subscribe}
-            unsubscribe={pushState.unsubscribe}
           />
           <PreferencesMatrix
             eventTypes={eventTypes}

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import ChannelStatusBadge, { type ChannelStatus } from "./ChannelStatusBadge";
+import type { ChannelStatus } from "./ChannelStatusBadge";
 import type { ChannelType } from "@/lib/notification-center/types";
 
 function isValidEmail(email: string): boolean {
@@ -121,7 +121,7 @@ function ConnectedChannelCard({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
-            className="rounded-xl border-line bg-neutral text-primary"
+            className="w-full rounded-lg border border-line bg-wash text-primary placeholder:text-tertiary"
           />
           <div className="flex shrink-0 items-center gap-3">
             <Button
@@ -156,10 +156,10 @@ function ConnectedChannelCard({
   }
 
   return (
-    <div className="rounded-xl border border-positive/20 bg-positive/5 p-3">
+    <div className="rounded-lg border border-line bg-wash p-3">
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-positive/10 text-positive">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-wash text-primary">
             {icon}
           </div>
           <span className="truncate text-sm font-medium text-primary">
@@ -216,7 +216,7 @@ function DisconnectedChannelForm({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="rounded-xl border-line bg-neutral text-primary"
+          className="w-full rounded-lg border border-line bg-wash text-primary placeholder:text-tertiary"
         />
         <Button
           size="sm"
@@ -278,21 +278,18 @@ function TelegramChannelRow({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        {renderStatusIcon(telegramStatus.status, telegramStatus.label)}
         <span className="text-xs font-semibold uppercase tracking-wide text-tertiary">
           Telegram
         </span>
-        <ChannelStatusBadge
-          status={telegramStatus.status}
-          label={telegramStatus.label}
-        />
       </div>
 
       {isLinked ? (
-        <div className="rounded-xl border border-positive/20 bg-positive/5 p-3">
+        <div className="rounded-lg border border-line bg-wash p-3">
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-2.5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-positive/10 text-positive">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-wash text-primary">
                 <svg
                   className="h-4 w-4"
                   viewBox="0 0 24 24"
@@ -327,7 +324,7 @@ function TelegramChannelRow({
       ) : (
         <div className="flex flex-col gap-2">
           {telegram.linkingUrl ? (
-            <div className="rounded-xl border border-brandPrimary/20 bg-brandPrimary/5 p-3">
+            <div className="rounded-lg border border-brandPrimary/20 bg-brandPrimary/5 p-3">
               <div className="text-sm font-medium text-primary">
                 Complete linking in Telegram
               </div>
@@ -338,7 +335,7 @@ function TelegramChannelRow({
               </p>
               <Button
                 size="sm"
-                className="mt-2"
+                className="mt-2 h-11 w-full justify-center"
                 onClick={() =>
                   window.open(
                     telegram.linkingUrl!,
@@ -354,6 +351,7 @@ function TelegramChannelRow({
             <Button
               size="sm"
               variant="elevatedOutline"
+              className="h-11 w-full justify-center"
               disabled={telegram.isInitiating}
               onClick={async () => {
                 try {
@@ -379,6 +377,41 @@ function TelegramChannelRow({
   );
 }
 
+function renderStatusIcon(status: ChannelStatus, label?: string) {
+  const isConnected = status === "connected";
+  const isPending = status === "pending";
+  const strokeClass = isConnected
+    ? "stroke-positive"
+    : isPending
+      ? "stroke-secondary"
+      : "stroke-tertiary";
+  const tooltip = label ?? status;
+
+  return (
+    <span
+      className="group inline-flex h-6 w-6 items-center justify-center relative"
+      title={tooltip}
+      aria-label={tooltip}
+    >
+      <svg
+        aria-hidden
+        viewBox="0 0 24 24"
+        className={`h-5 w-5 ${strokeClass}`}
+        fill="none"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M12 22c5.5228 0 10-4.4772 10-10S17.5228 2 12 2 2 6.4772 2 12s4.4772 10 10 10Z" />
+        <path d="M8 12.5 11 15l5-6" />
+      </svg>
+      <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/80 px-2 py-1 text-[11px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
+        {tooltip}
+      </span>
+    </span>
+  );
+}
+
 interface ContactInformationSectionProps {
   email: string;
   discordWebhook: string;
@@ -387,6 +420,7 @@ interface ContactInformationSectionProps {
   discordStatus: ChannelStatusInfo;
   slackStatus: ChannelStatusInfo;
   telegramStatus: ChannelStatusInfo;
+  pwaStatus: ChannelStatusInfo;
   telegram: TelegramInfo;
   onUpdateEmail: (email: string) => Promise<unknown>;
   onUpdateDiscord: (url: string) => Promise<unknown>;
@@ -395,6 +429,11 @@ interface ContactInformationSectionProps {
   onUnlinkEmail?: () => Promise<unknown>;
   onUnlinkDiscord?: () => Promise<unknown>;
   onUnlinkSlack?: () => Promise<unknown>;
+  onEnablePush: () => Promise<void>;
+  onDisablePush: () => Promise<void>;
+  isPushSubscribed: boolean;
+  isPushLoading: boolean;
+  pushError?: string | null;
   isUpdatingEmail: boolean;
   isUpdatingDiscord: boolean;
   isUpdatingSlack: boolean;
@@ -411,6 +450,7 @@ export default function ContactInformationSection({
   discordStatus,
   slackStatus,
   telegramStatus,
+  pwaStatus,
   telegram,
   onUpdateEmail,
   onUpdateDiscord,
@@ -419,6 +459,11 @@ export default function ContactInformationSection({
   onUnlinkEmail,
   onUnlinkDiscord,
   onUnlinkSlack,
+  onEnablePush,
+  onDisablePush,
+  isPushSubscribed,
+  isPushLoading,
+  pushError,
   isUpdatingEmail,
   isUpdatingDiscord,
   isUpdatingSlack,
@@ -475,14 +520,11 @@ export default function ContactInformationSection({
       <div className="mt-6 grid gap-6">
         {/* Email Channel */}
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {renderStatusIcon(emailStatus.status, emailStatus.label)}
             <span className="text-xs font-semibold uppercase tracking-wide text-tertiary">
               Email
             </span>
-            <ChannelStatusBadge
-              status={emailStatus.status}
-              label={emailStatus.label}
-            />
           </div>
 
           {isEmailConnected && !isEditingEmail ? (
@@ -597,23 +639,13 @@ export default function ContactInformationSection({
           )}
         </div>
 
-        {/* Telegram Channel */}
-        <TelegramChannelRow
-          telegramStatus={telegramStatus}
-          telegram={telegram}
-          isUnlinking={unlinkingChannel === "telegram"}
-        />
-
         {/* Discord Channel */}
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {renderStatusIcon(discordStatus.status, discordStatus.label)}
             <span className="text-xs font-semibold uppercase tracking-wide text-tertiary">
               Discord Webhook
             </span>
-            <ChannelStatusBadge
-              status={discordStatus.status}
-              label={discordStatus.label}
-            />
           </div>
 
           {isDiscordConnected && !isEditingDiscord ? (
@@ -682,14 +714,11 @@ export default function ContactInformationSection({
 
         {/* Slack Channel */}
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {renderStatusIcon(slackStatus.status, slackStatus.label)}
             <span className="text-xs font-semibold uppercase tracking-wide text-tertiary">
               Slack Webhook
             </span>
-            <ChannelStatusBadge
-              status={slackStatus.status}
-              label={slackStatus.label}
-            />
           </div>
 
           {isSlackConnected && !isEditingSlack ? (
@@ -754,6 +783,57 @@ export default function ContactInformationSection({
           <p className="text-xs text-tertiary">
             Paste a Slack webhook URL to deliver notifications to a channel.
           </p>
+        </div>
+
+        {/* Telegram Channel */}
+        <TelegramChannelRow
+          telegramStatus={telegramStatus}
+          telegram={telegram}
+          isUnlinking={unlinkingChannel === "telegram"}
+        />
+
+        {/* Browser Push */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            {renderStatusIcon(pwaStatus.status, pwaStatus.label)}
+            <span className="text-xs font-semibold uppercase tracking-wide text-tertiary">
+              Browser Push
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Button
+              size="sm"
+              variant="elevatedOutline"
+              className="h-11 w-full justify-center"
+              disabled={isPushLoading}
+              onClick={async () => {
+                try {
+                  if (isPushSubscribed) {
+                    await onDisablePush();
+                  } else {
+                    await onEnablePush();
+                  }
+                } catch {
+                  return;
+                }
+              }}
+            >
+              {isPushLoading
+                ? isPushSubscribed
+                  ? "Disabling..."
+                  : "Enabling..."
+                : isPushSubscribed
+                  ? "Disable push on this device"
+                  : "Enable browser notifications on this device"}
+            </Button>
+            <p className="text-xs text-tertiary">
+              Push notifications are device-specific and require a quick
+              signature.
+            </p>
+            {pushError ? (
+              <p className="text-xs text-negative">{pushError}</p>
+            ) : null}
+          </div>
         </div>
       </div>
     </section>
