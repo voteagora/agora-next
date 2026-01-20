@@ -389,7 +389,7 @@ export function renderStatusIcon(status: ChannelStatus, label?: string) {
 
   return (
     <span
-      className="group inline-flex h-6 w-6 items-center justify-center relative"
+      className="group relative inline-flex h-6 w-6 items-center justify-center"
       title={tooltip}
       aria-label={tooltip}
     >
@@ -405,7 +405,7 @@ export function renderStatusIcon(status: ChannelStatus, label?: string) {
         <path d="M12 22c5.5228 0 10-4.4772 10-10S17.5228 2 12 2 2 6.4772 2 12s4.4772 10 10 10Z" />
         <path d="M8 12.5 11 15l5-6" />
       </svg>
-      <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/80 px-2 py-1 text-[11px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
+      <span className="pointer-events-none absolute left-1/2 top-7 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/80 px-2 py-1 text-[11px] font-medium text-white opacity-0 shadow-newDefault transition-opacity group-hover:opacity-100">
         {tooltip}
       </span>
     </span>
