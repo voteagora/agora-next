@@ -51,3 +51,19 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  const auth = await requireNotificationPreferencesAuth(request);
+  if (!auth.ok) return auth.response;
+
+  try {
+    await notificationCenterClient.deleteChannel(auth.recipientId, "email");
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Failed to delete email channel", error);
+    return NextResponse.json(
+      { message: "Failed to disconnect email" },
+      { status: 500 }
+    );
+  }
+}
