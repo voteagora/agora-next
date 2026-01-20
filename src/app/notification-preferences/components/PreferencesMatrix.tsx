@@ -9,7 +9,7 @@ import type {
   PreferenceState,
   PreferencesByEvent,
 } from "@/lib/notification-center/types";
-import ChannelStatusBadge, { type ChannelStatus } from "./ChannelStatusBadge";
+import type { ChannelStatus } from "./ChannelStatusBadge";
 import PreferenceToggle from "./PreferenceToggle";
 
 interface ChannelStatusInfo {
@@ -22,6 +22,7 @@ interface PreferencesMatrixProps {
   preferences: PreferencesByEvent;
   channelOrder: ChannelType[];
   channelStatus: Record<ChannelType, ChannelStatusInfo>;
+  renderChannelStatus: (channel: ChannelType) => React.ReactNode;
   onToggle: (
     eventType: string,
     channel: ChannelType,
@@ -39,6 +40,7 @@ export default function PreferencesMatrix({
   preferences,
   channelOrder,
   channelStatus,
+  renderChannelStatus,
   onToggle,
   isUpdating,
 }: PreferencesMatrixProps) {
@@ -65,34 +67,40 @@ export default function PreferencesMatrix({
     <section className="overflow-hidden rounded-2xl border border-line bg-white shadow-newDefault">
       <div className="overflow-x-auto">
         <table className="min-w-full table-fixed text-sm">
-          <thead className="bg-neutral">
+          <thead>
             <tr className="text-left">
               <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wide text-tertiary">
                 Event
               </th>
               {channelOrder.map((channel) => (
                 <th key={channel} className="px-4 py-4 text-center">
-                  <div className="flex flex-col items-center gap-2 text-xs font-semibold text-primary">
+                  <div className="flex items-center justify-center gap-2 text-xs font-semibold text-primary">
+                    {renderChannelStatus(channel)}
                     <span className="capitalize">{channel}</span>
-                    <ChannelStatusBadge
-                      status={channelStatus[channel].status}
-                      label={channelStatus[channel].label}
-                    />
                   </div>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {orderedCategories.map((category) => {
+            {orderedCategories.map((category, categoryIndex) => {
               const items = grouped.get(category) ?? [];
               if (!items.length) return null;
 
               const label = CATEGORY_LABELS.get(category) ?? category;
+              const showTopDivider = categoryIndex === 0;
+              const showCategoryDivider =
+                categoryIndex === 0 || categoryIndex > 0;
 
               return (
                 <Fragment key={category}>
-                  <tr className="border-t border-line bg-neutral/60">
+                  <tr
+                    className={cn(
+                      "bg-neutral/60",
+                      (showTopDivider || showCategoryDivider) &&
+                        "border-t border-line"
+                    )}
+                  >
                     <td
                       colSpan={channelOrder.length + 1}
                       className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-tertiary"
@@ -109,10 +117,7 @@ export default function PreferencesMatrix({
                     return (
                       <tr
                         key={eventType.event_type}
-                        className={cn(
-                          "border-t border-line",
-                          isEven ? "bg-white" : "bg-neutral/30"
-                        )}
+                        className={cn(isEven ? "bg-white" : "bg-neutral/30")}
                       >
                         <td className="px-4 py-4 text-sm">
                           <div className="flex flex-col gap-1">

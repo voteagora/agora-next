@@ -377,7 +377,7 @@ function TelegramChannelRow({
   );
 }
 
-function renderStatusIcon(status: ChannelStatus, label?: string) {
+export function renderStatusIcon(status: ChannelStatus, label?: string) {
   const isConnected = status === "connected";
   const isPending = status === "pending";
   const strokeClass = isConnected
