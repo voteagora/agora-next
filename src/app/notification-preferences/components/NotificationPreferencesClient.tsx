@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import { useModal, useSIWE } from "connectkit";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -64,6 +64,7 @@ export default function NotificationPreferencesClient() {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const pushState = usePushNotifications();
   const { isSubscribed: isPushSubscribed } = pushState;
+  const hasAutoSignAttemptedRef = useRef(false);
 
   const recipientId = address?.toLowerCase() ?? "";
   const queryKey = ["notification-settings", recipientId];
@@ -234,6 +235,7 @@ export default function NotificationPreferencesClient() {
     setVerificationSentAt(null);
     setSiweError(null);
     setSiweJwt(undefined);
+    hasAutoSignAttemptedRef.current = false;
 
     const jwt = loadSiweJwt();
     setSiweJwt(jwt);
@@ -262,6 +264,25 @@ export default function NotificationPreferencesClient() {
       setSiweError(null);
     }
   }, [siweJwt]);
+
+  useEffect(() => {
+    if (!isConnected) return;
+    if (siweJwt !== null) return;
+    if (hasAutoSignAttemptedRef.current) return;
+
+    hasAutoSignAttemptedRef.current = true;
+    void (async () => {
+      try {
+        await ensureSiweSession();
+      } catch (error) {
+        setSiweError(
+          error instanceof Error
+            ? error.message
+            : "Failed to request signature. Please retry from your wallet."
+        );
+      }
+    })();
+  }, [ensureSiweSession, isConnected, siweJwt]);
 
   const recipient = data?.recipient ?? null;
 
@@ -739,20 +760,7 @@ export default function NotificationPreferencesClient() {
     );
   }
 
-  if (siweJwt === undefined) {
-    return (
-      <main className="mx-auto flex max-w-3xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-primary">
-            Notification Preferences
-          </h1>
-          <p className="text-secondary">Checking your sign-in...</p>
-        </div>
-      </main>
-    );
-  }
-
-  if (!siweJwt) {
+  if (siweJwt === undefined || siweJwt === null) {
     return (
       <main className="mx-auto flex max-w-3xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
         <div className="flex flex-col gap-2">
@@ -760,39 +768,12 @@ export default function NotificationPreferencesClient() {
             Notification Preferences
           </h1>
           <p className="text-secondary">
-            To manage your notification preferences, please sign this access
-            request.
+            Requesting a signature to manage notifications...
           </p>
           {siweError ? (
             <p className="text-sm text-negative">{siweError}</p>
           ) : null}
         </div>
-        <Button
-          className="w-fit"
-          disabled={isSigningIn}
-          onClick={async () => {
-            try {
-              const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(
-                  () =>
-                    reject(new Error("Sign-in timed out. Please try again.")),
-                  60000
-                )
-              );
-
-              await Promise.race([ensureSiweSession(), timeoutPromise]);
-            } catch (signInError) {
-              setIsSigningIn(false);
-              setSiweError(
-                signInError instanceof Error
-                  ? signInError.message
-                  : "Sign-in failed."
-              );
-            }
-          }}
-        >
-          {isSigningIn ? "Awaiting Confirmation..." : "Sign access request"}
-        </Button>
       </main>
     );
   }
