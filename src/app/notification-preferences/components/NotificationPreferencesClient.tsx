@@ -22,10 +22,11 @@ import {
   waitForStoredSiweJwt,
 } from "@/lib/siweSession";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import ContactInformationSection from "./ContactInformationSection";
+import ContactInformationSection, {
+  renderStatusIcon,
+} from "./ContactInformationSection";
 import PreferencesMatrix from "./PreferencesMatrix";
 import type { ChannelStatus } from "./ChannelStatusBadge";
-import { renderStatusIcon } from "./ContactInformationSection";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 const CHANNEL_ORDER: ChannelType[] = [
@@ -927,7 +928,7 @@ export default function NotificationPreferencesClient() {
               </div>
               <div className="flex gap-3">
                 <span className="text-base leading-6" aria-hidden>
-                  ⚙️
+                  🔔
                 </span>
                 <div className="space-y-1">
                   <p className="font-semibold text-primary">
@@ -936,20 +937,6 @@ export default function NotificationPreferencesClient() {
                   <p>
                     Customize notifications per channel across different
                     categories.
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <span className="text-base leading-6" aria-hidden>
-                  🔔
-                </span>
-                <div className="space-y-1">
-                  <p className="font-semibold text-primary">
-                    Enable browser notifications
-                  </p>
-                  <p>
-                    Turn on browser push with a quick, device-specific
-                    signature.
                   </p>
                 </div>
               </div>
@@ -964,6 +951,20 @@ export default function NotificationPreferencesClient() {
                     preferences stay saved.
                   </p>
                 </div>
+              </div>
+            </div>
+            <div className="mt-4 border-t border-line pt-4 space-y-2">
+              <div className="flex items-center gap-3 text-sm text-secondary">
+                {renderStatusIcon("connected", "Connected")}
+                <span>Connected</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-secondary">
+                {renderStatusIcon("pending", "Pending verification")}
+                <span>Pending verification</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-secondary">
+                {renderStatusIcon("inactive" as ChannelStatus, "Not connected")}
+                <span>Not connected</span>
               </div>
             </div>
           </div>

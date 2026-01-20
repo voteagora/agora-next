@@ -69,11 +69,11 @@ export default function PreferencesMatrix({
         <table className="min-w-full table-fixed text-sm">
           <thead>
             <tr className="text-left">
-              <th className="px-4 py-4 text-xs font-semibold uppercase tracking-wide text-tertiary">
+              <th className="px-4 py-5 text-xs font-semibold uppercase tracking-wide text-tertiary">
                 Event
               </th>
               {channelOrder.map((channel) => (
-                <th key={channel} className="px-4 py-4 text-center">
+                <th key={channel} className="px-4 py-5 text-center">
                   <div className="flex items-center justify-center gap-2 text-xs font-semibold text-primary">
                     {renderChannelStatus(channel)}
                     <span className="capitalize">{channel}</span>
@@ -98,7 +98,8 @@ export default function PreferencesMatrix({
                     className={cn(
                       "bg-neutral/60",
                       (showTopDivider || showCategoryDivider) &&
-                        "border-t border-line"
+                        "border-t border-line",
+                      "border-b border-line"
                     )}
                   >
                     <td
