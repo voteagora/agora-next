@@ -309,7 +309,7 @@ export const ProfileDropDownContent = ({
                   onClick={handleCloseDrawer}
                   className="self-stretch h-12 pl-4 flex text-secondary items-center hover:bg-neutral hover:font-bold hover:rounded-md"
                 >
-                  Set notification preferences
+                  Sign to manage notifications
                 </Link>
               </>
             )}
