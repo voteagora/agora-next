@@ -507,7 +507,7 @@ export default function ContactInformationSection({
   const isSlackConnected = !!slackWebhook;
 
   return (
-    <section className="rounded-2xl border border-line bg-white p-6 shadow-newDefault">
+    <section className="rounded-2xl border border-line bg-cardBackground p-6 shadow-newDefault">
       <div className="flex flex-col gap-1">
         <h2 className="text-lg font-semibold text-primary">
           Where we&apos;ll notify you

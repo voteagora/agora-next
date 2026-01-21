@@ -36,7 +36,7 @@ export default function TelegramLinkingSection({
       : null;
 
   return (
-    <section className="rounded-2xl border border-line bg-white p-6 shadow-newDefault">
+    <section className="rounded-2xl border border-line bg-cardBackground p-6 shadow-newDefault">
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-primary">Telegram</h2>

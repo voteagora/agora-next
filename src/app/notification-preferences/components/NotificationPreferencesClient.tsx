@@ -823,69 +823,69 @@ export default function NotificationPreferencesClient() {
     <main className="mx-auto flex max-w-screen-xl flex-col gap-8 px-4 pb-16 pt-12 lg:px-0">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 flex flex-col gap-6">
-        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2">
             <h1 className="text-2xl font-extrabold text-primary">
-            Notification Preferences
-          </h1>
-          <p className="text-secondary">
+              Notification Preferences
+            </h1>
+            <p className="text-secondary">
               Customize how you hear about proposals, discussions, and
               engagement.
-          </p>
-          {loadErrorMessage ? (
-            <p className="text-sm text-negative">{loadErrorMessage}</p>
-          ) : null}
-          {siweError ? (
-            <p className="text-sm text-negative">{siweError}</p>
-          ) : null}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {loadErrorMessage ? (
-            <Button
-              size="sm"
-              variant="elevatedOutline"
-              onClick={async () => {
-                try {
-                  await refetch();
-                } catch (retryError) {
-                  setSiweError(
-                    retryError instanceof Error
-                      ? retryError.message
-                      : "Unable to refresh settings."
-                  );
-                }
-              }}
-            >
-              Retry load
-            </Button>
-          ) : null}
-      </div>
+            </p>
+            {loadErrorMessage ? (
+              <p className="text-sm text-negative">{loadErrorMessage}</p>
+            ) : null}
+            {siweError ? (
+              <p className="text-sm text-negative">{siweError}</p>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {loadErrorMessage ? (
+              <Button
+                size="sm"
+                variant="elevatedOutline"
+                onClick={async () => {
+                  try {
+                    await refetch();
+                  } catch (retryError) {
+                    setSiweError(
+                      retryError instanceof Error
+                        ? retryError.message
+                        : "Unable to refresh settings."
+                    );
+                  }
+                }}
+              >
+                Retry load
+              </Button>
+            ) : null}
+          </div>
 
-      <ContactInformationSection
-        email={recipient?.channels?.email?.address ?? ""}
-        discordWebhook={recipient?.channels?.discord?.webhook_url ?? ""}
-        slackWebhook={recipient?.channels?.slack?.webhook_url ?? ""}
-        emailStatus={channelStatus.email}
-        discordStatus={channelStatus.discord}
-        slackStatus={channelStatus.slack}
-        telegramStatus={channelStatus.telegram}
+          <ContactInformationSection
+            email={recipient?.channels?.email?.address ?? ""}
+            discordWebhook={recipient?.channels?.discord?.webhook_url ?? ""}
+            slackWebhook={recipient?.channels?.slack?.webhook_url ?? ""}
+            emailStatus={channelStatus.email}
+            discordStatus={channelStatus.discord}
+            slackStatus={channelStatus.slack}
+            telegramStatus={channelStatus.telegram}
             pwaStatus={channelStatus.pwa}
-        telegram={{
-          username: recipient?.channels?.telegram?.username,
-          chatId: recipient?.channels?.telegram?.chat_id,
-          linkingUrl: telegramLink?.url,
-          expiresAt: telegramLink?.expiresAt,
-          isInitiating: telegramLinkMutation.isPending,
-          error: telegramError,
-          onStartLinking: telegramLinkMutation.mutateAsync,
-          onUnlink: () => deleteChannelMutation.mutateAsync("telegram"),
-        }}
-        onUpdateEmail={updateEmailMutation.mutateAsync}
-        onUpdateDiscord={validateAndSaveDiscordMutation.mutateAsync}
-        onUpdateSlack={handleSlackSave}
-        onSendVerification={emailVerificationMutation.mutateAsync}
-        onUnlinkEmail={() => deleteChannelMutation.mutateAsync("email")}
-        onUnlinkDiscord={() => deleteChannelMutation.mutateAsync("discord")}
-        onUnlinkSlack={() => deleteChannelMutation.mutateAsync("slack")}
+            telegram={{
+              username: recipient?.channels?.telegram?.username,
+              chatId: recipient?.channels?.telegram?.chat_id,
+              linkingUrl: telegramLink?.url,
+              expiresAt: telegramLink?.expiresAt,
+              isInitiating: telegramLinkMutation.isPending,
+              error: telegramError,
+              onStartLinking: telegramLinkMutation.mutateAsync,
+              onUnlink: () => deleteChannelMutation.mutateAsync("telegram"),
+            }}
+            onUpdateEmail={updateEmailMutation.mutateAsync}
+            onUpdateDiscord={validateAndSaveDiscordMutation.mutateAsync}
+            onUpdateSlack={handleSlackSave}
+            onSendVerification={emailVerificationMutation.mutateAsync}
+            onUnlinkEmail={() => deleteChannelMutation.mutateAsync("email")}
+            onUnlinkDiscord={() => deleteChannelMutation.mutateAsync("discord")}
+            onUnlinkSlack={() => deleteChannelMutation.mutateAsync("slack")}
             onEnablePush={async () => {
               if (!recipientId) {
                 throw new Error("Wallet not connected");
@@ -896,17 +896,17 @@ export default function NotificationPreferencesClient() {
             isPushSubscribed={pushState.isSubscribed}
             isPushLoading={pushState.loading}
             pushError={pushState.error}
-        isUpdatingEmail={updateEmailMutation.isPending}
-        isUpdatingDiscord={validateAndSaveDiscordMutation.isPending}
-        isUpdatingSlack={validateAndSaveSlackMutation.isPending}
-        isVerifying={emailVerificationMutation.isPending}
-        verificationSentAt={verificationSentAt}
-        unlinkingChannel={
-          deleteChannelMutation.isPending
-            ? deleteChannelMutation.variables
-            : null
-        }
-      />
+            isUpdatingEmail={updateEmailMutation.isPending}
+            isUpdatingDiscord={validateAndSaveDiscordMutation.isPending}
+            isUpdatingSlack={validateAndSaveSlackMutation.isPending}
+            isVerifying={emailVerificationMutation.isPending}
+            verificationSentAt={verificationSentAt}
+            unlinkingChannel={
+              deleteChannelMutation.isPending
+                ? deleteChannelMutation.variables
+                : null
+            }
+          />
         </div>
 
         <aside className="space-y-4">
@@ -972,30 +972,30 @@ export default function NotificationPreferencesClient() {
       </div>
 
       <div className="mt-8">
-      <PreferencesMatrix
-        eventTypes={eventTypes}
-        preferences={preferences}
-        channelOrder={CHANNEL_ORDER}
-        channelStatus={channelStatus}
-        onToggle={(eventType, channel, nextState) =>
+        <PreferencesMatrix
+          eventTypes={eventTypes}
+          preferences={preferences}
+          channelOrder={CHANNEL_ORDER}
+          channelStatus={channelStatus}
+          onToggle={(eventType, channel, nextState) =>
             setPreferenceMutation.mutate({
               eventType,
               channel,
               state: nextState,
             })
-        }
-        isUpdating={(eventType, channel) =>
-          setPreferenceMutation.isPending &&
-          setPreferenceMutation.variables?.eventType === eventType &&
-          setPreferenceMutation.variables?.channel === channel
-        }
+          }
+          isUpdating={(eventType, channel) =>
+            setPreferenceMutation.isPending &&
+            setPreferenceMutation.variables?.eventType === eventType &&
+            setPreferenceMutation.variables?.channel === channel
+          }
           renderChannelStatus={(channel) =>
             renderStatusIcon(
               channelStatus[channel].status,
               channelStatus[channel].label
             )
           }
-      />
+        />
       </div>
     </main>
   );

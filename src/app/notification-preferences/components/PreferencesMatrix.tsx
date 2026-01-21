@@ -64,7 +64,7 @@ export default function PreferencesMatrix({
   let rowIndex = 0;
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-line bg-white shadow-newDefault">
+    <section className="overflow-hidden rounded-2xl border border-line bg-cardBackground shadow-newDefault">
       <div className="overflow-x-auto">
         <table className="min-w-full table-fixed text-sm">
           <thead>
@@ -118,7 +118,9 @@ export default function PreferencesMatrix({
                     return (
                       <tr
                         key={eventType.event_type}
-                        className={cn(isEven ? "bg-white" : "bg-neutral/30")}
+                        className={cn(
+                          isEven ? "bg-cardBackground" : "bg-neutral"
+                        )}
                       >
                         <td className="px-4 py-4 text-sm">
                           <div className="flex flex-col gap-1">
