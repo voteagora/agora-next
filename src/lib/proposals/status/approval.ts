@@ -112,6 +112,7 @@ export const deriveApprovalStatus = (
     totalVotingPower = proposal.total_voting_power_at_start;
   } else if (isDaoNodeSource(proposal)) {
     voteTotals = proposal.totals?.["no-param"] || {};
+    console.log("voteTotals", voteTotals);
     totalVotingPower = proposal.total_voting_power_at_start;
   }
   const forVotes = convertToNumber(String(voteTotals["1"] ?? "0"), decimals);
@@ -122,6 +123,12 @@ export const deriveApprovalStatus = (
 
   // Quorum for approval = for + abstain
   const quorumVotes = forVotes + abstainVotes;
+  console.log(
+    "quorumValue, quorumVotes",
+    quorumValue,
+    quorumVotes,
+    proposal.id
+  );
   // Check quorum - use quorumValue calculated from proposal.quorum or VP/3
   if (quorumVotes < quorumValue) {
     return "DEFEATED";

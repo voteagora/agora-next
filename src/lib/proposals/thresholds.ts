@@ -26,6 +26,7 @@ export const extractThresholds = (
 ): ProposalThresholds => {
   // Handle eas-oodao proposals
   if (isEasOodaoSource(proposal)) {
+    console.log(proposal);
     // Check for pending approval ranges
     if (proposal.default_proposal_type_ranges) {
       return {
@@ -54,8 +55,8 @@ export const extractThresholds = (
 };
 
 export interface ResolvedThresholds {
-  quorum: bigint | number;
-  approvalThreshold: number;
+  quorum: bigint;
+  approvalThreshold: bigint;
   votableSupply: bigint;
 }
 
@@ -70,10 +71,12 @@ export const resolveArchiveThresholds = (
     if (proposal.default_proposal_type_ranges) {
       //standard awaiting approval easOodao proposals
       return {
-        quorum: proposal.default_proposal_type_ranges.min_quorum_pct / 100,
-        approvalThreshold:
-          proposal.default_proposal_type_ranges.min_approval_threshold_pct /
-          100,
+        quorum: BigInt(
+          proposal.default_proposal_type_ranges.min_quorum_pct / 100
+        ),
+        approvalThreshold: BigInt(
+          proposal.default_proposal_type_ranges.min_approval_threshold_pct / 100
+        ),
         votableSupply: safeBigInt(proposal.total_voting_power_at_start ?? 0),
       };
     }
@@ -94,20 +97,25 @@ export const resolveArchiveThresholds = (
     }
 
     return {
-      quorum: quorumValue,
-      approvalThreshold: approvalThresholdBp,
+      quorum: BigInt(quorumValue),
+      approvalThreshold: BigInt(approvalThresholdBp),
       votableSupply: totalVotingPower,
     };
   }
 
   if (isDaoNodeSource(proposal)) {
     if (!proposal.proposal_type_info) {
-      console.log("no approval threshold", proposal);
+      return {
+        quorum: 0n,
+        approvalThreshold: 0n,
+        votableSupply: safeBigInt(proposal.total_voting_power_at_start),
+      };
     }
     return {
       quorum: safeBigInt(proposal.quorum ?? proposal.quorumVotes ?? 0),
-      approvalThreshold: proposal.proposal_type_info.approval_threshold ?? 0,
-
+      approvalThreshold: BigInt(
+        proposal.proposal_type_info.approval_threshold ?? 0
+      ),
       votableSupply: safeBigInt(proposal.total_voting_power_at_start ?? 0),
     };
   }
@@ -115,7 +123,7 @@ export const resolveArchiveThresholds = (
   // Fallback for eas-atlas
   return {
     quorum: 0n,
-    approvalThreshold: 0,
+    approvalThreshold: 0n,
     votableSupply: 0n,
   };
 };
