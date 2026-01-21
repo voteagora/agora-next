@@ -15,7 +15,9 @@ import {
 import { getPublicClient } from "@/lib/viem";
 import {
   buildForumPostUrl,
+  buildProfileUrl,
   emitDirectEvent,
+  formatAddressForNotification,
 } from "@/lib/notification-center/emitter";
 
 const addReactionSchema = z.object({
@@ -146,6 +148,10 @@ export async function addForumReaction(
 
     const normalizedReactor = validated.address.toLowerCase();
     if (post.address && post.address.toLowerCase() !== normalizedReactor) {
+      // Format address for display (ENS or truncated) and build profile URL
+      const reactorDisplayName =
+        await formatAddressForNotification(normalizedReactor);
+
       emitDirectEvent(
         "forum_reaction_received",
         post.address,
@@ -156,6 +162,8 @@ export async function addForumReaction(
           post_url: buildForumPostUrl(post.topicId, post.topic?.title, post.id),
           reaction_emoji: emoji,
           reactor_address: normalizedReactor,
+          reactor_display_name: reactorDisplayName,
+          reactor_profile_url: buildProfileUrl(normalizedReactor),
         }
       );
     }

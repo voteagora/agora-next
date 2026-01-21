@@ -27,7 +27,9 @@ import { getPublicClient } from "@/lib/viem";
 import {
   addRecipientAttributeValue,
   buildForumTopicUrl,
+  buildProfileUrl,
   emitBroadcastEvent,
+  formatAddressForNotification,
 } from "@/lib/notification-center/emitter";
 const { slug } = Tenant.current();
 
@@ -431,6 +433,10 @@ export async function createForumTopic(
         select: { name: true },
       });
 
+      // Format address for display (ENS or truncated) and build profile URL
+      const authorDisplayName =
+        await formatAddressForNotification(normalizedAddress);
+
       emitBroadcastEvent(
         "forum_discussion_in_watched_category",
         String(newTopic.id),
@@ -446,6 +452,8 @@ export async function createForumTopic(
           topic_url: buildForumTopicUrl(newTopic.id, newTopic.title),
           category_name: category?.name ?? "General",
           author_address: normalizedAddress,
+          author_display_name: authorDisplayName,
+          author_profile_url: buildProfileUrl(normalizedAddress),
         }
       );
     }

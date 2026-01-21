@@ -32,8 +32,10 @@ import {
   addRecipientAttributeValue,
   buildForumPostUrl,
   buildForumTopicUrl,
+  buildProfileUrl,
   emitCompoundEvent,
   emitDirectEvent,
+  formatAddressForNotification,
 } from "@/lib/notification-center/emitter";
 const { slug } = Tenant.current();
 
@@ -155,6 +157,10 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
     });
 
     if (topic.address && topic.address.toLowerCase() !== normalizedVoter) {
+      // Format address for display (ENS or truncated) and build profile URL
+      const voterDisplayName =
+        await formatAddressForNotification(normalizedVoter);
+
       emitDirectEvent(
         "forum_topic_upvoted",
         topic.address,
@@ -164,6 +170,8 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
           topic_title: topic.title,
           topic_url: buildForumTopicUrl(topic.id, topic.title),
           voter_address: normalizedVoter,
+          voter_display_name: voterDisplayName,
+          voter_profile_url: buildProfileUrl(normalizedVoter),
         }
       );
     }
@@ -433,6 +441,11 @@ export async function createForumPost(
       const preview = buildPreview(validatedData.content);
       const topicUrl = buildForumTopicUrl(topicId, topic.title);
 
+      // Format address for display (ENS or truncated) and build profile URL
+      const authorDisplayName =
+        await formatAddressForNotification(normalizedAddress);
+      const authorProfileUrl = buildProfileUrl(normalizedAddress);
+
       const dedupeGroup = "forum_post_created";
       const dedupeKey = `forum_post:${newPost.id}`;
 
@@ -461,6 +474,8 @@ export async function createForumPost(
               topic_url: postUrl,
               reply_preview: preview,
               replier_address: normalizedAddress,
+              replier_display_name: authorDisplayName,
+              replier_profile_url: authorProfileUrl,
             },
           });
         }
@@ -482,6 +497,8 @@ export async function createForumPost(
             topic_url: topicUrl,
             comment_preview: preview,
             author_address: normalizedAddress,
+            author_display_name: authorDisplayName,
+            author_profile_url: authorProfileUrl,
           },
         },
         {
@@ -498,6 +515,8 @@ export async function createForumPost(
             topic_url: topicUrl,
             comment_preview: preview,
             author_address: normalizedAddress,
+            author_display_name: authorDisplayName,
+            author_profile_url: authorProfileUrl,
           },
         }
       );

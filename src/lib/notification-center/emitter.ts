@@ -9,8 +9,33 @@ import {
   type SendEventPayload,
 } from "./client";
 import type { ChannelType, RecipientType } from "./types";
+import { processAddressOrEnsName } from "@/app/lib/ENSUtils";
 
 const ALL_CHANNELS: ChannelType[] = ["email", "telegram", "discord", "slack"];
+
+/**
+ * Format an address for display in notifications.
+ * Returns ENS name if available, otherwise truncated address (0x1234...abcd).
+ */
+export async function formatAddressForNotification(
+  address: string
+): Promise<string> {
+  try {
+    const formatted = await processAddressOrEnsName(address);
+    return formatted || address;
+  } catch (error) {
+    // Fallback to raw address if ENS lookup fails
+    return address;
+  }
+}
+
+/**
+ * Build a profile URL for a given address.
+ */
+export function buildProfileUrl(address: string): string {
+  const baseUrl = getSiteBaseUrl();
+  return baseUrl ? `${baseUrl}/delegates/${address}` : `/delegates/${address}`;
+}
 
 const CHANNEL_SET = new Set<ChannelType>(ALL_CHANNELS);
 const ALLOWED_CHANNELS_CACHE_TTL_MS = 5 * 60 * 1000;
