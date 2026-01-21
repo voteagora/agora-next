@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import { checkNewProposal } from "@/lib/seatbelt/checkProposal";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { StructuredReport } from "@/components/Simulation/StructuredReport";
+import { TrashIcon } from "@heroicons/react/20/solid";
 
 type FormType = z.output<typeof BasicProposalSchema>;
 
@@ -49,14 +50,16 @@ const TransactionFormItem = ({
             Transaction #{index + 1}
           </h2>
         </div>
-        <span
-          className="text-red-500 text-sm hover:underline cursor-pointer"
+        <button
+          type="button"
+          className="flex items-center gap-1 text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded transition-colors text-xs font-medium"
           onClick={() => {
             remove(index);
           }}
         >
+          <TrashIcon className="w-4 h-4" />
           Remove
-        </span>
+        </button>
       </div>
       {children}
     </div>
@@ -162,6 +165,9 @@ const BasicProposalForm = () => {
   }, [watch, validateTransactionForms, updateSimulationState]);
 
   const simulateTransactions = async () => {
+    const isValid = await trigger("transactions");
+    if (!isValid) return;
+
     setSimulationPending(true);
     const transactions = getValues("transactions");
 
