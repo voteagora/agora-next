@@ -410,7 +410,10 @@ export default function DraftProposalPageClient({
                   authorAddress={draft.author_address}
                 />
               )}
-              <DeleteDraftButton proposalId={draft.id} onDeleteSuccess={onDeleteSuccess} />
+              <DeleteDraftButton
+                proposalId={draft.id}
+                onDeleteSuccess={onDeleteSuccess}
+              />
             </div>
           )}
           {isShareMode && (
