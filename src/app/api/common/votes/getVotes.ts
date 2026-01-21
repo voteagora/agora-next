@@ -172,7 +172,7 @@ async function getVotesForDelegateForAddress({
         }
 
         // Pass through proposal_type default if missing in archive mode
-        const voteWithType = safeProposalType
+        let voteWithType = safeProposalType
           ? ({
               ...(vote as any),
               proposal_type: safeProposalType,
@@ -215,6 +215,64 @@ async function getVotesForDelegateForAddress({
                   createdBlockNumber: archiveProposal.created_block_number,
                 };
               }
+              const votingType = archiveProposal?.kwargs?.voting_module;
+              if (votingType) {
+                voteWithType = {
+                  ...voteWithType,
+                  proposal_type: votingType.toUpperCase(),
+                };
+                if (votingType === "approval") {
+                  // For approval votes, support contains the option index (0, 1, 2, etc.)
+                  // Convert it to params array format for parseParams
+                  const supportValue = voteWithType.support;
+                  voteWithType = {
+                    ...voteWithType,
+                    params: supportValue
+                      ? `[${supportValue}]`
+                      : voteWithType.params,
+                    support: "1", // Set support to FOR for approval votes
+                  };
+                }
+              }
+
+              // Populate proposalData from archive proposal if not already set
+              if (!proposalData && archiveProposal.kwargs) {
+                try {
+                  const proposalType =
+                    votingType?.toUpperCase() || safeProposalType;
+
+                  if (votingType === "approval") {
+                    // For APPROVAL proposals, transform to expected format
+                    // Each option is [targets, values, calldatas, description]
+                    // For archive proposals with no on-chain actions, use empty string arrays
+                    const choices = archiveProposal.kwargs.choices || [];
+                    const options = choices.map((choice: string) => [
+                      [], // targets - empty array
+                      [], // values - empty array
+                      [], // calldatas - empty array
+                      choice, // description
+                    ]);
+
+                    const transformedData = [
+                      options,
+                      [
+                        String(archiveProposal.kwargs.max_approvals || 1),
+                        String(archiveProposal.kwargs.criteria || 0),
+                        "0x0000000000000000000000000000000000000000", // budgetToken
+                        String(archiveProposal.kwargs.criteria_value || 0),
+                        String(archiveProposal.kwargs.budget || 0),
+                      ],
+                    ];
+
+                    proposalData = parseProposalData(
+                      JSON.stringify(transformedData),
+                      proposalType as ProposalType
+                    );
+                  }
+                } catch (e) {
+                  console.error("Error parsing archive proposal data:", e);
+                }
+              }
             }
           } catch (_) {
             // ignore archive fetch errors; keep parsed title as-is
@@ -239,6 +297,7 @@ async function getVotesForDelegateForAddress({
         return parsed;
       })
     );
+
     return {
       meta,
       data,

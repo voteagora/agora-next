@@ -49,7 +49,7 @@ async function loadProposal(
       fetchProposalFromArchive(namespace, proposalId),
       fetchProposalTaxFormMetadata(proposalId),
     ]);
-
+    console.log("archiveResults", archiveResults);
     const archiveProposal = archiveResults ? archiveResults : undefined;
     if (archiveProposal) {
       const normalizeOptions = {

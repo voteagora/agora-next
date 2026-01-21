@@ -85,12 +85,19 @@ export function ApprovalOptionsInput({
   };
 
   const handleBudgetChange = (value: string) => {
-    const num = parseInt(value, 10);
-    if (!isNaN(num) && num >= 0) {
+    if (value === "") {
       onChange({
         ...settings,
-        budget: num,
+        budget: 0,
       });
+    } else {
+      const num = parseInt(value, 10);
+      if (!isNaN(num) && num >= 0) {
+        onChange({
+          ...settings,
+          budget: num,
+        });
+      }
     }
   };
 
@@ -115,12 +122,19 @@ export function ApprovalOptionsInput({
   };
 
   const handleCriteriaValueChange = (value: string) => {
-    const num = parseInt(value, 10);
-    if (!isNaN(num) && num >= 0) {
+    if (value === "") {
       onChange({
         ...settings,
-        criteriaValue: num,
+        criteriaValue: 0,
       });
+    } else {
+      const num = parseInt(value, 10);
+      if (!isNaN(num) && num >= 0) {
+        onChange({
+          ...settings,
+          criteriaValue: num,
+        });
+      }
     }
   };
 
@@ -193,10 +207,10 @@ export function ApprovalOptionsInput({
             />
             <Input
               type="number"
-              min={0}
+              min={1}
               value={settings.criteriaValue || ""}
               onChange={(e) => handleCriteriaValueChange(e.target.value)}
-              placeholder="0"
+              placeholder="1"
               className="bg-wash border-line"
             />
           </div>

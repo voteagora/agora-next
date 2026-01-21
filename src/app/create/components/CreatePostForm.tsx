@@ -220,7 +220,12 @@ export function CreatePostForm({
                   !title?.trim() ||
                   !description?.trim() ||
                   (postType === "tempcheck" && !canCreateTempCheck) ||
-                  (postType === "gov-proposal" && !canCreateGovernanceProposal)
+                  (postType === "gov-proposal" &&
+                    !canCreateGovernanceProposal) ||
+                  (selectedVotingType === "approval" &&
+                    (approvalSettings.choices.length === 0 ||
+                      (approvalSettings.criteria === "threshold" &&
+                        approvalSettings.criteriaValue <= 0)))
                 }
                 className={submitClassName}
               >
