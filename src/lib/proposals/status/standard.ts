@@ -155,8 +155,8 @@ export const deriveStandardStatus = (
 
   // Check approval threshold
   const hasMetThreshold =
-    voteThresholdPercent >= thresholds.approvalThreshold / 100 ||
-    thresholds.approvalThreshold === 0;
+    voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100 ||
+    Number(thresholds.approvalThreshold) === 0;
 
   // Calculate quorum based on calculationOptions
   // calculationOptions=1 means for only, otherwise for+abstain

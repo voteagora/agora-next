@@ -263,6 +263,9 @@ export const TENANT_PROPOSAL_SOURCES: Record<
   demo: ["dao-node"],
   syndicate: ["eas-oodao"],
   towns: ["dao-node"],
+  demo2: ["dao-node"],
+  demo4: ["dao-node"],
+  demo3: ["dao-node"],
 };
 
 export const ARCHIVE_GCS_BUCKET =

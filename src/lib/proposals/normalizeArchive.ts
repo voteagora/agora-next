@@ -138,10 +138,15 @@ function normalizeBase(
           name: proposal.proposal_type.name || "Standard",
           quorum: safeBigInt(proposal.proposal_type.quorum || 0),
           approval_threshold: safeBigInt(
-            proposal.proposal_type.approval_threshold || 0
+            proposal.proposal_type.approval_threshold
           ),
         }
-      : null;
+      : {
+          proposal_type_id: 0,
+          name: "Standard",
+          quorum: 0n,
+          approval_threshold: 0n,
+        };
 
   return {
     id: String(proposal.id),

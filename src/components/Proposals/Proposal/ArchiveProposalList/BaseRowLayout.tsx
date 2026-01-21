@@ -170,7 +170,7 @@ function StandardHeader({
     <div className="flex flex-row text-xs text-secondary gap-1">
       <div>
         {data.proposalTypeName}{" "}
-        <span className="hidden sm:inline"> | The {organizationTitle}</span>
+        <span className="hidden sm:inline"> by The {organizationTitle}</span>
       </div>
       <div className="block sm:hidden">
         <ProposalStatus proposal={statusProposal} />

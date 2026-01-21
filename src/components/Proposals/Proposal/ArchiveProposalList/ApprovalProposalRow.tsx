@@ -26,7 +26,10 @@ export function ApprovalProposalRow({
     const metrics = extractApprovalMetrics(proposal, {
       tokenDecimals: decimals,
     });
-    return { displayData, metrics };
+    return {
+      displayData,
+      metrics,
+    };
   }, [proposal, decimals, proposalType]);
 
   return (
@@ -38,6 +41,7 @@ export function ApprovalProposalRow({
           optionCount={metrics.choices.length}
         />
       }
+      proposalTypeName={proposalType}
     />
   );
 }
