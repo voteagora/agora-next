@@ -12,8 +12,7 @@ import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import ArchiveProposalsList from "@/components/Proposals/ProposalsList/ArchiveProposalsList";
 import { proposalsFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
-import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
-import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
+import { DraftsTabsWrapper } from "@/components/Proposals/DraftsTabsWrapper";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
 import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
@@ -97,26 +96,8 @@ export default async function ProposalsHome() {
       ]);
   }
 
-  return (
-    <div className="flex flex-col">
-      {supportsNotifications && <SubscribeDialogLauncher />}
-      <Hero page="proposals" />
-      {plmEnabled && (
-        <>
-          <MyDraftProposals
-            fetchDraftProposals={async (address) => {
-              "use server";
-              return apiFetchDraftProposals(address);
-            }}
-          />
-          <MySponsorshipRequests
-            fetchDraftProposals={async (address) => {
-              "use server";
-              return apiFetchDraftProposalsForSponsorship(address);
-            }}
-          />
-        </>
-      )}
+  const proposalsContent = (
+    <>
       <NeedsMyVoteProposalsList
         fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
         votableSupply={votableSupply}
@@ -141,6 +122,26 @@ export default async function ProposalsHome() {
           votableSupply={votableSupply}
         />
       )}
+    </>
+  );
+
+  return (
+    <div className="flex flex-col">
+      {supportsNotifications && <SubscribeDialogLauncher />}
+      <Hero page="proposals" />
+      <DraftsTabsWrapper
+        plmEnabled={!!plmEnabled}
+        fetchDraftProposals={async (address) => {
+          "use server";
+          return apiFetchDraftProposals(address);
+        }}
+        fetchSponsorshipProposals={async (address) => {
+          "use server";
+          return apiFetchDraftProposalsForSponsorship(address);
+        }}
+      >
+        {proposalsContent}
+      </DraftsTabsWrapper>
     </div>
   );
 }
