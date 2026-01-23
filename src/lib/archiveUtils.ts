@@ -8,13 +8,6 @@ import {
   getArchiveSlugForProposalVotes,
 } from "./constants";
 
-const withCacheBust = (url: string) => {
-  const now = Math.floor(Date.now() / 1000);
-  const rounded = now - (now % 15);
-  const separator = url.includes("?") ? "&" : "?";
-  return `${url}${separator}t=${rounded}`;
-};
-
 /**
  * Parse NDJSON (Newline Delimited JSON) string to array of objects
  */
@@ -117,8 +110,8 @@ export const fetchProposalFromArchive = async (
       proposalId
     );
     const [responseDaoNode, responseEasOodao] = await Promise.all([
-      fetch(withCacheBust(archiveDaoNodeUrl), { cache: "no-store" }),
-      fetch(withCacheBust(archiveEasOodaoUrl), { cache: "no-store" }),
+      fetch(archiveDaoNodeUrl, { next: { revalidate: 60 } }),
+      fetch(archiveEasOodaoUrl, { next: { revalidate: 60 } }),
     ]);
 
     if (!responseDaoNode.ok && !responseEasOodao.ok) {
@@ -209,8 +202,8 @@ async function gunzipToString(buffer: ArrayBuffer): Promise<string> {
 }
 
 async function fetchArchiveNdjson<T>(url: string): Promise<T[]> {
-  const response = await fetch(withCacheBust(url), {
-    cache: "no-store",
+  const response = await fetch(url, {
+    next: { revalidate: 60 },
   });
 
   if (response.status === 404) {
