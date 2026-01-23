@@ -734,6 +734,27 @@ async function getUserSnapshotVotesForProposal({
   return data;
 }
 
+async function hasUserVotedForProposal({
+  proposalId,
+  address,
+}: {
+  proposalId: string;
+  address: string;
+}): Promise<boolean> {
+  const { namespace } = Tenant.current();
+  try {
+    const result = await prismaWeb3Client.$queryRawUnsafe<any[]>(
+      `SELECT 1 FROM ${namespace + ".votes"} WHERE proposal_id = $1 AND voter = $2 LIMIT 1`,
+      proposalId,
+      address.toLowerCase()
+    );
+    return result.length > 0;
+  } catch (e) {
+    console.error("Error checking vote existence", e);
+    return false;
+  }
+}
+
 async function checkArchiveForUserVote({
   proposalId,
   address,
@@ -787,34 +808,6 @@ async function getUserVotesForProposal({
   return withMetrics("getUserVotesForProposal", async () => {
     const { namespace, contracts, ui } = Tenant.current();
 
-    const fetchFromDB = async () => {
-      const queryFunciton = prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
-        `
-      SELECT
-        STRING_AGG(transaction_hash,'|') as transaction_hash,
-        proposal_id,
-        proposal_type,
-        proposal_data,
-        voter,
-        support,
-        SUM(weight::numeric) as weight,
-        STRING_AGG(distinct reason, '\n --------- \n') as reason,
-        MAX(block_number) as block_number,
-        params
-      FROM ${namespace + ".votes"}
-      WHERE proposal_id = $1AND voter = $2
-      GROUP BY proposal_id, proposal_type, proposal_data, voter, support, params
-      `,
-        proposalId,
-        address.toLowerCase()
-      );
-
-      return await doInSpan(
-        { name: "getUserVotesForProposal" },
-        async () => queryFunciton
-      );
-    };
-
     const latestBlockPromise = ui.toggle("use-l1-block-number")?.enabled
       ? contracts.providerForTime?.getBlock("latest")
       : contracts.token.provider.getBlock("latest");
@@ -847,8 +840,12 @@ async function getUserVotesForProposal({
       // For closed proposals, rely strictly on the archive to avoid slow DB lookups.
       // This improves performance significantly for non-voters.
     } else {
-      // Race DB and Archive. Use the first successful result.
-      const dbPromise = fetchFromDB();
+      // Race lightweight DB existence check against Archive.
+      const dbExistencePromise = hasUserVotedForProposal({
+        proposalId,
+        address,
+      });
+
       const archivePromise = checkArchiveForUserVote({
         proposalId,
         address,
@@ -858,20 +855,47 @@ async function getUserVotesForProposal({
         let settledCount = 0;
         let resolved = false;
 
-        const handleResult = (result: VotePayload[]) => {
+        const handleResult = (result: VotePayload[] | boolean) => {
           if (resolved) return;
-          if (result.length > 0) {
-            resolved = true;
-            resolve(result);
-          } else {
-            settledCount++;
-            if (settledCount === 2) {
+
+          if (typeof result === "boolean") {
+            if (result === true) {
+              // User voted. Return minimal payload for UI check.
+              resolved = true;
+              resolve([
+                {
+                  proposal_id: proposalId,
+                  voter: address,
+                  support: "FOR",
+                  weight: 0n,
+                  reason: "",
+                  block_number: 0n,
+                  transaction_hash: "0x0",
+                  proposal_type: "STANDARD",
+                  proposal_data: null,
+                  params: null,
+                } as VotePayload,
+              ]);
+            } else {
+              // DB says not voted.
+              resolved = true;
               resolve([]);
+            }
+          } else {
+            // Archive result
+            if (result.length > 0) {
+              resolved = true;
+              resolve(result);
+            } else {
+              settledCount++;
+              if (settledCount === 2) {
+                resolve([]);
+              }
             }
           }
         };
 
-        dbPromise.then(handleResult).catch(() => handleResult([]));
+        dbExistencePromise.then(handleResult).catch(() => handleResult(false));
         archivePromise.then(handleResult).catch(() => handleResult([]));
       });
     }
