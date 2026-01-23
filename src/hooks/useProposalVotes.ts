@@ -66,19 +66,23 @@ export const useSnapshotProposalVotes = ({
   return { data, isFetching, isFetched, queryKey: QK };
 };
 
+import { Proposal } from "@/app/api/common/proposals/proposal";
+
 export const useUserVotes = ({
   proposalId,
   address,
+  proposal,
 }: {
   proposalId: string;
   address: string | `0x${string}` | undefined;
+  proposal?: Proposal;
 }) => {
   const { data, isFetching, isFetched } = useQuery({
     enabled: !!address && !!proposalId,
     queryKey: ["userVotes", proposalId, address],
     queryFn: async () => {
       if (!address) return [];
-      return await fetchUserVotesForProposal(proposalId, address);
+      return await fetchUserVotesForProposal(proposalId, address, proposal);
     },
     staleTime: 60000,
   });

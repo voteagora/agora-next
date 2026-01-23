@@ -54,11 +54,15 @@ export const fetchSnapshotProposalVotes = (
     pagination,
   });
 
+import { Proposal } from "../api/common/proposals/proposal";
+
 export const fetchUserVotesForProposal = (
   proposalId: string,
-  address: string | `0x${string}`
+  address: string | `0x${string}`,
+  proposal?: Proposal
 ) =>
   apiFetchUserVotesForProposal({
     proposalId,
     address,
+    proposal,
   });
