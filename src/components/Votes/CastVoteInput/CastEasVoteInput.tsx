@@ -39,6 +39,7 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
   const { hasVoted, isLoading } = useUserVotes({
     proposalId: proposal.id,
     address,
+    proposal,
   });
 
   // Check if proposal hasn't started yet
