@@ -24,7 +24,12 @@ import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
 import { ProposalType } from "@/lib/types";
-import { fetchProposalFromArchive } from "@/lib/archiveUtils";
+import {
+  fetchProposalFromArchive,
+  fetchRawProposalVotesFromArchive,
+} from "@/lib/archiveUtils";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import { PROPOSAL_STATUS } from "@/lib/constants";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -729,17 +734,62 @@ async function getUserSnapshotVotesForProposal({
   return data;
 }
 
-async function getUserVotesForProposal({
+async function checkArchiveForUserVote({
   proposalId,
   address,
 }: {
   proposalId: string;
   address: string;
+}): Promise<VotePayload[]> {
+  const { namespace } = Tenant.current();
+  try {
+    const archiveVotes = await fetchRawProposalVotesFromArchive({
+      namespace,
+      proposalId,
+    });
+
+    const userVote = archiveVotes.find(
+      (v) => v.voter.toLowerCase() === address.toLowerCase()
+    );
+
+    if (userVote) {
+      // Map archive vote to VotePayload shape
+      return [
+        {
+          transaction_hash: userVote.transaction_hash || "",
+          proposal_id: proposalId,
+          proposal_type: "STANDARD" as any, // Archive votes are standard-like (no types usually)
+          proposal_data: null,
+          voter: userVote.voter,
+          support: userVote.support || "ABSTAIN", // fallback
+          weight: BigInt(userVote.weight || 0),
+          reason: userVote.reason || "",
+          block_number: BigInt(userVote.block_number || 0),
+          params: userVote.params || null,
+        } as VotePayload,
+      ];
+    }
+  } catch (e) {
+    console.error("Error checking archive for user vote", e);
+  }
+  return [];
+}
+
+async function getUserVotesForProposal({
+  proposalId,
+  address,
+  proposal,
+}: {
+  proposalId: string;
+  address: string;
+  proposal?: Proposal;
 }) {
   return withMetrics("getUserVotesForProposal", async () => {
     const { namespace, contracts, ui } = Tenant.current();
-    const queryFunciton = prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
-      `
+
+    const fetchFromDB = async () => {
+      const queryFunciton = prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
+        `
       SELECT
         STRING_AGG(transaction_hash,'|') as transaction_hash,
         proposal_id,
@@ -755,18 +805,76 @@ async function getUserVotesForProposal({
       WHERE proposal_id = $1AND voter = $2
       GROUP BY proposal_id, proposal_type, proposal_data, voter, support, params
       `,
-      proposalId,
-      address.toLowerCase()
-    );
+        proposalId,
+        address.toLowerCase()
+      );
 
-    const votes = await doInSpan(
-      { name: "getUserVotesForProposal" },
-      async () => queryFunciton
-    );
+      return await doInSpan(
+        { name: "getUserVotesForProposal" },
+        async () => queryFunciton
+      );
+    };
 
-    const latestBlock = ui.toggle("use-l1-block-number")?.enabled
-      ? await contracts.providerForTime?.getBlock("latest")
-      : await contracts.token.provider.getBlock("latest");
+    const latestBlockPromise = ui.toggle("use-l1-block-number")?.enabled
+      ? contracts.providerForTime?.getBlock("latest")
+      : contracts.token.provider.getBlock("latest");
+
+    const [latestBlock] = await Promise.all([latestBlockPromise]);
+
+    let votes: VotePayload[] = [];
+
+    // Strategy:
+    // 1. If proposal is closed (CANCELLED, CLOSED, DEFEATED, EXECUTED, SUCCEEDED, QUEUED), check Archive only.
+    // 2. If proposal is active (ACTIVE, PENDING), race DB and Archive.
+    // 3. Fallback to DB if proposal status is unknown.
+
+    const isClosed =
+      proposal &&
+      [
+        PROPOSAL_STATUS.CANCELLED,
+        PROPOSAL_STATUS.CLOSED,
+        PROPOSAL_STATUS.DEFEATED,
+        PROPOSAL_STATUS.EXECUTED,
+        PROPOSAL_STATUS.SUCCEEDED,
+        PROPOSAL_STATUS.QUEUED,
+      ].includes(proposal.status as PROPOSAL_STATUS);
+
+    if (isClosed) {
+      votes = await checkArchiveForUserVote({
+        proposalId,
+        address,
+      });
+      // For closed proposals, rely strictly on the archive to avoid slow DB lookups.
+      // This improves performance significantly for non-voters.
+    } else {
+      // Race DB and Archive. Use the first successful result.
+      const dbPromise = fetchFromDB();
+      const archivePromise = checkArchiveForUserVote({
+        proposalId,
+        address,
+      });
+
+      votes = await new Promise<VotePayload[]>((resolve) => {
+        let settledCount = 0;
+        let resolved = false;
+
+        const handleResult = (result: VotePayload[]) => {
+          if (resolved) return;
+          if (result.length > 0) {
+            resolved = true;
+            resolve(result);
+          } else {
+            settledCount++;
+            if (settledCount === 2) {
+              resolve([]);
+            }
+          }
+        };
+
+        dbPromise.then(handleResult).catch(() => handleResult([]));
+        archivePromise.then(handleResult).catch(() => handleResult([]));
+      });
+    }
 
     const data = Promise.all(
       votes.map((vote) => {
