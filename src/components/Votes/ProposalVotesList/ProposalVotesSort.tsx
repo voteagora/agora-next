@@ -6,6 +6,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
+import { Listbox } from "@headlessui/react";
+import { ChevronDown } from "lucide-react";
 import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu";
 import { ArrowDownAZ } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -50,41 +52,38 @@ export default function ProposalVotesSort({
   onSortChange,
 }: ProposalVotesSortProps) {
   return (
-    <div className="flex flex-row items-center justify-between px-4 py-2">
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          className={`text-tertiary cursor-pointer outline-none`}
-        >
-          <div className="border border-line rounded-lg px-[10px] py-[6px] flex flex-row items-center gap-2">
-            <ArrowDownAZ className="stroke-primary w-4 h-4" />
-            <span className="text-primary text-xs font-medium">Sort by</span>
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56">
-          <DropdownMenuRadioGroup
-            value={sortOption.label}
-            onValueChange={(value: string) => {
-              const selected = sortOptions.find((opt) => opt.label === value);
-              if (selected) onSortChange(selected);
-            }}
-          >
-            {sortOptions.map((option) => (
-              <DropdownMenuRadioItem
-                key={option.label}
-                value={option.label}
-                className={cn(
-                  "relative flex cursor-pointer select-none items-center rounded-lg p-3 text-xs outline-none transition-colors hover:bg-neutral/50",
-                  option.label === sortOption.label
-                    ? "text-primary font-semibold"
-                    : "text-secondary"
-                )}
-              >
-                {option.label}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <div className="relative text-primary">
+      <Listbox
+        value={sortOption.label}
+        onChange={(value: string) => {
+          const selected = sortOptions.find((opt) => opt.label === value);
+          if (selected) onSortChange(selected);
+        }}
+      >
+        <Listbox.Button className="text-primary w-full sm:w-fit bg-neutral font-medium border border-line rounded-lg py-1 px-3 flex items-center text-xs">
+          <ArrowDownAZ className="stroke-primary w-4 h-4 mr-2" />
+          {sortOption.label}
+          <ChevronDown className="h-4 w-4 ml-2 opacity-30 hover:opacity-100" />
+        </Listbox.Button>
+        <Listbox.Options className="mt-3 absolute bg-neutral border border-line p-2 rounded-2xl flex flex-col gap-1 z-50 w-max right-0 shadow-xl">
+          {sortOptions.map((option) => (
+            <Listbox.Option key={option.label} value={option.label}>
+              {({ selected }) => (
+                <div
+                  className={cn(
+                    "cursor-pointer text-xs py-2 px-3 border rounded-xl font-medium",
+                    selected
+                      ? "text-primary bg-wash border-line"
+                      : "text-tertiary border-transparent hover:bg-wash"
+                  )}
+                >
+                  {option.label}
+                </div>
+              )}
+            </Listbox.Option>
+          ))}
+        </Listbox.Options>
+      </Listbox>
     </div>
   );
 }
