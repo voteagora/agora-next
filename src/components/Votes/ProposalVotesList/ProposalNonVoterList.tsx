@@ -11,18 +11,24 @@ import { Vote, VoterTypes } from "@/app/api/common/votes/vote";
 import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
 import ProposalVoterListFilter from "./ProsalVoterListFilter";
 import { VOTER_TYPES } from "@/lib/constants";
+import { VotesSort, VotesSortOrder } from "@/app/api/common/votes/vote";
 
 const LIMIT = 20;
 
 type ProposalNonVoterListProps = {
   proposal: Proposal;
   offchainProposalId?: string;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
+  selectedVoterType: VoterTypes;
 };
 
 type ProposalNonVoterListContentProps = {
   proposal: Proposal;
   offchainProposalId?: string;
   selectedVoterType: VoterTypes;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
 };
 
 const isApprovalProposal = (proposal: Proposal) => {
@@ -34,6 +40,8 @@ const ProposalNonVoterListContent = ({
   proposal,
   offchainProposalId,
   selectedVoterType,
+  sort,
+  sortOrder,
 }: ProposalNonVoterListContentProps) => {
   const { data: fetchedNonVotes, isFetched } = useProposalNonVotes({
     enabled: true,
@@ -42,18 +50,26 @@ const ProposalNonVoterListContent = ({
     proposalId: proposal.id,
     offchainProposalId,
     type: selectedVoterType.type,
+    sort,
+    sortOrder,
   });
 
   const fetching = useRef(false);
   const [pages, setPages] = useState<PaginatedResult<any[]>[]>([]);
   const [meta, setMeta] = useState<PaginatedResult<Vote[]>["meta"]>();
 
+  // Reset pages when sort/filter changes
+  useEffect(() => {
+    setPages([]);
+    setMeta(undefined);
+  }, [selectedVoterType, sort, sortOrder]);
+
   useEffect(() => {
     if (isFetched && fetchedNonVotes) {
       setPages([fetchedNonVotes]);
       setMeta(fetchedNonVotes.meta);
     }
-  }, [fetchedNonVotes, isFetched]);
+  }, [fetchedNonVotes, isFetched, selectedVoterType, sort, sortOrder]);
 
   const loadMore = useCallback(async () => {
     if (!fetching.current && meta?.has_next) {
@@ -66,7 +82,9 @@ const ProposalNonVoterListContent = ({
           offset: meta.next_offset,
         },
         offchainProposalId,
-        voterTypeAtRequest
+        voterTypeAtRequest,
+        sort,
+        sortOrder
       );
 
       if (selectedVoterType.type === voterTypeAtRequest) {
@@ -75,7 +93,7 @@ const ProposalNonVoterListContent = ({
       }
       fetching.current = false;
     }
-  }, [proposal, meta, selectedVoterType, offchainProposalId]);
+  }, [proposal, meta, selectedVoterType, offchainProposalId, sort, sortOrder]);
 
   const voters = useMemo(() => {
     return pages.flatMap((page) => page.data);
@@ -135,30 +153,21 @@ const ProposalNonVoterListContent = ({
 export const ProposalNonVoterList = ({
   proposal,
   offchainProposalId,
+  sort,
+  sortOrder,
+  selectedVoterType,
 }: ProposalNonVoterListProps) => {
-  const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>(
-    proposal.proposalType?.includes("HYBRID") ||
-      proposal.proposalType?.includes("OFFCHAIN")
-      ? VOTER_TYPES[0]
-      : VOTER_TYPES[VOTER_TYPES.length - 1]
-  );
-
   const isOffchain = proposal.proposalType?.includes("OFFCHAIN") ?? false;
 
   return (
     <>
-      {offchainProposalId && (
-        <ProposalVoterListFilter
-          selectedVoterType={selectedVoterType}
-          onVoterTypeChange={setSelectedVoterType}
-          isOffchain={isOffchain}
-        />
-      )}
       <ProposalNonVoterListContent
-        key={selectedVoterType.type}
+        key={selectedVoterType.type + sort + sortOrder}
         proposal={proposal}
         offchainProposalId={offchainProposalId}
         selectedVoterType={selectedVoterType}
+        sort={sort}
+        sortOrder={sortOrder}
       />
     </>
   );

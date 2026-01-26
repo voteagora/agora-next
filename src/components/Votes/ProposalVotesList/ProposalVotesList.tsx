@@ -11,10 +11,14 @@ import {
 } from "@/app/proposals/actions";
 import { PaginatedResult } from "@/app/lib/pagination";
 import { useProposalVotes } from "@/hooks/useProposalVotes";
+import { VotesSort, VotesSortOrder } from "@/app/api/common/votes/vote";
 
 interface Props {
   proposalId: string;
   offchainProposalId?: string;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
+  voterType?: string;
 }
 
 const LIMIT = 10;
@@ -22,6 +26,9 @@ const LIMIT = 10;
 export default function ProposalVotesList({
   proposalId,
   offchainProposalId,
+  sort = "weight",
+  sortOrder = "desc",
+  voterType = "ALL",
 }: Props) {
   const { data: fetchedVotes, isFetched } = useProposalVotes({
     enabled: true,
@@ -29,6 +36,7 @@ export default function ProposalVotesList({
     offset: 0,
     proposalId: proposalId,
     offchainProposalId,
+    sort, // Note: existing hook might need update, but we are primarily using fetchProposalVotes in loadMore
   });
 
   const { address: connectedAddress } = useAccount();
@@ -65,7 +73,7 @@ export default function ProposalVotesList({
         meta: fetchedVotes.meta,
       });
     }
-  }, [fetchedVotes, isFetched]);
+  }, [fetchedVotes, isFetched, sort, sortOrder, voterType]); // Reset on sort/filter change
 
   useEffect(() => {
     if (connectedAddress) {
@@ -93,7 +101,9 @@ export default function ProposalVotesList({
           offset: voteState.meta.next_offset,
         },
         undefined,
-        offchainProposalId
+        offchainProposalId,
+        sortOrder,
+        voterType
       );
       setVoteState((prev) => ({
         pages: [...prev.pages, { ...data, votes: data.data }],
@@ -101,7 +111,14 @@ export default function ProposalVotesList({
       }));
       fetching.current = false;
     }
-  }, [proposalId, voteState.meta]);
+  }, [
+    proposalId,
+    voteState.meta,
+    sort,
+    sortOrder,
+    voterType,
+    offchainProposalId,
+  ]);
 
   return (
     <div className="px-4 pb-4 overflow-y-auto min-h-[36px] max-h-[calc(100vh-437px)]">

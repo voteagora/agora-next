@@ -12,12 +12,28 @@ import CastVoteInput, {
 import { icons } from "@/assets/icons/icons";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalVotesFilter from "./ProposalVotesFilter";
+import ProposalVotesSort, {
+  SortParams,
+} from "@/components/Votes/ProposalVotesList/ProposalVotesSort";
+import { VoterTypes } from "@/app/api/common/votes/vote";
+import { VOTER_TYPES } from "@/lib/constants";
+import ProposalVoterListFilter from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
 import Tenant from "@/lib/tenant/tenant";
 
 const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
   const [isClicked, setIsClicked] = useState(false);
   const [showVoters, setShowVoters] = useState(true);
   const isOffchain = proposal.proposalType?.startsWith("OFFCHAIN");
+  const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>(
+    isOffchain || proposal.proposalType?.includes("HYBRID")
+      ? VOTER_TYPES[0]
+      : VOTER_TYPES[VOTER_TYPES.length - 1]
+  );
+  const [sortOption, setSortOption] = useState<SortParams>({
+    sortKey: "weight",
+    sortOrder: "desc",
+    label: "Most Voting Power",
+  });
   const { ui } = Tenant.current();
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"
@@ -46,13 +62,24 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
         <div className="flex flex-col gap-4">
           <div className="font-semibold px-4 text-primary">Voting activity</div>
           <ProposalVotesSummary proposal={proposal} />
-          <div className="px-4">
+          <div className="px-4 flex flex-col gap-4">
             <ProposalVotesFilter
               initialSelection={showVoters ? "Voters" : "Hasn't voted"}
               onSelectionChange={(value) => {
                 setShowVoters(value === "Voters");
               }}
             />
+            <div className="flex justify-between items-center border-b border-line pb-2">
+              <ProposalVoterListFilter
+                selectedVoterType={selectedVoterType}
+                onVoterTypeChange={setSelectedVoterType}
+                isOffchain={isOffchain}
+              />
+              <ProposalVotesSort
+                sortOption={sortOption}
+                onSortChange={setSortOption}
+              />
+            </div>
           </div>
         </div>
 
@@ -66,11 +93,17 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
           <ProposalVotesList
             proposalId={proposal.id}
             offchainProposalId={proposal.offchainProposalId}
+            sort={sortOption.sortKey}
+            sortOrder={sortOption.sortOrder}
+            voterType={selectedVoterType.type}
           />
         ) : (
           <ProposalNonVoterList
             proposal={proposal}
             offchainProposalId={proposal.offchainProposalId}
+            sort={sortOption.sortKey}
+            sortOrder={sortOption.sortOrder}
+            selectedVoterType={selectedVoterType}
           />
         )}
         {/* Show the input for the user to vote on a proposal if allowed */}
