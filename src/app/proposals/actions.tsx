@@ -8,7 +8,11 @@ import {
 } from "@/app/api/common/votes/getVotes";
 import { getProposalsCount } from "@/lib/prismaUtils";
 import { PaginationParams } from "../lib/pagination";
-import { VoterTypes, VotesSort } from "../api/common/votes/vote";
+import {
+  VoterTypes,
+  VotesSort,
+  VotesSortOrder,
+} from "../api/common/votes/vote";
 import Tenant from "@/lib/tenant/tenant";
 
 export async function fetchProposalsCount() {
@@ -23,26 +27,34 @@ export const fetchVotersWhoHaveNotVotedForProposal = (
   proposalId: string,
   pagination?: PaginationParams,
   offchainProposalId?: string,
-  type?: VoterTypes["type"]
+  type?: VoterTypes["type"],
+  sort?: VotesSort,
+  sortOrder?: VotesSortOrder
 ) =>
   apiFetchVotersWhoHaveNotVotedForProposal({
     proposalId,
     pagination,
     offchainProposalId,
     type,
+    sort,
+    sortOrder,
   });
 
 export const fetchProposalVotes = (
   proposalId: string,
   pagination?: PaginationParams,
   sort?: VotesSort,
-  offchainProposalId?: string
+  offchainProposalId?: string,
+  sortOrder?: VotesSortOrder,
+  voterType?: VoterTypes["type"]
 ) =>
   apiFetchVotesForProposal({
     proposalId,
     pagination,
     sort,
     offchainProposalId,
+    sortOrder,
+    voterType,
   });
 
 export const fetchSnapshotProposalVotes = (
