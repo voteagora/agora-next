@@ -569,7 +569,7 @@ async function getVotesForProposal({
                 ELSE voter_metadata::json
               END as voter_metadata
             FROM atlas."votes_with_meta_mat" ocv
-            LEFT JOIN agora.delegate_statements ds ON LOWER(ds.address) = LOWER(ocv.voter) AND ds.dao_slug = '${slug}'::config.dao_slug
+            LEFT JOIN agora.delegate_statements ds ON ds.address = ocv.voter AND ds.dao_slug = '${slug}'::config.dao_slug
             WHERE ocv.proposal_id = ${offchainProposalId ? "$5" : "$1"}
           `;
         }

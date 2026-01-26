@@ -81,6 +81,7 @@ export const DelegatesFilter = () => {
   return (
     <FilterResetListbox
       triggerLabel="Filter"
+      headerLabel={null}
       triggerIcon={
         <FilterIcon
           className={
