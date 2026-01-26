@@ -67,7 +67,7 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
                 setShowVoters(value === "Voters");
               }}
             />
-            <div className="flex justify-between items-center border-b border-line pb-2">
+            <div className="flex flex-col gap-2 border-b border-line pb-2">
               <ProposalVoterListFilter
                 selectedVoterType={selectedVoterType}
                 onVoterTypeChange={setSelectedVoterType}
