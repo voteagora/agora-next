@@ -141,6 +141,11 @@ const ProposalNonVoterListContent = ({
                 <ProposalSingleNonVoter voter={voter} proposal={proposal} />
               </li>
             ))}
+            {voters.length === 0 && (
+              <div className="px-4 pb-4 text-center text-secondary text-xs">
+                No votes yet
+              </div>
+            )}
           </ul>
         </InfiniteScroll>
       ) : (

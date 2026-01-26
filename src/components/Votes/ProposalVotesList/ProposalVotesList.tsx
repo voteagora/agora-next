@@ -100,7 +100,7 @@ export default function ProposalVotesList({
           limit: LIMIT,
           offset: voteState.meta.next_offset,
         },
-        undefined,
+        sort,
         offchainProposalId,
         sortOrder,
         voterType
@@ -149,6 +149,11 @@ export default function ProposalVotesList({
                 <ProposalSingleVote vote={vote} />
               </li>
             ))}
+            {userVotes.length === 0 && proposalVotes.length === 0 && (
+              <div className="px-4 pb-4 text-center text-secondary text-xs">
+                No votes yet
+              </div>
+            )}
           </ul>
         </InfiniteScroll>
       ) : (
