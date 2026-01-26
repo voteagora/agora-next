@@ -25,9 +25,12 @@ export default function ProposalVoterListFilter({
   onVoterTypeChange,
   isOffchain = false,
 }: ProposalVoterListFilterProps) {
-  const availableVoterTypes = isOffchain
-    ? VOTER_TYPES.filter((type) => type.type !== "TH")
-    : VOTER_TYPES;
+  const availableVoterTypes = [
+    { type: "ALL", value: "All" },
+    ...(isOffchain
+      ? VOTER_TYPES.filter((type) => type.type !== "TH")
+      : VOTER_TYPES),
+  ];
 
   return (
     <div className="relative text-primary">

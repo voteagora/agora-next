@@ -24,11 +24,10 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
   const [isClicked, setIsClicked] = useState(false);
   const [showVoters, setShowVoters] = useState(true);
   const isOffchain = proposal.proposalType?.startsWith("OFFCHAIN");
-  const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>(
-    isOffchain || proposal.proposalType?.includes("HYBRID")
-      ? VOTER_TYPES[0]
-      : VOTER_TYPES[VOTER_TYPES.length - 1]
-  );
+  const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>({
+    type: "ALL",
+    value: "All",
+  });
   const [sortOption, setSortOption] = useState<SortParams>({
     sortKey: "weight",
     sortOrder: "desc",
