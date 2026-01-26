@@ -537,7 +537,7 @@ async function getVotesForProposal({
   return withMetrics(
     "getVotesForProposal",
     async () => {
-      const { namespace, contracts, ui } = Tenant.current();
+      const { namespace, contracts, ui, slug } = Tenant.current();
 
       let eventsViewName;
 
@@ -564,7 +564,15 @@ async function getVotesForProposal({
               params,
               block_number,
               citizen_type::text,
-              voter_metadata::json
+              CASE
+                WHEN EXISTS (
+                  SELECT 1
+                  FROM agora.delegate_statements ds
+                  WHERE ds.address = ocv.voter
+                  AND ds.dao_slug = '${slug}'::config.dao_slug
+                ) THEN NULL
+                ELSE voter_metadata::json
+              END as voter_metadata
             FROM atlas."votes_with_meta_mat" ocv
             WHERE ocv.proposal_id = ${offchainProposalId ? "$5" : "$1"}
           `;
