@@ -28,7 +28,6 @@ export type FilterResetListboxProps = {
   onOpenChange?: (open: boolean) => void;
   borderBelowLabel?: boolean;
   animateFromBottom?: boolean;
-  headerLabel?: string | null;
 };
 
 const FilterResetListbox = ({
@@ -41,7 +40,6 @@ const FilterResetListbox = ({
   onOpenChange,
   borderBelowLabel = true,
   animateFromBottom = false,
-  headerLabel,
 }: FilterResetListboxProps) => {
   const [open, setOpen] = React.useState(false);
 
@@ -125,7 +123,7 @@ const FilterResetListbox = ({
                     )}
                   >
                     <div className="text-secondary text-base font-semibold leading-normal">
-                      {headerLabel === undefined ? triggerLabel : headerLabel}
+                      {triggerLabel}
                     </div>
                     <button
                       onClick={handleReset}
@@ -203,7 +201,7 @@ const FilterResetListbox = ({
               )}
             >
               <div className="text-secondary text-base font-semibold leading-normal">
-                {headerLabel === undefined ? triggerLabel : headerLabel}
+                {triggerLabel}
               </div>
               <button
                 onClick={handleReset}
