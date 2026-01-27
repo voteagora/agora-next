@@ -23,6 +23,7 @@ import {
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
+import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
 import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
 import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
 import { proposalsFilterOptions } from "@/lib/constants";
@@ -184,6 +185,17 @@ export const revalidateDelegateAddressPage = async (
   revalidateTag(`delegate-${delegateAddress}`);
   revalidatePath(`/delegates/${delegateAddress}`, "page");
 };
+
+export async function updateNotificationPreferencesForAddress(
+  address: `0x${string}`,
+  email: string,
+  options: {
+    wants_proposal_created_email: "prompt" | "prompted" | true | false;
+    wants_proposal_ending_soon_email: "prompt" | "prompted" | true | false;
+  }
+) {
+  return fetchUpdateNotificationPreferencesForAddress(address, email, options);
+}
 
 export const fetchDelegateStats = async (address: string) => {
   return getDelegateDataFromDaoNode(address);

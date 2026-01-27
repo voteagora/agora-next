@@ -28,6 +28,7 @@ import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithu
 import { ProposalType, StakedDeposit } from "@/lib/types";
 import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
+import SubscribeDialog from "@/components/Notifications/SubscribeDialog";
 import { ShareDialog as ShareVoteDialog } from "@/components/Proposals/ProposalPage/ShareVoteDialog/ShareVoteDialog";
 import { Vote } from "@/app/api/common/votes/vote";
 import { SimulationReportDialog } from "../SimulationReportDialog/SimulationReportDialog";
@@ -59,6 +60,7 @@ export type DialogType =
   | UndelegateDialogType
   | UpdateDraftProposalDialog
   | OpenGithubPRDialog
+  | SubscribeDialog
   | ShareVoteDialogType
   | SimulationReportDialogType
   | EncourageConnectWalletDialogType
@@ -267,6 +269,11 @@ export type SponsorOffchainDraftProposalDialog = {
 export type OpenGithubPRDialog = {
   type: "OPEN_GITHUB_PR";
   params: { redirectUrl: string; githubUrl: string };
+};
+
+export type SubscribeDialog = {
+  type: "SUBSCRIBE";
+  params: { type: "root" | "vote" };
 };
 
 export type SimulationReportDialogType = {
@@ -532,6 +539,9 @@ export const dialogs: DialogDefinitions<DialogType> = {
       closeDialog={closeDialog}
     />
   ),
+  SUBSCRIBE: ({ type }, closeDialog) => {
+    return <SubscribeDialog closeDialog={closeDialog} type={type} />;
+  },
   SIMULATION_REPORT: ({ report }, closeDialog) => (
     <SimulationReportDialog report={report} closeDialog={closeDialog} />
   ),

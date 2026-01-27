@@ -77,6 +77,7 @@ export default function DelegateStatementForm({
       topIssues: values.topIssues,
       topStakeholders: values.topStakeholders,
       scwAddress,
+      notificationPreferences: values.notificationPreferences,
     });
 
     try {
