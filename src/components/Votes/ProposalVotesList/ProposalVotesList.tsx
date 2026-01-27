@@ -36,7 +36,9 @@ export default function ProposalVotesList({
     offset: 0,
     proposalId: proposalId,
     offchainProposalId,
-    sort, // Note: existing hook might need update, but we are primarily using fetchProposalVotes in loadMore
+    sort,
+    sortOrder,
+    voterType,
   });
 
   const { address: connectedAddress } = useAccount();

@@ -83,7 +83,12 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
 
         {useArchiveVoteHistory ? (
           showVoters ? (
-            <ArchiveProposalVotesList proposal={proposal} />
+            <ArchiveProposalVotesList
+              proposal={proposal}
+              sort={sortOption.sortKey}
+              sortOrder={sortOption.sortOrder}
+              voterType={selectedVoterType.type}
+            />
           ) : (
             <ArchiveProposalNonVoterList proposal={proposal} />
           )

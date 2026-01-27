@@ -648,7 +648,7 @@ async function getVotesForProposal({
               FROM ${namespace}.proposals_v2 proposals
               WHERE proposals.proposal_id = $1 AND proposals.contract = $2) p ON TRUE
           ) q
-          ORDER BY citizen_type IS NOT NULL DESC, ${sort} ${sortOrder === "asc" ? "ASC" : "DESC"}
+          ORDER BY ${sort === "block_number" ? "block_number" : "weight"} ${sortOrder === "asc" ? "ASC" : "DESC"}
           OFFSET $3
           LIMIT $4;`;
 
