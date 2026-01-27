@@ -704,6 +704,13 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "duna/financial-statements",
+      enabled: true,
+      config: {
+        title: "Syndicate Collective Updates",
+      },
+    },
+    {
       name: "notifications",
       enabled: true,
     },

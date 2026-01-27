@@ -851,6 +851,26 @@ export async function getForumPostsByUser(
 ) {
   try {
     const { limit, offset } = pagination;
+    const now = new Date();
+    const attachmentWhere = {
+      archived: false,
+      OR: [
+        {
+          revealTime: null,
+          expirationTime: null,
+        },
+        {
+          AND: [
+            {
+              OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+            },
+            {
+              OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+            },
+          ],
+        },
+      ],
+    };
 
     const posts = await prismaWeb2Client.forumPost.findMany({
       where: {
@@ -873,7 +893,9 @@ export async function getForumPostsByUser(
             },
           },
         },
-        attachments: true,
+        attachments: {
+          where: attachmentWhere,
+        },
       },
       orderBy: { createdAt: "desc" },
       take: limit + 1,
@@ -910,6 +932,17 @@ export async function getForumPostsByUser(
           : new Date(att.createdAt)
         ).toISOString(),
         uploadedBy: att.address,
+        isFinancialStatement: att.isFinancialStatement ?? false,
+        revealTime: att.revealTime
+          ? att.revealTime instanceof Date
+            ? att.revealTime.toISOString()
+            : new Date(att.revealTime).toISOString()
+          : null,
+        expirationTime: att.expirationTime
+          ? att.expirationTime instanceof Date
+            ? att.expirationTime.toISOString()
+            : new Date(att.expirationTime).toISOString()
+          : null,
       })),
     }));
 

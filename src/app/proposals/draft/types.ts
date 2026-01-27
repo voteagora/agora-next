@@ -300,6 +300,7 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
     proposal_scope: proposal.proposal_scope,
     tiers_enabled: proposal.tiers_enabled || proposal.tiers?.length > 0,
     tiers: proposal.tiers,
+    proposalConfigType: proposal.proposal_type,
   };
 
   switch (proposal.voting_module_type) {

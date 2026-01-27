@@ -7,6 +7,9 @@ export interface ForumAttachment {
   url: string;
   createdAt: string;
   uploadedBy?: string;
+  isFinancialStatement?: boolean;
+  revealTime?: string | null;
+  expirationTime?: string | null;
 }
 
 export interface ForumTopic {
@@ -20,6 +23,9 @@ export interface ForumTopic {
   deletedAt?: string | null;
   deletedBy?: string | null;
   isNsfw?: boolean;
+  isFinancialStatement?: boolean;
+  revealTime?: string | null;
+  expirationTime?: string | null;
 }
 
 export interface ForumPost {
@@ -97,6 +103,20 @@ export function buildForumCategoryPath(
   return slug
     ? `/forums/category/${safeId}/${slug}`
     : `/forums/category/${safeId}`;
+}
+
+export function buildForumArticlePath(
+  id: number,
+  title?: string | null
+): string {
+  const numericId = Number(id);
+  const slug = buildForumTopicSlug(title);
+  if (!Number.isFinite(numericId)) {
+    return "/forums";
+  }
+  return slug
+    ? `/forum-article/${Math.abs(Math.trunc(numericId))}/${slug}`
+    : `/forum-article/${Math.abs(Math.trunc(numericId))}`;
 }
 
 export function extractForumTopicId(

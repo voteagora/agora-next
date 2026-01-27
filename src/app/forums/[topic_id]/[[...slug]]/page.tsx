@@ -26,8 +26,10 @@ import { DunaContentRenderer } from "@/components/duna-editor";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { stripHtmlToText } from "../../stripHtml";
 import Tenant from "@/lib/tenant/tenant";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
 import RelatedProposalLinks from "@/components/Proposals/ProposalPage/RelatedProposalLinks/RelatedProposalLinks";
+import FinancialStatementLayout from "../components/FinancialStatementLayout";
 
 // Force dynamic rendering - forum topics and posts change frequently
 export const dynamic = "force-dynamic";
@@ -262,6 +264,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
   const authorAddress = transformed.author || "";
   const createdAtIso = new Date(topicData.createdAt).toISOString();
   const categoryName = topicData.category?.name || null;
+  const { namespace } = Tenant.current();
 
   const adminRolesMap = adminsResult?.success
     ? adminsResult.data.reduce((map, admin) => {
@@ -297,6 +300,12 @@ export default async function ForumTopicPage({ params }: PageProps) {
 
   const rootPost = topicData.posts?.[0];
   const rootAttachments = (rootPost?.attachments as any[]) || [];
+
+  const isFinancialStatement = (topicData as any).isFinancialStatement ?? false;
+  const pdfAttachment = rootAttachments.find(
+    (att: any) => att.contentType === "application/pdf"
+  );
+  const pdfUrl = pdfAttachment?.url ?? null;
 
   const lastActivityAt =
     comments[comments.length - 1]?.createdAt || createdAtIso;
@@ -348,63 +357,91 @@ export default async function ForumTopicPage({ params }: PageProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Main Content */}
-          <div className="flex-1 min-w-0 max-w-full lg:max-w-4xl">
-            <TopicHeader topic={headerTopic} isAdmin={isAuthorAdmin} />
-
-            <div className="mt-2 mb-4 break-words">
-              <DunaContentRenderer
-                content={topicBody}
-                className="text-secondary text-sm leading-relaxed break-words"
-              />
-            </div>
-
-            {rootAttachments.length > 0 && (
-              <PostAttachments
-                attachments={rootAttachments}
-                postId={rootPost?.id}
-                postAuthor={authorAddress}
-                categoryId={categoryId}
-              />
-            )}
-
-            <div className="my-4">
-              <RelatedProposalLinks proposalId={topicId.toString()} />
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 lg:gap-6 text-xs font-semibold text-tertiary border-b pb-2">
-              {rootPostId && (
-                <div className="">
-                  <EmojiReactions
-                    targetType="post"
-                    targetId={rootPostId}
-                    initialByEmoji={topicReactionsByEmoji}
+          <div
+            className={`flex-1 min-w-0 max-w-full ${
+              isFinancialStatement
+                ? "lg:max-w-5xl xl:max-w-6xl"
+                : "lg:max-w-4xl"
+            }`}
+          >
+            {isFinancialStatement ? (
+              <>
+                <FinancialStatementLayout
+                  topicId={topicId}
+                  title={transformed.title}
+                  content={topicBody}
+                  pdfUrl={pdfUrl}
+                  isOnArticlePage={namespace === TENANT_NAMESPACES.UNISWAP}
+                />
+                <div className="mt-8">
+                  <ForumThread
+                    topicId={topicId}
+                    initialComments={comments}
+                    categoryId={categoryId}
+                    adminDirectory={adminDirectory}
                   />
                 </div>
-              )}
-              <div className="">
-                Last activity {formatRelative(lastActivityAt)}
-              </div>
-              <div className="">{comments.length} comments</div>
-              {labelName && (
-                <span className=" pr-4 py-1 bg-neutral-50 rounded-full text-neutral-700">
-                  {labelName}
-                </span>
-              )}
-            </div>
+              </>
+            ) : (
+              <>
+                <TopicHeader topic={headerTopic} isAdmin={isAuthorAdmin} />
 
-            {/* Replies Section */}
-            <div className="mt-8">
-              <ForumThread
-                topicId={topicId}
-                initialComments={comments}
-                categoryId={categoryId}
-                adminDirectory={adminDirectory}
-              />
-            </div>
+                <div className="mt-2 mb-4 break-words">
+                  <DunaContentRenderer
+                    content={topicBody}
+                    className="text-secondary text-sm leading-relaxed break-words"
+                  />
+                </div>
+
+                {rootAttachments.length > 0 && (
+                  <PostAttachments
+                    attachments={rootAttachments}
+                    postId={rootPost?.id}
+                    postAuthor={authorAddress}
+                    categoryId={categoryId}
+                  />
+                )}
+
+                <div className="my-4">
+                  <RelatedProposalLinks proposalId={topicId.toString()} />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 lg:gap-6 text-xs font-semibold text-tertiary border-b pb-2">
+                  {rootPostId && (
+                    <div className="">
+                      <EmojiReactions
+                        targetType="post"
+                        targetId={rootPostId}
+                        initialByEmoji={topicReactionsByEmoji}
+                      />
+                    </div>
+                  )}
+                  <div className="">
+                    Last activity {formatRelative(lastActivityAt)}
+                  </div>
+                  <div className="">{comments.length} comments</div>
+                  {labelName && (
+                    <span className=" pr-4 py-1 bg-neutral-50 rounded-full text-neutral-700">
+                      {labelName}
+                    </span>
+                  )}
+                </div>
+
+                {/* Replies Section */}
+                <div className="mt-8">
+                  <ForumThread
+                    topicId={topicId}
+                    initialComments={comments}
+                    categoryId={categoryId}
+                    adminDirectory={adminDirectory}
+                  />
+                </div>
+              </>
+            )}
           </div>
 
           {/* Sidebar */}
-          <div className="w-full lg:w-auto">
+          <div className="w-full lg:w-72 xl:w-64 lg:ml-auto flex-shrink-0">
             <ForumsSidebar
               categories={categories}
               latestPost={topicData}

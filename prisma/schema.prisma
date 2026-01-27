@@ -6205,22 +6205,25 @@ model ForumCategory {
 }
 
 model ForumTopic {
-  id             Int                      @id @default(autoincrement())
-  dao_slug       DaoSlug
-  title          String
-  address        String
-  categoryId     Int?                     @map("category_id")
-  category       ForumCategory?           @relation(fields: [categoryId], references: [id])
-  postsCount     Int                      @default(0) @map("posts_count")
-  archived       Boolean                  @default(false)
-  deletedAt      DateTime?                @map("deleted_at")
-  deletedBy      String?                  @map("deleted_by")
-  isNsfw         Boolean                  @default(false) @map("is_nsfw")
-  createdAt      DateTime                 @default(now()) @map("created_at")
-  updatedAt      DateTime                 @updatedAt @map("updated_at")
-  posts          ForumPost[]
-  subscriptions  ForumTopicSubscription[]
-  viewStats      ForumTopicViewStats[]
+  id                   Int                      @id @default(autoincrement())
+  dao_slug             DaoSlug
+  title                String
+  address              String
+  categoryId           Int?                     @map("category_id")
+  category             ForumCategory?           @relation(fields: [categoryId], references: [id])
+  postsCount           Int                      @default(0) @map("posts_count")
+  archived             Boolean                  @default(false)
+  deletedAt            DateTime?                @map("deleted_at")
+  deletedBy            String?                  @map("deleted_by")
+  isNsfw               Boolean                  @default(false) @map("is_nsfw")
+  isFinancialStatement Boolean                  @default(false) @map("is_financial_statement")
+  revealTime           DateTime?                @map("reveal_time")
+  expirationTime       DateTime?                @map("expiration_time")
+  createdAt            DateTime                 @default(now()) @map("created_at")
+  updatedAt            DateTime                 @updatedAt @map("updated_at")
+  posts                ForumPost[]
+  subscriptions        ForumTopicSubscription[]
+  viewStats            ForumTopicViewStats[]
 
   @@index([dao_slug])
   @@index([dao_slug, categoryId])
@@ -6282,17 +6285,20 @@ model ForumPostReaction {
 }
 
 model ForumPostAttachment {
-  id          Int       @id @default(autoincrement())
-  dao_slug    DaoSlug
-  postId      Int       @map("post_id")
-  post        ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  ipfsCid     String    @map("ipfs_cid")
-  fileName    String?   @map("file_name")
-  contentType String?   @map("content_type")
-  fileSize    BigInt?   @map("file_size")
-  address     String?
-  archived    Boolean   @default(false) @map("archived")
-  createdAt   DateTime  @default(now()) @map("created_at")
+  id                   Int       @id @default(autoincrement())
+  dao_slug             DaoSlug
+  postId               Int       @map("post_id")
+  post                 ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  ipfsCid              String    @map("ipfs_cid")
+  fileName             String?   @map("file_name")
+  contentType          String?   @map("content_type")
+  fileSize             BigInt?   @map("file_size")
+  address              String?
+  archived             Boolean   @default(false) @map("archived")
+  isFinancialStatement Boolean  @default(false) @map("is_financial_statement")
+  revealTime           DateTime? @map("reveal_time")
+  expirationTime       DateTime? @map("expiration_time")
+  createdAt            DateTime  @default(now()) @map("created_at")
 
   @@index([dao_slug, postId])
   @@map("forum_post_attachments")
@@ -6300,17 +6306,20 @@ model ForumPostAttachment {
 }
 
 model ForumCategoryAttachment {
-  id          Int           @id @default(autoincrement())
-  dao_slug    DaoSlug
-  categoryId  Int           @map("category_id")
-  category    ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  ipfsCid     String        @map("ipfs_cid")
-  fileName    String?       @map("file_name")
-  contentType String?       @map("content_type")
-  fileSize    BigInt?       @map("file_size")
-  address     String?
-  archived    Boolean       @default(false) @map("archived")
-  createdAt   DateTime      @default(now()) @map("created_at")
+  id                   Int           @id @default(autoincrement())
+  dao_slug             DaoSlug
+  categoryId           Int           @map("category_id")
+  category             ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  ipfsCid              String        @map("ipfs_cid")
+  fileName             String?       @map("file_name")
+  contentType          String?       @map("content_type")
+  fileSize             BigInt?       @map("file_size")
+  address              String?
+  archived             Boolean       @default(false) @map("archived")
+  isFinancialStatement Boolean       @default(false) @map("is_financial_statement")
+  revealTime           DateTime?     @map("reveal_time")
+  expirationTime       DateTime?     @map("expiration_time")
+  createdAt            DateTime      @default(now()) @map("created_at")
 
   @@index([dao_slug, categoryId])
   @@map("forum_category_attachments")

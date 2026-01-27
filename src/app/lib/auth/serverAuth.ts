@@ -32,8 +32,7 @@ type SiweData = {
 export async function authenticateApiUser(
   request: NextRequest
 ): Promise<AuthInfo> {
-  const prismaModule = require("@/app/lib/prisma");
-  const prisma = prismaModule.prismaWeb2Client as PrismaClient;
+  const { prismaWeb2Client: prisma } = await import("@/app/lib/prisma");
   let authResponse: AuthInfo = await validateBearerToken(request);
 
   if (!authResponse.authenticated) {

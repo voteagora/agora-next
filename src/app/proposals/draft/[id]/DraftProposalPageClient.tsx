@@ -223,7 +223,10 @@ export default function DraftProposalPageClient({
     signIn,
   ]);
 
-  const loadedAfterJwtRef = useRef<boolean>(false);
+  const onDeleteSuccess = useCallback(() => {
+    window.location.href = "/";
+  }, []);
+
   useEffect(() => {
     const id = setInterval(async () => {
       try {
@@ -402,7 +405,10 @@ export default function DraftProposalPageClient({
                   authorAddress={draft.author_address}
                 />
               )}
-              <DeleteDraftButton proposalId={draft.id} />
+              <DeleteDraftButton
+                proposalId={draft.id}
+                onDeleteSuccess={onDeleteSuccess}
+              />
             </div>
           )}
           {isShareMode && (
